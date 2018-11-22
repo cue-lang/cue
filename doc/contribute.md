@@ -256,7 +256,7 @@ an <a href="https://cuelang.org/issues">existing one</a>.
 
 <p>
 Whether you already know what contribution to make, or you are searching for
-an idea, the <a href="https://github.com/cuelang/core/issues">issue tracker</a> is
+an idea, the <a href="https://github.com/cuelang/cue/issues">issue tracker</a> is
 always the first place to go.
 Issues are triaged to categorize them and manage the workflow.
 </p>
@@ -290,16 +290,16 @@ You can use GitHub's search functionality to find issues to help out with. Examp
 
 <ul>
 	<li>
-	Issues that need investigation: <a href="https://github.com/cuelang/core/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation"><code>is:issue is:open label:NeedsInvestigation</code></a>
+	Issues that need investigation: <a href="https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation"><code>is:issue is:open label:NeedsInvestigation</code></a>
 	</li>
 	<li>
-	Issues that need a fix: <a href="https://github.com/cuelang/core/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix"><code>is:issue is:open label:NeedsFix</code></a>
+	Issues that need a fix: <a href="https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix"><code>is:issue is:open label:NeedsFix</code></a>
 	</li>
 	<li>
-	Issues that need a fix and have a CL: <a href="https://github.com/cuelang/core/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+%22golang.org%2Fcl%22"><code>is:issue is:open label:NeedsFix "cuelang.org/cl"</code></a>
+	Issues that need a fix and have a CL: <a href="https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+%22golang.org%2Fcl%22"><code>is:issue is:open label:NeedsFix "cuelang.org/cl"</code></a>
 	</li>
 	<li>
-	Issues that need a fix and do not have a CL: <a href="https://github.com/cuelang/core/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+NOT+%22golang.org%2Fcl%22"><code>is:issue is:open label:NeedsFix NOT "cuelang.org/cl"</code></a>
+	Issues that need a fix and do not have a CL: <a href="https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+NOT+%22golang.org%2Fcl%22"><code>is:issue is:open label:NeedsFix NOT "cuelang.org/cl"</code></a>
 	</li>
 </ul>
 
@@ -882,7 +882,7 @@ outside the issue/edit/code review/submit process itself.
 Files in the CUE repository don't list author names, both to avoid clutter
 and to avoid having to keep the lists up to date.
 Instead, your name will appear in the
-<a href="https://cue.googlesource.com/core/+log">change log</a> and in the <a
+<a href="https://cue.googlesource.com/cue/+log">change log</a> and in the <a
 href="/CONTRIBUTORS"><code>CONTRIBUTORS</code></a> file and perhaps the <a
 href="/AUTHORS"><code>AUTHORS</code></a> file.
 These files are automatically generated from the commit logs periodically.

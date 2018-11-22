@@ -13,10 +13,11 @@ The CUE tooling also provides powerful integrated scripting
 aimed at improving the overall experience of putting
 configurations to good use.
 
-Features highlights:
+Some highlights:
 
 - JSON superset: get started quickly
 - convert existing YAML and JSON
+- arbitrary-precision arithmetic
 - reformatter
 - automatically simplify configurations
 - powerful scripting

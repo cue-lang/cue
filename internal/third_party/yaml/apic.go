@@ -24,8 +24,9 @@ func yaml_insert_token(parser *yaml_parser_t, pos int, token *yaml_token_t) {
 }
 
 // Create a new parser object.
-func yaml_parser_initialize(parser *yaml_parser_t) bool {
+func yaml_parser_initialize(parser *yaml_parser_t, filename string) bool {
 	*parser = yaml_parser_t{
+		filename:   filename,
 		raw_buffer: make([]byte, 0, input_raw_buffer_size),
 		buffer:     make([]byte, 0, input_buffer_size),
 	}

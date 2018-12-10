@@ -1427,6 +1427,9 @@ func yaml_parser_fetch_plain_scalar(parser *yaml_parser_t) bool {
 // Eat whitespaces and comments until the next token is found.
 func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 
+	parser.linesSinceLast = 0
+	parser.spacesSinceLast = 0
+
 	// Until the next token is not found.
 	for {
 		// Allow the BOM mark to start a line.
@@ -1448,6 +1451,7 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 
 		for parser.buffer[parser.buffer_pos] == ' ' || ((parser.flow_level > 0 || !parser.simple_key_allowed) && parser.buffer[parser.buffer_pos] == '\t') {
 			skip(parser)
+			parser.spacesSinceLast++
 			if parser.unread < 1 && !yaml_parser_update_buffer(parser, 1) {
 				return false
 			}
@@ -1455,12 +1459,19 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 
 		// Eat a comment until a line break.
 		if parser.buffer[parser.buffer_pos] == '#' {
+			rel := parser.relPos()
+			m := parser.mark
+			parser.comment_buffer = parser.comment_buffer[:0]
 			for !is_breakz(parser.buffer, parser.buffer_pos) {
+				p := parser.buffer_pos
 				skip(parser)
+				parser.comment_buffer = append(parser.comment_buffer,
+					parser.buffer[p:parser.buffer_pos]...)
 				if parser.unread < 1 && !yaml_parser_update_buffer(parser, 1) {
 					return false
 				}
 			}
+			add_comment(parser, rel, m, string(parser.comment_buffer))
 		}
 
 		// If it is a line break, eat it.
@@ -1469,6 +1480,7 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 				return false
 			}
 			skip_line(parser)
+			parser.linesSinceLast++
 
 			// In the block context, a new line may start a simple key.
 			if parser.flow_level == 0 {
@@ -1557,12 +1569,19 @@ func yaml_parser_scan_directive(parser *yaml_parser_t, token *yaml_token_t) bool
 	}
 
 	if parser.buffer[parser.buffer_pos] == '#' {
+		rel := parser.relPos()
+		m := parser.mark
+		parser.comment_buffer = parser.comment_buffer[:0]
 		for !is_breakz(parser.buffer, parser.buffer_pos) {
+			p := parser.buffer_pos
 			skip(parser)
+			parser.comment_buffer = append(parser.comment_buffer,
+				parser.buffer[p:parser.buffer_pos]...)
 			if parser.unread < 1 && !yaml_parser_update_buffer(parser, 1) {
 				return false
 			}
 		}
+		add_comment(parser, rel, m, string(parser.comment_buffer))
 	}
 
 	// Check if we are at the end of the line.
@@ -2127,12 +2146,19 @@ func yaml_parser_scan_block_scalar(parser *yaml_parser_t, token *yaml_token_t, l
 		}
 	}
 	if parser.buffer[parser.buffer_pos] == '#' {
+		rel := parser.relPos()
+		m := parser.mark
+		parser.comment_buffer = parser.comment_buffer[:0]
 		for !is_breakz(parser.buffer, parser.buffer_pos) {
+			p := parser.buffer_pos
 			skip(parser)
+			parser.comment_buffer = append(parser.comment_buffer,
+				parser.buffer[p:parser.buffer_pos]...)
 			if parser.unread < 1 && !yaml_parser_update_buffer(parser, 1) {
 				return false
 			}
 		}
+		add_comment(parser, rel, m, string(parser.comment_buffer))
 	}
 
 	// Check if we are at the end of the line.

@@ -83,7 +83,9 @@ func resolvableTag(tag string) bool {
 
 var yamlStyleFloat = regexp.MustCompile(`^[-+]?[0-9]*\.?[0-9]+([eE][-+][0-9]+)?$`)
 
-func resolve(tag string, in string) (rtag string, out interface{}) {
+func (d *decoder) resolve(n *node) (rtag string, out interface{}) {
+	tag := n.tag
+	in := n.value
 	if !resolvableTag(tag) {
 		return tag, in
 	}
@@ -106,7 +108,7 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 				}
 			}
 		}
-		failf("cannot decode %s `%s` as a %s", shortTag(rtag), in, shortTag(tag))
+		d.p.failf(n.startPos.line, "cannot decode %s `%s` as a %s", shortTag(rtag), in, shortTag(tag))
 	}()
 
 	// Any data is accepted as a !!str or !!binary.
@@ -180,7 +182,7 @@ func resolve(tag string, in string) (rtag string, out interface{}) {
 					return yaml_INT_TAG, uintv
 				}
 			} else if strings.HasPrefix(plain, "-0b") {
-				intv, err := strconv.ParseInt("-" + plain[3:], 2, 64)
+				intv, err := strconv.ParseInt("-"+plain[3:], 2, 64)
 				if err == nil {
 					if true || intv == int64(int(intv)) {
 						return yaml_INT_TAG, int(intv)

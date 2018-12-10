@@ -4,15 +4,19 @@
 //
 //   https://github.com/go-yaml/yaml
 //
-package yaml
+package yaml // import "cuelang.org/go/internal/third_party/yaml"
 
 import (
 	"errors"
 	"fmt"
 	"io"
 	"reflect"
+	"strconv"
 	"strings"
 	"sync"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 // MapSlice encodes and decodes as a YAML map.
@@ -77,16 +81,8 @@ type Marshaler interface {
 // See the documentation of Marshal for the format of tags and a list of
 // supported tag options.
 //
-func Unmarshal(in []byte, out interface{}) (err error) {
-	return unmarshal(in, out, false)
-}
-
-// UnmarshalStrict is like Unmarshal except that any fields that are found
-// in the data that do not have corresponding struct members, or mapping
-// keys that are duplicates, will result in
-// an error.
-func UnmarshalStrict(in []byte, out interface{}) (err error) {
-	return unmarshal(in, out, true)
+func Unmarshal(fset *token.FileSet, filename string, in []byte) (expr ast.Expr, err error) {
+	return unmarshal(fset, filename, in)
 }
 
 // A Decorder reads and decodes YAML values from an input stream.
@@ -99,16 +95,12 @@ type Decoder struct {
 //
 // The decoder introduces its own buffering and may read
 // data from r beyond the YAML values requested.
-func NewDecoder(r io.Reader) *Decoder {
-	return &Decoder{
-		parser: newParserFromReader(r),
+func NewDecoder(fset *token.FileSet, filename string, r io.Reader) (*Decoder, error) {
+	d, err := newParser(fset, filename, r)
+	if err != nil {
+		return nil, err
 	}
-}
-
-// SetStrict sets whether strict decoding behaviour is enabled when
-// decoding items in the data (see UnmarshalStrict). By default, decoding is not strict.
-func (dec *Decoder) SetStrict(strict bool) {
-	dec.strict = strict
+	return &Decoder{parser: d}, nil
 }
 
 // Decode reads the next YAML-encoded value from its input
@@ -116,129 +108,36 @@ func (dec *Decoder) SetStrict(strict bool) {
 //
 // See the documentation for Unmarshal for details about the
 // conversion of YAML into a Go value.
-func (dec *Decoder) Decode(v interface{}) (err error) {
-	d := newDecoder(dec.strict)
+func (dec *Decoder) Decode() (expr ast.Expr, err error) {
+	d := newDecoder(dec.parser)
 	defer handleErr(&err)
 	node := dec.parser.parse()
 	if node == nil {
-		return io.EOF
+		return nil, io.EOF
 	}
-	out := reflect.ValueOf(v)
-	if out.Kind() == reflect.Ptr && !out.IsNil() {
-		out = out.Elem()
-	}
-	d.unmarshal(node, out)
+	expr = d.unmarshal(node)
 	if len(d.terrors) > 0 {
-		return &TypeError{d.terrors}
+		return nil, &TypeError{d.terrors}
 	}
-	return nil
+	return expr, nil
 }
 
-func unmarshal(in []byte, out interface{}, strict bool) (err error) {
+func unmarshal(fset *token.FileSet, filename string, in []byte) (expr ast.Expr, err error) {
 	defer handleErr(&err)
-	d := newDecoder(strict)
-	p := newParser(in)
+	p, err := newParser(fset, filename, in)
+	if err != nil {
+		return nil, err
+	}
 	defer p.destroy()
 	node := p.parse()
+	d := newDecoder(p)
 	if node != nil {
-		v := reflect.ValueOf(out)
-		if v.Kind() == reflect.Ptr && !v.IsNil() {
-			v = v.Elem()
-		}
-		d.unmarshal(node, v)
+		expr = d.unmarshal(node)
 	}
 	if len(d.terrors) > 0 {
-		return &TypeError{d.terrors}
+		return nil, &TypeError{d.terrors}
 	}
-	return nil
-}
-
-// Marshal serializes the value provided into a YAML document. The structure
-// of the generated document will reflect the structure of the value itself.
-// Maps and pointers (to struct, string, int, etc) are accepted as the in value.
-//
-// Struct fields are only marshalled if they are exported (have an upper case
-// first letter), and are marshalled using the field name lowercased as the
-// default key. Custom keys may be defined via the "yaml" name in the field
-// tag: the content preceding the first comma is used as the key, and the
-// following comma-separated options are used to tweak the marshalling process.
-// Conflicting names result in a runtime error.
-//
-// The field tag format accepted is:
-//
-//     `(...) yaml:"[<key>][,<flag1>[,<flag2>]]" (...)`
-//
-// The following flags are currently supported:
-//
-//     omitempty    Only include the field if it's not set to the zero
-//                  value for the type or to empty slices or maps.
-//                  Zero valued structs will be omitted if all their public
-//                  fields are zero, unless they implement an IsZero
-//                  method (see the IsZeroer interface type), in which
-//                  case the field will be included if that method returns true.
-//
-//     flow         Marshal using a flow style (useful for structs,
-//                  sequences and maps).
-//
-//     inline       Inline the field, which must be a struct or a map,
-//                  causing all of its fields or keys to be processed as if
-//                  they were part of the outer struct. For maps, keys must
-//                  not conflict with the yaml keys of other struct fields.
-//
-// In addition, if the key is "-", the field is ignored.
-//
-// For example:
-//
-//     type T struct {
-//         F int `yaml:"a,omitempty"`
-//         B int
-//     }
-//     yaml.Marshal(&T{B: 2}) // Returns "b: 2\n"
-//     yaml.Marshal(&T{F: 1}} // Returns "a: 1\nb: 0\n"
-//
-func Marshal(in interface{}) (out []byte, err error) {
-	defer handleErr(&err)
-	e := newEncoder()
-	defer e.destroy()
-	e.marshalDoc("", reflect.ValueOf(in))
-	e.finish()
-	out = e.out
-	return
-}
-
-// An Encoder writes YAML values to an output stream.
-type Encoder struct {
-	encoder *encoder
-}
-
-// NewEncoder returns a new encoder that writes to w.
-// The Encoder should be closed after use to flush all data
-// to w.
-func NewEncoder(w io.Writer) *Encoder {
-	return &Encoder{
-		encoder: newEncoderWithWriter(w),
-	}
-}
-
-// Encode writes the YAML encoding of v to the stream.
-// If multiple items are encoded to the stream, the
-// second and subsequent document will be preceded
-// with a "---" document separator, but the first will not.
-//
-// See the documentation for Marshal for details about the conversion of Go
-// values to YAML.
-func (e *Encoder) Encode(v interface{}) (err error) {
-	defer handleErr(&err)
-	e.encoder.marshalDoc("", reflect.ValueOf(v))
-	return nil
-}
-
-// Close closes the encoder by writing any remaining data.
-// It does not write a stream terminating string "...".
-func (e *Encoder) Close() (err error) {
-	defer handleErr(&err)
-	e.encoder.finish()
-	return nil
+	return expr, nil
 }
 
 func handleErr(err *error) {
@@ -255,12 +154,11 @@ type yamlError struct {
 	err error
 }
 
-func fail(err error) {
-	panic(yamlError{err})
-}
-
-func failf(format string, args ...interface{}) {
-	panic(yamlError{fmt.Errorf("yaml: "+format, args...)})
+func (p *parser) failf(line int, format string, args ...interface{}) {
+	where := p.parser.filename + ":"
+	line++
+	where += strconv.Itoa(line) + ": "
+	panic(yamlError{fmt.Errorf(where+format, args...)})
 }
 
 // A TypeError is returned by Unmarshal when one or more fields in

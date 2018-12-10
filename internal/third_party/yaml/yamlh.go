@@ -3,6 +3,8 @@ package yaml
 import (
 	"fmt"
 	"io"
+
+	"cuelang.org/go/cue/token"
 )
 
 // The version directive data.
@@ -518,6 +520,29 @@ type yaml_alias_data_t struct {
 	mark   yaml_mark_t // The anchor mark.
 }
 
+type yaml_comment_t struct {
+	pos  token.RelPos
+	mark yaml_mark_t
+	text string
+}
+
+func (p *yaml_parser_t) relPos() (pos token.RelPos) {
+	switch {
+	case p.linesSinceLast > 1:
+		pos = token.NewSection
+	case p.linesSinceLast == 1:
+		pos = token.Newline
+	case p.spacesSinceLast > 0:
+		pos = token.Blank
+	default:
+		pos = token.NoSpace
+	}
+	p.linesSinceLast = 0
+	p.spacesSinceLast = 0
+	// fmt.Println("REL", pos)
+	return token.NoRelPos
+}
+
 // The parser structure.
 //
 // All members are internal. Manage the structure using the
@@ -525,6 +550,8 @@ type yaml_alias_data_t struct {
 type yaml_parser_t struct {
 
 	// Error handling
+
+	filename string
 
 	error yaml_error_type_t // Error type.
 
@@ -557,10 +584,15 @@ type yaml_parser_t struct {
 	raw_buffer     []byte // The raw buffer.
 	raw_buffer_pos int    // The current position of the buffer.
 
+	comment_buffer []byte
+
 	encoding yaml_encoding_t // The input encoding.
 
 	offset int         // The offset of the current position (in bytes).
 	mark   yaml_mark_t // The mark of the current position.
+
+	linesSinceLast  int
+	spacesSinceLast int
 
 	// Scanner stuff
 
@@ -573,6 +605,8 @@ type yaml_parser_t struct {
 	tokens_head     int            // The head of the tokens queue.
 	tokens_parsed   int            // The number of tokens fetched from the queue.
 	token_available bool           // Does the tokens queue contain a token ready for dequeueing.
+
+	comments []yaml_comment_t
 
 	indent  int   // The current indentation level.
 	indents []int // The indentation levels stack.

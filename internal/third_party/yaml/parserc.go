@@ -2,6 +2,8 @@ package yaml
 
 import (
 	"bytes"
+
+	"cuelang.org/go/cue/token"
 )
 
 // The parser implements the following grammar:
@@ -56,6 +58,14 @@ func skip_token(parser *yaml_parser_t) {
 	parser.tokens_parsed++
 	parser.stream_end_produced = parser.tokens[parser.tokens_head].typ == yaml_STREAM_END_TOKEN
 	parser.tokens_head++
+}
+
+func add_comment(parser *yaml_parser_t, p token.RelPos, m yaml_mark_t, text string) {
+	parser.comments = append(parser.comments, yaml_comment_t{
+		pos:  p,
+		mark: m,
+		text: text,
+	})
 }
 
 // Get the next event.
@@ -1010,8 +1020,7 @@ var default_tag_directives = []yaml_tag_directive_t{
 }
 
 // Parse directives.
-func yaml_parser_process_directives(parser *yaml_parser_t,
-	version_directive_ref **yaml_version_directive_t,
+func yaml_parser_process_directives(parser *yaml_parser_t, version_directive_ref **yaml_version_directive_t,
 	tag_directives_ref *[]yaml_tag_directive_t) bool {
 
 	var version_directive *yaml_version_directive_t

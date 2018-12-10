@@ -1,0 +1,163 @@
+package expressions
+
+{
+	a:   1
+	aaa: 2
+
+	b: 3
+
+	c b a:    4
+	c bb aaa: 5
+	c b <Name> a: int
+	alias = 3.14
+
+	alias2 = foo
+	aaalias = foo
+	b: bar
+
+	bottom1: _|_
+	bottom2: _|_ // converted to compact symbol
+
+	empty: {}
+	emptyNewLine: {
+
+	}
+	someObject: {
+		a:   8
+		aa:  9
+		aaa: 10
+	}
+
+	e:  1 + 2*3
+	e:  1 * 2 * 3 // error
+	e:  2..3
+	e:  2..(3 + 4)
+	ex: 2..3 + 4*5
+	e:  (2..3)..4
+	e:  1 + 2 + 3 // error
+
+	e: s[1+2]
+	e: s[1:2]
+	e: s[1+2 : 2+4]
+	e: s[2]
+	e: s[2*3]
+	e: s[1+2*3]
+
+	e: f(3 + 4 + 5)
+	e: f(3 * 4 * 5)
+	e: f(3 + 4*5)
+
+	e: f(3 + 4 div 5)
+
+	e: 3 < 4 && 5 > 4
+	e: a || b && c || d
+
+	e: a + +b*3
+	e: -a - -b
+
+	e: b + c
+	e: b*c + d
+	e: a*b + c
+	e: a - b - c
+	e: a - (b - c)
+	e: a - b*c
+	e: a - (b * c)
+	e: a * b / c
+	e: a div b + 5
+	e: a / b
+	e: x[a | b]
+	e: x[a/b]
+	e: a & b
+	e: a + +b
+	e: a - -b
+	e: a div -b
+	e: x[a*-b]
+	e: x[a + +b]
+	e: len(longVariableName) * 2
+
+	e: "\(a)"
+	e: 'aa \(aaa) aa'
+	e: "aa \(aaa)"
+
+	e: [1, 2]
+	e: [1, 2, 3, 4,
+		5, 6, 7, 8]
+	e: [1, 2, 3, 4,
+		5, 6, 7, 8, // maybe force additional comma
+	]
+	e: [...]
+	e: [
+		...]
+	e: [...
+	]
+	e: [1, 2, ...]
+	e: [1, 2,
+		...]
+	e: [...int]
+	e: [...int]
+	e: [...int | float]
+	e: [ x for x in someObject if x > 9 ]
+	e: [ x
+		for x in someObject
+		if x > 9 ]
+	e: [ x
+		for x in someObject
+		if x > 9
+	]
+
+	[k]: v for k, v in someObject
+	[k]: v <-
+		for k, v in someObject
+
+	e: {[k]: v <-
+			for k, v in someObject
+			if k > "a"
+	}
+
+	e: {[k]: v for k, v in someObject if k > "a"}
+	e: {[k]: v <-
+			for k, v in someObject if k > "a"}
+
+	e: {[k]: v <-
+			for k, v in someObject
+			if k > "a"}
+
+	e: [{
+		a: 1, b: 2
+	}]
+
+	e: [{
+		a: 1, b: 2
+	},
+	]
+
+	e: [{
+		a: 1, b: 2
+	}, {
+		c: 1, d: 2
+	}]
+
+	e: [{
+		a: 1, b: 2
+	},
+		3,
+		4,
+	]
+
+	e: (a, b) -> a + b
+	e: (a,
+		b) -> a + b
+	e: (a, b) -> {
+		a: b
+	}
+	e: (a,
+		b,
+	) ->
+	{
+		a: b
+	}
+
+	e: e.f(1, 2)
+
+	e: (3 + 4)
+}

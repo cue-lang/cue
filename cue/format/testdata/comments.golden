@@ -1,0 +1,19 @@
+// Package line 1 group 1
+// Package line 2 group 1
+
+// Package line 1 - group 2
+// Package line 2 - group 2
+package comments
+
+// Emit line 1 group 1
+
+// Emit line 1 group 2
+// Emit line 2 group 2
+{
+	// Inside Emit
+}
+
+a: 3 // a line comment
+
+b:  4   // line comment that is last in the file.
+cc: 555 // align comments

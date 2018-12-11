@@ -12,17 +12,18 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pkg define CUE builtin packages.
+// Package pkg define CUE standard packages.
 //
-// The CUE core packages are different, but closely mimic the Go core packages.
-// The types, values, and functions are defined as their Go equivalence and
-// mapped to CUE types.
+// Many of the standard packages are modeled after and generated from the Go
+// core packages. The types, values, and functions are defined as their Go
+// equivalence and mapped to CUE types.
 //
 // Beware that some packages are defined in lesser-precision types than are
 // typically used in CUE and thus may lead to loss of precision.
 //
-// All packages in these subdirectories are hermetic. That is, the results
-// do not change based on environment conditions. That is:
+// All packages except those defined in the tool subdirectory are hermetic,
+// that is depending only on a known set of inputs, and therefore can guarantee
+// reproducible results.  That is:
 //
 //   - no reading of files contents
 //   - no querying of the file system of any kind
@@ -31,6 +32,7 @@
 //   - only reproduceable random generators
 //
 // Hermetic configurations allow for fast and advanced analysis that otherwise
-// would not be possible or practical. The cue "cmd" command can be used to
-// mix in non-hermetic influences into configurations.
+// would not be possible or practical. The cue "cmd" command can be used to mix
+// in non-hermetic influences into configurations by using packages defined
+// in the tool subdirectory.
 package pkg

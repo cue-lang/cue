@@ -1,0 +1,19 @@
+import _json "encoding/json"
+
+service: {
+	booster: [{
+		kind: "Service"
+		name: "booster"
+	}]
+	supplement: [{
+		kind: "Service"
+		name: "supplement"
+		json: _json.Marshal(cue_json)
+		cue_json = [1, 2]
+	}]
+}
+deployment booster: [{
+	kind:     "Deployment"
+	name:     "booster"
+	replicas: 1
+}]

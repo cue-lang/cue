@@ -1,0 +1,15 @@
+
+service booster: {
+	kind: "Service"
+	name: "booster"
+}
+deployment booster: {
+	kind:     "Deployment"
+	name:     "booster"
+	replicas: 1
+}
+service supplement: {
+	kind: "Service"
+	name: "supplement"
+	json: "[1, 2]"
+}

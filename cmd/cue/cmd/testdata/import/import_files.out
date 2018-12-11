@@ -1,0 +1,8 @@
+kind: "Service"
+name: "booster"
+kind:     "Deployment"
+name:     "booster"
+replicas: 1
+kind: "Service"
+name: "supplement"
+json: "[1, 2]"

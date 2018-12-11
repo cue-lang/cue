@@ -18,3 +18,14 @@ package internal // import "cuelang.org/go/internal"
 
 // DebugStr prints a syntax node.
 var DebugStr func(x interface{}) string
+
+// EvalExpr evaluates an expression within an existing struct value.
+// Identifiers only resolve to values defined within the struct.
+//
+// Expressions may refer to builtin packages if they can be uniquely identified
+//
+// Both value and result are of type cue.Value, but are an interface to prevent
+// cyclic dependencies.
+//
+// TODO: extract interface
+var EvalExpr func(value, expr interface{}) (result interface{})

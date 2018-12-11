@@ -145,6 +145,14 @@ func TestExport(t *testing.T) {
 				a: 0..10
 				b: "Count: \(a) times"
 			}`),
+	}, {
+		raw: true,
+		in:  `{ a: "", b: len(a) }`,
+		out: unindent(`
+				{
+					a: ""
+					b: len(a)
+				}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

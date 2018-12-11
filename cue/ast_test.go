@@ -19,6 +19,8 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
 
 func TestCompile(t *testing.T) {
@@ -281,6 +283,73 @@ func TestEmit(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			ctx, root := compileFile(t, tc.in)
 			v := testResolve(ctx, root.emit, tc.rw)
+			if got := debugStr(ctx, v); got != tc.out {
+				t.Errorf("output differs:\ngot  %q\nwant %q", got, tc.out)
+			}
+		})
+	}
+}
+
+func TestEval(t *testing.T) {
+	testCases := []struct {
+		in   string
+		expr string
+		out  string
+	}{{
+		in: `
+			hello: "Hello"
+			world: "World"
+			`,
+		expr: `"\(hello), \(world)!"`,
+		out:  `"Hello, World!"`,
+	}, {
+		in: `
+			a: { b: 2, c: 3 }
+			z: 1
+			`,
+		expr: `a.b + a.c + z`,
+		out:  `6`,
+	}, {
+		in: `
+			a: { b: 2, c: 3 }
+			`,
+		expr: `{ d: a.b + a.c }`,
+		out:  `<0>{d: 5}`,
+	}, {
+		in: `
+			a: "Hello World!"
+			`,
+		expr: `strings.ToUpper(a)`,
+		out:  `"HELLO WORLD!"`,
+	}, {
+		in: `
+			a: 0x8
+			b: 0x1`,
+		expr: `bits.Or(a, b)`, // package shorthand
+		out:  `9`,
+	}, {
+		in: `
+			a: 0x8
+			b: 0x1`,
+		expr: `math.Or(a, b)`,
+		out:  `_|_(<0>.Or:undefined field "Or")`,
+	}, {
+		in:   `a: 0x8`,
+		expr: `mathematics.Abs(a)`,
+		out:  `_|_(reference "mathematics" not found)`,
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			ctx, inst, errs := compileInstance(t, tc.in)
+			if errs != nil {
+				t.Fatal(errs)
+			}
+			expr, err := parser.ParseExpr(token.NewFileSet(), "<test>", tc.expr)
+			if err != nil {
+				t.Fatal(err)
+			}
+			evaluated := inst.evalExpr(ctx, expr)
+			v := testResolve(ctx, evaluated, evalFull)
 			if got := debugStr(ctx, v); got != tc.out {
 				t.Errorf("output differs:\ngot  %q\nwant %q", got, tc.out)
 			}

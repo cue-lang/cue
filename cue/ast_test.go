@@ -204,20 +204,20 @@ func TestCompile(t *testing.T) {
 		out: `<0>{a: <1>{<>: <2>(name: string)-><3>{n: <2>.name}, k: 1}, b: <4>{<>: <5>(x: string)-><6>{x: 0, y: 1}, v: <7>{}}}`,
 	}, {
 		in: `
-		a: { [k]: v for k, v in b if b.a < k }
+		a: { "\(k)": v for k, v in b if b.a < k }
 		b: {
 			a: 1
 			b: 2
 			c: 3
 		}
 		`,
-		out: `<0>{a: { <1>for k, v in <0>.b if (<0>.b.a < <1>.k) yield (<1>.k): <1>.v }, b: <2>{a: 1, b: 2, c: 3}}`,
+		out: `<0>{a: { <1>for k, v in <0>.b if (<0>.b.a < <1>.k) yield (""+<1>.k+""): <1>.v }, b: <2>{a: 1, b: 2, c: 3}}`,
 	}, {
 		in: `
-			a: { [v]: v for k, v in b }
+			a: { "\(v)": v for k, v in b }
 			b: { a: "aa", b: "bb", c: "cc" }
 			`,
-		out: `<0>{a: { <1>for k, v in <0>.b yield (<1>.v): <1>.v }, b: <2>{a: "aa", b: "bb", c: "cc"}}`,
+		out: `<0>{a: { <1>for k, v in <0>.b yield (""+<1>.v+""): <1>.v }, b: <2>{a: "aa", b: "bb", c: "cc"}}`,
 	}, {
 		in: `
 			a: [ v for _, v in b ]

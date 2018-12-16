@@ -272,11 +272,6 @@ func (f *formatter) label(l ast.Label) {
 	case *ast.Interpolation:
 		f.expr(n)
 
-	case *ast.ExprLabel:
-		f.print(n.Lbrack, token.LBRACK, indent)
-		f.expr(n.Label)
-		f.print(unindent, n.Rbrack, token.RBRACK)
-
 	default:
 		panic(fmt.Sprintf("unknown label type %T", n))
 	}

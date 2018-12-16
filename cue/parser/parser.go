@@ -884,19 +884,6 @@ func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
 		c.closeNode(p, label)
 		f.Label = label
 
-	case token.LBRACK:
-		expr = p.parseList()
-		list, ok := expr.(*ast.ListLit)
-		if ok && len(list.Elts) == 1 && list.Ellipsis == token.NoPos {
-			f.Label = &ast.ExprLabel{
-				Lbrack: list.Lbrack,
-				Label:  list.Elts[0],
-				Rbrack: list.Rbrack,
-			}
-			break
-		}
-
-		fallthrough
 	default:
 		return expr, false
 	}
@@ -1235,8 +1222,9 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	cc := p.openComments()
 
 	lit := p.lit
+	pos := p.pos
 	p.next()
-	last := &ast.BasicLit{ValuePos: p.pos, Kind: token.STRING, Value: lit}
+	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
 
 	quote := rune(lit[0])
@@ -1257,9 +1245,10 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 			p.error(p.pos, "expected ')' for string interpolation")
 		}
 		lit = p.scanner.ResumeInterpolation(quote, numQuotes)
+		pos = p.pos
 		p.next()
 		last = &ast.BasicLit{
-			ValuePos: p.pos,
+			ValuePos: pos,
 			Kind:     token.STRING,
 			Value:    lit,
 		}

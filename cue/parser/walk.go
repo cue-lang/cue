@@ -102,9 +102,6 @@ func walk(v visitor, node ast.Node) {
 	case *ast.BottomLit, *ast.BadExpr, *ast.Ident, *ast.BasicLit:
 		// nothing to do
 
-	case *ast.ExprLabel:
-		walk(v, n.Label)
-
 	case *ast.TemplateLabel:
 		walk(v, n.Ident)
 

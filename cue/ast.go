@@ -218,10 +218,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			yielder.key = v.walk(x)
 			yielder.value = v.walk(field.Value)
 
-		case *ast.ExprLabel:
-			yielder.key = v.walk(x.Label)
-			yielder.value = v.walk(field.Value)
-
 		case *ast.TemplateLabel:
 			f := v.label(x.Ident.Name, true)
 
@@ -260,16 +256,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				clauses:   yielder,
 			}
 			yielder.key = v.walk(x)
-			yielder.value = v.walk(n.Value)
-			v.comprehensions = append(v.comprehensions, sc)
-
-		case *ast.ExprLabel:
-			yielder := &yield{baseValue: newNode(x.Label)}
-			sc := &structComprehension{
-				baseValue: newDecl(n),
-				clauses:   yielder,
-			}
-			yielder.key = v.walk(x.Label)
 			yielder.value = v.walk(n.Value)
 			v.comprehensions = append(v.comprehensions, sc)
 
@@ -331,8 +317,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		// we don't support key for lists (yet?)
 		yielder.value = v.walk(n.Expr)
 		return lc
-
-	case *ast.ExprLabel:
 
 	// Expressions
 	case *ast.Ident:

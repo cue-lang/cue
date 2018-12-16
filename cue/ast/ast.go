@@ -120,17 +120,11 @@ func (n *TemplateLabel) labelName() (string, bool) {
 func (n *Interpolation) labelName() (string, bool) {
 	return "", false
 }
-func (n *ExprLabel) labelName() (string, bool) {
-	return "", false
-}
 
 // LabelName reports the name of a label, if known, and whether it is valid.
 func LabelName(x Label) (name string, ok bool) {
 	return x.labelName()
 }
-
-// As for now, a ExprLabel is not a label, as it can only use used in
-// struct comprehensions.
 
 // Clause nodes are part of comprehensions.
 type Clause interface {
@@ -375,14 +369,6 @@ type TemplateLabel struct {
 	Rangle token.Pos
 }
 
-// An ExprLabel is an expression to create a label in struct comprehensions.
-type ExprLabel struct {
-	comments
-	Lbrack token.Pos
-	Label  Expr
-	Rbrack token.Pos
-}
-
 // An Ellipsis node stands for the "..." type in a
 // parameter list or the "..." length in an array type.
 type Ellipsis struct {
@@ -515,7 +501,6 @@ type BinaryExpr struct {
 func (x *BadExpr) Pos() token.Pos       { return x.From }
 func (x *Ident) Pos() token.Pos         { return x.NamePos }
 func (x *TemplateLabel) Pos() token.Pos { return x.Langle }
-func (x *ExprLabel) Pos() token.Pos     { return x.Lbrack }
 func (x *Ellipsis) Pos() token.Pos      { return x.Ellipsis }
 func (x *BasicLit) Pos() token.Pos      { return x.ValuePos }
 func (x *Interpolation) Pos() token.Pos { return x.Elts[0].Pos() }
@@ -544,7 +529,6 @@ func (x *Ident) End() token.Pos {
 	return x.NamePos.Add(len(x.Name))
 }
 func (x *TemplateLabel) End() token.Pos { return x.Rangle }
-func (x *ExprLabel) End() token.Pos     { return x.Rbrack }
 func (x *Ellipsis) End() token.Pos {
 	if x.Elt != nil {
 		return x.Elt.End()

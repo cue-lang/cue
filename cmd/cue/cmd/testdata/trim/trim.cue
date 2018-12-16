@@ -7,7 +7,7 @@ foo <Name>: {
 	b: string
 	d: 8
 	e: "foo"
-	f: ">> \( _value ) <<"
+	f: ">> \( _value) <<"
 	n: 5
 
 	list: ["foo", 8.0]
@@ -62,7 +62,7 @@ foo multipath: {
 
 // TODO: top-level fields are currently not removed.
 group: {
-	comp [k]: v for k, v in foo
+	comp "\(k)": v for k, v in foo
 
 	comp bar: {
 		a:  4

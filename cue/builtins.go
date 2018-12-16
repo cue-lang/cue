@@ -8,14 +8,10 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
-	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/third_party/yaml"
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	goyaml "github.com/ghodss/yaml"
 	"html"
 	"io"
 	"math"
@@ -28,6 +24,11 @@ import (
 	"text/tabwriter"
 	"text/template"
 	"unicode"
+
+	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/third_party/yaml"
+	goyaml "github.com/ghodss/yaml"
 )
 
 func init() {

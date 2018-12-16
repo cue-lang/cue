@@ -567,7 +567,7 @@ func TestFields(t *testing.T) {
 		value: `{_a:"a"}`,
 		res:   "{}",
 	}, {
-		value: `{[k]: v for k, v in y if v > 1}
+		value: `{"\(k)": v for k, v in y if v > 1}
 		y: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
 	}, {
@@ -835,7 +835,7 @@ func TestDecode(t *testing.T) {
 		dst:   &fields{},
 		want:  &fields{A: 1, B: 2, C: 3},
 	}, {
-		value: `{[k]: v for k, v in y if v > 1}
+		value: `{"\(k)": v for k, v in y if v > 1}
 		y: {a:1,b:2,c:3}`,
 		dst:  &fields{},
 		want: &fields{B: 2, C: 3},

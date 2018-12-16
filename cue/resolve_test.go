@@ -998,7 +998,7 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "resolutions in struct comprehension keys",
 		in: `
-			a: { [b + "."]: "a" for _, b in ["c"] }
+			a: { "\(b + ".")": "a" for _, b in ["c"] }
 			`,
 		out: `<0>{a: <1>{c.: "a"}}`,
 	}, {

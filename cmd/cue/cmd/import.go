@@ -405,21 +405,6 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 				case *ast.Ident, *ast.BasicLit:
 					pathElems = append(pathElems, x)
 
-				case *ast.ExprLabel:
-					v := inst.Eval(x.Label)
-					switch v.Kind() {
-					case cue.StringKind:
-						pathElems = append(pathElems, v.Syntax().(ast.Label))
-					case cue.NullKind,
-						cue.NumberKind,
-						cue.BoolKind:
-						pathElems = append(pathElems, newString(fmt.Sprint(v)))
-					case cue.BottomKind:
-						return v.Err()
-					default:
-						return fmt.Errorf("expression %q in path is not a label", internal.DebugStr(v.Syntax()))
-					}
-
 				case *ast.TemplateLabel:
 					return fmt.Errorf("template labels not supported in path flag")
 				}

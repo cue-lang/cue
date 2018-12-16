@@ -120,8 +120,6 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		switch label := x.Label.(type) {
 		case *ast.Interpolation:
 			walk(s, label)
-		case *ast.ExprLabel:
-			walk(s, x.Label)
 		case *ast.TemplateLabel:
 			s := newScope(s.file, s, x, nil)
 			name, _ := ast.LabelName(label)

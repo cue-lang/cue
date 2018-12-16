@@ -156,12 +156,6 @@ func debugStr(x interface{}) (out string) {
 	case *ast.Ident:
 		return v.Name
 
-	case *ast.ExprLabel:
-		out := "["
-		out += debugStr(v.Label)
-		out += "]"
-		return out
-
 	case *ast.TemplateLabel:
 		out := "<"
 		out += debugStr(v.Ident)

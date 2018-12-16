@@ -54,6 +54,7 @@ func readSource(filename string, src interface{}) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
 
+// Option specifies a parse option.
 type Option func(p *parser)
 
 var (

@@ -103,21 +103,21 @@ package expressions
     for x in someObject
     if x > 9
     ]
+    "\(k)": v for k, v in someObject
 
-    [k]: v for k, v in someObject
-    [k]: v <-
+    "\(k)": v <-
     for k, v in someObject
 
-    e: { [k]:v <-
+    e: { "\(k)":v <-
     for k, v in someObject
     if k > "a"
     }
 
-    e: { [k]:v for k, v in someObject if k > "a"}
-    e: { [k]:v <-
+    e: { "\(k)":v for k, v in someObject if k > "a"}
+    e: { "\(k)":v <-
     for k, v in someObject if k > "a"}
     
-    e: { [k]:v <-
+    e: { "\(k)":v <-
     for k, v in someObject
     if k > "a"}
 

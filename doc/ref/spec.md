@@ -1,3 +1,19 @@
+<!--
+ Copyright 2018 The CUE Authors
+
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
+-->
+
 # The CUE Language Specification
 
 ## Introduction
@@ -259,7 +275,7 @@ div  mod   quo   rem   _|_   <-   ,
 ```
 Optional:
 ```
-->   ⊥
+->   _|_
 ```
 
 
@@ -568,10 +584,10 @@ true  ⊑ bool
 true  ⊑ true
 5     ⊑ int
 bool  ⊑ _
-⊥     ⊑ _
-⊥     ⊑ ⊥
+_|_     ⊑ _
+_|_     ⊑ _|_
 
-_     ⋢ ⊥
+_     ⋢ _|_
 _     ⋢ bool
 int   ⋢ bool
 bool  ⋢ int
@@ -653,7 +669,7 @@ Expression                       Default
 
 ### Bottom and errors
 Any evaluation error in CUE results in a bottom value, respresented by
-the identifier '⊥' or token '_|_', the latter mostly used for user input.
+the token '_|_'.
 Bottom is an instance of every other prototype.
 Any evaluation error is represented as bottom.
 
@@ -694,7 +710,7 @@ null_lit   = "null"
 ```
 
 ```
-null & 8     ⊥
+null & 8     _|_
 ```
 
 
@@ -714,7 +730,7 @@ bool & true       true
 bool | true       true
 true | false      true | false
 true & true       true
-true & false      ⊥
+true & false      _|_
 ```
 
 
@@ -791,8 +807,8 @@ Remember that an integer literal represents both an `int` and `float`:
 ```
 2   & 1..5          // 2,  where 2 is either an int or float.
 2.5 & 1..5          // 2.5
-2.5 & int & 1..5    // ⊥
-2.5 & (int & 1)..5  // ⊥
+2.5 & int & 1..5    // _|_
+2.5 & (int & 1)..5  // _|_
 2.5 & float & 1..5  // 2.5
 0..7 & 3..10        // 3..7
 ```
@@ -868,7 +884,7 @@ Expression                  Result
 {a: 1} & {b: 2}              {a: 1, b: 2}
 {a: 1, b: int} & {b: 2}      {a: 1, b: 2}
 
-{a: 1} & {a: 2}              ⊥
+{a: 1} & {a: 2}              _|_
 ```
 
 A struct literal may, besides fields, also define aliases.
@@ -1226,7 +1242,7 @@ T: {
 
 a: T.x  // int
 b: T.y  // 3
-c: T.z  // ⊥ // field 'z' not found in T
+c: T.z  // _|_ // field 'z' not found in T
 ```
 
 
@@ -1266,13 +1282,13 @@ for `a` of struct type:
 
 ```
 [ 1, 2 ][1]     // 2
-[ 1, 2 ][2]     // ⊥
+[ 1, 2 ][2]     // _|_
 "He\u0300?"[0]  // "H"
 "He\u0300?"[1]  // "e\u0300"
 "He\u0300?"[2]  // "e\u0300"
 "He\u0300?"[3]  // "e\u0300"
 "He\u0300?"[4]  // "?"
-"He\u0300?"[5]  // ⊥
+"He\u0300?"[5]  // _|_
 ```
 
 
@@ -1695,7 +1711,7 @@ For the conversion of numeric values, the following rules apply:
 
 ```
 a: uint16(int(1000))  // uint16(1000)
-b: uint8(1000)        // ⊥ // overflow
+b: uint8(1000)        // _|_ // overflow
 c: int(2.5)           // 2  TODO: TBD
 ```
 
@@ -1768,8 +1784,8 @@ x1: {
 }
 
 c1: T(x1)             // { a: { b: 8 } }
-c2: T({})             // ⊥  // missing field 'a' in '{}'
-c3: T({ a: {b: 0} })  // ⊥  // field a.b does not unify (0 & 1..10)
+c2: T({})             // _|_  // missing field 'a' in '{}'
+c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 ```
 
 
@@ -2236,7 +2252,7 @@ of constraints within the partial order of all values.
 > The unification of two constraint structures is evaluated as defined above.
 > All other functions are evaluated according to the definitions found earlier
 > in this spec.
-> An error is indicated by `⊥`.
+> An error is indicated by `_|_`.
 
 #### Definition of well-formedness
 
@@ -2445,8 +2461,8 @@ adding the expression `a == b` to the list of assertions.
 ```
 // Config            Evaluates to
 x: {                  x: {
-    a: b + 100            a: ⊥ // cycle detected
-    b: a - 100            b: ⊥ // cycle detected
+    a: b + 100            a: _|_ // cycle detected
+    b: a - 100            b: _|_ // cycle detected
 }                     }
 
 y: x & {              y: {

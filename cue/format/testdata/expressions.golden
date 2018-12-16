@@ -15,8 +15,7 @@ package expressions
 	aaalias = foo
 	b: bar
 
-	bottom1: _|_
-	bottom2: _|_ // converted to compact symbol
+	bottom: _|_
 
 	empty: {}
 	emptyNewLine: {

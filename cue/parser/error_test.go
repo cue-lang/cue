@@ -168,7 +168,7 @@ func checkErrors(t *testing.T, filename string, input interface{}) {
 	}
 
 	fset := token.NewFileSet()
-	_, err = ParseFile(fset, filename, src, DeclarationErrors, AllErrors, ParseLambdas)
+	_, err = ParseFile(fset, filename, src, DeclarationErrors, AllErrors)
 	found, ok := err.(errors.List)
 	if err != nil && !ok {
 		t.Error(err)

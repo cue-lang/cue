@@ -152,18 +152,6 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		walk(s, x.X)
 		return nil
 
-	case *ast.LambdaExpr:
-		s = newScope(s.file, s, x, nil)
-		for _, p := range x.Params {
-			name, _ := ast.LabelName(p.Label)
-			s.insert(name, p)
-			if p.Value == nil {
-				// TODO: make this optional
-				p.Value = ast.NewIdent("_")
-				s.insert(name, p)
-			}
-		}
-
 	case *ast.Ident:
 		if obj, node := s.lookup(x.Name); node != nil {
 			x.Node = node

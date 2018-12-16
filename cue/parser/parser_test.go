@@ -161,13 +161,6 @@ func TestParse(t *testing.T) {
 		}`,
 		`{a: b[2], b: c[1:2], c: "asdf", d: c["a"]}`,
 	}, {
-		"lambdas",
-		`{
-			a(P, Q, r: R) -> { p: P, q: Q }
-			b:             a(4002, "s")
-		}`,
-		`{a: (P: _,Q: _,r: R,) -> {p: P, q: Q}, b: a(4002, "s")}`, // c(C): {d(D): {}}}`,
-	}, {
 		"calls",
 		`{
 			a: b(a.b, c.d)
@@ -292,25 +285,8 @@ func TestParse(t *testing.T) {
 		a: 2 +  // 2 +
 		   3 +  // 3 +
 		   4    // 4
-		l1(     // sig
-		  ) ->  // arrow
-		   4    // expr
-		l2(a // la
-			) -> // arrow
-			a // l2
-		l3(
-			// param a
-			a : // la
-
-			// int
-			int // lint
-			 ) ->  // larrow
-			a + 1
 		   `,
-		"<[l4// 4] a: <[l2// 3 +] <[l2// 2 +] 2+3>+4>>, " +
-			"<[l4// expr] l1: <[l1// sig] [l4// arrow] () -> 4>>, " +
-			"<[l4// l2] l2: <[l4// arrow] (<[l1// la] a: _>,) -> a>>, " +
-			"l3: <[l4// larrow] (<[l1// la] [l3// lint] <[d0// param a] a>: <[d0// int] int>>,) -> a+1>",
+		"<[l4// 4] a: <[l2// 3 +] <[l2// 2 +] 2+3>+4>>",
 	}, {
 		"composit comments",
 		`a : {
@@ -360,7 +336,7 @@ func TestParse(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
 			fset := token.NewFileSet()
-			mode := []Option{AllErrors, ParseLambdas}
+			mode := []Option{AllErrors}
 			if strings.Contains(tc.desc, "comments") {
 				mode = append(mode, ParseComments)
 			}

@@ -21,7 +21,6 @@ import "testing"
 var valids = []string{
 	"\n",
 	`{}`,
-	`{ foo: "fmt", bar: () -> { baz: fmt.Service("Hello, World!") }, }`,
 	`{ <Name>: foo }`,
 	`{ a: 3 }`,
 }

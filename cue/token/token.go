@@ -61,13 +61,12 @@ const (
 	LAND // &&
 	LOR  // ||
 
-	BIND   // =
-	EQL    // ==
-	LSS    // <
-	GTR    // >
-	NOT    // !
-	ARROW  // <-
-	LAMBDA // ->
+	BIND  // =
+	EQL   // ==
+	LSS   // <
+	GTR   // >
+	NOT   // !
+	ARROW // <-
 
 	NEQ // !=
 	LEQ // <=
@@ -133,13 +132,12 @@ var tokens = [...]string{
 	LAND: "&&",
 	LOR:  "||",
 
-	BIND:   "=",
-	EQL:    "==",
-	LSS:    "<",
-	GTR:    ">",
-	NOT:    "!",
-	ARROW:  "<-",
-	LAMBDA: "->",
+	BIND:  "=",
+	EQL:   "==",
+	LSS:   "<",
+	GTR:   ">",
+	NOT:   "!",
+	ARROW: "<-",
 
 	NEQ: "!=",
 	LEQ: "<=",

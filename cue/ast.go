@@ -291,23 +291,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 	case *ast.Alias:
 		// parsed verbatim at reference.
 
-	case *ast.LambdaExpr:
-		sig := &params{}
-		lambda := &lambdaExpr{newExpr(n), sig, nil}
-		v.setScope(n, lambda)
-
-		for _, p := range n.Params {
-			f, _ := v.nodeLabel(p.Label)
-			if p.Value != nil {
-				sig.add(f, v.walk(p.Value))
-			} else {
-				src := &ast.Ident{NamePos: p.Pos(), Name: "_"}
-				sig.add(f, &top{baseValue: newExpr(src)})
-			}
-		}
-		lambda.value = v.walk(n.Expr)
-		return lambda
-
 	case *ast.ListComprehension:
 		yielder := &yield{baseValue: newExpr(n.Expr)}
 		lc := &listComprehension{

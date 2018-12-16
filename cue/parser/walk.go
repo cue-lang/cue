@@ -87,12 +87,6 @@ func walk(v visitor, node ast.Node) {
 			walk(v, n.Value)
 		}
 
-	case *ast.LambdaExpr:
-		for _, p := range n.Params {
-			walk(v, p)
-		}
-		walk(v, n.Expr)
-
 	case *ast.StructLit:
 		for _, f := range n.Elts {
 			walk(v, f)

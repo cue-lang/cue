@@ -964,9 +964,6 @@ func TestMashalJSON(t *testing.T) {
 		a: {}`,
 		err: "undefined field",
 	}, {
-		value: `((a)->a)`,
-		err:   "cannot convert value",
-	}, {
 		value: `true`,
 		json:  `true`,
 	}, {

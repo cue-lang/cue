@@ -62,7 +62,6 @@ func (*BasicLit) exprNode()      {}
 func (*Interpolation) exprNode() {}
 func (*StructLit) exprNode()     {}
 func (*ListLit) exprNode()       {}
-func (*LambdaExpr) exprNode()    {}
 
 // func (*StructComprehension) exprNode() {}
 func (*ListComprehension) exprNode() {}
@@ -271,8 +270,7 @@ type Field struct {
 	comments
 	Label Label // must have at least one element.
 
-	// No colon: Value must be an StructLit with one field or a
-	// LambdaExpr.
+	// No colon: Value must be an StructLit with one field.
 	Colon token.Pos
 	Value Expr // the value associated with this field.
 }
@@ -312,24 +310,6 @@ func (x *ComprehensionDecl) End() token.Pos {
 //
 // An expression is represented by a tree consisting of one
 // or more of the following concrete expression nodes.
-
-// A LambdaExpr defines a function expression.
-//
-// Lambdas are only used internally under controlled conditions. Although
-// the implementation of lambdas is fully functional, enabling them will
-// cause the language to be Turing-complete (if not otherwise limited).
-// Also, lambdas would provide yet another way to create structure, and one
-// that is known to not work well for declarative configuration languages.
-type LambdaExpr struct {
-	comments
-	Lparen token.Pos // position of "("
-	Params []*Field  // parameters with possible initializers
-	Rparen token.Pos // position of ")"
-	Expr   Expr
-}
-
-func (t *LambdaExpr) Pos() token.Pos { return t.Lparen }
-func (t *LambdaExpr) End() token.Pos { return t.Rparen }
 
 // A BadExpr node is a placeholder for expressions containing
 // syntax errors for which no correct expression nodes can be

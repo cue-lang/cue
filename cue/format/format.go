@@ -85,8 +85,7 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 		cfg.fset = token.NewFileSet()
 	}
 
-	f, err := parser.ParseFile(cfg.fset, "", b,
-		parser.ParseComments, parser.ParseLambdas)
+	f, err := parser.ParseFile(cfg.fset, "", b, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %s", err)
 	}

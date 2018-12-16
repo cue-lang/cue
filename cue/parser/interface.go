@@ -76,15 +76,6 @@ var (
 		p.mode |= parseCommentsMode
 	}
 
-	// ParseLambdas enables parsing of Lambdas. By default these are disabled.
-	//
-	// NOTE: this option is for internal use only and can be made unavailable at
-	// any time.
-	ParseLambdas Option = parseLambdas
-	parseLambdas        = func(p *parser) {
-		p.mode |= parseLambdasMode
-	}
-
 	// Trace causes parsing to print a trace of parsed productions.
 	Trace    Option = traceOpt
 	traceOpt        = func(p *parser) {
@@ -119,7 +110,6 @@ const (
 	packageClauseOnlyMode mode = 1 << iota // stop parsing after package clause
 	importsOnlyMode                        // stop parsing after import declarations
 	parseCommentsMode                      // parse comments and add them to AST
-	parseLambdasMode
 	partialMode
 	traceMode             // print a trace of parsed productions
 	declarationErrorsMode // report declaration errors

@@ -143,16 +143,6 @@ func debugStr(x interface{}) (out string) {
 		}
 		return out
 
-	case *ast.LambdaExpr:
-		out := "("
-		for _, m := range v.Params {
-			out += debugStr(m)
-			out += ","
-		}
-		out += ") -> "
-		out += debugStr(v.Expr)
-		return out
-
 	case *ast.Ident:
 		return v.Name
 

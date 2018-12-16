@@ -137,8 +137,7 @@ func TestSubsume(t *testing.T) {
 		65: {subsumes: true, in: `a: {}, b: {a: 1}`},
 		66: {subsumes: true, in: `a: {a:1}, b: {a:1, b:1}`},
 		67: {subsumes: true, in: `a: {s: { a:1} }, b: { s: { a:1, b:2 }}`},
-		// TODO: allow subsumption of unevaluated values?
-		68: {subsumes: true, in: `a: {}, b: c(), c: () -> {}`},
+		68: {subsumes: true, in: `a: {}, b: {}`},
 		// TODO: allow subsumption of unevaluated values?
 		// ref not yet evaluated and not structurally equivalent
 		69: {subsumes: true, in: `a: {}, b: {} & c, c: {}`},
@@ -146,21 +145,6 @@ func TestSubsume(t *testing.T) {
 		70: {subsumes: false, in: `a: {a:1}, b: {}`},
 		71: {subsumes: false, in: `a: {a:1, b:1}, b: {a:1}`},
 		72: {subsumes: false, in: `a: {s: { a:1} }, b: { s: {}}`},
-
-		// Lambda
-		73: {subsumes: true, in: `a: (x: _) -> {}, b: (x: _) -> {}`},
-		74: {subsumes: true, in: `a: (x: int) -> {}, b: (x: int) -> {}`},
-		75: {subsumes: true, in: `a: (x: {}) -> {}, b: (x: {}) -> {}`},
-		76: {subsumes: false, in: `a: (x: _) -> {}, b: (x: _, y:_) -> {}`},
-		77: {subsumes: true, in: `a: (x: _) -> {}, b: (x: 1) -> { a: 1 }`},
-		78: {subsumes: false, in: `a: (x: 1) -> {}, b: (x: _) -> {}`},
-		79: {subsumes: false, in: `a: (x: _) -> {}, b: () -> {}`},
-
-		80: {subsumes: true, in: `a: (x: _) -> {}, b: (y: _) -> {}`},
-		81: {subsumes: true, in: `a: (x) -> {}, b: (y) -> {}`},
-
-		82: {subsumes: true, in: `a: (x: {a:1}) -> {f:2}, b: (x: {a:1, b:1}) -> {f:2, g:3}`},
-		83: {subsumes: false, in: `a: (x: {a:1, b:1}) -> {f:2}, b: (x: {a:1}) -> {f:2, g:3}`},
 
 		// Disjunction TODO: for now these two are false: unifying may result in
 		// an ambiguity that we are currently not handling, so safer to not
@@ -203,71 +187,29 @@ func TestSubsume(t *testing.T) {
 		// true because both evaluate to bool
 		103: {subsumes: true, in: `a: !bool, b: bool`},
 
-		104: {subsumes: true, in: `
-			a: () -> 2
-			b: () -> 2`},
-		105: {subsumes: true, in: `
-			a: () -> number
-			b: () -> 2`},
-		106: {subsumes: true, in: `
-			a: (a: number) -> 2
-			b: (a: number) -> 2`},
-		107: {subsumes: true, in: `
-			a: (a: number) -> 2
-			b: (a: 2) -> 2`},
-		108: {subsumes: false, in: `
-			a: (a: 2) -> 2
-			b: (a: 2, b: 2) -> 2`},
-		109: {subsumes: false, in: `
-			a: (a: number) -> 2,
-			b: (a: number, b: number) -> 2`},
-		110: {subsumes: false, in: `
-			a: () -> 3
-			b: () -> number`},
-		111: {subsumes: false, in: `
-			a: (a: 3) -> 2
-			b: (a: number) -> 2`},
-		112: {subsumes: false, in: `
-			a: (a: 3, b: 3) -> 2
-			b: (a: 3) -> 2`},
-
 		// Call
 		113: {subsumes: true, in: `
-			a: (() -> 2)(),
-			b: (() -> 2)()`,
+			a: fn(),
+			b: fn()`,
 		},
 		// TODO: allow subsumption of unevaluated values?
 		114: {subsumes: true, in: `
-			a: (() -> 2)(),
-			b: ((a) -> 2)(1)`,
+			a: len(),
+			b: len(1)`,
 		},
 		115: {subsumes: true, in: `
-			a: ((a: number) -> [2])(2)
-			b: ((a: number) -> [2])(2)`,
+			a: fn(2)
+			b: fn(2)`,
 		},
 		// TODO: allow subsumption of unevaluated values?
 		116: {subsumes: true, in: `
-			a: ((a: number) -> [2])(number)
-			b: ((a: number) -> [2])(2)`,
+			a: fn(number)
+			b: fn(2)`,
 		},
 		// TODO: allow subsumption of unevaluated values?
 		117: {subsumes: true, in: `
-			a: ((a: number) -> [2])(2)
-			b: ((a: number) -> [2])(number)`,
-		},
-		118: {subsumes: true, in: `
-			a: ((a) -> number)(2)
-			b: ((a) -> 2)(2)`,
-		},
-		119: {subsumes: false, in: `
-			a: ((a) -> 2)(2)
-			b: ((a) -> number)(2)`,
-		},
-		// purely structural:
-		// TODO: allow subsumption of unevaluated values?
-		120: {subsumes: true, in: `
-			a: ((a) -> int)(2)
-			b: int`,
+			a: fn(2)
+			b: fn(number)`,
 		},
 
 		// TODO: allow subsumption of unevaluated values?
@@ -319,6 +261,9 @@ func TestSubsume(t *testing.T) {
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)
 	for i, tc := range testCases {
+		if tc.in == "" {
+			continue
+		}
 		m := re.FindStringSubmatch(strings.Join(strings.Split(tc.in, "\n"), ""))
 		const cutset = "\n ,"
 		key := strings.Trim(m[1], cutset) + " ⊑ " + strings.Trim(m[2], cutset)

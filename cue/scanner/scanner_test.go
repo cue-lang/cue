@@ -123,7 +123,6 @@ var testTokens = [...]elt{
 
 	{token.LAND, "&&", operator},
 	{token.LOR, "||", operator},
-	{token.LAMBDA, "->", operator},
 
 	{token.EQL, "==", operator},
 	{token.LSS, "<", operator},

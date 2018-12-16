@@ -71,8 +71,7 @@ func format(src []byte, mode checkMode) ([]byte, error) {
 	}
 
 	// make sure formatted output is syntactically correct
-	if _, err := parser.ParseFile(fset, "", res,
-		parser.ParseLambdas, parser.AllErrors); err != nil {
+	if _, err := parser.ParseFile(fset, "", res, parser.AllErrors); err != nil {
 		return nil, fmt.Errorf("re-parse: %s\n%s", err, res)
 	}
 
@@ -307,7 +306,7 @@ e2: c*t.z
 	// parse pretty printed original
 	// (//line comments must be interpreted even w/o syntax.ParseComments set)
 	f2, err := parser.ParseFile(fset, "", buf.Bytes(),
-		parser.AllErrors, parser.ParseLambdas, parser.ParseComments)
+		parser.AllErrors, parser.ParseComments)
 	if err != nil {
 		t.Fatalf("%s\n%s", err, buf.Bytes())
 	}

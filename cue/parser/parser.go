@@ -542,40 +542,12 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 		defer func() { c.closeNode(p, expr) }()
 		lparen := p.pos
 		p.next()
-		if p.tok == token.RPAREN && p.mode&parseLambdasMode != 0 {
-			c.pos = 2
-			rparen := p.expect(token.RPAREN)
-			p.expect(token.LAMBDA)
-			return &ast.LambdaExpr{
-				Lparen: lparen,
-				Rparen: rparen,
-				Expr:   p.parseRHS(),
-			}
-		}
 		p.exprLev++
 		p.openList()
 		x := p.parseRHS() // types may be parenthesized: (some type)
-		var params []*ast.Field
-		ident, ok := x.(*ast.Ident)
-		if ok && (p.tok == token.COLON || p.tok == token.COMMA) && p.mode&parseLambdasMode != 0 {
-			params = p.parseParams(ident, token.RPAREN)
-		}
 		p.closeList()
 		p.exprLev--
 		rparen := p.expect(token.RPAREN)
-		if p.tok == token.LAMBDA || params != nil && p.mode&parseLambdasMode != 0 {
-			p.expect(token.LAMBDA)
-			if params == nil {
-				m := &ast.Field{Label: ident}
-				params = append(params, m)
-			}
-			return &ast.LambdaExpr{
-				Lparen: lparen,
-				Params: params,
-				Rparen: rparen,
-				Expr:   p.parseRHS(),
-			}
-		}
 		return &ast.ParenExpr{
 			Lparen: lparen,
 			X:      x,
@@ -758,21 +730,6 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 					p.next()
 				}
 				return &ast.Alias{Ident: ident, Equal: pos, Expr: ref}
-
-			case token.LPAREN:
-				var value ast.Expr
-				if p.mode&parseLambdasMode != 0 {
-					c.pos = 2
-					// TODO: Only allow LambdaExpr after non-quoted identifier.
-					value = p.parseOperand()
-					if _, ok := unparen(value).(*ast.LambdaExpr); !ok {
-						p.error(value.Pos(), "expected lambda expression")
-					}
-				}
-				if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
-					p.next()
-				}
-				return &ast.Field{Label: ident, Value: value}
 			}
 		}
 
@@ -1078,7 +1035,6 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 	case *ast.Interpolation:
 	case *ast.StructLit:
 	case *ast.ListLit:
-	case *ast.LambdaExpr:
 	case *ast.ListComprehension:
 	case *ast.ParenExpr:
 		panic("unreachable")

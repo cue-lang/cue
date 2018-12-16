@@ -751,12 +751,7 @@ scanAgain:
 		case '+':
 			tok = token.ADD // Consider ++ for list concatenate.
 		case '-':
-			if s.ch == '>' {
-				s.next()
-				tok = token.LAMBDA
-			} else {
-				tok = token.SUB
-			}
+			tok = token.SUB
 		case '*':
 			tok = token.MUL
 		case '/':

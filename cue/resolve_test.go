@@ -46,7 +46,7 @@ func compileInstance(t *testing.T, body string) (*context, *Instance, errors.Lis
 
 	fset := token.NewFileSet()
 	x := newIndex(fset).NewInstance(nil)
-	f, err := parser.ParseFile(fset, "test", body, parser.ParseLambdas)
+	f, err := parser.ParseFile(fset, "test", body)
 	ctx := x.newContext()
 
 	switch errs := err.(type) {
@@ -283,16 +283,6 @@ func TestBasicRewrite(t *testing.T) {
 			`,
 		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | 2 | 3), o5: (1! | 2! | 3!), o6: (1! | 2! | 3!), o7: (2 | 3), o8: (2! | 3!), o9: (2 | 3), o10: (3! | 2!), i1: "c"}`,
 	}, {
-		desc: "lambda",
-		in: `
-			o1(A:1, B:2) -> { a: A, b: B }
-			oe() -> { a: 1, b: 2 }
-			l1: (A:1, B:2) -> { a: A, b: B }
-			c1: ((A:int, B:int) -> {a:A, b:B})(1, 2)
-			`,
-		// TODO(P1): don't let values refer to themselves.
-		out: "<0>{o1: <1>(A: 1, B: 2)-><2>{a: <1>.A, b: <1>.B}, oe: <3>()-><4>{a: 1, b: 2}, l1: <5>(A: 1, B: 2)-><6>{a: <5>.A, b: <5>.B}, c1: <7>{a: 1, b: 2}}",
-	}, {
 		desc: "types",
 		in: `
 			i: int
@@ -448,26 +438,6 @@ func TestResolve(t *testing.T) {
 		// 		c: a["x"]
 		// 	`,
 		// 	out: ``,
-	}, {
-		desc: "call",
-		in: `
-			a: { a: (P, Q) -> {p:P, q:Q} }
-			b: a // reference different nodes
-			c: a.a(1, 2)
-			`,
-		out: "<0>{a: <1>{a: <2>(P: _, Q: _)-><3>{p: <2>.P, q: <2>.Q}}, b: <4>{a: <2>(P: _, Q: _)-><3>{p: <2>.P, q: <2>.Q}}, c: <5>{p: 1, q: 2}}",
-	}, {
-		desc: "call of lambda",
-		in: `
-			a(P, Q) -> {p:P, q:Q}
-			a(P, Q) -> {p:P, q:Q}
-			ai(P, Q) -> {p:Q, q:P}
-			b: a(1,2)
-			c: (a | b)(1)
-			d: ([] | (a) -> 3)(2)
-			e1: a(1)
-			`,
-		out: "<1>{a: <2>(P: _, Q: _)->(<3>{p: <2>.P, q: <2>.Q} & <4>{p: <2>.P, q: <2>.Q}), ai: <5>(P: _, Q: _)-><6>{p: <5>.Q, q: <5>.P}, b: <7>{p: 1, q: 2}, c: _|_((<8>.a | <8>.b) (1):number of arguments does not match (2 vs 1)), d: _|_(([] | <0>(a: _)->3):cannot call non-function [] (type list)), e1: _|_(<8>.a (1):number of arguments does not match (2 vs 1))}",
 	}, {
 		desc: "reference across tuples and back",
 		// Tests that it is okay to partially evaluate structs.

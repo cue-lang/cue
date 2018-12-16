@@ -425,26 +425,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.walkClauseList(x.Clauses)
 		f.print(unindent, f.wsOverride(blank), x.Rbrack, token.RBRACK)
 
-	case *ast.LambdaExpr:
-		f.print(x.Lparen, token.LPAREN, indent, noblank)
-
-		f.before(nil)
-		for _, x := range x.Params {
-			f.label(x.Label)
-			if x.Colon.IsValid() {
-				f.print(x.Colon, token.COLON, blank)
-				f.expr(x.Value)
-			}
-			f.print(comma, blank)
-		}
-		f.print(trailcomma, noblank)
-		f.after(nil)
-
-		f.print(trailcomma, noblank, unindent)
-		f.print(x.Rparen, token.RPAREN, blank)
-		f.print(token.LAMBDA, blank)
-		f.expr(x.Expr)
-
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
 	}

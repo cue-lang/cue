@@ -461,7 +461,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		return x
 	}
 	arcs := make(arcs, 0, len(x.arcs)+len(y.arcs))
-	obj := &structLit{binSrc(src.Pos(), op, x, other), x.emit, nil, arcs}
+	obj := &structLit{binSrc(src.Pos(), op, x, other), x.emit, nil, nil, arcs}
 	defer ctx.pushForwards(x, obj, y, obj).popForwards()
 
 	tx, ex := evalLambda(ctx, x.template)
@@ -486,7 +486,16 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		t = v.(*lambdaExpr)
 	}
 	if t != nil {
-		obj.template = ctx.copy(t).(*lambdaExpr)
+		obj.template = ctx.copy(t)
+	}
+
+	sz := len(x.comprehensions) + len(y.comprehensions)
+	obj.comprehensions = make([]*fieldComprehension, sz)
+	for i, c := range x.comprehensions {
+		obj.comprehensions[i] = ctx.copy(c).(*fieldComprehension)
+	}
+	for i, c := range y.comprehensions {
+		obj.comprehensions[i+len(x.comprehensions)] = ctx.copy(c).(*fieldComprehension)
 	}
 
 	for _, a := range x.arcs {
@@ -497,7 +506,7 @@ outer:
 	for _, a := range y.arcs {
 		v := ctx.copy(a.v)
 		for i, b := range obj.arcs {
-			if a.feature == b.feature && a.v != b.v {
+			if a.feature == b.feature {
 				v = mkBin(ctx, src.Pos(), opUnify, b.v, v)
 				obj.arcs[i].v = v
 				continue outer
@@ -971,5 +980,9 @@ func (x *guard) binOp(ctx *context, src source, op op, other evaluated) evaluate
 }
 
 func (x *yield) binOp(ctx *context, src source, op op, other evaluated) evaluated {
+	return ctx.mkIncompatible(src, op, x, other)
+}
+
+func (x *fieldComprehension) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	return ctx.mkIncompatible(src, op, x, other)
 }

@@ -67,6 +67,12 @@ func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
 
 func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	if o, ok := v.(*structLit); ok {
+		// TODO: consider what to do with templates. Perhaps we should always
+		// do subsumption on fully evaluated structs.
+		if len(x.comprehensions) > 0 { //|| x.template != nil {
+			return false
+		}
+
 		// all arcs in n must exist in v and its values must subsume.
 		for _, a := range x.arcs {
 			b, _ := o.lookup(ctx, a.feature)
@@ -335,8 +341,8 @@ func (x *listComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode
 }
 
 // structural equivalence
-func (x *structComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
-	if b, ok := v.(*structComprehension); ok {
+func (x *fieldComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	if b, ok := v.(*fieldComprehension); ok {
 		return subsumes(ctx, x.clauses, b.clauses, 0)
 	}
 	return isBottom(v)

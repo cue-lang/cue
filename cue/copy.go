@@ -30,25 +30,37 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 
 	case *structLit:
 		arcs := make(arcs, len(x.arcs))
+
+		obj := &structLit{x.baseValue, nil, nil, nil, arcs}
+
+		defer ctx.pushForwards(x, obj).popForwards()
+
 		emit := x.emit
 		if emit != nil {
 			emit = ctx.copy(x.emit)
 		}
+		obj.emit = x.emit
+
 		t := x.template
 		if t != nil {
 			v := ctx.copy(t)
 			if isBottom(v) {
 				return t, false
 			}
-			t = v.(*lambdaExpr)
+			t = v
 		}
-		obj := &structLit{x.baseValue, emit, t, arcs}
+		obj.template = t
 
-		defer ctx.pushForwards(x, obj).popForwards()
 		for i, a := range x.arcs {
 			v := ctx.copy(a.v)
 			arcs[i] = arc{a.feature, v, nil}
 		}
+
+		comp := make([]*fieldComprehension, len(x.comprehensions))
+		for i, c := range x.comprehensions {
+			comp[i] = ctx.copy(c).(*fieldComprehension)
+		}
+		obj.comprehensions = comp
 		return obj, false
 
 	case *lambdaExpr:

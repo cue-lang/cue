@@ -42,17 +42,12 @@ func (inst *Instance) insertFile(f *ast.File) error {
 		return result.(*bottom)
 	}
 
-	for _, c := range v.comprehensions {
-		inst.rootValue = mkBin(v.ctx(), token.NoPos, opUnify, inst.rootValue, c)
-	}
-
 	return nil
 }
 
 type astVisitor struct {
 	*astState
-	object         *structLit
-	comprehensions []*structComprehension
+	object *structLit
 
 	inSelector int
 }
@@ -164,9 +159,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				v1.walk(e)
 			}
 		}
-		for _, c := range v1.comprehensions {
-			v.comprehensions = append(v.comprehensions, c)
-		}
 		value = obj
 
 	case *ast.ImportDecl:
@@ -198,17 +190,10 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			}
 		}
 		value = obj
-		for i, c := range v1.comprehensions {
-			if i == 0 && obj.template == nil && len(obj.arcs) == 0 {
-				value = c
-				continue
-			}
-			value = mkBin(v.ctx(), token.NoPos, opUnify, value, c)
-		}
 
 	case *ast.ComprehensionDecl:
 		yielder := &yield{baseValue: newExpr(n.Field.Value)}
-		sc := &structComprehension{
+		fc := &fieldComprehension{
 			baseValue: newDecl(n),
 			clauses:   wrapClauses(v, yielder, n.Clauses),
 		}
@@ -228,7 +213,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			v.setScope(field, template)
 			template.value = v.walk(field.Value)
 			yielder.value = template
-			sc.isTemplate = true
+			fc.isTemplate = true
 
 		case *ast.BasicLit, *ast.Ident:
 			name, ok := ast.LabelName(x)
@@ -245,19 +230,19 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 		// yielder.key = v.walk(n.Field.Label)
 		// yielder.value = v.walk(n.Field.Value)
-		v.comprehensions = append(v.comprehensions, sc)
+		v.object.comprehensions = append(v.object.comprehensions, fc)
 
 	case *ast.Field:
 		switch x := n.Label.(type) {
 		case *ast.Interpolation:
 			yielder := &yield{baseValue: newNode(x)}
-			sc := &structComprehension{
+			fc := &fieldComprehension{
 				baseValue: newDecl(n),
 				clauses:   yielder,
 			}
 			yielder.key = v.walk(x)
 			yielder.value = v.walk(n.Value)
-			v.comprehensions = append(v.comprehensions, sc)
+			v.object.comprehensions = append(v.object.comprehensions, fc)
 
 		case *ast.TemplateLabel:
 			f := v.label(x.Ident.Name, true)

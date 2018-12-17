@@ -16,7 +16,6 @@ package cue
 
 import (
 	"bytes"
-	"sort"
 )
 
 func eval(idx *index, v value) evaluated {
@@ -265,42 +264,6 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 	return &list{x.baseValue, a, t, n}
 }
 
-func (x *structComprehension) evalPartial(ctx *context) evaluated {
-	obj := &structLit{baseValue: x.baseValue}
-	result := x.clauses.yield(ctx, func(k, v evaluated) *bottom {
-		if !k.kind().isAnyOf(stringKind) {
-			return ctx.mkErr(k, "key must be of type string")
-		}
-		if x.isTemplate {
-			if obj.template == nil {
-				obj.template = v
-			} else {
-				obj.template = mkBin(ctx, x.Pos(), opUnify, obj.template, v)
-			}
-			return nil
-		}
-		// TODO: improve big O
-		f := ctx.label(k.strValue(), true)
-		for i, a := range obj.arcs {
-			if a.feature == f {
-				obj.arcs[i].v = mkBin(ctx, x.Pos(), opUnify, a.v, v)
-				return nil
-			}
-		}
-		obj.arcs = append(obj.arcs, arc{feature: f, v: v})
-		return nil
-	})
-	switch {
-	case result == nil:
-	case isBottom(result):
-		return result
-	default:
-		panic("should not happen")
-	}
-	sort.Stable(obj)
-	return obj
-}
-
 func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	list := &list{baseValue: x.baseValue}
 	result := x.clauses.yield(ctx, func(k, v evaluated) *bottom {
@@ -325,6 +288,8 @@ func (x *feed) evalPartial(ctx *context) evaluated  { return x }
 func (x *guard) evalPartial(ctx *context) evaluated { return x }
 func (x *yield) evalPartial(ctx *context) evaluated { return x }
 
+func (x *fieldComprehension) evalPartial(ctx *context) evaluated { return x }
+
 func (x *structLit) evalPartial(ctx *context) (result evaluated) {
 	if ctx.trace {
 		defer uni(indent(ctx, "struct eval", x))
@@ -333,6 +298,7 @@ func (x *structLit) evalPartial(ctx *context) (result evaluated) {
 	x = ctx.deref(x).(*structLit)
 
 	// TODO: Handle cycle?
+
 	return x
 }
 

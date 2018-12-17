@@ -199,12 +199,12 @@ func (x *listComprehension) rewrite(ctx *context, fn rewriteFunc) value {
 	return &listComprehension{x.baseValue, clauses}
 }
 
-func (x *structComprehension) rewrite(ctx *context, fn rewriteFunc) value {
+func (x *fieldComprehension) rewrite(ctx *context, fn rewriteFunc) value {
 	clauses := rewrite(ctx, x.clauses, fn).(yielder)
 	if clauses == x.clauses {
 		return x
 	}
-	return &structComprehension{x.baseValue, clauses, x.isTemplate}
+	return &fieldComprehension{x.baseValue, clauses, x.isTemplate}
 }
 
 func (x *yield) rewrite(ctx *context, fn rewriteFunc) value {

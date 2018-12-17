@@ -19,6 +19,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"golang.org/x/exp/errors/fmt"
 )
 
 // An Instance defines a single configuration based on a collection of
@@ -233,7 +234,10 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	value := convert(ctx, root, x)
 	eval := binOp(ctx, baseValue{}, opUnify, root, value)
 	// TODO: validate recursively?
-	st := eval.(*structLit)
+	st, ok := eval.(*structLit)
+	if !ok {
+		fmt.Errorf("structure at path did not resolve in struct")
+	}
 	inst = &Instance{
 		rootStruct: st,
 		rootValue:  st,

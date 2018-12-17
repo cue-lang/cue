@@ -129,24 +129,32 @@ func (p *exporter) expr(v value) ast.Expr {
 				Value: p.expr(a.v),
 			})
 		}
-		return obj
+		for _, c := range x.comprehensions {
+			var clauses []ast.Clause
+			next := c.clauses
+			for {
+				if yield, ok := next.(*yield); ok {
+					f := &ast.Field{
+						Label: p.expr(yield.key).(ast.Label),
+						Value: p.expr(yield.value),
+					}
+					var decl ast.Decl = f
+					if len(clauses) > 0 {
+						decl = &ast.ComprehensionDecl{Field: f, Clauses: clauses}
+					}
+					obj.Elts = append(obj.Elts, decl)
+					break
+				}
 
-	case *structComprehension:
-		var clauses []ast.Clause
-		for y, next := p.clause(x.clauses); ; y, next = p.clause(next) {
-			clauses = append(clauses, y)
-			if yield, ok := next.(*yield); ok {
-				return &ast.StructLit{Elts: []ast.Decl{
-					&ast.ComprehensionDecl{
-						Field: &ast.Field{
-							Label: p.expr(yield.key).(ast.Label),
-							Value: p.expr(yield.value),
-						},
-						Clauses: clauses,
-					},
-				}}
+				var y ast.Clause
+				y, next = p.clause(next)
+				clauses = append(clauses, y)
 			}
 		}
+		return obj
+
+	case *fieldComprehension:
+		panic("should be handled in structLit")
 
 	case *listComprehension:
 		var clauses []ast.Clause

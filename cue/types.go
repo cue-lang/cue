@@ -794,6 +794,8 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 	}
 	obj := v.eval(ctx).(*structLit)
 
+	obj.expand(ctx) // expand comprehensions
+
 	// check if any labels are hidden
 	f := label(0)
 	for _, a := range obj.arcs {
@@ -814,6 +816,7 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 			obj.baseValue,
 			obj.emit,
 			obj.template,
+			nil,
 			arcs,
 		}
 
@@ -826,6 +829,7 @@ func (v Value) structValWithHidden(ctx *context) (structValue, error) {
 		return structValue{}, err
 	}
 	obj := v.eval(ctx).(*structLit)
+	obj.expand(ctx)
 
 	return structValue{ctx, v.path, obj}, nil
 }

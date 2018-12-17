@@ -139,7 +139,7 @@ func runTrim(cmd *cobra.Command, args []string) error {
 		for _, f := range inst.Files {
 			filename := f.Filename
 
-			f.Decls = gen.trimDecls(f.Decls, rm, root, false)
+			f.Decls = gen.trimDecls(f.Decls, rm, root, true)
 
 			opts := []format.Option{}
 			if *fSimplify {
@@ -176,6 +176,7 @@ type trimSet struct {
 	stack     []string
 	exclude   map[ast.Node]bool // don't remove fields marked here
 	alwaysGen map[ast.Node]bool // node is always from a generated source
+	fromComp  map[ast.Node]bool // node originated from a comprehension
 }
 
 func newTrimSet(fset *token.FileSet) *trimSet {
@@ -183,6 +184,7 @@ func newTrimSet(fset *token.FileSet) *trimSet {
 		fset:      fset,
 		exclude:   map[ast.Node]bool{},
 		alwaysGen: map[ast.Node]bool{},
+		fromComp:  map[ast.Node]bool{},
 	}
 }
 
@@ -212,23 +214,37 @@ func (t *trimSet) markNodes(n ast.Node) {
 
 		case *ast.ListLit:
 			if x.Type != nil {
-				t.markAlwaysGen(x.Type)
+				t.markAlwaysGen(x.Type, false)
 			}
 
 		case *ast.Field:
 			if _, ok := x.Label.(*ast.TemplateLabel); ok {
-				t.markAlwaysGen(x.Value)
+				t.markAlwaysGen(x.Value, false)
 			}
 
 		case *ast.ListComprehension, *ast.ComprehensionDecl:
-			t.markAlwaysGen(x)
+			t.markAlwaysGen(x, true)
 		}
 	})
 }
 
-func (t *trimSet) markAlwaysGen(n ast.Node) {
-	ast.Walk(n, func(n ast.Node) bool {
+func (t *trimSet) markAlwaysGen(first ast.Node, isComp bool) {
+	ast.Walk(first, func(n ast.Node) bool {
+		if t.alwaysGen[n] {
+			return false
+		}
 		t.alwaysGen[n] = true
+		if isComp {
+			t.fromComp[n] = true
+		}
+		if x, ok := n.(*ast.Ident); ok && n != first {
+			// Also mark any value used within a template.
+			if x.Node != nil {
+				// fmt.Println("MARKED", internal.DebugStr(x.Node),
+				// "by", internal.DebugStr(first))
+				// t.markAlwaysGen(x.Node)
+			}
+		}
 		return true
 	}, nil)
 }
@@ -279,6 +295,10 @@ func hasStruct(n ast.Node) bool {
 //   based on another value without doing a full unification. So for now we
 //   skip any disjunction containing structs.
 //
+//		v      the current value
+//		m      the "mixed-in" values
+//		scope  in which to evaluate expressions
+//		rmSet  nodes in v that may be removed by the caller
 func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 	saved := t.stack
 	t.stack = append(t.stack, label)
@@ -296,32 +316,36 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		}
 	}
 
+	// Collect generated nodes.
+	// Only keep the good parts of the template.
+	// Incoming structs may be incomplete resulting in errors. It is safe
+	// to ignore these. If there is an actual error, it will manifest in
+	// the evaluation of v.
+	in := cue.Value{}
+	gen := []ast.Node{}
+	for _, v := range mSplit {
+		// TODO: consider resolving incomplete values within the current
+		// scope, as we do for fields.
+		if v.IsValid() {
+			in = in.Unify(v)
+		}
+		gen = append(gen, v.Source())
+	}
+
 	switch v.Kind() {
 	case cue.StructKind:
 		// TODO: merge template preprocessing with that of fields.
 
-		// Only keep the good parts of the template.
-		// Incoming structs may be incomplete resulting in errors. It is safe
-		// to ignore these. If there is an actual error, it will manifest in
-		// the evaluation of v.
-		in := cue.Value{}
-		gen := []ast.Node{}
-		for _, v := range mSplit {
-			// TODO: consider resolving incomplete values within the current
-			// scope, as we do for fields.
-			if v.IsValid() {
-				in = in.Unify(v)
-			}
-			// Collect generated nodes.
-			gen = append(gen, v.Source())
-		}
-
 		// Identify generated components and unify them with the mixin value.
+		exists := false
 		for _, v := range v.Split() {
 			if src := v.Source(); t.alwaysGen[src] {
 				if w := in.Unify(v); w.Err() == nil {
 					in = w
 				}
+				// One of the sources of this struct is generated. That means
+				// we can safely delete a non-generated version.
+				exists = true
 				gen = append(gen, src)
 			}
 		}
@@ -346,6 +370,38 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 			rm = append(rm, removed...)
 		}
 
+		canRemove := fn == nil
+		for _, v := range vSplit {
+			src := v.Source()
+			if t.fromComp[src] {
+				canRemove = true
+			}
+		}
+
+		// Remove fields from source.
+		for _, v := range vSplit {
+			if src := v.Source(); !t.alwaysGen[src] {
+				switch x := src.(type) {
+				case *ast.File:
+					// TODO: use in instead?
+					x.Decls = t.trimDecls(x.Decls, rm, m, canRemove)
+
+				case *ast.StructLit:
+					x.Elts = t.trimDecls(x.Elts, rm, m, canRemove)
+					exists = exists || m.Exists()
+					if len(x.Elts) == 0 && exists && t.canRemove(src) && !inNodes(gen, src) {
+						rmSet = append(rmSet, src)
+					}
+
+				default:
+					if len(t.stack) == 1 {
+						// TODO: fix this hack to pass down the fields to remove
+						return rm
+					}
+				}
+			}
+		}
+
 		if *fTrace {
 			w := &bytes.Buffer{}
 			fmt.Fprintln(w)
@@ -365,29 +421,6 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 			}
 
 			t.traceMsg(w.String())
-		}
-
-		// Remove fields from source.
-		for _, v := range vSplit {
-			if src := v.Source(); !t.alwaysGen[src] {
-				switch x := src.(type) {
-				case *ast.File:
-					// TODO: use in instead?
-					x.Decls = t.trimDecls(x.Decls, rm, m, fn != nil)
-
-				case *ast.StructLit:
-					x.Elts = t.trimDecls(x.Elts, rm, m, fn != nil)
-					if len(x.Elts) == 0 && m.Exists() && t.canRemove(src) && !inNodes(gen, src) {
-						rmSet = append(rmSet, src)
-					}
-
-				default:
-					if len(t.stack) == 1 {
-						// TODO: fix this hack to pass down the fields to remove
-						return rm
-					}
-				}
-			}
 		}
 
 	case cue.ListKind:
@@ -416,7 +449,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 						break
 					}
 				}
-				if rmList && m.Exists() && t.canRemove(src) {
+				if rmList && m.Exists() && t.canRemove(src) && !inNodes(gen, src) {
 					rmSet = append(rmSet, src)
 				}
 			}
@@ -424,17 +457,6 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		fallthrough
 
 	default:
-		// Collect generated nodes.
-		in := cue.Value{}
-		gen := []ast.Node{}
-		for _, v := range mSplit {
-			if v.IsValid() {
-				in = in.Unify(v)
-			}
-			// Collect generated nodes.
-			gen = append(gen, v.Source())
-		}
-
 		for _, v := range vSplit {
 			src := v.Source()
 			if t.alwaysGen[src] || inNodes(gen, src) {
@@ -492,14 +514,14 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 	return rmSet
 }
 
-func (t *trimSet) trimDecls(decls []ast.Decl, rm []ast.Node, m cue.Value, fromTemplate bool) []ast.Decl {
+func (t *trimSet) trimDecls(decls []ast.Decl, rm []ast.Node, m cue.Value, allow bool) []ast.Decl {
 	a := make([]ast.Decl, 0, len(decls))
 
 	for _, d := range decls {
 		if f, ok := d.(*ast.Field); ok {
 			label, _ := ast.LabelName(f.Label)
 			v := m.Lookup(label)
-			if inNodes(rm, f.Value) && (!fromTemplate || v.Exists()) {
+			if inNodes(rm, f.Value) && (allow || v.Exists()) {
 				continue
 			}
 		}

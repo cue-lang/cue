@@ -235,6 +235,12 @@ func (p *printer) debugStr(v interface{}) {
 			write(", ")
 		}
 		p.debugStr(x.arcs)
+		for i, c := range x.comprehensions {
+			p.debugStr(c)
+			if i < len(x.comprehensions)-1 {
+				p.write(", ")
+			}
+		}
 		write("}")
 
 	case []arc:
@@ -257,10 +263,8 @@ func (p *printer) debugStr(v interface{}) {
 		p.write(": ")
 		p.debugStr(n)
 
-	case *structComprehension:
-		writef("{")
+	case *fieldComprehension:
 		p.debugStr(x.clauses)
-		write(" }")
 
 	case *listComprehension:
 		writef("[")

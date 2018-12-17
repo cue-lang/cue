@@ -74,6 +74,7 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 			}
 			x = e.(*structLit)
 		}
+		x.expand(ctx)
 		arcs := make(arcs, len(x.arcs))
 		for i, a := range x.arcs {
 			v := x.at(ctx, i)
@@ -85,10 +86,10 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 			if isBottom(v) {
 				return v
 			}
-			t = v.(*lambdaExpr)
+			t = v
 		}
 		emit := testResolve(ctx, x.emit, m)
-		obj := &structLit{x.baseValue, emit, t, arcs}
+		obj := &structLit{x.baseValue, emit, t, nil, arcs}
 		return obj
 	case *list:
 		a := make([]value, len(x.a))

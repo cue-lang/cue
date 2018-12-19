@@ -1,4 +1,4 @@
-import _json "encoding/json"
+import xjson "encoding/json"
 
 service: {
 	booster: [{
@@ -8,8 +8,8 @@ service: {
 	supplement: [{
 		kind: "Service"
 		name: "supplement"
-		json: _json.Marshal(cue_json)
-		cue_json = [1, 2]
+		json: xjson.Marshal(_cue_json)
+		_cue_json = [1, 2]
 	}]
 }
 deployment booster: [{

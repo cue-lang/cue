@@ -42,6 +42,8 @@ github.com/xordataexchange/crypt v0.0.3-0.20170626215501-b2862e3d0a77/go.mod h1:
 golang.org/x/crypto v0.0.0-20181203042331-505ab145d0a9/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/exp/errors v0.0.0-20181210123644-7d6377eee41f h1:B/8yFg7PHSFdahc+fMB+RUy3if9GlZmexAbcdfCwREI=
 golang.org/x/exp/errors v0.0.0-20181210123644-7d6377eee41f/go.mod h1:YgqsNsAu4fTvlab/7uiYK9LJrCIzKg/NiZUIH1/ayqo=
+golang.org/x/exp/errors v0.0.0-20181220081853-a8d4f384862a h1:juhXrq7Jv3Yw6H4azsxx0SGft00IiERvkUW6cNqnV1I=
+golang.org/x/exp/errors v0.0.0-20181220081853-a8d4f384862a/go.mod h1:YgqsNsAu4fTvlab/7uiYK9LJrCIzKg/NiZUIH1/ayqo=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f h1:Bl/8QSvNqXvPGPGXa2z5xUTmV7VDcZyvRZ+QQXkXTZQ=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sys v0.0.0-20181205085412-a5c9d58dba9a h1:1n5lsVfiQW3yfsRGu98756EH1YthsFqr/5mxHduZW2A=

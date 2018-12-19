@@ -449,7 +449,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 		for _, enc := range encoding.All() {
 			if ident, ok := h.altNames[enc.Name()]; ok {
 				short := enc.Name()
-				name := h.uniqueName(short, "")
+				name := h.uniqueName(short, "", "")
 				ident.Name = name
 				if name == short {
 					ident = nil
@@ -669,11 +669,11 @@ func (h *hoister) hoist(expr ast.Expr) {
 			}
 
 			if h.altNames[enc.typ] == nil {
-				h.altNames[enc.typ] = &ast.Ident{Name: "cue"} // set name later
+				h.altNames[enc.typ] = &ast.Ident{Name: "_cue"} // set name later
 			}
 
 			// found a replacable string
-			dataField := h.uniqueName(name, "cue")
+			dataField := h.uniqueName(name, "_", "cue_")
 
 			f.Value = &ast.CallExpr{
 				Fun: &ast.SelectorExpr{
@@ -727,7 +727,7 @@ func tryParse(str string) (s ast.Expr, format *encodingInfo) {
 	return nil, nil
 }
 
-func (h *hoister) uniqueName(base, typ string) string {
+func (h *hoister) uniqueName(base, prefix, typ string) string {
 	base = strings.Map(func(r rune) rune {
 		if unicode.In(r, unicode.L, unicode.N) {
 			return r
@@ -735,12 +735,13 @@ func (h *hoister) uniqueName(base, typ string) string {
 		return '_'
 	}, base)
 
-	name := base
+	name := prefix + typ + base
 	for {
 		if !h.fields[name] {
+			h.fields[name] = true
 			return name
 		}
-		name = typ + "_" + base
+		name = prefix + typ + base
 		typ += "x"
 	}
 }

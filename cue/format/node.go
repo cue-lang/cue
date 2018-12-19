@@ -156,7 +156,7 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		nextFF := f.nextNeedsFormfeed(n.Value)
 		tab := vtab
-		if nextFF || f.nestExpr >= 1 {
+		if nextFF {
 			tab = blank
 		}
 

@@ -64,9 +64,9 @@ Examples:
 		tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 1, ' ', 0)
 		defer tw.Flush()
 		for _, inst := range instances {
-			// TODO: retrieve the fileset from the instance. Probably using an
-			// internal structure.
-			p := evalPrinter{w: tw, fset: nil}
+			// TODO: use ImportPath or some other sanitized path.
+			fmt.Fprintf(cmd.OutOrStdout(), "// %s\n", inst.Dir)
+			p := evalPrinter{w: tw}
 			if exprs == nil {
 				p.print(inst.Value())
 				fmt.Fprintln(tw)

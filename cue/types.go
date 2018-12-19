@@ -714,7 +714,7 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 	}
 	if !got.isGround() {
 		return ctx.mkErr(x, codeIncomplete,
-			"non-concrete value %v when evaluating config file", got)
+			"non-concrete value %v", got)
 	}
 	return nil
 }

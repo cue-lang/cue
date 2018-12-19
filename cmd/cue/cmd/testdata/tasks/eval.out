@@ -1,3 +1,4 @@
+// $CWD/testdata/tasks
 {
     message: "Hello world!"
 }

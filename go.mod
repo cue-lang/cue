@@ -8,7 +8,7 @@ require (
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/viper v1.3.1
-	golang.org/x/exp/errors v0.0.0-20181210123644-7d6377eee41f
+	golang.org/x/exp/errors v0.0.0-20181220081853-a8d4f384862a
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f
 	golang.org/x/tools v0.0.0-20181210225255-6a3e9aa2ab77
 )

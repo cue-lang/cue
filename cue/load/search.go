@@ -16,7 +16,6 @@ package load
 
 import (
 	"fmt" // TODO: remove this usage
-	"log"
 	"os"
 	"path"
 	"path/filepath"
@@ -196,8 +195,7 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 				}
 				return nil
 			default:
-				log.Print(err)
-				return nil
+				m.Err = err
 			}
 		}
 

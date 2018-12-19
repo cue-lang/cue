@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"fmt"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -22,8 +24,9 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func exitIfErr(cmd *cobra.Command, err error) {
+func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error) {
 	if err != nil {
+		fmt.Fprintf(cmd.OutOrStderr(), "--- %s\n", inst.Dir)
 		errors.Print(cmd.OutOrStderr(), err)
 		exit()
 	}
@@ -51,13 +54,13 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, inst.Err)
+		exitIfErr(cmd, inst, inst.Err)
 	}
 
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, inst.Value().Validate())
+		exitIfErr(cmd, inst, inst.Value().Validate())
 	}
 	return instances
 }
@@ -81,6 +84,6 @@ func buildTools(cmd *cobra.Command, args []string) *cue.Instance {
 	}
 
 	inst := cue.Merge(buildInstances(cmd, binst)...).Build(ti)
-	exitIfErr(cmd, inst.Err)
+	exitIfErr(cmd, inst, inst.Err)
 	return inst
 }

@@ -597,7 +597,7 @@ In addition, we defined a directory-specific label.
 In this section we will look into generalizing the objects per directory.
 
 
-#### Directory `frontent`
+#### Directory `frontend`
 
 We observe that all deployments in subdirectories of `frontend`
 have a single container with one port,
@@ -1106,11 +1106,11 @@ If order matters, users could explicitly specify the list as well.
 For ports we define two simple maps from name to port number:
 
 ```
-	// expose port defines named ports that is exposed in the service
-	expose port <N>: int
+    // expose port defines named ports that is exposed in the service
+    expose port <N>: int
 
-	// port defines a named port that is not exposed in the service.
-	port <N>: int
+    // port defines a named port that is not exposed in the service.
+    port <N>: int
 ```
 Both maps get defined in the container definition, but only `port` gets
 included in the service definition.
@@ -1161,14 +1161,14 @@ automatically derive a service is now a bit simpler:
 // define services implied by deployments
 service "\(k)": {
 
-	// Copy over all ports exposed from containers.
-	port "\(Name)": {
-		port:       Port | int
-		targetPort: Port | int
-	} for Name, Port in spec.expose.port
+    // Copy over all ports exposed from containers.
+    port "\(Name)": {
+        port:       Port | int
+        targetPort: Port | int
+    } for Name, Port in spec.expose.port
 
-	// Copy over the labels
-	label: spec.label
+    // Copy over the labels
+    label: spec.label
 
 } for k, spec in deployment
 ```
@@ -1212,8 +1212,8 @@ That said, most CUE users will never have to resort to this level of CUE
 to write configurations.
 For instance, none of the files in the subdirectories contain comprehensions,
 not even the template files in these directores (such as `kitchen/kube.cue`).
-
-
+Furthermore, none of the configuration files in any of the
+leaf directories contain string interpolations.
 
 
 ### Metrics

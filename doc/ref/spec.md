@@ -1058,7 +1058,6 @@ Derived   Value
 number    int | float
 uint      0..int
 uint8     0..255
-byte      uint8
 int8      -128..127
 uint16    0..65536
 int16     -32_768...32_767
@@ -1067,19 +1066,9 @@ uint32    0..4_294_967_296
 int32     -2_147_483_648..2_147_483_647
 uint64    0..18_446_744_073_709_551_615
 int64     -9_223_372_036_854_775_808..9_223_372_036_854_775_807
-uint128   340_282_366_920_938_463_463_374_607_431_768_211_455
-
-	"int128": mkIntRange(
-		"-170141183460469231731687303715884105728",
-		"170141183460469231731687303715884105727"),
-
-	// Do not include an alias for "byte", as it would be too easily confused
-	// with the builtin "bytes".
-	"uint8":   mkIntRange("0", "255"),
-	"uint16":  mkIntRange("0", "65535"),
-	"uint32":  mkIntRange("0", "4294967295"),
-	"uint64":  mkIntRange("0", "18446744073709551615"),
-}
+int128    -170_141_183_460_469_231_731_687_303_715_884_105_728..
+              170_141_183_460_469_231_731_687_303_715_884_105_727
+uint128   0..340_282_366_920_938_463_463_374_607_431_768_211_455
 ```
 
 
@@ -1353,7 +1342,7 @@ UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 binary_op  = "|" | "&" | "||" | "&&" | rel_op | add_op | mul_op | ".." .
 rel_op     = "==" | "!=" | "<" | "<=" | ">" | ">=" .
 add_op     = "+" | "-" .
-mul_op     = "*" | "/" | "div" | "mod" | "quo" | "rem" .
+mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
 
 unary_op   = "+" | "-" | "!" .
 ```
@@ -1381,7 +1370,7 @@ and finally `|` (disjunction):
 ```
 Precedence    Operator
     8             ..
-    7             *  /  div mod quo rem
+    7             *  /  %  div mod quo rem
     6             +  -
     5             ==  !=  <  <=  >  >=
     4             &&
@@ -1408,8 +1397,8 @@ x == y+1 && y == z-1
 Arithmetic operators apply to numeric values and yield a result of the same type
 as the first operand. The three of the four standard arithmetic operators
 `(+, -, *)` apply to integer and decimal floating-point types;
-`+` and `*` also applies to lists and strings.
-`/` only applies to decimal floating-point types and
+`+` and `*` also apply to lists and strings.
+`/` and `%` only apply to decimal floating-point types and
 `div`, `mod`, `quo`, and `rem` only apply to integer types.
 
 ```
@@ -1417,6 +1406,7 @@ as the first operand. The three of the four standard arithmetic operators
 -    difference             integers, floats
 *    product                integers, floats, lists, strings
 /    quotient               floats
+%    remainder              floats
 div  division               integers
 mod  modulo                 integers
 quo  quotient               integers
@@ -1672,6 +1662,7 @@ A value `x` can be converted to the type of `T` in any of these cases:
 - `x` is a string and `T` is a list of bytes or runes.
 
 
+<!--
 [Field tags] are ignored when comparing struct types for identity
 for the purpose of conversion:
 
@@ -1694,6 +1685,7 @@ person2: {
 
 p2 = person(person2)  // ignoring tags, the underlying types are identical
 ```
+-->
 
 Specific rules apply to conversions between numeric types, structs,
 or to and from a string type. These conversions may change the representation
@@ -1714,7 +1706,6 @@ a: uint16(int(1000))  // uint16(1000)
 b: uint8(1000)        // _|_ // overflow
 c: int(2.5)           // 2  TODO: TBD
 ```
-
 
 
 #### Conversions to and from a string type
@@ -1791,6 +1782,7 @@ c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 
 ### Calls
 
+Calls can be made to core library functions or builtins.
 Given an expression `f` of function type F,
 ```
 f(a1, a2, … an)
@@ -1802,47 +1794,14 @@ and are evaluated before the function is called.
 ```
 a: math.Atan2(x, y)
 ```
-<!---
-
-// FUNCTIONS ARE DISABLED:
-Point: {
-    Scale(a: float) -> Point({ Value: Point.Value * a })
-    Value: float
-}
-pt: Point
-pt: { Value: a }
-
-ptp: pt.Scale(3.5)
---->
-
 
 In a function call, the function value and arguments are evaluated in the usual
-order. After they are evaluated, the parameters of the call are passed by value
-to the function and the called function begins execution. The return parameters
+order.
+After they are evaluated, the parameters of the call are passed by value
+to the function and the called function begins execution.
+The return parameters
 of the function are passed by value back to the calling function when the
 function returns.
-
-<!---
-TODO:
-
-Passing arguments to ... parameters
-If f is variadic with a final parameter p of type ...T, then within f the type of p is equivalent to type []T. If f is invoked with no actual arguments for p, the value passed to p is nil. Otherwise, the value passed is a new slice of type []T with a new underlying array whose successive elements are the actual arguments, which all must be assignable to T. The length and capacity of the slice is therefore the number of arguments bound to p and may differ for each call site.
-
-Given the function and calls
-
-func Greeting(prefix string, who ...string)
-Greeting("nobody")
-Greeting("hello:", "Joe", "Anna", "Eileen")
-within Greeting, who will have the value nil in the first call, and []string{"Joe", "Anna", "Eileen"} in the second.
-
-If the final argument is assignable to a slice type []T, it may be passed unchanged as the value for a ...T parameter if the argument is followed by .... In this case no new slice is created.
-
-Given the slice s and call
-
-s := []string{"James", "Jasmine"}
-Greeting("goodbye:", s...)
-within Greeting, who will have the same value as s with the same underlying array.
---->
 
 
 ### Comprehensions
@@ -1882,7 +1841,7 @@ field comprehensions defined in the same struct.
 
 ```
 ComprehensionDecl   = Field [ "<-" ] Clauses .
-ListComprehension   = "[" Expression "<-" Clauses "]" .
+ListComprehension   = "[" Expression [ "<-" ] Clauses "]" .
 
 Clauses             = Clause { Clause } .
 Clause              = ForClause | GuardClause | LetClause .
@@ -2344,16 +2303,6 @@ Implementations are free to pick which constraint function is applied if
 both `a` and `b` are constraint functions, as the properties of unification
 will ensure this produces identical results.
 
-#### Manifestation
-
-TODO: a prototype which is a function invocation that cannot be evaluated
-or for which the result is not an atom or a struct is called _incomplete_.
-
-
-
-### Validation
-
-TODO: when to proactively do recursive validation
 
 #### References
 
@@ -2369,16 +2318,23 @@ the more traditional depth-first approach.
 Other approaches are possible, however, and implementations are free to choose
 which approach is deployed.
 
+
+### Validation
+
+TODO: when to proactively do recursive validation
+
 ### Cycles
 
 TODO: describe precisely which cycles must be resolved by implementations.
 
+<!--
 Rules:
 
 - Unification of atom value `a` with non-concrete atom `b` for node `q`:
   - set `q` to `a` and schedule the evalution `a == b` at the end of
     evaluating `q`: `C` is only correct under the assumption that `q` is `a`
     so evaluate later.
+-->
 
 A direct cyclic reference between nodes defines a shared node for the paths
 of the original nodes.
@@ -2403,16 +2359,7 @@ a: { x: 1 }
 b: { y: 3 }
 ```
 
-
-1. Cycle breaking
-1. Cycle detection
-1. Assertion checks
-1. Validation
-
-The preparation step loads all the relevant CUE sources and merges duplicate
-by creating unification expressions until each field is unique within its scope.
-
-
+<!--
 For fields of type struct any cycle that does not result in an infinite
 structure is allowed.
 An expresion of type struct only allows unification and disjunction operations.
@@ -2424,7 +2371,7 @@ handled with the following rules:
   with a new reference pointing to the respective copy,
 - a reference bound to a field that is not being copied refers to the
   original field.
-
+-->
 
 #### Self-referential cycles
 
@@ -2452,11 +2399,7 @@ y: x & {              y: {
 }                     }
 ```
 
-During the evaluation of a field  which expression is being evaluated is marked as such.  
-
-A field `f` with unification expression `e` where `e` contains reference that in turn
-point to `a` can be handled as follows:
-
+<!--
 #### Evaluation cycles
 
 For structs, cycles are disallowed
@@ -2481,7 +2424,6 @@ b: a.c  // illegal reference
 A reference to `Δ(π, q0)` may not recursively refer to `Δ(π', q)`,
 where `π` is a prefix to `π'`.
 
-
 a: b & { b: _ }
 
 
@@ -2493,7 +2435,6 @@ except for in the following cases:
 - Unification within disjunctions:
 
 
-<!--
 ### Inference
 
 There is currently no logical inference for values of references prescribed.
@@ -2508,6 +2449,4 @@ TODO: examples of situations where variables could be resolved but are not.
 ### Unused values
 
 TODO: rules for detection of unused variables
-
-1. Any alias value must be used
 

@@ -220,6 +220,20 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			if !ok {
 				return v.error(x, "invalid field name: %v", x)
 			}
+
+			// TODO: if the clauses do not contain a guard, we know that this
+			// field will always be added and we can move the comprehension one
+			// level down. This, in turn, has the advantage that it is more
+			// likely that the cross-reference limitation for field
+			// comprehensions is not violated. To ensure compatibility between
+			// implementations, though, we should relax the spec as well.
+			// The cross-reference rule is simple and this relaxation seems a
+			// bit more complex.
+
+			// TODO: for now we can also consider making this an error if
+			// the list of clauses does not contain if and make a suggestion
+			// to rewrite it.
+
 			if name != "" {
 				yielder.key = &stringLit{newNode(x), name}
 				yielder.value = v.walk(field.Value)

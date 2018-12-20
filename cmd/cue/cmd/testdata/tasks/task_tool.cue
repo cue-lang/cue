@@ -42,15 +42,3 @@ command http: {
 		text: task.http.response.body
 	}
 }
-
-runBase: {
-	task echo: {
-		kind:   "exec"
-		stdout: string
-	}
-
-	task display: {
-		kind: "print"
-		text: task.echo.stdout
-	}
-}

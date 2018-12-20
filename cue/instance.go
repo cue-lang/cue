@@ -137,6 +137,7 @@ func (inst *Instance) Eval(expr ast.Expr) Value {
 //
 // Errors regarding conflicts are included in the result, but not reported, so
 // that these will only surface during manifestation. This allows
+// non-conflicting parts to be used.
 func Merge(inst ...*Instance) *Instance {
 	switch len(inst) {
 	case 0:

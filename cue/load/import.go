@@ -401,7 +401,7 @@ func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
 	case isTest:
 		p.TestCUEFiles = append(p.TestCUEFiles, fullPath)
 	case isTool:
-		p.ToolCUEFiles = append(p.TestCUEFiles, fullPath)
+		p.ToolCUEFiles = append(p.ToolCUEFiles, fullPath)
 	default:
 		p.CUEFiles = append(p.CUEFiles, fullPath)
 	}

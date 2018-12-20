@@ -17,19 +17,19 @@ The first step is registering as a CUE contributor and configuring your environm
 Here is a checklist of the required steps to follow:
 
 
-- *Step 0*: Decide on a single Google Account you will be using to contribute to CUE.
+- **Step 0**: Decide on a single Google Account you will be using to contribute to CUE.
 Use that account for all the following steps and make sure that `git`
 is configured to create commits with that account's e-mail address.
-- *Step 1*: [Sign and submit](https://cla.developers.google.com/clas) a
+- **Step 1**: [Sign and submit](https://cla.developers.google.com/clas) a
 CLA (Contributor License Agreement).
-- *Step 2*: Configure authentication credentials for the CUE Git repository.
+- **Step 2**: Configure authentication credentials for the CUE Git repository.
 Visit
 [cue.googlesource.com](https://cue.googlesource.com), click
 on "Generate Password" (top right), and follow the instructions.
-- *Step 3*: Register for Gerrit, the code review tool used by the CUE team,
+- **Step 3**: Register for Gerrit, the code review tool used by the CUE team,
 by [visiting this page](https://cue-review.googlesource.com/login/).
 The CLA and the registration need to be done only once for your account.
-- *Step 4*: Install `git-codereview` by running
+- **Step 4**: Install `git-codereview` by running
 `go get -u golang.org/x/review/git-codereview`
 
 <!-- TODO
@@ -327,7 +327,7 @@ with help you understand the flow.
 This is an overview of the overall process:
 
 
-- *Step 1:* Clone the CUE source code from cue.googlesource.com
+- **Step 1:** Clone the CUE source code from cue.googlesource.com
 and make sure it's stable by compiling and testing it once:
 ```
 $ git clone https://cue.googlesource.com/core
@@ -336,7 +336,7 @@ $ go test ./...
 $ go install ./cmd/cue
 ```
 
-- *Step 2:* Prepare changes in a new branch, created from the master branch.
+- **Step 2:** Prepare changes in a new branch, created from the master branch.
 To commit the changes, use `git` `codereview` `change`; that
 will create or amend a single commit in the branch.
 ```
@@ -350,18 +350,18 @@ $ git codereview change   # amend the existing commit with new changes
 $ [etc.]
 ```
 
-- *Step 3:* Test your changes, re-running `go test`.
+- **Step 3:** Test your changes, re-running `go test`.
 ```
 $ go test ./...    # recompile and test
 ```
 
-- *Step 4:* Send the changes for review to Gerrit using `git`
+- **Step 4:** Send the changes for review to Gerrit using `git`
 `codereview` `mail` (which doesn't use e-mail, despite the name).
 ```
 $ git codereview mail     # send changes to Gerrit
 ```
 
-- *Step 5:* After a review, apply changes to the same single commit
+- **Step 5:** After a review, apply changes to the same single commit
 and mail them to Gerrit again:
 ```
 $ [edit files...]
@@ -600,23 +600,16 @@ contributors usually focuses on basic cosmetics and common mistakes.
 These include things like:
 
 
-<ul>
-<li>
-Commit message not following the suggested
+- Commit message not following the suggested
 format.
-</li>
-
-<li>
-The lack of a linked GitHub issue.
+- The lack of a linked GitHub issue.
 The vast majority of changes
 require a linked issue that describes the bug or the feature that the change
 fixes or implements, and consensus should have been reached on the tracker
 before proceeding with it.
 Gerrit reviews do not discuss the merit of the change,
 just its implementation.
-<br>
 Only trivial or cosmetic changes will be accepted without an associated issue.
-</li>
 
 <!-- TODO
 <li>
@@ -630,7 +623,6 @@ You can add `R=cue1.XX` as a comment yourself
 if you know that it's not the correct time frame for the change.
 </li>
 -->
-</ul>
 
 <!--
 TODO
@@ -688,25 +680,15 @@ As they near a decision, reviewers will make a "vote" on your change.
 The Gerrit voting system involves an integer in the range -2 to +2:
 
 
-<ul>
-	<li>
-	*+2* The change is approved for being merged.
+-	**+2** The change is approved for being merged.
 	Only CUE maintainers can cast a +2 vote.
-	</li>
-	<li>
-	*+1* The change looks good, but either the reviewer is requesting
+-	**+1** The change looks good, but either the reviewer is requesting
 	minor changes before approving it, or they are not a maintainer and cannot
 	approve it, but would like to encourage an approval.
-	</li>
-	<li>
-	*-1* The change is not good the way it is but might be fixable.
+-	**-1** The change is not good the way it is but might be fixable.
 	A -1 vote will always have a comment explaining why the change is unacceptable.
-	</li>
-	<li>
-	*-2* The change is blocked by a maintainer and cannot be approved.
+-	**-2** The change is blocked by a maintainer and cannot be approved.
 	Again, there will be a comment explaining the decision.
-	</li>
-</ul>
 
 ### Submitting an approved change
 
@@ -947,8 +929,7 @@ $ git fetch https://cue.googlesource.com/review refs/changes/21/13245/1 &amp;&am
 To revert, change back to the branch you were working in.
 
 
-
-### onfig">Set up git aliases
+### Set up git aliases
 
 The `git-codereview` command can be run directly from the shell
 by typing, for instance,

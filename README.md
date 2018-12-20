@@ -81,7 +81,7 @@ set of Kubernetes configurations is available in
 
 Our canonical Git repository is located at https://cue.googlesource.com.
 
-To contribute, please read the [Contribution Guide](./doc/contribute.html).
+To contribute, please read the [Contribution Guide](./doc/contribute.md).
 
 ##### Note that we do not accept pull requests and that we use the issue tracker for bug reports and proposals only.
 

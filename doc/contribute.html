@@ -1,4 +1,38 @@
-# Contribution Guide
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="theme-color" content="#375EAB">
+
+  <title>Contribution Guide - The CUE Configuration Language</title>
+
+<link type="text/css" rel="stylesheet" href="https://golang.org/lib/godoc/style.css">
+
+<link rel="stylesheet" href="/lib/godoc/jquery.treeview.css">
+
+</head>
+<body>
+
+<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
+...
+</div><!-- #lowframe -->
+
+<div id="topbar" class="wide"><div class="container">
+<div class="top-heading" id="heading-wide"><a href="/">The CUE Configuration Language</a></div>
+</div></div>
+
+<div id="page" class="wide">
+<div class="container">
+
+  <h1>
+    Contribution Guide
+    <span class="text-muted"></span>
+  </h1>
+
+<div id="nav"></div>
+
 
 <p>
 The CUE project welcomes all contributors.
@@ -729,16 +763,18 @@ just its implementation.
 Only trivial or cosmetic changes will be accepted without an associated issue.
 </li>
 
+<!-- TODO
 <li>
 Change sent during the freeze phase of the development cycle, when the tree
 is closed for general changes.
 In this case,
-a maintainer might review the code with a line such as <code>R=go1.12</code>,
+a maintainer might review the code with a line such as <code>R=cue1.1</code>,
 which means that it will be reviewed later when the tree opens for a new
 development window.
-You can add <code>R=go1.XX</code> as a comment yourself
+You can add <code>R=cue1.XX</code> as a comment yourself
 if you know that it's not the correct time frame for the change.
 </li>
+-->
 </ul>
 
 <!--
@@ -1151,3 +1187,18 @@ $ git codereview mail HEAD
 Make sure to explicitly specify <code>HEAD</code>, which is usually not required when sending
 single changes.
 </p>
+
+
+<div id="footer">
+Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
+the content of this page is licensed under the
+Creative Commons Attribution 3.0 License,
+and code is licensed under a <a href="/LICENSE">Apache 2 license</a>.<br>
+<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
+</div>
+
+</div><!-- .container -->
+</div><!-- #page -->
+
+</body>
+</html>

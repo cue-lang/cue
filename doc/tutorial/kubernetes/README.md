@@ -894,8 +894,8 @@ $ cue ls ./frontend/maitred
 If more than one instance is selected the `cue` tool may either operate
 on them one by one or merge them.
 The default is to merge them.
-Different instances of a package are typically not compatible: as instances
-in different subdirectories may have different specializations.
+Different instances of a package are typically not compatible:
+different subdirectories may have different specializations.
 A merge pre-expands templates of each instance and then merges their root
 values.
 The result may contain conflicts, such as our top-level `_component` field,
@@ -1015,7 +1015,7 @@ of course.
 
 In Section "Quick 'n Dirty" we showed how to quickly get going with CUE.
 With a bit more deliberation, one can reduce configurations even further.
-Also, we would like to define a configuration that more generic and less tied
+Also, we would like to define a configuration that is more generic and less tied
 to Kubernetes.
 
 We will rely heavily on CUEs order independence, which makes it easy to
@@ -1023,12 +1023,7 @@ combine two configurations of the same object in a well-defined way.
 This makes it easy, for instance, to put frequently used fields in one file
 and more esoteric one in another and then combine them without fear that one
 will override the other.
-
-For our manually constructed configuration we use this concept by defining
-a more generic and abstract model for the commonly used Kubernetes features
-while leaving the
-We define mappings to map the common configuration to Kubernetes and then
-merge them with the Kubernetes fields that were included verbatim.
+We will take this approach in this section.
 
 The end result of this tutorial is in the `manual` directory.
 In the next sections we will show how to get there.
@@ -1073,35 +1068,12 @@ service <Name>: {
 
 deployment <Name>: {
     name: Name | string
-    ...
+   ...
 }
 ```
 
 A Kubernetes-specific file then contains the definitions to
 convert the generic objects to Kubernetes.
-
-```
-// file k8s.cue
-package cloud
-
-// kubernetes holds the Kubernetes versions of definitions.
-kubernetes services: {
-    "\(k)": v.kubernetes & {
-        apiVersion: "v1"
-        kind: "Service"
-
-        metadata name:   x.name
-        metadata labels: x.label
-        spec selector:   x.label
-
-        spec ports: [ p for p in x.port ]
-    } for k, v in service
-}
-...
-```
-
-This approach allows us to come up with simple cloud definitions, while
-still have an out to use any Kubernetes-specific option we may want.
 
 Overall, the code modeling our services and the code generating the kubernetes
 code is separated, while still allowing to inject Kubernetes-specific
@@ -1109,13 +1081,14 @@ data into our general model.
 At the same time, we can add additional information to our model without
 it ending up in the Kubernetes defintions causing it to barf.
 
+
 ### Deployment Definition
 
 For our design we assume that all Kubernetes Pod derivatives only define one
 container.
 This is clearly not the case in general, but often it does and it is good
 practice.
-Conveniently, it simplifies this example.
+Conveniently, it simplifies our model as well.
 
 We base the model loosely on the master templates we derived in
 Section "Quick 'n Dirty".
@@ -1125,7 +1098,6 @@ rather just have a `deployment` allowing different kinds.
 ```
 deployment <Name>: _base & {
     name:     Name | string
-    kind:     "deployment" | "stateful" | "daemon"
     ...
 ```
 
@@ -1134,8 +1106,6 @@ daemonset.
 This also eliminates the need for `_spec`.
 
 The next step is to pull common fields, such as `image` to the top level.
-We introduce maps for arguments, environment variables, ports, and volumes
-to simplify their definition.
 
 Arguments can be specied as a map.
 ```
@@ -1157,7 +1127,7 @@ For ports we define two simple maps from name to port number:
 Both maps get defined in the container definition, but only `port` gets
 included in the service definition.
 This may not be the best model, and does not support all features,
-but it shows how one can chose a very different representation.
+but it shows how one can chose a different representation.
 
 A similar story holds for environment variables.
 In most cases mapping strings to string suffices.
@@ -1187,7 +1157,7 @@ volume spec and volume mount.
     }
 ```
 
-All other fields that may way want to define can go into a generic kubernetes
+All other fields that we way want to define can go into a generic kubernetes
 struct that gets merged in with all other generated kubernetes data.
 
 ```
@@ -1227,7 +1197,7 @@ subdirectory.
 Running our usual count yields
 ```
 find . | grep kube.cue | xargs wc | tail -1
-     536    1155   11398 total
+     542    1190   11520 total
 ```
 This does not count our conversion templates.
 Assuming that the top-level templates are reusable, and if we don't count them
@@ -1237,7 +1207,7 @@ If we count the templates as well, the two approaches are roughly equal.
 
 ### Conclusions Manual Configuration
 
-We have shown that we can further compact our configuration by manually
+We have shown that we can further compact a configuration by manually
 optimizing template files.
 However, we have also shown that the manual optimizition only gives
 a marginal benefit with respect to the quick-and-dirty semi-automatic reduction.
@@ -1246,14 +1216,13 @@ flexibility one gets.
 
 Manually tailoring your configurations allows creating an abstraction layer
 between logical definitions and Kubernetes-specific definitions.
-At the same time, CUE's flexibility,
-resulting from its order independences,
+At the same time, CUE's order independence
 makes it easy to mix in low-level Kubernetes configuration whereever it is
 convenient and applicable.
 
 Manual tailoring also allows us to add our own definitions without breaking
-Kuberenetes.
-This is crucial in defining information relevant to your definitions,
+Kubernetes.
+This is crucial in defining information relevant to definitions,
 but unrelated to Kubernetes, where they belong.
 
 Separating abstract from concrete configuration also allows us to create

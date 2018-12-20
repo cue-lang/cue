@@ -62,10 +62,9 @@ For more details see [Installing CUE](./doc/install.md).
 
 ### Learning CUE
 
-A demonstration of how to convert and restructure and existing
+A demonstration of how to convert and restructure an existing
 set of Kubernetes configurations is available in
-[written form](./doc/examples/kubernetes/Readme.md) or as
-[video]().
+[written form](./doc/tutorial/kubernetes/README.md).
 
 ### References
 
@@ -82,7 +81,7 @@ set of Kubernetes configurations is available in
 
 Our canonical Git repository is located at https://cue.googlesource.com.
 
-To contribute, please read the [Contribution Guidelines](./CONTRIBUTING.md).
+To contribute, please read the [Contribution Guide](./doc/contribute.md).
 
 ##### Note that we do not accept pull requests and that we use the issue tracker for bug reports and proposals only.
 

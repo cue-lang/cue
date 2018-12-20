@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: download
+  labels:
+    app: download
+    component: infra
+    domain: prod
+spec:
+  ports:
+  - port: 7080
+    targetPort: 7080
+    protocol: TCP
+    name: client
+  selector:
+    app: download
+    domain: prod
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: download
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        app: download
+        component: infra
+        domain: prod
+    spec:
+      containers:
+      - name: download
+        image: gcr.io/myproj/download:v0.0.2
+        ports:
+        - containerPort: 7080

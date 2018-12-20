@@ -21,7 +21,7 @@ again.
 
 All submissions, including submissions by project members, require review. We
 use Gerrit code reviews at https://cue-review.googlesource.com for this purpose.
-Please read the [Contributing Guidelines][./doc/contribute.html]
+Please read the [Contributing Guide][./doc/contribute.md]
 before reading patches.
 
 ## Community Guidelines

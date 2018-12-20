@@ -29,7 +29,7 @@ with other configuration languages.
 
 The CUE tooling also provides integrated declarative scripting
 aimed at simplifying putting configurations to good use while
-giving static analyis tools maximum domain knowledge.
+giving static analysis tools maximum domain knowledge.
 
 Some highlights:
 

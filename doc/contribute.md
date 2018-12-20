@@ -1,58 +1,22 @@
-
-<!DOCTYPE html>
-<html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="theme-color" content="#375EAB">
-
-  <title>Contribution Guide - The CUE Configuration Language</title>
-
-<link type="text/css" rel="stylesheet" href="https://golang.org/lib/godoc/style.css">
-
-<link rel="stylesheet" href="/lib/godoc/jquery.treeview.css">
-
-</head>
-<body>
-
-<div id='lowframe' style="position: fixed; bottom: 0; left: 0; height: 0; width: 100%; border-top: thin solid grey; background-color: white; overflow: auto;">
-...
-</div><!-- #lowframe -->
-
-<div id="topbar" class="wide"><div class="container">
-<div class="top-heading" id="heading-wide"><a href="/">The CUE Configuration Language</a></div>
-</div></div>
-
-<div id="page" class="wide">
-<div class="container">
-
   <h1>
     Contribution Guide
-    <span class="text-muted"></span>
   </h1>
 
-<div id="nav"></div>
 
-
-<p>
 The CUE project welcomes all contributors.
-</p>
 
-<p>
 This document is a guide to help you through the process
 of contributing to the CUE project, which is a little different
 from that used by other open source projects.
 We assume you have a basic understanding of Git and Go.
-</p>
+
 
 <h2 id="contributor">Becoming a contributor</h2>
 
 <h3>Overview</h3>
 
-<p>
 The first step is registering as a CUE contributor and configuring your environment.
 Here is a checklist of the required steps to follow:
-</p>
 
 <ul>
 <li>
@@ -81,10 +45,9 @@ The CLA and the registration need to be done only once for your account.
 </ul>
 
 <!-- TODO
-<p>
 If you prefer, there is an automated tool that walks through these steps.
 Just run:
-</p>
+
 
 <pre>
 $ go get -u cuelang.org/x/tools/cmd/cue-contrib-init
@@ -93,15 +56,13 @@ $ cue-contrib-init
 </pre>
 --->
 
-<p>
 The rest of this chapter elaborates on these instructions.
 If you have completed the steps above (either manually or through the tool), jump to
 <a href="#before_contributing">Before contributing code</a>.
-</p>
+
 
 <h3 id="google_account">Step 0: Select a Google Account</h3>
 
-<p>
 A contribution to CUE is made through a Google account with a specific
 e-mail address.
 Make sure to use the same account throughout the process and
@@ -112,9 +73,8 @@ will own the copyright for the code that you will be writing
 and submitting.
 You might want to discuss this topic with your employer before deciding which
 account to use.
-</p>
 
-<p>
+
 Google accounts can either be Gmail e-mail accounts, G Suite organization accounts, or
 accounts associated with an external e-mail address.
 For instance, if you need to use
@@ -122,24 +82,22 @@ an existing corporate e-mail that is not managed through G Suite, you can create
 an account associated
 <a href="https://accounts.google.com/SignUpWithoutGmail">with your existing
 e-mail address</a>.
-</p>
 
-<p>
+
 You also need to make sure that your Git tool is configured to create commits
 using your chosen e-mail address.
 You can either configure Git globally
 (as a default for all projects), or locally (for a single specific project).
 You can check the current configuration with this command:
-</p>
+
 
 <pre>
 $ git config --global user.email  # check current global config
 $ git config user.email           # check current local config
 </pre>
 
-<p>
 To change the configured address:
-</p>
+
 
 <pre>
 $ git config --global user.email name@example.com   # change global config
@@ -149,11 +107,10 @@ $ git config user.email name@example.com            # change local config
 
 <h3 id="cla">Step 1: Contributor License Agreement</h3>
 
-<p>
 Before sending your first change to the CUE project
 you must have completed one of the following two CLAs.
 Which CLA you should sign depends on who owns the copyright to your work.
-</p>
+
 
 <ul>
 <li>
@@ -169,35 +126,32 @@ contributor license agreement</a>.<br>
 </li>
 </ul>
 
-<p>
 You can check your currently signed agreements and sign new ones at
 the <a href="https://cla.developers.google.com/clas?pli=1&amp;authuser=1">Google Developers
 Contributor License Agreements</a> website.
 If the copyright holder for your contribution has already completed the
 agreement in connection with another Google open source project,
 it does not need to be completed again.
-</p>
 
-<p>
+
 If the copyright holder for the code you are submitting changes&mdash;for example,
 if you start contributing code on behalf of a new company&mdash;please send mail
 to the <a href="mailto:cue-dev@googlegroups.com"><code>cue-dev</code>
 mailing list</a>.
 This will let us know the situation so we can make sure an appropriate agreement is
 completed and update the <code>AUTHORS</code> file.
-</p>
+
 
 
 <h3 id="config_git_auth">Step 2: Configure git authentication</h3>
 
-<p>
 The main CUE repository is located at
 <a href="https://cue.googlesource.com">cue.googlesource.com</a>,
 a Git server hosted by Google.
 Authentication on the web server is made through your Google account, but
 you also need to configure <code>git</code> on your computer to access it.
 Follow this steps:
-</p>
+
 
 <ol>
 <li>
@@ -223,59 +177,51 @@ otherwise run the regular script.
 
 <h3 id="auth">Step 3: Create a Gerrit account </h3>
 
-<p>
 Gerrit is an open-source tool used by CUE maintainers to discuss and review
 code submissions.
-</p>
 
-<p>
+
 To register your account, visit <a href="https://cue-review.googlesource.com/login/">
 cue-review.googlesource.com/login/</a> and sign in once using the same Google Account you used above.
-</p>
+
 
 <h3 id="git-codereview_install">Step 4: Install the git-codereview command</h3>
 
-<p>
 Changes to CUE must be reviewed before they are accepted, no matter who makes the change.
 A custom <code>git</code> command called <code>git-codereview</code>
 simplifies sending changes to Gerrit.
-</p>
 
-<p>
+
 Install the <code>git-codereview</code> command by running,
-</p>
+
 
 <pre>
 $ go get -u golang.org/x/review/git-codereview
 </pre>
 
-<p>
 Make sure <code>git-codereview</code> is installed in your shell path, so that the
 <code>git</code> command can find it.
 Check that
-</p>
+
 
 <pre>
 $ git codereview help
 </pre>
 
-<p>
 prints help text, not an error.
-</p>
 
-<p>
+
 On Windows, when using git-bash you must make sure that
 <code>git-codereview.exe</code> is in your <code>git</code> exec-path.
 Run <code>git --exec-path</code> to discover the right location then create a
 symbolic link or just copy the executable from $GOPATH/bin to this directory.
-</p>
+
 
 
 <h2 id="before_contributing">Before contributing code</h2>
 
 <!--
 TODO
-<p>
 The project welcomes code patches, but to make sure things are well
 coordinated you should discuss any significant change before starting
 the work.
@@ -283,21 +229,19 @@ It's recommended that you signal your intention to contribute in the
 issue tracker, either by <a href="https://cuelang.org/issue/new">filing
 a new issue</a> or by claiming
 an <a href="https://cuelang.org/issues">existing one</a>.
-</p>
+
 -->
 
 <h3>Check the issue tracker</h3>
 
-<p>
 Whether you already know what contribution to make, or you are searching for
 an idea, the <a href="https://github.com/cuelang/cue/issues">issue tracker</a> is
 always the first place to go.
 Issues are triaged to categorize them and manage the workflow.
-</p>
 
-<p>
+
 Most issues will be marked with one of the following workflow labels:
-</p>
+
 
 <ul>
 	<li>
@@ -318,9 +262,8 @@ Most issues will be marked with one of the following workflow labels:
 	</li>
 </ul>
 
-<p>
 You can use GitHub's search functionality to find issues to help out with. Examples:
-</p>
+
 
 <ul>
 	<li>
@@ -339,7 +282,6 @@ You can use GitHub's search functionality to find issues to help out with. Examp
 
 <h3 id="design">Open an issue for any new problem</h3>
 
-<p>
 Excluding very trivial changes, all contributions should be connected
 to an existing issue.
 Feel free to open one and discuss your plans.
@@ -348,53 +290,47 @@ helps prevent duplication of effort,
 and ensures that the idea fits inside the goals for the language and tools.
 It also checks that the design is sound before code is written;
 the code review tool is not the place for high-level discussions.
-</p>
+
 
 <!--
 TODO
-<p>
 When planning work, please note that the CUE project follows a <a
 href="https://cuelang.org/wiki/CUE-Release-Cycle">six-month development cycle</a>.
 The latter half of each cycle is a three-month feature freeze during
 which only bug fixes and documentation updates are accepted.
 New contributions can be sent during a feature freeze, but they will
 not be merged until the freeze is over.
-</p>
 
-<p>
+
 Significant changes to the language, libraries, or tools must go
 through the
 <a href="https://cuelang.org/s/proposal-process">change proposal process</a>
 before they can be accepted.
-</p>
 
-<p>
+
 Sensitive security-related issues (only!) should be reported to <a href="mailto:security@cuelang.org">security@cuelang.org</a>.
-</p>
+
 
 <h2 id="sending_a_change_github">Sending a change via GitHub</h2>
 
-<p>
 First-time contributors that are already familiar with the
 <a href="https://guides.github.com/introduction/flow/">GitHub flow</a>
 are encouraged to use the same process for CUE contributions.
 Even though CUE
 maintainers use Gerrit for code review, a bot called Gopherbot has been created to sync
 GitHub pull requests to Gerrit.
-</p>
 
-<p>
+
 Open a pull request as you normally would.
 Gopherbot will create a corresponding Gerrit change and post a link to
 it on your GitHub pull request; updates to the pull request will also
 get reflected in the Gerrit change.
 When somebody comments on the change, their comment will be also
 posted in your pull request, so you will get a notification.
-</p>
 
-<p>
+
 Some things to keep in mind:
-</p>
+
 
 <ul>
 <li>
@@ -419,18 +355,16 @@ Remember you can always visit Gerrit to see the fine-grained review.
 
 <h2 id="sending_a_change_gerrit">Sending a change via Gerrit</h2>
 
-<p>
 It is not possible to fully sync Gerrit and GitHub, at least at the moment,
 so we recommend learning Gerrit.
 It's different but powerful and familiarity
 with help you understand the flow.
-</p>
+
 
 <h3>Overview</h3>
 
-<p>
 This is an overview of the overall process:
-</p>
+
 
 <ul>
 <li>
@@ -487,21 +421,19 @@ $ git codereview mail     # send to Gerrit again
 </li>
 </ul>
 
-<p>
 The rest of this section describes these steps in more detail.
-</p>
+
 
 
 <h3 id="checkout_go">Step 1: Clone the CUE source code</h3>
 
-<p>
 In addition to a recent CUE installation, you need to have a local copy of the source
 checked out from the correct repository.
 You can check out the CUE source repo onto your local file system anywhere
 you want as long as it's outside your <code>GOPATH</code>.
 Either clone from
 <code>cue.googlesource.com</code> or from GitHub:
-</p>
+
 
 <pre>
 $ git clone https://github.com/cuelang/core   # or https://cue.googlesource.com/core
@@ -512,12 +444,11 @@ $ go test ./...
 
 <h3 id="make_branch">Step 2: Prepare changes in a new branch</h3>
 
-<p>
 Each CUE change must be made in a separate branch, created from the master branch.
 You can use
 the normal <code>git</code> commands to create a branch and add changes to the
 staging area:
-</p>
+
 
 <pre>
 $ git checkout -b mybranch
@@ -525,56 +456,50 @@ $ [edit files...]
 $ git add [files...]
 </pre>
 
-<p>
 To commit changes, instead of <code>git commit</code>, use <code>git codereview change</code>.
-</p>
+
 
 <pre>
 $ git codereview change
 (open $EDITOR)
 </pre>
 
-<p>
 You can edit the commit description in your favorite editor as usual.
 The  <code>git</code> <code>codereview</code> <code>change</code> command
 will automatically add a unique Change-Id line near the bottom.
 That line is used by Gerrit to match successive uploads of the same change.
 Do not edit or delete it.
 A Change-Id looks like this:
-</p>
+
 
 <pre>
 Change-Id: I2fbdbffb3aab626c4b6f56348861b7909e3e8990
 </pre>
 
-<p>
 The tool also checks that you've
 run <code>go</code> <code>fmt</code> over the source code, and that
 the commit message follows the <a href="#commit_messages">suggested format</a>.
-</p>
 
-<p>
+
 If you need to edit the files again, you can stage the new changes and
 re-run <code>git</code> <code>codereview</code> <code>change</code>: each subsequent
 run will amend the existing commit while preserving the Change-Id.
-</p>
 
-<p>
+
 Make sure that you always keep a single commit in each branch.
 If you add more
 commits by mistake, you can use <code>git</code> <code>rebase</code> to
 <a href="https://stackoverflow.com/questions/31668794/squash-all-your-commits-in-one-before-a-pull-request-in-github">squash them together</a>
 into a single one.
-</p>
+
 
 
 <h3 id="testing">Step 3: Test your changes</h3>
 
-<p>
 You've <a href="code.html">written and tested your code</a>, but
 before sending code out for review, run <i>all the tests for the whole
 tree</i> to make sure the changes don't break other packages or programs:
-</p>
+
 
 <pre>
 $ go test ./...
@@ -583,53 +508,47 @@ $ go test ./...
 
 <h3 id="mail">Step 4: Send changes for review</h3>
 
-<p>
 Once the change is ready and tested over the whole tree, send it for review.
 This is done with the <code>mail</code> sub-command which, despite its name, doesn't
 directly mail anything; it just sends the change to Gerrit:
-</p>
+
 
 <pre>
 $ git codereview mail
 </pre>
 
-<p>
 Gerrit assigns your change a number and URL, which <code>git</code> <code>codereview</code> <code>mail</code> will print, something like:
-</p>
+
 
 <pre>
 remote: New Changes:
 remote:   https://cue-review.googlesource.com/99999 math: improved Sin, Cos and Tan precision for very large arguments
 </pre>
 
-<p>
 If you get an error instead, check the
 <a href="#troubleshooting_mail">Troubleshooting mail errors</a> section.
-</p>
 
-<p>
+
 If your change relates to an open GitHub issue and you have followed the <a href="#commit_messages">
 suggested commit message format</a>, the issue will be updated in a few minutes by a bot,
 linking your Gerrit change to it in the comments.
-</p>
+
 
 
 <h3 id="revise">Step 5: Revise changes after a review</h3>
 
-<p>
 CUE maintainers will review your code on Gerrit, and you will get notifications via e-mail.
 You can see the review on Gerrit and comment on them there.
 You can also reply
 <a href="https://gerrit-review.googlesource.com/Documentation/intro-user.html#reply-by-email">using e-mail</a>
 if you prefer.
-</p>
 
-<p>
+
 If you need to revise your change after the review, edit the files in
 the same branch you previously created, add them to the Git staging
 area, and then amend the commit with
 <code>git</code> <code>codereview</code> <code>change</code>:
-</p>
+
 
 <pre>
 $ git codereview change     # amend current commit
@@ -637,29 +556,25 @@ $ git codereview change     # amend current commit
 $ git codereview mail       # send new changes to Gerrit
 </pre>
 
-<p>
 If you don't need to change the commit description, just save and exit from the editor.
 Remember not to touch the special Change-Id line.
-</p>
 
-<p>
+
 Again, make sure that you always keep a single commit in each branch.
 If you add more
 commits by mistake, you can use <code>git rebase</code> to
 <a href="https://stackoverflow.com/questions/31668794/squash-all-your-commits-in-one-before-a-pull-request-in-github">squash them together</a>
 into a single one.
-</p>
+
 
 <h2 id="commit_messages">Good commit messages</h2>
 
-<p>
 Commit messages in CUE follow a specific set of conventions,
 which we discuss in this section.
-</p>
 
-<p>
+
 Here is an example of a good one:
-</p>
+
 
 <pre>
 math: improve Sin, Cos and Tan precision for very large arguments
@@ -675,75 +590,66 @@ Fixes #159
 
 <h3>First line</h3>
 
-<p>
 The first line of the change description is conventionally a short one-line
 summary of the change, prefixed by the primary affected package.
-</p>
 
-<p>
+
 A rule of thumb is that it should be written so to complete the sentence
 "This change modifies CUE to _____."
 That means it does not start with a capital letter, is not a complete sentence,
 and actually summarizes the result of the change.
-</p>
 
-<p>
+
 Follow the first line by a blank line.
-</p>
+
 
 <h3>Main content</h3>
 
-<p>
 The rest of the description elaborates and should provide context for the
 change and explain what it does.
 Write in complete sentences with correct punctuation, just like
 for your comments in CUE.
 Don't use HTML, Markdown, or any other markup language.
-</p>
+
 
 
 <h3>Referencing issues</h3>
 
-<p>
 The special notation "Fixes #12345" associates the change with issue 12345 in the
 <a href="https://cuelang.org/issue/12345">CUE issue tracker</a>.
 When this change is eventually applied, the issue
 tracker will automatically mark the issue as fixed.
-</p>
 
-<p>
+
 If the change is a partial step towards the resolution of the issue,
 uses the notation "Updates #12345".
 This will leave a comment in the issue
 linking back to the change in Gerrit, but it will not close the issue
 when the change is applied.
-</p>
 
-<p>
+
 If you are sending a change against a subrepository, you must use
 the fully-qualified syntax supported by GitHub to make sure the change is
 linked to the issue in the main repository, not the subrepository.
 All issues are tracked in the main repository's issue tracker.
 The correct form is "Fixes cuelang/core#159".
-</p>
+
 
 
 <h2 id="review">The review process</h2>
 
-<p>
 This section explains the review process in detail and how to approach
 reviews after a change has been mailed.
-</p>
+
 
 
 <h3 id="mistakes">Common beginner mistakes</h3>
 
-<p>
 When a change is sent to Gerrit, it is usually triaged within a few days.
 A maintainer will have a look and provide some initial review that for first-time
 contributors usually focuses on basic cosmetics and common mistakes.
 These include things like:
-</p>
+
 
 <ul>
 <li>
@@ -781,23 +687,20 @@ if you know that it's not the correct time frame for the change.
 TODO
 <h3 id="trybots">Trybots</h3>
 
-<p>
 After an initial reading of your change, maintainers will trigger trybots,
 a cluster of servers that will run the full test suite on several different
 architectures.
 Most trybots complete in a few minutes, at which point a link will
 be posted in Gerrit where you can see the results.
-</p>
 
-<p>
+
 If the trybot run fails, follow the link and check the full logs of the
 platforms on which the tests failed.
 Try to understand what broke, update your patch to fix it, and upload again.
 Maintainers will trigger a new trybot run to see
 if the problem was fixed.
-</p>
 
-<p>
+
 Sometimes, the tree can be broken on some platforms for a few hours; if
 the failure reported by the trybot doesn't seem related to your patch, go to the
 <a href="https://build.cuelang.org">Build Dashboard</a> and check if the same
@@ -805,40 +708,36 @@ failure appears in other recent commits on the same platform.
 In this case,
 feel free to write a comment in Gerrit to mention that the failure is
 unrelated to your change, to help maintainers understand the situation.
-</p>
+
 -->
 
 <h3 id="reviews">Reviews</h3>
 
-<p>
 The CUE community values very thorough reviews.
 Think of each review comment like a ticket: you are expected to somehow "close" it
 by acting on it, either by implementing the suggestion or convincing the
 reviewer otherwise.
-</p>
 
-<p>
+
 After you update the change, go through the review comments and make sure
 to reply to every one.
 You can click the "Done" button to reply
 indicating that you've implemented the reviewer's suggestion; otherwise,
 click on "Reply" and explain why you have not, or what you have done instead.
-</p>
 
-<p>
+
 It is perfectly normal for changes to go through several round of reviews,
 with one or more reviewers making new comments every time
 and then waiting for an updated change before reviewing again.
 This cycle happens even for experienced contributors, so
 don't be discouraged by it.
-</p>
+
 
 <h3 id="votes">Voting conventions</h3>
 
-<p>
 As they near a decision, reviewers will make a "vote" on your change.
 The Gerrit voting system involves an integer in the range -2 to +2:
-</p>
+
 
 <ul>
 	<li>
@@ -862,19 +761,16 @@ The Gerrit voting system involves an integer in the range -2 to +2:
 
 <h3 id="submit">Submitting an approved change</h3>
 
-<p>
 After the code has been +2'ed, an approver will
 apply it to the master branch using the Gerrit user interface.
 This is called "submitting the change".
-</p>
 
-<p>
+
 The two steps (approving and submitting) are separate because in some cases maintainers
 may want to approve it but not to submit it right away (for instance,
 the tree could be temporarily frozen).
-</p>
 
-<p>
+
 Submitting a change checks it into the repository.
 The change description will include a link to the code review,
 which will be updated with a link to the change
@@ -882,13 +778,12 @@ in the repository.
 Since the method used to integrate the changes is Git's "Cherry Pick",
 the commit hashes in the repository will be changed by
 the submit operation.
-</p>
 
-<p>
+
 If your change has been approved for a few days without being
 submitted, feel free to write a comment in Gerrit requesting
 submission.
-</p>
+
 
 
 <!--
@@ -896,25 +791,22 @@ submission.
 <h3 id="more_information">More information</h3>
 
 TODO
-<p>
 In addition to the information here, the CUE community maintains a <a
 href="https://cuelang.org/wiki/CodeReview">CodeReview</a> wiki page.
 Feel free to contribute to this page as you learn more about the review process.
-</p>
+
 -->
 
 
 <h2 id="advanced_topics">Miscellaneous topics</h2>
 
-<p>
 This section collects a number of other comments that are
 outside the issue/edit/code review/submit process itself.
-</p>
+
 
 
 <h3 id="copyright">Copyright headers</h3>
 
-<p>
 Files in the CUE repository don't list author names, both to avoid clutter
 and to avoid having to keep the lists up to date.
 Instead, your name will appear in the
@@ -924,11 +816,10 @@ href="/AUTHORS"><code>AUTHORS</code></a> file.
 These files are automatically generated from the commit logs periodically.
 The <a href="/AUTHORS"><code>AUTHORS</code></a> file defines who &ldquo;The CUE
 Authors&rdquo;&mdash;the copyright holders&mdash;are.
-</p>
 
-<p>
+
 New files that you contribute should use the standard copyright header:
-</p>
+
 
 <pre>
 // Copyright 2018 The CUE Authors
@@ -946,25 +837,23 @@ New files that you contribute should use the standard copyright header:
 // limitations under the License.
 </pre>
 
-<p>
 (Use the current year if you're reading this in 2019 or beyond.)
 Files in the repository are copyrighted the year they are added.
 Do not update the copyright year on files that you change.
-</p>
+
 
 
 
 
 <h3 id="troubleshooting_mail">Troubleshooting mail errors</h3>
 
-<p>
 The most common way that the <code>git</code> <code>codereview</code> <code>mail</code>
 command fails is because the e-mail address in the commit does not match the one
 that you used during <a href="#google_account">the registration process</a>.
 
 <br>
 If you see something like...
-</p>
+
 
 <pre>
 remote: Processing changes: refs: 1, done
@@ -974,27 +863,24 @@ remote: ERROR:  author email address XXXXXXXXXXXXXXXXXXX
 remote: ERROR:  does not match your user account.
 </pre>
 
-<p>
 you need to configure Git for this repository to use the
 e-mail address that you registered with.
 To change the e-mail address to ensure this doesn't happen again, run:
-</p>
+
 
 <pre>
 $ git config user.email email@address.com
 </pre>
 
-<p>
 Then change the commit to use this alternative e-mail address with this command:
-</p>
+
 
 <pre>
 $ git commit --amend --author="Author Name &lt;email@address.com&gt;"
 </pre>
 
-<p>
 Then retry by running:
-</p>
+
 
 <pre>
 $ git codereview mail
@@ -1003,13 +889,12 @@ $ git codereview mail
 
 <h3 id="quick_test">Quickly testing your changes</h3>
 
-<p>
 Running <code>go test ./...</code> for every single change to the code tree
 is burdensome.
 Even though it is strongly suggested to run it before
 sending a change, during the normal development cycle you may want
 to compile and test only the package you are developing.
-</p>
+
 
 <li>
 In this section, we'll call the directory into which you cloned the CUE repository <code>$CUEDIR</code>.
@@ -1044,22 +929,20 @@ To use the new tool you would still need to build and install it.
 TODO
 <h3 id="subrepos">Contributing to subrepositories (cuelang.org/x/...)</h3>
 
-<p>
 If you are contributing a change to a subrepository, obtain the
 CUE package using <code>go get</code>.
 For example, to contribute
 to <code>cuelang.org/x/editor/vscode</code>, check out the code by running:
-</p>
+
 
 <pre>
 $ go get -d cuelang.org/editor/vscode
 </pre>
 
-<p>
 Then, change your directory to the package's source directory
 (<code>$GOPATH/src/cuelang.org/x/oauth2</code>), and follow the
 normal contribution flow.
-</p>
+
 -->
 
 <h3 id="cc">Specifying a reviewer / CCing others</h3>
@@ -1067,7 +950,6 @@ normal contribution flow.
 <!--
 TODO:
 
-<p>
 Unless explicitly told otherwise, such as in the discussion leading
 up to sending in the change, it's better not to specify a reviewer.
 All changes are automatically CC'ed to the
@@ -1075,14 +957,13 @@ All changes are automatically CC'ed to the
 mailing list.
 If this is your first ever change, there may be a moderation
 delay before it appears on the mailing list, to prevent spam.
-</p>
+
 -->
 
-<p>
 You can specify a reviewer or CC interested parties
 using the <code>-r</code> or <code>-cc</code> options.
 Both accept a comma-separated list of e-mail addresses:
-</p>
+
 
 <pre>
 $ git codereview mail -r joe@cuelang.org -cc mabel@example.com,math-nuts@swtch.com
@@ -1091,24 +972,21 @@ $ git codereview mail -r joe@cuelang.org -cc mabel@example.com,math-nuts@swtch.c
 
 <h3 id="sync">Synchronize your client</h3>
 
-<p>
 While you were working, others might have submitted changes to the repository.
 To update your local branch, run
-</p>
+
 
 <pre>
 $ git codereview sync
 </pre>
 
-<p>
 (Under the covers this runs
 <code>git</code> <code>pull</code> <code>-r</code>.)
-</p>
+
 
 
 <h3 id="download">Reviewing code by others</h3>
 
-<p>
 As part of the review process reviewers can propose changes directly (in the
 GitHub workflow this would be someone else attaching commits to a pull request).
 
@@ -1116,43 +994,39 @@ You can import these changes proposed by someone else into your local Git reposi
 On the Gerrit review page, click the "Download ▼" link in the upper right
 corner, copy the "Checkout" command and run it from your local Git repo.
 It will look something like this:
-</p>
+
 
 <pre>
 $ git fetch https://cue.googlesource.com/review refs/changes/21/13245/1 &amp;&amp; git checkout FETCH_HEAD
 </pre>
 
-<p>
 To revert, change back to the branch you were working in.
-</p>
+
 
 
 <h3 id="git-config">Set up git aliases</h3>
 
-<p>
 The <code>git-codereview</code> command can be run directly from the shell
 by typing, for instance,
-</p>
+
 
 <pre>
 $ git codereview sync
 </pre>
 
-<p>
 but it is more convenient to set up aliases for <code>git-codereview</code>'s own
 subcommands, so that the above becomes,
-</p>
+
 
 <pre>
 $ git sync
 </pre>
 
-<p>
 The <code>git-codereview</code> subcommands have been chosen to be distinct from
 Git's own, so it's safe to define these aliases.
 To install them, copy this text into your
 Git configuration file (usually <code>.gitconfig</code> in your home directory):
-</p>
+
 
 <pre>
 [alias]
@@ -1167,38 +1041,20 @@ Git configuration file (usually <code>.gitconfig</code> in your home directory):
 
 <h3 id="multiple_changes">Sending multiple dependent changes</h3>
 
-<p>
 Advanced users may want to stack up related commits in a single branch.
 Gerrit allows for changes to be dependent on each other, forming such a dependency chain.
 Each change will need to be approved and submitted separately but the dependency
 will be visible to reviewers.
-</p>
 
-<p>
+
 To send out a group of dependent changes, keep each change as a different commit under
 the same branch, and then run:
-</p>
+
 
 <pre>
 $ git codereview mail HEAD
 </pre>
 
-<p>
 Make sure to explicitly specify <code>HEAD</code>, which is usually not required when sending
 single changes.
-</p>
 
-
-<div id="footer">
-Except as <a href="https://developers.google.com/site-policies#restrictions">noted</a>,
-the content of this page is licensed under the
-Creative Commons Attribution 3.0 License,
-and code is licensed under a <a href="/LICENSE">Apache 2 license</a>.<br>
-<a href="http://www.google.com/intl/en/policies/privacy/">Privacy Policy</a>
-</div>
-
-</div><!-- .container -->
-</div><!-- #page -->
-
-</body>
-</html>

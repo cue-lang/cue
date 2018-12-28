@@ -102,7 +102,7 @@ func appendPositions(pos []token.Position, fset *token.FileSet, src source) []to
 
 func (x *bottom) Error() string { return fmt.Sprint(x) }
 
-func (x *bottom) Format(p errors.Printer) error {
+func (x *bottom) FormatError(p errors.Printer) error {
 	p.Print(x.msg)
 	if p.Detail() && x.index != nil && x.index.fset != nil {
 		locs := appendLocations(nil, x.index.fset, x.pos)

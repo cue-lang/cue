@@ -122,7 +122,7 @@ func (e posError) Position() token.Position {
 // Error implements the error interface.
 func (e posError) Error() string { return fmt.Sprint(e) }
 
-func (e posError) Format(p errors.Printer) error {
+func (e posError) FormatError(p errors.Printer) error {
 	next := e.err
 	if e.msg == "" {
 		next = errFormat(p, e.err)
@@ -139,7 +139,7 @@ func (e posError) Format(p errors.Printer) error {
 func errFormat(p errors.Printer, err error) (next error) {
 	switch v := err.(type) {
 	case errors.Formatter:
-		err = v.Format(p)
+		err = v.FormatError(p)
 	default:
 		p.Print(err)
 		err = nil

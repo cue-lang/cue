@@ -44,6 +44,8 @@ golang.org/x/exp/errors v0.0.0-20181210123644-7d6377eee41f h1:B/8yFg7PHSFdahc+fM
 golang.org/x/exp/errors v0.0.0-20181210123644-7d6377eee41f/go.mod h1:YgqsNsAu4fTvlab/7uiYK9LJrCIzKg/NiZUIH1/ayqo=
 golang.org/x/exp/errors v0.0.0-20181220081853-a8d4f384862a h1:juhXrq7Jv3Yw6H4azsxx0SGft00IiERvkUW6cNqnV1I=
 golang.org/x/exp/errors v0.0.0-20181220081853-a8d4f384862a/go.mod h1:YgqsNsAu4fTvlab/7uiYK9LJrCIzKg/NiZUIH1/ayqo=
+golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf h1:4SQtY0VxhI0RZe/PFmCCfHyaPVuC5DgyXEqehsAWjwc=
+golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf/go.mod h1:YgqsNsAu4fTvlab/7uiYK9LJrCIzKg/NiZUIH1/ayqo=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f h1:Bl/8QSvNqXvPGPGXa2z5xUTmV7VDcZyvRZ+QQXkXTZQ=
 golang.org/x/sync v0.0.0-20181108010431-42b317875d0f/go.mod h1:RxMgew5VJxzue5/jJTE5uejpjVlOe/izrB70Jof72aM=
 golang.org/x/sys v0.0.0-20181205085412-a5c9d58dba9a h1:1n5lsVfiQW3yfsRGu98756EH1YthsFqr/5mxHduZW2A=

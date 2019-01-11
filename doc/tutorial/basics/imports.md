@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](packages.md) [Next](operators.md)
 
+_Modules, Packages, and Instances_
+
 # Imports
 
 A CUE file may import definitions from builtin or user-defined packages.

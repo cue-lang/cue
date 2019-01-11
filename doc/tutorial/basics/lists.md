@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](ranges.md) [Next](instances.md)
 
+_Types and Values_
+
 # Lists
 
 Lists define arbitrary sequences of CUE values.

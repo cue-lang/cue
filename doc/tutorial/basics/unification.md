@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](types.md) [Next](disjunctions.md)
 
+_Types and Values_
+
 # Order is Irrelevant
 
 As mentioned before, values of duplicates fields are combined.

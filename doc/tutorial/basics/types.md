@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](bottom.md) [Next](unification.md)
 
+_Types and Values_
+
 # Basic Types
 
 CUE defines the following basic types

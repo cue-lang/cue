@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](hidden.md) [Next](bottom.md)
 
+_Types and Values_
+
 # Duplicate Fields
 
 CUE allows duplicated field definitions as long as they don't conflict.

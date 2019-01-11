@@ -1,4 +1,6 @@
-[TOC](Readme.md) [Prev](disjunctions.md) [Next](numbers.md)
+[TOC](Readme.md) [Prev](defaults.md) [Next](numbers.md)
+
+_Types and Values_
 
 # Disjunctions of Structs
 

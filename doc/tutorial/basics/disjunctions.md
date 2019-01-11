@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](unification.md) [Next](disjstruct.md)
 
+_Types and Values_
+
 # Disjunctions
 
 Disjunctions, or sum types, define a new type that is one of several things.

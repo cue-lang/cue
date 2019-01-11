@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](json.md) [Next](commas.md)
 
+_JSON Sugar and other Goodness_
+
 # Quotes are Optional for Field Names
 
 JSON objects are called structs in CUE.

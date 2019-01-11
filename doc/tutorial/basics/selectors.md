@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](scopes.md) [Next](aliases.md)
 
+_References and Visibility_
+
 # Accessing Fields
 
 Selectors access fields within a struct using the `.` notation.

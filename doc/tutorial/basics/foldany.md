@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](fold.md) [Next](comments.md)
 
+_JSON Sugar and other Goodness_
+
 # Folding all Fields
 
 This also works if a struct has more than one member.

@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](emit.md) [Next](duplicates.md)
 
+_References and Visibility_
+
 # Hidden Fields
 
 A non-quoted field name that starts with an underscore (`_`) is not

@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](foldany.md) [Next](numberlit.md)
 
+_JSON Sugar and other Goodness_
+
 # Comments
 
 CUE supports C-style block and line comments.

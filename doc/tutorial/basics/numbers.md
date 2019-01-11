@@ -1,4 +1,6 @@
-[TOC](Readme.md) [Prev](disjunctions.md) [Next](ranges.md)
+[TOC](Readme.md) [Prev](defaults.md) [Next](ranges.md)
+
+_Types and Values_
 
 # Numbers
 

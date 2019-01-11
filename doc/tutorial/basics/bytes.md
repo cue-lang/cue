@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](stringlit.md) [Next](scopes.md)
 
+_JSON Sugar and other Goodness_
+
 # Bytes
 
 CUE distinguishes between a `string` and a `bytes` type.

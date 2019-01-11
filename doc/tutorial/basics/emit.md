@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](aliases.md) [Next](hidden.md)
 
+_References and Visibility_
+
 # Emit Values
 
 By default all top-level fields are emitted when evaluating a configuration.

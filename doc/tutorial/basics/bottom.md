@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](duplicates.md) [Next](types.md)
 
+_Types and Values_
+
 # Bottom
 
 Specifying duplicate fields with conflicting values results in an error,

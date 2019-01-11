@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](imports.md) [Next](interpolation.md)
 
+_Expressions_
+
 # Operators
 
 CUE supports many common arithmetic and boolean operators.

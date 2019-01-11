@@ -24,7 +24,7 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [Number Literals](numberlit.md)
   - [String Literals](stringlit.md)
   - [Bytes](bytes.md)
-- Scoping
+- References and Visibility
   - [References and Scopes](scopes.md)
   - [Accessing Fields](selectors.md)
   - [Aliases](aliases.md)
@@ -34,8 +34,9 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [Duplicate Fields](duplicates.md)
   - [Bottom / Error](bottom.md)
   - [Basic Types](types.md)
-  - [Unification](unification.md)
+  - [Order is Irrelevant](unification.md)
   - [Disjunctions](disjunctions.md)
+  - [Default Values](defaults.md)
   - [Disjunctions of Structs](disjstruct.md)
   - [Numbers](numbers.md)
   - [Ranges](ranges.md)

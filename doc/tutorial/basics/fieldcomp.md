@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](listcomp.md) [Next](conditional.md)
 
+_Expressions_
+
 # Field Comprehensions
 
 CUE also supports comprehensions for fields.

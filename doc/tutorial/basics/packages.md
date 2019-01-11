@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](instances.md) [Next](imports.md)
 
+_Modules, Packages, and Instances_
+
 # Packages
 
 A CUE file is a standalone file by default.

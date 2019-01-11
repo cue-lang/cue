@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](numbers.md) [Next](rangedef.md)
 
+_Types and Values_
+
 # Ranges
 
 Ranges define an inclusive range of valid values.

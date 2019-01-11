@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](numberlit.md) [Next](bytes.md)
 
+_JSON Sugar and other Goodness_
+
 # String Literals
 
 CUE strings allow a richer set of escape sequences than JSON.

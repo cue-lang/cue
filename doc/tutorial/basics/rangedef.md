@@ -1,5 +1,7 @@
 [TOC](Readme.md) [Prev](ranges.md) [Next](lists.md)
 
+_Types and Values_
+
 # Predefined Ranges
 
 CUE numbers have arbitrary precision.

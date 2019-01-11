@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](unification.md) [Next](defaults.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Disjunctions
 

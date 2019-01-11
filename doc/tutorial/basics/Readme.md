@@ -30,7 +30,7 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [Aliases](aliases.md)
   - [Emit Values](emit.md)
   - [Hidden Values](hidden.md)
-- Types and Values
+- Types ~~and~~ are Values
   - [Duplicate Fields](duplicates.md)
   - [Bottom / Error](bottom.md)
   - [Basic Types](types.md)
@@ -42,6 +42,7 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [Ranges](ranges.md)
   - [Predefined Ranges](rangedef.md)
   - [Lists](lists.md)
+  - [Templates](templates.md)
 - [Modules, Packages, and Instances](instances.md)
   - [Packages](packages.md)
   - [Imports](imports.md)
@@ -52,6 +53,6 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [List Comprehensions](listcomp.md)
   - [Field Comprehensions](fieldcomp.md)
   - [Conditional Fields](conditional.md)
-  - [Null or Error coalescing](coalescing.md)
+  - [Null or Error coalescing](coalesce.md)
   <!-- - Conversions -->
   <!-- - Functions (simulating) -->

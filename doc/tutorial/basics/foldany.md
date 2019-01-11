@@ -6,7 +6,7 @@ _JSON Sugar and other Goodness_
 
 This also works if a struct has more than one member.
 
-In general, any JSON configuration can be expressed as a collection of
+In general, any JSON object can be expressed as a collection of
 path-leaf pairs without using any curly braces.
 
 <!-- CUE editor -->

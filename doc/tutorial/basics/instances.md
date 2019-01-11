@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](lists.md) [Next](packages.md)
+[TOC](Readme.md) [Prev](templates.md) [Next](packages.md)
 
 # Modules, Packages, and Instances
 
@@ -7,8 +7,6 @@
 A CUE file is a standalone file by default.
 A `package` clause allows a single configuration to be split across multiple
 files.
-
-[Packages tutorial](packages.md)
 
 ## Instances
 

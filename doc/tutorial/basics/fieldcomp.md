@@ -17,7 +17,7 @@ a: [ "Barcelona", "Shanghai", "Munich" ]
 
 {
     "\( strings.ToLower(v) )": {
-        pos:     k
+        pos:     k + 1
         name:    v
         nameLen: len(v)
     } for k, v in a

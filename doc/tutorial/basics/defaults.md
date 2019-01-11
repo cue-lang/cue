@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](disjunctions.md) [Next](disjstruct.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Default Values
 

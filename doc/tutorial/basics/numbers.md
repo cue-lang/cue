@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](defaults.md) [Next](ranges.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Numbers
 

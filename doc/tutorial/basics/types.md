@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](bottom.md) [Next](unification.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Basic Types
 
@@ -14,6 +14,7 @@ bytes
 int
 float
 ```
+in addition to the error type mentioned in the previous section.
 
 CUE does not distinguish between types and values.
 A field value can be a type (using one of the above names), a concrete value,

@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](types.md) [Next](disjunctions.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Order is Irrelevant
 

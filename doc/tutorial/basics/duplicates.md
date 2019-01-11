@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](hidden.md) [Next](bottom.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Duplicate Fields
 

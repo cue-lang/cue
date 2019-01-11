@@ -1,6 +1,6 @@
-[TOC](Readme.md) [Prev](ranges.md) [Next](instances.md)
+[TOC](Readme.md) [Prev](rangedef.md) [Next](templates.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Lists
 

@@ -1,6 +1,6 @@
 [TOC](Readme.md) [Prev](numbers.md) [Next](rangedef.md)
 
-_Types and Values_
+_Types ~~and~~ are Values_
 
 # Ranges
 

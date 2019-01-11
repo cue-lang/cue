@@ -45,8 +45,7 @@ xaxis x: 0
 yaxis: point
 yaxis y: 0
 
-origin: xaxis
-origin: yaxis
+origin: xaxis & yaxis
 ```
 
 <!-- result -->
@@ -55,17 +54,14 @@ point: {
     x: float
     y: float
 }
-
 xaxis: {
     x: 0
     y: float
 }
-
 yaxis: {
     x: float
     y: 0
 }
-
 origin: {
     x: 0
     y: 0

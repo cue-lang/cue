@@ -7,7 +7,7 @@ A `package` clause allows a single configuration to be split across multiple
 files.
 
 The configuration for a package is defined by the concatenation of all its
-files, after stripping the package clauses and not considering imports for now.
+files, after stripping the package clauses and not considering imports.
 
 Duplicate definitions are treated analogously to duplicate definitions within
 the same file.

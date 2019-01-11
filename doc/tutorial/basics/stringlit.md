@@ -2,7 +2,7 @@
 
 # String Literals
 
-CUE stings allow a richer set of escape sequences.
+CUE strings allow a richer set of escape sequences than JSON.
 
 CUE also supports multi-line strings, enclosed by a pair of triple quotes `"""`.
 The opening quote must be followed by a newline.

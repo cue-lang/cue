@@ -2,7 +2,7 @@
 
 # Predefined Ranges
 
-Numbers if CUE have arbitrary precision.
+CUE numbers have arbitrary precision.
 Also there is no unsigned integer type.
 
 CUE defines the following predefined identifiers to restrict the ranges of

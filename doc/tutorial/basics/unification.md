@@ -6,7 +6,7 @@ As mentioned before, values of duplicates fields are combined.
 This process is called unification.
 Unification can also be written explicitly with the `&` operator.
 
-There is always a single result, possibly bottom,
+There is always a single unique result, possibly bottom,
 for unifying any two CUE values.
 
 Unification is commutative, associative, and idempotent.

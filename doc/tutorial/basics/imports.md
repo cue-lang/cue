@@ -3,7 +3,7 @@
 # Imports
 
 A CUE file may import definitions from builtin or user-defined packages.
-The CUE file itself does not need to be part of a package to use imports.
+A CUE file does not need to be part of a package to use imports.
 
 The example here shows the use of builtin packages.
 

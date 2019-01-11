@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](unification.md) [Next](disjstruct.md)
+[TOC](Readme.md) [Prev](unification.md) [Next](defaults.md)
 
 _Types and Values_
 

@@ -13,9 +13,11 @@ outer middle inner: 3
 
 <!-- JSON result -->
 ```json
-"outer": {
-    "middle": {
-        "inner": 3
+{
+    "outer": {
+        "middle": {
+            "inner": 3
+        }
     }
 }
 ```

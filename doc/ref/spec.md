@@ -273,10 +273,6 @@ The following character sequences represent operators and punctuation:
 /    ::    ;     =     ...   ..   .
 div  mod   quo   rem   _|_   <-   ,
 ```
-Optional:
-```
-->   _|_
-```
 
 
 ### Integer literals
@@ -523,7 +519,7 @@ This represents the same string as:
 
 Support for other values:
 - Duration literals
-- regualr expessions: `re("[a-z]")`
+- regular expessions: `re("[a-z]")`
 -->
 
 ## Prototypes
@@ -829,7 +825,7 @@ corresponding label.
 We denote the value for a label `f` defined for `a` as `δ(f, a)`.
 
 A struct `a` is an instance of `b`, or `a ⊑ b`, if for any label `f`
-defined for `b` label `f` is also defiend for `a` and `δ(f, a) ⊑ δ(f, b)`.
+defined for `b` label `f` is also defined for `a` and `δ(f, a) ⊑ δ(f, b)`.
 Note that if `a` is an instance of `b` it may have fields with labels that
 are not defined for `b`.
 
@@ -992,7 +988,7 @@ A _block_ is a possibly empty sequence of declarations.
 A block is mostly corresponds with the brace brackets of a struct literal
 `{ ... }`, but also includes the following,
 
-- The _universe block_ encompases all CUE source text.
+- The _universe block_ encompasses all CUE source text.
 - Each package has a _package block_ containing all CUE source text in that package.
 - Each file has a _file block_ containing all CUE source text in that file.
 - Each `for` and `let` clause in a comprehension is considered to be
@@ -1037,7 +1033,7 @@ declared by the inner declaration.
 The package clause is not a declaration;
 the package name do not appear in any scope.
 Its purpose is to identify the files belonging to the same package
-and tospecify the default name for import declarations.
+and to specify the default name for import declarations.
 
 
 ### Predeclared identifiers
@@ -1417,7 +1413,8 @@ rem  remainder              integers
 
 For two integer values `x` and `y`,
 the integer quotient `q = x div y` and remainder `r = x mod y `
-satisfy the following relationships:
+implement Euclidean division and
+satisfy the following relationship:
 
 ```
 r = x - y*q  with 0 <= r < |y|
@@ -1434,7 +1431,8 @@ where `|y|` denotes the absolute value of `y`.
 
 For two integer values `x` and `y`,
 the integer quotient `q = x quo y` and remainder `r = x rem y `
-satisfy the following relationships:
+implement truncated division and
+satisfy the following relationship:
 
 ```
 x = q*y + r  and  |r| < |y|
@@ -1755,7 +1753,7 @@ Private10: IP([10, ...])  // [10, byte, byte, byte]
 ```
 --->
 
-#### Convesions between struct types
+#### Conversions between struct types
 
 A conversion from `x` to `T`
 is applied using the following rules:

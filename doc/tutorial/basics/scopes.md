@@ -1,0 +1,35 @@
+[TOC](Readme.md) [Prev](json.md) [Next](selectors.md)
+
+# References and Scopes
+
+A reference refers to the value of the field defined within nearest
+enclosing scope.
+
+If no field matches the reference within the file, it may match a top-level
+field of the same package.
+
+If there is still no match, it may match a predefined value.
+
+<!-- CUE editor -->
+```
+v: 1
+a: {
+    v: 2
+    b: v // matches the inner v
+}
+a: {
+    c: v // matches the top-level v
+}
+b: v
+```
+
+<!-- result -->
+```
+v: 1
+a: {
+    v: 2
+    b: 2
+    c: 1
+}
+b: 1
+```

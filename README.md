@@ -62,8 +62,11 @@ For more details see [Installing CUE](./doc/install.md).
 
 ### Learning CUE
 
-A demonstration of how to convert and restructure an existing
-set of Kubernetes configurations is available in
+The fastest way to learn the basics is to follow the
+[tutorial on basic language constructs](./doc/tutorial/basics/Readme.md).
+
+A more elaborate tutorial demonstrating of how to convert and restructure
+an existing set of Kubernetes configurations is available in
 [written form](./doc/tutorial/kubernetes/README.md).
 
 ### References

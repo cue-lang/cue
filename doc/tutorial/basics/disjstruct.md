@@ -1,0 +1,26 @@
+[TOC](Readme.md) [Prev](disjunctions.md) [Next](numbers.md)
+
+# Disjunctions of Structs
+
+Disjunction work for any type.
+
+In this example we see that a `floor` of some specific house
+has an exit on level 0 and 1, but not on any other floor.
+
+<!-- CUE editor -->
+```
+// floor defines the specs of a floor in some house.
+floor: {
+    level:   int  // the level on which this floor resides
+    hasExit: bool // is there a door to exit the house?
+}
+
+// constraints on the possible values of floor.
+floor: {
+    level: 0 | 1
+    hasExit: true
+} | {
+    level: -1 | 2 | 3
+    hasExit: false
+}
+```

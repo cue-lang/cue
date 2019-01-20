@@ -4,6 +4,8 @@ _Types ~~and~~ are Values_
 
 # Templates
 
+<!-- jba: this is not in the spec, aside from the TemplateLabel grammar rule. -->
+
 One of CUE's most powerful features is templates.
 A template defines a value to be unified which each field of a struct.
 

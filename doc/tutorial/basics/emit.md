@@ -6,6 +6,10 @@ _References and Visibility_
 
 By default all top-level fields are emitted when evaluating a configuration.
 CUE files may define a top-level value that is emitted instead.
+<!-- jba:
+It's unclear how they do that. Is it the first form in the file?
+And this is not in the spec AFAICT.
+-->
 
 Values within the emit value may refer to fields defined outside of it.
 

@@ -22,7 +22,7 @@ _Configure, Unify, Execute_
 CUE is an open source configuration language which aims
 to make complex configurations more manageable and usable.
 
-CUE is a constrained-based language.
+CUE is a constraint-based language.
 Constraints provide a powerful yet simple alternative
 to inheritance, a common source of complexity
 with other configuration languages.

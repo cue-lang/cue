@@ -12,7 +12,7 @@ Any error in CUE results in `_|_`.
 Logically all errors are equal, although errors may be associated with
 metadata such as an error message.
 
-Note that an error is different from `null`: `null` is a valid JSON value,
+Note that an error is different from `null`: `null` is a valid value,
 whereas `_|_` is not.
 
 <!-- CUE editor -->

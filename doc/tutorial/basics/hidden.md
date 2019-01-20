@@ -9,7 +9,7 @@ emitted from the output.
 To includes fields in the configuration that start with an underscore
 put them in quotes.
 
-Quoted an non-quoted fields share the same namespace unless they start
+Quoted and non-quoted fields share the same namespace unless they start
 with an underscore.
 
 <!-- CUE editor -->

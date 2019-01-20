@@ -10,6 +10,7 @@ kubernetes services: {
 		spec selector:   x.label
 
 		spec ports: [ p for p in x.port ]
+// jba: how does [p for p in x.port ] differ from x.port?
 	} for k, x in service
 	// Note that we cannot write
 	//   kubernetes services "\(k)": {} for k, x in service
@@ -22,7 +23,7 @@ kubernetes services: {
 // TODO: with type conversions and types, if implemented:
 // deployments :: k8s.Deployment
 // deployments: _k8sSpec(X: x) for x in deployment
-// This would look nicer and would allow fpr superior type checking.
+// This would look nicer and would allow for superior type checking.
 
 kubernetes deployments: {
 	"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {

@@ -13,6 +13,8 @@ _base: {
 
 deployment <Name>: _base & {
 	name:     Name | string
+// jba: why do you need to write "Name | string"? Doesn't the grammar require that the value
+// of <Name> is a string?
 	kind:     "deployment" | "stateful" | "daemon"
 	replicas: 1 | int
 
@@ -65,7 +67,9 @@ service "\(k)": {
 	// Copy over all ports exposed from containers.
 	port "\(Name)": {
 		port:       Port | int
+// jba: Port must be defined, so why do you need "| int"?
 		targetPort: Port | int
+// jba: I don't think you need targetPort, because it's defined above in terms of port.
 	} for Name, Port in spec.expose.port
 
 	// Copy over the labels

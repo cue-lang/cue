@@ -8,13 +8,12 @@ An alias defines a local macro.
 
 A typical use case is to provide access to a shadowed field.
 
-Alias are not members of a struct and thus are not part of the model and
-cannot be accessed.
-
+Alias are not members of a struct. They can be referred to, but they do not
+appear in the output.
 
 <!-- CUE editor -->
 ```
-A = a  // A is an alias to a
+A = a  // A is an alias for a
 a: {
     d: 3
 }

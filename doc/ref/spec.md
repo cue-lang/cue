@@ -297,7 +297,7 @@ decimal_lit = ( "1" … "9" ) { [ "_" ] decimal_digit } [ [ "." decimals ] multi
 octal_lit   = "0" octal_digit { [ "_" ] octal_digit } .
 binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
-multiplier  =  "k" | "Ki" | ( "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
+multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
 ```
 <!-- jba: why is "K" omitted? -->
 
@@ -578,8 +578,8 @@ I think that covers all the material up to "Unification".
 
 CUE defines basic types and structs. The _basic types_ are null, bool,
 int, float, string, and bytes.
-A _struct_ is a map from labels to a values, where the values may be of any
-type. <!-- jba: and what about the labels? -->
+A _struct_ is a map from labels to a values, where the labels must be strings and the 
+values may be of any type.
 Lists, provided by CUE as a convenience, are special cases of structs and
 are not included in the definition of the type system.
 
@@ -612,9 +612,7 @@ We also say that `b` _subsumes_ `a` in this case.
 
 
 An _atom_ is any value whose only instances are itself and bottom. Examples of
-atoms are `42`, `"hello"`, `true`, `null`.
-<!-- jba: so bottom is an atom? -->
-<!-- jba: I thought `42` could represent both int(42) and 42.0 -->
+atoms are `42.0`, `"hello"`, `true`, `null`.
 
 A _type_ is any value which is only an instance of itself or top.
 This includes `null`: the null value, `bool`: all possible boolean values,

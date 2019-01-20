@@ -8,8 +8,8 @@ An alias defines a local macro.
 
 A typical use case is to provide access to a shadowed field.
 
-Alias are not members of a struct. They can be referred to, but they do not
-appear in the output.
+Alias are not members of a struct. They can be referred to only within the
+struct, and they do not appear in the output.
 
 <!-- CUE editor -->
 ```

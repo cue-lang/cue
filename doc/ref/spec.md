@@ -299,8 +299,7 @@ binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
 multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
 ```
-<!-- jba: why is "K" omitted? -->
-
+<!-- TODO(mpvl): implement "K" instead of "k" -->
 <!--
 TODO: consider 0o766 notation for octal.
 --->
@@ -344,26 +343,12 @@ exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
 ```
 
 
-### String literals
+### String and byte sequence literals
 A string literal represents a string constant obtained from concatenating a
-sequence of characters. There are three forms: raw string literals,
-interpreted strings, and interpreted byte sequences.
+sequence of characters.
+Byte sequences are a sequence of bytes.
 
-Raw string literals are character sequences between backquotes, as in
-```
-`foo`
-```
-Within the quotes, any character may appear except backquote. The value of a
-raw string literal is the string composed of the uninterpreted (implicitly
-UTF-8-encoded) characters between the quotes; in particular, backslashes have no
-special meaning and the string may contain newlines. Carriage return characters
-(`\r`) inside raw string literals are discarded from the raw string value.
-
-<!-- jba: omit the `\r` because it's confusing -- even though you just said that -->
-<!-- backslashes aren't interpreted, the reader might think that maybe \r is an -->
-<!-- exception. -->
-
-Interpreted string and byte sequence literals are character sequences between,
+String and byte sequence literals are character sequences between,
 respectively, double and single quotes, as in `"bar"` and `'bar'`.
 Within the quotes, any character may appear except newline and,
 respectively, unescaped double or single quote.
@@ -408,6 +393,7 @@ After a backslash, certain single-character escapes represent special values:
 \r   U+000D carriage return
 \t   U+0009 horizontal tab
 \v   U+000b vertical tab
+\/   U+002f slash (solidus)
 \\   U+005c backslash
 \'   U+0027 single quote  (valid escape only within single quoted literals)
 \"   U+0022 double quote  (valid escape only within double quoted literals)
@@ -428,12 +414,11 @@ little_u_value   = `\` "u" hex_digit hex_digit hex_digit hex_digit .
 big_u_value      = `\` "U" hex_digit hex_digit hex_digit hex_digit
                            hex_digit hex_digit hex_digit hex_digit .
 
-string_lit             = raw_string_lit |
-                       interpreted_string_lit |
-                       interpreted_bytes_lit |
-                       multiline_lit .
+string_lit             = interpreted_string_lit |
+                         interpreted_bytes_lit |
+                         multiline_lit .
+
 interpolation          = "\(" Expression ")" .
-raw_string_lit         = "`" { unicode_char | newline } "`" .
 interpreted_string_lit = `"` { unicode_value | interpolation } `"` .
 interpreted_bytes_lit  = `"` { unicode_value | interpolation | byte_value } `"` .
 ```
@@ -527,130 +512,58 @@ Support for other values:
 - regular expessions: `re("[a-z]")`
 -->
 
-## Prototypes
-
-<!-- jba: I would drop the word "prototype", since it has other associations for 
-most of your readers, and use the word value. Also, combine this and the following section.
-Something like:
 
 ## Values
 
-In addition to simple values like `"hello"` and `42.0`, CUE has _structs_. A
-struct is a map from labels to values, like `{a: 42.0, b: "hello"}`. Structs are
-CUE's only way of building up complex values; lists, which we will see later,
+In addition to simple values like `"hello"` and `42.0`, CUE has _structs_.
+A struct is a map from labels to values, like `{a: 42.0, b: "hello"}`.
+Structs are CUE's only way of building up complex values;
+lists, which we will see later,
 are defined in terms of structs.
 
+All possible values are ordered in a lattice,
+a partial order where every two elements have a single greatest lower bound.
 A value `a` is an _instance_ of a value `b`,
 denoted `a ⊑ b`, if `b == a` or `b` is more general than `a`,
 that is if `a` orders before `b` in the partial order
 (`⊑` is _not_ a CUE operator).
-We also say that `b` _subsumes_ `a` in this case. 
+We also say that `b` _subsumes_ `a` in this case.
 In graphical terms, `b` is "above" `a` in the lattice.
 
 At the top of the lattice is the single ancestor of all values, called
-_top_, denoted `_` in CUE. Every value is an instance of top.
+_top_, denoted `_` in CUE.
+Every value is an instance of top.
 
 At the bottom of the lattice is the value called _bottom_, denoted `_|_`.
-A bottom value usually indicates an error. Bottom is an instance of every value.
+A bottom value usually indicates an error.
+Bottom is an instance of every value.
 
-An _atom_ is any value whose only instances are itself and bottom. Examples of
-atoms are `42.0`, `"hello"`, `true`, `null`.
+An _atom_ is any value whose only instances are itself and bottom.
+Examples of atoms are `42.0`, `"hello"`, `true`, `null`.
 
-A value is _concrete_ if it is either an atom, or a struct all of whose field values
-are themselves concrete, recursively.
+A value is _concrete_ if it is either an atom, or a struct all of whose
+field values are themselves concrete, recursively.
 
 CUE's values also include what we normally think of as types, like `string` and
-`float`. But CUE does not distinguish between types and values; only the
-relationship of values in the lattice is important. Each CUE "type" subsumes the
-concrete values that one would normally think of as part of that type. For
-example, "hello" is an instance of `string`, and `42.0` is an instance of
-`float`. In addition to `string` and `float`, CUE has `null`, `int`, `bool` and `bytes`.
-We informally call these CUE's "basic types". 
-
-
-
-
-I think that covers all the material up to "Unification".
-
--->
-
-
-
-CUE defines basic types and structs. The _basic types_ are null, bool,
-int, float, string, and bytes.
-A _struct_ is a map from labels to a values, where the labels must be strings and the 
-values may be of any type.
-Lists, provided by CUE as a convenience, are special cases of structs and
-are not included in the definition of the type system.
-
-In CUE, all possible types and values are partially ordered in a lattice.
-CUE does not distinguish between types and values, only between
-concrete and partially defined instances of a certain type.
-
-For example `string` is the identifier denoting the set of all possible strings.
-The string `"hello"` is an instance of such a string and ordered below
-this string. The value `42` is not an instance of `string`.
-
-
-### Ordering and lattices
-
-All possible prototypes are ordered in a lattice,
-a partial order where every two elements have a single greatest lower bound.
-A value `a` is said to be _greater_ than `b` if `a` orders before `b` in this
-<!-- jba: Don't use the term "greater," because later you define ">" to mean something different. -->
-partial order.
-At the top of this lattice is the single ancestor of all values, called
-_top_, denoted `_` in CUE.
-At the bottom of this lattice is the value called _bottom_, denoted `_|_`.
-A bottom value usually indicates an error.
-
-We say that for any two prototypes `a` and `b` that `a` is an _instance_ of `b`,
-denoted `a ⊑ b`, if `b == a` or `b` is more general than `a`
-that is if `a` orders before `b` in the partial order
-(`⊑` is _not_ a CUE operator).
-We also say that `b` _subsumes_ `a` in this case.
-
-
-An _atom_ is any value whose only instances are itself and bottom. Examples of
-atoms are `42.0`, `"hello"`, `true`, `null`.
-
-A _type_ is any value which is only an instance of itself or top.
-This includes `null`: the null value, `bool`: all possible boolean values,
-`int`: all integral numbers, `float`, `string`, `bytes`, and `{}`.
-<!-- jba: You haven't explained what `{}` means yet -->
-<!-- 
-   jba: I'm not fond of this definition. bool is also an instance of bool | int,
-   for example. I actually wonder why you need the concept of type, except for
-   expository convenience.
--->
-
-A value is _concrete_ if it is either an atom, or a struct all of whose field values
-are themselves concrete, recursively.
-A concrete value corresponds to a valid JSON value. <!-- jba: except for bottom -->
-<!-- jba: I understand that you're positioning this as an alternative to
- Jsonnet and similar tools. But at least for the spec, I wish you'd put sentences like this in a
- separate section that describes how the result of evaluation is translated
- to JSON. (The two earlier mentions in this doc were rationales that
- referred to compatibility with JSON, which is fine.) Your type system is
- much richer than JSON's, and when reading the spec I shouldn't need to
- concern myself with how. e.g. large numbers or bytes values are going to be
- mapped to JSON. -->
-
-A _prototype_ is any concrete value, type, or any instance of a type
-that is not a concrete value.
-We will informally refer to a prototype as _value_.
-<!-- jba: I don't understand the sentence. What points in the lattice fail to be -->
-<!-- prototypes? Just top and bottom?  -->
+`float`.
+But CUE does not distinguish between types and values; only the
+relationship of values in the lattice is important.
+Each CUE "type" subsumes the concrete values that one would normally think
+of as part of that type.
+For example, "hello" is an instance of `string`, and `42.0` is an instance of
+`float`.
+In addition to `string` and `float`, CUE has `null`, `int`, `bool` and `bytes`.
+We informally call these CUE's "basic types".
 
 
 ```
 false ⊑ bool
 true  ⊑ bool
 true  ⊑ true
-5     ⊑ int
+5.0   ⊑ float
 bool  ⊑ _
-_|_     ⊑ _
-_|_     ⊑ _|_
+_|_   ⊑ _
+_|_   ⊑ _|_
 
 _     ⋢ _|_
 _     ⋢ bool
@@ -658,7 +571,7 @@ int   ⋢ bool
 bool  ⋢ int
 false ⋢ true
 true  ⋢ false
-int   ⋢ 5
+float ⋢ 5.0
 5     ⋢ 6
 ```
 
@@ -679,9 +592,7 @@ As a consequence, order of evaluation is irrelevant, a property that is key
 to many of the constructs in the CUE language as well as the tooling layered
 on top of it.
 
-Syntactically, unification is a [binary expression].
-<!-- jba: You don't define a section called "Binary Expressions", but if you did you'd write -->
-<!-- this [binary expression](#binary-expressions) -->
+Syntactically, unification is a [binary expression](#Operands).
 
 
 ### Disjunction
@@ -694,7 +605,7 @@ These all follow from the definition of disjunction:
 - The disjunction of a value `a` with bottom is always `a`.
 - The disjunction of two bottom values is bottom.
 
-Syntactically, disjunction is a [binary expression].
+Syntactically, disjunction is a [binary expression](#Operands).
 
 Implementations should report an error if for a disjunction `a | ... | b`
 where `b` is an instance of `a`, as `b` will be superfluous and can never
@@ -788,6 +699,7 @@ Expression                       Default
 
 
 ### Bottom and errors
+
 Any evaluation error in CUE results in a bottom value, respresented by
 the token '_|_'.
 Bottom is an instance of every other prototype.
@@ -807,6 +719,7 @@ _|_ & _|_      _|_
 
 
 ### Top
+
 Top is represented by the underscore character '_', lexically an identifier.
 Unifying any value `v` with top results `v` itself.
 
@@ -831,6 +744,8 @@ null_lit   = "null"
 
 ```
 null & 8     _|_
+null & _     null
+null & _|_   _|_
 ```
 
 
@@ -846,11 +761,11 @@ boolean_lit = "true" | "false"
 ```
 
 ```
-bool & true       true
-bool | true       true
-true | false      true | false
-true & true       true
-true & false      _|_
+bool & true          true
+true & true          true
+true & false         _|_
+bool & (false|true)  false | true
+bool & (true|false)  true | false
 ```
 
 
@@ -870,20 +785,15 @@ An integer literal has both type `int` and `float`, with the integer variant
 being the default if no other constraints are applied.
 Expressed in terms of disjunction and [type conversion](#conversions),
 the literal `1`, for instance, is defined as `int(1) | float(1)`.
+Hexadecimal, octal, and binary integer literals are always of type `int`.
 
-Numeric values are exact values of arbitrary precision and do not overflow.
-Consequently, there are no constants denoting the IEEE-754 negative zero,
-infinity, and not-a-number values.
-<!-- jba: unclear: are there no such _values_, or merely no constants?
-     E.g. is there a solution to the pair of constraints
-        a: b + 1.0
-        b: a + 1.0
-     where a and b are both infinity?
--->
+Numeric literals are exact values of arbitrary precision.
+If the operation permits it, numbers should be kept in arbitrary precision.
 
-Implementation restriction: Although numeric values have arbitrary precision
+Implementation restriction: although numeric values have arbitrary precision
 in the language, implementations may implement them using an internal
-representation with limited precision. That said, every implementation must:
+representation with limited precision.
+That said, every implementation must:
 
 - Represent integer values with at least 256 bits.
 - Represent floating-point values, with a mantissa of at least 256 bits and
@@ -892,10 +802,8 @@ a signed binary exponent of at least 16 bits.
 - Give an error if unable to represent a floating-point value due to overflow.
 - Round to the nearest representable value if unable to represent
 a floating-point value due to limits on precision.
-
-These requirements apply to the result of any expression except builtin
-expressions where the loss of precision is remarked. 
-<!-- jba: What do you mean by "remarked"? -->
+These requirements apply to the result of any expression except for builtin
+functions for which an unusual loss of precision must be explicitly documented.
 
 
 ### Strings
@@ -906,39 +814,26 @@ The predeclared string type is `string`; it is a defined type.
 
 Strings are designed to be unicode-safe.
 Comparison is done using canonical forms ("é" == "e\u0301").
-A string element is an extended grapheme cluster, which is an approximation
-of a human readable character.
-<!-- jba: I've never heard that term, and I suspect I'm not alone. Can you link to an -->
-<!-- official definition? -->
-
-The length of a string is its number of extended grapheme clusters, and can
-be discovered using the built-in function `len`.
+A string element is an
+[extended grapheme cluster](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries),
+which is an approximation of a human-readable character.
 
 The length of a string `s` (its size in bytes) can be discovered using
 the built-in function len.
-<!-- jba: I think one of the above two sentences must be wrong. -->
-
 A string's extended grapheme cluster can be accessed by integer index
 0 through len(s)-1 for any byte that is part of that grapheme cluster.
+
 To access the individual bytes of a string one should convert it to
 a sequence of bytes first.
 
 
 ### Ranges
 
-A _range type_, syntactically a [binary expression], defines
-a (possibly infinite) disjunction of concrete values that can be represented as a contiguous range.
+A _range type_, syntactically a [binary expression](#Operands), defines
+a (possibly infinite) disjunction of concrete values that can be represented
+as a contiguous range.
+A concrete value `c` unifies with `a..b` if `a <= c` and `c <= b`.
 Ranges can be defined on numbers and strings.
-
-
-The type of range `a..b` is the unification of the type of `a` and `b`.
-Note that this may be more than one defined type.
-<!-- jba: added "defined" because you seem to think (from use of "the") that a
- range has one type. As I mentioned elsewhere, I'm not sure why it's
- important that values have "types" in the usual sense. It suffices (I would
- hope) that "3..4" is shorthand for the set 
-    {int(3), int(4)} union {x | x in float and x >= 3.0 and x <= 4.0 }.
--->
 
 A range of numbers `a..b` defines an inclusive range for integers and
 floating-point numbers.
@@ -947,39 +842,26 @@ Remember that an integer literal represents both an `int` and `float`:
 ```
 2   & 1..5          // 2, where 2 is either an int or float.
 2.5 & 1..5          // 2.5
+2 & 1.0..3.0        // 2.0
+2 & 1..3.0          // 2.0
 2.5 & int & 1..5    // _|_
-2.5 & (int & 1)..5  // _|_
 2.5 & float & 1..5  // 2.5
+int & 2 & 1.0..3.0  // _|_
+2.5 & (int & 1)..5  // _|_
 0..7 & 3..10        // 3..7
+"foo" & "a".."n"    // "foo"
 ```
-
-<!-- jba: I'd like to see examples of floating-point ranges. Notably things
-     like:
-       2 & 1.0..3.0         // 2.0
-       2 & 1..3.0           // 2.0
-       int & 2 & 1.0..3.0   // _|_
--->
-
-
-A range of strings `a..b` defines a set of strings that includes any `s`
-for which `NFC(a) <= NFC(s)` and `NFC(s) <= NFC(b)` in a byte-wise comparison,
-where `NFC(x)` is the Unicode normal form of `x`.
 
 
 ### Structs
 
 A _struct_ is a set of elements called _fields_, each of
 which has a name, called a _label_, and value.
-Structs and fields respectively correspond to JSON objects and members.
 
 We say a label is defined for a struct if the struct has a field with the
 corresponding label.
-We denote the value for a label `f` defined for a struct `a` as `δ(f, a)`.
-<!-- jba: you've been informal about mixing meta and object levels throughout, -->
-<!-- so why not use `f.a`? -->
-
 A struct `a` is an instance of `b`, or `a ⊑ b`, if for any label `f`
-defined for `b` label `f` is also defined for `a` and `δ(f, a) ⊑ δ(f, b)`.
+defined for `b`, label `f` is also defined for `a` and `a.f ⊑ b.f`.
 Note that if `a` is an instance of `b` it may have fields with labels that
 are not defined for `b`.
 
@@ -987,38 +869,35 @@ The (unique) struct with no fields, written `{}`, has every struct as an
 instance. It can be considered the type of all structs.
 
 The unification of structs `a` and `b` is a new struct `c` which
-has all fields of both `a` and `b`. The value of a field `f` in `c` is `a.f &
-b.f` if `f` is in both `a` and `b`, or just `a.f` or `b.f` if `f` is in just `a`
-or `b`, respectively.
-Any [references] to `a` or `b` in their respective field values need to be
-replaced with references to `c`.
+has all fields of both `a` and `b`, where
+the value of a field `f` in `c` is `a.f & b.f` if `f` is in both `a` and `b`,
+or just `a.f` or `b.f` if `f` is in just `a` or `b`, respectively.
+Any [references](#References) to `a` or `b`
+in their respective field values need to be replaced with references to `c`.
 
+A field name may also be an interpolated string.
+Identifiers used in such strings are evaluated within
+the scope of the struct in which the label is defined.
 
 Syntactically, a struct literal may contain multiple fields with
 the same label, the result of which is a single field with a value
 that is the unification of the values of those fields.
 
+A TemplateLabel indicates a template value that is to be unified with
+the values of all fields within a struct.
+The identifier of a template label binds to the field name of each
+field and is visible within the template value.
+
 ```
 StructLit     = "{" [ { Declaration "," } Declaration ] "}" .
-Declaration   = FieldDecl | AliasDecl .
+Declaration   = FieldDecl | AliasDecl | ComprehensionDecl .
 FieldDecl     = Label { Label } ":" Expression .
 
 AliasDecl     = Label "=" Expression .
-Label         = identifier | json_string | TemplateLabel | ExprLabel.
+Label         = identifier | interpreted_string_lit | TemplateLabel .
 TemplateLabel = "<" identifier ">" .
-ExprLabel     = "[" Expression "]" .
 Tag           = "#" identifier [ ":" json_string ] .
-json_string   = `"` { unicode_value } `"`
 ```
-<!-- jba: must labels be of string type? With ExprLabel it would be possible to -->
-<!-- use different types. You probably want to say even more about ExprLabel, -->
-<!-- like the expression must evaluate to a concrete value. -->
-
-<!--
-TODO: consider using string interpolations for ExprLabel, instead of []
-So "\(k)" for [k]
---->
-
 
 ```
 {a: 1} ⊑ {}
@@ -1071,9 +950,7 @@ a sequence of the two field names,
 followed by a colon and the value of that single field.
 
 ```
-job myTask: {
-    replicas: 2
-}
+job myTask replicas: 2
 ```
 expands to
 ```
@@ -1084,21 +961,6 @@ job: {
 }
 ```
 
-
-A field declaration may be followed by an optional field tag,
-which becomes a key-value pair for all equivalent fields in structs with which
-it is unified.
-<!-- jba: Very hard to parse the previous sentence. For example, we don't know -->
-<!-- what you mean by a key-value pair in this context, or what it means for -->
-<!-- something to become a key-value pair. Etc. -->
-If two structs are unified which both define a field for a label and both
-fields have a tag for that field with the same key,
-implementations may require that their value match.
-<!-- jba: Oy. That's quite a window for incompatibility. -->
-The tags are made visible through CUE's API and are
-not visible within the language itself.
-<!-- jba: This whole section is hard to understand and is unmotivated. Examples are -->
-<!-- needed. -->
 
 ### Lists
 
@@ -1120,7 +982,7 @@ Element       = Expression | LiteralValue .
 KeyedElement  = Element .
 --->
 
-Lists are defined in terms of structs:
+Lists can be thought of as structs:
 
 ```
 List: null | {
@@ -1140,17 +1002,12 @@ and the closed version of this list, [ 1, 2 ], as
 closed: List & { Elem: 1, Tail: { Elem: 2, Tail: null } }
 ```
 
-Using this definition, the subsumption and unification rules for lists can
-<!-- jba: There aren't two sets of rules. Unification follows from subsumption. -->
+Using this representation, the subsumption rule for lists can
 be derived from those of structs.
 Implementations are not required to implement lists as structs.
-<!-- jba: If this is really the definition, then it must follow that
+The `Elem` and `Tail` fields are not special and `len` will not work as
+expected in these cases.
 
-        {Elem: 1, Tail: null, Foo: "bar" }
-    is an instance of
-        [1]
-Do you want to have the labels Elem and Tail be special in this way, and allow -->
-<!-- these kinds of structs? -->
 
 ## Declarations and Scopes
 
@@ -1158,23 +1015,22 @@ Do you want to have the labels Elem and Tail be special in this way, and allow -
 ### Blocks
 
 A _block_ is a possibly empty sequence of declarations.
-The braces of a struct literal `{ ... }` for a block, but there are 
+The braces of a struct literal `{ ... }` form a block, but there are
 others as well:
 
 - The _universe block_ encompasses all CUE source text.
-- Each [package](#modules-instances-and-packages) has a _package block_ containing all CUE source text in that package.
+- Each [package](#modules-instances-and-packages) has a _package block_
+  containing all CUE source text in that package.
 - Each file has a _file block_ containing all CUE source text in that file.
-- Each `for` and `let` clause in a [comprehension](#comprehensions) is considered to be
-  its own implicit block.
-- Each function value is considered to be its own implicit block.
+- Each `for` and `let` clause in a [comprehension](#comprehensions)
+  is considered to be its own implicit block.
 
 Blocks nest and influence [scoping].
 
 
 ### Declarations and scope
 
-A _declaration_ binds an identifier to a field, alias, function, or package.
-<!-- jba: but you say below that the package clause isn't a decl --> 
+A _declaration_ binds an identifier to a field, alias, or package.
 Every identifier in a program must be declared.
 Other than for fields,
 no identifier may be declared twice within the same block.
@@ -1188,7 +1044,7 @@ Emit           = Operand .
 ```
 
 The _scope_ of a declared identifier is the extent of source text in which the
-identifier denotes the specified field, alias, function, or package.
+identifier denotes the specified field, alias, or package.
 
 CUE is lexically scoped using blocks:
 
@@ -1199,7 +1055,6 @@ CUE is lexically scoped using blocks:
   file containing the import declaration.
 1. The scope of a field or alias identifier declared inside a struct literal
   is the innermost containing block.
-<!-- jba: some of the above should mention functions, I assume? -->
 
 An identifier declared in a block may be redeclared in an inner block.
 While the identifier of the inner declaration is in scope, it denotes the entity
@@ -1237,9 +1092,9 @@ uint32    0..4_294_967_296
 int32     -2_147_483_648..2_147_483_647
 uint64    0..18_446_744_073_709_551_615
 int64     -9_223_372_036_854_775_808..9_223_372_036_854_775_807
+uint128   340_282_366_920_938_463_463_374_607_431_768_211_455
 int128    -170_141_183_460_469_231_731_687_303_715_884_105_728..
-              170_141_183_460_469_231_731_687_303_715_884_105_727
-uint128   0..340_282_366_920_938_463_463_374_607_431_768_211_455
+           170_141_183_460_469_231_731_687_303_715_884_105_727
 ```
 
 
@@ -1288,40 +1143,17 @@ expression.
 The expression is evaluated in the scope as it was declared.
 
 
-### Function declarations
-
-NOTE: this is an internal construction.
-<!-- jba: what does that mean? -->
-
-A function declaration binds an identifier, the function name, to a function.
-
-```
-FunctionDecl   = FunctionName Parameters "->" FunctionValue .
-FunctionName   = identifier .
-FunctionValue  = Expression .
-Result         = Parameters .
-Parameters     = "(" [ ParameterList [ "," ] ] ")" .
-ParameterList  = ParameterDecl { "," ParameterDecl } .
-ParameterDecl  = identifier [ ":" Type ] .
-```
-
-
 ## Expressions
 
 An expression specifies the computation of a value by applying operators and
-functions to operands.
+built-in functions to operands.
 
-<!-- jba: How do these work with non-concrete values? E.g.
-      int + int
-      5 < 3..8
-and many more.
--->
 
 ### Operands
 
 Operands denote the elementary values in an expression.
-An operand may be a literal, a (possibly [qualified]) identifier denoting
-field, alias, or function, or a parenthesized expression.
+An operand may be a literal, a (possibly qualified) identifier denoting
+field, alias, or a parenthesized expression.
 
 ```
 Operand     = Literal | OperandName | ListComprehension | "(" Expression ")" .
@@ -1420,31 +1252,29 @@ A primary expression of the form
 a[x]
 ```
 
-denotes the element of the list, string, or struct `a` indexed by `x`.
-<!-- jba: what about bytes? -->
+denotes the element of the list, string, bytes, or struct `a` indexed by `x`.
 The value `x` is called the index or field name, respectively.
 The following rules apply:
 
 If `a` is not a struct:
 
-- the index `x` must be of integer type
-<!-- jba: Explain again why integer literals work here (since they're not -->
-<!-- technically instances of int). Actually, what happens in general if `x` -->
-<!-- isn't concrete?-->
+- the index `x` must be a concrete integer.
+  If `x` is a disjunction, the default, if any will be selected without unifying
+  `x` with `int` beforehand.
 - the index `x` is in range if `0 <= x < len(a)`, otherwise it is out of range
 
 The result of `a[x]` is
 
 for `a` of list type (including single quoted strings, which are lists of bytes):
 
-- the list element at index `x`, if `x` is within range
+- the list element at index `x`, if `x` is within range, where only the
+  explicitly defined values of an open-ended list are considered
 - bottom (an error), otherwise
-<!-- jba: what happens if I index an open list? -->
 
 for `a` of string type:
 
 - the grapheme cluster at the `x`th byte (type string), if `x` is within range
-<!-- jba: what if I index into the middle of a grapheme cluster? -->
+  where `x` may match any byte of the grapheme cluster
 - bottom (an error), otherwise
 
 for `a` of struct type:
@@ -1455,6 +1285,7 @@ for `a` of struct type:
 ```
 [ 1, 2 ][1]     // 2
 [ 1, 2 ][2]     // _|_
+[ 1, 2, ...][2] // _|_
 "He\u0300?"[0]  // "H"
 "He\u0300?"[1]  // "e\u0300"
 "He\u0300?"[2]  // "e\u0300"
@@ -1472,12 +1303,12 @@ For strings or lists, the primary expression
 ```
 a[low : high]
 ```
-constructs a substring or slice. The indices `low` and `high` select
+constructs a substring or slice. The indices `low` and `high` must be
+concrete integers and select
 which elements of operand a appear in the result. The result has indices
 starting at 0 and length equal to `high` - `low`.
-<!-- jba: So low and high must be concrete integers? -->
 After slicing the list `a`
-<!-- jba: how does slicing open lists work? -->
+<!-- TODO(jba): how does slicing open lists work? -->
 
 ```
 a := [1, 2, 3, 4, 5]
@@ -1531,6 +1362,7 @@ mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
 
 unary_op   = "+" | "-" | "!" .
 ```
+<!-- TODO: consider adding unary_op: "<" | "<=" | ">" | ">=" -->
 
 Comparisons are discussed [elsewhere]. For other binary operators, the operand
 types must be [identical] unless the operation involves untyped [constants]
@@ -1772,8 +1604,9 @@ These terms and the result of the comparisons are defined as follows:
 - Integer values are comparable and ordered, in the usual way.
 - Floating-point values are comparable and ordered, as per the definitions
   for binary coded decimals in the IEEE-754-2008 standard.
-- String and byte-sequence values are comparable and ordered, lexically byte-wise.
-- Structs are comparable.
+- String values are comparable and ordered, lexically byte-wise after
+  normalization to Unicode normal form NFC.
+- Struct are not comparable.
   Two struct values are equal if their corresponding non-blank fields are equal.
 - Lists are comparable.
   Two list values are equal if their corresponding elements are equal.
@@ -1917,23 +1750,6 @@ c: int(2.5)           // 2  TODO: TBD
 
 #### Conversions to and from a string type
 
-Converting a signed or unsigned integer value to a string type yields a string
-containing the UTF-8 representation of the integer. 
-<!-- jba: This is ambiguous. It sounds like you picked the current Go way, where
-   string(65) = "A". There's been serious talk of removing this conversion in Go 2,
-   because it can be expressed with a function and many people erroneously think
-   the answer should be "65". I think you should omit it from CUE. -->
-Values outside the range of
-valid Unicode code points are converted to `"\uFFFD"`.
-
-```
-string('a')       // "a"
-string(-1)        // "\ufffd" == "\xef\xbf\xbd"
-string(0xf8)      // "\u00f8" == "ø" == "\xc3\xb8"
-
-MyString(0x65e5)  // "\u65e5" == "日" == "\xe6\x97\xa5"
-```
-
 Converting a list of bytes to a string type yields a string whose successive
 bytes are the elements of the slice.
 Invalid UTF-8 is converted to `"\uFFFD"`.
@@ -1996,7 +1812,7 @@ c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 
 ### Calls
 
-Calls can be made to core library functions or builtins.
+Calls can be made to core library functions, called builtins.
 Given an expression `f` of function type F,
 ```
 f(a1, a2, … an)
@@ -2032,7 +1848,7 @@ value of some iterable value in a new scope.
 A `for` clause may bind one or two identifiers.
 If there is one identifier, it binds it to the value, for instance
 a list element, a struct field value or a range element.
-If there are more two identifies, the first value will be the key or index,
+If there are two identifiers, the first value will be the key or index,
 if available, and the second will be the value.
 
 An `if` clause, or guard, specifies an expression that terminates the current
@@ -2044,14 +1860,15 @@ in a new scope.
 A current iteration is said to complete if the innermost block of the clause
 sequence is reached.
 
-List comprehensions specify a single expression that is evaluated and included
+_List comprehensions_ specify a single expression that is evaluated and included
 in the list for each completed iteration.
 
-Field comprehensions specify a field that is included in the struct for each
-completed iteration.
-If the same field is generated more than once, its values are unified.
-The clauses of a field comprehension may not refer to fields generated by
-field comprehensions defined in the same struct.
+_Field comprehensions_ follow a `Field` with a clause sequence, where the
+label and value of the field are evaluated for each iteration.
+The label must be an identifier or interpreted_string_lit, where the
+later may be a string interpolation that refers to the identifiers defined
+in the clauses.
+Values of iterations that map to the same label unify into a single field.
 
 ```
 ComprehensionDecl   = Field [ "<-" ] Clauses .
@@ -2093,7 +1910,6 @@ b: "Hello \( a )!" // Hello World!
 
 Built-in functions are predeclared. They are called like any other function.
 
-The built-in functions cannot be used as function values.
 
 ### `len`
 
@@ -2301,7 +2117,7 @@ re("Hello .*!")
 The basic prototypes correspond to their respective types defined earlier.
 
 Struct (and by extension lists), are represented by the abstract notion of
-a constraint structure.
+a typed feature structure.
 Each node in a configuration, including the root node,
 is associated with a constraint.
 
@@ -2312,10 +2128,10 @@ is associated with a constraint.
    added a bit of rigor to the above spec. Or at a minimum, translate the
    formalism into the terms you use above.
 -->
-   
+
 > A typed feature structure_ defined for a finite set of labels `Label`
 > is directed acyclic graph with labeled
-> arcs and values, represented by a tuple `C = <Q, q0,   υ, δ>`, where
+> arcs and values, represented by a tuple `C = <Q, q0, υ, δ>`, where
 >
 > 1. `Q` is the finite set of nodes,
 > 1. `q0 ∈ Q`, is the root node,
@@ -2344,9 +2160,10 @@ is associated with a constraint.
 > The set of _terms_ for label set `Label` is recursively defined as
 >
 > 1. every basic prototype: `P ⊆ T`
-> 2. every constraint in `𝒞`<sub>`Label`</sub> is a term: `𝒞`<sub>`Label`</sub>` ⊆ T`
-> 3. for every `n` prototypes `t₁, ..., tₙ`, and every `n`-ary function symbol
->    `f ∈ F_n`, the prototye `f(t₁,...,tₙ) ∈ T`.
+> 1. every constraint in `𝒞`<sub>`Label`</sub> is a term: `𝒞`<sub>`Label`</sub>` ⊆ T`
+>    a _reference_ may refer to any substructure of `C`.
+> 1. for every `n` prototypes `t₁, ..., tₙ`, and every `n`-ary function symbol
+>    `f ∈ F_n`, the prototype `f(t₁,...,tₙ) ∈ T`.
 >
 
 
@@ -2357,13 +2174,21 @@ Without loss of generality, we will henceforth assume that the given set
 of labels is constant and denote `𝒞`<sub>`Label`</sub> as `𝒞`.
 
 In CUE configurations, the abstract constraints implicated by `υ`
-are CUE exressions.
+are CUE expressions.
 Literal structs can be treated as part of the original typed feature structure
 and do not need evaluation.
 Any other expression is evaluated and unified with existing values of that node.
 
 References in expressions refer to other nodes within the `C` and represent
-a copy of such a `C`.
+a copy of the substructure `C'` of `C` rooted at these nodes.
+Any references occuring in terms assigned to nodes of `C'` are be updated to
+point to the equivalent node in a copy of `C'`.
+<!-- TODO: define formally. Right now this is implied already by the
+definition of evaluation functions and unification: unifying
+the original TFS' structure of the constraint with the current node
+preserves the structure of the original graph by definition.
+This is getting very implicit, though.
+-->
 The functions defined by `F` correspond to the binary and unary operators
 and interpolation construct of CUE, as well as builtin functions.
 
@@ -2393,11 +2218,11 @@ Multiple labels may be recursively combined in any order.
 #### Definition of subsumption and unification on typed attribute structure
 
 > For a given collection of constraints `𝒞`,
-> we define `π ≡`<sub>`C`</sub> `π'` to mean that constraint structure `C ∈ 𝒞`
+> we define `π ≡`<sub>`C`</sub> `π'` to mean that typed feature structure `C ∈ 𝒞`
 > contains path equivalence between the paths `π` and `π'`
 > (i.e. `δ(q0, π) = δ(q0, π')`, where `q0` is the root node of `C`);
 > and `𝒫`<sub>`C`</sub>`(π) = c` to mean that
-> the constraint structure at the path `π` in `C`
+> the typed feature structure at the path `π` in `C`
 > is `c` (i.e. `𝒫`<sub>`C`</sub>`(π) = c` if and only if `υ(δ(q0, π)) == c`,
 > where `q0` is the root node of `C`).
 > Subsumption is then defined as follows:
@@ -2422,15 +2247,15 @@ of constraints within the partial order of all values.
 #### Evaluation function
 
 > The evaluation function is given by `E: T -> 𝒞`.
-> The unification of two constraint structures is evaluated as defined above.
+> The unification of two typed feature structures is evaluated as defined above.
 > All other functions are evaluated according to the definitions found earlier
 > in this spec.
 > An error is indicated by `_|_`.
 
 #### Definition of well-formedness
 
-> We say that a given constraint structure `C = <Q, q0,  υ, δ> ∈ 𝒞` is
-> a _well-formed_ constraint structure if and only if for all nodes `q ∈ Q`,
+> We say that a given typed feature structure `C = <Q, q0, υ, δ> ∈ 𝒞` is
+> a _well-formed_ typed feature structure if and only if for all nodes `q ∈ Q`,
 > the substructure `C'` rooted at `q`,
 > is such that `E(υ(q)) ∈ 𝒞` and `C' = <Q', q, δ', υ'> ⊑ E(υ(q))`.
 
@@ -2446,7 +2271,7 @@ and
 
 a: MyStruct & { a: 1 } // appropriate features are those of MyStruct + 'a'
 
-This is way to suttle, though.
+This is way too subtle, though.
 
 Alternatively: use Haskell's approach:
 
@@ -2489,7 +2314,7 @@ Some graph unification algorithms:
   the Association for Computational Linguistics. Chicago, IL
 - [1991] H. Tomabechi, "Quasi-destructive graph unifications.."; In Proceedings
   of the 29th Annual Meeting of the ACL. Berkeley, CA
-- [1992] Hideto Tomabechi, "Quasi-destructive graph ynifications with structure-
+- [1992] Hideto Tomabechi, "Quasi-destructive graph unifications with structure-
    sharing."; In Proceedings of the 15th International Conference on
    Computational Linguistics (COLING-92), Nantes, France.
 - [2001] Marcel van Lohuizen, "Memory-efficient and thread-safe
@@ -2505,10 +2330,10 @@ making `C` well-formed.
 This document does not define any operational semantics.
 As the unification operation is communitive, transitive, and reflexive,
 implementations have a considerable amount of leeway in
-chosing an evaluation strategy.
+choosing an evaluation strategy.
 Although most algorithms for the unification of typed attribute structure
 that have been proposed are `O(n)`, there can be considerable performance
-benefits of chosing one of the many proposed evaluation strategies over the
+benefits of choosing one of the many proposed evaluation strategies over the
 other.
 Implementations will need to be verified against the above formal definition.
 
@@ -2539,13 +2364,12 @@ both `a` and `b` are constraint functions, as the properties of unification
 will ensure this produces identical results.
 
 
-
 #### References
 
 A distinguising feature of CUE's unification algorithm is the use of references.
 In conventional graph unification for typed feature structures, the structures
 that are unified into the existing graph are independent and pre-evaluated.
-In CUE, the constraint structures indicated by references may still need to
+In CUE, the typed feature structures indicated by references may still need to
 be evaluated.
 Some conventional evaluation strategies may not cope well with references that
 refer to each other.
@@ -2572,7 +2396,7 @@ TODO: describe precisely which cycles must be resolved by implementations.
 Rules:
 
 - Unification of atom value `a` with non-concrete atom `b` for node `q`:
-  - set `q` to `a` and schedule the evalution `a == b` at the end of
+  - set `q` to `a` and schedule the evaluation `a == b` at the end of
     evaluating `q`: `C` is only correct under the assumption that `q` is `a`
     so evaluate later.
 -->
@@ -2683,6 +2507,15 @@ It mostly relies on users defining the value of all variables.
 The main reason for this is to keep control over run time complexity.
 However, implementations may be free to do so.
 Also, later versions of the language may strengthen requirements for resolution.
+There is no backtracking to try to find possible instantiations of incomplete
+values.
+This design keeps run time complexity in check.
+However, implementations are free to provide additional functionality to
+resolve incomplete references, for instance by rewriting configurations to
+augment them with additional constraints that are implied from the current
+fields.
+Also, later versions of the language may strengthen requirements
+for resolution.
 
 TODO: examples of situations where variables could be resolved but are not.
 -->

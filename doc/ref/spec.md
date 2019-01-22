@@ -227,7 +227,7 @@ This restriction is to ensure compatibility with JSON configuration files.
 
 #### Preamble
 
-The following pseudo-keywords are used at the preamble of a CUE file.
+The following keywords are used at the preamble of a CUE file.
 After the preamble, they may be used as identifiers to refer to namesake fields.
 
 ```
@@ -237,13 +237,13 @@ package      import
 
 #### Comprehension clauses
 
-The following pseudo-keywords are used in comprehensions.
+The following keywords are used in comprehensions.
 
 ```
 for          in           if           let
 ```
 
-The pseudo-keywords `for`, `if` and `let` cannot be used as identifiers to
+The keywords `for`, `if` and `let` cannot be used as identifiers to
 refer to fields. All others can.
 
 <!--
@@ -346,6 +346,7 @@ exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
 
 
 ### String and byte sequence literals
+
 A string literal represents a string constant obtained from concatenating a
 sequence of characters.
 Byte sequences are a sequence of bytes.
@@ -581,7 +582,7 @@ float ⋢ 5.0
 ### Unification
 
 The _unification_ of values `a` and `b`, denoted as `a & b` in CUE,
-is defined as the greatest lower bound of `a` and `b`. (That is, the 
+is defined as the greatest lower bound of `a` and `b`. (That is, the
 value `u` such that `u ⊑ a` and `u ⊑ b`,
 and for any other value `v` for which `v ⊑ a` and `v ⊑ b`
 it holds that `v ⊑ u`.)
@@ -595,129 +596,119 @@ to many of the constructs in the CUE language as well as the tooling layered
 on top of it.
 
 Syntactically, unification is a [binary expression](#Operands).
-
+<!-- TODO: explicitly mention that disjunction is not a binary operation
+but a definition of a single value?-->
 
 ### Disjunction
 
 A _disjunction_ of two values `a` and `b`, denoted as `a | b` in CUE,
-is defined as the smallest value `d` such that `a ⊑ d` and `b ⊑ d`.
+defines the smallest value `d` such that `a ⊑ d` and `b ⊑ d`.
+This style of disjunctions is sometimes also referred to as sum types.
+
 These all follow from the definition of disjunction:
 - The disjunction of `a` with itself is always `a`.
 - The disjunction of a value `a` and `b` where `a ⊑ b` is always `b`.
 - The disjunction of a value `a` with bottom is always `a`.
 - The disjunction of two bottom values is bottom.
 
+Elements that evaluate to bottom are eliminated from a disjunction.
+A disjunction evaluates to bottom (`_|_`) if it has no elements
+after such elimination.
+
 Syntactically, disjunction is a [binary expression](#Operands).
 
-Implementations should report an error if for a disjunction `a | ... | b`
-where `b` is an instance of `a`, as `b` will be superfluous and can never
-be selected as a default. <!-- jba: either put this paragraph later, or link 
-to the discussion of defaults. -->
-
-If a disjunction is used in any operation other than unification or another
-disjunction, the default value is chosen before operating on it.
-<!-- jba: I wish that the default mechanism wasn't so intertwined with
-     disjunction. Like Prolog "cut," it breaks the beautiful functional
-     structure. 
-     
-     But reading the Kubernetes examples, I see how pervasive and useful it is.
--->
-
-   
+The unification of a disjunction with another value is equal to the disjunction
+composed of the unification of this value with all of the original elements
+of the disjunction.
+In other words, unification distributes over disjunction.
+So
 
 ```
-Expression                Result (without picking default)
+(a_0 | ... |a_n) & b ==> a_0&b | ... | a_n&b,
+```
+
+with values evaluating to bottom removed from the resulting disjunction.
+
+```
+Expression                Result
+({a:1} | {b:2}) & {c:3}   {a:1, c:3} | {b:2, c:3}
 (int | string) & "foo"    "foo"
 ("a" | "b") & "c"         _|_
-
-(3 | 5) + 2               5
 ```
 
-If the values of a disjunction are unambiguous, its first value may be taken
-as a default value. <!-- jba: move this sentence higher -->
+Unification of two disjunctions is defined to retain a strict ordering
+of the elements of the resulting disjunction:
 
-The default value for a disjunction is selected when:
-
-1. passing it to an argument of a call or index value,
-1. using it in any unary or binary expression except for unification or disjunction,
-1. using it as the receiver of a call, index, slice, or selector expression, and
-1. a value is taken for a configuration. <!-- jba: not clear what this phrase means -->
-<!-- jba: you said this above more concisely as "anything other than unification
-or disjunction". -->
-
-<!-- jba: This rule concerns me. It seems to imply that the default value can be
-used even if it is not ultimately selected as the concrete value for the
-disjunction. Example:
-
-    a: 1 | int
-    b: a+1
-    // later
-    a: 2
-
-You say "the default value for a disjunction is selected when...using it in any
-unary or binary expression except for unification or disjunction", so 1 is
-selected for `a` in the second line, and therefore `b` is 2. But then `a` is 2,
-so the constraint on the second line is violated at the end of the evaluation.
-
-Maybe the rule only applies to disjunction expressions that appear as part of
-other expressions, not when they are the value of a field? 
+```
+(a_0 | ... | a_n) & (b_0 | ... | b_m) =>
+a_0&b_0 | ... | a_n&b_0 | a_0&b_1 | ... | a_n&b_m
+```
+<!-- Note that there are several variants of ordering that would work here.
+It only matters that there exists a pre-determined order.
 -->
 
-<!-- jba
-Assuming I'm right about the above and the default is not always selected in expressions,
-then it can matter which order the defaults are selected. Consider:
+The _first value_ of a disjunction is the first element in a disjunction
+after eliminating values evaluating to bottom.
+The ordering is irrelevant for the placement of a disjunction within the
+lattice of values, but it is relevant for default values, which we will
+discuss next.
 
-    a: 1 | int
-    b: 2 | int
-    c: a + b
-    c: 4
+#### Default values
 
-After applying all constraints, I don't have concrete values for `a` or `b`, so
-I must select a default and then re-run my constraint engine. (At least that's
-how I imagine the implementation to work.) 
+A disjunction evaluates to its _default_ value if it is used as a value for any
+operation other than unification or disjunction.
+The default value of a disjunction is its first value or
+bottom in case of a manifest failure.
+A _manifest failure_ occurs if
+the disjunction resulted from the unification of two or more disjunctions and
+these disjunctions can be unified in different orders such that they
+result in different first values.
 
-If I select `a` first, then I end with a==1 and b=3. If I select `b` first, then
-I get b==2 and a==2.
+<!-- TODO(mpvl): consider it to be a manifest failure if if non-concrete
+values are used in expressions requiring concrete values.
 -->
 
-
-A value is unambiguous if a disjunction has never been unified with another
-disjunction, or if the first element is the result of unifying two first
-values of a disjunction.
-<!-- jba: Hard to understand this sentence, or why a disjunction must be
-unambiguous to use its first value as a default. -->
+A default value is chosen if the disjunction is not used
+in a unification or disjunction operation.
+This means that in practice, a default is chosen for almost any expression
+that does not involve `&` and `|`, including slices, indices, selectors,
+and all but a few explicitly marked builtin functions.
 
 ```
 Expression                       Default
-("tcp"|"udp") & ("tcp"|"udp")    "tcp"  // default chosen
-("tcp"|"udp") & ("udp"|"tcp")    _|_    // no unique default
+"tcp" | "udp"                    "tcp"
+1 | int                          1
+string | 1.0                     string
 
-("a"|"b") & ("b"|"a") & "a"      "a"    // single value after evaluation
+("tcp"|"udp") & ("tcp"|"udp")    "tcp"
+("tcp"|"udp") & ("udp"|"tcp")    _|_ // ambiguous: no unique first value
 ```
-<!-- jba: the first two examples here contradict your assertion that -->
-<!-- defaults are not chosen under unfication and disjunction. Both should have -->
-<!-- the result ("tcp"|"udp"). -->
 
+A disjunction always evaluates to the same default value, regardless of
+the context in which the value is used.
+For instance, `[1, 3]["a" | 1]` will result in an error, as `"a"` will be
+selected as the default value.
+
+
+```
+[1, 2]["a" | 1]          //  _|_ // "a" is not an integer value
+[1, 2][("a" | 1) & int]  //  2
+```
+
+Implementations should report an error for a disjunction `a | ... | b`,
+where `b` is an instance of `a`, as `b` will be superfluous and can never
+be selected as a default.
 
 
 ### Bottom and errors
 
 Any evaluation error in CUE results in a bottom value, respresented by
 the token '_|_'.
-Bottom is an instance of every other prototype.
+Bottom is an instance of every other value.
 Any evaluation error is represented as bottom.
 
 Implementations may associate error strings with different instances of bottom;
 logically they all remain the same value.
-
-```
-Expr         Result
- 1  &  2       _|_
-int & bool     _|_
-_|_ |  1        1
-_|_ &  2       _|_
-_|_ & _|_      _|_
-```
 
 
 ### Top
@@ -736,9 +727,9 @@ _ | _|_       _
 
 ### Null
 
-The _null value_ is represented with the pseudo-keyword `null`.
+The _null value_ is represented with the keyword `null`.
 It has only one parent, top, and one child, bottom.
-It is unordered with respect to any other prototype.
+It is unordered with respect to any other value.
 
 ```
 null_lit   = "null"
@@ -754,7 +745,7 @@ null & _|_   _|_
 ### Boolean values
 
 A _boolean type_ represents the set of Boolean truth values denoted by
-the pseudo-keywords `true` and `false`.
+the keywords `true` and `false`.
 The predeclared boolean type is `bool`; it is a defined type and a separate
 element in the lattice.
 
@@ -862,6 +853,7 @@ which has a name, called a _label_, and value.
 
 We say a label is defined for a struct if the struct has a field with the
 corresponding label.
+The value for a label `f` of struct `a` is denoted `f.a`.
 A struct `a` is an instance of `b`, or `a ⊑ b`, if for any label `f`
 defined for `b`, label `f` is also defined for `a` and `a.f ⊑ b.f`.
 Note that if `a` is an instance of `b` it may have fields with labels that
@@ -870,12 +862,14 @@ are not defined for `b`.
 The (unique) struct with no fields, written `{}`, has every struct as an
 instance. It can be considered the type of all structs.
 
-The unification of structs `a` and `b` is a new struct `c` which
+The successful unification of structs `a` and `b` is a new struct `c` which
 has all fields of both `a` and `b`, where
 the value of a field `f` in `c` is `a.f & b.f` if `f` is in both `a` and `b`,
 or just `a.f` or `b.f` if `f` is in just `a` or `b`, respectively.
 Any [references](#References) to `a` or `b`
 in their respective field values need to be replaced with references to `c`.
+The result of a unification is bottom (`_|_`) if any of its fields evaluates
+to bottom, recursively.
 
 A field name may also be an interpolated string.
 Identifiers used in such strings are evaluated within
@@ -966,10 +960,10 @@ job: {
 
 ### Lists
 
-A list literal defines a new prototype of type list.
+A list literal defines a new value of type list.
 A list may be open or closed.
 An open list is indicated with a `...` at the end of an element list,
-optionally followed by a prototype for the remaining elements.
+optionally followed by a value for the remaining elements.
 
 The length of a closed list is the number of elements it contains.
 The length of an open list is the its number of elements as a lower bound
@@ -1307,8 +1301,8 @@ a[low : high]
 ```
 constructs a substring or slice. The indices `low` and `high` must be
 concrete integers and select
-which elements of operand a appear in the result. The result has indices
-starting at 0 and length equal to `high` - `low`.
+which elements of operand `a` appear in the result.
+The result has indices starting at 0 and length equal to `high` - `low`.
 After slicing the list `a`
 <!-- TODO(jba): how does slicing open lists work? -->
 
@@ -1366,14 +1360,16 @@ unary_op   = "+" | "-" | "!" .
 ```
 <!-- TODO: consider adding unary_op: "<" | "<=" | ">" | ">=" -->
 
-Comparisons are discussed [elsewhere]. For other binary operators, the operand
-types must be [identical] unless the operation involves untyped [constants]
-or durations. For operations involving constants only, see the section on
-[constant expressions].
+Comparisons are discussed [elsewhere](#Comparison-operators).
+For other binary operators, the operand
+types must unify.
+<!-- TODO: durations
+ unless the operation involves durations.
 
 Except for duration operations, if one operand is an untyped [literal] and the
 other operand is not, the constant is [converted] to the type of the other
 operand.
+-->
 
 
 #### Operator precedence
@@ -1486,6 +1482,7 @@ For integer operands, the unary operators `+` and `-` are defined as follows:
 For decimal floating-point numbers, `+x` is the same as `x`,
 while -x is the negation of x.
 The result of a floating-point division by zero is bottom (an error).
+<!-- TODO: consider making it +/- Inf -->
 
 An implementation may combine multiple floating-point operations into a single
 fused operation, possibly across statements, and produce a result that differs
@@ -1495,7 +1492,7 @@ from the value obtained by executing and rounding the instructions individually.
 #### List operators
 
 Lists can be concatenated using the `+` operator.
-For lists `a` and `b`, 
+For lists `a` and `b`,
 ```
 a + b
 ```
@@ -1541,7 +1538,7 @@ ipT: {
 }
 
 rangeList:  (1..2)*[int]
-rangeListT: null | {
+rangeListT: {
     Elem: int
     Tail: {
         Elem: int
@@ -1561,8 +1558,8 @@ strIntListT: null | {
     }
 }
 ```
-<!-- jba: I thought (1..2)*[int] is equivalent to [int] | [int, int]
-     but rangeListT is not that. -->
+<!-- TODO(mpvl): should we disallow multiplication with a range?
+If so, how does one specify a list with a range of possible lengths? -->
 
 <!-- jba: Clarify the allowed values for the non-list operand. And must that be 
 the left operand? -->
@@ -1694,40 +1691,10 @@ If `T` and `x` of different underlying type, a conversion is allowed if
 `x'` is an instance of `T`.
 A value `x` can be converted to the type of `T` in any of these cases:
 
-- `x` is of type struct and is subsumed by `T` ignoring struct tags.
-- `x` and `T` are both integer or floating point types.
-- `x` is an integer or a list of bytes or runes and `T` is a string type.
-<!-- jba: first mention of runes -->
-- `x` is a string and `T` is a list of bytes or runes.
-
-
-<!--
-[Field tags] are ignored when comparing struct types for identity
-for the purpose of conversion:
-
-```
-person: {
-    name:    string #xml:"Name"
-    address: null | {
-        street: string #xml:"Street"
-        city:   string #xml:"City"
-    }  #xml:"Address"
-}
-
-person2: {
-    name:    string
-    address: null | {
-        street: string
-        city:   string
-    }
-}
-
-p2 = person(person2)  // ignoring tags, the underlying types are identical
-```
--->
-
-<!-- jba: I don't know what the type of a struct is, other than {}. -->
-
+- `x` is a struct and is subsumed by `T`.
+- `x` and `T` are both integer or floating points.
+- `x` is an integer or a byte sequence and `T` is a string.
+- `x` is a string and `T` is a byte sequence.
 
 Specific rules apply to conversions between numeric types, structs,
 or to and from a string type. These conversions may change the representation
@@ -1738,7 +1705,7 @@ All other conversions only change the type but not the representation of x.
 #### Conversions between numeric ranges
 For the conversion of numeric values, the following rules apply:
 
-1. Any integer prototype can be converted into any other integer prototype
+1. Any integer value can be converted into any other integer value
    provided that it is within range.
 2. When converting a decimal floating-point number to an integer, the fraction
    is discarded (truncation towards zero). TODO: or disallow truncating?
@@ -1774,7 +1741,6 @@ bytes("")        // ''
 Conversions between list types are possible only if `T` strictly subsumes `x`
 and the result will be the unification of `T` and `x`.
 
-<!---
 If we introduce named types this would be different from IP & [10, ...]
 
 Consider removing this until it has a different meaning.
@@ -1922,14 +1888,19 @@ a result of type int.
 Argument type    Result
 
 string            string length in bytes
-list              list length
+bytes             length of byte sequence
+list              list length, smallest length for an open list
 struct            number of distinct fields
 ```
-<!-- jba: 
-   String length contradicts what you said in the Strings section near the beginning.
-   What does len([1, 2, ...]) return?
-   If [1] is actually { Elem: 1, Tail: null}, then wouldn't len([1]) == 2?
--->
+
+```
+Expression           Result
+len("Hellø")         6
+len([1, 2, 3])       3
+len([1, 2, ...])     2
+len({a:1, b:2})      2
+```
+
 
 ### `required`
 
@@ -2095,16 +2066,16 @@ A _struct_ is a set of _fields_ with unique labels for each field.
 A CUE configuration can be defined in terms of constraints, which are
 analogous to typed attribute structures referred to above.
 
-#### Definition of basic prototypes
+#### Definition of basic values
 
-> A _basic prototype_ is any CUE prototype that is not a struct (or, by
+> A _basic value_ is any CUE value that is not a struct (or, by
 > extension, a list).
-> All basic prototypes are partially ordered in a lattice, such that for any
-> basic prototype `a` and `b` there is a unique greatest lower bound
+> All basic values are partially ordered in a lattice, such that for any
+> basic value `a` and `b` there is a unique greatest lower bound
 > defined for the subsumption relation `a ⊑ b`.
 
 ```
-Basic prototypes
+Basic values
 null
 true
 bool
@@ -2116,7 +2087,7 @@ string
 re("Hello .*!")
 ```
 
-The basic prototypes correspond to their respective types defined earlier.
+The basic values correspond to their respective types defined earlier.
 
 Struct (and by extension lists), are represented by the abstract notion of
 a typed feature structure.
@@ -2161,11 +2132,11 @@ is associated with a constraint.
 >
 > The set of _terms_ for label set `Label` is recursively defined as
 >
-> 1. every basic prototype: `P ⊆ T`
+> 1. every basic value: `P ⊆ T`
 > 1. every constraint in `𝒞`<sub>`Label`</sub> is a term: `𝒞`<sub>`Label`</sub>` ⊆ T`
 >    a _reference_ may refer to any substructure of `C`.
-> 1. for every `n` prototypes `t₁, ..., tₙ`, and every `n`-ary function symbol
->    `f ∈ F_n`, the prototype `f(t₁,...,tₙ) ∈ T`.
+> 1. for every `n` values `t₁, ..., tₙ`, and every `n`-ary function symbol
+>    `f ∈ F_n`, the value `f(t₁,...,tₙ) ∈ T`.
 >
 
 
@@ -2202,19 +2173,19 @@ the unification of `a` and `b`.
 Multiple labels may be recursively combined in any order.
 
 <!-- unnecessary, probably.
-#### Definition of evaluated prototype
+#### Definition of evaluated value
 
-> A fully evaluated prototype, `T_evaluated ⊆ T` is a subset of `T` consisting
+> A fully evaluated value, `T_evaluated ⊆ T` is a subset of `T` consisting
 > only of atoms, typed attribute structures and constraint functions.
 >
-> A prototype is called _ground_ if it is an atom or typed attribute structure.
+> A value is called _ground_ if it is an atom or typed attribute structure.
 
-#### Unification of evaluated prototypes
+#### Unification of evaluated values
 
-> A fully evaluated prototype, `T_evaluated ⊆ T` is a subset of `T` consisting
+> A fully evaluated value, `T_evaluated ⊆ T` is a subset of `T` consisting
 > only of atoms, typed attribute structures and constraint functions.
 >
-> A prototype is called _ground_ if it is an atom or typed attribute structure.
+> A value is called _ground_ if it is an atom or typed attribute structure.
 -->
 
 #### Definition of subsumption and unification on typed attribute structure
@@ -2241,7 +2212,7 @@ various "instance-of" definitions in the main spec? I thought those were
 sufficiently precise. Although I admit that references and cycles
 are still unclear to me. -->
 
-Like with the subsumption relation for basic prototypes,
+Like with the subsumption relation for basic values,
 the subsumption relation for constraints determines the mutual placement
 of constraints within the partial order of all values.
 

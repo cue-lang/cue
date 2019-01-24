@@ -599,11 +599,16 @@ Syntactically, unification is a [binary expression](#Operands).
 <!-- TODO: explicitly mention that disjunction is not a binary operation
 but a definition of a single value?-->
 
+
 ### Disjunction
 
 A _disjunction_ of two values `a` and `b`, denoted as `a | b` in CUE,
 defines the smallest value `d` such that `a ⊑ d` and `b ⊑ d`.
 This style of disjunctions is sometimes also referred to as sum types.
+Disjunctions can have any number of elements.
+<!--
+Important now we have marks, as *a | *b | c differs from *a | (*b | c).
+-->
 
 These all follow from the definition of disjunction:
 - The disjunction of `a` with itself is always `a`.
@@ -611,23 +616,16 @@ These all follow from the definition of disjunction:
 - The disjunction of a value `a` with bottom is always `a`.
 - The disjunction of two bottom values is bottom.
 
-Elements that evaluate to bottom are eliminated from a disjunction.
-A disjunction evaluates to bottom (`_|_`) if it has no elements
-after such elimination.
-
 Syntactically, disjunction is a [binary expression](#Operands).
 
 The unification of a disjunction with another value is equal to the disjunction
 composed of the unification of this value with all of the original elements
 of the disjunction.
 In other words, unification distributes over disjunction.
-So
 
 ```
-(a_0 | ... |a_n) & b ==> a_0&b | ... | a_n&b,
+(a_0 | ... |a_n) & b ==> a_0&b | ... | a_n&b.
 ```
-
-with values evaluating to bottom removed from the resulting disjunction.
 
 ```
 Expression                Result
@@ -636,68 +634,102 @@ Expression                Result
 ("a" | "b") & "c"         _|_
 ```
 
-Unification of two disjunctions is defined to retain a strict ordering
-of the elements of the resulting disjunction:
-
-```
-(a_0 | ... | a_n) & (b_0 | ... | b_m) =>
-a_0&b_0 | ... | a_n&b_0 | a_0&b_1 | ... | a_n&b_m
-```
-<!-- Note that there are several variants of ordering that would work here.
-It only matters that there exists a pre-determined order.
--->
-
-The _first value_ of a disjunction is the first element in a disjunction
-after eliminating values evaluating to bottom.
-The ordering is irrelevant for the placement of a disjunction within the
-lattice of values, but it is relevant for default values, which we will
-discuss next.
 
 #### Default values
 
-A disjunction evaluates to its _default_ value if it is used as a value for any
-operation other than unification or disjunction.
-The default value of a disjunction is its first value or
-bottom in case of a manifest failure.
-A _manifest failure_ occurs if
-the disjunction resulted from the unification of two or more disjunctions and
-these disjunctions can be unified in different orders such that they
-result in different first values.
+One or more values in a disjunction can be _marked_
+by prefixing it with a `*` ([`Preference`](#Primary-expressions)).
+A bottom value cannot be marked.
+When a marked value is unified, the result is also marked.
+(When unification results in a single value,
+the mark is dropped, as single values cannot be marked.)
 
-<!-- TODO(mpvl): consider it to be a manifest failure if if non-concrete
-values are used in expressions requiring concrete values.
+A disjunction is _normalized_ if there is no unmarked element
+`a` for which there is an element `b` such that `a ⊑ b`
+and no marked element `c` for which there is a marked element
+`d` such that `c ⊑ d`.
+A disjunction literal must be normalized.
+
+<!--
+(non-normalized entries could also be implicitly marked, allowing writing
+int | 1, instead of int | *1, but that can be done in a backwards
+compatible way later if really desirable).
+
+Normalization is important, as we need to account for spurious elements
+For instance
+"tcp" | "tcp", or
+({a:1} | {b:1}) & ({a:1} | {b:2}) -> {a:1} | {a:1,b:1} | {a:1,b:2},
+
+In the latter case, elements {a:1,b:1} and {a:1,b:2} are subsumed by {a:1}.
+Note that without defaults, {a:1} | {a:1,b:1} | {a:1,b:2} is logically
+identical to {a:1}.
+More to the point, without normalization unifying {a:1} | {b:1} with {a:1,b:2}
+results in a single value and thus resolves,
+whereas unifying {a:1} | {a:1,b:1} | {a:1,b:2} with {a:1,b:2}
+results in two values, and thus does not resolve.
+With normalization:
+({a:1} | {a:1,b:1} | {a:1,b:2}) & {a:1}          {a:1}, instead of _|_,
+({a:1} | {b:1}) & {a:1}         {a:1} (instead of _|_), as {a:1,b:1} ⊑ {a:1}
 -->
+
+If a disjunction appears where a concrete value is required
+(that is, as an operand or in a location where it will be emitted),
+the result is, after normalization and after dropping non-marked elements
+if some elements are marked,
+the resulting value itself if only a single value remains or bottom otherwise.
+
+<!--
+We treat remaining marked and unmarked elements the same to have less surprises:
+
+Unifying {a:1}|{b:1} with *{}|string produces *{a:1}|*{b:1}. It would be
+surprising to have a different default for {a:1}|{b:1} and *{a:1}|*{b:1} in
+this case.
+
+Similarly, we do not unify the remaining elements to minimize the difference
+between using a disjunction in cases where concrete values are required
+versus otherwise.
+-->
+
+<!-- TODO: is the above definition precise enough, or perhaps too abstract?
+Previously:
 
 A default value is chosen if the disjunction is not used
 in a unification or disjunction operation.
-This means that in practice, a default is chosen for almost any expression
+This means that, in practice, a default is chosen for almost any expression
 that does not involve `&` and `|`, including slices, indices, selectors,
-and all but a few explicitly marked builtin functions.
+and all but a few explicitly marked builtin functions. -->
 
 ```
 Expression                       Default
-"tcp" | "udp"                    "tcp"
-1 | int                          1
-string | 1.0                     string
+"tcp" | "udp"                    _|_ // more than one element remaining
+*"tcp" | "udp"                   "tcp"
+float | *1                       1
+*string | 1.0                    string
 
-("tcp"|"udp") & ("tcp"|"udp")    "tcp"
-("tcp"|"udp") & ("udp"|"tcp")    _|_ // ambiguous: no unique first value
+(*"tcp"|"udp") & ("udp"|*"tcp")  "tcp"
+(*"tcp"|"udp") & ("udp"|"tcp")   "tcp"
+(*"tcp"|"udp") & "tcp"           "tcp"
+(*"tcp"|"udp") & (*"udp"|"tcp")  _|_ // "tcp" & "udp"
+
+(*true | false) & bool           true
+(*true | false) & (true | false) true
+
+{a: 1} | {b: 1}                  _|_ // more than one element remaining
+{a: 1} | *{b: 1}                 {b:1}
+*{a: 1} | *{b: 1}                _|_ // more than one marked element remaining
+({a: 1} | {b: 1}) & {a:1}        {a:1} // after eliminating {a:1,b:1}
+({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1} // after eliminating *{a:1,b:1}
 ```
 
 A disjunction always evaluates to the same default value, regardless of
 the context in which the value is used.
-For instance, `[1, 3]["a" | 1]` will result in an error, as `"a"` will be
+For instance, `[1, 3][*"a" | 1]` will result in an error, as `"a"` will be
 selected as the default value.
 
-
 ```
-[1, 2]["a" | 1]          //  _|_ // "a" is not an integer value
-[1, 2][("a" | 1) & int]  //  2
+[1, 2][*"a" | 1]          //  _|_ // "a" is not an integer value
+[1, 2][(*"a" | 1) & int]  //  2, as "a" is eliminated before choosing a default.
 ```
-
-Implementations should report an error for a disjunction `a | ... | b`,
-where `b` is an instance of `a`, as `b` will be superfluous and can never
-be selected as a default.
 
 
 ### Bottom and errors
@@ -1179,16 +1211,19 @@ math.Sin    // denotes the Sin function in package math
 ### Primary expressions
 
 Primary expressions are the operands for unary and binary expressions.
+A default expression is only valid as an operand to a disjunction.
 
 ```
 PrimaryExpr =
 	Operand |
 	Conversion |
+	Preference |
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
 	PrimaryExpr Slice |
 	PrimaryExpr Arguments .
 
+Preference     = "*" Expression
 Selector       = "." identifier .
 Index          = "[" Expression "]" .
 Slice          = "[" [ Expression ] ":" [ Expression ] "]"
@@ -1899,17 +1934,6 @@ len("Hellø")         6
 len([1, 2, 3])       3
 len([1, 2, ...])     2
 len({a:1, b:2})      2
-```
-
-
-### `required`
-
-The built-in function `required` discards the default mechanism of
-a disjunction.
-
-```
-"tcp" | "udp"             // default is "tcp"
-required("tcp" | "udp")   // no default, user must specify either "tcp" or "udp"
 ```
 
 

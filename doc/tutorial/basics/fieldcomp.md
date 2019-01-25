@@ -34,11 +34,11 @@ barcelona: {
 shanghai: {
     pos:     2
     name:    "Shanghai"
-    nameLen: 9
+    nameLen: 8
 }
 munich: {
     pos:     3
     name:    "Munich"
-    nameLen: 9
+    nameLen: 6
 }
 ```

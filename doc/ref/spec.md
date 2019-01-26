@@ -1937,6 +1937,149 @@ len({a:1, b:2})      2
 ```
 
 
+## Cycles
+
+Implementations are required to interpret or reject cycles encountered
+during evaluation according to the rules in this section.
+
+
+### Reference cycles
+
+A _reference cycle_ occurs if a field references itself, either directly or
+indirectly.
+
+```
+// x references itself
+x: x
+
+// indirect cycles
+b: c
+c: d
+d: b
+```
+
+Implementations should report these as an error except in the following cases:
+
+
+#### Expressions that unify an atom with an expression
+
+An expression of the form `a & e`, where `a` is an atom
+and `e` is an expression, always evaluates to `a` or bottom.
+As it does not matter how we fail, we can assume the result to be `a`
+and validate after the field in which the expression occurs has been evaluated
+that `a == e`.
+
+```
+// Config            Evaluates to
+x: {                  x: {
+    a: b + 100            a: _|_ // cycle detected
+    b: a - 100            b: _|_ // cycle detected
+}                     }
+
+y: x & {              y: {
+    a: 200                a: 200 // asserted that 200 == b + 100
+                          b: 100
+}                     }
+```
+
+
+#### Field values
+
+A field value of the form `r & v`,
+where `r` evaluates to a reference cycle and `v` is a value,
+evaluates to `v`.
+Unification is idempotent and unifying a value with itself ad infinitum,
+which is what the cycle represents, results in this value.
+Implementations should detect cycles of this kind, ignore `r`,
+and take `v` as the result of unification.
+<!-- Tomabechi's graph unification algorithm
+can detect such cycles at near-zero cost. -->
+
+```
+Configuration    Evaluated
+//    c           Cycles in nodes of type struct evaluate
+//  ↙︎   ↖         to the fixed point of unifying their
+// a  →  b        values ad infinitum.
+
+a: b & { x: 1 }   // a: { x: 1, y: 2, z: 3 }
+b: c & { y: 2 }   // b: { x: 1, y: 2, z: 3 }
+c: a & { z: 3 }   // c: { x: 1, y: 2, z: 3 }
+
+// resolve a             b & {x:1}
+// substitute b          c & {y:2} & {x:1}
+// substitute c          a & {z:3} & {y:2} & {x:1}
+// eliminate a (cycle)   {z:3} & {y:2} & {x:1}
+// simplify              {x:1,y:2,z:3}
+```
+
+This rule also applies to field values that are disjunctions of unification
+operations of the above form.
+
+```
+a: b&{x:1} | {y:1}  // {x:1,y:3,z:2} | {y:1}
+b: {x:2} | c&{z:2}  // {x:2} | {x:1,y:3,z:2}
+c: a&{y:3} | {z:3}  // {x:1,y:3,z:2} | {z:3}
+
+
+// resolving a           b&{x:1} | {y:1}
+// substitute b          ({x:2} | c&{z:2})&{x:1} | {y:1}
+// simplify              c&{z:2}&{x:1} | {y:1}
+// substitute c          (a&{y:3} | {z:3})&{z:2}&{x:1} | {y:1}
+// simplify              a&{y:3}&{z:2}&{x:1} | {y:1}
+// eliminate a (cycle)   {y:3}&{z:2}&{x:1} | {y:1}
+// expand                {x:1,y:3,z:2} | {y:1}
+```
+
+Note that all nodes that form a reference cycle to form a struct will evaluate
+to the same value.
+If a field value is a disjunction, any element that is part of a cycle will
+evaluate to this value.
+
+
+### Structural cycles
+
+CUE disallows infinite structures.
+Implementations must report an error when encountering such declarations.
+
+<!-- for instance using an occurs check -->
+
+```
+// Disallowed: a list of infinite length with all elements being 1.
+list: {
+    head: 1
+    tail: list
+}
+
+// Disallowed: another infinite structure (a:{b:{d:{b:{d:{...}}}}}, ...).
+a: {
+    b: c
+}
+c: {
+    d: a
+}
+```
+
+It is allowed for a value to define an infinite set of possibilities
+without evaluating to an infinite structure itself.
+
+```
+// List defines a list of arbitrary length (default null).
+List: *null | {
+    head: _
+    tail: List
+}
+```
+
+<!--
+### Unused fields
+
+TODO: rules for detection of unused fields
+
+1. Any alias value must be used
+-->
+
+
+
 ## Modules, instances, and packages
 
 CUE configurations are constructed combining _instances_.
@@ -2054,6 +2197,7 @@ exported identifiers.
 ### An example package
 
 TODO
+
 
 ## Interpretation
 
@@ -2374,150 +2518,4 @@ The simple solution is to deploy a breadth-first evaluation strategy, rather tha
 the more traditional depth-first approach.
 Other approaches are possible, however, and implementations are free to choose
 which approach is deployed.
-
-
-<!-- jba: Looks like the stuff below here is in an early stage, so I didn't
-read it closely.
-
--->
-
-### Validation
-
-TODO: when to proactively do recursive validation
-
-### Cycles
-
-TODO: describe precisely which cycles must be resolved by implementations.
-
-<!--
-Rules:
-
-- Unification of atom value `a` with non-concrete atom `b` for node `q`:
-  - set `q` to `a` and schedule the evaluation `a == b` at the end of
-    evaluating `q`: `C` is only correct under the assumption that `q` is `a`
-    so evaluate later.
--->
-
-A direct cyclic reference between nodes defines a shared node for the paths
-of the original nodes.
-
-- Unification of cycle of references of struct,
-  for instance: `{ a: b, b: c, c: a }`
-  - ignore the cycle and continue evaluating not including the last unification:
-    a unification of a value with itself is itself. As `a` was already included,
-    ignoring the cycle will produce the same result.
-
-```
-Configuration    Evaluated
-//    c           Cycles in nodes of type struct evaluate
-//  ↙︎   ↖         to the fixed point of unifying their.
-// a  →  b        values
-
-a: b              // a: { x: 1, y: 3 }  
-b: c              // b: { x: 1, y: 3 }  
-c: a              // c: { x: 1, y: 3 }
-
-a: { x: 1 }
-b: { y: 3 }
-```
-
-<!--
-For fields of type struct any cycle that does not result in an infinite
-structure is allowed.
-An expresion of type struct only allows unification and disjunction operations.
-
-Unification of structs is done by unifying a copy of each of the input structs.
-A copy of a referenced input struct may itself contain references which are
-handled with the following rules:
-- a reference bound to a field that it is being copied is replaced
-  with a new reference pointing to the respective copy,
-- a reference bound to a field that is not being copied refers to the
-  original field.
--->
-
-#### Self-referential cycles
-
-A graph unification algorithm like Tomabechi [] or Van Lohuizen [] can be used
-to handle the reference replacement rules and minimize the cost of
-copying and cycle detection.
-
-Unification of lists, which are expressible as structs, follow along the same
-lines.
-
-For an expression `a & b` of any scalar type where exactly one of `a` or `b` is
-a concrete value, the result may be replaced by this concrete value while
-adding the expression `a == b` to the list of assertions.
-
-```
-// Config            Evaluates to
-x: {                  x: {
-    a: b + 100            a: _|_ // cycle detected
-    b: a - 100            b: _|_ // cycle detected
-}                     }
-
-y: x & {              y: {
-    a: 200                a: 200 // asserted that 200 == b + 100
-                          b: 100
-}                     }
-```
-
-<!--
-#### Evaluation cycles
-
-For structs, cycles are disallowed
-
-Disallowed cycles:
-
-A field `a` is _reachable_ from field `b` if there is a selector sequence
-from `a` to `b`.
-
-A reference used in field `a` may not refer to a value that recursively
-refers to a value that is reachable from `a`.
-
-```
-a: b & { c: 3 }
-
-b: a.c  // illegal reference
-
-```
-
-#### Structural cycles
-
-A reference to `Δ(π, q0)` may not recursively refer to `Δ(π', q)`,
-where `π` is a prefix to `π'`.
-
-a: b & { b: _ }
-
-
-### Validation
-
-Implementations are allowed to postpone recursive unification of structures
-except for in the following cases:
-
-- Unification within disjunctions:
-
-
-### Inference
-
-There is currently no logical inference for values of references prescribed.
-It mostly relies on users defining the value of all variables.
-The main reason for this is to keep control over run time complexity.
-However, implementations may be free to do so.
-Also, later versions of the language may strengthen requirements for resolution.
-There is no backtracking to try to find possible instantiations of incomplete
-values.
-This design keeps run time complexity in check.
-However, implementations are free to provide additional functionality to
-resolve incomplete references, for instance by rewriting configurations to
-augment them with additional constraints that are implied from the current
-fields.
-Also, later versions of the language may strengthen requirements
-for resolution.
-
-TODO: examples of situations where variables could be resolved but are not.
--->
-
-### Unused values
-
-TODO: rules for detection of unused variables
 

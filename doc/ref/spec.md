@@ -18,18 +18,20 @@
 
 ## Introduction
 
-This is a reference manual for the CUE configuration language.
+This is a reference manual for the CUE data constraint language.
 CUE, pronounced cue or Q, is a general-purpose and strongly typed
-configuration language.
-The CUE tooling, layered on top of CUE, converts this language to
+constraint-based language.
+It can be used for data templating, data validation, code generation, scripting,
+and many other applications involving structured data.
+The CUE tooling, layered on top of CUE, provides
 a general purpose scripting language for creating scripts as well as
-simple servers.
+simple servers, also expressed in CUE.
 
 CUE was designed with cloud configuration, and related systems, in mind,
 but is not limited to this domain.
 It derives its formalism from relational programming languages.
 This formalism allows for managing and reasoning over large amounts of
-configuration in a straightforward manner.
+data in a straightforward manner.
 
 The grammar is compact and regular, allowing for easy analysis by automatic
 tools such as integrated development environments.

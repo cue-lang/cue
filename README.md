@@ -15,17 +15,23 @@
 -->
 
 
-# The CUE Configuration Language
+# The CUE Data Constraint Language
 
 _Configure, Unify, Execute_
 
-CUE is an open source configuration language which aims
-to make complex configurations more manageable and usable.
+CUE is an open source data constraint language which aims
+to simplify tasks involving defining and using data.
+It can be used for data templating, data validation, and even
+defining scrips operating on data.
 
 CUE is a constraint-based language.
+Constraints act both as data templates and detailed type definitions.
 Constraints provide a powerful yet simple alternative
 to inheritance, a common source of complexity
-with other configuration languages.
+with existing configuration languages.
+Constraints also provide an expressive way to define the possible
+values of data types, which in turn can be used for data validation
+in various applications.
 
 The CUE tooling also provides integrated declarative scripting
 aimed at simplifying putting configurations to good use while

@@ -259,8 +259,8 @@ service <Name>: {
         // Any port has the following properties.
         ports: [...{
             port:       int
-            protocol:   "TCP" | "UDP"      // from the Kubernetes definition
-            name:       "client" | string
+            protocol:   *"TCP" | "UDP"      // from the Kubernetes definition
+            name:       string | *"client"
         }]
         selector: metadata.labels // we want those to be the same
     }
@@ -427,7 +427,7 @@ deployment <Name>: _spec & {
     apiVersion: "extensions/v1beta1"
     kind:       "Deployment"
     _name:      Name
-    spec replicas: 1 | int
+    spec replicas: *1 | int
 }
 
 configMap <Name>: {
@@ -473,7 +473,7 @@ $ cat <<EOF >> kube.cue
 // for all ports defined in all containers.
 _spec spec template spec containers: [...{
     ports: [...{
-        _export: true | false // include the port in the service
+        _export: *true | false // include the port in the service
     }]
 }]
 
@@ -482,8 +482,8 @@ service "\(k)": {
 
     spec ports: [ {
         Port = p.containerPort // Port is an alias
-        port:       Port | int
-        targetPort: Port | int
+        port:       *Port | int
+        targetPort: *Port | int
     } for c in v.spec.template.spec.containers
         for p in c.ports
         if p._export ]
@@ -615,7 +615,7 @@ deployment <X> spec template: {
         "prometheus.io.port":   "\(spec.containers[0].ports[0].containerPort)"
     }
     spec containers: [{
-        ports: [{containerPort: 7080 | int}] // 7080 is the default
+        ports: [{containerPort: *7080 | int}] // 7080 is the default
     }]
 }
 EOF
@@ -690,24 +690,24 @@ directory with two disks), and generalize it:
 $ cat <<EOF >> kitchen/kube.cue
 
 deployment <Name> spec template spec: {
-    _hasDisks: true | bool
+    _hasDisks: *true | bool
 
     volumes: [{
-        name: "\(Name)-disk" | string
-        gcePersistentDisk pdName: "\(Name)-disk" | string
+        name: *"\(Name)-disk" | string
+        gcePersistentDisk pdName: *"\(Name)-disk" | string
         gcePersistentDisk fsType: "ext4"
     }, {
-        name: "secret-\(Name)" | string
-        secret secretName: "\(Name)-secrets" | string
+        name: *"secret-\(Name)" | string
+        secret secretName: *"\(Name)-secrets" | string
     }, ...] if _hasDisks
 
     containers: [{
         volumeMounts: [{
-            name:      "\(Name)-disk" | string
-            mountPath: "/logs" | string
+            name:      *"\(Name)-disk" | string
+            mountPath: *"/logs" | string
         }, {
-            mountPath: "/etc/certs" | string
-            name:      "secret-\(Name)" | string
+            mountPath: *"/etc/certs" | string
+            name:      *"secret-\(Name)" | string
             readOnly:  true
         }, ...]
     }] if _hasDisks // field comprehension using just "if"

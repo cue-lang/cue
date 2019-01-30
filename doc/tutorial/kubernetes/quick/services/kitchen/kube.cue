@@ -20,7 +20,7 @@ deployment <Name> spec template: {
 }
 
 deployment <Name> spec template spec: {
-	_hasDisks: true | bool
+	_hasDisks: *true | bool
 
 	volumes: [{
 		name: *"\(Name)-disk" | string

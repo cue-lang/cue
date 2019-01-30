@@ -6,17 +6,17 @@ service <Name>: {
 	metadata: {
 		name: Name
 		labels: {
-			app:       Name       // by convention
-			domain:    "prod"     // always the same in the given files
-			component: _component // varies per directory
+			app:       Name
+			component: _component
+			domain:    "prod"
 		}
 	}
 	spec: {
 		// Any port has the following properties.
 		ports: [...{
 			port:     int
-			protocol: *"TCP" | "UDP" // from the Kubernetes definition
-			name:     *"client" | string
+			protocol: *"TCP" | "UDP"
+			name:     string | *"client"
 		}]
 		selector: metadata.labels // we want those to be the same
 	}
@@ -40,7 +40,7 @@ deployment <Name>: _spec & {
 	apiVersion: "extensions/v1beta1"
 	kind:       "Deployment"
 	_name:      Name
-	spec replicas: 1 | int
+	spec replicas: *1 | int
 }
 
 configMap <Name>: {

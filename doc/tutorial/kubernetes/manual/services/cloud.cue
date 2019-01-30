@@ -14,7 +14,7 @@ _base: {
 deployment <Name>: _base & {
 	// Allow any string, but take Name by default.
 	name:     string | *Name
-	kind:     "deployment" | "stateful" | "daemon"
+	kind:     *"deployment" | "stateful" | "daemon"
 	replicas: int | *1
 
 	image: string
@@ -44,14 +44,13 @@ deployment <Name>: _base & {
 }
 
 service <Name>: _base & {
-	name: Name | string
+	name: *Name | string
 
 	port <Name>: {
 		name: string | *Name
 
-		port:       int
-		targetPort: int | *port
-		protocol:   *"TCP" | "UDP"
+		port:     int
+		protocol: *"TCP" | "UDP"
 	}
 
 	kubernetes: {}
@@ -65,11 +64,10 @@ service "\(k)": {
 
 	// Copy over all ports exposed from containers.
 	port "\(Name)": {
-		// Set default external port to Port.
+		// Set default external port to Port. targetPort must be
+		// the respective containerPort (Port) if it differs from port.
 		port:       int | *Port
-		targetPort: int | *Port
-		// TODO(verify): jba: I don't think you need targetPort, because it's defined above in terms of port.
-		// Should probably be Port fixed.
+		targetPort: Port if port != Port
 	} for Name, Port in spec.expose.port
 
 	// Copy over the labels

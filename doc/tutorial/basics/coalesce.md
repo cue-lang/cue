@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](conditional.md) _Next_
+[TOC](Readme.md) [Prev](conditional.md) [Next](cycles.md)
 
 _Expressions_
 
@@ -33,7 +33,7 @@ a: *list[0] | "None"
 b: *list[5] | "None"
 
 n: [null]
-v: *n[0] & string | "default"
+v: *n[0]&string | "default"
 ```
 
 <!-- result -->

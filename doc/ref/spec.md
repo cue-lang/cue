@@ -272,10 +272,10 @@ The following character sequences represent operators and punctuation:
 +    &     &&    ==    !=    (    )
 -    |     ||    <     <=    [    ]
 *    :     !     >     >=    {    }
-/    ::    ;     =     ...   ..   .
+/          ;     =     ...   ..   .
 div  mod   quo   rem   _|_   <-   ,
 ```
-
+<!-- :: for "is-a" definitions -->
 
 ### Integer literals
 
@@ -296,13 +296,13 @@ int_lit     = decimal_lit | octal_lit | binary_lit | hex_lit .
 decimals  = ( "0" … "9" ) { [ "_" ] decimal_digit } .
 decimal_lit = ( "1" … "9" ) { [ "_" ] decimal_digit } [ [ "." decimals ] multiplier ] |
             "." decimals multiplier.
-octal_lit   = "0" octal_digit { [ "_" ] octal_digit } .
 binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
 multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
 ```
-<!-- TODO(mpvl): implement "K" instead of "k" -->
+
 <!--
+octal_lit   = "0" octal_digit { [ "_" ] octal_digit } .
 TODO: consider 0o766 notation for octal.
 --->
 
@@ -427,21 +427,18 @@ interpreted_bytes_lit  = `"` { unicode_value | interpolation | byte_value } `"` 
 ```
 
 ```
-`abc`                // same as "abc"
-`\n
-\n`                  // same as "\\n\n\\n"
 'a\000\xab'
 '\007'
 '\377'
 '\xa'        // illegal: too few hexadecimal digits
 "\n"
-"\""                 // same as `"`
+"\""
 'Hello, world!\n'
 "Hello, \( name )!"
 "日本語"
 "\u65e5本\U00008a9e"
 "\xff\u00FF"
-"\uD800"             // illegal: surrogate half
+"\uD800"             // illegal: surrogate half (TODO: probably should allow)
 "\U00110000"         // illegal: invalid Unicode code point
 ```
 
@@ -1213,10 +1210,12 @@ math.Sin    // denotes the Sin function in package math
 Primary expressions are the operands for unary and binary expressions.
 A default expression is only valid as an operand to a disjunction.
 
+<!-- TODO(mpvl)
+	Conversion |
+-->
 ```
 PrimaryExpr =
 	Operand |
-	Conversion |
 	Preference |
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
@@ -1684,6 +1683,7 @@ Illegal conversions always apply to CUE.
 Implementation restriction: A compiler may use rounding while computing untyped floating-point or complex constant expressions; see the implementation restriction in the section on constants. This rounding may cause a floating-point constant expression to be invalid in an integer context, even if it would be integral when calculated using infinite precision, and vice versa.
 -->
 
+<!--- TODO(mpvl): conversions
 ### Conversions
 Conversions are expressions of the form `T(x)` where `T` and `x` are
 expressions.
@@ -1692,7 +1692,7 @@ The result is always an instance of `T`.
 ```
 Conversion = Expression "(" Expression [ "," ] ")" .
 ```
-
+--->
 <!---
 
 A literal value `x` can be converted to type T if `x` is representable by a
@@ -1718,6 +1718,7 @@ int(1.2)                 // illegal: 1.2 cannot be represented as an int
 string(65.0)             // illegal: 65.0 is not an integer constant
 ```
 --->
+<!---
 
 A conversion is always allowed if `x` is an instance of `T`.
 
@@ -1770,7 +1771,6 @@ bytes("hellø")   // 'hell\xc3\xb8'
 bytes("")        // ''
 ```
 
-<!---
 #### Conversions between list types
 
 Conversions between list types are possible only if `T` strictly subsumes `x`
@@ -1784,7 +1784,6 @@ Consider removing this until it has a different meaning.
 IP:        4*[byte]
 Private10: IP([10, ...])  // [10, byte, byte, byte]
 ```
---->
 
 #### Conversions between struct types
 
@@ -1796,7 +1795,10 @@ is applied using the following rules:
   the result of the conversion, recursively.
 
 <!-- jba: I don't think you say anywhere that the matching fields are unified.
+mpvl: they are not, x must be an instance of T, in which case x == T&x,
+so unification would be unnecessary.
 -->
+<!-->
 ```
 T: {
     a: { b: 1..10 }
@@ -1811,7 +1813,7 @@ c1: T(x1)             // { a: { b: 8 } }
 c2: T({})             // _|_  // missing field 'a' in '{}'
 c3: T({ a: {b: 0} })  // _|_  // field a.b does not unify (0 & 1..10)
 ```
-
+-->
 
 ### Calls
 

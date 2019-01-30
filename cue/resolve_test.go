@@ -16,7 +16,6 @@ package cue
 
 import (
 	"flag"
-	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -70,9 +69,6 @@ func rewriteHelper(t *testing.T, cases []testCase, r rewriteMode) {
 			root := testResolve(ctx, obj, r)
 
 			got := debugStr(ctx, root)
-			if v := ctx.processDelayedConstraints(); v != nil {
-				got += fmt.Sprintf("\n%s", debugStr(ctx, v))
-			}
 
 			// Copy the result
 			if got != tc.out {
@@ -353,29 +349,31 @@ func TestBasicRewrite(t *testing.T) {
 			c: [c[1], c[0]]
 		`,
 		out: `<0>{a: _|_(cycle detected), b: _|_(cycle detected), c: _|_(cycle detected)}`,
-		// }, {
-		// 	desc: "resolved self-reference cycles",
-		// 	in: `
-		// 		a: b - 100
-		// 		b: a + 100
-		// 		b: 200
+	}, {
+		desc: "resolved self-reference cycles",
+		in: `
+			a: b - 100
+			b: a + 100
+			b: 200
 
-		// 		c: [c[1], a] // TODO: should be allowed
+			c: [c[1], a] // TODO: should be allowed
 
-		// 		s1: s2 & {a: 1}
-		// 		s2: s3 & {b: 2}
-		// 		s3: s1 & {c: 3}
-		// 	`,
-		// 	out: `<0>{a: 100, b: 200, c: _|_(cycle detected)}`,
+			s1: s2 & {a: 1}
+			s2: s3 & {b: 2}
+			s3: s1 & {c: 3}
+		`,
+		out: `<0>{a: 100, b: 200, c: _|_(cycle detected), s1: <1>{a: 1, b: 2, c: 3}, s2: <2>{a: 1, b: 2, c: 3}, s3: <3>{a: 1, b: 2, c: 3}}`,
 	}, {
 		desc: "delayed constraint failure",
 		in: `
 			a: b - 100
 			b: a + 110
 			b: 200
+
+			x: 100
+			x: x + 1
 		`,
-		out: `<0>{a: 100, b: 200}
-_|_(((<1>.a + 110) & 200):constraint violated: _|_((210 & 200):cannot unify numbers 210 and 200))`,
+		out: `<0>{a: _|_(((<1>.a + 110) & 200):constraint violated: _|_((210 & 200):cannot unify numbers 210 and 200)), b: 200, x: _|_((100 & (<1>.x + 1)):constraint violated: _|_((100 & 101):cannot unify numbers 100 and 101))}`,
 		// TODO: find a way to mark error in data.
 	}}
 	rewriteHelper(t, testCases, evalPartial)
@@ -800,26 +798,24 @@ func TestResolve(t *testing.T) {
 		`,
 		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: ("dummy" | string) if true yield ("sub"): <4>{as: <3>.a}}, ` +
 			`foo: <5>{a: "bar", sub: <6>{as: "bar"}}}}`,
-		// TODO(P3): if two fields are evaluating to the same field, their
-		// values could be bound.
-		// nodes:   use a shared node
-		// other:   change to where clause
-		// unknown: change to where clause.
-		// in: `
-		// 		a: b
-		// 		b: a
-		// 		a: { d: 1 }
-		// 		`,
-		// out: `<0>{a: {d:1}, b: {d:1}}`,
-
-		// TODO(P2): circular references in expressions can be resolved when
-		// unified with complete values.
-		// in: `
-		// 		a: 20
-		// 		a: b + 10  // 20 & b+10  ==> 20; where a == b+10
-		// 		b: a - 10  // 10-10 = 10  ==>         20 == 10+10
-		// `
-		// out: `<0>{a_0:20, b_1:10}`
+	}, {
+		desc: "self-reference cycles conflicts with strings",
+		in: `
+			a: {
+				x: y+"?"
+				y: x+"!"
+			}
+			a x: "hey"
+		`,
+		out: `<1>{a: <2>{x: _|_(((<0>.y + "?") & "hey"):constraint violated: _|_("hey":delayed constraint ((<0>.y + "?") & "hey") violated)), y: _|_(cycle detected)}}`,
+	}, {
+		desc: "resolved self-reference cycles with disjunctions",
+		in: `
+			a: b&{x:1} | {y:1}  // {x:1,y:3,z:2} | {y:1}
+			b: {x:2} | c&{z:2}  // {x:2} | {x:1,y:3,z:2}
+			c: a&{y:3} | {z:3}  // {x:1,y:3,z:2} | {z:3}
+		`,
+		out: `<0>{a: (<1>{x: 1, y: 3, z: 2} | <2>{y: 1}), b: (<3>{x: 2} | <4>{x: 1, y: 3, z: 2}), c: (<5>{x: 1, y: 3, z: 2} | <6>{z: 3})}`,
 	}}
 	rewriteHelper(t, testCases, evalPartial)
 }

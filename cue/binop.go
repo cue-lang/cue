@@ -36,8 +36,19 @@ func unify(ctx *context, src source, left, right evaluated) evaluated {
 }
 
 func binOp(ctx *context, src source, op op, left, right evaluated) (result evaluated) {
-	if err := firstBottom(left, right); err != nil {
-		return err
+	if isBottom(left) {
+		if op == opUnify && ctx.exprDepth == 0 && cycleError(left) != nil {
+			ctx.cycleErr = true
+			return right
+		}
+		return left
+	}
+	if isBottom(right) {
+		if op == opUnify && ctx.exprDepth == 0 && cycleError(right) != nil {
+			ctx.cycleErr = true
+			return left
+		}
+		return right
 	}
 
 	leftKind := left.kind()
@@ -53,7 +64,9 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		left, right = right, left
 	}
 	if op != opUnify {
+		ctx.exprDepth++
 		v := left.binOp(ctx, src, op, right) // may return incomplete
+		ctx.exprDepth--
 		return v
 	}
 

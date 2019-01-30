@@ -30,6 +30,9 @@ type context struct {
 	// constraints are to be evaluated at the end values to be evaluated later.
 	constraints []value
 	noDelay     bool
+	exprDepth   int // nesting of expression that are not unification
+	evalDepth   int
+	cycleErr    bool
 
 	// for debug strings
 	nodeRefs map[scope]string

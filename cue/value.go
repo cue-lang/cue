@@ -601,86 +601,6 @@ func (x *structLit) iterAt(ctx *context, i int) (evaluated, value, label) {
 	return v, x.arcs[i].v, x.arcs[i].feature // TODO: return template & v for original?
 }
 
-// Cycle Handling
-//
-// Structs (and thus lists)
-//
-// Unresolved cycle
-// a: b  // _|_
-// b: a  // _|_
-//
-// a: b | {c:1} // _|_
-// b: a | {d:1} // _|_
-//
-// Resolved cycles
-// a: b               // {c:1} : b -> a&{c:1} ->a&{c:1}[a:cycle error] -> {c:1}
-// b: a & { c: 1 }    // {c:1}
-//
-// a: b & { d: 1 }    // {c:1, d:1}
-// b: a & { c: 1 }    // {c:1, d:1}
-//
-// To resolve cycles in disjunctions, the unification operations need to be
-// rewritten before that disjunction values are unified. This is optional for
-// CUE implementations.
-// a: b | {d:1}       // {c:1} | {d:1}
-// b: a & {c:1}       // b & {c:1} | {d:1}&{c:1} -> {c:1} | {c:1,d:1}
-//
-//
-// Atoms
-// a: b + 100  // _|_
-// b: a - 100  // _|_
-//
-// a: b + 100  // 200
-// b: a - 100  // 100  + check 100 & (a-100)
-// b: 100
-//
-// a: b+100 | b+50 // 200 | 150
-// b: a-100 | a-50 // 100  + check 100 & (a-100 | a-50)
-// b: 100
-
-// TODO: Question: defining an interpration of a constraint structure with no
-// default resolution applied versus one there is. And given a substitution that
-// is valid for both interpretation, resulting in a an b, respectively. Is there
-// any expression in which a an b can be substituted for which the fully
-// evaluated interpretation can yield different results? If so, can we define
-// disjunction in a way that it does not?
-// ANSWER: NO. But is it sufficient to only require this for direct references?
-// Maybe, but at least it holds in that case.
-// f1: a1 | ... | an
-// f2: f1
-// f2: b1 | ... | bm | ... | bn
-// --  Suppose the element that unifies with a1 in f2 is bm.
-//     Is a1 & bm the same answer if f2 referencing f1 referred to the
-//     disjunction?
-//     Assume that some ax, x > 1 unifies with a by, y < m.
-//     This would be an ambiguous disjunction, and by definition invalid.
-//     The first valid disjunction is one where bm is the first to match
-//     any of the values in f1. The result will therefore be the same.
-//
-// Case 1
-// replicas: 1 | int
-//
-// foo: 1 | 2     // interpretations must be equal or else the value crosses
-// foo: replicas
-//
-// Case 2
-// a: {
-//    replicas: 1 | int
-//    b: {chk: 0, num: 4 } | { chk: int, e: 5, f: int } | { chk: 1, e: 6, f: 7 }
-//    b chk: replicas          // { chk: 1, num: 5 }
-//    c: 1/(replicas-1) | 0    // 0
-// }
-//
-// b: {
-// 	b chk f: 7
-// }
-//
-// This may be an issue, but by defining all expressions to be lazily evaluated,
-// this is not a surprise. We could have a cue.Choose() builtin to pick
-// the disjunctions recursively. Note that within a single struct, though, the
-// selection for a field is always unique. It may only vary if a substructure
-// is referred to in a new substructure.
-
 func (x *structLit) at(ctx *context, i int) evaluated {
 	x.expand(ctx)
 	// if x.emit != nil && isBottom(x.emit) {
@@ -693,15 +613,31 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 
 		// cycle detection
 		x.arcs[i].cache = cycleSentinel
-		v := x.arcs[i].v.evalPartial(ctx)
 
-		if err := cycleError(v); err != nil {
-			x.arcs[i].cache = nil
-			return err
-		}
+		ctx.evalDepth++
+		v := x.arcs[i].v.evalPartial(ctx)
+		ctx.evalDepth--
 
 		v = x.applyTemplate(ctx, i, v)
+
+		if ctx.evalDepth > 0 && ctx.cycleErr {
+			// Don't cache while we're in a evaluation cycle as it will cache
+			// partial results. Each field involved in the cycle will have to
+			// reevaluated the values from scratch. As the result will be
+			// cached after one cycle, it will evaluate the cycle at most twice.
+			x.arcs[i].cache = nil
+			return v
+		}
+		// If there as a cycle error, we have by now evaluated full cycle and
+		// it is safe to cache the result.
+		ctx.cycleErr = false
+
 		x.arcs[i].cache = v
+		if ctx.evalDepth == 0 {
+			if err := ctx.processDelayedConstraints(); err != nil {
+				x.arcs[i].cache = err
+			}
+		}
 	}
 	return x.arcs[i].cache
 }
@@ -1056,7 +992,12 @@ func (x *disjunction) normalize(ctx *context, src source) mVal {
 	k := 0
 outer:
 	for i, v := range x.values {
-		if isBottom(v.val) {
+		// TODO: this is pre-evaluation is quite aggressive. Verify whether
+		// this does not trigger structural cycles. If so, this can check for
+		// bottom and the validation can be delayed to as late as picking
+		// defaults. The drawback of this approach is that printed intermediate
+		// results will not look great.
+		if err := validate(ctx, v.val); err != nil {
 			continue
 		}
 		for j, w := range x.values {

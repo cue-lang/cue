@@ -4,18 +4,16 @@ _Types ~~and~~ are Values_
 
 # Default Values
 
-If at the time of evaluation a sum type still has more than one possible
-value, the first error-free value is taken.
-A value is error free if it is not an error, it is a list with only error-free
-elements, or it is a struct where all field values are error-free.
-The default value must also not be ambiguous.
+Elements of a disjunction may be marked as preferred.
+If there is only one mark, or the users constraints a field enough such that
+only one mark remains, that value is the default value.
 
 In the example, `replicas` defaults to `1`.
 In the case of `protocol`, however, there are multiple definitions with
 different, mutually incompatible defaults.
-It is still possible to resolve this error by explicitly setting the value
-for protocol.
-Try it!
+In that case, both `"tcp"` and `"udp"` are preferred and one must explicitly
+specify either `"tcp"` or `"udp"` as if no marks were given.
+
 <!-- CUE editor -->
 ```
 // any positive number, 1 is the default

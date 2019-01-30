@@ -24,8 +24,8 @@ rs: "a".."mo"
     a: rn & 3.5
     b: ri & 3.5
     c: rf & 3
-    d: "ma"
-    e: "mu"
+    d: rs & "ma"
+    e: rs & "mu"
 
     r1: 0..7 & 3..10
 }
@@ -35,7 +35,7 @@ rs: "a".."mo"
 ```
 a:  3.5
 b:  _|_
-c:  3   <!-- jba: this should be 3.0, right? -->
+c:  3.0
 d:  "ma"
 e:  _|_
 r1: 3..7

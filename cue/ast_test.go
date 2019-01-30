@@ -137,12 +137,13 @@ func TestCompile(t *testing.T) {
 	}, {
 		in: `
 		a: 5 | "a" | true
+		aa: 5 | *"a" | true
 		b c: {
 			cc: { ccc: 3 }
 		}
 		d: true
 		`,
-		out: "<0>{a: (5 | \"a\" | true), b: <1>{c: <2>{cc: <3>{ccc: 3}}}, d: true}",
+		out: "<0>{a: (5 | \"a\" | true), aa: (5 | *\"a\" | true), b: <1>{c: <2>{cc: <3>{ccc: 3}}}, d: true}",
 	}, {
 		in: `
 		a a: { b: a } // referencing ancestor nodes is legal.
@@ -232,6 +233,13 @@ func TestCompile(t *testing.T) {
 			d: (2+3)..(4+5)
 			`,
 		out: `<0>{a: (1..2), b: ((1..2)..3), c: ("a".."b"), d: ((2 + 3)..(4 + 5))}`,
+	}, {
+		in: `
+			a: *1,
+			b: **1 | 2
+		`,
+		out: `<0>{a: _|_(preference mark not allowed at this position), ` +
+			`b: (*_|_(preference mark not allowed at this position) | 2)}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -276,7 +284,7 @@ func TestEmit(t *testing.T) {
 			a: 8000 | 7080
 			a: 7080 | int
 		}`,
-		out: `<0>{a: _|_((8000! | 7080! | 7080):ambiguous disjunction)}`,
+		out: `<0>{a: _|_((8000 | 7080):more than one element remaining (8000 and 7080))}`,
 		rw:  evalFull,
 	}}
 	for _, tc := range testCases {

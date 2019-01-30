@@ -30,16 +30,16 @@ _kitchenDeployment: {
 	// Volumes
 	volume "\(name)-disk": {
 		name:      string
-		mountPath: "/logs" | string
+		mountPath: *"/logs" | string
 		spec gcePersistentDisk: {
-			pdName: name | string
+			pdName: *name | string
 			fsType: "ext4"
 		}
 	}
 
 	volume "secret-\(name)": {
-		mountPath: "/etc/certs" | string
+		mountPath: *"/etc/certs" | string
 		readOnly:  true
-		spec secret secretName: "\(name)-secrets" | string
+		spec secret secretName: *"\(name)-secrets" | string
 	}
 }

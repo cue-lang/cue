@@ -18,7 +18,7 @@ that is unified with each of the siblings.
 // The name of each element is bound to Name and visible in the struct.
 job <Name>: {
     name:     Name
-    replicas: 1 | uint
+    replicas: uint | *1
     command:  string
 }
 

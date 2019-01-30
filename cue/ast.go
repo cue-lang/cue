@@ -457,6 +457,9 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		value = call
 
 	case *ast.UnaryExpr:
+		if n.Op == token.MUL {
+			return v.error(n, "preference mark not allowed at this position")
+		}
 		value = &unaryExpr{
 			newExpr(n),
 			tokenMap[n.Op],
@@ -466,7 +469,10 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 	case *ast.BinaryExpr:
 		switch n.Op {
 		case token.DISJUNCTION:
-			value = makeDisjunction(v.ctx(), n, v.walk(n.X), v.walk(n.Y))
+			d := &disjunction{baseValue: newExpr(n)}
+			v.addDisjunctionElem(d, n.X, false)
+			v.addDisjunctionElem(d, n.Y, false)
+			value = d
 		case token.RANGE:
 			value = &rangeLit{
 				newExpr(n),
@@ -491,6 +497,23 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 
 	}
 	return value
+}
+
+func (v *astVisitor) addDisjunctionElem(d *disjunction, n ast.Node, mark bool) {
+	switch x := n.(type) {
+	case *ast.BinaryExpr:
+		if x.Op == token.DISJUNCTION {
+			v.addDisjunctionElem(d, x.X, mark)
+			v.addDisjunctionElem(d, x.Y, mark)
+			return
+		}
+	case *ast.UnaryExpr:
+		if x.Op == token.MUL {
+			mark = true
+			n = x.X
+		}
+	}
+	d.values = append(d.values, dValue{v.walk(n), mark})
 }
 
 func wrapClauses(v *astVisitor, y yielder, clauses []ast.Clause) yielder {

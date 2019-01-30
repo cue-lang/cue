@@ -19,11 +19,11 @@ Try it!
 <!-- CUE editor -->
 ```
 // any positive number, 1 is the default
-replicas: 1 | uint
+replicas: uint | *1
 
 // the default value is ambiguous
-protocol: "tcp" | "udp"
-protocol: "udp" | "tcp"
+protocol: *"tcp" | "udp"
+protocol: *"udp" | "tcp"
 ```
 
 <!-- result -->

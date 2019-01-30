@@ -31,12 +31,6 @@ func binSrc(pos token.Pos, op op, a, b value) baseValue {
 	return baseValue{&computedSource{pos, op, a, b}}
 }
 
-type binFunc func(ctx *context, src source, op op, left, right evaluated) evaluated
-
-func binSwap(ctx *context, src source, op op, x, y evaluated) evaluated {
-	return binOp(ctx, src, op, y, x)
-}
-
 func unify(ctx *context, src source, left, right evaluated) evaluated {
 	return binOp(ctx, src, opUnify, left, right)
 }
@@ -65,17 +59,6 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 
 	// op == opUnify
 
-	// Evaluated and recompose disjunctions.
-
-	if dl, ok := left.(*disjunction); ok {
-		if dr, ok := right.(*disjunction); ok {
-			return dl.cross(ctx, src, op, dr)
-		}
-		return dl.expand(ctx, src, op, right, binOp)
-	} else if dr, ok := right.(*disjunction); ok {
-		return dr.expand(ctx, src, op, left, binSwap)
-	}
-
 	// TODO: unify type masks.
 	if left == right {
 		return left
@@ -85,6 +68,12 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 	}
 	if isTop(right) {
 		return left
+	}
+
+	if dl, ok := left.(*disjunction); ok {
+		return distribute(ctx, src, dl, right)
+	} else if dr, ok := right.(*disjunction); ok {
+		return distribute(ctx, src, dr, left)
 	}
 
 	// TODO: value may be incomplete if there is a cycle. Instead of an error
@@ -101,48 +90,35 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 	return v
 }
 
-func (x *disjunction) expand(ctx *context, src source, op op, y evaluated, fn binFunc) evaluated {
-	// disjunction & single value
-	dn := disjunction{src.base(), make([]dValue, 0, len(x.values))}
-	changed := false
-	for _, v := range x.values {
-		e := fn(ctx, src, op, v.val.(evaluated), y)
-		changed = changed || e != v.val
-		dn.add(ctx, e, v.ambiguous)
-	}
-	if !changed {
-		return x
-	}
-	return dn.simplify(ctx, binSrc(src.Pos(), op, x, y)).(evaluated)
+type mVal struct {
+	val  evaluated
+	mark bool
 }
 
-func (x *disjunction) cross(ctx *context, src source, op op, y *disjunction) evaluated {
-	vr := []dValue{}
-	idx := make([]int, 0, len(y.values))
-	for _, va := range x.values {
-		for j, vb := range y.values {
-			e := binOp(ctx, src, op, va.val.(evaluated), vb.val.(evaluated))
-			if isBottom(e) {
-				continue
-			}
+// distribute distributes a value over the element of a disjunction in a
+// unification operation. If allowCycle is true, references that resolve
+// to a cycle are dropped.
+func distribute(ctx *context, src source, x *disjunction, y evaluated) evaluated {
+	return dist(ctx, src, x, mVal{y, false}).val
+}
 
-			// TODO: filter using subsumption.
+func dist(ctx *context, src source, dx *disjunction, y mVal) mVal {
+	dn := &disjunction{src.base(), make([]dValue, 0, len(dx.values))}
+	for _, dv := range dx.values {
+		x := mVal{dv.val.evalPartial(ctx), dv.marked}
+		src := binSrc(src.Pos(), opUnify, x.val, y.val)
 
-			// Mark crossing values as ambiguous.
-			ambiguous := va.ambiguous || vb.ambiguous
-			for xi, x := range idx {
-				if x > j {
-					vr[xi].ambiguous = true
-					ambiguous = true
-				}
-			}
-			vr = append(vr, dValue{e, ambiguous})
-			idx = append(idx, j)
+		var v mVal
+		if dy, ok := y.val.(*disjunction); ok {
+			v = dist(ctx, src, dy, x)
+		} else if ddv, ok := dv.val.(*disjunction); ok {
+			v = dist(ctx, src, ddv, y)
+		} else {
+			v = mVal{binOp(ctx, src, opUnify, x.val, y.val), x.mark || y.mark}
 		}
+		dn.add(ctx, v.val, v.mark)
 	}
-
-	d := &disjunction{baseValue: src.base(), values: vr}
-	return d.simplify(ctx, binSrc(src.Pos(), op, x, y)).(evaluated)
+	return dn.normalize(ctx, src)
 }
 
 func (x *disjunction) binOp(ctx *context, src source, op op, other evaluated) evaluated {

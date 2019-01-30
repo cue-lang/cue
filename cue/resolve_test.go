@@ -269,19 +269,39 @@ func TestBasicRewrite(t *testing.T) {
 		in: `
 			o1: 1 | 2 | 3
 			o2: (1 | 2 | 3) & 1
-			o3: 2 & (1 | 2 | 3)
-			o4: (1 | 2 | 3) & (1 | 2 | 3)
-			o5: (1 | 2 | 3) & (3 | 2 | 1)
+			o3: 2 & (1 | *2 | 3)
+			o4: (1 | *2 | 3) & (1 | 2 | *3)
+			o5: (1 | *2 | 3) & (3 | *2 | 1)
 			o6: (1 | 2 | 3) & (3 | 1 | 2)
 			o7: (1 | 2 | 3) & (2 | 3)
 			o8: (1 | 2 | 3) & (3 | 2)
 			o9: (2 | 3) & (1 | 2 | 3)
-			o10: (3 | 2) & (1 | 2 | 3)
+			o10: (3 | 2) & (1 | *2 | 3)
+
+			m1: (*1 | (*2 | 3)) & 2..3
+			m2: (*1 | (*2 | 3)) & (2 | 3)
+			m3: (*1 | *(*2 | 3)) & (2 | 3)
+			m4: (2 | 3) & (*2 | 3)
+			m5: (*2 | 3) & (2 | 3)
+
+			// (*2 | 3) & (2 | 3)
+			// (2 | 3) & (*2 | 3)
+			// 2&(*2 | 3) | 3&(*2 | 3)
+			// (*1 | (*2 | 3)) & (2 | 3)
+			// *1& (2 | 3) | (*2 | 3)&(2 | 3)
+			// *2&(2 | 3) | 3&(2 | 3)
+
+			// (2 | 3)&(*1 | (*2 | 3))
+			// 2&(*1 | (*2 | 3)) | 3&(*1 | (*2 | 3))
+			// *1&2 | (*2 | 3)&2 | *1&3 | (*2 | 3)&3
+			// (*2 | 3)&2 | (*2 | 3)&3
+			// *2 | 3
+
 
 			// All errors are treated the same as per the unification model.
 			i1: [1, 2][3] | "c"
 			`,
-		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | 2 | 3), o5: (1! | 2! | 3!), o6: (1! | 2! | 3!), o7: (2 | 3), o8: (2! | 3!), o9: (2 | 3), o10: (3! | 2!), i1: "c"}`,
+		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | *2 | *3), o5: (1 | *2 | 3), o6: (1 | 2 | 3), o7: (2 | 3), o8: (2 | 3), o9: (2 | 3), o10: (3 | *2), m1: (*2 | 3), m2: (*2 | 3), m3: (*2 | 3), m4: (*2 | 3), m5: (*2 | 3), i1: "c"}`,
 	}, {
 		desc: "types",
 		in: `
@@ -365,8 +385,8 @@ func TestChooseFirst(t *testing.T) {
 	testCases := []testCase{{
 		desc: "pick first",
 		in: `
-		a: 5 | "a" | true
-		b c: {
+		a: *5 | "a" | true
+		b c: *{
 			a: 2
 		} | {
 			a : 3
@@ -376,19 +396,19 @@ func TestChooseFirst(t *testing.T) {
 	}, {
 		desc: "simple disambiguation conflict",
 		in: `
-			a: "a" | "b"
-			b: "b" | "a"
+			a: *"a" | "b"
+			b: *"b" | "a"
 			c: a & b
 			`,
-		out: `<0>{a: "a", b: "b", c: _|_(("a"! | "b"!):ambiguous disjunction)}`,
+		out: `<0>{a: "a", b: "b", c: _|_((*"a" | *"b"):more than one default remaining ("a" and "b"))}`,
 	}, {
 		desc: "disambiguation non-conflict",
 		in: `
-			a: "a" | ("b" | "c")
-			b: ("a" | "b") | "c"
+			a: *"a" | ("b" | "c")
+			b: (*"a" | "b") | "c"
 			c: a & b
 			`,
-		out: `<0>{a: "a", b: "a", c: "a"}`,
+		out: `<0>{a: "a", b: _|_(((*"a" | "b") | "c"):more than one element remaining ((*"a" | "b") and "c")), c: "a"}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }
@@ -451,15 +471,15 @@ func TestResolve(t *testing.T) {
 		in: `
 			a: [2][0]
 			b: {foo:"bar"}["foo"]
-			c: (l|{"3":3})["3"]
-			d: ([]|[1])[0]
+			c: (*l|{"3":3})["3"]
+			d: (*[]|[1])[0]
 			l: []
 			e1: [2][""]
 			e2: 2[2]
 			e3: [][true]
 			e4: [1,2,3][3]
 			e5: [1,2,3][-1]
-			e6: ([]|{})[1]
+			e6: (*[]|{})[1]
 		`,
 		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type number does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds)}`,
 	}, {
@@ -810,19 +830,19 @@ func TestFullEval(t *testing.T) {
 		in: `
 				a: 8000.9
 				a: 7080 | int`,
-		out: `<0>{a: _|_(empty disjunction after evaluation)}`,
+		out: `<0>{a: _|_((8000.9 & (7080 | int)):empty disjunction: cannot unify numbers 7080 and 8000.9)}`,
 	}, {
 		desc: "resolve all disjunctions",
 		in: `
 			service <Name>: {
-				name: Name | string
-				port: 7080 | int
+				name: string | *Name
+				port: int | *7080
 			}
 			service foo: _
 			service bar: { port: 8000 }
 			service baz: { name: "foobar" }
 			`,
-		out: `<0>{service: <1>{<>: <2>(Name: string)-><3>{name: (<2>.Name | string), port: (7080 | int)}, foo: <4>{name: "foo", port: 7080}, bar: <5>{name: "bar", port: 8000}, baz: <6>{name: "foobar", port: 7080}}}`,
+		out: `<0>{service: <1>{<>: <2>(Name: string)-><3>{name: (string | *<2>.Name), port: (int | *7080)}, foo: <4>{name: "foo", port: 7080}, bar: <5>{name: "bar", port: 8000}, baz: <6>{name: "foobar", port: 7080}}}`,
 	}, {
 		desc: "field templates",
 		in: `
@@ -831,7 +851,7 @@ func TestFullEval(t *testing.T) {
 				k: 1
 			}
 			b: {
-				<x>: { x: 0, y: 1 | int }
+				<x>: { x: 0, y: *1 | int }
 				v: {}
 				w: { y: 0 }
 			}
@@ -842,7 +862,7 @@ func TestFullEval(t *testing.T) {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
 		desc: "field comprehension",
 		in: `
@@ -952,7 +972,7 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "disjunctions of lists",
 		in: `
-			l: [ int, int ] | [ string, string ]
+			l: *[ int, int ] | [ string, string ]
 
 			l1: [ "a", "b" ]
 			l2: l & [ "c", "d" ]
@@ -980,8 +1000,8 @@ func TestFullEval(t *testing.T) {
 
 			service <Name>: {
 				type: "service"
-				name: Name | string
-				port: 7080 | int
+				name: *Name | string
+				port: *7080 | int
 			}
 			service foo: {}
 			service bar: { port: 8000 }
@@ -993,7 +1013,7 @@ func TestFullEval(t *testing.T) {
 			`<3>{type: "service", name: "foobar", port: 7080}], ` +
 
 			`service: <4>{` +
-			`<>: <5>(Name: string)-><6>{type: "service", name: (<5>.Name | string), port: (7080 | int)}, ` +
+			`<>: <5>(Name: string)-><6>{type: "service", name: (*<5>.Name | string), port: (*7080 | int)}, ` +
 			`foo: <7>{type: "service", name: "foo", port: 7080}, ` +
 			`bar: <8>{type: "service", name: "bar", port: 8000}, ` +
 			`baz: <9>{type: "service", name: "foobar", port: 7080}}}`,
@@ -1026,7 +1046,7 @@ func TestFullEval(t *testing.T) {
 		IP: 4*[ 0..255 ]
 
 		Private:
-			[ 192, 168, 0..255, 0..255 ] |
+			*[ 192, 168, 0..255, 0..255 ] |
 			[ 10, 0..255, 0..255, 0..255] |
 			[ 172, 16..32, 0..255, 0..255 ]
 

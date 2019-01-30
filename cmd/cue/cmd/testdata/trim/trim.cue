@@ -14,7 +14,7 @@ foo <Name>: {
 
 	struct: {a: 3.0}
 
-	sList: [{a: 8, b: string}, {a: 9, b: "foo" | string}]
+	sList: [{a: 8, b: string}, {a: 9, b: *"foo" | string}]
 	rList: [{a: "a"}]
 	rcList: [{a: "a", c: b}]
 

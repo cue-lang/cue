@@ -313,33 +313,51 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 	for _, v := range x.values {
 		n := v.val.evalPartial(ctx)
 		changed = changed || n != v.val
-		dn.add(ctx, n, v.ambiguous)
+		dn.add(ctx, n, v.marked)
 	}
 	// TODO: move to evaluator
 	if !changed {
 		return x
 	}
-	return dn.simplify(ctx, x).(evaluated)
+	return dn.normalize(ctx, x).val
 }
 
 func (x *disjunction) manifest(ctx *context) (result evaluated) {
-	switch len(x.values) {
-	case 0:
-		return x.simplify(ctx, x).(evaluated) // force error
-	case 1:
-		return x.values[0].val.(evaluated)
-	default:
-		for _, d := range x.values {
-			if validate(ctx, d.val) != nil {
-				continue
-			}
-			if d.ambiguous {
-				// better error
-				return ctx.mkErr(x, "ambiguous disjunction")
-			}
-			return d.val.(evaluated)
+	var err, marked, unmarked1, unmarked2 evaluated
+	for _, d := range x.values {
+		// Because of the lazy evaluation strategy, we may still have
+		// latent unification.
+		if err := validate(ctx, d.val); err != nil {
+			continue
 		}
-		return ctx.mkErr(x, "empty disjunction after evaluation")
+		switch {
+		case d.marked:
+			if marked != nil {
+				return ctx.mkErr(x, "more than one default remaining (%v and %v)", debugStr(ctx, marked), debugStr(ctx, d.val))
+			}
+			marked = d.val.(evaluated)
+		case unmarked1 == nil:
+			unmarked1 = d.val.(evaluated)
+		default:
+			unmarked2 = d.val.(evaluated)
+		}
+	}
+	switch {
+	case marked != nil:
+		return marked
+
+	case unmarked2 != nil:
+		return ctx.mkErr(x, "more than one element remaining (%v and %v)",
+			debugStr(ctx, unmarked1), debugStr(ctx, unmarked2))
+
+	case unmarked1 != nil:
+		return unmarked1
+
+	case err != nil:
+		return err
+
+	default:
+		return ctx.mkErr(x, "empty disjunction")
 	}
 }
 

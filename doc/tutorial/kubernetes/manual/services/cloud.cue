@@ -12,11 +12,10 @@ _base: {
 }
 
 deployment <Name>: _base & {
-	name:     Name | string
-// jba: why do you need to write "Name | string"? Doesn't the grammar require that the value
-// of <Name> is a string?
+	// Allow any string, but take Name by default.
+	name:     string | *Name
 	kind:     "deployment" | "stateful" | "daemon"
-	replicas: 1 | int
+	replicas: int | *1
 
 	image: string
 
@@ -36,10 +35,10 @@ deployment <Name>: _base & {
 	envSpec: {"\(k)" value: v for k, v in env}
 
 	volume <Name>: {
-		name:      Name | string
+		name:      string | *Name
 		mountPath: string
-		subPath:   null | string
-		readOnly:  false | true
+		subPath:   string | *null
+		readOnly:  *false | true
 		kubernetes: {}
 	}
 }
@@ -48,11 +47,11 @@ service <Name>: _base & {
 	name: Name | string
 
 	port <Name>: {
-		name: Name | string
+		name: string | *Name
 
 		port:       int
-		targetPort: port | int
-		protocol:   "TCP" | "UDP"
+		targetPort: int | *port
+		protocol:   *"TCP" | "UDP"
 	}
 
 	kubernetes: {}
@@ -66,10 +65,11 @@ service "\(k)": {
 
 	// Copy over all ports exposed from containers.
 	port "\(Name)": {
-		port:       Port | int
-// jba: Port must be defined, so why do you need "| int"?
-		targetPort: Port | int
-// jba: I don't think you need targetPort, because it's defined above in terms of port.
+		// Set default external port to Port.
+		port:       int | *Port
+		targetPort: int | *Port
+		// TODO(verify): jba: I don't think you need targetPort, because it's defined above in terms of port.
+		// Should probably be Port fixed.
 	} for Name, Port in spec.expose.port
 
 	// Copy over the labels

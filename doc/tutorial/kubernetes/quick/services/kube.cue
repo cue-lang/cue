@@ -15,8 +15,8 @@ service <Name>: {
 		// Any port has the following properties.
 		ports: [...{
 			port:     int
-			protocol: "TCP" | "UDP" // from the Kubernetes definition
-			name:     "client" | string
+			protocol: *"TCP" | "UDP" // from the Kubernetes definition
+			name:     *"client" | string
 		}]
 		selector: metadata.labels // we want those to be the same
 	}
@@ -66,7 +66,7 @@ _spec: {
 // for all ports defined in all containers.
 _spec spec template spec containers: [...{
 	ports: [...{
-		_export: true | false // include the port in the service
+		_export: *true | false // include the port in the service
 	}]
 }]
 
@@ -75,8 +75,8 @@ service "\(k)": {
 
 	spec ports: [ {
 		Port = p.containerPort // Port is an alias
-		port:       Port | int
-		targetPort: Port | int
+		port:       *Port | int
+		targetPort: *Port | int
 	} for c in v.spec.template.spec.containers
 		for p in c.ports
 		if p._export ]

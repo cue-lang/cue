@@ -103,20 +103,22 @@ func (p *exporter) expr(v value) ast.Expr {
 		if len(x.values) == 1 {
 			return p.expr(x.values[0].val)
 		}
+		expr := func(v dValue) ast.Expr {
+			e := p.expr(v.val)
+			if v.marked {
+				e = &ast.UnaryExpr{Op: token.MUL, X: e}
+			}
+			return e
+		}
 		bin := &ast.BinaryExpr{
-			X:  p.expr(x.values[0].val),
+			X:  expr(x.values[0]),
 			Op: token.DISJUNCTION,
-			Y:  p.expr(x.values[1].val),
+			Y:  expr(x.values[1]),
 		}
 		for _, v := range x.values[2:] {
-			bin = &ast.BinaryExpr{X: bin, Op: token.DISJUNCTION, Y: p.expr(v.val)}
+			bin = &ast.BinaryExpr{X: bin, Op: token.DISJUNCTION, Y: expr(v)}
 		}
 		return bin
-	// case *lambdaExpr:
-
-	// 	p.debugStr(x.params.arcs)
-	// 	write(")->")
-	// 	p.debugStr(x.value)
 
 	case *structLit:
 		obj := &ast.StructLit{}

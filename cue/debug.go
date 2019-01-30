@@ -210,10 +210,10 @@ func (p *printer) debugStr(v interface{}) {
 			if i != 0 {
 				writef(" | ")
 			}
-			p.debugStr(v.val)
-			if v.ambiguous {
-				writef("!")
+			if v.marked {
+				writef("*")
 			}
+			p.debugStr(v.val)
 		}
 		write(")")
 	case *lambdaExpr:

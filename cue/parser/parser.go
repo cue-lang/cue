@@ -1109,7 +1109,7 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 	}
 
 	switch p.tok {
-	case token.ADD, token.SUB, token.NOT:
+	case token.ADD, token.SUB, token.NOT, token.MUL:
 		pos, op := p.pos, p.tok
 		c := p.openComments()
 		p.next()

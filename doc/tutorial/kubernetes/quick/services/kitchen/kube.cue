@@ -23,21 +23,21 @@ deployment <Name> spec template spec: {
 	_hasDisks: true | bool
 
 	volumes: [{
-		name: "\(Name)-disk" | string
-		gcePersistentDisk pdName: "\(Name)-disk" | string
+		name: *"\(Name)-disk" | string
+		gcePersistentDisk pdName: *"\(Name)-disk" | string
 		gcePersistentDisk fsType: "ext4"
 	}, {
-		name: "secret-\(Name)" | string
-		secret secretName: "\(Name)-secrets" | string
+		name: *"secret-\(Name)" | string
+		secret secretName: *"\(Name)-secrets" | string
 	}, ...] if _hasDisks
 
 	containers: [{
 		volumeMounts: [{
-			name:      "\(Name)-disk" | string
-			mountPath: "/logs" | string
+			name:      *"\(Name)-disk" | string
+			mountPath: *"/logs" | string
 		}, {
-			mountPath: "/etc/certs" | string
-			name:      "secret-\(Name)" | string
+			mountPath: *"/etc/certs" | string
+			name:      *"secret-\(Name)" | string
 			readOnly:  true
 		}, ...]
 	}] if _hasDisks // field comprehension using just "if"

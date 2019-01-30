@@ -113,10 +113,10 @@ func TestExport(t *testing.T) {
 			}`),
 	}, {
 		raw: true,
-		in:  `{ a: "foo" | "bar" | string, b: a[2:3] }`,
+		in:  `{ a: *"foo" | *"bar" | *string | int, b: a[2:3] }`,
 		out: unindent(`
 			{
-				a: "foo" | "bar" | string
+				a: *"foo" | *"bar" | *string | int
 				b: a[2:3]
 			}`),
 	}, {

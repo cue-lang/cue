@@ -1022,22 +1022,8 @@ type disjunction struct {
 }
 
 type dValue struct {
-	val       value
-	ambiguous bool
-}
-
-// makeDisjunction constructs a disjunction linked list.
-func makeDisjunction(ctx *context, n ast.Expr, a, b value) *disjunction {
-	d, ok := a.(*disjunction)
-	if !ok {
-		d = &disjunction{newExpr(n), []dValue{{val: a}}}
-	}
-	if o, ok := b.(*disjunction); ok {
-		d.values = append(d.values, o.values...)
-	} else {
-		d.values = append(d.values, dValue{val: b})
-	}
-	return d
+	val    value
+	marked bool
 }
 
 func (x *disjunction) kind() kind {
@@ -1054,21 +1040,58 @@ func (x *disjunction) kind() kind {
 func (x *disjunction) Pos() token.Pos { return x.values[0].val.Pos() }
 
 // add add a value to the disjunction. It is assumed not to be a disjunction.
-func (x *disjunction) add(ctx *context, v value, ambiguous bool) {
-	if !isBottom(v) {
-		x.values = append(x.values, dValue{v, ambiguous})
-	}
+func (x *disjunction) add(ctx *context, v value, marked bool) {
+	x.values = append(x.values, dValue{v, marked})
 }
 
-// simplify unwraps the disjunction if necessary.
-func (x *disjunction) simplify(ctx *context, src source) value {
-	switch len(x.values) {
-	case 0:
-		return ctx.mkErr(src, "empty disjunction after evaluation")
-	case 1:
-		return x.values[0].val
+// normalize removes redundant element from unification.
+// x must already have been evaluated.
+func (x *disjunction) normalize(ctx *context, src source) mVal {
+	less := func(ctx *context, lt, gt dValue) bool {
+		if isBottom(lt.val) {
+			return true
+		}
+		return (!lt.marked || gt.marked) && subsumes(ctx, gt.val, lt.val, 0)
 	}
-	return x
+	k := 0
+outer:
+	for i, v := range x.values {
+		if isBottom(v.val) {
+			continue
+		}
+		for j, w := range x.values {
+			if i == j {
+				continue
+			}
+			if less(ctx, v, w) && (!less(ctx, w, v) || j < i) {
+				// strictly subsumed, or equal and and the equal element was
+				// processed earlier.
+				continue outer
+			}
+		}
+		// If there was a three-way equality, an element w, where w == v could
+		// already have been added.
+		for j := 0; j < k; j++ {
+			if less(ctx, v, x.values[j]) {
+				continue outer
+			}
+		}
+		x.values[k] = v
+		k++
+	}
+
+	switch k {
+	case 0:
+		// Empty disjunction. All elements must be errors.
+		// Take the first error as an example.
+		str := fmt.Sprintf("empty disjunction: %v", x.values[0].val)
+		return mVal{ctx.mkErr(src, str), false}
+	case 1:
+		v := x.values[0]
+		return mVal{v.val.(evaluated), v.marked}
+	}
+	x.values = x.values[:k]
+	return mVal{x, false}
 }
 
 type listComprehension struct {

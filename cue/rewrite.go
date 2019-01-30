@@ -182,7 +182,7 @@ func (x *disjunction) rewrite(ctx *context, fn rewriteFunc) value {
 	changed := false
 	for i, d := range x.values {
 		v := rewrite(ctx, d.val, fn)
-		values[i] = dValue{v, d.ambiguous}
+		values[i] = dValue{v, d.marked}
 		changed = changed || v != d.val
 	}
 	if !changed {

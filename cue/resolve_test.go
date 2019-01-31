@@ -400,13 +400,15 @@ func TestChooseFirst(t *testing.T) {
 			`,
 		out: `<0>{a: "a", b: "b", c: _|_((*"a" | *"b"):more than one default remaining ("a" and "b"))}`,
 	}, {
-		desc: "disambiguation non-conflict",
+		desc: "associativity of defaults",
 		in: `
 			a: *"a" | ("b" | "c")
 			b: (*"a" | "b") | "c"
-			c: a & b
+			c: *"a" | (*"b" | "c")
+			x: a & b
+			y: b & c
 			`,
-		out: `<0>{a: "a", b: _|_(((*"a" | "b") | "c"):more than one element remaining ((*"a" | "b") and "c")), c: "a"}`,
+		out: `<0>{a: "a", b: "a", c: _|_((*"a" | *"b" | "c"):more than one default remaining ("a" and "b")), x: "a", y: _|_((*"a" | *"b" | "c"):more than one default remaining ("a" and "b"))}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

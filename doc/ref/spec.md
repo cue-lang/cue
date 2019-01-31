@@ -602,10 +602,6 @@ but a definition of a single value?-->
 A _disjunction_ of two values `a` and `b`, denoted as `a | b` in CUE,
 defines the smallest value `d` such that `a ⊑ d` and `b ⊑ d`.
 This style of disjunctions is sometimes also referred to as sum types.
-Disjunctions can have any number of elements.
-<!--
-Important now we have marks, as *a | *b | c differs from *a | (*b | c).
--->
 
 These all follow from the definition of disjunction:
 - The disjunction of `a` with itself is always `a`.

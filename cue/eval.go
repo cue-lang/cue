@@ -313,7 +313,16 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 	for _, v := range x.values {
 		n := v.val.evalPartial(ctx)
 		changed = changed || n != v.val
-		dn.add(ctx, n, v.marked)
+		// Including elements of disjunctions recursively makes default handling
+		// associative (*a | (*b|c)) == ((*a|*b) | c).
+		if d, ok := n.(*disjunction); ok {
+			changed = true
+			for _, dv := range d.values {
+				dn.add(ctx, dv.val, dv.marked)
+			}
+		} else {
+			dn.add(ctx, n, v.marked)
+		}
 	}
 	// TODO: move to evaluator
 	if !changed {

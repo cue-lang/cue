@@ -1534,61 +1534,13 @@ If list `a` is open, its default value, the shortest variant, is selected.
 [ 1, 2 ]      + [ 3, 4, ... ]  // [ 1, 2, 3, 4, ... ]
 ```
 
-Lists can be multiplied using the `*` operator.
+Lists can be multiplied with a positive `int` using the `*` operator
+to create a repeated the list by the indicated number.
 ```
 3*[1,2]         // [1, 2, 1, 2, 1, 2]
-
-[1, 2, ...int]  // open list of two elements with element type int
-4*[byte]        // [byte, byte, byte, byte]
-[...byte]       // byte list or arbitrary length
-(0..5)*[byte]   // byte list of size 0 through 5
-
-// list with alternating elements of type string and int
-uint*[string, int]
+3*[1, 2, ...]   // [1, 2, 1, 2, 1 ,2]
+[byte]*4        // [byte, byte, byte, byte]
 ```
-<!-- jba: You don't show multiplication of open lists. Is it allowed? -->
-
-The following illustrate how typed lists can be encoded as structs:
-```
-ip:  4*[byte]
-ipT: {
-    Elem: byte
-    Tail: {
-        Elem: byte
-        Tail: {
-            Elem: byte
-            Tail: {
-                Elem: byte
-                Tail: null
-            }
-        }
-    }
-}
-
-rangeList:  (1..2)*[int]
-rangeListT: {
-    Elem: int
-    Tail: {
-        Elem: int
-        Tail: null | {
-            Elem: int
-            Tail: null
-        }
-    }
-}
-
-strIntList:  uint*[string, int]
-strIntListT: null | {
-    Elem: string
-    Tail: {
-        Elem: int
-        Tail: strIntListT
-    }
-}
-```
-<!-- TODO(mpvl): should we disallow multiplication with a range?
-If so, how does one specify a list with a range of possible lengths? -->
-
 
 <!-- TODO(mpvl): should we allow multiplication with a range?
 If so, how does one specify a list with a range of possible lengths?

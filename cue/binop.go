@@ -450,7 +450,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		return x
 	}
 	arcs := make(arcs, 0, len(x.arcs)+len(y.arcs))
-	obj := &structLit{binSrc(src.Pos(), op, x, other), x.emit, nil, nil, arcs}
+	obj := &structLit{binSrc(src.Pos(), op, x, other), x.emit, nil, nil, arcs, nil}
 	defer ctx.pushForwards(x, obj, y, obj).popForwards()
 
 	tx, ex := evalLambda(ctx, x.template)

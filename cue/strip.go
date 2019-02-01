@@ -30,7 +30,7 @@ func stripRewriter(ctx *context, v value) (value, bool) {
 	eval := ctx.manifest(v)
 	switch x := eval.(type) {
 	case *structLit:
-		x.expand(ctx)
+		x = x.expandFields(ctx)
 		if x.template != nil {
 			arcs := make(arcs, len(x.arcs))
 			for i, a := range x.arcs {
@@ -38,7 +38,7 @@ func stripRewriter(ctx *context, v value) (value, bool) {
 				arcs[i] = arc{a.feature, v, nil}
 			}
 			// TODO: verify that len(x.comprehensions) == 0
-			return &structLit{x.baseValue, x.emit, nil, nil, arcs}, false
+			return &structLit{x.baseValue, x.emit, nil, nil, arcs, nil}, false
 		}
 	}
 	return eval, true

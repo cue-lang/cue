@@ -563,7 +563,8 @@ type structLit struct {
 	comprehensions []*fieldComprehension
 
 	// TODO: consider hoisting the template arc to its own value.
-	arcs []arc
+	arcs     []arc
+	expanded *structLit
 }
 
 func newStruct(src source) *structLit {
@@ -580,7 +581,7 @@ func (x *structLit) Swap(i, j int)      { x.arcs[i], x.arcs[j] = x.arcs[j], x.ar
 
 // lookup returns the node for the given label f, if present, or nil otherwise.
 func (x *structLit) lookup(ctx *context, f label) (v evaluated, raw value) {
-	x.expand(ctx)
+	x = x.expandFields(ctx)
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.
@@ -593,7 +594,7 @@ func (x *structLit) lookup(ctx *context, f label) (v evaluated, raw value) {
 }
 
 func (x *structLit) iterAt(ctx *context, i int) (evaluated, value, label) {
-	x.expand(ctx)
+	x = x.expandFields(ctx)
 	if i >= len(x.arcs) {
 		return nil, nil, 0
 	}
@@ -602,7 +603,7 @@ func (x *structLit) iterAt(ctx *context, i int) (evaluated, value, label) {
 }
 
 func (x *structLit) at(ctx *context, i int) evaluated {
-	x.expand(ctx)
+	x = x.expandFields(ctx)
 	// if x.emit != nil && isBottom(x.emit) {
 	// 	return x.emit.(evaluated)
 	// }
@@ -642,15 +643,22 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 	return x.arcs[i].cache
 }
 
-func (x *structLit) expand(ctx *context) {
+func (x *structLit) expandFields(ctx *context) *structLit {
+	if x.expanded != nil {
+		return x.expanded
+	}
 	if x.comprehensions == nil {
-		return
+		x.expanded = x
+		return x
 	}
 
-	comprehensions := x.comprehensions
-	x.comprehensions = nil
+	x.expanded = x
 
+	comprehensions := x.comprehensions
+	emit := x.emit
+	template := x.template
 	newArcs := []arc{}
+
 	for _, c := range comprehensions {
 		result := c.clauses.yield(ctx, func(k, v evaluated) *bottom {
 			if !k.kind().isAnyOf(stringKind) {
@@ -658,10 +666,10 @@ func (x *structLit) expand(ctx *context) {
 			}
 			if c.isTemplate {
 				// TODO: disallow altogether or only when it refers to fields.
-				if x.template == nil {
-					x.template = v
+				if template == nil {
+					template = v
 				} else {
-					x.template = mkBin(ctx, c.Pos(), opUnify, x.template, v)
+					template = mkBin(ctx, c.Pos(), opUnify, template, v)
 				}
 				return nil
 			}
@@ -679,7 +687,7 @@ func (x *structLit) expand(ctx *context) {
 		switch {
 		case result == nil:
 		case isBottom(result):
-			x.emit = result
+			emit = result
 		default:
 			panic("should not happen")
 		}
@@ -688,6 +696,11 @@ func (x *structLit) expand(ctx *context) {
 	// new arcs may be merged with old ones, but only if the old ones were not
 	// referred to in the evaluation of any of the arcs.
 	// TODO(perf): improve big O
+	arcs := make([]arc, 0, len(x.arcs)+len(newArcs))
+	arcs = append(arcs, x.arcs...)
+	x = &structLit{x.baseValue, emit, template, nil, arcs, nil}
+	x.expanded = x
+
 outer:
 	for _, na := range newArcs {
 		f := na.feature
@@ -705,6 +718,7 @@ outer:
 		x.arcs = append(x.arcs, arc{feature: f, v: na.v})
 	}
 	sort.Stable(x)
+	return x
 }
 
 func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) evaluated {
@@ -1130,7 +1144,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
 
 	switch src := source.(type) {
 	case *structLit:
-		src.expand(ctx)
+		src = src.expandFields(ctx)
 		for i, a := range src.arcs {
 			key := &stringLit{
 				x.baseValue,

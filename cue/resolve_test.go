@@ -807,7 +807,7 @@ func TestResolve(t *testing.T) {
 			}
 			a x: "hey"
 		`,
-		out: `<1>{a: <2>{x: _|_(((<0>.y + "?") & "hey"):constraint violated: _|_("hey":delayed constraint ((<0>.y + "?") & "hey") violated)), y: _|_(cycle detected)}}`,
+		out: `<0>{a: <1>{x: _|_(((<2>.y + "?") & "hey"):constraint violated: _|_(("hey!?" & "hey"):failed to unify: hey!? != hey)), y: "hey!"}}`,
 	}, {
 		desc: "resolved self-reference cycles with disjunctions",
 		in: `
@@ -1087,6 +1087,43 @@ func TestFullEval(t *testing.T) {
 				`,
 		out: `<0>{res: [<1>{<>: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], ` +
 			`t: <7>{<>: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
+	}, {
+		// TODO: A nice property for CUE to have would be that evaluation time
+		// is proportional to the number of output nodes (note that this is
+		// not the same as saying that the running time is O(n)).
+		// We should probably disallow shenanigans like the one below. But until
+		// this is allowed, it should at least be correct. At least we are not
+		// making reentrant coding easy.
+		desc: "reentrance",
+		in: `
+		// This indirection is needed to avoid binding references to fib
+		// within fib to the instantiated version.
+		fibRec: {nn: int, out: (fib & {n: nn}).out}
+		fib: {
+			n: int
+
+			out: (fibRec & {nn: n - 2}).out + (fibRec & {nn: n - 1}).out if n >= 2
+			out: n if n < 2
+		}
+		fib2: (fib & {n: 2}).out
+		fib7: (fib & {n: 7}).out
+		fib12: (fib & {n: 12}).out
+		`,
+		out: `<0>{fibRec: <1>{nn: int, out: _|_((<2>.fib & <3>{n: <4>.nn}).out:undefined field "out")}, fib: <5>{n: int}, ` +
+			`fib2: 1, ` +
+			`fib7: 13, ` +
+			`fib12: 144}`,
+	}}
+	rewriteHelper(t, testCases, evalFull)
+}
+
+func TestX(t *testing.T) {
+	t.Skip()
+
+	// Don't remove. For debugging.
+	testCases := []testCase{{
+		in: `
+		`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

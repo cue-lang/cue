@@ -794,7 +794,8 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 	}
 	obj := v.eval(ctx).(*structLit)
 
-	obj.expand(ctx) // expand comprehensions
+	// TODO: This is expansion appropriate?
+	obj = obj.expandFields(ctx) // expand comprehensions
 
 	// check if any labels are hidden
 	f := label(0)
@@ -818,6 +819,7 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 			obj.template,
 			nil,
 			arcs,
+			nil,
 		}
 
 	}
@@ -829,7 +831,7 @@ func (v Value) structValWithHidden(ctx *context) (structValue, error) {
 		return structValue{}, err
 	}
 	obj := v.eval(ctx).(*structLit)
-	obj.expand(ctx)
+	obj = obj.expandFields(ctx)
 
 	return structValue{ctx, v.path, obj}, nil
 }

@@ -22,7 +22,7 @@ func validate(ctx *context, v value) *bottom {
 	}
 	switch x := eval.(type) {
 	case *structLit:
-		x.expand(ctx)
+		x = x.expandFields(ctx)
 		for i := range x.arcs {
 			if err := validate(ctx, x.at(ctx, i)); err != nil {
 				return err

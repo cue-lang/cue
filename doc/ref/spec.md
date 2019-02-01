@@ -2073,13 +2073,29 @@ List: *null | {
 ```
 
 <!--
+Consider banning any construct that makes CUE not having a linear
+running time expressed in the number of nodes in the output.
+
+This would require restricting constructs like:
+
+(fib&{n:2}).out
+
+fib: {
+        n: int
+
+        out: (fib&{n:n-2}).out + (fib&{n:n-1}).out if n >= 2
+        out: fib({n:n-2}).out + fib({n:n-1}).out if n >= 2
+        out: n if n < 2
+}
+
+-->
+<!--
 ### Unused fields
 
 TODO: rules for detection of unused fields
 
 1. Any alias value must be used
 -->
-
 
 
 ## Modules, instances, and packages

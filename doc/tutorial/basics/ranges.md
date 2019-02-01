@@ -2,23 +2,22 @@
 
 _Types ~~and~~ are Values_
 
-# Ranges
+# Bounds
 
-Ranges define an inclusive range of valid values.
-They work on numbers, strings, and bytes.
+Bounds define a lower bound, upper bound, or inequality for a certain value.
+They work on numbers, strings, bytes, and and null.
 
-The type of a range is the unification of the types of the start and end
-value.
-
-Unifying two ranges results in the overlapping range or an error if there
-is no overlap.
+The bound is defined for all values for which the corresponding comparison
+operation is define.
+For instance `>5.0` allows all floating point values greater than `5.0`,
+whereas `<0` allows all negative numbers (int or float).
 
 <!-- CUE editor -->
 ```
-rn: 3..5       // type int | float
-ri: 3..5 & int // type int
-rf: 3..5.0     // type float
-rs: "a".."mo"
+rn: >=3 & <8        // type int | float
+ri: >=3 & <8 & int  // type int
+rf: >=3 & <=8.0     // type float
+rs: >="a" & <"mo"
 
 {
     a: rn & 3.5
@@ -27,7 +26,7 @@ rs: "a".."mo"
     d: rs & "ma"
     e: rs & "mu"
 
-    r1: 0..7 & 3..10
+    r1: rn & >=5 & <10
 }
 ```
 
@@ -38,5 +37,5 @@ b:  _|_
 c:  3.0
 d:  "ma"
 e:  _|_
-r1: 3..7
+r1: >=5 & <8
 ```

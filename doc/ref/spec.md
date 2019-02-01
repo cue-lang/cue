@@ -273,7 +273,7 @@ The following character sequences represent operators and punctuation:
 -    mod   ||    <     <=    [    ]
 *    quo   !     >     >=    {    }
 /    rem   &     :     <-    ;    ,
-%    _|_   |     =     ...   ..   .
+%    _|_   |     =           ...  .
 ```
 <!-- :: for "is-a" definitions -->
 
@@ -857,7 +857,7 @@ a sequence of bytes first.
 ### Bounds
 
 A _bound_, syntactically_ a [unary expression](#Operands), defines
-a (possibly infinite) disjunction of concrete values than can be represented
+an infinite disjunction of concrete values than can be represented
 as a single comparison.
 
 For any [comparison operator](#Comparison-operators) `op` except `==`,
@@ -867,7 +867,7 @@ For any [comparison operator](#Comparison-operators) `op` except `==`,
 2 & >=2 & <=5           // 2, where 2 is either an int or float.
 2.5 & >=1 & <=5         // 2.5
 2 & >=1.0 & <3.0        // 2.0
-2 & 1..3.0              // 2.0
+2 & >1 & <3.0           // 2.0
 2.5 & int & >1 & <5     // _|_
 2.5 & float & >1 & <5   // 2.5
 int & 2 & >1.0 & <3.0   // _|_
@@ -875,32 +875,6 @@ int & 2 & >1.0 & <3.0   // _|_
 >=0 & <=7 & >=3 & <=10  // >=3 & <=7
 !=null & 1              // 1
 >=5 & <=5               // 5
-```
-
-
-### Ranges
-
-A _range type_, syntactically a [binary expression](#Operands), defines
-a (possibly infinite) disjunction of concrete values that can be represented
-as a contiguous range.
-A concrete value `c` unifies with `a..b` if `a <= c` and `c <= b`.
-Ranges can be defined on numbers and strings.
-
-A range of numbers `a..b` defines an inclusive range for integers and
-floating-point numbers.
-
-Remember that an integer literal represents both an `int` and `float`:
-```
-2   & 1..5          // 2, where 2 is either an int or float.
-2.5 & 1..5          // 2.5
-2 & 1.0..3.0        // 2.0
-2 & 1..3.0          // 2.0
-2.5 & int & 1..5    // _|_
-2.5 & float & 1..5  // 2.5
-int & 2 & 1.0..3.0  // _|_
-2.5 & (int & 1)..5  // _|_
-0..7 & 3..10        // 3..7
-"foo" & "a".."n"    // "foo"
 ```
 
 
@@ -965,20 +939,21 @@ Tag           = "#" identifier [ ":" json_string ] .
 ```
 
 ```
-Expression                  Result
-{a: int, a: 1}               {a: int(1)}
-{a: int} & {a: 1}            {a: int(1)}
-{a: 1..7} & {a: 5..9}        {a: 5..7}
-{a: 1..7, a: 5..9}           {a: 5..7}
+Expression                             Result
+{a: int, a: 1}                         {a: int(1)}
+{a: int} & {a: 1}                      {a: int(1)}
+{a: >=1 & <=7} & {a: >=5 & <=9}        {a: >=5 & <=7}
+{a: >=1 & <=7, a: >=5 & <=9}           {a: >=5 & <=7}
 
-{a: 1} & {b: 2}              {a: 1, b: 2}
-{a: 1, b: int} & {b: 2}      {a: 1, b: int(2)}
+{a: 1} & {b: 2}                        {a: 1, b: 2}
+{a: 1, b: int} & {b: 2}                {a: 1, b: int(2)}
 
-{a: 1} & {a: 2}              _|_
+{a: 1} & {a: 2}                        _|_
 ```
 
 In addition to fields, a struct literal may also define aliases.
-Aliases name values that can be referred to within the [scope](#declarations-and-scopes) of their
+Aliases name values that can be referred to
+within the [scope](#declarations-and-scopes) of their
 definition, but are not part of the struct: aliases are irrelevant to
 the partial ordering of values and are not emitted as part of any
 generated data.
@@ -1136,19 +1111,19 @@ bytes     Any vallid byte sequence
 
 Derived   Value
 number    int | float
-uint      0..int
-uint8     0..255
-int8      -128..127
-uint16    0..65536
-int16     -32_768...32_767
-rune      0..0x10FFFF
-uint32    0..4_294_967_296
-int32     -2_147_483_648..2_147_483_647
-uint64    0..18_446_744_073_709_551_615
-int64     -9_223_372_036_854_775_808..9_223_372_036_854_775_807
-uint128   340_282_366_920_938_463_463_374_607_431_768_211_455
-int128    -170_141_183_460_469_231_731_687_303_715_884_105_728..
-           170_141_183_460_469_231_731_687_303_715_884_105_727
+uint      >=0
+uint8     >=0 & <=255
+int8      >=-128 & <=127
+uint16    >=0 & <=65536
+int16     >=-32_768 & <=32_767
+rune      >=0 & <=0x10FFFF
+uint32    >=0 & <=4_294_967_296
+int32     >=-2_147_483_648 & <=2_147_483_647
+uint64    >=0 & <=18_446_744_073_709_551_615
+int64     >=-9_223_372_036_854_775_808 & <=9_223_372_036_854_775_807
+uint128   >=0 & <=340_282_366_920_938_463_463_374_607_431_768_211_455
+int128    >=-170_141_183_460_469_231_731_687_303_715_884_105_728 &
+           <=170_141_183_460_469_231_731_687_303_715_884_105_727
 ```
 
 
@@ -1412,7 +1387,7 @@ Operators combine operands into expressions.
 Expression = UnaryExpr | Expression binary_op Expression .
 UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 
-binary_op  = "|" | "&" | "||" | "&&" | "==" | rel_op | add_op | mul_op | ".."  .
+binary_op  = "|" | "&" | "||" | "&&" | "==" | rel_op | add_op | mul_op  .
 rel_op     = "!=" | "<" | "<=" | ">" | ">=" .
 add_op     = "+" | "-" .
 mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
@@ -1436,14 +1411,13 @@ operand.
 Unary operators have the highest precedence.
 
 There are eight precedence levels for binary operators.
-The `..` operator (range) binds strongest, followed by
-multiplication operators, addition operators, comparison operators,
+Multiplication operators binds strongest, followed by
+addition operators, comparison operators,
 `&&` (logical AND), `||` (logical OR), `&` (unification),
 and finally `|` (disjunction):
 
 ```
 Precedence    Operator
-    8             ..
     7             *  /  %  div mod quo rem
     6             +  -
     5             ==  !=  <  <=  >  >=
@@ -1579,8 +1553,8 @@ If so, how does one specify a list with a range of possible lengths?
 Suggestion from jba:
 Multiplication should distribute over disjunction,
 so int(1)..int(3) * [x] = [x] | [x, x] | [x, x, x].
-The hard part is figuring out what 1..3 * [x] means,
-since 1..3 includes many floats.
+The hard part is figuring out what (>=1 & <=3) * [x] means,
+since  >=1 & <=3 includes many floats.
 (mpvl: could constrain arguments to parameter types, but needs to be
 done consistently.)
 -->
@@ -1641,11 +1615,11 @@ d: {} == {}    // _|_: structs are not comparable against structs
 <!-- jba
 I think I know what `3 < a` should mean if
 
-    a: 1..5
-    
+    a: >=1 & <=5
+
 It should be a constraint on `a` that can be evaluated once `a`'s value is known more precisely.
 
-But what does `3 < 1..5` mean? We'll never get more information, so it must have a definite value.
+But what does `3 < (>=1 & <=5)` mean? We'll never get more information, so it must have a definite value.
 -->
 
 #### Logical operators

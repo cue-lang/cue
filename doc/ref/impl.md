@@ -67,7 +67,7 @@ bool
 3.14
 string
 "Hello"
-0..10
+>=0
 <8
 re("Hello .*!")
 ```
@@ -304,8 +304,8 @@ returns values that are an instance of `a`. For instance, the constraint
 function `f` for `string` returns `"foo"` for `f("foo")` and `_|_` for `f(1)`.
 Constraint functions may take other constraint functions as arguments to
 produce a more restricting constraint function.
-For instance, the constraint function `f` for `0..8` returns `5` for `f(5)`,
-`5..8` for `f(5..10)`, and `_|_` for `f("foo")`.
+For instance, the constraint function `f` for `<=8` returns `5` for `f(5)`,
+`>=5 & <=8` for `f(>=5)`, and `_|_` for `f("foo")`.
 
 
 Constraint functions play a special role in unification.

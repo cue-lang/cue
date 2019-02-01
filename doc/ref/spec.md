@@ -854,6 +854,30 @@ To access the individual bytes of a string one should convert it to
 a sequence of bytes first.
 
 
+### Bounds
+
+A _bound_, syntactically_ a [unary expression](#Operands), defines
+a (possibly infinite) disjunction of concrete values than can be represented
+as a single comparison.
+
+For any [comparison operator](#Comparison-operators) `op` except `==`,
+`op a` is the disjunction of every `x` such that `x op a`.
+
+```
+2 & >=2 & <=5           // 2, where 2 is either an int or float.
+2.5 & >=1 & <=5         // 2.5
+2 & >=1.0 & <3.0        // 2.0
+2 & 1..3.0              // 2.0
+2.5 & int & >1 & <5     // _|_
+2.5 & float & >1 & <5   // 2.5
+int & 2 & >1.0 & <3.0   // _|_
+2.5 & >=(int & 1) & <5  // _|_
+>=0 & <=7 & >=3 & <=10  // >=3 & <=7
+!=null & 1              // 1
+>=5 & <=5               // 5
+```
+
+
 ### Ranges
 
 A _range type_, syntactically a [binary expression](#Operands), defines
@@ -1388,18 +1412,16 @@ Operators combine operands into expressions.
 Expression = UnaryExpr | Expression binary_op Expression .
 UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 
-binary_op  = "|" | "&" | "||" | "&&" | rel_op | add_op | mul_op | ".." .
-rel_op     = "==" | "!=" | "<" | "<=" | ">" | ">=" .
+binary_op  = "|" | "&" | "||" | "&&" | "==" | rel_op | add_op | mul_op | ".."  .
+rel_op     = "!=" | "<" | "<=" | ">" | ">=" .
 add_op     = "+" | "-" .
 mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
-
-unary_op   = "+" | "-" | "!" | "*" .
+unary_op   = "+" | "-" | "!" | "*" | rel_op .
 ```
 <!-- TODO: consider adding unary_op: "<" | "<=" | ">" | ">=" -->
 
 Comparisons are discussed [elsewhere](#Comparison-operators).
-For other binary operators, the operand
-types must unify.
+For any binary operators, the operand types must unify.
 <!-- TODO: durations
  unless the operation involves durations.
 

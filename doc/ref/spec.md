@@ -1798,7 +1798,7 @@ is applied using the following rules:
 mpvl: they are not, x must be an instance of T, in which case x == T&x,
 so unification would be unnecessary.
 -->
-<!-->
+<!--
 ```
 T: {
     a: { b: 1..10 }

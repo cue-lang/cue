@@ -269,11 +269,11 @@ These may be used as identifiers to refer to fields in all other contexts.
 The following character sequences represent operators and punctuation:
 
 ```
-+    &     &&    ==    !=    (    )
--    |     ||    <     <=    [    ]
-*    :     !     >     >=    {    }
-/          ;     =     ...   ..   .
-div  mod   quo   rem   _|_   <-   ,
++    div   &&    ==    !=    (    )
+-    mod   ||    <     <=    [    ]
+*    quo   !     >     >=    {    }
+/    rem   &     :     <-    ;    ,
+%    _|_   |     =     ...   ..   .
 ```
 <!-- :: for "is-a" definitions -->
 
@@ -631,7 +631,7 @@ Expression                Result
 #### Default values
 
 One or more values in a disjunction can be _marked_
-by prefixing it with a `*` ([`Preference`](#Primary-expressions)).
+by prefixing it with a `*` ([a unary expression](#Operators)).
 A bottom value cannot be marked.
 When a marked value is unified, the result is also marked.
 (When unification results in a single value,
@@ -1006,14 +1006,14 @@ KeyedElement  = Element .
 Lists can be thought of as structs:
 
 ```
-List: null | {
+List: *null | {
     Elem: _
     Tail: List
 }
 ```
 
 For closed lists, `Tail` is `null` for the last element, for open lists it is
-`null | List`.
+`*null | List`, defaulting to the shortest variant.
 For instance, the open list [ 1, 2, ... ] can be represented as:
 ```
 open: List & { Elem: 1, Tail: { Elem: 2 } }
@@ -1212,13 +1212,11 @@ A default expression is only valid as an operand to a disjunction.
 ```
 PrimaryExpr =
 	Operand |
-	Preference |
 	PrimaryExpr Selector |
 	PrimaryExpr Index |
 	PrimaryExpr Slice |
 	PrimaryExpr Arguments .
 
-Preference     = "*" Expression
 Selector       = "." identifier .
 Index          = "[" Expression "]" .
 Slice          = "[" [ Expression ] ":" [ Expression ] "]"
@@ -1386,7 +1384,7 @@ rel_op     = "==" | "!=" | "<" | "<=" | ">" | ">=" .
 add_op     = "+" | "-" .
 mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
 
-unary_op   = "+" | "-" | "!" .
+unary_op   = "+" | "-" | "!" | "*" .
 ```
 <!-- TODO: consider adding unary_op: "<" | "<=" | ">" | ">=" -->
 
@@ -1447,9 +1445,9 @@ as the first operand. The three of the four standard arithmetic operators
 `div`, `mod`, `quo`, and `rem` only apply to integer types.
 
 ```
-+    sum                    integers, floats, lists, strings
++    sum                    integers, floats, lists, strings, bytes
 -    difference             integers, floats
-*    product                integers, floats, lists, strings
+*    product                integers, floats, lists, strings, bytes
 /    quotient               floats
 %    remainder              floats
 div  division               integers
@@ -1457,6 +1455,7 @@ mod  modulo                 integers
 quo  quotient               integers
 rem  remainder              integers
 ```
+
 
 #### Integer operators
 
@@ -1527,8 +1526,7 @@ For lists `a` and `b`,
 a + b
 ```
 will produce an open list if `b` is open.
-If list `a` is open, only the existing elements will be involved in the
-concatenation.
+If list `a` is open, its default value, the shortest variant, is selected.
 
 ```
 [ 1, 2 ]      + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
@@ -1591,8 +1589,19 @@ strIntListT: null | {
 <!-- TODO(mpvl): should we disallow multiplication with a range?
 If so, how does one specify a list with a range of possible lengths? -->
 
-<!-- jba: Clarify the allowed values for the non-list operand. And must that be 
-the left operand? -->
+
+<!-- TODO(mpvl): should we allow multiplication with a range?
+If so, how does one specify a list with a range of possible lengths?
+
+Suggestion from jba:
+Multiplication should distribute over disjunction,
+so int(1)..int(3) * [x] = [x] | [x, x] | [x, x, x].
+The hard part is figuring out what 1..3 * [x] means,
+since 1..3 includes many floats.
+(mpvl: could constrain arguments to parameter types, but needs to be
+done consistently.)
+-->
+
 
 #### String operators
 

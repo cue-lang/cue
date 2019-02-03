@@ -578,30 +578,41 @@ float ⋢ 5.0
 
 ### Unification
 
-The _unification_ of values `a` and `b`, denoted as `a & b` in CUE,
+The _unification_ of values `a` and `b`
 is defined as the greatest lower bound of `a` and `b`. (That is, the
 value `u` such that `u ⊑ a` and `u ⊑ b`,
 and for any other value `v` for which `v ⊑ a` and `v ⊑ b`
 it holds that `v ⊑ u`.)
-Since CUE values form a lattice, the greatest lower bound of two CUE values is always unique.
-The unification of `a` with itself is always `a`.
-The unification of a value `a` and `b` where `a ⊑ b` is always `a`.
+Since CUE values form a lattice, the unification of two CUE values is
+always unique. 
 
-Unification is commutative, transitive, and reflexive.
+These all follow from the definition of unification:
+- The unification of `a` with itself is always `a`.
+- The unification of values `a` and `b` where `a ⊑ b` is always `a`.
+- The unification of a value with bottom is always bottom.
+
+Unification in CUE is a [binary expression](#Operands), written `a & b`.
+It is commutative and associative.
 As a consequence, order of evaluation is irrelevant, a property that is key
 to many of the constructs in the CUE language as well as the tooling layered
 on top of it.
 
-Syntactically, unification is a [binary expression](#Operands).
+
+
 <!-- TODO: explicitly mention that disjunction is not a binary operation
 but a definition of a single value?-->
 
 
 ### Disjunction
 
-A _disjunction_ of two values `a` and `b`, denoted as `a | b` in CUE,
-defines the smallest value `d` such that `a ⊑ d` and `b ⊑ d`.
+The _disjunction_ of values `a` and `b`
+is defined as the least upper bound of `a` and `b`.
+(That is, the value `d` such that `a ⊑ d` and `b ⊑ d`,
+and for any other value `e` for which `a ⊑ e` and `b ⊑ e`,
+it holds that `d ⊑ e`.)
 This style of disjunctions is sometimes also referred to as sum types.
+Since CUE values form a lattice, the disjunction of two CUE values is always unique.
+
 
 These all follow from the definition of disjunction:
 - The disjunction of `a` with itself is always `a`.
@@ -609,7 +620,8 @@ These all follow from the definition of disjunction:
 - The disjunction of a value `a` with bottom is always `a`.
 - The disjunction of two bottom values is bottom.
 
-Syntactically, disjunction is a [binary expression](#Operands).
+Disjunction in CUE is a [binary expression](#Operands), written `a | b`.
+It is commutative and associative.
 
 The unification of a disjunction with another value is equal to the disjunction
 composed of the unification of this value with all of the original elements

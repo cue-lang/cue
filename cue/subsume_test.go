@@ -23,7 +23,7 @@ import (
 
 func TestSubsume(t *testing.T) {
 	testCases := []struct {
-		// the result of a ⊑ b, where a and b are defined in "in"
+		// the result of b ⊑ a, where a and b are defined in "in"
 		subsumes bool
 		in       string
 		mode     subsumeMode
@@ -156,10 +156,7 @@ func TestSubsume(t *testing.T) {
 		87: {subsumes: true, in: `a: number, b: 2 | 1`},
 		88: {subsumes: false, in: `a: int, b: 1 | 2 | 3.1`},
 
-		// Disjunction TODO: for now these two are false: unifying may result in
-		// an ambiguity that we are currently not handling, so safer to not
-		// unify.
-		89: {subsumes: false, in: `a: float | number, b: 1 | 2 | 3.1`},
+		89: {subsumes: true, in: `a: float | number, b: 1 | 2 | 3.1`},
 
 		90: {subsumes: false, in: `a: int, b: 1 | 2 | 3.1`},
 		91: {subsumes: true, in: `a: 1 | 2, b: 1`},

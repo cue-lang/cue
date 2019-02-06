@@ -324,9 +324,8 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 			dn.add(ctx, n, v.marked)
 		}
 	}
-	// TODO: move to evaluator
 	if !changed {
-		return x
+		dn = x
 	}
 	return dn.normalize(ctx, x).val
 }
@@ -342,6 +341,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 		switch {
 		case d.marked:
 			if marked != nil {
+				// TODO: allow disjunctions to be returned as is.
 				return ctx.mkErr(x, "more than one default remaining (%v and %v)", debugStr(ctx, marked), debugStr(ctx, d.val))
 			}
 			marked = d.val.(evaluated)

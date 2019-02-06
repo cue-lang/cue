@@ -794,11 +794,11 @@ func TestResolve(t *testing.T) {
 		in: `
 			obj foo a: "bar"
 			obj <Name>: {
-				a: "dummy" | string
+				a: *"dummy" | string
 				sub as: a if true
 			}
 		`,
-		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: ("dummy" | string) if true yield ("sub"): <4>{as: <3>.a}}, ` +
+		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield ("sub"): <4>{as: <3>.a}}, ` +
 			`foo: <5>{a: "bar", sub: <6>{as: "bar"}}}}`,
 	}, {
 		desc: "self-reference cycles conflicts with strings",
@@ -959,7 +959,6 @@ func TestFullEval(t *testing.T) {
 					name: A
 					kind: B
 				} if num < 5
-
 			}
 			a b c d: "bar"
 			`,
@@ -976,6 +975,25 @@ func TestFullEval(t *testing.T) {
 			l2: l & [ "c", "d" ]
 			`,
 		out: `<0>{l: [int,int], l1: ["a","b"], l2: ["c","d"]}`,
+	}, {
+		desc: "normalization",
+		in: `
+			a: string | string
+			b: *1 | *int  // 1 == int(1) | float(1)
+			c: *1.0 | *float
+		`,
+		out: `<0>{a: string, b: _|_((*1 | *int):more than one default remaining (1 and int)), c: float}`,
+	}, {
+		desc: "default disambiguation",
+		in: `
+		a: *1 | int
+		b: *3 | int
+		c: a & b
+		d: b & a
+
+		e: *1 | *1
+		`,
+		out: `<0>{a: 1, b: 3, c: _|_((*1 | *3 | int):more than one default remaining (1 and 3)), d: _|_((*3 | *1 | int):more than one default remaining (3 and 1)), e: 1}`,
 	}, {
 		desc: "list comprehension",
 		in: `

@@ -997,7 +997,7 @@ func (x *disjunction) add(ctx *context, v value, marked bool) {
 // normalize removes redundant element from unification.
 // x must already have been evaluated.
 func (x *disjunction) normalize(ctx *context, src source) mVal {
-	less := func(ctx *context, lt, gt dValue) bool {
+	leq := func(ctx *context, lt, gt dValue) bool {
 		if isBottom(lt.val) {
 			return true
 		}
@@ -1018,7 +1018,7 @@ outer:
 			if i == j {
 				continue
 			}
-			if less(ctx, v, w) && (!less(ctx, w, v) || j < i) {
+			if leq(ctx, v, w) && (!leq(ctx, w, v) || j < i) {
 				// strictly subsumed, or equal and and the equal element was
 				// processed earlier.
 				continue outer
@@ -1027,7 +1027,7 @@ outer:
 		// If there was a three-way equality, an element w, where w == v could
 		// already have been added.
 		for j := 0; j < k; j++ {
-			if less(ctx, v, x.values[j]) {
+			if leq(ctx, v, x.values[j]) {
 				continue outer
 			}
 		}

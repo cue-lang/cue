@@ -146,11 +146,8 @@ func TestSubsume(t *testing.T) {
 		71: {subsumes: false, in: `a: {a:1, b:1}, b: {a:1}`},
 		72: {subsumes: false, in: `a: {s: { a:1} }, b: { s: {}}`},
 
-		// Disjunction TODO: for now these two are false: unifying may result in
-		// an ambiguity that we are currently not handling, so safer to not
-		// unify.
-		84: {subsumes: false, in: `a: 1 | 2, b: 2 | 1`},
-		85: {subsumes: false, in: `a: 1 | 2, b: 1 | 2`},
+		84: {subsumes: true, in: `a: 1 | 2, b: 2 | 1`},
+		85: {subsumes: true, in: `a: 1 | 2, b: 1 | 2`},
 
 		86: {subsumes: true, in: `a: number, b: 2 | 1`},
 		87: {subsumes: true, in: `a: number, b: 2 | 1`},
@@ -254,6 +251,12 @@ func TestSubsume(t *testing.T) {
 		146: {subsumes: false, in: ` a: "s \(d)m\(d) e", b: "s a e", d: _`},
 
 		147: {subsumes: true, in: ` a: 7080, b: 7080 | int`, mode: subChoose},
+
+		// Defaults
+		150: {subsumes: false, in: `a: number | *1, b: number | *2`},
+		151: {subsumes: true, in: `a: number | *2, b: number | *2`},
+		152: {subsumes: true, in: `a: int | *float, b: int | *2.0`},
+		154: {subsumes: true, in: `a: number, b: number | *2`},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

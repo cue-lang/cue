@@ -210,18 +210,23 @@ func (x *lambdaExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool 
 // subsumes for disjunction is logically precise. However, just like with
 // structural subsumption, it should not have to be called after evaluation.
 func (x *disjunction) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	// A disjunction subsumes another disjunction if all values of v are
+	// subsumed by the values of x, and default values in v are subsumed by the
+	// default values of x.
+	//
+	// This assumes that overlapping ranges in x are merged. If this is not the
+	// case, subsumes will return a false negative, which is allowed.
 	if d, ok := v.(*disjunction); ok {
-		// TODO: the result of subsuming a value by a disjunction is logically
-		// the subsumed value. However, since we have default semantics, we
-		// should mark a resulting subsumed value as ambiguous if necessary.
-		// Also, prove that the returned subsumed single value is always the
-		// left-most matching value.
-		return false
 		// at least one value in x should subsume each value in d.
+	outer:
 		for _, vd := range d.values {
-			if !subsumes(ctx, x, vd.val, 0) {
-				return false
+			// v is subsumed if any value in x subsumes v.
+			for _, vx := range x.values {
+				if (vx.marked || !vd.marked) && subsumes(ctx, vx.val, vd.val, 0) {
+					continue outer
+				}
 			}
+			return false
 		}
 		return true
 	}

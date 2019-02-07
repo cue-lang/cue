@@ -126,6 +126,7 @@ func TestLiterals(t *testing.T) {
 		lit  string
 		node value
 	}{
+		{"0", mkInt(0)},
 		{"null", nullSentinel},
 		{"true", trueSentinel},
 		{"false", falseSentinel},
@@ -153,6 +154,7 @@ func TestLiterals(t *testing.T) {
 		{"1", mkInt(1)},
 		{"100_000", hk},
 		{"1.", mkFloat("1")},
+		{"0.0", mkFloat("0.0")},
 		{".0", mkFloat(".0")},
 		{"1K", mkMul(1000, mulK, 10)},
 		{"1Mi", mkMul(1024*1024, mulMi, 10)},
@@ -166,7 +168,7 @@ func TestLiterals(t *testing.T) {
 		{"0xABCD", mkMul(0xABCD, 0, 16)},
 		{"0b11001000", mkMul(0xc8, 0, 2)},
 		{"0b1", mkMul(1, 0, 2)},
-		{"0755", mkMul(0755, 0, 8)},
+		{"0o755", mkMul(0755, 0, 8)},
 	}
 	p := litParser{
 		ctx: &context{Context: &apd.BaseContext},
@@ -195,7 +197,7 @@ func TestLiteralErrors(t *testing.T) {
 		// not allowed in string literal, only binary
 		{`"foo\x00"`},
 		{`0x`},
-		{`09`},
+		{`0o`},
 		{`0_`},
 		{``},
 		{`"`},

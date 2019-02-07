@@ -122,7 +122,7 @@ var unmarshalTests = []struct {
 		"decimal: +685_230",
 	}, {
 		"octal: 02472256",
-		"octal: 02472256",
+		"octal: 0o2472256",
 	}, {
 		"hexa: 0x_0A_74_AE",
 		"hexa: 0x_0A_74_AE",

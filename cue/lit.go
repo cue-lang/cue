@@ -557,32 +557,29 @@ func (p *litParser) scanNumber(seenDecimalPoint bool) value {
 				// only scanned "0x" or "0X"
 				return p.error(p.node, "illegal hexadecimal number %q", p.src)
 			}
-		} else if p.ch == 'b' || p.ch == 'B' {
+		} else if p.ch == 'b' {
 			base = 2
 			// binary int
 			p.next()
 			p.scanMantissa(2)
 			if p.p <= 2 {
-				// only scanned "0b" or "0B"
+				// only scanned "0b"
 				return p.error(p.node, "illegal binary number %q", p.src)
 			}
-		} else {
+		} else if p.ch == 'o' {
 			base = 8
-			// octal int or float
-			seenDecimalDigit := false
+			// octal int
+			p.next()
 			p.scanMantissa(8)
-			if p.ch == '8' || p.ch == '9' {
-				// illegal octal int or float
-				seenDecimalDigit = true
-				p.scanMantissa(10)
+			if p.p <= 2 {
+				// only scanned "0o"
+				return p.error(p.node, "illegal octal number %q", p.src)
 			}
-			// TODO: disallow complex
+		} else {
+			// int or float
+			p.scanMantissa(10)
 			if p.ch == '.' || p.ch == 'e' {
 				goto fraction
-			}
-			// octal int
-			if seenDecimalDigit {
-				return p.error(p.node, "illegal octal number %q", p.src)
 			}
 		}
 		goto exit

@@ -456,7 +456,13 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		return d.ident(n, str)
 
 	case yaml_INT_TAG:
-		return d.makeNum(n, n.value, token.INT)
+		// Convert YAML octal to CUE octal. If YAML accepted an invalid
+		// integer, just convert it as well to ensure CUE will fail.
+		s := n.value
+		if len(s) > 1 && s[0] == '0' && s[1] <= '9' {
+			s = "0o" + s[1:]
+		}
+		return d.makeNum(n, s, token.INT)
 
 	case yaml_FLOAT_TAG:
 		value := n.value

@@ -324,30 +324,35 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 				// only scanned "0x" or "0X"
 				s.error(offs, "illegal hexadecimal number")
 			}
-		} else if s.ch == 'b' || s.ch == 'B' {
+		} else if s.ch == 'b' {
 			// binary int
 			s.next()
 			s.scanMantissa(2)
 			if s.offset-offs <= 2 {
-				// only scanned "0b" or "0B"
+				// only scanned "0b"
 				s.error(offs, "illegal binary number")
 			}
-		} else {
-			// octal int or float
-			seenDecimalDigit := false
+		} else if s.ch == 'o' {
+			// octal int
+			s.next()
 			s.scanMantissa(8)
-			if s.ch == '8' || s.ch == '9' {
-				// illegal octal int or float
-				seenDecimalDigit = true
+			if s.offset-offs <= 2 {
+				// only scanned "0o"
+				s.error(offs, "illegal octal number")
+			}
+		} else {
+			// 0 or float
+			seenDigits := false
+			if s.ch >= '0' && s.ch <= '9' {
+				seenDigits = true
 				s.scanMantissa(10)
 			}
-			// TODO: disallow complex.
 			if s.ch == '.' || s.ch == 'e' {
 				goto fraction
 			}
-			// octal int
-			if seenDecimalDigit {
-				s.error(offs, "illegal octal number")
+			if seenDigits {
+				// integer other than 0 may not start with 0
+				s.error(offs, "illegal integer number")
 			}
 		}
 		goto exit

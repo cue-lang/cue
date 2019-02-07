@@ -925,7 +925,7 @@ func TestValueLookup(t *testing.T) {
 	}, {
 		config: config,
 		path:   strList("b", "d", "lookup in non-struct"),
-		str:    "not of right kind (int vs struct)",
+		str:    "not of right kind (number vs struct)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.str, func(t *testing.T) {

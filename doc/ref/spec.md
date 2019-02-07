@@ -298,20 +298,17 @@ decimal_lit = ( "1" … "9" ) { [ "_" ] decimal_digit } [ [ "." decimals ] multi
             "." decimals multiplier.
 binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
+octal_lit   = "0o" octal_digit { [ "_" ] octal_digit } .
 multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
 ```
-
-<!--
-octal_lit   = "0" octal_digit { [ "_" ] octal_digit } .
-TODO: consider 0o766 notation for octal.
---->
 
 ```
 42
 1.5Gi
-0600
-0xBad_Face
 170_141_183_460_469_231_731_687_303_715_884_105_727
+0xBad_Face
+0o755
+0b0101_0001
 ```
 
 ### Decimal floating-point literals

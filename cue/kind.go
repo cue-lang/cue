@@ -54,8 +54,8 @@ const (
 	// to move the reference to an assertion clause.
 	referenceKind
 
-	atomKind     = (listKind - 1)
-	concreteKind = (lambdaKind - 1)
+	atomKind     = (listKind - 1) &^ unknownKind
+	concreteKind = (lambdaKind - 1) &^ unknownKind
 
 	// doneKind indicates a value can not further develop on its own (i.e. not a
 	// reference). If doneKind is not set, but the result is ground, it
@@ -65,10 +65,10 @@ const (
 	// unless the range is restricted by a root type.
 	numKind = intKind | floatKind
 
-	comparableKind = listKind - 1
+	comparableKind = (listKind - 1) &^ unknownKind
 	stringableKind = scalarKinds | stringKind
 	topKind        = (referenceKind - 1) // all kinds, but not references
-	typeKinds      = nonGround - 1
+	typeKinds      = (nonGround - 1) &^ unknownKind
 	okKinds        = typeKinds &^ bottomKind
 	fixedKinds     = okKinds &^ (structKind | lambdaKind)
 	scalarKinds    = numKind | durationKind
@@ -180,10 +180,20 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 	u := unifyType(a, b)
 	valBits := u & typeKinds
 	catBits := u &^ typeKinds
+	aGround := a&nonGround == 0
+	bGround := b&nonGround == 0
 	a = a & typeKinds
 	b = b & typeKinds
 	if valBits == bottomKind {
-		if op == opEql || op == opNeq {
+		if op == opEql || op == opNeq || op == opUnify {
+			// Set invert for better error messages
+			// invert = aGround && !bGround
+			if a&nullKind != 0 {
+				return boolKind, false
+			}
+			if b&nullKind != 0 {
+				return boolKind, true
+			}
 			return bottomKind, false
 		}
 		if a.isAnyOf(listKind) && b.isAnyOf(intKind) {
@@ -225,7 +235,7 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 	case op != opUnify && op != opLand && op != opLor:
 
 	default:
-		invert = a&nonGround == 0 && b&nonGround != 0
+		invert = aGround && !bGround
 	}
 	// a and b have overlapping types.
 	switch op {

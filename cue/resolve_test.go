@@ -334,12 +334,12 @@ func TestBasicRewrite(t *testing.T) {
 			unf: null & null
 
 			// errors
-			eqe1: null == 1
-			eqe2: 1 == null
-			nee1: "s" != null
+			eq1: null == 1
+			eq2: 1 == null
+			ne1: "s" != null
 			call: null()
 		`,
-		out: `<0>{eql: true, neq: false, unf: null, eqe1: _|_((null == 1):unsupported op ==(null, number)), eqe2: _|_((1 == null):unsupported op ==(number, null)), nee1: _|_(("s" != null):unsupported op !=(string, null)), call: _|_(null:cannot call non-function null (type null))}`,
+		out: `<0>{eql: true, neq: false, unf: null, eq1: false, eq2: false, ne1: true, call: _|_(null:cannot call non-function null (type null))}`,
 	}, {
 		desc: "self-reference cycles",
 		in: `
@@ -450,6 +450,17 @@ func TestResolve(t *testing.T) {
 				e2: int & 4.0/2.0
 				`,
 		out: `<0>{v1: 5e+11, v2: true, i1: 1, v5: 2, e1: _|_((2.0 % 3):unsupported op %(float, number)), e2: _|_((int & 2):unsupported op &((int)*, float))}`,
+	}, {
+		desc: "inequality",
+		in: `
+			a: 1 != 2
+			b: 1 != null
+			c: true == null
+			d: null != {}
+			e: null == []
+			f: 0 == 0.0    // types are unified first TODO: make this consistent
+		`,
+		out: `<0>{a: true, b: true, c: false, d: true, e: false, f: true}`,
 	}, {
 		desc: "null coalescing",
 		in: `

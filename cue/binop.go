@@ -510,16 +510,26 @@ outer:
 
 func (x *nullLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	// TODO: consider using binSrc instead of src.base() for better traceability.
-	switch op {
-	case opEql:
-		return &boolLit{baseValue: src.base(), b: true}
-	case opNeq:
-		return &boolLit{baseValue: src.base(), b: false}
-	case opUnify:
-		return x
+	switch other.(type) {
+	case *nullLit:
+		switch op {
+		case opEql:
+			return &boolLit{baseValue: src.base(), b: true}
+		case opNeq:
+			return &boolLit{baseValue: src.base(), b: false}
+		case opUnify:
+			return x
+		}
+
 	default:
-		panic("unimplemented")
+		switch op {
+		case opEql:
+			return &boolLit{baseValue: src.base(), b: false}
+		case opNeq:
+			return &boolLit{baseValue: src.base(), b: true}
+		}
 	}
+	return ctx.mkIncompatible(src, op, x, other)
 }
 
 func (x *boolLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {

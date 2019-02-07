@@ -1598,6 +1598,8 @@ The equality operators `==` and `!=` apply to operands that are comparable.
 The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
 These terms and the result of the comparisons are defined as follows:
 
+- Null is comparable with itself and any other type.
+  Two null values are always equal, null is unequal with anything else.
 - Boolean values are comparable.
   Two boolean values are equal if they are either both true or both false.
 - Integer values are comparable and ordered, in the usual way.
@@ -1606,16 +1608,12 @@ These terms and the result of the comparisons are defined as follows:
 - String values are comparable and ordered, lexically byte-wise after
   normalization to Unicode normal form NFC.
 - Struct are not comparable.
-  Two struct values are equal if their corresponding non-blank fields are equal.
-- Lists are comparable.
-  Two list values are equal if their corresponding elements are equal.
+- Lists are not comparable.
 ```
-c: 3 < 4
-
-x: int
-y: int
-
-b3: x == y // b3 has type bool
+a: 3 < 4       // true
+b: null == 2   // false
+c: null != {}  // true
+d: {} == {}    // _|_: structs are not comparable against structs
 ```
 
 <!-- jba

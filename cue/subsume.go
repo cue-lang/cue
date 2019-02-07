@@ -62,6 +62,28 @@ func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
 		// 	// no resolution if references are in play.
 		// 	return false, false
 	}
+	switch lt := lt.(type) {
+	case *unification:
+		if _, ok := gt.(*unification); !ok {
+			for _, x := range lt.values {
+				if subsumes(ctx, gt, x, mode) {
+					return true
+				}
+			}
+			return false
+		}
+
+	case *disjunction:
+		if _, ok := gt.(*disjunction); !ok {
+			for _, x := range lt.values {
+				if !subsumes(ctx, gt, x.val, mode) {
+					return false
+				}
+			}
+			return true
+		}
+	}
+
 	return gt.subsumesImpl(ctx, lt, mode)
 }
 
@@ -97,38 +119,80 @@ func (x *basicType) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	return true
 }
 
-func (x *rangeLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
-	k := unifyType(x.from.kind(), x.to.kind())
-	if k.isDone() && k.isGround() {
-		switch y := v.(type) {
-		case *rangeLit:
-			// structural equivalence
-			return subsumes(ctx, x.from, y.from, 0) && subsumes(ctx, x.to, y.to, 0)
-		case *numLit, *stringLit, *durationLit:
-			kv := v.kind()
-			k, _ := matchBinOpKind(opAdd, k, kv)
-			if k != kv {
+func (x *bound) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	if isBottom(v) {
+		return true
+	}
+	kx := x.value.kind()
+	if !kx.isDone() || !kx.isGround() {
+		return false
+	}
+
+	switch y := v.(type) {
+	case *bound:
+		if ky := y.value.kind(); ky.isDone() && ky.isGround() {
+			if (kx&ky)&^kx != 0 {
 				return false
 			}
-			v := v.(evaluated)
-			if x.from != nil {
-				from := minNumRaw(x.from)
-				if !from.kind().isGround() {
-					return subsumes(ctx, from, v, 0) // false negative is okay
+			// x subsumes y if
+			// x: >= a, y: >= b ==> a <= b
+			// x: >= a, y: >  b ==> a <= b
+			// x: >  a, y: >  b ==> a <= b
+			// x: >  a, y: >= b ==> a < b
+			//
+			// x: <= a, y: <= b ==> a >= b
+			//
+			// x: != a, y: != b ==> a != b
+			//
+			// false if types or op direction doesn't match
+
+			xv := x.value.(evaluated)
+			yv := y.value.(evaluated)
+			switch x.op {
+			case opGtr:
+				if y.op == opGeq {
+					return test(ctx, x, opLss, xv, yv)
 				}
-				return leq(ctx, x, x.from.(evaluated), v)
-			}
-			if x.to != nil {
-				to := minNumRaw(x.to)
-				if !to.kind().isGround() {
-					return subsumes(ctx, to, v, 0) // false negative is okay
+				fallthrough
+			case opGeq:
+				if y.op == opGtr || y.op == opGeq {
+					return test(ctx, x, opLeq, xv, yv)
 				}
-				return leq(ctx, x, v, x.to.(evaluated))
+			case opLss:
+				if y.op == opLeq {
+					return test(ctx, x, opGtr, xv, yv)
+				}
+				fallthrough
+			case opLeq:
+				if y.op == opLss || y.op == opLeq {
+					return test(ctx, x, opGeq, xv, yv)
+				}
+			case opNeq:
+				switch y.op {
+				case opNeq:
+					return test(ctx, x, opEql, xv, yv)
+				case opGeq:
+					return test(ctx, x, opLss, xv, yv)
+				case opGtr:
+					return test(ctx, x, opLeq, xv, yv)
+				case opLss:
+					return test(ctx, x, opGeq, xv, yv)
+				case opLeq:
+					return test(ctx, x, opGtr, xv, yv)
+				}
+
+			default:
+				// opNeq already handled above.
+				panic("cue: undefined bound mode")
 			}
-			return true
 		}
+		// structural equivalence
+		return false
+
+	case *numLit, *stringLit, *durationLit, *boolLit:
+		return test(ctx, x, x.op, y.(evaluated), x.value.(evaluated))
 	}
-	return isBottom(v)
+	return false
 }
 
 func (x *nullLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
@@ -207,12 +271,38 @@ func (x *lambdaExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool 
 	return isBottom(v)
 }
 
+func (x *unification) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	if y, ok := v.(*unification); ok {
+		// A unification subsumes another unification if for all values a in x
+		// there is a value b in y such that a subsumes b.
+		//
+		// This assumes overlapping ranges in disjunctions are merged.If this is
+		// not the case, subsumes will return a false negative, which is
+		// allowed.
+	outer:
+		for _, vx := range x.values {
+			for _, vy := range y.values {
+				if subsumes(ctx, vx, vy, mode) {
+					continue outer
+				}
+			}
+			return false
+		}
+		return true
+	}
+	subsumed := true
+	for _, vx := range x.values {
+		subsumed = subsumed && subsumes(ctx, vx, v, mode)
+	}
+	return subsumed
+}
+
 // subsumes for disjunction is logically precise. However, just like with
 // structural subsumption, it should not have to be called after evaluation.
 func (x *disjunction) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	// A disjunction subsumes another disjunction if all values of v are
-	// subsumed by the values of x, and default values in v are subsumed by the
-	// default values of x.
+	// subsumed by any of the values of x, and default values in v are subsumed
+	// by the default values of x.
 	//
 	// This assumes that overlapping ranges in x are merged. If this is not the
 	// case, subsumes will return a false negative, which is allowed.

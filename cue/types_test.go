@@ -107,7 +107,7 @@ func TestValueType(t *testing.T) {
 		kind:           NumberKind,
 		incompleteKind: NumberKind,
 	}, {
-		value:          `0..5`,
+		value:          `>=0 & <5`,
 		kind:           BottomKind,
 		incompleteKind: NumberKind,
 	}, {
@@ -513,7 +513,7 @@ func TestList(t *testing.T) {
 		value: `[1,2,3]`,
 		res:   "[1,2,3,]",
 	}, {
-		value: `(0..5)*[1,2,3, ...int]`,
+		value: `>=5*[1,2,3, ...int]`,
 		res:   "[1,2,3,]",
 	}, {
 		value: `[x for x in y if x > 1]
@@ -998,7 +998,7 @@ func TestMashalJSON(t *testing.T) {
 		value: `[int]`,
 		err:   `cannot convert incomplete value`,
 	}, {
-		value: `((0..3) * [1, 2])`,
+		value: `(>=3 * [1, 2])`,
 		json:  `[1,2]`,
 	}, {
 		value: `{}`,
@@ -1071,7 +1071,7 @@ func TestWalk(t *testing.T) {
 		value: `[int]`,
 		out:   `[int]`,
 	}, {
-		value: `((0..3) * [1, 2])`,
+		value: `(>=3 * [1, 2])`,
 		out:   `[1,2]`,
 	}, {
 		value: `{}`,

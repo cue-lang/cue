@@ -494,8 +494,8 @@ func (v Value) Label() (string, bool) {
 }
 
 // Kind returns the kind of value. It returns BottomKind for atomic values that
-// are not concrete. For instance, it will return BottomKind for the range
-// 0..5.
+// are not concrete. For instance, it will return BottomKind for the bounds
+// >=0.
 func (v Value) Kind() Kind {
 	k := v.eval(v.ctx()).kind()
 	if k.isGround() {

@@ -354,6 +354,8 @@ func newNum(src source, k kind) *numLit {
 
 var ten = big.NewInt(10)
 
+var one = parseInt(intKind, "1")
+
 func (x *numLit) kind() kind       { return x.k }
 func (x *numLit) strValue() string { return x.v.String() }
 
@@ -404,26 +406,30 @@ type durationLit struct {
 func (x *durationLit) kind() kind       { return durationKind }
 func (x *durationLit) strValue() string { return x.d.String() }
 
-type rangeLit struct {
+type bound struct {
 	baseValue
-	from, to value
+	op    op // opNeq, opLss, opLeq, opGeq, or opGtr
+	value value
 }
 
-func (x *rangeLit) kind() kind {
-	return unifyType(x.from.kind(), x.to.kind()) | nonGround
+func (x *bound) kind() kind {
+	k := x.value.kind()
+	if x.op == opNeq && k&atomKind == nullKind {
+		k = typeKinds &^ nullKind
+	}
+	return k | nonGround
 }
 
-func mkIntRange(a, b string) *rangeLit {
-	from := parseInt(intKind, a)
-	to := parseInt(intKind, b)
-	return &rangeLit{
-		binSrc(token.NoPos, opRange, from, to),
-		from,
-		to,
+func mkIntRange(a, b string) evaluated {
+	from := &bound{op: opGeq, value: parseInt(intKind, a)}
+	to := &bound{op: opLeq, value: parseInt(intKind, b)}
+	return &unification{
+		binSrc(token.NoPos, opUnify, from, to),
+		[]evaluated{from, to},
 	}
 }
 
-var predefinedRanges = map[string]*rangeLit{
+var predefinedRanges = map[string]evaluated{
 	"rune":  mkIntRange("0", strconv.Itoa(0x10FFFF)),
 	"int8":  mkIntRange("-128", "127"),
 	"int16": mkIntRange("-32768", "32767"),
@@ -435,6 +441,7 @@ var predefinedRanges = map[string]*rangeLit{
 
 	// Do not include an alias for "byte", as it would be too easily confused
 	// with the builtin "bytes".
+	"uint":    &bound{op: opGeq, value: parseInt(intKind, "0")},
 	"uint8":   mkIntRange("0", "255"),
 	"uint16":  mkIntRange("0", "65535"),
 	"uint32":  mkIntRange("0", "4294967295"),
@@ -514,7 +521,7 @@ func (x *list) isOpen() bool {
 // lo and hi must be nil or a ground integer.
 func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
 	a := x.a
-	max := maxNum(x.len.(evaluated))
+	max := maxNum(x.len).evalPartial(ctx)
 	if hi != nil {
 		n := hi.intValue(ctx)
 		if n < 0 {
@@ -956,8 +963,22 @@ func (x *binaryExpr) kind() kind {
 	return kind | nonGround
 }
 
-// TODO: make disjunction a binOp, but translate disjunctions into
-// arrays, or at least linked lists.
+// unification collects evaluated values that are not mutually exclusive
+// but cannot be represented as a single value. It allows doing the bookkeeping
+// on accumulating conjunctions, simplifying them along the way, until they do
+// resolve into a single value.
+type unification struct {
+	baseValue
+	values []evaluated
+}
+
+func (x *unification) kind() kind {
+	k := topKind
+	for _, v := range x.values {
+		k &= v.kind()
+	}
+	return k | nonGround
+}
 
 type disjunction struct {
 	baseValue

@@ -231,10 +231,10 @@ func TestBasicRewrite(t *testing.T) {
 			e: [] & 4
 			e2: [3]["d"]
 			e3: [3][-1]
-			e4: [1, 2, ...4..5] & [1, 2, 4, 8]
-			e5: [1, 2, 4, 8] & [1, 2, ...4..5]
+			e4: [1, 2, ...>=4 & <=5] & [1, 2, 4, 8]
+			e5: [1, 2, 4, 8] & [1, 2, ...>=4 & <=5]
 			`,
-		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, number)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: _|_(((4..5) & 8):value 8 not in range (4..5)), e5: _|_(((4..5) & 8):value 8 not in range (4..5))}`,
+		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, number)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: _|_((<=5 & 8):8 not within bound <=5), e5: _|_((<=5 & 8):8 not within bound <=5)}`,
 	}, {
 		desc: "selecting",
 		in: `
@@ -274,7 +274,7 @@ func TestBasicRewrite(t *testing.T) {
 			o9: (2 | 3) & (1 | 2 | 3)
 			o10: (3 | 2) & (1 | *2 | 3)
 
-			m1: (*1 | (*2 | 3)) & 2..3
+			m1: (*1 | (*2 | 3)) & (>=2 & <=3)
 			m2: (*1 | (*2 | 3)) & (2 | 3)
 			m3: (*1 | *(*2 | 3)) & (2 | 3)
 			m4: (2 | 3) & (*2 | 3)
@@ -462,6 +462,92 @@ func TestResolve(t *testing.T) {
 		`,
 		out: `<0>{a: true, b: true, c: false, d: true, e: false, f: true}`,
 	}, {
+		desc: "bounds",
+		in: `
+			i1: >1 & 5
+			i2: (>=0 & <=10) & 5
+			i3: !=null & []
+			i4: !=2 & !=4
+
+
+			s1: >=0 & <=10 & !=1        // no simplification
+			s2: >=0 & <=10 & !=11       // >=0 & <=10
+			s3: >5 & !=5                // >5
+			s4: <10 & !=10              // <10
+			s5: !=2 & !=2
+
+			s10: >=0 & <=10 & <12 & >1   // >1  & <=10
+			s11: >0 & >=0 & <=12 & <12   // >0  & <12
+
+			s20: >=10 & <=10             // 10
+
+			s22:  >5 & <=6                // no simplification
+			s22a: >5 & (<=6 & int)       // 6
+			s22b: (int & >5) & <=6       // 6
+			s22c: >=5 & (<6 & int)       // 5
+			s22d: (int & >=5) & <6       // 5
+			s22e: (>=5 & <6) & int       // 5
+			s22f: int & (>=5 & <6)       // 5
+
+			s23: >0 & <2                 // no simplification
+			s23a: (>0 & <2) & int        // int & 1
+			s23b: int & (>0 & <2)        // int & 1
+			s23c: (int & >0) & <2        // int & 1
+			s23d: >0 & (int & <2)        // int & 1
+			s23e: >0.0 & <2.0            // no simplification
+
+			s30: >0 & int
+
+			e1: null & !=null
+			e2: !=null & null
+			e3: >1 & 1
+			e4: <0 & 0
+			e5: >1 & <0
+			e6: >11 & <11
+			e7: >=11 & <11
+			e8: >11 & <=11
+			e9: >"a" & <1
+		`,
+		out: `<0>{i1: 5, i2: 5, i3: [], i4: (!=2 & !=4), ` +
+
+			`s1: (>=0 & <=10 & !=1), ` +
+			`s2: (>=0 & <=10), ` +
+			`s3: >5, ` +
+			`s4: <10, ` +
+			`s5: !=2, ` +
+
+			`s10: (<=10 & >1), ` +
+			`s11: (>0 & <12), ` +
+
+			`s20: 10, ` +
+
+			`s22: (>5 & <=6), ` +
+			`s22a: 6, ` +
+			`s22b: 6, ` +
+			`s22c: 5, ` +
+			`s22d: 5, ` +
+			`s22e: 5, ` +
+			`s22f: 5, ` +
+
+			`s23: (>0 & <2), ` +
+			`s23a: 1, ` +
+			`s23b: 1, ` +
+			`s23c: 1, ` +
+			`s23d: 1, ` +
+			`s23e: (>0.0 & <2.0), ` +
+
+			`s30: >0, ` +
+
+			`e1: _|_((!=null & null):null excluded by !=null), ` +
+			`e2: _|_((!=null & null):null excluded by !=null), ` +
+			`e3: _|_((>1 & 1):1 not within bound >1), ` +
+			`e4: _|_((<0 & 0):0 not within bound <0), ` +
+			`e5: _|_(incompatible bounds >1 and <0), ` +
+			`e6: _|_(incompatible bounds >11 and <11), ` +
+			`e7: _|_(incompatible bounds >=11 and <11), ` +
+			`e8: _|_(incompatible bounds >11 and <=11), ` +
+			`e9: _|_((>"a" & <1):unsupported op &((string)*, (number)*))}`,
+	}, {
 		desc: "null coalescing",
 		in: `
 				a: null
@@ -553,40 +639,39 @@ func TestResolve(t *testing.T) {
 		in: `
 			l0: 3*[int]
 			l0: [1, 2, 3]
-			l1:(0..5)*[string]
+			l1: <=5*[string]
 			l1: ["a", "b"]
-			l2: (0..5)*[{ a: int }]
+			l2: <=5*[{ a: int }]
 			l2: [{a: 1}, {a: 2, b: 3}]
-			l3: (0..10)*[int]
-			l3: [1, 2, 3, ...]
 
-			s1: ((0..6)*[int])[2:3] // TODO: simplify 1*[int] to [int]
+			// TODO: work out a decent way to specify length ranges of lists.
+			// l3: <=10*[int]
+			// l3: [1, 2, 3, ...]
+
+			s1: (<=6*[int])[2:3] // TODO: simplify 1*[int] to [int]
 			s2: [0,2,3][1:2]
 
-			i1: ((0..6)*[int])[2]
+			i1: (<=6*[int])[2]
 			i2: [0,2,3][2]
 
 			t0: [...{a: 8}]
 			t0: [{}]
 
-			e0: (2..5)*[{}]
+			e0: >=2*[{}]
 			e0: [{}]
-
-			e1: 0.._*[...int]
 			`,
-		out: `<0>{l0: [1,2,3], l1: ["a","b"], l2: [<1>{a: 1},<2>{a: 2, b: 3}], l3: (3..10)*[int]([1,2,3, ...int]), s1: 1*[int], s2: [2], i1: int, i2: 3, t0: [<3>{a: 8}], e0: _|_(((2..5)*[<4>{}] & [<5>{}]):incompatible list lengths: value 1 not in range (2..5)), e1: [, ...int]}`,
+		out: `<0>{l0: [1,2,3], l1: ["a","b"], l2: [<1>{a: 1},<2>{a: 2, b: 3}], s1: 1*[int], s2: [2], i1: int, i2: 3, t0: [<3>{a: 8}], e0: _|_(([, ...<4>{}] & [<5>{}]):incompatible list lengths: 1 not within bound >=2)}`,
 	}, {
 		desc: "list arithmetic",
 		in: `
 			l0: 3*[1, 2, 3]
 			l1: 0*[1, 2, 3]
 			l2: 10*[]
-			l3: (0..2)*[]
-			l4: (0..2)*[int]
-			l5: (0..2)*(int*[int])
-			l6: 3*((3..4)*[int])
+			l3: <=2*[]
+			l4: <=2*[int]
+			l5: <=2*(int*[int])
 		`,
-		out: `<0>{l0: [1,2,3,1,2,3,1,2,3], l1: [], l2: [], l3: [], l4: (0..2)*[int], l5: (0..2)*[int], l6: (9..12)*[int]}`,
+		out: `<0>{l0: [1,2,3,1,2,3,1,2,3], l1: [], l2: [], l3: [], l4: <=2*[int], l5: <=2*[int]}`,
 	}, {
 		desc: "correct error messages",
 		// Tests that it is okay to partially evaluate structs.
@@ -694,98 +779,93 @@ func TestResolve(t *testing.T) {
 			`,
 		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (1 | int)} & <6>{}), v: <7>{x: 0, y: (1 | int)}, w: <8>{x: 0, y: (1 | int)}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
-		desc: "simple ranges",
-		in: `
-			a: 1..2
-			c: "a".."b"
-			d: (2+3)..(4+5)  // 5..9
-
-			s1: 1..1       // 1
-			s2: 1..2..3    // simplify (1..2)..3 to 1..3
-			s3: (1..10)..5 // This is okay!
-			s4: 5..(1..10) // This is okay!
-			s5: (0..(5..6))..(1..10)
-			`,
-		out: `<0>{a: (1..2), c: ("a".."b"), d: (5..9), s1: 1, s2: (1..3), s3: (1..5), s4: (5..10), s5: (0..10)}`,
-	}, {
 		desc: "range unification",
 		in: `
 			// with concrete values
-			a1: 1..5 & 3
-			a2: 1..5 & 1
-			a3: 1..5 & 5
-			a4: 1..5 & 6
-			a5: 1..5 & 0
+			a1: >=1 & <=5 & 3
+			a2: >=1 & <=5 & 1
+			a3: >=1 & <=5 & 5
+			a4: >=1 & <=5 & 6
+			a5: >=1 & <=5 & 0
 
-			a6: 3 & 1..5
-			a7: 1 & 1..5
-			a8: 5 & 1..5
-			a9: 6 & 1..5
-			a10: 0 & 1..5
+			a6: 3 & >=1 & <=5
+			a7: 1 & >=1 & <=5
+			a8: 5 & >=1 & <=5
+			a9: 6 & >=1 & <=5
+			a10: 0 & >=1 & <=5
 
 			// with ranges
-			b1: 1..5 & 1..5
-			b2: 1..5 & 1..1
-			b3: 1..5 & 5..5
-			b4: 1..5 & 2..3
-			b5: 1..5 & 3..9
-			b6: 1..5 & 5..9
-			b7: 1..5 & 6..9
+			b1: >=1 & <=5 & >=1 & <=5
+			b2: >=1 & <=5 & >=1 & <=1
+			b3: >=1 & <=5 & >=5 & <=5
+			b4: >=1 & <=5 & >=2 & <=3
+			b5: >=1 & <=5 & >=3 & <=9
+			b6: >=1 & <=5 & >=5 & <=9
+			b7: >=1 & <=5 & >=6 & <=9
 
-			b8: 1..5 & 1..5
-			b9: 1..1 & 1..5
-			b10: 5..5 & 1..5
-			b11: 2..3 & 1..5
-			b12: 3..9 & 1..5
-			b13: 5..9 & 1..5
-			b14: 6..9 & 1..5
+			b8: >=1 & <=5 & >=1 & <=5
+			b9: >=1 & <=1 & >=1 & <=5
+			b10: >=5 & <=5 & >=1 & <=5
+			b11: >=2 & <=3 & >=1 & <=5
+			b12: >=3 & <=9 & >=1 & <=5
+			b13: >=5 & <=9 & >=1 & <=5
+			b14: >=6 & <=9 & >=1 & <=5
 
 			// ranges with more general types
-			c1: int & 1..5
-			c2: 1..5 & int
-			c3: string & 1..5
-			c4: 1..5 & string
+			c1: int & >=1 & <=5
+			c2: >=1 & <=5 & int
+			c3: string & >=1 & <=5
+			c4: >=1 & <=5 & string
 
 			// other types
-			s1: "d" .. "z" & "e"
-			s2: "d" .. "z" & "ee"
+			s1: >="d" & <="z" & "e"
+			s2: >="d" & <="z" & "ee"
 
-			n1: number & 1..2
-			n2: int & 1.1 .. 1.3
-			n3: 1.0..3.0 & 2
-			n4: 0.0..0.1 & 0.09999
-			n5: 1..5 & 2.5
+			n1: number & >=1 & <=2
+			n2: int & >=1.1 & <=1.3
+			n3: >=1.0 & <=3.0 & 2
+			n4: >=0.0 & <=0.1 & 0.09999
+			n5: >=1 & <=5 & 2.5
 			`,
-		out: `<0>{a1: 3, a2: 1, a3: 5, a4: _|_(((1..5) & 6):value 6 not in range (1..5)), a5: _|_(((1..5) & 0):value 0 not in range (1..5)), a6: 3, a7: 1, a8: 5, a9: _|_(((1..5) & 6):value 6 not in range (1..5)), a10: _|_(((1..5) & 0):value 0 not in range (1..5)), b1: (1..5), b2: 1, b3: 5, b4: (2..3), b5: (3..5), b6: 5, b7: _|_(((1..5) & (6..9)):non-overlapping ranges (1..5) and (6..9)), b8: (1..5), b9: 1, b10: 5, b11: (2..3), b12: (3..5), b13: 5, b14: _|_(((6..9) & (1..5)):non-overlapping ranges (6..9) and (1..5)), c1: (1..5), c2: (1..5), c3: _|_((string & (1..5)):unsupported op &((string)*, (number)*)), c4: _|_(((1..5) & string):unsupported op &((number)*, (string)*)), s1: "e", s2: "ee", n1: (1..2), n2: _|_((int & (1.1..1.3)):unsupported op &((int)*, (float)*)), n3: 2, n4: 0.09999, n5: 2.5}`,
-	}, {
-		desc: "range arithmetic",
-		in: `
-			r0: (1..2) * (4..5)
-			r1: (1..2) * (-1..2)
-			r2: (1.0..2.0) * (-0.5..1.0)
-			r3: (1..2) + (4..5)
+		out: `<0>{` +
+			`a1: 3, ` +
+			`a2: 1, ` +
+			`a3: 5, ` +
+			`a4: _|_((<=5 & 6):6 not within bound <=5), ` +
+			`a5: _|_((>=1 & 0):0 not within bound >=1), ` +
+			`a6: 3, ` +
+			`a7: 1, ` +
+			`a8: 5, ` +
 
-			i0: (1..2) * 2
-			i1: (2..3) * -2
-			i2: (1..2) * 2
-			i3: (2..3) * -2
+			// TODO: improve error
+			`a9: _|_((6 & <=5):unsupported op &(number, (number)*)), ` +
+			`a10: _|_((0 & >=1):unsupported op &(number, (number)*)), ` +
 
-			t0: int * (1..2) // TODO: should be int
-			t1: (1..2) * int
-			t2: (1..2) * (0..int)
-			t3: (1..int) * (0..2)
-			t4: (1..int) * (-1..2)
-			t5: _ * (1..2)  // TODO: should be int
-
-			s0: (1..2) - (3..5)
-			s1: (1..2) - 1
-
-			str0: ("ab".."cd") + "ef"
-			str1: ("ab".."cd") + ("ef".."gh")
-			str2: ("ab".."cd") + string
-
-		`,
-		out: `<0>{r0: (4..10), r1: (-2..4), r2: (-1.00..2.00), r3: (5..7), i0: (2..4), i1: (-6..-4), i2: (2..4), i3: (-6..-4), t0: (int * (1..2)), t1: int, t2: (0..int), t3: (0..int), t4: int, t5: _|_((_ * (1..2)):binary operation on non-ground top value), s0: (-4..-1), s1: (0..1), str0: ("abef".."cdef"), str1: ("abef".."cdgh"), str2: ("ab".."cd")}`,
+			`b1: (>=1 & <=5), ` +
+			`b2: 1, ` +
+			`b3: 5, ` +
+			`b4: (>=2 & <=3), ` +
+			`b5: (>=3 & <=5), ` +
+			`b6: 5, ` +
+			`b7: _|_(incompatible bounds >=6 and <=5), ` +
+			`b8: (>=1 & <=5), ` +
+			`b9: 1, ` +
+			`b10: 5, ` +
+			`b11: (>=2 & <=3), ` +
+			`b12: (>=3 & <=5), ` +
+			`b13: 5, ` +
+			`b14: _|_(incompatible bounds >=6 and <=5), ` +
+			`c1: (>=1 & <=5), ` +
+			`c2: (<=5 & >=1), ` +
+			`c3: _|_((string & >=1):unsupported op &((string)*, (number)*)), ` +
+			`c4: _|_(((>=1 & <=5) & string):unsupported op &((number)*, (string)*)), ` +
+			`s1: "e", ` +
+			`s2: "ee", ` +
+			`n1: (>=1 & <=2), ` +
+			`n2: _|_((int & >=1.1):unsupported op &((int)*, (float)*)), ` +
+			`n3: 2, ` +
+			`n4: 0.09999, ` +
+			`n5: 2.5}`,
 	}, {
 		desc: "predefined ranges",
 		in: `
@@ -799,7 +879,7 @@ func TestResolve(t *testing.T) {
 			e1: 100_000
 		`,
 		out: `<0>{k1: 44, k2: -8000000000, ` +
-			`e1: _|_(((-32768..32767) & 100000):value 100000 not in range (-32768..32767))}`,
+			`e1: _|_((<=32767 & 100000):100000 not within bound <=32767)}`,
 	}, {
 		desc: "field comprehensions",
 		in: `
@@ -1070,18 +1150,18 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "ips",
 		in: `
-		IP: 4*[ 0..255 ]
+		IP: 4*[ uint8 ]
 
 		Private:
-			*[ 192, 168, 0..255, 0..255 ] |
-			[ 10, 0..255, 0..255, 0..255] |
-			[ 172, 16..32, 0..255, 0..255 ]
+			*[ 192, 168, uint8, uint8 ] |
+			[ 10, uint8, uint8, uint8] |
+			[ 172, >=16 & <=32, uint8, uint8 ]
 
 		Inst: Private & [ _, 10, ... ]
 
 		MyIP: Inst & [_, _, 10, 10 ]
 		`,
-		out: `<0>{IP: 4*[(0..255)], Private: [192,168,(0..255),(0..255)], Inst: [10,10,(0..255),(0..255)], MyIP: [10,10,10,10]}`,
+		out: `<0>{IP: 4*[(>=0 & <=255)], Private: [192,168,(>=0 & <=255),(>=0 & <=255)], Inst: [10,10,(>=0 & <=255),(>=0 & <=255)], MyIP: [10,10,10,10]}`,
 	}, {
 		desc: "complex interaction of groundness",
 		in: `

@@ -204,6 +204,15 @@ func (p *printer) debugStr(v interface{}) {
 		writef(" %v ", x.op)
 		p.debugStr(x.right)
 		write(")")
+	case *unification:
+		write("(")
+		for i, v := range x.values {
+			if i != 0 {
+				writef(" & ")
+			}
+			p.debugStr(v)
+		}
+		write(")")
 	case *disjunction:
 		write("(")
 		for i, v := range x.values {
@@ -312,12 +321,9 @@ func (p *printer) debugStr(v interface{}) {
 		}
 	case *durationLit:
 		write(x.d.String())
-	case *rangeLit:
-		write("(")
-		p.debugStr(x.from)
-		write("..")
-		p.debugStr(x.to)
-		write(")")
+	case *bound:
+		p.writef("%v", x.op)
+		p.debugStr(x.value)
 	case *interpolation:
 		for i, e := range x.parts {
 			if i != 0 {
@@ -327,13 +333,13 @@ func (p *printer) debugStr(v interface{}) {
 		}
 	case *list:
 		// TODO: do not evaluate
-		max := maxNum(x.len.evalPartial(p.ctx))
+		max := maxNum(x.len).evalPartial(p.ctx)
 		inCast := false
 		ellipsis := false
 		n, ok := max.(*numLit)
 		if !ok {
 			// TODO: do not evaluate
-			min := minNum(x.len.evalPartial(p.ctx))
+			min := minNum(x.len).evalPartial(p.ctx)
 			n, _ = min.(*numLit)
 		}
 		ln := 0
@@ -341,8 +347,13 @@ func (p *printer) debugStr(v interface{}) {
 			x, _ := n.v.Int64()
 			ln = int(x)
 		}
+		open := false
+		switch max.(type) {
+		case *top, *basicType:
+			open = true
+		}
 		if !ok || ln > len(x.a) {
-			if !isTop(max) && !isTop(x.typ) {
+			if !open && !isTop(x.typ) {
 				p.debugStr(x.len)
 				write("*[")
 				p.debugStr(x.typ)

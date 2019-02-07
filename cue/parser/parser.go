@@ -425,12 +425,6 @@ func (p *parser) atComma(context string, follow ...token.Token) bool {
 	return true // "insert" comma and continue
 }
 
-func assert(cond bool, msg string) {
-	if !cond {
-		panic("lacelang/parser internal error: " + msg)
-	}
-}
-
 // syncExpr advances to the next field in a field list.
 // Used for synchronization after an error.
 func syncExpr(p *parser) {
@@ -1109,7 +1103,8 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 	}
 
 	switch p.tok {
-	case token.ADD, token.SUB, token.NOT, token.MUL:
+	case token.ADD, token.SUB, token.NOT, token.MUL,
+		token.NEQ, token.LSS, token.LEQ, token.GEQ, token.GTR:
 		pos, op := p.pos, p.tok
 		c := p.openComments()
 		p.next()
@@ -1226,18 +1221,6 @@ func (p *parser) parseExpr() ast.Expr {
 func (p *parser) parseRHS() ast.Expr {
 	x := p.checkExpr(p.parseExpr())
 	return x
-}
-
-func (p *parser) parseCallExpr(callType string) *ast.CallExpr {
-	x := p.parseRHS() // could be a conversion: (some type)(x)
-	if call, isCall := x.(*ast.CallExpr); isCall {
-		return call
-	}
-	if _, isBad := x.(*ast.BadExpr); !isBad {
-		// only report error if it's a new one
-		p.error(p.safePos(x.End()), fmt.Sprintf("function must be invoked in %s statement", callType))
-	}
-	return nil
 }
 
 // ----------------------------------------------------------------------------

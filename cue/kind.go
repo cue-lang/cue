@@ -232,7 +232,7 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 	case a&nonGround == 0 && b&nonGround == 0:
 		// both ground values: nothing to do
 
-	case op != opUnify && op != opLand && op != opLor:
+	case op != opUnify && op != opLand && op != opLor && op != opNeq:
 
 	default:
 		invert = aGround && !bGround

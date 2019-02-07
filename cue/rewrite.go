@@ -83,13 +83,12 @@ func (x *bytesLit) rewrite(ctx *context, fn rewriteFunc) value    { return x }
 func (x *numLit) rewrite(ctx *context, fn rewriteFunc) value      { return x }
 func (x *durationLit) rewrite(ctx *context, fn rewriteFunc) value { return x }
 
-func (x *rangeLit) rewrite(ctx *context, fn rewriteFunc) value {
-	from := rewrite(ctx, x.from, fn)
-	to := rewrite(ctx, x.to, fn)
-	if from == x.from && to == x.to {
+func (x *bound) rewrite(ctx *context, fn rewriteFunc) value {
+	v := rewrite(ctx, x.value, fn)
+	if v == x.value {
 		return x
 	}
-	return &rangeLit{x.baseValue, from, to}
+	return &bound{x.baseValue, x.op, v}
 }
 
 func (x *interpolation) rewrite(ctx *context, fn rewriteFunc) value {
@@ -175,6 +174,11 @@ func (x *binaryExpr) rewrite(ctx *context, fn rewriteFunc) value {
 		return x
 	}
 	return &binaryExpr{x.baseValue, x.op, left, right}
+}
+
+func (x *unification) rewrite(ctx *context, fn rewriteFunc) value {
+	// Can a unification ever be rewritten as it is a post-evaluation type?
+	panic("cue: unification only used post-evaluation")
 }
 
 func (x *disjunction) rewrite(ctx *context, fn rewriteFunc) value {

@@ -134,7 +134,6 @@ var testTokens = [...]elt{
 	{token.NEQ, "!=", operator},
 	{token.LEQ, "<=", operator},
 	{token.GEQ, ">=", operator},
-	{token.RANGE, "..", operator},
 	{token.ELLIPSIS, "...", operator},
 
 	{token.LPAREN, "(", operator},

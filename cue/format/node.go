@@ -310,9 +310,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			f.internalError("depth < 1:", depth)
 			depth = 1
 		}
-		if prec1 == 8 { // ..
-			prec1 = 9 // always parentheses for values of ranges
-		}
 		f.binaryExpr(x, prec1, cutoff(x, depth), depth)
 
 	case *ast.UnaryExpr:
@@ -556,7 +553,6 @@ func reduceDepth(depth int) int {
 // (Algorithm suggestion by Russ Cox.)
 //
 // The precedences are:
-//  8             ..
 //	7             *  /  % quo rem div mod
 //	6             +  -
 //	5             ==  !=  <  <=  >  >=

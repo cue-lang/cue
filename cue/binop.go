@@ -64,6 +64,9 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		left, right = right, left
 	}
 	if op != opUnify {
+		if !kind.isGround() {
+			return ctx.mkErr(src, codeIncomplete, "incomplete error")
+		}
 		ctx.exprDepth++
 		v := left.binOp(ctx, src, op, right) // may return incomplete
 		ctx.exprDepth--
@@ -87,6 +90,10 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		return distribute(ctx, src, dl, right)
 	} else if dr, ok := right.(*disjunction); ok {
 		return distribute(ctx, src, dr, left)
+	}
+
+	if _, ok := right.(*unification); ok {
+		return right.binOp(ctx, src, opUnify, left)
 	}
 
 	// TODO: value may be incomplete if there is a cycle. Instead of an error
@@ -142,6 +149,58 @@ func (x *bottom) binOp(ctx *context, src source, op op, other evaluated) evaluat
 	panic("unreachable: special-cased")
 }
 
+func (x *unification) add(ctx *context, src source, v evaluated) evaluated {
+	for progress := true; progress; {
+		progress = false
+		k := 0
+
+		for i, vx := range x.values {
+			a := binOp(ctx, src, opUnify, vx, v)
+			switch _, isUnify := a.(*unification); {
+			case isBottom(a):
+				if !isIncomplete(a) {
+					return a
+				}
+				fallthrough
+			case isUnify:
+				x.values[k] = x.values[i]
+				k++
+				continue
+			}
+			// k will not be raised in this iteration. So the outer loop
+			// will ultimately terminate as k reaches 0.
+			// In practice it is seems unlikely that there will be more than
+			// two iterations for any addition.
+			// progress = true
+			v = a
+		}
+		if k == 0 {
+			return v
+		}
+		x.values = x.values[:k]
+	}
+	x.values = append(x.values, v)
+	return nil
+}
+
+func (x *unification) binOp(ctx *context, src source, op op, other evaluated) evaluated {
+	if op == opUnify {
+		u := &unification{baseValue: baseValue{src}}
+		u.values = append(u.values, x.values...)
+		if y, ok := other.(*unification); ok {
+			for _, vy := range y.values {
+				if v := u.add(ctx, src, vy); v != nil {
+					return v
+				}
+			}
+		} else if v := u.add(ctx, src, other); v != nil {
+			return v
+		}
+		return u
+	}
+	return ctx.mkIncompatible(src, op, x, other)
+}
+
 func (x *top) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch op {
 	case opUnify:
@@ -162,9 +221,11 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 				return &basicType{binSrc(src.Pos(), op, x, other), k & typeKinds}
 			}
 		}
-	case *rangeLit:
+
+	case *bound:
 		src = mkBin(ctx, src.Pos(), op, x, other)
 		return ctx.mkErr(src, codeIncomplete, "%s with incomplete values", op)
+
 	case *numLit:
 		if op == opUnify {
 			if k == y.k {
@@ -176,6 +237,7 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 		}
 		src = mkBin(ctx, src.Pos(), op, x, other)
 		return ctx.mkErr(src, codeIncomplete, "%s with incomplete values", op)
+
 	default:
 		if k&typeKinds != bottomKind {
 			return other
@@ -184,238 +246,203 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 	return ctx.mkIncompatible(src, op, x, other)
 }
 
-// unifyFrom determines the maximum value of a and b.
-func unifyFrom(ctx *context, src source, a, b evaluated) evaluated {
-	if a.kind().isGround() && b.kind().isGround() {
-		if leq(ctx, src, a, b) {
-			return b
-		}
-		return a
+func checkBounds(ctx *context, src source, r *bound, op op, a, b evaluated) evaluated {
+	v := binOp(ctx, src, op, a, b)
+	if isBottom(v) || !v.(*boolLit).b {
+		return errOutOfBounds(ctx, src.Pos(), r, a)
 	}
-	if isTop(a) {
-		return b
-	}
-	if isTop(b) {
-		return a
-	}
-	if x, ok := a.(*rangeLit); ok {
-		return unifyFrom(ctx, src, x.from.(evaluated), b)
-	}
-	if x, ok := b.(*rangeLit); ok {
-		return unifyFrom(ctx, src, a, x.from.(evaluated))
-	}
-	src = mkBin(ctx, src.Pos(), opUnify, a, b)
-	return ctx.mkErr(src, "incompatible types %v and %v", a.kind(), b.kind())
+	return nil
 }
 
-// unifyTo determines the minimum value of a and b.
-func unifyTo(ctx *context, src source, a, b evaluated) evaluated {
-	if a.kind().isGround() && b.kind().isGround() {
-		if leq(ctx, src, a, b) {
-			return a
-		}
-		return b
-	}
-	if isTop(a) {
-		return b
-	}
-	if isTop(b) {
-		return a
-	}
-	if x, ok := a.(*rangeLit); ok {
-		return unifyTo(ctx, src, x.to.(evaluated), b)
-	}
-	if x, ok := b.(*rangeLit); ok {
-		return unifyTo(ctx, src, a, x.to.(evaluated))
-	}
-	src = mkBin(ctx, src.Pos(), opUnify, a, b)
-	return ctx.mkErr(src, "incompatible types %v and %v", a.kind(), b.kind())
-}
-
-func errInRange(ctx *context, pos token.Pos, r *rangeLit, v evaluated) *bottom {
+func errOutOfBounds(ctx *context, pos token.Pos, r *bound, v evaluated) *bottom {
 	if pos == token.NoPos {
 		pos = r.Pos()
 	}
-	const msgInRange = "value %v not in range %v"
 	e := mkBin(ctx, pos, opUnify, r, v)
-	return ctx.mkErr(e, msgInRange, v.strValue(), debugStr(ctx, r))
+	if r.op == opNeq {
+		const msgInRange = "%v excluded by %v"
+		return ctx.mkErr(e, msgInRange, debugStr(ctx, v), debugStr(ctx, r))
+	}
+	const msgInRange = "%v not within bound %v"
+	return ctx.mkErr(e, msgInRange, debugStr(ctx, v), debugStr(ctx, r))
 }
 
-func (x *rangeLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
-	combine := func(x, y evaluated) evaluated {
-		if _, ok := x.(*numLit); !ok {
-			return x
-		}
-		if _, ok := y.(*numLit); !ok {
-			return y
-		}
-		return binOp(ctx, src, op, x, y)
+func opInfo(op op) (cmp op, norm int) {
+	switch op {
+	case opGtr:
+		return opGeq, 1
+	case opGeq:
+		return opGtr, 1
+	case opLss:
+		return opLeq, -1
+	case opLeq:
+		return opLss, -1
+	case opNeq:
+		return opNeq, 0
 	}
-	from := x.from.(evaluated)
-	to := x.to.(evaluated)
-	newSrc := mkBin(ctx, src.Pos(), op, x, other)
+	panic("cue: unreachable")
+}
+
+func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluated {
+	xv := x.value.(evaluated)
+
+	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
 	case opUnify:
-		k := unifyType(x.kind(), other.kind())
-		if k&comparableKind != bottomKind {
-			switch y := other.(type) {
-			case *basicType:
-				from := unify(ctx, src, x.from.(evaluated), y)
-				to := unify(ctx, src, x.to.(evaluated), y)
-				if from == x.from && to == x.to {
-					return x
-				}
-				return &rangeLit{newSrc.base(), from, to}
-			case *rangeLit:
-				from := unifyFrom(ctx, src, x.from.(evaluated), y.from.(evaluated))
-				to := unifyTo(ctx, src, x.to.(evaluated), y.to.(evaluated))
-				if from.kind().isGround() && to.kind().isGround() && !leq(ctx, src, from, to) {
-					r1 := debugStr(ctx, x)
-					r2 := debugStr(ctx, y)
-					return ctx.mkErr(newSrc, "non-overlapping ranges %s and %s", r1, r2)
-				}
-				return ctx.manifest(&rangeLit{newSrc.base(), from, to})
-
-			case *numLit:
-				if !leq(ctx, src, x.from.(evaluated), y) || !leq(ctx, src, y, x.to.(evaluated)) {
-					return errInRange(ctx, src.Pos(), x, y)
-				}
-				if y.k != k {
-					n := *y
-					n.k = k
-					return &n
-				}
-				return other
-
-			case *durationLit, *stringLit:
-				if !leq(ctx, src, x.from.(evaluated), y) || !leq(ctx, src, y, x.to.(evaluated)) {
-					return errInRange(ctx, src.Pos(), x, y)
-				}
-				return other
-			}
+		k, _ := matchBinOpKind(opUnify, x.kind(), other.kind())
+		if k == bottomKind {
+			break
 		}
-	// See https://en.wikipedia.org/wiki/Interval_arithmetic.
-	case opAdd:
-		switch x.kind() & typeKinds {
-		case stringKind:
-			if !x.from.kind().isGround() || !x.to.kind().isGround() {
-				// TODO: return regexp
+		switch y := other.(type) {
+		case *basicType:
+			v := unify(ctx, src, xv, y)
+			if v == xv {
+				return x
+			}
+			return &bound{newSrc.base(), x.op, v}
+
+		case *bound:
+			yv := y.value.(evaluated)
+			if !xv.kind().isGround() || !yv.kind().isGround() {
 				return ctx.mkErr(newSrc, codeIncomplete, "cannot add incomplete values")
 			}
-			combine := func(x, y evaluated) evaluated {
-				if _, ok := x.(*basicType); ok {
-					return ctx.mkErr(newSrc, "adding string to non-concrete type")
+
+			cmp, xCat := opInfo(x.op)
+			_, yCat := opInfo(y.op)
+
+			switch {
+			case xCat == yCat:
+				if x.op == opNeq {
+					if test(ctx, x, opEql, xv, yv) {
+						return x
+					}
+					break
 				}
-				if _, ok := y.(*basicType); ok {
+
+				// xCat == yCat && x.op != opNeq
+				// > a & >= b
+				//    > a   if a >= b
+				//    >= b  if a <  b
+				// > a & > b
+				//    > a   if a >= b
+				//    > b   if a <  b
+				// >= a & > b
+				//    >= a   if a > b
+				//    > b    if a <= b
+				// >= a & >= b
+				//    >= a   if a > b
+				//    >= b   if a <= b
+				// inverse is true as well.
+
+				// Tighten bound.
+				if test(ctx, x, cmp, xv, yv) {
 					return x
 				}
-				return binOp(ctx, src, opAdd, x, y)
-			}
-			return &rangeLit{
-				baseValue: binSrc(src.Pos(), op, x, other),
-				from:      combine(minNum(from), minNum(other)),
-				to:        combine(maxNum(to), maxNum(other)),
-			}
+				return y
 
-		case intKind, numKind, floatKind:
-			return &rangeLit{
-				baseValue: binSrc(src.Pos(), op, x, other),
-				from:      combine(minNum(from), minNum(other)),
-				to:        combine(maxNum(to), maxNum(other)),
-			}
+			case xCat == -yCat:
+				if xCat == -1 {
+					x, y = y, x
+				}
+				a, aOK := x.value.(evaluated).(*numLit)
+				b, bOK := y.value.(evaluated).(*numLit)
 
-		default:
-			return ctx.mkErrUnify(src, x, other)
-		}
+				if !aOK || !bOK {
+					break
+				}
 
-	case opSub:
-		return &rangeLit{
-			baseValue: binSrc(src.Pos(), op, x, other),
-			from:      combine(minNum(from), maxNum(other)),
-			to:        combine(maxNum(to), minNum(other)),
-		}
+				var d apd.Decimal
+				cond, err := apd.BaseContext.Sub(&d, &b.v, &a.v)
+				if cond.Inexact() || err != nil {
+					break
+				}
 
-	case opQuo:
-		// See https://en.wikipedia.org/wiki/Interval_arithmetic.
-		// TODO: all this is strictly not correct. To do it right we need to
-		// have non-inclusive ranges at the least. So for now we just do this.
-		var from, to evaluated
-		if max := maxNum(other); !max.kind().isGround() {
-			from = newNum(other, max.kind()) // 1/infinity is 0
-		} else if num, ok := max.(*numLit); ok && num.v.IsZero() {
-			from = &basicType{num.baseValue, num.kind()} // div by 0
-		} else {
-			one := newNum(other, max.kind())
-			one.v.SetInt64(1)
-			from = combine(one, max)
-		}
+				// attempt simplification
+				// numbers
+				// >=a & <=b
+				//     a   if a == b
+				//     _|_ if a < b
+				// >=a & <b
+				//     _|_ if b <= a
+				// >a  & <=b
+				//     _|_ if b <= a
+				// >a  & <b
+				//     _|_ if b <= a
 
-		if _, ok := other.(*rangeLit); !ok {
-			other = from
-		} else {
-			if min := minNum(other); !min.kind().isGround() {
-				to = newNum(other, min.kind()) // 1/infinity is 0
-			} else if num, ok := min.(*numLit); ok && num.v.IsZero() {
-				to = &basicType{num.baseValue, num.kind()} // div by 0
-			} else {
-				one := newNum(other, min.kind())
-				one.v.SetInt64(1)
-				to = combine(one, min)
-			}
+				// integers
+				// >=a & <=b
+				//     a   if b-a == 0
+				//     _|_ if a < b
+				// >=a & <b
+				//     a   if b-a == 1
+				//     _|_ if b <= a
+				// >a  & <=b
+				//     b   if b-a == 1
+				//     _|_ if b <= a
+				// >a  & <b
+				//     a+1 if b-a == 2
+				//     _|_ if b <= a
 
-			if !from.kind().isGround() && !to.kind().isGround() {
-				other = from
-			} else if leq(ctx, src, from, to) && leq(ctx, src, to, from) {
-				other = from
-			} else {
-				other = &rangeLit{newSrc.base(), from, to}
-			}
-		}
-		fallthrough
+				switch diff, err := d.Int64(); {
+				case err != nil:
 
-	case opMul:
-		xMin, xMax := minNum(from), maxNum(to)
-		yMin, yMax := minNum(other), maxNum(other)
+				case diff == 1:
+					if k&floatKind == 0 {
+						if x.op == opGeq && y.op == opLss {
+							return a
+						}
+						if x.op == opGtr && y.op == opLeq {
+							return b
+						}
+					}
 
-		var from, to evaluated
-		negMax := func(from, to *evaluated, val, sign evaluated) {
-			if !val.kind().isGround() {
-				*from = val
-				if num, ok := sign.(*numLit); ok && num.v.Negative {
-					*to = val
+				case diff == 2:
+					if k&floatKind == 0 && x.op == opGtr && y.op == opLss {
+						apd.BaseContext.Add(&d, d.SetInt64(1), &a.v)
+						n := *a
+						n.k = k
+						n.v = d
+						return &n
+					}
+
+				case diff == 0:
+					if x.op == opGeq && y.op == opLeq {
+						return a
+					}
+					fallthrough
+
+				case d.Negative:
+					return ctx.mkErr(newSrc, "incompatible bounds %v and %v",
+						debugStr(ctx, x), debugStr(ctx, y))
+				}
+
+			case y.op == opNeq:
+				if !test(ctx, x, x.op, yv, xv) {
+					return x
 				}
 			}
-		}
-		negMax(&from, &to, yMin, xMax)
-		negMax(&to, &from, yMax, xMin)
-		negMax(&from, &to, xMin, yMax)
-		negMax(&to, &from, xMax, yMin)
-		if from != nil && to != nil {
-			return binOp(ctx, src, opUnify, from, to)
-		}
+			return &unification{newSrc, []evaluated{x, y}}
 
-		values := []evaluated{}
-		add := func(a, b evaluated) {
-			if a.kind().isGround() && b.kind().isGround() {
-				values = append(values, combine(a, b))
+		case *numLit:
+			if err := checkBounds(ctx, src, x, x.op, y, xv); err != nil {
+				return err
 			}
-		}
-		add(xMin, yMin)
-		add(xMax, yMin)
-		add(xMin, yMax)
-		add(xMax, yMax)
-		sort.Slice(values, func(i, j int) bool {
-			return !leq(ctx, src, values[j], values[i])
-		})
+			// Narrow down number type.
+			if y.k != k {
+				n := *y
+				n.k = k
+				return &n
+			}
+			return other
 
-		r := &rangeLit{baseValue: binSrc(src.Pos(), op, x, other), from: from, to: to}
-		if from == nil {
-			r.from = values[0]
+		case *nullLit, *boolLit, *durationLit, *list, *structLit, *stringLit, *bytesLit:
+			// All remaining concrete types. This includes non-comparable types
+			// for comparison to null.
+			if err := checkBounds(ctx, src, x, x.op, y, xv); err != nil {
+				return err
+			}
+			return y
 		}
-		if to == nil {
-			r.to = values[len(values)-1]
-		}
-		return r
 	}
 	return ctx.mkIncompatible(src, op, x, other)
 }
@@ -521,6 +548,13 @@ func (x *nullLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 			return x
 		}
 
+	case *bound:
+		// Not strictly necessary, but handling this results in better error
+		// messages.
+		if op == opUnify {
+			return other.binOp(ctx, src, opUnify, x)
+		}
+
 	default:
 		switch op {
 		case opEql:
@@ -610,6 +644,14 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 	return ctx.mkIncompatible(src, op, x, other)
 }
 
+func test(ctx *context, src source, op op, a, b evaluated) bool {
+	v := binOp(ctx, src, op, a, b)
+	if isBottom(v) {
+		return false
+	}
+	return v.(*boolLit).b
+}
+
 func leq(ctx *context, src source, a, b evaluated) bool {
 	if isTop(a) || isTop(b) {
 		return true
@@ -621,42 +663,35 @@ func leq(ctx *context, src source, a, b evaluated) bool {
 	return v.(*boolLit).b
 }
 
-func maxNum(v evaluated) evaluated {
+// TODO: should these go?
+func maxNum(v value) value {
 	switch x := v.(type) {
 	case *numLit:
 		return x
-	case *rangeLit:
-		return maxNum(x.to.(evaluated))
+	case *bound:
+		switch x.op {
+		case opLeq:
+			return x.value
+		case opLss:
+			return &binaryExpr{x.baseValue, opSub, x.value, one}
+		}
+		return &basicType{x.baseValue, intKind}
 	}
 	return v
 }
 
-func minNum(v evaluated) evaluated {
+func minNum(v value) value {
 	switch x := v.(type) {
 	case *numLit:
 		return x
-	case *rangeLit:
-		return minNum(x.from.(evaluated))
-	}
-	return v
-}
-
-func maxNumRaw(v value) value {
-	switch x := v.(type) {
-	case *numLit:
-		return x
-	case *rangeLit:
-		return maxNumRaw(x.to)
-	}
-	return v
-}
-
-func minNumRaw(v value) value {
-	switch x := v.(type) {
-	case *numLit:
-		return x
-	case *rangeLit:
-		return minNumRaw(x.from)
+	case *bound:
+		switch x.op {
+		case opGeq:
+			return x.value
+		case opGtr:
+			return &binaryExpr{x.baseValue, opAdd, x.value, one}
+		}
+		return &basicType{x.baseValue, intKind}
 	}
 	return v
 }
@@ -690,13 +725,6 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		if op == opUnify {
 			return y.binOp(ctx, src, op, x)
 		}
-		// infinity math
-		// 4 * int = int
-	case *rangeLit:
-		if op == opUnify {
-			return y.binOp(ctx, src, op, x)
-		}
-		// 5..7 - 8 = -3..4
 	case *numLit:
 		k := unifyType(x.kind(), y.kind())
 		n := newNumBin(k, x, y)
@@ -843,6 +871,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		if !ok {
 			break
 		}
+
 		n := unify(ctx, src, x.len.(evaluated), y.len.(evaluated))
 		if isBottom(n) {
 			src = mkBin(ctx, src.Pos(), op, x, other)

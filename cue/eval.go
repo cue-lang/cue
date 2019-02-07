@@ -168,44 +168,19 @@ func (x *callExpr) evalPartial(ctx *context) (result evaluated) {
 	return e.err(err)
 }
 
-func (x *rangeLit) evalPartial(ctx *context) (result evaluated) {
+func (x *bound) evalPartial(ctx *context) (result evaluated) {
 	if ctx.trace {
-		defer uni(indent(ctx, "rangeLit", x))
+		defer uni(indent(ctx, "bound", x))
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
-	rngFrom := x.from.evalPartial(ctx)
-	rngTo := x.to.evalPartial(ctx)
-	// rngFrom := ctx.manifest(x.from)
-	// rngTo := ctx.manifest(x.to)
-	// kind := unifyType(rngFrom.kind(), rngTo.kind())
-	// TODO: sufficient to do just this?
-	kind, _ := matchBinOpKind(opLeq, rngFrom.kind(), rngTo.kind())
-	if kind&comparableKind == bottomKind {
-		return ctx.mkErr(x, "invalid range: must be defined for strings or numbers")
+	v := x.value.evalPartial(ctx)
+	if isBottom(v) {
+		return ctx.mkErr(x, v, "error evaluating bound")
 	}
-	// Collapse evaluated nested ranges
-	if from, ok := rngFrom.(*rangeLit); ok {
-		rngFrom = from.from.(evaluated)
+	if v == x.value {
+		return x
 	}
-	if to, ok := rngTo.(*rangeLit); ok {
-		rngTo = to.to.(evaluated)
-	}
-	rng := &rangeLit{x.baseValue, rngFrom, rngTo}
-	if !rngFrom.kind().isGround() || !rngTo.kind().isGround() {
-		return rng
-	}
-	// validate range
-	comp := binOp(ctx, x, opLeq, rngFrom, rngTo)
-	if isBottom(comp) {
-		return ctx.mkErr(comp, "invalid range")
-	}
-	if !comp.(*boolLit).b {
-		return ctx.mkErr(x, "for ranges from <= to, found %v > %v", rngFrom, rngTo)
-	}
-	if binOp(ctx, x, opEql, rngFrom, rngTo).(*boolLit).b {
-		return rngFrom
-	}
-	return rng
+	return &bound{x.baseValue, x.op, v}
 }
 
 func (x *interpolation) evalPartial(ctx *context) (result evaluated) {
@@ -299,6 +274,11 @@ func (x *structLit) evalPartial(ctx *context) (result evaluated) {
 
 	// TODO: Handle cycle?
 
+	return x
+}
+
+func (x *unification) evalPartial(ctx *context) (result evaluated) {
+	// By definition, all of the values in this type are already evaluated.
 	return x
 }
 
@@ -460,10 +440,6 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 			return &basicType{v.baseValue, numeric | nonGround}
 		case *basicType:
 			return &basicType{v.baseValue, (v.k & numeric) | nonGround}
-		case *rangeLit:
-			from := evalUnary(ctx, src, op, v.from)
-			to := evalUnary(ctx, src, op, v.to)
-			return &rangeLit{src.base(), from, to}
 		}
 
 	case opNot:

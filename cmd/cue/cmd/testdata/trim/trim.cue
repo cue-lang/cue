@@ -19,7 +19,7 @@ foo <Name>: {
 	rcList: [{a: "a", c: b}]
 
 	t <Name>: {
-		x: 0..5
+		x: >=0 & <=5
 	}
 }
 
@@ -52,7 +52,7 @@ foo multipath: {
 	t <Name>: {
 		// Combined with the other template, we know the value must be 5 and
 		// thus the entry below can be eliminated.
-		x: 5..8
+		x: >=5 & <=8
 	}
 
 	t u: {

@@ -167,7 +167,7 @@ func TestSubsume(t *testing.T) {
 		97: {subsumes: true, in: `a: number + number, b: int + int`},
 		// TODO: allow subsumption of unevaluated values?
 		// TODO: may be false if we allow arithmetic on incomplete values.
-		98: {subsumes: true, in: `a: int + int, b: int * int`},
+		98: {subsumes: false, in: `a: int + int, b: int * int`},
 
 		99:  {subsumes: true, in: `a: !int, b: !int`},
 		100: {subsumes: true, in: `a: !number, b: !int`},
@@ -175,8 +175,8 @@ func TestSubsume(t *testing.T) {
 		// true because both evaluate to bottom
 		101: {subsumes: true, in: `a: !int, b: !number`},
 		// TODO: allow subsumption of unevaluated values?
-		// true because both evaluate to bottom
-		102: {subsumes: true, in: `a: int + int, b: !number`},
+		// May be true because both evaluate to bottom. false is always allowed.
+		102: {subsumes: false, in: `a: int + int, b: !number`},
 		// TODO: allow subsumption of unevaluated values?
 		// true because both evaluate to bool
 		103: {subsumes: true, in: `a: !bool, b: bool`},
@@ -256,7 +256,52 @@ func TestSubsume(t *testing.T) {
 		150: {subsumes: false, in: `a: number | *1, b: number | *2`},
 		151: {subsumes: true, in: `a: number | *2, b: number | *2`},
 		152: {subsumes: true, in: `a: int | *float, b: int | *2.0`},
-		154: {subsumes: true, in: `a: number, b: number | *2`},
+		153: {subsumes: true, in: `a: int | *2, b: int | *2.0`},
+		154: {subsumes: true, in: `a: number | *2 | *3, b: number | *2`},
+		155: {subsumes: true, in: `a: number, b: number | *2`},
+
+		// Bounds
+		170: {subsumes: true, in: `a: >=2, b: >=2`},
+		171: {subsumes: true, in: `a: >=1, b: >=2`},
+		172: {subsumes: true, in: `a: >0, b: >=2`},
+		173: {subsumes: true, in: `a: >1, b: >1`},
+		174: {subsumes: true, in: `a: >=1, b: >1`},
+		175: {subsumes: false, in: `a: >1, b: >=1`},
+		176: {subsumes: true, in: `a: >=1, b: >=1`},
+		177: {subsumes: true, in: `a: <1, b: <1`},
+		178: {subsumes: true, in: `a: <=1, b: <1`},
+		179: {subsumes: false, in: `a: <1, b: <=1`},
+		180: {subsumes: true, in: `a: <=1, b: <=1`},
+
+		181: {subsumes: true, in: `a: !=1, b: !=1`},
+		182: {subsumes: false, in: `a: !=1, b: !=2`},
+
+		183: {subsumes: false, in: `a: !=1, b: <=1`},
+		184: {subsumes: true, in: `a: !=1, b: <1`},
+		185: {subsumes: false, in: `a: !=1, b: >=1`},
+		186: {subsumes: true, in: `a: !=1, b: <1`},
+
+		187: {subsumes: true, in: `a: !=1, b: <=0`},
+		188: {subsumes: true, in: `a: !=1, b: >=2`},
+		189: {subsumes: true, in: `a: !=1, b: >1`},
+
+		195: {subsumes: false, in: `a: >=2, b: !=2`},
+		196: {subsumes: false, in: `a: >2, b: !=2`},
+		197: {subsumes: false, in: `a: <2, b: !=2`},
+		198: {subsumes: false, in: `a: <=2, b: !=2`},
+
+		// Conjunctions
+		200: {subsumes: true, in: `a: >0, b: >=2 & <=100`},
+		201: {subsumes: false, in: `a: >0, b: >=0 & <=100`},
+
+		210: {subsumes: true, in: `a: >=0 & <=100, b: 10`},
+		211: {subsumes: true, in: `a: >=0 & <=100, b: >=0 & <=100`},
+		212: {subsumes: false, in: `a: !=2 & !=4, b: >3`},
+		213: {subsumes: true, in: `a: !=2 & !=4, b: >5`},
+
+		// Disjunctions
+		230: {subsumes: true, in: `a: >5, b: >10 | 8`},
+		231: {subsumes: false, in: `a: >8, b: >10 | 8`},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

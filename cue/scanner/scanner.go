@@ -730,7 +730,7 @@ scanAgain:
 					s.next()
 					tok = token.ELLIPSIS
 				} else {
-					tok = token.RANGE
+					s.error(s.file.Offset(pos), "illegal token '..'; expected '.'")
 				}
 			} else {
 				tok = token.PERIOD

@@ -417,7 +417,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 		list.initLit()
 		if n.Ellipsis != token.NoPos || n.Type != nil {
-			list.len = &rangeLit{list.baseValue, list.len, &top{list.baseValue}}
+			list.len = &bound{list.baseValue, opGeq, list.len}
 			if n.Type != nil {
 				list.typ = v.walk(n.Type)
 			}
@@ -457,13 +457,24 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		value = call
 
 	case *ast.UnaryExpr:
-		if n.Op == token.MUL {
+		switch n.Op {
+		case token.NOT, token.ADD, token.SUB:
+			value = &unaryExpr{
+				newExpr(n),
+				tokenMap[n.Op],
+				v.walk(n.X),
+			}
+		case token.GEQ, token.GTR, token.LSS, token.LEQ, token.NEQ:
+			value = &bound{
+				newExpr(n),
+				tokenMap[n.Op],
+				v.walk(n.X),
+			}
+
+		case token.MUL:
 			return v.error(n, "preference mark not allowed at this position")
-		}
-		value = &unaryExpr{
-			newExpr(n),
-			tokenMap[n.Op],
-			v.walk(n.X),
+		default:
+			return v.error(n, "unsupported unary operator %q", n.Op)
 		}
 
 	case *ast.BinaryExpr:
@@ -473,12 +484,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			v.addDisjunctionElem(d, n.X, false)
 			v.addDisjunctionElem(d, n.Y, false)
 			value = d
-		case token.RANGE:
-			value = &rangeLit{
-				newExpr(n),
-				v.walk(n.X), // from
-				v.walk(n.Y), // to
-			}
+
 		default:
 			value = &binaryExpr{
 				newExpr(n),

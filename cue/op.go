@@ -67,8 +67,6 @@ const (
 	opIMod
 	opIQuo
 	opIRem
-
-	opRange // Used in computedSource
 )
 
 var opStrings = []string{
@@ -99,8 +97,6 @@ var opStrings = []string{
 	opIMod: "mod",
 	opIQuo: "quo",
 	opIRem: "rem",
-
-	opRange: "..",
 }
 
 func (op op) String() string { return opStrings[op] }
@@ -131,8 +127,6 @@ var tokenMap = map[token.Token]op{
 	token.NEQ: opNeq, // !=
 	token.LEQ: opLeq, // <=
 	token.GEQ: opGeq, // >=
-
-	token.RANGE: opRange, // ..
 }
 
 var opMap = map[op]token.Token{}

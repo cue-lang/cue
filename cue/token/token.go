@@ -77,7 +77,6 @@ const (
 	LBRACE   // {
 	COMMA    // ,
 	PERIOD   // .
-	RANGE    // ..
 	ELLIPSIS // ...
 
 	RPAREN    // )
@@ -148,7 +147,6 @@ var tokens = [...]string{
 	LBRACE:   "{",
 	COMMA:    ",",
 	PERIOD:   ".",
-	RANGE:    "..",
 	ELLIPSIS: "...",
 
 	RPAREN:    ")",
@@ -222,8 +220,6 @@ func (tok Token) Precedence() int {
 		return 6
 	case MUL, QUO, REM, IDIV, IMOD, IQUO, IREM:
 		return 7
-	case RANGE:
-		return 8
 	}
 	return lowestPrec
 }

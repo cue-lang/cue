@@ -74,11 +74,11 @@ func TestExport(t *testing.T) {
 		in: `{
 			a: 5*[int]
 			a: [1, 2, ...]
-			b: 0..5*[int]
+			b: <=5*[int]
 			b: [1, 2, ...]
-			c: 3..5*[int]
+			c: (>=3 & <=5)*[int]
 			c: [1, 2, ...]
-			d: 2.._*[int]
+			d: >=2*[int]
 			d: [1, 2, ...]
 			e: [...int]
 			e: [1, 2, ...]
@@ -87,16 +87,16 @@ func TestExport(t *testing.T) {
 		out: unindent(`
 			{
 				a: 5*[int] & [1, 2, ...int]
-				b: 2..5*[int] & [1, 2, ...int]
-				c: 3..5*[int] & [1, 2, ...int]
+				b: (>=2 & <=5)*[int] & [1, 2, ...int]
+				c: (<=5 & >=3)*[int] & [1, 2, ...int]
 				d: [1, 2, ...int]
 				e: [1, 2, ...int]
 				f: [1, 2, ...]
 			}`),
 	}, {
 		in: `{
-			a: (0.._)*[int]
-			a: (0.._)*[...int]
+			a: >=0*[int]
+			a: [...int]
 		}`,
 		out: unindent(`
 			{
@@ -120,6 +120,23 @@ func TestExport(t *testing.T) {
 				b: a[2:3]
 			}`),
 	}, {
+		in: `{
+			a: >=0 & <=10 & !=1
+		}`,
+		out: unindent(`
+			{
+				a: >=0 & <=10 & !=1
+			}`),
+	}, {
+		raw: true,
+		in: `{
+				a: >=0 & <=10 & !=1
+			}`,
+		out: unindent(`
+			{
+				a: >=0 & <=10 & !=1
+			}`),
+	}, {
 		raw: true,
 		in:  `{ a: [1, 2], b: { "\(k)": v for k, v in a if a > 1 } }`,
 		out: unindent(`
@@ -139,10 +156,10 @@ func TestExport(t *testing.T) {
 			}`),
 	}, {
 		raw: true,
-		in:  `{ a: 0..10, b: "Count: \(a) times" }`,
+		in:  `{ a: >=0 & <=10, b: "Count: \(a) times" }`,
 		out: unindent(`
 			{
-				a: 0..10
+				a: >=0 & <=10
 				b: "Count: \(a) times"
 			}`),
 	}, {

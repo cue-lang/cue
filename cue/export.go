@@ -99,6 +99,18 @@ func (p *exporter) expr(v value) ast.Expr {
 			X:  p.expr(x.left),
 			Op: opMap[x.op], Y: p.expr(x.right),
 		}
+	case *bound:
+		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.value)}
+	case *unification:
+		if len(x.values) == 1 {
+			return p.expr(x.values[0])
+		}
+		bin := p.expr(x.values[0])
+		for _, v := range x.values[1:] {
+			bin = &ast.BinaryExpr{X: bin, Op: token.UNIFY, Y: p.expr(v)}
+		}
+		return bin
+
 	case *disjunction:
 		if len(x.values) == 1 {
 			return p.expr(x.values[0].val)
@@ -110,12 +122,8 @@ func (p *exporter) expr(v value) ast.Expr {
 			}
 			return e
 		}
-		bin := &ast.BinaryExpr{
-			X:  expr(x.values[0]),
-			Op: token.DISJUNCTION,
-			Y:  expr(x.values[1]),
-		}
-		for _, v := range x.values[2:] {
+		bin := expr(x.values[0])
+		for _, v := range x.values[1:] {
 			bin = &ast.BinaryExpr{X: bin, Op: token.DISJUNCTION, Y: expr(v)}
 		}
 		return bin
@@ -203,13 +211,6 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *durationLit:
 		panic("unimplemented")
 
-	case *rangeLit:
-		return &ast.BinaryExpr{
-			X:  p.expr(x.from),
-			Op: token.RANGE,
-			Y:  p.expr(x.to),
-		}
-
 	case *interpolation:
 		t := &ast.Interpolation{}
 		multiline := false
@@ -257,10 +258,10 @@ func (p *exporter) expr(v value) ast.Expr {
 		for _, e := range x.a {
 			list.Elts = append(list.Elts, p.expr(e))
 		}
-		max := maxNumRaw(x.len)
+		max := maxNum(x.len)
 		num, ok := max.(*numLit)
 		if !ok {
-			min := minNumRaw(x.len)
+			min := minNum(x.len)
 			num, _ = min.(*numLit)
 		}
 		ln := 0
@@ -268,9 +269,14 @@ func (p *exporter) expr(v value) ast.Expr {
 			x, _ := num.v.Int64()
 			ln = int(x)
 		}
+		open := false
+		switch max.(type) {
+		case *top, *basicType:
+			open = true
+		}
 		if !ok || ln > len(x.a) {
 			list.Type = p.expr(x.typ)
-			if !isTop(max) && !isTop(x.typ) {
+			if !open && !isTop(x.typ) {
 				expr = &ast.BinaryExpr{
 					X: &ast.BinaryExpr{
 						X:  p.expr(x.len),

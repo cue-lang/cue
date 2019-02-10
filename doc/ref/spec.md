@@ -269,13 +269,14 @@ These may be used as identifiers to refer to fields in all other contexts.
 The following character sequences represent operators and punctuation:
 
 ```
-+    div   &&    ==    !=    (    )
--    mod   ||    <     <=    [    ]
-*    quo   !     >     >=    {    }
-/    rem   &     :     <-    ;    ,
-%    _|_   |     =           ...  .
++     div   &&    ==    <     .     (     )
+-     mod   ||    !=    >     :     {     }
+*     quo   &     =~    <=    =     [     ]
+/     rem   |     !~    >=    <-    ...   ,
+%           _|_   !           ;
 ```
 <!-- :: for "is-a" definitions -->
+
 
 ### Integer literals
 
@@ -1586,12 +1587,18 @@ Comparison operators compare two operands and yield an untyped boolean value.
 <=    less or equal
 >     greater
 >=    greater or equal
+=~    matches regular expression
+!~    does not match regular expression
 ```
+<!-- regular expression operator inspired by Bash, Perl, and Ruby. -->
 
-In any comparison, the types of the two operands must unify.
+In any comparison, the types of the two operands must unify or one of the
+operands must be null.
 
 The equality operators `==` and `!=` apply to operands that are comparable.
 The ordering operators `<`, `<=`, `>`, and `>=` apply to operands that are ordered.
+The matching operators `=~` and `!~` apply to a string and regular
+expression operand.
 These terms and the result of the comparisons are defined as follows:
 
 - Null is comparable with itself and any other type.
@@ -1605,11 +1612,25 @@ These terms and the result of the comparisons are defined as follows:
   normalization to Unicode normal form NFC.
 - Struct are not comparable.
 - Lists are not comparable.
+- The regular expression syntax is the one accepted by RE2,
+  described in https://github.com/google/re2/wiki/Syntax,
+  except for `\C`.
+- `s =~ r` is true if `s` matches the regular expression `r`.
+- `s !~ r` is true if `s` does not match regular expression `r`.
+<!-- TODO: Implementations should adopt an algorithm that runs in linear time? -->
+<!-- Consider implementing Level 2 of Unicode regular expresssion. -->
+
 ```
-a: 3 < 4       // true
-b: null == 2   // false
-c: null != {}  // true
-d: {} == {}    // _|_: structs are not comparable against structs
+3 < 4       // true
+null == 2   // false
+null != {}  // true
+{} == {}    // _|_: structs are not comparable against structs
+
+"Wild cats" =~ "cat"   // true
+"Wild cats" !~ "dog"   // true
+
+"foo" =~ "^[a-z]{3}$"  // true
+"foo" =~ "^[a-z]{4}$"  // false
 ```
 
 <!-- jba

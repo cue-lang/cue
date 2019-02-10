@@ -163,8 +163,11 @@ type kindInfo struct {
 
 var toKindInfo = map[kind]*kindInfo{}
 
-// matchBinOpKind reports whether the given op is possible for the given kinds
-// and what the result will be. Evaluating binary expressions uses this to
+// matchBinOpKind returns the result kind of applying the given op to operands with
+// the given kinds. The operation is disallowed if the return value is bottomKind. If
+// the second return value is true, the operands should be swapped before evaluation.
+//
+// Evaluating binary expressions uses this to
 // - fail incompatible operations early, even if the concrete types are
 //   not known,
 // - check the result type of unification,

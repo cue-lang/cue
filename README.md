@@ -92,6 +92,9 @@ Our canonical Git repository is located at https://cue.googlesource.com.
 
 To contribute, please read the [Contribution Guide](./doc/contribute.md).
 
+To report issues or make a feature request, use the
+[issue tracker](https://github.com/cuelang/cue/issues).
+
 ##### Note that we do not accept pull requests and that we use the issue tracker for bug reports and proposals only.
 
 Unless otherwise noted, the CUE source files are distributed

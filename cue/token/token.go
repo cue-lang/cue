@@ -72,6 +72,9 @@ const (
 	LEQ // <=
 	GEQ // >=
 
+	MAT  // =~
+	NMAT // !~
+
 	LPAREN   // (
 	LBRACK   // [
 	LBRACE   // {
@@ -141,6 +144,9 @@ var tokens = [...]string{
 	NEQ: "!=",
 	LEQ: "<=",
 	GEQ: ">=",
+
+	MAT:  "=~",
+	NMAT: "!~",
 
 	LPAREN:   "(",
 	LBRACK:   "[",
@@ -214,7 +220,7 @@ func (tok Token) Precedence() int {
 		return 3
 	case LAND:
 		return 4
-	case EQL, NEQ, LSS, LEQ, GTR, GEQ:
+	case EQL, NEQ, LSS, LEQ, GTR, GEQ, MAT, NMAT:
 		return 5
 	case ADD, SUB:
 		return 6

@@ -247,7 +247,7 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 		if u.isAnyOf(boolKind) {
 			return boolKind | catBits, invert
 		}
-	case opEql, opNeq:
+	case opEql, opNeq, opMat, opNMat:
 		if u.isAnyOf(fixedKinds) {
 			return boolKind | catBits, false
 		}

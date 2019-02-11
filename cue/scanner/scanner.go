@@ -793,9 +793,19 @@ scanAgain:
 		case '>':
 			tok = s.switch2(token.GTR, token.GEQ)
 		case '=':
-			tok = s.switch2(token.BIND, token.EQL)
+			if s.ch == '~' {
+				s.next()
+				tok = token.MAT
+			} else {
+				tok = s.switch2(token.BIND, token.EQL)
+			}
 		case '!':
-			tok = s.switch2(token.NOT, token.NEQ)
+			if s.ch == '~' {
+				s.next()
+				tok = token.NMAT
+			} else {
+				tok = s.switch2(token.NOT, token.NEQ)
+			}
 		case '&':
 			switch s.ch {
 			case '&':

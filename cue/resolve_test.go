@@ -101,6 +101,46 @@ func TestBasicRewrite(t *testing.T) {
 			`,
 		out: `<0>{a: _|_(from source), b: _|_(from source), c: true, d: false, e: true}`,
 	}, {
+		desc: "regexp",
+		in: `
+			c1: "a" =~ "a"
+			c2: "foo" =~ "[a-z]{3}"
+			c3: "foo" =~ "[a-z]{4}"
+			c4: "foo" !~ "[a-z]{4}"
+
+			b1: =~ "a"
+			b1: "a"
+			b2: =~ "[a-z]{3}"
+			b2: "foo"
+			b3: =~ "[a-z]{4}"
+			b3: "foo"
+			b4: !~ "[a-z]{4}"
+			b4: "foo"
+
+			s1: != "b" & =~"c"      // =~"c"
+			s2: != "b" & =~"[a-z]"  // != "b" & =~"[a-z]"
+
+			e1: "foo" =~ 1
+			e2: "foo" !~ true
+			e3: != "a" & <5
+		`,
+		out: `<0>{c1: true, ` +
+			`c2: true, ` +
+			`c3: false, ` +
+			`c4: true, ` +
+
+			`b1: "a", ` +
+			`b2: "foo", ` +
+			`b3: _|_((=~"[a-z]{4}" & "foo"):"foo" does not match =~"[a-z]{4}"), ` +
+			`b4: "foo", ` +
+
+			`s1: =~"c", ` +
+			`s2: (!="b" & =~"[a-z]"), ` +
+
+			`e1: _|_(("foo" =~ 1):unsupported op =~(string, number)), ` +
+			`e2: _|_(("foo" !~ true):unsupported op !~(string, bool)), ` +
+			`e3: _|_((!="a" & <5):unsupported op &((string)*, (number)*))}`,
+	}, {
 		desc: "arithmetic",
 		in: `
 			sum: -1 + +2        // 1
@@ -476,6 +516,12 @@ func TestResolve(t *testing.T) {
 			s4: <10 & !=10              // <10
 			s5: !=2 & !=2
 
+			// TODO: could change inequality
+			s6: !=2 & >=2
+			s7: >=2 & !=2
+
+			s8: !=5 & >5
+
 			s10: >=0 & <=10 & <12 & >1   // >1  & <=10
 			s11: >0 & >=0 & <=12 & <12   // >0  & <12
 
@@ -515,6 +561,11 @@ func TestResolve(t *testing.T) {
 			`s3: >5, ` +
 			`s4: <10, ` +
 			`s5: !=2, ` +
+
+			`s6: (!=2 & >=2), ` +
+			`s7: (>=2 & !=2), ` +
+
+			`s8: >5, ` +
 
 			`s10: (<=10 & >1), ` +
 			`s11: (>0 & <12), ` +

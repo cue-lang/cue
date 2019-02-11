@@ -464,7 +464,8 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				tokenMap[n.Op],
 				v.walk(n.X),
 			}
-		case token.GEQ, token.GTR, token.LSS, token.LEQ, token.NEQ:
+		case token.GEQ, token.GTR, token.LSS, token.LEQ,
+			token.NEQ, token.MAT, token.NMAT:
 			value = &bound{
 				newExpr(n),
 				tokenMap[n.Op],

@@ -330,8 +330,8 @@ This is an overview of the overall process:
 - **Step 1:** Clone the CUE source code from cue.googlesource.com
 and make sure it's stable by compiling and testing it once:
 ```
-$ git clone https://cue.googlesource.com/core
-$ cd core
+$ git clone https://cue.googlesource.com/cue
+$ cd cue
 $ go test ./...
 $ go install ./cmd/cue
 ```
@@ -385,8 +385,8 @@ Either clone from
 
 
 ```
-$ git clone https://github.com/cuelang/core   # or https://cue.googlesource.com/core
-$ cd core
+$ git clone https://github.com/cuelang/cue   # or https://cue.googlesource.com/cue
+$ cd cue
 $ go test ./...
 # go install ./cmd/cue
 ```
@@ -581,7 +581,7 @@ If you are sending a change against a subrepository, you must use
 the fully-qualified syntax supported by GitHub to make sure the change is
 linked to the issue in the main repository, not the subrepository.
 All issues are tracked in the main repository's issue tracker.
-The correct form is "Fixes cuelang/core#159".
+The correct form is "Fixes cuelang/cue#159".
 
 
 
@@ -923,7 +923,7 @@ It will look something like this:
 
 
 ```
-$ git fetch https://cue.googlesource.com/review refs/changes/21/13245/1 &amp;&amp; git checkout FETCH_HEAD
+$ git fetch https://cue.googlesource.com/review refs/changes/21/13245/1 && git checkout FETCH_HEAD
 ```
 
 To revert, change back to the branch you were working in.

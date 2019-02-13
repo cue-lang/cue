@@ -173,7 +173,7 @@ var toKindInfo = map[kind]*kindInfo{}
 // - keep type compatibility mapped at a central place
 // - reduce the amount op type switching.
 // - simplifies testing
-func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
+func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 	if op == opDisjunction {
 		return a | b, false
 	}
@@ -185,14 +185,16 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 	a = a & typeKinds
 	b = b & typeKinds
 	if valBits == bottomKind {
-		if op == opEql || op == opNeq || op == opUnify {
-			// Set invert for better error messages
-			// invert = aGround && !bGround
+		k := nullKind
+		switch op {
+		case opEql, opNeq:
+			fallthrough
+		case opUnify:
 			if a&nullKind != 0 {
-				return boolKind, false
+				return k, false
 			}
 			if b&nullKind != 0 {
-				return boolKind, true
+				return k, true
 			}
 			return bottomKind, false
 		}
@@ -219,12 +221,6 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 			}
 		case op.isCmp():
 			return boolKind, false
-		case op.allowImplicitNumCast():
-			if a.isAnyOf(intKind) ||
-				(a.isAnyOf(floatKind) && !b.isAnyOf(intKind)) {
-				return b | catBits, false
-			}
-			return a | catBits, false
 		}
 		return bottomKind, false
 	}
@@ -235,17 +231,17 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 	case op != opUnify && op != opLand && op != opLor && op != opNeq:
 
 	default:
-		invert = aGround && !bGround
+		swap = aGround && !bGround
 	}
 	// a and b have overlapping types.
 	switch op {
 	case opUnify:
 		// Increase likelihood of unification succeeding on first try.
-		return u, invert
+		return u, swap
 
 	case opLand, opLor:
 		if u.isAnyOf(boolKind) {
-			return boolKind | catBits, invert
+			return boolKind | catBits, swap
 		}
 	case opEql, opNeq, opMat, opNMat:
 		if u.isAnyOf(fixedKinds) {
@@ -265,11 +261,11 @@ func matchBinOpKind(op op, a, b kind) (k kind, invert bool) {
 			return u&scalarKinds | catBits, false
 		}
 	case opRem:
-		if u.isAnyOf(durationKind | intKind) {
-			return u&(durationKind|intKind) | catBits, false
+		if u.isAnyOf(floatKind) {
+			return floatKind | catBits, false
 		}
 	case opQuo:
-		if u.isAnyOf(durationKind | numKind) {
+		if u.isAnyOf(floatKind) {
 			return floatKind | catBits, false
 		}
 	case opIRem, opIMod:

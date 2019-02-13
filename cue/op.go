@@ -30,13 +30,6 @@ func (op op) isCmp() bool {
 	return opEql <= op && op <= opGeq
 }
 
-// allowImplicitNumCast returns whether an operator is allowed between two
-// different kind of numeric types without an explicit cast.
-// TODO: remove
-func (op op) allowImplicitNumCast() bool {
-	return opAdd <= op && op <= opQuo
-}
-
 type op uint16
 
 const (

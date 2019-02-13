@@ -17,6 +17,7 @@ package cue
 import (
 	"bytes"
 	"math/big"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -259,12 +260,14 @@ func errOutOfBounds(ctx *context, pos token.Pos, r *bound, v evaluated) *bottom 
 		pos = r.Pos()
 	}
 	e := mkBin(ctx, pos, opUnify, r, v)
-	if r.op == opNeq {
-		const msgInRange = "%v excluded by %v"
-		return ctx.mkErr(e, msgInRange, debugStr(ctx, v), debugStr(ctx, r))
+	msg := "%v not within bound %v"
+	switch r.op {
+	case opNeq, opNMat:
+		msg = "%v excluded by %v"
+	case opMat:
+		msg = "%v does not match %v"
 	}
-	const msgInRange = "%v not within bound %v"
-	return ctx.mkErr(e, msgInRange, debugStr(ctx, v), debugStr(ctx, r))
+	return ctx.mkErr(e, msg, debugStr(ctx, v), debugStr(ctx, r))
 }
 
 func opInfo(op op) (cmp op, norm int) {
@@ -279,6 +282,10 @@ func opInfo(op op) (cmp op, norm int) {
 		return opLss, -1
 	case opNeq:
 		return opNeq, 0
+	case opMat:
+		return opMat, 2
+	case opNMat:
+		return opNMat, 3
 	}
 	panic("cue: unreachable")
 }
@@ -312,11 +319,11 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 
 			switch {
 			case xCat == yCat:
-				if x.op == opNeq {
+				if x.op == opNeq || x.op == opMat || x.op == opNMat {
 					if test(ctx, x, opEql, xv, yv) {
 						return x
 					}
-					break
+					break // unify the two bounds
 				}
 
 				// xCat == yCat && x.op != opNeq
@@ -414,6 +421,11 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 				case d.Negative:
 					return ctx.mkErr(newSrc, "incompatible bounds %v and %v",
 						debugStr(ctx, x), debugStr(ctx, y))
+				}
+
+			case x.op == opNeq:
+				if !test(ctx, x, y.op, xv, yv) {
+					return y
 				}
 
 			case y.op == opNeq:
@@ -610,9 +622,21 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
-			return cmpTonode(src, op, strings.Compare(string(x.str), string(str)))
+			return cmpTonode(src, op, strings.Compare(x.str, str))
 		case opAdd:
 			return &stringLit{binSrc(src.Pos(), op, x, other), x.str + str}
+		case opMat:
+			b, err := regexp.MatchString(str, x.str)
+			if err != nil {
+				return ctx.mkErr(src, "error parsing regexp: %v", err)
+			}
+			return boolTonode(src, b)
+		case opNMat:
+			b, err := regexp.MatchString(str, x.str)
+			if err != nil {
+				return ctx.mkErr(src, "error parsing regexp: %v", err)
+			}
+			return boolTonode(src, !b)
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)

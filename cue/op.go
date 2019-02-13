@@ -51,6 +51,8 @@ const (
 
 	opEql
 	opNeq
+	opMat
+	opNMat
 
 	opLss
 	opGtr
@@ -79,8 +81,10 @@ var opStrings = []string{
 	opLor:  "||",
 	opNot:  "!",
 
-	opEql: "==",
-	opNeq: "!=",
+	opEql:  "==",
+	opNeq:  "!=",
+	opMat:  "=~",
+	opNMat: "!~",
 
 	opLss: "<",
 	opGtr: ">",
@@ -124,9 +128,11 @@ var tokenMap = map[token.Token]op{
 	token.GTR: opGtr, // >
 	token.NOT: opNot, // !
 
-	token.NEQ: opNeq, // !=
-	token.LEQ: opLeq, // <=
-	token.GEQ: opGeq, // >=
+	token.NEQ:  opNeq,  // !=
+	token.LEQ:  opLeq,  // <=
+	token.GEQ:  opGeq,  // >=
+	token.MAT:  opMat,  // =~
+	token.NMAT: opNMat, // !~
 }
 
 var opMap = map[op]token.Token{}

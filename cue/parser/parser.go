@@ -1104,7 +1104,8 @@ func (p *parser) parseUnaryExpr() ast.Expr {
 
 	switch p.tok {
 	case token.ADD, token.SUB, token.NOT, token.MUL,
-		token.NEQ, token.LSS, token.LEQ, token.GEQ, token.GTR:
+		token.LSS, token.LEQ, token.GEQ, token.GTR,
+		token.NEQ, token.MAT, token.NMAT:
 		pos, op := p.pos, p.tok
 		c := p.openComments()
 		p.next()

@@ -143,15 +143,54 @@ func TestBasicRewrite(t *testing.T) {
 	}, {
 		desc: "arithmetic",
 		in: `
+			i1: 1 & int
+			i2: 2 & int
+
 			sum: -1 + +2        // 1
 			str: "foo" + "bar"  // "foobar"
 			div1: 2.0 / 3 * 6   // 4
 			div2: 2 / 3 * 6     // 4
 			rem: 2 % 3          // 2
-			e: 2 + "a"          // _|_: unsupported op +(int, string))
 			b: 1 != 4
+
+			v1: 1.0T/2.0
+			v2: 2.0 == 2
+			v3: 2.0/3.0
+			v4: 2.0%3.0
+			v5: i1 div i2
+
+			e0: 2 + "a"
+			e1: 2.0 / i1
+			e2: i1 / 2.0
+			e3: 3.0 % i2
+			e4: i1 % 2.0
+			e5: 1.0 div 2
+			e6: 2 rem 2.0
+			e7: 2 quo 2.0
+			e8: 1.0 mod 1
 			`,
-		out: `<0>{sum: 1, str: "foobar", div1: 4.00000000000000000000000, div2: 4.00000000000000000000000, rem: 2, e: _|_((2 + "a"):unsupported op +(number, string)), b: true}`,
+		out: `<0>{i1: 1, i2: 2, ` +
+			`sum: 1, ` +
+			`str: "foobar", ` +
+			`div1: 4.00000000000000000000000, ` +
+			`div2: 4.00000000000000000000000, ` +
+			`rem: 2, ` +
+			`b: true, ` +
+			`v1: 5e+11, ` +
+			`v2: true, ` +
+			`v3: 0.666666666666666666666667, ` +
+			`v4: 2.0, ` +
+			`v5: 0, ` +
+
+			`e0: _|_((2 + "a"):unsupported op +(number, string)), ` +
+			`e1: _|_((2.0 / 1):unsupported op /(float, int)), ` +
+			`e2: _|_((1 / 2.0):unsupported op /(int, float)), ` +
+			`e3: _|_((3.0 % 2):unsupported op %(float, int)), ` +
+			`e4: _|_((1 % 2.0):unsupported op %(int, float)), ` +
+			`e5: _|_((1.0 div 2):unsupported op div(float, number)), ` +
+			`e6: _|_((2 rem 2.0):unsupported op rem(number, float)), ` +
+			`e7: _|_((2 quo 2.0):unsupported op quo(number, float)), ` +
+			`e8: _|_((1.0 mod 1):unsupported op mod(float, number))}`,
 	}, {
 		desc: "integer-specific arithmetic",
 		in: `
@@ -482,14 +521,14 @@ func TestResolve(t *testing.T) {
 	}, {
 		desc: "arithmetic",
 		in: `
-				v1: 1.0T/2.0  //
+				v1: 1.0T/2.0
 				v2: 2.0 == 2
-				i1: 1
-				v5: 2.0 / i1  // TODO: should probably fail
-				e1: 2.0 % 3
+				n1: 1
+				v5: 2.0 / n1
+				e1: 2.0 % (3&int)
 				e2: int & 4.0/2.0
 				`,
-		out: `<0>{v1: 5e+11, v2: true, i1: 1, v5: 2, e1: _|_((2.0 % 3):unsupported op %(float, number)), e2: _|_((int & 2):unsupported op &((int)*, float))}`,
+		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: _|_((2.0 % 3):unsupported op %(float, int)), e2: _|_((int & 2):unsupported op &((int)*, float))}`,
 	}, {
 		desc: "inequality",
 		in: `

@@ -19,7 +19,6 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"reflect"
 	"runtime"
 	"strings"
 	"testing"
@@ -92,25 +91,22 @@ var testTokens = [...]elt{
 	{token.FLOAT, "1e+100", literal},
 	{token.FLOAT, "1e-100", literal},
 	{token.FLOAT, "2.71828e-1000", literal},
-	{token.STRING, "`aa\n\n`", literal},
 	{token.STRING, "'a'", literal},
 	{token.STRING, "'\\000'", literal},
 	{token.STRING, "'\\xFF'", literal},
 	{token.STRING, "'\\uff16'", literal},
 	{token.STRING, "'\\U0000ff16'", literal},
 	{token.STRING, "'foobar'", literal},
-	{token.STRING, "`" + `foo
-	                        bar` +
-		"`",
-		literal,
-	},
-	{token.STRING, "`foobar`", literal},
-	{token.STRING, "`\r`", literal},
-	{token.STRING, "`foo\r\nbar`", literal},
+	{token.STRING, `#"foobar"#`, literal},
+	{token.STRING, `#"\r"#`, literal},
+	{token.STRING, `#"\("#`, literal},
+	{token.STRING, `#"\q"#`, literal},
+	{token.STRING, `###"\##q"###`, literal},
 	{token.STRING, "'" + `\r` + "'", literal},
 	{token.STRING, "'foo" + `\r\n` + "bar'", literal},
 	{token.STRING, `"foobar"`, literal},
 	{token.STRING, `"""\n  foobar\n  """`, literal},
+	{token.STRING, `#"""\n  \(foobar\n  """#`, literal},
 
 	// Operators and delimiters
 	{token.ADD, "+", operator},
@@ -299,7 +295,7 @@ func checkComma(t *testing.T, line string, mode Mode) {
 			// the illegal token literal indicates what
 			// kind of semicolon literal to expect
 			commaLit := "\n"
-			if lit[0] == '#' {
+			if lit[0] == '~' {
 				commaLit = ","
 			}
 			// next token must be a comma
@@ -323,11 +319,11 @@ func checkComma(t *testing.T, line string, mode Mode) {
 }
 
 var lines = []string{
-	// # indicates a comma present in the source
+	// ~ indicates a comma present in the source
 	// ? indicates an automatically inserted comma
 	"",
-	"\ufeff#,", // first BOM is ignored
-	"#,",
+	"\ufeff~,", // first BOM is ignored
+	"~,",
 	"foo?\n",
 	"_foo?\n",
 	"123?\n",
@@ -336,7 +332,7 @@ var lines = []string{
 	"_|_?\n",
 	"_|_?\n",
 	`"x"` + "?\n",
-	"`x`?\n",
+	"#'x'#?\n",
 	`"""
 		foo
 		"""` + "?\n",
@@ -379,7 +375,7 @@ var lines = []string{
 	"[[\n",
 	"{\n",
 	"{{\n",
-	"#,\n",
+	"~,\n",
 	".\n",
 
 	")?\n",
@@ -581,16 +577,18 @@ func TestInit(t *testing.T) {
 	}
 }
 
-func TestScanTemplate(t *testing.T) {
+func TestScanInterpolation(t *testing.T) {
 	// error handler
 	eh := func(pos token.Position, msg string) {
 		t.Errorf("error handler called (pos = %v, msg = %s)", pos, msg)
 	}
-	trim := func(s string) string { return strings.Trim(s, `"\\()`) }
+	trim := func(s string) string { return strings.Trim(s, `#"\\()`) }
 
 	sources := []string{
 		`"first\(first)\\second\(second)"`,
+		`#"first\#(first)\second\#(second)"#`,
 		`"level\( ["foo", "level", level ][2] )end\( end )"`,
+		`##"level\##( ["foo", "level", level ][2] )end\##( end )"##`,
 		`"level\( { "foo": 1, "bar": level } )end\(end)"`,
 	}
 	for i, src := range sources {
@@ -610,7 +608,7 @@ func TestScanTemplate(t *testing.T) {
 					count++
 				case token.RPAREN:
 					if count--; count == 0 {
-						str = trim(s.ResumeInterpolation('"', 1))
+						str = trim(s.ResumeInterpolation())
 					}
 				case token.INTERPOLATION:
 					str = trim(lit)
@@ -626,14 +624,14 @@ func TestScanTemplate(t *testing.T) {
 }
 
 func TestStdErrorHander(t *testing.T) {
-	const src = "#\n" + // illegal character, cause an error
-		"# #\n" + // two errors on the same line
+	const src = "~\n" + // illegal character, cause an error
+		"~ ~\n" + // two errors on the same line
 		"//line File2:20\n" +
-		"#\n" + // different file, but same line
+		"~\n" + // different file, but same line
 		"//line File2:1\n" +
-		"# #\n" + // same file, decreasing line number
+		"~ ~\n" + // same file, decreasing line number
 		"//line File1:1\n" +
-		"# # #" // original file, line 1 again
+		"~ ~ ~" // original file, line 1 again
 
 	var list errors.List
 	eh := func(pos token.Position, msg string) { list.AddNew(pos, msg) }
@@ -743,10 +741,6 @@ var errorTests = []struct {
 	{`"\U00000000"`, token.STRING, 0, `"\U00000000"`, ""},
 	{`"\Uffffffff"`, token.STRING, 2, `"\Uffffffff"`, "escape sequence is invalid Unicode code point"},
 	{`'`, token.STRING, 0, `'`, "string literal not terminated"},
-	// TODO
-	// {`'\`, token.STRING, 0, `'\`, "raw string literal not terminated"}, // "escape sequence not terminated"},
-	// {"`\n", token.STRING, 0, s"`\n", "raw string literal not terminated"},
-	// {"'\n   ", token.STRING, 0, "'", "raw string literal not terminated"},
 	{`""`, token.STRING, 0, `""`, ""},
 	{`"abc`, token.STRING, 0, `"abc`, "string literal not terminated"},
 	{`""abc`, token.STRING, 0, `""`, ""},
@@ -754,11 +748,19 @@ var errorTests = []struct {
 	{`'''abc`, token.STRING, 0, `'''abc`, "string literal not terminated"},
 	{"\"abc\n", token.STRING, 0, `"abc`, "string literal not terminated"},
 	{"\"abc\n   ", token.STRING, 0, `"abc`, "string literal not terminated"},
-	{"``", token.STRING, 0, "``", ""},
+	{`#""`, token.STRING, 0, `#""`, "string literal not terminated"},
+	{`#"""`, token.STRING, 0, `#"""`, "string literal not terminated"},
+	{`#""#`, token.STRING, 0, `#""#`, ""},
 	// {"$", IDENT, 0, "$", ""}, // TODO: for root of file?
-	{"`", token.STRING, 0, "`", "raw string literal not terminated"},
+	{"#'", token.STRING, 0, "#'", "string literal not terminated"},
 	{"''", token.STRING, 0, "''", ""},
 	{"'", token.STRING, 0, "'", "string literal not terminated"},
+	{`"\("`, token.INTERPOLATION, 0, `"\(`, ""},
+	{`#"\("#`, token.STRING, 0, `#"\("#`, ""},
+	{`#"\#("#`, token.INTERPOLATION, 0, `#"\#(`, ""},
+	{`"\q"`, token.STRING, 2, `"\q"`, "unknown escape sequence"},
+	{`#"\q"#`, token.STRING, 0, `#"\q"#`, ""},
+	{`#"\#q"#`, token.STRING, 4, `#"\#q"#`, "unknown escape sequence"},
 	{"/**/", token.COMMENT, 0, "/**/", ""},
 	{"/*", token.COMMENT, 0, "/*", "comment not terminated"},
 	{"0", token.INT, 0, "0", ""},
@@ -861,332 +863,6 @@ func BenchmarkScanFile(b *testing.B) {
 			if tok == token.EOF {
 				break
 			}
-		}
-	}
-}
-
-func TestScanner_next(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.s.next()
-	}
-}
-
-func TestScanner_Init(t *testing.T) {
-	type args struct {
-		file *token.File
-		src  []byte
-		err  errors.Handler
-		mode Mode
-	}
-	tests := []struct {
-		name string
-		s    *Scanner
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.s.Init(tt.args.file, tt.args.src, tt.args.err, tt.args.mode)
-	}
-}
-
-func TestScanner_error(t *testing.T) {
-	type args struct {
-		offs int
-		msg  string
-	}
-	tests := []struct {
-		name string
-		s    *Scanner
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.s.error(tt.args.offs, tt.args.msg)
-	}
-}
-
-func TestScanner_interpretLineComment(t *testing.T) {
-	type args struct {
-		text []byte
-	}
-	tests := []struct {
-		name string
-		s    *Scanner
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.s.interpretLineComment(tt.args.text)
-	}
-}
-
-func TestScanner_scanComment(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.s.scanComment(); got != tt.want {
-			t.Errorf("%q. Scanner.scanComment() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_findLineEnd(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.s.findLineEnd(); got != tt.want {
-			t.Errorf("%q. Scanner.findLineEnd() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func Test_isLetter(t *testing.T) {
-	type args struct {
-		ch rune
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := isLetter(tt.args.ch); got != tt.want {
-			t.Errorf("%q. isLetter() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func Test_isDigit(t *testing.T) {
-	type args struct {
-		ch rune
-	}
-	tests := []struct {
-		name string
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := isDigit(tt.args.ch); got != tt.want {
-			t.Errorf("%q. isDigit() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_scanIdentifier(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.s.scanIdentifier(); got != tt.want {
-			t.Errorf("%q. Scanner.scanIdentifier() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func Test_digitVal(t *testing.T) {
-	type args struct {
-		ch rune
-	}
-	tests := []struct {
-		name string
-		args args
-		want int
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := digitVal(tt.args.ch); got != tt.want {
-			t.Errorf("%q. digitVal() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_scanMantissa(t *testing.T) {
-	type args struct {
-		base int
-	}
-	tests := []struct {
-		name string
-		s    *Scanner
-		args args
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.s.scanMantissa(tt.args.base)
-	}
-}
-
-func TestScanner_scanNumber(t *testing.T) {
-	type args struct {
-		seenDecimalPoint bool
-	}
-	tests := []struct {
-		name  string
-		s     *Scanner
-		args  args
-		want  token.Token
-		want1 string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		got, got1 := tt.s.scanNumber(tt.args.seenDecimalPoint)
-		if !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. Scanner.scanNumber() got = %v, want %v", tt.name, got, tt.want)
-		}
-		if got1 != tt.want1 {
-			t.Errorf("%q. Scanner.scanNumber() got1 = %v, want %v", tt.name, got1, tt.want1)
-		}
-	}
-}
-
-func TestScanner_scanEscape(t *testing.T) {
-	type args struct {
-		quote rune
-	}
-	tests := []struct {
-		name string
-		s    *Scanner
-		args args
-		want bool
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got, _ := tt.s.scanEscape(tt.args.quote); got != tt.want {
-			t.Errorf("%q. Scanner.scanEscape() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_scanString(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if _, got := tt.s.scanString(rune(tt.name[0]), 1, 1); got != tt.want {
-			t.Errorf("%q. Scanner.scanString() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func Test_stripCR(t *testing.T) {
-	type args struct {
-		b []byte
-	}
-	tests := []struct {
-		name string
-		args args
-		want []byte
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := stripCR(tt.args.b); !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. stripCR() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_scanRawString(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-		want string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.s.scanRawString(); got != tt.want {
-			t.Errorf("%q. Scanner.scanRawString() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_skipWhitespace(t *testing.T) {
-	tests := []struct {
-		name string
-		s    *Scanner
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		tt.s.skipWhitespace(1)
-	}
-}
-
-func TestScanner_switch2(t *testing.T) {
-	type args struct {
-		tok0 token.Token
-		tok1 token.Token
-	}
-	tests := []struct {
-		name string
-		s    *Scanner
-		args args
-		want token.Token
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		if got := tt.s.switch2(tt.args.tok0, tt.args.tok1); !reflect.DeepEqual(got, tt.want) {
-			t.Errorf("%q. Scanner.switch2() = %v, want %v", tt.name, got, tt.want)
-		}
-	}
-}
-
-func TestScanner_Scan(t *testing.T) {
-	tests := []struct {
-		name    string
-		s       *Scanner
-		wantPos token.Pos
-		wantTok token.Token
-		wantLit string
-	}{
-		// TODO: Add test cases.
-	}
-	for _, tt := range tests {
-		gotPos, gotTok, gotLit := tt.s.Scan()
-		if !reflect.DeepEqual(gotPos, tt.wantPos) {
-			t.Errorf("%q. Scanner.Scan() gotPos = %v, want %v", tt.name, gotPos, tt.wantPos)
-		}
-		if !reflect.DeepEqual(gotTok, tt.wantTok) {
-			t.Errorf("%q. Scanner.Scan() gotTok = %v, want %v", tt.name, gotTok, tt.wantTok)
-		}
-		if gotLit != tt.wantLit {
-			t.Errorf("%q. Scanner.Scan() gotLit = %v, want %v", tt.name, gotLit, tt.wantLit)
 		}
 	}
 }

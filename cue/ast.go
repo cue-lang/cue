@@ -17,6 +17,7 @@ package cue
 import (
 	"fmt"
 	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -382,36 +383,28 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 		lit := &interpolation{baseValue: newExpr(n), k: stringKind}
 		value = lit
-		quote, err := stringType(first.Value)
+		info, prefixLen, _, err := ParseQuotes(first.Value, last.Value)
 		if err != nil {
 			return v.error(n, "invalid interpolation: %v", err)
 		}
-		if quote[0] == '\'' {
-			return v.error(n, "interpolation not implemented for bytes: %v", err)
-		}
-		ws, err := wsPrefix(last.Value, quote)
-		if err != nil {
-			return v.error(n, "invalid interpolation: %v", err)
-		}
-		prefix := quote
-		multi := len(quote) == 3
-		p := v.litParser
+		prefix := ""
 		for i := 0; i < len(n.Elts); i += 2 {
 			l, ok := n.Elts[i].(*ast.BasicLit)
 			if !ok {
 				return v.error(n, "invalid interpolation")
 			}
-			if err := p.init(l); err != nil {
-				return v.error(n, "invalid interpolation: %v", err)
+			s := l.Value
+			if !strings.HasPrefix(s, prefix) {
+				return v.error(l, "invalid interpolation: unmatched ')'")
 			}
+			s = l.Value[prefixLen:]
+			x := parseString(v.ctx(), l, info, s)
+			lit.parts = append(lit.parts, x)
 			if i+1 < len(n.Elts) {
-				x := p.parseString(prefix, `\(`, ws, multi, quote[0])
-				lit.parts = append(lit.parts, x, v.walk(n.Elts[i+1]))
-			} else {
-				x := p.parseString(prefix, quote, ws, multi, quote[0])
-				lit.parts = append(lit.parts, x)
+				lit.parts = append(lit.parts, v.walk(n.Elts[i+1]))
 			}
 			prefix = ")"
+			prefixLen = 1
 		}
 
 	case *ast.ListLit:

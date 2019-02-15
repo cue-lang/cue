@@ -49,8 +49,16 @@ type Scanner struct {
 	spacesSinceLast int
 	insertEOL       bool // insert a comma before next newline
 
+	quoteStack []quoteInfo
+
 	// public state - ok to modify
 	ErrorCount int // number of errors encountered
+}
+
+type quoteInfo struct {
+	char    rune
+	numChar int
+	numHash int
 }
 
 const bom = 0xFEFF // byte order mark, only permitted as very first character
@@ -406,16 +414,22 @@ exit:
 // escaped quote. In case of a syntax error, it stops at the offending
 // character (without consuming it) and returns false. Otherwise
 // it returns true.
-func (s *Scanner) scanEscape(quote rune) (ok, template bool) {
+func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
+	for i := 0; i < quote.numHash; i++ {
+		if s.ch != '#' {
+			return true, false
+		}
+		s.next()
+	}
+
 	offs := s.offset
 
 	var n int
 	var base, max uint32
 	switch s.ch {
-	// TODO: remove
 	case '(':
 		return true, true
-	case 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', quote:
+	case 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', quote.char:
 		s.next()
 		return true, false
 	case '0', '1', '2', '3', '4', '5', '6', '7':
@@ -454,6 +468,8 @@ func (s *Scanner) scanEscape(quote rune) (ok, template bool) {
 		n--
 	}
 
+	// TODO: this is valid JSON, so remove, but normalize and report an error
+	// if for unmatched surrogate pairs .
 	if x > max || 0xD800 <= x && x < 0xE000 {
 		s.error(offs, "escape sequence is invalid Unicode code point")
 		return false, false
@@ -462,7 +478,7 @@ func (s *Scanner) scanEscape(quote rune) (ok, template bool) {
 	return true, false
 }
 
-func (s *Scanner) scanString(quote rune, offset, numQuotes int) (token.Token, string) {
+func (s *Scanner) scanString(offset int, quote quoteInfo) (token.Token, string) {
 	// ", """, ', or ''' opening already consumed
 	offs := s.offset - offset
 
@@ -471,11 +487,11 @@ func (s *Scanner) scanString(quote rune, offset, numQuotes int) (token.Token, st
 	hasCR := false
 	extra := 0
 	for {
-		ch, n := s.consumeQuotes(quote, numQuotes)
-		if n == numQuotes {
+		ch, ok := s.consumeStringClose(quote)
+		if ok {
 			break
 		}
-		if (numQuotes != 3 && ch == '\n') || ch < 0 {
+		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
 			s.error(offs, "string literal not terminated")
 			lit := s.src[offs:s.offset]
 			if hasCR {
@@ -483,17 +499,17 @@ func (s *Scanner) scanString(quote rune, offset, numQuotes int) (token.Token, st
 			}
 			return tok, string(lit)
 		}
-		if ch == '\r' && numQuotes == 3 {
+		if ch == '\r' && quote.numChar == 3 {
 			hasCR = true
 		}
 		s.next()
 		if ch == '\\' {
-			if s.ch == '(' {
+			if _, interpolation := s.scanEscape(quote); interpolation {
 				tok = token.INTERPOLATION
 				extra = 1
+				s.quoteStack = append(s.quoteStack, quote)
 				break
 			}
-			s.scanEscape(quote)
 		}
 	}
 	lit := s.src[offs : s.offset+extra]
@@ -513,6 +529,27 @@ func (s *Scanner) consumeQuotes(quote rune, max int) (next rune, n int) {
 	return s.ch, n
 }
 
+func (s *Scanner) consumeStringClose(quote quoteInfo) (next rune, atEnd bool) {
+	for i := 0; i < quote.numChar; i++ {
+		if s.ch != quote.char {
+			return s.ch, false
+		}
+		s.next()
+	}
+	hasHash := s.hashCount(quote)
+	return s.ch, hasHash
+}
+
+func (s *Scanner) hashCount(quote quoteInfo) bool {
+	for i := 0; i < quote.numHash; i++ {
+		if s.ch != '#' {
+			return false
+		}
+		s.next()
+	}
+	return true
+}
+
 func stripCR(b []byte) []byte {
 	c := make([]byte, len(b))
 	i := 0
@@ -523,34 +560,6 @@ func stripCR(b []byte) []byte {
 		}
 	}
 	return c[:i]
-}
-
-func (s *Scanner) scanRawString() string {
-	// '`' opening already consumed
-	offs := s.offset - 1
-
-	hasCR := false
-	for {
-		ch := s.ch
-		if ch < 0 {
-			s.error(offs, "raw string literal not terminated")
-			break
-		}
-		s.next()
-		if ch == '`' {
-			break
-		}
-		if ch == '\r' {
-			hasCR = true
-		}
-	}
-
-	lit := s.src[offs:s.offset]
-	if hasCR {
-		lit = stripCR(lit)
-	}
-
-	return string(lit)
 }
 
 func (s *Scanner) skipWhitespace(inc int) {
@@ -586,8 +595,10 @@ func (s *Scanner) switch2(tok0, tok1 token.Token) token.Token {
 }
 
 // ResumeInterpolation resumes scanning of a string interpolation.
-func (s *Scanner) ResumeInterpolation(quote rune, numQuotes int) string {
-	_, str := s.scanString(quote, 1, numQuotes)
+func (s *Scanner) ResumeInterpolation() string {
+	quote := s.quoteStack[len(s.quoteStack)-1]
+	s.quoteStack = s.quoteStack[:len(s.quoteStack)-1]
+	_, str := s.scanString(1, quote)
 	return str
 }
 
@@ -665,6 +676,7 @@ scanAgain:
 		tok, lit = s.scanNumber(false)
 	default:
 		s.next() // always make progress
+		var quote quoteInfo
 		switch ch {
 		case -1:
 			if s.insertEOL {
@@ -676,7 +688,7 @@ scanAgain:
 			if s.ch == '|' {
 				// Unconditionally require this to be followed by another
 				// underscore to avoid needing an extra lookahead.
-				// Note that `_|x` is always equal to x.
+				// Note that `_|x` is always equal to _.
 				s.next()
 				if s.ch != '_' {
 					s.error(s.file.Offset(pos), "illegal token '_|'; expected '_'")
@@ -699,22 +711,33 @@ scanAgain:
 			// from s.skipWhitespace()
 			s.insertEOL = false // newline consumed
 			return s.file.Pos(offset, token.Elided), token.COMMA, "\n"
+		case '#':
+			for quote.numHash = 1; s.ch == '#'; quote.numHash++ {
+				s.next()
+			}
+			ch = s.ch
+			if ch != '\'' && ch != '"' {
+				break
+			}
+			s.next()
+			fallthrough
 		case '"', '\'':
 			insertEOL = true
+			quote.char = ch
+			quote.numChar = 1
+			offs := s.offset - 1 - quote.numHash
 			switch _, n := s.consumeQuotes(ch, 2); n {
 			case 1:
-				if ch == '"' {
-					tok, lit = token.STRING, `""`
-				} else {
-					tok, lit = token.STRING, `''`
+				if ch == '"' || ch == '\'' {
+					if !s.hashCount(quote) {
+						s.error(offs, "string literal not terminated")
+					}
+					tok, lit = token.STRING, string(s.src[offs:s.offset])
 				}
 			default:
-				tok, lit = s.scanString(ch, n+1, n+1)
+				quote.numChar = n + 1
+				tok, lit = s.scanString(quote.numChar+quote.numHash, quote)
 			}
-		case '`':
-			insertEOL = true
-			tok = token.STRING
-			lit = s.scanRawString()
 		case ':':
 			tok = token.COLON
 		case ';':

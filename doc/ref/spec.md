@@ -356,10 +356,15 @@ respectively, unescaped double or single quote.
 String literals may only be valid UTF-8.
 Byte sequences may contain any sequence of bytes.
 
-Several backslash escapes allow arbitrary values to be encoded as ASCII text
-in interpreted strings.
+Several escape sequences allow arbitrary values to be encoded as ASCII text.
+An escape sequence starts with an _escape delimiter_, which is `\` by default.
+The escape delimiter may be altered to be `\` plus a fixed number of
+hash symbols `#`
+by padding the start and end of a string or byte sequence literal
+with this number of hash symbols.
+
 There are four ways to represent the integer value as a numeric constant: `\x`
-followed by exactly two hexadecimal digits; \u followed by exactly four
+followed by exactly two hexadecimal digits; `\u` followed by exactly four
 hexadecimal digits; `\U` followed by exactly eight hexadecimal digits, and a
 plain backslash `\` followed by exactly three octal digits.
 In each case the value of the literal is the value represented by the
@@ -373,7 +378,7 @@ Octal escapes must represent a value between 0 and 255 inclusive.
 Hexadecimal escapes satisfy this condition by construction.
 The escapes `\u` and `\U` represent Unicode code points so within them
 some values are illegal, in particular those above `0x10FFFF`.
-Surrogate halves are allowed to be compatible with JSON,
+Surrogate halves are allowed,
 but are translated into their non-surrogate equivalent internally.
 
 The three-digit octal (`\nnn`) and two-digit hexadecimal (`\xnn`) escapes
@@ -383,8 +388,6 @@ Thus inside a string literal `\377` and `\xFF` represent a single byte of
 value `0xFF=255`, while `ÿ`, `\u00FF`, `\U000000FF` and `\xc3\xbf` represent
 the two bytes `0xc3 0xbf` of the UTF-8
 encoding of character `U+00FF`.
-
-After a backslash, certain single-character escapes represent special values:
 
 ```
 \a   U+0007 alert or bell
@@ -406,23 +409,34 @@ A `\(` must be followed by a valid CUE Expression, followed by a `)`.
 All other sequences starting with a backslash are illegal inside literals.
 
 ```
-escaped_char     = `\` ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
-unicode_value    = unicode_char | little_u_value | big_u_value | escaped_char .
+escaped_char     = `\` { `#` } ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
 byte_value       = octal_byte_value | hex_byte_value .
 octal_byte_value = `\` octal_digit octal_digit octal_digit .
 hex_byte_value   = `\` "x" hex_digit hex_digit .
 little_u_value   = `\` "u" hex_digit hex_digit hex_digit hex_digit .
 big_u_value      = `\` "U" hex_digit hex_digit hex_digit hex_digit
                            hex_digit hex_digit hex_digit hex_digit .
+unicode_value    = unicode_char | little_u_value | big_u_value | escaped_char .
+interpolation    = "\(" Expression ")" .
 
-string_lit             = interpreted_string_lit |
-                         interpreted_bytes_lit |
-                         multiline_lit .
+string_lit       = simple_string_lit |
+                   multiline_string_lit |
+                   simple_bytes_lit |
+                   multiline_bytes_lit |
+                   `#` string_lit `#` .
 
-interpolation          = "\(" Expression ")" .
-interpreted_string_lit = `"` { unicode_value | interpolation } `"` .
-interpreted_bytes_lit  = `"` { unicode_value | interpolation | byte_value } `"` .
+simple_string_lit    = `"` { unicode_value | interpolation } `"` .
+simple_bytes_lit     = `"` { unicode_value | interpolation | byte_value } `"` .
+multiline_string_lit = `"""` newline
+                             { unicode_value | interpolation | newline }
+                             newline `"""` .
+multiline_bytes_lit  = "'''" newline
+                             { unicode_value | interpolation | byte_value | newline }
+                             newline "'''" .
 ```
+
+Carriage return characters (`\r`) inside string literals are discarded from
+the raw string value.
 
 ```
 'a\000\xab'
@@ -438,6 +452,10 @@ interpreted_bytes_lit  = `"` { unicode_value | interpolation | byte_value } `"` 
 "\xff\u00FF"
 "\uD800"             // illegal: surrogate half (TODO: probably should allow)
 "\U00110000"         // illegal: invalid Unicode code point
+
+#"This is not an \(interpolation)"#
+#"This is an \#(interpolation)"#
+#"The sequence "\U0001F604" renders as \#U0001F604."#
 ```
 
 These examples all represent the same string:
@@ -455,13 +473,11 @@ If the source code represents a character as two code points, such as a
 combining form involving an accent and a letter, the result will appear as two
 code points if placed in a string literal.
 
-Each of the interpreted string variants have a multiline equivalent.
-Multiline interpreted strings are like their single-line equivalent,
+Strings and byte sequences have a multiline equivalent.
+Multiline strings are like their single-line equivalent,
 but allow newline characters.
-Carriage return characters (`\r`) inside raw string literals are discarded from
-the raw string value.
 
-Multiline interpreted strings and byte sequences respectively start with
+Multiline strings and byte sequences respectively start with
 a triple double quote (`"""`) or triple single quote (`'''`),
 immediately followed by a newline, which is discarded from the string contents.
 The string is closed by a matching triple quote, which must be by itself
@@ -471,16 +487,6 @@ line after the opening quote and will be removed from each of these
 lines in the string literal.
 A closing triple quote may not appear in the string.
 To include it is suffices to escape one of the quotes.
-
-```
-multiline_lit         = multiline_string_lit | multiline_bytes_lit .
-multiline_string_lit  = `"""` newline
-                        { unicode_char | interpolation | newline }
-                        newline `"""` .
-multiline_bytes_lit   = "'''" newline
-                        { unicode_char | interpolation | newline | byte_value }
-                        newline "'''" .
-```
 
 ```
 """
@@ -923,7 +929,7 @@ Declaration   = FieldDecl | AliasDecl | ComprehensionDecl .
 FieldDecl     = Label { Label } ":" Expression .
 
 AliasDecl     = Label "=" Expression .
-Label         = identifier | interpreted_string_lit | TemplateLabel .
+Label         = identifier | simple_string_lit | TemplateLabel .
 TemplateLabel = "<" identifier ">" .
 Tag           = "#" identifier [ ":" json_string ] .
 ```
@@ -1851,7 +1857,7 @@ in the list for each completed iteration.
 
 _Field comprehensions_ follow a `Field` with a clause sequence, where the
 label and value of the field are evaluated for each iteration.
-The label must be an identifier or interpreted_string_lit, where the
+The label must be an identifier or simple_string_lit, where the
 later may be a string interpolation that refers to the identifiers defined
 in the clauses.
 Values of iterations that map to the same label unify into a single field.

@@ -19,7 +19,7 @@ directory and all of its ancestor directories, belonging to the same package.
 This allows common configuration to be shared and policies to be enforced
 across a collection of related configurations.
 
-See the [Kubernetes Tutorial](../kubernetes/Readme.md) for a concrete example
+See the [Kubernetes Tutorial](../kubernetes/README.md) for a concrete example
 of instances.
 
 

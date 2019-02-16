@@ -203,10 +203,10 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 		}
 		if op == opMul {
 			if a.isAnyOf(listKind|stringKind|bytesKind) && b.isAnyOf(intKind) {
-				return a, false
+				return a | catBits, false
 			}
 			if b.isAnyOf(listKind|stringKind|bytesKind) && a.isAnyOf(intKind) {
-				return b, true
+				return b | catBits, true
 			}
 		}
 		// non-overlapping types

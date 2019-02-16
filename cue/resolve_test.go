@@ -332,6 +332,28 @@ func TestBasicRewrite(t *testing.T) {
 			`,
 		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, number)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: _|_((<=5 & 8):8 not within bound <=5), e5: _|_((<=5 & 8):8 not within bound <=5)}`,
 	}, {
+		desc: "list arithmetic",
+		in: `
+			list: [1,2,3]
+			mul0: list*0
+			mul1: list*1
+			mul2: 2*list
+			list1: [1]
+		    mul1_0: list1*0
+			mul1_1: 1*list1
+			mul1_2: list1*2
+			e: list*-1
+			`,
+		out: `<0>{list: [1,2,3], ` +
+			`mul0: [], ` +
+			`mul1: [1,2,3], ` +
+			`mul2: [1,2,3,1,2,3], ` +
+			`list1: [1], ` +
+			`mul1_0: [], ` +
+			`mul1_1: [1], ` +
+			`mul1_2: [1,1], ` +
+			`e: _|_((<1>.list * -1):negative number -1 multiplies list)}`,
+	}, {
 		desc: "selecting",
 		in: `
 			obj: {a: 1, b: 2}
@@ -409,7 +431,7 @@ func TestBasicRewrite(t *testing.T) {
 		`,
 		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):unsupported op &((int)*, (string)*)), e2: _|_((1 & string):unsupported op &(number, (string)*)), b: _|_(!int:unary '!' requires bool value, found (int)*), p: _|_(+true:unary '+' requires numeric value, found bool), m: _|_(-false:unary '-' requires numeric value, found bool)}`,
 	}, {
-		desc: "comparisson",
+		desc: "comparison",
 		in: `
 			lss: 1 < 2
 			leq: 1 <= 1.0
@@ -765,28 +787,41 @@ func TestResolve(t *testing.T) {
 		in: `
 			l0: 3*[int]
 			l0: [1, 2, 3]
-			l1: <=5*[string]
-			l1: ["a", "b"]
-			l2: <=5*[{ a: int }]
+			l2: [...{ a: int }]
 			l2: [{a: 1}, {a: 2, b: 3}]
 
 			// TODO: work out a decent way to specify length ranges of lists.
 			// l3: <=10*[int]
 			// l3: [1, 2, 3, ...]
 
-			s1: (<=6*[int])[2:3] // TODO: simplify 1*[int] to [int]
+			s1: (6*[int])[2:3]
 			s2: [0,2,3][1:2]
 
-			i1: (<=6*[int])[2]
+			i1: (6*[int])[2]
 			i2: [0,2,3][2]
 
 			t0: [...{a: 8}]
 			t0: [{}]
+			t1: [...]
+			t1: [...int]
 
-			e0: >=2*[{}]
+			e0: 2*[{}]
 			e0: [{}]
+			e1: [...int]
+			e1: [...float]
 			`,
-		out: `<0>{l0: [1,2,3], l1: ["a","b"], l2: [<1>{a: 1},<2>{a: 2, b: 3}], s1: 1*[int], s2: [2], i1: int, i2: 3, t0: [<3>{a: 8}], e0: _|_(([, ...<4>{}] & [<5>{}]):incompatible list lengths: 1 not within bound >=2)}`,
+		out: `<0>{` +
+			`l0: [1,2,3], ` +
+			`l2: [<1>{a: 1},<2>{a: 2, b: 3}], ` +
+			`s1: [int], ` +
+			`s2: [2], ` +
+			`i1: int, ` +
+			`i2: 3, ` +
+			`t0: [<3>{a: 8}], ` +
+			`t1: [, ...int], ` +
+			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):incompatible list lengths: cannot unify numbers 2 and 1), ` +
+			`e1: _|_(([, ...int] & [, ...float]):incompatible list types: unsupported op &((int)*, (float)*): )` +
+			`}`,
 	}, {
 		desc: "list arithmetic",
 		in: `
@@ -796,8 +831,20 @@ func TestResolve(t *testing.T) {
 			l3: <=2*[]
 			l4: <=2*[int]
 			l5: <=2*(int*[int])
-		`,
-		out: `<0>{l0: [1,2,3,1,2,3,1,2,3], l1: [], l2: [], l3: [], l4: <=2*[int], l5: <=2*[int]}`,
+			l6: 3*[...int]
+			l7: 3*[1, ...int]
+			l8: 3*[1, 2, ...int]
+			`,
+		out: `<0>{l0: [1,2,3,1,2,3,1,2,3], ` +
+			`l1: [], ` +
+			`l2: [], ` +
+			`l3: (<=2 * []), ` +
+			`l4: (<=2 * [int]), ` +
+			`l5: (<=2 * (int * [int])), ` +
+			`l6: [, ...int], ` +
+			`l7: [1,1,1, ...int], ` +
+			`l8: [1,2,1,2,1,2, ...int]` +
+			`}`,
 	}, {
 		desc: "correct error messages",
 		// Tests that it is okay to partially evaluate structs.
@@ -1506,7 +1553,13 @@ func TestFullEval(t *testing.T) {
 				c:  string
 			}
 		`,
-		out: `<0>{l: [<1>{c: "t", d: "t"}], a: <2>{c: "t", d: "t"}, b: <3>{c: string, d: string}, l1: [<4>{c: "t", d: "st"}], a1: <5>{c: "t", d: "st"}, b1: <6>{c: string, d: _|_(("s" + string):unsupported op +(string, (string)*))}}`,
+		out: `<0>{` +
+			`l: [<1>{c: "t", d: "t"}], ` +
+			`a: <2>{c: "t", d: "t"}, ` +
+			`b: <3>{c: string, d: string}, ` +
+			`l1: [<4>{c: "t", d: "st"}], ` +
+			`a1: <5>{c: "t", d: "st"}, ` +
+			`b1: <6>{c: string, d: ("s" + <7>.c)}}`,
 	}, {
 		desc: "ips",
 		in: `
@@ -1521,7 +1574,12 @@ func TestFullEval(t *testing.T) {
 
 		MyIP: Inst & [_, _, 10, 10 ]
 		`,
-		out: `<0>{IP: 4*[(>=0 & <=255)], Private: [192,168,(>=0 & <=255),(>=0 & <=255)], Inst: [10,10,(>=0 & <=255),(>=0 & <=255)], MyIP: [10,10,10,10]}`,
+		out: `<0>{` +
+			`IP: [(>=0 & <=255),(>=0 & <=255),(>=0 & <=255),(>=0 & <=255)], ` +
+			`Private: [192,168,(>=0 & <=255),(>=0 & <=255)], ` +
+			`Inst: [10,10,(>=0 & <=255),(>=0 & <=255)], ` +
+			`MyIP: [10,10,10,10]` +
+			`}`,
 	}, {
 		desc: "complex interaction of groundness",
 		in: `
@@ -1532,7 +1590,8 @@ func TestFullEval(t *testing.T) {
 			a b c d: string
 		`,
 		// TODO(perf): unification should catch shared node.
-		out: `<0>{res: [<1>{d: "b", s: "ab"}], a: <2>{b: <3>{<>: <4>(C: string)-><5>{d: string, s: ("a" + <5>.d)}, c: <6>{d: string, s: _|_(("a" + string):unsupported op +(string, (string)*))}}}}`,
+		out: `<0>{res: [<1>{d: "b", s: "ab"}], ` +
+			`a: <2>{b: <3>{<>: <4>(C: string)-><5>{d: string, s: ("a" + <5>.d)}, c: <6>{d: string, s: ("a" + <7>.d)}}}}`,
 	}, {
 		desc: "complex groundness 2",
 		in: `
@@ -1544,7 +1603,7 @@ func TestFullEval(t *testing.T) {
 			a b <C>: { d: string, s: "a" + d }
 			a b c d: string
 		`,
-		out: `<0>{r1: <1>{y: "c", res: <2>{d: "c", s: "ac"}}, f1: <3>{y: string, res: <4>{d: string, s: _|_(("a" + string):unsupported op +(string, (string)*))}}, a: <5>{b: <6>{<>: <7>(C: string)-><8>{d: string, s: ("a" + <8>.d)}, c: <9>{d: string, s: _|_(("a" + string):unsupported op +(string, (string)*))}}}}`,
+		out: `<0>{r1: <1>{y: "c", res: <2>{d: "c", s: "ac"}}, f1: <3>{y: string, res: <4>{d: string, s: (("a" + <5>.d) & ("a" + <5>.d))}}, a: <6>{b: <7>{<>: <8>(C: string)-><9>{d: string, s: ("a" + <9>.d)}, c: <10>{d: string, s: (("a" + <11>.d) & ("a" + <11>.d))}}}}`,
 	}, {
 		desc: "references from template to concrete",
 		in: `

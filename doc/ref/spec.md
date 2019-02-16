@@ -1546,12 +1546,13 @@ If list `a` is open, its default value, the shortest variant, is selected.
 [ 1, 2 ]      + [ 3, 4, ... ]  // [ 1, 2, 3, 4, ... ]
 ```
 
-Lists can be multiplied with a positive `int` using the `*` operator
+Lists can be multiplied with a non-negative`int` using the `*` operator
 to create a repeated the list by the indicated number.
 ```
 3*[1,2]         // [1, 2, 1, 2, 1, 2]
-3*[1, 2, ...]   // [1, 2, 1, 2, 1 ,2]
+3*[1, 2, ...]   // [1, 2, 1, 2, 1 ,2, ...]
 [byte]*4        // [byte, byte, byte, byte]
+0*[1,2]         // []
 ```
 
 <!-- TODO(mpvl): should we allow multiplication with a range?

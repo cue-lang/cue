@@ -65,7 +65,9 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		left, right = right, left
 	}
 	if op != opUnify {
-		if !kind.isGround() {
+		// Any operation other than unification or disjunction must be on
+		// concrete types. Disjunction is handled separately.
+		if !leftKind.isGround() || !rightKind.isGround() {
 			return ctx.mkErr(src, codeIncomplete, "incomplete error")
 		}
 		ctx.exprDepth++
@@ -959,39 +961,30 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		if !k.isAnyOf(intKind) {
 			panic("multiplication must be int type")
 		}
-		typ := x.typ.(evaluated)
-		ln := x.len.(evaluated)
 		n := &list{baseValue: binSrc(src.Pos(), op, x, other), typ: x.typ}
-		switch len(x.a) {
-		case 0:
-		case 1:
-			n.typ = binOp(ctx, src, opUnify, typ, x.a[0].evalPartial(ctx))
-		default:
+		if len(x.a) > 0 {
 			if !k.isGround() {
-				return x
+				// should never reach here.
+				break
 			}
 			if ln := other.(*numLit).intValue(ctx); ln > 0 {
-				// TODO: check error
 				for i := 0; i < ln; i++ {
 					// TODO: copy values
 					n.a = append(n.a, x.a...)
 				}
+			} else if ln < 0 {
+				return ctx.mkErr(src, "negative number %d multiplies list", ln)
 			}
 		}
 		switch v := x.len.(type) {
-		case *top, *basicType:
-			n.len = other
 		case *numLit:
-			switch v.intValue(ctx) {
-			case 0:
-				n.len = x.len
-			case 1:
-				n.len = other
-			default:
-				n.len = binOp(ctx, src, opMul, ln, other)
-			}
+			// Closed list
+			ln := &numLit{numBase: v.numBase}
+			ln.v.SetInt64(int64(len(n.a)))
+			n.len = ln
 		default:
-			n.len = binOp(ctx, src, opMul, ln, other)
+			// Open list
+			n.len = x.len
 		}
 		return n
 	}

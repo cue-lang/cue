@@ -463,6 +463,9 @@ type list struct {
 	a []value // TODO: could be arc?
 
 	typ value
+
+	// TODO: consider removing len. Currently can only be len(a) or >= len(a)
+	// and could be replaced with a bool.
 	len value
 }
 

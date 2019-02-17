@@ -12,7 +12,7 @@ this until later.
 
 By postponing that evaluation, we can often break cycles.
 This is very useful for template writers that may not know what fields
-a user will want ot fill out.
+a user will want to fill out.
 
 
 <!-- CUE editor -->

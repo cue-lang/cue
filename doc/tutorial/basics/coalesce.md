@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](conditional.md) [Next](cycles.md)
+[TOC](Readme.md) [Prev](conditional.md) [Next](cycle.md)
 
 _Expressions_
 

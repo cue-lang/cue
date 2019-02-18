@@ -42,6 +42,21 @@ func Simplify() Option {
 	return func(c *config) { c.simplify = true }
 }
 
+// UseSpaces specifies that tabs should be converted to spaces and sets the
+// default tab width.
+func UseSpaces(tabwidth int) Option {
+	return func(c *config) {
+		c.UseSpaces = true
+		c.Tabwidth = tabwidth
+	}
+}
+
+// TabIndent specifies whether to use tabs for indentation independent of
+// UseSpaces.
+func TabIndent(indent bool) Option {
+	return func(c *config) { c.TabIndent = indent }
+}
+
 // TODO: other options:
 //
 // const (

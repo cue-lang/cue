@@ -443,6 +443,22 @@ func TestBasicRewrite(t *testing.T) {
 		`,
 		out: `<0>{a: 100, b: 200, c: _|_(cycle detected), s1: <1>{a: 1, b: 2, c: 3}, s2: <2>{a: 1, b: 2, c: 3}, s3: <3>{a: 1, b: 2, c: 3}}`,
 	}, {
+		desc: "resolved self-reference cycles: Issue 19",
+		in: `
+			// CUE knows how to resolve the following:
+			x: y + 100
+			y: x - 100
+			x: 200
+
+			z1: z2 + 1
+			z2: z3 + 2
+			z3: z1 - 3
+			z3: 8
+
+			// TODO: extensive tests with disjunctions.
+		`,
+		out: `<0>{x: 200, y: 100, z1: 11, z2: 10, z3: 8}`,
+	}, {
 		desc: "delayed constraint failure",
 		in: `
 			a: b - 100

@@ -25,6 +25,7 @@ import (
 	"text/template"
 	"unicode"
 
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/third_party/yaml"
@@ -1283,7 +1284,7 @@ var builtinPackages = map[string][]*builtin{
 		Func: func(c *callCtxt) {
 			s := c.string(0)
 			c.ret, c.err = func() (interface{}, error) {
-				return Unquote(s)
+				return literal.Unquote(s)
 			}()
 		},
 	}, {

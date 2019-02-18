@@ -24,10 +24,10 @@ import (
 	"path"
 	"reflect"
 	"sort"
-	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	"github.com/cockroachdb/apd"
 )
 
@@ -349,7 +349,7 @@ func (c *callCtxt) strList(i int) (a []string) {
 
 // lookupBuiltinPkg returns the builtin package for the given path if it exists.
 func lookupBuiltinPkg(ctx *context, imp *ast.ImportSpec) evaluated {
-	path, err := strconv.Unquote(imp.Path.Value)
+	path, err := literal.Unquote(imp.Path.Value)
 	if err != nil {
 		return ctx.mkErr(newNode(imp), "illformed import spec")
 	}

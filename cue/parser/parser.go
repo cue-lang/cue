@@ -16,12 +16,12 @@ package parser
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
 )
@@ -1225,7 +1225,7 @@ type parseSpecFunction func(iota int) *ast.ImportSpec
 
 func isValidImport(lit string) bool {
 	const illegalChars = `!"#$%&'()*,:;<=>?[\]^{|}` + "`\uFFFD"
-	s, _ := strconv.Unquote(lit) // go/scanner returns a legal string literal
+	s, _ := literal.Unquote(lit) // go/scanner returns a legal string literal
 	for _, r := range s {
 		if !unicode.IsGraphic(r) || unicode.IsSpace(r) || strings.ContainsRune(illegalChars, r) {
 			return false

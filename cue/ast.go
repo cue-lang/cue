@@ -85,6 +85,10 @@ func (s *astState) setScope(n ast.Node, v scope) {
 
 func newVisitor(idx *index, inst *build.Instance, obj, resolveRoot *structLit) *astVisitor {
 	ctx := idx.newContext()
+	return newVisitorCtx(ctx, inst, obj, resolveRoot)
+}
+
+func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structLit) *astVisitor {
 	v := &astVisitor{
 		object: obj,
 	}

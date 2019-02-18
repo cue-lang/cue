@@ -13,6 +13,7 @@
 // limitations under the License.
 
 //go:generate go run gen.go
+//go:generate goimports -w builtins.go
 
 package cue
 
@@ -366,8 +367,9 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 		return v
 	case nil:
 		return &nullLit{src.base()}
-	case *Instance:
-		return v.eval(ctx)
+	case ast.Expr:
+		x := newVisitorCtx(ctx, nil, nil, nil)
+		return ctx.manifest(x.walk(v))
 	case error:
 		return ctx.mkErr(src, v.Error())
 	case bool:

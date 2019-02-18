@@ -18,27 +18,50 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 	"unicode/utf8"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 )
 
-func export(ctx *context, v value) ast.Expr {
-	e := exporter{ctx}
+type exportMode int
+
+const (
+	exportRaw exportMode = iota
+	exportEval
+)
+
+func export(ctx *context, v value, m exportMode) ast.Expr {
+	e := exporter{ctx, m}
 	return e.expr(v)
 }
 
 type exporter struct {
-	ctx *context
+	ctx  *context
+	mode exportMode
 }
 
-func (p *exporter) label(f label) *ast.Ident {
+func (p *exporter) label(f label) ast.Label {
 	orig := p.ctx.labelStr(f)
 	str := strconv.Quote(orig)
-	if len(orig)+2 == len(str) {
-		str = str[1 : len(str)-1]
+	if len(orig)+2 < len(str) {
+		return &ast.BasicLit{Value: str}
 	}
+	for i, r := range orig {
+		if unicode.IsLetter(r) || r == '_' {
+			continue
+		}
+		if i > 0 && unicode.IsDigit(r) {
+			continue
+		}
+		return &ast.BasicLit{Value: str}
+	}
+	return &ast.Ident{Name: orig}
+}
+
+func (p *exporter) identifier(f label) *ast.Ident {
+	str := p.ctx.labelStr(f)
 	return &ast.Ident{Name: str}
 }
 
@@ -50,12 +73,12 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 	switch x := v.(type) {
 	case *feed:
 		feed := &ast.ForClause{
-			Value:  p.label(x.fn.params.arcs[1].feature),
+			Value:  p.identifier(x.fn.params.arcs[1].feature),
 			Source: p.expr(x.source),
 		}
 		key := x.fn.params.arcs[0]
 		if p.ctx.labelStr(key.feature) != "_" {
-			feed.Key = p.label(key.feature)
+			feed.Key = p.identifier(key.feature)
 		}
 		return feed, x.fn.value.(yielder)
 
@@ -66,6 +89,10 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 }
 
 func (p *exporter) expr(v value) ast.Expr {
+	if p.mode == exportEval {
+		v = v.evalPartial(p.ctx)
+	}
+
 	// TODO: also add position information.
 	switch x := v.(type) {
 	case *builtin:
@@ -75,9 +102,9 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *selectorExpr:
 		n := p.expr(x.x)
 		if n == nil {
-			return p.label(x.feature)
+			return p.identifier(x.feature)
 		}
-		return &ast.SelectorExpr{X: n, Sel: p.label(x.feature)}
+		return &ast.SelectorExpr{X: n, Sel: p.identifier(x.feature)}
 	case *indexExpr:
 		return &ast.IndexExpr{X: p.expr(x.x), Index: p.expr(x.index)}
 	case *sliceExpr:
@@ -130,6 +157,9 @@ func (p *exporter) expr(v value) ast.Expr {
 
 	case *structLit:
 		obj := &ast.StructLit{}
+		if p.mode == exportEval {
+			x = x.expandFields(p.ctx)
+		}
 		if x.emit != nil {
 			obj.Elts = append(obj.Elts, &ast.EmitDecl{Expr: p.expr(x.emit)})
 		}
@@ -144,8 +174,14 @@ func (p *exporter) expr(v value) ast.Expr {
 			next := c.clauses
 			for {
 				if yield, ok := next.(*yield); ok {
+					l := p.expr(yield.key)
+					label, ok := l.(ast.Label)
+					if !ok {
+						// TODO: add an invalid field instead?
+						continue
+					}
 					f := &ast.Field{
-						Label: p.expr(yield.key).(ast.Label),
+						Label: label,
 						Value: p.expr(yield.value),
 					}
 					var decl ast.Decl = f

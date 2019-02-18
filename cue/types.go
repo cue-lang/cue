@@ -592,7 +592,7 @@ func (v Value) Syntax() ast.Expr {
 		return nil
 	}
 	ctx := v.ctx()
-	return export(ctx, v.eval(ctx))
+	return export(ctx, v.eval(ctx), exportEval)
 }
 
 // Decode initializes x with Value v. If x is a struct, it will validate the

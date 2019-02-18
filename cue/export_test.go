@@ -138,12 +138,12 @@ func TestExport(t *testing.T) {
 			}`),
 	}, {
 		raw: true,
-		in:  `{ a: [1, 2], b: { "\(k)": v for k, v in a if a > 1 } }`,
+		in:  `{ a: [1, 2], b: { "\(k)": v for k, v in a if v > 1 } }`,
 		out: unindent(`
 			{
 				a: [1, 2]
 				b: {
-					"\(k)": v for k, v in a if a > 1
+					"\(k)": v for k, v in a if v > 1
 				}
 			}`),
 	}, {
@@ -186,7 +186,7 @@ func TestExport(t *testing.T) {
 			v := newValueRoot(ctx, n)
 
 			buf := &bytes.Buffer{}
-			err := format.Node(buf, export(ctx, v.eval(ctx)))
+			err := format.Node(buf, export(ctx, v.eval(ctx), exportRaw))
 			if err != nil {
 				log.Fatal(err)
 			}

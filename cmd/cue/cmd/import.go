@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -658,7 +659,7 @@ func (h *hoister) hoist(expr ast.Expr) {
 				continue
 			}
 
-			str, err := cue.Unquote(lit.Value)
+			str, err := literal.Unquote(lit.Value)
 			if err != nil {
 				continue
 			}

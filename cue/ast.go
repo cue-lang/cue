@@ -16,11 +16,11 @@ package cue
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
@@ -131,7 +131,7 @@ func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 	if !isBottom(val) {
 		return val
 	}
-	path, err := strconv.Unquote(imp.Path.Value)
+	path, err := literal.Unquote(imp.Path.Value)
 	if err != nil {
 		return ctx.mkErr(newNode(imp), "illformed import spec")
 	}
@@ -383,7 +383,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 		lit := &interpolation{baseValue: newExpr(n), k: stringKind}
 		value = lit
-		info, prefixLen, _, err := ParseQuotes(first.Value, last.Value)
+		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)
 		if err != nil {
 			return v.error(n, "invalid interpolation: %v", err)
 		}

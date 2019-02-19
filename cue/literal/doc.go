@@ -1,4 +1,4 @@
-// Copyright 2018 The CUE Authors
+// Copyright 2019 CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,15 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package strconv
-
-import "cuelang.org/go/cue/literal"
-
-// Unquote interprets s as a single-quoted, double-quoted,
-// or backquoted CUE string literal, returning the string value
-// that s quotes.
-func Unquote(s string) (string, error) {
-	return literal.Unquote(s)
-}
-
-// TODO: replace parsing functions with parsing to apd
+// Package literal implements conversions to and from string representations of
+// basic data types.
+package literal

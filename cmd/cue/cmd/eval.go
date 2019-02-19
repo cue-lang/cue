@@ -16,11 +16,7 @@ package cmd
 
 import (
 	"fmt"
-	"io"
-	"strings"
-	"text/tabwriter"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
@@ -61,19 +57,22 @@ Examples:
 			exprs = append(exprs, expr)
 		}
 
-		tw := tabwriter.NewWriter(cmd.OutOrStdout(), 0, 0, 1, ' ', 0)
-		defer tw.Flush()
+		w := cmd.OutOrStdout()
+
 		for _, inst := range instances {
 			// TODO: use ImportPath or some other sanitized path.
-			fmt.Fprintf(cmd.OutOrStdout(), "// %s\n", inst.Dir)
-			p := evalPrinter{w: tw}
+			fmt.Fprintf(w, "// %s\n", inst.Dir)
+			opts := []format.Option{
+				format.UseSpaces(4),
+				format.TabIndent(false),
+			}
 			if exprs == nil {
-				p.print(inst.Value())
-				fmt.Fprintln(tw)
+				format.Node(w, inst.Value().Syntax(), opts...)
+				fmt.Fprintln(w)
 			}
 			for _, e := range exprs {
-				p.print(inst.Eval(e))
-				fmt.Fprintln(tw)
+				format.Node(w, inst.Eval(e).Syntax(), opts...)
+				fmt.Fprintln(w)
 			}
 		}
 		return nil
@@ -90,102 +89,3 @@ func init() {
 var (
 	expressions *[]string
 )
-
-type evalPrinter struct {
-	w        io.Writer
-	fset     *token.FileSet
-	indent   int
-	newline  bool
-	formfeed bool
-}
-
-type ws byte
-
-const (
-	unindent    = -1
-	indent      = 1
-	newline  ws = '\n'
-	vtab     ws = '\v'
-	space    ws = ' '
-
-	// maxDiffLen is the maximum different in length for object keys for which
-	// to still align keys and values.
-	maxDiffLen = 5
-)
-
-func (p *evalPrinter) print(args ...interface{}) {
-	for _, a := range args {
-		if d, ok := a.(int); ok {
-			p.indent += d
-			continue
-		}
-		if p.newline {
-			nl := '\n'
-			if p.formfeed {
-				nl = '\f'
-			}
-			p.w.Write([]byte{byte(nl)})
-			fmt.Fprint(p.w, strings.Repeat("    ", int(p.indent)))
-			p.newline = false
-		}
-		switch v := a.(type) {
-		case ws:
-			switch v {
-			case newline:
-				p.newline = true
-			default:
-				p.w.Write([]byte{byte(v)})
-			}
-		case string:
-			fmt.Fprint(p.w, v)
-		case cue.Value:
-			switch v.Kind() {
-			case cue.StructKind:
-				iter, err := v.AllFields()
-				must(err)
-				lastLen := 0
-				p.print("{", indent, newline)
-				for iter.Next() {
-					value := iter.Value()
-					key := iter.Label()
-					newLen := len([]rune(key)) // TODO: measure cluster length.
-					if lastLen > 0 && abs(lastLen, newLen) > maxDiffLen {
-						p.formfeed = true
-					} else {
-						k := value.Kind()
-						p.formfeed = k == cue.StructKind || k == cue.ListKind
-					}
-					p.print(key, ":", vtab, value, newline)
-					p.formfeed = false
-					lastLen = newLen
-				}
-				p.print(unindent, "}")
-			case cue.ListKind:
-				list, err := v.List()
-				must(err)
-				p.print("[", indent, newline)
-				for list.Next() {
-					p.print(list.Value(), newline)
-				}
-				p.print(unindent, "]")
-			default:
-				format.Node(p.w, v.Syntax())
-			}
-		}
-	}
-}
-
-func abs(a, b int) int {
-	a -= b
-	if a < 0 {
-		return -a
-	}
-	return a
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}

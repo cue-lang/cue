@@ -705,8 +705,10 @@ func (x *structLit) expandFields(ctx *context) *structLit {
 	// TODO(perf): improve big O
 	arcs := make([]arc, 0, len(x.arcs)+len(newArcs))
 	arcs = append(arcs, x.arcs...)
+	orig := x
 	x = &structLit{x.baseValue, emit, template, nil, arcs, nil}
 	x.expanded = x
+	orig.expanded = x
 
 outer:
 	for _, na := range newArcs {

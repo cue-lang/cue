@@ -288,6 +288,7 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
 
+	ctx.inSum++
 	dn := &disjunction{x.baseValue, make([]dValue, 0, len(x.values))}
 	changed := false
 	for _, v := range x.values {
@@ -307,6 +308,7 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 	if !changed {
 		dn = x
 	}
+	ctx.inSum--
 	return dn.normalize(ctx, x).val
 }
 
@@ -322,7 +324,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 		case d.marked:
 			if marked != nil {
 				// TODO: allow disjunctions to be returned as is.
-				return ctx.mkErr(x, "more than one default remaining (%v and %v)", debugStr(ctx, marked), debugStr(ctx, d.val))
+				return ctx.mkErr(x, codeIncomplete, "more than one default remaining (%v and %v)", debugStr(ctx, marked), debugStr(ctx, d.val))
 			}
 			marked = d.val.(evaluated)
 		case unmarked1 == nil:
@@ -336,7 +338,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 		return marked
 
 	case unmarked2 != nil:
-		return ctx.mkErr(x, "more than one element remaining (%v and %v)",
+		return ctx.mkErr(x, codeIncomplete, "more than one element remaining (%v and %v)",
 			debugStr(ctx, unmarked1), debugStr(ctx, unmarked2))
 
 	case unmarked1 != nil:
@@ -358,8 +360,10 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 	var left, right evaluated
 
 	if x.op != opUnify {
+		ctx.exprDepth++
 		left = ctx.manifest(x.left)
 		right = ctx.manifest(x.right)
+		ctx.exprDepth--
 
 		// TODO: allow comparing to a literal bottom only. Find something more
 		// principled perhaps. One should especially take care that two values
@@ -379,13 +383,11 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 		left = x.left.evalPartial(ctx)
 		right = x.right.evalPartial(ctx)
 
-		if err := cycleError(left); err != nil && right.kind().isAtom() {
-			return ctx.delayConstraint(right,
-				mkBin(ctx, x.Pos(), opUnify, x.left, right))
+		if err := cycleError(left); err != nil && ctx.inSum == 0 && right.kind().isAtom() {
+			return ctx.delayConstraint(right, x)
 		}
-		if err := cycleError(right); err != nil && left.kind().isAtom() {
-			return ctx.delayConstraint(left,
-				mkBin(ctx, x.Pos(), opUnify, left, x.right))
+		if err := cycleError(right); err != nil && ctx.inSum == 0 && left.kind().isAtom() {
+			return ctx.delayConstraint(left, x)
 		}
 
 		// check if it is a cycle that can be unwrapped.

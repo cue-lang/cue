@@ -468,7 +468,10 @@ func TestBasicRewrite(t *testing.T) {
 			x: 100
 			x: x + 1
 		`,
-		out: `<0>{a: _|_(((<1>.a + 110) & 200):constraint violated: _|_((210 & 200):cannot unify numbers 210 and 200)), b: 200, x: _|_((100 & (<1>.x + 1)):constraint violated: _|_((100 & 101):cannot unify numbers 100 and 101))}`,
+		out: `<0>{` +
+			`a: _|_((210 & 200):cannot unify numbers 210 and 200), ` +
+			`b: _|_((210 & 200):cannot unify numbers 210 and 200), ` +
+			`x: _|_((100 & 101):cannot unify numbers 100 and 101)}`,
 		// TODO: find a way to mark error in data.
 	}}
 	rewriteHelper(t, testCases, evalPartial)
@@ -1059,7 +1062,7 @@ func TestResolve(t *testing.T) {
 			}
 			a x: "hey"
 		`,
-		out: `<0>{a: <1>{x: _|_(((<2>.y + "?") & "hey"):constraint violated: _|_(("hey!?" & "hey"):failed to unify: hey!? != hey)), y: "hey!"}}`,
+		out: `<0>{a: <1>{x: _|_(("hey!?" & "hey"):failed to unify: hey!? != hey), y: "hey!"}}`,
 	}, {
 		desc: "resolved self-reference cycles with disjunctions",
 		in: `
@@ -1068,6 +1071,187 @@ func TestResolve(t *testing.T) {
 			c: a&{y:3} | {z:3}  // {x:1,y:3,z:2} | {z:3}
 		`,
 		out: `<0>{a: (<1>{x: 1, y: 3, z: 2} | <2>{y: 1}), b: (<3>{x: 2} | <4>{x: 1, y: 3, z: 2}), c: (<5>{x: 1, y: 3, z: 2} | <6>{z: 3})}`,
+	}, {
+		// We take a very conservative stance on delaying arithmetic
+		// expressions within disjunctions. It should remain resolvable, though,
+		// once the user specifies one.
+		desc: "resolved self-reference cycles with disjunction",
+		in: `
+			// The disjunction in xa could be resolved, but as disjunctions
+			// are not resolved for expression, it remains unresolved.
+			xa1: (xa2 & 8) | (xa4 & 9)
+			xa2: xa3 + 2
+			xa3: 6 & xa1-2
+			xa4: xa2 + 2
+
+			// As xb3 is a disjunction, xb2 cannot be resolved and evaluating
+			// the cycle completely is broken. However, it is not an error
+			// as the user might still resolve the disjunction.
+			xb1: (xb2 & 8) | (xb4 & 9)
+			xb2: xb3 + 2
+			xb3: (6 & (xb1-2)) | (xb4 & 9)
+			xb4: xb2 + 2
+
+			// Another variant with more disjunctions. xc1 remains with two
+			// possibilities. Technically, only the first value is valid.
+			// However, to fully determine that, all options of the remaining
+			// disjunction will have to be evaluated algebraically, which is
+			// not done.
+			xc1: xc2 & 8 | xc4 & 9 | xc5 & 9
+			xc2: xc3 + 2
+			xc3: 6 & xc1-2
+			xc4: xc2 + 1
+			xc5: xc2 + 2
+
+			// The above is resolved by setting xd1 explicitly.
+			xd1: xd2 & 8 | xd4 & 9 | xd5 & 9
+			xd2: xd3 + 2
+			xd3: 6 & xd1-2
+			xd4: xd2 + 1
+			xd5: xd2 + 2
+			xd1: 8
+
+			// The above is resolved by setting xd1 explicitly to the wrong
+			// value, resulting in an error.
+			xe1: xe2 & 8 | xe4 & 9 | xe5 & 9
+			xe2: xe3 + 2
+			xe3: 6 & xe1-2
+			xe4: xe2 + 1
+			xe5: xe2 + 2
+			xe1: 9
+
+			// TODO: this is resolvable, but requires some detection logic
+			// in disjunctions.
+			// xf1: xf2 & 8 | xf4 & 9
+			// xf2: xf3 + 2
+			// xf3: 6 & xf1-2 | xf4 & 9
+			// xf4: xf2 + 2
+			// xf1: 8
+			// xf3: 6
+
+			z1: z2 + 1 | z3 + 5
+			z2: z3 + 2
+			z3: z1 - 3
+			z3: 8
+		`,
+		out: `<0>{` +
+			`xa1: (8 | 9), ` +
+			`xa2: (<1>.xa3 + 2), ` +
+			`xa4: (<1>.xa2 + 2), ` +
+			`xa3: (6 & (<1>.xa1 - 2)), ` +
+
+			`xb1: _|_(((<1>.xb2 & 8) | (<1>.xb4 & 9)):empty disjunction: empty disjunction: cycle detected), ` +
+			`xb2: _|_(((6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+			`xb4: _|_(((6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+			`xb3: _|_(((6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+
+			`xc1: (8 | 9), ` +
+			`xc2: (<1>.xc3 + 2), ` +
+			`xc4: (<1>.xc2 + 1), ` +
+			`xc5: (<1>.xc2 + 2), ` +
+			`xc3: (6 & (<1>.xc1 - 2)), ` +
+
+			`xd1: 8, ` +
+			`xd2: 8, ` +
+			`xd4: 9, ` +
+			`xd5: 10, ` +
+			`xd3: 6, ` +
+
+			`xe1: 9, ` +
+			`xe2: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe4: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe5: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe3: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+
+			`z1: _|_(((<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
+			`z2: _|_(((<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
+			`z3: _|_(((<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected)}`,
+	}, {
+		// Defaults should not alter the result of the above disjunctions.
+		// The results may differ, but errors and resolution should be roughly
+		// the same.
+		desc: "resolved self-reference cycles with disjunction with defaults",
+		in: `
+			// The disjunction in xa could be resolved, but as disjunctions
+			// are not resolved for expression, it remains unresolved.
+			xa1: *(xa2 & 8) | (xa4 & 9)
+			xa2: xa3 + 2
+			xa3: 6 & xa1-2
+			xa4: xa2 + 2
+
+			// As xb3 is a disjunction, xb2 cannot be resolved and evaluating
+			// the cycle completely is broken. However, it is not an error
+			// as the user might still resolve the disjunction.
+			xb1: *(xb2 & 8) | (xb4 & 9)
+			xb2: xb3 + 2
+			xb3: *(6 & (xb1-2)) | (xb4 & 9)
+			xb4: xb2 + 2
+
+			// Another variant with more disjunctions. xc1 remains with two
+			// possibilities. Technically, only the first value is valid.
+			// However, to fully determine that, all options of the remaining
+			// disjunction will have to be evaluated algebraically, which is
+			// not done.
+			xc1: *(xc2 & 8) | xc4 & 9 | xc5 & 9
+			xc2: xc3 + 2
+			xc3: 6 & xc1-2
+			xc4: xc2 + 1
+			xc5: xc2 + 2
+
+			// The above is resolved by setting xd1 explicitly.
+			xd1: *(xd2 & 8) | xd4 & 9 | xd5 & 9
+			xd2: xd3 + 2
+			xd3: 6 & xd1-2
+			xd4: xd2 + 1
+			xd5: xd2 + 2
+			xd1: 8
+
+			// The above is resolved by setting xd1 explicitly to the wrong
+			// value, resulting in an error.
+			xe1: *(xe2 & 8) | xe4 & 9 | xe5 & 9
+			xe2: xe3 + 2
+			xe3: 6 & xe1-2
+			xe4: xe2 + 1
+			xe5: xe2 + 2
+			xe1: 9
+
+			z1: *(z2 + 1) | z3 + 5
+			z2: z3 + 2
+			z3: z1 - 3
+			z3: 8
+		`,
+		out: `<0>{` +
+			`xa1: (*8 | 9), ` + // TODO: should resolve. Just testing logic, so okay for now.
+			`xa2: 8, ` +
+			`xa4: 10, ` +
+			`xa3: 6, ` +
+
+			`xb1: _|_((*(<1>.xb2 & 8) | (<1>.xb4 & 9)):empty disjunction: empty disjunction: cycle detected), ` +
+			`xb2: _|_((*(6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+			`xb4: _|_((*(6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+			`xb3: _|_((*(6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+
+			`xc1: (*8 | 9), ` + // TODO: resolve
+			`xc2: 8, ` +
+			`xc4: 9, ` +
+			`xc5: 10, ` +
+			`xc3: 6, ` +
+
+			`xd1: 8, ` +
+			`xd2: 8, ` +
+			`xd4: 9, ` +
+			`xd5: 10, ` +
+			`xd3: 6, ` +
+
+			`xe1: 9, ` +
+			`xe2: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe4: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe5: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe3: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+
+			`z1: _|_((*(<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
+			`z2: _|_((*(<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
+			`z3: _|_((*(<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected)}`,
 	}}
 	rewriteHelper(t, testCases, evalPartial)
 }

@@ -28,10 +28,10 @@ type context struct {
 	oldSize    []int
 
 	// constraints are to be evaluated at the end values to be evaluated later.
-	constraints []value
-	noDelay     bool
+	constraints []*binaryExpr
 	exprDepth   int // nesting of expression that are not unification
 	evalDepth   int
+	inSum       int
 	cycleErr    bool
 
 	// for debug strings
@@ -60,10 +60,8 @@ func (idx *index) newContext() *context {
 
 // delayConstraint schedules constraint to be evaluated and returns ret. If
 // delaying constraints is currently not allowed, it returns an error instead.
-func (c *context) delayConstraint(ret evaluated, constraint value) evaluated {
-	if c.noDelay {
-		return c.mkErr(ret, "delayed constraint %v violated", debugStr(c, constraint))
-	}
+func (c *context) delayConstraint(ret evaluated, constraint *binaryExpr) evaluated {
+	c.cycleErr = true
 	c.constraints = append(c.constraints, constraint)
 	return ret
 }
@@ -72,11 +70,9 @@ func (c *context) processDelayedConstraints() evaluated {
 	cons := c.constraints
 	c.constraints = c.constraints[:0]
 	for _, dc := range cons {
-		c.noDelay = true
-		v := c.manifest(dc)
-		c.noDelay = false
+		v := binOp(c, dc, dc.op, dc.left.evalPartial(c), dc.right.evalPartial(c))
 		if isBottom(v) {
-			return c.mkErr(dc, "constraint violated: %v", debugStr(c, v))
+			return v
 		}
 	}
 	return nil

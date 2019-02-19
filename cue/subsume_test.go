@@ -250,7 +250,7 @@ func TestSubsume(t *testing.T) {
 		145: {subsumes: false, in: ` a: "s \(d) e", b: "s a e", d: _`},
 		146: {subsumes: false, in: ` a: "s \(d)m\(d) e", b: "s a e", d: _`},
 
-		147: {subsumes: true, in: ` a: 7080, b: 7080 | int`, mode: subChoose},
+		147: {subsumes: true, in: ` a: 7080, b: *7080 | int`, mode: subChoose},
 
 		// Defaults
 		150: {subsumes: false, in: `a: number | *1, b: number | *2`},

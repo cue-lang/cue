@@ -628,7 +628,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 
 		v = x.applyTemplate(ctx, i, v)
 
-		if ctx.evalDepth > 0 && ctx.cycleErr {
+		if (ctx.evalDepth > 0 && ctx.cycleErr) || cycleError(v) != nil {
 			// Don't cache while we're in a evaluation cycle as it will cache
 			// partial results. Each field involved in the cycle will have to
 			// reevaluated the values from scratch. As the result will be
@@ -636,7 +636,8 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 			x.arcs[i].cache = nil
 			return v
 		}
-		// If there as a cycle error, we have by now evaluated full cycle and
+
+		// If there as a cycle error, we have by now evaluated a full cycle and
 		// it is safe to cache the result.
 		ctx.cycleErr = false
 

@@ -18,6 +18,7 @@ import (
 	"bytes"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/third_party/yaml"
 	goyaml "github.com/ghodss/yaml"
@@ -51,11 +52,7 @@ func MarshalStream(v cue.Value) (string, error) {
 }
 
 // Unmarshal parses the YAML to a CUE instance.
-func Unmarshal(data []byte) (*cue.Instance, error) {
+func Unmarshal(data []byte) (ast.Expr, error) {
 	fset := token.NewFileSet()
-	expr, err := yaml.Unmarshal(fset, "", data)
-	if err != nil {
-		return nil, err
-	}
-	return cue.FromExpr(fset, expr)
+	return yaml.Unmarshal(fset, "", data)
 }

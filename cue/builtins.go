@@ -371,7 +371,7 @@ var builtinPackages = map[string][]*builtin{
 
 					return nil, fmt.Errorf("json: could not parse JSON: %v", err)
 				}
-				return FromExpr(fset, expr)
+				return expr, nil
 			}()
 		},
 	}},
@@ -420,11 +420,7 @@ var builtinPackages = map[string][]*builtin{
 			data := c.bytes(0)
 			c.ret, c.err = func() (interface{}, error) {
 				fset := token.NewFileSet()
-				expr, err := yaml.Unmarshal(fset, "", data)
-				if err != nil {
-					return nil, err
-				}
-				return FromExpr(fset, expr)
+				return yaml.Unmarshal(fset, "", data)
 			}()
 		},
 	}},

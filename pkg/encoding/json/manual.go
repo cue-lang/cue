@@ -20,6 +20,7 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 )
@@ -90,7 +91,7 @@ func MarshalStream(v cue.Value) (string, error) {
 }
 
 // Unmarshal parses the JSON-encoded data.
-func Unmarshal(b []byte) (*cue.Instance, error) {
+func Unmarshal(b []byte) (ast.Expr, error) {
 	if !json.Valid(b) {
 		return nil, fmt.Errorf("json: invalid JSON")
 	}
@@ -100,5 +101,5 @@ func Unmarshal(b []byte) (*cue.Instance, error) {
 		// NOTE: should never happen.
 		return nil, fmt.Errorf("json: could not parse JSON: %v", err)
 	}
-	return cue.FromExpr(fset, expr)
+	return expr, nil
 }

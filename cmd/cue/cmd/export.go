@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"encoding/json"
+	"fmt"
 
 	"github.com/spf13/cobra"
 )
@@ -72,14 +73,19 @@ If the package is not explicitly defined by the '-p' flag, it must be uniquely
 defined by the files in the current directory.
 `,
 
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		instances := buildFromArgs(cmd, args)
-		e := json.NewEncoder(cmd.OutOrStdout())
+		w := cmd.OutOrStdout()
+		e := json.NewEncoder(w)
 		e.SetIndent("", "    ")
 		e.SetEscapeHTML(*escape)
 
 		root := instances[0].Value()
-		must(e.Encode(root))
+		err := e.Encode(root)
+		if err != nil {
+			fmt.Fprintln(w, err)
+		}
+		return nil
 	},
 }
 

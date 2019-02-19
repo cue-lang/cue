@@ -1179,12 +1179,6 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 	last := &ast.BasicLit{ValuePos: pos, Kind: token.STRING, Value: lit}
 	exprs := []ast.Expr{last}
 
-	quote := rune(lit[0])
-	numQuotes := 1
-	if len(lit) > 2 && lit[0] == lit[1] {
-		numQuotes = 3
-	}
-
 	for p.tok == token.LPAREN {
 		c.pos = 1
 		p.expect(token.LPAREN)
@@ -1196,7 +1190,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 		if p.tok != token.RPAREN {
 			p.error(p.pos, "expected ')' for string interpolation")
 		}
-		lit = p.scanner.ResumeInterpolation(quote, numQuotes)
+		lit = p.scanner.ResumeInterpolation()
 		pos = p.pos
 		p.next()
 		last = &ast.BasicLit{

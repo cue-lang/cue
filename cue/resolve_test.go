@@ -845,6 +845,59 @@ func TestResolve(t *testing.T) {
 			e: "\([])"`,
 		out: `<0>{a: "4", b: "one 4 two 4one", c: "one", d: ""+<1>.r+"", r: _, u: ""+_+"", e: _|_([]:expression in interpolation must evaluate to a number kind or string (found list))}`,
 	}, {
+		desc: "multiline interpolation",
+		in: `
+			a1: """
+			before
+			\(4)
+			after
+			"""
+			a2: """
+			before
+			\(4)
+
+			"""
+			a3: """
+
+			\(4)
+			after
+			"""
+			a4: """
+
+			\(4)
+
+			"""
+			m1: """
+			before
+			\(
+				4)
+			after
+			"""
+			m2: """
+			before
+			\(
+	4)
+
+			"""
+			m3: """
+
+			\(
+
+				4)
+			after
+			"""
+			m4: """
+
+			\(
+	4)
+
+			"""
+			`,
+		out: `<0>{` +
+			`a1: "before\n4\nafter", a2: "before\n4\n", a3: "\n4\nafter", a4: "\n4\n", ` +
+			`m1: "before\n4\nafter", m2: "before\n4\n", m3: "\n4\nafter", m4: "\n4\n"` +
+			`}`,
+	}, {
 		desc: "diamond-shaped constraints",
 		in: `
 		S: {

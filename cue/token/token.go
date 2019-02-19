@@ -55,6 +55,7 @@ const (
 	IDIV // div
 	IMOD // mod
 
+	// TODO: rename to AND and OR
 	UNIFY       // &
 	DISJUNCTION // |
 

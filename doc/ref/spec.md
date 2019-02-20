@@ -1624,7 +1624,7 @@ These terms and the result of the comparisons are defined as follows:
 - `s =~ r` is true if `s` matches the regular expression `r`.
 - `s !~ r` is true if `s` does not match regular expression `r`.
 <!-- TODO: Implementations should adopt an algorithm that runs in linear time? -->
-<!-- Consider implementing Level 2 of Unicode regular expresssion. -->
+<!-- Consider implementing Level 2 of Unicode regular expression. -->
 
 ```
 3 < 4       // true

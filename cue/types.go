@@ -478,11 +478,6 @@ func (v Value) eval(ctx *context) value {
 	return ctx.manifest(v.path.v)
 }
 
-// Default returs v if v.Exists or a value converted from x otherwise.
-func (v Value) Default(x interface{}) Value {
-	return v
-}
-
 // Label reports he label used to obtain this value from the enclosing struct.
 //
 // TODO: get rid of this somehow. Maybe by passing it to walk
@@ -709,12 +704,14 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 		return b
 	}
 	got := x.kind()
-	if got&want&concreteKind == bottomKind && want != bottomKind {
-		return ctx.mkErr(x, "not of right kind (%v vs %v)", got, want)
-	}
-	if !got.isGround() {
-		return ctx.mkErr(x, codeIncomplete,
-			"non-concrete value %v", got)
+	if want != bottomKind {
+		if got&want&concreteKind == bottomKind {
+			return ctx.mkErr(x, "not of right kind (%v vs %v)", got, want)
+		}
+		if !got.isGround() {
+			return ctx.mkErr(x, codeIncomplete,
+				"non-concrete value %v", got)
+		}
 	}
 	return nil
 }
@@ -985,13 +982,39 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 	return v, true
 }
 
+type options struct {
+	concrete bool
+}
+
+// An Option defines modes of evaluation.
+type Option func(p *options)
+
+// Used in Validate, Subsume?, Fields()
+
+// TODO: could also be used for subsumption.
+
+// RequireConcrete verifies that all values in a tree are concrete.
+func RequireConcrete() Option {
+	return func(p *options) { p.concrete = true }
+}
+
+// VisitHidden(visit bool)
+//
+
 // Validate reports any errors, recursively. The returned error may be an
 // errors.List reporting multiple errors, where the total number of errors
 // reported may be less than the actual number.
-func (v Value) Validate() error {
+func (v Value) Validate(opts ...Option) error {
+	var o options
+	for _, fn := range opts {
+		fn(&o)
+	}
 	list := errors.List{}
 	v.Walk(func(v Value) bool {
 		if err := v.Err(); err != nil {
+			if !o.concrete && isIncomplete(v.eval(v.ctx())) {
+				return false
+			}
 			list.Add(err)
 			if len(list) > 50 {
 				return false // mostly to avoid some hypothetical cycle issue

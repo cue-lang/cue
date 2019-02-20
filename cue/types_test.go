@@ -429,7 +429,7 @@ func TestError(t *testing.T) {
 		value: `"Hello world!"`,
 	}, {
 		value: `string`,
-		err:   "non-concrete value (string)*",
+		err:   "",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

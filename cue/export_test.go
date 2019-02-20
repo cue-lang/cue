@@ -27,6 +27,7 @@ import (
 func TestExport(t *testing.T) {
 	testCases := []struct {
 		raw     bool
+		mode    exportMode
 		in, out string
 	}{{
 		in:  `"hello"`,
@@ -85,14 +86,14 @@ func TestExport(t *testing.T) {
 			f: [1, 2, ...]
 		}`,
 		out: unindent(`
-			{
-				a: 5*[int] & [1, 2, ...int]
-				b: (>=2 & <=5)*[int] & [1, 2, ...int]
-				c: (<=5 & >=3)*[int] & [1, 2, ...int]
-				d: [1, 2, ...int]
-				e: [1, 2, ...int]
-				f: [1, 2, ...]
-			}`),
+		{
+			a: 5*[int] & [1, 2, ...int]
+			b: (>=2 & <=5)*[int] & [1, 2, ...int]
+			c: (<=5 & >=3)*[int] & [1, 2, ...int]
+			d: [1, 2, ...int]
+			e: [1, 2, ...int]
+			f: [1, 2, ...]
+		}`),
 	}, {
 		in: `{
 			a: >=0*[int]
@@ -170,6 +171,49 @@ func TestExport(t *testing.T) {
 					a: ""
 					b: len(a)
 				}`),
+	}, {
+		raw:  true,
+		mode: exportEval,
+		in: `{
+			b: {
+				idx: a[str]
+				str: string
+			}
+			b a b: 4
+			a b: 3
+		}`,
+		// reference to a must be redirected to outer a through alias
+		out: unindent(`
+		{
+			A = a
+			b: {
+				idx: A[str]
+				a b: 4
+				str: string
+			}
+			a b: 3
+		}`),
+	}, {
+		raw:  true,
+		mode: exportEval,
+		in: `{
+			b: [{
+				<X>: int
+				f: 4 if a > 4
+			}][a]
+			a: int
+			c: *1 | 2
+		}`,
+		// reference to a must be redirected to outer a through alias
+		out: unindent(`
+		{
+			b: [{
+				<X>: int
+				"f": 4 if a > 4
+			}][a]
+			a: int
+			c: 1
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -186,7 +230,7 @@ func TestExport(t *testing.T) {
 			v := newValueRoot(ctx, n)
 
 			buf := &bytes.Buffer{}
-			err := format.Node(buf, export(ctx, v.eval(ctx), exportRaw))
+			err := format.Node(buf, export(ctx, v.eval(ctx), tc.mode))
 			if err != nil {
 				log.Fatal(err)
 			}

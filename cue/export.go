@@ -16,6 +16,7 @@ package cue
 
 import (
 	"fmt"
+	"math/rand"
 	"strconv"
 	"strings"
 	"unicode"
@@ -28,18 +29,39 @@ import (
 type exportMode int
 
 const (
-	exportRaw exportMode = iota
-	exportEval
+	exportEval exportMode = 1 << iota
+	exportRaw  exportMode = 0
 )
 
 func export(ctx *context, v value, m exportMode) ast.Expr {
-	e := exporter{ctx, m}
+	e := exporter{ctx, m, nil}
 	return e.expr(v)
 }
 
 type exporter struct {
-	ctx  *context
-	mode exportMode
+	ctx   *context
+	mode  exportMode
+	stack []remap
+}
+
+type remap struct {
+	key  scope // structLit or params
+	from label
+	to   *ast.Ident
+	syn  *ast.StructLit
+}
+
+func (p *exporter) unique(s string) string {
+	s = strings.ToUpper(s)
+	lab := s
+	for {
+		if _, ok := p.ctx.labelMap[lab]; !ok {
+			p.ctx.label(lab, true)
+			break
+		}
+		lab = s + fmt.Sprintf("%0.6x", rand.Intn(1<<24))
+	}
+	return lab
 }
 
 func (p *exporter) label(f label) ast.Label {
@@ -90,44 +112,92 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 
 func (p *exporter) expr(v value) ast.Expr {
 	if p.mode == exportEval {
-		v = v.evalPartial(p.ctx)
+		x := p.ctx.manifest(v)
+		if isIncomplete(x) {
+			p = &exporter{p.ctx, exportRaw, p.stack}
+			return p.expr(v)
+		}
+		v = x
 	}
+
+	old := p.stack
+	defer func() { p.stack = old }()
 
 	// TODO: also add position information.
 	switch x := v.(type) {
 	case *builtin:
 		return &ast.Ident{Name: x.Name}
+
 	case *nodeRef:
 		return nil
+
 	case *selectorExpr:
 		n := p.expr(x.x)
-		if n == nil {
-			return p.identifier(x.feature)
+		if n != nil {
+			return &ast.SelectorExpr{X: n, Sel: p.identifier(x.feature)}
 		}
-		return &ast.SelectorExpr{X: n, Sel: p.identifier(x.feature)}
+		ident := p.identifier(x.feature)
+		node, ok := x.x.(*nodeRef)
+		if !ok {
+			// TODO: should not happen: report error
+			return ident
+		}
+		conflict := false
+		for i := len(p.stack) - 1; i >= 0; i-- {
+			e := &p.stack[i]
+			if e.from != x.feature {
+				continue
+			}
+			if e.key != node.node {
+				conflict = true
+				continue
+			}
+			if conflict {
+				ident = e.to
+				if e.to == nil {
+					name := p.unique(p.ctx.labelStr(x.feature))
+					e.syn.Elts = append(e.syn.Elts, &ast.Alias{
+						Ident: p.ident(name),
+						Expr:  p.identifier(x.feature),
+					})
+					ident = p.ident(name)
+					e.to = ident
+				}
+			}
+			return ident
+		}
+		// TODO: should not happen: report error
+		return ident
+
 	case *indexExpr:
 		return &ast.IndexExpr{X: p.expr(x.x), Index: p.expr(x.index)}
+
 	case *sliceExpr:
 		return &ast.SliceExpr{
 			X:    p.expr(x.x),
 			Low:  p.expr(x.lo),
 			High: p.expr(x.hi),
 		}
+
 	case *callExpr:
 		call := &ast.CallExpr{Fun: p.expr(x.x)}
 		for _, a := range x.args {
 			call.Args = append(call.Args, p.expr(a))
 		}
 		return call
+
 	case *unaryExpr:
 		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.x)}
+
 	case *binaryExpr:
 		return &ast.BinaryExpr{
 			X:  p.expr(x.left),
 			Op: opMap[x.op], Y: p.expr(x.right),
 		}
+
 	case *bound:
 		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.value)}
+
 	case *unification:
 		if len(x.values) == 1 {
 			return p.expr(x.values[0])
@@ -158,10 +228,29 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *structLit:
 		obj := &ast.StructLit{}
 		if p.mode == exportEval {
+			for _, a := range x.arcs {
+				p.stack = append(p.stack, remap{
+					key:  x,
+					from: a.feature,
+					to:   nil,
+					syn:  obj,
+				})
+			}
 			x = x.expandFields(p.ctx)
 		}
 		if x.emit != nil {
 			obj.Elts = append(obj.Elts, &ast.EmitDecl{Expr: p.expr(x.emit)})
+		}
+		if p.mode != exportEval && x.template != nil {
+			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
+			if ok {
+				obj.Elts = append(obj.Elts, &ast.Field{
+					Label: &ast.TemplateLabel{
+						Ident: p.identifier(l.params.arcs[0].feature),
+					},
+					Value: p.expr(l.value),
+				})
+			} // TODO: else record error
 		}
 		for _, a := range x.arcs {
 			obj.Elts = append(obj.Elts, &ast.Field{
@@ -169,6 +258,7 @@ func (p *exporter) expr(v value) ast.Expr {
 				Value: p.expr(a.v),
 			})
 		}
+
 		for _, c := range x.comprehensions {
 			var clauses []ast.Clause
 			next := c.clauses

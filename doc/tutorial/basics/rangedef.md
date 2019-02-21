@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](ranges.md) [Next](lists.md)
+[TOC](Readme.md) [Prev](ranges.md) [Next](regexp.md)
 
 _Types ~~and~~ are Values_
 

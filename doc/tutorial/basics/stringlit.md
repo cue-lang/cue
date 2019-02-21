@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](numberlit.md) [Next](bytes.md)
+[TOC](Readme.md) [Prev](numberlit.md) [Next](stringraw.md)
 
 _JSON Sugar and other Goodness_
 

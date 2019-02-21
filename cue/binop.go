@@ -605,7 +605,7 @@ func (x *boolLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 }
 
 func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
-	switch other.(type) {
+	switch y := other.(type) {
 	// case *basicType:
 	// 	return x
 
@@ -624,7 +624,8 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
 			return cmpTonode(src, op, strings.Compare(x.str, str))
 		case opAdd:
-			return &stringLit{binSrc(src.Pos(), op, x, other), x.str + str}
+			src := binSrc(src.Pos(), op, x, other)
+			return &stringLit{src, x.str + str}
 		case opMat:
 			b, err := regexp.MatchString(str, x.str)
 			if err != nil {
@@ -637,6 +638,12 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 				return ctx.mkErr(src, "error parsing regexp: %v", err)
 			}
 			return boolTonode(src, !b)
+		}
+	case *numLit:
+		switch op {
+		case opMul:
+			src := binSrc(src.Pos(), op, x, other)
+			return &stringLit{src, strings.Repeat(x.str, y.intValue(ctx))}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -663,6 +670,13 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 			copy := append([]byte(nil), x.b...)
 			copy = append(copy, b...)
 			return &bytesLit{binSrc(src.Pos(), op, x, other), copy}
+		}
+
+	case *numLit:
+		switch op {
+		case opMul:
+			src := binSrc(src.Pos(), op, x, other)
+			return &bytesLit{src, bytes.Repeat(x.b, y.intValue(ctx))}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)

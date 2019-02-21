@@ -147,7 +147,6 @@ func TestBasicRewrite(t *testing.T) {
 			i2: 2 & int
 
 			sum: -1 + +2        // 1
-			str: "foo" + "bar"  // "foobar"
 			div1: 2.0 / 3 * 6   // 4
 			div2: 2 / 3 * 6     // 4
 			rem: 2 % 3          // 2
@@ -171,7 +170,6 @@ func TestBasicRewrite(t *testing.T) {
 			`,
 		out: `<0>{i1: 1, i2: 2, ` +
 			`sum: 1, ` +
-			`str: "foobar", ` +
 			`div1: 4.00000000000000000000000, ` +
 			`div2: 4.00000000000000000000000, ` +
 			`rem: 2, ` +
@@ -271,6 +269,25 @@ func TestBasicRewrite(t *testing.T) {
 			f: bool
 			`,
 		out: `<0>{a: 1, b: 1, c: 1.0, d: _|_((int & float):unsupported op &((int)*, (float)*)), e: "4", f: true}`,
+	}, {
+		desc: "strings and bytes",
+		in: `
+			s0: "foo" + "bar"
+			s1: 3 * "abc"
+			s2: "abc" * 2
+
+			b0: 'foo' + 'bar'
+			b1: 3 * 'abc'
+			b2: 'abc' * 2
+		`,
+		out: `<0>{` +
+			`s0: "foobar", ` +
+			`s1: "abcabcabc", ` +
+			`s2: "abcabc", ` +
+			`b0: 'foobar', ` +
+			`b1: 'abcabcabc', ` +
+			`b2: 'abcabc'` +
+			`}`,
 	}, {
 		desc: "escaping",
 

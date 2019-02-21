@@ -27,5 +27,5 @@ protocol: *"udp" | "tcp"
 <!-- result -->
 ```
 replicas: 1
-protocol: _|_
+protocol: *"tcp" | *"udp"
 ```

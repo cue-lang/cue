@@ -436,7 +436,7 @@ multiline_bytes_lit  = "'''" newline
 ```
 
 Carriage return characters (`\r`) inside string literals are discarded from
-the raw string value.
+the string value.
 
 ```
 'a\000\xab'

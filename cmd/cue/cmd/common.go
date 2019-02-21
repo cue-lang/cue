@@ -24,11 +24,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error) {
+func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 	if err != nil {
 		fmt.Fprintf(cmd.OutOrStderr(), "--- %s\n", inst.Dir)
 		errors.Print(cmd.OutOrStderr(), err)
-		exit()
+		if fatal {
+			exit()
+		}
 	}
 }
 
@@ -54,13 +56,14 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, inst, inst.Err)
+		exitIfErr(cmd, inst, inst.Err, true)
 	}
 
+	// TODO check errors after the fact in case of ignore.
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, inst, inst.Value().Validate())
+		exitIfErr(cmd, inst, inst.Value().Validate(), !*fIgnore)
 	}
 	return instances
 }
@@ -84,6 +87,6 @@ func buildTools(cmd *cobra.Command, args []string) *cue.Instance {
 	}
 
 	inst := cue.Merge(buildInstances(cmd, binst)...).Build(ti)
-	exitIfErr(cmd, inst, inst.Err)
+	exitIfErr(cmd, inst, inst.Err, true)
 	return inst
 }

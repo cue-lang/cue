@@ -156,6 +156,7 @@ var (
 	fDryrun   = RootCmd.PersistentFlags().BoolP("dryrun", "n", false, "only run simulation")
 	fPackage  = RootCmd.PersistentFlags().StringP("package", "p", "", "CUE package to evaluate")
 	fSimplify = RootCmd.PersistentFlags().BoolP("simplify", "s", false, "simplify output")
+	fIgnore   = RootCmd.PersistentFlags().BoolP("ignore", "i", false, "proceed in the presence of errors")
 )
 
 // initConfig reads in config file and ENV variables if set.

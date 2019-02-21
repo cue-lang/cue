@@ -252,11 +252,19 @@ func (p *exporter) expr(v value) ast.Expr {
 				})
 			} // TODO: else record error
 		}
-		for _, a := range x.arcs {
-			obj.Elts = append(obj.Elts, &ast.Field{
+		for i, a := range x.arcs {
+			f := &ast.Field{
 				Label: p.label(a.feature),
-				Value: p.expr(a.v),
-			})
+			}
+			if p.mode != exportEval {
+				f.Value = p.expr(a.v)
+			} else if v := p.ctx.manifest(x.at(p.ctx, i)); isIncomplete(v) {
+				p := &exporter{p.ctx, exportRaw, p.stack}
+				f.Value = p.expr(a.v)
+			} else {
+				f.Value = p.expr(v)
+			}
+			obj.Elts = append(obj.Elts, f)
 		}
 
 		for _, c := range x.comprehensions {

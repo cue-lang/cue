@@ -197,24 +197,55 @@ func TestExport(t *testing.T) {
 		raw:  true,
 		mode: exportEval,
 		in: `{
-			b: [{
-				<X>: int
-				f: 4 if a > 4
-			}][a]
-			a: int
-			c: *1 | 2
+			job <Name>: {
+				name:     Name
+				replicas: uint | *1
+				command:  string
+			}
+			
+			job list command: "ls"
+
+			job nginx: {
+				command:  "nginx"
+				replicas: 2
+			}
 		}`,
-		// reference to a must be redirected to outer a through alias
 		out: unindent(`
 		{
-			b: [{
-				<X>: int
-				"f": 4 if a > 4
-			}][a]
-			a: int
-			c: 1
+			job: {
+				list: {
+					name:     "list"
+					replicas: 1
+					command:  "ls"
+				}
+				nginx: {
+					name:     "nginx"
+					replicas: 2
+					command:  "nginx"
+				}
+			}
 		}`),
-	}}
+	}, {
+		raw:  true,
+		mode: exportEval,
+		in: `{
+				b: [{
+					<X>: int
+					f: 4 if a > 4
+				}][a]
+				a: int
+				c: *1 | 2
+			}`,
+		// reference to a must be redirected to outer a through alias
+		out: unindent(`
+			{
+				b: [{
+					<X>: int
+					"f": 4 if a > 4
+				}][a]
+				a: int
+				c: 1
+			}`)}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			body := fmt.Sprintf("Test: %s", tc.in)

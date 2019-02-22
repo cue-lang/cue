@@ -55,6 +55,7 @@ const (
 	referenceKind
 
 	atomKind     = (listKind - 1) &^ unknownKind
+	addableKind  = (structKind - 1) &^ unknownKind
 	concreteKind = (lambdaKind - 1) &^ unknownKind
 
 	// doneKind indicates a value can not further develop on its own (i.e. not a
@@ -257,9 +258,8 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 			return boolKind | catBits, false
 		}
 	case opAdd:
-		if u.isAnyOf(atomKind) {
-			return u&(atomKind) | catBits, false
-			// u&(durationKind|intKind)
+		if u.isAnyOf(addableKind) {
+			return u&(addableKind) | catBits, false
 		}
 	case opSub:
 		if u.isAnyOf(scalarKinds) {

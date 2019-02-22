@@ -1544,6 +1544,7 @@ If list `a` is open, its default value, the shortest variant, is selected.
 [ 1, 2 ]      + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
 [ 1, 2, ... ] + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
 [ 1, 2 ]      + [ 3, 4, ... ]  // [ 1, 2, 3, 4, ... ]
+[ 1, 2, ... ] + [ 3, 4, ... ]  // [ 1, 2, 3, 4, ... ]
 ```
 
 Lists can be multiplied with a non-negative`int` using the `*` operator

@@ -956,6 +956,25 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		}
 		return &list{baseValue: binSrc(src.Pos(), op, x, other), a: a, typ: typ, len: n}
 
+	case opAdd:
+		y, ok := other.(*list)
+		if !ok {
+			break
+		}
+		n := &list{baseValue: binSrc(src.Pos(), op, x, other), typ: y.typ}
+		n.a = append(x.a, y.a...)
+		switch v := y.len.(type) {
+		case *numLit:
+			// Closed list
+			ln := &numLit{numBase: v.numBase}
+			ln.v.SetInt64(int64(len(n.a)))
+			n.len = ln
+		default:
+			// Open list
+			n.len = y.len
+		}
+		return n
+
 	case opMul:
 		k := other.kind()
 		if !k.isAnyOf(intKind) {

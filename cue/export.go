@@ -204,7 +204,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 		bin := p.expr(x.values[0])
 		for _, v := range x.values[1:] {
-			bin = &ast.BinaryExpr{X: bin, Op: token.UNIFY, Y: p.expr(v)}
+			bin = &ast.BinaryExpr{X: bin, Op: token.AND, Y: p.expr(v)}
 		}
 		return bin
 
@@ -221,7 +221,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 		bin := expr(x.values[0])
 		for _, v := range x.values[1:] {
-			bin = &ast.BinaryExpr{X: bin, Op: token.DISJUNCTION, Y: expr(v)}
+			bin = &ast.BinaryExpr{X: bin, Op: token.OR, Y: expr(v)}
 		}
 		return bin
 
@@ -419,7 +419,7 @@ func (p *exporter) expr(v value) ast.Expr {
 							p.expr(x.typ),
 						}},
 					},
-					Op: token.UNIFY,
+					Op: token.AND,
 					Y:  list,
 				}
 

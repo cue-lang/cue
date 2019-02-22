@@ -115,8 +115,8 @@ var testTokens = [...]elt{
 	{token.QUO, "/", operator},
 	{token.REM, "%", operator},
 
-	{token.UNIFY, "&", operator},
-	{token.DISJUNCTION, "|", operator},
+	{token.AND, "&", operator},
+	{token.OR, "|", operator},
 
 	{token.LAND, "&&", operator},
 	{token.LOR, "||", operator},

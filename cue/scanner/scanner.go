@@ -835,14 +835,14 @@ scanAgain:
 				s.next()
 				tok = token.LAND
 			default:
-				tok = token.UNIFY
+				tok = token.AND
 			}
 		case '|':
 			if s.ch == '|' {
 				s.next()
 				tok = token.LOR
 			} else {
-				tok = token.DISJUNCTION
+				tok = token.OR
 			}
 		default:
 			// next reports unexpected BOMs - don't repeat

@@ -55,9 +55,8 @@ const (
 	IDIV // div
 	IMOD // mod
 
-	// TODO: rename to AND and OR
-	UNIFY       // &
-	DISJUNCTION // |
+	AND // &
+	OR  // |
 
 	LAND // &&
 	LOR  // ||
@@ -129,8 +128,8 @@ var tokens = [...]string{
 	IDIV: "div",
 	IMOD: "mod",
 
-	UNIFY:       "&",
-	DISJUNCTION: "|",
+	AND: "&",
+	OR:  "|",
 
 	LAND: "&&",
 	LOR:  "||",
@@ -213,9 +212,9 @@ const (
 //
 func (tok Token) Precedence() int {
 	switch tok {
-	case DISJUNCTION:
+	case OR:
 		return 1
-	case UNIFY:
+	case AND:
 		return 2
 	case LOR:
 		return 3

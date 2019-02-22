@@ -99,8 +99,8 @@ var opStrings = []string{
 func (op op) String() string { return opStrings[op] }
 
 var tokenMap = map[token.Token]op{
-	token.DISJUNCTION: opDisjunction, // |
-	token.UNIFY:       opUnify,       // &
+	token.OR:  opDisjunction, // |
+	token.AND: opUnify,       // &
 
 	token.ADD: opAdd, // +
 	token.SUB: opSub, // -

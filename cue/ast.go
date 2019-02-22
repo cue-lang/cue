@@ -477,7 +477,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 
 	case *ast.BinaryExpr:
 		switch n.Op {
-		case token.DISJUNCTION:
+		case token.OR:
 			d := &disjunction{baseValue: newExpr(n)}
 			v.addDisjunctionElem(d, n.X, false)
 			v.addDisjunctionElem(d, n.Y, false)
@@ -506,7 +506,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 func (v *astVisitor) addDisjunctionElem(d *disjunction, n ast.Node, mark bool) {
 	switch x := n.(type) {
 	case *ast.BinaryExpr:
-		if x.Op == token.DISJUNCTION {
+		if x.Op == token.OR {
 			v.addDisjunctionElem(d, x.X, mark)
 			v.addDisjunctionElem(d, x.Y, mark)
 			return

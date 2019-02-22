@@ -256,7 +256,7 @@ func (t *trimSet) canRemove(n ast.Node) bool {
 func isDisjunctionOfStruct(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.BinaryExpr:
-		if x.Op == token.DISJUNCTION {
+		if x.Op == token.OR {
 			return hasStruct(x.X) || hasStruct(x.Y)
 		}
 	}

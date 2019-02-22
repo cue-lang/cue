@@ -104,11 +104,6 @@ func walk(v visitor, node ast.Node) {
 			walk(v, e)
 		}
 
-	case *ast.Ellipsis:
-		if n.Elt != nil {
-			walk(v, n.Elt)
-		}
-
 	case *ast.ListLit:
 		walkExprList(v, n.Elts)
 		if n.Type != nil {

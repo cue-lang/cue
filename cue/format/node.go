@@ -387,12 +387,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 			f.print(unindent)
 		}
 
-	case *ast.Ellipsis:
-		f.print(x.Ellipsis, token.ELLIPSIS)
-		if x.Elt != nil {
-			f.expr(x.Elt) // TODO
-		}
-
 	case *ast.StructLit:
 		f.print(x.Lbrace, token.LBRACE, noblank, f.formfeed(), indent)
 		f.walkDeclList(x.Elts)

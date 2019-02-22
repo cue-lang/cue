@@ -57,7 +57,6 @@ type Expr interface {
 
 func (*BadExpr) exprNode()       {}
 func (*Ident) exprNode()         {}
-func (*Ellipsis) exprNode()      {}
 func (*BasicLit) exprNode()      {}
 func (*Interpolation) exprNode() {}
 func (*StructLit) exprNode()     {}
@@ -349,14 +348,6 @@ type TemplateLabel struct {
 	Rangle token.Pos
 }
 
-// An Ellipsis node stands for the "..." type in a
-// parameter list or the "..." length in an array type.
-type Ellipsis struct {
-	comments
-	Ellipsis token.Pos // position of "..."
-	Elt      Expr      // ellipsis element type (parameter lists only); or nil
-}
-
 // A BasicLit node represents a literal of basic type.
 type BasicLit struct {
 	comments
@@ -481,7 +472,6 @@ type BinaryExpr struct {
 func (x *BadExpr) Pos() token.Pos       { return x.From }
 func (x *Ident) Pos() token.Pos         { return x.NamePos }
 func (x *TemplateLabel) Pos() token.Pos { return x.Langle }
-func (x *Ellipsis) Pos() token.Pos      { return x.Ellipsis }
 func (x *BasicLit) Pos() token.Pos      { return x.ValuePos }
 func (x *Interpolation) Pos() token.Pos { return x.Elts[0].Pos() }
 func (x *StructLit) Pos() token.Pos {
@@ -509,12 +499,6 @@ func (x *Ident) End() token.Pos {
 	return x.NamePos.Add(len(x.Name))
 }
 func (x *TemplateLabel) End() token.Pos { return x.Rangle }
-func (x *Ellipsis) End() token.Pos {
-	if x.Elt != nil {
-		return x.Elt.End()
-	}
-	return x.Ellipsis + 3 // len("...")
-}
 func (x *BasicLit) End() token.Pos      { return token.Pos(int(x.ValuePos) + len(x.Value)) }
 func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].Pos() }
 func (x *StructLit) End() token.Pos {

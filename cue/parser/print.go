@@ -162,9 +162,6 @@ func debugStr(x interface{}) (out string) {
 		out += ")"
 		return out
 
-	case *ast.Ellipsis:
-		return debugStr(v.Elt) + "..."
-
 	case *ast.ParenExpr:
 		out := "("
 		out += debugStr(v.X)

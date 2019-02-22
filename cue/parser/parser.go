@@ -1011,12 +1011,7 @@ func (p *parser) parseListElement() (expr ast.Expr) {
 	c := p.openComments()
 	defer func() { c.closeNode(p, expr) }()
 
-	e := p.parseRHS()
-	switch p.tok {
-	case token.ELLIPSIS:
-		return &ast.Ellipsis{Ellipsis: p.expect(token.ELLIPSIS), Elt: e}
-	}
-	return e
+	return p.parseRHS()
 }
 
 // checkExpr checks that x is an expression (and not a type).

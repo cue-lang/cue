@@ -10,7 +10,7 @@ Byte literals are defined with single quotes.
 The following additional escape sequences are allowed in byte literals:
 
     \xnn    // arbitrary byte value defined as a 2-digit hexadecimal number
-    \0nnn   // arbitrary byte value defined as a 3-digit octal number
+    \nnn   // arbitrary byte value defined as a 3-digit octal number
 <!-- jba: this contradicts the spec, which has \nnn (no leading zero) -->
 
 <!-- CUE editor -->

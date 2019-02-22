@@ -10,6 +10,7 @@ For other cases one can use the indexing notation.
 
 
 <!-- CUE editor -->
+_selectors.cue:_
 ```
 a: {
     b: 2
@@ -20,6 +21,7 @@ w: a["c-e"]
 ```
 
 <!-- result -->
+`$ cue eval selectors.cue`
 ```
 a: {
     b:     2

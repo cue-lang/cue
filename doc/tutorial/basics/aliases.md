@@ -12,6 +12,7 @@ Alias are not members of a struct. They can be referred to only within the
 struct, and they do not appear in the output.
 
 <!-- CUE editor -->
+_alias.cue:_
 ```
 A = a  // A is an alias for a
 a: {
@@ -27,6 +28,7 @@ b: {
 ```
 
 <!-- result -->
+`$ cue eval alias.cue`
 ```
 a: {
     d: 3

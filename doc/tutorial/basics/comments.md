@@ -7,6 +7,7 @@ _JSON Sugar and other Goodness_
 CUE supports C-style block and line comments.
 
 <!-- CUE editor -->
+_comments.cue:_
 ```
 // whole numbers
 one: 1
@@ -18,6 +19,7 @@ two: 2
 ```
 
 <!-- JSON result -->
+`$ cue export comments.cue`
 ```json
 {
     "one": 1,

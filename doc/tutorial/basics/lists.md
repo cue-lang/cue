@@ -21,6 +21,7 @@ The output contains a valid private IP address (`myIP`)
 and an invalid one (`yourIP`).
 
 <!-- CUE editor -->
+_lists.cue:_
 ```
 IP: 4 * [ uint8 ]
 
@@ -35,6 +36,7 @@ yourIP: [11, 1, 2, 3]
 ```
 
 <!-- result -->
+`$ cue eval -i lists.cue`
 ```
 IP: [>=0 & <=255, >=0 & <=255, >=0 & <=255, >=0 & <=255]
 PrivateIP:

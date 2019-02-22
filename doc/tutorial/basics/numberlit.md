@@ -8,6 +8,7 @@ _JSON Sugar and other Goodness_
 CUE adds a variety of sugar for writing numbers.
 
 <!-- CUE editor -->
+_numlit.cue:_
 ```
 [
     1_234,       // 1234
@@ -18,6 +19,7 @@ CUE adds a variety of sugar for writing numbers.
 ```
 
 <!-- JSON result -->
+`$ cue export numlit.cue`
 ```json
 [
     1234,

@@ -14,11 +14,13 @@ The following additional escape sequences are allowed in byte literals:
 <!-- jba: this contradicts the spec, which has \nnn (no leading zero) -->
 
 <!-- CUE editor -->
+_bytes.cue:_
 ```
 a: '\x03abc'
 ```
 
 <!-- JSON result -->
+`$ cue export bytes.cue`
 ```json
 {
     a: "A2FiYw=="

@@ -13,6 +13,8 @@ The template's identifier (in angular brackets) is bound to name of each
 of its sibling fields and is visible within the template value
 that is unified with each of the siblings.
 
+<!-- CUE editor -->
+_templates.cue:_
 ```
 // The following struct is unified with all elements in job.
 // The name of each element is bound to Name and visible in the struct.
@@ -30,6 +32,8 @@ job nginx: {
 }
 ```
 
+<!-- JSON result -->
+`$ cue eval templates.cue`
 ```
 job: {
     list: {

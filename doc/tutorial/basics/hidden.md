@@ -13,6 +13,7 @@ Quoted and non-quoted fields share the same namespace unless they start
 with an underscore.
 
 <!-- CUE editor -->
+_hidden.cue:_
 ```
 "_foo": 2
 _foo:   3
@@ -20,7 +21,10 @@ foo:    4
 ```
 
 <!-- result -->
+`$ cue export hidden.cue`
 ```
-"_foo": 2
-foo:    4
+{
+    "_foo": 2,
+    "foo": 4
+}
 ```

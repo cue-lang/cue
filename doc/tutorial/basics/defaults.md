@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](disjunctions.md) [Next](disjstruct.md)
+[TOC](Readme.md) [Prev](disjunctions.md) [Next](sumstruct.md)
 
 _Types ~~and~~ are Values_
 
@@ -15,6 +15,7 @@ In that case, both `"tcp"` and `"udp"` are preferred and one must explicitly
 specify either `"tcp"` or `"udp"` as if no marks were given.
 
 <!-- CUE editor -->
+_defaults.cue:_
 ```
 // any positive number, 1 is the default
 replicas: uint | *1
@@ -25,6 +26,7 @@ protocol: *"udp" | "tcp"
 ```
 
 <!-- result -->
+`$ cue eval defaults.cue`
 ```
 replicas: 1
 protocol: *"tcp" | *"udp"

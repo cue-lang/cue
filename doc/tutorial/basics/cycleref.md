@@ -10,6 +10,7 @@ the cycle and unify their values once to achieve the same result as
 merging them ad infinitum.
 
 <!-- CUE editor -->
+_cycleref.cue:_
 ```
 labels: selectors
 labels: {app: "foo"}
@@ -19,6 +20,7 @@ selectors: {name: "bar"}
 ```
 
 <!-- result -->
+`$ cue eval cycleref.cue`
 ```
 labels:    {app: "foo", name: "bar"}
 selectors: {app: "foo", name: "bar"}

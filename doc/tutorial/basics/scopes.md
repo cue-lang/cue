@@ -13,6 +13,7 @@ field defined in any other file of the same package.
 If there is still no match, it may match a predefined value.
 
 <!-- CUE editor -->
+_scopes.cue:_
 ```
 v: 1
 a: {
@@ -26,6 +27,7 @@ b: v
 ```
 
 <!-- result -->
+`$ cue eval scopes.cue`
 ```
 v: 1
 a: {

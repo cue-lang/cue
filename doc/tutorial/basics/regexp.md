@@ -14,6 +14,7 @@ as unary versions to define a set of strings.
 
 
 <!-- CUE editor -->
+_regexp.cue:_
 ```
 a: "foo bar" =~ "foo [a-z]{3}"
 b: "maze" !~ "^[a-z]{3}$"
@@ -28,6 +29,7 @@ e: "foo bar"
 ```
 
 <!-- result -->
+`$ cue eval -i regexp.cue`
 ```
 a: true
 b: true

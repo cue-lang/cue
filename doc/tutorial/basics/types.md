@@ -36,6 +36,7 @@ explicitly.
 
 
 <!-- CUE editor -->
+_types.cue:_
 ```
 point: {
     x: float
@@ -52,6 +53,7 @@ origin: xaxis & yaxis
 ```
 
 <!-- result -->
+`$ cue eval types.cue`
 ```
 point: {
     x: float

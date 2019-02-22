@@ -9,6 +9,7 @@ String interpolations may also be used in field names.
 One cannot refer to generated fields with references.
 
 <!-- CUE editor -->
+_- genfield.cue:_
 ```
 sandwich: {
     type:            "Cheese"
@@ -19,6 +20,7 @@ sandwich: {
 ```
 
 <!-- result -->
+`$ cue eval -i genfield.cue`
 ```
 sandwich: {
     type:            "Cheese"

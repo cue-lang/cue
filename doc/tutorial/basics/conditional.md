@@ -12,6 +12,7 @@ as `justification` is required yet no concrete value is given.
 
 
 <!-- CUE editor -->
+_conditional.cue:_
 ```
 price: float
 
@@ -22,6 +23,7 @@ price: 200
 ```
 
 <!-- result -->
+`$ cue eval conditional.cue`
 ```
 price:         200
 justification: string

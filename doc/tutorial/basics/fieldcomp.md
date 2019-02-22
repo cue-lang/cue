@@ -10,6 +10,7 @@ One cannot refer to generated fields with references.
 Instead, one must use indexing.
 
 <!-- CUE editor -->
+_fieldcomp.cue:_
 ```
 import "strings"
 
@@ -25,6 +26,7 @@ a: [ "Barcelona", "Shanghai", "Munich" ]
 ```
 
 <!-- result -->
+`$ cue eval fieldcomp.cue`
 ```
 barcelona: {
     pos:     1

@@ -26,6 +26,7 @@ In that case the default will be used if either the lookup fails or
 the result is not of the desired type.
 
 <!-- CUE editor -->
+_coalesce.cue:_
 ```
 list: [ "Cat", "Mouse", "Dog" ]
 
@@ -37,6 +38,7 @@ v: *n[0]&string | "default"
 ```
 
 <!-- result -->
+`$ cue eval coalesce.cue`
 ```
 list: [ "Cat", "Mouse", "Dog" ]
 

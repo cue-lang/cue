@@ -16,6 +16,7 @@ In other words, order doesn't matter and unifying a given set of values
 in any order always gives the same result.
 
 <!-- CUE editor -->
+_unification.cue:_
 ```
 a: { x: 1, y: 2 }
 b: { y: 2, z: 3 }
@@ -27,6 +28,7 @@ s: c & b & a
 ```
 
 <!-- result -->
+`$ cue eval -i unification.cue`
 ```
 a: { x: 1, y: 2 }
 b: { y: 2, z: 3 }

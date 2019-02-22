@@ -18,6 +18,7 @@ to define any type, instead of just structs, while keeping the common case
 of defining structs light.
 
 <!-- CUE editor -->
+_emit.cue:_
 ```
 {
     a: A
@@ -29,6 +30,7 @@ B: 2
 ```
 
 <!-- result -->
+`$ cue eval emit.cue`
 ```
 a: 1
 b: 2

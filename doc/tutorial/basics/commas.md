@@ -14,6 +14,7 @@ requires commas, but the scanner inserts commas according to a small set
 of simple rules._
 
 <!-- CUE editor -->
+_commas.cue:_
 ```
 {
     one: 1
@@ -25,6 +26,7 @@ of simple rules._
 
 
 <!-- JSON result -->
+`$ cue export commas.cue`
 ```json
 {
     "one": 1,

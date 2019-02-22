@@ -12,6 +12,7 @@ For `int` CUE supports both Euclidean division (`div` and `mod`)
 and truncated division (`quo` and `rem`).
 
 <!-- CUE editor -->
+_op.cue:_
 ```
 a: 3 / 2   // type float
 b: 3 div 2 // type int: Euclidean division
@@ -23,6 +24,7 @@ e: 8 < 10
 ```
 
 <!-- result -->
+`$ cue eval -i op.cue`
 ```
 a: 1.5
 b: 1

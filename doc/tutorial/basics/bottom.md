@@ -16,6 +16,7 @@ Note that an error is different from `null`: `null` is a valid value,
 whereas `_|_` is not.
 
 <!-- CUE editor -->
+_bottom.cue:_
 ```
 a: 4
 a: 5
@@ -28,6 +29,7 @@ val: list[3]
 ```
 
 <!-- result -->
+`$ cue eval -i bottom.cue`
 ```
 a:    _|_
 l:    _|_

@@ -27,6 +27,7 @@ uint128   >=0 & <=340_282_366_920_938_463_463_374_607_431_768_211_455
 ```
 
 <!-- CUE editor -->
+_range.cue:_
 ```
 positive: uint
 byte:     uint8
@@ -40,6 +41,7 @@ word:     int32
 ```
 
 <!-- result -->
+`$ cue eval -i range.cue`
 ```
 a: _|_
 b: 128

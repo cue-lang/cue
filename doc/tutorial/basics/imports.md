@@ -21,6 +21,7 @@ import "math"
 But it is good style to use the factored import statement.
 
 <!-- CUE editor -->
+_imports.cue:_
 ```
 import (
 	"encoding/json"
@@ -31,6 +32,7 @@ data: json.Marshal({ a: math.Sqrt(7) })
 ```
 
 <!-- result -->
+`$ cue eval imports.cue`
 ```
 data: "{\"a\":2.6457513110645907}"
 ```

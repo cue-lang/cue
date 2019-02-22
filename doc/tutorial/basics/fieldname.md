@@ -12,6 +12,7 @@ Double quotes may be omitted from field names if their name contains no
 special characters and does not start with a number:
 
 <!-- CUE editor -->
+_fieldname.cue:_
 ```
 {
     one: 1,
@@ -22,6 +23,7 @@ special characters and does not start with a number:
 ```
 
 <!-- JSON result -->
+`$ cue export fieldname.cue`
 ```json
 {
     "one": 1,

@@ -17,7 +17,7 @@ The order in which files are loaded is undefined, but any order will result
 in the same outcome, given that order does not matter.
 
 <!-- CUE editor tab 1-->
-File a.cue
+_a.cue:_
 ```
 package config
 
@@ -26,7 +26,7 @@ bar: int
 ```
 
 <!-- CUE editor tab 2-->
-File b.cue
+_b.cue:_
 ```
 package config
 
@@ -34,7 +34,7 @@ bar: 200
 ```
 
 <!-- result -->
-Result
+`$ cue eval a.cue b.cue`
 ```
 foo: 100
 bar: 200

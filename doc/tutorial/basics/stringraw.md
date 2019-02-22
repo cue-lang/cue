@@ -13,6 +13,7 @@ This works for normal and interpolated strings.
 Quotes do not have to be escaped in such strings.
 
 <!-- CUE editor -->
+_stringraw.cue:_
 ```
 msg1: #"The sequence "\U0001F604" renders as \#U0001F604."#
 
@@ -21,11 +22,13 @@ msg2: ##"""
 
         #"\d{3}"#
 
-    This construct works for bytes, strings and their multi-line variants.
+    This construct works for bytes, strings and their
+    multi-line variants.
     """##
 ```
 
 <!-- JSON result -->
+`$ cue eval stringraw.cue`
 ```json
 {
     msg1: "The sequence \"\\U0001F604\" renders as 😄."
@@ -34,7 +37,8 @@ msg2: ##"""
         
             #\"\\d{3}\"#
         
-        This construct works for bytes, strings and their multi-line variants.
+        This construct works for bytes, strings and their
+        multi-line variants.
         """
 }
 ```

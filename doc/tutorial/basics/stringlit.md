@@ -15,6 +15,7 @@ whitespace on all other lines and is removed from these lines.
 Strings may also contain [interpolations](interpolation.md).
 
 <!-- CUE editor -->
+_stringlit.cue:_
 ```
 // 21-bit unicode characters
 a: "\U0001F60E" // 😎
@@ -27,9 +28,10 @@ b: """
 ```
 
 <!-- JSON result -->
+`$ cue extract stringlit.cue`
 ```json
 {
-    a: "😎"
-    b: "Hello\nWorld!"
+    "a": "😎",
+    "b": "Hello\nWorld!"
 }
 ```

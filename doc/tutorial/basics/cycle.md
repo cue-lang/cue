@@ -16,6 +16,7 @@ a user will want to fill out.
 
 
 <!-- CUE editor -->
+_cycle.cue:_
 ```
 // CUE knows how to resolve the following:
 x: 200
@@ -28,6 +29,7 @@ b: a - 100
 ```
 
 <!-- result -->
+`$ cue eval -i cycle.cue`
 ```
 x: 200
 y: 100

@@ -13,6 +13,7 @@ For instance `>5.0` allows all floating point values greater than `5.0`,
 whereas `<0` allows all negative numbers (int or float).
 
 <!-- CUE editor -->
+_bounds.cue:_
 ```
 rn: >=3 & <8        // type int | float
 ri: >=3 & <8 & int  // type int
@@ -31,6 +32,7 @@ rs: >="a" & <"mo"
 ```
 
 <!-- result -->
+`$ cue eval -i bounds.cue`
 ```
 a:  3.5
 b:  _|_

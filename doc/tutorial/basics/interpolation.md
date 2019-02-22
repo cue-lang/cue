@@ -10,6 +10,7 @@ Any valid CUE expression may be used inside the escaped parentheses.
 Interpolation may also be used in multiline string and byte literals.
 
 <!-- CUE editor -->
+_interpolation.cue:_
 ```
 "You are \( cost - budget ) dollars over budget!"
 
@@ -18,6 +19,7 @@ budget: 88
 ```
 
 <!-- result -->
+`$ cue eval interpolation.cue`
 ```
 "You are 14 dollars over budget!"
 ```

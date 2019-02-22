@@ -1,4 +1,4 @@
-[TOC](Readme.md) [Prev](defaults.md) [Next](ranges.md)
+[TOC](Readme.md) [Prev](sumstruct.md) [Next](ranges.md)
 
 _Types ~~and~~ are Values_
 
@@ -15,6 +15,7 @@ In the example, the result of `b` is a `float` and cannot be
 used as an `int` without conversion.
 
 <!-- CUE editor -->
+_numbers.cue:_
 ```
 a: int
 a: 4 // type int
@@ -29,6 +30,7 @@ d: 4  // will evaluate to type int (default)
 ```
 
 <!-- result -->
+`$ cue eval -i numbers.cue`
 ```
 a: 4
 b: 4.0

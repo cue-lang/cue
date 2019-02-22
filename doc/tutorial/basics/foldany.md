@@ -10,12 +10,14 @@ In general, any JSON object can be expressed as a collection of
 path-leaf pairs without using any curly braces.
 
 <!-- CUE editor -->
+_foldany.cue:_
 ```
 outer middle1 inner: 3
 outer middle2 inner: 7
 ```
 
 <!-- JSON result -->
+`$ cue export foldany.cue`
 ```json
 {
     "outer": {

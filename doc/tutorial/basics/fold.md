@@ -7,11 +7,13 @@ _JSON Sugar and other Goodness_
 CUE allows a shorthand for structs with single members.
 
 <!-- CUE editor -->
+_fold.cue:_
 ```
 outer middle inner: 3
 ```
 
 <!-- JSON result -->
+`$ cue export fold.cue`
 ```json
 {
     "outer": {

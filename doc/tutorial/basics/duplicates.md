@@ -14,6 +14,7 @@ For lists, all elements must match accordingly
 ([we discuss open-ended lists later](lists.md).)
 
 <!-- CUE editor -->
+_dup.cue:_
 ```
 a: 4
 a: 4
@@ -30,6 +31,7 @@ l: [ 1, 2 ]
 ```
 
 <!-- result -->
+`$ cue eval dup.cue`
 ```
 a: 4
 s: {

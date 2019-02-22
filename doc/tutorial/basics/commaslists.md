@@ -9,6 +9,7 @@ Commas are still required as separators in lists.
 The last element of a list may also have a comma.
 
 <!-- CUE editor -->
+_commas2.cue:_
 ```
 [
     1,
@@ -18,6 +19,7 @@ The last element of a list may also have a comma.
 ```
 
 <!-- JSON result -->
+`$ cue export commas2.cue`
 ```json
 [
     1,

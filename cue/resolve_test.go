@@ -930,6 +930,74 @@ func TestResolve(t *testing.T) {
 
 			`}`,
 	}, {
+		desc: "list equality",
+		in: `
+		eq0: [] == []
+		eq1: [...] == []
+		eq2: [] == [...]
+		eq3: [...] == [...]
+
+		eq4: [1] == [1]
+		eq5: [1, ...] == [1]
+		eq6: [1] == [1, ...]
+		eq7: [1, ...] == [1, ...]
+
+		eq8: [1, 2] == [1, 2]
+		eq9: [1, 2, ...] == [1, 2]
+		eq10: [1, 2] == [1, 2, ...]
+		eq11: [1, 2, ...] == [1, 2, ...]
+
+		ne0: [] != []
+		ne1: [...] != []
+		ne2: [] != [...]
+		ne3: [...] != [...]
+
+		ne4: [1] != [1]
+		ne5: [1, ...] != [1]
+		ne6: [1] != [1, ...]
+		ne7: [1, ...] != [1, ...]
+
+		ne8: [1, 2] != [1, 2]
+		ne9: [1, 2, ...] != [1, 2]
+		ne10: [1, 2] != [1, 2, ...]
+		ne11: [1, 2, ...] != [1, 2, ...]
+
+		feq0: [] == [1]
+		feq1: [...] == [1]
+		feq2: [] == [1, ...]
+		feq3: [...] == [1, ...]
+
+		feq4: [1] == []
+		feq5: [1, ...] == []
+		feq6: [1] == [...]
+		feq7: [1, ...] == [...]
+
+		feq8: [1, 2] == [1]
+		feq9: [1, ...] == [1, 2]
+		feq10: [1, 2] == [1, ...]
+		feq11: [1, ...] == [1, 2, ...]
+
+		fne0: [] != [1]
+		fne1: [...] != [1]
+		fne2: [] != [1, ...]
+		fne3: [1, ...] != [1, ...]
+
+		fne4: [1] != []
+		fne5: [1, ...] != []
+		fne6: [1] != [...]
+		fne7: [1, ...] != [...]
+
+		fne8: [1, 2] != [1]
+		fne9: [1, ...] != [1, 2]
+		fne10: [1, 2] != [1, ...]
+		fne11: [1, ...] != [1, 2, ...]
+		`,
+		out: `<0>{` +
+			`eq0: true, eq1: true, eq2: true, eq3: true, eq4: true, eq5: true, eq6: true, eq7: true, eq8: true, eq9: true, eq10: true, eq11: true, ` +
+			`ne0: true, ne1: true, ne2: true, ne3: true, ne4: false, ne5: false, ne6: false, ne7: false, ne8: false, ne9: false, ne10: false, ne11: false, ` +
+			`feq0: false, feq1: false, feq2: false, feq3: false, feq4: false, feq5: false, feq6: false, feq7: false, feq8: false, feq9: false, feq10: false, feq11: false, ` +
+			`fne0: false, fne1: false, fne2: false, fne3: false, fne4: false, fne5: false, fne6: false, fne7: false, fne8: false, fne9: false, fne10: false, fne11: false}`,
+	}, {
 		desc: "correct error messages",
 		// Tests that it is okay to partially evaluate structs.
 		in: `

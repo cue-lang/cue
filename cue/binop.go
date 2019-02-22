@@ -956,6 +956,21 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		}
 		return &list{baseValue: binSrc(src.Pos(), op, x, other), a: a, typ: typ, len: n}
 
+	case opEql, opNeq:
+		y, ok := other.(*list)
+		if !ok {
+			break
+		}
+		if len(x.a) != len(y.a) {
+			return boolTonode(src, false)
+		}
+		for i := range x.a {
+			if !test(ctx, src, op, x.at(ctx, i), y.at(ctx, i)) {
+				return boolTonode(src, false)
+			}
+		}
+		return boolTonode(src, true)
+
 	case opAdd:
 		y, ok := other.(*list)
 		if !ok {

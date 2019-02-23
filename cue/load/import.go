@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"fmt"
 	"log"
+	"os"
 	pathpkg "path"
 	"path/filepath"
 	"sort"
@@ -75,7 +76,7 @@ func (l *loader) importPkg(path, srcDir string) *build.Instance {
 
 	parentPath := path
 	if isLocalImport(path) {
-		parentPath = filepath.Join(srcDir, path)
+		parentPath = filepath.Join(srcDir, filepath.FromSlash(path))
 	}
 	p := cfg.Context.NewInstance(path, l.loadFunc(parentPath))
 	p.DisplayPath = path
@@ -162,10 +163,18 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 	return func(path string) *build.Instance {
 		cfg := l.cfg
 
-		// TODO: HACK: for now we don't handle any imports that are not
-		// relative paths.
 		if !isLocalImport(path) {
-			return nil
+			// is it a builtin?
+			if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
+				return nil
+			}
+			if cfg.modRoot == "" {
+				i := cfg.newInstance(path)
+				report(i, l.errPkgf(nil,
+					"import %q not found in the pkg directory", path))
+				return i
+			}
+			return l.importPkg(path, filepath.Join(cfg.modRoot, "pkg"))
 		}
 
 		if strings.Contains(path, "@") {
@@ -186,6 +195,10 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 		return fmt.Errorf("import %q: invalid import path", path)
 	}
 
+	if ctxt.isAbsPath(path) || strings.HasPrefix(path, "/") {
+		return fmt.Errorf("load: absolute import path %q not allowed", path)
+	}
+
 	if isLocalImport(path) {
 		if srcDir == "" {
 			return fmt.Errorf("import %q: import relative to unknown directory", path)
@@ -194,13 +207,14 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 			p.Dir = ctxt.joinPath(srcDir, path)
 		}
 		return nil
+	} else {
+		dir := ctxt.joinPath(srcDir, path)
+		info, err := os.Stat(filepath.Join(srcDir, path))
+		if err == nil && info.IsDir() {
+			p.Dir = dir
+			return nil
+		}
 	}
-
-	if strings.HasPrefix(path, "/") {
-		return fmt.Errorf("import %q: cannot import absolute path", path)
-	}
-
-	// TODO: Lookup the import in dir "pkg" at the module root.
 
 	// package was not found
 	return fmt.Errorf("cannot find package %q", path)

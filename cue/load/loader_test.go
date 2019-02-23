@@ -77,6 +77,12 @@ main: other/main.cue (1 files)
 		args: args("./empty"),
 		want: ":  (0 files)",
 		err:  `no CUE files in ./empty`,
+	}, {
+		args: args("./imports"),
+		want: `
+imports: imports/imports.cue (1 files)
+	catch: pkg/acme.com/catch/catch.cue (1 files)`,
+		err: ``,
 	}}
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {

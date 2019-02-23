@@ -26,6 +26,7 @@ const (
 	cueSuffix  = ".cue"
 	defaultDir = "cue"
 	modFile    = "cue.mod"
+	pkgDir     = "pkg" // TODO: vendor?
 )
 
 // FromArgsUsage is a partial usage message that applications calling
@@ -138,17 +139,6 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	}
 
-	c.loader = &loader{cfg: &c}
-
-	if c.Context == nil {
-		c.Context = build.NewContext(build.Loader(c.loader.loadFunc(c.Dir)))
-	}
-
-	if c.cache == "" {
-		c.cache = filepath.Join(home(), defaultDir)
-		// os.MkdirAll(c.Cache, 0755) // TODO: tools task
-	}
-
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
@@ -161,26 +151,50 @@ func (c Config) complete() (cfg *Config, err error) {
 			c.modRoot = abs
 		}
 	}
+
+	c.loader = &loader{cfg: &c}
+
+	if c.Context == nil {
+		c.Context = build.NewContext(build.Loader(c.loader.loadFunc(c.Dir)))
+	}
+
+	if c.cache == "" {
+		c.cache = filepath.Join(home(), defaultDir)
+		// os.MkdirAll(c.Cache, 0755) // TODO: tools task
+	}
+
 	return &c, nil
 }
 
 func findRoot(dir string) (string, error) {
-	abs, err := filepath.Abs(dir)
+	absDir, err := filepath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
+	abs := absDir
 	for {
 		info, err := os.Stat(filepath.Join(abs, modFile))
 		if err == nil && !info.IsDir() {
-			break
+			return abs, nil
 		}
 		d := filepath.Dir(abs)
 		if len(d) >= len(abs) {
-			return "", err // reached top of file system, no cue.mod
+			break // reached top of file system, no cue.mod
 		}
 		abs = d
 	}
-	return abs, nil
+	abs = absDir
+	for {
+		info, err := os.Stat(filepath.Join(abs, pkgDir))
+		if err == nil && info.IsDir() {
+			return abs, nil
+		}
+		d := filepath.Dir(abs)
+		if len(d) >= len(abs) {
+			return "", err // reached top of file system, no pkg dir.
+		}
+		abs = d
+	}
 }
 
 func home() string {

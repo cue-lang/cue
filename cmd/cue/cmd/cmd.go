@@ -216,5 +216,5 @@ An example using pipes:
 }
 
 func init() {
-	RootCmd.AddCommand(cmdCmd)
+	rootCmd.AddCommand(cmdCmd)
 }

@@ -91,7 +91,7 @@ removal.
 }
 
 func init() {
-	RootCmd.AddCommand(trimCmd)
+	rootCmd.AddCommand(trimCmd)
 	fOut = trimCmd.Flags().StringP("out", "o", "", "alternative output or - for stdout")
 }
 

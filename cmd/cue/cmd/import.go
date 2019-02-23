@@ -196,7 +196,7 @@ Example:
 }
 
 func init() {
-	RootCmd.AddCommand(importCmd)
+	rootCmd.AddCommand(importCmd)
 
 	out = importCmd.Flags().StringP("out", "o", "", "alternative output or - for stdout")
 	name = importCmd.Flags().StringP("name", "n", "", "glob filter for file names")

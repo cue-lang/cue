@@ -26,7 +26,7 @@ import (
 // fmtCmd represents the fmt command
 var fmtCmd = &cobra.Command{
 	Use:   "fmt [-s] [packages]",
-	Short: "formats CUE configuration files.",
+	Short: "formats CUE configuration files",
 	Long: `Fmt formats the given files or the files for the given packages in place
 `,
 	RunE: func(cmd *cobra.Command, args []string) error {
@@ -69,5 +69,5 @@ var fmtCmd = &cobra.Command{
 }
 
 func init() {
-	RootCmd.AddCommand(fmtCmd)
+	rootCmd.AddCommand(fmtCmd)
 }

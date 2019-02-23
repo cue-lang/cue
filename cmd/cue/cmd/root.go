@@ -40,8 +40,8 @@ var log = logger.New(os.Stderr, "", logger.Lshortfile)
 
 var cfgFile string
 
-// RootCmd represents the base command when called without any subcommands
-var RootCmd = &cobra.Command{
+// rootCmd represents the base command when called without any subcommands
+var rootCmd = &cobra.Command{
 	Use:   "cue",
 	Short: "cue emits configuration files to user-defined commands.",
 	Long: `cue evaluates CUE files, an extension of JSON, and sends them
@@ -91,9 +91,9 @@ func Execute() {
 		// TODO: for now we only allow one instance. Eventually, we can allow
 		// more if they all belong to the same package and we merge them
 		// before computing commands.
-		if cmd, _, err := RootCmd.Find(args); err != nil || cmd == nil {
-			tools := buildTools(RootCmd, args[1:])
-			addCustom(RootCmd, commandSection, args[0], tools)
+		if cmd, _, err := rootCmd.Find(args); err != nil || cmd == nil {
+			tools := buildTools(rootCmd, args[1:])
+			addCustom(rootCmd, commandSection, args[0], tools)
 		}
 
 		type subSpec struct {
@@ -108,7 +108,7 @@ func Execute() {
 		if sub, ok := sub[args[0]]; ok && len(args) >= 2 {
 			args = args[1:]
 			if len(args) == 0 {
-				tools := buildTools(RootCmd, args)
+				tools := buildTools(rootCmd, args)
 				// list available commands
 				commands := tools.Lookup(sub.name)
 				i, err := commands.Fields()
@@ -118,7 +118,7 @@ func Execute() {
 				}
 				return // TODO: will this trigger the help?
 			}
-			tools := buildTools(RootCmd, args[1:])
+			tools := buildTools(rootCmd, args[1:])
 			_, err := addCustom(sub.cmd, sub.name, args[0], tools)
 			if err != nil {
 				log.Printf("%s %q is not defined", sub.name, args[0])
@@ -126,7 +126,7 @@ func Execute() {
 			}
 		}
 	}
-	if err := RootCmd.Execute(); err != nil {
+	if err := rootCmd.Execute(); err != nil {
 		// log.Fatal(err)
 		os.Exit(1)
 	}
@@ -146,17 +146,17 @@ func exit() { panic(panicSentinel) }
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	RootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cue)")
-	RootCmd.PersistentFlags().Bool("root", false, "load a CUE package from its root")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cue)")
+	rootCmd.PersistentFlags().Bool("root", false, "load a CUE package from its root")
 }
 
 var (
-	fDebug    = RootCmd.PersistentFlags().Bool("debug", false, "give detailed error info")
-	fTrace    = RootCmd.PersistentFlags().Bool("trace", false, "trace computation")
-	fDryrun   = RootCmd.PersistentFlags().BoolP("dryrun", "n", false, "only run simulation")
-	fPackage  = RootCmd.PersistentFlags().StringP("package", "p", "", "CUE package to evaluate")
-	fSimplify = RootCmd.PersistentFlags().BoolP("simplify", "s", false, "simplify output")
-	fIgnore   = RootCmd.PersistentFlags().BoolP("ignore", "i", false, "proceed in the presence of errors")
+	fDebug    = rootCmd.PersistentFlags().Bool("debug", false, "give detailed error info")
+	fTrace    = rootCmd.PersistentFlags().Bool("trace", false, "trace computation")
+	fDryrun   = rootCmd.PersistentFlags().BoolP("dryrun", "n", false, "only run simulation")
+	fPackage  = rootCmd.PersistentFlags().StringP("package", "p", "", "CUE package to evaluate")
+	fSimplify = rootCmd.PersistentFlags().BoolP("simplify", "s", false, "simplify output")
+	fIgnore   = rootCmd.PersistentFlags().BoolP("ignore", "i", false, "proceed in the presence of errors")
 )
 
 // initConfig reads in config file and ENV variables if set.

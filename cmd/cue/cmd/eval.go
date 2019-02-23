@@ -80,7 +80,7 @@ Examples:
 }
 
 func init() {
-	RootCmd.AddCommand(evalCmd)
+	rootCmd.AddCommand(evalCmd)
 
 	expressions = evalCmd.Flags().StringArrayP("expression", "e", nil, "evaluate this expression only")
 

@@ -181,6 +181,12 @@ func (x *bound) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 					return test(ctx, x, opGtr, xv, yv)
 				}
 
+			case opMat, opNMat:
+				// these are just approximations
+				if y.op == x.op {
+					return test(ctx, x, opEql, xv, yv)
+				}
+
 			default:
 				// opNeq already handled above.
 				panic("cue: undefined bound mode")

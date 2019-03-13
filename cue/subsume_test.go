@@ -290,18 +290,49 @@ func TestSubsume(t *testing.T) {
 		197: {subsumes: false, in: `a: <2, b: !=2`},
 		198: {subsumes: false, in: `a: <=2, b: !=2`},
 
-		// Conjunctions
-		200: {subsumes: true, in: `a: >0, b: >=2 & <=100`},
-		201: {subsumes: false, in: `a: >0, b: >=0 & <=100`},
+		200: {subsumes: true, in: `a: =~"foo", b: =~"foo"`},
+		201: {subsumes: false, in: `a: =~"foo", b: =~"bar"`},
+		202: {subsumes: false, in: `a: =~"foo1", b: =~"foo"`},
 
-		210: {subsumes: true, in: `a: >=0 & <=100, b: 10`},
-		211: {subsumes: true, in: `a: >=0 & <=100, b: >=0 & <=100`},
-		212: {subsumes: false, in: `a: !=2 & !=4, b: >3`},
-		213: {subsumes: true, in: `a: !=2 & !=4, b: >5`},
+		203: {subsumes: true, in: `a: !~"foo", b: !~"foo"`},
+		204: {subsumes: false, in: `a: !~"foo", b: !~"bar"`},
+		205: {subsumes: false, in: `a: !~"foo", b: !~"foo1"`},
+
+		// The following is could be true, but we will not go down the rabbit
+		// hold of trying to prove subsumption of regular expressions.
+		210: {subsumes: false, in: `a: =~"foo", b: =~"foo1"`},
+		211: {subsumes: false, in: `a: !~"foo1", b: !~"foo"`},
+
+		220: {subsumes: true, in: `a: <5, b: 4`},
+		221: {subsumes: false, in: `a: <5, b: 5`},
+		222: {subsumes: true, in: `a: <=5, b: 5`},
+		223: {subsumes: false, in: `a: <=5.0, b: 5.00000001`},
+		224: {subsumes: true, in: `a: >5, b: 6`},
+		225: {subsumes: false, in: `a: >5, b: 5`},
+		226: {subsumes: true, in: `a: >=5, b: 5`},
+		227: {subsumes: false, in: `a: >=5, b: 4`},
+		228: {subsumes: true, in: `a: !=5, b: 6`},
+		229: {subsumes: false, in: `a: !=5, b: 5`},
+		230: {subsumes: false, in: `a: !=5.0, b: 5.0`},
+		231: {subsumes: false, in: `a: !=5.0, b: 5`},
+
+		250: {subsumes: true, in: `a: =~ #"^\d{3}$"#, b: "123"`},
+		251: {subsumes: false, in: `a: =~ #"^\d{3}$"#, b: "1234"`},
+		252: {subsumes: true, in: `a: !~ #"^\d{3}$"#, b: "1234"`},
+		253: {subsumes: false, in: `a: !~ #"^\d{3}$"#, b: "123"`},
+
+		// Conjunctions
+		300: {subsumes: true, in: `a: >0, b: >=2 & <=100`},
+		301: {subsumes: false, in: `a: >0, b: >=0 & <=100`},
+
+		310: {subsumes: true, in: `a: >=0 & <=100, b: 10`},
+		311: {subsumes: true, in: `a: >=0 & <=100, b: >=0 & <=100`},
+		312: {subsumes: false, in: `a: !=2 & !=4, b: >3`},
+		313: {subsumes: true, in: `a: !=2 & !=4, b: >5`},
 
 		// Disjunctions
-		230: {subsumes: true, in: `a: >5, b: >10 | 8`},
-		231: {subsumes: false, in: `a: >8, b: >10 | 8`},
+		330: {subsumes: true, in: `a: >5, b: >10 | 8`},
+		331: {subsumes: false, in: `a: >8, b: >10 | 8`},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

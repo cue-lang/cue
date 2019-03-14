@@ -21,34 +21,69 @@ _Configure, Unify, Execute_
 
 CUE is an open source data constraint language which aims
 to simplify tasks involving defining and using data.
-It can be used for data templating, data validation, and even
-defining scrips operating on data.
 
-CUE is a constraint-based language.
-Constraints act both as data templates and detailed type definitions.
-Constraints provide a powerful yet simple alternative
-to inheritance, a common source of complexity
-with existing configuration languages.
-Constraints also provide an expressive way to define the possible
-values of data types, which in turn can be used for data validation
-in various applications.
+It is a superset of JSON,
+allowing users familiar with JSON to get started quickly.
 
-The CUE tooling also provides integrated declarative scripting
-aimed at simplifying putting configurations to good use while
-giving static analysis tools maximum domain knowledge.
 
-Some highlights:
+### What is it for?
 
-- JSON superset: get started quickly
+You can use CUE to
+
+- define a detailed validation schema for your data (manually or automatically from data)
+- reduce boilerplate in your data (manually or automatically from schema)
+- extract a schema from code
+- generate type definitions and validation code
+- merge JSON in a principled way
+- define and run declarative scripts
+
+
+### How?
+
+CUE merges the notion of schema and data.
+The same CUE defintion can simultaneously be used for validating data
+and act as a template to reduce boilerplate.
+Schema definition is enriched with fine-grained value definitions
+and default values.
+At the same time,
+data can be simplified by removing values implied by such detailed definitions.
+The merging of these two concepts enables
+many tasks to be handled in a principled way.
+
+
+Constraints provide a simple and well-defined, yet powerful, alternative
+to inheritance,
+a common source of complexity with configuration languages.
+
+
+### CUE Scripting
+
+The CUE scripting layer defines declarative scripting, expressed in CUE,
+on top of data.
+This solves three problems:
+working around the closedness of CUE definitions (we say CUE is hermetic),
+providing an easy way to share common scripts and workflows for using data,
+and giving CUE the knowledge of how data is used to optimize validation.
+
+There are many tools that interpret data or use a specialized language for
+a specific domain (Kustomize, Ksonnet).
+This solves dealing with data on one level, but the problem it solves may repeat
+itself at a higher level when integrating other systems in a workflow.
+CUE scripting is generic and allows users to define any workflow.
+
+
+### Tooling
+
+CUE is designed for automation.
+Some aspects of this are:
+
 - convert existing YAML and JSON
-- declarative scripting
 - automatically simplify configurations
+- rich APIs designed for automated tooling
 - formatter
 - arbitrary-precision arithmetic
-- rich APIs designed for automated tooling
-- a formalism conducive to automated reasoning
 - generate CUE templates from source code
-- generate source code from CUE configurations (TODO)
+- generate source code from CUE definitions (TODO)
 
 
 ### Download and Install

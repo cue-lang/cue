@@ -33,9 +33,10 @@ type parser struct {
 	scanner scanner.Scanner
 
 	// Tracing/debugging
-	mode   mode // parsing mode
-	trace  bool // == (mode & Trace != 0)
-	indent int  // indentation used for tracing output
+	mode      mode // parsing mode
+	trace     bool // == (mode & Trace != 0)
+	panicking bool // set if we are bailing out due to too many errors.
+	indent    int  // indentation used for tracing output
 
 	// Comments
 	leadComment *ast.CommentGroup
@@ -150,7 +151,9 @@ func (p *parser) closeList() {
 	}
 	switch c.isList--; {
 	case c.isList < 0:
-		panic("unmatched close list")
+		if !p.panicking {
+			panic("unmatched close list")
+		}
 	case c.isList == 0:
 		parent := c.parent
 		parent.groups = append(parent.groups, c.groups...)
@@ -161,7 +164,10 @@ func (p *parser) closeList() {
 
 func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
 	if p.comments != c {
-		panic("unmatched comments")
+		if !p.panicking {
+			panic("unmatched comments")
+		}
+		return n
 	}
 	p.comments = c.parent
 	if c.parent != nil {
@@ -336,9 +342,6 @@ func (p *parser) next() {
 	}
 }
 
-// A bailout panic is raised to indicate early termination.
-type bailout struct{}
-
 func (p *parser) error(pos token.Pos, msg string) {
 	ePos := p.file.Position(pos)
 
@@ -351,7 +354,8 @@ func (p *parser) error(pos token.Pos, msg string) {
 			return // discard - likely a spurious error
 		}
 		if n > 10 {
-			panic(bailout{})
+			p.panicking = true
+			panic("too many errors")
 		}
 	}
 

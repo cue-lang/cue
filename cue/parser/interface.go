@@ -147,11 +147,8 @@ func ParseFile(p *token.FileSet, filename string, src interface{}, mode ...Optio
 
 	var pp parser
 	defer func() {
-		if e := recover(); e != nil {
-			// resume same panic if it's not a bailout
-			if _, ok := e.(bailout); !ok {
-				panic(e)
-			}
+		if pp.panicking {
+			recover()
 		}
 
 		// set result values
@@ -198,11 +195,8 @@ func ParseExpr(fset *token.FileSet, filename string, src interface{}, mode ...Op
 
 	var p parser
 	defer func() {
-		if e := recover(); e != nil {
-			// resume same panic if it's not a bailout
-			if _, ok := e.(bailout); !ok {
-				panic(e)
-			}
+		if p.panicking {
+			recover()
 		}
 		p.errors.Sort()
 		err = p.errors.Err()

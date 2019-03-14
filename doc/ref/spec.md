@@ -625,7 +625,7 @@ These all follow from the definition of disjunction:
 - The disjunction of two bottom values is bottom.
 
 Disjunction in CUE is a [binary expression](#Operands), written `a | b`.
-It is commutative and associative.
+It is commutative, associative, and idempotent.
 
 The unification of a disjunction with another value is equal to the disjunction
 composed of the unification of this value with all of the original elements
@@ -643,92 +643,155 @@ Expression                Result
 ("a" | "b") & "c"         _|_
 ```
 
+A disjunction is _normalized_ if there is no element
+`a` for which there is an element `b` such that `a ⊑ b`.
+
+<!--
+Normalization is important, as we need to account for spurious elements
+For instance "tcp" | "tcp" should resolve to "tcp".
+
+Also consider
+
+  ({a:1} | {b:1}) & ({a:1} | {b:2}) -> {a:1} | {a:1,b:1} | {a:1,b:2},
+
+in this case, elements {a:1,b:1} and {a:1,b:2} are subsumed by {a:1} and thus
+this expression is logically equivalent to {a:1} and should therefore be
+considered to be unambiguous and resolve to {a:1} if a concrete value is needed.
+
+For instance, in
+
+  x: ({a:1} | {b:1}) & ({a:1} | {b:2}) // -> {a:1} | {a:1,b:1} | {a:1,b:2}
+  y: x.a // 1
+
+y should resolve to 1, and not an error.
+
+For comparison, in
+
+  x: ({a:1, b:1} | {b:2}) & {a:1} // -> {a:1,b:1} | {a:1,b:2}
+  y: x.a // _|_
+
+y should be an error as x is still ambiguous before the selector is applied,
+even though `a` resolves to 1 in all cases.
+-->
+
 
 #### Default values
 
-One or more values in a disjunction can be _marked_
-by prefixing it with a `*` ([a unary expression](#Operators)).
-A bottom value cannot be marked.
-When a marked value is unified, the result is also marked.
-(When unification results in a single value,
-the mark is dropped, as single values cannot be marked.)
+Any element of a disjunction can be marked as a default
+by prefixing it with an asterisk '*'.
+Intuitively, when an expression needs to be resolved for an operation other
+than unification or disjunctions,
+non-starred elements are dropped in favor of starred ones if the starred ones
+do not resolve to bottom.
 
-A disjunction is _normalized_ if there is no unmarked element
-`a` for which there is an element `b` such that `a ⊑ b`
-and no marked element `c` for which there is a marked element
-`d` such that `c ⊑ d`.
-A disjunction literal must be normalized.
+More precisely, any value `v` may be associated with a default value `d`,
+denoted `(v, d)` (not CUE syntax),
+where `d` must be in instance of `v` (`d ⊑ v`).
+The rules for unifying and disjoining such values are as follows:
+
+```
+U1: (v1, d1) & v2       => (v1&v2, d1&v2)
+U2: (v1, d1) & (v2, d2) => (v1&v2, d1&d2)
+
+D1: (v1, d1) | v2       => (v1|v2, d1)
+D2: (v1, d1) | (v2, d2) => (v1|v2, d1|d2)
+```
+
+For any other operation, such as arithmetic expressions, indices, slices, and
+selectors, the value `(v, d)` yields `d` if it is not bottom, or `v` otherwise.
+
+Default values may be introduced within disjunctions
+by _marking_ terms of a disjunction with an asterisk `*`
+([a unary expression](#Operators)).
+The default value of a disjunction with marked terms is the disjunction
+of those marked terms, applying the following rules for marks:
+
+```
+M1: *v        => (v, v)  
+M2: *(v1, d1) => (v1, d1)
+```
+
+```
+Expression               Value-default pair      Rules applied
+*"tcp" | "udp"           ("tcp"|"udp", "tcp")    M1, D1
+string | *"foo"          (string, "foo")         M1, D1
+
+*1 | 2 | 3               (1|2|3, 1)              M1, D1
+
+(*1|2|3) | (1|*2|3)      (1|2|3, 1|2)            M1, D1, D2
+(*1|2|3) | *(1|*2|3)     (1|2|3, 1|2)            M1, D1, M2, D2
+(*1|2|3) | (1|*2|3)&2    (1|2|3, 1|2)            M1, D1, U1, D2
+
+(*1|2) & (1|*2)          (1|2, _|_)              M1, D1, U2
+```
+
+The rules of subsumption for defaults can be derived from the above definitions
+and are as follows.
+
+```
+(v2, d2) ⊑ (v1, d1)  if v2 ⊑ v1 and d2 ⊑ d1
+(v1, d1) ⊑ v         if v1 ⊑ v
+v ⊑ (v1, d1)         if v ⊑ d1
+```
+
+<!--
+For the second rule, note that by definition d1 ⊑ v1, so d1 ⊑ v1 ⊑ v.
+
+The last one is so restrictive as v could still be made more specific by
+associating it with a default that is not subsumed by d1.
+
+Proof:
+  by definition for any d ⊑ v, it holds that (v, d) ⊑ v,
+  where the most general value is (v, v).
+  Given the subsumption rule for (v2, d2) ⊑ (v1, d1),
+  from (v, v) ⊑ v ⊑ (v1, d1) it follows that v ⊑ d1
+  exactly defines the boundary of this subsumption.
+-->
 
 <!--
 (non-normalized entries could also be implicitly marked, allowing writing
 int | 1, instead of int | *1, but that can be done in a backwards
-compatible way later if really desirable).
-
-Normalization is important, as we need to account for spurious elements
-For instance
-"tcp" | "tcp", or
-({a:1} | {b:1}) & ({a:1} | {b:2}) -> {a:1} | {a:1,b:1} | {a:1,b:2},
-
-In the latter case, elements {a:1,b:1} and {a:1,b:2} are subsumed by {a:1}.
-Note that without defaults, {a:1} | {a:1,b:1} | {a:1,b:2} is logically
-identical to {a:1}.
-More to the point, without normalization unifying {a:1} | {b:1} with {a:1,b:2}
-results in a single value and thus resolves,
-whereas unifying {a:1} | {a:1,b:1} | {a:1,b:2} with {a:1,b:2}
-results in two values, and thus does not resolve.
-With normalization:
-({a:1} | {a:1,b:1} | {a:1,b:2}) & {a:1}          {a:1}, instead of _|_,
-({a:1} | {b:1}) & {a:1}         {a:1} (instead of _|_), as {a:1,b:1} ⊑ {a:1}
+compatible way later if really desirable, as long as we require that
+disjunction literals be normalized).
 -->
 
-If a disjunction appears where a concrete value is required
-(that is, as an operand or in a location where it will be emitted),
-the result is, after normalization and after dropping non-marked elements
-if some elements are marked,
-the resulting value itself if only a single value remains or bottom otherwise.
-
-<!--
-We treat remaining marked and unmarked elements the same to have less surprises:
-
-Unifying {a:1}|{b:1} with *{}|string produces *{a:1}|*{b:1}. It would be
-surprising to have a different default for {a:1}|{b:1} and *{a:1}|*{b:1} in
-this case.
-
-Similarly, we do not unify the remaining elements to minimize the difference
-between using a disjunction in cases where concrete values are required
-versus otherwise.
--->
-
-<!-- TODO: is the above definition precise enough, or perhaps too abstract?
-Previously:
-
-A default value is chosen if the disjunction is not used
-in a unification or disjunction operation.
-This means that, in practice, a default is chosen for almost any expression
-that does not involve `&` and `|`, including slices, indices, selectors,
-and all but a few explicitly marked builtin functions. -->
 
 ```
-Expression                       Default
-"tcp" | "udp"                    _|_ // more than one element remaining
+Expression                       Resolves to
+"tcp" | "udp"                    "tcp" | "udp"
 *"tcp" | "udp"                   "tcp"
 float | *1                       1
 *string | 1.0                    string
 
+(*1|2|3) | (1|*2|3)              1|2
+(*1|2|3) & (1|*2|3)              1|2|3 // default is _|_
+
+(* >=5 | int) & (* <=5 | int)    5
+
 (*"tcp"|"udp") & ("udp"|*"tcp")  "tcp"
 (*"tcp"|"udp") & ("udp"|"tcp")   "tcp"
 (*"tcp"|"udp") & "tcp"           "tcp"
-(*"tcp"|"udp") & (*"udp"|"tcp")  _|_ // "tcp" & "udp"
+(*"tcp"|"udp") & (*"udp"|"tcp")  "tcp" | "udp" // default is _|_
 
 (*true | false) & bool           true
 (*true | false) & (true | false) true
 
-{a: 1} | {b: 1}                  _|_ // more than one element remaining
+{a: 1} | {b: 1}                  {a: 1} | {b: 1}
 {a: 1} | *{b: 1}                 {b:1}
-*{a: 1} | *{b: 1}                _|_ // more than one marked element remaining
-({a: 1} | {b: 1}) & {a:1}        {a:1} // after eliminating {a:1,b:1}
-({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1} // after eliminating *{a:1,b:1}
+*{a: 1} | *{b: 1}                {a: 1} | {b: 1}
+({a: 1} | {b: 1}) & {a:1}        {a:1} // after eliminating {a:1,b:1} by normalization
+({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1} // after eliminating {a:1,b:1} by normalization
 ```
+
+<!--
+TODO: to be consistent, we should probably drop this requirement and define
+for such operation which which types a value is unified.
+
+For instance, right now [1, 2][0.0] is not allowed,
+whereas [1, 2][0] is (implicitly unified with int).
+It would be consistent to allow [1, 2]["foo" | 0] to work as well.
+The alternative is to disallow [1, 2][0], which would be quite annoying.
+-->
 
 A disjunction always evaluates to the same default value, regardless of
 the context in which the value is used.

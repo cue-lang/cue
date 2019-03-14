@@ -562,6 +562,92 @@ func stripCR(b []byte) []byte {
 	return c[:i]
 }
 
+// scanAttribute scans aa full attribute of the form @foo(str). An attribute
+// is a lexical entry and as such whitespace is treated as normal characters
+// within the attribute.
+func (s *Scanner) scanAttribute() (tok token.Token, lit string) {
+	offs := s.offset - 1 // @ already consumed
+
+	s.scanIdentifier()
+
+	if s.ch != '(' {
+		s.error(s.offset, "invalid attribute: expected '('")
+		return token.ATTRIBUTE, string(s.src[offs:s.offset])
+	}
+	s.next()
+
+	for {
+		s.scanAttributeElem()
+		if s.ch != ',' {
+			break
+		}
+		s.next()
+	}
+
+	if s.ch == ')' {
+		s.next()
+	} else {
+		s.error(s.offset, "attribute missing ')'")
+	}
+	return token.ATTRIBUTE, string(s.src[offs:s.offset])
+}
+
+func (s *Scanner) scanAttributeElem() {
+	// try CUE string
+	if s.scanAttributeString() {
+		return
+	}
+
+	// try key-value pair
+	if s.scanIdentifier() != "" && s.ch == '=' {
+		s.next()
+		if s.scanAttributeString() {
+			return
+		}
+	}
+
+	// raw element or key-value pair with raw value
+	for s.ch != ',' && s.ch != ')' && s.ch != '\n' && s.ch != -1 {
+		switch s.ch {
+		case '#', '\'', '"', '(', '=':
+			s.error(s.offset, "illegal character in attribute")
+			s.recoverParen(1)
+			return
+		}
+		s.next()
+	}
+}
+
+func (s *Scanner) scanAttributeString() bool {
+	if s.ch == '#' || s.ch == '"' || s.ch == '\'' {
+		if _, tok, _ := s.Scan(); tok == token.INTERPOLATION {
+			s.error(s.offset, "interpolation not allowed in attribute")
+			s.popInterpolation()
+			s.recoverParen(1)
+		}
+		return true
+	}
+	return false
+}
+
+// recoverParen is an approximate recovery mechanism to recover from invalid
+// attributes.
+func (s *Scanner) recoverParen(open int) {
+	for {
+		switch s.ch {
+		case '\n', -1:
+			return
+		case '(':
+			open++
+		case ')':
+			if open--; open == 0 {
+				return
+			}
+		}
+		s.next()
+	}
+}
+
 func (s *Scanner) skipWhitespace(inc int) {
 	for {
 		switch s.ch {
@@ -594,10 +680,15 @@ func (s *Scanner) switch2(tok0, tok1 token.Token) token.Token {
 	return tok0
 }
 
-// ResumeInterpolation resumes scanning of a string interpolation.
-func (s *Scanner) ResumeInterpolation() string {
+func (s *Scanner) popInterpolation() quoteInfo {
 	quote := s.quoteStack[len(s.quoteStack)-1]
 	s.quoteStack = s.quoteStack[:len(s.quoteStack)-1]
+	return quote
+}
+
+// ResumeInterpolation resumes scanning of a string interpolation.
+func (s *Scanner) ResumeInterpolation() string {
+	quote := s.popInterpolation()
 	_, str := s.scanString(1, quote)
 	return str
 }
@@ -706,7 +797,7 @@ scanAgain:
 			}
 			insertEOL = true
 		case '\n':
-			// we only reach here if s.insertSemi was
+			// we only reach here if s.insertComma was
 			// set in the first place and exited early
 			// from s.skipWhitespace()
 			s.insertEOL = false // newline consumed
@@ -738,6 +829,9 @@ scanAgain:
 				quote.numChar = n + 1
 				tok, lit = s.scanString(quote.numChar+quote.numHash, quote)
 			}
+		case '@':
+			insertEOL = true
+			tok, lit = s.scanAttribute()
 		case ':':
 			tok = token.COLON
 		case ';':

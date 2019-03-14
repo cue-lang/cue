@@ -27,6 +27,7 @@ const (
 	ILLEGAL Token = iota
 	EOF
 	COMMENT
+	ATTRIBUTE // @foo(bar,baz=4)
 
 	literalBeg
 	// Identifiers and basic type literals
@@ -115,6 +116,7 @@ var tokens = [...]string{
 	// DURATION:      "DURATION", // TODO
 	STRING:        "STRING",
 	INTERPOLATION: "INTERPOLATION",
+	ATTRIBUTE:     "ATTRIBUTE",
 
 	ADD: "+",
 	SUB: "-",

@@ -140,8 +140,15 @@ func debugStr(x interface{}) (out string) {
 		if v.Value != nil {
 			out += ": "
 			out += debugStr(v.Value)
+			for _, a := range v.Attrs {
+				out += " "
+				out += debugStr(a)
+			}
 		}
 		return out
+
+	case *ast.Attribute:
+		return v.Text
 
 	case *ast.Ident:
 		return v.Name

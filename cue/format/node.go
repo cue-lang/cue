@@ -168,6 +168,15 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.visitComments(f.current.pos)
 		}
 
+		space := tab
+		for _, a := range n.Attrs {
+			if f.before(a) {
+				f.print(space, a.At, a)
+			}
+			f.after(a)
+			space = blank
+		}
+
 		if nextFF {
 			f.print(formfeed)
 		}

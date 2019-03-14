@@ -60,9 +60,11 @@ type atter interface {
 }
 
 type iterAtter interface {
+	// TODO: make iterAt return a struct type instead, possibly an arc!
+
 	// at returns the evaluated and its original value at the given position.
 	// If the original could not be found, it returns an error and nil.
-	iterAt(*context, int) (evaluated, value, label)
+	iterAt(*context, int) (evaluated, value, label, *attributes)
 }
 
 // caller must be implemented by any concrete lambdaKind
@@ -204,12 +206,12 @@ type bytesLit struct {
 func (x *bytesLit) kind() kind       { return bytesKind }
 func (x *bytesLit) strValue() string { return string(x.b) }
 
-func (x *bytesLit) iterAt(ctx *context, i int) (evaluated, value, label) {
+func (x *bytesLit) iterAt(ctx *context, i int) (evaluated, value, label, *attributes) {
 	if i >= len(x.b) {
-		return nil, nil, 0
+		return nil, nil, 0, nil
 	}
 	v := x.at(ctx, i)
-	return v, v, 0
+	return v, v, 0, nil
 }
 
 func (x *bytesLit) at(ctx *context, i int) evaluated {
@@ -258,13 +260,13 @@ type stringLit struct {
 func (x *stringLit) kind() kind       { return stringKind }
 func (x *stringLit) strValue() string { return x.str }
 
-func (x *stringLit) iterAt(ctx *context, i int) (evaluated, value, label) {
+func (x *stringLit) iterAt(ctx *context, i int) (evaluated, value, label, *attributes) {
 	runes := []rune(x.str)
 	if i >= len(runes) {
-		return nil, nil, 0
+		return nil, nil, 0, nil
 	}
 	v := x.at(ctx, i)
-	return v, v, 0
+	return v, v, 0, nil
 }
 
 func (x *stringLit) at(ctx *context, i int) evaluated {
@@ -487,7 +489,7 @@ func (x *list) kind() kind {
 // already have been evaluated. It returns an error and nil if there was an
 // issue evaluating the list itself.
 func (x *list) at(ctx *context, i int) evaluated {
-	e, _, _ := x.iterAt(ctx, i)
+	e, _, _, _ := x.iterAt(ctx, i)
 	if e == nil {
 		return ctx.mkErr(x, "index %d out of bounds", i)
 	}
@@ -497,24 +499,24 @@ func (x *list) at(ctx *context, i int) evaluated {
 // iterAt returns the evaluated and original value of position i. List x must
 // already have been evaluated. It returns an error and nil if there was an
 // issue evaluating the list itself.
-func (x *list) iterAt(ctx *context, i int) (evaluated, value, label) {
+func (x *list) iterAt(ctx *context, i int) (evaluated, value, label, *attributes) {
 	if i < 0 {
-		return ctx.mkErr(x, "index %d out of bounds", i), nil, 0
+		return ctx.mkErr(x, "index %d out of bounds", i), nil, 0, nil
 	}
 	if i < len(x.a) {
-		return x.a[i].evalPartial(ctx), x.a[i], 0
+		return x.a[i].evalPartial(ctx), x.a[i], 0, nil
 	}
 	max := maxNum(x.len.(evaluated))
 	if max.kind().isGround() {
 		if max.kind()&intKind == bottomKind {
-			return ctx.mkErr(max, "length indicator of list not of type int"), nil, 0
+			return ctx.mkErr(max, "length indicator of list not of type int"), nil, 0, nil
 		}
 		n := max.(*numLit).intValue(ctx)
 		if i >= n {
-			return nil, nil, 0
+			return nil, nil, 0, nil
 		}
 	}
-	return x.typ.(evaluated), x.typ, 0
+	return x.typ.(evaluated), x.typ, 0, nil
 }
 
 func (x *list) isOpen() bool {
@@ -603,13 +605,13 @@ func (x *structLit) lookup(ctx *context, f label) (v evaluated, raw value) {
 	return nil, nil
 }
 
-func (x *structLit) iterAt(ctx *context, i int) (evaluated, value, label) {
+func (x *structLit) iterAt(ctx *context, i int) (evaluated, value, label, *attributes) {
 	x = x.expandFields(ctx)
 	if i >= len(x.arcs) {
-		return nil, nil, 0
+		return nil, nil, 0, nil
 	}
 	v := x.at(ctx, i)
-	return v, x.arcs[i].v, x.arcs[i].feature // TODO: return template & v for original?
+	return v, x.arcs[i].v, x.arcs[i].feature, x.arcs[i].attrs // TODO: return template & v for original?
 }
 
 func (x *structLit) at(ctx *context, i int) evaluated {
@@ -763,6 +765,7 @@ type arc struct {
 
 	v     value
 	cache evaluated // also used as newValue during unification.
+	attrs *attributes
 }
 
 type arcInfo struct {
@@ -773,7 +776,7 @@ type arcInfo struct {
 var hiddenArc = &arcInfo{hidden: true}
 
 // insertValue is used during initialization but never during evaluation.
-func (x *structLit) insertValue(ctx *context, f label, value value) {
+func (x *structLit) insertValue(ctx *context, f label, value value, a *attributes) {
 	for i, p := range x.arcs {
 		if f != p.feature {
 			continue
@@ -781,7 +784,7 @@ func (x *structLit) insertValue(ctx *context, f label, value value) {
 		x.arcs[i].v = mkBin(ctx, token.NoPos, opUnify, p.v, value)
 		return
 	}
-	x.arcs = append(x.arcs, arc{feature: f, v: value})
+	x.arcs = append(x.arcs, arc{feature: f, v: value, attrs: a})
 	sort.Stable(x)
 }
 
@@ -851,7 +854,7 @@ func (x *params) add(f label, v value) {
 	if v == nil {
 		panic("nil node")
 	}
-	x.arcs = append(x.arcs, arc{f, v, nil})
+	x.arcs = append(x.arcs, arc{f, v, nil, nil})
 }
 
 func (x *params) iterAt(ctx *context, i int) (evaluated, value) {
@@ -913,7 +916,7 @@ func (x *lambdaExpr) call(ctx *context, p source, args ...evaluated) value {
 		if isBottom(v) {
 			return v
 		}
-		arcs[i] = arc{a.feature, v, v}
+		arcs[i] = arc{a.feature, v, v, nil}
 	}
 	lambda := &lambdaExpr{x.baseValue, &params{arcs}, nil}
 	defer ctx.pushForwards(x, lambda).popForwards()

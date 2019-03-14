@@ -35,7 +35,7 @@ func stripRewriter(ctx *context, v value) (value, bool) {
 			arcs := make(arcs, len(x.arcs))
 			for i, a := range x.arcs {
 				v := rewrite(ctx, x.at(ctx, i), stripRewriter)
-				arcs[i] = arc{a.feature, v, nil}
+				arcs[i] = arc{a.feature, v, nil, a.attrs}
 			}
 			// TODO: verify that len(x.comprehensions) == 0
 			return &structLit{x.baseValue, x.emit, nil, nil, arcs, nil}, false

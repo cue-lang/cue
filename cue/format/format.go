@@ -303,12 +303,17 @@ func (f *formatter) visitComments(until int8) {
 			printBlank = true
 		}
 		for _, c := range c.cg[0].List {
+			isEnd := strings.HasPrefix(c.Text, "//")
 			if !printBlank {
-				f.Print(vtab)
+				if isEnd {
+					f.Print(vtab)
+				} else {
+					f.Print(blank)
+				}
 			}
 			f.Print(c.Slash)
 			f.Print(c)
-			if strings.HasPrefix(c.Text, "//") {
+			if isEnd {
 				f.Print(newline)
 			}
 		}

@@ -44,7 +44,7 @@ func (x *structLit) rewrite(ctx *context, fn rewriteFunc) value {
 	changed := emit == x.emit
 	for i, a := range x.arcs {
 		v := rewrite(ctx, a.v, fn)
-		arcs[i] = arc{a.feature, v, nil}
+		arcs[i] = arc{a.feature, v, nil, a.attrs}
 		changed = changed || arcs[i].v != v
 	}
 	if !changed {

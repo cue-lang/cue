@@ -264,6 +264,16 @@ func (g *CommentGroup) Text() string {
 	return strings.Join(lines, "\n")
 }
 
+// An Attribute provides meta data about a field.
+type Attribute struct {
+	comments
+	At   token.Pos
+	Text string // must be a valid attribute format.
+}
+
+func (a *Attribute) Pos() token.Pos { return a.At }
+func (a *Attribute) End() token.Pos { return a.At.Add(len(a.Text)) }
+
 // A Field represents a field declaration in a struct.
 type Field struct {
 	comments
@@ -272,10 +282,17 @@ type Field struct {
 	// No colon: Value must be an StructLit with one field.
 	Colon token.Pos
 	Value Expr // the value associated with this field.
+
+	Attrs []*Attribute
 }
 
 func (d *Field) Pos() token.Pos { return d.Label.Pos() }
-func (d *Field) End() token.Pos { return d.Value.End() }
+func (d *Field) End() token.Pos {
+	if len(d.Attrs) > 0 {
+		return d.Attrs[len(d.Attrs)-1].End()
+	}
+	return d.Value.End()
+}
 
 // An Alias binds another field to the alias name in the current struct.
 type Alias struct {

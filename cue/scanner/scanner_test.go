@@ -62,8 +62,17 @@ var testTokens = [...]elt{
 	{token.COMMENT, "/*\r*/", special},
 	{token.COMMENT, "//\r\n", special},
 
+	// Attributes
+	{token.ATTRIBUTE, "@foo()", special},
+	{token.ATTRIBUTE, "@foo(,,)", special},
+	{token.ATTRIBUTE, "@foo(a)", special},
+	{token.ATTRIBUTE, "@foo(aa=b)", special},
+	{token.ATTRIBUTE, "@foo(,a=b)", special},
+	{token.ATTRIBUTE, `@foo(",a=b")`, special},
+	{token.ATTRIBUTE, `@foo(##"\(),a=b"##)`, special},
+	{token.ATTRIBUTE, `@foo("",a="")`, special},
+
 	// Identifiers and basic type literals
-	{token.BOTTOM, "_|_", literal},
 	{token.BOTTOM, "_|_", literal},
 
 	{token.IDENT, "foobar", literal},
@@ -251,6 +260,8 @@ func TestScan(t *testing.T) {
 			if elit[1] == '/' {
 				elit = elit[0 : len(elit)-1]
 			}
+		case token.ATTRIBUTE:
+			elit = e.lit
 		case token.IDENT:
 			elit = e.lit
 		case token.COMMA:
@@ -715,6 +726,18 @@ var errorTests = []struct {
 	{`?`, token.ILLEGAL, 0, "", "illegal character U+003F '?'"},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
 	{`_|`, token.ILLEGAL, 0, "", "illegal token '_|'; expected '_'"},
+
+	{`@`, token.ATTRIBUTE, 1, `@`, "invalid attribute: expected '('"},
+	{`@foo`, token.ATTRIBUTE, 4, `@foo`, "invalid attribute: expected '('"},
+	{`@foo(`, token.ATTRIBUTE, 5, `@foo(`, "attribute missing ')'"},
+	{`@foo( `, token.ATTRIBUTE, 6, `@foo( `, "attribute missing ')'"},
+	{`@foo( "")`, token.ATTRIBUTE, 6, `@foo( "")`, "illegal character in attribute"},
+	{`@foo(a=b=c)`, token.ATTRIBUTE, 8, `@foo(a=b=c)`, "illegal character in attribute"},
+	{`@foo("" )`, token.ATTRIBUTE, 7, `@foo(""`, "attribute missing ')'"},
+	{`@foo(""`, token.ATTRIBUTE, 7, `@foo(""`, "attribute missing ')'"},
+	{`@foo(aa`, token.ATTRIBUTE, 7, `@foo(aa`, "attribute missing ')'"},
+	{`@foo("\(())")`, token.ATTRIBUTE, 7, `@foo("\(())")`, "interpolation not allowed in attribute"},
+
 	// {`' '`, STRING, 0, `' '`, ""},
 	// {"`\0`", STRING, 3, `'\0'`, "illegal character U+0027 ''' in escape sequence"},
 	// {`'\07'`, STRING, 4, `'\07'`, "illegal character U+0027 ''' in escape sequence"},

@@ -30,7 +30,8 @@ type exportMode int
 
 const (
 	exportEval exportMode = 1 << iota
-	exportRaw  exportMode = 0
+	exportAttrs
+	exportRaw exportMode = 0
 )
 
 func export(ctx *context, v value, m exportMode) ast.Expr {
@@ -263,6 +264,11 @@ func (p *exporter) expr(v value) ast.Expr {
 				f.Value = p.expr(a.v)
 			} else {
 				f.Value = p.expr(v)
+			}
+			if a.attrs != nil { // TODO: && p.mode&exportAttrs != 0 {
+				for _, at := range a.attrs.attr {
+					f.Attrs = append(f.Attrs, &ast.Attribute{Text: at.text})
+				}
 			}
 			obj.Elts = append(obj.Elts, f)
 		}

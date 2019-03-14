@@ -190,7 +190,7 @@ func TestExport(t *testing.T) {
 		in: `{
 			job <Name>: {
 				name:     Name
-				replicas: uint | *1
+				replicas: uint | *1 @protobuf(10)
 				command:  string
 			}
 			
@@ -206,12 +206,12 @@ func TestExport(t *testing.T) {
 			job: {
 				list: {
 					name:     "list"
-					replicas: 1
+					replicas: 1 @protobuf(10)
 					command:  "ls"
 				}
 				nginx: {
 					name:     "nginx"
-					replicas: 2
+					replicas: 2 @protobuf(10)
 					command:  "nginx"
 				}
 			}

@@ -138,6 +138,11 @@ func (p *printer) Print(v interface{}) {
 		}
 		return
 
+	case *ast.Attribute:
+		data = x.Text
+		impliedComma = true
+		p.lastTok = token.ATTRIBUTE
+
 	case *ast.Comment:
 		// TODO: if implied comma, postpone comment
 		data = x.Text

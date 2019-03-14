@@ -987,14 +987,18 @@ The identifier of a template label binds to the field name of each
 field and is visible within the template value.
 
 ```
-StructLit     = "{" [ { Declaration "," } Declaration ] "}" .
+StructLit     = "{" [ Declaration { "," Declaration } [ "," ] ] "}" .
 Declaration   = FieldDecl | AliasDecl | ComprehensionDecl .
-FieldDecl     = Label { Label } ":" Expression .
+FieldDecl     = Label { Label } ":" Expression { attribute } .
 
 AliasDecl     = Label "=" Expression .
 Label         = identifier | simple_string_lit | TemplateLabel .
 TemplateLabel = "<" identifier ">" .
-Tag           = "#" identifier [ ":" json_string ] .
+
+attribute     = "@" identifier "(" attr_elem { "," attr_elem } ")" .
+attr_elem     =  attr_string | identifier "=" attr_string .
+attr_string   = { attr_char } | string_lit .
+attr_char     = /* an arbitrary Unicode code point except newline, ',', '"', `'`, '#', '=', '(', and ')' */ .
 ```
 
 ```
@@ -1019,6 +1023,44 @@ Expression                             Result
 {a: 1, b: int} & {b: 2}                {a: 1, b: int(2)}
 
 {a: 1} & {a: 2}                        _|_
+```
+
+Fields may be associated with attributes.
+Attributes define additional information about a field,
+such as a mapping to a protobuf tag or alternative
+name of the field when mapping to a different language.
+
+If a field has multiple attributes their identifiers must be unique.
+Attributes accumulate when unifying two fields, removing duplicate entries.
+It is an error for the resulting field to have two different attributes
+with the same identifier.
+
+Attributes are not directly part of the data model, but may be
+accessed through the API or other means of reflection.
+The interpretation of the attribute value
+(a comma-separated list of attribute elements) depends on the attribute.
+Interpolations are not allowed in attribute strings.
+
+The recommended convention, however, is to interpret the first
+`n` arguments as positional arguments,
+where duplicate conflicting entries are an error,
+and the remaining arguments as a combination of flags
+(an identifier) and key value pairs, separated by a `=`.
+
+```
+MyStruct1: {
+    field: string @go(Field)
+    attr:  int    @xml(,attr) @go(Attr)
+}
+
+MyStruct2: {
+    field: string @go(Field)
+    attr:  int    @xml(a1,attr) @go(Attr)
+}
+
+Combined: MyStruct1 & MyStruct2
+// field: string @go(Field)
+// attr:  int    @xml(,attr) @xml(a1,attr) @go(Attr)
 ```
 
 In addition to fields, a struct literal may also define aliases.
@@ -1927,8 +1969,14 @@ later may be a string interpolation that refers to the identifiers defined
 in the clauses.
 Values of iterations that map to the same label unify into a single field.
 
+<!--
+TODO: consider allowing multiple labels for comprehensions
+(current implementation). Generally it is better to define comprehensions
+in the current scope, though, as it may prevent surprises given the
+restrictions on comprehensions.
+-->
 ```
-ComprehensionDecl   = Field [ "<-" ] Clauses .
+ComprehensionDecl   = Label ":" Expression [ "<-" ] Clauses .
 ListComprehension   = "[" Expression [ "<-" ] Clauses "]" .
 
 Clauses             = Clause { Clause } .

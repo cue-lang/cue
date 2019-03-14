@@ -1,8 +1,8 @@
 package expressions
 
 {
-    a: 1
-    aaa: 2
+    a: 1 // comment
+    aaa: 22 // comment
 
     b: 3
 
@@ -25,6 +25,14 @@ package expressions
         a: 8
         aa: 9
         aaa: 10
+    }
+
+    attrs: {
+        a: 8 @go(A) // comment
+        aa: 8 @go(A) // comment
+        bb: 9
+        bbb: 10 @go(Bbb) @xml(,attr) // comment
+        bbbb: 100 @go(Bbbb) /* a */ @xml(,attr) // comment
     }
 
     e: 1+2*3

@@ -81,10 +81,16 @@ func walk(v visitor, node ast.Node) {
 			walk(v, c)
 		}
 
+	case *ast.Attribute:
+		// nothing to do
+
 	case *ast.Field:
 		walk(v, n.Label)
 		if n.Value != nil {
 			walk(v, n.Value)
+		}
+		for _, a := range n.Attrs {
+			walk(v, a)
 		}
 
 	case *ast.StructLit:

@@ -698,6 +698,8 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 	this := &ast.Field{Label: nil}
 	m := this
 
+	allowComprehension := true
+
 	for i := 0; ; i++ {
 		tok := p.tok
 
@@ -735,6 +737,12 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 			break
 		}
 
+		// TODO: consider disallowing comprehensions with more than one label.
+		// This can be a bit awkward in some cases, but it would naturally
+		// enforce the proper style that a comprehension be defined in the
+		// smallest possible scope.
+		// allowComprehension = false
+
 		switch p.tok {
 		default:
 			if !allowEmit || p.tok != token.COMMA {
@@ -762,6 +770,17 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 	p.expect(token.COLON)
 	m.Value = p.parseRHS()
 
+	p.openList()
+	for p.tok == token.ATTRIBUTE {
+		allowComprehension = false
+		c := p.openComments()
+		a := &ast.Attribute{At: p.pos, Text: p.lit}
+		p.next()
+		c.closeNode(p, a)
+		this.Attrs = append(this.Attrs, a)
+	}
+	p.closeList()
+
 	decl = this
 	var arrow token.Pos
 	switch p.tok {
@@ -770,6 +789,9 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 		fallthrough
 
 	case token.FOR, token.IF:
+		if !allowComprehension {
+			p.error(p.pos, "comprehension not alowed for this field")
+		}
 		clauses := p.parseComprehensionClauses()
 		return &ast.ComprehensionDecl{
 			Field:   this,

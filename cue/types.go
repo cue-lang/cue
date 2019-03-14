@@ -21,6 +21,7 @@ import (
 	"io"
 	"math"
 	"math/big"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -130,13 +131,14 @@ func (o *structValue) MarshalJSON() (b []byte, err error) {
 // An Iterator iterates over values.
 //
 type Iterator struct {
-	val  Value
-	ctx  *context
-	iter iterAtter
-	len  int
-	p    int
-	cur  Value
-	f    label
+	val   Value
+	ctx   *context
+	iter  iterAtter
+	len   int
+	p     int
+	cur   Value
+	f     label
+	attrs *attributes
 }
 
 // Next advances the iterator to the next value and reports whether there was
@@ -146,8 +148,8 @@ func (i *Iterator) Next() bool {
 		i.cur = Value{}
 		return false
 	}
-	eval, orig, f := i.iter.iterAt(i.ctx, i.p)
-	i.cur = i.val.makeChild(i.ctx, uint32(i.p), f, eval, orig)
+	eval, orig, f, attrs := i.iter.iterAt(i.ctx, i.p)
+	i.cur = i.val.makeChild(i.ctx, uint32(i.p), f, eval, orig, attrs)
 	i.f = f
 	i.p++
 	return true
@@ -442,6 +444,7 @@ type valueData struct {
 	index   uint32
 	v       evaluated
 	raw     value
+	attrs   *attributes
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,
@@ -453,22 +456,22 @@ type Value struct {
 
 func newValueRoot(ctx *context, x value) Value {
 	v := x.evalPartial(ctx)
-	return Value{ctx.index, &valueData{nil, 0, 0, v, x}}
+	return Value{ctx.index, &valueData{nil, 0, 0, v, x, nil}}
 }
 
 func newChildValue(obj *structValue, i int) Value {
 	eval := obj.ctx.manifest(obj.n.at(obj.ctx, i))
 	a := obj.n.arcs[i]
-	return Value{obj.ctx.index, &valueData{obj.path, a.feature, uint32(i), eval, a.v}}
+	return Value{obj.ctx.index, &valueData{obj.path, a.feature, uint32(i), eval, a.v, a.attrs}}
 }
 
 func (v Value) ctx() *context {
 	return v.idx.newContext()
 }
 
-func (v Value) makeChild(ctx *context, i uint32, f label, eval evaluated, raw value) Value {
+func (v Value) makeChild(ctx *context, i uint32, f label, eval evaluated, raw value, attrs *attributes) Value {
 	eval = ctx.manifest(eval)
-	return Value{v.idx, &valueData{v.path, f, i, eval, raw}}
+	return Value{v.idx, &valueData{v.path, f, i, eval, raw, attrs}}
 }
 
 func (v Value) eval(ctx *context) value {
@@ -1060,4 +1063,102 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 	if after != nil {
 		after(v)
 	}
+}
+
+// Attribute returns the attribute data for the given key.
+// The returned attribute will return an error for any of its methods if there
+// is no attribute for the requested key.
+func (v Value) Attribute(key string) Attribute {
+	// look up the attributes
+	if v.path == nil || v.path.attrs == nil {
+		return Attribute{err: errNotExists}
+	}
+	for _, a := range v.path.attrs.attr {
+		if a.key() != key {
+			continue
+		}
+		at := Attribute{}
+		if err := parseAttrBody(v.ctx(), nil, a.body(), &at.attr); err != nil {
+			return Attribute{err: err.(error)}
+		}
+		return at
+	}
+	return Attribute{err: errNotExists}
+}
+
+var (
+	errNoSuchAttribute = errors.New("entry for key does not exist")
+)
+
+// An Attribute contains meta data about a field.
+type Attribute struct {
+	attr parsedAttr
+	err  error
+}
+
+// Err returns the error associated with this Attribute or nil if this
+// attribute is valid.
+func (a *Attribute) Err() error {
+	return a.err
+}
+
+func (a *Attribute) hasPos(p int) error {
+	if a.err != nil {
+		return a.err
+	}
+	if p >= len(a.attr.fields) {
+		return fmt.Errorf("field does not exist")
+	}
+	return nil
+}
+
+// String reports the possibly empty string value at the given position or
+// an error the attribute is invalid or if the position does not exist.
+func (a *Attribute) String(pos int) (string, error) {
+	if err := a.hasPos(pos); err != nil {
+		return "", err
+	}
+	return a.attr.fields[pos].text(), nil
+}
+
+// Int reports the integer at the given position or an error if the attribute is
+// invalid, the position does not exist, or the value at the given position is
+// not an integer.
+func (a *Attribute) Int(pos int) (int64, error) {
+	if err := a.hasPos(pos); err != nil {
+		return 0, err
+	}
+	// TODO: use CUE's literal parser once it exists, allowing any of CUE's
+	// number types.
+	return strconv.ParseInt(a.attr.fields[pos].text(), 10, 64)
+}
+
+// Flag reports whether an entry with the given name exists at position pos or
+// onwards or an error if the attribute is invalid or if the first pos-1 entries
+// are not defined.
+func (a *Attribute) Flag(pos int, key string) (bool, error) {
+	if err := a.hasPos(pos - 1); err != nil {
+		return false, err
+	}
+	for _, kv := range a.attr.fields[pos:] {
+		if kv.text() == key {
+			return true, nil
+		}
+	}
+	return false, nil
+}
+
+// Lookup searches for an entry of the form key=value from position pos onwards
+// and reports the value if found. It reports an error if the attribute is
+// invalid or if the first pos-1 entries are not defined.
+func (a *Attribute) Lookup(pos int, key string) (val string, found bool, err error) {
+	if err := a.hasPos(pos - 1); err != nil {
+		return "", false, err
+	}
+	for _, kv := range a.attr.fields[pos:] {
+		if kv.key() == key {
+			return kv.value(), true, nil
+		}
+	}
+	return "", false, nil
 }

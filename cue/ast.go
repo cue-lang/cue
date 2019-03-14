@@ -280,12 +280,16 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			}
 
 		case *ast.BasicLit, *ast.Ident:
+			attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
+			if err != nil {
+				return err
+			}
 			f, ok := v.nodeLabel(x)
 			if !ok {
 				return v.error(n.Label, "invalid field name: %v", n.Label)
 			}
 			if f != 0 {
-				v.object.insertValue(v.ctx(), f, v.walk(n.Value))
+				v.object.insertValue(v.ctx(), f, v.walk(n.Value), attrs)
 			}
 
 		default:

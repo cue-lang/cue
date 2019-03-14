@@ -606,6 +606,19 @@ func TestResolve(t *testing.T) {
 		`,
 		out: `<0>{a: true, b: true, c: false, d: true, e: false, f: true}`,
 	}, {
+		desc: "attributes",
+		in: `
+			a: { foo: 1 @foo() @baz(1) }
+			b: { foo: 1 @bar() @foo() }
+			c: a & b
+
+			e: a & { foo: 1 @foo(other) }
+		`,
+		out: `<0>{a: <1>{foo: 1 @baz(1) @foo()}, ` +
+			`b: <2>{foo: 1 @bar() @foo()}, ` +
+			`c: <3>{foo: 1 @bar() @baz(1) @foo()}, ` +
+			`e: _|_((<4>.a & <5>{foo: 1 @foo(other)}):conflicting attributes for key "foo")}`,
+	}, {
 		desc: "bounds",
 		in: `
 			i1: >1 & 5

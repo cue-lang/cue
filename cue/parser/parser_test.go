@@ -66,6 +66,15 @@ func TestParse(t *testing.T) {
 		}`,
 		`{a: 1, b: "2", c: 3}`,
 	}, {
+		"attributes",
+		`a: 1 @xml(,attr)
+		 b: 2 @foo(a,b=4) @go(Foo)
+		 c: {
+			 d: "x" @go(D) @json(,omitempty)
+			 e: "y" @ts(,type=string)
+		 }`,
+		`a: 1 @xml(,attr), b: 2 @foo(a,b=4) @go(Foo), c: {d: "x" @go(D) @json(,omitempty), e: "y" @ts(,type=string)}`,
+	}, {
 		"not emitted",
 		`a: true
 		 b: "2"
@@ -73,7 +82,7 @@ func TestParse(t *testing.T) {
 		`,
 		`a: true, b: "2", c: 3`,
 	}, {
-		"emitted refrencing non-emitted",
+		"emitted referencing non-emitted",
 		`a: 1
 		 b: "2"
 		 c: 3
@@ -256,8 +265,8 @@ func TestParse(t *testing.T) {
 		 b: 6 // lineb
 			  // next
 			`, // next is followed by EOF. Ensure it doesn't move to file.
-		"<[d0// doc] [l4// line] a: 5>, " +
-			"<[l4// lineb] [4// next] b: 6>",
+		"<[d0// doc] [l5// line] a: 5>, " +
+			"<[l5// lineb] [5// next] b: 6>",
 	}, {
 		"alt comments",
 		`// a ...
@@ -276,9 +285,9 @@ func TestParse(t *testing.T) {
 		// about c
 
 		`,
-		"<[d0// a ...] [l4// line a] [4// about a] a: 5>, " +
-			"<[d0// b ...] [l2// lineb] [4// about b] b: 6>, " +
-			"<[4// about c] c: 7>",
+		"<[d0// a ...] [l5// line a] [5// about a] a: 5>, " +
+			"<[d0// b ...] [l2// lineb] [5// about b] b: 6>, " +
+			"<[5// about c] c: 7>",
 	}, {
 		"expr comments",
 		`
@@ -286,7 +295,7 @@ func TestParse(t *testing.T) {
 		   3 +  // 3 +
 		   4    // 4
 		   `,
-		"<[l4// 4] a: <[l2// 3 +] <[l2// 2 +] 2+3>+4>>",
+		"<[l5// 4] a: <[l2// 3 +] <[l2// 2 +] 2+3>+4>>",
 	}, {
 		"composit comments",
 		`a : {
@@ -315,9 +324,15 @@ func TestParse(t *testing.T) {
 		"a: <[d2// end] {a: 1, b: 2, c: 3, d: 4}>, " +
 			"b: <[d2// end] [1, 2, 3, 4, 5]>, " +
 			"c: [1, 2, 3, <[l1// here] 4>, 5, 6, 7, <[l1// and here] 8>], " +
-			"d: {<[2/* 8 */] [l4// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
+			"d: {<[2/* 8 */] [l5// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
 			"e1: <[d2// comment in list body] []>, " +
 			"e2: <[d1// comment in struct body] {}>",
+	}, {
+		"attribute comments",
+		`
+		a: 1 /* a */ @a() /* b */ @b() /* c */ // d
+		`,
+		`<[l5/* c */ // d] a: <[1/* a */] 1> <[1/* b */] @a()> @b()>`,
 	}, {
 		"emit comments",
 		`// a comment at the beginning of the file

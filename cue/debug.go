@@ -271,6 +271,11 @@ func (p *printer) debugStr(v interface{}) {
 		p.writef(str)
 		p.write(": ")
 		p.debugStr(n)
+		if x.attrs != nil {
+			for _, a := range x.attrs.attr {
+				p.write(" ", a.text)
+			}
+		}
 
 	case *fieldComprehension:
 		p.debugStr(x.clauses)

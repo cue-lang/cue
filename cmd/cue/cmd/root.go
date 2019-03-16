@@ -28,7 +28,7 @@ import (
 //   fix:      rewrite/refactor configuration files
 //             -i interactive: open diff and ask to update
 //   serve:    like cmd, but for servers
-//   extract:  extract cue from other languages, like proto and go.
+//   get:      convert cue from other languages, like proto and go.
 //   gen:      generate files for other languages
 //   generate  like go generate (also convert cue to go doc)
 //   test      load and fully evaluate test files.
@@ -151,13 +151,20 @@ func init() {
 }
 
 var (
-	fDebug    = rootCmd.PersistentFlags().Bool("debug", false, "give detailed error info")
-	fTrace    = rootCmd.PersistentFlags().Bool("trace", false, "trace computation")
-	fDryrun   = rootCmd.PersistentFlags().BoolP("dryrun", "n", false, "only run simulation")
-	fPackage  = rootCmd.PersistentFlags().StringP("package", "p", "", "CUE package to evaluate")
-	fSimplify = rootCmd.PersistentFlags().BoolP("simplify", "s", false, "simplify output")
-	fIgnore   = rootCmd.PersistentFlags().BoolP("ignore", "i", false, "proceed in the presence of errors")
-	fVerbose  = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "print information about progress")
+	fDebug = rootCmd.PersistentFlags().Bool("debug", false,
+		"give detailed error info")
+	fTrace = rootCmd.PersistentFlags().Bool("trace", false,
+		"trace computation")
+	fDryrun = rootCmd.PersistentFlags().BoolP("dryrun", "n", false,
+		"only run simulation")
+	fPackage = rootCmd.PersistentFlags().StringP("package", "p", "",
+		"CUE package to evaluate")
+	fSimplify = rootCmd.PersistentFlags().BoolP("simplify", "s", false,
+		"simplify output")
+	fIgnore = rootCmd.PersistentFlags().BoolP("ignore", "i", false,
+		"proceed in the presence of errors")
+	fVerbose = rootCmd.PersistentFlags().BoolP("verbose", "v", false,
+		"print information about progress")
 )
 
 // initConfig reads in config file and ENV variables if set.

@@ -42,8 +42,8 @@ func runCommand(t *testing.T, f func(cmd *cobra.Command, args []string) error, n
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	const dir = "./testdata"
+
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		t.Run(path, func(t *testing.T) {
 			if err != nil {

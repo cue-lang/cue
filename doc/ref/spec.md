@@ -1115,9 +1115,8 @@ The length of an open list is the its number of elements as a lower bound
 and an unlimited number of elements as its upper bound.
 
 ```
-ListLit       = "[" [ ElementList [ "," [ "..." [ Element ] ] ] "]" .
-ElementList   = Element { "," Element } .
-Element       = Expression | LiteralValue .
+ListLit       = "[" [ ElementList [ "," [ "..." [ Expression ] ] ] "]" .
+ElementList   = Expression { "," Expression } .
 ```
 <!---
 KeyedElement  = Element .
@@ -1500,12 +1499,11 @@ Expression = UnaryExpr | Expression binary_op Expression .
 UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 
 binary_op  = "|" | "&" | "||" | "&&" | "==" | rel_op | add_op | mul_op  .
-rel_op     = "!=" | "<" | "<=" | ">" | ">=" .
+rel_op     = "!=" | "<" | "<=" | ">" | ">=" | "=~" | "!~" .
 add_op     = "+" | "-" .
 mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
 unary_op   = "+" | "-" | "!" | "*" | rel_op .
 ```
-<!-- TODO: consider adding unary_op: "<" | "<=" | ">" | ">=" -->
 
 Comparisons are discussed [elsewhere](#Comparison-operators).
 For any binary operators, the operand types must unify.
@@ -1532,7 +1530,7 @@ and finally `|` (disjunction):
 Precedence    Operator
     7             *  /  %  div mod quo rem
     6             +  -
-    5             ==  !=  <  <=  >  >=
+    5             ==  !=  <  <=  >  >= =~ !~
     4             &&
     3             ||
     2             &

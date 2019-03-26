@@ -148,9 +148,9 @@ func (i *Iterator) Next() bool {
 		i.cur = Value{}
 		return false
 	}
-	eval, orig, f, attrs := i.iter.iterAt(i.ctx, i.p)
-	i.cur = i.val.makeChild(i.ctx, uint32(i.p), f, eval, orig, attrs)
-	i.f = f
+	arc := i.iter.iterAt(i.ctx, i.p)
+	i.cur = i.val.makeChild(i.ctx, uint32(i.p), arc)
+	i.f = arc.feature
 	i.p++
 	return true
 }
@@ -201,7 +201,7 @@ func (v Value) getNum(k kind) (*numLit, error) {
 	if err := v.checkKind(v.ctx(), k); err != nil {
 		return nil, err
 	}
-	n, _ := v.path.v.(*numLit)
+	n, _ := v.path.cache.(*numLit)
 	return n, nil
 }
 
@@ -288,7 +288,7 @@ func (v Value) IsUint() bool {
 	if !v.IsInt() {
 		return false
 	}
-	n, _ := v.path.v.(*numLit)
+	n, _ := v.path.cache.(*numLit)
 	return n.v.Sign() >= 0
 }
 
@@ -439,12 +439,9 @@ func (v Value) Float64() (float64, error) {
 }
 
 type valueData struct {
-	parent  *valueData
-	feature label
-	index   uint32
-	v       evaluated
-	raw     value
-	attrs   *attributes
+	parent *valueData
+	index  uint32
+	arc
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,
@@ -456,29 +453,30 @@ type Value struct {
 
 func newValueRoot(ctx *context, x value) Value {
 	v := x.evalPartial(ctx)
-	return Value{ctx.index, &valueData{nil, 0, 0, v, x, nil}}
+	return Value{ctx.index, &valueData{nil, 0, arc{cache: v, v: x}}}
 }
 
 func newChildValue(obj *structValue, i int) Value {
-	eval := obj.ctx.manifest(obj.n.at(obj.ctx, i))
 	a := obj.n.arcs[i]
-	return Value{obj.ctx.index, &valueData{obj.path, a.feature, uint32(i), eval, a.v, a.attrs}}
+	a.cache = obj.ctx.manifest(obj.n.at(obj.ctx, i))
+
+	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
 }
 
 func (v Value) ctx() *context {
 	return v.idx.newContext()
 }
 
-func (v Value) makeChild(ctx *context, i uint32, f label, eval evaluated, raw value, attrs *attributes) Value {
-	eval = ctx.manifest(eval)
-	return Value{v.idx, &valueData{v.path, f, i, eval, raw, attrs}}
+func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
+	a.cache = ctx.manifest(a.cache)
+	return Value{v.idx, &valueData{v.path, i, a}}
 }
 
 func (v Value) eval(ctx *context) value {
-	if v.path == nil || v.path.v == nil {
+	if v.path == nil || v.path.cache == nil {
 		panic("undefined value")
 	}
-	return ctx.manifest(v.path.v)
+	return ctx.manifest(v.path.cache)
 }
 
 // Label reports he label used to obtain this value from the enclosing struct.
@@ -586,7 +584,7 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 // Syntax converts the possibly partially evaluated value into syntax. This
 // can use used to print the value with package format.
 func (v Value) Syntax() ast.Expr {
-	if v.path == nil || v.path.v == nil {
+	if v.path == nil || v.path.cache == nil {
 		return nil
 	}
 	ctx := v.ctx()
@@ -618,10 +616,10 @@ func (v Value) Split() []Value {
 	}
 	ctx := v.ctx()
 	a := []Value{}
-	for _, x := range separate(v.path.raw) {
+	for _, x := range separate(v.path.v) {
 		path := *v.path
-		path.v = x.evalPartial(ctx)
-		path.raw = x
+		path.cache = x.evalPartial(ctx)
+		path.v = x
 		a = append(a, Value{v.idx, &path})
 	}
 	return a
@@ -649,7 +647,7 @@ func (v Value) Source() ast.Node {
 	if v.path == nil {
 		return nil
 	}
-	return v.path.raw.syntax()
+	return v.path.v.syntax()
 }
 
 // Err returns the error represented by v or nil v is not an error.
@@ -682,7 +680,7 @@ func (v Value) IsIncomplete() bool {
 // IsValid reports whether this value is defined and evaluates to something
 // other than an error.
 func (v Value) IsValid() bool {
-	if v.path == nil || v.path.v == nil {
+	if v.path == nil || v.path.cache == nil {
 		return false
 	}
 	k := v.eval(v.ctx()).kind()
@@ -882,7 +880,7 @@ func (v Value) Lookup(path ...string) Value {
 // given its name.
 func (v Value) Template() func(label string) Value {
 	ctx := v.ctx()
-	x, ok := v.path.v.(*structLit)
+	x, ok := v.path.cache.(*structLit)
 	if !ok || x.template == nil {
 		return nil
 	}
@@ -934,7 +932,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 		fmt.Fprint(state, "<nil>")
 		return
 	}
-	io.WriteString(state, debugStr(ctx, v.path.v))
+	io.WriteString(state, debugStr(ctx, v.path.cache))
 }
 
 // References reports all references used to evaluate this value. It does not
@@ -942,7 +940,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 func (v Value) References() [][]string {
 	ctx := v.ctx()
 	pf := pathFinder{up: v.path}
-	raw := v.path.raw
+	raw := v.path.v
 	if raw == nil {
 		return nil
 	}
@@ -967,7 +965,7 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 	case *nodeRef:
 		i := len(p.stack)
 		up := p.up
-		for ; up != nil && up.v != x.node.(value); up = up.parent {
+		for ; up != nil && up.cache != x.node.(value); up = up.parent {
 		}
 		for ; up != nil && up.feature > 0; up = up.parent {
 			p.stack = append(p.stack, ctx.labelStr(up.feature))

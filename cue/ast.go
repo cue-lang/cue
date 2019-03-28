@@ -112,7 +112,7 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 	ctx := v.ctx()
 	label := v.label(n.Name, true)
 	if r := v.resolveRoot; r != nil {
-		if value, _ := r.lookup(v.ctx(), label); value != nil {
+		if a := r.lookup(v.ctx(), label); a.val() != nil {
 			return &selectorExpr{newExpr(n),
 				&nodeRef{baseValue: newExpr(n), node: r}, label}
 		}
@@ -252,6 +252,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		v.object.comprehensions = append(v.object.comprehensions, fc)
 
 	case *ast.Field:
+		opt := n.Optional != token.NoPos
 		switch x := n.Label.(type) {
 		case *ast.Interpolation:
 			yielder := &yield{baseValue: newNode(x)}
@@ -261,6 +262,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			}
 			yielder.key = v.walk(x)
 			yielder.value = v.walk(n.Value)
+			yielder.opt = opt
 			v.object.comprehensions = append(v.object.comprehensions, fc)
 
 		case *ast.TemplateLabel:
@@ -289,7 +291,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				return v.error(n.Label, "invalid field name: %v", n.Label)
 			}
 			if f != 0 {
-				v.object.insertValue(v.ctx(), f, v.walk(n.Value), attrs)
+				v.object.insertValue(v.ctx(), f, opt, v.walk(n.Value), attrs)
 			}
 
 		default:

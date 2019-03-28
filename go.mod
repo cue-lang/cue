@@ -1,9 +1,12 @@
 module cuelang.org/go
 
 require (
+	github.com/BurntSushi/toml v0.3.1 // indirect
 	github.com/cockroachdb/apd v1.1.0
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/go-cmp v0.2.0
+	github.com/inconshreveable/mousetrap v1.0.0 // indirect
+	github.com/lib/pq v1.0.0 // indirect
 	github.com/mitchellh/go-homedir v1.0.0
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/spf13/cobra v0.0.3

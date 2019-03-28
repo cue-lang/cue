@@ -149,6 +149,7 @@ var testTokens = [...]elt{
 	{token.LBRACE, "{", operator},
 	{token.COMMA, ",", operator},
 	{token.PERIOD, ".", operator},
+	{token.OPTION, "?", operator},
 
 	{token.RPAREN, ")", operator},
 	{token.RBRACK, "]", operator},
@@ -331,28 +332,28 @@ func checkComma(t *testing.T, line string, mode Mode) {
 
 var lines = []string{
 	// ~ indicates a comma present in the source
-	// ? indicates an automatically inserted comma
+	// ^ indicates an automatically inserted comma
 	"",
 	"\ufeff~,", // first BOM is ignored
 	"~,",
-	"foo?\n",
-	"_foo?\n",
-	"123?\n",
-	"1.2?\n",
-	"'x'?\n",
-	"_|_?\n",
-	"_|_?\n",
-	`"x"` + "?\n",
-	"#'x'#?\n",
+	"foo^\n",
+	"_foo^\n",
+	"123^\n",
+	"1.2^\n",
+	"'x'^\n",
+	"_|_^\n",
+	"_|_^\n",
+	`"x"` + "^\n",
+	"#'x'#^\n",
 	`"""
 		foo
-		"""` + "?\n",
+		"""` + "^\n",
 	// `"""
 	// 	foo \(bar)
-	// 	"""` + "?\n",
+	// 	"""` + "^\n",
 	`'''
 		foo
-		'''` + "?\n",
+		'''` + "^\n",
 
 	"+\n",
 	"-\n",
@@ -361,7 +362,7 @@ var lines = []string{
 	"%\n",
 
 	"&\n",
-	// "&?\n",
+	// "&^\n",
 	"|\n",
 
 	"&&\n",
@@ -389,41 +390,41 @@ var lines = []string{
 	"~,\n",
 	".\n",
 
-	")?\n",
-	"]?\n",
-	"]]?\n",
-	"}?\n",
-	"}}?\n",
+	")^\n",
+	"]^\n",
+	"]]^\n",
+	"}^\n",
+	"}}^\n",
 	":\n",
-	";?\n",
+	";^\n",
 
-	"true?\n",
-	"false?\n",
-	"null?\n",
+	"true^\n",
+	"false^\n",
+	"null^\n",
 
-	"foo?//comment\n",
-	"foo?//comment",
-	"foo?/*comment*/\n",
-	"foo?/*\n*/",
-	"foo?/*comment*/    \n",
-	"foo?/*\n*/    ",
+	"foo^//comment\n",
+	"foo^//comment",
+	"foo^/*comment*/\n",
+	"foo^/*\n*/",
+	"foo^/*comment*/    \n",
+	"foo^/*\n*/    ",
 
-	"foo    ?// comment\n",
-	"foo    ?// comment",
-	"foo    ?/*comment*/\n",
-	"foo    ?/*\n*/",
-	"foo    ?/*  */ /* \n */ bar?/**/\n",
-	"foo    ?/*0*/ /*1*/ /*2*/\n",
+	"foo    ^// comment\n",
+	"foo    ^// comment",
+	"foo    ^/*comment*/\n",
+	"foo    ^/*\n*/",
+	"foo    ^/*  */ /* \n */ bar^/**/\n",
+	"foo    ^/*0*/ /*1*/ /*2*/\n",
 
-	"foo    ?/*comment*/    \n",
-	"foo    ?/*0*/ /*1*/ /*2*/    \n",
-	"foo	?/**/ /*-------------*/       /*----\n*/bar       ?/*  \n*/baa?\n",
-	"foo    ?/* an EOF terminates a line */",
-	"foo    ?/* an EOF terminates a line */ /*",
-	"foo    ?/* an EOF terminates a line */ //",
+	"foo    ^/*comment*/    \n",
+	"foo    ^/*0*/ /*1*/ /*2*/    \n",
+	"foo	^/**/ /*-------------*/       /*----\n*/bar       ^/*  \n*/baa^\n",
+	"foo    ^/* an EOF terminates a line */",
+	"foo    ^/* an EOF terminates a line */ /*",
+	"foo    ^/* an EOF terminates a line */ //",
 
-	// "package main?\n\nfunc main() {\n\tif {\n\t\treturn /* */ }?\n}?\n",
-	// "package main?",
+	"package main^\n\nfoo: bar^",
+	"package main^",
 }
 
 func TestCommas(t *testing.T) {
@@ -723,7 +724,7 @@ var errorTests = []struct {
 	err string
 }{
 	{"\a", token.ILLEGAL, 0, "", "illegal character U+0007"},
-	{`?`, token.ILLEGAL, 0, "", "illegal character U+003F '?'"},
+	{`^`, token.ILLEGAL, 0, "", "illegal character U+005E '^'"},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
 	{`_|`, token.ILLEGAL, 0, "", "illegal token '_|'; expected '_'"},
 

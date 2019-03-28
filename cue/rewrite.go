@@ -43,9 +43,9 @@ func (x *structLit) rewrite(ctx *context, fn rewriteFunc) value {
 	obj := &structLit{baseValue: x.baseValue, emit: emit, arcs: arcs}
 	changed := emit == x.emit
 	for i, a := range x.arcs {
-		v := rewrite(ctx, a.v, fn)
-		arcs[i] = arc{a.feature, v, nil, a.attrs}
-		changed = changed || arcs[i].v != v
+		a.setValue(rewrite(ctx, a.v, fn))
+		changed = changed || arcs[i].v != a.v
+		arcs[i] = a
 	}
 	if !changed {
 		return x
@@ -228,7 +228,7 @@ func (x *yield) rewrite(ctx *context, fn rewriteFunc) value {
 	if key == x.key && value == x.value {
 		return x
 	}
-	return &yield{x.baseValue, key, value}
+	return &yield{x.baseValue, x.opt, key, value}
 }
 
 func (x *guard) rewrite(ctx *context, fn rewriteFunc) value {

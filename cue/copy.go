@@ -52,8 +52,8 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 		obj.template = t
 
 		for i, a := range x.arcs {
-			v := ctx.copy(a.v)
-			arcs[i] = arc{a.feature, v, nil, a.attrs}
+			a.setValue(ctx.copy(a.v))
+			arcs[i] = a
 		}
 
 		comp := make([]*fieldComprehension, len(x.comprehensions))

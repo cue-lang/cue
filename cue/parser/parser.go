@@ -733,6 +733,11 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 			}
 		}
 
+		if tok != token.LSS && p.tok == token.OPTION {
+			m.Optional = p.pos
+			p.next()
+		}
+
 		if p.tok == token.COLON {
 			break
 		}

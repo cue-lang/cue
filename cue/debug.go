@@ -269,6 +269,9 @@ func (p *printer) debugStr(v interface{}) {
 			str = str[1 : len(str)-1]
 		}
 		p.writef(str)
+		if x.optional {
+			p.write("?")
+		}
 		p.write(": ")
 		p.debugStr(n)
 		if x.attrs != nil {
@@ -289,6 +292,9 @@ func (p *printer) debugStr(v interface{}) {
 		writef(" yield ")
 		writef("(")
 		p.debugStr(x.key)
+		if x.opt {
+			writef("?")
+		}
 		writef("): ")
 		p.debugStr(x.value)
 

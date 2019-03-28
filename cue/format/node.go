@@ -115,7 +115,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		// shortcut single-element structs.
 		lastSize := len(f.labelBuf)
 		f.labelBuf = f.labelBuf[:0]
-		first := n.Label
+		first, opt := n.Label, n.Optional != token.NoPos
 		for {
 			obj, ok := n.Value.(*ast.StructLit)
 			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) {
@@ -138,7 +138,8 @@ func (f *formatter) decl(decl ast.Decl) {
 			if !ok {
 				break
 			}
-			f.labelBuf = append(f.labelBuf, mem.Label)
+			entry := labelEntry{mem.Label, mem.Optional != token.NoPos}
+			f.labelBuf = append(f.labelBuf, entry)
 			n = mem
 		}
 
@@ -147,10 +148,10 @@ func (f *formatter) decl(decl ast.Decl) {
 		}
 
 		f.before(nil)
-		f.label(first)
+		f.label(first, opt)
 		for _, x := range f.labelBuf {
 			f.print(blank, nooverride)
-			f.label(x)
+			f.label(x.label, x.optional)
 		}
 		f.after(nil)
 
@@ -243,7 +244,7 @@ func (f *formatter) nextNeedsFormfeed(n ast.Expr) bool {
 
 func (f *formatter) importSpec(x *ast.ImportSpec) {
 	if x.Name != nil {
-		f.label(x.Name)
+		f.label(x.Name, false)
 		f.print(blank)
 	} else {
 		f.current.pos++
@@ -253,7 +254,7 @@ func (f *formatter) importSpec(x *ast.ImportSpec) {
 	f.print(newline)
 }
 
-func (f *formatter) label(l ast.Label) {
+func (f *formatter) label(l ast.Label, optional bool) {
 	switch n := l.(type) {
 	case *ast.Ident:
 		f.print(n.NamePos, n)
@@ -275,7 +276,7 @@ func (f *formatter) label(l ast.Label) {
 
 	case *ast.TemplateLabel:
 		f.print(n.Langle, token.LSS, indent)
-		f.label(n.Ident)
+		f.label(n.Ident, false)
 		f.print(unindent, n.Rangle, token.GTR)
 
 	case *ast.Interpolation:
@@ -283,6 +284,9 @@ func (f *formatter) label(l ast.Label) {
 
 	default:
 		panic(fmt.Sprintf("unknown label type %T", n))
+	}
+	if optional {
+		f.print(token.OPTION)
 	}
 }
 
@@ -436,13 +440,13 @@ func (f *formatter) clause(clause ast.Clause) {
 	case *ast.ForClause:
 		f.print(blank, n.For, "for", blank)
 		if n.Key != nil {
-			f.label(n.Key)
+			f.label(n.Key, false)
 			f.print(n.Colon, token.COMMA, blank)
 		} else {
 			f.current.pos++
 			f.visitComments(f.current.pos)
 		}
-		f.label(n.Value)
+		f.label(n.Value, false)
 		f.print(blank, n.In, "in", blank)
 		f.expr(n.Source)
 

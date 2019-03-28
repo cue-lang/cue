@@ -619,6 +619,24 @@ func TestResolve(t *testing.T) {
 			`c: <3>{foo: 1 @bar() @baz(1) @foo()}, ` +
 			`e: _|_((<4>.a & <5>{foo: 1 @foo(other)}):conflicting attributes for key "foo")}`,
 	}, {
+		desc: "optional fields",
+		in: `
+			a: { foo?: string }
+			b: { foo: "foo" }
+			c: a & b
+			d: a & { "foo"?: "bar" }
+
+			g1: 1
+			"g\(1)"?: 1
+			"g\(2)"?: 2
+		`,
+		out: `<0>{a: <1>{foo?: string}, ` +
+			`b: <2>{foo: "foo"}, ` +
+			`c: <3>{foo: "foo"}, ` +
+			`d: <4>{foo?: "bar"}, ` +
+			`g1: 1, ` +
+			`g2?: 2}`,
+	}, {
 		desc: "bounds",
 		in: `
 			i1: >1 & 5

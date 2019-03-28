@@ -78,7 +78,8 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 		arcs := make(arcs, len(x.arcs))
 		for i, a := range x.arcs {
 			v := x.at(ctx, i)
-			arcs[i] = arc{a.feature, rewriteRec(ctx, a.v, v, m), nil, a.attrs}
+			a.setValue(rewriteRec(ctx, a.v, v, m))
+			arcs[i] = a
 		}
 		t := x.template
 		if t != nil {

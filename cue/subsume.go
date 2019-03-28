@@ -97,8 +97,15 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 
 		// all arcs in n must exist in v and its values must subsume.
 		for _, a := range x.arcs {
-			b, _ := o.lookup(ctx, a.feature)
-			if b == nil || !subsumes(ctx, a.v, b, mode) {
+			b := o.lookup(ctx, a.feature)
+			if !a.optional && b.optional {
+				return false
+			} else if b.val() == nil {
+				// If field a is optional and has value top, neither the
+				// omission of the field nor the field defined with any value
+				// may cause unification to fail.
+				return a.optional && isTop(a.v)
+			} else if !subsumes(ctx, a.v, b.val(), mode) {
 				return false
 			}
 		}

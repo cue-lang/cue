@@ -1294,6 +1294,14 @@ func TestMashalJSON(t *testing.T) {
 	}, {
 		value: `{a: 2, b: 3, c: ["A", "B"]}`,
 		json:  `{"a":2,"b":3,"c":["A","B"]}`,
+	}, {
+		value: `{foo?: 1, bar?: 2, baz: 3}`,
+		json:  `{"baz":3}`,
+	}, {
+		// Has an unresolved cycle, but should not matter as all fields involved
+		// are optional
+		value: `{foo?: bar, bar?: foo, baz: 3}`,
+		json:  `{"baz":3}`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

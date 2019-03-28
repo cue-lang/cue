@@ -277,7 +277,8 @@ func (a *Attribute) End() token.Pos { return a.At.Add(len(a.Text)) }
 // A Field represents a field declaration in a struct.
 type Field struct {
 	comments
-	Label Label // must have at least one element.
+	Label    Label // must have at least one element.
+	Optional token.Pos
 
 	// No colon: Value must be an StructLit with one field.
 	Colon token.Pos

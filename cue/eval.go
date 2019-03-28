@@ -56,13 +56,14 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 	v := e.eval(x.x, structKind|lambdaKind, msgType, x)
 
 	if e.is(v, structKind|lambdaKind, "") {
-		n, _ := v.(scope).lookup(ctx, x.feature)
-		if n == nil {
+		n := v.(scope).lookup(ctx, x.feature)
+		if n.val() == nil {
 			field := ctx.labelStr(x.feature)
 			//	m.foo undefined (type map[string]bool has no field or method foo)
 			return ctx.mkErr(x, "undefined field %q", field)
 		}
-		return n.evalPartial(ctx)
+		// TODO: do we need to evaluate here?
+		return n.cache.evalPartial(ctx)
 	}
 	return e.err(&selectorExpr{x.baseValue, v, x.feature})
 }
@@ -87,11 +88,11 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 		if e.is(index, stringKind, msgIndexType, k) {
 			s := index.strValue()
 			// TODO: must lookup
-			n, _ := v.lookup(ctx, ctx.strLabel(s))
-			if n == nil {
+			n := v.lookup(ctx, ctx.strLabel(s))
+			if n.val() == nil {
 				return ctx.mkErr(x, index, "undefined field %q", s)
 			}
-			return n
+			return n.cache
 		}
 	case atter:
 		if e.is(index, intKind, msgIndexType, k) {
@@ -241,7 +242,7 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 
 func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	list := &list{baseValue: x.baseValue}
-	result := x.clauses.yield(ctx, func(k, v evaluated) *bottom {
+	result := x.clauses.yield(ctx, func(k, v evaluated, _ bool) *bottom {
 		if !k.kind().isAnyOf(intKind) {
 			return ctx.mkErr(k, "key must be of type int")
 		}

@@ -284,9 +284,14 @@ func (p *exporter) expr(v value) ast.Expr {
 						// TODO: add an invalid field instead?
 						continue
 					}
+					opt := token.NoPos
+					if yield.opt {
+						opt = 1 // anything but token.NoPos
+					}
 					f := &ast.Field{
-						Label: label,
-						Value: p.expr(yield.value),
+						Label:    label,
+						Optional: opt,
+						Value:    p.expr(yield.value),
 					}
 					var decl ast.Decl = f
 					if len(clauses) > 0 {

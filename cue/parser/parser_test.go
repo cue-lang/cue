@@ -77,10 +77,12 @@ func TestParse(t *testing.T) {
 	}, {
 		"not emitted",
 		`a: true
-		 b: "2"
-		 c: 3
+		 b?: "2"
+		 c?: 3
+
+		 "g\("en")"?: 4
 		`,
-		`a: true, b: "2", c: 3`,
+		`a: true, b?: "2", c?: 3, "g\("en")"?: 4`,
 	}, {
 		"emitted referencing non-emitted",
 		`a: 1

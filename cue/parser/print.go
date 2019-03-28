@@ -137,6 +137,9 @@ func debugStr(x interface{}) (out string) {
 
 	case *ast.Field:
 		out := debugStr(v.Label)
+		if v.Optional != token.NoPos {
+			out += "?"
+		}
 		if v.Value != nil {
 			out += ": "
 			out += debugStr(v.Value)

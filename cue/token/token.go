@@ -86,8 +86,9 @@ const (
 	RPAREN    // )
 	RBRACK    // ]
 	RBRACE    // }
-	SEMICOLON // :
+	SEMICOLON // ;
 	COLON     // :
+	OPTION    // ?
 	operatorEnd
 
 	keywordBeg
@@ -162,6 +163,7 @@ var tokens = [...]string{
 	RBRACE:    "}",
 	SEMICOLON: ";",
 	COLON:     ":",
+	OPTION:    "?",
 
 	BOTTOM: "_|_",
 

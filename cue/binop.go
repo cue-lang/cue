@@ -530,7 +530,8 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 
 	for _, a := range x.arcs {
 		cp := ctx.copy(a.v)
-		obj.arcs = append(obj.arcs, arc{a.feature, cp, nil, a.attrs})
+		obj.arcs = append(obj.arcs,
+			arc{a.feature, a.optional, cp, nil, a.attrs})
 	}
 outer:
 	for _, a := range y.arcs {
@@ -539,6 +540,8 @@ outer:
 			if a.feature == b.feature {
 				v = mkBin(ctx, src.Pos(), opUnify, b.v, v)
 				obj.arcs[i].v = v
+				obj.arcs[i].cache = nil
+				obj.arcs[i].optional = a.optional && b.optional
 				attrs, err := unifyAttrs(ctx, src, a.attrs, b.attrs)
 				if err != nil {
 					return err
@@ -547,7 +550,8 @@ outer:
 				continue outer
 			}
 		}
-		obj.arcs = append(obj.arcs, arc{feature: a.feature, v: v, attrs: a.attrs})
+		a.setValue(v)
+		obj.arcs = append(obj.arcs, a)
 	}
 	sort.Stable(obj)
 
@@ -1054,7 +1058,7 @@ func (x *lambdaExpr) binOp(ctx *context, src source, op op, other evaluated) eva
 			if isBottom(v) {
 				return v
 			}
-			arcs[i] = arc{x.arcs[i].feature, v, nil, nil}
+			arcs[i] = arc{feature: x.arcs[i].feature, v: v}
 		}
 
 		return lambda

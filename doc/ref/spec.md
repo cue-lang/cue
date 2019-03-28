@@ -992,8 +992,10 @@ Declaration   = FieldDecl | AliasDecl | ComprehensionDecl .
 FieldDecl     = Label { Label } ":" Expression { attribute } .
 
 AliasDecl     = Label "=" Expression .
-Label         = identifier | simple_string_lit | TemplateLabel .
 TemplateLabel = "<" identifier ">" .
+ConcreteLabel = identifier | simple_string_lit
+OptionalLabel = ConcreteLabel "?"
+Label         = ConcreteLabel | OptionalLabel | TemplateLabel .
 
 attribute     = "@" identifier "(" attr_elem { "," attr_elem } ")" .
 attr_elem     =  attr_string | identifier "=" attr_string .
@@ -1100,6 +1102,74 @@ job: {
         replicas: 2
     }
 }
+```
+
+#### Optional fields
+
+An identifier or string label may be followed by a question mark `?`
+to indicate a field is optional.
+Constraints defined by an optional field should only be applied when
+a field is present.
+Fields with such markers may be omitted from output and should not cause
+an error when emitting a concrete configuration, even if its value is
+not concrete or bottom.
+The question mark is not part of the field name.
+The result of unifying two fields only has an optional marker
+if both fields have such a marker.
+
+<!--
+The optional marker solves the issue of having to print large amounts of
+boilerplate when dealing with large types with many optional or default
+values (such as Kubernetes).
+Writing such optional values in terms of *null | value is tedious,
+unpleasant to read, and as it is not well defined what can be dropped or not,
+all null values have to be emitted from the output, even if the user
+doesn't override them.
+Part of the issue is how null is defined. We could adopt a Typescript-like
+approach of introducing "void" or "undefined" to mean "not defined and not
+part of the output". But having all of null, undefined, and void can be
+confusing. If these ever are introduced anyway, the ? operator could be
+expressed along the lines of
+   foo?: bar
+being a shorthand for
+   foo: void | bar
+where void is the default if no other default is given.
+
+The current mechanical definition of "?" is straightforward, though, and
+probably avoids the need for void, while solving a big issue.
+
+Caveats:
+[1] this definition requires explicitly defined fields to be emitted, even
+if they could be elided (for instance if the explicit value is the default
+value defined an optional field). This is probably a good thing.
+
+[2] a default value may still need to be included in an output if it is not
+the zero value for that field and it is not known if any outside system is
+aware of defaults. For instance, which defaults are specified by the user
+and which by the schema understood by the receiving system.
+The use of "?" together with defaults should therefore be used carefully
+in non-schema definitions.
+Problematic cases should be easy to detect by a vet-like check, though.
+
+[3] It should be considered how this affects the trim command.
+Should values implied by optional fields be allowed to be removed?
+Probably not. This restriction is unlikely to limit the usefulness of trim,
+though.
+
+[4] There should be an option to emit all concrete optional values.
+```
+-->
+
+```
+Input                            Result
+a: { foo?: string }              {}
+b: { foo: "bar" }                { foo: "bar" }
+c: { foo?: *"bar" | string }     {}
+
+d: a & b                         { foo: "bar" }
+e: b & c                         { foo: "bar" }
+f: a & c                         {}
+g: a & { foo?: number }          _|_
 ```
 
 

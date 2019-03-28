@@ -785,6 +785,10 @@ func (v Value) Reader() (io.Reader, error) {
 	return nil, v.checkKind(ctx, stringKind|bytesKind)
 }
 
+// TODO: distinguish between optional, hidden, etc. Probably the best approach
+// is to mark options in context and have a single function for creating
+// a structVal.
+
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structVal(ctx *context) (structValue, error) {
 	if err := v.checkKind(ctx, structKind); err != nil {
@@ -796,16 +800,18 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 	obj = obj.expandFields(ctx) // expand comprehensions
 
 	// check if any labels are hidden
+	hasOptional := false
 	f := label(0)
 	for _, a := range obj.arcs {
 		f |= a.feature
+		hasOptional = hasOptional || a.optional
 	}
 
-	if f&hidden != 0 {
+	if f&hidden != 0 || hasOptional {
 		arcs := make([]arc, len(obj.arcs))
 		k := 0
 		for _, a := range obj.arcs {
-			if a.feature&hidden == 0 {
+			if a.feature&hidden == 0 && !a.optional {
 				arcs[k] = a
 				k++
 			}
@@ -819,7 +825,6 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 			arcs,
 			nil,
 		}
-
 	}
 	return structValue{ctx, v.path, obj}, nil
 }

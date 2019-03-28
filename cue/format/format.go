@@ -174,7 +174,12 @@ type formatter struct {
 	current  frame
 	nestExpr int
 
-	labelBuf []ast.Label
+	labelBuf []labelEntry
+}
+
+type labelEntry struct {
+	label    ast.Label
+	optional bool
 }
 
 func newFormatter(p *printer) *formatter {

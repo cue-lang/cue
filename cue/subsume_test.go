@@ -333,6 +333,43 @@ func TestSubsume(t *testing.T) {
 		// Disjunctions
 		330: {subsumes: true, in: `a: >5, b: >10 | 8`},
 		331: {subsumes: false, in: `a: >8, b: >10 | 8`},
+
+		// Optional fields
+		// Optional fields defined constraints on fields that are not yet
+		// defined. So even if such a field is not part of the output, it
+		// influences the lattice structure.
+		// For a given A and B, where A and B unify and where A has an optional
+		// field that is not defined in B, the addition of an incompatible
+		// value of that field in B can cause A and B to no longer unify.
+		//
+		400: {subsumes: false, in: `a: {foo: 1}, b: {}`},
+		401: {subsumes: false, in: `a: {foo?: 1}, b: {}`},
+		402: {subsumes: true, in: `a: {}, b: {foo: 1}`},
+		403: {subsumes: true, in: `a: {}, b: {foo?: 1}`},
+
+		404: {subsumes: true, in: `a: {foo: 1}, b: {foo: 1}`},
+		405: {subsumes: true, in: `a: {foo?: 1}, b: {foo: 1}`},
+		406: {subsumes: true, in: `a: {foo?: 1}, b: {foo?: 1}`},
+		407: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`},
+
+		408: {subsumes: false, in: `a: {foo: 1}, b: {foo: 2}`},
+		409: {subsumes: false, in: `a: {foo?: 1}, b: {foo: 2}`},
+		410: {subsumes: false, in: `a: {foo?: 1}, b: {foo?: 2}`},
+		411: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 2}`},
+
+		412: {subsumes: true, in: `a: {foo: number}, b: {foo: 2}`},
+		413: {subsumes: true, in: `a: {foo?: number}, b: {foo: 2}`},
+		414: {subsumes: true, in: `a: {foo?: number}, b: {foo?: 2}`},
+		415: {subsumes: false, in: `a: {foo: number}, b: {foo?: 2}`},
+
+		416: {subsumes: false, in: `a: {foo: 1}, b: {foo: number}`},
+		417: {subsumes: false, in: `a: {foo?: 1}, b: {foo: number}`},
+		418: {subsumes: false, in: `a: {foo?: 1}, b: {foo?: number}`},
+		419: {subsumes: false, in: `a: {foo: 1}, b: {foo?: number}`},
+
+		// The one exception of the rule: there is no value of foo that can be
+		// added to b which would cause the unification of a and b to fail.
+		420: {subsumes: true, in: `a: {foo?: _}, b: {}`},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

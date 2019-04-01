@@ -127,13 +127,12 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 
 func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 	ctx := v.ctx()
-	val := lookupBuiltinPkg(ctx, imp)
-	if !isBottom(val) {
-		return val
-	}
 	path, err := literal.Unquote(imp.Path.Value)
 	if err != nil {
 		return ctx.mkErr(newNode(imp), "illformed import spec")
+	}
+	if p := getBuiltinPkg(ctx, path); p != nil {
+		return p
 	}
 	bimp := v.inst.LookupImport(path)
 	if bimp == nil {

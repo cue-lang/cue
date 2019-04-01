@@ -54,10 +54,10 @@ var builtinPackages = map[string][]*builtin{
 	"": []*builtin{{}},
 	"crypto/md5": []*builtin{{
 		Name:  "Size",
-		Const: intFromGo("16"),
+		Const: "16",
 	}, {
 		Name:  "BlockSize",
-		Const: intFromGo("64"),
+		Const: "64",
 	}, {
 		Name:   "Sum",
 		Params: []kind{stringKind},
@@ -71,10 +71,10 @@ var builtinPackages = map[string][]*builtin{
 	}},
 	"crypto/sha1": []*builtin{{
 		Name:  "Size",
-		Const: intFromGo("20"),
+		Const: "20",
 	}, {
 		Name:  "BlockSize",
-		Const: intFromGo("64"),
+		Const: "64",
 	}, {
 		Name:   "Sum",
 		Params: []kind{stringKind},
@@ -88,13 +88,13 @@ var builtinPackages = map[string][]*builtin{
 	}},
 	"crypto/sha256": []*builtin{{
 		Name:  "Size",
-		Const: intFromGo("32"),
+		Const: "32",
 	}, {
 		Name:  "Size224",
-		Const: intFromGo("28"),
+		Const: "28",
 	}, {
 		Name:  "BlockSize",
-		Const: intFromGo("64"),
+		Const: "64",
 	}, {
 		Name:   "Sum256",
 		Params: []kind{stringKind},
@@ -118,19 +118,19 @@ var builtinPackages = map[string][]*builtin{
 	}},
 	"crypto/sha512": []*builtin{{
 		Name:  "Size",
-		Const: intFromGo("64"),
+		Const: "64",
 	}, {
 		Name:  "Size224",
-		Const: intFromGo("28"),
+		Const: "28",
 	}, {
 		Name:  "Size256",
-		Const: intFromGo("32"),
+		Const: "32",
 	}, {
 		Name:  "Size384",
-		Const: intFromGo("48"),
+		Const: "48",
 	}, {
 		Name:  "BlockSize",
-		Const: intFromGo("128"),
+		Const: "128",
 	}, {
 		Name:   "Sum512",
 		Params: []kind{stringKind},
@@ -449,40 +449,40 @@ var builtinPackages = map[string][]*builtin{
 	"list": []*builtin{{}},
 	"math": []*builtin{{
 		Name:  "MaxExp",
-		Const: intFromGo("2147483647"),
+		Const: "2147483647",
 	}, {
 		Name:  "MinExp",
-		Const: intFromGo("-2147483648"),
+		Const: "-2147483648",
 	}, {
 		Name:  "MaxPrec",
-		Const: intFromGo("4294967295"),
+		Const: "4294967295",
 	}, {
 		Name:  "ToNearestEven",
-		Const: intFromGo("0"),
+		Const: "0",
 	}, {
 		Name:  "ToNearestAway",
-		Const: intFromGo("1"),
+		Const: "1",
 	}, {
 		Name:  "ToZero",
-		Const: intFromGo("2"),
+		Const: "2",
 	}, {
 		Name:  "AwayFromZero",
-		Const: intFromGo("3"),
+		Const: "3",
 	}, {
 		Name:  "ToNegativeInf",
-		Const: intFromGo("4"),
+		Const: "4",
 	}, {
 		Name:  "ToPositiveInf",
-		Const: intFromGo("5"),
+		Const: "5",
 	}, {
 		Name:  "Below",
-		Const: intFromGo("-1"),
+		Const: "-1",
 	}, {
 		Name:  "Exact",
-		Const: intFromGo("0"),
+		Const: "0",
 	}, {
 		Name:  "Above",
-		Const: intFromGo("1"),
+		Const: "1",
 	}, {
 		Name:   "Jacobi",
 		Params: []kind{intKind, intKind},
@@ -495,7 +495,7 @@ var builtinPackages = map[string][]*builtin{
 		},
 	}, {
 		Name:  "MaxBase",
-		Const: intFromGo("62"),
+		Const: "62",
 	}, {
 		Name:   "Floor",
 		Params: []kind{numKind},
@@ -638,37 +638,37 @@ var builtinPackages = map[string][]*builtin{
 		},
 	}, {
 		Name:  "E",
-		Const: floatFromGo("2.71828182845904523536028747135266249775724709369995957496696763"),
+		Const: "2.71828182845904523536028747135266249775724709369995957496696763",
 	}, {
 		Name:  "Pi",
-		Const: floatFromGo("3.14159265358979323846264338327950288419716939937510582097494459"),
+		Const: "3.14159265358979323846264338327950288419716939937510582097494459",
 	}, {
 		Name:  "Phi",
-		Const: floatFromGo("1.61803398874989484820458683436563811772030917980576286213544861"),
+		Const: "1.61803398874989484820458683436563811772030917980576286213544861",
 	}, {
 		Name:  "Sqrt2",
-		Const: floatFromGo("1.41421356237309504880168872420969807856967187537694807317667974"),
+		Const: "1.41421356237309504880168872420969807856967187537694807317667974",
 	}, {
 		Name:  "SqrtE",
-		Const: floatFromGo("1.64872127070012814684865078781416357165377610071014801157507931"),
+		Const: "1.64872127070012814684865078781416357165377610071014801157507931",
 	}, {
 		Name:  "SqrtPi",
-		Const: floatFromGo("1.77245385090551602729816748334114518279754945612238712821380779"),
+		Const: "1.77245385090551602729816748334114518279754945612238712821380779",
 	}, {
 		Name:  "SqrtPhi",
-		Const: floatFromGo("1.27201964951406896425242246173749149171560804184009624861664038"),
+		Const: "1.27201964951406896425242246173749149171560804184009624861664038",
 	}, {
 		Name:  "Ln2",
-		Const: floatFromGo("0.693147180559945309417232121458176568075500134360255254120680009"),
+		Const: "0.693147180559945309417232121458176568075500134360255254120680009",
 	}, {
 		Name:  "Log2E",
-		Const: floatFromGo("1.442695040888963407359924681001892137426645954152985934135449408"),
+		Const: "1.442695040888963407359924681001892137426645954152985934135449408",
 	}, {
 		Name:  "Ln10",
-		Const: floatFromGo("2.3025850929940456840179914546843642076011014886287729760333278"),
+		Const: "2.3025850929940456840179914546843642076011014886287729760333278",
 	}, {
 		Name:  "Log10E",
-		Const: floatFromGo("0.43429448190325182765112891891660508229439700580366656611445378"),
+		Const: "0.43429448190325182765112891891660508229439700580366656611445378",
 	}, {
 		Name:   "Copysign",
 		Params: []kind{numKind, numKind},
@@ -1319,7 +1319,7 @@ var builtinPackages = map[string][]*builtin{
 		},
 	}, {
 		Name:  "IntSize",
-		Const: intFromGo("64"),
+		Const: "64",
 	}, {
 		Name:   "ParseUint",
 		Params: []kind{stringKind, intKind, intKind},

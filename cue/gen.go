@@ -228,24 +228,21 @@ func (g *generator) genConst(spec *ast.ValueSpec) {
 	name := spec.Names[0].Name
 	value := ""
 	switch v := g.toValue(spec.Values[0]); v.Kind() {
-	case constant.Bool:
-		value = fmt.Sprintf("&boolList{b: %q}", v.String())
-	case constant.String:
-		value = fmt.Sprintf("&stringLit{str: %q}", v.ExactString())
-	case constant.Int:
-		value = fmt.Sprintf("intFromGo(%q)", v.ExactString())
+	case constant.Bool, constant.Int, constant.String:
+		// TODO: convert octal numbers
+		value = v.ExactString()
 	case constant.Float:
 		var rat big.Rat
 		rat.SetString(v.ExactString())
 		var float big.Float
 		float.SetRat(&rat)
-		value = fmt.Sprintf("floatFromGo(%q)", float.Text('g', -1))
+		value = float.Text('g', -1)
 	default:
 		fmt.Printf("Dropped entry %s.%s (%T: %v)\n", g.defaultPkg, name, v.Kind(), v.ExactString())
 		return
 	}
 	g.sep()
-	fmt.Fprintf(g.w, "Name: %q,\n Const: %s,\n", name, value)
+	fmt.Fprintf(g.w, "Name: %q,\n Const: %q,\n", name, value)
 }
 
 func (g *generator) toValue(x ast.Expr) constant.Value {

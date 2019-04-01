@@ -19,7 +19,6 @@ import (
 	"math/big"
 	"sort"
 	"strconv"
-	"strings"
 	"time"
 
 	"cuelang.org/go/cue/ast"
@@ -370,32 +369,6 @@ func (x *numLit) intValue(ctx *context) int {
 		return 0
 	}
 	return int(v)
-}
-
-func intFromGo(s string) *numLit {
-	num := &numLit{}
-	num.k = intKind
-	var ok bool
-	switch {
-	case strings.HasPrefix(s, "0x"), strings.HasPrefix(s, "0X"):
-		_, ok = num.v.Coeff.SetString(s, 16)
-	case strings.HasPrefix(s, "0"):
-		_, ok = num.v.Coeff.SetString(s, 16)
-	default:
-		_, cond, err := num.v.SetString(s)
-		ok = cond == 0 && err == nil
-	}
-	if !ok {
-		panic(fmt.Sprintf("could not parse number %q", s))
-	}
-	return num
-}
-
-func floatFromGo(s string) *numLit {
-	num := &numLit{}
-	num.k = floatKind
-	num.v.SetString(s)
-	return num
 }
 
 type durationLit struct {
@@ -768,6 +741,10 @@ const hidden label = 0x01 // only set iff identifier starting with $
 type arc struct {
 	feature  label
 	optional bool
+	// TODO: add index to preserve approximate order within a struct and use
+	// topological sort to compute new struct order when unifying. This could
+	// also be achieved by not sorting labels on features and doing
+	// a linear search in fields.
 
 	v     value
 	cache evaluated // also used as newValue during unification.

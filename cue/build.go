@@ -69,16 +69,36 @@ type index struct {
 	labels   []string
 
 	loaded map[*build.Instance]*Instance
+
+	offset label
+	parent *index
+	freeze bool
 }
 
-// newIndex creates a new index.
-func newIndex(f *token.FileSet) *index {
+// sharedIndex is used for indexing builtins and any other labels common to
+// all instances.
+var sharedIndex = newSharedIndex(token.NewFileSet())
+
+func newSharedIndex(f *token.FileSet) *index {
 	i := &index{
 		fset:     f,
 		labelMap: map[string]label{"": 0},
 		labels:   []string{""},
-		loaded:   map[*build.Instance]*Instance{},
 	}
+	return i
+}
+
+// newIndex creates a new index.
+func newIndex(f *token.FileSet) *index {
+	parent := sharedIndex
+	i := &index{
+		fset:     f,
+		labelMap: map[string]label{},
+		loaded:   map[*build.Instance]*Instance{},
+		offset:   label(len(parent.labels)) + parent.offset,
+		parent:   parent,
+	}
+	parent.freeze = true
 	return i
 }
 
@@ -97,10 +117,23 @@ func (idx *index) nodeLabel(n ast.Node) (f label, ok bool) {
 	return 0, false
 }
 
+func (idx *index) findLabel(s string) (f label, ok bool) {
+	for x := idx; x != nil; x = x.parent {
+		f, ok = x.labelMap[s]
+		if ok {
+			break
+		}
+	}
+	return f, ok
+}
+
 func (idx *index) label(s string, isIdent bool) label {
-	f, ok := idx.labelMap[s]
+	f, ok := idx.findLabel(s)
 	if !ok {
-		f = label(len(idx.labelMap))
+		if idx.freeze {
+			panic("adding label to frozen index")
+		}
+		f = label(len(idx.labelMap)) + idx.offset
 		idx.labelMap[s] = f
 		idx.labels = append(idx.labels, s)
 	}
@@ -112,7 +145,10 @@ func (idx *index) label(s string, isIdent bool) label {
 }
 
 func (idx *index) labelStr(l label) string {
-	return idx.labels[l>>1]
+	l >>= 1
+	for ; l < idx.offset; idx = idx.parent {
+	}
+	return idx.labels[l-idx.offset]
 }
 
 func (idx *index) loadInstance(p *build.Instance) *Instance {
@@ -189,13 +225,12 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 			continue // quietly ignore the error
 		}
 		name := path.Base(id)
-		if _, ok := builtins[id]; ok {
-		} else if imp := p.LookupImport(id); imp != nil {
+		if imp := p.LookupImport(id); imp != nil {
 			name = imp.PkgName
 			if spec.Name != nil {
 				name = spec.Name.Name
 			}
-		} else {
+		} else if _, ok := builtins[id]; !ok {
 			// continue
 			return idx.mkErr(newNode(spec), "package %q not found", id)
 		}

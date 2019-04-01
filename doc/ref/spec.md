@@ -1108,12 +1108,12 @@ job: {
 
 An identifier or string label may be followed by a question mark `?`
 to indicate a field is optional.
+The question mark is not part of the field name.
 Constraints defined by an optional field should only be applied when
 a field is present.
-Fields with such markers may be omitted from output and should not cause
+A field with such a marker may be omitted from output and should not cause
 an error when emitting a concrete configuration, even if its value is
 not concrete or bottom.
-The question mark is not part of the field name.
 The result of unifying two fields only has an optional marker
 if both fields have such a marker.
 

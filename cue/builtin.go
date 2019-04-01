@@ -27,7 +27,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/cue/parser"
 	"github.com/cockroachdb/apd"
 )
 
@@ -56,7 +56,34 @@ type builtin struct {
 	Result kind
 	Func   func(c *callCtxt)
 	// Const  interface{}
-	Const evaluated
+	Const string
+}
+
+func mustCompileBuiltins(ctx *context, b []*builtin) *structLit {
+	obj := &structLit{}
+	for _, b := range b {
+		f := ctx.label(b.Name, false) // never starts with _
+		// n := &node{baseValue: newBase(imp.Path)}
+		var v evaluated = b
+		if b.Const != "" {
+			v = mustParseConstBuiltin(ctx, b.Name, b.Const)
+		}
+		obj.arcs = append(obj.arcs, arc{feature: f, v: v})
+	}
+	sort.Sort(obj)
+	return obj
+}
+
+// newConstBuiltin parses and creates any CUE expression that does not have
+// fields.
+func mustParseConstBuiltin(ctx *context, name, val string) evaluated {
+	expr, err := parser.ParseExpr(ctx.index.fset, "<builtin:"+name+">", val)
+	if err != nil {
+		panic(err)
+	}
+	v := newVisitor(ctx.index, nil, nil, nil)
+	value := v.walk(expr)
+	return value.evalPartial(ctx)
 }
 
 var _ caller = &builtin{}
@@ -88,16 +115,10 @@ var lenBuiltin = &builtin{
 }
 
 func (x *builtin) kind() kind {
-	if x.Const != nil {
-		return x.Const.kind()
-	}
 	return lambdaKind
 }
 
 func (x *builtin) evalPartial(ctx *context) evaluated {
-	if x.Const != nil {
-		return x.Const
-	}
 	return x
 }
 
@@ -150,12 +171,14 @@ type callCtxt struct {
 	ret  interface{}
 }
 
-var builtins map[string][]*builtin
+var builtins = map[string]*structLit{}
 
 func initBuiltins(pkgs map[string][]*builtin) {
-	builtins = pkgs
+	ctx := sharedIndex.newContext()
 	for k, b := range pkgs {
-		builtins["-/"+path.Base(k)] = b
+		e := mustCompileBuiltins(ctx, b)
+		builtins[k] = e
+		builtins["-/"+path.Base(k)] = e
 	}
 }
 
@@ -168,17 +191,7 @@ func getBuiltinPkg(ctx *context, path string) *structLit {
 	if !ok {
 		return nil
 	}
-
-	// TODO(perf): store in index
-
-	obj := &structLit{}
-	for _, b := range p {
-		f := ctx.label(b.Name, false) // never starts with _
-		// n := &node{baseValue: newBase(imp.Path)}
-		obj.arcs = append(obj.arcs, arc{feature: f, v: b})
-	}
-	sort.Sort(obj)
-	return obj
+	return p
 }
 
 // do returns whether the call should be done.
@@ -345,20 +358,6 @@ func (c *callCtxt) strList(i int) (a []string) {
 		a = append(a, str)
 	}
 	return a
-}
-
-// lookupBuiltinPkg returns the builtin package for the given path if it exists.
-func lookupBuiltinPkg(ctx *context, imp *ast.ImportSpec) evaluated {
-	path, err := literal.Unquote(imp.Path.Value)
-	if err != nil {
-		return ctx.mkErr(newNode(imp), "illformed import spec")
-	}
-
-	p := getBuiltinPkg(ctx, path)
-	if p == nil {
-		return ctx.mkErr(newNode(imp), "package %q not found", path)
-	}
-	return p
 }
 
 func convert(ctx *context, src source, x interface{}) evaluated {

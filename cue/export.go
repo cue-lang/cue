@@ -56,7 +56,7 @@ func (p *exporter) unique(s string) string {
 	s = strings.ToUpper(s)
 	lab := s
 	for {
-		if _, ok := p.ctx.labelMap[lab]; !ok {
+		if _, ok := p.ctx.findLabel(lab); !ok {
 			p.ctx.label(lab, true)
 			break
 		}

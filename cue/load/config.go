@@ -108,6 +108,10 @@ type Config struct {
 	// to CUE.
 	DataFiles bool
 
+	// StdRoot specifies an alternative directory for standard libaries.
+	// This is mostly used for bootstrapping.
+	StdRoot string
+
 	fileSystem
 }
 

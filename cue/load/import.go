@@ -166,6 +166,9 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 		if !isLocalImport(path) {
 			// is it a builtin?
 			if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
+				if l.cfg.StdRoot != "" {
+					return l.importPkg(path, l.cfg.StdRoot)
+				}
 				return nil
 			}
 			if cfg.modRoot == "" {
@@ -207,13 +210,12 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 			p.Dir = ctxt.joinPath(srcDir, path)
 		}
 		return nil
-	} else {
-		dir := ctxt.joinPath(srcDir, path)
-		info, err := os.Stat(filepath.Join(srcDir, path))
-		if err == nil && info.IsDir() {
-			p.Dir = dir
-			return nil
-		}
+	}
+	dir := ctxt.joinPath(srcDir, path)
+	info, err := os.Stat(filepath.Join(srcDir, path))
+	if err == nil && info.IsDir() {
+		p.Dir = dir
+		return nil
 	}
 
 	// package was not found

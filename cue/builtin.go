@@ -59,9 +59,14 @@ type builtin struct {
 	Const string
 }
 
-func mustCompileBuiltins(ctx *context, b []*builtin) *structLit {
+type builtinPkg struct {
+	native []*builtin
+	cue    string
+}
+
+func mustCompileBuiltins(ctx *context, p *builtinPkg) *structLit {
 	obj := &structLit{}
-	for _, b := range b {
+	for _, b := range p.native {
 		f := ctx.label(b.Name, false) // never starts with _
 		// n := &node{baseValue: newBase(imp.Path)}
 		var v evaluated = b
@@ -71,6 +76,22 @@ func mustCompileBuiltins(ctx *context, b []*builtin) *structLit {
 		obj.arcs = append(obj.arcs, arc{feature: f, v: v})
 	}
 	sort.Sort(obj)
+
+	// Parse builtin CUE
+	if p.cue != "" {
+		expr, err := parser.ParseExpr(ctx.index.fset, "<builtinPkg>", p.cue)
+		if err != nil {
+			fmt.Println(p.cue)
+			panic(err)
+		}
+		pkg := evalExpr(ctx.index, obj, expr).(*structLit)
+		for _, a := range pkg.arcs {
+			// Discard option status and attributes at top level.
+			// TODO: filter on capitalized fields?
+			obj.insertValue(ctx, a.feature, false, a.v, nil)
+		}
+	}
+
 	return obj
 }
 
@@ -173,7 +194,7 @@ type callCtxt struct {
 
 var builtins = map[string]*structLit{}
 
-func initBuiltins(pkgs map[string][]*builtin) {
+func initBuiltins(pkgs map[string]*builtinPkg) {
 	ctx := sharedIndex.newContext()
 	for k, b := range pkgs {
 		e := mustCompileBuiltins(ctx, b)

@@ -36,6 +36,11 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+
+	"cuelang.org/go/cue"
+	cueformat "cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
+	cuetoken "cuelang.org/go/cue/token"
 )
 
 const prefix = "../pkg/"
@@ -63,9 +68,10 @@ func main() {
 		w:     &bytes.Buffer{},
 		decls: &bytes.Buffer{},
 		fset:  token.NewFileSet(),
+		cfset: cuetoken.NewFileSet(),
 	}
 
-	fmt.Fprintln(g.w, "var builtinPackages = map[string][]*builtin{")
+	fmt.Fprintln(g.w, "var builtinPackages = map[string]*builtinPkg{")
 	filepath.Walk(prefix, func(dir string, info os.FileInfo, err error) error {
 		if err != nil {
 			log.Fatal(err)
@@ -131,6 +137,7 @@ type generator struct {
 	w          *bytes.Buffer
 	decls      *bytes.Buffer
 	fset       *token.FileSet
+	cfset      *cuetoken.FileSet
 	defaultPkg string
 	first      bool
 	iota       int
@@ -139,20 +146,29 @@ type generator struct {
 }
 
 func (g *generator) processDir(dir string) {
-	args, err := filepath.Glob(filepath.Join(dir, "*.go"))
+	goFiles, err := filepath.Glob(filepath.Join(dir, "*.go"))
 	if err != nil {
 		log.Fatal(err)
 	}
-	if len(args) == 0 {
+
+	cueFiles, err := filepath.Glob(filepath.Join(dir, "*.cue"))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	if len(goFiles)+len(cueFiles) == 0 {
 		return
 	}
+
 	pkg := dir[len(prefix):]
-	fmt.Fprintf(g.w, "%q: []*builtin{{\n", pkg)
-	defer fmt.Fprintf(g.w, "}},\n")
+	fmt.Fprintf(g.w, "%q: &builtinPkg{\nnative: []*builtin{{\n", pkg)
 	g.first = true
-	for _, filename := range args {
-		g.process(filename)
+	for _, filename := range goFiles {
+		g.processGo(filename)
 	}
+	fmt.Fprintf(g.w, "}},\n")
+	g.processCUE(dir)
+	fmt.Fprintf(g.w, "},\n")
 }
 
 func (g *generator) sep() {
@@ -174,7 +190,34 @@ func importName(s *ast.ImportSpec) string {
 	return path.Base(pkg)
 }
 
-func (g *generator) process(filename string) {
+// processCUE mixes in CUE definitions defined in the package directory.
+func (g *generator) processCUE(dir string) {
+	instances := cue.Build(load.Instances([]string{dir}, &load.Config{
+		StdRoot: "../pkg",
+	}))
+
+	if err := instances[0].Err; err != nil {
+		if !strings.Contains(err.Error(), "no CUE files") {
+			log.Fatal(err)
+		}
+		return
+	}
+
+	var buf bytes.Buffer
+	if err := cueformat.Node(&buf, instances[0].Value().Syntax()); err != nil {
+		log.Fatal(err)
+	}
+	body := buf.String()
+	body = strings.ReplaceAll(body, "\n\n", "\n")
+	// body = strings.ReplaceAll(body, "\t", "")
+	// TODO: escape backtick
+	fmt.Fprintf(g.w, "cue: `%s`,\n", body)
+}
+
+func (g *generator) processGo(filename string) {
+	if strings.HasSuffix(filename, "_test.go") {
+		return
+	}
 	f, err := parser.ParseFile(g.fset, filename, nil, parser.ParseComments)
 	if err != nil {
 		log.Fatal(err)
@@ -351,6 +394,8 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "bytes"
 	case "io.Reader":
 		return "reader"
+	case "time.Time":
+		return "string"
 	default:
 		return str
 	}

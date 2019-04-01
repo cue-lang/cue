@@ -46,7 +46,7 @@ func Build(instances []*build.Instance) []*Instance {
 	return loaded
 }
 
-// FromExpr creates anb instance from an expression.
+// FromExpr creates an instance from an expression.
 // Any references must be resolved beforehand.
 func FromExpr(fset *token.FileSet, expr ast.Expr) (*Instance, error) {
 	i := newIndex(fset).NewInstance(nil)

@@ -177,8 +177,16 @@ func (x *binaryExpr) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *unification) rewrite(ctx *context, fn rewriteFunc) value {
-	// Can a unification ever be rewritten as it is a post-evaluation type?
-	panic("cue: unification only used post-evaluation")
+	values := make([]evaluated, len(x.values))
+	changed := false
+	for i, v := range x.values {
+		values[i] = rewrite(ctx, v, fn).(evaluated)
+		changed = changed || v != values[i]
+	}
+	if !changed {
+		return x
+	}
+	return &unification{x.baseValue, values}
 }
 
 func (x *disjunction) rewrite(ctx *context, fn rewriteFunc) value {

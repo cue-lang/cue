@@ -1273,6 +1273,17 @@ Quoted strings and identifiers can be used used interchangeably, with the
 exception of identifiers starting with an underscore '_'.
 The latter represent hidden fields and are treated in a different namespace.
 
+<!-- TODO: disallow creating identifiers starting with __
+...and reserve them for builtin values.
+
+The issue is with code generation. As no guarantee can be given that
+a predeclared identifier is not overridden in one of the enclosing scopes,
+code will have to handle detecting such cases and renaming them.
+An alternative is to have the predeclared identifiers be aliases for namesake
+equivalents starting with a double underscore (e.g. string -> __string),
+allowing generated code (normal code would keep using `string`) to refer
+to these directly.
+-->
 
 ### Alias declarations
 

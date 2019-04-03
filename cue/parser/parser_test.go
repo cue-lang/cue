@@ -395,6 +395,22 @@ func TestParseExpr(t *testing.T) {
 		t.Errorf("ParseExpr(%q): got no error", src)
 	}
 
+	// check resolution
+	src = "{ foo: bar, bar: foo }"
+	x, err = parseExprString(src)
+	if err != nil {
+		t.Fatalf("ParseExpr(%q): %v", src, err)
+	}
+	for _, d := range x.(*ast.StructLit).Elts {
+		v := d.(*ast.Field).Value.(*ast.Ident)
+		if v.Scope == nil {
+			t.Errorf("ParseExpr(%q): scope of field %v not set", src, v.Name)
+		}
+		if v.Node == nil {
+			t.Errorf("ParseExpr(%q): scope of node %v not set", src, v.Name)
+		}
+	}
+
 	// various other stuff following a valid expression
 	const validExpr = "a + b"
 	const anything = "dh3*#D)#_"

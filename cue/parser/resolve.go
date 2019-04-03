@@ -30,6 +30,11 @@ func resolve(f *ast.File, errFn func(pos token.Pos, msg string)) {
 	walk(&scope{errFn: errFn}, f)
 }
 
+func resolveExpr(e ast.Expr, errFn func(pos token.Pos, msg string)) {
+	f := &ast.File{}
+	walk(&scope{file: f, errFn: errFn}, e)
+}
+
 // A Scope maintains the set of named language entities declared
 // in the scope and a link to the immediately surrounding (outer)
 // scope.

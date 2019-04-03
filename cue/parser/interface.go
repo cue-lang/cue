@@ -223,6 +223,7 @@ func ParseExpr(fset *token.FileSet, filename string, src interface{}, mode ...Op
 		p.errors.Sort()
 		return nil, p.errors.Err()
 	}
+	resolveExpr(e, p.error)
 
 	return e, nil
 }

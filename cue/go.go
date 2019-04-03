@@ -25,10 +25,24 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd"
 )
 
 // This file contains functionality for converting Go to CUE.
+//
+// The code in this file is a prototype implementation and is far from
+// optimized.
+
+func init() {
+	internal.FromGoValue = func(instance, x interface{}) interface{} {
+		return convertValue(instance.(*Instance), x)
+	}
+
+	internal.FromGoType = func(instance, x interface{}) interface{} {
+		return convertType(instance.(*Instance), x)
+	}
+}
 
 func convertValue(inst *Instance, x interface{}) Value {
 	ctx := inst.index.newContext()

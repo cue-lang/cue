@@ -29,3 +29,13 @@ var DebugStr func(x interface{}) string
 //
 // TODO: extract interface
 var EvalExpr func(value, expr interface{}) (result interface{})
+
+// FromGoValue converts an arbitrary Go value to the corresponding CUE value.
+// instance must be of type *cue.Instance.
+// The returned value is a cue.Value, which the caller must cast to.
+var FromGoValue func(instance, x interface{}) interface{}
+
+// FromGoType converts an arbitrary Go type to the corresponding CUE value.
+// instance must be of type *cue.Instance.
+// The returned value is a cue.Value, which the caller must cast to.
+var FromGoType func(instance, x interface{}) interface{}

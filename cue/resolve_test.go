@@ -1808,6 +1808,13 @@ func TestFullEval(t *testing.T) {
 			`fib2: 1, ` +
 			`fib7: 13, ` +
 			`fib12: 144}`,
+	}, {
+		desc: "Issue #23",
+		in: `
+			x: {a:1}|{a:2}
+			y: x & {a:3}
+		`,
+		out: `<3>{x: _|_((<0>{a: 1} | <1>{a: 2}):more than one element remaining (<0>{a: 1} and <1>{a: 2})), y: _|_((<4>.x & <5>{a: 3}):empty disjunction: <2>{a: (1 & 3)})}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

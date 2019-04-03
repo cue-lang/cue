@@ -1070,8 +1070,11 @@ outer:
 	case 0:
 		// Empty disjunction. All elements must be errors.
 		// Take the first error as an example.
-		str := fmt.Sprintf("empty disjunction: %v", x.values[0].val)
-		return mVal{ctx.mkErr(src, str), false}
+		err := x.values[0].val
+		if !isBottom(err) {
+			err = ctx.mkErr(src, debugStr(ctx, err))
+		}
+		return mVal{ctx.mkErr(src, "empty disjunction: %v", err), false}
 	case 1:
 		v := x.values[0]
 		return mVal{v.val.(evaluated), v.marked}

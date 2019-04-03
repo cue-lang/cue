@@ -112,9 +112,11 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 	ctx := v.ctx()
 	label := v.label(n.Name, true)
 	if r := v.resolveRoot; r != nil {
-		if a := r.lookup(v.ctx(), label); a.val() != nil {
-			return &selectorExpr{newExpr(n),
-				&nodeRef{baseValue: newExpr(n), node: r}, label}
+		for _, a := range r.arcs {
+			if a.feature == label {
+				return &selectorExpr{newExpr(n),
+					&nodeRef{baseValue: newExpr(n), node: r}, label}
+			}
 		}
 		if v.inSelector > 0 {
 			if p := getBuiltinShorthandPkg(ctx, n.Name); p != nil {
@@ -131,6 +133,8 @@ func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 	if err != nil {
 		return ctx.mkErr(newNode(imp), "illformed import spec")
 	}
+	// TODO: allow builtin *and* imported package. The result is a unified
+	// struct.
 	if p := getBuiltinPkg(ctx, path); p != nil {
 		return p
 	}

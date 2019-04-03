@@ -920,9 +920,10 @@ func (v Value) Unify(w Value) Value {
 	if w.path == nil {
 		return v
 	}
-	a := v.eval(ctx)
-	b := w.eval(ctx)
-	val := ctx.manifest(mkBin(ctx, token.NoPos, opUnify, a, b))
+	a := v.path.cache.evalPartial(ctx)
+	b := w.path.cache.evalPartial(ctx)
+	src := binSrc(token.NoPos, opUnify, a, b)
+	val := binOp(ctx, src, opUnify, a, b)
 	if err := validate(ctx, val); err != nil {
 		val = err
 	}

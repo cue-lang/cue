@@ -395,10 +395,17 @@ func (x *bound) kind() kind {
 func mkIntRange(a, b string) evaluated {
 	from := &bound{op: opGeq, value: parseInt(intKind, a)}
 	to := &bound{op: opLeq, value: parseInt(intKind, b)}
-	return &unification{
+	e := &unification{
 		binSrc(token.NoPos, opUnify, from, to),
 		[]evaluated{from, to},
 	}
+	// TODO: make this an integer
+	// int := &basicType{k: intKind}
+	// e = &unification{
+	// 	binSrc(token.NoPos, opUnify, int, e),
+	// 	[]evaluated{int, e},
+	// }
+	return e
 }
 
 var predefinedRanges = map[string]evaluated{
@@ -1029,6 +1036,12 @@ func (x *disjunction) normalize(ctx *context, src source) mVal {
 		return (!lt.marked || gt.marked) && subsumes(ctx, gt.val, lt.val, 0)
 	}
 	k := 0
+
+	// manifesting values should be disabled for recursive evaluation as
+	// these values may still be bound to another value later on, for instance
+	// when the result of this value is unified with another value.
+	noManifest := ctx.noManifest
+	ctx.noManifest = true
 outer:
 	for i, v := range x.values {
 		// TODO: this is pre-evaluation is quite aggressive. Verify whether
@@ -1059,6 +1072,7 @@ outer:
 		x.values[k] = v
 		k++
 	}
+	ctx.noManifest = noManifest
 
 	switch k {
 	case 0:

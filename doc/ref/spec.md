@@ -43,8 +43,8 @@ from the Go specification as a result.
 CUE draws its influence from many languages.
 Its main influences were BCL/ GCL (internal to Google),
 LKB (LinGO), Go, and JSON.
-Others are Swift, Javascript, Prolog, NCL (internal to Google), Jsonnet, HCL,
-Flabbergast, JSONPath, Haskell, Objective-C, and Python.
+Others are Swift, Typescript, Javascript, Prolog, NCL (internal to Google),
+Jsonnet, HCL, Flabbergast, JSONPath, Haskell, Objective-C, and Python.
 
 
 ## Notation
@@ -697,9 +697,6 @@ D1: (v1, d1) | v2       => (v1|v2, d1)
 D2: (v1, d1) | (v2, d2) => (v1|v2, d1|d2)
 ```
 
-For any other operation, such as arithmetic expressions, indices, slices, and
-selectors, the value `(v, d)` yields `d` if it is not bottom, or `v` otherwise.
-
 Default values may be introduced within disjunctions
 by _marking_ terms of a disjunction with an asterisk `*`
 ([a unary expression](#Operators)).
@@ -707,9 +704,18 @@ The default value of a disjunction with marked terms is the disjunction
 of those marked terms, applying the following rules for marks:
 
 ```
-M1: *v        => (v, v)  
+M1: *v        => (v, v)
 M2: *(v1, d1) => (v1, d1)
 ```
+
+In general, any operation in CUE involving default values proceeds along the
+following lines
+```
+O1: f((v1, d1), ..., (vn, dn))  => (fn(v1, ..., vn), fn(d1, ..., dn))
+```
+where, with the exception of disjunction, a value `v` without a default
+value is promoted to `(v, v)`.
+
 
 ```
 Expression               Value-default pair      Rules applied
@@ -723,6 +729,8 @@ string | *"foo"          (string, "foo")         M1, D1
 (*1|2|3) | (1|*2|3)&2    (1|2|3, 1|2)            M1, D1, U1, D2
 
 (*1|2) & (1|*2)          (1|2, _|_)              M1, D1, U2
+
+(*1|2) + (1|*2)          ((1|2)+(1|2), 3)        M1, D1, O1
 ```
 
 The rules of subsumption for defaults can be derived from the above definitions
@@ -781,26 +789,6 @@ float | *1                       1
 *{a: 1} | *{b: 1}                {a: 1} | {b: 1}
 ({a: 1} | {b: 1}) & {a:1}        {a:1} // after eliminating {a:1,b:1} by normalization
 ({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1} // after eliminating {a:1,b:1} by normalization
-```
-
-<!--
-TODO: to be consistent, we should probably drop this requirement and define
-for such operation which which types a value is unified.
-
-For instance, right now [1, 2][0.0] is not allowed,
-whereas [1, 2][0] is (implicitly unified with int).
-It would be consistent to allow [1, 2]["foo" | 0] to work as well.
-The alternative is to disallow [1, 2][0], which would be quite annoying.
--->
-
-A disjunction always evaluates to the same default value, regardless of
-the context in which the value is used.
-For instance, `[1, 3][*"a" | 1]` will result in an error, as `"a"` will be
-selected as the default value.
-
-```
-[1, 2][*"a" | 1]          //  _|_ // "a" is not an integer value
-[1, 2][(*"a" | 1) & int]  //  2, as "a" is eliminated before choosing a default.
 ```
 
 
@@ -1104,6 +1092,7 @@ job: {
 }
 ```
 
+
 #### Optional fields
 
 An identifier or string label may be followed by a question mark `?`
@@ -1343,6 +1332,10 @@ Quoted strings and identifiers can be used used interchangeably, with the
 exception of identifiers starting with an underscore '_'.
 The latter represent hidden fields and are treated in a different namespace.
 
+If an expression may result in a value associated with a default value
+as described in [default values](#default-values), the field binds to this
+value-default pair.
+
 <!-- TODO: disallow creating identifiers starting with __
 ...and reserve them for builtin values.
 
@@ -1354,6 +1347,7 @@ equivalents starting with a double underscore (e.g. string -> __string),
 allowing generated code (normal code would keep using `string`) to refer
 to these directly.
 -->
+
 
 ### Alias declarations
 
@@ -1369,6 +1363,11 @@ The expression is evaluated in the scope as it was declared.
 An expression specifies the computation of a value by applying operators and
 built-in functions to operands.
 
+Expressions that require concrete values are called _incomplete_ if any of
+their operands are not concrete, but define a value that would be legal for
+that expression.
+Incomplete expressions may be left unevaluated until a concrete value is
+requested at the application level.
 
 ### Operands
 
@@ -1400,12 +1399,59 @@ The identifier must be declared in the [package block] of that package.
 math.Sin    // denotes the Sin function in package math
 ```
 
+### References
+
+An identifier operand refers to a field and is called a reference.
+The value of a reference is a copy of the expression associated with the field
+that it is bound to,
+with any references within that expression bound to the respective copies of
+the fields they were originally bound to.
+Implementations may use a different mechanism to evaluate as long as
+these semantics are maintained.
+
+```
+a: {
+    place:    string
+    greeting: "Hello, \(place)!"
+}
+
+b: a & { place: "world" }
+c: a & { place: "you" }
+
+d: b.greeting  // "Hello, world!"
+e: c.greeting  // "Hello, you!"
+```
+
+
 
 ### Primary expressions
 
 Primary expressions are the operands for unary and binary expressions.
-A default expression is only valid as an operand to a disjunction.
 
+
+```
+
+Slice: indices must be complete
+([0, 1, 2, 3] | [2, 3])[0:2]   => [0, 1] | [2, 3]
+
+([0, 1, 2, 3] | *[2, 3])[0:2]   => [0, 1] | [2, 3]
+([0,1,2,3]|[2,3], [2,3])[0:2]   => ([0,1]|[2,3], [2,3])
+
+Index
+a: (1|2, 1)
+b: ([0,1,2,3]|[2,3], [2,3])[a]   => ([0,1,2,3]|[2,3][a], 3)
+
+Binary operation
+A binary is only evaluated if its operands are complete.
+
+Input          Maximum allowed evaluation
+a: string      string
+b: 2           2
+c: a * b       a * 2
+
+An error in a struct is if the evaluation of any expression results in
+bottom, where an incomplete expression is not considered bottom.
+```
 <!-- TODO(mpvl)
 	Conversion |
 -->
@@ -1453,8 +1499,27 @@ The identifier `f` is called the field selector.
 The type of the selector expression is the type of `f`.
 If `x` is a package name, see the section on [qualified identifiers].
 
+<!--
+TODO: consider allowing this and also for selectors. It needs to be considered
+how defaults are corried forward in cases like:
+
+    x: { a: string | *"foo" } | *{ a: int | *4 }
+    y: x.a & string
+
+What is y in this case?
+   (x.a & string, _|_)
+   (string|"foo", _|_)
+   (string|"foo", "foo)
+If the latter, then why?
+
+For a disjunction of the form `x1 | ... | xn`,
+the selector is applied to each element `x1.f | ... | xn.f`.
+-->
+
 Otherwise, if `x` is not a struct, or if `f` does not exist in `x`,
 the result of the expression is bottom (an error).
+In the latter case the expression is incomplete.
+The operand of a selector may be associated with a default.
 
 ```
 T: {
@@ -1465,7 +1530,20 @@ T: {
 a: T.x  // int
 b: T.y  // 3
 c: T.z  // _|_ // field 'z' not found in T
+
+e: {a: 1|*2} | *{a: 3|*4}
+f: e.a  // 4 (default value)
 ```
+
+<!--
+```
+(v, d).f  =>  (v.f, d.f)
+
+e: {a: 1|*2} | *{a: 3|*4}
+f: e.a  // 4 after selecting default from (({a: 1|*2} | {a: 3|*4}).a, 4)
+
+```
+-->
 
 
 ### Index expressions
@@ -1482,17 +1560,17 @@ The following rules apply:
 
 If `a` is not a struct:
 
-- the index `x` must be a concrete integer.
-  If `x` is a disjunction, the default, if any will be selected without unifying
-  `x` with `int` beforehand.
-- the index `x` is in range if `0 <= x < len(a)`, otherwise it is out of range
+- `a` is a concrete string or bytes type or a list (which need not be complete)
+- the index `x` unified with `int` must be concrete.
+- the index `x` is in range if `0 <= x < len(a)`, where only the
+  explicitly defined values of an open-ended list are considered,
+  otherwise it is out of range
 
 The result of `a[x]` is
 
-for `a` of list type (including single quoted strings, which are lists of bytes):
+for `a` of list or bytes type:
 
-- the list element at index `x`, if `x` is within range, where only the
-  explicitly defined values of an open-ended list are considered
+- the list or byte element at index `x`, if `x` is within range
 - bottom (an error), otherwise
 
 for `a` of string type:
@@ -1503,8 +1581,10 @@ for `a` of string type:
 
 for `a` of struct type:
 
+- the index `x` unified with `string` must be concrete.
 - the value of the field named `x` of struct `a`, if this field exists
 - bottom (an error), otherwise
+
 
 ```
 [ 1, 2 ][1]     // 2
@@ -1518,12 +1598,28 @@ for `a` of struct type:
 "He\u0300?"[5]  // _|_
 ```
 
+Both the operand and index value may be a value-default pair.
+```
+va[vi]              =>  va[vi]
+va[(vi, di)]        =>  (va[vi], va[di])
+(va, da)[vi]        =>  (va[vi], da[vi])
+(va, da)[(vi, di)]  =>  (va[vi], da[di])
+```
+
+```
+Fields                  Result
+x: [1, 2] | *[3, 4]     ([1,2]|[3,4], [3,4])
+i: int | *1             (int, 1)
+
+v: x[i]                 (x[i], 4)
+```
 
 ### Slice expressions
 
-Slice expressions construct a substring or slice from a string or list.
+Slice expressions construct a substring or slice from a string, bytes,
+or list value.
 
-For strings or lists, the primary expression
+For strings, bytes or lists, the primary expression
 ```
 a[low : high]
 ```
@@ -1534,6 +1630,10 @@ The result has indices starting at 0 and length equal to `high` - `low`.
 After slicing the list `a`
 <!-- TODO(jba): how does slicing open lists work? -->
 
+<!-- TODO: consider this.
+For `a` is a disjunction of the form `a1 | ... | an`, then the result is
+`a1[low:high] | ... | an[low:high]` observing the above rules.
+-->
 ```
 a := [1, 2, 3, 4, 5]
 s := a[1:4]
@@ -1570,6 +1670,20 @@ a slice is bottom (error).
 The result of a successful slice operation is a value of the same type
 as the operand.
 
+Both the slice operand and the slice indices may be associated with a default.
+
+<!--
+```
+va[vs:ve]                      =>  va[vs:ve]
+va[vs:(ve, de)]                =>  (va[vs:ve], va[vs:de])
+va[(vs, ds):ve]                =>  (va[vs:ve], va[ds:ve])
+va[(vs, ds):(ve, de)]          =>  (va[vs:ve], va[ds:de])
+(va, da)[vs:ve]                =>  (va[vs:ve], da[vs:ve])
+(va, da)[vs:(ve, de)]          =>  (va[vs:ve], da[vs:de])
+(va, da)[(vs, ds):ve]          =>  (va[vs:ve], da[ds:ve])
+(va, da)[(vs, ds):(ve, de)]    =>  (va[vs:ve], da[ds:de])
+```
+-->
 
 ### Operators
 
@@ -1596,6 +1710,27 @@ other operand is not, the constant is [converted] to the type of the other
 operand.
 -->
 
+Operands of unary and binary expressions may be associated with a default using
+the following
+<!--
+```
+O1: op (v1, d1)          => (op v1, op d1)
+
+O2: (v1, d1) op (v2, d2) => (v1 op v2, d1 op d2)
+and because v => (v, v)
+O3: v1       op (v2, d2) => (v1 op v2, v1 op d2)
+O4: (v1, d1) op v2       => (v1 op v2, d1 op v2)
+```
+-->
+
+```
+Field               Resulting Value-Default pair
+a: *1|2             (1|2, 1)
+b: -a               (-a, -1)
+
+c: a + 2            (a+2, 3)
+d: a + a            (a+a, 2)
+```
 
 #### Operator precedence
 
@@ -1651,7 +1786,6 @@ mod  modulo                 integers
 quo  quotient               integers
 rem  remainder              integers
 ```
-
 
 #### Integer operators
 

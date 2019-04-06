@@ -15,7 +15,6 @@
 package cue
 
 import (
-	"fmt"
 	"math/big"
 	"sort"
 	"strconv"

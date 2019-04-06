@@ -26,8 +26,8 @@ import (
 
 func TestExport(t *testing.T) {
 	testCases := []struct {
-		raw     bool
-		mode    exportMode
+		raw     bool // skip evaluation the root, fully raw
+		eval    bool // evaluate the full export
 		in, out string
 	}{{
 		in:  `"hello"`,
@@ -164,7 +164,7 @@ func TestExport(t *testing.T) {
 				}`),
 	}, {
 		raw:  true,
-		mode: exportEval,
+		eval: true,
 		in: `{
 			b: {
 				idx: a[str]
@@ -186,7 +186,7 @@ func TestExport(t *testing.T) {
 		}`),
 	}, {
 		raw:  true,
-		mode: exportEval,
+		eval: true,
 		in: `{
 			job <Name>: {
 				name:     Name
@@ -218,7 +218,7 @@ func TestExport(t *testing.T) {
 		}`),
 	}, {
 		raw:  true,
-		mode: exportEval,
+		eval: true,
 		in: `{
 				b: [{
 					<X>: int
@@ -252,7 +252,8 @@ func TestExport(t *testing.T) {
 			v := newValueRoot(ctx, n)
 
 			buf := &bytes.Buffer{}
-			err := format.Node(buf, export(ctx, v.eval(ctx), tc.mode))
+			opts := options{raw: !tc.eval}
+			err := format.Node(buf, export(ctx, v.eval(ctx), opts))
 			if err != nil {
 				log.Fatal(err)
 			}

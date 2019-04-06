@@ -26,22 +26,18 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-type exportMode int
+func doEval(m options) bool {
+	return !m.raw
+}
 
-const (
-	exportEval exportMode = 1 << iota
-	exportAttrs
-	exportRaw exportMode = 0
-)
-
-func export(ctx *context, v value, m exportMode) ast.Expr {
+func export(ctx *context, v value, m options) ast.Expr {
 	e := exporter{ctx, m, nil}
 	return e.expr(v)
 }
 
 type exporter struct {
 	ctx   *context
-	mode  exportMode
+	mode  options
 	stack []remap
 }
 
@@ -112,10 +108,10 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 }
 
 func (p *exporter) expr(v value) ast.Expr {
-	if p.mode == exportEval {
+	if doEval(p.mode) {
 		x := p.ctx.manifest(v)
 		if isIncomplete(x) {
-			p = &exporter{p.ctx, exportRaw, p.stack}
+			p = &exporter{p.ctx, options{raw: true}, p.stack}
 			return p.expr(v)
 		}
 		v = x
@@ -228,7 +224,7 @@ func (p *exporter) expr(v value) ast.Expr {
 
 	case *structLit:
 		obj := &ast.StructLit{}
-		if p.mode == exportEval {
+		if doEval(p.mode) {
 			for _, a := range x.arcs {
 				p.stack = append(p.stack, remap{
 					key:  x,
@@ -242,7 +238,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		if x.emit != nil {
 			obj.Elts = append(obj.Elts, &ast.EmitDecl{Expr: p.expr(x.emit)})
 		}
-		if p.mode != exportEval && x.template != nil {
+		if !doEval(p.mode) && x.template != nil {
 			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
 			if ok {
 				obj.Elts = append(obj.Elts, &ast.Field{
@@ -257,15 +253,30 @@ func (p *exporter) expr(v value) ast.Expr {
 			f := &ast.Field{
 				Label: p.label(a.feature),
 			}
-			if p.mode != exportEval {
+			// TODO: allow the removal of hidden fields. However, hidden fields
+			// that still used in incomplete expressions should not be removed
+			// (unless RequireConcrete is requested).
+			if a.optional {
+				// Optional fields are almost never concrete. We omit them in
+				// concrete mode to allow the user to use the -a option in eval
+				// without getting many errors.
+				if p.mode.omitOptional || p.mode.concrete {
+					continue
+				}
+				f.Optional = 1
+			}
+			if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
+				continue
+			}
+			if !doEval(p.mode) {
 				f.Value = p.expr(a.v)
-			} else if v := p.ctx.manifest(x.at(p.ctx, i)); isIncomplete(v) {
-				p := &exporter{p.ctx, exportRaw, p.stack}
+			} else if v := p.ctx.manifest(x.at(p.ctx, i)); isIncomplete(v) && !p.mode.concrete {
+				p := &exporter{p.ctx, options{raw: true}, p.stack}
 				f.Value = p.expr(a.v)
 			} else {
 				f.Value = p.expr(v)
 			}
-			if a.attrs != nil { // TODO: && p.mode&exportAttrs != 0 {
+			if a.attrs != nil && !p.mode.omitAttrs {
 				for _, at := range a.attrs.attr {
 					f.Attrs = append(f.Attrs, &ast.Attribute{Text: at.text})
 				}

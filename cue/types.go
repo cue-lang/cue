@@ -170,10 +170,14 @@ func (i *Iterator) Label() string {
 	return i.ctx.labelStr(i.f)
 }
 
-// IsHidden reports if a field is hidden from the data model. This may only
-// be true if the field was obtained using AllFields.
+// IsHidden reports if a field is hidden from the data model.
 func (i *Iterator) IsHidden() bool {
 	return i.f&hidden != 0
+}
+
+// IsOptional reports if a field is optional.
+func (i *Iterator) IsOptional() bool {
+	return i.cur.path.arc.optional
 }
 
 // marshalJSON iterates over the list and generates JSON output. HasNext
@@ -481,7 +485,8 @@ func (v Value) eval(ctx *context) value {
 
 // Label reports he label used to obtain this value from the enclosing struct.
 //
-// TODO: get rid of this somehow. Maybe by passing it to walk
+// TODO: get rid of this somehow. Probably by including a FieldInfo struct
+// or the like.
 func (v Value) Label() (string, bool) {
 	if v.path.feature == 0 {
 		return "", false
@@ -583,12 +588,12 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 
 // Syntax converts the possibly partially evaluated value into syntax. This
 // can use used to print the value with package format.
-func (v Value) Syntax() ast.Expr {
+func (v Value) Syntax(opts ...Option) ast.Expr {
 	if v.path == nil || v.path.cache == nil {
 		return nil
 	}
 	ctx := v.ctx()
-	return export(ctx, v.eval(ctx), exportEval)
+	return export(ctx, v.eval(ctx), getOptions(opts))
 }
 
 // Decode initializes x with Value v. If x is a struct, it will validate the
@@ -791,6 +796,14 @@ func (v Value) Reader() (io.Reader, error) {
 
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structVal(ctx *context) (structValue, error) {
+	return v.structValOpts(ctx, options{
+		omitHidden:   true,
+		omitOptional: true,
+	})
+}
+
+// structVal returns an structVal or an error if v is not a struct.
+func (v Value) structValOpts(ctx *context, o options) (structValue, error) {
 	if err := v.checkKind(ctx, structKind); err != nil {
 		return structValue{}, err
 	}
@@ -799,15 +812,20 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 	// TODO: This is expansion appropriate?
 	obj = obj.expandFields(ctx) // expand comprehensions
 
-	// check if any labels are hidden
-	hasOptional := false
-	f := label(0)
-	for _, a := range obj.arcs {
-		f |= a.feature
-		hasOptional = hasOptional || a.optional
+	// check if any fields can be omitted
+	needFilter := false
+	if o.omitHidden || o.omitOptional {
+		f := label(0)
+		for _, a := range obj.arcs {
+			f |= a.feature
+			if o.omitOptional && a.optional {
+				needFilter = true
+			}
+		}
+		needFilter = needFilter || f&hidden != 0
 	}
 
-	if f&hidden != 0 || hasOptional {
+	if needFilter {
 		arcs := make([]arc, len(obj.arcs))
 		k := 0
 		for _, a := range obj.arcs {
@@ -829,32 +847,13 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 	return structValue{ctx, v.path, obj}, nil
 }
 
-func (v Value) structValWithHidden(ctx *context) (structValue, error) {
-	if err := v.checkKind(ctx, structKind); err != nil {
-		return structValue{}, err
-	}
-	obj := v.eval(ctx).(*structLit)
-	obj = obj.expandFields(ctx)
-
-	return structValue{ctx, v.path, obj}, nil
-}
-
 // Fields creates an iterator over v's fields if v is a struct or an error
 // otherwise.
-func (v Value) Fields() (Iterator, error) {
+func (v Value) Fields(opts ...Option) (Iterator, error) {
+	o := options{omitHidden: true, omitOptional: true}
+	o.updateOptions(opts)
 	ctx := v.ctx()
-	obj, err := v.structVal(ctx)
-	if err != nil {
-		return Iterator{ctx: ctx}, err
-	}
-	return Iterator{ctx: ctx, val: v, iter: obj.n, len: len(obj.n.arcs)}, nil
-}
-
-// AllFields creates an iterator over all of v's fields, including the hidden
-// ones, if v is a struct or an error otherwise.
-func (v Value) AllFields() (Iterator, error) {
-	ctx := v.ctx()
-	obj, err := v.structValWithHidden(ctx)
+	obj, err := v.structValOpts(ctx, o)
 	if err != nil {
 		return Iterator{ctx: ctx}, err
 	}
@@ -989,32 +988,83 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 }
 
 type options struct {
-	concrete bool
+	concrete     bool // enforce that values are concrete
+	raw          bool // show original values
+	hasHidden    bool
+	omitHidden   bool
+	omitOptional bool
+	omitAttrs    bool
 }
 
 // An Option defines modes of evaluation.
-type Option func(p *options)
+type Option option
 
-// Used in Validate, Subsume?, Fields()
+type option func(p *options)
+
+// Used in Iter, Validate, Subsume?, Fields() Syntax, Export
 
 // TODO: could also be used for subsumption.
 
-// RequireConcrete verifies that all values in a tree are concrete.
+// RequireConcrete ensures that all values are concrete.
+//
+// For Validate this means it returns an error if this is not the case.
+// In other cases a non-concrete value will be replaced with an error.
 func RequireConcrete() Option {
-	return func(p *options) { p.concrete = true }
+	return func(p *options) {
+		p.concrete = true
+		if !p.hasHidden {
+			p.omitHidden = true
+		}
+	}
 }
 
-// VisitHidden(visit bool)
+// All indicates that all fields and values should be included in processing
+// even if they can be elided or omitted.
+func All() Option {
+	return func(p *options) {
+		p.omitAttrs = false
+		p.omitHidden = false
+		p.omitOptional = false
+	}
+}
+
+// Hidden indicates that hidden fields should be included.
 //
+// Hidden fields may still be included if include is false,
+// even if a value is not concrete.
+func Hidden(include bool) Option {
+	return func(p *options) {
+		p.hasHidden = true
+		p.omitHidden = !include
+	}
+}
+
+// Optional indicates that optional fields should be included.
+func Optional(include bool) Option {
+	return func(p *options) { p.omitOptional = !include }
+}
+
+// Attributes indicates that attributes should be included.
+func Attributes(include bool) Option {
+	return func(p *options) { p.omitAttrs = !include }
+}
+
+func getOptions(opts []Option) (o options) {
+	o.updateOptions(opts)
+	return
+}
+
+func (o *options) updateOptions(opts []Option) {
+	for _, fn := range opts {
+		fn(o)
+	}
+}
 
 // Validate reports any errors, recursively. The returned error may be an
 // errors.List reporting multiple errors, where the total number of errors
 // reported may be less than the actual number.
 func (v Value) Validate(opts ...Option) error {
-	var o options
-	for _, fn := range opts {
-		fn(&o)
-	}
+	o := getOptions(opts)
 	list := errors.List{}
 	v.Walk(func(v Value) bool {
 		if err := v.Err(); err != nil {

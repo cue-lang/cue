@@ -352,7 +352,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 
 		// Build map of mixin fields.
 		valueMap := map[key]cue.Value{}
-		for mIter, _ := in.AllFields(); mIter.Next(); {
+		for mIter, _ := in.Fields(cue.All()); mIter.Next(); {
 			valueMap[iterKey(mIter)] = mIter.Value()
 		}
 
@@ -360,7 +360,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 
 		// Process fields.
 		rm := []ast.Node{}
-		for iter, _ := v.AllFields(); iter.Next(); {
+		for iter, _ := v.Fields(cue.All()); iter.Next(); {
 			mSub := valueMap[iterKey(iter)]
 			if fn != nil {
 				mSub = mSub.Unify(fn(iter.Label()))

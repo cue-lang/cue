@@ -51,6 +51,15 @@ package expressions
     e: s[2*3]
     e: s[1+2*3]
 
+    e: a |
+    b|
+    c
+
+    e:
+    a|
+    b| c |
+    d
+
     e: f(3+4+5)
     e: f(3*4*5)
     e: f(3+4*5)

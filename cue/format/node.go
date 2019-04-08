@@ -163,7 +163,14 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		f.print(n.Colon, token.COLON, tab)
 		if n.Value != nil {
-			f.expr(n.Value)
+			switch n.Value.(type) {
+			case *ast.ListComprehension, *ast.ListLit, *ast.StructLit:
+				f.expr(n.Value)
+			default:
+				f.print(indent)
+				f.expr(n.Value)
+				f.markUnindentLine()
+			}
 		} else {
 			f.current.pos++
 			f.visitComments(f.current.pos)
@@ -609,7 +616,6 @@ func (f *formatter) binaryExpr(x *ast.BinaryExpr, prec1, cutoff, depth int) {
 
 	printBlank := prec < cutoff
 
-	ws := indent
 	f.expr1(x.X, prec, depth+diffPrec(x.X, prec))
 	f.print(nooverride)
 	if printBlank {
@@ -628,9 +634,6 @@ func (f *formatter) binaryExpr(x *ast.BinaryExpr, prec1, cutoff, depth int) {
 		f.print(blank)
 	}
 	f.expr1(x.Y, prec+1, depth+1)
-	if ws == ignore {
-		f.print(unindent)
-	}
 }
 
 func isBinary(expr ast.Expr) bool {

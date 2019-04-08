@@ -414,6 +414,8 @@ exit:
 // escaped quote. In case of a syntax error, it stops at the offending
 // character (without consuming it) and returns false. Otherwise
 // it returns true.
+//
+// Must be compliant with https://tools.ietf.org/html/rfc4627.
 func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	for i := 0; i < quote.numHash; i++ {
 		if s.ch != '#' {
@@ -429,7 +431,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	switch s.ch {
 	case '(':
 		return true, true
-	case 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', quote.char:
+	case 'a', 'b', 'f', 'n', 'r', 't', 'v', '\\', '/', quote.char:
 		s.next()
 		return true, false
 	case '0', '1', '2', '3', '4', '5', '6', '7':
@@ -470,7 +472,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 
 	// TODO: this is valid JSON, so remove, but normalize and report an error
 	// if for unmatched surrogate pairs .
-	if x > max || 0xD800 <= x && x < 0xE000 {
+	if x > max {
 		s.error(offs, "escape sequence is invalid Unicode code point")
 		return false, false
 	}

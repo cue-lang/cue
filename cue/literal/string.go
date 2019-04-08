@@ -28,6 +28,9 @@ var (
 	errMissingNewline    = errors.New(
 		"invalid string: opening quote of multiline string must be followed by newline")
 	errUnmatchedQuote = errors.New("invalid string: unmatched quote")
+	// TODO: making this an error is optional according to RFC 4627. But we
+	// could make it not an error if this ever results in an issue.
+	errSurrogate = errors.New("unmatched surrogate pair")
 )
 
 // Unquote interprets s as a single- or double-quoted, single- or multi-line
@@ -124,18 +127,19 @@ func ParseQuotes(start, end string) (q QuoteInfo, nStart, nEnd int, err error) {
 }
 
 // Unquote unquotes the given string. It must be terminated with a quote or an
-// interpolation start.
+// interpolation start. Escape sequences are expanded and surrogates
+// are replaced with the corresponding non-surrogate code points.
 func (q QuoteInfo) Unquote(s string) (string, error) {
 	if len(s) > 0 && !q.multiline {
 		if contains(s, '\n') || contains(s, '\r') {
 			return "", errSyntax
 		}
+
 		// Is it trivial? Avoid allocation.
-		if s[len(s)-1] == q.char &&
-			q.numHash == 0 &&
-			!contains(s, '\\') &&
-			!contains(s[:len(s)-1], q.char) {
-			return s[:len(s)-1], nil
+		if s[len(s)-1] == q.char && q.numHash == 0 {
+			if s := s[:len(s)-1]; isSimple(s, rune(q.char)) {
+				return s, nil
+			}
 		}
 	}
 
@@ -163,11 +167,22 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 			continue
 		}
 		c, multibyte, ss, err := unquoteChar(s, q)
+		if surHigh <= c && c < surEnd {
+			if c >= surLow {
+				return "", errSurrogate
+			}
+			var cl rune
+			cl, _, ss, err = unquoteChar(ss, q)
+			if cl < surLow || surEnd <= cl {
+				return "", errSurrogate
+			}
+			c = 0x10000 + (c-surHigh)*0x400 + (cl - surLow)
+		}
+
 		if err != nil {
 			return "", err
 		}
-		// TODO: handle surrogates: if we have a left-surrogate, expect the
-		// next value to be a right surrogate. Otherwise this is an error.
+
 		s = ss
 		if c < 0 {
 			if c == -2 {
@@ -190,6 +205,27 @@ func (q QuoteInfo) Unquote(s string) (string, error) {
 	}
 	// allow unmatched quotes if already checked.
 	return "", errUnmatchedQuote
+}
+
+const (
+	surHigh = 0xD800
+	surLow  = 0xDC00
+	surEnd  = 0xE000
+)
+
+func isSimple(s string, quote rune) bool {
+	// TODO(perf): check if using a simple DFA to detect surrogate pairs is
+	// faster than converting to code points. At the very least there should
+	// be an ASCII fast path.
+	for _, r := range s {
+		if r == quote || r == '\\' {
+			return false
+		}
+		if surHigh <= r && r < surEnd {
+			return false
+		}
+	}
+	return true
 }
 
 // contains reports whether the string contains the byte c.
@@ -238,6 +274,9 @@ func unquoteChar(s string, info QuoteInfo) (value rune, multibyte bool, tail str
 		}
 		return -1, false, "", nil
 	case c >= utf8.RuneSelf:
+		// TODO: consider handling surrogate values. These are discarded by
+		// DecodeRuneInString. It is technically correct to disallow it, but
+		// some JSON parsers allow this anyway.
 		r, size := utf8.DecodeRuneInString(s)
 		return r, true, s[size:], nil
 	case c != '\\':

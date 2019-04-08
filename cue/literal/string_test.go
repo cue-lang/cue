@@ -54,6 +54,11 @@ func TestUnquote(t *testing.T) {
 		{`"\x04"`, "", errSyntax},       // not allowed in strings
 		{`'\U01230123'`, "", errSyntax}, // too large
 
+		// Surrogate pairs
+		{`"\uD834\uDD1E"`, "𝄞", nil},
+		{`"\uDD1E\uD834"`, "", errSurrogate},
+		{`"\uD834\uD834"`, "", errSurrogate},
+
 		{`"\\"`, "\\", nil},
 		{`"\'"`, "", errSyntax},
 		{`"\q"`, "", errSyntax},

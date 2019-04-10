@@ -15,7 +15,11 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
+	"io"
+	"os"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -24,10 +28,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
+func init() {
+	s, err := os.Getwd()
+	if err == nil {
+		cwd = s
+	}
+}
+
+var cwd = "////"
+
+// printHeader is a hacky and unprincipled way to sanatize the package path.
+func printHeader(w io.Writer, inst *cue.Instance) {
+	head := strings.Replace(inst.Dir, cwd, ".", 1)
+	fmt.Fprintf(w, "--- %s\n", head)
+}
+
 func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 	if err != nil {
-		fmt.Fprintf(cmd.OutOrStderr(), "--- %s\n", inst.Dir)
-		errors.Print(cmd.OutOrStderr(), err)
+		w := &bytes.Buffer{}
+		printHeader(w, inst)
+		errors.Print(w, err)
+
+		// TODO: do something more principled than this.
+		b := w.Bytes()
+		b = bytes.ReplaceAll(b, []byte(cwd), []byte("."))
+		cmd.OutOrStderr().Write(b)
 		if fatal {
 			exit()
 		}
@@ -42,9 +67,15 @@ func buildFromArgs(cmd *cobra.Command, args []string) []*cue.Instance {
 	return buildInstances(cmd, binst)
 }
 
+var (
+	config = &load.Config{
+		Context: build.NewContext(),
+	}
+)
+
 func loadFromArgs(cmd *cobra.Command, args []string) []*build.Instance {
 	log.SetOutput(cmd.OutOrStderr())
-	binst := load.Instances(args, nil)
+	binst := load.Instances(args, config)
 	if len(binst) == 0 {
 		return nil
 	}

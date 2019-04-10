@@ -71,7 +71,7 @@ func addCustom(parent *cobra.Command, typ, name string, tools *cue.Instance) (*c
 			// - parse flags and env vars
 			// - constrain current config with config section
 
-			return doTasks(typ, name, tools)
+			return doTasks(cmd, typ, name, tools)
 		},
 	}
 	parent.AddCommand(sub)
@@ -110,9 +110,9 @@ func (k *taskKey) lookupTasks(root *cue.Instance) cue.Value {
 	return root.Lookup(k.typ, k.name, taskSection)
 }
 
-func doTasks(typ, command string, root *cue.Instance) error {
+func doTasks(cmd *cobra.Command, typ, command string, root *cue.Instance) error {
 	if err := executeTasks(typ, command, root); err != nil {
-		return fmt.Errorf("failed to run instance %q: %v", root.Dir, err)
+		exitIfErr(cmd, root, err, true)
 	}
 	return nil
 }
@@ -121,7 +121,7 @@ func doTasks(typ, command string, root *cue.Instance) error {
 //
 // All tasks are started at once, but will block until tasks that they depend
 // on will continue.
-func executeTasks(typ, command string, root *cue.Instance) error {
+func executeTasks(typ, command string, root *cue.Instance) (err error) {
 	spec := taskKey{typ, command, ""}
 	tasks := spec.lookupTasks(root)
 

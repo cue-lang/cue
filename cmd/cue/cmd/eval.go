@@ -78,7 +78,13 @@ Examples:
 				format.TabIndent(false),
 			}
 			if exprs == nil {
-				format.Node(w, inst.Value().Syntax(syn...), opts...)
+				v := inst.Value()
+				if *compile {
+					err := v.Validate(cue.RequireConcrete())
+					exitIfErr(cmd, inst, err, false)
+					continue
+				}
+				format.Node(w, v.Syntax(syn...), opts...)
 				fmt.Fprintln(w)
 			}
 			for _, e := range exprs {

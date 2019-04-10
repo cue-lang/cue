@@ -1077,12 +1077,35 @@ func (v Value) Validate(opts ...Option) error {
 				return false // mostly to avoid some hypothetical cycle issue
 			}
 		}
+		if o.concrete {
+			if err := isGroundRecursive(v.ctx(), v.eval(v.ctx())); err != nil {
+				list.Add(err)
+			}
+		}
 		return true
 	}, nil)
 	if len(list) > 0 {
 		list.Sort()
 		// list.RemoveMultiples() // TODO: use RemoveMultiples when it is fixed
-		return list
+		// return list
+		return list[0]
+	}
+	return nil
+}
+
+func isGroundRecursive(ctx *context, v value) error {
+	switch x := v.(type) {
+	case *list:
+		for i := 0; i < len(x.a); i++ {
+			v := ctx.manifest(x.at(ctx, i))
+			if err := isGroundRecursive(ctx, v); err != nil {
+				return err
+			}
+		}
+	default:
+		if !x.kind().isGround() {
+			return ctx.mkErr(v, "incomplete value %q", debugStr(ctx, v))
+		}
 	}
 	return nil
 }

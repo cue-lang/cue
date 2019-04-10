@@ -96,6 +96,6 @@ var (
 func init() {
 	rootCmd.AddCommand(exportCmd)
 
-	exportCmd.Flags().StringP("output", "o", "json", "output format (json only for now)")
+	// exportCmd.Flags().StringP("output", "o", "json", "output format (json only for now)")
 	escape = exportCmd.Flags().BoolP("escape", "e", false, "use HTML escaping")
 }

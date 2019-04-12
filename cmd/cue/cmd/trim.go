@@ -100,6 +100,16 @@ var (
 )
 
 func runTrim(cmd *cobra.Command, args []string) error {
+	// TODO: Do something more fine-grained. Optional fields are mostly not
+	// useful to consider as an optional field will almost never subsume
+	// another value. However, an optional field may subsume and therefore
+	// trigger the removal of another optional field.
+	// For now this is the better approach: trimming is not 100% accurate,
+	// and optional fields are just more likely to cause edge cases that may
+	// block a removal.
+	internal.DropOptional = true
+	defer func() { internal.DropOptional = false }()
+
 	log.SetOutput(cmd.OutOrStderr())
 
 	ctxt := build.NewContext(build.ParseOptions(parser.ParseComments))
@@ -352,7 +362,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 
 		// Build map of mixin fields.
 		valueMap := map[key]cue.Value{}
-		for mIter, _ := in.Fields(cue.All()); mIter.Next(); {
+		for mIter, _ := in.Fields(cue.All(), cue.Optional(false)); mIter.Next(); {
 			valueMap[iterKey(mIter)] = mIter.Value()
 		}
 

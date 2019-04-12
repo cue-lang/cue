@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // insertFile inserts the given file at the root of the instance.
@@ -285,6 +286,9 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			}
 
 		case *ast.BasicLit, *ast.Ident:
+			if internal.DropOptional && opt {
+				break
+			}
 			attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
 			if err != nil {
 				return err

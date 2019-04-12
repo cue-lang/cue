@@ -39,3 +39,7 @@ var FromGoValue func(instance, x interface{}) interface{}
 // instance must be of type *cue.Instance.
 // The returned value is a cue.Value, which the caller must cast to.
 var FromGoType func(instance, x interface{}) interface{}
+
+// DropOptional is a blanket override of handling optional values during
+// compilation. TODO: should we make this a build option?
+var DropOptional bool

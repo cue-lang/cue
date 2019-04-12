@@ -26,6 +26,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"sync"
 	"unicode"
 
 	"cuelang.org/go/cue"
@@ -347,7 +348,13 @@ func handleFile(cmd *cobra.Command, pkg, filename string) error {
 	return combineExpressions(cmd, pkg, newName(filename, 0), objs...)
 }
 
+// TODO: implement a more fine-grained approach.
+var mutex sync.Mutex
+
 func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Expr) error {
+	mutex.Lock()
+	defer mutex.Unlock()
+
 	if *out != "" {
 		cueFile = *out
 	}

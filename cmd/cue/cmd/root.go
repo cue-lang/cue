@@ -157,6 +157,7 @@ var (
 	fPackage  = rootCmd.PersistentFlags().StringP("package", "p", "", "CUE package to evaluate")
 	fSimplify = rootCmd.PersistentFlags().BoolP("simplify", "s", false, "simplify output")
 	fIgnore   = rootCmd.PersistentFlags().BoolP("ignore", "i", false, "proceed in the presence of errors")
+	fVerbose  = rootCmd.PersistentFlags().BoolP("verbose", "v", false, "print information about progress")
 )
 
 // initConfig reads in config file and ENV variables if set.

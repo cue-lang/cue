@@ -1,0 +1,1 @@
+command "ls --badflags" failed: exit status 1

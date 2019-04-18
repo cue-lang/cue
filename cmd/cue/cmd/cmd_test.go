@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"os"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -27,12 +28,17 @@ func TestCmd(t *testing.T) {
 		"run",
 		"run_list",
 		"baddisplay",
+		"errcode",
 		"http",
 	}
+	defer func() {
+		stdout = os.Stdout
+		stderr = os.Stderr
+	}()
 	for _, name := range testCases {
 		run := func(cmd *cobra.Command, args []string) error {
-			testOut = cmd.OutOrStdout()
-			defer func() { testOut = nil }()
+			stdout = cmd.OutOrStdout()
+			stderr = cmd.OutOrStderr()
 
 			tools := buildTools(rootCmd, args)
 			cmd, err := addCustom(rootCmd, "command", name, tools)
@@ -41,7 +47,7 @@ func TestCmd(t *testing.T) {
 			}
 			err = executeTasks("command", name, tools)
 			if err != nil {
-				errors.Print(testOut, err)
+				errors.Print(stdout, err)
 			}
 			return nil
 		}

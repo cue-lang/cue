@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
+	"golang.org/x/xerrors"
 )
 
 const (
@@ -47,6 +48,12 @@ func lookupString(obj cue.Value, key string) string {
 	}
 	return str
 }
+
+// Variables used for testing.
+var (
+	stdout io.Writer = os.Stdout
+	stderr io.Writer = os.Stderr
+)
 
 func addCustom(parent *cobra.Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
 	if tools == nil {
@@ -68,6 +75,7 @@ func addCustom(parent *cobra.Command, typ, name string, tools *cue.Instance) (*c
 		Short: lookupString(o, "short"),
 		Long:  lookupString(o, "long"),
 		RunE: func(cmd *cobra.Command, args []string) error {
+			// TODO:
 			// - parse flags and env vars
 			// - constrain current config with config section
 
@@ -111,10 +119,9 @@ func (k *taskKey) lookupTasks(root *cue.Instance) cue.Value {
 }
 
 func doTasks(cmd *cobra.Command, typ, command string, root *cue.Instance) error {
-	if err := executeTasks(typ, command, root); err != nil {
-		exitIfErr(cmd, root, err, true)
-	}
-	return nil
+	err := executeTasks(typ, command, root)
+	exitIfErr(cmd, root, err, true)
+	return err
 }
 
 // executeTasks runs user-defined tasks as part of a user-defined command.
@@ -293,19 +300,12 @@ func newPrintCmd(v cue.Value) (Runner, error) {
 	return &printCmd{}, nil
 }
 
-// TODO: get rid of this hack
-var testOut io.Writer
-
 func (c *printCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err error) {
 	str, err := v.Lookup("text").String()
 	if err != nil {
 		return nil, err
 	}
-	if testOut != nil {
-		fmt.Fprintln(testOut, str)
-	} else {
-		fmt.Println(str)
-	}
+	fmt.Fprintln(stdout, str)
 	return nil, nil
 }
 
@@ -319,12 +319,14 @@ func (c *execCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err er
 	// TODO: set environment variables, if defined.
 	var bin string
 	var args []string
+	doc := ""
 	switch v := v.Lookup("cmd"); v.Kind() {
 	case cue.StringKind:
 		str, _ := v.String()
 		if str == "" {
 			return cue.Value{}, errors.New("empty command")
 		}
+		doc = str
 		list := strings.Fields(str)
 		bin = list[0]
 		for _, s := range list[1:] {
@@ -340,12 +342,14 @@ func (c *execCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err er
 		if err != nil {
 			return cue.Value{}, err
 		}
+		doc += bin
 		for list.Next() {
 			str, err := list.Value().String()
 			if err != nil {
 				return cue.Value{}, err
 			}
 			args = append(args, str)
+			doc += " " + str
 		}
 	}
 
@@ -356,18 +360,18 @@ func (c *execCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err er
 			return nil, fmt.Errorf("cue: %v", err)
 		}
 	}
-	captureOut := !v.Lookup("stdout").IsNull()
+	captureOut := v.Lookup("stdout").Exists()
 	if !captureOut {
-		cmd.Stdout = os.Stdout
+		cmd.Stdout = stdout
 	}
-	captureErr := !v.Lookup("stderr").IsNull()
-	if captureErr {
-		cmd.Stderr = os.Stderr
+	captureErr := v.Lookup("stderr").Exists()
+	if !captureErr {
+		cmd.Stderr = stderr
 	}
 
 	update := map[string]interface{}{}
-	var stdout, stderr []byte
 	if captureOut {
+		var stdout []byte
 		stdout, err = cmd.Output()
 		update["stdout"] = string(stdout)
 	} else {
@@ -375,16 +379,14 @@ func (c *execCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err er
 	}
 	update["success"] = err == nil
 	if err != nil {
-		if exit, ok := err.(*exec.ExitError); ok && captureErr {
-			stderr = exit.Stderr
+		if exit := (*exec.ExitError)(nil); xerrors.As(err, &exit) && captureErr {
+			update["stderr"] = string(exit.Stderr)
 		} else {
-			return nil, fmt.Errorf("cue: %v", err)
+			update = nil
 		}
+		err = fmt.Errorf("command %q failed: %v", doc, err)
 	}
-	if captureErr {
-		update["stderr"] = string(stderr)
-	}
-	return update, nil
+	return update, err
 }
 
 type httpCmd struct{}

@@ -1,3 +1,3 @@
 not of right kind (number vs string):
-    $CWD/testdata/tasks/task_tool.cue:23:9
+    $CWD/testdata/tasks/task_tool.cue:29:9
     

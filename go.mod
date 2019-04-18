@@ -14,4 +14,5 @@ require (
 	golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f
 	golang.org/x/tools v0.0.0-20181210225255-6a3e9aa2ab77
+	golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373
 )

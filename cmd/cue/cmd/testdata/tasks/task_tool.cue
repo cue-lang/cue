@@ -8,12 +8,18 @@ command run_list: runBase & {
 	task echo cmd: ["echo", message]
 }
 
+command errcode: {
+	task bad: {
+		kind:   "exec"
+		cmd:    "ls --badflags"
+		stderr: string // suppress error message
+	}}
+
 // TODO: capture stdout and stderr for tests.
 command runRedirect: {
 	task echo: {
-		kind:   "exec"
-		cmd:    "echo \(message)"
-		stdout: null // should be automatic
+		kind: "exec"
+		cmd:  "echo \(message)"
 	}
 }
 

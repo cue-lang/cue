@@ -224,9 +224,11 @@ Before we start the restructuring, lets save a full evaluation so that we
 can verify that simplifications yield the same results.
 
 ```
-$ cue eval ./... > snapshot
+$ cue eval -c ./... > snapshot
 ```
 
+The `-c` option tells `cue` that only concrete values, that is valid JSON,
+are allowed.
 We focus on the objects defined in the various `kube.cue` files.
 A quick inspection reveals that many of the Deployments and Services share
 common structure.
@@ -272,7 +274,7 @@ deployment <Name>: {
     metadata name: Name
     spec: {
         // 1 is the default, but we allow any number
-        replicas: 1 | int
+        replicas: *1 | int
         template: {
             metadata labels: {
                 app:       Name
@@ -322,7 +324,7 @@ other a user of the template will want to specify.
 Let's compare the result of merging our new template to our original snapshot.
 
 ```
-$ cue eval ./... > snapshot2
+$ cue eval ./... -c > snapshot2
 --- ./mon/alertmanager
 non-concrete value (string)*:
     ./kube.cue:11:15
@@ -369,7 +371,7 @@ $ cue fmt kube.cue */kube.cue
 Let's try again to see if it is fixed:
 
 ```
-$ cue eval ./... > snapshot2
+$ cue eval -c ./... > snapshot2
 $ diff snapshot snapshot2
 ...
 ```

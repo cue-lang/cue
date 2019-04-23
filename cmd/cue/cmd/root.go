@@ -57,7 +57,7 @@ Commands are defined in CUE as follows:
 
 cue can also combine the results of http or grpc request with the input
 configuration for further processing. For more information on defining commands
-run 'gcfg help commands' or go to cuelang.org/pkg/cmd.
+run 'cue help cmd' or go to cuelang.org/pkg/cmd.
 
 For more information on writing CUE configuration files see cuelang.org.`,
 	// Uncomment the following line if your bare application

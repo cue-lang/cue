@@ -17,7 +17,6 @@ package cue
 import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"golang.org/x/exp/errors/fmt"
 )
@@ -146,20 +145,16 @@ func Merge(inst ...*Instance) *Instance {
 		return inst[0]
 	}
 
+	values := []value{}
 	for _, i := range inst {
 		if i.Err != nil {
 			return i
 		}
+		values = append(values, i.rootValue)
 	}
+	merged := &mergedValues{values: values}
 
 	ctx := inst[0].newContext()
-
-	merged := stripTemplates(ctx, inst[0].rootValue)
-
-	for _, i := range inst[1:] {
-		x := stripTemplates(ctx, i.rootValue)
-		merged = mkBin(ctx, token.NoPos, opUnify, merged, x)
-	}
 
 	st, ok := ctx.manifest(merged).(*structLit)
 	if !ok {

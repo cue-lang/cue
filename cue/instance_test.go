@@ -82,6 +82,20 @@ func TestMerge(t *testing.T) {
 		),
 		out: `{obj:{alpha:{a:A,b:2},beta:{a:B,b:3}}}`,
 	}, {
+		desc: "top-level comprehensions",
+		instances: insts(`
+			t: {"\(k)": 10 for k, x in s}
+			s <Name>: {}
+			s foo a: 1
+			`,
+			`
+			t: {"\(k)": 10 for k, x in s}
+			s <Name>: {}
+			s bar b: 2
+			`,
+		),
+		out: `{t:{foo:10,bar:10},s:{foo:{a:1},bar:{b:2}}}`,
+	}, {
 		desc:      "error",
 		instances: insts(`a:`),
 		out:       `{}`,

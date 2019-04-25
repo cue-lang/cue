@@ -438,8 +438,7 @@ func (x *interpolation) kind() kind { return x.k | nonGround }
 
 type list struct {
 	baseValue
-	// TODO: Elements in a list are nodes to allow for cycle detection.
-	a []value // TODO: could be arc?
+	elem *structLit
 
 	typ value
 
@@ -451,7 +450,7 @@ type list struct {
 // initLit initializes a literal list.
 func (x *list) initLit() {
 	n := newNum(x, intKind)
-	n.v.SetInt64(int64(len(x.a)))
+	n.v.SetInt64(int64(len(x.elem.arcs)))
 	x.len = n
 	x.typ = &top{x.baseValue}
 }
@@ -481,8 +480,10 @@ func (x *list) iterAt(ctx *context, i int) arc {
 		v := ctx.mkErr(x, "index %d out of bounds", i)
 		return arc{cache: v}
 	}
-	if i < len(x.a) {
-		return arc{cache: x.a[i].evalPartial(ctx), v: x.a[i]}
+	if i < len(x.elem.arcs) {
+		a := x.elem.iterAt(ctx, i)
+		a.feature = 0
+		return a
 	}
 	max := maxNum(x.len.(evaluated))
 	if max.kind().isGround() {
@@ -504,7 +505,7 @@ func (x *list) isOpen() bool {
 
 // lo and hi must be nil or a ground integer.
 func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
-	a := x.a
+	a := x.elem.arcs
 	max := maxNum(x.len).evalPartial(ctx)
 	if hi != nil {
 		n := hi.intValue(ctx)
@@ -535,10 +536,15 @@ func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
 		if n < len(a) {
 			a = a[n:]
 		} else {
-			a = []value{}
+			a = []arc{}
 		}
 	}
-	return &list{baseValue: x.baseValue, a: a, typ: x.typ, len: max}
+	arcs := make([]arc, len(a))
+	for i, a := range a {
+		arcs[i] = arc{feature: label(i), v: a.v}
+	}
+	s := &structLit{baseValue: x.baseValue, arcs: arcs}
+	return &list{baseValue: x.baseValue, elem: s, typ: x.typ, len: max}
 }
 
 // An structLit is a single structLit in the configuration tree.
@@ -1205,7 +1211,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
 		return nil
 
 	case *list:
-		for i := range src.a {
+		for i := range src.elem.arcs {
 			idx := newNum(x, intKind)
 			idx.v.SetInt64(int64(i))
 			v := fn.call(ctx, x, idx, src.at(ctx, i))

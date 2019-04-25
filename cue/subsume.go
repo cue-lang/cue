@@ -239,20 +239,19 @@ func (x *list) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 		if !subsumes(ctx, x.len, y.len, mode) {
 			return false
 		}
-		n := len(x.a)
-		if len(y.a) < n {
-			n = len(y.a)
+		if !subsumes(ctx, x.elem, y.elem, mode) {
+			return false
 		}
-		for i, a := range x.a[:n] {
-			if !subsumes(ctx, a, y.a[i], mode) {
-				return false
-			}
+		n := len(x.elem.arcs)
+		if len(y.elem.arcs) < n {
+			n = len(y.elem.arcs)
 		}
 		if y.isOpen() {
 			return subsumes(ctx, x.typ, y.typ, 0)
 		}
-		for i := range y.a[n:] {
-			if !subsumes(ctx, x.typ, y.a[i], mode) {
+		for _, a := range y.elem.arcs[n:] {
+			// TODO: evaluate?
+			if !subsumes(ctx, x.typ, a.v, mode) {
 				return false
 			}
 		}

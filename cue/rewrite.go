@@ -105,18 +105,13 @@ func (x *interpolation) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *list) rewrite(ctx *context, fn rewriteFunc) value {
-	a := make([]value, len(x.a))
-	changed := false
-	for i, e := range x.a {
-		a[i] = rewrite(ctx, e, fn)
-		changed = changed || a[i] != e
-	}
+	elem := rewrite(ctx, x.elem, fn).(*structLit)
 	typ := rewrite(ctx, x.typ, fn)
 	len := rewrite(ctx, x.len, fn)
-	if !changed && typ == x.typ && len == x.len {
+	if elem == x.elem && typ == x.typ && len == x.len {
 		return x
 	}
-	return &list{x.baseValue, a, typ, len}
+	return &list{x.baseValue, elem, typ, len}
 }
 
 func (x *sliceExpr) rewrite(ctx *context, fn rewriteFunc) value {

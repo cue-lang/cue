@@ -29,11 +29,8 @@ func validate(ctx *context, v value) *bottom {
 			}
 		}
 	case *list:
-		for _, v := range x.a {
-			if err := validate(ctx, v); err != nil {
-				return err
-			}
-		}
+		// TODO: also validate types for open lists?
+		return validate(ctx, x.elem)
 	}
 	return nil
 }

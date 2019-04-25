@@ -411,8 +411,12 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *list:
 		list := &ast.ListLit{}
 		var expr ast.Expr = list
-		for _, e := range x.a {
-			list.Elts = append(list.Elts, p.expr(e))
+		for _, e := range x.elem.arcs {
+			if doEval(p.mode) {
+				list.Elts = append(list.Elts, p.expr(e.v.evalPartial(p.ctx)))
+			} else {
+				list.Elts = append(list.Elts, p.expr(e.v))
+			}
 		}
 		max := maxNum(x.len)
 		num, ok := max.(*numLit)
@@ -430,7 +434,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		case *top, *basicType:
 			open = true
 		}
-		if !ok || ln > len(x.a) {
+		if !ok || ln > len(x.elem.arcs) {
 			list.Type = p.expr(x.typ)
 			if !open && !isTop(x.typ) {
 				expr = &ast.BinaryExpr{

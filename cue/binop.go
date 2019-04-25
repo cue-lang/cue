@@ -926,22 +926,20 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			src = mkBin(ctx, src.Pos(), op, x, other)
 			return ctx.mkErr(src, "incompatible list lengths: %v", n)
 		}
-		var a, rest []value
-		var rtyp value
-		nx, ny := len(x.a), len(y.a)
-		if nx < ny {
-			a = make([]value, nx, ny)
-			rest = y.a[nx:]
-			rtyp = x.typ
-
-		} else {
-			a = make([]value, ny, nx)
-			rest = x.a[ny:]
-			rtyp = y.typ
+		sx := x.elem.arcs
+		xa := sx
+		sy := y.elem.arcs
+		ya := sy
+		for len(xa) < len(ya) {
+			xa = append(xa, arc{feature: label(len(xa)), v: x.typ})
 		}
+		for len(ya) < len(xa) {
+			ya = append(ya, arc{feature: label(len(ya)), v: y.typ})
+		}
+
 		typ := x.typ
 		max, ok := n.(*numLit)
-		if !ok || len(a)+len(rest) < max.intValue(ctx) {
+		if !ok || len(xa) < max.intValue(ctx) {
 			typ = unify(ctx, src, x.typ.(evaluated), y.typ.(evaluated))
 			if isBottom(typ) {
 				src = mkBin(ctx, src.Pos(), op, x, other)
@@ -949,31 +947,25 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			}
 		}
 
-		for i := range a {
-			ai := unify(ctx, src, x.at(ctx, i).evalPartial(ctx), y.at(ctx, i).evalPartial(ctx))
-			if isBottom(ai) {
-				return ai
-			}
-			a[i] = ai
-		}
-		for _, n := range rest {
-			an := unify(ctx, src, n.evalPartial(ctx), rtyp.(evaluated))
-			if isBottom(an) {
-				return an
-			}
-			a = append(a, an)
-		}
-		return &list{baseValue: binSrc(src.Pos(), op, x, other), a: a, typ: typ, len: n}
+		// TODO: use forwarding instead of this mild hack.
+		x.elem.arcs = xa
+		y.elem.arcs = ya
+		s := unify(ctx, src, x.elem, y.elem).(*structLit)
+		x.elem.arcs = sx
+		y.elem.arcs = sy
+
+		base := binSrc(src.Pos(), op, x, other)
+		return &list{baseValue: base, elem: s, typ: typ, len: n}
 
 	case opEql, opNeq:
 		y, ok := other.(*list)
 		if !ok {
 			break
 		}
-		if len(x.a) != len(y.a) {
+		if len(x.elem.arcs) != len(y.elem.arcs) {
 			return boolTonode(src, false)
 		}
-		for i := range x.a {
+		for i := range x.elem.arcs {
 			if !test(ctx, src, op, x.at(ctx, i), y.at(ctx, i)) {
 				return boolTonode(src, false)
 			}
@@ -986,17 +978,24 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			break
 		}
 		n := &list{baseValue: binSrc(src.Pos(), op, x, other), typ: y.typ}
-		n.a = append(x.a, y.a...)
+		arcs := []arc{}
+		for _, v := range x.elem.arcs {
+			arcs = append(arcs, arc{feature: label(len(arcs)), v: v.v})
+		}
+		for _, v := range y.elem.arcs {
+			arcs = append(arcs, arc{feature: label(len(arcs)), v: v.v})
+		}
 		switch v := y.len.(type) {
 		case *numLit:
 			// Closed list
 			ln := &numLit{numBase: v.numBase}
-			ln.v.SetInt64(int64(len(n.a)))
+			ln.v.SetInt64(int64(len(arcs)))
 			n.len = ln
 		default:
 			// Open list
-			n.len = y.len
+			n.len = y.len // TODO: add length of x?
 		}
+		n.elem = &structLit{baseValue: n.baseValue, arcs: arcs}
 		return n
 
 	case opMul:
@@ -1005,7 +1004,8 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			panic("multiplication must be int type")
 		}
 		n := &list{baseValue: binSrc(src.Pos(), op, x, other), typ: x.typ}
-		if len(x.a) > 0 {
+		arcs := []arc{}
+		if len(x.elem.arcs) > 0 {
 			if !k.isGround() {
 				// should never reach here.
 				break
@@ -1013,7 +1013,9 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			if ln := other.(*numLit).intValue(ctx); ln > 0 {
 				for i := 0; i < ln; i++ {
 					// TODO: copy values
-					n.a = append(n.a, x.a...)
+					for _, a := range x.elem.arcs {
+						arcs = append(arcs, arc{feature: label(len(arcs)), v: a.v})
+					}
 				}
 			} else if ln < 0 {
 				return ctx.mkErr(src, "negative number %d multiplies list", ln)
@@ -1023,12 +1025,13 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		case *numLit:
 			// Closed list
 			ln := &numLit{numBase: v.numBase}
-			ln.v.SetInt64(int64(len(n.a)))
+			ln.v.SetInt64(int64(len(arcs)))
 			n.len = ln
 		default:
 			// Open list
-			n.len = x.len
+			n.len = x.len // TODO: multiply length?
 		}
+		n.elem = &structLit{baseValue: n.baseValue, arcs: arcs}
 		return n
 	}
 	return ctx.mkIncompatible(src, op, x, other)

@@ -568,7 +568,7 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 		return json.Marshal(x.(*bytesLit).b)
 	case listKind:
 		l := x.(*list)
-		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.a)}
+		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}
 		return marshalList(&i)
 	case structKind:
 		obj, _ := v.structVal(ctx)
@@ -730,7 +730,7 @@ func (v Value) List() (Iterator, error) {
 		return Iterator{ctx: ctx}, err
 	}
 	l := v.eval(ctx).(*list)
-	return Iterator{ctx: ctx, val: v, iter: l, len: len(l.a)}, nil
+	return Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}, nil
 }
 
 // Null reports an error if v is not null.
@@ -1096,7 +1096,7 @@ func (v Value) Validate(opts ...Option) error {
 func isGroundRecursive(ctx *context, v value) error {
 	switch x := v.(type) {
 	case *list:
-		for i := 0; i < len(x.a); i++ {
+		for i := 0; i < len(x.elem.arcs); i++ {
 			v := ctx.manifest(x.at(ctx, i))
 			if err := isGroundRecursive(ctx, v); err != nil {
 				return err

@@ -346,13 +346,15 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 
 		case reflect.Slice, reflect.Array:
 			list := &list{baseValue: src.base()}
+			arcs := []arc{}
 			for i := 0; i < value.Len(); i++ {
 				x := convert(ctx, src, value.Index(i).Interface())
 				if isBottom(x) {
 					return x
 				}
-				list.a = append(list.a, x)
+				arcs = append(arcs, arc{feature: label(len(arcs)), v: x})
 			}
+			list.elem = &structLit{baseValue: list.baseValue, arcs: arcs}
 			list.initLit()
 			// There is no need to set the type of the list, as the list will
 			// be of fixed size and all elements will already have a defined
@@ -522,7 +524,7 @@ func goTypeToValue(ctx *context, t reflect.Type) (e value) {
 			if t.Kind() == reflect.Array {
 				ln = toInt(ctx, baseValue{}, int64(t.Len()))
 			}
-			e = &list{typ: elem, len: ln}
+			e = &list{elem: &structLit{}, typ: elem, len: ln}
 		}
 		if k == reflect.Slice {
 			e = wrapOrNull(e)

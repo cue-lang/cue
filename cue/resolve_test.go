@@ -337,7 +337,7 @@ func TestBasicRewrite(t *testing.T) {
 			e4: [1, 2, ...>=4 & <=5] & [1, 2, 4, 8]
 			e5: [1, 2, 4, 8] & [1, 2, ...>=4 & <=5]
 			`,
-		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, number)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: _|_((<=5 & 8):8 not within bound <=5), e5: _|_((<=5 & 8):8 not within bound <=5)}`,
+		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, number)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)], e5: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)]}`,
 	}, {
 		desc: "list arithmetic",
 		in: `
@@ -473,7 +473,7 @@ func TestBasicRewrite(t *testing.T) {
 
 			c: [c[1], c[0]]
 		`,
-		out: `<0>{a: _|_(cycle detected), b: _|_(cycle detected), c: _|_(cycle detected)}`,
+		out: `<0>{a: _|_(cycle detected), b: _|_(cycle detected), c: [_|_(cycle detected),_|_(cycle detected)]}`,
 	}, {
 		desc: "resolved self-reference cycles",
 		in: `
@@ -481,13 +481,13 @@ func TestBasicRewrite(t *testing.T) {
 			b: a + 100
 			b: 200
 
-			c: [c[1], a] // TODO: should be allowed
+			c: [c[1], a]
 
 			s1: s2 & {a: 1}
 			s2: s3 & {b: 2}
 			s3: s1 & {c: 3}
 		`,
-		out: `<0>{a: 100, b: 200, c: _|_(cycle detected), s1: <1>{a: 1, b: 2, c: 3}, s2: <2>{a: 1, b: 2, c: 3}, s3: <3>{a: 1, b: 2, c: 3}}`,
+		out: `<0>{a: 100, b: 200, c: [100,100], s1: <1>{a: 1, b: 2, c: 3}, s2: <2>{a: 1, b: 2, c: 3}, s3: <3>{a: 1, b: 2, c: 3}}`,
 	}, {
 		desc: "resolved self-reference cycles: Issue 19",
 		in: `
@@ -1028,6 +1028,16 @@ func TestResolve(t *testing.T) {
 			`ne0: true, ne1: true, ne2: true, ne3: true, ne4: false, ne5: false, ne6: false, ne7: false, ne8: false, ne9: false, ne10: false, ne11: false, ` +
 			`feq0: false, feq1: false, feq2: false, feq3: false, feq4: false, feq5: false, feq6: false, feq7: false, feq8: false, feq9: false, feq10: false, feq11: false, ` +
 			`fne0: false, fne1: false, fne2: false, fne3: false, fne4: false, fne5: false, fne6: false, fne7: false, fne8: false, fne9: false, fne10: false, fne11: false}`,
+	}, {
+		desc: "list unification",
+		in: `
+		a: { l: ["foo", v], v: l[1] }
+		b: a & { l: [_, "bar"] }
+		`,
+		out: `<0>{` +
+			`a: <1>{l: ["foo",_|_(cycle detected)], ` +
+			`v: _|_(cycle detected)}, ` +
+			`b: <2>{l: ["foo","bar"], v: "bar"}}`,
 	}, {
 		desc: "correct error messages",
 		// Tests that it is okay to partially evaluate structs.

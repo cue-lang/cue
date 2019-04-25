@@ -93,13 +93,10 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 		obj := &structLit{x.baseValue, emit, t, nil, arcs, nil}
 		return obj
 	case *list:
-		a := make([]value, len(x.a))
-		for i := range x.a {
-			a[i] = rewriteRec(ctx, x.a[i], x.at(ctx, i), m)
-		}
+		elm := rewriteRec(ctx, x.elem, x.elem, m).(*structLit)
 		len := rewriteRec(ctx, x.len, x.len.(evaluated), m)
 		typ := rewriteRec(ctx, x.typ, x.typ.(evaluated), m)
-		return &list{x.baseValue, a, typ, len}
+		return &list{x.baseValue, elm, typ, len}
 	default:
 		return eval
 	}

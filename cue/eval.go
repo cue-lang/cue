@@ -219,34 +219,24 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 	if err := firstBottom(n, t); err != nil {
 		return err
 	}
-	a := make([]value, len(x.a))
-	changed := false
-	for i, v := range x.a {
-		// TODO: don't evaluate now. List elements may refer to other list
-		// elements. Evaluating them here will cause a cycle evaluating the
-		// struct field.
-		e := v.evalPartial(ctx)
-		changed = changed || e != v
-		switch e.(type) {
-		case *bottom:
-			return e
-		case value:
-			a[i] = e
-		}
-	}
-	if !changed && n == x.len && t == x.typ {
+	s := x.elem.evalPartial(ctx).(*structLit)
+	if s == x.elem && n == x.len && t == x.typ {
 		return x
 	}
-	return &list{x.baseValue, a, t, n}
+	return &list{x.baseValue, s, t, n}
 }
 
 func (x *listComprehension) evalPartial(ctx *context) evaluated {
-	list := &list{baseValue: x.baseValue}
+	s := &structLit{baseValue: x.baseValue}
+	list := &list{baseValue: x.baseValue, elem: s}
 	result := x.clauses.yield(ctx, func(k, v evaluated, _ bool) *bottom {
 		if !k.kind().isAnyOf(intKind) {
 			return ctx.mkErr(k, "key must be of type int")
 		}
-		list.a = append(list.a, v.evalPartial(ctx))
+		list.elem.arcs = append(list.elem.arcs, arc{
+			feature: label(len(list.elem.arcs)),
+			v:       v.evalPartial(ctx),
+		})
 		return nil
 	})
 	switch {

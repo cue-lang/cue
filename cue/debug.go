@@ -363,13 +363,13 @@ func (p *printer) debugStr(v interface{}) {
 		case *top, *basicType:
 			open = true
 		}
-		if !ok || ln > len(x.a) {
+		if !ok || ln > len(x.elem.arcs) {
 			if !open && !isTop(x.typ) {
 				p.debugStr(x.len)
 				write("*[")
 				p.debugStr(x.typ)
 				write("]")
-				if len(x.a) == 0 {
+				if len(x.elem.arcs) == 0 {
 					break
 				}
 				write("(")
@@ -378,9 +378,9 @@ func (p *printer) debugStr(v interface{}) {
 			ellipsis = true
 		}
 		write("[")
-		for i, a := range x.a {
-			p.debugStr(a)
-			if i < len(x.a)-1 {
+		for i, a := range x.elem.arcs {
+			p.debugStr(a.v)
+			if i < len(x.elem.arcs)-1 {
 				write(",")
 			}
 		}

@@ -421,10 +421,12 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 
 	case *ast.ListLit:
-		list := &list{baseValue: newExpr(n)}
-		for _, e := range n.Elts {
-			list.a = append(list.a, v.walk(e))
+		arcs := []arc{}
+		for i, e := range n.Elts {
+			arcs = append(arcs, arc{feature: label(i), v: v.walk(e)})
 		}
+		s := &structLit{baseValue: newExpr(n), arcs: arcs}
+		list := &list{baseValue: newExpr(n), elem: s}
 		list.initLit()
 		if n.Ellipsis != token.NoPos || n.Type != nil {
 			list.len = &bound{list.baseValue, opGeq, list.len}

@@ -52,16 +52,16 @@ Commands are defined at the top-level of the configuration:
 		// usage gives a short usage pattern of the command.
 		// Example:
 		//    fmt [-n] [-x] [packages]
-		usage: Name | string
+		usage?: Name | string
 
 		// short gives a brief on-line description of the command.
 		// Example:
 		//    reformat package sources
-		short: "" | string
+		short?: string
 
 		// long gives a detailed description of the command, including a
 		// description of flags usage and examples.
-		long: "" | string
+		long?: string
 
 		// A task defines a single action to be run as part of this command.
 		// Each task can have inputs and outputs, depending on the type
@@ -103,15 +103,15 @@ Commands are defined at the top-level of the configuration:
 			// value defines the possible values for this flag.
 			// The default is string. Users can define default values by
 			// using disjunctions.
-			value: env[Name].value | VarValue
+			value: *env[Name].value | VarValue
 
 			// name, if set, allows var to be set with the command-line flag
 			// of the given name. null disables the command line flag.
-			name: Name | null | string
+			name?: *Name | string
 
 			// short defines an abbreviated version of the flag.
 			// Disabled by default.
-			short: null | string
+			short?: string
 		}
 
 		// populate flag with the default values for
@@ -129,18 +129,18 @@ Commands are defined at the top-level of the configuration:
 		//
 		env <Name>: {
 			// name defines the environment variable that sets this flag.
-			name: "CUE_VAR_" + strings.Upper(Name) | string | null
+			name?: *"CUE_VAR_" + strings.Upper(Name) | string
 
 			// The value retrieved from the environment variable or null
 			// if not set.
-			value: null | string | bytes
+			value?: string | bytes
 		}
 		env: { "\(k)": { value: v } | null for k, v in var }
 	}
 
 Available tasks can be found in the package documentation at
 
-	cuelang.org/pkg/tool.
+	https://godoc.org/cuelang.org/go/pkg/tool
 
 More on tasks can be found in the tasks topic.
 
@@ -158,11 +158,11 @@ A simple file using command line execution:
 	// Say hello!
 	command hello: {
 		// whom to say hello to
-		var who: "World" | string
+		var who: *"World" | string
 
-		task print: exec.Run({
+		task print: exec.Run & {
 			cmd: "echo Hello \(var.who)! Welcome to \(city)."
-		})
+		}
 	}
 	EOF
 
@@ -185,27 +185,27 @@ An example using pipes:
 	command hello: {
 		var file: "out.txt" | string // save transcript to this file
 
-		task ask: cli.Ask({
+		task ask: cli.Ask & {
 			prompt:   "What is your name?"
 			response: string
-		})
+		}
 
 		// starts after ask
-		task echo: exec.Run({
+		task echo: exec.Run & {
 			cmd:    ["echo", "Hello", task.ask.response + "!"]
 			stdout: string // capture stdout
-		})
+		}
 
 		// starts after echo
-		task write: file.Append({
+		task write: file.Append & {
 			filename: var.file
 			contents: task.echo.stdout
-		})
+		}
 
 		// also starts after echo
-		task print: cli.Print({
+		task print: cli.Print & {
 			contents: task.echo.stdout
-		})
+		}
 	}
 
 `,

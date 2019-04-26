@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package http provides tasks related to the HTTP protocol.
 package http
+
+//go:generate go run gen.go
 
 import (
 	"io"

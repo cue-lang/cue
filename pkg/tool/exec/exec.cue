@@ -44,12 +44,3 @@ Run: {
 	// force a fatal error if the desired success code is not reached.
 	success: bool
 }
-
-/* TODO
-// Env collects the environment variables of the current process.
-Env: {
-	kind: "tool/exec.Env"
-
-	env <Name>: string | number
-}
-*/

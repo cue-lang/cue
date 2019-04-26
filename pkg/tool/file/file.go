@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package file provides file operations for cue tasks.
 package file
+
+//go:generate go run gen.go
 
 import (
 	"io/ioutil"

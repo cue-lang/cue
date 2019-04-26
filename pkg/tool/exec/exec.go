@@ -12,8 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package exec defines tasks for running commands.
 package exec
+
+//go:generate go run gen.go
 
 import (
 	"errors"

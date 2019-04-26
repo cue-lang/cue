@@ -29,6 +29,7 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal"
 	itask "cuelang.org/go/internal/task"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
 	_ "cuelang.org/go/pkg/tool/exec"
@@ -251,15 +252,34 @@ type task struct {
 	dep   map[*task]bool
 }
 
+var oldKinds = map[string]string{
+	"exec":       "tool/exec.Run",
+	"http":       "tool/http.Do",
+	"print":      "tool/cli.Print",
+	"testserver": "cmd/cue/cmd.Test",
+}
+
 func newTask(index int, name string, v cue.Value) (*task, error) {
+	// Lookup kind for backwards compatibility.
+	// TODO: consider at some point whether kind can be removed.
 	kind, err := v.Lookup("kind").String()
 	if err != nil {
 		return nil, err
+	}
+	if k, ok := oldKinds[kind]; ok {
+		kind = k
 	}
 	rf := itask.Lookup(kind)
 	if rf == nil {
 		return nil, fmt.Errorf("runner of kind %q not found", kind)
 	}
+
+	// Verify entry against template.
+	v = internal.UnifyBuiltin(v, kind).(cue.Value)
+	if err := v.Err(); err != nil {
+		return nil, err
+	}
+
 	runner, err := rf(v)
 	if err != nil {
 		return nil, err
@@ -278,7 +298,7 @@ func isValid(v cue.Value) bool {
 }
 
 func init() {
-	itask.Register("testserver", newTestServerCmd)
+	itask.Register("cmd/cue/cmd.Test", newTestServerCmd)
 }
 
 var testOnce sync.Once

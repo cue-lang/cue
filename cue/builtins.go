@@ -466,9 +466,6 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"list": &builtinPkg{
-		native: []*builtin{{}},
-	},
 	"math": &builtinPkg{
 		native: []*builtin{{
 			Name:  "MaxExp",
@@ -1297,18 +1294,6 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"runtime": &builtinPkg{
-		native: []*builtin{{
-			Name:   "Path",
-			Params: []kind{},
-			Result: stringKind,
-			Func: func(c *callCtxt) {
-				c.ret = func() interface{} {
-					return ""
-				}()
-			},
-		}},
-	},
 	"strconv": &builtinPkg{
 		native: []*builtin{{
 			Name:   "Unquote",
@@ -1880,6 +1865,112 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Time: null | =~"^\("\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\\d|3[0-1])")T\("([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d")\("(.\\d{1,10})?")\("(Z|(-|\\+)\\d\\d:\\d\\d)")$"
+}`,
+	},
+	"tool": &builtinPkg{
+		native: []*builtin{{}},
+		cue: `{
+	Command: {
+		usage?: string
+		short?: string
+		long?:  string
+		var <name>: {
+			value:       _
+			description: "" | string
+		}
+		tasks <name>: Task
+	}
+	Task _kind: =~"\\."
+}`,
+	},
+	"tool/cli": &builtinPkg{
+		native: []*builtin{{}},
+		cue: `{
+	Print: {
+		_kind: "tool/cli.Print"
+		text:  string
+	}
+}`,
+	},
+	"tool/exec": &builtinPkg{
+		native: []*builtin{{}},
+		cue: `{
+	Run: {
+		_kind:    "tool/exec.Run"
+		cmd:      string | [string, ...string]
+		install?: string | [string, ...string]
+		env <Key>: string
+		stdout:  *null | string | bytes
+		stderr:  *null | string | bytes
+		stdin?:  string | bytes
+		success: bool
+	}
+	Env: {
+		_kind: "tool/exec.Env"
+		env <Name>: string | number
+	}
+}`,
+	},
+	"tool/file": &builtinPkg{
+		native: []*builtin{{}},
+		cue: `{
+	Read: {
+		_kind:    "tool/file.Read"
+		filename: !=""
+		contents: *bytes | string
+	}
+	Create: {
+		_kind:       "tool/file.Create"
+		filename:    !=""
+		contents:    bytes | string
+		permissions: int | *420
+		overwrite:   *false | true
+	}
+	Append: {
+		_kind:       "tool/file.Append"
+		filename:    !=""
+		contents:    bytes | string
+		permissions: int | *420
+	}
+	Glob: {
+		_kind: "tool/file.Glob"
+		glob:  !=""
+		files: [...string]
+	}
+}`,
+	},
+	"tool/http": &builtinPkg{
+		native: []*builtin{{}},
+		cue: `{
+	Get: Do & {
+		method: "GET"
+	}
+	Do: {
+		_kind:  "tool/http.Do"
+		method: string
+		response: {
+			body: *bytes | string
+			header <Name>:  string | [...string]
+			trailer <Name>: string | [...string]
+			status:     string
+			statusCode: int
+		}
+		url: string
+		request: {
+			body: *bytes | string
+			header <Name>:  string | [...string]
+			trailer <Name>: string | [...string]
+		}
+	}
+	Post: Do & {
+		method: "POST"
+	}
+	Put: Do & {
+		method: "PUT"
+	}
+	Delete: Do & {
+		method: "DELETE"
+	}
 }`,
 	},
 }

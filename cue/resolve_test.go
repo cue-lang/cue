@@ -1748,8 +1748,8 @@ func TestFullEval(t *testing.T) {
 			result: [ v for _, v in service ]
 
 			service <Name>: {
-				type: "service"
 				name: *Name | string
+				type: "service"
 				port: *7080 | int
 			}
 			service foo: {}
@@ -1757,15 +1757,15 @@ func TestFullEval(t *testing.T) {
 			service baz: { name: "foobar" }
 			`,
 		out: `<0>{result: [` +
-			`<1>{type: "service", name: "foo", port: 7080},` +
-			`<2>{type: "service", name: "bar", port: 8000},` +
-			`<3>{type: "service", name: "foobar", port: 7080}], ` +
+			`<1>{name: "foo", type: "service", port: 7080},` +
+			`<2>{name: "bar", type: "service", port: 8000},` +
+			`<3>{name: "foobar", type: "service", port: 7080}], ` +
 
 			`service: <4>{` +
-			`<>: <5>(Name: string)-><6>{type: "service", name: (*<5>.Name | string), port: (*7080 | int)}, ` +
-			`foo: <7>{type: "service", name: "foo", port: 7080}, ` +
-			`bar: <8>{type: "service", name: "bar", port: 8000}, ` +
-			`baz: <9>{type: "service", name: "foobar", port: 7080}}}`,
+			`<>: <5>(Name: string)-><6>{name: (*<5>.Name | string), type: "service", port: (*7080 | int)}, ` +
+			`foo: <7>{name: "foo", type: "service", port: 7080}, ` +
+			`bar: <8>{name: "bar", type: "service", port: 8000}, ` +
+			`baz: <9>{name: "foobar", type: "service", port: 7080}}}`,
 	}, {
 		desc: "resolutions in struct comprehension keys",
 		in: `

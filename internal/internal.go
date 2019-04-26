@@ -43,3 +43,6 @@ var FromGoType func(instance, x interface{}) interface{}
 // DropOptional is a blanket override of handling optional values during
 // compilation. TODO: should we make this a build option?
 var DropOptional bool
+
+// UnifyBuiltin returns the given Value unified with the given builtin template.
+var UnifyBuiltin func(v interface{}, kind string) interface{}

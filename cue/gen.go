@@ -203,8 +203,9 @@ func (g *generator) processCUE(dir string) {
 		return
 	}
 
+	n := instances[0].Value().Syntax(cue.Hidden(true), cue.Concrete(false))
 	var buf bytes.Buffer
-	if err := cueformat.Node(&buf, instances[0].Value().Syntax()); err != nil {
+	if err := cueformat.Node(&buf, n); err != nil {
 		log.Fatal(err)
 	}
 	body := buf.String()
@@ -250,13 +251,12 @@ func (g *generator) processGo(filename string) {
 				fmt.Fprint(g.decls, "\n\n")
 				continue
 			case token.TYPE:
+				// TODO: support type declarations.
 				for _, spec := range x.Specs {
 					if ast.IsExported(spec.(*ast.TypeSpec).Name.Name) {
 						log.Fatal("type declarations not supported")
 					}
 				}
-				printer.Fprint(g.decls, g.fset, x)
-				fmt.Fprint(g.decls, "\n\n")
 				continue
 			default:
 				log.Fatalf("unexpected spec of type %s", x.Tok)

@@ -23,9 +23,11 @@ import (
 	"math/big"
 	"path"
 	"sort"
+	"strings"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 )
 
 // A builtin is a builtin function or constant.
@@ -248,6 +250,26 @@ func getBuiltinPkg(ctx *context, path string) *structLit {
 		return nil
 	}
 	return p
+}
+
+func init() {
+	internal.UnifyBuiltin = func(val interface{}, kind string) interface{} {
+		v := val.(Value)
+		ctx := v.ctx()
+
+		p := strings.Split(kind, ".")
+		pkg, name := p[0], p[1]
+		s := getBuiltinPkg(ctx, pkg)
+		if s == nil {
+			return v
+		}
+		a := s.lookup(ctx, ctx.label(name, false))
+		if a.v == nil {
+			return v
+		}
+
+		return v.Unify(newValueRoot(ctx, a.v.evalPartial(ctx)))
+	}
 }
 
 // do returns whether the call should be done.

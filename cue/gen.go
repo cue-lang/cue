@@ -320,6 +320,11 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 	}
 	if n := len(types); n != 1 && (n != 2 || types[1] != "error") {
 		fmt.Printf("Dropped func %s.%s: must have one return value or a value and an error %v\n", g.defaultPkg, x.Name.Name, types)
+		return
+	}
+
+	if !ast.IsExported(x.Name.Name) || x.Recv != nil {
+		return
 	}
 
 	g.sep()

@@ -26,14 +26,15 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
-	"os/exec"
-	"strings"
 	"sync"
 
 	"cuelang.org/go/cue"
+	itask "cuelang.org/go/internal/task"
+	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
+	_ "cuelang.org/go/pkg/tool/exec"
+	_ "cuelang.org/go/pkg/tool/http"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -187,7 +188,7 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 			m.Lock()
 			obj := tasks.Lookup(t.name)
 			m.Unlock()
-			update, err := t.Run(ctx, obj)
+			update, err := t.Run(&itask.Context{ctx, stdout, stderr}, obj)
 			if err == nil && update != nil {
 				m.Lock()
 				root, err = root.Fill(update, spec.taskPath(t.name)...)
@@ -242,7 +243,7 @@ func (cc *cycleChecker) isCyclic(t *task) bool {
 }
 
 type task struct {
-	Runner
+	itask.Runner
 
 	index int
 	name  string
@@ -255,8 +256,8 @@ func newTask(index int, name string, v cue.Value) (*task, error) {
 	if err != nil {
 		return nil, err
 	}
-	rf, ok := runners[kind]
-	if !ok {
+	rf := itask.Lookup(kind)
+	if rf == nil {
 		return nil, fmt.Errorf("runner of kind %q not found", kind)
 	}
 	runner, err := rf(v)
@@ -272,202 +273,17 @@ func newTask(index int, name string, v cue.Value) (*task, error) {
 	}, nil
 }
 
-// A Runner defines a command type.
-type Runner interface {
-	// Init is called with the original configuration before any task is run.
-	// As a result, the configuration may be incomplete, but allows some
-	// validation before tasks are kicked off.
-	// Init(v cue.Value)
-
-	// Runner runs given the current value and returns a new value which is to
-	// be unified with the original result.
-	Run(ctx context.Context, v cue.Value) (results interface{}, err error)
-}
-
-// A RunnerFunc creates a Runner.
-type RunnerFunc func(v cue.Value) (Runner, error)
-
-var runners = map[string]RunnerFunc{
-	"print":      newPrintCmd,
-	"exec":       newExecCmd,
-	"http":       newHTTPCmd,
-	"testserver": newTestServerCmd,
-}
-
-type printCmd struct{}
-
-func newPrintCmd(v cue.Value) (Runner, error) {
-	return &printCmd{}, nil
-}
-
-func (c *printCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err error) {
-	str, err := v.Lookup("text").String()
-	if err != nil {
-		return nil, err
-	}
-	fmt.Fprintln(stdout, str)
-	return nil, nil
-}
-
-type execCmd struct{}
-
-func newExecCmd(v cue.Value) (Runner, error) {
-	return &execCmd{}, nil
-}
-
-func (c *execCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err error) {
-	// TODO: set environment variables, if defined.
-	var bin string
-	var args []string
-	doc := ""
-	switch v := v.Lookup("cmd"); v.Kind() {
-	case cue.StringKind:
-		str, _ := v.String()
-		if str == "" {
-			return cue.Value{}, errors.New("empty command")
-		}
-		doc = str
-		list := strings.Fields(str)
-		bin = list[0]
-		for _, s := range list[1:] {
-			args = append(args, s)
-		}
-
-	case cue.ListKind:
-		list, _ := v.List()
-		if !list.Next() {
-			return cue.Value{}, errors.New("empty command list")
-		}
-		bin, err = list.Value().String()
-		if err != nil {
-			return cue.Value{}, err
-		}
-		doc += bin
-		for list.Next() {
-			str, err := list.Value().String()
-			if err != nil {
-				return cue.Value{}, err
-			}
-			args = append(args, str)
-			doc += " " + str
-		}
-	}
-
-	cmd := exec.CommandContext(ctx, bin, args...)
-
-	if v := v.Lookup("stdin"); v.IsValid() {
-		if cmd.Stdin, err = v.Reader(); err != nil {
-			return nil, fmt.Errorf("cue: %v", err)
-		}
-	}
-	captureOut := v.Lookup("stdout").Exists()
-	if !captureOut {
-		cmd.Stdout = stdout
-	}
-	captureErr := v.Lookup("stderr").Exists()
-	if !captureErr {
-		cmd.Stderr = stderr
-	}
-
-	update := map[string]interface{}{}
-	if captureOut {
-		var stdout []byte
-		stdout, err = cmd.Output()
-		update["stdout"] = string(stdout)
-	} else {
-		err = cmd.Run()
-	}
-	update["success"] = err == nil
-	if err != nil {
-		if exit := (*exec.ExitError)(nil); xerrors.As(err, &exit) && captureErr {
-			update["stderr"] = string(exit.Stderr)
-		} else {
-			update = nil
-		}
-		err = fmt.Errorf("command %q failed: %v", doc, err)
-	}
-	return update, err
-}
-
-type httpCmd struct{}
-
-func newHTTPCmd(v cue.Value) (Runner, error) {
-	return &httpCmd{}, nil
-}
-
-func (c *httpCmd) Run(ctx context.Context, v cue.Value) (res interface{}, err error) {
-	// v.Validate()
-	var header, trailer http.Header
-	method := lookupString(v, "method")
-	u := lookupString(v, "url")
-	var r io.Reader
-	if obj := v.Lookup("request"); v.Exists() {
-		if v := obj.Lookup("body"); v.Exists() {
-			r, err = v.Reader()
-			if err != nil {
-				return nil, err
-			}
-		}
-		if header, err = parseHeaders(obj, "header"); err != nil {
-			return nil, err
-		}
-		if trailer, err = parseHeaders(obj, "trailer"); err != nil {
-			return nil, err
-		}
-	}
-	req, err := http.NewRequest(method, u, r)
-	if err != nil {
-		return nil, err
-	}
-	req.Header = header
-	req.Trailer = trailer
-
-	// TODO:
-	//  - retry logic
-	//  - TLS certs
-	resp, err := http.DefaultClient.Do(req)
-	if err != nil {
-		return nil, err
-	}
-	defer resp.Body.Close()
-	b, err := ioutil.ReadAll(resp.Body)
-	// parse response body and headers
-	return map[string]interface{}{
-		"response": map[string]interface{}{
-			"body":    string(b),
-			"header":  resp.Header,
-			"trailer": resp.Trailer,
-		},
-	}, err
-}
-
-func parseHeaders(obj cue.Value, label string) (http.Header, error) {
-	m := obj.Lookup(label)
-	if !m.Exists() {
-		return nil, nil
-	}
-	iter, err := m.Fields()
-	if err != nil {
-		return nil, err
-	}
-	var h http.Header
-	for iter.Next() {
-		str, err := iter.Value().String()
-		if err != nil {
-			return nil, err
-		}
-		h.Add(iter.Label(), str)
-	}
-	return h, nil
-}
-
 func isValid(v cue.Value) bool {
 	return v.Kind() == cue.BottomKind
 }
 
+func init() {
+	itask.Register("testserver", newTestServerCmd)
+}
+
 var testOnce sync.Once
 
-func newTestServerCmd(v cue.Value) (Runner, error) {
+func newTestServerCmd(v cue.Value) (itask.Runner, error) {
 	server := ""
 	testOnce.Do(func() {
 		s := httptest.NewServer(http.HandlerFunc(
@@ -487,6 +303,6 @@ func newTestServerCmd(v cue.Value) (Runner, error) {
 
 type testServerCmd string
 
-func (s testServerCmd) Run(ctx context.Context, v cue.Value) (x interface{}, err error) {
+func (s testServerCmd) Run(ctx *itask.Context, v cue.Value) (x interface{}, err error) {
 	return map[string]interface{}{"url": string(s)}, nil
 }

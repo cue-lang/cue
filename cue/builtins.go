@@ -1907,26 +1907,25 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Read: {
-		_kind:    "tool/file.Read"
+		kind:     "tool/file.Read"
 		filename: !=""
 		contents: *bytes | string
 	}
 	Create: {
-		_kind:       "tool/file.Create"
+		kind:        "tool/file.Create"
 		filename:    !=""
 		contents:    bytes | string
 		permissions: int | *420
-		overwrite:   *false | true
 	}
 	Append: {
-		_kind:       "tool/file.Append"
+		kind:        "tool/file.Append"
 		filename:    !=""
 		contents:    bytes | string
 		permissions: int | *420
 	}
 	Glob: {
-		_kind: "tool/file.Glob"
-		glob:  !=""
+		kind: "tool/file.Glob"
+		glob: !=""
 		files: [...string]
 	}
 }`,

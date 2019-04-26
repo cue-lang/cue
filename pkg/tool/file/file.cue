@@ -12,66 +12,52 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package os
-
-import "tool"
+package file
 
 // Read reads the contents of a file.
-Read: tool.Task & {
-	_kind: "tool/file.Read"
+Read: {
+	kind: "tool/file.Read"
 
 	// filename names the file to read.
-	filename: string
+	filename: !=""
 
 	// contents is the read contents. If the contents are constraint to bytes
 	// (the default), the file is read as is. If it is constraint to a string,
 	// the contents are checked to be valid UTF-8.
 	contents: *bytes | string
-
-	// if body is given, the file contents are parsed as JSON and unified with
-	// the specified CUE value.
-	body?: _
-}
-
-// Create writes contents to the given file.
-Create: tool.Task & {
-	_kind: "tool/file.Create"
-
-	// filename names the file to write.
-	filename: string
-
-	// permissions defines the permissions to use if the file does not yet exist.
-	permissions: int
-
-	// overwrite defines whether an existing file may be overwritten.
-	overwrite: *false | true
-
-	// contents specifies the bytes to be written.
-	contents: bytes | string
 }
 
 // Append writes contents to the given file.
-Append: tool.Task & {
+Append: {
+	kind: "tool/file.Append"
+
 	// filename names the file to append.
-	filename: string
+	filename: !=""
 
 	// permissions defines the permissions to use if the file does not yet exist.
-	permissions: int
+	permissions: int | *0o644
 
 	// contents specifies the bytes to be written.
 	contents: bytes | string
 }
 
-Dir: tool.Task & {
-	_kind: "tool/file.Dir"
+// Create writes contents to the given file.
+Create: {
+	kind: "tool/file.Create"
 
-	path: string
-	dir: [...string]
+	// filename names the file to write.
+	filename: !=""
+
+	// permissions defines the permissions to use if the file does not yet exist.
+	permissions: int | *0o644
+
+	// contents specifies the bytes to be written.
+	contents: bytes | string
 }
 
-Glob: tool.Task & {
-	_kind: "tool/file.Glob"
+Glob: {
+	kind: "tool/file.Glob"
 
-	glob: string
-	files <Filename>: string
+	glob: !=""
+	files: [...string]
 }

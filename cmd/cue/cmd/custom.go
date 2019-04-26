@@ -33,6 +33,7 @@ import (
 	itask "cuelang.org/go/internal/task"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
 	_ "cuelang.org/go/pkg/tool/exec"
+	_ "cuelang.org/go/pkg/tool/file"
 	_ "cuelang.org/go/pkg/tool/http"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"

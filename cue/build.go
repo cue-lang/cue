@@ -75,11 +75,18 @@ type index struct {
 	freeze bool
 }
 
+const sharedOffset = 0x40000000
+
 // sharedIndex is used for indexing builtins and any other labels common to
 // all instances.
 var sharedIndex = newSharedIndex(token.NewFileSet())
 
 func newSharedIndex(f *token.FileSet) *index {
+	// TODO: nasty hack to indicate FileSet of shared index. Remove the whole
+	// FileSet idea from the API. Just take the hit of the extra pointers for
+	// positions in the ast, and then optimize the storage in an abstract
+	// machine implementation for storing graphs.
+	f.AddFile("dummy", sharedOffset, 0)
 	i := &index{
 		fset:     f,
 		labelMap: map[string]label{"": 0},

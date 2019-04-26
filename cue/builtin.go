@@ -61,7 +61,7 @@ type builtinPkg struct {
 	cue    string
 }
 
-func mustCompileBuiltins(ctx *context, p *builtinPkg) *structLit {
+func mustCompileBuiltins(ctx *context, p *builtinPkg, name string) *structLit {
 	obj := &structLit{}
 	for _, b := range p.native {
 		f := ctx.label(b.Name, false) // never starts with _
@@ -76,7 +76,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg) *structLit {
 
 	// Parse builtin CUE
 	if p.cue != "" {
-		expr, err := parser.ParseExpr(ctx.index.fset, "<builtinPkg>", p.cue)
+		expr, err := parser.ParseExpr(ctx.index.fset, name, p.cue)
 		if err != nil {
 			fmt.Println(p.cue)
 			panic(err)
@@ -232,7 +232,7 @@ var builtins = map[string]*structLit{}
 func initBuiltins(pkgs map[string]*builtinPkg) {
 	ctx := sharedIndex.newContext()
 	for k, b := range pkgs {
-		e := mustCompileBuiltins(ctx, b)
+		e := mustCompileBuiltins(ctx, b, k)
 		builtins[k] = e
 		builtins["-/"+path.Base(k)] = e
 	}

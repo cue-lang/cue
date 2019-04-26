@@ -1061,9 +1061,6 @@ func TestResolve(t *testing.T) {
 			c: a & {
 				b: 100
 				d: a.b + 3 // do not resolve as c != a.
-
-				// TODO(crash)
-				// e: int; e < 100 // where clause can be different.
 			}
 			x: {
 				b: int
@@ -1594,8 +1591,6 @@ func TestFullEval(t *testing.T) {
 					if k < "d"
 					if v > b.a
 			}
-			// TODO: Propagate error:
-			// e: { "\(k)": v for k, v in b if k < "d" if v > b.a }
 			`,
 		out: `<0>{a: <1>{b: 2, c: 3}, b: <2>{a: 1, b: 2, c: 3, d: 4}, c: <3>{b: 2, c: 3}}`,
 	}, {

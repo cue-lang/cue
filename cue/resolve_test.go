@@ -1311,6 +1311,32 @@ func TestResolve(t *testing.T) {
 		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield ("sub"): <4>{as: <3>.a}}, ` +
 			`foo: <5>{a: "bar", sub: <6>{as: "bar"}}}}`,
 	}, {
+		desc: "builtins",
+		in: `
+		a1: {
+			a: and([b, c])
+			b: =~"oo"
+			c: =~"fo"
+		}
+		a2: a1 & { a: "foo" }
+		a3: a1 & { a: "bar" }
+
+		o1: {
+			a: or([b, c])
+			b: string
+			c: "bar"
+		}
+		o2: o1 & { a: "foo" }
+		o3: o1 & { a: "foo", b: "baz" }
+		`,
+		out: `<0>{` +
+			`a1: <1>{a: (=~"oo" & =~"fo"), b: =~"oo", c: =~"fo"}, ` +
+			`a2: <2>{a: "foo", b: =~"oo", c: =~"fo"}, ` +
+			`a3: <3>{a: _|_((=~"oo" & "bar"):"bar" does not match =~"oo"), b: =~"oo", c: =~"fo"}, ` +
+			`o1: <4>{a: string, b: string, c: "bar"}, ` +
+			`o2: <5>{a: "foo", b: string, c: "bar"}, ` +
+			`o3: <6>{a: _|_((builtin:or ([<7>.b,<7>.c]) & "foo"):empty disjunction: failed to unify: baz != foo), b: "baz", c: "bar"}}`,
+	}, {
 		desc: "self-reference cycles conflicts with strings",
 		in: `
 			a: {

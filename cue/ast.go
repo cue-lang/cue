@@ -345,6 +345,10 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 
 			case "len":
 				return lenBuiltin
+			case "and":
+				return andBuiltin
+			case "or":
+				return orBuiltin
 			}
 			if r, ok := predefinedRanges[n.Name]; ok {
 				return r

@@ -24,6 +24,7 @@ import (
 	"path"
 	"sort"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 )
 
@@ -131,6 +132,41 @@ var lenBuiltin = &builtin{
 	},
 }
 
+var andBuiltin = &builtin{
+	Name:   "and",
+	Params: []kind{listKind},
+	Result: intKind,
+	Func: func(c *callCtxt) {
+		iter := c.list(0)
+		if !iter.Next() {
+			c.ret = &top{baseValue{c.src}}
+			return
+		}
+		u := iter.Value().path.v
+		for iter.Next() {
+			u = mkBin(c.ctx, c.src.Pos(), opUnify, u, iter.Value().path.v)
+		}
+		c.ret = u
+	},
+}
+
+var orBuiltin = &builtin{
+	Name:   "or",
+	Params: []kind{stringKind | bytesKind | listKind | structKind},
+	Result: intKind,
+	Func: func(c *callCtxt) {
+		iter := c.list(0)
+		d := []dValue{}
+		for iter.Next() {
+			d = append(d, dValue{iter.Value().path.v, false})
+		}
+		c.ret = &disjunction{baseValue{c.src}, d}
+		if len(d) == 0 {
+			c.ret = errors.New("empty or")
+		}
+	},
+}
+
 func (x *builtin) kind() kind {
 	return lambdaKind
 }
@@ -176,6 +212,9 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		}
 	}()
 	x.Func(&call)
+	if e, ok := call.ret.(value); ok {
+		return e
+	}
 	return convert(ctx, x, call.ret)
 }
 

@@ -2251,6 +2251,28 @@ len([1, 2, ...])     2
 len({a:1, b:2})      2
 ```
 
+### `and`
+
+The built-in function `and` takes a list and returns the result of applying
+the `&` operator to all elements in the list.
+It returns top for the empty list.
+
+Expression:          Result
+and([a, b])          a & b
+and([a])             a
+and([])              _
+
+### `or`
+
+The built-in function `or` takes a list and returns the result of applying
+the `|` operator to all elements in the list.
+It returns bottom for the empty list.
+
+Expression:          Result
+and([a, b])          a | b
+and([a])             a
+and([])              _|_
+
 
 ## Cycles
 

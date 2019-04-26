@@ -113,6 +113,21 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		testExpr(`len('f\x20\x20')`),
 		`3`,
+	}, {
+		testExpr(`and([string, "foo"])`),
+		`"foo"`,
+	}, {
+		testExpr(`and([string, =~"fo"]) & "foo"`),
+		`"foo"`,
+	}, {
+		testExpr(`and([])`),
+		`_`,
+	}, {
+		testExpr(`or([1, 2, 3]) & 2`),
+		`2`,
+	}, {
+		testExpr(`or([])`),
+		`_|_(builtin:or:empty or)`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

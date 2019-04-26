@@ -1,4 +1,4 @@
 unsupported op &(number, (string)*):
     $CWD/testdata/tasks/task_tool.cue:29:9
-    tool/cli:4:10
+    tool/cli:4:9
     

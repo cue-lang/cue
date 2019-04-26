@@ -20,7 +20,7 @@ Put:    Do & {method: "PUT"}
 Delete: Do & {method: "DELETE"}
 
 Do: {
-	kind: "tool/http.Do"
+	kind: *"tool/http.Do" | "http" // http for backwards compatibility
 
 	method: string
 	url:    string // TODO: make url.URL type

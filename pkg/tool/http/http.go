@@ -46,7 +46,6 @@ func lookupString(obj cue.Value, key string) string {
 }
 
 func (c *httpCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	// v.Validate()
 	var header, trailer http.Header
 	method := lookupString(v, "method")
 	u := lookupString(v, "url")

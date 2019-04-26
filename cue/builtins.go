@@ -1874,21 +1874,17 @@ var builtinPackages = map[string]*builtinPkg{
 		usage?: string
 		short?: string
 		long?:  string
-		var <name>: {
-			value:       _
-			description: "" | string
-		}
 		tasks <name>: Task
 	}
-	Task _kind: =~"\\."
+	Task kind: =~"\\."
 }`,
 	},
 	"tool/cli": &builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Print: {
-		_kind: "tool/cli.Print"
-		text:  string
+		kind: *"tool/cli.Print" | "print"
+		text: string
 	}
 }`,
 	},
@@ -1896,7 +1892,7 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Run: {
-		_kind:    "tool/exec.Run"
+		kind:     *"tool/exec.Run" | "exec"
 		cmd:      string | [string, ...string]
 		install?: string | [string, ...string]
 		env <Key>: string
@@ -1904,10 +1900,6 @@ var builtinPackages = map[string]*builtinPkg{
 		stderr:  *null | string | bytes
 		stdin?:  string | bytes
 		success: bool
-	}
-	Env: {
-		_kind: "tool/exec.Env"
-		env <Name>: string | number
 	}
 }`,
 	},
@@ -1946,7 +1938,7 @@ var builtinPackages = map[string]*builtinPkg{
 		method: "GET"
 	}
 	Do: {
-		_kind:  "tool/http.Do"
+		kind:   *"tool/http.Do" | "http"
 		method: string
 		response: {
 			body: *bytes | string

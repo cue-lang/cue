@@ -16,7 +16,7 @@ package exec
 
 // Run executes the given shell command.
 Run: {
-	kind: "tool/exec.Run"
+	kind: *"tool/exec.Run" | "exec" // exec for backwards compatibility
 
 	// cmd is the command to run.
 	cmd: string | [string, ...string]
@@ -45,9 +45,11 @@ Run: {
 	success: bool
 }
 
+/* TODO
 // Env collects the environment variables of the current process.
 Env: {
 	kind: "tool/exec.Env"
 
 	env <Name>: string | number
 }
+*/

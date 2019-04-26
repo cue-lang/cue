@@ -16,7 +16,7 @@ package cli
 
 // Print sends text to the stdout of the current process.
 Print: {
-	kind: "tool/cli.Print"
+	kind: *"tool/cli.Print" | "print" // for backwards compatibility
 
 	// text is the text to be printed.
 	text: string

@@ -231,6 +231,9 @@ func (g *generator) processGo(filename string) {
 			switch x.Tok {
 			case token.CONST:
 				for _, spec := range x.Specs {
+					if !ast.IsExported(spec.(*ast.ValueSpec).Names[0].Name) {
+						continue
+					}
 					g.genConst(spec.(*ast.ValueSpec))
 				}
 			case token.IMPORT:

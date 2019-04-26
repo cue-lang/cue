@@ -233,7 +233,13 @@ var builtins = map[string]*structLit{}
 
 func initBuiltins(pkgs map[string]*builtinPkg) {
 	ctx := sharedIndex.newContext()
-	for k, b := range pkgs {
+	keys := []string{}
+	for k := range pkgs {
+		keys = append(keys, k)
+	}
+	sort.Strings(keys)
+	for _, k := range keys {
+		b := pkgs[k]
 		e := mustCompileBuiltins(ctx, b, k)
 		builtins[k] = e
 		builtins["-/"+path.Base(k)] = e

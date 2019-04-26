@@ -59,7 +59,7 @@ func doVet(cmd *cobra.Command, args []string) error {
 		opt := []cue.Option{
 			cue.Attributes(true),
 			cue.Optional(true),
-			cue.RequireConcrete(),
+			cue.Concrete(true),
 			cue.Hidden(true),
 		}
 		err := inst.Value().Validate(opt...)

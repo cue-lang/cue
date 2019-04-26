@@ -68,7 +68,7 @@ Examples:
 				cue.Optional(*all || *optional),
 			}
 			if *compile {
-				syn = append(syn, cue.RequireConcrete())
+				syn = append(syn, cue.Concrete(true))
 			}
 			if *hidden || *all {
 				syn = append(syn, cue.Hidden(true))
@@ -80,7 +80,7 @@ Examples:
 			if exprs == nil {
 				v := inst.Value()
 				if *compile {
-					err := v.Validate(cue.RequireConcrete())
+					err := v.Validate(cue.Concrete(true))
 					exitIfErr(cmd, inst, err, false)
 					continue
 				}

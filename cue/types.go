@@ -1006,15 +1006,19 @@ type option func(p *options)
 
 // TODO: could also be used for subsumption.
 
-// RequireConcrete ensures that all values are concrete.
+// Concrete ensures that all values are concrete.
 //
 // For Validate this means it returns an error if this is not the case.
 // In other cases a non-concrete value will be replaced with an error.
-func RequireConcrete() Option {
+func Concrete(concrete bool) Option {
 	return func(p *options) {
-		p.concrete = true
-		if !p.hasHidden {
-			p.omitHidden = true
+		if concrete {
+			p.concrete = true
+			if !p.hasHidden {
+				p.omitHidden = true
+			}
+		} else {
+			p.raw = true
 		}
 	}
 }

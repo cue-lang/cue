@@ -1,10 +1,12 @@
 package kube
 
-import "encoding/yaml"
+import (
+	"encoding/yaml"
+	"tool/cli"
+)
 
 command dump: {
-    task print: {
-        kind: "print"
-        text: yaml.MarshalStream(objects)
-    }
+	task print: cli.Print & {
+		text: yaml.MarshalStream(objects)
+	}
 }

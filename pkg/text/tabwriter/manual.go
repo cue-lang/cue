@@ -16,6 +16,7 @@ package tabwriter
 
 import (
 	"bytes"
+	"fmt"
 	"text/tabwriter"
 
 	"cuelang.org/go/cue"
@@ -26,13 +27,35 @@ import (
 func Write(data cue.Value) (string, error) {
 	buf := &bytes.Buffer{}
 	tw := tabwriter.NewWriter(buf, 0, 4, 1, ' ', 0)
-	b, err := data.Bytes()
-	if err != nil {
-		return "", err
+
+	write := func(v cue.Value) error {
+		b, err := v.Bytes()
+		if err != nil {
+			return err
+		}
+		_, err = tw.Write(b)
+		if err != nil {
+			return err
+		}
+		return nil
 	}
-	_, err = tw.Write(b)
-	if err != nil {
-		return "", err
+
+	switch data.Kind() {
+	case cue.BytesKind, cue.StringKind:
+		if err := write(data); err != nil {
+			return "", err
+		}
+	case cue.ListKind:
+		for i, _ := data.List(); i.Next(); {
+			if err := write(i.Value()); err != nil {
+				return "", err
+			}
+			tw.Write([]byte{'\n'})
+		}
+	default:
+		return "", fmt.Errorf("tabwriter.Write: unsupported type %v", data.Kind())
 	}
+
+	err := tw.Flush()
 	return buf.String(), err
 }

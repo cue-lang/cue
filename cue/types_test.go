@@ -223,15 +223,6 @@ func TestInt(t *testing.T) {
 				}
 			}
 
-			if got := n.IsInt(); got != !tc.notInt {
-				t.Errorf("isInt: got %v; want %v", got, !tc.notInt)
-			}
-
-			isUint := !tc.notInt && tc.int >= 0
-			if got := n.IsUint(); got != isUint {
-				t.Errorf("isUint: got %v; want %v", got, isUint)
-			}
-
 			vi, err := n.Int64()
 			checkErr(t, err, tc.err, "Int64")
 			if vi != tc.int {

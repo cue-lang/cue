@@ -281,21 +281,6 @@ var (
 	ErrInfinite = errors.New("cue: infinite")
 )
 
-// IsInt reports whether n is a integral number type.
-func (v Value) IsInt() bool {
-	_, err := v.getNum(intKind) // TODO: make more efficient.
-	return err == nil
-}
-
-// IsUint reports whether n is a positive integral number type.
-func (v Value) IsUint() bool {
-	if !v.IsInt() {
-		return false
-	}
-	n, _ := v.path.cache.(*numLit)
-	return n.v.Sign() >= 0
-}
-
 // Int converts the underlying integral number to an big.Int. It reports an
 // error if the underlying value is not an integer type. If a non-nil *Int
 // argument z is provided, Int stores the result in z instead of allocating a

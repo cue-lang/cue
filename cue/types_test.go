@@ -45,6 +45,7 @@ func TestValueType(t *testing.T) {
 		incompleteKind Kind
 		json           string
 		valid          bool
+		concrete       bool
 		// pos            token.Pos
 	}{{ // Not a concrete value.
 		value:          `_`,
@@ -54,18 +55,22 @@ func TestValueType(t *testing.T) {
 		value:          `_|_`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
+		concrete:       true,
 	}, {
 		value:          `1&2`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
+		concrete:       true,
 	}, { // TODO: should be error{
 		value:          `b`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
+		concrete:       true,
 	}, {
 		value:          `(b[a])`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
+		concrete:       true,
 	}, { // TODO: should be error{
 		value: `(b)
 			b: bool`,
@@ -75,18 +80,22 @@ func TestValueType(t *testing.T) {
 		value:          `([][b])`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
+		concrete:       true,
 	}, {
 		value:          `null`,
 		kind:           NullKind,
 		incompleteKind: NullKind,
+		concrete:       true,
 	}, {
 		value:          `true`,
 		kind:           BoolKind,
 		incompleteKind: BoolKind,
+		concrete:       true,
 	}, {
 		value:          `false`,
 		kind:           BoolKind,
 		incompleteKind: BoolKind,
+		concrete:       true,
 	}, {
 		value:          `bool`,
 		kind:           BottomKind,
@@ -95,18 +104,22 @@ func TestValueType(t *testing.T) {
 		value:          `2`,
 		kind:           NumberKind,
 		incompleteKind: NumberKind,
+		concrete:       true,
 	}, {
 		value:          `2.0`,
 		kind:           FloatKind,
 		incompleteKind: FloatKind,
+		concrete:       true,
 	}, {
 		value:          `2.0Mi`,
 		kind:           NumberKind,
 		incompleteKind: NumberKind,
+		concrete:       true,
 	}, {
 		value:          `14_000`,
 		kind:           NumberKind,
 		incompleteKind: NumberKind,
+		concrete:       true,
 	}, {
 		value:          `>=0 & <5`,
 		kind:           BottomKind,
@@ -119,10 +132,12 @@ func TestValueType(t *testing.T) {
 		value:          `"str"`,
 		kind:           StringKind,
 		incompleteKind: StringKind,
+		concrete:       true,
 	}, {
 		value:          "'''\n'''",
 		kind:           BytesKind,
 		incompleteKind: BytesKind,
+		concrete:       true,
 	}, {
 		value:          "string",
 		kind:           BottomKind,
@@ -131,10 +146,16 @@ func TestValueType(t *testing.T) {
 		value:          `{}`,
 		kind:           StructKind,
 		incompleteKind: StructKind,
+		concrete:       true,
 	}, {
 		value:          `[]`,
 		kind:           ListKind,
 		incompleteKind: ListKind,
+		concrete:       true,
+	}, {
+		value:    `{a: int, b: [1][a]}.b`,
+		kind:     BottomKind,
+		concrete: false,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -150,6 +171,9 @@ func TestValueType(t *testing.T) {
 			incomplete := tc.incompleteKind != tc.kind
 			if got := v.IsIncomplete(); got != incomplete {
 				t.Errorf("IsIncomplete: got %v; want %v", got, incomplete)
+			}
+			if got := v.IsConcrete(); got != tc.concrete {
+				t.Errorf("IsConcrete: got %v; want %v", got, tc.concrete)
 			}
 			invalid := tc.kind == BottomKind
 			if got := v.IsValid(); got != !invalid {
@@ -648,6 +672,83 @@ func TestAllFields(t *testing.T) {
 			buf = append(buf, '}')
 			if got := string(buf); got != tc.res {
 				t.Errorf("got %v; want %v", got, tc.res)
+			}
+		})
+	}
+}
+
+func TestDefaults(t *testing.T) {
+	testCases := []struct {
+		value string
+		def   string
+		val   string
+		err   string
+	}{{
+		value: `number | *1`,
+		def:   "1",
+		val:   "number",
+	}, {
+		value: `1 | 2 | *3`,
+		def:   "3",
+		val:   "1|2|3",
+	}, {
+		value: `*{a:1,b:2}|{a:1}|{b:2}`,
+		def:   "<0>{a: 1, b: 2}",
+		val:   "<0>{a: 1}|<0>{b: 2}",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.value, func(t *testing.T) {
+			v := getInstance(t, "a: "+tc.value).Lookup("a")
+
+			_, val := v.Expr()
+			d, _ := v.Default()
+
+			if got := fmt.Sprint(d); got != tc.def {
+				t.Errorf("default: got %v; want %v", got, tc.def)
+			}
+
+			vars := []string{}
+			for _, v := range val {
+				vars = append(vars, fmt.Sprint(v))
+			}
+			if got := strings.Join(vars, "|"); got != tc.val {
+				t.Errorf("value: got %v; want %v", got, tc.val)
+			}
+		})
+	}
+}
+
+func TestLen(t *testing.T) {
+	testCases := []struct {
+		input  string
+		length string
+	}{{
+		input:  "[1, 3]",
+		length: "2",
+	}, {
+		input:  "[1, 3, ...]",
+		length: ">=2",
+	}, {
+		input:  `"foo"`,
+		length: "3",
+	}, {
+		input:  `'foo'`,
+		length: "3",
+		// TODO: Currently not supported.
+		// }, {
+		// 	input:  "{a:1, b:3, a:1, c?: 3, _hidden: 4}",
+		// 	length: "2",
+	}, {
+		input:  "3",
+		length: "_|_(3:len not supported for type 24)",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.input, func(t *testing.T) {
+			v := getInstance(t, "a: "+tc.input).Lookup("a")
+
+			length := v.Len()
+			if got := fmt.Sprint(length); got != tc.length {
+				t.Errorf("length: got %v; want %v", got, tc.length)
 			}
 		})
 	}
@@ -1440,6 +1541,33 @@ func TestTrimZeros(t *testing.T) {
 	}
 }
 
+func TestReference(t *testing.T) {
+	testCases := []struct {
+		input string
+		want  string
+	}{{
+		input: "v: _|_",
+		want:  "",
+	}, {
+		input: "v: 2",
+		want:  "",
+	}, {
+		input: "v: a, a: 1",
+		want:  "a",
+	}, {
+		input: "v: a.b.c, a b c: 1",
+		want:  "a b c",
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			v := getInstance(t, tc.input).Lookup("v")
+			if got := strings.Join(v.Reference(), " "); got != tc.want {
+				t.Errorf("\n got %v;\nwant %v", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestReferences(t *testing.T) {
 	config1 := `
 	a: {
@@ -1521,4 +1649,149 @@ func checkFailed(t *testing.T, err error, str, name string) bool {
 		return false
 	}
 	return true
+}
+
+func TestExpr(t *testing.T) {
+	testCases := []struct {
+		input string
+		want  string
+	}{{
+		input: "v: 3",
+		want:  " 3",
+	}, {
+		input: "v: 3 + 4",
+		want:  "+ 3 4",
+	}, {
+		input: "v: !a, a: 3",
+		want:  "! <0>.a",
+	}, {
+		input: "v: 1 | 2 | 3 | *4",
+		want:  "| 1 2 3 4",
+	}, {
+		input: "v: 2 & 5",
+		want:  "& 2 5",
+	}, {
+		input: "v: 2 | 5",
+		want:  "| 2 5",
+	}, {
+		input: "v: 2 && 5",
+		want:  "&& 2 5",
+	}, {
+		input: "v: 2 || 5",
+		want:  "|| 2 5",
+	}, {
+		input: "v: 2 == 5",
+		want:  "== 2 5",
+	}, {
+		input: "v: !b, b: true",
+		want:  "! <0>.b",
+	}, {
+		input: "v: 2 != 5",
+		want:  "!= 2 5",
+	}, {
+		input: "v: <5",
+		want:  "< 5",
+	}, {
+		input: "v: 2 <= 5",
+		want:  "<= 2 5",
+	}, {
+		input: "v: 2 > 5",
+		want:  "> 2 5",
+	}, {
+		input: "v: 2 >= 5",
+		want:  ">= 2 5",
+	}, {
+		input: "v: 2 =~ 5",
+		want:  "=~ 2 5",
+	}, {
+		input: "v: 2 !~ 5",
+		want:  "!~ 2 5",
+	}, {
+		input: "v: 2 + 5",
+		want:  "+ 2 5",
+	}, {
+		input: "v: 2 - 5",
+		want:  "- 2 5",
+	}, {
+		input: "v: 2 * 5",
+		want:  "* 2 5",
+	}, {
+		input: "v: 2 / 5",
+		want:  "/ 2 5",
+	}, {
+		input: "v: 2 % 5",
+		want:  "% 2 5",
+	}, {
+		input: "v: 2 quo 5",
+		want:  "quo 2 5",
+	}, {
+		input: "v: 2 rem 5",
+		want:  "rem 2 5",
+	}, {
+		input: "v: 2 div 5",
+		want:  "div 2 5",
+	}, {
+		input: "v: 2 mod 5",
+		want:  "mod 2 5",
+	}, {
+		input: "v: a.b, a b: 4",
+		want:  `. <0>.a "b"`,
+	}, {
+		input: `v: a["b"], a b: 3 `,
+		want:  `[] <0>.a "b"`,
+	}, {
+		input: "v: a[2:5], a: [1, 2, 3, 4, 5]",
+		want:  "[:] <0>.a 2 5",
+	}, {
+		input: "v: len([])",
+		want:  "() builtin:len []",
+	}, {
+		input: `v: "Hello, \(x)! Welcome to \(place)", place: string, x: string`,
+		want:  `\() "Hello, " <0>.x "! Welcome to " <0>.place ""`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.input, func(t *testing.T) {
+			v := getInstance(t, tc.input).Lookup("v")
+			op, operands := v.Expr()
+			got := opToString[op]
+			for _, v := range operands {
+				got += " "
+				got += debugStr(v.ctx(), v.path.v)
+			}
+			if got != tc.want {
+				t.Errorf("\n got %v;\nwant %v", got, tc.want)
+			}
+		})
+	}
+}
+
+var opToString = map[Op]string{
+	AndOp:              "&",
+	OrOp:               "|",
+	BooleanAndOp:       "&&",
+	BooleanOrOp:        "||",
+	EqualOp:            "==",
+	NotOp:              "!",
+	NotEqualOp:         "!=",
+	LessThanOp:         "<",
+	LessThanEqualOp:    "<=",
+	GreaterThanOp:      ">",
+	GreaterThanEqualOp: ">=",
+	RegexMatchOp:       "=~",
+	NotRegexMatchOp:    "!~",
+	AddOp:              "+",
+	SubtractOp:         "-",
+	MultiplyOp:         "*",
+	FloatQuotientOp:    "/",
+	FloatRemainOp:      "%",
+	IntQuotientOp:      "quo",
+	IntRemainderOp:     "rem",
+	IntDivideOp:        "div",
+	IntModuloOp:        "mod",
+
+	SelectorOp:      ".",
+	IndexOp:         "[]",
+	SliceOp:         "[:]",
+	CallOp:          "()",
+	InterpolationOp: `\()`,
 }

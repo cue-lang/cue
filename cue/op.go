@@ -16,6 +16,74 @@ package cue
 
 import "cuelang.org/go/cue/token"
 
+// Op indicates the operation at the top of an expression tree of the expression
+// use to evaluate a value.
+type Op int
+
+// Values of Op.
+const (
+	NoOp Op = iota
+
+	AndOp
+	OrOp
+
+	SelectorOp
+	IndexOp
+	SliceOp
+	CallOp
+
+	BooleanAndOp
+	BooleanOrOp
+
+	EqualOp
+	NotOp
+	NotEqualOp
+	LessThanOp
+	LessThanEqualOp
+	GreaterThanOp
+	GreaterThanEqualOp
+
+	RegexMatchOp
+	NotRegexMatchOp
+
+	AddOp
+	SubtractOp
+	MultiplyOp
+	FloatQuotientOp
+	FloatRemainOp
+	IntQuotientOp
+	IntRemainderOp
+	IntDivideOp
+	IntModuloOp
+
+	InterpolationOp
+)
+
+var opToOp = map[op]Op{
+	opUnify:       AndOp,
+	opDisjunction: OrOp,
+	opLand:        BooleanAndOp,
+	opLor:         BooleanOrOp,
+	opEql:         EqualOp,
+	opNot:         NotOp,
+	opNeq:         NotEqualOp,
+	opLss:         LessThanOp,
+	opLeq:         LessThanEqualOp,
+	opGtr:         GreaterThanOp,
+	opGeq:         GreaterThanEqualOp,
+	opMat:         RegexMatchOp,
+	opNMat:        NotRegexMatchOp,
+	opAdd:         AddOp,
+	opSub:         SubtractOp,
+	opMul:         MultiplyOp,
+	opQuo:         FloatQuotientOp,
+	opRem:         FloatRemainOp,
+	opIQuo:        IntQuotientOp,
+	opIRem:        IntRemainderOp,
+	opIDiv:        IntDivideOp,
+	opIMod:        IntModuloOp,
+}
+
 func opIn(op op, anyOf ...op) bool {
 	for _, o := range anyOf {
 		if o == op {

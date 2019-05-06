@@ -460,6 +460,13 @@ func newChildValue(obj *structValue, i int) Value {
 	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
 }
 
+func remakeValue(base Value, v value) Value {
+	path := *base.path
+	path.v = v
+	path.cache = v.evalPartial(base.ctx())
+	return Value{base.idx, &path}
+}
+
 func (v Value) ctx() *context {
 	return v.idx.newContext()
 }
@@ -474,6 +481,28 @@ func (v Value) eval(ctx *context) value {
 		panic("undefined value")
 	}
 	return ctx.manifest(v.path.cache)
+}
+
+// Eval resolves the references of a value and returns the result.
+// This method is not necessary to obtain concrete values.
+func (v Value) Eval() Value {
+	if v.path == nil {
+		return v
+	}
+	return remakeValue(v, v.path.v.evalPartial(v.ctx()))
+}
+
+// Default reports the default value and whether it existed. It returns the
+// normal value if there is no default.
+func (v Value) Default() (Value, bool) {
+	if v.path == nil {
+		return v, false
+	}
+	x := v.ctx().manifest(v.path.v)
+	if x != v.path.v {
+		return remakeValue(v, x), true
+	}
+	return v, false
 }
 
 // Label reports he label used to obtain this value from the enclosing struct.
@@ -595,7 +624,11 @@ func (v Value) Syntax(opts ...Option) ast.Expr {
 		return nil
 	}
 	ctx := v.ctx()
-	return export(ctx, v.eval(ctx), getOptions(opts))
+	o := getOptions(opts)
+	if o.raw {
+		return export(ctx, v.path.v, o)
+	}
+	return export(ctx, v.path.cache, o)
 }
 
 // Decode initializes x with Value v. If x is a struct, it will validate the
@@ -634,7 +667,7 @@ func (v Value) Split() []Value {
 
 func separate(v value) (a []value) {
 	c := v.computed()
-	if c == nil {
+	if c == nil || c.op != opUnify {
 		return []value{v}
 	}
 	if c.x != nil {
@@ -674,9 +707,30 @@ func (v Value) Pos() token.Position {
 	return v.idx.fset.Position(pos)
 }
 
-// IsIncomplete indicates that the value cannot be fully evaluated due to
+// IsConcrete reports whether the current value is a concrete scalar value,
+// not relying on default values, a terminal error, a list, or a struct.
+// It does not verify that values of lists or structs are concrete themselves.
+// To check whether there is a concrete default, use v.Default().IsConcrete().
+func (v Value) IsConcrete() bool {
+	if v.path == nil {
+		return false // any is neither concrete, not a list or struct.
+	}
+	x := v.path.v.evalPartial(v.ctx())
+
+	// Errors marked as incomplete are treated as not complete.
+	if isIncomplete(x) {
+		return false
+	}
+	// Other errors are considered ground.
+	return x.kind().isGround()
+}
+
+// IsIncomplete is deprecated.
+//
+// It indicates that the value cannot be fully evaluated due to
 // insufficient information.
 func (v Value) IsIncomplete() bool {
+	// TODO: remove
 	x := v.eval(v.ctx())
 	if x.kind().hasReferences() || !x.kind().isGround() {
 		return true
@@ -722,6 +776,53 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 		}
 	}
 	return nil
+}
+
+func makeInt(v Value, x int64) Value {
+	n := &numLit{numBase: numBase{baseValue: v.path.v.base()}}
+	n.v.SetInt64(x)
+	return remakeValue(v, n)
+}
+
+// Len returns the number of items of the underlying value.
+// For lists it reports the capacity of the list. For structs it indicates the
+// number of fields, for bytes the number of bytes.
+func (v Value) Len() Value {
+	if v.path != nil {
+		switch x := v.path.v.evalPartial(v.ctx()).(type) {
+		case *list:
+			return remakeValue(v, x.len.evalPartial(v.ctx()))
+		case *bytesLit:
+			return makeInt(v, int64(x.len()))
+		case *stringLit:
+			return makeInt(v, int64(x.len()))
+		}
+	}
+	const msg = "len not supported for type %v"
+	return remakeValue(v, v.ctx().mkErr(v.path.v, msg, v.Kind()))
+}
+
+// Elem returns the value of undefined element types of lists and structs.
+func (v Value) Elem() (Value, bool) {
+	ctx := v.ctx()
+	switch x := v.path.cache.(type) {
+	case *structLit:
+		if x.template == nil {
+			break
+		}
+		fn, ok := ctx.manifest(x.template).(*lambdaExpr)
+		if !ok {
+			// TODO: return an error instead.
+			break
+		}
+		// Note, this template does not maintain the relation between the
+		// the attribute value and the instance.
+		y := fn.call(ctx, x, &basicType{x.baseValue, stringKind})
+		return newValueRoot(ctx, y), true
+	case *list:
+		return newValueRoot(ctx, x.typ), true
+	}
+	return Value{}, false
 }
 
 // List creates an iterator over the values of a list or reports an error if
@@ -942,8 +1043,47 @@ func (v Value) Format(state fmt.State, verb rune) {
 	io.WriteString(state, debugStr(ctx, v.path.cache))
 }
 
+// Reference returns path from the root of the file referred to by this value
+// or no path if this value is not a reference.
+func (v Value) Reference() []string {
+	// TODO: don't include references to hidden fields.
+	if v.path == nil {
+		return nil
+	}
+	sel, ok := v.path.v.(*selectorExpr)
+	if !ok {
+		return nil
+	}
+	return mkPath(v.ctx(), v.path, sel, 0)
+}
+
+func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (a []string) {
+	switch x := sel.x.(type) {
+	case *selectorExpr:
+		a = mkPath(c, up.parent, x, d+1)
+	case *nodeRef:
+		// the parent must exist.
+		for ; up != nil && up.cache != x.node.(value); up = up.parent {
+		}
+		a = mkFromRoot(c, up, d+1)
+	default:
+		panic("should not happend")
+	}
+	return append(a, c.labelStr(sel.feature))
+}
+
+func mkFromRoot(c *context, up *valueData, d int) []string {
+	if up == nil || up.parent == nil {
+		return make([]string, 0, d)
+	}
+	a := mkFromRoot(c, up.parent, d+1)
+	return append(a, c.labelStr(up.feature))
+}
+
 // References reports all references used to evaluate this value. It does not
 // report references for sub fields if v is a struct.
+//
+// Deprecated: can be implemented in terms of Reference and Expr.
 func (v Value) References() [][]string {
 	ctx := v.ctx()
 	pf := pathFinder{up: v.path}
@@ -1244,4 +1384,104 @@ func (a *Attribute) Lookup(pos int, key string) (val string, found bool, err err
 		}
 	}
 	return "", false, nil
+}
+
+// Expr reports the operation of the underlying expression and the values it
+// operates on. The returned values are appended to the given slice, which may
+// be nil.
+//
+// For unary expressions, it returns the single value of the expression.
+//
+// For binary expressions it returns first the left and right value, in that
+// order. For associative operations however, (for instance '&' and '|'), it may
+// return more than two values, where the operation is to be applied in
+// sequence.
+//
+// For selector and index expressions it returns the subject and then the index.
+// For selectors, the index is the string value of the identifier. For slice
+// expressions, it returns the subject, low value, and high value, in that
+// order.
+//
+// For interpolations it returns a sequence of values to be concatenated, some
+// of which will be literal strings and some unevaluated expressions.
+//
+// A builtin call expression returns the value of the builtin followed by the
+// args of the call.
+//
+// If v is not an expression, Partial append v itself.
+// TODO: return v if this is complete? Yes for now
+// TODO: add values if a == nil?
+func (v Value) Expr() (Op, []Value) {
+	if v.path == nil {
+		return NoOp, nil
+	}
+	// TODO: replace appends with []Value{}. For not leave.
+	a := []Value{}
+	op := NoOp
+	switch x := v.path.v.(type) {
+	case *binaryExpr:
+		a = append(a, remakeValue(v, x.left))
+		a = append(a, remakeValue(v, x.right))
+		op = opToOp[x.op]
+	case *unaryExpr:
+		a = append(a, remakeValue(v, x.x))
+		op = opToOp[x.op]
+	case *bound:
+		a = append(a, remakeValue(v, x.value))
+		op = opToOp[x.op]
+	case *unification:
+		// pre-expanded unification
+		for _, conjunct := range x.values {
+			a = append(a, remakeValue(v, conjunct))
+		}
+		op = AndOp
+	case *disjunction:
+		// Filter defaults that are subsumed by another value.
+		count := 0
+	outer:
+		for _, disjunct := range x.values {
+			if disjunct.marked {
+				for _, n := range x.values {
+					if !n.marked && subsumes(v.ctx(), n.val, disjunct.val, 0) {
+						continue outer
+					}
+				}
+			}
+			count++
+			a = append(a, remakeValue(v, disjunct.val))
+		}
+		if count > 1 {
+			op = OrOp
+		}
+	case *interpolation:
+		for _, p := range x.parts {
+			a = append(a, remakeValue(v, p))
+		}
+		op = InterpolationOp
+	case *selectorExpr:
+		a = append(a, remakeValue(v, x.x))
+		a = append(a, remakeValue(v, &stringLit{
+			x.baseValue,
+			v.ctx().labelStr(x.feature),
+		}))
+		op = SelectorOp
+	case *indexExpr:
+		a = append(a, remakeValue(v, x.x))
+		a = append(a, remakeValue(v, x.index))
+		op = IndexOp
+	case *sliceExpr:
+		a = append(a, remakeValue(v, x.x))
+		a = append(a, remakeValue(v, x.lo))
+		a = append(a, remakeValue(v, x.hi))
+		op = SliceOp
+	case *callExpr:
+		a = append(a, remakeValue(v, x.x))
+		for _, arg := range x.args {
+			a = append(a, remakeValue(v, arg))
+		}
+		op = CallOp
+	default:
+		a = append(a, v)
+	}
+	return op, a
 }

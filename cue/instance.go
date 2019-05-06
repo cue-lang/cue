@@ -71,6 +71,7 @@ func (inst *Instance) setError(err error) {
 }
 
 func (inst *Instance) eval(ctx *context) evaluated {
+	// TODO: remove manifest here? It may be good here, though not consistent.
 	v := ctx.manifest(inst.rootValue)
 	if s, ok := v.(*structLit); ok && s.emit != nil {
 		v = ctx.manifest(s.emit)

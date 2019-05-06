@@ -210,6 +210,7 @@ func marshalList(l *Iterator) (b []byte, err error) {
 }
 
 func (v Value) getNum(k kind) (*numLit, error) {
+	v, _ = v.Default()
 	if err := v.checkKind(v.ctx(), k); err != nil {
 		return nil, err
 	}
@@ -455,7 +456,7 @@ func newValueRoot(ctx *context, x value) Value {
 
 func newChildValue(obj *structValue, i int) Value {
 	a := obj.n.arcs[i]
-	a.cache = obj.ctx.manifest(obj.n.at(obj.ctx, i))
+	a.cache = obj.n.at(obj.ctx, i)
 
 	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
 }
@@ -472,7 +473,6 @@ func (v Value) ctx() *context {
 }
 
 func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
-	a.cache = ctx.manifest(a.cache)
 	return Value{v.idx, &valueData{v.path, i, a}}
 }
 
@@ -523,7 +523,7 @@ func (v Value) Kind() Kind {
 	if v.path == nil {
 		return BottomKind
 	}
-	k := v.eval(v.ctx()).kind()
+	k := v.path.v.evalPartial(v.ctx()).kind()
 	if k.isGround() {
 		switch {
 		case k.isAnyOf(nullKind):
@@ -551,7 +551,10 @@ func (v Value) Kind() Kind {
 
 // IncompleteKind returns a mask of all kinds that this value may be.
 func (v Value) IncompleteKind() Kind {
-	k := v.eval(v.ctx()).kind()
+	if v.path == nil {
+		return BottomKind
+	}
+	k := v.path.v.evalPartial(v.ctx()).kind()
 	vk := BottomKind // Everything is a bottom kind.
 	for i := kind(1); i < nonGround; i <<= 1 {
 		if k&i != 0 {
@@ -580,6 +583,7 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
+	v, _ = v.Default()
 	if v.path == nil {
 		return json.Marshal(nil)
 	}
@@ -692,6 +696,7 @@ func (v Value) Source() ast.Node {
 
 // Err returns the error represented by v or nil v is not an error.
 func (v Value) Err() error {
+	// TODO(incomplete): change to not return an error for incomplete.
 	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 		return err
 	}
@@ -828,6 +833,7 @@ func (v Value) Elem() (Value, bool) {
 // List creates an iterator over the values of a list or reports an error if
 // v is not a list.
 func (v Value) List() (Iterator, error) {
+	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, listKind); err != nil {
 		return Iterator{ctx: ctx}, err
@@ -838,19 +844,21 @@ func (v Value) List() (Iterator, error) {
 
 // Null reports an error if v is not null.
 func (v Value) Null() error {
+	v, _ = v.Default()
 	if err := v.checkKind(v.ctx(), nullKind); err != nil {
 		return err
 	}
 	return nil
 }
 
-// IsNull reports whether v is null.
-func (v Value) IsNull() bool {
-	return v.Null() == nil
-}
+// // IsNull reports whether v is null.
+// func (v Value) IsNull() bool {
+// 	return v.Null() == nil
+// }
 
 // Bool returns the bool value of v or false and an error if v is not a boolean.
 func (v Value) Bool() (bool, error) {
+	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, boolKind); err != nil {
 		return false, err
@@ -860,6 +868,7 @@ func (v Value) Bool() (bool, error) {
 
 // String returns the string value if v is a string or an error otherwise.
 func (v Value) String() (string, error) {
+	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, stringKind); err != nil {
 		return "", err
@@ -870,6 +879,7 @@ func (v Value) String() (string, error) {
 // Bytes returns a byte slice if v represents a list of bytes or an error
 // otherwise.
 func (v Value) Bytes() ([]byte, error) {
+	v, _ = v.Default()
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
 	case *bytesLit:
@@ -883,6 +893,7 @@ func (v Value) Bytes() ([]byte, error) {
 // Reader returns a new Reader if v is a string or bytes type and an error
 // otherwise.
 func (v Value) Reader() (io.Reader, error) {
+	v, _ = v.Default()
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
 	case *bytesLit:
@@ -907,6 +918,7 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *context, o options) (structValue, error) {
+	v, _ = v.Default()
 	if err := v.checkKind(ctx, structKind); err != nil {
 		return structValue{}, err
 	}
@@ -1023,11 +1035,11 @@ func (v Value) Unify(w Value) Value {
 	if w.path == nil {
 		return v
 	}
-	a := v.path.cache.evalPartial(ctx)
-	b := w.path.cache.evalPartial(ctx)
+	a := v.path.v
+	b := w.path.v
 	src := binSrc(token.NoPos, opUnify, a, b)
-	val := binOp(ctx, src, opUnify, a, b)
-	if err := validate(ctx, val); err != nil {
+	val := mkBin(ctx, src.Pos(), opUnify, a, b)
+	if err := validate(ctx, val.evalPartial(ctx)); err != nil {
 		val = err
 	}
 	return newValueRoot(ctx, val)

@@ -127,7 +127,6 @@ var testTokens = [...]elt{
 	{token.SUB, "-", operator},
 	{token.MUL, "*", operator},
 	{token.QUO, "/", operator},
-	{token.REM, "%", operator},
 
 	{token.AND, "&", operator},
 	{token.OR, "|", operator},
@@ -364,7 +363,6 @@ var lines = []string{
 	"-\n",
 	"*\n",
 	"/\n",
-	"%\n",
 
 	"&\n",
 	// "&^\n",

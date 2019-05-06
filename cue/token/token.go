@@ -49,7 +49,6 @@ const (
 	MUL // *
 	POW // ^
 	QUO // /
-	REM // %
 
 	IQUO // quo
 	IREM // rem
@@ -111,10 +110,9 @@ var tokens = [...]string{
 	EOF:     "EOF",
 	COMMENT: "COMMENT",
 
-	IDENT: "IDENT",
-	INT:   "INT",
-	FLOAT: "FLOAT",
-	// DURATION:      "DURATION", // TODO
+	IDENT:         "IDENT",
+	INT:           "INT",
+	FLOAT:         "FLOAT",
 	STRING:        "STRING",
 	INTERPOLATION: "INTERPOLATION",
 	ATTRIBUTE:     "ATTRIBUTE",
@@ -124,7 +122,6 @@ var tokens = [...]string{
 	MUL: "*",
 	POW: "^",
 	QUO: "/",
-	REM: "%",
 
 	IQUO: "quo",
 	IREM: "rem",
@@ -228,7 +225,7 @@ func (tok Token) Precedence() int {
 		return 5
 	case ADD, SUB:
 		return 6
-	case MUL, QUO, REM, IDIV, IMOD, IQUO, IREM:
+	case MUL, QUO, IDIV, IMOD, IQUO, IREM:
 		return 7
 	}
 	return lowestPrec

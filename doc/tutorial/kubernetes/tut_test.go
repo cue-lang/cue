@@ -255,9 +255,6 @@ func logf(t *testing.T, format string, args ...interface{}) {
 	log.Printf(format, args...)
 }
 
-// TODO:
-// Test manual and quick: evaluation results in output of testdata directory.
-
 func TestEval(t *testing.T) {
 	for _, dir := range []string{"quick", "manual"} {
 		t.Run(dir, func(t *testing.T) {

@@ -2104,9 +2104,6 @@ func TestExpr(t *testing.T) {
 		input: "v: 2 / 5",
 		want:  "/ 2 5",
 	}, {
-		input: "v: 2 % 5",
-		want:  "% 2 5",
-	}, {
 		input: "v: 2 quo 5",
 		want:  "quo 2 5",
 	}, {

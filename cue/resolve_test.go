@@ -141,13 +141,11 @@ func TestBasicRewrite(t *testing.T) {
 			sum: -1 + +2        // 1
 			div1: 2.0 / 3 * 6   // 4
 			div2: 2 / 3 * 6     // 4
-			rem: 2 % 3          // 2
 			b: 1 != 4
 
 			v1: 1.0T/2.0
 			v2: 2.0 == 2
 			v3: 2.0/3.0
-			v4: 2.0%3.0
 			v5: i1 div i2
 
 			e0: 2 + "a"
@@ -165,12 +163,10 @@ func TestBasicRewrite(t *testing.T) {
 			`sum: 1, ` +
 			`div1: 4.00000000000000000000000, ` +
 			`div2: 4.00000000000000000000000, ` +
-			`rem: 2, ` +
 			`b: true, ` +
 			`v1: 5e+11, ` +
 			`v2: true, ` +
 			`v3: 0.666666666666666666666667, ` +
-			`v4: 2.0, ` +
 			`v5: 0, ` +
 
 			`e0: _|_((2 + "a"):invalid operation 2 + "a" (mismatched types int and string)), ` +
@@ -587,10 +583,9 @@ func TestResolve(t *testing.T) {
 				v2: 2.0 == 2
 				n1: 1
 				v5: 2.0 / n1
-				e1: 2.0 % (3&int)
 				e2: int & 4.0/2.0
 				`,
-		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: 2.0, e2: _|_((int & (4.0 / 2.0)):conflicting values int and (4.0 / 2.0) (mismatched types int and float))}`,
+		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e2: _|_((int & (4.0 / 2.0)):conflicting values int and (4.0 / 2.0) (mismatched types int and float))}`,
 	}, {
 		desc: "inequality",
 		in: `

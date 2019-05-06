@@ -273,7 +273,7 @@ The following character sequences represent operators and punctuation:
 -     mod   ||    !=    >     :     {     }
 *     quo   &     =~    <=    =     [     ]
 /     rem   |     !~    >=    <-    ...   ,
-%           _|_   !           ;
+            _|_   !           ;
 ```
 <!-- :: for "is-a" definitions -->
 
@@ -866,17 +866,26 @@ The _integer type_ represents the set of all integral numbers.
 The _decimal floating-point type_ represents the set of all decimal floating-point
 numbers.
 They are two distinct types.
-The predeclared integer and decimal floating-point types are `int` and `float`;
-they are defined types.
+Both are instances instances of a generic `number` type.
+
+<!--
+                    number
+                   /      \
+                int      float
+-->
+
+The predeclared number, integer, decimal floating-point types are
+`number`, `int` and `float`; they are defined types.
+<!--
+TODO: should we drop float? It is somewhat preciser and probably a good idea
+to have it in the programmatic API, but it may be confusing to have to deal
+with it in the language.
+-->
 
 A decimal floating-point literal always has type `float`;
 it is not an instance of `int` even if it is an integral number.
 
-An integer literal has both type `int` and `float`, with the integer variant
-being the default if no other constraints are applied.
-Expressed in terms of disjunction and [type conversion](#conversions),
-the literal `1`, for instance, is defined as `int(1) | float(1)`.
-Hexadecimal, octal, and binary integer literals are always of type `int`.
+Integer literals are always of type `int and don't match type `float`.
 
 Numeric literals are exact values of arbitrary precision.
 If the operation permits it, numbers should be kept in arbitrary precision.
@@ -991,8 +1000,11 @@ ConcreteLabel = identifier | simple_string_lit
 OptionalLabel = ConcreteLabel "?"
 Label         = ConcreteLabel | OptionalLabel | TemplateLabel .
 
-attribute     = "@" identifier "(" attr_elem { "," attr_elem } ")" .
-attr_elem     =  attr_string | identifier "=" attr_string .
+attribute     = "@" identifier "(" attr_elems ")" .
+attr_elems    = attr_elem { "," attr_elem }
+attr_elem     =  attr_string | attr_label | attr_nest .
+attr_label    = identifier "=" attr_string .
+attr_nest     = identifier "(" attr_elems ")" .
 attr_string   = { attr_char } | string_lit .
 attr_char     = /* an arbitrary Unicode code point except newline, ',', '"', `'`, '#', '=', '(', and ')' */ .
 ```
@@ -1300,6 +1312,10 @@ int64     >=-9_223_372_036_854_775_808 & <=9_223_372_036_854_775_807
 uint128   >=0 & <=340_282_366_920_938_463_463_374_607_431_768_211_455
 int128    >=-170_141_183_460_469_231_731_687_303_715_884_105_728 &
            <=170_141_183_460_469_231_731_687_303_715_884_105_727
+float32   >=-3.40282346638528859811704183484516925440e+38 &
+          <=3.40282346638528859811704183484516925440e+38
+float64   >=-1.797693134862315708145274237317043567981e+308 &
+          <=1.797693134862315708145274237317043567981e+308
 ```
 
 
@@ -1702,7 +1718,7 @@ UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 binary_op  = "|" | "&" | "||" | "&&" | "==" | rel_op | add_op | mul_op  .
 rel_op     = "!=" | "<" | "<=" | ">" | ">=" | "=~" | "!~" .
 add_op     = "+" | "-" .
-mul_op     = "*" | "/" | "%" | "div" | "mod" | "quo" | "rem" .
+mul_op     = "*" | "/" | "div" | "mod" | "quo" | "rem" .
 unary_op   = "+" | "-" | "!" | "*" | rel_op .
 ```
 
@@ -1750,7 +1766,7 @@ and finally `|` (disjunction):
 
 ```
 Precedence    Operator
-    7             *  /  %  div mod quo rem
+    7             *  / div mod quo rem
     6             +  -
     5             ==  !=  <  <=  >  >= =~ !~
     4             &&
@@ -1778,7 +1794,7 @@ Arithmetic operators apply to numeric values and yield a result of the same type
 as the first operand. The three of the four standard arithmetic operators
 `(+, -, *)` apply to integer and decimal floating-point types;
 `+` and `*` also apply to lists and strings.
-`/` and `%` only apply to decimal floating-point types and
+`/` only applies to decimal floating-point types and
 `div`, `mod`, `quo`, and `rem` only apply to integer types.
 
 ```
@@ -1786,12 +1802,17 @@ as the first operand. The three of the four standard arithmetic operators
 -    difference             integers, floats
 *    product                integers, floats, lists, strings, bytes
 /    quotient               floats
-%    remainder              floats
 div  division               integers
 mod  modulo                 integers
 quo  quotient               integers
 rem  remainder              integers
 ```
+
+For any operator that accepts operands of type `float`, any operand may be
+of type `int` or `float`, in which case the result will be `float` if any
+of the operands is `float` or `int` otherwise.
+For `/` the result is always `float`.
+
 
 #### Integer operators
 
@@ -1857,25 +1878,19 @@ from the value obtained by executing and rounding the instructions individually.
 #### List operators
 
 Lists can be concatenated using the `+` operator.
-For lists `a` and `b`,
-```
-a + b
-```
-will produce an open list if `b` is open.
-If list `a` is open, its default value, the shortest variant, is selected.
+Opens list are closed to their default value beforehand.
 
 ```
 [ 1, 2 ]      + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
 [ 1, 2, ... ] + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
-[ 1, 2 ]      + [ 3, 4, ... ]  // [ 1, 2, 3, 4, ... ]
-[ 1, 2, ... ] + [ 3, 4, ... ]  // [ 1, 2, 3, 4, ... ]
+[ 1, 2 ]      + [ 3, 4, ... ]  // [ 1, 2, 3, 4 ]
 ```
 
 Lists can be multiplied with a non-negative`int` using the `*` operator
 to create a repeated the list by the indicated number.
 ```
 3*[1,2]         // [1, 2, 1, 2, 1, 2]
-3*[1, 2, ...]   // [1, 2, 1, 2, 1 ,2, ...]
+3*[1, 2, ...]   // [1, 2, 1, 2, 1 ,2]
 [byte]*4        // [byte, byte, byte, byte]
 0*[1,2]         // []
 ```
@@ -1907,6 +1922,7 @@ A string can be repeated by multiplying it:
 s: "etc. "*3  // "etc. etc. etc. "
 ```
 <!-- jba: Do these work for byte sequences? If not, why not? -->
+
 
 ##### Comparison operators
 
@@ -2248,15 +2264,21 @@ Argument type    Result
 string            string length in bytes
 bytes             length of byte sequence
 list              list length, smallest length for an open list
-struct            number of distinct fields
+struct            number of distinct data fields, including optional
 ```
+<!-- TODO: consider not supporting len, but instead rely on more
+precisely named builtin functions:
+  - strings.RuneLen(x)
+  - bytes.Len(x)  // x may be a string
+  - struct.NumFooFields(x)
+  - list.Len(x)
+-->
 
 ```
 Expression           Result
 len("Hellø")         6
 len([1, 2, 3])       3
-len([1, 2, ...])     2
-len({a:1, b:2})      2
+len([1, 2, ...])     >=2
 ```
 
 ### `and`
@@ -2276,10 +2298,12 @@ The built-in function `or` takes a list and returns the result of applying
 the `|` operator to all elements in the list.
 It returns bottom for the empty list.
 
+```
 Expression:          Result
 and([a, b])          a | b
 and([a])             a
 and([])              _|_
+```
 
 
 ## Cycles

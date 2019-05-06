@@ -191,7 +191,6 @@ var opStrings = []string{
 	opSub: "-",
 	opMul: "*",
 	opQuo: "/",
-	opRem: "%",
 
 	opIDiv: "div",
 	opIMod: "mod",
@@ -209,7 +208,6 @@ var tokenMap = map[token.Token]op{
 	token.SUB: opSub, // -
 	token.MUL: opMul, // *
 	token.QUO: opQuo, // /
-	token.REM: opRem, // %
 
 	token.IDIV: opIDiv, // div
 	token.IMOD: opIMod, // mod

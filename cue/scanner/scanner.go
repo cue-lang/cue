@@ -932,8 +932,9 @@ scanAgain:
 			} else {
 				tok = token.QUO
 			}
-		case '%':
-			tok = token.REM
+		// We no longer use %, but seems like a useful token to use for
+		// something else at some point.
+		// case '%':
 		case '<':
 			if s.ch == '-' {
 				s.next()

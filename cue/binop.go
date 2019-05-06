@@ -911,9 +911,6 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 			ctx.Quo(&n.v, &x.v, &y.v)
 			ctx.Reduce(&n.v, &n.v)
 			n.k = floatKind
-		case opRem:
-			ctx.Rem(&n.v, &x.v, &y.v)
-			n.k = floatKind
 		case opIDiv:
 			intOp(ctx, n, (*big.Int).Div, x, y)
 		case opIMod:
@@ -995,7 +992,7 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 			d := apd.New(int64(y.d), 0)
 			ctx.Quo(&n.v, &n.v, d)
 			return n
-		case opRem:
+		case opIRem:
 			n := &numLit{
 				numBase: newNumBase(nil, newNumInfo(intKind, 0, 10, false)),
 			}
@@ -1016,7 +1013,7 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 			f, _ := y.v.Float64()
 			d := time.Duration(float64(x.d) * f)
 			return &durationLit{binSrc(src.Pos(), op, x, other), d}
-		case opRem:
+		case opIRem:
 			d := x.d % time.Duration(y.intValue(ctx))
 			return &durationLit{binSrc(src.Pos(), op, x, other), d}
 		}

@@ -97,8 +97,8 @@ func TestValueType(t *testing.T) {
 		incompleteKind: NumberKind,
 	}, {
 		value:          `2.0`,
-		kind:           NumberKind,
-		incompleteKind: NumberKind,
+		kind:           FloatKind,
+		incompleteKind: FloatKind,
 	}, {
 		value:          `2.0Mi`,
 		kind:           NumberKind,
@@ -114,7 +114,7 @@ func TestValueType(t *testing.T) {
 	}, {
 		value:          `float`,
 		kind:           BottomKind,
-		incompleteKind: NumberKind,
+		incompleteKind: FloatKind,
 	}, {
 		value:          `"str"`,
 		kind:           StringKind,
@@ -247,6 +247,7 @@ func TestFloat(t *testing.T) {
 		exp     int
 		fmt     byte
 		prec    int
+		kind    Kind
 		err     string
 	}{{
 		value:   "1",
@@ -255,6 +256,7 @@ func TestFloat(t *testing.T) {
 		exp:     0,
 		float64: 1,
 		fmt:     'g',
+		kind:    NumberKind,
 	}, {
 		value:   "-1",
 		float:   "-1",
@@ -262,6 +264,7 @@ func TestFloat(t *testing.T) {
 		exp:     0,
 		float64: -1,
 		fmt:     'g',
+		kind:    NumberKind,
 	}, {
 		value:   "1.0",
 		float:   "1.0",
@@ -269,6 +272,7 @@ func TestFloat(t *testing.T) {
 		exp:     -1,
 		float64: 1.0,
 		fmt:     'g',
+		kind:    FloatKind,
 	}, {
 		value:   "2.6",
 		float:   "2.6",
@@ -276,6 +280,7 @@ func TestFloat(t *testing.T) {
 		exp:     -1,
 		float64: 2.6,
 		fmt:     'g',
+		kind:    FloatKind,
 	}, {
 		value:   "20.600",
 		float:   "20.60",
@@ -284,6 +289,7 @@ func TestFloat(t *testing.T) {
 		float64: 20.60,
 		prec:    2,
 		fmt:     'f',
+		kind:    FloatKind,
 	}, {
 		value:   "1/0",
 		float:   "∞",
@@ -291,6 +297,7 @@ func TestFloat(t *testing.T) {
 		prec:    2,
 		fmt:     'f',
 		err:     ErrAbove.Error(),
+		kind:    FloatKind,
 	}, {
 		value:   "-1/0",
 		float:   "-∞",
@@ -298,6 +305,7 @@ func TestFloat(t *testing.T) {
 		prec:    2,
 		fmt:     'f',
 		err:     ErrBelow.Error(),
+		kind:    FloatKind,
 	}, {
 		value:   "1.797693134862315708145274237317043567982e+308",
 		float:   "1.8e+308",
@@ -307,6 +315,7 @@ func TestFloat(t *testing.T) {
 		prec:    2,
 		fmt:     'g',
 		err:     ErrAbove.Error(),
+		kind:    FloatKind,
 	}, {
 		value:   "-1.797693134862315708145274237317043567982e+308",
 		float:   "-1.8e+308",
@@ -315,6 +324,7 @@ func TestFloat(t *testing.T) {
 		float64: math.Inf(-1),
 		prec:    2,
 		fmt:     'g',
+		kind:    FloatKind,
 		err:     ErrBelow.Error(),
 	}, {
 		value:   "4.940656458412465441765687928682213723650e-324",
@@ -324,6 +334,7 @@ func TestFloat(t *testing.T) {
 		float64: 0,
 		prec:    4,
 		fmt:     'g',
+		kind:    FloatKind,
 		err:     ErrBelow.Error(),
 	}, {
 		value:   "-4.940656458412465441765687928682213723650e-324",
@@ -333,12 +344,13 @@ func TestFloat(t *testing.T) {
 		float64: 0,
 		prec:    -1,
 		fmt:     'g',
+		kind:    FloatKind,
 		err:     ErrAbove.Error(),
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
 			n := getInstance(t, tc.value).Value()
-			if n.Kind() != NumberKind {
+			if n.Kind() != tc.kind {
 				t.Fatal("Not a number")
 			}
 

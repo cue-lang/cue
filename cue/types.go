@@ -43,8 +43,13 @@ const (
 	// BoolKind indicates a boolean value.
 	BoolKind
 
-	// NumberKind represents any kind of number.
-	NumberKind
+	// IntKind represents an integral number.
+	IntKind
+
+	// FloatKind represents a decimal float point number that cannot be
+	// converted to an integer. The underlying number may still be integral,
+	// but resulting from an operation that enforces the float type.
+	FloatKind
 
 	// StringKind indicates any kind of string.
 	StringKind
@@ -59,6 +64,9 @@ const (
 	ListKind
 
 	nextKind
+
+	// NumberKind represents any kind of number.
+	NumberKind = IntKind | FloatKind
 )
 
 // An structValue represents a JSON object.
@@ -483,6 +491,9 @@ func (v Value) Label() (string, bool) {
 // are not concrete. For instance, it will return BottomKind for the bounds
 // >=0.
 func (v Value) Kind() Kind {
+	if v.path == nil {
+		return BottomKind
+	}
 	k := v.eval(v.ctx()).kind()
 	if k.isGround() {
 		switch {
@@ -490,6 +501,10 @@ func (v Value) Kind() Kind {
 			return NullKind
 		case k.isAnyOf(boolKind):
 			return BoolKind
+		case k&numKind == (intKind):
+			return IntKind
+		case k&numKind == (floatKind):
+			return FloatKind
 		case k.isAnyOf(numKind):
 			return NumberKind
 		case k.isAnyOf(bytesKind):
@@ -516,8 +531,10 @@ func (v Value) IncompleteKind() Kind {
 				vk |= NullKind
 			case boolKind:
 				vk |= BoolKind
-			case intKind, floatKind:
-				vk |= NumberKind
+			case intKind:
+				vk |= IntKind
+			case floatKind:
+				vk |= FloatKind
 			case stringKind:
 				vk |= StringKind
 			case bytesKind:

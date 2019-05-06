@@ -344,6 +344,19 @@ func parseInt(k kind, s string) *numLit {
 	return num
 }
 
+func parseFloat(s string) *numLit {
+	n := &ast.BasicLit{
+		Kind:  token.FLOAT,
+		Value: s,
+	}
+	num := newNum(newExpr(n), floatKind)
+	_, _, err := num.v.SetString(s)
+	if err != nil {
+		panic(err)
+	}
+	return num
+}
+
 func newNum(src source, k kind) *numLit {
 	n := &numLit{numBase: numBase{baseValue: src.base()}}
 	n.k = k
@@ -408,6 +421,22 @@ func mkIntRange(a, b string) evaluated {
 	return e
 }
 
+func mkFloatRange(a, b string) evaluated {
+	from := &bound{op: opGeq, value: parseFloat(a)}
+	to := &bound{op: opLeq, value: parseFloat(b)}
+	e := &unification{
+		binSrc(token.NoPos, opUnify, from, to),
+		[]evaluated{from, to},
+	}
+	// TODO: make this an integer
+	// int := &basicType{k: intKind}
+	// e = &unification{
+	// 	binSrc(token.NoPos, opUnify, int, e),
+	// 	[]evaluated{int, e},
+	// }
+	return e
+}
+
 var predefinedRanges = map[string]evaluated{
 	"rune":  mkIntRange("0", strconv.Itoa(0x10FFFF)),
 	"int8":  mkIntRange("-128", "127"),
@@ -426,6 +455,17 @@ var predefinedRanges = map[string]evaluated{
 	"uint32":  mkIntRange("0", "4294967295"),
 	"uint64":  mkIntRange("0", "18446744073709551615"),
 	"uint128": mkIntRange("0", "340282366920938463463374607431768211455"),
+
+	// 2**127 * (2**24 - 1) / 2**23
+	"float32": mkFloatRange(
+		"-3.40282346638528859811704183484516925440e+38",
+		"+3.40282346638528859811704183484516925440e+38",
+	),
+	// 2**1023 * (2**53 - 1) / 2**52
+	"float64": mkFloatRange(
+		"-1.797693134862315708145274237317043567981e+308",
+		"+1.797693134862315708145274237317043567981e+308",
+	),
 }
 
 type interpolation struct {

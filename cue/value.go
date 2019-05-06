@@ -455,10 +455,31 @@ func (x *list) initLit() {
 	x.typ = &top{x.baseValue}
 }
 
+func (x *list) manifest(ctx *context) evaluated {
+	if x.kind().isGround() {
+		return x
+	}
+	// A list is ground if its length is ground, or if the current length
+	// meets matches the cap.
+	n := newNum(x, intKind)
+	n.v.SetInt64(int64(len(x.elem.arcs)))
+	if n := binOp(ctx, x, opUnify, n, x.len.evalPartial(ctx)); !isBottom(n) {
+		return &list{
+			baseValue: x.baseValue,
+			elem:      x.elem,
+			len:       n,
+			typ:       &top{x.baseValue},
+		}
+	}
+	return x
+}
+
 func (x *list) kind() kind {
-	// Any open list has a default manifestation and can thus always be
-	// interpreted as ground (ignoring non-ground elements).
-	return listKind
+	k := listKind
+	if _, ok := x.len.(*numLit); ok {
+		return k
+	}
+	return k | nonGround
 }
 
 // at returns the evaluated and original value of position i. List x must

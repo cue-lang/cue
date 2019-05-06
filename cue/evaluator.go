@@ -19,12 +19,18 @@ func (c *context) manifest(v value) evaluated {
 	if c.noManifest {
 		return evaluated
 	}
+outer:
 	for {
-		x, ok := evaluated.(*disjunction)
-		if !ok {
-			break
+		switch x := evaluated.(type) {
+		case *disjunction:
+			evaluated = x.manifest(c)
+
+		case *list:
+			return x.manifest(c)
+
+		default:
+			break outer
 		}
-		evaluated = x.manifest(c)
 	}
 	return evaluated
 }

@@ -239,21 +239,20 @@ func (x *list) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 		if !subsumes(ctx, x.len, y.len, mode) {
 			return false
 		}
+		// TODO: need to handle case where len(x.elem) > len(y.elem) explicitly
+		// if we introduce cap().
 		if !subsumes(ctx, x.elem, y.elem, mode) {
 			return false
 		}
-		n := len(x.elem.arcs)
-		if len(y.elem.arcs) < n {
-			n = len(y.elem.arcs)
-		}
-		if y.isOpen() {
-			return subsumes(ctx, x.typ, y.typ, 0)
-		}
-		for _, a := range y.elem.arcs[n:] {
-			// TODO: evaluate?
+		// TODO: assuming continuous indices, use merge sort if we allow
+		// sparse arrays.
+		for _, a := range y.elem.arcs[len(x.elem.arcs):] {
 			if !subsumes(ctx, x.typ, a.v, mode) {
 				return false
 			}
+		}
+		if y.isOpen() { // implies from first check that x.IsOpen.
+			return subsumes(ctx, x.typ, y.typ, 0)
 		}
 		return true
 	}

@@ -122,16 +122,6 @@ func TestSubsume(t *testing.T) {
 		54: {subsumes: true, in: `a: int, b: int`},
 		55: {subsumes: true, in: `a: number, b: int`},
 
-		// Lists
-		56: {subsumes: true, in: `a: [], b: [] `},
-		57: {subsumes: true, in: `a: [1], b: [1] `},
-		58: {subsumes: false, in: `a: [1], b: [2] `},
-		59: {subsumes: false, in: `a: [1], b: [2, 3] `},
-		60: {subsumes: true, in: `a: [{b: string}], b: [{b: "foo"}] `},
-		61: {subsumes: true, in: `a: [...{b: string}], b: [{b: "foo"}] `},
-		62: {subsumes: false, in: `a: [{b: "foo"}], b: [{b: string}] `},
-		63: {subsumes: false, in: `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `},
-
 		// Structs
 		64: {subsumes: true, in: `a: {}, b: {}`},
 		65: {subsumes: true, in: `a: {}, b: {a: 1}`},
@@ -370,6 +360,17 @@ func TestSubsume(t *testing.T) {
 		// The one exception of the rule: there is no value of foo that can be
 		// added to b which would cause the unification of a and b to fail.
 		420: {subsumes: true, in: `a: {foo?: _}, b: {}`},
+
+		// Lists
+		506: {subsumes: true, in: `a: [], b: [] `},
+		507: {subsumes: true, in: `a: [1], b: [1] `},
+		508: {subsumes: false, in: `a: [1], b: [2] `},
+		509: {subsumes: false, in: `a: [1], b: [2, 3] `},
+		510: {subsumes: true, in: `a: [{b: string}], b: [{b: "foo"}] `},
+		511: {subsumes: true, in: `a: [...{b: string}], b: [{b: "foo"}] `},
+		512: {subsumes: false, in: `a: [{b: "foo"}], b: [{b: string}] `},
+		513: {subsumes: false, in: `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `},
+		520: {subsumes: false, in: `a: [_, int, ...], b: [int, string, ...string] `},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

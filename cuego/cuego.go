@@ -168,7 +168,7 @@ func init() {
 	context := build.NewContext()
 	fset = context.FileSet()
 	inst := context.NewInstance("<cuego>", nil)
-	if err := inst.AddFile("<ceugo>", "{}"); err != nil {
+	if err := inst.AddFile("<cuego>", "{}"); err != nil {
 		panic(err)
 	}
 	instance = cue.Build([]*build.Instance{inst})[0]

@@ -677,18 +677,26 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.
-	if x.arcs[i].cache == nil {
+	if v := x.arcs[i].cache; v == nil {
 
 		// cycle detection
-		x.arcs[i].cache = cycleSentinel
 
-		ctx.evalDepth++
+		popped := ctx.evalStack
+		ctx.evalStack = append(ctx.evalStack, bottom{
+			baseValue: x.base(),
+			index:     ctx.index,
+			code:      codeCycle,
+			value:     x.arcs[i].v,
+			msg:       "cycle detected",
+		})
+		x.arcs[i].cache = &(ctx.evalStack[len(ctx.evalStack)-1])
+
 		v := x.arcs[i].v.evalPartial(ctx)
-		ctx.evalDepth--
+		ctx.evalStack = popped
 
 		v = x.applyTemplate(ctx, i, v)
 
-		if (ctx.evalDepth > 0 && ctx.cycleErr) || cycleError(v) != nil {
+		if (len(ctx.evalStack) > 0 && ctx.cycleErr) || cycleError(v) != nil {
 			// Don't cache while we're in a evaluation cycle as it will cache
 			// partial results. Each field involved in the cycle will have to
 			// reevaluated the values from scratch. As the result will be
@@ -702,11 +710,14 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		ctx.cycleErr = false
 
 		x.arcs[i].cache = v
-		if ctx.evalDepth == 0 {
+		if len(ctx.evalStack) == 0 {
 			if err := ctx.processDelayedConstraints(); err != nil {
 				x.arcs[i].cache = err
 			}
 		}
+	} else if b := cycleError(v); b != nil {
+		copy := *b
+		return &copy
 	}
 	return x.arcs[i].cache
 }
@@ -1069,6 +1080,8 @@ type disjunction struct {
 	baseValue
 
 	values []dValue
+
+	hasDefaults bool // also true if it had elminated defaults.
 
 	// bind is the node that a successful disjunction will bind to. This
 	// allows other arcs to point to this node before the disjunction is

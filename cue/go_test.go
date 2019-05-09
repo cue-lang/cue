@@ -198,7 +198,7 @@ func TestConvertType(t *testing.T) {
 	for _, tc := range testCases {
 		ctx := inst.newContext()
 		t.Run("", func(t *testing.T) {
-			v := goTypeToValue(ctx, reflect.TypeOf(tc.goTyp))
+			v := goTypeToValue(ctx, true, reflect.TypeOf(tc.goTyp))
 			got := debugStr(ctx, v)
 			if got != tc.want {
 				t.Errorf("\n got %q;\nwant %q", got, tc.want)

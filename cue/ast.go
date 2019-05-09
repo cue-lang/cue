@@ -536,6 +536,7 @@ func (v *astVisitor) addDisjunctionElem(d *disjunction, n ast.Node, mark bool) {
 			mark = true
 			n = x.X
 		}
+		d.hasDefaults = true
 	}
 	d.values = append(d.values, dValue{v.walk(n), mark})
 }

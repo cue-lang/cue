@@ -162,7 +162,7 @@ var orBuiltin = &builtin{
 		for iter.Next() {
 			d = append(d, dValue{iter.Value().path.v, false})
 		}
-		c.ret = &disjunction{baseValue{c.src}, d}
+		c.ret = &disjunction{baseValue{c.src}, d, false}
 		if len(d) == 0 {
 			c.ret = errors.New("empty or")
 		}

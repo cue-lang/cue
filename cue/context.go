@@ -29,10 +29,10 @@ type context struct {
 
 	// constraints are to be evaluated at the end values to be evaluated later.
 	constraints []*binaryExpr
-	exprDepth   int // nesting of expression that are not unification
-	evalDepth   int
-	inSum       int
-	cycleErr    bool
+	evalStack   []bottom
+
+	inSum    int
+	cycleErr bool
 
 	noManifest bool
 
@@ -42,6 +42,18 @@ type context struct {
 	// tracing
 	trace bool
 	level int
+}
+
+func (c *context) incEvalDepth() {
+	if len(c.evalStack) > 0 {
+		c.evalStack[len(c.evalStack)-1].exprDepth++
+	}
+}
+
+func (c *context) decEvalDepth() {
+	if len(c.evalStack) > 0 {
+		c.evalStack[len(c.evalStack)-1].exprDepth--
+	}
 }
 
 var baseContext apd.Context

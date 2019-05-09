@@ -279,8 +279,11 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
 
-	ctx.inSum++
-	dn := &disjunction{x.baseValue, make([]dValue, 0, len(x.values))}
+	// decSum := false
+	if len(ctx.evalStack) > 1 {
+		ctx.inSum++
+	}
+	dn := &disjunction{x.baseValue, make([]dValue, 0, len(x.values)), x.hasDefaults}
 	changed := false
 	for _, v := range x.values {
 		n := v.val.evalPartial(ctx)
@@ -299,7 +302,9 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 	if !changed {
 		dn = x
 	}
-	ctx.inSum--
+	if len(ctx.evalStack) > 1 {
+		ctx.inSum--
+	}
 	return dn.normalize(ctx, x).val
 }
 
@@ -351,10 +356,10 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 	var left, right evaluated
 
 	if x.op != opUnify {
-		ctx.exprDepth++
+		ctx.incEvalDepth()
 		left = ctx.manifest(x.left)
 		right = ctx.manifest(x.right)
-		ctx.exprDepth--
+		ctx.decEvalDepth()
 
 		// TODO: allow comparing to a literal bottom only. Find something more
 		// principled perhaps. One should especially take care that two values

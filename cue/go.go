@@ -191,10 +191,7 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 	case nil:
 		// Interpret a nil pointer as an undefined value that is only
 		// null by default, but may still be set: *null | _.
-		return &disjunction{values: []dValue{
-			{val: &nullLit{src.base()}, marked: true},
-			{val: &top{src.base()}}},
-		}
+		return makeNullable(&top{src.base()}).(evaluated)
 
 	case *big.Int:
 		n := newNum(src, intKind)
@@ -291,10 +288,7 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 			if value.IsNil() {
 				// Interpret a nil pointer as an undefined value that is only
 				// null by default, but may still be set: *null | _.
-				return &disjunction{values: []dValue{
-					{val: &nullLit{src.base()}, marked: true},
-					{val: &top{src.base()}}},
-				}
+				return makeNullable(&top{src.base()}).(evaluated)
 			}
 			return convert(ctx, src, value.Elem().Interface())
 
@@ -387,7 +381,7 @@ func convertGoType(inst *Instance, t reflect.Type) value {
 	// TODO: this can be much more efficient.
 	mutex.Lock()
 	defer mutex.Unlock()
-	return goTypeToValue(ctx, t)
+	return goTypeToValue(ctx, true, t)
 }
 
 var (
@@ -400,7 +394,7 @@ var (
 //
 // TODO: if this value will always be unified with a concrete type in Go, then
 // many of the fields may be omitted.
-func goTypeToValue(ctx *context, t reflect.Type) (e value) {
+func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value) {
 	if e, ok := typeCache.Load(t); ok {
 		return e.(value)
 	}
@@ -419,7 +413,10 @@ func goTypeToValue(ctx *context, t reflect.Type) (e value) {
 		for elem.Kind() == reflect.Ptr {
 			elem = elem.Elem()
 		}
-		e = wrapOrNull(goTypeToValue(ctx, elem))
+		e = goTypeToValue(ctx, false, elem)
+		if allowNullDefault {
+			e = wrapOrNull(e)
+		}
 
 	case reflect.Interface:
 		switch t.Name() {
@@ -477,7 +474,8 @@ func goTypeToValue(ctx *context, t reflect.Type) (e value) {
 			if f.PkgPath != "" {
 				continue
 			}
-			elem := goTypeToValue(ctx, f.Type)
+			_, ok := f.Tag.Lookup("cue")
+			elem := goTypeToValue(ctx, !ok, f.Type)
 
 			// leave errors like we do during normal evaluation or do we
 			// want to return the error?
@@ -507,7 +505,6 @@ func goTypeToValue(ctx *context, t reflect.Type) (e value) {
 					// with the constraints from the tags. The type constraints
 					// will be implied when unified with a concrete value.
 					obj.arcs[i].v = mkBin(ctx, 0, opUnify, a.v, v)
-					// obj.arcs[i].v = v
 				}
 			}
 		}
@@ -518,7 +515,7 @@ func goTypeToValue(ctx *context, t reflect.Type) (e value) {
 		if t.Elem().Kind() == reflect.Uint8 {
 			e = &basicType{k: bytesKind}
 		} else {
-			elem := goTypeToValue(ctx, t.Elem())
+			elem := goTypeToValue(ctx, allowNullDefault, t.Elem())
 
 			var ln value = &top{}
 			if t.Kind() == reflect.Array {
@@ -540,7 +537,7 @@ func goTypeToValue(ctx *context, t reflect.Type) (e value) {
 		obj := newStruct(baseValue{})
 		sig := &params{}
 		sig.add(ctx.label("_", true), &basicType{k: stringKind})
-		v := goTypeToValue(ctx, t.Elem())
+		v := goTypeToValue(ctx, allowNullDefault, t.Elem())
 		obj.template = &lambdaExpr{params: sig, value: v}
 
 		e = wrapOrNull(obj)
@@ -558,9 +555,17 @@ func wrapOrNull(e value) value {
 	if e.kind().isAnyOf(nullKind) {
 		return e
 	}
-	e = &disjunction{values: []dValue{
-		{val: &nullLit{}, marked: true},
-		{val: e}},
+	return makeNullable(e)
+}
+
+const nullIsDefault = true
+
+func makeNullable(e value) value {
+	return &disjunction{
+		baseValue: baseValue{e},
+		values: []dValue{
+			{val: &nullLit{}, marked: nullIsDefault},
+			{val: e}},
+		hasDefaults: nullIsDefault,
 	}
-	return e
 }

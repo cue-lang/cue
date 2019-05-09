@@ -423,7 +423,7 @@ func TestBasicRewrite(t *testing.T) {
 			// All errors are treated the same as per the unification model.
 			i1: [1, 2][3] | "c"
 			`,
-		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | *2 | *3), o5: (1 | *2 | 3), o6: (1 | 2 | 3), o7: (2 | 3), o8: (2 | 3), o9: (2 | 3), o10: (3 | *2), m1: (*2 | 3), m2: (*2 | 3), m3: (*2 | 3), m4: (*2 | 3), m5: (*2 | 3), i1: "c"}`,
+		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | 2 | 3), o5: (1 | *2 | 3), o6: (1 | 2 | 3), o7: (2 | 3), o8: (2 | 3), o9: (2 | 3), o10: (3 | *2), m1: (*2 | 3), m2: (*2 | 3), m3: (*2 | 3), m4: (*2 | 3), m5: (*2 | 3), i1: "c"}`,
 	}, {
 		desc: "types",
 		in: `
@@ -474,7 +474,9 @@ func TestBasicRewrite(t *testing.T) {
 
 			c: [c[1], c[0]]
 		`,
-		out: `<0>{a: _|_(cycle detected), b: _|_(cycle detected), c: [_|_(cycle detected),_|_(cycle detected)]}`,
+		out: `<0>{a: _|_((<1>.b - 100):cycle detected), ` +
+			`b: _|_((<1>.a + 100):cycle detected), ` +
+			`c: [_|_(<1>.c[1]:cycle detected),_|_(<1>.c[0]:cycle detected)]}`,
 	}, {
 		desc: "resolved self-reference cycles",
 		in: `
@@ -543,7 +545,7 @@ func TestChooseFirst(t *testing.T) {
 			b: *"b" | "a"
 			c: a & b
 			`,
-		out: `<0>{a: "a", b: "b", c: _|_((*"a" | *"b"):more than one default remaining ("a" and "b"))}`,
+		out: `<0>{a: "a", b: "b", c: _|_(("a" | "b"):more than one element remaining ("a" and "b"))}`,
 	}, {
 		desc: "associativity of defaults",
 		in: `
@@ -1039,9 +1041,9 @@ func TestResolve(t *testing.T) {
 		b: a & { l: [_, "bar"] }
 		`,
 		out: `<0>{` +
-			`a: <1>{l: ["foo",_|_(cycle detected)], ` +
-			`v: _|_(cycle detected)}, ` +
-			`b: <2>{l: ["foo","bar"], v: "bar"}}`,
+			`a: <1>{l: ["foo",_|_(<2>.v:cycle detected)], ` +
+			`v: _|_(<2>.l[1]:cycle detected)}, ` +
+			`b: <3>{l: ["foo","bar"], v: "bar"}}`,
 	}, {
 		desc: "correct error messages",
 		// Tests that it is okay to partially evaluate structs.
@@ -1361,16 +1363,22 @@ func TestResolve(t *testing.T) {
 		// once the user specifies one.
 		desc: "resolved self-reference cycles with disjunction",
 		in: `
-			// The disjunction in xa could be resolved, but as disjunctions
-			// are not resolved for expression, it remains unresolved.
+			// The second disjunct in xa1 is not resolvable and can be
+			// eliminated:
+			//   xa4 & 9
+			//   (xa2 + 2) & 9
+			//   ((xa3 + 2) + 2) & 9
+			//   (((6 & xa1-2) + 2) + 2) & 9
+			//   ((6 + 2) + 2) & 9 // 6 == xa1-2
+			//   10 & 9 => _|_
+			// The remaining values resolve.
 			xa1: (xa2 & 8) | (xa4 & 9)
 			xa2: xa3 + 2
 			xa3: 6 & xa1-2
 			xa4: xa2 + 2
 
-			// As xb3 is a disjunction, xb2 cannot be resolved and evaluating
-			// the cycle completely is broken. However, it is not an error
-			// as the user might still resolve the disjunction.
+			// The second disjunct in xb4 can be eliminated as both disjuncts
+			// of xb3 result in an incompatible sum when substituted.
 			xb1: (xb2 & 8) | (xb4 & 9)
 			xb2: xb3 + 2
 			xb3: (6 & (xb1-2)) | (xb4 & 9)
@@ -1404,14 +1412,11 @@ func TestResolve(t *testing.T) {
 			xe5: xe2 + 2
 			xe1: 9
 
-			// TODO: this is resolvable, but requires some detection logic
-			// in disjunctions.
-			// xf1: xf2 & 8 | xf4 & 9
-			// xf2: xf3 + 2
-			// xf3: 6 & xf1-2 | xf4 & 9
-			// xf4: xf2 + 2
-			// xf1: 8
-			// xf3: 6
+			// Only one solution.
+			xf1: xf2 & 8 | xf4 & 9
+			xf2: xf3 + 2
+			xf3: 6 & xf1-2 | xf4 & 9
+			xf4: xf2 + 2
 
 			z1: z2 + 1 | z3 + 5
 			z2: z3 + 2
@@ -1419,17 +1424,17 @@ func TestResolve(t *testing.T) {
 			z3: 8
 		`,
 		out: `<0>{` +
-			`xa1: (8 | 9), ` +
-			`xa2: (<1>.xa3 + 2), ` +
-			`xa4: (<1>.xa2 + 2), ` +
-			`xa3: (6 & (<1>.xa1 - 2)), ` +
+			`xa1: 8, ` +
+			`xa2: 8, ` +
+			`xa4: 10, ` +
+			`xa3: 6, ` +
 
-			`xb1: _|_(((<1>.xb2 & 8) | (<1>.xb4 & 9)):empty disjunction: empty disjunction: cycle detected), ` +
-			`xb2: _|_(((6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
-			`xb4: _|_(((6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
-			`xb3: _|_(((6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+			`xb1: 8, ` +
+			`xb2: 8, ` +
+			`xb4: 10, ` +
+			`xb3: 6, ` +
 
-			`xc1: (8 | 9), ` +
+			`xc1: ((<1>.xc2 & 8) | (<1>.xc4 & 9) | (<1>.xc5 & 9)), ` +
 			`xc2: (<1>.xc3 + 2), ` +
 			`xc4: (<1>.xc2 + 1), ` +
 			`xc5: (<1>.xc2 + 2), ` +
@@ -1441,15 +1446,20 @@ func TestResolve(t *testing.T) {
 			`xd5: 10, ` +
 			`xd3: 6, ` +
 
-			`xe1: 9, ` +
+			`xe1: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe2: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe4: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe5: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe3: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 
-			`z1: _|_(((<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
-			`z2: _|_(((<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
-			`z3: _|_(((<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected)}`,
+			`xf1: 8, ` +
+			`xf2: 8, ` +
+			`xf4: 10, ` +
+			`xf3: 6, ` +
+
+			`z1: ((<1>.z2 + 1) | (<1>.z3 + 5)), ` +
+			`z2: (<1>.z3 + 2), ` +
+			`z3: ((<1>.z1 - 3) & 8)}`,
 	}, {
 		// Defaults should not alter the result of the above disjunctions.
 		// The results may differ, but errors and resolution should be roughly
@@ -1458,7 +1468,7 @@ func TestResolve(t *testing.T) {
 		in: `
 			// The disjunction in xa could be resolved, but as disjunctions
 			// are not resolved for expression, it remains unresolved.
-			xa1: *(xa2 & 8) | (xa4 & 9)
+			xa1: (xa2 & 8) | *(xa4 & 9)
 			xa2: xa3 + 2
 			xa3: 6 & xa1-2
 			xa4: xa2 + 2
@@ -1476,7 +1486,7 @@ func TestResolve(t *testing.T) {
 			// However, to fully determine that, all options of the remaining
 			// disjunction will have to be evaluated algebraically, which is
 			// not done.
-			xc1: *(xc2 & 8) | xc4 & 9 | xc5 & 9
+			xc1: *(xc2 & 8) | (xc4 & 9) | (xc5 & 9)
 			xc2: xc3 + 2
 			xc3: 6 & xc1-2
 			xc4: xc2 + 1
@@ -1488,7 +1498,6 @@ func TestResolve(t *testing.T) {
 			xd3: 6 & xd1-2
 			xd4: xd2 + 1
 			xd5: xd2 + 2
-			xd1: 8
 
 			// The above is resolved by setting xd1 explicitly to the wrong
 			// value, resulting in an error.
@@ -1505,37 +1514,37 @@ func TestResolve(t *testing.T) {
 			z3: 8
 		`,
 		out: `<0>{` +
-			`xa1: (*8 | 9), ` + // TODO: should resolve. Just testing logic, so okay for now.
+			`xa1: 8, ` +
 			`xa2: 8, ` +
 			`xa4: 10, ` +
 			`xa3: 6, ` +
 
-			`xb1: _|_((*(<1>.xb2 & 8) | (<1>.xb4 & 9)):empty disjunction: empty disjunction: cycle detected), ` +
-			`xb2: _|_((*(6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
-			`xb4: _|_((*(6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
-			`xb3: _|_((*(6 & (<1>.xb1 - 2)) | (<1>.xb4 & 9)):empty disjunction: cycle detected), ` +
+			`xb1: 8, ` +
+			`xb2: 8, ` +
+			`xb4: 10, ` +
+			`xb3: 6, ` +
 
-			`xc1: (*8 | 9), ` + // TODO: resolve
+			`xc1: (*8 | 9), ` + // not resolved because we use evalPartial
 			`xc2: 8, ` +
 			`xc4: 9, ` +
 			`xc5: 10, ` +
 			`xc3: 6, ` +
 
-			`xd1: 8, ` +
+			`xd1: (*8 | 9), ` + // TODO: eliminate 9?
 			`xd2: 8, ` +
 			`xd4: 9, ` +
 			`xd5: 10, ` +
 			`xd3: 6, ` +
 
-			`xe1: 9, ` +
+			`xe1: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe2: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe4: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe5: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 			`xe3: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
 
-			`z1: _|_((*(<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
-			`z2: _|_((*(<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected), ` +
-			`z3: _|_((*(<1>.z2 + 1) | (<1>.z3 + 5)):empty disjunction: cycle detected)}`,
+			`z1: (*11 | 13), ` + // 13 is eliminated with evalFull
+			`z2: 10, ` +
+			`z3: 8}`,
 	}}
 	rewriteHelper(t, testCases, evalPartial)
 }
@@ -1716,7 +1725,7 @@ func TestFullEval(t *testing.T) {
 		`,
 		out: `<0>{a: string, b: int, c: float}`,
 	}, {
-		desc: "default disambiguation",
+		desc: "default disambiguation and elimination",
 		in: `
 		a: *1 | int
 		b: *3 | int
@@ -1725,7 +1734,7 @@ func TestFullEval(t *testing.T) {
 
 		e: *1 | *1
 		`,
-		out: `<0>{a: 1, b: 3, c: _|_((*1 | *3 | int):more than one default remaining (1 and 3)), d: _|_((*3 | *1 | int):more than one default remaining (3 and 1)), e: 1}`,
+		out: `<0>{a: 1, b: 3, c: int, d: int, e: 1}`,
 	}, {
 		desc: "list comprehension",
 		in: `
@@ -1884,6 +1893,29 @@ func TestFullEval(t *testing.T) {
 			y: x & {a:3}
 		`,
 		out: `<3>{x: _|_((<0>{a: 1} | <1>{a: 2}):more than one element remaining (<0>{a: 1} and <1>{a: 2})), y: _|_((<4>.x & <5>{a: 3}):empty disjunction: <2>{a: (1 & 3)})}`,
+	}, {
+		desc: "cannot resolve references that would be ambiguous",
+		in: `
+		a1: *0 | 1
+		a1: a3 - a2
+		a2: *0 | 1
+		a2: a3 - a1
+		a3: 1
+
+		b1: (*0 | 1) & b2
+		b2: (0 | *1) & b1
+
+		c1: (*{a:1} | {b:1}) & c2
+		c2: (*{a:2} | {b:2}) & c1
+		`,
+		out: `<4>{` +
+			`a1: _|_(((*0 | 1) & (<5>.a3 - <5>.a2)):cycle detected), ` +
+			`a3: 1, ` +
+			`a2: _|_(((*0 | 1) & (<5>.a3 - <5>.a1)):cycle detected), ` +
+			`b1: _|_((0 | 1):more than one element remaining (0 and 1)), ` +
+			`b2: _|_((0 | 1):more than one element remaining (0 and 1)), ` +
+			`c1: _|_((<0>{a: 1, b: 2} | <1>{a: 2, b: 1}):more than one element remaining (<0>{a: 1, b: 2} and <1>{a: 2, b: 1})), ` +
+			`c2: _|_((<2>{a: 2, b: 1} | <3>{a: 1, b: 2}):more than one element remaining (<2>{a: 2, b: 1} and <3>{a: 1, b: 2}))}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

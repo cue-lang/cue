@@ -195,7 +195,7 @@ func (x *disjunction) rewrite(ctx *context, fn rewriteFunc) value {
 	if !changed {
 		return x
 	}
-	return &disjunction{x.baseValue, values}
+	return &disjunction{x.baseValue, values, x.hasDefaults}
 }
 
 func (x *listComprehension) rewrite(ctx *context, fn rewriteFunc) value {

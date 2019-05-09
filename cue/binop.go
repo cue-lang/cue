@@ -37,15 +37,15 @@ func unify(ctx *context, src source, left, right evaluated) evaluated {
 }
 
 func binOp(ctx *context, src source, op op, left, right evaluated) (result evaluated) {
-	if isBottom(left) {
-		if op == opUnify && ctx.exprDepth == 0 && cycleError(left) != nil {
+	if b, ok := left.(*bottom); ok {
+		if op == opUnify && b.exprDepth == 0 && cycleError(b) != nil {
 			ctx.cycleErr = true
 			return right
 		}
 		return left
 	}
-	if isBottom(right) {
-		if op == opUnify && ctx.exprDepth == 0 && cycleError(right) != nil {
+	if b, ok := right.(*bottom); ok {
+		if op == opUnify && b.exprDepth == 0 && cycleError(b) != nil {
 			ctx.cycleErr = true
 			return left
 		}
@@ -70,9 +70,9 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		if !leftKind.isGround() || !rightKind.isGround() {
 			return ctx.mkErr(src, codeIncomplete, "incomplete error")
 		}
-		ctx.exprDepth++
+		ctx.incEvalDepth()
 		v := left.binOp(ctx, src, op, right) // may return incomplete
-		ctx.exprDepth--
+		ctx.decEvalDepth()
 		return v
 	}
 
@@ -119,29 +119,41 @@ type mVal struct {
 }
 
 // distribute distributes a value over the element of a disjunction in a
-// unification operation. If allowCycle is true, references that resolve
-// to a cycle are dropped.
-func distribute(ctx *context, src source, x *disjunction, y evaluated) evaluated {
-	return dist(ctx, src, x, mVal{y, false}).val
+// unification operation.
+// TODO: this is an exponential algorithm. There is no reason to have to
+// resolve this early. Revise this to only do early pruning but not a full
+// evaluation.
+func distribute(ctx *context, src source, x, y evaluated) evaluated {
+	dn := &disjunction{baseValue: src.base()}
+	dist(ctx, dn, false, mVal{x, true}, mVal{y, true})
+	return dn.normalize(ctx, src).val
 }
 
-func dist(ctx *context, src source, dx *disjunction, y mVal) mVal {
-	dn := &disjunction{src.base(), make([]dValue, 0, len(dx.values))}
-	for _, dv := range dx.values {
-		x := mVal{dv.val.evalPartial(ctx), dv.marked}
-		src := binSrc(src.Pos(), opUnify, x.val, y.val)
-
-		var v mVal
-		if dy, ok := y.val.(*disjunction); ok {
-			v = dist(ctx, src, dy, x)
-		} else if ddv, ok := dv.val.(*disjunction); ok {
-			v = dist(ctx, src, ddv, y)
-		} else {
-			v = mVal{binOp(ctx, src, opUnify, x.val, y.val), x.mark || y.mark}
+func dist(ctx *context, d *disjunction, mark bool, x, y mVal) {
+	if dx, ok := x.val.(*disjunction); ok {
+		if dx.hasDefaults {
+			mark = true
+			d.hasDefaults = true
 		}
-		dn.add(ctx, v.val, v.mark)
+		for _, dxv := range dx.values {
+			m := dxv.marked || !dx.hasDefaults
+			dist(ctx, d, mark, mVal{dxv.val.evalPartial(ctx), m}, y)
+		}
+		return
 	}
-	return dn.normalize(ctx, src)
+	if dy, ok := y.val.(*disjunction); ok {
+		if dy.hasDefaults {
+			mark = true
+			d.hasDefaults = true
+		}
+		for _, dxy := range dy.values {
+			m := dxy.marked || !dy.hasDefaults
+			dist(ctx, d, mark, x, mVal{dxy.val.evalPartial(ctx), m})
+		}
+		return
+	}
+	src := binSrc(0, opUnify, x.val, y.val)
+	d.add(ctx, binOp(ctx, src, opUnify, x.val, y.val), mark && x.mark && y.mark)
 }
 
 func (x *disjunction) binOp(ctx *context, src source, op op, other evaluated) evaluated {

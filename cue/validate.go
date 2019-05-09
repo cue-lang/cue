@@ -17,7 +17,7 @@ package cue
 // validate returns whether there is any error, recursively.
 func validate(ctx *context, v value) *bottom {
 	eval := v.evalPartial(ctx)
-	if err, ok := eval.(*bottom); ok && err.code != codeIncomplete {
+	if err, ok := eval.(*bottom); ok && err.code != codeIncomplete && err.code != codeCycle {
 		return eval.(*bottom)
 	}
 	switch x := eval.(type) {

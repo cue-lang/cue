@@ -66,6 +66,7 @@ type bottom struct {
 
 	index          *index
 	code           errCode
+	exprDepth      int
 	value          value
 	offendingValue value
 	replacement    evaluated // for cycle resolution
@@ -142,20 +143,6 @@ func cycleError(v evaluated) *bottom {
 	}
 	return nil
 }
-
-// sentinel values used for signalling a type of error.
-var (
-	// errNonGround =  // values are not compatible
-	cycleSentinel = &bottom{
-		code: codeCycle,
-		msg:  "cycle detected",
-	}
-
-	// unifyNotSupported may be returned when a node implementation cannot
-	// handle the other type. In this case it may still be the case that the
-	// converse can be implemented.
-	// unifyNotSupported node = &bottom{}
-)
 
 func (idx *index) mkErrUnify(src source, a, b evaluated) evaluated {
 	if err := firstBottom(a, b); err != nil {

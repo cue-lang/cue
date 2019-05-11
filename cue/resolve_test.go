@@ -137,7 +137,7 @@ func TestBasicRewrite(t *testing.T) {
 			`s1: =~"c", ` +
 			`s2: (!="b" & =~"[a-z]"), ` +
 
-			`e1: _|_(("foo" =~ 1):unsupported op =~(string, number)), ` +
+			`e1: _|_(("foo" =~ 1):unsupported op =~(string, int)), ` +
 			`e2: _|_(("foo" !~ true):unsupported op !~(string, bool)), ` +
 			`e3: _|_((!="a" & <5):unsupported op &((string)*, (number)*))}`,
 	}, {
@@ -159,10 +159,11 @@ func TestBasicRewrite(t *testing.T) {
 			v5: i1 div i2
 
 			e0: 2 + "a"
-			e1: 2.0 / i1
-			e2: i1 / 2.0
-			e3: 3.0 % i2
-			e4: i1 % 2.0
+			// these are now all alloweed
+			// e1: 2.0 / i1
+			// e2: i1 / 2.0
+			// e3: 3.0 % i2
+			// e4: i1 % 2.0
 			e5: 1.0 div 2
 			e6: 2 rem 2.0
 			e7: 2 quo 2.0
@@ -180,15 +181,15 @@ func TestBasicRewrite(t *testing.T) {
 			`v4: 2.0, ` +
 			`v5: 0, ` +
 
-			`e0: _|_((2 + "a"):unsupported op +(number, string)), ` +
-			`e1: _|_((2.0 / 1):unsupported op /(float, int)), ` +
-			`e2: _|_((1 / 2.0):unsupported op /(int, float)), ` +
-			`e3: _|_((3.0 % 2):unsupported op %(float, int)), ` +
-			`e4: _|_((1 % 2.0):unsupported op %(int, float)), ` +
-			`e5: _|_((1.0 div 2):unsupported op div(float, number)), ` +
-			`e6: _|_((2 rem 2.0):unsupported op rem(number, float)), ` +
-			`e7: _|_((2 quo 2.0):unsupported op quo(number, float)), ` +
-			`e8: _|_((1.0 mod 1):unsupported op mod(float, number))}`,
+			`e0: _|_((2 + "a"):unsupported op +(int, string)), ` +
+			// `e1: _|_((2.0 / 1):unsupported op /(float, int)), ` +
+			// `e2: _|_((1 / 2.0):unsupported op /(int, float)), ` +
+			// `e3: _|_((3.0 % 2):unsupported op %(float, int)), ` +
+			// `e4: _|_((1 % 2.0):unsupported op %(int, float)), ` +
+			`e5: _|_((1.0 div 2):unsupported op div(float, int)), ` +
+			`e6: _|_((2 rem 2.0):unsupported op rem(int, float)), ` +
+			`e7: _|_((2 quo 2.0):unsupported op quo(int, float)), ` +
+			`e8: _|_((1.0 mod 1):unsupported op mod(float, int))}`,
 	}, {
 		desc: "integer-specific arithmetic",
 		in: `
@@ -223,17 +224,17 @@ func TestBasicRewrite(t *testing.T) {
 			// TODO: handle divide by zero
 			`,
 		out: `<0>{q1: 2, q2: -2, q3: -2, q4: 2, ` +
-			`qe1: _|_((2.0 quo 1):unsupported op quo(float, number)), ` +
-			`qe2: _|_((2 quo 1.0):unsupported op quo(number, float)), ` +
+			`qe1: _|_((2.0 quo 1):unsupported op quo(float, int)), ` +
+			`qe2: _|_((2 quo 1.0):unsupported op quo(int, float)), ` +
 			`r1: 1, r2: 1, r3: -1, r4: -1, re1: ` +
-			`_|_((2.0 rem 1):unsupported op rem(float, number)), ` +
-			`re2: _|_((2 rem 1.0):unsupported op rem(number, float)), ` +
+			`_|_((2.0 rem 1):unsupported op rem(float, int)), ` +
+			`re2: _|_((2 rem 1.0):unsupported op rem(int, float)), ` +
 			`d1: 2, d2: -2, d3: -3, d4: 3, ` +
-			`de1: _|_((2.0 div 1):unsupported op div(float, number)), ` +
-			`de2: _|_((2 div 1.0):unsupported op div(number, float)), ` +
+			`de1: _|_((2.0 div 1):unsupported op div(float, int)), ` +
+			`de2: _|_((2 div 1.0):unsupported op div(int, float)), ` +
 			`m1: 1, m2: 1, m3: 1, m4: 1, ` +
-			`me1: _|_((2.0 mod 1):unsupported op mod(float, number)), ` +
-			`me2: _|_((2 mod 1.0):unsupported op mod(number, float))}`,
+			`me1: _|_((2.0 mod 1):unsupported op mod(float, int)), ` +
+			`me2: _|_((2 mod 1.0):unsupported op mod(int, float))}`,
 	}, {
 		desc: "booleans",
 		in: `
@@ -337,7 +338,7 @@ func TestBasicRewrite(t *testing.T) {
 			e4: [1, 2, ...>=4 & <=5] & [1, 2, 4, 8]
 			e5: [1, 2, 4, 8] & [1, 2, ...>=4 & <=5]
 			`,
-		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, number)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)], e5: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)]}`,
+		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, int)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)], e5: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)]}`,
 	}, {
 		desc: "list arithmetic",
 		in: `
@@ -371,7 +372,7 @@ func TestBasicRewrite(t *testing.T) {
 			g: {a: 1}["b"]
 			h: [3].b
 			`,
-		out: `<0>{obj: <1>{a: 1, b: 2}, index: 2, mulidx: 3, e: _|_(4:invalid struct index 4 (type number)), f: _|_(<2>{a: 1}.b:undefined field "b"), g: _|_(<3>{a: 1}["b"]:undefined field "b"), h: _|_([3]:invalid operation: [3].b (type list does not support selection))}`,
+		out: `<0>{obj: <1>{a: 1, b: 2}, index: 2, mulidx: 3, e: _|_(4:invalid struct index 4 (type int)), f: _|_(<2>{a: 1}.b:undefined field "b"), g: _|_(<3>{a: 1}["b"]:undefined field "b"), h: _|_([3]:invalid operation: [3].b (type list does not support selection))}`,
 	}, {
 		desc: "obj unify",
 		in: `
@@ -384,7 +385,7 @@ func TestBasicRewrite(t *testing.T) {
 			e: 1                       // 1 & {a:3}
 			e: {a:3}
 			`,
-		out: "<0>{o1: <1>{a: 1, b: 2}, o2: <2>{a: 1, b: 2}, o3: <3>{a: 1, b: 2}, o4: <4>{a: 1, b: 2}, e: _|_((1 & <5>{a: 3}):unsupported op &(number, struct))}",
+		out: "<0>{o1: <1>{a: 1, b: 2}, o2: <2>{a: 1, b: 2}, o3: <3>{a: 1, b: 2}, o4: <4>{a: 1, b: 2}, e: _|_((1 & <5>{a: 3}):unsupported op &(int, struct))}",
 	}, {
 		desc: "disjunctions",
 		in: `
@@ -436,7 +437,7 @@ func TestBasicRewrite(t *testing.T) {
 			p: +true
 			m: -false
 		`,
-		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):unsupported op &((int)*, (string)*)), e2: _|_((1 & string):unsupported op &(number, (string)*)), b: _|_(!int:unary '!' requires bool value, found (int)*), p: _|_(+true:unary '+' requires numeric value, found bool), m: _|_(-false:unary '-' requires numeric value, found bool)}`,
+		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):unsupported op &((int)*, (string)*)), e2: _|_((1 & string):unsupported op &(int, (string)*)), b: _|_(!int:unary '!' requires bool value, found (int)*), p: _|_(+true:unary '+' requires numeric value, found bool), m: _|_(-false:unary '-' requires numeric value, found bool)}`,
 	}, {
 		desc: "comparison",
 		in: `
@@ -450,7 +451,7 @@ func TestBasicRewrite(t *testing.T) {
 			seq: "a" + "b" == "ab"
 			err: 2 == "s"
 		`,
-		out: `<0>{lss: true, leq: true, eql: true, neq: true, gtr: true, geq: true, seq: true, err: _|_((2 == "s"):unsupported op ==(number, string))}`,
+		out: `<0>{lss: true, leq: true, eql: true, neq: true, gtr: true, geq: true, seq: true, err: _|_((2 == "s"):unsupported op ==(int, string))}`,
 	}, {
 		desc: "null",
 		in: `
@@ -593,7 +594,7 @@ func TestResolve(t *testing.T) {
 				e1: 2.0 % (3&int)
 				e2: int & 4.0/2.0
 				`,
-		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: _|_((2.0 % 3):unsupported op %(float, int)), e2: _|_((int & 2):unsupported op &((int)*, float))}`,
+		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: 2.0, e2: _|_((int & 2):unsupported op &((int)*, float))}`,
 	}, {
 		desc: "inequality",
 		in: `
@@ -662,7 +663,7 @@ func TestResolve(t *testing.T) {
 
 			s20: >=10 & <=10             // 10
 
-			s22:  >5 & <=6                // no simplification
+			s22:  >5 & <=6               // no simplification
 			s22a: >5 & (<=6 & int)       // 6
 			s22b: (int & >5) & <=6       // 6
 			s22c: >=5 & (<6 & int)       // 5
@@ -722,7 +723,7 @@ func TestResolve(t *testing.T) {
 			`s23d: 1, ` +
 			`s23e: (>0.0 & <2.0), ` +
 
-			`s30: >0, ` +
+			`s30: int & >0, ` +
 
 			`e1: _|_((!=null & null):null excluded by !=null), ` +
 			`e2: _|_((!=null & null):null excluded by !=null), ` +
@@ -764,7 +765,7 @@ func TestResolve(t *testing.T) {
 			e5: [1,2,3][-1]
 			e6: (*[]|{})[1]
 		`,
-		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type number does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds)}`,
+		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds)}`,
 	}, {
 		desc: "string index",
 		in: `
@@ -800,7 +801,7 @@ func TestResolve(t *testing.T) {
 			e7: [2][:"9"]
 
 		`,
-		out: `<0>{a: [], b: [], e1: _|_(1:slice bounds out of range), e2: _|_([0]:negative slice index), e3: _|_([0]:invalid slice index: 1 > 0), e4: _|_(2:slice bounds out of range), e5: _|_(4:cannot slice 4 (type number)), e6: _|_("":invalid slice index "" (type string)), e7: _|_("9":invalid slice index "9" (type string))}`,
+		out: `<0>{a: [], b: [], e1: _|_(1:slice bounds out of range), e2: _|_([0]:negative slice index), e3: _|_([0]:invalid slice index: 1 > 0), e4: _|_(2:slice bounds out of range), e5: _|_(4:cannot slice 4 (type int)), e6: _|_("":invalid slice index "" (type string)), e7: _|_("9":invalid slice index "9" (type string))}`,
 	}, {
 		desc: "string slice",
 		in: `
@@ -1047,7 +1048,7 @@ func TestResolve(t *testing.T) {
 		in: `
 			a: "a" & 1
 			`,
-		out: `<0>{a: _|_(("a" & 1):unsupported op &(string, number))}`,
+		out: `<0>{a: _|_(("a" & 1):unsupported op &(string, int))}`,
 	}, {
 		desc: "structs",
 		in: `
@@ -1185,7 +1186,7 @@ func TestResolve(t *testing.T) {
 				k: 1
 			}
 			b: {
-				<x>: { x: 0, y: 1 | int }
+				<x>: { x: 0, y: *1 | int }
 				v: {}
 				w: { x: 0 }
 			}
@@ -1196,7 +1197,7 @@ func TestResolve(t *testing.T) {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (1 | int)} & <6>{}), v: <7>{x: 0, y: (1 | int)}, w: <8>{x: 0, y: (1 | int)}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
 		desc: "range unification",
 		in: `
@@ -1257,8 +1258,8 @@ func TestResolve(t *testing.T) {
 			`a8: 5, ` +
 
 			// TODO: improve error
-			`a9: _|_((6 & <=5):unsupported op &(number, (number)*)), ` +
-			`a10: _|_((0 & >=1):unsupported op &(number, (number)*)), ` +
+			`a9: _|_((<=5 & 6):6 not within bound <=5), ` +
+			`a10: _|_((>=1 & 0):0 not within bound >=1), ` +
 
 			`b1: (>=1 & <=5), ` +
 			`b2: 1, ` +
@@ -1274,14 +1275,14 @@ func TestResolve(t *testing.T) {
 			`b12: (>=3 & <=5), ` +
 			`b13: 5, ` +
 			`b14: _|_(incompatible bounds >=6 and <=5), ` +
-			`c1: (>=1 & <=5), ` +
-			`c2: (<=5 & >=1), ` +
+			`c1: (int & >=1 & <=5), ` +
+			`c2: (<=5 & int & >=1), ` +
 			`c3: _|_((string & >=1):unsupported op &((string)*, (number)*)), ` +
 			`c4: _|_(((>=1 & <=5) & string):unsupported op &((number)*, (string)*)), ` +
 			`s1: "e", ` +
 			`s2: "ee", ` +
 			`n1: (>=1 & <=2), ` +
-			`n2: _|_((int & >=1.1):unsupported op &((int)*, (float)*)), ` +
+			`n2: (int & >=1.1 & <=1.3), ` +
 			`n3: 2, ` +
 			`n4: 0.09999, ` +
 			`n5: 2.5}`,
@@ -1298,7 +1299,7 @@ func TestResolve(t *testing.T) {
 			e1: 100_000
 		`,
 		out: `<0>{k1: 44, k2: -8000000000, ` +
-			`e1: _|_((<=32767 & 100000):100000 not within bound <=32767)}`,
+			`e1: _|_((int & <=32767 & 100000):100000 not within bound int & <=32767)}`,
 	}, {
 		desc: "field comprehensions",
 		in: `
@@ -1545,7 +1546,7 @@ func TestFullEval(t *testing.T) {
 		in: `
 				a: 8000.9
 				a: 7080 | int`,
-		out: `<0>{a: _|_((8000.9 & (7080 | int)):empty disjunction: cannot unify numbers 7080 and 8000.9)}`,
+		out: `<0>{a: _|_((8000.9 & int):unsupported op &(float, (int)*))}`,
 	}, {
 		desc: "resolve all disjunctions",
 		in: `
@@ -1710,10 +1711,10 @@ func TestFullEval(t *testing.T) {
 		desc: "normalization",
 		in: `
 			a: string | string
-			b: *1 | *int  // 1 == int(1) | float(1)
+			b: *1 | *int
 			c: *1.0 | *float
 		`,
-		out: `<0>{a: string, b: _|_((*1 | *int):more than one default remaining (1 and int)), c: float}`,
+		out: `<0>{a: string, b: int, c: float}`,
 	}, {
 		desc: "default disambiguation",
 		in: `
@@ -1808,9 +1809,9 @@ func TestFullEval(t *testing.T) {
 		MyIP: Inst & [_, _, 10, 10 ]
 		`,
 		out: `<0>{` +
-			`IP: [(>=0 & <=255),(>=0 & <=255),(>=0 & <=255),(>=0 & <=255)], ` +
-			`Private: [192,168,(>=0 & <=255),(>=0 & <=255)], ` +
-			`Inst: [10,10,(>=0 & <=255),(>=0 & <=255)], ` +
+			`IP: [(int & >=0 & int & <=255),(int & >=0 & int & <=255),(int & >=0 & int & <=255),(int & >=0 & int & <=255)], ` +
+			`Private: [192,168,(int & >=0 & int & <=255),(int & >=0 & int & <=255)], ` +
+			`Inst: [10,10,(int & >=0 & int & <=255),(int & >=0 & int & <=255)], ` +
 			`MyIP: [10,10,10,10]` +
 			`}`,
 	}, {

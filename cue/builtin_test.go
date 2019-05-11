@@ -94,7 +94,7 @@ func TestBuiltins(t *testing.T) {
 		`"Hello World!"`,
 	}, {
 		test("strings", `strings.Join([1, 2], " ")`),
-		`_|_(<0>.Join ([1,2]," "):list element 1: not of right kind (number vs string))`,
+		`_|_(<0>.Join ([1,2]," "):list element 1: not of right kind (int vs string))`,
 	}, {
 		test("math/bits", `bits.Or(0x8, 0x1)`),
 		`9`,

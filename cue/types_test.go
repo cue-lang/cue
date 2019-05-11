@@ -102,8 +102,8 @@ func TestValueType(t *testing.T) {
 		incompleteKind: BoolKind,
 	}, {
 		value:          `2`,
-		kind:           NumberKind,
-		incompleteKind: NumberKind,
+		kind:           IntKind,
+		incompleteKind: IntKind,
 		concrete:       true,
 	}, {
 		value:          `2.0`,
@@ -112,13 +112,13 @@ func TestValueType(t *testing.T) {
 		concrete:       true,
 	}, {
 		value:          `2.0Mi`,
-		kind:           NumberKind,
-		incompleteKind: NumberKind,
+		kind:           IntKind,
+		incompleteKind: IntKind,
 		concrete:       true,
 	}, {
 		value:          `14_000`,
-		kind:           NumberKind,
-		incompleteKind: NumberKind,
+		kind:           IntKind,
+		incompleteKind: IntKind,
 		concrete:       true,
 	}, {
 		value:          `>=0 & <5`,
@@ -280,7 +280,7 @@ func TestFloat(t *testing.T) {
 		exp:     0,
 		float64: 1,
 		fmt:     'g',
-		kind:    NumberKind,
+		kind:    IntKind,
 	}, {
 		value:   "-1",
 		float:   "-1",
@@ -288,7 +288,7 @@ func TestFloat(t *testing.T) {
 		exp:     0,
 		float64: -1,
 		fmt:     'g',
-		kind:    NumberKind,
+		kind:    IntKind,
 	}, {
 		value:   "1.0",
 		float:   "1.0",
@@ -727,7 +727,7 @@ func TestLen(t *testing.T) {
 		length: "2",
 	}, {
 		input:  "[1, 3, ...]",
-		length: ">=2",
+		length: "int & >=2",
 	}, {
 		input:  `"foo"`,
 		length: "3",
@@ -740,7 +740,7 @@ func TestLen(t *testing.T) {
 		// 	length: "2",
 	}, {
 		input:  "3",
-		length: "_|_(3:len not supported for type 24)",
+		length: "_|_(3:len not supported for type 8)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
@@ -1030,7 +1030,7 @@ func TestValueLookup(t *testing.T) {
 	}, {
 		config: config,
 		path:   strList("b", "d", "lookup in non-struct"),
-		str:    "not of right kind (number vs struct)",
+		str:    "not of right kind (int vs struct)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.str, func(t *testing.T) {

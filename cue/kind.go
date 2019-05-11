@@ -191,7 +191,14 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 	if valBits == bottomKind {
 		k := nullKind
 		switch op {
+		case opLss, opLeq, opGtr, opGeq:
+			if a.isAnyOf(numKind) && b.isAnyOf(numKind) {
+				return boolKind, false
+			}
 		case opEql, opNeq:
+			if a.isAnyOf(numKind) && b.isAnyOf(numKind) {
+				return boolKind, false
+			}
 			fallthrough
 		case opUnify:
 			if a&nullKind != 0 {
@@ -201,6 +208,10 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 				return k, true
 			}
 			return bottomKind, false
+		case opRem, opQuo, opMul, opAdd, opSub:
+			if a.isAnyOf(numKind) && b.isAnyOf(numKind) {
+				return floatKind, false
+			}
 		}
 		if op == opMul {
 			if a.isAnyOf(listKind|stringKind|bytesKind) && b.isAnyOf(intKind) {
@@ -266,11 +277,11 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 			return u&scalarKinds | catBits, false
 		}
 	case opRem:
-		if u.isAnyOf(floatKind) {
+		if u.isAnyOf(numKind) {
 			return floatKind | catBits, false
 		}
 	case opQuo:
-		if u.isAnyOf(floatKind) {
+		if u.isAnyOf(numKind) {
 			return floatKind | catBits, false
 		}
 	case opIRem, opIMod:

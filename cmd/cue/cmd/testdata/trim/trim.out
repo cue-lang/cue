@@ -28,11 +28,6 @@ foo bar: {
 	b:      "foo"
 	c:      45
 
-	// The template does not require that this field be an integer (it may be
-	// a float), and thus this field specified additional information and
-	// cannot be removed.
-	n: int
-
 	sList: [{b: "foo"}, {}]
 }
 

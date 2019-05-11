@@ -181,7 +181,7 @@ func (x *bound) evalPartial(ctx *context) (result evaluated) {
 	if v == x.value {
 		return x
 	}
-	return &bound{x.baseValue, x.op, v}
+	return newBound(x.baseValue, x.op, x.k, v)
 }
 
 func (x *interpolation) evalPartial(ctx *context) (result evaluated) {

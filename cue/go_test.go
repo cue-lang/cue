@@ -145,7 +145,7 @@ func TestConvertType(t *testing.T) {
 			F *big.Float
 		}{},
 		// TODO: indicate that B is explicitly an int only.
-		`<0>{A: ((>=-9223372036854775808 & <=9223372036854775807) & (>=0 & <100)), ` +
+		`<0>{A: ((int & >=-9223372036854775808 & int & <=9223372036854775807) & (>=0 & <100)), ` +
 			`B: >=0, ` +
 			`C?: _, ` +
 			`D: int, ` +
@@ -160,7 +160,7 @@ func TestConvertType(t *testing.T) {
 			L []byte
 			T time.Time
 		}{},
-		`(*null | <0>{A: ((>=-32768 & <=32767) & (>=0 & <100)), ` +
+		`(*null | <0>{A: ((int & >=-32768 & int & <=32767) & (>=0 & <100)), ` +
 			`C: string, ` +
 			`D: bool, ` +
 			`F: float, ` +
@@ -174,9 +174,9 @@ func TestConvertType(t *testing.T) {
 			C int8 `cue:"A+B"`
 		}{},
 		// TODO: should B be marked as optional?
-		`<0>{A: ((>=-128 & <=127) & (<0>.C - <0>.B)), ` +
-			`B?: ((>=-128 & <=127) & (<0>.C - <0>.A)), ` +
-			`C: ((>=-128 & <=127) & (<0>.A + <0>.B))}`,
+		`<0>{A: ((int & >=-128 & int & <=127) & (<0>.C - <0>.B)), ` +
+			`B?: ((int & >=-128 & int & <=127) & (<0>.C - <0>.A)), ` +
+			`C: ((int & >=-128 & int & <=127) & (<0>.A + <0>.B))}`,
 	}, {
 		[]string{},
 		`(*null | [, ...string])`,
@@ -188,7 +188,7 @@ func TestConvertType(t *testing.T) {
 		`(*null | ` +
 			`<0>{<>: <1>(_: string)-><2>{` +
 			`A?: (*null | ` +
-			`<3>{<>: <4>(_: string)->(>=0 & <=18446744073709551615), })}, })`,
+			`<3>{<>: <4>(_: string)->(int & >=0 & int & <=18446744073709551615), })}, })`,
 	}, {
 		map[float32]int{},
 		`_|_(type float32 not supported as key type)`,

@@ -1934,6 +1934,7 @@ These terms and the result of the comparisons are defined as follows:
 - Integer values are comparable and ordered, in the usual way.
 - Floating-point values are comparable and ordered, as per the definitions
   for binary coded decimals in the IEEE-754-2008 standard.
+- Floating point numbers may be compared with integers.
 - String values are comparable and ordered, lexically byte-wise after
   normalization to Unicode normal form NFC.
 - Struct are not comparable.
@@ -1948,6 +1949,7 @@ These terms and the result of the comparisons are defined as follows:
 
 ```
 3 < 4       // true
+3 < 4.0     // true
 null == 2   // false
 null != {}  // true
 {} == {}    // _|_: structs are not comparable against structs

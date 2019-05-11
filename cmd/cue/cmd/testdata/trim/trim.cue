@@ -32,9 +32,6 @@ foo bar: {
 	e: string
 	f: ">> here <<"
 
-	// The template does not require that this field be an integer (it may be
-	// a float), and thus this field specified additional information and
-	// cannot be removed.
 	n: int
 
 	struct: {a: 3.0}

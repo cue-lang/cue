@@ -88,7 +88,7 @@ func (x *bound) rewrite(ctx *context, fn rewriteFunc) value {
 	if v == x.value {
 		return x
 	}
-	return &bound{x.baseValue, x.op, v}
+	return newBound(x.baseValue, x.op, x.k, v)
 }
 
 func (x *interpolation) rewrite(ctx *context, fn rewriteFunc) value {

@@ -393,21 +393,28 @@ func (x *durationLit) strValue() string { return x.d.String() }
 
 type bound struct {
 	baseValue
-	op    op // opNeq, opLss, opLeq, opGeq, or opGtr
+	op    op   // opNeq, opLss, opLeq, opGeq, or opGtr
+	k     kind // mostly used for number kind
 	value value
 }
 
-func (x *bound) kind() kind {
-	k := x.value.kind()
-	if x.op == opNeq && k&atomKind == nullKind {
-		k = typeKinds &^ nullKind
+func newBound(base baseValue, op op, k kind, v value) *bound {
+	kv := v.kind()
+	if kv.isAnyOf(numKind) {
+		kv |= numKind
+	} else if op == opNeq && kv&atomKind == nullKind {
+		kv = typeKinds &^ nullKind
 	}
-	return k | nonGround
+	return &bound{base, op, unifyType(k&topKind, kv) | nonGround, v}
+}
+
+func (x *bound) kind() kind {
+	return x.k
 }
 
 func mkIntRange(a, b string) evaluated {
-	from := &bound{op: opGeq, value: parseInt(intKind, a)}
-	to := &bound{op: opLeq, value: parseInt(intKind, b)}
+	from := newBound(baseValue{}, opGeq, intKind, parseInt(intKind, a))
+	to := newBound(baseValue{}, opLeq, intKind, parseInt(intKind, b))
 	e := &unification{
 		binSrc(token.NoPos, opUnify, from, to),
 		[]evaluated{from, to},
@@ -422,8 +429,8 @@ func mkIntRange(a, b string) evaluated {
 }
 
 func mkFloatRange(a, b string) evaluated {
-	from := &bound{op: opGeq, value: parseFloat(a)}
-	to := &bound{op: opLeq, value: parseFloat(b)}
+	from := newBound(baseValue{}, opGeq, numKind, parseFloat(a))
+	to := newBound(baseValue{}, opLeq, numKind, parseFloat(b))
 	e := &unification{
 		binSrc(token.NoPos, opUnify, from, to),
 		[]evaluated{from, to},
@@ -449,7 +456,7 @@ var predefinedRanges = map[string]evaluated{
 
 	// Do not include an alias for "byte", as it would be too easily confused
 	// with the builtin "bytes".
-	"uint":    &bound{op: opGeq, value: parseInt(intKind, "0")},
+	"uint":    newBound(baseValue{}, opGeq, intKind, parseInt(intKind, "0")),
 	"uint8":   mkIntRange("0", "255"),
 	"uint16":  mkIntRange("0", "65535"),
 	"uint32":  mkIntRange("0", "4294967295"),

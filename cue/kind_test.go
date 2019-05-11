@@ -39,7 +39,7 @@ func TestMatchBinOpKind(t *testing.T) {
 		op:   opMul,
 		a:    floatKind,
 		b:    intKind,
-		want: bottomKind,
+		want: floatKind,
 	}, {
 		op:   opMul,
 		a:    listKind,

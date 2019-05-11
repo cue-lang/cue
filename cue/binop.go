@@ -304,11 +304,11 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 		}
 		switch y := other.(type) {
 		case *basicType:
-			v := unify(ctx, src, xv, y)
-			if v == xv {
+			k := unifyType(x.k, y.kind())
+			if k == x.k {
 				return x
 			}
-			return &bound{newSrc.base(), x.op, v}
+			return newBound(newSrc.base(), x.op, k, xv)
 
 		case *bound:
 			yv := y.value.(evaluated)
@@ -770,7 +770,7 @@ func (x *numLit) updateNumInfo(a, b *numLit) {
 
 func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch y := other.(type) {
-	case *basicType:
+	case *basicType, *bound: // for better error reporting
 		if op == opUnify {
 			return y.binOp(ctx, src, op, x)
 		}

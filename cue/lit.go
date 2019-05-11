@@ -306,7 +306,7 @@ exponent:
 			mul |= mulDec
 		}
 		n := &numLit{
-			numBase: newNumBase(p.node, newNumInfo(numKind, mul, 10, p.useSep)),
+			numBase: newNumBase(p.node, newNumInfo(intKind, mul, 10, p.useSep)),
 		}
 		n.v.UnmarshalText(p.buf)
 		p.ctx.Mul(&n.v, &n.v, mulToRat[mul])
@@ -335,7 +335,7 @@ exit:
 		f.v.UnmarshalText(p.buf)
 		return f
 	}
-	i := &numLit{numBase: newNumBase(p.node, newNumInfo(numKind, 0, base, p.useSep))}
+	i := &numLit{numBase: newNumBase(p.node, newNumInfo(intKind, 0, base, p.useSep))}
 	i.v.Coeff.SetString(string(p.buf), base)
 	return i
 }

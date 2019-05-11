@@ -25,7 +25,7 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-var defIntBase = newNumBase(&ast.BasicLit{}, newNumInfo(numKind, 0, 10, false))
+var defIntBase = newNumBase(&ast.BasicLit{}, newNumInfo(intKind, 0, 10, false))
 var defRatBase = newNumBase(&ast.BasicLit{}, newNumInfo(floatKind, 0, 10, false))
 
 func mkInt(a int64) *numLit {
@@ -79,12 +79,12 @@ var (
 func TestLiterals(t *testing.T) {
 	mkMul := func(x int64, m multiplier, base int) *numLit {
 		return &numLit{
-			newNumBase(&ast.BasicLit{}, newNumInfo(numKind, m, base, false)),
+			newNumBase(&ast.BasicLit{}, newNumInfo(intKind, m, base, false)),
 			mkBigInt(x),
 		}
 	}
 	hk := &numLit{
-		newNumBase(&ast.BasicLit{}, newNumInfo(numKind, 0, 10, true)),
+		newNumBase(&ast.BasicLit{}, newNumInfo(intKind, 0, 10, true)),
 		mkBigInt(100000),
 	}
 	testCases := []struct {

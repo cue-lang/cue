@@ -333,6 +333,12 @@ func (p *printer) debugStr(v interface{}) {
 	case *durationLit:
 		write(x.d.String())
 	case *bound:
+		switch x.k & numKind {
+		case intKind:
+			p.writef("int & ")
+		case floatKind:
+			p.writef("float & ")
+		}
 		p.writef("%v", x.op)
 		p.debugStr(x.value)
 	case *interpolation:

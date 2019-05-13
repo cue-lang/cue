@@ -85,6 +85,7 @@ func (*ImportDecl) declNode()        {}
 func (*BadDecl) declNode()           {}
 func (*EmitDecl) declNode()          {}
 func (*Alias) declNode()             {}
+func (*CommentGroup) declNode()      {}
 
 // A Label is any prduction that can be used as a LHS label.
 type Label interface {
@@ -177,7 +178,7 @@ func (c *Comment) End() token.Pos { return c.Slash.Add(len(c.Text)) }
 // A CommentGroup represents a sequence of comments
 // with no other tokens and no empty lines between.
 type CommentGroup struct {
-	// TODO: remove and use the token position of the first commment.
+	// TODO: remove and use the token position of the first comment.
 	Doc  bool
 	Line bool // true if it is on the same line as the node's end pos.
 
@@ -630,6 +631,9 @@ func (d *ImportDecl) End() token.Pos {
 	if d.Rparen.IsValid() {
 		return d.Rparen.Add(1)
 	}
+	if len(d.Specs) == 0 {
+		return token.NoPos
+	}
 	return d.Specs[0].End()
 }
 func (d *EmitDecl) End() token.Pos { return d.Expr.End() }
@@ -647,9 +651,10 @@ type File struct {
 	comments
 	Package token.Pos // position of "package" pseudo-keyword
 	Name    *Ident    // package names
+	Decls   []Decl    // top-level declarations; or nil
+
 	// TODO: Change Expr to Decl?
 	Imports    []*ImportSpec // imports in this file
-	Decls      []Decl        // top-level declarations; or nil
 	Unresolved []*Ident      // unresolved identifiers in this file
 }
 
@@ -662,6 +667,7 @@ func (f *File) Pos() token.Pos {
 	}
 	return token.NoPos
 }
+
 func (f *File) End() token.Pos {
 	if n := len(f.Decls); n > 0 {
 		return f.Decls[n-1].End()

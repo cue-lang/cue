@@ -181,9 +181,6 @@ func walk(v visitor, node ast.Node) {
 			walk(v, n.Name)
 		}
 		walkDeclList(v, n.Decls)
-		// don't walk n.Comments - they have been
-		// visited already through the individual
-		// nodes
 
 	case *ast.ListComprehension:
 		walk(v, n.Expr)

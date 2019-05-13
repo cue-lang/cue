@@ -207,6 +207,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.print(n.Import, "import")
 		if len(n.Specs) == 0 {
 			f.print(blank, n.Lparen, token.LPAREN, n.Rparen, token.RPAREN, newline)
+			break
 		}
 		switch {
 		case len(n.Specs) == 1:
@@ -232,6 +233,11 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.print(blank, n.Equal, token.BIND, blank)
 		f.expr(n.Expr)
 		f.print(declcomma, newline) // implied
+
+	case *ast.CommentGroup:
+		f.print(newsection)
+		f.printComment(n)
+		f.print(newsection)
 	}
 after:
 	f.after(decl)

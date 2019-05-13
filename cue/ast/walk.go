@@ -100,9 +100,7 @@ func walk(v visitor, node Node) {
 		}
 
 	case *StructLit:
-		for _, f := range n.Elts {
-			walk(v, f)
-		}
+		walkDeclList(v, n.Elts)
 
 	// Expressions
 	case *BottomLit, *BadExpr, *Ident, *BasicLit:
@@ -187,9 +185,6 @@ func walk(v visitor, node Node) {
 			walk(v, n.Name)
 		}
 		walkDeclList(v, n.Decls)
-		// don't walk n.Comments - they have been
-		// visited already through the individual
-		// nodes
 
 	case *ListComprehension:
 		walk(v, n.Expr)

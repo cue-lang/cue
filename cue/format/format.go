@@ -299,28 +299,37 @@ func (f *formatter) after(node ast.Node) {
 func (f *formatter) visitComments(until int8) {
 	c := &f.current
 
+	printed := false
 	for ; len(c.cg) > 0 && c.cg[0].Position <= until; c.cg = c.cg[1:] {
-		f.Print(c.cg[0])
-
-		printBlank := false
-		if c.cg[0].Doc {
-			f.Print(newline)
-			printBlank = true
+		if printed {
+			f.Print(newsection)
 		}
-		for _, c := range c.cg[0].List {
-			isEnd := strings.HasPrefix(c.Text, "//")
-			if !printBlank {
-				if isEnd {
-					f.Print(vtab)
-				} else {
-					f.Print(blank)
-				}
-			}
-			f.Print(c.Slash)
-			f.Print(c)
+		printed = true
+		f.printComment(c.cg[0])
+	}
+}
+
+func (f *formatter) printComment(cg *ast.CommentGroup) {
+	f.Print(cg)
+
+	printBlank := false
+	if cg.Doc {
+		f.Print(newline)
+		printBlank = true
+	}
+	for _, c := range cg.List {
+		isEnd := strings.HasPrefix(c.Text, "//")
+		if !printBlank {
 			if isEnd {
-				f.Print(newline)
+				f.Print(vtab)
+			} else {
+				f.Print(blank)
 			}
+		}
+		f.Print(c.Slash)
+		f.Print(c)
+		if isEnd {
+			f.Print(newline)
 		}
 	}
 }

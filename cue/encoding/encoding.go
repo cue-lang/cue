@@ -31,7 +31,7 @@ func (e *Encoding) Name() string {
 
 // All returns all known encodings.
 func All() []*Encoding {
-	return []*Encoding{jsonEnc, yamlEnc}
+	return []*Encoding{jsonEnc, yamlEnc, protodefEnc}
 }
 
 // MapExtension returns the likely encoding for a given file extension.
@@ -40,8 +40,9 @@ func MapExtension(ext string) *Encoding {
 }
 
 var (
-	jsonEnc = &Encoding{name: "json"}
-	yamlEnc = &Encoding{name: "yaml"}
+	jsonEnc     = &Encoding{name: "json"}
+	yamlEnc     = &Encoding{name: "yaml"}
+	protodefEnc = &Encoding{name: "protobuf"}
 )
 
 // extensions maps a file extension to a Kind.
@@ -51,4 +52,5 @@ var extensions = map[string]*Encoding{
 	".ndjson": jsonEnc,
 	".yaml":   yamlEnc,
 	".yml":    yamlEnc,
+	".proto":  protodefEnc,
 }

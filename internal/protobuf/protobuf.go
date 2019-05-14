@@ -52,16 +52,16 @@ func Parse(filename string, body io.Reader, c *Config) (f *ast.File, err error) 
 	return p.file, nil
 }
 
-// ProtoError describes the location and cause of an error.
-type ProtoError struct {
+// Error describes the location and cause of an error.
+type Error struct {
 	Filename string
 	Path     string
 	Err      error
 }
 
-func (p *ProtoError) Unwrap() error { return p.Err }
+func (p *Error) Unwrap() error { return p.Err }
 
-func (p *ProtoError) Error() string {
+func (p *Error) Error() string {
 	if p.Path == "" {
 		return fmt.Sprintf("parse of file %q failed: %v", p.Filename, p.Err)
 	}

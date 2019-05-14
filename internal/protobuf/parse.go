@@ -65,7 +65,7 @@ func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, er
 		switch x := recover().(type) {
 		case nil:
 		case protoError:
-			err = &ProtoError{
+			err = &Error{
 				Filename: filename,
 				Path:     strings.Join(p.path, "."),
 				Err:      x.error,

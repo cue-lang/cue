@@ -38,6 +38,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/protobuf"
 	"cuelang.org/go/internal/third_party/yaml"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
@@ -51,9 +52,10 @@ var importCmd = &cobra.Command{
 
 The following file formats are currently supported:
 
-  Format     Extensions
-    JSON       .json .jsonl .ndjson
-    YAML       .yaml .yml
+  Format       Extensions
+	JSON       .json .jsonl .ndjson
+	YAML       .yaml .yml
+	protobuf   .proto
 
 Files can either be specified explicitly, or inferred from the specified
 packages. In either case, the file extension is replaced with .cue. It will
@@ -211,6 +213,8 @@ func init() {
 	parseStrings = importCmd.Flags().BoolP("recursive", "R", false, "recursively parse string values")
 
 	importCmd.Flags().String("fix", "", "apply given fix")
+
+	protoPaths = importCmd.Flags().StringArrayP("proto_path", "I", nil, "paths in which to search for imports")
 }
 
 var (
@@ -223,18 +227,22 @@ var (
 	list         *bool
 	files        *bool
 	parseStrings *bool
+	protoPaths   *[]string
 )
 
-type importFunc func(path string, r io.Reader) ([]ast.Expr, error)
+type importStreamFunc func(path string, r io.Reader) ([]ast.Expr, error)
+type importFileFunc func(path string, r io.Reader) (*ast.File, error)
 
 type encodingInfo struct {
-	fn  importFunc
-	typ string
+	fnStream importStreamFunc
+	fnFile   importFileFunc
+	typ      string
 }
 
 var (
-	jsonEnc = &encodingInfo{handleJSON, "json"}
-	yamlEnc = &encodingInfo{handleYAML, "yaml"}
+	jsonEnc     = &encodingInfo{fnStream: handleJSON, typ: "json"}
+	yamlEnc     = &encodingInfo{fnStream: handleYAML, typ: "yaml"}
+	protodefEnc = &encodingInfo{fnFile: handleProtoDef, typ: "proto"}
 )
 
 func getExtInfo(ext string) *encodingInfo {
@@ -247,6 +255,8 @@ func getExtInfo(ext string) *encodingInfo {
 		return jsonEnc
 	case "yaml":
 		return yamlEnc
+	case "protobuf":
+		return protodefEnc
 	}
 	return nil
 }
@@ -324,14 +334,42 @@ func handleFile(cmd *cobra.Command, pkg, filename string) error {
 	ext := filepath.Ext(filename)
 	handler := getExtInfo(ext)
 
-	if handler == nil {
+	switch {
+	case handler == nil:
 		return fmt.Errorf("unsupported extension %q", ext)
+
+	case handler.fnFile != nil:
+		file, err := handler.fnFile(filename, f)
+		if err != nil {
+			return err
+		}
+		file.Filename = filename
+		return processFile(cmd, file)
+
+	case handler.fnStream != nil:
+		objs, err := handler.fnStream(filename, f)
+		if err != nil {
+			return err
+		}
+		return processStream(cmd, pkg, filename, objs)
+
+	default:
+		panic("incorrect handler")
 	}
-	objs, err := handler.fn(filename, f)
-	if err != nil {
+}
+
+func processFile(cmd *cobra.Command, file *ast.File) (err error) {
+	name := file.Filename + ".cue"
+
+	buf := &bytes.Buffer{}
+	if err := format.Node(buf, file); err != nil {
 		return err
 	}
 
+	return ioutil.WriteFile(name, buf.Bytes(), 0644)
+}
+
+func processStream(cmd *cobra.Command, pkg, filename string, objs []ast.Expr) error {
 	if *files {
 		for i, f := range objs {
 			err := combineExpressions(cmd, pkg, newName(filename, i), f)
@@ -617,6 +655,10 @@ func handleYAML(path string, r io.Reader) (objects []ast.Expr, err error) {
 		objects = append(objects, expr)
 	}
 	return objects, nil
+}
+
+func handleProtoDef(path string, r io.Reader) (f *ast.File, err error) {
+	return protobuf.Parse(path, r, &protobuf.Config{Paths: *protoPaths})
 }
 
 type hoister struct {

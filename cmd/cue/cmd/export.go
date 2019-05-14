@@ -83,6 +83,9 @@ defined by the files in the current directory.
 		root := instances[0].Value()
 		err := e.Encode(root)
 		if err != nil {
+			if x, ok := err.(*json.MarshalerError); ok {
+				err = x.Err
+			}
 			fmt.Fprintln(w, err)
 		}
 		return nil

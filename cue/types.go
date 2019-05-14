@@ -112,20 +112,20 @@ func (o *structValue) Lookup(key string) Value {
 
 // MarshalJSON returns a valid JSON encoding or reports an error if any of the
 // fields is invalid.
-func (o *structValue) MarshalJSON() (b []byte, err error) {
+func (o *structValue) marshalJSON() (b []byte, err error) {
 	b = append(b, '{')
 	n := o.Len()
 	for i := 0; i < n; i++ {
 		k, v := o.At(i)
 		s, err := json.Marshal(k)
 		if err != nil {
-			return nil, err
+			return nil, unwrapJSONError(k, err)
 		}
 		b = append(b, s...)
 		b = append(b, ':')
 		bb, err := json.Marshal(v)
 		if err != nil {
-			return nil, err
+			return nil, unwrapJSONError(k, err)
 		}
 		b = append(b, bb...)
 		if i < n-1 {
@@ -134,6 +134,34 @@ func (o *structValue) MarshalJSON() (b []byte, err error) {
 	}
 	b = append(b, '}')
 	return b, nil
+}
+
+type marshalError struct {
+	path string
+	err  error
+	// TODO: maybe also collect the file locations contributing to the
+	// failing values?
+}
+
+func (e *marshalError) Error() string {
+	return fmt.Sprintf("cue: marshal error at path %s: %v", e.path, e.err)
+}
+
+func unwrapJSONError(key interface{}, err error) error {
+	if je, ok := err.(*json.MarshalerError); ok {
+		err = je.Err
+	}
+	path := make([]string, 0, 2)
+	if key != nil {
+		path = append(path, fmt.Sprintf("%v", key))
+	}
+	if me, ok := err.(*marshalError); ok {
+		if me.path != "" {
+			path = append(path, me.path)
+		}
+		err = me.err
+	}
+	return &marshalError{strings.Join(path, "."), err}
 }
 
 // An Iterator iterates over values.
@@ -193,10 +221,10 @@ func (i *Iterator) IsOptional() bool {
 func marshalList(l *Iterator) (b []byte, err error) {
 	b = append(b, '[')
 	if l.Next() {
-		for {
+		for i := 0; ; i++ {
 			x, err := json.Marshal(l.Value())
 			if err != nil {
-				return nil, err
+				return nil, unwrapJSONError(i, err)
 			}
 			b = append(b, x...)
 			if !l.Next() {
@@ -583,6 +611,14 @@ func (v Value) IncompleteKind() Kind {
 
 // MarshalJSON marshalls this value into valid JSON.
 func (v Value) MarshalJSON() (b []byte, err error) {
+	b, err = v.marshalJSON()
+	if err != nil {
+		return nil, unwrapJSONError(nil, err)
+	}
+	return b, nil
+}
+
+func (v Value) marshalJSON() (b []byte, err error) {
 	v, _ = v.Default()
 	if v.path == nil {
 		return json.Marshal(nil)
@@ -607,7 +643,7 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 		return marshalList(&i)
 	case structKind:
 		obj, _ := v.structVal(ctx)
-		return obj.MarshalJSON()
+		return obj.marshalJSON()
 	case bottomKind:
 		return nil, x.(*bottom)
 	default:

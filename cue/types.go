@@ -526,8 +526,9 @@ func (v Value) Default() (Value, bool) {
 	if v.path == nil {
 		return v, false
 	}
-	x := v.ctx().manifest(v.path.v)
-	if x != v.path.v {
+	u := v.path.v.evalPartial(v.ctx())
+	x := v.ctx().manifest(u)
+	if x != u {
 		return remakeValue(v, x), true
 	}
 	return v, false

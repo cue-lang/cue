@@ -683,31 +683,45 @@ func TestDefaults(t *testing.T) {
 		value string
 		def   string
 		val   string
-		err   string
+		ok    bool
 	}{{
 		value: `number | *1`,
 		def:   "1",
 		val:   "number",
+		ok:    true,
 	}, {
 		value: `1 | 2 | *3`,
 		def:   "3",
 		val:   "1|2|3",
+		ok:    true,
 	}, {
 		value: `*{a:1,b:2}|{a:1}|{b:2}`,
 		def:   "<0>{a: 1, b: 2}",
 		val:   "<0>{a: 1}|<0>{b: 2}",
+		ok:    true,
+	}, {
+		value: `{a:1}&{b:2}`,
+		def:   `<0>{a: 1, b: 2}`,
+		val:   ``,
+		ok:    false,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
 			v := getInstance(t, "a: "+tc.value).Lookup("a")
 
-			_, val := v.Expr()
-			d, _ := v.Default()
+			d, ok := v.Default()
+			if ok != tc.ok {
+				t.Errorf("hasDefault: got %v; want %v", ok, tc.ok)
+			}
 
 			if got := fmt.Sprint(d); got != tc.def {
 				t.Errorf("default: got %v; want %v", got, tc.def)
 			}
 
+			op, val := v.Expr()
+			if op != OrOp {
+				return
+			}
 			vars := []string{}
 			for _, v := range val {
 				vars = append(vars, fmt.Sprint(v))

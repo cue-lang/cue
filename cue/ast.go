@@ -50,6 +50,13 @@ func (inst *Instance) insertFile(f *ast.File) error {
 type astVisitor struct {
 	*astState
 	object *structLit
+	// For single line fields, the doc comment is applied to the inner-most
+	// field value.
+	//
+	//   // This comment is for bar.
+	//   foo bar: value
+	//
+	doc *docNode
 
 	inSelector int
 }
@@ -187,6 +194,10 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			astState: v.astState,
 			object:   obj,
 		}
+		passDoc := len(n.Elts) == 1 && !n.Lbrace.IsValid() && v.doc != nil
+		if passDoc {
+			v1.doc = v.doc
+		}
 		for _, e := range n.Elts {
 			switch x := e.(type) {
 			case *ast.EmitDecl:
@@ -197,6 +208,9 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			case *ast.ComprehensionDecl:
 				v1.walk(x)
 			}
+		}
+		if passDoc {
+			v.doc = v1.doc // signal usage of document back to parent.
 		}
 		value = obj
 
@@ -274,7 +288,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 
 			sig := &params{}
 			sig.add(f, &basicType{newNode(n.Label), stringKind})
-			template := &lambdaExpr{newExpr(n.Value), sig, nil}
+			template := &lambdaExpr{newNode(n), sig, nil}
 
 			v.setScope(n, template)
 			template.value = v.walk(n.Value)
@@ -298,7 +312,17 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				return v.error(n.Label, "invalid field name: %v", n.Label)
 			}
 			if f != 0 {
-				v.object.insertValue(v.ctx(), f, opt, v.walk(n.Value), attrs)
+				var leftOverDoc *docNode
+				for _, c := range n.Comments() {
+					if c.Position == 0 {
+						leftOverDoc = v.doc
+						v.doc = &docNode{n: n}
+						break
+					}
+				}
+				val := v.walk(n.Value)
+				v.object.insertValue(v.ctx(), f, opt, val, attrs, v.doc)
+				v.doc = leftOverDoc
 			}
 
 		default:

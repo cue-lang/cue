@@ -87,7 +87,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, name string) *structLit {
 		for _, a := range pkg.arcs {
 			// Discard option status and attributes at top level.
 			// TODO: filter on capitalized fields?
-			obj.insertValue(ctx, a.feature, false, a.v, nil)
+			obj.insertValue(ctx, a.feature, false, a.v, nil, a.docs)
 		}
 	}
 

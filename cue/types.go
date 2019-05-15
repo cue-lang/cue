@@ -687,6 +687,15 @@ func (v Value) Decode(x interface{}) error {
 // 	return nil
 // }
 
+// Doc returns all documentation comments associated with the field from which
+// the current value originates.
+func (v Value) Doc() []*ast.CommentGroup {
+	if v.path == nil {
+		return nil
+	}
+	return v.path.docs.appendDocs(nil)
+}
+
 // Split returns a list of values from which v originated such that
 // the unification of all these values equals v and for all returned values
 // Source returns a non-nil value.

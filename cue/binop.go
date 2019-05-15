@@ -543,7 +543,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	for _, a := range x.arcs {
 		cp := ctx.copy(a.v)
 		obj.arcs = append(obj.arcs,
-			arc{a.feature, a.optional, cp, nil, a.attrs})
+			arc{a.feature, a.optional, cp, nil, a.attrs, a.docs})
 	}
 outer:
 	for _, a := range y.arcs {
@@ -554,6 +554,7 @@ outer:
 				obj.arcs[i].v = v
 				obj.arcs[i].cache = nil
 				obj.arcs[i].optional = a.optional && b.optional
+				obj.arcs[i].docs = mergeDocs(a.docs, b.docs)
 				attrs, err := unifyAttrs(ctx, src, a.attrs, b.attrs)
 				if err != nil {
 					return err

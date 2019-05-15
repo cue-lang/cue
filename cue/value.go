@@ -609,7 +609,7 @@ func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
 	}
 	arcs := make([]arc, len(a))
 	for i, a := range a {
-		arcs[i] = arc{feature: label(i), v: a.v}
+		arcs[i] = arc{feature: label(i), v: a.v, docs: a.docs}
 	}
 	s := &structLit{baseValue: x.baseValue, arcs: arcs}
 	return &list{baseValue: x.baseValue, elem: s, typ: x.typ, len: max}
@@ -694,7 +694,8 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		v := x.arcs[i].v.evalPartial(ctx)
 		ctx.evalStack = popped
 
-		v = x.applyTemplate(ctx, i, v)
+		var doc *ast.Field
+		v, doc = x.applyTemplate(ctx, i, v)
 
 		if (len(ctx.evalStack) > 0 && ctx.cycleErr) || cycleError(v) != nil {
 			// Don't cache while we're in a evaluation cycle as it will cache
@@ -710,6 +711,9 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		ctx.cycleErr = false
 
 		x.arcs[i].cache = v
+		if doc != nil {
+			x.arcs[i].docs = &docNode{n: doc, left: x.arcs[i].docs}
+		}
 		if len(ctx.evalStack) == 0 {
 			if err := ctx.processDelayedConstraints(); err != nil {
 				x.arcs[i].cache = err
@@ -795,6 +799,7 @@ outer:
 				} else {
 					x.arcs[i].v = mkBin(ctx, x.Pos(), opUnify, a.v, na.v)
 					x.arcs[i].optional = x.arcs[i].optional && optional
+					x.arcs[i].docs = mergeDocs(na.docs, a.docs)
 				}
 				continue outer
 			}
@@ -805,18 +810,21 @@ outer:
 	return x
 }
 
-func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) evaluated {
+func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (evaluated, *ast.Field) {
 	if x.template != nil {
 		fn, err := evalLambda(ctx, x.template)
 		if err != nil {
-			return err
+			return err, nil
 		}
 		name := ctx.labelStr(x.arcs[i].feature)
 		arg := &stringLit{x.baseValue, name}
 		w := fn.call(ctx, x, arg).evalPartial(ctx)
 		v = binOp(ctx, x, opUnify, v, w)
+
+		f, _ := x.template.base().syntax().(*ast.Field)
+		return v, f
 	}
-	return v
+	return v, nil
 }
 
 // A label is a canonicalized feature name.
@@ -840,6 +848,46 @@ type arc struct {
 	v     value
 	cache evaluated // also used as newValue during unification.
 	attrs *attributes
+	docs  *docNode
+}
+
+type docNode struct {
+	n     *ast.Field
+	left  *docNode
+	right *docNode
+}
+
+func (d *docNode) appendDocs(docs []*ast.CommentGroup) []*ast.CommentGroup {
+	if d == nil {
+		return docs
+	}
+	docs = d.left.appendDocs(docs)
+	if d.n != nil {
+		docs = appendDocComments(docs, d.n)
+		docs = appendDocComments(docs, d.n.Label)
+	}
+	docs = d.right.appendDocs(docs)
+	return docs
+}
+
+func appendDocComments(docs []*ast.CommentGroup, n ast.Node) []*ast.CommentGroup {
+	for _, c := range n.Comments() {
+		if c.Position == 0 {
+			docs = append(docs, c)
+		}
+	}
+	return docs
+}
+
+func mergeDocs(a, b *docNode) *docNode {
+	if a == b || a == nil {
+		return b
+	}
+	if b == nil {
+		return b
+	}
+	// TODO: filter out duplicates?
+	return &docNode{nil, a, b}
 }
 
 func (a *arc) val() evaluated {
@@ -851,15 +899,8 @@ func (a *arc) setValue(v value) {
 	a.cache = nil
 }
 
-type arcInfo struct {
-	hidden bool
-	tags   []string // name:string
-}
-
-var hiddenArc = &arcInfo{hidden: true}
-
 // insertValue is used during initialization but never during evaluation.
-func (x *structLit) insertValue(ctx *context, f label, optional bool, value value, a *attributes) {
+func (x *structLit) insertValue(ctx *context, f label, optional bool, value value, a *attributes, docs *docNode) {
 	for i, p := range x.arcs {
 		if f != p.feature {
 			continue
@@ -870,7 +911,7 @@ func (x *structLit) insertValue(ctx *context, f label, optional bool, value valu
 		x.arcs[i].optional = x.arcs[i].optional && optional
 		return
 	}
-	x.arcs = append(x.arcs, arc{f, optional, value, nil, a})
+	x.arcs = append(x.arcs, arc{f, optional, value, nil, a, docs})
 	sort.Stable(x)
 }
 

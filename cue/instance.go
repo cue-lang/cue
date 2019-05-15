@@ -15,6 +15,8 @@
 package cue
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/internal"
@@ -114,6 +116,29 @@ func (inst *Instance) evalExpr(ctx *context, expr ast.Expr) evaluated {
 	}
 	v := newVisitor(ctx.index, inst.inst, nil, obj)
 	return v.walk(expr).evalPartial(ctx)
+}
+
+// Doc returns the package comments for this instance.
+func (inst *Instance) Doc() []*ast.CommentGroup {
+	var docs []*ast.CommentGroup
+	if inst.inst == nil {
+		return nil
+	}
+	for _, f := range inst.inst.Files {
+		if strings.HasPrefix(f.Filename, inst.Dir) {
+			continue
+		}
+		var cg *ast.CommentGroup
+		for _, c := range f.Comments() {
+			if c.Position == 0 {
+				cg = c
+			}
+		}
+		if cg != nil {
+			docs = append(docs, cg)
+		}
+	}
+	return docs
 }
 
 // Value returns the root value of the configuration. If the configuration

@@ -91,6 +91,7 @@ func (x *mergedValues) evalPartial(ctx *context) evaluated {
 			if err != nil {
 				return err
 			}
+			a.docs = mergeDocs(a.docs, arcs[i].docs)
 		}
 		if len(values) == 1 {
 			arcs[k] = a

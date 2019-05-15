@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 )
 
@@ -181,7 +182,7 @@ type bimport struct {
 
 func makeInstances(insts []*bimport) (instances []*build.Instance) {
 	b := builder{
-		ctxt:    build.NewContext(),
+		ctxt:    build.NewContext(build.ParseOptions(parser.ParseComments)),
 		imports: map[string]*bimport{},
 	}
 	for _, bi := range insts {

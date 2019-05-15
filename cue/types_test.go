@@ -24,6 +24,7 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"github.com/google/go-cmp/cmp"
 )
@@ -1337,6 +1338,117 @@ func TestAttributeLookup(t *testing.T) {
 		})
 	}
 }
+
+func TestValueDoc(t *testing.T) {
+	const config = `
+	// foobar defines at least foo.
+	package foobar
+
+	// A Foo fooses stuff.
+	Foo: {
+		// field1 is an int.
+		field1: int
+
+		field2: int
+
+		// duplicate field comment
+		dup3: int
+	}
+
+	// foos are instances of Foo.
+	foos <foo>: Foo
+
+	// My first little foo.
+	foos MyFoo: {
+		// local field comment.
+		field1: 0
+
+		// Dangling comment.
+
+		// other field comment.
+		field2: 1
+
+		// duplicate field comment
+		dup3: int
+	}
+
+	bar: {
+		// comment from bar on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int // don't include this
+	}
+
+	baz: bar & {
+		// comment from baz on field 1
+		field1: int
+		field2: int
+	}
+	`
+	testCases := []struct {
+		path string
+		doc  string
+	}{{
+		path: "foos",
+		doc:  "foos are instances of Foo.\n",
+	}, {
+		path: "foos MyFoo",
+		doc:  "My first little foo.\n",
+	}, {
+		path: "foos MyFoo field1",
+		doc: `field1 is an int.
+
+local field comment.
+`,
+	}, {
+		path: "foos MyFoo field2",
+		doc:  "other field comment.\n",
+	}, {
+		path: "foos MyFoo dup3",
+		doc: `duplicate field comment
+
+duplicate field comment
+`,
+	}, {
+		path: "bar field1",
+		doc:  "comment from bar on field 1\n",
+	}, {
+		path: "baz field1",
+		doc: `comment from baz on field 1
+
+comment from bar on field 1
+`,
+	}, {
+		path: "baz field2",
+		doc:  "comment from bar on field 2\n",
+	}}
+	inst := getInstance(t, config)
+	for _, tc := range testCases {
+		t.Run("field:"+tc.path, func(t *testing.T) {
+			v := inst.Value().Lookup(strings.Split(tc.path, " ")...)
+			doc := docStr(v.Doc())
+			if doc != tc.doc {
+				t.Errorf("doc: got:\n%vwant:\n%v", doc, tc.doc)
+			}
+		})
+	}
+	want := "foobar defines at least foo.\n"
+	if got := docStr(inst.Doc()); got != want {
+		t.Errorf("pkg: got:\n%vwant:\n%v", got, want)
+	}
+}
+
+func docStr(docs []*ast.CommentGroup) string {
+	doc := ""
+	for _, d := range docs {
+		if doc != "" {
+			doc += "\n"
+		}
+		doc += d.Text()
+	}
+	return doc
+}
+
 func TestMashalJSON(t *testing.T) {
 	testCases := []struct {
 		value string

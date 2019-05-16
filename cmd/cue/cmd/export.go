@@ -17,7 +17,9 @@ package cmd
 import (
 	"encoding/json"
 	"fmt"
+	"io"
 
+	"cuelang.org/go/cue"
 	"github.com/spf13/cobra"
 )
 
@@ -71,22 +73,37 @@ A package instance for a directory contains all files in the directory and its
 ancestor directories, up to the module root, belonging to the same package.
 If the package is not explicitly defined by the '-p' flag, it must be uniquely
 defined by the files in the current directory.
+
+
+Formats
+The following formats are recognized:
+
+json    output as JSON
+		Outputs any CUE value.
+
+text    output as raw text
+        The evaluated value must be of type string.
 `,
 
 	RunE: func(cmd *cobra.Command, args []string) error {
 		instances := buildFromArgs(cmd, args)
 		w := cmd.OutOrStdout()
-		e := json.NewEncoder(w)
-		e.SetIndent("", "    ")
-		e.SetEscapeHTML(*escape)
 
-		root := instances[0].Value()
-		err := e.Encode(root)
-		if err != nil {
-			if x, ok := err.(*json.MarshalerError); ok {
-				err = x.Err
+		for _, inst := range instances {
+			root := inst.Value()
+			if !root.IsValid() {
+				continue
 			}
-			fmt.Fprintln(w, err)
+			switch *media {
+			case "json":
+				err := outputJSON(w, root)
+				exitIfErr(cmd, inst, err, true)
+			case "text":
+				err := outputText(w, root)
+				exitIfErr(cmd, inst, err, true)
+			default:
+				return fmt.Errorf("export: unknown format %q", *media)
+			}
 		}
 		return nil
 	},
@@ -94,11 +111,36 @@ defined by the files in the current directory.
 
 var (
 	escape *bool
+	media  *string
 )
 
 func init() {
 	rootCmd.AddCommand(exportCmd)
 
-	// exportCmd.Flags().StringP("output", "o", "json", "output format (json only for now)")
-	escape = exportCmd.Flags().BoolP("escape", "e", false, "use HTML escaping")
+	media = exportCmd.Flags().String("out", "json", "output format (json or text)")
+	escape = exportCmd.Flags().Bool("escape", false, "use HTML escaping")
+}
+
+func outputJSON(w io.Writer, v cue.Value) error {
+	e := json.NewEncoder(w)
+	e.SetIndent("", "    ")
+	e.SetEscapeHTML(*escape)
+
+	err := e.Encode(v)
+	if err != nil {
+		if x, ok := err.(*json.MarshalerError); ok {
+			err = x.Err
+		}
+		fmt.Fprintln(w, err)
+	}
+	return nil
+}
+
+func outputText(w io.Writer, v cue.Value) error {
+	str, err := v.String()
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprint(w, str)
+	return err
 }

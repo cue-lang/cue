@@ -27,8 +27,12 @@ func Execute(templ string, data cue.Value) (string, error) {
 	if err != nil {
 		return "", err
 	}
+	var x interface{}
+	if err := data.Decode(&x); err != nil {
+		return "", err
+	}
 	buf := &bytes.Buffer{}
-	if err := t.Execute(buf, data); err != nil {
+	if err := t.Execute(buf, x); err != nil {
 		return "", err
 	}
 	return buf.String(), nil

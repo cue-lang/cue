@@ -247,7 +247,7 @@ func (g *generator) processGo(filename string) {
 			case token.VAR:
 				for _, spec := range x.Specs {
 					if ast.IsExported(spec.(*ast.ValueSpec).Names[0].Name) {
-						log.Fatal("var declarations not supported")
+						log.Fatal("gen %s: var declarations not supported", filename)
 					}
 				}
 				printer.Fprint(g.decls, g.fset, x)
@@ -257,12 +257,12 @@ func (g *generator) processGo(filename string) {
 				// TODO: support type declarations.
 				for _, spec := range x.Specs {
 					if ast.IsExported(spec.(*ast.TypeSpec).Name.Name) {
-						log.Fatal("type declarations not supported")
+						log.Fatal("gen %s: type declarations not supported", filename)
 					}
 				}
 				continue
 			default:
-				log.Fatalf("unexpected spec of type %s", x.Tok)
+				log.Fatalf("gen %s: unexpected spec of type %s", filename, x.Tok)
 			}
 		case *ast.FuncDecl:
 			g.genFun(x)

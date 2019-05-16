@@ -37,7 +37,7 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [Order is Irrelevant](unification.md)
   - [Disjunctions](disjunctions.md)
   - [Default Values](defaults.md)
-  - [Disjunctions of Structs](disjstruct.md)
+  - [Disjunctions of Structs](sumstruct.md)
   - [Numbers](numbers.md)
   - [Ranges](ranges.md)
   - [Predefined Ranges](rangedef.md)

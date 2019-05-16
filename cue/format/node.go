@@ -95,7 +95,7 @@ func (f *formatter) file(file *ast.File) {
 	f.before(file)
 	if file.Name != nil {
 		f.print(file.Package, "package")
-		f.print(blank, file.Name, newline, newsection)
+		f.print(blank, file.Name, newsection, nooverride)
 	}
 	f.current.pos = 3
 	f.visitComments(3)
@@ -222,11 +222,11 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.walkSpecList(n.Specs)
 			f.print(unindent, newline, n.Rparen, token.RPAREN, newline)
 		}
-		f.print(newsection)
+		f.print(newsection, nooverride)
 
 	case *ast.EmitDecl:
 		f.expr(n.Expr)
-		f.print(newline, newsection) // force newline
+		f.print(newline, newsection, nooverride) // force newline
 
 	case *ast.Alias:
 		f.expr(n.Ident)

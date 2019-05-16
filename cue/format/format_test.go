@@ -237,6 +237,28 @@ func TestBadNodes(t *testing.T) {
 		t.Errorf("got %q, expected %q", buf.String(), res)
 	}
 }
+func TestPackage(t *testing.T) {
+	f := &ast.File{
+		Name: ast.NewIdent("foo"),
+		Decls: []ast.Decl{
+			&ast.EmitDecl{
+				Expr: &ast.BasicLit{
+					ValuePos: token.Pos(token.NoSpace),
+					Value:    "1",
+				},
+			},
+		},
+	}
+	var buf bytes.Buffer
+	err := Node(&buf, f)
+	if err != nil {
+		t.Fatal(err)
+	}
+	const want = "package foo\n\n1\n"
+	if got := buf.String(); got != want {
+		t.Errorf("got %q, expected %q", got, want)
+	}
+}
 
 // idents is an iterator that returns all idents in f via the result channel.
 func idents(f *ast.File) <-chan *ast.Ident {

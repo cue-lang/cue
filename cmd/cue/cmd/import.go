@@ -17,7 +17,6 @@ package cmd
 import (
 	"bytes"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -32,6 +31,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/encoding"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
@@ -266,7 +266,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 
 	var group errgroup.Group
 
-	group.Go(func() error {
+	group.Go(func() (err error) {
 		if len(args) > 0 && len(filepath.Ext(args[0])) > len(".") {
 			for _, a := range args {
 				group.Go(func() error { return handleFile(cmd, *fPackage, a) })
@@ -311,13 +311,11 @@ func runImport(cmd *cobra.Command, args []string) error {
 	})
 
 	err := group.Wait()
-	if err != nil {
-		return fmt.Errorf("Import failed: %v", err)
-	}
+	exitOnErr(cmd, "", err, true)
 	return nil
 }
 
-func handleFile(cmd *cobra.Command, pkg, filename string) error {
+func handleFile(cmd *cobra.Command, pkg, filename string) (err error) {
 	re, err := regexp.Compile(*name)
 	if err != nil {
 		return err

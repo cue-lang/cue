@@ -64,7 +64,7 @@ func doVet(cmd *cobra.Command, args []string) error {
 		}
 		err := inst.Value().Validate(opt...)
 		if *fVerbose || err != nil {
-			printHeader(w, inst)
+			printHeader(w, inst.Dir)
 		}
 		exitIfErr(cmd, inst, err, false)
 	}

@@ -4,7 +4,7 @@ _Types ~~and~~ are Values_
 
 # Disjunctions of Structs
 
-Disjunction work for any type.
+Disjunctions work for any type.
 
 In this example we see that a `floor` of some specific house
 has an exit on level 0 and 1, but not on any other floor.

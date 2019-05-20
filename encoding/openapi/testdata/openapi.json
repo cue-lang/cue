@@ -1,0 +1,287 @@
+{
+   "openapi": "3.0.0",
+   "components": {
+      "schema": {
+         "MyMessage": {
+            "description": "MyMessage is my message.",
+            "allOf": [
+               {
+                  "type": "object",
+                  "required": [
+                     "foo",
+                     "bar"
+                  ],
+                  "properties": {
+                     "bar": {
+                        "type": "array",
+                        "items": {
+                           "type": "string"
+                        },
+                        "default": []
+                     },
+                     "foo": {
+                        "allOf": [
+                           {
+                              "$ref": "#/components/schema/Int32"
+                           },
+                           {
+                              "type": "number",
+                              "exclusiveMinimum": 10,
+                              "exclusiveMaximum": 1000
+                           }
+                        ]
+                     },
+                     "port": {
+                        "$ref": "#/components/schema/Port",
+                        "type": "object"
+                     }
+                  }
+               },
+               {
+                  "type": "object",
+                  "anyOf": [
+                     {
+                        "type": "object",
+                        "required": [
+                           "a"
+                        ],
+                        "properties": {
+                           "a": {
+                              "description": "Field a.",
+                              "type": "integer",
+                              "enum": [
+                                 1
+                              ]
+                           }
+                        }
+                     },
+                     {
+                        "type": "object",
+                        "required": [
+                           "b"
+                        ],
+                        "properties": {
+                           "b": {
+                              "type": "string"
+                           }
+                        }
+                     }
+                  ]
+               }
+            ]
+         },
+         "Port": {
+            "type": "object",
+            "required": [
+               "port",
+               "obj"
+            ],
+            "properties": {
+               "obj": {
+                  "type": "array",
+                  "items": {
+                     "type": "integer"
+                  },
+                  "default": []
+               },
+               "port": {
+                  "type": "integer"
+               }
+            }
+         },
+         "Int32": {
+            "type": "integer",
+            "minimum": -2147483648,
+            "maximum": 2147483647
+         },
+         "YourMessage": {
+            "anyOf": [
+               {
+                  "type": "object",
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "a": {
+                        "type": "string"
+                     },
+                     "b": {
+                        "type": "string"
+                     }
+                  }
+               },
+               {
+                  "type": "object",
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "a": {
+                        "type": "string"
+                     },
+                     "b": {
+                        "type": "number"
+                     }
+                  }
+               }
+            ]
+         },
+         "YourMessage2": {
+            "allOf": [
+               {
+                  "anyOf": [
+                     {
+                        "type": "object",
+                        "required": [
+                           "a"
+                        ],
+                        "properties": {
+                           "a": {
+                              "type": "number"
+                           }
+                        }
+                     },
+                     {
+                        "type": "object",
+                        "required": [
+                           "b"
+                        ],
+                        "properties": {
+                           "b": {
+                              "type": "number"
+                           }
+                        }
+                     }
+                  ]
+               },
+               {
+                  "anyOf": [
+                     {
+                        "type": "object",
+                        "required": [
+                           "c"
+                        ],
+                        "properties": {
+                           "c": {
+                              "type": "number"
+                           }
+                        }
+                     },
+                     {
+                        "type": "object",
+                        "required": [
+                           "d"
+                        ],
+                        "properties": {
+                           "d": {
+                              "type": "number"
+                           }
+                        }
+                     }
+                  ]
+               },
+               {
+                  "anyOf": [
+                     {
+                        "type": "object",
+                        "required": [
+                           "e"
+                        ],
+                        "properties": {
+                           "e": {
+                              "type": "number"
+                           }
+                        }
+                     },
+                     {
+                        "type": "object",
+                        "required": [
+                           "f"
+                        ],
+                        "properties": {
+                           "f": {
+                              "type": "number"
+                           }
+                        }
+                     }
+                  ]
+               }
+            ]
+         },
+         "Msg2": {
+            "anyOf": [
+               {
+                  "type": "object",
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "b": {
+                        "type": "number"
+                     }
+                  }
+               },
+               {
+                  "type": "object",
+                  "required": [
+                     "a"
+                  ],
+                  "properties": {
+                     "a": {
+                        "type": "string"
+                     }
+                  }
+               }
+            ]
+         },
+         "Enum": {
+            "enum": [
+               "foo",
+               "bar",
+               "baz"
+            ]
+         },
+         "List": {
+            "type": "array",
+            "items": {
+               "type": "number"
+            },
+            "default": [
+               1,
+               2,
+               3
+            ]
+         },
+         "DefaultStruct": {
+            "allOf": [
+               {
+                  "anyOf": [
+                     {
+                        "$ref": "#/components/schema/Port"
+                     },
+                     {
+                        "type": "object",
+                        "required": [
+                           "port"
+                        ],
+                        "properties": {
+                           "port": {
+                              "type": "integer",
+                              "enum": [
+                                 1
+                              ]
+                           }
+                        }
+                     }
+                  ]
+               },
+               {
+                  "default": {
+                     "port": 1
+                  }
+               }
+            ]
+         }
+      }
+   }
+}

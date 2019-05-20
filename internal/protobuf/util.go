@@ -38,8 +38,8 @@ type protoError struct {
 }
 
 var (
-	newline    = token.Pos(token.Newline)
-	newSection = token.Pos(token.NewSection)
+	newline    = token.Newline.Pos()
+	newSection = token.NewSection.Pos()
 )
 
 func addComments(f ast.Node, i int, doc, inline *proto.Comment) bool {

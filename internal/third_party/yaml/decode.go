@@ -322,7 +322,7 @@ func (d *decoder) attachDocComments(m yaml_mark_t, pos int8, expr ast.Node) {
 		}
 		// fp := d.p.info.Pos(c.mark.index, 0)
 		comments = append(comments, &ast.Comment{
-			token.Pos(c.pos),
+			c.pos.Pos(),
 			"//" + c.text[1:],
 		})
 		d.p.parser.comments = d.p.parser.comments[1:]
@@ -343,7 +343,7 @@ func (d *decoder) attachLineComment(m yaml_mark_t, pos int8, expr ast.Node) {
 	c := d.p.parser.comments[0]
 	if c.mark.index == m.index {
 		comment := &ast.Comment{
-			token.Pos(c.pos),
+			c.pos.Pos(),
 			// d.p.info.Pos(m.index+1, 0),
 			"//" + c.text[1:],
 		}
@@ -374,7 +374,7 @@ func (d *decoder) start(n *node) token.Pos {
 func (d *decoder) ident(n *node, name string) *ast.Ident {
 	return &ast.Ident{
 		// NamePos: d.pos(n.startPos),
-		NamePos: token.Pos(d.p.parser.relPos()),
+		NamePos: d.p.parser.relPos().Pos(),
 		Name:    name,
 	}
 }
@@ -424,7 +424,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 	case yaml_TIMESTAMP_TAG:
 		return &ast.BasicLit{
 			// ValuePos: d.start(n),
-			ValuePos: token.Pos(d.p.parser.relPos()),
+			ValuePos: d.p.parser.relPos().Pos(),
 			Kind:     token.STRING,
 			Value:    strconv.Quote(n.value),
 		}
@@ -432,7 +432,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 	case yaml_STR_TAG:
 		return &ast.BasicLit{
 			// ValuePos: d.start(n),
-			ValuePos: token.Pos(d.p.parser.relPos()),
+			ValuePos: d.p.parser.relPos().Pos(),
 			Kind:     token.STRING,
 			Value:    d.quoteString(n.value),
 		}
@@ -443,7 +443,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		buf[len(buf)-1] = '\''
 		return &ast.BasicLit{
 			// ValuePos: d.start(n),
-			ValuePos: token.Pos(d.p.parser.relPos()),
+			ValuePos: d.p.parser.relPos().Pos(),
 			Kind:     token.STRING,
 			Value:    string(buf),
 		}
@@ -487,11 +487,11 @@ func (d *decoder) scalar(n *node) ast.Expr {
 	}
 	err := &ast.BottomLit{
 		// Bottom: d.pos(n.startPos)
-		Bottom: token.Pos(d.p.parser.relPos()),
+		Bottom: d.p.parser.relPos().Pos(),
 	}
 	comment := &ast.Comment{
 		// Slash: d.start(n),
-		Slash: token.Pos(token.Blank),
+		Slash: token.Blank.Pos(),
 		Text:  "// " + d.terror(n, tag),
 	}
 	err.AddComment(&ast.CommentGroup{
@@ -522,7 +522,7 @@ func (d *decoder) label(n *node) ast.Label {
 	}
 stringLabel:
 	return &ast.BasicLit{
-		ValuePos: token.Pos(d.p.parser.relPos()),
+		ValuePos: d.p.parser.relPos().Pos(),
 		// ValuePos: d.start(n),
 		Kind:  token.STRING,
 		Value: strconv.Quote(n.value),
@@ -535,15 +535,15 @@ func (d *decoder) makeNum(n *node, val string, kind token.Token) (expr ast.Expr)
 		minuses++
 	}
 	expr = &ast.BasicLit{
-		// ValuePos: d.start(n) + token.Pos(minuses),
-		ValuePos: token.Pos(d.p.parser.relPos()),
+		// ValuePos: d.start(n) + minuses.Pos(),
+		ValuePos: d.p.parser.relPos().Pos(),
 		Kind:     kind,
 		Value:    val,
 	}
 	if minuses > 0 {
 		expr = &ast.UnaryExpr{
 			// OpPos: d.start(n),
-			OpPos: token.Pos(d.p.parser.relPos()),
+			OpPos: d.p.parser.relPos().Pos(),
 			Op:    token.SUB,
 			X:     expr,
 		}

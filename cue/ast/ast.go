@@ -518,7 +518,8 @@ func (x *Ident) End() token.Pos {
 	return x.NamePos.Add(len(x.Name))
 }
 func (x *TemplateLabel) End() token.Pos { return x.Rangle }
-func (x *BasicLit) End() token.Pos      { return token.Pos(int(x.ValuePos) + len(x.Value)) }
+func (x *BasicLit) End() token.Pos      { return x.ValuePos.Add(len(x.Value)) }
+
 func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].Pos() }
 func (x *StructLit) End() token.Pos {
 	if x.Rbrace == token.NoPos && len(x.Elts) > 0 {
@@ -580,7 +581,7 @@ func (s *ImportSpec) Pos() token.Pos {
 // func (s *TypeSpec) Pos() token.Pos  { return s.Name.Pos() }
 
 func (s *ImportSpec) End() token.Pos {
-	if s.EndPos != 0 {
+	if s.EndPos != token.NoPos {
 		return s.EndPos
 	}
 	return s.Path.End()

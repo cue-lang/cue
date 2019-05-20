@@ -77,13 +77,16 @@ func (pos Position) String() string {
 // to comparing the respective source file offsets. If p and q are in different
 // files, p < q is true if the file implied by p was added to the respective
 // file set before the file implied by cue.
-type Pos int
+type Pos struct {
+	file   *File
+	offset int
+}
 
 // NoPos is the zero value for Pos; there is no file and line information
 // associated with it, and NoPos().IsValid() is false. NoPos is always
 // smaller than any other Pos value. The corresponding Position value
 // for NoPos is the zero value for Position.
-const NoPos Pos = 0
+var NoPos = Pos{}
 
 // RelPos indicates the relative position of token to the previous token.
 type RelPos int
@@ -108,8 +111,8 @@ const (
 	// NewSection means there are two or more newlines after this token.
 	NewSection
 
-	relMask  Pos = 0xf
-	relShift     = 4
+	relMask  = 0xf
+	relShift = 4
 )
 
 var relNames = []string{
@@ -118,14 +121,28 @@ var relNames = []string{
 
 func (p RelPos) String() string { return relNames[p] }
 
+func (p RelPos) Pos() Pos {
+	return Pos{nil, int(p)}
+}
+
 // HasRelPos repors whether p has a relative position.
 func (p Pos) HasRelPos() bool {
-	return p&relMask != 0
+	return p.offset&relMask != 0
 
 }
 
+func (p Pos) Before(q Pos) bool {
+	return p.file == q.file && p.Offset() < q.Offset()
+}
+
+// Offset reports the byte offset relative to the file.
+func (p Pos) Offset() int {
+	return p.offset >> relShift
+}
+
+// Add creates a new position relative to the p offset by n.
 func (p Pos) Add(n int) Pos {
-	return p + toPos(index(n))
+	return Pos{p.file, p.offset + toPos(index(n))}
 }
 
 // IsValid reports whether the position is valid.
@@ -140,19 +157,19 @@ func (p Pos) IsNewline() bool {
 }
 
 func (p Pos) WithRel(rel RelPos) Pos {
-	return p&^relMask | Pos(rel)
+	return Pos{p.file, p.offset&^relMask | int(rel)}
 }
 
 func (p Pos) RelPos() RelPos {
-	return RelPos(p & relMask)
+	return RelPos(p.offset & relMask)
 }
 
 func (p Pos) index() index {
-	return index(p) >> relShift
+	return index(p.offset) >> relShift
 }
 
-func toPos(x index) Pos {
-	return (Pos(x) << relShift)
+func toPos(x index) int {
+	return (int(x) << relShift)
 }
 
 // -----------------------------------------------------------------------------
@@ -316,7 +333,7 @@ func (f *File) Pos(offset int, rel RelPos) Pos {
 	if index(offset) > f.size {
 		panic("illegal file offset")
 	}
-	return toPos(f.base+index(offset)) + Pos(rel)
+	return Pos{f, toPos(f.base+index(offset)) + int(rel)}
 }
 
 // Offset returns the offset for the given file position p;

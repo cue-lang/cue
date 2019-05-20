@@ -263,7 +263,7 @@ func (p *exporter) expr(v value) ast.Expr {
 				if p.mode.omitOptional || p.mode.concrete {
 					continue
 				}
-				f.Optional = 1
+				f.Optional = token.NoSpace.Pos()
 			}
 			if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
 				continue
@@ -297,7 +297,7 @@ func (p *exporter) expr(v value) ast.Expr {
 					}
 					opt := token.NoPos
 					if yield.opt {
-						opt = 1 // anything but token.NoPos
+						opt = token.NoSpace.Pos() // anything but token.NoPos
 					}
 					f := &ast.Field{
 						Label:    label,

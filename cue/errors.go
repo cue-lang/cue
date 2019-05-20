@@ -91,7 +91,7 @@ func (x *bottom) Position() []token.Position {
 func appendPositions(pos []token.Position, fset *token.FileSet, src source) []token.Position {
 	if src != nil {
 		if p := src.Pos(); p != token.NoPos {
-			if p >= sharedOffset {
+			if p.Offset() >= sharedOffset {
 				fset = sharedIndex.fset
 			}
 			return append(pos, fset.Position(src.Pos()))
@@ -124,7 +124,7 @@ func (x *bottom) FormatError(p errors.Printer) error {
 func appendLocations(locs []string, fset *token.FileSet, src source) []string {
 	if src != nil {
 		if p := src.Pos(); p != token.NoPos {
-			if p >= sharedOffset {
+			if p.Offset() >= sharedOffset {
 				fset = sharedIndex.fset
 			}
 			return append(locs, fset.Position(src.Pos()).String())

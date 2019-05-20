@@ -81,7 +81,7 @@ func verifyPositions(t *testing.T, fset *FileSet, f *File, lines []int) {
 			t.Errorf("%s, Offset: got offset %d; want %d", f.Name(), offs2, offs)
 		}
 		line, col := linecol(lines, offs)
-		msg := fmt.Sprintf("%s (offs = %d, p = %d)", f.Name(), offs, p)
+		msg := fmt.Sprintf("%s (offs = %d, p = %d)", f.Name(), offs, p.offset)
 		checkPos(t, msg, f.Position(f.Pos(offs, 0)), Position{f.Name(), offs, line, col})
 		checkPos(t, msg, fset.Position(p), Position{f.Name(), offs, line, col})
 	}
@@ -168,7 +168,7 @@ func TestLineInfo(t *testing.T) {
 	for offs := 0; offs <= f.Size(); offs++ {
 		p := f.Pos(offs, 0)
 		_, col := linecol(lines, offs)
-		msg := fmt.Sprintf("%s (offs = %d, p = %d)", f.Name(), offs, p)
+		msg := fmt.Sprintf("%s (offs = %d, p = %d)", f.Name(), offs, p.offset)
 		checkPos(t, msg, f.Position(f.Pos(offs, 0)), Position{"bar", offs, 42, col})
 		checkPos(t, msg, fset.Position(p), Position{"bar", offs, 42, col})
 	}
@@ -204,7 +204,7 @@ func TestFileSetPastEnd(t *testing.T) {
 	for _, test := range tests {
 		fset.AddFile(test.filename, fset.Base(), test.size)
 	}
-	if f := fset.File(toPos(index(fset.Base()))); f != nil {
+	if f := fset.File(Pos{nil, toPos(index(fset.Base()))}); f != nil {
 		t.Errorf("got %v, want nil", f)
 	}
 }
@@ -217,7 +217,7 @@ func TestFileSetCacheUnlikely(t *testing.T) {
 		fset.AddFile(test.filename, fset.Base(), test.size)
 	}
 	for file, pos := range offsets {
-		f := fset.File(toPos(pos))
+		f := fset.File(Pos{nil, toPos(pos)})
 		if f.Name() != file {
 			t.Errorf("got %q at position %d, want %q", f.Name(), pos, file)
 		}
@@ -239,7 +239,7 @@ func TestFileSetRace(t *testing.T) {
 		stop.Add(1)
 		go func() {
 			for i := 0; i < 1000; i++ {
-				fset.Position(Pos(r.Int31n(max)))
+				fset.Position(Pos{nil, int(r.Int31n(max))})
 			}
 			stop.Done()
 		}()

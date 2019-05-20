@@ -462,8 +462,8 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 			}
 			if idx.field.Value == nil {
 				idx.field.Value = &ast.ListLit{
-					Lbrack: token.Pos(token.NoSpace),
-					Rbrack: token.Pos(token.NoSpace),
+					Lbrack: token.NoSpace.Pos(),
+					Rbrack: token.NoSpace.Pos(),
 				}
 			}
 			list := idx.field.Value.(*ast.ListLit)

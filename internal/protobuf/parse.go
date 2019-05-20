@@ -386,7 +386,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 		if x.Repeated {
 			f.Value = &ast.ListLit{
-				Ellipsis: token.Pos(token.NoSpace),
+				Ellipsis: token.NoSpace.Pos(),
 				Type:     f.Value,
 			}
 		}
@@ -571,7 +571,7 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 	p.addTag(f, o.tags)
 
 	if !o.required {
-		f.Optional = token.Pos(token.NoSpace)
+		f.Optional = token.NoSpace.Pos()
 	}
 	return f
 }
@@ -606,7 +606,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 			addComments(constraint, 1, o.Comment, o.InlineComment)
 			p.message.Elts = append(p.message.Elts, constraint)
 			if !p.required {
-				constraint.Optional = token.Pos(token.NoSpace)
+				constraint.Optional = token.NoSpace.Pos()
 			}
 
 		default:

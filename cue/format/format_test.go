@@ -243,7 +243,7 @@ func TestPackage(t *testing.T) {
 		Decls: []ast.Decl{
 			&ast.EmitDecl{
 				Expr: &ast.BasicLit{
-					ValuePos: token.Pos(token.NoSpace),
+					ValuePos: token.NoSpace.Pos(),
 					Value:    "1",
 				},
 			},

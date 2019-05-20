@@ -25,6 +25,7 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd"
 )
@@ -504,7 +505,7 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 					// Instead of unifying with the existing type, we substitute
 					// with the constraints from the tags. The type constraints
 					// will be implied when unified with a concrete value.
-					obj.arcs[i].v = mkBin(ctx, 0, opUnify, a.v, v)
+					obj.arcs[i].v = mkBin(ctx, token.NoPos, opUnify, a.v, v)
 				}
 			}
 		}

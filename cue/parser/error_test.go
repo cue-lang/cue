@@ -112,7 +112,7 @@ func expectedErrors(t *testing.T, fset *token.FileSet, filename string, src []by
 			} else {
 				l = len(tok.String())
 			}
-			here = prev + token.Pos(l)
+			here = prev.Add(l)
 		}
 	}
 }

@@ -446,7 +446,7 @@ func syncExpr(p *parser) {
 				p.syncCnt++
 				return
 			}
-			if p.pos > p.syncPos {
+			if p.syncPos.Before(p.pos) {
 				p.syncPos = p.pos
 				p.syncCnt = 0
 				return
@@ -475,7 +475,7 @@ func syncExpr(p *parser) {
 func (p *parser) safePos(pos token.Pos) (res token.Pos) {
 	defer func() {
 		if recover() != nil {
-			res = token.Pos(p.file.Base() + p.file.Size()) // EOF position
+			res = p.file.Pos(p.file.Base()+p.file.Size(), pos.RelPos()) // EOF position
 		}
 	}()
 	_ = p.file.Offset(pos) // trigger a panic if position is out-of-range
@@ -969,7 +969,7 @@ func (p *parser) parseList() (expr ast.Expr) {
 	if clauses := p.parseComprehensionClauses(); clauses != nil {
 		var expr ast.Expr
 		if len(elts) != 1 {
-			p.error(lbrack+1, "list comprehension must have exactly one element")
+			p.error(lbrack.Add(1), "list comprehension must have exactly one element")
 		}
 		if len(elts) > 0 {
 			expr = elts[0]

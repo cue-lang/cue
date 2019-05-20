@@ -164,6 +164,8 @@ func (x byImportSpec) Less(i, j int) bool {
 
 type byCommentPos []*ast.CommentGroup
 
-func (x byCommentPos) Len() int           { return len(x) }
-func (x byCommentPos) Swap(i, j int)      { x[i], x[j] = x[j], x[i] }
-func (x byCommentPos) Less(i, j int) bool { return x[i].Pos() < x[j].Pos() }
+func (x byCommentPos) Len() int      { return len(x) }
+func (x byCommentPos) Swap(i, j int) { x[i], x[j] = x[j], x[i] }
+func (x byCommentPos) Less(i, j int) bool {
+	return x[i].Pos().Before(x[j].Pos())
+}

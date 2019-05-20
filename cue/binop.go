@@ -152,7 +152,7 @@ func dist(ctx *context, d *disjunction, mark bool, x, y mVal) {
 		}
 		return
 	}
-	src := binSrc(0, opUnify, x.val, y.val)
+	src := binSrc(token.NoPos, opUnify, x.val, y.val)
 	d.add(ctx, binOp(ctx, src, opUnify, x.val, y.val), mark && x.mark && y.mark)
 }
 

@@ -755,7 +755,7 @@ func (v Value) Pos() token.Position {
 		return token.Position{}
 	}
 	pos := v.Source().Pos()
-	return v.idx.fset.Position(pos)
+	return pos.Position()
 }
 
 // IsConcrete reports whether the current value is a concrete scalar value,

@@ -24,7 +24,7 @@ import (
 
 // sortImports sorts runs of consecutive import lines in import blocks in f.
 // It also removes duplicate imports when it is possible to do so without data loss.
-func sortImports(fset *token.FileSet, f *ast.File) {
+func sortImports(f *ast.File) {
 	for _, d := range f.Decls {
 		d, ok := d.(*ast.ImportDecl)
 		if !ok {
@@ -42,23 +42,23 @@ func sortImports(fset *token.FileSet, f *ast.File) {
 		i := 0
 		specs := d.Specs[:0]
 		for j, s := range d.Specs {
-			if j > i && fset.Position(s.Pos()).Line > 1+fset.Position(d.Specs[j-1].End()).Line {
+			if j > i && s.Pos().Line() > 1+d.Specs[j-1].End().Line() {
 				// j begins a new run. End this one.
-				specs = append(specs, sortSpecs(fset, f, d.Specs[i:j])...)
+				specs = append(specs, sortSpecs(f, d.Specs[i:j])...)
 				i = j
 			}
 		}
-		specs = append(specs, sortSpecs(fset, f, d.Specs[i:])...)
+		specs = append(specs, sortSpecs(f, d.Specs[i:])...)
 		d.Specs = specs
 
 		// Deduping can leave a blank line before the rparen; clean that up.
 		if len(d.Specs) > 0 {
 			lastSpec := d.Specs[len(d.Specs)-1]
-			lastLine := fset.Position(lastSpec.Pos()).Line
-			rParenLine := fset.Position(d.Rparen).Line
+			lastLine := lastSpec.Pos().Line()
+			rParenLine := d.Rparen.Line()
 			for rParenLine > lastLine+1 {
 				rParenLine--
-				fset.File(d.Rparen).MergeLine(rParenLine)
+				d.Rparen.File().MergeLine(rParenLine)
 			}
 		}
 	}
@@ -107,7 +107,7 @@ type posSpan struct {
 	End   token.Pos
 }
 
-func sortSpecs(fset *token.FileSet, f *ast.File, specs []*ast.ImportSpec) []*ast.ImportSpec {
+func sortSpecs(f *ast.File, specs []*ast.ImportSpec) []*ast.ImportSpec {
 	// Can't short-circuit here even if specs are already sorted,
 	// since they might yet need deduplication.
 	// A lone import, however, may be safely ignored.
@@ -136,7 +136,7 @@ func sortSpecs(fset *token.FileSet, f *ast.File, specs []*ast.ImportSpec) []*ast
 			deduped = append(deduped, s)
 		} else {
 			p := s.Pos()
-			fset.File(p).MergeLine(fset.Position(p).Line)
+			p.File().MergeLine(p.Line())
 		}
 	}
 	specs = deduped

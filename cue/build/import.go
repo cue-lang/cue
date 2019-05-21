@@ -40,8 +40,7 @@ func (inst *Instance) complete() error {
 
 	var (
 		c        = inst.ctxt
-		fset     = c.FileSet()
-		imported = map[string][]token.Position{}
+		imported = map[string][]token.Pos{}
 	)
 
 	for _, f := range inst.Files {
@@ -57,7 +56,7 @@ func (inst *Instance) complete() error {
 					// TODO: remove panic
 					log.Panicf("%s: parser returned invalid quoted string: <%s>", f.Filename, quoted)
 				}
-				imported[path] = append(imported[path], fset.Position(spec.Pos()))
+				imported[path] = append(imported[path], spec.Pos())
 			}
 		}
 	}

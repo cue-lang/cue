@@ -100,7 +100,7 @@ type Instance struct {
 
 	// Dependencies
 	ImportPaths []string
-	ImportPos   map[string][]token.Position // line information for Imports
+	ImportPos   map[string][]token.Pos // line information for Imports
 
 	Deps       []string
 	DepsErrors []error
@@ -140,7 +140,7 @@ func (inst *Instance) ReportError(err error) {
 }
 
 func (inst *Instance) errorf(pos token.Pos, format string, args ...interface{}) error {
-	return inst.chkErr(errors.E(inst.ctxt.Pos(pos), fmt.Sprintf(format, args...)))
+	return inst.chkErr(errors.E(pos.Position(), fmt.Sprintf(format, args...)))
 }
 
 // Context defines the build context for this instance. All files defined

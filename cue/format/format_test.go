@@ -358,8 +358,8 @@ e2: c*t.z
 			t.Errorf("got ident %s; want %s", i2.Name, i1.Name)
 		}
 
-		l1 := fset.Position(i1.Pos()).Line
-		l2 := fset.Position(i2.Pos()).Line
+		l1 := i1.Pos().Line()
+		l2 := i2.Pos().Line()
 		if l2 != l1 {
 			t.Errorf("got line %d; want %d for %s", l2, l1, i1.Name)
 		}

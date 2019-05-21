@@ -269,7 +269,7 @@ func sortParentsFirst(s []string) {
 type fileProcessor struct {
 	firstFile        string
 	firstCommentFile string
-	imported         map[string][]token.Position
+	imported         map[string][]token.Pos
 	allTags          map[string]bool
 	allFiles         bool
 	ignoreOther      bool // ignore files from other packages
@@ -282,7 +282,7 @@ type fileProcessor struct {
 
 func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
 	return &fileProcessor{
-		imported: make(map[string][]token.Position),
+		imported: make(map[string][]token.Pos),
 		allTags:  make(map[string]bool),
 		c:        c,
 		pkg:      p,
@@ -409,7 +409,7 @@ func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
 				log.Panicf("%s: parser returned invalid quoted string: <%s>", filename, quoted)
 			}
 			if !isTest || fp.c.Tests {
-				fp.imported[path] = append(fp.imported[path], fset.Position(spec.Pos()))
+				fp.imported[path] = append(fp.imported[path], spec.Pos())
 			}
 		}
 	}
@@ -557,7 +557,7 @@ func parseWord(data []byte) (word, rest []byte) {
 	return word, rest
 }
 
-func cleanImports(m map[string][]token.Position) ([]string, map[string][]token.Position) {
+func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {
 	all := make([]string, 0, len(m))
 	for path := range m {
 		all = append(all, path)

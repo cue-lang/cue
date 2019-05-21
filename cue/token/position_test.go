@@ -16,8 +16,6 @@ package token
 
 import (
 	"fmt"
-	"math/rand"
-	"sync"
 	"testing"
 )
 
@@ -40,10 +38,7 @@ func TestNoPos(t *testing.T) {
 	if NoPos.IsValid() {
 		t.Errorf("NoPos should not be valid")
 	}
-	var fset *FileSet
-	checkPos(t, "nil NoPos", fset.Position(NoPos), Position{})
-	fset = NewFileSet()
-	checkPos(t, "fset NoPos", fset.Position(NoPos), Position{})
+	checkPos(t, "nil NoPos", NoPos.Position(), Position{})
 }
 
 var tests = []struct {
@@ -82,8 +77,8 @@ func verifyPositions(t *testing.T, fset *FileSet, f *File, lines []int) {
 		}
 		line, col := linecol(lines, offs)
 		msg := fmt.Sprintf("%s (offs = %d, p = %d)", f.Name(), offs, p.offset)
-		checkPos(t, msg, f.Position(f.Pos(offs, 0)), Position{f.Name(), offs, line, col})
-		checkPos(t, msg, fset.Position(p), Position{f.Name(), offs, line, col})
+		checkPos(t, msg, f.Pos(offs, 0).Position(), Position{f.Name(), offs, line, col})
+		checkPos(t, msg, p.Position(), Position{f.Name(), offs, line, col})
 	}
 }
 
@@ -107,14 +102,14 @@ func TestPositions(t *testing.T) {
 		}
 
 		// add file and verify name and size
-		f := fset.AddFile(test.filename, fset.Base()+delta, test.size)
+		f := NewFile(test.filename, 1+delta, test.size)
 		if f.Name() != test.filename {
 			t.Errorf("got filename %q; want %q", f.Name(), test.filename)
 		}
 		if f.Size() != test.size {
 			t.Errorf("%s: got file size %d; want %d", f.Name(), f.Size(), test.size)
 		}
-		if fset.File(f.Pos(0, 0)) != f {
+		if f.Pos(0, 0).file != f {
 			t.Errorf("%s: f.Pos(0, 0) was not found in f", f.Name())
 		}
 
@@ -156,8 +151,7 @@ func TestPositions(t *testing.T) {
 }
 
 func TestLineInfo(t *testing.T) {
-	fset := NewFileSet()
-	f := fset.AddFile("foo", fset.Base(), 500)
+	f := NewFile("foo", 1, 500)
 	lines := []int{0, 42, 77, 100, 210, 220, 277, 300, 333, 401}
 	// add lines individually and provide alternative line information
 	for _, offs := range lines {
@@ -170,110 +164,8 @@ func TestLineInfo(t *testing.T) {
 		_, col := linecol(lines, offs)
 		msg := fmt.Sprintf("%s (offs = %d, p = %d)", f.Name(), offs, p.offset)
 		checkPos(t, msg, f.Position(f.Pos(offs, 0)), Position{"bar", offs, 42, col})
-		checkPos(t, msg, fset.Position(p), Position{"bar", offs, 42, col})
+		checkPos(t, msg, p.Position(), Position{"bar", offs, 42, col})
 	}
-}
-
-func TestFiles(t *testing.T) {
-	fset := NewFileSet()
-	for i, test := range tests {
-		base := fset.Base()
-		if i%2 == 1 {
-			// Setting a negative base is equivalent to
-			// fset.Base(), so test some of each.
-			base = -1
-		}
-		fset.AddFile(test.filename, base, test.size)
-		j := 0
-		fset.Iterate(func(f *File) bool {
-			if f.Name() != tests[j].filename {
-				t.Errorf("got filename = %s; want %s", f.Name(), tests[j].filename)
-			}
-			j++
-			return true
-		})
-		if j != i+1 {
-			t.Errorf("got %d files; want %d", j, i+1)
-		}
-	}
-}
-
-// FileSet.File should return nil if Pos is past the end of the FileSet.
-func TestFileSetPastEnd(t *testing.T) {
-	fset := NewFileSet()
-	for _, test := range tests {
-		fset.AddFile(test.filename, fset.Base(), test.size)
-	}
-	if f := fset.File(Pos{nil, toPos(index(fset.Base()))}); f != nil {
-		t.Errorf("got %v, want nil", f)
-	}
-}
-
-func TestFileSetCacheUnlikely(t *testing.T) {
-	fset := NewFileSet()
-	offsets := make(map[string]index)
-	for _, test := range tests {
-		offsets[test.filename] = index(fset.Base())
-		fset.AddFile(test.filename, fset.Base(), test.size)
-	}
-	for file, pos := range offsets {
-		f := fset.File(Pos{nil, toPos(pos)})
-		if f.Name() != file {
-			t.Errorf("got %q at position %d, want %q", f.Name(), pos, file)
-		}
-	}
-}
-
-// issue 4345. Test that concurrent use of FileSet.Pos does not trigger a
-// race in the FileSet position cache.
-func TestFileSetRace(t *testing.T) {
-	fset := NewFileSet()
-	for i := 0; i < 100; i++ {
-		fset.AddFile(fmt.Sprintf("file-%d", i), fset.Base(), 1031)
-	}
-	max := int32(fset.Base())
-	var stop sync.WaitGroup
-	r := rand.New(rand.NewSource(7))
-	for i := 0; i < 2; i++ {
-		r := rand.New(rand.NewSource(r.Int63()))
-		stop.Add(1)
-		go func() {
-			for i := 0; i < 1000; i++ {
-				fset.Position(Pos{nil, int(r.Int31n(max))})
-			}
-			stop.Done()
-		}()
-	}
-	stop.Wait()
-}
-
-// issue 16548. Test that concurrent use of File.AddLine and FileSet.PositionFor
-// does not trigger a race in the FileSet position cache.
-func TestFileSetRace2(t *testing.T) {
-	const N = 1e3
-	var (
-		fset = NewFileSet()
-		file = fset.AddFile("", -1, N)
-		ch   = make(chan int, 2)
-	)
-
-	go func() {
-		for i := 0; i < N; i++ {
-			file.AddLine(i)
-		}
-		ch <- 1
-	}()
-
-	go func() {
-		pos := file.Pos(0, 0)
-		for i := 0; i < N; i++ {
-			fset.PositionFor(pos, false)
-		}
-		ch <- 1
-	}()
-
-	<-ch
-	<-ch
 }
 
 func TestPositionFor(t *testing.T) {
@@ -288,8 +180,7 @@ done
 `)
 
 	const filename = "foo"
-	fset := NewFileSet()
-	f := fset.AddFile(filename, fset.Base(), len(src))
+	f := NewFile(filename, 1, len(src))
 	f.SetLinesForContent(src)
 
 	// verify position info

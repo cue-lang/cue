@@ -101,14 +101,6 @@ func NewContext(opts ...Option) *Context {
 	return c
 }
 
-// Pos returns position information for a token.Pos.
-func (c *Context) Pos(pos token.Pos) token.Position {
-	if c.fset == nil {
-		return token.Position{}
-	}
-	return c.fset.Position(pos)
-}
-
 // FileSet reports the file set used for parsing files.
 func (c *Context) FileSet() *token.FileSet {
 	c.init()

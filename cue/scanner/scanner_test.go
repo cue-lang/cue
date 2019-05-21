@@ -190,7 +190,7 @@ func newlineCount(s string) int {
 }
 
 func checkPosScan(t *testing.T, lit string, p token.Pos, expected token.Position) {
-	pos := fset.Position(p)
+	pos := p.Position()
 	if pos.Filename != expected.Filename {
 		t.Errorf("bad filename for %q: got %s, expected %s", lit, pos.Filename, expected.Filename)
 	}
@@ -216,7 +216,7 @@ func TestScan(t *testing.T) {
 
 	// verify scan
 	var s Scanner
-	s.Init(fset.AddFile("", fset.Base(), len(source)), source, eh, ScanComments|dontInsertCommas)
+	s.Init(token.NewFile("", 1, len(source)), source, eh, ScanComments|dontInsertCommas)
 
 	// set up expected position
 	epos := token.Position{
@@ -301,7 +301,7 @@ func TestScan(t *testing.T) {
 
 func checkComma(t *testing.T, line string, mode Mode) {
 	var S Scanner
-	file := fset.AddFile("TestCommas", fset.Base(), len(line))
+	file := token.NewFile("TestCommas", 1, len(line))
 	S.Init(file, []byte(line), nil, mode)
 	pos, tok, lit := S.Scan()
 	for tok != token.EOF {
@@ -476,7 +476,7 @@ func TestRelative(t *testing.T) {
 		"elided  ,        \n",
 	}
 	var S Scanner
-	f := fset.AddFile("TestCommas", fset.Base(), len(test))
+	f := token.NewFile("TestCommas", 1, len(test))
 	S.Init(f, []byte(test), nil, ScanComments)
 	pos, tok, lit := S.Scan()
 	got := []string{}
@@ -538,7 +538,7 @@ func TestLineComments(t *testing.T) {
 
 	// verify scan
 	var S Scanner
-	f := fset.AddFile(filepath.Join("dir", "TestLineComments"), fset.Base(), len(src))
+	f := token.NewFile(filepath.Join("dir", "TestLineComments"), 1, len(src))
 	S.Init(f, []byte(src), nil, dontInsertCommas)
 	for _, s := range segs {
 		p, _, lit := S.Scan()
@@ -562,7 +562,7 @@ func TestInit(t *testing.T) {
 
 	// 1st init
 	src1 := "false true { }"
-	f1 := fset.AddFile("src1", fset.Base(), len(src1))
+	f1 := token.NewFile("src1", 1, len(src1))
 	s.Init(f1, []byte(src1), nil, dontInsertCommas)
 	if f1.Size() != len(src1) {
 		t.Errorf("bad file size: got %d, expected %d", f1.Size(), len(src1))
@@ -576,7 +576,7 @@ func TestInit(t *testing.T) {
 
 	// 2nd init
 	src2 := "null true { ]"
-	f2 := fset.AddFile("src2", fset.Base(), len(src2))
+	f2 := token.NewFile("src2", 1, len(src2))
 	s.Init(f2, []byte(src2), nil, dontInsertCommas)
 	if f2.Size() != len(src2) {
 		t.Errorf("bad file size: got %d, expected %d", f2.Size(), len(src2))
@@ -608,7 +608,7 @@ func TestScanInterpolation(t *testing.T) {
 	for i, src := range sources {
 		name := fmt.Sprintf("tsrc%d", i)
 		t.Run(name, func(t *testing.T) {
-			f := fset.AddFile(name, fset.Base(), len(src))
+			f := token.NewFile(name, 1, len(src))
 
 			// verify scan
 			var s Scanner
@@ -651,7 +651,7 @@ func TestStdErrorHander(t *testing.T) {
 	eh := func(pos token.Position, msg string) { list.AddNew(pos, msg) }
 
 	var s Scanner
-	s.Init(fset.AddFile("File1", fset.Base(), len(src)), []byte(src), eh, dontInsertCommas)
+	s.Init(token.NewFile("File1", 1, len(src)), []byte(src), eh, dontInsertCommas)
 	for {
 		if _, tok, _ := s.Scan(); tok == token.EOF {
 			break
@@ -695,7 +695,7 @@ func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err str
 		h.msg = msg
 		h.pos = pos
 	}
-	s.Init(fset.AddFile("", fset.Base(), len(src)), []byte(src), eh, ScanComments|dontInsertCommas)
+	s.Init(token.NewFile("", 1, len(src)), []byte(src), eh, ScanComments|dontInsertCommas)
 	_, tok0, lit0 := s.Scan()
 	if tok0 != tok {
 		t.Errorf("%q: got %s, expected %s", src, tok0, tok)
@@ -840,12 +840,12 @@ func TestNoLiteralComments(t *testing.T) {
 		}
 	`
 	var s Scanner
-	s.Init(fset.AddFile("", fset.Base(), len(src)), []byte(src), nil, 0)
+	s.Init(token.NewFile("", 1, len(src)), []byte(src), nil, 0)
 	for {
 		pos, tok, lit := s.Scan()
 		class := tokenclass(tok)
 		if lit != "" && class != keyword && class != literal && tok != token.COMMA {
-			t.Errorf("%s: tok = %s, lit = %q", fset.Position(pos), tok, lit)
+			t.Errorf("%s: tok = %s, lit = %q", pos, tok, lit)
 		}
 		if tok <= token.EOF {
 			break
@@ -855,8 +855,7 @@ func TestNoLiteralComments(t *testing.T) {
 
 func BenchmarkScan(b *testing.B) {
 	b.StopTimer()
-	fset := token.NewFileSet()
-	file := fset.AddFile("", fset.Base(), len(source))
+	file := token.NewFile("", 1, len(source))
 	var s Scanner
 	b.StartTimer()
 	for i := 0; i < b.N; i++ {
@@ -877,8 +876,7 @@ func BenchmarkScanFile(b *testing.B) {
 	if err != nil {
 		panic(err)
 	}
-	fset := token.NewFileSet()
-	file := fset.AddFile(filename, fset.Base(), len(src))
+	file := token.NewFile(filename, 1, len(src))
 	b.SetBytes(int64(len(src)))
 	var s Scanner
 	b.StartTimer()

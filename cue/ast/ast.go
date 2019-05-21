@@ -666,6 +666,10 @@ func (f *File) Pos() token.Pos {
 	if len(f.Decls) > 0 {
 		return f.Decls[0].Pos()
 	}
+	if f.Filename != "" {
+		// TODO. Do something more principled and efficient.
+		return token.NewFile(f.Filename, -1, 1).Pos(0, 0)
+	}
 	return token.NoPos
 }
 

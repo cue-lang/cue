@@ -86,7 +86,7 @@ func newSharedIndex(f *token.FileSet) *index {
 	// FileSet idea from the API. Just take the hit of the extra pointers for
 	// positions in the ast, and then optimize the storage in an abstract
 	// machine implementation for storing graphs.
-	f.AddFile("dummy", sharedOffset, 0)
+	token.NewFile("dummy", sharedOffset, 0)
 	i := &index{
 		fset:     f,
 		labelMap: map[string]label{"": 0},
@@ -182,7 +182,7 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 }
 
 func lineStr(idx *index, n ast.Node) string {
-	return idx.fset.Position(n.Pos()).String()
+	return n.Pos().String()
 }
 
 func resolveFiles(idx *index, p *build.Instance) error {

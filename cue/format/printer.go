@@ -65,7 +65,7 @@ func (p *printer) lineFor(pos token.Pos) int {
 	if p.fset == nil {
 		return 0
 	}
-	return p.fset.Position(pos).Line
+	return pos.Line()
 }
 
 func (p *printer) Print(v interface{}) {
@@ -156,7 +156,7 @@ func (p *printer) Print(v interface{}) {
 	case token.Pos:
 		// TODO: should we use a known file position to synchronize? Go does,
 		// but we don't really have to.
-		// pos := p.fset.Position(x)
+		// pos := x
 		if x.HasRelPos() {
 			if p.allowed&nooverride == 0 {
 				requested := p.allowed

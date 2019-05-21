@@ -80,7 +80,7 @@ func newParser(fset *token.FileSet, filename string, src interface{}) (*parser, 
 	if err != nil {
 		return nil, err
 	}
-	info := fset.AddFile(filename, -1, len(b))
+	info := token.NewFile(filename, -1, len(b))
 	info.SetLinesForContent(b)
 	p := parser{info: info}
 	if !yaml_parser_initialize(&p.parser, filename) {

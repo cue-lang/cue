@@ -81,20 +81,20 @@ type bottom struct {
 
 func (x *bottom) kind() kind { return bottomKind }
 
-func (x *bottom) Position() []token.Position {
+func (x *bottom) Position() []token.Pos {
 	if x.index != nil && x.index.fset != nil {
 		return appendPositions(nil, x.index.fset, x.pos)
 	}
 	return nil
 }
 
-func appendPositions(pos []token.Position, fset *token.FileSet, src source) []token.Position {
+func appendPositions(pos []token.Pos, fset *token.FileSet, src source) []token.Pos {
 	if src != nil {
 		if p := src.Pos(); p != token.NoPos {
 			if p.Offset() >= sharedOffset {
 				fset = sharedIndex.fset
 			}
-			return append(pos, fset.Position(src.Pos()))
+			return append(pos, src.Pos())
 		}
 		if c := src.computed(); c != nil {
 			pos = appendPositions(pos, fset, c.x)
@@ -127,7 +127,7 @@ func appendLocations(locs []string, fset *token.FileSet, src source) []string {
 			if p.Offset() >= sharedOffset {
 				fset = sharedIndex.fset
 			}
-			return append(locs, fset.Position(src.Pos()).String())
+			return append(locs, src.Pos().String())
 		}
 		if c := src.computed(); c != nil {
 			locs = appendLocations(locs, fset, c.x)

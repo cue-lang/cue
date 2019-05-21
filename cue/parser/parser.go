@@ -62,7 +62,7 @@ type parser struct {
 }
 
 func (p *parser) init(fset *token.FileSet, filename string, src []byte, mode []Option) {
-	p.file = fset.AddFile(filename, -1, len(src))
+	p.file = token.NewFile(filename, -1, len(src))
 	for _, f := range mode {
 		f(p)
 	}

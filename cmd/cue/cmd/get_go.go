@@ -33,7 +33,6 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
-	cuetoken "cuelang.org/go/cue/token"
 	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/packages"
 )
@@ -501,7 +500,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			if filepath.Ext(path) != ".cue" {
 				return nil
 			}
-			f, err := parser.ParseFile(cuetoken.NewFileSet(), path, nil)
+			f, err := parser.ParseFile(path, nil)
 			if err != nil {
 				return err
 			}

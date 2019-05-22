@@ -82,23 +82,20 @@ type bottom struct {
 func (x *bottom) kind() kind { return bottomKind }
 
 func (x *bottom) Position() []token.Pos {
-	if x.index != nil && x.index.fset != nil {
-		return appendPositions(nil, x.index.fset, x.pos)
+	if x.index != nil {
+		return appendPositions(nil, x.pos)
 	}
 	return nil
 }
 
-func appendPositions(pos []token.Pos, fset *token.FileSet, src source) []token.Pos {
+func appendPositions(pos []token.Pos, src source) []token.Pos {
 	if src != nil {
 		if p := src.Pos(); p != token.NoPos {
-			if p.Offset() >= sharedOffset {
-				fset = sharedIndex.fset
-			}
 			return append(pos, src.Pos())
 		}
 		if c := src.computed(); c != nil {
-			pos = appendPositions(pos, fset, c.x)
-			pos = appendPositions(pos, fset, c.y)
+			pos = appendPositions(pos, c.x)
+			pos = appendPositions(pos, c.y)
 		}
 	}
 	return pos
@@ -108,8 +105,8 @@ func (x *bottom) Error() string { return fmt.Sprint(x) }
 
 func (x *bottom) FormatError(p errors.Printer) error {
 	p.Print(x.msg)
-	if p.Detail() && x.index != nil && x.index.fset != nil {
-		locs := appendLocations(nil, x.index.fset, x.pos)
+	if p.Detail() && x.index != nil {
+		locs := appendLocations(nil, x.pos)
 		sort.Strings(locs)
 		for _, l := range locs {
 			p.Printf("%s\n", l)
@@ -121,17 +118,14 @@ func (x *bottom) FormatError(p errors.Printer) error {
 	return nil
 }
 
-func appendLocations(locs []string, fset *token.FileSet, src source) []string {
+func appendLocations(locs []string, src source) []string {
 	if src != nil {
 		if p := src.Pos(); p != token.NoPos {
-			if p.Offset() >= sharedOffset {
-				fset = sharedIndex.fset
-			}
 			return append(locs, src.Pos().String())
 		}
 		if c := src.computed(); c != nil {
-			locs = appendLocations(locs, fset, c.x)
-			locs = appendLocations(locs, fset, c.y)
+			locs = appendLocations(locs, c.x)
+			locs = appendLocations(locs, c.y)
 		}
 	}
 	return locs

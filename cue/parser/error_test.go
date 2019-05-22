@@ -154,7 +154,7 @@ func checkErrors(t *testing.T, filename string, input interface{}) {
 		return
 	}
 
-	f, err := ParseFile(token.NewFileSet(), filename, src, DeclarationErrors, AllErrors)
+	f, err := ParseFile(filename, src, DeclarationErrors, AllErrors)
 	file := f.Pos().File()
 	found, ok := err.(errors.List)
 	if err != nil && !ok {

@@ -41,7 +41,7 @@ func TestFromExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			inst, err := FromExpr(nil, tc.expr)
+			inst, err := FromExpr(tc.expr)
 			if err != nil {
 				t.Fatal(err)
 			}

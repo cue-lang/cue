@@ -18,7 +18,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"github.com/spf13/cobra"
 )
 
@@ -45,7 +44,7 @@ func doVet(cmd *cobra.Command, args []string) error {
 
 	var exprs []ast.Expr
 	for _, e := range *expressions {
-		expr, err := parser.ParseExpr(token.NewFileSet(), "<expression flag>", e)
+		expr, err := parser.ParseExpr("<expression flag>", e)
 		if err != nil {
 			return err
 		}

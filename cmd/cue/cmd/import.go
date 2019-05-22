@@ -428,7 +428,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 
 		switch {
 		case *node != "":
-			inst, err := cue.FromExpr(nil, expr)
+			inst, err := cue.FromExpr(expr)
 			if err != nil {
 				return err
 			}
@@ -570,8 +570,7 @@ func (x *listIndex) label(label ast.Label) *listIndex {
 }
 
 func parsePath(exprs string) (p []ast.Label, err error) {
-	fset := token.NewFileSet()
-	f, err := parser.ParseFile(fset, "<path flag>", exprs+": _")
+	f, err := parser.ParseFile("<path flag>", exprs+": _")
 	if err != nil {
 		return nil, fmt.Errorf("parser error in path %q: %v", exprs, err)
 	}
@@ -614,8 +613,6 @@ func newName(filename string, i int) string {
 	return filename
 }
 
-var fset = token.NewFileSet()
-
 func handleJSON(path string, r io.Reader) (objects []ast.Expr, err error) {
 	d := json.NewDecoder(r)
 
@@ -628,7 +625,7 @@ func handleJSON(path string, r io.Reader) (objects []ast.Expr, err error) {
 		if err != nil {
 			return nil, fmt.Errorf("could not parse JSON: %v", err)
 		}
-		expr, err := parser.ParseExpr(fset, path, []byte(raw))
+		expr, err := parser.ParseExpr(path, []byte(raw))
 		if err != nil {
 			return nil, fmt.Errorf("invalid input: %v %q", err, raw)
 		}
@@ -638,7 +635,7 @@ func handleJSON(path string, r io.Reader) (objects []ast.Expr, err error) {
 }
 
 func handleYAML(path string, r io.Reader) (objects []ast.Expr, err error) {
-	d, err := yaml.NewDecoder(fset, path, r)
+	d, err := yaml.NewDecoder(path, r)
 	if err != nil {
 		return nil, err
 	}
@@ -748,9 +745,8 @@ func (h *hoister) hoist(expr ast.Expr) {
 
 func tryParse(str string) (s ast.Expr, format *encodingInfo) {
 	b := []byte(str)
-	fset := token.NewFileSet()
 	if json.Valid(b) {
-		expr, err := parser.ParseExpr(fset, "", b)
+		expr, err := parser.ParseExpr("", b)
 		if err != nil {
 			// TODO: report error
 			return nil, nil
@@ -763,7 +759,7 @@ func tryParse(str string) (s ast.Expr, format *encodingInfo) {
 		return expr, jsonEnc
 	}
 
-	if expr, err := yaml.Unmarshal(fset, "", b); err == nil {
+	if expr, err := yaml.Unmarshal("", b); err == nil {
 		switch expr.(type) {
 		case *ast.StructLit, *ast.ListLit:
 		default:

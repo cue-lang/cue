@@ -190,7 +190,6 @@ func toPos(x index) int {
 
 type index int
 
-// A File is a handle for a file belonging to a FileSet.
 // A File has a name, size, and line offset table.
 type File struct {
 	mutex sync.RWMutex
@@ -430,23 +429,6 @@ func (f *File) PositionFor(p Pos, adjusted bool) (pos Position) {
 //
 func (f *File) Position(p Pos) (pos Position) {
 	return f.PositionFor(p, true)
-}
-
-// A FileSet represents a set of source files.
-// Methods of file sets are synchronized; multiple goroutines
-// may invoke them concurrently.
-type FileSet struct {
-	mutex sync.RWMutex // protects the file set
-	base  int          // base offset for the next file
-	files []*File      // list of files in the order added to the set
-	last  *File        // cache of last file looked up
-}
-
-// NewFileSet creates a new file set.
-func NewFileSet() *FileSet {
-	return &FileSet{
-		base: 1, // 0 == NoPos
-	}
 }
 
 // -----------------------------------------------------------------------------

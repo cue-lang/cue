@@ -61,7 +61,7 @@ type parser struct {
 
 }
 
-func (p *parser) init(fset *token.FileSet, filename string, src []byte, mode []Option) {
+func (p *parser) init(filename string, src []byte, mode []Option) {
 	p.file = token.NewFile(filename, -1, len(src))
 	for _, f := range mode {
 		f(p)

@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 )
 
 // Compact generates the JSON-encoded src with insignificant space characters
@@ -95,8 +94,7 @@ func Unmarshal(b []byte) (ast.Expr, error) {
 	if !json.Valid(b) {
 		return nil, fmt.Errorf("json: invalid JSON")
 	}
-	fset := token.NewFileSet()
-	expr, err := parser.ParseExpr(fset, "json", b)
+	expr, err := parser.ParseExpr("json", b)
 	if err != nil {
 		// NOTE: should never happen.
 		return nil, fmt.Errorf("json: could not parse JSON: %v", err)

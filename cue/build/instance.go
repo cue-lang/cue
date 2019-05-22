@@ -179,7 +179,7 @@ func (inst *Instance) addImport(imp *Instance) {
 // match the package name of the instance.
 func (inst *Instance) AddFile(filename string, src interface{}) error {
 	c := inst.ctxt
-	file, err := parser.ParseFile(c.FileSet(), filename, src, c.parseOptions...)
+	file, err := parser.ParseFile(filename, src, c.parseOptions...)
 	if err == nil {
 		err = inst.addSyntax(file)
 	}

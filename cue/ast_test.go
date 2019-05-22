@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 )
 
 func TestCompile(t *testing.T) {
@@ -360,7 +359,7 @@ func TestEval(t *testing.T) {
 			if errs != nil {
 				t.Fatal(errs)
 			}
-			expr, err := parser.ParseExpr(token.NewFileSet(), "<test>", tc.expr)
+			expr, err := parser.ParseExpr("<test>", tc.expr)
 			if err != nil {
 				t.Fatal(err)
 			}

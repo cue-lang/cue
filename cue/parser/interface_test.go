@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 func Test_readSource(t *testing.T) {
@@ -49,7 +48,6 @@ func Test_readSource(t *testing.T) {
 
 func TestParseFile(t *testing.T) {
 	type args struct {
-		fset     *token.FileSet
 		filename string
 		src      interface{}
 		options  []Option
@@ -63,7 +61,7 @@ func TestParseFile(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		gotF, err := ParseFile(tt.args.fset, tt.args.filename, tt.args.src, tt.args.options...)
+		gotF, err := ParseFile(tt.args.filename, tt.args.src, tt.args.options...)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. ParseFile() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue
@@ -76,7 +74,6 @@ func TestParseFile(t *testing.T) {
 
 func TestParseExprFrom(t *testing.T) {
 	type args struct {
-		fset     *token.FileSet
 		filename string
 		src      interface{}
 		mode     Option
@@ -90,7 +87,7 @@ func TestParseExprFrom(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := ParseExpr(tt.args.fset, tt.args.filename, tt.args.src, tt.args.mode)
+		got, err := ParseExpr(tt.args.filename, tt.args.src, tt.args.mode)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. ParseExprFrom() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue

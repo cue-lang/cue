@@ -113,7 +113,6 @@ func runTrim(cmd *cobra.Command, args []string) error {
 	log.SetOutput(cmd.OutOrStderr())
 
 	ctxt := build.NewContext(build.ParseOptions(parser.ParseComments))
-	fset := ctxt.FileSet()
 	binst := load.Instances(args, &load.Config{Context: ctxt})
 
 	instances := cue.Build(binst)
@@ -134,7 +133,7 @@ func runTrim(cmd *cobra.Command, args []string) error {
 
 	for i, inst := range binst {
 
-		gen := newTrimSet(fset)
+		gen := newTrimSet()
 		for _, f := range inst.Files {
 			gen.markNodes(f)
 		}
@@ -182,16 +181,14 @@ func runTrim(cmd *cobra.Command, args []string) error {
 }
 
 type trimSet struct {
-	fset      *token.FileSet
 	stack     []string
 	exclude   map[ast.Node]bool // don't remove fields marked here
 	alwaysGen map[ast.Node]bool // node is always from a generated source
 	fromComp  map[ast.Node]bool // node originated from a comprehension
 }
 
-func newTrimSet(fset *token.FileSet) *trimSet {
+func newTrimSet() *trimSet {
 	return &trimSet{
-		fset:      fset,
 		exclude:   map[ast.Node]bool{},
 		alwaysGen: map[ast.Node]bool{},
 		fromComp:  map[ast.Node]bool{},

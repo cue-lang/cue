@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
 
@@ -136,7 +135,7 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	expr, err := parser.ParseExpr(fset, fmt.Sprintf("<%T>", x), constraints)
+	expr, err := parser.ParseExpr(fmt.Sprintf("<%T>", x), constraints)
 	if err != nil {
 		return err
 	}
@@ -161,12 +160,10 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 var (
 	mutex    sync.Mutex
 	instance *cue.Instance
-	fset     *token.FileSet
 )
 
 func init() {
 	context := build.NewContext()
-	fset = context.FileSet()
 	inst := context.NewInstance("<cuego>", nil)
 	if err := inst.AddFile("<cuego>", "{}"); err != nil {
 		panic(err)

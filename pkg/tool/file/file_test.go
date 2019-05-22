@@ -23,19 +23,17 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
 
 func parse(t *testing.T, kind, expr string) cue.Value {
 	t.Helper()
-	fset := token.NewFileSet()
 
-	x, err := parser.ParseExpr(fset, "test", expr)
+	x, err := parser.ParseExpr("test", expr)
 	if err != nil {
 		t.Fatal(err)
 	}
-	i, err := cue.FromExpr(fset, x)
+	i, err := cue.FromExpr(x)
 	if err != nil {
 		t.Fatal(err)
 	}

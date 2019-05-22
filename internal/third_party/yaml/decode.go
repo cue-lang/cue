@@ -75,7 +75,7 @@ func readSource(filename string, src interface{}) ([]byte, error) {
 	return ioutil.ReadFile(filename)
 }
 
-func newParser(fset *token.FileSet, filename string, src interface{}) (*parser, error) {
+func newParser(filename string, src interface{}) (*parser, error) {
 	b, err := readSource(filename, src)
 	if err != nil {
 		return nil, err

@@ -16,7 +16,6 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 // MapSlice encodes and decodes as a YAML map.
@@ -81,8 +80,8 @@ type Marshaler interface {
 // See the documentation of Marshal for the format of tags and a list of
 // supported tag options.
 //
-func Unmarshal(fset *token.FileSet, filename string, in []byte) (expr ast.Expr, err error) {
-	return unmarshal(fset, filename, in)
+func Unmarshal(filename string, in []byte) (expr ast.Expr, err error) {
+	return unmarshal(filename, in)
 }
 
 // A Decorder reads and decodes YAML values from an input stream.
@@ -95,8 +94,8 @@ type Decoder struct {
 //
 // The decoder introduces its own buffering and may read
 // data from r beyond the YAML values requested.
-func NewDecoder(fset *token.FileSet, filename string, r io.Reader) (*Decoder, error) {
-	d, err := newParser(fset, filename, r)
+func NewDecoder(filename string, r io.Reader) (*Decoder, error) {
+	d, err := newParser(filename, r)
 	if err != nil {
 		return nil, err
 	}
@@ -122,9 +121,9 @@ func (dec *Decoder) Decode() (expr ast.Expr, err error) {
 	return expr, nil
 }
 
-func unmarshal(fset *token.FileSet, filename string, in []byte) (expr ast.Expr, err error) {
+func unmarshal(filename string, in []byte) (expr ast.Expr, err error) {
 	defer handleErr(&err)
-	p, err := newParser(fset, filename, in)
+	p, err := newParser(filename, in)
 	if err != nil {
 		return nil, err
 	}

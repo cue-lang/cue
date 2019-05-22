@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 )
 
 var traceOn = flag.Bool("debug", false, "enable tracing")
@@ -43,9 +42,8 @@ func compileFile(t *testing.T, body string) (*context, *structLit) {
 func compileInstance(t *testing.T, body string) (*context, *Instance, errors.List) {
 	t.Helper()
 
-	fset := token.NewFileSet()
-	x := newIndex(fset).NewInstance(nil)
-	f, err := parser.ParseFile(fset, "test", body)
+	x := newIndex().NewInstance(nil)
+	f, err := parser.ParseFile("test", body)
 	ctx := x.newContext()
 
 	switch errs := err.(type) {

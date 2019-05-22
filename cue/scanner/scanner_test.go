@@ -28,8 +28,6 @@ import (
 	"github.com/google/go-cmp/cmp"
 )
 
-var fset = token.NewFileSet()
-
 const /* class */ (
 	special = iota
 	literal

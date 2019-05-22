@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 )
 
 func TestTime(t *testing.T) {
@@ -32,7 +31,7 @@ func TestTime(t *testing.T) {
 	}
 
 	parseCUE := func(t *testing.T, time string) error {
-		expr, err := parser.ParseExpr(token.NewFileSet(), "test", "Time&"+time)
+		expr, err := parser.ParseExpr("test", "Time&"+time)
 		if err != nil {
 			t.Fatal(err)
 		}

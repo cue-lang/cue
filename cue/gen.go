@@ -40,7 +40,6 @@ import (
 	"cuelang.org/go/cue"
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
-	cuetoken "cuelang.org/go/cue/token"
 )
 
 const prefix = "../pkg/"
@@ -68,7 +67,6 @@ func main() {
 		w:     &bytes.Buffer{},
 		decls: &bytes.Buffer{},
 		fset:  token.NewFileSet(),
-		cfset: cuetoken.NewFileSet(),
 	}
 
 	fmt.Fprintln(g.w, "var builtinPackages = map[string]*builtinPkg{")
@@ -137,7 +135,6 @@ type generator struct {
 	w          *bytes.Buffer
 	decls      *bytes.Buffer
 	fset       *token.FileSet
-	cfset      *cuetoken.FileSet
 	defaultPkg string
 	first      bool
 	iota       int

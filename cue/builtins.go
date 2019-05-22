@@ -27,7 +27,6 @@ import (
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/third_party/yaml"
 	goyaml "github.com/ghodss/yaml"
 )
@@ -381,8 +380,7 @@ var builtinPackages = map[string]*builtinPkg{
 					if !json.Valid(b) {
 						return nil, fmt.Errorf("json: invalid JSON")
 					}
-					fset := token.NewFileSet()
-					expr, err := parser.ParseExpr(fset, "json", b)
+					expr, err := parser.ParseExpr("json", b)
 					if err != nil {
 
 						return nil, fmt.Errorf("json: could not parse JSON: %v", err)
@@ -437,8 +435,7 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret, c.err = func() (interface{}, error) {
-					fset := token.NewFileSet()
-					return yaml.Unmarshal(fset, "", data)
+					return yaml.Unmarshal("", data)
 				}()
 			},
 		}},

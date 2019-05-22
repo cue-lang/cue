@@ -78,7 +78,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, name string) *structLit {
 
 	// Parse builtin CUE
 	if p.cue != "" {
-		expr, err := parser.ParseExpr(ctx.index.fset, name, p.cue)
+		expr, err := parser.ParseExpr(name, p.cue)
 		if err != nil {
 			fmt.Println(p.cue)
 			panic(err)
@@ -97,7 +97,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, name string) *structLit {
 // newConstBuiltin parses and creates any CUE expression that does not have
 // fields.
 func mustParseConstBuiltin(ctx *context, name, val string) evaluated {
-	expr, err := parser.ParseExpr(ctx.index.fset, "<builtin:"+name+">", val)
+	expr, err := parser.ParseExpr("<builtin:"+name+">", val)
 	if err != nil {
 		panic(err)
 	}

@@ -316,7 +316,6 @@ func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
 	name := filepath.Base(fullPath)
 	dir := filepath.Dir(fullPath)
 
-	fset := token.NewFileSet()
 	ext := nameExt(name)
 	p := fp.pkg
 
@@ -341,7 +340,7 @@ func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
 		return false // don't mark as added
 	}
 
-	pf, err := parser.ParseFile(fset, filename, data, parser.ImportsOnly, parser.ParseComments)
+	pf, err := parser.ParseFile(filename, data, parser.ImportsOnly, parser.ParseComments)
 	if err != nil {
 		return badFile(err)
 	}

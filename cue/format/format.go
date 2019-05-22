@@ -30,12 +30,6 @@ import (
 // An Option sets behavior of the formatter.
 type Option func(c *config)
 
-// FileSet sets the file set that was used for creating a node. The formatter
-// generally formats fine without it.
-func FileSet(fset *token.FileSet) Option {
-	return func(c *config) { c.fset = fset }
-}
-
 // Simplify allows the formatter to simplify output, such as removing
 // unnecessary quotes.
 func Simplify() Option {
@@ -96,11 +90,8 @@ func Node(dst io.Writer, node ast.Node, opt ...Option) error {
 //
 func Source(b []byte, opt ...Option) ([]byte, error) {
 	cfg := newConfig(opt)
-	if cfg.fset == nil {
-		cfg.fset = token.NewFileSet()
-	}
 
-	f, err := parser.ParseFile(cfg.fset, "", b, parser.ParseComments)
+	f, err := parser.ParseFile("", b, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %s", err)
 	}
@@ -114,8 +105,6 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 }
 
 type config struct {
-	fset *token.FileSet
-
 	UseSpaces bool
 	TabIndent bool
 	Tabwidth  int // default: 8
@@ -264,7 +253,7 @@ func (f *formatter) wsOverride(def whiteSpace) whiteSpace {
 func (f *formatter) onOneLine(node ast.Node) bool {
 	a := node.Pos()
 	b := node.End()
-	if f.fset != nil && a.IsValid() && b.IsValid() {
+	if a.IsValid() && b.IsValid() {
 		return f.lineFor(a) == f.lineFor(b)
 	}
 	// TODO: walk and look at relative positions to determine the same?
@@ -277,7 +266,8 @@ func (f *formatter) before(node ast.Node) bool {
 	f.current.parentSep = f.current.nodeSep
 
 	if node != nil {
-		if f.current.nodeSep != blank && f.onOneLine(node) {
+		s, ok := node.(*ast.StructLit)
+		if ok && len(s.Elts) <= 1 && f.current.nodeSep != blank && f.onOneLine(node) {
 			f.current.nodeSep = blank
 		}
 		f.current.cg = node.Comments()

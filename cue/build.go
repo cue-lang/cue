@@ -33,7 +33,7 @@ func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {
 		panic("cue: list of instances must not be empty")
 	}
-	index := newIndex(instances[0].Context().FileSet())
+	index := newIndex()
 
 	loaded := []*Instance{}
 
@@ -48,8 +48,8 @@ func Build(instances []*build.Instance) []*Instance {
 
 // FromExpr creates an instance from an expression.
 // Any references must be resolved beforehand.
-func FromExpr(fset *token.FileSet, expr ast.Expr) (*Instance, error) {
-	i := newIndex(fset).NewInstance(nil)
+func FromExpr(expr ast.Expr) (*Instance, error) {
+	i := newIndex().NewInstance(nil)
 	err := i.insertFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmitDecl{Expr: expr}},
 	})
@@ -63,8 +63,6 @@ func FromExpr(fset *token.FileSet, expr ast.Expr) (*Instance, error) {
 //
 // All instances belonging to the same package should share this index.
 type index struct {
-	fset *token.FileSet
-
 	labelMap map[string]label
 	labels   []string
 
@@ -79,16 +77,15 @@ const sharedOffset = 0x40000000
 
 // sharedIndex is used for indexing builtins and any other labels common to
 // all instances.
-var sharedIndex = newSharedIndex(token.NewFileSet())
+var sharedIndex = newSharedIndex()
 
-func newSharedIndex(f *token.FileSet) *index {
+func newSharedIndex() *index {
 	// TODO: nasty hack to indicate FileSet of shared index. Remove the whole
 	// FileSet idea from the API. Just take the hit of the extra pointers for
 	// positions in the ast, and then optimize the storage in an abstract
 	// machine implementation for storing graphs.
 	token.NewFile("dummy", sharedOffset, 0)
 	i := &index{
-		fset:     f,
 		labelMap: map[string]label{"": 0},
 		labels:   []string{""},
 	}
@@ -96,10 +93,9 @@ func newSharedIndex(f *token.FileSet) *index {
 }
 
 // newIndex creates a new index.
-func newIndex(f *token.FileSet) *index {
+func newIndex() *index {
 	parent := sharedIndex
 	i := &index{
-		fset:     f,
 		labelMap: map[string]label{},
 		loaded:   map[*build.Instance]*Instance{},
 		offset:   label(len(parent.labels)) + parent.offset,

@@ -13,7 +13,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -624,8 +623,6 @@ type inlineC struct {
 	C int
 }
 
-var fset = token.NewFileSet()
-
 func cueStr(node ast.Node) string {
 	if s, ok := node.(*ast.StructLit); ok {
 		node = &ast.File{
@@ -638,7 +635,7 @@ func cueStr(node ast.Node) string {
 }
 
 func newDecoder(t *testing.T, data string) *yaml.Decoder {
-	dec, err := yaml.NewDecoder(fset, "test.yaml", strings.NewReader(data))
+	dec, err := yaml.NewDecoder("test.yaml", strings.NewReader(data))
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -646,7 +643,7 @@ func newDecoder(t *testing.T, data string) *yaml.Decoder {
 }
 
 func callUnmarshal(t *testing.T, data string) (ast.Expr, error) {
-	return yaml.Unmarshal(fset, "test.yaml", []byte(data))
+	return yaml.Unmarshal("test.yaml", []byte(data))
 }
 
 func TestUnmarshal(t *testing.T) {
@@ -806,7 +803,7 @@ func TestFiles(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			expr, err := yaml.Unmarshal(fset, "test.yaml", mergeTests)
+			expr, err := yaml.Unmarshal("test.yaml", mergeTests)
 			if err != nil {
 				t.Fatal(err)
 			}

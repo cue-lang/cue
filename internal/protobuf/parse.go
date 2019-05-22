@@ -596,8 +596,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 
 		case "(cue.val)":
 			// TODO: set filename and base offset.
-			fset := token.NewFileSet()
-			expr, err := parser.ParseExpr(fset, "", o.Constant.Source)
+			expr, err := parser.ParseExpr("", o.Constant.Source)
 			if err != nil {
 				failf("invalid cue.val value: %v", err)
 			}

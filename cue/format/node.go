@@ -276,9 +276,8 @@ func (f *formatter) label(l ast.Label, optional bool) {
 		if f.cfg.simplify && n.Kind == token.STRING && len(n.Value) > 2 {
 			s := n.Value
 			unquoted, err := strconv.Unquote(s)
-			fset := token.NewFileSet()
 			if err == nil {
-				e, _ := parser.ParseExpr(fset, "check", unquoted)
+				e, _ := parser.ParseExpr("check", unquoted)
 				if _, ok := e.(*ast.Ident); ok {
 					f.print(n.ValuePos, unquoted)
 					break

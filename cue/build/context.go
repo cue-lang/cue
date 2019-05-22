@@ -29,13 +29,11 @@ import (
 	"context"
 
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 )
 
 // A Context keeps track of state of building instances and caches work.
 type Context struct {
 	ctxt context.Context
-	fset *token.FileSet
 
 	loader       LoadFunc
 	parseOptions []parser.Option
@@ -79,7 +77,6 @@ func (c *Context) init() {
 		c.ctxt = context.Background()
 		c.initialized = true
 		c.imports = map[string]*Instance{}
-		c.fset = token.NewFileSet()
 	}
 }
 
@@ -99,12 +96,6 @@ func NewContext(opts ...Option) *Context {
 	}
 	c.init()
 	return c
-}
-
-// FileSet reports the file set used for parsing files.
-func (c *Context) FileSet() *token.FileSet {
-	c.init()
-	return c.fset
 }
 
 // PurgeCache purges the instance cache.

@@ -68,7 +68,7 @@ func linecol(lines []int, offs int) (int, int) {
 	return len(lines), offs - prevLineOffs + 1
 }
 
-func verifyPositions(t *testing.T, fset *FileSet, f *File, lines []int) {
+func verifyPositions(t *testing.T, f *File, lines []int) {
 	for offs := 0; offs < f.Size(); offs++ {
 		p := f.Pos(offs, 0)
 		offs2 := f.Offset(p)
@@ -94,7 +94,6 @@ func makeTestSource(size int, lines []int) []byte {
 
 func TestPositions(t *testing.T) {
 	const delta = 7 // a non-zero base offset increment
-	fset := NewFileSet()
 	for _, test := range tests {
 		// verify consistency of test case
 		if test.source != nil && len(test.source) != test.size {
@@ -124,7 +123,7 @@ func TestPositions(t *testing.T) {
 			if f.LineCount() != i+1 {
 				t.Errorf("%s, AddLine: got unchanged line count %d; want %d", f.Name(), f.LineCount(), i+1)
 			}
-			verifyPositions(t, fset, f, test.lines[0:i+1])
+			verifyPositions(t, f, test.lines[0:i+1])
 		}
 
 		// add lines with SetLines and verify all positions
@@ -134,7 +133,7 @@ func TestPositions(t *testing.T) {
 		if f.LineCount() != len(test.lines) {
 			t.Errorf("%s, SetLines: got line count %d; want %d", f.Name(), f.LineCount(), len(test.lines))
 		}
-		verifyPositions(t, fset, f, test.lines)
+		verifyPositions(t, f, test.lines)
 
 		// add lines with SetLinesForContent and verify all positions
 		src := test.source
@@ -146,7 +145,7 @@ func TestPositions(t *testing.T) {
 		if f.LineCount() != len(test.lines) {
 			t.Errorf("%s, SetLinesForContent: got line count %d; want %d", f.Name(), f.LineCount(), len(test.lines))
 		}
-		verifyPositions(t, fset, f, test.lines)
+		verifyPositions(t, f, test.lines)
 	}
 }
 

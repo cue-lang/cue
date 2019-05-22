@@ -134,10 +134,7 @@ const (
 // errors were found, the result is a partial AST (with Bad* nodes
 // representing the fragments of erroneous source code). Multiple errors
 // are returned via a ErrorList which is sorted by file position.
-func ParseFile(p *token.FileSet, filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
-	if p == nil {
-		panic("ParseFile: no file.FileSet provided (fset == nil)")
-	}
+func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
 
 	// get source
 	text, err := readSource(filename, src)
@@ -167,7 +164,7 @@ func ParseFile(p *token.FileSet, filename string, src interface{}, mode ...Optio
 	}()
 
 	// parse source
-	pp.init(p, filename, text, mode)
+	pp.init(filename, text, mode)
 	f = pp.parseFile()
 	if f == nil {
 		return nil, pp.errors
@@ -182,11 +179,7 @@ func ParseFile(p *token.FileSet, filename string, src interface{}, mode ...Optio
 // The arguments have the same meaning as for Parse, but the source must
 // be a valid CUE (type or value) expression. Specifically, fset must not
 // be nil.
-func ParseExpr(fset *token.FileSet, filename string, src interface{}, mode ...Option) (ast.Expr, error) {
-	if fset == nil {
-		panic("ParseExprFrom: no file.FileSet provided (fset == nil)")
-	}
-
+func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, error) {
 	// get source
 	text, err := readSource(filename, src)
 	if err != nil {
@@ -203,7 +196,7 @@ func ParseExpr(fset *token.FileSet, filename string, src interface{}, mode ...Op
 	}()
 
 	// parse expr
-	p.init(fset, filename, text, mode)
+	p.init(filename, text, mode)
 	// Set up pkg-level scopes to avoid nil-pointer errors.
 	// This is not needed for a correct expression x as the
 	// parser will be ok with a nil topScope, but be cautious
@@ -232,5 +225,5 @@ func ParseExpr(fset *token.FileSet, filename string, src interface{}, mode ...Op
 // expression x. The position information recorded in the AST is undefined. The
 // filename used in error messages is the empty string.
 func parseExprString(x string) (ast.Expr, error) {
-	return ParseExpr(token.NewFileSet(), "", []byte(x))
+	return ParseExpr("", []byte(x))
 }

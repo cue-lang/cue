@@ -21,7 +21,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 func TestParse(t *testing.T) {
@@ -352,12 +351,11 @@ func TestParse(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
-			fset := token.NewFileSet()
 			mode := []Option{AllErrors}
 			if strings.Contains(tc.desc, "comments") {
 				mode = append(mode, ParseComments)
 			}
-			f, err := ParseFile(fset, "input", tc.in, mode...)
+			f, err := ParseFile("input", tc.in, mode...)
 			if err != nil {
 				t.Errorf("unexpected error: %v", err)
 			}
@@ -464,7 +462,7 @@ func TestImports(t *testing.T) {
 	for path, isValid := range imports {
 		t.Run(path, func(t *testing.T) {
 			src := fmt.Sprintf("package p, import %s", path)
-			_, err := ParseFile(token.NewFileSet(), "", src)
+			_, err := ParseFile("", src)
 			switch {
 			case err != nil && isValid:
 				t.Errorf("ParseFile(%s): got %v; expected no error", src, err)
@@ -522,8 +520,7 @@ func TestIncompleteSelection(t *testing.T) {
 		"{ a: fmt.\n\"a\": x }", // not at end of struct
 	} {
 		t.Run("", func(t *testing.T) {
-			fset := token.NewFileSet()
-			f, err := ParseFile(fset, "", src)
+			f, err := ParseFile("", src)
 			if err == nil {
 				t.Fatalf("ParseFile(%s) succeeded unexpectedly", src)
 			}

@@ -18,15 +18,12 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 )
 
 func ExampleParseFile() {
-	fset := token.NewFileSet() // positions are relative to fset
-
 	// Parse the file containing this very example
 	// but stop after processing the imports.
-	f, err := parser.ParseFile(fset, "testdata/test.cue", nil)
+	f, err := parser.ParseFile("testdata/test.cue", nil)
 	if err != nil {
 		fmt.Println(err)
 		return

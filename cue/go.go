@@ -66,7 +66,7 @@ func parseTag(ctx *context, obj *structLit, field label, tag string) value {
 	if tag == "" {
 		return &top{}
 	}
-	expr, err := parser.ParseExpr(ctx.index.fset, "<field:>", tag)
+	expr, err := parser.ParseExpr("<field:>", tag)
 	if err != nil {
 		field := ctx.labelStr(field)
 		return ctx.mkErr(baseValue{}, "invalid tag %q for field %q: %v", tag, field, err)
@@ -155,7 +155,7 @@ func isOmitEmpty(f *reflect.StructField) bool {
 
 // parseJSON parses JSON into a CUE value. b must be valid JSON.
 func parseJSON(ctx *context, b []byte) evaluated {
-	expr, err := parser.ParseExpr(ctx.index.fset, "json", b)
+	expr, err := parser.ParseExpr("json", b)
 	if err != nil {
 		panic(err) // cannot happen
 	}

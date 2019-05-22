@@ -29,8 +29,7 @@ import (
 type printer struct {
 	w tabwriter.Writer
 
-	fset *token.FileSet
-	cfg  *config
+	cfg *config
 
 	allowed     whiteSpace
 	requested   whiteSpace
@@ -62,9 +61,6 @@ func (p *printer) internalError(msg ...interface{}) {
 }
 
 func (p *printer) lineFor(pos token.Pos) int {
-	if p.fset == nil {
-		return 0
-	}
 	return pos.Line()
 }
 

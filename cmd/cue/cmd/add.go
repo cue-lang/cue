@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"github.com/spf13/cobra"
 )
 
@@ -251,7 +250,7 @@ func initFile(file string, getBuild func(path string) *build.Instance) (todo *fi
 			return nil, fmt.Errorf("cannot append to directory %s", file)
 		}
 
-		f, err := parser.ParseFile(token.NewFileSet(), file, nil)
+		f, err := parser.ParseFile(file, nil)
 		if err != nil {
 			return nil, err
 		}

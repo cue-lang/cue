@@ -36,6 +36,8 @@ func init() {
 	}
 }
 
+var runtime = &cue.Runtime{}
+
 var cwd = "////"
 
 // printHeader is a hacky and unprincipled way to sanatize the package path.

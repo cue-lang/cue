@@ -33,7 +33,8 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	i, err := cue.FromExpr(x)
+	var r cue.Runtime
+	i, err := r.FromExpr(x)
 	if err != nil {
 		t.Fatal(err)
 	}

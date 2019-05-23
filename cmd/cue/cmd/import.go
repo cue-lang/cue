@@ -428,7 +428,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 
 		switch {
 		case *node != "":
-			inst, err := cue.FromExpr(expr)
+			inst, err := runtime.FromExpr(expr)
 			if err != nil {
 				return err
 			}

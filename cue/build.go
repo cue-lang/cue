@@ -19,9 +19,62 @@ import (
 	"strconv"
 
 	"cuelang.org/go/cue/ast"
-	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/token"
 )
+
+// A Runtime is used for creating CUE interpretations.
+//
+// Any operation that involves two Values or Instances should originate from
+// the same Runtime.
+type Runtime struct {
+	Context *build.Context
+	idx     *index
+	ctxt    *build.Context
+}
+
+func dummyLoad(string) *build.Instance { return nil }
+
+func (r *Runtime) index() *index {
+	if r.idx == nil {
+		r.idx = newIndex()
+	}
+	return r.idx
+}
+
+func (r *Runtime) complete(p *build.Instance) (*Instance, error) {
+	idx := r.index()
+	if err := p.Complete(); err != nil {
+		return nil, err
+	}
+	inst := idx.loadInstance(p)
+	if inst.Err != nil {
+		return nil, inst.Err
+	}
+	return inst, nil
+}
+
+// Parse parses a CUE source value into a CUE Instance. The source code may
+// be provided as a string, byte slice, or io.Reader. The name is used as the
+// file name in position information. The source may import builtin packages.
+//
+func (r *Runtime) Parse(name string, source interface{}) (*Instance, error) {
+	ctx := r.Context
+	if ctx == nil {
+		ctx = build.NewContext()
+	}
+	p := ctx.NewInstance(name, dummyLoad)
+	if err := p.AddFile(name, source); err != nil {
+		return nil, err
+	}
+	return r.complete(p)
+}
+
+// Build creates an Instance from the given build.Instance. A returned Instance
+// may be incomplete, in which case its Err field is set.
+func (r *Runtime) Build(instance *build.Instance) (*Instance, error) {
+	return r.complete(instance)
+}
 
 // Build creates one Instance for each build.Instance. A returned Instance
 // may be incomplete, in which case its Err field is set.
@@ -33,7 +86,8 @@ func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {
 		panic("cue: list of instances must not be empty")
 	}
-	index := newIndex()
+	var r Runtime
+	index := r.index()
 
 	loaded := []*Instance{}
 
@@ -48,8 +102,8 @@ func Build(instances []*build.Instance) []*Instance {
 
 // FromExpr creates an instance from an expression.
 // Any references must be resolved beforehand.
-func FromExpr(expr ast.Expr) (*Instance, error) {
-	i := newIndex().NewInstance(nil)
+func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
+	i := r.index().NewInstance(nil)
 	err := i.insertFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmitDecl{Expr: expr}},
 	})

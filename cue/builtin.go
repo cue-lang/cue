@@ -51,6 +51,7 @@ import (
 type builtin struct {
 	baseValue
 	Name   string
+	pkg    label
 	Params []kind
 	Result kind
 	Func   func(c *callCtxt)
@@ -63,9 +64,12 @@ type builtinPkg struct {
 	cue    string
 }
 
-func mustCompileBuiltins(ctx *context, p *builtinPkg, name string) *structLit {
+func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit {
 	obj := &structLit{}
+	pkgLabel := ctx.label(pkgName, false)
 	for _, b := range p.native {
+		b.pkg = pkgLabel
+
 		f := ctx.label(b.Name, false) // never starts with _
 		// n := &node{baseValue: newBase(imp.Path)}
 		var v evaluated = b
@@ -78,10 +82,9 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, name string) *structLit {
 
 	// Parse builtin CUE
 	if p.cue != "" {
-		expr, err := parser.ParseExpr(name, p.cue)
+		expr, err := parser.ParseExpr(pkgName, p.cue)
 		if err != nil {
-			fmt.Println(p.cue)
-			panic(err)
+			panic(fmt.Errorf("could not parse %v: %v", p.cue, err))
 		}
 		pkg := evalExpr(ctx.index, obj, expr).(*structLit)
 		for _, a := range pkg.arcs {
@@ -187,6 +190,10 @@ func (x *builtin) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) {
 	if x.Func == nil {
 		return ctx.mkErr(x, "Builtin %q is not a function", x.Name)
+	}
+	if len(x.Params)-1 == len(args) && x.Result == boolKind {
+		// We have a custom builtin
+		return &customValidator{src.base(), args, x}
 	}
 	if len(x.Params) != len(args) {
 		return ctx.mkErr(src, x, "number of arguments does not match (%d vs %d)",

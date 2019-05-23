@@ -660,7 +660,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 
 // Syntax converts the possibly partially evaluated value into syntax. This
 // can use used to print the value with package format.
-func (v Value) Syntax(opts ...Option) ast.Expr {
+func (v Value) Syntax(opts ...Option) ast.Node {
 	if v.path == nil || v.path.cache == nil {
 		return nil
 	}

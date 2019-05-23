@@ -195,6 +195,16 @@ func (p *printer) debugStr(v interface{}) {
 			}
 		}
 		write(")")
+	case *customValidator:
+		p.debugStr(x.call)
+		write(" (")
+		for i, a := range x.args {
+			p.debugStr(a)
+			if i < len(x.args)-1 {
+				write(",")
+			}
+		}
+		write(")")
 	case *unaryExpr:
 		write(x.op)
 		p.debugStr(x.x)

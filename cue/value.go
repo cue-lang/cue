@@ -967,10 +967,35 @@ type callExpr struct {
 
 func (x *callExpr) kind() kind {
 	// TODO: could this be narrowed down?
-	if l, ok := x.x.(*lambdaExpr); ok {
-		return l.returnKind() | nonGround
+	switch c := x.x.(type) {
+	case *lambdaExpr:
+		return c.returnKind() | nonGround
+	case *builtin:
+		switch len(x.args) {
+		case len(c.Params):
+			return c.Result
+		case len(c.Params) - 1:
+			if len(c.Params) == 0 || c.Result&boolKind == 0 {
+				return bottomKind
+			}
+			return c.Params[0]
+		}
 	}
 	return topKind | referenceKind
+}
+
+type customValidator struct {
+	baseValue
+
+	args []evaluated // any but the first value
+	call *builtin    // function must return a bool
+}
+
+func (x *customValidator) kind() kind {
+	if len(x.call.Params) == 0 {
+		return bottomKind
+	}
+	return x.call.Params[0] | nonGround
 }
 
 type params struct {

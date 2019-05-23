@@ -169,6 +169,14 @@ func (x *callExpr) evalPartial(ctx *context) (result evaluated) {
 	return e.err(err)
 }
 
+func (x *customValidator) evalPartial(ctx *context) (result evaluated) {
+	if ctx.trace {
+		defer uni(indent(ctx, "custom", x))
+		defer func() { ctx.debugPrint("result:", result) }()
+	}
+	return x
+}
+
 func (x *bound) evalPartial(ctx *context) (result evaluated) {
 	if ctx.trace {
 		defer uni(indent(ctx, "bound", x))

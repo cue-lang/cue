@@ -83,6 +83,20 @@ func (x *bytesLit) rewrite(ctx *context, fn rewriteFunc) value    { return x }
 func (x *numLit) rewrite(ctx *context, fn rewriteFunc) value      { return x }
 func (x *durationLit) rewrite(ctx *context, fn rewriteFunc) value { return x }
 
+func (x *customValidator) rewrite(ctx *context, fn rewriteFunc) value {
+	args := make([]evaluated, len(x.args))
+	changed := false
+	for i, a := range x.args {
+		v := rewrite(ctx, a, fn)
+		args[i] = v.(evaluated)
+		changed = changed || v != a
+	}
+	if !changed {
+		return x
+	}
+	return &customValidator{baseValue: x.baseValue, args: args, call: x.call}
+}
+
 func (x *bound) rewrite(ctx *context, fn rewriteFunc) value {
 	v := rewrite(ctx, x.value, fn)
 	if v == x.value {

@@ -405,6 +405,23 @@ func (x *sliceExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 }
 
 // structural equivalence
+func (x *customValidator) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	y, ok := v.(*customValidator)
+	if !ok {
+		return isBottom(v)
+	}
+	if x.call != y.call {
+		return false
+	}
+	for i, v := range x.args {
+		if !subsumes(ctx, v, y.args[i], mode) {
+			return false
+		}
+	}
+	return true
+}
+
+// structural equivalence
 func (x *callExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	if c, ok := v.(*callExpr); ok {
 		if len(x.args) != len(c.args) {

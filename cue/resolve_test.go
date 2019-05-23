@@ -19,7 +19,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 )
 
 var traceOn = flag.Bool("debug", false, "enable tracing")
@@ -42,14 +41,19 @@ func compileFile(t *testing.T, body string) (*context, *structLit) {
 func compileInstance(t *testing.T, body string) (*context, *Instance, errors.List) {
 	t.Helper()
 
-	x := newIndex().NewInstance(nil)
-	f, err := parser.ParseFile("test", body)
-	ctx := x.newContext()
+	var r Runtime
+	x, err := r.Parse("test", body)
+	ctx := r.index().newContext()
 
 	switch errs := err.(type) {
 	case nil:
-		x.insertFile(f)
+		var r Runtime
+		inst, _ := r.Parse("test", body)
+		return r.index().newContext(), inst, nil
 	case errors.List:
+		x := newIndex().NewInstance(nil)
+		ctx := x.newContext()
+
 		return ctx, x, errs
 	default:
 		t.Fatal(err)
@@ -735,11 +739,26 @@ func TestResolve(t *testing.T) {
 			`e8: _|_(incompatible bounds >11 and <=11), ` +
 			`e9: _|_((>"a" & <1):unsupported op &((string)*, (number)*))}`,
 	}, {
+		desc: "custom validators",
+		in: `
+		import "strings"
+
+		a: strings.ContainsAny("ab")
+		a: "after"
+
+		b: strings.ContainsAny("c")
+		b: "dog"
+		`,
+		out: `<0>{` +
+			`a: "after", ` +
+			`b: _|_(builtin:ContainsAny ("c"):value "dog" not in ContainsAny("c"))` +
+			`}`,
+	}, {
 		desc: "null coalescing",
 		in: `
-				a: null
-				b: a.x | "b"
-				c: a["x"] | "c"
+			a: null
+			b: a.x | "b"
+			c: a["x"] | "c"
 			`,
 		out: `<1>{a: null, b: "b", c: "c"}`,
 	}, {

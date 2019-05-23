@@ -288,6 +288,59 @@ func TestExport(t *testing.T) {
 	}
 }
 
+func TestExportFile(t *testing.T) {
+	testCases := []struct {
+		eval    bool // evaluate the full export
+		in, out string
+	}{{
+		in: `
+		import "strings"
+
+		a: strings.ContainsAny("c")
+		`,
+		out: unindent(`
+		import "strings"
+
+		a: strings.ContainsAny("c")`),
+	}, {
+		in: `
+		import "strings"
+
+		stringsx = strings
+
+		a: {
+			strings: stringsx.ContainsAny("c")
+		}
+		`,
+		out: unindent(`
+		import "strings"
+
+		STRINGS = strings
+		a strings: STRINGS.ContainsAny("c")`),
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			var r Runtime
+			inst, err := r.Parse("test", tc.in)
+			if err != nil {
+				t.Fatal(err)
+			}
+			v := inst.Value()
+			ctx := r.index().newContext()
+
+			buf := &bytes.Buffer{}
+			opts := options{raw: false}
+			err = format.Node(buf, export(ctx, v.eval(ctx), opts))
+			if err != nil {
+				log.Fatal(err)
+			}
+			if got := strings.TrimSpace(buf.String()); got != tc.out {
+				t.Errorf("\ngot:\n%v\nwant:\n%v", got, tc.out)
+			}
+		})
+	}
+}
+
 func unindent(s string) string {
 	lines := strings.Split(s, "\n")[1:]
 	ws := lines[0][:len(lines[0])-len(strings.TrimLeft(lines[0], " \t"))]

@@ -17,6 +17,7 @@ package cue
 import (
 	"fmt"
 	"math/rand"
+	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -30,15 +31,70 @@ func doEval(m options) bool {
 	return !m.raw
 }
 
-func export(ctx *context, v value, m options) ast.Expr {
-	e := exporter{ctx, m, nil}
-	return e.expr(v)
+func export(ctx *context, v value, m options) ast.Node {
+	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}}
+	top, ok := v.evalPartial(ctx).(*structLit)
+	if ok {
+		top = top.expandFields(ctx)
+		for _, a := range top.arcs {
+			e.top[a.feature] = true
+		}
+	}
+
+	value := e.expr(v)
+	if len(e.imports) == 0 {
+		return value
+	}
+	imports := make([]string, 0, len(e.imports))
+	for k := range e.imports {
+		imports = append(imports, k)
+	}
+	sort.Strings(imports)
+
+	importDecl := &ast.ImportDecl{}
+	file := &ast.File{Decls: []ast.Decl{importDecl}}
+
+	for _, k := range imports {
+		info := e.imports[k]
+		ident := (*ast.Ident)(nil)
+		if info.name != "" {
+			ident = ast.NewIdent(info.name)
+		}
+		if info.alias != "" {
+			file.Decls = append(file.Decls, &ast.Alias{
+				Ident: ast.NewIdent(info.alias),
+				Expr:  ast.NewIdent(info.short),
+			})
+		}
+		importDecl.Specs = append(importDecl.Specs, &ast.ImportSpec{
+			Name: ident,
+			Path: &ast.BasicLit{Kind: token.STRING, Value: quote(k, '"')},
+		})
+	}
+
+	// TODO: should we unwrap structs?
+	if obj, ok := value.(*ast.StructLit); ok {
+		file.Decls = append(file.Decls, obj.Elts...)
+	} else {
+		file.Decls = append(file.Decls, &ast.EmitDecl{Expr: value})
+	}
+
+	// resolve the file.
+	return file
 }
 
 type exporter struct {
-	ctx   *context
-	mode  options
-	stack []remap
+	ctx     *context
+	mode    options
+	stack   []remap
+	top     map[label]bool        // label to alias or ""
+	imports map[string]importInfo // pkg path to info
+}
+
+type importInfo struct {
+	name  string
+	short string
+	alias string
 }
 
 type remap struct {
@@ -111,7 +167,7 @@ func (p *exporter) expr(v value) ast.Expr {
 	if doEval(p.mode) {
 		x := p.ctx.manifest(v)
 		if isIncomplete(x) {
-			p = &exporter{p.ctx, options{raw: true}, p.stack}
+			p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
 			return p.expr(v)
 		}
 		v = x
@@ -123,7 +179,42 @@ func (p *exporter) expr(v value) ast.Expr {
 	// TODO: also add position information.
 	switch x := v.(type) {
 	case *builtin:
-		return &ast.Ident{Name: x.Name}
+		name := ast.NewIdent(x.Name)
+		if x.pkg == 0 {
+			return name
+		}
+		pkg := p.ctx.labelStr(x.pkg)
+		info, ok := p.imports[pkg]
+		short := info.short
+		if !ok {
+			info.short = ""
+			short = pkg
+			if i := strings.LastIndexByte(pkg, '.'); i >= 0 {
+				short = pkg[i+1:]
+			}
+			for {
+				if _, ok := p.top[p.ctx.label(short, true)]; !ok {
+					break
+				}
+				short += "x"
+				info.name = short
+			}
+			info.short = short
+			p.top[p.ctx.label(short, true)] = true
+			p.imports[pkg] = info
+		}
+		f := p.ctx.label(short, true)
+		for _, e := range p.stack {
+			if e.from == f {
+				if info.alias == "" {
+					info.alias = p.unique(short)
+					p.imports[pkg] = info
+				}
+				short = info.alias
+				break
+			}
+		}
+		return &ast.SelectorExpr{X: ast.NewIdent(short), Sel: name}
 
 	case *nodeRef:
 		return nil
@@ -139,6 +230,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			// TODO: should not happen: report error
 			return ident
 		}
+		// TODO: nodes may have changed. Use different algorithm.
 		conflict := false
 		for i := len(p.stack) - 1; i >= 0; i-- {
 			e := &p.stack[i]
@@ -178,6 +270,13 @@ func (p *exporter) expr(v value) ast.Expr {
 
 	case *callExpr:
 		call := &ast.CallExpr{Fun: p.expr(x.x)}
+		for _, a := range x.args {
+			call.Args = append(call.Args, p.expr(a))
+		}
+		return call
+
+	case *customValidator:
+		call := &ast.CallExpr{Fun: p.expr(x.call)}
 		for _, a := range x.args {
 			call.Args = append(call.Args, p.expr(a))
 		}
@@ -225,6 +324,7 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *structLit:
 		obj := &ast.StructLit{}
 		if doEval(p.mode) {
+			x = x.expandFields(p.ctx)
 			for _, a := range x.arcs {
 				p.stack = append(p.stack, remap{
 					key:  x,
@@ -233,7 +333,6 @@ func (p *exporter) expr(v value) ast.Expr {
 					syn:  obj,
 				})
 			}
-			x = x.expandFields(p.ctx)
 		}
 		if x.emit != nil {
 			obj.Elts = append(obj.Elts, &ast.EmitDecl{Expr: p.expr(x.emit)})
@@ -271,7 +370,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			if !doEval(p.mode) {
 				f.Value = p.expr(a.v)
 			} else if v := p.ctx.manifest(x.at(p.ctx, i)); isIncomplete(v) && !p.mode.concrete {
-				p := &exporter{p.ctx, options{raw: true}, p.stack}
+				p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
 				f.Value = p.expr(a.v)
 			} else {
 				f.Value = p.expr(v)

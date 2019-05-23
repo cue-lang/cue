@@ -473,6 +473,75 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 	return ctx.mkIncompatible(src, op, x, other)
 }
 
+func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated) evaluated {
+	newSrc := binSrc(src.Pos(), op, x, other)
+	switch op {
+	case opUnify:
+		k, _ := matchBinOpKind(opUnify, x.kind(), other.kind())
+		if k == bottomKind {
+			break
+		}
+		switch y := other.(type) {
+		case *basicType:
+			k := unifyType(x.kind(), y.kind())
+			if k == x.kind() {
+				return x
+			}
+			return &unification{newSrc, []evaluated{x, y}}
+
+		case *bound:
+			return &unification{newSrc, []evaluated{x, y}}
+
+		case *numLit:
+			if err := x.check(ctx, y); err != nil {
+				return err
+			}
+			// Narrow down number type.
+			if y.k != k {
+				n := *y
+				n.k = k
+				return &n
+			}
+			return other
+
+		case *nullLit, *boolLit, *durationLit, *list, *structLit, *stringLit, *bytesLit:
+			// All remaining concrete types. This includes non-comparable types
+			// for comparison to null.
+			if err := x.check(ctx, y); err != nil {
+				return err
+			}
+			return y
+		}
+	}
+	return ctx.mkIncompatible(src, op, x, other)
+}
+
+func (x *customValidator) check(ctx *context, v evaluated) evaluated {
+	args := make([]evaluated, 1+len(x.args))
+	args[0] = v
+	for i, v := range x.args {
+		args[1+i] = v.(evaluated)
+	}
+	res := x.call.call(ctx, x, args...)
+	if isBottom(res) {
+		return res.(evaluated)
+	}
+	if b, ok := res.(*boolLit); !ok {
+		// should never reach here
+		return ctx.mkErr(x, "invalid custom validator")
+	} else if !b.b {
+		var buf bytes.Buffer
+		buf.WriteString(x.call.Name)
+		buf.WriteString("(")
+		for _, a := range x.args {
+			buf.WriteString(debugStr(ctx, a))
+		}
+		buf.WriteString(")")
+		return ctx.mkErr(x, "value %v not in %v", debugStr(ctx, v), buf.String())
+	}
+	return nil
+}
+
 func evalLambda(ctx *context, a value) (l *lambdaExpr, err evaluated) {
 	if a == nil {
 		return nil, nil
@@ -783,7 +852,7 @@ func (x *numLit) updateNumInfo(a, b *numLit) {
 
 func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch y := other.(type) {
-	case *basicType, *bound: // for better error reporting
+	case *basicType, *bound, *customValidator: // for better error reporting
 		if op == opUnify {
 			return y.binOp(ctx, src, op, x)
 		}

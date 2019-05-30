@@ -293,14 +293,20 @@ When multiplying a fraction by a multiplier, the result is truncated
 towards zero if it is not an integer.
 
 ```
-int_lit     = decimal_lit | octal_lit | binary_lit | hex_lit .
-decimals  = ( "0" … "9" ) { [ "_" ] decimal_digit } .
-decimal_lit = ( "1" … "9" ) { [ "_" ] decimal_digit } [ [ "." decimals ] multiplier ] |
-            "." decimals multiplier.
+int_lit     = decimal_lit | si_lit | octal_lit | binary_lit | hex_lit .
+decimal_lit = ( "1" … "9" ) { [ "_" ] decimal_digit } .
+decimals    = decimal_digit { [ "_" ] decimal_digit } .
+si_it       = decimals [ "." decimals ] multiplier |
+              "." decimals  multiplier .
 binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
-octal_lit   = "0o" octal_digit { [ "_" ] octal_digit } .
+octal_lit   = "0" [ "o" ] octal_digit { [ "_" ] octal_digit } .
 multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
+
+float_lit   = decimals "." [ decimals ] [ exponent ] |
+              decimals exponent |
+              "." decimals [ exponent ].
+exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
 ```
 
 ```

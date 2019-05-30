@@ -121,7 +121,12 @@ func TestLiterals(t *testing.T) {
 		{"1.", mkFloat("1")},
 		{"0.0", mkFloat("0.0")},
 		{".0", mkFloat(".0")},
+		{"012.34", mkFloat("012.34")},
+		{".01", mkFloat(".01")},
+		{".01e2", mkFloat("1")},
+		{"0.", mkFloat("0.")},
 		{"1K", mkMul(1000, mulK, 10)},
+		{".5K", mkMul(500, mulK, 10)},
 		{"1Mi", mkMul(1024*1024, mulMi, 10)},
 		{"1.5Mi", mkMul((1024+512)*1024, mulMi, 10)},
 		{"1.3Mi", &bottom{}}, // Cannot be accurately represented.
@@ -134,6 +139,7 @@ func TestLiterals(t *testing.T) {
 		{"0b11001000", mkMul(0xc8, 0, 2)},
 		{"0b1", mkMul(1, 0, 2)},
 		{"0o755", mkMul(0755, 0, 8)},
+		{"0755", mkMul(0755, 0, 8)},
 	}
 	p := litParser{
 		ctx: &context{Context: &apd.BaseContext},

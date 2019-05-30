@@ -131,8 +131,10 @@ func (p *litParser) next() bool {
 	p.ch = p.src[p.p]
 	p.p++
 	if p.ch == '.' {
+		if len(p.buf) == 0 {
+			p.buf = append(p.buf, '0')
+		}
 		p.buf = append(p.buf, '.')
-
 	}
 	return true
 }
@@ -229,7 +231,6 @@ func (p *litParser) scanMantissa(base int) {
 }
 
 func (p *litParser) scanNumber(seenDecimalPoint bool) value {
-	// digitVal(s.ch) < 10
 	isFloat := false
 	base := 10
 
@@ -242,7 +243,8 @@ func (p *litParser) scanNumber(seenDecimalPoint bool) value {
 	if p.ch == '0' {
 		// int or float
 		p.next()
-		if p.ch == 'x' || p.ch == 'X' {
+		switch p.ch {
+		case 'x', 'X':
 			base = 16
 			// hexadecimal int
 			p.next()
@@ -251,7 +253,7 @@ func (p *litParser) scanNumber(seenDecimalPoint bool) value {
 				// only scanned "0x" or "0X"
 				return p.error(p.node, "illegal hexadecimal number %q", p.src)
 			}
-		} else if p.ch == 'b' {
+		case 'b':
 			base = 2
 			// binary int
 			p.next()
@@ -260,7 +262,7 @@ func (p *litParser) scanNumber(seenDecimalPoint bool) value {
 				// only scanned "0b"
 				return p.error(p.node, "illegal binary number %q", p.src)
 			}
-		} else if p.ch == 'o' {
+		case 'o':
 			base = 8
 			// octal int
 			p.next()
@@ -269,11 +271,18 @@ func (p *litParser) scanNumber(seenDecimalPoint bool) value {
 				// only scanned "0o"
 				return p.error(p.node, "illegal octal number %q", p.src)
 			}
-		} else {
-			// int or float
-			p.scanMantissa(10)
-			if p.ch == '.' || p.ch == 'e' {
+		default:
+			// int (base 8 or 10) or float
+			p.scanMantissa(8)
+			if p.ch == '.' || p.ch == 'e' || p.ch == '8' || p.ch == '9' {
+				p.scanMantissa(10)
+				if p.ch != '.' && p.ch != 'e' {
+					return p.error(p.node, "illegal octal number %q", p.src)
+				}
 				goto fraction
+			}
+			if len(p.buf) > 0 {
+				base = 8
 			}
 		}
 		goto exit

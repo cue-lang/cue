@@ -53,9 +53,6 @@ var flagOut = stringFlag{
 }
 
 func addGlobalFlags(f *pflag.FlagSet) {
-	f.StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cue)")
-	f.Bool("root", false, "load a CUE package from its root")
-
 	f.Bool(string(flagDebug), false,
 		"give detailed error info")
 	f.Bool(string(flagTrace), false,

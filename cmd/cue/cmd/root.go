@@ -15,6 +15,8 @@
 package cmd
 
 import (
+	"context"
+	"errors"
 	"fmt"
 	logger "log"
 	"os"
@@ -67,9 +69,8 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	SilenceUsage: true,
 }
 
-// Execute adds all child commands to the root command sets flags appropriately.
-// This is called by main.main(). It only needs to happen once to the rootCmd.
-func Execute() {
+// Main runs the cue tool. It loads the tool flags.
+func Main(ctx context.Context, args []string) (err error) {
 	log.SetFlags(0)
 	// Three categories of commands:
 	// - normal
@@ -77,17 +78,17 @@ func Execute() {
 	// - help
 	// For the latter two, we need to use the default loading.
 	defer func() {
-		switch err := recover(); err {
+		switch e := recover().(type) {
 		case nil:
-		case panicSentinel:
-			log.Fatal(err)
-			os.Exit(1)
+		case panicError:
+			err = e.Err
 		default:
 			panic(err)
 		}
 		// We use panic to escape, instead of os.Exit
 	}()
-	if args := os.Args[1:]; len(args) >= 1 && args[0] != "help" {
+	rootCmd.SetArgs(args)
+	if len(args) >= 1 && args[0] != "help" {
 		// TODO: for now we only allow one instance. Eventually, we can allow
 		// more if they all belong to the same package and we merge them
 		// before computing commands.
@@ -112,11 +113,13 @@ func Execute() {
 				// list available commands
 				commands := tools.Lookup(sub.name)
 				i, err := commands.Fields()
-				must(err)
+				if err != nil {
+					return err
+				}
 				for i.Next() {
 					_, _ = addCustom(sub.cmd, sub.name, i.Label(), tools)
 				}
-				return // TODO: will this trigger the help?
+				return nil
 			}
 			tools := buildTools(rootCmd, args[1:])
 			_, err := addCustom(sub.cmd, sub.name, args[0], tools)
@@ -126,22 +129,16 @@ func Execute() {
 			}
 		}
 	}
-	if err := rootCmd.Execute(); err != nil {
-		// log.Fatal(err)
-		os.Exit(1)
-	}
+	return rootCmd.Execute()
 }
 
-var panicSentinel = "terminating because of errors"
-
-func must(err error) {
-	if err != nil {
-		log.Print(err)
-		exit()
-	}
+type panicError struct {
+	Err error
 }
 
-func exit() { panic(panicSentinel) }
+func exit() {
+	panic(panicError{errors.New("terminating because of errors")})
+}
 
 func init() {
 	cobra.OnInitialize(initConfig)

@@ -14,8 +14,18 @@
 
 package main
 
-import "cuelang.org/go/cmd/cue/cmd"
+import (
+	"context"
+	"log"
+	"os"
+
+	"cuelang.org/go/cmd/cue/cmd"
+)
 
 func main() {
-	cmd.Execute()
+	err := cmd.Main(context.Background(), os.Args[1:])
+	if err != nil {
+		log.Println(err)
+		os.Exit(1)
+	}
 }

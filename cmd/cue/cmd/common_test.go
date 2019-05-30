@@ -70,12 +70,14 @@ func runCommand(t *testing.T, f func(cmd *cobra.Command, args []string) error, n
 			g.Go(func() error {
 				defer wOut.Close()
 				defer func() {
-					if e := recover(); e != nil {
-						if err, ok := e.(error); ok {
-							errors.Print(wOut, err)
-						} else {
-							fmt.Fprintln(wOut, e)
-						}
+					switch err := recover().(type) {
+					case nil:
+					case panicError:
+						errors.Print(wOut, err.Err)
+					case error:
+						errors.Print(wOut, err)
+					default:
+						fmt.Fprintln(wOut, err)
 					}
 				}()
 				cmd.Execute()

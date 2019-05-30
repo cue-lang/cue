@@ -17,6 +17,6 @@ package cmd
 import "testing"
 
 func TestExport(t *testing.T) {
-	runCommand(t, exportCmd.RunE, "export")
-	runCommand(t, exportCmd.RunE, "export_err")
+	runCommand(t, newExportCmd(), "export")
+	runCommand(t, newExportCmd(), "export_err")
 }

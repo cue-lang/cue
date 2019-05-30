@@ -45,10 +45,13 @@ import (
 )
 
 // importCmd represents the import command
-var importCmd = &cobra.Command{
-	Use:   "import",
-	Short: "convert other data formats to CUE files",
-	Long: `import converts other data formats, like JSON and YAML to CUE files
+var importCmd = newImportCmd()
+
+func newImportCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "import",
+		Short: "convert other data formats to CUE files",
+		Long: `import converts other data formats, like JSON and YAML to CUE files
 
 The following file formats are currently supported:
 
@@ -195,43 +198,34 @@ Example:
       }
   }
 `,
-	RunE: runImport,
+		RunE: runImport,
+	}
+
+	flagOut.Add(cmd)
+	cmd.Flags().StringP(string(flagGlob), "n", "", "glob filter for file names")
+	cmd.Flags().String(string(flagType), "", "only apply to files of this type")
+	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
+	cmd.Flags().Bool(string(flagDryrun), false, "force overwriting existing files")
+
+	cmd.Flags().StringP(string(flagPath), "l", "", "path to include root")
+	cmd.Flags().Bool(string(flagList), false, "concatenate multiple objects into a list")
+	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
+	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
+
+	cmd.Flags().String("fix", "", "apply given fix")
+
+	cmd.Flags().StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
+
+	return cmd
 }
 
-func init() {
-	rootCmd.AddCommand(importCmd)
-
-	out = importCmd.Flags().StringP("out", "o", "", "alternative output or - for stdout")
-	name = importCmd.Flags().StringP("name", "n", "", "glob filter for file names")
-	typ = importCmd.Flags().String("type", "", "only apply to files of this type")
-	force = importCmd.Flags().BoolP("force", "f", false, "force overwriting existing files")
-	dryrun = importCmd.Flags().Bool("dryrun", false, "force overwriting existing files")
-
-	node = importCmd.Flags().StringP("path", "l", "", "path to include root")
-	list = importCmd.Flags().Bool("list", false, "concatenate multiple objects into a list")
-	files = importCmd.Flags().Bool("files", false, "split multiple entries into different files")
-	parseStrings = importCmd.Flags().BoolP("recursive", "R", false, "recursively parse string values")
-
-	importCmd.Flags().String("fix", "", "apply given fix")
-
-	protoPaths = importCmd.Flags().StringArrayP("proto_path", "I", nil, "paths in which to search for imports")
-}
-
-var (
-	force        *bool
-	name         *string
-	typ          *string
-	node         *string
-	out          *string
-	dryrun       *bool
-	list         *bool
-	files        *bool
-	parseStrings *bool
-	protoPaths   *[]string
+const (
+	flagFiles     flagName = "files"
+	flagProtoPath flagName = "proto_path"
 )
 
 type importStreamFunc func(path string, r io.Reader) ([]ast.Expr, error)
-type importFileFunc func(path string, r io.Reader) (*ast.File, error)
+type importFileFunc func(cmd *cobra.Command, path string, r io.Reader) (*ast.File, error)
 
 type encodingInfo struct {
 	fnStream importStreamFunc
@@ -266,10 +260,12 @@ func runImport(cmd *cobra.Command, args []string) error {
 
 	var group errgroup.Group
 
+	pkgFlag := flagPackage.String(cmd)
+
 	group.Go(func() (err error) {
 		if len(args) > 0 && len(filepath.Ext(args[0])) > len(".") {
 			for _, a := range args {
-				group.Go(func() error { return handleFile(cmd, *fPackage, a) })
+				group.Go(func() error { return handleFile(cmd, pkgFlag, a) })
 			}
 			return nil
 		}
@@ -278,7 +274,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 
 		inst := load.Instances(args, &load.Config{DataFiles: true})
 		for _, pkg := range inst {
-			pkgName := *fPackage
+			pkgName := pkgFlag
 			if pkgName == "" {
 				pkgName = pkg.PkgName
 			}
@@ -300,7 +296,8 @@ func runImport(cmd *cobra.Command, args []string) error {
 			}
 			for _, file := range files {
 				ext := filepath.Ext(file.Name())
-				if enc := getExtInfo(ext); enc == nil || (*typ != "" && *typ != enc.typ) {
+				typ := flagType.String(cmd)
+				if enc := getExtInfo(ext); enc == nil || (typ != "" && typ != enc.typ) {
 					continue
 				}
 				path := filepath.Join(dir, file.Name())
@@ -316,7 +313,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 }
 
 func handleFile(cmd *cobra.Command, pkg, filename string) (err error) {
-	re, err := regexp.Compile(*name)
+	re, err := regexp.Compile(flagGlob.String(cmd))
 	if err != nil {
 		return err
 	}
@@ -337,7 +334,7 @@ func handleFile(cmd *cobra.Command, pkg, filename string) (err error) {
 		return fmt.Errorf("unsupported extension %q", ext)
 
 	case handler.fnFile != nil:
-		file, err := handler.fnFile(filename, f)
+		file, err := handler.fnFile(cmd, filename, f)
 		if err != nil {
 			return err
 		}
@@ -368,7 +365,7 @@ func processFile(cmd *cobra.Command, file *ast.File) (err error) {
 }
 
 func processStream(cmd *cobra.Command, pkg, filename string, objs []ast.Expr) error {
-	if *files {
+	if flagFiles.Bool(cmd) {
 		for i, f := range objs {
 			err := combineExpressions(cmd, pkg, newName(filename, i), f)
 			if err != nil {
@@ -377,7 +374,7 @@ func processStream(cmd *cobra.Command, pkg, filename string, objs []ast.Expr) er
 		}
 		return nil
 	} else if len(objs) > 1 {
-		if !*list && *node == "" && !*files {
+		if !flagList.Bool(cmd) && flagPath.String(cmd) == "" && !flagFiles.Bool(cmd) {
 			return fmt.Errorf("list, flag, or files flag needed to handle multiple objects in file %q", filename)
 		}
 	}
@@ -391,14 +388,14 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if *out != "" {
-		cueFile = *out
+	if out := flagOut.String(cmd); out != "" {
+		cueFile = out
 	}
 	if cueFile != "-" {
 		switch _, err := os.Stat(cueFile); {
 		case os.IsNotExist(err):
 		case err == nil:
-			if !*force {
+			if !flagForce.Bool(cmd) {
 				log.Printf("skipping file %q: already exists", cueFile)
 				return nil
 			}
@@ -419,7 +416,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 
 	index := newIndex()
 	for _, expr := range objs {
-		if *parseStrings {
+		if flagRecursive.Bool(cmd) {
 			h.hoist(expr)
 		}
 
@@ -427,13 +424,13 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 		var pathElems []ast.Label
 
 		switch {
-		case *node != "":
+		case flagPath.String(cmd) != "":
 			inst, err := runtime.FromExpr(expr)
 			if err != nil {
 				return err
 			}
 
-			labels, err := parsePath(*node)
+			labels, err := parsePath(flagPath.String(cmd))
 			if err != nil {
 				return err
 			}
@@ -455,7 +452,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 			}
 		}
 
-		if *list {
+		if flagList.Bool(cmd) {
 			idx := index
 			for _, e := range pathElems {
 				idx = idx.label(e)
@@ -509,7 +506,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 		f.Decls = append([]ast.Decl{imports}, f.Decls...)
 	}
 
-	if *list {
+	if flagList.Bool(cmd) {
 		switch x := index.field.Value.(type) {
 		case *ast.StructLit:
 			f.Decls = append(f.Decls, x.Elts...)
@@ -652,8 +649,8 @@ func handleYAML(path string, r io.Reader) (objects []ast.Expr, err error) {
 	return objects, nil
 }
 
-func handleProtoDef(path string, r io.Reader) (f *ast.File, err error) {
-	return protobuf.Parse(path, r, &protobuf.Config{Paths: *protoPaths})
+func handleProtoDef(cmd *cobra.Command, path string, r io.Reader) (f *ast.File, err error) {
+	return protobuf.Parse(path, r, &protobuf.Config{Paths: flagProtoPath.StringArray(cmd)})
 }
 
 type hoister struct {

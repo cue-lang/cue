@@ -36,6 +36,7 @@ func TestCmd(t *testing.T) {
 		stderr = os.Stderr
 	}()
 	for _, name := range testCases {
+		rootCmd := newRootCmd()
 		run := func(cmd *cobra.Command, args []string) error {
 			stdout = cmd.OutOrStdout()
 			stderr = cmd.OutOrStderr()
@@ -51,6 +52,6 @@ func TestCmd(t *testing.T) {
 			}
 			return nil
 		}
-		runCommand(t, run, "cmd_"+name)
+		runCommand(t, &cobra.Command{RunE: run}, "cmd_"+name)
 	}
 }

@@ -38,11 +38,12 @@ import (
 // - remove the limitations mentioned in the documentation
 // - implement verification post-processing as extra safety
 
-// trimCmd represents the trim command
-var trimCmd = &cobra.Command{
-	Use:   "trim",
-	Short: "remove superfluous fields",
-	Long: `trim removes fields from structs that are already defined by a template
+// newTrimCmd creates a trim command
+func newTrimCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "trim",
+		Short: "remove superfluous fields",
+		Long: `trim removes fields from structs that are already defined by a template
 
 A field, struct, or list is removed if it is implied by a template, a list type
 value, a comprehension or any other implied content. It will modify the files
@@ -87,17 +88,12 @@ Examples:
 It is guaranteed that the resulting files give the same output as before the
 removal.
 `,
-	RunE: runTrim,
-}
+		RunE: runTrim,
+	}
 
-func init() {
-	rootCmd.AddCommand(trimCmd)
-	fOut = trimCmd.Flags().StringP("out", "o", "", "alternative output or - for stdout")
+	flagOut.Add(cmd)
+	return cmd
 }
-
-var (
-	fOut *string
-)
 
 func runTrim(cmd *cobra.Command, args []string) error {
 	// TODO: Do something more fine-grained. Optional fields are mostly not
@@ -122,8 +118,10 @@ func runTrim(cmd *cobra.Command, args []string) error {
 		}
 	}
 
-	if *fOut != "" && *fOut != "-" {
-		switch _, err := os.Stat(*fOut); {
+	// dst := flagName("o").String(cmd)
+	dst := flagOut.String(cmd)
+	if dst != "" && dst != "-" {
+		switch _, err := os.Stat(dst); {
 		case os.IsNotExist(err):
 		case err == nil:
 		default:
@@ -132,8 +130,7 @@ func runTrim(cmd *cobra.Command, args []string) error {
 	}
 
 	for i, inst := range binst {
-
-		gen := newTrimSet()
+		gen := newTrimSet(cmd)
 		for _, f := range inst.Files {
 			gen.markNodes(f)
 		}
@@ -141,7 +138,7 @@ func runTrim(cmd *cobra.Command, args []string) error {
 		root := instances[i].Lookup()
 		rm := gen.trim("root", root, cue.Value{}, root)
 
-		if *fDryrun {
+		if flagDryrun.Bool(cmd) {
 			continue
 		}
 
@@ -151,7 +148,7 @@ func runTrim(cmd *cobra.Command, args []string) error {
 			f.Decls = gen.trimDecls(f.Decls, rm, root, true)
 
 			opts := []format.Option{}
-			if *fSimplify {
+			if flagSimplify.Bool(cmd) {
 				opts = append(opts, format.Simplify())
 			}
 
@@ -161,14 +158,14 @@ func runTrim(cmd *cobra.Command, args []string) error {
 				return fmt.Errorf("error formatting file: %v", err)
 			}
 
-			if *fOut == "-" {
+			if dst == "-" {
 				_, err := io.Copy(cmd.OutOrStdout(), &buf)
 				if err != nil {
 					return err
 				}
 				continue
-			} else if *fOut != "" {
-				filename = *fOut
+			} else if dst != "" {
+				filename = dst
 			}
 
 			err = ioutil.WriteFile(filename, buf.Bytes(), 0644)
@@ -181,14 +178,16 @@ func runTrim(cmd *cobra.Command, args []string) error {
 }
 
 type trimSet struct {
+	cmd       *cobra.Command
 	stack     []string
 	exclude   map[ast.Node]bool // don't remove fields marked here
 	alwaysGen map[ast.Node]bool // node is always from a generated source
 	fromComp  map[ast.Node]bool // node originated from a comprehension
 }
 
-func newTrimSet() *trimSet {
+func newTrimSet(cmd *cobra.Command) *trimSet {
 	return &trimSet{
+		cmd:       cmd,
 		exclude:   map[ast.Node]bool{},
 		alwaysGen: map[ast.Node]bool{},
 		fromComp:  map[ast.Node]bool{},
@@ -200,7 +199,7 @@ func (t *trimSet) path() string {
 }
 
 func (t *trimSet) traceMsg(msg string) {
-	if *fTrace {
+	if flagTrace.Bool(t.cmd) {
 		fmt.Print(t.path())
 		msg = strings.TrimRight(msg, "\n")
 		msg = strings.Replace(msg, "\n", "\n    ", -1)
@@ -409,7 +408,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 			}
 		}
 
-		if *fTrace {
+		if flagTrace.Bool(t.cmd) {
 			w := &bytes.Buffer{}
 			fmt.Fprintln(w)
 			fmt.Fprintln(w, "value:    ", v)
@@ -491,7 +490,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 			}
 		}
 
-		if *fTrace {
+		if flagTrace.Bool(t.cmd) {
 			w := &bytes.Buffer{}
 			if len(rmSet) > 0 {
 				fmt.Fprint(w, "field: SUBSUMED\n")

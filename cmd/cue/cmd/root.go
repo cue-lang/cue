@@ -42,11 +42,12 @@ var log = logger.New(os.Stderr, "", logger.Lshortfile)
 
 var cfgFile string
 
-// rootCmd represents the base command when called without any subcommands
-var rootCmd = &cobra.Command{
-	Use:   "cue",
-	Short: "cue emits configuration files to user-defined commands.",
-	Long: `cue evaluates CUE files, an extension of JSON, and sends them
+// newRootCmd creates the base command when called without any subcommands
+func newRootCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "cue",
+		Short: "cue emits configuration files to user-defined commands.",
+		Long: `cue evaluates CUE files, an extension of JSON, and sends them
 to user-defined commands for processing.
 
 Commands are defined in CUE as follows:
@@ -62,11 +63,32 @@ configuration for further processing. For more information on defining commands
 run 'cue help cmd' or go to cuelang.org/pkg/cmd.
 
 For more information on writing CUE configuration files see cuelang.org.`,
-	// Uncomment the following line if your bare application
-	// has an action associated with it:
-	//	Run: func(cmd *cobra.Command, args []string) { },
+		// Uncomment the following line if your bare application
+		// has an action associated with it:
+		//	Run: func(cmd *cobra.Command, args []string) { },
 
-	SilenceUsage: true,
+		SilenceUsage: true,
+	}
+
+	subCommands := []*cobra.Command{
+		newTrimCmd(),
+		newImportCmd(),
+		newEvalCmd(),
+		newGetCmd(),
+		newFmtCmd(),
+		newExportCmd(),
+		newCmdCmd(),
+		newVetCmd(),
+		newAddCmd(),
+	}
+
+	addGlobalFlags(cmd.PersistentFlags())
+
+	for _, sub := range subCommands {
+		cmd.AddCommand(sub)
+	}
+
+	return cmd
 }
 
 // Main runs the cue tool. It loads the tool flags.
@@ -87,6 +109,7 @@ func Main(ctx context.Context, args []string) (err error) {
 		}
 		// We use panic to escape, instead of os.Exit
 	}()
+	rootCmd := newRootCmd()
 	rootCmd.SetArgs(args)
 	if len(args) >= 1 && args[0] != "help" {
 		// TODO: for now we only allow one instance. Eventually, we can allow
@@ -102,7 +125,7 @@ func Main(ctx context.Context, args []string) (err error) {
 			cmd  *cobra.Command
 		}
 		sub := map[string]subSpec{
-			"cmd": {commandSection, cmdCmd},
+			"cmd": {commandSection, newCmdCmd()},
 			// "serve": {"server", nil},
 			// "fix":   {"fix", nil},
 		}
@@ -143,26 +166,7 @@ func exit() {
 func init() {
 	cobra.OnInitialize(initConfig)
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cue)")
-	rootCmd.PersistentFlags().Bool("root", false, "load a CUE package from its root")
 }
-
-var (
-	fDebug = rootCmd.PersistentFlags().Bool("debug", false,
-		"give detailed error info")
-	fTrace = rootCmd.PersistentFlags().Bool("trace", false,
-		"trace computation")
-	fDryrun = rootCmd.PersistentFlags().BoolP("dryrun", "n", false,
-		"only run simulation")
-	fPackage = rootCmd.PersistentFlags().StringP("package", "p", "",
-		"CUE package to evaluate")
-	fSimplify = rootCmd.PersistentFlags().BoolP("simplify", "s", false,
-		"simplify output")
-	fIgnore = rootCmd.PersistentFlags().BoolP("ignore", "i", false,
-		"proceed in the presence of errors")
-	fVerbose = rootCmd.PersistentFlags().BoolP("verbose", "v", false,
-		"print information about progress")
-)
 
 // initConfig reads in config file and ENV variables if set.
 func initConfig() {

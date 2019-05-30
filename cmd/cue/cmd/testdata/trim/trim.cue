@@ -25,22 +25,10 @@ foo <Name>: {
 
 foo bar: {
 	_value: "here"
+	b:      "foo"
+	c:      45
 
-	a: 4
-	b: "foo"
-	c: 45
-	e: string
-	f: ">> here <<"
-
-	n: int
-
-	struct: {a: 3.0}
-
-	list: ["foo", float]
-
-	sList: [{a: 8, b: "foo"}, {b: "foo"}]
-	rList: [{a: string}]
-	rcList: [{a: "a", c: "foo"}]
+	sList: [{b: "foo"}, {}]
 }
 
 foo baz: {}
@@ -53,7 +41,6 @@ foo multipath: {
 	}
 
 	t u: {
-		x: 5
 	}
 }
 
@@ -62,9 +49,6 @@ group: {
 	comp "\(k)": v for k, v in foo
 
 	comp bar: {
-		a:  4
 		aa: 8 // new value
 	}
-
-	comp baz: {} // removed: fully implied by comprehension above
 }

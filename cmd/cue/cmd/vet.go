@@ -21,29 +21,20 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// vetCmd represents the vet command
-var vetCmd = &cobra.Command{
-	Use:   "vet",
-	Short: "A brief description of your command",
-	Long: `A longer description that spans multiple lines and likely contains examples
-and usage of using your command. For example:
-
-Cobra is a CLI library for Go that empowers applications.
-This application is a tool to generate the needed files
-to quickly create a Cobra application.`,
-	RunE: doVet,
-}
-
-func init() {
-	rootCmd.AddCommand(vetCmd)
+func newVetCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "vet",
+		Short: "validate CUE configurations",
+		RunE:  doVet,
+	}
+	return cmd
 }
 
 func doVet(cmd *cobra.Command, args []string) error {
-
 	instances := buildFromArgs(cmd, args)
 
 	var exprs []ast.Expr
-	for _, e := range *expressions {
+	for _, e := range flagExpression.StringArray(cmd) {
 		expr, err := parser.ParseExpr("<expression flag>", e)
 		if err != nil {
 			return err
@@ -62,7 +53,7 @@ func doVet(cmd *cobra.Command, args []string) error {
 			cue.Hidden(true),
 		}
 		err := inst.Value().Validate(opt...)
-		if *fVerbose || err != nil {
+		if flagVerbose.Bool(cmd) || err != nil {
 			printHeader(w, inst.Dir)
 		}
 		exitIfErr(cmd, inst, err, false)

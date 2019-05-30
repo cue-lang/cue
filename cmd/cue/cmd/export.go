@@ -23,11 +23,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// exportCmd represents the emit command
-var exportCmd = &cobra.Command{
-	Use:   "export",
-	Short: "output data in a standard format",
-	Long: `export evaluates the configuration found in the current
+// newExportCmd creates and export command
+func newExportCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "export",
+		Short: "output data in a standard format",
+		Long: `export evaluates the configuration found in the current
 directory and prints the emit value to stdout.
 
 Examples:
@@ -85,46 +86,41 @@ text    output as raw text
         The evaluated value must be of type string.
 `,
 
-	RunE: func(cmd *cobra.Command, args []string) error {
-		instances := buildFromArgs(cmd, args)
-		w := cmd.OutOrStdout()
+		RunE: runExport,
+	}
+	flagMedia.Add(cmd)
+	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 
-		for _, inst := range instances {
-			root := inst.Value()
-			if !root.IsValid() {
-				continue
-			}
-			switch *media {
-			case "json":
-				err := outputJSON(w, root)
-				exitIfErr(cmd, inst, err, true)
-			case "text":
-				err := outputText(w, root)
-				exitIfErr(cmd, inst, err, true)
-			default:
-				return fmt.Errorf("export: unknown format %q", *media)
-			}
+	return cmd
+}
+
+func runExport(cmd *cobra.Command, args []string) error {
+	instances := buildFromArgs(cmd, args)
+	w := cmd.OutOrStdout()
+
+	for _, inst := range instances {
+		root := inst.Value()
+		if !root.IsValid() {
+			continue
 		}
-		return nil
-	},
+		switch media := flagMedia.String(cmd); media {
+		case "json":
+			err := outputJSON(cmd, w, root)
+			exitIfErr(cmd, inst, err, true)
+		case "text":
+			err := outputText(w, root)
+			exitIfErr(cmd, inst, err, true)
+		default:
+			return fmt.Errorf("export: unknown format %q", media)
+		}
+	}
+	return nil
 }
 
-var (
-	escape *bool
-	media  *string
-)
-
-func init() {
-	rootCmd.AddCommand(exportCmd)
-
-	media = exportCmd.Flags().String("out", "json", "output format (json or text)")
-	escape = exportCmd.Flags().Bool("escape", false, "use HTML escaping")
-}
-
-func outputJSON(w io.Writer, v cue.Value) error {
+func outputJSON(cmd *cobra.Command, w io.Writer, v cue.Value) error {
 	e := json.NewEncoder(w)
 	e.SetIndent("", "    ")
-	e.SetEscapeHTML(*escape)
+	e.SetEscapeHTML(flagEscape.Bool(cmd))
 
 	err := e.Encode(v)
 	if err != nil {

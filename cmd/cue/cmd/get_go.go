@@ -47,10 +47,11 @@ import (
 //   package foo
 //   Type: enumType
 
-var getGoCmd = &cobra.Command{
-	Use:   "go [packages]",
-	Short: "add Go dependencies to the current module",
-	Long: `go converts Go types into CUE definitions
+func newGoCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "go [packages]",
+		Short: "add Go dependencies to the current module",
+		Long: `go converts Go types into CUE definitions
 
 The command "cue get go" is like "go get", but converts the retrieved Go
 packages to CUE. The retrieved packages are put in the CUE module's pkg
@@ -195,45 +196,44 @@ values for Switch. Note that there are now two definitions of Switch.
 CUE handles this in the usual way by unifying the two definitions, in which case
 the more restrictive enum interpretation of Switch remains.
 `,
-	// - TODO: interpret cuego's struct tags and annotations.
+		// - TODO: interpret cuego's struct tags and annotations.
 
-	RunE: func(cmd *cobra.Command, args []string) error {
-		return extract(cmd, args)
-	},
-}
+		RunE: func(cmd *cobra.Command, args []string) error {
+			return extract(cmd, args)
+		},
+	}
 
-func init() {
-	getCmd.AddCommand(getGoCmd)
-
-	exclude = getGoCmd.Flags().StringP("exclude", "e", "",
+	cmd.Flags().StringP(string(flagExclude), "e", "",
 		"comma-separated list of regexps of entries")
+
+	return cmd
 }
 
-var (
-	cueTestRoot string // the CUE module root for test purposes.
-	exclude     *string
-
-	exclusions []*regexp.Regexp
+const (
+	flagExclude flagName = "exclude"
 )
+
+var cueTestRoot string // the CUE module root for test purposes.
 
 type dstUsed struct {
 	dst  string
 	used bool
 }
 
-func initExclusions() {
-	for _, re := range strings.Split(*exclude, ",") {
+func (e *extractor) initExclusions(str string) {
+	e.exclude = str
+	for _, re := range strings.Split(str, ",") {
 		if re != "" {
-			exclusions = append(exclusions, regexp.MustCompile(re))
+			e.exclusions = append(e.exclusions, regexp.MustCompile(re))
 		}
 	}
 }
 
-func filter(name string) bool {
+func (e *extractor) filter(name string) bool {
 	if !ast.IsExported(name) {
 		return true
 	}
-	for _, ex := range exclusions {
+	for _, ex := range e.exclusions {
 		if ex.MatchString(name) {
 			return true
 		}
@@ -242,6 +242,8 @@ func filter(name string) bool {
 }
 
 type extractor struct {
+	cmd *cobra.Command
+
 	stderr io.Writer
 	err    error
 	pkgs   []*packages.Package
@@ -259,10 +261,13 @@ type extractor struct {
 	pkgNames   map[string]string
 	usedInFile map[string]bool
 	indent     int
+
+	exclusions []*regexp.Regexp
+	exclude    string
 }
 
 func (e *extractor) logf(format string, args ...interface{}) {
-	if *fVerbose {
+	if flagVerbose.Bool(e.cmd) {
 		fmt.Fprintf(e.stderr, format+"\n", args...)
 	}
 }
@@ -344,12 +349,13 @@ func extract(cmd *cobra.Command, args []string) error {
 	}
 
 	e := extractor{
+		cmd:    cmd,
 		stderr: cmd.OutOrStderr(),
 		pkgs:   pkgs,
 		orig:   map[types.Type]*ast.StructType{},
 	}
 
-	initExclusions()
+	e.initExclusions(flagExclude.String(cmd))
 
 	e.done = map[string]bool{}
 
@@ -403,8 +409,8 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	e.usedPkgs = map[string]bool{}
 
 	args := pkg
-	if *exclude != "" {
-		args += " --exclude=" + *exclude
+	if e.exclude != "" {
+		args += " --exclude=" + e.exclude
 	}
 
 	for i, f := range p.Syntax {
@@ -568,7 +574,7 @@ func (e *extractor) reportDecl(w io.Writer, x *ast.GenDecl) (added bool) {
 	case token.TYPE:
 		for _, s := range x.Specs {
 			v, ok := s.(*ast.TypeSpec)
-			if !ok || filter(v.Name.Name) {
+			if !ok || e.filter(v.Name.Name) {
 				continue
 			}
 

@@ -22,7 +22,6 @@ import (
 	"testing"
 
 	"github.com/retr0h/go-gilt/copy"
-	"github.com/spf13/cobra"
 )
 
 func TestGetGo(t *testing.T) {
@@ -39,7 +38,7 @@ func TestGetGo(t *testing.T) {
 	cueTestRoot = tmp
 
 	// We don't use runCommand here, as we are interested in generated packages.
-	cmd := &cobra.Command{RunE: getGoCmd.RunE}
+	cmd := newGoCmd()
 	cmd.SetArgs([]string{"./testdata/code/go/..."})
 	err = cmd.Execute()
 	if err != nil {

@@ -17,24 +17,28 @@ package cmd
 import "testing"
 
 func TestImport(t *testing.T) {
-	importCmd.ParseFlags([]string{
+	cmd := newImportCmd()
+	cmd.ParseFlags([]string{
 		"-o", "-", "-f", "--files",
 	})
-	runCommand(t, importCmd.RunE, "import_files")
+	runCommand(t, cmd, "import_files")
 
-	*files = false
-	importCmd.ParseFlags([]string{
-		"-f", "-l", `"\(strings.ToLower(kind))" "\(name)"`,
+	cmd = newImportCmd()
+	cmd.ParseFlags([]string{
+		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))" "\(name)"`,
 	})
-	runCommand(t, importCmd.RunE, "import_path")
+	runCommand(t, cmd, "import_path")
 
-	importCmd.ParseFlags([]string{
-		"-f", "-l", `"\(strings.ToLower(kind))"`, "--list",
+	cmd = newImportCmd()
+	cmd.ParseFlags([]string{
+		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))"`, "--list",
 	})
-	runCommand(t, importCmd.RunE, "import_list")
+	runCommand(t, cmd, "import_list")
 
-	importCmd.ParseFlags([]string{
-		"-f", "-l", `"\(strings.ToLower(kind))" "\(name)"`, "--recursive",
+	cmd = newImportCmd()
+	cmd.ParseFlags([]string{
+		"-o", "-", "-f", "--list",
+		"-l", `"\(strings.ToLower(kind))" "\(name)"`, "--recursive",
 	})
-	runCommand(t, importCmd.RunE, "import_hoiststr")
+	runCommand(t, cmd, "import_hoiststr")
 }

@@ -20,11 +20,11 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// getCmd represents the extract command
-var getCmd = &cobra.Command{
-	Use:   "get <language> [packages]",
-	Short: "add dependencies to the current module",
-	Long: `Get downloads packages or modules for CUE or another language
+func newGetCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "get <language> [packages]",
+		Short: "add dependencies to the current module",
+		Long: `Get downloads packages or modules for CUE or another language
 to include them in the module's pkg directory.
 
 Get requires an additional language field to determine for which
@@ -34,12 +34,11 @@ the source of the respective language and stored.
 The specifics on how dependencies are fechted and converted vary
 per language and are documented in the respective subcommands.
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("get must be run as one of its subcommands")
-		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(getCmd)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println("get must be run as one of its subcommands")
+			return nil
+		},
+	}
+	cmd.AddCommand(newGoCmd())
+	return cmd
 }

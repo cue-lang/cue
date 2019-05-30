@@ -14,9 +14,12 @@
 
 package cmd
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestTrim(t *testing.T) {
-	trimCmd.ParseFlags([]string{"-o", "-"})
-	runCommand(t, trimCmd.RunE, "trim")
+	cmd := newTrimCmd()
+	cmd.ParseFlags([]string{"-o", "-"})
+	runCommand(t, cmd, "trim")
 }

@@ -33,28 +33,27 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var addCmd = &cobra.Command{
-	// TODO: this command is still experimental, don't show it in
-	// the documentation just yet.
-	Hidden: true,
+func newAddCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		// TODO: this command is still experimental, don't show it in
+		// the documentation just yet.
+		Hidden: true,
 
-	Use:   "add <glob> [--list]",
-	Short: "bulk append to CUE files",
-	Long: `Append a common snippet of CUE to many files and commit atomically.
+		Use:   "add <glob> [--list]",
+		Short: "bulk append to CUE files",
+		Long: `Append a common snippet of CUE to many files and commit atomically.
 `,
-	RunE: runAdd,
-}
+		RunE: runAdd,
+	}
 
-func init() {
-	rootCmd.AddCommand(addCmd)
-
-	fList = addCmd.Flags().Bool("list", false,
+	f := cmd.Flags()
+	f.Bool(string(flagList), false,
 		"text executed as Go template with instance info")
-}
+	f.BoolP(string(flagDryrun), "n", false,
+		"only run simulation")
 
-var (
-	fList *bool
-)
+	return cmd
+}
 
 func runAdd(cmd *cobra.Command, args []string) (err error) {
 	return doAdd(cmd, stdin, args)
@@ -113,13 +112,13 @@ func doAdd(cmd *cobra.Command, stdin io.Reader, args []string) (err error) {
 				continue
 			}
 			done[file] = true
-			fi, err := initFile(file, getBuild)
+			fi, err := initFile(cmd, file, getBuild)
 			if err != nil {
 				return err
 			}
 			todo = append(todo, fi)
 			b := fi.build
-			if *fList && (b == nil) {
+			if flagList.Bool(cmd) && (b == nil) {
 				return fmt.Errorf("instance info not available for %s", fi.filename)
 			}
 		}
@@ -132,7 +131,7 @@ func doAdd(cmd *cobra.Command, stdin io.Reader, args []string) (err error) {
 	}
 
 	var tmpl *template.Template
-	if *fList {
+	if flagList.Bool(cmd) {
 		tmpl, err = template.New("append").Parse(string(text))
 		if err != nil {
 			return err
@@ -149,7 +148,7 @@ func doAdd(cmd *cobra.Command, stdin io.Reader, args []string) (err error) {
 		}
 	}
 
-	if *fDryrun {
+	if flagDryrun.Bool(cmd) {
 		stdout := cmd.OutOrStdout()
 		for _, fi := range todo {
 			fmt.Fprintln(stdout, "---", fi.filename)
@@ -214,7 +213,7 @@ type fileInfo struct {
 	build    *build.Instance
 }
 
-func initFile(file string, getBuild func(path string) *build.Instance) (todo *fileInfo, err error) {
+func initFile(cmd *cobra.Command, file string, getBuild func(path string) *build.Instance) (todo *fileInfo, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("init file: %v", err)
@@ -230,9 +229,8 @@ func initFile(file string, getBuild func(path string) *build.Instance) (todo *fi
 		// File does not exist
 		b := getBuild(dir)
 		todo.build = b
-		pkg := ""
-		if *fPackage != "" {
-			pkg = *fPackage
+		pkg := flagPackage.String(cmd)
+		if pkg != "" {
 			// TODO: do something more intelligent once the package name is
 			// computed on a module basis, even for empty directories.
 			b.PkgName = pkg
@@ -255,13 +253,13 @@ func initFile(file string, getBuild func(path string) *build.Instance) (todo *fi
 			return nil, err
 		}
 		if f.Name != nil {
-			if *fPackage != "" && f.Name.Name != *fPackage {
-				return nil, fmt.Errorf("package mismatch (%s vs %s) for file %s", f.Name.Name, *fPackage, file)
+			if pkg := flagPackage.String(cmd); pkg != "" && f.Name.Name != pkg {
+				return nil, fmt.Errorf("package mismatch (%s vs %s) for file %s", f.Name.Name, pkg, file)
 			}
 			todo.build = getBuild(dir)
 		} else {
-			if *fPackage != "" {
-				return nil, fmt.Errorf("file %s has no package clause but package %s requested", file, *fPackage)
+			if pkg := flagPackage.String(cmd); pkg != "" {
+				return nil, fmt.Errorf("file %s has no package clause but package %s requested", file, pkg)
 			}
 			todo.build = getBuild(file)
 			todo.buildArg = file

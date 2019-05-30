@@ -101,7 +101,7 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
 		// duplicates are removed.
-		exitIfErr(cmd, inst, inst.Value().Validate(), !*fIgnore)
+		exitIfErr(cmd, inst, inst.Value().Validate(), !flagIgnore.Bool(cmd))
 	}
 	return instances
 }

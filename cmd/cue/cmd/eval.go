@@ -24,11 +24,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// evalCmd represents the eval command
-var evalCmd = &cobra.Command{
-	Use:   "eval",
-	Short: "evaluate and print a configuration",
-	Long: `eval evaluates, validates, and prints a configuration.
+// newEvalCmd creates a new eval command
+func newEvalCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "eval",
+		Short: "evaluate and print a configuration",
+		Long: `eval evaluates, validates, and prints a configuration.
 
 Printing is skipped if validation fails.
 
@@ -45,84 +46,82 @@ Examples:
   "a"
   "c"
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		instances := buildFromArgs(cmd, args)
+		RunE: runEval,
+	}
 
-		var exprs []ast.Expr
-		for _, e := range *expressions {
-			expr, err := parser.ParseExpr("<expression flag>", e)
-			if err != nil {
-				return err
-			}
-			exprs = append(exprs, expr)
-		}
+	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
 
-		w := cmd.OutOrStdout()
-
-		for _, inst := range instances {
-			// TODO: use ImportPath or some other sanitized path.
-			fmt.Fprintf(w, "// %s\n", inst.Dir)
-			syn := []cue.Option{
-				cue.Attributes(*attrs),
-				cue.Optional(*all || *optional),
-			}
-			if *compile {
-				syn = append(syn, cue.Concrete(true))
-			}
-			if *hidden || *all {
-				syn = append(syn, cue.Hidden(true))
-			}
-			opts := []format.Option{
-				format.UseSpaces(4),
-				format.TabIndent(false),
-			}
-			if exprs == nil {
-				v := inst.Value()
-				if *compile {
-					err := v.Validate(cue.Concrete(true))
-					exitIfErr(cmd, inst, err, false)
-					continue
-				}
-				format.Node(w, v.Syntax(syn...), opts...)
-				fmt.Fprintln(w)
-			}
-			for _, e := range exprs {
-				format.Node(w, inst.Eval(e).Syntax(syn...), opts...)
-				fmt.Fprintln(w)
-			}
-		}
-		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(evalCmd)
-
-	expressions = evalCmd.Flags().StringArrayP("expression", "e", nil, "evaluate this expression only")
-
-	compile = evalCmd.Flags().BoolP("concrete", "c", false,
+	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete")
 
-	hidden = evalCmd.Flags().BoolP("show-hidden", "H", false,
+	cmd.Flags().BoolP(string(flagHidden), "H", false,
 		"display hidden attributes")
 
-	optional = evalCmd.Flags().BoolP("show-optional", "O", false,
+	cmd.Flags().BoolP(string(flagOptional), "O", false,
 		"display hidden attributes")
 
-	attrs = evalCmd.Flags().BoolP("attributes", "l", false,
+	cmd.Flags().BoolP(string(flagAttributes), "l", false,
 		"display field attributes")
 
-	all = evalCmd.Flags().BoolP("all", "a", false,
+	cmd.Flags().BoolP(string(flagAll), "a", false,
 		"show optional and hidden fields")
 
 	// TODO: Option to include comments in output.
+	return cmd
 }
 
-var (
-	expressions *[]string
-	compile     *bool
-	attrs       *bool
-	all         *bool
-	hidden      *bool
-	optional    *bool
+const (
+	flagConcrete   flagName = "concrete"
+	flagHidden     flagName = "show-hidden"
+	flagOptional   flagName = "show-optional"
+	flagAttributes flagName = "attributes"
 )
+
+func runEval(cmd *cobra.Command, args []string) error {
+	instances := buildFromArgs(cmd, args)
+
+	var exprs []ast.Expr
+	for _, e := range flagExpression.StringArray(cmd) {
+		expr, err := parser.ParseExpr("<expression flag>", e)
+		if err != nil {
+			return err
+		}
+		exprs = append(exprs, expr)
+	}
+
+	w := cmd.OutOrStdout()
+
+	for _, inst := range instances {
+		// TODO: use ImportPath or some other sanitized path.
+		fmt.Fprintf(w, "// %s\n", inst.Dir)
+		syn := []cue.Option{
+			cue.Attributes(flagAttributes.Bool(cmd)),
+			cue.Optional(flagAll.Bool(cmd) || flagOptional.Bool(cmd)),
+		}
+		if flagConcrete.Bool(cmd) {
+			syn = append(syn, cue.Concrete(true))
+		}
+		if flagHidden.Bool(cmd) || flagAll.Bool(cmd) {
+			syn = append(syn, cue.Hidden(true))
+		}
+		opts := []format.Option{
+			format.UseSpaces(4),
+			format.TabIndent(false),
+		}
+		if exprs == nil {
+			v := inst.Value()
+			if flagConcrete.Bool(cmd) {
+				err := v.Validate(cue.Concrete(true))
+				exitIfErr(cmd, inst, err, false)
+				continue
+			}
+			format.Node(w, v.Syntax(syn...), opts...)
+			fmt.Fprintln(w)
+		}
+		for _, e := range exprs {
+			format.Node(w, inst.Eval(e).Syntax(syn...), opts...)
+			fmt.Fprintln(w)
+		}
+	}
+	return nil
+}

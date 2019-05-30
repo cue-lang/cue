@@ -34,7 +34,7 @@ var _ = errors.Print
 
 var update = flag.Bool("update", false, "update the test files")
 
-func runCommand(t *testing.T, f func(cmd *cobra.Command, args []string) error, name string, args ...string) {
+func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 	t.Helper()
 	log.SetFlags(0)
 
@@ -61,7 +61,6 @@ func runCommand(t *testing.T, f func(cmd *cobra.Command, args []string) error, n
 				return
 			}
 
-			cmd := &cobra.Command{RunE: f}
 			cmd.SetArgs(append(args, "./"+path))
 			rOut, wOut := io.Pipe()
 			cmd.SetOutput(wOut)
@@ -107,5 +106,5 @@ func runCommand(t *testing.T, f func(cmd *cobra.Command, args []string) error, n
 }
 
 func TestLoadError(t *testing.T) {
-	runCommand(t, evalCmd.RunE, "loaderr", "non-existing", ".")
+	runCommand(t, newEvalCmd(), "loaderr", "non-existing", ".")
 }

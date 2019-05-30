@@ -17,5 +17,5 @@ package cmd
 import "testing"
 
 func TestEval(t *testing.T) {
-	runCommand(t, evalCmd.RunE, "eval")
+	runCommand(t, newEvalCmd(), "eval")
 }

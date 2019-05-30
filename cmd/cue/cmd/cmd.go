@@ -22,11 +22,11 @@ import (
 
 // TODO: generate long description from documentation.
 
-// cmdCmd represents the cmd command
-var cmdCmd = &cobra.Command{
-	Use:   "cmd <name> [-x] [instances]",
-	Short: "run a user-defined shell command",
-	Long: `cmd executes defined the named command for each of the named instances.
+func newCmdCmd() *cobra.Command {
+	return &cobra.Command{
+		Use:   "cmd <name> [-x] [instances]",
+		Short: "run a user-defined shell command",
+		Long: `cmd executes defined the named command for each of the named instances.
 
 Commands define actions on instances. For example, they may specify
 how to upload a configuration to Kubernetes. Commands are defined
@@ -209,12 +209,9 @@ An example using pipes:
 	}
 
 `,
-	RunE: func(cmd *cobra.Command, args []string) error {
-		fmt.Println("cmd run but shouldn't")
-		return nil
-	},
-}
-
-func init() {
-	rootCmd.AddCommand(cmdCmd)
+		RunE: func(cmd *cobra.Command, args []string) error {
+			fmt.Println("cmd run but shouldn't")
+			return nil
+		},
+	}
 }

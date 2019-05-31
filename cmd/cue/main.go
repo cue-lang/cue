@@ -16,7 +16,7 @@ package main
 
 import (
 	"context"
-	"log"
+	"fmt"
 	"os"
 
 	"cuelang.org/go/cmd/cue/cmd"
@@ -25,7 +25,7 @@ import (
 func main() {
 	err := cmd.Main(context.Background(), os.Args[1:])
 	if err != nil {
-		log.Println(err)
+		fmt.Println(err)
 		os.Exit(1)
 	}
 }

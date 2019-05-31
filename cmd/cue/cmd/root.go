@@ -18,6 +18,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"io"
 	logger "log"
 	"os"
 
@@ -43,7 +44,7 @@ var log = logger.New(os.Stderr, "", logger.Lshortfile)
 var cfgFile string
 
 // newRootCmd creates the base command when called without any subcommands
-func newRootCmd() *cobra.Command {
+func newRootCmd() *Command {
 	cmd := &cobra.Command{
 		Use:   "cue",
 		Short: "cue emits configuration files to user-defined commands.",
@@ -70,6 +71,8 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		SilenceUsage: true,
 	}
 
+	cmdCmd := newCmdCmd()
+
 	subCommands := []*cobra.Command{
 		newTrimCmd(),
 		newImportCmd(),
@@ -77,7 +80,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		newGetCmd(),
 		newFmtCmd(),
 		newExportCmd(),
-		newCmdCmd(),
+		cmdCmd,
 		newVetCmd(),
 		newAddCmd(),
 	}
@@ -88,28 +91,57 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		cmd.AddCommand(sub)
 	}
 
-	return cmd
+	return &Command{root: cmd, cmd: cmdCmd}
 }
 
 // Main runs the cue tool. It loads the tool flags.
 func Main(ctx context.Context, args []string) (err error) {
+	cmd, err := New(args)
+	if err != nil {
+		return err
+	}
+	return cmd.Run(ctx)
+}
+
+type Command struct {
+	root *cobra.Command
+
+	// Subcommands
+	cmd *cobra.Command
+}
+
+func (c *Command) SetOutput(w io.Writer) {
+	c.root.SetOutput(w)
+}
+
+func (c *Command) Run(ctx context.Context) (err error) {
 	log.SetFlags(0)
 	// Three categories of commands:
 	// - normal
 	// - user defined
 	// - help
 	// For the latter two, we need to use the default loading.
-	defer func() {
-		switch e := recover().(type) {
-		case nil:
-		case panicError:
-			err = e.Err
-		default:
-			panic(err)
-		}
-		// We use panic to escape, instead of os.Exit
-	}()
-	rootCmd := newRootCmd()
+	defer recoverError(&err)
+
+	return c.root.Execute()
+}
+
+func recoverError(err *error) {
+	switch e := recover().(type) {
+	case nil:
+	case panicError:
+		*err = e.Err
+	default:
+		panic(e)
+	}
+	// We use panic to escape, instead of os.Exit
+}
+
+func New(args []string) (cmd *Command, err error) {
+	defer recoverError(&err)
+
+	cmd = newRootCmd()
+	rootCmd := cmd.root
 	rootCmd.SetArgs(args)
 	if len(args) >= 1 && args[0] != "help" {
 		// TODO: for now we only allow one instance. Eventually, we can allow
@@ -125,7 +157,7 @@ func Main(ctx context.Context, args []string) (err error) {
 			cmd  *cobra.Command
 		}
 		sub := map[string]subSpec{
-			"cmd": {commandSection, newCmdCmd()},
+			"cmd": {commandSection, cmd.cmd},
 			// "serve": {"server", nil},
 			// "fix":   {"fix", nil},
 		}
@@ -137,12 +169,12 @@ func Main(ctx context.Context, args []string) (err error) {
 				commands := tools.Lookup(sub.name)
 				i, err := commands.Fields()
 				if err != nil {
-					return err
+					return nil, err
 				}
 				for i.Next() {
 					_, _ = addCustom(sub.cmd, sub.name, i.Label(), tools)
 				}
-				return nil
+				return cmd, nil
 			}
 			tools := buildTools(rootCmd, args[1:])
 			_, err := addCustom(sub.cmd, sub.name, args[0], tools)
@@ -152,7 +184,7 @@ func Main(ctx context.Context, args []string) (err error) {
 			}
 		}
 	}
-	return rootCmd.Execute()
+	return cmd, nil
 }
 
 type panicError struct {

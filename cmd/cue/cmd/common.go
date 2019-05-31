@@ -29,21 +29,17 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func init() {
-	s, err := os.Getwd()
-	if err == nil {
-		cwd = s
-	}
-}
-
 var runtime = &cue.Runtime{}
 
-var cwd = "////"
-
 // printHeader is a hacky and unprincipled way to sanatize the package path.
-func printHeader(w io.Writer, dir string) {
-	head := strings.Replace(dir, cwd, ".", 1)
-	fmt.Fprintf(w, "--- %s\n", head)
+func printHeader(w io.Writer, cwd, dir string) {
+	if cwd != "" {
+		if dir == cwd {
+			return
+		}
+		dir = strings.Replace(dir, cwd, ".", 1)
+	}
+	fmt.Fprintf(w, "--- %s\n", dir)
 }
 
 func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
@@ -51,18 +47,24 @@ func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 }
 
 func exitOnErr(cmd *cobra.Command, file string, err error, fatal bool) {
-	if err != nil {
-		w := &bytes.Buffer{}
-		printHeader(w, file)
-		errors.Print(w, err)
+	if err == nil {
+		return
+	}
+	cwd := "////"
+	if p, _ := os.Getwd(); p != "" {
+		cwd = p
+	}
 
-		// TODO: do something more principled than this.
-		b := w.Bytes()
-		b = bytes.ReplaceAll(b, []byte(cwd), []byte("."))
-		cmd.OutOrStderr().Write(b)
-		if fatal {
-			exit()
-		}
+	w := &bytes.Buffer{}
+	printHeader(w, cwd, file)
+	errors.Print(w, err)
+
+	// TODO: do something more principled than this.
+	b := w.Bytes()
+	b = bytes.ReplaceAll(b, []byte(cwd), []byte("."))
+	cmd.OutOrStderr().Write(b)
+	if fatal {
+		exit()
 	}
 }
 

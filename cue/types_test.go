@@ -224,8 +224,8 @@ func TestInt(t *testing.T) {
 		notInt: true,
 	}, {
 		value:  "int",
-		err:    "non-concrete value (int)*",
-		errU:   "non-concrete value (int)*",
+		err:    "non-concrete value int",
+		errU:   "non-concrete value int",
 		notInt: true,
 	}, {
 		value:  "_|_",
@@ -421,7 +421,7 @@ func TestString(t *testing.T) {
 		str: `Hello world!`,
 	}, {
 		value: `string`,
-		err:   "non-concrete value (string)*",
+		err:   "non-concrete value string",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -482,7 +482,7 @@ func TestNull(t *testing.T) {
 		value: `null`,
 	}, {
 		value: `_`,
-		err:   "non-concrete value (_)*",
+		err:   "non-concrete value _",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -510,7 +510,7 @@ func TestBool(t *testing.T) {
 		value: `false`,
 	}, {
 		value: `bool`,
-		err:   "non-concrete value (bool)*",
+		err:   "non-concrete value bool",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

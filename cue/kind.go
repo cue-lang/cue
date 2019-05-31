@@ -145,12 +145,6 @@ finalize:
 	if str == "" {
 		return "_|_"
 	}
-	if k&nonGround != 0 {
-		str = "(" + str + ")*"
-	}
-	if k&referenceKind != 0 {
-		str = "&" + str
-	}
 	return str
 }
 

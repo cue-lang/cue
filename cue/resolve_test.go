@@ -141,7 +141,7 @@ func TestBasicRewrite(t *testing.T) {
 
 			`e1: _|_(("foo" =~ 1):unsupported op =~(string, int)), ` +
 			`e2: _|_(("foo" !~ true):unsupported op !~(string, bool)), ` +
-			`e3: _|_((!="a" & <5):unsupported op &((string)*, (number)*))}`,
+			`e3: _|_((!="a" & <5):unsupported op &(string, number))}`,
 	}, {
 		desc: "arithmetic",
 		in: `
@@ -271,7 +271,7 @@ func TestBasicRewrite(t *testing.T) {
 			f: true
 			f: bool
 			`,
-		out: `<0>{a: 1, b: 1, c: 1.0, d: _|_((int & float):unsupported op &((int)*, (float)*)), e: "4", f: true}`,
+		out: `<0>{a: 1, b: 1, c: 1.0, d: _|_((int & float):unsupported op &(int, float)), e: "4", f: true}`,
 	}, {
 		desc: "strings and bytes",
 		in: `
@@ -439,7 +439,7 @@ func TestBasicRewrite(t *testing.T) {
 			p: +true
 			m: -false
 		`,
-		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):unsupported op &((int)*, (string)*)), e2: _|_((1 & string):unsupported op &(int, (string)*)), b: _|_(!int:unary '!' requires bool value, found (int)*), p: _|_(+true:unary '+' requires numeric value, found bool), m: _|_(-false:unary '-' requires numeric value, found bool)}`,
+		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):unsupported op &(int, string)), e2: _|_((1 & string):unsupported op &(int, string)), b: _|_(!int:unary '!' requires bool value, found int), p: _|_(+true:unary '+' requires numeric value, found bool), m: _|_(-false:unary '-' requires numeric value, found bool)}`,
 	}, {
 		desc: "comparison",
 		in: `
@@ -598,7 +598,7 @@ func TestResolve(t *testing.T) {
 				e1: 2.0 % (3&int)
 				e2: int & 4.0/2.0
 				`,
-		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: 2.0, e2: _|_((int & 2):unsupported op &((int)*, float))}`,
+		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: 2.0, e2: _|_((int & 2):unsupported op &(int, float))}`,
 	}, {
 		desc: "inequality",
 		in: `
@@ -737,7 +737,7 @@ func TestResolve(t *testing.T) {
 			`e6: _|_(incompatible bounds >11 and <11), ` +
 			`e7: _|_(incompatible bounds >=11 and <11), ` +
 			`e8: _|_(incompatible bounds >11 and <=11), ` +
-			`e9: _|_((>"a" & <1):unsupported op &((string)*, (number)*))}`,
+			`e9: _|_((>"a" & <1):unsupported op &(string, number))}`,
 	}, {
 		desc: "custom validators",
 		in: `
@@ -878,7 +878,7 @@ func TestResolve(t *testing.T) {
 			`t0: [<3>{a: 8}], ` +
 			`t1: [, ...int], ` +
 			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):incompatible list lengths: cannot unify numbers 2 and 1), ` +
-			`e1: _|_(([, ...int] & [, ...float]):incompatible list types: unsupported op &((int)*, (float)*): )` +
+			`e1: _|_(([, ...int] & [, ...float]):incompatible list types: unsupported op &(int, float): )` +
 			`}`,
 	}, {
 		// TODO: consider removing list arithmetic altogether. It is no longer
@@ -1296,8 +1296,8 @@ func TestResolve(t *testing.T) {
 			`b14: _|_(incompatible bounds >=6 and <=5), ` +
 			`c1: (int & >=1 & <=5), ` +
 			`c2: (<=5 & int & >=1), ` +
-			`c3: _|_((string & >=1):unsupported op &((string)*, (number)*)), ` +
-			`c4: _|_(((>=1 & <=5) & string):unsupported op &((number)*, (string)*)), ` +
+			`c3: _|_((string & >=1):unsupported op &(string, number)), ` +
+			`c4: _|_(((>=1 & <=5) & string):unsupported op &(number, string)), ` +
 			`s1: "e", ` +
 			`s2: "ee", ` +
 			`n1: (>=1 & <=2), ` +
@@ -1572,7 +1572,7 @@ func TestFullEval(t *testing.T) {
 		in: `
 				a: 8000.9
 				a: 7080 | int`,
-		out: `<0>{a: _|_((8000.9 & int):unsupported op &(float, (int)*))}`,
+		out: `<0>{a: _|_((8000.9 & int):unsupported op &(float, int))}`,
 	}, {
 		desc: "resolve all disjunctions",
 		in: `

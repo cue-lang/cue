@@ -108,6 +108,10 @@ func runEval(cmd *cobra.Command, args []string) error {
 			format.UseSpaces(4),
 			format.TabIndent(false),
 		}
+		if flagSimplify.Bool(cmd) {
+			opts = append(opts, format.Simplify())
+		}
+
 		if exprs == nil {
 			v := inst.Value()
 			if flagConcrete.Bool(cmd) {
@@ -115,13 +119,22 @@ func runEval(cmd *cobra.Command, args []string) error {
 				exitIfErr(cmd, inst, err, false)
 				continue
 			}
-			format.Node(w, v.Syntax(syn...), opts...)
+			format.Node(w, getSyntax(v, syn), opts...)
 			fmt.Fprintln(w)
 		}
 		for _, e := range exprs {
-			format.Node(w, inst.Eval(e).Syntax(syn...), opts...)
+			format.Node(w, getSyntax(inst.Eval(e), syn), opts...)
 			fmt.Fprintln(w)
 		}
 	}
 	return nil
+}
+
+func getSyntax(v cue.Value, opts []cue.Option) ast.Node {
+	n := v.Syntax(opts...)
+	switch x := n.(type) {
+	case *ast.StructLit:
+		n = &ast.File{Decls: x.Elts}
+	}
+	return n
 }

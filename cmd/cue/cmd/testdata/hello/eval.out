@@ -1,5 +1,4 @@
 // $CWD/testdata/hello
-{
-    who:     "World"
-    message: "Hello World!"
-}
+who:     "World"
+message: "Hello World!"
+

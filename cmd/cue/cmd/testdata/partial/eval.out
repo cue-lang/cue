@@ -1,24 +1,23 @@
 // $CWD/testdata/partial
-{
-    def: 1
-    sum: 1 | 2
-    A = a
-    b: {
-        idx: A[str]
-        a: {
-            b: 4
-        }
-        str: string
-    }
+def: 1
+sum: 1 | 2
+A = a
+b: {
+    idx: A[str]
     a: {
-        b: 3
-        c: 4
+        b: 4
     }
-    c: {
-        idx: 3
-        a: {
-            b: 4
-        }
-        str: "b"
-    }
+    str: string
 }
+a: {
+    b: 3
+    c: 4
+}
+c: {
+    idx: 3
+    a: {
+        b: 4
+    }
+    str: "b"
+}
+

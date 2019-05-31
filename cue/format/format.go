@@ -107,14 +107,18 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 type config struct {
 	UseSpaces bool
 	TabIndent bool
-	Tabwidth  int // default: 8
+	Tabwidth  int // default: 4
 	Indent    int // default: 0 (all code is indented at least by this much)
 
 	simplify bool
 }
 
 func newConfig(opt []Option) *config {
-	cfg := &config{Tabwidth: 8, TabIndent: true, UseSpaces: true}
+	cfg := &config{
+		Tabwidth:  8,
+		TabIndent: true,
+		UseSpaces: true,
+	}
 	for _, o := range opt {
 		o(cfg)
 	}
@@ -123,27 +127,24 @@ func newConfig(opt []Option) *config {
 
 // Config defines the output of Fprint.
 func (cfg *config) fprint(output io.Writer, node interface{}) (err error) {
-	// print node
 	var p printer
 	p.init(cfg)
 	if err = printNode(node, &p); err != nil {
 		return err
 	}
 
-	minwidth := cfg.Tabwidth
-
 	padchar := byte('\t')
 	if cfg.UseSpaces {
-		padchar = ' '
+		padchar = byte(' ')
 	}
 
-	twmode := tabwriter.DiscardEmptyColumns | tabwriter.StripEscape
+	twmode := tabwriter.StripEscape | tabwriter.TabIndent | tabwriter.DiscardEmptyColumns
 	if cfg.TabIndent {
-		minwidth = 0
 		twmode |= tabwriter.TabIndent
 	}
 
-	tw := tabwriter.NewWriter(output, minwidth, cfg.Tabwidth, 1, padchar, twmode)
+	buf := &bytes.Buffer{}
+	tw := tabwriter.NewWriter(buf, 0, cfg.Tabwidth, 1, padchar, twmode)
 
 	// write printer result via tabwriter/trimmer to output
 	if _, err = tw.Write(p.output); err != nil {
@@ -151,7 +152,16 @@ func (cfg *config) fprint(output io.Writer, node interface{}) (err error) {
 	}
 
 	err = tw.Flush()
-	return
+	if err != nil {
+		return err
+	}
+
+	b := buf.Bytes()
+	if !cfg.TabIndent {
+		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, cfg.Tabwidth))
+	}
+	_, err = output.Write(b)
+	return err
 }
 
 // A formatter walks a syntax.Node, interspersed with comments and spacing

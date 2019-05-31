@@ -213,8 +213,8 @@ Gateway: {
 	//  label search is restricted to the configuration namespace in which the
 	//  the resource is present. In other words, the Gateway resource must
 	//  reside in the same namespace as the gateway workload instance.
-	selector <_>: string
-	selector?: {<name>: name}
+	selector <_>:     string
+	selector? <name>: name
 }
 
 //  `Server` describes the properties of the proxy on a given load balancer
@@ -413,10 +413,10 @@ Server_TLSOptions_TLSmode:
 	"AUTO_PASSTHROUGH"
 
 Server_TLSOptions_TLSmode_value: {
-	"PASSTHROUGH":      0
-	"SIMPLE":           1
-	"MUTUAL":           2
-	"AUTO_PASSTHROUGH": 3
+	PASSTHROUGH:      0
+	SIMPLE:           1
+	MUTUAL:           2
+	AUTO_PASSTHROUGH: 3
 }
 
 //  TLS protocol versions.
@@ -428,11 +428,11 @@ Server_TLSOptions_TLSProtocol:
 	"TLSV1_3" //  TLS version 1.3
 
 Server_TLSOptions_TLSProtocol_value: {
-	"TLS_AUTO": 0
-	"TLSV1_0":  1
-	"TLSV1_1":  2
-	"TLSV1_2":  3
-	"TLSV1_3":  4
+	TLS_AUTO: 0
+	TLSV1_0:  1
+	TLSV1_1:  2
+	TLSV1_2:  3
+	TLSV1_3:  4
 }
 
 //  Port describes the properties of a specific port of a service.

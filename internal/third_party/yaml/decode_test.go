@@ -209,7 +209,9 @@ var unmarshalTests = []struct {
 	// Structs
 	{
 		"a: {b: c}",
-		`a b: "c"`,
+		`a: {
+	b: "c"
+}`,
 	},
 	{
 		"hello: world",
@@ -231,7 +233,10 @@ var unmarshalTests = []struct {
 		"a: true",
 	}, {
 		"{ a: 1, b: {c: 1} }",
-		"a: 1\nb c: 1",
+		`a: 1
+b: {
+	c: 1
+}`,
 	},
 
 	// Some cross type conversions
@@ -396,7 +401,12 @@ c: 1
 d: 2`,
 	}, {
 		"a: &a {c: 1}\nb: *a",
-		"a c: 1\nb c: 1",
+		`a: {
+	c: 1
+}
+b: {
+	c: 1
+}`,
 	}, {
 		"a: &a [1, 2]\nb: *a",
 		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a
@@ -449,7 +459,9 @@ d: 2`,
 	// issue #295 (allow scalars with colons in flow mappings and sequences)
 	{
 		"a: {b: https://github.com/go-yaml/yaml}",
-		`a b: "https://github.com/go-yaml/yaml"`,
+		`a: {
+	b: "https://github.com/go-yaml/yaml"
+}`,
 	},
 	{
 		"a: [https://github.com/go-yaml/yaml]",
@@ -493,13 +505,19 @@ d: 2`,
 a: 1
 d: 4
 c: 3
-sub e: 5`,
+sub: {
+	e: 5
+}`,
 	},
 
 	// Issue #39.
 	{
 		"a:\n b:\n  c: d\n",
-		`a b c: "d"`,
+		`a: {
+	b: {
+		c: "d"
+	}
+}`,
 	},
 
 	// Timestamps

@@ -58,7 +58,7 @@ const (
 // if any.
 func format(src []byte, mode checkMode) ([]byte, error) {
 	// parse src
-	var opts []Option
+	opts := []Option{TabIndent(true)}
 	if mode&simplify != 0 {
 		opts = append(opts, Simplify())
 	}

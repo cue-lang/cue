@@ -52,8 +52,8 @@ NetworkFailPolicy_FailPolicy:
 	"FAIL_CLOSE"
 
 NetworkFailPolicy_FailPolicy_value: {
-	"FAIL_OPEN":  0
-	"FAIL_CLOSE": 1
+	FAIL_OPEN:  0
+	FAIL_CLOSE: 1
 }
 
 //  Defines the per-service client configuration.

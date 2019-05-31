@@ -256,7 +256,7 @@ func TestExport(t *testing.T) {
 			{
 				b: [{
 					<X>: int
-					"f": 4 if a > 4
+					f:   4 if a > 4
 				}][a]
 				a: int
 				c: 1
@@ -277,7 +277,7 @@ func TestExport(t *testing.T) {
 
 			buf := &bytes.Buffer{}
 			opts := options{raw: !tc.eval}
-			err := format.Node(buf, export(ctx, v.eval(ctx), opts))
+			err := format.Node(buf, export(ctx, v.eval(ctx), opts), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}
@@ -330,7 +330,7 @@ func TestExportFile(t *testing.T) {
 
 			buf := &bytes.Buffer{}
 			opts := options{raw: false}
-			err = format.Node(buf, export(ctx, v.eval(ctx), opts))
+			err = format.Node(buf, export(ctx, v.eval(ctx), opts), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}

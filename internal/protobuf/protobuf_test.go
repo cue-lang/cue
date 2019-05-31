@@ -46,7 +46,7 @@ func TestParseDefinitions(t *testing.T) {
 			if f, err := Parse(filename, nil, c); err != nil {
 				fmt.Fprintln(out, err)
 			} else {
-				format.Node(out, f)
+				format.Node(out, f, format.Simplify())
 			}
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")

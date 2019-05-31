@@ -116,7 +116,9 @@ func (f *formatter) decl(decl ast.Decl) {
 		lastSize := len(f.labelBuf)
 		f.labelBuf = f.labelBuf[:0]
 		first, opt := n.Label, n.Optional != token.NoPos
-		for {
+		// If the field has a valid position, we assume that an unspecified
+		// Lbrace does not signal the intend to collapse fields.
+		for n.Label.Pos().IsValid() || f.printer.cfg.simplify {
 			obj, ok := n.Value.(*ast.StructLit)
 			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) {
 				break

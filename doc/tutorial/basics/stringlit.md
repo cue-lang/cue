@@ -28,7 +28,7 @@ b: """
 ```
 
 <!-- JSON result -->
-`$ cue extract stringlit.cue`
+`$ cue export stringlit.cue`
 ```json
 {
     "a": "😎",

@@ -292,7 +292,7 @@ EOF
 By replacing the service and deployment name with `<Name>` we have changed the
 definition into a template.
 CUE bind the field name to `Name` as a result.
-During importing we used `metadata.data` as a key for the object names,
+During importing we used `metadata.name` as a key for the object names,
 so we can now set this field to `Name`.
 
 Templates are applied to (are unified with) all entries in the struct in which

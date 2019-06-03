@@ -23,6 +23,6 @@ a: '\x03abc'
 `$ cue export bytes.cue`
 ```json
 {
-    a: "A2FiYw=="
+    "a": "A2FiYw=="
 }
 ```

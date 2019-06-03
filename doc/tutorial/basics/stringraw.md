@@ -29,7 +29,7 @@ msg2: ##"""
 
 <!-- JSON result -->
 `$ cue eval stringraw.cue`
-```json
+```
 {
     msg1: "The sequence \"\\U0001F604\" renders as 😄."
     msg2: """

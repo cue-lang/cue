@@ -6,5 +6,5 @@
 CUE is an extension of JSON.
 This improves familiarity and makes it easy to get going quickly.
 
-In its simplist use case, CUE can substitute for a more pleasent way to write
+In its simplest use case, CUE can substitute for a more pleasant way to write
 JSON.

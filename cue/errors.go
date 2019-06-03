@@ -81,7 +81,7 @@ type bottom struct {
 
 func (x *bottom) kind() kind { return bottomKind }
 
-func (x *bottom) Position() []token.Pos {
+func (x *bottom) Positions() []token.Pos {
 	if x.index != nil {
 		return appendPositions(nil, x.pos)
 	}

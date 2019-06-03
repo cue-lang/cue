@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"golang.org/x/exp/errors"
 	"golang.org/x/exp/errors/fmt"
+	"golang.org/x/xerrors"
 )
 
 // New is a convenience wrapper for errors.New in the core library.
@@ -115,14 +116,14 @@ func toErr(err error) Error {
 	return &posError{err: err}
 }
 
-func (e posError) Position() token.Position {
+func (e *posError) Position() token.Position {
 	return e.pos
 }
 
 // Error implements the error interface.
-func (e posError) Error() string { return fmt.Sprint(e) }
+func (e *posError) Error() string { return fmt.Sprint(e) }
 
-func (e posError) FormatError(p errors.Printer) error {
+func (e *posError) FormatError(p errors.Printer) error {
 	next := e.err
 	if e.msg == "" {
 		next = errFormat(p, e.err)
@@ -134,6 +135,10 @@ func (e posError) FormatError(p errors.Printer) error {
 	}
 	return next
 
+}
+
+func (e posError) Unwrap() error {
+	return e.err
 }
 
 func errFormat(p errors.Printer, err error) (next error) {
@@ -250,6 +255,30 @@ func Print(w io.Writer, err error) {
 	}
 }
 
-func printError(w io.Writer, err Error) {
-	fmt.Fprintf(w, "%+v\n", err)
+func printError(w io.Writer, err error) {
+	fmt.Fprintf(w, "%v", err)
+	printedColon := false
+	for ; err != nil; err = xerrors.Unwrap(err) {
+		switch x := err.(type) {
+		case interface{ Position() token.Position }:
+			if pos := x.Position().String(); pos != "-" {
+				if !printedColon {
+					fmt.Fprint(w, ":")
+					printedColon = true
+				}
+				fmt.Fprintf(w, "\n    %v", pos)
+			}
+		case interface{ Positions() []token.Pos }:
+			for _, p := range x.Positions() {
+				if p.IsValid() {
+					if !printedColon {
+						fmt.Fprint(w, ":")
+						printedColon = true
+					}
+					fmt.Fprintf(w, "\n    %v", p)
+				}
+			}
+		}
+	}
+	fmt.Fprintln(w)
 }

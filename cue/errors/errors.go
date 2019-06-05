@@ -19,6 +19,8 @@ import (
 	"io"
 	"sort"
 
+	"github.com/mpvl/unique"
+
 	"cuelang.org/go/cue/token"
 	"golang.org/x/exp/errors"
 	"golang.org/x/exp/errors/fmt"
@@ -248,37 +250,44 @@ func (p List) Err() error {
 func Print(w io.Writer, err error) {
 	if list, ok := err.(List); ok {
 		for _, e := range list {
-			printError(w, e)
+			printErrors(w, e)
 		}
 	} else if err != nil {
-		printError(w, toErr(err))
+		printErrors(w, err)
+	}
+}
+
+func printErrors(w io.Writer, err error) {
+	for ; err != nil; err = xerrors.Unwrap(err) {
+		printError(w, err)
 	}
 }
 
 func printError(w io.Writer, err error) {
-	fmt.Fprintf(w, "%v", err)
-	printedColon := false
-	for ; err != nil; err = xerrors.Unwrap(err) {
-		switch x := err.(type) {
-		case interface{ Position() token.Position }:
-			if pos := x.Position().String(); pos != "-" {
-				if !printedColon {
-					fmt.Fprint(w, ":")
-					printedColon = true
-				}
-				fmt.Fprintf(w, "\n    %v", pos)
-			}
-		case interface{ Positions() []token.Pos }:
-			for _, p := range x.Positions() {
-				if p.IsValid() {
-					if !printedColon {
-						fmt.Fprint(w, ":")
-						printedColon = true
-					}
-					fmt.Fprintf(w, "\n    %v", p)
-				}
+	positions := []string{}
+	switch x := err.(type) {
+	case interface{ Position() token.Position }:
+		if pos := x.Position().String(); pos != "-" {
+			positions = append(positions, pos)
+		}
+	case interface{ Positions() []token.Pos }:
+		for _, p := range x.Positions() {
+			if p.IsValid() {
+				positions = append(positions, p.String())
 			}
 		}
+	}
+
+	if len(positions) == 0 {
+		fmt.Fprintln(w, err)
+		return
+	}
+
+	unique.Strings(&positions)
+
+	fmt.Fprintf(w, "%v:", err)
+	for _, pos := range positions {
+		fmt.Fprintf(w, "\n    %v", pos)
 	}
 	fmt.Fprintln(w)
 }

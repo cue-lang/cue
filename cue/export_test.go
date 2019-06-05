@@ -67,9 +67,9 @@ func TestExport(t *testing.T) {
 					s: "abc"
 				}
 				b: 2.0
-				c: _|_ // undefined field "c"
-				d: _|_ // undefined field "d"
-				e: _|_ // undefined field "t"
+				c: _|_ /* undefined field "c" */
+				d: _|_ /* undefined field "d" */
+				e: _|_ /* undefined field "t" */
 			}`),
 	}, {
 		in: `{

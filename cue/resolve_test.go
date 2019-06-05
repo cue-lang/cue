@@ -247,7 +247,7 @@ func TestBasicRewrite(t *testing.T) {
 			e: true
 			e: !true
 			`,
-		out: "<0>{t: true, f: false, e: _|_(true:failed to unify: true != false)}",
+		out: "<0>{t: true, f: false, e: _|_(true:conflicting values: true != false)}",
 	}, {
 		desc: "boolean arithmetic",
 		in: `
@@ -258,7 +258,7 @@ func TestBasicRewrite(t *testing.T) {
 			e: true & true
 			f: true & false
 			`,
-		out: "<0>{a: true, b: true, c: false, d: true, e: true, f: _|_(true:failed to unify: true != false)}",
+		out: "<0>{a: true, b: true, c: false, d: true, e: true, f: _|_(true:conflicting values: true != false)}",
 	}, {
 		desc: "basic type",
 		in: `
@@ -520,9 +520,9 @@ func TestBasicRewrite(t *testing.T) {
 			x: x + 1
 		`,
 		out: `<0>{` +
-			`a: _|_((210 & 200):cannot unify numbers 210 and 200), ` +
-			`b: _|_((210 & 200):cannot unify numbers 210 and 200), ` +
-			`x: _|_((100 & 101):cannot unify numbers 100 and 101)}`,
+			`a: _|_((210 & 200):conflicting values: 210 != 200), ` +
+			`b: _|_((210 & 200):conflicting values: 210 != 200), ` +
+			`x: _|_((100 & 101):conflicting values: 100 != 101)}`,
 		// TODO: find a way to mark error in data.
 	}}
 	rewriteHelper(t, testCases, evalPartial)
@@ -877,7 +877,7 @@ func TestResolve(t *testing.T) {
 			`i2: 3, ` +
 			`t0: [<3>{a: 8}], ` +
 			`t1: [, ...int], ` +
-			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):incompatible list lengths: cannot unify numbers 2 and 1), ` +
+			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):incompatible list lengths: conflicting values: 2 != 1), ` +
 			`e1: _|_(([, ...int] & [, ...float]):incompatible list types: unsupported op &(int, float): )` +
 			`}`,
 	}, {
@@ -1355,7 +1355,7 @@ func TestResolve(t *testing.T) {
 			`a3: <3>{a: _|_((=~"oo" & "bar"):"bar" does not match =~"oo"), b: =~"oo", c: =~"fo"}, ` +
 			`o1: <4>{a: string, b: string, c: "bar"}, ` +
 			`o2: <5>{a: "foo", b: string, c: "bar"}, ` +
-			`o3: <6>{a: _|_((builtin:or ([<7>.b,<7>.c]) & "foo"):empty disjunction: failed to unify: baz != foo), b: "baz", c: "bar"}}`,
+			`o3: <6>{a: _|_((builtin:or ([<7>.b,<7>.c]) & "foo"):empty disjunction: conflicting values: baz != foo), b: "baz", c: "bar"}}`,
 	}, {
 		desc: "self-reference cycles conflicts with strings",
 		in: `
@@ -1365,7 +1365,7 @@ func TestResolve(t *testing.T) {
 			}
 			a x: "hey"
 		`,
-		out: `<0>{a: <1>{x: _|_(("hey!?" & "hey"):failed to unify: hey!? != hey), y: "hey!"}}`,
+		out: `<0>{a: <1>{x: _|_(("hey!?" & "hey"):conflicting values: hey!? != hey), y: "hey!"}}`,
 	}, {
 		desc: "resolved self-reference cycles with disjunctions",
 		in: `
@@ -1463,11 +1463,11 @@ func TestResolve(t *testing.T) {
 			`xd5: 10, ` +
 			`xd3: 6, ` +
 
-			`xe1: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe2: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe4: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe5: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe3: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe1: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe2: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe4: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe5: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe3: _|_((6 & 7):conflicting values: 6 != 7), ` +
 
 			`xf1: 8, ` +
 			`xf2: 8, ` +
@@ -1553,11 +1553,11 @@ func TestResolve(t *testing.T) {
 			`xd5: 10, ` +
 			`xd3: 6, ` +
 
-			`xe1: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe2: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe4: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe5: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
-			`xe3: _|_((6 & 7):cannot unify numbers 6 and 7), ` +
+			`xe1: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe2: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe4: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe5: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe3: _|_((6 & 7):conflicting values: 6 != 7), ` +
 
 			`z1: (*11 | 13), ` + // 13 is eliminated with evalFull
 			`z2: 10, ` +

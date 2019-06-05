@@ -222,7 +222,7 @@ func (x *top) binOp(ctx *context, src source, op op, other evaluated) evaluated 
 		return other
 	}
 	src = mkBin(ctx, src.Pos(), op, x, other)
-	return ctx.mkErr(src, "binary operation on non-ground top value")
+	return ctx.mkErr(src, codeIncomplete, "binary operation on (incomplete) top value")
 }
 
 func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) evaluated {
@@ -681,7 +681,7 @@ func (x *boolLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 		switch op {
 		case opUnify:
 			if x.b != y.b {
-				return ctx.mkErr(x, "failed to unify: %v != %v", x.b, y.b)
+				return ctx.mkErr(x, "conflicting values: %v != %v", x.b, y.b)
 			}
 			return x
 		case opLand:
@@ -711,7 +711,7 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			str := other.strValue()
 			if x.str != str {
 				src := mkBin(ctx, src.Pos(), op, x, other)
-				return ctx.mkErr(src, "failed to unify: %v != %v", x.str, str)
+				return ctx.mkErr(src, "conflicting values: %v != %v", x.str, str)
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
@@ -754,7 +754,7 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 		switch op {
 		case opUnify:
 			if !bytes.Equal(x.b, b) {
-				return ctx.mkErr(x, "failed to unify: %v != %v", x.b, b)
+				return ctx.mkErr(x, "conflicting values: %v != %v", x.b, b)
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
@@ -863,7 +863,7 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		case opUnify:
 			if x.v.Cmp(&y.v) != 0 {
 				src = mkBin(ctx, src.Pos(), op, x, other)
-				return ctx.mkErr(src, "cannot unify numbers %v and %v", x.strValue(), y.strValue())
+				return ctx.mkErr(src, "conflicting values: %v != %v", x.strValue(), y.strValue())
 			}
 			if k != x.k {
 				n.v = x.v
@@ -1126,7 +1126,7 @@ func (x *lambdaExpr) binOp(ctx *context, src source, op op, other evaluated) eva
 		n, m := len(x.params.arcs), len(y.params.arcs)
 		if n != m {
 			src = mkBin(ctx, src.Pos(), op, x, other)
-			return ctx.mkErr(src, "number of params of params should match in unification (%d != %d)", n, m)
+			return ctx.mkErr(src, "number of params should match (%d != %d)", n, m)
 		}
 		arcs := make([]arc, len(x.arcs))
 		lambda := &lambdaExpr{binSrc(src.Pos(), op, x, other), &params{arcs}, nil}

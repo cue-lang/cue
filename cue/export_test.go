@@ -153,6 +153,18 @@ func TestExport(t *testing.T) {
 				a: >=0 & <=10 & !=1
 			}`),
 	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+				a: (*1 | 2) & (1 | *2)
+				b: [(*1 | 2) & (1 | *2)]
+			}`,
+		out: unindent(`
+			{
+				a: 1 | 2
+				b: [1 | 2]
+			}`),
+	}, {
 		raw: true,
 		in:  `{ a: [1, 2], b: { "\(k)": v for k, v in a if v > 1 } }`,
 		out: unindent(`

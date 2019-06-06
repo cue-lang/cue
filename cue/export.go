@@ -165,12 +165,17 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 
 func (p *exporter) expr(v value) ast.Expr {
 	if doEval(p.mode) {
-		x := p.ctx.manifest(v)
+		e := v.evalPartial(p.ctx)
+		x := p.ctx.manifest(e)
 		if isIncomplete(x) {
-			p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
-			return p.expr(v)
+			if isBottom(e) {
+				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
+				return p.expr(v)
+			}
+			v = e
+		} else {
+			v = x
 		}
-		v = x
 	}
 
 	old := p.stack
@@ -369,11 +374,14 @@ func (p *exporter) expr(v value) ast.Expr {
 			}
 			if !doEval(p.mode) {
 				f.Value = p.expr(a.v)
-			} else if v := p.ctx.manifest(x.at(p.ctx, i)); isIncomplete(v) && !p.mode.concrete {
-				p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
-				f.Value = p.expr(a.v)
 			} else {
-				f.Value = p.expr(v)
+				e := x.at(p.ctx, i)
+				if v := p.ctx.manifest(e); isIncomplete(v) && !p.mode.concrete && isBottom(e) {
+					p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
+					f.Value = p.expr(a.v)
+				} else {
+					f.Value = p.expr(e)
+				}
 			}
 			if a.attrs != nil && !p.mode.omitAttrs {
 				for _, at := range a.attrs.attr {

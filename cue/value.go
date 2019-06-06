@@ -1195,6 +1195,8 @@ func (x *disjunction) normalize(ctx *context, src source) mVal {
 	// when the result of this value is unified with another value.
 	noManifest := ctx.noManifest
 	ctx.noManifest = true
+	hasMarked := false
+	var markedErr *bottom
 outer:
 	for i, v := range x.values {
 		// TODO: this is pre-evaluation is quite aggressive. Verify whether
@@ -1203,7 +1205,13 @@ outer:
 		// defaults. The drawback of this approach is that printed intermediate
 		// results will not look great.
 		if err := validate(ctx, v.val); err != nil {
+			if v.marked {
+				markedErr = err
+			}
 			continue
+		}
+		if v.marked {
+			hasMarked = true
 		}
 		for j, w := range x.values {
 			if i == j {
@@ -1223,6 +1231,10 @@ outer:
 			}
 		}
 		x.values[k] = v
+		k++
+	}
+	if !hasMarked && markedErr != nil && (k > 1 || !x.values[0].val.kind().isGround()) {
+		x.values[k] = dValue{&bottom{}, true}
 		k++
 	}
 	ctx.noManifest = noManifest

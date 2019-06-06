@@ -425,7 +425,7 @@ func TestBasicRewrite(t *testing.T) {
 			// All errors are treated the same as per the unification model.
 			i1: [1, 2][3] | "c"
 			`,
-		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | 2 | 3), o5: (1 | *2 | 3), o6: (1 | 2 | 3), o7: (2 | 3), o8: (2 | 3), o9: (2 | 3), o10: (3 | *2), m1: (*2 | 3), m2: (*2 | 3), m3: (*2 | 3), m4: (*2 | 3), m5: (*2 | 3), i1: "c"}`,
+		out: `<0>{o1: (1 | 2 | 3), o2: 1, o3: 2, o4: (1 | 2 | 3 | *_|_), o5: (1 | *2 | 3), o6: (1 | 2 | 3), o7: (2 | 3), o8: (2 | 3), o9: (2 | 3), o10: (3 | *2), m1: (*2 | 3), m2: (*2 | 3), m3: (*2 | 3), m4: (*2 | 3), m5: (*2 | 3), i1: "c"}`,
 	}, {
 		desc: "types",
 		in: `
@@ -547,7 +547,7 @@ func TestChooseFirst(t *testing.T) {
 			b: *"b" | "a"
 			c: a & b
 			`,
-		out: `<0>{a: "a", b: "b", c: _|_(("a" | "b"):more than one element remaining ("a" and "b"))}`,
+		out: `<0>{a: "a", b: "b", c: _|_(("a" | "b" | *_|_):more than one element remaining ("a" and "b"))}`,
 	}, {
 		desc: "associativity of defaults",
 		in: `
@@ -1929,10 +1929,10 @@ func TestFullEval(t *testing.T) {
 			`a1: _|_(((*0 | 1) & (<5>.a3 - <5>.a2)):cycle detected), ` +
 			`a3: 1, ` +
 			`a2: _|_(((*0 | 1) & (<5>.a3 - <5>.a1)):cycle detected), ` +
-			`b1: _|_((0 | 1):more than one element remaining (0 and 1)), ` +
-			`b2: _|_((0 | 1):more than one element remaining (0 and 1)), ` +
-			`c1: _|_((<0>{a: 1, b: 2} | <1>{a: 2, b: 1}):more than one element remaining (<0>{a: 1, b: 2} and <1>{a: 2, b: 1})), ` +
-			`c2: _|_((<2>{a: 2, b: 1} | <3>{a: 1, b: 2}):more than one element remaining (<2>{a: 2, b: 1} and <3>{a: 1, b: 2}))}`,
+			`b1: _|_((0 | 1 | *_|_):more than one element remaining (0 and 1)), ` +
+			`b2: _|_((0 | 1 | *_|_):more than one element remaining (0 and 1)), ` +
+			`c1: _|_((<0>{a: 1, b: 2} | <1>{a: 2, b: 1} | *_|_):more than one element remaining (<0>{a: 1, b: 2} and <1>{a: 2, b: 1})), ` +
+			`c2: _|_((<2>{a: 2, b: 1} | <3>{a: 1, b: 2} | *_|_):more than one element remaining (<2>{a: 2, b: 1} and <3>{a: 1, b: 2}))}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

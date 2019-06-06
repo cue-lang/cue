@@ -99,6 +99,10 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 		exitIfErr(cmd, inst, inst.Err, true)
 	}
 
+	if flagIgnore.Bool(cmd) {
+		return instances
+	}
+
 	// TODO check errors after the fact in case of ignore.
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure

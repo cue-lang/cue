@@ -93,7 +93,9 @@ func runEval(cmd *cobra.Command, args []string) error {
 
 	for _, inst := range instances {
 		// TODO: use ImportPath or some other sanitized path.
-		fmt.Fprintf(w, "// %s\n", inst.Dir)
+		if len(instances) > 1 {
+			fmt.Fprintf(w, "\n// %s\n", inst.Dir)
+		}
 		syn := []cue.Option{
 			cue.Attributes(flagAttributes.Bool(cmd)),
 			cue.Optional(flagAll.Bool(cmd) || flagOptional.Bool(cmd)),
@@ -120,11 +122,9 @@ func runEval(cmd *cobra.Command, args []string) error {
 				continue
 			}
 			format.Node(w, getSyntax(v, syn), opts...)
-			fmt.Fprintln(w)
 		}
 		for _, e := range exprs {
 			format.Node(w, getSyntax(inst.Eval(e), syn), opts...)
-			fmt.Fprintln(w)
 		}
 	}
 	return nil

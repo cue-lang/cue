@@ -15,8 +15,6 @@
 package cmd
 
 import (
-	"os"
-
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -44,10 +42,6 @@ func doVet(cmd *cobra.Command, args []string) error {
 		exprs = append(exprs, expr)
 	}
 
-	w := cmd.OutOrStdout()
-
-	cwd, _ := os.Getwd()
-
 	for _, inst := range instances {
 		// TODO: use ImportPath or some other sanitized path.
 		opt := []cue.Option{
@@ -57,9 +51,6 @@ func doVet(cmd *cobra.Command, args []string) error {
 			cue.Hidden(true),
 		}
 		err := inst.Value().Validate(opt...)
-		if flagVerbose.Bool(cmd) || err != nil {
-			printHeader(w, cwd, inst.Dir)
-		}
 		exitIfErr(cmd, inst, err, false)
 	}
 	return nil

@@ -164,4 +164,9 @@ package expressions
 	e: e.f(1, 2)
 
 	e: (3 + 4)
+
+	// field before list
+	f: 3
+	a: [1, 2, // add comma
+	]
 }

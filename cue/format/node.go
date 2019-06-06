@@ -59,6 +59,24 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 			f.print(declcomma)
 		}
 		f.decl(x)
+		if j := i + 1; j < len(list) {
+			switch x := list[j].(type) {
+			case *ast.Field:
+				switch x := x.Value.(type) {
+				case *ast.StructLit:
+					// TODO: not entirely correct: could have multiple elements,
+					// not have a valid Lbrace, and be marked multiline. This
+					// cannot occur for ASTs resulting from a parse, though.
+					if x.Lbrace.IsValid() || len(x.Elts) != 1 {
+						f.print(f.formfeed())
+						continue
+					}
+				case *ast.ListLit:
+					f.print(f.formfeed())
+					continue
+				}
+			}
+		}
 		f.print(f.current.parentSep)
 	}
 	f.after(nil)

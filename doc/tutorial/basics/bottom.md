@@ -31,8 +31,8 @@ val: list[3]
 <!-- result -->
 `$ cue eval -i bottom.cue`
 ```
-a:    _|_
-l:    _|_
+a: _|_ /* conflicting values: 4 != 5 */
+l: [1, _|_ /* conflicting values: 2 != 3 */]
 list: [0, 1, 2]
-val:  _|_
+val: _|_ /* index 3 out of bounds */
 ```

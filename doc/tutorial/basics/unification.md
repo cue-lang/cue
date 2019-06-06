@@ -30,11 +30,31 @@ s: c & b & a
 <!-- result -->
 `$ cue eval -i unification.cue`
 ```
-a: { x: 1, y: 2 }
-b: { y: 2, z: 3 }
-c: { x: 1, z: 4 }
-
-q: { x: 1, y: 2, z: _|_ }
-r: { x: 1, y: 2, z: _|_ }
-s: { x: 1, y: 2, z: _|_ }
+a: {
+    x: 1
+    y: 2
+}
+b: {
+    y: 2
+    z: 3
+}
+c: {
+    x: 1
+    z: 4
+}
+q: {
+    x: 1
+    y: 2
+    z: _|_ /* conflicting values: 3 != 4 */
+}
+r: {
+    x: 1
+    y: 2
+    z: _|_ /* conflicting values: 3 != 4 */
+}
+s: {
+    x: 1
+    y: 2
+    z: _|_ /* conflicting values: 4 != 3 */
+}
 ```

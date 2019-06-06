@@ -33,7 +33,6 @@ b: a - 100
 ```
 x: 200
 y: 100
-
-a: _|_ // cycle detected
-b: _|_ // cycle detected
+a: _|_ /* cycle detected */
+b: _|_ /* cycle detected */
 ```

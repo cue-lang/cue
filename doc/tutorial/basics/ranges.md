@@ -35,9 +35,9 @@ rs: >="a" & <"mo"
 `$ cue eval -i bounds.cue`
 ```
 a:  3.5
-b:  _|_
-c:  3.0
+b:  _|_ /* unsupported op &(int, float) */
+c:  3
 d:  "ma"
-e:  _|_
+e:  _|_ /* "mu" not within bound <"mo" */
 r1: >=5 & <8
 ```

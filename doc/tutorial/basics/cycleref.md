@@ -22,6 +22,12 @@ selectors: {name: "bar"}
 <!-- result -->
 `$ cue eval cycleref.cue`
 ```
-labels:    {app: "foo", name: "bar"}
-selectors: {app: "foo", name: "bar"}
+labels: {
+    name: "bar"
+    app:  "foo"
+}
+selectors: {
+    name: "bar"
+    app:  "foo"
+}
 ```

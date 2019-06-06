@@ -16,7 +16,7 @@ the same file.
 The order in which files are loaded is undefined, but any order will result
 in the same outcome, given that order does not matter.
 
-<!-- CUE editor tab 1-->
+<!-- CUE editor -->
 _a.cue:_
 ```
 package config
@@ -25,7 +25,7 @@ foo: 100
 bar: int
 ```
 
-<!-- CUE editor tab 2-->
+<!-- CUE editor -->
 _b.cue:_
 ```
 package config

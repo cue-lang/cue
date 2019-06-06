@@ -40,8 +40,7 @@ v: *n[0]&string | "default"
 <!-- result -->
 `$ cue eval coalesce.cue`
 ```
-list: [ "Cat", "Mouse", "Dog" ]
-
+list: ["Cat", "Mouse", "Dog"]
 a: "Cat"
 b: "None"
 n: [null]

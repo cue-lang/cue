@@ -20,7 +20,7 @@ _numbers.cue:_
 a: int
 a: 4 // type int
 
-b: float
+b: number
 b: 4 // type float
 
 c: int
@@ -33,7 +33,7 @@ d: 4  // will evaluate to type int (default)
 `$ cue eval -i numbers.cue`
 ```
 a: 4
-b: 4.0
-c: _|_
+b: 4
+c: _|_ /* unsupported op &(int, float) */
 d: 4
 ```

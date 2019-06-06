@@ -39,8 +39,8 @@ explicitly.
 _types.cue:_
 ```
 point: {
-    x: float
-    y: float
+    x: number
+    y: number
 }
 
 xaxis: point
@@ -56,15 +56,15 @@ origin: xaxis & yaxis
 `$ cue eval types.cue`
 ```
 point: {
-    x: float
-    y: float
+    x: number
+    y: number
 }
 xaxis: {
     x: 0
-    y: float
+    y: number
 }
 yaxis: {
-    x: float
+    x: number
     y: 0
 }
 origin: {

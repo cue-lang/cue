@@ -9,7 +9,7 @@ String interpolations may also be used in field names.
 One cannot refer to generated fields with references.
 
 <!-- CUE editor -->
-_- genfield.cue:_
+_genfield.cue:_
 ```
 sandwich: {
     type:            "Cheese"
@@ -24,8 +24,8 @@ sandwich: {
 ```
 sandwich: {
     type:            "Cheese"
-    hasCheese:       true
     hasButter:       true
-    butterAndCheese: _|_ // unknown reference 'hasCheese'
+    butterAndCheese: _|_ /* reference "hasCheese" not found */
+    hasCheese:       true
 }
 ```

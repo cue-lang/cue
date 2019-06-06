@@ -14,7 +14,7 @@ as `justification` is required yet no concrete value is given.
 <!-- CUE editor -->
 _conditional.cue:_
 ```
-price: float
+price: number
 
 // Require a justification if price is too high
 justification: string if price > 100

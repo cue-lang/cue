@@ -29,18 +29,18 @@ a: [ "Barcelona", "Shanghai", "Munich" ]
 `$ cue eval fieldcomp.cue`
 ```
 barcelona: {
-    pos:     1
     name:    "Barcelona"
+    pos:     1
     nameLen: 9
 }
 shanghai: {
-    pos:     2
     name:    "Shanghai"
+    pos:     2
     nameLen: 8
 }
 munich: {
-    pos:     3
     name:    "Munich"
+    pos:     3
     nameLen: 6
 }
 ```

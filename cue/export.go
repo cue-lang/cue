@@ -23,6 +23,8 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/cockroachdb/apd"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 )
@@ -300,14 +302,18 @@ func (p *exporter) expr(v value) ast.Expr {
 		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.value)}
 
 	case *unification:
-		if len(x.values) == 1 {
-			return p.expr(x.values[0])
+		b := boundSimplifier{p: p}
+		vals := make([]evaluated, 0, 3)
+		for _, v := range x.values {
+			if !b.add(v) {
+				vals = append(vals, v)
+			}
 		}
-		bin := p.expr(x.values[0])
-		for _, v := range x.values[1:] {
-			bin = &ast.BinaryExpr{X: bin, Op: token.AND, Y: p.expr(v)}
+		e := b.expr(p.ctx)
+		for _, v := range vals {
+			e = wrapBin(e, p.expr(v), opUnify)
 		}
-		return bin
+		return e
 
 	case *disjunction:
 		if len(x.values) == 1 {
@@ -683,4 +689,199 @@ func appendEscapedRune(buf []byte, r rune, quote byte, graphicOnly bool) []byte 
 		}
 	}
 	return buf
+}
+
+type boundSimplifier struct {
+	p *exporter
+
+	isInt  bool
+	min    *bound
+	minNum *numLit
+	max    *bound
+	maxNum *numLit
+}
+
+func (s *boundSimplifier) add(v value) (used bool) {
+	switch x := v.(type) {
+	case *basicType:
+		switch x.k & scalarKinds {
+		case intKind:
+			s.isInt = true
+			return true
+		}
+
+	case *bound:
+		if x.k&concreteKind == intKind {
+			s.isInt = true
+		}
+		switch x.op {
+		case opGtr:
+			if n, ok := x.value.(*numLit); ok {
+				if s.min == nil || s.minNum.v.Cmp(&n.v) != 1 {
+					s.min = x
+					s.minNum = n
+				}
+				return true
+			}
+
+		case opGeq:
+			if n, ok := x.value.(*numLit); ok {
+				if s.min == nil || s.minNum.v.Cmp(&n.v) == -1 {
+					s.min = x
+					s.minNum = n
+				}
+				return true
+			}
+
+		case opLss:
+			if n, ok := x.value.(*numLit); ok {
+				if s.max == nil || s.maxNum.v.Cmp(&n.v) != -1 {
+					s.max = x
+					s.maxNum = n
+				}
+				return true
+			}
+
+		case opLeq:
+			if n, ok := x.value.(*numLit); ok {
+				if s.max == nil || s.maxNum.v.Cmp(&n.v) == 1 {
+					s.max = x
+					s.maxNum = n
+				}
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+type builtinRange struct {
+	typ string
+	lo  *apd.Decimal
+	hi  *apd.Decimal
+}
+
+func makeDec(s string) *apd.Decimal {
+	d, _, err := apd.NewFromString(s)
+	if err != nil {
+		panic(err)
+	}
+	return d
+}
+
+func (s *boundSimplifier) expr(ctx *context) (e ast.Expr) {
+	if s.min == nil || s.max == nil {
+		return nil
+	}
+	switch {
+	case s.isInt:
+		t := s.matchRange(intRanges)
+		if t != "" {
+			e = ast.NewIdent(t)
+			break
+		}
+		if sign := s.minNum.v.Sign(); sign == -1 {
+			e = ast.NewIdent("int")
+
+		} else {
+			e = ast.NewIdent("uint")
+			if sign == 0 && s.min.op == opGeq {
+				s.min = nil
+				break
+			}
+		}
+		fallthrough
+	default:
+		t := s.matchRange(floatRanges)
+		if t != "" {
+			e = wrapBin(e, ast.NewIdent(t), opUnify)
+		}
+	}
+
+	if s.min != nil {
+		e = wrapBin(e, s.p.expr(s.min), opUnify)
+	}
+	if s.max != nil {
+		e = wrapBin(e, s.p.expr(s.max), opUnify)
+	}
+	return e
+}
+
+func (s *boundSimplifier) matchRange(ranges []builtinRange) (t string) {
+	for _, r := range ranges {
+		if !s.minNum.v.IsZero() && s.min.op == opGeq && s.minNum.v.Cmp(r.lo) == 0 {
+			switch s.maxNum.v.Cmp(r.hi) {
+			case 0:
+				if s.max.op == opLeq {
+					s.max = nil
+				}
+				s.min = nil
+				return r.typ
+			case -1:
+				if !s.minNum.v.IsZero() {
+					s.min = nil
+					return r.typ
+				}
+			case 1:
+			}
+		} else if s.max.op == opLeq && s.maxNum.v.Cmp(r.hi) == 0 {
+			switch s.minNum.v.Cmp(r.lo) {
+			case -1:
+			case 0:
+				if s.min.op == opGeq {
+					s.min = nil
+				}
+				fallthrough
+			case 1:
+				s.max = nil
+				t = r.typ
+				return r.typ
+			}
+		}
+	}
+	return ""
+}
+
+var intRanges = []builtinRange{
+	{"int8", makeDec("-128"), makeDec("127")},
+	{"int16", makeDec("-32768"), makeDec("32767")},
+	{"int32", makeDec("-2147483648"), makeDec("2147483647")},
+	{"int64", makeDec("-9223372036854775808"), makeDec("9223372036854775807")},
+	{"int128", makeDec("-170141183460469231731687303715884105728"),
+		makeDec("170141183460469231731687303715884105727")},
+
+	{"uint8", makeDec("0"), makeDec("255")},
+	{"uint16", makeDec("0"), makeDec("65535")},
+	{"uint32", makeDec("0"), makeDec("4294967295")},
+	{"uint64", makeDec("0"), makeDec("18446744073709551615")},
+	{"uint128", makeDec("0"), makeDec("340282366920938463463374607431768211455")},
+
+	// {"rune", makeDec("0"), makeDec(strconv.Itoa(0x10FFFF))},
+}
+
+var floatRanges = []builtinRange{
+	// 2**127 * (2**24 - 1) / 2**23
+	{"float32",
+		makeDec("-3.40282346638528859811704183484516925440e+38"),
+		makeDec("+3.40282346638528859811704183484516925440e+38")},
+
+	// 2**1023 * (2**53 - 1) / 2**52
+	{"float64",
+		makeDec("-1.797693134862315708145274237317043567981e+308"),
+		makeDec("+1.797693134862315708145274237317043567981e+308")},
+}
+
+func wrapBin(a, b ast.Expr, op op) ast.Expr {
+	if a == nil {
+		return b
+	}
+	if b == nil {
+		return a
+	}
+	return &ast.BinaryExpr{
+		X:  a,
+		Op: opMap[op],
+		Y:  b,
+	}
 }

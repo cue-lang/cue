@@ -165,6 +165,40 @@ func TestExport(t *testing.T) {
 				b: [1 | 2]
 			}`),
 	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+				u16: int & >=0 & <=65535
+				u32: uint32
+				u64: uint64
+				u128: uint128
+				u8: uint8
+				ua: uint16 & >0
+				us: >=0 & <10_000 & int
+				i16: >=-32768 & int & <=32767
+				i32: int32 & > 0
+				i64:  int64
+				i128: int128
+				f64:  float64
+				fi:  float64 & int
+			}`,
+		out: unindent(`
+			{
+				u16:  uint16
+				u32:  uint32
+				u64:  uint64
+				u128: uint128
+				u8:   uint8
+				ua:   uint16 & >0
+				us:   uint & <10000
+				i16:  int16
+				i32:  int32 & >0
+				i64:  int64
+				i128: int128
+				f64:  float64
+				fi:   int & float64
+			}`),
+	}, {
 		raw: true,
 		in:  `{ a: [1, 2], b: { "\(k)": v for k, v in a if v > 1 } }`,
 		out: unindent(`

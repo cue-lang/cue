@@ -250,30 +250,32 @@ func (p List) Err() error {
 func Print(w io.Writer, err error) {
 	if list, ok := err.(List); ok {
 		for _, e := range list {
-			printErrors(w, e)
+			printError(w, e)
 		}
 	} else if err != nil {
-		printErrors(w, err)
-	}
-}
-
-func printErrors(w io.Writer, err error) {
-	for ; err != nil; err = xerrors.Unwrap(err) {
 		printError(w, err)
 	}
 }
 
 func printError(w io.Writer, err error) {
+	if err == nil {
+		return
+	}
+
 	positions := []string{}
-	switch x := err.(type) {
-	case interface{ Position() token.Position }:
-		if pos := x.Position().String(); pos != "-" {
-			positions = append(positions, pos)
-		}
-	case interface{ Positions() []token.Pos }:
-		for _, p := range x.Positions() {
-			if p.IsValid() {
-				positions = append(positions, p.String())
+
+	for e := err; e != nil; e = xerrors.Unwrap(e) {
+		switch x := e.(type) {
+		case interface{ Position() token.Position }:
+			if pos := x.Position().String(); pos != "-" {
+				positions = append(positions, pos)
+			}
+
+		case interface{ Positions() []token.Pos }:
+			for _, p := range x.Positions() {
+				if p.IsValid() {
+					positions = append(positions, p.String())
+				}
 			}
 		}
 	}
@@ -285,9 +287,8 @@ func printError(w io.Writer, err error) {
 
 	unique.Strings(&positions)
 
-	fmt.Fprintf(w, "%v:", err)
+	fmt.Fprintf(w, "%v:\n", err)
 	for _, pos := range positions {
-		fmt.Fprintf(w, "\n    %v", pos)
+		fmt.Fprintf(w, "    %v\n", pos)
 	}
-	fmt.Fprintln(w)
 }

@@ -16,10 +16,7 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
-	"io"
 	"os"
-	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -31,22 +28,11 @@ import (
 
 var runtime = &cue.Runtime{}
 
-// printHeader is a hacky and unprincipled way to sanatize the package path.
-func printHeader(w io.Writer, cwd, dir string) {
-	if cwd != "" {
-		if dir == cwd {
-			return
-		}
-		dir = strings.Replace(dir, cwd, ".", 1)
-	}
-	fmt.Fprintf(w, "--- %s\n", dir)
-}
-
 func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
-	exitOnErr(cmd, inst.Dir, err, fatal)
+	exitOnErr(cmd, err, fatal)
 }
 
-func exitOnErr(cmd *cobra.Command, file string, err error, fatal bool) {
+func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 	if err == nil {
 		return
 	}
@@ -56,7 +42,6 @@ func exitOnErr(cmd *cobra.Command, file string, err error, fatal bool) {
 	}
 
 	w := &bytes.Buffer{}
-	printHeader(w, cwd, file)
 	errors.Print(w, err)
 
 	// TODO: do something more principled than this.

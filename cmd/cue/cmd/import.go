@@ -308,7 +308,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 	})
 
 	err := group.Wait()
-	exitOnErr(cmd, "", err, true)
+	exitOnErr(cmd, err, true)
 	return nil
 }
 

@@ -993,6 +993,67 @@ func TestDecode(t *testing.T) {
 	}
 }
 
+func TestValidate(t *testing.T) {
+	testCases := []struct {
+		desc string
+		in   string
+		err  bool
+		opts []Option
+	}{{
+		desc: "issue #51",
+		in: `
+		a <Name>: foo
+		a b: {}
+		`,
+		err: true,
+	}, {
+		desc: "concrete",
+		in: `
+		a: 1
+		b: { c: 2, d: 3 }
+		c d e f: 5
+		`,
+		opts: []Option{Concrete(true)},
+	}, {
+		desc: "disjunction",
+		in:   `a: 1 | 2`,
+	}, {
+		desc: "disjunction concrete",
+		in:   `a: 1 | 2`,
+		opts: []Option{Concrete(true)},
+		err:  true,
+	}, {
+		desc: "incomplete concrete",
+		in:   `a: string`,
+	}, {
+		desc: "incomplete",
+		in:   `a: string`,
+		opts: []Option{Concrete(true)},
+		err:  true,
+	}, {
+		desc: "list",
+		in:   `a: [{b: string}, 3]`,
+	}, {
+		desc: "list concrete",
+		in:   `a: [{b: string}, 3]`,
+		opts: []Option{Concrete(true)},
+		err:  true,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			r := Runtime{}
+			inst, err := r.Parse("validate", tc.in)
+			if err != nil {
+				t.Fatal(err)
+			}
+			err = inst.Value().Validate(tc.opts...)
+			if gotErr := err != nil; gotErr != tc.err {
+				t.Errorf("got %v; want %v", err, tc.err)
+			}
+		})
+	}
+}
+
 func TestValueLookup(t *testing.T) {
 	config := `
 		a: {

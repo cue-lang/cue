@@ -80,6 +80,9 @@ type structValue struct {
 
 // Len reports the number of fields in this struct.
 func (o *structValue) Len() int {
+	if o.n == nil {
+		return 0
+	}
 	return len(o.n.arcs)
 }
 
@@ -95,12 +98,13 @@ func (o *structValue) At(i int) (key string, v Value) {
 func (o *structValue) Lookup(key string) Value {
 	f := o.ctx.strLabel(key)
 	i := 0
-	for ; i < len(o.n.arcs); i++ {
+	len := o.Len()
+	for ; i < len; i++ {
 		if o.n.arcs[i].feature == f {
 			break
 		}
 	}
-	if i == len(o.n.arcs) {
+	if i == len {
 		// TODO: better message.
 		return newValueRoot(o.ctx, o.ctx.mkErr(o.n, codeNotExist,
 			"value %q not found", key))

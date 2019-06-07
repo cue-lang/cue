@@ -85,5 +85,5 @@ func simulateFile(t *testing.T, path string) {
 		gold = gold[p+1:]
 	}
 
-	cuetest.Run(t, dir, command, gold)
+	cuetest.Run(t, dir, command, &cuetest.Config{Golden: gold})
 }

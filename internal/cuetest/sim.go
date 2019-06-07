@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"io"
 	"os"
 	"regexp"
 	"strings"
@@ -27,9 +28,19 @@ import (
 	"github.com/kylelemons/godebug/diff"
 )
 
+type Config struct {
+	Stdin  io.Reader
+	Stdout io.Writer
+	Golden string
+}
+
 // Run executes the given command in the given directory and reports any
 // errors comparing it to the gold standard.
-func Run(t *testing.T, dir, command, gold string) {
+func Run(t *testing.T, dir, command string, cfg *Config) {
+	if cfg == nil {
+		cfg = &Config{}
+	}
+
 	old, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)
@@ -42,14 +53,21 @@ func Run(t *testing.T, dir, command, gold string) {
 	logf(t, "Executing command: %s", command)
 
 	command = strings.TrimSpace(command[4:])
-	args := splitArgs(t, command)
+	args := SplitArgs(t, command)
 	logf(t, "Args: %q", args)
 
 	buf := &bytes.Buffer{}
 	cmd, err := cmd.New(args)
 	cmd.SetOutput(buf)
+	if cfg.Stdin != nil {
+		cmd.SetInput(cfg.Stdin)
+	}
 	if err = cmd.Run(context.Background()); err != nil {
 		logf(t, "Execution failed: %v", err)
+	}
+
+	if cfg.Golden == "" {
+		return
 	}
 
 	pattern := fmt.Sprintf("//.*%s.*", regexp.QuoteMeta(dir))
@@ -60,7 +78,7 @@ func Run(t *testing.T, dir, command, gold string) {
 	got := re.ReplaceAllString(buf.String(), "")
 	got = strings.TrimSpace(got)
 
-	want := strings.TrimSpace(gold)
+	want := strings.TrimSpace(cfg.Golden)
 	if got != want {
 		t.Errorf("files differ:\n%s", diff.Diff(want, got))
 	}
@@ -70,7 +88,7 @@ func logf(t *testing.T, format string, args ...interface{}) {
 	t.Logf(format, args...)
 }
 
-func splitArgs(t *testing.T, s string) (args []string) {
+func SplitArgs(t *testing.T, s string) (args []string) {
 	c := NewChunker(t, []byte(s))
 	for {
 		found := c.Find(" '")

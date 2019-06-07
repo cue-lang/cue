@@ -74,7 +74,8 @@ Although not strictly necessary, we mark the root of the configuration tree
 for good measure.
 
 ```
-$ cue mod init
+$ touch cue.mod
+cue mod init
 ```
 -->
 
@@ -167,7 +168,7 @@ $ cue import ./... -p kube -l '"\(strings.ToCamel(kind))" "\(metadata.name)"' -f
 Now the file looks like:
 
 ```
-$  cat mon/prometheus/configmap.cue
+$ cat mon/prometheus/configmap.cue
 package kube
 
 import "encoding/yaml"
@@ -347,6 +348,14 @@ As there are very few objects that do not specify this label, we will modify
 the configurations to include them everywhere.
 We do this by setting a newly defined top-level field in each directory
 to the directory name and modify our master template file to use it.
+
+<!--
+```
+$ cue add */kube.cue -p kube --list <<EOF
+_component: "{{.DisplayPath}}"
+EOF
+```
+-->
 
 ```
 # set the component label to our new top-level field
@@ -831,7 +840,7 @@ back to a simple list.
 We create the tool file to do just that.
 
 ```
-$ cat << EOF > kube_tool.cue
+$ cat <<EOF > kube_tool.cue
 package kube
 
 objects: [ x for v in objectSets for x in v ]
@@ -857,19 +866,27 @@ download a web page, or execute a command.
 We start by defining the `ls` command which dumps all our objects
 
 ```
-$ cat << EOF > ls_tool.cue
+$ cat <<EOF > ls_tool.cue
 package kube
 
-import "strings"
+import (
+	"text/tabwriter"
+	"tool/cli"
+	"tool/file"
+)
 
 command ls: {
-    task print: {
-        kind: "print"
-        Lines = [
-            "\(x.kind)  \t\(x.metadata.labels.component)   \t\(x.metadata.name)"
-            for x in objects ]
-        text: strings.Join(Lines, "\n")
-    }
+	task print: cli.Print & {
+		text: tabwriter.Write([
+			"\(x.kind)  \t\(x.metadata.labels.component)  \t\(x.metadata.name)"
+			for x in objects
+		])
+	}
+
+	task write: file.Create & {
+		filename: "foo.txt"
+		contents: task.print.text
+	}
 }
 EOF
 ```
@@ -934,16 +951,18 @@ The following adds a command to dump the selected objects as a YAML stream.
 TODO: add command line flags to filter object types.
 -->
 ```
-$ cat << EOF > dump_tool.cue
+$ cat <<EOF > dump_tool.cue
 package kube
 
-import "encoding/yaml"
+import (
+	"encoding/yaml"
+	"tool/cli"
+)
 
 command dump: {
-    task print: {
-        kind: "print"
-        text: yaml.MarshalStream(objects)
-    }
+	task print: cli.Print & {
+		text: yaml.MarshalStream(objects)
+	}
 }
 EOF
 ```
@@ -968,19 +987,22 @@ The `create` command sends a list of objects to `kubectl create`.
 $ cat <<EOF > create_tool.cue
 package kube
 
-import "encoding/yaml"
+import (
+	"encoding/yaml"
+	"tool/exec"
+	"tool/cli"
+)
 
 command create: {
-    task kube: {
-        kind:   "exec"
-        cmd:    "kubectl create --dry-run -f -"
-        stdin:  yaml.MarshalStream(objects)
-        stdout: string
-    }
-    task display: {
-        kind: "print"
-        text: task.kube.stdout
-    }
+	task kube: exec.Run & {
+		cmd:    "kubectl create --dry-run -f -"
+		stdin:  yaml.MarshalStream(objects)
+		stdout: string
+	}
+
+	task display: cli.Print & {
+		text: task.kube.stdout
+	}
 }
 EOF
 ```
@@ -1224,7 +1246,7 @@ The fully written out manual configuration can be found in the `manual`
 subdirectory.
 Running our usual count yields
 ```
-find . | grep kube.cue | xargs wc | tail -1
+$ find . | grep kube.cue | xargs wc | tail -1
      542    1190   11520 total
 ```
 This does not count our conversion templates.

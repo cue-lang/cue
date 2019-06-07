@@ -97,7 +97,10 @@ func Main(ctx context.Context, args []string) (err error) {
 	if err != nil {
 		return err
 	}
-	return cmd.Run(ctx)
+	err = cmd.Run(ctx)
+	// TODO: remove this ugly hack. Either fix Cobra or use something else.
+	stdin = nil
+	return err
 }
 
 type Command struct {
@@ -109,6 +112,11 @@ type Command struct {
 
 func (c *Command) SetOutput(w io.Writer) {
 	c.root.SetOutput(w)
+}
+
+func (c *Command) SetInput(r io.Reader) {
+	// TODO: ugly hack. Cobra does not have a way to pass the stdin.
+	stdin = r
 }
 
 func (c *Command) Run(ctx context.Context) (err error) {

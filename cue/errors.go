@@ -15,12 +15,65 @@
 package cue
 
 import (
+	"fmt"
 	"sort"
 
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"golang.org/x/exp/errors"
-	"golang.org/x/exp/errors/fmt"
+	"golang.org/x/xerrors"
 )
+
+// A nodeError is an error associated with processing an AST node.
+type nodeError struct {
+	path []string // optional
+	n    ast.Node
+
+	errors.Message
+}
+
+func nodeErrorf(n ast.Node, format string, args ...interface{}) *nodeError {
+	return &nodeError{
+		n:       n,
+		Message: errors.Message{Format: format, Args: args},
+	}
+}
+
+func (e *nodeError) Position() token.Position {
+	return e.n.Pos().Position()
+}
+
+func (e *nodeError) Path() []string {
+	return e.path
+}
+
+func (v Value) toErr(b *bottom) errors.Error {
+	return &valueError{
+		Message: errors.Message{
+			Format: b.msg,
+			Args:   nil,
+		},
+		v:   v,
+		err: b,
+	}
+}
+
+// A valueError is returned as a result of evaluating a value.
+type valueError struct {
+	errors.Message
+
+	v   Value
+	err *bottom
+}
+
+func (e *valueError) Position() token.Position {
+	return e.err.pos.Pos().Position()
+}
+
+func (e *valueError) Path() (a []string) {
+	a, _ = e.v.path.appendPath(a, e.v.idx)
+	return a
+}
 
 type errCode int
 
@@ -109,7 +162,11 @@ func appendPositions(pos []token.Pos, src source) []token.Pos {
 
 func (x *bottom) Error() string { return fmt.Sprint(x) }
 
-func (x *bottom) FormatError(p errors.Printer) error {
+func (x *bottom) Format(s fmt.State, verb rune) {
+	xerrors.FormatError(x, s, verb)
+}
+
+func (x *bottom) FormatError(p xerrors.Printer) error {
 	p.Print(x.msg)
 	if p.Detail() && x.index != nil {
 		locs := appendLocations(nil, x.pos)

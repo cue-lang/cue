@@ -1245,6 +1245,7 @@ outer:
 		// Take the first error as an example.
 		err := x.values[0].val
 		if !isBottom(err) {
+			// TODO: use format instead of debugStr.
 			err = ctx.mkErr(src, debugStr(ctx, err))
 		}
 		return mVal{ctx.mkErr(src, "empty disjunction: %v", err), false}

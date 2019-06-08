@@ -237,8 +237,7 @@ func (inst *Instance) Lookup(path ...string) Value {
 	for _, k := range path {
 		obj, err := v.structVal(ctx)
 		if err != nil {
-			v := err.(*bottom)
-			return Value{idx, &valueData{arc: arc{cache: v, v: v}}}
+			return Value{idx, &valueData{arc: arc{cache: err, v: err}}}
 		}
 		v = obj.Lookup(k)
 	}

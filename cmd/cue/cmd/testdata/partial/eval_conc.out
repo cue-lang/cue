@@ -1,2 +1,2 @@
-: invalid non-ground value string (must be concrete int|string):
-    ./testdata/partial/partial.cue:7:7
+more than one element remaining (1 and 2):
+    ./testdata/partial/partial.cue:4:6

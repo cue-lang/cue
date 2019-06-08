@@ -421,7 +421,7 @@ func (c *callCtxt) bool(i int) bool {
 
 func (c *callCtxt) error(i int) error {
 	x := newValueRoot(c.ctx, c.args[i])
-	return x.Err()
+	return x.err()
 }
 
 func (c *callCtxt) list(i int) (a Iterator) {

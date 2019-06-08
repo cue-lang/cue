@@ -51,7 +51,6 @@ func (e *nodeError) Path() []string {
 
 func (v Value) toErr(b *bottom) errors.Error {
 	return &valueError{
-		Message: errors.NewMessage(b.msg, nil),
 		v:       v,
 		err:     b,
 	}
@@ -61,14 +60,20 @@ var _ errors.Error = &valueError{}
 
 // A valueError is returned as a result of evaluating a value.
 type valueError struct {
-	errors.Message
-
 	v   Value
 	err *bottom
 }
 
+func (e *valueError) Error() string {
+	return fmt.Sprint(e.err)
+}
+
 func (e *valueError) Position() token.Pos {
-	return e.err.pos.Pos()
+	return e.err.Pos()
+}
+
+func (e *valueError) Positions() []token.Pos {
+	return e.err.Positions()
 }
 
 func (e *valueError) Path() (a []string) {

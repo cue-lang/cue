@@ -299,16 +299,16 @@ func printError(w io.Writer, err error) {
 
 	for e := err; e != nil; e = xerrors.Unwrap(e) {
 		switch x := e.(type) {
-		case interface{ Position() token.Pos }:
-			if pos := x.Position().String(); pos != "-" {
-				positions = append(positions, pos)
-			}
-
 		case interface{ Positions() []token.Pos }:
 			for _, p := range x.Positions() {
 				if p.IsValid() {
 					positions = append(positions, p.String())
 				}
+			}
+
+		case interface{ Position() token.Pos }:
+			if pos := x.Position().String(); pos != "-" {
+				positions = append(positions, pos)
 			}
 		}
 	}

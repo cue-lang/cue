@@ -463,7 +463,7 @@ func TestError(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Value().Err()
+			err := getInstance(t, tc.value).Value().err()
 			checkErr(t, err, tc.err, "init")
 		})
 	}
@@ -638,7 +638,7 @@ func TestFields(t *testing.T) {
 				}
 			}
 			v := obj.Lookup("non-existing")
-			checkErr(t, v.Err(), "not found", "non-existing")
+			checkErr(t, v.err(), "not found", "non-existing")
 		})
 	}
 }

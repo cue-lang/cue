@@ -788,6 +788,14 @@ func (v Value) Source() ast.Node {
 
 // Err returns the error represented by v or nil v is not an error.
 func (v Value) Err() error {
+	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
+		return v.toErr(err)
+	}
+	return nil
+}
+
+// TODO: make bottom not an error and then make this return *bottom.
+func (v Value) err() error {
 	// TODO(incomplete): change to not return an error for incomplete.
 	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 		return err
@@ -928,7 +936,7 @@ func (v Value) List() (Iterator, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, listKind); err != nil {
-		return Iterator{ctx: ctx}, err
+		return Iterator{ctx: ctx}, v.toErr(err)
 	}
 	l := v.eval(ctx).(*list)
 	return Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}, nil
@@ -938,7 +946,7 @@ func (v Value) List() (Iterator, error) {
 func (v Value) Null() error {
 	v, _ = v.Default()
 	if err := v.checkKind(v.ctx(), nullKind); err != nil {
-		return err
+		return v.toErr(err)
 	}
 	return nil
 }
@@ -953,7 +961,7 @@ func (v Value) Bool() (bool, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, boolKind); err != nil {
-		return false, err
+		return false, v.toErr(err)
 	}
 	return v.eval(ctx).(*boolLit).b, nil
 }
@@ -963,7 +971,7 @@ func (v Value) String() (string, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, stringKind); err != nil {
-		return "", err
+		return "", v.toErr(err)
 	}
 	return v.eval(ctx).(*stringLit).str, nil
 }
@@ -979,7 +987,7 @@ func (v Value) Bytes() ([]byte, error) {
 	case *stringLit:
 		return []byte(x.str), nil
 	}
-	return nil, v.checkKind(ctx, bytesKind|stringKind)
+	return nil, v.toErr(v.checkKind(ctx, bytesKind|stringKind))
 }
 
 // Reader returns a new Reader if v is a string or bytes type and an error
@@ -993,7 +1001,7 @@ func (v Value) Reader() (io.Reader, error) {
 	case *stringLit:
 		return strings.NewReader(x.str), nil
 	}
-	return nil, v.checkKind(ctx, stringKind|bytesKind)
+	return nil, v.toErr(v.checkKind(ctx, stringKind|bytesKind))
 }
 
 // TODO: distinguish between optional, hidden, etc. Probably the best approach
@@ -1001,7 +1009,7 @@ func (v Value) Reader() (io.Reader, error) {
 // a structVal.
 
 // structVal returns an structVal or an error if v is not a struct.
-func (v Value) structVal(ctx *context) (structValue, error) {
+func (v Value) structVal(ctx *context) (structValue, *bottom) {
 	return v.structValOpts(ctx, options{
 		omitHidden:   true,
 		omitOptional: true,
@@ -1009,7 +1017,7 @@ func (v Value) structVal(ctx *context) (structValue, error) {
 }
 
 // structVal returns an structVal or an error if v is not a struct.
-func (v Value) structValOpts(ctx *context, o options) (structValue, error) {
+func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 	v, _ = v.Default()
 	if err := v.checkKind(ctx, structKind); err != nil {
 		return structValue{}, err
@@ -1062,7 +1070,7 @@ func (v Value) Fields(opts ...Option) (Iterator, error) {
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, o)
 	if err != nil {
-		return Iterator{ctx: ctx}, err
+		return Iterator{ctx: ctx}, v.toErr(err)
 	}
 	return Iterator{ctx: ctx, val: v, iter: obj.n, len: len(obj.n.arcs)}, nil
 }
@@ -1076,7 +1084,8 @@ func (v Value) Lookup(path ...string) Value {
 	for _, k := range path {
 		obj, err := v.structVal(ctx)
 		if err != nil {
-			return newValueRoot(ctx, err.(*bottom))
+			// TODO: return a Value at the same location and a new error?
+			return newValueRoot(ctx, err)
 		}
 		v = obj.Lookup(k)
 	}
@@ -1318,18 +1327,18 @@ func (v Value) Validate(opts ...Option) error {
 	o := getOptions(opts)
 	list := errors.List{}
 	v.Walk(func(v Value) bool {
-		if err := v.Err(); err != nil {
+		if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 			if !o.concrete && isIncomplete(v.eval(v.ctx())) {
 				return false
 			}
-			list.Add(err)
+			list.Add(v.toErr(err))
 			if len(list) > 50 {
 				return false // mostly to avoid some hypothetical cycle issue
 			}
 		}
 		if o.concrete {
 			if err := isGroundRecursive(v.ctx(), v.eval(v.ctx())); err != nil {
-				list.Add(err)
+				list.Add(v.toErr(err))
 			}
 		}
 		return true
@@ -1343,7 +1352,7 @@ func (v Value) Validate(opts ...Option) error {
 	return nil
 }
 
-func isGroundRecursive(ctx *context, v value) error {
+func isGroundRecursive(ctx *context, v value) *bottom {
 	switch x := v.(type) {
 	case *list:
 		for i := 0; i < len(x.elem.arcs); i++ {
@@ -1354,7 +1363,7 @@ func isGroundRecursive(ctx *context, v value) error {
 		}
 	default:
 		if !x.kind().isGround() {
-			return ctx.mkErr(v, "incomplete value %q", debugStr(ctx, v))
+			return ctx.mkErr(v, "incomplete value (%v)", debugStr(ctx, v))
 		}
 	}
 	return nil

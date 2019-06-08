@@ -70,7 +70,7 @@ func (p *parser) init(filename string, src []byte, mode []Option) {
 	if p.mode&parseCommentsMode != 0 {
 		m = scanner.ScanComments
 	}
-	eh := func(pos token.Position, msg string) { p.errors.AddNew(pos, msg) }
+	eh := func(pos token.Pos, msg string) { p.errors.AddNew(pos, msg) }
 	p.scanner.Init(p.file, src, eh, m)
 
 	p.trace = p.mode&traceMode != 0 // for convenience (p.trace is used frequently)
@@ -343,14 +343,15 @@ func (p *parser) next() {
 }
 
 func (p *parser) error(pos token.Pos, msg string) {
-	ePos := p.file.Position(pos)
+	// ePos := p.file.Position(pos)
+	ePos := pos
 
 	// If AllErrors is not set, discard errors reported on the same line
 	// as the last recorded error and stop parsing if there are more than
 	// 10 errors.
 	if p.mode&allErrorsMode == 0 {
 		n := len(p.errors)
-		if n > 0 && p.errors[n-1].Position().Line == ePos.Line {
+		if n > 0 && p.errors[n-1].Position().Line() == ePos.Line() {
 			return // discard - likely a spurious error
 		}
 		if n > 10 {

@@ -147,7 +147,7 @@ func (s *Scanner) Init(file *token.File, src []byte, err errors.Handler, mode Mo
 
 func (s *Scanner) error(offs int, msg string) {
 	if s.err != nil {
-		s.err(s.file.Position(s.file.Pos(offs, 0)), msg)
+		s.err(s.file.Pos(offs, 0), msg)
 	}
 	s.ErrorCount++
 }

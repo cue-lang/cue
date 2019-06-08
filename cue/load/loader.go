@@ -89,13 +89,6 @@ const (
 	getTestDeps
 )
 
-func firstPos(p []token.Position) token.Position {
-	if len(p) == 0 {
-		return token.Position{}
-	}
-	return p[0]
-}
-
 type loader struct {
 	cfg *Config
 	stk importStack

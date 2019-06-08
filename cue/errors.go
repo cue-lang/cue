@@ -24,6 +24,8 @@ import (
 	"golang.org/x/xerrors"
 )
 
+var _ errors.Error = &nodeError{}
+
 // A nodeError is an error associated with processing an AST node.
 type nodeError struct {
 	path []string // optional
@@ -35,12 +37,12 @@ type nodeError struct {
 func nodeErrorf(n ast.Node, format string, args ...interface{}) *nodeError {
 	return &nodeError{
 		n:       n,
-		Message: errors.Message{Format: format, Args: args},
+		Message: errors.NewMessage(format, args),
 	}
 }
 
-func (e *nodeError) Position() token.Position {
-	return e.n.Pos().Position()
+func (e *nodeError) Position() token.Pos {
+	return e.n.Pos()
 }
 
 func (e *nodeError) Path() []string {
@@ -49,14 +51,13 @@ func (e *nodeError) Path() []string {
 
 func (v Value) toErr(b *bottom) errors.Error {
 	return &valueError{
-		Message: errors.Message{
-			Format: b.msg,
-			Args:   nil,
-		},
-		v:   v,
-		err: b,
+		Message: errors.NewMessage(b.msg, nil),
+		v:       v,
+		err:     b,
 	}
 }
+
+var _ errors.Error = &valueError{}
 
 // A valueError is returned as a result of evaluating a value.
 type valueError struct {
@@ -66,8 +67,8 @@ type valueError struct {
 	err *bottom
 }
 
-func (e *valueError) Position() token.Position {
-	return e.err.pos.Pos().Position()
+func (e *valueError) Position() token.Pos {
+	return e.err.pos.Pos()
 }
 
 func (e *valueError) Path() (a []string) {

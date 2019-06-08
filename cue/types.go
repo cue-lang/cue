@@ -796,12 +796,12 @@ func (v Value) Err() error {
 }
 
 // Pos returns position information.
-func (v Value) Pos() token.Position {
+func (v Value) Pos() token.Pos {
 	if v.path == nil || v.Source() == nil {
-		return token.Position{}
+		return token.NoPos
 	}
 	pos := v.Source().Pos()
-	return pos.Position()
+	return pos
 }
 
 // IsConcrete reports whether the current value is a concrete scalar value,

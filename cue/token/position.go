@@ -84,6 +84,20 @@ func (p Pos) Line() int {
 	return p.Position().Line
 }
 
+func (p Pos) Column() int {
+	if p.file == nil {
+		return 0
+	}
+	return p.Position().Column
+}
+
+func (p Pos) Filename() string {
+	if p.file == nil {
+		return ""
+	}
+	return p.Position().Filename
+}
+
 func (p Pos) Position() Position {
 	if p.file == nil {
 		return Position{}
@@ -150,7 +164,7 @@ func (p Pos) Before(q Pos) bool {
 
 // Offset reports the byte offset relative to the file.
 func (p Pos) Offset() int {
-	return p.offset >> relShift
+	return p.Position().Offset
 }
 
 // Add creates a new position relative to the p offset by n.

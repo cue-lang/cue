@@ -114,7 +114,7 @@ func compareErrors(t *testing.T, file *token.File, expected map[token.Pos]string
 		// a Pos so we can do a map lookup
 		ePos := error.Position()
 		eMsg := error.Error()
-		pos := getPos(file, ePos.Offset).WithRel(0)
+		pos := getPos(file, ePos.Offset()).WithRel(0)
 		if msg, found := expected[pos]; found {
 			// we expect a message at pos; check if it matches
 			rx, err := regexp.Compile(msg)

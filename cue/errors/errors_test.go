@@ -38,7 +38,7 @@ func TestError_Error(t *testing.T) {
 
 func TestErrorList_Add(t *testing.T) {
 	type args struct {
-		pos token.Position
+		pos token.Pos
 		msg string
 	}
 	tests := []struct {

@@ -34,7 +34,7 @@ func New(msg string) error {
 // A Handler is a generic error handler used throughout CUE packages.
 //
 // The position points to the beginning of the offending value.
-type Handler func(pos token.Position, msg string)
+type Handler func(pos token.Pos, msg string)
 
 // A Message implements the error interface as well as Message to allow
 // internationalized messages.
@@ -62,7 +62,7 @@ func (m *Message) Error() string {
 
 // Error is the common error message.
 type Error interface {
-	Position() token.Position
+	Position() token.Pos
 
 	// Error reports the error message without position information.
 	Error() string
@@ -71,11 +71,7 @@ type Error interface {
 // // TODO: make Error an interface that returns a list of positions.
 
 // Newf creates an Error with the associated position and message.
-func Newf(pos token.Pos, format string, args ...interface{}) Error {
-	var p token.Position
-	if pos.IsValid() {
-		p = pos.Position()
-	}
+func Newf(p token.Pos, format string, args ...interface{}) Error {
 	return &posError{
 		pos:     p,
 		Message: NewMessage(format, args),
@@ -84,11 +80,7 @@ func Newf(pos token.Pos, format string, args ...interface{}) Error {
 
 // Wrapf creates an Error with the associated position and message. The provided
 // error is added for inspection context.
-func Wrapf(err error, pos token.Pos, format string, args ...interface{}) Error {
-	var p token.Position
-	if pos.IsValid() {
-		p = pos.Position()
-	}
+func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
 	return &posError{
 		pos:     p,
 		Message: NewMessage(format, args),
@@ -96,12 +88,14 @@ func Wrapf(err error, pos token.Pos, format string, args ...interface{}) Error {
 	}
 }
 
+var _ Error = &posError{}
+
 // In an List, an error is represented by an *posError.
 // The position Pos, if valid, points to the beginning of
 // the offending token, and the error condition is described
 // by Msg.
 type posError struct {
-	pos token.Position
+	pos token.Pos
 	Message
 
 	// The underlying error that triggered this one, if any.
@@ -121,9 +115,9 @@ func update(e *posError, args []interface{}) {
 		switch x := a.(type) {
 		case string:
 			e.Message = NewMessage("%s", []interface{}{x})
-		case token.Position:
+		case token.Pos:
 			e.pos = x
-		case []token.Position:
+		case []token.Pos:
 			// TODO: do something more clever
 			if len(x) > 0 {
 				e.pos = x[0]
@@ -157,7 +151,7 @@ func toErr(err error) Error {
 	return &posError{err: err}
 }
 
-func (e *posError) Position() token.Position {
+func (e *posError) Position() token.Pos {
 	return e.pos
 }
 
@@ -171,7 +165,7 @@ func (e *posError) FormatError(p errors.Printer) error {
 	} else {
 		p.Printf(format, args...)
 	}
-	if p.Detail() && e.pos.Filename != "" || e.pos.IsValid() {
+	if p.Detail() && e.pos.Filename() != "" || e.pos.IsValid() {
 		p.Printf("%s", e.pos.String())
 	}
 	return next
@@ -204,7 +198,7 @@ func (p *List) add(err Error) {
 }
 
 // AddNew adds an Error with given position and error message to an List.
-func (p *List) AddNew(pos token.Position, msg string) {
+func (p *List) AddNew(pos token.Pos, msg string) {
 	p.add(&posError{pos: pos, Message: Message{format: msg}})
 }
 
@@ -226,14 +220,14 @@ func (p List) Less(i, j int) bool {
 	// Note that it is not sufficient to simply compare file offsets because
 	// the offsets do not reflect modified line information (through //line
 	// comments).
-	if e.Filename != f.Filename {
-		return e.Filename < f.Filename
+	if e.Filename() != f.Filename() {
+		return e.Filename() < f.Filename()
 	}
-	if e.Line != f.Line {
-		return e.Line < f.Line
+	if e.Line() != f.Line() {
+		return e.Line() < f.Line()
 	}
-	if e.Column != f.Column {
-		return e.Column < f.Column
+	if e.Column() != f.Column() {
+		return e.Column() < f.Column()
 	}
 	return p[i].Error() < p[j].Error()
 }
@@ -249,11 +243,11 @@ func (p List) Sort() {
 // RemoveMultiples sorts an List and removes all but the first error per line.
 func (p *List) RemoveMultiples() {
 	sort.Sort(p)
-	var last token.Position // initial last.Line is != any legal error line
+	var last token.Pos // initial last.Line is != any legal error line
 	i := 0
 	for _, e := range *p {
 		pos := e.Position()
-		if pos.Filename != last.Filename || pos.Line != last.Line {
+		if pos.Filename() != last.Filename() || pos.Line() != last.Line() {
 			last = pos
 			(*p)[i] = e
 			i++
@@ -305,7 +299,7 @@ func printError(w io.Writer, err error) {
 
 	for e := err; e != nil; e = xerrors.Unwrap(e) {
 		switch x := e.(type) {
-		case interface{ Position() token.Position }:
+		case interface{ Position() token.Pos }:
 			if pos := x.Position().String(); pos != "-" {
 				positions = append(positions, pos)
 			}

@@ -140,7 +140,7 @@ func (inst *Instance) ReportError(err error) {
 }
 
 func (inst *Instance) errorf(pos token.Pos, format string, args ...interface{}) error {
-	return inst.chkErr(errors.E(pos.Position(), fmt.Sprintf(format, args...)))
+	return inst.chkErr(errors.E(pos, fmt.Sprintf(format, args...)))
 }
 
 // Context defines the build context for this instance. All files defined

@@ -208,7 +208,7 @@ func TestScan(t *testing.T) {
 	whitespace_linecount := newlineCount(whitespace)
 
 	// error handler
-	eh := func(_ token.Position, msg string) {
+	eh := func(_ token.Pos, msg string) {
 		t.Errorf("error handler called (msg = %s)", msg)
 	}
 
@@ -591,7 +591,7 @@ func TestInit(t *testing.T) {
 
 func TestScanInterpolation(t *testing.T) {
 	// error handler
-	eh := func(pos token.Position, msg string) {
+	eh := func(pos token.Pos, msg string) {
 		t.Errorf("error handler called (pos = %v, msg = %s)", pos, msg)
 	}
 	trim := func(s string) string { return strings.Trim(s, `#"\\()`) }
@@ -646,7 +646,7 @@ func TestStdErrorHander(t *testing.T) {
 		"~ ~ ~" // original file, line 1 again
 
 	var list errors.List
-	eh := func(pos token.Position, msg string) { list.AddNew(pos, msg) }
+	eh := func(pos token.Pos, msg string) { list.AddNew(pos, msg) }
 
 	var s Scanner
 	s.Init(token.NewFile("File1", 1, len(src)), []byte(src), eh, dontInsertCommas)
@@ -679,16 +679,16 @@ func TestStdErrorHander(t *testing.T) {
 }
 
 type errorCollector struct {
-	cnt int            // number of errors encountered
-	msg string         // last error message encountered
-	pos token.Position // last error position encountered
+	cnt int       // number of errors encountered
+	msg string    // last error message encountered
+	pos token.Pos // last error position encountered
 }
 
 func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err string) {
 	t.Helper()
 	var s Scanner
 	var h errorCollector
-	eh := func(pos token.Position, msg string) {
+	eh := func(pos token.Pos, msg string) {
 		h.cnt++
 		h.msg = msg
 		h.pos = pos
@@ -711,8 +711,8 @@ func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err str
 	if h.msg != err {
 		t.Errorf("%q: got msg %q, expected %q", src, h.msg, err)
 	}
-	if h.pos.Offset != pos {
-		t.Errorf("%q: got offset %d, expected %d", src, h.pos.Offset, pos)
+	if h.pos.Offset() != pos {
+		t.Errorf("%q: got offset %d, expected %d", src, h.pos.Offset(), pos)
 	}
 }
 

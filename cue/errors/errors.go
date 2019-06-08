@@ -115,16 +115,6 @@ func E(args ...interface{}) error {
 	return e
 }
 
-// Augment adorns an existing error with new information.
-func Augment(err error, args ...interface{}) error {
-	e, ok := err.(*posError)
-	if !ok {
-		e = &posError{err: err}
-	}
-	update(e, args)
-	return e
-}
-
 func update(e *posError, args []interface{}) {
 	err := e.err
 	for _, a := range args {

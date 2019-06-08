@@ -202,7 +202,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			switch x := e.(type) {
 			case *ast.EmitDecl:
 				// Only allowed at top-level.
-				v1.error(x, "emitting values is only allowed at top level")
+				return v1.error(x, "emitting values is only allowed at top level")
 			case *ast.Field, *ast.Alias:
 				v1.walk(e)
 			case *ast.ComprehensionDecl:

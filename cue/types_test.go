@@ -21,6 +21,7 @@ import (
 	"math"
 	"math/big"
 	"reflect"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -1049,6 +1050,65 @@ func TestValidate(t *testing.T) {
 			err = inst.Value().Validate(tc.opts...)
 			if gotErr := err != nil; gotErr != tc.err {
 				t.Errorf("got %v; want %v", err, tc.err)
+			}
+		})
+	}
+}
+
+func TestPath(t *testing.T) {
+	config := `
+	a b c: 5
+	b: {
+		b1: 3
+		b2: 4
+		"b 3": 5
+		"4b": 6
+		l: [
+			{a: 2},
+			{c: 2},
+		]
+	}
+	`
+	mkpath := func(p ...string) []string { return p }
+	testCases := [][]string{
+		mkpath("a", "b", "c"),
+		mkpath("b", "l", "1", "c"),
+		mkpath("b", `"b 3"`),
+		mkpath("b", `"4b"`),
+	}
+	for _, tc := range testCases {
+		r := Runtime{}
+		inst, err := r.Parse("config", config)
+		if err != nil {
+			t.Fatal(err)
+		}
+		t.Run(strings.Join(tc, "."), func(t *testing.T) {
+			v := inst.Lookup(tc[0])
+			for _, e := range tc[1:] {
+				if '0' <= e[0] && e[0] <= '9' {
+					i, err := strconv.Atoi(e)
+					if err != nil {
+						t.Fatal(err)
+					}
+					iter, err := v.List()
+					if err != nil {
+						t.Fatal(err)
+					}
+					for c := 0; iter.Next(); c++ {
+						if c == i {
+							v = iter.Value()
+							break
+						}
+					}
+				} else if e[0] == '"' {
+					v = v.Lookup(e[1 : len(e)-1])
+				} else {
+					v = v.Lookup(e)
+				}
+			}
+			got, _ := v.path.appendPath(nil, v.idx)
+			if !reflect.DeepEqual(got, tc) {
+				t.Errorf("got %v; want %v", got, tc)
 			}
 		})
 	}

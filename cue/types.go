@@ -23,6 +23,7 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -472,6 +473,47 @@ type valueData struct {
 	parent *valueData
 	index  uint32
 	arc
+}
+
+// path returns the path of the value.
+func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
+	var k kind
+	if v.parent != nil {
+		a, k = v.parent.appendPath(a, idx)
+	}
+	switch k {
+	case listKind:
+		a = append(a, strconv.FormatInt(int64(v.index), 10))
+	case structKind:
+		f := idx.labelStr(v.arc.feature)
+		if !isIdent(f) && !isNumber(f) {
+			f = quote(f, '"')
+		}
+		a = append(a, f)
+	}
+	return a, v.arc.cache.kind()
+}
+
+var validIdent = []*unicode.RangeTable{unicode.L, unicode.N}
+
+func isIdent(s string) bool {
+	valid := []*unicode.RangeTable{unicode.Letter}
+	for _, r := range s {
+		if !unicode.In(r, valid...) && r != '_' {
+			return false
+		}
+		valid = validIdent
+	}
+	return true
+}
+
+func isNumber(s string) bool {
+	for _, r := range s {
+		if r < '0' || '9' < r {
+			return false
+		}
+	}
+	return true
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,

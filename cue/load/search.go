@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/token"
 )
 
 // A match represents the result of matching a single package pattern.
@@ -189,7 +190,7 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 		// due to invalid CUE source files. This means that directories
 		// containing parse errors will be built (and fail) instead of being
 		// silently skipped as not matching the pattern.
-		p := l.importPkg("."+path[len(root):], root)
+		p := l.importPkg(token.NoPos, "."+path[len(root):], root)
 		if err := p.Err; err != nil && (p == nil || len(p.InvalidCUEFiles) == 0) {
 			switch err.(type) {
 			case nil:
@@ -329,7 +330,7 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 			continue
 		}
 
-		pkg := l.importPkg(a, l.cfg.Dir)
+		pkg := l.importPkg(token.NoPos, a, l.cfg.Dir)
 		out = append(out, &match{Pattern: a, Literal: true, Pkgs: []*build.Instance{pkg}})
 	}
 	return out

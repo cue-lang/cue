@@ -33,7 +33,7 @@ type Runtime struct {
 	ctxt    *build.Context
 }
 
-func dummyLoad(string) *build.Instance { return nil }
+func dummyLoad(token.Pos, string) *build.Instance { return nil }
 
 func (r *Runtime) index() *index {
 	if r.idx == nil {

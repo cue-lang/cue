@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-type LoadFunc func(path string) *Instance
+type LoadFunc func(pos token.Pos, path string) *Instance
 
 func (inst *Instance) complete() error {
 	// TODO: handle case-insensitive collisions.
@@ -80,14 +80,15 @@ func (inst *Instance) complete() error {
 
 			imp := c.imports[path]
 			if imp == nil {
-				imp = inst.loadFunc(path)
+				pos := token.NoPos
+				if len(imported[path]) > 0 {
+					pos = imported[path][0]
+				}
+				imp = inst.loadFunc(pos, path)
 				if imp == nil {
 					continue
 				}
 				if imp.Err != nil {
-					if len(imported[path]) > 0 {
-						imp.Err = errors.Augment(imp.Err, imported[path][0])
-					}
 					return imp.Err
 				}
 				imp.ImportPath = path

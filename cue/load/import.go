@@ -16,7 +16,6 @@ package load
 
 import (
 	"bytes"
-	"fmt"
 	"log"
 	"os"
 	pathpkg "path"
@@ -30,6 +29,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	build "cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/encoding"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 )
@@ -67,7 +67,7 @@ const (
 // If an error occurs, importPkg sets the error in the returned instance,
 // which then may contain partial information.
 //
-func (l *loader) importPkg(path, srcDir string) *build.Instance {
+func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 	l.stk.Push(path)
 	defer l.stk.Pop()
 
@@ -117,7 +117,7 @@ func (l *loader) importPkg(path, srcDir string) *build.Instance {
 			if f.IsDir() {
 				continue
 			}
-			if fp.add(dir, f.Name(), importComment) {
+			if fp.add(pos, dir, f.Name(), importComment) {
 				root = dir
 			}
 			if f.Name() == "cue.mod" {
@@ -160,14 +160,14 @@ func (l *loader) importPkg(path, srcDir string) *build.Instance {
 // loadFunc creates a LoadFunc that can be used to create new build.Instances.
 func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 
-	return func(path string) *build.Instance {
+	return func(pos token.Pos, path string) *build.Instance {
 		cfg := l.cfg
 
 		if !isLocalImport(path) {
 			// is it a builtin?
 			if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
 				if l.cfg.StdRoot != "" {
-					return l.importPkg(path, l.cfg.StdRoot)
+					return l.importPkg(pos, path, l.cfg.StdRoot)
 				}
 				return nil
 			}
@@ -177,7 +177,7 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 					"import %q not found in the pkg directory", path))
 				return i
 			}
-			return l.importPkg(path, filepath.Join(cfg.modRoot, "pkg"))
+			return l.importPkg(pos, path, filepath.Join(cfg.modRoot, "pkg"))
 		}
 
 		if strings.Contains(path, "@") {
@@ -187,7 +187,7 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 			return i
 		}
 
-		return l.importPkg(path, parentPath)
+		return l.importPkg(pos, path, parentPath)
 	}
 }
 
@@ -195,16 +195,16 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 	ctxt := &c.fileSystem
 	// path := p.ImportPath
 	if path == "" {
-		return fmt.Errorf("import %q: invalid import path", path)
+		return errors.Newf(token.NoPos, "import %q: invalid import path", path)
 	}
 
 	if ctxt.isAbsPath(path) || strings.HasPrefix(path, "/") {
-		return fmt.Errorf("load: absolute import path %q not allowed", path)
+		return errors.Newf(token.NoPos, "absolute import path %q not allowed", path)
 	}
 
 	if isLocalImport(path) {
 		if srcDir == "" {
-			return fmt.Errorf("import %q: import relative to unknown directory", path)
+			return errors.Newf(token.NoPos, "import %q: import relative to unknown directory", path)
 		}
 		if !ctxt.isAbsPath(path) {
 			p.Dir = ctxt.joinPath(srcDir, path)
@@ -219,7 +219,7 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 	}
 
 	// package was not found
-	return fmt.Errorf("cannot find package %q", path)
+	return errors.Newf(token.NoPos, "cannot find package %q", path)
 }
 
 func normPrefix(root, path string, isLocal bool) string {
@@ -308,7 +308,7 @@ func (fp *fileProcessor) finalize() error {
 	return nil
 }
 
-func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
+func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) (added bool) {
 	fullPath := path
 	if !filepath.IsAbs(path) {
 		fullPath = filepath.Join(root, path)
@@ -361,7 +361,7 @@ func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
 				return false
 			}
 			// TODO: package does not conform with requested.
-			return badFile(fmt.Errorf("%s: found package %q; want %q", filename, pkg, fp.c.Package))
+			return badFile(errors.Newf(pos, "%s: found package %q; want %q", filename, pkg, fp.c.Package))
 		}
 	} else if fp.firstFile == "" {
 		p.PkgName = pkg
@@ -386,12 +386,12 @@ func (fp *fileProcessor) add(root, path string, mode importMode) (added bool) {
 		if line != 0 {
 			com, err := strconv.Unquote(qcom)
 			if err != nil {
-				badFile(fmt.Errorf("%s:%d: cannot parse import comment", filename, line))
+				badFile(errors.Newf(pos, "%s:%d: cannot parse import comment", filename, line))
 			} else if p.ImportComment == "" {
 				p.ImportComment = com
 				fp.firstCommentFile = name
 			} else if p.ImportComment != com {
-				badFile(fmt.Errorf("found import comments %q (%s) and %q (%s) in %s", p.ImportComment, fp.firstCommentFile, com, name, p.Dir))
+				badFile(errors.Newf(pos, "found import comments %q (%s) and %q (%s) in %s", p.ImportComment, fp.firstCommentFile, com, name, p.Dir))
 			}
 		}
 	}

@@ -166,7 +166,7 @@ type builder struct {
 	imports map[string]*bimport
 }
 
-func (b *builder) load(path string) *build.Instance {
+func (b *builder) load(pos token.Pos, path string) *build.Instance {
 	p := b.ctxt.NewInstance(path, b.load)
 	bi := b.imports[path]
 	if bi == nil {

@@ -20,8 +20,6 @@ package load
 //    - go/build
 
 import (
-	"errors"
-	"fmt"
 	"os"
 	pathpkg "path"
 	"path/filepath"
@@ -29,6 +27,7 @@ import (
 	"unicode"
 
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -112,6 +111,7 @@ func (l *loader) abs(filename string) string {
 // cueFilesPackage creates a package for building a collection of CUE files
 // (typically named on the command line).
 func (l *loader) cueFilesPackage(files []string) *build.Instance {
+	pos := token.NoPos
 	cfg := l.cfg
 	// ModInit() // TODO: support modules
 	for _, f := range files {
@@ -135,9 +135,9 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		}
 		if fi.IsDir() {
 			return cfg.newErrInstance(nil, path,
-				fmt.Errorf("%s is a directory, should be a CUE file", file))
+				errors.Newf(pos, "%s is a directory, should be a CUE file", file))
 		}
-		fp.add(cfg.Dir, file, allowAnonymous)
+		fp.add(pos, cfg.Dir, file, allowAnonymous)
 	}
 
 	// TODO: ModImportFromFiles(files)

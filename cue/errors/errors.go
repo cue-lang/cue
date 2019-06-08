@@ -19,9 +19,8 @@ import (
 	"io"
 	"sort"
 
-	"github.com/mpvl/unique"
-
 	"cuelang.org/go/cue/token"
+	"github.com/mpvl/unique"
 	"golang.org/x/exp/errors"
 	"golang.org/x/exp/errors/fmt"
 	"golang.org/x/xerrors"
@@ -37,6 +36,30 @@ func New(msg string) error {
 // The position points to the beginning of the offending value.
 type Handler func(pos token.Position, msg string)
 
+// A Message implements the error interface as well as Message to allow
+// internationalized messages.
+type Message struct {
+	format string
+	args   []interface{}
+}
+
+// NewMessage creates an error message for human consumption. The arguments
+// are for later consumption, allowing the message to be localized at a later
+// time.
+func NewMessage(format string, args []interface{}) Message {
+	return Message{format: format, args: args}
+}
+
+// Msg returns a printf-style format string and its arguments for human
+// consumption.
+func (m *Message) Msg() (format string, args []interface{}) {
+	return m.format, m.args
+}
+
+func (m *Message) Error() string {
+	return fmt.Sprintf(m.format, m.args...)
+}
+
 // Error is the common error message.
 type Error interface {
 	Position() token.Position
@@ -47,13 +70,39 @@ type Error interface {
 
 // // TODO: make Error an interface that returns a list of positions.
 
+// Newf creates an Error with the associated position and message.
+func Newf(pos token.Pos, format string, args ...interface{}) Error {
+	var p token.Position
+	if pos.IsValid() {
+		p = pos.Position()
+	}
+	return &posError{
+		pos:     p,
+		Message: NewMessage(format, args),
+	}
+}
+
+// Wrapf creates an Error with the associated position and message. The provided
+// error is added for inspection context.
+func Wrapf(err error, pos token.Pos, format string, args ...interface{}) Error {
+	var p token.Position
+	if pos.IsValid() {
+		p = pos.Position()
+	}
+	return &posError{
+		pos:     p,
+		Message: NewMessage(format, args),
+		err:     err,
+	}
+}
+
 // In an List, an error is represented by an *posError.
 // The position Pos, if valid, points to the beginning of
 // the offending token, and the error condition is described
 // by Msg.
 type posError struct {
 	pos token.Position
-	msg string
+	Message
 
 	// The underlying error that triggered this one, if any.
 	err error
@@ -81,7 +130,7 @@ func update(e *posError, args []interface{}) {
 	for _, a := range args {
 		switch x := a.(type) {
 		case string:
-			e.msg = x
+			e.Message = NewMessage("%s", []interface{}{x})
 		case token.Position:
 			e.pos = x
 		case []token.Position:
@@ -127,10 +176,10 @@ func (e *posError) Error() string { return fmt.Sprint(e) }
 
 func (e *posError) FormatError(p errors.Printer) error {
 	next := e.err
-	if e.msg == "" {
+	if format, args := e.Msg(); format == "" {
 		next = errFormat(p, e.err)
 	} else {
-		p.Print(e.msg)
+		p.Printf(format, args...)
 	}
 	if p.Detail() && e.pos.Filename != "" || e.pos.IsValid() {
 		p.Printf("%s", e.pos.String())
@@ -166,7 +215,7 @@ func (p *List) add(err Error) {
 
 // AddNew adds an Error with given position and error message to an List.
 func (p *List) AddNew(pos token.Position, msg string) {
-	p.add(&posError{pos: pos, msg: msg})
+	p.add(&posError{pos: pos, Message: Message{format: msg}})
 }
 
 // Add adds an Error with given position and error message to an List.

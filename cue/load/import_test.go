@@ -21,6 +21,7 @@ import (
 	"testing"
 
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/token"
 )
 
 const testdata = "./testdata/"
@@ -28,17 +29,17 @@ const testdata = "./testdata/"
 func getInst(pkg, cwd string) (*build.Instance, error) {
 	c, _ := (&Config{}).complete()
 	l := loader{cfg: c}
-	p := l.importPkg(pkg, cwd)
+	p := l.importPkg(token.NoPos, pkg, cwd)
 	return p, p.Err
 }
 
 func TestDotSlashImport(t *testing.T) {
 	c, _ := (&Config{}).complete()
 	l := loader{cfg: c}
-	p := l.importPkg(".", testdata+"other")
-	err := p.Err
-	if err != nil {
-		t.Fatal(err)
+	p := l.importPkg(token.NoPos, ".", testdata+"other")
+	errl := p.Err
+	if errl != nil {
+		t.Fatal(errl)
 	}
 	if len(p.ImportPaths) != 1 || p.ImportPaths[0] != "./file" {
 		t.Fatalf("testdata/other: Imports=%v, want [./file]", p.ImportPaths)

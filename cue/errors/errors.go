@@ -18,6 +18,7 @@ package errors // import "cuelang.org/go/cue/errors"
 import (
 	"io"
 	"sort"
+	"strings"
 
 	"cuelang.org/go/cue/token"
 	"github.com/mpvl/unique"
@@ -66,6 +67,19 @@ type Error interface {
 
 	// Error reports the error message without position information.
 	Error() string
+
+	// Path returns the path into the data tree where the error occurred.
+	// This path may be nil if the error is not associated with such a location.
+	Path() []string
+}
+
+// Path returns the path of an Error if err is of that type.
+func Path(err error) []string {
+	e, ok := err.(Error)
+	if !ok {
+		return nil
+	}
+	return e.Path()
 }
 
 // // TODO: make Error an interface that returns a list of positions.
@@ -100,6 +114,10 @@ type posError struct {
 
 	// The underlying error that triggered this one, if any.
 	err error
+}
+
+func (p *posError) Path() []string {
+	return Path(p.err)
 }
 
 // E creates a new error.
@@ -229,7 +247,34 @@ func (p List) Less(i, j int) bool {
 	if e.Column() != f.Column() {
 		return e.Column() < f.Column()
 	}
+	if !equalPath(p[i].Path(), p[j].Path()) {
+		return lessPath(p[i].Path(), p[j].Path())
+	}
 	return p[i].Error() < p[j].Error()
+}
+
+func lessPath(a, b []string) bool {
+	for i, x := range a {
+		if i >= len(b) {
+			return false
+		}
+		if x != b[i] {
+			return x < b[i]
+		}
+	}
+	return len(a) < len(b)
+}
+
+func equalPath(a, b []string) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i, x := range a {
+		if x != b[i] {
+			return false
+		}
+	}
+	return true
 }
 
 // Sort sorts an List. *posError entries are sorted by position,
@@ -243,12 +288,15 @@ func (p List) Sort() {
 // RemoveMultiples sorts an List and removes all but the first error per line.
 func (p *List) RemoveMultiples() {
 	sort.Sort(p)
-	var last token.Pos // initial last.Line is != any legal error line
+	var last Error
 	i := 0
 	for _, e := range *p {
 		pos := e.Position()
-		if pos.Filename() != last.Filename() || pos.Line() != last.Line() {
-			last = pos
+		if last == nil ||
+			pos.Filename() != last.Position().Filename() ||
+			pos.Line() != last.Position().Line() ||
+			!equalPath(e.Path(), last.Path()) {
+			last = e
 			(*p)[i] = e
 			i++
 		}
@@ -311,6 +359,10 @@ func printError(w io.Writer, err error) {
 				positions = append(positions, pos)
 			}
 		}
+	}
+
+	if p := Path(err); p != nil {
+		fmt.Fprintf(w, "%v:", strings.Join(p, "."))
 	}
 
 	if len(positions) == 0 {

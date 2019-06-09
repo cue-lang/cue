@@ -1345,9 +1345,8 @@ func (v Value) Validate(opts ...Option) error {
 	}, nil)
 	if len(list) > 0 {
 		list.Sort()
-		// list.RemoveMultiples() // TODO: use RemoveMultiples when it is fixed
-		// return list
-		return list[0]
+		list.RemoveMultiples() // TODO: use RemoveMultiples when it is fixed
+		return list
 	}
 	return nil
 }

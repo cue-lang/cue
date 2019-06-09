@@ -1,2 +1,6 @@
-more than one element remaining (1 and 2):
+sum:more than one element remaining (1 and 2):
     ./testdata/partial/partial.cue:4:6
+b.idx:: invalid non-ground value string (must be concrete int|string):
+    ./testdata/partial/partial.cue:7:7
+b.str:incomplete value (string):
+    ./testdata/partial/partial.cue:8:7

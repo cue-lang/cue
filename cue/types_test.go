@@ -463,7 +463,7 @@ func TestError(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Value().err()
+			err := getInstance(t, tc.value).Value().Err()
 			checkErr(t, err, tc.err, "init")
 		})
 	}
@@ -638,7 +638,7 @@ func TestFields(t *testing.T) {
 				}
 			}
 			v := obj.Lookup("non-existing")
-			checkErr(t, v.err(), "not found", "non-existing")
+			checkErr(t, v.Err(), "not found", "non-existing")
 		})
 	}
 }
@@ -1610,7 +1610,6 @@ func TestMashalJSON(t *testing.T) {
 		json:  `false`,
 	}, {
 		value: `bool`,
-		json:  `bool`,
 		err:   "cannot convert incomplete value",
 	}, {
 		value: `"str"`,
@@ -1635,7 +1634,7 @@ func TestMashalJSON(t *testing.T) {
 		json:  `[1,2,3]`,
 	}, {
 		value: `[int]`,
-		err:   `cannot convert incomplete value`,
+		err:   `0: cannot convert incomplete value`,
 	}, {
 		value: `(>=3 * [1, 2])`,
 		err:   "incomplete error", // TODO: improve error
@@ -1645,6 +1644,12 @@ func TestMashalJSON(t *testing.T) {
 	}, {
 		value: `{a: 2, b: 3, c: ["A", "B"]}`,
 		json:  `{"a":2,"b":3,"c":["A","B"]}`,
+	}, {
+		value: `{a: 2, b: 3, c: [string, "B"]}`,
+		err:   `c.0: cannot convert incomplete value`,
+	}, {
+		value: `{a: [{b: [0, {c: string}] }] }`,
+		err:   `path a.0.b.1.c: cannot convert incomplete value`,
 	}, {
 		value: `{foo?: 1, bar?: 2, baz: 3}`,
 		json:  `{"baz":3}`,

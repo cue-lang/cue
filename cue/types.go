@@ -117,20 +117,20 @@ func (o *structValue) Lookup(key string) Value {
 
 // MarshalJSON returns a valid JSON encoding or reports an error if any of the
 // fields is invalid.
-func (o *structValue) marshalJSON() (b []byte, err error) {
+func (o *structValue) marshalJSON() (b []byte, err errors.Error) {
 	b = append(b, '{')
 	n := o.Len()
 	for i := 0; i < n; i++ {
 		k, v := o.At(i)
 		s, err := json.Marshal(k)
 		if err != nil {
-			return nil, unwrapJSONError(k, err)
+			return nil, unwrapJSONError(err)
 		}
 		b = append(b, s...)
 		b = append(b, ':')
 		bb, err := json.Marshal(v)
 		if err != nil {
-			return nil, unwrapJSONError(k, err)
+			return nil, unwrapJSONError(err)
 		}
 		b = append(b, bb...)
 		if i < n-1 {
@@ -141,32 +141,45 @@ func (o *structValue) marshalJSON() (b []byte, err error) {
 	return b, nil
 }
 
+var _ errors.Error = &marshalError{}
+
 type marshalError struct {
-	path string
-	err  error
-	// TODO: maybe also collect the file locations contributing to the
-	// failing values?
+	err errors.Error
+}
+
+func toMarshalErr(v Value, b *bottom) error {
+	return &marshalError{v.toErr(b)}
+}
+
+func marshalErrf(v Value, src source, msg string, args ...interface{}) error {
+	arguments := append([]interface{}{msg}, args...)
+	b := v.idx.mkErr(src, arguments...)
+	return toMarshalErr(v, b)
 }
 
 func (e *marshalError) Error() string {
-	return fmt.Sprintf("cue: marshal error at path %s: %v", e.path, e.err)
+	path := e.Path()
+	if len(path) == 0 {
+		return fmt.Sprintf("cue: marshal error: %v", e.err)
+	}
+	p := strings.Join(path, ".")
+	return fmt.Sprintf("cue: marshal error at path %s: %v", p, e.err)
 }
 
-func unwrapJSONError(key interface{}, err error) error {
-	if je, ok := err.(*json.MarshalerError); ok {
-		err = je.Err
+func (e *marshalError) Path() []string      { return e.err.Path() }
+func (e *marshalError) Position() token.Pos { return e.err.Position() }
+
+func unwrapJSONError(err error) errors.Error {
+	switch x := err.(type) {
+	case *json.MarshalerError:
+		return unwrapJSONError(x.Err)
+	case *marshalError:
+		return x
+	case errors.Error:
+		return &marshalError{x}
+	default:
+		return &marshalError{errors.Wrapf(err, token.NoPos, err.Error())}
 	}
-	path := make([]string, 0, 2)
-	if key != nil {
-		path = append(path, fmt.Sprintf("%v", key))
-	}
-	if me, ok := err.(*marshalError); ok {
-		if me.path != "" {
-			path = append(path, me.path)
-		}
-		err = me.err
-	}
-	return &marshalError{strings.Join(path, "."), err}
 }
 
 // An Iterator iterates over values.
@@ -223,13 +236,13 @@ func (i *Iterator) IsOptional() bool {
 
 // marshalJSON iterates over the list and generates JSON output. HasNext
 // will return false after this operation.
-func marshalList(l *Iterator) (b []byte, err error) {
+func marshalList(l *Iterator) (b []byte, err errors.Error) {
 	b = append(b, '[')
 	if l.Next() {
 		for i := 0; ; i++ {
 			x, err := json.Marshal(l.Value())
 			if err != nil {
-				return nil, unwrapJSONError(i, err)
+				return nil, unwrapJSONError(err)
 			}
 			b = append(b, x...)
 			if !l.Next() {
@@ -242,10 +255,10 @@ func marshalList(l *Iterator) (b []byte, err error) {
 	return b, nil
 }
 
-func (v Value) getNum(k kind) (*numLit, error) {
+func (v Value) getNum(k kind) (*numLit, errors.Error) {
 	v, _ = v.Default()
 	if err := v.checkKind(v.ctx(), k); err != nil {
-		return nil, err
+		return nil, v.toErr(err)
 	}
 	n, _ := v.path.cache.(*numLit)
 	return n, nil
@@ -660,7 +673,7 @@ func (v Value) IncompleteKind() Kind {
 func (v Value) MarshalJSON() (b []byte, err error) {
 	b, err = v.marshalJSON()
 	if err != nil {
-		return nil, unwrapJSONError(nil, err)
+		return nil, unwrapJSONError(err)
 	}
 	return b, nil
 }
@@ -692,15 +705,15 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		obj, _ := v.structVal(ctx)
 		return obj.marshalJSON()
 	case bottomKind:
-		return nil, x.(*bottom)
+		return nil, toMarshalErr(v, x.(*bottom))
 	default:
 		if k.hasReferences() {
-			return nil, v.idx.mkErr(x, "value %q contains unresolved references", debugStr(ctx, x))
+			return nil, marshalErrf(v, x, "value %q contains unresolved references", debugStr(ctx, x))
 		}
 		if !k.isGround() {
-			return nil, v.idx.mkErr(x, "cannot convert incomplete value %q to JSON", debugStr(ctx, x))
+			return nil, marshalErrf(v, x, "cannot convert incomplete value %q to JSON", debugStr(ctx, x))
 		}
-		return nil, v.idx.mkErr(x, "cannot convert value %q of type %T to JSON", debugStr(ctx, x), x)
+		return nil, marshalErrf(v, x, "cannot convert value %q of type %T to JSON", debugStr(ctx, x), x)
 	}
 }
 
@@ -794,8 +807,7 @@ func (v Value) Err() error {
 	return nil
 }
 
-// TODO: make bottom not an error and then make this return *bottom.
-func (v Value) err() error {
+func (v Value) err() *bottom {
 	// TODO(incomplete): change to not return an error for incomplete.
 	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 		return err
@@ -1406,7 +1418,7 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 func (v Value) Attribute(key string) Attribute {
 	// look up the attributes
 	if v.path == nil || v.path.attrs == nil {
-		return Attribute{err: errNotExists}
+		return Attribute{err: v.toErr(errNotExists)}
 	}
 	for _, a := range v.path.attrs.attr {
 		if a.key() != key {
@@ -1418,7 +1430,7 @@ func (v Value) Attribute(key string) Attribute {
 		}
 		return at
 	}
-	return Attribute{err: errNotExists}
+	return Attribute{err: v.toErr(errNotExists)}
 }
 
 var (

@@ -16,12 +16,10 @@ package cue
 
 import (
 	"fmt"
-	"sort"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"golang.org/x/xerrors"
 )
 
 var _ errors.Error = &nodeError{}
@@ -166,38 +164,11 @@ func appendPositions(pos []token.Pos, src source) []token.Pos {
 	return pos
 }
 
-func (x *bottom) Error() string { return fmt.Sprint(x) }
-
 func (x *bottom) Format(s fmt.State, verb rune) {
-	xerrors.FormatError(x, s, verb)
-}
-
-func (x *bottom) FormatError(p xerrors.Printer) error {
-	p.Print(x.msg)
-	if p.Detail() && x.index != nil {
-		locs := appendLocations(nil, x.pos)
-		sort.Strings(locs)
-		for _, l := range locs {
-			p.Printf("%s\n", l)
-		}
-	}
+	fmt.Fprint(s, x.msg)
 	if x.wrapped != nil {
-		return x.wrapped // nil interface
+		fmt.Fprint(s, ": ", x.wrapped)
 	}
-	return nil
-}
-
-func appendLocations(locs []string, src source) []string {
-	if src != nil {
-		if p := src.Pos(); p != token.NoPos {
-			return append(locs, src.Pos().String())
-		}
-		if c := src.computed(); c != nil {
-			locs = appendLocations(locs, c.x)
-			locs = appendLocations(locs, c.y)
-		}
-	}
-	return locs
 }
 
 func cycleError(v evaluated) *bottom {

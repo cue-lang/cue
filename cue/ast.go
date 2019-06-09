@@ -16,10 +16,12 @@ package cue
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -39,9 +41,14 @@ func (inst *Instance) insertFile(f *ast.File) error {
 	// First process single file.
 	v := newVisitor(inst.index, inst.inst, inst.rootStruct, inst.scope)
 	v.astState.astMap[f] = inst.rootStruct
+	// TODO: fix cmd/import to resolve references in the AST before
+	// inserting. For now, we accept errors that did not make it up to the tree.
 	result := v.walk(f)
 	if isBottom(result) {
-		return result.(*bottom)
+		if v.errors.Len() > 0 {
+			return v.errors
+		}
+		return &callError{result.(*bottom)}
 	}
 
 	return nil
@@ -50,6 +57,9 @@ func (inst *Instance) insertFile(f *ast.File) error {
 type astVisitor struct {
 	*astState
 	object *structLit
+
+	parent *astVisitor
+	sel    string // label or index; may be '*'
 	// For single line fields, the doc comment is applied to the inner-most
 	// field value.
 	//
@@ -75,6 +85,8 @@ type astState struct {
 
 	// make unique per level to avoid reuse of structs being an issue.
 	astMap map[ast.Node]scope
+
+	errors errors.List
 }
 
 func (s *astState) mapScope(n ast.Node) (m scope) {
@@ -112,8 +124,27 @@ func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structL
 	return v
 }
 
-func (v *astVisitor) error(n ast.Node, args ...interface{}) value {
-	return v.mkErr(newNode(n), args...)
+func (v *astVisitor) errf(n ast.Node, format string, args ...interface{}) evaluated {
+	v.astState.errors.Add(&nodeError{
+		path: v.appendPath(nil),
+		n:    n,
+		Message: errors.Message{
+			Format: format,
+			Args:   args,
+		},
+	})
+	arguments := append([]interface{}{format}, args...)
+	return v.mkErr(newNode(n), arguments...)
+}
+
+func (v *astVisitor) appendPath(a []string) []string {
+	if v.parent != nil {
+		a = v.parent.appendPath(a)
+	}
+	if v.sel != "" {
+		a = append(a, v.sel)
+	}
+	return a
 }
 
 func (v *astVisitor) resolve(n *ast.Ident) value {
@@ -139,7 +170,7 @@ func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 	ctx := v.ctx()
 	path, err := literal.Unquote(imp.Path.Value)
 	if err != nil {
-		return ctx.mkErr(newNode(imp), "illformed import spec")
+		return v.errf(imp, "illformed import spec")
 	}
 	// TODO: allow builtin *and* imported package. The result is a unified
 	// struct.
@@ -148,7 +179,7 @@ func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 	}
 	bimp := v.inst.LookupImport(path)
 	if bimp == nil {
-		return ctx.mkErr(newNode(imp), "package %q not found", path)
+		return v.errf(imp, "package %q not found", path)
 	}
 	impInst := v.index.loadInstance(bimp)
 	return impInst.rootValue.evalPartial(ctx)
@@ -193,6 +224,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		v1 := &astVisitor{
 			astState: v.astState,
 			object:   obj,
+			parent:   v,
 		}
 		passDoc := len(n.Elts) == 1 && !n.Lbrace.IsValid() && v.doc != nil
 		if passDoc {
@@ -202,7 +234,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			switch x := e.(type) {
 			case *ast.EmitDecl:
 				// Only allowed at top-level.
-				return v1.error(x, "emitting values is only allowed at top level")
+				return v1.errf(x, "emitting values is only allowed at top level")
 			case *ast.Field, *ast.Alias:
 				v1.walk(e)
 			case *ast.ComprehensionDecl:
@@ -214,6 +246,28 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 		value = obj
 
+	case *ast.ListLit:
+		v1 := &astVisitor{
+			astState: v.astState,
+			object:   v.object,
+			parent:   v,
+		}
+		arcs := []arc{}
+		for i, e := range n.Elts {
+			v1.sel = strconv.Itoa(i)
+			arcs = append(arcs, arc{feature: label(i), v: v1.walk(e)})
+		}
+		s := &structLit{baseValue: newExpr(n), arcs: arcs}
+		list := &list{baseValue: newExpr(n), elem: s}
+		list.initLit()
+		if n.Ellipsis != token.NoPos || n.Type != nil {
+			list.len = newBound(list.baseValue, opGeq, intKind, list.len)
+			if n.Type != nil {
+				list.typ = v1.walk(n.Type)
+			}
+		}
+		value = list
+
 	case *ast.ComprehensionDecl:
 		yielder := &yield{baseValue: newExpr(n.Field.Value)}
 		fc := &fieldComprehension{
@@ -223,10 +277,12 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		field := n.Field
 		switch x := field.Label.(type) {
 		case *ast.Interpolation:
+			v.sel = "?"
 			yielder.key = v.walk(x)
 			yielder.value = v.walk(field.Value)
 
 		case *ast.TemplateLabel:
+			v.sel = "*"
 			f := v.label(x.Ident.Name, true)
 
 			sig := &params{}
@@ -241,8 +297,10 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		case *ast.BasicLit, *ast.Ident:
 			name, ok := ast.LabelName(x)
 			if !ok {
-				return v.error(x, "invalid field name: %v", x)
+				return v.errf(x, "invalid field name: %v", x)
 			}
+			// TODO: is this correct? Just for info, so not very important.
+			v.sel = name
 
 			// TODO: if the clauses do not contain a guard, we know that this
 			// field will always be added and we can move the comprehension one
@@ -273,6 +331,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		opt := n.Optional != token.NoPos
 		switch x := n.Label.(type) {
 		case *ast.Interpolation:
+			v.sel = "?"
 			yielder := &yield{baseValue: newNode(x)}
 			fc := &fieldComprehension{
 				baseValue: newDecl(n),
@@ -284,6 +343,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			v.object.comprehensions = append(v.object.comprehensions, fc)
 
 		case *ast.TemplateLabel:
+			v.sel = "*"
 			f := v.label(x.Ident.Name, true)
 
 			sig := &params{}
@@ -303,13 +363,14 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			if internal.DropOptional && opt {
 				break
 			}
+			v.sel, _ = ast.LabelName(x)
 			attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
 			if err != nil {
 				return err
 			}
 			f, ok := v.nodeLabel(x)
 			if !ok {
-				return v.error(n.Label, "invalid field name: %v", n.Label)
+				return v.errf(n.Label, "invalid field name: %v", n.Label)
 			}
 			if f != 0 {
 				var leftOverDoc *docNode
@@ -378,7 +439,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				return r
 			}
 
-			value = v.error(n, "reference %q not found", n.Name)
+			value = v.errf(n, "reference %q not found", n.Name)
 			break
 		}
 
@@ -398,25 +459,26 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 
 	case *ast.BottomLit:
-		value = v.error(n, "from source")
+		// TODO: record inline comment.
+		value = &bottom{baseValue: newExpr(n), msg: "from source"}
 
 	case *ast.BadDecl:
 		// nothing to do
 
 	case *ast.BadExpr:
-		value = v.error(n, "invalid expression")
+		value = v.errf(n, "invalid expression")
 
 	case *ast.BasicLit:
 		value = v.litParser.parse(n)
 
 	case *ast.Interpolation:
 		if len(n.Elts) == 0 {
-			return v.error(n, "invalid interpolation")
+			return v.errf(n, "invalid interpolation")
 		}
 		first, ok1 := n.Elts[0].(*ast.BasicLit)
 		last, ok2 := n.Elts[len(n.Elts)-1].(*ast.BasicLit)
 		if !ok1 || !ok2 {
-			return v.error(n, "invalid interpolation")
+			return v.errf(n, "invalid interpolation")
 		}
 		if len(n.Elts) == 1 {
 			value = v.walk(n.Elts[0])
@@ -426,17 +488,17 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		value = lit
 		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)
 		if err != nil {
-			return v.error(n, "invalid interpolation: %v", err)
+			return v.errf(n, "invalid interpolation: %v", err)
 		}
 		prefix := ""
 		for i := 0; i < len(n.Elts); i += 2 {
 			l, ok := n.Elts[i].(*ast.BasicLit)
 			if !ok {
-				return v.error(n, "invalid interpolation")
+				return v.errf(n, "invalid interpolation")
 			}
 			s := l.Value
 			if !strings.HasPrefix(s, prefix) {
-				return v.error(l, "invalid interpolation: unmatched ')'")
+				return v.errf(l, "invalid interpolation: unmatched ')'")
 			}
 			s = l.Value[prefixLen:]
 			x := parseString(v.ctx(), l, info, s)
@@ -447,22 +509,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			prefix = ")"
 			prefixLen = 1
 		}
-
-	case *ast.ListLit:
-		arcs := []arc{}
-		for i, e := range n.Elts {
-			arcs = append(arcs, arc{feature: label(i), v: v.walk(e)})
-		}
-		s := &structLit{baseValue: newExpr(n), arcs: arcs}
-		list := &list{baseValue: newExpr(n), elem: s}
-		list.initLit()
-		if n.Ellipsis != token.NoPos || n.Type != nil {
-			list.len = newBound(list.baseValue, opGeq, intKind, list.len)
-			if n.Type != nil {
-				list.typ = v.walk(n.Type)
-			}
-		}
-		value = list
 
 	case *ast.ParenExpr:
 		value = v.walk(n.X)
@@ -514,9 +560,9 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			)
 
 		case token.MUL:
-			return v.error(n, "preference mark not allowed at this position")
+			return v.errf(n, "preference mark not allowed at this position")
 		default:
-			return v.error(n, "unsupported unary operator %q", n.Op)
+			return v.errf(n, "unsupported unary operator %q", n.Op)
 		}
 
 	case *ast.BinaryExpr:

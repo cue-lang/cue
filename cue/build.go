@@ -289,10 +289,10 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 			}
 		} else if _, ok := builtins[id]; !ok {
 			// continue
-			return idx.mkErr(newNode(spec), "package %q not found", id)
+			return nodeErrorf(spec, "package %q not found", id)
 		}
 		if n, ok := fields[name]; ok {
-			return idx.mkErr(newNode(spec),
+			return nodeErrorf(spec,
 				"%s redeclared as imported package name\n"+
 					"\tprevious declaration at %v", name, lineStr(idx, n))
 		}
@@ -303,10 +303,10 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 		}
 		if !used {
 			if spec.Name == nil {
-				errUnused = idx.mkErr(newNode(spec),
+				errUnused = nodeErrorf(spec,
 					"imported and not used: %s", spec.Path.Value)
 			} else {
-				errUnused = idx.mkErr(newNode(spec),
+				errUnused = nodeErrorf(spec,
 					"imported and not used: %s as %s", spec.Path.Value, spec.Name)
 			}
 		}

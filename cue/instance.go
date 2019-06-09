@@ -210,9 +210,10 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	}
 
 	ctx := inst.newContext()
-	v, err := newValueRoot(ctx, inst.rootValue).structVal(ctx)
+	val := newValueRoot(ctx, inst.rootValue)
+	v, err := val.structVal(ctx)
 	if err != nil {
-		i.setError(err)
+		i.setError(val.toErr(err))
 		return i
 	}
 	i.scope = v.n

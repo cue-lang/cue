@@ -214,9 +214,10 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		}
 		switch err := errVal.(type) {
 		case nil:
-		case *bottom:
-			ret = err
+		case *callError:
+			ret = err.b
 		default:
+			// TODO: store the underlying error explicitly
 			ret = ctx.mkErr(src, x, "call error: %v", err)
 		}
 	}()
@@ -290,6 +291,25 @@ func (c *callCtxt) do() bool {
 	return c.err == nil
 }
 
+type callError struct {
+	b *bottom
+}
+
+func (e *callError) Error() string {
+	return fmt.Sprint(e.b)
+}
+
+func (c *callCtxt) errf(src source, underlying error, format string, args ...interface{}) {
+	a := make([]interface{}, 0, 2+len(args))
+	if underlying != nil {
+		a = append(a, underlying)
+	}
+	a = append(a, format)
+	a = append(a, args...)
+	err := c.ctx.mkErr(src, a...)
+	c.err = &callError{err}
+}
+
 func (c *callCtxt) value(i int) Value {
 	return newValueRoot(c.ctx, c.args[i])
 }
@@ -305,11 +325,11 @@ func (c *callCtxt) intValue(i, bits int) int64 {
 	x := newValueRoot(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, "argument %d must be in int, found number", i)
+		c.errf(c.src, err, "argument %d must be in int, found number", i)
 		return 0
 	}
 	if n.BitLen() > bits {
-		c.err = c.ctx.mkErr(c.src, err, "argument %d out of range: has %d > %d bits", n.BitLen(), bits)
+		c.errf(c.src, err, "argument %d out of range: has %d > %d bits", n.BitLen(), bits)
 	}
 	res, _ := x.Int64()
 	return res
@@ -326,15 +346,15 @@ func (c *callCtxt) uintValue(i, bits int) uint64 {
 	x := newValueRoot(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, "argument %d must be an integer", i)
+		c.errf(c.src, err, "argument %d must be an integer", i)
 		return 0
 	}
 	if n.Sign() < 0 {
-		c.err = c.ctx.mkErr(c.src, "argument %d must be a positive integer", i)
+		c.errf(c.src, nil, "argument %d must be a positive integer", i)
 		return 0
 	}
 	if n.BitLen() > bits {
-		c.err = c.ctx.mkErr(c.src, err, "argument %d out of range: has %d > %d bits", i, n.BitLen(), bits)
+		c.errf(c.src, nil, "argument %d out of range: has %d > %d bits", i, n.BitLen(), bits)
 	}
 	res, _ := x.Uint64()
 	return res
@@ -344,7 +364,7 @@ func (c *callCtxt) float64(i int) float64 {
 	x := newValueRoot(c.ctx, c.args[i])
 	res, err := x.Float64()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return 0
 	}
 	return res
@@ -354,7 +374,7 @@ func (c *callCtxt) bigInt(i int) *big.Int {
 	x := newValueRoot(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, "argument %d must be in int, found number", i)
+		c.errf(c.src, err, "argument %d must be in int, found number", i)
 		return nil
 	}
 	return n
@@ -365,7 +385,7 @@ func (c *callCtxt) bigFloat(i int) *big.Float {
 	var mant big.Int
 	exp, err := x.MantExp(&mant)
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return nil
 	}
 	f := &big.Float{}
@@ -382,7 +402,7 @@ func (c *callCtxt) string(i int) string {
 	x := newValueRoot(c.ctx, c.args[i])
 	v, err := x.String()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return ""
 	}
 	return v
@@ -392,7 +412,7 @@ func (c *callCtxt) bytes(i int) []byte {
 	x := newValueRoot(c.ctx, c.args[i])
 	v, err := x.Bytes()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return nil
 	}
 	return v
@@ -403,7 +423,7 @@ func (c *callCtxt) reader(i int) io.Reader {
 	// TODO: optimize for string and bytes cases
 	r, err := x.Reader()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return nil
 	}
 	return r
@@ -413,22 +433,17 @@ func (c *callCtxt) bool(i int) bool {
 	x := newValueRoot(c.ctx, c.args[i])
 	b, err := x.Bool()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return false
 	}
 	return b
-}
-
-func (c *callCtxt) error(i int) error {
-	x := newValueRoot(c.ctx, c.args[i])
-	return x.err()
 }
 
 func (c *callCtxt) list(i int) (a Iterator) {
 	x := newValueRoot(c.ctx, c.args[i])
 	v, err := x.List()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return Iterator{ctx: c.ctx}
 	}
 	return v
@@ -438,13 +453,13 @@ func (c *callCtxt) strList(i int) (a []string) {
 	x := newValueRoot(c.ctx, c.args[i])
 	v, err := x.List()
 	if err != nil {
-		c.err = c.ctx.mkErr(c.src, err, "invalid argument %d: %v", i, err)
+		c.errf(c.src, err, "invalid argument %d: %v", i, err)
 		return nil
 	}
 	for i := 0; v.Next(); i++ {
 		str, err := v.Value().String()
 		if err != nil {
-			c.err = c.ctx.mkErr(c.src, err, "list element %d: %v", i, err)
+			c.errf(c.src, err, "list element %d: %v", i, err)
 		}
 		a = append(a, str)
 	}

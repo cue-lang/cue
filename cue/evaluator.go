@@ -145,5 +145,7 @@ func (e *evaluator) err(v value) evaluated {
 			return b
 		}
 	}
-	return e.ctx.mkErr(v, codeIncomplete, e.bottom[0])
+	b := *e.bottom[0]
+	b.code = codeIncomplete
+	return &b
 }

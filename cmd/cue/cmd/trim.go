@@ -564,16 +564,3 @@ type key struct {
 func iterKey(v cue.Iterator) key {
 	return key{v.Label(), v.IsHidden()}
 }
-
-func nodeKey(v *ast.Field) key {
-	if v == nil {
-		return key{}
-	}
-	name, _ := ast.LabelName(v.Label)
-	hidden := false
-	if ident, ok := v.Label.(*ast.Ident); ok &&
-		strings.HasPrefix(ident.Name, "_") {
-		hidden = true
-	}
-	return key{name, hidden}
-}

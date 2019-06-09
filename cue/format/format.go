@@ -224,7 +224,6 @@ type frame struct {
 	pos int8
 
 	settings
-	commentNewline bool
 }
 
 type settings struct {

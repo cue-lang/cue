@@ -18,10 +18,6 @@ import (
 	"bytes"
 )
 
-type valueSubsumer interface {
-	subsumesImpl(ctx *context, v value) bool
-}
-
 type subsumeMode int
 
 const (

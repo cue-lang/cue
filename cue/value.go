@@ -319,13 +319,6 @@ func newNumBin(k kind, a, b *numLit) *numLit {
 	return n
 }
 
-func resultNumBase(a, b numBase) numBase {
-	return numBase{
-		baseValue: a.baseValue,
-		numInfo:   unifyNuminfo(a.numInfo, b.numInfo),
-	}
-}
-
 type numLit struct {
 	numBase
 	v apd.Decimal

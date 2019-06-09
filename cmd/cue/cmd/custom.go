@@ -294,10 +294,6 @@ func newTask(index int, name string, v cue.Value) (*task, error) {
 	}, nil
 }
 
-func isValid(v cue.Value) bool {
-	return v.Kind() == cue.BottomKind
-}
-
 func init() {
 	itask.Register("cmd/cue/cmd.Test", newTestServerCmd)
 }

@@ -23,10 +23,9 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"github.com/cockroachdb/apd"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"github.com/cockroachdb/apd"
 )
 
 func doEval(m options) bool {
@@ -837,7 +836,6 @@ func (s *boundSimplifier) matchRange(ranges []builtinRange) (t string) {
 				fallthrough
 			case 1:
 				s.max = nil
-				t = r.typ
 				return r.typ
 			}
 		}

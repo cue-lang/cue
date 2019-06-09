@@ -23,7 +23,6 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"strconv"
 	"strings"
 	"sync"
 	"unicode"
@@ -541,10 +540,6 @@ func newIndex() *listIndex {
 		index: map[string]*listIndex{},
 		field: &ast.Field{},
 	}
-}
-
-func newString(s string) *ast.BasicLit {
-	return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(s)}
 }
 
 func (x *listIndex) label(label ast.Label) *listIndex {

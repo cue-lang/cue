@@ -39,7 +39,7 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 		if emit != nil {
 			emit = ctx.copy(x.emit)
 		}
-		obj.emit = x.emit
+		obj.emit = emit
 
 		t := x.template
 		if t != nil {

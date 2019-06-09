@@ -38,8 +38,6 @@ import (
 
 var log = logger.New(os.Stderr, "", logger.Lshortfile)
 
-var cfgFile string
-
 // newRootCmd creates the base command when called without any subcommands
 func newRootCmd() *Command {
 	cmd := &cobra.Command{

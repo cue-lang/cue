@@ -21,7 +21,6 @@ import (
 	"errors"
 	"flag"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"path/filepath"
 	"testing"
@@ -392,28 +391,6 @@ func TestDeclLists(t *testing.T) {
 			t.Errorf("\ngot : %q\nwant: %q\n", out, src)
 		}
 	}
-}
-
-var stmts = []string{
-	"i := 0",
-	"select {}\nvar a, b = 1, 2\nreturn a + b",
-	"go f()\ndefer func() {}()",
-}
-
-type limitWriter struct {
-	remaining int
-	errCount  int
-}
-
-func (l *limitWriter) Write(buf []byte) (n int, err error) {
-	n = len(buf)
-	if n >= l.remaining {
-		n = l.remaining
-		err = io.EOF
-		l.errCount++
-	}
-	l.remaining -= n
-	return n, err
 }
 
 // TextX is a skeleton test that can be filled in for debugging one-off cases.

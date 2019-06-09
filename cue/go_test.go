@@ -105,7 +105,7 @@ func TestConvert(t *testing.T) {
 		"<0>{a: 3, b: 4}",
 	}, {
 		struct {
-			A int `json:",bb" yaml:"" protobuf:"aa"`
+			A int `json:"" yaml:"" protobuf:"aa"`
 			B int `yaml:"cc" json:"bb" protobuf:"aa"`
 		}{3, 4},
 		"<0>{aa: 3, bb: 4}",

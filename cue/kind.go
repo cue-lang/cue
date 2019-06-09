@@ -16,8 +16,6 @@ package cue
 
 import (
 	"fmt"
-
-	"cuelang.org/go/cue/token"
 )
 
 func unifyType(a, b kind) kind {
@@ -147,16 +145,6 @@ finalize:
 	}
 	return str
 }
-
-type kindInfo struct {
-	kind
-	subsumes   []*kindInfo
-	subsumedBy []*kindInfo
-	unary      []token.Token
-	binary     []token.Token
-}
-
-var toKindInfo = map[kind]*kindInfo{}
 
 // matchBinOpKind returns the result kind of applying the given op to operands with
 // the given kinds. The operation is disallowed if the return value is bottomKind. If

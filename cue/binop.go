@@ -846,10 +846,6 @@ func cmpTonode(src source, op op, r int) evaluated {
 	return boolTonode(src, result)
 }
 
-func (x *numLit) updateNumInfo(a, b *numLit) {
-	x.numInfo = unifyNuminfo(a.numInfo, b.numInfo)
-}
-
 func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch y := other.(type) {
 	case *basicType, *bound, *customValidator: // for better error reporting

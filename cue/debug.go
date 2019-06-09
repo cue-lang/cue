@@ -22,10 +22,7 @@ import (
 )
 
 func debugStr(ctx *context, v value) string {
-	p := &printer{
-		ctx: ctx,
-		w:   &bytes.Buffer{},
-	}
+	p := newPrinter(ctx)
 	p.debugStr(v)
 	return p.w.String()
 }
@@ -128,13 +125,6 @@ func newPrinter(ctx *context) *printer {
 type printer struct {
 	ctx *context
 	w   *bytes.Buffer
-}
-
-func (p *printer) str(v value) string {
-	p.debugStr(v)
-	str := p.w.String()
-	p.w.Reset()
-	return str
 }
 
 func (p *printer) label(f label) string {

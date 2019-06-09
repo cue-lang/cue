@@ -27,14 +27,11 @@ import (
 // produced by the formatter and adjusts the spacing based on the original
 // source code.
 type printer struct {
-	w tabwriter.Writer
-
 	cfg *config
 
 	allowed     whiteSpace
 	requested   whiteSpace
 	indentStack []whiteSpace
-	indentPos   int
 
 	pos token.Position // current pos in AST
 
@@ -143,7 +140,6 @@ func (p *printer) Print(v interface{}) {
 		// TODO: if implied comma, postpone comment
 		data = x.Text
 		p.lastTok = token.COMMENT
-		break
 
 	case whiteSpace:
 		p.allowed |= x
@@ -366,5 +362,5 @@ func mayCombine(prev, next token.Token) (before, after bool) {
 	case token.QUO:
 		before = s[0] == '*' // /*
 	}
-	return false, false
+	return before, false
 }

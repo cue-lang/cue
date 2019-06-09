@@ -14,11 +14,6 @@
 
 package cue
 
-import (
-	"fmt"
-	"strings"
-)
-
 type rewriteMode int
 
 const (
@@ -34,23 +29,6 @@ func testResolve(ctx *context, v value, m rewriteMode) (result value) {
 		return v
 	}
 	return rewriteRec(ctx, v, v.evalPartial(ctx), m)
-}
-
-var indentLevel int
-
-func (c *context) ind() int {
-	old := indentLevel
-	indentLevel += 2
-	return old
-}
-
-func (c *context) unindent(old int) {
-	indentLevel = old
-}
-
-func (c *context) printIndent(args ...interface{}) {
-	fmt.Print(strings.Repeat("  ", indentLevel))
-	c.println(args...)
 }
 
 func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result value) {

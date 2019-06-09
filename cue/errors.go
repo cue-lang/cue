@@ -97,17 +97,6 @@ func isIncomplete(v value) bool {
 	return false
 }
 
-func recoverable(v value) bool {
-	if err, ok := v.(*bottom); ok {
-		switch err.code {
-		case codeFatal,
-			codeCycle: // only recoverable when explicitly handled and discarded
-			return false
-		}
-	}
-	return true
-}
-
 var errNotExists = &bottom{code: codeNotExist, msg: "undefined value"}
 
 func exists(v value) bool {
@@ -126,7 +115,6 @@ type bottom struct {
 	exprDepth      int
 	value          value
 	offendingValue value
-	replacement    evaluated // for cycle resolution
 	pos            source
 	msg            string
 
@@ -178,15 +166,6 @@ func cycleError(v evaluated) *bottom {
 	return nil
 }
 
-func (idx *index) mkErrUnify(src source, a, b evaluated) evaluated {
-	if err := firstBottom(a, b); err != nil {
-		return err
-	}
-	e := binSrc(src.Pos(), opUnify, a, b)
-	// TODO: show string of values and show location of both values.
-	return idx.mkErr(e, "incompatible values &(%s, %s)", a.kind(), b.kind())
-}
-
 func (c *context) mkIncompatible(src source, op op, a, b evaluated) evaluated {
 	if err := firstBottom(a, b); err != nil {
 		return err
@@ -235,12 +214,3 @@ func firstBottom(v ...value) evaluated {
 	}
 	return nil
 }
-
-func expectType(idx *index, t kind, n evaluated) value {
-	if isBottom(n) {
-		return n
-	}
-	return idx.mkErr(n, "value should of type %s, found %s", n.kind(), t)
-}
-
-// TODO: consider returning a type or subsuption error for op != opUnify

@@ -390,7 +390,7 @@ func TestFloat(t *testing.T) {
 				t.Errorf("mantExp: got %s %d; want %s %d", mstr, exp, tc.mant, tc.exp)
 			}
 
-			b, err := n.AppendFloat(nil, tc.fmt, tc.prec)
+			b, _ := n.AppendFloat(nil, tc.fmt, tc.prec)
 			want := tc.float
 			if got := string(b); got != want {
 				t.Errorf("append: got %v; want %v", got, want)

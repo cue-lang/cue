@@ -594,7 +594,7 @@ func TestScanInterpolation(t *testing.T) {
 	eh := func(pos token.Pos, msg string) {
 		t.Errorf("error handler called (pos = %v, msg = %s)", pos, msg)
 	}
-	trim := func(s string) string { return strings.Trim(s, `#"\\()`) }
+	trim := func(s string) string { return strings.Trim(s, `#"\()`) }
 
 	sources := []string{
 		`"first\(first)\\second\(second)"`,

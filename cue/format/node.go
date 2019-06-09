@@ -464,7 +464,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
 	}
-	return
 }
 
 func (f *formatter) clause(clause ast.Clause) {

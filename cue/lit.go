@@ -18,19 +18,9 @@ import (
 	"math/big"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"github.com/cockroachdb/apd"
 )
-
-// errRange indicates that a value is out of range for the target type.
-var errRange = errors.New("value out of range")
-
-// errSyntax indicates that a value does not have the right syntax for the
-// target type.
-var errSyntax = errors.New("invalid syntax")
-
-var errInvalidString = errors.New("invalid string")
 
 type numInfo struct {
 	rep multiplier

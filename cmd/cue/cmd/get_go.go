@@ -215,11 +215,6 @@ const (
 
 var cueTestRoot string // the CUE module root for test purposes.
 
-type dstUsed struct {
-	dst  string
-	used bool
-}
-
 func (e *extractor) initExclusions(str string) {
 	e.exclude = str
 	for _, re := range strings.Split(str, ",") {
@@ -245,7 +240,6 @@ type extractor struct {
 	cmd *cobra.Command
 
 	stderr io.Writer
-	err    error
 	pkgs   []*packages.Package
 	done   map[string]bool
 
@@ -275,14 +269,6 @@ func (e *extractor) logf(format string, args ...interface{}) {
 func (e *extractor) usedPkg(pkg string) {
 	e.usedPkgs[pkg] = true
 	e.usedInFile[pkg] = true
-}
-
-func (e *extractor) errorf(format string, args ...interface{}) {
-	err := fmt.Errorf(format, args...)
-	fmt.Fprintln(e.stderr, err)
-	if e.err == nil {
-		e.err = err
-	}
 }
 
 func initInterfaces() error {

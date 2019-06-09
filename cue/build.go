@@ -257,11 +257,6 @@ func resolveFiles(idx *index, p *build.Instance) error {
 }
 
 func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[string]ast.Node) error {
-	type importInfo struct {
-		node ast.Node
-		inst *Instance
-		used bool // TODO: use a more general unresolved value technique
-	}
 	index := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
 		index[u.Name] = append(index[u.Name], u)

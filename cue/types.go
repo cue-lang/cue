@@ -185,14 +185,13 @@ func unwrapJSONError(err error) errors.Error {
 // An Iterator iterates over values.
 //
 type Iterator struct {
-	val   Value
-	ctx   *context
-	iter  iterAtter
-	len   int
-	p     int
-	cur   Value
-	f     label
-	attrs *attributes
+	val  Value
+	ctx  *context
+	iter iterAtter
+	len  int
+	p    int
+	cur  Value
+	f    label
 }
 
 // Next advances the iterator to the next value and reports whether there was
@@ -803,14 +802,6 @@ func (v Value) Source() ast.Node {
 func (v Value) Err() error {
 	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 		return v.toErr(err)
-	}
-	return nil
-}
-
-func (v Value) err() *bottom {
-	// TODO(incomplete): change to not return an error for incomplete.
-	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
-		return err
 	}
 	return nil
 }
@@ -1432,10 +1423,6 @@ func (v Value) Attribute(key string) Attribute {
 	}
 	return Attribute{err: v.toErr(errNotExists)}
 }
-
-var (
-	errNoSuchAttribute = errors.New("entry for key does not exist")
-)
 
 // An Attribute contains meta data about a field.
 type Attribute struct {

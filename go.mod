@@ -1,6 +1,7 @@
 module cuelang.org/go
 
 require (
+	github.com/cloudfoundry-attic/jibber_jabber v0.0.0-20151120183258-bcc4c8345a21
 	github.com/cockroachdb/apd v1.1.0
 	github.com/emicklei/proto v1.6.11
 	github.com/ghodss/yaml v1.0.0
@@ -15,6 +16,7 @@ require (
 	github.com/spf13/pflag v1.0.3
 	golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f
+	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20181210225255-6a3e9aa2ab77
 	golang.org/x/xerrors v0.0.0-20190410155217-1f06c39b4373
 	gopkg.in/yaml.v2 v2.2.2 // indirect

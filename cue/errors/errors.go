@@ -324,23 +324,41 @@ func (p List) Err() error {
 	return p
 }
 
+// A Config defines parameters for printing.
+type Config struct {
+	// Format formats the given string and arguments and writes it to w.
+	// It is used for all printing.
+	Format func(w io.Writer, format string, args ...interface{})
+}
+
 // Print is a utility function that prints a list of errors to w,
 // one error per line, if the err parameter is an List. Otherwise
 // it prints the err string.
 //
-func Print(w io.Writer, err error) {
+func Print(w io.Writer, err error, cfg *Config) {
+	if cfg == nil {
+		cfg = &Config{}
+	}
 	if list, ok := err.(List); ok {
 		for _, e := range list {
-			printError(w, e)
+			printError(w, e, cfg)
 		}
 	} else if err != nil {
-		printError(w, err)
+		printError(w, err, cfg)
 	}
 }
 
-func printError(w io.Writer, err error) {
+func defaultFprintf(w io.Writer, format string, args ...interface{}) {
+	fmt.Fprintf(w, format, args...)
+}
+
+func printError(w io.Writer, err error, cfg *Config) {
 	if err == nil {
 		return
+	}
+	fprintf := cfg.Format
+	if fprintf == nil {
+		fprintf = defaultFprintf
 	}
 
 	positions := []string{}
@@ -361,19 +379,19 @@ func printError(w io.Writer, err error) {
 		}
 	}
 
-	if p := Path(err); p != nil {
-		fmt.Fprintf(w, "%v:", strings.Join(p, "."))
+	if path := Path(err); path != nil {
+		fprintf(w, "%s:", strings.Join(path, "."))
 	}
 
 	if len(positions) == 0 {
-		fmt.Fprintln(w, err)
+		fprintf(w, "%v\n", err)
 		return
 	}
 
 	unique.Strings(&positions)
 
-	fmt.Fprintf(w, "%v:\n", err)
+	fprintf(w, "%v:\n", err)
 	for _, pos := range positions {
-		fmt.Fprintf(w, "    %v\n", pos)
+		fprintf(w, "    %s\n", pos)
 	}
 }

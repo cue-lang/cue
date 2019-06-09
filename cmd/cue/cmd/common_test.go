@@ -72,9 +72,9 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 					switch err := recover().(type) {
 					case nil:
 					case panicError:
-						errors.Print(wOut, err.Err)
+						errors.Print(wOut, err.Err, nil)
 					case error:
-						errors.Print(wOut, err)
+						errors.Print(wOut, err, nil)
 					default:
 						fmt.Fprintln(wOut, err)
 					}

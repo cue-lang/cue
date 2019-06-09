@@ -662,19 +662,19 @@ func TestStdErrorHander(t *testing.T) {
 
 	if len(list) != 9 {
 		t.Errorf("found %d raw errors, expected 9", len(list))
-		errors.Print(os.Stderr, list)
+		errors.Print(os.Stderr, list, nil)
 	}
 
 	list.Sort()
 	if len(list) != 9 {
 		t.Errorf("found %d sorted errors, expected 9", len(list))
-		errors.Print(os.Stderr, list)
+		errors.Print(os.Stderr, list, nil)
 	}
 
 	list.RemoveMultiples()
 	if len(list) != 4 {
 		t.Errorf("found %d one-per-line errors, expected 4", len(list))
-		errors.Print(os.Stderr, list)
+		errors.Print(os.Stderr, list, nil)
 	}
 }
 

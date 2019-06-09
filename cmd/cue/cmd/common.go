@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"bytes"
+	"io"
 	"os"
 
 	"cuelang.org/go/cue"
@@ -23,7 +24,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
+	"github.com/cloudfoundry-attic/jibber_jabber"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/language"
+	"golang.org/x/text/message"
 )
 
 var runtime = &cue.Runtime{}
@@ -41,8 +45,15 @@ func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 		cwd = p
 	}
 
+	// Link x/text as our localizer.
+	lang, _ := jibber_jabber.DetectIETF()
+	p := message.NewPrinter(language.Make(lang))
+	format := func(w io.Writer, format string, args ...interface{}) {
+		p.Fprintf(w, format, args...)
+	}
+
 	w := &bytes.Buffer{}
-	errors.Print(w, err)
+	errors.Print(w, err, &errors.Config{Format: format})
 
 	// TODO: do something more principled than this.
 	b := w.Bytes()

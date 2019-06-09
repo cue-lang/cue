@@ -184,7 +184,7 @@ func TestPrintError(t *testing.T) {
 	}
 	for _, tt := range tests {
 		w := &bytes.Buffer{}
-		Print(w, tt.args.err)
+		Print(w, tt.args.err, nil)
 		if gotW := w.String(); gotW != tt.wantW {
 			t.Errorf("%q. PrintError() = %v, want %v", tt.name, gotW, tt.wantW)
 		}

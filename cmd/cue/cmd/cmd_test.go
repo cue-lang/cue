@@ -48,7 +48,7 @@ func TestCmd(t *testing.T) {
 			}
 			err = executeTasks("command", name, tools)
 			if err != nil {
-				errors.Print(stdout, err)
+				errors.Print(stdout, err, nil)
 			}
 			return nil
 		}

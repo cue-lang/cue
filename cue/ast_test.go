@@ -253,7 +253,7 @@ func TestCompile(t *testing.T) {
 			ctx, root, errs := compileFileWithErrors(t, tc.in)
 			buf := &bytes.Buffer{}
 			if len(errs) > 0 {
-				errors.Print(buf, errs)
+				errors.Print(buf, errs, nil)
 			}
 			buf.WriteString(debugStr(ctx, root))
 			got := buf.String()

@@ -567,8 +567,8 @@ func (p *exporter) expr(v value) ast.Expr {
 
 	case *bottom:
 		err := &ast.BottomLit{}
-		if x.msg != "" {
-			comment := &ast.Comment{Text: "/* " + x.msg + " */"}
+		if x.format != "" {
+			comment := &ast.Comment{Text: "/* " + x.msg() + " */"}
 			err.AddComment(&ast.CommentGroup{
 				Line:     true,
 				Position: 1,

@@ -403,12 +403,12 @@ func (p *printer) debugStr(v interface{}) {
 
 	case *bottom:
 		write("_|_")
-		if x.value != nil || x.msg != "" {
+		if x.value != nil || x.format != "" {
 			write("(")
 			if x.value != nil {
 				writef("%s:", debugStr(p.ctx, x.value))
 			}
-			write(x.msg)
+			write(x.msg())
 			write(")")
 		}
 	case *top:

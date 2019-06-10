@@ -16,6 +16,7 @@ package cue
 
 import (
 	"fmt"
+	"reflect"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -49,8 +50,8 @@ func (e *nodeError) Path() []string {
 
 func (v Value) toErr(b *bottom) errors.Error {
 	return &valueError{
-		v:       v,
-		err:     b,
+		v:   v,
+		err: b,
 	}
 }
 
@@ -72,6 +73,10 @@ func (e *valueError) Position() token.Pos {
 
 func (e *valueError) Positions() []token.Pos {
 	return e.err.Positions()
+}
+
+func (e *valueError) Msg() (string, []interface{}) {
+	return e.err.Msg()
 }
 
 func (e *valueError) Path() (a []string) {
@@ -97,7 +102,7 @@ func isIncomplete(v value) bool {
 	return false
 }
 
-var errNotExists = &bottom{code: codeNotExist, msg: "undefined value"}
+var errNotExists = &bottom{code: codeNotExist, format: "undefined value"}
 
 func exists(v value) bool {
 	if err, ok := v.(*bottom); ok {
@@ -110,14 +115,15 @@ func exists(v value) bool {
 type bottom struct {
 	baseValue
 
-	index          *index
-	code           errCode
-	exprDepth      int
-	value          value
-	offendingValue value
-	pos            source
-	msg            string
+	index     *index
+	code      errCode
+	exprDepth int
+	pos       source
+	format    string
+	args      []interface{}
 
+	// Debugging info
+	value   value
 	wrapped *bottom
 
 	// TODO: file at which the error was generated in the code.
@@ -127,7 +133,7 @@ type bottom struct {
 func (x *bottom) kind() kind { return bottomKind }
 
 func (x *bottom) Positions() []token.Pos {
-	if x.index != nil {
+	if x.index != nil { // TODO: remove check?
 		return appendPositions(nil, x.pos)
 	}
 	return nil
@@ -152,11 +158,22 @@ func appendPositions(pos []token.Pos, src source) []token.Pos {
 	return pos
 }
 
+func (x *bottom) Msg() (format string, args []interface{}) {
+	ctx := x.index.newContext()
+	// We need to copy to avoid races.
+	args = make([]interface{}, len(x.args))
+	copy(args, x.args)
+	preEvalArgs(ctx, args)
+	return x.format, x.args
+}
+
+func (x *bottom) msg() string {
+	return fmt.Sprint(x)
+}
+
 func (x *bottom) Format(s fmt.State, verb rune) {
-	fmt.Fprint(s, x.msg)
-	if x.wrapped != nil {
-		fmt.Fprint(s, ": ", x.wrapped)
-	}
+	msg, args := x.Msg()
+	fmt.Fprintf(s, msg, args...)
 }
 
 func cycleError(v evaluated) *bottom {
@@ -186,13 +203,14 @@ func (idx *index) mkErr(src source, args ...interface{}) *bottom {
 			e.code = x
 		case *bottom:
 			e.wrapped = x
-			e.offendingValue = x
 		case value:
-			e.offendingValue = x
-		case op:
-			panic("no longer using offending value and op")
 		case string:
-			e.msg += fmt.Sprintf(x, args[i+1:]...)
+			e.format = x
+			e.args = args[i+1:]
+			// Do not expand message so that errors can be localized.
+			for i, a := range e.args {
+				e.args[i] = fixArg(idx, a)
+			}
 			return e
 		}
 	}
@@ -200,6 +218,35 @@ func (idx *index) mkErr(src source, args ...interface{}) *bottom {
 		e.code = e.wrapped.code
 	}
 	return e
+}
+
+func fixArg(idx *index, x interface{}) interface{} {
+	switch x.(type) {
+	case uint, int, string:
+		return x
+	case value:
+		return x
+	}
+	t := reflect.TypeOf(x)
+	// Store all non-ptr types as is, as they cannot change.
+	if k := t.Kind(); k == reflect.String || k <= reflect.Complex128 {
+		return x
+	}
+	return fmt.Sprint(x)
+}
+
+// preEvalArgs is used to expand value arguments just before printing.
+func preEvalArgs(ctx *context, args []interface{}) {
+	for i, a := range args {
+		switch v := a.(type) {
+		case *bottom:
+			args[i] = v.msg()
+		case value:
+			// TODO: convert to Go values so that localization frameworks
+			// can format values accordingly.
+			args[i] = debugStr(ctx, v)
+		}
+	}
 }
 
 func isBottom(n value) bool {

@@ -680,7 +680,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 			index:     ctx.index,
 			code:      codeCycle,
 			value:     x.arcs[i].v,
-			msg:       "cycle detected",
+			format:    "cycle detected",
 		})
 		x.arcs[i].cache = &(ctx.evalStack[len(ctx.evalStack)-1])
 

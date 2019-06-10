@@ -46,7 +46,7 @@ type Message struct {
 
 // NewMessage creates an error message for human consumption. The arguments
 // are for later consumption, allowing the message to be localized at a later
-// time.
+// time. The passed argument list should not be modified.
 func NewMessage(format string, args []interface{}) Message {
 	return Message{format: format, args: args}
 }
@@ -71,6 +71,10 @@ type Error interface {
 	// Path returns the path into the data tree where the error occurred.
 	// This path may be nil if the error is not associated with such a location.
 	Path() []string
+
+	// Msg returns the unformatted error message and its arguments for human
+	// consumption.
+	Msg() (format string, args []interface{})
 }
 
 // Path returns the path of an Error if err is of that type.

@@ -126,12 +126,9 @@ func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structL
 
 func (v *astVisitor) errf(n ast.Node, format string, args ...interface{}) evaluated {
 	v.astState.errors.Add(&nodeError{
-		path: v.appendPath(nil),
-		n:    n,
-		Message: errors.Message{
-			Format: format,
-			Args:   args,
-		},
+		path:    v.appendPath(nil),
+		n:       n,
+		Message: errors.NewMessage(format, args),
 	})
 	arguments := append([]interface{}{format}, args...)
 	return v.mkErr(newNode(n), arguments...)
@@ -460,7 +457,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 
 	case *ast.BottomLit:
 		// TODO: record inline comment.
-		value = &bottom{baseValue: newExpr(n), msg: "from source"}
+		value = &bottom{baseValue: newExpr(n), format: "from source"}
 
 	case *ast.BadDecl:
 		// nothing to do

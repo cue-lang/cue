@@ -37,6 +37,10 @@ var (
 )
 
 func TestTutorial(t *testing.T) {
+	if testing.Short() {
+		t.Skip()
+	}
+
 	cwd, err := os.Getwd()
 	if err != nil {
 		t.Fatal(err)

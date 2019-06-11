@@ -64,7 +64,7 @@ func TestTutorial(t *testing.T) {
 	}
 
 	wd := filepath.Join(dir, "services")
-	if err := copy.Dir(filepath.Join("testdata", "services"), wd); err != nil {
+	if err := copy.Dir(filepath.Join("original", "services"), wd); err != nil {
 		t.Fatal(err)
 	}
 	if err := os.Chdir(wd); err != nil {

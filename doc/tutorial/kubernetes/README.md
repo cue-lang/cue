@@ -65,7 +65,7 @@ directory.
 We first make a copy of the data directory.
 
 ```
-$ cp -a testdata tmp
+$ cp -a original tmp
 $ cd tmp/services
 ```
 

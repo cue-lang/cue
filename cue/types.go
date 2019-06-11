@@ -167,8 +167,11 @@ func (e *marshalError) Error() string {
 }
 
 func (e *marshalError) Path() []string               { return e.err.Path() }
-func (e *marshalError) Position() token.Pos          { return e.err.Position() }
 func (e *marshalError) Msg() (string, []interface{}) { return e.err.Msg() }
+func (e *marshalError) Position() token.Pos          { return e.err.Position() }
+func (e *marshalError) InputPositions() []token.Pos {
+	return e.err.InputPositions()
+}
 
 func unwrapJSONError(err error) errors.Error {
 	switch x := err.(type) {

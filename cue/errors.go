@@ -44,6 +44,8 @@ func (e *nodeError) Position() token.Pos {
 	return e.n.Pos()
 }
 
+func (e *nodeError) InputPositions() []token.Pos { return nil }
+
 func (e *nodeError) Path() []string {
 	return e.path
 }
@@ -71,7 +73,7 @@ func (e *valueError) Position() token.Pos {
 	return e.err.Pos()
 }
 
-func (e *valueError) Positions() []token.Pos {
+func (e *valueError) InputPositions() []token.Pos {
 	return e.err.Positions()
 }
 

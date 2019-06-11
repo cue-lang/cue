@@ -63,7 +63,14 @@ func (m *Message) Error() string {
 
 // Error is the common error message.
 type Error interface {
+	// Position returns the primary position of an error. If multiple positions
+	// contribute equally, this reflects one of them.
 	Position() token.Pos
+
+	// InputPositions reports positions that contributed to an error, including
+	// the expressions resulting in the conflict, as well as values that were
+	// the input to this expression.
+	InputPositions() []token.Pos
 
 	// Error reports the error message without position information.
 	Error() string
@@ -77,16 +84,49 @@ type Error interface {
 	Msg() (format string, args []interface{})
 }
 
-// Path returns the path of an Error if err is of that type.
-func Path(err error) []string {
-	e, ok := err.(Error)
-	if !ok {
+// Positions returns all positions returned by an error, sorted
+// by relevance when possible and with duplicates removed.
+func Positions(err error) []token.Pos {
+	e := Error(nil)
+	if !xerrors.As(err, &e) {
 		return nil
 	}
-	return e.Path()
+
+	a := make([]token.Pos, 0, 3)
+
+	sortOffset := 0
+	pos := e.Position()
+	if pos.IsValid() {
+		a = append(a, pos)
+		sortOffset = 1
+	}
+
+	for _, p := range e.InputPositions() {
+		if p.IsValid() && p != pos {
+			a = append(a, p)
+		}
+	}
+
+	byPos := byPos(a[sortOffset:])
+	sort.Sort(byPos)
+	k := unique.ToFront(byPos)
+	return a[:k+sortOffset]
 }
 
-// // TODO: make Error an interface that returns a list of positions.
+type byPos []token.Pos
+
+func (s *byPos) Truncate(n int)    { (*s) = (*s)[:n] }
+func (s byPos) Len() int           { return len(s) }
+func (s byPos) Swap(i, j int)      { s[i], s[j] = s[j], s[i] }
+func (s byPos) Less(i, j int) bool { return comparePos(s[i], s[j]) == -1 }
+
+// Path returns the path of an Error if err is of that type.
+func Path(err error) []string {
+	if e := Error(nil); xerrors.As(err, &e) {
+		return e.Path()
+	}
+	return nil
+}
 
 // Newf creates an Error with the associated position and message.
 func Newf(p token.Pos, format string, args ...interface{}) Error {
@@ -123,6 +163,8 @@ type posError struct {
 func (p *posError) Path() []string {
 	return Path(p.err)
 }
+
+func (p *posError) InputPositions() []token.Pos { return nil }
 
 // E creates a new error.
 func E(args ...interface{}) error {
@@ -237,24 +279,37 @@ func (p List) Len() int      { return len(p) }
 func (p List) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 
 func (p List) Less(i, j int) bool {
-	e := p[i].Position()
-	f := p[j].Position()
+	if c := comparePos(p[i].Position(), p[j].Position()); c != 0 {
+		return c == -1
+	}
 	// Note that it is not sufficient to simply compare file offsets because
 	// the offsets do not reflect modified line information (through //line
 	// comments).
-	if e.Filename() != f.Filename() {
-		return e.Filename() < f.Filename()
-	}
-	if e.Line() != f.Line() {
-		return e.Line() < f.Line()
-	}
-	if e.Column() != f.Column() {
-		return e.Column() < f.Column()
-	}
+
 	if !equalPath(p[i].Path(), p[j].Path()) {
 		return lessPath(p[i].Path(), p[j].Path())
 	}
 	return p[i].Error() < p[j].Error()
+}
+
+func lessOrMore(isLess bool) int {
+	if isLess {
+		return -1
+	}
+	return 1
+}
+
+func comparePos(a, b token.Pos) int {
+	if a.Filename() != b.Filename() {
+		return lessOrMore(a.Filename() < b.Filename())
+	}
+	if a.Line() != b.Line() {
+		return lessOrMore(a.Line() < b.Line())
+	}
+	if a.Column() != b.Column() {
+		return lessOrMore(a.Column() < b.Column())
+	}
+	return 0
 }
 
 func lessPath(a, b []string) bool {
@@ -366,21 +421,8 @@ func printError(w io.Writer, err error, cfg *Config) {
 	}
 
 	positions := []string{}
-
-	for e := err; e != nil; e = xerrors.Unwrap(e) {
-		switch x := e.(type) {
-		case interface{ Positions() []token.Pos }:
-			for _, p := range x.Positions() {
-				if p.IsValid() {
-					positions = append(positions, p.String())
-				}
-			}
-
-		case interface{ Position() token.Pos }:
-			if pos := x.Position().String(); pos != "-" {
-				positions = append(positions, pos)
-			}
-		}
+	for _, p := range Positions(err) {
+		positions = append(positions, p.String())
 	}
 
 	if path := Path(err); path != nil {
@@ -391,8 +433,6 @@ func printError(w io.Writer, err error, cfg *Config) {
 		fprintf(w, "%v\n", err)
 		return
 	}
-
-	unique.Strings(&positions)
 
 	fprintf(w, "%v:\n", err)
 	for _, pos := range positions {

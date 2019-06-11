@@ -32,11 +32,6 @@ func New(msg string) error {
 	return errors.New(msg)
 }
 
-// A Handler is a generic error handler used throughout CUE packages.
-//
-// The position points to the beginning of the offending value.
-type Handler func(pos token.Pos, msg string)
-
 // A Message implements the error interface as well as Message to allow
 // internationalized messages.
 type Message struct {

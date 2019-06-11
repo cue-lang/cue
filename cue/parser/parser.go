@@ -70,7 +70,9 @@ func (p *parser) init(filename string, src []byte, mode []Option) {
 	if p.mode&parseCommentsMode != 0 {
 		m = scanner.ScanComments
 	}
-	eh := func(pos token.Pos, msg string) { p.errors.AddNew(pos, msg) }
+	eh := func(pos token.Pos, msg string, args []interface{}) {
+		p.errors.AddNew(pos, fmt.Sprintf(msg, args...))
+	}
 	p.scanner.Init(p.file, src, eh, m)
 
 	p.trace = p.mode&traceMode != 0 // for convenience (p.trace is used frequently)

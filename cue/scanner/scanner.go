@@ -25,20 +25,24 @@ import (
 	"unicode"
 	"unicode/utf8"
 
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
+
+// An ErrorHandler is a generic error handler used throughout CUE packages.
+//
+// The position points to the beginning of the offending value.
+type ErrorHandler func(pos token.Pos, msg string, args []interface{})
 
 // A Scanner holds the Scanner's internal state while processing
 // a given text. It can be allocated as part of another data
 // structure but must be initialized via Init before use.
 type Scanner struct {
 	// immutable state
-	file *token.File    // source file handle
-	dir  string         // directory portion of file.Name()
-	src  []byte         // source
-	err  errors.Handler // error reporting; or nil
-	mode Mode           // scanning mode
+	file *token.File  // source file handle
+	dir  string       // directory portion of file.Name()
+	src  []byte       // source
+	errh ErrorHandler // error reporting; or nil
+	mode Mode         // scanning mode
 
 	// scanning state
 	ch              rune // current character
@@ -75,14 +79,14 @@ func (s *Scanner) next() {
 		r, w := rune(s.src[s.rdOffset]), 1
 		switch {
 		case r == 0:
-			s.error(s.offset, "illegal character NUL")
+			s.errf(s.offset, "illegal character NUL")
 		case r >= utf8.RuneSelf:
 			// not ASCII
 			r, w = utf8.DecodeRune(s.src[s.rdOffset:])
 			if r == utf8.RuneError && w == 1 {
-				s.error(s.offset, "illegal UTF-8 encoding")
+				s.errf(s.offset, "illegal UTF-8 encoding")
 			} else if r == bom && s.offset > 0 {
-				s.error(s.offset, "illegal byte order mark")
+				s.errf(s.offset, "illegal byte order mark")
 			}
 		}
 		s.rdOffset += w
@@ -121,7 +125,7 @@ const (
 //
 // Note that Init may call err if there is an error in the first character
 // of the file.
-func (s *Scanner) Init(file *token.File, src []byte, err errors.Handler, mode Mode) {
+func (s *Scanner) Init(file *token.File, src []byte, eh ErrorHandler, mode Mode) {
 	// Explicitly initialize all fields since a scanner may be reused.
 	if file.Size() != len(src) {
 		panic(fmt.Sprintf("file size (%d) does not match src len (%d)", file.Size(), len(src)))
@@ -129,7 +133,7 @@ func (s *Scanner) Init(file *token.File, src []byte, err errors.Handler, mode Mo
 	s.file = file
 	s.dir, _ = filepath.Split(file.Name())
 	s.src = src
-	s.err = err
+	s.errh = eh
 	s.mode = mode
 
 	s.ch = ' '
@@ -145,9 +149,9 @@ func (s *Scanner) Init(file *token.File, src []byte, err errors.Handler, mode Mo
 	}
 }
 
-func (s *Scanner) error(offs int, msg string) {
-	if s.err != nil {
-		s.err(s.file.Pos(offs, 0), msg)
+func (s *Scanner) errf(offs int, msg string, args ...interface{}) {
+	if s.errh != nil {
+		s.errh(s.file.Pos(offs, 0), msg, args)
 	}
 	s.ErrorCount++
 }
@@ -210,7 +214,7 @@ func (s *Scanner) scanComment() string {
 		}
 	}
 
-	s.error(offs, "comment not terminated")
+	s.errf(offs, "comment not terminated")
 
 exit:
 	lit := s.src[offs:s.offset]
@@ -304,7 +308,7 @@ func (s *Scanner) scanMantissa(base int) {
 		s.next()
 	}
 	if last == '_' {
-		s.error(s.offset-1, "illegal '_' in number")
+		s.errf(s.offset-1, "illegal '_' in number")
 	}
 }
 
@@ -330,7 +334,7 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 			s.scanMantissa(16)
 			if s.offset-offs <= 2 {
 				// only scanned "0x" or "0X"
-				s.error(offs, "illegal hexadecimal number")
+				s.errf(offs, "illegal hexadecimal number")
 			}
 		} else if s.ch == 'b' {
 			// binary int
@@ -338,7 +342,7 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 			s.scanMantissa(2)
 			if s.offset-offs <= 2 {
 				// only scanned "0b"
-				s.error(offs, "illegal binary number")
+				s.errf(offs, "illegal binary number")
 			}
 		} else if s.ch == 'o' {
 			// octal int
@@ -346,7 +350,7 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 			s.scanMantissa(8)
 			if s.offset-offs <= 2 {
 				// only scanned "0o"
-				s.error(offs, "illegal octal number")
+				s.errf(offs, "illegal octal number")
 			}
 		} else {
 			// 0 or float
@@ -360,7 +364,7 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 			}
 			if seenDigits {
 				// integer other than 0 may not start with 0
-				s.error(offs, "illegal integer number")
+				s.errf(offs, "illegal integer number")
 			}
 		}
 		goto exit
@@ -450,7 +454,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 		if s.ch < 0 {
 			msg = "escape sequence not terminated"
 		}
-		s.error(offs, msg)
+		s.errf(offs, msg)
 		return false, false
 	}
 
@@ -458,11 +462,11 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	for n > 0 {
 		d := uint32(digitVal(s.ch))
 		if d >= base {
-			msg := fmt.Sprintf("illegal character %#U in escape sequence", s.ch)
 			if s.ch < 0 {
-				msg = "escape sequence not terminated"
+				s.errf(s.offset, "escape sequence not terminated")
+			} else {
+				s.errf(s.offset, "illegal character %#U in escape sequence", s.ch)
 			}
-			s.error(s.offset, msg)
 			return false, false
 		}
 		x = x*base + d
@@ -473,7 +477,7 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	// TODO: this is valid JSON, so remove, but normalize and report an error
 	// if for unmatched surrogate pairs .
 	if x > max {
-		s.error(offs, "escape sequence is invalid Unicode code point")
+		s.errf(offs, "escape sequence is invalid Unicode code point")
 		return false, false
 	}
 
@@ -494,7 +498,7 @@ func (s *Scanner) scanString(offset int, quote quoteInfo) (token.Token, string) 
 			break
 		}
 		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
-			s.error(offs, "string literal not terminated")
+			s.errf(offs, "string literal not terminated")
 			lit := s.src[offs:s.offset]
 			if hasCR {
 				lit = stripCR(lit)
@@ -573,7 +577,7 @@ func (s *Scanner) scanAttribute() (tok token.Token, lit string) {
 	s.scanIdentifier()
 
 	if s.ch != '(' {
-		s.error(s.offset, "invalid attribute: expected '('")
+		s.errf(s.offset, "invalid attribute: expected '('")
 		return token.ATTRIBUTE, string(s.src[offs:s.offset])
 	}
 	s.next()
@@ -589,7 +593,7 @@ func (s *Scanner) scanAttribute() (tok token.Token, lit string) {
 	if s.ch == ')' {
 		s.next()
 	} else {
-		s.error(s.offset, "attribute missing ')'")
+		s.errf(s.offset, "attribute missing ')'")
 	}
 	return token.ATTRIBUTE, string(s.src[offs:s.offset])
 }
@@ -612,7 +616,7 @@ func (s *Scanner) scanAttributeElem() {
 	for s.ch != ',' && s.ch != ')' && s.ch != '\n' && s.ch != -1 {
 		switch s.ch {
 		case '#', '\'', '"', '(', '=':
-			s.error(s.offset, "illegal character in attribute")
+			s.errf(s.offset, "illegal character in attribute")
 			s.recoverParen(1)
 			return
 		}
@@ -623,7 +627,7 @@ func (s *Scanner) scanAttributeElem() {
 func (s *Scanner) scanAttributeString() bool {
 	if s.ch == '#' || s.ch == '"' || s.ch == '\'' {
 		if _, tok, _ := s.Scan(); tok == token.INTERPOLATION {
-			s.error(s.offset, "interpolation not allowed in attribute")
+			s.errf(s.offset, "interpolation not allowed in attribute")
 			s.popInterpolation()
 			s.recoverParen(1)
 		}
@@ -784,7 +788,7 @@ scanAgain:
 				// Note that `_|x` is always equal to _.
 				s.next()
 				if s.ch != '_' {
-					s.error(s.file.Offset(pos), "illegal token '_|'; expected '_'")
+					s.errf(s.file.Offset(pos), "illegal token '_|'; expected '_'")
 					insertEOL = s.insertEOL // preserve insertComma info
 					tok = token.ILLEGAL
 					lit = "_|"
@@ -823,7 +827,7 @@ scanAgain:
 			case 1:
 				if ch == '"' || ch == '\'' {
 					if !s.hashCount(quote) {
-						s.error(offs, "string literal not terminated")
+						s.errf(offs, "string literal not terminated")
 					}
 					tok, lit = token.STRING, string(s.src[offs:s.offset])
 				}
@@ -852,7 +856,7 @@ scanAgain:
 					s.next()
 					tok = token.ELLIPSIS
 				} else {
-					s.error(s.file.Offset(pos), "illegal token '..'; expected '.'")
+					s.errf(s.file.Offset(pos), "illegal token '..'; expected '.'")
 				}
 			} else {
 				tok = token.PERIOD
@@ -946,7 +950,7 @@ scanAgain:
 		default:
 			// next reports unexpected BOMs - don't repeat
 			if ch != bom {
-				s.error(s.file.Offset(pos), fmt.Sprintf("illegal character %#U", ch))
+				s.errf(s.file.Offset(pos), "illegal character %#U", ch)
 			}
 			insertEOL = s.insertEOL // preserve insertSemi info
 			tok = token.ILLEGAL

@@ -208,8 +208,8 @@ func TestScan(t *testing.T) {
 	whitespace_linecount := newlineCount(whitespace)
 
 	// error handler
-	eh := func(_ token.Pos, msg string) {
-		t.Errorf("error handler called (msg = %s)", msg)
+	eh := func(_ token.Pos, msg string, args []interface{}) {
+		t.Errorf("error handler called (msg = %s)", fmt.Sprintf(msg, args...))
 	}
 
 	// verify scan
@@ -591,7 +591,8 @@ func TestInit(t *testing.T) {
 
 func TestScanInterpolation(t *testing.T) {
 	// error handler
-	eh := func(pos token.Pos, msg string) {
+	eh := func(pos token.Pos, msg string, args []interface{}) {
+		msg = fmt.Sprintf(msg, args...)
 		t.Errorf("error handler called (pos = %v, msg = %s)", pos, msg)
 	}
 	trim := func(s string) string { return strings.Trim(s, `#"\()`) }
@@ -646,7 +647,9 @@ func TestStdErrorHander(t *testing.T) {
 		"~ ~ ~" // original file, line 1 again
 
 	var list errors.List
-	eh := func(pos token.Pos, msg string) { list.AddNew(pos, msg) }
+	eh := func(pos token.Pos, msg string, args []interface{}) {
+		list.AddNew(pos, fmt.Sprintf(msg, args...))
+	}
 
 	var s Scanner
 	s.Init(token.NewFile("File1", 1, len(src)), []byte(src), eh, dontInsertCommas)
@@ -688,9 +691,9 @@ func checkError(t *testing.T, src string, tok token.Token, pos int, lit, err str
 	t.Helper()
 	var s Scanner
 	var h errorCollector
-	eh := func(pos token.Pos, msg string) {
+	eh := func(pos token.Pos, msg string, args []interface{}) {
 		h.cnt++
-		h.msg = msg
+		h.msg = fmt.Sprintf(msg, args...)
 		h.pos = pos
 	}
 	s.Init(token.NewFile("", 1, len(src)), []byte(src), eh, ScanComments|dontInsertCommas)

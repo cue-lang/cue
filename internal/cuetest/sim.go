@@ -57,8 +57,16 @@ func Run(t *testing.T, dir, command string, cfg *Config) {
 	logf(t, "Args: %q", args)
 
 	buf := &bytes.Buffer{}
+	if cfg.Golden != "" {
+		if cfg.Stdout != nil {
+			t.Fatal("cannot set Golden and Stdout")
+		}
+		cfg.Stdout = buf
+	}
 	cmd, err := cmd.New(args)
-	cmd.SetOutput(buf)
+	if cfg.Stdout != nil {
+		cmd.SetOutput(cfg.Stdout)
+	}
 	if cfg.Stdin != nil {
 		cmd.SetInput(cfg.Stdin)
 	}

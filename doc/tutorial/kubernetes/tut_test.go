@@ -15,6 +15,7 @@
 package kubernetes
 
 import (
+	"bytes"
 	"flag"
 	"fmt"
 	"io"
@@ -244,3 +245,33 @@ func logf(t *testing.T, format string, args ...interface{}) {
 
 // TODO:
 // Test manual and quick: evaluation results in output of testdata directory.
+
+func TestEval(t *testing.T) {
+	for _, dir := range []string{"quick", "manual"} {
+		t.Run(dir, func(t *testing.T) {
+			buf := &bytes.Buffer{}
+			cuetest.Run(t, dir, "cue eval ./...", &cuetest.Config{
+				Stdout: buf,
+			})
+
+			testfile := filepath.Join("testdata", dir+".out")
+
+			if *update {
+				err := ioutil.WriteFile(testfile, buf.Bytes(), 0644)
+				if err != nil {
+					t.Fatal(err)
+				}
+				return
+			}
+
+			b, err := ioutil.ReadFile(testfile)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if got, want := buf.String(), string(b); got != want {
+				t.Errorf("files differ:\n%s", diff.Diff(got, want))
+			}
+		})
+	}
+}

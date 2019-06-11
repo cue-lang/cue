@@ -1,0 +1,3961 @@
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services
+configMap: {
+}
+service: {
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: string
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: string
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: string
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend
+configMap: {
+}
+service: {
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/bartender
+configMap: {
+}
+service: {
+    bartender: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "bartender"
+            labels: {
+                component: "frontend"
+                app:       "bartender"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "bartender"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    bartender: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "bartender"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "bartender"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "bartender"
+                        image: "gcr.io/myproj/bartender:v0.1.34"
+                        args: []
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "bartender"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/breaddispatcher
+configMap: {
+}
+service: {
+    breaddispatcher: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "breaddispatcher"
+            labels: {
+                component: "frontend"
+                app:       "breaddispatcher"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "breaddispatcher"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    breaddispatcher: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "breaddispatcher"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "breaddispatcher"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "breaddispatcher"
+                        image: "gcr.io/myproj/breaddispatcher:v0.3.24"
+                        args: ["-etcd=etcd:2379", "-event-server=events:7788"]
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "breaddispatcher"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/host
+configMap: {
+}
+service: {
+    host: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "host"
+            labels: {
+                component: "frontend"
+                app:       "host"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "host"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    host: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "host"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "host"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "host"
+                        image: "gcr.io/myproj/host:v0.1.10"
+                        args: []
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 2
+        }
+        _name: "host"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/maitred
+configMap: {
+}
+service: {
+    maitred: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "maitred"
+            labels: {
+                component: "frontend"
+                app:       "maitred"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "maitred"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    maitred: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "maitred"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "maitred"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "maitred"
+                        image: "gcr.io/myproj/maitred:v0.0.4"
+                        args: []
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "maitred"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/valeter
+configMap: {
+}
+service: {
+    valeter: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "valeter"
+            labels: {
+                component: "frontend"
+                app:       "valeter"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "valeter"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "http"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    valeter: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "valeter"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "valeter"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "8080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "valeter"
+                        image: "gcr.io/myproj/valeter:v0.0.4"
+                        args: ["-http=:8080", "-etcd=etcd:2379"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "valeter"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/waiter
+configMap: {
+}
+service: {
+    waiter: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "waiter"
+            labels: {
+                component: "frontend"
+                app:       "waiter"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "waiter"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    waiter: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "waiter"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "waiter"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "waiter"
+                        image: "gcr.io/myproj/waiter:v0.3.0"
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 5
+        }
+        _name: "waiter"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/waterdispatcher
+configMap: {
+}
+service: {
+    waterdispatcher: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "waterdispatcher"
+            labels: {
+                component: "frontend"
+                app:       "waterdispatcher"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "frontend"
+                app:       "waterdispatcher"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "http"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    waterdispatcher: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "waterdispatcher"
+            labels: {
+                component: "frontend"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "frontend"
+                        app:       "waterdispatcher"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "waterdispatcher"
+                        image: "gcr.io/myproj/waterdispatcher:v0.0.48"
+                        args: ["-http=:8080", "-etcd=etcd:2379"]
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "waterdispatcher"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "frontend"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "frontend"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "frontend"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra
+configMap: {
+}
+service: {
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/download
+configMap: {
+}
+service: {
+    download: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "download"
+            labels: {
+                component: "infra"
+                app:       "download"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "infra"
+                app:       "download"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       7080
+                targetPort: 7080
+            }]
+        }
+    }
+}
+deployment: {
+    download: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "download"
+            labels: {
+                component: "infra"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "infra"
+                        app:       "download"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "download"
+                        image: "gcr.io/myproj/download:v0.0.2"
+                        ports: [{
+                            containerPort: 7080
+                            _export:       true
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "download"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/etcd
+configMap: {
+}
+service: {
+    etcd: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "etcd"
+            labels: {
+                component: "infra"
+                app:       "etcd"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "infra"
+                app:       "etcd"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       2379
+                targetPort: 2379
+            }, {
+                name:       "peer"
+                protocol:   "TCP"
+                port:       2380
+                targetPort: 2380
+            }]
+            clusterIP: "None"
+        }
+    }
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+    etcd: {
+        kind:       "StatefulSet"
+        apiVersion: "apps/v1beta1"
+        metadata: {
+            name: "etcd"
+            labels: {
+                component: "infra"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "infra"
+                        app:       "etcd"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "2379"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name: "etcd"
+                        env: [{
+                            name:  "ETCDCTL_API"
+                            value: "3"
+                        }, {
+                            name:  "ETCD_AUTO_COMPACTION_RETENTION"
+                            value: "4"
+                        }, {
+                            name: "NAME"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "metadata.name"
+                                }
+                            }
+                        }, {
+                            name: "IP"
+                            valueFrom: {
+                                fieldRef: {
+                                    fieldPath: "status.podIP"
+                                }
+                            }
+                        }]
+                        image: "quay.io/coreos/etcd:v3.3.10"
+                        command: ["/usr/local/bin/etcd"]
+                        args: ["-name", "$(NAME)", "-data-dir", "/data/etcd3", "-initial-advertise-peer-urls", "http://$(IP):2380", "-listen-peer-urls", "http://$(IP):2380", "-listen-client-urls", "http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls", "http://$(IP):2379", "-discovery", "https://discovery.etcd.io/xxxxxx"]
+                        ports: [{
+                            name:          "client"
+                            containerPort: 2379
+                            _export:       true
+                        }, {
+                            name:          "peer"
+                            containerPort: 2380
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "etcd3"
+                            mountPath: "/data"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 30
+                            httpGet: {
+                                path: "/health"
+                                port: "client"
+                            }
+                        }
+                    }]
+                    terminationGracePeriodSeconds: 10
+                    affinity: {
+                        podAntiAffinity: {
+                            requiredDuringSchedulingIgnoredDuringExecution: [{
+                                labelSelector: {
+                                    matchExpressions: [{
+                                        key:      "app"
+                                        operator: "In"
+                                        values: ["etcd"]
+                                    }]
+                                }
+                                topologyKey: "kubernetes.io/hostname"
+                            }]
+                        }
+                    }
+                }
+            }
+            replicas:    3
+            serviceName: "etcd"
+            volumeClaimTemplates: [{
+                metadata: {
+                    name: "etcd3"
+                    annotations: {
+                        "volume.alpha.kubernetes.io/storage-class": "default"
+                    }
+                }
+                spec: {
+                    resources: {
+                        requests: {
+                            storage: "10Gi"
+                        }
+                    }
+                    accessModes: ["ReadWriteOnce"]
+                }
+            }]
+        }
+        _name: "etcd"
+    }
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/events
+configMap: {
+}
+service: {
+    events: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "events"
+            labels: {
+                component: "infra"
+                app:       "events"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "infra"
+                app:       "events"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "grpc"
+                protocol:   "TCP"
+                port:       7788
+                targetPort: 7788
+            }]
+        }
+    }
+}
+deployment: {
+    events: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "events"
+            labels: {
+                component: "infra"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "infra"
+                        app:       "events"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "biz-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "events"
+                        image: "gcr.io/myproj/events:v0.1.31"
+                        args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
+                        ports: [{
+                            containerPort: 7080
+                            _export:       false
+                        }, {
+                            containerPort: 7788
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "secret-volume"
+                            mountPath: "/etc/ssl"
+                        }]
+                    }]
+                    affinity: {
+                        podAntiAffinity: {
+                            requiredDuringSchedulingIgnoredDuringExecution: [{
+                                labelSelector: {
+                                    matchExpressions: [{
+                                        key:      "app"
+                                        operator: "In"
+                                        values: ["events"]
+                                    }]
+                                }
+                                topologyKey: "kubernetes.io/hostname"
+                            }]
+                        }
+                    }
+                }
+            }
+            replicas: 2
+        }
+        _name: "events"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/tasks
+configMap: {
+}
+service: {
+    tasks: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "tasks"
+            labels: {
+                component: "infra"
+                app:       "tasks"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            type: "LoadBalancer"
+            selector: {
+                component: "infra"
+                app:       "tasks"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "http"
+                protocol:   "TCP"
+                port:       443
+                targetPort: 7443
+            }]
+            loadBalancerIP: "1.2.3.4"
+        }
+    }
+}
+deployment: {
+    tasks: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "tasks"
+            labels: {
+                component: "infra"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "infra"
+                        app:       "tasks"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                        "prometheus.io.port":   "7080"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "star-example-com-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "tasks"
+                        image: "gcr.io/myproj/tasks:v0.2.6"
+                        ports: [{
+                            containerPort: 7080
+                            _export:       false
+                        }, {
+                            containerPort: 7443
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "secret-volume"
+                            mountPath: "/etc/ssl"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "tasks"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/updater
+configMap: {
+}
+service: {
+    updater: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "updater"
+            labels: {
+                component: "infra"
+                app:       "updater"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "infra"
+                app:       "updater"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    updater: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "updater"
+            labels: {
+                component: "infra"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "infra"
+                        app:       "updater"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-updater"
+                        secret: {
+                            secretName: "updater-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "updater"
+                        image: "gcr.io/myproj/updater:v0.1.0"
+                        args: ["-key=/etc/certs/updater.pem"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "secret-updater"
+                            mountPath: "/etc/certs"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "updater"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/watcher
+configMap: {
+}
+service: {
+    watcher: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "watcher"
+            labels: {
+                component: "infra"
+                app:       "watcher"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            type: "LoadBalancer"
+            selector: {
+                component: "infra"
+                app:       "watcher"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "http"
+                protocol:   "TCP"
+                port:       7788
+                targetPort: 7788
+            }]
+            loadBalancerIP: "1.2.3.4."
+        }
+    }
+}
+deployment: {
+    watcher: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "watcher"
+            labels: {
+                component: "infra"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "infra"
+                        app:       "watcher"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "star-example-com-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "watcher"
+                        image: "gcr.io/myproj/watcher:v0.1.0"
+                        ports: [{
+                            containerPort: 7080
+                            _export:       false
+                        }, {
+                            containerPort: 7788
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "secret-volume"
+                            mountPath: "/etc/ssl"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "watcher"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "infra"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "infra"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "infra"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen
+configMap: {
+}
+service: {
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/caller
+configMap: {
+}
+service: {
+    caller: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "caller"
+            labels: {
+                component: "kitchen"
+                app:       "caller"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "caller"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    caller: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "caller"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "caller"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "ssd-caller"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "ssd-caller"
+                        }
+                    }, {
+                        name: "secret-caller"
+                        secret: {
+                            secretName: "caller-secrets"
+                        }
+                    }, {
+                        name: "secret-ssh-key"
+                        secret: {
+                            secretName: "secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "caller"
+                        image: "gcr.io/myproj/caller:v0.20.14"
+                        args: ["-env=prod", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "ssd-caller"
+                            mountPath: "/logs"
+                        }, {
+                            name:      "secret-caller"
+                            readOnly:  true
+                            mountPath: "/etc/certs"
+                        }, {
+                            name:      "secret-ssh-key"
+                            readOnly:  true
+                            mountPath: "/sslcerts"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: true
+                }
+            }
+            replicas: 3
+        }
+        _name: "caller"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/dishwasher
+configMap: {
+}
+service: {
+    dishwasher: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "dishwasher"
+            labels: {
+                component: "kitchen"
+                app:       "dishwasher"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "dishwasher"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    dishwasher: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "dishwasher"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "dishwasher"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "dishwasher-disk"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "dishwasher-disk"
+                        }
+                    }, {
+                        name: "secret-dishwasher"
+                        secret: {
+                            secretName: "dishwasher-secrets"
+                        }
+                    }, {
+                        name: "secret-ssh-key"
+                        secret: {
+                            secretName: "dishwasher-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "dishwasher"
+                        image: "gcr.io/myproj/dishwasher:v0.2.13"
+                        args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "dishwasher-disk"
+                            mountPath: "/logs"
+                        }, {
+                            name:      "secret-dishwasher"
+                            readOnly:  true
+                            mountPath: "/sslcerts"
+                        }, {
+                            name:      "secret-ssh-key"
+                            readOnly:  true
+                            mountPath: "/etc/certs"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: true
+                }
+            }
+            replicas: 5
+        }
+        _name: "dishwasher"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/expiditer
+configMap: {
+}
+service: {
+    expiditer: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "expiditer"
+            labels: {
+                component: "kitchen"
+                app:       "expiditer"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "expiditer"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    expiditer: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "expiditer"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "expiditer"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "expiditer-disk"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "expiditer-disk"
+                        }
+                    }, {
+                        name: "secret-expiditer"
+                        secret: {
+                            secretName: "expiditer-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "expiditer"
+                        image: "gcr.io/myproj/expiditer:v0.5.34"
+                        args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "expiditer-disk"
+                            mountPath: "/logs"
+                        }, {
+                            name:      "secret-expiditer"
+                            readOnly:  true
+                            mountPath: "/etc/certs"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: true
+                }
+            }
+            replicas: 1
+        }
+        _name: "expiditer"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/headchef
+configMap: {
+}
+service: {
+    headchef: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "headchef"
+            labels: {
+                component: "kitchen"
+                app:       "headchef"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "headchef"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    headchef: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "headchef"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "headchef"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "headchef-disk"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "headchef-disk"
+                        }
+                    }, {
+                        name: "secret-headchef"
+                        secret: {
+                            secretName: "headchef-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "headchef"
+                        image: "gcr.io/myproj/headchef:v0.2.16"
+                        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "headchef-disk"
+                            mountPath: "/logs"
+                        }, {
+                            name:      "secret-headchef"
+                            readOnly:  true
+                            mountPath: "/sslcerts"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: true
+                }
+            }
+            replicas: 1
+        }
+        _name: "headchef"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/linecook
+configMap: {
+}
+service: {
+    linecook: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "linecook"
+            labels: {
+                component: "kitchen"
+                app:       "linecook"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "linecook"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    linecook: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "linecook"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "linecook"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "linecook-disk"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "linecook-disk"
+                        }
+                    }, {
+                        name: "secret-kitchen"
+                        secret: {
+                            secretName: "secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "linecook"
+                        image: "gcr.io/myproj/linecook:v0.1.42"
+                        args: ["-name=linecook", "-env=prod", "-logdir=/logs", "-event-server=events:7788", "-etcd", "etcd:2379", "-reconnect-delay", "1h", "-recovery-overlap", "100000"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "linecook-disk"
+                            mountPath: "/logs"
+                        }, {
+                            name:      "secret-kitchen"
+                            readOnly:  true
+                            mountPath: "/etc/certs"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: true
+                }
+            }
+            replicas: 1
+        }
+        _name: "linecook"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/pastrychef
+configMap: {
+}
+service: {
+    pastrychef: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "pastrychef"
+            labels: {
+                component: "kitchen"
+                app:       "pastrychef"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "pastrychef"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    pastrychef: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "pastrychef"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "pastrychef"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "pastrychef-disk"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "pastrychef-disk"
+                        }
+                    }, {
+                        name: "secret-ssh-key"
+                        secret: {
+                            secretName: "secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "pastrychef"
+                        image: "gcr.io/myproj/pastrychef:v0.1.15"
+                        args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "pastrychef-disk"
+                            mountPath: "/logs"
+                        }, {
+                            name:      "secret-ssh-key"
+                            readOnly:  true
+                            mountPath: "/etc/certs"
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: true
+                }
+            }
+            replicas: 1
+        }
+        _name: "pastrychef"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/souschef
+configMap: {
+}
+service: {
+    souschef: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "souschef"
+            labels: {
+                component: "kitchen"
+                app:       "souschef"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "kitchen"
+                app:       "souschef"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       8080
+                targetPort: 8080
+            }]
+        }
+    }
+}
+deployment: {
+    souschef: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "souschef"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "kitchen"
+                        app:       "souschef"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "souschef"
+                        image: "gcr.io/myproj/souschef:v0.5.3"
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        livenessProbe: {
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
+                            httpGet: {
+                                path: "/debug/health"
+                                port: 8080
+                            }
+                        }
+                    }]
+                    _hasDisks: false
+                }
+            }
+            replicas: 1
+        }
+        _name: "souschef"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "kitchen"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "kitchen"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "kitchen"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon
+configMap: {
+}
+service: {
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "mon"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "mon"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "mon"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/alertmanager
+configMap: {
+    alertmanager: {
+        kind:       "ConfigMap"
+        apiVersion: "v1"
+        metadata: {
+            name: "alertmanager"
+            labels: {
+                component: "mon"
+            }
+        }
+        data: {
+            "alerts.yaml": """
+        receivers:
+        - name: pager
+          slack_configs:
+          - channel: '#cloudmon'
+            send_resolved: true
+            text: |-
+              {{ range .Alerts }}{{ .Annotations.description }}
+              {{ end }}
+        route:
+          group_by:
+          - alertname
+          - cluster
+          receiver: pager
+        
+        """
+        }
+    }
+}
+service: {
+    alertmanager: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "alertmanager"
+            labels: {
+                name:      "alertmanager"
+                component: "mon"
+                app:       "alertmanager"
+                domain:    "prod"
+            }
+            annotations: {
+                "prometheus.io/scrape": "true"
+                "prometheus.io/path":   "/metrics"
+            }
+        }
+        spec: {
+            selector: {
+                name:      "alertmanager"
+                component: "mon"
+                app:       "alertmanager"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "main"
+                protocol:   "TCP"
+                port:       9093
+                targetPort: 9093
+            }]
+        }
+    }
+}
+deployment: {
+    alertmanager: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "alertmanager"
+            labels: {
+                component: "mon"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "alertmanager"
+                }
+            }
+            template: {
+                metadata: {
+                    name: "alertmanager"
+                    labels: {
+                        component: "mon"
+                        app:       "alertmanager"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "config-volume"
+                        configMap: {
+                            name: "alertmanager"
+                        }
+                    }, {
+                        name: "alertmanager"
+                        emptyDir: {
+                        }
+                    }]
+                    containers: [{
+                        name:  "alertmanager"
+                        image: "prom/alertmanager:v0.15.2"
+                        args: ["--config.file=/etc/alertmanager/alerts.yaml", "--storage.path=/alertmanager", "--web.external-url=https://alertmanager.example.com"]
+                        ports: [{
+                            name:          "alertmanager"
+                            containerPort: 9093
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "config-volume"
+                            mountPath: "/etc/alertmanager"
+                        }, {
+                            name:      "alertmanager"
+                            mountPath: "/alertmanager"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "alertmanager"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "mon"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "mon"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "mon"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/grafana
+configMap: {
+}
+service: {
+    grafana: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "grafana"
+            labels: {
+                component: "mon"
+                app:       "grafana"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "mon"
+                app:       "grafana"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "grafana"
+                protocol:   "TCP"
+                port:       3000
+                targetPort: 3000
+            }]
+        }
+    }
+}
+deployment: {
+    grafana: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "grafana"
+            labels: {
+                component: "mon"
+                app:       "grafana"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "mon"
+                        app:       "grafana"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "grafana-volume"
+                        gcePersistentDisk: {
+                            fsType: "ext4"
+                            pdName: "grafana-volume"
+                        }
+                    }]
+                    containers: [{
+                        name: "grafana"
+                        env: [{
+                            name:  "GF_AUTH_BASIC_ENABLED"
+                            value: "false"
+                        }, {
+                            name:  "GF_AUTH_ANONYMOUS_ENABLED"
+                            value: "true"
+                        }, {
+                            name:  "GF_AUTH_ANONYMOUS_ORG_ROLE"
+                            value: "admin"
+                        }]
+                        resources: {
+                            limits: {
+                                cpu:    "100m"
+                                memory: "100Mi"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "100Mi"
+                            }
+                        }
+                        image: "grafana/grafana:4.5.2"
+                        ports: [{
+                            containerPort: 8080
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "grafana-volume"
+                            mountPath: "/var/lib/grafana"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "grafana"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "mon"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "mon"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "mon"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/nodeexporter
+configMap: {
+}
+service: {
+    "node-exporter": {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "node-exporter"
+            labels: {
+                component: "mon"
+                app:       "node-exporter"
+                domain:    "prod"
+            }
+            annotations: {
+                "prometheus.io/scrape": "true"
+            }
+        }
+        spec: {
+            type: "ClusterIP"
+            selector: {
+                component: "mon"
+                app:       "node-exporter"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "metrics"
+                protocol:   "TCP"
+                port:       9100
+                targetPort: 9100
+            }]
+            clusterIP: "None"
+        }
+    }
+}
+deployment: {
+}
+daemonSet: {
+    "node-exporter": {
+        kind:       "DaemonSet"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "node-exporter"
+            labels: {
+                component: "mon"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    name: "node-exporter"
+                    labels: {
+                        component: "mon"
+                        app:       "node-exporter"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "proc"
+                        hostPath: {
+                            path: "/proc"
+                        }
+                    }, {
+                        name: "sys"
+                        hostPath: {
+                            path: "/sys"
+                        }
+                    }]
+                    containers: [{
+                        name: "node-exporter"
+                        resources: {
+                            limits: {
+                                cpu:    "200m"
+                                memory: "50Mi"
+                            }
+                            requests: {
+                                cpu:    "100m"
+                                memory: "30Mi"
+                            }
+                        }
+                        image: "quay.io/prometheus/node-exporter:v0.16.0"
+                        args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
+                        ports: [{
+                            name:          "scrape"
+                            hostPort:      9100
+                            containerPort: 9100
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "proc"
+                            readOnly:  true
+                            mountPath: "/host/proc"
+                        }, {
+                            name:      "sys"
+                            readOnly:  true
+                            mountPath: "/host/sys"
+                        }]
+                    }]
+                    hostNetwork: true
+                    hostPID:     true
+                }
+            }
+        }
+        _name: "node-exporter"
+    }
+}
+statefulSet: {
+}
+_component: "mon"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "mon"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "mon"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/prometheus
+configMap: {
+    prometheus: {
+        kind:       "ConfigMap"
+        apiVersion: "v1"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                component: "mon"
+            }
+        }
+        data: {
+            "alert.rules": """
+        groups:
+        - name: rules.yaml
+          rules:
+          - alert: InstanceDown
+            annotations:
+              description: '{{$labels.app}} of job {{ $labels.job }} has been down for more
+                than 30 seconds.'
+              summary: Instance {{$labels.app}} down
+            expr: up == 0
+            for: 30s
+            labels:
+              severity: page
+          - alert: InsufficientPeers
+            annotations:
+              description: If one more etcd peer goes down the cluster will be unavailable
+              summary: etcd cluster small
+            expr: count(up{job=\"etcd\"} == 0) > (count(up{job=\"etcd\"}) / 2 - 1)
+            for: 3m
+            labels:
+              severity: page
+          - alert: EtcdNoMaster
+            annotations:
+              summary: No ETCD master elected.
+            expr: sum(etcd_server_has_leader{app=\"etcd\"}) == 0
+            for: 1s
+            labels:
+              severity: page
+          - alert: PodRestart
+            annotations:
+              description: '{{$labels.app}} {{ $labels.container }} resturted {{ $value }}
+                times in 5m.'
+              summary: Pod for {{$labels.container}} restarts too often
+            expr: (max_over_time(pod_container_status_restarts_total[5m]) - min_over_time(pod_container_status_restarts_total[5m]))
+              > 2
+            for: 1m
+            labels:
+              severity: page
+        
+        """
+            "prometheus.yml": """
+        alerting:
+          alertmanagers:
+          - scheme: http
+            static_configs:
+            - targets:
+              - alertmanager:9093
+        global:
+          scrape_interval: 15s
+        rule_files:
+        - /etc/prometheus/alert.rules
+        scrape_configs:
+        - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          job_name: kubernetes-apiservers
+          kubernetes_sd_configs:
+          - role: endpoints
+          relabel_configs:
+          - action: keep
+            regex: default;kubernetes;https
+            source_labels:
+            - __meta_kubernetes_namespace
+            - __meta_kubernetes_service_name
+            - __meta_kubernetes_endpoint_port_name
+          scheme: https
+          tls_config:
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          job_name: kubernetes-nodes
+          kubernetes_sd_configs:
+          - role: node
+          relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - replacement: kubernetes.default.svc:443
+            target_label: __address__
+          - regex: (.+)
+            replacement: /api/v1/nodes/${1}/proxy/metrics
+            source_labels:
+            - __meta_kubernetes_node_name
+            target_label: __metrics_path__
+          scheme: https
+          tls_config:
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          job_name: kubernetes-cadvisor
+          kubernetes_sd_configs:
+          - role: node
+          relabel_configs:
+          - action: labelmap
+            regex: __meta_kubernetes_node_label_(.+)
+          - replacement: kubernetes.default.svc:443
+            target_label: __address__
+          - regex: (.+)
+            replacement: /api/v1/nodes/${1}/proxy/metrics/cadvisor
+            source_labels:
+            - __meta_kubernetes_node_name
+            target_label: __metrics_path__
+          scheme: https
+          tls_config:
+            ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
+        - job_name: kubernetes-service-endpoints
+          kubernetes_sd_configs:
+          - role: endpoints
+          relabel_configs:
+          - action: keep
+            regex: true
+            source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scrape
+          - action: replace
+            regex: (https?)
+            source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_scheme
+            target_label: __scheme__
+          - action: replace
+            regex: (.+)
+            source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_path
+            target_label: __metrics_path__
+          - action: replace
+            regex: ([^:]+)(?::\\d+)?;(\\d+)
+            replacement: $1:$2
+            source_labels:
+            - __address__
+            - __meta_kubernetes_service_annotation_prometheus_io_port
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+          - action: replace
+            source_labels:
+            - __meta_kubernetes_namespace
+            target_label: kubernetes_namespace
+          - action: replace
+            source_labels:
+            - __meta_kubernetes_service_name
+            target_label: kubernetes_name
+        - job_name: kubernetes-services
+          kubernetes_sd_configs:
+          - role: service
+          metrics_path: /probe
+          params:
+            module:
+            - http_2xx
+          relabel_configs:
+          - action: keep
+            regex: true
+            source_labels:
+            - __meta_kubernetes_service_annotation_prometheus_io_probe
+          - source_labels:
+            - __address__
+            target_label: __param_target
+          - replacement: blackbox-exporter.example.com:9115
+            target_label: __address__
+          - source_labels:
+            - __param_target
+            target_label: app
+          - action: labelmap
+            regex: __meta_kubernetes_service_label_(.+)
+          - source_labels:
+            - __meta_kubernetes_namespace
+            target_label: kubernetes_namespace
+          - source_labels:
+            - __meta_kubernetes_service_name
+            target_label: kubernetes_name
+        - job_name: kubernetes-ingresses
+          kubernetes_sd_configs:
+          - role: ingress
+          metrics_path: /probe
+          params:
+            module:
+            - http_2xx
+          relabel_configs:
+          - action: keep
+            regex: true
+            source_labels:
+            - __meta_kubernetes_ingress_annotation_prometheus_io_probe
+          - regex: (.+);(.+);(.+)
+            replacement: ${1}://${2}${3}
+            source_labels:
+            - __meta_kubernetes_ingress_scheme
+            - __address__
+            - __meta_kubernetes_ingress_path
+            target_label: __param_target
+          - replacement: blackbox-exporter.example.com:9115
+            target_label: __address__
+          - source_labels:
+            - __param_target
+            target_label: app
+          - action: labelmap
+            regex: __meta_kubernetes_ingress_label_(.+)
+          - source_labels:
+            - __meta_kubernetes_namespace
+            target_label: kubernetes_namespace
+          - source_labels:
+            - __meta_kubernetes_ingress_name
+            target_label: kubernetes_name
+        - job_name: kubernetes-pods
+          kubernetes_sd_configs:
+          - role: pod
+          relabel_configs:
+          - action: keep
+            regex: true
+            source_labels:
+            - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+          - action: replace
+            regex: (.+)
+            source_labels:
+            - __meta_kubernetes_pod_annotation_prometheus_io_path
+            target_label: __metrics_path__
+          - action: replace
+            regex: ([^:]+)(?::\\d+)?;(\\d+)
+            replacement: $1:$2
+            source_labels:
+            - __address__
+            - __meta_kubernetes_pod_annotation_prometheus_io_port
+            target_label: __address__
+          - action: labelmap
+            regex: __meta_kubernetes_pod_label_(.+)
+          - action: replace
+            source_labels:
+            - __meta_kubernetes_namespace
+            target_label: kubernetes_namespace
+          - action: replace
+            source_labels:
+            - __meta_kubernetes_pod_name
+            target_label: kubernetes_pod_name
+        
+        """
+        }
+    }
+}
+service: {
+    prometheus: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                name:      "prometheus"
+                component: "mon"
+                app:       "prometheus"
+                domain:    "prod"
+            }
+            annotations: {
+                "prometheus.io/scrape": "true"
+            }
+        }
+        spec: {
+            type: "NodePort"
+            selector: {
+                name:      "prometheus"
+                component: "mon"
+                app:       "prometheus"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "main"
+                protocol:   "TCP"
+                port:       9090
+                targetPort: 9090
+                nodePort:   30900
+            }]
+        }
+    }
+}
+deployment: {
+    prometheus: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "prometheus"
+            labels: {
+                component: "mon"
+            }
+        }
+        spec: {
+            selector: {
+                matchLabels: {
+                    app: "prometheus"
+                }
+            }
+            template: {
+                metadata: {
+                    name: "prometheus"
+                    labels: {
+                        component: "mon"
+                        app:       "prometheus"
+                        domain:    "prod"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "config-volume"
+                        configMap: {
+                            name: "prometheus"
+                        }
+                    }]
+                    containers: [{
+                        name:  "prometheus"
+                        image: "prom/prometheus:v2.4.3"
+                        args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
+                        ports: [{
+                            name:          "web"
+                            containerPort: 9090
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "config-volume"
+                            mountPath: "/etc/prometheus"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+            strategy: {
+                type: "RollingUpdate"
+                rollingUpdate: {
+                    maxUnavailable: 1
+                    maxSurge:       0
+                }
+            }
+        }
+        _name: "prometheus"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "mon"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "mon"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "mon"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy
+configMap: {
+}
+service: {
+}
+deployment: {
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "proxy"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "proxy"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "proxy"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy/authproxy
+configMap: {
+    authproxy: {
+        kind:       "ConfigMap"
+        apiVersion: "v1"
+        metadata: {
+            name: "authproxy"
+            labels: {
+                component: "proxy"
+            }
+        }
+        data: {
+            "authproxy.cfg": """
+        # Google Auth Proxy Config File
+        ## https://github.com/bitly/google_auth_proxy
+        
+        ## <addr>:<port> to listen on for HTTP clients
+        http_address = \"0.0.0.0:4180\"
+        
+        ## the OAuth Redirect URL.
+        redirect_url = \"https://auth.example.com/oauth2/callback\"
+        
+        ## the http url(s) of the upstream endpoint. If multiple, routing is based on path
+        upstreams = [
+            # frontend
+            \"http://frontend-waiter:7080/dpr/\",
+            \"http://frontend-maitred:7080/ui/\",
+            \"http://frontend-maitred:7080/ui\",
+            \"http://frontend-maitred:7080/report/\",
+            \"http://frontend-maitred:7080/report\",
+            \"http://frontend-maitred:7080/static/\",
+            # kitchen
+            \"http://kitchen-chef:8080/visit\",
+            # infrastructure
+            \"http://download:7080/file/\",
+            \"http://download:7080/archive\",
+            \"http://tasks:7080/tasks\",
+            \"http://tasks:7080/tasks/\",
+        ]
+        
+        ## pass HTTP Basic Auth, X-Forwarded-User and X-Forwarded-Email information to upstream
+        pass_basic_auth = true
+        request_logging = true
+        
+        ## Google Apps Domains to allow authentication for
+        google_apps_domains = [
+            \"example.com\",
+        ]
+        
+        email_domains = [
+            \"example.com\",
+        ]
+        
+        ## The Google OAuth Client ID, Secret
+        client_id = \"---\"
+        client_secret = \"---\"
+        
+        ## Cookie Settings
+        ## Secret - the seed string for secure cookies
+        ## Domain - optional cookie domain to force cookies to (ie: .yourcompany.com)
+        ## Expire - expire timeframe for cookie
+        cookie_secret = \"won't tell you\"
+        cookie_domain = \".example.com\"
+        cookie_https_only = true
+        """
+        }
+    }
+}
+service: {
+    authproxy: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "authproxy"
+            labels: {
+                component: "proxy"
+                app:       "authproxy"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            selector: {
+                component: "proxy"
+                app:       "authproxy"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "client"
+                protocol:   "TCP"
+                port:       4180
+                targetPort: 4180
+            }]
+        }
+    }
+}
+deployment: {
+    authproxy: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "authproxy"
+            labels: {
+                component: "proxy"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "proxy"
+                        app:       "authproxy"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "config-volume"
+                        configMap: {
+                            name: "authproxy"
+                        }
+                    }]
+                    containers: [{
+                        name:  "authproxy"
+                        image: "skippy/oauth2_proxy:2.0.1"
+                        args: ["--config=/etc/authproxy/authproxy.cfg"]
+                        ports: [{
+                            containerPort: 4180
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "config-volume"
+                            mountPath: "/etc/authproxy"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "authproxy"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "proxy"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "proxy"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "proxy"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy/goget
+configMap: {
+}
+service: {
+    goget: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "goget"
+            labels: {
+                component: "proxy"
+                app:       "goget"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            type: "LoadBalancer"
+            selector: {
+                component: "proxy"
+                app:       "goget"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "https"
+                protocol:   "TCP"
+                port:       443
+                targetPort: 7443
+            }]
+            loadBalancerIP: "1.3.5.7"
+        }
+    }
+}
+deployment: {
+    goget: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "goget"
+            labels: {
+                component: "proxy"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "proxy"
+                        app:       "goget"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "goget-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "goget"
+                        image: "gcr.io/myproj/goget:v0.5.1"
+                        ports: [{
+                            containerPort: 7443
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "secret-volume"
+                            mountPath: "/etc/ssl"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "goget"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "proxy"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "proxy"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "proxy"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}
+
+// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy/nginx
+configMap: {
+    nginx: {
+        kind:       "ConfigMap"
+        apiVersion: "v1"
+        metadata: {
+            name: "nginx"
+            labels: {
+                component: "proxy"
+            }
+        }
+        data: {
+            "nginx.conf": """
+        events {
+            worker_connections 768;
+        }
+        http {
+            sendfile on;
+            tcp_nopush on;
+            tcp_nodelay on;
+            # needs to be high for some download jobs.
+            keepalive_timeout 400;
+            # proxy_connect_timeout  300;
+            proxy_send_timeout       300;
+            proxy_read_timeout       300;
+            send_timeout             300;
+        
+            types_hash_max_size 2048;
+        
+            include /etc/nginx/mime.types;
+            default_type application/octet-stream;
+        
+            access_log /dev/stdout;
+            error_log  /dev/stdout;
+        
+            # Disable POST body size constraints. We often deal with large
+            # files. Especially docker containers may be large.
+            client_max_body_size 0;
+        
+            upstream goget {
+                server localhost:7070;
+            }
+        
+            # Redirect incoming Google Cloud Storage notifications:
+           server {
+                listen 443 ssl;
+                server_name notify.example.com notify2.example.com;
+        
+                ssl_certificate /etc/ssl/server.crt;
+                ssl_certificate_key /etc/ssl/server.key;
+        
+                # Security enhancements to deal with poodles and the like.
+                # See https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+                # ssl_ciphers 'AES256+EECDH:AES256+EDH';
+                ssl_ciphers \"ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4\";
+        
+                # We don't like poodles.
+                ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+                ssl_session_cache shared:SSL:10m;
+        
+                # Enable Forward secrecy.
+                ssl_dhparam /etc/ssl/dhparam.pem;
+                ssl_prefer_server_ciphers on;
+        
+                # Enable HTST.
+                add_header Strict-Transport-Security max-age=1209600;
+        
+                # required to avoid HTTP 411: see Issue #1486 (https://github.com/dotcloud/docker/issues/1486)
+                chunked_transfer_encoding on;
+        
+                location / {
+                    proxy_pass http://tasks:7080;
+                    proxy_connect_timeout 1;
+                }
+            }
+        
+            server {
+                listen 80;
+                listen 443 ssl;
+                server_name x.example.com example.io;
+        
+                location ~ \"(/[^/]+)(/.*)?\" {
+                    set $myhost $host;
+                    if ($arg_go-get = \"1\") {
+                        set $myhost \"goget\";
+                    }
+                    proxy_pass http://$myhost$1;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Scheme $scheme;
+                    proxy_connect_timeout 1;
+                }
+        
+                location / {
+                    set $myhost $host;
+                    if ($arg_go-get = \"1\") {
+                        set $myhost \"goget\";
+                    }
+                    proxy_pass http://$myhost;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Scheme $scheme;
+                    proxy_connect_timeout 1;
+                }
+            }
+        
+            server {
+                listen 80;
+                server_name www.example.com w.example.com;
+        
+                resolver 8.8.8.8;
+        
+                location / {
+                    proxy_set_header X-Forwarded-Host $host;
+                    proxy_set_header X-Forwarded-Server $host;
+                    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+                    proxy_set_header X-Real-IP $remote_addr;
+        
+                    proxy_pass http://$host.default.example.appspot.com/$request_uri;
+                    proxy_redirect http://$host.default.example.appspot.com/ /;
+                }
+            }
+        
+            server {
+                # We could add the following line and the connection would still be SSL,
+                # but it doesn't appear to be necessary. Seems saver this way.
+                listen 80;
+                listen 443 default ssl;
+                server_name ~^(?<sub>.*)\\.example\\.com$;
+        
+                ssl_certificate /etc/ssl/server.crt;
+                ssl_certificate_key /etc/ssl/server.key;
+        
+                # Security enhancements to deal with poodles and the like.
+                # See https://raymii.org/s/tutorials/Strong_SSL_Security_On_nginx.html
+                # ssl_ciphers 'AES256+EECDH:AES256+EDH';
+                ssl_ciphers \"ECDHE-RSA-AES256-GCM-SHA384:ECDHE-RSA-AES128-GCM-SHA256:DHE-RSA-AES256-GCM-SHA384:DHE-RSA-AES128-GCM-SHA256:ECDHE-RSA-AES256-SHA384:ECDHE-RSA-AES128-SHA256:ECDHE-RSA-AES256-SHA:ECDHE-RSA-AES128-SHA:DHE-RSA-AES256-SHA256:DHE-RSA-AES128-SHA256:DHE-RSA-AES256-SHA:DHE-RSA-AES128-SHA:ECDHE-RSA-DES-CBC3-SHA:EDH-RSA-DES-CBC3-SHA:AES256-GCM-SHA384:AES128-GCM-SHA256:AES256-SHA256:AES128-SHA256:AES256-SHA:AES128-SHA:DES-CBC3-SHA:HIGH:!aNULL:!eNULL:!EXPORT:!DES:!MD5:!PSK:!RC4\";
+        
+                # We don't like poodles.
+                ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+                ssl_session_cache shared:SSL:10m;
+        
+                # Enable Forward secrecy.
+                ssl_dhparam /etc/ssl/dhparam.pem;
+                ssl_prefer_server_ciphers on;
+        
+                # Enable HTST.
+                add_header Strict-Transport-Security max-age=1209600;
+        
+                if ($ssl_protocol = \"\") {
+                    rewrite ^   https://$host$request_uri? permanent;
+                }
+        
+                # required to avoid HTTP 411: see Issue #1486 (https://github.com/dotcloud/docker/issues/1486)
+                chunked_transfer_encoding on;
+        
+                location / {
+                    proxy_pass http://authproxy:4180;
+                    proxy_set_header Host $host;
+                    proxy_set_header X-Real-IP $remote_addr;
+                    proxy_set_header X-Scheme $scheme;
+                    proxy_connect_timeout 1;
+                }
+            }
+        }
+        """
+        }
+    }
+}
+service: {
+    nginx: {
+        kind:       "Service"
+        apiVersion: "v1"
+        metadata: {
+            name: "nginx"
+            labels: {
+                component: "proxy"
+                app:       "nginx"
+                domain:    "prod"
+            }
+        }
+        spec: {
+            type: "LoadBalancer"
+            selector: {
+                component: "proxy"
+                app:       "nginx"
+                domain:    "prod"
+            }
+            ports: [{
+                name:       "http"
+                protocol:   "TCP"
+                port:       80
+                targetPort: 80
+            }, {
+                name:       "https"
+                protocol:   "TCP"
+                port:       443
+                targetPort: 443
+            }]
+            loadBalancerIP: "1.3.4.5"
+        }
+    }
+}
+deployment: {
+    nginx: {
+        kind:       "Deployment"
+        apiVersion: "extensions/v1beta1"
+        metadata: {
+            name: "nginx"
+            labels: {
+                component: "proxy"
+            }
+        }
+        spec: {
+            template: {
+                metadata: {
+                    labels: {
+                        component: "proxy"
+                        app:       "nginx"
+                        domain:    "prod"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "proxy-secrets"
+                        }
+                    }, {
+                        name: "config-volume"
+                        configMap: {
+                            name: "nginx"
+                        }
+                    }]
+                    containers: [{
+                        name:  "nginx"
+                        image: "nginx:1.11.10-alpine"
+                        ports: [{
+                            containerPort: 80
+                            _export:       true
+                        }, {
+                            containerPort: 443
+                            _export:       true
+                        }]
+                        volumeMounts: [{
+                            name:      "secret-volume"
+                            mountPath: "/etc/ssl"
+                        }, {
+                            name:      "config-volume"
+                            mountPath: "/etc/nginx/nginx.conf"
+                            subPath:   "nginx.conf"
+                        }]
+                    }]
+                }
+            }
+            replicas: 1
+        }
+        _name: "nginx"
+    }
+}
+daemonSet: {
+}
+statefulSet: {
+}
+_component: "proxy"
+_spec: {
+    metadata: {
+        name: string
+        labels: {
+            component: "proxy"
+        }
+    }
+    spec: {
+        template: {
+            metadata: {
+                labels: {
+                    component: "proxy"
+                    app:       string
+                    domain:    "prod"
+                }
+            }
+            spec: {
+                containers: [{
+                    name: string
+                    ports: []
+                }]
+            }
+        }
+    }
+    _name: string
+}

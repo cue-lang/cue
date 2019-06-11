@@ -49,7 +49,7 @@ func TestErrorList_Add(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		tt.p.AddNew(tt.args.pos, tt.args.msg)
+		tt.p.AddNewf(tt.args.pos, tt.args.msg)
 	}
 }
 

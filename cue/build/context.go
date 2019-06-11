@@ -65,10 +65,13 @@ func (inst *Instance) Complete() error {
 
 	err := inst.complete()
 	if err != nil {
-		inst.Err = err
-		inst.Incomplete = true
+		inst.ReportError(err)
 	}
-	return err
+	if inst.Err != nil {
+		inst.Incomplete = true
+		return inst.Err
+	}
+	return nil
 }
 
 func (c *Context) init() {

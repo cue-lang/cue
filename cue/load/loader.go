@@ -58,7 +58,8 @@ func Instances(args []string, c *Config) []*build.Instance {
 	a := []*build.Instance{}
 	for _, m := range l.importPaths(args) {
 		if m.Err != nil {
-			inst := c.newErrInstance(m, "", m.Err)
+			inst := c.newErrInstance(m, "",
+				errors.Wrapf(m.Err, token.NoPos, "no match"))
 			a = append(a, inst)
 			continue
 		}
@@ -110,7 +111,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	for _, f := range files {
 		if !strings.HasSuffix(f, ".cue") {
 			return cfg.newErrInstance(nil, f,
-				errors.New("named files must be .cue files"))
+				errors.Newf(pos, "named files must be .cue files"))
 		}
 	}
 
@@ -124,7 +125,8 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		}
 		fi, err := os.Stat(path)
 		if err != nil {
-			return cfg.newErrInstance(nil, path, err)
+			return cfg.newErrInstance(nil, path,
+				errors.Wrapf(err, pos, "could not find dir %s", path))
 		}
 		if fi.IsDir() {
 			return cfg.newErrInstance(nil, path,
@@ -136,11 +138,14 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	// TODO: ModImportFromFiles(files)
 	_, err := filepath.Abs(cfg.Dir)
 	if err != nil {
-		return cfg.newErrInstance(nil, cfg.Dir, err)
+		return cfg.newErrInstance(nil, cfg.Dir,
+			errors.Wrapf(err, pos, "could convert '%s' to absolute path", cfg.Dir))
 	}
 	pkg.Dir = cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
-	err = fp.finalize() // ImportDir(&ctxt, dir, 0)
+	for _, err := range fp.finalize() { // ImportDir(&ctxt, dir, 0)
+		pkg.ReportError(err)
+	}
 	// TODO: Support module importing.
 	// if ModDirImportPath != nil {
 	// 	// Use the effective import path of the directory

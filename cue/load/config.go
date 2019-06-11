@@ -20,6 +20,7 @@ import (
 	"runtime"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 )
 
 const (
@@ -121,7 +122,7 @@ func (c Config) newInstance(path string) *build.Instance {
 	return i
 }
 
-func (c Config) newErrInstance(m *match, path string, err error) *build.Instance {
+func (c Config) newErrInstance(m *match, path string, err errors.Error) *build.Instance {
 	i := c.Context.NewInstance(path, nil)
 	i.DisplayPath = path
 	i.ReportError(err)

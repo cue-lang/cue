@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -235,7 +236,7 @@ func lineStr(idx *index, n ast.Node) string {
 	return n.Pos().String()
 }
 
-func resolveFiles(idx *index, p *build.Instance) error {
+func resolveFiles(idx *index, p *build.Instance) errors.Error {
 	// Link top-level declarations. As top-level entries get unified, an entry
 	// may be linked to any top-level entry of any of the files.
 	allFields := map[string]ast.Node{}
@@ -256,7 +257,7 @@ func resolveFiles(idx *index, p *build.Instance) error {
 	return nil
 }
 
-func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[string]ast.Node) error {
+func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[string]ast.Node) errors.Error {
 	index := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
 		index[u.Name] = append(index[u.Name], u)
@@ -269,7 +270,7 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 			}
 		}
 	}
-	var errUnused error
+	var errUnused errors.Error
 
 	for _, spec := range f.Imports {
 		id, err := strconv.Unquote(spec.Path.Value)

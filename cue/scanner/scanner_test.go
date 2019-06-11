@@ -648,7 +648,7 @@ func TestStdErrorHander(t *testing.T) {
 
 	var list errors.List
 	eh := func(pos token.Pos, msg string, args []interface{}) {
-		list.AddNew(pos, fmt.Sprintf(msg, args...))
+		list.AddNewf(pos, msg, args...)
 	}
 
 	var s Scanner

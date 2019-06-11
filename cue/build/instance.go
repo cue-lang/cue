@@ -15,7 +15,6 @@
 package build
 
 import (
-	"fmt"
 	pathpkg "path"
 	"path/filepath"
 	"strings"
@@ -116,13 +115,6 @@ func (inst *Instance) Abs(path string) string {
 	return filepath.Join(inst.Root, path)
 }
 
-func (inst *Instance) chkErr(err error) error {
-	if err != nil {
-		inst.ReportError(err)
-	}
-	return err
-}
-
 func (inst *Instance) setPkg(pkg string) bool {
 	if !inst.hasName {
 		inst.hasName = true
@@ -133,14 +125,23 @@ func (inst *Instance) setPkg(pkg string) bool {
 }
 
 // ReportError reports an error processing this instance.
-func (inst *Instance) ReportError(err error) {
-	if inst.Err == nil {
+func (inst *Instance) ReportError(err errors.Error) {
+	var list errors.List
+	switch x := inst.Err.(type) {
+	default:
+		// Should never happen, but in the worst case at least one error is
+		// recorded.
+		return
+	case nil:
 		inst.Err = err
+		return
+	case errors.List:
+		list = x
+	case errors.Error:
+		list.Add(x)
 	}
-}
-
-func (inst *Instance) errorf(pos token.Pos, format string, args ...interface{}) error {
-	return inst.chkErr(errors.E(pos, fmt.Sprintf(format, args...)))
+	list.Add(err)
+	inst.Err = list
 }
 
 // Context defines the build context for this instance. All files defined
@@ -180,15 +181,33 @@ func (inst *Instance) addImport(imp *Instance) {
 func (inst *Instance) AddFile(filename string, src interface{}) error {
 	c := inst.ctxt
 	file, err := parser.ParseFile(filename, src, c.parseOptions...)
-	if err == nil {
-		err = inst.addSyntax(file)
+	if err != nil {
+		// should always be an errors.List, but just in case.
+		switch x := err.(type) {
+		case errors.List:
+			for _, e := range x {
+				inst.ReportError(e)
+			}
+		case errors.Error:
+			inst.ReportError(x)
+		default:
+			e := errors.Wrapf(err, token.NoPos, "error adding file")
+			inst.ReportError(e)
+			err = e
+		}
+		return err
 	}
-	return inst.chkErr(err)
+
+	if err := inst.addSyntax(file); err != nil {
+		inst.ReportError(err)
+		return err
+	}
+	return nil
 }
 
 // addSyntax adds the given file to list of files for this instance. The package
 // name of the file must match the package name of the instance.
-func (inst *Instance) addSyntax(file *ast.File) error {
+func (inst *Instance) addSyntax(file *ast.File) errors.Error {
 	pkg := ""
 	pos := file.Pos()
 	if file.Name != nil {
@@ -196,7 +215,7 @@ func (inst *Instance) addSyntax(file *ast.File) error {
 		pos = file.Name.Pos()
 	}
 	if !inst.setPkg(pkg) && pkg != inst.PkgName {
-		return inst.errorf(pos,
+		return errors.Newf(pos,
 			"package name %q conflicts with previous package name %q",
 			pkg, inst.PkgName)
 	}

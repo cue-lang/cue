@@ -26,11 +26,11 @@ import (
 
 // resolve resolves all identifiers in a file. Unresolved identifiers are
 // recorded in Unresolved.
-func resolve(f *ast.File, errFn func(pos token.Pos, msg string)) {
+func resolve(f *ast.File, errFn func(pos token.Pos, msg string, args ...interface{})) {
 	walk(&scope{errFn: errFn}, f)
 }
 
-func resolveExpr(e ast.Expr, errFn func(pos token.Pos, msg string)) {
+func resolveExpr(e ast.Expr, errFn func(pos token.Pos, msg string, args ...interface{})) {
 	f := &ast.File{}
 	walk(&scope{file: f, errFn: errFn}, e)
 }
@@ -45,7 +45,7 @@ type scope struct {
 	node  ast.Node
 	index map[string]ast.Node
 
-	errFn func(p token.Pos, msg string)
+	errFn func(p token.Pos, msg string, args ...interface{})
 }
 
 func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope {

@@ -19,6 +19,8 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"golang.org/x/exp/errors/fmt"
 )
@@ -61,15 +63,47 @@ func (x *index) NewInstance(p *build.Instance) *Instance {
 		i.Dir = p.Dir
 		i.Name = p.PkgName
 		if p.Err != nil {
-			i.setError(p.Err)
+			i.setListOrError(p.Err)
 		}
 	}
 	return i
 }
 
-func (inst *Instance) setError(err error) {
-	inst.Err = err
+func (inst *Instance) setListOrError(err error) {
 	inst.Incomplete = true
+	switch x := err.(type) {
+	case errors.List:
+		if inst.Err == nil {
+			inst.Err = x
+			return
+		}
+		for _, e := range x {
+			inst.setError(e)
+		}
+	case errors.Error:
+		inst.setError(x)
+	default:
+		inst.setError(errors.Wrapf(err, token.NoPos, "unknown error"))
+	}
+}
+
+func (inst *Instance) setError(err errors.Error) {
+	inst.Incomplete = true
+	var list errors.List
+	switch x := inst.Err.(type) {
+	default:
+		// Should never happen, but in the worst case at least one error is
+		// recorded.
+		return
+	case nil:
+		inst.Err = err
+		return
+	case errors.List:
+		list = x
+	case errors.Error:
+		list.Add(err)
+	}
+	inst.Err = list
 }
 
 func (inst *Instance) eval(ctx *context) evaluated {
@@ -218,9 +252,14 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	}
 	i.scope = v.n
 
-	i.Err = resolveFiles(idx, p)
+	if err := resolveFiles(idx, p); err != nil {
+		i.setError(err)
+		return i
+	}
 	for _, f := range p.Files {
-		i.insertFile(f)
+		if err := i.insertFile(f); err != nil {
+			i.setListOrError(err)
+		}
 	}
 	i.complete = true
 

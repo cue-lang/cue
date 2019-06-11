@@ -71,7 +71,7 @@ func (p *parser) init(filename string, src []byte, mode []Option) {
 		m = scanner.ScanComments
 	}
 	eh := func(pos token.Pos, msg string, args []interface{}) {
-		p.errors.AddNew(pos, fmt.Sprintf(msg, args...))
+		p.errors.AddNewf(pos, msg, args...)
 	}
 	p.scanner.Init(p.file, src, eh, m)
 
@@ -344,7 +344,7 @@ func (p *parser) next() {
 	}
 }
 
-func (p *parser) error(pos token.Pos, msg string) {
+func (p *parser) errf(pos token.Pos, msg string, args ...interface{}) {
 	// ePos := p.file.Position(pos)
 	ePos := pos
 
@@ -362,24 +362,26 @@ func (p *parser) error(pos token.Pos, msg string) {
 		}
 	}
 
-	p.errors.AddNew(ePos, msg)
+	p.errors.AddNewf(ePos, msg, args...)
 }
 
-func (p *parser) errorExpected(pos token.Pos, msg string) {
-	msg = "expected " + msg
-	if pos == p.pos {
-		// the error happened at the current position;
-		// make the error message more specific
-		if p.tok == token.COMMA && p.lit == "\n" {
-			msg += ", found newline"
-		} else {
-			msg += ", found '" + p.tok.String() + "'"
-			if p.tok.IsLiteral() {
-				msg += " " + p.lit
-			}
-		}
+func (p *parser) errorExpected(pos token.Pos, obj string) {
+	if pos != p.pos {
+		p.errf(pos, "expected %s", obj)
+		return
 	}
-	p.error(pos, msg)
+	// the error happened at the current position;
+	// make the error message more specific
+	if p.tok == token.COMMA && p.lit == "\n" {
+		p.errf(pos, "expected %s, found newline", obj)
+		return
+	}
+
+	if p.tok.IsLiteral() {
+		p.errf(pos, "expected %s, found '%s'", obj, p.tok)
+	} else {
+		p.errf(pos, "expected %s, found '%s' %s", obj, p.tok, p.lit)
+	}
 }
 
 func (p *parser) expect(tok token.Token) token.Pos {
@@ -395,7 +397,7 @@ func (p *parser) expect(tok token.Token) token.Pos {
 // for the common case of a missing comma before a newline.
 func (p *parser) expectClosing(tok token.Token, context string) token.Pos {
 	if p.tok != tok && p.tok == token.COMMA && p.lit == "\n" {
-		p.error(p.pos, "missing ',' before newline in "+context)
+		p.errf(p.pos, "missing ',' before newline in %s", context)
 		p.next()
 	}
 	return p.expect(tok)
@@ -423,12 +425,12 @@ func (p *parser) atComma(context string, follow ...token.Token) bool {
 			return false
 		}
 	}
-	msg := "missing ','"
 	// TODO: find a way to detect crossing lines now we don't have a semi.
 	if p.lit == "\n" {
-		msg += " before newline"
+		p.errf(p.pos, "missing ',' before newline")
+	} else {
+		p.errf(p.pos, "missing ',' in %s", context)
 	}
-	p.error(p.pos, msg+" in "+context)
 	return true // "insert" comma and continue
 }
 
@@ -673,7 +675,7 @@ func (p *parser) parseFieldList(allowEmit bool) (list []ast.Decl) {
 		d := p.parseField(allowEmit)
 		if e, ok := d.(*ast.EmitDecl); ok {
 			if origEmit && !allowEmit {
-				p.error(p.pos, "only one emit allowed at top level")
+				p.errf(p.pos, "only one emit allowed at top level")
 			}
 			if !origEmit || !allowEmit {
 				d = &ast.BadDecl{From: e.Pos(), To: e.End()}
@@ -710,7 +712,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 
 		if !ok {
 			if !allowEmit {
-				p.error(pos, "expected label, found "+tok.String())
+				p.errf(pos, "expected label, found %s", tok)
 			}
 			if expr == nil {
 				expr = p.parseExpr()
@@ -798,7 +800,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 
 	case token.FOR, token.IF:
 		if !allowComprehension {
-			p.error(p.pos, "comprehension not alowed for this field")
+			p.errf(p.pos, "comprehension not alowed for this field")
 		}
 		clauses := p.parseComprehensionClauses()
 		return &ast.ComprehensionDecl{
@@ -972,7 +974,7 @@ func (p *parser) parseList() (expr ast.Expr) {
 	if clauses := p.parseComprehensionClauses(); clauses != nil {
 		var expr ast.Expr
 		if len(elts) != 1 {
-			p.error(lbrack.Add(1), "list comprehension must have exactly one element")
+			p.errf(lbrack.Add(1), "list comprehension must have exactly one element")
 		}
 		if len(elts) > 0 {
 			expr = elts[0]
@@ -1028,7 +1030,7 @@ func (p *parser) parseListElements() (list []ast.Expr) {
 			if p.tok == token.RBRACK || p.tok == token.FOR || p.tok == token.IF {
 				break
 			}
-			p.error(p.pos, "missing ',' before newline in list literal")
+			p.errf(p.pos, "missing ',' before newline in list literal")
 		} else if !p.atComma("list literal", token.RBRACK, token.FOR, token.IF) {
 			break
 		}
@@ -1217,7 +1219,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 
 		cc = p.openComments()
 		if p.tok != token.RPAREN {
-			p.error(p.pos, "expected ')' for string interpolation")
+			p.errf(p.pos, "expected ')' for string interpolation")
 		}
 		lit = p.scanner.ResumeInterpolation()
 		pos = p.pos
@@ -1284,7 +1286,7 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 	if p.tok == token.STRING {
 		path = p.lit
 		if !isValidImport(path) {
-			p.error(pos, "invalid import path: "+path)
+			p.errf(pos, "invalid import path: %s", path)
 		}
 		p.next()
 		p.expectComma() // call before accessing p.linecomment
@@ -1362,7 +1364,7 @@ func (p *parser) parseFile() *ast.File {
 		p.expect(token.IDENT)
 		name = p.parseIdent()
 		if name.Name == "_" && p.mode&declarationErrorsMode != 0 {
-			p.error(p.pos, "invalid package name _")
+			p.errf(p.pos, "invalid package name _")
 		}
 		p.expectComma()
 	} else {

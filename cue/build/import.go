@@ -26,7 +26,7 @@ import (
 
 type LoadFunc func(pos token.Pos, path string) *Instance
 
-func (inst *Instance) complete() error {
+func (inst *Instance) complete() errors.Error {
 	// TODO: handle case-insensitive collisions.
 	// dir := inst.Dir
 	// names := []string{}
@@ -89,7 +89,7 @@ func (inst *Instance) complete() error {
 					continue
 				}
 				if imp.Err != nil {
-					return imp.Err
+					return nil
 				}
 				imp.ImportPath = path
 				// imp.parent = inst

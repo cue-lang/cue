@@ -13,27 +13,33 @@
 // limitations under the License.
 
 // Package errors defines shared types for handling CUE errors.
+//
+// The pivotal error type in CUE packages is the interface type Error.
+// The information available in such errors can be most easily retrieved using
+// the Path, Positions, and Print functions.
 package errors // import "cuelang.org/go/cue/errors"
 
 import (
+	"errors"
+	"fmt"
 	"io"
 	"sort"
 	"strings"
 
 	"cuelang.org/go/cue/token"
 	"github.com/mpvl/unique"
-	"golang.org/x/exp/errors"
-	"golang.org/x/exp/errors/fmt"
 	"golang.org/x/xerrors"
 )
 
 // New is a convenience wrapper for errors.New in the core library.
+// It does not return a CUE error.
 func New(msg string) error {
 	return errors.New(msg)
 }
 
 // A Message implements the error interface as well as Message to allow
-// internationalized messages.
+// internationalized messages. A Message is typically used as an embedding
+// in a CUE message.
 type Message struct {
 	format string
 	args   []interface{}
@@ -141,6 +147,33 @@ func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
 	}
 }
 
+// E creates a new error. The following types correspond to the following
+// methods:
+//     arg type     maps to
+//     Message      Msg
+//     string       shorthand for a format message with no arguments
+//     token.Pos    Position
+//     []token.Pos  Positions
+//     error        Unwrap/Cause
+func E(args ...interface{}) Error {
+	e := &posError{}
+	for _, a := range args {
+		switch x := a.(type) {
+		case string:
+			e.Message = NewMessage(x, nil)
+		case Message:
+			e.Message = x
+		case token.Pos:
+			e.pos = x
+		case []token.Pos:
+			e.inputs = x
+		case error:
+			e.err = x
+		}
+	}
+	return e
+}
+
 var _ Error = &posError{}
 
 // In an List, an error is represented by an *posError.
@@ -148,122 +181,41 @@ var _ Error = &posError{}
 // the offending token, and the error condition is described
 // by Msg.
 type posError struct {
-	pos token.Pos
+	pos    token.Pos
+	inputs []token.Pos
 	Message
 
 	// The underlying error that triggered this one, if any.
 	err error
 }
 
-func (p *posError) Path() []string {
-	return Path(p.err)
-}
-
-func (p *posError) InputPositions() []token.Pos { return nil }
-
-// E creates a new error.
-func E(args ...interface{}) error {
-	e := &posError{}
-	update(e, args)
-	return e
-}
-
-func update(e *posError, args []interface{}) {
-	err := e.err
-	for _, a := range args {
-		switch x := a.(type) {
-		case string:
-			e.Message = NewMessage("%s", []interface{}{x})
-		case token.Pos:
-			e.pos = x
-		case []token.Pos:
-			// TODO: do something more clever
-			if len(x) > 0 {
-				e.pos = x[0]
-			}
-		case *posError:
-			copy := *x
-			err = &copy
-			e.err = combine(e.err, err)
-		case error:
-			e.err = combine(e.err, x)
-		}
-	}
-}
-
-func combine(a, b error) error {
-	switch x := a.(type) {
-	case nil:
-		return b
-	case List:
-		x.add(toErr(b))
-		return x
-	default:
-		return List{toErr(a), toErr(b)}
-	}
-}
-
-func toErr(err error) Error {
-	if e, ok := err.(Error); ok {
-		return e
-	}
-	return &posError{err: err}
-}
-
-func (e *posError) Position() token.Pos {
-	return e.pos
-}
+func (e *posError) Path() []string              { return Path(e.err) }
+func (e *posError) InputPositions() []token.Pos { return e.inputs }
+func (e *posError) Position() token.Pos         { return e.pos }
+func (e *posError) Unwrap() error               { return e.err }
+func (e *posError) Cause() error                { return e.err }
 
 // Error implements the error interface.
-func (e *posError) Error() string { return fmt.Sprint(e) }
-
-func (e *posError) FormatError(p errors.Printer) error {
-	next := e.err
-	if format, args := e.Msg(); format == "" {
-		next = errFormat(p, e.err)
-	} else {
-		p.Printf(format, args...)
-	}
-	if p.Detail() && e.pos.Filename() != "" || e.pos.IsValid() {
-		p.Printf("%s", e.pos.String())
-	}
-	return next
-
+func (e *posError) Error() string {
+	return e.Message.Error()
 }
 
-func (e posError) Unwrap() error {
-	return e.err
-}
-
-func errFormat(p errors.Printer, err error) (next error) {
-	switch v := err.(type) {
-	case errors.Formatter:
-		err = v.FormatError(p)
-	default:
-		p.Print(err)
-		err = nil
-	}
-
-	return err
-}
-
-// List is a list of *posError.
+// List is a list of Errors.
 // The zero value for an List is an empty List ready to use.
-//
 type List []Error
 
 func (p *List) add(err Error) {
 	*p = append(*p, err)
 }
 
-// AddNew adds an Error with given position and error message to an List.
-func (p *List) AddNew(pos token.Pos, msg string) {
-	p.add(&posError{pos: pos, Message: Message{format: msg}})
+// AddNewf adds an Error with given position and error message to an List.
+func (p *List) AddNewf(pos token.Pos, msg string, args ...interface{}) {
+	p.add(&posError{pos: pos, Message: Message{format: msg, args: args}})
 }
 
 // Add adds an Error with given position and error message to an List.
-func (p *List) Add(err error) {
-	p.add(toErr(err))
+func (p *List) Add(err Error) {
+	p.add(err)
 }
 
 // Reset resets an List to no errors.
@@ -341,7 +293,7 @@ func (p List) Sort() {
 
 // RemoveMultiples sorts an List and removes all but the first error per line.
 func (p *List) RemoveMultiples() {
-	sort.Sort(p)
+	p.Sort()
 	var last Error
 	i := 0
 	for _, e := range *p {

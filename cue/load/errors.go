@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -53,17 +54,21 @@ func shortPath(cwd, path string) string {
 
 // A packageError describes an error loading information about a package.
 type packageError struct {
-	ImportStack   []string  // shortest path from package named on command line to this one
-	Pos           token.Pos // position of error
-	Err           string    // the error itself
-	IsImportCycle bool      `json:"-"` // the error is an import cycle
-	Hard          bool      `json:"-"` // whether the error is soft or hard; soft errors are ignored in some places
+	ImportStack    []string  // shortest path from package named on command line to this one
+	Pos            token.Pos // position of error
+	errors.Message           // the error itself
+	IsImportCycle  bool      `json:"-"` // the error is an import cycle
+	Hard           bool      `json:"-"` // whether the error is soft or hard; soft errors are ignored in some places
 }
+
+func (p *packageError) Position() token.Pos         { return p.Pos }
+func (p *packageError) InputPositions() []token.Pos { return nil }
+func (p *packageError) Path() []string              { return nil }
 
 func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *packageError {
 	err := &packageError{
 		ImportStack: l.stk.Copy(),
-		Err:         fmt.Sprintf(format, args...),
+		Message:     errors.NewMessage(format, args),
 	}
 	err.fillPos(l.cfg.Dir, importPos)
 	return err
@@ -75,20 +80,21 @@ func (p *packageError) fillPos(cwd string, positions []token.Pos) {
 	}
 }
 
+// TODO(localize)
 func (p *packageError) Error() string {
 	// Import cycles deserve special treatment.
 	if p.IsImportCycle {
-		return fmt.Sprintf("%s\npackage %s\n", p.Err, strings.Join(p.ImportStack, "\n\timports "))
+		return fmt.Sprintf("%s\npackage %s\n", p.Message, strings.Join(p.ImportStack, "\n\timports "))
 	}
 	if p.Pos.IsValid() {
 		// Omit import stack. The full path to the file where the error
 		// is the most important thing.
-		return p.Pos.String() + ": " + p.Err
+		return p.Pos.String() + ": " + p.Message.Error()
 	}
 	if len(p.ImportStack) == 0 {
-		return p.Err
+		return p.Message.Error()
 	}
-	return "package " + strings.Join(p.ImportStack, "\n\timports ") + ": " + p.Err
+	return "package " + strings.Join(p.ImportStack, "\n\timports ") + ": " + p.Message.Error()
 }
 
 // noCUEError is the error used by Import to describe a directory
@@ -101,14 +107,14 @@ type noCUEError struct {
 	Ignored bool // whether any Go files were ignored due to build tags
 }
 
-// func (e *noCUEError) Error() string {
-// 	msg := "no buildable CUE config files in " + e.Dir
-// 	if e.Ignored {
-// 		msg += " (.cue files ignored due to build tags)"
-// 	}
-// 	return msg
-// }
+func (e *noCUEError) Position() token.Pos         { return token.NoPos }
+func (e *noCUEError) InputPositions() []token.Pos { return nil }
+func (e *noCUEError) Path() []string              { return nil }
 
+// TODO(localize)
+func (e *noCUEError) Msg() (string, []interface{}) { return e.Error(), nil }
+
+// TODO(localize)
 func (e *noCUEError) Error() string {
 	// Count files beginning with _ and ., which we will pretend don't exist at all.
 	dummy := 0
@@ -142,7 +148,22 @@ type multiplePackageError struct {
 	Files    []string // corresponding files: Files[i] declares package Packages[i]
 }
 
+func (e *multiplePackageError) Position() token.Pos         { return token.NoPos }
+func (e *multiplePackageError) InputPositions() []token.Pos { return nil }
+func (e *multiplePackageError) Path() []string              { return nil }
+
+func (e *multiplePackageError) Msg() (string, []interface{}) {
+	return "found packages %s (%s) and %s (%s) in %s", []interface{}{
+		e.Packages[0],
+		e.Files[0],
+		e.Packages[1],
+		e.Files[1],
+		e.Dir,
+	}
+}
+
 func (e *multiplePackageError) Error() string {
 	// Error string limited to two entries for compatibility.
-	return fmt.Sprintf("found packages %s (%s) and %s (%s) in %s", e.Packages[0], e.Files[0], e.Packages[1], e.Files[1], e.Dir)
+	format, args := e.Msg()
+	return fmt.Sprintf(format, args...)
 }

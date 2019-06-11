@@ -109,7 +109,7 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 	for dir := p.Dir; ctxt.isDir(dir); {
 		files, err := ctxt.readDir(dir)
 		if err != nil {
-			p.ReportError(err)
+			p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dir))
 			return p
 		}
 		rootFound := false
@@ -142,8 +142,10 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 	}
 
 	rewriteFiles(p, root, false)
-	if err := fp.finalize(); err != nil {
-		p.ReportError(err)
+	if errs := fp.finalize(); errs != nil {
+		for _, e := range errs {
+			p.ReportError(e)
+		}
 		return p
 	}
 
@@ -191,7 +193,7 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 	}
 }
 
-func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMode) error {
+func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMode) errors.Error {
 	ctxt := &c.fileSystem
 	// path := p.ImportPath
 	if path == "" {
@@ -277,7 +279,7 @@ type fileProcessor struct {
 	c   *Config
 	pkg *build.Instance
 
-	err error
+	err errors.List
 }
 
 func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
@@ -289,13 +291,14 @@ func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
 	}
 }
 
-func (fp *fileProcessor) finalize() error {
+func (fp *fileProcessor) finalize() errors.List {
 	p := fp.pkg
 	if fp.err != nil {
 		return fp.err
 	}
 	if len(p.CUEFiles) == 0 && !fp.c.DataFiles {
-		return &noCUEError{Package: p, Dir: p.Dir, Ignored: len(p.IgnoredCUEFiles) > 0}
+		fp.err.Add(&noCUEError{Package: p, Dir: p.Dir, Ignored: len(p.IgnoredCUEFiles) > 0})
+		return fp.err
 	}
 
 	for tag := range fp.allTags {
@@ -319,17 +322,15 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 	ext := nameExt(name)
 	p := fp.pkg
 
-	badFile := func(err error) bool {
-		if fp.err == nil {
-			fp.err = err
-		}
+	badFile := func(err errors.Error) bool {
+		fp.err.Add(err)
 		p.InvalidCUEFiles = append(p.InvalidCUEFiles, fullPath)
 		return true
 	}
 
 	match, data, filename, err := matchFile(fp.c, dir, name, true, fp.allFiles, fp.allTags)
 	if err != nil {
-		return badFile(err)
+		return badFile(errors.Wrapf(err, pos, "no match"))
 	}
 	if !match {
 		if ext == cueSuffix {
@@ -342,7 +343,18 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 
 	pf, err := parser.ParseFile(filename, data, parser.ImportsOnly, parser.ParseComments)
 	if err != nil {
-		return badFile(err)
+		// should always be an errors.List, but just in case.
+		switch x := err.(type) {
+		case errors.List:
+			for _, e := range x {
+				badFile(e)
+			}
+		case errors.Error:
+			badFile(x)
+		default:
+			badFile(errors.Wrapf(err, token.NoPos, "error adding file"))
+		}
+		return true
 	}
 
 	pkg := ""

@@ -170,7 +170,7 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 		return nil, pp.errors
 	}
 	f.Filename = filename
-	resolve(f, pp.error)
+	resolve(f, pp.errf)
 
 	return
 }
@@ -216,7 +216,7 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 		p.errors.Sort()
 		return nil, p.errors.Err()
 	}
-	resolveExpr(e, p.error)
+	resolveExpr(e, p.errf)
 
 	return e, nil
 }

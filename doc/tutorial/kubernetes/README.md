@@ -74,7 +74,7 @@ Although not strictly necessary, we mark the root of the configuration tree
 for good measure.
 
 ```
-$ touch cue.mod
+$ touch ../cue.mod
 cue mod init
 ```
 -->

@@ -24,6 +24,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"regexp"
 	"strings"
 	"testing"
 
@@ -254,10 +255,19 @@ func TestEval(t *testing.T) {
 				Stdout: buf,
 			})
 
+			cwd, _ := os.Getwd()
+			pattern := fmt.Sprintf("//.*%s.*", regexp.QuoteMeta(filepath.Join(cwd, dir)))
+			re, err := regexp.Compile(pattern)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := re.ReplaceAll(buf.Bytes(), []byte{})
+			got = bytes.TrimSpace(got)
+
 			testfile := filepath.Join("testdata", dir+".out")
 
 			if *update {
-				err := ioutil.WriteFile(testfile, buf.Bytes(), 0644)
+				err := ioutil.WriteFile(testfile, got, 0644)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -269,7 +279,7 @@ func TestEval(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if got, want := buf.String(), string(b); got != want {
+			if got, want := string(got), string(b); got != want {
 				t.Errorf("files differ:\n%s", diff.Diff(got, want))
 			}
 		})

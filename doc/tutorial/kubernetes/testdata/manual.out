@@ -1,5 +1,3 @@
-
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services
 _base: {
     name: string
     label: {
@@ -60,7 +58,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend
+
 _base: {
     name: string
     label: {
@@ -121,7 +119,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/bartender
+
 _base: {
     name: string
     label: {
@@ -299,7 +297,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/breaddispatcher
+
 _base: {
     name: string
     label: {
@@ -479,7 +477,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/host
+
 _base: {
     name: string
     label: {
@@ -657,7 +655,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/maitred
+
 _base: {
     name: string
     label: {
@@ -835,7 +833,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/valeter
+
 _base: {
     name: string
     label: {
@@ -1015,7 +1013,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/waiter
+
 _base: {
     name: string
     label: {
@@ -1193,7 +1191,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/frontend/waterdispatcher
+
 _base: {
     name: string
     label: {
@@ -1373,7 +1371,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra
+
 _base: {
     name: string
     label: {
@@ -1434,7 +1432,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra/download
+
 _base: {
     name: string
     label: {
@@ -1598,7 +1596,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra/etcd
+
 _base: {
     name: string
     label: {
@@ -1935,7 +1933,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra/events
+
 _base: {
     name: string
     label: {
@@ -2172,7 +2170,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra/tasks
+
 _base: {
     name: string
     label: {
@@ -2384,7 +2382,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra/updater
+
 _base: {
     name: string
     label: {
@@ -2570,7 +2568,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/infra/watcher
+
 _base: {
     name: string
     label: {
@@ -2772,7 +2770,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen
+
 _base: {
     name: string
     label: {
@@ -2845,7 +2843,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/caller
+
 _base: {
     name: string
     label: {
@@ -3125,7 +3123,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/dishwasher
+
 _base: {
     name: string
     label: {
@@ -3402,7 +3400,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/expiditer
+
 _base: {
     name: string
     label: {
@@ -3658,7 +3656,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/headchef
+
 _base: {
     name: string
     label: {
@@ -3913,7 +3911,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/linecook
+
 _base: {
     name: string
     label: {
@@ -4172,7 +4170,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/pastrychef
+
 _base: {
     name: string
     label: {
@@ -4431,7 +4429,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/kitchen/souschef
+
 _base: {
     name: string
     label: {
@@ -4639,7 +4637,7 @@ _kitchenDeployment: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/mon
+
 _base: {
     name: string
     label: {
@@ -4700,7 +4698,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/mon/alertmanager
+
 _base: {
     name: string
     label: {
@@ -4976,7 +4974,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/mon/grafana
+
 _base: {
     name: string
     label: {
@@ -5217,7 +5215,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/mon/nodeexporter
+
 _base: {
     name: string
     label: {
@@ -5474,7 +5472,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/mon/prometheus
+
 _base: {
     name: string
     label: {
@@ -6181,7 +6179,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/proxy
+
 _base: {
     name: string
     label: {
@@ -6242,7 +6240,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/proxy/authproxy
+
 _base: {
     name: string
     label: {
@@ -6548,7 +6546,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/proxy/goget
+
 _base: {
     name: string
     label: {
@@ -6749,7 +6747,7 @@ _k8sSpec: {
     }
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/manual/services/proxy/nginx
+
 _base: {
     name: string
     label: {

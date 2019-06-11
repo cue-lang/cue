@@ -1,5 +1,3 @@
-
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services
 configMap: {
 }
 service: {
@@ -38,7 +36,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend
+
 configMap: {
 }
 service: {
@@ -77,7 +75,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/bartender
+
 configMap: {
 }
 service: {
@@ -179,7 +177,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/breaddispatcher
+
 configMap: {
 }
 service: {
@@ -281,7 +279,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/host
+
 configMap: {
 }
 service: {
@@ -383,7 +381,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/maitred
+
 configMap: {
 }
 service: {
@@ -485,7 +483,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/valeter
+
 configMap: {
 }
 service: {
@@ -587,7 +585,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/waiter
+
 configMap: {
 }
 service: {
@@ -688,7 +686,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/frontend/waterdispatcher
+
 configMap: {
 }
 service: {
@@ -790,7 +788,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra
+
 configMap: {
 }
 service: {
@@ -829,7 +827,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/download
+
 configMap: {
 }
 service: {
@@ -926,7 +924,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/etcd
+
 configMap: {
 }
 service: {
@@ -1104,7 +1102,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/events
+
 configMap: {
 }
 service: {
@@ -1233,7 +1231,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/tasks
+
 configMap: {
 }
 service: {
@@ -1349,7 +1347,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/updater
+
 configMap: {
 }
 service: {
@@ -1457,7 +1455,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/infra/watcher
+
 configMap: {
 }
 service: {
@@ -1569,7 +1567,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen
+
 configMap: {
 }
 service: {
@@ -1608,7 +1606,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/caller
+
 configMap: {
 }
 service: {
@@ -1747,7 +1745,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/dishwasher
+
 configMap: {
 }
 service: {
@@ -1886,7 +1884,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/expiditer
+
 configMap: {
 }
 service: {
@@ -2016,7 +2014,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/headchef
+
 configMap: {
 }
 service: {
@@ -2146,7 +2144,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/linecook
+
 configMap: {
 }
 service: {
@@ -2276,7 +2274,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/pastrychef
+
 configMap: {
 }
 service: {
@@ -2406,7 +2404,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/kitchen/souschef
+
 configMap: {
 }
 service: {
@@ -2515,7 +2513,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon
+
 configMap: {
 }
 service: {
@@ -2554,7 +2552,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/alertmanager
+
 configMap: {
     alertmanager: {
         kind:       "ConfigMap"
@@ -2710,7 +2708,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/grafana
+
 configMap: {
 }
 service: {
@@ -2839,7 +2837,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/nodeexporter
+
 configMap: {
 }
 service: {
@@ -2976,7 +2974,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/mon/prometheus
+
 configMap: {
     prometheus: {
         kind:       "ConfigMap"
@@ -3347,7 +3345,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy
+
 configMap: {
 }
 service: {
@@ -3386,7 +3384,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy/authproxy
+
 configMap: {
     authproxy: {
         kind:       "ConfigMap"
@@ -3559,7 +3557,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy/goget
+
 configMap: {
 }
 service: {
@@ -3668,7 +3666,7 @@ _spec: {
     _name: string
 }
 
-// /Users/mpvl/dev/go/text/src/cuelang.org/go/doc/tutorial/kubernetes/quick/services/proxy/nginx
+
 configMap: {
     nginx: {
         kind:       "ConfigMap"

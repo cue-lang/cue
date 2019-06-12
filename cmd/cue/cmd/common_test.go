@@ -15,14 +15,12 @@
 package cmd
 
 import (
-	"bytes"
 	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -34,15 +32,29 @@ var _ = errors.Print
 
 var update = flag.Bool("update", false, "update the test files")
 
+func printConfig(t *testing.T) *errors.Config {
+	t.Helper()
+
+	inTest = true
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	return &errors.Config{
+		Cwd:     cwd,
+		ToSlash: true,
+	}
+}
+
 func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 	t.Helper()
 	log.SetFlags(0)
 
-	cwd, err := os.Getwd()
-	if err != nil {
-		log.Fatal(err)
-	}
 	const dir = "./testdata"
+
+	cfg := printConfig(t)
 
 	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		t.Run(path, func(t *testing.T) {
@@ -72,9 +84,9 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 					switch err := recover().(type) {
 					case nil:
 					case panicError:
-						errors.Print(wOut, err.Err, nil)
+						errors.Print(wOut, err.Err, cfg)
 					case error:
-						errors.Print(wOut, err, nil)
+						errors.Print(wOut, err, cfg)
 					default:
 						fmt.Fprintln(wOut, err)
 					}
@@ -89,9 +101,6 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 			if err := g.Wait(); err != nil {
 				t.Error(err)
 			}
-			bOut = bytes.Replace(bOut, []byte(cwd), []byte("$CWD"), -1)
-			re := regexp.MustCompile("/.*/cue/")
-			bOut = re.ReplaceAll(bOut, []byte(`$$HOME/cue/`))
 			if *update {
 				ioutil.WriteFile(testfile, bOut, 0644)
 				return

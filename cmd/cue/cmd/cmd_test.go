@@ -23,6 +23,8 @@ import (
 )
 
 func TestCmd(t *testing.T) {
+	cfg := printConfig(t)
+
 	testCases := []string{
 		"echo",
 		"run",
@@ -48,7 +50,7 @@ func TestCmd(t *testing.T) {
 			}
 			err = executeTasks("command", name, tools)
 			if err != nil {
-				errors.Print(stdout, err, nil)
+				errors.Print(stdout, err, cfg)
 			}
 			return nil
 		}

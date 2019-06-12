@@ -23,6 +23,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -335,6 +336,13 @@ type Config struct {
 	// Format formats the given string and arguments and writes it to w.
 	// It is used for all printing.
 	Format func(w io.Writer, format string, args ...interface{})
+
+	// Cwd is the current working directory. Filename positions are taken
+	// relative to this path.
+	Cwd string
+
+	// ToSlash sets whether to use Unix paths. Mostly used for testing.
+	ToSlash bool
 }
 
 // Print is a utility function that prints a list of errors to w,
@@ -369,7 +377,32 @@ func printError(w io.Writer, err error, cfg *Config) {
 
 	positions := []string{}
 	for _, p := range Positions(err) {
-		positions = append(positions, p.String())
+		pos := p.Position()
+		s := pos.Filename
+		if cfg.Cwd != "" {
+			if p, err := filepath.Rel(cfg.Cwd, s); err == nil {
+				s = p
+				// Some IDEs (e.g. VSCode) only recognize a path if it start
+				// with a dot. This also helps to distinguish between local
+				// files and builtin packages.
+				if !strings.HasPrefix(s, ".") {
+					s = fmt.Sprintf(".%s%s", string(filepath.Separator), s)
+				}
+			}
+		}
+		if cfg.ToSlash {
+			s = filepath.ToSlash(s)
+		}
+		if pos.IsValid() {
+			if s != "" {
+				s += ":"
+			}
+			s += fmt.Sprintf("%d:%d", pos.Line, pos.Column)
+		}
+		if s == "" {
+			s = "-"
+		}
+		positions = append(positions, s)
 	}
 
 	if path := Path(err); path != nil {

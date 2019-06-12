@@ -32,6 +32,8 @@ import (
 
 var runtime = &cue.Runtime{}
 
+var inTest = false
+
 func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 	exitOnErr(cmd, err, fatal)
 }
@@ -39,10 +41,6 @@ func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 	if err == nil {
 		return
-	}
-	cwd := "////"
-	if p, _ := os.Getwd(); p != "" {
-		cwd = p
 	}
 
 	// Link x/text as our localizer.
@@ -52,12 +50,16 @@ func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 		p.Fprintf(w, format, args...)
 	}
 
-	w := &bytes.Buffer{}
-	errors.Print(w, err, &errors.Config{Format: format})
+	cwd, _ := os.Getwd()
 
-	// TODO: do something more principled than this.
+	w := &bytes.Buffer{}
+	errors.Print(w, err, &errors.Config{
+		Format:  format,
+		Cwd:     cwd,
+		ToSlash: inTest,
+	})
+
 	b := w.Bytes()
-	b = bytes.ReplaceAll(b, []byte(cwd), []byte("."))
 	cmd.OutOrStderr().Write(b)
 	if fatal {
 		exit()

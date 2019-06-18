@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 // TODO: use ast.Walk or adopt that version to allow visitors.
@@ -32,12 +31,6 @@ type visitor interface {
 }
 
 // Helper functions for common node lists. They may be empty.
-
-func walkIdentList(v visitor, list []*ast.Ident) {
-	for _, x := range list {
-		walk(v, x)
-	}
-}
 
 func walkExprList(v visitor, list []ast.Expr) {
 	for _, x := range list {
@@ -203,68 +196,4 @@ func walk(v visitor, node ast.Node) {
 	}
 
 	v.After(node)
-}
-
-type inspector struct {
-	before func(ast.Node) bool
-	after  func(ast.Node)
-
-	commentStack []commentFrame
-	current      commentFrame
-}
-
-type commentFrame struct {
-	cg  []*ast.CommentGroup
-	pos int8
-}
-
-func (f *inspector) Before(node ast.Node) visitor {
-	if f.before == nil || f.before(node) {
-		f.commentStack = append(f.commentStack, f.current)
-		f.current = commentFrame{cg: node.Comments()}
-		f.visitComments(f.current.pos)
-		return f
-	}
-	return nil
-}
-
-func (f *inspector) After(node ast.Node) {
-	f.visitComments(127)
-	p := len(f.commentStack) - 1
-	f.current = f.commentStack[p]
-	f.commentStack = f.commentStack[:p]
-	f.current.pos++
-	if f.after != nil {
-		f.after(node)
-	}
-}
-
-func (f *inspector) Token(t token.Token) {
-	f.current.pos++
-}
-
-func (f *inspector) setPos(i int8) {
-	f.current.pos = i
-}
-
-func (f *inspector) visitComments(pos int8) {
-	c := &f.current
-	for ; len(c.cg) > 0; c.cg = c.cg[1:] {
-		cg := c.cg[0]
-		if cg.Position == pos {
-			continue
-		}
-		if f.before == nil || f.before(cg) {
-			for _, c := range cg.List {
-				if f.before == nil || f.before(c) {
-					if f.after != nil {
-						f.after(c)
-					}
-				}
-			}
-			if f.after != nil {
-				f.after(cg)
-			}
-		}
-	}
 }

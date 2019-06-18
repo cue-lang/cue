@@ -558,31 +558,6 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 	return c.closeExpr(p, &ast.BadExpr{From: pos, To: p.pos})
 }
 
-func (p *parser) parseParams(ident *ast.Ident, follow token.Token) (params []*ast.Field) {
-	for {
-		c := p.openComments()
-		if ident == nil {
-			ident = p.parseIdent()
-		}
-		m := &ast.Field{Label: ident}
-		if p.tok == token.COLON {
-			m.Colon = p.expect(token.COLON)
-			m.Value = p.parseRHS()
-		}
-		hasComma := p.tok == token.COMMA
-		if hasComma {
-			p.expect(token.COMMA)
-		}
-		c.closeNode(p, m)
-		params = append(params, m)
-		if !hasComma || p.tok == follow || p.tok == token.EOF {
-			break
-		}
-		ident = nil
-	}
-	return params
-}
-
 func (p *parser) parseIndexOrSlice(x ast.Expr) (expr ast.Expr) {
 	if p.trace {
 		defer un(trace(p, "IndexOrSlice"))

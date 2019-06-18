@@ -1,0 +1,4 @@
+steps:
+- name: golang:1.12
+  env: ['GO111MODULE=on']
+  args: ['go', 'test', './...']

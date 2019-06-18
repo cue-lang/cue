@@ -126,6 +126,10 @@ completed and update the `AUTHORS` file.
 
 ### Step 2: Configure git authentication
 
+The remaining two steps only apply if you wish to contribute through Gerrit,
+which is the source of truth for the CUE project. You can also send Pull
+Requests to the mirror at https://github.com/cuelang/cue.
+
 The main CUE repository is located at
 [cue.googlesource.com](https://cue.googlesource.com),
 a Git server hosted by Google.
@@ -316,7 +320,8 @@ Remember you can always visit Gerrit to see the fine-grained review.
 
 ## Sending a change via Gerrit
 
-It is not possible to fully sync Gerrit and GitHub, at least at the moment,
+It is not possible to fully sync Gerrit and GitHub,
+although things are improving,
 so we recommend learning Gerrit.
 It's different but powerful and familiarity
 with help you understand the flow.

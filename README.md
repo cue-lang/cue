@@ -13,6 +13,9 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
+[![GoDoc](https://godoc.org/cuelang.org/go?status.svg)](https://godoc.org/cuelang.org/go)
+[![Appveyor](https://ci.appveyor.com/api/projects/status/0v3ec7p5162hpwpe?svg=true)](https://ci.appveyor.com/project/mpvl/cue)
+[![Go Report Card](https://goreportcard.com/badge/github.com/cuelang/cue)](https://goreportcard.com/report/github.com/cuelang/cue)
 
 
 # The CUE Data Constraint Language

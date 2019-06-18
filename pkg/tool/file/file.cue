@@ -19,6 +19,9 @@ Read: {
 	kind: "tool/file.Read"
 
 	// filename names the file to read.
+	//
+	// Relative names are taken relative to the current working directory.
+	// Slashes are converted to the native OS path separator.
 	filename: !=""
 
 	// contents is the read contents. If the contents are constraint to bytes
@@ -32,6 +35,9 @@ Append: {
 	kind: "tool/file.Append"
 
 	// filename names the file to append.
+	//
+	// Relative names are taken relative to the current working directory.
+	// Slashes are converted to the native OS path separator.
 	filename: !=""
 
 	// permissions defines the permissions to use if the file does not yet exist.
@@ -46,6 +52,9 @@ Create: {
 	kind: "tool/file.Create"
 
 	// filename names the file to write.
+	//
+	// Relative names are taken relative to the current working directory.
+	// Slashes are converted to the native OS path separator.
 	filename: !=""
 
 	// permissions defines the permissions to use if the file does not yet exist.
@@ -55,9 +64,14 @@ Create: {
 	contents: bytes | string
 }
 
+// Glob returns a list of files.
 Glob: {
 	kind: "tool/file.Glob"
 
+	// glob specifies the pattern to match files with.
+	//
+	// A relative pattern is taken relative to the current working directory.
+	// Slashes are converted to the native OS path separator.
 	glob: !=""
 	files: [...string]
 }

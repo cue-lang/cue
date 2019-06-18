@@ -64,6 +64,7 @@ func (c *cmdRead) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 
 func (c *cmdAppend) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
 	filename := lookupStr(v, "filename")
+	filename = filepath.FromSlash(filename)
 	mode, err := v.Lookup("permissions").Int64()
 	if err != nil {
 		return nil, err
@@ -84,6 +85,7 @@ func (c *cmdAppend) Run(ctx *task.Context, v cue.Value) (res interface{}, err er
 
 func (c *cmdCreate) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
 	filename := lookupStr(v, "filename")
+	filename = filepath.FromSlash(filename)
 	mode, err := v.Lookup("permissions").Int64()
 	if err != nil {
 		return nil, err
@@ -94,6 +96,10 @@ func (c *cmdCreate) Run(ctx *task.Context, v cue.Value) (res interface{}, err er
 }
 
 func (c *cmdGlob) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	m, err := filepath.Glob(lookupStr(v, "glob"))
+	glob := filepath.FromSlash(lookupStr(v, "glob"))
+	m, err := filepath.Glob(glob)
+	for i, s := range m {
+		m[i] = filepath.ToSlash(s)
+	}
 	return m, err
 }

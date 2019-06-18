@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"reflect"
 	"testing"
 
@@ -73,6 +74,7 @@ func TestAppend(t *testing.T) {
 	name := f.Name()
 	defer os.Remove(name)
 	f.Close()
+	name = filepath.ToSlash(name)
 
 	v := parse(t, "tool/file.Append", fmt.Sprintf(`{
 		filename: "%s"
@@ -101,6 +103,7 @@ func TestCreate(t *testing.T) {
 	name := f.Name()
 	defer os.Remove(name)
 	f.Close()
+	name = filepath.ToSlash(name)
 
 	v := parse(t, "tool/file.Create", fmt.Sprintf(`{
 		filename: "%s"

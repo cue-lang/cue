@@ -25,10 +25,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/load"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"github.com/spf13/cobra"
@@ -106,17 +103,11 @@ func runTrim(cmd *cobra.Command, args []string) error {
 	internal.DropOptional = true
 	defer func() { internal.DropOptional = false }()
 
-	log.SetOutput(cmd.OutOrStderr())
-
-	ctxt := build.NewContext(build.ParseOptions(parser.ParseComments))
-	binst := load.Instances(args, &load.Config{Context: ctxt})
-
-	instances := cue.Build(binst)
-	for _, inst := range instances {
-		if err := inst.Err; err != nil {
-			return err
-		}
+	binst := loadFromArgs(cmd, args)
+	if binst == nil {
+		return nil
 	}
+	instances := buildInstances(cmd, binst)
 
 	// dst := flagName("o").String(cmd)
 	dst := flagOut.String(cmd)

@@ -85,9 +85,8 @@ type Instance struct {
 	// directory.
 	AllTags []string
 
-	Standard    bool // Is a builtin package
-	Local       bool
-	localPrefix string
+	Standard bool // Is a builtin package
+	Local    bool
 
 	// Relative to Dir
 	CUEFiles        []string // .cue source files

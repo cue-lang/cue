@@ -153,7 +153,7 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 		if !filepath.IsAbs(f) {
 			f = filepath.Join(root, f)
 		}
-		p.AddFile(f, nil)
+		_ = p.AddFile(f, nil)
 	}
 	p.Complete()
 	return p

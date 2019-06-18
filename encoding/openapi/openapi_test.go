@@ -59,11 +59,11 @@ func TestParseDefinitions(t *testing.T) {
 
 			b, err := Gen(inst, tc.config)
 			var out = &bytes.Buffer{}
-			json.Indent(out, b, "", "   ")
+			_ = json.Indent(out, b, "", "   ")
 
 			wantFile := filepath.Join("testdata", tc.out)
 			if *update {
-				ioutil.WriteFile(wantFile, out.Bytes(), 0644)
+				_ = ioutil.WriteFile(wantFile, out.Bytes(), 0644)
 				return
 			}
 

@@ -157,7 +157,7 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 
 	pkgDir := filepath.Join(root, "pkg")
 
-	filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+	_ = filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
 		if err != nil || !fi.IsDir() {
 			return nil
 		}

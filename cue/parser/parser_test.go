@@ -15,7 +15,6 @@
 package parser
 
 import (
-	"bytes"
 	"fmt"
 	"strings"
 	"testing"
@@ -423,7 +422,7 @@ func TestParseExpr(t *testing.T) {
 
 	// ParseExpr must not crash
 	for _, src := range valids {
-		parseExprString(src)
+		_, _ = parseExprString(src)
 	}
 }
 
@@ -476,39 +475,6 @@ func TestImports(t *testing.T) {
 func labelName(l ast.Label) string {
 	name, _ := ast.LabelName(l)
 	return name
-}
-
-func getField(file *ast.File, fieldname string) *ast.Field {
-	get := func(elts []ast.Decl, name string) *ast.Field {
-		for _, s := range elts {
-			if s, ok := s.(*ast.Field); ok && labelName(s.Label) == name {
-				return s
-			}
-		}
-		return nil
-	}
-	elts := file.Decls
-	var m *ast.Field
-	for _, p := range strings.Split(fieldname, ".") {
-		m = get(elts, p)
-		if v, ok := m.Value.(*ast.StructLit); ok {
-			elts = v.Elts
-		} else {
-			break
-		}
-	}
-	return m
-}
-
-// Don't use CommentGroup.Text() - we want to see exact comment text.
-func commentText(c *ast.CommentGroup) string {
-	var buf bytes.Buffer
-	if c != nil {
-		for _, c := range c.List {
-			buf.WriteString(c.Text)
-		}
-	}
-	return buf.String()
 }
 
 // TestIncompleteSelection ensures that an incomplete selector

@@ -130,7 +130,7 @@ func buildTools(cmd *cobra.Command, args []string) *cue.Instance {
 	for _, inst := range binst {
 		for _, f := range inst.ToolCUEFiles {
 			if file := inst.Abs(f); !included[file] {
-				ti.AddFile(file, nil)
+				_ = ti.AddFile(file, nil)
 				included[file] = true
 			}
 		}

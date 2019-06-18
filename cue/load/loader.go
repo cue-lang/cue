@@ -80,14 +80,6 @@ const (
 	// of that package must not pass resolveImport, because
 	// disallowVendor will reject direct use of paths containing /vendor/.
 	resolveImport = 1 << iota
-
-	// resolveModule is for download (part of "go get") and indicates
-	// that the module adjustment should be done, but not vendor adjustment.
-	resolveModule
-
-	// getTestDeps is for download (part of "go get") and indicates
-	// that test dependencies should be fetched too.
-	getTestDeps
 )
 
 type loader struct {
@@ -157,7 +149,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		if !filepath.IsAbs(f) {
 			f = filepath.Join(cfg.Dir, f)
 		}
-		pkg.AddFile(f, nil)
+		_ = pkg.AddFile(f, nil)
 	}
 
 	pkg.Local = true

@@ -145,7 +145,7 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 	var pp parser
 	defer func() {
 		if pp.panicking {
-			recover()
+			_ = recover()
 		}
 
 		// set result values
@@ -189,7 +189,7 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 	var p parser
 	defer func() {
 		if p.panicking {
-			recover()
+			_ = recover()
 		}
 		p.errors.Sort()
 		err = p.errors.Err()

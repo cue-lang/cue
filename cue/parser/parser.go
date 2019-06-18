@@ -82,13 +82,6 @@ func (p *parser) init(filename string, src []byte, mode []Option) {
 	p.next()
 }
 
-type commentList struct {
-	taken      bool // for validation
-	attachTail bool
-	head       *ast.CommentGroup
-	last       *ast.CommentGroup
-}
-
 type commentState struct {
 	parent *commentState
 	pos    int8
@@ -911,10 +904,6 @@ func (p *parser) parseStructBody() []ast.Decl {
 	return elts
 }
 
-func isClauseStart(tok token.Token) bool {
-	return tok == token.FOR || tok == token.IF // || tok == LET
-}
-
 func (p *parser) parseComprehensionClauses() (clauses []ast.Clause) {
 	// TODO: reuse Template spec, which is possible if it doesn't check the
 	// first is an identifier.
@@ -1251,8 +1240,6 @@ func (p *parser) parseRHS() ast.Expr {
 
 // ----------------------------------------------------------------------------
 // Declarations
-
-type parseSpecFunction func(iota int) *ast.ImportSpec
 
 func isValidImport(lit string) bool {
 	const illegalChars = `!"#$%&'()*,:;<=>?[\]^{|}` + "`\uFFFD"

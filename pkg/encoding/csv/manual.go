@@ -48,7 +48,7 @@ func Encode(x cue.Value) (string, error) {
 				a = append(a, string(b))
 			}
 		}
-		w.Write(a)
+		_ = w.Write(a)
 	}
 	w.Flush()
 	return buf.String(), nil

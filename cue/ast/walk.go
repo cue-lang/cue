@@ -39,12 +39,6 @@ type visitor interface {
 
 // Helper functions for common node lists. They may be empty.
 
-func walkIdentList(v visitor, list []*Ident) {
-	for _, x := range list {
-		walk(v, x)
-	}
-}
-
 func walkExprList(v visitor, list []Expr) {
 	for _, x := range list {
 		walk(v, x)

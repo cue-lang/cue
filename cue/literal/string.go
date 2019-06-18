@@ -23,7 +23,6 @@ import (
 
 var (
 	errSyntax            = errors.New("invalid syntax")
-	errInvalidString     = errors.New("invalid string")
 	errInvalidWhitespace = errors.New("invalid string: invalid whitespace")
 	errMissingNewline    = errors.New(
 		"invalid string: opening quote of multiline string must be followed by newline")

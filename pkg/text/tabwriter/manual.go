@@ -50,7 +50,7 @@ func Write(data cue.Value) (string, error) {
 			if err := write(i.Value()); err != nil {
 				return "", err
 			}
-			tw.Write([]byte{'\n'})
+			_, _ = tw.Write([]byte{'\n'})
 		}
 	default:
 		return "", fmt.Errorf("tabwriter.Write: unsupported type %v", data.Kind())

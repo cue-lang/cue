@@ -48,8 +48,6 @@ func allFiles(p *build.Instance) []string {
 	)
 }
 
-var foldPath = make(map[string]string)
-
 // safeArg reports whether arg is a "safe" command-line argument,
 // meaning that when it appears in a command-line, it probably
 // doesn't have some special meaning other than its own name.

@@ -108,7 +108,7 @@ func TestMerge(t *testing.T) {
 			in := []*build.Instance{}
 			for _, str := range tc.instances {
 				bi := ctx.NewInstance("dir", nil) // no packages
-				bi.AddFile("file", str)
+				_ = bi.AddFile("file", str)
 				in = append(in, bi)
 			}
 			merged := Merge(Build(in)...)
@@ -143,14 +143,14 @@ func TestInstance_Build(t *testing.T) {
 			ctx := build.NewContext()
 
 			bi := ctx.NewInstance("main", nil) // no packages
-			bi.AddFile("file", tc.instance)
+			_ = bi.AddFile("file", tc.instance)
 			main := Build([]*build.Instance{bi})
 			if err := main[0].Err; err != nil {
 				t.Fatal(err)
 			}
 
 			bi = ctx.NewInstance("overlay", nil) // no packages
-			bi.AddFile("file", tc.overlay)
+			_ = bi.AddFile("file", tc.overlay)
 
 			overlay := main[0].Build(bi)
 

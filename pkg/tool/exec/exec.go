@@ -54,9 +54,7 @@ func (c *execCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 		doc = str
 		list := strings.Fields(str)
 		bin = list[0]
-		for _, s := range list[1:] {
-			args = append(args, s)
-		}
+		args = append(args, list[1:]...)
 
 	case cue.ListKind:
 		list, _ := v.List()

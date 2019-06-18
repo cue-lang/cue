@@ -203,7 +203,7 @@ func makeInstances(insts []*bimport) (instances []*build.Instance) {
 
 func buildInstance(bi *bimport, p *build.Instance) {
 	for i, f := range bi.files {
-		p.AddFile(fmt.Sprintf("file%d.cue", i), f)
+		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
 	}
 	p.Complete()
 }

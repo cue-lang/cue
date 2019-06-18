@@ -18,13 +18,13 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
-	"github.com/cloudfoundry-attic/jibber_jabber"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -38,14 +38,22 @@ func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 	exitOnErr(cmd, err, fatal)
 }
 
+func getLang() language.Tag {
+	loc := os.Getenv("LC_ALL")
+	if loc == "" {
+		loc = os.Getenv("LANG")
+	}
+	loc = strings.Split(loc, ".")[0]
+	return language.Make(loc)
+}
+
 func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 	if err == nil {
 		return
 	}
 
 	// Link x/text as our localizer.
-	lang, _ := jibber_jabber.DetectIETF()
-	p := message.NewPrinter(language.Make(lang))
+	p := message.NewPrinter(getLang())
 	format := func(w io.Writer, format string, args ...interface{}) {
 		p.Fprintf(w, format, args...)
 	}

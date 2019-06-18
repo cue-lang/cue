@@ -445,11 +445,14 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			break
 		}
 
-		label := v.label(n.Name, true)
+		f := v.label(n.Name, true)
 		if n.Scope != nil {
 			n2 := v.mapScope(n.Scope)
+			if l, ok := n2.(*lambdaExpr); ok && len(l.params.arcs) == 1 {
+				f = 0
+			}
 			value = &nodeRef{baseValue: newExpr(n), node: n2}
-			value = &selectorExpr{newExpr(n), value, label}
+			value = &selectorExpr{newExpr(n), value, f}
 		} else {
 			n2 := v.mapScope(n.Node)
 			value = &nodeRef{baseValue: newExpr(n), node: n2}

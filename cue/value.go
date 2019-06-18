@@ -1022,6 +1022,12 @@ func (x *params) at(ctx *context, i int) evaluated {
 
 // lookup returns the node for the given label f, if present, or nil otherwise.
 func (x *params) lookup(ctx *context, f label) arc {
+	if f == 0 && len(x.arcs) == 1 {
+		// A template binding.
+		a := x.arcs[0]
+		a.cache = x.at(ctx, 0)
+		return a
+	}
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.

@@ -1645,6 +1645,14 @@ func TestFullEval(t *testing.T) {
 		`,
 		out: `<0>{a: <1>{b: <2>{c: 4, d: 5}, c: 4, d: 5}}`,
 	}, {
+		desc: "different labels for templates",
+		in: `
+		a <X>: { name: X }
+		a <Name>: { name: Name }
+		a foo: {}
+		`,
+		out: `<0>{a: <1>{<>: <2>(X: string)->(<3>{name: <2>.X} & <4>{name: <2>.X}), foo: <5>{name: "foo"}}}`,
+	}, {
 		// TODO: rename EE and FF to E and F to check correct ordering.
 
 		desc: "nested templates in one field",

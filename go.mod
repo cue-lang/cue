@@ -2,6 +2,7 @@ module cuelang.org/go
 
 require (
 	github.com/cloudfoundry-attic/jibber_jabber v0.0.0-20151120183258-bcc4c8345a21
+	github.com/cloudfoundry/jibber_jabber v0.0.0-20151120183258-bcc4c8345a21 // indirect
 	github.com/cockroachdb/apd v1.1.0
 	github.com/emicklei/proto v1.6.11
 	github.com/ghodss/yaml v1.0.0
@@ -10,6 +11,8 @@ require (
 	github.com/kylelemons/godebug v1.1.0
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
+	github.com/onsi/ginkgo v1.8.0 // indirect
+	github.com/onsi/gomega v1.5.0 // indirect
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/retr0h/go-gilt v0.0.0-20190206215556-f73826b37af2
 	github.com/spf13/cobra v0.0.3

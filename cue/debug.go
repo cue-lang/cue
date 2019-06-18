@@ -142,6 +142,18 @@ func (p *printer) write(args ...interface{}) {
 	fmt.Fprint(p.w, args...)
 }
 
+func lambdaName(f label, v value) label {
+	switch x := v.(type) {
+	case *nodeRef:
+		return lambdaName(f, x.node)
+	case *lambdaExpr:
+		if f == 0 && len(x.params.arcs) == 1 {
+			return x.params.arcs[0].feature
+		}
+	}
+	return f
+}
+
 func (p *printer) debugStr(v interface{}) {
 	writef := p.writef
 	write := p.write
@@ -158,7 +170,8 @@ func (p *printer) debugStr(v interface{}) {
 		// p.debugStr(x.node)
 	case *selectorExpr:
 		p.debugStr(x.x)
-		writef(".%v", p.label(x.feature))
+		f := lambdaName(x.feature, x.x)
+		writef(".%v", p.label(f))
 	case *indexExpr:
 		p.debugStr(x.x)
 		write("[")

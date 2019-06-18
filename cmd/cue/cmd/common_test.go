@@ -21,6 +21,7 @@ import (
 	"io/ioutil"
 	"os"
 	"path/filepath"
+	"regexp"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -96,6 +97,8 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 			})
 			g.Go(func() error {
 				bOut, err = ioutil.ReadAll(rOut)
+				re := regexp.MustCompile(`exit status \d`)
+				bOut = re.ReplaceAll(bOut, []byte("non-zero exist code"))
 				return err
 			})
 			if err := g.Wait(); err != nil {

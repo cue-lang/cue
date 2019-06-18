@@ -1,1 +1,1 @@
-command "ls --badflags" failed: exit status 1
+command "ls --badflags" failed: non-zero exist code

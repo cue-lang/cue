@@ -53,8 +53,6 @@ github.com/stretchr/testify v1.2.0/go.mod h1:a8OnRcib4nhh0OaRAV+Yts87kKdq0PP7pXf
 github.com/xeipuuv/gojsonpointer v0.0.0-20170225233418-6fe8760cad35/go.mod h1:N2zxlSyiKSe5eX1tZViRH5QA0qijqEDrYZiPEAiq3wU=
 github.com/xeipuuv/gojsonreference v0.0.0-20150808065054-e02fc20de94c/go.mod h1:GwrjFmJcFw6At/Gs6z4yjiIwzuJ1/+UwLxMQDVQXShQ=
 github.com/xeipuuv/gojsonschema v0.0.0-20171230112544-511d08a359d1/go.mod h1:5yf86TLmAcydyeJq5YvxkGPE2fm/u4myDekKRoLuqhs=
-golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf h1:4SQtY0VxhI0RZe/PFmCCfHyaPVuC5DgyXEqehsAWjwc=
-golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf/go.mod h1:YgqsNsAu4fTvlab/7uiYK9LJrCIzKg/NiZUIH1/ayqo=
 golang.org/x/lint v0.0.0-20181011164241-5906bd5c48cd/go.mod h1:UVdnD1Gm6xHRNCYTkRU2/jEulfH38KcIWyp/GAMgvoE=
 golang.org/x/net v0.0.0-20180906233101-161cd47e91fd h1:nTDtHvHSdCn1m6ITfMRqtOd/9+7a3s8RBNOZ3eYZzJA=
 golang.org/x/net v0.0.0-20180906233101-161cd47e91fd/go.mod h1:mL1N/T3taQHkDXs73rZJwtUhF3w3ftmwwsq0BUmARs4=

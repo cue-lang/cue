@@ -22,7 +22,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"golang.org/x/exp/errors/fmt"
 )
 
 // An Instance defines a single configuration based on a collection of
@@ -295,9 +294,16 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	value := convert(ctx, root, x)
 	eval := binOp(ctx, baseValue{}, opUnify, root, value)
 	// TODO: validate recursively?
-	st, ok := eval.(*structLit)
-	if !ok {
-		fmt.Errorf("structure at path did not resolve in struct")
+	err := inst.Err
+	var st *structLit
+	switch x := eval.(type) {
+	case *structLit:
+		st = x
+	default:
+		// This should not happen.
+		err = errors.Newf(x.Pos(), "error filling struct")
+	case *bottom:
+		err = inst.Value().toErr(x)
 	}
 	inst = &Instance{
 		rootStruct: st,
@@ -308,9 +314,9 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 		ImportPath: inst.ImportPath,
 		Name:       inst.Name,
 		Incomplete: inst.Incomplete,
-		Err:        inst.Err,
+		Err:        err,
 
-		complete: true,
+		complete: err != nil,
 	}
-	return inst, nil
+	return inst, err
 }

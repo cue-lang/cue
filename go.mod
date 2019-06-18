@@ -17,7 +17,6 @@ require (
 	github.com/retr0h/go-gilt v0.0.0-20190206215556-f73826b37af2
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3
-	golang.org/x/exp/errors v0.0.0-20181221233300-b68661188fbf
 	golang.org/x/sync v0.0.0-20181108010431-42b317875d0f
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20181210225255-6a3e9aa2ab77

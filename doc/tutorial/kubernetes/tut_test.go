@@ -117,6 +117,7 @@ func TestTutorial(t *testing.T) {
 				cmd = cmd[:p]
 			}
 
+			logf(t, "$ %s", cmd)
 			switch cmd = strings.TrimSpace(cmd); {
 			case strings.HasPrefix(cmd, "cat"):
 				if input == "" {
@@ -146,8 +147,6 @@ func TestTutorial(t *testing.T) {
 				}
 
 			case strings.HasPrefix(cmd, "cue "):
-				logf(t, "$ %s", cmd)
-
 				if strings.HasPrefix(cmd, "cue create") {
 					// Don't execute the kubernetes dry run.
 					break
@@ -158,20 +157,32 @@ func TestTutorial(t *testing.T) {
 				}
 
 				cuetest.Run(t, wd, cmd, &cuetest.Config{
-					Stdin:  strings.NewReader(input),
-					Stdout: ioutil.Discard,
+					Stdin: strings.NewReader(input),
 				})
 
-			case strings.HasPrefix(cmd, "sed "),
-				strings.HasPrefix(cmd, "touch "):
-				logf(t, "$ %s", cmd)
-				args := cuetest.SplitArgs(t, cmd)
-				cx := exec.Command(args[0], args[1:]...)
-				if input != "" {
-					cx.Stdin = strings.NewReader(input)
-					cx.Stdout = ioutil.Discard
+			case strings.HasPrefix(cmd, "sed "):
+				c := cuetest.NewChunker(t, []byte(cmd))
+				c.Next("s/", "/")
+				re := regexp.MustCompile(c.Text())
+				c.Next("", "/'")
+				repl := c.Bytes()
+				c.Next(" ", ".cue")
+				file := c.Text() + ".cue"
+				b, err := ioutil.ReadFile(file)
+				if err != nil {
+					t.Fatal(err)
 				}
-				if err := cx.Run(); err != nil {
+				b = re.ReplaceAll(b, repl)
+				err = ioutil.WriteFile(file, b, 0644)
+				if err != nil {
+					t.Fatal(err)
+				}
+
+			case strings.HasPrefix(cmd, "touch "):
+				logf(t, "$ %s", cmd)
+				file := strings.TrimSpace(cmd[len("touch "):])
+				err := ioutil.WriteFile(file, []byte(""), 0644)
+				if err != nil {
 					t.Fatal(err)
 				}
 			}
@@ -280,7 +291,8 @@ func TestEval(t *testing.T) {
 			}
 
 			if got, want := string(got), string(b); got != want {
-				t.Errorf("files differ:\n%s", diff.Diff(got, want))
+				t.Log(got)
+				t.Errorf("output differs for file %s in %s", testfile, cwd)
 			}
 		})
 	}

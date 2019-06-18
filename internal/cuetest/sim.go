@@ -66,11 +66,16 @@ func Run(t *testing.T, dir, command string, cfg *Config) {
 	cmd, err := cmd.New(args)
 	if cfg.Stdout != nil {
 		cmd.SetOutput(cfg.Stdout)
+	} else {
+		cmd.SetOutput(buf)
 	}
 	if cfg.Stdin != nil {
 		cmd.SetInput(cfg.Stdin)
 	}
 	if err = cmd.Run(context.Background()); err != nil {
+		if cfg.Stdout == nil {
+			logf(t, "Ouput:\n%s", buf.String())
+		}
 		logf(t, "Execution failed: %v", err)
 	}
 
@@ -93,6 +98,7 @@ func Run(t *testing.T, dir, command string, cfg *Config) {
 }
 
 func logf(t *testing.T, format string, args ...interface{}) {
+	t.Helper()
 	t.Logf(format, args...)
 }
 

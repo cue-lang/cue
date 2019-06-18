@@ -103,6 +103,8 @@ imports: imports/imports.cue (1 files)
 				t.Errorf("error:\n got: %v\nwant: %v", err, tc.err)
 			}
 			got := strings.Join(data, ";")
+			// Make test work with Windows.
+			got = strings.Replace(got, string(filepath.Separator), "/", -1)
 			want := strings.TrimSpace(tc.want)
 			if got != want {
 				t.Errorf("got:\n%v\nwant:\n%v", got, want)

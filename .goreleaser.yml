@@ -1,0 +1,56 @@
+# This is an example goreleaser.yaml file with some sane defaults.
+# Make sure to check the documentation at http://goreleaser.com
+before:
+  hooks:
+    - go mod download
+    # you may remove this if you don't need go generate
+    - go generate ./...
+    - go fmt ./...
+builds:
+- env:
+  - CGO_ENABLED=0
+  main: ./cmd/cue
+  binary: cue
+  ldflags:
+    - -s -w
+    - -X cuelang.org/go/cmd/cue/cmd.version={{.Version}}
+    # TODO: consider adding the following for a verbose mode
+    # - -X cuelang.org/go/cmd/cue/cmd.commit={{.ShortCommit}}
+    # - -X cuelang.org/go/cmd/cue/cmd.date={{.Date}}
+    # - -X cuelang.org/cmd/cue/cmd.date={{.Env.GOVERSION}}
+  goos:
+    # File and Issue to request including other platforms.
+    - darwin
+    - linux
+    - windows
+  goarch:
+    - amd64
+    - arm64
+
+archives:
+- replacements:
+    darwin: Darwin
+    linux: Linux
+    windows: Windows
+    386: i386
+    amd64: x86_64
+  files:
+    - LICENSE
+    - README.md
+    - doc/tutorial/**/*
+    - doc/ref/spec.md
+  format_overrides:
+    - goos: windows
+      format: zip
+
+checksum:
+  name_template: 'checksums.txt'
+
+snapshot:
+  name_template: "{{ .Tag }}-next"
+
+changelog:
+  sort: asc
+  filters:
+    exclude:
+    - '^test:'

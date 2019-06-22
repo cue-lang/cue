@@ -213,7 +213,7 @@ var builtinPackages = map[string]*builtinPkg{
 								a = append(a, string(b))
 							}
 						}
-						w.Write(a)
+						_ = w.Write(a)
 					}
 					w.Flush()
 					return buf.String(), nil
@@ -1827,7 +1827,7 @@ var builtinPackages = map[string]*builtinPkg{
 							if err := write(i.Value()); err != nil {
 								return "", err
 							}
-							tw.Write([]byte{'\n'})
+							_, _ = tw.Write([]byte{'\n'})
 						}
 					default:
 						return "", fmt.Errorf("tabwriter.Write: unsupported type %v", data.Kind())
@@ -1897,9 +1897,13 @@ var builtinPackages = map[string]*builtinPkg{
 		usage?: string
 		short?: string
 		long?:  string
-		tasks <name>: Task
+		tasks: {
+			<name>: Task
+		}
 	}
-	Task kind: =~"\\."
+	Task: {
+		kind: =~"\\."
+	}
 }`,
 	},
 	"tool/cli": &builtinPkg{
@@ -1918,7 +1922,9 @@ var builtinPackages = map[string]*builtinPkg{
 		kind:     *"tool/exec.Run" | "exec"
 		cmd:      string | [string, ...string]
 		install?: string | [string, ...string]
-		env <Key>: string
+		env: {
+			<Key>: string
+		}
 		stdout:  *null | string | bytes
 		stderr:  *null | string | bytes
 		stdin?:  string | bytes
@@ -1964,16 +1970,24 @@ var builtinPackages = map[string]*builtinPkg{
 		method: string
 		response: {
 			body: *bytes | string
-			header <Name>:  string | [...string]
-			trailer <Name>: string | [...string]
+			header: {
+				<Name>: string | [...string]
+			}
+			trailer: {
+				<Name>: string | [...string]
+			}
 			status:     string
 			statusCode: int
 		}
 		url: string
 		request: {
 			body: *bytes | string
-			header <Name>:  string | [...string]
-			trailer <Name>: string | [...string]
+			header: {
+				<Name>: string | [...string]
+			}
+			trailer: {
+				<Name>: string | [...string]
+			}
 		}
 	}
 	Post: Do & {

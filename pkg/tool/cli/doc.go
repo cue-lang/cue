@@ -6,10 +6,29 @@
 //
 //     // Print sends text to the stdout of the current process.
 //     Print: {
-//     	kind: "tool/cli.Print"
+//     	kind: *"tool/cli.Print" | "print" // for backwards compatibility
 //
 //     	// text is the text to be printed.
 //     	text: string
 //     }
+//
+//     // TODO:
+//     // Ask prompts the current console with a message and waits for input.
+//     //
+//     // Example:
+//     //     task ask: cli.Ask({
+//     //         prompt:   "Are you okay?"
+//     //         repsonse: bool
+//     //     })
+//     // Ask: {
+//     //  kind: "tool/cli.Ask"
+//
+//     //  // prompt sends this message to the output.
+//     //  prompt: string
+//
+//     //  // response holds the user's response. If it is a boolean expression it
+//     //  // will interpret the answer using textual yes/ no.
+//     //  response: string | bool
+//     // }
 //
 package cli

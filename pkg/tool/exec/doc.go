@@ -6,7 +6,7 @@
 //
 //     // Run executes the given shell command.
 //     Run: {
-//     	kind: "tool/exec.Run"
+//     	kind: *"tool/exec.Run" | "exec" // exec for backwards compatibility
 //
 //     	// cmd is the command to run.
 //     	cmd: string | [string, ...string]

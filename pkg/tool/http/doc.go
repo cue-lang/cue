@@ -10,7 +10,7 @@
 //     Delete: Do & {method: "DELETE"}
 //
 //     Do: {
-//     	kind: "tool/http.Do"
+//     	kind: *"tool/http.Do" | "http" // http for backwards compatibility
 //
 //     	method: string
 //     	url:    string // TODO: make url.URL type
@@ -29,5 +29,18 @@
 //     		trailer <Name>: string | [...string]
 //     	}
 //     }
+//
+//     /* TODO: support serving once we have the cue serve command.
+//     Serve: {
+//     	port: int
+//
+//     	cert: string
+//     	key:  string
+//
+//     	handle <Pattern>: Message & {
+//     		pattern: Pattern
+//     	}
+//     }
+//     */
 //
 package http

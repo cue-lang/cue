@@ -22,7 +22,6 @@ import (
 	"go/ast"
 	"go/constant"
 	"go/format"
-	"go/parser"
 	"go/printer"
 	"go/token"
 	"go/types"
@@ -34,7 +33,7 @@ import (
 	"regexp"
 	"strings"
 
-	"golang.org/x/tools/go/loader"
+	"golang.org/x/tools/go/packages"
 )
 
 const help = `
@@ -129,23 +128,21 @@ func pkgName() string {
 }
 
 type extracter struct {
-	prog *loader.Program
-	pkg  *loader.PackageInfo
+	pkg *packages.Package
 }
 
 func extract(args []string) {
-
-	cfg := loader.Config{
-		ParserMode: parser.ParseComments,
+	cfg := &packages.Config{
+		Mode: packages.LoadFiles |
+			packages.LoadAllSyntax |
+			packages.LoadTypes,
 	}
-	cfg.FromArgs(args, false)
-
-	e := extracter{}
-	var err error
-	e.prog, err = cfg.Load()
+	pkgs, err := packages.Load(cfg, args...)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	e := extracter{}
 
 	lastPkg := ""
 	var w *bytes.Buffer
@@ -165,18 +162,18 @@ func extract(args []string) {
 		w = &bytes.Buffer{}
 	}
 
-	for _, p := range e.prog.InitialPackages() {
+	for _, p := range pkgs {
 		e.pkg = p
-		for _, f := range p.Files {
-			if lastPkg != p.Pkg.Name() {
+		for _, f := range p.Syntax {
+			if lastPkg != p.Name {
 				flushFile()
-				lastPkg = p.Pkg.Name()
+				lastPkg = p.Name
 				fmt.Fprintln(w, copyright)
 				fmt.Fprintln(w, genLine)
 				fmt.Fprintln(w)
 				fmt.Fprintf(w, "package %s\n", pkgName())
 				fmt.Fprintln(w)
-				fmt.Fprintf(w, "import %q", p.Pkg.Path())
+				fmt.Fprintf(w, "import %q", p.PkgPath)
 				fmt.Fprintln(w)
 			}
 
@@ -197,7 +194,7 @@ func (e *extracter) reportFun(w io.Writer, x *ast.FuncDecl) {
 	if filter(x.Name.Name) {
 		return
 	}
-	pkgName := e.pkg.Pkg.Name()
+	pkgName := e.pkg.Name
 	override := ""
 	params := []ast.Expr{}
 	if x.Type.Params != nil {
@@ -261,14 +258,14 @@ func (e *extracter) reportFun(w io.Writer, x *ast.FuncDecl) {
 		default:
 			fmt.Printf("Skipping ")
 			x.Doc = nil
-			printer.Fprint(os.Stdout, e.prog.Fset, x)
+			printer.Fprint(os.Stdout, e.pkg.Fset, x)
 			fmt.Println()
 			return
 		}
 	}
 	fmt.Fprintln(w)
-	printer.Fprint(w, e.prog.Fset, x.Doc)
-	printer.Fprint(w, e.prog.Fset, x)
+	printer.Fprint(w, e.pkg.Fset, x.Doc)
+	printer.Fprint(w, e.pkg.Fset, x)
 	fmt.Fprint(w, "\n")
 	if override != "" {
 		fmt.Fprintf(w, "var %s = %s.%s\n\n", override, pkgName, x.Name.Name)
@@ -290,7 +287,7 @@ func (e *extracter) reportDecl(w io.Writer, x *ast.GenDecl) {
 				if _, ok := v.Values[i].(*ast.BasicLit); ok {
 					continue
 				}
-				tv, _ := types.Eval(e.prog.Fset, e.pkg.Pkg, v.Pos(), v.Names[0].Name)
+				tv, _ := types.Eval(e.pkg.Fset, e.pkg.Types, v.Pos(), v.Names[0].Name)
 				tok := token.ILLEGAL
 				switch tv.Value.Kind() {
 				case constant.Bool:
@@ -322,6 +319,6 @@ func (e *extracter) reportDecl(w io.Writer, x *ast.GenDecl) {
 		return
 	}
 	fmt.Fprintln(w)
-	printer.Fprint(w, e.prog.Fset, x)
+	printer.Fprint(w, e.pkg.Fset, x)
 	fmt.Fprintln(w)
 }

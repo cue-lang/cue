@@ -446,7 +446,7 @@ func Remainder(x, y float64) float64 {
 	return math.Remainder(x, y)
 }
 
-// Signbit returns true if x is negative or negative zero.
+// Signbit reports whether x is negative or negative zero.
 func Signbit(x float64) bool {
 	return math.Signbit(x)
 }

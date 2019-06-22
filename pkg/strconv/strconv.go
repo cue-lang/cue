@@ -86,7 +86,7 @@ func ParseInt(s string, base int, bitSize int) (i int64, err error) {
 	return strconv.ParseInt(s, base, bitSize)
 }
 
-// Atoi returns the result of ParseInt(s, 10, 0) converted to type int.
+// Atoi is equivalent to ParseInt(s, 10, 0), converted to type int.
 func Atoi(s string) (int, error) {
 	return strconv.Atoi(s)
 }

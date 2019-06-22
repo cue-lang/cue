@@ -76,6 +76,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		newFmtCmd(),
 		newExportCmd(),
 		cmdCmd,
+		newVersionCmd(),
 		newVetCmd(),
 		newAddCmd(),
 	}

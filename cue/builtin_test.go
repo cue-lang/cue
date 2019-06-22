@@ -16,6 +16,7 @@ package cue
 
 import (
 	"fmt"
+	"math/big"
 	"strings"
 	"testing"
 )
@@ -30,6 +31,11 @@ func TestBuiltins(t *testing.T) {
 		return []*bimport{&bimport{"",
 			[]string{fmt.Sprintf("(%s)", expr)},
 		}}
+	}
+	hexToDec := func(s string) string {
+		var x big.Int
+		x.SetString(s, 16)
+		return x.String()
 	}
 	testCases := []struct {
 		instances []*bimport
@@ -128,6 +134,66 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		testExpr(`or([])`),
 		`_|_(builtin:or:empty or)`,
+	}, {
+		test("encoding/csv", `csv.Encode([[1,2,3],[4,5],[7,8,9]])`),
+		`"1,2,3\n4,5\n7,8,9\n"`,
+	}, {
+		test("encoding/csv", `csv.Encode([["a", "b"], ["c"]])`),
+		`"a,b\nc\n"`,
+	}, {
+		test("encoding/json", `json.Valid("1")`),
+		`true`,
+	}, {
+		test("encoding/json", `json.Compact("[1, 2]")`),
+		`"[1,2]"`,
+	}, {
+		test("encoding/json", `json.Indent(#"{"a": 1, "b": 2}"#, "", "  ")`),
+		`"{\n  \"a\": 1,\n  \"b\": 2\n}"`,
+	}, {
+		test("encoding/json", `json.Unmarshal("1")`),
+		`1`,
+	}, {
+		test("encoding/json", `json.MarshalStream([{a: 1}, {b: 2}])`),
+		`"{\"a\":1}\n{\"b\":2}\n"`,
+	}, {
+		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),
+		`"a: 1\n---\nb: 2\n"`,
+	}, {
+		test("strings", `strings.ToCamel("AlphaBeta")`),
+		`"alphaBeta"`,
+	}, {
+		test("strings", `strings.ToTitle("alpha")`),
+		`"Alpha"`,
+	}, {
+		test("math/bits", `bits.And(0x10000000000000F0E, 0xF0F7)`), `6`,
+	}, {
+		test("math/bits", `bits.Or(0x100000000000000F0, 0x0F)`),
+		hexToDec("100000000000000FF"),
+	}, {
+		test("math/bits", `bits.Xor(0x10000000000000F0F, 0xFF0)`),
+		hexToDec("100000000000000FF"),
+	}, {
+		test("math/bits", `bits.Xor(0xFF0, 0x10000000000000F0F)`),
+		hexToDec("100000000000000FF"),
+	}, {
+		test("math/bits", `bits.Clear(0xF, 0x100000000000008)`), `7`,
+	}, {
+		test("math/bits", `bits.Clear(0x1000000000000000008, 0xF)`),
+		hexToDec("1000000000000000000"),
+	}, {
+		test("text/tabwriter", `tabwriter.Write("""
+			a\tb\tc
+			aaa\tbb\tvv
+			""")`),
+		`"a   b  c\naaa bb vv"`,
+	}, {
+		test("text/tabwriter", `tabwriter.Write([
+				"a\tb\tc",
+				"aaa\tbb\tvv"])`),
+		`"a   b  c\naaa bb vv\n"`,
+	}, {
+		test("text/template", `template.Execute("{{.}}-{{.}}", "foo")`),
+		`"foo-foo"`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

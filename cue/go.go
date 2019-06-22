@@ -24,6 +24,7 @@ import (
 	"strings"
 	"sync"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -193,6 +194,10 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 		// Interpret a nil pointer as an undefined value that is only
 		// null by default, but may still be set: *null | _.
 		return makeNullable(&top{src.base()}).(evaluated)
+
+	case ast.Expr:
+		x := newVisitorCtx(ctx, nil, nil, nil)
+		return ctx.manifest(x.walk(v))
 
 	case *big.Int:
 		n := newNum(src, intKind)

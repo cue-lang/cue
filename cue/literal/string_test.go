@@ -75,6 +75,10 @@ func TestUnquote(t *testing.T) {
 		{"##'''\n\t\tHello\\#v\n\t\t'''##", "Hello\\#v", nil},
 		{`#"""` + "\n\t\t\\#r\n\t\t" + `"""#`, "\r", nil},
 		{`#""#`, "", nil},
+		{`#" ""#`, ` "`, nil},
+		{`#" """#`, ` ""`, nil},
+		{`##" """# "##`, ` """# `, nil},
+		{`##" """# "##`, ` """# `, nil},
 		{`#"This is a "dog""#`, `This is a "dog"`, nil},
 		{"#\"\"\"\n\"\n\"\"\"#", `"`, nil},
 		{"#\"\"\"\n\"\"\"\n\"\"\"#", `"""`, nil},
@@ -98,9 +102,9 @@ func TestUnquote(t *testing.T) {
 		{`"Hello""`, "", errSyntax},
 		{`#"Hello"`, "", errUnmatchedQuote},
 		{`#"Hello'#`, "", errUnmatchedQuote},
-		{`#"""#`, "", errMissingNewline},
+		{`#""" """#`, "", errMissingNewline},
 
-		// TODO: should these be legal?
+		// TODO: should this be legal?
 		{`#"""#`, "", errMissingNewline},
 	}
 	for i, tc := range testCases {

@@ -484,19 +484,15 @@ func (s *Scanner) scanEscape(quote quoteInfo) (ok, interpolation bool) {
 	return true, false
 }
 
-func (s *Scanner) scanString(offset int, quote quoteInfo) (token.Token, string) {
+func (s *Scanner) scanString(offs int, quote quoteInfo) (token.Token, string) {
 	// ", """, ', or ''' opening already consumed
-	offs := s.offset - offset
 
 	tok := token.STRING
 
 	hasCR := false
 	extra := 0
 	for {
-		ch, ok := s.consumeStringClose(quote)
-		if ok {
-			break
-		}
+		ch := s.ch
 		if (quote.numChar != 3 && ch == '\n') || ch < 0 {
 			s.errf(offs, "string literal not terminated")
 			lit := s.src[offs:s.offset]
@@ -505,10 +501,15 @@ func (s *Scanner) scanString(offset int, quote quoteInfo) (token.Token, string) 
 			}
 			return tok, string(lit)
 		}
+
+		s.next()
+		ch, ok := s.consumeStringClose(ch, quote)
+		if ok {
+			break
+		}
 		if ch == '\r' && quote.numChar == 3 {
 			hasCR = true
 		}
-		s.next()
 		if ch == '\\' {
 			if _, interpolation := s.scanEscape(quote); interpolation {
 				tok = token.INTERPOLATION
@@ -535,25 +536,34 @@ func (s *Scanner) consumeQuotes(quote rune, max int) (next rune, n int) {
 	return s.ch, n
 }
 
-func (s *Scanner) consumeStringClose(quote quoteInfo) (next rune, atEnd bool) {
-	for i := 0; i < quote.numChar; i++ {
-		if s.ch != quote.char {
-			return s.ch, false
+func (s *Scanner) consumeStringClose(ch rune, quote quoteInfo) (next rune, atEnd bool) {
+	if quote.char != ch {
+		return ch, false
+	}
+	numChar := quote.numChar
+	n := numChar + quote.numHash
+	want := quote.char
+	for i := 1; i < n; i++ {
+		if i == numChar {
+			want = '#'
 		}
+		if want != s.ch {
+			return ch, false
+		}
+		ch = s.ch
 		s.next()
 	}
-	hasHash := s.hashCount(quote)
-	return s.ch, hasHash
+	return s.ch, true
 }
 
-func (s *Scanner) hashCount(quote quoteInfo) bool {
+func (s *Scanner) checkHashCount(offs int, quote quoteInfo) {
 	for i := 0; i < quote.numHash; i++ {
 		if s.ch != '#' {
-			return false
+			s.errf(offs, "string literal not terminated")
+			return
 		}
 		s.next()
 	}
-	return true
 }
 
 func stripCR(b []byte) []byte {
@@ -695,7 +705,7 @@ func (s *Scanner) popInterpolation() quoteInfo {
 // ResumeInterpolation resumes scanning of a string interpolation.
 func (s *Scanner) ResumeInterpolation() string {
 	quote := s.popInterpolation()
-	_, str := s.scanString(1, quote)
+	_, str := s.scanString(s.offset-1, quote)
 	return str
 }
 
@@ -824,16 +834,31 @@ scanAgain:
 			quote.numChar = 1
 			offs := s.offset - 1 - quote.numHash
 			switch _, n := s.consumeQuotes(ch, 2); n {
+			case 0:
+				quote.numChar = 1
+				tok, lit = s.scanString(offs, quote)
 			case 1:
-				if ch == '"' || ch == '\'' {
-					if !s.hashCount(quote) {
-						s.errf(offs, "string literal not terminated")
+				s.checkHashCount(offs, quote)
+				tok, lit = token.STRING, string(s.src[offs:s.offset])
+			case 2:
+				quote.numChar = 3
+				switch s.ch {
+				case '\n':
+					s.next()
+					tok, lit = s.scanString(offs, quote)
+				case '\r':
+					s.next()
+					if s.ch == '\n' {
+						s.next()
+						tok, lit = s.scanString(offs, quote)
+						break
 					}
+					fallthrough
+				default:
+					s.errf(offs, "expected newline after multiline quote %s",
+						s.src[offs:s.offset])
 					tok, lit = token.STRING, string(s.src[offs:s.offset])
 				}
-			default:
-				quote.numChar = n + 1
-				tok, lit = s.scanString(quote.numChar+quote.numHash, quote)
 			}
 		case '@':
 			insertEOL = true

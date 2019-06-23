@@ -106,6 +106,7 @@ var testTokens = [...]elt{
 	{token.STRING, "'\\U0000ff16'", literal},
 	{token.STRING, "'foobar'", literal},
 	{token.STRING, `'foo\/bar'`, literal},
+	{token.STRING, `#" ""#`, literal},
 	{token.STRING, `#"foobar"#`, literal},
 	{token.STRING, `#"\r"#`, literal},
 	{token.STRING, `#"\("#`, literal},
@@ -114,8 +115,12 @@ var testTokens = [...]elt{
 	{token.STRING, "'" + `\r` + "'", literal},
 	{token.STRING, "'foo" + `\r\n` + "bar'", literal},
 	{token.STRING, `"foobar"`, literal},
-	{token.STRING, `"""\n  foobar\n  """`, literal},
-	{token.STRING, `#"""\n  \(foobar\n  """#`, literal},
+	{token.STRING, "\"\"\"\n  foobar\n  \"\"\"", literal},
+	{token.STRING, "#\"\"\"\n  \\(foobar\n  \"\"\"#", literal},
+	// TODO: should we preserve the \r instead and have it removed by the
+	// literal parser? This would allow preserving \r for formatting without
+	// changing the semantics of evaluation.
+	{token.STRING, "#\"\"\"\r\n  \\(foobar\n  \"\"\"#", literal},
 
 	// Operators and delimiters
 	{token.ADD, "+", operator},
@@ -771,12 +776,13 @@ var errorTests = []struct {
 	{`""`, token.STRING, 0, `""`, ""},
 	{`"abc`, token.STRING, 0, `"abc`, "string literal not terminated"},
 	{`""abc`, token.STRING, 0, `""`, ""},
-	{`"""abc`, token.STRING, 0, `"""abc`, "string literal not terminated"},
-	{`'''abc`, token.STRING, 0, `'''abc`, "string literal not terminated"},
+	{"\"\"\"\nabc", token.STRING, 0, "\"\"\"\nabc", "string literal not terminated"},
+	{"'''\nabc", token.STRING, 0, "'''\nabc", "string literal not terminated"},
 	{"\"abc\n", token.STRING, 0, `"abc`, "string literal not terminated"},
 	{"\"abc\n   ", token.STRING, 0, `"abc`, "string literal not terminated"},
+	{"\"abc\r\n   ", token.STRING, 0, "\"abc\r", "string literal not terminated"},
 	{`#""`, token.STRING, 0, `#""`, "string literal not terminated"},
-	{`#"""`, token.STRING, 0, `#"""`, "string literal not terminated"},
+	{`#"""`, token.STRING, 0, `#"""`, `expected newline after multiline quote #"""`},
 	{`#""#`, token.STRING, 0, `#""#`, ""},
 	// {"$", IDENT, 0, "$", ""}, // TODO: for root of file?
 	{"#'", token.STRING, 0, "#'", "string literal not terminated"},

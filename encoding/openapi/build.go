@@ -18,9 +18,11 @@ import (
 	"fmt"
 	"math"
 	"path"
+	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 )
 
 type buildContext struct {
@@ -44,8 +46,14 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 	}
 
 	defer func() {
+		switch x := recover().(type) {
+		case nil:
+		case *openapiError:
+			err = x
+		default:
+			panic(x)
+		}
 		if x := recover(); x != nil {
-			// TODO: check if it's one of our own.
 			path := strings.Join(c.path, ".")
 			err = fmt.Errorf("error: %s: %v", path, x)
 		}
@@ -63,16 +71,34 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 	}
 	for i.Next() {
 		// message, enum, or constant.
-		c.schemas.Set(i.Label(), c.build(i.Value()))
+		label := i.Label()
+		c.schemas.Set(label, c.build(label, i.Value()))
 	}
 	return comps, nil
 }
 
-func (c *buildContext) build(v cue.Value) *oaSchema {
-	return newRootBuilder(c).schema(v)
+func (c *buildContext) build(name string, v cue.Value) *oaSchema {
+	return newRootBuilder(c).schema(name, v)
 }
 
-func (b *builder) schema(v cue.Value) *oaSchema {
+// shouldExpand reports is the given identifier is not exported.
+func (c *buildContext) shouldExpand(name string) bool {
+	return c.expandRefs
+}
+
+func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
+	panic(&openapiError{
+		errors.NewMessage(format, args),
+		b.ctx.path,
+		v.Pos(),
+	})
+}
+
+func (b *builder) schema(name string, v cue.Value) *oaSchema {
+	oldPath := b.ctx.path
+	b.ctx.path = append(b.ctx.path, name)
+	defer func() { b.ctx.path = oldPath }()
+
 	c := newRootBuilder(b.ctx)
 	c.value(v, nil)
 	schema := c.finish()
@@ -90,7 +116,7 @@ func (b *builder) schema(v cue.Value) *oaSchema {
 func (b *builder) value(v cue.Value, f typeFunc) {
 	count := 0
 	var values cue.Value
-	if b.ctx.expandRefs {
+	if b.ctx.shouldExpand(strings.Join(v.Reference(), ".")) {
 		values = v
 		count = 1
 	} else {
@@ -122,7 +148,7 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 			switch {
 			case isConcrete(v):
 				b.dispatch(f, v)
-				b.set("enum", []interface{}{decode(v)})
+				b.set("enum", []interface{}{b.decode(v)})
 
 			default:
 				if a := appendSplit(nil, cue.OrOp, v); len(a) > 1 {
@@ -130,7 +156,8 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 				} else {
 					v = a[0]
 					if err := v.Err(); err != nil {
-						panic(err)
+						b.failf(v, "openapi: %v", err)
+						return
 					}
 					b.dispatch(f, v)
 				}
@@ -213,7 +240,7 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 			nullable = true
 
 		case isConcrete(v):
-			enums = append(enums, decode(v))
+			enums = append(enums, b.decode(v))
 
 		default:
 			disjuncts = append(disjuncts, v)
@@ -332,14 +359,14 @@ func (b *builder) object(v cue.Value) {
 
 	properties := map[string]*oaSchema{}
 	for i, _ := v.Fields(cue.Optional(true), cue.Hidden(false)); i.Next(); {
-		properties[i.Label()] = b.schema(i.Value())
+		properties[i.Label()] = b.schema(i.Label(), i.Value())
 	}
 	if len(properties) > 0 {
 		b.set("properties", properties)
 	}
 
 	if t, ok := v.Elem(); ok {
-		b.set("additionalProperties", b.schema(t))
+		b.set("additionalProperties", b.schema("*", t))
 	}
 
 	// TODO: maxProperties, minProperties: can be done once we allow cap to
@@ -376,8 +403,9 @@ func (b *builder) array(v cue.Value) {
 	// There is never a need for allOf or anyOf. Note that a CUE list
 	// corresponds almost one-to-one to OpenAPI lists.
 	items := []*oaSchema{}
-	for i, _ := v.List(); i.Next(); {
-		items = append(items, b.schema(i.Value()))
+	count := 0
+	for i, _ := v.List(); i.Next(); count++ {
+		items = append(items, b.schema(strconv.Itoa(count), i.Value()))
 	}
 	if len(items) > 0 {
 		// TODO: per-item schema are not allowed in OpenAPI, only in JSON Schema.
@@ -403,7 +431,7 @@ func (b *builder) array(v cue.Value) {
 
 	if !hasMax || int64(len(items)) < maxLength {
 		if typ, ok := v.Elem(); ok {
-			t := b.schema(typ)
+			t := b.schema("*", typ)
 			if len(items) > 0 {
 				b.set("additionalItems", t)
 			} else {
@@ -435,7 +463,8 @@ func (b *builder) listCap(v cue.Value) {
 		})
 
 	default:
-		panic(fmt.Sprintf("unsupported op for list capacity %v", op))
+		b.failf(v, "unsupported op for list capacity %v", op)
+		return
 	}
 }
 
@@ -527,7 +556,8 @@ func (b *builder) string(v cue.Value) {
 			// TODO: this may be an unresolved interpolation or expression. Consider
 			// whether it is reasonable to treat unevaluated operands as wholes and
 			// generate a compound regular expression.
-			panic(err)
+			b.failf(v, "regexp value must be a string: %v", err)
+			return
 		}
 		if op == cue.RegexMatchOp {
 			b.set("pattern", s)
@@ -543,7 +573,7 @@ func (b *builder) string(v cue.Value) {
 		// TODO: determine formats from specific types.
 
 	default:
-		panic(fmt.Sprintf("unsupported of %v for bytes type", op))
+		b.failf(v, "unsupported op %v for string type", op)
 	}
 }
 
@@ -556,7 +586,8 @@ func (b *builder) bytes(v cue.Value) {
 			// TODO: this may be an unresolved interpolation or expression. Consider
 			// whether it is reasonable to treat unevaluated operands as wholes and
 			// generate a compound regular expression.
-			panic(err)
+			b.failf(v, "regexp value must be of type bytes: %v", err)
+			return
 		}
 
 		if op == cue.RegexMatchOp {
@@ -572,7 +603,7 @@ func (b *builder) bytes(v cue.Value) {
 	case cue.NoOp:
 
 	default:
-		panic(fmt.Sprintf("unsupported of %v for bytes type", op))
+		b.failf(v, "unsupported op %v for bytes type", op)
 	}
 }
 
@@ -643,7 +674,8 @@ func (b *builder) finish() *oaSchema {
 	switch len(b.allOf) {
 	case 0:
 		if b.typ == "" {
-			panic("no type specified at finish")
+			b.failf(cue.Value{}, "no type specified at finish")
+			return nil
 		}
 		t := &orderedMap{}
 		setType(t, b)
@@ -682,15 +714,15 @@ func (b *builder) addRef(ref []string) {
 func (b *builder) int(v cue.Value) int64 {
 	i, err := v.Int64()
 	if err != nil {
-		panic("could not retrieve int")
+		b.failf(v, "could not retrieve int: %v", err)
 	}
 	return i
 }
 
-func decode(v cue.Value) interface{} {
+func (b *builder) decode(v cue.Value) interface{} {
 	var d interface{}
 	if err := v.Decode(&d); err != nil {
-		panic(err)
+		b.failf(v, "decode error: %v", err)
 	}
 	return d
 }

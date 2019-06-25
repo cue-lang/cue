@@ -20,6 +20,10 @@ import "cuelang.org/go/cue/token"
 // use to evaluate a value.
 type Op int
 
+func (o Op) String() string {
+	return opToString[o]
+}
+
 // Values of Op.
 const (
 	NoOp Op = iota
@@ -82,6 +86,37 @@ var opToOp = map[op]Op{
 	opIRem:        IntRemainderOp,
 	opIDiv:        IntDivideOp,
 	opIMod:        IntModuloOp,
+}
+
+var opToString = map[Op]string{
+	AndOp:              "&",
+	OrOp:               "|",
+	BooleanAndOp:       "&&",
+	BooleanOrOp:        "||",
+	EqualOp:            "==",
+	NotOp:              "!",
+	NotEqualOp:         "!=",
+	LessThanOp:         "<",
+	LessThanEqualOp:    "<=",
+	GreaterThanOp:      ">",
+	GreaterThanEqualOp: ">=",
+	RegexMatchOp:       "=~",
+	NotRegexMatchOp:    "!~",
+	AddOp:              "+",
+	SubtractOp:         "-",
+	MultiplyOp:         "*",
+	FloatQuotientOp:    "/",
+	FloatRemainOp:      "%",
+	IntQuotientOp:      "quo",
+	IntRemainderOp:     "rem",
+	IntDivideOp:        "div",
+	IntModuloOp:        "mod",
+
+	SelectorOp:      ".",
+	IndexOp:         "[]",
+	SliceOp:         "[:]",
+	CallOp:          "()",
+	InterpolationOp: `\()`,
 }
 
 func opIn(op op, anyOf ...op) bool {

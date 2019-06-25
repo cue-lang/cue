@@ -2016,34 +2016,3 @@ func TestExpr(t *testing.T) {
 		})
 	}
 }
-
-var opToString = map[Op]string{
-	AndOp:              "&",
-	OrOp:               "|",
-	BooleanAndOp:       "&&",
-	BooleanOrOp:        "||",
-	EqualOp:            "==",
-	NotOp:              "!",
-	NotEqualOp:         "!=",
-	LessThanOp:         "<",
-	LessThanEqualOp:    "<=",
-	GreaterThanOp:      ">",
-	GreaterThanEqualOp: ">=",
-	RegexMatchOp:       "=~",
-	NotRegexMatchOp:    "!~",
-	AddOp:              "+",
-	SubtractOp:         "-",
-	MultiplyOp:         "*",
-	FloatQuotientOp:    "/",
-	FloatRemainOp:      "%",
-	IntQuotientOp:      "quo",
-	IntRemainderOp:     "rem",
-	IntDivideOp:        "div",
-	IntModuloOp:        "mod",
-
-	SelectorOp:      ".",
-	IndexOp:         "[]",
-	SliceOp:         "[:]",
-	CallOp:          "()",
-	InterpolationOp: `\()`,
-}

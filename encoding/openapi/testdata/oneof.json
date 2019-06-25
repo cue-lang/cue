@@ -3,7 +3,7 @@
    "components": {
       "schema": {
          "MyString": {
-            "anyOf": [
+            "oneOf": [
                {
                   "type": "object",
                   "required": [
@@ -46,8 +46,7 @@
                   "type": "array",
                   "items": {
                      "$ref": "#/components/schema/MyString"
-                  },
-                  "default": []
+                  }
                },
                "include": {
                   "$ref": "#/components/schema/MyString"

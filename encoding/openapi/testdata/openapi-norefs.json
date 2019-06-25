@@ -16,8 +16,7 @@
                         "type": "array",
                         "items": {
                            "type": "string"
-                        },
-                        "default": []
+                        }
                      },
                      "foo": {
                         "type": "number",
@@ -35,8 +34,7 @@
                               "type": "array",
                               "items": {
                                  "type": "integer"
-                              },
-                              "default": []
+                              }
                            },
                            "port": {
                               "type": "integer"
@@ -47,7 +45,7 @@
                },
                {
                   "type": "object",
-                  "anyOf": [
+                  "oneOf": [
                      {
                         "type": "object",
                         "required": [
@@ -89,8 +87,7 @@
                   "type": "array",
                   "items": {
                      "type": "integer"
-                  },
-                  "default": []
+                  }
                },
                "port": {
                   "type": "integer"
@@ -103,7 +100,7 @@
             "maximum": 2147483647
          },
          "YourMessage": {
-            "anyOf": [
+            "oneOf": [
                {
                   "type": "object",
                   "required": [
@@ -137,7 +134,7 @@
          "YourMessage2": {
             "allOf": [
                {
-                  "anyOf": [
+                  "oneOf": [
                      {
                         "type": "object",
                         "required": [
@@ -163,7 +160,7 @@
                   ]
                },
                {
-                  "anyOf": [
+                  "oneOf": [
                      {
                         "type": "object",
                         "required": [
@@ -189,7 +186,7 @@
                   ]
                },
                {
-                  "anyOf": [
+                  "oneOf": [
                      {
                         "type": "object",
                         "required": [
@@ -217,7 +214,7 @@
             ]
          },
          "Msg2": {
-            "anyOf": [
+            "oneOf": [
                {
                   "type": "object",
                   "required": [
@@ -263,7 +260,7 @@
          "DefaultStruct": {
             "allOf": [
                {
-                  "anyOf": [
+                  "oneOf": [
                      {
                         "type": "object",
                         "required": [
@@ -275,8 +272,7 @@
                               "type": "array",
                               "items": {
                                  "type": "integer"
-                              },
-                              "default": []
+                              }
                            },
                            "port": {
                               "type": "integer"

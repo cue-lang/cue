@@ -72,6 +72,9 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 	for i.Next() {
 		// message, enum, or constant.
 		label := i.Label()
+		if c.isInternal(label) {
+			continue
+		}
 		c.schemas.Set(label, c.build(label, i.Value()))
 	}
 	return comps, nil
@@ -81,9 +84,16 @@ func (c *buildContext) build(name string, v cue.Value) *oaSchema {
 	return newRootBuilder(c).schema(name, v)
 }
 
+// isInternal reports whether or not to include this type.
+func (c *buildContext) isInternal(name string) bool {
+	// TODO: allow a regexp filter in Config. If we have closed structs and
+	// definitions, this will likely be unnecessary.
+	return strings.HasSuffix(name, "_value")
+}
+
 // shouldExpand reports is the given identifier is not exported.
 func (c *buildContext) shouldExpand(name string) bool {
-	return c.expandRefs
+	return c.expandRefs || c.isInternal(name)
 }
 
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
@@ -115,6 +125,7 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 
 func (b *builder) value(v cue.Value, f typeFunc) {
 	count := 0
+	disallowDefault := false
 	var values cue.Value
 	if b.ctx.shouldExpand(strings.Join(v.Reference(), ".")) {
 		values = v
@@ -126,6 +137,7 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 			switch r := v.Reference(); {
 			case r != nil:
 				b.addRef(r)
+				disallowDefault = true
 			default:
 				count++
 				values = values.Unify(v)
@@ -165,9 +177,20 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 		}
 	}
 
-	if v, ok := v.Default(); ok && v.IsConcrete() {
-		v.Default()
-		b.set("default", v)
+	if v, ok := v.Default(); ok && v.IsConcrete() && !disallowDefault {
+		// TODO: should we show the empty list default? This would be correct
+		// but perhaps a bit too pedantic and noisy.
+		switch {
+		case v.Kind() == cue.ListKind:
+			iter, _ := v.List()
+			if !iter.Next() {
+				// Don't show default for empty list.
+				break
+			}
+			fallthrough
+		default:
+			b.set("default", v)
+		}
 	}
 }
 
@@ -273,7 +296,9 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 			anyOf = append(anyOf, c.finish())
 		}
 
-		b.set("anyOf", anyOf)
+		// TODO: analyze CUE structs to figure out if it should be oneOf or
+		// anyOf. As the source is protobuf for now, it is always oneOf.
+		b.set("oneOf", anyOf)
 		if nullable {
 			b.set("nullable", true)
 		}
@@ -569,7 +594,7 @@ func (b *builder) string(v cue.Value) {
 		// - maxLength
 		// - minLength
 
-	case cue.NoOp:
+	case cue.NoOp, cue.SelectorOp:
 		// TODO: determine formats from specific types.
 
 	default:
@@ -600,7 +625,7 @@ func (b *builder) bytes(v cue.Value) {
 		// - maxLength
 		// - minLength
 
-	case cue.NoOp:
+	case cue.NoOp, cue.SelectorOp:
 
 	default:
 		b.failf(v, "unsupported op %v for bytes type", op)

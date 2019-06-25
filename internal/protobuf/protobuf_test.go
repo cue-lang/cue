@@ -26,7 +26,7 @@ import (
 	"github.com/kr/pretty"
 )
 
-var update *bool = flag.Bool("update", false, "update the test output")
+var update = flag.Bool("update", false, "update the test output")
 
 func TestParseDefinitions(t *testing.T) {
 	testCases := []string{

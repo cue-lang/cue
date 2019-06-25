@@ -16,6 +16,7 @@ package protobuf
 
 import (
 	"strings"
+	"text/scanner"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -25,15 +26,16 @@ import (
 
 // failf panics with a marked error that can be intercepted upon returning
 // from parsing.
-func failf(format string, args ...interface{}) {
-	panic(protoError{xerrors.Errorf(format, args...)})
+func failf(pos scanner.Position, format string, args ...interface{}) {
+	panic(protoError{pos, xerrors.Errorf(format, args...)})
 }
 
-func fail(err error) {
-	panic(protoError{err})
+func fail(pos scanner.Position, err error) {
+	panic(protoError{pos, err})
 }
 
 type protoError struct {
+	pos scanner.Position
 	error
 }
 

@@ -19,9 +19,6 @@
 package protobuf
 
 import (
-	"fmt"
-	"io"
-
 	"cuelang.org/go/cue/ast"
 )
 
@@ -30,10 +27,11 @@ type Config struct {
 	Paths []string
 }
 
-// Parse parses a single proto file and returns its contents translated to
-// a CUE file. Imports are resolved using the path define in Config.
-// If body is not nil, it will use this as the contents of the file. Otherwise
-// Parse will open the given file name at the fully qualified path.
+// Parse parses a single proto file and returns its contents translated to a CUE
+// file. Imports are resolved using the paths defined in Config. If src is not
+// nil, it will use this as the contents of the file. It may be a string, []byte
+// or io.Reader. Otherwise Parse will open the given file name at the fully
+// qualified path.
 //
 // The following field options are supported:
 //    (cue.val)     string        CUE constraint for this field. The string may
@@ -41,31 +39,15 @@ type Config struct {
 //    (cue.opt)     FieldOptions
 //       required   bool          Defines the field is required. Use with
 //                                caution.
-func Parse(filename string, body io.Reader, c *Config) (f *ast.File, err error) {
+func Parse(filename string, src interface{}, c *Config) (f *ast.File, err error) {
 	state := &sharedState{
 		paths: c.Paths,
 	}
-	p, err := state.parse(filename, body)
+	p, err := state.parse(filename, src)
 	if err != nil {
 		return nil, err
 	}
 	return p.file, nil
-}
-
-// Error describes the location and cause of an error.
-type Error struct {
-	Filename string
-	Path     string
-	Err      error
-}
-
-func (p *Error) Unwrap() error { return p.Err }
-
-func (p *Error) Error() string {
-	if p.Path == "" {
-		return fmt.Sprintf("parse of file %q failed: %v", p.Filename, p.Err)
-	}
-	return fmt.Sprintf("parse of file %q failed at %s: %v", p.Filename, p.Path, p.Err)
 }
 
 // TODO

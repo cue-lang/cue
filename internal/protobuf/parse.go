@@ -15,18 +15,20 @@
 package protobuf
 
 import (
+	"bytes"
 	"fmt"
-	"io"
 	"os"
 	"path"
 	"path/filepath"
 	"sort"
 	"strconv"
 	"strings"
+	"text/scanner"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 	"github.com/emicklei/proto"
 	"golang.org/x/xerrors"
 )
@@ -35,18 +37,10 @@ type sharedState struct {
 	paths []string
 }
 
-func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, err error) {
-	// Determine files to convert.
-	if r == nil {
-		f, err := os.Open(filename)
-		if err != nil {
-			return nil, xerrors.Errorf("protobuf: %w", err)
-		}
-		defer f.Close()
-		r = f
-	}
+func (s *sharedState) parse(filename string, src interface{}) (p *protoConverter, err error) {
+	b, err := source.Read(filename, src)
 
-	parser := proto.NewParser(r)
+	parser := proto.NewParser(bytes.NewReader(b))
 	if filename != "" {
 		parser.Filename(filename)
 	}
@@ -57,6 +51,7 @@ func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, er
 
 	p = &protoConverter{
 		state:   s,
+		tfile:   token.NewFile(filename, 0, len(b)),
 		used:    map[string]bool{},
 		symbols: map[string]bool{},
 	}
@@ -65,10 +60,10 @@ func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, er
 		switch x := recover().(type) {
 		case nil:
 		case protoError:
-			err = &Error{
-				Filename: filename,
-				Path:     strings.Join(p.path, "."),
-				Err:      x.error,
+			err = &protobufError{
+				path: p.path,
+				pos:  p.toCUEPos(x.pos),
+				err:  x.error,
 			}
 		default:
 			panic(x)
@@ -88,7 +83,7 @@ func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, er
 			if x.Name == "go_package" {
 				str, err := strconv.Unquote(x.Constant.SourceRepresentation())
 				if err != nil {
-					failf("unquoting package filed: %v", err)
+					failf(x.Position, "unquoting package filed: %v", err)
 				}
 				split := strings.Split(str, ";")
 				p.goPkgPath = split[0]
@@ -98,7 +93,7 @@ func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, er
 				case 2:
 					p.goPkg = split[1]
 				default:
-					failf("unexpected ';' in %q", str)
+					failf(x.Position, "unexpected ';' in %q", str)
 				}
 				p.file.Name = ast.NewIdent(p.goPkg)
 				// name.AddComment(comment(x.Comment, true))
@@ -144,6 +139,7 @@ func (s *sharedState) parse(filename string, r io.Reader) (p *protoConverter, er
 // CUE files one to one.
 type protoConverter struct {
 	state *sharedState
+	tfile *token.File
 
 	proto3 bool
 
@@ -174,10 +170,14 @@ type pkgInfo struct {
 	shortName  string // Used for the cue package path, default is base of goPath
 }
 
-func (p *protoConverter) addRef(from, to string) {
+func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
+	return p.tfile.Pos(pos.Offset, 0)
+}
+
+func (p *protoConverter) addRef(pos scanner.Position, from, to string) {
 	top := p.scope[len(p.scope)-1]
 	if _, ok := top[from]; ok {
-		failf("entity %q already defined", from)
+		failf(pos, "entity %q already defined", from)
 	}
 	top[from] = mapping{ref: to}
 }
@@ -185,6 +185,7 @@ func (p *protoConverter) addRef(from, to string) {
 func (p *protoConverter) addNames(elems []proto.Visitee) {
 	p.scope = append(p.scope, map[string]mapping{})
 	for _, e := range elems {
+		var pos scanner.Position
 		var name string
 		switch x := e.(type) {
 		case *proto.Message:
@@ -192,14 +193,16 @@ func (p *protoConverter) addNames(elems []proto.Visitee) {
 				continue
 			}
 			name = x.Name
+			pos = x.Position
 		case *proto.Enum:
 			name = x.Name
+			pos = x.Position
 		default:
 			continue
 		}
 		sym := strings.Join(append(p.path, name), ".")
 		p.symbols[sym] = true
-		p.addRef(name, strings.Join(append(p.path, name), "_"))
+		p.addRef(pos, name, strings.Join(append(p.path, name), "_"))
 	}
 }
 
@@ -207,19 +210,19 @@ func (p *protoConverter) popNames() {
 	p.scope = p.scope[:len(p.scope)-1]
 }
 
-func (p *protoConverter) resolve(name string, options []*proto.Option) string {
+func (p *protoConverter) resolve(pos scanner.Position, name string, options []*proto.Option) string {
 	if strings.HasPrefix(name, ".") {
-		return p.resolveTopScope(name[1:], options)
+		return p.resolveTopScope(pos, name[1:], options)
 	}
 	for i := len(p.scope) - 1; i > 0; i-- {
 		if m, ok := p.scope[i][name]; ok {
 			return m.ref
 		}
 	}
-	return p.resolveTopScope(name, options)
+	return p.resolveTopScope(pos, name, options)
 }
 
-func (p *protoConverter) resolveTopScope(name string, options []*proto.Option) string {
+func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, options []*proto.Option) string {
 	for i := 0; i < len(name); i++ {
 		k := strings.IndexByte(name[i:], '.')
 		i += k
@@ -236,7 +239,7 @@ func (p *protoConverter) resolveTopScope(name string, options []*proto.Option) s
 	if s, ok := protoToCUE(name, options); ok {
 		return s
 	}
-	failf("name %q not found", name)
+	failf(pos, "name %q not found", name)
 	return ""
 }
 
@@ -257,13 +260,13 @@ func (p *protoConverter) doImport(v *proto.Import) {
 	}
 
 	if filename == "" {
-		p.mustBuiltinPackage(v.Filename)
+		p.mustBuiltinPackage(v.Position, v.Filename)
 		return
 	}
 
 	imp, err := p.state.parse(filename, nil)
 	if err != nil {
-		fail(err)
+		fail(v.Position, err)
 	}
 
 	prefix := ""
@@ -298,16 +301,26 @@ func (p *protoConverter) doImport(v *proto.Import) {
 	}
 }
 
-func (p *protoConverter) stringLit(s string) *ast.BasicLit {
-	return &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(s)}
+func (p *protoConverter) stringLit(pos scanner.Position, s string) *ast.BasicLit {
+	return &ast.BasicLit{
+		ValuePos: p.toCUEPos(pos),
+		Kind:     token.STRING,
+		Value:    strconv.Quote(s)}
 }
 
-func (p *protoConverter) ref() *ast.Ident {
-	return ast.NewIdent(strings.Join(p.path, "_"))
+func (p *protoConverter) ident(pos scanner.Position, name string) *ast.Ident {
+	return &ast.Ident{NamePos: p.toCUEPos(pos), Name: labelName(name)}
 }
 
-func (p *protoConverter) subref(name string) *ast.Ident {
-	return ast.NewIdent(strings.Join(append(p.path, name), "_"))
+func (p *protoConverter) ref(pos scanner.Position) *ast.Ident {
+	return &ast.Ident{NamePos: p.toCUEPos(pos), Name: strings.Join(p.path, "_")}
+}
+
+func (p *protoConverter) subref(pos scanner.Position, name string) *ast.Ident {
+	return &ast.Ident{
+		NamePos: p.toCUEPos(pos),
+		Name:    strings.Join(append(p.path, name), "_"),
+	}
 }
 
 func (p *protoConverter) addTag(f *ast.Field, body string) {
@@ -344,7 +357,7 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 		// already handled.
 
 	default:
-		failf("unsupported type %T", x)
+		failf(scanner.Position{}, "unsupported type %T", x)
 	}
 }
 
@@ -358,10 +371,12 @@ func (p *protoConverter) message(v *proto.Message) {
 	// TODO: handle IsExtend/ proto2
 
 	s := &ast.StructLit{
+		Lbrace: p.toCUEPos(v.Position),
 		// TOOD: set proto file position.
+		Rbrace: token.Newline.Pos(),
 	}
 
-	ref := p.ref()
+	ref := p.ref(v.Position)
 	if v.Comment == nil {
 		ref.NamePos = newSection
 	}
@@ -386,6 +401,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 		if x.Repeated {
 			f.Value = &ast.ListLit{
+				Lbrack:   p.toCUEPos(x.Position),
 				Ellipsis: token.NoSpace.Pos(),
 				Type:     f.Value,
 			}
@@ -397,18 +413,18 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		// All keys are converted to strings.
 		// TODO: support integer keys.
 		f.Label = &ast.TemplateLabel{Ident: ast.NewIdent("_")}
-		f.Value = ast.NewIdent(p.resolve(x.Type, x.Options))
+		f.Value = ast.NewIdent(p.resolve(x.Position, x.Type, x.Options))
 
-		name := labelName(x.Name)
+		name := p.ident(x.Position, x.Name)
 		f = &ast.Field{
-			Label: ast.NewIdent(name),
+			Label: name,
 			Value: &ast.StructLit{Elts: []ast.Decl{f}},
 		}
 		addComments(f, i, x.Comment, x.InlineComment)
 
 		o := optionParser{message: s, field: f}
 		o.tags = fmt.Sprintf("%d,type=map<%s,%s>", x.Sequence, x.KeyType, x.Type)
-		if x.Name != name {
+		if x.Name != name.Name {
 			o.tags += "," + x.Name
 		}
 		s.Elts = append(s.Elts, f)
@@ -425,7 +441,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		p.oneOf(x)
 
 	default:
-		failf("unsupported type %T", v)
+		failf(scanner.Position{}, "unsupported type %T", v)
 	}
 }
 
@@ -449,10 +465,10 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 // will be prefixed with the name of its parent and an underscore.
 func (p *protoConverter) enum(x *proto.Enum) {
 	if len(x.Elements) == 0 {
-		failf("empty enum")
+		failf(x.Position, "empty enum")
 	}
 
-	name := p.subref(x.Name)
+	name := p.subref(x.Position, x.Name)
 
 	p.addNames(x.Elements)
 
@@ -482,13 +498,13 @@ func (p *protoConverter) enum(x *proto.Enum) {
 		case *proto.EnumField:
 			// Add enum value to map
 			f := &ast.Field{
-				Label: p.stringLit(y.Name),
+				Label: p.stringLit(y.Position, y.Name),
 				Value: &ast.BasicLit{Value: strconv.Itoa(y.Integer)},
 			}
 			valueMap.Elts = append(valueMap.Elts, f)
 
 			// add to enum disjunction
-			value := p.stringLit(y.Name)
+			value := p.stringLit(y.Position, y.Name)
 
 			var e ast.Expr = value
 			// Make the first value the default value.
@@ -523,14 +539,17 @@ func (p *protoConverter) enum(x *proto.Enum) {
 
 func (p *protoConverter) oneOf(x *proto.Oneof) {
 	f := &ast.Field{
-		Label: p.ref(),
+		Label: p.ref(x.Position),
 	}
 	f.AddComment(comment(x.Comment, true))
 
 	p.file.Decls = append(p.file.Decls, f)
 
 	for _, v := range x.Elements {
-		s := &ast.StructLit{}
+		s := &ast.StructLit{
+			// TODO: make this the default in the formatter.
+			Rbrace: token.Newline.Pos(),
+		}
 		switch x := v.(type) {
 		case *proto.OneOfField:
 			f := p.parseField(s, 0, x.Field)
@@ -551,9 +570,9 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 	f := &ast.Field{}
 	addComments(f, i, x.Comment, x.InlineComment)
 
-	name := labelName(x.Name)
-	f.Label = ast.NewIdent(name)
-	typ := p.resolve(x.Type, x.Options)
+	name := p.ident(x.Position, x.Name)
+	f.Label = name
+	typ := p.resolve(x.Position, x.Type, x.Options)
 	f.Value = ast.NewIdent(typ)
 	s.Elts = append(s.Elts, f)
 
@@ -564,7 +583,7 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 	if x.Type != typ {
 		o.tags += ",type=" + x.Type
 	}
-	if x.Name != name {
+	if x.Name != name.Name {
 		o.tags += ",name=" + x.Name
 	}
 	o.parse(x.Options)
@@ -598,7 +617,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 			// TODO: set filename and base offset.
 			expr, err := parser.ParseExpr("", o.Constant.Source)
 			if err != nil {
-				failf("invalid cue.val value: %v", err)
+				failf(o.Position, "invalid cue.val value: %v", err)
 			}
 			// Any further checks will be done at the end.
 			constraint := &ast.Field{Label: p.field.Label, Value: expr}

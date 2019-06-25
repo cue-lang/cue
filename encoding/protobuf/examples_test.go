@@ -20,7 +20,7 @@ import (
 	"path/filepath"
 
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/internal/protobuf"
+	"cuelang.org/go/encoding/protobuf"
 )
 
 func ExampleParse() {

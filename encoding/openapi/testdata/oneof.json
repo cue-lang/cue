@@ -1,0 +1,59 @@
+{
+   "openapi": "3.0.0",
+   "components": {
+      "schema": {
+         "MyString": {
+            "anyOf": [
+               {
+                  "type": "object",
+                  "required": [
+                     "exact"
+                  ],
+                  "properties": {
+                     "exact": {
+                        "type": "string"
+                     }
+                  }
+               },
+               {
+                  "type": "object",
+                  "required": [
+                     "regex"
+                  ],
+                  "properties": {
+                     "regex": {
+                        "type": "string"
+                     }
+                  }
+               }
+            ]
+         },
+         "MyInt": {
+            "type": "integer"
+         },
+         "Foo": {
+            "type": "object",
+            "required": [
+               "include",
+               "exclude",
+               "count"
+            ],
+            "properties": {
+               "count": {
+                  "$ref": "#/components/schema/MyInt"
+               },
+               "exclude": {
+                  "type": "array",
+                  "items": {
+                     "$ref": "#/components/schema/MyString"
+                  },
+                  "default": []
+               },
+               "include": {
+                  "$ref": "#/components/schema/MyString"
+               }
+            }
+         }
+      }
+   }
+}

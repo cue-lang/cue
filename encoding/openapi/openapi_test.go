@@ -43,6 +43,10 @@ func TestParseDefinitions(t *testing.T) {
 		in, out string
 		config  *Config
 	}{{
+		"oneof.cue",
+		"oneof.json",
+		defaultConfig,
+	}, {
 		"openapi.cue",
 		"openapi.json",
 		defaultConfig,

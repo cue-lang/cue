@@ -917,7 +917,7 @@ func (v Value) Len() Value {
 // Elem returns the value of undefined element types of lists and structs.
 func (v Value) Elem() (Value, bool) {
 	ctx := v.ctx()
-	switch x := v.path.cache.(type) {
+	switch x := v.path.v.(type) {
 	case *structLit:
 		if x.template == nil {
 			break

@@ -17,42 +17,10 @@
 package parser
 
 import (
-	"bytes"
-	"fmt"
-	"io"
-	"io/ioutil"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 )
-
-// If src != nil, readSource converts src to a []byte if possible;
-// otherwise it returns an error. If src == nil, readSource returns
-// the result of reading the file specified by filename.
-//
-func readSource(filename string, src interface{}) ([]byte, error) {
-	if src != nil {
-		switch s := src.(type) {
-		case string:
-			return []byte(s), nil
-		case []byte:
-			return s, nil
-		case *bytes.Buffer:
-			// is io.Reader, but src is already available in []byte form
-			if s != nil {
-				return s.Bytes(), nil
-			}
-		case io.Reader:
-			var buf bytes.Buffer
-			if _, err := io.Copy(&buf, s); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
-		}
-		return nil, fmt.Errorf("invalid source type %T", src)
-	}
-	return ioutil.ReadFile(filename)
-}
 
 // Option specifies a parse option.
 type Option func(p *parser)
@@ -137,7 +105,7 @@ const (
 func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
 
 	// get source
-	text, err := readSource(filename, src)
+	text, err := source.Read(filename, src)
 	if err != nil {
 		return nil, err
 	}
@@ -181,7 +149,7 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 // be nil.
 func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, error) {
 	// get source
-	text, err := readSource(filename, src)
+	text, err := source.Read(filename, src)
 	if err != nil {
 		return nil, err
 	}

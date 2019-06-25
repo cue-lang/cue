@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/source"
 )
 
 func Test_readSource(t *testing.T) {
@@ -35,7 +36,7 @@ func Test_readSource(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		got, err := readSource(tt.args.filename, tt.args.src)
+		got, err := source.Read(tt.args.filename, tt.args.src)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. readSource() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue

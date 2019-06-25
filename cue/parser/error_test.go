@@ -42,6 +42,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/source"
 )
 
 const testdata = "testdata"
@@ -148,7 +149,7 @@ func compareErrors(t *testing.T, file *token.File, expected map[token.Pos]string
 
 func checkErrors(t *testing.T, filename string, input interface{}) {
 	t.Helper()
-	src, err := readSource(filename, input)
+	src, err := source.Read(filename, input)
 	if err != nil {
 		t.Error(err)
 		return

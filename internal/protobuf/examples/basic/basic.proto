@@ -1,0 +1,16 @@
+syntax = "proto3";
+
+// Package basic is just that: basic.
+package cuelang.examples.basic;
+
+import "cue/cue.proto";
+
+option go_package = "cuelang.org/encoding/protobuf/examples/basic";
+
+// This is my type.
+message MyType {
+    string string_value = 1; // just any 'ole string
+
+    // A method must start with a capital letter.
+    repeated string method = 2 [(cue.val) = '[...=~"^[A-Z]"]'];
+}

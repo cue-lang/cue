@@ -15,7 +15,6 @@
 // Package protobuf defines functionality for parsing protocol buffer
 // definitions and instances.
 //
-// TODO: this package can become public once we have found a good nest for it.
 package protobuf
 
 import (
@@ -28,10 +27,12 @@ type Config struct {
 }
 
 // Parse parses a single proto file and returns its contents translated to a CUE
-// file. Imports are resolved using the paths defined in Config. If src is not
-// nil, it will use this as the contents of the file. It may be a string, []byte
-// or io.Reader. Otherwise Parse will open the given file name at the fully
-// qualified path.
+// file. If src is not nil, it will use this as the contents of the file. It may
+// be a string, []byte or io.Reader. Otherwise Parse will open the given file
+// name at the fully qualified path.
+//
+// Parse assumes the proto file compiles with protoc and may not report an error
+// if it does not. Imports are resolved using the paths defined in Config.
 //
 // The following field options are supported:
 //    (cue.val)     string        CUE constraint for this field. The string may
@@ -40,6 +41,9 @@ type Config struct {
 //       required   bool          Defines the field is required. Use with
 //                                caution.
 func Parse(filename string, src interface{}, c *Config) (f *ast.File, err error) {
+	if c == nil {
+		c = &Config{}
+	}
 	state := &sharedState{
 		paths: c.Paths,
 	}

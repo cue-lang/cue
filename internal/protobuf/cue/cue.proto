@@ -1,0 +1,18 @@
+syntax = "proto3";
+
+package cue;
+
+import "google/protobuf/descriptor.proto";
+
+option go_package = "cuelang.org/cueproto";
+option java_package = "org.cuelang.cueproto";
+
+message FieldOptions {
+    bool required = 1;
+}
+
+extend google.protobuf.FieldOptions {
+    string val = 123456;
+    FieldOptions opt = 1069;
+}
+

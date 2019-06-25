@@ -206,7 +206,7 @@ syntax = "proto3";
 //
 package istio.networking.v1alpha3;
 
-import "cuelang/cue.proto";
+import "cue/cue.proto";
 
 // GO PACKAGE
 option go_package = "istio.io/api/networking/v1alpha3"; // INLINE

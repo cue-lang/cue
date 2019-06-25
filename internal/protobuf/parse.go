@@ -244,7 +244,7 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 }
 
 func (p *protoConverter) doImport(v *proto.Import) {
-	if v.Filename == "cuelang/cue.proto" {
+	if v.Filename == "cue/cue.proto" {
 		return
 	}
 
@@ -259,10 +259,7 @@ func (p *protoConverter) doImport(v *proto.Import) {
 		break
 	}
 
-	if filename == "" {
-		p.mustBuiltinPackage(v.Position, v.Filename)
-		return
-	}
+	p.mapBuiltinPackage(v.Position, v.Filename, filename == "")
 
 	imp, err := p.state.parse(filename, nil)
 	if err != nil {
@@ -356,6 +353,9 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 	case *proto.Import:
 		// already handled.
 
+	case *proto.Extensions:
+		// no need to handle
+
 	default:
 		failf(scanner.Position{}, "unsupported type %T", x)
 	}
@@ -439,6 +439,9 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 	case *proto.Oneof:
 		p.oneOf(x)
+
+	case *proto.Extensions:
+		// no need to handle
 
 	default:
 		failf(scanner.Position{}, "unsupported type %T", v)

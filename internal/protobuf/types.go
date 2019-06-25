@@ -57,7 +57,7 @@ func (p *protoConverter) setBuiltin(from, to string, pkg *protoConverter) {
 	p.scope[0][from] = mapping{to, pkg}
 }
 
-func (p *protoConverter) mustBuiltinPackage(pos scanner.Position, file string) {
+func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, required bool) {
 	// Map some builtin types to their JSON/CUE mappings.
 	switch file {
 	case "gogoproto/gogo.proto":
@@ -75,6 +75,8 @@ func (p *protoConverter) mustBuiltinPackage(pos scanner.Position, file string) {
 		p.setBuiltin("google.protobuf.Empty", "{}", nil)
 
 	default:
-		failf(pos, "import %q not found", file)
+		if required {
+			failf(pos, "import %q not found", file)
+		}
 	}
 }

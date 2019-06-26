@@ -15,7 +15,6 @@
 package cue
 
 import (
-	"bytes"
 	"fmt"
 	"log"
 	"strings"
@@ -321,13 +320,12 @@ func TestExport(t *testing.T) {
 			n := root.(*structLit).arcs[0].v
 			v := newValueRoot(ctx, n)
 
-			buf := &bytes.Buffer{}
 			opts := options{raw: !tc.eval}
-			err := format.Node(buf, export(ctx, v.eval(ctx), opts), format.Simplify())
+			b, err := format.Node(export(ctx, v.eval(ctx), opts), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}
-			if got := buf.String(); got != tc.out {
+			if got := string(b); got != tc.out {
 				t.Errorf("\ngot  %v;\nwant %v", got, tc.out)
 			}
 		})
@@ -374,13 +372,12 @@ func TestExportFile(t *testing.T) {
 			v := inst.Value()
 			ctx := r.index().newContext()
 
-			buf := &bytes.Buffer{}
 			opts := options{raw: false}
-			err = format.Node(buf, export(ctx, v.eval(ctx), opts), format.Simplify())
+			b, err := format.Node(export(ctx, v.eval(ctx), opts), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}
-			if got := strings.TrimSpace(buf.String()); got != tc.out {
+			if got := strings.TrimSpace(string(b)); got != tc.out {
 				t.Errorf("\ngot:\n%v\nwant:\n%v", got, tc.out)
 			}
 		})

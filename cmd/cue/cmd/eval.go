@@ -122,12 +122,14 @@ func runEval(cmd *cobra.Command, args []string) error {
 					continue
 				}
 			}
-			format.Node(w, getSyntax(v, syn), opts...)
+			b, _ := format.Node(getSyntax(v, syn), opts...)
+			w.Write(b)
 		}
 		for _, e := range exprs {
 			if len(exprs) > 1 {
 				fmt.Fprint(w, "// ")
-				format.Node(w, e)
+				b, _ := format.Node(e)
+				w.Write(b)
 				fmt.Fprintln(w)
 			}
 			v := inst.Eval(e)
@@ -137,7 +139,8 @@ func runEval(cmd *cobra.Command, args []string) error {
 					continue
 				}
 			}
-			format.Node(w, getSyntax(v, syn), opts...)
+			b, _ := format.Node(getSyntax(v, syn), opts...)
+			w.Write(b)
 			fmt.Fprintln(w)
 		}
 	}

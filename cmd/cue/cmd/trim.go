@@ -17,7 +17,6 @@ package cmd
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -143,14 +142,13 @@ func runTrim(cmd *cobra.Command, args []string) error {
 				opts = append(opts, format.Simplify())
 			}
 
-			var buf bytes.Buffer
-			err := format.Node(&buf, f, opts...)
+			b, err := format.Node(f, opts...)
 			if err != nil {
 				return fmt.Errorf("error formatting file: %v", err)
 			}
 
 			if dst == "-" {
-				_, err := io.Copy(cmd.OutOrStdout(), &buf)
+				_, err := cmd.OutOrStdout().Write(b)
 				if err != nil {
 					return err
 				}
@@ -159,7 +157,7 @@ func runTrim(cmd *cobra.Command, args []string) error {
 				filename = dst
 			}
 
-			err = ioutil.WriteFile(filename, buf.Bytes(), 0644)
+			err = ioutil.WriteFile(filename, b, 0644)
 			if err != nil {
 				return err
 			}

@@ -1,7 +1,6 @@
 package yaml_test
 
 import (
-	"bytes"
 	"errors"
 	"flag"
 	"fmt"
@@ -647,9 +646,8 @@ func cueStr(node ast.Node) string {
 			Decls: s.Elts,
 		}
 	}
-	buf := bytes.Buffer{}
-	format.Node(&buf, node)
-	return strings.TrimSpace(buf.String())
+	b, _ := format.Node(node)
+	return strings.TrimSpace(string(b))
 }
 
 func newDecoder(t *testing.T, data string) *yaml.Decoder {

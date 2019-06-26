@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -355,12 +354,12 @@ func handleFile(cmd *cobra.Command, pkg, filename string) (err error) {
 func processFile(cmd *cobra.Command, file *ast.File) (err error) {
 	name := file.Filename + ".cue"
 
-	buf := &bytes.Buffer{}
-	if err := format.Node(buf, file); err != nil {
+	b, err := format.Node(file)
+	if err != nil {
 		return err
 	}
 
-	return ioutil.WriteFile(name, buf.Bytes(), 0644)
+	return ioutil.WriteFile(name, b, 0644)
 }
 
 func processStream(cmd *cobra.Command, pkg, filename string, objs []ast.Expr) error {
@@ -516,17 +515,16 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 		}
 	}
 
-	var buf bytes.Buffer
-	err := format.Node(&buf, f, format.Simplify())
+	b, err := format.Node(f, format.Simplify())
 	if err != nil {
 		return fmt.Errorf("error formatting file: %v", err)
 	}
 
 	if cueFile == "-" {
-		_, err := io.Copy(cmd.OutOrStdout(), &buf)
+		_, err := cmd.OutOrStdout().Write(b)
 		return err
 	}
-	return ioutil.WriteFile(cueFile, buf.Bytes(), 0644)
+	return ioutil.WriteFile(cueFile, b, 0644)
 }
 
 type listIndex struct {

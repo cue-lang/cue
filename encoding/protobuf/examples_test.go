@@ -15,6 +15,7 @@
 package protobuf_test
 
 import (
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -37,7 +38,8 @@ func ExampleParse() {
 		log.Fatal(err, "")
 	}
 
-	format.Node(os.Stdout, f)
+	b, _ := format.Node(f)
+	fmt.Println(string(b))
 
 	// Output:
 	// //  Package basic is just that: basic.

@@ -209,13 +209,13 @@ func TestFiles(t *testing.T) {
 // Verify that the printer can be invoked during initialization.
 func init() {
 	const name = "foobar"
-	var buf bytes.Buffer
-	if err := Fprint(&buf, &ast.Ident{Name: name}); err != nil {
+	b, err := Fprint(&ast.Ident{Name: name})
+	if err != nil {
 		panic(err) // error in test
 	}
 	// in debug mode, the result contains additional information;
 	// ignore it
-	if s := buf.String(); !debug && s != name {
+	if s := string(b); !debug && s != name {
 		panic("got " + s + ", want " + name)
 	}
 }
@@ -228,10 +228,9 @@ func TestBadNodes(t *testing.T) {
 	if err == nil {
 		t.Error("expected illegal program") // error in test
 	}
-	var buf bytes.Buffer
-	Fprint(&buf, f)
-	if buf.String() != res {
-		t.Errorf("got %q, expected %q", buf.String(), res)
+	b, _ := Fprint(f)
+	if string(b) != res {
+		t.Errorf("got %q, expected %q", string(b), res)
 	}
 }
 func TestPackage(t *testing.T) {
@@ -246,13 +245,12 @@ func TestPackage(t *testing.T) {
 			},
 		},
 	}
-	var buf bytes.Buffer
-	err := Node(&buf, f)
+	b, err := Node(f)
 	if err != nil {
 		t.Fatal(err)
 	}
 	const want = "package foo\n\n1\n"
-	if got := buf.String(); got != want {
+	if got := string(b); got != want {
 		t.Errorf("got %q, expected %q", got, want)
 	}
 }
@@ -316,18 +314,16 @@ e2: c*t.z
 	}
 
 	// pretty-print original
-	var buf bytes.Buffer
-	err = (&config{UseSpaces: true, Tabwidth: 8}).fprint(&buf, f1)
+	b, err := (&config{UseSpaces: true, Tabwidth: 8}).fprint(f1)
 	if err != nil {
 		t.Fatal(err)
 	}
 
 	// parse pretty printed original
 	// (//line comments must be interpreted even w/o syntax.ParseComments set)
-	f2, err := parser.ParseFile("", buf.Bytes(),
-		parser.AllErrors, parser.ParseComments)
+	f2, err := parser.ParseFile("", b, parser.AllErrors, parser.ParseComments)
 	if err != nil {
-		t.Fatalf("%s\n%s", err, buf.Bytes())
+		t.Fatalf("%s\n%s", err, b)
 	}
 
 	// At this point the position information of identifiers in f2 should
@@ -363,7 +359,7 @@ e2: c*t.z
 	}
 
 	if t.Failed() {
-		t.Logf("\n%s", buf.Bytes())
+		t.Logf("\n%s", b)
 	}
 }
 
@@ -379,13 +375,12 @@ func TestDeclLists(t *testing.T) {
 			panic(err) // error in test
 		}
 
-		var buf bytes.Buffer
-		err = Fprint(&buf, file.Decls) // only print declarations
+		b, err := Fprint(file.Decls) // only print declarations
 		if err != nil {
 			panic(err) // error in test
 		}
 
-		out := buf.String()
+		out := string(b)
 
 		if out != src {
 			t.Errorf("\ngot : %q\nwant: %q\n", out, src)

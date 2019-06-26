@@ -18,7 +18,6 @@ package format // import "cuelang.org/go/cue/format"
 import (
 	"bytes"
 	"fmt"
-	"io"
 	"strings"
 	"text/tabwriter"
 
@@ -70,9 +69,9 @@ func TabIndent(indent bool) Option {
 // The function may return early (before the entire result is written) and
 // return a formatting error, for instance due to an incorrect AST.
 //
-func Node(dst io.Writer, node ast.Node, opt ...Option) error {
+func Node(node ast.Node, opt ...Option) ([]byte, error) {
 	cfg := newConfig(opt)
-	return cfg.fprint(dst, node)
+	return cfg.fprint(node)
 }
 
 // Source formats src in canonical cue fmt style and returns the result or an
@@ -97,11 +96,7 @@ func Source(b []byte, opt ...Option) ([]byte, error) {
 	}
 
 	// print AST
-	var buf bytes.Buffer
-	if err := cfg.fprint(&buf, f); err != nil {
-		return nil, fmt.Errorf("print: %s", err)
-	}
-	return buf.Bytes(), nil
+	return cfg.fprint(f)
 }
 
 type config struct {
@@ -126,11 +121,11 @@ func newConfig(opt []Option) *config {
 }
 
 // Config defines the output of Fprint.
-func (cfg *config) fprint(output io.Writer, node interface{}) (err error) {
+func (cfg *config) fprint(node interface{}) (out []byte, err error) {
 	var p printer
 	p.init(cfg)
 	if err = printNode(node, &p); err != nil {
-		return err
+		return p.output, err
 	}
 
 	padchar := byte('\t')
@@ -153,15 +148,14 @@ func (cfg *config) fprint(output io.Writer, node interface{}) (err error) {
 
 	err = tw.Flush()
 	if err != nil {
-		return err
+		return buf.Bytes(), err
 	}
 
 	b := buf.Bytes()
 	if !cfg.TabIndent {
 		b = bytes.ReplaceAll(b, []byte{'\t'}, bytes.Repeat([]byte{' '}, cfg.Tabwidth))
 	}
-	_, err = output.Write(b)
-	return err
+	return b, nil
 }
 
 // A formatter walks a syntax.Node, interspersed with comments and spacing

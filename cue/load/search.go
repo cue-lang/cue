@@ -15,7 +15,8 @@
 package load
 
 import (
-	"fmt" // TODO: remove this usage
+	// TODO: remove this usage
+
 	"os"
 	"path"
 	"path/filepath"
@@ -23,6 +24,7 @@ import (
 	"strings"
 
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -94,7 +96,7 @@ func (l *loader) matchPackages(pattern string) *match {
 	// 			return nil
 	// 		}
 	// 		if !want {
-	// 			return filepath.SkipDir
+	// 			return skipDir
 	// 		}
 
 	// 		if have[name] {
@@ -148,7 +150,7 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 
 	if c.modRoot != "" {
 		if !hasFilepathPrefix(root, c.modRoot) {
-			m.Err = fmt.Errorf(
+			m.Err = errors.Newf(token.NoPos,
 				"cue: pattern %s refers to dir %s, outside module root %s",
 				pattern, root, c.modRoot)
 			return m
@@ -157,12 +159,12 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 
 	pkgDir := filepath.Join(root, "pkg")
 
-	_ = filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
+	_ = c.fileSystem.walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
 		if err != nil || !fi.IsDir() {
 			return nil
 		}
 		if path == pkgDir {
-			return filepath.SkipDir
+			return skipDir
 		}
 
 		top := path == root
@@ -171,13 +173,13 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 		_, elem := filepath.Split(path)
 		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
 		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
-			return filepath.SkipDir
+			return skipDir
 		}
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := os.Stat(filepath.Join(path, modFile)); err == nil {
-				return filepath.SkipDir
+			if _, err := c.fileSystem.stat(filepath.Join(path, modFile)); err == nil {
+				return skipDir
 			}
 		}
 
@@ -300,7 +302,7 @@ func warnUnmatched(matches []*match) {
 	for _, m := range matches {
 		if len(m.Pkgs) == 0 {
 			m.Err =
-				fmt.Errorf("cue: %q matched no packages\n", m.Pattern)
+				errors.Newf(token.NoPos, "cue: %q matched no packages\n", m.Pattern)
 		}
 	}
 }

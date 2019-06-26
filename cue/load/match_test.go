@@ -16,8 +16,9 @@ package load
 
 import (
 	"io"
+	"os"
+	"path/filepath"
 	"reflect"
-	"strings"
 	"testing"
 )
 
@@ -116,27 +117,25 @@ var matchFileTests = []struct {
 	match bool
 }{
 	{defCfg, "foo.cue", "", true},
-	{defCfg, "foo.cue", "// +build enable\n\npackage foo\n", false},
+	{defCfg, "a/b/c/foo.cue", "// +build enable\n\npackage foo\n", false},
 	{defCfg, "foo.cue", "// +build !enable\n\npackage foo\n", true},
 	{defCfg, "foo1.cue", "// +build linux\n\npackage foo\n", false},
 	{defCfg, "foo.badsuffix", "", false},
-	{cfg, "foo.cue", "// +build enable\n\npackage foo\n", true},
+	{cfg, "a/b/c/d/foo.cue", "// +build enable\n\npackage foo\n", true},
 	{cfg, "foo.cue", "// +build !enable\n\npackage foo\n", false},
 }
 
 func TestMatchFile(t *testing.T) {
+	cwd, _ := os.Getwd()
+	abs := func(path string) string {
+		return filepath.Join(cwd, path)
+	}
 	for _, tt := range matchFileTests {
-		ctxt := &tt.cfg.fileSystem
-		ctxt.OpenFile = func(path string) (r io.ReadCloser, err error) {
-			if path != "x+"+tt.name {
-				t.Fatalf("OpenFile asked for %q, expected %q", path, "x+"+tt.name)
-			}
-			return &readNopCloser{strings.NewReader(tt.data)}, nil
-		}
-		ctxt.JoinPath = func(elem ...string) string {
-			return strings.Join(elem, "+")
-		}
-		match, err := matchFileTest(tt.cfg, "x", tt.name)
+		cfg := tt.cfg
+		cfg.Overlay = map[string]Source{abs(tt.name): FromString(tt.data)}
+		cfg, _ = cfg.complete()
+
+		match, err := matchFileTest(cfg, "", tt.name)
 		if match != tt.match || err != nil {
 			t.Fatalf("MatchFile(%q) = %v, %v, want %v, nil", tt.name, match, err, tt.match)
 		}

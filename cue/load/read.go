@@ -16,16 +16,18 @@ package load
 
 import (
 	"bufio"
-	"errors"
 	"io"
 	"unicode/utf8"
+
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 type importReader struct {
 	b    *bufio.Reader
 	buf  []byte
 	peek byte
-	err  error
+	err  errors.Error
 	eof  bool
 	nerr int
 }
@@ -35,8 +37,8 @@ func isIdent(c byte) bool {
 }
 
 var (
-	errSyntax = errors.New("syntax error")
-	errNUL    = errors.New("unexpected NUL in input")
+	errSyntax = errors.Newf(token.NoPos, "syntax error") // TODO: remove
+	errNUL    = errors.Newf(token.NoPos, "unexpected NUL in input")
 )
 
 // syntaxError records a syntax error, but only if an I/O error has not already been recorded.
@@ -60,7 +62,7 @@ func (r *importReader) readByte() byte {
 		if err == io.EOF {
 			r.eof = true
 		} else if r.err == nil {
-			r.err = err
+			r.err = errors.Wrapf(err, token.NoPos, "readByte")
 		}
 		c = 0
 	}
@@ -208,7 +210,7 @@ func (r *importReader) readImport(imports *[]string) {
 
 // readComments is like ioutil.ReadAll, except that it only reads the leading
 // block of comments in the file.
-func readComments(f io.Reader) ([]byte, error) {
+func readComments(f io.Reader) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}
 	r.peekByte(true)
 	if r.err == nil && !r.eof {
@@ -220,7 +222,7 @@ func readComments(f io.Reader) ([]byte, error) {
 
 // readImports is like ioutil.ReadAll, except that it expects a Go file as input
 // and stops reading the input once the imports have completed.
-func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte, error) {
+func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}
 
 	r.readKeyword("package")

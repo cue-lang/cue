@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 const (
@@ -113,6 +114,16 @@ type Config struct {
 	// This is mostly used for bootstrapping.
 	StdRoot string
 
+	// Overlay provides a mapping of absolute file paths to file contents.
+	// If the file  with the given path already exists, the parser will use the
+	// alternative file contents provided by the map.
+	//
+	// Overlays provide incomplete support for when a given file doesn't
+	// already exist on disk. See the package doc above for more details.
+	//
+	// If the value must be of type string, []byte, io.Reader, or *ast.File.
+	Overlay map[string]Source
+
 	fileSystem
 }
 
@@ -122,10 +133,19 @@ func (c Config) newInstance(path string) *build.Instance {
 	return i
 }
 
-func (c Config) newErrInstance(m *match, path string, err errors.Error) *build.Instance {
+func (c Config) newErrInstance(m *match, path string, err error) *build.Instance {
 	i := c.Context.NewInstance(path, nil)
 	i.DisplayPath = path
-	i.ReportError(err)
+	switch x := err.(type) {
+	case errors.Error:
+		i.ReportError(x)
+	case errors.List:
+		for _, e := range x {
+			i.ReportError(e)
+		}
+	default:
+		i.ReportError(errors.Wrapf(err, token.NoPos, "instance"))
+	}
 	return i
 }
 
@@ -144,11 +164,17 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	}
 
+	// TODO: we could populate this already with absolute file paths,
+	// but relative paths cannot be added. Consider what is reasonable.
+	if err := c.fileSystem.init(&c); err != nil {
+		return nil, err
+	}
+
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
 	if c.modRoot == "" {
-		abs, err := findRoot(c.Dir)
+		abs, err := c.findRoot(c.Dir)
 		if err != nil {
 			// Not using modules: only consider the current directory.
 			c.modRoot = c.Dir
@@ -165,20 +191,21 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	if c.cache == "" {
 		c.cache = filepath.Join(home(), defaultDir)
-		// os.MkdirAll(c.Cache, 0755) // TODO: tools task
 	}
 
 	return &c, nil
 }
 
-func findRoot(dir string) (string, error) {
+func (c Config) findRoot(dir string) (string, error) {
+	fs := &c.fileSystem
+
 	absDir, err := filepath.Abs(dir)
 	if err != nil {
 		return "", err
 	}
 	abs := absDir
 	for {
-		info, err := os.Stat(filepath.Join(abs, modFile))
+		info, err := fs.stat(filepath.Join(abs, modFile))
 		if err == nil && !info.IsDir() {
 			return abs, nil
 		}
@@ -190,7 +217,7 @@ func findRoot(dir string) (string, error) {
 	}
 	abs = absDir
 	for {
-		info, err := os.Stat(filepath.Join(abs, pkgDir))
+		info, err := fs.stat(filepath.Join(abs, pkgDir))
 		if err == nil && info.IsDir() {
 			return abs, nil
 		}

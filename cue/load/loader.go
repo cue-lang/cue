@@ -20,7 +20,6 @@ package load
 //    - go/build
 
 import (
-	"os"
 	pathpkg "path"
 	"path/filepath"
 	"strings"
@@ -115,7 +114,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		if !filepath.IsAbs(file) {
 			path = filepath.Join(cfg.Dir, file)
 		}
-		fi, err := os.Stat(path)
+		fi, err := cfg.fileSystem.stat(path)
 		if err != nil {
 			return cfg.newErrInstance(nil, path,
 				errors.Wrapf(err, pos, "could not find dir %s", path))
@@ -146,10 +145,15 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	// }
 
 	for _, f := range pkg.CUEFiles {
-		if !filepath.IsAbs(f) {
-			f = filepath.Join(cfg.Dir, f)
+		fs := &l.cfg.fileSystem
+		if !fs.isAbsPath(f) {
+			f = fs.joinPath(cfg.Dir, f)
 		}
-		_ = pkg.AddFile(f, nil)
+		r, err := fs.openFile(f)
+		if err != nil {
+			pkg.ReportError(err)
+		}
+		_ = pkg.AddFile(f, r)
 	}
 
 	pkg.Local = true

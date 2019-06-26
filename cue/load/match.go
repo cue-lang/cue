@@ -16,9 +16,11 @@ package load
 
 import (
 	"bytes"
-	"fmt"
 	"strings"
 	"unicode"
+
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 // matchFileTest reports whether the file with the given name in the given directory
@@ -40,7 +42,7 @@ func matchFileTest(cfg *Config, dir, name string) (match bool, err error) {
 // considers text until the first non-comment.
 // If allTags is non-nil, matchFile records any encountered build tag
 // by setting allTags[tag] = true.
-func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, filename string, err error) {
+func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, filename string, err errors.Error) {
 	if strings.HasPrefix(name, "_") ||
 		strings.HasPrefix(name, ".") {
 		return
@@ -73,7 +75,7 @@ func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allT
 	}
 	f.Close()
 	if err != nil {
-		err = fmt.Errorf("read %s: %v", filename, err)
+		err = errors.Newf(token.NoPos, "read %s: %v", filename, err)
 		return
 	}
 

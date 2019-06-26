@@ -22,8 +22,11 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"unicode"
 
+	"cuelang.org/go/cue"
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/str"
 )
 
@@ -121,4 +124,53 @@ func pkgInfo(p *build.Instance) string {
 		fmt.Fprintf(b, "\t%s\n", pkgInfo(p))
 	}
 	return b.String()
+}
+
+func TestOverlays(t *testing.T) {
+	cwd, _ := os.Getwd()
+	abs := func(path string) string {
+		return filepath.Join(cwd, path)
+	}
+	c := &Config{
+		Overlay: map[string]Source{
+			abs("dir/top.cue"): FromBytes([]byte(`
+			   package top
+			   msg: "Hello"
+			`)),
+			abs("dir/b/foo.cue"): FromString(`
+			   package foo
+
+			   a: <= 5
+			`),
+			abs("dir/b/bar.cue"): FromString(`
+			   package foo
+
+			   a: >= 5
+			`),
+		},
+	}
+	want := []string{
+		`{msg:"Hello"}`,
+		`{a:5}`,
+	}
+	rmSpace := func(r rune) rune {
+		if unicode.IsSpace(r) {
+			return -1
+		}
+		return r
+	}
+	for i, inst := range cue.Build(Instances([]string{"./dir/..."}, c)) {
+		if inst.Err != nil {
+			t.Error(inst.Err)
+			continue
+		}
+		b, err := format.Node(inst.Value().Syntax())
+		if err != nil {
+			t.Error(err)
+			continue
+		}
+		if got := string(bytes.Map(rmSpace, b)); got != want[i] {
+			t.Errorf("%s: got %s; want %s", inst.Dir, got, want)
+		}
+	}
 }

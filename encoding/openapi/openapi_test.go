@@ -23,17 +23,11 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/cue/parser"
 	"github.com/kylelemons/godebug/diff"
 )
 
 var update *bool = flag.Bool("update", false, "update the test output")
-
-var config = &load.Config{
-	Context: build.NewContext(build.ParseOptions(parser.ParseComments)),
-}
 
 func TestParseDefinitions(t *testing.T) {
 	defaultConfig := &Config{}
@@ -59,7 +53,7 @@ func TestParseDefinitions(t *testing.T) {
 		t.Run(tc.out, func(t *testing.T) {
 			filename := filepath.Join("testdata", filepath.FromSlash(tc.in))
 
-			inst := cue.Build(load.Instances([]string{filename}, config))[0]
+			inst := cue.Build(load.Instances([]string{filename}, nil))[0]
 
 			b, err := Gen(inst, tc.config)
 			var out = &bytes.Buffer{}

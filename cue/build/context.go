@@ -27,16 +27,13 @@ package build
 
 import (
 	"context"
-
-	"cuelang.org/go/cue/parser"
 )
 
 // A Context keeps track of state of building instances and caches work.
 type Context struct {
 	ctxt context.Context
 
-	loader       LoadFunc
-	parseOptions []parser.Option
+	loader LoadFunc
 
 	initialized bool
 
@@ -101,20 +98,8 @@ func NewContext(opts ...Option) *Context {
 	return c
 }
 
-// PurgeCache purges the instance cache.
-func (c *Context) PurgeCache() {
-	for name := range c.imports {
-		delete(c.imports, name)
-	}
-}
-
 // Option define build options.
 type Option func(c *Context)
-
-// ParseOptions sets parsing options.
-func ParseOptions(mode ...parser.Option) Option {
-	return func(c *Context) { c.parseOptions = mode }
-}
 
 // Loader sets parsing options.
 func Loader(f LoadFunc) Option {

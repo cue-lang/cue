@@ -178,8 +178,7 @@ func (inst *Instance) addImport(imp *Instance) {
 // It does not process the file's imports. The package name of the file must
 // match the package name of the instance.
 func (inst *Instance) AddFile(filename string, src interface{}) error {
-	c := inst.ctxt
-	file, err := parser.ParseFile(filename, src, c.parseOptions...)
+	file, err := parser.ParseFile(filename, src, parser.ParseComments)
 	if err != nil {
 		// should always be an errors.List, but just in case.
 		switch x := err.(type) {

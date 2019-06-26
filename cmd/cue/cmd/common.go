@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/cue/parser"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -82,15 +81,9 @@ func buildFromArgs(cmd *cobra.Command, args []string) []*cue.Instance {
 	return buildInstances(cmd, binst)
 }
 
-var (
-	config = &load.Config{
-		Context: build.NewContext(build.ParseOptions(parser.ParseComments)),
-	}
-)
-
 func loadFromArgs(cmd *cobra.Command, args []string) []*build.Instance {
 	log.SetOutput(cmd.OutOrStderr())
-	binst := load.Instances(args, config)
+	binst := load.Instances(args, nil)
 	if len(binst) == 0 {
 		return nil
 	}

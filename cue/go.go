@@ -254,9 +254,9 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 	case bool:
 		return &boolLit{src.base(), v}
 	case string:
-		return &stringLit{src.base(), v}
+		return &stringLit{src.base(), v, nil}
 	case []byte:
-		return &bytesLit{src.base(), v}
+		return &bytesLit{src.base(), v, nil}
 	case int:
 		return toInt(ctx, src, int64(v))
 	case int8:

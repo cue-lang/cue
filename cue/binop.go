@@ -320,7 +320,7 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 			if k == x.k {
 				return x
 			}
-			return newBound(newSrc.base(), x.op, k, xv)
+			return newBound(ctx, newSrc.base(), x.op, k, xv)
 
 		case *bound:
 			yv := y.value.(evaluated)
@@ -718,25 +718,33 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			return cmpTonode(src, op, strings.Compare(x.str, str))
 		case opAdd:
 			src := binSrc(src.Pos(), op, x, other)
-			return &stringLit{src, x.str + str}
+			return &stringLit{src, x.str + str, nil}
 		case opMat:
-			b, err := regexp.MatchString(str, x.str)
-			if err != nil {
-				return ctx.mkErr(src, "error parsing regexp: %v", err)
+			if y.re == nil {
+				// This really should not happen, but leave in for safety.
+				b, err := regexp.MatchString(str, x.str)
+				if err != nil {
+					return ctx.mkErr(src, "error parsing regexp: %v", err)
+				}
+				return boolTonode(src, b)
 			}
-			return boolTonode(src, b)
+			return boolTonode(src, y.re.MatchString(x.str))
 		case opNMat:
-			b, err := regexp.MatchString(str, x.str)
-			if err != nil {
-				return ctx.mkErr(src, "error parsing regexp: %v", err)
+			if y.re == nil {
+				// This really should not happen, but leave in for safety.
+				b, err := regexp.MatchString(str, x.str)
+				if err != nil {
+					return ctx.mkErr(src, "error parsing regexp: %v", err)
+				}
+				return boolTonode(src, !b)
 			}
-			return boolTonode(src, !b)
+			return boolTonode(src, !y.re.MatchString(x.str))
 		}
 	case *numLit:
 		switch op {
 		case opMul:
 			src := binSrc(src.Pos(), op, x, other)
-			return &stringLit{src, strings.Repeat(x.str, y.intValue(ctx))}
+			return &stringLit{src, strings.Repeat(x.str, y.intValue(ctx)), nil}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -762,14 +770,14 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 		case opAdd:
 			copy := append([]byte(nil), x.b...)
 			copy = append(copy, b...)
-			return &bytesLit{binSrc(src.Pos(), op, x, other), copy}
+			return &bytesLit{binSrc(src.Pos(), op, x, other), copy, nil}
 		}
 
 	case *numLit:
 		switch op {
 		case opMul:
 			src := binSrc(src.Pos(), op, x, other)
-			return &bytesLit{src, bytes.Repeat(x.b, y.intValue(ctx))}
+			return &bytesLit{src, bytes.Repeat(x.b, y.intValue(ctx)), nil}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)

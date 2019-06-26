@@ -16,6 +16,7 @@ package cue
 
 import (
 	"math/big"
+	"regexp"
 	"sort"
 	"strconv"
 	"time"
@@ -195,8 +196,8 @@ func boolTonode(src source, b bool) evaluated {
 
 type bytesLit struct {
 	baseValue
-	b []byte
-	// TODO: maintain extended grapheme index cache.
+	b  []byte
+	re *regexp.Regexp // only set if needed
 }
 
 func (x *bytesLit) kind() kind       { return bytesKind }
@@ -243,12 +244,13 @@ func (x *bytesLit) slice(ctx *context, lo, hi *numLit) evaluated {
 	if len(x.b) < hix {
 		return ctx.mkErr(hi, "slice bounds out of range")
 	}
-	return &bytesLit{x.baseValue, x.b[lox:hix]}
+	return &bytesLit{x.baseValue, x.b[lox:hix], nil}
 }
 
 type stringLit struct {
 	baseValue
 	str string
+	re  *regexp.Regexp // only set if needed
 
 	// TODO: maintain extended grapheme index cache.
 }
@@ -271,7 +273,7 @@ func (x *stringLit) at(ctx *context, i int) evaluated {
 		return ctx.mkErr(x, "index %d out of bounds", i)
 	}
 	// TODO: this is incorrect.
-	return &stringLit{x.baseValue, string(runes[i : i+1])}
+	return &stringLit{x.baseValue, string(runes[i : i+1]), nil}
 }
 func (x *stringLit) len() int { return len([]rune(x.str)) }
 
@@ -297,7 +299,7 @@ func (x *stringLit) slice(ctx *context, lo, hi *numLit) evaluated {
 	if len(runes) < hix {
 		return ctx.mkErr(hi, "slice bounds out of range")
 	}
-	return &stringLit{x.baseValue, string(runes[lox:hix])}
+	return &stringLit{x.baseValue, string(runes[lox:hix]), nil}
 }
 
 type numBase struct {
@@ -391,12 +393,18 @@ type bound struct {
 	value value
 }
 
-func newBound(base baseValue, op op, k kind, v value) *bound {
+func newBound(ctx *context, base baseValue, op op, k kind, v value) evaluated {
 	kv := v.kind()
 	if kv.isAnyOf(numKind) {
 		kv |= numKind
 	} else if op == opNeq && kv&atomKind == nullKind {
 		kv = typeKinds &^ nullKind
+	}
+	if op == opMat || op == opNMat {
+		v = compileRegexp(ctx, v)
+		if isBottom(v) {
+			return v.(*bottom)
+		}
 	}
 	return &bound{base, op, unifyType(k&topKind, kv) | nonGround, v}
 }
@@ -406,8 +414,8 @@ func (x *bound) kind() kind {
 }
 
 func mkIntRange(a, b string) evaluated {
-	from := newBound(baseValue{}, opGeq, intKind, parseInt(intKind, a))
-	to := newBound(baseValue{}, opLeq, intKind, parseInt(intKind, b))
+	from := newBound(nil, baseValue{}, opGeq, intKind, parseInt(intKind, a))
+	to := newBound(nil, baseValue{}, opLeq, intKind, parseInt(intKind, b))
 	e := &unification{
 		binSrc(token.NoPos, opUnify, from, to),
 		[]evaluated{from, to},
@@ -422,8 +430,8 @@ func mkIntRange(a, b string) evaluated {
 }
 
 func mkFloatRange(a, b string) evaluated {
-	from := newBound(baseValue{}, opGeq, numKind, parseFloat(a))
-	to := newBound(baseValue{}, opLeq, numKind, parseFloat(b))
+	from := newBound(nil, baseValue{}, opGeq, numKind, parseFloat(a))
+	to := newBound(nil, baseValue{}, opLeq, numKind, parseFloat(b))
 	e := &unification{
 		binSrc(token.NoPos, opUnify, from, to),
 		[]evaluated{from, to},
@@ -449,7 +457,7 @@ var predefinedRanges = map[string]evaluated{
 
 	// Do not include an alias for "byte", as it would be too easily confused
 	// with the builtin "bytes".
-	"uint":    newBound(baseValue{}, opGeq, intKind, parseInt(intKind, "0")),
+	"uint":    newBound(nil, baseValue{}, opGeq, intKind, parseInt(intKind, "0")),
 	"uint8":   mkIntRange("0", "255"),
 	"uint16":  mkIntRange("0", "65535"),
 	"uint32":  mkIntRange("0", "4294967295"),
@@ -810,7 +818,7 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (evaluated, 
 			return err, nil
 		}
 		name := ctx.labelStr(x.arcs[i].feature)
-		arg := &stringLit{x.baseValue, name}
+		arg := &stringLit{x.baseValue, name, nil}
 		w := fn.call(ctx, x, arg).evalPartial(ctx)
 		v = binOp(ctx, x, opUnify, v, w)
 
@@ -1086,6 +1094,27 @@ type unaryExpr struct {
 
 func (x *unaryExpr) kind() kind { return x.x.kind() }
 
+func compileRegexp(ctx *context, v value) value {
+	var err error
+	switch x := v.(type) {
+	case *stringLit:
+		if x.re == nil {
+			x.re, err = regexp.Compile(x.str)
+			if err != nil {
+				return ctx.mkErr(v, "could not compile regular expression %q: %v", x.str, err)
+			}
+		}
+	case *bytesLit:
+		if x.re == nil {
+			x.re, err = regexp.Compile(string(x.b))
+			if err != nil {
+				return ctx.mkErr(v, "could not compile regular expression %q: %v", x.b, err)
+			}
+		}
+	}
+	return v
+}
+
 type binaryExpr struct {
 	baseValue
 	op    op
@@ -1115,7 +1144,19 @@ func mkBin(ctx *context, pos token.Pos, op op, left, right value) value {
 		// 	return left
 		// }
 	}
-	return &binaryExpr{binSrc(pos, op, left, right), op, left, right}
+	bin := &binaryExpr{binSrc(pos, op, left, right), op, left, right}
+	return updateBin(ctx, bin)
+}
+
+func updateBin(ctx *context, bin *binaryExpr) value {
+	switch bin.op {
+	case opMat, opNMat:
+		bin.right = compileRegexp(ctx, bin.right)
+		if isBottom(bin.right) {
+			return bin.right
+		}
+	}
+	return bin
 }
 
 func (x *binaryExpr) kind() kind {
@@ -1357,6 +1398,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
 			key := &stringLit{
 				x.baseValue,
 				ctx.labelStr(a.feature),
+				nil,
 			}
 			val := src.at(ctx, i)
 			v := fn.call(ctx, x, key, val)

@@ -102,7 +102,7 @@ func (x *bound) rewrite(ctx *context, fn rewriteFunc) value {
 	if v == x.value {
 		return x
 	}
-	return newBound(x.baseValue, x.op, x.k, v)
+	return newBound(ctx, x.baseValue, x.op, x.k, v)
 }
 
 func (x *interpolation) rewrite(ctx *context, fn rewriteFunc) value {
@@ -182,7 +182,7 @@ func (x *binaryExpr) rewrite(ctx *context, fn rewriteFunc) value {
 	if left == x.left && right == x.right {
 		return x
 	}
-	return &binaryExpr{x.baseValue, x.op, left, right}
+	return updateBin(ctx, &binaryExpr{x.baseValue, x.op, left, right})
 }
 
 func (x *unification) rewrite(ctx *context, fn rewriteFunc) value {

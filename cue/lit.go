@@ -184,9 +184,9 @@ func parseString(ctx *context, node ast.Expr, q literal.QuoteInfo, s string) (n 
 		return ctx.mkErr(src, err, "invalid string: %v", err)
 	}
 	if q.IsDouble() {
-		return &stringLit{src, str}
+		return &stringLit{src, str, nil}
 	}
-	return &bytesLit{src, []byte(str)}
+	return &bytesLit{src, []byte(str), nil}
 }
 
 func (p *litParser) digitVal(ch byte) (d int) {

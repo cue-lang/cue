@@ -258,7 +258,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		list := &list{baseValue: newExpr(n), elem: s}
 		list.initLit()
 		if n.Ellipsis != token.NoPos || n.Type != nil {
-			list.len = newBound(list.baseValue, opGeq, intKind, list.len)
+			list.len = newBound(v.ctx(), list.baseValue, opGeq, intKind, list.len)
 			if n.Type != nil {
 				list.typ = v1.walk(n.Type)
 			}
@@ -313,7 +313,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			// to rewrite it.
 
 			if name != "" {
-				yielder.key = &stringLit{newNode(x), name}
+				yielder.key = &stringLit{newNode(x), name, nil}
 				yielder.value = v.walk(field.Value)
 			}
 
@@ -553,6 +553,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		case token.GEQ, token.GTR, token.LSS, token.LEQ,
 			token.NEQ, token.MAT, token.NMAT:
 			value = newBound(
+				v.ctx(),
 				newExpr(n),
 				tokenMap[n.Op],
 				topKind|nonGround,
@@ -574,12 +575,12 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			value = d
 
 		default:
-			value = &binaryExpr{
+			value = updateBin(v.ctx(), &binaryExpr{
 				newExpr(n),
 				tokenMap[n.Op], // op
 				v.walk(n.X),    // left
 				v.walk(n.Y),    // right
-			}
+			})
 		}
 
 	case *ast.CommentGroup:

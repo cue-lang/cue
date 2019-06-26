@@ -1116,7 +1116,7 @@ func (v Value) Template() func(label string) Value {
 		return nil
 	}
 	return func(label string) Value {
-		arg := &stringLit{x.baseValue, label}
+		arg := &stringLit{x.baseValue, label, nil}
 		y := fn.call(ctx, x, arg)
 		return newValueRoot(ctx, y)
 	}
@@ -1578,6 +1578,7 @@ func (v Value) Expr() (Op, []Value) {
 		a = append(a, remakeValue(v, &stringLit{
 			x.baseValue,
 			v.ctx().labelStr(x.feature),
+			nil,
 		}))
 		op = SelectorOp
 	case *indexExpr:

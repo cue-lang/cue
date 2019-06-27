@@ -19,6 +19,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"github.com/spf13/cobra"
+	"golang.org/x/text/message"
 )
 
 func newVetCmd() *cobra.Command {
@@ -27,6 +28,10 @@ func newVetCmd() *cobra.Command {
 		Short: "validate CUE configurations",
 		RunE:  doVet,
 	}
+
+	cmd.Flags().BoolP(string(flagConcrete), "c", false,
+		"require the evaluation to be concrete")
+
 	return cmd
 }
 
@@ -44,13 +49,31 @@ func doVet(cmd *cobra.Command, args []string) error {
 
 	for _, inst := range instances {
 		// TODO: use ImportPath or some other sanitized path.
+
+		concrete := true
+		hasFlag := false
+		if flag := cmd.Flag(string(flagConcrete)); flag != nil {
+			hasFlag = flag.Changed
+			if hasFlag {
+				concrete = flagConcrete.Bool(cmd)
+			}
+		}
 		opt := []cue.Option{
 			cue.Attributes(true),
 			cue.Optional(true),
-			cue.Concrete(true),
 			cue.Hidden(true),
 		}
-		err := inst.Value().Validate(opt...)
+		w := cmd.OutOrStderr()
+		shown := false
+		err := inst.Value().Validate(append(opt, cue.Concrete(concrete))...)
+		if err != nil && !hasFlag {
+			err = inst.Value().Validate(append(opt, cue.Concrete(false))...)
+			if !shown && err == nil {
+				shown = true
+				p := message.NewPrinter(getLang())
+				p.Fprintln(w, "some instances are incomplete; use the -c flag to show errors or suppress this message")
+			}
+		}
 		exitIfErr(cmd, inst, err, false)
 	}
 	return nil

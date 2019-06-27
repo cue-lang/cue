@@ -388,6 +388,25 @@ func TestDeclLists(t *testing.T) {
 	}
 }
 
+func TestIncorrectIdent(t *testing.T) {
+	testCases := []struct {
+		ident string
+		out   string
+	}{
+		{"foo", "foo"},
+		{"a.b.c", `"a.b.c"`},
+		{"for", "for"},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.ident, func(t *testing.T) {
+			b, _ := Node(&ast.Field{Label: ast.NewIdent(tc.ident), Value: ast.NewIdent("A")})
+			if got, want := string(b), tc.out+`: A`; got != want {
+				t.Errorf("got %q; want %q", got, want)
+			}
+		})
+	}
+}
+
 // TextX is a skeleton test that can be filled in for debugging one-off cases.
 // Do not remove.
 func TestX(t *testing.T) {

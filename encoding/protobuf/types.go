@@ -49,12 +49,13 @@ var scalars = map[string]string{
 }
 
 var timePkg = &protoConverter{
+	id:        "time",
 	goPkg:     "time",
 	goPkgPath: "time",
 }
 
 func (p *protoConverter) setBuiltin(from, to string, pkg *protoConverter) {
-	p.scope[0][from] = mapping{to, pkg}
+	p.scope[0][from] = mapping{to, "", pkg}
 }
 
 func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, required bool) {

@@ -19,9 +19,12 @@ import (
 	"flag"
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"github.com/kr/pretty"
 )
@@ -36,9 +39,10 @@ func TestParseDefinitions(t *testing.T) {
 	}
 	for _, file := range testCases {
 		t.Run(file, func(t *testing.T) {
-			filename := filepath.Join("testdata", filepath.FromSlash(file))
+			root := "testdata/istio.io/api"
+			filename := filepath.Join(root, filepath.FromSlash(file))
 			c := &Config{
-				Paths: []string{"testdata"},
+				Paths: []string{"testdata", root},
 			}
 
 			out := &bytes.Buffer{}
@@ -65,5 +69,86 @@ func TestParseDefinitions(t *testing.T) {
 				t.Errorf("files differ:\n%v", desc)
 			}
 		})
+	}
+}
+
+func TestBuild(t *testing.T) {
+	cwd, _ := os.Getwd()
+	root := filepath.Join(cwd, "testdata/istio.io/api")
+	c := &Config{
+		Root:   root,
+		Module: "istio.io/api",
+		Paths: []string{
+			root,
+			filepath.Join(cwd, "testdata"),
+		},
+	}
+
+	b := NewBuilder(c)
+	b.AddFile("networking/v1alpha3/gateway.proto", nil)
+	b.AddFile("mixer/v1/attributes.proto", nil)
+	b.AddFile("mixer/v1/mixer.proto", nil)
+	b.AddFile("mixer/v1/config/client/client_config.proto", nil)
+
+	files, err := b.Files()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if *update {
+		for _, f := range files {
+			b, err := format.Node(f)
+			if err != nil {
+				t.Fatal(err)
+			}
+			_ = os.MkdirAll(filepath.Dir(f.Filename), 0755)
+			err = ioutil.WriteFile(f.Filename, b, 0644)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+		return
+	}
+
+	gotFiles := map[string]*ast.File{}
+
+	for _, f := range files {
+		rel, err := filepath.Rel(cwd, f.Filename)
+		if err != nil {
+			t.Fatal(err)
+		}
+		gotFiles[rel] = f
+	}
+
+	filepath.Walk("testdata/istio.io/api", func(path string, fi os.FileInfo, err error) error {
+		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".cue") {
+			return err
+		}
+
+		f := gotFiles[path]
+		if f == nil {
+			t.Errorf("did not produce file %q", path)
+			return nil
+		}
+		delete(gotFiles, path)
+
+		got, err := format.Node(f)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		want, err := ioutil.ReadFile(path)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if !bytes.Equal(got, want) {
+			t.Errorf("%s: files differ", path)
+		}
+		return nil
+	})
+
+	for filename := range gotFiles {
+		t.Errorf("did not expect file %q", filename)
 	}
 }

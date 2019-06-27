@@ -71,17 +71,6 @@ func comment(c *proto.Comment, doc bool) *ast.CommentGroup {
 	return cg
 }
 
-func quote(s string) string {
-	if !strings.ContainsAny(s, `"\`) {
-		return s
-	}
-	esc := `\#`
-	for strings.Contains(s, esc) {
-		esc += "#"
-	}
-	return esc[1:] + `"` + s + `"` + esc[1:]
-}
-
 func labelName(s string) string {
 	split := strings.Split(s, "_")
 	for i := 1; i < len(split); i++ {

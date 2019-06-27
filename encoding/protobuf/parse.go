@@ -24,21 +24,31 @@ import (
 	"strconv"
 	"strings"
 	"text/scanner"
+	"unicode"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/source"
 	"github.com/emicklei/proto"
-	"golang.org/x/xerrors"
 )
 
-type sharedState struct {
-	paths []string
-}
+func (s *Builder) parse(filename string, src interface{}) (p *protoConverter, err error) {
+	if filename == "" {
+		return nil, errors.Newf(token.NoPos, "empty filename")
+	}
+	if r, ok := s.fileCache[filename]; ok {
+		return r.p, r.err
+	}
+	defer func() {
+		s.fileCache[filename] = result{p, err}
+	}()
 
-func (s *sharedState) parse(filename string, src interface{}) (p *protoConverter, err error) {
 	b, err := source.Read(filename, src)
+	if err != nil {
+		return nil, err
+	}
 
 	parser := proto.NewParser(bytes.NewReader(b))
 	if filename != "" {
@@ -46,14 +56,19 @@ func (s *sharedState) parse(filename string, src interface{}) (p *protoConverter
 	}
 	d, err := parser.Parse()
 	if err != nil {
-		return nil, xerrors.Errorf("protobuf: %w", err)
+		return nil, errors.Newf(token.NoPos, "protobuf: %v", err)
 	}
 
+	tfile := token.NewFile(filename, 0, len(b))
+	tfile.SetLinesForContent(b)
+
 	p = &protoConverter{
+		id:      filename,
 		state:   s,
-		tfile:   token.NewFile(filename, 0, len(b)),
+		tfile:   tfile,
 		used:    map[string]bool{},
 		symbols: map[string]bool{},
+		aliases: map[string]string{},
 	}
 
 	defer func() {
@@ -105,7 +120,9 @@ func (s *sharedState) parse(filename string, src interface{}) (p *protoConverter
 	for _, e := range d.Elements {
 		switch x := e.(type) {
 		case *proto.Import:
-			p.doImport(x)
+			if err := p.doImport(x); err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -121,11 +138,14 @@ func (s *sharedState) parse(filename string, src interface{}) (p *protoConverter
 		used = append(used, k)
 	}
 	sort.Strings(used)
+	p.sorted = used
 
 	for _, v := range used {
-		imports.Specs = append(imports.Specs, &ast.ImportSpec{
+		spec := &ast.ImportSpec{
 			Path: &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(v)},
-		})
+		}
+		imports.Specs = append(imports.Specs, spec)
+		p.file.Imports = append(p.file.Imports, spec)
 	}
 
 	if len(imports.Specs) == 0 {
@@ -138,11 +158,12 @@ func (s *sharedState) parse(filename string, src interface{}) (p *protoConverter
 // A protoConverter converts a proto definition to CUE. Proto files map to
 // CUE files one to one.
 type protoConverter struct {
-	state *sharedState
+	state *Builder
 	tfile *token.File
 
 	proto3 bool
 
+	id        string
 	protoPkg  string
 	goPkg     string
 	goPkgPath string
@@ -151,23 +172,26 @@ type protoConverter struct {
 	file   *ast.File
 	inBody bool
 
-	imports map[string]string
-	used    map[string]bool
+	sorted []string
+	used   map[string]bool
 
 	path    []string
 	scope   []map[string]mapping // for symbols resolution within package.
 	symbols map[string]bool      // symbols provided by package
+	aliases map[string]string    // for shadowed packages
 }
 
 type mapping struct {
-	ref string
-	pkg *protoConverter
+	ref   string
+	alias string // alias for the type, if exists.
+	pkg   *protoConverter
 }
 
 type pkgInfo struct {
 	importPath string // the import path
 	goPath     string // The Go import path
 	shortName  string // Used for the cue package path, default is base of goPath
+	protoName  string // the protobuf package name
 }
 
 func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
@@ -210,13 +234,52 @@ func (p *protoConverter) popNames() {
 	p.scope = p.scope[:len(p.scope)-1]
 }
 
+func (p *protoConverter) uniqueTop(name string) string {
+	if len(p.path) == 0 {
+		return name
+	}
+	a := strings.SplitN(name, ".", 2)
+	if p.path[len(p.path)-1] == a[0] {
+		first := a[0]
+		alias, ok := p.aliases[first]
+		if !ok {
+			// TODO: this is likely to be okay, but find something better.
+			alias = "__" + first
+			p.file.Decls = append(p.file.Decls, &ast.Alias{
+				Ident: ast.NewIdent(alias),
+				Expr:  ast.NewIdent(first),
+			})
+			p.aliases[first] = alias
+		}
+		if len(a) > 1 {
+			alias += "." + a[1]
+		}
+		return alias
+	}
+	return name
+}
+
+func (p *protoConverter) toExpr(pos scanner.Position, name string) (expr ast.Expr) {
+	a := strings.Split(name, ".")
+	for i, s := range a {
+		if i == 0 {
+			expr = &ast.Ident{NamePos: p.toCUEPos(pos), Name: s}
+			continue
+		}
+		expr = &ast.SelectorExpr{X: expr, Sel: ast.NewIdent(s)}
+	}
+	return expr
+}
+
 func (p *protoConverter) resolve(pos scanner.Position, name string, options []*proto.Option) string {
 	if strings.HasPrefix(name, ".") {
 		return p.resolveTopScope(pos, name[1:], options)
 	}
 	for i := len(p.scope) - 1; i > 0; i-- {
 		if m, ok := p.scope[i][name]; ok {
-			return m.ref
+			cueName := m.ref
+			cueName = strings.Replace(m.ref, ".", "_", -1)
+			return cueName
 		}
 	}
 	return p.resolveTopScope(pos, name, options)
@@ -232,8 +295,10 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 		if m, ok := p.scope[0][name[:i]]; ok {
 			if m.pkg != nil {
 				p.used[m.pkg.goPkgPath] = true
+				// TODO: do something more principled.
 			}
-			return m.ref + name[i:]
+			cueName := strings.Replace(name[i:], ".", "_", -1)
+			return p.uniqueTop(m.ref + cueName)
 		}
 	}
 	if s, ok := protoToCUE(name, options); ok {
@@ -243,9 +308,9 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 	return ""
 }
 
-func (p *protoConverter) doImport(v *proto.Import) {
+func (p *protoConverter) doImport(v *proto.Import) error {
 	if v.Filename == "cue/cue.proto" {
-		return
+		return nil
 	}
 
 	filename := ""
@@ -257,6 +322,12 @@ func (p *protoConverter) doImport(v *proto.Import) {
 		}
 		filename = name
 		break
+	}
+
+	if filename == "" {
+		err := errors.Newf(p.toCUEPos(v.Position), "could not find import %q", v.Filename)
+		p.state.addErr(err)
+		return err
 	}
 
 	p.mapBuiltinPackage(v.Position, v.Filename, filename == "")
@@ -284,7 +355,7 @@ func (p *protoConverter) doImport(v *proto.Import) {
 				if imp.goPkgPath == p.goPkgPath {
 					pkg = nil
 				}
-				p.scope[0][ref] = mapping{prefix + k, pkg}
+				p.scope[0][ref] = mapping{prefix + k, "", pkg}
 			}
 		}
 		if len(pkgNamespace) == 0 {
@@ -296,6 +367,7 @@ func (p *protoConverter) doImport(v *proto.Import) {
 		pkgNamespace = pkgNamespace[1:]
 		curNamespace = curNamespace[1:]
 	}
+	return nil
 }
 
 func (p *protoConverter) stringLit(pos scanner.Position, s string) *ast.BasicLit {
@@ -353,7 +425,10 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 	case *proto.Import:
 		// already handled.
 
-	case *proto.Extensions:
+	case *proto.Service:
+		// TODO: handle services.
+
+	case *proto.Extensions, *proto.Reserved:
 		// no need to handle
 
 	default:
@@ -362,6 +437,11 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 }
 
 func (p *protoConverter) message(v *proto.Message) {
+	if v.IsExtend {
+		// TODO: we are not handling extensions as for now.
+		return
+	}
+
 	defer func(saved []string) { p.path = saved }(p.path)
 	p.path = append(p.path, v.Name)
 
@@ -383,7 +463,6 @@ func (p *protoConverter) message(v *proto.Message) {
 	f := &ast.Field{Label: ref, Value: s}
 	addComments(f, 1, v.Comment, nil)
 
-	// In CUE a message is always defined at the top level.
 	p.file.Decls = append(p.file.Decls, f)
 
 	for i, e := range v.Elements {
@@ -408,12 +487,15 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		}
 
 	case *proto.MapField:
+		defer func(saved []string) { p.path = saved }(p.path)
+		p.path = append(p.path, x.Name)
+
 		f := &ast.Field{}
 
 		// All keys are converted to strings.
 		// TODO: support integer keys.
 		f.Label = &ast.TemplateLabel{Ident: ast.NewIdent("_")}
-		f.Value = ast.NewIdent(p.resolve(x.Position, x.Type, x.Options))
+		f.Value = p.toExpr(x.Position, p.resolve(x.Position, x.Type, x.Options))
 
 		name := p.ident(x.Position, x.Name)
 		f = &ast.Field{
@@ -440,11 +522,11 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 	case *proto.Oneof:
 		p.oneOf(x)
 
-	case *proto.Extensions:
+	case *proto.Extensions, *proto.Reserved:
 		// no need to handle
 
 	default:
-		failf(scanner.Position{}, "unsupported type %T", v)
+		failf(scanner.Position{}, "unsupported field type %T", v)
 	}
 }
 
@@ -467,11 +549,15 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 // Enums are always defined at the top level. The name of a nested enum
 // will be prefixed with the name of its parent and an underscore.
 func (p *protoConverter) enum(x *proto.Enum) {
+
 	if len(x.Elements) == 0 {
 		failf(x.Position, "empty enum")
 	}
 
 	name := p.subref(x.Position, x.Name)
+
+	defer func(saved []string) { p.path = saved }(p.path)
+	p.path = append(p.path, x.Name)
 
 	p.addNames(x.Elements)
 
@@ -491,6 +577,9 @@ func (p *protoConverter) enum(x *proto.Enum) {
 	d := &ast.Field{Label: valueName, Value: valueMap}
 	// addComments(valueMap, 1, x.Comment, nil)
 
+	if strings.Contains(name.Name, "google") {
+		panic(name.Name)
+	}
 	p.file.Decls = append(p.file.Decls, enum, d)
 
 	// The line comments for an enum field need to attach after the '|', which
@@ -570,13 +659,16 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 }
 
 func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *ast.Field {
+	defer func(saved []string) { p.path = saved }(p.path)
+	p.path = append(p.path, x.Name)
+
 	f := &ast.Field{}
 	addComments(f, i, x.Comment, x.InlineComment)
 
 	name := p.ident(x.Position, x.Name)
 	f.Label = name
 	typ := p.resolve(x.Position, x.Type, x.Options)
-	f.Value = ast.NewIdent(typ)
+	f.Value = p.toExpr(x.Position, typ)
 	s.Elts = append(s.Elts, f)
 
 	o := optionParser{message: s, field: f}
@@ -635,7 +727,34 @@ func (p *optionParser) parse(options []*proto.Option) {
 
 			// TODO: should CUE support nested attributes?
 			source := o.Constant.SourceRepresentation()
-			p.tags += "," + quote("option("+o.Name+","+source+")")
+			p.tags += ","
+			switch source {
+			case "true":
+				p.tags += quoteOption(o.Name)
+			default:
+				p.tags += quoteOption(o.Name + "=" + source)
+			}
 		}
 	}
+}
+
+func quoteOption(s string) string {
+	needQuote := false
+	for _, r := range s {
+		if !unicode.In(r, unicode.L, unicode.N) {
+			needQuote = true
+			break
+		}
+	}
+	if !needQuote {
+		return s
+	}
+	if !strings.ContainsAny(s, `"\`) {
+		return strconv.Quote(s)
+	}
+	esc := `\#`
+	for strings.Contains(s, esc) {
+		esc += "#"
+	}
+	return esc[1:] + `"` + s + `"` + esc[1:]
 }

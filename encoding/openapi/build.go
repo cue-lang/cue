@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"math"
 	"path"
+	"sort"
 	"strconv"
 	"strings"
 
@@ -26,12 +27,24 @@ import (
 )
 
 type buildContext struct {
+	inst      *cue.Instance
 	refPrefix string
 	path      []string
 
 	expandRefs bool
+	nameFunc   func(inst *cue.Instance, path []string) string
 
 	schemas *orderedMap
+
+	// Track external schemas.
+	externalRefs map[string]*externalType
+}
+
+type externalType struct {
+	ref   string
+	inst  *cue.Instance
+	path  []string
+	value cue.Value
 }
 
 type oaSchema = orderedMap
@@ -40,9 +53,12 @@ type typeFunc func(b *builder, a cue.Value)
 
 func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) {
 	c := buildContext{
-		refPrefix:  "components/schema",
-		expandRefs: cfg.ExpandReferences,
-		schemas:    &orderedMap{},
+		inst:         inst,
+		refPrefix:    "components/schema",
+		expandRefs:   cfg.ExpandReferences,
+		nameFunc:     cfg.ReferenceFunc,
+		schemas:      &orderedMap{},
+		externalRefs: map[string]*externalType{},
 	}
 
 	defer func() {
@@ -75,7 +91,24 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 		if c.isInternal(label) {
 			continue
 		}
-		c.schemas.Set(label, c.build(label, i.Value()))
+		c.schemas.Set(c.makeRef(inst, []string{label}), c.build(label, i.Value()))
+	}
+
+	// keep looping until a fixed point is reached.
+	for done := 0; len(c.externalRefs) != done; {
+		done = len(c.externalRefs)
+
+		// From now on, all references need to be expanded
+		external := []string{}
+		for k := range c.externalRefs {
+			external = append(external, k)
+		}
+		sort.Strings(external)
+
+		for _, k := range external {
+			ext := c.externalRefs[k]
+			c.schemas.Set(ext.ref, c.build(ext.ref, ext.value.Eval()))
+		}
 	}
 	return comps, nil
 }
@@ -110,20 +143,23 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 	defer func() { b.ctx.path = oldPath }()
 
 	c := newRootBuilder(b.ctx)
-	c.value(v, nil)
+	isRef := c.value(v, nil)
 	schema := c.finish()
-	doc := []string{}
-	for _, d := range v.Doc() {
-		doc = append(doc, d.Text())
-	}
-	if len(doc) > 0 {
-		str := strings.TrimSpace(strings.Join(doc, "\n"))
-		schema.Prepend("description", str)
+
+	if !isRef {
+		doc := []string{}
+		for _, d := range v.Doc() {
+			doc = append(doc, d.Text())
+		}
+		if len(doc) > 0 {
+			str := strings.TrimSpace(strings.Join(doc, "\n"))
+			schema.Prepend("description", str)
+		}
 	}
 	return schema
 }
 
-func (b *builder) value(v cue.Value, f typeFunc) {
+func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	count := 0
 	disallowDefault := false
 	var values cue.Value
@@ -132,18 +168,28 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 		values = v
 		count = 1
 	} else {
+		dedup := map[string]bool{}
+		hasNoRef := false
 		for _, v := range appendSplit(nil, cue.AndOp, v) {
 			// This may be a reference to an enum. So we need to check references before
 			// dissecting them.
 			switch p, r := v.Reference(); {
 			case len(r) > 0:
+				ref := b.ctx.makeRef(p, r)
+				if dedup[ref] {
+					continue
+				}
+				dedup[ref] = true
+
 				b.addRef(v, p, r)
 				disallowDefault = true
 			default:
+				hasNoRef = true
 				count++
 				values = values.Unify(v)
 			}
 		}
+		isRef = !hasNoRef && len(dedup) == 1
 	}
 
 	if count > 0 { // TODO: implement IsAny.
@@ -193,6 +239,7 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 			b.set("default", v)
 		}
 	}
+	return isRef
 }
 
 func appendSplit(a []cue.Value, splitBy cue.Op, v cue.Value) []cue.Value {
@@ -729,10 +776,29 @@ func (b *builder) addConjunct(f func(*builder)) {
 }
 
 func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
+	name := b.ctx.makeRef(inst, ref)
 	b.addConjunct(func(b *builder) {
-		a := append([]string{"#", b.ctx.refPrefix}, ref...)
-		b.set("$ref", path.Join(a...))
+		b.set("$ref", path.Join("#", b.ctx.refPrefix, name))
 	})
+
+	if b.ctx.inst != inst {
+		b.ctx.externalRefs[name] = &externalType{
+			ref:   name,
+			inst:  inst,
+			path:  ref,
+			value: v,
+		}
+	}
+}
+
+func (b *buildContext) makeRef(inst *cue.Instance, ref []string) string {
+	a := make([]string, 0, len(ref)+3)
+	if b.nameFunc != nil {
+		a = append(a, b.nameFunc(inst, ref))
+	} else {
+		a = append(a, ref...)
+	}
+	return path.Join(a...)
 }
 
 func (b *builder) int(v cue.Value) int64 {

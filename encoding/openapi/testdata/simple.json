@@ -1,0 +1,35 @@
+{
+   "openapi": "3.0.0",
+   "components": {
+      "schema": {
+         "MyStruct": {
+            "type": "object",
+            "required": [
+               "mediumNum",
+               "smallNum",
+               "float",
+               "double"
+            ],
+            "properties": {
+               "double": {
+                  "type": "number",
+                  "format": "double"
+               },
+               "float": {
+                  "type": "number",
+                  "format": "float"
+               },
+               "mediumNum": {
+                  "type": "integer",
+                  "format": "int32"
+               },
+               "smallNum": {
+                  "type": "integer",
+                  "minimum": -128,
+                  "maximum": 127
+               }
+            }
+         }
+      }
+   }
+}

@@ -22,6 +22,14 @@ import (
 
 // A Config defines options for mapping CUE to and from OpenAPI.
 type Config struct {
+	// ReferenceFunc allows users to specify an alternative representation
+	// for references.
+	ReferenceFunc func(inst *cue.Instance, path []string) string
+
+	// SelfContained causes all non-expanded external references to be included
+	// in this document.
+	SelfContained bool
+
 	// ExpandReferences replaces references with actual objects when generating
 	// OpenAPI Schema. It is an error for an CUE value to refer to itself
 	// when this object is used.

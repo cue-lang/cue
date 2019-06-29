@@ -23,11 +23,16 @@ func validate(ctx *context, v value) *bottom {
 	switch x := eval.(type) {
 	case *structLit:
 		x = x.expandFields(ctx)
+		if ctx.maxDepth++; ctx.maxDepth > 20 {
+			return nil
+		}
 		for i := range x.arcs {
 			if err := validate(ctx, x.at(ctx, i)); err != nil {
+				ctx.maxDepth--
 				return err
 			}
 		}
+		ctx.maxDepth--
 	case *list:
 		// TODO: also validate types for open lists?
 		return validate(ctx, x.elem)

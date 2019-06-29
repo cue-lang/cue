@@ -42,6 +42,10 @@ type context struct {
 	// tracing
 	trace bool
 	level int
+
+	// TODO: replace with proper structural cycle detection/ occurs check.
+	// See Issue #29.
+	maxDepth int
 }
 
 func (c *context) incEvalDepth() {

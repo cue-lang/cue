@@ -41,19 +41,13 @@ NetworkFailPolicy: {
 	maxRetryWait?: time.Duration @protobuf(4,type=google.protobuf.Duration,name=max_retry_wait)
 }
 
-//  Describes the policy.
+//  Example of single-value enum.
 NetworkFailPolicy_FailPolicy:
 	//  If network connection fails, request is allowed and delivered to the
 	//  service.
-	*"FAIL_OPEN" |
+	"FAIL_OPEN"
 
-	//  If network connection fails, request is rejected.
-	"FAIL_CLOSE"
-
-NetworkFailPolicy_FailPolicy_value: {
-	"FAIL_OPEN":  0
-	"FAIL_CLOSE": 1
-}
+NetworkFailPolicy_FailPolicy_value "FAIL_OPEN": 0
 
 //  Defines the per-service client configuration.
 ServiceConfig: {

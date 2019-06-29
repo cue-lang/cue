@@ -582,6 +582,13 @@ func (p *protoConverter) enum(x *proto.Enum) {
 	}
 	p.file.Decls = append(p.file.Decls, enum, d)
 
+	numEnums := 0
+	for _, v := range x.Elements {
+		if _, ok := v.(*proto.EnumField); ok {
+			numEnums++
+		}
+	}
+
 	// The line comments for an enum field need to attach after the '|', which
 	// is only known at the next iteration.
 	var lastComment *proto.Comment
@@ -601,7 +608,10 @@ func (p *protoConverter) enum(x *proto.Enum) {
 			var e ast.Expr = value
 			// Make the first value the default value.
 			if i == 0 {
-				e = &ast.UnaryExpr{OpPos: newline, Op: token.MUL, X: value}
+				e = value
+				if numEnums > 1 {
+					e = &ast.UnaryExpr{OpPos: newline, Op: token.MUL, X: value}
+				}
 			} else {
 				value.ValuePos = newline
 			}

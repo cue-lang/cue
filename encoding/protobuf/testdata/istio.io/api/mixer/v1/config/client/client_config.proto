@@ -37,14 +37,12 @@ option (gogoproto.stable_marshaler_all) = true;
 
 // Specifies the behavior when the client is unable to connect to Mixer.
 message NetworkFailPolicy {
-  // Describes the policy.
+
+  // Example of single-value enum.
   enum FailPolicy {
     // If network connection fails, request is allowed and delivered to the
     // service.
     FAIL_OPEN = 0;
-
-    // If network connection fails, request is rejected.
-    FAIL_CLOSE = 1;
   }
 
   // Specifies the behavior when the client is unable to connect to Mixer.

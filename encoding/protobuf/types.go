@@ -63,18 +63,6 @@ func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, re
 	switch file {
 	case "gogoproto/gogo.proto":
 
-	case "google/protobuf/duration.proto":
-		p.setBuiltin("google.protobuf.Duration", "time.Duration", timePkg)
-
-	case "google/protobuf/timestamp.proto":
-		p.setBuiltin("google.protobuf.Timestamp", "time.Time", timePkg)
-
-	case "google/protobuf/any.proto":
-		p.setBuiltin("google.protobuf.Any", "_", nil)
-
-	case "google/protobuf/empty.proto":
-		p.setBuiltin("google.protobuf.Empty", "{}", nil)
-
 	default:
 		if required {
 			failf(pos, "import %q not found", file)

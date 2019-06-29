@@ -14,7 +14,10 @@
 //  limitations under the License.
 package v1
 
-import "time"
+import (
+	"github.com/golang/protobuf/ptypes/duration"
+	"github.com/golang/protobuf/ptypes/timestamp"
+)
 
 //  Attributes represents a set of typed name/value pairs. Many of Mixer's
 //  API either consume and/or return attributes.
@@ -77,10 +80,10 @@ Attributes_AttributeValue: {
 	bytesValue?: bytes @protobuf(6,name=bytes_value)
 } | {
 	//  Used for values of type TIMESTAMP
-	timestampValue?: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
+	timestampValue?: timestamp.Timestamp @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
 } | {
 	//  Used for values of type DURATION
-	durationValue?: time.Duration @protobuf(8,type=google.protobuf.Duration,name=duration_value)
+	durationValue?: duration.Duration @protobuf(8,type=google.protobuf.Duration,name=duration_value)
 } | {
 	//  Used for values of type STRING_MAP
 	stringMapValue?: Attributes_StringMap @protobuf(9,type=StringMap,name=string_map_value)
@@ -116,10 +119,10 @@ CompressedAttributes: {
 	bools <_>: bool
 
 	//  Holds attributes of type TIMESTAMP
-	timestamps <_>: time.Time
+	timestamps <_>: timestamp.Timestamp
 
 	//  Holds attributes of type DURATION
-	durations <_>: time.Duration
+	durations <_>: duration.Duration
 
 	//  Holds attributes of type BYTES
 	bytes <_>: bytes

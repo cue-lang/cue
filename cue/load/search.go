@@ -148,11 +148,11 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 
 	root := l.abs(dir)
 
-	if c.modRoot != "" {
-		if !hasFilepathPrefix(root, c.modRoot) {
+	if c.ModuleRoot != "" {
+		if !hasFilepathPrefix(root, c.ModuleRoot) {
 			m.Err = errors.Newf(token.NoPos,
 				"cue: pattern %s refers to dir %s, outside module root %s",
-				pattern, root, c.modRoot)
+				pattern, root, c.ModuleRoot)
 			return m
 		}
 	}

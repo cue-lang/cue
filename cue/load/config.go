@@ -19,6 +19,7 @@ import (
 	"path/filepath"
 	"runtime"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -75,7 +76,14 @@ type Config struct {
 
 	loader *loader
 
-	modRoot string // module root for package paths ("" if unknown)
+	// A Module is a collection of packages and instances that are within the
+	// directory hierarchy rooted at the module root. The module root can be
+	// marked with a cue.mod file.
+	ModuleRoot string
+
+	// Module specifies the module prefix. If not empty, this value must match
+	// the module field of an existing cue.mod file.
+	Module string
 
 	// cache specifies the package cache in which to look for packages.
 	cache string
@@ -173,13 +181,13 @@ func (c Config) complete() (cfg *Config, err error) {
 	// TODO: determine root on a package basis. Maybe we even need a
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
-	if c.modRoot == "" {
+	if c.ModuleRoot == "" {
 		abs, err := c.findRoot(c.Dir)
 		if err != nil {
 			// Not using modules: only consider the current directory.
-			c.modRoot = c.Dir
+			c.ModuleRoot = c.Dir
 		} else {
-			c.modRoot = abs
+			c.ModuleRoot = abs
 		}
 	}
 
@@ -191,6 +199,32 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	if c.cache == "" {
 		c.cache = filepath.Join(home(), defaultDir)
+	}
+
+	// TODO: also make this work if run from outside the module?
+	switch {
+	case true:
+		mod := filepath.Join(c.ModuleRoot, modFile)
+		f, cerr := c.fileSystem.openFile(mod)
+		if cerr != nil {
+			break
+		}
+		var r cue.Runtime
+		inst, err := r.Parse(mod, f)
+		if err != nil {
+			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
+		}
+		prefix := inst.Lookup("module")
+		if prefix.IsValid() {
+			name, err := prefix.String()
+			if err != nil {
+				return nil, err
+			}
+			if c.Module == "" || c.Module != name {
+				return nil, errors.Newf(prefix.Pos(), "inconsistent modules: got %q, want %q", name, c.Module)
+			}
+			c.Module = name
+		}
 	}
 
 	return &c, nil

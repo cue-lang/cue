@@ -81,6 +81,11 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 	p.DisplayPath = path
 
 	isLocal := isLocalImport(path)
+
+	if cfg.Module != "" && isLocal {
+		p.ImportPath = filepath.Join(cfg.Module, path)
+	}
+
 	var modDir string
 	// var modErr error
 	if !isLocal {
@@ -125,7 +130,7 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 			}
 		}
 
-		if rootFound || dir == p.Root || fp.pkg.PkgName == "" {
+		if rootFound || filepath.Clean(dir) == l.cfg.ModuleRoot || fp.pkg.PkgName == "" {
 			break
 		}
 
@@ -176,13 +181,19 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 				}
 				return nil
 			}
-			if cfg.modRoot == "" {
+			if cfg.ModuleRoot == "" {
 				i := cfg.newInstance(path)
 				report(i, l.errPkgf(nil,
 					"import %q not found in the pkg directory", path))
 				return i
 			}
-			return l.importPkg(pos, path, filepath.Join(cfg.modRoot, "pkg"))
+			root := cfg.ModuleRoot
+			if mod := cfg.Module; path == mod || strings.HasPrefix(path, mod+"/") {
+				path = path[len(mod)+1:]
+			} else {
+				root = filepath.Join(root, "pkg")
+			}
+			return l.importPkg(pos, path, root)
 		}
 
 		if strings.Contains(path, "@") {

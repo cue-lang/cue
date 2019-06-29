@@ -42,7 +42,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	c, err := c.complete()
 	if err != nil {
-		return nil
+		return []*build.Instance{c.newErrInstance(nil, "", err)}
 	}
 
 	l := c.loader
@@ -57,8 +57,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	a := []*build.Instance{}
 	for _, m := range l.importPaths(args) {
 		if m.Err != nil {
-			inst := c.newErrInstance(m, "",
-				errors.Wrapf(m.Err, token.NoPos, "no match"))
+			inst := c.newErrInstance(m, "", m.Err)
 			a = append(a, inst)
 			continue
 		}

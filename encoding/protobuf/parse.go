@@ -644,8 +644,7 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 		}
 		switch x := v.(type) {
 		case *proto.OneOfField:
-			f := p.parseField(s, 0, x.Field)
-			f.Optional = token.NoPos
+			p.parseField(s, 0, x.Field)
 
 		default:
 			p.messageField(s, 1, v)

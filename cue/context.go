@@ -15,7 +15,7 @@
 package cue
 
 import (
-	"github.com/cockroachdb/apd"
+	"github.com/cockroachdb/apd/v2"
 )
 
 // context manages evaluation state.

@@ -198,7 +198,10 @@ func (e *posError) Cause() error                { return e.err }
 
 // Error implements the error interface.
 func (e *posError) Error() string {
-	return e.Message.Error()
+	if e.err == nil {
+		return e.Message.Error()
+	}
+	return fmt.Sprintf("%s: %s", e.Message.Error(), e.err)
 }
 
 // List is a list of Errors.

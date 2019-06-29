@@ -182,7 +182,7 @@ func unwrapJSONError(err error) errors.Error {
 	case errors.Error:
 		return &marshalError{x}
 	default:
-		return &marshalError{errors.Wrapf(err, token.NoPos, err.Error())}
+		return &marshalError{errors.Wrapf(err, token.NoPos, "json error")}
 	}
 }
 

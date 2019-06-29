@@ -49,6 +49,7 @@ func (r *Runtime) complete(p *build.Instance) (*Instance, error) {
 		return nil, err
 	}
 	inst := idx.loadInstance(p)
+	inst.ImportPath = p.ImportPath
 	if inst.Err != nil {
 		return nil, inst.Err
 	}
@@ -121,7 +122,8 @@ type index struct {
 	labelMap map[string]label
 	labels   []string
 
-	loaded map[*build.Instance]*Instance
+	loaded  map[*build.Instance]*Instance
+	imports map[value]*Instance // key is always a *structLit
 
 	offset label
 	parent *index
@@ -143,6 +145,7 @@ func newSharedIndex() *index {
 	i := &index{
 		labelMap: map[string]label{"": 0},
 		labels:   []string{""},
+		imports:  map[value]*Instance{},
 	}
 	return i
 }
@@ -153,6 +156,7 @@ func newIndex() *index {
 	i := &index{
 		labelMap: map[string]label{},
 		loaded:   map[*build.Instance]*Instance{},
+		imports:  map[value]*Instance{},
 		offset:   label(len(parent.labels)) + parent.offset,
 		parent:   parent,
 	}
@@ -228,6 +232,8 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 			inst.insertFile(f)
 		}
 	}
+	inst.ImportPath = p.ImportPath
+
 	inst.complete = true
 	return inst
 }

@@ -251,6 +251,13 @@ func initBuiltins(pkgs map[string]*builtinPkg) {
 		e := mustCompileBuiltins(ctx, b, k)
 		builtins[k] = e
 		builtins["-/"+path.Base(k)] = e
+
+		sharedIndex.addInst(&Instance{
+			ImportPath: k,
+			Name:       path.Base(k),
+			rootStruct: e,
+			rootValue:  e,
+		})
 	}
 }
 

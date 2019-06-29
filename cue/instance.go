@@ -48,15 +48,31 @@ type Instance struct {
 	complete bool // for cycle detection
 }
 
+func (x *index) addInst(p *Instance) *Instance {
+	if p.rootStruct == nil {
+		panic("struct must not be nil")
+	}
+	p.index = x
+	x.imports[p.rootStruct] = p
+	return p
+}
+
+func (x *index) getImportFromNode(v value) *Instance {
+	imp := x.imports[v]
+	if imp == nil && x.parent != nil {
+		return x.parent.getImportFromNode(v)
+	}
+	return imp
+}
+
 // NewInstance creates a new instance. Use Insert to populate the instance.
 func (x *index) NewInstance(p *build.Instance) *Instance {
 	st := &structLit{baseValue: baseValue{nil}}
-	i := &Instance{
-		index:      x,
+	i := x.addInst(&Instance{
 		rootStruct: st,
 		rootValue:  st,
 		inst:       p,
-	}
+	})
 	if p != nil {
 		i.ImportPath = p.ImportPath
 		i.Dir = p.Dir
@@ -220,12 +236,11 @@ func Merge(inst ...*Instance) *Instance {
 		return nil
 	}
 
-	p := &Instance{
+	p := ctx.index.addInst(&Instance{
 		rootStruct: st,
 		rootValue:  merged,
-		index:      ctx.index,
 		complete:   true,
-	}
+	})
 	return p
 }
 
@@ -305,18 +320,18 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	case *bottom:
 		err = inst.Value().toErr(x)
 	}
-	inst = &Instance{
+	inst = inst.index.addInst(&Instance{
 		rootStruct: st,
 		rootValue:  st,
-		index:      inst.index,
 		inst:       nil,
 
+		// TODO: somehow indicate this is not an original
 		ImportPath: inst.ImportPath,
 		Name:       inst.Name,
 		Incomplete: inst.Incomplete,
 		Err:        err,
 
 		complete: err != nil,
-	}
+	})
 	return inst, err
 }

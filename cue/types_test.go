@@ -1813,8 +1813,16 @@ func TestReference(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			v := getInstance(t, tc.input).Lookup("v")
-			if got := strings.Join(v.Reference(), " "); got != tc.want {
+			inst, a := v.Reference()
+			if got := strings.Join(a, " "); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
+			}
+
+			if tc.want != "" {
+				v := inst.Lookup(a...)
+				if x, _ := v.Int64(); x != 1 {
+					t.Errorf("path resolved to %s; want 1", v)
+				}
 			}
 		})
 	}

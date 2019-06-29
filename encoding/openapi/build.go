@@ -92,8 +92,8 @@ func (c *buildContext) isInternal(name string) bool {
 }
 
 // shouldExpand reports is the given identifier is not exported.
-func (c *buildContext) shouldExpand(name string) bool {
-	return c.expandRefs || c.isInternal(name)
+func (c *buildContext) shouldExpand(p *cue.Instance, ref []string) bool {
+	return c.expandRefs
 }
 
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
@@ -127,16 +127,17 @@ func (b *builder) value(v cue.Value, f typeFunc) {
 	count := 0
 	disallowDefault := false
 	var values cue.Value
-	if b.ctx.shouldExpand(strings.Join(v.Reference(), ".")) {
+	p, a := v.Reference()
+	if b.ctx.shouldExpand(p, a) {
 		values = v
 		count = 1
 	} else {
 		for _, v := range appendSplit(nil, cue.AndOp, v) {
 			// This may be a reference to an enum. So we need to check references before
 			// dissecting them.
-			switch r := v.Reference(); {
-			case r != nil:
-				b.addRef(r)
+			switch p, r := v.Reference(); {
+			case len(r) > 0:
+				b.addRef(v, p, r)
 				disallowDefault = true
 			default:
 				count++
@@ -727,9 +728,7 @@ func (b *builder) addConjunct(f func(*builder)) {
 	b.add(c.finish())
 }
 
-func (b *builder) addRef(ref []string) {
-	// TODO: validate path.
-	// TODO: map CUE types to OAPI types.
+func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
 	b.addConjunct(func(b *builder) {
 		a := append([]string{"#", b.ctx.refPrefix}, ref...)
 		b.set("$ref", path.Join(a...))

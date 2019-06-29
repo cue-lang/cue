@@ -1163,41 +1163,53 @@ func (v Value) Format(state fmt.State, verb rune) {
 	io.WriteString(state, debugStr(ctx, v.path.cache))
 }
 
-// Reference returns path from the root of the file referred to by this value
-// or no path if this value is not a reference.
-func (v Value) Reference() []string {
+// Reference returns path from the root of the instance referred to by this
+// value such that inst.Lookup(path) resolves to the same value, or no path if
+// this value is not a reference,
+func (v Value) Reference() (inst *Instance, path []string) {
 	// TODO: don't include references to hidden fields.
 	if v.path == nil {
-		return nil
+		return nil, nil
 	}
 	sel, ok := v.path.v.(*selectorExpr)
 	if !ok {
-		return nil
+		return nil, nil
 	}
-	return mkPath(v.ctx(), v.path, sel, 0)
+	imp, a := mkPath(v.ctx(), v.path, sel, 0)
+	return imp, a
 }
 
-func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (a []string) {
+func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (imp *Instance, a []string) {
 	switch x := sel.x.(type) {
 	case *selectorExpr:
-		a = mkPath(c, up.parent, x, d+1)
+		imp, a = mkPath(c, up.parent, x, d+1)
 	case *nodeRef:
 		// the parent must exist.
 		for ; up != nil && up.cache != x.node.(value); up = up.parent {
 		}
-		a = mkFromRoot(c, up, d+1)
+		var v value
+		v, a = mkFromRoot(c, up, d+2)
+		if v == nil {
+			v = x.node
+		}
+		imp = c.getImportFromNode(x.node)
 	default:
 		panic("should not happend")
 	}
-	return append(a, c.labelStr(sel.feature))
+	return imp, append(a, c.labelStr(sel.feature))
 }
 
-func mkFromRoot(c *context, up *valueData, d int) []string {
-	if up == nil || up.parent == nil {
-		return make([]string, 0, d)
+func mkFromRoot(c *context, up *valueData, d int) (root value, a []string) {
+	if up == nil {
+		return nil, make([]string, 0, d)
 	}
-	a := mkFromRoot(c, up.parent, d+1)
-	return append(a, c.labelStr(up.feature))
+	root, a = mkFromRoot(c, up.parent, d+1)
+	if up.parent != nil {
+		a = append(a, c.labelStr(up.feature))
+	} else {
+		root = up.v
+	}
+	return root, a
 }
 
 // References reports all references used to evaluate this value. It does not

@@ -11,7 +11,8 @@
                   ],
                   "properties": {
                      "exact": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "string"
                      }
                   }
                },
@@ -22,7 +23,8 @@
                   ],
                   "properties": {
                      "regex": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "string"
                      }
                   }
                }

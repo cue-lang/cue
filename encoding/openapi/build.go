@@ -17,6 +17,7 @@ package openapi
 import (
 	"fmt"
 	"math"
+	"math/big"
 	"path"
 	"sort"
 	"strconv"
@@ -24,6 +25,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"github.com/cockroachdb/apd/v2"
 )
 
 type buildContext struct {
@@ -143,6 +145,7 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 	defer func() { b.ctx.path = oldPath }()
 
 	c := newRootBuilder(b.ctx)
+	c.format = extractFormat(v)
 	isRef := c.value(v, nil)
 	schema := c.finish()
 
@@ -156,6 +159,9 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 			schema.Prepend("description", str)
 		}
 	}
+
+	simplify(c, schema)
+
 	return schema
 }
 
@@ -383,6 +389,8 @@ func (b *builder) dispatch(f typeFunc, v cue.Value) {
 		b.setType("integer", "") // may be overridden to integer
 		b.number(v)
 
+		// TODO: for JSON schema, consider adding multipleOf: 1.
+
 	case cue.BytesKind:
 		// byte		string	byte	base64 	encoded characters
 		// binary	string	binary	any 	sequence of octets
@@ -555,19 +563,19 @@ func (b *builder) number(v cue.Value) {
 	// setIntConstraint(t, "multipleOf", a)
 
 	case cue.LessThanOp:
-		b.set("exclusiveMaximum", b.int(a[0]))
+		b.set("exclusiveMaximum", b.big(a[0]))
 
 	case cue.LessThanEqualOp:
-		b.set("maximum", b.int(a[0]))
+		b.set("maximum", b.big(a[0]))
 
 	case cue.GreaterThanOp:
-		b.set("exclusiveMinimum", b.int(a[0]))
+		b.set("exclusiveMinimum", b.big(a[0]))
 
 	case cue.GreaterThanEqualOp:
-		b.set("minimum", b.int(a[0]))
+		b.set("minimum", b.big(a[0]))
 
 	case cue.NotEqualOp:
-		i := b.int(a[0])
+		i := b.big(a[0])
 		b.setNot("allOff", []*oaSchema{
 			b.kv("minItems", i),
 			b.kv("maxItems", i),
@@ -705,7 +713,9 @@ func newOASBuilder(parent *builder) *builder {
 func (b *builder) setType(t, format string) {
 	if b.typ == "" {
 		b.typ = t
-		b.format = format
+		if format != "" {
+			b.format = format
+		}
 	}
 }
 
@@ -815,4 +825,14 @@ func (b *builder) decode(v cue.Value) interface{} {
 		b.failf(v, "decode error: %v", err)
 	}
 	return d
+}
+
+func (b *builder) big(v cue.Value) interface{} {
+	var mant big.Int
+	exp, err := v.MantExp(&mant)
+	if err != nil {
+		b.failf(v, "value not a number: %v", err)
+		return nil
+	}
+	return &decimal{apd.NewWithBigInt(&mant, int32(exp))}
 }

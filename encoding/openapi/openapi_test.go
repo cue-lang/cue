@@ -37,6 +37,14 @@ func TestParseDefinitions(t *testing.T) {
 		in, out string
 		config  *Config
 	}{{
+		"simple.cue",
+		"simple.json",
+		resolveRefs,
+	}, {
+		"array.cue",
+		"array.json",
+		defaultConfig,
+	}, {
 		"oneof.cue",
 		"oneof.json",
 		defaultConfig,

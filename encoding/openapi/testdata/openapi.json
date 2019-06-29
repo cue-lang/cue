@@ -15,7 +15,8 @@
                      "bar": {
                         "type": "array",
                         "items": {
-                           "type": "string"
+                           "type": "string",
+                           "format": "string"
                         }
                      },
                      "foo": {
@@ -61,7 +62,8 @@
                         ],
                         "properties": {
                            "b": {
-                              "type": "string"
+                              "type": "string",
+                              "format": "string"
                            }
                         }
                      }
@@ -89,8 +91,7 @@
          },
          "Int32": {
             "type": "integer",
-            "minimum": -2147483648,
-            "maximum": 2147483647
+            "format": "int32"
          },
          "YourMessage": {
             "oneOf": [
@@ -101,10 +102,12 @@
                   ],
                   "properties": {
                      "a": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "string"
                      },
                      "b": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "string"
                      }
                   }
                },
@@ -115,7 +118,8 @@
                   ],
                   "properties": {
                      "a": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "string"
                      },
                      "b": {
                         "type": "number"
@@ -226,7 +230,8 @@
                   ],
                   "properties": {
                      "a": {
-                        "type": "string"
+                        "type": "string",
+                        "format": "string"
                      }
                   }
                }

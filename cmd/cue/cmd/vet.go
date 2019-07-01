@@ -47,6 +47,8 @@ func doVet(cmd *cobra.Command, args []string) error {
 		exprs = append(exprs, expr)
 	}
 
+	shown := false
+
 	for _, inst := range instances {
 		// TODO: use ImportPath or some other sanitized path.
 
@@ -64,7 +66,6 @@ func doVet(cmd *cobra.Command, args []string) error {
 			cue.Hidden(true),
 		}
 		w := cmd.OutOrStderr()
-		shown := false
 		err := inst.Value().Validate(append(opt, cue.Concrete(concrete))...)
 		if err != nil && !hasFlag {
 			err = inst.Value().Validate(append(opt, cue.Concrete(false))...)

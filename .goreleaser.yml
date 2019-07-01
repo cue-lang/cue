@@ -54,3 +54,12 @@ changelog:
   filters:
     exclude:
     - '^test:'
+
+brews:
+- github:
+    owner: cuelang 
+    name: homebrew-tap
+  homepage: "https://github.com/cuelang/cue"
+  description: "CUE is an open source data constraint language which aims to simplify tasks involving defining and using data."
+  test: |
+    system "#{bin}/cue version"

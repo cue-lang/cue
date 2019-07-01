@@ -201,15 +201,14 @@ func (g *generator) processCUE(dir string) {
 	}
 
 	n := instances[0].Value().Syntax(cue.Hidden(true), cue.Concrete(false))
-	var buf bytes.Buffer
-	if err := cueformat.Node(&buf, n); err != nil {
+	b, err := cueformat.Node(n)
+	if err != nil {
 		log.Fatal(err)
 	}
-	body := buf.String()
-	body = strings.ReplaceAll(body, "\n\n", "\n")
+	b = bytes.ReplaceAll(b, []byte("\n\n"), []byte("\n"))
 	// body = strings.ReplaceAll(body, "\t", "")
 	// TODO: escape backtick
-	fmt.Fprintf(g.w, "cue: `%s`,\n", body)
+	fmt.Fprintf(g.w, "cue: `%s`,\n", string(b))
 }
 
 func (g *generator) processGo(filename string) {

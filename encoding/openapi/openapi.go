@@ -20,8 +20,8 @@ import (
 	"cuelang.org/go/cue"
 )
 
-// A Config defines options for mapping CUE to and from OpenAPI.
-type Config struct {
+// A Generator converts CUE to OpenAPI.
+type Generator struct {
 	// ReferenceFunc allows users to specify an alternative representation
 	// for references.
 	ReferenceFunc func(inst *cue.Instance, path []string) string
@@ -31,23 +31,55 @@ type Config struct {
 	SelfContained bool
 
 	// ExpandReferences replaces references with actual objects when generating
-	// OpenAPI Schema. It is an error for an CUE value to refer to itself
-	// when this object is used.
+	// OpenAPI Schema. It is an error for an CUE value to refer to itself.
 	ExpandReferences bool
 }
 
-// Gen generates the set OpenAPI schema for all top-level types of the given
-// instance.
+// Config is now Generator
+// Deprecated: use Generator
+type Config = Generator
+
+// Gen generates the set OpenAPI schema for all top-level types of the
+// given instance.
 //
+// Deprecated: use Generator.All.
 func Gen(inst *cue.Instance, c *Config) ([]byte, error) {
 	if c == nil {
 		c = defaultConfig
 	}
-	comps, err := components(inst, c)
+	all, err := c.All(inst)
 	if err != nil {
 		return nil, err
 	}
-	return json.Marshal(comps)
+	return json.Marshal(all)
+}
+
+// All generates an OpenAPI definition from the given instance.
+//
+// Note: only a limited number of top-level types are supported so far.
+func (g *Generator) All(inst *cue.Instance) (OrderedMap, error) {
+	all, err := g.Schemas(inst)
+	if err != nil {
+		return nil, err
+	}
+
+	schemas := &OrderedMap{}
+	schemas.set("schema", all)
+
+	top := OrderedMap{}
+	top.set("openapi", "3.0.0")
+	top.set("components", schemas)
+
+	return top, nil
+}
+
+// Schemas extracts component/schemas from the CUE top-level types.
+func (g *Generator) Schemas(inst *cue.Instance) (OrderedMap, error) {
+	comps, err := schemas(g, inst)
+	if err != nil {
+		return nil, err
+	}
+	return comps, err
 }
 
 var defaultConfig = &Config{}

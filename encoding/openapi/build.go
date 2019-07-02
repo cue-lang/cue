@@ -36,7 +36,7 @@ type buildContext struct {
 	expandRefs bool
 	nameFunc   func(inst *cue.Instance, path []string) string
 
-	schemas *orderedMap
+	schemas *OrderedMap
 
 	// Track external schemas.
 	externalRefs map[string]*externalType
@@ -49,17 +49,17 @@ type externalType struct {
 	value cue.Value
 }
 
-type oaSchema = orderedMap
+type oaSchema = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
 
-func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) {
+func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
 	c := buildContext{
 		inst:         inst,
 		refPrefix:    "components/schema",
-		expandRefs:   cfg.ExpandReferences,
-		nameFunc:     cfg.ReferenceFunc,
-		schemas:      &orderedMap{},
+		expandRefs:   g.ExpandReferences,
+		nameFunc:     g.ReferenceFunc,
+		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 	}
 
@@ -77,11 +77,7 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 		}
 	}()
 
-	schemas := &orderedMap{}
-	schemas.Set("schema", c.schemas)
-	comps = &orderedMap{}
-	comps.Set("openapi", "3.0.0")
-	comps.Set("components", schemas)
+	// Although paths is empty for now, it makes it valid OpenAPI spec.
 
 	i, err := inst.Value().Fields()
 	if err != nil {
@@ -93,7 +89,7 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 		if c.isInternal(label) {
 			continue
 		}
-		c.schemas.Set(c.makeRef(inst, []string{label}), c.build(label, i.Value()))
+		c.schemas.set(c.makeRef(inst, []string{label}), c.build(label, i.Value()))
 	}
 
 	// keep looping until a fixed point is reached.
@@ -109,10 +105,11 @@ func components(inst *cue.Instance, cfg *Config) (comps *orderedMap, err error) 
 
 		for _, k := range external {
 			ext := c.externalRefs[k]
-			c.schemas.Set(ext.ref, c.build(ext.ref, ext.value.Eval()))
+			c.schemas.set(ext.ref, c.build(ext.ref, ext.value.Eval()))
 		}
 	}
-	return comps, nil
+
+	return *c.schemas, nil
 }
 
 func (c *buildContext) build(name string, v cue.Value) *oaSchema {
@@ -156,7 +153,7 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 		}
 		if len(doc) > 0 {
 			str := strings.TrimSpace(strings.Join(doc, "\n"))
-			schema.Prepend("description", str)
+			schema.prepend("description", str)
 		}
 	}
 
@@ -721,35 +718,35 @@ func (b *builder) setType(t, format string) {
 
 func setType(t *oaSchema, b *builder) {
 	if b.typ != "" {
-		t.Set("type", b.typ)
+		t.set("type", b.typ)
 		if b.format != "" {
-			t.Set("format", b.format)
+			t.set("format", b.format)
 		}
 	}
 }
 
 func (b *builder) set(key string, v interface{}) {
 	if b.current == nil {
-		b.current = &orderedMap{}
+		b.current = &OrderedMap{}
 		b.allOf = append(b.allOf, b.current)
 		setType(b.current, b)
-	} else if b.current.Exists(key) {
-		b.current = &orderedMap{}
+	} else if b.current.exists(key) {
+		b.current = &OrderedMap{}
 		b.allOf = append(b.allOf, b.current)
 	}
-	b.current.Set(key, v)
+	b.current.set(key, v)
 }
 
 func (b *builder) kv(key string, value interface{}) *oaSchema {
-	constraint := &orderedMap{}
+	constraint := &OrderedMap{}
 	setType(constraint, b)
-	constraint.Set(key, value)
+	constraint.set(key, value)
 	return constraint
 }
 
 func (b *builder) setNot(key string, value interface{}) {
-	not := &orderedMap{}
-	not.Set("not", b.kv(key, value))
+	not := &OrderedMap{}
+	not.set("not", b.kv(key, value))
 	b.add(not)
 }
 
@@ -760,7 +757,7 @@ func (b *builder) finish() *oaSchema {
 			b.failf(cue.Value{}, "no type specified at finish")
 			return nil
 		}
-		t := &orderedMap{}
+		t := &OrderedMap{}
 		setType(t, b)
 		return t
 
@@ -769,8 +766,8 @@ func (b *builder) finish() *oaSchema {
 		return b.allOf[0]
 
 	default:
-		t := &orderedMap{}
-		t.Set("allOf", b.allOf)
+		t := &OrderedMap{}
+		t.set("allOf", b.allOf)
 		return t
 	}
 }

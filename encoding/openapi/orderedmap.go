@@ -16,56 +16,64 @@ package openapi
 
 import "encoding/json"
 
-type orderedMap []kvPair
+// An OrderedMap is a set of key-value pairs that preserves the order in which
+// items were added. It marshals to JSON as an object.
+type OrderedMap []KeyValue
 
-type kvPair struct {
-	key   string
-	value interface{}
+// KeyValue associates a value with a key.
+type KeyValue struct {
+	Key   string
+	Value interface{}
 }
 
-func (m *orderedMap) Prepend(key string, value interface{}) {
-	*m = append([]kvPair{{key, value}}, (*m)...)
+func (m *OrderedMap) prepend(key string, value interface{}) {
+	*m = append([]KeyValue{{key, value}}, (*m)...)
 }
 
-func (m *orderedMap) Set(key string, value interface{}) {
+// set sets a key value pair. If a pair with the same key already existed, it
+// will be replaced with the new value. Otherwise, the new value is added to
+// the end.
+func (m *OrderedMap) set(key string, value interface{}) {
 	for i, v := range *m {
-		if v.key == key {
-			(*m)[i].value = value
+		if v.Key == key {
+			(*m)[i].Value = value
 			return
 		}
 	}
-	*m = append(*m, kvPair{key, value})
+	*m = append(*m, KeyValue{key, value})
 }
 
-func (m *orderedMap) Exists(key string) bool {
-	for _, v := range *m {
-		if v.key == key {
+// exists reports whether a key-value pair exists for the given key.
+func (m OrderedMap) exists(key string) bool {
+	for _, v := range m {
+		if v.Key == key {
 			return true
 		}
 	}
 	return false
 }
 
-func (m *orderedMap) MarshalJSON() (b []byte, err error) {
+// MarshalJSON implements Marshal
+func (m OrderedMap) MarshalJSON() (b []byte, err error) {
 	b = append(b, '{')
-	for i, v := range *m {
+	for i, v := range m {
 		if i > 0 {
 			b = append(b, ",\n"...)
 		}
-		key, err := json.Marshal(v.key)
+		key, err := json.Marshal(v.Key)
 		if je, ok := err.(*json.MarshalerError); ok {
 			return nil, je.Err
 		}
 		b = append(b, key...)
 		b = append(b, ": "...)
 
-		value, err := json.Marshal(v.value)
+		value, jerr := json.Marshal(v.Value)
 		if je, ok := err.(*json.MarshalerError); ok {
-			// return nil, je.Err
+			err = jerr
 			value, _ = json.Marshal(je.Err.Error())
 		}
 		b = append(b, value...)
 	}
 	b = append(b, '}')
-	return b, nil
+	return b, err
 }

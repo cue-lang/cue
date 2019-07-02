@@ -48,7 +48,7 @@ func extractFormat(v cue.Value) string {
 	return cueToOpenAPI[string(b)]
 }
 
-func simplify(b *builder, t *orderedMap) {
+func simplify(b *builder, t *OrderedMap) {
 	if b.format == "" {
 		return
 	}
@@ -58,17 +58,17 @@ func simplify(b *builder, t *orderedMap) {
 	}
 }
 
-func simplifyNumber(t *orderedMap, format string) string {
+func simplifyNumber(t *OrderedMap, format string) string {
 	pairs := *t
 	k := 0
 	for i, kv := range pairs {
-		switch kv.key {
+		switch kv.Key {
 		case "minimum":
-			if decimalEqual(minMap[format], kv.value) {
+			if decimalEqual(minMap[format], kv.Value) {
 				continue
 			}
 		case "maximum":
-			if decimalEqual(maxMap[format], kv.value) {
+			if decimalEqual(maxMap[format], kv.Value) {
 				continue
 			}
 		}

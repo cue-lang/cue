@@ -24,13 +24,13 @@ import (
 	"cuelang.org/go/encoding/protobuf"
 )
 
-func ExampleParse() {
+func ExampleExtract() {
 	cwd, _ := os.Getwd()
 	var paths = []string{}
 	paths = append(paths, cwd)
 	paths = append(paths, filepath.Join(cwd, "testdata"))
 
-	f, err := protobuf.Parse("examples/basic/basic.proto", nil, &protobuf.Config{
+	f, err := protobuf.Extract("examples/basic/basic.proto", nil, &protobuf.Config{
 		Paths: paths,
 	})
 

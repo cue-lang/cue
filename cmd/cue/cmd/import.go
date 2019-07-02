@@ -643,7 +643,7 @@ func handleYAML(path string, r io.Reader) (objects []ast.Expr, err error) {
 }
 
 func handleProtoDef(cmd *cobra.Command, path string, r io.Reader) (f *ast.File, err error) {
-	return protobuf.Parse(path, r, &protobuf.Config{Paths: flagProtoPath.StringArray(cmd)})
+	return protobuf.Extract(path, r, &protobuf.Config{Paths: flagProtoPath.StringArray(cmd)})
 }
 
 type hoister struct {

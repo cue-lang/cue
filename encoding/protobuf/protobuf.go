@@ -61,7 +61,7 @@ type Config struct {
 	Paths []string
 }
 
-// A Builder converts a collection of proto files, typically belonging to one
+// An Extractor converts a collection of proto files, typically belonging to one
 // repo or module, to CUE. It thereby observes the CUE package layout.
 //
 // CUE observes the same package layout as Go and requires .proto files to have
@@ -71,7 +71,7 @@ type Config struct {
 // All other imported files are assigned to the CUE pkg dir ($Root/pkg)
 // according to their Go package import path.
 //
-type Builder struct {
+type Extractor struct {
 	root   string
 	cwd    string
 	module string
@@ -90,12 +90,12 @@ type result struct {
 	err error
 }
 
-// NewBuilder creates a Builder. If the configuration contained any errors it
-// will be observable by the Err method fo the Builder. It is safe, however, to
-// only check errors after building the output.
-func NewBuilder(c *Config) *Builder {
+// NewExtractor creates an Extractor. If the configuration contained any errors
+// it will be observable by the Err method fo the Extractor. It is safe,
+// however, to only check errors after building the output.
+func NewExtractor(c *Config) *Extractor {
 	cwd, _ := os.Getwd()
-	b := &Builder{
+	b := &Extractor{
 		root:      c.Root,
 		cwd:       cwd,
 		paths:     c.Paths,
@@ -113,11 +113,11 @@ func NewBuilder(c *Config) *Builder {
 
 // Err returns the errors accumulated during testing. The returned error may be
 // of type cuelang.org/go/cue/errors.List.
-func (b *Builder) Err() error {
+func (b *Extractor) Err() error {
 	return b.errs.Err()
 }
 
-func (b *Builder) addErr(err error) {
+func (b *Extractor) addErr(err error) {
 	switch err := err.(type) {
 	case errors.Error:
 		b.errs.Add(err)
@@ -134,7 +134,7 @@ func (b *Builder) addErr(err error) {
 // an error if it does not. Imports are resolved using the paths defined in
 // Config.
 //
-func (b *Builder) AddFile(filename string, src interface{}) error {
+func (b *Extractor) AddFile(filename string, src interface{}) error {
 	if b.done {
 		b.errs.Add(errors.Newf(token.NoPos, "protobuf: cannot call AddFile: Instances was already called"))
 		return b.Err()
@@ -150,7 +150,7 @@ func (b *Builder) AddFile(filename string, src interface{}) error {
 
 // Files returns a File for each proto file that was added or imported,
 // recursively.
-func (b *Builder) Files() (files []*ast.File, err error) {
+func (b *Extractor) Files() (files []*ast.File, err error) {
 	defer func() { err = b.Err() }()
 	b.done = true
 
@@ -177,7 +177,7 @@ func (b *Builder) Files() (files []*ast.File, err error) {
 // All import paths are located within the specified Root, where external
 // packages are located under $Root/pkg. Instances for builtin (like time)
 // packages may be omitted, and if not will have no associated files.
-func (b *Builder) Instances() (instances []*build.Instance, err error) {
+func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 	defer func() { err = b.Err() }()
 	b.done = true
 
@@ -246,7 +246,7 @@ func (b *Builder) Instances() (instances []*build.Instance, err error) {
 	return instances, nil
 }
 
-func (b *Builder) getInst(p *protoConverter) *build.Instance {
+func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	if b.errs != nil {
 		return nil
 	}
@@ -289,19 +289,19 @@ func (b *Builder) getInst(p *protoConverter) *build.Instance {
 	return inst
 }
 
-// Parse parses a single proto file and returns its contents translated to a CUE
+// Extract parses a single proto file and returns its contents translated to a CUE
 // file. If src is not nil, it will use this as the contents of the file. It may
-// be a string, []byte or io.Reader. Otherwise Parse will open the given file
+// be a string, []byte or io.Reader. Otherwise Extract will open the given file
 // name at the fully qualified path.
 //
-// Parse assumes the proto file compiles with protoc and may not report an error
+// Extract assumes the proto file compiles with protoc and may not report an error
 // if it does not. Imports are resolved using the paths defined in Config.
 //
-func Parse(filename string, src interface{}, c *Config) (f *ast.File, err error) {
+func Extract(filename string, src interface{}, c *Config) (f *ast.File, err error) {
 	if c == nil {
 		c = &Config{}
 	}
-	b := NewBuilder(c)
+	b := NewExtractor(c)
 
 	p, err := b.parse(filename, src)
 	if err != nil {

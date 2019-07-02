@@ -34,7 +34,7 @@ import (
 	"github.com/emicklei/proto"
 )
 
-func (s *Builder) parse(filename string, src interface{}) (p *protoConverter, err error) {
+func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, err error) {
 	if filename == "" {
 		return nil, errors.Newf(token.NoPos, "empty filename")
 	}
@@ -158,7 +158,7 @@ func (s *Builder) parse(filename string, src interface{}) (p *protoConverter, er
 // A protoConverter converts a proto definition to CUE. Proto files map to
 // CUE files one to one.
 type protoConverter struct {
-	state *Builder
+	state *Extractor
 	tfile *token.File
 
 	proto3 bool

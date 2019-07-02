@@ -31,7 +31,7 @@ import (
 
 var update = flag.Bool("update", false, "update the test output")
 
-func TestParseDefinitions(t *testing.T) {
+func TestExtractDefinitions(t *testing.T) {
 	testCases := []string{
 		"networking/v1alpha3/gateway.proto",
 		"mixer/v1/attributes.proto",
@@ -47,7 +47,7 @@ func TestParseDefinitions(t *testing.T) {
 
 			out := &bytes.Buffer{}
 
-			if f, err := Parse(filename, nil, c); err != nil {
+			if f, err := Extract(filename, nil, c); err != nil {
 				fmt.Fprintln(out, err)
 			} else {
 				b, _ := format.Node(f, format.Simplify())
@@ -84,7 +84,7 @@ func TestBuild(t *testing.T) {
 		},
 	}
 
-	b := NewBuilder(c)
+	b := NewExtractor(c)
 	b.AddFile("networking/v1alpha3/gateway.proto", nil)
 	b.AddFile("mixer/v1/attributes.proto", nil)
 	b.AddFile("mixer/v1/mixer.proto", nil)

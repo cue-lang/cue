@@ -22,9 +22,19 @@ import (
 
 // A Generator converts CUE to OpenAPI.
 type Generator struct {
+	// Info specifies the info section of the OpenAPI document. To be a valid
+	// OpenAPI document, it must include at least the title and version fields.
+	Info OrderedMap
+
 	// ReferenceFunc allows users to specify an alternative representation
 	// for references.
 	ReferenceFunc func(inst *cue.Instance, path []string) string
+
+	// DescriptionFunc allows rewriting a description associated with a certain
+	// field. A typical implementation compiles the description from the
+	// comments obtains from the Doc method. No description field is added if
+	// the empty string is returned.
+	DescriptionFunc func(v cue.Value) string
 
 	// SelfContained causes all non-expanded external references to be included
 	// in this document.
@@ -68,6 +78,7 @@ func (g *Generator) All(inst *cue.Instance) (OrderedMap, error) {
 
 	top := OrderedMap{}
 	top.set("openapi", "3.0.0")
+	top.set("info", g.Info)
 	top.set("components", schemas)
 
 	return top, nil

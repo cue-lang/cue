@@ -1,5 +1,9 @@
 {
    "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
    "components": {
       "schema": {
          "MyStruct": {

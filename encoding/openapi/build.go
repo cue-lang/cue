@@ -35,6 +35,7 @@ type buildContext struct {
 
 	expandRefs bool
 	nameFunc   func(inst *cue.Instance, path []string) string
+	descFunc   func(v cue.Value) string
 
 	schemas *OrderedMap
 
@@ -59,6 +60,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
 		refPrefix:    "components/schema",
 		expandRefs:   g.ExpandReferences,
 		nameFunc:     g.ReferenceFunc,
+		descFunc:     g.DescriptionFunc,
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 	}
@@ -148,11 +150,17 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 
 	if !isRef {
 		doc := []string{}
-		for _, d := range v.Doc() {
-			doc = append(doc, d.Text())
+		if b.ctx.descFunc != nil {
+			if str := b.ctx.descFunc(v); str != "" {
+				doc = append(doc, str)
+			}
+		} else {
+			for _, d := range v.Doc() {
+				doc = append(doc, d.Text())
+			}
 		}
 		if len(doc) > 0 {
-			str := strings.TrimSpace(strings.Join(doc, "\n"))
+			str := strings.TrimSpace(strings.Join(doc, "\n\n"))
 			schema.prepend("description", str)
 		}
 	}

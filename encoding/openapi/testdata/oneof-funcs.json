@@ -1,9 +1,13 @@
 {
    "openapi": "3.0.0",
-   "info": {},
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
    "components": {
       "schema": {
-         "MyString": {
+         "MYSTRING": {
+            "description": "Randomly picked description from a set of size one.",
             "oneOf": [
                {
                   "type": "object",
@@ -12,6 +16,7 @@
                   ],
                   "properties": {
                      "exact": {
+                        "description": "Randomly picked description from a set of size one.",
                         "type": "string",
                         "format": "string"
                      }
@@ -24,6 +29,7 @@
                   ],
                   "properties": {
                      "regex": {
+                        "description": "Randomly picked description from a set of size one.",
                         "type": "string",
                         "format": "string"
                      }
@@ -31,10 +37,12 @@
                }
             ]
          },
-         "MyInt": {
+         "MYINT": {
+            "description": "Randomly picked description from a set of size one.",
             "type": "integer"
          },
-         "Foo": {
+         "FOO": {
+            "description": "Randomly picked description from a set of size one.",
             "type": "object",
             "required": [
                "include",
@@ -43,16 +51,17 @@
             ],
             "properties": {
                "count": {
-                  "$ref": "#/components/schema/MyInt"
+                  "$ref": "#/components/schema/MYINT"
                },
                "exclude": {
+                  "description": "Randomly picked description from a set of size one.",
                   "type": "array",
                   "items": {
-                     "$ref": "#/components/schema/MyString"
+                     "$ref": "#/components/schema/MYSTRING"
                   }
                },
                "include": {
-                  "$ref": "#/components/schema/MyString"
+                  "$ref": "#/components/schema/MYSTRING"
                }
             }
          }

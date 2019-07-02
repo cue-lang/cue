@@ -20,6 +20,7 @@ import (
 	"flag"
 	"io/ioutil"
 	"path/filepath"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -30,8 +31,9 @@ import (
 var update *bool = flag.Bool("update", false, "update the test output")
 
 func TestParseDefinitions(t *testing.T) {
+	info := OrderedMap{KeyValue{"title", "test"}, KeyValue{"version", "v1"}}
 	defaultConfig := &Config{}
-	resolveRefs := &Config{ExpandReferences: true}
+	resolveRefs := &Config{Info: info, ExpandReferences: true}
 
 	testCases := []struct {
 		in, out string
@@ -56,6 +58,18 @@ func TestParseDefinitions(t *testing.T) {
 		"openapi.cue",
 		"openapi-norefs.json",
 		resolveRefs,
+	}, {
+		"oneof.cue",
+		"oneof-funcs.json",
+		&Generator{
+			Info: info,
+			ReferenceFunc: func(inst *cue.Instance, path []string) string {
+				return strings.ToUpper(strings.Join(path, "_"))
+			},
+			DescriptionFunc: func(v cue.Value) string {
+				return "Randomly picked description from a set of size one."
+			},
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {

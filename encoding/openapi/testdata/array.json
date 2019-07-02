@@ -1,5 +1,6 @@
 {
    "openapi": "3.0.0",
+   "info": {},
    "components": {
       "schema": {
          "Arrays": {

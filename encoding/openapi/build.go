@@ -15,16 +15,17 @@
 package openapi
 
 import (
-	"fmt"
 	"math"
 	"math/big"
 	"path"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"github.com/cockroachdb/apd/v2"
 )
 
@@ -33,9 +34,10 @@ type buildContext struct {
 	refPrefix string
 	path      []string
 
-	expandRefs bool
-	nameFunc   func(inst *cue.Instance, path []string) string
-	descFunc   func(v cue.Value) string
+	expandRefs  bool
+	nameFunc    func(inst *cue.Instance, path []string) string
+	descFunc    func(v cue.Value) string
+	fieldFilter *regexp.Regexp
 
 	schemas *OrderedMap
 
@@ -55,6 +57,23 @@ type oaSchema = OrderedMap
 type typeFunc func(b *builder, a cue.Value)
 
 func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
+	var fieldFilter *regexp.Regexp
+	if g.FieldFilter != "" {
+		fieldFilter, err = regexp.Compile(g.FieldFilter)
+		if err != nil {
+			return nil, errors.Newf(token.NoPos, "invalid field filter: %v", err)
+		}
+
+		// verify that certain elements are still passed.
+		for _, f := range strings.Split(
+			"version,title,allOf,anyOf,not,enum,Schema/properties,Schema/items"+
+				"nullable,type", ",") {
+			if fieldFilter.MatchString(f) {
+				return nil, errors.Newf(token.NoPos, "field filter may not exclude %q", f)
+			}
+		}
+	}
+
 	c := buildContext{
 		inst:         inst,
 		refPrefix:    "components/schema",
@@ -63,6 +82,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
 		descFunc:     g.DescriptionFunc,
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
+		fieldFilter:  fieldFilter,
 	}
 
 	defer func() {
@@ -72,10 +92,6 @@ func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
 			err = x
 		default:
 			panic(x)
-		}
-		if x := recover(); x != nil {
-			path := strings.Join(c.path, ".")
-			err = fmt.Errorf("error: %s: %v", path, x)
 		}
 	}()
 
@@ -247,7 +263,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			}
 			fallthrough
 		default:
-			b.set("default", v)
+			b.setFilter("Schema", "default", v)
 		}
 	}
 	return isRef
@@ -440,7 +456,7 @@ func (b *builder) object(v cue.Value) {
 		required = append(required, i.Label())
 	}
 	if len(required) > 0 {
-		b.set("required", required)
+		b.setFilter("Schema", "required", required)
 	}
 
 	properties := map[string]*oaSchema{}
@@ -452,7 +468,7 @@ func (b *builder) object(v cue.Value) {
 	}
 
 	if t, ok := v.Elem(); ok {
-		b.set("additionalProperties", b.schema("*", t))
+		b.setFilter("Schema", "additionalProperties", b.schema("*", t))
 	}
 
 	// TODO: maxProperties, minProperties: can be done once we allow cap to
@@ -519,7 +535,7 @@ func (b *builder) array(v cue.Value) {
 		if typ, ok := v.Elem(); ok {
 			t := b.schema("*", typ)
 			if len(items) > 0 {
-				b.set("additionalItems", t)
+				b.setFilter("Schema", "additionalItems", t)
 			} else {
 				b.set("items", t)
 			}
@@ -530,14 +546,14 @@ func (b *builder) array(v cue.Value) {
 func (b *builder) listCap(v cue.Value) {
 	switch op, a := v.Expr(); op {
 	case cue.LessThanOp:
-		b.set("maxItems", b.int(a[0])-1)
+		b.setFilter("Schema", "maxItems", b.int(a[0])-1)
 	case cue.LessThanEqualOp:
-		b.set("maxItems", b.int(a[0]))
+		b.setFilter("Schema", "maxItems", b.int(a[0]))
 	case cue.GreaterThanOp:
-		b.set("minItems", b.int(a[0])+1)
+		b.setFilter("Schema", "minItems", b.int(a[0])+1)
 	case cue.GreaterThanEqualOp:
 		if b.int(a[0]) > 0 {
-			b.set("minItems", b.int(a[0]))
+			b.setFilter("Schema", "minItems", b.int(a[0]))
 		}
 	case cue.NoOp:
 		// must be type, so okay.
@@ -557,10 +573,6 @@ func (b *builder) listCap(v cue.Value) {
 func (b *builder) number(v cue.Value) {
 	// Multiple conjuncts mostly means just additive constraints.
 	// Type may be number of float.
-	// TODO: deterimine integer kind.
-	// if v.IsInt() {
-	// 	b.typ = "integer"
-	// }
 
 	switch op, a := v.Expr(); op {
 	// TODO: support the following JSON schema constraints
@@ -568,16 +580,16 @@ func (b *builder) number(v cue.Value) {
 	// setIntConstraint(t, "multipleOf", a)
 
 	case cue.LessThanOp:
-		b.set("exclusiveMaximum", b.big(a[0]))
+		b.setFilter("Schema", "exclusiveMaximum", b.big(a[0]))
 
 	case cue.LessThanEqualOp:
-		b.set("maximum", b.big(a[0]))
+		b.setFilter("Schema", "maximum", b.big(a[0]))
 
 	case cue.GreaterThanOp:
-		b.set("exclusiveMinimum", b.big(a[0]))
+		b.setFilter("Schema", "exclusiveMinimum", b.big(a[0]))
 
 	case cue.GreaterThanEqualOp:
-		b.set("minimum", b.big(a[0]))
+		b.setFilter("Schema", "minimum", b.big(a[0]))
 
 	case cue.NotEqualOp:
 		i := b.big(a[0])
@@ -646,7 +658,7 @@ func (b *builder) string(v cue.Value) {
 			return
 		}
 		if op == cue.RegexMatchOp {
-			b.set("pattern", s)
+			b.setFilter("schema", "pattern", s)
 		} else {
 			b.setNot("pattern", s)
 		}
@@ -677,7 +689,7 @@ func (b *builder) bytes(v cue.Value) {
 		}
 
 		if op == cue.RegexMatchOp {
-			b.set("pattern", s)
+			b.setFilter("Schema", "pattern", s)
 		} else {
 			b.setNot("pattern", s)
 		}
@@ -731,6 +743,14 @@ func setType(t *oaSchema, b *builder) {
 			t.set("format", b.format)
 		}
 	}
+}
+
+// setFilter is like set, but allows the key-value pair to be filtered.
+func (b *builder) setFilter(schema, key string, v interface{}) {
+	if re := b.ctx.fieldFilter; re != nil && re.MatchString(path.Join(schema, key)) {
+		return
+	}
+	b.set(key, v)
 }
 
 func (b *builder) set(key string, v interface{}) {

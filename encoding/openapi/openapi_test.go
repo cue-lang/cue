@@ -43,6 +43,10 @@ func TestParseDefinitions(t *testing.T) {
 		"simple.json",
 		resolveRefs,
 	}, {
+		"simple.cue",
+		"simple-filter.json",
+		&Config{Info: info, FieldFilter: "min.*|max.*"},
+	}, {
 		"array.cue",
 		"array.json",
 		defaultConfig,

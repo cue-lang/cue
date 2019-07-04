@@ -82,7 +82,7 @@ func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
 	}
 
 	schemas := &OrderedMap{}
-	schemas.Set("schema", all)
+	schemas.Set("schemas", all)
 
 	top := &OrderedMap{}
 	top.Set("openapi", "3.0.0")

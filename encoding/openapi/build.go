@@ -76,7 +76,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) 
 
 	c := buildContext{
 		inst:         inst,
-		refPrefix:    "components/schema",
+		refPrefix:    "components/schemas",
 		expandRefs:   g.ExpandReferences,
 		nameFunc:     g.ReferenceFunc,
 		descFunc:     g.DescriptionFunc,

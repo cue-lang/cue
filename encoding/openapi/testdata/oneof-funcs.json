@@ -5,7 +5,7 @@
       "version": "v1"
    },
    "components": {
-      "schema": {
+      "schemas": {
          "MYSTRING": {
             "description": "Randomly picked description from a set of size one.",
             "oneOf": [
@@ -51,17 +51,17 @@
             ],
             "properties": {
                "include": {
-                  "$ref": "#/components/schema/MYSTRING"
+                  "$ref": "#/components/schemas/MYSTRING"
                },
                "exclude": {
                   "description": "Randomly picked description from a set of size one.",
                   "type": "array",
                   "items": {
-                     "$ref": "#/components/schema/MYSTRING"
+                     "$ref": "#/components/schemas/MYSTRING"
                   }
                },
                "count": {
-                  "$ref": "#/components/schema/MYINT"
+                  "$ref": "#/components/schemas/MYINT"
                }
             }
          }

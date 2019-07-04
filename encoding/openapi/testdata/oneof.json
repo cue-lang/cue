@@ -2,7 +2,7 @@
    "openapi": "3.0.0",
    "info": {},
    "components": {
-      "schema": {
+      "schemas": {
          "MyString": {
             "oneOf": [
                {
@@ -43,16 +43,16 @@
             ],
             "properties": {
                "include": {
-                  "$ref": "#/components/schema/MyString"
+                  "$ref": "#/components/schemas/MyString"
                },
                "exclude": {
                   "type": "array",
                   "items": {
-                     "$ref": "#/components/schema/MyString"
+                     "$ref": "#/components/schemas/MyString"
                   }
                },
                "count": {
-                  "$ref": "#/components/schema/MyInt"
+                  "$ref": "#/components/schemas/MyInt"
                }
             }
          }

@@ -5,7 +5,7 @@
       "version": "v1"
    },
    "components": {
-      "schema": {
+      "schemas": {
          "MyMessage": {
             "description": "MyMessage is my message.",
             "allOf": [

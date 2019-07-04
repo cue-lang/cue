@@ -2,7 +2,7 @@
    "openapi": "3.0.0",
    "info": {},
    "components": {
-      "schema": {
+      "schemas": {
          "MyMessage": {
             "description": "MyMessage is my message.",
             "allOf": [
@@ -14,13 +14,13 @@
                   ],
                   "properties": {
                      "port": {
-                        "$ref": "#/components/schema/Port",
+                        "$ref": "#/components/schemas/Port",
                         "type": "object"
                      },
                      "foo": {
                         "allOf": [
                            {
-                              "$ref": "#/components/schema/Int32"
+                              "$ref": "#/components/schemas/Int32"
                            },
                            {
                               "type": "number",
@@ -261,7 +261,7 @@
                {
                   "oneOf": [
                      {
-                        "$ref": "#/components/schema/Port"
+                        "$ref": "#/components/schemas/Port"
                      },
                      {
                         "type": "object",

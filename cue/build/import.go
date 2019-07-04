@@ -26,6 +26,17 @@ import (
 
 type LoadFunc func(pos token.Pos, path string) *Instance
 
+type cueError = errors.Error
+
+type buildError struct {
+	cueError
+	inputs []token.Pos
+}
+
+func (e *buildError) InputPositions() []token.Pos {
+	return e.inputs
+}
+
 func (inst *Instance) complete() errors.Error {
 	// TODO: handle case-insensitive collisions.
 	// dir := inst.Dir
@@ -65,7 +76,10 @@ func (inst *Instance) complete() errors.Error {
 	for path := range imported {
 		paths = append(paths, path)
 		if path == "" {
-			return errors.E(imported[path], "empty import path")
+			return &buildError{
+				errors.Newf(token.NoPos, "empty import path"),
+				imported[path],
+			}
 		}
 	}
 

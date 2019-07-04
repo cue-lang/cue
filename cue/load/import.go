@@ -358,16 +358,7 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 	pf, perr := parser.ParseFile(filename, data, parser.ImportsOnly, parser.ParseComments)
 	if perr != nil {
 		// should always be an errors.List, but just in case.
-		switch x := perr.(type) {
-		case errors.List:
-			for _, e := range x {
-				badFile(e)
-			}
-		case errors.Error:
-			badFile(x)
-		default:
-			badFile(errors.Wrapf(err, token.NoPos, "add failed"))
-		}
+		badFile(errors.Promote(perr, "add failed"))
 		return true
 	}
 

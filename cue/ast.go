@@ -35,7 +35,7 @@ import (
 //
 // There should be no unresolved identifiers in file, meaning the Node field
 // of all identifiers should be set to a non-nil value.
-func (inst *Instance) insertFile(f *ast.File) error {
+func (inst *Instance) insertFile(f *ast.File) errors.Error {
 	// TODO: insert by converting to value first so that the trim command can
 	// also remove top-level fields.
 	// First process single file.
@@ -48,7 +48,8 @@ func (inst *Instance) insertFile(f *ast.File) error {
 		if v.errors.Len() > 0 {
 			return v.errors
 		}
-		return &callError{result.(*bottom)}
+		v := newValueRoot(v.ctx(), result)
+		return v.toErr(result.(*bottom))
 	}
 
 	return nil

@@ -144,16 +144,7 @@ func (c Config) newInstance(path string) *build.Instance {
 func (c Config) newErrInstance(m *match, path string, err error) *build.Instance {
 	i := c.Context.NewInstance(path, nil)
 	i.DisplayPath = path
-	switch x := err.(type) {
-	case errors.Error:
-		i.ReportError(x)
-	case errors.List:
-		for _, e := range x {
-			i.ReportError(e)
-		}
-	default:
-		i.ReportError(errors.Wrapf(err, token.NoPos, "instance"))
-	}
+	i.ReportError(errors.Promote(err, "instance"))
 	return i
 }
 

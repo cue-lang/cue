@@ -118,12 +118,7 @@ func (b *Extractor) Err() error {
 }
 
 func (b *Extractor) addErr(err error) {
-	switch err := err.(type) {
-	case errors.Error:
-		b.errs.Add(err)
-	default:
-		b.errs.AddNewf(token.NoPos, "unknown error: %v", err)
-	}
+	b.errs.Add(errors.Promote(err, "unknown error"))
 }
 
 // AddFile adds a proto definition file to be converted into CUE by the builder.

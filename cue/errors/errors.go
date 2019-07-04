@@ -148,31 +148,14 @@ func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
 	}
 }
 
-// E creates a new error. The following types correspond to the following
-// methods:
-//     arg type     maps to
-//     Message      Msg
-//     string       shorthand for a format message with no arguments
-//     token.Pos    Position
-//     []token.Pos  Positions
-//     error        Unwrap/Cause
-func E(args ...interface{}) Error {
-	e := &posError{}
-	for _, a := range args {
-		switch x := a.(type) {
-		case string:
-			e.Message = NewMessage(x, nil)
-		case Message:
-			e.Message = x
-		case token.Pos:
-			e.pos = x
-		case []token.Pos:
-			e.inputs = x
-		case error:
-			e.err = x
-		}
+// Promote converts a regular Go error to an Error if it isn't already so.
+func Promote(err error, msg string) Error {
+	switch x := err.(type) {
+	case Error:
+		return x
+	default:
+		return Wrapf(err, token.NoPos, msg)
 	}
-	return e
 }
 
 var _ Error = &posError{}
@@ -201,25 +184,70 @@ func (e *posError) Error() string {
 	if e.err == nil {
 		return e.Message.Error()
 	}
+	if e.Message.format == "" {
+		return e.err.Error()
+	}
 	return fmt.Sprintf("%s: %s", e.Message.Error(), e.err)
+}
+
+// Append combines two errors, flattening Lists as necessary.
+func Append(a, b Error) Error {
+	switch x := a.(type) {
+	case nil:
+		return b
+	case List:
+		return appendToList(x, b)
+	}
+	// Preserve order of errors.
+	list := appendToList(nil, a)
+	list = appendToList(list, b)
+	return list
+}
+
+// Errors reports the individual errors associated with an error, which is
+// the error itself if there is only one or, if the underlying type is List,
+// its individual elements. If the given error is not an Error, it will be
+// promoted to one.
+func Errors(err error) []Error {
+	switch x := err.(type) {
+	case nil:
+		return nil
+	case List:
+		return []Error(x)
+	case Error:
+		return []Error{x}
+	default:
+		return []Error{Promote(err, "")}
+	}
+}
+
+func appendToList(list List, err Error) List {
+	switch x := err.(type) {
+	case nil:
+		return list
+	case List:
+		if list == nil {
+			return x
+		}
+		return append(list, x...)
+	default:
+		return append(list, err)
+	}
 }
 
 // List is a list of Errors.
 // The zero value for an List is an empty List ready to use.
 type List []Error
 
-func (p *List) add(err Error) {
-	*p = append(*p, err)
-}
-
 // AddNewf adds an Error with given position and error message to an List.
 func (p *List) AddNewf(pos token.Pos, msg string, args ...interface{}) {
-	p.add(&posError{pos: pos, Message: Message{format: msg, args: args}})
+	err := &posError{pos: pos, Message: Message{format: msg, args: args}}
+	*p = append(*p, err)
 }
 
 // Add adds an Error with given position and error message to an List.
 func (p *List) Add(err Error) {
-	p.add(err)
+	*p = appendToList(*p, err)
 }
 
 // Reset resets an List to no errors.
@@ -316,13 +344,44 @@ func (p *List) RemoveMultiples() {
 
 // An List implements the error interface.
 func (p List) Error() string {
+	format, args := p.Msg()
+	return fmt.Sprintf(format, args...)
+}
+
+// Msg reports the unformatted error message for the first error, if any.
+func (p List) Msg() (format string, args []interface{}) {
 	switch len(p) {
 	case 0:
-		return "no errors"
+		return "no errors", nil
 	case 1:
-		return p[0].Error()
+		return p[0].Msg()
 	}
-	return fmt.Sprintf("%s (and %d more errors)", p[0], len(p)-1)
+	format, args = p[0].Msg()
+	return "%s (and %d more errors)", append(args, len(p)-1)
+}
+
+// Position reports the primary position for the first error, if any.
+func (p List) Position() token.Pos {
+	if len(p) == 0 {
+		return token.NoPos
+	}
+	return p[0].Position()
+}
+
+// InputPositions reports the input positions for the first error, if any.
+func (p List) InputPositions() []token.Pos {
+	if len(p) == 0 {
+		return nil
+	}
+	return p[0].InputPositions()
+}
+
+// Path reports the path location of the first error, if any.
+func (p List) Path() []string {
+	if len(p) == 0 {
+		return nil
+	}
+	return p[0].Path()
 }
 
 // Err returns an error equivalent to this error list.
@@ -356,12 +415,8 @@ func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {
 		cfg = &Config{}
 	}
-	if list, ok := err.(List); ok {
-		for _, e := range list {
-			printError(w, e, cfg)
-		}
-	} else if err != nil {
-		printError(w, err, cfg)
+	for _, e := range Errors(err) {
+		printError(w, e, cfg)
 	}
 }
 

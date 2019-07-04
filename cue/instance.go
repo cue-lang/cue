@@ -20,7 +20,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
 
@@ -40,8 +39,8 @@ type Instance struct {
 	Dir        string
 	Name       string
 
-	Incomplete bool  // true if Pkg and all its dependencies are free of errors
-	Err        error // non-nil if the package had errors
+	Incomplete bool         // true if Pkg and all its dependencies are free of errors
+	Err        errors.Error // non-nil if the package had errors
 
 	inst *build.Instance
 
@@ -84,41 +83,14 @@ func (x *index) NewInstance(p *build.Instance) *Instance {
 	return i
 }
 
-func (inst *Instance) setListOrError(err error) {
+func (inst *Instance) setListOrError(err errors.Error) {
 	inst.Incomplete = true
-	switch x := err.(type) {
-	case errors.List:
-		if inst.Err == nil {
-			inst.Err = x
-			return
-		}
-		for _, e := range x {
-			inst.setError(e)
-		}
-	case errors.Error:
-		inst.setError(x)
-	default:
-		inst.setError(errors.Wrapf(err, token.NoPos, "unknown error"))
-	}
+	inst.Err = errors.Append(inst.Err, err)
 }
 
 func (inst *Instance) setError(err errors.Error) {
 	inst.Incomplete = true
-	var list errors.List
-	switch x := inst.Err.(type) {
-	default:
-		// Should never happen, but in the worst case at least one error is
-		// recorded.
-		return
-	case nil:
-		inst.Err = err
-		return
-	case errors.List:
-		list = x
-	case errors.Error:
-		list.Add(err)
-	}
-	inst.Err = list
+	inst.Err = errors.Append(inst.Err, err)
 }
 
 func (inst *Instance) eval(ctx *context) evaluated {

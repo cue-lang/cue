@@ -59,7 +59,7 @@ type Instance struct {
 	// The Err for loading this package or nil on success. This does not
 	// include any errors of dependencies. Incomplete will be set if there
 	// were any errors in dependencies.
-	Err error
+	Err errors.Error
 
 	// Incomplete reports whether any dependencies had an error.
 	Incomplete bool
@@ -125,22 +125,7 @@ func (inst *Instance) setPkg(pkg string) bool {
 
 // ReportError reports an error processing this instance.
 func (inst *Instance) ReportError(err errors.Error) {
-	var list errors.List
-	switch x := inst.Err.(type) {
-	default:
-		// Should never happen, but in the worst case at least one error is
-		// recorded.
-		return
-	case nil:
-		inst.Err = err
-		return
-	case errors.List:
-		list = x
-	case errors.Error:
-		list.Add(x)
-	}
-	list.Add(err)
-	inst.Err = list
+	inst.Err = errors.Append(inst.Err, err)
 }
 
 // Context defines the build context for this instance. All files defined
@@ -181,18 +166,8 @@ func (inst *Instance) AddFile(filename string, src interface{}) error {
 	file, err := parser.ParseFile(filename, src, parser.ParseComments)
 	if err != nil {
 		// should always be an errors.List, but just in case.
-		switch x := err.(type) {
-		case errors.List:
-			for _, e := range x {
-				inst.ReportError(e)
-			}
-		case errors.Error:
-			inst.ReportError(x)
-		default:
-			e := errors.Wrapf(err, token.NoPos, "error adding file")
-			inst.ReportError(e)
-			err = e
-		}
+		err := errors.Promote(err, "error adding file")
+		inst.ReportError(err)
 		return err
 	}
 

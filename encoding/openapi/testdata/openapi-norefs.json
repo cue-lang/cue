@@ -16,18 +16,6 @@
                      "bar"
                   ],
                   "properties": {
-                     "bar": {
-                        "type": "array",
-                        "items": {
-                           "type": "string",
-                           "format": "string"
-                        }
-                     },
-                     "foo": {
-                        "type": "number",
-                        "exclusiveMinimum": 10,
-                        "exclusiveMaximum": 1000
-                     },
                      "port": {
                         "type": "object",
                         "required": [
@@ -35,15 +23,27 @@
                            "obj"
                         ],
                         "properties": {
+                           "port": {
+                              "type": "integer"
+                           },
                            "obj": {
                               "type": "array",
                               "items": {
                                  "type": "integer"
                               }
-                           },
-                           "port": {
-                              "type": "integer"
                            }
+                        }
+                     },
+                     "foo": {
+                        "type": "number",
+                        "exclusiveMinimum": 10,
+                        "exclusiveMaximum": 1000
+                     },
+                     "bar": {
+                        "type": "array",
+                        "items": {
+                           "type": "string",
+                           "format": "string"
                         }
                      }
                   }
@@ -89,14 +89,14 @@
                "obj"
             ],
             "properties": {
+               "port": {
+                  "type": "integer"
+               },
                "obj": {
                   "type": "array",
                   "items": {
                      "type": "integer"
                   }
-               },
-               "port": {
-                  "type": "integer"
                }
             }
          },
@@ -277,14 +277,14 @@
                            "obj"
                         ],
                         "properties": {
+                           "port": {
+                              "type": "integer"
+                           },
                            "obj": {
                               "type": "array",
                               "items": {
                                  "type": "integer"
                               }
-                           },
-                           "port": {
-                              "type": "integer"
                            }
                         }
                      },

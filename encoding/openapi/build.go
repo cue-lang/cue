@@ -56,7 +56,7 @@ type oaSchema = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
 
-func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
+func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) {
 	var fieldFilter *regexp.Regexp
 	if g.FieldFilter != "" {
 		fieldFilter, err = regexp.Compile(g.FieldFilter)
@@ -107,7 +107,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
 		if c.isInternal(label) {
 			continue
 		}
-		c.schemas.set(c.makeRef(inst, []string{label}), c.build(label, i.Value()))
+		c.schemas.Set(c.makeRef(inst, []string{label}), c.build(label, i.Value()))
 	}
 
 	// keep looping until a fixed point is reached.
@@ -123,11 +123,11 @@ func schemas(g *Generator, inst *cue.Instance) (schemas OrderedMap, err error) {
 
 		for _, k := range external {
 			ext := c.externalRefs[k]
-			c.schemas.set(ext.ref, c.build(ext.ref, ext.value.Eval()))
+			c.schemas.Set(ext.ref, c.build(ext.ref, ext.value.Eval()))
 		}
 	}
 
-	return *c.schemas, nil
+	return c.schemas, nil
 }
 
 func (c *buildContext) build(name string, v cue.Value) *oaSchema {
@@ -459,11 +459,11 @@ func (b *builder) object(v cue.Value) {
 		b.setFilter("Schema", "required", required)
 	}
 
-	properties := map[string]*oaSchema{}
+	properties := &OrderedMap{}
 	for i, _ := v.Fields(cue.Optional(true), cue.Hidden(false)); i.Next(); {
-		properties[i.Label()] = b.schema(i.Label(), i.Value())
+		properties.Set(i.Label(), b.schema(i.Label(), i.Value()))
 	}
-	if len(properties) > 0 {
+	if len(properties.kvs) > 0 {
 		b.set("properties", properties)
 	}
 
@@ -738,9 +738,9 @@ func (b *builder) setType(t, format string) {
 
 func setType(t *oaSchema, b *builder) {
 	if b.typ != "" {
-		t.set("type", b.typ)
+		t.Set("type", b.typ)
 		if b.format != "" {
-			t.set("format", b.format)
+			t.Set("format", b.format)
 		}
 	}
 }
@@ -762,19 +762,19 @@ func (b *builder) set(key string, v interface{}) {
 		b.current = &OrderedMap{}
 		b.allOf = append(b.allOf, b.current)
 	}
-	b.current.set(key, v)
+	b.current.Set(key, v)
 }
 
 func (b *builder) kv(key string, value interface{}) *oaSchema {
 	constraint := &OrderedMap{}
 	setType(constraint, b)
-	constraint.set(key, value)
+	constraint.Set(key, value)
 	return constraint
 }
 
 func (b *builder) setNot(key string, value interface{}) {
 	not := &OrderedMap{}
-	not.set("not", b.kv(key, value))
+	not.Set("not", b.kv(key, value))
 	b.add(not)
 }
 
@@ -795,7 +795,7 @@ func (b *builder) finish() *oaSchema {
 
 	default:
 		t := &OrderedMap{}
-		t.set("allOf", b.allOf)
+		t.Set("allOf", b.allOf)
 		return t
 	}
 }

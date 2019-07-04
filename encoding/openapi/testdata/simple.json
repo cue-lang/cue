@@ -15,14 +15,6 @@
                "double"
             ],
             "properties": {
-               "double": {
-                  "type": "number",
-                  "format": "double"
-               },
-               "float": {
-                  "type": "number",
-                  "format": "float"
-               },
                "mediumNum": {
                   "type": "integer",
                   "format": "int32"
@@ -31,6 +23,14 @@
                   "type": "integer",
                   "minimum": -128,
                   "maximum": 127
+               },
+               "float": {
+                  "type": "number",
+                  "format": "float"
+               },
+               "double": {
+                  "type": "number",
+                  "format": "double"
                }
             }
          }

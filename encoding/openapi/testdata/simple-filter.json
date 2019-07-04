@@ -15,20 +15,20 @@
                "double"
             ],
             "properties": {
-               "double": {
-                  "type": "number",
-                  "format": "double"
-               },
-               "float": {
-                  "type": "number",
-                  "format": "float"
-               },
                "mediumNum": {
                   "type": "integer",
                   "format": "int32"
                },
                "smallNum": {
                   "type": "integer"
+               },
+               "float": {
+                  "type": "number",
+                  "format": "float"
+               },
+               "double": {
+                  "type": "number",
+                  "format": "double"
                }
             }
          }

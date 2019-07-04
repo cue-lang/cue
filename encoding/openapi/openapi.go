@@ -75,25 +75,25 @@ func Gen(inst *cue.Instance, c *Config) ([]byte, error) {
 // All generates an OpenAPI definition from the given instance.
 //
 // Note: only a limited number of top-level types are supported so far.
-func (g *Generator) All(inst *cue.Instance) (OrderedMap, error) {
+func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
 	all, err := g.Schemas(inst)
 	if err != nil {
 		return nil, err
 	}
 
 	schemas := &OrderedMap{}
-	schemas.set("schema", all)
+	schemas.Set("schema", all)
 
-	top := OrderedMap{}
-	top.set("openapi", "3.0.0")
-	top.set("info", g.Info)
-	top.set("components", schemas)
+	top := &OrderedMap{}
+	top.Set("openapi", "3.0.0")
+	top.Set("info", &g.Info)
+	top.Set("components", schemas)
 
 	return top, nil
 }
 
 // Schemas extracts component/schemas from the CUE top-level types.
-func (g *Generator) Schemas(inst *cue.Instance) (OrderedMap, error) {
+func (g *Generator) Schemas(inst *cue.Instance) (*OrderedMap, error) {
 	comps, err := schemas(g, inst)
 	if err != nil {
 		return nil, err

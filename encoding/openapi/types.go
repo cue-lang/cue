@@ -59,7 +59,7 @@ func simplify(b *builder, t *OrderedMap) {
 }
 
 func simplifyNumber(t *OrderedMap, format string) string {
-	pairs := *t
+	pairs := t.kvs
 	k := 0
 	for i, kv := range pairs {
 		switch kv.Key {
@@ -75,7 +75,7 @@ func simplifyNumber(t *OrderedMap, format string) string {
 		pairs[i] = pairs[k]
 		k++
 	}
-	*t = pairs[:k]
+	t.kvs = pairs[:k]
 	return format
 }
 

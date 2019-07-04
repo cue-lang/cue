@@ -42,8 +42,8 @@
                "count"
             ],
             "properties": {
-               "count": {
-                  "$ref": "#/components/schema/MyInt"
+               "include": {
+                  "$ref": "#/components/schema/MyString"
                },
                "exclude": {
                   "type": "array",
@@ -51,8 +51,8 @@
                      "$ref": "#/components/schema/MyString"
                   }
                },
-               "include": {
-                  "$ref": "#/components/schema/MyString"
+               "count": {
+                  "$ref": "#/components/schema/MyInt"
                }
             }
          }

@@ -13,12 +13,9 @@
                      "bar"
                   ],
                   "properties": {
-                     "bar": {
-                        "type": "array",
-                        "items": {
-                           "type": "string",
-                           "format": "string"
-                        }
+                     "port": {
+                        "$ref": "#/components/schema/Port",
+                        "type": "object"
                      },
                      "foo": {
                         "allOf": [
@@ -32,9 +29,12 @@
                            }
                         ]
                      },
-                     "port": {
-                        "$ref": "#/components/schema/Port",
-                        "type": "object"
+                     "bar": {
+                        "type": "array",
+                        "items": {
+                           "type": "string",
+                           "format": "string"
+                        }
                      }
                   }
                },
@@ -79,14 +79,14 @@
                "obj"
             ],
             "properties": {
+               "port": {
+                  "type": "integer"
+               },
                "obj": {
                   "type": "array",
                   "items": {
                      "type": "integer"
                   }
-               },
-               "port": {
-                  "type": "integer"
                }
             }
          },

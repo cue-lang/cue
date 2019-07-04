@@ -31,7 +31,7 @@ import (
 var update *bool = flag.Bool("update", false, "update the test output")
 
 func TestParseDefinitions(t *testing.T) {
-	info := OrderedMap{KeyValue{"title", "test"}, KeyValue{"version", "v1"}}
+	info := OrderedMap{kvs: []KeyValue{{"title", "test"}, {"version", "v1"}}}
 	defaultConfig := &Config{}
 	resolveRefs := &Config{Info: info, ExpandReferences: true}
 

@@ -18,7 +18,9 @@ import "encoding/json"
 
 // An OrderedMap is a set of key-value pairs that preserves the order in which
 // items were added. It marshals to JSON as an object.
-type OrderedMap []KeyValue
+type OrderedMap struct {
+	kvs []KeyValue
+}
 
 // KeyValue associates a value with a key.
 type KeyValue struct {
@@ -26,26 +28,37 @@ type KeyValue struct {
 	Value interface{}
 }
 
-func (m *OrderedMap) prepend(key string, value interface{}) {
-	*m = append([]KeyValue{{key, value}}, (*m)...)
+// Pairs returns the KeyValue pairs associated with m.
+func (m *OrderedMap) Pairs() []KeyValue {
+	return m.kvs
 }
 
-// set sets a key value pair. If a pair with the same key already existed, it
+func (m *OrderedMap) prepend(key string, value interface{}) {
+	m.kvs = append([]KeyValue{{key, value}}, m.kvs...)
+}
+
+// Set sets a key value pair. If a pair with the same key already existed, it
 // will be replaced with the new value. Otherwise, the new value is added to
 // the end.
-func (m *OrderedMap) set(key string, value interface{}) {
-	for i, v := range *m {
+func (m *OrderedMap) Set(key string, value interface{}) {
+	for i, v := range m.kvs {
 		if v.Key == key {
-			(*m)[i].Value = value
+			m.kvs[i].Value = value
 			return
 		}
 	}
-	*m = append(*m, KeyValue{key, value})
+	m.kvs = append(m.kvs, KeyValue{key, value})
+}
+
+// SetAll replaces existing key-value pairs with the given ones. The keys must
+// be unique.
+func (m *OrderedMap) SetAll(kvs []KeyValue) {
+	m.kvs = kvs
 }
 
 // exists reports whether a key-value pair exists for the given key.
-func (m OrderedMap) exists(key string) bool {
-	for _, v := range m {
+func (m *OrderedMap) exists(key string) bool {
+	for _, v := range m.kvs {
 		if v.Key == key {
 			return true
 		}
@@ -53,10 +66,13 @@ func (m OrderedMap) exists(key string) bool {
 	return false
 }
 
-// MarshalJSON implements Marshal
-func (m OrderedMap) MarshalJSON() (b []byte, err error) {
+// MarshalJSON implements json.Marshaler.
+func (m *OrderedMap) MarshalJSON() (b []byte, err error) {
+	// This is a pointer receiever to enforce that we only store pointers to
+	// OrderedMap in the output.
+
 	b = append(b, '{')
-	for i, v := range m {
+	for i, v := range m.kvs {
 		if i > 0 {
 			b = append(b, ",\n"...)
 		}

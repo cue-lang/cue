@@ -43,7 +43,7 @@ func TestCmd(t *testing.T) {
 			stdout = cmd.OutOrStdout()
 			stderr = cmd.OutOrStderr()
 
-			tools := buildTools(rootCmd, args)
+			tools, _ := buildTools(rootCmd, args)
 			cmd, err := addCustom(rootCmd, "command", name, tools)
 			if err != nil {
 				return err

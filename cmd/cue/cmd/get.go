@@ -16,6 +16,7 @@ package cmd
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/spf13/cobra"
 )
@@ -35,7 +36,13 @@ The specifics on how dependencies are fechted and converted vary
 per language and are documented in the respective subcommands.
 `,
 		RunE: func(cmd *cobra.Command, args []string) error {
-			fmt.Println("get must be run as one of its subcommands")
+			if len(args) == 0 {
+				fmt.Println("get must be run as one of its subcommands")
+			} else {
+				fmt.Printf("get must be run as one of its subcommands: unknown subcommand %q\n", args[0])
+			}
+			fmt.Println("Run 'cue help get' for known subcommands.")
+			os.Exit(1) // TODO: get rid of this
 			return nil
 		},
 	}

@@ -16,11 +16,14 @@ package cmd
 
 import (
 	"context"
-	"errors"
+	"fmt"
 	"io"
 	logger "log"
 	"os"
+	"strings"
 
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"github.com/spf13/cobra"
 )
 
@@ -147,48 +150,91 @@ func New(args []string) (cmd *Command, err error) {
 	cmd = newRootCmd()
 	rootCmd := cmd.root
 	rootCmd.SetArgs(args)
-	if len(args) >= 1 && args[0] != "help" {
-		// TODO: for now we only allow one instance. Eventually, we can allow
-		// more if they all belong to the same package and we merge them
-		// before computing commands.
-		if cmd, _, err := rootCmd.Find(args); err != nil || cmd == nil {
-			tools := buildTools(rootCmd, args[1:])
-			addCustom(rootCmd, commandSection, args[0], tools)
-		}
+	if len(args) == 0 {
+		return cmd, nil
+	}
 
-		type subSpec struct {
-			name string
-			cmd  *cobra.Command
-		}
-		sub := map[string]subSpec{
-			"cmd": {commandSection, cmd.cmd},
-			// "serve": {"server", nil},
-			// "fix":   {"fix", nil},
-		}
-		if sub, ok := sub[args[0]]; ok && len(args) >= 2 {
-			args = args[1:]
-			if len(args) == 0 {
-				tools := buildTools(rootCmd, args)
-				// list available commands
-				commands := tools.Lookup(sub.name)
-				i, err := commands.Fields()
-				if err != nil {
-					return nil, err
-				}
-				for i.Next() {
-					_, _ = addCustom(sub.cmd, sub.name, i.Label(), tools)
-				}
-				return cmd, nil
-			}
-			tools := buildTools(rootCmd, args[1:])
-			_, err := addCustom(sub.cmd, sub.name, args[0], tools)
-			if err != nil {
-				log.Printf("%s %q is not defined", sub.name, args[0])
-				exit()
-			}
-		}
+	var sub = map[string]*subSpec{
+		"cmd": {commandSection, cmd.cmd},
+		// "serve": {"server", nil},
+		// "fix":   {"fix", nil},
+	}
+
+	if args[0] == "help" {
+		return cmd, addSubcommands(cmd, sub, args[1:])
+	}
+
+	if _, ok := sub[args[0]]; ok {
+		return cmd, addSubcommands(cmd, sub, args)
+	}
+
+	if c, _, err := rootCmd.Find(args); err == nil && c != nil {
+		return cmd, nil
+	}
+
+	if !isCommandName(args[0]) {
+		return cmd, nil // Forces unknown command message from Cobra.
+	}
+
+	tools, err := buildTools(rootCmd, args[1:])
+	if err != nil {
+		return cmd, err
+	}
+	_, err = addCustom(rootCmd, commandSection, args[0], tools)
+	if err != nil {
+		fmt.Printf("command %s %q is not defined\n", commandSection, args[0])
+		fmt.Println("Run 'cue help' to show available commands.")
+		os.Exit(1)
 	}
 	return cmd, nil
+}
+
+type subSpec struct {
+	name string
+	cmd  *cobra.Command
+}
+
+func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error {
+	if len(args) == 0 {
+		return nil
+	}
+
+	if _, ok := sub[args[0]]; ok {
+		args = args[1:]
+	}
+
+	if len(args) > 0 {
+		if !isCommandName(args[0]) {
+			return nil // Forces unknown command message from Cobra.
+		}
+		args = args[1:]
+	}
+
+	tools, err := buildTools(cmd.root, args)
+	if err != nil {
+		return err
+	}
+
+	// TODO: for now we only allow one instance. Eventually, we can allow
+	// more if they all belong to the same package and we merge them
+	// before computing commands.
+	for _, spec := range sub {
+		commands := tools.Lookup(spec.name)
+		i, err := commands.Fields()
+		if err != nil {
+			return errors.Newf(token.NoPos, "could not create command definitions: %v", err)
+		}
+		for i.Next() {
+			_, _ = addCustom(spec.cmd, spec.name, i.Label(), tools)
+		}
+	}
+	return nil
+}
+
+func isCommandName(s string) bool {
+	return !strings.Contains(s, `/\`) &&
+		!strings.HasPrefix(s, ".") &&
+		!strings.HasSuffix(s, ".cue")
 }
 
 type panicError struct {

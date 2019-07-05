@@ -111,10 +111,10 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 	return instances
 }
 
-func buildTools(cmd *cobra.Command, args []string) *cue.Instance {
+func buildTools(cmd *cobra.Command, args []string) (*cue.Instance, error) {
 	binst := loadFromArgs(cmd, args)
 	if len(binst) == 0 {
-		return nil
+		return nil, nil
 	}
 
 	included := map[string]bool{}
@@ -130,6 +130,5 @@ func buildTools(cmd *cobra.Command, args []string) *cue.Instance {
 	}
 
 	inst := cue.Merge(buildInstances(cmd, binst)...).Build(ti)
-	exitIfErr(cmd, inst, inst.Err, true)
-	return inst
+	return inst, inst.Err
 }

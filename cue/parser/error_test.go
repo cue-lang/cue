@@ -108,7 +108,7 @@ func expectedErrors(t *testing.T, file *token.File, src []byte) map[token.Pos]st
 // compareErrors compares the map of expected error messages with the list
 // of found errors and reports discrepancies.
 //
-func compareErrors(t *testing.T, file *token.File, expected map[token.Pos]string, found errors.List) {
+func compareErrors(t *testing.T, file *token.File, expected map[token.Pos]string, found []errors.Error) {
 	t.Helper()
 	for _, error := range found {
 		// error.Pos is a Position, but we want
@@ -157,12 +157,7 @@ func checkErrors(t *testing.T, filename string, input interface{}) {
 
 	f, err := ParseFile(filename, src, DeclarationErrors, AllErrors)
 	file := f.Pos().File()
-	found, ok := err.(errors.List)
-	if err != nil && !ok {
-		t.Error(err)
-		return
-	}
-	found.RemoveMultiples()
+	found := errors.Errors(err)
 
 	// we are expecting the following errors
 	// (collect these after parsing a file so that it is found in the file set)

@@ -250,10 +250,10 @@ func TestCompile(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			ctx, root, errs := compileFileWithErrors(t, tc.in)
+			ctx, root, err := compileFileWithErrors(t, tc.in)
 			buf := &bytes.Buffer{}
-			if len(errs) > 0 {
-				errors.Print(buf, errs, nil)
+			if err != nil {
+				errors.Print(buf, err, nil)
 			}
 			buf.WriteString(debugStr(ctx, root))
 			got := buf.String()

@@ -1339,35 +1339,30 @@ func (o *options) updateOptions(opts []Option) {
 	}
 }
 
-// Validate reports any errors, recursively. The returned error may be an
-// errors.List reporting multiple errors, where the total number of errors
-// reported may be less than the actual number.
+// Validate reports any errors, recursively. The returned error may represent
+// more than one error, retrievable with errors.Errors, if more than one
+// exists.
 func (v Value) Validate(opts ...Option) error {
 	o := getOptions(opts)
-	list := errors.List{}
+	var errs errors.Error
 	v.Walk(func(v Value) bool {
 		if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 			if !o.concrete && isIncomplete(v.eval(v.ctx())) {
 				return false
 			}
-			list.Add(v.toErr(err))
-			if len(list) > 50 {
+			errs = errors.Append(errs, v.toErr(err))
+			if len(errors.Errors(errs)) > 50 {
 				return false // mostly to avoid some hypothetical cycle issue
 			}
 		}
 		if o.concrete {
 			if err := isGroundRecursive(v.ctx(), v.eval(v.ctx())); err != nil {
-				list.Add(v.toErr(err))
+				errs = errors.Append(errs, v.toErr(err))
 			}
 		}
 		return true
 	}, nil)
-	if len(list) > 0 {
-		list.Sort()
-		list.RemoveMultiples() // TODO: use RemoveMultiples when it is fixed
-		return list
-	}
-	return nil
+	return errors.Sanitize(errs)
 }
 
 func isGroundRecursive(ctx *context, v value) *bottom {

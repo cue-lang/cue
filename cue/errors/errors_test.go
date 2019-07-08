@@ -43,7 +43,7 @@ func TestErrorList_Add(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		p    *List
+		p    *list
 		args args
 	}{
 		// TODO: Add test cases.
@@ -56,7 +56,7 @@ func TestErrorList_Add(t *testing.T) {
 func TestErrorList_Reset(t *testing.T) {
 	tests := []struct {
 		name string
-		p    *List
+		p    *list
 	}{
 		// TODO: Add test cases.
 	}
@@ -68,14 +68,14 @@ func TestErrorList_Reset(t *testing.T) {
 func TestErrorList_Len(t *testing.T) {
 	tests := []struct {
 		name string
-		p    List
+		p    list
 		want int
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if got := tt.p.Len(); got != tt.want {
-			t.Errorf("%q. List.Len() = %v, want %v", tt.name, got, tt.want)
+			t.Errorf("%q. list.Len() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
@@ -87,7 +87,7 @@ func TestErrorList_Swap(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		p    List
+		p    list
 		args args
 	}{
 		// TODO: Add test cases.
@@ -104,7 +104,7 @@ func TestErrorList_Less(t *testing.T) {
 	}
 	tests := []struct {
 		name string
-		p    List
+		p    list
 		args args
 		want bool
 	}{
@@ -112,7 +112,7 @@ func TestErrorList_Less(t *testing.T) {
 	}
 	for _, tt := range tests {
 		if got := tt.p.Less(tt.args.i, tt.args.j); got != tt.want {
-			t.Errorf("%q. List.Less() = %v, want %v", tt.name, got, tt.want)
+			t.Errorf("%q. list.Less() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
@@ -120,7 +120,7 @@ func TestErrorList_Less(t *testing.T) {
 func TestErrorList_Sort(t *testing.T) {
 	tests := []struct {
 		name string
-		p    List
+		p    list
 	}{
 		// TODO: Add test cases.
 	}
@@ -132,7 +132,7 @@ func TestErrorList_Sort(t *testing.T) {
 func TestErrorList_RemoveMultiples(t *testing.T) {
 	tests := []struct {
 		name string
-		p    *List
+		p    *list
 	}{
 		// TODO: Add test cases.
 	}
@@ -144,14 +144,14 @@ func TestErrorList_RemoveMultiples(t *testing.T) {
 func TestErrorList_Error(t *testing.T) {
 	tests := []struct {
 		name string
-		p    List
+		p    list
 		want string
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if got := tt.p.Error(); got != tt.want {
-			t.Errorf("%q. List.Error() = %v, want %v", tt.name, got, tt.want)
+			t.Errorf("%q. list.Error() = %v, want %v", tt.name, got, tt.want)
 		}
 	}
 }
@@ -159,14 +159,14 @@ func TestErrorList_Error(t *testing.T) {
 func TestErrorList_Err(t *testing.T) {
 	tests := []struct {
 		name    string
-		p       List
+		p       list
 		wantErr bool
 	}{
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
 		if err := tt.p.Err(); (err != nil) != tt.wantErr {
-			t.Errorf("%q. List.Err() error = %v, wantErr %v", tt.name, err, tt.wantErr)
+			t.Errorf("%q. list.Err() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 		}
 	}
 }

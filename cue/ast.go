@@ -45,7 +45,7 @@ func (inst *Instance) insertFile(f *ast.File) errors.Error {
 	// inserting. For now, we accept errors that did not make it up to the tree.
 	result := v.walk(f)
 	if isBottom(result) {
-		if v.errors.Len() > 0 {
+		if v.errors != nil {
 			return v.errors
 		}
 		v := newValueRoot(v.ctx(), result)
@@ -87,7 +87,7 @@ type astState struct {
 	// make unique per level to avoid reuse of structs being an issue.
 	astMap map[ast.Node]scope
 
-	errors errors.List
+	errors errors.Error
 }
 
 func (s *astState) mapScope(n ast.Node) (m scope) {
@@ -126,7 +126,7 @@ func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structL
 }
 
 func (v *astVisitor) errf(n ast.Node, format string, args ...interface{}) evaluated {
-	v.astState.errors.Add(&nodeError{
+	v.astState.errors = errors.Append(v.astState.errors, &nodeError{
 		path:    v.appendPath(nil),
 		n:       n,
 		Message: errors.NewMessage(format, args),

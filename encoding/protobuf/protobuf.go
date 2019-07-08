@@ -81,7 +81,7 @@ type Extractor struct {
 	instCache map[string]*build.Instance
 	imports   map[string]*build.Instance
 
-	errs errors.List
+	errs errors.Error
 	done bool
 }
 
@@ -114,11 +114,11 @@ func NewExtractor(c *Config) *Extractor {
 // Err returns the errors accumulated during testing. The returned error may be
 // of type cuelang.org/go/cue/errors.List.
 func (b *Extractor) Err() error {
-	return b.errs.Err()
+	return b.errs
 }
 
 func (b *Extractor) addErr(err error) {
-	b.errs.Add(errors.Promote(err, "unknown error"))
+	b.errs = errors.Append(b.errs, errors.Promote(err, "unknown error"))
 }
 
 // AddFile adds a proto definition file to be converted into CUE by the builder.
@@ -131,8 +131,10 @@ func (b *Extractor) addErr(err error) {
 //
 func (b *Extractor) AddFile(filename string, src interface{}) error {
 	if b.done {
-		b.errs.Add(errors.Newf(token.NoPos, "protobuf: cannot call AddFile: Instances was already called"))
-		return b.Err()
+		err := errors.Newf(token.NoPos,
+			"protobuf: cannot call AddFile: Instances was already called")
+		b.errs = errors.Append(b.errs, err)
+		return err
 	}
 	if b.root != b.cwd && !filepath.IsAbs(filename) {
 		filename = filepath.Join(b.root, filename)
@@ -235,7 +237,7 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 		return instances[i].ImportPath < instances[j].ImportPath
 	})
 
-	if err := b.errs.Err(); err != nil {
+	if err != nil {
 		return instances, err
 	}
 	return instances, nil
@@ -247,8 +249,10 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	}
 	importPath := p.goPkgPath
 	if importPath == "" {
-		b.errs.AddNewf(token.NoPos, "no go_package for proto package %q in file %s", p.id, p.file.Filename)
-		// TODO: fine an alternative. Is proto package good enough?
+		err := errors.Newf(token.NoPos,
+			"no go_package for proto package %q in file %s", p.id, p.file.Filename)
+		b.errs = errors.Append(b.errs, err)
+		// TODO: find an alternative. Is proto package good enough?
 		return nil
 	}
 
@@ -263,10 +267,11 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 			want = filepath.Join(b.root, want)
 		}
 		if dir != want {
-			b.errs.AddNewf(token.NoPos,
+			err := errors.Newf(token.NoPos,
 				"file %s mapped to inconsistent path %s; module name %q may be inconsistent with root dir %s",
 				want, dir, b.module, b.root,
 			)
+			b.errs = errors.Append(b.errs, err)
 		}
 	}
 

@@ -651,9 +651,9 @@ func TestStdErrorHander(t *testing.T) {
 		"//line File1:1\n" +
 		"~ ~ ~" // original file, line 1 again
 
-	var list errors.List
+	var list errors.Error
 	eh := func(pos token.Pos, msg string, args []interface{}) {
-		list.AddNewf(pos, msg, args...)
+		list = errors.Append(list, errors.Newf(pos, msg, args...))
 	}
 
 	var s Scanner
@@ -664,24 +664,19 @@ func TestStdErrorHander(t *testing.T) {
 		}
 	}
 
-	if len(list) != s.ErrorCount {
-		t.Errorf("found %d errors, expected %d", len(list), s.ErrorCount)
+	n := len(errors.Errors(list))
+	if n != s.ErrorCount {
+		t.Errorf("found %d errors, expected %d", n, s.ErrorCount)
 	}
 
-	if len(list) != 9 {
-		t.Errorf("found %d raw errors, expected 9", len(list))
+	if n != 9 {
+		t.Errorf("found %d raw errors, expected 9", n)
 		errors.Print(os.Stderr, list, nil)
 	}
 
-	list.Sort()
-	if len(list) != 9 {
-		t.Errorf("found %d sorted errors, expected 9", len(list))
-		errors.Print(os.Stderr, list, nil)
-	}
-
-	list.RemoveMultiples()
-	if len(list) != 4 {
-		t.Errorf("found %d one-per-line errors, expected 4", len(list))
+	n = len(errors.Errors(errors.Sanitize(list)))
+	if n != 4 {
+		t.Errorf("found %d one-per-line errors, expected 4", n)
 		errors.Print(os.Stderr, list, nil)
 	}
 }

@@ -148,7 +148,7 @@ func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
 	}
 }
 
-// Promote converts a regular Go error to an Error if it isn't already so.
+// Promote converts a regular Go error to an Error if it isn't already one.
 func Promote(err error, msg string) Error {
 	switch x := err.(type) {
 	case Error:
@@ -195,7 +195,7 @@ func Append(a, b Error) Error {
 	switch x := a.(type) {
 	case nil:
 		return b
-	case List:
+	case list:
 		return appendToList(x, b)
 	}
 	// Preserve order of errors.
@@ -212,7 +212,7 @@ func Errors(err error) []Error {
 	switch x := err.(type) {
 	case nil:
 		return nil
-	case List:
+	case list:
 		return []Error(x)
 	case Error:
 		return []Error{x}
@@ -221,43 +221,43 @@ func Errors(err error) []Error {
 	}
 }
 
-func appendToList(list List, err Error) List {
+func appendToList(a list, err Error) list {
 	switch x := err.(type) {
 	case nil:
-		return list
-	case List:
-		if list == nil {
+		return a
+	case list:
+		if a == nil {
 			return x
 		}
-		return append(list, x...)
+		return append(a, x...)
 	default:
-		return append(list, err)
+		return append(a, err)
 	}
 }
 
-// List is a list of Errors.
-// The zero value for an List is an empty List ready to use.
-type List []Error
+// list is a list of Errors.
+// The zero value for an list is an empty list ready to use.
+type list []Error
 
 // AddNewf adds an Error with given position and error message to an List.
-func (p *List) AddNewf(pos token.Pos, msg string, args ...interface{}) {
+func (p *list) AddNewf(pos token.Pos, msg string, args ...interface{}) {
 	err := &posError{pos: pos, Message: Message{format: msg, args: args}}
 	*p = append(*p, err)
 }
 
 // Add adds an Error with given position and error message to an List.
-func (p *List) Add(err Error) {
+func (p *list) Add(err Error) {
 	*p = appendToList(*p, err)
 }
 
 // Reset resets an List to no errors.
-func (p *List) Reset() { *p = (*p)[0:0] }
+func (p *list) Reset() { *p = (*p)[0:0] }
 
 // List implements the sort Interface.
-func (p List) Len() int      { return len(p) }
-func (p List) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
+func (p list) Len() int      { return len(p) }
+func (p list) Swap(i, j int) { p[i], p[j] = p[j], p[i] }
 
-func (p List) Less(i, j int) bool {
+func (p list) Less(i, j int) bool {
 	if c := comparePos(p[i].Position(), p[j].Position()); c != 0 {
 		return c == -1
 	}
@@ -315,16 +315,29 @@ func equalPath(a, b []string) bool {
 	return true
 }
 
+// Sanitize sorts multiple errors and removes duplicates on a best effort basis.
+// If err represents a single or no error, it returns the error as is.
+func Sanitize(err Error) Error {
+	if l, ok := err.(list); ok && err != nil {
+		a := make(list, len(l))
+		copy(a, l)
+		a.Sort()
+		a.RemoveMultiples()
+		return a
+	}
+	return err
+}
+
 // Sort sorts an List. *posError entries are sorted by position,
 // other errors are sorted by error message, and before any *posError
 // entry.
 //
-func (p List) Sort() {
+func (p list) Sort() {
 	sort.Sort(p)
 }
 
 // RemoveMultiples sorts an List and removes all but the first error per line.
-func (p *List) RemoveMultiples() {
+func (p *list) RemoveMultiples() {
 	p.Sort()
 	var last Error
 	i := 0
@@ -343,13 +356,13 @@ func (p *List) RemoveMultiples() {
 }
 
 // An List implements the error interface.
-func (p List) Error() string {
+func (p list) Error() string {
 	format, args := p.Msg()
 	return fmt.Sprintf(format, args...)
 }
 
 // Msg reports the unformatted error message for the first error, if any.
-func (p List) Msg() (format string, args []interface{}) {
+func (p list) Msg() (format string, args []interface{}) {
 	switch len(p) {
 	case 0:
 		return "no errors", nil
@@ -361,7 +374,7 @@ func (p List) Msg() (format string, args []interface{}) {
 }
 
 // Position reports the primary position for the first error, if any.
-func (p List) Position() token.Pos {
+func (p list) Position() token.Pos {
 	if len(p) == 0 {
 		return token.NoPos
 	}
@@ -369,7 +382,7 @@ func (p List) Position() token.Pos {
 }
 
 // InputPositions reports the input positions for the first error, if any.
-func (p List) InputPositions() []token.Pos {
+func (p list) InputPositions() []token.Pos {
 	if len(p) == 0 {
 		return nil
 	}
@@ -377,7 +390,7 @@ func (p List) InputPositions() []token.Pos {
 }
 
 // Path reports the path location of the first error, if any.
-func (p List) Path() []string {
+func (p list) Path() []string {
 	if len(p) == 0 {
 		return nil
 	}
@@ -386,7 +399,7 @@ func (p List) Path() []string {
 
 // Err returns an error equivalent to this error list.
 // If the list is empty, Err returns nil.
-func (p List) Err() error {
+func (p list) Err() error {
 	if len(p) == 0 {
 		return nil
 	}

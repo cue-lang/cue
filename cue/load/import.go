@@ -147,7 +147,7 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 
 	rewriteFiles(p, root, false)
 	if errs := fp.finalize(); errs != nil {
-		for _, e := range errs {
+		for _, e := range errors.Errors(errs) {
 			p.ReportError(e)
 		}
 		return p
@@ -293,7 +293,7 @@ type fileProcessor struct {
 	c   *Config
 	pkg *build.Instance
 
-	err errors.List
+	err errors.Error
 }
 
 func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
@@ -305,13 +305,13 @@ func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
 	}
 }
 
-func (fp *fileProcessor) finalize() errors.List {
+func (fp *fileProcessor) finalize() errors.Error {
 	p := fp.pkg
 	if fp.err != nil {
 		return fp.err
 	}
 	if len(p.CUEFiles) == 0 && !fp.c.DataFiles {
-		fp.err.Add(&noCUEError{Package: p, Dir: p.Dir, Ignored: len(p.IgnoredCUEFiles) > 0})
+		fp.err = errors.Append(fp.err, &noCUEError{Package: p, Dir: p.Dir, Ignored: len(p.IgnoredCUEFiles) > 0})
 		return fp.err
 	}
 
@@ -337,7 +337,7 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 	p := fp.pkg
 
 	badFile := func(err errors.Error) bool {
-		fp.err.Add(err)
+		fp.err = errors.Append(fp.err, err)
 		p.InvalidCUEFiles = append(p.InvalidCUEFiles, fullPath)
 		return true
 	}
@@ -357,7 +357,6 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 
 	pf, perr := parser.ParseFile(filename, data, parser.ImportsOnly, parser.ParseComments)
 	if perr != nil {
-		// should always be an errors.List, but just in case.
 		badFile(errors.Promote(perr, "add failed"))
 		return true
 	}

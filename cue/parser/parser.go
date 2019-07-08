@@ -29,7 +29,7 @@ import (
 // The parser structure holds the parser's internal state.
 type parser struct {
 	file    *token.File
-	errors  errors.List
+	errors  errors.Error
 	scanner scanner.Scanner
 
 	// Tracing/debugging
@@ -71,7 +71,7 @@ func (p *parser) init(filename string, src []byte, mode []Option) {
 		m = scanner.ScanComments
 	}
 	eh := func(pos token.Pos, msg string, args []interface{}) {
-		p.errors.AddNewf(pos, msg, args...)
+		p.errors = errors.Append(p.errors, errors.Newf(pos, msg, args...))
 	}
 	p.scanner.Init(p.file, src, eh, m)
 
@@ -345,8 +345,9 @@ func (p *parser) errf(pos token.Pos, msg string, args ...interface{}) {
 	// as the last recorded error and stop parsing if there are more than
 	// 10 errors.
 	if p.mode&allErrorsMode == 0 {
-		n := len(p.errors)
-		if n > 0 && p.errors[n-1].Position().Line() == ePos.Line() {
+		errors := errors.Errors(p.errors)
+		n := len(errors)
+		if n > 0 && errors[n-1].Position().Line() == ePos.Line() {
 			return // discard - likely a spurious error
 		}
 		if n > 10 {
@@ -355,7 +356,7 @@ func (p *parser) errf(pos token.Pos, msg string, args ...interface{}) {
 		}
 	}
 
-	p.errors.AddNewf(ePos, msg, args...)
+	p.errors = errors.Append(p.errors, errors.Newf(ePos, msg, args...))
 }
 
 func (p *parser) errorExpected(pos token.Pos, obj string) {
@@ -1314,7 +1315,7 @@ func (p *parser) parseFile() *ast.File {
 
 	// Don't bother parsing the rest if we had errors scanning the first
 	// Likely not a Go source file at all.
-	if p.errors.Len() != 0 {
+	if p.errors != nil {
 		return nil
 	}
 

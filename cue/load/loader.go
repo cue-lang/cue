@@ -133,7 +133,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	}
 	pkg.Dir = cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
-	for _, err := range fp.finalize() { // ImportDir(&ctxt, dir, 0)
+	for _, err := range errors.Errors(fp.finalize()) { // ImportDir(&ctxt, dir, 0)
 		pkg.ReportError(err)
 	}
 	// TODO: Support module importing.

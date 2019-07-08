@@ -18,6 +18,7 @@ package parser
 
 import (
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/source"
 )
@@ -127,8 +128,7 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 			}
 		}
 
-		pp.errors.Sort()
-		err = pp.errors.Err()
+		err = errors.Sanitize(pp.errors)
 	}()
 
 	// parse source
@@ -159,8 +159,7 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 		if p.panicking {
 			_ = recover()
 		}
-		p.errors.Sort()
-		err = p.errors.Err()
+		err = errors.Sanitize(p.errors)
 	}()
 
 	// parse expr
@@ -180,9 +179,8 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 		p.expect(token.EOF)
 	}
 
-	if p.errors.Len() > 0 {
-		p.errors.Sort()
-		return nil, p.errors.Err()
+	if p.errors != nil {
+		return nil, p.errors
 	}
 	resolveExpr(e, p.errf)
 

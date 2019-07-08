@@ -17,16 +17,14 @@ package cue
 import (
 	"flag"
 	"testing"
-
-	"cuelang.org/go/cue/errors"
 )
 
 var traceOn = flag.Bool("debug", false, "enable tracing")
 
-func compileFileWithErrors(t *testing.T, body string) (*context, *structLit, errors.List) {
+func compileFileWithErrors(t *testing.T, body string) (*context, *structLit, error) {
 	t.Helper()
-	ctx, inst, errs := compileInstance(t, body)
-	return ctx, inst.rootValue.evalPartial(ctx).(*structLit), errs
+	ctx, inst, err := compileInstance(t, body)
+	return ctx, inst.rootValue.evalPartial(ctx).(*structLit), err
 }
 
 func compileFile(t *testing.T, body string) (*context, *structLit) {
@@ -38,27 +36,19 @@ func compileFile(t *testing.T, body string) (*context, *structLit) {
 	return ctx, inst.rootValue.evalPartial(ctx).(*structLit)
 }
 
-func compileInstance(t *testing.T, body string) (*context, *Instance, errors.List) {
+func compileInstance(t *testing.T, body string) (*context, *Instance, error) {
 	t.Helper()
 
 	var r Runtime
-	x, err := r.Parse("test", body)
-	ctx := r.index().newContext()
+	inst, err := r.Parse("test", body)
 
-	switch errs := err.(type) {
-	case nil:
-		var r Runtime
-		inst, _ := r.Parse("test", body)
-		return r.index().newContext(), inst, nil
-	case errors.List:
+	if err != nil {
 		x := newIndex().NewInstance(nil)
 		ctx := x.newContext()
-
-		return ctx, x, errs
-	default:
-		t.Fatal(err)
+		return ctx, x, err
 	}
-	return ctx, x, nil
+
+	return r.index().newContext(), inst, nil
 }
 
 func rewriteHelper(t *testing.T, cases []testCase, r rewriteMode) {

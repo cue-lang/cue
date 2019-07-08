@@ -45,11 +45,9 @@ func (inst *Instance) insertFile(f *ast.File) errors.Error {
 	// inserting. For now, we accept errors that did not make it up to the tree.
 	result := v.walk(f)
 	if isBottom(result) {
-		if v.errors != nil {
-			return v.errors
-		}
-		v := newValueRoot(v.ctx(), result)
-		return v.toErr(result.(*bottom))
+		val := newValueRoot(v.ctx(), result)
+		v.errors = errors.Append(v.errors, val.toErr(result.(*bottom)))
+		return v.errors
 	}
 
 	return nil

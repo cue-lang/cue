@@ -186,7 +186,7 @@ configMap prometheus: {
 
 That looks better!
 The resulting configuration file replaces the original embedded string
-with a call to `yaml.Unmarshal` converting a structured CUE source to
+with a call to `yaml.Marshal` converting a structured CUE source to
 a string with an equivalent YAML file.
 Fields starting with an underscore (`_`) are not included when emitting
 a configuration file (they are when enclosed in double quotes).
@@ -248,7 +248,7 @@ $ cat <<EOF > kube.cue
 package kube
 
 service <Name>: {
-    apiVersion: "v1"  
+    apiVersion: "v1"
     kind:       "Service"
     metadata: {
         name: Name

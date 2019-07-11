@@ -159,6 +159,7 @@ func TestConvertType(t *testing.T) {
 			F float64
 			L []byte
 			T time.Time
+			G func()
 		}{},
 		`(*null | <0>{A: ((int & >=-32768 & int & <=32767) & (>=0 & <100)), ` +
 			`C: string, ` +

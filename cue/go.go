@@ -482,6 +482,9 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 			}
 			_, ok := f.Tag.Lookup("cue")
 			elem := goTypeToValue(ctx, !ok, f.Type)
+			if elem == nil {
+				continue // Ignore fields for unsupported types
+			}
 
 			// leave errors like we do during normal evaluation or do we
 			// want to return the error?

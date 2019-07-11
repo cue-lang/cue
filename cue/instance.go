@@ -64,8 +64,8 @@ func (x *index) getImportFromNode(v value) *Instance {
 	return imp
 }
 
-// NewInstance creates a new instance. Use Insert to populate the instance.
-func (x *index) NewInstance(p *build.Instance) *Instance {
+// newInstance creates a new instance. Use Insert to populate the instance.
+func (x *index) newInstance(p *build.Instance) *Instance {
 	st := &structLit{baseValue: baseValue{nil}}
 	i := x.addInst(&Instance{
 		rootStruct: st,
@@ -224,7 +224,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 
 	idx := inst.index
 
-	i := idx.NewInstance(p)
+	i := idx.newInstance(p)
 	if i.Err != nil {
 		return i
 	}

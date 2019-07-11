@@ -105,7 +105,7 @@ func Build(instances []*build.Instance) []*Instance {
 // FromExpr creates an instance from an expression.
 // Any references must be resolved beforehand.
 func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
-	i := r.index().NewInstance(nil)
+	i := r.index().newInstance(nil)
 	err := i.insertFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmitDecl{Expr: expr}},
 	})
@@ -223,7 +223,7 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 		return inst
 	}
 	files := p.Files
-	inst := idx.NewInstance(p)
+	inst := idx.newInstance(p)
 	if inst.Err == nil {
 		// inst.instance.index.state = s
 		// inst.instance.inst = p

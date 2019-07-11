@@ -449,11 +449,18 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		}
 
 	case yaml_BOOL_TAG:
+		tok := token.FALSE
 		str := "false"
 		if b, _ := resolved.(bool); b {
+			tok = token.TRUE
 			str = "true"
 		}
-		return d.ident(n, str)
+		return &ast.BasicLit{
+			// ValuePos: d.start(n),
+			ValuePos: d.p.parser.relPos().Pos(),
+			Kind:     tok,
+			Value:    str,
+		}
 
 	case yaml_INT_TAG:
 		// Convert YAML octal to CUE octal. If YAML accepted an invalid
@@ -483,7 +490,11 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		return d.makeNum(n, value, token.FLOAT)
 
 	case yaml_NULL_TAG:
-		return d.ident(n, "null")
+		return &ast.BasicLit{
+			ValuePos: d.p.parser.relPos().Pos(),
+			Kind:     token.NULL,
+			Value:    "null",
+		}
 	}
 	err := &ast.BottomLit{
 		// Bottom: d.pos(n.startPos)

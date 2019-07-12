@@ -8,5 +8,8 @@ deployment valeter spec template spec containers: [{
 	ports: [{
 		containerPort: 8080
 	}]
-	args: ["-http=:8080", "-etcd=etcd:2379"]
+	args: [
+		"-http=:8080",
+		"-etcd=etcd:2379",
+	]
 }]

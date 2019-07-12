@@ -3,8 +3,6 @@ package yaml
 import (
 	"fmt"
 	"io"
-
-	"cuelang.org/go/cue/token"
 )
 
 // The version directive data.
@@ -521,26 +519,8 @@ type yaml_alias_data_t struct {
 }
 
 type yaml_comment_t struct {
-	pos  token.RelPos
 	mark yaml_mark_t
 	text string
-}
-
-func (p *yaml_parser_t) relPos() (pos token.RelPos) {
-	switch {
-	case p.linesSinceLast > 1:
-		pos = token.NewSection
-	case p.linesSinceLast == 1:
-		pos = token.Newline
-	case p.spacesSinceLast > 0:
-		pos = token.Blank
-	default:
-		pos = token.NoSpace
-	}
-	p.linesSinceLast = 0
-	p.spacesSinceLast = 0
-	// fmt.Println("REL", pos)
-	return token.NoRelPos
 }
 
 // The parser structure.

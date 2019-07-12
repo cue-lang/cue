@@ -19,7 +19,12 @@ deployment dishwasher spec: {
 				name:      "secret-ssh-key"
 				readOnly:  true
 			}]
-			args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
+			args: [
+				"-env=prod",
+				"-ssh-tunnel-key=/etc/certs/tunnel-private.pem",
+				"-logdir=/logs",
+				"-event-server=events:7788",
+			]
 		}]
 	}
 }

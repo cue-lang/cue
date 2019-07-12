@@ -17,7 +17,10 @@ daemonSet "node-exporter" spec template: {
 		hostPID:     true
 		containers: [{
 			image: "quay.io/prometheus/node-exporter:v0.16.0"
-			args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
+			args: [
+				"--path.procfs=/host/proc",
+				"--path.sysfs=/host/sys",
+			]
 			ports: [{
 				containerPort: 9100
 				hostPort:      9100

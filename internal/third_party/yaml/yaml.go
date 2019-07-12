@@ -102,11 +102,12 @@ func NewDecoder(filename string, r io.Reader) (*Decoder, error) {
 	return &Decoder{parser: d}, nil
 }
 
-// Decode reads the next YAML-encoded value from its input
-// and stores it in the value pointed to by v.
+// Decode reads the next YAML-encoded value from its input and stores it in the
+// value pointed to by v. It returns io.EOF if there are no more value in the
+// stream.
 //
-// See the documentation for Unmarshal for details about the
-// conversion of YAML into a Go value.
+// See the documentation for Unmarshal for details about the conversion of YAML
+// into a Go value.
 func (dec *Decoder) Decode() (expr ast.Expr, err error) {
 	d := newDecoder(dec.parser)
 	defer handleErr(&err)

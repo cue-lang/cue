@@ -2,8 +2,6 @@ package yaml
 
 import (
 	"bytes"
-
-	"cuelang.org/go/cue/token"
 )
 
 // The parser implements the following grammar:
@@ -60,9 +58,8 @@ func skip_token(parser *yaml_parser_t) {
 	parser.tokens_head++
 }
 
-func add_comment(parser *yaml_parser_t, p token.RelPos, m yaml_mark_t, text string) {
+func add_comment(parser *yaml_parser_t, m yaml_mark_t, text string) {
 	parser.comments = append(parser.comments, yaml_comment_t{
-		pos:  p,
 		mark: m,
 		text: text,
 	})

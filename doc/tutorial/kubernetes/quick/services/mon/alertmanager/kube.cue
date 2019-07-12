@@ -22,7 +22,11 @@ deployment alertmanager spec: {
 		spec: {
 			containers: [{
 				image: "prom/alertmanager:v0.15.2"
-				args: ["--config.file=/etc/alertmanager/alerts.yaml", "--storage.path=/alertmanager", "--web.external-url=https://alertmanager.example.com"]
+				args: [
+					"--config.file=/etc/alertmanager/alerts.yaml",
+					"--storage.path=/alertmanager",
+					"--web.external-url=https://alertmanager.example.com",
+				]
 				ports: [{
 					name:          "alertmanager"
 					containerPort: 9093
@@ -40,8 +44,7 @@ deployment alertmanager spec: {
 				configMap name: "alertmanager"
 			}, {
 				name: "alertmanager"
-				emptyDir: {
-				}
+				emptyDir: {}
 			}]
 		}
 	}

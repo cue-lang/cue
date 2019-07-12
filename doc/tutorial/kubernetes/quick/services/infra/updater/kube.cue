@@ -11,9 +11,12 @@ deployment updater spec template spec: {
 			mountPath: "/etc/certs"
 			name:      "secret-updater"
 		}]
+
 		ports: [{
 			containerPort: 8080
 		}]
-		args: ["-key=/etc/certs/updater.pem"]
+		args: [
+			"-key=/etc/certs/updater.pem",
+		]
 	}]
 }

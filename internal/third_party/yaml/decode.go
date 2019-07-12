@@ -80,7 +80,7 @@ func newParser(filename string, src interface{}) (*parser, error) {
 	if err != nil {
 		return nil, err
 	}
-	info := token.NewFile(filename, -1, len(b))
+	info := token.NewFile(filename, -1, len(b)+2)
 	info.SetLinesForContent(b)
 	p := parser{info: info}
 	if !yaml_parser_initialize(&p.parser, filename) {
@@ -233,6 +233,9 @@ func (p *parser) sequence() *node {
 	for p.peek() != yaml_SEQUENCE_END_EVENT {
 		n.children = append(n.children, p.parse())
 	}
+	if len(n.children) > 0 {
+		n.endPos = n.children[len(n.children)-1].endPos
+	}
 	p.expect(yaml_SEQUENCE_END_EVENT)
 	return n
 }
@@ -244,6 +247,9 @@ func (p *parser) mapping() *node {
 	for p.peek() != yaml_MAPPING_END_EVENT {
 		n.children = append(n.children, p.parse(), p.parse())
 	}
+	if len(n.children) > 0 {
+		n.endPos = n.children[len(n.children)-1].endPos
+	}
 	p.expect(yaml_MAPPING_END_EVENT)
 	return n
 }
@@ -252,13 +258,14 @@ func (p *parser) mapping() *node {
 // Decoder, unmarshals a node into a provided value.
 
 type decoder struct {
-	p        *parser
-	doc      *node
-	aliases  map[*node]bool
-	mapType  reflect.Type
-	terrors  []string
-	prev     token.Pos
-	lastNode ast.Node
+	p            *parser
+	doc          *node
+	aliases      map[*node]bool
+	mapType      reflect.Type
+	terrors      []string
+	prev         token.Pos
+	lastNode     ast.Node
+	forceNewline bool
 }
 
 var (
@@ -320,10 +327,9 @@ func (d *decoder) attachDocComments(m yaml_mark_t, pos int8, expr ast.Node) {
 		if c.mark.index >= m.index {
 			break
 		}
-		// fp := d.p.info.Pos(c.mark.index, 0)
 		comments = append(comments, &ast.Comment{
-			c.pos.Pos(),
-			"//" + c.text[1:],
+			Slash: d.pos(c.mark),
+			Text:  "//" + c.text[1:],
 		})
 		d.p.parser.comments = d.p.parser.comments[1:]
 	}
@@ -343,11 +349,9 @@ func (d *decoder) attachLineComment(m yaml_mark_t, pos int8, expr ast.Node) {
 	c := d.p.parser.comments[0]
 	if c.mark.index == m.index {
 		comment := &ast.Comment{
-			c.pos.Pos(),
-			// d.p.info.Pos(m.index+1, 0),
-			"//" + c.text[1:],
+			Slash: d.pos(c.mark),
+			Text:  "//" + c.text[1:],
 		}
-		// expr.AddComment(pos, false)
 		expr.AddComment(&ast.CommentGroup{
 			Line:     true,
 			Position: pos,
@@ -357,14 +361,35 @@ func (d *decoder) attachLineComment(m yaml_mark_t, pos int8, expr ast.Node) {
 }
 
 func (d *decoder) pos(m yaml_mark_t) token.Pos {
-	return token.NoPos
-	// TODO: reenable once we have better spacing.
-	// pos := d.p.info.Pos(m.index)
-	// if pos <= d.prev+1 {
-	// 	return token.NoPos
-	// }
-	// d.prev = pos
-	// return pos
+	pos := d.p.info.Pos(m.index+1, token.NoRelPos)
+
+	if d.forceNewline {
+		d.forceNewline = false
+		pos = pos.WithRel(token.Newline)
+	} else if d.prev.IsValid() {
+		c := pos.Position()
+		p := d.prev.Position()
+		switch {
+		case c.Line-p.Line >= 2:
+			pos = pos.WithRel(token.NewSection)
+		case c.Line-p.Line == 1:
+			pos = pos.WithRel(token.Newline)
+		case c.Column-p.Column > 0:
+			pos = pos.WithRel(token.Blank)
+		default:
+			pos = pos.WithRel(token.NoSpace)
+		}
+		if pos.Before(d.prev) {
+			return token.NoPos
+		}
+	}
+
+	d.prev = pos
+	return pos
+}
+
+func (d *decoder) absPos(m yaml_mark_t) token.Pos {
+	return d.p.info.Pos(m.index+1, token.NoRelPos)
 }
 
 func (d *decoder) start(n *node) token.Pos {
@@ -373,8 +398,7 @@ func (d *decoder) start(n *node) token.Pos {
 
 func (d *decoder) ident(n *node, name string) *ast.Ident {
 	return &ast.Ident{
-		// NamePos: d.pos(n.startPos),
-		NamePos: d.p.parser.relPos().Pos(),
+		NamePos: d.pos(n.startPos),
 		Name:    name,
 	}
 }
@@ -423,16 +447,14 @@ func (d *decoder) scalar(n *node) ast.Expr {
 	// TODO: use parse literal or parse expression instead.
 	case yaml_TIMESTAMP_TAG:
 		return &ast.BasicLit{
-			// ValuePos: d.start(n),
-			ValuePos: d.p.parser.relPos().Pos(),
+			ValuePos: d.start(n),
 			Kind:     token.STRING,
 			Value:    strconv.Quote(n.value),
 		}
 
 	case yaml_STR_TAG:
 		return &ast.BasicLit{
-			// ValuePos: d.start(n),
-			ValuePos: d.p.parser.relPos().Pos(),
+			ValuePos: d.start(n),
 			Kind:     token.STRING,
 			Value:    d.quoteString(n.value),
 		}
@@ -442,8 +464,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		buf[0] = '\''
 		buf[len(buf)-1] = '\''
 		return &ast.BasicLit{
-			// ValuePos: d.start(n),
-			ValuePos: d.p.parser.relPos().Pos(),
+			ValuePos: d.start(n),
 			Kind:     token.STRING,
 			Value:    string(buf),
 		}
@@ -456,8 +477,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 			str = "true"
 		}
 		return &ast.BasicLit{
-			// ValuePos: d.start(n),
-			ValuePos: d.p.parser.relPos().Pos(),
+			ValuePos: d.start(n),
 			Kind:     tok,
 			Value:    str,
 		}
@@ -491,18 +511,16 @@ func (d *decoder) scalar(n *node) ast.Expr {
 
 	case yaml_NULL_TAG:
 		return &ast.BasicLit{
-			ValuePos: d.p.parser.relPos().Pos(),
+			ValuePos: d.start(n),
 			Kind:     token.NULL,
 			Value:    "null",
 		}
 	}
 	err := &ast.BottomLit{
-		// Bottom: d.pos(n.startPos)
-		Bottom: d.p.parser.relPos().Pos(),
+		Bottom: d.pos(n.startPos),
 	}
 	comment := &ast.Comment{
-		// Slash: d.start(n),
-		Slash: token.Blank.Pos(),
+		Slash: d.start(n),
 		Text:  "// " + d.terror(n, tag),
 	}
 	err.AddComment(&ast.CommentGroup{
@@ -533,10 +551,9 @@ func (d *decoder) label(n *node) ast.Label {
 	}
 stringLabel:
 	return &ast.BasicLit{
-		ValuePos: d.p.parser.relPos().Pos(),
-		// ValuePos: d.start(n),
-		Kind:  token.STRING,
-		Value: strconv.Quote(n.value),
+		ValuePos: d.start(n),
+		Kind:     token.STRING,
+		Value:    strconv.Quote(n.value),
 	}
 }
 
@@ -546,15 +563,13 @@ func (d *decoder) makeNum(n *node, val string, kind token.Token) (expr ast.Expr)
 		minuses++
 	}
 	expr = &ast.BasicLit{
-		// ValuePos: d.start(n) + minuses.Pos(),
-		ValuePos: d.p.parser.relPos().Pos(),
+		ValuePos: d.start(n), //  + minuses.Pos(),
 		Kind:     kind,
 		Value:    val,
 	}
 	if minuses > 0 {
 		expr = &ast.UnaryExpr{
-			// OpPos: d.start(n),
-			OpPos: d.p.parser.relPos().Pos(),
+			OpPos: d.start(n),
 			Op:    token.SUB,
 			X:     expr,
 		}
@@ -601,22 +616,53 @@ quoted:
 
 func (d *decoder) sequence(n *node) ast.Expr {
 	list := &ast.ListLit{}
-	if n.startPos.line != n.endPos.line || len(n.children) != 1 {
-		list.Lbrack = d.pos(n.startPos)
-		list.Rbrack = d.pos(n.endPos)
+	list.Lbrack = d.pos(n.startPos).WithRel(token.Blank)
+	switch ln := len(n.children); ln {
+	case 0:
+		d.prev = list.Lbrack
+	default:
+		d.prev = d.pos(n.children[ln-1].endPos)
 	}
+	list.Rbrack = d.pos(n.endPos)
+
+	noNewline := true
+	single := d.isOneLiner(n.startPos, n.endPos)
 	for _, c := range n.children {
-		list.Elts = append(list.Elts, d.unmarshal(c))
+		d.forceNewline = !single
+		elem := d.unmarshal(c)
+		list.Elts = append(list.Elts, elem)
+		_, noNewline = elem.(*ast.StructLit)
+	}
+	if !single && !noNewline {
+		list.Rbrack = list.Rbrack.WithRel(token.Newline)
 	}
 	return list
 }
 
+func (d *decoder) isOneLiner(start, end yaml_mark_t) bool {
+	s := d.absPos(start).Position()
+	e := d.absPos(end).Position()
+	return s.Line == e.Line
+}
+
 func (d *decoder) mapping(n *node) ast.Expr {
+	newline := d.forceNewline
+
 	structure := &ast.StructLit{}
 	d.insertMap(n, structure, false)
-	if len(structure.Elts) != 1 {
-		structure.Lbrace = d.pos(n.startPos)
-		structure.Rbrace = d.pos(n.endPos)
+
+	// NOTE: we currently translate YAML without curly braces to CUE with
+	// curly braces, even for single elements. Removing the following line
+	// would generate the folded form.
+	structure.Lbrace = d.absPos(n.startPos).WithRel(token.NoSpace)
+	structure.Rbrace = d.absPos(n.endPos).WithRel(token.Newline)
+	if d.isOneLiner(n.startPos, n.endPos) && !newline {
+		if len(structure.Elts) != 1 {
+			structure.Lbrace = d.absPos(n.startPos).WithRel(token.Blank)
+		}
+		if len(structure.Elts) != 1 || structure.Elts[0].Pos().RelPos() < token.Newline {
+			structure.Rbrace = structure.Rbrace.WithRel(token.Blank)
+		}
 	}
 	return structure
 }

@@ -169,13 +169,24 @@ var unmarshalTests = []struct {
 	// Block sequence
 	{
 		"seq:\n - A\n - B",
-		`seq: ["A", "B"]`,
+		`seq: [
+	"A",
+	"B",
+]`,
 	}, {
 		"seq:\n - A\n - B\n - C",
-		`seq: ["A", "B", "C"]`,
+		`seq: [
+	"A",
+	"B",
+	"C",
+]`,
 	}, {
 		"seq:\n - A\n - 1\n - C",
-		`seq: ["A", 1, "C"]`,
+		`seq: [
+	"A",
+	1,
+	"C",
+]`,
 	},
 
 	// Literal block scalar
@@ -208,9 +219,7 @@ var unmarshalTests = []struct {
 	// Structs
 	{
 		"a: {b: c}",
-		`a: {
-	b: "c"
-}`,
+		`a: {b: "c"}`,
 	},
 	{
 		"hello: world",
@@ -232,10 +241,7 @@ var unmarshalTests = []struct {
 		"a: true",
 	}, {
 		"{ a: 1, b: {c: 1} }",
-		`a: 1
-b: {
-	c: 1
-}`,
+		`a: 1, b: {c: 1}`,
 	},
 
 	// Some cross type conversions
@@ -360,10 +366,13 @@ b: {
 		`"1": "\"2\""`,
 	}, {
 		"v:\n- A\n- 'B\n\n  C'\n",
-		`v: ["A", """
+		`v: [
+	"A",
+	"""
 		B
 		C
-		"""]`,
+		""",
+]`,
 	},
 
 	// Explicit tags.
@@ -400,12 +409,9 @@ c: 1
 d: 2`,
 	}, {
 		"a: &a {c: 1}\nb: *a",
-		`a: {
-	c: 1
-}
+		`a: {c: 1}
 b: {
-	c: 1
-}`,
+	c: 1}`, // TODO fix this spacing. Expansions low priority though.
 	}, {
 		"a: &a [1, 2]\nb: *a",
 		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a
@@ -458,9 +464,7 @@ b: {
 	// issue #295 (allow scalars with colons in flow mappings and sequences)
 	{
 		"a: {b: https://github.com/go-yaml/yaml}",
-		`a: {
-	b: "https://github.com/go-yaml/yaml"
-}`,
+		`a: {b: "https://github.com/go-yaml/yaml"}`,
 	},
 	{
 		"a: [https://github.com/go-yaml/yaml]",
@@ -500,12 +504,45 @@ b: {
 	// Ordered maps.
 	{
 		"{b: 2, a: 1, d: 4, c: 3, sub: {e: 5}}",
-		`b: 2
-a: 1
-d: 4
-c: 3
-sub: {
-	e: 5
+		`b: 2, a: 1, d: 4, c: 3, sub: {e: 5}`,
+	},
+
+	// Spacing
+	{
+		`
+a: {}
+c: 1
+d: [
+]
+e: []
+`,
+		`a: {}
+c: 1
+d: [
+]
+e: []`,
+	},
+
+	{
+		`
+a:
+  - { "a": 1, "b": 2 }
+  - { "c": 1, "d": 2 }
+`,
+		`a: [{
+	a: 1, b: 2
+}, {
+	c: 1, d: 2
+}]`,
+	},
+
+	{
+		"a:\n b:\n  c: d\n  e: f\n",
+		`a: {
+	b: {
+		c: "d"
+		e: "f"
+	}
 }`,
 	},
 

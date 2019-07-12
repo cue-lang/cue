@@ -6,5 +6,9 @@ deployment headchef spec template spec containers: [{
 	}, {
 		mountPath: "/sslcerts"
 	}]
-	args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
+	args: [
+		"-env=prod",
+		"-logdir=/logs",
+		"-event-server=events:7788",
+	]
 }]

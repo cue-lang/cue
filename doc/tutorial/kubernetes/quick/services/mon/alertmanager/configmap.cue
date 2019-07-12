@@ -21,9 +21,11 @@ configMap alertmanager: {
 					send_resolved: true
 				}]
 			}]
+
 			// The root route on which each incoming alert enters.
 			route: {
 				receiver: "pager"
+
 				// The labels by which incoming alerts are grouped together. For example,
 				// multiple alerts coming in for cluster=A and alertname=LatencyHigh would
 				// be batched into a single group.

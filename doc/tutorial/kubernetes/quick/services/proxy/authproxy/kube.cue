@@ -9,7 +9,10 @@ deployment authproxy spec: {
 			ports: [{
 				containerPort: 4180
 			}]
-			args: ["--config=/etc/authproxy/authproxy.cfg"]
+			args: [
+				"--config=/etc/authproxy/authproxy.cfg",
+			]
+
 			volumeMounts: [{
 				name:      "config-volume"
 				mountPath: "/etc/authproxy"

@@ -20,7 +20,9 @@ statefulSet etcd spec: {
 				labelSelector matchExpressions: [{
 					key:      "app"
 					operator: "In"
-					values: ["etcd"]
+					values: [
+						"etcd",
+					]
 				}]
 				topologyKey: "kubernetes.io/hostname"
 			}]
@@ -59,12 +61,28 @@ statefulSet etcd spec: {
 					valueFrom fieldRef fieldPath: "status.podIP"
 				}]
 				command: ["/usr/local/bin/etcd"]
-				args: ["-name", "$(NAME)", "-data-dir", "/data/etcd3", "-initial-advertise-peer-urls", "http://$(IP):2380", "-listen-peer-urls", "http://$(IP):2380", "-listen-client-urls", "http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls", "http://$(IP):2379", "-discovery", "https://discovery.etcd.io/xxxxxx"]
+				args: [
+					"-name",
+					"$(NAME)",
+					"-data-dir",
+					"/data/etcd3",
+					"-initial-advertise-peer-urls",
+					"http://$(IP):2380",
+					"-listen-peer-urls",
+					"http://$(IP):2380",
+					"-listen-client-urls",
+					"http://$(IP):2379,http://127.0.0.1:2379",
+					"-advertise-client-urls",
+					"http://$(IP):2379",
+					"-discovery",
+					"https://discovery.etcd.io/xxxxxx",
+				]
 			}]
 		}
 	}
 	// bootstrap
 	// "-initial-cluster-token", "etcd-prod-events2",
+
 	volumeClaimTemplates: [{
 		metadata: {
 			name: "etcd3"

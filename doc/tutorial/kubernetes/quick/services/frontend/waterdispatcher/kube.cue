@@ -5,5 +5,8 @@ service waterdispatcher spec ports: [{
 }]
 deployment waterdispatcher spec template spec containers: [{
 	image: "gcr.io/myproj/waterdispatcher:v0.0.48"
-	args: ["-http=:8080", "-etcd=etcd:2379"]
+	args: [
+		"-http=:8080",
+		"-etcd=etcd:2379",
+	]
 }]

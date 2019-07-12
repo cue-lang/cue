@@ -15,7 +15,9 @@ deployment events spec: {
 				labelSelector matchExpressions: [{
 					key:      "app"
 					operator: "In"
-					values: ["events"]
+					values: [
+						"events",
+					]
 				}]
 				topologyKey: "kubernetes.io/hostname"
 			}]
@@ -30,7 +32,12 @@ deployment events spec: {
 				}, {
 					containerPort: 7788
 				}]
-				args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
+				args: [
+					"-cert=/etc/ssl/server.pem",
+					"-key=/etc/ssl/server.key",
+					"-grpc=:7788",
+				]
+
 				volumeMounts: [{
 					mountPath: "/etc/ssl"
 					name:      "secret-volume"

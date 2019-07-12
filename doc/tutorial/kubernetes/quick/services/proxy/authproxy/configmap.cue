@@ -5,6 +5,7 @@ configMap authproxy: {
 	// kubectl apply -f configmap.yaml
 	// kubectl scale --replicas=0 deployment/proxy
 	// kubectl scale --replicas=1 deployment/proxy
+
 	apiVersion: "v1"
 	kind:       "ConfigMap"
 	data "authproxy.cfg": """

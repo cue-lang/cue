@@ -12,6 +12,14 @@ deployment pastrychef spec template spec: {
 		}, {
 			name: "secret-ssh-key"
 		}]
-		args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
+		args: [
+			"-env=prod",
+			"-ssh-tunnel-key=/etc/certs/tunnel-private.pem",
+			"-logdir=/logs",
+			"-event-server=events:7788",
+			"-reconnect-delay=1m",
+			"-etcd=etcd:2379",
+			"-recovery-overlap=10000",
+		]
 	}]
 }

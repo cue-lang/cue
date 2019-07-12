@@ -24,7 +24,15 @@ deployment caller spec: {
 				name:      "secret-ssh-key"
 				readOnly:  true
 			}]
-			args: ["-env=prod", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
+			args: [
+				"-env=prod",
+				"-key=/etc/certs/client.key",
+				"-cert=/etc/certs/client.pem",
+				"-ca=/etc/certs/servfx.ca",
+				"-ssh-tunnel-key=/sslcerts/tunnel-private.pem",
+				"-logdir=/logs",
+				"-event-server=events:7788",
+			]
 		}]
 	}
 }

@@ -1459,7 +1459,6 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 
 		// Eat a comment until a line break.
 		if parser.buffer[parser.buffer_pos] == '#' {
-			rel := parser.relPos()
 			m := parser.mark
 			parser.comment_buffer = parser.comment_buffer[:0]
 			for !is_breakz(parser.buffer, parser.buffer_pos) {
@@ -1471,7 +1470,7 @@ func yaml_parser_scan_to_next_token(parser *yaml_parser_t) bool {
 					return false
 				}
 			}
-			add_comment(parser, rel, m, string(parser.comment_buffer))
+			add_comment(parser, m, string(parser.comment_buffer))
 		}
 
 		// If it is a line break, eat it.
@@ -1569,7 +1568,6 @@ func yaml_parser_scan_directive(parser *yaml_parser_t, token *yaml_token_t) bool
 	}
 
 	if parser.buffer[parser.buffer_pos] == '#' {
-		rel := parser.relPos()
 		m := parser.mark
 		parser.comment_buffer = parser.comment_buffer[:0]
 		for !is_breakz(parser.buffer, parser.buffer_pos) {
@@ -1581,7 +1579,7 @@ func yaml_parser_scan_directive(parser *yaml_parser_t, token *yaml_token_t) bool
 				return false
 			}
 		}
-		add_comment(parser, rel, m, string(parser.comment_buffer))
+		add_comment(parser, m, string(parser.comment_buffer))
 	}
 
 	// Check if we are at the end of the line.
@@ -2146,7 +2144,6 @@ func yaml_parser_scan_block_scalar(parser *yaml_parser_t, token *yaml_token_t, l
 		}
 	}
 	if parser.buffer[parser.buffer_pos] == '#' {
-		rel := parser.relPos()
 		m := parser.mark
 		parser.comment_buffer = parser.comment_buffer[:0]
 		for !is_breakz(parser.buffer, parser.buffer_pos) {
@@ -2158,7 +2155,7 @@ func yaml_parser_scan_block_scalar(parser *yaml_parser_t, token *yaml_token_t, l
 				return false
 			}
 		}
-		add_comment(parser, rel, m, string(parser.comment_buffer))
+		add_comment(parser, m, string(parser.comment_buffer))
 	}
 
 	// Check if we are at the end of the line.

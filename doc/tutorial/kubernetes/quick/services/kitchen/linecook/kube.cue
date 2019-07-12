@@ -12,6 +12,17 @@ deployment linecook spec template spec: {
 		}, {
 			name: "secret-kitchen"
 		}]
-		args: ["-name=linecook", "-env=prod", "-logdir=/logs", "-event-server=events:7788", "-etcd", "etcd:2379", "-reconnect-delay", "1h", "-recovery-overlap", "100000"]
+		args: [
+			"-name=linecook",
+			"-env=prod",
+			"-logdir=/logs",
+			"-event-server=events:7788",
+			"-etcd",
+			"etcd:2379",
+			"-reconnect-delay",
+			"1h",
+			"-recovery-overlap",
+			"100000",
+		]
 	}]
 }

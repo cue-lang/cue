@@ -30,7 +30,10 @@ deployment prometheus spec: {
 		spec: {
 			containers: [{
 				image: "prom/prometheus:v2.4.3"
-				args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
+				args: [
+					"--config.file=/etc/prometheus/prometheus.yml",
+					"--web.external-url=https://prometheus.example.com",
+				]
 				ports: [{
 					name:          "web"
 					containerPort: 9090

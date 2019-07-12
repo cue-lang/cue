@@ -17,7 +17,8 @@ configMap prometheus: {
 					labels severity: "page"
 					annotations: {
 						description: "{{$labels.app}} of job {{ $labels.job }} has been down for more than 30 seconds."
-						summary:     "Instance {{$labels.app}} down"
+
+						summary: "Instance {{$labels.app}} down"
 					}
 				}, {
 					alert: "InsufficientPeers"
@@ -46,24 +47,32 @@ configMap prometheus: {
 				}]
 			}]
 		}
+
 		"prometheus.yml": yaml.Marshal(_cue_prometheus_yml)
 		_cue_prometheus_yml = {
 			global scrape_interval: "15s"
-			rule_files: ["/etc/prometheus/alert.rules"]
+			rule_files: [
+				"/etc/prometheus/alert.rules",
+			]
 			alerting alertmanagers: [{
 				scheme: "http"
 				static_configs: [{
-					targets: ["alertmanager:9093"]
+					targets: [
+						"alertmanager:9093",
+					]
 				}]
 			}]
 			scrape_configs: [{
 				job_name: "kubernetes-apiservers"
+
 				kubernetes_sd_configs: [{
 					role: "endpoints"
 				}]
+
 				// Default to scraping over https. If required, just disable this or change to
 				// `http`.
 				scheme: "https"
+
 				// This TLS & bearer token file config is used to connect to the actual scrape
 				// endpoints for cluster components. This is separate to discovery auth
 				// configuration because discovery & scraping are two separate concerns in
@@ -79,6 +88,7 @@ configMap prometheus: {
 				//
 				// insecure_skip_verify: true
 				bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
 				// Keep only the default/kubernetes service endpoints for the https port. This
 				// will add targets for each API server which Kubernetes adds an endpoint to
 				// the default/kubernetes service.
@@ -95,9 +105,11 @@ configMap prometheus: {
 				// cluster, or can't connect to nodes for some other reason (e.g. because of
 				// firewalling).
 				job_name: "kubernetes-nodes"
+
 				// Default to scraping over https. If required, just disable this or change to
 				// `http`.
 				scheme: "https"
+
 				// This TLS & bearer token file config is used to connect to the actual scrape
 				// endpoints for cluster components. This is separate to discovery auth
 				// configuration because discovery & scraping are two separate concerns in
@@ -106,9 +118,11 @@ configMap prometheus: {
 				// <kubernetes_sd_config>.
 				tls_config ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 				bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
 				kubernetes_sd_configs: [{
 					role: "node"
 				}]
+
 				relabel_configs: [{
 					action: "labelmap"
 					regex:  "__meta_kubernetes_node_label_(.+)"
@@ -137,9 +151,11 @@ configMap prometheus: {
 				// This job is not necessary and should be removed in Kubernetes 1.6 and
 				// earlier versions, or it will cause the metrics to be scraped twice.
 				job_name: "kubernetes-cadvisor"
+
 				// Default to scraping over https. If required, just disable this or change to
 				// `http`.
 				scheme: "https"
+
 				// This TLS & bearer token file config is used to connect to the actual scrape
 				// endpoints for cluster components. This is separate to discovery auth
 				// configuration because discovery & scraping are two separate concerns in
@@ -148,9 +164,11 @@ configMap prometheus: {
 				// <kubernetes_sd_config>.
 				tls_config ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 				bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
+
 				kubernetes_sd_configs: [{
 					role: "node"
 				}]
+
 				relabel_configs: [{
 					action: "labelmap"
 					regex:  "__meta_kubernetes_node_label_(.+)"
@@ -176,9 +194,11 @@ configMap prometheus: {
 				// * `prometheus.io/port`: If the metrics are exposed on a different port to the
 				// service then set this appropriately.
 				job_name: "kubernetes-service-endpoints"
+
 				kubernetes_sd_configs: [{
 					role: "endpoints"
 				}]
+
 				relabel_configs: [{
 					source_labels: ["__meta_kubernetes_service_annotation_prometheus_io_scrape"]
 					action: "keep"
@@ -218,12 +238,15 @@ configMap prometheus: {
 				// via the following annotations:
 				//
 				// * `prometheus.io/probe`: Only probe services that have a value of `true`
-				job_name:     "kubernetes-services"
+				job_name: "kubernetes-services"
+
 				metrics_path: "/probe"
 				params module: ["http_2xx"]
+
 				kubernetes_sd_configs: [{
 					role: "service"
 				}]
+
 				relabel_configs: [{
 					source_labels: ["__meta_kubernetes_service_annotation_prometheus_io_probe"]
 					action: "keep"
@@ -254,12 +277,15 @@ configMap prometheus: {
 				// via the following annotations:
 				//
 				// * `prometheus.io/probe`: Only probe services that have a value of `true`
-				job_name:     "kubernetes-ingresses"
+				job_name: "kubernetes-ingresses"
+
 				metrics_path: "/probe"
 				params module: ["http_2xx"]
+
 				kubernetes_sd_configs: [{
 					role: "ingress"
 				}]
+
 				relabel_configs: [{
 					source_labels: ["__meta_kubernetes_ingress_annotation_prometheus_io_probe"]
 					action: "keep"
@@ -296,9 +322,11 @@ configMap prometheus: {
 				// * `prometheus.io/port`: Scrape the pod on the indicated port instead of the
 				// pod's declared ports (default is a port-free target if none are declared).
 				job_name: "kubernetes-pods"
+
 				kubernetes_sd_configs: [{
 					role: "pod"
 				}]
+
 				relabel_configs: [{
 					source_labels: ["__meta_kubernetes_pod_annotation_prometheus_io_scrape"]
 					action: "keep"

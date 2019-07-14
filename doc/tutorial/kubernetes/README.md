@@ -10,7 +10,7 @@ in subdirectories.
 This is a common pattern.
 The `cue` tooling has been optimized for this use case.
 
-In this tutorial we will address the folowing topics:
+In this tutorial we will address the following topics:
 
 1. convert the given YAML files to CUE
 1. hoist common patterns to parent directories
@@ -99,7 +99,7 @@ Many of the files contain more than one Kubernetes object.
 Moreover, we are creating a single configuration that contains all objects
 of all files.
 We need to organize all Kubernetes objects such that each is individually
-identifyable within a single configuration.
+identifiable within a single configuration.
 We do so by defining a different struct for each type putting each object
 in this respective struct keyed by its name.
 This allows objects of different types to share the same name,
@@ -464,14 +464,14 @@ $ cue fmt
 ```
 
 The common configuration has been factored out into `_spec`.
-We introducded `_name` to aid both specifying and referring
+We introduced `_name` to aid both specifying and referring
 to the name of an object.
 For completeness, we added `configMap` as a top-level entry.
 
 Note that we have not yet removed the old definition of deployment.
 This is fine.
 As it is equivalent to the new one, unifying them will have no effect.
-We leave its removal as an excersize to the reader.
+We leave its removal as an exercise to the reader.
 
 Next we observe that all deployments, stateful sets and daemon sets have
 an accompanying service which shares many of the same fields.
@@ -505,8 +505,8 @@ $ cue fmt
 ```
 
 This example introduces a few new concepts.
-Open-ended lists are indicated with an elipsis (`...`).
-The value following an elipsis is unified with any subsequent elements and
+Open-ended lists are indicated with an ellipsis (`...`).
+The value following an ellipsis is unified with any subsequent elements and
 defines the "type", or template, for additional list elements.
 
 The `Port` declaration is an alias.
@@ -515,7 +515,7 @@ They can be used to make shadowed fields visible within nested scopes or,
 in this case, to reduce boilerplate without introducing new fields.
 
 Finally, this example introduces list and field comprehensions.
-List comprehensions are analoguous to list comprehensions found in other
+List comprehensions are analogous to list comprehensions found in other
 languages.
 Field comprehensions allow inserting fields in structs.
 In this case, the field comprehension adds a namesake service for any
@@ -524,7 +524,7 @@ Field comprehensions can also be used to add a field conditionally.
 
 
 Specifying the `targetPort` is not necessary, but since many files define it,
-defining it here will allow those defintitions to be removed
+defining it here will allow those definitions to be removed
 using `cue trim`.
 We add an option `_export` for ports defined in containers to specify whether
 to include them in the service and explicitly set this to false
@@ -558,14 +558,14 @@ $ cue trim ./...
 $ find . | grep kube.cue | xargs wc | tail -1
     1129    2270   22073 total
 ```
-This is after removing the rewriten and now redundant deployment definition.
+This is after removing the rewritten and now redundant deployment definition.
 
 We shaved off almost another 100 lines, even after adding the template.
 You can verify that the service definitions are now gone in most of the files.
 What remains is either some additional configuration, or inconsistencies that
 should probably be cleaned up.
 
-But we have another trick up our sleave.
+But we have another trick up our sleeve.
 With the `-s` or `--simplify` option we can tell `trim` or `fmt` to collapse
 structs with a single element onto a single line. For instance:
 
@@ -650,10 +650,10 @@ $ find . | grep kube.cue | xargs wc | tail -1
      931    2052   19624 total
 ```
 
-Antoher 40 lines removed.
+Another 40 lines removed.
 We may have gotten used to larger reductions, but at this point there is just
 not much left to remove: in some of the frontend files there are only 4 lines
-of confiugration left.
+of configuration left.
 
 
 #### Directory `kitchen`
@@ -736,7 +736,7 @@ This template definition is not ideal: the definitions are positional, so if
 configurations were to define the disks in a different order, there would be
 no reuse or even conflicts.
 Also note that in order to deal with this restriction, almost all field values
-are just default values and can be overriden by instances.
+are just default values and can be overridden by instances.
 A better way would be define a map of volumes,
 similarly to how we organized the top-level Kubernetes objects,
 and then generate these two sections from this map.
@@ -765,7 +765,7 @@ We also reduced the configuration by a sizeable amount once more.
 
 However, on closer inspection of the remaining files we see a lot of remaining
 fields in the disk specifications as a result of inconsistent naming.
-Reducing configurations like we did in this excersize exposes inconsistencies.
+Reducing configurations like we did in this exercise exposes inconsistencies.
 The inconsistencies can be removed by simply deleting the overrides in the
 specific configuration.
 Leaving them as is gives a clear signal that a configuration is inconsistent.
@@ -774,7 +774,7 @@ Leaving them as is gives a clear signal that a configuration is inconsistent.
 ### Conclusion of Quick 'n Dirty tutorial
 
 There is still some gain to be made with the other directories.
-At nearly a 1000-line, or 55%, reduction, we leave the rest as an excersize to
+At nearly a 1000-line, or 55%, reduction, we leave the rest as an exercise to
 the reader.
 
 We have shown how CUE can be used to reduce boilerplate, enforce consistencies,
@@ -920,7 +920,7 @@ values.
 The result may contain conflicts, such as our top-level `_component` field,
 but our per-type maps of Kubernetes objects should be free of conflict
 (if there is, we have a problem with Kubernetes down the line).
-A merge thus gives us a unfied view of all objects.
+A merge thus gives us a unified view of all objects.
 
 ```
 $ cue ls ./...
@@ -1010,7 +1010,7 @@ EOF
 This command has two tasks, named `kube` and `display`.
 The `display` task depends on the output of the `kube` task.
 The `cue` tool does a static analysis of the dependencies and runs all
-tasks which depencies are satisfied in parallel while blocking tasks
+tasks which dependencies are satisfied in parallel while blocking tasks
 for which an input is missing.
 
 ```
@@ -1088,7 +1088,7 @@ In the next sections we will show how to get there.
 
 ### Outline
 
-The basic premis of our configuration is to maintain two configurations,
+The basic premise of our configuration is to maintain two configurations,
 a simple and abstract one, and one compatible with Kubernetes.
 The Kubernetes version is automatically generated from the simple configuration.
 Each simplified object has a `kubernetes` section that get gets merged into
@@ -1124,7 +1124,7 @@ Overall, the code modeling our services and the code generating the kubernetes
 code is separated, while still allowing to inject Kubernetes-specific
 data into our general model.
 At the same time, we can add additional information to our model without
-it ending up in the Kubernetes defintions causing it to barf.
+it ending up in the Kubernetes definitions causing it to barf.
 
 
 ### Deployment Definition
@@ -1152,7 +1152,7 @@ This also eliminates the need for `_spec`.
 
 The next step is to pull common fields, such as `image` to the top level.
 
-Arguments can be specied as a map.
+Arguments can be specified as a map.
 ```
     arg <Key>: string
     args: [ "-\(k)=\(v)" for k, v in arg ] | [...string]
@@ -1268,7 +1268,7 @@ part of this exercise.
 That said, most CUE users will never have to resort to this level of CUE
 to write configurations.
 For instance, none of the files in the subdirectories contain comprehensions,
-not even the template files in these directores (such as `kitchen/kube.cue`).
+not even the template files in these directories (such as `kitchen/kube.cue`).
 Furthermore, none of the configuration files in any of the
 leaf directories contain string interpolations.
 
@@ -1284,7 +1284,7 @@ $ find . | grep kube.cue | xargs wc | tail -1
 ```
 This does not count our conversion templates.
 Assuming that the top-level templates are reusable, and if we don't count them
-for both approaches, the manual approach shaves off about anoter 150 lines.
+for both approaches, the manual approach shaves off about another 150 lines.
 If we count the templates as well, the two approaches are roughly equal.
 
 
@@ -1292,15 +1292,15 @@ If we count the templates as well, the two approaches are roughly equal.
 
 We have shown that we can further compact a configuration by manually
 optimizing template files.
-However, we have also shown that the manual optimizition only gives
+However, we have also shown that the manual optimization only gives
 a marginal benefit with respect to the quick-and-dirty semi-automatic reduction.
-The benefits for the manual definition largely lies in the orginazational
+The benefits for the manual definition largely lies in the organizational
 flexibility one gets.
 
 Manually tailoring your configurations allows creating an abstraction layer
 between logical definitions and Kubernetes-specific definitions.
 At the same time, CUE's order independence
-makes it easy to mix in low-level Kubernetes configuration whereever it is
+makes it easy to mix in low-level Kubernetes configuration wherever it is
 convenient and applicable.
 
 Manual tailoring also allows us to add our own definitions without breaking

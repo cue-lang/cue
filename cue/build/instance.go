@@ -171,16 +171,12 @@ func (inst *Instance) AddFile(filename string, src interface{}) error {
 		return err
 	}
 
-	if err := inst.addSyntax(file); err != nil {
-		inst.ReportError(err)
-		return err
-	}
-	return nil
+	return inst.AddSyntax(file)
 }
 
-// addSyntax adds the given file to list of files for this instance. The package
+// AddSyntax adds the given file to list of files for this instance. The package
 // name of the file must match the package name of the instance.
-func (inst *Instance) addSyntax(file *ast.File) errors.Error {
+func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
 	pkg := ""
 	pos := file.Pos()
 	if file.Name != nil {
@@ -188,9 +184,11 @@ func (inst *Instance) addSyntax(file *ast.File) errors.Error {
 		pos = file.Name.Pos()
 	}
 	if !inst.setPkg(pkg) && pkg != inst.PkgName {
-		return errors.Newf(pos,
+		err := errors.Newf(pos,
 			"package name %q conflicts with previous package name %q",
 			pkg, inst.PkgName)
+		inst.ReportError(err)
+		return err
 	}
 	inst.Files = append(inst.Files, file)
 	return nil

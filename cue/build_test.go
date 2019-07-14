@@ -41,7 +41,7 @@ func TestFromExpr(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			r := &Runtime{}
-			inst, err := r.FromExpr(tc.expr)
+			inst, err := r.CompileExpr(tc.expr)
 			if err != nil {
 				t.Fatal(err)
 			}

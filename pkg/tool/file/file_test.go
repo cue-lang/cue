@@ -35,7 +35,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 		t.Fatal(err)
 	}
 	var r cue.Runtime
-	i, err := r.FromExpr(x)
+	i, err := r.CompileExpr(x)
 	if err != nil {
 		t.Fatal(err)
 	}

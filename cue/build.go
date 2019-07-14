@@ -56,10 +56,68 @@ func (r *Runtime) complete(p *build.Instance) (*Instance, error) {
 	return inst, nil
 }
 
+// Compile compiles the given source into an Instance. The source code may be
+// provided as a string, byte slice, io.Reader. The name is used as the file
+// name in position information. The source may import builtin packages. Use
+// Build to allow importing non-builtin packages.
+func (r *Runtime) Compile(filename string, source interface{}) (*Instance, error) {
+	ctx := r.Context
+	if ctx == nil {
+		ctx = build.NewContext()
+	}
+	p := ctx.NewInstance(filename, dummyLoad)
+	if err := p.AddFile(filename, source); err != nil {
+		return nil, p.Err
+	}
+	return r.complete(p)
+}
+
+// CompileFile compiles the given source file into an Instance. The source may
+// import builtin packages. Use Build to allow importing non-builtin packages.
+func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
+	ctx := r.Context
+	if ctx == nil {
+		ctx = build.NewContext()
+	}
+	p := ctx.NewInstance(file.Filename, dummyLoad)
+	err := p.AddSyntax(file)
+	if err != nil {
+		return nil, err
+	}
+	if file.Name != nil {
+		p.PkgName = file.Name.Name
+	}
+	return r.complete(p)
+}
+
+// CompileExpr compiles the given source expression into an Instance. The source
+// may import builtin packages. Use Build to allow importing non-builtin
+// packages.
+func (r *Runtime) CompileExpr(expr ast.Expr) (*Instance, error) {
+	ctx := r.Context
+	if ctx == nil {
+		ctx = build.NewContext()
+	}
+	p := ctx.NewInstance("", dummyLoad)
+	switch x := expr.(type) {
+	case *ast.StructLit:
+		_ = p.AddSyntax(&ast.File{Decls: x.Elts})
+	default:
+		_ = p.AddSyntax(&ast.File{
+			Decls: []ast.Decl{&ast.EmitDecl{Expr: expr}},
+		})
+	}
+	if p.Err != nil {
+		return nil, p.Err
+	}
+	return r.complete(p)
+}
+
 // Parse parses a CUE source value into a CUE Instance. The source code may
 // be provided as a string, byte slice, or io.Reader. The name is used as the
 // file name in position information. The source may import builtin packages.
 //
+// Deprecated: use Compile
 func (r *Runtime) Parse(name string, source interface{}) (*Instance, error) {
 	ctx := r.Context
 	if ctx == nil {
@@ -104,6 +162,8 @@ func Build(instances []*build.Instance) []*Instance {
 
 // FromExpr creates an instance from an expression.
 // Any references must be resolved beforehand.
+//
+// Deprecated: use CompileExpr
 func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 	i := r.index().newInstance(nil)
 	err := i.insertFile(&ast.File{

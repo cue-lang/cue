@@ -423,7 +423,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 
 		switch {
 		case flagPath.String(cmd) != "":
-			inst, err := runtime.FromExpr(expr)
+			inst, err := runtime.CompileExpr(expr)
 			if err != nil {
 				return err
 			}

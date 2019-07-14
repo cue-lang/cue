@@ -94,8 +94,8 @@ type Decoder struct {
 //
 // The decoder introduces its own buffering and may read
 // data from r beyond the YAML values requested.
-func NewDecoder(filename string, r io.Reader) (*Decoder, error) {
-	d, err := newParser(filename, r)
+func NewDecoder(filename string, src interface{}) (*Decoder, error) {
+	d, err := newParser(filename, src)
 	if err != nil {
 		return nil, err
 	}

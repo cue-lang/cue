@@ -1,3 +1,3 @@
-unsupported op &(int, string):
+text:unsupported op &(int, string):
     ./testdata/tasks/task_tool.cue:29:9
     tool/cli:4:9

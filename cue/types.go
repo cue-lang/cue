@@ -1147,10 +1147,21 @@ func (v Value) Unify(w Value) Value {
 	b := w.path.v
 	src := binSrc(token.NoPos, opUnify, a, b)
 	val := mkBin(ctx, src.Pos(), opUnify, a, b)
-	if err := validate(ctx, val.evalPartial(ctx)); err != nil {
-		val = err
+	u := newValueRoot(ctx, val)
+	if err := u.Validate(); err != nil {
+		// TODO: record all errors in a Value.
+		switch x := errors.Errors(err)[0].(type) {
+		case *valueError:
+			p := *x.v.path
+			p.v = x.err
+			p.cache = x.err
+			u = Value{x.v.idx, &p}
+
+		default:
+			u = newValueRoot(ctx, ctx.mkErr(src, err))
+		}
 	}
-	return newValueRoot(ctx, val)
+	return u
 }
 
 // Format prints a debug version of a value.

@@ -35,5 +35,5 @@ a: true
 b: true
 c: =~"^[a-z]{3}$"
 d: "foo"
-e: _|_ /* "foo bar" does not match =~"^[a-z]{3}$" */
+e: _|_ /* invalid value "foo bar" (does not match =~"^[a-z]{3}$") */
 ```

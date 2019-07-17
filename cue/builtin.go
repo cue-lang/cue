@@ -167,7 +167,7 @@ var orBuiltin = &builtin{
 		}
 		c.ret = &disjunction{baseValue{c.src}, d, false}
 		if len(d) == 0 {
-			c.ret = errors.New("empty or")
+			c.ret = errors.New("empty list in call to or")
 		}
 	},
 }
@@ -187,26 +187,38 @@ func (x *builtin) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	return false
 }
 
+func (x *builtin) name(ctx *context) string {
+	if x.pkg == 0 {
+		return x.Name
+	}
+	return fmt.Sprintf("%s.%s", ctx.labelStr(x.pkg), x.Name)
+}
+
 func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) {
 	if x.Func == nil {
-		return ctx.mkErr(x, "Builtin %q is not a function", x.Name)
+		return ctx.mkErr(x, "builtin %s is not a function", x.name(ctx))
 	}
 	if len(x.Params)-1 == len(args) && x.Result == boolKind {
 		// We have a custom builtin
 		return &customValidator{src.base(), args, x}
 	}
-	if len(x.Params) != len(args) {
-		return ctx.mkErr(src, x, "number of arguments does not match (%d vs %d)",
-			len(x.Params), len(args))
+	switch {
+	case len(x.Params) < len(args):
+		return ctx.mkErr(src, x, "too many arguments in call to %s (have %d, want %d)",
+			x.name(ctx), len(args), len(x.Params))
+	case len(x.Params) > len(args):
+		return ctx.mkErr(src, x, "not enough arguments in call to %s (have %d, want %d)",
+			x.name(ctx), len(args), len(x.Params))
 	}
 	for i, a := range args {
 		if x.Params[i] != bottomKind {
 			if unifyType(x.Params[i], a.kind()) == bottomKind {
-				return ctx.mkErr(src, x, "argument %d requires type %v, found %v", i+1, x.Params[i], a.kind())
+				const msg = "cannot use %s (type %s) as %s in argument %d to %s"
+				return ctx.mkErr(src, x, msg, ctx.str(a), a.kind(), x.Params[i], i+1, x.name(ctx))
 			}
 		}
 	}
-	call := callCtxt{src: src, ctx: ctx, args: args}
+	call := callCtxt{src: src, ctx: ctx, builtin: x, args: args}
 	defer func() {
 		var errVal interface{} = call.err
 		if err := recover(); err != nil {
@@ -218,7 +230,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 			ret = err.b
 		default:
 			// TODO: store the underlying error explicitly
-			ret = ctx.mkErr(src, x, "call error: %v", err)
+			ret = ctx.mkErr(src, x, "error in call to %s: %v", x.name(ctx), err)
 		}
 	}()
 	x.Func(&call)
@@ -230,11 +242,16 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 
 // callCtxt is passed to builtin implementations.
 type callCtxt struct {
-	src  source
-	ctx  *context
-	args []evaluated
-	err  error
-	ret  interface{}
+	src     source
+	ctx     *context
+	builtin *builtin
+	args    []evaluated
+	err     error
+	ret     interface{}
+}
+
+func (c *callCtxt) name() string {
+	return c.builtin.name(c.ctx)
 }
 
 var builtins = map[string]*structLit{}
@@ -321,47 +338,56 @@ func (c *callCtxt) value(i int) Value {
 	return newValueRoot(c.ctx, c.args[i])
 }
 
-func (c *callCtxt) int(i int) int     { return int(c.intValue(i, 64)) }
-func (c *callCtxt) int8(i int) int8   { return int8(c.intValue(i, 8)) }
-func (c *callCtxt) int16(i int) int16 { return int16(c.intValue(i, 16)) }
-func (c *callCtxt) int32(i int) int32 { return int32(c.intValue(i, 32)) }
-func (c *callCtxt) rune(i int) rune   { return rune(c.intValue(i, 32)) }
-func (c *callCtxt) int64(i int) int64 { return int64(c.intValue(i, 64)) }
+func (c *callCtxt) invalidArgType(arg value, i int, typ string, err error) {
+	if err != nil {
+		c.errf(c.src, err, "cannot use %s (type %s) as %s in argument %d to %s: %v",
+			c.ctx.str(arg), arg.kind(), typ, i, c.name(), err)
+	} else {
+		c.errf(c.src, nil, "cannot use %s (type %s) as %s in argument %d to %s",
+			c.ctx.str(arg), arg.kind(), typ, i, c.name())
+	}
+}
 
-func (c *callCtxt) intValue(i, bits int) int64 {
-	x := newValueRoot(c.ctx, c.args[i])
+func (c *callCtxt) int(i int) int     { return int(c.intValue(i, 64, "int64")) }
+func (c *callCtxt) int8(i int) int8   { return int8(c.intValue(i, 8, "int8")) }
+func (c *callCtxt) int16(i int) int16 { return int16(c.intValue(i, 16, "int16")) }
+func (c *callCtxt) int32(i int) int32 { return int32(c.intValue(i, 32, "int32")) }
+func (c *callCtxt) rune(i int) rune   { return rune(c.intValue(i, 32, "rune")) }
+func (c *callCtxt) int64(i int) int64 { return int64(c.intValue(i, 64, "int64")) }
+
+func (c *callCtxt) intValue(i, bits int, typ string) int64 {
+	arg := c.args[i]
+	x := newValueRoot(c.ctx, arg)
 	n, err := x.Int(nil)
 	if err != nil {
-		c.errf(c.src, err, "argument %d must be in int, found number", i)
+		c.invalidArgType(arg, i, typ, err)
 		return 0
 	}
 	if n.BitLen() > bits {
-		c.errf(c.src, err, "argument %d out of range: has %d > %d bits", n.BitLen(), bits)
+		c.errf(c.src, err, "int %s overflows %s in argument %d in call to %s",
+			n, typ, i, c.name())
 	}
 	res, _ := x.Int64()
 	return res
 }
 
-func (c *callCtxt) uint(i int) uint     { return uint(c.uintValue(i, 64)) }
-func (c *callCtxt) uint8(i int) uint8   { return uint8(c.uintValue(i, 8)) }
-func (c *callCtxt) byte(i int) uint8    { return byte(c.uintValue(i, 8)) }
-func (c *callCtxt) uint16(i int) uint16 { return uint16(c.uintValue(i, 16)) }
-func (c *callCtxt) uint32(i int) uint32 { return uint32(c.uintValue(i, 32)) }
-func (c *callCtxt) uint64(i int) uint64 { return uint64(c.uintValue(i, 64)) }
+func (c *callCtxt) uint(i int) uint     { return uint(c.uintValue(i, 64, "uint64")) }
+func (c *callCtxt) uint8(i int) uint8   { return uint8(c.uintValue(i, 8, "uint8")) }
+func (c *callCtxt) byte(i int) uint8    { return byte(c.uintValue(i, 8, "byte")) }
+func (c *callCtxt) uint16(i int) uint16 { return uint16(c.uintValue(i, 16, "uint16")) }
+func (c *callCtxt) uint32(i int) uint32 { return uint32(c.uintValue(i, 32, "uint32")) }
+func (c *callCtxt) uint64(i int) uint64 { return uint64(c.uintValue(i, 64, "uint64")) }
 
-func (c *callCtxt) uintValue(i, bits int) uint64 {
+func (c *callCtxt) uintValue(i, bits int, typ string) uint64 {
 	x := newValueRoot(c.ctx, c.args[i])
 	n, err := x.Int(nil)
-	if err != nil {
-		c.errf(c.src, err, "argument %d must be an integer", i)
-		return 0
-	}
-	if n.Sign() < 0 {
-		c.errf(c.src, nil, "argument %d must be a positive integer", i)
+	if err != nil || n.Sign() < 0 {
+		c.invalidArgType(c.args[i], i, typ, err)
 		return 0
 	}
 	if n.BitLen() > bits {
-		c.errf(c.src, nil, "argument %d out of range: has %d > %d bits", i, n.BitLen(), bits)
+		c.errf(c.src, err, "int %s overflows %s in argument %d in call to %s",
+			n, typ, i, c.name())
 	}
 	res, _ := x.Uint64()
 	return res
@@ -371,7 +397,7 @@ func (c *callCtxt) float64(i int) float64 {
 	x := newValueRoot(c.ctx, c.args[i])
 	res, err := x.Float64()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "float64", err)
 		return 0
 	}
 	return res
@@ -381,7 +407,7 @@ func (c *callCtxt) bigInt(i int) *big.Int {
 	x := newValueRoot(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil {
-		c.errf(c.src, err, "argument %d must be in int, found number", i)
+		c.invalidArgType(c.args[i], i, "int", err)
 		return nil
 	}
 	return n
@@ -392,7 +418,7 @@ func (c *callCtxt) bigFloat(i int) *big.Float {
 	var mant big.Int
 	exp, err := x.MantExp(&mant)
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "float", err)
 		return nil
 	}
 	f := &big.Float{}
@@ -409,7 +435,7 @@ func (c *callCtxt) string(i int) string {
 	x := newValueRoot(c.ctx, c.args[i])
 	v, err := x.String()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "string", err)
 		return ""
 	}
 	return v
@@ -419,7 +445,7 @@ func (c *callCtxt) bytes(i int) []byte {
 	x := newValueRoot(c.ctx, c.args[i])
 	v, err := x.Bytes()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "bytes", err)
 		return nil
 	}
 	return v
@@ -430,7 +456,7 @@ func (c *callCtxt) reader(i int) io.Reader {
 	// TODO: optimize for string and bytes cases
 	r, err := x.Reader()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "bytes|string", err)
 		return nil
 	}
 	return r
@@ -440,33 +466,37 @@ func (c *callCtxt) bool(i int) bool {
 	x := newValueRoot(c.ctx, c.args[i])
 	b, err := x.Bool()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "bool", err)
 		return false
 	}
 	return b
 }
 
 func (c *callCtxt) list(i int) (a Iterator) {
-	x := newValueRoot(c.ctx, c.args[i])
+	arg := c.args[i]
+	x := newValueRoot(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "list", err)
 		return Iterator{ctx: c.ctx}
 	}
 	return v
 }
 
 func (c *callCtxt) strList(i int) (a []string) {
-	x := newValueRoot(c.ctx, c.args[i])
+	arg := c.args[i]
+	x := newValueRoot(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
-		c.errf(c.src, err, "invalid argument %d: %v", i, err)
+		c.invalidArgType(c.args[i], i, "list", err)
 		return nil
 	}
-	for i := 0; v.Next(); i++ {
+	for j := 0; v.Next(); j++ {
 		str, err := v.Value().String()
 		if err != nil {
-			c.errf(c.src, err, "list element %d: %v", i, err)
+			c.errf(c.src, err, "invalid list element %d in argument %d to %s: %v",
+				j, i, c.name(), err)
+			break
 		}
 		a = append(a, str)
 	}

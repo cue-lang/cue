@@ -60,6 +60,7 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 		if n.val() == nil {
 			field := ctx.labelStr(x.feature)
 			//	m.foo undefined (type map[string]bool has no field or method foo)
+			// TODO: mention x.x in error message?
 			return ctx.mkErr(x, "undefined field %q", field)
 		}
 		// TODO: do we need to evaluate here?
@@ -150,7 +151,7 @@ func (x *callExpr) evalPartial(ctx *context) (result evaluated) {
 
 	e := newEval(ctx, true)
 
-	fn := e.eval(x.x, lambdaKind, "cannot call non-function %[1]s (type %[3]s)")
+	fn := e.eval(x.x, lambdaKind, "cannot call non-function %[2]s (type %[3]s)")
 	args := make([]evaluated, len(x.args))
 	for i, a := range x.args {
 		args[i] = e.evalPartial(a, typeKinds, "never triggers")
@@ -328,7 +329,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 		case d.marked:
 			if marked != nil {
 				// TODO: allow disjunctions to be returned as is.
-				return ctx.mkErr(x, codeIncomplete, "more than one default remaining (%v and %v)", debugStr(ctx, marked), debugStr(ctx, d.val))
+				return ctx.mkErr(x, codeIncomplete, "more than one default remaining (%v and %v)", ctx.str(marked), ctx.str(d.val))
 			}
 			marked = d.val.(evaluated)
 		case unmarked1 == nil:
@@ -343,7 +344,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 
 	case unmarked2 != nil:
 		return ctx.mkErr(x, codeIncomplete, "more than one element remaining (%v and %v)",
-			debugStr(ctx, unmarked1), debugStr(ctx, unmarked2))
+			ctx.str(unmarked1), ctx.str(unmarked2))
 
 	case unmarked1 != nil:
 		return unmarked1
@@ -418,7 +419,7 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 	switch op {
 	case opSub:
 		if kind&numeric == bottomKind {
-			return ctx.mkErr(src, "unary '-' requires numeric value, found %s", kind)
+			return ctx.mkErr(src, "invalid operation -%s (- %s)", ctx.str(x), kind)
 		}
 		switch v := v.(type) {
 		case *numLit:
@@ -434,7 +435,7 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 
 	case opAdd:
 		if kind&numeric == bottomKind {
-			return ctx.mkErr(src, "unary '+' requires numeric value, found %s", kind)
+			return ctx.mkErr(src, "invalid operation +%s (+ %s)", ctx.str(x), kind)
 		}
 		if kind&^(numeric|nonGround|referenceKind) == bottomKind {
 			return v
@@ -450,7 +451,7 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 
 	case opNot:
 		if kind&boolKind == bottomKind {
-			return ctx.mkErr(src, "unary '!' requires bool value, found %s", kind)
+			return ctx.mkErr(src, "invalid operation !%s (! %s)", ctx.str(x), kind)
 		}
 		switch v := v.(type) {
 		case *top:
@@ -461,5 +462,5 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 			return &boolLit{src.base(), !v.b}
 		}
 	}
-	return ctx.mkErr(src, "invalid operand type %v for unary operator %v", v, op)
+	return ctx.mkErr(src, "invalid operation %s%s (%s %s)", op, ctx.str(x), op, kind)
 }

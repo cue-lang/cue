@@ -76,7 +76,7 @@ func checkKind(ctx *context, x value, want kind) *bottom {
 	}
 	got := x.kind()
 	if got&want&concreteKind == bottomKind && want != bottomKind {
-		return ctx.mkErr(x, "not of right kind (%v vs %v)", got, want)
+		return ctx.mkErr(x, "cannot use value %v (type %s) as %s", x, got, want)
 	}
 	if !got.isGround() {
 		return ctx.mkErr(x, codeIncomplete,
@@ -1161,7 +1161,7 @@ func updateBin(ctx *context, bin *binaryExpr) value {
 
 func (x *binaryExpr) kind() kind {
 	// TODO: cache results
-	kind, _ := matchBinOpKind(x.op, x.left.kind(), x.right.kind())
+	kind, _, _ := matchBinOpKind(x.op, x.left.kind(), x.right.kind())
 	return kind | nonGround
 }
 
@@ -1286,7 +1286,7 @@ outer:
 		err := x.values[0].val
 		if !isBottom(err) {
 			// TODO: use format instead of debugStr.
-			err = ctx.mkErr(src, debugStr(ctx, err))
+			err = ctx.mkErr(src, ctx.str(err))
 		}
 		return mVal{ctx.mkErr(src, "empty disjunction: %v", err), false}
 	case 1:

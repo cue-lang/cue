@@ -48,13 +48,13 @@ func TestBuiltins(t *testing.T) {
 		`3`,
 	}, {
 		test("math", "math.Pi(3)"),
-		`_|_(<0>.Pi:cannot call non-function 3.14159265358979323846264338327950288419716939937510582097494459 (type float))`,
+		`_|_(cannot call non-function Pi (type float))`,
 	}, {
 		test("math", "math.Floor(3, 5)"),
-		`_|_(<0>.Floor (3,5):number of arguments does not match (1 vs 2))`,
+		`_|_(too many arguments in call to math.Floor (have 2, want 1))`,
 	}, {
 		test("math", `math.Floor("foo")`),
-		`_|_(<0>.Floor ("foo"):argument 1 requires type number, found string)`,
+		`_|_(cannot use "foo" (type string) as number in argument 1 to math.Floor)`,
 	}, {
 		test("encoding/hex", `hex.Encode("foo")`),
 		`"666f6f"`,
@@ -63,32 +63,32 @@ func TestBuiltins(t *testing.T) {
 		`'foo'`,
 	}, {
 		test("encoding/hex", `hex.Decode("foo")`),
-		`_|_(<0>.Decode ("foo"):call error: encoding/hex: invalid byte: U+006F 'o')`,
+		`_|_(error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o')`,
 	}, {
 		test("strconv", `strconv.FormatUint(64, 16)`),
 		`"40"`,
 	}, {
 		// Find a better alternative, as this call should go.
 		test("strconv", `strconv.FormatFloat(3.02, 300, 4, 64)`),
-		`_|_(<0>.FormatFloat (3.02,300,4,64):argument 1 out of range: has 9 > 8 bits)`,
+		`_|_(int 300 overflows byte in argument 1 in call to strconv.FormatFloat)`,
 	}, {
 		// Find a better alternative, as this call should go.
 		test("strconv", `strconv.FormatFloat(3.02, -1, 4, 64)`),
-		`_|_(<0>.FormatFloat (3.02,-1,4,64):argument 1 must be a positive integer)`,
+		`_|_(cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat)`,
 	}, {
 		// Find a better alternative, as this call should go.
 		test("strconv", `strconv.FormatFloat(3.02, 1.0, 4, 64)`),
-		`_|_(<0>.FormatFloat (3.02,1.0,4,64):argument 2 requires type int, found float)`,
+		`_|_(cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat)`,
 	}, {
 		// Panics
 		test("math", `math.Jacobi(1000, 2000)`),
-		`_|_(<0>.Jacobi (1000,2000):call error: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000)`,
+		`_|_(error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000)`,
 	}, {
 		test("math", `math.Jacobi(1000, 201)`),
 		`1`,
 	}, {
 		test("math", `math.Asin(2.0e400)`),
-		`_|_(<0>.Asin (2.0e+400):invalid argument 0: cue: value was rounded up)`,
+		`_|_(cannot use 2.0e+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up)`,
 	}, {
 		test("encoding/csv", `csv.Decode("1,2,3\n4,5,6")`),
 		`[["1","2","3"],["4","5","6"]]`,
@@ -100,7 +100,7 @@ func TestBuiltins(t *testing.T) {
 		`"Hello World!"`,
 	}, {
 		test("strings", `strings.Join([1, 2], " ")`),
-		`_|_(<0>.Join ([1,2]," "):list element 1: not of right kind (int vs string))`,
+		`_|_(invalid list element 0 in argument 0 to strings.Join: cannot use value 1 (type int) as string)`,
 	}, {
 		test("math/bits", `bits.Or(0x8, 0x1)`),
 		`9`,
@@ -133,7 +133,7 @@ func TestBuiltins(t *testing.T) {
 		`2`,
 	}, {
 		testExpr(`or([])`),
-		`_|_(builtin:or:empty or)`,
+		`_|_(empty list in call to or)`,
 	}, {
 		test("encoding/csv", `csv.Encode([[1,2,3],[4,5],[7,8,9]])`),
 		`"1,2,3\n4,5\n7,8,9\n"`,

@@ -45,16 +45,16 @@ c: {
 q: {
     x: 1
     y: 2
-    z: _|_ /* conflicting values: 3 != 4 */
+    z: _|_ /* conflicting values 3 and 4 */
 }
 r: {
     x: 1
     y: 2
-    z: _|_ /* conflicting values: 3 != 4 */
+    z: _|_ /* conflicting values 3 and 4 */
 }
 s: {
     x: 1
     y: 2
-    z: _|_ /* conflicting values: 4 != 3 */
+    z: _|_ /* conflicting values 4 and 3 */
 }
 ```

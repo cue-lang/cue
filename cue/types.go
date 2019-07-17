@@ -330,13 +330,13 @@ func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
 
 var (
 	// ErrBelow indicates that a value was rounded down in a conversion.
-	ErrBelow = errors.New("cue: value was rounded down")
+	ErrBelow = errors.New("value was rounded down")
 
 	// ErrAbove indicates that a value was rounded up in a conversion.
-	ErrAbove = errors.New("cue: value was rounded up")
+	ErrAbove = errors.New("value was rounded up")
 
 	// ErrInfinite indicates that a value is infinite.
-	ErrInfinite = errors.New("cue: infinite")
+	ErrInfinite = errors.New("infinite")
 )
 
 // Int converts the underlying integral number to an big.Int. It reports an
@@ -711,12 +711,12 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		return nil, toMarshalErr(v, x.(*bottom))
 	default:
 		if k.hasReferences() {
-			return nil, marshalErrf(v, x, "value %q contains unresolved references", debugStr(ctx, x))
+			return nil, marshalErrf(v, x, "value %q contains unresolved references", ctx.str(x))
 		}
 		if !k.isGround() {
-			return nil, marshalErrf(v, x, "cannot convert incomplete value %q to JSON", debugStr(ctx, x))
+			return nil, marshalErrf(v, x, "cannot convert incomplete value %q to JSON", ctx.str(x))
 		}
-		return nil, marshalErrf(v, x, "cannot convert value %q of type %T to JSON", debugStr(ctx, x), x)
+		return nil, marshalErrf(v, x, "cannot convert value %q of type %T to JSON", ctx.str(x), x)
 	}
 }
 
@@ -880,7 +880,8 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 	got := x.kind()
 	if want != bottomKind {
 		if got&want&concreteKind == bottomKind {
-			return ctx.mkErr(x, "not of right kind (%v vs %v)", got, want)
+			return ctx.mkErr(x, "cannot use value %v (type %s) as %s",
+				v.ctx().str(x), got, want)
 		}
 		if !got.isGround() {
 			return ctx.mkErr(x, codeIncomplete,
@@ -1171,7 +1172,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 		fmt.Fprint(state, "<nil>")
 		return
 	}
-	io.WriteString(state, debugStr(ctx, v.path.cache))
+	_, _ = io.WriteString(state, ctx.str(v.path.cache))
 }
 
 // Reference returns path from the root of the instance referred to by this
@@ -1387,7 +1388,7 @@ func isGroundRecursive(ctx *context, v value) *bottom {
 		}
 	default:
 		if !x.kind().isGround() {
-			return ctx.mkErr(v, "incomplete value (%v)", debugStr(ctx, v))
+			return ctx.mkErr(v, "incomplete value (%v)", ctx.str(v))
 		}
 	}
 	return nil
@@ -1429,9 +1430,10 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 // The returned attribute will return an error for any of its methods if there
 // is no attribute for the requested key.
 func (v Value) Attribute(key string) Attribute {
+	const msgNotExist = "attribute %q does not exist"
 	// look up the attributes
 	if v.path == nil || v.path.attrs == nil {
-		return Attribute{err: v.toErr(errNotExists)}
+		return Attribute{err: errors.Newf(token.NoPos, msgNotExist, key)}
 	}
 	for _, a := range v.path.attrs.attr {
 		if a.key() != key {
@@ -1443,7 +1445,7 @@ func (v Value) Attribute(key string) Attribute {
 		}
 		return at
 	}
-	return Attribute{err: v.toErr(errNotExists)}
+	return Attribute{err: errors.Newf(token.NoPos, msgNotExist, key)}
 }
 
 // An Attribute contains meta data about a field.

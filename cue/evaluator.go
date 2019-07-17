@@ -69,7 +69,7 @@ func (e *evaluator) mkErr(orig, eval value, code errCode, want kind, desc string
 	for i := 3; i < len(args); i++ {
 		switch v := args[i].(type) {
 		case value:
-			args[i] = debugStr(e.ctx, v)
+			args[i] = e.ctx.str(v)
 		}
 	}
 	err = e.ctx.mkErr(orig, args...)

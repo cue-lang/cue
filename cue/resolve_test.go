@@ -123,15 +123,15 @@ func TestBasicRewrite(t *testing.T) {
 
 			`b1: "a", ` +
 			`b2: "foo", ` +
-			`b3: _|_((=~"[a-z]{4}" & "foo"):"foo" does not match =~"[a-z]{4}"), ` +
+			`b3: _|_((=~"[a-z]{4}" & "foo"):invalid value "foo" (does not match =~"[a-z]{4}")), ` +
 			`b4: "foo", ` +
 
 			`s1: =~"c", ` +
 			`s2: (!="b" & =~"[a-z]"), ` +
 
-			`e1: _|_(("foo" =~ 1):unsupported op =~(string, int)), ` +
-			`e2: _|_(("foo" !~ true):unsupported op !~(string, bool)), ` +
-			`e3: _|_((!="a" & <5):unsupported op &(string, number))}`,
+			`e1: _|_(("foo" =~ 1):invalid operation "foo" =~ 1 (mismatched types string and int)), ` +
+			`e2: _|_(("foo" !~ true):invalid operation "foo" !~ true (mismatched types string and bool)), ` +
+			`e3: _|_((!="a" & <5):conflicting values !="a" and <5 (mismatched types string and number))}`,
 	}, {
 		desc: "arithmetic",
 		in: `
@@ -173,15 +173,15 @@ func TestBasicRewrite(t *testing.T) {
 			`v4: 2.0, ` +
 			`v5: 0, ` +
 
-			`e0: _|_((2 + "a"):unsupported op +(int, string)), ` +
+			`e0: _|_((2 + "a"):invalid operation 2 + "a" (mismatched types int and string)), ` +
 			// `e1: _|_((2.0 / 1):unsupported op /(float, int)), ` +
 			// `e2: _|_((1 / 2.0):unsupported op /(int, float)), ` +
 			// `e3: _|_((3.0 % 2):unsupported op %(float, int)), ` +
 			// `e4: _|_((1 % 2.0):unsupported op %(int, float)), ` +
-			`e5: _|_((1.0 div 2):unsupported op div(float, int)), ` +
-			`e6: _|_((2 rem 2.0):unsupported op rem(int, float)), ` +
-			`e7: _|_((2 quo 2.0):unsupported op quo(int, float)), ` +
-			`e8: _|_((1.0 mod 1):unsupported op mod(float, int))}`,
+			`e5: _|_((1.0 div 2):invalid operation 1.0 div 2 (mismatched types float and int)), ` +
+			`e6: _|_((2 rem 2.0):invalid operation 2 rem 2.0 (mismatched types int and float)), ` +
+			`e7: _|_((2 quo 2.0):invalid operation 2 quo 2.0 (mismatched types int and float)), ` +
+			`e8: _|_((1.0 mod 1):invalid operation 1.0 mod 1 (mismatched types float and int))}`,
 	}, {
 		desc: "integer-specific arithmetic",
 		in: `
@@ -216,17 +216,17 @@ func TestBasicRewrite(t *testing.T) {
 			// TODO: handle divide by zero
 			`,
 		out: `<0>{q1: 2, q2: -2, q3: -2, q4: 2, ` +
-			`qe1: _|_((2.0 quo 1):unsupported op quo(float, int)), ` +
-			`qe2: _|_((2 quo 1.0):unsupported op quo(int, float)), ` +
-			`r1: 1, r2: 1, r3: -1, r4: -1, re1: ` +
-			`_|_((2.0 rem 1):unsupported op rem(float, int)), ` +
-			`re2: _|_((2 rem 1.0):unsupported op rem(int, float)), ` +
+			`qe1: _|_((2.0 quo 1):invalid operation 2.0 quo 1 (mismatched types float and int)), ` +
+			`qe2: _|_((2 quo 1.0):invalid operation 2 quo 1.0 (mismatched types int and float)), ` +
+			`r1: 1, r2: 1, r3: -1, r4: -1, ` +
+			`re1: _|_((2.0 rem 1):invalid operation 2.0 rem 1 (mismatched types float and int)), ` +
+			`re2: _|_((2 rem 1.0):invalid operation 2 rem 1.0 (mismatched types int and float)), ` +
 			`d1: 2, d2: -2, d3: -3, d4: 3, ` +
-			`de1: _|_((2.0 div 1):unsupported op div(float, int)), ` +
-			`de2: _|_((2 div 1.0):unsupported op div(int, float)), ` +
+			`de1: _|_((2.0 div 1):invalid operation 2.0 div 1 (mismatched types float and int)), ` +
+			`de2: _|_((2 div 1.0):invalid operation 2 div 1.0 (mismatched types int and float)), ` +
 			`m1: 1, m2: 1, m3: 1, m4: 1, ` +
-			`me1: _|_((2.0 mod 1):unsupported op mod(float, int)), ` +
-			`me2: _|_((2 mod 1.0):unsupported op mod(int, float))}`,
+			`me1: _|_((2.0 mod 1):invalid operation 2.0 mod 1 (mismatched types float and int)), ` +
+			`me2: _|_((2 mod 1.0):invalid operation 2 mod 1.0 (mismatched types int and float))}`,
 	}, {
 		desc: "booleans",
 		in: `
@@ -237,7 +237,7 @@ func TestBasicRewrite(t *testing.T) {
 			e: true
 			e: !true
 			`,
-		out: "<0>{t: true, f: false, e: _|_(true:conflicting values: true != false)}",
+		out: "<0>{t: true, f: false, e: _|_(true:conflicting values true and false)}",
 	}, {
 		desc: "boolean arithmetic",
 		in: `
@@ -248,7 +248,7 @@ func TestBasicRewrite(t *testing.T) {
 			e: true & true
 			f: true & false
 			`,
-		out: "<0>{a: true, b: true, c: false, d: true, e: true, f: _|_(true:conflicting values: true != false)}",
+		out: "<0>{a: true, b: true, c: false, d: true, e: true, f: _|_(true:conflicting values true and false)}",
 	}, {
 		desc: "basic type",
 		in: `
@@ -261,7 +261,7 @@ func TestBasicRewrite(t *testing.T) {
 			f: true
 			f: bool
 			`,
-		out: `<0>{a: 1, b: 1, c: 1.0, d: _|_((int & float):unsupported op &(int, float)), e: "4", f: true}`,
+		out: `<0>{a: 1, b: 1, c: 1.0, d: _|_((int & float):conflicting values int and float (mismatched types int and float)), e: "4", f: true}`, // TODO: eliminate redundancy
 	}, {
 		desc: "strings and bytes",
 		in: `
@@ -285,8 +285,8 @@ func TestBasicRewrite(t *testing.T) {
 			`b1: 'abcabcabc', ` +
 			`b2: 'abcabc', ` +
 
-			`e0: _|_(("a" + ''):unsupported op +(string, bytes)), ` +
-			`e1: _|_(('b' + "c"):unsupported op +(bytes, string))` +
+			`e0: _|_(("a" + ''):invalid operation "a" + '' (mismatched types string and bytes)), ` +
+			`e1: _|_(('b' + "c"):invalid operation 'b' + "c" (mismatched types bytes and string))` +
 			`}`,
 	}, {
 		desc: "escaping",
@@ -330,7 +330,7 @@ func TestBasicRewrite(t *testing.T) {
 			e4: [1, 2, ...>=4 & <=5] & [1, 2, 4, 8]
 			e5: [1, 2, 4, 8] & [1, 2, ...>=4 & <=5]
 			`,
-		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):unsupported op &(list, int)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)], e5: [1,2,4,_|_((<=5 & 8):8 not within bound <=5)]}`,
+		out: `<0>{list: [1,2,3], index: 2, unify: [1,2,3], e: _|_(([] & 4):conflicting values [] and 4 (mismatched types list and int)), e2: _|_("d":invalid list index "d" (type string)), e3: _|_(-1:invalid list index -1 (index must be non-negative)), e4: [1,2,4,_|_((<=5 & 8):invalid value 8 (out of bound <=5))], e5: [1,2,4,_|_((<=5 & 8):invalid value 8 (out of bound <=5))]}`,
 	}, {
 		desc: "list arithmetic",
 		in: `
@@ -377,7 +377,7 @@ func TestBasicRewrite(t *testing.T) {
 			e: 1                       // 1 & {a:3}
 			e: {a:3}
 			`,
-		out: "<0>{o1: <1>{a: 1, b: 2}, o2: <2>{a: 1, b: 2}, o3: <3>{a: 1, b: 2}, o4: <4>{a: 1, b: 2}, e: _|_((1 & <5>{a: 3}):unsupported op &(int, struct))}",
+		out: "<0>{o1: <1>{a: 1, b: 2}, o2: <2>{a: 1, b: 2}, o3: <3>{a: 1, b: 2}, o4: <4>{a: 1, b: 2}, e: _|_((1 & <5>{a: 3}):conflicting values 1 and {a: 3} (mismatched types int and struct))}",
 	}, {
 		desc: "disjunctions",
 		in: `
@@ -429,7 +429,7 @@ func TestBasicRewrite(t *testing.T) {
 			p: +true
 			m: -false
 		`,
-		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):unsupported op &(int, string)), e2: _|_((1 & string):unsupported op &(int, string)), b: _|_(!int:unary '!' requires bool value, found int), p: _|_(+true:unary '+' requires numeric value, found bool), m: _|_(-false:unary '-' requires numeric value, found bool)}`,
+		out: `<0>{i: int, j: 3, s: string, t: "s", e: _|_((int & string):conflicting values int and string (mismatched types int and string)), e2: _|_((1 & string):conflicting values 1 and string (mismatched types int and string)), b: _|_(!int:invalid operation !int (! int)), p: _|_(+true:invalid operation +true (+ bool)), m: _|_(-false:invalid operation -false (- bool))}`,
 	}, {
 		desc: "comparison",
 		in: `
@@ -443,7 +443,7 @@ func TestBasicRewrite(t *testing.T) {
 			seq: "a" + "b" == "ab"
 			err: 2 == "s"
 		`,
-		out: `<0>{lss: true, leq: true, eql: true, neq: true, gtr: true, geq: true, seq: true, err: _|_((2 == "s"):unsupported op ==(int, string))}`,
+		out: `<0>{lss: true, leq: true, eql: true, neq: true, gtr: true, geq: true, seq: true, err: _|_((2 == "s"):invalid operation 2 == "s" (mismatched types int and string))}`,
 	}, {
 		desc: "null",
 		in: `
@@ -510,9 +510,9 @@ func TestBasicRewrite(t *testing.T) {
 			x: x + 1
 		`,
 		out: `<0>{` +
-			`a: _|_((210 & 200):conflicting values: 210 != 200), ` +
-			`b: _|_((210 & 200):conflicting values: 210 != 200), ` +
-			`x: _|_((100 & 101):conflicting values: 100 != 101)}`,
+			`a: _|_((210 & 200):conflicting values 210 and 200), ` +
+			`b: _|_((210 & 200):conflicting values 210 and 200), ` +
+			`x: _|_((100 & 101):conflicting values 100 and 101)}`,
 		// TODO: find a way to mark error in data.
 	}}
 	rewriteHelper(t, testCases, evalPartial)
@@ -588,7 +588,7 @@ func TestResolve(t *testing.T) {
 				e1: 2.0 % (3&int)
 				e2: int & 4.0/2.0
 				`,
-		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: 2.0, e2: _|_((int & 2):unsupported op &(int, float))}`,
+		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e1: 2.0, e2: _|_((int & (4.0 / 2.0)):conflicting values int and (4.0 / 2.0) (mismatched types int and float))}`,
 	}, {
 		desc: "inequality",
 		in: `
@@ -719,15 +719,15 @@ func TestResolve(t *testing.T) {
 
 			`s30: int & >0, ` +
 
-			`e1: _|_((!=null & null):null excluded by !=null), ` +
-			`e2: _|_((!=null & null):null excluded by !=null), ` +
-			`e3: _|_((>1 & 1):1 not within bound >1), ` +
-			`e4: _|_((<0 & 0):0 not within bound <0), ` +
-			`e5: _|_(incompatible bounds >1 and <0), ` +
-			`e6: _|_(incompatible bounds >11 and <11), ` +
-			`e7: _|_(incompatible bounds >=11 and <11), ` +
-			`e8: _|_(incompatible bounds >11 and <=11), ` +
-			`e9: _|_((>"a" & <1):unsupported op &(string, number))}`,
+			`e1: _|_((!=null & null):invalid value null (excluded by !=null)), ` +
+			`e2: _|_((!=null & null):invalid value null (excluded by !=null)), ` +
+			`e3: _|_((>1 & 1):invalid value 1 (out of bound >1)), ` +
+			`e4: _|_((<0 & 0):invalid value 0 (out of bound <0)), ` +
+			`e5: _|_(conflicting bounds >1 and <0), ` +
+			`e6: _|_(conflicting bounds >11 and <11), ` +
+			`e7: _|_(conflicting bounds >=11 and <11), ` +
+			`e8: _|_(conflicting bounds >11 and <=11), ` +
+			`e9: _|_((>"a" & <1):conflicting values >"a" and <1 (mismatched types string and number))}`,
 	}, {
 		desc: "custom validators",
 		in: `
@@ -741,7 +741,7 @@ func TestResolve(t *testing.T) {
 		`,
 		out: `<0>{` +
 			`a: "after", ` +
-			`b: _|_(builtin:ContainsAny ("c"):value "dog" not in ContainsAny("c"))` +
+			`b: _|_(builtin:ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c")))` +
 			`}`,
 	}, {
 		desc: "null coalescing",
@@ -750,7 +750,7 @@ func TestResolve(t *testing.T) {
 			b: a.x | "b"
 			c: a["x"] | "c"
 			`,
-		out: `<1>{a: null, b: "b", c: "c"}`,
+		out: `<0>{a: null, b: "b", c: "c"}`,
 	}, {
 		desc: "reference across tuples and back",
 		// Tests that it is okay to partially evaluate structs.
@@ -867,8 +867,8 @@ func TestResolve(t *testing.T) {
 			`i2: 3, ` +
 			`t0: [<3>{a: 8}], ` +
 			`t1: [, ...int], ` +
-			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):incompatible list lengths: conflicting values: 2 != 1), ` +
-			`e1: _|_(([, ...int] & [, ...float]):incompatible list types: unsupported op &(int, float): )` +
+			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):conflicting list lengths: conflicting values 2 and 1), ` +
+			`e1: _|_((int & float):conflicting list element types: conflicting values int and float (mismatched types int and float))` +
 			`}`,
 	}, {
 		// TODO: consider removing list arithmetic altogether. It is no longer
@@ -1057,7 +1057,7 @@ func TestResolve(t *testing.T) {
 		in: `
 			a: "a" & 1
 			`,
-		out: `<0>{a: _|_(("a" & 1):unsupported op &(string, int))}`,
+		out: `<0>{a: _|_(("a" & 1):conflicting values "a" and 1 (mismatched types string and int))}`,
 	}, {
 		desc: "structs",
 		in: `
@@ -1260,15 +1260,14 @@ func TestResolve(t *testing.T) {
 			`a1: 3, ` +
 			`a2: 1, ` +
 			`a3: 5, ` +
-			`a4: _|_((<=5 & 6):6 not within bound <=5), ` +
-			`a5: _|_((>=1 & 0):0 not within bound >=1), ` +
+			`a4: _|_((<=5 & 6):invalid value 6 (out of bound <=5)), ` +
+			`a5: _|_((>=1 & 0):invalid value 0 (out of bound >=1)), ` +
 			`a6: 3, ` +
 			`a7: 1, ` +
 			`a8: 5, ` +
 
-			// TODO: improve error
-			`a9: _|_((<=5 & 6):6 not within bound <=5), ` +
-			`a10: _|_((>=1 & 0):0 not within bound >=1), ` +
+			`a9: _|_((<=5 & 6):invalid value 6 (out of bound <=5)), ` +
+			`a10: _|_((>=1 & 0):invalid value 0 (out of bound >=1)), ` +
 
 			`b1: (>=1 & <=5), ` +
 			`b2: 1, ` +
@@ -1276,18 +1275,18 @@ func TestResolve(t *testing.T) {
 			`b4: (>=2 & <=3), ` +
 			`b5: (>=3 & <=5), ` +
 			`b6: 5, ` +
-			`b7: _|_(incompatible bounds >=6 and <=5), ` +
+			`b7: _|_(conflicting bounds >=6 and <=5), ` +
 			`b8: (>=1 & <=5), ` +
 			`b9: 1, ` +
 			`b10: 5, ` +
 			`b11: (>=2 & <=3), ` +
 			`b12: (>=3 & <=5), ` +
 			`b13: 5, ` +
-			`b14: _|_(incompatible bounds >=6 and <=5), ` +
+			`b14: _|_(conflicting bounds >=6 and <=5), ` +
 			`c1: (int & >=1 & <=5), ` +
 			`c2: (<=5 & int & >=1), ` +
-			`c3: _|_((string & >=1):unsupported op &(string, number)), ` +
-			`c4: _|_(((>=1 & <=5) & string):unsupported op &(number, string)), ` +
+			`c3: _|_((string & >=1):conflicting values string and >=1 (mismatched types string and number)), ` +
+			`c4: _|_(((>=1 & <=5) & string):conflicting values (>=1 & <=5) and string (mismatched types number and string)), ` +
 			`s1: "e", ` +
 			`s2: "ee", ` +
 			`n1: (>=1 & <=2), ` +
@@ -1308,7 +1307,7 @@ func TestResolve(t *testing.T) {
 			e1: 100_000
 		`,
 		out: `<0>{k1: 44, k2: -8000000000, ` +
-			`e1: _|_((int & <=32767 & 100000):100000 not within bound int & <=32767)}`,
+			`e1: _|_((int & <=32767 & 100000):invalid value 100000 (out of bound int & <=32767))}`,
 	}, {
 		desc: "field comprehensions",
 		in: `
@@ -1342,10 +1341,10 @@ func TestResolve(t *testing.T) {
 		out: `<0>{` +
 			`a1: <1>{a: (=~"oo" & =~"fo"), b: =~"oo", c: =~"fo"}, ` +
 			`a2: <2>{a: "foo", b: =~"oo", c: =~"fo"}, ` +
-			`a3: <3>{a: _|_((=~"oo" & "bar"):"bar" does not match =~"oo"), b: =~"oo", c: =~"fo"}, ` +
+			`a3: <3>{a: _|_((=~"oo" & "bar"):invalid value "bar" (does not match =~"oo")), b: =~"oo", c: =~"fo"}, ` +
 			`o1: <4>{a: string, b: string, c: "bar"}, ` +
 			`o2: <5>{a: "foo", b: string, c: "bar"}, ` +
-			`o3: <6>{a: _|_((builtin:or ([<7>.b,<7>.c]) & "foo"):empty disjunction: conflicting values: baz != foo), b: "baz", c: "bar"}}`,
+			`o3: <6>{a: _|_((builtin:or ([<7>.b,<7>.c]) & "foo"):empty disjunction: conflicting values "baz" and "foo"), b: "baz", c: "bar"}}`,
 	}, {
 		desc: "self-reference cycles conflicts with strings",
 		in: `
@@ -1355,7 +1354,7 @@ func TestResolve(t *testing.T) {
 			}
 			a x: "hey"
 		`,
-		out: `<0>{a: <1>{x: _|_(("hey!?" & "hey"):conflicting values: hey!? != hey), y: "hey!"}}`,
+		out: `<0>{a: <1>{x: _|_(("hey!?" & "hey"):conflicting values "hey!?" and "hey"), y: "hey!"}}`,
 	}, {
 		desc: "resolved self-reference cycles with disjunctions",
 		in: `
@@ -1453,11 +1452,11 @@ func TestResolve(t *testing.T) {
 			`xd5: 10, ` +
 			`xd3: 6, ` +
 
-			`xe1: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe2: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe4: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe5: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe3: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe1: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe2: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe4: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe5: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe3: _|_((6 & 7):conflicting values 6 and 7), ` +
 
 			`xf1: 8, ` +
 			`xf2: 8, ` +
@@ -1543,11 +1542,11 @@ func TestResolve(t *testing.T) {
 			`xd5: 10, ` +
 			`xd3: 6, ` +
 
-			`xe1: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe2: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe4: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe5: _|_((6 & 7):conflicting values: 6 != 7), ` +
-			`xe3: _|_((6 & 7):conflicting values: 6 != 7), ` +
+			`xe1: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe2: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe4: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe5: _|_((6 & 7):conflicting values 6 and 7), ` +
+			`xe3: _|_((6 & 7):conflicting values 6 and 7), ` +
 
 			`z1: (*11 | 13), ` + // 13 is eliminated with evalFull
 			`z2: 10, ` +
@@ -1562,7 +1561,7 @@ func TestFullEval(t *testing.T) {
 		in: `
 				a: 8000.9
 				a: 7080 | int`,
-		out: `<0>{a: _|_((8000.9 & int):unsupported op &(float, int))}`,
+		out: `<0>{a: _|_((8000.9 & (int | int)):conflicting values 8000.9 and int (mismatched types float and int))}`, // TODO: fix repetition
 	}, {
 		desc: "resolve all disjunctions",
 		in: `
@@ -1907,7 +1906,7 @@ func TestFullEval(t *testing.T) {
 			x: {a:1}|{a:2}
 			y: x & {a:3}
 		`,
-		out: `<3>{x: _|_((<0>{a: 1} | <1>{a: 2}):more than one element remaining (<0>{a: 1} and <1>{a: 2})), y: _|_((<4>.x & <5>{a: 3}):empty disjunction: <2>{a: (1 & 3)})}`,
+		out: `<0>{x: _|_((<1>{a: 1} | <2>{a: 2}):more than one element remaining ({a: 1} and {a: 2})), y: _|_((<3>.x & <4>{a: 3}):empty disjunction: {a: (1 & 3)})}`,
 	}, {
 		desc: "cannot resolve references that would be ambiguous",
 		in: `
@@ -1923,14 +1922,14 @@ func TestFullEval(t *testing.T) {
 		c1: (*{a:1} | {b:1}) & c2
 		c2: (*{a:2} | {b:2}) & c1
 		`,
-		out: `<4>{` +
-			`a1: _|_(((*0 | 1) & (<5>.a3 - <5>.a2)):cycle detected), ` +
+		out: `<0>{` +
+			`a1: _|_(((*0 | 1) & (<1>.a3 - <1>.a2)):cycle detected), ` +
 			`a3: 1, ` +
-			`a2: _|_(((*0 | 1) & (<5>.a3 - <5>.a1)):cycle detected), ` +
+			`a2: _|_(((*0 | 1) & (<1>.a3 - <1>.a1)):cycle detected), ` +
 			`b1: _|_((0 | 1 | *_|_):more than one element remaining (0 and 1)), ` +
 			`b2: _|_((0 | 1 | *_|_):more than one element remaining (0 and 1)), ` +
-			`c1: _|_((<0>{a: 1, b: 2} | <1>{a: 2, b: 1} | *_|_):more than one element remaining (<0>{a: 1, b: 2} and <1>{a: 2, b: 1})), ` +
-			`c2: _|_((<2>{a: 2, b: 1} | <3>{a: 1, b: 2} | *_|_):more than one element remaining (<2>{a: 2, b: 1} and <3>{a: 1, b: 2}))}`,
+			`c1: _|_((<2>{a: 1, b: 2} | <3>{a: 2, b: 1} | *_|_):more than one element remaining ({a: 1, b: 2} and {a: 2, b: 1})), ` +
+			`c2: _|_((<4>{a: 2, b: 1} | <5>{a: 1, b: 2} | *_|_):more than one element remaining ({a: 2, b: 1} and {a: 1, b: 2}))}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

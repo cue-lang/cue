@@ -23,7 +23,14 @@ import (
 
 func debugStr(ctx *context, v value) string {
 	p := newPrinter(ctx)
-	p.debugStr(v)
+	p.showNodeRef = true
+	p.str(v)
+	return p.w.String()
+}
+
+func (c *context) str(v value) string {
+	p := newPrinter(c)
+	p.str(v)
 	return p.w.String()
 }
 
@@ -123,8 +130,9 @@ func newPrinter(ctx *context) *printer {
 }
 
 type printer struct {
-	ctx *context
-	w   *bytes.Buffer
+	ctx         *context
+	w           *bytes.Buffer
+	showNodeRef bool
 }
 
 func (p *printer) label(f label) string {
@@ -154,7 +162,7 @@ func lambdaName(f label, v value) label {
 	return f
 }
 
-func (p *printer) debugStr(v interface{}) {
+func (p *printer) str(v interface{}) {
 	writef := p.writef
 	write := p.write
 	switch x := v.(type) {
@@ -164,45 +172,50 @@ func (p *printer) debugStr(v interface{}) {
 		write(x)
 	case *builtin:
 		write("builtin:")
-		p.debugStr(x.Name)
+		p.str(x.Name)
 	case *nodeRef:
-		writef("<%s>", p.ctx.ref(x.node))
-		// p.debugStr(x.node)
+		if p.showNodeRef {
+			writef("<%s>", p.ctx.ref(x.node))
+		}
 	case *selectorExpr:
-		p.debugStr(x.x)
 		f := lambdaName(x.feature, x.x)
-		writef(".%v", p.label(f))
+		if _, ok := x.x.(*nodeRef); ok && !p.showNodeRef {
+			write(p.label(f))
+		} else {
+			p.str(x.x)
+			writef(".%v", p.label(f))
+		}
 	case *indexExpr:
-		p.debugStr(x.x)
+		p.str(x.x)
 		write("[")
-		p.debugStr(x.index)
+		p.str(x.index)
 		write("]")
 	case *sliceExpr:
-		p.debugStr(x.x)
+		p.str(x.x)
 		write("[")
 		if x.lo != nil {
-			p.debugStr(x.lo)
+			p.str(x.lo)
 		}
 		write(":")
 		if x.hi != nil {
-			p.debugStr(x.hi)
+			p.str(x.hi)
 		}
 		write("]")
 	case *callExpr:
-		p.debugStr(x.x)
+		p.str(x.x)
 		write(" (")
 		for i, a := range x.args {
-			p.debugStr(a)
+			p.str(a)
 			if i < len(x.args)-1 {
 				write(",")
 			}
 		}
 		write(")")
 	case *customValidator:
-		p.debugStr(x.call)
+		p.str(x.call)
 		write(" (")
 		for i, a := range x.args {
-			p.debugStr(a)
+			p.str(a)
 			if i < len(x.args)-1 {
 				write(",")
 			}
@@ -210,12 +223,12 @@ func (p *printer) debugStr(v interface{}) {
 		write(")")
 	case *unaryExpr:
 		write(x.op)
-		p.debugStr(x.x)
+		p.str(x.x)
 	case *binaryExpr:
 		write("(")
-		p.debugStr(x.left)
+		p.str(x.left)
 		writef(" %v ", x.op)
-		p.debugStr(x.right)
+		p.str(x.right)
 		write(")")
 	case *unification:
 		write("(")
@@ -223,7 +236,7 @@ func (p *printer) debugStr(v interface{}) {
 			if i != 0 {
 				writef(" & ")
 			}
-			p.debugStr(v)
+			p.str(v)
 		}
 		write(")")
 	case *disjunction:
@@ -235,30 +248,35 @@ func (p *printer) debugStr(v interface{}) {
 			if v.marked {
 				writef("*")
 			}
-			p.debugStr(v.val)
+			p.str(v.val)
 		}
 		write(")")
 	case *lambdaExpr:
-		writef("<%s>(", p.ctx.ref(x))
-		p.debugStr(x.params.arcs)
+		if p.showNodeRef {
+			writef("<%s>", p.ctx.ref(x))
+		}
+		write("(")
+		p.str(x.params.arcs)
 		write(")->")
-		p.debugStr(x.value)
+		p.str(x.value)
 
 	case *structLit:
 		if x == nil {
 			write("*nil node*")
 			break
 		}
-		p.writef("<%s>", p.ctx.ref(x))
+		if p.showNodeRef {
+			p.writef("<%s>", p.ctx.ref(x))
+		}
 		writef("{")
 		if x.template != nil {
 			write("<>: ")
-			p.debugStr(x.template)
+			p.str(x.template)
 			write(", ")
 		}
-		p.debugStr(x.arcs)
+		p.str(x.arcs)
 		for i, c := range x.comprehensions {
-			p.debugStr(c)
+			p.str(c)
 			if i < len(x.comprehensions)-1 {
 				p.write(", ")
 			}
@@ -267,7 +285,7 @@ func (p *printer) debugStr(v interface{}) {
 
 	case []arc:
 		for i, a := range x {
-			p.debugStr(a)
+			p.str(a)
 
 			if i < len(x)-1 {
 				p.write(", ")
@@ -286,7 +304,7 @@ func (p *printer) debugStr(v interface{}) {
 			p.write("?")
 		}
 		p.write(": ")
-		p.debugStr(n)
+		p.str(n)
 		if x.attrs != nil {
 			for _, a := range x.attrs.attr {
 				p.write(" ", a.text)
@@ -294,22 +312,22 @@ func (p *printer) debugStr(v interface{}) {
 		}
 
 	case *fieldComprehension:
-		p.debugStr(x.clauses)
+		p.str(x.clauses)
 
 	case *listComprehension:
 		writef("[")
-		p.debugStr(x.clauses)
+		p.str(x.clauses)
 		write(" ]")
 
 	case *yield:
 		writef(" yield ")
 		writef("(")
-		p.debugStr(x.key)
+		p.str(x.key)
 		if x.opt {
 			writef("?")
 		}
 		writef("): ")
-		p.debugStr(x.value)
+		p.str(x.value)
 
 	case *feed:
 		writef(" <%s>for ", p.ctx.ref(x.fn))
@@ -319,13 +337,13 @@ func (p *printer) debugStr(v interface{}) {
 		a = x.fn.params.arcs[1]
 		p.writef(p.label(a.feature))
 		writef(" in ")
-		p.debugStr(x.source)
-		p.debugStr(x.fn.value)
+		p.str(x.source)
+		p.str(x.fn.value)
 
 	case *guard:
 		writef(" if ")
-		p.debugStr(x.condition)
-		p.debugStr(x.value)
+		p.str(x.condition)
+		p.str(x.value)
 
 	case *nullLit:
 		write("null")
@@ -353,13 +371,13 @@ func (p *printer) debugStr(v interface{}) {
 			p.writef("float & ")
 		}
 		p.writef("%v", x.op)
-		p.debugStr(x.value)
+		p.str(x.value)
 	case *interpolation:
 		for i, e := range x.parts {
 			if i != 0 {
 				write("+")
 			}
-			p.debugStr(e)
+			p.str(e)
 		}
 	case *list:
 		// TODO: do not evaluate
@@ -384,9 +402,9 @@ func (p *printer) debugStr(v interface{}) {
 		}
 		if !ok || ln > len(x.elem.arcs) {
 			if !open && !isTop(x.typ) {
-				p.debugStr(x.len)
+				p.str(x.len)
 				write("*[")
-				p.debugStr(x.typ)
+				p.str(x.typ)
 				write("]")
 				if len(x.elem.arcs) == 0 {
 					break
@@ -398,7 +416,7 @@ func (p *printer) debugStr(v interface{}) {
 		}
 		write("[")
 		for i, a := range x.elem.arcs {
-			p.debugStr(a.v)
+			p.str(a.v)
 			if i < len(x.elem.arcs)-1 {
 				write(",")
 			}
@@ -406,7 +424,7 @@ func (p *printer) debugStr(v interface{}) {
 		if ellipsis {
 			write(", ...")
 			if !isTop(x.typ) {
-				p.debugStr(x.typ)
+				p.str(x.typ)
 			}
 		}
 		write("]")
@@ -418,8 +436,9 @@ func (p *printer) debugStr(v interface{}) {
 		write("_|_")
 		if x.value != nil || x.format != "" {
 			write("(")
-			if x.value != nil {
-				writef("%s:", debugStr(p.ctx, x.value))
+			if x.value != nil && p.showNodeRef {
+				p.str(x.value)
+				p.write(":")
 			}
 			write(x.msg())
 			write(")")

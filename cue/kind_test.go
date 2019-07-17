@@ -54,7 +54,7 @@ func TestMatchBinOpKind(t *testing.T) {
 	for _, tc := range testCases {
 		key := fmt.Sprintf("%s(%v, %v)", tc.op, tc.a, tc.b)
 		t.Run(key, func(t *testing.T) {
-			got, _ := matchBinOpKind(tc.op, tc.a, tc.b)
+			got, _, _ := matchBinOpKind(tc.op, tc.a, tc.b)
 			if got != tc.want {
 				t.Errorf("got %v, want %v", got, tc.want)
 			}

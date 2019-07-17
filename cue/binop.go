@@ -16,6 +16,7 @@ package cue
 
 import (
 	"bytes"
+	"fmt"
 	"math/big"
 	"regexp"
 	"sort"
@@ -54,9 +55,27 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 
 	leftKind := left.kind()
 	rightKind := right.kind()
-	kind, invert := matchBinOpKind(op, leftKind, rightKind)
+	kind, invert, msg := matchBinOpKind(op, leftKind, rightKind)
 	if kind == bottomKind {
-		return ctx.mkIncompatible(src, op, left, right)
+		simplify := func(v, orig value) value {
+			switch x := v.(type) {
+			case *disjunction:
+				return orig
+			case *binaryExpr:
+				if x.op == opDisjunction {
+					return orig
+				}
+			default:
+				return x
+			}
+			return v
+		}
+		var l, r value = left, right
+		if x, ok := src.(*binaryExpr); ok {
+			l = simplify(x.left, left)
+			r = simplify(x.right, right)
+		}
+		return ctx.mkErr(src, msg, op, ctx.str(l), ctx.str(r), leftKind, rightKind)
 	}
 	if kind.hasReferences() {
 		panic("unexpected references in expression")
@@ -274,14 +293,14 @@ func errOutOfBounds(ctx *context, pos token.Pos, r *bound, v evaluated) *bottom 
 		pos = r.Pos()
 	}
 	e := mkBin(ctx, pos, opUnify, r, v)
-	msg := "%v not within bound %v"
+	msg := "invalid value %v (out of bound %v)"
 	switch r.op {
 	case opNeq, opNMat:
-		msg = "%v excluded by %v"
+		msg = "invalid value %v (excluded by %v)"
 	case opMat:
-		msg = "%v does not match %v"
+		msg = "invalid value %v (does not match %v)"
 	}
-	return ctx.mkErr(e, msg, debugStr(ctx, v), debugStr(ctx, r))
+	return ctx.mkErr(e, msg, ctx.str(v), ctx.str(r))
 }
 
 func opInfo(op op) (cmp op, norm int) {
@@ -310,8 +329,9 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
 	case opUnify:
-		k, _ := matchBinOpKind(opUnify, x.kind(), other.kind())
+		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
 		if k == bottomKind {
+			return ctx.mkErr(src, msg, opUnify, ctx.str(x), ctx.str(other), x.kind(), other.kind())
 			break
 		}
 		switch y := other.(type) {
@@ -433,8 +453,8 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 					fallthrough
 
 				case d.Negative:
-					return ctx.mkErr(newSrc, "incompatible bounds %v and %v",
-						debugStr(ctx, x), debugStr(ctx, y))
+					return ctx.mkErr(newSrc, "conflicting bounds %v and %v",
+						ctx.str(x), ctx.str(y))
 				}
 
 			case x.op == opNeq:
@@ -477,8 +497,9 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
 	case opUnify:
-		k, _ := matchBinOpKind(opUnify, x.kind(), other.kind())
+		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
 		if k == bottomKind {
+			return ctx.mkErr(src, msg, op, ctx.str(x), ctx.str(other), x.kind(), other.kind())
 			break
 		}
 		switch y := other.(type) {
@@ -513,7 +534,7 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 			return y
 		}
 	}
-	return ctx.mkIncompatible(src, op, x, other)
+	return ctx.mkErr(src, "invalid operation %v and %v (operator not defined for custom validator)")
 }
 
 func (x *customValidator) check(ctx *context, v evaluated) evaluated {
@@ -531,13 +552,13 @@ func (x *customValidator) check(ctx *context, v evaluated) evaluated {
 		return ctx.mkErr(x, "invalid custom validator")
 	} else if !b.b {
 		var buf bytes.Buffer
-		buf.WriteString(x.call.Name)
+		fmt.Fprintf(&buf, "%s.%s", ctx.labelStr(x.call.pkg), x.call.Name)
 		buf.WriteString("(")
 		for _, a := range x.args {
-			buf.WriteString(debugStr(ctx, a))
+			buf.WriteString(ctx.str(a))
 		}
 		buf.WriteString(")")
-		return ctx.mkErr(x, "value %v not in %v", debugStr(ctx, v), buf.String())
+		return ctx.mkErr(x, "invalid value %s (does not satisfy %s)", ctx.str(v), buf.String())
 	}
 	return nil
 }
@@ -681,7 +702,7 @@ func (x *boolLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 		switch op {
 		case opUnify:
 			if x.b != y.b {
-				return ctx.mkErr(x, "conflicting values: %v != %v", x.b, y.b)
+				return ctx.mkErr(x, "conflicting values %v and %v", x.b, y.b)
 			}
 			return x
 		case opLand:
@@ -711,7 +732,8 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			str := other.strValue()
 			if x.str != str {
 				src := mkBin(ctx, src.Pos(), op, x, other)
-				return ctx.mkErr(src, "conflicting values: %v != %v", x.str, str)
+				return ctx.mkErr(src, "conflicting values %v and %v",
+					ctx.str(x), ctx.str(y))
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
@@ -762,7 +784,8 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 		switch op {
 		case opUnify:
 			if !bytes.Equal(x.b, b) {
-				return ctx.mkErr(x, "conflicting values: %v != %v", x.b, b)
+				return ctx.mkErr(x, "conflicting values %v and %v",
+					ctx.str(x), ctx.str(y))
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
@@ -867,7 +890,8 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		case opUnify:
 			if x.v.Cmp(&y.v) != 0 {
 				src = mkBin(ctx, src.Pos(), op, x, other)
-				return ctx.mkErr(src, "conflicting values: %v != %v", x.strValue(), y.strValue())
+				return ctx.mkErr(src, "conflicting values %v and %v",
+					ctx.str(x), ctx.str(y))
 			}
 			if k != x.k {
 				n.v = x.v
@@ -1010,7 +1034,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		n := unify(ctx, src, x.len.(evaluated), y.len.(evaluated))
 		if isBottom(n) {
 			src = mkBin(ctx, src.Pos(), op, x, other)
-			return ctx.mkErr(src, "incompatible list lengths: %v", n)
+			return ctx.mkErr(src, "conflicting list lengths: %v", n)
 		}
 		sx := x.elem.arcs
 		xa := sx
@@ -1026,10 +1050,10 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		typ := x.typ
 		max, ok := n.(*numLit)
 		if !ok || len(xa) < max.intValue(ctx) {
+			src := mkBin(ctx, src.Pos(), op, x.typ, y.typ)
 			typ = unify(ctx, src, x.typ.(evaluated), y.typ.(evaluated))
 			if isBottom(typ) {
-				src = mkBin(ctx, src.Pos(), op, x, other)
-				return ctx.mkErr(src, "incompatible list types: %v: ", typ)
+				return ctx.mkErr(src, "conflicting list element types: %v", typ)
 			}
 		}
 

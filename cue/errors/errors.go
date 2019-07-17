@@ -477,7 +477,7 @@ func printError(w io.Writer, err error, cfg *Config) {
 	}
 
 	if path := Path(err); path != nil {
-		fprintf(w, "%s:", strings.Join(path, "."))
+		fprintf(w, "%s: ", strings.Join(path, "."))
 	}
 
 	if len(positions) == 0 {

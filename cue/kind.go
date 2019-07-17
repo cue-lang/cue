@@ -159,9 +159,9 @@ finalize:
 // - keep type compatibility mapped at a central place
 // - reduce the amount op type switching.
 // - simplifies testing
-func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
+func matchBinOpKind(op op, a, b kind) (k kind, swap bool, msg string) {
 	if op == opDisjunction {
-		return a | b, false
+		return a | b, false, ""
 	}
 	u := unifyType(a, b)
 	valBits := u & typeKinds
@@ -171,57 +171,72 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 	a = a & typeKinds
 	b = b & typeKinds
 	if valBits == bottomKind {
+		msg := "invalid operation %[2]s %[1]s %[3]s (mismatched types %[4]s and %[5]s)"
 		k := nullKind
 		switch op {
 		case opLss, opLeq, opGtr, opGeq:
 			if a.isAnyOf(numKind) && b.isAnyOf(numKind) {
-				return boolKind, false
+				return boolKind, false, ""
 			}
 		case opEql, opNeq:
 			if a.isAnyOf(numKind) && b.isAnyOf(numKind) {
-				return boolKind, false
+				return boolKind, false, ""
 			}
-			fallthrough
-		case opUnify:
 			if a&nullKind != 0 {
-				return k, false
+				return k, false, ""
 			}
 			if b&nullKind != 0 {
-				return k, true
+				return k, true, ""
 			}
-			return bottomKind, false
+			return bottomKind, false, msg
+		case opUnify:
+			if a&nullKind != 0 {
+				return k, false, ""
+			}
+			if b&nullKind != 0 {
+				return k, true, ""
+			}
+			switch {
+			case a.isGround() && !b.isGround():
+				msg = "invalid value %[2]s (must be %[5]s)"
+			case !a.isGround() && b.isGround():
+				msg = "invalid value %[3]s (must be %[4]s)"
+			default:
+				msg = "conflicting values %[2]s and %[3]s (mismatched types %[4]s and %[5]s)"
+			}
+			return bottomKind, false, msg
 		case opRem, opQuo, opMul, opAdd, opSub:
 			if a.isAnyOf(numKind) && b.isAnyOf(numKind) {
-				return floatKind, false
+				return floatKind, false, ""
 			}
 		}
 		if op == opMul {
 			if a.isAnyOf(listKind|stringKind|bytesKind) && b.isAnyOf(intKind) {
-				return a | catBits, false
+				return a | catBits, false, ""
 			}
 			if b.isAnyOf(listKind|stringKind|bytesKind) && a.isAnyOf(intKind) {
-				return b | catBits, true
+				return b | catBits, true, ""
 			}
 		}
 		// non-overlapping types
 		if a&scalarKinds == 0 || b&scalarKinds == 0 {
-			return bottomKind, false
+			return bottomKind, false, msg
 		}
 		// a and b have different numeric types.
 		switch {
 		case b.isAnyOf(durationKind):
 			// a must be a numeric, non-duration type.
 			if op == opMul {
-				return durationKind | catBits, true
+				return durationKind | catBits, true, msg
 			}
 		case a.isAnyOf(durationKind):
 			if opIn(op, opMul, opQuo, opRem) {
-				return durationKind | catBits, false
+				return durationKind | catBits, false, msg
 			}
 		case op.isCmp():
-			return boolKind, false
+			return boolKind, false, ""
 		}
-		return bottomKind, false
+		return bottomKind, false, msg
 	}
 	switch {
 	case a&nonGround == 0 && b&nonGround == 0:
@@ -236,50 +251,52 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool) {
 	switch op {
 	case opUnify:
 		// Increase likelihood of unification succeeding on first try.
-		return u, swap
+		return u, swap, ""
 
 	case opLand, opLor:
 		if u.isAnyOf(boolKind) {
-			return boolKind | catBits, swap
+			return boolKind | catBits, swap, ""
 		}
 	case opEql, opNeq, opMat, opNMat:
 		if u.isAnyOf(fixedKinds) {
-			return boolKind | catBits, false
+			return boolKind | catBits, false, ""
 		}
 	case opLss, opLeq, opGeq, opGtr:
 		if u.isAnyOf(fixedKinds) {
-			return boolKind | catBits, false
+			return boolKind | catBits, false, ""
 		}
 	case opAdd:
 		if u.isAnyOf(addableKind) {
-			return u&(addableKind) | catBits, false
+			return u&(addableKind) | catBits, false, ""
 		}
 	case opSub:
 		if u.isAnyOf(scalarKinds) {
-			return u&scalarKinds | catBits, false
+			return u&scalarKinds | catBits, false, ""
 		}
 	case opRem:
 		if u.isAnyOf(numKind) {
-			return floatKind | catBits, false
+			return floatKind | catBits, false, ""
 		}
 	case opQuo:
 		if u.isAnyOf(numKind) {
-			return floatKind | catBits, false
+			return floatKind | catBits, false, ""
 		}
 	case opIRem, opIMod:
 		if u.isAnyOf(intKind) {
-			return u&(intKind) | catBits, false
+			return u&(intKind) | catBits, false, ""
 		}
 	case opIQuo, opIDiv:
 		if u.isAnyOf(intKind) {
-			return intKind | catBits, false
+			return intKind | catBits, false, ""
 		}
 	case opMul:
 		if u.isAnyOf(numKind) {
-			return u&numKind | catBits, false
+			return u&numKind | catBits, false, ""
 		}
 	default:
 		panic("unimplemented")
 	}
-	return bottomKind, false
+	msg = "invalid operation %[2]s %[1]s %[3]s"
+	msg += fmt.Sprintf(" (operator not defined on %s)", valBits)
+	return bottomKind, false, msg
 }

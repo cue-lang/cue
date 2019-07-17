@@ -193,7 +193,8 @@ func (c *context) mkIncompatible(src source, op op, a, b evaluated) evaluated {
 		return err
 	}
 	e := mkBin(c, src.Pos(), op, a, b)
-	return c.mkErr(e, "unsupported op %s(%s, %s)", op, a.kind(), b.kind())
+	return c.mkErr(e, "invalid operation %s %s %s (mismatched types %s and %s)",
+		c.str(a), op, c.str(b), a.kind(), b.kind())
 }
 
 func (idx *index) mkErr(src source, args ...interface{}) *bottom {
@@ -249,7 +250,7 @@ func preEvalArgs(ctx *context, args []interface{}) {
 		case value:
 			// TODO: convert to Go values so that localization frameworks
 			// can format values accordingly.
-			args[i] = debugStr(ctx, v)
+			args[i] = ctx.str(v)
 		}
 	}
 }

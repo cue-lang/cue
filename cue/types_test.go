@@ -220,8 +220,8 @@ func TestInt(t *testing.T) {
 		errU:  ErrBelow.Error(),
 	}, {
 		value:  "1.0",
-		err:    "not of right kind (float vs int)",
-		errU:   "not of right kind (float vs int)",
+		err:    "cannot use value 1.0 (type float) as int",
+		errU:   "cannot use value 1.0 (type float) as int",
 		notInt: true,
 	}, {
 		value:  "int",
@@ -478,7 +478,7 @@ func TestNull(t *testing.T) {
 		err:   "from source",
 	}, {
 		value: `"str"`,
-		err:   "not of right kind (string vs null)",
+		err:   "cannot use value \"str\" (type string) as null",
 	}, {
 		value: `null`,
 	}, {
@@ -503,7 +503,7 @@ func TestBool(t *testing.T) {
 		err:   "from source",
 	}, {
 		value: `"str"`,
-		err:   "not of right kind (string vs bool)",
+		err:   "cannot use value \"str\" (type string) as bool",
 	}, {
 		value: `true`,
 		bool:  true,
@@ -535,7 +535,7 @@ func TestList(t *testing.T) {
 		err:   "from source",
 	}, {
 		value: `"str"`,
-		err:   "not of right kind (string vs list)",
+		err:   "cannot use value \"str\" (type string) as list",
 	}, {
 		value: `[]`,
 		res:   "[]",
@@ -583,7 +583,7 @@ func TestFields(t *testing.T) {
 		err:   "from source",
 	}, {
 		value: `"str"`,
-		err:   "not of right kind (string vs struct)",
+		err:   "cannot use value \"str\" (type string) as struct",
 	}, {
 		value: `{}`,
 		res:   "{}",
@@ -697,12 +697,12 @@ func TestDefaults(t *testing.T) {
 		ok:    true,
 	}, {
 		value: `*{a:1,b:2}|{a:1}|{b:2}`,
-		def:   "<0>{a: 1, b: 2}",
-		val:   "<0>{a: 1}|<0>{b: 2}",
+		def:   "{a: 1, b: 2}",
+		val:   "{a: 1}|{b: 2}",
 		ok:    true,
 	}, {
 		value: `{a:1}&{b:2}`,
-		def:   `<0>{a: 1, b: 2}`,
+		def:   `{a: 1, b: 2}`,
 		val:   ``,
 		ok:    false,
 	}}
@@ -756,7 +756,7 @@ func TestLen(t *testing.T) {
 		// 	length: "2",
 	}, {
 		input:  "3",
-		length: "_|_(3:len not supported for type 8)",
+		length: "_|_(len not supported for type 8)", // TODO: fix kind name
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
@@ -1145,7 +1145,7 @@ func TestValueLookup(t *testing.T) {
 	}, {
 		config: config,
 		path:   strList(),
-		str:    "<0>{a: <1>{a: 0, b: 1, c: 2}, b: <2>{d: <0>.a.a, e: int}",
+		str:    "{a: {a: 0, b: 1, c: 2}, b: {d: a.a, e: int}",
 	}, {
 		config: config,
 		path:   strList("a", "a"),
@@ -1153,7 +1153,7 @@ func TestValueLookup(t *testing.T) {
 	}, {
 		config: config,
 		path:   strList("a"),
-		str:    "<0>{a: 0, b: 1, c: 2}",
+		str:    "{a: 0, b: 1, c: 2}",
 	}, {
 		config: config,
 		path:   strList("b", "d"),
@@ -1166,7 +1166,7 @@ func TestValueLookup(t *testing.T) {
 	}, {
 		config: config,
 		path:   strList("b", "d", "lookup in non-struct"),
-		str:    "not of right kind (int vs struct)",
+		str:    "cannot use value 0 (type int) as struct",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.str, func(t *testing.T) {
@@ -1214,15 +1214,15 @@ func TestAttributeErr(t *testing.T) {
 	}, {
 		path: "a",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "xx",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "e",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.path+"-"+tc.attr, func(t *testing.T) {
@@ -1267,7 +1267,7 @@ func TestAttributeString(t *testing.T) {
 	}, {
 		path: "e",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "b",
 		attr: "foo",
@@ -1315,7 +1315,7 @@ func TestAttributeInt(t *testing.T) {
 	}, {
 		path: "e",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "b",
 		attr: "foo",
@@ -1377,7 +1377,7 @@ func TestAttributeFlag(t *testing.T) {
 	}, {
 		path: "e",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "b",
 		attr: "foo",
@@ -1452,7 +1452,7 @@ func TestAttributeLookup(t *testing.T) {
 	}, {
 		path: "e",
 		attr: "bar",
-		err:  errors.New("undefined value"),
+		err:  errors.New(`attribute "bar" does not exist`),
 	}, {
 		path: "b",
 		attr: "foo",
@@ -1688,7 +1688,7 @@ func TestWalk(t *testing.T) {
 	}, {
 		value: `(a.b)
 		a: {}`,
-		out: `_|_(<0>.a.b:undefined field "b")`,
+		out: `_|_(undefined field "b")`,
 	}, {
 		value: `true`,
 		out:   `true`,

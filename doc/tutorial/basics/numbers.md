@@ -34,6 +34,6 @@ d: 4  // will evaluate to type int (default)
 ```
 a: 4
 b: 4
-c: _|_ /* unsupported op &(int, float) */
+c: _|_ /* conflicting values int and 4.0 (mismatched types int and float) */
 d: 4
 ```

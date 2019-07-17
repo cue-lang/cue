@@ -7,7 +7,7 @@ _Types ~~and~~ are Values_
 Specifying duplicate fields with conflicting values results in an error
 or bottom.
 _Bottom_ is a special value in CUE, denoted `_|_`, that indicates an
-error such as incompatible values.
+error such as conflicting values.
 Any error in CUE results in `_|_`.
 Logically all errors are equal, although errors may be associated with
 metadata such as an error message.
@@ -31,8 +31,8 @@ val: list[3]
 <!-- result -->
 `$ cue eval -i bottom.cue`
 ```
-a: _|_ /* conflicting values: 4 != 5 */
-l: [1, _|_ /* conflicting values: 2 != 3 */]
+a: _|_ /* conflicting values 4 and 5 */
+l: [1, _|_ /* conflicting values 2 and 3 */]
 list: [0, 1, 2]
 val: _|_ /* index 3 out of bounds */
 ```

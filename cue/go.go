@@ -211,7 +211,10 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 	case *big.Rat:
 		// should we represent this as a binary operation?
 		n := newNum(src, numKind)
-		ctx.Quo(&n.v, apd.NewWithBigInt(v.Num(), 0), apd.NewWithBigInt(v.Denom(), 0))
+		_, err := ctx.Quo(&n.v, apd.NewWithBigInt(v.Num(), 0), apd.NewWithBigInt(v.Denom(), 0))
+		if err != nil {
+			return ctx.mkErr(src, err)
+		}
 		if !v.IsInt() {
 			n.k = floatKind
 		}
@@ -219,7 +222,7 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 
 	case *big.Float:
 		n := newNum(src, floatKind)
-		n.v.SetString(v.String())
+		_, _, _ = n.v.SetString(v.String())
 		return n
 
 	case *apd.Decimal:

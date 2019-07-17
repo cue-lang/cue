@@ -79,7 +79,7 @@ func TestBuild(t *testing.T) {
 		emit      string
 	}{{
 		insts(&bimport{"", files(`test: "ok"`)}),
-		`<0>{test: "ok"}`,
+		`{test: "ok"}`,
 		// }, {
 		// 	insts(pkg1, &bimport{"",
 		// 		files(

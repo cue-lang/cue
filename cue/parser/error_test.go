@@ -182,3 +182,17 @@ func TestErrors(t *testing.T) {
 		}
 	}
 }
+
+func TestFuzz(t *testing.T) {
+	testCases := []string{
+		"(({\"\\(0)\"(",
+		"{{\"\\(0\xbf\"(",
+		"a:y for x n{b:\"\"(\"\\(" +
+			"\"\"\\\"(",
+	}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			_, _ = ParseFile("go-fuzz", []byte(tc))
+		})
+	}
+}

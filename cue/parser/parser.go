@@ -147,7 +147,10 @@ func (p *parser) closeList() {
 	switch c.isList--; {
 	case c.isList < 0:
 		if !p.panicking {
-			panic("unmatched close list")
+			err := errors.Newf(p.pos, "unmatched close list")
+			p.errors = errors.Append(p.errors, err)
+			p.panicking = true
+			panic(err)
 		}
 	case c.isList == 0:
 		parent := c.parent
@@ -160,7 +163,10 @@ func (p *parser) closeList() {
 func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
 	if p.comments != c {
 		if !p.panicking {
-			panic("unmatched comments")
+			err := errors.Newf(p.pos, "unmatched comments")
+			p.errors = errors.Append(p.errors, err)
+			p.panicking = true
+			panic(err)
 		}
 		return n
 	}

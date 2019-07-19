@@ -182,7 +182,7 @@ func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 }
 
 // We probably don't need to call Walk.s
-func (v *astVisitor) walk(astNode ast.Node) (value value) {
+func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 	switch n := astNode.(type) {
 	case *ast.File:
 		obj := v.object
@@ -202,7 +202,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				v1.walk(e)
 			}
 		}
-		value = obj
+		ret = obj
 
 	case *ast.ImportDecl:
 		for _, s := range n.Specs {
@@ -226,6 +226,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		if passDoc {
 			v1.doc = v.doc
 		}
+		ret = obj
 		for _, e := range n.Elts {
 			switch x := e.(type) {
 			case *ast.EmitDecl:
@@ -240,7 +241,6 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		if passDoc {
 			v.doc = v1.doc // signal usage of document back to parent.
 		}
-		value = obj
 
 	case *ast.ListLit:
 		v1 := &astVisitor{
@@ -262,7 +262,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				list.typ = v1.walk(n.Type)
 			}
 		}
-		value = list
+		ret = list
 
 	case *ast.ComprehensionDecl:
 		yielder := &yield{baseValue: newExpr(n.Field.Value)}
@@ -402,7 +402,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 	// Expressions
 	case *ast.Ident:
 		if n.Node == nil {
-			if value = v.resolve(n); value != nil {
+			if ret = v.resolve(n); ret != nil {
 				break
 			}
 
@@ -435,12 +435,12 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 				return r
 			}
 
-			value = v.errf(n, "reference %q not found", n.Name)
+			ret = v.errf(n, "reference %q not found", n.Name)
 			break
 		}
 
 		if a, ok := n.Node.(*ast.Alias); ok {
-			value = v.walk(a.Expr)
+			ret = v.walk(a.Expr)
 			break
 		}
 
@@ -450,25 +450,25 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			if l, ok := n2.(*lambdaExpr); ok && len(l.params.arcs) == 1 {
 				f = 0
 			}
-			value = &nodeRef{baseValue: newExpr(n), node: n2}
-			value = &selectorExpr{newExpr(n), value, f}
+			ret = &nodeRef{baseValue: newExpr(n), node: n2}
+			ret = &selectorExpr{newExpr(n), ret, f}
 		} else {
 			n2 := v.mapScope(n.Node)
-			value = &nodeRef{baseValue: newExpr(n), node: n2}
+			ret = &nodeRef{baseValue: newExpr(n), node: n2}
 		}
 
 	case *ast.BottomLit:
 		// TODO: record inline comment.
-		value = &bottom{baseValue: newExpr(n), format: "from source"}
+		ret = &bottom{baseValue: newExpr(n), format: "from source"}
 
 	case *ast.BadDecl:
 		// nothing to do
 
 	case *ast.BadExpr:
-		value = v.errf(n, "invalid expression")
+		ret = v.errf(n, "invalid expression")
 
 	case *ast.BasicLit:
-		value = v.litParser.parse(n)
+		ret = v.litParser.parse(n)
 
 	case *ast.Interpolation:
 		if len(n.Elts) == 0 {
@@ -480,11 +480,11 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			return v.errf(n, "invalid interpolation")
 		}
 		if len(n.Elts) == 1 {
-			value = v.walk(n.Elts[0])
+			ret = v.walk(n.Elts[0])
 			break
 		}
 		lit := &interpolation{baseValue: newExpr(n), k: stringKind}
-		value = lit
+		ret = lit
 		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)
 		if err != nil {
 			return v.errf(n, "invalid interpolation: %v", err)
@@ -510,11 +510,11 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		}
 
 	case *ast.ParenExpr:
-		value = v.walk(n.X)
+		ret = v.walk(n.X)
 
 	case *ast.SelectorExpr:
 		v.inSelector++
-		value = &selectorExpr{
+		ret = &selectorExpr{
 			newExpr(n),
 			v.walk(n.X),
 			v.label(n.Sel.Name, true),
@@ -522,7 +522,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		v.inSelector--
 
 	case *ast.IndexExpr:
-		value = &indexExpr{newExpr(n), v.walk(n.X), v.walk(n.Index)}
+		ret = &indexExpr{newExpr(n), v.walk(n.X), v.walk(n.Index)}
 
 	case *ast.SliceExpr:
 		slice := &sliceExpr{baseValue: newExpr(n), x: v.walk(n.X)}
@@ -532,26 +532,26 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		if n.High != nil {
 			slice.hi = v.walk(n.High)
 		}
-		value = slice
+		ret = slice
 
 	case *ast.CallExpr:
 		call := &callExpr{baseValue: newExpr(n), x: v.walk(n.Fun)}
 		for _, a := range n.Args {
 			call.args = append(call.args, v.walk(a))
 		}
-		value = call
+		ret = call
 
 	case *ast.UnaryExpr:
 		switch n.Op {
 		case token.NOT, token.ADD, token.SUB:
-			value = &unaryExpr{
+			ret = &unaryExpr{
 				newExpr(n),
 				tokenMap[n.Op],
 				v.walk(n.X),
 			}
 		case token.GEQ, token.GTR, token.LSS, token.LEQ,
 			token.NEQ, token.MAT, token.NMAT:
-			value = newBound(
+			ret = newBound(
 				v.ctx(),
 				newExpr(n),
 				tokenMap[n.Op],
@@ -571,10 +571,10 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 			d := &disjunction{baseValue: newExpr(n)}
 			v.addDisjunctionElem(d, n.X, false)
 			v.addDisjunctionElem(d, n.Y, false)
-			value = d
+			ret = d
 
 		default:
-			value = updateBin(v.ctx(), &binaryExpr{
+			ret = updateBin(v.ctx(), &binaryExpr{
 				newExpr(n),
 				tokenMap[n.Op], // op
 				v.walk(n.X),    // left
@@ -593,7 +593,7 @@ func (v *astVisitor) walk(astNode ast.Node) (value value) {
 		panic(fmt.Sprintf("unimplemented %T", n))
 
 	}
-	return value
+	return ret
 }
 
 func (v *astVisitor) addDisjunctionElem(d *disjunction, n ast.Node, mark bool) {

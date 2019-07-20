@@ -56,6 +56,18 @@ func TestBuiltins(t *testing.T) {
 		test("math", `math.Floor("foo")`),
 		`_|_(cannot use "foo" (type string) as number in argument 1 to math.Floor)`,
 	}, {
+		test("encoding/base64", `base64.Encode(null, "foo")`),
+		`"Zm9v"`,
+	}, {
+		test("encoding/base64", `base64.Decode(null, base64.Encode(null, "foo"))`),
+		`'foo'`,
+	}, {
+		test("encoding/base64", `base64.Decode(null, "foo")`),
+		`_|_(error in call to encoding/base64.Decode: illegal base64 data at input byte 0)`,
+	}, {
+		test("encoding/base64", `base64.Decode({}, "foo")`),
+		`_|_(error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null)`,
+	}, {
 		test("encoding/hex", `hex.Encode("foo")`),
 		`"666f6f"`,
 	}, {

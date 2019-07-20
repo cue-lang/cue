@@ -8,6 +8,7 @@ import (
 	"crypto/sha1"
 	"crypto/sha256"
 	"crypto/sha512"
+	"encoding/base64"
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
@@ -181,6 +182,61 @@ var builtinPackages = map[string]*builtinPkg{
 				data := c.bytes(0)
 				c.ret = func() interface{} {
 					return sha512.Sum512_256(data)
+				}()
+			},
+		}},
+	},
+	"encoding/base64": &builtinPkg{
+		native: []*builtin{{
+			Name:   "EncodedLen",
+			Params: []kind{topKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				encoding, n := c.value(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if err := encoding.Null(); err != nil {
+						return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
+					}
+					return base64.StdEncoding.EncodedLen(n), nil
+				}()
+			},
+		}, {
+			Name:   "DecodedLen",
+			Params: []kind{topKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				encoding, x := c.value(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if err := encoding.Null(); err != nil {
+						return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
+					}
+					return base64.StdEncoding.DecodedLen(x), nil
+				}()
+			},
+		}, {
+			Name:   "Encode",
+			Params: []kind{topKind, stringKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				encoding, src := c.value(0), c.bytes(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if err := encoding.Null(); err != nil {
+						return "", fmt.Errorf("base64: unsupported encoding: %v", err)
+					}
+					return base64.StdEncoding.EncodeToString(src), nil
+				}()
+			},
+		}, {
+			Name:   "Decode",
+			Params: []kind{topKind, stringKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				encoding, s := c.value(0), c.string(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if err := encoding.Null(); err != nil {
+						return nil, fmt.Errorf("base64: unsupported encoding: %v", err)
+					}
+					return base64.StdEncoding.DecodeString(s)
 				}()
 			},
 		}},

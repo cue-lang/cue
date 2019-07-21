@@ -155,7 +155,7 @@ func walk(v visitor, node ast.Node) {
 			walk(v, s)
 		}
 
-	case *ast.EmitDecl:
+	case *ast.EmbedDecl:
 		walk(v, n.Expr)
 
 	case *ast.Alias:

@@ -57,10 +57,10 @@ func Extract(filename string, src interface{}) (*ast.File, error) {
 		case *ast.StructLit:
 			f.Decls = x.Elts
 		default:
-			f.Decls = []ast.Decl{&ast.EmitDecl{Expr: x}}
+			f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: x}}
 		}
 	default:
-		f.Decls = []ast.Decl{&ast.EmitDecl{Expr: &ast.ListLit{Elts: a}}}
+		f.Decls = []ast.Decl{&ast.EmbedDecl{Expr: &ast.ListLit{Elts: a}}}
 	}
 	return f, nil
 }

@@ -67,10 +67,8 @@ func debugStr(x interface{}) (out string) {
 		}
 		return out
 
-	case *ast.EmitDecl:
-		// out := "<"
+	case *ast.EmbedDecl:
 		out += debugStr(v.Expr)
-		// out += ">"
 		return out
 
 	case *ast.ImportDecl:

@@ -83,7 +83,7 @@ func (*Field) declNode()             {}
 func (*ComprehensionDecl) declNode() {}
 func (*ImportDecl) declNode()        {}
 func (*BadDecl) declNode()           {}
-func (*EmitDecl) declNode()          {}
+func (*EmbedDecl) declNode()         {}
 func (*Alias) declNode()             {}
 func (*CommentGroup) declNode()      {}
 
@@ -610,12 +610,12 @@ type (
 		Rparen token.Pos // position of ')', if any
 	}
 
-	// An EmitDecl node represents a single expression used as a declaration.
+	// An EmbedDecl node represents a single expression used as a declaration.
 	// The expressions in this declaration is what will be emitted as
 	// configuration output.
 	//
-	// An EmitDecl may only appear at the top level.
-	EmitDecl struct {
+	// An EmbedDecl may only appear at the top level.
+	EmbedDecl struct {
 		comments
 		Expr Expr
 	}
@@ -625,7 +625,7 @@ type (
 
 func (d *BadDecl) Pos() token.Pos    { return d.From }
 func (d *ImportDecl) Pos() token.Pos { return d.Import }
-func (d *EmitDecl) Pos() token.Pos   { return d.Expr.Pos() }
+func (d *EmbedDecl) Pos() token.Pos  { return d.Expr.Pos() }
 
 func (d *BadDecl) End() token.Pos { return d.To }
 func (d *ImportDecl) End() token.Pos {
@@ -637,7 +637,7 @@ func (d *ImportDecl) End() token.Pos {
 	}
 	return d.Specs[0].End()
 }
-func (d *EmitDecl) End() token.Pos { return d.Expr.End() }
+func (d *EmbedDecl) End() token.Pos { return d.Expr.End() }
 
 // ----------------------------------------------------------------------------
 // Files and packages

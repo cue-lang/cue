@@ -160,7 +160,7 @@ func walk(v visitor, node Node) {
 			walk(v, s)
 		}
 
-	case *EmitDecl:
+	case *EmbedDecl:
 		walk(v, n.Expr)
 
 	case *Alias:

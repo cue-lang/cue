@@ -244,7 +244,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		}
 		f.print(newsection, nooverride)
 
-	case *ast.EmitDecl:
+	case *ast.EmbedDecl:
 		f.expr(n.Expr)
 		f.print(newline, newsection, nooverride) // force newline
 

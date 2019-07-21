@@ -237,7 +237,7 @@ func TestPackage(t *testing.T) {
 	f := &ast.File{
 		Name: ast.NewIdent("foo"),
 		Decls: []ast.Decl{
-			&ast.EmitDecl{
+			&ast.EmbedDecl{
 				Expr: &ast.BasicLit{
 					ValuePos: token.NoSpace.Pos(),
 					Value:    "1",

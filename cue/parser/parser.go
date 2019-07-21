@@ -648,7 +648,7 @@ func (p *parser) parseFieldList(allowEmit bool) (list []ast.Decl) {
 
 	for p.tok != token.RBRACE && p.tok != token.EOF {
 		d := p.parseField(allowEmit)
-		if e, ok := d.(*ast.EmitDecl); ok {
+		if e, ok := d.(*ast.EmbedDecl); ok {
 			if origEmit && !allowEmit {
 				p.errf(p.pos, "only one emit allowed at top level")
 			}
@@ -692,7 +692,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 			if expr == nil {
 				expr = p.parseExpr()
 			}
-			e := &ast.EmitDecl{Expr: expr}
+			e := &ast.EmbedDecl{Expr: expr}
 			if p.atComma("file", token.RBRACE) {
 				p.next()
 			}
@@ -737,7 +737,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 			case token.IDENT, token.LBRACK, token.STRING, token.INTERPOLATION, token.NULL, token.TRUE, token.FALSE:
 				if p.tok == token.COMMA {
 					p.expectComma()
-					return &ast.EmitDecl{Expr: expr}
+					return &ast.EmbedDecl{Expr: expr}
 				}
 			}
 			return &ast.BadDecl{From: pos, To: p.pos}

@@ -77,7 +77,7 @@ func export(ctx *context, v value, m options) ast.Node {
 	if obj, ok := value.(*ast.StructLit); ok {
 		file.Decls = append(file.Decls, obj.Elts...)
 	} else {
-		file.Decls = append(file.Decls, &ast.EmitDecl{Expr: value})
+		file.Decls = append(file.Decls, &ast.EmbedDecl{Expr: value})
 	}
 
 	// resolve the file.
@@ -345,7 +345,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			}
 		}
 		if x.emit != nil {
-			obj.Elts = append(obj.Elts, &ast.EmitDecl{Expr: p.expr(x.emit)})
+			obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
 		}
 		if !doEval(p.mode) && x.template != nil {
 			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)

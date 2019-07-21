@@ -509,7 +509,7 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 		case *ast.StructLit:
 			f.Decls = append(f.Decls, x.Elts...)
 		case *ast.ListLit:
-			f.Decls = append(f.Decls, &ast.EmitDecl{Expr: x})
+			f.Decls = append(f.Decls, &ast.EmbedDecl{Expr: x})
 		default:
 			panic("unreachable")
 		}

@@ -192,7 +192,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		}
 		for _, e := range n.Decls {
 			switch x := e.(type) {
-			case *ast.EmitDecl:
+			case *ast.EmbedDecl:
 				if v1.object.emit == nil {
 					v1.object.emit = v1.walk(x.Expr)
 				} else {
@@ -229,7 +229,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		ret = obj
 		for _, e := range n.Elts {
 			switch x := e.(type) {
-			case *ast.EmitDecl:
+			case *ast.EmbedDecl:
 				// Only allowed at top-level.
 				return v1.errf(x, "emitting values is only allowed at top level")
 			case *ast.Field, *ast.Alias:
@@ -586,7 +586,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		// Nothing to do for a free-floating comment group.
 
 	// nothing to do
-	// case *syntax.EmitDecl:
+	// case *syntax.EmbedDecl:
 	default:
 		// TODO: unhandled node.
 		// value = ctx.mkErr(n, "unknown node type %T", n)

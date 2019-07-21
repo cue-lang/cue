@@ -104,7 +104,7 @@ func (r *Runtime) CompileExpr(expr ast.Expr) (*Instance, error) {
 		_ = p.AddSyntax(&ast.File{Decls: x.Elts})
 	default:
 		_ = p.AddSyntax(&ast.File{
-			Decls: []ast.Decl{&ast.EmitDecl{Expr: expr}},
+			Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
 		})
 	}
 	if p.Err != nil {
@@ -167,7 +167,7 @@ func Build(instances []*build.Instance) []*Instance {
 func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 	i := r.index().newInstance(nil)
 	err := i.insertFile(&ast.File{
-		Decls: []ast.Decl{&ast.EmitDecl{Expr: expr}},
+		Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
 	})
 	if err != nil {
 		return nil, err

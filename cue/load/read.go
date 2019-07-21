@@ -220,8 +220,8 @@ func readComments(f io.Reader) ([]byte, errors.Error) {
 	return r.buf, r.err
 }
 
-// readImports is like ioutil.ReadAll, except that it expects a Go file as input
-// and stops reading the input once the imports have completed.
+// readImports is like ioutil.ReadAll, except that it expects a CUE file as
+// input and stops reading the input once the imports have completed.
 func readImports(f io.Reader, reportSyntaxError bool, imports *[]string) ([]byte, errors.Error) {
 	r := &importReader{b: bufio.NewReader(f)}
 

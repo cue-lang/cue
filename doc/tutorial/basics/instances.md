@@ -29,9 +29,42 @@ A _module_ is the directory hierarchy containing the CUE files of a package.
 The root of this directory hierarchy is the _module root_.
 It may be explicitly marked with a `cue.mod` file.
 
-<!-- TODO:
 The module root may contain a `pkg` directory containing packages that are
 importable with import.
+The first package path component needs to be a domain name, else the cue tool
+is unable to import non-core packages.
 The convention is to use the URL from which the package is retrieved.
--->
 
+## Example
+
+For importing a package from the `pkg` directory you can create the directory
+layout as follows:
+
+```sh
+touch cue.mod
+mkdir -p pkg/cuelang.org/example
+```
+
+In our example the package `cuelang.org` contains the following content.
+Note that only identifiers starting with a capital letter may be imported.
+
+_pkg/cuelang.org/example/example.cue:_
+```
+package example
+
+Foo: 100
+```
+
+_a.cue:_
+```
+package a
+
+import "cuelang.org/example"
+
+bar: example.Foo
+```
+
+`$ cue eval a.cue`
+```
+bar: 100
+```

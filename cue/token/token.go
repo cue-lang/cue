@@ -87,6 +87,7 @@ const (
 	RBRACE    // }
 	SEMICOLON // ;
 	COLON     // :
+	ISA       // ::
 	OPTION    // ?
 	operatorEnd
 
@@ -160,6 +161,7 @@ var tokens = [...]string{
 	RBRACE:    "}",
 	SEMICOLON: ";",
 	COLON:     ":",
+	ISA:       "::",
 	OPTION:    "?",
 
 	BOTTOM: "_|_",

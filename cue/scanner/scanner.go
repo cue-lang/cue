@@ -864,7 +864,12 @@ scanAgain:
 			insertEOL = true
 			tok, lit = s.scanAttribute()
 		case ':':
-			tok = token.COLON
+			if s.ch == ':' {
+				s.next()
+				tok = token.ISA
+			} else {
+				tok = token.COLON
+			}
 		case ';':
 			tok = token.SEMICOLON
 			insertEOL = true

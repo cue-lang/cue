@@ -50,6 +50,10 @@ unsupported:
 	return fmt.Errorf("cue/format: unsupported node type %T", node)
 }
 
+func isRegularField(tok token.Token) bool {
+	return tok == token.ILLEGAL || tok == token.COLON
+}
+
 // Helper functions for common node lists. They may be empty.
 
 func (f *formatter) walkDeclList(list []ast.Decl) {
@@ -131,10 +135,12 @@ func (f *formatter) decl(decl ast.Decl) {
 		// shortcut single-element structs.
 		lastSize := len(f.labelBuf)
 		f.labelBuf = f.labelBuf[:0]
+		regular := isRegularField(n.Token)
 		first, opt := n.Label, n.Optional != token.NoPos
-		// If the field has a valid position, we assume that an unspecified
-		// Lbrace does not signal the intend to collapse fields.
-		for n.Label.Pos().IsValid() || f.printer.cfg.simplify {
+
+		// If the label has a valid position, we assume that an unspecified
+		// Lbrace signals the intend to collapse fields.
+		for (n.Label.Pos().IsValid() || f.printer.cfg.simplify) && regular {
 			obj, ok := n.Value.(*ast.StructLit)
 			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) || len(n.Attrs) > 0 {
 				break
@@ -156,6 +162,9 @@ func (f *formatter) decl(decl ast.Decl) {
 			if !ok || len(mem.Attrs) > 0 {
 				break
 			}
+			if !isRegularField(mem.Token) {
+				break
+			}
 			entry := labelEntry{mem.Label, mem.Optional != token.NoPos}
 			f.labelBuf = append(f.labelBuf, entry)
 			n = mem
@@ -163,6 +172,9 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		if lastSize != len(f.labelBuf) {
 			f.print(formfeed)
+		}
+		if !regular && first.Pos().RelPos() < token.Newline {
+			f.print(newline, nooverride)
 		}
 
 		f.before(nil)
@@ -179,7 +191,11 @@ func (f *formatter) decl(decl ast.Decl) {
 			tab = blank
 		}
 
-		f.print(n.Colon, token.COLON, tab)
+		if isRegularField(n.Token) {
+			f.print(n.TokenPos, token.COLON, tab)
+		} else {
+			f.print(blank, nooverride, n.Token, tab)
+		}
 		if n.Value != nil {
 			switch n.Value.(type) {
 			case *ast.ListComprehension, *ast.ListLit, *ast.StructLit:
@@ -249,6 +265,9 @@ func (f *formatter) decl(decl ast.Decl) {
 	case *ast.EmbedDecl:
 		f.expr(n.Expr)
 		f.print(newline, newsection, nooverride) // force newline
+
+	case *ast.Ellipsis:
+		f.ellipsis(n)
 
 	case *ast.Alias:
 		f.expr(n.Ident)
@@ -337,6 +356,13 @@ func (f *formatter) label(l ast.Label, optional bool) {
 	}
 	if optional {
 		f.print(token.OPTION)
+	}
+}
+
+func (f *formatter) ellipsis(x *ast.Ellipsis) {
+	f.print(x.Ellipsis, token.ELLIPSIS)
+	if x.Type != nil && !isTop(x.Type) {
+		f.expr(x.Type)
 	}
 }
 
@@ -465,10 +491,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.print(noblank, x.Rbrack, token.RBRACK)
 
 	case *ast.Ellipsis:
-		f.print(x.Ellipsis, token.ELLIPSIS)
-		if x.Type != nil && !isTop(x.Type) {
-			f.expr(x.Type)
-		}
+		f.ellipsis(x)
 
 	case *ast.ListComprehension:
 		f.print(x.Lbrack, token.LBRACK, blank, indent)

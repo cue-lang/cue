@@ -159,6 +159,7 @@ var testTokens = [...]elt{
 	{token.RBRACK, "]", operator},
 	{token.RBRACE, "}", operator},
 	{token.COLON, ":", operator},
+	{token.ISA, "::", operator},
 
 	// Keywords
 	{token.TRUE, "true", keyword},
@@ -399,6 +400,7 @@ var lines = []string{
 	"}^\n",
 	"}}^\n",
 	":\n",
+	"::\n",
 	";^\n",
 
 	"true^\n",
@@ -825,7 +827,7 @@ func TestNoLiteralComments(t *testing.T) {
 			A: 1 // foo
 		}
 
-		b: {
+		b :: {
 			B: 2
 			// foo
 		}

@@ -86,6 +86,7 @@ func (*ImportDecl) declNode()        {}
 func (*BadDecl) declNode()           {}
 func (*EmbedDecl) declNode()         {}
 func (*Alias) declNode()             {}
+func (*Ellipsis) declNode()          {}
 
 // Not technically declarations, but appearing at the same level.
 func (*Package) declNode()      {}
@@ -285,8 +286,10 @@ type Field struct {
 	Label    Label // must have at least one element.
 	Optional token.Pos
 
-	// No colon: Value must be an StructLit with one field.
-	Colon token.Pos
+	// No TokenPos: Value must be an StructLit with one field.
+	TokenPos token.Pos
+	Token    token.Token // ':' or '::', ILLEGAL implies ':'
+
 	Value Expr // the value associated with this field.
 
 	Attrs []*Attribute
@@ -299,6 +302,9 @@ func (d *Field) End() token.Pos {
 	}
 	return d.Value.End()
 }
+
+// TODO: make Alias a type of Field. This is possible now we have different
+// separator types.
 
 // An Alias binds another field to the alias name in the current struct.
 type Alias struct {
@@ -419,8 +425,9 @@ type ListComprehension struct {
 // A ForClause node represents a for clause in a comprehension.
 type ForClause struct {
 	comments
-	For    token.Pos
-	Key    *Ident // allow pattern matching?
+	For token.Pos
+	Key *Ident // allow pattern matching?
+	// TODO: change to Comma
 	Colon  token.Pos
 	Value  *Ident // allow pattern matching?
 	In     token.Pos

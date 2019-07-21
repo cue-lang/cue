@@ -28,6 +28,17 @@ package expressions
 		aaa: 10
 	}
 
+	someDefinition :: {
+		embedding
+
+		field: 2
+	}
+
+	openDef :: {
+		a: int
+		...
+	}
+
 	attrs: {
 		a:    8 @go(A) // comment
 		aa:   8 @go(A) // comment

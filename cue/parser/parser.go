@@ -638,34 +638,25 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
 		Rparen: rparen}
 }
 
-func (p *parser) parseFieldList(allowEmit bool) (list []ast.Decl) {
+func (p *parser) parseFieldList() (list []ast.Decl) {
 	if p.trace {
 		defer un(trace(p, "FieldList"))
 	}
-	origEmit := allowEmit
 	p.openList()
 	defer p.closeList()
 
-	for p.tok != token.RBRACE && p.tok != token.EOF {
-		d := p.parseField(allowEmit)
-		if e, ok := d.(*ast.EmbedDecl); ok {
-			if origEmit && !allowEmit {
-				p.errf(p.pos, "only one emit allowed at top level")
-			}
-			if !origEmit || !allowEmit {
-				d = &ast.BadDecl{From: e.Pos(), To: e.End()}
-				for _, cg := range e.Comments() {
-					d.AddComment(cg)
-				}
-			}
-			// uncomment to only allow one emit per top-level
-			// allowEmit = false
-		}
-		list = append(list, d)
+	for p.tok != token.RBRACE && p.tok != token.ELLIPSIS && p.tok != token.EOF {
+		list = append(list, p.parseField())
+	}
+
+	if p.tok == token.ELLIPSIS {
+		list = append(list, &ast.Ellipsis{Ellipsis: p.pos})
+		p.next()
 	}
 	return
 }
-func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
+
+func (p *parser) parseField() (decl ast.Decl) {
 	if p.trace {
 		defer un(trace(p, "Field"))
 	}
@@ -678,6 +669,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 	this := &ast.Field{Label: nil}
 	m := this
 
+	multipleLabels := false
 	allowComprehension := true
 
 	for i := 0; ; i++ {
@@ -686,9 +678,6 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 		expr, ok := p.parseLabel(m)
 
 		if !ok {
-			if !allowEmit {
-				p.errf(pos, "expected label, found %s", tok)
-			}
 			if expr == nil {
 				expr = p.parseExpr()
 			}
@@ -718,9 +707,14 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 			p.next()
 		}
 
-		if p.tok == token.COLON {
+		_ = multipleLabels
+		if p.tok == token.COLON || p.tok == token.ISA {
+			if p.tok == token.ISA && multipleLabels {
+				p.errf(p.pos, "more than one label before '::' (only one allowed)")
+			}
 			break
 		}
+		multipleLabels = true
 
 		// TODO: consider disallowing comprehensions with more than one label.
 		// This can be a bit awkward in some cases, but it would naturally
@@ -730,7 +724,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 
 		switch p.tok {
 		default:
-			if !allowEmit || p.tok != token.COMMA {
+			if p.tok != token.COMMA {
 				p.errorExpected(p.pos, "label or ':'")
 			}
 			switch tok {
@@ -747,12 +741,14 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 			m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 			m = field
 		}
-
-		allowEmit = false
 	}
 
-	this.Colon = p.pos
-	p.expect(token.COLON)
+	m.TokenPos = p.pos
+	m.Token = p.tok
+	if p.tok != token.COLON && p.tok != token.ISA {
+		p.errorExpected(pos, "':' or '::'")
+	}
+	p.next() // : or ::
 	m.Value = p.parseRHS()
 
 	p.openList()
@@ -879,7 +875,7 @@ func (p *parser) parseStructBody() []ast.Decl {
 	p.exprLev++
 	var elts []ast.Decl
 	if p.tok != token.RBRACE {
-		elts = p.parseFieldList(false)
+		elts = p.parseFieldList()
 	}
 	p.exprLev--
 
@@ -1354,7 +1350,7 @@ func (p *parser) parseFile() *ast.File {
 		if p.mode&importsOnlyMode == 0 {
 			// rest of package decls
 			// TODO: loop and allow multiple expressions.
-			decls = append(decls, p.parseFieldList(true)...)
+			decls = append(decls, p.parseFieldList()...)
 			p.expect(token.EOF)
 		}
 	}

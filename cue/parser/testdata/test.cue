@@ -1,4 +1,3 @@
-
 import "math"
 
 foo: 1

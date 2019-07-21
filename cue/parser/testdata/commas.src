@@ -33,3 +33,4 @@ bar: [
 	3
 ]
 
+not allowed :: /* ERROR "more than one label before '::'" */ {}

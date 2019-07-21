@@ -82,6 +82,24 @@ func TestParse(t *testing.T) {
 		`,
 		`a: true, b?: "2", c?: 3, "g\("en")"?: 4`,
 	}, {
+		"definition",
+		`Def :: {
+			 b: "2"
+			 c: 3
+
+			 embedding
+		}
+		`,
+		`Def :: {b: "2", c: 3, embedding}`,
+	}, {
+		"ellipsis in structs",
+		`Def :: {
+			b: "2"
+			...
+		}
+		`,
+		`Def :: {b: "2", ...}`,
+	}, {
 		"emitted referencing non-emitted",
 		`a: 1
 		 b: "2"

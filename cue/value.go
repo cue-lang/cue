@@ -1072,7 +1072,7 @@ func (x *lambdaExpr) call(ctx *context, p source, args ...evaluated) value {
 	// its own and does not depend on its input parameters.
 	arcs := make(arcs, len(x.arcs))
 	for i, a := range x.arcs {
-		v := unify(ctx, p, a.v.evalPartial(ctx), args[i])
+		v := binOp(ctx, p, opUnify, a.v.evalPartial(ctx), args[i])
 		if isBottom(v) {
 			return v
 		}

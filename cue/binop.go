@@ -33,10 +33,6 @@ func binSrc(pos token.Pos, op op, a, b value) baseValue {
 	return baseValue{&computedSource{pos, op, a, b}}
 }
 
-func unify(ctx *context, src source, left, right evaluated) evaluated {
-	return binOp(ctx, src, opUnify, left, right)
-}
-
 func binOp(ctx *context, src source, op op, left, right evaluated) (result evaluated) {
 	if b, ok := left.(*bottom); ok {
 		if op == opUnify && b.exprDepth == 0 && cycleError(b) != nil {
@@ -503,7 +499,6 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
 		if k == bottomKind {
 			return ctx.mkErr(src, msg, op, ctx.str(x), ctx.str(other), x.kind(), other.kind())
-			break
 		}
 		switch y := other.(type) {
 		case *basicType:
@@ -1037,7 +1032,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			break
 		}
 
-		n := unify(ctx, src, x.len.(evaluated), y.len.(evaluated))
+		n := binOp(ctx, src, opUnify, x.len.(evaluated), y.len.(evaluated))
 		if isBottom(n) {
 			src = mkBin(ctx, src.Pos(), op, x, other)
 			return ctx.mkErr(src, "conflicting list lengths: %v", n)
@@ -1057,7 +1052,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		max, ok := n.(*numLit)
 		if !ok || len(xa) < max.intValue(ctx) {
 			src := mkBin(ctx, src.Pos(), op, x.typ, y.typ)
-			typ = unify(ctx, src, x.typ.(evaluated), y.typ.(evaluated))
+			typ = binOp(ctx, src, opUnify, x.typ.(evaluated), y.typ.(evaluated))
 			if isBottom(typ) {
 				return ctx.mkErr(src, "conflicting list element types: %v", typ)
 			}
@@ -1066,7 +1061,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		// TODO: use forwarding instead of this mild hack.
 		x.elem.arcs = xa
 		y.elem.arcs = ya
-		s := unify(ctx, src, x.elem, y.elem).(*structLit)
+		s := binOp(ctx, src, opUnify, x.elem, y.elem).(*structLit)
 		x.elem.arcs = sx
 		y.elem.arcs = sy
 

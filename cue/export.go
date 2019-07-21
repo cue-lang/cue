@@ -352,104 +352,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		return bin
 
 	case *structLit:
-		obj := &ast.StructLit{}
-		if doEval(p.mode) {
-			x = x.expandFields(p.ctx)
-		}
-		for _, a := range x.arcs {
-			p.stack = append(p.stack, remap{
-				key:  x,
-				from: a.feature,
-				to:   nil,
-				syn:  obj,
-			})
-		}
-		if x.emit != nil {
-			obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
-		}
-		if !doEval(p.mode) && x.template != nil {
-			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
-			if ok {
-				obj.Elts = append(obj.Elts, &ast.Field{
-					Label: &ast.TemplateLabel{
-						Ident: p.identifier(l.params.arcs[0].feature),
-					},
-					Value: p.expr(l.value),
-				})
-			} // TODO: else record error
-		}
-		for i, a := range x.arcs {
-			f := &ast.Field{
-				Label: p.label(a.feature),
-			}
-			// TODO: allow the removal of hidden fields. However, hidden fields
-			// that still used in incomplete expressions should not be removed
-			// (unless RequireConcrete is requested).
-			if a.optional {
-				// Optional fields are almost never concrete. We omit them in
-				// concrete mode to allow the user to use the -a option in eval
-				// without getting many errors.
-				if p.mode.omitOptional || p.mode.concrete {
-					continue
-				}
-				f.Optional = token.NoSpace.Pos()
-			}
-			if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
-				continue
-			}
-			if !doEval(p.mode) {
-				f.Value = p.expr(a.v)
-			} else {
-				e := x.at(p.ctx, i)
-				if v := p.ctx.manifest(e); isIncomplete(v) && !p.mode.concrete && isBottom(e) {
-					p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
-					f.Value = p.expr(a.v)
-				} else {
-					f.Value = p.expr(e)
-				}
-			}
-			if a.attrs != nil && !p.mode.omitAttrs {
-				for _, at := range a.attrs.attr {
-					f.Attrs = append(f.Attrs, &ast.Attribute{Text: at.text})
-				}
-			}
-			obj.Elts = append(obj.Elts, f)
-		}
-
-		for _, c := range x.comprehensions {
-			var clauses []ast.Clause
-			next := c.clauses
-			for {
-				if yield, ok := next.(*yield); ok {
-					l := p.expr(yield.key)
-					label, ok := l.(ast.Label)
-					if !ok {
-						// TODO: add an invalid field instead?
-						continue
-					}
-					opt := token.NoPos
-					if yield.opt {
-						opt = token.NoSpace.Pos() // anything but token.NoPos
-					}
-					f := &ast.Field{
-						Label:    label,
-						Optional: opt,
-						Value:    p.expr(yield.value),
-					}
-					var decl ast.Decl = f
-					if len(clauses) > 0 {
-						decl = &ast.ComprehensionDecl{Field: f, Clauses: clauses}
-					}
-					obj.Elts = append(obj.Elts, decl)
-					break
-				}
-
-				var y ast.Clause
-				y, next = p.clause(next)
-				clauses = append(clauses, y)
-			}
-		}
-		return obj
+		return p.structure(x)
 
 	case *fieldComprehension:
 		panic("should be handled in structLit")
@@ -605,6 +508,107 @@ func (p *exporter) expr(v value) ast.Expr {
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
 	}
+}
+
+func (p *exporter) structure(x *structLit) *ast.StructLit {
+	obj := &ast.StructLit{}
+	if doEval(p.mode) {
+		x = x.expandFields(p.ctx)
+	}
+	for _, a := range x.arcs {
+		p.stack = append(p.stack, remap{
+			key:  x,
+			from: a.feature,
+			to:   nil,
+			syn:  obj,
+		})
+	}
+	if x.emit != nil {
+		obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
+	}
+	if !doEval(p.mode) && x.template != nil {
+		l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
+		if ok {
+			obj.Elts = append(obj.Elts, &ast.Field{
+				Label: &ast.TemplateLabel{
+					Ident: p.identifier(l.params.arcs[0].feature),
+				},
+				Value: p.expr(l.value),
+			})
+		} // TODO: else record error
+	}
+	for i, a := range x.arcs {
+		f := &ast.Field{
+			Label: p.label(a.feature),
+		}
+		// TODO: allow the removal of hidden fields. However, hidden fields
+		// that still used in incomplete expressions should not be removed
+		// (unless RequireConcrete is requested).
+		if a.optional {
+			// Optional fields are almost never concrete. We omit them in
+			// concrete mode to allow the user to use the -a option in eval
+			// without getting many errors.
+			if p.mode.omitOptional || p.mode.concrete {
+				continue
+			}
+			f.Optional = token.NoSpace.Pos()
+		}
+		if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
+			continue
+		}
+		if !doEval(p.mode) {
+			f.Value = p.expr(a.v)
+		} else {
+			e := x.at(p.ctx, i)
+			if v := p.ctx.manifest(e); isIncomplete(v) && !p.mode.concrete && isBottom(e) {
+				p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
+				f.Value = p.expr(a.v)
+			} else {
+				f.Value = p.expr(e)
+			}
+		}
+		if a.attrs != nil && !p.mode.omitAttrs {
+			for _, at := range a.attrs.attr {
+				f.Attrs = append(f.Attrs, &ast.Attribute{Text: at.text})
+			}
+		}
+		obj.Elts = append(obj.Elts, f)
+	}
+
+	for _, c := range x.comprehensions {
+		var clauses []ast.Clause
+		next := c.clauses
+		for {
+			if yield, ok := next.(*yield); ok {
+				l := p.expr(yield.key)
+				label, ok := l.(ast.Label)
+				if !ok {
+					// TODO: add an invalid field instead?
+					continue
+				}
+				opt := token.NoPos
+				if yield.opt {
+					opt = token.NoSpace.Pos() // anything but token.NoPos
+				}
+				f := &ast.Field{
+					Label:    label,
+					Optional: opt,
+					Value:    p.expr(yield.value),
+				}
+				var decl ast.Decl = f
+				if len(clauses) > 0 {
+					decl = &ast.ComprehensionDecl{Field: f, Clauses: clauses}
+				}
+				obj.Elts = append(obj.Elts, decl)
+				break
+			}
+
+			var y ast.Clause
+			y, next = p.clause(next)
+			clauses = append(clauses, y)
+		}
+	}
+	return obj
 }
 
 // quote quotes the given string.

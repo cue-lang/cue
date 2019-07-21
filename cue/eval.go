@@ -365,7 +365,7 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 	}
 	var left, right evaluated
 
-	if x.op != opUnify {
+	if _, isUnify := x.op.unifyType(); !isUnify {
 		ctx.incEvalDepth()
 		left = ctx.manifest(x.left)
 		right = ctx.manifest(x.right)

@@ -147,7 +147,7 @@ func (x *bottom) Positions() []token.Pos {
 func appendPositions(pos []token.Pos, src source) []token.Pos {
 	if src != nil {
 		if b, ok := src.(*binaryExpr); ok {
-			if b.op == opUnify {
+			if _, isUnify := b.op.unifyType(); isUnify {
 				pos = appendPositions(pos, b.left)
 				pos = appendPositions(pos, b.right)
 			}

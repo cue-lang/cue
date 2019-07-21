@@ -742,11 +742,9 @@ func (x *structLit) expandFields(ctx *context) *structLit {
 	emit := x.emit
 	template := x.template
 	newArcs := []arc{}
-	optional := false
 
 	for _, c := range comprehensions {
 		result := c.clauses.yield(ctx, func(k, v evaluated, opt bool) *bottom {
-			optional = opt
 			if !k.kind().isAnyOf(stringKind) {
 				return ctx.mkErr(k, "key must be of type string")
 			}
@@ -767,7 +765,11 @@ func (x *structLit) expandFields(ctx *context) *structLit {
 					return nil
 				}
 			}
-			newArcs = append(newArcs, arc{feature: f, v: v})
+			newArcs = append(newArcs, arc{
+				feature:  f,
+				optional: opt,
+				v:        v,
+			})
 			return nil
 		})
 		switch {
@@ -785,7 +787,14 @@ func (x *structLit) expandFields(ctx *context) *structLit {
 	arcs := make([]arc, 0, len(x.arcs)+len(newArcs))
 	arcs = append(arcs, x.arcs...)
 	orig := x
-	x = &structLit{x.baseValue, emit, template, nil, arcs, nil}
+	x = &structLit{
+		x.baseValue, // baseValue
+		emit,        // emit
+		template,    // template
+		nil,         // comprehensions
+		arcs,        // arcs
+		nil,         // attributes
+	}
 	x.expanded = x
 	orig.expanded = x
 
@@ -799,13 +808,17 @@ outer:
 						ctx.labelStr(f))
 				} else {
 					x.arcs[i].v = mkBin(ctx, x.Pos(), opUnify, a.v, na.v)
-					x.arcs[i].optional = x.arcs[i].optional && optional
+					x.arcs[i].optional = x.arcs[i].optional && na.optional
 					x.arcs[i].docs = mergeDocs(na.docs, a.docs)
 				}
 				continue outer
 			}
 		}
-		x.arcs = append(x.arcs, arc{feature: f, optional: optional, v: na.v})
+		x.arcs = append(x.arcs, arc{
+			feature:  f,
+			optional: na.optional,
+			v:        na.v,
+		})
 	}
 	sort.Stable(x)
 	return x

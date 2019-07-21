@@ -34,15 +34,16 @@ func binSrc(pos token.Pos, op op, a, b value) baseValue {
 }
 
 func binOp(ctx *context, src source, op op, left, right evaluated) (result evaluated) {
+	_, isUnify := op.unifyType()
 	if b, ok := left.(*bottom); ok {
-		if op == opUnify && b.exprDepth == 0 && cycleError(b) != nil {
+		if isUnify && b.exprDepth == 0 && cycleError(b) != nil {
 			ctx.cycleErr = true
 			return right
 		}
 		return left
 	}
 	if b, ok := right.(*bottom); ok {
-		if op == opUnify && b.exprDepth == 0 && cycleError(b) != nil {
+		if isUnify && b.exprDepth == 0 && cycleError(b) != nil {
 			ctx.cycleErr = true
 			return left
 		}
@@ -82,7 +83,7 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 	if invert {
 		left, right = right, left
 	}
-	if op != opUnify {
+	if !isUnify {
 		// Any operation other than unification or disjunction must be on
 		// concrete types. Disjunction is handled separately.
 		if !leftKind.isGround() || !rightKind.isGround() {
@@ -94,7 +95,7 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		return v
 	}
 
-	// op == opUnify
+	// isUnify
 
 	// TODO: unify type masks.
 	if left == right {
@@ -108,13 +109,13 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 	}
 
 	if dl, ok := left.(*disjunction); ok {
-		return distribute(ctx, src, dl, right)
+		return distribute(ctx, src, op, dl, right)
 	} else if dr, ok := right.(*disjunction); ok {
-		return distribute(ctx, src, dr, left)
+		return distribute(ctx, src, op, dr, left)
 	}
 
 	if _, ok := right.(*unification); ok {
-		return right.binOp(ctx, src, opUnify, left)
+		return right.binOp(ctx, src, op, left)
 	}
 
 	// TODO: value may be incomplete if there is a cycle. Instead of an error
@@ -141,13 +142,13 @@ type mVal struct {
 // TODO: this is an exponential algorithm. There is no reason to have to
 // resolve this early. Revise this to only do early pruning but not a full
 // evaluation.
-func distribute(ctx *context, src source, x, y evaluated) evaluated {
+func distribute(ctx *context, src source, op op, x, y evaluated) evaluated {
 	dn := &disjunction{baseValue: src.base()}
-	dist(ctx, dn, false, mVal{x, true}, mVal{y, true})
+	dist(ctx, dn, false, op, mVal{x, true}, mVal{y, true})
 	return dn.normalize(ctx, src).val
 }
 
-func dist(ctx *context, d *disjunction, mark bool, x, y mVal) {
+func dist(ctx *context, d *disjunction, mark bool, op op, x, y mVal) {
 	if dx, ok := x.val.(*disjunction); ok {
 		if dx.hasDefaults {
 			mark = true
@@ -155,7 +156,7 @@ func dist(ctx *context, d *disjunction, mark bool, x, y mVal) {
 		}
 		for _, dxv := range dx.values {
 			m := dxv.marked || !dx.hasDefaults
-			dist(ctx, d, mark, mVal{dxv.val.evalPartial(ctx), m}, y)
+			dist(ctx, d, mark, op, mVal{dxv.val.evalPartial(ctx), m}, y)
 		}
 		return
 	}
@@ -166,12 +167,12 @@ func dist(ctx *context, d *disjunction, mark bool, x, y mVal) {
 		}
 		for _, dxy := range dy.values {
 			m := dxy.marked || !dy.hasDefaults
-			dist(ctx, d, mark, x, mVal{dxy.val.evalPartial(ctx), m})
+			dist(ctx, d, mark, op, x, mVal{dxy.val.evalPartial(ctx), m})
 		}
 		return
 	}
-	src := binSrc(token.NoPos, opUnify, x.val, y.val)
-	d.add(ctx, binOp(ctx, src, opUnify, x.val, y.val), mark && x.mark && y.mark)
+	src := binSrc(token.NoPos, op, x.val, y.val)
+	d.add(ctx, binOp(ctx, src, op, x.val, y.val), mark && x.mark && y.mark)
 }
 
 func (x *disjunction) binOp(ctx *context, src source, op op, other evaluated) evaluated {
@@ -331,7 +332,6 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
 		if k == bottomKind {
 			return ctx.mkErr(src, msg, opUnify, ctx.str(x), ctx.str(other), x.kind(), other.kind())
-			break
 		}
 		switch y := other.(type) {
 		case *basicType:
@@ -582,7 +582,8 @@ func evalLambda(ctx *context, a value) (l *lambdaExpr, err evaluated) {
 
 func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	y, ok := other.(*structLit)
-	if !ok || op != opUnify {
+	_, isUnify := op.unifyType()
+	if !ok || !isUnify {
 		return ctx.mkIncompatible(src, op, x, other)
 	}
 
@@ -594,7 +595,14 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		return x
 	}
 	arcs := make(arcs, 0, len(x.arcs)+len(y.arcs))
-	obj := &structLit{binSrc(src.Pos(), op, x, other), x.emit, nil, nil, arcs, nil}
+	obj := &structLit{
+		binSrc(src.Pos(), op, x, other), // baseValue
+		x.emit,                          // emit
+		nil,                             // template
+		nil,                             // comprehensions
+		arcs,                            // arcs
+		nil,                             // attributes
+	}
 	defer ctx.pushForwards(x, obj, y, obj).popForwards()
 
 	tx, ex := evalLambda(ctx, x.template)

@@ -133,6 +133,10 @@ func (op op) isCmp() bool {
 	return opEql <= op && op <= opGeq
 }
 
+func (op op) unifyType() (unchecked, ok bool) {
+	return false, op == opUnify
+}
+
 type op uint16
 
 const (

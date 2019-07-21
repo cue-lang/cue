@@ -237,7 +237,7 @@ func (x *yield) rewrite(ctx *context, fn rewriteFunc) value {
 	if key == x.key && value == x.value {
 		return x
 	}
-	return &yield{x.baseValue, x.opt, key, value}
+	return &yield{x.baseValue, x.opt, x.def, key, value}
 }
 
 func (x *guard) rewrite(ctx *context, fn rewriteFunc) value {

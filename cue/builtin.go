@@ -91,7 +91,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit
 		for _, a := range pkg.arcs {
 			// Discard option status and attributes at top level.
 			// TODO: filter on capitalized fields?
-			obj.insertValue(ctx, a.feature, false, a.v, nil, a.docs)
+			obj.insertValue(ctx, a.feature, false, false, a.v, nil, a.docs)
 		}
 	}
 
@@ -135,6 +135,20 @@ var lenBuiltin = &builtin{
 			s, _ := v.String()
 			c.ret = len(s)
 		}
+	},
+}
+
+var closeBuiltin = &builtin{
+	Name:   "close",
+	Params: []kind{structKind},
+	Result: structKind,
+	Func: func(c *callCtxt) {
+		s, ok := c.args[0].(*structLit)
+		if !ok {
+			c.ret = errors.Newf(c.args[0].Pos(), "struct argument must be concrete")
+			return
+		}
+		c.ret = s.close()
 	},
 }
 

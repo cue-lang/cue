@@ -624,13 +624,41 @@ type structLit struct {
 	baseValue
 
 	// TODO(perf): separate out these infrequent values to save space.
-	emit           value // currently only supported at top level.
-	template       value
+	emit value // currently only supported at top level.
+	// TODO: make this a list of templates and don't unify until templates are
+	// applied. This allows generalization of having different constraints
+	// for different field sets. This could also be used to mark closedness:
+	// use [string]: _ for fully open. This could be a sentinel value.
+	// For now we use a boolean for closedness.
+
+	// NOTE: must be conjunction of lists.
+	// For lists originating from closed structs,
+	// there must be at least one match.
+	// templates [][]value
+	// catch_all: value
+
+	// template must evaluated to a lambda and is applied to all concrete
+	// values in the struct, whether it be open or closed.
+	template value
+	isClosed bool
+
 	comprehensions []*fieldComprehension
 
 	// TODO: consider hoisting the template arc to its own value.
 	arcs     []arc
 	expanded evaluated
+}
+
+func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
+	if x.template == nil {
+		x.template = t
+	} else {
+		x.template = mkBin(ctx, pos, opUnify, x.template, t)
+	}
+}
+
+func (x *structLit) allows(f label) bool {
+	return !x.isClosed
 }
 
 func newStruct(src source) *structLit {
@@ -644,6 +672,16 @@ type arcs []arc
 func (x *structLit) Len() int           { return len(x.arcs) }
 func (x *structLit) Less(i, j int) bool { return x.arcs[i].feature < x.arcs[j].feature }
 func (x *structLit) Swap(i, j int)      { x.arcs[i], x.arcs[j] = x.arcs[j], x.arcs[i] }
+
+func (x *structLit) close() *structLit {
+	if x.template != nil {
+		return x // there is nothing to close as it is already fully defined.
+	}
+
+	newS := *x
+	newS.isClosed = true
+	return &newS
+}
 
 // lookup returns the node for the given label f, if present, or nil otherwise.
 func (x *structLit) lookup(ctx *context, f label) arc {
@@ -674,11 +712,22 @@ func (x *structLit) iterAt(ctx *context, i int) arc {
 }
 
 func (x *structLit) at(ctx *context, i int) evaluated {
+	// TODO: limit visibility of definitions:
+	// Approach:
+	// - add package identifier to arc (label)
+	// - assume ctx is unique for a package
+	// - record package identifier in context
+	// - if arc is a definition, check IsExported and verify the package if not.
+	//
+	// The same approach could be valid for looking up package-level identifiers.
+	// - detect somehow aht root nodes are.
+	//
+	// Allow import of CUE files. These cannot have a package clause.
+
 	x, err := x.expandFields(ctx)
 	if err != nil {
 		return err
 	}
-
 	// if x.emit != nil && isBottom(x.emit) {
 	// 	return x.emit.(evaluated)
 	// }
@@ -755,7 +804,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	newArcs := []arc{}
 
 	for _, c := range comprehensions {
-		result := c.clauses.yield(ctx, func(k, v evaluated, opt bool) *bottom {
+		result := c.clauses.yield(ctx, func(k, v evaluated, opt, def bool) *bottom {
 			if !k.kind().isAnyOf(stringKind) {
 				return ctx.mkErr(k, "key must be of type string")
 			}
@@ -777,9 +826,10 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 				}
 			}
 			newArcs = append(newArcs, arc{
-				feature:  f,
-				optional: opt,
-				v:        v,
+				feature:    f,
+				optional:   opt,
+				definition: def,
+				v:          v,
 			})
 			return nil
 		})
@@ -803,6 +853,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 		x.baseValue, // baseValue
 		emit,        // emit
 		template,    // template
+		false,       // isClosed
 		nil,         // comprehensions
 		newArcs,     // arcs
 		nil,         // attributes
@@ -843,8 +894,10 @@ const hidden label = 0x01 // only set iff identifier starting with $
 // however, may have both. In this case, the value must ultimately evaluate
 // to a node, which will then be merged with the existing one.
 type arc struct {
-	feature  label
-	optional bool
+	feature    label
+	optional   bool
+	definition bool // field is a definition
+
 	// TODO: add index to preserve approximate order within a struct and use
 	// topological sort to compute new struct order when unifying. This could
 	// also be achieved by not sorting labels on features and doing
@@ -905,19 +958,27 @@ func (a *arc) setValue(v value) {
 }
 
 // insertValue is used during initialization but never during evaluation.
-func (x *structLit) insertValue(ctx *context, f label, optional bool, value value, a *attributes, docs *docNode) {
+func (x *structLit) insertValue(ctx *context, f label, optional, isDef bool, value value, a *attributes, docs *docNode) {
 	for i, p := range x.arcs {
 		if f != p.feature {
 			continue
 		}
-		x.arcs[i].v = mkBin(ctx, token.NoPos, opUnify, p.v, value)
-		// TODO: should we warn if there is a mixed mode of optional and non
-		// optional fields at this point?
 		x.arcs[i].optional = x.arcs[i].optional && optional
 		x.arcs[i].docs = mergeDocs(x.arcs[i].docs, docs)
+		x.arcs[i].v = mkBin(ctx, token.NoPos, opUnify, p.v, value)
+		if isDef != p.definition {
+			src := binSrc(token.NoPos, opUnify, p.v, value)
+			x.arcs[i].v = ctx.mkErr(src,
+				"field %q declared as definition and regular field",
+				ctx.labelStr(f))
+			isDef = false
+		}
+		x.arcs[i].definition = isDef
+		// TODO: should we warn if there is a mixed mode of optional and non
+		// optional fields at this point?
 		return
 	}
-	x.arcs = append(x.arcs, arc{f, optional, value, nil, a, docs})
+	x.arcs = append(x.arcs, arc{f, optional, isDef, value, nil, a, docs})
 	sort.Stable(x)
 }
 
@@ -1322,7 +1383,7 @@ func (x *fieldComprehension) kind() kind {
 	return topKind | nonGround
 }
 
-type yieldFunc func(k, v evaluated, optional bool) *bottom
+type yieldFunc func(k, v evaluated, optional, definition bool) *bottom
 
 type yielder interface {
 	value
@@ -1332,6 +1393,7 @@ type yielder interface {
 type yield struct {
 	baseValue
 	opt   bool
+	def   bool
 	key   value
 	value value
 }
@@ -1352,7 +1414,7 @@ func (x *yield) yield(ctx *context, fn yieldFunc) evaluated {
 	if isBottom(v) {
 		return v
 	}
-	if err := fn(k, v, x.opt); err != nil {
+	if err := fn(k, v, x.opt, x.def); err != nil {
 		return err
 	}
 	return nil

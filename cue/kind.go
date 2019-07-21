@@ -196,7 +196,7 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool, msg string) {
 				return k, true, ""
 			}
 			return bottomKind, false, msg
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			if a&nullKind != 0 {
 				return k, false, ""
 			}
@@ -256,7 +256,7 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool, msg string) {
 	}
 	// a and b have overlapping types.
 	switch op {
-	case opUnify:
+	case opUnify, opUnifyUnchecked:
 		// Increase likelihood of unification succeeding on first try.
 		return u, swap, ""
 

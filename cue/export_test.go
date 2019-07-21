@@ -70,6 +70,8 @@ func TestExport(t *testing.T) {
 				f: string
 			}`),
 	}, {
+		// Here the failed lookups are not considered permanent
+		// failures, as the structs are open.
 		in: `{ a: { b: 2.0, s: "abc" }, b: a.b, c: a.c, d: a["d"], e: a.t[2:3] }`,
 		out: unindent(`
 			{
@@ -82,6 +84,45 @@ func TestExport(t *testing.T) {
 				d: a["d"]
 				e: a.t[2:3]
 			}`),
+	}, {
+		// Here the failed lookups are permanent failures as the structs are
+		// closed.
+		in: `{ a :: { b: 2.0, s: "abc" }, b: a.b, c: a.c, d: a["d"], e: a.t[2:3] }`,
+		out: unindent(`
+			{
+				a :: {
+					b: 2.0
+					s: "abc"
+				}
+				b: 2.0
+				c: _|_ /* undefined field "c" */
+				d: _|_ /* undefined field "d" */
+				e: _|_ /* undefined field "t" */
+			}`),
+	}, {
+		// a closed struct with template restrictions is exported as a
+		// conjunction of two structs.
+		in: `{
+			A :: { b: int }
+			a: A & { <_>: <10 }
+			B :: a
+		}`,
+		out: unindent(`
+		{
+			A :: {
+				b: int
+			}
+			a: close({
+				b: <10
+			}) & {
+				<_>: <10
+			}
+			B :: {
+				b: <10
+			} & {
+				<_>: <10
+			}
+		}`),
 	}, {
 		in: `{
 			a: 5*[int]
@@ -296,6 +337,87 @@ func TestExport(t *testing.T) {
 					command:  "nginx"
 				}
 			}
+		}`),
+	}, {
+		raw: true,
+		in: `{
+			emb :: {
+				a: 1
+
+				sub: {
+					f: 3
+				}
+			}
+			def :: {
+				emb
+
+				b: 2
+			}
+			f :: { a: 10 }
+			e :: {
+				f
+
+				b: int
+				<_>: <100
+			}
+		}`,
+		out: unindent(`
+		{
+			emb :: {
+				a: 1
+				sub f: 3
+			}
+			f :: {
+				a: 10
+			}
+			def :: {
+				emb
+
+				b: 2
+			}
+			e :: {
+				f
+		
+				<_>: <100
+				b:   int
+			}
+		}`),
+	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+				reg: { foo: 1, bar: { baz: 3 } }
+				def :: {
+					a: 1
+
+					sub: reg
+				}
+				val: def
+			}`,
+		out: unindent(`
+		{
+			reg: {
+				foo: 1
+				bar baz: 3
+			}
+			def :: {
+				a: 1
+				sub: {
+					foo: 1
+					bar: {
+						baz: 3
+						...
+					}
+					...
+				}
+			}
+			val: close({
+				a: 1
+				sub: {
+					foo: 1
+					bar baz: 3
+				}
+			})
 		}`),
 	}, {
 		raw:  true,

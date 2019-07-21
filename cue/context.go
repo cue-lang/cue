@@ -31,8 +31,9 @@ type context struct {
 	constraints []*binaryExpr
 	evalStack   []bottom
 
-	inSum    int
-	cycleErr bool
+	inDefinition int
+	inSum        int
+	cycleErr     bool
 
 	noManifest bool
 

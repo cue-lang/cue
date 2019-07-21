@@ -549,8 +549,9 @@ func TestChooseDefault(t *testing.T) {
 
 func TestResolve(t *testing.T) {
 	testCases := []testCase{{
-		in:  `a: { <_>: _ }`,
-		out: `<0>{a: <1>{<>: <2>(_: string)->_, }}`,
+		desc: "convert _ to top",
+		in:   `a: { <_>: _ }`,
+		out:  `<0>{a: <1>{...}}`,
 	}, {
 		in: `
 			a: b.c.d
@@ -611,7 +612,7 @@ func TestResolve(t *testing.T) {
 			`c: <3>{foo: 1 @bar() @baz(1) @foo()}, ` +
 			`e: _|_((<4>.a & <5>{foo: 1 @foo(other)}):conflicting attributes for key "foo")}`,
 	}, {
-		desc: "optional fields",
+		desc: "optional field unification",
 		in: `
 			a: { foo?: string }
 			b: { foo: "foo" }
@@ -628,6 +629,16 @@ func TestResolve(t *testing.T) {
 			`d: <4>{foo?: "bar"}, ` +
 			`g1: 1, ` +
 			`g2?: 2}`,
+	}, {
+		desc: "optional field resolves to incomplete",
+		in: `
+		r: {
+			a?: 3
+			b: a
+			c: r["a"]
+		}
+	`,
+		out: `<0>{r: <1>{a?: 3, b: <2>.a, c: <2>["a"]}}`,
 	}, {
 		desc: "bounds",
 		in: `
@@ -1068,6 +1079,188 @@ func TestResolve(t *testing.T) {
 			ti: t & { c: int }
 			`,
 		out: `<0>{a: <1>{c: 5, d: 15}, t: <2>{c: number, d: (<3>.c * 3)}, b: <4>{c: 7, d: 21}, ti: <5>{c: int, d: (<6>.c * 3)}}`,
+	}, {
+		desc: "definitions",
+		in: `
+			Foo :: {
+				field: int
+				recursive: {
+					field: string
+				}
+			}
+
+			Foo1 :: { field: int }
+			Foo1 :: { field2: string }
+
+			foo: Foo
+			foo: { feild: 2 }
+
+			foo1: Foo
+			foo1: {
+				field: 2
+				recursive: {
+					feild: 2 // Not caught as per spec. TODO: change?
+				}
+			}
+
+			Bar :: {
+				field: int
+				<A>:   int
+			}
+			bar: Bar
+			bar: { feild: 2 }
+
+			Mixed :: string
+			Mixed: string
+
+			mixedRec: { Mixed :: string }
+			mixedRec: { Mixed: string }
+			`,
+		out: `<0>{` +
+			`Foo :: <1>C{field: int, recursive: <2>C{field: string}}, ` +
+			`Foo1 :: _|_((<3>C{field: int} & <4>C{field2: string}):field "field" not allowed in closed struct), ` +
+			`foo: _|_(2:field "feild" not allowed in closed struct), ` +
+			`foo1: <5>C{field: 2, recursive: _|_(2:field "feild" not allowed in closed struct)}, ` +
+			`Bar :: <6>{<>: <7>(A: string)->int, field: int}, ` +
+			`bar: <8>{<>: <9>(A: string)->int, field: int, feild: 2}, ` +
+			`Mixed: _|_(field "Mixed" declared as definition and regular field), ` +
+			`mixedRec: _|_(field "Mixed" declared as definition and regular field)}`,
+	}, {
+		desc: "definitions with oneofs",
+		in: `
+			Foo :: {
+				field: int
+
+				{ a: 1 } |
+				{ b: 2 }
+			}
+
+			foo: Foo
+			foo: { a: 2 }
+
+			bar: Foo
+			bar: { c: 2 }
+
+			baz: Foo
+			baz: { b: 2 }
+			`,
+		out: `<0>{` +
+			`Foo :: (<1>C{field: int, a: 1} | <2>C{field: int, b: 2}), ` +
+			`foo: _|_((<3>.Foo & <4>{a: 2}):empty disjunction: C{field: int, a: (1 & 2)}), ` +
+			`bar: _|_((<3>.Foo & <5>{c: 2}):empty disjunction: field "c" not allowed in closed struct), ` +
+			`baz: <6>C{field: int, b: 2}}`,
+	}, {
+		desc: "definitions with embedding",
+		in: `
+		E :: {
+			a: { b: int }
+		}
+
+		S :: {
+			E
+			a: { c: int }
+			b: 3
+		}
+
+		// error: literal struct is closed before unify
+		e1 :: S & { a c: 4 }
+		// no such issue here
+		v1: S & { a c: 4 }
+
+		// adding a field to a nested struct that is closed.
+		e2: S & { a d: 4 }
+		`,
+		out: `<0>{` +
+			`E :: <1>C{a: <2>C{b: int}}, ` +
+			`S :: <3>C{a: _|_((<4>C{b: int} & <5>C{c: int}):field "b" not allowed in closed struct), b: 3}, ` +
+			`e1 :: _|_((<6>.S & <7>C{a: <8>C{c: 4}}):field "b" not allowed in closed struct), ` +
+			`v1: <9>C{a: _|_((<10>C{b: int} & <11>C{c: int}):field "b" not allowed in closed struct), b: 3}, ` +
+			`e2: <12>C{a: _|_((<13>C{b: int} & <14>C{c: int}):field "b" not allowed in closed struct), b: 3}}`,
+	}, {
+		desc: "closing structs",
+		in: `
+		op: {x: int}             // {x: int}
+		ot: {x: int, ...}        // {x: int, ...}
+		cp: close({x: int})      // closed({x: int})
+		ct: close({x: int, ...}) // {x: int, ...}
+
+		opot: op & ot  // {x: int, ...}
+		otop: ot & op  // {x: int, ...}
+		opcp: op & cp  // closed({x: int})
+		cpop: cp & op  // closed({x: int})
+		opct: op & ct  // {x: int, ...}
+		ctop: ct & op  // {x: int, ...}
+		otcp: ot & cp  // closed({x: int})
+		cpot: cp & ot  // closed({x: int})
+		otct: ot & ct  // {x: int, ...}
+		ctot: ct & ot  // {x: int, ...}
+		cpct: cp & ct  // closed({x: int})
+		ctcp: ct & cp  // closed({x: int})
+		ctct: ct & ct  // {x: int, ...}
+		`,
+		out: `<0>{` +
+			`op: <1>{x: int}, ` +
+			`ot: <2>{x: int, ...}, ` +
+			`cp: <3>C{x: int}, ` +
+			`ct: <4>{x: int, ...}, ` +
+			`opot: <5>{x: int, ...}, ` +
+			`otop: <6>{x: int, ...}, ` +
+			`opcp: <7>C{x: int}, ` +
+			`cpop: <8>C{x: int}, ` +
+			`opct: <9>{x: int, ...}, ` +
+			`ctop: <10>{x: int, ...}, ` +
+			`otcp: <11>C{x: int}, ` +
+			`cpot: <12>C{x: int}, ` +
+			`otct: <13>{x: int, ...}, ` +
+			`ctot: <14>{x: int, ...}, ` +
+			`cpct: <15>C{x: int}, ` +
+			`ctcp: <16>C{x: int}, ` +
+			`ctct: <17>{x: int, ...}}`,
+	}, {
+		desc: "closing with failed optional",
+		in: `
+		k1 :: {a: int, b?: int} & {a: int} // closed({a: int})
+		k2 :: {a: int} & {a: int, b?: int} // closed({a: int})
+
+		o1: {a?: 3} & {a?: 4} // {a?: _|_}
+
+		// Optional fields with error values can be elimintated when closing
+		o2 :: {a?: 3} & {a?: 4} // close({})
+
+		d1 :: {a?: 2, b: 4} | {a?: 3, c: 5}
+		v1: d1 & {a?: 3, b: 4}  // close({b: 4})
+		`,
+		out: `<0>{` +
+			`k1 :: <1>C{a: int}, ` +
+			`k2 :: <2>C{a: int}, ` +
+			`o1: <3>{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
+			`o2 :: <4>C{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
+			`d1 :: (<5>C{a?: 2, b: 4} | <6>C{a?: 3, c: 5}), ` +
+			`v1: <7>C{a?: _|_((2 & 3):conflicting values 2 and 3), b: 4}}`,
+	}, {
+		desc: "closing with comprehensions",
+		in: `
+		A :: {f1: int, f2: int}
+
+		// Comprehension fields cannot be added like any other.
+		a: A & { "\(k)": v for k, v in {f3 : int}}
+
+		// A closed struct may not generate comprehension values it does not
+		// define explicitly.
+		B :: {"\(k)": v for k, v in {f1: int}}
+
+		// To fix this, add all allowed fields.
+		C :: {f1: _, "\(k)": v for k, v in {f1: int}}
+
+		// Or like this.
+		D :: {"\(k)": v for k, v in {f1: int}, ...}
+		`,
+		out: `<0>{` +
+			`A :: <1>C{f1: int, f2: int}, ` +
+			`a: _|_(int:field "f3" not allowed in closed struct), ` +
+			`B :: _|_(int:field "f1" not allowed in closed struct), ` +
+			`C :: <2>C{f1: int}, ` +
+			`D :: <3>{f1: int, ...}}`,
 	}, {
 		desc: "reference to root",
 		in: `
@@ -1564,6 +1757,15 @@ func TestFullEval(t *testing.T) {
 				a: 7080 | int`,
 		out: `<0>{a: _|_((8000.9 & (int | int)):conflicting values 8000.9 and int (mismatched types float and int))}`, // TODO: fix repetition
 	}, {
+		desc: "conflicts in optional fields are okay ",
+		in: `
+			d: {a: 1, b?: 3} | {a: 2}
+
+			// the following conjunction should not eliminate any disjuncts
+			c: d & {b?:4}
+		`,
+		out: `<0>{d: (<1>{a: 1, b?: 3} | <2>{a: 2}), c: (<3>{a: 1, b?: (3 & 4)} | <4>{a: 2, b?: 4})}`,
+	}, {
 		desc: "resolve all disjunctions",
 		in: `
 			service <Name>: {
@@ -1622,8 +1824,12 @@ func TestFullEval(t *testing.T) {
 				a: 3
 				a: 3 if a > 1
 			}
+			d: {
+				a: int
+				a: 3 if a > 1
+			}
 		`,
-		out: `<0>{b: true, c: <1>{a: 3}, a: "foo"}`,
+		out: `<0>{b: true, c: <1>{a: 3}, a: "foo", d: <2>{a: int if (<2>.a > 1) yield ("a"): 3}}`,
 	}, {
 		desc: "referencing field in field comprehension",
 		in: `

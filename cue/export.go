@@ -33,7 +33,7 @@ func doEval(m options) bool {
 }
 
 func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
-	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}}
+	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}, false}
 	top, ok := v.evalPartial(ctx).(*structLit)
 	if ok {
 		top, err := top.expandFields(ctx)
@@ -94,6 +94,7 @@ type exporter struct {
 	stack   []remap
 	top     map[label]bool        // label to alias or ""
 	imports map[string]importInfo // pkg path to info
+	inDef   bool                  // TODO(recclose):use count instead
 }
 
 type importInfo struct {
@@ -202,6 +203,30 @@ func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 	return short
 }
 
+func hasTemplate(s *ast.StructLit) bool {
+	for _, e := range s.Elts {
+		if f, ok := e.(*ast.Field); ok {
+			if _, ok := f.Label.(*ast.TemplateLabel); ok {
+				return true
+			}
+		}
+	}
+	return false
+}
+
+func (p *exporter) closeOrOpen(s *ast.StructLit, isClosed bool) ast.Expr {
+	if isClosed && !p.inDef {
+		return &ast.CallExpr{
+			Fun:  ast.NewIdent("close"),
+			Args: []ast.Expr{s},
+		}
+	}
+	if !isClosed && p.inDef && !hasTemplate(s) {
+		s.Elts = append(s.Elts, &ast.Ellipsis{})
+	}
+	return s
+}
+
 func (p *exporter) expr(v value) ast.Expr {
 	// TODO: use the raw expression for convert incomplete errors downstream
 	// as well.
@@ -210,7 +235,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		x := p.ctx.manifest(e)
 		if isIncomplete(x) {
 			if isBottom(e) {
-				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
+				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports, p.inDef}
 				return p.expr(v)
 			}
 			v = e
@@ -318,6 +343,12 @@ func (p *exporter) expr(v value) ast.Expr {
 		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.x)}
 
 	case *binaryExpr:
+		// opUnifyUnchecked: represented as embedding. The two arguments must
+		// be structs.
+		if x.op == opUnifyUnchecked {
+			s := &ast.StructLit{}
+			return p.closeOrOpen(s, p.embedding(s, x))
+		}
 		return &ast.BinaryExpr{
 			X:  p.expr(x.left),
 			Op: opMap[x.op], Y: p.expr(x.right),
@@ -358,9 +389,28 @@ func (p *exporter) expr(v value) ast.Expr {
 		return bin
 
 	case *structLit:
-		expr, err := p.structure(x)
+		st, err := p.structure(x, !x.isClosed)
 		if err != nil {
 			return p.expr(err)
+		}
+		expr := p.closeOrOpen(st, x.isClosed)
+		switch {
+		case x.isClosed && x.template != nil:
+			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
+			if !ok {
+				break
+			}
+			if _, ok := l.value.(*top); ok {
+				break
+			}
+			expr = &ast.BinaryExpr{X: expr, Op: token.AND, Y: &ast.StructLit{
+				Elts: []ast.Decl{&ast.Field{
+					Label: &ast.TemplateLabel{
+						Ident: p.identifier(l.params.arcs[0].feature),
+					},
+					Value: p.expr(l.value),
+				}},
+			}}
 		}
 		return expr
 
@@ -520,7 +570,7 @@ func (p *exporter) expr(v value) ast.Expr {
 	}
 }
 
-func (p *exporter) structure(x *structLit) (ret *ast.StructLit, err *bottom) {
+func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, err *bottom) {
 	obj := &ast.StructLit{}
 	if doEval(p.mode) {
 		x, err = x.expandFields(p.ctx)
@@ -539,9 +589,13 @@ func (p *exporter) structure(x *structLit) (ret *ast.StructLit, err *bottom) {
 	if x.emit != nil {
 		obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
 	}
-	if !doEval(p.mode) && x.template != nil {
+	switch {
+	case !doEval(p.mode) && x.template != nil && addTempl:
 		l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
 		if ok {
+			if _, ok := l.value.(*top); ok && !x.isClosed {
+				break
+			}
 			obj.Elts = append(obj.Elts, &ast.Field{
 				Label: &ast.TemplateLabel{
 					Ident: p.identifier(l.params.arcs[0].feature),
@@ -566,20 +620,26 @@ func (p *exporter) structure(x *structLit) (ret *ast.StructLit, err *bottom) {
 			}
 			f.Optional = token.NoSpace.Pos()
 		}
+		if a.definition {
+			f.Token = token.ISA
+		}
 		if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
 			continue
 		}
+		oldInDef := p.inDef
+		p.inDef = a.definition || p.inDef
 		if !doEval(p.mode) {
 			f.Value = p.expr(a.v)
 		} else {
 			e := x.at(p.ctx, i)
 			if v := p.ctx.manifest(e); isIncomplete(v) && !p.mode.concrete && isBottom(e) {
-				p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports}
+				p := &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports, p.inDef}
 				f.Value = p.expr(a.v)
 			} else {
 				f.Value = p.expr(e)
 			}
 		}
+		p.inDef = oldInDef
 		if a.attrs != nil && !p.mode.omitAttrs {
 			for _, at := range a.attrs.attr {
 				f.Attrs = append(f.Attrs, &ast.Attribute{Text: at.text})
@@ -622,6 +682,31 @@ func (p *exporter) structure(x *structLit) (ret *ast.StructLit, err *bottom) {
 		}
 	}
 	return obj, nil
+}
+
+func (p *exporter) embedding(s *ast.StructLit, n value) (closed bool) {
+	switch x := n.(type) {
+	case *structLit:
+		st, err := p.structure(x, true)
+		if err != nil {
+			n = err
+			break
+		}
+		s.Elts = append(s.Elts, st.Elts...)
+		return x.isClosed
+
+	case *binaryExpr:
+		if x.op != opUnifyUnchecked {
+			// should not happen
+			s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: p.expr(x)})
+			return false
+		}
+		leftClosed := p.embedding(s, x.left)
+		rightClosed := p.embedding(s, x.right)
+		return leftClosed || rightClosed
+	}
+	s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: p.expr(n)})
+	return false
 }
 
 // quote quotes the given string.

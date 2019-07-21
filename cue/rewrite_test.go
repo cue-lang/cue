@@ -75,7 +75,7 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 			t = v
 		}
 		emit := testResolve(ctx, x.emit, m)
-		obj := &structLit{x.baseValue, emit, t, nil, arcs, nil}
+		obj := &structLit{x.baseValue, emit, t, x.isClosed, nil, arcs, nil}
 		return obj
 	case *list:
 		elm := rewriteRec(ctx, x.elem, x.elem, m).(*structLit)

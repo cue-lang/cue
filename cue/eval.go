@@ -67,7 +67,7 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 		}
 		if n.val() == nil {
 			field := ctx.labelStr(x.feature)
-			if _, ok := sc.(*structLit); ok {
+			if st, ok := sc.(*structLit); ok && !st.isClosed {
 				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
 			}
 			//	m.foo undefined (type map[string]bool has no field or method foo)
@@ -105,7 +105,10 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 				return ctx.mkErr(x, index, codeIncomplete, "field %q is optional", s)
 			}
 			if n.val() == nil {
-				return ctx.mkErr(x, index, codeIncomplete, "undefined field %q", s)
+				if !v.isClosed {
+					return ctx.mkErr(x, index, codeIncomplete, "undefined field %q", s)
+				}
+				return ctx.mkErr(x, index, "undefined field %q", s)
 			}
 			return n.cache
 		}
@@ -252,7 +255,7 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	s := &structLit{baseValue: x.baseValue}
 	list := &list{baseValue: x.baseValue, elem: s}
-	result := x.clauses.yield(ctx, func(k, v evaluated, _ bool) *bottom {
+	result := x.clauses.yield(ctx, func(k, v evaluated, _, _ bool) *bottom {
 		if !k.kind().isAnyOf(intKind) {
 			return ctx.mkErr(k, "key must be of type int")
 		}

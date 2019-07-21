@@ -230,16 +230,42 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v1.doc = v.doc
 		}
 		ret = obj
-		for _, e := range n.Elts {
+		for i, e := range n.Elts {
 			switch x := e.(type) {
+			case *ast.Ellipsis:
+				if i != len(n.Elts)-1 {
+					return v1.walk(x.Type) // Generate an error
+				}
+				f := v.ctx().label("_", true)
+				sig := &params{}
+				sig.add(f, &basicType{newNode(x), stringKind})
+				template := &lambdaExpr{newNode(x), sig, &top{newNode(x)}}
+				v1.object.addTemplate(v.ctx(), token.NoPos, template)
+
 			case *ast.EmbedDecl:
-				// Only allowed at top-level.
-				return v1.errf(x, "emitting values is only allowed at top level")
+				e := v1.walk(x.Expr)
+				if isBottom(e) {
+					return e
+				}
+				if e.kind()&structKind == 0 {
+					return v1.errf(x, "can only embed structs (found %v)", e.kind())
+				}
+				ret = mkBin(v1.ctx(), x.Pos(), opUnifyUnchecked, ret, e)
+				obj = &structLit{}
+				v1.object = obj
+				ret = mkBin(v1.ctx(), x.Pos(), opUnifyUnchecked, ret, obj)
+
 			case *ast.Field, *ast.Alias:
 				v1.walk(e)
+
 			case *ast.ComprehensionDecl:
 				v1.walk(x)
 			}
+		}
+		if v.ctx().inDefinition > 0 {
+			// For embeddings this is handled in binOp, in which case the
+			// isClosed bit is cleared if a template is introduced.
+			obj.isClosed = obj.template == nil
 		}
 		if passDoc {
 			v.doc = v1.doc // signal usage of document back to parent.
@@ -271,10 +297,14 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		ret = list
 
 	case *ast.Ellipsis:
-		return v.errf(n, "ellipsis (...) only allowed at end of list")
+		return v.errf(n, "ellipsis (...) only allowed at end of list or struct")
 
 	case *ast.ComprehensionDecl:
-		yielder := &yield{baseValue: newExpr(n.Field.Value)}
+		yielder := &yield{
+			baseValue: newExpr(n.Field.Value),
+			opt:       n.Field.Optional != token.NoPos,
+			def:       n.Field.Token == token.ISA,
+		}
 		fc := &fieldComprehension{
 			baseValue: newDecl(n),
 			clauses:   wrapClauses(v, yielder, n.Clauses),
@@ -334,6 +364,12 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 	case *ast.Field:
 		opt := n.Optional != token.NoPos
+		isDef := n.Token == token.ISA
+		if isDef {
+			ctx := v.ctx()
+			ctx.inDefinition++
+			defer func() { ctx.inDefinition-- }()
+		}
 		switch x := n.Label.(type) {
 		case *ast.Interpolation:
 			v.sel = "?"
@@ -345,9 +381,13 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			yielder.key = v.walk(x)
 			yielder.value = v.walk(n.Value)
 			yielder.opt = opt
+			yielder.def = isDef
 			v.object.comprehensions = append(v.object.comprehensions, fc)
 
 		case *ast.TemplateLabel:
+			if isDef {
+				v.errf(x, "map element type cannot be a definition")
+			}
 			v.sel = "*"
 			f := v.label(x.Ident.Name, true)
 
@@ -358,11 +398,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v.setScope(n, template)
 			template.value = v.walk(n.Value)
 
-			if v.object.template == nil {
-				v.object.template = template
-			} else {
-				v.object.template = mkBin(v.ctx(), token.NoPos, opUnify, v.object.template, template)
-			}
+			v.object.addTemplate(v.ctx(), token.NoPos, template)
 
 		case *ast.BasicLit, *ast.Ident:
 			if internal.DropOptional && opt {
@@ -392,7 +428,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 					}
 				}
 				val := v.walk(n.Value)
-				v.object.insertValue(v.ctx(), f, opt, val, attrs, v.doc)
+				v.object.insertValue(v.ctx(), f, opt, isDef, val, attrs, v.doc)
 				v.doc = leftOverDoc
 			}
 
@@ -445,6 +481,8 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 			case "len":
 				return lenBuiltin
+			case "close":
+				return closeBuiltin
 			case "and":
 				return andBuiltin
 			case "or":

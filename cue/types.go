@@ -1078,12 +1078,13 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		}
 		arcs = arcs[:k]
 		obj = &structLit{
-			obj.baseValue,
-			obj.emit,
-			obj.template,
-			nil,
-			arcs,
-			nil,
+			obj.baseValue, // baseValue
+			obj.emit,      // emit
+			obj.template,  // template
+			obj.isClosed,  // isClosed
+			nil,           // comprehensions
+			arcs,          // arcs
+			nil,           // attributes
 		}
 	}
 	return structValue{ctx, v.path, obj}, nil

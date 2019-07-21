@@ -134,6 +134,9 @@ func (op op) isCmp() bool {
 }
 
 func (op op) unifyType() (unchecked, ok bool) {
+	if op == opUnifyUnchecked {
+		return true, true
+	}
 	return false, op == opUnify
 }
 
@@ -143,6 +146,7 @@ const (
 	opUnknown op = iota
 
 	opUnify
+	opUnifyUnchecked
 	opDisjunction
 
 	opLand
@@ -174,8 +178,11 @@ const (
 var opStrings = []string{
 	opUnknown: "??",
 
-	opUnify:       "&",
-	opDisjunction: "|",
+	opUnify: "&",
+	// opUnifyUnchecked is internal only. Syntactically this is
+	// represented as embedding.
+	opUnifyUnchecked: "&!",
+	opDisjunction:    "|",
 
 	opLand: "&&",
 	opLor:  "||",

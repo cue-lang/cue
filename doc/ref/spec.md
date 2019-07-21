@@ -976,6 +976,22 @@ Any [references](#References) to `a` or `b`
 in their respective field values need to be replaced with references to `c`.
 The result of a unification is bottom (`_|_`) if any of its required
 fields evaluates to bottom, recursively.
+<!--NOTE: About bottom values for optional fields being okay.
+
+The proposition ¬P is a close cousin of P → ⊥ and is often used
+as an approximation to avoid the issues of using not.
+Bottom (⊥) is also frequently used to mean undefined. This makes sense.
+Consider `{a?: 2} & {a?: 3}`.
+Both structs say `a` is optional; in other words, it may be omitted.
+So we can still get a valid result by omitting `a`, even in
+case of a conflict.
+
+Granted, this definition may lead to confusing results, especially in
+definitions, when tightening an optional field leads to unintentionally
+discarding it.
+It could be a role of vet checkers to identify such cases (and suggest users
+to explicitly use `_|_` to discard a field, for instance).
+-->
 
 Syntactically, the labels of optional fields are followed by a
 question mark `?`.
@@ -998,6 +1014,8 @@ An optional expression limits this to the set of optional fields which
 labels match the expression.
 -->
 A Bind label binds an identifier to the label name scoped to the field value.
+It also makes all possible labels an optional field set to the
+associated field value.
 The token `...` is a shorthand for `<_>: _`.
 <!-- NOTE: if we allow ...Expr, as in list, it would mean something different. -->
 
@@ -1103,12 +1121,11 @@ h: b & { foo?: number }                _|_
 #### Closed structs
 
 By default, structs are open to adding fields.
-One could say that an optional field `f` with value top (`_`) is defined for any
-unspecified field.
+Instances of an open struct `p` may contain fields not defined in `p`.
 A _closed struct_ `c` is a struct whose instances may not have fields
 not defined in `c`.
 Closing a struct is equivalent to adding an optional field with value `_|_`
-for any undefined field.
+for all undefined fields.
 
 Note that fields created with field comprehensions are not considered
 defined fields.
@@ -1150,9 +1167,19 @@ D: close({
 #### Embedding
 
 A struct may contain an _embedded value_, an Operand used
-as a field declaration.
+as a declaration, which must evaluate to a struct.
+An embedded value of type struct is unified with the struct in which it is
+embedded, but disregarding the restrictions imposed by closed structs
+for its top-level fields.
+<!--TODO: consider relaxing it to the below.
 An embedded value of type struct is unified with the struct in which it is
 embedded, but disregarding the restrictions imposed by closed structs.
+
+Note that in the above definition we cannot say that the fields of the
+embedded struct are added: references within these fields referring to
+the embedded struct should be rewired to reference the new struct.
+This would not be the case with  per-field definition.
+-->
 A struct resulting from such a unification is closed if either of the involved
 structs were closed.
 
@@ -1166,7 +1193,8 @@ to be concrete when emitting data.
 It is illegal to have a normal field and a definition with the same name
 within the same struct.
 Literal structs that are part of a definition's value are implicitly closed.
-An ellipsis `...` in such literal structs keeps them open.
+An ellipsis `...` in such literal structs keeps them open,
+as it defines `_` for all labels.
 
 
 ```

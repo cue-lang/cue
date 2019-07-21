@@ -267,8 +267,19 @@ func (p *printer) str(v interface{}) {
 		if p.showNodeRef {
 			p.writef("<%s>", p.ctx.ref(x))
 		}
-		writef("{")
-		if x.template != nil {
+		if x.isClosed {
+			write("C")
+		}
+		write("{")
+		topDefault := false
+		switch {
+		case x.template != nil:
+			lambda, ok := x.template.(*lambdaExpr)
+			if ok {
+				if _, topDefault = lambda.value.(*top); topDefault {
+					break
+				}
+			}
 			write("<>: ")
 			p.str(x.template)
 			write(", ")
@@ -279,6 +290,12 @@ func (p *printer) str(v interface{}) {
 			if i < len(x.comprehensions)-1 {
 				p.write(", ")
 			}
+		}
+		if topDefault && !x.isClosed {
+			if len(x.arcs) > 0 {
+				p.write(", ")
+			}
+			p.write("...")
 		}
 		write("}")
 
@@ -302,7 +319,11 @@ func (p *printer) str(v interface{}) {
 		if x.optional {
 			p.write("?")
 		}
-		p.write(": ")
+		if x.definition {
+			p.write(" :: ")
+		} else {
+			p.write(": ")
+		}
 		p.str(n)
 		if x.attrs != nil {
 			for _, a := range x.attrs.attr {

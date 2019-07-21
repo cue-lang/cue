@@ -183,6 +183,8 @@ func (x *bottom) binOp(ctx *context, src source, op op, other evaluated) evaluat
 	panic("unreachable: special-cased")
 }
 
+// add adds to a unification. Note that the value cannot be a struct and thus
+// there is no need to distinguish between checked and unchecked unification.
 func (x *unification) add(ctx *context, src source, v evaluated) evaluated {
 	for progress := true; progress; {
 		progress = false
@@ -218,7 +220,8 @@ func (x *unification) add(ctx *context, src source, v evaluated) evaluated {
 }
 
 func (x *unification) binOp(ctx *context, src source, op op, other evaluated) evaluated {
-	if op == opUnify {
+	if _, isUnify := op.unifyType(); isUnify {
+		// Cannot be checked unification.
 		u := &unification{baseValue: baseValue{src}}
 		u.values = append(u.values, x.values...)
 		if y, ok := other.(*unification); ok {
@@ -237,7 +240,7 @@ func (x *unification) binOp(ctx *context, src source, op op, other evaluated) ev
 
 func (x *top) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch op {
-	case opUnify:
+	case opUnify, opUnifyUnchecked:
 		return other
 	}
 	src = mkBin(ctx, src.Pos(), op, x, other)
@@ -328,7 +331,7 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 
 	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
-	case opUnify:
+	case opUnify, opUnifyUnchecked:
 		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
 		if k == bottomKind {
 			return ctx.mkErr(src, msg, opUnify, ctx.str(x), ctx.str(other), x.kind(), other.kind())
@@ -495,7 +498,7 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
-	case opUnify:
+	case opUnify, opUnifyUnchecked:
 		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
 		if k == bottomKind {
 			return ctx.mkErr(src, msg, op, ctx.str(x), ctx.str(other), x.kind(), other.kind())
@@ -582,7 +585,7 @@ func evalLambda(ctx *context, a value) (l *lambdaExpr, err evaluated) {
 
 func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	y, ok := other.(*structLit)
-	_, isUnify := op.unifyType()
+	unchecked, isUnify := op.unifyType()
 	if !ok || !isUnify {
 		return ctx.mkIncompatible(src, op, x, other)
 	}
@@ -599,6 +602,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		binSrc(src.Pos(), op, x, other), // baseValue
 		x.emit,                          // emit
 		nil,                             // template
+		x.isClosed || y.isClosed,        // isClosed
 		nil,                             // comprehensions
 		arcs,                            // arcs
 		nil,                             // attributes
@@ -629,6 +633,8 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	if t != nil {
 		obj.template = ctx.copy(t)
 	}
+	// If unifying with a closed struct that does not have a template,
+	// we need to apply the template to all elements.
 
 	sz := len(x.comprehensions) + len(y.comprehensions)
 	obj.comprehensions = make([]*fieldComprehension, sz)
@@ -640,15 +646,38 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	}
 
 	for _, a := range x.arcs {
+		found := false
+		for _, b := range y.arcs {
+			if a.feature == b.feature {
+				found = true
+				break
+			}
+		}
+		if !unchecked && !found && !y.allows(a.feature) {
+			if a.optional {
+				continue
+			}
+			return ctx.mkErr(src, y, "field %q not allowed in closed struct",
+				ctx.labelStr(a.feature))
+		}
 		cp := ctx.copy(a.v)
 		obj.arcs = append(obj.arcs,
-			arc{a.feature, a.optional, cp, nil, a.attrs, a.docs})
+			arc{a.feature, a.optional, a.definition, cp, nil, a.attrs, a.docs})
 	}
 outer:
 	for _, a := range y.arcs {
 		v := ctx.copy(a.v)
+		found := false
 		for i, b := range obj.arcs {
 			if a.feature == b.feature {
+				found = true
+				if a.definition != b.definition {
+					src := binSrc(x.Pos(), op, a.v, b.v)
+					return ctx.mkErr(src, "field %q declared as definition and regular field",
+						ctx.labelStr(a.feature))
+				}
+				// TODO: using opUnify here disables recursive opening in
+				// embedding. Change to op enable it.
 				v = mkBin(ctx, src.Pos(), opUnify, b.v, v)
 				obj.arcs[i].v = v
 				obj.arcs[i].cache = nil
@@ -662,10 +691,21 @@ outer:
 				continue outer
 			}
 		}
+		if !unchecked && !found && !x.allows(a.feature) {
+			if a.optional {
+				continue
+			}
+			return ctx.mkErr(a.v, x, "field %q not allowed in closed struct",
+				ctx.labelStr(a.feature))
+		}
 		a.setValue(v)
 		obj.arcs = append(obj.arcs, a)
 	}
 	sort.Stable(obj)
+
+	if unchecked && obj.template != nil {
+		obj.isClosed = false
+	}
 
 	return obj
 }

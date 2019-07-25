@@ -741,7 +741,7 @@ func TestResolve(t *testing.T) {
 		`,
 		out: `<0>{` +
 			`a: "after", ` +
-			`b: _|_(builtin:ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c")))` +
+			`b: _|_(strings.ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c")))` +
 			`}`,
 	}, {
 		desc: "null coalescing",
@@ -1344,7 +1344,7 @@ func TestResolve(t *testing.T) {
 			`a3: <3>{a: _|_((=~"oo" & "bar"):invalid value "bar" (does not match =~"oo")), b: =~"oo", c: =~"fo"}, ` +
 			`o1: <4>{a: string, b: string, c: "bar"}, ` +
 			`o2: <5>{a: "foo", b: string, c: "bar"}, ` +
-			`o3: <6>{a: _|_((builtin:or ([<7>.b,<7>.c]) & "foo"):empty disjunction: conflicting values "baz" and "foo"), b: "baz", c: "bar"}}`,
+			`o3: <6>{a: _|_((or ([<7>.b,<7>.c]) & "foo"):empty disjunction: conflicting values "baz" and "foo"), b: "baz", c: "bar"}}`,
 	}, {
 		desc: "self-reference cycles conflicts with strings",
 		in: `

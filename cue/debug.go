@@ -171,8 +171,7 @@ func (p *printer) str(v interface{}) {
 	case string:
 		write(x)
 	case *builtin:
-		write("builtin:")
-		p.str(x.Name)
+		write(x.name(p.ctx))
 	case *nodeRef:
 		if p.showNodeRef {
 			writef("<%s>", p.ctx.ref(x.node))

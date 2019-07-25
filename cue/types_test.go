@@ -2004,7 +2004,7 @@ func TestExpr(t *testing.T) {
 		want:  "[:] <0>.a 2 5",
 	}, {
 		input: "v: len([])",
-		want:  "() builtin:len []",
+		want:  "() len []",
 	}, {
 		input: `v: "Hello, \(x)! Welcome to \(place)", place: string, x: string`,
 		want:  `\() "Hello, " <0>.x "! Welcome to " <0>.place ""`,

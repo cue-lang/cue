@@ -921,6 +921,59 @@ func TestUnify(t *testing.T) {
 	}
 }
 
+func TestEquals(t *testing.T) {
+	testCases := []struct {
+		a, b string
+		want bool
+	}{{
+		`4`, `4`, true,
+	}, {
+		`"str"`, `2`, false,
+	}, {
+		`2`, `3`, false,
+	}, {
+		`[1]`, `[3]`, false,
+	}, {
+		`[]`, `[]`, true,
+	}, {
+		`{
+			a: b,
+			b: a,
+		}`,
+		`{
+			a: b,
+			b: a,
+		}`,
+		true,
+	}, {
+		`{
+			a: "foo",
+			b: "bar",
+		}`,
+		`{
+			a: "foo",
+		}`,
+		false,
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			var r Runtime
+			a, err := r.Compile("a", tc.a)
+			if err != nil {
+				t.Fatal(err)
+			}
+			b, err := r.Compile("b", tc.b)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := a.Value().Equals(b.Value())
+			if got != tc.want {
+				t.Errorf("got %v; want %v", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestDecode(t *testing.T) {
 	type fields struct {
 		A int `json:"A"`

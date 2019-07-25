@@ -6,6 +6,22 @@
          "mul": {
             "type": "number",
             "multipleOf": 5
+         },
+         "neq": {
+            "not": {
+               "type": "number",
+               "allOff": [
+                  {
+                     "type": "number",
+                     "minimum": 4
+                  },
+                  {
+                     "type": "number",
+                     "maximum": 4
+                  }
+               ]
+            },
+            "type": "number"
          }
       }
    }

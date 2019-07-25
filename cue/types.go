@@ -1165,6 +1165,18 @@ func (v Value) Unify(w Value) Value {
 	return u
 }
 
+// Equals reports whether two values are equal.
+// The result is undefined for incomplete values.
+func (v Value) Equals(other Value) bool {
+	if v.path == nil || other.path == nil {
+		return false
+	}
+	x := v.path.val()
+	y := other.path.val()
+	// TODO: improve upon this highly inefficient implementation.
+	return subsumes(v.ctx(), x, y, 0) && subsumes(v.ctx(), y, x, 0)
+}
+
 // Format prints a debug version of a value.
 func (v Value) Format(state fmt.State, verb rune) {
 	ctx := v.ctx()

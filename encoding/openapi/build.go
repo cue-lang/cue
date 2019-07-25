@@ -576,10 +576,6 @@ func (b *builder) number(v cue.Value) {
 	// Type may be number of float.
 
 	switch op, a := v.Expr(); op {
-	// TODO: support the following JSON schema constraints
-	// - multipleOf
-	// setIntConstraint(t, "multipleOf", a)
-
 	case cue.LessThanOp:
 		b.setFilter("Schema", "exclusiveMaximum", b.big(a[0]))
 
@@ -595,8 +591,8 @@ func (b *builder) number(v cue.Value) {
 	case cue.NotEqualOp:
 		i := b.big(a[0])
 		b.setNot("allOff", []*oaSchema{
-			b.kv("minItems", i),
-			b.kv("maxItems", i),
+			b.kv("minimum", i),
+			b.kv("maximum", i),
 		})
 
 	case cue.CallOp:

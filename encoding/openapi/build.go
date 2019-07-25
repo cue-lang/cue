@@ -15,6 +15,7 @@
 package openapi
 
 import (
+	"fmt"
 	"math"
 	"math/big"
 	"path"
@@ -612,8 +613,8 @@ func (b *builder) number(v cue.Value) {
 
 // string supports the following options:
 //
-// - maxLenght (Unicode codepoints)
-// - minLenght (Unicode codepoints)
+// - maxLength (Unicode codepoints)
+// - minLength (Unicode codepoints)
 // - pattern (a regexp)
 //
 // The regexp pattern is as follows, and is limited to be a  strict subset of RE2:
@@ -658,7 +659,7 @@ func (b *builder) string(v cue.Value) {
 			return
 		}
 		if op == cue.RegexMatchOp {
-			b.setFilter("schema", "pattern", s)
+			b.setFilter("Schema", "pattern", s)
 		} else {
 			b.setNot("pattern", s)
 		}
@@ -669,6 +670,22 @@ func (b *builder) string(v cue.Value) {
 
 	case cue.NoOp, cue.SelectorOp:
 		// TODO: determine formats from specific types.
+
+	case cue.CallOp:
+		name := fmt.Sprint(a[0])
+		field := ""
+		switch name {
+		case "strings.MinRunes":
+			field = "minLength"
+		case "strings.MaxRunes":
+			field = "maxLength"
+		default:
+			b.failf(v, "builtin %v not supported in OpenAPI", name)
+		}
+		if len(a) != 2 {
+			b.failf(v, "builtin %v may only be used with single argument", name)
+		}
+		b.setFilter("Schema", field, b.int(a[1]))
 
 	default:
 		b.failf(v, "unsupported op %v for string type", op)

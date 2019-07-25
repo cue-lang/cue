@@ -165,6 +165,18 @@ func TestBuiltins(t *testing.T) {
 		test("strings", `strings.ToTitle("alpha")`),
 		`"Alpha"`,
 	}, {
+		test("strings", `strings.MaxRunes(3) & "foo"`),
+		`"foo"`,
+	}, {
+		test("strings", `strings.MaxRunes(3) & "quux"`),
+		`_|_(invalid value "quux" (does not satisfy strings.MaxRunes(3)))`,
+	}, {
+		test("strings", `strings.MinRunes(1) & "e"`),
+		`"e"`,
+	}, {
+		test("strings", `strings.MinRunes(0) & "e"`),
+		`_|_(invalid value "e" (does not satisfy strings.MinRunes(0)))`,
+	}, {
 		test("math/bits", `bits.And(0x10000000000000F0E, 0xF0F7)`), `6`,
 	}, {
 		test("math/bits", `bits.Or(0x100000000000000F0, 0x0F)`),

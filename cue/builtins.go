@@ -1489,6 +1489,27 @@ var builtinPackages = map[string]*builtinPkg{
 	},
 	"strings": &builtinPkg{
 		native: []*builtin{{
+			Name:   "MinRunes",
+			Params: []kind{stringKind, intKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				s, max := c.string(0), c.int(1)
+				c.ret = func() interface{} {
+
+					return len([]rune(s)) <= max
+				}()
+			},
+		}, {
+			Name:   "MaxRunes",
+			Params: []kind{stringKind, intKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				s, max := c.string(0), c.int(1)
+				c.ret = func() interface{} {
+					return len([]rune(s)) <= max
+				}()
+			},
+		}, {
 			Name:   "ToTitle",
 			Params: []kind{stringKind},
 			Result: stringKind,

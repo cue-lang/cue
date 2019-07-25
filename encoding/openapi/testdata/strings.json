@@ -1,0 +1,34 @@
+{
+   "openapi": "3.0.0",
+   "info": {},
+   "components": {
+      "schemas": {
+         "MyType": {
+            "type": "object",
+            "required": [
+               "myString",
+               "myPattern",
+               "myAntiPattern"
+            ],
+            "properties": {
+               "myString": {
+                  "type": "string",
+                  "minLength": 1,
+                  "maxLength": 5
+               },
+               "myPattern": {
+                  "type": "string",
+                  "pattern": "foo.*bar"
+               },
+               "myAntiPattern": {
+                  "not": {
+                     "type": "string",
+                     "pattern": "foo.*bar"
+                  },
+                  "type": "string"
+               }
+            }
+         }
+      }
+   }
+}

@@ -51,6 +51,10 @@ func TestParseDefinitions(t *testing.T) {
 		"array.json",
 		defaultConfig,
 	}, {
+		"strings.cue",
+		"strings.json",
+		defaultConfig,
+	}, {
 		"oneof.cue",
 		"oneof.json",
 		defaultConfig,
@@ -82,6 +86,9 @@ func TestParseDefinitions(t *testing.T) {
 			inst := cue.Build(load.Instances([]string{filename}, nil))[0]
 
 			b, err := Gen(inst, tc.config)
+			if err != nil {
+				t.Fatal(err)
+			}
 			var out = &bytes.Buffer{}
 			_ = json.Indent(out, b, "", "   ")
 

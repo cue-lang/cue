@@ -1,0 +1,12 @@
+{
+   "openapi": "3.0.0",
+   "info": {},
+   "components": {
+      "schemas": {
+         "mul": {
+            "type": "number",
+            "multipleOf": 5
+         }
+      }
+   }
+}

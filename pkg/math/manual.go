@@ -14,7 +14,12 @@
 
 package math
 
-import "math"
+import (
+	"math"
+
+	"cuelang.org/go/internal"
+	"github.com/cockroachdb/apd/v2"
+)
 
 // TODO: use apd
 
@@ -66,4 +71,13 @@ func Round(x float64) float64 {
 //	RoundToEven(NaN) = NaN
 func RoundToEven(x float64) float64 {
 	return math.RoundToEven(x)
+}
+
+var mulContext = apd.BaseContext.WithPrecision(1)
+
+// MultipleOf reports whether x is a multiple of y.
+func MultipleOf(x, y *internal.Decimal) (bool, error) {
+	var d apd.Decimal
+	cond, err := mulContext.Quo(&d, x, y)
+	return !cond.Inexact(), err
 }

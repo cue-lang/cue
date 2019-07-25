@@ -16,6 +16,13 @@ package internal // import "cuelang.org/go/internal"
 
 // TODO: refactor packages as to make this package unnecessary.
 
+import "github.com/cockroachdb/apd/v2"
+
+// A Decimal is an arbitrary-precision binary-coded decimal number.
+//
+// Right now Decimal is aliased to apd.Decimal. This may change in the future.
+type Decimal = apd.Decimal
+
 // DebugStr prints a syntax node.
 var DebugStr func(x interface{}) string
 

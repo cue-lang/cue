@@ -435,7 +435,7 @@ func (b *builder) dispatch(f typeFunc, v cue.Value) {
 
 // object supports the following
 // - maxProperties: maximum allowed fields in this struct.
-// - minProperties: minimum required fields in this struct.a
+// - minProperties: minimum required fields in this struct.
 // - patternProperties: [regexp]: schema
 //   TODO: we can support this once .kv(key, value) allow
 //      foo [=~"pattern"]: type
@@ -598,6 +598,18 @@ func (b *builder) number(v cue.Value) {
 			b.kv("minItems", i),
 			b.kv("maxItems", i),
 		})
+
+	case cue.CallOp:
+		name := fmt.Sprint(a[0])
+		switch name {
+		case "math.MultipleOf":
+			if len(a) != 2 {
+				b.failf(v, "builtin %v may only be used with single argument", name)
+			}
+			b.setFilter("Schema", "multipleOf", b.int(a[1]))
+		default:
+			b.failf(v, "builtin %v not supported in OpenAPI", name)
+		}
 
 	case cue.NoOp:
 		// TODO: extract format from specific type.

@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/third_party/yaml"
+	"github.com/cockroachdb/apd/v2"
 	goyaml "github.com/ghodss/yaml"
 )
 
@@ -36,6 +37,8 @@ func init() {
 }
 
 var _ io.Reader
+
+var mulContext = apd.BaseContext.WithPrecision(1)
 
 var split = path.Split
 
@@ -561,6 +564,18 @@ var builtinPackages = map[string]*builtinPkg{
 				x := c.float64(0)
 				c.ret = func() interface{} {
 					return math.RoundToEven(x)
+				}()
+			},
+		}, {
+			Name:   "MultipleOf",
+			Params: []kind{numKind, numKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				x, y := c.decimal(0), c.decimal(1)
+				c.ret, c.err = func() (interface{}, error) {
+					var d apd.Decimal
+					cond, err := mulContext.Quo(&d, x, y)
+					return !cond.Inexact(), err
 				}()
 			},
 		}, {
@@ -1506,6 +1521,7 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				s, max := c.string(0), c.int(1)
 				c.ret = func() interface{} {
+
 					return len([]rune(s)) <= max
 				}()
 			},

@@ -388,6 +388,8 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "bigFloat"
 	case "big.Rat":
 		return "bigRat"
+	case "internal.Decimal":
+		return "decimal"
 	case "cue.Value":
 		return "value"
 	case "cue.List":
@@ -419,7 +421,7 @@ func (g *generator) goToCUE(expr ast.Expr) (cueKind string, omitCheck bool) {
 		"uint", "byte", "uint8", "uint16", "uint32", "uint64",
 		"bigInt":
 		cueKind += "intKind"
-	case "float64", "bigRat", "bigFloat":
+	case "float64", "bigRat", "bigFloat", "decimal":
 		cueKind += "numKind"
 	case "list":
 		cueKind += "listKind"

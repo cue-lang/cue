@@ -90,6 +90,21 @@ func TestBuiltins(t *testing.T) {
 		test("math", `math.Asin(2.0e400)`),
 		`_|_(cannot use 2.0e+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up)`,
 	}, {
+		test("math", `math.MultipleOf(4, 2)`), `true`,
+	}, {
+		test("math", `math.MultipleOf(5, 2)`), `false`,
+	}, {
+		test("math", `math.MultipleOf(5, 0)`),
+		`_|_(error in call to math.MultipleOf: division by zero)`,
+	}, {
+		test("math", `math.MultipleOf(100, 1.00001)`), `false`,
+	}, {
+		test("math", `math.MultipleOf(1, 1)`), `true`,
+	}, {
+		test("math", `math.MultipleOf(5, 2.5)`), `true`,
+	}, {
+		test("math", `math.MultipleOf(100e100, 10)`), `true`,
+	}, {
 		test("encoding/csv", `csv.Decode("1,2,3\n4,5,6")`),
 		`[["1","2","3"],["4","5","6"]]`,
 	}, {

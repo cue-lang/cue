@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	"github.com/cockroachdb/apd/v2"
 )
 
 // A builtin is a builtin function or constant.
@@ -391,6 +392,15 @@ func (c *callCtxt) uintValue(i, bits int, typ string) uint64 {
 	}
 	res, _ := x.Uint64()
 	return res
+}
+
+func (c *callCtxt) decimal(i int) *apd.Decimal {
+	x := newValueRoot(c.ctx, c.args[i])
+	if _, err := x.MantExp(nil); err != nil {
+		c.invalidArgType(c.args[i], i, "Decimal", err)
+		return nil
+	}
+	return &c.args[i].(*numLit).v
 }
 
 func (c *callCtxt) float64(i int) float64 {

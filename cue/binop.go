@@ -510,6 +510,9 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 			}
 			return &unification{newSrc, []evaluated{x, y}}
 
+		case *customValidator:
+			return &unification{newSrc, []evaluated{x, y}}
+
 		case *bound:
 			return &unification{newSrc, []evaluated{x, y}}
 
@@ -534,7 +537,7 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 			return y
 		}
 	}
-	return ctx.mkErr(src, "invalid operation %v and %v (operator not defined for custom validator)")
+	return ctx.mkErr(src, "invalid operation %v and %v (operator not defined for custom validator)", ctx.str(x), ctx.str(other))
 }
 
 func (x *customValidator) check(ctx *context, v evaluated) evaluated {

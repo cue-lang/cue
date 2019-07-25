@@ -738,10 +738,14 @@ func TestResolve(t *testing.T) {
 
 		b: strings.ContainsAny("c")
 		b: "dog"
+
+		c: strings.ContainsAny("d") & strings.ContainsAny("g")
+		c: "dog"
 		`,
 		out: `<0>{` +
 			`a: "after", ` +
-			`b: _|_(strings.ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c")))` +
+			`b: _|_(strings.ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c"))), ` +
+			`c: "dog"` +
 			`}`,
 	}, {
 		desc: "null coalescing",

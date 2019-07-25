@@ -1616,6 +1616,12 @@ func (v Value) Expr() (Op, []Value) {
 			a = append(a, remakeValue(v, arg))
 		}
 		op = CallOp
+	case *customValidator:
+		a = append(a, remakeValue(v, x.call))
+		for _, arg := range x.args {
+			a = append(a, remakeValue(v, arg))
+		}
+		op = CallOp
 	default:
 		a = append(a, v)
 	}

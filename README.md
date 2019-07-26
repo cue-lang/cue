@@ -137,6 +137,17 @@ To report issues or make a feature request, use the
 
 Changes can be contributed using Gerrit or Github pull requests.
 
+
+### Contact
+
+You can get in touch with the cuelang community in the following ways:
+
+- Chat with us on our
+  [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNjk1NzU1MzMwMjI2LWQ0ZDA2OTRjYTQ0MGUyZDBiYWIzZjVhZGI1YWVlNTVmMWU3MTFhY2MxZmRmMjBiMTA5MGQ1YzUyMmMzN2IxYzc).
+
+
+---
+
 Unless otherwise noted, the CUE source files are distributed
 under the Apache 2.0 license found in the LICENSE file.
 

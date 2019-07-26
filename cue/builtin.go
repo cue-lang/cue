@@ -143,7 +143,7 @@ var andBuiltin = &builtin{
 	Params: []kind{listKind},
 	Result: intKind,
 	Func: func(c *callCtxt) {
-		iter := c.list(0)
+		iter := c.iter(0)
 		if !iter.Next() {
 			c.ret = &top{baseValue{c.src}}
 			return
@@ -161,7 +161,7 @@ var orBuiltin = &builtin{
 	Params: []kind{stringKind | bytesKind | listKind | structKind},
 	Result: intKind,
 	Func: func(c *callCtxt) {
-		iter := c.list(0)
+		iter := c.iter(0)
 		d := []dValue{}
 		for iter.Next() {
 			d = append(d, dValue{iter.Value().path.v, false})
@@ -482,7 +482,21 @@ func (c *callCtxt) bool(i int) bool {
 	return b
 }
 
-func (c *callCtxt) list(i int) (a Iterator) {
+func (c *callCtxt) list(i int) (a []Value) {
+	arg := c.args[i]
+	x := newValueRoot(c.ctx, arg)
+	v, err := x.List()
+	if err != nil {
+		c.invalidArgType(c.args[i], i, "list", err)
+		return a
+	}
+	for v.Next() {
+		a = append(a, v.Value())
+	}
+	return a
+}
+
+func (c *callCtxt) iter(i int) (a Iterator) {
 	arg := c.args[i]
 	x := newValueRoot(c.ctx, arg)
 	v, err := x.List()

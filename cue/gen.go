@@ -398,6 +398,8 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "strList"
 	case "[]byte":
 		return "bytes"
+	case "[]cue.Value":
+		return "list"
 	case "io.Reader":
 		return "reader"
 	case "time.Time":

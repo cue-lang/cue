@@ -19,6 +19,7 @@ import (
 	"math/bits"
 	"path"
 	"regexp"
+	"sort"
 	"strconv"
 	"strings"
 	"text/tabwriter"
@@ -462,6 +463,64 @@ var builtinPackages = map[string]*builtinPkg{
 				s := c.string(0)
 				c.ret = func() interface{} {
 					return html.UnescapeString(s)
+				}()
+			},
+		}},
+	},
+	"list": &builtinPkg{
+		native: []*builtin{{
+			Name:   "MinItems",
+			Params: []kind{listKind, intKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				a, n := c.list(0), c.int(1)
+				c.ret = func() interface{} {
+					return len(a) <= n
+				}()
+			},
+		}, {
+			Name:   "MaxItems",
+			Params: []kind{listKind, intKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				a, n := c.list(0), c.int(1)
+				c.ret = func() interface{} {
+					return len(a) <= n
+				}()
+			},
+		}, {
+			Name:   "UniqueItems",
+			Params: []kind{listKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				a := c.list(0)
+				c.ret = func() interface{} {
+					b := []string{}
+					for _, v := range a {
+						b = append(b, fmt.Sprint(v))
+					}
+					sort.Strings(b)
+					for i := 1; i < len(b); i++ {
+						if b[i-1] == b[i] {
+							return false
+						}
+					}
+					return true
+				}()
+			},
+		}, {
+			Name:   "Contains",
+			Params: []kind{listKind, topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				a, v := c.list(0), c.value(1)
+				c.ret = func() interface{} {
+					for _, w := range a {
+						if v.Equals(w) {
+							return true
+						}
+					}
+					return false
 				}()
 			},
 		}},

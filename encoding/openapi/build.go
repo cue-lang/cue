@@ -499,6 +499,44 @@ func (b *builder) object(v cue.Value) {
 //   schema: an array instance is valid if at least one element matches
 //   this schema.
 func (b *builder) array(v cue.Value) {
+
+	switch op, a := v.Expr(); op {
+	case cue.CallOp:
+		name := fmt.Sprint(a[0])
+		switch name {
+		case "list.UniqueItems":
+			if len(a) != 1 {
+				b.failf(v, "builtin %v may only be used without arguments", name)
+			}
+			b.setFilter("Schema", "uniqueItems", true)
+			return
+
+		case "list.MinItems":
+			if len(a) != 2 {
+				b.failf(v, "builtin %v must be called with one argument", name)
+			}
+			b.setFilter("Schema", "minItems", b.int(a[1]))
+			return
+
+		case "list.MaxItems":
+			if len(a) != 2 {
+				b.failf(v, "builtin %v must be called with one argument", name)
+			}
+			b.setFilter("Schema", "maxItems", b.int(a[1]))
+			return
+
+		default:
+			b.failf(v, "builtin %v not supported in OpenAPI", name)
+		}
+
+	case cue.NoOp:
+		// TODO: extract format from specific type.
+
+	default:
+		b.failf(v, "unsupported op %v for number type", op)
+		return
+	}
+
 	// Possible conjuncts:
 	//   - one list (CUE guarantees merging all conjuncts)
 	//   - no cap: is unified with list

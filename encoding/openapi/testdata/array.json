@@ -38,6 +38,15 @@
                         }
                      }
                   }
+               },
+               "baz": {
+                  "type": "array",
+                  "uniqueItems": true
+               },
+               "qux": {
+                  "type": "array",
+                  "minItems": 1,
+                  "maxItems": 3
                }
             }
          },

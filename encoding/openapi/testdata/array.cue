@@ -1,6 +1,12 @@
+import "list"
+
 Arrays: {
 	bar?: [...MyEnum]
 	foo?: [...MyStruct]
+
+	baz?: list.UniqueItems()
+
+	qux?: list.MinItems(1) & list.MaxItems(3)
 }
 
 Arrays: {

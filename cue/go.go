@@ -193,7 +193,7 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 	case nil:
 		// Interpret a nil pointer as an undefined value that is only
 		// null by default, but may still be set: *null | _.
-		return makeNullable(&top{src.base()}).(evaluated)
+		return makeNullable(&top{src.base()}, false).(evaluated)
 
 	case ast.Expr:
 		x := newVisitorCtx(ctx, nil, nil, nil)
@@ -297,7 +297,8 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 			if value.IsNil() {
 				// Interpret a nil pointer as an undefined value that is only
 				// null by default, but may still be set: *null | _.
-				return makeNullable(&top{src.base()}).(evaluated)
+				elem := goTypeToValue(ctx, false, reflect.TypeOf(v).Elem())
+				return makeNullable(elem, false).(evaluated)
 			}
 			return convert(ctx, src, value.Elem().Interface())
 
@@ -567,12 +568,10 @@ func wrapOrNull(e value) value {
 	if e.kind().isAnyOf(nullKind) {
 		return e
 	}
-	return makeNullable(e)
+	return makeNullable(e, true)
 }
 
-const nullIsDefault = true
-
-func makeNullable(e value) value {
+func makeNullable(e value, nullIsDefault bool) value {
 	return &disjunction{
 		baseValue: baseValue{e},
 		values: []dValue{

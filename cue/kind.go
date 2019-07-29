@@ -76,7 +76,8 @@ const (
 )
 
 func isTop(v value) bool {
-	return v.kind() == topKind
+	_, ok := v.(*top)
+	return ok
 }
 
 // isDone means that the value will not evaluate further.

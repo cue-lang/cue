@@ -33,7 +33,7 @@ func TestConvert(t *testing.T) {
 		goVal interface{}
 		want  string
 	}{{
-		nil, "(*null | _)",
+		nil, "(null | _)",
 	}, {
 		true, "true",
 	}, {
@@ -112,7 +112,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		&struct{ A int }{3}, "<0>{A: 3}",
 	}, {
-		(*struct{ A int })(nil), "(*null | _)",
+		(*struct{ A int })(nil), "(null | <0>{A: (int & >=-9223372036854775808 & int & <=9223372036854775807)})",
 	}, {
 		reflect.ValueOf(3), "3",
 	}, {

@@ -53,6 +53,9 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		return right
 	}
 
+	left = convertBuiltin(left)
+	right = convertBuiltin(right)
+
 	leftKind := left.kind()
 	rightKind := right.kind()
 	kind, invert, msg := matchBinOpKind(op, leftKind, rightKind)
@@ -125,7 +128,7 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		v := right.binOp(ctx, src, op, left)
 		// Return the original failure if both fail, as this will result in
 		// better error messages.
-		if !isBottom(v) {
+		if !isBottom(v) || isCustom(v) {
 			return v
 		}
 	}

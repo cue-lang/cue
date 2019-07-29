@@ -80,6 +80,11 @@ func isTop(v value) bool {
 	return ok
 }
 
+func isCustom(v value) bool {
+	_, ok := v.(*customValidator)
+	return ok
+}
+
 // isDone means that the value will not evaluate further.
 func (k kind) isDone() bool        { return k&referenceKind == bottomKind }
 func (k kind) hasReferences() bool { return k&referenceKind != bottomKind }

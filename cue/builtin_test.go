@@ -186,6 +186,57 @@ func TestBuiltins(t *testing.T) {
 		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),
 		`"a: 1\n---\nb: 2\n"`,
 	}, {
+		test("net", `net.FQDN & "foo.bar."`),
+		`"foo.bar."`,
+	}, {
+		test("net", `net.FQDN("foo.bararararararararararararararararararararararararararararararararara")`),
+		`false`,
+	}, {
+		test("net", `net.SplitHostPort("[::%lo0]:80")`),
+		`["::%lo0","80"]`,
+	}, {
+		test("net", `net.JoinHostPort("example.com", "80")`),
+		`"example.com:80"`,
+	}, {
+		test("net", `net.JoinHostPort("2001:db8::1", 80)`),
+		`"[2001:db8::1]:80"`,
+	}, {
+		test("net", `net.JoinHostPort([192,30,4,2], 80)`),
+		`"192.30.4.2:80"`,
+	}, {
+		test("net", `net.JoinHostPort([192,30,4], 80)`),
+		`_|_(error in call to net.JoinHostPort: invalid host [192,30,4])`,
+	}, {
+		test("net", `net.IP("23.23.23.23")`),
+		`true`,
+	}, {
+		test("net", `net.IPv4 & "23.23.23.2333"`),
+		`_|_(invalid value "23.23.23.2333" (does not satisfy net.IPv4()))`,
+	}, {
+		test("net", `net.IP("23.23.23.23")`),
+		`true`,
+	}, {
+		test("net", `net.IP("2001:db8::1")`),
+		`true`,
+	}, {
+		test("net", `net.IPv4("2001:db8::1")`),
+		`false`,
+	}, {
+		test("net", `net.IPv4() & "ff02::1:3"`),
+		`_|_(invalid value "ff02::1:3" (does not satisfy net.IPv4()))`,
+	}, {
+		test("net", `net.LoopbackIP([127, 0, 0, 1])`),
+		`true`,
+	}, {
+		test("net", `net.LoopbackIP("127.0.0.1")`),
+		`true`,
+	}, {
+		test("net", `net.ToIP4("127.0.0.1")`),
+		`[127,0,0,1]`,
+	}, {
+		test("net", `net.ToIP16("127.0.0.1")`),
+		`[0,0,0,0,0,0,0,0,0,0,255,255,127,0,0,1]`,
+	}, {
 		test("strings", `strings.ToCamel("AlphaBeta")`),
 		`"alphaBeta"`,
 	}, {

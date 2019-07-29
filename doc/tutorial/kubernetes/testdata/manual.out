@@ -1651,6 +1651,13 @@ kubernetes: {
                         containers: [{
                             name: "etcd"
                             env: [{
+                                name: "IP"
+                                valueFrom: {
+                                    fieldRef: {
+                                        fieldPath: "status.podIP"
+                                    }
+                                }
+                            }, {
                                 name:  "ETCDCTL_API"
                                 value: "3"
                             }, {
@@ -1661,13 +1668,6 @@ kubernetes: {
                                 valueFrom: {
                                     fieldRef: {
                                         fieldPath: "metadata.name"
-                                    }
-                                }
-                            }, {
-                                name: "IP"
-                                valueFrom: {
-                                    fieldRef: {
-                                        fieldPath: "status.podIP"
                                     }
                                 }
                             }]
@@ -1847,6 +1847,13 @@ deployment: {
         }
         args: []
         envSpec: {
+            IP: {
+                valueFrom: {
+                    fieldRef: {
+                        fieldPath: "status.podIP"
+                    }
+                }
+            }
             ETCDCTL_API: {
                 value: "3"
             }
@@ -1857,13 +1864,6 @@ deployment: {
                 valueFrom: {
                     fieldRef: {
                         fieldPath: "metadata.name"
-                    }
-                }
-            }
-            IP: {
-                valueFrom: {
-                    fieldRef: {
-                        fieldPath: "status.podIP"
                     }
                 }
             }

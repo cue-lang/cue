@@ -134,6 +134,7 @@ func main() {
 type generator struct {
 	w          *bytes.Buffer
 	decls      *bytes.Buffer
+	name       string
 	fset       *token.FileSet
 	defaultPkg string
 	first      bool
@@ -220,6 +221,7 @@ func (g *generator) processGo(filename string) {
 		log.Fatal(err)
 	}
 	g.defaultPkg = ""
+	g.name = f.Name.Name
 
 	for _, d := range f.Decls {
 		switch x := d.(type) {
@@ -323,6 +325,10 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 	}
 
 	if !ast.IsExported(x.Name.Name) || x.Recv != nil {
+		if strings.HasPrefix(x.Name.Name, g.name) {
+			printer.Fprint(g.decls, g.fset, x)
+			fmt.Fprint(g.decls, "\n\n")
+		}
 		return
 	}
 

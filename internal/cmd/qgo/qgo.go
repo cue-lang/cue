@@ -232,8 +232,10 @@ func (e *extracter) reportFun(w io.Writer, x *ast.FuncDecl) {
 	if name := x.Name.Name; *stripstr && strings.HasSuffix(name, "String") {
 		newName := name[:len(name)-len("String")]
 		x.Name = ast.NewIdent(newName)
-		for _, c := range x.Doc.List {
-			c.Text = strings.Replace(c.Text, name, newName, -1)
+		if x.Doc != nil {
+			for _, c := range x.Doc.List {
+				c.Text = strings.Replace(c.Text, name, newName, -1)
+			}
 		}
 	}
 	types := []ast.Expr{}

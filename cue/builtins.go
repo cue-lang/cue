@@ -18,6 +18,7 @@ import (
 	"math"
 	"math/big"
 	"math/bits"
+	"net"
 	"path"
 	"regexp"
 	"sort"
@@ -26,12 +27,14 @@ import (
 	"text/tabwriter"
 	"text/template"
 	"unicode"
+	"unicode/utf8"
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/third_party/yaml"
 	"github.com/cockroachdb/apd/v2"
 	goyaml "github.com/ghodss/yaml"
+	"golang.org/x/net/idna"
 )
 
 func init() {
@@ -41,6 +44,67 @@ func init() {
 var _ io.Reader
 
 var mulContext = apd.BaseContext.WithPrecision(1)
+
+var idnaProfile = idna.New(
+	idna.ValidateLabels(true),
+	idna.VerifyDNSLength(true),
+	idna.StrictDomainName(true),
+)
+
+func netGetIP(ip Value) (goip net.IP) {
+	switch ip.Kind() {
+	case StringKind:
+		s, err := ip.String()
+		if err != nil {
+			return nil
+		}
+		goip := net.ParseIP(s)
+		if goip == nil {
+			return nil
+		}
+		return goip
+
+	case BytesKind:
+		b, err := ip.Bytes()
+		if err != nil {
+			return nil
+		}
+		goip := net.ParseIP(string(b))
+		if goip == nil {
+			return nil
+		}
+		return goip
+
+	case ListKind:
+		iter, err := ip.List()
+		if err != nil {
+			return nil
+		}
+		for iter.Next() {
+			v, err := iter.Value().Int64()
+			if err != nil {
+				return nil
+			}
+			if v < 0 || 255 < v {
+				return nil
+			}
+			goip = append(goip, byte(v))
+		}
+		return goip
+
+	default:
+
+		return nil
+	}
+}
+
+func netToList(ip net.IP) []uint {
+	a := make([]uint, len(ip))
+	for i, p := range ip {
+		a[i] = uint(p)
+	}
+	return a
+}
 
 var split = path.Split
 
@@ -1320,6 +1384,244 @@ var builtinPackages = map[string]*builtinPkg{
 				x := c.uint64(0)
 				c.ret = func() interface{} {
 					return bits.Len64(x)
+				}()
+			},
+		}},
+	},
+	"net": &builtinPkg{
+		native: []*builtin{{
+			Name:   "SplitHostPort",
+			Params: []kind{stringKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret, c.err = func() (interface{}, error) {
+					host, port, err := net.SplitHostPort(s)
+					if err != nil {
+						return nil, err
+					}
+					return []string{host, port}, nil
+				}()
+			},
+		}, {
+			Name:   "JoinHostPort",
+			Params: []kind{topKind, topKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				host, port := c.value(0), c.value(1)
+				c.ret, c.err = func() (interface{}, error) {
+					var err error
+					hostStr := ""
+					switch host.Kind() {
+					case ListKind:
+						ipdata := netGetIP(host)
+						if len(ipdata) != 4 && len(ipdata) != 16 {
+							err = fmt.Errorf("invalid host %q", host)
+						}
+						hostStr = ipdata.String()
+					case BytesKind:
+						var b []byte
+						b, err = host.Bytes()
+						hostStr = string(b)
+					default:
+						hostStr, err = host.String()
+					}
+					if err != nil {
+						return "", err
+					}
+
+					portStr := ""
+					switch port.Kind() {
+					case StringKind:
+						portStr, err = port.String()
+					case BytesKind:
+						var b []byte
+						b, err = port.Bytes()
+						portStr = string(b)
+					default:
+						var i int64
+						i, err = port.Int64()
+						portStr = strconv.Itoa(int(i))
+					}
+					if err != nil {
+						return "", err
+					}
+
+					return net.JoinHostPort(hostStr, portStr), nil
+				}()
+			},
+		}, {
+			Name:   "FQDN",
+			Params: []kind{stringKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret = func() interface{} {
+					for i := 0; i < len(s); i++ {
+						if s[i] >= utf8.RuneSelf {
+							return false
+						}
+					}
+					_, err := idnaProfile.ToASCII(s)
+					return err == nil
+				}()
+			},
+		}, {
+			Name:  "IPv4len",
+			Const: "4",
+		}, {
+			Name:  "IPv6len",
+			Const: "16",
+		}, {
+			Name:   "ParseIP",
+			Params: []kind{stringKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret, c.err = func() (interface{}, error) {
+					goip := net.ParseIP(s)
+					if goip == nil {
+						return nil, fmt.Errorf("invalid IP address %q", s)
+					}
+					return netToList(goip), nil
+				}()
+			},
+		}, {
+			Name:   "IPv4",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+
+					return netGetIP(ip).To4() != nil
+				}()
+			},
+		}, {
+			Name:   "IP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+
+					return netGetIP(ip) != nil
+				}()
+			},
+		}, {
+			Name:   "LoopbackIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsLoopback()
+				}()
+			},
+		}, {
+			Name:   "MulticastIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsMulticast()
+				}()
+			},
+		}, {
+			Name:   "InterfaceLocalMulticastIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsInterfaceLocalMulticast()
+				}()
+			},
+		}, {
+			Name:   "LinkLocalMulticastIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsLinkLocalMulticast()
+				}()
+			},
+		}, {
+			Name:   "LinkLocalUnicastIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsLinkLocalUnicast()
+				}()
+			},
+		}, {
+			Name:   "GlobalUnicastIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsGlobalUnicast()
+				}()
+			},
+		}, {
+			Name:   "UnspecifiedIP",
+			Params: []kind{topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret = func() interface{} {
+					return netGetIP(ip).IsUnspecified()
+				}()
+			},
+		}, {
+			Name:   "ToIP4",
+			Params: []kind{topKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret, c.err = func() (interface{}, error) {
+					ipdata := netGetIP(ip)
+					if ipdata == nil {
+						return nil, fmt.Errorf("invalid IP %q", ip)
+					}
+					ipv4 := ipdata.To4()
+					if ipv4 == nil {
+						return nil, fmt.Errorf("cannot convert %q to IPv4", ipdata)
+					}
+					return netToList(ipv4), nil
+				}()
+			},
+		}, {
+			Name:   "ToIP16",
+			Params: []kind{topKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret, c.err = func() (interface{}, error) {
+					ipdata := netGetIP(ip)
+					if ipdata == nil {
+						return nil, fmt.Errorf("invalid IP %q", ip)
+					}
+					return netToList(ipdata), nil
+				}()
+			},
+		}, {
+			Name:   "IPString",
+			Params: []kind{topKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				ip := c.value(0)
+				c.ret, c.err = func() (interface{}, error) {
+					ipdata := netGetIP(ip)
+					if ipdata == nil {
+						return "", fmt.Errorf("invalid IP %q", ip)
+					}
+					return ipdata.String(), nil
 				}()
 			},
 		}},

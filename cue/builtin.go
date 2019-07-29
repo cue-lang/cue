@@ -195,6 +195,14 @@ func (x *builtin) name(ctx *context) string {
 	return fmt.Sprintf("%s.%s", ctx.labelStr(x.pkg), x.Name)
 }
 
+func convertBuiltin(v evaluated) evaluated {
+	x, ok := v.(*builtin)
+	if ok && len(x.Params) == 1 && x.Result == boolKind {
+		return &customValidator{v.base(), []evaluated{}, x}
+	}
+	return v
+}
+
 func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) {
 	if x.Func == nil {
 		return ctx.mkErr(x, "builtin %s is not a function", x.name(ctx))

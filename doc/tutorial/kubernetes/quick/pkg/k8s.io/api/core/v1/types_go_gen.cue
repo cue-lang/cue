@@ -3153,6 +3153,18 @@ PodSpec: {
 	// +patchStrategy=merge
 	containers: [...Container] @go(Containers,[]Container) @protobuf(2,bytes,rep)
 
+	// EphemeralContainers is the list of ephemeral containers that run in this pod. Ephemeral containers
+	// are added to an existing pod as a result of a user-initiated action such as troubleshooting.
+	// This list is read-only in the pod spec. It may not be specified in a create or modified in an
+	// update of a pod or pod template.
+	// To add an ephemeral container use the pod's ephemeralcontainers subresource, which allows update
+	// using the EphemeralContainers kind.
+	// This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge
+	ephemeralContainers?: [...EphemeralContainer] @go(EphemeralContainers,[]EphemeralContainer) @protobuf(34,bytes,rep)
+
 	// Restart policy for all containers within the pod.
 	// One of Always, OnFailure, Never.
 	// Default to Always.
@@ -3336,6 +3348,97 @@ PodSpec: {
 	// This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature.
 	// +optional
 	preemptionPolicy?: null | PreemptionPolicy @go(PreemptionPolicy,*PreemptionPolicy) @protobuf(31,bytes,opt)
+
+	// Overhead represents the resource overhead associated with running a pod for a given RuntimeClass.
+	// This field will be autopopulated at admission time by the RuntimeClass admission controller. If
+	// the RuntimeClass admission controller is enabled, overhead must not be set in Pod create requests.
+	// The RuntimeClass admission controller will reject Pod create requests which have the overhead already
+	// set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value
+	// defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
+	// More info: https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md
+	// This field is alpha-level as of Kubernetes v1.16, and is only honored by servers that enable the PodOverhead feature.
+	// +optional
+	overhead?: ResourceList @go(Overhead) @protobuf(32,bytes,opt)
+
+	// TopologySpreadConstraints describes how a group of pods ought to spread across topology
+	// domains. Scheduler will schedule pods in a way which abides by the constraints.
+	// This field is alpha-level and is only honored by clusters that enables the EvenPodsSpread
+	// feature.
+	// All topologySpreadConstraints are ANDed.
+	// +optional
+	// +patchMergeKey=topologyKey
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=topologyKey
+	// +listMapKey=whenUnsatisfiable
+	topologySpreadConstraints?: [...TopologySpreadConstraint] @go(TopologySpreadConstraints,[]TopologySpreadConstraint) @protobuf(33,bytes,opt)
+}
+
+UnsatisfiableConstraintAction: string // enumUnsatisfiableConstraintAction
+
+enumUnsatisfiableConstraintAction:
+	DoNotSchedule |
+	ScheduleAnyway
+
+// DoNotSchedule instructs the scheduler not to schedule the pod
+// when constraints are not satisfied.
+DoNotSchedule: UnsatisfiableConstraintAction & "DoNotSchedule"
+
+// ScheduleAnyway instructs the scheduler to schedule the pod
+// even if constraints are not satisfied.
+ScheduleAnyway: UnsatisfiableConstraintAction & "ScheduleAnyway"
+
+// TopologySpreadConstraint specifies how to spread matching pods among the given topology.
+TopologySpreadConstraint: {
+	// MaxSkew describes the degree to which pods may be unevenly distributed.
+	// It's the maximum permitted difference between the number of matching pods in
+	// any two topology domains of a given topology type.
+	// For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+	// labelSelector spread as 1/1/0:
+	// +-------+-------+-------+
+	// | zone1 | zone2 | zone3 |
+	// +-------+-------+-------+
+	// |   P   |   P   |       |
+	// +-------+-------+-------+
+	// - if MaxSkew is 1, incoming pod can only be scheduled to zone3 to become 1/1/1;
+	// scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2)
+	// violate MaxSkew(1).
+	// - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
+	// It's a required field. Default value is 1 and 0 is not allowed.
+	maxSkew: int32 @go(MaxSkew) @protobuf(1,varint,opt)
+
+	// TopologyKey is the key of node labels. Nodes that have a label with this key
+	// and identical values are considered to be in the same topology.
+	// We consider each <key, value> as a "bucket", and try to put balanced number
+	// of pods into each bucket.
+	// It's a required field.
+	topologyKey: string @go(TopologyKey) @protobuf(2,bytes,opt)
+
+	// WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
+	// the spread constraint.
+	// - DoNotSchedule (default) tells the scheduler not to schedule it
+	// - ScheduleAnyway tells the scheduler to still schedule it
+	// It's considered as "Unsatisfiable" if and only if placing incoming pod on any
+	// topology violates "MaxSkew".
+	// For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
+	// labelSelector spread as 3/1/1:
+	// +-------+-------+-------+
+	// | zone1 | zone2 | zone3 |
+	// +-------+-------+-------+
+	// | P P P |   P   |   P   |
+	// +-------+-------+-------+
+	// If WhenUnsatisfiable is set to DoNotSchedule, incoming pod can only be scheduled
+	// to zone2(zone3) to become 3/2/1(3/1/2) as ActualSkew(2-1) on zone2(zone3) satisfies
+	// MaxSkew(1). In other words, the cluster can still be imbalanced, but scheduler
+	// won't make it *more* imbalanced.
+	// It's a required field.
+	whenUnsatisfiable: UnsatisfiableConstraintAction @go(WhenUnsatisfiable) @protobuf(3,bytes,opt,casttype=UnsatisfiableConstraintAction)
+
+	// LabelSelector is used to find matching pods.
+	// Pods that match this label selector are counted to determine the number of pods
+	// in their corresponding topology domain.
+	// +optional
+	labelSelector?: null | metav1.LabelSelector @go(LabelSelector,*metav1.LabelSelector) @protobuf(4,bytes,opt)
 }
 
 // The default value for enableServiceLinks attribute.
@@ -3363,7 +3466,9 @@ PodSecurityContext: {
 	// +optional
 	seLinuxOptions?: null | SELinuxOptions @go(SELinuxOptions,*SELinuxOptions) @protobuf(1,bytes,opt)
 
-	// Windows security options.
+	// The Windows specific settings applied to all containers.
+	// If unspecified, the options within a container's SecurityContext will be used.
+	// If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
 	// +optional
 	windowsOptions?: null | WindowsSecurityContextOptions @go(WindowsOptions,*WindowsSecurityContextOptions) @protobuf(8,bytes,opt)
 
@@ -3465,6 +3570,174 @@ PodDNSConfigOption: {
 	value?: null | string @go(Value,*string) @protobuf(2,bytes,opt)
 }
 
+// IP address information for entries in the (plural) PodIPs field.
+// Each entry includes:
+//    IP: An IP address allocated to the pod. Routable at least within the cluster.
+PodIP: {
+	// ip is an IP address (IPv4 or IPv6) assigned to the pod
+	ip?: string @go(IP) @protobuf(1,bytes,opt)
+}
+
+EphemeralContainerCommon: {
+	// Name of the ephemeral container specified as a DNS_LABEL.
+	// This name must be unique among all containers, init containers and ephemeral containers.
+	name: string @go(Name) @protobuf(1,bytes,opt)
+
+	// Docker image name.
+	// More info: https://kubernetes.io/docs/concepts/containers/images
+	image?: string @go(Image) @protobuf(2,bytes,opt)
+
+	// Entrypoint array. Not executed within a shell.
+	// The docker image's ENTRYPOINT is used if this is not provided.
+	// Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
+	// cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax
+	// can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
+	// regardless of whether the variable exists or not.
+	// Cannot be updated.
+	// More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+	// +optional
+	command?: [...string] @go(Command,[]string) @protobuf(3,bytes,rep)
+
+	// Arguments to the entrypoint.
+	// The docker image's CMD is used if this is not provided.
+	// Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
+	// cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax
+	// can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
+	// regardless of whether the variable exists or not.
+	// Cannot be updated.
+	// More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
+	// +optional
+	args?: [...string] @go(Args,[]string) @protobuf(4,bytes,rep)
+
+	// Container's working directory.
+	// If not specified, the container runtime's default will be used, which
+	// might be configured in the container image.
+	// Cannot be updated.
+	// +optional
+	workingDir?: string @go(WorkingDir) @protobuf(5,bytes,opt)
+
+	// Ports are not allowed for ephemeral containers.
+	ports?: [...ContainerPort] @go(Ports,[]ContainerPort) @protobuf(6,bytes,rep)
+
+	// List of sources to populate environment variables in the container.
+	// The keys defined within a source must be a C_IDENTIFIER. All invalid keys
+	// will be reported as an event when the container is starting. When a key exists in multiple
+	// sources, the value associated with the last source will take precedence.
+	// Values defined by an Env with a duplicate key will take precedence.
+	// Cannot be updated.
+	// +optional
+	envFrom?: [...EnvFromSource] @go(EnvFrom,[]EnvFromSource) @protobuf(19,bytes,rep)
+
+	// List of environment variables to set in the container.
+	// Cannot be updated.
+	// +optional
+	// +patchMergeKey=name
+	// +patchStrategy=merge
+	env?: [...EnvVar] @go(Env,[]EnvVar) @protobuf(7,bytes,rep)
+
+	// Resources are not allowed for ephemeral containers. Ephemeral containers use spare resources
+	// already allocated to the pod.
+	// +optional
+	resources?: ResourceRequirements @go(Resources) @protobuf(8,bytes,opt)
+
+	// Pod volumes to mount into the container's filesystem.
+	// Cannot be updated.
+	// +optional
+	// +patchMergeKey=mountPath
+	// +patchStrategy=merge
+	volumeMounts?: [...VolumeMount] @go(VolumeMounts,[]VolumeMount) @protobuf(9,bytes,rep)
+
+	// volumeDevices is the list of block devices to be used by the container.
+	// This is a beta feature.
+	// +patchMergeKey=devicePath
+	// +patchStrategy=merge
+	// +optional
+	volumeDevices?: [...VolumeDevice] @go(VolumeDevices,[]VolumeDevice) @protobuf(21,bytes,rep)
+
+	// Probes are not allowed for ephemeral containers.
+	// +optional
+	livenessProbe?: null | Probe @go(LivenessProbe,*Probe) @protobuf(10,bytes,opt)
+
+	// Probes are not allowed for ephemeral containers.
+	// +optional
+	readinessProbe?: null | Probe @go(ReadinessProbe,*Probe) @protobuf(11,bytes,opt)
+
+	// Lifecycle is not allowed for ephemeral containers.
+	// +optional
+	lifecycle?: null | Lifecycle @go(Lifecycle,*Lifecycle) @protobuf(12,bytes,opt)
+
+	// Optional: Path at which the file to which the container's termination message
+	// will be written is mounted into the container's filesystem.
+	// Message written is intended to be brief final status, such as an assertion failure message.
+	// Will be truncated by the node if greater than 4096 bytes. The total message length across
+	// all containers will be limited to 12kb.
+	// Defaults to /dev/termination-log.
+	// Cannot be updated.
+	// +optional
+	terminationMessagePath?: string @go(TerminationMessagePath) @protobuf(13,bytes,opt)
+
+	// Indicate how the termination message should be populated. File will use the contents of
+	// terminationMessagePath to populate the container status message on both success and failure.
+	// FallbackToLogsOnError will use the last chunk of container log output if the termination
+	// message file is empty and the container exited with an error.
+	// The log output is limited to 2048 bytes or 80 lines, whichever is smaller.
+	// Defaults to File.
+	// Cannot be updated.
+	// +optional
+	terminationMessagePolicy?: TerminationMessagePolicy @go(TerminationMessagePolicy) @protobuf(20,bytes,opt,casttype=TerminationMessagePolicy)
+
+	// Image pull policy.
+	// One of Always, Never, IfNotPresent.
+	// Defaults to Always if :latest tag is specified, or IfNotPresent otherwise.
+	// Cannot be updated.
+	// More info: https://kubernetes.io/docs/concepts/containers/images#updating-images
+	// +optional
+	imagePullPolicy?: PullPolicy @go(ImagePullPolicy) @protobuf(14,bytes,opt,casttype=PullPolicy)
+
+	// SecurityContext is not allowed for ephemeral containers.
+	// +optional
+	securityContext?: null | SecurityContext @go(SecurityContext,*SecurityContext) @protobuf(15,bytes,opt)
+
+	// Whether this container should allocate a buffer for stdin in the container runtime. If this
+	// is not set, reads from stdin in the container will always result in EOF.
+	// Default is false.
+	// +optional
+	stdin?: bool @go(Stdin) @protobuf(16,varint,opt)
+
+	// Whether the container runtime should close the stdin channel after it has been opened by
+	// a single attach. When stdin is true the stdin stream will remain open across multiple attach
+	// sessions. If stdinOnce is set to true, stdin is opened on container start, is empty until the
+	// first client attaches to stdin, and then remains open and accepts data until the client disconnects,
+	// at which time stdin is closed and remains closed until the container is restarted. If this
+	// flag is false, a container processes that reads from stdin will never receive an EOF.
+	// Default is false
+	// +optional
+	stdinOnce?: bool @go(StdinOnce) @protobuf(17,varint,opt)
+
+	// Whether this container should allocate a TTY for itself, also requires 'stdin' to be true.
+	// Default is false.
+	// +optional
+	tty?: bool @go(TTY) @protobuf(18,varint,opt)
+}
+
+// An EphemeralContainer is a special type of container which doesn't come with any resource
+// or scheduling guarantees but can be added to a pod that has already been created. They are
+// intended for user-initiated activities such as troubleshooting a running pod.
+// Ephemeral containers will not be restarted when they exit, and they will be killed if the
+// pod is removed or restarted. If an ephemeral container causes a pod to exceed its resource
+// allocation, the pod may be evicted.
+// Ephemeral containers are added via a pod's ephemeralcontainers subresource and will appear
+// in the pod spec once added. No fields in EphemeralContainer may be changed once added.
+// This is an alpha feature enabled by the EphemeralContainers feature flag.
+EphemeralContainer: EphemeralContainerCommon & {
+	// If set, the name of the container from PodSpec that this ephemeral container targets.
+	// The ephemeral container will be run in the namespaces (IPC, PID, etc) of this container.
+	// If not set then the ephemeral container is run in whatever namespaces are shared
+	// for the pod. Note that the container runtime must support this feature.
+	// +optional
+	targetContainerName?: string @go(TargetContainerName) @protobuf(2,bytes,opt)
+}
+
 // PodStatus represents information about the status of a pod. Status may trail the actual
 // state of a system, especially if the node that hosts the pod cannot contact the control
 // plane.
@@ -3525,6 +3798,14 @@ PodStatus: {
 	// +optional
 	podIP?: string @go(PodIP) @protobuf(6,bytes,opt)
 
+	// podIPs holds the IP addresses allocated to the pod. If this field is specified, the 0th entry must
+	// match the podIP field. Pods may be allocated at most 1 value for each of IPv4 and IPv6. This list
+	// is empty if no IPs have been allocated yet.
+	// +optional
+	// +patchStrategy=merge
+	// +patchMergeKey=ip
+	podIPs?: [...PodIP] @go(PodIPs,[]PodIP) @protobuf(12,bytes,rep)
+
 	// RFC 3339 date and time at which the object was acknowledged by the Kubelet.
 	// This is before the Kubelet pulled the container image(s) for the pod.
 	// +optional
@@ -3547,6 +3828,11 @@ PodStatus: {
 	// More info: https://git.k8s.io/community/contributors/design-proposals/node/resource-qos.md
 	// +optional
 	qosClass?: PodQOSClass @go(QOSClass) @protobuf(9,bytes,rep)
+
+	// Status for any ephemeral containers that running in this pod.
+	// This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature.
+	// +optional
+	ephemeralContainerStatuses?: [...ContainerStatus] @go(EphemeralContainerStatuses,[]ContainerStatus) @protobuf(13,bytes,rep)
 }
 
 // PodStatusResult is a wrapper for PodStatus returned by kubelet that can be encode/decoded
@@ -4210,6 +4496,13 @@ NodeSpec: {
 	// +optional
 	podCIDR?: string @go(PodCIDR) @protobuf(1,bytes,opt)
 
+	// podCIDRs represents the IP ranges assigned to the node for usage by Pods on that node. If this
+	// field is specified, the 0th entry must match the podCIDR field. It may contain at most 1 value for
+	// each of IPv4 and IPv6.
+	// +optional
+	// +patchStrategy=merge
+	podCIDRs?: [...string] @go(PodCIDRs,[]string) @protobuf(7,bytes,opt)
+
 	// ID of the node assigned by the cloud provider in the format: <ProviderName>://<ProviderSpecificNodeID>
 	// +optional
 	providerID?: string @go(ProviderID) @protobuf(3,bytes,opt)
@@ -4393,6 +4686,9 @@ NodeStatus: {
 	// List of addresses reachable to the node.
 	// Queried from cloud provider, if available.
 	// More info: https://kubernetes.io/docs/concepts/nodes/node/#addresses
+	// Note: This field is declared as mergeable, but the merge key is not sufficiently
+	// unique, which can cause data corruption when it is merged. Callers should instead
+	// use a full-replacement patch. See http://pr.k8s.io/79391 for an example.
 	// +optional
 	// +patchMergeKey=type
 	// +patchStrategy=merge
@@ -4502,7 +4798,6 @@ NodeConditionType: string // enumNodeConditionType
 
 enumNodeConditionType:
 	NodeReady |
-	NodeOutOfDisk |
 	NodeMemoryPressure |
 	NodeDiskPressure |
 	NodePIDPressure |
@@ -4510,10 +4805,6 @@ enumNodeConditionType:
 
 // NodeReady means kubelet is healthy and ready to accept pods.
 NodeReady: NodeConditionType & "Ready"
-
-// NodeOutOfDisk means the kubelet will not accept new pods due to insufficient free disk
-// space on the node.
-NodeOutOfDisk: NodeConditionType & "OutOfDisk"
 
 // NodeMemoryPressure means the kubelet is under pressure due to insufficient available memory.
 NodeMemoryPressure: NodeConditionType & "MemoryPressure"
@@ -4735,6 +5026,17 @@ Binding: metav1.TypeMeta & {
 
 	// The target object that you want to bind to the standard object.
 	target: ObjectReference @go(Target) @protobuf(2,bytes,opt)
+}
+
+// A list of ephemeral containers used in API operations
+EphemeralContainers: metav1.TypeMeta & {
+	// +optional
+	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
+
+	// The new set of ephemeral containers to use for a pod.
+	// +patchMergeKey=name
+	// +patchStrategy=merge
+	ephemeralContainers: [...EphemeralContainer] @go(EphemeralContainers,[]EphemeralContainer) @protobuf(2,bytes,rep)
 }
 
 // Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.
@@ -5655,7 +5957,9 @@ SecurityContext: {
 	// +optional
 	seLinuxOptions?: null | SELinuxOptions @go(SELinuxOptions,*SELinuxOptions) @protobuf(3,bytes,opt)
 
-	// Windows security options.
+	// The Windows specific settings applied to all containers.
+	// If unspecified, the options from the PodSecurityContext will be used.
+	// If set in both SecurityContext and PodSecurityContext, the value specified in SecurityContext takes precedence.
 	// +optional
 	windowsOptions?: null | WindowsSecurityContextOptions @go(WindowsOptions,*WindowsSecurityContextOptions) @protobuf(10,bytes,opt)
 
@@ -5752,6 +6056,14 @@ WindowsSecurityContextOptions: {
 	// This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
 	// +optional
 	gmsaCredentialSpec?: null | string @go(GMSACredentialSpec,*string) @protobuf(2,bytes,opt)
+
+	// The UserName in Windows to run the entrypoint of the container process.
+	// Defaults to the user specified in image metadata if unspecified.
+	// May also be set in PodSecurityContext. If set in both SecurityContext and
+	// PodSecurityContext, the value specified in SecurityContext takes precedence.
+	// This field is alpha-level and it is only honored by servers that enable the WindowsRunAsUserName feature flag.
+	// +optional
+	runAsUserName?: null | string @go(RunAsUserName,*string) @protobuf(3,bytes,opt)
 }
 
 // RangeAllocation is not a public type.

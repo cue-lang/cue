@@ -359,7 +359,7 @@ EOF
 
 ```
 # set the component label to our new top-level field
-$ sed -i "" 's/component:.*string/component: _component/' kube.cue
+$ sed -i.bak 's/component:.*string/component: _component/' kube.cue && rm kube.cue.bak
 
 # add the new top-level field to our previous template definitions
 $ cat <<EOF >> kube.cue

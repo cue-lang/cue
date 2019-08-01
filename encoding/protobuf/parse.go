@@ -330,7 +330,9 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 		return err
 	}
 
-	p.mapBuiltinPackage(v.Position, v.Filename, filename == "")
+	if !p.mapBuiltinPackage(v.Position, v.Filename, filename == "") {
+		return nil
+	}
 
 	imp, err := p.state.parse(filename, nil)
 	if err != nil {

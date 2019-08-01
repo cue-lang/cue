@@ -21,12 +21,23 @@ option go_package = "istio.io/api/mixer/v1";
 import "gogoproto/gogo.proto";
 import "google/protobuf/duration.proto";
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
 
 option (gogoproto.goproto_getters_all) = false;
 option (gogoproto.equal_all) = false;
 option (gogoproto.gostring_all) = false;
 option (gogoproto.stable_marshaler_all) = true;
 option cc_enable_arenas = true;
+
+message StructWrap {
+  google.protobuf.Struct struct = 1;
+
+  google.protobuf.Value any = 2;
+  google.protobuf.ListValue listVal = 3;
+  google.protobuf.BoolValue boolVal = 4;
+  google.protobuf.StringValue stringVal = 5;
+  google.protobuf.NumberValue numberVal = 6;
+}
 
 // Attributes represents a set of typed name/value pairs. Many of Mixer's
 // API either consume and/or return attributes.

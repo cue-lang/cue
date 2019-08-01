@@ -19,6 +19,15 @@ import (
 	"github.com/golang/protobuf/ptypes/timestamp"
 )
 
+StructWrap: {
+	struct?:    {}     @protobuf(1,type=google.protobuf.Struct)
+	any?:       _      @protobuf(2,type=google.protobuf.Value)
+	listVal?:   [...]  @protobuf(3,type=google.protobuf.ListValue)
+	boolVal?:   bool   @protobuf(4,type=google.protobuf.BoolValue)
+	stringVal?: string @protobuf(5,type=google.protobuf.StringValue)
+	numberVal?: number @protobuf(6,type=google.protobuf.NumberValue)
+}
+
 //  Attributes represents a set of typed name/value pairs. Many of Mixer's
 //  API either consume and/or return attributes.
 // 

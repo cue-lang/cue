@@ -48,24 +48,40 @@ var scalars = map[string]string{
 	"bytes":  "bytes",
 }
 
-var timePkg = &protoConverter{
-	id:        "time",
-	goPkg:     "time",
-	goPkgPath: "time",
-}
-
 func (p *protoConverter) setBuiltin(from, to string, pkg *protoConverter) {
 	p.scope[0][from] = mapping{to, "", pkg}
 }
 
-func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, required bool) {
+func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, required bool) (generate bool) {
 	// Map some builtin types to their JSON/CUE mappings.
 	switch file {
 	case "gogoproto/gogo.proto":
+
+	case "google/protobuf/struct.proto":
+		p.setBuiltin("google.protobuf.Struct", "{}", nil)
+		p.setBuiltin("google.protobuf.Value", "_", nil)
+		p.setBuiltin("google.protobuf.NullValue", "null", nil)
+		p.setBuiltin("google.protobuf.ListValue", "[...]", nil)
+		p.setBuiltin("google.protobuf.StringValue", "string", nil)
+		p.setBuiltin("google.protobuf.BoolValue", "bool", nil)
+		p.setBuiltin("google.protobuf.NumberValue", "number", nil)
+		return false
+
+	// TODO: consider mapping the following:
+
+	// case "google/protobuf/duration.proto":
+	// 	p.setBuiltin("google.protobuf.Duration", "time.Duration", "time")
+
+	// case "google/protobuf/timestamp.proto":
+	// 	p.setBuiltin("google.protobuf.Timestamp", "time.Time", "time")
+
+	// case "google/protobuf/empty.proto":
+	// 	p.setBuiltin("google.protobuf.Empty", "struct.MaxFields(0)", nil)
 
 	default:
 		if required {
 			failf(pos, "import %q not found", file)
 		}
 	}
+	return true
 }

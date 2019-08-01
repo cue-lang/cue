@@ -51,6 +51,10 @@ func TestParseDefinitions(t *testing.T) {
 		"array.json",
 		defaultConfig,
 	}, {
+		"struct.cue",
+		"struct.json",
+		defaultConfig,
+	}, {
 		"strings.cue",
 		"strings.json",
 		defaultConfig,

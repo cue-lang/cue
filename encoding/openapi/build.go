@@ -466,6 +466,36 @@ func (b *builder) object(v cue.Value) {
 	// object composed of the same type, if a property is required and set to a
 	// constant value for each type, it is a discriminator.
 
+	switch op, a := v.Expr(); op {
+	case cue.CallOp:
+		name := fmt.Sprint(a[0])
+		switch name {
+		case "struct.MinFields":
+			if len(a) != 2 {
+				b.failf(v, "builtin %v must be called with one argument", name)
+			}
+			b.setFilter("Schema", "minProperties", b.int(a[1]))
+			return
+
+		case "struct.MaxFields":
+			if len(a) != 2 {
+				b.failf(v, "builtin %v must be called with one argument", name)
+			}
+			b.setFilter("Schema", "maxProperties", b.int(a[1]))
+			return
+
+		default:
+			b.failf(v, "builtin %v not supported in OpenAPI", name)
+		}
+
+	case cue.NoOp:
+		// TODO: extract format from specific type.
+
+	default:
+		b.failf(v, "unsupported op %v for number type", op)
+		return
+	}
+
 	required := []string{}
 	for i, _ := v.Fields(cue.Optional(false), cue.Hidden(false)); i.Next(); {
 		required = append(required, i.Label())

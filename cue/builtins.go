@@ -2238,6 +2238,39 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
+	"struct": &builtinPkg{
+		native: []*builtin{{
+			Name:   "MinFields",
+			Params: []kind{structKind, intKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				object, n := c.structVal(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					iter := object.Fields(Hidden(false), Optional(false))
+					count := 0
+					for iter.Next() {
+						count++
+					}
+					return count >= n, nil
+				}()
+			},
+		}, {
+			Name:   "MaxFields",
+			Params: []kind{structKind, intKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				object, n := c.structVal(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					iter := object.Fields(Hidden(false), Optional(false))
+					count := 0
+					for iter.Next() {
+						count++
+					}
+					return count <= n, nil
+				}()
+			},
+		}},
+	},
 	"text/tabwriter": &builtinPkg{
 		native: []*builtin{{
 			Name:   "Write",

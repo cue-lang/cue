@@ -209,10 +209,10 @@ func (c Config) complete() (cfg *Config, err error) {
 		if prefix.IsValid() {
 			name, err := prefix.String()
 			if err != nil {
-				return nil, err
+				return &c, err
 			}
-			if c.Module == "" || c.Module != name {
-				return nil, errors.Newf(prefix.Pos(), "inconsistent modules: got %q, want %q", name, c.Module)
+			if c.Module != "" && c.Module != name {
+				return &c, errors.Newf(prefix.Pos(), "inconsistent modules: got %q, want %q", name, c.Module)
 			}
 			c.Module = name
 		}

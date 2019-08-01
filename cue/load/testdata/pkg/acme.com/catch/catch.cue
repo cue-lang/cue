@@ -1,3 +1,5 @@
 package catch
 
-Method: "tnt" | "catapult" | "net"
+import "acme.com/helper"
+
+Method: "tnt" | "catapult" | "net" | helper.Gotcha

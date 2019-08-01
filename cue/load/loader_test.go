@@ -43,10 +43,14 @@ func TestLoad(t *testing.T) {
 		err  string
 	}{{
 		args: nil,
-		want: "test: test.cue (1 files)",
+		want: `
+test: test.cue (1 files)
+	sub: sub/sub.cue (1 files)`,
 	}, {
 		args: args("."),
-		want: "test: test.cue (1 files)",
+		want: `
+test: test.cue (1 files)
+	sub: sub/sub.cue (1 files)`,
 	}, {
 		args: args("./other/..."),
 		want: `
@@ -64,7 +68,9 @@ main: other/main.cue (1 files)
 	file: other/file/file.cue (1 files)`,
 	}, {
 		args: args("./hello"),
-		want: "test: test.cue hello/test.cue (2 files)",
+		want: `
+test: test.cue hello/test.cue (2 files)
+	sub: sub/sub.cue (1 files)`,
 	}, {
 		args: args("./anon.cue", "./other/anon.cue"),
 		want: ": ./anon.cue ./other/anon.cue (2 files)",
@@ -84,7 +90,8 @@ main: other/main.cue (1 files)
 		args: args("./imports"),
 		want: `
 imports: imports/imports.cue (1 files)
-	catch: pkg/acme.com/catch/catch.cue (1 files)`,
+	catch: pkg/acme.com/catch/catch.cue (1 files)
+	helper: pkg/acme.com/helper/helper.cue (1 files)`,
 		err: ``,
 	}}
 	for i, tc := range testCases {

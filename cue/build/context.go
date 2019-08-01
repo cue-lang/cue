@@ -42,6 +42,9 @@ type Context struct {
 
 // NewInstance creates an instance for this Context.
 func (c *Context) NewInstance(dir string, f LoadFunc) *Instance {
+	if c == nil {
+		c = &Context{}
+	}
 	if f == nil {
 		f = c.loader
 	}

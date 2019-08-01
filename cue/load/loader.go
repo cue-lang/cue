@@ -39,11 +39,11 @@ func Instances(args []string, c *Config) []*build.Instance {
 	if c == nil {
 		c = &Config{}
 	}
-
-	c, err := c.complete()
+	newC, err := c.complete()
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(nil, "", err)}
 	}
+	c = newC
 
 	l := c.loader
 

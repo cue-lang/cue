@@ -1,0 +1,114 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "components": {
+      "schemas": {
+         "MyString": {
+            "oneOf": [
+               {
+                  "type": "object",
+                  "required": [
+                     "exact"
+                  ],
+                  "properties": {
+                     "exact": {
+                        "type": "string",
+                        "format": "string"
+                     }
+                  }
+               },
+               {
+                  "type": "object",
+                  "required": [
+                     "regex"
+                  ],
+                  "properties": {
+                     "regex": {
+                        "type": "string",
+                        "format": "string"
+                     }
+                  }
+               }
+            ]
+         },
+         "MyInt": {
+            "type": "integer"
+         },
+         "Foo": {
+            "type": "object",
+            "required": [
+               "include",
+               "exclude",
+               "count"
+            ],
+            "properties": {
+               "include": {
+                  "oneOf": [
+                     {
+                        "type": "object",
+                        "required": [
+                           "exact"
+                        ],
+                        "properties": {
+                           "exact": {
+                              "type": "string",
+                              "format": "string"
+                           }
+                        }
+                     },
+                     {
+                        "type": "object",
+                        "required": [
+                           "regex"
+                        ],
+                        "properties": {
+                           "regex": {
+                              "type": "string",
+                              "format": "string"
+                           }
+                        }
+                     }
+                  ]
+               },
+               "exclude": {
+                  "type": "array",
+                  "items": {
+                     "oneOf": [
+                        {
+                           "type": "object",
+                           "required": [
+                              "exact"
+                           ],
+                           "properties": {
+                              "exact": {
+                                 "type": "string",
+                                 "format": "string"
+                              }
+                           }
+                        },
+                        {
+                           "type": "object",
+                           "required": [
+                              "regex"
+                           ],
+                           "properties": {
+                              "regex": {
+                                 "type": "string",
+                                 "format": "string"
+                              }
+                           }
+                        }
+                     ]
+                  }
+               },
+               "count": {
+                  "type": "integer"
+               }
+            }
+         }
+      }
+   }
+}

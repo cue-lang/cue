@@ -39,6 +39,7 @@ type buildContext struct {
 	nameFunc    func(inst *cue.Instance, path []string) string
 	descFunc    func(v cue.Value) string
 	fieldFilter *regexp.Regexp
+	evalDepth   int // detect cycles when resolving references
 
 	schemas *OrderedMap
 
@@ -142,11 +143,6 @@ func (c *buildContext) isInternal(name string) bool {
 	return strings.HasSuffix(name, "_value")
 }
 
-// shouldExpand reports is the given identifier is not exported.
-func (c *buildContext) shouldExpand(p *cue.Instance, ref []string) bool {
-	return c.expandRefs
-}
-
 func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
 	panic(&openapiError{
 		errors.NewMessage(format, args),
@@ -187,13 +183,31 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 	return schema
 }
 
+func resolve(v cue.Value) cue.Value {
+	switch op, a := v.Expr(); op {
+	case cue.SelectorOp:
+		field, _ := a[1].String()
+		v = resolve(a[0]).Lookup(field)
+	}
+	return v
+}
+
 func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	count := 0
 	disallowDefault := false
 	var values cue.Value
-	p, a := v.Reference()
-	if b.ctx.shouldExpand(p, a) {
-		values = v
+	if b.ctx.expandRefs {
+		// Cycles are not allowed when expanding references. Right now we just
+		// cap the depth of evaluation at 30.
+		// TODO: do something more principled.
+		const maxDepth = 30
+		if b.ctx.evalDepth > maxDepth {
+			b.failf(v, "maximum stack depth of %d reached", maxDepth)
+		}
+		b.ctx.evalDepth++
+		defer func() { b.ctx.evalDepth-- }()
+
+		values = resolve(v)
 		count = 1
 	} else {
 		dedup := map[string]bool{}
@@ -844,12 +858,10 @@ func (b *builder) setNot(key string, value interface{}) {
 func (b *builder) finish() *oaSchema {
 	switch len(b.allOf) {
 	case 0:
-		if b.typ == "" {
-			b.failf(cue.Value{}, "no type specified at finish")
-			return nil
-		}
 		t := &OrderedMap{}
-		setType(t, b)
+		if b.typ != "" {
+			setType(t, b)
+		}
 		return t
 
 	case 1:

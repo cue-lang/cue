@@ -63,6 +63,10 @@ func TestParseDefinitions(t *testing.T) {
 		"oneof.json",
 		defaultConfig,
 	}, {
+		"oneof.cue",
+		"oneof-resolve.json",
+		resolveRefs,
+	}, {
 		"openapi.cue",
 		"openapi.json",
 		defaultConfig,
@@ -107,7 +111,7 @@ func TestParseDefinitions(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			if d := diff.Diff(string(b), out.String()); d != "" {
+			if d := diff.Diff(out.String(), string(b)); d != "" {
 				t.Errorf("files differ:\n%v", d)
 			}
 		})

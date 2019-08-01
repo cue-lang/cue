@@ -49,7 +49,8 @@ type Generator struct {
 	FieldFilter string
 
 	// ExpandReferences replaces references with actual objects when generating
-	// OpenAPI Schema. It is an error for an CUE value to refer to itself.
+	// OpenAPI Schema. It is an error for an CUE value to refer to itself
+	// if this option is used.
 	ExpandReferences bool
 }
 

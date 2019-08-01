@@ -222,6 +222,9 @@ func (g *generator) processGo(filename string) {
 	}
 	g.defaultPkg = ""
 	g.name = f.Name.Name
+	if g.name == "structs" {
+		g.name = "struct"
+	}
 
 	for _, d := range f.Decls {
 		switch x := d.(type) {
@@ -396,6 +399,8 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "bigRat"
 	case "internal.Decimal":
 		return "decimal"
+	case "cue.Struct":
+		return "structVal"
 	case "cue.Value":
 		return "value"
 	case "cue.List":
@@ -436,6 +441,8 @@ func (g *generator) goToCUE(expr ast.Expr) (cueKind string, omitCheck bool) {
 	case "strList":
 		omitCheck = false
 		cueKind += "listKind"
+	case "structVal":
+		cueKind += "structKind"
 	case "value":
 		// Must use callCtxt.value method for these types and resolve manually.
 		cueKind += "topKind" // TODO: can be more precise

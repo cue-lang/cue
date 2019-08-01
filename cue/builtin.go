@@ -347,6 +347,16 @@ func (c *callCtxt) value(i int) Value {
 	return newValueRoot(c.ctx, c.args[i])
 }
 
+func (c *callCtxt) structVal(i int) *Struct {
+	v := newValueRoot(c.ctx, c.args[i])
+	s, err := v.Struct()
+	if err != nil {
+		c.invalidArgType(c.args[i], i, "struct", err)
+		return nil
+	}
+	return s
+}
+
 func (c *callCtxt) invalidArgType(arg value, i int, typ string, err error) {
 	if err != nil {
 		c.errf(c.src, err, "cannot use %s (type %s) as %s in argument %d to %s: %v",

@@ -107,8 +107,10 @@ func (o *structValue) Lookup(key string) Value {
 	}
 	if i == len {
 		// TODO: better message.
-		return newValueRoot(o.ctx, o.ctx.mkErr(o.n, codeNotExist,
-			"value %q not found", key))
+		ctx := o.ctx
+		x := ctx.mkErr(o.n, codeNotExist, "value %q not found", key)
+		v := x.evalPartial(ctx)
+		return Value{ctx.index, &valueData{o.path, 0, arc{cache: v, v: x}}}
 	}
 	// v, _ := o.n.lookup(o.ctx, f)
 	// v = o.ctx.manifest(v)
@@ -1026,7 +1028,7 @@ func (v Value) structVal(ctx *context) (structValue, *bottom) {
 
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
-	v, _ = v.Default()
+	v, _ = v.Default() // TODO: remove?
 	if err := v.checkKind(ctx, structKind); err != nil {
 		return structValue{}, err
 	}
@@ -1068,6 +1070,63 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		}
 	}
 	return structValue{ctx, v.path, obj}, nil
+}
+
+// Struct returns the underlying struct of a value or an error if the value
+// is not a struct.
+func (v Value) Struct(opts ...Option) (*Struct, error) {
+	ctx := v.ctx()
+	if err := v.checkKind(ctx, structKind); err != nil {
+		return nil, v.toErr(err)
+	}
+	obj := v.eval(ctx).(*structLit)
+
+	// TODO: This is expansion appropriate?
+	obj = obj.expandFields(ctx)
+
+	return &Struct{v, obj}, nil
+}
+
+// Struct represents a CUE struct value.
+type Struct struct {
+	v Value
+	s *structLit
+}
+
+// FieldInfo contains information about a struct field.
+type FieldInfo struct {
+	Name  string
+	Value Value
+
+	IsOptional bool
+	IsHidden   bool
+}
+
+// field reports information about the ith field, i < o.Len().
+func (s *Struct) field(i int) FieldInfo {
+	ctx := s.v.ctx()
+	a := s.s.arcs[i]
+	a.cache = s.s.at(ctx, i)
+
+	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
+	str := ctx.labelStr(a.feature)
+	return FieldInfo{str, v, a.optional, a.feature&hidden != 0}
+}
+
+func (s *Struct) FieldByName(name string) (FieldInfo, bool) {
+	f := s.v.ctx().strLabel(name)
+	for i, a := range s.s.arcs {
+		if a.feature == f {
+			return s.field(i), true
+		}
+	}
+	return FieldInfo{}, false
+}
+
+// Fields creates an iterator over the Struct's fields.
+func (s *Struct) Fields(opts ...Option) Iterator {
+	iter, _ := s.v.Fields(opts...)
+	return iter
 }
 
 // Fields creates an iterator over v's fields if v is a struct or an error

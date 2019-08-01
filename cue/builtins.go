@@ -1888,16 +1888,6 @@ var builtinPackages = map[string]*builtinPkg{
 				}()
 			},
 		}, {
-			Name:   "CanBackquote",
-			Params: []kind{stringKind},
-			Result: boolKind,
-			Func: func(c *callCtxt) {
-				s := c.string(0)
-				c.ret = func() interface{} {
-					return strconv.CanBackquote(s)
-				}()
-			},
-		}, {
 			Name:   "IsPrint",
 			Params: []kind{intKind},
 			Result: boolKind,

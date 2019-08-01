@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo -exclude=Append,Unquote,Itoa extract strconv
+//go:generate qgo -exclude=Append,Unquote,Itoa,CanBackquote extract strconv
 
 package strconv
 
@@ -172,13 +172,6 @@ func QuoteRuneToASCII(r rune) string {
 // by IsGraphic.
 func QuoteRuneToGraphic(r rune) string {
 	return strconv.QuoteRuneToGraphic(r)
-}
-
-// CanBackquote reports whether the string s can be represented
-// unchanged as a single-line backquoted string without control
-// characters other than tab.
-func CanBackquote(s string) bool {
-	return strconv.CanBackquote(s)
 }
 
 // IsPrint reports whether the rune is defined as printable by Go, with

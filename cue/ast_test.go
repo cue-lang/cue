@@ -291,7 +291,7 @@ func TestEmit(t *testing.T) {
 			a: 8000 | 7080
 			a: 7080 | int
 		}`,
-		out: `<0>{a: _|_((8000 | 7080):more than one element remaining (8000 and 7080))}`,
+		out: `<0>{a: (8000 | 7080)}`,
 		rw:  evalFull,
 	}}
 	for _, tc := range testCases {

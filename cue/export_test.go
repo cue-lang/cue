@@ -160,8 +160,8 @@ func TestExport(t *testing.T) {
 			}`,
 		out: unindent(`
 			{
-				a: 1 | 2 | *_|_
-				b: [1 | 2 | *_|_]
+				a: 1 | 2
+				b: [1 | 2]
 			}`),
 	}, {
 		raw:  true,

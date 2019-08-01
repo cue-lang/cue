@@ -318,43 +318,40 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 }
 
 func (x *disjunction) manifest(ctx *context) (result evaluated) {
-	var err, marked, unmarked1, unmarked2 evaluated
-	for _, d := range x.values {
-		// Because of the lazy evaluation strategy, we may still have
-		// latent unification.
-		if err := validate(ctx, d.val); err != nil {
-			continue
-		}
+	values := make([]dValue, 0, len(x.values))
+	validValue := false
+	for _, dv := range x.values {
 		switch {
-		case d.marked:
-			if marked != nil {
-				// TODO: allow disjunctions to be returned as is.
-				return ctx.mkErr(x, codeIncomplete, "more than one default remaining (%v and %v)", ctx.str(marked), ctx.str(d.val))
-			}
-			marked = d.val.(evaluated)
-		case unmarked1 == nil:
-			unmarked1 = d.val.(evaluated)
+		case isBottom(dv.val):
+		case dv.marked:
+			values = append(values, dv)
 		default:
-			unmarked2 = d.val.(evaluated)
+			validValue = true
 		}
 	}
+
 	switch {
-	case marked != nil:
-		return marked
-
-	case unmarked2 != nil:
-		return ctx.mkErr(x, codeIncomplete, "more than one element remaining (%v and %v)",
-			ctx.str(unmarked1), ctx.str(unmarked2))
-
-	case unmarked1 != nil:
-		return unmarked1
-
-	case err != nil:
-		return err
-
+	case len(values) > 0:
+		// values contains all the valid defaults
+	case !validValue:
+		return x
 	default:
-		return ctx.mkErr(x, "empty disjunction")
+		for _, dv := range x.values {
+			dv.marked = false
+			values = append(values, dv)
+		}
 	}
+
+	switch len(values) {
+	case 0:
+		return x
+
+	case 1:
+		return values[0].val.evalPartial(ctx)
+	}
+
+	x = &disjunction{x.baseValue, values, true}
+	return x.normalize(ctx, x).val
 }
 
 func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {

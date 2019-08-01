@@ -518,7 +518,7 @@ func TestBasicRewrite(t *testing.T) {
 	rewriteHelper(t, testCases, evalPartial)
 }
 
-func TestChooseFirst(t *testing.T) {
+func TestChooseDefault(t *testing.T) {
 	testCases := []testCase{{
 		desc: "pick first",
 		in: `
@@ -531,13 +531,15 @@ func TestChooseFirst(t *testing.T) {
 		`,
 		out: "<0>{a: 5, b: <1>{c: <2>{a: 2}}}",
 	}, {
+		// In this test, default results to bottom, meaning that the non-default
+		// value remains.
 		desc: "simple disambiguation conflict",
 		in: `
 			a: *"a" | "b"
 			b: *"b" | "a"
 			c: a & b
 			`,
-		out: `<0>{a: "a", b: "b", c: _|_(("a" | "b" | *_|_):more than one element remaining ("a" and "b"))}`,
+		out: `<0>{a: "a", b: "b", c: ("a" | "b")}`,
 	}, {
 		desc: "associativity of defaults",
 		in: `
@@ -547,7 +549,7 @@ func TestChooseFirst(t *testing.T) {
 			x: a & b
 			y: b & c
 			`,
-		out: `<0>{a: "a", b: "a", c: _|_((*"a" | *"b" | "c"):more than one default remaining ("a" and "b")), x: "a", y: _|_((*"a" | *"b" | "c"):more than one default remaining ("a" and "b"))}`,
+		out: `<0>{a: "a", b: "a", c: (*"a" | *"b"), x: "a", y: (*"a" | *"b")}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }
@@ -1910,7 +1912,7 @@ func TestFullEval(t *testing.T) {
 			x: {a:1}|{a:2}
 			y: x & {a:3}
 		`,
-		out: `<0>{x: _|_((<1>{a: 1} | <2>{a: 2}):more than one element remaining ({a: 1} and {a: 2})), y: _|_((<3>.x & <4>{a: 3}):empty disjunction: {a: (1 & 3)})}`,
+		out: `<0>{x: (<1>{a: 1} | <2>{a: 2}), y: _|_((<3>.x & <4>{a: 3}):empty disjunction: {a: (1 & 3)})}`,
 	}, {
 		desc: "cannot resolve references that would be ambiguous",
 		in: `
@@ -1930,10 +1932,10 @@ func TestFullEval(t *testing.T) {
 			`a1: _|_(((*0 | 1) & (<1>.a3 - <1>.a2)):cycle detected), ` +
 			`a3: 1, ` +
 			`a2: _|_(((*0 | 1) & (<1>.a3 - <1>.a1)):cycle detected), ` +
-			`b1: _|_((0 | 1 | *_|_):more than one element remaining (0 and 1)), ` +
-			`b2: _|_((0 | 1 | *_|_):more than one element remaining (0 and 1)), ` +
-			`c1: _|_((<2>{a: 1, b: 2} | <3>{a: 2, b: 1} | *_|_):more than one element remaining ({a: 1, b: 2} and {a: 2, b: 1})), ` +
-			`c2: _|_((<4>{a: 2, b: 1} | <5>{a: 1, b: 2} | *_|_):more than one element remaining ({a: 2, b: 1} and {a: 1, b: 2}))}`,
+			`b1: (0 | 1), ` +
+			`b2: (0 | 1), ` +
+			`c1: (<2>{a: 1, b: 2} | <3>{a: 2, b: 1}), ` +
+			`c2: (<4>{a: 2, b: 1} | <5>{a: 1, b: 2})}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

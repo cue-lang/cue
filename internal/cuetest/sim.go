@@ -93,7 +93,7 @@ func Run(t *testing.T, dir, command string, cfg *Config) {
 
 	want := strings.TrimSpace(cfg.Golden)
 	if got != want {
-		t.Errorf("files differ:\n%s", diff.Diff(want, got))
+		t.Errorf("files differ:\n%s", diff.Diff(got, want))
 	}
 }
 

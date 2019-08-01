@@ -1990,7 +1990,7 @@ kubernetes: {
                                 containerPort: 7788
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-volume"
                                 mountPath: "/etc/ssl"
@@ -2230,7 +2230,7 @@ kubernetes: {
                                 containerPort: 7443
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-volume"
                                 mountPath: "/etc/ssl"
@@ -2436,7 +2436,7 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-updater"
                                 mountPath: "/etc/certs"
@@ -2627,7 +2627,7 @@ kubernetes: {
                                 containerPort: 7788
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-volume"
                                 mountPath: "/etc/ssl"
@@ -2897,18 +2897,18 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "ssd-caller"
                                 mountPath: "/logs"
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-ssh-key"
                                 mountPath: "/sslcerts"
                                 readOnly:  true
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-caller"
                                 mountPath: "/etc/certs"
@@ -3177,18 +3177,18 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-ssh-key"
                                 mountPath: "/sslcerts"
                                 readOnly:  true
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "dishwasher-disk"
                                 mountPath: "/logs"
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-dishwasher"
                                 mountPath: "/etc/certs"
@@ -3454,12 +3454,12 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "expiditer-disk"
                                 mountPath: "/logs"
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-expiditer"
                                 mountPath: "/etc/certs"
@@ -3710,13 +3710,13 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-headchef"
                                 mountPath: "/sslcerts"
                                 readOnly:  true
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "headchef-disk"
                                 mountPath: "/logs"
@@ -3965,13 +3965,13 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-kitchen"
                                 mountPath: "/etc/certs"
                                 readOnly:  true
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "linecook-disk"
                                 mountPath: "/logs"
@@ -4224,13 +4224,13 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-ssh-key"
                                 mountPath: "/etc/certs"
                                 readOnly:  true
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "pastrychef-disk"
                                 mountPath: "/logs"
@@ -4763,12 +4763,12 @@ kubernetes: {
                                 containerPort: 9093
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "alertmanager"
                                 mountPath: "/alertmanager"
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "config-volume"
                                 mountPath: "/etc/alertmanager"
@@ -5041,7 +5041,7 @@ kubernetes: {
                                 containerPort: 8080
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "grafana-volume"
                                 mountPath: "/var/lib/grafana"
@@ -5278,13 +5278,13 @@ kubernetes: {
                                 hostPort:      9100
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "proc"
                                 mountPath: "/host/proc"
                                 readOnly:  true
                             }, {
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "sys"
                                 mountPath: "/host/sys"
@@ -5538,7 +5538,7 @@ kubernetes: {
                                 containerPort: 9090
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "config-volume"
                                 mountPath: "/etc/prometheus"
@@ -6294,7 +6294,7 @@ kubernetes: {
                                 containerPort: 4180
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "config-volume"
                                 mountPath: "/etc/authproxy"
@@ -6606,7 +6606,7 @@ kubernetes: {
                                 containerPort: 7443
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-volume"
                                 mountPath: "/etc/ssl"
@@ -6810,7 +6810,7 @@ kubernetes: {
                                 containerPort: 443
                             }]
                             volumeMounts: [{
-                                _|_ /* more than one element remaining (false and true) */
+                                _|_ /* non-concrete value bool */
 
                                 name:      "secret-volume"
                                 mountPath: "/etc/ssl"

@@ -20,17 +20,15 @@ func (c *context) manifest(v value) evaluated {
 		return evaluated
 	}
 outer:
-	for {
-		switch x := evaluated.(type) {
-		case *disjunction:
-			evaluated = x.manifest(c)
+	switch x := evaluated.(type) {
+	case *disjunction:
+		evaluated = x.manifest(c)
 
-		case *list:
-			return x.manifest(c)
+	case *list:
+		return x.manifest(c)
 
-		default:
-			break outer
-		}
+	default:
+		break outer
 	}
 	return evaluated
 }

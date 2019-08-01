@@ -524,11 +524,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		list := &ast.ListLit{}
 		var expr ast.Expr = list
 		for _, e := range x.elem.arcs {
-			if doEval(p.mode) {
-				list.Elts = append(list.Elts, p.expr(e.v.evalPartial(p.ctx)))
-			} else {
-				list.Elts = append(list.Elts, p.expr(e.v))
-			}
+			list.Elts = append(list.Elts, p.expr(e.v))
 		}
 		max := maxNum(x.len)
 		num, ok := max.(*numLit)

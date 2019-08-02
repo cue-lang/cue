@@ -568,7 +568,7 @@ func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
 	return Value{v.idx, &valueData{v.path, i, a}}
 }
 
-func (v Value) eval(ctx *context) value {
+func (v Value) eval(ctx *context) evaluated {
 	if v.path == nil || v.path.cache == nil {
 		panic("undefined value")
 	}

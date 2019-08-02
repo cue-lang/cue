@@ -36,6 +36,8 @@ package expressions
 		bbbb: 100 @go(Bbbb) /* a */ @xml(,attr) // comment
 	}
 
+	foo: {bar: string @go(-)}
+
 	e:  1 + 2*3
 	e:  1 * 2 * 3 // error
 	e:  >=2 & <=3

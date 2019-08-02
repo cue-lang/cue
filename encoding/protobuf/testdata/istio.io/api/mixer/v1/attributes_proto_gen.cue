@@ -65,7 +65,9 @@ StructWrap: {
 //  3) Forward attributes from client proxy to server proxy for HTTP requests.
 Attributes: {
 	//  A map of attribute name to its value.
-	attributes <_>: Attributes_AttributeValue
+	attributes: {
+		<_>: Attributes_AttributeValue
+	} @protobuf(1,type=map<string,AttributeValue>)
 }
 
 //  Specifies one attribute value with different type.
@@ -101,7 +103,9 @@ Attributes_AttributeValue: {
 //  Defines a string map.
 Attributes_StringMap: {
 	//  Holds a set of name/value pairs.
-	entries <_>: string
+	entries: {
+		<_>: string
+	} @protobuf(1,type=map<string,string>)
 }
 
 //  Defines a list of attributes in compressed format optimized for transport.
@@ -116,33 +120,51 @@ CompressedAttributes: {
 	words?: [...string] @protobuf(1)
 
 	//  Holds attributes of type STRING, DNS_NAME, EMAIL_ADDRESS, URI
-	strings <_>: int32
+	strings: {
+		<_>: int32
+	} @protobuf(2,type=map<sint32,sint32>)
 
 	//  Holds attributes of type INT64
-	int64s <_>: int64
+	int64s: {
+		<_>: int64
+	} @protobuf(3,type=map<sint32,int64>)
 
 	//  Holds attributes of type DOUBLE
-	doubles <_>: float64
+	doubles: {
+		<_>: float64
+	} @protobuf(4,type=map<sint32,double>)
 
 	//  Holds attributes of type BOOL
-	bools <_>: bool
+	bools: {
+		<_>: bool
+	} @protobuf(5,type=map<sint32,bool>)
 
 	//  Holds attributes of type TIMESTAMP
-	timestamps <_>: timestamp.Timestamp
+	timestamps: {
+		<_>: timestamp.Timestamp
+	} @protobuf(6,type=map<sint32,google.protobuf.Timestamp>,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
 
 	//  Holds attributes of type DURATION
-	durations <_>: duration.Duration
+	durations: {
+		<_>: duration.Duration
+	} @protobuf(7,type=map<sint32,google.protobuf.Duration>,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	//  Holds attributes of type BYTES
-	bytes <_>: bytes
+	bytes: {
+		<_>: bytes
+	} @protobuf(8,type=map<sint32,bytes>)
 
 	//  Holds attributes of type STRING_MAP
-	stringMaps <_>: StringMap
+	stringMaps: {
+		<_>: StringMap
+	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
 
 //  A map of string to string. The keys and values in this map are dictionary
 //  indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)
 StringMap: {
 	//  Holds a set of name/value pairs.
-	entries <_>: int32
+	entries: {
+		<_>: int32
+	} @protobuf(1,type=map<sint32,sint32>)
 }

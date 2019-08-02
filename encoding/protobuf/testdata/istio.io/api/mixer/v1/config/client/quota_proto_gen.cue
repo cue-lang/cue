@@ -97,7 +97,9 @@ AttributeMatch: {
 	//        exact: SOURCE_UID
 	//      request.http_method:
 	//        exact: POST
-	clause <_>: StringMatch
+	clause: {
+		<_>: StringMatch
+	} @protobuf(1,type=map<string,StringMatch>)
 }
 
 //  Specifies a quota to use with quota name and amount.

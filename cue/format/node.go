@@ -138,7 +138,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		// Lbrace does not signal the intend to collapse fields.
 		for n.Label.Pos().IsValid() || f.printer.cfg.simplify {
 			obj, ok := n.Value.(*ast.StructLit)
-			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) {
+			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) || len(n.Attrs) > 0 {
 				break
 			}
 
@@ -155,7 +155,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			}
 
 			mem, ok := obj.Elts[0].(*ast.Field)
-			if !ok {
+			if !ok || len(mem.Attrs) > 0 {
 				break
 			}
 			entry := labelEntry{mem.Label, mem.Optional != token.NoPos}

@@ -212,7 +212,9 @@ Gateway: {
 	//  label search is restricted to the configuration namespace in which the
 	//  the resource is present. In other words, the Gateway resource must
 	//  reside in the same namespace as the gateway workload instance.
-	selector <_>: string
+	selector: {
+		<_>: string
+	} @protobuf(2,type=map<string,string>)
 	selector?: {<name>: name}
 }
 

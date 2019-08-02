@@ -762,7 +762,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 		a := &ast.Attribute{At: p.pos, Text: p.lit}
 		p.next()
 		c.closeNode(p, a)
-		this.Attrs = append(this.Attrs, a)
+		m.Attrs = append(m.Attrs, a)
 	}
 	p.closeList()
 
@@ -775,7 +775,7 @@ func (p *parser) parseField(allowEmit bool) (decl ast.Decl) {
 
 	case token.FOR, token.IF:
 		if !allowComprehension {
-			p.errf(p.pos, "comprehension not alowed for this field")
+			p.errf(p.pos, "comprehension not allowed for this field")
 		}
 		clauses := p.parseComprehensionClauses()
 		return &ast.ComprehensionDecl{

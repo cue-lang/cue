@@ -40,7 +40,9 @@ CheckRequest: {
 	deduplicationId?: string @protobuf(3,name=deduplication_id)
 
 	//  The individual quotas to allocate
-	quotas <_>: CheckRequest_QuotaParams
+	quotas: {
+		<_>: CheckRequest_QuotaParams
+	} @protobuf(4,type=map<string,QuotaParams>,"(gogoproto.nullable)=false")
 }
 
 //  parameters for a quota allocation
@@ -59,7 +61,9 @@ CheckResponse: {
 	precondition?: CheckResponse_PreconditionResult @protobuf(2,type=PreconditionResult,"(gogoproto.nullable)=false")
 
 	//  The resulting quota, one entry per requested quota.
-	quotas <_>: CheckResponse_QuotaResult
+	quotas: {
+		<_>: CheckResponse_QuotaResult
+	} @protobuf(3,type=map<string,QuotaResult>,"(gogoproto.nullable)=false")
 }
 
 //  Expresses the result of a precondition check.

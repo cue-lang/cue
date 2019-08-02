@@ -305,7 +305,8 @@ func TestExport(t *testing.T) {
 				}][a]
 				a: int
 				c: 1
-			}`)}}
+			}`),
+	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			body := fmt.Sprintf("Test: %s", tc.in)
@@ -350,6 +351,16 @@ func TestExportFile(t *testing.T) {
 		in: `
 		import "strings"
 
+		a: strings.TrimSpace("  c  ")
+		`,
+		out: unindent(`
+		import "strings"
+
+		a: strings.TrimSpace("  c  ")`),
+	}, {
+		in: `
+		import "strings"
+
 		stringsx = strings
 
 		a: {
@@ -361,6 +372,16 @@ func TestExportFile(t *testing.T) {
 
 		STRINGS = strings
 		a strings: STRINGS.ContainsAny("c")`),
+	}, {
+		in: `
+			a: b - 100
+			b: a + 100
+		`,
+		out: unindent(`
+		{
+			a: b - 100
+			b: a + 100
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -372,8 +393,8 @@ func TestExportFile(t *testing.T) {
 			v := inst.Value()
 			ctx := r.index().newContext()
 
-			opts := options{raw: false}
-			b, err := format.Node(export(ctx, v.eval(ctx), opts), format.Simplify())
+			opts := options{raw: true}
+			b, err := format.Node(export(ctx, v.path.v, opts), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}

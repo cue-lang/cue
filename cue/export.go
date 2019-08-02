@@ -44,6 +44,7 @@ func export(ctx *context, v value, m options) ast.Node {
 
 	value := e.expr(v)
 	if len(e.imports) == 0 {
+		// TODO: unwrap structs?
 		return value
 	}
 	imports := make([]string, 0, len(e.imports))
@@ -73,7 +74,6 @@ func export(ctx *context, v value, m options) ast.Node {
 		})
 	}
 
-	// TODO: should we unwrap structs?
 	if obj, ok := value.(*ast.StructLit); ok {
 		file.Decls = append(file.Decls, obj.Elts...)
 	} else {
@@ -275,7 +275,13 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 
 	case *callExpr:
-		call := &ast.CallExpr{Fun: p.expr(x.x)}
+		call := &ast.CallExpr{}
+		b := x.x.evalPartial(p.ctx)
+		if b, ok := b.(*builtin); ok {
+			call.Fun = p.expr(b)
+		} else {
+			call.Fun = p.expr(x.x)
+		}
 		for _, a := range x.args {
 			call.Args = append(call.Args, p.expr(a))
 		}
@@ -335,14 +341,14 @@ func (p *exporter) expr(v value) ast.Expr {
 		obj := &ast.StructLit{}
 		if doEval(p.mode) {
 			x = x.expandFields(p.ctx)
-			for _, a := range x.arcs {
-				p.stack = append(p.stack, remap{
-					key:  x,
-					from: a.feature,
-					to:   nil,
-					syn:  obj,
-				})
-			}
+		}
+		for _, a := range x.arcs {
+			p.stack = append(p.stack, remap{
+				key:  x,
+				from: a.feature,
+				to:   nil,
+				syn:  obj,
+			})
 		}
 		if x.emit != nil {
 			obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})

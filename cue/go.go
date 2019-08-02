@@ -37,24 +37,24 @@ import (
 // optimized.
 
 func init() {
-	internal.FromGoValue = func(instance, x interface{}) interface{} {
-		return convertValue(instance.(*Instance), x)
+	internal.FromGoValue = func(runtime, x interface{}) interface{} {
+		return convertValue(runtime.(*Runtime), x)
 	}
 
-	internal.FromGoType = func(instance, x interface{}) interface{} {
-		return convertType(instance.(*Instance), x)
+	internal.FromGoType = func(runtime, x interface{}) interface{} {
+		return convertType(runtime.(*Runtime), x)
 	}
 }
 
-func convertValue(inst *Instance, x interface{}) Value {
-	ctx := inst.index.newContext()
+func convertValue(r *Runtime, x interface{}) Value {
+	ctx := r.index().newContext()
 	v := convert(ctx, baseValue{}, x)
 	return newValueRoot(ctx, v)
 }
 
-func convertType(inst *Instance, x interface{}) Value {
-	ctx := inst.index.newContext()
-	v := convertGoType(inst, reflect.TypeOf(x))
+func convertType(r *Runtime, x interface{}) Value {
+	ctx := r.index().newContext()
+	v := convertGoType(r, reflect.TypeOf(x))
 	return newValueRoot(ctx, v)
 
 }
@@ -386,8 +386,8 @@ var (
 	mutex     sync.Mutex
 )
 
-func convertGoType(inst *Instance, t reflect.Type) value {
-	ctx := inst.newContext()
+func convertGoType(r *Runtime, t reflect.Type) value {
+	ctx := r.index().newContext()
 	// TODO: this can be much more efficient.
 	mutex.Lock()
 	defer mutex.Unlock()

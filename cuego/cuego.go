@@ -20,7 +20,6 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 )
@@ -160,16 +159,13 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 var (
 	mutex    sync.Mutex
 	instance *cue.Instance
+	runtime  = &cue.Runtime{}
 )
 
 func init() {
-	context := build.NewContext()
-	inst := context.NewInstance("<cuego>", nil)
-	if err := inst.AddFile("<cuego>", "{}"); err != nil {
-		panic(err)
-	}
-	instance = cue.Build([]*build.Instance{inst})[0]
-	if err := instance.Err; err != nil {
+	var err error
+	instance, err = runtime.Compile("<cuego>", "{}")
+	if err != nil {
 		panic(err)
 	}
 }
@@ -180,7 +176,7 @@ func fromGoValue(x interface{}) (v cue.Value, err error) {
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v = internal.FromGoValue(instance, x).(cue.Value)
+	v = internal.FromGoValue(runtime, x).(cue.Value)
 	mutex.Unlock()
 	return v, nil
 
@@ -205,7 +201,7 @@ func fromGoType(x interface{}) cue.Value {
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v := internal.FromGoType(instance, x).(cue.Value)
+	v := internal.FromGoType(runtime, x).(cue.Value)
 	mutex.Unlock()
 	return v
 }

@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // A Runtime is used for creating CUE interpretations.
@@ -36,6 +37,12 @@ import (
 type Runtime struct {
 	ctx *build.Context // TODO: remove
 	idx *index
+}
+
+func init() {
+	internal.GetRuntime = func(instance interface{}) interface{} {
+		return &Runtime{idx: instance.(*Instance).index}
+	}
 }
 
 func dummyLoad(token.Pos, string) *build.Instance { return nil }

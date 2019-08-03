@@ -53,3 +53,6 @@ var DropOptional bool
 
 // UnifyBuiltin returns the given Value unified with the given builtin template.
 var UnifyBuiltin func(v interface{}, kind string) interface{}
+
+// GetRuntime reports the runtime for an Instance.
+var GetRuntime func(instance interface{}) interface{}

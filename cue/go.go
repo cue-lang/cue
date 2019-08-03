@@ -22,7 +22,6 @@ import (
 	"reflect"
 	"sort"
 	"strings"
-	"sync"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -381,16 +380,11 @@ func toUint(ctx *context, src source, x uint64) evaluated {
 	return n
 }
 
-var (
-	typeCache sync.Map // map[reflect.Type]evaluated
-	mutex     sync.Mutex
-)
-
 func convertGoType(r *Runtime, t reflect.Type) value {
 	ctx := r.index().newContext()
 	// TODO: this can be much more efficient.
-	mutex.Lock()
-	defer mutex.Unlock()
+	ctx.mutex.Lock()
+	defer ctx.mutex.Unlock()
 	return goTypeToValue(ctx, true, t)
 }
 
@@ -405,7 +399,7 @@ var (
 // TODO: if this value will always be unified with a concrete type in Go, then
 // many of the fields may be omitted.
 func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value) {
-	if e, ok := typeCache.Load(t); ok {
+	if e, ok := ctx.typeCache.Load(t); ok {
 		return e.(value)
 	}
 
@@ -477,7 +471,7 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 		// resolve field tags to allow field tags to refer to the struct fields.
 		tags := map[label]string{}
 		obj := newStruct(baseValue{})
-		typeCache.Store(t, obj)
+		ctx.typeCache.Store(t, obj)
 
 		for i := 0; i < t.NumField(); i++ {
 			f := t.Field(i)
@@ -559,7 +553,7 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 store:
 	// TODO: store error if not nil?
 	if e != nil {
-		typeCache.Store(t, e)
+		ctx.typeCache.Store(t, e)
 	}
 	return e
 }

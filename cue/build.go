@@ -20,6 +20,7 @@ import (
 	"encoding/gob"
 	"path"
 	"strconv"
+	"sync"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -33,8 +34,8 @@ import (
 // Any operation that involves two Values or Instances should originate from
 // the same Runtime.
 type Runtime struct {
-	Context *build.Context // TODO: remove
-	idx     *index
+	ctx *build.Context // TODO: remove
+	idx *index
 }
 
 func dummyLoad(token.Pos, string) *build.Instance { return nil }
@@ -131,7 +132,7 @@ func (inst *Instance) MarshalBinary() (b []byte, err error) {
 // name in position information. The source may import builtin packages. Use
 // Build to allow importing non-builtin packages.
 func (r *Runtime) Compile(filename string, source interface{}) (*Instance, error) {
-	ctx := r.Context
+	ctx := r.ctx
 	if ctx == nil {
 		ctx = build.NewContext()
 	}
@@ -145,7 +146,7 @@ func (r *Runtime) Compile(filename string, source interface{}) (*Instance, error
 // CompileFile compiles the given source file into an Instance. The source may
 // import builtin packages. Use Build to allow importing non-builtin packages.
 func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
-	ctx := r.Context
+	ctx := r.ctx
 	if ctx == nil {
 		ctx = build.NewContext()
 	}
@@ -164,7 +165,7 @@ func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
 // may import builtin packages. Use Build to allow importing non-builtin
 // packages.
 func (r *Runtime) CompileExpr(expr ast.Expr) (*Instance, error) {
-	ctx := r.Context
+	ctx := r.ctx
 	if ctx == nil {
 		ctx = build.NewContext()
 	}
@@ -250,6 +251,9 @@ type index struct {
 	offset label
 	parent *index
 	freeze bool
+
+	mutex     sync.Mutex
+	typeCache sync.Map // map[reflect.Type]evaluated
 }
 
 const sharedOffset = 0x40000000

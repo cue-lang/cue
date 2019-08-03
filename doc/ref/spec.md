@@ -2315,7 +2315,7 @@ and validate after the field in which the expression occurs has been evaluated
 that `a == e`.
 
 ```
-// Config            Evaluates to
+// Config            Evaluates to (requiring concrete values)
 x: {                  x: {
     a: b + 100            a: _|_ // cycle detected
     b: a - 100            b: _|_ // cycle detected

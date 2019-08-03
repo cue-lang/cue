@@ -1346,12 +1346,13 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 }
 
 type options struct {
-	concrete     bool // enforce that values are concrete
-	raw          bool // show original values
-	hasHidden    bool
-	omitHidden   bool
-	omitOptional bool
-	omitAttrs    bool
+	concrete       bool // enforce that values are concrete
+	raw            bool // show original values
+	hasHidden      bool
+	omitHidden     bool
+	omitOptional   bool
+	omitAttrs      bool
+	disallowCycles bool // implied by concrete
 }
 
 // An Option defines modes of evaluation.
@@ -1378,6 +1379,12 @@ func Concrete(concrete bool) Option {
 			p.raw = true
 		}
 	}
+}
+
+// DisallowCycles forces validation in the precense of cycles, even if
+// non-concrete values are allowed. This is implied by Concrete(true).
+func DisallowCycles(disallow bool) Option {
+	return func(p *options) { p.disallowCycles = disallow }
 }
 
 // All indicates that all fields and values should be included in processing
@@ -1430,7 +1437,10 @@ func (v Value) Validate(opts ...Option) error {
 	var errs errors.Error
 	v.Walk(func(v Value) bool {
 		if err := v.checkKind(v.ctx(), bottomKind); err != nil {
-			if !o.concrete && isIncomplete(v.eval(v.ctx())) {
+			if !o.concrete && isIncomplete(err) {
+				if o.disallowCycles && err.code == codeCycle {
+					errs = errors.Append(errs, v.toErr(err))
+				}
 				return false
 			}
 			errs = errors.Append(errs, v.toErr(err))

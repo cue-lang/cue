@@ -29,7 +29,7 @@ b: a - 100
 ```
 
 <!-- result -->
-`$ cue eval -i cycle.cue`
+`$ cue eval -i -c cycle.cue`
 ```
 x: 200
 y: 100

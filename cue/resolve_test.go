@@ -466,9 +466,9 @@ func TestBasicRewrite(t *testing.T) {
 
 			c: [c[1], c[0]]
 		`,
-		out: `<0>{a: _|_((<1>.b - 100):cycle detected), ` +
-			`b: _|_((<1>.a + 100):cycle detected), ` +
-			`c: [_|_(<1>.c[1]:cycle detected),_|_(<1>.c[0]:cycle detected)]}`,
+		out: `<0>{a: (<1>.b - 100), ` +
+			`b: (<1>.a + 100), ` +
+			`c: [<1>.c[1],<1>.c[0]]}`,
 	}, {
 		desc: "resolved self-reference cycles",
 		in: `
@@ -1054,8 +1054,8 @@ func TestResolve(t *testing.T) {
 		b: a & { l: [_, "bar"] }
 		`,
 		out: `<0>{` +
-			`a: <1>{l: ["foo",_|_(<2>.v:cycle detected)], ` +
-			`v: _|_(<2>.l[1]:cycle detected)}, ` +
+			`a: <1>{l: ["foo",<2>.v], ` +
+			`v: <2>.l[1]}, ` +
 			`b: <3>{l: ["foo","bar"], v: "bar"}}`,
 	}, {
 		desc: "correct error messages",
@@ -1929,9 +1929,9 @@ func TestFullEval(t *testing.T) {
 		c2: (*{a:2} | {b:2}) & c1
 		`,
 		out: `<0>{` +
-			`a1: _|_(((*0 | 1) & (<1>.a3 - <1>.a2)):cycle detected), ` +
+			`a1: ((*0 | 1) & (<1>.a3 - <1>.a2)), ` +
 			`a3: 1, ` +
-			`a2: _|_(((*0 | 1) & (<1>.a3 - <1>.a1)):cycle detected), ` +
+			`a2: ((*0 | 1) & (<1>.a3 - <1>.a1)), ` +
 			`b1: (0 | 1), ` +
 			`b2: (0 | 1), ` +
 			`c1: (<2>{a: 1, b: 2} | <3>{a: 2, b: 1}), ` +

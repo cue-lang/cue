@@ -116,31 +116,31 @@ func runEval(cmd *cobra.Command, args []string) error {
 
 		if exprs == nil {
 			v := inst.Value()
-			if flagConcrete.Bool(cmd) {
+			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
 					exitIfErr(cmd, inst, err, false)
 					continue
 				}
 			}
 			b, _ := format.Node(getSyntax(v, syn), opts...)
-			w.Write(b)
+			_, _ = w.Write(b)
 		}
 		for _, e := range exprs {
 			if len(exprs) > 1 {
 				fmt.Fprint(w, "// ")
 				b, _ := format.Node(e)
-				w.Write(b)
+				_, _ = w.Write(b)
 				fmt.Fprintln(w)
 			}
 			v := inst.Eval(e)
-			if flagConcrete.Bool(cmd) {
+			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
 					exitIfErr(cmd, inst, err, false)
 					continue
 				}
 			}
 			b, _ := format.Node(getSyntax(v, syn), opts...)
-			w.Write(b)
+			_, _ = w.Write(b)
 			fmt.Fprintln(w)
 		}
 	}

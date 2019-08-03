@@ -102,7 +102,7 @@ const (
 
 func isIncomplete(v value) bool {
 	if err, ok := v.(*bottom); ok {
-		return err.code == codeIncomplete
+		return err.code == codeIncomplete || err.code == codeCycle
 	}
 	return false
 }

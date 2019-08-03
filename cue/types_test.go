@@ -1092,6 +1092,22 @@ func TestValidate(t *testing.T) {
 		in:   `a: [{b: string}, 3]`,
 		opts: []Option{Concrete(true)},
 		err:  true,
+	}, {
+		desc: "allow cycles",
+		in: `
+			a: b - 100
+			b: a + 100
+			c: [c[1], c[0]]
+			`,
+	}, {
+		desc: "disallow cycles",
+		in: `
+			a: b - 100
+			b: a + 100
+			c: [c[1], c[0]]
+			`,
+		opts: []Option{DisallowCycles(true)},
+		err:  true,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

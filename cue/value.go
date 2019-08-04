@@ -885,7 +885,7 @@ func mergeDocs(a, b *docNode) *docNode {
 		return b
 	}
 	if b == nil {
-		return b
+		return a
 	}
 	// TODO: filter out duplicates?
 	return &docNode{nil, a, b}
@@ -910,6 +910,7 @@ func (x *structLit) insertValue(ctx *context, f label, optional bool, value valu
 		// TODO: should we warn if there is a mixed mode of optional and non
 		// optional fields at this point?
 		x.arcs[i].optional = x.arcs[i].optional && optional
+		x.arcs[i].docs = mergeDocs(x.arcs[i].docs, docs)
 		return
 	}
 	x.arcs = append(x.arcs, arc{f, optional, value, nil, a, docs})

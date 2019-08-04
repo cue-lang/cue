@@ -1590,47 +1590,71 @@ func TestValueDoc(t *testing.T) {
 		field2: int
 	}
 	`
+	config2 := `
+	// Another Foo.
+	Foo: {}
+	`
+	inst := getInstance(t, config)
+	v1 := inst.Value()
+	v2 := getInstance(t, config2).Value()
+	both := v1.Unify(v2)
+
 	testCases := []struct {
+		val  Value
 		path string
 		doc  string
 	}{{
+		val:  v1,
 		path: "foos",
 		doc:  "foos are instances of Foo.\n",
 	}, {
+		val:  v1,
 		path: "foos MyFoo",
 		doc:  "My first little foo.\n",
 	}, {
+		val:  v1,
 		path: "foos MyFoo field1",
 		doc: `field1 is an int.
 
 local field comment.
 `,
 	}, {
+		val:  v1,
 		path: "foos MyFoo field2",
 		doc:  "other field comment.\n",
 	}, {
+		val:  v1,
 		path: "foos MyFoo dup3",
 		doc: `duplicate field comment
 
 duplicate field comment
 `,
 	}, {
+		val:  v1,
 		path: "bar field1",
 		doc:  "comment from bar on field 1\n",
 	}, {
+		val:  v1,
 		path: "baz field1",
 		doc: `comment from baz on field 1
 
 comment from bar on field 1
 `,
 	}, {
+		val:  v1,
 		path: "baz field2",
 		doc:  "comment from bar on field 2\n",
+	}, {
+		val:  both,
+		path: "Foo",
+		doc: `Another Foo.
+
+A Foo fooses stuff.
+`,
 	}}
-	inst := getInstance(t, config)
 	for _, tc := range testCases {
 		t.Run("field:"+tc.path, func(t *testing.T) {
-			v := inst.Value().Lookup(strings.Split(tc.path, " ")...)
+			v := tc.val.Lookup(strings.Split(tc.path, " ")...)
 			doc := docStr(v.Doc())
 			if doc != tc.doc {
 				t.Errorf("doc: got:\n%vwant:\n%v", doc, tc.doc)

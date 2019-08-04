@@ -201,7 +201,7 @@ func (g *generator) processCUE(dir string) {
 		return
 	}
 
-	n := instances[0].Value().Syntax(cue.Hidden(true), cue.Concrete(false))
+	n := instances[0].Value().Syntax(cue.Raw())
 	b, err := cueformat.Node(n)
 	if err != nil {
 		log.Fatal(err)

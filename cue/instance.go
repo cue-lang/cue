@@ -94,14 +94,12 @@ func (inst *Instance) setError(err errors.Error) {
 }
 
 func (inst *Instance) eval(ctx *context) evaluated {
-	// TODO: remove manifest here? It may be good here, though not consistent.
+	// TODO: remove manifest here?
 	v := ctx.manifest(inst.rootValue)
 	if s, ok := v.(*structLit); ok && s.emit != nil {
-		v = ctx.manifest(s.emit)
+		return s.emit.evalPartial(ctx)
 	}
-	// manifest to benefit from validation step.
-	// TODO: consider not doing manifest.
-	return ctx.manifest(v)
+	return v
 }
 
 func init() {

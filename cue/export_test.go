@@ -410,11 +410,7 @@ func TestExportFile(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			v := inst.Value()
-			ctx := r.index().newContext()
-
-			opts := options{raw: true}
-			b, err := format.Node(export(ctx, v.path.v, opts), format.Simplify())
+			b, err := format.Node(inst.Value().Syntax(Raw()), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}

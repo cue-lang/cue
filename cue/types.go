@@ -725,6 +725,9 @@ func (v Value) marshalJSON() (b []byte, err error) {
 // Syntax converts the possibly partially evaluated value into syntax. This
 // can use used to print the value with package format.
 func (v Value) Syntax(opts ...Option) ast.Node {
+	// TODO: the default should ideally be simplified representation that
+	// exactly represents the value. The latter can currently only be
+	// ensured with Raw().
 	if v.path == nil || v.path.cache == nil {
 		return nil
 	}
@@ -1375,8 +1378,6 @@ func Concrete(concrete bool) Option {
 			if !p.hasHidden {
 				p.omitHidden = true
 			}
-		} else {
-			p.raw = true
 		}
 	}
 }
@@ -1385,6 +1386,11 @@ func Concrete(concrete bool) Option {
 // non-concrete values are allowed. This is implied by Concrete(true).
 func DisallowCycles(disallow bool) Option {
 	return func(p *options) { p.disallowCycles = disallow }
+}
+
+// Raw tells Syntax to generate the value as is without any simplifications.
+func Raw() Option {
+	return func(p *options) { p.raw = true }
 }
 
 // All indicates that all fields and values should be included in processing

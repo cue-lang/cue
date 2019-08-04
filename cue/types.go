@@ -1522,7 +1522,7 @@ func (v Value) Attribute(key string) Attribute {
 		}
 		at := Attribute{}
 		if err := parseAttrBody(v.ctx(), nil, a.body(), &at.attr); err != nil {
-			return Attribute{err: err.(error)}
+			return Attribute{err: v.toErr(err)}
 		}
 		return at
 	}

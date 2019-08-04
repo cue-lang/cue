@@ -69,9 +69,9 @@ func TestParse(t *testing.T) {
 		 b: 2 @foo(a,b=4) @go(Foo)
 		 c: {
 			 d: "x" @go(D) @json(,omitempty)
-			 e: "y" @ts(,type=string)
+			 e: "y" @ts(,type=string,"str")
 		 }`,
-		`a: 1 @xml(,attr), b: 2 @foo(a,b=4) @go(Foo), c: {d: "x" @go(D) @json(,omitempty), e: "y" @ts(,type=string)}`,
+		`a: 1 @xml(,attr), b: 2 @foo(a,b=4) @go(Foo), c: {d: "x" @go(D) @json(,omitempty), e: "y" @ts(,type=string,"str")}`,
 	}, {
 		"not emitted",
 		`a: true

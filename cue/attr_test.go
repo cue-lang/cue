@@ -37,6 +37,9 @@ func TestAttributeBody(t *testing.T) {
 		in:  "a,",
 		out: "[{a 0} { 0}]",
 	}, {
+		in:  `"a",`,
+		out: "[{a 0} { 0}]",
+	}, {
 		in:  "a,b",
 		out: "[{a 0} {b 0}]",
 	}, {
@@ -118,6 +121,18 @@ func TestCreateAttrs(t *testing.T) {
 	}, {
 		in:  "@b('' ,b)",
 		err: "invalid attribute",
+	}, {
+		in:  `@foo(,"bar")`,
+		out: `foo:,"bar"`,
+	}, {
+		in:  `@foo("bar",1)`,
+		out: `foo:"bar",1`,
+	}, {
+		in:  `@foo("bar")`,
+		out: `foo:"bar"`,
+	}, {
+		in:  `@foo(,"bar",1)`,
+		out: `foo:,"bar",1`,
 	}}
 	for _, tc := range testdata {
 		t.Run(tc.in, func(t *testing.T) {

@@ -362,7 +362,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v.sel, _ = ast.LabelName(x)
 			attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
 			if err != nil {
-				return err
+				return v.errf(n, err.format, err.args)
 			}
 			f, ok := v.nodeLabel(x)
 			if !ok {

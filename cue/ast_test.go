@@ -247,6 +247,16 @@ func TestCompile(t *testing.T) {
 		`,
 		out: `<0>{a: _|_(preference mark not allowed at this position), ` +
 			`b: (*_|_(preference mark not allowed at this position) | 2)}`,
+	}, {
+		in: `
+			a: int @foo(1,"str")
+		`,
+		out: "<0>{a: int @foo(1,\"str\")}",
+	}, {
+		in: `
+			a: int @b('' ,b) // invalid
+		`,
+		out: "attribute missing ')':\n    test:2:16\nmissing ',' in file:\n    test:3:3\n<0>{}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

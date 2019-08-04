@@ -382,6 +382,26 @@ func TestExportFile(t *testing.T) {
 			a: b - 100
 			b: a + 100
 		}`),
+	}, {
+		in: `A: {
+			<_>: B
+		} @protobuf(1,"test")
+
+		B: {}
+		B: {a: int} | {b: int}
+		`,
+		out: unindent(`
+		{
+			A: {
+				<_>: B
+			} @protobuf(1,"test")
+			B: {
+			} & ({
+				a: int
+			} | {
+				b: int
+			})
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

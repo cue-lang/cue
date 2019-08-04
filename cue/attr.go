@@ -45,7 +45,7 @@ func (a *attr) body() string {
 	return a.text[a.offset+1 : len(a.text)-1]
 }
 
-func createAttrs(ctx *context, src source, attrs []*ast.Attribute) (a *attributes, err evaluated) {
+func createAttrs(ctx *context, src source, attrs []*ast.Attribute) (a *attributes, err *bottom) {
 	if len(attrs) == 0 {
 		return nil, nil
 	}
@@ -57,6 +57,10 @@ func createAttrs(ctx *context, src source, attrs []*ast.Attribute) (a *attribute
 			return nil, ctx.mkErr(newNode(a), "invalid attribute %q", a.Text)
 		}
 		as = append(as, attr{a.Text[:n], index})
+
+		if err := parseAttrBody(ctx, src, a.Text[index+1:n-1], nil); err != nil {
+			return nil, err
+		}
 	}
 
 	sort.Slice(as, func(i, j int) bool { return as[i].text < as[j].text })
@@ -67,11 +71,6 @@ func createAttrs(ctx *context, src source, attrs []*ast.Attribute) (a *attribute
 		}
 	}
 
-	for _, a := range attrs {
-		if err := parseAttrBody(ctx, src, a.Text, nil); err != nil {
-			return nil, err
-		}
-	}
 	return &attributes{as}, nil
 }
 
@@ -131,7 +130,7 @@ func (kv *keyValue) text() string  { return kv.data }
 func (kv *keyValue) key() string   { return kv.data[:kv.equal] }
 func (kv *keyValue) value() string { return kv.data[kv.equal+1:] }
 
-func parseAttrBody(ctx *context, src source, s string, a *parsedAttr) (err evaluated) {
+func parseAttrBody(ctx *context, src source, s string, a *parsedAttr) (err *bottom) {
 	i := 0
 	for {
 		// always scan at least one, possibly empty element.
@@ -150,7 +149,7 @@ func parseAttrBody(ctx *context, src source, s string, a *parsedAttr) (err evalu
 	return nil
 }
 
-func scanAttributeElem(ctx *context, src source, s string, a *parsedAttr) (n int, err evaluated) {
+func scanAttributeElem(ctx *context, src source, s string, a *parsedAttr) (n int, err *bottom) {
 	// try CUE string
 	kv := keyValue{}
 	if n, kv.data, err = scanAttributeString(ctx, src, s); n == 0 {
@@ -187,7 +186,7 @@ func scanAttributeElem(ctx *context, src source, s string, a *parsedAttr) (n int
 	return n, err
 }
 
-func scanAttributeString(ctx *context, src source, s string) (n int, str string, err evaluated) {
+func scanAttributeString(ctx *context, src source, s string) (n int, str string, err *bottom) {
 	if s == "" || (s[0] != '#' && s[0] != '"' && s[0] != '\'') {
 		return 0, "", nil
 	}

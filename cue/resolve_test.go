@@ -43,7 +43,7 @@ func compileInstance(t *testing.T, body string) (*context, *Instance, error) {
 	inst, err := r.Parse("test", body)
 
 	if err != nil {
-		x := newIndex().newInstance(nil)
+		x := newIndex(sharedIndex).newInstance(nil)
 		ctx := x.newContext()
 		return ctx, x, err
 	}

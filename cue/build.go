@@ -39,13 +39,22 @@ func init() {
 	internal.GetRuntime = func(instance interface{}) interface{} {
 		return &Runtime{idx: instance.(*Instance).index}
 	}
+
+	internal.CheckAndForkRuntime = func(runtime, value interface{}) interface{} {
+		r := runtime.(*Runtime)
+		idx := value.(Value).ctx().index
+		if idx != r.idx {
+			panic("value not from same runtime")
+		}
+		return &Runtime{idx: newIndex(idx)}
+	}
 }
 
 func dummyLoad(token.Pos, string) *build.Instance { return nil }
 
 func (r *Runtime) index() *index {
 	if r.idx == nil {
-		r.idx = newIndex()
+		r.idx = newIndex(sharedIndex)
 	}
 	return r.idx
 }
@@ -197,10 +206,17 @@ type index struct {
 
 	offset label
 	parent *index
-	freeze bool
 
 	mutex     sync.Mutex
 	typeCache sync.Map // map[reflect.Type]evaluated
+}
+
+// work around golang-ci linter bug: fields are used.
+func init() {
+	var i index
+	i.mutex.Lock()
+	i.mutex.Unlock()
+	i.typeCache.Load(1)
 }
 
 const sharedOffset = 0x40000000
@@ -225,8 +241,7 @@ func newSharedIndex() *index {
 }
 
 // newIndex creates a new index.
-func newIndex() *index {
-	parent := sharedIndex
+func newIndex(parent *index) *index {
 	i := &index{
 		labelMap:      map[string]label{},
 		loaded:        map[*build.Instance]*Instance{},
@@ -235,7 +250,6 @@ func newIndex() *index {
 		offset:        label(len(parent.labels)) + parent.offset,
 		parent:        parent,
 	}
-	parent.freeze = true
 	return i
 }
 
@@ -267,9 +281,6 @@ func (idx *index) findLabel(s string) (f label, ok bool) {
 func (idx *index) label(s string, isIdent bool) label {
 	f, ok := idx.findLabel(s)
 	if !ok {
-		if idx.freeze {
-			panic("adding label to frozen index")
-		}
 		f = label(len(idx.labelMap)) + idx.offset
 		idx.labelMap[s] = f
 		idx.labels = append(idx.labels, s)

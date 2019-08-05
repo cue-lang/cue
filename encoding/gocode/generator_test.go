@@ -1,0 +1,84 @@
+// Copyright 2019 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+package gocode
+
+import (
+	"bytes"
+	"flag"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+	"regexp"
+	"testing"
+
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/load"
+)
+
+var update = flag.Bool("update", false, "update test files")
+
+func TestGenerate(t *testing.T) {
+	dirs, err := ioutil.ReadDir("testdata")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	cwd, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	for _, d := range dirs {
+		if !d.IsDir() {
+			continue
+		}
+		t.Run(d.Name(), func(t *testing.T) {
+			dir := filepath.Join(cwd, "testdata")
+			pkg := "." + string(filepath.Separator) + d.Name()
+			inst := cue.Build(load.Instances([]string{pkg}, &load.Config{
+				Dir:        dir,
+				ModuleRoot: dir,
+				Module:     "cuelang.org/go/encoding/gocode/testdata",
+			}))[0]
+			if err := inst.Err; err != nil {
+				t.Fatal(err)
+			}
+
+			goPkg := "./testdata/" + d.Name()
+			b, err := Generate(goPkg, inst, nil)
+			if err != nil {
+				t.Fatal(errStr(err))
+			}
+			// t.Log(string(b))
+
+			goFile := filepath.Join("testdata", d.Name(), "cue_gen.go")
+			if *update {
+				_ = ioutil.WriteFile(goFile, b, 0644)
+				return
+			}
+		})
+	}
+}
+
+func errStr(err error) string {
+	if err == nil {
+		return "nil"
+	}
+	buf := &bytes.Buffer{}
+	errors.Print(buf, err, nil)
+	r := regexp.MustCompile(`.cue:\d+:\d+`)
+	return r.ReplaceAllString(buf.String(), ".cue:x:x")
+}

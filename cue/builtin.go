@@ -257,7 +257,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 	if e, ok := call.ret.(value); ok {
 		return e
 	}
-	return convert(ctx, x, call.ret)
+	return convert(ctx, x, false, call.ret)
 }
 
 // callCtxt is passed to builtin implementations.

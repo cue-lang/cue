@@ -279,7 +279,7 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convert(ctx, root, x)
+	value := convert(ctx, root, true, x)
 	eval := binOp(ctx, baseValue{}, opUnify, root, value)
 	// TODO: validate recursively?
 	err := inst.Err

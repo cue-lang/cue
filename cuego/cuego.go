@@ -75,7 +75,7 @@ type Context struct {
 // function.
 func (c *Context) Validate(x interface{}) error {
 	a := c.load(x)
-	v, err := fromGoValue(x)
+	v, err := fromGoValue(x, false)
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func (c *Context) Validate(x interface{}) error {
 // successful update.
 func (c *Context) Complete(x interface{}) error {
 	a := c.load(x)
-	v, err := fromGoValue(x)
+	v, err := fromGoValue(x, true)
 	if err != nil {
 		return err
 	}
@@ -171,12 +171,12 @@ func init() {
 }
 
 // fromGoValue converts a Go value to CUE
-func fromGoValue(x interface{}) (v cue.Value, err error) {
+func fromGoValue(x interface{}, allowDefault bool) (v cue.Value, err error) {
 	// TODO: remove the need to have a lock here. We could use a new index (new
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v = internal.FromGoValue(runtime, x).(cue.Value)
+	v = internal.FromGoValue(runtime, x, allowDefault).(cue.Value)
 	mutex.Unlock()
 	if err := v.Err(); err != nil {
 		return v, err

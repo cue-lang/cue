@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package internal exposes some cue internals to other packages.
+//
+// A better name for this package would be technicaldebt.
 package internal // import "cuelang.org/go/internal"
 
 // TODO: refactor packages as to make this package unnecessary.
@@ -40,7 +43,7 @@ var EvalExpr func(value, expr interface{}) (result interface{})
 // FromGoValue converts an arbitrary Go value to the corresponding CUE value.
 // instance must be of type *cue.Instance.
 // The returned value is a cue.Value, which the caller must cast to.
-var FromGoValue func(instance, x interface{}) interface{}
+var FromGoValue func(instance, x interface{}, allowDefault bool) interface{}
 
 // FromGoType converts an arbitrary Go type to the corresponding CUE value.
 // instance must be of type *cue.Instance.
@@ -56,3 +59,8 @@ var UnifyBuiltin func(v interface{}, kind string) interface{}
 
 // GetRuntime reports the runtime for an Instance.
 var GetRuntime func(instance interface{}) interface{}
+
+// CheckAndForkRuntime checks that value is created using runtime, panicking
+// if it does not, and returns a forked runtime that will discard additional
+// keys.
+var CheckAndForkRuntime func(runtime, value interface{}) interface{}

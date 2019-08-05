@@ -349,6 +349,50 @@ func TestExportFile(t *testing.T) {
 		a: strings.ContainsAny("c")`),
 	}, {
 		in: `
+		import "time"
+
+		a: time.Time
+		`,
+		out: unindent(`
+		import "time"
+
+		a: time.Time`),
+	}, {
+		in: `
+		import "time"
+
+		{
+			a: time.Time
+		} & {
+			time: int
+		}		`,
+		out: unindent(`
+		import timex "time"
+
+		time: int
+		a:    timex.Time`),
+	}, {
+		in: `
+		import time2 "time"
+
+		a:    time2.Time`,
+		out: unindent(`
+		import "time"
+
+		a: time.Time`),
+	}, {
+		in: `
+		import time2 "time"
+
+		time: int
+		a:    time2.Time`,
+		out: unindent(`
+		import time2 "time"
+
+		time: int
+		a:    time2.Time`),
+	}, {
+		in: `
 		import "strings"
 
 		a: strings.TrimSpace("  c  ")
@@ -406,7 +450,7 @@ func TestExportFile(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			var r Runtime
-			inst, err := r.Parse("test", tc.in)
+			inst, err := r.Compile("test", tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}

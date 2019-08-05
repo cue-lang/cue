@@ -920,7 +920,8 @@ func (x *structLit) insertValue(ctx *context, f label, optional bool, value valu
 // A nodeRef is a reference to a node.
 type nodeRef struct {
 	baseValue
-	node scope
+	node  scope
+	short label // only for packages, otherwise 0
 }
 
 func (x *nodeRef) kind() kind {

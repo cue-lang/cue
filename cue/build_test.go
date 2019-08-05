@@ -147,15 +147,24 @@ func TestBuild(t *testing.T) {
 	}{{
 		insts(&bimport{"", files(`test: "ok"`)}),
 		`{test: "ok"}`,
-		// }, {
-		// 	insts(pkg1, &bimport{"",
-		// 		files(
-		// 			`package test
+	}, {
+		insts(&bimport{"",
+			files(
+				`package test
 
-		// 			import "math"
+				import "math"
 
-		// 			"Pi: \(math.Pi)!"`)}),
-		// 	`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
+				"Pi: \(math.Pi)!"`)}),
+		`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
+	}, {
+		insts(&bimport{"",
+			files(
+				`package test
+
+				import math2 "math"
+
+				"Pi: \(math2.Pi)!"`)}),
+		`"Pi: 3.14159265358979323846264338327950288419716939937510582097494459!"`,
 	}, {
 		insts(pkg1, &bimport{"",
 			files(
@@ -172,12 +181,21 @@ func TestBuild(t *testing.T) {
 				`package test
 
 				import "pkg1"
-				pkg1: 1
 
 				"Hello \(pkg1.Object)!"`),
 		}),
-		`pkg1 redeclared as imported package name
-	previous declaration at file0.cue:4:5`,
+		`"Hello World!"`,
+	}, {
+		insts(pkg1, &bimport{"",
+			files(
+				`package test
+
+				import pkg2 "pkg1"
+				pkg1: pkg2.Object
+
+				"Hello \(pkg1)!"`),
+		}),
+		`"Hello World!"`,
 	}, {
 		insts(pkg1, &bimport{"",
 			files(

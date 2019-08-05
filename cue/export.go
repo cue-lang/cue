@@ -164,6 +164,43 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 	panic(fmt.Sprintf("unsupported clause type %T", v))
 }
 
+func (p *exporter) shortName(preferred, pkg string) string {
+	info, ok := p.imports[pkg]
+	short := info.short
+	if !ok {
+		short = pkg
+		if i := strings.LastIndexByte(pkg, '.'); i >= 0 {
+			short = pkg[i+1:]
+		}
+		if _, ok := p.top[p.ctx.label(short, true)]; ok && preferred != "" {
+			short = preferred
+			info.name = short
+		}
+		for {
+			if _, ok := p.top[p.ctx.label(short, true)]; !ok {
+				break
+			}
+			short += "x"
+			info.name = short
+		}
+		info.short = short
+		p.top[p.ctx.label(short, true)] = true
+		p.imports[pkg] = info
+	}
+	f := p.ctx.label(short, true)
+	for _, e := range p.stack {
+		if e.from == f {
+			if info.alias == "" {
+				info.alias = p.unique(short)
+				p.imports[pkg] = info
+			}
+			short = info.alias
+			break
+		}
+	}
+	return short
+}
+
 func (p *exporter) expr(v value) ast.Expr {
 	if doEval(p.mode) {
 		e := v.evalPartial(p.ctx)
@@ -189,41 +226,19 @@ func (p *exporter) expr(v value) ast.Expr {
 		if x.pkg == 0 {
 			return name
 		}
-		pkg := p.ctx.labelStr(x.pkg)
-		info, ok := p.imports[pkg]
-		short := info.short
-		if !ok {
-			info.short = ""
-			short = pkg
-			if i := strings.LastIndexByte(pkg, '.'); i >= 0 {
-				short = pkg[i+1:]
-			}
-			for {
-				if _, ok := p.top[p.ctx.label(short, true)]; !ok {
-					break
-				}
-				short += "x"
-				info.name = short
-			}
-			info.short = short
-			p.top[p.ctx.label(short, true)] = true
-			p.imports[pkg] = info
-		}
-		f := p.ctx.label(short, true)
-		for _, e := range p.stack {
-			if e.from == f {
-				if info.alias == "" {
-					info.alias = p.unique(short)
-					p.imports[pkg] = info
-				}
-				short = info.alias
-				break
-			}
-		}
+		short := p.shortName("", p.ctx.labelStr(x.pkg))
 		return &ast.SelectorExpr{X: ast.NewIdent(short), Sel: name}
 
 	case *nodeRef:
-		return nil
+		if x.short == 0 {
+			return nil
+		}
+		inst := p.ctx.getImportFromNode(x.node)
+		if inst == nil {
+			return nil // should not happen!
+		}
+		short := p.ctx.labelStr(x.short)
+		return ast.NewIdent(p.shortName(short, inst.ImportPath))
 
 	case *selectorExpr:
 		n := p.expr(x.x)

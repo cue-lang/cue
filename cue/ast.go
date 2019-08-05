@@ -155,7 +155,7 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 		}
 		if v.inSelector > 0 {
 			if p := getBuiltinShorthandPkg(ctx, n.Name); p != nil {
-				return &nodeRef{baseValue: newExpr(n), node: p}
+				return &nodeRef{newExpr(n), p, label}
 			}
 		}
 	}
@@ -454,7 +454,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			ret = &selectorExpr{newExpr(n), ret, f}
 		} else {
 			n2 := v.mapScope(n.Node)
-			ret = &nodeRef{baseValue: newExpr(n), node: n2}
+			ref := &nodeRef{baseValue: newExpr(n), node: n2}
+			ret = ref
+			if inst := v.ctx().getImportFromNode(n2); inst != nil {
+				ref.short = f
+			}
 		}
 
 	case *ast.BottomLit:

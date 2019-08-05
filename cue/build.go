@@ -419,12 +419,12 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 		name := path.Base(id)
 		if imp := p.LookupImport(id); imp != nil {
 			name = imp.PkgName
-			if spec.Name != nil {
-				name = spec.Name.Name
-			}
 		} else if _, ok := builtins[id]; !ok {
 			// continue
 			return nodeErrorf(spec, "package %q not found", id)
+		}
+		if spec.Name != nil {
+			name = spec.Name.Name
 		}
 		if n, ok := fields[name]; ok {
 			return nodeErrorf(spec,

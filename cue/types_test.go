@@ -994,7 +994,7 @@ func TestDecode(t *testing.T) {
 		err:   "from source",
 	}, {
 		value: `"str"`,
-		dst:   "",
+		dst:   new(string),
 		want:  "str",
 	}, {
 		value: `"str"`,
@@ -1003,16 +1003,16 @@ func TestDecode(t *testing.T) {
 	}, {
 		value: `{}`,
 		dst:   &fields{},
-		want:  &fields{},
+		want:  fields{},
 	}, {
 		value: `{a:1,b:2,c:3}`,
 		dst:   &fields{},
-		want:  &fields{A: 1, B: 2, C: 3},
+		want:  fields{A: 1, B: 2, C: 3},
 	}, {
 		value: `{"\(k)": v for k, v in y if v > 1}
 		y: {a:1,b:2,c:3}`,
 		dst:  &fields{},
-		want: &fields{B: 2, C: 3},
+		want: fields{B: 2, C: 3},
 	}, {
 		value: `{a:1,b:2,c:int}`,
 		dst:   new(fields),
@@ -1020,28 +1020,29 @@ func TestDecode(t *testing.T) {
 	}, {
 		value: `[]`,
 		dst:   intList(),
-		want:  intList(),
+		want:  *intList(),
 	}, {
 		value: `[1,2,3]`,
 		dst:   intList(),
-		want:  intList(1, 2, 3),
+		want:  *intList(1, 2, 3),
 	}, {
 		value: `[x for x in y if x > 1]
 				y: [1,2,3]`,
 		dst:  intList(),
-		want: intList(2, 3),
+		want: *intList(2, 3),
 	}, {
 		value: `[int]`,
 		err:   "cannot convert incomplete value",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Value().Decode(&tc.dst)
+			err := getInstance(t, tc.value).Value().Decode(tc.dst)
 			checkFatal(t, err, tc.err, "init")
 
-			if !cmp.Equal(tc.dst, tc.want) {
-				t.Error(cmp.Diff(tc.dst, tc.want))
-				t.Errorf("\n%#v\n%#v", tc.dst, tc.want)
+			got := reflect.ValueOf(tc.dst).Elem().Interface()
+			if !cmp.Equal(got, tc.want) {
+				t.Error(cmp.Diff(got, tc.want))
+				t.Errorf("\n%#v\n%#v", got, tc.want)
 			}
 		})
 	}

@@ -151,6 +151,19 @@ func (b *builder) failf(v cue.Value, format string, args ...interface{}) {
 	})
 }
 
+func (b *builder) unsupported(v cue.Value) {
+	if b.format == "" {
+		// Not strictly an error, but consider listing it as a warning
+		// in strict mode.
+	}
+}
+
+func (b *builder) checkArgs(a []cue.Value, n int) {
+	if len(a)-1 != n {
+		b.failf(a[0], "%v must be used with %d arguments", a[0], len(a)-1)
+	}
+}
+
 func (b *builder) schema(name string, v cue.Value) *oaSchema {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
@@ -471,21 +484,18 @@ func (b *builder) object(v cue.Value) {
 		name := fmt.Sprint(a[0])
 		switch name {
 		case "struct.MinFields":
-			if len(a) != 2 {
-				b.failf(v, "builtin %v must be called with one argument", name)
-			}
+			b.checkArgs(a, 1)
 			b.setFilter("Schema", "minProperties", b.int(a[1]))
 			return
 
 		case "struct.MaxFields":
-			if len(a) != 2 {
-				b.failf(v, "builtin %v must be called with one argument", name)
-			}
+			b.checkArgs(a, 1)
 			b.setFilter("Schema", "maxProperties", b.int(a[1]))
 			return
 
 		default:
-			b.failf(v, "builtin %v not supported in OpenAPI", name)
+			b.unsupported(a[0])
+			return
 		}
 
 	case cue.NoOp:
@@ -549,28 +559,23 @@ func (b *builder) array(v cue.Value) {
 		name := fmt.Sprint(a[0])
 		switch name {
 		case "list.UniqueItems":
-			if len(a) != 1 {
-				b.failf(v, "builtin %v may only be used without arguments", name)
-			}
+			b.checkArgs(a, 0)
 			b.setFilter("Schema", "uniqueItems", true)
 			return
 
 		case "list.MinItems":
-			if len(a) != 2 {
-				b.failf(v, "builtin %v must be called with one argument", name)
-			}
+			b.checkArgs(a, 1)
 			b.setFilter("Schema", "minItems", b.int(a[1]))
 			return
 
 		case "list.MaxItems":
-			if len(a) != 2 {
-				b.failf(v, "builtin %v must be called with one argument", name)
-			}
+			b.checkArgs(a, 1)
 			b.setFilter("Schema", "maxItems", b.int(a[1]))
 			return
 
 		default:
-			b.failf(v, "builtin %v not supported in OpenAPI", name)
+			b.unsupported(a[0])
+			return
 		}
 
 	case cue.NoOp:
@@ -681,12 +686,12 @@ func (b *builder) number(v cue.Value) {
 		name := fmt.Sprint(a[0])
 		switch name {
 		case "math.MultipleOf":
-			if len(a) != 2 {
-				b.failf(v, "builtin %v may only be used with single argument", name)
-			}
+			b.checkArgs(a, 1)
 			b.setFilter("Schema", "multipleOf", b.int(a[1]))
+
 		default:
-			b.failf(v, "builtin %v not supported in OpenAPI", name)
+			b.unsupported(a[0])
+			return
 		}
 
 	case cue.NoOp:
@@ -754,28 +759,26 @@ func (b *builder) string(v cue.Value) {
 			b.setNot("pattern", s)
 		}
 
-		// TODO: support the following JSON schema constraints
-		// - maxLength
-		// - minLength
-
 	case cue.NoOp, cue.SelectorOp:
 		// TODO: determine formats from specific types.
 
 	case cue.CallOp:
 		name := fmt.Sprint(a[0])
-		field := ""
 		switch name {
 		case "strings.MinRunes":
-			field = "minLength"
+			b.checkArgs(a, 1)
+			b.setFilter("Schema", "minLength", b.int(a[1]))
+			return
+
 		case "strings.MaxRunes":
-			field = "maxLength"
+			b.checkArgs(a, 1)
+			b.setFilter("Schema", "maxLength", b.int(a[1]))
+			return
+
 		default:
-			b.failf(v, "builtin %v not supported in OpenAPI", name)
+			b.unsupported(a[0])
+			return
 		}
-		if len(a) != 2 {
-			b.failf(v, "builtin %v may only be used with single argument", name)
-		}
-		b.setFilter("Schema", field, b.int(a[1]))
 
 	default:
 		b.failf(v, "unsupported op %v for string type", op)

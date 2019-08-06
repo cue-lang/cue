@@ -116,7 +116,6 @@ type Extractor struct {
 	paths  []string
 
 	fileCache map[string]result
-	instCache map[string]*build.Instance
 	imports   map[string]*build.Instance
 
 	errs errors.Error

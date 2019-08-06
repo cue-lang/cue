@@ -187,13 +187,6 @@ type mapping struct {
 	pkg   *protoConverter
 }
 
-type pkgInfo struct {
-	importPath string // the import path
-	goPath     string // The Go import path
-	shortName  string // Used for the cue package path, default is base of goPath
-	protoName  string // the protobuf package name
-}
-
 func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
 	return p.tfile.Pos(pos.Offset, 0)
 }
@@ -277,8 +270,7 @@ func (p *protoConverter) resolve(pos scanner.Position, name string, options []*p
 	}
 	for i := len(p.scope) - 1; i > 0; i-- {
 		if m, ok := p.scope[i][name]; ok {
-			cueName := m.ref
-			cueName = strings.Replace(m.ref, ".", "_", -1)
+			cueName := strings.Replace(m.ref, ".", "_", -1)
 			return cueName
 		}
 	}

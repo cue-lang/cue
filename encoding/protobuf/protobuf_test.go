@@ -56,7 +56,7 @@ func TestExtractDefinitions(t *testing.T) {
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")
 			if *update {
-				ioutil.WriteFile(wantFile, out.Bytes(), 0644)
+				_ = ioutil.WriteFile(wantFile, out.Bytes(), 0644)
 				return
 			}
 
@@ -85,10 +85,10 @@ func TestBuild(t *testing.T) {
 	}
 
 	b := NewExtractor(c)
-	b.AddFile("networking/v1alpha3/gateway.proto", nil)
-	b.AddFile("mixer/v1/attributes.proto", nil)
-	b.AddFile("mixer/v1/mixer.proto", nil)
-	b.AddFile("mixer/v1/config/client/client_config.proto", nil)
+	_ = b.AddFile("networking/v1alpha3/gateway.proto", nil)
+	_ = b.AddFile("mixer/v1/attributes.proto", nil)
+	_ = b.AddFile("mixer/v1/mixer.proto", nil)
+	_ = b.AddFile("mixer/v1/config/client/client_config.proto", nil)
 
 	files, err := b.Files()
 	if err != nil {

@@ -16,29 +16,12 @@ package time
 
 import (
 	"encoding/json"
+	"strconv"
 	"testing"
 	"time"
-
-	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/load"
-	"cuelang.org/go/cue/parser"
 )
 
-func TestTime(t *testing.T) {
-	inst := cue.Build(load.Instances([]string{"."}, nil))[0]
-	if inst.Err != nil {
-		t.Fatal(inst.Err)
-	}
-
-	parseCUE := func(t *testing.T, time string) error {
-		expr, err := parser.ParseExpr("test", "Time&"+time)
-		if err != nil {
-			t.Fatal(err)
-		}
-		v := inst.Eval(expr)
-		return v.Err()
-	}
-
+func TestTimestamp(t *testing.T) {
 	// Valid go times (for JSON marshaling) are represented as is
 	validTimes := []string{
 		// valid Go times
@@ -47,7 +30,7 @@ func TestTime(t *testing.T) {
 		`"2019-01-02T15:04:05-08:00"`,
 		`"2019-01-02T15:04:05.0-08:00"`,
 		`"2019-01-02T15:04:05.01-08:00"`,
-		`"2019-01-02T15:04:05.0123456789-08:00"`, // Is this a Go bug?
+		`"2019-01-02T15:04:05.012345678-08:00"`,
 		`"2019-02-28T15:04:59Z"`,
 
 		// TODO: allow leap seconds? This is allowed by the RFC 3339 spec.
@@ -63,8 +46,16 @@ func TestTime(t *testing.T) {
 				t.Errorf("unmarshal JSON failed unexpectedly: %v", err)
 			}
 
-			if err := parseCUE(t, tc); err != nil {
-				t.Errorf("CUE eval failed unexpectedly: %v", err)
+			if tc == "null" {
+				return
+			}
+			str, _ := strconv.Unquote(tc)
+
+			if b, err := Time(str); !b || err != nil {
+				t.Errorf("Time failed unexpectedly: %v", err)
+			}
+			if _, err := Parse(RFC3339Nano, str); err != nil {
+				t.Errorf("Parse failed unexpectedly")
 			}
 		})
 	}
@@ -92,8 +83,34 @@ func TestTime(t *testing.T) {
 				t.Errorf("unmarshal JSON succeeded unexpectedly: %v", err)
 			}
 
-			if err := parseCUE(t, tc); err == nil {
-				t.Errorf("CUE eval succeeded unexpectedly: %v", err)
+			str, _ := strconv.Unquote(tc)
+
+			if _, err := Time(str); err == nil {
+				t.Errorf("CUE eval succeeded unexpectedly")
+			}
+
+			if _, err := Parse(RFC3339Nano, str); err == nil {
+				t.Errorf("CUE eval succeeded unexpectedly")
+			}
+		})
+	}
+}
+
+func TestUnix(t *testing.T) {
+	valid := []struct {
+		sec  int64
+		nano int64
+		want string
+	}{
+		{0, 0, "1970-01-01T01:00:00+01:00"},
+		{1500000000, 123456, "2017-07-14T04:40:00.000123456+02:00"},
+	}
+
+	for _, tc := range valid {
+		t.Run(tc.want, func(t *testing.T) {
+			got := Unix(tc.sec, tc.nano)
+			if got != tc.want {
+				t.Errorf("got %v; want %s", got, tc.want)
 			}
 		})
 	}

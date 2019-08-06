@@ -299,6 +299,12 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		test("text/template", `template.Execute("{{.}}-{{.}}", "foo")`),
 		`"foo-foo"`,
+	}, {
+		test("time", `time.Time & "1937-01-01T12:00:27.87+00:20"`),
+		`"1937-01-01T12:00:27.87+00:20"`,
+	}, {
+		test("time", `time.Time & "no time"`),
+		`_|_(error in call to time.Time: invalid time "no time")`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

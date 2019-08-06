@@ -26,6 +26,7 @@ import (
 	"strings"
 	"text/tabwriter"
 	"text/template"
+	"time"
 	"unicode"
 	"unicode/utf8"
 
@@ -117,6 +118,15 @@ var pathBase = path.Base
 var pathIsAbs = path.IsAbs
 
 var pathDir = path.Dir
+
+func timeFormat(value, layout string) (bool, error) {
+	_, err := time.Parse(layout, value)
+	if err != nil {
+
+		return false, fmt.Errorf("invalid time %q", value)
+	}
+	return true, nil
+}
 
 var builtinPackages = map[string]*builtinPkg{
 	"": &builtinPkg{
@@ -2362,10 +2372,193 @@ var builtinPackages = map[string]*builtinPkg{
 		}},
 	},
 	"time": &builtinPkg{
-		native: []*builtin{{}},
-		cue: `{
-	Time: null | =~"^\("\\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[1-2]\\d|3[0-1])")T\("([0-1]\\d|2[0-3]):[0-5]\\d:[0-5]\\d")\("(.\\d{1,10})?")\("(Z|(-|\\+)\\d\\d:\\d\\d)")$"
-}`,
+		native: []*builtin{{
+			Name:  "Nanosecond",
+			Const: "1",
+		}, {
+			Name:  "Microsecond",
+			Const: "1000",
+		}, {
+			Name:  "Millisecond",
+			Const: "1000000",
+		}, {
+			Name:  "Second",
+			Const: "1000000000",
+		}, {
+			Name:  "Minute",
+			Const: "60000000000",
+		}, {
+			Name:  "Hour",
+			Const: "3600000000000",
+		}, {
+			Name:   "Duration",
+			Params: []kind{stringKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret, c.err = func() (interface{}, error) {
+					if _, err := time.ParseDuration(s); err != nil {
+						return false, err
+					}
+					return true, nil
+				}()
+			},
+		}, {
+			Name:   "ParseDuration",
+			Params: []kind{stringKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret, c.err = func() (interface{}, error) {
+					d, err := time.ParseDuration(s)
+					if err != nil {
+						return 0, err
+					}
+					return int64(d), nil
+				}()
+			},
+		}, {
+			Name:  "ANSIC",
+			Const: "\"Mon Jan _2 15:04:05 2006\"",
+		}, {
+			Name:  "UnixDate",
+			Const: "\"Mon Jan _2 15:04:05 MST 2006\"",
+		}, {
+			Name:  "RubyDate",
+			Const: "\"Mon Jan 02 15:04:05 -0700 2006\"",
+		}, {
+			Name:  "RFC822",
+			Const: "\"02 Jan 06 15:04 MST\"",
+		}, {
+			Name:  "RFC822Z",
+			Const: "\"02 Jan 06 15:04 -0700\"",
+		}, {
+			Name:  "RFC850",
+			Const: "\"Monday, 02-Jan-06 15:04:05 MST\"",
+		}, {
+			Name:  "RFC1123",
+			Const: "\"Mon, 02 Jan 2006 15:04:05 MST\"",
+		}, {
+			Name:  "RFC1123Z",
+			Const: "\"Mon, 02 Jan 2006 15:04:05 -0700\"",
+		}, {
+			Name:  "RFC3339",
+			Const: "\"2006-01-02T15:04:05Z07:00\"",
+		}, {
+			Name:  "RFC3339Nano",
+			Const: "\"2006-01-02T15:04:05.999999999Z07:00\"",
+		}, {
+			Name:  "RFC3339Date",
+			Const: "\"2006-01-02\"",
+		}, {
+			Name:  "Kitchen",
+			Const: "\"3:04PM\"",
+		}, {
+			Name:  "Kitchen24",
+			Const: "\"15:04\"",
+		}, {
+			Name:  "January",
+			Const: "1",
+		}, {
+			Name:  "February",
+			Const: "2",
+		}, {
+			Name:  "March",
+			Const: "3",
+		}, {
+			Name:  "April",
+			Const: "4",
+		}, {
+			Name:  "May",
+			Const: "5",
+		}, {
+			Name:  "June",
+			Const: "6",
+		}, {
+			Name:  "July",
+			Const: "7",
+		}, {
+			Name:  "August",
+			Const: "8",
+		}, {
+			Name:  "September",
+			Const: "9",
+		}, {
+			Name:  "October",
+			Const: "10",
+		}, {
+			Name:  "November",
+			Const: "11",
+		}, {
+			Name:  "December",
+			Const: "12",
+		}, {
+			Name:  "Sunday",
+			Const: "0",
+		}, {
+			Name:  "Monday",
+			Const: "1",
+		}, {
+			Name:  "Tuesday",
+			Const: "2",
+		}, {
+			Name:  "Wednesday",
+			Const: "3",
+		}, {
+			Name:  "Thursday",
+			Const: "4",
+		}, {
+			Name:  "Friday",
+			Const: "5",
+		}, {
+			Name:  "Saturday",
+			Const: "6",
+		}, {
+			Name:   "Time",
+			Params: []kind{stringKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret, c.err = func() (interface{}, error) {
+					return timeFormat(s, time.RFC3339Nano)
+				}()
+			},
+		}, {
+			Name:   "Format",
+			Params: []kind{stringKind, stringKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				value, layout := c.string(0), c.string(1)
+				c.ret, c.err = func() (interface{}, error) {
+					return timeFormat(value, layout)
+				}()
+			},
+		}, {
+			Name:   "Parse",
+			Params: []kind{stringKind, stringKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				layout, value := c.string(0), c.string(1)
+				c.ret, c.err = func() (interface{}, error) {
+					t, err := time.Parse(layout, value)
+					if err != nil {
+						return "", err
+					}
+					return t.Format(time.RFC3339Nano), nil
+				}()
+			},
+		}, {
+			Name:   "Unix",
+			Params: []kind{intKind, intKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				sec, nsec := c.int64(0), c.int64(1)
+				c.ret = func() interface{} {
+					t := time.Unix(sec, nsec)
+					return t.Format(time.RFC3339Nano)
+				}()
+			},
+		}},
 	},
 	"tool": &builtinPkg{
 		native: []*builtin{{}},

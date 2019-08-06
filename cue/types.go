@@ -647,7 +647,16 @@ func (v Value) IncompleteKind() Kind {
 	if v.path == nil {
 		return BottomKind
 	}
-	k := v.path.v.evalPartial(v.ctx()).kind()
+	var k kind
+	x := v.path.v.evalPartial(v.ctx())
+	switch x := convertBuiltin(x).(type) {
+	case *builtin:
+		k = x.representedKind()
+	case *customValidator:
+		k = x.call.Params[0]
+	default:
+		k = x.kind()
+	}
 	vk := BottomKind // Everything is a bottom kind.
 	for i := kind(1); i < nonGround; i <<= 1 {
 		if k&i != 0 {
@@ -824,8 +833,8 @@ func (v Value) Pos() token.Pos {
 	return pos
 }
 
-// IsConcrete reports whether the current value is a concrete scalar value,
-// not relying on default values, a terminal error, a list, or a struct.
+// IsConcrete reports whether the current value is a concrete scalar value
+// (not relying on default values), a terminal error, a list, or a struct.
 // It does not verify that values of lists or structs are concrete themselves.
 // To check whether there is a concrete default, use v.Default().IsConcrete().
 func (v Value) IsConcrete() bool {
@@ -839,17 +848,17 @@ func (v Value) IsConcrete() bool {
 		return false
 	}
 	// Other errors are considered ground.
-	return x.kind().isGround()
+	return x.kind().isConcrete()
 }
 
-// IsIncomplete is deprecated.
+// Deprecated: IsIncomplete
 //
 // It indicates that the value cannot be fully evaluated due to
 // insufficient information.
 func (v Value) IsIncomplete() bool {
 	// TODO: remove
 	x := v.eval(v.ctx())
-	if x.kind().hasReferences() || !x.kind().isGround() {
+	if !x.kind().isConcrete() {
 		return true
 	}
 	return isIncomplete(x)

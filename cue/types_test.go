@@ -158,6 +158,30 @@ func TestValueType(t *testing.T) {
 		value:    `{a: int, b: [1][a]}.b`,
 		kind:     BottomKind,
 		concrete: false,
+	}, {
+		value: `import "time"
+			{a: time.Time}.a`,
+		kind:           BottomKind,
+		incompleteKind: StringKind,
+		concrete:       false,
+	}, {
+		value: `import "time"
+			{a: time.Time & string}.a`,
+		kind:           BottomKind,
+		incompleteKind: StringKind,
+		concrete:       false,
+	}, {
+		value: `import "strings"
+			{a: strings.ContainsAny("D")}.a`,
+		kind:           BottomKind,
+		incompleteKind: StringKind,
+		concrete:       false,
+	}, {
+		value: `import "struct"
+		{a: struct.MaxFields(2) & {}}.a`,
+		kind:           StructKind, // Can determine a valid struct already.
+		incompleteKind: StructKind,
+		concrete:       true,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -1109,6 +1133,13 @@ func TestValidate(t *testing.T) {
 			`,
 		opts: []Option{DisallowCycles(true)},
 		err:  true,
+	}, {
+		desc: "builtins are okay",
+		in: `
+		import "time"
+
+		a: { b: time.Duration } | { c: time.Duration }
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

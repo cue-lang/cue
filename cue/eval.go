@@ -56,7 +56,11 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 	v := e.eval(x.x, structKind|lambdaKind, msgType, x)
 
 	if e.is(v, structKind|lambdaKind, "") {
-		n := v.(scope).lookup(ctx, x.feature)
+		sc, ok := v.(scope)
+		if !ok {
+			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.kind())
+		}
+		n := sc.lookup(ctx, x.feature)
 		if n.val() == nil {
 			field := ctx.labelStr(x.feature)
 			//	m.foo undefined (type map[string]bool has no field or method foo)

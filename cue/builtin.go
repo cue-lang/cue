@@ -173,6 +173,13 @@ var orBuiltin = &builtin{
 	},
 }
 
+func (x *builtin) representedKind() kind {
+	if x.isValidator() {
+		return x.Params[0]
+	}
+	return x.kind()
+}
+
 func (x *builtin) kind() kind {
 	return lambdaKind
 }
@@ -195,9 +202,13 @@ func (x *builtin) name(ctx *context) string {
 	return fmt.Sprintf("%s.%s", ctx.labelStr(x.pkg), x.Name)
 }
 
+func (x *builtin) isValidator() bool {
+	return len(x.Params) == 1 && x.Result == boolKind
+}
+
 func convertBuiltin(v evaluated) evaluated {
 	x, ok := v.(*builtin)
-	if ok && len(x.Params) == 1 && x.Result == boolKind {
+	if ok && x.isValidator() {
 		return &customValidator{v.base(), []evaluated{}, x}
 	}
 	return v

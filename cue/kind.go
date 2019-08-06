@@ -88,7 +88,8 @@ func isCustom(v value) bool {
 // isDone means that the value will not evaluate further.
 func (k kind) isDone() bool        { return k&referenceKind == bottomKind }
 func (k kind) hasReferences() bool { return k&referenceKind != bottomKind }
-func (k kind) isGround() bool      { return k&nonGround == bottomKind }
+func (k kind) isConcrete() bool    { return k&^(lambdaKind-1) == bottomKind }
+func (k kind) isGround() bool      { return k&^(nonGround-1) == bottomKind }
 func (k kind) isAtom() bool        { return k.isGround() && k&atomKind != bottomKind }
 func (k kind) isAnyOf(of kind) bool {
 	return k&of != bottomKind

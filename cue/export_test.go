@@ -446,6 +446,20 @@ func TestExportFile(t *testing.T) {
 				b: int
 			})
 		}`),
+	}, {
+		in: `
+		import "time"
+
+		a: { b: time.Duration } | { c: time.Duration }
+		`,
+		out: unindent(`
+		import "time"
+
+		a: {
+			b: time.Duration
+		} | {
+			c: time.Duration
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

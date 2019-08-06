@@ -1,0 +1,50 @@
+{
+   "openapi": "3.0.0",
+   "info": {},
+   "components": {
+      "schemas": {
+         "MyStruct": {
+            "type": "object",
+            "required": [
+               "contains"
+            ],
+            "properties": {
+               "timestamp1": {
+                  "type": "string",
+                  "format": "dateTime"
+               },
+               "timestamp2": {
+                  "type": "string",
+                  "format": "dateTime"
+               },
+               "timestamp3": {
+                  "type": "string",
+                  "format": "dateTime"
+               },
+               "timestamp4": {
+                  "type": "string",
+                  "format": "dateTime"
+               },
+               "date1": {
+                  "type": "string",
+                  "format": "date"
+               },
+               "date2": {
+                  "type": "string",
+                  "format": "date"
+               },
+               "timeout": {
+                  "$ref": "#/components/schemas/Duration"
+               },
+               "contains": {
+                  "type": "array"
+               }
+            }
+         },
+         "Duration": {
+            "description": "This is not an OpenAPI type and has no format. In this case\nwe map to a type so that it can be documented properly (without\nrepeating it).",
+            "type": "string"
+         }
+      }
+   }
+}

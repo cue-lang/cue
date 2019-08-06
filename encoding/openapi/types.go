@@ -15,6 +15,8 @@
 package openapi
 
 import (
+	"fmt"
+
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue"
@@ -32,7 +34,15 @@ var cueToOpenAPI = map[string]string{
 	"string": "string",
 	"bytes":  "binary",
 
-	// TODO: date, date-time, password.
+	"time.Time":                  "dateTime",
+	"time.Time ()":               "dateTime",
+	`time.Format ("2006-01-02")`: "date",
+
+	// TODO: if a format is more strict (e.g. using zeros instead of nines
+	// for fractional seconds), we could still use this as an approximation.
+	`time.Format ("2006-01-02T15:04:05.999999999Z07:00")`: "dateTime",
+
+	// TODO:  password.
 }
 
 func extractFormat(v cue.Value) string {
@@ -45,7 +55,11 @@ func extractFormat(v cue.Value) string {
 	if err != nil {
 		return ""
 	}
-	return cueToOpenAPI[string(b)]
+	if s, ok := cueToOpenAPI[string(b)]; ok {
+		return s
+	}
+	s := fmt.Sprint(v)
+	return cueToOpenAPI[s]
 }
 
 func simplify(b *builder, t *OrderedMap) {

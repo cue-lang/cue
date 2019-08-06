@@ -209,7 +209,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	count := 0
 	disallowDefault := false
 	var values cue.Value
-	if b.ctx.expandRefs {
+	if b.ctx.expandRefs || b.format != "" {
 		// Cycles are not allowed when expanding references. Right now we just
 		// cap the depth of evaluation at 30.
 		// TODO: do something more principled.
@@ -760,7 +760,6 @@ func (b *builder) string(v cue.Value) {
 		}
 
 	case cue.NoOp, cue.SelectorOp:
-		// TODO: determine formats from specific types.
 
 	case cue.CallOp:
 		name := fmt.Sprint(a[0])

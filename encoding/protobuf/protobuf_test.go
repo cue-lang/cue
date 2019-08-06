@@ -120,7 +120,7 @@ func TestBuild(t *testing.T) {
 		gotFiles[rel] = f
 	}
 
-	filepath.Walk("testdata/istio.io/api", func(path string, fi os.FileInfo, err error) error {
+	_ = filepath.Walk("testdata/istio.io/api", func(path string, fi os.FileInfo, err error) error {
 		if err != nil || fi.IsDir() || !strings.HasSuffix(path, ".cue") {
 			return err
 		}

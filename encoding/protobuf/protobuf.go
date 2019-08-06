@@ -21,29 +21,33 @@
 //
 // The following type mappings of defintions apply:
 //
-//   Proto type     CUE type/def   Comments
-//   message        struct         Message fields become CUE fields, whereby
-//                                 names are mapped to lowerCamelCase.
-//   enum           e1 | e2 | ...  Where ex are strings. A separate mapping is
-//                                 generated to obtain the numeric values.
-//   map<K, V>      { <>: V }      All keys are converted to strings.
-//   repeated V     [...V]         null is accepted as the empty list [].
+//   Proto type     CUE type/def     Comments
+//   message        struct           Message fields become CUE fields, whereby
+//                                   names are mapped to lowerCamelCase.
+//   enum           e1 | e2 | ...    Where ex are strings. A separate mapping is
+//                                   generated to obtain the numeric values.
+//   map<K, V>      { <>: V }        All keys are converted to strings.
+//   repeated V     [...V]           null is accepted as the empty list [].
 //   bool           bool
 //   string         string
-//   bytes          bytes          A base64-encoded string when converted to JSON.
-//   int32, fixed32 int32          An integer with bounds as defined by int32.
-//   uint32         uint32         An integer with bounds as defined by uint32.
-//   int64, fixed64 int64          An integer with bounds as defined by int64.
-//   uint64         uint64         An integer with bounds as defined by uint64.
-//   float          float32        A number with bounds as defined by float32.
-//   double         float64        A number with bounds as defined by float64.
-//   Struct         struct         See struct.proto.
-//   Value          _              See struct.proto.
-//   ListValue      [...]          See struct.proto.
-//   BoolValue      bool           See struct.proto.
-//   StringValue    string         See struct.proto.
-//   NumberValue    number         See struct.proto.
-//   StringValue    string         See struct.proto.
+//   bytes          bytes            A base64-encoded string when converted to JSON.
+//   int32, fixed32 int32            An integer with bounds as defined by int32.
+//   uint32         uint32           An integer with bounds as defined by uint32.
+//   int64, fixed64 int64            An integer with bounds as defined by int64.
+//   uint64         uint64           An integer with bounds as defined by uint64.
+//   float          float32          A number with bounds as defined by float32.
+//   double         float64          A number with bounds as defined by float64.
+//   Struct         struct           See struct.proto.
+//   Value          _                See struct.proto.
+//   ListValue      [...]            See struct.proto.
+//   NullValue      null             See struct.proto.
+//   BoolValue      bool             See struct.proto.
+//   StringValue    string           See struct.proto.
+//   NumberValue    number           See struct.proto.
+//   StringValue    string           See struct.proto.
+//   Empty          struct.MaxFields(0)
+//   Timestamp      time.Time        See struct.proto.
+//   Duration       time.Duration    See struct.proto.
 //
 // Protobuf definitions can be annotated with CUE constraints that are
 // included in the generated CUE:
@@ -58,12 +62,12 @@
 package protobuf
 
 // TODO mappings:
-// Timestamp	string	"1972-01-01T10:00:20.021Z"	Uses RFC 3339, where generated output will always be Z-normalized and uses 0, 3, 6 or 9 fractional digits. Offsets other than "Z" are also accepted.
-// Duration	string	"1.000340012s", "1s"	Generated output always contains 0, 3, 6, or 9 fractional digits, depending on required precision, followed by the suffix "s". Accepted are any fractional digits (also none) as long as they fit into nano-seconds precision and the suffix "s" is required.
-// Empty	object	{}
 //
 // Wrapper types	various types	2, "2", "foo", true, "true", null, 0, …	Wrappers use the same representation in JSON as the wrapped primitive type, except that null is allowed and preserved during data conversion and transfer.
 // FieldMask	string	"f.fooBar,h"	See field_mask.proto.
+//   Any            {"@type":"url",  See struct.proto.
+//                   f1: value,
+//                   ...}
 
 import (
 	"os"
@@ -238,9 +242,7 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 		}
 		f, err = parser.ParseFile(f.Filename, buf, parser.ParseComments)
 		if err != nil {
-			panic(err)
 			b.addErr(err)
-			// return nil, err
 			continue
 		}
 
@@ -251,7 +253,7 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 		// 	return nil, err
 		// }
 
-		for pkg := range r.p.used {
+		for pkg := range r.p.imported {
 			inst.ImportPaths = append(inst.ImportPaths, pkg)
 		}
 	}

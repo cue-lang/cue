@@ -139,7 +139,7 @@ message CompressedAttributes {
   map<sint32, bool> bools = 5;
 
   // Holds attributes of type TIMESTAMP
-  map<sint32, google.protobuf.Timestamp> timestamps = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
+  map<sint32, google.protobuf.Timestamp> time = 6 [(gogoproto.nullable) = false, (gogoproto.stdtime) = true];
 
   // Holds attributes of type DURATION
   map<sint32, google.protobuf.Duration> durations = 7 [(gogoproto.nullable) = false, (gogoproto.stdduration) = true];

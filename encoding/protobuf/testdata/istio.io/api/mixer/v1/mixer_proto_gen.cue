@@ -17,8 +17,8 @@
 package v1
 
 import (
-	"github.com/golang/protobuf/ptypes/duration"
 	"google.golang.org/genproto/googleapis/rpc/status"
+	"time"
 )
 
 //  Used to get a thumbs-up/thumbs-down before performing an action.
@@ -74,7 +74,7 @@ CheckResponse_PreconditionResult: {
 	status?: __status.Status @protobuf(1,type=google.rpc.Status,"(gogoproto.nullable)=false")
 
 	//  The amount of time for which this result can be considered valid.
-	validDuration?: duration.Duration @protobuf(2,type=google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
+	validDuration?: time.Duration @protobuf(2,type=google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	//  The number of uses for which this result can be considered valid.
 	validUseCount?: int32 @protobuf(3,name=valid_use_count)
@@ -92,7 +92,7 @@ __status = status
 //  Expresses the result of a quota allocation.
 CheckResponse_QuotaResult: {
 	//  The amount of time for which this result can be considered valid.
-	validDuration?: duration.Duration @protobuf(1,type=google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
+	validDuration?: time.Duration @protobuf(1,type=google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	//  The amount of granted quota. When `QuotaParams.best_effort` is true, this will be >= 0.
 	//  If `QuotaParams.best_effort` is false, this will be either 0 or >= `QuotaParams.amount`.

@@ -63,12 +63,12 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	tfile.SetLinesForContent(b)
 
 	p = &protoConverter{
-		id:      filename,
-		state:   s,
-		tfile:   tfile,
-		used:    map[string]bool{},
-		symbols: map[string]bool{},
-		aliases: map[string]string{},
+		id:       filename,
+		state:    s,
+		tfile:    tfile,
+		imported: map[string]bool{},
+		symbols:  map[string]bool{},
+		aliases:  map[string]string{},
 	}
 
 	defer func() {
@@ -133,14 +133,14 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		p.topElement(e)
 	}
 
-	used := []string{}
-	for k := range p.used {
-		used = append(used, k)
+	imported := []string{}
+	for k := range p.imported {
+		imported = append(imported, k)
 	}
-	sort.Strings(used)
-	p.sorted = used
+	sort.Strings(imported)
+	p.sorted = imported
 
-	for _, v := range used {
+	for _, v := range imported {
 		spec := &ast.ImportSpec{
 			Path: &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(v)},
 		}
@@ -172,8 +172,8 @@ type protoConverter struct {
 	file   *ast.File
 	inBody bool
 
-	sorted []string
-	used   map[string]bool
+	sorted   []string
+	imported map[string]bool
 
 	path    []string
 	scope   []map[string]mapping // for symbols resolution within package.
@@ -214,6 +214,15 @@ func (p *protoConverter) addNames(elems []proto.Visitee) {
 		case *proto.Enum:
 			name = x.Name
 			pos = x.Position
+		case *proto.NormalField:
+			name = x.Name
+			pos = x.Position
+		case *proto.MapField:
+			name = x.Name
+			pos = x.Position
+		case *proto.Oneof:
+			name = x.Name
+			pos = x.Position
 		default:
 			continue
 		}
@@ -228,26 +237,25 @@ func (p *protoConverter) popNames() {
 }
 
 func (p *protoConverter) uniqueTop(name string) string {
-	if len(p.path) == 0 {
-		return name
-	}
 	a := strings.SplitN(name, ".", 2)
-	if p.path[len(p.path)-1] == a[0] {
-		first := a[0]
-		alias, ok := p.aliases[first]
-		if !ok {
-			// TODO: this is likely to be okay, but find something better.
-			alias = "__" + first
-			p.file.Decls = append(p.file.Decls, &ast.Alias{
-				Ident: ast.NewIdent(alias),
-				Expr:  ast.NewIdent(first),
-			})
-			p.aliases[first] = alias
+	for i := len(p.scope) - 1; i > 0; i-- {
+		if _, ok := p.scope[i][a[0]]; ok {
+			first := a[0]
+			alias, ok := p.aliases[first]
+			if !ok {
+				// TODO: this is likely to be okay, but find something better.
+				alias = "__" + first
+				p.file.Decls = append(p.file.Decls, &ast.Alias{
+					Ident: ast.NewIdent(alias),
+					Expr:  ast.NewIdent(first),
+				})
+				p.aliases[first] = alias
+			}
+			if len(a) > 1 {
+				alias += "." + a[1]
+			}
+			return alias
 		}
-		if len(a) > 1 {
-			alias += "." + a[1]
-		}
-		return alias
 	}
 	return name
 }
@@ -265,6 +273,9 @@ func (p *protoConverter) toExpr(pos scanner.Position, name string) (expr ast.Exp
 }
 
 func (p *protoConverter) resolve(pos scanner.Position, name string, options []*proto.Option) string {
+	if s, ok := protoToCUE(name, options); ok {
+		return s
+	}
 	if strings.HasPrefix(name, ".") {
 		return p.resolveTopScope(pos, name[1:], options)
 	}
@@ -286,15 +297,12 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 		}
 		if m, ok := p.scope[0][name[:i]]; ok {
 			if m.pkg != nil {
-				p.used[m.pkg.goPkgPath] = true
+				p.imported[m.pkg.goPkgPath] = true
 				// TODO: do something more principled.
 			}
 			cueName := strings.Replace(name[i:], ".", "_", -1)
 			return p.uniqueTop(m.ref + cueName)
 		}
-	}
-	if s, ok := protoToCUE(name, options); ok {
-		return s
 	}
 	failf(pos, "name %q not found", name)
 	return ""

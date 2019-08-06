@@ -52,6 +52,11 @@ func (p *protoConverter) setBuiltin(from, to string, pkg *protoConverter) {
 	p.scope[0][from] = mapping{to, "", pkg}
 }
 
+var (
+	pkgTime   = &protoConverter{goPkgPath: "time"}
+	pkgStruct = &protoConverter{goPkgPath: "struct"}
+)
+
 func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, required bool) (generate bool) {
 	// Map some builtin types to their JSON/CUE mappings.
 	switch file {
@@ -67,16 +72,22 @@ func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, re
 		p.setBuiltin("google.protobuf.NumberValue", "number", nil)
 		return false
 
-	// TODO: consider mapping the following:
+	case "google/protobuf/empty.proto":
+		p.setBuiltin("google.protobuf.Empty", "struct.MaxFields(0)", pkgStruct)
+		return false
 
-	// case "google/protobuf/duration.proto":
-	// 	p.setBuiltin("google.protobuf.Duration", "time.Duration", "time")
+	case "google/protobuf/duration.proto":
+		p.setBuiltin("google.protobuf.Duration", "time.Duration", pkgTime)
+		return false
 
-	// case "google/protobuf/timestamp.proto":
-	// 	p.setBuiltin("google.protobuf.Timestamp", "time.Time", "time")
+	case "google/protobuf/timestamp.proto":
+		p.setBuiltin("google.protobuf.Timestamp", "time.Time", pkgTime)
+		return false
 
-	// case "google/protobuf/empty.proto":
-	// 	p.setBuiltin("google.protobuf.Empty", "struct.MaxFields(0)", nil)
+	// case "google/protobuf/field_mask.proto":
+	// 	p.setBuiltin("google.protobuf.FieldMask", "protobuf.FieldMask", nil)
+
+	// 	protobuf.Any
 
 	default:
 		if required {

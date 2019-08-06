@@ -20,8 +20,8 @@
 package client
 
 import (
-	"github.com/golang/protobuf/ptypes/duration"
 	"istio.io/api/mixer/v1"
+	"time"
 )
 
 //  Specifies the behavior when the client is unable to connect to Mixer.
@@ -35,10 +35,10 @@ NetworkFailPolicy: {
 
 	//  Base time to wait between retries.  Will be adjusted by exponential
 	//  backoff and jitter.
-	baseRetryWait?: duration.Duration @protobuf(3,type=google.protobuf.Duration,name=base_retry_wait)
+	baseRetryWait?: time.Duration @protobuf(3,type=google.protobuf.Duration,name=base_retry_wait)
 
 	//  Max time to wait between retries.
-	maxRetryWait?: duration.Duration @protobuf(4,type=google.protobuf.Duration,name=max_retry_wait)
+	maxRetryWait?: time.Duration @protobuf(4,type=google.protobuf.Duration,name=max_retry_wait)
 }
 
 //  Example of single-value enum.
@@ -107,7 +107,7 @@ TransportConfig: {
 
 	//  Specify refresh interval to write Mixer client statistics to Envoy share
 	//  memory. If not specified, the interval is 10 seconds.
-	statsUpdateInterval?: duration.Duration @protobuf(5,type=google.protobuf.Duration,name=stats_update_interval)
+	statsUpdateInterval?: time.Duration @protobuf(5,type=google.protobuf.Duration,name=stats_update_interval)
 
 	//  Name of the cluster that will forward check calls to a pool of mixer
 	//  servers. Defaults to "mixer_server". By using different names for
@@ -184,5 +184,5 @@ TcpClientConfig: {
 	//  Specify report interval to send periodical reports for long TCP
 	//  connections. If not specified, the interval is 10 seconds. This interval
 	//  should not be less than 1 second, otherwise it will be reset to 1 second.
-	reportInterval?: duration.Duration @protobuf(6,type=google.protobuf.Duration,name=report_interval)
+	reportInterval?: time.Duration @protobuf(6,type=google.protobuf.Duration,name=report_interval)
 }

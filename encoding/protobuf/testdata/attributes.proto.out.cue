@@ -14,10 +14,7 @@
 //  limitations under the License.
 package v1
 
-import (
-	"github.com/golang/protobuf/ptypes/duration"
-	"github.com/golang/protobuf/ptypes/timestamp"
-)
+import "time"
 
 StructWrap: {
 	struct?:    {}     @protobuf(1,type=google.protobuf.Struct)
@@ -91,10 +88,10 @@ Attributes_AttributeValue: {
 	bytesValue?: bytes @protobuf(6,name=bytes_value)
 } | {
 	//  Used for values of type TIMESTAMP
-	timestampValue?: timestamp.Timestamp @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
+	timestampValue?: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
 } | {
 	//  Used for values of type DURATION
-	durationValue?: duration.Duration @protobuf(8,type=google.protobuf.Duration,name=duration_value)
+	durationValue?: time.Duration @protobuf(8,type=google.protobuf.Duration,name=duration_value)
 } | {
 	//  Used for values of type STRING_MAP
 	stringMapValue?: Attributes_StringMap @protobuf(9,type=StringMap,name=string_map_value)
@@ -140,13 +137,13 @@ CompressedAttributes: {
 	} @protobuf(5,type=map<sint32,bool>)
 
 	//  Holds attributes of type TIMESTAMP
-	timestamps: {
-		<_>: timestamp.Timestamp
+	time: {
+		<_>: __time.Time
 	} @protobuf(6,type=map<sint32,google.protobuf.Timestamp>,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
 
 	//  Holds attributes of type DURATION
 	durations: {
-		<_>: duration.Duration
+		<_>: __time.Duration
 	} @protobuf(7,type=map<sint32,google.protobuf.Duration>,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	//  Holds attributes of type BYTES
@@ -159,6 +156,7 @@ CompressedAttributes: {
 		<_>: StringMap
 	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
+__time = time
 
 //  A map of string to string. The keys and values in this map are dictionary
 //  indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)

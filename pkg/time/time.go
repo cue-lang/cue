@@ -189,7 +189,7 @@ func Parse(layout, value string) (string, error) {
 	if err != nil {
 		return "", err
 	}
-	return t.Format(time.RFC3339Nano), nil
+	return t.UTC().Format(time.RFC3339Nano), nil
 }
 
 // Unix returns the local Time corresponding to the given Unix time,
@@ -199,5 +199,5 @@ func Parse(layout, value string) (string, error) {
 // value is 1<<63-1 (the largest int64 value).
 func Unix(sec int64, nsec int64) string {
 	t := time.Unix(sec, nsec)
-	return t.Format(time.RFC3339Nano)
+	return t.UTC().Format(time.RFC3339Nano)
 }

@@ -188,6 +188,14 @@ func isZero(v reflect.Value) bool {
 }
 
 func convert(ctx *context, src source, x interface{}) evaluated {
+	v := convertRec(ctx, src, x)
+	if v == nil {
+		return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", v)
+	}
+	return v
+}
+
+func convertRec(ctx *context, src source, x interface{}) evaluated {
 	switch v := x.(type) {
 	case nil:
 		// Interpret a nil pointer as an undefined value that is only
@@ -279,19 +287,42 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 		return toUint(ctx, src, uint64(v))
 	case uint64:
 		return toUint(ctx, src, uint64(v))
+	case uintptr:
+		return toUint(ctx, src, uint64(v))
 	case float64:
+		r := newNum(src, floatKind)
+		r.v.SetString(fmt.Sprintf("%g", v))
+		return r
+	case float32:
 		r := newNum(src, floatKind)
 		r.v.SetString(fmt.Sprintf("%g", v))
 		return r
 
 	case reflect.Value:
 		if v.CanInterface() {
-			return convert(ctx, src, v.Interface())
+			return convertRec(ctx, src, v.Interface())
 		}
 
 	default:
 		value := reflect.ValueOf(v)
 		switch value.Kind() {
+		case reflect.Bool:
+			return &boolLit{src.base(), value.Bool()}
+
+		case reflect.String:
+			return &stringLit{src.base(), value.String(), nil}
+
+		case reflect.Int, reflect.Int8, reflect.Int16,
+			reflect.Int32, reflect.Int64:
+			return toInt(ctx, src, value.Int())
+
+		case reflect.Uint, reflect.Uint8, reflect.Uint16,
+			reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+			return toUint(ctx, src, value.Uint())
+
+		case reflect.Float32, reflect.Float64:
+			return convertRec(ctx, src, value.Float())
+
 		case reflect.Ptr:
 			if value.IsNil() {
 				// Interpret a nil pointer as an undefined value that is only
@@ -299,7 +330,7 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 				elem := goTypeToValue(ctx, false, reflect.TypeOf(v).Elem())
 				return makeNullable(elem, false).(evaluated)
 			}
-			return convert(ctx, src, value.Elem().Interface())
+			return convertRec(ctx, src, value.Elem().Interface())
 
 		case reflect.Struct:
 			obj := newStruct(src)
@@ -313,7 +344,15 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 				if isOmitEmpty(&t) && isZero(val) {
 					continue
 				}
-				sub := convert(ctx, src, val.Interface())
+				sub := convertRec(ctx, src, val.Interface())
+				if sub == nil {
+					// mimic behavior of encoding/json: skip fields of unsupported types
+					continue
+				}
+				if isBottom(sub) {
+					return sub
+				}
+
 				// leave errors like we do during normal evaluation or do we
 				// want to return the error?
 				name := getName(&t)
@@ -328,21 +367,49 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 
 		case reflect.Map:
 			obj := newStruct(src)
-			t := value.Type()
-			if t.Key().Kind() != reflect.String {
-				return ctx.mkErr(src, "builtin map key not a string, but unsupported type %s", t.Key().String())
-			}
+
+			sorted := []string{}
 			keys := []string{}
-			for _, k := range value.MapKeys() {
-				keys = append(keys, k.String())
+			t := value.Type()
+			switch key := t.Key(); key.Kind() {
+			case reflect.String,
+				reflect.Int, reflect.Int8, reflect.Int16,
+				reflect.Int32, reflect.Int64,
+				reflect.Uint, reflect.Uint8, reflect.Uint16,
+				reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+				for _, k := range value.MapKeys() {
+					s := fmt.Sprint(k)
+					keys = append(keys, s)
+					sorted = append(sorted, s)
+
+					val := value.MapIndex(k).Interface()
+					sub := convertRec(ctx, src, val)
+					// mimic behavior of encoding/json: report error of
+					// unsupported type.
+					if sub == nil {
+						return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", val)
+					}
+					if isBottom(sub) {
+						return sub
+					}
+
+					// Set feature later.
+					obj.arcs = append(obj.arcs, arc{feature: 0, v: sub})
+				}
+
+			default:
+				return ctx.mkErr(baseValue{}, "unsupported Go type for map key (%v)", key)
 			}
-			sort.Strings(keys)
-			for _, k := range keys {
-				sub := convert(ctx, src, value.MapIndex(reflect.ValueOf(k)).Interface())
-				// leave errors like we do during normal evaluation or do we
-				// want to return the error?
-				f := ctx.strLabel(k)
-				obj.arcs = append(obj.arcs, arc{feature: f, v: sub})
+
+			// Assign label in normalized order.
+			sort.Strings(sorted)
+			for _, k := range sorted {
+				ctx.strLabel(k)
+			}
+
+			// Now assign the labels to the arcs.
+			for i, k := range keys {
+				obj.arcs[i].feature = ctx.strLabel(k)
 			}
 			sort.Sort(obj)
 			return obj
@@ -351,7 +418,11 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 			list := &list{baseValue: src.base()}
 			arcs := []arc{}
 			for i := 0; i < value.Len(); i++ {
-				x := convert(ctx, src, value.Index(i).Interface())
+				val := value.Index(i).Interface()
+				x := convertRec(ctx, src, val)
+				if x == nil {
+					return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", val)
+				}
 				if isBottom(x) {
 					return x
 				}
@@ -365,7 +436,7 @@ func convert(ctx *context, src source, x interface{}) evaluated {
 			return list
 		}
 	}
-	return ctx.mkErr(src, "builtin returned unsupported type %T", x)
+	return nil
 }
 
 func toInt(ctx *context, src source, x int64) evaluated {
@@ -398,9 +469,31 @@ var (
 //
 // TODO: if this value will always be unified with a concrete type in Go, then
 // many of the fields may be omitted.
-func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value) {
+func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) value {
+	v := goTypeToValueRec(ctx, allowNullDefault, t)
+	if v == nil {
+		return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", t)
+	}
+	return v
+}
+
+func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e value) {
 	if e, ok := ctx.typeCache.Load(t); ok {
 		return e.(value)
+	}
+
+	switch reflect.Zero(t).Interface().(type) {
+	case *big.Int, big.Int:
+		e = &basicType{k: intKind}
+		goto store
+
+	case *big.Float, big.Float, *big.Rat, big.Rat:
+		e = &basicType{k: numKind}
+		goto store
+
+	case *apd.Decimal, apd.Decimal:
+		e = &basicType{k: numKind}
+		goto store
 	}
 
 	// Even if this is for types that we know cast to a certain type, it can't
@@ -417,7 +510,7 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 		for elem.Kind() == reflect.Ptr {
 			elem = elem.Elem()
 		}
-		e = goTypeToValue(ctx, false, elem)
+		e = goTypeToValueRec(ctx, false, elem)
 		if allowNullDefault {
 			e = wrapOrNull(e)
 		}
@@ -451,22 +544,6 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 		e = &basicType{k: floatKind}
 
 	case reflect.Struct:
-		// Some of these values have MarshalJSON methods, but that may not be
-		// the case for older Go versions.
-		name := fmt.Sprint(t)
-		switch name {
-		case "big.Int":
-			e = &basicType{k: intKind}
-			goto store
-		case "big.Rat", "big.Float", "apd.Decimal":
-			e = &basicType{k: floatKind}
-			goto store
-		case "time.Time":
-			// We let the concrete value decide.
-			e = topSentinel
-			goto store
-		}
-
 		// First iterate to create struct, then iterate another time to
 		// resolve field tags to allow field tags to refer to the struct fields.
 		tags := map[label]string{}
@@ -479,8 +556,8 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 				continue
 			}
 			_, ok := f.Tag.Lookup("cue")
-			elem := goTypeToValue(ctx, !ok, f.Type)
-			if elem == nil {
+			elem := goTypeToValueRec(ctx, !ok, f.Type)
+			if elem == nil || isBottom(elem) {
 				continue // Ignore fields for unsupported types
 			}
 
@@ -506,6 +583,9 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 
 		for label, tag := range tags {
 			v := parseTag(ctx, obj, label, tag)
+			if isBottom(v) {
+				return v
+			}
 			for i, a := range obj.arcs {
 				if a.feature == label {
 					// Instead of unifying with the existing type, we substitute
@@ -522,7 +602,10 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 		if t.Elem().Kind() == reflect.Uint8 {
 			e = &basicType{k: bytesKind}
 		} else {
-			elem := goTypeToValue(ctx, allowNullDefault, t.Elem())
+			elem := goTypeToValueRec(ctx, allowNullDefault, t.Elem())
+			if elem == nil {
+				return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", t.Elem())
+			}
 
 			var ln value = &top{}
 			if t.Kind() == reflect.Array {
@@ -535,16 +618,24 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) (e value
 		}
 
 	case reflect.Map:
-		if key := t.Key(); key.Kind() != reflect.String {
-			// What does the JSON library do here?
-			e = ctx.mkErr(baseValue{}, "type %v not supported as key type", key)
-			break
+		switch key := t.Key(); key.Kind() {
+		case reflect.String, reflect.Int, reflect.Int8, reflect.Int16,
+			reflect.Int32, reflect.Int64, reflect.Uint, reflect.Uint8,
+			reflect.Uint16, reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+		default:
+			return ctx.mkErr(baseValue{}, "unsupported Go type for map key (%v)", key)
 		}
 
 		obj := newStruct(baseValue{})
 		sig := &params{}
 		sig.add(ctx.label("_", true), &basicType{k: stringKind})
-		v := goTypeToValue(ctx, allowNullDefault, t.Elem())
+		v := goTypeToValueRec(ctx, allowNullDefault, t.Elem())
+		if v == nil {
+			return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", t.Elem())
+		}
+		if isBottom(v) {
+			return v
+		}
 		obj.template = &lambdaExpr{params: sig, value: v}
 
 		e = wrapOrNull(obj)
@@ -559,7 +650,7 @@ store:
 }
 
 func wrapOrNull(e value) value {
-	if e.kind().isAnyOf(nullKind) {
+	if e == nil || isBottom(e) || e.kind().isAnyOf(nullKind) {
 		return e
 	}
 	return makeNullable(e, true)

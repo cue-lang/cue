@@ -178,6 +178,9 @@ func fromGoValue(x interface{}) (v cue.Value, err error) {
 	mutex.Lock()
 	v = internal.FromGoValue(runtime, x).(cue.Value)
 	mutex.Unlock()
+	if err := v.Err(); err != nil {
+		return v, err
+	}
 	return v, nil
 
 	// // This should be equivalent to the following:

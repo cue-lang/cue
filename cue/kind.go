@@ -246,7 +246,7 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool, msg string) {
 		return bottomKind, false, msg
 	}
 	switch {
-	case a&nonGround == 0 && b&nonGround == 0:
+	case aGround && bGround:
 		// both ground values: nothing to do
 
 	case op != opUnify && op != opLand && op != opLor && op != opNeq:

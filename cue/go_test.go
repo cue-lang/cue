@@ -22,6 +22,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"github.com/cockroachdb/apd/v2"
 )
 
 func TestConvert(t *testing.T) {
@@ -65,6 +66,10 @@ func TestConvert(t *testing.T) {
 	}, {
 		float64(3.1), "3.1",
 	}, {
+		float32(3.1), "3.1",
+	}, {
+		uintptr(3), "3",
+	}, {
 		&i34, "34",
 	}, {
 		&f34, "34",
@@ -82,9 +87,11 @@ func TestConvert(t *testing.T) {
 			"b": []int{3, 4},
 		}, "<0>{a: [1], b: [3,4]}",
 	}, {
-		map[int]int{}, "_|_(builtin map key not a string, but unsupported type int)",
+		map[bool]int{}, "_|_(unsupported Go type for map key (bool))",
 	}, {
-		map[int]int{1: 2}, "_|_(builtin map key not a string, but unsupported type int)",
+		map[struct{}]int{struct{}{}: 2}, "_|_(unsupported Go type for map key (struct {}))",
+	}, {
+		map[int]int{1: 2}, "<0>{1: 2}",
 	}, {
 		struct {
 			a int
@@ -146,14 +153,14 @@ func TestConvertType(t *testing.T) {
 		}{},
 		// TODO: indicate that B is explicitly an int only.
 		`<0>{A: ((int & >=-9223372036854775808 & int & <=9223372036854775807) & (>=0 & <100)), ` +
-			`B: >=0, ` +
-			`C?: _, ` +
+			`B: (int & >=0), ` +
+			`C?: int, ` +
 			`D: int, ` +
-			`F?: _}`,
+			`F?: number}`,
 	}, {
 		&struct {
 			A int16 `cue:">=0&<100"`
-			B error `json:"b"`
+			B error `json:"b,"`
 			C string
 			D bool
 			F float64
@@ -168,6 +175,21 @@ func TestConvertType(t *testing.T) {
 			`b: null, ` +
 			`L?: (*null | bytes), ` +
 			`T: _})`,
+	}, {
+		struct {
+			A int `cue:"<"` // invalid
+		}{},
+		"_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF' )",
+	}, {
+		struct {
+			A int `json:"-"` // skip
+			D *apd.Decimal
+			P ***apd.Decimal
+			I interface{ Foo() }
+			T string `cue:""` // allowed
+			h int
+		}{},
+		"<0>{D?: number, T: string, P?: (*null | number), I?: _}",
 	}, {
 		struct {
 			A int8 `cue:"C-B"`
@@ -185,6 +207,9 @@ func TestConvertType(t *testing.T) {
 		[4]string{},
 		`4*[string]`,
 	}, {
+		[]func(){},
+		"_|_(unsupported Go type (func()))",
+	}, {
 		map[string]struct{ A map[string]uint }{},
 		`(*null | ` +
 			`<0>{<>: <1>(_: string)-><2>{` +
@@ -192,7 +217,16 @@ func TestConvertType(t *testing.T) {
 			`<3>{<>: <4>(_: string)->(int & >=0 & int & <=18446744073709551615), })}, })`,
 	}, {
 		map[float32]int{},
-		`_|_(type float32 not supported as key type)`,
+		`_|_(unsupported Go type for map key (float32))`,
+	}, {
+		map[int]map[float32]int{},
+		`_|_(unsupported Go type for map key (float32))`,
+	}, {
+		map[int]func(){},
+		`_|_(unsupported Go type (func()))`,
+	}, {
+		time.Now, // a function
+		"_|_(unsupported Go type (func() time.Time))",
 	}}
 	inst := getInstance(t, "foo")
 

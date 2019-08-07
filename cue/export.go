@@ -32,7 +32,7 @@ func doEval(m options) bool {
 	return !m.raw
 }
 
-func export(ctx *context, v value, m options) ast.Node {
+func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
 	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}}
 	top, ok := v.evalPartial(ctx).(*structLit)
 	if ok {
@@ -45,9 +45,9 @@ func export(ctx *context, v value, m options) ast.Node {
 	value := e.expr(v)
 	if len(e.imports) == 0 {
 		// TODO: unwrap structs?
-		return value
+		return value, nil
 	}
-	imports := make([]string, 0, len(e.imports))
+	imports = make([]string, 0, len(e.imports))
 	for k := range e.imports {
 		imports = append(imports, k)
 	}
@@ -81,7 +81,7 @@ func export(ctx *context, v value, m options) ast.Node {
 	}
 
 	// resolve the file.
-	return file
+	return file, imports
 }
 
 type exporter struct {
@@ -164,14 +164,11 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 	panic(fmt.Sprintf("unsupported clause type %T", v))
 }
 
-func (p *exporter) shortName(preferred, pkg string) string {
+func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 	info, ok := p.imports[pkg]
 	short := info.short
 	if !ok {
-		short = pkg
-		if i := strings.LastIndexByte(pkg, '.'); i >= 0 {
-			short = pkg[i+1:]
-		}
+		short = inst.Name
 		if _, ok := p.top[p.ctx.label(short, true)]; ok && preferred != "" {
 			short = preferred
 			info.name = short
@@ -226,7 +223,9 @@ func (p *exporter) expr(v value) ast.Expr {
 		if x.pkg == 0 {
 			return name
 		}
-		short := p.shortName("", p.ctx.labelStr(x.pkg))
+		pkg := p.ctx.labelStr(x.pkg)
+		inst := builtins[pkg]
+		short := p.shortName(inst, "", pkg)
 		return &ast.SelectorExpr{X: ast.NewIdent(short), Sel: name}
 
 	case *nodeRef:
@@ -238,7 +237,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			return nil // should not happen!
 		}
 		short := p.ctx.labelStr(x.short)
-		return ast.NewIdent(p.shortName(short, inst.ImportPath))
+		return ast.NewIdent(p.shortName(inst, short, inst.ImportPath))
 
 	case *selectorExpr:
 		n := p.expr(x.x)

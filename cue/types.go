@@ -743,9 +743,11 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 	ctx := v.ctx()
 	o := getOptions(opts)
 	if o.raw {
-		return export(ctx, v.path.v, o)
+		n, _ := export(ctx, v.path.v, o)
+		return n
 	}
-	return export(ctx, v.path.cache, o)
+	n, _ := export(ctx, v.path.cache, o)
+	return n
 }
 
 // Decode initializes x with Value v. If x is a struct, it will validate the

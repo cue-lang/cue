@@ -322,7 +322,8 @@ func TestExport(t *testing.T) {
 			v := newValueRoot(ctx, n)
 
 			opts := options{raw: !tc.eval}
-			b, err := format.Node(export(ctx, v.eval(ctx), opts), format.Simplify())
+			node, _ := export(ctx, v.eval(ctx), opts)
+			b, err := format.Node(node, format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}

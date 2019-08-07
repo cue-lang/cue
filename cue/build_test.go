@@ -24,73 +24,6 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-func TestMarshalling(t *testing.T) {
-	testCases := []struct {
-		filename string
-		input    string
-		pkg      string
-	}{{
-		filename: "foo.cue",
-		pkg:      "foo",
-		input: `package foo
-
-		A: int
-		B: string
-		`,
-	}, {
-		filename: "bar.cue",
-		pkg:      "bar",
-		input: `package bar
-
-		"Hello world!"
-		`,
-	}, {
-		filename: "qux.cue",
-		input: `
-			"Hello world!"
-		`,
-	}, {
-		filename: "baz.cue",
-		pkg:      "baz",
-		input: `package baz
-
-		import "strings"
-
-		a: strings.TrimSpace("  Hello world!  ")
-		`}}
-	for _, tc := range testCases {
-		t.Run(tc.filename, func(t *testing.T) {
-			r := &Runtime{}
-			inst, err := r.Compile(tc.filename, tc.input)
-			if err != nil {
-				t.Fatal(err)
-			}
-			inst.ImportPath = "test/pkg"
-			got := fmt.Sprint(inst.Value())
-
-			b, err := inst.MarshalBinary()
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			r2 := &Runtime{}
-			inst, err = r2.Unmarshal(b)
-			if err != nil {
-				t.Fatal(err)
-			}
-
-			if inst.ImportPath != "test/pkg" {
-				t.Error("import path was not restored")
-			}
-			want := fmt.Sprint(inst.Value())
-
-			if got != want {
-				t.Errorf("\ngot:  %q;\nwant: %q", got, want)
-			}
-		})
-	}
-}
-
 func TestFromExpr(t *testing.T) {
 	testCases := []struct {
 		expr ast.Expr
@@ -139,7 +72,6 @@ func TestBuild(t *testing.T) {
 		Number: 12
 		`),
 	}
-	insts(pkg1, pkg2)
 
 	testCases := []struct {
 		instances []*bimport
@@ -251,13 +183,11 @@ type builder struct {
 }
 
 func (b *builder) load(pos token.Pos, path string) *build.Instance {
-	p := b.ctxt.NewInstance(path, b.load)
 	bi := b.imports[path]
 	if bi == nil {
 		return nil
 	}
-	buildInstance(b.imports[path], p)
-	return p
+	return b.build(bi)
 }
 
 type bimport struct {
@@ -277,17 +207,21 @@ func makeInstances(insts []*bimport) (instances []*build.Instance) {
 	}
 	for _, bi := range insts {
 		if bi.path == "" {
-			p := b.ctxt.NewInstance("dir", b.load)
-			buildInstance(bi, p)
-			instances = append(instances, p)
+			instances = append(instances, b.build(bi))
 		}
 	}
 	return
 }
 
-func buildInstance(bi *bimport, p *build.Instance) {
+func (b *builder) build(bi *bimport) *build.Instance {
+	path := bi.path
+	if path == "" {
+		path = "dir"
+	}
+	p := b.ctxt.NewInstance(path, b.load)
 	for i, f := range bi.files {
 		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
 	}
-	p.Complete()
+	_ = p.Complete()
+	return p
 }

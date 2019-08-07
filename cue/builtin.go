@@ -274,7 +274,7 @@ func (c *callCtxt) name() string {
 	return c.builtin.name(c.ctx)
 }
 
-var builtins = map[string]*structLit{}
+var builtins = map[string]*Instance{}
 
 func initBuiltins(pkgs map[string]*builtinPkg) {
 	ctx := sharedIndex.newContext()
@@ -286,15 +286,16 @@ func initBuiltins(pkgs map[string]*builtinPkg) {
 	for _, k := range keys {
 		b := pkgs[k]
 		e := mustCompileBuiltins(ctx, b, k)
-		builtins[k] = e
-		builtins["-/"+path.Base(k)] = e
 
-		sharedIndex.addInst(&Instance{
+		i := sharedIndex.addInst(&Instance{
 			ImportPath: k,
 			Name:       path.Base(k),
 			rootStruct: e,
 			rootValue:  e,
 		})
+
+		builtins[k] = i
+		builtins["-/"+path.Base(k)] = i
 	}
 }
 
@@ -307,7 +308,7 @@ func getBuiltinPkg(ctx *context, path string) *structLit {
 	if !ok {
 		return nil
 	}
-	return p
+	return p.rootStruct
 }
 
 func init() {

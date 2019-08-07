@@ -53,6 +53,9 @@ func (x *index) addInst(p *Instance) *Instance {
 	}
 	p.index = x
 	x.imports[p.rootStruct] = p
+	if p.ImportPath != "" {
+		x.importsByPath[p.ImportPath] = p
+	}
 	return p
 }
 
@@ -67,11 +70,11 @@ func (x *index) getImportFromNode(v value) *Instance {
 // newInstance creates a new instance. Use Insert to populate the instance.
 func (x *index) newInstance(p *build.Instance) *Instance {
 	st := &structLit{baseValue: baseValue{nil}}
-	i := x.addInst(&Instance{
+	i := &Instance{
 		rootStruct: st,
 		rootValue:  st,
 		inst:       p,
-	})
+	}
 	if p != nil {
 		i.ImportPath = p.ImportPath
 		i.Dir = p.Dir
@@ -80,7 +83,7 @@ func (x *index) newInstance(p *build.Instance) *Instance {
 			i.setListOrError(p.Err)
 		}
 	}
-	return i
+	return x.addInst(i)
 }
 
 func (inst *Instance) setListOrError(err errors.Error) {

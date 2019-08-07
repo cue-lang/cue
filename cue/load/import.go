@@ -78,28 +78,13 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 		parentPath = filepath.Join(srcDir, filepath.FromSlash(path))
 	}
 	p := cfg.Context.NewInstance(path, l.loadFunc(parentPath))
-	p.DisplayPath = path
-
-	isLocal := isLocalImport(path)
-
-	if cfg.Module != "" && isLocal {
-		p.ImportPath = filepath.Join(cfg.Module, path)
-	}
-
-	var modDir string
-	// var modErr error
-	if !isLocal {
-		// TODO(mpvl): support module lookup
-	}
-
-	p.Local = isLocal
 
 	if err := updateDirs(cfg, p, path, srcDir, 0); err != nil {
 		p.ReportError(err)
 		return p
 	}
 
-	if modDir == "" && path != cleanImport(path) {
+	if path != cleanImport(path) {
 		report(p, l.errPkgf(nil,
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 		p.Incomplete = true
@@ -108,7 +93,7 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 
 	fp := newFileProcessor(cfg, p)
 
-	root := p.Dir
+	root := srcDir
 
 	for dir := p.Dir; ctxt.isDir(dir); {
 		files, err := ctxt.readDir(dir)
@@ -143,6 +128,10 @@ func (l *loader) importPkg(pos token.Pos, path, srcDir string) *build.Instance {
 			break
 		}
 		dir = parent
+	}
+
+	if strings.HasPrefix(root, srcDir) {
+		root = srcDir
 	}
 
 	rewriteFiles(p, root, false)
@@ -208,8 +197,13 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 }
 
 func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMode) errors.Error {
+	p.DisplayPath = path
+
+	isLocal := isLocalImport(path)
+	p.Local = isLocal
+
 	ctxt := &c.fileSystem
-	// path := p.ImportPath
+
 	if path == "" {
 		return errors.Newf(token.NoPos, "import %q: invalid import path", path)
 	}
@@ -218,17 +212,19 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 		return errors.Newf(token.NoPos, "absolute import path %q not allowed", path)
 	}
 
-	if isLocalImport(path) {
+	if isLocal {
+		if c.Module != "" {
+			p.ImportPath = filepath.Join(c.Module, path)
+		}
+
 		if srcDir == "" {
 			return errors.Newf(token.NoPos, "import %q: import relative to unknown directory", path)
 		}
-		if !ctxt.isAbsPath(path) {
-			p.Dir = ctxt.joinPath(srcDir, path)
-		}
+		p.Dir = ctxt.joinPath(srcDir, path)
 		return nil
 	}
 	dir := ctxt.joinPath(srcDir, path)
-	info, err := ctxt.stat(filepath.Join(srcDir, path))
+	info, err := ctxt.stat(dir)
 	if err == nil && info.IsDir() {
 		p.Dir = dir
 		return nil
@@ -239,14 +235,9 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 }
 
 func normPrefix(root, path string, isLocal bool) string {
-	root = filepath.Clean(root)
-	prefix := ""
-	if isLocal {
-		prefix = "." + string(filepath.Separator)
-	}
-	if !strings.HasSuffix(root, string(filepath.Separator)) &&
-		strings.HasPrefix(path, root) {
-		path = prefix + path[len(root)+1:]
+	path, err := filepath.Rel(root, path)
+	if err == nil && isLocal {
+		path = "." + string(filepath.Separator) + path
 	}
 	return path
 }

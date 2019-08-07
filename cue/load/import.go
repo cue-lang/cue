@@ -235,9 +235,14 @@ func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMo
 }
 
 func normPrefix(root, path string, isLocal bool) string {
-	path, err := filepath.Rel(root, path)
-	if err == nil && isLocal {
-		path = "." + string(filepath.Separator) + path
+	root = filepath.Clean(root)
+	prefix := ""
+	if isLocal {
+		prefix = "." + string(filepath.Separator)
+	}
+	if !strings.HasSuffix(root, string(filepath.Separator)) &&
+		strings.HasPrefix(path, root) {
+		path = prefix + path[len(root)+1:]
 	}
 	return path
 }

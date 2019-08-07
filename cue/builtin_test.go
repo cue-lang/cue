@@ -305,6 +305,9 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		test("time", `time.Time & "no time"`),
 		`_|_(error in call to time.Time: invalid time "no time")`,
+	}, {
+		test("time", `time.Unix(1500000000, 123456)`),
+		`"2017-07-14T02:40:00.000123456Z"`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

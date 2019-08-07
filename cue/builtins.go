@@ -2544,7 +2544,7 @@ var builtinPackages = map[string]*builtinPkg{
 					if err != nil {
 						return "", err
 					}
-					return t.Format(time.RFC3339Nano), nil
+					return t.UTC().Format(time.RFC3339Nano), nil
 				}()
 			},
 		}, {
@@ -2555,7 +2555,7 @@ var builtinPackages = map[string]*builtinPkg{
 				sec, nsec := c.int64(0), c.int64(1)
 				c.ret = func() interface{} {
 					t := time.Unix(sec, nsec)
-					return t.Format(time.RFC3339Nano)
+					return t.UTC().Format(time.RFC3339Nano)
 				}()
 			},
 		}},

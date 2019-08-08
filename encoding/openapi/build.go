@@ -109,7 +109,11 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) 
 		if c.isInternal(label) {
 			continue
 		}
-		c.schemas.Set(c.makeRef(inst, []string{label}), c.build(label, i.Value()))
+		ref := c.makeRef(inst, []string{label})
+		if ref == "" {
+			continue
+		}
+		c.schemas.Set(ref, c.build(label, i.Value()))
 	}
 
 	// keep looping until a fixed point is reached.
@@ -196,11 +200,21 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 	return schema
 }
 
-func resolve(v cue.Value) cue.Value {
+func (b *builder) resolve(v cue.Value) cue.Value {
+	// Cycles are not allowed when expanding references. Right now we just
+	// cap the depth of evaluation at 30.
+	// TODO: do something more principled.
+	const maxDepth = 30
+	if b.ctx.evalDepth > maxDepth {
+		b.failf(v, "maximum stack depth of %d reached", maxDepth)
+	}
+	b.ctx.evalDepth++
+	defer func() { b.ctx.evalDepth-- }()
+
 	switch op, a := v.Expr(); op {
 	case cue.SelectorOp:
 		field, _ := a[1].String()
-		v = resolve(a[0]).Lookup(field)
+		v = b.resolve(a[0]).Lookup(field)
 	}
 	return v
 }
@@ -210,17 +224,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	disallowDefault := false
 	var values cue.Value
 	if b.ctx.expandRefs || b.format != "" {
-		// Cycles are not allowed when expanding references. Right now we just
-		// cap the depth of evaluation at 30.
-		// TODO: do something more principled.
-		const maxDepth = 30
-		if b.ctx.evalDepth > maxDepth {
-			b.failf(v, "maximum stack depth of %d reached", maxDepth)
-		}
-		b.ctx.evalDepth++
-		defer func() { b.ctx.evalDepth-- }()
-
-		values = resolve(v)
+		values = b.resolve(v)
 		count = 1
 	} else {
 		dedup := map[string]bool{}
@@ -231,6 +235,10 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			switch p, r := v.Reference(); {
 			case len(r) > 0:
 				ref := b.ctx.makeRef(p, r)
+				if ref == "" {
+					v = b.resolve(v)
+					break
+				}
 				if dedup[ref] {
 					continue
 				}
@@ -238,11 +246,11 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 
 				b.addRef(v, p, r)
 				disallowDefault = true
-			default:
-				hasNoRef = true
-				count++
-				values = values.Unify(v)
+				continue
 			}
+			hasNoRef = true
+			count++
+			values = values.Unify(v)
 		}
 		isRef = !hasNoRef && len(dedup) == 1
 	}
@@ -502,7 +510,7 @@ func (b *builder) object(v cue.Value) {
 		// TODO: extract format from specific type.
 
 	default:
-		b.failf(v, "unsupported op %v for number type", op)
+		b.failf(v, "unsupported op %v for object type (%v)", op, v)
 		return
 	}
 
@@ -582,7 +590,7 @@ func (b *builder) array(v cue.Value) {
 		// TODO: extract format from specific type.
 
 	default:
-		b.failf(v, "unsupported op %v for number type", op)
+		b.failf(v, "unsupported op %v for array type", op)
 		return
 	}
 
@@ -698,7 +706,7 @@ func (b *builder) number(v cue.Value) {
 		// TODO: extract format from specific type.
 
 	default:
-		// panic(fmt.Sprintf("unsupported of %v for number type", op))
+		b.failf(v, "unsupported op for number %v", op)
 	}
 }
 

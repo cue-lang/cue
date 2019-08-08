@@ -27,7 +27,8 @@ type Generator struct {
 	Info OrderedMap
 
 	// ReferenceFunc allows users to specify an alternative representation
-	// for references.
+	// for references. An empty string tells the generator to expand the type
+	// in place and not generate a schema for that entity, if applicable.
 	ReferenceFunc func(inst *cue.Instance, path []string) string
 
 	// DescriptionFunc allows rewriting a description associated with a certain

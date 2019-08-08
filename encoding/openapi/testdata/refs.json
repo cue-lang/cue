@@ -1,0 +1,35 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "components": {
+      "schemas": {
+         "Keep": {
+            "type": "object",
+            "required": [
+               "excludedStruct",
+               "excludedInt"
+            ],
+            "properties": {
+               "excludedStruct": {
+                  "description": "This comment is included",
+                  "type": "object",
+                  "required": [
+                     "A"
+                  ],
+                  "properties": {
+                     "A": {
+                        "type": "integer"
+                     }
+                  }
+               },
+               "excludedInt": {
+                  "type": "integer"
+               }
+            }
+         }
+      }
+   }
+}

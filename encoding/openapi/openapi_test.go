@@ -94,6 +94,19 @@ func TestParseDefinitions(t *testing.T) {
 				return "Randomly picked description from a set of size one."
 			},
 		},
+	}, {
+		"refs.cue",
+		"refs.json",
+		&Generator{
+			Info: info,
+			ReferenceFunc: func(inst *cue.Instance, path []string) string {
+				switch {
+				case strings.HasPrefix(path[0], "Excluded"):
+					return ""
+				}
+				return strings.Join(path, ".")
+			},
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {

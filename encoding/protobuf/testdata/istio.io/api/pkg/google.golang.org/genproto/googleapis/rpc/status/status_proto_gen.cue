@@ -14,8 +14,6 @@
 //  limitations under the License.
 package status
 
-import "github.com/golang/protobuf/ptypes/any"
-
 //  The `Status` type defines a logical error model that is suitable for
 //  different programming environments, including REST APIs and RPC APIs. It is
 //  used by [gRPC](https://github.com/grpc). The error model is designed to be:
@@ -82,5 +80,9 @@ Status: {
 
 	//  A list of messages that carry the error details.  There is a common set of
 	//  message types for APIs to use.
-	details?: [...any.Any] @protobuf(3,type=google.protobuf.Any)
+	details?: [...{
+		// A URL/resource name that uniquely identifies the type of the serialized protocol buffer message. This string must contain at least one "/" character. The last segment of the URL's path must represent the fully qualified name of the type (as in `type.googleapis.com/google.protobuf.Duration`). The name should be in a canonical form (e.g., leading "." is not accepted).
+		// The remaining fields of this object correspond to fields of the proto messsage. If the embedded message is well-known and has a custom JSON representation, that representation is assigned to the 'value' field.
+		"@type": string
+	}] @protobuf(3,type=google.protobuf.Any)
 }

@@ -84,6 +84,33 @@ func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, re
 		p.setBuiltin("google.protobuf.Timestamp", "time.Time", pkgTime)
 		return false
 
+	case "google/protobuf/any.proto":
+		// TODO: technically, the value should be `_` (anything), but that
+		// will not convert to a valid OpenAPI value. In practice, all
+		// "well-known" types except wrapper types (which will likely not
+		// be used here) are represented as strings.
+		//
+		// In Structural OpenAPI this type cannot be represented.
+		p.setBuiltin("google.protobuf.Any", `{
+	// A URL/resource name that uniquely identifies the type of the serialized protocol buffer message. This string must contain at least one "/" character. The last segment of the URL's path must represent the fully qualified name of the type (as in `+
+			"`type.googleapis.com/google.protobuf.Duration`"+`). The name should be in a canonical form (e.g., leading "." is not accepted).
+	// The remaining fields of this object correspond to fields of the proto messsage. If the embedded message is well-known and has a custom JSON representation, that representation is assigned to the 'value' field.
+	"@type": string,
+}`, nil)
+		return false
+
+	case "google/protobuf/wrappers.proto":
+		p.setBuiltin("google.protobuf.DoubleValue", `null | float`, nil)
+		p.setBuiltin("google.protobuf.FloatValue", `null | float`, nil)
+		p.setBuiltin("google.protobuf.Int64Value", `null | int64`, nil)
+		p.setBuiltin("google.protobuf.UInt64Value", `null | uint64`, nil)
+		p.setBuiltin("google.protobuf.Int32Value", `null | int32`, nil)
+		p.setBuiltin("google.protobuf.UInt32Value", `null | uint32`, nil)
+		p.setBuiltin("google.protobuf.BoolValue", `null | bool`, nil)
+		p.setBuiltin("google.protobuf.StringValue", `null | string`, nil)
+		p.setBuiltin("google.protobuf.BytesValue", `null | bytes`, nil)
+		return false
+
 	// case "google/protobuf/field_mask.proto":
 	// 	p.setBuiltin("google.protobuf.FieldMask", "protobuf.FieldMask", nil)
 

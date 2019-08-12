@@ -148,7 +148,7 @@ CompressedAttributes: {
 
 	//  Holds attributes of type BYTES
 	bytes: {
-		<_>: bytes
+		<_>: __bytes
 	} @protobuf(8,type=map<sint32,bytes>)
 
 	//  Holds attributes of type STRING_MAP
@@ -157,6 +157,7 @@ CompressedAttributes: {
 	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
 __time = time
+__bytes = bytes
 
 //  A map of string to string. The keys and values in this map are dictionary
 //  indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)

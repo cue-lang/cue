@@ -274,7 +274,7 @@ func (p *protoConverter) toExpr(pos scanner.Position, name string) (expr ast.Exp
 
 func (p *protoConverter) resolve(pos scanner.Position, name string, options []*proto.Option) string {
 	if s, ok := protoToCUE(name, options); ok {
-		return s
+		return p.uniqueTop(s)
 	}
 	if strings.HasPrefix(name, ".") {
 		return p.resolveTopScope(pos, name[1:], options)

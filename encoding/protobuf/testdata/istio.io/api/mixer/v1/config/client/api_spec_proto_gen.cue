@@ -126,7 +126,7 @@ HTTPAPISpecPattern: {
 	//      /dictionary/{term:1}/{term}
 	//      /search{?q*,lang}
 	// 
-	uriTemplate?: string @protobuf(3,name=uri_template)
+	uriTemplate: string @protobuf(3,name=uri_template)
 } | {
 	//  EXPERIMENTAL:
 	// 
@@ -136,7 +136,7 @@ HTTPAPISpecPattern: {
 	// 
 	//      "^/pets/(.*?)?"
 	// 
-	regex?: string @protobuf(4)
+	regex: string @protobuf(4)
 }
 
 //  APIKey defines the explicit configuration for generating the
@@ -155,7 +155,7 @@ APIKey: {
 	// 
 	//      GET /something?api_key=abcdef12345
 	// 
-	query?: string @protobuf(1)
+	query: string @protobuf(1)
 } | {
 	//  API key is sent in a request header. `header` represents the
 	//  header name.
@@ -166,7 +166,7 @@ APIKey: {
 	//      GET /something HTTP/1.1
 	//      X-API-Key: abcdef12345
 	// 
-	header?: string @protobuf(2)
+	header: string @protobuf(2)
 } | {
 	//  API key is sent in a
 	//  [cookie](https://swagger.io/docs/specification/authentication/cookie-authentication),
@@ -177,7 +177,7 @@ APIKey: {
 	//      GET /something HTTP/1.1
 	//      Cookie: X-API-KEY=abcdef12345
 	// 
-	cookie?: string @protobuf(3)
+	cookie: string @protobuf(3)
 }
 
 //  HTTPAPISpecReference defines a reference to an HTTPAPISpec. This is

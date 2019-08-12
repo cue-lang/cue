@@ -641,9 +641,19 @@ func (p *protoConverter) enum(x *proto.Enum) {
 	addComments(enum.Value, 1, nil, lastComment)
 }
 
+// oneOf converts a Proto OneOf field to CUE. Note that Protobuf defines
+// a oneOf to be at most one of the fields. Rather than making each field
+// optional, we define oneOfs as all required fields, but add one more
+// disjunction allowing no fields. This makes it easier to constrain the
+// result to include at least one of the values.
 func (p *protoConverter) oneOf(x *proto.Oneof) {
 	f := &ast.Field{
 		Label: p.ref(x.Position),
+		// TODO: Once we have closed structs, a oneOf is represented as a
+		// disjunction of empty structs and closed structs with required fields.
+		// For now we just specify the required fields. This is not correct
+		// but more practical.
+		// Value: &ast.StructLit{}, // Remove to make at least one required.
 	}
 	f.AddComment(comment(x.Comment, true))
 
@@ -656,7 +666,8 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 		}
 		switch x := v.(type) {
 		case *proto.OneOfField:
-			p.parseField(s, 0, x.Field)
+			oneOf := p.parseField(s, 0, x.Field)
+			oneOf.Optional = token.NoPos
 
 		default:
 			p.messageField(s, 1, v)

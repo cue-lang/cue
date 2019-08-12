@@ -76,13 +76,13 @@ StringMatch: {
 }
 StringMatch: {
 	//  exact string match
-	exact?: string @protobuf(1)
+	exact: string @protobuf(1)
 } | {
 	//  prefix-based match
-	prefix?: string @protobuf(2)
+	prefix: string @protobuf(2)
 } | {
 	//  ECMAscript style regex-based match
-	regex?: string @protobuf(3)
+	regex: string @protobuf(3)
 }
 
 //  Specifies a match clause to match Istio attributes

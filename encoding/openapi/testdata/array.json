@@ -9,12 +9,13 @@
                "bar": {
                   "type": "array",
                   "items": {
-                     "default": "1",
+                     "type": "string",
                      "enum": [
                         "1",
                         "2",
                         "3"
-                     ]
+                     ],
+                     "default": "1"
                   }
                },
                "foo": {
@@ -28,12 +29,13 @@
                         "e": {
                            "type": "array",
                            "items": {
-                              "default": "1",
+                              "type": "string",
                               "enum": [
                                  "1",
                                  "2",
                                  "3"
-                              ]
+                              ],
+                              "default": "1"
                            }
                         }
                      }
@@ -52,12 +54,13 @@
          },
          "MyEnum": {
             "description": "MyEnum",
-            "default": "1",
+            "type": "string",
             "enum": [
                "1",
                "2",
                "3"
-            ]
+            ],
+            "default": "1"
          },
          "MyStruct": {
             "description": "MyStruct",
@@ -69,12 +72,13 @@
                "e": {
                   "type": "array",
                   "items": {
-                     "default": "1",
+                     "type": "string",
                      "enum": [
                         "1",
                         "2",
                         "3"
-                     ]
+                     ],
+                     "default": "1"
                   }
                }
             }

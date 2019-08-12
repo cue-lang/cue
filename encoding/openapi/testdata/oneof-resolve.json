@@ -7,30 +7,27 @@
    "components": {
       "schemas": {
          "MyString": {
+            "type": "object",
+            "properties": {
+               "exact": {
+                  "type": "string",
+                  "format": "string"
+               },
+               "regex": {
+                  "type": "string",
+                  "format": "string"
+               }
+            },
             "oneOf": [
                {
-                  "type": "object",
                   "required": [
                      "exact"
-                  ],
-                  "properties": {
-                     "exact": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
+                  ]
                },
                {
-                  "type": "object",
                   "required": [
                      "regex"
-                  ],
-                  "properties": {
-                     "regex": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
+                  ]
                }
             ]
          },
@@ -46,60 +43,54 @@
             ],
             "properties": {
                "include": {
+                  "type": "object",
+                  "properties": {
+                     "exact": {
+                        "type": "string",
+                        "format": "string"
+                     },
+                     "regex": {
+                        "type": "string",
+                        "format": "string"
+                     }
+                  },
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "exact"
-                        ],
-                        "properties": {
-                           "exact": {
-                              "type": "string",
-                              "format": "string"
-                           }
-                        }
+                        ]
                      },
                      {
-                        "type": "object",
                         "required": [
                            "regex"
-                        ],
-                        "properties": {
-                           "regex": {
-                              "type": "string",
-                              "format": "string"
-                           }
-                        }
+                        ]
                      }
                   ]
                },
                "exclude": {
                   "type": "array",
                   "items": {
+                     "type": "object",
+                     "properties": {
+                        "exact": {
+                           "type": "string",
+                           "format": "string"
+                        },
+                        "regex": {
+                           "type": "string",
+                           "format": "string"
+                        }
+                     },
                      "oneOf": [
                         {
-                           "type": "object",
                            "required": [
                               "exact"
-                           ],
-                           "properties": {
-                              "exact": {
-                                 "type": "string",
-                                 "format": "string"
-                              }
-                           }
+                           ]
                         },
                         {
-                           "type": "object",
                            "required": [
                               "regex"
-                           ],
-                           "properties": {
-                              "regex": {
-                                 "type": "string",
-                                 "format": "string"
-                              }
-                           }
+                           ]
                         }
                      ]
                   }

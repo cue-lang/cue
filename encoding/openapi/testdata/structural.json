@@ -1,0 +1,234 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "components": {
+      "schemas": {
+         "Attributes": {
+            "type": "object",
+            "required": [
+               "attributes"
+            ],
+            "properties": {
+               "attributes": {
+                  "description": "A map of attribute name to its value.",
+                  "type": "object",
+                  "additionalProperties": {
+                     "type": "object",
+                     "properties": {
+                        "stringValue": {
+                           "description": "Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI",
+                           "type": "string",
+                           "format": "string"
+                        },
+                        "int64Value": {
+                           "description": "Used for values of type INT64",
+                           "type": "integer",
+                           "format": "int64"
+                        },
+                        "doubleValue": {
+                           "description": "Used for values of type DOUBLE",
+                           "type": "number",
+                           "format": "double"
+                        },
+                        "boolValue": {
+                           "description": "Used for values of type BOOL",
+                           "type": "boolean"
+                        },
+                        "bytesValue": {
+                           "description": "Used for values of type BYTES",
+                           "type": "string",
+                           "format": "binary"
+                        },
+                        "timestampValue": {
+                           "description": "Used for values of type TIMESTAMP",
+                           "type": "string",
+                           "format": "dateTime"
+                        },
+                        "durationValue": {
+                           "description": "Used for values of type DURATION",
+                           "type": "string"
+                        },
+                        "stringMapValue": {
+                           "description": "Used for values of type STRING_MAP",
+                           "type": "object",
+                           "required": [
+                              "entries"
+                           ],
+                           "properties": {
+                              "entries": {
+                                 "description": "Holds a set of name/value pairs.",
+                                 "type": "object",
+                                 "additionalProperties": {
+                                    "type": "string",
+                                    "format": "string"
+                                 }
+                              }
+                           }
+                        }
+                     },
+                     "oneOf": [
+                        {
+                           "required": [
+                              "stringValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "int64Value"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "doubleValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "boolValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "bytesValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "timestampValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "durationValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "stringMapValue"
+                           ]
+                        }
+                     ]
+                  }
+               }
+            }
+         },
+         "AttrValue": {
+            "description": "The attribute value.",
+            "type": "object",
+            "properties": {
+               "stringValue": {
+                  "description": "Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI",
+                  "type": "string",
+                  "format": "string"
+               },
+               "int64Value": {
+                  "description": "Used for values of type INT64",
+                  "type": "integer",
+                  "format": "int64"
+               },
+               "doubleValue": {
+                  "description": "Used for values of type DOUBLE",
+                  "type": "number",
+                  "format": "double"
+               },
+               "boolValue": {
+                  "description": "Used for values of type BOOL",
+                  "type": "boolean"
+               },
+               "bytesValue": {
+                  "description": "Used for values of type BYTES",
+                  "type": "string",
+                  "format": "binary"
+               },
+               "timestampValue": {
+                  "description": "Used for values of type TIMESTAMP",
+                  "type": "string",
+                  "format": "dateTime"
+               },
+               "durationValue": {
+                  "description": "Used for values of type DURATION",
+                  "type": "string"
+               },
+               "stringMapValue": {
+                  "description": "Used for values of type STRING_MAP",
+                  "type": "object",
+                  "required": [
+                     "entries"
+                  ],
+                  "properties": {
+                     "entries": {
+                        "description": "Holds a set of name/value pairs.",
+                        "type": "object",
+                        "additionalProperties": {
+                           "type": "string",
+                           "format": "string"
+                        }
+                     }
+                  }
+               }
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "stringValue"
+                  ]
+               },
+               {
+                  "required": [
+                     "int64Value"
+                  ]
+               },
+               {
+                  "required": [
+                     "doubleValue"
+                  ]
+               },
+               {
+                  "required": [
+                     "boolValue"
+                  ]
+               },
+               {
+                  "required": [
+                     "bytesValue"
+                  ]
+               },
+               {
+                  "required": [
+                     "timestampValue"
+                  ]
+               },
+               {
+                  "required": [
+                     "durationValue"
+                  ]
+               },
+               {
+                  "required": [
+                     "stringMapValue"
+                  ]
+               }
+            ]
+         },
+         "Attributes_StringMap": {
+            "type": "object",
+            "required": [
+               "entries"
+            ],
+            "properties": {
+               "entries": {
+                  "description": "Holds a set of name/value pairs.",
+                  "type": "object",
+                  "additionalProperties": {
+                     "type": "string",
+                     "format": "string"
+                  }
+               }
+            }
+         }
+      }
+   }
+}

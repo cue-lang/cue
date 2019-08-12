@@ -39,6 +39,10 @@ func TestParseDefinitions(t *testing.T) {
 		in, out string
 		config  *Config
 	}{{
+		"structural.cue",
+		"structural.json",
+		resolveRefs,
+	}, {
 		"simple.cue",
 		"simple.json",
 		resolveRefs,
@@ -137,4 +141,28 @@ func TestParseDefinitions(t *testing.T) {
 			}
 		})
 	}
+}
+
+// This is for debugging purposes. Do not remove.
+func TestX(t *testing.T) {
+	t.Skip()
+
+	var r cue.Runtime
+	inst, err := r.Compile("test", `
+	AnyField: "any value"
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	b, err := Gen(inst, &Config{
+		ExpandReferences: true,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	var out = &bytes.Buffer{}
+	_ = json.Indent(out, b, "", "   ")
+	t.Error(out.String())
 }

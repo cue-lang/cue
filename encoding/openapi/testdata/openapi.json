@@ -5,70 +5,61 @@
       "schemas": {
          "MyMessage": {
             "description": "MyMessage is my message.",
-            "allOf": [
-               {
+            "type": "object",
+            "required": [
+               "foo",
+               "bar"
+            ],
+            "properties": {
+               "port": {
                   "type": "object",
+                  "$ref": "#/components/schemas/Port"
+               },
+               "foo": {
+                  "type": "number",
+                  "allOf": [
+                     {
+                        "$ref": "#/components/schemas/Int32"
+                     },
+                     {
+                        "exclusiveMinimum": 10,
+                        "exclusiveMaximum": 1000
+                     }
+                  ]
+               },
+               "bar": {
+                  "type": "array",
+                  "items": {
+                     "type": "string",
+                     "format": "string"
+                  }
+               }
+            },
+            "oneOf": [
+               {
                   "required": [
-                     "foo",
-                     "bar"
+                     "a"
                   ],
                   "properties": {
-                     "port": {
-                        "type": "object",
-                        "$ref": "#/components/schemas/Port"
-                     },
-                     "foo": {
-                        "allOf": [
-                           {
-                              "$ref": "#/components/schemas/Int32"
-                           },
-                           {
-                              "type": "number",
-                              "exclusiveMinimum": 10,
-                              "exclusiveMaximum": 1000
-                           }
+                     "a": {
+                        "description": "Field a.",
+                        "type": "integer",
+                        "enum": [
+                           1
                         ]
-                     },
-                     "bar": {
-                        "type": "array",
-                        "items": {
-                           "type": "string",
-                           "format": "string"
-                        }
                      }
                   }
                },
                {
-                  "type": "object",
-                  "oneOf": [
-                     {
-                        "type": "object",
-                        "required": [
-                           "a"
-                        ],
-                        "properties": {
-                           "a": {
-                              "description": "Field a.",
-                              "type": "integer",
-                              "enum": [
-                                 1
-                              ]
-                           }
-                        }
-                     },
-                     {
-                        "type": "object",
-                        "required": [
-                           "b"
-                        ],
-                        "properties": {
-                           "b": {
-                              "type": "string",
-                              "format": "string"
-                           }
-                        }
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "b": {
+                        "type": "string",
+                        "format": "string"
                      }
-                  ]
+                  }
                }
             ]
          },
@@ -95,9 +86,9 @@
             "format": "int32"
          },
          "YourMessage": {
+            "type": "object",
             "oneOf": [
                {
-                  "type": "object",
                   "required": [
                      "b"
                   ],
@@ -113,7 +104,6 @@
                   }
                },
                {
-                  "type": "object",
                   "required": [
                      "b"
                   ],
@@ -130,11 +120,11 @@
             ]
          },
          "YourMessage2": {
+            "type": "object",
             "allOf": [
                {
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "a"
                         ],
@@ -145,7 +135,6 @@
                         }
                      },
                      {
-                        "type": "object",
                         "required": [
                            "b"
                         ],
@@ -160,7 +149,6 @@
                {
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "c"
                         ],
@@ -171,7 +159,6 @@
                         }
                      },
                      {
-                        "type": "object",
                         "required": [
                            "d"
                         ],
@@ -186,7 +173,6 @@
                {
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "e"
                         ],
@@ -197,7 +183,6 @@
                         }
                      },
                      {
-                        "type": "object",
                         "required": [
                            "f"
                         ],
@@ -212,9 +197,9 @@
             ]
          },
          "Msg2": {
+            "type": "object",
             "oneOf": [
                {
-                  "type": "object",
                   "required": [
                      "b"
                   ],
@@ -225,7 +210,6 @@
                   }
                },
                {
-                  "type": "object",
                   "required": [
                      "a"
                   ],
@@ -239,6 +223,7 @@
             ]
          },
          "Enum": {
+            "type": "string",
             "enum": [
                "foo",
                "bar",
@@ -257,31 +242,25 @@
             ]
          },
          "DefaultStruct": {
-            "allOf": [
+            "type": "object",
+            "default": {
+               "port": 1
+            },
+            "oneOf": [
                {
-                  "oneOf": [
-                     {
-                        "$ref": "#/components/schemas/Port"
-                     },
-                     {
-                        "type": "object",
-                        "required": [
-                           "port"
-                        ],
-                        "properties": {
-                           "port": {
-                              "type": "integer",
-                              "enum": [
-                                 1
-                              ]
-                           }
-                        }
-                     }
-                  ]
+                  "$ref": "#/components/schemas/Port"
                },
                {
-                  "default": {
-                     "port": 1
+                  "required": [
+                     "port"
+                  ],
+                  "properties": {
+                     "port": {
+                        "type": "integer",
+                        "enum": [
+                           1
+                        ]
+                     }
                   }
                }
             ]

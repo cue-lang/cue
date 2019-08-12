@@ -36,6 +36,7 @@ type buildContext struct {
 	path      []string
 
 	expandRefs  bool
+	structural  bool
 	nameFunc    func(inst *cue.Instance, path []string) string
 	descFunc    func(v cue.Value) string
 	fieldFilter *regexp.Regexp
@@ -80,6 +81,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) 
 		inst:         inst,
 		refPrefix:    "components/schemas",
 		expandRefs:   g.ExpandReferences,
+		structural:   g.ExpandReferences,
 		nameFunc:     g.ReferenceFunc,
 		descFunc:     g.DescriptionFunc,
 		schemas:      &OrderedMap{},
@@ -137,7 +139,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) 
 }
 
 func (c *buildContext) build(name string, v cue.Value) *oaSchema {
-	return newRootBuilder(c).schema(name, v)
+	return newCoreBuilder(c).schema(nil, name, v)
 }
 
 // isInternal reports whether or not to include this type.
@@ -168,37 +170,67 @@ func (b *builder) checkArgs(a []cue.Value, n int) {
 	}
 }
 
-func (b *builder) schema(name string, v cue.Value) *oaSchema {
+func (b *builder) schema(core *builder, name string, v cue.Value) *oaSchema {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
 	defer func() { b.ctx.path = oldPath }()
 
-	c := newRootBuilder(b.ctx)
-	c.format = extractFormat(v)
-	isRef := c.value(v, nil)
-	schema := c.finish()
+	var c *builder
+	if core == nil && b.ctx.structural {
+		c = newCoreBuilder(b.ctx)
+		c.buildCore(v)     // initialize core structure
+		c.coreSchema(name) // build the
+	} else {
+		c = newRootBuilder(b.ctx)
+		c.core = core
+	}
 
-	if !isRef {
-		doc := []string{}
-		if b.ctx.descFunc != nil {
-			if str := b.ctx.descFunc(v); str != "" {
-				doc = append(doc, str)
-			}
-		} else {
-			for _, d := range v.Doc() {
-				doc = append(doc, d.Text())
-			}
+	return c.fillSchema(v)
+}
+
+func (b *builder) getDoc(v cue.Value) {
+	doc := []string{}
+	if b.ctx.descFunc != nil {
+		if str := b.ctx.descFunc(v); str != "" {
+			doc = append(doc, str)
 		}
-		if len(doc) > 0 {
-			str := strings.TrimSpace(strings.Join(doc, "\n\n"))
-			schema.Set("description", str)
+	} else {
+		for _, d := range v.Doc() {
+			doc = append(doc, d.Text())
+		}
+	}
+	if len(doc) > 0 {
+		str := strings.TrimSpace(strings.Join(doc, "\n\n"))
+		b.setSingle("description", str, true)
+	}
+}
+
+func (b *builder) fillSchema(v cue.Value) *oaSchema {
+	if b.filled != nil {
+		return b.filled
+	}
+
+	b.setValueType(v)
+	b.format = extractFormat(v)
+
+	if b.core == nil || len(b.core.values) > 1 {
+		isRef := b.value(v, nil)
+		if isRef {
+			b.typ = ""
+		}
+
+		if !isRef && !b.ctx.structural {
+			b.getDoc(v)
 		}
 	}
 
-	simplify(c, schema)
+	schema := b.finish()
+
+	simplify(b, schema)
 
 	sortSchema(schema)
 
+	b.filled = schema
 	return schema
 }
 
@@ -230,6 +262,8 @@ var fieldOrder = map[string]int{
 	"minLength":        16,
 	"maxLength":        15,
 	"items":            14,
+	"enum":             13,
+	"default":          12,
 }
 
 func (b *builder) resolve(v cue.Value) cue.Value {
@@ -302,8 +336,9 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			switch {
 			case isConcrete(v):
 				b.dispatch(f, v)
-				b.set("enum", []interface{}{b.decode(v)})
-
+				if !b.isNonCore() {
+					b.set("enum", []interface{}{b.decode(v)})
+				}
 			default:
 				if a := appendSplit(nil, cue.OrOp, v); len(a) > 1 {
 					b.disjunction(a, f)
@@ -331,7 +366,9 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			}
 			fallthrough
 		default:
-			b.setFilter("Schema", "default", v)
+			if !b.isNonCore() {
+				b.setFilter("Schema", "default", v)
+			}
 		}
 	}
 	return isRef
@@ -418,34 +455,64 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 		if len(disjuncts) == 1 {
 			b.value(disjuncts[0], f)
 		}
-		if len(enums) > 0 {
+		if len(enums) > 0 && !b.isNonCore() {
 			b.set("enum", enums)
 		}
 		if nullable {
-			b.set("nullable", true)
+			b.setSingle("nullable", true, true) // allowed in Structural
 		}
 		return
 	}
 
-	b.addConjunct(func(b *builder) {
-		anyOf := []*oaSchema{}
-		if len(enums) > 0 {
-			anyOf = append(anyOf, b.kv("enum", enums))
-		}
+	anyOf := []*oaSchema{}
+	if len(enums) > 0 {
+		anyOf = append(anyOf, b.kv("enum", enums))
+	}
 
-		for _, v := range disjuncts {
-			c := newOASBuilder(b)
-			c.value(v, f)
-			anyOf = append(anyOf, c.finish())
+	hasEmpty := false
+	for _, v := range disjuncts {
+		c := newOASBuilder(b)
+		c.value(v, f)
+		t := c.finish()
+		if len(t.kvs) == 0 {
+			hasEmpty = true
 		}
+		anyOf = append(anyOf, t)
+	}
 
-		// TODO: analyze CUE structs to figure out if it should be oneOf or
-		// anyOf. As the source is protobuf for now, it is always oneOf.
+	// If any of the types was "any", a oneOf may be discarded.
+	if !hasEmpty {
 		b.set("oneOf", anyOf)
-		if nullable {
-			b.set("nullable", true)
-		}
-	})
+	}
+
+	// TODO: analyze CUE structs to figure out if it should be oneOf or
+	// anyOf. As the source is protobuf for now, it is always oneOf.
+	if nullable {
+		b.setSingle("nullable", true, true)
+	}
+}
+
+func (b *builder) setValueType(v cue.Value) {
+	if b.core != nil {
+		return
+	}
+
+	switch v.IncompleteKind() &^ cue.BottomKind {
+	case cue.BoolKind:
+		b.typ = "boolean"
+	case cue.FloatKind, cue.NumberKind:
+		b.typ = "number"
+	case cue.IntKind:
+		b.typ = "integer"
+	case cue.BytesKind:
+		b.typ = "string"
+	case cue.StringKind:
+		b.typ = "string"
+	case cue.StructKind:
+		b.typ = "object"
+	case cue.ListKind:
+		b.typ = "array"
+	}
 }
 
 func (b *builder) dispatch(f typeFunc, v cue.Value) {
@@ -458,7 +525,7 @@ func (b *builder) dispatch(f typeFunc, v cue.Value) {
 	case cue.NullKind:
 		// TODO: for JSON schema we would set the type here. For OpenAPI,
 		// it must be nullable.
-		b.set("nullable", true)
+		b.setSingle("nullable", true, true)
 
 	case cue.BoolKind:
 		b.setType("boolean", "")
@@ -554,16 +621,36 @@ func (b *builder) object(v cue.Value) {
 		b.setFilter("Schema", "required", required)
 	}
 
-	properties := &OrderedMap{}
-	for i, _ := v.Fields(cue.Optional(true), cue.Hidden(false)); i.Next(); {
-		properties.Set(i.Label(), b.schema(i.Label(), i.Value()))
+	var properties *OrderedMap
+	if b.singleFields != nil {
+		properties = b.singleFields.getMap("properties")
 	}
-	if len(properties.kvs) > 0 {
-		b.set("properties", properties)
+	hasProps := properties != nil
+	if !hasProps {
+		properties = &OrderedMap{}
 	}
 
-	if t, ok := v.Elem(); ok {
-		b.setFilter("Schema", "additionalProperties", b.schema("*", t))
+	for i, _ := v.Fields(cue.Optional(true), cue.Hidden(false)); i.Next(); {
+		label := i.Label()
+		var core *builder
+		if b.core != nil {
+			core = b.core.properties[label]
+		}
+		schema := b.schema(core, label, i.Value())
+		if !b.isNonCore() || len(schema.kvs) > 0 {
+			properties.Set(label, schema)
+		}
+	}
+
+	if !hasProps && len(properties.kvs) > 0 {
+		b.setSingle("properties", properties, false)
+	}
+
+	if t, ok := v.Elem(); ok && (b.core == nil || b.core.items == nil) {
+		schema := b.schema(nil, "*", t)
+		if len(schema.kvs) > 0 {
+			b.setSingle("additionalProperties", schema, true) // Not allowed in structural.
+		}
 	}
 
 	// TODO: maxProperties, minProperties: can be done once we allow cap to
@@ -635,7 +722,7 @@ func (b *builder) array(v cue.Value) {
 	items := []*oaSchema{}
 	count := 0
 	for i, _ := v.List(); i.Next(); count++ {
-		items = append(items, b.schema(strconv.Itoa(count), i.Value()))
+		items = append(items, b.schema(nil, strconv.Itoa(count), i.Value()))
 	}
 	if len(items) > 0 {
 		// TODO: per-item schema are not allowed in OpenAPI, only in JSON Schema.
@@ -661,11 +748,15 @@ func (b *builder) array(v cue.Value) {
 
 	if !hasMax || int64(len(items)) < maxLength {
 		if typ, ok := v.Elem(); ok {
-			t := b.schema("*", typ)
+			var core *builder
+			if b.core != nil {
+				core = b.core.items
+			}
+			t := b.schema(core, "*", typ)
 			if len(items) > 0 {
-				b.setFilter("Schema", "additionalItems", t)
-			} else {
-				b.set("items", t)
+				b.setFilter("Schema", "additionalItems", t) // Not allowed in structural.
+			} else if !b.isNonCore() || len(t.kvs) > 0 {
+				b.setSingle("items", t, true)
 			}
 		}
 	}
@@ -855,12 +946,21 @@ func (b *builder) bytes(v cue.Value) {
 }
 
 type builder struct {
-	ctx     *buildContext
-	typ     string
-	format  string
-	current *oaSchema
-	allOf   []*oaSchema
-	enums   []interface{}
+	ctx          *buildContext
+	typ          string
+	format       string
+	singleFields *oaSchema
+	current      *oaSchema
+	allOf        []*oaSchema
+
+	// Building structural schema
+	core       *builder
+	kind       cue.Kind
+	filled     *oaSchema
+	values     []cue.Value // in structural mode, all values of not and *Of.
+	keys       []string
+	properties map[string]*builder
+	items      *builder
 }
 
 func newRootBuilder(c *buildContext) *builder {
@@ -868,12 +968,21 @@ func newRootBuilder(c *buildContext) *builder {
 }
 
 func newOASBuilder(parent *builder) *builder {
+	core := parent
+	if parent.core != nil {
+		core = parent.core
+	}
 	b := &builder{
+		core:   core,
 		ctx:    parent.ctx,
 		typ:    parent.typ,
 		format: parent.format,
 	}
 	return b
+}
+
+func (b *builder) isNonCore() bool {
+	return b.core != nil
 }
 
 func (b *builder) setType(t, format string) {
@@ -887,8 +996,14 @@ func (b *builder) setType(t, format string) {
 
 func setType(t *oaSchema, b *builder) {
 	if b.typ != "" {
-		t.Set("type", b.typ)
-		if b.format != "" {
+		if b.core == nil || (b.core.typ != b.typ && !b.ctx.structural) {
+			if !t.exists("type") {
+				t.Set("type", b.typ)
+			}
+		}
+	}
+	if b.format != "" {
+		if b.core == nil || b.core.format != b.format {
 			t.Set("format", b.format)
 		}
 	}
@@ -902,11 +1017,23 @@ func (b *builder) setFilter(schema, key string, v interface{}) {
 	b.set(key, v)
 }
 
+// setSingle sets a value of which there should only be one.
+func (b *builder) setSingle(key string, v interface{}, drop bool) {
+	if b.singleFields == nil {
+		b.singleFields = &OrderedMap{}
+	}
+	if b.singleFields.exists(key) {
+		if !drop {
+			b.failf(cue.Value{}, "more than one value added for key %q", key)
+		}
+	}
+	b.singleFields.Set(key, v)
+}
+
 func (b *builder) set(key string, v interface{}) {
 	if b.current == nil {
 		b.current = &OrderedMap{}
 		b.allOf = append(b.allOf, b.current)
-		setType(b.current, b)
 	} else if b.current.exists(key) {
 		b.current = &OrderedMap{}
 		b.allOf = append(b.allOf, b.current)
@@ -916,7 +1043,6 @@ func (b *builder) set(key string, v interface{}) {
 
 func (b *builder) kv(key string, value interface{}) *oaSchema {
 	constraint := &OrderedMap{}
-	setType(constraint, b)
 	constraint.Set(key, value)
 	return constraint
 }
@@ -927,24 +1053,28 @@ func (b *builder) setNot(key string, value interface{}) {
 	b.add(not)
 }
 
-func (b *builder) finish() *oaSchema {
+func (b *builder) finish() (t *oaSchema) {
+	if b.filled != nil {
+		return b.filled
+	}
 	switch len(b.allOf) {
 	case 0:
-		t := &OrderedMap{}
-		if b.typ != "" {
-			setType(t, b)
-		}
-		return t
+		t = &OrderedMap{}
 
 	case 1:
-		setType(b.allOf[0], b)
-		return b.allOf[0]
+		t = b.allOf[0]
 
 	default:
-		t := &OrderedMap{}
+		t = &OrderedMap{}
 		t.Set("allOf", b.allOf)
-		return t
 	}
+	if b.singleFields != nil {
+		b.singleFields.kvs = append(b.singleFields.kvs, t.kvs...)
+		t = b.singleFields
+	}
+	setType(t, b)
+	sortSchema(t)
+	return t
 }
 
 func (b *builder) add(t *oaSchema) {

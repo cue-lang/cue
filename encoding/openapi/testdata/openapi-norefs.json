@@ -8,76 +8,63 @@
       "schemas": {
          "MyMessage": {
             "description": "MyMessage is my message.",
-            "allOf": [
-               {
+            "type": "object",
+            "required": [
+               "foo",
+               "bar"
+            ],
+            "properties": {
+               "port": {
                   "type": "object",
                   "required": [
-                     "foo",
-                     "bar"
+                     "port",
+                     "obj"
                   ],
                   "properties": {
                      "port": {
-                        "type": "object",
-                        "required": [
-                           "port",
-                           "obj"
-                        ],
-                        "properties": {
-                           "port": {
-                              "type": "integer"
-                           },
-                           "obj": {
-                              "type": "array",
-                              "items": {
-                                 "type": "integer"
-                              }
-                           }
-                        }
+                        "type": "integer"
                      },
-                     "foo": {
-                        "type": "number",
-                        "exclusiveMinimum": 10,
-                        "exclusiveMaximum": 1000
-                     },
-                     "bar": {
+                     "obj": {
                         "type": "array",
                         "items": {
-                           "type": "string",
-                           "format": "string"
+                           "type": "integer"
                         }
                      }
                   }
                },
+               "foo": {
+                  "type": "number",
+                  "exclusiveMinimum": 10,
+                  "exclusiveMaximum": 1000
+               },
+               "bar": {
+                  "type": "array",
+                  "items": {
+                     "type": "string",
+                     "format": "string"
+                  }
+               },
+               "a": {
+                  "description": "Field a.",
+                  "type": "integer",
+                  "enum": [
+                     1
+                  ]
+               },
+               "b": {
+                  "type": "string",
+                  "format": "string"
+               }
+            },
+            "oneOf": [
                {
-                  "type": "object",
-                  "oneOf": [
-                     {
-                        "type": "object",
-                        "required": [
-                           "a"
-                        ],
-                        "properties": {
-                           "a": {
-                              "description": "Field a.",
-                              "type": "integer",
-                              "enum": [
-                                 1
-                              ]
-                           }
-                        }
-                     },
-                     {
-                        "type": "object",
-                        "required": [
-                           "b"
-                        ],
-                        "properties": {
-                           "b": {
-                              "type": "string",
-                              "format": "string"
-                           }
-                        }
-                     }
+                  "required": [
+                     "a"
+                  ]
+               },
+               {
+                  "required": [
+                     "b"
                   ]
                }
             ]
@@ -105,150 +92,122 @@
             "format": "int32"
          },
          "YourMessage": {
+            "type": "object",
+            "properties": {
+               "a": {
+                  "type": "string",
+                  "format": "string"
+               },
+               "b": {
+                  "format": "string"
+               }
+            },
             "oneOf": [
                {
-                  "type": "object",
                   "required": [
                      "b"
-                  ],
-                  "properties": {
-                     "a": {
-                        "type": "string",
-                        "format": "string"
-                     },
-                     "b": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
+                  ]
                },
                {
-                  "type": "object",
                   "required": [
                      "b"
-                  ],
-                  "properties": {
-                     "a": {
-                        "type": "string",
-                        "format": "string"
-                     },
-                     "b": {
-                        "type": "number"
-                     }
-                  }
+                  ]
                }
             ]
          },
          "YourMessage2": {
+            "type": "object",
+            "properties": {
+               "a": {
+                  "type": "number"
+               },
+               "c": {
+                  "type": "number"
+               },
+               "e": {
+                  "type": "number"
+               },
+               "f": {
+                  "type": "number"
+               },
+               "d": {
+                  "type": "number"
+               },
+               "b": {
+                  "type": "number"
+               }
+            },
             "allOf": [
                {
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "a"
-                        ],
-                        "properties": {
-                           "a": {
-                              "type": "number"
-                           }
-                        }
+                        ]
                      },
                      {
-                        "type": "object",
                         "required": [
                            "b"
-                        ],
-                        "properties": {
-                           "b": {
-                              "type": "number"
-                           }
-                        }
+                        ]
                      }
                   ]
                },
                {
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "c"
-                        ],
-                        "properties": {
-                           "c": {
-                              "type": "number"
-                           }
-                        }
+                        ]
                      },
                      {
-                        "type": "object",
                         "required": [
                            "d"
-                        ],
-                        "properties": {
-                           "d": {
-                              "type": "number"
-                           }
-                        }
+                        ]
                      }
                   ]
                },
                {
                   "oneOf": [
                      {
-                        "type": "object",
                         "required": [
                            "e"
-                        ],
-                        "properties": {
-                           "e": {
-                              "type": "number"
-                           }
-                        }
+                        ]
                      },
                      {
-                        "type": "object",
                         "required": [
                            "f"
-                        ],
-                        "properties": {
-                           "f": {
-                              "type": "number"
-                           }
-                        }
+                        ]
                      }
                   ]
                }
             ]
          },
          "Msg2": {
+            "type": "object",
+            "properties": {
+               "b": {
+                  "type": "number"
+               },
+               "a": {
+                  "type": "string",
+                  "format": "string"
+               }
+            },
             "oneOf": [
                {
-                  "type": "object",
                   "required": [
                      "b"
-                  ],
-                  "properties": {
-                     "b": {
-                        "type": "number"
-                     }
-                  }
+                  ]
                },
                {
-                  "type": "object",
                   "required": [
                      "a"
-                  ],
-                  "properties": {
-                     "a": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
+                  ]
                }
             ]
          },
          "Enum": {
+            "type": "string",
             "enum": [
                "foo",
                "bar",
@@ -267,47 +226,30 @@
             ]
          },
          "DefaultStruct": {
-            "allOf": [
+            "type": "object",
+            "properties": {
+               "port": {},
+               "obj": {
+                  "type": "array",
+                  "items": {
+                     "type": "integer"
+                  }
+               }
+            },
+            "default": {
+               "port": 1
+            },
+            "oneOf": [
                {
-                  "oneOf": [
-                     {
-                        "type": "object",
-                        "required": [
-                           "port",
-                           "obj"
-                        ],
-                        "properties": {
-                           "port": {
-                              "type": "integer"
-                           },
-                           "obj": {
-                              "type": "array",
-                              "items": {
-                                 "type": "integer"
-                              }
-                           }
-                        }
-                     },
-                     {
-                        "type": "object",
-                        "required": [
-                           "port"
-                        ],
-                        "properties": {
-                           "port": {
-                              "type": "integer",
-                              "enum": [
-                                 1
-                              ]
-                           }
-                        }
-                     }
+                  "required": [
+                     "port",
+                     "obj"
                   ]
                },
                {
-                  "default": {
-                     "port": 1
-                  }
+                  "required": [
+                     "port"
+                  ]
                }
             ]
          }

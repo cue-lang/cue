@@ -8,9 +8,9 @@
       "schemas": {
          "MYSTRING": {
             "description": "Randomly picked description from a set of size one.",
+            "type": "object",
             "oneOf": [
                {
-                  "type": "object",
                   "required": [
                      "exact"
                   ],
@@ -23,7 +23,6 @@
                   }
                },
                {
-                  "type": "object",
                   "required": [
                      "regex"
                   ],

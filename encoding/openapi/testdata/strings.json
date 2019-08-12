@@ -23,7 +23,6 @@
                "myAntiPattern": {
                   "type": "string",
                   "not": {
-                     "type": "string",
                      "pattern": "foo.*bar"
                   }
                }

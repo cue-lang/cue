@@ -10,14 +10,11 @@
          "neq": {
             "type": "number",
             "not": {
-               "type": "number",
                "allOff": [
                   {
-                     "type": "number",
                      "minimum": 4
                   },
                   {
-                     "type": "number",
                      "maximum": 4
                   }
                ]

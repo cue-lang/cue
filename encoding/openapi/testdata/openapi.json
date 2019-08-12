@@ -14,8 +14,8 @@
                   ],
                   "properties": {
                      "port": {
-                        "$ref": "#/components/schemas/Port",
-                        "type": "object"
+                        "type": "object",
+                        "$ref": "#/components/schemas/Port"
                      },
                      "foo": {
                         "allOf": [

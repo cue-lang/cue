@@ -28,7 +28,7 @@ type Generator struct {
 
 	// ReferenceFunc allows users to specify an alternative representation
 	// for references. An empty string tells the generator to expand the type
-	// in place and not generate a schema for that entity, if applicable.
+	// in place and, if applicable, not generate a schema for that entity.
 	ReferenceFunc func(inst *cue.Instance, path []string) string
 
 	// DescriptionFunc allows rewriting a description associated with a certain

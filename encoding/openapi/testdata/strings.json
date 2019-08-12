@@ -21,11 +21,11 @@
                   "pattern": "foo.*bar"
                },
                "myAntiPattern": {
+                  "type": "string",
                   "not": {
                      "type": "string",
                      "pattern": "foo.*bar"
-                  },
-                  "type": "string"
+                  }
                }
             }
          }

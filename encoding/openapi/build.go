@@ -191,13 +191,45 @@ func (b *builder) schema(name string, v cue.Value) *oaSchema {
 		}
 		if len(doc) > 0 {
 			str := strings.TrimSpace(strings.Join(doc, "\n\n"))
-			schema.prepend("description", str)
+			schema.Set("description", str)
 		}
 	}
 
 	simplify(c, schema)
 
+	sortSchema(schema)
+
 	return schema
+}
+
+func sortSchema(s *oaSchema) {
+	sort.Slice(s.kvs, func(i, j int) bool {
+		pi := fieldOrder[s.kvs[i].Key]
+		pj := fieldOrder[s.kvs[j].Key]
+		if pi != pj {
+			return pi > pj
+		}
+		return s.kvs[i].Key < s.kvs[j].Key
+	})
+}
+
+var fieldOrder = map[string]int{
+	"description":      31,
+	"type":             30,
+	"format":           29,
+	"required":         28,
+	"properties":       27,
+	"minProperties":    26,
+	"maxProperties":    25,
+	"minimum":          24,
+	"exclusiveMinimum": 23,
+	"maximum":          22,
+	"exclusiveMaximum": 21,
+	"minItems":         18,
+	"maxItems":         17,
+	"minLength":        16,
+	"maxLength":        15,
+	"items":            14,
 }
 
 func (b *builder) resolve(v cue.Value) cue.Value {

@@ -33,10 +33,6 @@ func (m *OrderedMap) Pairs() []KeyValue {
 	return m.kvs
 }
 
-func (m *OrderedMap) prepend(key string, value interface{}) {
-	m.kvs = append([]KeyValue{{key, value}}, m.kvs...)
-}
-
 // Set sets a key value pair. If a pair with the same key already existed, it
 // will be replaced with the new value. Otherwise, the new value is added to
 // the end.
@@ -66,6 +62,16 @@ func (m *OrderedMap) exists(key string) bool {
 	return false
 }
 
+// exists reports whether a key-value pair exists for the given key.
+func (m *OrderedMap) getMap(key string) *OrderedMap {
+	for _, v := range m.kvs {
+		if v.Key == key {
+			return v.Value.(*OrderedMap)
+		}
+	}
+	return nil
+}
+
 // MarshalJSON implements json.Marshaler.
 func (m *OrderedMap) MarshalJSON() (b []byte, err error) {
 	// This is a pointer receiever to enforce that we only store pointers to
@@ -76,15 +82,15 @@ func (m *OrderedMap) MarshalJSON() (b []byte, err error) {
 		if i > 0 {
 			b = append(b, ",\n"...)
 		}
-		key, err := json.Marshal(v.Key)
-		if je, ok := err.(*json.MarshalerError); ok {
+		key, ferr := json.Marshal(v.Key)
+		if je, ok := ferr.(*json.MarshalerError); ok {
 			return nil, je.Err
 		}
 		b = append(b, key...)
 		b = append(b, ": "...)
 
 		value, jerr := json.Marshal(v.Value)
-		if je, ok := err.(*json.MarshalerError); ok {
+		if je, ok := jerr.(*json.MarshalerError); ok {
 			err = jerr
 			value, _ = json.Marshal(je.Err.Error())
 		}

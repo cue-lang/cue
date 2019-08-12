@@ -86,7 +86,7 @@ func simplifyNumber(t *OrderedMap, format string) string {
 				continue
 			}
 		}
-		pairs[i] = pairs[k]
+		pairs[k] = pairs[i]
 		k++
 	}
 	t.kvs = pairs[:k]

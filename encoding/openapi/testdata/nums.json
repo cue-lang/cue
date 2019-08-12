@@ -8,6 +8,7 @@
             "multipleOf": 5
          },
          "neq": {
+            "type": "number",
             "not": {
                "type": "number",
                "allOff": [
@@ -20,8 +21,7 @@
                      "maximum": 4
                   }
                ]
-            },
-            "type": "number"
+            }
          }
       }
    }

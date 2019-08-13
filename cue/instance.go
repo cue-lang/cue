@@ -15,8 +15,6 @@
 package cue
 
 import (
-	"strings"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -147,11 +145,12 @@ func (inst *Instance) Doc() []*ast.CommentGroup {
 		return nil
 	}
 	for _, f := range inst.inst.Files {
-		if strings.HasPrefix(f.Filename, inst.Dir) {
+		pkg, _, _ := internal.PackageInfo(f)
+		if pkg == nil {
 			continue
 		}
 		var cg *ast.CommentGroup
-		for _, c := range f.Comments() {
+		for _, c := range pkg.Comments() {
 			if c.Position == 0 {
 				cg = c
 			}

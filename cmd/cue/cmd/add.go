@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"github.com/spf13/cobra"
 )
 
@@ -252,9 +253,9 @@ func initFile(cmd *cobra.Command, file string, getBuild func(path string) *build
 		if err != nil {
 			return nil, err
 		}
-		if f.Name != nil {
-			if pkg := flagPackage.String(cmd); pkg != "" && f.Name.Name != pkg {
-				return nil, fmt.Errorf("package mismatch (%s vs %s) for file %s", f.Name.Name, pkg, file)
+		if _, pkgName, _ := internal.PackageInfo(f); pkgName != "" {
+			if pkg := flagPackage.String(cmd); pkg != "" && pkgName != pkg {
+				return nil, fmt.Errorf("package mismatch (%s vs %s) for file %s", pkgName, pkg, file)
 			}
 			todo.build = getBuild(dir)
 		} else {

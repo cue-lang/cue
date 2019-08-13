@@ -403,9 +403,6 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 	}
 
 	f := &ast.File{}
-	if pkg != "" {
-		f.Name = ast.NewIdent(pkg)
-	}
 
 	h := hoister{
 		fields:   map[string]bool{},
@@ -502,6 +499,11 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 			}
 		}
 		f.Decls = append([]ast.Decl{imports}, f.Decls...)
+	}
+
+	if pkg != "" {
+		p := &ast.Package{Name: ast.NewIdent(pkg)}
+		f.Decls = append([]ast.Decl{p}, f.Decls...)
 	}
 
 	if flagList.Bool(cmd) {

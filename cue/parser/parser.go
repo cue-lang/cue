@@ -1319,25 +1319,32 @@ func (p *parser) parseFile() *ast.File {
 	if p.errors != nil {
 		return nil
 	}
+	p.openList()
+
+	var decls []ast.Decl
 
 	// The package clause is not a declaration: it does not appear in any
 	// scope.
-	pos := p.pos
-	var name *ast.Ident
 	if p.tok == token.IDENT && p.lit == "package" {
+		c := p.openComments()
+
+		pos := p.pos
+		var name *ast.Ident
 		p.expect(token.IDENT)
 		name = p.parseIdent()
 		if name.Name == "_" && p.mode&declarationErrorsMode != 0 {
 			p.errf(p.pos, "invalid package name _")
 		}
-		p.expectComma()
-	} else {
-		pos = token.NoPos
-	}
-	c.pos = 3
 
-	p.openList()
-	var decls []ast.Decl
+		pkg := &ast.Package{
+			PackagePos: pos,
+			Name:       name,
+		}
+		decls = append(decls, pkg)
+		p.expectComma()
+		c.closeNode(p, pkg)
+	}
+
 	if p.mode&packageClauseOnlyMode == 0 {
 		// import decls
 		for p.tok == token.IDENT && p.lit == "import" {
@@ -1354,8 +1361,6 @@ func (p *parser) parseFile() *ast.File {
 	p.closeList()
 
 	f := &ast.File{
-		Package: pos,
-		Name:    name,
 		Imports: p.imports,
 		Decls:   decls,
 	}

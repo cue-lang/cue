@@ -112,11 +112,9 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 					default:
 						failf(x.Position, "unexpected ';' in %q", str)
 					}
-					p.file.Name = ast.NewIdent(p.shortPkgName)
 
 				case len(split) == 1:
 					p.shortPkgName = split[0]
-					p.file.Name = ast.NewIdent(p.shortPkgName)
 
 				default:
 					failf(x.Position, "malformed go_package clause %s", str)
@@ -125,6 +123,10 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 				// name.AddComment(comment(x.InlineComment, false))
 			}
 		}
+	}
+
+	if name := p.shortName(); name != "" {
+		p.file.Decls = append(p.file.Decls, &ast.Package{Name: ast.NewIdent(name)})
 	}
 
 	for _, e := range d.Elements {
@@ -137,6 +139,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	}
 
 	imports := &ast.ImportDecl{}
+	importIdx := len(p.file.Decls)
 	p.file.Decls = append(p.file.Decls, imports)
 
 	for _, e := range d.Elements {
@@ -159,7 +162,9 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	}
 
 	if len(imports.Specs) == 0 {
-		p.file.Decls = p.file.Decls[1:]
+		a := p.file.Decls
+		copy(a[importIdx:], a[importIdx+1:])
+		p.file.Decls = a[:len(a)-1]
 	}
 
 	return p, nil
@@ -209,7 +214,6 @@ func (p *protoConverter) shortName() string {
 	if p.shortPkgName == "" && p.protoPkg != "" {
 		split := strings.Split(p.protoPkg, ".")
 		p.shortPkgName = split[len(split)-1]
-		p.file.Name = ast.NewIdent(p.shortPkgName)
 	}
 	return p.shortPkgName
 }

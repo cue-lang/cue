@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package parser
+package format
 
 import (
 	"sort"
@@ -23,45 +23,50 @@ import (
 )
 
 // sortImports sorts runs of consecutive import lines in import blocks in f.
-// It also removes duplicate imports when it is possible to do so without data loss.
-func sortImports(f *ast.File) {
-	for _, d := range f.Decls {
-		d, ok := d.(*ast.ImportDecl)
-		if !ok {
-			// Not an import declaration, so we're done.
-			// Imports are always first.
-			break
-		}
+// It also removes duplicate imports when it is possible to do so without data
+// loss.
+func sortImports(d *ast.ImportDecl) {
+	if !d.Lparen.IsValid() || len(d.Specs) == 0 {
+		// Not a block: sorted by default.
+		return
+	}
 
-		if !d.Lparen.IsValid() {
-			// Not a block: sorted by default.
-			continue
-		}
-
-		// Identify and sort runs of specs on successive lines.
-		i := 0
-		specs := d.Specs[:0]
-		for j, s := range d.Specs {
-			if j > i && s.Pos().Line() > 1+d.Specs[j-1].End().Line() {
-				// j begins a new run. End this one.
-				specs = append(specs, sortSpecs(f, d.Specs[i:j])...)
-				i = j
-			}
-		}
-		specs = append(specs, sortSpecs(f, d.Specs[i:])...)
-		d.Specs = specs
-
-		// Deduping can leave a blank line before the rparen; clean that up.
-		if len(d.Specs) > 0 {
-			lastSpec := d.Specs[len(d.Specs)-1]
-			lastLine := lastSpec.Pos().Line()
-			rParenLine := d.Rparen.Line()
-			for rParenLine > lastLine+1 {
-				rParenLine--
-				d.Rparen.File().MergeLine(rParenLine)
-			}
+	// Identify and sort runs of specs on successive lines.
+	i := 0
+	specs := d.Specs[:0]
+	for j, s := range d.Specs {
+		if j > i && (s.Pos().RelPos() >= token.NewSection || hasDoc(s)) {
+			setRelativePos(s, token.Newline)
+			// j begins a new run. End this one.
+			block := sortSpecs(d.Specs[i:j])
+			specs = append(specs, block...)
+			i = j
 		}
 	}
+	specs = append(specs, sortSpecs(d.Specs[i:])...)
+	setRelativePos(specs[0], token.Newline)
+	d.Specs = specs
+}
+
+func setRelativePos(s *ast.ImportSpec, r token.RelPos) {
+	if hasDoc(s) {
+		return
+	}
+	pos := s.Pos().WithRel(r)
+	if s.Name != nil {
+		s.Name.NamePos = pos
+	} else {
+		s.Path.ValuePos = pos
+	}
+}
+
+func hasDoc(s *ast.ImportSpec) bool {
+	for _, doc := range s.Comments() {
+		if doc.Doc {
+			return true
+		}
+	}
+	return false
 }
 
 func importPath(s *ast.ImportSpec) string {
@@ -107,11 +112,12 @@ type posSpan struct {
 	End   token.Pos
 }
 
-func sortSpecs(f *ast.File, specs []*ast.ImportSpec) []*ast.ImportSpec {
+func sortSpecs(specs []*ast.ImportSpec) []*ast.ImportSpec {
 	// Can't short-circuit here even if specs are already sorted,
 	// since they might yet need deduplication.
 	// A lone import, however, may be safely ignored.
 	if len(specs) <= 1 {
+		setRelativePos(specs[0], token.NewSection)
 		return specs
 	}
 
@@ -134,13 +140,11 @@ func sortSpecs(f *ast.File, specs []*ast.ImportSpec) []*ast.ImportSpec {
 	for i, s := range specs {
 		if i == len(specs)-1 || !collapse(s, specs[i+1]) {
 			deduped = append(deduped, s)
-		} else {
-			p := s.Pos()
-			p.File().MergeLine(p.Line())
 		}
 	}
 	specs = deduped
 
+	setRelativePos(specs[0], token.NewSection)
 	return specs
 }
 

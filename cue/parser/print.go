@@ -41,12 +41,12 @@ func debugStr(x interface{}) (out string) {
 	switch v := x.(type) {
 	case *ast.File:
 		out := ""
-		if v.Name != nil {
-			out += "package "
-			out += debugStr(v.Name)
-			out += ", "
-		}
 		out += debugStr(v.Decls)
+		return out
+
+	case *ast.Package:
+		out := "package "
+		out += debugStr(v.Name)
 		return out
 
 	case *ast.Alias:

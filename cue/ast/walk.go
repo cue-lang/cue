@@ -177,10 +177,10 @@ func walk(v visitor, node Node) {
 
 	// Files and packages
 	case *File:
-		if n.Name != nil {
-			walk(v, n.Name)
-		}
 		walkDeclList(v, n.Decls)
+
+	case *Package:
+		walk(v, n.Name)
 
 	case *ListComprehension:
 		walk(v, n.Expr)

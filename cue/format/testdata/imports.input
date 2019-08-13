@@ -1,0 +1,27 @@
+package foo
+
+import (
+    "cuelang.org/go/foo"
+    "cuelang.org/go/bar"
+    "time"
+)
+
+import (
+    "time"
+
+    // comment f2
+    f2 "cuelang.org/go/foo"
+    f1 "cuelang.org/go/foo"
+)
+
+import (
+    "time"
+
+    same "cuelang.org/go/foo" // comment 2
+    same "cuelang.org/go/foo" // comment 1
+)
+
+
+a: time.time
+b: foo.foo
+c: bar.Bar

@@ -33,6 +33,7 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/packages"
 )
@@ -497,7 +498,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 				return err
 			}
 
-			if f.Name != nil && f.Name.Name == p.Name {
+			if _, pkg, _ := internal.PackageInfo(f); pkg != "" && pkg == p.Name {
 				file := filepath.Base(path)
 				file = file[:len(file)-len(".cue")]
 				file += "_gen.cue"

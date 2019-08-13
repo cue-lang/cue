@@ -149,7 +149,8 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 			}
 		}
 		if i.Name != "" {
-			file.Name = ast.NewIdent(i.Name)
+			pkg := &ast.Package{Name: ast.NewIdent(i.Name)}
+			file.Decls = append([]ast.Decl{pkg}, file.Decls...)
 		}
 
 		b, err := format.Node(file)

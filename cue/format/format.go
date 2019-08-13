@@ -50,6 +50,12 @@ func TabIndent(indent bool) Option {
 	return func(c *config) { c.TabIndent = indent }
 }
 
+// TODO: make public
+// sortImportsOption causes import declarations to be sorted.
+func sortImportsOption() Option {
+	return func(c *config) { c.sortImports = true }
+}
+
 // TODO: other options:
 //
 // const (
@@ -105,7 +111,8 @@ type config struct {
 	Tabwidth  int // default: 4
 	Indent    int // default: 0 (all code is indented at least by this much)
 
-	simplify bool
+	simplify    bool
+	sortImports bool
 }
 
 func newConfig(opt []Option) *config {

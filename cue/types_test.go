@@ -1617,9 +1617,19 @@ func TestValueDoc(t *testing.T) {
 	// Another Foo.
 	Foo: {}
 	`
-	inst := getInstance(t, config)
+	var r Runtime
+	getInst := func(name, body string) *Instance {
+		inst, err := r.Compile("dir/file1.cue", body)
+		if err != nil {
+			t.Fatal(err)
+		}
+		return inst
+	}
+
+	inst := getInst("config", config)
+
 	v1 := inst.Value()
-	v2 := getInstance(t, config2).Value()
+	v2 := getInst("config2", config2).Value()
 	both := v1.Unify(v2)
 
 	testCases := []struct {
@@ -1667,6 +1677,11 @@ comment from bar on field 1
 		val:  v1,
 		path: "baz field2",
 		doc:  "comment from bar on field 2\n",
+	}, {
+		val:  v2,
+		path: "Foo",
+		doc: `Another Foo.
+`,
 	}, {
 		val:  both,
 		path: "Foo",

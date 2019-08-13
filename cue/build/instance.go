@@ -24,6 +24,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // An Instance describes the collection of files, and its imports, necessary
@@ -177,12 +178,7 @@ func (inst *Instance) AddFile(filename string, src interface{}) error {
 // AddSyntax adds the given file to list of files for this instance. The package
 // name of the file must match the package name of the instance.
 func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
-	pkg := ""
-	pos := file.Pos()
-	if file.Name != nil {
-		pkg = file.Name.Name
-		pos = file.Name.Pos()
-	}
+	_, pkg, pos := internal.PackageInfo(file)
 	if !inst.setPkg(pkg) && pkg != inst.PkgName {
 		err := errors.Newf(pos,
 			"package name %q conflicts with previous package name %q",

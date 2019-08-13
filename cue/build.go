@@ -102,9 +102,7 @@ func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
 	if err != nil {
 		return nil, err
 	}
-	if file.Name != nil {
-		p.PkgName = file.Name.Name
-	}
+	_, p.PkgName, _ = internal.PackageInfo(file)
 	return r.complete(p)
 }
 

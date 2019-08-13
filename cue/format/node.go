@@ -85,7 +85,9 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 func (f *formatter) walkSpecList(list []*ast.ImportSpec) {
 	f.before(nil)
 	for _, x := range list {
+		f.before(x)
 		f.importSpec(x)
+		f.after(x)
 	}
 	f.after(nil)
 }
@@ -93,7 +95,9 @@ func (f *formatter) walkSpecList(list []*ast.ImportSpec) {
 func (f *formatter) walkClauseList(list []ast.Clause) {
 	f.before(nil)
 	for _, x := range list {
+		f.before(x)
 		f.clause(x)
+		f.after(x)
 	}
 	f.after(nil)
 }
@@ -111,12 +115,6 @@ func (f *formatter) walkExprList(list []ast.Expr, depth int) {
 
 func (f *formatter) file(file *ast.File) {
 	f.before(file)
-	if file.Name != nil {
-		f.print(file.Package, "package")
-		f.print(blank, file.Name, newsection, nooverride)
-	}
-	f.current.pos = 3
-	f.visitComments(3)
 	f.walkDeclList(file.Decls)
 	f.after(file)
 	f.print(token.EOF)
@@ -222,6 +220,10 @@ func (f *formatter) decl(decl ast.Decl) {
 
 	case *ast.BadDecl:
 		f.print(n.From, "*bad decl*", declcomma)
+
+	case *ast.Package:
+		f.print(n.PackagePos, "package")
+		f.print(blank, n.Name, newsection, nooverride)
 
 	case *ast.ImportDecl:
 		f.print(n.Import, "import")

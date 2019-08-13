@@ -50,6 +50,7 @@ const (
 	rawFormat
 	idempotent
 	simplify
+	sortImps
 )
 
 // format parses src, prints the corresponding AST, verifies the resulting
@@ -60,6 +61,9 @@ func format(src []byte, mode checkMode) ([]byte, error) {
 	opts := []Option{TabIndent(true)}
 	if mode&simplify != 0 {
 		opts = append(opts, Simplify())
+	}
+	if mode&sortImps != 0 {
+		opts = append(opts, sortImportsOption())
 	}
 
 	res, err := Source(src, opts...)
@@ -189,6 +193,7 @@ var data = []entry{
 	{"comments.input", "comments.golden", 0},
 	{"simplify.input", "simplify.golden", simplify},
 	{"expressions.input", "expressions.golden", 0},
+	{"imports.input", "imports.golden", sortImps},
 }
 
 func TestFiles(t *testing.T) {
@@ -235,8 +240,8 @@ func TestBadNodes(t *testing.T) {
 }
 func TestPackage(t *testing.T) {
 	f := &ast.File{
-		Name: ast.NewIdent("foo"),
 		Decls: []ast.Decl{
+			&ast.Package{Name: ast.NewIdent("foo")},
 			&ast.EmbedDecl{
 				Expr: &ast.BasicLit{
 					ValuePos: token.NoSpace.Pos(),
@@ -364,13 +369,13 @@ e2: c*t.z
 }
 
 var decls = []string{
-	`import "fmt"`,
-	"pi = 3.1415\ne = 2.71828\n\nx = pi",
+	"package p\n\n" + `import "fmt"`,
+	"package p\n\n" + "pi = 3.1415\ne = 2.71828\n\nx = pi",
 }
 
 func TestDeclLists(t *testing.T) {
 	for _, src := range decls {
-		file, err := parser.ParseFile("", "package p\n"+src, parser.ParseComments)
+		file, err := parser.ParseFile("", src, parser.ParseComments)
 		if err != nil {
 			panic(err) // error in test
 		}

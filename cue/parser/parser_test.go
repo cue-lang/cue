@@ -255,7 +255,7 @@ func TestParse(t *testing.T) {
 		// file.2
 
 		`,
-		"<[0// foo] [d0// uni] [l3// uniline] [3// file.1 // file.2] package foo, >",
+		"<[0// foo] <[d0// uni] [l3// uniline] [3// file.1 // file.2] package foo>>",
 	}, {
 		"line comments",
 		`// doc
@@ -468,11 +468,6 @@ func TestImports(t *testing.T) {
 			}
 		})
 	}
-}
-
-func labelName(l ast.Label) string {
-	name, _ := ast.LabelName(l)
-	return name
 }
 
 // TestIncompleteSelection ensures that an incomplete selector

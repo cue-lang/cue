@@ -86,7 +86,10 @@ func (*ImportDecl) declNode()        {}
 func (*BadDecl) declNode()           {}
 func (*EmbedDecl) declNode()         {}
 func (*Alias) declNode()             {}
-func (*CommentGroup) declNode()      {}
+
+// Not technically declarations, but appearing at the same level.
+func (*Package) declNode()      {}
+func (*CommentGroup) declNode() {}
 
 // A Label is any prduction that can be used as a LHS label.
 type Label interface {
@@ -599,39 +602,42 @@ func (s *ImportSpec) End() token.Pos {
 	return s.Path.End()
 }
 
-// specNode() ensures that only spec nodes can be assigned to a Spec.
+// A BadDecl node is a placeholder for declarations containing
+// syntax errors for which no correct declaration nodes can be
+// created.
+type BadDecl struct {
+	comments
+	From, To token.Pos // position range of bad declaration
+}
+
+// A ImportDecl node represents a series of import declarations. A valid
+// Lparen position (Lparen.Line > 0) indicates a parenthesized declaration.
+type ImportDecl struct {
+	comments
+	Import token.Pos
+	Lparen token.Pos // position of '(', if any
+	Specs  []*ImportSpec
+	Rparen token.Pos // position of ')', if any
+}
+
+type Spec interface {
+	Node
+	specNode()
+}
+
 func (*ImportSpec) specNode() {}
 
-// A declaration is represented by one of the following declaration nodes.
-type (
-	// A BadDecl node is a placeholder for declarations containing
-	// syntax errors for which no correct declaration nodes can be
-	// created.
-	BadDecl struct {
-		comments
-		From, To token.Pos // position range of bad declaration
-	}
+func (*Package) specNode() {}
 
-	// A ImportDecl node represents a series of import declarations. A valid
-	// Lparen position (Lparen.Line > 0) indicates a parenthesized declaration.
-	ImportDecl struct {
-		comments
-		Import token.Pos
-		Lparen token.Pos // position of '(', if any
-		Specs  []*ImportSpec
-		Rparen token.Pos // position of ')', if any
-	}
-
-	// An EmbedDecl node represents a single expression used as a declaration.
-	// The expressions in this declaration is what will be emitted as
-	// configuration output.
-	//
-	// An EmbedDecl may only appear at the top level.
-	EmbedDecl struct {
-		comments
-		Expr Expr
-	}
-)
+// An EmbedDecl node represents a single expression used as a declaration.
+// The expressions in this declaration is what will be emitted as
+// configuration output.
+//
+// An EmbedDecl may only appear at the top level.
+type EmbedDecl struct {
+	comments
+	Expr Expr
+}
 
 // Pos and End implementations for declaration nodes.
 
@@ -662,19 +668,13 @@ func (d *EmbedDecl) End() token.Pos { return d.Expr.End() }
 type File struct {
 	Filename string
 	comments
-	Package token.Pos // position of "package" pseudo-keyword
-	Name    *Ident    // package names
-	Decls   []Decl    // top-level declarations; or nil
+	Decls []Decl // top-level declarations; or nil
 
-	// TODO: Change Expr to Decl?
 	Imports    []*ImportSpec // imports in this file
 	Unresolved []*Ident      // unresolved identifiers in this file
 }
 
 func (f *File) Pos() token.Pos {
-	if f.Package != token.NoPos {
-		return f.Package
-	}
 	if len(f.Decls) > 0 {
 		return f.Decls[0].Pos()
 	}
@@ -689,8 +689,29 @@ func (f *File) End() token.Pos {
 	if n := len(f.Decls); n > 0 {
 		return f.Decls[n-1].End()
 	}
-	if f.Name != nil {
-		return f.Name.End()
+	return token.NoPos
+}
+
+// A Package represents a package clause.
+type Package struct {
+	comments
+	PackagePos token.Pos // position of "package" pseudo-keyword
+	Name       *Ident    // package name
+}
+
+func (p *Package) Pos() token.Pos {
+	if p.PackagePos != token.NoPos {
+		return p.PackagePos
+	}
+	if p.Name != nil {
+		return p.Name.Pos()
+	}
+	return token.NoPos
+}
+
+func (p *Package) End() token.Pos {
+	if p.Name != nil {
+		return p.Name.End()
 	}
 	return token.NoPos
 }

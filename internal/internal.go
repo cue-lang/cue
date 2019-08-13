@@ -21,6 +21,7 @@ package internal // import "cuelang.org/go/internal"
 
 import (
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 	"github.com/cockroachdb/apd/v2"
 )
 
@@ -81,4 +82,18 @@ func ListEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
 		}
 	}
 	return elts, e
+}
+
+func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
+	for _, d := range f.Decls {
+		switch x := d.(type) {
+		case *ast.CommentGroup:
+		case *ast.Package:
+			if x.Name == nil {
+				break
+			}
+			return x, x.Name.Name, x.Name.Pos()
+		}
+	}
+	return nil, "", f.Pos()
 }

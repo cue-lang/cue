@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // An importMode controls the behavior of the Import method.
@@ -357,10 +358,7 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 		return true
 	}
 
-	pkg := ""
-	if pf.Name != nil {
-		pkg = pf.Name.Name
-	}
+	_, pkg, _ := internal.PackageInfo(pf)
 	if pkg == "" && mode&allowAnonymous == 0 {
 		p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
 		return false // don't mark as added

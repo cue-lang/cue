@@ -123,7 +123,6 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 			// ParseFile API and return a valid (but) empty
 			// *File
 			f = &ast.File{
-				Name: new(ast.Ident),
 				// Scope: NewScope(nil),
 			}
 		}

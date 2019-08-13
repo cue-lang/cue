@@ -2524,6 +2524,7 @@ For example, an instance may be defined as the subset of package files
 belonging to a directory and all its ancestors.
 <!-- jba: OK, that helps a little, but I still don't see what the purpose is. -->
 
+
 ### Import declarations
 
 An import declaration states that the source file containing the declaration
@@ -2535,24 +2536,35 @@ ImportPath that specifies the package to be imported.
 ```
 ImportDecl       = "import" ( ImportSpec | "(" { ImportSpec ";" } ")" ) .
 ImportSpec       = [ PackageName ] ImportPath .
-ImportPath       = `"` { unicode_value } `"` .
+ImportLocation   = { unicode_value } .
+ImportPath       = `"` ImportLocation [ ":" identifier ] `"` .
 ```
 
-The PackageName is used in qualified identifiers to access exported identifiers
-of the package within the importing source file.
+The PackageName is used in qualified identifiers to access
+exported identifiers of the package within the importing source file.
 It is declared in the file block.
-If the PackageName is omitted, it defaults to the identifier specified in the
-package clause of the imported instance.
+It defaults to the identifier specified in the package clause of the imported
+package, which must match either the last path component of ImportLocation
+or the identifier following it.
+
+<!--
+Note: this deviates from the Go spec where there is no such restriction.
+This restriction has the benefit of being to determine the identifiers
+for packages from within the file itself. But for CUE it is has another benefit:
+when using package hiearchies, one is more likely to want to include multiple
+packages within the same directory structure. This mechanism allows
+disambiguation in these cases.
+-->
 
 The interpretation of the ImportPath is implementation-dependent but it is
 typically either the path of a builtin package or a fully qualifying location
-of an instance within a source code repository.
+of a package within a source code repository.
 
-Implementation restriction: An interpreter may restrict ImportPaths to non-empty
-strings using only characters belonging to Unicode's L, M, N, P, and S general
-categories (the Graphic characters without spaces) and may also exclude the
-characters !"#$%&'()*,:;<=>?[\]^`{|} and the Unicode replacement character
-U+FFFD.
+An ImportLocation must be a non-empty strings using only characters belonging
+Unicode's L, M, N, P, and S general categories
+(the Graphic characters without spaces)
+and may not include the characters !"#$%&'()*,:;<=>?[\]^`{|}
+or the Unicode replacement character U+FFFD.
 
 Assume we have package containing the package clause "package math",
 which exports function Sin at the path identified by "lib/math".
@@ -2563,6 +2575,7 @@ that import the package after the various types of import declaration.
 Import declaration          Local name of Sin
 
 import   "lib/math"         math.Sin
+import   "lib/math:math"    math.Sin
 import m "lib/math"         m.Sin
 ```
 

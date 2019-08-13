@@ -908,23 +908,21 @@ functions for which an unusual loss of precision must be explicitly documented.
 
 ### Strings
 
-The _string type_ represents the set of all possible UTF-8 strings,
+The _string type_ represents the set of UTF-8 strings,
 not allowing surrogates.
 The predeclared string type is `string`; it is a defined type.
 
-Strings are designed to be unicode-safe.
-Comparison is done using canonical forms ("é" == "e\u0301").
-A string element is an
-[extended grapheme cluster](https://unicode.org/reports/tr29/#Grapheme_Cluster_Boundaries),
-which is an approximation of a human-readable character.
-
 The length of a string `s` (its size in bytes) can be discovered using
 the built-in function len.
-A string's extended grapheme cluster can be accessed by integer index
-0 through len(s)-1 for any byte that is part of that grapheme cluster.
 
-To access the individual bytes of a string one should convert it to
-a sequence of bytes first.
+
+### Bytes
+
+The _bytes type_ represents the set of byte sequences.
+A byte sequence value is a (possibly empty) sequence of bytes.
+The number of bytes is called the length of the byte sequence
+and is never negative.
+The predeclared byte sequence type is `bytes`; it is a defined type.
 
 
 ### Bounds
@@ -1295,7 +1293,7 @@ bool      All boolean values
 int       All integral numbers
 float     All decimal floating-point numbers
 string    Any valid UTF-8 sequence
-bytes     Any vallid byte sequence
+bytes     Any valid byte sequence
 
 Derived   Value
 number    int | float
@@ -1576,13 +1574,13 @@ A primary expression of the form
 a[x]
 ```
 
-denotes the element of the list, string, bytes, or struct `a` indexed by `x`.
+denotes the element of a list or struct `a` indexed by `x`.
 The value `x` is called the index or field name, respectively.
 The following rules apply:
 
 If `a` is not a struct:
 
-- `a` is a concrete string or bytes type or a list (which need not be complete)
+- `a` is a list (which need not be complete)
 - the index `x` unified with `int` must be concrete.
 - the index `x` is in range if `0 <= x < len(a)`, where only the
   explicitly defined values of an open-ended list are considered,
@@ -1590,16 +1588,11 @@ If `a` is not a struct:
 
 The result of `a[x]` is
 
-for `a` of list or bytes type:
+for `a` of list type:
 
-- the list or byte element at index `x`, if `x` is within range
+- the list element at index `x`, if `x` is within range
 - bottom (an error), otherwise
 
-for `a` of string type:
-
-- the grapheme cluster at the `x`th byte (type string), if `x` is within range
-  where `x` may match any byte of the grapheme cluster
-- bottom (an error), otherwise
 
 for `a` of struct type:
 
@@ -1612,12 +1605,6 @@ for `a` of struct type:
 [ 1, 2 ][1]     // 2
 [ 1, 2 ][2]     // _|_
 [ 1, 2, ...][2] // _|_
-"He\u0300?"[0]  // "H"
-"He\u0300?"[1]  // "e\u0300"
-"He\u0300?"[2]  // "e\u0300"
-"He\u0300?"[3]  // "e\u0300"
-"He\u0300?"[4]  // "?"
-"He\u0300?"[5]  // _|_
 ```
 
 Both the operand and index value may be a value-default pair.
@@ -1636,17 +1623,29 @@ i: int | *1             (int, 1)
 v: x[i]                 (x[i], 4)
 ```
 
+
 ### Slice expressions
 
-Slice expressions construct a substring or slice from a string, bytes,
-or list value.
+<!-- TODO: consider removing slices alltogether
+Slice is or marginal utility in CUE. Also, it may be that we will use
+other notations to achieve the same.
 
-For strings, bytes or lists, the primary expression
+For now it seems saver to remove and provide slicing as builtins instead:
+
+    list.Slice()
+    strings.Runes().Slice()      // slice by rune
+    strings.Characters().Slice() // slice by character
+    bytes.Slice()                // slice by bytes
+-->
+
+Slice expressions construct a slice from a list value.
+
+The primary expression
 ```
 a[low : high]
 ```
-constructs a substring or slice. The indices `low` and `high` must be
-concrete integers and select
+constructs a slice.
+The indices `low` and `high` must be concrete integers and select
 which elements of operand `a` appear in the result.
 The result has indices starting at 0 and length equal to `high` - `low`.
 After slicing the list `a`
@@ -1677,20 +1676,6 @@ a[:]   // same as a[0 : len(a)]
 
 Indices are in range if `0 <= low <= high <= len(a)`,
 otherwise they are out of range.
-For strings, the indices selects the start of the extended grapheme cluster
-at byte position indicated by the index.
-If any of the slice values is out of range or if `low > high`, the result of
-a slice is bottom (error).
-
-```
-"He\u0300?"[:2]  // "He\u0300"
-"He\u0300?"[1:2] // "e\u0300"
-"He\u0300?"[4:5] // "e\u0300?"
-```
-
-
-The result of a successful slice operation is a value of the same type
-as the operand.
 
 Both the slice operand and the slice indices may be associated with a default.
 
@@ -1706,6 +1691,7 @@ va[(vs, ds):(ve, de)]          =>  (va[vs:ve], va[ds:de])
 (va, da)[(vs, ds):(ve, de)]    =>  (va[vs:ve], da[ds:de])
 ```
 -->
+
 
 ### Operators
 
@@ -1957,8 +1943,7 @@ These terms and the result of the comparisons are defined as follows:
 - Floating-point values are comparable and ordered, as per the definitions
   for binary coded decimals in the IEEE-754-2008 standard.
 - Floating point numbers may be compared with integers.
-- String values are comparable and ordered, lexically byte-wise after
-  normalization to Unicode normal form NFC.
+- String and bytes values are comparable and ordered lexically byte-wise.
 - Struct are not comparable.
 - Lists are not comparable.
 - The regular expression syntax is the one accepted by RE2,

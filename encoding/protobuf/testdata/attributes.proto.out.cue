@@ -14,7 +14,11 @@
 //  limitations under the License.
 package v1
 
-import "time"
+import (
+	"googleapis.com/acme/test"
+	"googleapis.com/acme/test/test"
+	"time"
+)
 
 StructWrap: {
 	struct?:    {}     @protobuf(1,type=google.protobuf.Struct)
@@ -42,24 +46,6 @@ StructWrap: {
 //  target.service: example
 //  ```
 // 
-//  A given Istio deployment has a fixed vocabulary of attributes that it understands.
-//  The specific vocabulary is determined by the set of attribute producers being used
-//  in the deployment. The primary attribute producer in Istio is Envoy, although
-//  specialized Mixer adapters and services can also generate attributes.
-// 
-//  The common baseline set of attributes available in most Istio deployments is defined
-//  [here](https://istio.io/docs/reference/config/policy-and-telemetry/attribute-vocabulary/).
-// 
-//  Attributes are strongly typed. The supported attribute types are defined by
-//  [ValueType](https://github.com/istio/api/blob/master/policy/v1beta1/value_type.proto).
-//  Each type of value is encoded into one of the so-called transport types present
-//  in this message.
-// 
-//  Defines a map of attributes in uncompressed format.
-//  Following places may use this message:
-//  1) Configure Istio/Proxy with static per-proxy attributes, such as source.uid.
-//  2) Service IDL definition to extract api attributes for active requests.
-//  3) Forward attributes from client proxy to server proxy for HTTP requests.
 Attributes: {
 	//  A map of attribute name to its value.
 	attributes: {
@@ -95,6 +81,10 @@ Attributes_AttributeValue: {
 } | {
 	//  Used for values of type STRING_MAP
 	stringMapValue: Attributes_StringMap @protobuf(9,type=StringMap,name=string_map_value)
+} | {
+	testValue: test.Test @protobuf(10,type=acme.test.Test,name=test_value)
+} | {
+	testValue: test_test.AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
 }
 
 //  Defines a string map.

@@ -101,16 +101,26 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 					failf(x.Position, "unquoting package filed: %v", err)
 				}
 				split := strings.Split(str, ";")
-				p.goPkgPath = split[0]
-				switch len(split) {
-				case 1:
-					p.goPkg = path.Base(str)
-				case 2:
-					p.goPkg = split[1]
+				switch {
+				case strings.Contains(split[0], "."):
+					p.cuePkgPath = split[0]
+					switch len(split) {
+					case 1:
+						p.shortPkgName = path.Base(str)
+					case 2:
+						p.shortPkgName = split[1]
+					default:
+						failf(x.Position, "unexpected ';' in %q", str)
+					}
+					p.file.Name = ast.NewIdent(p.shortPkgName)
+
+				case len(split) == 1:
+					p.shortPkgName = split[0]
+					p.file.Name = ast.NewIdent(p.shortPkgName)
+
 				default:
-					failf(x.Position, "unexpected ';' in %q", str)
+					failf(x.Position, "malformed go_package clause %s", str)
 				}
-				p.file.Name = ast.NewIdent(p.goPkg)
 				// name.AddComment(comment(x.Comment, true))
 				// name.AddComment(comment(x.InlineComment, false))
 			}
@@ -163,10 +173,10 @@ type protoConverter struct {
 
 	proto3 bool
 
-	id        string
-	protoPkg  string
-	goPkg     string
-	goPkgPath string
+	id           string
+	protoPkg     string
+	shortPkgName string
+	cuePkgPath   string
 
 	// w bytes.Buffer
 	file   *ast.File
@@ -185,6 +195,23 @@ type mapping struct {
 	ref   string
 	alias string // alias for the type, if exists.
 	pkg   *protoConverter
+}
+
+func (p *protoConverter) importPath() string {
+	if p.cuePkgPath == "" && p.protoPkg != "" {
+		dir := strings.Replace(p.protoPkg, ".", "/", -1)
+		p.cuePkgPath = path.Join("googleapis.com", dir)
+	}
+	return p.cuePkgPath
+}
+
+func (p *protoConverter) shortName() string {
+	if p.shortPkgName == "" && p.protoPkg != "" {
+		split := strings.Split(p.protoPkg, ".")
+		p.shortPkgName = split[len(split)-1]
+		p.file.Name = ast.NewIdent(p.shortPkgName)
+	}
+	return p.shortPkgName
 }
 
 func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
@@ -297,7 +324,7 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 		}
 		if m, ok := p.scope[0][name[:i]]; ok {
 			if m.pkg != nil {
-				p.imported[m.pkg.goPkgPath] = true
+				p.imported[m.pkg.importPath()] = true
 				// TODO: do something more principled.
 			}
 			cueName := strings.Replace(name[i:], ".", "_", -1)
@@ -340,8 +367,8 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 	}
 
 	prefix := ""
-	if imp.goPkgPath != p.goPkgPath {
-		prefix = imp.goPkg + "."
+	if imp.importPath() != p.importPath() {
+		prefix = imp.shortName() + "."
 	}
 
 	pkgNamespace := strings.Split(imp.protoPkg, ".")
@@ -354,7 +381,7 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 			}
 			if _, ok := p.scope[0][ref]; !ok {
 				pkg := imp
-				if imp.goPkgPath == p.goPkgPath {
+				if imp.importPath() == p.importPath() {
 					pkg = nil
 				}
 				p.scope[0][ref] = mapping{prefix + k, "", pkg}

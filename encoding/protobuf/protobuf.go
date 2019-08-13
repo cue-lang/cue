@@ -16,8 +16,24 @@
 // definitions and instances.
 //
 // Proto definition mapping follows the guidelines of mapping Proto to JSON as
-// discussed in https://developers.google.com/protocol-buffers/docs/proto3,
-// and carries some of the mapping further when possible with CUE.
+// discussed in https://developers.google.com/protocol-buffers/docs/proto3, and
+// carries some of the mapping further when possible with CUE.
+//
+//
+// Package Paths
+//
+// If a .proto file contains a go_package directive, it will be used as the
+// destination package fo the generated .cue files. A common use case is to
+// generate the CUE in the same directory as the .proto definition. If a
+// destination package is not within the current CUE module, it will be written
+// relative to the pkg directory.
+//
+// If a .proto file does not specify go_package, it will convert a proto package
+// "google.parent.sub" to the import path "googleapis.com/google/parent/sub".
+// It is safe to mix package with and without a go_package within the same
+// project.
+//
+// Type Mappings
 //
 // The following type mappings of defintions apply:
 //
@@ -49,8 +65,8 @@
 //   Timestamp      time.Time        See struct.proto.
 //   Duration       time.Duration    See struct.proto.
 //
-// Protobuf definitions can be annotated with CUE constraints that are
-// included in the generated CUE:
+// Protobuf definitions can be annotated with CUE constraints that are included
+// in the generated CUE:
 //    (cue.val)     string        CUE expression defining a constraint for this
 //                                field. The string may refer to other fields
 //                                in a message definition using their JSON name.
@@ -286,10 +302,10 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	if b.errs != nil {
 		return nil
 	}
-	importPath := p.goPkgPath
+	importPath := p.importPath()
 	if importPath == "" {
 		err := errors.Newf(token.NoPos,
-			"no go_package for proto package %q in file %s", p.id, p.file.Filename)
+			"no package clause for proto package %q in file %s", p.id, p.file.Filename)
 		b.errs = errors.Append(b.errs, err)
 		// TODO: find an alternative. Is proto package good enough?
 		return nil
@@ -320,7 +336,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 			Root:        b.root,
 			Dir:         dir,
 			ImportPath:  importPath,
-			PkgName:     p.goPkg,
+			PkgName:     p.shortPkgName,
 			DisplayPath: p.protoPkg,
 		}
 		b.imports[importPath] = inst

@@ -53,8 +53,8 @@ func (p *protoConverter) setBuiltin(from, to string, pkg *protoConverter) {
 }
 
 var (
-	pkgTime   = &protoConverter{goPkgPath: "time"}
-	pkgStruct = &protoConverter{goPkgPath: "struct"}
+	pkgTime   = &protoConverter{cuePkgPath: "time"}
+	pkgStruct = &protoConverter{cuePkgPath: "struct"}
 )
 
 func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, required bool) (generate bool) {

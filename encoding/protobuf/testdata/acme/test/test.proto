@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+package acme.test.test;
+
+// Override the short name only of this package. This notation is seen in some
+// gogoproto files.
+option go_package = "test_test"
+
+message AnotherTest {
+  int32 test = 1;
+}

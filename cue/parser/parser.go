@@ -1242,11 +1242,7 @@ func (p *parser) parseImportSpec(_ int) *ast.ImportSpec {
 	c := p.openComments()
 
 	var ident *ast.Ident
-	switch p.tok {
-	case token.PERIOD:
-		ident = &ast.Ident{NamePos: p.pos, Name: "."}
-		p.next()
-	case token.IDENT:
+	if p.tok == token.IDENT {
 		ident = p.parseIdent()
 	}
 

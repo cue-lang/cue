@@ -2534,7 +2534,7 @@ ImportPath that specifies the package to be imported.
 
 ```
 ImportDecl       = "import" ( ImportSpec | "(" { ImportSpec ";" } ")" ) .
-ImportSpec       = [ "." | PackageName ] ImportPath .
+ImportSpec       = [ PackageName ] ImportPath .
 ImportPath       = `"` { unicode_value } `"` .
 ```
 
@@ -2543,12 +2543,6 @@ of the package within the importing source file.
 It is declared in the file block.
 If the PackageName is omitted, it defaults to the identifier specified in the
 package clause of the imported instance.
-If an explicit period (.) appears instead of a name, all the instances's
-exported identifiers declared in that instances's package block will be declared
-in the importing source file's file block
-and must be accessed without a qualifier. 
-<!-- jba: Can you omit this feature? It's likely to only decrease readability,
-as we know from Go. -->
 
 The interpretation of the ImportPath is implementation-dependent but it is
 typically either the path of a builtin package or a fully qualifying location
@@ -2570,7 +2564,6 @@ Import declaration          Local name of Sin
 
 import   "lib/math"         math.Sin
 import m "lib/math"         m.Sin
-import . "lib/math"         Sin
 ```
 
 An import declaration declares a dependency relation between the importing and

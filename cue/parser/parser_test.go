@@ -101,19 +101,17 @@ func TestParse(t *testing.T) {
 		import (
 			a "foo"
 			"bar/baz"
-			. "model"
 		)
 		`,
-		`package k8s, import ( a "foo", "bar/baz", . "model" )`,
+		`package k8s, import ( a "foo", "bar/baz" )`,
 	}, {
 		"imports single",
 		`package k8s
 
 		import a "foo"
 		import "bar/baz"
-		import . "model"
 			`,
-		`package k8s, import a "foo", import "bar/baz", import . "model"`,
+		`package k8s, import a "foo", import "bar/baz"`,
 	}, {
 		"collapsed fields",
 		`a b c: 1

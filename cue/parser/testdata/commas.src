@@ -18,7 +18,7 @@ package foo
 
 import "path/to/pkg"
 import name "path/to/pkg"
-import . "path/to/pkg"
+import . /* ERROR "expected 'STRING', found '.' " */
 import      /* ERROR "expected 'STRING', found newline" */
 import err  /* ERROR "expected 'STRING', found newline" */
 

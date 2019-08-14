@@ -438,7 +438,7 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 
 				case diff == 2:
 					if k&floatKind == 0 && x.op == opGtr && y.op == opLss {
-						apd.BaseContext.Add(&d, d.SetInt64(1), &a.v)
+						_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &a.v)
 						n := *a
 						n.k = k
 						n.v = d
@@ -902,22 +902,37 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
 			return cmpTonode(src, op, x.v.Cmp(&y.v))
 		case opAdd:
-			ctx.Add(&n.v, &x.v, &y.v)
+			_, _ = ctx.Add(&n.v, &x.v, &y.v)
 		case opSub:
-			ctx.Sub(&n.v, &x.v, &y.v)
+			_, _ = ctx.Sub(&n.v, &x.v, &y.v)
 		case opMul:
-			ctx.Mul(&n.v, &x.v, &y.v)
+			_, _ = ctx.Mul(&n.v, &x.v, &y.v)
 		case opQuo:
-			ctx.Quo(&n.v, &x.v, &y.v)
-			ctx.Reduce(&n.v, &n.v)
+			cond, _ := ctx.Quo(&n.v, &x.v, &y.v)
+			if cond.DivisionByZero() {
+				return ctx.mkErr(src, "divide by zero")
+			}
+			_, _, _ = ctx.Reduce(&n.v, &n.v)
 			n.k = floatKind
 		case opIDiv:
+			if y.v.IsZero() {
+				return ctx.mkErr(src, "divide by zero")
+			}
 			intOp(ctx, n, (*big.Int).Div, x, y)
 		case opIMod:
+			if y.v.IsZero() {
+				return ctx.mkErr(src, "divide by zero")
+			}
 			intOp(ctx, n, (*big.Int).Mod, x, y)
 		case opIQuo:
+			if y.v.IsZero() {
+				return ctx.mkErr(src, "divide by zero")
+			}
 			intOp(ctx, n, (*big.Int).Quo, x, y)
 		case opIRem:
+			if y.v.IsZero() {
+				return ctx.mkErr(src, "divide by zero")
+			}
 			intOp(ctx, n, (*big.Int).Rem, x, y)
 		}
 		return n
@@ -938,11 +953,11 @@ type intFunc func(z, x, y *big.Int) *big.Int
 
 func intOp(ctx *context, n *numLit, fn intFunc, a, b *numLit) {
 	var x, y apd.Decimal
-	ctx.RoundToIntegralValue(&x, &a.v)
+	_, _ = ctx.RoundToIntegralValue(&x, &a.v)
 	if x.Negative {
 		x.Coeff.Neg(&x.Coeff)
 	}
-	ctx.RoundToIntegralValue(&y, &b.v)
+	_, _ = ctx.RoundToIntegralValue(&y, &b.v)
 	if y.Negative {
 		y.Coeff.Neg(&y.Coeff)
 	}
@@ -990,7 +1005,8 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 			}
 			n.v.SetInt64(int64(x.d))
 			d := apd.New(int64(y.d), 0)
-			ctx.Quo(&n.v, &n.v, d)
+			// TODO: check result if this code becomes undead.
+			_, _ = ctx.Quo(&n.v, &n.v, d)
 			return n
 		case opIRem:
 			n := &numLit{

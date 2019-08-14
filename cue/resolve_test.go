@@ -136,6 +136,7 @@ func TestBasicRewrite(t *testing.T) {
 			sum: -1 + +2        // 1
 			div1: 2.0 / 3 * 6   // 4
 			div2: 2 / 3 * 6     // 4
+			divZero: 1.0 / 0
 			b: 1 != 4
 
 			v1: 1.0T/2.0
@@ -158,6 +159,7 @@ func TestBasicRewrite(t *testing.T) {
 			`sum: 1, ` +
 			`div1: 4.00000000000000000000000, ` +
 			`div2: 4.00000000000000000000000, ` +
+			`divZero: _|_((1.0 / 0):divide by zero), ` +
 			`b: true, ` +
 			`v1: 5e+11, ` +
 			`v2: true, ` +

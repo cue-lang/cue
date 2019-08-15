@@ -378,9 +378,9 @@ func (p *parser) errorExpected(pos token.Pos, obj string) {
 	}
 
 	if p.tok.IsLiteral() {
-		p.errf(pos, "expected %s, found '%s'", obj, p.tok)
-	} else {
 		p.errf(pos, "expected %s, found '%s' %s", obj, p.tok, p.lit)
+	} else {
+		p.errf(pos, "expected %s, found '%s'", obj, p.tok)
 	}
 }
 

@@ -179,7 +179,7 @@ func TestConvertType(t *testing.T) {
 		struct {
 			A int `cue:"<"` // invalid
 		}{},
-		"_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF' )",
+		"_|_(invalid tag \"<\" for field \"A\": expected operand, found 'EOF')",
 	}, {
 		struct {
 			A int `json:"-"` // skip

@@ -563,7 +563,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			open = true
 		}
 		if !ok || ln > len(x.elem.arcs) {
-			list.Type = p.expr(x.typ)
+			list.Elts = append(list.Elts, &ast.Ellipsis{Type: p.expr(x.typ)})
 			if !open && !isTop(x.typ) {
 				expr = &ast.BinaryExpr{
 					X: &ast.BinaryExpr{

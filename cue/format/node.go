@@ -457,18 +457,16 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 	case *ast.ListLit:
 		f.print(x.Lbrack, token.LBRACK, indent)
 		f.walkExprList(x.Elts, 1)
-		if x.Ellipsis != token.NoPos || x.Type != nil {
-			f.print(x.Ellipsis, token.ELLIPSIS)
-			if x.Type != nil && !isTop(x.Type) {
-				f.expr(x.Type)
-			}
-		} else {
-			f.print(trailcomma, noblank)
-			f.current.pos += 2
-			f.visitComments(f.current.pos)
-		}
+		f.print(trailcomma, noblank)
+		f.visitComments(f.current.pos)
 		f.matchUnindent()
 		f.print(noblank, x.Rbrack, token.RBRACK)
+
+	case *ast.Ellipsis:
+		f.print(x.Ellipsis, token.ELLIPSIS)
+		if x.Type != nil && !isTop(x.Type) {
+			f.expr(x.Type)
+		}
 
 	case *ast.ListComprehension:
 		f.print(x.Lbrack, token.LBRACK, blank, indent)

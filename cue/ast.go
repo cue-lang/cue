@@ -248,21 +248,27 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			object:   v.object,
 			parent:   v,
 		}
+
+		elts, ellipsis := internal.ListEllipsis(n)
+
 		arcs := []arc{}
-		for i, e := range n.Elts {
+		for i, e := range elts {
 			v1.sel = strconv.Itoa(i)
 			arcs = append(arcs, arc{feature: label(i), v: v1.walk(e)})
 		}
 		s := &structLit{baseValue: newExpr(n), arcs: arcs}
 		list := &list{baseValue: newExpr(n), elem: s}
 		list.initLit()
-		if n.Ellipsis != token.NoPos || n.Type != nil {
+		if ellipsis != nil {
 			list.len = newBound(v.ctx(), list.baseValue, opGeq, intKind, list.len)
-			if n.Type != nil {
-				list.typ = v1.walk(n.Type)
+			if ellipsis.Type != nil {
+				list.typ = v1.walk(ellipsis.Type)
 			}
 		}
 		ret = list
+
+	case *ast.Ellipsis:
+		return v.errf(n, "ellipsis (...) only allowed at end of list")
 
 	case *ast.ComprehensionDecl:
 		yielder := &yield{baseValue: newExpr(n.Field.Value)}

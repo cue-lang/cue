@@ -208,8 +208,9 @@ func (t *trimSet) markNodes(n ast.Node) {
 			}
 
 		case *ast.ListLit:
-			if x.Type != nil {
-				t.markAlwaysGen(x.Type, false)
+			_, e := internal.ListEllipsis(x)
+			if e != nil && e.Type != nil {
+				t.markAlwaysGen(e.Type, false)
 			}
 
 		case *ast.Field:

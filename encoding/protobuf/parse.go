@@ -509,9 +509,8 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 		if x.Repeated {
 			f.Value = &ast.ListLit{
-				Lbrack:   p.toCUEPos(x.Position),
-				Ellipsis: token.NoSpace.Pos(),
-				Type:     f.Value,
+				Lbrack: p.toCUEPos(x.Position),
+				Elts:   []ast.Expr{&ast.Ellipsis{Type: f.Value}},
 			}
 		}
 

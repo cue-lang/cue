@@ -61,6 +61,7 @@ func (*BasicLit) exprNode()      {}
 func (*Interpolation) exprNode() {}
 func (*StructLit) exprNode()     {}
 func (*ListLit) exprNode()       {}
+func (*Ellipsis) exprNode()      {}
 
 // func (*StructComprehension) exprNode() {}
 func (*ListComprehension) exprNode() {}
@@ -392,11 +393,15 @@ type StructLit struct {
 // A ListLit node represents a literal list.
 type ListLit struct {
 	comments
-	Lbrack   token.Pos // position of "["
-	Elts     []Expr    // list of composite elements; or nil
+	Lbrack token.Pos // position of "["
+	Elts   []Expr    // list of composite elements; or nil
+	Rbrack token.Pos // position of "]"
+}
+
+type Ellipsis struct {
+	comments
 	Ellipsis token.Pos // open list if set
 	Type     Expr      // type for the remaining elements
-	Rbrack   token.Pos // position of "]"
 }
 
 // A ListComprehension node represents as list comprehension.
@@ -501,6 +506,7 @@ func (x *StructLit) Pos() token.Pos {
 }
 
 func (x *ListLit) Pos() token.Pos           { return x.Lbrack }
+func (x *Ellipsis) Pos() token.Pos          { return x.Ellipsis }
 func (x *ListComprehension) Pos() token.Pos { return x.Lbrack }
 func (x *ForClause) Pos() token.Pos         { return x.For }
 func (x *IfClause) Pos() token.Pos          { return x.If }
@@ -527,7 +533,13 @@ func (x *StructLit) End() token.Pos {
 	}
 	return x.Rbrace.Add(1)
 }
-func (x *ListLit) End() token.Pos           { return x.Rbrack.Add(1) }
+func (x *ListLit) End() token.Pos { return x.Rbrack.Add(1) }
+func (x *Ellipsis) End() token.Pos {
+	if x.Type != nil {
+		return x.Type.End()
+	}
+	return x.Ellipsis.Add(3) // len("...")
+}
 func (x *ListComprehension) End() token.Pos { return x.Rbrack }
 func (x *ForClause) End() token.Pos         { return x.Source.End() }
 func (x *IfClause) End() token.Pos          { return x.Condition.End() }

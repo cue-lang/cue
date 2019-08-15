@@ -19,7 +19,10 @@ package internal // import "cuelang.org/go/internal"
 
 // TODO: refactor packages as to make this package unnecessary.
 
-import "github.com/cockroachdb/apd/v2"
+import (
+	"cuelang.org/go/cue/ast"
+	"github.com/cockroachdb/apd/v2"
+)
 
 // A Decimal is an arbitrary-precision binary-coded decimal number.
 //
@@ -64,3 +67,18 @@ var GetRuntime func(instance interface{}) interface{}
 // if it does not, and returns a forked runtime that will discard additional
 // keys.
 var CheckAndForkRuntime func(runtime, value interface{}) interface{}
+
+// ListEllipsis reports the list type and remaining elements of a list. If we
+// ever relax the usage of ellipsis, this function will likely change. Using
+// this function will ensure keeping correct behavior or causing a compiler
+// failure.
+func ListEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
+	elts = n.Elts
+	if n := len(elts); n > 0 {
+		var ok bool
+		if e, ok = elts[n-1].(*ast.Ellipsis); ok {
+			elts = elts[:n-1]
+		}
+	}
+	return elts, e
+}

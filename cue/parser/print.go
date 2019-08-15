@@ -97,16 +97,14 @@ func debugStr(x interface{}) (out string) {
 	case *ast.ListLit:
 		out := "["
 		out += debugStr(v.Elts)
-		if v.Ellipsis != token.NoPos || v.Type != nil {
-			if out != "[" {
-				out += ", "
-			}
-			out += "..."
-			if v.Type != nil {
-				out += debugStr(v.Type)
-			}
-		}
 		out += "]"
+		return out
+
+	case *ast.Ellipsis:
+		out := "..."
+		if v.Type != nil {
+			out += debugStr(v.Type)
+		}
 		return out
 
 	case *ast.ListComprehension:

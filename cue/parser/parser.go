@@ -960,13 +960,14 @@ func (p *parser) parseList() (expr ast.Expr) {
 		}
 	}
 
-	ellipsis := token.NoPos
-	typ := ast.Expr(nil)
 	if p.tok == token.ELLIPSIS {
-		ellipsis = p.pos
+		ellipsis := &ast.Ellipsis{
+			Ellipsis: p.pos,
+		}
+		elts = append(elts, ellipsis)
 		p.next()
 		if p.tok != token.COMMA && p.tok != token.RBRACK {
-			typ = p.parseRHS()
+			ellipsis.Type = p.parseRHS()
 		}
 		if p.atComma("list literal", token.RBRACK) {
 			p.next()
@@ -975,11 +976,9 @@ func (p *parser) parseList() (expr ast.Expr) {
 
 	rbrack := p.expectClosing(token.RBRACK, "list literal")
 	return &ast.ListLit{
-		Lbrack:   lbrack,
-		Elts:     elts,
-		Ellipsis: ellipsis,
-		Type:     typ,
-		Rbrack:   rbrack}
+		Lbrack: lbrack,
+		Elts:   elts,
+		Rbrack: rbrack}
 }
 
 func (p *parser) parseListElements() (list []ast.Expr) {

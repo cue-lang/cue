@@ -121,7 +121,7 @@ func (p *exporter) unique(s string) string {
 func (p *exporter) label(f label) ast.Label {
 	orig := p.ctx.labelStr(f)
 	str := strconv.Quote(orig)
-	if len(orig)+2 < len(str) {
+	if len(orig)+2 < len(str) || (strings.HasPrefix(orig, "_") && f&1 == 0) {
 		return &ast.BasicLit{Value: str}
 	}
 	for i, r := range orig {

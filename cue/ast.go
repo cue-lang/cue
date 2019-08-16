@@ -360,6 +360,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				break
 			}
 			v.sel, _ = ast.LabelName(x)
+			if v.sel == "_" {
+				if _, ok := x.(*ast.BasicLit); ok {
+					v.sel = "*"
+				}
+			}
 			attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
 			if err != nil {
 				return v.errf(n, err.format, err.args)
@@ -401,6 +406,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 	// Expressions
 	case *ast.Ident:
+		if n.Name == "_" {
+			ret = &top{newNode(n)}
+			break
+		}
+
 		if n.Node == nil {
 			if ret = v.resolve(n); ret != nil {
 				break

@@ -47,6 +47,18 @@ func TestExport(t *testing.T) {
 			multiSep + "world" +
 			multiSep + `"""`,
 	}, {
+		in: `{
+			"_": int
+			"_foo": int
+			_bar: int
+		}`,
+		out: unindent(`
+		{
+			"_":    int
+			"_foo": int
+			_bar:   int
+		}`),
+	}, {
 		in: "{ a: 1, b: a + 2, c: null, d: true, e: _, f: string }",
 		out: unindent(`
 			{

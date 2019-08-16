@@ -552,6 +552,9 @@ func TestChooseDefault(t *testing.T) {
 
 func TestResolve(t *testing.T) {
 	testCases := []testCase{{
+		in:  `a: { <_>: _ }`,
+		out: `<0>{a: <1>{<>: <2>(_: string)->_, }}`,
+	}, {
 		in: `
 			a: b.c.d
 			b c: { d: 3 }

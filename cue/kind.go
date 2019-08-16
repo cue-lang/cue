@@ -303,7 +303,8 @@ func matchBinOpKind(op op, a, b kind) (k kind, swap bool, msg string) {
 	default:
 		panic("unimplemented")
 	}
+	// TODO: localize
 	msg = "invalid operation %[2]s %[1]s %[3]s"
-	msg += fmt.Sprintf(" (operator not defined on %s)", valBits)
+	msg += fmt.Sprintf(" (operator '%s' not defined on %s)", op, valBits)
 	return bottomKind, false, msg
 }

@@ -26,7 +26,10 @@ func validate(ctx *context, v value) *bottom {
 		if ctx.maxDepth++; ctx.maxDepth > 20 {
 			return nil
 		}
-		for i := range x.arcs {
+		for i, a := range x.arcs {
+			if a.optional {
+				continue
+			}
 			if err := validate(ctx, x.at(ctx, i)); err != nil {
 				ctx.maxDepth--
 				return err

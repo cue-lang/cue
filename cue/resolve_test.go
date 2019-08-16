@@ -28,7 +28,6 @@ func compileFileWithErrors(t *testing.T, body string) (*context, *structLit, err
 }
 
 func compileFile(t *testing.T, body string) (*context, *structLit) {
-	t.Helper()
 	ctx, inst, errs := compileInstance(t, body)
 	if errs != nil {
 		t.Fatal(errs)
@@ -37,8 +36,6 @@ func compileFile(t *testing.T, body string) (*context, *structLit) {
 }
 
 func compileInstance(t *testing.T, body string) (*context, *Instance, error) {
-	t.Helper()
-
 	var r Runtime
 	inst, err := r.Parse("test", body)
 
@@ -52,10 +49,8 @@ func compileInstance(t *testing.T, body string) (*context, *Instance, error) {
 }
 
 func rewriteHelper(t *testing.T, cases []testCase, r rewriteMode) {
-	t.Helper()
 	for _, tc := range cases {
 		t.Run(tc.desc, func(t *testing.T) {
-			t.Helper()
 			ctx, obj := compileFile(t, tc.in)
 			ctx.trace = *traceOn
 			root := testResolve(ctx, obj, r)

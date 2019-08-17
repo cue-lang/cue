@@ -61,8 +61,15 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.kind())
 		}
 		n := sc.lookup(ctx, x.feature)
+		if n.optional {
+			field := ctx.labelStr(x.feature)
+			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
+		}
 		if n.val() == nil {
 			field := ctx.labelStr(x.feature)
+			if _, ok := sc.(*structLit); ok {
+				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
+			}
 			//	m.foo undefined (type map[string]bool has no field or method foo)
 			// TODO: mention x.x in error message?
 			return ctx.mkErr(x, "undefined field %q", field)
@@ -94,8 +101,11 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 			s := index.strValue()
 			// TODO: must lookup
 			n := v.lookup(ctx, ctx.strLabel(s))
+			if n.optional {
+				return ctx.mkErr(x, index, codeIncomplete, "field %q is optional", s)
+			}
 			if n.val() == nil {
-				return ctx.mkErr(x, index, "undefined field %q", s)
+				return ctx.mkErr(x, index, codeIncomplete, "undefined field %q", s)
 			}
 			return n.cache
 		}

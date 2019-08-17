@@ -15,14 +15,17 @@
 package cue
 
 // validate returns whether there is any error, recursively.
-func validate(ctx *context, v value) *bottom {
+func validate(ctx *context, v value) (err *bottom) {
 	eval := v.evalPartial(ctx)
 	if err, ok := eval.(*bottom); ok && err.code != codeIncomplete && err.code != codeCycle {
 		return eval.(*bottom)
 	}
 	switch x := eval.(type) {
 	case *structLit:
-		x = x.expandFields(ctx)
+		x, err = x.expandFields(ctx)
+		if err != nil {
+			return err
+		}
 		if ctx.maxDepth++; ctx.maxDepth > 20 {
 			return nil
 		}

@@ -36,9 +36,13 @@ func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
 	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}}
 	top, ok := v.evalPartial(ctx).(*structLit)
 	if ok {
-		top = top.expandFields(ctx)
-		for _, a := range top.arcs {
-			e.top[a.feature] = true
+		top, err := top.expandFields(ctx)
+		if err != nil {
+			v = err
+		} else {
+			for _, a := range top.arcs {
+				e.top[a.feature] = true
+			}
 		}
 	}
 
@@ -199,6 +203,8 @@ func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 }
 
 func (p *exporter) expr(v value) ast.Expr {
+	// TODO: use the raw expression for convert incomplete errors downstream
+	// as well.
 	if doEval(p.mode) {
 		e := v.evalPartial(p.ctx)
 		x := p.ctx.manifest(e)
@@ -352,7 +358,11 @@ func (p *exporter) expr(v value) ast.Expr {
 		return bin
 
 	case *structLit:
-		return p.structure(x)
+		expr, err := p.structure(x)
+		if err != nil {
+			return p.expr(err)
+		}
+		return expr
 
 	case *fieldComprehension:
 		panic("should be handled in structLit")
@@ -510,10 +520,13 @@ func (p *exporter) expr(v value) ast.Expr {
 	}
 }
 
-func (p *exporter) structure(x *structLit) *ast.StructLit {
+func (p *exporter) structure(x *structLit) (ret *ast.StructLit, err *bottom) {
 	obj := &ast.StructLit{}
 	if doEval(p.mode) {
-		x = x.expandFields(p.ctx)
+		x, err = x.expandFields(p.ctx)
+		if err != nil {
+			return nil, err
+		}
 	}
 	for _, a := range x.arcs {
 		p.stack = append(p.stack, remap{
@@ -608,7 +621,7 @@ func (p *exporter) structure(x *structLit) *ast.StructLit {
 			clauses = append(clauses, y)
 		}
 	}
-	return obj
+	return obj, nil
 }
 
 // quote quotes the given string.

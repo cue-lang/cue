@@ -1049,7 +1049,10 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 	obj := v.eval(ctx).(*structLit)
 
 	// TODO: This is expansion appropriate?
-	obj = obj.expandFields(ctx) // expand comprehensions
+	obj, err := obj.expandFields(ctx) // expand comprehensions
+	if err != nil {
+		return structValue{}, err
+	}
 
 	// check if any fields can be omitted
 	needFilter := false
@@ -1096,7 +1099,10 @@ func (v Value) Struct(opts ...Option) (*Struct, error) {
 	obj := v.eval(ctx).(*structLit)
 
 	// TODO: This is expansion appropriate?
-	obj = obj.expandFields(ctx)
+	obj, err := obj.expandFields(ctx)
+	if err != nil {
+		return nil, v.toErr(err)
+	}
 
 	return &Struct{v, obj}, nil
 }

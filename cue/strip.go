@@ -43,7 +43,10 @@ func (x *mergedValues) evalPartial(ctx *context) evaluated {
 			}
 			return v.evalPartial(ctx)
 		}
-		o = o.expandFields(ctx)
+		o, err := o.expandFields(ctx)
+		if err != nil {
+			return err
+		}
 		structs = append(structs, o)
 	}
 

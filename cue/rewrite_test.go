@@ -52,7 +52,14 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 			}
 			x = e.(*structLit)
 		}
-		x = x.expandFields(ctx)
+		var err *bottom
+		x, err = x.expandFields(ctx)
+		if err != nil {
+			if isIncomplete(err) {
+				return raw
+			}
+			return err
+		}
 		arcs := make(arcs, len(x.arcs))
 		for i, a := range x.arcs {
 			v := x.at(ctx, i)

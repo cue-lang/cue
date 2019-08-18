@@ -21,7 +21,7 @@ a: int
 a: 4 // type int
 
 b: number
-b: 4 // type float
+b: 4.0 // type float
 
 c: int
 c: 4.0
@@ -33,7 +33,7 @@ d: 4  // will evaluate to type int (default)
 `$ cue eval -i numbers.cue`
 ```
 a: 4
-b: 4
+b: 4.0
 c: _|_ /* conflicting values int and 4.0 (mismatched types int and float) */
 d: 4
 ```

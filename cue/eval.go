@@ -91,7 +91,7 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 	const msgType = "invalid operation: %[5]s (type %[3]s does not support indexing)"
 	const msgIndexType = "invalid %[5]s index %[1]s (type %[3]s)"
 
-	val := e.eval(x.x, listKind|structKind|stringKind|bytesKind, msgType, x)
+	val := e.eval(x.x, listKind|structKind, msgType, x)
 	k := val.kind()
 	index := e.eval(x.index, stringKind|intKind, msgIndexType, k)
 
@@ -136,7 +136,7 @@ func (x *sliceExpr) evalPartial(ctx *context) (result evaluated) {
 	e := newEval(ctx, true)
 	const msgType = "cannot slice %[2]s (type %[3]s)"
 	const msgInvalidIndex = "invalid slice index %[1]s (type %[3]s)"
-	val := e.eval(x.x, listKind|stringKind, msgType)
+	val := e.eval(x.x, listKind, msgType)
 	lo := e.evalAllowNil(x.lo, intKind, msgInvalidIndex)
 	hi := e.evalAllowNil(x.hi, intKind, msgInvalidIndex)
 	var low, high *numLit

@@ -787,18 +787,20 @@ func TestResolve(t *testing.T) {
 			e6: (*[]|{})[1]
 		`,
 		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds)}`,
-	}, {
-		desc: "string index",
-		in: `
-			a0: "abc"[0]
-			a1: "abc"[1]
-			a2: "abc"[2]
-			a3: "abc"[3]
-			a4: "abc"[-1]
+		// }, {
+		// NOTE: string indexing no longer supported.
+		// Keeping it around until this is no longer an experiment.
+		// 	desc: "string index",
+		// 	in: `
+		// 		a0: "abc"[0]
+		// 		a1: "abc"[1]
+		// 		a2: "abc"[2]
+		// 		a3: "abc"[3]
+		// 		a4: "abc"[-1]
 
-			b: "zoëven"[2]
-		`,
-		out: `<0>{a0: "a", a1: "b", a2: "c", a3: _|_("abc":index 3 out of bounds), a4: _|_(-1:invalid string index -1 (index must be non-negative)), b: "ë"}`,
+		// 		b: "zoëven"[2]
+		// 	`,
+		// 	out: `<0>{a0: "a", a1: "b", a2: "c", a3: _|_("abc":index 3 out of bounds), a4: _|_(-1:invalid string index -1 (index must be non-negative)), b: "ë"}`,
 	}, {
 		desc: "disjunctions of lists",
 		in: `
@@ -823,25 +825,27 @@ func TestResolve(t *testing.T) {
 
 		`,
 		out: `<0>{a: [], b: [], e1: _|_(1:slice bounds out of range), e2: _|_([0]:negative slice index), e3: _|_([0]:invalid slice index: 1 > 0), e4: _|_(2:slice bounds out of range), e5: _|_(4:cannot slice 4 (type int)), e6: _|_("":invalid slice index "" (type string)), e7: _|_("9":invalid slice index "9" (type string))}`,
-	}, {
-		desc: "string slice",
-		in: `
-			a0: ""[0:0]
-			a1: ""[:]
-			a2: ""[0:]
-			a3: ""[:0]
-			b0: "abc"[0:0]
-			b1: "abc"[0:1]
-			b2: "abc"[0:2]
-			b3: "abc"[0:3]
-			b4: "abc"[3:3]
-			b5: "abc"[1:]
-			b6: "abc"[:2]
+		// }, {
+		// NOTE: string indexing no longer supported.
+		// Keeping it around until this is no longer an experiment.
+		// 	desc: "string slice",
+		// 	in: `
+		// 		a0: ""[0:0]
+		// 		a1: ""[:]
+		// 		a2: ""[0:]
+		// 		a3: ""[:0]
+		// 		b0: "abc"[0:0]
+		// 		b1: "abc"[0:1]
+		// 		b2: "abc"[0:2]
+		// 		b3: "abc"[0:3]
+		// 		b4: "abc"[3:3]
+		// 		b5: "abc"[1:]
+		// 		b6: "abc"[:2]
 
-			// TODO: supported extended graphemes, instead of just runes.
-			u: "Spaß"[3:4]
-		`,
-		out: `<0>{a0: "", a1: "", a2: "", a3: "", b0: "", b1: "a", b2: "ab", b3: "abc", b4: "", b5: "bc", b6: "ab", u: "ß"}`,
+		// 		// TODO: supported extended graphemes, instead of just runes.
+		// 		u: "Spaß"[3:4]
+		// 	`,
+		// 	out: `<0>{a0: "", a1: "", a2: "", a3: "", b0: "", b1: "a", b2: "ab", b3: "abc", b4: "", b5: "bc", b6: "ab", u: "ß"}`,
 	}, {
 		desc: "list types",
 		in: `

@@ -1,3 +1,3 @@
 package hello
 
-who: "World"
+who :: "World"

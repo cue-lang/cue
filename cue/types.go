@@ -1060,8 +1060,13 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		f := label(0)
 		for _, a := range obj.arcs {
 			f |= a.feature
-			if o.omitOptional && a.optional {
+			if a.optional && o.omitOptional {
 				needFilter = true
+				break
+			}
+			if a.definition && (o.omitHidden || o.concrete) {
+				needFilter = true
+				break
 			}
 		}
 		needFilter = needFilter || f&hidden != 0
@@ -1071,10 +1076,17 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		arcs := make([]arc, len(obj.arcs))
 		k := 0
 		for _, a := range obj.arcs {
-			if a.feature&hidden == 0 && !a.optional {
-				arcs[k] = a
-				k++
+			if a.definition && (o.omitHidden || o.concrete) {
+				continue
 			}
+			if a.feature&hidden != 0 && o.omitHidden {
+				continue
+			}
+			if o.omitOptional && a.optional {
+				continue
+			}
+			arcs[k] = a
+			k++
 		}
 		arcs = arcs[:k]
 		obj = &structLit{

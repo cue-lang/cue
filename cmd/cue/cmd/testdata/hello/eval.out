@@ -1,2 +1,2 @@
-who:     "World"
+who ::   "World"
 message: "Hello World!"

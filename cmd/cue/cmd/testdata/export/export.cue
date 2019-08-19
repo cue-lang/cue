@@ -1,6 +1,8 @@
 package export
 
-def: *1 | int
+One :: 1
+
+def: *One | int
 
 a: string
 a: "foo"

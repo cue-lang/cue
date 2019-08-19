@@ -173,7 +173,7 @@ func (f *formatter) decl(decl ast.Decl) {
 		if lastSize != len(f.labelBuf) {
 			f.print(formfeed)
 		}
-		if !regular && first.Pos().RelPos() < token.Newline {
+		if !regular && first.Pos().RelPos() < token.Newline && len(f.output) > 0 {
 			f.print(newline, nooverride)
 		}
 

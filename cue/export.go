@@ -621,6 +621,9 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 			f.Optional = token.NoSpace.Pos()
 		}
 		if a.definition {
+			if p.mode.omitHidden || p.mode.concrete {
+				continue
+			}
 			f.Token = token.ISA
 		}
 		if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {

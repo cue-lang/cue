@@ -19,6 +19,7 @@ import (
 	"io"
 	"os"
 	"strings"
+	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -32,6 +33,12 @@ import (
 var runtime = &cue.Runtime{}
 
 var inTest = false
+
+func mustParseFlags(t *testing.T, cmd *cobra.Command, flags ...string) {
+	if err := cmd.ParseFlags(flags); err != nil {
+		t.Fatal(err)
+	}
+}
 
 func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
 	exitOnErr(cmd, err, fatal)
@@ -67,7 +74,7 @@ func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 	})
 
 	b := w.Bytes()
-	cmd.OutOrStderr().Write(b)
+	_, _ = cmd.OutOrStderr().Write(b)
 	if fatal {
 		exit()
 	}

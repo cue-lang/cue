@@ -20,10 +20,10 @@ func TestEval(t *testing.T) {
 	runCommand(t, newEvalCmd(), "eval")
 
 	cmd := newEvalCmd()
-	cmd.ParseFlags([]string{"-c", "-a"})
+	mustParseFlags(t, cmd, "-c", "-a")
 	runCommand(t, cmd, "eval_conc")
 
 	cmd = newEvalCmd()
-	cmd.ParseFlags([]string{"-c", "-e", "b.a.b", "-e", "b.idx"})
+	mustParseFlags(t, cmd, "-c", "-e", "b.a.b", "-e", "b.idx")
 	runCommand(t, cmd, "eval_expr")
 }

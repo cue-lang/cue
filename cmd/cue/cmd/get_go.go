@@ -465,7 +465,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			fmt.Fprintln(w)
 		}
 		fmt.Fprintln(w)
-		io.Copy(w, e.w)
+		_, _ = io.Copy(w, e.w)
 
 		file := filepath.Base(p.CompiledGoFiles[i])
 
@@ -473,7 +473,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		file += "_gen.cue"
 		b, err := format.Source(w.Bytes())
 		if err != nil {
-			ioutil.WriteFile(filepath.Join(dir, file), w.Bytes(), 0644)
+			_ = ioutil.WriteFile(filepath.Join(dir, file), w.Bytes(), 0644)
 			fmt.Println(w.String())
 			fmt.Println(dir, file)
 			return err

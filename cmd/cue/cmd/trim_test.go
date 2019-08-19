@@ -20,6 +20,6 @@ import (
 
 func TestTrim(t *testing.T) {
 	cmd := newTrimCmd()
-	cmd.ParseFlags([]string{"-o", "-"})
+	mustParseFlags(t, cmd, "-o", "-")
 	runCommand(t, cmd, "trim")
 }

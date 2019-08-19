@@ -49,7 +49,7 @@ func TestGetGo(t *testing.T) {
 	// for the common ground to not have breaking text if people run these
 	// test in GOPATH mode.
 	root := ""
-	filepath.Walk(tmp, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(tmp, func(path string, info os.FileInfo, err error) error {
 		if root != "" {
 			return filepath.SkipDir
 		}
@@ -72,7 +72,7 @@ func TestGetGo(t *testing.T) {
 	}
 
 	prefix := "testdata/pkg/cuelang.org/go/cmd/cue/cmd/testdata/code/go/"
-	filepath.Walk(dst, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(dst, func(path string, info os.FileInfo, err error) error {
 		if info.IsDir() {
 			return nil
 		}

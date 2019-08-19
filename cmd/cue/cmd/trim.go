@@ -535,17 +535,6 @@ func inNodes(a []ast.Node, n ast.Node) bool {
 	return false
 }
 
-func deleteNode(a []ast.Node, n ast.Node) []ast.Node {
-	k := 0
-	for _, e := range a {
-		if e != n {
-			a[k] = e
-			k++
-		}
-	}
-	return a[:k]
-}
-
 type key struct {
 	label  string
 	hidden bool

@@ -57,7 +57,7 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 
 	cfg := printConfig(t)
 
-	filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 		t.Run(path, func(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
@@ -92,8 +92,7 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 						fmt.Fprintln(wOut, err)
 					}
 				}()
-				cmd.Execute()
-				return nil
+				return cmd.Execute()
 			})
 			g.Go(func() error {
 				bOut, err = ioutil.ReadAll(rOut)
@@ -105,7 +104,7 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 				t.Error(err)
 			}
 			if *update {
-				ioutil.WriteFile(testfile, bOut, 0644)
+				_ = ioutil.WriteFile(testfile, bOut, 0644)
 				return
 			}
 			got, want := string(bOut), string(bWant)

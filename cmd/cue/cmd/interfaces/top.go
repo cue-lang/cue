@@ -27,3 +27,11 @@ type (
 		UnmarshalYAML(func(interface{}) error) error
 	}
 )
+
+// Suppress incorrect linter errors (types are used).
+var (
+	_ = jsonMarshaler(nil)
+	_ = jsonUnmarshaler(nil)
+	_ = yamlMarshal(nil)
+	_ = yamlUnmarshal(nil)
+)

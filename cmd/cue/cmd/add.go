@@ -153,7 +153,7 @@ func doAdd(cmd *cobra.Command, stdin io.Reader, args []string) (err error) {
 		stdout := cmd.OutOrStdout()
 		for _, fi := range todo {
 			fmt.Fprintln(stdout, "---", fi.filename)
-			io.Copy(stdout, fi.contents)
+			_, _ = io.Copy(stdout, fi.contents)
 		}
 		return nil
 	}
@@ -291,7 +291,7 @@ func (fi *fileInfo) appendAndCheck() (fo originalFile, err error) {
 
 	if err = ioutil.WriteFile(fi.filename, b, 0644); err != nil {
 		// Just in case, attempt to restore original file.
-		fo.restore()
+		_ = fo.restore()
 		return originalFile{}, err
 	}
 

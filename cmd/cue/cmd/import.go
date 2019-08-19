@@ -42,9 +42,6 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-// importCmd represents the import command
-var importCmd = newImportCmd()
-
 func newImportCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "import",
@@ -531,7 +528,6 @@ func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Exp
 
 type listIndex struct {
 	index map[string]*listIndex
-	file  *ast.File // top-level only
 	field *ast.Field
 }
 

@@ -72,7 +72,8 @@ func doVet(cmd *cobra.Command, args []string) error {
 			if !shown && err == nil {
 				shown = true
 				p := message.NewPrinter(getLang())
-				p.Fprintln(w, "some instances are incomplete; use the -c flag to show errors or suppress this message")
+				_, _ = p.Fprintln(w,
+					"some instances are incomplete; use the -c flag to show errors or suppress this message")
 			}
 		}
 		exitIfErr(cmd, inst, err, false)

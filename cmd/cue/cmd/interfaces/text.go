@@ -20,3 +20,9 @@ type (
 	textMarshaler   = encoding.TextMarshaler
 	textUnmarshaler = encoding.TextUnmarshaler
 )
+
+// Suppress incorrect linter errors (types are used).
+var (
+	_ = textMarshaler(nil)
+	_ = textUnmarshaler(nil)
+)

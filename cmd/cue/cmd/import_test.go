@@ -14,31 +14,29 @@
 
 package cmd
 
-import "testing"
+import (
+	"testing"
+)
 
 func TestImport(t *testing.T) {
 	cmd := newImportCmd()
-	cmd.ParseFlags([]string{
-		"-o", "-", "-f", "--files",
-	})
+	mustParseFlags(t, cmd,
+		"-o", "-", "-f", "--files")
 	runCommand(t, cmd, "import_files")
 
 	cmd = newImportCmd()
-	cmd.ParseFlags([]string{
-		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))" "\(name)"`,
-	})
+	mustParseFlags(t, cmd,
+		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))" "\(name)"`)
 	runCommand(t, cmd, "import_path")
 
 	cmd = newImportCmd()
-	cmd.ParseFlags([]string{
-		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))"`, "--list",
-	})
+	mustParseFlags(t, cmd,
+		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))"`, "--list")
 	runCommand(t, cmd, "import_list")
 
 	cmd = newImportCmd()
-	cmd.ParseFlags([]string{
+	mustParseFlags(t, cmd,
 		"-o", "-", "-f", "--list",
-		"-l", `"\(strings.ToLower(kind))" "\(name)"`, "--recursive",
-	})
+		"-l", `"\(strings.ToLower(kind))" "\(name)"`, "--recursive")
 	runCommand(t, cmd, "import_hoiststr")
 }

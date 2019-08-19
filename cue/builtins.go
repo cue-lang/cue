@@ -1977,6 +1977,42 @@ var builtinPackages = map[string]*builtinPkg{
 	},
 	"strings": &builtinPkg{
 		native: []*builtin{{
+			Name:   "ByteAt",
+			Params: []kind{stringKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				b, i := c.bytes(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if i < 0 || i >= len(b) {
+						return 0, fmt.Errorf("index out of range")
+					}
+					return b[i], nil
+				}()
+			},
+		}, {
+			Name:   "ByteSlice",
+			Params: []kind{stringKind, intKind, intKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				b, start, end := c.bytes(0), c.int(1), c.int(2)
+				c.ret, c.err = func() (interface{}, error) {
+					if start < 0 || start > end || end > len(b) {
+						return nil, fmt.Errorf("index out of range")
+					}
+					return b[start:end], nil
+				}()
+			},
+		}, {
+			Name:   "Runes",
+			Params: []kind{stringKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				s := c.string(0)
+				c.ret = func() interface{} {
+					return []rune(s)
+				}()
+			},
+		}, {
 			Name:   "MinRunes",
 			Params: []kind{stringKind, intKind},
 			Result: boolKind,

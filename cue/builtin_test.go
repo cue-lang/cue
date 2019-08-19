@@ -17,6 +17,7 @@ package cue
 import (
 	"fmt"
 	"math/big"
+	"strconv"
 	"strings"
 	"testing"
 )
@@ -140,6 +141,15 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		test("strings", `strings.Join([1, 2], " ")`),
 		`_|_(invalid list element 0 in argument 0 to strings.Join: cannot use value 1 (type int) as string)`,
+	}, {
+		test("strings", `strings.ByteAt("a", 0)`),
+		strconv.Itoa('a'),
+	}, {
+		test("strings", `strings.ByteSlice("Hello", 2, 5)`),
+		`'llo'`,
+	}, {
+		test("strings", `strings.Runes("Café")`),
+		strings.Replace(fmt.Sprint([]rune{'C', 'a', 'f', 'é'}), " ", ",", -1),
 	}, {
 		test("math/bits", `bits.Or(0x8, 0x1)`),
 		`9`,

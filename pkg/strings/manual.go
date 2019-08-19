@@ -26,9 +26,32 @@
 package strings
 
 import (
+	"fmt"
 	"strings"
 	"unicode"
 )
+
+// ByteAt reports the ith byte of the underlying strings or byte.
+func ByteAt(b []byte, i int) (byte, error) {
+	if i < 0 || i >= len(b) {
+		return 0, fmt.Errorf("index out of range")
+	}
+	return b[i], nil
+}
+
+// ByteSlice reports the bytes of the underlying string data from the start
+// index up to but not including the end index.
+func ByteSlice(b []byte, start, end int) ([]byte, error) {
+	if start < 0 || start > end || end > len(b) {
+		return nil, fmt.Errorf("index out of range")
+	}
+	return b[start:end], nil
+}
+
+// Runes returns the Unicode code points of the given string.
+func Runes(s string) []rune {
+	return []rune(s)
+}
 
 // MinRunes reports whether the number of runes (Unicode codepoints) in a string
 // is at least a certain minimum. MinRunes can be used a a field constraint to

@@ -37,8 +37,7 @@ var (
 )
 
 const (
-	dataDir  = "testdata"
-	tabwidth = 8
+	dataDir = "testdata"
 )
 
 var update = flag.Bool("update", false, "update golden files")
@@ -46,8 +45,7 @@ var update = flag.Bool("update", false, "update golden files")
 type checkMode uint
 
 const (
-	export checkMode = 1 << iota
-	rawFormat
+	_ checkMode = 1 << iota
 	idempotent
 	simplify
 	sortImps
@@ -159,6 +157,9 @@ func runcheck(t *testing.T, source, golden string, mode checkMode) {
 		// (This is very difficult to achieve in general and for now
 		// it is only checked for files explicitly marked as such.)
 		res, err = format(gld, mode)
+		if err != nil {
+			t.Fatal(err)
+		}
 		if err := diff(golden, fmt.Sprintf("format(%s)", golden), gld, res); err != nil {
 			t.Errorf("golden is not idempotent: %s", err)
 		}

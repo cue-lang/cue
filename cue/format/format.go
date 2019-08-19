@@ -235,6 +235,12 @@ type settings struct {
 	override  whiteSpace
 }
 
+// suppress spurious linter warning: field is actually used.
+func init() {
+	s := settings{}
+	_ = s.override
+}
+
 func (f *formatter) print(a ...interface{}) {
 	for _, x := range a {
 		f.Print(x)

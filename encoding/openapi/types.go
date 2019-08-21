@@ -62,6 +62,13 @@ func extractFormat(v cue.Value) string {
 	return cueToOpenAPI[s]
 }
 
+func getDeprecated(v cue.Value) bool {
+	// only looking at protobuf attribute for now.
+	a := v.Attribute("protobuf")
+	r, _ := a.Flag(1, "deprecated")
+	return r
+}
+
 func simplify(b *builder, t *OrderedMap) {
 	if b.format == "" {
 		return

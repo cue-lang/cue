@@ -212,6 +212,7 @@ func (b *builder) fillSchema(v cue.Value) *oaSchema {
 
 	b.setValueType(v)
 	b.format = extractFormat(v)
+	b.deprecated = getDeprecated(v)
 
 	if b.core == nil || len(b.core.values) > 1 {
 		isRef := b.value(v, nil)
@@ -952,6 +953,7 @@ type builder struct {
 	singleFields *oaSchema
 	current      *oaSchema
 	allOf        []*oaSchema
+	deprecated   bool
 
 	// Building structural schema
 	core       *builder
@@ -1071,6 +1073,9 @@ func (b *builder) finish() (t *oaSchema) {
 	if b.singleFields != nil {
 		b.singleFields.kvs = append(b.singleFields.kvs, t.kvs...)
 		t = b.singleFields
+	}
+	if b.deprecated {
+		t.Set("deprecated", true)
 	}
 	setType(t, b)
 	sortSchema(t)

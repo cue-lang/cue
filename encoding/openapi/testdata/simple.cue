@@ -4,4 +4,6 @@ MyStruct: {
 
 	float:  float32
 	double: float64
+
+	deprecatedField: string @protobuf(5,deprecated)
 }

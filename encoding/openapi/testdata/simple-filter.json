@@ -12,7 +12,8 @@
                "mediumNum",
                "smallNum",
                "float",
-               "double"
+               "double",
+               "deprecatedField"
             ],
             "properties": {
                "mediumNum": {
@@ -29,6 +30,11 @@
                "double": {
                   "type": "number",
                   "format": "double"
+               },
+               "deprecatedField": {
+                  "type": "string",
+                  "format": "string",
+                  "deprecated": true
                }
             }
          }

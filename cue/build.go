@@ -37,7 +37,16 @@ type Runtime struct {
 
 func init() {
 	internal.GetRuntime = func(instance interface{}) interface{} {
-		return &Runtime{idx: instance.(*Instance).index}
+		switch x := instance.(type) {
+		case Value:
+			return &Runtime{idx: x.idx}
+
+		case *Instance:
+			return &Runtime{idx: x.index}
+
+		default:
+			panic("argument must be Value or *Instance")
+		}
 	}
 
 	internal.CheckAndForkRuntime = func(runtime, value interface{}) interface{} {

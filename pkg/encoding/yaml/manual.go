@@ -16,9 +16,11 @@ package yaml
 
 import (
 	"bytes"
+	"io"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
 	goyaml "github.com/ghodss/yaml"
 )
@@ -53,4 +55,32 @@ func MarshalStream(v cue.Value) (string, error) {
 // Unmarshal parses the YAML to a CUE instance.
 func Unmarshal(data []byte) (ast.Expr, error) {
 	return yaml.Unmarshal("", data)
+}
+
+// Validate validates YAML and confirms it matches the constraints
+// specified by v. If the YAML source is a stream, every object must match v.
+func Validate(b []byte, v cue.Value) (bool, error) {
+	d, err := yaml.NewDecoder("yaml.Validate", b)
+	if err != nil {
+		return false, err
+	}
+	r := internal.GetRuntime(v).(*cue.Runtime)
+	for {
+		expr, err := d.Decode()
+		if err != nil {
+			if err == io.EOF {
+				return true, nil
+			}
+			return false, err
+		}
+
+		inst, err := r.CompileExpr(expr)
+		if err != nil {
+			return false, err
+		}
+
+		if x := v.Unify(inst.Value()); x.Err() != nil {
+			return false, x.Err()
+		}
+	}
 }

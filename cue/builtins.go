@@ -32,6 +32,7 @@ import (
 
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
 	"github.com/cockroachdb/apd/v2"
 	goyaml "github.com/ghodss/yaml"
@@ -522,6 +523,29 @@ var builtinPackages = map[string]*builtinPkg{
 					return expr, nil
 				}()
 			},
+		}, {
+			Name:   "Validate",
+			Params: []kind{stringKind, topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				b, v := c.bytes(0), c.value(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if !json.Valid(b) {
+						return false, fmt.Errorf("json: invalid JSON")
+					}
+					r := internal.GetRuntime(v).(*Runtime)
+					inst, err := r.Compile("json.Validate", b)
+					if err != nil {
+						return false, err
+					}
+
+					v = v.Unify(inst.Value())
+					if v.Err() != nil {
+						return false, v.Err()
+					}
+					return true, nil
+				}()
+			},
 		}},
 	},
 	"encoding/yaml": &builtinPkg{
@@ -570,6 +594,38 @@ var builtinPackages = map[string]*builtinPkg{
 				data := c.bytes(0)
 				c.ret, c.err = func() (interface{}, error) {
 					return yaml.Unmarshal("", data)
+				}()
+			},
+		}, {
+			Name:   "Validate",
+			Params: []kind{stringKind, topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				b, v := c.bytes(0), c.value(1)
+				c.ret, c.err = func() (interface{}, error) {
+					d, err := yaml.NewDecoder("yaml.Validate", b)
+					if err != nil {
+						return false, err
+					}
+					r := internal.GetRuntime(v).(*Runtime)
+					for {
+						expr, err := d.Decode()
+						if err != nil {
+							if err == io.EOF {
+								return true, nil
+							}
+							return false, err
+						}
+
+						inst, err := r.CompileExpr(expr)
+						if err != nil {
+							return false, err
+						}
+
+						if x := v.Unify(inst.Value()); x.Err() != nil {
+							return false, x.Err()
+						}
+					}
 				}()
 			},
 		}},

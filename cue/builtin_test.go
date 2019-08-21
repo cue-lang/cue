@@ -77,6 +77,18 @@ func TestBuiltins(t *testing.T) {
 		test("encoding/hex", `hex.Decode("foo")`),
 		`_|_(error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o')`,
 	}, {
+		test("encoding/json", `json.Validate("{\"a\":10}", {b:string})`),
+		`true`,
+	}, {
+		test("encoding/json", `json.Validate("{\"a\":10}", {a:<3})`),
+		`_|_(error in call to encoding/json.Validate: invalid value 10 (out of bound <3))`,
+	}, {
+		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<3})`),
+		`_|_(error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3))`,
+	}, {
+		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<5})`),
+		`true`,
+	}, {
 		test("strconv", `strconv.FormatUint(64, 16)`),
 		`"40"`,
 	}, {

@@ -16,6 +16,7 @@ package cue
 
 import (
 	"bytes"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -377,6 +378,57 @@ func TestEval(t *testing.T) {
 			v := testResolve(ctx, evaluated, evalFull)
 			if got := debugStr(ctx, v); got != tc.out {
 				t.Errorf("output differs:\ngot  %q\nwant %q", got, tc.out)
+			}
+		})
+	}
+}
+
+func TestResolution(t *testing.T) {
+	testCases := []struct {
+		name string
+		in   string
+		err  string
+	}{{
+		name: "package name identifier should not resolve to anything",
+		in: `package time
+
+		import "time"
+
+		a: time.Time
+		`,
+	}, {
+		name: "duplicate_imports.cue",
+		in: `
+		import "time"
+		import time "math"
+
+		t: time.Time
+		`,
+		err: "time redeclared as imported package name",
+	}, {
+		name: "unused_import",
+		in: `
+			import "time"
+			`,
+		err: `imported and not used: "time"`,
+	}, {
+		name: "nonexisting import package",
+		in:   `import "doesnotexist"`,
+		err:  `package "doesnotexist" not found`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			var r Runtime
+			_, err := r.Compile(tc.name, tc.in)
+			got := err == nil
+			want := tc.err == ""
+			if got != want {
+				t.Fatalf("got %v; want %v", err, tc.err)
+			}
+			if err != nil {
+				if s := err.Error(); !strings.Contains(s, tc.err) {
+					t.Errorf("got %v; want %v", err, tc.err)
+				}
 			}
 		})
 	}

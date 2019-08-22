@@ -391,6 +391,7 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 				"%s redeclared as imported package name\n"+
 					"\tprevious declaration at %v", name, lineStr(idx, n))
 		}
+		fields[name] = spec
 		used := false
 		for _, u := range index[name] {
 			used = true

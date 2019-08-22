@@ -205,7 +205,8 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		ret = obj
 
 	case *ast.Package:
-		v.walk(n.Name)
+		// NOTE: Do NOT walk the identifier of the package here, as it is not
+		// supposed to resolve to anything.
 
 	case *ast.ImportDecl:
 		for _, s := range n.Specs {

@@ -53,7 +53,7 @@ type fileSystem struct {
 func (fs *fileSystem) getDir(dir string, create bool) map[string]*overlayFile {
 	dir = filepath.Clean(dir)
 	m, ok := fs.overlayDirs[dir]
-	if !ok {
+	if !ok && create {
 		m = map[string]*overlayFile{}
 		fs.overlayDirs[dir] = m
 	}

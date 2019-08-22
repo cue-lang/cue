@@ -40,6 +40,7 @@ func MapExtension(ext string) *Encoding {
 }
 
 var (
+	cueEnc      = &Encoding{name: "cue"}
 	jsonEnc     = &Encoding{name: "json"}
 	yamlEnc     = &Encoding{name: "yaml"}
 	protodefEnc = &Encoding{name: "protobuf"}
@@ -47,6 +48,7 @@ var (
 
 // extensions maps a file extension to a Kind.
 var extensions = map[string]*Encoding{
+	".cue":    cueEnc,
 	".json":   jsonEnc,
 	".jsonl":  jsonEnc,
 	".ndjson": jsonEnc,

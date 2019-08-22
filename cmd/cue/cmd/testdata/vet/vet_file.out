@@ -1,0 +1,3 @@
+translations.hello.lang: conflicting values false and string (mismatched types bool and string):
+    ./testdata/vet/data.yaml:9:11
+    ./testdata/vet/vet.cue:2:24

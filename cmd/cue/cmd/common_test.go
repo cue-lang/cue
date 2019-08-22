@@ -74,7 +74,11 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 				return
 			}
 
-			cmd.SetArgs(append(args, "./"+path))
+			extra := args
+			if len(args) == 0 {
+				extra = append(args, "./"+path)
+			}
+			cmd.SetArgs(extra)
 			rOut, wOut := io.Pipe()
 			cmd.SetOutput(wOut)
 			var bOut []byte

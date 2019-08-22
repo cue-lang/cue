@@ -1,0 +1,6 @@
+sum: incomplete value ((1 | 2)):
+    ./testdata/partial/partial.cue:4:6
+b.idx: invalid non-ground value string (must be concrete int|string):
+    ./testdata/partial/partial.cue:7:9
+b.str: incomplete value (string):
+    ./testdata/partial/partial.cue:8:7

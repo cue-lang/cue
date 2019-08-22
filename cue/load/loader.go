@@ -26,6 +26,7 @@ import (
 	"unicode"
 
 	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -47,7 +48,10 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	l := c.loader
 
-	if len(args) > 0 && strings.HasSuffix(args[0], cueSuffix) {
+	// TODO: this is work in progress. We aim to replace the original Go
+	// implementation, which is not ideal for CUE.
+
+	if len(args) > 0 && encoding.MapExtension(filepath.Ext(args[0])) != nil {
 		return []*build.Instance{l.cueFilesPackage(args)}
 	}
 
@@ -98,15 +102,22 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	pos := token.NoPos
 	cfg := l.cfg
 	// ModInit() // TODO: support modules
+	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc(cfg.Dir))
+
 	for _, f := range files {
-		if !strings.HasSuffix(f, ".cue") {
+		if cfg.isDir(f) {
 			return cfg.newErrInstance(nil, f,
-				errors.Newf(pos, "named files must be .cue files"))
+				errors.Newf(pos, "cannot mix files with directories %v", f))
+		}
+		ext := filepath.Ext(f)
+		enc := encoding.MapExtension(ext)
+		if enc == nil {
+			return cfg.newErrInstance(nil, f,
+				errors.Newf(pos, "unrecognized extension %q", ext))
 		}
 	}
 
-	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc(cfg.Dir))
-	// TODO: add fiels directly?
+	// TODO: add fiedls directly?
 	fp := newFileProcessor(cfg, pkg)
 	for _, file := range files {
 		path := file

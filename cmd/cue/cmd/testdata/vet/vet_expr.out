@@ -1,0 +1,2 @@
+field "skip" not allowed in closed struct:
+    ./testdata/vet/vet.cue:4:9

@@ -166,6 +166,7 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 			}
 			if dir != "" {
 				filename, _ = filepath.Rel(dir, filename)
+				filename = filepath.ToSlash(filename)
 			}
 		}
 

@@ -56,13 +56,10 @@ type Generator struct {
 }
 
 // Config is now Generator
-// Deprecated: use Generator
 type Config = Generator
 
 // Gen generates the set OpenAPI schema for all top-level types of the
 // given instance.
-//
-// Deprecated: use Generator.All.
 func Gen(inst *cue.Instance, c *Config) ([]byte, error) {
 	if c == nil {
 		c = defaultConfig
@@ -113,5 +110,4 @@ var defaultConfig = &Config{}
 //      writeOnly       sets the writeOnly flag for a property in the schema
 //                      only one of readOnly and writeOnly may be set.
 //      discriminator   explicitly sets a field as the discriminator field
-//      deprecated      sets a field as deprecated
 //

@@ -19,16 +19,3 @@
 //
 // See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#schemaObject.
 package openapi
-
-// TODO:
-// * map range boundaries to format For instance,
-// 		{
-//			"type": "integer",
-//			"minimum": -2147483648,
-//			"maximum": 2147483647
-//		}
-//     should map to
-// 		{
-//			"type": "integer",
-//			"format": "int32"
-//		}

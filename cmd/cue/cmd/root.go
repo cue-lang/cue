@@ -220,6 +220,9 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error 
 	// before computing commands.
 	for _, spec := range sub {
 		commands := tools.Lookup(spec.name)
+		if !commands.Exists() {
+			return nil
+		}
 		i, err := commands.Fields()
 		if err != nil {
 			return errors.Newf(token.NoPos, "could not create command definitions: %v", err)

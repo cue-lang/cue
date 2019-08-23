@@ -545,6 +545,10 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		o.parse(x.Options)
 		p.addTag(f, o.tags)
 
+		if !o.required {
+			f.Optional = token.NoSpace.Pos()
+		}
+
 	case *proto.Enum:
 		p.enum(x)
 

@@ -13,4 +13,6 @@ message MyType {
 
     // A method must start with a capital letter.
     repeated string method = 2 [(cue.val) = '[...=~"^[A-Z]"]'];
+
+    map<string, string> exmaple_map = 3;
 }

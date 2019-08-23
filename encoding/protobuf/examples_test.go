@@ -52,5 +52,8 @@ func ExampleExtract() {
 	// 	// A method must start with a capital letter.
 	// 	method?: [...string] @protobuf(2)
 	// 	method?: [...=~"^[A-Z]"]
+	// 	exmapleMap?: {
+	// 		<_>: string
+	// 	} @protobuf(3,type=map<string,string>,exmaple_map)
 	// }
 }

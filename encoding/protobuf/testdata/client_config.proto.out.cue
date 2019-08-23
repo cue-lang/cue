@@ -144,7 +144,7 @@ HttpClientConfig: {
 	// Map of control configuration indexed by destination.service. This
 	// is used to support per-service configuration for cases where a
 	// mixerclient serves multiple services.
-	serviceConfigs: {
+	serviceConfigs?: {
 		<_>: ServiceConfig
 	} @protobuf(2,type=map<string,ServiceConfig>,service_configs)
 

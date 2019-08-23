@@ -48,7 +48,7 @@ StructWrap: {
 //
 Attributes: {
 	// A map of attribute name to its value.
-	attributes: {
+	attributes?: {
 		<_>: Attributes_AttributeValue
 	} @protobuf(1,type=map<string,AttributeValue>)
 }
@@ -90,7 +90,7 @@ Attributes_AttributeValue: {
 // Defines a string map.
 Attributes_StringMap: {
 	// Holds a set of name/value pairs.
-	entries: {
+	entries?: {
 		<_>: string
 	} @protobuf(1,type=map<string,string>)
 }
@@ -107,42 +107,42 @@ CompressedAttributes: {
 	words?: [...string] @protobuf(1)
 
 	// Holds attributes of type STRING, DNS_NAME, EMAIL_ADDRESS, URI
-	strings: {
+	strings?: {
 		<_>: int32
 	} @protobuf(2,type=map<sint32,sint32>)
 
 	// Holds attributes of type INT64
-	int64s: {
+	int64s?: {
 		<_>: int64
 	} @protobuf(3,type=map<sint32,int64>)
 
 	// Holds attributes of type DOUBLE
-	doubles: {
+	doubles?: {
 		<_>: float64
 	} @protobuf(4,type=map<sint32,double>)
 
 	// Holds attributes of type BOOL
-	bools: {
+	bools?: {
 		<_>: bool
 	} @protobuf(5,type=map<sint32,bool>)
 
 	// Holds attributes of type TIMESTAMP
-	time: {
+	time?: {
 		<_>: __time.Time
 	} @protobuf(6,type=map<sint32,google.protobuf.Timestamp>,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
 
 	// Holds attributes of type DURATION
-	durations: {
+	durations?: {
 		<_>: __time.Duration
 	} @protobuf(7,type=map<sint32,google.protobuf.Duration>,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	// Holds attributes of type BYTES
-	bytes: {
+	bytes?: {
 		<_>: __bytes
 	} @protobuf(8,type=map<sint32,bytes>)
 
 	// Holds attributes of type STRING_MAP
-	stringMaps: {
+	stringMaps?: {
 		<_>: StringMap
 	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
@@ -153,7 +153,7 @@ __bytes = bytes
 // indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)
 StringMap: {
 	// Holds a set of name/value pairs.
-	entries: {
+	entries?: {
 		<_>: int32
 	} @protobuf(1,type=map<sint32,sint32>)
 }

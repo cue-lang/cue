@@ -118,6 +118,23 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 	return instances
 }
 
+func buildToolInstances(cmd *cobra.Command, binst []*build.Instance) ([]*cue.Instance, error) {
+	instances := cue.Build(binst)
+	for _, inst := range instances {
+		if inst.Err != nil {
+			return nil, inst.Err
+		}
+	}
+
+	// TODO check errors after the fact in case of ignore.
+	for _, inst := range instances {
+		if err := inst.Value().Validate(); err != nil {
+			return nil, err
+		}
+	}
+	return instances, nil
+}
+
 func buildTools(cmd *cobra.Command, args []string) (*cue.Instance, error) {
 	binst := loadFromArgs(cmd, args)
 	if len(binst) == 0 {
@@ -136,6 +153,11 @@ func buildTools(cmd *cobra.Command, args []string) (*cue.Instance, error) {
 		}
 	}
 
-	inst := cue.Merge(buildInstances(cmd, binst)...).Build(ti)
+	insts, err := buildToolInstances(cmd, binst)
+	if err != nil {
+		return nil, err
+	}
+
+	inst := cue.Merge(insts...).Build(ti)
 	return inst, inst.Err
 }

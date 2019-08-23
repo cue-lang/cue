@@ -161,7 +161,9 @@ func New(args []string) (cmd *Command, err error) {
 	}
 
 	if args[0] == "help" {
-		return cmd, addSubcommands(cmd, sub, args[1:])
+		// Allow errors.
+		_ = addSubcommands(cmd, sub, args[1:])
+		return cmd, nil
 	}
 
 	if _, ok := sub[args[0]]; ok {

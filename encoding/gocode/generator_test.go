@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
+	"github.com/kylelemons/godebug/diff"
 )
 
 var update = flag.Bool("update", false, "update test files")
@@ -62,12 +63,20 @@ func TestGenerate(t *testing.T) {
 			if err != nil {
 				t.Fatal(errStr(err))
 			}
-			// t.Log(string(b))
 
 			goFile := filepath.Join("testdata", d.Name(), "cue_gen.go")
 			if *update {
 				_ = ioutil.WriteFile(goFile, b, 0644)
 				return
+			}
+
+			want, err := ioutil.ReadFile(goFile)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			if d := diff.Diff(string(want), string(b)); d != "" {
+				t.Errorf("files differ:\n%v", d)
 			}
 		})
 	}

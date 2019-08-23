@@ -51,6 +51,9 @@ func (e *nodeError) Path() []string {
 }
 
 func (v Value) toErr(b *bottom) errors.Error {
+	if b.err != nil {
+		return b.err
+	}
 	return &valueError{
 		v:   v,
 		err: b,
@@ -127,12 +130,9 @@ type bottom struct {
 	format    string
 	args      []interface{}
 
-	// Debugging info
+	err     errors.Error // pass-through from higher-level API
 	value   value
 	wrapped *bottom
-
-	// TODO: file at which the error was generated in the code.
-	// File positions of where the error occurred.
 }
 
 func (x *bottom) kind() kind { return bottomKind }
@@ -209,6 +209,8 @@ func (idx *index) mkErr(src source, args ...interface{}) *bottom {
 			e.code = x
 		case *bottom:
 			e.wrapped = x
+		case errors.Error:
+			e.err = x
 		case value:
 		case string:
 			e.format = x

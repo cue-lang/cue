@@ -181,7 +181,7 @@ func parseString(ctx *context, node ast.Expr, q literal.QuoteInfo, s string) (n 
 	src := newExpr(node)
 	str, err := q.Unquote(s)
 	if err != nil {
-		return ctx.mkErr(src, err, "invalid string: %v", err)
+		return ctx.mkErr(src, "invalid string: %v", err)
 	}
 	if q.IsDouble() {
 		return &stringLit{src, str, nil}

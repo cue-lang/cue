@@ -159,8 +159,13 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 		filename := "unmarshal"
 		if i.inst != nil && len(i.inst.Files) == 1 {
 			filename = i.inst.Files[0].Filename
-			if i.Dir != "" {
-				filename, _ = filepath.Rel(i.Dir, filename)
+
+			dir := i.Dir
+			if i.inst != nil && i.inst.Root != "" {
+				dir = i.inst.Root
+			}
+			if dir != "" {
+				filename, _ = filepath.Rel(dir, filename)
 			}
 		}
 

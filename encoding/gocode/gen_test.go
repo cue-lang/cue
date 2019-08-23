@@ -42,7 +42,7 @@ func TestPackages(t *testing.T) {
 			v := &pkg1.OtherStruct{A: "car"}
 			return v.Validate()
 		}(),
-		want: "A: invalid value \"car\" (does not satisfy strings.ContainsAny(\"X\")):\n    pkg1/instance.cue:x:x",
+		want: "A: invalid value \"car\" (does not satisfy strings.ContainsAny(\"X\")):\n    pkg1/instance.cue:x:x\nP: invalid value 0 (out of bound >5):\n    pkg2/instance.cue:x:x",
 	}, {
 		name: "failing field of type int",
 		got: func() error {
@@ -53,7 +53,7 @@ func TestPackages(t *testing.T) {
 	}, {
 		name: "failing nested struct ",
 		got: func() error {
-			v := &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car"}}
+			v := &pkg1.MyStruct{A: 5, B: "dog", O: &pkg1.OtherStruct{A: "car", P: 6}}
 			return v.Validate()
 		}(),
 		want: "O.A: invalid value \"car\" (does not satisfy strings.ContainsAny(\"X\")):\n    pkg1/instance.cue:x:x",

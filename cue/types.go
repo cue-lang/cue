@@ -1242,17 +1242,7 @@ func (v Value) Unify(w Value) Value {
 	val := mkBin(ctx, src.Pos(), opUnify, a, b)
 	u := newValueRoot(ctx, val)
 	if err := u.Validate(); err != nil {
-		// TODO: record all errors in a Value.
-		switch x := errors.Errors(err)[0].(type) {
-		case *valueError:
-			p := *x.v.path
-			p.v = x.err
-			p.cache = x.err
-			u = Value{x.v.idx, &p}
-
-		default:
-			u = newValueRoot(ctx, ctx.mkErr(src, err))
-		}
+		u = newValueRoot(ctx, ctx.mkErr(src, err))
 	}
 	return u
 }

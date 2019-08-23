@@ -165,13 +165,17 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 				dir = i.inst.Root
 			}
 			if dir != "" {
+				filename = filepath.FromSlash(filename)
 				filename, _ = filepath.Rel(dir, filename)
 				filename = filepath.ToSlash(filename)
 			}
 		}
+		// TODO: this should probably be changed upstream, but as the path
+		// is for reference purposes only, this is safe.
+		importPath := filepath.ToSlash(i.ImportPath)
 
 		staged = append(staged, instanceData{
-			Path:  i.ImportPath,
+			Path:  importPath,
 			Files: []fileData{{filename, b}},
 		})
 

@@ -61,7 +61,7 @@
 //   StringValue    string           See struct.proto.
 //   NumberValue    number           See struct.proto.
 //   StringValue    string           See struct.proto.
-//   Empty          struct.MaxFields(0)
+//   Empty          close({})
 //   Timestamp      time.Time        See struct.proto.
 //   Duration       time.Duration    See struct.proto.
 //

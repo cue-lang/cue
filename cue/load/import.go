@@ -199,6 +199,8 @@ func (l *loader) loadFunc(parentPath string) build.LoadFunc {
 
 func updateDirs(c *Config, p *build.Instance, path, srcDir string, mode importMode) errors.Error {
 	p.DisplayPath = path
+	p.Root = c.ModuleRoot
+	p.Module = c.Module
 
 	isLocal := isLocalImport(path)
 	p.Local = isLocal

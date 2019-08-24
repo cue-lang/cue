@@ -148,6 +148,13 @@ func (c Config) newErrInstance(m *match, path string, err error) *build.Instance
 	return i
 }
 
+// Complete updates the configuration information. After calling complete,
+// the following invariants hold:
+//  - c.ModuleRoot != ""
+//  - c.Module is set to the module import prefix if there is a cue.mod file
+//    with the module property.
+//  - c.loader != nil
+//  - c.cache != ""
 func (c Config) complete() (cfg *Config, err error) {
 	// Each major CUE release should add a tag here.
 	// Old tags should not be removed. That is, the cue1.x tag is present
@@ -201,7 +208,7 @@ func (c Config) complete() (cfg *Config, err error) {
 			break
 		}
 		var r cue.Runtime
-		inst, err := r.Parse(mod, f)
+		inst, err := r.Compile(mod, f)
 		if err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 		}

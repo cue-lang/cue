@@ -80,7 +80,16 @@ type Instance struct {
 	// from ancestor directories, up to the module file.
 	Dir string
 
-	Root string // module root directory ("" if unknown)
+	// Module defines the module name of a package. It must be defined if
+	// the packages within the directory structure of the module are to be
+	// imported by other packages, including those within the module.
+	Module string
+
+	// Root is the root of the directory hierarchy, it may be "" if this an
+	// instance has no imports.
+	// If Module != "", this corresponds to the module root.
+	// Root/pkg is the directory that holds third-party packages.
+	Root string // root directory of hierarchy ("" if unknown)
 
 	// AllTags are the build tags that can influence file selection in this
 	// directory.
@@ -104,6 +113,25 @@ type Instance struct {
 	Deps       []string
 	DepsErrors []error
 	Match      []string
+}
+
+// Dependencies reports all Instances on which this instance depends.
+func (inst *Instance) Dependencies() []*Instance {
+	// TODO: as cyclic dependencies are not allowed, we could just not check.
+	// Do for safety now and remove later if needed.
+	return appendDependencies(nil, inst, map[*Instance]bool{})
+}
+
+func appendDependencies(a []*Instance, inst *Instance, done map[*Instance]bool) []*Instance {
+	for _, d := range inst.Imports {
+		if done[d] {
+			continue
+		}
+		a = append(a, d)
+		done[d] = true
+		a = appendDependencies(a, d, done)
+	}
+	return a
 }
 
 // Abs converts relative path used in the one of the file fields to an

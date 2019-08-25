@@ -96,6 +96,8 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 			b := o.lookup(ctx, a.feature)
 			if !a.optional && b.optional {
 				return false
+			} else if a.definition != b.definition {
+				return false
 			} else if b.val() == nil {
 				// If field a is optional and has value top, neither the
 				// omission of the field nor the field defined with any value
@@ -103,6 +105,15 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 				return a.optional && isTop(a.v)
 			} else if !subsumes(ctx, a.v, b.val(), mode) {
 				return false
+			}
+		}
+		// For closed structs, all arcs in b must exist in a.
+		if x.isClosed {
+			for _, b := range o.arcs {
+				a := x.lookup(ctx, b.feature)
+				if a.val() == nil {
+					return false
+				}
 			}
 		}
 	}

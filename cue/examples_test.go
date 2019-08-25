@@ -16,6 +16,7 @@ package cue_test
 
 import (
 	"fmt"
+	"log"
 
 	"cuelang.org/go/cue"
 )
@@ -63,4 +64,54 @@ func ExampleValue_Decode() {
 	// Output:
 	// {2 4}
 	// json: cannot unmarshal string into Go struct field ab.B of type int
+}
+
+func ExampleSubsumes() {
+	// Check compatibility of successive APIs.
+	var r cue.Runtime
+
+	inst, err := r.Compile("apis", `
+	// Release notes:
+	// - You can now specify your age and your hobby!
+	V1 :: {
+		age:   >=0 & <=100
+		hobby: string
+	}
+
+	// Release notes:
+	// - People get to be older than 100, so we relaxed it.
+	// - It seems not many people have a hobby, so we made it optional.
+	V2 :: {
+		age:    >=0 & <=150 // people get older now
+		hobby?: string      // some people don't have a hobby
+	}
+
+	// Release notes:
+	// - Actually no one seems to have a hobby nowadays anymore,
+	//   so we dropped the field.
+	V3 :: {
+		age: >=0 & <=150
+	}`)
+
+	if err != nil {
+		fmt.Println(err)
+		// handle error
+	}
+	v1, err1 := inst.LookupField("V1")
+	v2, err2 := inst.LookupField("V2")
+	v3, err3 := inst.LookupField("V3")
+	if err1 != nil || err2 != nil || err3 != nil {
+		log.Println(err1, err2, err3)
+	}
+
+	// Is V2 backwards compatible with V1? In other words, does V2 subsume V1?
+	pass := v2.Value.Subsumes(v1.Value)
+	fmt.Println("V2 is backwards compatible with V1:", pass)
+
+	pass = v3.Value.Subsumes(v2.Value)
+	fmt.Println("V3 is backwards compatible with V2:", pass)
+
+	// Output:
+	// V2 is backwards compatible with V1: true
+	// V3 is backwards compatible with V2: false
 }

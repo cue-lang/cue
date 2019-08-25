@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	goast "go/ast"
 	"io"
 	"math"
 	"math/big"
@@ -716,7 +717,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}
 		return marshalList(&i)
 	case structKind:
-		obj, _ := v.structVal(ctx)
+		obj, _ := v.structValData(ctx)
 		return obj.marshalJSON()
 	case bottomKind:
 		return nil, toMarshalErr(v, x.(*bottom))
@@ -1033,11 +1034,15 @@ func (v Value) Reader() (io.Reader, error) {
 // a structVal.
 
 // structVal returns an structVal or an error if v is not a struct.
-func (v Value) structVal(ctx *context) (structValue, *bottom) {
+func (v Value) structValData(ctx *context) (structValue, *bottom) {
 	return v.structValOpts(ctx, options{
 		omitHidden:   true,
 		omitOptional: true,
 	})
+}
+
+func (v Value) structValFull(ctx *context) (structValue, *bottom) {
+	return v.structValOpts(ctx, options{})
 }
 
 // structVal returns an structVal or an error if v is not a struct.
@@ -1131,8 +1136,9 @@ type FieldInfo struct {
 	Name  string
 	Value Value
 
-	IsOptional bool
-	IsHidden   bool
+	IsDefinition bool
+	IsOptional   bool
+	IsHidden     bool
 }
 
 // field reports information about the ith field, i < o.Len().
@@ -1143,17 +1149,17 @@ func (s *Struct) field(i int) FieldInfo {
 
 	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
 	str := ctx.labelStr(a.feature)
-	return FieldInfo{str, v, a.optional, a.feature&hidden != 0}
+	return FieldInfo{str, v, a.definition, a.optional, a.feature&hidden != 0}
 }
 
-func (s *Struct) FieldByName(name string) (FieldInfo, bool) {
+func (s *Struct) FieldByName(name string) (FieldInfo, error) {
 	f := s.v.ctx().strLabel(name)
 	for i, a := range s.s.arcs {
 		if a.feature == f {
-			return s.field(i), true
+			return s.field(i), nil
 		}
 	}
-	return FieldInfo{}, false
+	return FieldInfo{}, errNotFound
 }
 
 // Fields creates an iterator over the Struct's fields.
@@ -1175,14 +1181,15 @@ func (v Value) Fields(opts ...Option) (Iterator, error) {
 	return Iterator{ctx: ctx, val: v, iter: obj.n, len: len(obj.n.arcs)}, nil
 }
 
-// Lookup reports the value starting from v, or an error if the path is not
-// found. The empty path returns v itself.
+// Lookup reports the value at a path starting from v.
+// The empty path returns v itself.
 //
-// Lookup cannot be used to look up hidden fields.
+// The Exists() method can be used to verify if the returned value existed.
+// Lookup cannot be used to look up hidden or optional fields or definitions.
 func (v Value) Lookup(path ...string) Value {
 	ctx := v.ctx()
 	for _, k := range path {
-		obj, err := v.structVal(ctx)
+		obj, err := v.structValData(ctx)
 		if err != nil {
 			// TODO: return a Value at the same location and a new error?
 			return newValueRoot(ctx, err)
@@ -1190,6 +1197,25 @@ func (v Value) Lookup(path ...string) Value {
 		v = obj.Lookup(k)
 	}
 	return v
+}
+
+var errNotFound = errors.Newf(token.NoPos, "field not found")
+
+// LookupField reports information about a field of v.
+func (v Value) LookupField(path string) (FieldInfo, error) {
+	s, err := v.Struct()
+	if err != nil {
+		// TODO: return a Value at the same location and a new error?
+		return FieldInfo{}, err
+	}
+	f, err := s.FieldByName(path)
+	if err != nil {
+		return f, err
+	}
+	if f.IsHidden || f.IsDefinition && !goast.IsExported(path) {
+		return f, errNotFound
+	}
+	return f, err
 }
 
 // Template returns a function that represents the template definition for a
@@ -1502,7 +1528,8 @@ func isGroundRecursive(ctx *context, v value) *bottom {
 }
 
 // Walk descends into all values of v, calling f. If f returns false, Walk
-// will not descent further.
+// will not descent further. It only visits values that are part of the data
+// model, so this excludes optional fields, hidden fields, and definitions.
 func (v Value) Walk(before func(Value) bool, after func(Value)) {
 	ctx := v.ctx()
 	switch v.Kind() {
@@ -1510,7 +1537,7 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 		if before != nil && !before(v) {
 			return
 		}
-		obj, _ := v.structVal(ctx)
+		obj, _ := v.structValData(ctx)
 		for i := 0; i < obj.Len(); i++ {
 			_, v := obj.At(i)
 			v.Walk(before, after)

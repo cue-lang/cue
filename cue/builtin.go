@@ -120,7 +120,7 @@ var lenBuiltin = &builtin{
 		v := c.value(0)
 		switch v.Kind() {
 		case StructKind:
-			s, _ := v.structVal(c.ctx)
+			s, _ := v.structValData(c.ctx)
 			c.ret = s.Len()
 		case ListKind:
 			i := 0

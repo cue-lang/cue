@@ -320,6 +320,9 @@ func TestSubsume(t *testing.T) {
 		312: {subsumes: false, in: `a: !=2 & !=4, b: >3`},
 		313: {subsumes: true, in: `a: !=2 & !=4, b: >5`},
 
+		314: {subsumes: false, in: `a: >=0 & <=100, b: >=0 & <=150`},
+		315: {subsumes: true, in: `a: >=0 & <=150, b: >=0 & <=100`},
+
 		// Disjunctions
 		330: {subsumes: true, in: `a: >5, b: >10 | 8`},
 		331: {subsumes: false, in: `a: >8, b: >10 | 8`},
@@ -371,6 +374,18 @@ func TestSubsume(t *testing.T) {
 		512: {subsumes: false, in: `a: [{b: "foo"}], b: [{b: string}] `},
 		513: {subsumes: false, in: `a: [{b: string}], b: [{b: "foo"}, ...{b: "foo"}] `},
 		520: {subsumes: false, in: `a: [_, int, ...], b: [int, string, ...string] `},
+
+		// Closed structs.
+		600: {subsumes: false, in: `a: close({}), b: {a: 1}`},
+		601: {subsumes: true, in: `a: close({a: 1}), b: {a: 1}`},
+		602: {subsumes: false, in: `a: close({a: 1, b: 1}), b: {a: 1}`},
+		603: {subsumes: false, in: `a: {a: 1}, b: close({})`},
+		604: {subsumes: true, in: `a: {a: 1}, b: close({a: 1})`},
+		605: {subsumes: true, in: `a: {a: 1}, b: close({a: 1, b: 1})`},
+
+		// Definitions are not values.
+		610: {subsumes: false, in: `a: {a :: 1}, b: {a: 1}`},
+		611: {subsumes: false, in: `a: {a: 1}, b: {a :: 1}`},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)
@@ -395,7 +410,8 @@ func TestSubsume(t *testing.T) {
 					b = arc.v
 				}
 			}
-			if got := subsumes(ctx, a, b, tc.mode); got != tc.subsumes {
+			got := subsumes(ctx, a, b, tc.mode)
+			if got != tc.subsumes {
 				t.Errorf("got %v; want %v (%v vs %v)", got, tc.subsumes, a.kind(), b.kind())
 			}
 		})

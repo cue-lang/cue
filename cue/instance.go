@@ -15,6 +15,8 @@
 package cue
 
 import (
+	goast "go/ast"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -231,7 +233,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 
 	ctx := inst.newContext()
 	val := newValueRoot(ctx, inst.rootValue)
-	v, err := val.structVal(ctx)
+	v, err := val.structValFull(ctx)
 	if err != nil {
 		i.setError(val.toErr(err))
 		return i
@@ -252,22 +254,48 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	return i
 }
 
-// Lookup reports the value starting from the top level struct (not the emitted
-// value), or an error if the path is not found.
-// The empty path returns the top-level configuration struct, regardless of
-// whether an emit value was specified.
+// Lookup reports the value at a path starting from the top level struct (not
+// the emitted value). The Exists method of the returned value will report false
+// if the path did not exist. The Err method reports if any error occurred
+// during evaluation. The empty path returns the top-level configuration struct,
+// regardless of whether an emit value was specified.
 func (inst *Instance) Lookup(path ...string) Value {
 	idx := inst.index
 	ctx := idx.newContext()
 	v := newValueRoot(ctx, inst.rootValue)
 	for _, k := range path {
-		obj, err := v.structVal(ctx)
+		obj, err := v.structValData(ctx)
 		if err != nil {
 			return Value{idx, &valueData{arc: arc{cache: err, v: err}}}
 		}
 		v = obj.Lookup(k)
 	}
 	return v
+}
+
+// LookupField reports a Field at a path starting from v, or an error if the
+// path is not. The empty path returns v itself.
+//
+// It cannot look up hidden or unexported fields.
+func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
+	idx := inst.index
+	ctx := idx.newContext()
+	v := newValueRoot(ctx, inst.rootValue)
+	for i, k := range path {
+		s, err := v.Struct()
+		if err != nil {
+			return f, err
+		}
+
+		f, err = s.FieldByName(k)
+		if err != nil {
+			return f, err
+		}
+		if f.IsHidden || (i == 0 || f.IsDefinition) && !goast.IsExported(f.Name) {
+			return f, errNotFound
+		}
+	}
+	return f, err
 }
 
 // Fill creates a new instance with the values of the old instance unified with

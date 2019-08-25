@@ -1992,7 +1992,7 @@ func TestReferences(t *testing.T) {
 			ctx, st := compileFile(t, tc.config)
 			v := newValueRoot(ctx, st)
 			for _, k := range strings.Split(tc.in, ".") {
-				obj, err := v.structVal(ctx)
+				obj, err := v.structValFull(ctx)
 				if err != nil {
 					t.Fatal(err)
 				}

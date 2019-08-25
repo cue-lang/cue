@@ -666,7 +666,7 @@ func (h *hoister) hoist(expr ast.Expr) {
 
 	ast.Walk(expr, func(n ast.Node) bool {
 		switch n.(type) {
-		case *ast.ComprehensionDecl:
+		case *ast.Comprehension:
 			return false
 		}
 		return true

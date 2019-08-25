@@ -231,7 +231,7 @@ func TestParse(t *testing.T) {
 				y: { a: 1, b: 2}
 				a: { "\(k)": v for k, v in y if v > 2 }
 			 }`,
-		`{y: {a: 1, b: 2}, a: {"\(k)": v for k: v in y if v>2 }}`,
+		`{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
 	}, {
 		"duplicates allowed",
 		`{

@@ -115,7 +115,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 	case *ast.StructLit:
 		return newScope(s.file, s, x, x.Elts)
 
-	case *ast.ComprehensionDecl:
+	case *ast.Comprehension:
 		s = scopeClauses(s, x.Clauses)
 
 	case *ast.ListComprehension:

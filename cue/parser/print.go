@@ -82,10 +82,9 @@ func debugStr(x interface{}) (out string) {
 		}
 		return out
 
-	case *ast.ComprehensionDecl:
-		out := debugStr(v.Field)
-		out += " "
-		out += debugStr(v.Clauses)
+	case *ast.Comprehension:
+		out := debugStr(v.Clauses)
+		out += debugStr(v.Value)
 		return out
 
 	case *ast.StructLit:

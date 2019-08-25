@@ -63,7 +63,7 @@ func (*StructLit) exprNode()     {}
 func (*ListLit) exprNode()       {}
 func (*Ellipsis) exprNode()      {}
 
-// func (*StructComprehension) exprNode() {}
+// func (*Comprehension) exprNode() {}
 func (*ListComprehension) exprNode() {}
 func (*ParenExpr) exprNode()         {}
 func (*SelectorExpr) exprNode()      {}
@@ -80,13 +80,13 @@ type Decl interface {
 	declNode()
 }
 
-func (*Field) declNode()             {}
-func (*ComprehensionDecl) declNode() {}
-func (*ImportDecl) declNode()        {}
-func (*BadDecl) declNode()           {}
-func (*EmbedDecl) declNode()         {}
-func (*Alias) declNode()             {}
-func (*Ellipsis) declNode()          {}
+func (*Field) declNode()         {}
+func (*Comprehension) declNode() {}
+func (*ImportDecl) declNode()    {}
+func (*BadDecl) declNode()       {}
+func (*EmbedDecl) declNode()     {}
+func (*Alias) declNode()         {}
+func (*Ellipsis) declNode()      {}
 
 // Not technically declarations, but appearing at the same level.
 func (*Package) declNode()      {}
@@ -317,20 +317,16 @@ type Alias struct {
 func (a *Alias) Pos() token.Pos { return a.Ident.Pos() }
 func (a *Alias) End() token.Pos { return a.Expr.End() }
 
-// A ComprehensionDecl node represents a field comprehension.
-type ComprehensionDecl struct {
+// A Comprehension node represents a comprehension declaration.
+type Comprehension struct {
 	comments
-	Field   *Field
-	Select  token.Pos
-	Clauses []Clause
+	Clauses []Clause // There must be at least one clause.
+	Value   Expr     // Must be a struct
 }
 
-func (x *ComprehensionDecl) Pos() token.Pos { return x.Field.Pos() }
-func (x *ComprehensionDecl) End() token.Pos {
-	if len(x.Clauses) > 0 {
-		return x.Clauses[len(x.Clauses)-1].End()
-	}
-	return x.Select
+func (x *Comprehension) Pos() token.Pos { return x.Clauses[0].Pos() }
+func (x *Comprehension) End() token.Pos {
+	return x.Value.End()
 }
 
 // ----------------------------------------------------------------------------

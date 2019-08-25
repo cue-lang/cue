@@ -678,7 +678,12 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 				}
 				var decl ast.Decl = f
 				if len(clauses) > 0 {
-					decl = &ast.ComprehensionDecl{Field: f, Clauses: clauses}
+					decl = &ast.Comprehension{
+						Clauses: clauses,
+						Value: &ast.StructLit{
+							Elts: []ast.Decl{f},
+						},
+					}
 				}
 				obj.Elts = append(obj.Elts, decl)
 				break

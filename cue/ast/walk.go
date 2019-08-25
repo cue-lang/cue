@@ -169,11 +169,11 @@ func walk(v visitor, node Node) {
 		walk(v, n.Ident)
 		walk(v, n.Expr)
 
-	case *ComprehensionDecl:
-		walk(v, n.Field)
+	case *Comprehension:
 		for _, c := range n.Clauses {
 			walk(v, c)
 		}
+		walk(v, n.Value)
 
 	// Files and packages
 	case *File:

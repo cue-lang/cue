@@ -218,7 +218,7 @@ func (t *trimSet) markNodes(n ast.Node) {
 				t.markAlwaysGen(x.Value, false)
 			}
 
-		case *ast.ListComprehension, *ast.ComprehensionDecl:
+		case *ast.ListComprehension, *ast.Comprehension:
 			t.markAlwaysGen(x, true)
 		}
 	})

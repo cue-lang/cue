@@ -93,6 +93,12 @@ Some aspects of this are:
 
 ### Download and Install
 
+#### Install using Homebrew
+
+Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
+
+`brew install cuelang/tap/cue`
+
 #### Install From Source
 
 If you already have Go installed, the short version is:

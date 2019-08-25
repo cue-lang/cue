@@ -103,7 +103,7 @@ func (inst *Instance) complete() errors.Error {
 					continue
 				}
 				if imp.Err != nil {
-					return nil
+					return imp.Err
 				}
 				imp.ImportPath = path
 				// imp.parent = inst

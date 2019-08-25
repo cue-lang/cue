@@ -1221,6 +1221,9 @@ func (p *parser) parseRHS() ast.Expr {
 func isValidImport(lit string) bool {
 	const illegalChars = `!"#$%&'()*,:;<=>?[\]^{|}` + "`\uFFFD"
 	s, _ := literal.Unquote(lit) // go/scanner returns a legal string literal
+	if p := strings.LastIndexByte(s, ':'); p >= 0 {
+		s = s[:p]
+	}
 	for _, r := range s {
 		if !unicode.IsGraphic(r) || unicode.IsSpace(r) || strings.ContainsRune(illegalChars, r) {
 			return false

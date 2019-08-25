@@ -239,6 +239,24 @@ func appendToList(a list, err Error) list {
 // The zero value for an list is an empty list ready to use.
 type list []Error
 
+func (p list) Is(err, target error) bool {
+	for _, e := range p {
+		if xerrors.Is(e, target) {
+			return true
+		}
+	}
+	return false
+}
+
+func (p list) As(err error, target interface{}) bool {
+	for _, e := range p {
+		if xerrors.As(e, target) {
+			return true
+		}
+	}
+	return false
+}
+
 // AddNewf adds an Error with given position and error message to an List.
 func (p *list) AddNewf(pos token.Pos, msg string, args ...interface{}) {
 	err := &posError{pos: pos, Message: Message{format: msg, args: args}}

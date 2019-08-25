@@ -16,47 +16,49 @@ package load
 
 import (
 	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 
 	build "cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/token"
+	"golang.org/x/xerrors"
 )
 
 const testdata = "./testdata/"
 
 func getInst(pkg, cwd string) (*build.Instance, error) {
-	c, _ := (&Config{}).complete()
+	c, _ := (&Config{Dir: cwd}).complete()
 	l := loader{cfg: c}
-	p := l.importPkg(token.NoPos, pkg, cwd)
+	inst := c.newRelInstance(token.NoPos, pkg)
+	p := l.importPkg(token.NoPos, inst)
 	return p, p.Err
 }
 
-func TestDotSlashImport(t *testing.T) {
-	c, _ := (&Config{}).complete()
-	l := loader{cfg: c}
-	p := l.importPkg(token.NoPos, ".", testdata+"other")
-	errl := p.Err
-	if errl != nil {
-		t.Fatal(errl)
-	}
-	if len(p.ImportPaths) != 1 || p.ImportPaths[0] != "./file" {
-		t.Fatalf("testdata/other: Imports=%v, want [./file]", p.ImportPaths)
-	}
+// Uncomment this test if we decide to allow relative imports again.
+// func TestDotSlashImport(t *testing.T) {
+// 	c, _ := (&Config{}).complete()
+// 	l := loader{cfg: c}
+// 	p := l.importPkg(token.NoPos, ".", testdata+"other")
+// 	errl := p.Err
+// 	if errl != nil {
+// 		t.Fatal(errl)
+// 	}
+// 	if len(p.ImportPaths) != 1 || p.ImportPaths[0] != "./file" {
+// 		t.Fatalf("testdata/other: Imports=%v, want [./file]", p.ImportPaths)
+// 	}
 
-	p1, err := getInst("./file", testdata+"other")
-	if err != nil {
-		t.Fatal(err)
-	}
-	if p1.PkgName != "file" {
-		t.Fatalf("./file: Name=%q, want %q", p1.PkgName, "file")
-	}
-	dir := filepath.Clean(testdata + "other/file") // Clean to use \ on Windows
-	if p1.Dir != dir {
-		t.Fatalf("./file: Dir=%q, want %q", p1.PkgName, dir)
-	}
-}
+// 	p1, err := getInst("./file", testdata+"other")
+// 	if err != nil {
+// 		t.Fatal(err)
+// 	}
+// 	if p1.PkgName != "file" {
+// 		t.Fatalf("./file: Name=%q, want %q", p1.PkgName, "file")
+// 	}
+// 	dir := filepath.Clean(testdata + "other/file") // Clean to use \ on Windows
+// 	if p1.Dir != dir {
+// 		t.Fatalf("./file: Dir=%q, want %q", p1.PkgName, dir)
+// 	}
+// }
 
 func TestEmptyImport(t *testing.T) {
 	p, err := getInst("", "")
@@ -80,7 +82,8 @@ func TestEmptyFolderImport(t *testing.T) {
 
 func TestIgnoredCUEFilesImport(t *testing.T) {
 	_, err := getInst(".", testdata+"ignored")
-	e, ok := err.(*noCUEError)
+	var e *noCUEError
+	ok := xerrors.As(err, &e)
 	if !ok {
 		t.Fatal(`Import("testdata/ignored") did not return NoCUEError.`)
 	}
@@ -95,8 +98,8 @@ func TestMultiplePackageImport(t *testing.T) {
 	if !ok {
 		t.Fatal(`Import("testdata/multi") did not return MultiplePackageError.`)
 	}
+	mpe.Dir = ""
 	want := &multiplePackageError{
-		Dir:      filepath.FromSlash("testdata/multi"),
 		Packages: []string{"main", "test_package"},
 		Files:    []string{"file.cue", "file_appengine.cue"},
 	}

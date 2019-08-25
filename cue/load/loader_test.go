@@ -55,6 +55,7 @@ path:   example.org/test
 module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata
+display:.
 files:
     $CWD/testdata/test.cue
 imports:
@@ -70,33 +71,23 @@ path:   example.org/test
 module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata
+display:.
 files:
     $CWD/testdata/test.cue
 imports:
     example.org/test/sub: $CWD/testdata/sub/sub.cue`,
 	}, {
 		// TODO:
-		// - paths are incorrect, should be example.org/test/other:main and
-		//   example.org/test/other/file, respectively.
-		// - referenced import path of files is wrong.
+		// - path incorrect, should be example.org/test/other:main.
 		cfg:  dirCfg,
 		args: args("./other/..."),
 		want: `
-path:   example.org/test
+err:    relative import paths not allowed ("./file")
+path:   ""
 module: example.org/test
-root:   $CWD/testdata/
-dir:    $CWD/testdata/other
-files:
-	$CWD/testdata/other/main.cue
-imports:
-	./file: $CWD/testdata/other/file/file.cue
-
-path:   example.org/test/file
-module: example.org/test
-root:   $CWD/testdata/
-dir:    $CWD/testdata/other/file
-files:
-	$CWD/testdata/other/file/file.cue`,
+root:   $CWD/testdata
+dir:    $CWD/testdata/pkg
+display:`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./anon"),
@@ -105,37 +96,66 @@ err:    build constraints exclude all CUE files in ./anon
 path:   example.org/test/anon
 module: example.org/test
 root:   $CWD/testdata
-dir:    $CWD/testdata/anon`,
+dir:    $CWD/testdata/anon
+display:./anon`,
 	}, {
 		// TODO:
-		// - paths are incorrect, should be example.org/test/other:main and
-		//   example.org/test/other/file, respectively.
+		// - paths are incorrect, should be example.org/test/other:main.
 		cfg:  dirCfg,
 		args: args("./other"),
 		want: `
-path:   example.org/test/other
+err:    relative import paths not allowed ("./file")
+path:   example.org/test/other:main
 module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata/other
+display:./other
 files:
-	$CWD/testdata/other/main.cue
-imports:
-	./file: $CWD/testdata/other/file/file.cue`,
+	$CWD/testdata/other/main.cue`,
 	}, {
 		// TODO:
 		// - incorrect path, should be example.org/test/hello:test
 		cfg:  dirCfg,
 		args: args("./hello"),
 		want: `
-path:   example.org/test/hello
+path:   example.org/test/hello:test
 module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata/hello
+display:./hello
 files:
 	$CWD/testdata/test.cue
 	$CWD/testdata/hello/test.cue
 imports:
 	example.org/test/sub: $CWD/testdata/sub/sub.cue`,
+	}, {
+		// TODO:
+		// - incorrect path, should be example.org/test/hello:test
+		cfg:  dirCfg,
+		args: args("example.org/test/hello:test"),
+		want: `
+path:   example.org/test/hello:test
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/hello
+display:example.org/test/hello:test
+files:
+	$CWD/testdata/test.cue
+	$CWD/testdata/hello/test.cue
+imports:
+	example.org/test/sub: $CWD/testdata/sub/sub.cue`,
+	}, {
+		// TODO:
+		// - incorrect path, should be example.org/test/hello:test
+		cfg:  dirCfg,
+		args: args("example.org/test/hello:nonexist"),
+		want: `
+err:    build constraints exclude all CUE files in example.org/test/hello:nonexist
+path:   example.org/test/hello:nonexist
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/hello
+display:example.org/test/hello:nonexist`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./anon.cue", "./other/anon.cue"),
@@ -144,6 +164,7 @@ path:   ""
 module: ""
 root:   $CWD/testdata
 dir:    $CWD/testdata
+display:command-line-arguments
 files:
 	$CWD/testdata/anon.cue
 	$CWD/testdata/other/anon.cue`,
@@ -156,6 +177,7 @@ path:   ""
 module: ""
 root:   $CWD/testdata
 dir:    $CWD/testdata
+display:command-line-arguments
 files:
 	$CWD/testdata/anon.cue`,
 	}, {
@@ -164,10 +186,11 @@ files:
 		args: args("non-existing"),
 		want: `
 err:    cannot find package "non-existing"
-path:   ""
+path:   non-existing
 module: example.org/test
 root:   $CWD/testdata
-dir:    non-existing `,
+dir:    $CWD/testdata/pkg/non-existing
+display:non-existing`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./empty"),
@@ -176,7 +199,8 @@ err:    no CUE files in ./empty
 path:   example.org/test/empty
 module: example.org/test
 root:   $CWD/testdata
-dir:    $CWD/testdata/empty`,
+dir:    $CWD/testdata/empty
+display:./empty`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./imports"),
@@ -185,13 +209,17 @@ path:   example.org/test/imports
 module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata/imports
+display:./imports
 files:
 	$CWD/testdata/imports/imports.cue
 imports:
 	acme.com/catch: $CWD/testdata/pkg/acme.com/catch/catch.cue
-	acme.com/helper: $CWD/testdata/pkg/acme.com/helper/helper.cue`,
+	acme.com/helper:helper1: $CWD/testdata/pkg/acme.com/helper/helper1.cue`,
 	}}
 	for i, tc := range testCases {
+		// if i != 5 {
+		// 	continue
+		// }
 		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {
 			pkgs := Instances(tc.args, tc.cfg)
 
@@ -223,6 +251,7 @@ path:   {{if .ImportPath}}{{.ImportPath}}{{else}}""{{end}}
 module: {{if .Module}}{{.Module}}{{else}}""{{end}}
 root:   {{.Root}}
 dir:    {{.Dir}}
+display:{{.DisplayPath}}
 {{if .Files -}}
 files:
 {{- range .Files}}
@@ -245,6 +274,9 @@ func TestOverlays(t *testing.T) {
 	}
 	c := &Config{
 		Overlay: map[string]Source{
+			// Not necessary, but nice to add.
+			abs("cue.mod"): FromString(`module: acme.com`),
+
 			abs("dir/top.cue"): FromBytes([]byte(`
 			   package top
 			   msg: "Hello"

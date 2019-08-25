@@ -148,13 +148,14 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 
 	root := l.abs(dir)
 
-	if c.ModuleRoot != "" {
-		if !hasFilepathPrefix(root, c.ModuleRoot) {
-			m.Err = errors.Newf(token.NoPos,
-				"cue: pattern %s refers to dir %s, outside module root %s",
-				pattern, root, c.ModuleRoot)
-			return m
-		}
+	// Find new module root from here or check there are no additional
+	// cue.mod files between here and the next module.
+
+	if !hasFilepathPrefix(root, c.ModuleRoot) {
+		m.Err = errors.Newf(token.NoPos,
+			"cue: pattern %s refers to dir %s, outside module root %s",
+			pattern, root, c.ModuleRoot)
+		return m
 	}
 
 	pkgDir := filepath.Join(root, "pkg")
@@ -192,7 +193,17 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 		// due to invalid CUE source files. This means that directories
 		// containing parse errors will be built (and fail) instead of being
 		// silently skipped as not matching the pattern.
-		p := l.importPkg(token.NoPos, "."+path[len(root):], root)
+		// Do not take root, as we want to stay relative
+		// to one dir only.
+		dir, e := filepath.Rel(c.Dir, path)
+		if e != nil {
+			panic(err)
+		} else {
+			dir = "./" + dir
+		}
+		// TODO: consider not doing these checks here.
+		inst := c.newRelInstance(token.NoPos, dir)
+		p := l.importPkg(token.NoPos, inst)
 		if err := p.Err; err != nil && (p == nil || len(p.InvalidCUEFiles) == 0) {
 			switch err.(type) {
 			case nil:
@@ -332,7 +343,14 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 			continue
 		}
 
-		pkg := l.importPkg(token.NoPos, a, l.cfg.Dir)
+		var p *build.Instance
+		if isLocalImport(a) {
+			p = l.cfg.newRelInstance(token.NoPos, a)
+		} else {
+			p = l.cfg.newInstance(token.NoPos, importPath(a))
+		}
+
+		pkg := l.importPkg(token.NoPos, p)
 		out = append(out, &match{Pattern: a, Literal: true, Pkgs: []*build.Instance{pkg}})
 	}
 	return out

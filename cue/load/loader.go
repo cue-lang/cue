@@ -42,7 +42,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 	newC, err := c.complete()
 	if err != nil {
-		return []*build.Instance{c.newErrInstance(nil, "", err)}
+		return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
 	}
 	c = newC
 
@@ -55,13 +55,10 @@ func Instances(args []string, c *Config) []*build.Instance {
 		return []*build.Instance{l.cueFilesPackage(args)}
 	}
 
-	dummy := c.newInstance("user")
-	dummy.Local = true
-
 	a := []*build.Instance{}
 	for _, m := range l.importPaths(args) {
 		if m.Err != nil {
-			inst := c.newErrInstance(m, "", m.Err)
+			inst := c.newErrInstance(token.NoPos, "", m.Err)
 			a = append(a, inst)
 			continue
 		}
@@ -102,17 +99,17 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	pos := token.NoPos
 	cfg := l.cfg
 	// ModInit() // TODO: support modules
-	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc(cfg.Dir))
+	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc())
 
 	for _, f := range files {
 		if cfg.isDir(f) {
-			return cfg.newErrInstance(nil, f,
+			return cfg.newErrInstance(token.NoPos, toImportPath(f),
 				errors.Newf(pos, "cannot mix files with directories %v", f))
 		}
 		ext := filepath.Ext(f)
 		enc := encoding.MapExtension(ext)
 		if enc == nil {
-			return cfg.newErrInstance(nil, f,
+			return cfg.newErrInstance(token.NoPos, toImportPath(f),
 				errors.Newf(pos, "unrecognized extension %q", ext))
 		}
 	}
@@ -126,11 +123,11 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		}
 		fi, err := cfg.fileSystem.stat(path)
 		if err != nil {
-			return cfg.newErrInstance(nil, path,
+			return cfg.newErrInstance(pos, toImportPath(path),
 				errors.Wrapf(err, pos, "could not find dir %s", path))
 		}
 		if fi.IsDir() {
-			return cfg.newErrInstance(nil, path,
+			return cfg.newErrInstance(pos, toImportPath(path),
 				errors.Newf(pos, "%s is a directory, should be a CUE file", file))
 		}
 		fp.add(pos, cfg.Dir, file, allowAnonymous)
@@ -139,7 +136,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	// TODO: ModImportFromFiles(files)
 	_, err := filepath.Abs(cfg.Dir)
 	if err != nil {
-		return cfg.newErrInstance(nil, cfg.Dir,
+		return cfg.newErrInstance(pos, toImportPath(cfg.Dir),
 			errors.Wrapf(err, pos, "could convert '%s' to absolute path", cfg.Dir))
 	}
 	pkg.Dir = cfg.Dir

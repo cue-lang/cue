@@ -16,8 +16,10 @@ package load
 
 import (
 	"os"
+	pathpkg "path"
 	"path/filepath"
 	"runtime"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/build"
@@ -29,7 +31,7 @@ const (
 	cueSuffix  = ".cue"
 	defaultDir = "cue"
 	modFile    = "cue.mod"
-	pkgDir     = "pkg" // TODO: vendor?
+	pkgDir     = "pkg" // TODO: vendor, third_party, _imports?
 )
 
 // FromArgsUsage is a partial usage message that applications calling
@@ -133,19 +135,184 @@ type Config struct {
 	Overlay map[string]Source
 
 	fileSystem
+
+	loadFunc build.LoadFunc
 }
 
-func (c Config) newInstance(path string) *build.Instance {
-	i := c.Context.NewInstance(path, nil)
-	i.DisplayPath = path
+func (c *Config) newInstance(pos token.Pos, p importPath) *build.Instance {
+	dir, name, err := c.absDirFromImportPath(pos, p)
+	i := c.Context.NewInstance(dir, c.loadFunc)
+	i.Dir = dir
+	i.PkgName = name
+	i.DisplayPath = string(p)
+	i.ImportPath = string(p)
+	i.Root = c.ModuleRoot
+	i.Module = c.Module
+	i.Err = errors.Append(i.Err, err)
+
 	return i
 }
 
-func (c Config) newErrInstance(m *match, path string, err error) *build.Instance {
-	i := c.Context.NewInstance(path, nil)
-	i.DisplayPath = path
-	i.ReportError(errors.Promote(err, "instance"))
+func (c *Config) newRelInstance(pos token.Pos, path string) *build.Instance {
+	fs := c.fileSystem
+
+	var err errors.Error
+	dir := path
+
+	p := c.Context.NewInstance(path, c.loadFunc)
+	p.PkgName = c.Package
+	p.DisplayPath = filepath.ToSlash(path)
+	// p.ImportPath = string(dir) // compute unique ID.
+	p.Root = c.ModuleRoot
+	p.Module = c.Module
+
+	if isLocalImport(path) {
+		p.Local = true
+		if c.Dir == "" {
+			err = errors.Append(err, errors.Newf(pos, "cwd unknown"))
+		}
+		dir = filepath.Join(c.Dir, filepath.FromSlash(path))
+	}
+
+	if path == "" {
+		err = errors.Append(err, errors.Newf(pos,
+			"import %q: invalid import path", path))
+	} else if path != cleanImport(path) {
+		err = errors.Append(err, c.loader.errPkgf(nil,
+			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
+	}
+
+	if importPath, e := c.importPathFromAbsDir(fsPath(dir), path, c.Package); e != nil {
+		// Detect later to keep error messages consistent.
+	} else {
+		p.ImportPath = string(importPath)
+	}
+
+	p.Dir = dir
+
+	if fs.isAbsPath(path) || strings.HasPrefix(path, "/") {
+		err = errors.Append(err, errors.Newf(pos,
+			"absolute import path %q not allowed", path))
+	}
+	if err != nil {
+		p.Err = errors.Append(p.Err, err)
+		p.Incomplete = true
+	}
+
+	return p
+}
+
+func (c Config) newErrInstance(pos token.Pos, path importPath, err error) *build.Instance {
+	i := c.newInstance(pos, path)
+	i.Err = errors.Promote(err, "instance")
 	return i
+}
+
+func toImportPath(dir string) importPath {
+	return importPath(filepath.ToSlash(dir))
+}
+
+type importPath string
+
+type fsPath string
+
+func (c *Config) importPathFromAbsDir(absDir fsPath, key, name string) (importPath, errors.Error) {
+	if c.ModuleRoot == "" {
+		return "", errors.Newf(token.NoPos,
+			"cannot determine import path for %q (root undefined)", key)
+	}
+
+	dir := filepath.Clean(string(absDir))
+	if !strings.HasPrefix(dir, c.ModuleRoot) {
+		return "", errors.Newf(token.NoPos,
+			"cannot determine import path for %q (dir outside of root)", key)
+	}
+
+	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
+	switch {
+	case strings.HasPrefix(pkg, "/pkg/"):
+		pkg = pkg[len("/pkg/"):]
+		if pkg == "" {
+			return "", errors.Newf(token.NoPos,
+				"invalid package %q (root of %s)", key, pkgDir)
+		}
+
+	case c.Module == "":
+		return "", errors.Newf(token.NoPos,
+			"cannot determine import path for %q (no module)", key)
+	default:
+		pkg = c.Module + pkg
+	}
+
+	return addImportQualifier(importPath(pkg), name)
+}
+
+func addImportQualifier(pkg importPath, name string) (importPath, errors.Error) {
+	if name != "" {
+		s := string(pkg)
+		if i := strings.LastIndexByte(s, '/'); i >= 0 {
+			s = s[i+1:]
+		}
+		if i := strings.LastIndexByte(s, ':'); i >= 0 {
+			// should never happen, but just in case.
+			s = s[i+1:]
+			if s != name {
+				return "", errors.Newf(token.NoPos,
+					"non-matching package names (%s != %s)", s, name)
+			}
+		} else if s != name {
+			pkg += importPath(":" + name)
+		}
+	}
+
+	return pkg, nil
+}
+
+// absDirFromImportPath converts a giving import path to an absolute directory
+// and a package name. The root directory must be set.
+//
+// The returned directory may not exist.
+func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name string, err errors.Error) {
+	if c.ModuleRoot == "" {
+		return "", "", errors.Newf(pos, "cannot import %q (root undefined)", p)
+	}
+
+	// Extract the package name.
+
+	name = string(p)
+	switch i := strings.LastIndexAny(name, "/:"); {
+	case i < 0:
+	case p[i] == ':':
+		name = string(p[i+1:])
+		p = p[:i]
+
+	default: // p[i] == '/'
+		name = string(p[i+1:])
+	}
+
+	// TODO: fully test that name is a valid identifier.
+	if name == "" {
+		err = errors.Newf(pos, "empty package name in import path %q", p)
+	} else if strings.IndexByte(name, '.') >= 0 {
+		err = errors.Newf(pos,
+			"cannot determine package name for %q (set explicitly with ':')", p)
+	}
+
+	// Determine the directory.
+
+	sub := filepath.FromSlash(string(p))
+	switch hasPrefix := strings.HasPrefix(string(p), c.Module); {
+	case hasPrefix && len(sub) == len(c.Module):
+		absDir = c.ModuleRoot
+
+	case hasPrefix && p[len(c.Module)] == '/':
+		absDir = filepath.Join(c.ModuleRoot, sub[len(c.Module)+1:])
+
+	default:
+		absDir = filepath.Join(c.ModuleRoot, "pkg", sub)
+	}
+
+	return absDir, name, nil
 }
 
 // Complete updates the configuration information. After calling complete,
@@ -168,6 +335,8 @@ func (c Config) complete() (cfg *Config, err error) {
 		if err != nil {
 			return nil, err
 		}
+	} else if c.Dir, err = filepath.Abs(c.Dir); err != nil {
+		return nil, err
 	}
 
 	// TODO: we could populate this already with absolute file paths,
@@ -190,10 +359,6 @@ func (c Config) complete() (cfg *Config, err error) {
 	}
 
 	c.loader = &loader{cfg: &c}
-
-	if c.Context == nil {
-		c.Context = build.NewContext(build.Loader(c.loader.loadFunc(c.Dir)))
-	}
 
 	if c.cache == "" {
 		c.cache = filepath.Join(home(), defaultDir)
@@ -223,6 +388,12 @@ func (c Config) complete() (cfg *Config, err error) {
 			}
 			c.Module = name
 		}
+	}
+
+	c.loadFunc = c.loader.loadFunc()
+
+	if c.Context == nil {
+		c.Context = build.NewContext(build.Loader(c.loadFunc))
 	}
 
 	return &c, nil

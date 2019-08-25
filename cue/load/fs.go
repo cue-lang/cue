@@ -68,10 +68,6 @@ func (fs *fileSystem) init(c *Config) error {
 
 	// Organize overlay
 	for filename, src := range overlay {
-		if !strings.HasSuffix(filename, ".cue") {
-			return errors.Newf(token.NoPos, "overlay file %s not a .cue file", filename)
-		}
-
 		// TODO: do we need to further clean the path or check that the
 		// specified files are within the root/ absolute files?
 		dir, base := filepath.Split(filename)

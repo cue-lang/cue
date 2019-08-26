@@ -194,10 +194,6 @@ func TestValueType(t *testing.T) {
 			if got := v.IncompleteKind(); got != want {
 				t.Errorf("IncompleteKind: got %x; want %x", got, want)
 			}
-			incomplete := tc.incompleteKind != tc.kind
-			if got := v.IsIncomplete(); got != incomplete {
-				t.Errorf("IsIncomplete: got %v; want %v", got, incomplete)
-			}
 			if got := v.IsConcrete(); got != tc.concrete {
 				t.Errorf("IsConcrete: got %v; want %v", got, tc.concrete)
 			}
@@ -772,7 +768,7 @@ func TestLen(t *testing.T) {
 		// 	length: "2",
 	}, {
 		input:  "3",
-		length: "_|_(len not supported for type 8)", // TODO: fix kind name
+		length: "_|_(len not supported for type 4)", // TODO: fix kind name
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

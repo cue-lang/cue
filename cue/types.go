@@ -35,12 +35,11 @@ import (
 // Kind determines the underlying type of a Value.
 type Kind int
 
-const (
-	// BottomKind is the error value.
-	BottomKind Kind = 1 << iota
+const BottomKind Kind = 0
 
+const (
 	// NullKind indicates a null value.
-	NullKind
+	NullKind Kind = 1 << iota
 
 	// BoolKind indicates a boolean value.
 	BoolKind

@@ -116,7 +116,7 @@ func (b *builder) buildCore(v cue.Value) {
 		b.format = format
 	} else {
 		v = v.Eval()
-		b.kind = v.IncompleteKind() &^ cue.BottomKind
+		b.kind = v.IncompleteKind()
 
 		switch b.kind {
 		case cue.StructKind:

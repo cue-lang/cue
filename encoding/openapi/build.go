@@ -498,7 +498,7 @@ func (b *builder) setValueType(v cue.Value) {
 		return
 	}
 
-	switch v.IncompleteKind() &^ cue.BottomKind {
+	switch v.IncompleteKind() {
 	case cue.BoolKind:
 		b.typ = "boolean"
 	case cue.FloatKind, cue.NumberKind:
@@ -522,7 +522,7 @@ func (b *builder) dispatch(f typeFunc, v cue.Value) {
 		return
 	}
 
-	switch v.IncompleteKind() &^ cue.BottomKind {
+	switch v.IncompleteKind() {
 	case cue.NullKind:
 		// TODO: for JSON schema we would set the type here. For OpenAPI,
 		// it must be nullable.

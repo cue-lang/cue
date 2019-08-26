@@ -54,7 +54,7 @@ func (c *cmdRead) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 	}
 	update := map[string]interface{}{"contents": b}
 
-	switch v.Lookup("contents").IncompleteKind() &^ cue.BottomKind {
+	switch v.Lookup("contents").IncompleteKind() {
 	case cue.BytesKind:
 	case cue.StringKind:
 		update["contents"] = string(b)

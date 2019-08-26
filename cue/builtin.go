@@ -359,7 +359,10 @@ func (e *callError) Error() string {
 }
 
 func (c *callCtxt) errf(src source, underlying error, format string, args ...interface{}) {
-	a := make([]interface{}, 0, 1+len(args))
+	a := make([]interface{}, 0, 2+len(args))
+	if err, ok := underlying.(*valueError); ok {
+		a = append(a, err.err)
+	}
 	a = append(a, format)
 	a = append(a, args...)
 	err := c.ctx.mkErr(src, a...)

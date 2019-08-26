@@ -78,6 +78,9 @@ func TestBuiltins(t *testing.T) {
 		test("encoding/hex", `hex.Decode("foo")`),
 		`_|_(error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o')`,
 	}, {
+		test("encoding/hex", `hex.Dump('foo')`),
+		`"00000000  66 6f 6f                                          |foo|\n"`,
+	}, {
 		test("encoding/json", `json.Validate("{\"a\":10}", {b:string})`),
 		`true`,
 	}, {

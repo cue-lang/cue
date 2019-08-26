@@ -428,7 +428,9 @@ func (g *generator) goToCUE(expr ast.Expr) (cueKind string, omitCheck bool) {
 		cueKind += "bottomKind"
 	case "bool":
 		cueKind += "boolKind"
-	case "string", "bytes", "reader":
+	case "bytes", "reader":
+		cueKind += "bytesKind|stringKind"
+	case "string":
 		cueKind += "stringKind"
 	case "int", "int8", "int16", "int32", "rune", "int64",
 		"uint", "byte", "uint8", "uint16", "uint32", "uint64",

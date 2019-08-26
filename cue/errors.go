@@ -203,6 +203,7 @@ func (idx *index) mkErr(src source, args ...interface{}) *bottom {
 	if v, ok := src.(value); ok {
 		e.value = v
 	}
+outer:
 	for i, a := range args {
 		switch x := a.(type) {
 		case errCode:
@@ -219,7 +220,7 @@ func (idx *index) mkErr(src source, args ...interface{}) *bottom {
 			for i, a := range e.args {
 				e.args[i] = fixArg(idx, a)
 			}
-			return e
+			break outer
 		}
 	}
 	if e.code == codeNone && e.wrapped != nil {

@@ -202,6 +202,9 @@ func (x *bound) evalPartial(ctx *context) (result evaluated) {
 	}
 	v := x.value.evalPartial(ctx)
 	if isBottom(v) {
+		if isIncomplete(v) {
+			return v
+		}
 		return ctx.mkErr(x, v, "error evaluating bound")
 	}
 	if v == x.value {
@@ -445,14 +448,11 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 			d.d = -d.d
 			return &d
 		}
-		fallthrough
+		return ctx.mkErr(src, codeIncomplete, "operand %s of '-' not concrete (was %s)", ctx.str(x), kind)
 
 	case opAdd:
 		if kind&numeric == bottomKind {
 			return ctx.mkErr(src, "invalid operation +%s (+ %s)", ctx.str(x), kind)
-		}
-		if kind&^(numeric|nonGround|referenceKind) == bottomKind {
-			return v
 		}
 		switch v := v.(type) {
 		case *numLit, *durationLit:
@@ -462,19 +462,17 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 		case *basicType:
 			return &basicType{v.baseValue, (v.k & numeric) | nonGround}
 		}
+		return ctx.mkErr(src, codeIncomplete, "operand %s of '+' not concrete (was %s)", ctx.str(x), kind)
 
 	case opNot:
 		if kind&boolKind == bottomKind {
 			return ctx.mkErr(src, "invalid operation !%s (! %s)", ctx.str(x), kind)
 		}
 		switch v := v.(type) {
-		case *top:
-			return &basicType{v.baseValue, boolKind | nonGround}
-		case *basicType:
-			return v
 		case *boolLit:
 			return &boolLit{src.base(), !v.b}
 		}
+		return ctx.mkErr(src, codeIncomplete, "operand %s of '!' not concrete (was %s)", ctx.str(x), kind)
 	}
 	return ctx.mkErr(src, "invalid operation %s%s (%s %s)", op, ctx.str(x), op, kind)
 }

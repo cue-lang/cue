@@ -2145,6 +2145,43 @@ func TestFullEval(t *testing.T) {
 			`b2: (0 | 1), ` +
 			`c1: (<2>{a: 1, b: 2} | <3>{a: 2, b: 1}), ` +
 			`c2: (<4>{a: 2, b: 1} | <5>{a: 1, b: 2})}`,
+	}, {
+		desc: "don't convert incomplete errors to non-incomplete",
+		in: `
+		import "strings"
+
+		n1: {min: <max, max: >min}
+		n2: -num
+		n3: +num
+		n4: num + num
+		n5: num - num
+		n6: num * num
+		n7: num / num
+
+		b1: !is
+
+		s1: "\(str)"
+		s2: strings.ContainsAny("dd")
+		s3: strings.ContainsAny(str, "dd")
+
+		str: string
+		num: <4
+		is:  bool
+		`,
+		out: `<0>{` +
+			`n1: <1>{min: <<2>.max, max: ><2>.min}, ` +
+			`n2: -<3>.num, num: <4, ` +
+			`n3: +<3>.num, ` +
+			`n4: (<3>.num + <3>.num), ` +
+			`n5: (<3>.num - <3>.num), ` +
+			`n6: (<3>.num * <3>.num), ` +
+			`n7: (<3>.num / <3>.num), ` +
+			`b1: !<3>.is, ` +
+			`is: bool, ` +
+			`s1: ""+<3>.str+"", ` +
+			`str: string, ` +
+			`s2: strings.ContainsAny ("dd"), ` +
+			`s3: <4>.ContainsAny (<3>.str,"dd")}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

@@ -36,7 +36,6 @@ func TestValid(t *testing.T) {
 func TestInvalid(t *testing.T) {
 	invalids := []string{
 		`foo !/* ERROR "expected label or ':', found '!'" */`,
-		// `foo: /* ERROR "expected operand, found '}'" */}`, // TODO: wrong position
 		`{ <Name
 			/* ERROR "expected '>', found newline" */ >: foo }`,
 		// TODO:

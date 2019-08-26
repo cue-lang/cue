@@ -707,7 +707,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 			p.next()
 		}
 
-		_ = multipleLabels
 		if p.tok == token.COLON || p.tok == token.ISA {
 			if p.tok == token.ISA && multipleLabels {
 				p.errf(p.pos, "more than one label before '::' (only one allowed)")
@@ -723,23 +722,28 @@ func (p *parser) parseField() (decl ast.Decl) {
 		// allowComprehension = false
 
 		switch p.tok {
-		default:
-			if p.tok != token.COMMA {
-				p.errorExpected(p.pos, "label or ':'")
-			}
-			switch tok {
-			case token.IDENT, token.LBRACK, token.STRING, token.INTERPOLATION, token.NULL, token.TRUE, token.FALSE:
-				if p.tok == token.COMMA {
-					p.expectComma()
-					return &ast.EmbedDecl{Expr: expr}
-				}
-			}
-			return &ast.BadDecl{From: pos, To: p.pos}
-
 		case token.IDENT, token.STRING, token.LSS, token.INTERPOLATION, token.LBRACK:
 			field := &ast.Field{}
 			m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 			m = field
+
+		case token.COMMA:
+			p.expectComma() // sync parser.
+			fallthrough
+
+		case token.RBRACE:
+			if i == 0 {
+				switch tok {
+				case token.IDENT, token.LBRACK, token.STRING, token.INTERPOLATION,
+					token.NULL, token.TRUE, token.FALSE:
+					return &ast.EmbedDecl{Expr: expr}
+				}
+			}
+			fallthrough
+
+		default:
+			p.errorExpected(p.pos, "label or ':'")
+			return &ast.BadDecl{From: pos, To: p.pos}
 		}
 	}
 

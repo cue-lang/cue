@@ -92,6 +92,10 @@ func TestParse(t *testing.T) {
 		`,
 		`Def :: {b: "2", c: 3, embedding}`,
 	}, {
+		"one-line embedding",
+		`{ V1, V2 }`,
+		`{V1, V2}`,
+	}, {
 		"ellipsis in structs",
 		`Def :: {
 			b: "2"
@@ -523,4 +527,15 @@ func TestIncompleteSelection(t *testing.T) {
 			}
 		})
 	}
+}
+
+// For debugging, do not delete.
+func TestX(t *testing.T) {
+	t.Skip()
+
+	f, err := ParseFile("input", ``)
+	if err != nil {
+		t.Errorf("unexpected error: %v", err)
+	}
+	t.Error(debugStr(f))
 }

@@ -699,9 +699,7 @@ outer:
 					return ctx.mkErr(src, "field %q declared as definition and regular field",
 						ctx.labelStr(a.feature))
 				}
-				// TODO: using opUnify here disables recursive opening in
-				// embedding. Change to op enable it.
-				v = mkBin(ctx, src.Pos(), opUnify, b.v, v)
+				v = mkBin(ctx, src.Pos(), op, b.v, v)
 				obj.arcs[i].v = v
 				obj.arcs[i].cache = nil
 				obj.arcs[i].optional = a.optional && b.optional

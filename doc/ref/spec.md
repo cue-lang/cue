@@ -1281,17 +1281,7 @@ D: close({
 A struct may contain an _embedded value_, an operand used
 as a declaration, which must evaluate to a struct.
 An embedded value of type struct is unified with the struct in which it is
-embedded, but disregarding the restrictions imposed by closed structs
-for its top-level fields.
-<!--TODO: consider relaxing it to the below.
-An embedded value of type struct is unified with the struct in which it is
 embedded, but disregarding the restrictions imposed by closed structs.
-
-Note that in the above definition we cannot say that the fields of the
-embedded struct are added: references within these fields referring to
-the embedded struct should be rewired to reference the new struct.
-This would not be the case with  per-field definition.
--->
 A struct resulting from such a unification is closed if either of the involved
 structs were closed.
 

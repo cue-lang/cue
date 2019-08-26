@@ -1235,10 +1235,10 @@ a: {
 		`,
 		out: `<0>{` +
 			`E :: <1>C{a: <2>C{b: int}}, ` +
-			`S :: <3>C{a: _|_((<4>C{b: int} & <5>C{c: int}):field "b" not allowed in closed struct), b: 3}, ` +
-			`e1 :: _|_((<6>.S & <7>C{a: <8>C{c: 4}}):field "b" not allowed in closed struct), ` +
-			`v1: <9>C{a: _|_((<10>C{b: int} & <11>C{c: int}):field "b" not allowed in closed struct), b: 3}, ` +
-			`e2: <12>C{a: _|_((<13>C{b: int} & <14>C{c: int}):field "b" not allowed in closed struct), b: 3}}`,
+			`S :: <3>C{a: <4>C{b: int, c: int}, b: 3}, ` +
+			`e1 :: _|_((<5>.S & <6>C{a: <7>C{c: 4}}):field "b" not allowed in closed struct), ` +
+			`v1: <8>C{a: <9>C{b: int, c: 4}, b: 3}, ` +
+			`e2: <10>C{a: _|_(4:field "d" not allowed in closed struct), b: 3}}`,
 	}, {
 		desc: "closing structs",
 		in: `

@@ -149,7 +149,7 @@ Changes can be contributed using Gerrit or Github pull requests.
 You can get in touch with the cuelang community in the following ways:
 
 - Chat with us on our
-  [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNjk1NzU1MzMwMjI2LWQ0ZDA2OTRjYTQ0MGUyZDBiYWIzZjVhZGI1YWVlNTVmMWU3MTFhY2MxZmRmMjBiMTA5MGQ1YzUyMmMzN2IxYzc).
+  [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE).
 
 
 ---

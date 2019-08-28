@@ -3,13 +3,14 @@ module cuelang.org/go
 require (
 	github.com/cockroachdb/apd v1.1.0 // indirect
 	github.com/cockroachdb/apd/v2 v2.0.1
-	github.com/emicklei/proto v1.6.11
+	github.com/emicklei/proto v1.6.15
 	github.com/ghodss/yaml v1.0.0
 	github.com/google/go-cmp v0.2.0
 	github.com/kr/pretty v0.1.0
 	github.com/kylelemons/godebug v1.1.0
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
+	github.com/pkg/errors v0.8.1 // indirect
 	github.com/retr0h/go-gilt v0.0.0-20190206215556-f73826b37af2
 	github.com/spf13/cobra v0.0.3
 	github.com/spf13/pflag v1.0.3

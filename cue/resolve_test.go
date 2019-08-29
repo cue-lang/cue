@@ -2182,6 +2182,43 @@ func TestFullEval(t *testing.T) {
 			`str: string, ` +
 			`s2: strings.ContainsAny ("dd"), ` +
 			`s3: <4>.ContainsAny (<3>.str,"dd")}`,
+	}, {
+		desc: "len of incomplete types",
+		in: `
+		args: *[] | [...string]
+		v1: len(args)
+		v2: len([])
+		v3: len({})
+		v4: len({a: 3})
+		v5: len({a: 3} | {a: 4})
+		v6: len('sf' | 'dd')
+		v7: len([2] | *[1, 2])
+		v8: len([2] | [1, 2])
+		v9: len("😂")
+		v10: len("")
+		`,
+		out: `<0>{` +
+			`args: [], ` +
+			`v1: 0, ` +
+			`v2: 0, ` +
+			`v3: 0, ` +
+			`v4: 1, ` +
+			`v5: len ((<1>{a: 3} | <2>{a: 4})), ` +
+			`v6: len (('sf' | 'dd')), ` +
+			`v7: 2, ` +
+			`v8: len (([2] | [1,2])), ` +
+			`v9: 4, ` +
+			`v10: 0}`,
+	}, {
+		desc: "slice rewrite bug",
+		in: `
+		fn: {
+			arg: [...int] & [1]
+			out: arg[1:]
+		}
+		fn1: fn & {arg: [1]}
+		`,
+		out: `<0>{fn: <1>{arg: [1], out: []}, fn1: <2>{arg: [1], out: []}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }
@@ -2192,6 +2229,16 @@ func TestX(t *testing.T) {
 	// Don't remove. For debugging.
 	testCases := []testCase{{
 		in: `
+		fnRec: {nn: [...int], out: (fn & {arg: nn}).out}
+		fn: {
+			arg: [...int]
+
+			out: arg[0] + (fnRec & {nn: arg[1:]}).out if len(arg) > 0
+			out: 0 if len(arg) == 0
+		}
+		fn7: (fn & {arg: [1, 2, 3]}).out
+
+
 		`,
 	}}
 	rewriteHelper(t, testCases, evalFull)

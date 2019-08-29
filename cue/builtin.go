@@ -27,6 +27,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd/v2"
 )
@@ -118,22 +119,41 @@ var lenBuiltin = &builtin{
 	Result: intKind,
 	Func: func(c *callCtxt) {
 		v := c.value(0)
-		switch v.Kind() {
+		switch k := v.IncompleteKind(); k {
 		case StructKind:
-			s, _ := v.structValData(c.ctx)
+			s, err := v.structValData(c.ctx)
+			if err != nil {
+				c.ret = err
+				break
+			}
 			c.ret = s.Len()
 		case ListKind:
 			i := 0
-			iter, _ := v.List()
+			iter, err := v.List()
+			if err != nil {
+				c.ret = err
+				break
+			}
 			for ; iter.Next(); i++ {
 			}
 			c.ret = i
 		case BytesKind:
-			b, _ := v.Bytes()
+			b, err := v.Bytes()
+			if err != nil {
+				c.ret = err
+				break
+			}
 			c.ret = len(b)
 		case StringKind:
-			s, _ := v.String()
+			s, err := v.String()
+			if err != nil {
+				c.ret = err
+				break
+			}
 			c.ret = len(s)
+		default:
+			c.ret = errors.Newf(token.NoPos,
+				"invalid argument type %v", k)
 		}
 	},
 }
@@ -268,8 +288,11 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		}
 	}()
 	x.Func(&call)
-	if e, ok := call.ret.(value); ok {
-		return e
+	switch v := call.ret.(type) {
+	case value:
+		return v
+	case *valueError:
+		return v.err
 	}
 	return convert(ctx, x, false, call.ret)
 }

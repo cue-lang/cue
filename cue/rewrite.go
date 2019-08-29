@@ -130,8 +130,13 @@ func (x *list) rewrite(ctx *context, fn rewriteFunc) value {
 
 func (x *sliceExpr) rewrite(ctx *context, fn rewriteFunc) value {
 	v := rewrite(ctx, x.x, fn)
-	lo := rewrite(ctx, x.lo, fn)
-	hi := rewrite(ctx, x.hi, fn)
+	var lo, hi value
+	if x.lo != nil {
+		lo = rewrite(ctx, x.lo, fn)
+	}
+	if x.hi != nil {
+		hi = rewrite(ctx, x.hi, fn)
+	}
 	if v == x.x && lo == x.lo && hi == x.hi {
 		return x
 	}

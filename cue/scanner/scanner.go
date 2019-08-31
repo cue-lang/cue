@@ -304,6 +304,9 @@ func digitVal(ch rune) int {
 func (s *Scanner) scanMantissa(base int) {
 	var last rune
 	for digitVal(s.ch) < base {
+		if last == '_' && s.ch == '_' {
+			s.errf(s.offset, "illegal '_' in number")
+		}
 		last = s.ch
 		s.next()
 	}

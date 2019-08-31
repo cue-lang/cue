@@ -801,6 +801,7 @@ var errorTests = []struct {
 	{"0x", token.INT, 0, "0x", "illegal hexadecimal number"},
 	{"0X", token.INT, 0, "0X", "illegal hexadecimal number"},
 	{"0Xbeef_", token.INT, 6, "0Xbeef_", "illegal '_' in number"},
+	{"0Xbeef__beef", token.INT, 7, "0Xbeef__beef", "illegal '_' in number"},
 	{"0b", token.INT, 0, "0b", "illegal binary number"},
 	{"0o", token.INT, 0, "0o", "illegal octal number"},
 	// {"123456789012345678890_i", IMAG, 21, "123456789012345678890_i", "illegal '_' in number"},

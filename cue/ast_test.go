@@ -257,7 +257,7 @@ func TestCompile(t *testing.T) {
 		in: `
 			a: int @b('' ,b) // invalid
 		`,
-		out: "attribute missing ')':\n    test:2:16\nmissing ',' in file:\n    test:3:3\n<0>{}",
+		out: "attribute missing ')':\n    test:2:16\nmissing ',' in struct literal:\n    test:3:3\n<0>{}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

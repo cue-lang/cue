@@ -646,7 +646,13 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	defer p.closeList()
 
 	for p.tok != token.RBRACE && p.tok != token.ELLIPSIS && p.tok != token.EOF {
-		list = append(list, p.parseField())
+		switch p.tok {
+		case token.FOR, token.IF, token.LET:
+			list = append(list, p.parseComprehension())
+
+		default:
+			list = append(list, p.parseField())
+		}
 	}
 
 	if p.tok == token.ELLIPSIS {
@@ -654,6 +660,70 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 		p.next()
 	}
 	return
+}
+
+func (p *parser) parseComprehension() (decl ast.Decl) {
+	if p.trace {
+		defer un(trace(p, "Field"))
+	}
+
+	c := p.openComments()
+	defer func() { c.closeNode(p, decl) }()
+
+	tok := p.tok
+	pos := p.pos
+	clauses, fc := p.parseComprehensionClauses(true)
+	if fc != nil {
+		lab := &ast.Ident{
+			NamePos: pos,
+			Name:    tok.String(),
+		}
+		opt := token.NoPos
+		tok = p.tok
+		pos = p.pos
+		if p.tok == token.OPTION {
+			opt = pos
+			p.next()
+			tok = p.tok
+			pos = p.pos
+		}
+		p.next()
+		rhs := p.parseRHS()
+
+		// Field or alias.
+		switch tok {
+		case token.BIND:
+			decl = &ast.Alias{Ident: lab, Equal: pos, Expr: rhs}
+		case token.ISA, token.COLON:
+			decl = &ast.Field{
+				Label:    lab,
+				Optional: opt,
+				TokenPos: pos,
+				Token:    tok,
+				Value:    rhs,
+				Attrs:    p.parseAttributes(),
+			}
+		default:
+			decl = &ast.BadDecl{From: lab.Pos(), To: rhs.End()}
+		}
+		fc.closeNode(p, decl)
+		if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
+			p.next()
+		}
+
+		return decl
+	}
+
+	expr := p.parseStruct()
+
+	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
+		p.next()
+	}
+
+	return &ast.Comprehension{
+		Clauses: clauses,
+		Value:   expr,
+	}
 }
 
 func (p *parser) parseField() (decl ast.Decl) {
@@ -682,7 +752,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 				expr = p.parseExpr()
 			}
 			e := &ast.EmbedDecl{Expr: expr}
-			if p.atComma("file", token.RBRACE) {
+			if p.atComma("struct literal", token.RBRACE) {
 				p.next()
 			}
 			return e
@@ -755,16 +825,10 @@ func (p *parser) parseField() (decl ast.Decl) {
 	p.next() // : or ::
 	m.Value = p.parseRHS()
 
-	p.openList()
-	for p.tok == token.ATTRIBUTE {
+	if attrs := p.parseAttributes(); attrs != nil {
 		allowComprehension = false
-		c := p.openComments()
-		a := &ast.Attribute{At: p.pos, Text: p.lit}
-		p.next()
-		c.closeNode(p, a)
-		m.Attrs = append(m.Attrs, a)
+		m.Attrs = attrs
 	}
-	p.closeList()
 
 	decl = this
 	switch p.tok {
@@ -776,7 +840,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		if !allowComprehension {
 			p.errf(p.pos, "comprehension not allowed for this field")
 		}
-		clauses := p.parseComprehensionClauses()
+		clauses, _ := p.parseComprehensionClauses(false)
 		return &ast.Comprehension{
 			Clauses: clauses,
 			Value: &ast.StructLit{
@@ -790,6 +854,19 @@ func (p *parser) parseField() (decl ast.Decl) {
 	}
 
 	return decl
+}
+
+func (p *parser) parseAttributes() (attrs []*ast.Attribute) {
+	p.openList()
+	for p.tok == token.ATTRIBUTE {
+		c := p.openComments()
+		a := &ast.Attribute{At: p.pos, Text: p.lit}
+		p.next()
+		c.closeNode(p, a)
+		attrs = append(attrs, a)
+	}
+	p.closeList()
+	return attrs
 }
 
 func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
@@ -886,17 +963,26 @@ func (p *parser) parseStructBody() []ast.Decl {
 	return elts
 }
 
-func (p *parser) parseComprehensionClauses() (clauses []ast.Clause) {
+// parseComprehensionClauses parses either new-style (first==true)
+// or old-style (first==false).
+// Should we now disallow keywords as identifiers? If not, we need to
+// return a list of discovered labels as the alternative.
+func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c *commentState) {
 	// TODO: reuse Template spec, which is possible if it doesn't check the
 	// first is an identifier.
+
 	for {
-		if p.tok == token.COMMA {
-			p.next()
-		}
 		switch p.tok {
 		case token.FOR:
 			c := p.openComments()
 			forPos := p.expect(token.FOR)
+			if first {
+				switch p.tok {
+				case token.COLON, token.ISA, token.BIND, token.OPTION:
+					return nil, c
+				}
+			}
+
 			var key, value *ast.Ident
 			var colon token.Pos
 			value = p.parseIdent()
@@ -918,15 +1004,28 @@ func (p *parser) parseComprehensionClauses() (clauses []ast.Clause) {
 
 		case token.IF:
 			c := p.openComments()
+			ifPos := p.expect(token.IF)
+			if first {
+				switch p.tok {
+				case token.COLON, token.ISA, token.BIND, token.OPTION:
+					return nil, c
+				}
+			}
+
 			clauses = append(clauses, c.closeClause(p, &ast.IfClause{
-				If:        p.expect(token.IF),
+				If:        ifPos,
 				Condition: p.parseExpr(),
 			}))
 
-		// TODO: case LET:
+		// case token.LET:
 		default:
-			return clauses
+			return clauses, nil
 		}
+		if p.tok == token.COMMA {
+			p.next()
+		}
+
+		first = false
 	}
 }
 
@@ -942,7 +1041,7 @@ func (p *parser) parseList() (expr ast.Expr) {
 
 	elts := p.parseListElements()
 
-	if clauses := p.parseComprehensionClauses(); clauses != nil {
+	if clauses, _ := p.parseComprehensionClauses(false); clauses != nil {
 		var expr ast.Expr
 		if len(elts) != 1 {
 			p.errf(lbrack.Add(1), "list comprehension must have exactly one element")

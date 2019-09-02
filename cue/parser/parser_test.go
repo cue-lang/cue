@@ -229,7 +229,11 @@ func TestParse(t *testing.T) {
 		"field comprehensions",
 		`{
 				y: { a: 1, b: 2}
-				a: { "\(k)": v for k, v in y if v > 2 }
+				a: {
+					for k, v in y if v > 2 {
+						"\(k)": v
+					}
+				}
 			 }`,
 		`{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
 	}, {

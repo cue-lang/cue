@@ -137,7 +137,13 @@ func TestBasicRewrite(t *testing.T) {
 			div1: 2.0 / 3 * 6   // 4
 			div2: 2 / 3 * 6     // 4
 			divZero: 1.0 / 0
+			div00: 0 / 0
 			b: 1 != 4
+
+			idiv00: 0 div 0
+			imod00: 0 mod 0
+			iquo00: 0 quo 0
+			irem00: 0 rem 0
 
 			v1: 1.0T/2.0
 			v2: 2.0 == 2
@@ -159,8 +165,13 @@ func TestBasicRewrite(t *testing.T) {
 			`sum: 1, ` +
 			`div1: 4.00000000000000000000000, ` +
 			`div2: 4.00000000000000000000000, ` +
-			`divZero: _|_((1.0 / 0):divide by zero), ` +
+			`divZero: _|_((1.0 / 0):division by zero), ` +
+			`div00: _|_((0 / 0):division undefined), ` +
 			`b: true, ` +
+			`idiv00: _|_((0 div 0):division by zero), ` +
+			`imod00: _|_((0 mod 0):division by zero), ` +
+			`iquo00: _|_((0 quo 0):division by zero), ` +
+			`irem00: _|_((0 rem 0):division by zero), ` +
 			`v1: 5e+11, ` +
 			`v2: true, ` +
 			`v3: 0.666666666666666666666667, ` +
@@ -205,8 +216,6 @@ func TestBasicRewrite(t *testing.T) {
 			m4: -5 mod -2  // 1
 			me1: 2.0 mod 1
 			me2: 2 mod 1.0
-
-			// TODO: handle divide by zero
 			`,
 		out: `<0>{q1: 2, q2: -2, q3: -2, q4: 2, ` +
 			`qe1: _|_((2.0 quo 1):invalid operation 2.0 quo 1 (mismatched types float and int)), ` +

@@ -956,30 +956,33 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		case opMul:
 			_, _ = ctx.Mul(&n.v, &x.v, &y.v)
 		case opQuo:
-			cond, _ := ctx.Quo(&n.v, &x.v, &y.v)
+			cond, err := ctx.Quo(&n.v, &x.v, &y.v)
+			if err != nil {
+				return ctx.mkErr(src, err.Error())
+			}
 			if cond.DivisionByZero() {
-				return ctx.mkErr(src, "divide by zero")
+				return ctx.mkErr(src, "division by zero")
 			}
 			_, _, _ = ctx.Reduce(&n.v, &n.v)
 			n.k = floatKind
 		case opIDiv:
 			if y.v.IsZero() {
-				return ctx.mkErr(src, "divide by zero")
+				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Div, x, y)
 		case opIMod:
 			if y.v.IsZero() {
-				return ctx.mkErr(src, "divide by zero")
+				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Mod, x, y)
 		case opIQuo:
 			if y.v.IsZero() {
-				return ctx.mkErr(src, "divide by zero")
+				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Quo, x, y)
 		case opIRem:
 			if y.v.IsZero() {
-				return ctx.mkErr(src, "divide by zero")
+				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Rem, x, y)
 		}

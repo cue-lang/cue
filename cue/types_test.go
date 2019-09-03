@@ -342,7 +342,7 @@ func TestFloat(t *testing.T) {
 		float64: 0,
 		prec:    2,
 		fmt:     'f',
-		err:     "divide by zero",
+		err:     "division by zero",
 		kind:    BottomKind,
 	}, {
 		value:   "1.797693134862315708145274237317043567982e+308",
@@ -1754,6 +1754,9 @@ func TestMashalJSON(t *testing.T) {
 	}, {
 		value: `3.0e100`,
 		json:  `3.0E+100`,
+	}, {
+		value: `0/0`,
+		err:   "division undefined",
 	}, {
 		value: `[]`,
 		json:  `[]`,

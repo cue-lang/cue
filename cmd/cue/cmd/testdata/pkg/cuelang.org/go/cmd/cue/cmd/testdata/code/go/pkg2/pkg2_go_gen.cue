@@ -10,7 +10,7 @@ import (
 )
 
 // A Barzer barzes.
-Barzer: {
+Barzer :: {
 	a:   int @go(A) @protobuf(2,varint,)
 	T:   t.Time
 	B:   null | int    @go(,*big.Int)
@@ -21,8 +21,8 @@ Barzer: {
 	Err: _ @go(,error)
 }
 
-Perm: 0o755
+Perm :: 0o755
 
-Few: 3
+Few :: 3
 
-Couple: int & 2
+Couple :: int & 2

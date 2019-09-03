@@ -23,7 +23,7 @@ import (
 // Structures that are versioned or persisted should inline TypeMeta.
 //
 // +k8s:deepcopy-gen=false
-TypeMeta: {
+TypeMeta :: {
 	// Kind is a string value representing the REST resource this object represents.
 	// Servers may infer this from the endpoint the client submits requests to.
 	// Cannot be updated.
@@ -42,7 +42,7 @@ TypeMeta: {
 
 // ListMeta describes metadata that synthetic resources must have, including lists and
 // various status objects. A resource may have only one of {ObjectMeta, ListMeta}.
-ListMeta: {
+ListMeta :: {
 	// selfLink is a URL representing this object.
 	// Populated by the system.
 	// Read-only.
@@ -84,12 +84,12 @@ ListMeta: {
 	remainingItemCount?: null | int64 @go(RemainingItemCount,*int64) @protobuf(4,bytes,opt)
 }
 
-FinalizerOrphanDependents: "orphan"
-FinalizerDeleteDependents: "foregroundDeletion"
+FinalizerOrphanDependents :: "orphan"
+FinalizerDeleteDependents :: "foregroundDeletion"
 
 // ObjectMeta is metadata that all persisted resources must have, which includes all objects
 // users must create.
-ObjectMeta: {
+ObjectMeta :: {
 	// Name must be unique within a namespace. Is required when creating resources, although
 	// some resources may allow a client to request the generation of an appropriate name
 	// automatically. Name is primarily intended for creation idempotence and configuration
@@ -257,24 +257,24 @@ ObjectMeta: {
 }
 
 // NamespaceDefault means the object is in the default namespace which is applied when not specified by clients
-NamespaceDefault: "default"
+NamespaceDefault :: "default"
 
 // NamespaceAll is the default argument to specify on a context when you want to list or filter resources across all namespaces
-NamespaceAll: ""
+NamespaceAll :: ""
 
 // NamespaceNone is the argument for a context when there is no namespace.
-NamespaceNone: ""
+NamespaceNone :: ""
 
 // NamespaceSystem is the system namespace where we place system components.
-NamespaceSystem: "kube-system"
+NamespaceSystem :: "kube-system"
 
 // NamespacePublic is the namespace where we place public info (ConfigMaps)
-NamespacePublic: "kube-public"
+NamespacePublic :: "kube-public"
 
 // OwnerReference contains enough information to let you identify an owning
 // object. An owning object must be in the same namespace as the dependent, or
 // be cluster-scoped, so there is no namespace field.
-OwnerReference: {
+OwnerReference :: {
 	// API version of the referent.
 	apiVersion: string @go(APIVersion) @protobuf(5,bytes,opt)
 
@@ -305,7 +305,9 @@ OwnerReference: {
 }
 
 // ListOptions is the query options to a standard REST list call.
-ListOptions: TypeMeta & {
+ListOptions :: {
+	(TypeMeta)
+
 	// A selector to restrict the list of returned objects by their labels.
 	// Defaults to everything.
 	// +optional
@@ -386,7 +388,9 @@ ListOptions: TypeMeta & {
 
 // ExportOptions is the query options to the standard REST get call.
 // Deprecated. Planned for removal in 1.18.
-ExportOptions: TypeMeta & {
+ExportOptions :: {
+	(TypeMeta)
+
 	// Should this value be exported.  Export strips fields that a user can not specify.
 	// Deprecated. Planned for removal in 1.18.
 	export: bool @go(Export) @protobuf(1,varint,opt)
@@ -397,7 +401,9 @@ ExportOptions: TypeMeta & {
 }
 
 // GetOptions is the standard query options to the standard REST get call.
-GetOptions: TypeMeta & {
+GetOptions :: {
+	(TypeMeta)
+
 	// When specified:
 	// - if unset, then the result is returned from remote storage based on quorum-read flag;
 	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
@@ -407,33 +413,35 @@ GetOptions: TypeMeta & {
 
 // DeletionPropagation decides if a deletion will propagate to the dependents of
 // the object, and how the garbage collector will handle the propagation.
-DeletionPropagation: string // enumDeletionPropagation
+DeletionPropagation :: string // enumDeletionPropagation
 
-enumDeletionPropagation:
+enumDeletionPropagation ::
 	DeletePropagationOrphan |
 	DeletePropagationBackground |
 	DeletePropagationForeground
 
 // Orphans the dependents.
-DeletePropagationOrphan: DeletionPropagation & "Orphan"
+DeletePropagationOrphan :: DeletionPropagation & "Orphan"
 
 // Deletes the object from the key-value store, the garbage collector will
 // delete the dependents in the background.
-DeletePropagationBackground: DeletionPropagation & "Background"
+DeletePropagationBackground :: DeletionPropagation & "Background"
 
 // The object exists in the key-value store until the garbage collector
 // deletes all the dependents whose ownerReference.blockOwnerDeletion=true
 // from the key-value store.  API sever will put the "foregroundDeletion"
 // finalizer on the object, and sets its deletionTimestamp.  This policy is
 // cascading, i.e., the dependents will be deleted with Foreground.
-DeletePropagationForeground: DeletionPropagation & "Foreground"
+DeletePropagationForeground :: DeletionPropagation & "Foreground"
 
 // DryRunAll means to complete all processing stages, but don't
 // persist changes to storage.
-DryRunAll: "All"
+DryRunAll :: "All"
 
 // DeleteOptions may be provided when deleting an API object.
-DeleteOptions: TypeMeta & {
+DeleteOptions :: {
+	(TypeMeta)
+
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer.
 	// The value zero indicates delete immediately. If this value is nil, the default grace period for the
 	// specified type will be used.
@@ -474,7 +482,9 @@ DeleteOptions: TypeMeta & {
 }
 
 // CreateOptions may be provided when creating an API object.
-CreateOptions: TypeMeta & {
+CreateOptions :: {
+	(TypeMeta)
+
 	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
@@ -493,7 +503,9 @@ CreateOptions: TypeMeta & {
 
 // PatchOptions may be provided when patching an API object.
 // PatchOptions is meant to be a superset of UpdateOptions.
-PatchOptions: TypeMeta & {
+PatchOptions :: {
+	(TypeMeta)
+
 	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
@@ -521,7 +533,9 @@ PatchOptions: TypeMeta & {
 
 // UpdateOptions may be provided when updating an API object.
 // All fields in UpdateOptions should also be present in PatchOptions.
-UpdateOptions: TypeMeta & {
+UpdateOptions :: {
+	(TypeMeta)
+
 	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
@@ -539,7 +553,7 @@ UpdateOptions: TypeMeta & {
 }
 
 // Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.
-Preconditions: {
+Preconditions :: {
 	// Specifies the target UID.
 	// +optional
 	uid?: null | types.UID @go(UID,*types.UID) @protobuf(1,bytes,opt,casttype=k8s.io/apimachinery/pkg/types.UID)
@@ -550,7 +564,9 @@ Preconditions: {
 }
 
 // Status is a return value for calls that don't return other objects.
-Status: TypeMeta & {
+Status :: {
+	(TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -591,7 +607,7 @@ Status: TypeMeta & {
 // must ignore fields that do not match the defined type of each attribute,
 // and should assume that any attribute may be empty, invalid, or under
 // defined.
-StatusDetails: {
+StatusDetails :: {
 	// The name attribute of the resource associated with the status StatusReason
 	// (when there is a single name which can be described).
 	// +optional
@@ -625,16 +641,16 @@ StatusDetails: {
 	retryAfterSeconds?: int32 @go(RetryAfterSeconds) @protobuf(5,varint,opt)
 }
 
-StatusSuccess: "Success"
-StatusFailure: "Failure"
+StatusSuccess :: "Success"
+StatusFailure :: "Failure"
 
 // StatusReason is an enumeration of possible failure causes.  Each StatusReason
 // must map to a single HTTP status code, but multiple reasons may map
 // to the same HTTP status code.
 // TODO: move to apiserver
-StatusReason: string // enumStatusReason
+StatusReason :: string // enumStatusReason
 
-enumStatusReason:
+enumStatusReason ::
 	StatusReasonUnknown |
 	StatusReasonUnauthorized |
 	StatusReasonForbidden |
@@ -658,14 +674,14 @@ enumStatusReason:
 // StatusReasonUnknown means the server has declined to indicate a specific reason.
 // The details field may contain other information about this error.
 // Status code 500.
-StatusReasonUnknown: StatusReason & ""
+StatusReasonUnknown :: StatusReason & ""
 
 // StatusReasonUnauthorized means the server can be reached and understood the request, but requires
 // the user to present appropriate authorization credentials (identified by the WWW-Authenticate header)
 // in order for the action to be completed. If the user has specified credentials on the request, the
 // server considers them insufficient.
 // Status code 401
-StatusReasonUnauthorized: StatusReason & "Unauthorized"
+StatusReasonUnauthorized :: StatusReason & "Unauthorized"
 
 // StatusReasonForbidden means the server can be reached and understood the request, but refuses
 // to take any further action.  It is the result of the server being configured to deny access for some reason
@@ -676,7 +692,7 @@ StatusReasonUnauthorized: StatusReason & "Unauthorized"
 //                   resource.
 //   "id"   string - the identifier of the forbidden resource
 // Status code 403
-StatusReasonForbidden: StatusReason & "Forbidden"
+StatusReasonForbidden :: StatusReason & "Forbidden"
 
 // StatusReasonNotFound means one or more resources required for this operation
 // could not be found.
@@ -686,26 +702,26 @@ StatusReasonForbidden: StatusReason & "Forbidden"
 //                   resource.
 //   "id"   string - the identifier of the missing resource
 // Status code 404
-StatusReasonNotFound: StatusReason & "NotFound"
+StatusReasonNotFound :: StatusReason & "NotFound"
 
 // StatusReasonAlreadyExists means the resource you are creating already exists.
 // Details (optional):
 //   "kind" string - the kind attribute of the conflicting resource
 //   "id"   string - the identifier of the conflicting resource
 // Status code 409
-StatusReasonAlreadyExists: StatusReason & "AlreadyExists"
+StatusReasonAlreadyExists :: StatusReason & "AlreadyExists"
 
 // StatusReasonConflict means the requested operation cannot be completed
 // due to a conflict in the operation. The client may need to alter the
 // request. Each resource may define custom details that indicate the
 // nature of the conflict.
 // Status code 409
-StatusReasonConflict: StatusReason & "Conflict"
+StatusReasonConflict :: StatusReason & "Conflict"
 
 // StatusReasonGone means the item is no longer available at the server and no
 // forwarding address is known.
 // Status code 410
-StatusReasonGone: StatusReason & "Gone"
+StatusReasonGone :: StatusReason & "Gone"
 
 // StatusReasonInvalid means the requested create or update operation cannot be
 // completed due to invalid data provided as part of the request. The client may
@@ -718,7 +734,7 @@ StatusReasonGone: StatusReason & "Gone"
 //                   provided resource that was invalid.  The code, message, and
 //                   field attributes will be set.
 // Status code 422
-StatusReasonInvalid: StatusReason & "Invalid"
+StatusReasonInvalid :: StatusReason & "Invalid"
 
 // StatusReasonServerTimeout means the server can be reached and understood the request,
 // but cannot complete the action in a reasonable time. The client should retry the request.
@@ -730,7 +746,7 @@ StatusReasonInvalid: StatusReason & "Invalid"
 //   "id"   string - the operation that is being attempted.
 //   "retryAfterSeconds" int32 - the number of seconds before the operation should be retried
 // Status code 500
-StatusReasonServerTimeout: StatusReason & "ServerTimeout"
+StatusReasonServerTimeout :: StatusReason & "ServerTimeout"
 
 // StatusReasonTimeout means that the request could not be completed within the given time.
 // Clients can get this response only when they specified a timeout param in the request,
@@ -740,7 +756,7 @@ StatusReasonServerTimeout: StatusReason & "ServerTimeout"
 // Details (optional):
 //   "retryAfterSeconds" int32 - the number of seconds before the operation should be retried
 // Status code 504
-StatusReasonTimeout: StatusReason & "Timeout"
+StatusReasonTimeout :: StatusReason & "Timeout"
 
 // StatusReasonTooManyRequests means the server experienced too many requests within a
 // given window and that the client must wait to perform the action again. A client may
@@ -749,59 +765,59 @@ StatusReasonTimeout: StatusReason & "Timeout"
 // Details (optional):
 //   "retryAfterSeconds" int32 - the number of seconds before the operation should be retried
 // Status code 429
-StatusReasonTooManyRequests: StatusReason & "TooManyRequests"
+StatusReasonTooManyRequests :: StatusReason & "TooManyRequests"
 
 // StatusReasonBadRequest means that the request itself was invalid, because the request
 // doesn't make any sense, for example deleting a read-only object.  This is different than
 // StatusReasonInvalid above which indicates that the API call could possibly succeed, but the
 // data was invalid.  API calls that return BadRequest can never succeed.
 // Status code 400
-StatusReasonBadRequest: StatusReason & "BadRequest"
+StatusReasonBadRequest :: StatusReason & "BadRequest"
 
 // StatusReasonMethodNotAllowed means that the action the client attempted to perform on the
 // resource was not supported by the code - for instance, attempting to delete a resource that
 // can only be created. API calls that return MethodNotAllowed can never succeed.
 // Status code 405
-StatusReasonMethodNotAllowed: StatusReason & "MethodNotAllowed"
+StatusReasonMethodNotAllowed :: StatusReason & "MethodNotAllowed"
 
 // StatusReasonNotAcceptable means that the accept types indicated by the client were not acceptable
 // to the server - for instance, attempting to receive protobuf for a resource that supports only json and yaml.
 // API calls that return NotAcceptable can never succeed.
 // Status code 406
-StatusReasonNotAcceptable: StatusReason & "NotAcceptable"
+StatusReasonNotAcceptable :: StatusReason & "NotAcceptable"
 
 // StatusReasonRequestEntityTooLarge means that the request entity is too large.
 // Status code 413
-StatusReasonRequestEntityTooLarge: StatusReason & "RequestEntityTooLarge"
+StatusReasonRequestEntityTooLarge :: StatusReason & "RequestEntityTooLarge"
 
 // StatusReasonUnsupportedMediaType means that the content type sent by the client is not acceptable
 // to the server - for instance, attempting to send protobuf for a resource that supports only json and yaml.
 // API calls that return UnsupportedMediaType can never succeed.
 // Status code 415
-StatusReasonUnsupportedMediaType: StatusReason & "UnsupportedMediaType"
+StatusReasonUnsupportedMediaType :: StatusReason & "UnsupportedMediaType"
 
 // StatusReasonInternalError indicates that an internal error occurred, it is unexpected
 // and the outcome of the call is unknown.
 // Details (optional):
 //   "causes" - The original error
 // Status code 500
-StatusReasonInternalError: StatusReason & "InternalError"
+StatusReasonInternalError :: StatusReason & "InternalError"
 
 // StatusReasonExpired indicates that the request is invalid because the content you are requesting
 // has expired and is no longer available. It is typically associated with watches that can't be
 // serviced.
 // Status code 410 (gone)
-StatusReasonExpired: StatusReason & "Expired"
+StatusReasonExpired :: StatusReason & "Expired"
 
 // StatusReasonServiceUnavailable means that the request itself was valid,
 // but the requested service is unavailable at this time.
 // Retrying the request after some time might succeed.
 // Status code 503
-StatusReasonServiceUnavailable: StatusReason & "ServiceUnavailable"
+StatusReasonServiceUnavailable :: StatusReason & "ServiceUnavailable"
 
 // StatusCause provides more information about an api.Status failure, including
 // cases when multiple errors are encountered.
-StatusCause: {
+StatusCause :: {
 	// A machine-readable description of the cause of the error. If this value is
 	// empty there is no information available.
 	// +optional
@@ -828,9 +844,9 @@ StatusCause: {
 // CauseType is a machine readable value providing more detail about what
 // occurred in a status response. An operation may have multiple causes for a
 // status (whether Failure or Success).
-CauseType: string // enumCauseType
+CauseType :: string // enumCauseType
 
-enumCauseType:
+enumCauseType ::
 	CauseTypeFieldValueNotFound |
 	CauseTypeFieldValueRequired |
 	CauseTypeFieldValueDuplicate |
@@ -841,35 +857,37 @@ enumCauseType:
 
 // CauseTypeFieldValueNotFound is used to report failure to find a requested value
 // (e.g. looking up an ID).
-CauseTypeFieldValueNotFound: CauseType & "FieldValueNotFound"
+CauseTypeFieldValueNotFound :: CauseType & "FieldValueNotFound"
 
 // CauseTypeFieldValueRequired is used to report required values that are not
 // provided (e.g. empty strings, null values, or empty arrays).
-CauseTypeFieldValueRequired: CauseType & "FieldValueRequired"
+CauseTypeFieldValueRequired :: CauseType & "FieldValueRequired"
 
 // CauseTypeFieldValueDuplicate is used to report collisions of values that must be
 // unique (e.g. unique IDs).
-CauseTypeFieldValueDuplicate: CauseType & "FieldValueDuplicate"
+CauseTypeFieldValueDuplicate :: CauseType & "FieldValueDuplicate"
 
 // CauseTypeFieldValueInvalid is used to report malformed values (e.g. failed regex
 // match).
-CauseTypeFieldValueInvalid: CauseType & "FieldValueInvalid"
+CauseTypeFieldValueInvalid :: CauseType & "FieldValueInvalid"
 
 // CauseTypeFieldValueNotSupported is used to report valid (as per formatting rules)
 // values that can not be handled (e.g. an enumerated string).
-CauseTypeFieldValueNotSupported: CauseType & "FieldValueNotSupported"
+CauseTypeFieldValueNotSupported :: CauseType & "FieldValueNotSupported"
 
 // CauseTypeUnexpectedServerResponse is used to report when the server responded to the client
 // without the expected return type. The presence of this cause indicates the error may be
 // due to an intervening proxy or the server software malfunctioning.
-CauseTypeUnexpectedServerResponse: CauseType & "UnexpectedServerResponse"
+CauseTypeUnexpectedServerResponse :: CauseType & "UnexpectedServerResponse"
 
 // FieldManagerConflict is used to report when another client claims to manage this field,
 // It should only be returned for a request using server-side apply.
-CauseTypeFieldManagerConflict: CauseType & "FieldManagerConflict"
+CauseTypeFieldManagerConflict :: CauseType & "FieldManagerConflict"
 
 // List holds a list of objects, which may not be known by the server.
-List: TypeMeta & {
+List :: {
+	(TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -884,7 +902,9 @@ List: TypeMeta & {
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-APIVersions: TypeMeta & {
+APIVersions :: {
+	(TypeMeta)
+
 	// versions are the api versions that are available.
 	versions: [...string] @go(Versions,[]string) @protobuf(1,bytes,rep)
 
@@ -900,14 +920,18 @@ APIVersions: TypeMeta & {
 
 // APIGroupList is a list of APIGroup, to allow clients to discover the API at
 // /apis.
-APIGroupList: TypeMeta & {
+APIGroupList :: {
+	(TypeMeta)
+
 	// groups is a list of APIGroup.
 	groups: [...APIGroup] @go(Groups,[]APIGroup) @protobuf(1,bytes,rep)
 }
 
 // APIGroup contains the name, the supported versions, and the preferred version
 // of a group.
-APIGroup: TypeMeta & {
+APIGroup :: {
+	(TypeMeta)
+
 	// name is the name of the group.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -931,7 +955,7 @@ APIGroup: TypeMeta & {
 }
 
 // ServerAddressByClientCIDR helps the client to determine the server address that they should use, depending on the clientCIDR that they match.
-ServerAddressByClientCIDR: {
+ServerAddressByClientCIDR :: {
 	// The CIDR with which clients can match their IP to figure out the server address that they should use.
 	clientCIDR: string @go(ClientCIDR) @protobuf(1,bytes,opt)
 
@@ -942,7 +966,7 @@ ServerAddressByClientCIDR: {
 
 // GroupVersion contains the "group/version" and "version" string of a version.
 // It is made a struct to keep extensibility.
-GroupVersionForDiscovery: {
+GroupVersionForDiscovery :: {
 	// groupVersion specifies the API group and version in the form "group/version"
 	groupVersion: string @go(GroupVersion) @protobuf(1,bytes,opt)
 
@@ -952,7 +976,7 @@ GroupVersionForDiscovery: {
 }
 
 // APIResource specifies the name of a resource and whether it is namespaced.
-APIResource: {
+APIResource :: {
 	// name is the plural name of the resource.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -1000,12 +1024,14 @@ APIResource: {
 //
 // +protobuf.nullable=true
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-Verbs: [...string]
+Verbs :: [...string]
 
 // APIResourceList is a list of APIResource, it is used to expose the name of the
 // resources supported in a specific group and version, and if the resource
 // is namespaced.
-APIResourceList: TypeMeta & {
+APIResourceList :: {
+	(TypeMeta)
+
 	// groupVersion is the group and version this APIResourceList is for.
 	groupVersion: string @go(GroupVersion) @protobuf(1,bytes,opt)
 
@@ -1015,19 +1041,19 @@ APIResourceList: TypeMeta & {
 
 // RootPaths lists the paths available at root.
 // For example: "/healthz", "/apis".
-RootPaths: {
+RootPaths :: {
 	// paths are the paths available at root.
 	paths: [...string] @go(Paths,[]string) @protobuf(1,bytes,rep)
 }
 
 // Patch is provided to give a concrete name and type to the Kubernetes PATCH request body.
-Patch: {
+Patch :: {
 }
 
 // A label selector is a label query over a set of resources. The result of matchLabels and
 // matchExpressions are ANDed. An empty label selector matches all objects. A null
 // label selector matches no objects.
-LabelSelector: {
+LabelSelector :: {
 	// matchLabels is a map of {key,value} pairs. A single {key,value} in the matchLabels
 	// map is equivalent to an element of matchExpressions, whose key field is "key", the
 	// operator is "In", and the values array contains only "value". The requirements are ANDed.
@@ -1041,7 +1067,7 @@ LabelSelector: {
 
 // A label selector requirement is a selector that contains values, a key, and an operator that
 // relates the key and values.
-LabelSelectorRequirement: {
+LabelSelectorRequirement :: {
 	// key is the label key that the selector applies to.
 	// +patchMergeKey=key
 	// +patchStrategy=merge
@@ -1060,22 +1086,22 @@ LabelSelectorRequirement: {
 }
 
 // A label selector operator is the set of operators that can be used in a selector requirement.
-LabelSelectorOperator: string // enumLabelSelectorOperator
+LabelSelectorOperator :: string // enumLabelSelectorOperator
 
-enumLabelSelectorOperator:
+enumLabelSelectorOperator ::
 	LabelSelectorOpIn |
 	LabelSelectorOpNotIn |
 	LabelSelectorOpExists |
 	LabelSelectorOpDoesNotExist
 
-LabelSelectorOpIn:           LabelSelectorOperator & "In"
-LabelSelectorOpNotIn:        LabelSelectorOperator & "NotIn"
-LabelSelectorOpExists:       LabelSelectorOperator & "Exists"
-LabelSelectorOpDoesNotExist: LabelSelectorOperator & "DoesNotExist"
+LabelSelectorOpIn ::           LabelSelectorOperator & "In"
+LabelSelectorOpNotIn ::        LabelSelectorOperator & "NotIn"
+LabelSelectorOpExists ::       LabelSelectorOperator & "Exists"
+LabelSelectorOpDoesNotExist :: LabelSelectorOperator & "DoesNotExist"
 
 // ManagedFieldsEntry is a workflow-id, a FieldSet and the group version of the resource
 // that the fieldset applies to.
-ManagedFieldsEntry: {
+ManagedFieldsEntry :: {
 	// Manager is an identifier of the workflow managing these fields.
 	manager?: string @go(Manager) @protobuf(1,bytes,opt)
 
@@ -1103,14 +1129,14 @@ ManagedFieldsEntry: {
 }
 
 // ManagedFieldsOperationType is the type of operation which lead to a ManagedFieldsEntry being created.
-ManagedFieldsOperationType: string // enumManagedFieldsOperationType
+ManagedFieldsOperationType :: string // enumManagedFieldsOperationType
 
-enumManagedFieldsOperationType:
+enumManagedFieldsOperationType ::
 	ManagedFieldsOperationApply |
 	ManagedFieldsOperationUpdate
 
-ManagedFieldsOperationApply:  ManagedFieldsOperationType & "Apply"
-ManagedFieldsOperationUpdate: ManagedFieldsOperationType & "Update"
+ManagedFieldsOperationApply ::  ManagedFieldsOperationType & "Apply"
+ManagedFieldsOperationUpdate :: ManagedFieldsOperationType & "Update"
 
 // FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
 //
@@ -1123,13 +1149,15 @@ ManagedFieldsOperationUpdate: ManagedFieldsOperationType & "Update"
 // If a key maps to an empty Fields value, the field that key represents is part of the set.
 //
 // The exact format is defined in sigs.k8s.io/structured-merge-diff
-FieldsV1: _
+FieldsV1 :: _
 
 // Table is a tabular representation of a set of API resources. The server transforms the
 // object into a set of preferred columns for quickly reviewing the objects.
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +protobuf=false
-Table: TypeMeta & {
+Table :: {
+	(TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -1145,7 +1173,7 @@ Table: TypeMeta & {
 
 // TableColumnDefinition contains information about a column returned in the Table.
 // +protobuf=false
-TableColumnDefinition: {
+TableColumnDefinition :: {
 	// name is a human readable name for the column.
 	name: string @go(Name)
 
@@ -1172,7 +1200,7 @@ TableColumnDefinition: {
 
 // TableRow is an individual row in a table.
 // +protobuf=false
-TableRow: {
+TableRow :: {
 	// cells will be as wide as the column definitions array and may contain strings, numbers (float64 or
 	// int64), booleans, simple maps, lists, or null. See the type field of the column definition for a
 	// more detailed description.
@@ -1197,7 +1225,7 @@ TableRow: {
 
 // TableRowCondition allows a row to be marked with additional information.
 // +protobuf=false
-TableRowCondition: {
+TableRowCondition :: {
 	// Type of row condition. The only defined value is 'Completed' indicating that the
 	// object this row represents has reached a completed state and may be given less visual
 	// priority than other rows. Clients are not required to honor any conditions but should
@@ -1216,46 +1244,48 @@ TableRowCondition: {
 	message?: string @go(Message)
 }
 
-RowConditionType: string // enumRowConditionType
+RowConditionType :: string // enumRowConditionType
 
-enumRowConditionType:
+enumRowConditionType ::
 	RowCompleted
 
 // RowCompleted means the underlying resource has reached completion and may be given less
 // visual priority than other resources.
-RowCompleted: RowConditionType & "Completed"
+RowCompleted :: RowConditionType & "Completed"
 
-ConditionStatus: string // enumConditionStatus
+ConditionStatus :: string // enumConditionStatus
 
-enumConditionStatus:
+enumConditionStatus ::
 	ConditionTrue |
 	ConditionFalse |
 	ConditionUnknown
 
-ConditionTrue:    ConditionStatus & "True"
-ConditionFalse:   ConditionStatus & "False"
-ConditionUnknown: ConditionStatus & "Unknown"
+ConditionTrue ::    ConditionStatus & "True"
+ConditionFalse ::   ConditionStatus & "False"
+ConditionUnknown :: ConditionStatus & "Unknown"
 
 // IncludeObjectPolicy controls which portion of the object is returned with a Table.
-IncludeObjectPolicy: string // enumIncludeObjectPolicy
+IncludeObjectPolicy :: string // enumIncludeObjectPolicy
 
-enumIncludeObjectPolicy:
+enumIncludeObjectPolicy ::
 	IncludeNone |
 	IncludeMetadata |
 	IncludeObject
 
 // IncludeNone returns no object.
-IncludeNone: IncludeObjectPolicy & "None"
+IncludeNone :: IncludeObjectPolicy & "None"
 
 // IncludeMetadata serializes the object containing only its metadata field.
-IncludeMetadata: IncludeObjectPolicy & "Metadata"
+IncludeMetadata :: IncludeObjectPolicy & "Metadata"
 
 // IncludeObject contains the full object.
-IncludeObject: IncludeObjectPolicy & "Object"
+IncludeObject :: IncludeObjectPolicy & "Object"
 
 // TableOptions are used when a Table is requested by the caller.
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-TableOptions: TypeMeta & {
+TableOptions :: {
+	(TypeMeta)
+
 	// includeObject decides whether to include each object along with its columnar information.
 	// Specifying "None" will return no object, specifying "Object" will return the full object contents, and
 	// specifying "Metadata" (the default) will return the object's metadata in the PartialObjectMetadata kind
@@ -1266,7 +1296,9 @@ TableOptions: TypeMeta & {
 // PartialObjectMetadata is a generic representation of any object with ObjectMeta. It allows clients
 // to get access to a particular ObjectMeta schema without knowing the details of the version.
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-PartialObjectMetadata: TypeMeta & {
+PartialObjectMetadata :: {
+	(TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1275,7 +1307,9 @@ PartialObjectMetadata: TypeMeta & {
 
 // PartialObjectMetadataList contains a list of objects containing only their metadata
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-PartialObjectMetadataList: TypeMeta & {
+PartialObjectMetadataList :: {
+	(TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional

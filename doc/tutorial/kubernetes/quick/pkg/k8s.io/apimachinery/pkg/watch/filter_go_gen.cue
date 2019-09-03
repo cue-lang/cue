@@ -5,6 +5,6 @@
 package watch
 
 // Recorder records all events that are sent from the watch until it is closed.
-Recorder: {
+Recorder :: {
 	Interface: Interface
 }

@@ -8,7 +8,7 @@ package v1
 // concepts during lookup stages without having partially valid types
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-GroupResource: {
+GroupResource :: {
 	group:    string @go(Group) @protobuf(1,bytes,opt)
 	resource: string @go(Resource) @protobuf(2,bytes,opt)
 }
@@ -17,7 +17,7 @@ GroupResource: {
 // to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-GroupVersionResource: {
+GroupVersionResource :: {
 	group:    string @go(Group) @protobuf(1,bytes,opt)
 	version:  string @go(Version) @protobuf(2,bytes,opt)
 	resource: string @go(Resource) @protobuf(3,bytes,opt)
@@ -27,7 +27,7 @@ GroupVersionResource: {
 // concepts during lookup stages without having partially valid types
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-GroupKind: {
+GroupKind :: {
 	group: string @go(Group) @protobuf(1,bytes,opt)
 	kind:  string @go(Kind) @protobuf(2,bytes,opt)
 }
@@ -36,7 +36,7 @@ GroupKind: {
 // to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-GroupVersionKind: {
+GroupVersionKind :: {
 	group:   string @go(Group) @protobuf(1,bytes,opt)
 	version: string @go(Version) @protobuf(2,bytes,opt)
 	kind:    string @go(Kind) @protobuf(3,bytes,opt)
@@ -45,4 +45,4 @@ GroupVersionKind: {
 // GroupVersion contains the "group" and the "version", which uniquely identifies the API.
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-GroupVersion: _
+GroupVersion :: _

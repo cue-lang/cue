@@ -33,6 +33,7 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/packages"
@@ -40,8 +41,9 @@ import (
 
 // TODO:
 // Document:
+// - Use ast package.
 // - how to deal with "oneOf" or sum types?
-// - generate cue files for cuego definitions?
+// - generate cue files for cue field tags?
 // - cue go get or cue get go
 // - include generation report in doc_gen.cue or report.txt.
 //   Possible enums:
@@ -574,7 +576,7 @@ func (e *extractor) reportDecl(w io.Writer, x *ast.GenDecl) (added bool) {
 					// TODO: add the underlying tag as a Go tag once we have
 					// proper string escaping for CUE.
 					e.printDoc(x.Doc, true)
-					fmt.Fprintf(e.w, "%s: %s", name, altType)
+					fmt.Fprintf(e.w, "%s :: %s", name, altType)
 					added = true
 					break
 				}
@@ -589,12 +591,12 @@ func (e *extractor) reportDecl(w io.Writer, x *ast.GenDecl) (added bool) {
 
 				if s := e.altType(types.NewPointer(typ)); s != "" {
 					e.printDoc(x.Doc, true)
-					fmt.Fprint(e.w, name, ": ", s)
+					fmt.Fprint(e.w, name, " :: ", s)
 					break
 				}
 				// TODO: only print original type if value is not marked as enum.
 				underlying := e.pkg.TypesInfo.TypeOf(v.Type)
-				e.printField(name, false, underlying, x.Doc, true)
+				e.printField(name, cuetoken.ISA, underlying, x.Doc, true)
 			}
 
 			e.indent++
@@ -603,7 +605,7 @@ func (e *extractor) reportDecl(w io.Writer, x *ast.GenDecl) (added bool) {
 
 				e.newLine()
 				e.newLine()
-				fmt.Fprintf(e.w, "enum%s:\n%v", name, enums[0])
+				fmt.Fprintf(e.w, "enum%s::\n%v", name, enums[0])
 				for _, v := range enums[1:] {
 					fmt.Fprint(e.w, " |")
 					e.newLine()
@@ -632,7 +634,7 @@ func (e *extractor) reportDecl(w io.Writer, x *ast.GenDecl) (added bool) {
 				added = true
 
 				e.printDoc(v.Doc, true)
-				fmt.Fprint(e.w, name.Name, ": ")
+				fmt.Fprint(e.w, name.Name, " :: ")
 
 				typ := e.pkg.TypesInfo.TypeOf(name)
 				if s := typ.String(); !strings.Contains(s, "untyped") {
@@ -799,10 +801,13 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 	return false
 }
 
-func (e *extractor) printField(name string, opt bool, expr types.Type, doc *ast.CommentGroup, newline bool) (typename string) {
+func (e *extractor) printField(name string, kind cuetoken.Token, expr types.Type, doc *ast.CommentGroup, newline bool) (typename string) {
 	e.printDoc(doc, newline)
 	colon := ": "
-	if opt {
+	switch kind {
+	case cuetoken.ISA:
+		colon = " :: "
+	case cuetoken.OPTION:
 		colon = "?: "
 	}
 	fmt.Fprint(e.w, name, colon)
@@ -857,16 +862,6 @@ func (e *extractor) printType(expr types.Type) {
 		e.printType(x.Elem())
 
 	case *types.Struct:
-		for i := 0; i < x.NumFields(); i++ {
-			f := x.Field(i)
-			if f.Anonymous() && e.isInline(x.Tag(i)) {
-				typ := f.Type()
-				if _, ok := typ.(*types.Named); ok {
-					e.printType(typ)
-					fmt.Fprintf(e.w, " & ")
-				}
-			}
-		}
 		fmt.Fprint(e.w, "{")
 		e.indent++
 		e.printFields(x)
@@ -943,7 +938,18 @@ func (e *extractor) printFields(x *types.Struct) {
 		}
 		if f.Anonymous() && e.isInline(x.Tag(i)) {
 			typ := f.Type()
-			if _, ok := typ.(*types.Named); !ok {
+			if _, ok := typ.(*types.Named); ok {
+				// TODO: strongly consider allowing Expressions for embedded
+				//       values. This ties in with using dots instead of spaces,
+				//       comprehensions, and the ability to generate good
+				//       error messages, so thread carefully.
+				if i > 0 {
+					fmt.Fprintln(e.w)
+				}
+				fmt.Fprint(e.w, "\n(")
+				e.printType(typ)
+				fmt.Fprint(e.w, ")")
+			} else {
 				switch x := typ.(type) {
 				case *types.Struct:
 					e.printFields(x)
@@ -959,7 +965,11 @@ func (e *extractor) printFields(x *types.Struct) {
 			continue
 		}
 		e.newLine()
-		cueType := e.printField(name, e.isOptional(tag), f.Type(), docs[i], count > 0)
+		kind := cuetoken.COLON
+		if e.isOptional(tag) {
+			kind = cuetoken.OPTION
+		}
+		cueType := e.printField(name, kind, f.Type(), docs[i], count > 0)
 
 		// Add field tag to convert back to Go.
 		typeName := f.Type().String()

@@ -1,3 +1,3 @@
 package kube
 
-_component: "mon"
+Component :: "mon"

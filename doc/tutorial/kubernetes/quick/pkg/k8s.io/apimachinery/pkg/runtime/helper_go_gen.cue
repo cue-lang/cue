@@ -5,16 +5,16 @@
 package runtime
 
 // MultiObjectTyper returns the types of objects across multiple schemes in order.
-MultiObjectTyper: [...ObjectTyper]
+MultiObjectTyper :: [...ObjectTyper]
 
 // WithVersionEncoder serializes an object and ensures the GVK is set.
-WithVersionEncoder: {
+WithVersionEncoder :: {
 	Version:     GroupVersioner
 	Encoder:     Encoder
 	ObjectTyper: ObjectTyper
 }
 
 // WithoutVersionDecoder clears the group version kind of a deserialized object.
-WithoutVersionDecoder: {
+WithoutVersionDecoder :: {
 	Decoder: Decoder
 }

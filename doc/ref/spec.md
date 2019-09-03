@@ -1059,6 +1059,11 @@ future extensions and relaxations:
 ExpressionLabel = BindLabel | [ BindLabel ] "[" [ Expression ] "]" .
 -->
 
+<!-- TODO: strongly consider relaxing an embedding to be an Expression, instead
+of Operand. This will tie in with using dots instead of spaces on the LHS,
+comprehensions and the ability to generate good error messages, so thread
+carefully.
+-->
 ```
 StructLit       = "{" [ DeclarationList [ "," [ "..." ] ] "}" .
 DeclarationList = Declaration { "," Declaration }

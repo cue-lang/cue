@@ -4,6 +4,6 @@
 
 package v1
 
-GroupName: "meta.k8s.io"
+GroupName :: "meta.k8s.io"
 
-WatchEventKind: "WatchEvent"
+WatchEventKind :: "WatchEvent"

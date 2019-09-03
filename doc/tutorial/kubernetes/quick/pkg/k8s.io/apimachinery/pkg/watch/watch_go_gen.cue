@@ -9,28 +9,28 @@ import (
 )
 
 // Interface can be implemented by anything that knows how to watch and report changes.
-Interface: _
+Interface :: _
 
 // EventType defines the possible types of events.
-EventType: string // enumEventType
+EventType :: string // enumEventType
 
-enumEventType:
+enumEventType ::
 	Added |
 	Modified |
 	Deleted |
 	Bookmark |
 	Error
 
-Added:           EventType & "ADDED"
-Modified:        EventType & "MODIFIED"
-Deleted:         EventType & "DELETED"
-Bookmark:        EventType & "BOOKMARK"
-Error:           EventType & "ERROR"
-DefaultChanSize: int32 & 100
+Added ::           EventType & "ADDED"
+Modified ::        EventType & "MODIFIED"
+Deleted ::         EventType & "DELETED"
+Bookmark ::        EventType & "BOOKMARK"
+Error ::           EventType & "ERROR"
+DefaultChanSize :: int32 & 100
 
 // Event represents a single event to a watched resource.
 // +k8s:deepcopy-gen=true
-Event: {
+Event :: {
 	Type: EventType
 
 	// Object is:
@@ -46,11 +46,11 @@ Event: {
 }
 
 // FakeWatcher lets you test anything that consumes a watch.Interface; threadsafe.
-FakeWatcher: {
+FakeWatcher :: {
 	Stopped: bool
 }
 
 // RaceFreeFakeWatcher lets you test anything that consumes a watch.Interface; threadsafe.
-RaceFreeFakeWatcher: {
+RaceFreeFakeWatcher :: {
 	Stopped: bool
 }

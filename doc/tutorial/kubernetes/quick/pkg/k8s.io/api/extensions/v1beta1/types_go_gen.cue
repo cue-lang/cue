@@ -11,14 +11,14 @@ import (
 )
 
 // describes the attributes of a scale subresource
-ScaleSpec: {
+ScaleSpec :: {
 	// desired number of instances for the scaled object.
 	// +optional
 	replicas?: int32 @go(Replicas) @protobuf(1,varint,opt)
 }
 
 // represents the current status of a scale subresource.
-ScaleStatus: {
+ScaleStatus :: {
 	// actual number of observed instances of the scaled object.
 	replicas: int32 @go(Replicas) @protobuf(1,varint,opt)
 
@@ -37,7 +37,9 @@ ScaleStatus: {
 }
 
 // represents a scaling request for a resource.
-Scale: metav1.TypeMeta & {
+Scale :: {
+	(metav1.TypeMeta)
+
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -52,13 +54,17 @@ Scale: metav1.TypeMeta & {
 }
 
 // Dummy definition
-ReplicationControllerDummy: metav1.TypeMeta & {
+ReplicationControllerDummy :: {
+	(metav1.TypeMeta)
+
 }
 
 // DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for
 // more information.
 // Deployment enables declarative updates for Pods and ReplicaSets.
-Deployment: metav1.TypeMeta & {
+Deployment :: {
+	(metav1.TypeMeta)
+
 	// Standard object metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -73,7 +79,7 @@ Deployment: metav1.TypeMeta & {
 }
 
 // DeploymentSpec is the specification of the desired behavior of the Deployment.
-DeploymentSpec: {
+DeploymentSpec :: {
 	// Number of desired pods. This is a pointer to distinguish between explicit
 	// zero and not specified. Defaults to 1.
 	// +optional
@@ -127,7 +133,9 @@ DeploymentSpec: {
 
 // DEPRECATED.
 // DeploymentRollback stores the information required to rollback a deployment.
-DeploymentRollback: metav1.TypeMeta & {
+DeploymentRollback :: {
+	(metav1.TypeMeta)
+
 	// Required: This must match the Name of a deployment.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -140,7 +148,7 @@ DeploymentRollback: metav1.TypeMeta & {
 }
 
 // DEPRECATED.
-RollbackConfig: {
+RollbackConfig :: {
 	// The revision to rollback to. If set to 0, rollback to the last revision.
 	// +optional
 	revision?: int64 @go(Revision) @protobuf(1,varint,opt)
@@ -149,10 +157,10 @@ RollbackConfig: {
 // DefaultDeploymentUniqueLabelKey is the default key of the selector that is added
 // to existing RCs (and label key that is added to its pods) to prevent the existing RCs
 // to select new pods (and old pods being select by new RC).
-DefaultDeploymentUniqueLabelKey: "pod-template-hash"
+DefaultDeploymentUniqueLabelKey :: "pod-template-hash"
 
 // DeploymentStrategy describes how to replace existing pods with new ones.
-DeploymentStrategy: {
+DeploymentStrategy :: {
 	// Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
 	// +optional
 	type?: DeploymentStrategyType @go(Type) @protobuf(1,bytes,opt,casttype=DeploymentStrategyType)
@@ -166,20 +174,20 @@ DeploymentStrategy: {
 	rollingUpdate?: null | RollingUpdateDeployment @go(RollingUpdate,*RollingUpdateDeployment) @protobuf(2,bytes,opt)
 }
 
-DeploymentStrategyType: string // enumDeploymentStrategyType
+DeploymentStrategyType :: string // enumDeploymentStrategyType
 
-enumDeploymentStrategyType:
+enumDeploymentStrategyType ::
 	RecreateDeploymentStrategyType |
 	RollingUpdateDeploymentStrategyType
 
 // Kill all existing pods before creating new ones.
-RecreateDeploymentStrategyType: DeploymentStrategyType & "Recreate"
+RecreateDeploymentStrategyType :: DeploymentStrategyType & "Recreate"
 
 // Replace the old RCs by new one using rolling update i.e gradually scale down the old RCs and scale up the new one.
-RollingUpdateDeploymentStrategyType: DeploymentStrategyType & "RollingUpdate"
+RollingUpdateDeploymentStrategyType :: DeploymentStrategyType & "RollingUpdate"
 
 // Spec to control the desired behavior of rolling update.
-RollingUpdateDeployment: {
+RollingUpdateDeployment :: {
 	// The maximum number of pods that can be unavailable during the update.
 	// Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
 	// Absolute number is calculated from percentage by rounding down.
@@ -209,7 +217,7 @@ RollingUpdateDeployment: {
 }
 
 // DeploymentStatus is the most recently observed status of the Deployment.
-DeploymentStatus: {
+DeploymentStatus :: {
 	// The generation observed by the deployment controller.
 	// +optional
 	observedGeneration?: int64 @go(ObservedGeneration) @protobuf(1,varint,opt)
@@ -248,29 +256,29 @@ DeploymentStatus: {
 	collisionCount?: null | int32 @go(CollisionCount,*int32) @protobuf(8,varint,opt)
 }
 
-DeploymentConditionType: string // enumDeploymentConditionType
+DeploymentConditionType :: string // enumDeploymentConditionType
 
-enumDeploymentConditionType:
+enumDeploymentConditionType ::
 	DeploymentAvailable |
 	DeploymentProgressing |
 	DeploymentReplicaFailure
 
 // Available means the deployment is available, ie. at least the minimum available
 // replicas required are up and running for at least minReadySeconds.
-DeploymentAvailable: DeploymentConditionType & "Available"
+DeploymentAvailable :: DeploymentConditionType & "Available"
 
 // Progressing means the deployment is progressing. Progress for a deployment is
 // considered when a new replica set is created or adopted, and when new pods scale
 // up or old pods scale down. Progress is not estimated for paused deployments or
 // when progressDeadlineSeconds is not specified.
-DeploymentProgressing: DeploymentConditionType & "Progressing"
+DeploymentProgressing :: DeploymentConditionType & "Progressing"
 
 // ReplicaFailure is added in a deployment when one of its pods fails to be created
 // or deleted.
-DeploymentReplicaFailure: DeploymentConditionType & "ReplicaFailure"
+DeploymentReplicaFailure :: DeploymentConditionType & "ReplicaFailure"
 
 // DeploymentCondition describes the state of a deployment at a certain point.
-DeploymentCondition: {
+DeploymentCondition :: {
 	// Type of deployment condition.
 	type: DeploymentConditionType @go(Type) @protobuf(1,bytes,opt,casttype=DeploymentConditionType)
 
@@ -291,7 +299,9 @@ DeploymentCondition: {
 }
 
 // DeploymentList is a list of Deployments.
-DeploymentList: metav1.TypeMeta & {
+DeploymentList :: {
+	(metav1.TypeMeta)
+
 	// Standard list metadata.
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
@@ -300,7 +310,7 @@ DeploymentList: metav1.TypeMeta & {
 	items: [...Deployment] @go(Items,[]Deployment) @protobuf(2,bytes,rep)
 }
 
-DaemonSetUpdateStrategy: {
+DaemonSetUpdateStrategy :: {
 	// Type of daemon set update. Can be "RollingUpdate" or "OnDelete".
 	// Default is OnDelete.
 	// +optional
@@ -315,20 +325,20 @@ DaemonSetUpdateStrategy: {
 	rollingUpdate?: null | RollingUpdateDaemonSet @go(RollingUpdate,*RollingUpdateDaemonSet) @protobuf(2,bytes,opt)
 }
 
-DaemonSetUpdateStrategyType: string // enumDaemonSetUpdateStrategyType
+DaemonSetUpdateStrategyType :: string // enumDaemonSetUpdateStrategyType
 
-enumDaemonSetUpdateStrategyType:
+enumDaemonSetUpdateStrategyType ::
 	RollingUpdateDaemonSetStrategyType |
 	OnDeleteDaemonSetStrategyType
 
 // Replace the old daemons by new ones using rolling update i.e replace them on each node one after the other.
-RollingUpdateDaemonSetStrategyType: DaemonSetUpdateStrategyType & "RollingUpdate"
+RollingUpdateDaemonSetStrategyType :: DaemonSetUpdateStrategyType & "RollingUpdate"
 
 // Replace the old daemons only when it's killed
-OnDeleteDaemonSetStrategyType: DaemonSetUpdateStrategyType & "OnDelete"
+OnDeleteDaemonSetStrategyType :: DaemonSetUpdateStrategyType & "OnDelete"
 
 // Spec to control the desired behavior of daemon set rolling update.
-RollingUpdateDaemonSet: {
+RollingUpdateDaemonSet :: {
 	// The maximum number of DaemonSet pods that can be unavailable during the
 	// update. Value can be an absolute number (ex: 5) or a percentage of total
 	// number of DaemonSet pods at the start of the update (ex: 10%). Absolute
@@ -348,7 +358,7 @@ RollingUpdateDaemonSet: {
 }
 
 // DaemonSetSpec is the specification of a daemon set.
-DaemonSetSpec: {
+DaemonSetSpec :: {
 	// A label query over pods that are managed by the daemon set.
 	// Must match in order to be controlled.
 	// If empty, defaulted to labels on Pod template.
@@ -388,7 +398,7 @@ DaemonSetSpec: {
 }
 
 // DaemonSetStatus represents the current status of a daemon set.
-DaemonSetStatus: {
+DaemonSetStatus :: {
 	// The number of nodes that are running at least 1
 	// daemon pod and are supposed to run the daemon pod.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/daemonset/
@@ -441,10 +451,10 @@ DaemonSetStatus: {
 	conditions?: [...DaemonSetCondition] @go(Conditions,[]DaemonSetCondition) @protobuf(10,bytes,rep)
 }
 
-DaemonSetConditionType: string
+DaemonSetConditionType :: string
 
 // DaemonSetCondition describes the state of a DaemonSet at a certain point.
-DaemonSetCondition: {
+DaemonSetCondition :: {
 	// Type of DaemonSet condition.
 	type: DaemonSetConditionType @go(Type) @protobuf(1,bytes,opt,casttype=DaemonSetConditionType)
 
@@ -467,7 +477,9 @@ DaemonSetCondition: {
 // DEPRECATED - This group version of DaemonSet is deprecated by apps/v1beta2/DaemonSet. See the release notes for
 // more information.
 // DaemonSet represents the configuration of a daemon set.
-DaemonSet: metav1.TypeMeta & {
+DaemonSet :: {
+	(metav1.TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -491,15 +503,17 @@ DaemonSet: metav1.TypeMeta & {
 // DaemonSetTemplateGenerationKey is the key of the labels that is added
 // to daemon set pods to distinguish between old and new pod templates
 // during DaemonSet template update.
-DaemonSetTemplateGenerationKey: "pod-template-generation"
+DaemonSetTemplateGenerationKey :: "pod-template-generation"
 
 // DefaultDaemonSetUniqueLabelKey is the default label key that is added
 // to existing DaemonSet pods to distinguish between old and new
 // DaemonSet pods during DaemonSet template updates.
-DefaultDaemonSetUniqueLabelKey: "controller-revision-hash"
+DefaultDaemonSetUniqueLabelKey :: "controller-revision-hash"
 
 // DaemonSetList is a collection of daemon sets.
-DaemonSetList: metav1.TypeMeta & {
+DaemonSetList :: {
+	(metav1.TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -514,7 +528,9 @@ DaemonSetList: metav1.TypeMeta & {
 // externally-reachable urls, load balance traffic, terminate SSL, offer name
 // based virtual hosting etc.
 // DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
-Ingress: metav1.TypeMeta & {
+Ingress :: {
+	(metav1.TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -532,7 +548,9 @@ Ingress: metav1.TypeMeta & {
 }
 
 // IngressList is a collection of Ingress.
-IngressList: metav1.TypeMeta & {
+IngressList :: {
+	(metav1.TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -543,7 +561,7 @@ IngressList: metav1.TypeMeta & {
 }
 
 // IngressSpec describes the Ingress the user wishes to exist.
-IngressSpec: {
+IngressSpec :: {
 	// A default backend capable of servicing requests that don't match any
 	// rule. At least one of 'backend' or 'rules' must be specified. This field
 	// is optional to allow the loadbalancer controller or defaulting logic to
@@ -566,7 +584,7 @@ IngressSpec: {
 }
 
 // IngressTLS describes the transport layer security associated with an Ingress.
-IngressTLS: {
+IngressTLS :: {
 	// Hosts are a list of hosts included in the TLS certificate. The values in
 	// this list must match the name/s used in the tlsSecret. Defaults to the
 	// wildcard host setting for the loadbalancer controller fulfilling this
@@ -584,7 +602,7 @@ IngressTLS: {
 }
 
 // IngressStatus describe the current state of the Ingress.
-IngressStatus: {
+IngressStatus :: {
 	// LoadBalancer contains the current status of the load-balancer.
 	// +optional
 	loadBalancer?: v1.LoadBalancerStatus @go(LoadBalancer) @protobuf(1,bytes,opt)
@@ -593,7 +611,7 @@ IngressStatus: {
 // IngressRule represents the rules mapping the paths under a specified host to
 // the related backend services. Incoming requests are first evaluated for a host
 // match, then routed to the backend associated with the matching IngressRuleValue.
-IngressRule: IngressRuleValue & {
+IngressRule :: {
 	// Host is the fully qualified domain name of a network host, as defined
 	// by RFC 3986. Note the following deviations from the "host" part of the
 	// URI as defined in the RFC:
@@ -608,13 +626,16 @@ IngressRule: IngressRuleValue & {
 	// specified IngressRuleValue.
 	// +optional
 	host?: string @go(Host) @protobuf(1,bytes,opt)
+
+	(IngressRuleValue)
+
 }
 
 // IngressRuleValue represents a rule to apply against incoming requests. If the
 // rule is satisfied, the request is routed to the specified backend. Currently
 // mixing different types of rules in a single Ingress is disallowed, so exactly
 // one of the following must be set.
-IngressRuleValue: {
+IngressRuleValue :: {
 	// +optional
 	http?: null | HTTPIngressRuleValue @go(HTTP,*HTTPIngressRuleValue) @protobuf(1,bytes,opt)
 }
@@ -624,14 +645,14 @@ IngressRuleValue: {
 // where parts of the url correspond to RFC 3986, this resource will be used
 // to match against everything after the last '/' and before the first '?'
 // or '#'.
-HTTPIngressRuleValue: {
+HTTPIngressRuleValue :: {
 	// A collection of paths that map requests to backends.
 	paths: [...HTTPIngressPath] @go(Paths,[]HTTPIngressPath) @protobuf(1,bytes,rep)
 }
 
 // HTTPIngressPath associates a path regex with a backend. Incoming urls matching
 // the path are forwarded to the backend.
-HTTPIngressPath: {
+HTTPIngressPath :: {
 	// Path is an extended POSIX regex as defined by IEEE Std 1003.1,
 	// (i.e this follows the egrep/unix syntax, not the perl syntax)
 	// matched against the path of an incoming request. Currently it can
@@ -648,7 +669,7 @@ HTTPIngressPath: {
 }
 
 // IngressBackend describes all endpoints for a given service and port.
-IngressBackend: {
+IngressBackend :: {
 	// Specifies the name of the referenced service.
 	serviceName: string @go(ServiceName) @protobuf(1,bytes,opt)
 
@@ -659,7 +680,9 @@ IngressBackend: {
 // DEPRECATED - This group version of ReplicaSet is deprecated by apps/v1beta2/ReplicaSet. See the release notes for
 // more information.
 // ReplicaSet ensures that a specified number of pod replicas are running at any given time.
-ReplicaSet: metav1.TypeMeta & {
+ReplicaSet :: {
+	(metav1.TypeMeta)
+
 	// If the Labels of a ReplicaSet are empty, they are defaulted to
 	// be the same as the Pod(s) that the ReplicaSet manages.
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -681,7 +704,9 @@ ReplicaSet: metav1.TypeMeta & {
 }
 
 // ReplicaSetList is a collection of ReplicaSets.
-ReplicaSetList: metav1.TypeMeta & {
+ReplicaSetList :: {
+	(metav1.TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -693,7 +718,7 @@ ReplicaSetList: metav1.TypeMeta & {
 }
 
 // ReplicaSetSpec is the specification of a ReplicaSet.
-ReplicaSetSpec: {
+ReplicaSetSpec :: {
 	// Replicas is the number of desired replicas.
 	// This is a pointer to distinguish between explicit zero and unspecified.
 	// Defaults to 1.
@@ -722,7 +747,7 @@ ReplicaSetSpec: {
 }
 
 // ReplicaSetStatus represents the current status of a ReplicaSet.
-ReplicaSetStatus: {
+ReplicaSetStatus :: {
 	// Replicas is the most recently oberved number of replicas.
 	// More info: https://kubernetes.io/docs/concepts/workloads/controllers/replicationcontroller/#what-is-a-replicationcontroller
 	replicas: int32 @go(Replicas) @protobuf(1,varint,opt)
@@ -750,18 +775,18 @@ ReplicaSetStatus: {
 	conditions?: [...ReplicaSetCondition] @go(Conditions,[]ReplicaSetCondition) @protobuf(6,bytes,rep)
 }
 
-ReplicaSetConditionType: string // enumReplicaSetConditionType
+ReplicaSetConditionType :: string // enumReplicaSetConditionType
 
-enumReplicaSetConditionType:
+enumReplicaSetConditionType ::
 	ReplicaSetReplicaFailure
 
 // ReplicaSetReplicaFailure is added in a replica set when one of its pods fails to be created
 // due to insufficient quota, limit ranges, pod security policy, node selectors, etc. or deleted
 // due to kubelet being down or finalizers are failing.
-ReplicaSetReplicaFailure: ReplicaSetConditionType & "ReplicaFailure"
+ReplicaSetReplicaFailure :: ReplicaSetConditionType & "ReplicaFailure"
 
 // ReplicaSetCondition describes the state of a replica set at a certain point.
-ReplicaSetCondition: {
+ReplicaSetCondition :: {
 	// Type of replica set condition.
 	type: ReplicaSetConditionType @go(Type) @protobuf(1,bytes,opt,casttype=ReplicaSetConditionType)
 
@@ -784,7 +809,9 @@ ReplicaSetCondition: {
 // PodSecurityPolicy governs the ability to make requests that affect the Security Context
 // that will be applied to a pod and container.
 // Deprecated: use PodSecurityPolicy from policy API Group instead.
-PodSecurityPolicy: metav1.TypeMeta & {
+PodSecurityPolicy :: {
+	(metav1.TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -797,7 +824,7 @@ PodSecurityPolicy: metav1.TypeMeta & {
 
 // PodSecurityPolicySpec defines the policy enforced.
 // Deprecated: use PodSecurityPolicySpec from policy API Group instead.
-PodSecurityPolicySpec: {
+PodSecurityPolicySpec :: {
 	// privileged determines if a pod can request to be run as privileged.
 	// +optional
 	privileged?: bool @go(Privileged) @protobuf(1,varint,opt)
@@ -930,7 +957,7 @@ PodSecurityPolicySpec: {
 // AllowedHostPath defines the host volume conditions that will be enabled by a policy
 // for pods to use. It requires the path prefix to be defined.
 // Deprecated: use AllowedHostPath from policy API Group instead.
-AllowedHostPath: {
+AllowedHostPath :: {
 	// pathPrefix is the path prefix that the host volume must match.
 	// It does not support `*`.
 	// Trailing slashes are trimmed when validating the path prefix with a host path.
@@ -947,17 +974,17 @@ AllowedHostPath: {
 
 // FSType gives strong typing to different file systems that are used by volumes.
 // Deprecated: use FSType from policy API Group instead.
-FSType: string
+FSType :: string
 
 // AllowedFlexVolume represents a single Flexvolume that is allowed to be used.
 // Deprecated: use AllowedFlexVolume from policy API Group instead.
-AllowedFlexVolume: {
+AllowedFlexVolume :: {
 	// driver is the name of the Flexvolume driver.
 	driver: string @go(Driver) @protobuf(1,bytes,opt)
 }
 
 // AllowedCSIDriver represents a single inline CSI Driver that is allowed to be used.
-AllowedCSIDriver: {
+AllowedCSIDriver :: {
 	// Name is the registered name of the CSI driver
 	name: string @go(Name) @protobuf(1,bytes,opt)
 }
@@ -965,7 +992,7 @@ AllowedCSIDriver: {
 // HostPortRange defines a range of host ports that will be enabled by a policy
 // for pods to use.  It requires both the start and end to be defined.
 // Deprecated: use HostPortRange from policy API Group instead.
-HostPortRange: {
+HostPortRange :: {
 	// min is the start of the range, inclusive.
 	min: int32 @go(Min) @protobuf(1,varint,opt)
 
@@ -975,7 +1002,7 @@ HostPortRange: {
 
 // SELinuxStrategyOptions defines the strategy type and any options used to create the strategy.
 // Deprecated: use SELinuxStrategyOptions from policy API Group instead.
-SELinuxStrategyOptions: {
+SELinuxStrategyOptions :: {
 	// rule is the strategy that will dictate the allowable labels that may be set.
 	rule: SELinuxStrategy @go(Rule) @protobuf(1,bytes,opt,casttype=SELinuxStrategy)
 
@@ -988,23 +1015,23 @@ SELinuxStrategyOptions: {
 // SELinuxStrategy denotes strategy types for generating SELinux options for a
 // Security Context.
 // Deprecated: use SELinuxStrategy from policy API Group instead.
-SELinuxStrategy: string // enumSELinuxStrategy
+SELinuxStrategy :: string // enumSELinuxStrategy
 
-enumSELinuxStrategy:
+enumSELinuxStrategy ::
 	SELinuxStrategyMustRunAs |
 	SELinuxStrategyRunAsAny
 
 // SELinuxStrategyMustRunAs means that container must have SELinux labels of X applied.
 // Deprecated: use SELinuxStrategyMustRunAs from policy API Group instead.
-SELinuxStrategyMustRunAs: SELinuxStrategy & "MustRunAs"
+SELinuxStrategyMustRunAs :: SELinuxStrategy & "MustRunAs"
 
 // SELinuxStrategyRunAsAny means that container may make requests for any SELinux context labels.
 // Deprecated: use SELinuxStrategyRunAsAny from policy API Group instead.
-SELinuxStrategyRunAsAny: SELinuxStrategy & "RunAsAny"
+SELinuxStrategyRunAsAny :: SELinuxStrategy & "RunAsAny"
 
 // RunAsUserStrategyOptions defines the strategy type and any options used to create the strategy.
 // Deprecated: use RunAsUserStrategyOptions from policy API Group instead.
-RunAsUserStrategyOptions: {
+RunAsUserStrategyOptions :: {
 	// rule is the strategy that will dictate the allowable RunAsUser values that may be set.
 	rule: RunAsUserStrategy @go(Rule) @protobuf(1,bytes,opt,casttype=RunAsUserStrategy)
 
@@ -1016,7 +1043,7 @@ RunAsUserStrategyOptions: {
 
 // RunAsGroupStrategyOptions defines the strategy type and any options used to create the strategy.
 // Deprecated: use RunAsGroupStrategyOptions from policy API Group instead.
-RunAsGroupStrategyOptions: {
+RunAsGroupStrategyOptions :: {
 	// rule is the strategy that will dictate the allowable RunAsGroup values that may be set.
 	rule: RunAsGroupStrategy @go(Rule) @protobuf(1,bytes,opt,casttype=RunAsGroupStrategy)
 
@@ -1028,7 +1055,7 @@ RunAsGroupStrategyOptions: {
 
 // IDRange provides a min/max of an allowed range of IDs.
 // Deprecated: use IDRange from policy API Group instead.
-IDRange: {
+IDRange :: {
 	// min is the start of the range, inclusive.
 	min: int64 @go(Min) @protobuf(1,varint,opt)
 
@@ -1039,50 +1066,50 @@ IDRange: {
 // RunAsUserStrategy denotes strategy types for generating RunAsUser values for a
 // Security Context.
 // Deprecated: use RunAsUserStrategy from policy API Group instead.
-RunAsUserStrategy: string // enumRunAsUserStrategy
+RunAsUserStrategy :: string // enumRunAsUserStrategy
 
-enumRunAsUserStrategy:
+enumRunAsUserStrategy ::
 	RunAsUserStrategyMustRunAs |
 	RunAsUserStrategyMustRunAsNonRoot |
 	RunAsUserStrategyRunAsAny
 
 // RunAsUserStrategyMustRunAs means that container must run as a particular uid.
 // Deprecated: use RunAsUserStrategyMustRunAs from policy API Group instead.
-RunAsUserStrategyMustRunAs: RunAsUserStrategy & "MustRunAs"
+RunAsUserStrategyMustRunAs :: RunAsUserStrategy & "MustRunAs"
 
 // RunAsUserStrategyMustRunAsNonRoot means that container must run as a non-root uid.
 // Deprecated: use RunAsUserStrategyMustRunAsNonRoot from policy API Group instead.
-RunAsUserStrategyMustRunAsNonRoot: RunAsUserStrategy & "MustRunAsNonRoot"
+RunAsUserStrategyMustRunAsNonRoot :: RunAsUserStrategy & "MustRunAsNonRoot"
 
 // RunAsUserStrategyRunAsAny means that container may make requests for any uid.
 // Deprecated: use RunAsUserStrategyRunAsAny from policy API Group instead.
-RunAsUserStrategyRunAsAny: RunAsUserStrategy & "RunAsAny"
+RunAsUserStrategyRunAsAny :: RunAsUserStrategy & "RunAsAny"
 
 // RunAsGroupStrategy denotes strategy types for generating RunAsGroup values for a
 // Security Context.
 // Deprecated: use RunAsGroupStrategy from policy API Group instead.
-RunAsGroupStrategy: string // enumRunAsGroupStrategy
+RunAsGroupStrategy :: string // enumRunAsGroupStrategy
 
-enumRunAsGroupStrategy:
+enumRunAsGroupStrategy ::
 	RunAsGroupStrategyMayRunAs |
 	RunAsGroupStrategyMustRunAs |
 	RunAsGroupStrategyRunAsAny
 
 // RunAsGroupStrategyMayRunAs means that container does not need to run with a particular gid.
 // However, when RunAsGroup are specified, they have to fall in the defined range.
-RunAsGroupStrategyMayRunAs: RunAsGroupStrategy & "MayRunAs"
+RunAsGroupStrategyMayRunAs :: RunAsGroupStrategy & "MayRunAs"
 
 // RunAsGroupStrategyMustRunAs means that container must run as a particular gid.
 // Deprecated: use RunAsGroupStrategyMustRunAs from policy API Group instead.
-RunAsGroupStrategyMustRunAs: RunAsGroupStrategy & "MustRunAs"
+RunAsGroupStrategyMustRunAs :: RunAsGroupStrategy & "MustRunAs"
 
 // RunAsGroupStrategyRunAsAny means that container may make requests for any gid.
 // Deprecated: use RunAsGroupStrategyRunAsAny from policy API Group instead.
-RunAsGroupStrategyRunAsAny: RunAsGroupStrategy & "RunAsAny"
+RunAsGroupStrategyRunAsAny :: RunAsGroupStrategy & "RunAsAny"
 
 // FSGroupStrategyOptions defines the strategy type and options used to create the strategy.
 // Deprecated: use FSGroupStrategyOptions from policy API Group instead.
-FSGroupStrategyOptions: {
+FSGroupStrategyOptions :: {
 	// rule is the strategy that will dictate what FSGroup is used in the SecurityContext.
 	// +optional
 	rule?: FSGroupStrategyType @go(Rule) @protobuf(1,bytes,opt,casttype=FSGroupStrategyType)
@@ -1096,23 +1123,23 @@ FSGroupStrategyOptions: {
 // FSGroupStrategyType denotes strategy types for generating FSGroup values for a
 // SecurityContext
 // Deprecated: use FSGroupStrategyType from policy API Group instead.
-FSGroupStrategyType: string // enumFSGroupStrategyType
+FSGroupStrategyType :: string // enumFSGroupStrategyType
 
-enumFSGroupStrategyType:
+enumFSGroupStrategyType ::
 	FSGroupStrategyMustRunAs |
 	FSGroupStrategyRunAsAny
 
 // FSGroupStrategyMustRunAs meant that container must have FSGroup of X applied.
 // Deprecated: use FSGroupStrategyMustRunAs from policy API Group instead.
-FSGroupStrategyMustRunAs: FSGroupStrategyType & "MustRunAs"
+FSGroupStrategyMustRunAs :: FSGroupStrategyType & "MustRunAs"
 
 // FSGroupStrategyRunAsAny means that container may make requests for any FSGroup labels.
 // Deprecated: use FSGroupStrategyRunAsAny from policy API Group instead.
-FSGroupStrategyRunAsAny: FSGroupStrategyType & "RunAsAny"
+FSGroupStrategyRunAsAny :: FSGroupStrategyType & "RunAsAny"
 
 // SupplementalGroupsStrategyOptions defines the strategy type and options used to create the strategy.
 // Deprecated: use SupplementalGroupsStrategyOptions from policy API Group instead.
-SupplementalGroupsStrategyOptions: {
+SupplementalGroupsStrategyOptions :: {
 	// rule is the strategy that will dictate what supplemental groups is used in the SecurityContext.
 	// +optional
 	rule?: SupplementalGroupsStrategyType @go(Rule) @protobuf(1,bytes,opt,casttype=SupplementalGroupsStrategyType)
@@ -1126,23 +1153,23 @@ SupplementalGroupsStrategyOptions: {
 // SupplementalGroupsStrategyType denotes strategy types for determining valid supplemental
 // groups for a SecurityContext.
 // Deprecated: use SupplementalGroupsStrategyType from policy API Group instead.
-SupplementalGroupsStrategyType: string // enumSupplementalGroupsStrategyType
+SupplementalGroupsStrategyType :: string // enumSupplementalGroupsStrategyType
 
-enumSupplementalGroupsStrategyType:
+enumSupplementalGroupsStrategyType ::
 	SupplementalGroupsStrategyMustRunAs |
 	SupplementalGroupsStrategyRunAsAny
 
 // SupplementalGroupsStrategyMustRunAs means that container must run as a particular gid.
 // Deprecated: use SupplementalGroupsStrategyMustRunAs from policy API Group instead.
-SupplementalGroupsStrategyMustRunAs: SupplementalGroupsStrategyType & "MustRunAs"
+SupplementalGroupsStrategyMustRunAs :: SupplementalGroupsStrategyType & "MustRunAs"
 
 // SupplementalGroupsStrategyRunAsAny means that container may make requests for any gid.
 // Deprecated: use SupplementalGroupsStrategyRunAsAny from policy API Group instead.
-SupplementalGroupsStrategyRunAsAny: SupplementalGroupsStrategyType & "RunAsAny"
+SupplementalGroupsStrategyRunAsAny :: SupplementalGroupsStrategyType & "RunAsAny"
 
 // RuntimeClassStrategyOptions define the strategy that will dictate the allowable RuntimeClasses
 // for a pod.
-RuntimeClassStrategyOptions: {
+RuntimeClassStrategyOptions :: {
 	// allowedRuntimeClassNames is a whitelist of RuntimeClass names that may be specified on a pod.
 	// A value of "*" means that any RuntimeClass name is allowed, and must be the only item in the
 	// list. An empty list requires the RuntimeClassName field to be unset.
@@ -1155,11 +1182,13 @@ RuntimeClassStrategyOptions: {
 	defaultRuntimeClassName?: null | string @go(DefaultRuntimeClassName,*string) @protobuf(2,bytes,opt)
 }
 
-AllowAllRuntimeClassNames: "*"
+AllowAllRuntimeClassNames :: "*"
 
 // PodSecurityPolicyList is a list of PodSecurityPolicy objects.
 // Deprecated: use PodSecurityPolicyList from policy API Group instead.
-PodSecurityPolicyList: metav1.TypeMeta & {
+PodSecurityPolicyList :: {
+	(metav1.TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1171,7 +1200,9 @@ PodSecurityPolicyList: metav1.TypeMeta & {
 
 // DEPRECATED 1.9 - This group version of NetworkPolicy is deprecated by networking/v1/NetworkPolicy.
 // NetworkPolicy describes what network traffic is allowed for a set of Pods
-NetworkPolicy: metav1.TypeMeta & {
+NetworkPolicy :: {
+	(metav1.TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1185,20 +1216,20 @@ NetworkPolicy: metav1.TypeMeta & {
 // DEPRECATED 1.9 - This group version of PolicyType is deprecated by networking/v1/PolicyType.
 // Policy Type string describes the NetworkPolicy type
 // This type is beta-level in 1.8
-PolicyType: string // enumPolicyType
+PolicyType :: string // enumPolicyType
 
-enumPolicyType:
+enumPolicyType ::
 	PolicyTypeIngress |
 	PolicyTypeEgress
 
 // PolicyTypeIngress is a NetworkPolicy that affects ingress traffic on selected pods
-PolicyTypeIngress: PolicyType & "Ingress"
+PolicyTypeIngress :: PolicyType & "Ingress"
 
 // PolicyTypeEgress is a NetworkPolicy that affects egress traffic on selected pods
-PolicyTypeEgress: PolicyType & "Egress"
+PolicyTypeEgress :: PolicyType & "Egress"
 
 // DEPRECATED 1.9 - This group version of NetworkPolicySpec is deprecated by networking/v1/NetworkPolicySpec.
-NetworkPolicySpec: {
+NetworkPolicySpec :: {
 	// Selects the pods to which this NetworkPolicy object applies.  The array of ingress rules
 	// is applied to any pods selected by this field. Multiple network policies can select the
 	// same set of pods.  In this case, the ingress rules for each are combined additively.
@@ -1242,7 +1273,7 @@ NetworkPolicySpec: {
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyIngressRule is deprecated by networking/v1/NetworkPolicyIngressRule.
 // This NetworkPolicyIngressRule matches traffic if and only if the traffic matches both ports AND from.
-NetworkPolicyIngressRule: {
+NetworkPolicyIngressRule :: {
 	// List of ports which should be made accessible on the pods selected for this rule.
 	// Each item in this list is combined using a logical OR.
 	// If this field is empty or missing, this rule matches all ports (traffic not restricted by port).
@@ -1264,7 +1295,7 @@ NetworkPolicyIngressRule: {
 // NetworkPolicyEgressRule describes a particular set of traffic that is allowed out of pods
 // matched by a NetworkPolicySpec's podSelector. The traffic must match both ports and to.
 // This type is beta-level in 1.8
-NetworkPolicyEgressRule: {
+NetworkPolicyEgressRule :: {
 	// List of destination ports for outgoing traffic.
 	// Each item in this list is combined using a logical OR. If this field is
 	// empty or missing, this rule matches all ports (traffic not restricted by port).
@@ -1283,7 +1314,7 @@ NetworkPolicyEgressRule: {
 }
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyPort is deprecated by networking/v1/NetworkPolicyPort.
-NetworkPolicyPort: {
+NetworkPolicyPort :: {
 	// Optional.  The protocol (TCP, UDP, or SCTP) which traffic must match.
 	// If not specified, this field defaults to TCP.
 	// +optional
@@ -1302,7 +1333,7 @@ NetworkPolicyPort: {
 // IPBlock describes a particular CIDR (Ex. "192.168.1.1/24") that is allowed to the pods
 // matched by a NetworkPolicySpec's podSelector. The except entry describes CIDRs that should
 // not be included within this rule.
-IPBlock: {
+IPBlock :: {
 	// CIDR is a string representing the IP Block
 	// Valid examples are "192.168.1.1/24"
 	cidr: string @go(CIDR) @protobuf(1,bytes)
@@ -1315,7 +1346,7 @@ IPBlock: {
 }
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyPeer is deprecated by networking/v1/NetworkPolicyPeer.
-NetworkPolicyPeer: {
+NetworkPolicyPeer :: {
 	// This is a label selector which selects Pods. This field follows standard label
 	// selector semantics; if present but empty, it selects all pods.
 	//
@@ -1342,7 +1373,9 @@ NetworkPolicyPeer: {
 
 // DEPRECATED 1.9 - This group version of NetworkPolicyList is deprecated by networking/v1/NetworkPolicyList.
 // Network Policy List is a list of NetworkPolicy objects.
-NetworkPolicyList: metav1.TypeMeta & {
+NetworkPolicyList :: {
+	(metav1.TypeMeta)
+
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional

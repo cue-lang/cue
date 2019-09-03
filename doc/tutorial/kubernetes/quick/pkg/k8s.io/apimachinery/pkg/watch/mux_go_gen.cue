@@ -6,11 +6,11 @@ package watch
 
 // FullChannelBehavior controls how the Broadcaster reacts if a watcher's watch
 // channel is full.
-FullChannelBehavior: int // enumFullChannelBehavior
+FullChannelBehavior :: int // enumFullChannelBehavior
 
-enumFullChannelBehavior:
+enumFullChannelBehavior ::
 	WaitIfChannelFull |
 	DropIfChannelFull
 
-WaitIfChannelFull: FullChannelBehavior & 0
-DropIfChannelFull: FullChannelBehavior & 1
+WaitIfChannelFull :: FullChannelBehavior & 0
+DropIfChannelFull :: FullChannelBehavior & 1

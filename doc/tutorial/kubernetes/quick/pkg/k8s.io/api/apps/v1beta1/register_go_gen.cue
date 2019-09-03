@@ -4,4 +4,4 @@
 
 package v1beta1
 
-GroupName: "apps"
+GroupName :: "apps"

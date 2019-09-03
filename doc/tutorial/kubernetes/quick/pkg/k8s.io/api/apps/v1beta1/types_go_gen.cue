@@ -11,19 +11,19 @@ import (
 	"k8s.io/apimachinery/pkg/util/intstr"
 )
 
-ControllerRevisionHashLabelKey: "controller-revision-hash"
-StatefulSetRevisionLabel:       "controller-revision-hash"
-StatefulSetPodNameLabel:        "statefulset.kubernetes.io/pod-name"
+ControllerRevisionHashLabelKey :: "controller-revision-hash"
+StatefulSetRevisionLabel ::       "controller-revision-hash"
+StatefulSetPodNameLabel ::        "statefulset.kubernetes.io/pod-name"
 
 // ScaleSpec describes the attributes of a scale subresource
-ScaleSpec: {
+ScaleSpec :: {
 	// desired number of instances for the scaled object.
 	// +optional
 	replicas?: int32 @go(Replicas) @protobuf(1,varint,opt)
 }
 
 // ScaleStatus represents the current status of a scale subresource.
-ScaleStatus: {
+ScaleStatus :: {
 	// actual number of observed instances of the scaled object.
 	replicas: int32 @go(Replicas) @protobuf(1,varint,opt)
 
@@ -42,7 +42,9 @@ ScaleStatus: {
 }
 
 // Scale represents a scaling request for a resource.
-Scale: metav1.TypeMeta & {
+Scale :: {
+	(metav1.TypeMeta)
+
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -64,7 +66,9 @@ Scale: metav1.TypeMeta & {
 //  - Storage: As many VolumeClaims as requested.
 // The StatefulSet guarantees that a given network identity will always
 // map to the same storage identity.
-StatefulSet: metav1.TypeMeta & {
+StatefulSet :: {
+	(metav1.TypeMeta)
+
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -79,9 +83,9 @@ StatefulSet: metav1.TypeMeta & {
 }
 
 // PodManagementPolicyType defines the policy for creating pods under a stateful set.
-PodManagementPolicyType: string // enumPodManagementPolicyType
+PodManagementPolicyType :: string // enumPodManagementPolicyType
 
-enumPodManagementPolicyType:
+enumPodManagementPolicyType ::
 	OrderedReadyPodManagement |
 	ParallelPodManagement
 
@@ -89,17 +93,17 @@ enumPodManagementPolicyType:
 // scale up and strictly decreasing order on scale down, progressing only when
 // the previous pod is ready or terminated. At most one pod will be changed
 // at any time.
-OrderedReadyPodManagement: PodManagementPolicyType & "OrderedReady"
+OrderedReadyPodManagement :: PodManagementPolicyType & "OrderedReady"
 
 // ParallelPodManagement will create and delete pods as soon as the stateful set
 // replica count is changed, and will not wait for pods to be ready or complete
 // termination.
-ParallelPodManagement: PodManagementPolicyType & "Parallel"
+ParallelPodManagement :: PodManagementPolicyType & "Parallel"
 
 // StatefulSetUpdateStrategy indicates the strategy that the StatefulSet
 // controller will use to perform updates. It includes any additional parameters
 // necessary to perform the update for the indicated strategy.
-StatefulSetUpdateStrategy: {
+StatefulSetUpdateStrategy :: {
 	// Type indicates the type of the StatefulSetUpdateStrategy.
 	type?: StatefulSetUpdateStrategyType @go(Type) @protobuf(1,bytes,opt,casttype=StatefulSetStrategyType)
 
@@ -109,9 +113,9 @@ StatefulSetUpdateStrategy: {
 
 // StatefulSetUpdateStrategyType is a string enumeration type that enumerates
 // all possible update strategies for the StatefulSet controller.
-StatefulSetUpdateStrategyType: string // enumStatefulSetUpdateStrategyType
+StatefulSetUpdateStrategyType :: string // enumStatefulSetUpdateStrategyType
 
-enumStatefulSetUpdateStrategyType:
+enumStatefulSetUpdateStrategyType ::
 	RollingUpdateStatefulSetStrategyType |
 	OnDeleteStatefulSetStrategyType
 
@@ -120,24 +124,24 @@ enumStatefulSetUpdateStrategyType:
 // ordering constraints. When a scale operation is performed with this
 // strategy, new Pods will be created from the specification version indicated
 // by the StatefulSet's updateRevision.
-RollingUpdateStatefulSetStrategyType: StatefulSetUpdateStrategyType & "RollingUpdate"
+RollingUpdateStatefulSetStrategyType :: StatefulSetUpdateStrategyType & "RollingUpdate"
 
 // OnDeleteStatefulSetStrategyType triggers the legacy behavior. Version
 // tracking and ordered rolling restarts are disabled. Pods are recreated
 // from the StatefulSetSpec when they are manually deleted. When a scale
 // operation is performed with this strategy,specification version indicated
 // by the StatefulSet's currentRevision.
-OnDeleteStatefulSetStrategyType: StatefulSetUpdateStrategyType & "OnDelete"
+OnDeleteStatefulSetStrategyType :: StatefulSetUpdateStrategyType & "OnDelete"
 
 // RollingUpdateStatefulSetStrategy is used to communicate parameter for RollingUpdateStatefulSetStrategyType.
-RollingUpdateStatefulSetStrategy: {
+RollingUpdateStatefulSetStrategy :: {
 	// Partition indicates the ordinal at which the StatefulSet should be
 	// partitioned.
 	partition?: null | int32 @go(Partition,*int32) @protobuf(1,varint,opt)
 }
 
 // A StatefulSetSpec is the specification of a StatefulSet.
-StatefulSetSpec: {
+StatefulSetSpec :: {
 	// replicas is the desired number of replicas of the given Template.
 	// These are replicas in the sense that they are instantiations of the
 	// same Template, but individual replicas also have a consistent identity.
@@ -199,7 +203,7 @@ StatefulSetSpec: {
 }
 
 // StatefulSetStatus represents the current state of a StatefulSet.
-StatefulSetStatus: {
+StatefulSetStatus :: {
 	// observedGeneration is the most recent generation observed for this StatefulSet. It corresponds to the
 	// StatefulSet's generation, which is updated on mutation by the API Server.
 	// +optional
@@ -240,10 +244,10 @@ StatefulSetStatus: {
 	conditions?: [...StatefulSetCondition] @go(Conditions,[]StatefulSetCondition) @protobuf(10,bytes,rep)
 }
 
-StatefulSetConditionType: string
+StatefulSetConditionType :: string
 
 // StatefulSetCondition describes the state of a statefulset at a certain point.
-StatefulSetCondition: {
+StatefulSetCondition :: {
 	// Type of statefulset condition.
 	type: StatefulSetConditionType @go(Type) @protobuf(1,bytes,opt,casttype=StatefulSetConditionType)
 
@@ -264,7 +268,9 @@ StatefulSetCondition: {
 }
 
 // StatefulSetList is a collection of StatefulSets.
-StatefulSetList: metav1.TypeMeta & {
+StatefulSetList :: {
+	(metav1.TypeMeta)
+
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 	items: [...StatefulSet] @go(Items,[]StatefulSet) @protobuf(2,bytes,rep)
@@ -273,7 +279,9 @@ StatefulSetList: metav1.TypeMeta & {
 // DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for
 // more information.
 // Deployment enables declarative updates for Pods and ReplicaSets.
-Deployment: metav1.TypeMeta & {
+Deployment :: {
+	(metav1.TypeMeta)
+
 	// Standard object metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -288,7 +296,7 @@ Deployment: metav1.TypeMeta & {
 }
 
 // DeploymentSpec is the specification of the desired behavior of the Deployment.
-DeploymentSpec: {
+DeploymentSpec :: {
 	// Number of desired pods. This is a pointer to distinguish between explicit
 	// zero and not specified. Defaults to 1.
 	// +optional
@@ -339,7 +347,9 @@ DeploymentSpec: {
 
 // DEPRECATED.
 // DeploymentRollback stores the information required to rollback a deployment.
-DeploymentRollback: metav1.TypeMeta & {
+DeploymentRollback :: {
+	(metav1.TypeMeta)
+
 	// Required: This must match the Name of a deployment.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -352,7 +362,7 @@ DeploymentRollback: metav1.TypeMeta & {
 }
 
 // DEPRECATED.
-RollbackConfig: {
+RollbackConfig :: {
 	// The revision to rollback to. If set to 0, rollback to the last revision.
 	// +optional
 	revision?: int64 @go(Revision) @protobuf(1,varint,opt)
@@ -361,10 +371,10 @@ RollbackConfig: {
 // DefaultDeploymentUniqueLabelKey is the default key of the selector that is added
 // to existing ReplicaSets (and label key that is added to its pods) to prevent the existing ReplicaSets
 // to select new pods (and old pods being select by new ReplicaSet).
-DefaultDeploymentUniqueLabelKey: "pod-template-hash"
+DefaultDeploymentUniqueLabelKey :: "pod-template-hash"
 
 // DeploymentStrategy describes how to replace existing pods with new ones.
-DeploymentStrategy: {
+DeploymentStrategy :: {
 	// Type of deployment. Can be "Recreate" or "RollingUpdate". Default is RollingUpdate.
 	// +optional
 	type?: DeploymentStrategyType @go(Type) @protobuf(1,bytes,opt,casttype=DeploymentStrategyType)
@@ -378,20 +388,20 @@ DeploymentStrategy: {
 	rollingUpdate?: null | RollingUpdateDeployment @go(RollingUpdate,*RollingUpdateDeployment) @protobuf(2,bytes,opt)
 }
 
-DeploymentStrategyType: string // enumDeploymentStrategyType
+DeploymentStrategyType :: string // enumDeploymentStrategyType
 
-enumDeploymentStrategyType:
+enumDeploymentStrategyType ::
 	RecreateDeploymentStrategyType |
 	RollingUpdateDeploymentStrategyType
 
 // Kill all existing pods before creating new ones.
-RecreateDeploymentStrategyType: DeploymentStrategyType & "Recreate"
+RecreateDeploymentStrategyType :: DeploymentStrategyType & "Recreate"
 
 // Replace the old ReplicaSets by new one using rolling update i.e gradually scale down the old ReplicaSets and scale up the new one.
-RollingUpdateDeploymentStrategyType: DeploymentStrategyType & "RollingUpdate"
+RollingUpdateDeploymentStrategyType :: DeploymentStrategyType & "RollingUpdate"
 
 // Spec to control the desired behavior of rolling update.
-RollingUpdateDeployment: {
+RollingUpdateDeployment :: {
 	// The maximum number of pods that can be unavailable during the update.
 	// Value can be an absolute number (ex: 5) or a percentage of desired pods (ex: 10%).
 	// Absolute number is calculated from percentage by rounding down.
@@ -421,7 +431,7 @@ RollingUpdateDeployment: {
 }
 
 // DeploymentStatus is the most recently observed status of the Deployment.
-DeploymentStatus: {
+DeploymentStatus :: {
 	// The generation observed by the deployment controller.
 	// +optional
 	observedGeneration?: int64 @go(ObservedGeneration) @protobuf(1,varint,opt)
@@ -460,29 +470,29 @@ DeploymentStatus: {
 	collisionCount?: null | int32 @go(CollisionCount,*int32) @protobuf(8,varint,opt)
 }
 
-DeploymentConditionType: string // enumDeploymentConditionType
+DeploymentConditionType :: string // enumDeploymentConditionType
 
-enumDeploymentConditionType:
+enumDeploymentConditionType ::
 	DeploymentAvailable |
 	DeploymentProgressing |
 	DeploymentReplicaFailure
 
 // Available means the deployment is available, ie. at least the minimum available
 // replicas required are up and running for at least minReadySeconds.
-DeploymentAvailable: DeploymentConditionType & "Available"
+DeploymentAvailable :: DeploymentConditionType & "Available"
 
 // Progressing means the deployment is progressing. Progress for a deployment is
 // considered when a new replica set is created or adopted, and when new pods scale
 // up or old pods scale down. Progress is not estimated for paused deployments or
 // when progressDeadlineSeconds is not specified.
-DeploymentProgressing: DeploymentConditionType & "Progressing"
+DeploymentProgressing :: DeploymentConditionType & "Progressing"
 
 // ReplicaFailure is added in a deployment when one of its pods fails to be created
 // or deleted.
-DeploymentReplicaFailure: DeploymentConditionType & "ReplicaFailure"
+DeploymentReplicaFailure :: DeploymentConditionType & "ReplicaFailure"
 
 // DeploymentCondition describes the state of a deployment at a certain point.
-DeploymentCondition: {
+DeploymentCondition :: {
 	// Type of deployment condition.
 	type: DeploymentConditionType @go(Type) @protobuf(1,bytes,opt,casttype=DeploymentConditionType)
 
@@ -503,7 +513,9 @@ DeploymentCondition: {
 }
 
 // DeploymentList is a list of Deployments.
-DeploymentList: metav1.TypeMeta & {
+DeploymentList :: {
+	(metav1.TypeMeta)
+
 	// Standard list metadata.
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
@@ -523,7 +535,9 @@ DeploymentList: metav1.TypeMeta & {
 // the DaemonSet and StatefulSet controllers for update and rollback, this object is beta. However,
 // it may be subject to name and representation changes in future releases, and clients should not
 // depend on its stability. It is primarily for internal use by controllers.
-ControllerRevision: metav1.TypeMeta & {
+ControllerRevision :: {
+	(metav1.TypeMeta)
+
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -537,7 +551,9 @@ ControllerRevision: metav1.TypeMeta & {
 }
 
 // ControllerRevisionList is a resource containing a list of ControllerRevision objects.
-ControllerRevisionList: metav1.TypeMeta & {
+ControllerRevisionList :: {
+	(metav1.TypeMeta)
+
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)

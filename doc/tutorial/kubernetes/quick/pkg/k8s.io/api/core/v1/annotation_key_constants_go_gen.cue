@@ -6,52 +6,52 @@ package v1
 
 // ImagePolicyFailedOpenKey is added to pods created by failing open when the image policy
 // webhook backend fails.
-ImagePolicyFailedOpenKey: "alpha.image-policy.k8s.io/failed-open"
+ImagePolicyFailedOpenKey :: "alpha.image-policy.k8s.io/failed-open"
 
 // PodPresetOptOutAnnotationKey represents the annotation key for a pod to exempt itself from pod preset manipulation
-PodPresetOptOutAnnotationKey: "podpreset.admission.kubernetes.io/exclude"
+PodPresetOptOutAnnotationKey :: "podpreset.admission.kubernetes.io/exclude"
 
 // MirrorAnnotationKey represents the annotation key set by kubelets when creating mirror pods
-MirrorPodAnnotationKey: "kubernetes.io/config.mirror"
+MirrorPodAnnotationKey :: "kubernetes.io/config.mirror"
 
 // TolerationsAnnotationKey represents the key of tolerations data (json serialized)
 // in the Annotations of a Pod.
-TolerationsAnnotationKey: "scheduler.alpha.kubernetes.io/tolerations"
+TolerationsAnnotationKey :: "scheduler.alpha.kubernetes.io/tolerations"
 
 // TaintsAnnotationKey represents the key of taints data (json serialized)
 // in the Annotations of a Node.
-TaintsAnnotationKey: "scheduler.alpha.kubernetes.io/taints"
+TaintsAnnotationKey :: "scheduler.alpha.kubernetes.io/taints"
 
 // SeccompPodAnnotationKey represents the key of a seccomp profile applied
 // to all containers of a pod.
-SeccompPodAnnotationKey: "seccomp.security.alpha.kubernetes.io/pod"
+SeccompPodAnnotationKey :: "seccomp.security.alpha.kubernetes.io/pod"
 
 // SeccompContainerAnnotationKeyPrefix represents the key of a seccomp profile applied
 // to one container of a pod.
-SeccompContainerAnnotationKeyPrefix: "container.seccomp.security.alpha.kubernetes.io/"
+SeccompContainerAnnotationKeyPrefix :: "container.seccomp.security.alpha.kubernetes.io/"
 
 // SeccompProfileRuntimeDefault represents the default seccomp profile used by container runtime.
-SeccompProfileRuntimeDefault: "runtime/default"
+SeccompProfileRuntimeDefault :: "runtime/default"
 
 // DeprecatedSeccompProfileDockerDefault represents the default seccomp profile used by docker.
 // This is now deprecated and should be replaced by SeccompProfileRuntimeDefault.
-DeprecatedSeccompProfileDockerDefault: "docker/default"
+DeprecatedSeccompProfileDockerDefault :: "docker/default"
 
 // PreferAvoidPodsAnnotationKey represents the key of preferAvoidPods data (json serialized)
 // in the Annotations of a Node.
-PreferAvoidPodsAnnotationKey: "scheduler.alpha.kubernetes.io/preferAvoidPods"
+PreferAvoidPodsAnnotationKey :: "scheduler.alpha.kubernetes.io/preferAvoidPods"
 
 // ObjectTTLAnnotations represents a suggestion for kubelet for how long it can cache
 // an object (e.g. secret, config map) before fetching it again from apiserver.
 // This annotation can be attached to node.
-ObjectTTLAnnotationKey: "node.alpha.kubernetes.io/ttl"
+ObjectTTLAnnotationKey :: "node.alpha.kubernetes.io/ttl"
 
 // annotation key prefix used to identify non-convertible json paths.
-NonConvertibleAnnotationPrefix: "non-convertible.kubernetes.io"
+NonConvertibleAnnotationPrefix :: "non-convertible.kubernetes.io"
 
 // LastAppliedConfigAnnotation is the annotation used to store the previous
 // configuration of a resource for use in a three way diff by UpdateApplyAnnotation.
-LastAppliedConfigAnnotation: "kubectl.kubernetes.io/last-applied-configuration"
+LastAppliedConfigAnnotation :: "kubectl.kubernetes.io/last-applied-configuration"
 
 // AnnotationLoadBalancerSourceRangesKey is the key of the annotation on a service to set allowed ingress ranges on their LoadBalancers
 //
@@ -60,7 +60,7 @@ LastAppliedConfigAnnotation: "kubectl.kubernetes.io/last-applied-configuration"
 // access only from the CIDRs currently allocated to MIT & the USPS.
 //
 // Not all cloud providers support this annotation, though AWS & GCE do.
-AnnotationLoadBalancerSourceRangesKey: "service.beta.kubernetes.io/load-balancer-source-ranges"
+AnnotationLoadBalancerSourceRangesKey :: "service.beta.kubernetes.io/load-balancer-source-ranges"
 
 // EndpointsLastChangeTriggerTime is the annotation key, set for endpoints objects, that
 // represents the timestamp (stored as RFC 3339 date-time string, e.g. '2018-10-22T19:32:52.1Z')
@@ -79,10 +79,10 @@ AnnotationLoadBalancerSourceRangesKey: "service.beta.kubernetes.io/load-balancer
 //
 // This annotation will be used to compute the in-cluster network programming latency SLI, see
 // https://github.com/kubernetes/community/blob/master/sig-scalability/slos/network_programming_latency.md
-EndpointsLastChangeTriggerTime: "endpoints.kubernetes.io/last-change-trigger-time"
+EndpointsLastChangeTriggerTime :: "endpoints.kubernetes.io/last-change-trigger-time"
 
 // MigratedPluginsAnnotationKey is the annotation key, set for CSINode objects, that is a comma-separated
 // list of in-tree plugins that will be serviced by the CSI backend on the Node represented by CSINode.
 // This annotation is used by the Attach Detach Controller to determine whether to use the in-tree or
 // CSI Backend for a volume plugin on a specific node.
-MigratedPluginsAnnotationKey: "storage.alpha.kubernetes.io/migrated-plugins"
+MigratedPluginsAnnotationKey :: "storage.alpha.kubernetes.io/migrated-plugins"

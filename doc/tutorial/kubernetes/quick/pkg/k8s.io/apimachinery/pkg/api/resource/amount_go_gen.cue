@@ -7,9 +7,9 @@ package resource
 // Scale is used for getting and setting the base-10 scaled value.
 // Base-2 scales are omitted for mathematical simplicity.
 // See Quantity.ScaledValue for more details.
-Scale: int32 // enumScale
+Scale :: int32 // enumScale
 
-enumScale:
+enumScale ::
 	Nano |
 	Micro |
 	Milli |
@@ -20,12 +20,12 @@ enumScale:
 	Peta |
 	Exa
 
-Nano:  Scale & -9
-Micro: Scale & -6
-Milli: Scale & -3
-Kilo:  Scale & 3
-Mega:  Scale & 6
-Giga:  Scale & 9
-Tera:  Scale & 12
-Peta:  Scale & 15
-Exa:   Scale & 18
+Nano ::  Scale & -9
+Micro :: Scale & -6
+Milli :: Scale & -3
+Kilo ::  Scale & 3
+Mega ::  Scale & 6
+Giga ::  Scale & 9
+Tera ::  Scale & 12
+Peta ::  Scale & 15
+Exa ::   Scale & 18

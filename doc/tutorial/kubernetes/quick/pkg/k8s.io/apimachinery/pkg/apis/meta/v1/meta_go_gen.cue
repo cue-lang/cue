@@ -5,29 +5,29 @@
 package v1
 
 // TODO: move this, Object, List, and Type to a different package
-ObjectMetaAccessor: _
+ObjectMetaAccessor :: _
 
 // Object lets you work with object metadata from any of the versioned or
 // internal API objects. Attempting to set or retrieve a field on an object that does
 // not support that field (Name, UID, Namespace on lists) will be a no-op and return
 // a default value.
-Object: _
+Object :: _
 
 // ListMetaAccessor retrieves the list interface from an object
-ListMetaAccessor: _
+ListMetaAccessor :: _
 
 // Common lets you work with core metadata from any of the versioned or
 // internal API objects. Attempting to set or retrieve a field on an object that does
 // not support that field will be a no-op and return a default value.
 // TODO: move this, and TypeMeta and ListMeta, to a different package
-Common: _
+Common :: _
 
 // ListInterface lets you work with list metadata from any of the versioned or
 // internal API objects. Attempting to set or retrieve a field on an object that does
 // not support that field will be a no-op and return a default value.
 // TODO: move this, and TypeMeta and ListMeta, to a different package
-ListInterface: _
+ListInterface :: _
 
 // Type exposes the type and APIVersion of versioned or internal API objects.
 // TODO: move this, and TypeMeta and ListMeta, to a different package
-Type: _
+Type :: _

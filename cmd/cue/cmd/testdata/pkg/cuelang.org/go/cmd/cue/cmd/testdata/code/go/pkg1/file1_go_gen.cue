@@ -10,9 +10,12 @@ import (
 )
 
 // Foozer foozes a jaman.
-Foozer: Inline & {
-	Int:        int
-	String:     string
+Foozer :: {
+	Int:    int
+	String: string
+
+	(Inline)
+
 	NoInline:   NoInline
 	CustomJSON: CustomJSON
 	CustomYAML: null | CustomYAML @go(,*CustomYAML)
@@ -45,32 +48,32 @@ Foozer: Inline & {
 }
 
 // Level gives an indication of the extent of stuff.
-Level: int // enumLevel
+Level :: int // enumLevel
 
-enumLevel:
+enumLevel ::
 	Unknown |
 	Low |
 	Medium |
 	High
 
-Unknown: Level & 0
-Low:     Level & 1
+Unknown :: Level & 0
+Low ::     Level & 1
 
 // Medium is neither High nor Low
-Medium: Level & 2
-High:   Level & 3
+Medium :: Level & 2
+High ::   Level & 3
 
-CustomJSON: _
+CustomJSON :: _
 
-CustomYAML: {
+CustomYAML :: {
 }
 
-Inline: {
+Inline :: {
 	Kind: string
 }
 
-NoInline: {
+NoInline :: {
 	Kind: string
 }
 
-Interface: _
+Interface :: _

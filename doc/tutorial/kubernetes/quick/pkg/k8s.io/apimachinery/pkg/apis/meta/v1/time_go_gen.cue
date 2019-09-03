@@ -11,4 +11,4 @@ package v1
 // +protobuf.options.marshal=false
 // +protobuf.as=Timestamp
 // +protobuf.options.(gogoproto.goproto_stringer)=false
-Time: _
+Time :: _

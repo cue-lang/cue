@@ -5,10 +5,10 @@
 package runtime
 
 // Pair of strings. We keed the name of fields and the doc
-Pair: {
+Pair :: {
 	Name: string
 	Doc:  string
 }
 
 // KubeTypes is an array to represent all available types in a parsed file. [0] is for the type itself
-KubeTypes: [...Pair]
+KubeTypes :: [...Pair]

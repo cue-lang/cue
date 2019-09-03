@@ -14,7 +14,7 @@ import (
 // +protobuf=true
 // +k8s:deepcopy-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-WatchEvent: {
+WatchEvent :: {
 	type: string @go(Type) @protobuf(1,bytes,opt)
 
 	// Object is:
@@ -27,4 +27,4 @@ WatchEvent: {
 
 // InternalEvent makes watch.Event versioned
 // +protobuf=false
-InternalEvent: watch.Event
+InternalEvent :: watch.Event

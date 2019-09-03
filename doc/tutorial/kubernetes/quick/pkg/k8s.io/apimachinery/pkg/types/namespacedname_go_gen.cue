@@ -4,9 +4,9 @@
 
 package types
 
-NamespacedName: {
+NamespacedName :: {
 	Namespace: string
 	Name:      string
 }
 
-Separator: 47 // '/'
+Separator :: 47 // '/'

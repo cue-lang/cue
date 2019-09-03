@@ -6,7 +6,7 @@ import (
   apps_v1beta1 "k8s.io/api/apps/v1beta1"
 )
 
-service <Name>: v1.Service & {}
-deployment <Name>: extensions_v1beta1.Deployment & {}
-daemonSet <Name>: extensions_v1beta1.DaemonSet & {}
-statefulSet <Name>: apps_v1beta1.StatefulSet & {}
+service <Name>: v1.Service
+deployment <Name>: extensions_v1beta1.Deployment
+daemonSet <Name>: extensions_v1beta1.DaemonSet
+statefulSet <Name>: apps_v1beta1.StatefulSet

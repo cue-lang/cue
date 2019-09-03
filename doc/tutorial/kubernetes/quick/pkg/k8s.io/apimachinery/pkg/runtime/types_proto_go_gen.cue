@@ -4,6 +4,6 @@
 
 package runtime
 
-ProtobufMarshaller: _
+ProtobufMarshaller :: _
 
-ProtobufReverseMarshaller: _
+ProtobufReverseMarshaller :: _

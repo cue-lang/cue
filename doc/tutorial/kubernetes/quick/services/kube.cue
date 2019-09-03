@@ -1,14 +1,14 @@
 package kube
 
-service <Name>: {
+service <ID>: {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
-		name: Name
+		name: ID
 		labels: {
-			app:       Name       // by convention
-			domain:    "prod"     // always the same in the given files
-			component: _component // varies per directory
+			app:       ID        // by convention
+			domain:    "prod"    // always the same in the given files
+			component: Component // varies per directory
 		}
 	}
 	spec: {
@@ -22,62 +22,63 @@ service <Name>: {
 	}
 }
 
-deployment <Name>: {
+deployment <ID>: {
 	apiVersion: "extensions/v1beta1"
 	kind:       "Deployment"
-	metadata name: Name
+	metadata name: ID
 	spec: {
 		// 1 is the default, but we allow any number
 		replicas: *1 | int
 		template: {
 			metadata labels: {
-				app:       Name
+				app:       ID
 				domain:    "prod"
-				component: _component
+				component: Component
 			}
 			// we always have one namesake container
-			spec containers: [{name: Name}]
+			spec containers: [{name: ID}]
 		}
 	}
 }
 
-_component: string
+Component :: string
 
-daemonSet <Name>: _spec & {
+daemonSet <ID>: _spec & {
 	apiVersion: "extensions/v1beta1"
 	kind:       "DaemonSet"
-	_name:      Name
+	Name ::     ID
 }
 
-statefulSet <Name>: _spec & {
+statefulSet <ID>: _spec & {
 	apiVersion: "apps/v1beta1"
 	kind:       "StatefulSet"
-	_name:      Name
+	Name ::     ID
 }
 
-deployment <Name>: _spec & {
+deployment <ID>: _spec & {
 	apiVersion: "extensions/v1beta1"
 	kind:       "Deployment"
-	_name:      Name
+	Name ::     ID
 	spec replicas: *1 | int
 }
 
-configMap <Name>: {
-	metadata name: Name
-	metadata labels component: _component
+configMap <ID>: {
+	metadata name: ID
+	metadata labels component: Component
 }
 
 _spec: {
-	_name: string
-	metadata name: _name
-	metadata labels component: _component
+	Name :: string
+
+	metadata name: Name
+	metadata labels component: Component
 	spec template: {
 		metadata labels: {
-			app:       _name
-			component: _component
+			app:       Name
+			component: Component
 			domain:    "prod"
 		}
-		spec containers: [{name: _name}]
+		spec containers: [{name: Name}]
 	}
 }
 

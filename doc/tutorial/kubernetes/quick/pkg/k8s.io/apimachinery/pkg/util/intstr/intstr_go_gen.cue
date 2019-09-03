@@ -13,14 +13,14 @@ package intstr
 // +protobuf=true
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 // +k8s:openapi-gen=true
-IntOrString: _
+IntOrString :: _
 
 // Type represents the stored type of IntOrString.
-Type: int // enumType
+Type :: int // enumType
 
-enumType:
+enumType ::
 	Int |
 	String
 
-Int:    Type & 0
-String: Type & 1
+Int ::    Type & 0
+String :: Type & 1

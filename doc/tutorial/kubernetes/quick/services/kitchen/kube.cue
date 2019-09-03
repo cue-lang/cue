@@ -1,6 +1,6 @@
 package kube
 
-_component: "kitchen"
+Component :: "kitchen"
 
 deployment <Name> spec template: {
 	metadata annotations "prometheus.io.scrape": "true"
@@ -19,26 +19,26 @@ deployment <Name> spec template: {
 	}]
 }
 
-deployment <Name> spec template spec: {
-	_hasDisks: *true | bool
+deployment <ID> spec template spec: {
+	hasDisks :: *true | bool
 
 	volumes: [{
-		name: *"\(Name)-disk" | string
-		gcePersistentDisk pdName: *"\(Name)-disk" | string
+		name: *"\(ID)-disk" | string
+		gcePersistentDisk pdName: *"\(ID)-disk" | string
 		gcePersistentDisk fsType: "ext4"
 	}, {
-		name: *"secret-\(Name)" | string
-		secret secretName: *"\(Name)-secrets" | string
-	}, ...] if _hasDisks
+		name: *"secret-\(ID)" | string
+		secret secretName: *"\(ID)-secrets" | string
+	}, ...] if hasDisks
 
 	containers: [{
 		volumeMounts: [{
-			name:      *"\(Name)-disk" | string
+			name:      *"\(ID)-disk" | string
 			mountPath: *"/logs" | string
 		}, {
 			mountPath: *"/etc/certs" | string
-			name:      *"secret-\(Name)" | string
+			name:      *"secret-\(ID)" | string
 			readOnly:  true
 		}, ...]
-	}] if _hasDisks // field comprehension using just "if"
+	}] if hasDisks // field comprehension using just "if"
 }

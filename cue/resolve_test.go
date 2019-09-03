@@ -1230,6 +1230,31 @@ func TestResolve(t *testing.T) {
 			`ctcp: <16>C{x: int}, ` +
 			`ctct: <17>{x: int, ...}}`,
 	}, {
+		desc: "excluded embedding from closing",
+		in: `
+		S :: {
+			a: { c: int }
+			{
+				c: { d: int }
+			}
+			B = { open: int }
+			b: B
+		}
+		V: S & {
+			c e: int
+			b extra: int
+		}
+		`,
+		out: `<0>{` +
+			`S :: <1>C{` +
+			`a: <2>C{c: int}, ` +
+			`c: <3>{d: int}, ` +
+			`b: <4>{open: int}}, ` +
+			`V: <5>C{` +
+			`a: <6>C{c: int}, ` +
+			`c: <7>{d: int, e: int}, ` +
+			`b: <8>{open: int, extra: int}}}`,
+	}, {
 		desc: "closing with failed optional",
 		in: `
 		k1 :: {a: int, b?: int} & {a: int} // closed({a: int})

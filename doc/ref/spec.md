@@ -1198,9 +1198,32 @@ to be concrete when emitting data.
 It is illegal to have a regular field and a definition with the same name
 within the same struct.
 Literal structs that are part of a definition's value are implicitly closed.
+This excludes literals structs in embeddings and aliases.
 An ellipsis `...` in such literal structs keeps them open,
 as it defines `_` for all labels.
+<!--
+Excluding embeddings from recursive closing allows comprehensions to be
+interpreted as embeddings without some exception. For instance,
+    if x > 2 {
+        foo: string
+    }
+should not cause any failure. It is also consistent with embeddings being
+opened when included in a closed struct.
 
+Finally, excluding embeddings from recursive closing allows for
+a mechanism to not recursively close, without needing an additional language
+construct, such as a triple colon or something else:
+foo :: {
+    {
+        // not recursively closed
+    }
+    ... // include this to not close outer struct
+}
+
+Including aliases from this exclusion, which are more a separate definition
+than embedding seems sensible, and allows for an easy mechanism to avoid
+closing, aside from embedding.
+-->
 
 ```
 // MyStruct is closed and as there is no expression label or `...`, we know

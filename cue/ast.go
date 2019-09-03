@@ -244,7 +244,10 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				v1.object.addTemplate(v.ctx(), token.NoPos, template)
 
 			case *ast.EmbedDecl:
+				old := v.ctx().inDefinition
+				v.ctx().inDefinition = 0
 				e := v1.walk(x.Expr)
+				v.ctx().inDefinition = old
 				if isBottom(e) {
 					return e
 				}
@@ -498,7 +501,10 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		}
 
 		if a, ok := n.Node.(*ast.Alias); ok {
+			old := v.ctx().inDefinition
+			v.ctx().inDefinition = 0
 			ret = v.walk(a.Expr)
+			v.ctx().inDefinition = old
 			break
 		}
 

@@ -200,7 +200,7 @@ Example:
 	cmd.Flags().StringP(string(flagGlob), "n", "", "glob filter for file names")
 	cmd.Flags().String(string(flagType), "", "only apply to files of this type")
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
-	cmd.Flags().Bool(string(flagDryrun), false, "force overwriting existing files")
+	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 
 	cmd.Flags().StringP(string(flagPath), "l", "", "path to include root")
 	cmd.Flags().Bool(string(flagList), false, "concatenate multiple objects into a list")

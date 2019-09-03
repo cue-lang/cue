@@ -78,12 +78,12 @@ VolumeSource: {
 
 	// ISCSI represents an ISCSI Disk resource that is attached to a
 	// kubelet's host machine and then exposed to the pod.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/iscsi/README.md
+	// More info: https://examples.k8s.io/volumes/iscsi/README.md
 	// +optional
 	iscsi?: null | ISCSIVolumeSource @go(ISCSI,*ISCSIVolumeSource) @protobuf(8,bytes,opt)
 
 	// Glusterfs represents a Glusterfs mount on the host that shares a pod's lifetime.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md
 	// +optional
 	glusterfs?: null | GlusterfsVolumeSource @go(Glusterfs,*GlusterfsVolumeSource) @protobuf(9,bytes,opt)
 
@@ -94,7 +94,7 @@ VolumeSource: {
 	persistentVolumeClaim?: null | PersistentVolumeClaimVolumeSource @go(PersistentVolumeClaim,*PersistentVolumeClaimVolumeSource) @protobuf(10,bytes,opt)
 
 	// RBD represents a Rados Block Device mount on the host that shares a pod's lifetime.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md
+	// More info: https://examples.k8s.io/volumes/rbd/README.md
 	// +optional
 	rbd?: null | RBDVolumeSource @go(RBD,*RBDVolumeSource) @protobuf(11,bytes,opt)
 
@@ -103,8 +103,8 @@ VolumeSource: {
 	// +optional
 	flexVolume?: null | FlexVolumeSource @go(FlexVolume,*FlexVolumeSource) @protobuf(12,bytes,opt)
 
-	// Cinder represents a cinder volume attached and mounted on kubelets host machine
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// Cinder represents a cinder volume attached and mounted on kubelets host machine.
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	// +optional
 	cinder?: null | CinderVolumeSource @go(Cinder,*CinderVolumeSource) @protobuf(13,bytes,opt)
 
@@ -207,7 +207,7 @@ PersistentVolumeSource: {
 
 	// Glusterfs represents a Glusterfs volume that is attached to a host and
 	// exposed to the pod. Provisioned by an admin.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md
 	// +optional
 	glusterfs?: null | GlusterfsPersistentVolumeSource @go(Glusterfs,*GlusterfsPersistentVolumeSource) @protobuf(4,bytes,opt)
 
@@ -217,7 +217,7 @@ PersistentVolumeSource: {
 	nfs?: null | NFSVolumeSource @go(NFS,*NFSVolumeSource) @protobuf(5,bytes,opt)
 
 	// RBD represents a Rados Block Device mount on the host that shares a pod's lifetime.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md
+	// More info: https://examples.k8s.io/volumes/rbd/README.md
 	// +optional
 	rbd?: null | RBDPersistentVolumeSource @go(RBD,*RBDPersistentVolumeSource) @protobuf(6,bytes,opt)
 
@@ -226,8 +226,8 @@ PersistentVolumeSource: {
 	// +optional
 	iscsi?: null | ISCSIPersistentVolumeSource @go(ISCSI,*ISCSIPersistentVolumeSource) @protobuf(7,bytes,opt)
 
-	// Cinder represents a cinder volume attached and mounted on kubelets host machine
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// Cinder represents a cinder volume attached and mounted on kubelets host machine.
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	// +optional
 	cinder?: null | CinderPersistentVolumeSource @go(Cinder,*CinderPersistentVolumeSource) @protobuf(8,bytes,opt)
 
@@ -280,7 +280,7 @@ PersistentVolumeSource: {
 	local?: null | LocalVolumeSource @go(Local,*LocalVolumeSource) @protobuf(20,bytes,opt)
 
 	// StorageOS represents a StorageOS volume that is attached to the kubelet's host machine and mounted into the pod
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/storageos/README.md
+	// More info: https://examples.k8s.io/volumes/storageos/README.md
 	// +optional
 	storageos?: null | StorageOSPersistentVolumeSource @go(StorageOS,*StorageOSPersistentVolumeSource) @protobuf(21,bytes,opt)
 
@@ -301,7 +301,7 @@ MountOptionAnnotation: "volume.beta.kubernetes.io/mount-options"
 // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
 PersistentVolume: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -428,7 +428,7 @@ PersistentVolumeStatus: {
 // PersistentVolumeList is a list of PersistentVolume items.
 PersistentVolumeList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -440,7 +440,7 @@ PersistentVolumeList: metav1.TypeMeta & {
 // PersistentVolumeClaim is a user's request for and claim to a persistent volume
 PersistentVolumeClaim: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -459,7 +459,7 @@ PersistentVolumeClaim: metav1.TypeMeta & {
 // PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
 PersistentVolumeClaimList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -710,16 +710,16 @@ EmptyDirVolumeSource: {
 // Glusterfs volumes do not support ownership management or SELinux relabeling.
 GlusterfsVolumeSource: {
 	// EndpointsName is the endpoint name that details Glusterfs topology.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	endpoints: string @go(EndpointsName) @protobuf(1,bytes,opt)
 
 	// Path is the Glusterfs volume path.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	path: string @go(Path) @protobuf(2,bytes,opt)
 
 	// ReadOnly here will force the Glusterfs volume to be mounted with read-only permissions.
 	// Defaults to false.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(3,varint,opt)
 }
@@ -728,22 +728,22 @@ GlusterfsVolumeSource: {
 // Glusterfs volumes do not support ownership management or SELinux relabeling.
 GlusterfsPersistentVolumeSource: {
 	// EndpointsName is the endpoint name that details Glusterfs topology.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	endpoints: string @go(EndpointsName) @protobuf(1,bytes,opt)
 
 	// Path is the Glusterfs volume path.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	path: string @go(Path) @protobuf(2,bytes,opt)
 
 	// ReadOnly here will force the Glusterfs volume to be mounted with read-only permissions.
 	// Defaults to false.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(3,varint,opt)
 
 	// EndpointsNamespace is the namespace that contains Glusterfs endpoint.
 	// If this field is empty, the EndpointNamespace defaults to the same namespace as the bound PVC.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/glusterfs/README.md#create-a-pod
+	// More info: https://examples.k8s.io/volumes/glusterfs/README.md#create-a-pod
 	// +optional
 	endpointsNamespace?: null | string @go(EndpointsNamespace,*string) @protobuf(4,bytes,opt)
 }
@@ -752,11 +752,11 @@ GlusterfsPersistentVolumeSource: {
 // RBD volumes support ownership management and SELinux relabeling.
 RBDVolumeSource: {
 	// A collection of Ceph monitors.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	monitors: [...string] @go(CephMonitors,[]string) @protobuf(1,bytes,rep)
 
 	// The rados image name.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	image: string @go(RBDImage) @protobuf(2,bytes,opt)
 
 	// Filesystem type of the volume that you want to mount.
@@ -769,32 +769,32 @@ RBDVolumeSource: {
 
 	// The rados pool name.
 	// Default is rbd.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	pool?: string @go(RBDPool) @protobuf(4,bytes,opt)
 
 	// The rados user name.
 	// Default is admin.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	user?: string @go(RadosUser) @protobuf(5,bytes,opt)
 
 	// Keyring is the path to key ring for RBDUser.
 	// Default is /etc/ceph/keyring.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	keyring?: string @go(Keyring) @protobuf(6,bytes,opt)
 
 	// SecretRef is name of the authentication secret for RBDUser. If provided
 	// overrides keyring.
 	// Default is nil.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	secretRef?: null | LocalObjectReference @go(SecretRef,*LocalObjectReference) @protobuf(7,bytes,opt)
 
 	// ReadOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(8,varint,opt)
 }
@@ -803,11 +803,11 @@ RBDVolumeSource: {
 // RBD volumes support ownership management and SELinux relabeling.
 RBDPersistentVolumeSource: {
 	// A collection of Ceph monitors.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	monitors: [...string] @go(CephMonitors,[]string) @protobuf(1,bytes,rep)
 
 	// The rados image name.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	image: string @go(RBDImage) @protobuf(2,bytes,opt)
 
 	// Filesystem type of the volume that you want to mount.
@@ -820,32 +820,32 @@ RBDPersistentVolumeSource: {
 
 	// The rados pool name.
 	// Default is rbd.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	pool?: string @go(RBDPool) @protobuf(4,bytes,opt)
 
 	// The rados user name.
 	// Default is admin.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	user?: string @go(RadosUser) @protobuf(5,bytes,opt)
 
 	// Keyring is the path to key ring for RBDUser.
 	// Default is /etc/ceph/keyring.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	keyring?: string @go(Keyring) @protobuf(6,bytes,opt)
 
 	// SecretRef is name of the authentication secret for RBDUser. If provided
 	// overrides keyring.
 	// Default is nil.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	secretRef?: null | SecretReference @go(SecretRef,*SecretReference) @protobuf(7,bytes,opt)
 
 	// ReadOnly here will force the ReadOnly setting in VolumeMounts.
 	// Defaults to false.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/rbd/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/rbd/README.md#how-to-use-it
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(8,varint,opt)
 }
@@ -855,20 +855,20 @@ RBDPersistentVolumeSource: {
 // The volume must also be in the same region as the kubelet.
 // Cinder volumes support ownership management and SELinux relabeling.
 CinderVolumeSource: {
-	// volume id used to identify the volume in cinder
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// volume id used to identify the volume in cinder.
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	volumeID: string @go(VolumeID) @protobuf(1,bytes,opt)
 
 	// Filesystem type to mount.
 	// Must be a filesystem type supported by the host operating system.
 	// Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	// +optional
 	fsType?: string @go(FSType) @protobuf(2,bytes,opt)
 
 	// Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(3,varint,opt)
 
@@ -883,20 +883,20 @@ CinderVolumeSource: {
 // The volume must also be in the same region as the kubelet.
 // Cinder volumes support ownership management and SELinux relabeling.
 CinderPersistentVolumeSource: {
-	// volume id used to identify the volume in cinder
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// volume id used to identify the volume in cinder.
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	volumeID: string @go(VolumeID) @protobuf(1,bytes,opt)
 
 	// Filesystem type to mount.
 	// Must be a filesystem type supported by the host operating system.
 	// Examples: "ext4", "xfs", "ntfs". Implicitly inferred to be "ext4" if unspecified.
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	// +optional
 	fsType?: string @go(FSType) @protobuf(2,bytes,opt)
 
 	// Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
-	// More info: https://releases.k8s.io/HEAD/examples/mysql-cinder-pd/README.md
+	// More info: https://examples.k8s.io/mysql-cinder-pd/README.md
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(3,varint,opt)
 
@@ -910,7 +910,7 @@ CinderPersistentVolumeSource: {
 // Cephfs volumes do not support ownership management or SELinux relabeling.
 CephFSVolumeSource: {
 	// Required: Monitors is a collection of Ceph monitors
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	monitors: [...string] @go(Monitors,[]string) @protobuf(1,bytes,rep)
 
 	// Optional: Used as the mounted root, rather than the full Ceph tree, default is /
@@ -918,23 +918,23 @@ CephFSVolumeSource: {
 	path?: string @go(Path) @protobuf(2,bytes,opt)
 
 	// Optional: User is the rados user name, default is admin
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	user?: string @go(User) @protobuf(3,bytes,opt)
 
 	// Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	secretFile?: string @go(SecretFile) @protobuf(4,bytes,opt)
 
 	// Optional: SecretRef is reference to the authentication secret for User, default is empty.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	secretRef?: null | LocalObjectReference @go(SecretRef,*LocalObjectReference) @protobuf(5,bytes,opt)
 
 	// Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(6,varint,opt)
 }
@@ -955,7 +955,7 @@ SecretReference: {
 // Cephfs volumes do not support ownership management or SELinux relabeling.
 CephFSPersistentVolumeSource: {
 	// Required: Monitors is a collection of Ceph monitors
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	monitors: [...string] @go(Monitors,[]string) @protobuf(1,bytes,rep)
 
 	// Optional: Used as the mounted root, rather than the full Ceph tree, default is /
@@ -963,23 +963,23 @@ CephFSPersistentVolumeSource: {
 	path?: string @go(Path) @protobuf(2,bytes,opt)
 
 	// Optional: User is the rados user name, default is admin
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	user?: string @go(User) @protobuf(3,bytes,opt)
 
 	// Optional: SecretFile is the path to key ring for User, default is /etc/ceph/user.secret
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	secretFile?: string @go(SecretFile) @protobuf(4,bytes,opt)
 
 	// Optional: SecretRef is reference to the authentication secret for User, default is empty.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	secretRef?: null | SecretReference @go(SecretRef,*SecretReference) @protobuf(5,bytes,opt)
 
 	// Optional: Defaults to false (read/write). ReadOnly here will force
 	// the ReadOnly setting in VolumeMounts.
-	// More info: https://releases.k8s.io/HEAD/examples/volumes/cephfs/README.md#how-to-use-it
+	// More info: https://examples.k8s.io/volumes/cephfs/README.md#how-to-use-it
 	// +optional
 	readOnly?: bool @go(ReadOnly) @protobuf(6,varint,opt)
 }
@@ -2269,7 +2269,7 @@ Probe: Handler & {
 	periodSeconds?: int32 @go(PeriodSeconds) @protobuf(4,varint,opt)
 
 	// Minimum consecutive successes for the probe to be considered successful after having failed.
-	// Defaults to 1. Must be 1 for liveness. Minimum value is 1.
+	// Defaults to 1. Must be 1 for liveness and startup. Minimum value is 1.
 	// +optional
 	successThreshold?: int32 @go(SuccessThreshold) @protobuf(5,varint,opt)
 
@@ -2465,6 +2465,17 @@ Container: {
 	// +optional
 	readinessProbe?: null | Probe @go(ReadinessProbe,*Probe) @protobuf(11,bytes,opt)
 
+	// StartupProbe indicates that the Pod has successfully initialized.
+	// If specified, no other probes are executed until this completes successfully.
+	// If this probe fails, the Pod will be restarted, just as if the livenessProbe failed.
+	// This can be used to provide different probe parameters at the beginning of a Pod's lifecycle,
+	// when it might take a long time to load data or warm a cache, than during steady-state operation.
+	// This cannot be updated.
+	// This is an alpha feature enabled by the StartupProbe feature flag.
+	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
+	// +optional
+	startupProbe?: null | Probe @go(StartupProbe,*Probe) @protobuf(22,bytes,opt)
+
 	// Actions that the management system should take in response to container lifecycle events.
 	// Cannot be updated.
 	// +optional
@@ -2557,7 +2568,7 @@ Lifecycle: {
 	postStart?: null | Handler @go(PostStart,*Handler) @protobuf(1,bytes,opt)
 
 	// PreStop is called immediately before a container is terminated due to an
-	// API request or management event such as liveness probe failure,
+	// API request or management event such as liveness/startup probe failure,
 	// preemption, resource contention, etc. The handler is not called if the
 	// container crashes or exits. The reason for termination is passed to the
 	// handler. The Pod's termination grace period countdown begins before the
@@ -2680,6 +2691,13 @@ ContainerStatus: {
 	// Container's ID in the format 'docker://<container_id>'.
 	// +optional
 	containerID?: string @go(ContainerID) @protobuf(8,bytes,opt)
+
+	// Specifies whether the container has passed its startup probe.
+	// Initialized as false, becomes true after startupProbe is considered successful.
+	// Resets to false when the container is restarted, or if kubelet loses state temporarily.
+	// Is always true when no startupProbe is defined.
+	// +optional
+	started?: null | bool @go(Started,*bool) @protobuf(9,varint,opt)
 }
 
 // PodPhase is a label for the condition of a pod at the current time.
@@ -3133,7 +3151,7 @@ PodSpec: {
 	// init container fails, the pod is considered to have failed and is handled according
 	// to its restartPolicy. The name for an init container or normal container must be
 	// unique among all containers.
-	// Init containers may not have Lifecycle actions, Readiness probes, or Liveness probes.
+	// Init containers may not have Lifecycle actions, Readiness probes, Liveness probes, or Startup probes.
 	// The resourceRequirements of an init container are taken into account during scheduling
 	// by finding the highest request/limit for each resource type, and then using the max of
 	// of that value or the sum of the normal containers. Limits are applied to init containers
@@ -3153,12 +3171,10 @@ PodSpec: {
 	// +patchStrategy=merge
 	containers: [...Container] @go(Containers,[]Container) @protobuf(2,bytes,rep)
 
-	// EphemeralContainers is the list of ephemeral containers that run in this pod. Ephemeral containers
-	// are added to an existing pod as a result of a user-initiated action such as troubleshooting.
-	// This list is read-only in the pod spec. It may not be specified in a create or modified in an
-	// update of a pod or pod template.
-	// To add an ephemeral container use the pod's ephemeralcontainers subresource, which allows update
-	// using the EphemeralContainers kind.
+	// List of ephemeral containers run in this pod. Ephemeral containers may be run in an existing
+	// pod to perform user-initiated actions such as debugging. This list cannot be specified when
+	// creating a pod, and it cannot be modified by updating the pod spec. In order to add an
+	// ephemeral container to an existing pod, use the pod's ephemeralcontainers subresource.
 	// This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature.
 	// +optional
 	// +patchMergeKey=name
@@ -3578,6 +3594,10 @@ PodIP: {
 	ip?: string @go(IP) @protobuf(1,bytes,opt)
 }
 
+// EphemeralContainerCommon is a copy of all fields in Container to be inlined in
+// EphemeralContainer. This separate type allows easy conversion from EphemeralContainer
+// to Container and allows separate documentation for the fields of EphemeralContainer.
+// When a new field is added to Container it must be added here as well.
 EphemeralContainerCommon: {
 	// Name of the ephemeral container specified as a DNS_LABEL.
 	// This name must be unique among all containers, init containers and ephemeral containers.
@@ -3662,6 +3682,10 @@ EphemeralContainerCommon: {
 	// +optional
 	readinessProbe?: null | Probe @go(ReadinessProbe,*Probe) @protobuf(11,bytes,opt)
 
+	// Probes are not allowed for ephemeral containers.
+	// +optional
+	startupProbe?: null | Probe @go(StartupProbe,*Probe) @protobuf(22,bytes,opt)
+
 	// Lifecycle is not allowed for ephemeral containers.
 	// +optional
 	lifecycle?: null | Lifecycle @go(Lifecycle,*Lifecycle) @protobuf(12,bytes,opt)
@@ -3720,14 +3744,14 @@ EphemeralContainerCommon: {
 	tty?: bool @go(TTY) @protobuf(18,varint,opt)
 }
 
-// An EphemeralContainer is a special type of container which doesn't come with any resource
-// or scheduling guarantees but can be added to a pod that has already been created. They are
-// intended for user-initiated activities such as troubleshooting a running pod.
-// Ephemeral containers will not be restarted when they exit, and they will be killed if the
-// pod is removed or restarted. If an ephemeral container causes a pod to exceed its resource
+// An EphemeralContainer is a container that may be added temporarily to an existing pod for
+// user-initiated activities such as debugging. Ephemeral containers have no resource or
+// scheduling guarantees, and they will not be restarted when they exit or when a pod is
+// removed or restarted. If an ephemeral container causes a pod to exceed its resource
 // allocation, the pod may be evicted.
-// Ephemeral containers are added via a pod's ephemeralcontainers subresource and will appear
-// in the pod spec once added. No fields in EphemeralContainer may be changed once added.
+// Ephemeral containers may not be added by directly updating the pod spec. They must be added
+// via the pod's ephemeralcontainers subresource, and they will appear in the pod spec
+// once added.
 // This is an alpha feature enabled by the EphemeralContainers feature flag.
 EphemeralContainer: EphemeralContainerCommon & {
 	// If set, the name of the container from PodSpec that this ephemeral container targets.
@@ -3829,8 +3853,8 @@ PodStatus: {
 	// +optional
 	qosClass?: PodQOSClass @go(QOSClass) @protobuf(9,bytes,rep)
 
-	// Status for any ephemeral containers that running in this pod.
-	// This field is alpha-level and is only honored by servers that enable the EphemeralContainers feature.
+	// Status for any ephemeral containers that have run in this pod.
+	// This field is alpha-level and is only populated by servers that enable the EphemeralContainers feature.
 	// +optional
 	ephemeralContainerStatuses?: [...ContainerStatus] @go(EphemeralContainerStatuses,[]ContainerStatus) @protobuf(13,bytes,rep)
 }
@@ -3838,7 +3862,7 @@ PodStatus: {
 // PodStatusResult is a wrapper for PodStatus returned by kubelet that can be encode/decoded
 PodStatusResult: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -3846,7 +3870,7 @@ PodStatusResult: metav1.TypeMeta & {
 	// This data may not be up to date.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: PodStatus @go(Status) @protobuf(2,bytes,opt)
 }
@@ -3855,12 +3879,12 @@ PodStatusResult: metav1.TypeMeta & {
 // by clients and scheduled onto hosts.
 Pod: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Specification of the desired behavior of the pod.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: PodSpec @go(Spec) @protobuf(2,bytes,opt)
 
@@ -3868,7 +3892,7 @@ Pod: metav1.TypeMeta & {
 	// This data may not be up to date.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: PodStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -3876,24 +3900,24 @@ Pod: metav1.TypeMeta & {
 // PodList is a list of Pods.
 PodList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
 	// List of pods.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md
 	items: [...Pod] @go(Items,[]Pod) @protobuf(2,bytes,rep)
 }
 
 // PodTemplateSpec describes the data a pod should have when created from a template
 PodTemplateSpec: {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Specification of the desired behavior of the pod.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: PodSpec @go(Spec) @protobuf(2,bytes,opt)
 }
@@ -3901,12 +3925,12 @@ PodTemplateSpec: {
 // PodTemplate describes a template for creating copies of a predefined pod.
 PodTemplate: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Template defines the pods that will be created from this pod template.
-	// https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	template?: PodTemplateSpec @go(Template) @protobuf(2,bytes,opt)
 }
@@ -3914,7 +3938,7 @@ PodTemplate: metav1.TypeMeta & {
 // PodTemplateList is a list of PodTemplates.
 PodTemplateList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -4017,12 +4041,12 @@ ReplicationControllerCondition: {
 ReplicationController: metav1.TypeMeta & {
 	// If the Labels of a ReplicationController are empty, they are defaulted to
 	// be the same as the Pod(s) that the replication controller manages.
-	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Spec defines the specification of the desired behavior of the replication controller.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: ReplicationControllerSpec @go(Spec) @protobuf(2,bytes,opt)
 
@@ -4030,7 +4054,7 @@ ReplicationController: metav1.TypeMeta & {
 	// This data may be out of date by some window of time.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: ReplicationControllerStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -4038,7 +4062,7 @@ ReplicationController: metav1.TypeMeta & {
 // ReplicationControllerList is a collection of replication controllers.
 ReplicationControllerList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -4147,6 +4171,20 @@ LoadBalancerIngress: {
 	// +optional
 	hostname?: string @go(Hostname) @protobuf(2,bytes,opt)
 }
+
+// IPFamily represents the IP Family (IPv4 or IPv6). This type is used
+// to express the family of an IP expressed by a type (i.e. service.Spec.IPFamily)
+IPFamily: string // enumIPFamily
+
+enumIPFamily:
+	IPv4Protocol |
+	IPv6Protocol
+
+// IPv4Protocol indicates that this IP is IPv4 protocol
+IPv4Protocol: IPFamily & "IPv4"
+
+// IPv6Protocol indicates that this IP is IPv6 protocol
+IPv6Protocol: IPFamily & "IPv6"
 
 // ServiceSpec describes the attributes that a user creates on a service.
 ServiceSpec: {
@@ -4264,13 +4302,24 @@ ServiceSpec: {
 	// sessionAffinityConfig contains the configurations of session affinity.
 	// +optional
 	sessionAffinityConfig?: null | SessionAffinityConfig @go(SessionAffinityConfig,*SessionAffinityConfig) @protobuf(14,bytes,opt)
+
+	// ipFamily specifies whether this Service has a preference for a particular IP family (e.g. IPv4 vs.
+	// IPv6).  If a specific IP family is requested, the clusterIP field will be allocated from that family, if it is
+	// available in the cluster.  If no IP family is requested, the cluster's primary IP family will be used.
+	// Other IP fields (loadBalancerIP, loadBalancerSourceRanges, externalIPs) and controllers which
+	// allocate external load-balancers should use the same IP family.  Endpoints for this Service will be of
+	// this family.  This field is immutable after creation. Assigning a ServiceIPFamily not available in the
+	// cluster (e.g. IPv6 in IPv4 only cluster) is an error condition and will fail during clusterIP assignment.
+	// +optional
+	ipFamily?: null | IPFamily @go(IPFamily,*IPFamily) @protobuf(15,bytes,opt,Configcasttype=IPFamily)
 }
 
 // ServicePort contains information on service's port.
 ServicePort: {
 	// The name of this port within the service. This must be a DNS_LABEL.
-	// All ports within a ServiceSpec must have unique names. This maps to
-	// the 'Name' field in EndpointPort objects.
+	// All ports within a ServiceSpec must have unique names. When considering
+	// the endpoints for a Service, this must match the 'name' field in the
+	// EndpointPort.
 	// Optional if only one ServicePort is defined on this service.
 	// +optional
 	name?: string @go(Name) @protobuf(1,bytes,opt)
@@ -4308,19 +4357,19 @@ ServicePort: {
 // will answer requests sent through the proxy.
 Service: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Spec defines the behavior of a service.
-	// https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: ServiceSpec @go(Spec) @protobuf(2,bytes,opt)
 
 	// Most recently observed status of the service.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: ServiceStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -4332,7 +4381,7 @@ ClusterIPNone: "None"
 // ServiceList holds a list of services.
 ServiceList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -4346,7 +4395,7 @@ ServiceList: metav1.TypeMeta & {
 // * a set of secrets
 ServiceAccount: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -4373,7 +4422,7 @@ ServiceAccount: metav1.TypeMeta & {
 // ServiceAccountList is a list of ServiceAccount objects
 ServiceAccountList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -4396,7 +4445,7 @@ ServiceAccountList: metav1.TypeMeta & {
 //  ]
 Endpoints: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -4463,7 +4512,8 @@ EndpointAddress: {
 
 // EndpointPort is a tuple that describes a single port.
 EndpointPort: {
-	// The name of this port (corresponds to ServicePort.Name).
+	// The name of this port.  This must match the 'name' field in the
+	// corresponding ServicePort.
 	// Must be a DNS_LABEL.
 	// Optional only if one port is defined.
 	// +optional
@@ -4482,7 +4532,7 @@ EndpointPort: {
 // EndpointsList is a list of endpoints.
 EndpointsList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -4921,19 +4971,19 @@ ResourceList: {<_>: resource.Quantity}
 // Each node will have a unique identifier in the cache (i.e. in etcd).
 Node: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Spec defines the behavior of a node.
-	// https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: NodeSpec @go(Spec) @protobuf(2,bytes,opt)
 
 	// Most recently observed status of the node.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: NodeStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -4941,7 +4991,7 @@ Node: metav1.TypeMeta & {
 // NodeList is the whole list of all Nodes which have been registered with master.
 NodeList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -4971,6 +5021,12 @@ NamespaceStatus: {
 	// More info: https://kubernetes.io/docs/tasks/administer-cluster/namespaces/
 	// +optional
 	phase?: NamespacePhase @go(Phase) @protobuf(1,bytes,opt,casttype=NamespacePhase)
+
+	// Represents the latest available observations of a namespace's current state.
+	// +optional
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	conditions?: [...NamespaceCondition] @go(Conditions,[]NamespaceCondition) @protobuf(2,bytes,rep)
 }
 
 NamespacePhase: string // enumNamespacePhase
@@ -4985,21 +5041,55 @@ NamespaceActive: NamespacePhase & "Active"
 // NamespaceTerminating means the namespace is undergoing graceful termination
 NamespaceTerminating: NamespacePhase & "Terminating"
 
+NamespaceConditionType: string // enumNamespaceConditionType
+
+enumNamespaceConditionType:
+	NamespaceDeletionDiscoveryFailure |
+	NamespaceDeletionContentFailure |
+	NamespaceDeletionGVParsingFailure
+
+// NamespaceDeletionDiscoveryFailure contains information about namespace deleter errors during resource discovery.
+NamespaceDeletionDiscoveryFailure: NamespaceConditionType & "NamespaceDeletionDiscoveryFailure"
+
+// NamespaceDeletionContentFailure contains information about namespace deleter errors during deletion of resources.
+NamespaceDeletionContentFailure: NamespaceConditionType & "NamespaceDeletionContentFailure"
+
+// NamespaceDeletionGVParsingFailure contains information about namespace deleter errors parsing GV for legacy types.
+NamespaceDeletionGVParsingFailure: NamespaceConditionType & "NamespaceDeletionGroupVersionParsingFailure"
+
+// NamespaceCondition contains details about state of namespace.
+NamespaceCondition: {
+	// Type of namespace controller condition.
+	type: NamespaceConditionType @go(Type) @protobuf(1,bytes,opt,casttype=NamespaceConditionType)
+
+	// Status of the condition, one of True, False, Unknown.
+	status: ConditionStatus @go(Status) @protobuf(2,bytes,opt,casttype=ConditionStatus)
+
+	// +optional
+	lastTransitionTime?: metav1.Time @go(LastTransitionTime) @protobuf(4,bytes,opt)
+
+	// +optional
+	reason?: string @go(Reason) @protobuf(5,bytes,opt)
+
+	// +optional
+	message?: string @go(Message) @protobuf(6,bytes,opt)
+}
+
 // Namespace provides a scope for Names.
 // Use of multiple namespaces is optional.
 Namespace: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Spec defines the behavior of the Namespace.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: NamespaceSpec @go(Spec) @protobuf(2,bytes,opt)
 
 	// Status describes the current status of a Namespace.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: NamespaceStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -5007,7 +5097,7 @@ Namespace: metav1.TypeMeta & {
 // NamespaceList is a list of Namespaces.
 NamespaceList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -5020,7 +5110,7 @@ NamespaceList: metav1.TypeMeta & {
 // Deprecated in 1.7, please use the bindings subresource of pods instead.
 Binding: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -5028,12 +5118,14 @@ Binding: metav1.TypeMeta & {
 	target: ObjectReference @go(Target) @protobuf(2,bytes,opt)
 }
 
-// A list of ephemeral containers used in API operations
+// A list of ephemeral containers used with the Pod ephemeralcontainers subresource.
 EphemeralContainers: metav1.TypeMeta & {
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
-	// The new set of ephemeral containers to use for a pod.
+	// A list of ephemeral containers associated with this pod. New ephemeral containers
+	// may be appended to this list, but existing ephemeral containers may not be removed
+	// or modified.
 	// +patchMergeKey=name
 	// +patchStrategy=merge
 	ephemeralContainers: [...EphemeralContainer] @go(EphemeralContainers,[]EphemeralContainer) @protobuf(2,bytes,rep)
@@ -5201,7 +5293,7 @@ ServiceProxyOptions: metav1.TypeMeta & {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 ObjectReference: {
 	// Kind of the referent.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	kind?: string @go(Kind) @protobuf(1,bytes,opt)
 
@@ -5225,7 +5317,7 @@ ObjectReference: {
 	apiVersion?: string @go(APIVersion) @protobuf(5,bytes,opt)
 
 	// Specific resourceVersion to which this reference is made, if any.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
 	// +optional
 	resourceVersion?: string @go(ResourceVersion) @protobuf(6,bytes,opt)
 
@@ -5294,7 +5386,7 @@ EventTypeWarning: "Warning"
 // Event is a report of an event somewhere in the cluster.
 Event: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	metadata: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// The object that this event is about.
@@ -5384,7 +5476,7 @@ EventSeriesStateUnknown:  EventSeriesState & "Unknown"
 // EventList is a list of events.
 EventList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -5448,12 +5540,12 @@ LimitRangeSpec: {
 // LimitRange sets resource usage limits for each kind of resource in a Namespace.
 LimitRange: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Spec defines the limits enforced.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: LimitRangeSpec @go(Spec) @protobuf(2,bytes,opt)
 }
@@ -5461,7 +5553,7 @@ LimitRange: metav1.TypeMeta & {
 // LimitRangeList is a list of LimitRange items.
 LimitRangeList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -5625,17 +5717,17 @@ ResourceQuotaStatus: {
 // ResourceQuota sets aggregate quota restrictions enforced per namespace
 ResourceQuota: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
 	// Spec defines the desired quota.
-	// https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	spec?: ResourceQuotaSpec @go(Spec) @protobuf(2,bytes,opt)
 
 	// Status defines the actual enforced quota and its current usage.
-	// https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: ResourceQuotaStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -5643,7 +5735,7 @@ ResourceQuota: metav1.TypeMeta & {
 // ResourceQuotaList is a list of ResourceQuota items.
 ResourceQuotaList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -5656,7 +5748,7 @@ ResourceQuotaList: metav1.TypeMeta & {
 // the Data field must be less than MaxSecretSize bytes.
 Secret: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -5787,7 +5879,7 @@ SecretTypeBootstrapToken: SecretType & "bootstrap.kubernetes.io/token"
 // SecretList is a list of Secret.
 SecretList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -5799,7 +5891,7 @@ SecretList: metav1.TypeMeta & {
 // ConfigMap holds configuration data for pods to consume.
 ConfigMap: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -5824,7 +5916,7 @@ ConfigMap: metav1.TypeMeta & {
 
 // ConfigMapList is a resource containing a list of ConfigMap objects.
 ConfigMapList: metav1.TypeMeta & {
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -5864,7 +5956,7 @@ ComponentCondition: {
 // ComponentStatus (and ComponentStatusList) holds the cluster validation info.
 ComponentStatus: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -5878,7 +5970,7 @@ ComponentStatus: metav1.TypeMeta & {
 // Status of all the conditions for the component as a list of ComponentStatus objects.
 ComponentStatusList: metav1.TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -6069,7 +6161,7 @@ WindowsSecurityContextOptions: {
 // RangeAllocation is not a public type.
 RangeAllocation: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 

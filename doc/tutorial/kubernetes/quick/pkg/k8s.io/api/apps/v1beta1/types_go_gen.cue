@@ -43,15 +43,15 @@ ScaleStatus: {
 
 // Scale represents a scaling request for a resource.
 Scale: metav1.TypeMeta & {
-	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata.
+	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
-	// defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status.
+	// defines the behavior of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status.
 	// +optional
 	spec?: ScaleSpec @go(Spec) @protobuf(2,bytes,opt)
 
-	// current status of the scale. More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status. Read-only.
+	// current status of the scale. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status. Read-only.
 	// +optional
 	status?: ScaleStatus @go(Status) @protobuf(3,bytes,opt)
 }
@@ -109,21 +109,25 @@ StatefulSetUpdateStrategy: {
 
 // StatefulSetUpdateStrategyType is a string enumeration type that enumerates
 // all possible update strategies for the StatefulSet controller.
-StatefulSetUpdateStrategyType: string
+StatefulSetUpdateStrategyType: string // enumStatefulSetUpdateStrategyType
+
+enumStatefulSetUpdateStrategyType:
+	RollingUpdateStatefulSetStrategyType |
+	OnDeleteStatefulSetStrategyType
 
 // RollingUpdateStatefulSetStrategyType indicates that update will be
 // applied to all Pods in the StatefulSet with respect to the StatefulSet
 // ordering constraints. When a scale operation is performed with this
 // strategy, new Pods will be created from the specification version indicated
 // by the StatefulSet's updateRevision.
-RollingUpdateStatefulSetStrategyType: "RollingUpdate"
+RollingUpdateStatefulSetStrategyType: StatefulSetUpdateStrategyType & "RollingUpdate"
 
 // OnDeleteStatefulSetStrategyType triggers the legacy behavior. Version
 // tracking and ordered rolling restarts are disabled. Pods are recreated
 // from the StatefulSetSpec when they are manually deleted. When a scale
 // operation is performed with this strategy,specification version indicated
 // by the StatefulSet's currentRevision.
-OnDeleteStatefulSetStrategyType: "OnDelete"
+OnDeleteStatefulSetStrategyType: StatefulSetUpdateStrategyType & "OnDelete"
 
 // RollingUpdateStatefulSetStrategy is used to communicate parameter for RollingUpdateStatefulSetStrategyType.
 RollingUpdateStatefulSetStrategy: {
@@ -521,7 +525,7 @@ DeploymentList: metav1.TypeMeta & {
 // depend on its stability. It is primarily for internal use by controllers.
 ControllerRevision: metav1.TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -534,7 +538,7 @@ ControllerRevision: metav1.TypeMeta & {
 
 // ControllerRevisionList is a resource containing a list of ControllerRevision objects.
 ControllerRevisionList: metav1.TypeMeta & {
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 

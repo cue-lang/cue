@@ -28,14 +28,14 @@ TypeMeta: {
 	// Servers may infer this from the endpoint the client submits requests to.
 	// Cannot be updated.
 	// In CamelCase.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	kind?: string @go(Kind) @protobuf(1,bytes,opt)
 
 	// APIVersion defines the versioned schema of this representation of an object.
 	// Servers should convert recognized schemas to the latest internal value, and
 	// may reject unrecognized values.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#resources
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
 	// +optional
 	apiVersion?: string @go(APIVersion) @protobuf(2,bytes,opt)
 }
@@ -46,6 +46,10 @@ ListMeta: {
 	// selfLink is a URL representing this object.
 	// Populated by the system.
 	// Read-only.
+	//
+	// DEPRECATED
+	// Kubernetes will stop propagating this field in 1.20 release and the field is planned
+	// to be removed in 1.21 release.
 	// +optional
 	selfLink?: string @go(SelfLink) @protobuf(1,bytes,opt)
 
@@ -54,7 +58,7 @@ ListMeta: {
 	// Value must be treated as opaque by clients and passed unmodified back to the server.
 	// Populated by the system.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
 	// +optional
 	resourceVersion?: string @go(ResourceVersion) @protobuf(2,bytes,opt)
 
@@ -76,9 +80,6 @@ ListMeta: {
 	// Servers older than v1.15 do not set this field.
 	// The intended use of the remainingItemCount is *estimating* the size of a collection. Clients
 	// should not rely on the remainingItemCount to be set or to be exact.
-	//
-	// This field is alpha and can be changed or removed without notice.
-	//
 	// +optional
 	remainingItemCount?: null | int64 @go(RemainingItemCount,*int64) @protobuf(4,bytes,opt)
 }
@@ -112,7 +113,7 @@ ObjectMeta: {
 	// should retry (optionally after the time indicated in the Retry-After header).
 	//
 	// Applied only if Name is not specified.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#idempotency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#idempotency
 	// +optional
 	generateName?: string @go(GenerateName) @protobuf(2,bytes,opt)
 
@@ -130,6 +131,10 @@ ObjectMeta: {
 	// SelfLink is a URL representing this object.
 	// Populated by the system.
 	// Read-only.
+	//
+	// DEPRECATED
+	// Kubernetes will stop propagating this field in 1.20 release and the field is planned
+	// to be removed in 1.21 release.
 	// +optional
 	selfLink?: string @go(SelfLink) @protobuf(4,bytes,opt)
 
@@ -152,7 +157,7 @@ ObjectMeta: {
 	// Populated by the system.
 	// Read-only.
 	// Value must be treated as opaque by clients and .
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#concurrency-control-and-consistency
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#concurrency-control-and-consistency
 	// +optional
 	resourceVersion?: string @go(ResourceVersion) @protobuf(6,bytes,opt)
 
@@ -168,7 +173,7 @@ ObjectMeta: {
 	// Populated by the system.
 	// Read-only.
 	// Null for lists.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	creationTimestamp?: Time @go(CreationTimestamp) @protobuf(8,bytes,opt)
 
@@ -189,7 +194,7 @@ ObjectMeta: {
 	//
 	// Populated by the system when a graceful deletion is requested.
 	// Read-only.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	deletionTimestamp?: null | Time @go(DeletionTimestamp,*Time) @protobuf(9,bytes,opt)
 
@@ -274,7 +279,7 @@ OwnerReference: {
 	apiVersion: string @go(APIVersion) @protobuf(5,bytes,opt)
 
 	// Kind of the referent.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	kind: string @go(Kind) @protobuf(1,bytes,opt)
 
 	// Name of the referent.
@@ -547,13 +552,13 @@ Preconditions: {
 // Status is a return value for calls that don't return other objects.
 Status: TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
 	// Status of the operation.
 	// One of: "Success" or "Failure".
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#spec-and-status
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#spec-and-status
 	// +optional
 	status?: string @go(Status) @protobuf(2,bytes,opt)
 
@@ -598,7 +603,7 @@ StatusDetails: {
 
 	// The kind attribute of the resource associated with the status StatusReason.
 	// On some operations may differ from the requested resource Kind.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	kind?: string @go(Kind) @protobuf(3,bytes,opt)
 
@@ -750,11 +755,13 @@ StatusReasonTooManyRequests: StatusReason & "TooManyRequests"
 // doesn't make any sense, for example deleting a read-only object.  This is different than
 // StatusReasonInvalid above which indicates that the API call could possibly succeed, but the
 // data was invalid.  API calls that return BadRequest can never succeed.
+// Status code 400
 StatusReasonBadRequest: StatusReason & "BadRequest"
 
 // StatusReasonMethodNotAllowed means that the action the client attempted to perform on the
 // resource was not supported by the code - for instance, attempting to delete a resource that
 // can only be created. API calls that return MethodNotAllowed can never succeed.
+// Status code 405
 StatusReasonMethodNotAllowed: StatusReason & "MethodNotAllowed"
 
 // StatusReasonNotAcceptable means that the accept types indicated by the client were not acceptable
@@ -864,7 +871,7 @@ CauseTypeFieldManagerConflict: CauseType & "FieldManagerConflict"
 // List holds a list of objects, which may not be known by the server.
 List: TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
@@ -1086,9 +1093,13 @@ ManagedFieldsEntry: {
 	// +optional
 	time?: null | Time @go(Time,*Time) @protobuf(4,bytes,opt)
 
-	// Fields identifies a set of fields.
+	// FieldsType is the discriminator for the different fields format and version.
+	// There is currently only one possible value: "FieldsV1"
+	fieldsType?: string @go(FieldsType) @protobuf(6,bytes,opt)
+
+	// FieldsV1 holds the first JSON version format as described in the "FieldsV1" type.
 	// +optional
-	fields?: null | Fields @go(Fields,*Fields) @protobuf(5,bytes,opt,casttype=Fields)
+	fieldsV1?: null | FieldsV1 @go(FieldsV1,*FieldsV1) @protobuf(7,bytes,opt)
 }
 
 // ManagedFieldsOperationType is the type of operation which lead to a ManagedFieldsEntry being created.
@@ -1101,9 +1112,18 @@ enumManagedFieldsOperationType:
 ManagedFieldsOperationApply:  ManagedFieldsOperationType & "Apply"
 ManagedFieldsOperationUpdate: ManagedFieldsOperationType & "Update"
 
-// Fields stores a set of fields in a data structure like a Trie.
-// To understand how this is used, see: https://github.com/kubernetes-sigs/structured-merge-diff
-Fields: _
+// FieldsV1 stores a set of fields in a data structure like a Trie, in JSON format.
+//
+// Each key is either a '.' representing the field itself, and will always map to an empty set,
+// or a string representing a sub-field or item. The string will follow one of these four formats:
+// 'f:<name>', where <name> is the name of a field in a struct, or key in a map
+// 'v:<value>', where <value> is the exact json formatted value of a list item
+// 'i:<index>', where <index> is position of a item in a list
+// 'k:<keys>', where <keys> is a map of  a list item's key fields to their unique values
+// If a key maps to an empty Fields value, the field that key represents is part of the set.
+//
+// The exact format is defined in sigs.k8s.io/structured-merge-diff
+FieldsV1: _
 
 // Table is a tabular representation of a set of API resources. The server transforms the
 // object into a set of preferred columns for quickly reviewing the objects.
@@ -1111,7 +1131,7 @@ Fields: _
 // +protobuf=false
 Table: TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: ListMeta @go(ListMeta)
 
@@ -1248,7 +1268,7 @@ TableOptions: TypeMeta & {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 PartialObjectMetadata: TypeMeta & {
 	// Standard object's metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#metadata
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 }
@@ -1257,7 +1277,7 @@ PartialObjectMetadata: TypeMeta & {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 PartialObjectMetadataList: TypeMeta & {
 	// Standard list metadata.
-	// More info: https://git.k8s.io/community/contributors/devel/api-conventions.md#types-kinds
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
 	metadata?: ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 

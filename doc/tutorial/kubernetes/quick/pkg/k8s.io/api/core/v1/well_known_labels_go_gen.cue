@@ -19,3 +19,9 @@ LabelNamespaceSuffixNode: "node.kubernetes.io"
 
 // LabelNamespaceNodeRestriction is a forbidden label namespace that kubelets may not self-set when the NodeRestriction admission plugin is enabled
 LabelNamespaceNodeRestriction: "node-restriction.kubernetes.io"
+
+// IsHeadlessService is added by Controller to an Endpoint denoting if its parent
+// Service is Headless. The existence of this label can be used further by other
+// controllers and kube-proxy to check if the Endpoint objects should be replicated when
+// using Headless Services
+IsHeadlessService: "service.kubernetes.io/headless"

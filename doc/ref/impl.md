@@ -139,7 +139,7 @@ Any other expression is evaluated and unified with existing values of that node.
 
 References in expressions refer to other nodes within the `C` and represent
 a copy of the substructure `C'` of `C` rooted at these nodes.
-Any references occuring in terms assigned to nodes of `C'` are be updated to
+Any references occurring in terms assigned to nodes of `C'` are be updated to
 point to the equivalent node in a copy of `C'`.
 <!-- TODO: define formally. Right now this is implied already by the
 definition of evaluation functions and unification: unifying

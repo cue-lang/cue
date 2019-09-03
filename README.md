@@ -46,7 +46,7 @@ You can use CUE to
 ### How?
 
 CUE merges the notion of schema and data.
-The same CUE defintion can simultaneously be used for validating data
+The same CUE definition can simultaneously be used for validating data
 and act as a template to reduce boilerplate.
 Schema definition is enriched with fine-grained value definitions
 and default values.

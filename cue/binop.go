@@ -653,7 +653,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 				break
 			}
 		}
-		if !unchecked && !found && !y.allows(a.feature) {
+		if !unchecked && !found && !y.allows(a.feature) && !a.definition {
 			if a.optional {
 				continue
 			}
@@ -691,7 +691,7 @@ outer:
 				continue outer
 			}
 		}
-		if !unchecked && !found && !x.allows(a.feature) {
+		if !unchecked && !found && !x.allows(a.feature) && !a.definition {
 			if a.optional {
 				continue
 			}

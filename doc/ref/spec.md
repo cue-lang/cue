@@ -1122,7 +1122,7 @@ h: b & { foo?: number }                _|_
 
 By default, structs are open to adding fields.
 Instances of an open struct `p` may contain fields not defined in `p`.
-A _closed struct_ `c` is a struct whose instances may not have fields
+A _closed struct_ `c` is a struct whose instances may not have regular fields
 not defined in `c`.
 Closing a struct is equivalent to adding an optional field with value `_|_`
 for all undefined fields.
@@ -1190,7 +1190,7 @@ A fields of a struct may be declared as a regular field (using `:`)
 or as a _definition_ (using `::`).
 Definitions are not emitted as part of the model and are never required
 to be concrete when emitting data.
-It is illegal to have a normal field and a definition with the same name
+It is illegal to have a regular field and a definition with the same name
 within the same struct.
 Literal structs that are part of a definition's value are implicitly closed.
 An ellipsis `...` in such literal structs keeps them open,
@@ -1517,7 +1517,7 @@ the identifier is declared in the file block.
 All other identifiers are not exported.
 
 An identifier that starts with the underscore "_" is not
-emitted in any data output.
+emitted in any data output and treated as a definition for that purpose.
 Quoted labels that start with an underscore are emitted, however.
 <!-- END REPLACE -->
 

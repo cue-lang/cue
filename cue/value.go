@@ -658,7 +658,7 @@ func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
 }
 
 func (x *structLit) allows(f label) bool {
-	return !x.isClosed
+	return !x.isClosed || f&hidden != 0
 }
 
 func newStruct(src source) *structLit {
@@ -886,7 +886,7 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (evaluated, 
 // A label is a canonicalized feature name.
 type label uint32
 
-const hidden label = 0x01 // only set iff identifier starting with $
+const hidden label = 0x01 // only set iff identifier starting with _
 
 // An arc holds the label-value pair.
 //

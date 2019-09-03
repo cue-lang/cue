@@ -27,6 +27,7 @@ func TestExport(t *testing.T) {
 	testCases := []struct {
 		raw     bool // skip evaluation the root, fully raw
 		eval    bool // evaluate the full export
+		noOpt   bool
 		in, out string
 	}{{
 		in:  `"hello"`,
@@ -99,30 +100,6 @@ func TestExport(t *testing.T) {
 				d: _|_ /* undefined field "d" */
 				e: _|_ /* undefined field "t" */
 			}`),
-	}, {
-		// a closed struct with template restrictions is exported as a
-		// conjunction of two structs.
-		in: `{
-			A :: { b: int }
-			a: A & { <_>: <10 }
-			B :: a
-		}`,
-		out: unindent(`
-		{
-			A :: {
-				b: int
-			}
-			a: close({
-				b: <10
-			}) & {
-				<_>: <10
-			}
-			B :: {
-				b: <10
-			} & {
-				<_>: <10
-			}
-		}`),
 	}, {
 		in: `{
 			a: 5*[int]
@@ -383,8 +360,9 @@ func TestExport(t *testing.T) {
 			}
 		}`),
 	}, {
-		raw:  true,
-		eval: true,
+		raw:   true,
+		eval:  true,
+		noOpt: true,
 		in: `{
 				reg: { foo: 1, bar: { baz: 3 } }
 				def :: {
@@ -404,42 +382,38 @@ func TestExport(t *testing.T) {
 				a: 1
 				sub: {
 					foo: 1
-					bar: {
-						baz: 3
-						...
-					}
-					...
+					bar baz: 3
 				}
 			}
-			val: close({
+			val: {
 				a: 1
 				sub: {
 					foo: 1
 					bar baz: 3
 				}
-			})
+			}
 		}`),
 	}, {
 		raw:  true,
 		eval: true,
 		in: `{
-				b: [{
-					<X>: int
-					f: 4 if a > 4
-				}][a]
-				a: int
-				c: *1 | 2
-			}`,
+			b: [{
+				<X>: int
+				f: 4 if a > 4
+			}][a]
+			a: int
+			c: *1 | 2
+		}`,
 		// reference to a must be redirected to outer a through alias
 		out: unindent(`
-			{
-				b: [{
-					<X>: int
-					f:   4 if a > 4
-				}][a]
-				a: int
-				c: 1
-			}`),
+		{
+			b: [{
+				<X>: int
+				f:   4 if a > 4
+			}][a]
+			a: int
+			c: 1
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -455,7 +429,7 @@ func TestExport(t *testing.T) {
 			n := root.(*structLit).arcs[0].v
 			v := newValueRoot(ctx, n)
 
-			opts := options{raw: !tc.eval}
+			opts := options{raw: !tc.eval, omitOptional: true}
 			node, _ := export(ctx, v.eval(ctx), opts)
 			b, err := format.Node(node, format.Simplify())
 			if err != nil {
@@ -595,6 +569,67 @@ func TestExportFile(t *testing.T) {
 		} | {
 			c: time.Duration
 		}`),
+	}, {
+		// a closed struct unified with a struct with a template restrictions is
+		// exported as a conjunction of two structs.
+		eval: true,
+		in: `
+		A :: { b: int }
+		a: A & { <_>: <10 }
+		B :: a
+		`,
+		out: unindent(`
+		{
+			A :: {
+				b: int
+			}
+			a: close({
+				b: <10
+			}) & {
+				<_>: <10
+			}
+			B :: {
+				b: <10
+			} & {
+				<_>: <10
+			}
+		}`),
+	}, {
+		eval: true,
+		in: `{
+			reg: { foo: 1, bar: { baz: 3 } }
+			def :: {
+				a: 1
+
+				sub: reg
+			}
+			val: def
+		}`,
+		out: unindent(`
+		{
+			reg: {
+				foo: 1
+				bar baz: 3
+			}
+			def :: {
+				a: 1
+				sub: {
+					foo: 1
+					bar: {
+						baz: 3
+						...
+					}
+					...
+				}
+			}
+			val: close({
+				a: 1
+				sub: {
+					foo: 1
+					bar baz: 3
+				}
+			})
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -603,7 +638,11 @@ func TestExportFile(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			b, err := format.Node(inst.Value().Syntax(Raw()), format.Simplify())
+			opts := []Option{}
+			if !tc.eval {
+				opts = []Option{Raw()}
+			}
+			b, err := format.Node(inst.Value().Syntax(opts...), format.Simplify())
 			if err != nil {
 				log.Fatal(err)
 			}

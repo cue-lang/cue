@@ -215,6 +215,11 @@ func hasTemplate(s *ast.StructLit) bool {
 }
 
 func (p *exporter) closeOrOpen(s *ast.StructLit, isClosed bool) ast.Expr {
+	// Note, there is no point in printing close if we are dropping optional
+	// fields, as by this the meaning of close will change anyway.
+	if p.mode.omitOptional || p.mode.concrete {
+		return s
+	}
 	if isClosed && !p.inDef {
 		return &ast.CallExpr{
 			Fun:  ast.NewIdent("close"),

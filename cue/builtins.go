@@ -143,11 +143,12 @@ var builtinPackages = map[string]*builtinPkg{
 		}, {
 			Name:   "Sum",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return md5.Sum(data)
+					a := md5.Sum(data)
+					return a[:]
 				}()
 			},
 		}},
@@ -162,11 +163,12 @@ var builtinPackages = map[string]*builtinPkg{
 		}, {
 			Name:   "Sum",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha1.Sum(data)
+					a := sha1.Sum(data)
+					return a[:]
 				}()
 			},
 		}},
@@ -184,21 +186,23 @@ var builtinPackages = map[string]*builtinPkg{
 		}, {
 			Name:   "Sum256",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha256.Sum256(data)
+					a := sha256.Sum256(data)
+					return a[:]
 				}()
 			},
 		}, {
 			Name:   "Sum224",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha256.Sum224(data)
+					a := sha256.Sum224(data)
+					return a[:]
 				}()
 			},
 		}},
@@ -222,41 +226,45 @@ var builtinPackages = map[string]*builtinPkg{
 		}, {
 			Name:   "Sum512",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha512.Sum512(data)
+					a := sha512.Sum512(data)
+					return a[:]
 				}()
 			},
 		}, {
 			Name:   "Sum384",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha512.Sum384(data)
+					a := sha512.Sum384(data)
+					return a[:]
 				}()
 			},
 		}, {
 			Name:   "Sum512_224",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha512.Sum512_224(data)
+					a := sha512.Sum512_224(data)
+					return a[:]
 				}()
 			},
 		}, {
 			Name:   "Sum512_256",
 			Params: []kind{bytesKind | stringKind},
-			Result: topKind,
+			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
 				c.ret = func() interface{} {
-					return sha512.Sum512_256(data)
+					a := sha512.Sum512_256(data)
+					return a[:]
 				}()
 			},
 		}},

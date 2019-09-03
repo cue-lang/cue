@@ -16,8 +16,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo extract crypto/sha512
-
 package sha512
 
 import "crypto/sha512"
@@ -41,21 +39,25 @@ const (
 )
 
 // Sum512 returns the SHA512 checksum of the data.
-func Sum512(data []byte) [Size]byte {
-	return sha512.Sum512(data)
+func Sum512(data []byte) []byte {
+	a := sha512.Sum512(data)
+	return a[:]
 }
 
 // Sum384 returns the SHA384 checksum of the data.
-func Sum384(data []byte) (sum384 [Size384]byte) {
-	return sha512.Sum384(data)
+func Sum384(data []byte) (sum384 []byte) {
+	a := sha512.Sum384(data)
+	return a[:]
 }
 
 // Sum512_224 returns the Sum512/224 checksum of the data.
-func Sum512_224(data []byte) (sum224 [Size224]byte) {
-	return sha512.Sum512_224(data)
+func Sum512_224(data []byte) (sum224 []byte) {
+	a := sha512.Sum512_224(data)
+	return a[:]
 }
 
 // Sum512_256 returns the Sum512/256 checksum of the data.
-func Sum512_256(data []byte) (sum256 [Size256]byte) {
-	return sha512.Sum512_256(data)
+func Sum512_256(data []byte) (sum256 []byte) {
+	a := sha512.Sum512_256(data)
+	return a[:]
 }

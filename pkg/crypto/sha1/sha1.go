@@ -16,8 +16,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo extract crypto/sha1
-
 package sha1
 
 import "crypto/sha1"
@@ -29,6 +27,7 @@ const Size = 20
 const BlockSize = 64
 
 // Sum returns the SHA-1 checksum of the data.
-func Sum(data []byte) [Size]byte {
-	return sha1.Sum(data)
+func Sum(data []byte) []byte {
+	a := sha1.Sum(data)
+	return a[:]
 }

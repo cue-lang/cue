@@ -57,6 +57,33 @@ func TestBuiltins(t *testing.T) {
 		test("math", `math.Floor("foo")`),
 		`_|_(cannot use "foo" (type string) as number in argument 1 to math.Floor)`,
 	}, {
+		test("crypto/sha256", `sha256.Sum256("hash me")`),
+		`'\xeb \x1a\xf5\xaa\xf0\xd6\x06)\xd3Ҧ\x1eFl\xfc\x0f\xed\xb5\x17\xad\xd81\xec\xacR5\xe1کc\xd6'`,
+	}, {
+		test("crypto/md5", `len(md5.Sum("hash me"))`),
+		`16`,
+	}, {
+		test("crypto/sha1", `len(sha1.Sum("hash me"))`),
+		`20`,
+	}, {
+		test("crypto/sha256", `len(sha256.Sum256("hash me"))`),
+		`32`,
+	}, {
+		test("crypto/sha256", `len(sha256.Sum224("hash me"))`),
+		`28`,
+	}, {
+		test("crypto/sha512", `len(sha512.Sum512("hash me"))`),
+		`64`,
+	}, {
+		test("crypto/sha512", `len(sha512.Sum384("hash me"))`),
+		`48`,
+	}, {
+		test("crypto/sha512", `len(sha512.Sum512_224("hash me"))`),
+		`28`,
+	}, {
+		test("crypto/sha512", `len(sha512.Sum512_256("hash me"))`),
+		`32`,
+	}, {
 		test("encoding/base64", `base64.Encode(null, "foo")`),
 		`"Zm9v"`,
 	}, {

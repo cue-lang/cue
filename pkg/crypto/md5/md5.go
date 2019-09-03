@@ -16,8 +16,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo extract crypto/md5
-
 package md5
 
 import "crypto/md5"
@@ -29,6 +27,7 @@ const Size = 16
 const BlockSize = 64
 
 // Sum returns the MD5 checksum of the data.
-func Sum(data []byte) [Size]byte {
-	return md5.Sum(data)
+func Sum(data []byte) []byte {
+	a := md5.Sum(data)
+	return a[:]
 }

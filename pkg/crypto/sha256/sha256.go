@@ -16,8 +16,6 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo extract crypto/sha256
-
 package sha256
 
 import "crypto/sha256"
@@ -32,11 +30,13 @@ const Size224 = 28
 const BlockSize = 64
 
 // Sum256 returns the SHA256 checksum of the data.
-func Sum256(data []byte) [Size]byte {
-	return sha256.Sum256(data)
+func Sum256(data []byte) []byte {
+	a := sha256.Sum256(data)
+	return a[:]
 }
 
 // Sum224 returns the SHA224 checksum of the data.
-func Sum224(data []byte) (sum224 [Size224]byte) {
-	return sha256.Sum224(data)
+func Sum224(data []byte) (sum224 []byte) {
+	a := sha256.Sum224(data)
+	return a[:]
 }

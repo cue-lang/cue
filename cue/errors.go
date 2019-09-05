@@ -262,7 +262,7 @@ func isBottom(n value) bool {
 	return n.kind() == bottomKind
 }
 
-func firstBottom(v ...value) evaluated {
+func firstBottom(v ...value) *bottom {
 	for _, b := range v {
 		if isBottom(b) {
 			return b.(*bottom)

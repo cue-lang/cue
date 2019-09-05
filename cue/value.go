@@ -804,7 +804,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	newArcs := []arc{}
 
 	for _, c := range comprehensions {
-		result := c.clauses.yield(ctx, func(k, v evaluated, opt, def bool) *bottom {
+		err := c.clauses.yield(ctx, func(k, v evaluated, opt, def bool) *bottom {
 			if !k.kind().isAnyOf(stringKind) {
 				return ctx.mkErr(k, "key must be of type string")
 			}
@@ -833,12 +833,8 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 			})
 			return nil
 		})
-		switch {
-		case result == nil:
-		case isBottom(result):
-			return nil, result.(*bottom)
-		default:
-			panic("should not happen")
+		if err != nil {
+			return nil, err
 		}
 	}
 
@@ -1380,14 +1376,14 @@ type fieldComprehension struct {
 }
 
 func (x *fieldComprehension) kind() kind {
-	return topKind | nonGround
+	return structKind | nonGround
 }
 
 type yieldFunc func(k, v evaluated, optional, definition bool) *bottom
 
 type yielder interface {
 	value
-	yield(*context, yieldFunc) evaluated
+	yield(*context, yieldFunc) *bottom
 }
 
 type yield struct {
@@ -1400,19 +1396,19 @@ type yield struct {
 
 func (x *yield) kind() kind { return topKind | referenceKind }
 
-func (x *yield) yield(ctx *context, fn yieldFunc) evaluated {
+func (x *yield) yield(ctx *context, fn yieldFunc) *bottom {
 	var k evaluated
 	if x.key != nil {
 		k = ctx.manifest(x.key)
-		if isBottom(k) {
-			return k
+		if err, ok := k.(*bottom); ok {
+			return err
 		}
 	} else {
 		k = &top{}
 	}
 	v := x.value.evalPartial(ctx)
-	if isBottom(v) {
-		return v
+	if err, ok := v.(*bottom); ok {
+		return err
 	}
 	if err := fn(k, v, x.opt, x.def); err != nil {
 		return err
@@ -1428,10 +1424,10 @@ type guard struct { // rename to guard
 
 func (x *guard) kind() kind { return topKind | referenceKind }
 
-func (x *guard) yield(ctx *context, fn yieldFunc) evaluated {
+func (x *guard) yield(ctx *context, fn yieldFunc) *bottom {
 	filter := ctx.manifest(x.condition)
-	if isBottom(filter) {
-		return filter
+	if err, ok := filter.(*bottom); ok {
+		return err
 	}
 	if err := checkKind(ctx, filter, boolKind); err != nil {
 		return err
@@ -1452,7 +1448,7 @@ type feed struct {
 
 func (x *feed) kind() kind { return topKind | referenceKind }
 
-func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
+func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 	if ctx.trace {
 		defer uni(indent(ctx, "feed", x))
 	}
@@ -1474,8 +1470,8 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
 			}
 			val := src.at(ctx, i)
 			v := fn.call(ctx, x, key, val)
-			if isBottom(v) {
-				return v.evalPartial(ctx)
+			if err, ok := v.(*bottom); ok {
+				return err
 			}
 			if err := v.(yielder).yield(ctx, yfn); err != nil {
 				return err
@@ -1488,8 +1484,8 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
 			idx := newNum(x, intKind)
 			idx.v.SetInt64(int64(i))
 			v := fn.call(ctx, x, idx, src.at(ctx, i))
-			if isBottom(v) {
-				return v.evalPartial(ctx)
+			if err, ok := v.(*bottom); ok {
+				return err
 			}
 			if err := v.(yielder).yield(ctx, yfn); err != nil {
 				return err
@@ -1498,8 +1494,8 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result evaluated) {
 		return nil
 
 	default:
-		if isBottom(source) {
-			return source
+		if err, ok := source.(*bottom); ok {
+			return err
 		}
 		if k := source.kind(); k&(structKind|listKind) == bottomKind {
 			return ctx.mkErr(x, x.source, "feed source must be list or struct, found %s", k)

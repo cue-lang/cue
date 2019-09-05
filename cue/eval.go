@@ -258,7 +258,7 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	s := &structLit{baseValue: x.baseValue}
 	list := &list{baseValue: x.baseValue, elem: s}
-	result := x.clauses.yield(ctx, func(k, v evaluated, _, _ bool) *bottom {
+	err := x.clauses.yield(ctx, func(k, v evaluated, _, _ bool) *bottom {
 		if !k.kind().isAnyOf(intKind) {
 			return ctx.mkErr(k, "key must be of type int")
 		}
@@ -268,12 +268,8 @@ func (x *listComprehension) evalPartial(ctx *context) evaluated {
 		})
 		return nil
 	})
-	switch {
-	case result == nil:
-	case isBottom(result):
-		return result
-	default:
-		panic("should not happen")
+	if err != nil {
+		return err
 	}
 	list.initLit()
 	return list

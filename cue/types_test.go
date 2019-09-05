@@ -609,9 +609,12 @@ func TestFields(t *testing.T) {
 		value: `{_a:"a"}`,
 		res:   "{}",
 	}, {
-		value: `{"\(k)": v for k, v in y if v > 1}
+		value: `{ for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
+	}, {
+		value: `{ def :: 1, _hidden: 2, opt?: 3, reg: 4 }`,
+		res:   "{reg:4,}",
 	}, {
 		value: `{a:1,b:2,c:int}`,
 		err:   "cannot convert incomplete value",
@@ -1021,7 +1024,7 @@ func TestDecode(t *testing.T) {
 		dst:   &fields{},
 		want:  fields{A: 1, B: 2, C: 3},
 	}, {
-		value: `{"\(k)": v for k, v in y if v > 1}
+		value: `{for k, v in y if v > 1 {"\(k)": v} }
 		y: {a:1,b:2,c:3}`,
 		dst:  &fields{},
 		want: fields{B: 2, C: 3},

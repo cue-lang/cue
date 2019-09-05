@@ -253,7 +253,7 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 	case *basicType:
 		switch op {
 		// TODO: other types.
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			if k&typeKinds != bottomKind {
 				return &basicType{binSrc(src.Pos(), op, x, other), k & typeKinds}
 			}
@@ -264,7 +264,7 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 		return ctx.mkErr(src, codeIncomplete, "%s with incomplete values", op)
 
 	case *numLit:
-		if op == opUnify {
+		if op == opUnify || op == opUnifyUnchecked {
 			if k == y.k {
 				return y
 			}
@@ -637,12 +637,12 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	// we need to apply the template to all elements.
 
 	sz := len(x.comprehensions) + len(y.comprehensions)
-	obj.comprehensions = make([]*fieldComprehension, sz)
+	obj.comprehensions = make([]value, sz)
 	for i, c := range x.comprehensions {
-		obj.comprehensions[i] = ctx.copy(c).(*fieldComprehension)
+		obj.comprehensions[i] = ctx.copy(c)
 	}
 	for i, c := range y.comprehensions {
-		obj.comprehensions[i+len(x.comprehensions)] = ctx.copy(c).(*fieldComprehension)
+		obj.comprehensions[i+len(x.comprehensions)] = ctx.copy(c)
 	}
 
 	for _, a := range x.arcs {
@@ -719,14 +719,14 @@ func (x *nullLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 			return &boolLit{baseValue: src.base(), b: true}
 		case opNeq:
 			return &boolLit{baseValue: src.base(), b: false}
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			return x
 		}
 
 	case *bound:
 		// Not strictly necessary, but handling this results in better error
 		// messages.
-		if op == opUnify {
+		if op == opUnify || op == opUnifyUnchecked {
 			return other.binOp(ctx, src, opUnify, x)
 		}
 
@@ -749,7 +749,7 @@ func (x *boolLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 
 	case *boolLit:
 		switch op {
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			if x.b != y.b {
 				return ctx.mkErr(x, "conflicting values %v and %v", x.b, y.b)
 			}
@@ -777,7 +777,7 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	case *stringLit:
 		str := other.strValue()
 		switch op {
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			str := other.strValue()
 			if x.str != str {
 				src := mkBin(ctx, src.Pos(), op, x, other)
@@ -831,7 +831,7 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 	case *bytesLit:
 		b := y.b
 		switch op {
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			if !bytes.Equal(x.b, b) {
 				return ctx.mkErr(x, "conflicting values %v and %v",
 					ctx.str(x), ctx.str(y))
@@ -914,7 +914,7 @@ func cmpTonode(src source, op op, r int) evaluated {
 		result = r == -1
 	case opLeq:
 		result = r != 1
-	case opEql, opUnify:
+	case opEql, opUnify, opUnifyUnchecked:
 		result = r == 0
 	case opNeq:
 		result = r != 0
@@ -929,14 +929,14 @@ func cmpTonode(src source, op op, r int) evaluated {
 func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch y := other.(type) {
 	case *basicType, *bound, *customValidator: // for better error reporting
-		if op == opUnify {
+		if op == opUnify || op == opUnifyUnchecked {
 			return y.binOp(ctx, src, op, x)
 		}
 	case *numLit:
 		k := unifyType(x.kind(), y.kind())
 		n := newNumBin(k, x, y)
 		switch op {
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			if x.v.Cmp(&y.v) != 0 {
 				src = mkBin(ctx, src.Pos(), op, x, other)
 				return ctx.mkErr(src, "conflicting values %v and %v",
@@ -1029,7 +1029,7 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 
 	case *durationLit:
 		switch op {
-		case opUnify:
+		case opUnify, opUnifyUnchecked:
 			if x.d != y.d {
 				return ctx.mkIncompatible(src, op, x, other)
 			}
@@ -1090,13 +1090,13 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 
 func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated {
 	switch op {
-	case opUnify:
+	case opUnify, opUnifyUnchecked:
 		y, ok := other.(*list)
 		if !ok {
 			break
 		}
 
-		n := binOp(ctx, src, opUnify, x.len.(evaluated), y.len.(evaluated))
+		n := binOp(ctx, src, op, x.len.(evaluated), y.len.(evaluated))
 		if isBottom(n) {
 			src = mkBin(ctx, src.Pos(), op, x, other)
 			return ctx.mkErr(src, "conflicting list lengths: %v", n)
@@ -1116,7 +1116,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		max, ok := n.(*numLit)
 		if !ok || len(xa) < max.intValue(ctx) {
 			src := mkBin(ctx, src.Pos(), op, x.typ, y.typ)
-			typ = binOp(ctx, src, opUnify, x.typ.(evaluated), y.typ.(evaluated))
+			typ = binOp(ctx, src, op, x.typ.(evaluated), y.typ.(evaluated))
 			if isBottom(typ) {
 				return ctx.mkErr(src, "conflicting list element types: %v", typ)
 			}
@@ -1125,7 +1125,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		// TODO: use forwarding instead of this mild hack.
 		x.elem.arcs = xa
 		y.elem.arcs = ya
-		s := binOp(ctx, src, opUnify, x.elem, y.elem).(*structLit)
+		s := binOp(ctx, src, op, x.elem, y.elem).(*structLit)
 		x.elem.arcs = sx
 		y.elem.arcs = sy
 
@@ -1245,7 +1245,7 @@ func (x *lambdaExpr) binOp(ctx *context, src source, op op, other evaluated) eva
 }
 
 func (x *builtin) binOp(ctx *context, src source, op op, other evaluated) evaluated {
-	if op == opUnify && evaluated(x) == other {
+	if _, isUnify := op.unifyType(); isUnify && evaluated(x) == other {
 		return x
 	}
 	return ctx.mkIncompatible(src, op, x, other)

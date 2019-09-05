@@ -213,7 +213,11 @@ func TestCompile(t *testing.T) {
 		out: `<0>{a: <1>{<>: <2>(name: string)-><3>{n: <2>.name}, k: 1}, b: <4>{<>: <5>(x: string)-><6>{x: 0, y: 1}, v: <7>{}}}`,
 	}, {
 		in: `
-		a: { "\(k)": v for k, v in b if b.a < k }
+		a: {
+			for k, v in b if b.a < k {
+				"\(k)": v
+			}
+		}
 		b: {
 			a: 1
 			b: 2
@@ -223,7 +227,7 @@ func TestCompile(t *testing.T) {
 		out: `<0>{a: <1>{ <2>for k, v in <0>.b if (<0>.b.a < <2>.k) yield (""+<2>.k+""): <2>.v}, b: <3>{a: 1, b: 2, c: 3}}`,
 	}, {
 		in: `
-			a: { "\(v)": v for k, v in b }
+			a: { for k, v in b {"\(v)": v} }
 			b: { a: "aa", b: "bb", c: "cc" }
 			`,
 		out: `<0>{a: <1>{ <2>for k, v in <0>.b yield (""+<2>.v+""): <2>.v}, b: <3>{a: "aa", b: "bb", c: "cc"}}`,

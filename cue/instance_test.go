@@ -84,12 +84,12 @@ func TestMerge(t *testing.T) {
 	}, {
 		desc: "top-level comprehensions",
 		instances: insts(`
-			t: {"\(k)": 10 for k, x in s}
+			t: { for k, x in s {"\(k)": 10} }
 			s <Name>: {}
 			s foo a: 1
 			`,
 			`
-			t: {"\(k)": 10 for k, x in s}
+			t: { for k, x in s {"\(k)": 10 } }
 			s <Name>: {}
 			s bar b: 2
 			`,

@@ -229,7 +229,7 @@ func TestExport(t *testing.T) {
 			}`),
 	}, {
 		raw: true,
-		in:  `{ a: [1, 2], b: { "\(k)": v for k, v in a if v > 1 } }`,
+		in:  `{ a: [1, 2], b: { for k, v in a if v > 1 { "\(k)": v } } }`,
 		out: unindent(`
 			{
 				a: [1, 2]

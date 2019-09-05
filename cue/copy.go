@@ -56,9 +56,9 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 			arcs[i] = a
 		}
 
-		comp := make([]*fieldComprehension, len(x.comprehensions))
+		comp := make([]value, len(x.comprehensions))
 		for i, c := range x.comprehensions {
-			comp[i] = ctx.copy(c).(*fieldComprehension)
+			comp[i] = ctx.copy(c)
 		}
 		obj.comprehensions = comp
 		return obj, false

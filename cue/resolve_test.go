@@ -1298,24 +1298,36 @@ a: {
 		A :: {f1: int, f2: int}
 
 		// Comprehension fields cannot be added like any other.
-		a: A & { "\(k)": v for k, v in {f3 : int}}
+		for k, v in {f3 : int} {
+			a: A & { "\(k)": v }
+		}
 
-		// A closed struct may not generate comprehension values it does not
-		// define explicitly.
-		B :: {"\(k)": v for k, v in {f1: int}}
+		B :: {
+			for k, v in {f1: int} {
+				"\(k)": v
+			}
+		}
 
-		// To fix this, add all allowed fields.
-		C :: {f1: _, "\(k)": v for k, v in {f1: int}}
+		C :: {
+			f1: _
+			for k, v in {f1: int} {
+				"\(k)": v
+			}
+		}
 
-		// Or like this.
-		D :: {"\(k)": v for k, v in {f1: int}, ...}
+		D :: {
+			for k, v in {f1: int} {
+				"\(k)": v
+			}
+			...
+		}
 		`,
 		out: `<0>{` +
 			`A :: <1>C{f1: int, f2: int}, ` +
-			`a: _|_(int:field "f3" not allowed in closed struct), ` +
-			`B :: _|_(int:field "f1" not allowed in closed struct), ` +
-			`C :: <2>C{f1: int}, ` +
-			`D :: <3>{f1: int, ...}}`,
+			`B :: <2>C{f1: int}, ` +
+			`C :: <3>C{f1: int}, ` +
+			`D :: <4>{f1: int, ...}, ` +
+			`a: <5>C{f1: int, f2: int, f3: int}}`,
 	}, {
 		desc: "reference to root",
 		in: `
@@ -1563,7 +1575,9 @@ a: {
 			obj foo a: "bar"
 			obj <Name>: {
 				a: *"dummy" | string
-				sub as: a if true
+				if true {
+					sub as: a
+				}
 			}
 		`,
 		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield ("sub"): <4>{as: <3>.a}}, ` +
@@ -1855,7 +1869,13 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "field comprehension",
 		in: `
-			a: { "\(k)": v for k, v in b if k < "d" if v > b.a }
+			a: {
+				for k, v in b
+				if k < "d"
+				if v > b.a {
+					"\(k)": v
+				}
+			}
 			b: {
 				a: 1
 				b: 2
@@ -1863,25 +1883,32 @@ func TestFullEval(t *testing.T) {
 				d: 4
 			}
 			c: {
-				"\(k)": v <-
-					for k, v in b
-					if k < "d"
-					if v > b.a
+				for k, v in b
+				if k < "d"
+				if v > b.a {
+					"\(k)": v
+				}
 			}
 			`,
 		out: `<0>{a: <1>{b: 2, c: 3}, b: <2>{a: 1, b: 2, c: 3, d: 4}, c: <3>{b: 2, c: 3}}`,
 	}, {
 		desc: "conditional field",
 		in: `
-			a: "foo" if b
+			if b {
+				a: "foo"
+			}
 			b: true
 			c: {
 				a: 3
-				a: 3 if a > 1
+				if a > 1 {
+					a: 3
+				}
 			}
 			d: {
 				a: int
-				a: 3 if a > 1
+				if a > 1 {
+					a: 3
+				}
 			}
 		`,
 		out: `<0>{b: true, c: <1>{a: 3}, a: "foo", d: <2>{a: int if (<2>.a > 1) yield ("a"): 3}}`,
@@ -1891,7 +1918,9 @@ func TestFullEval(t *testing.T) {
 		a: { b c: 4 }
 		a: {
 			b d: 5
-			"\(k)": v for k, v in b
+			for k, v in b {
+				"\(k)": v
+			}
 		}
 		`,
 		out: `<0>{a: <1>{b: <2>{c: 4, d: 5}, c: 4, d: 5}}`,
@@ -1941,17 +1970,22 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "field comprehensions with multiple keys",
 		in: `
-			a "\(x.a)" b "\(x.b)": x for x in [
+			for x in [
 				{a: "A", b: "B" },
 				{a: "C", b: "D" },
 				{a: "E", b: "F" },
-			]
+			] {
+				a "\(x.a)" b "\(x.b)": x
+			}
 
-			"\(x.a)" "\(x.b)": x for x in [
+			for x in [
 				{a: "A", b: "B" },
 				{a: "C", b: "D" },
 				{a: "E", b: "F" },
-			]`,
+			] {
+				"\(x.a)" "\(x.b)": x
+			}
+			`,
 		out: `<0>{E: <1>{F: <2>{a: "E", b: "F"}}, ` +
 			`a: <3>{` +
 			`E: <4>{b: <5>{F: <6>{a: "E", b: "F"}}}, ` +
@@ -1972,10 +2006,12 @@ func TestFullEval(t *testing.T) {
 		in: `
 			num: 1
 			a: {
-				<A> <B>: {
-					name: A
-					kind: B
-				} if num < 5
+				if num < 5 {
+					<A> <B>: {
+						name: A
+						kind: B
+					}
+				}
 			}
 			a b c d: "bar"
 			`,
@@ -2053,7 +2089,7 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "resolutions in struct comprehension keys",
 		in: `
-			a: { "\(b + ".")": "a" for _, b in ["c"] }
+			a: { for _, b in ["c"] { "\(b + ".")": "a" } }
 			`,
 		out: `<0>{a: <1>{c.: "a"}}`,
 	}, {
@@ -2151,8 +2187,12 @@ func TestFullEval(t *testing.T) {
 		fib: {
 			n: int
 
-			out: (fibRec & {nn: n - 2}).out + (fibRec & {nn: n - 1}).out if n >= 2
-			out: n if n < 2
+			if n >= 2 {
+				out: (fibRec & {nn: n - 2}).out + (fibRec & {nn: n - 1}).out
+			}
+			if n < 2 {
+				out: n
+			}
 		}
 		fib2: (fib & {n: 2}).out
 		fib7: (fib & {n: 7}).out

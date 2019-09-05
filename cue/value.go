@@ -642,7 +642,7 @@ type structLit struct {
 	template value
 	isClosed bool
 
-	comprehensions []*fieldComprehension
+	comprehensions []value
 
 	// TODO: consider hoisting the template arc to its own value.
 	arcs     []arc
@@ -783,6 +783,10 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 	return x.arcs[i].cache
 }
 
+// expandFields merges in embedded and interpolated fields.
+// Such fields are semantically equivalent to child values, and thus
+// should not be evaluated until the other fields of a struct are
+// fully evaluated.
 func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	switch v := x.expanded.(type) {
 	case nil:
@@ -791,7 +795,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	default:
 		return nil, x.expanded.(*bottom)
 	}
-	if x.comprehensions == nil {
+	if len(x.comprehensions) == 0 {
 		x.expanded = x
 		return x, nil
 	}
@@ -803,38 +807,42 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	template := x.template
 	newArcs := []arc{}
 
-	for _, c := range comprehensions {
-		err := c.clauses.yield(ctx, func(k, v evaluated, opt, def bool) *bottom {
-			if !k.kind().isAnyOf(stringKind) {
-				return ctx.mkErr(k, "key must be of type string")
-			}
-			if c.isTemplate {
-				// TODO: disallow altogether or only when it refers to fields.
-				if template == nil {
-					template = v
-				} else {
-					template = mkBin(ctx, c.Pos(), opUnify, template, v)
+	for _, x := range comprehensions {
+		switch c := x.(type) {
+		case *fieldComprehension:
+			err := c.clauses.yield(ctx, func(k, v evaluated, opt, def bool) *bottom {
+				if !k.kind().isAnyOf(stringKind) {
+					return ctx.mkErr(k, "key must be of type string")
 				}
-				return nil
-			}
-			// TODO(perf): improve big O
-			f := ctx.label(k.strValue(), true)
-			for i, a := range newArcs {
-				if a.feature == f {
-					newArcs[i].v = mkBin(ctx, x.Pos(), opUnify, a.v, v)
+
+				if c.isTemplate {
+					// TODO: disallow altogether or only when it refers to fields.
+					if template == nil {
+						template = v
+					} else {
+						template = mkBin(ctx, c.Pos(), opUnify, template, v)
+					}
 					return nil
 				}
-			}
-			newArcs = append(newArcs, arc{
-				feature:    f,
-				optional:   opt,
-				definition: def,
-				v:          v,
+				// TODO(perf): improve big O
+				f := ctx.label(k.strValue(), true)
+				for i, a := range newArcs {
+					if a.feature == f {
+						newArcs[i].v = mkBin(ctx, x.Pos(), opUnify, a.v, v)
+						return nil
+					}
+				}
+				newArcs = append(newArcs, arc{
+					feature:    f,
+					optional:   opt,
+					definition: def,
+					v:          v,
+				})
+				return nil
 			})
-			return nil
-		})
-		if err != nil {
-			return nil, err
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 
@@ -845,7 +853,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	orig := *x
 	orig.comprehensions = nil
 
-	res := orig.binOp(ctx, x, opUnify, &structLit{
+	res := orig.binOp(ctx, x, opUnifyUnchecked, &structLit{
 		x.baseValue, // baseValue
 		emit,        // emit
 		template,    // template

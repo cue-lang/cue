@@ -776,8 +776,12 @@ func (v Value) Doc() []*ast.CommentGroup {
 }
 
 // Split returns a list of values from which v originated such that
-// the unification of all these values equals v and for all returned values
+// the unification of all these values equals v and for all returned values.
+// It will also split unchecked unifications (embeddings), so unifying the
+// split values may fail if actually unified.
 // Source returns a non-nil value.
+//
+// Deprecated: use Expr.
 func (v Value) Split() []Value {
 	if v.path == nil {
 		return nil
@@ -795,7 +799,7 @@ func (v Value) Split() []Value {
 
 func separate(v value) (a []value) {
 	c := v.computed()
-	if c == nil || c.op != opUnify {
+	if c == nil || (c.op != opUnify && c.op != opUnifyUnchecked) {
 		return []value{v}
 	}
 	if c.x != nil {

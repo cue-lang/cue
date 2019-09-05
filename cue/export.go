@@ -656,42 +656,45 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		obj.Elts = append(obj.Elts, f)
 	}
 
-	for _, c := range x.comprehensions {
-		var clauses []ast.Clause
-		next := c.clauses
-		for {
-			if yield, ok := next.(*yield); ok {
-				l := p.expr(yield.key)
-				label, ok := l.(ast.Label)
-				if !ok {
-					// TODO: add an invalid field instead?
-					continue
-				}
-				opt := token.NoPos
-				if yield.opt {
-					opt = token.NoSpace.Pos() // anything but token.NoPos
-				}
-				f := &ast.Field{
-					Label:    label,
-					Optional: opt,
-					Value:    p.expr(yield.value),
-				}
-				var decl ast.Decl = f
-				if len(clauses) > 0 {
-					decl = &ast.Comprehension{
-						Clauses: clauses,
-						Value: &ast.StructLit{
-							Elts: []ast.Decl{f},
-						},
+	for _, v := range x.comprehensions {
+		switch c := v.(type) {
+		case *fieldComprehension:
+			var clauses []ast.Clause
+			next := c.clauses
+			for {
+				if yield, ok := next.(*yield); ok {
+					l := p.expr(yield.key)
+					label, ok := l.(ast.Label)
+					if !ok {
+						// TODO: add an invalid field instead?
+						continue
 					}
+					opt := token.NoPos
+					if yield.opt {
+						opt = token.NoSpace.Pos() // anything but token.NoPos
+					}
+					f := &ast.Field{
+						Label:    label,
+						Optional: opt,
+						Value:    p.expr(yield.value),
+					}
+					var decl ast.Decl = f
+					if len(clauses) > 0 {
+						decl = &ast.Comprehension{
+							Clauses: clauses,
+							Value: &ast.StructLit{
+								Elts: []ast.Decl{f},
+							},
+						}
+					}
+					obj.Elts = append(obj.Elts, decl)
+					break
 				}
-				obj.Elts = append(obj.Elts, decl)
-				break
-			}
 
-			var y ast.Clause
-			y, next = p.clause(next)
-			clauses = append(clauses, y)
+				var y ast.Clause
+				y, next = p.clause(next)
+				clauses = append(clauses, y)
+			}
 		}
 	}
 	return obj, nil

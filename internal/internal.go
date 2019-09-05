@@ -20,6 +20,8 @@ package internal // import "cuelang.org/go/internal"
 // TODO: refactor packages as to make this package unnecessary.
 
 import (
+	"strconv"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 	"github.com/cockroachdb/apd/v2"
@@ -99,4 +101,36 @@ func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
 		}
 	}
 	return nil, "", f.Pos()
+}
+
+// LabelName reports the name of a label, if known, and whether it is valid.
+func LabelName(l ast.Label) (name string, ok bool) {
+	switch n := l.(type) {
+	case *ast.Ident:
+		str, err := ast.ParseIdent(n)
+		if err != nil {
+			return "", false
+		}
+		return str, true
+
+	case *ast.BasicLit:
+		switch n.Kind {
+		case token.STRING:
+			// Use strconv to only allow double-quoted, single-line strings.
+			if str, err := strconv.Unquote(n.Value); err == nil {
+				return str, true
+			}
+
+		case token.NULL, token.TRUE, token.FALSE:
+			return n.Value, true
+
+			// TODO: allow numbers to be fields?
+		}
+
+	case *ast.TemplateLabel:
+		return n.Ident.Name, false
+
+	}
+	// This includes interpolation.
+	return "", false
 }

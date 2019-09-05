@@ -22,6 +22,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // resolve resolves all identifiers in a file. Unresolved identifiers are
@@ -60,11 +61,10 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			if name, ok := ast.LabelName(x.Label); ok {
-				s.insert(name, x.Value)
-			}
+			name, _ := internal.LabelName(x.Label)
+			s.insert(name, x.Value)
 		case *ast.Alias:
-			name := x.Ident.Name
+			name, _ := internal.LabelName(x.Ident)
 			s.insert(name, x)
 			// Handle imports
 		}
@@ -73,6 +73,9 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 }
 
 func (s *scope) insert(name string, n ast.Node) {
+	if name == "" {
+		return
+	}
 	if _, existing := s.lookup(name); existing != nil {
 		_, isAlias1 := n.(*ast.Alias)
 		_, isAlias2 := existing.(*ast.Alias)
@@ -127,7 +130,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			walk(s, label)
 		case *ast.TemplateLabel:
 			s := newScope(s.file, s, x, nil)
-			name, _ := ast.LabelName(label)
+			name, _ := internal.LabelName(label)
 			s.insert(name, x.Label) // Field used for entire lambda.
 			walk(s, x.Value)
 			return nil
@@ -158,7 +161,11 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		return nil
 
 	case *ast.Ident:
-		if obj, node := s.lookup(x.Name); node != nil {
+		name, ok := internal.LabelName(x)
+		if !ok {
+			break
+		}
+		if obj, node := s.lookup(name); node != nil {
 			x.Node = node
 			x.Scope = obj
 		} else {
@@ -175,9 +182,11 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			walk(s, f.Source)
 			s = newScope(s.file, s, f, nil)
 			if f.Key != nil {
-				s.insert(f.Key.Name, f.Key)
+				name, _ := internal.LabelName(f.Key)
+				s.insert(name, f.Key)
 			}
-			s.insert(f.Value.Name, f.Value)
+			name, _ := internal.LabelName(f.Value)
+			s.insert(name, f.Value)
 		} else {
 			walk(s, c)
 		}

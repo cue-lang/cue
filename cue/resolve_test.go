@@ -570,6 +570,23 @@ func TestResolve(t *testing.T) {
 			`,
 		out: "<0>{a: 3, b: <1>{c: <2>{d: 3}}, c: <3>{c: 2}, d: <4>{d: 2}}",
 	}, {
+		in:  "`foo-bar`: 3\n x: `foo-bar`,",
+		out: `<0>{foo-bar: 3, x: 3}`,
+	}, {
+		desc: "resolution of quoted identifiers",
+		in: `
+		package foo
+
+` + "`foo-bar`" + `: 2
+"baz":     ` + "`foo-bar`" + `
+
+a: {
+	qux:        3
+	` + "`qux-quux`" + `: qux
+	"qaz":      ` + "`qux-quux`" + `
+}`,
+		out: "<0>{foo-bar: 2, baz: 2, a: <1>{qux: 3, qux-quux: 3, qaz: 3}}",
+	}, {
 		in: `
 			a: _
 			b: a

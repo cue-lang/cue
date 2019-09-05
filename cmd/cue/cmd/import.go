@@ -655,7 +655,7 @@ func (h *hoister) hoist(expr ast.Expr) {
 		name := ""
 		switch x := n.(type) {
 		case *ast.Field:
-			name, _ = ast.LabelName(x.Label)
+			name, _ = internal.LabelName(x.Label)
 		case *ast.Alias:
 			name = x.Ident.Name
 		}
@@ -682,7 +682,7 @@ func (h *hoister) hoist(expr ast.Expr) {
 				continue
 			}
 
-			name, ident := ast.LabelName(f.Label)
+			name, ident := internal.LabelName(f.Label)
 			if name == "" || !ident {
 				continue
 			}

@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
@@ -285,6 +286,36 @@ func (s *Scanner) scanIdentifier() string {
 		s.next()
 	}
 	return string(s.src[offs:s.offset])
+}
+
+func isExtendedIdent(r rune) bool {
+	return strings.IndexRune("-_#$%. ", r) >= 0
+}
+
+func (s *Scanner) scanQuotedIdentifier() string {
+	offs := s.offset - 1 // quote already consumed
+	hasInvalid := false
+	for ; ; s.next() {
+		switch {
+		default:
+			if !hasInvalid {
+				s.errf(s.offset, "invalid character '%s' in identifier", string(s.ch))
+				hasInvalid = true
+			}
+			continue
+
+		case isLetter(s.ch) || isDigit(s.ch) || isExtendedIdent(s.ch):
+			continue
+
+		case s.ch == '`':
+			s.next()
+			return string(s.src[offs:s.offset])
+
+		case s.ch == '\n':
+			s.errf(s.offset, "quoted identifier not terminated")
+			return string(s.src[offs:s.offset])
+		}
+	}
 }
 
 func digitVal(ch rune) int {
@@ -815,6 +846,11 @@ scanAgain:
 				lit = "_" + s.scanIdentifier()
 			}
 			insertEOL = true
+		case '`':
+			tok = token.IDENT
+			lit = s.scanQuotedIdentifier()
+			insertEOL = true
+
 		case '\n':
 			// we only reach here if s.insertComma was
 			// set in the first place and exited early

@@ -107,6 +107,9 @@ func (p *printer) Print(v interface{}) {
 
 	case *ast.Ident:
 		data = x.Name
+		if q, err := ast.QuoteIdent(data); err == nil {
+			data = q
+		}
 		impliedComma = true
 		p.lastTok = token.IDENT
 

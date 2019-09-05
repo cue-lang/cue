@@ -145,7 +145,8 @@ func (v *astVisitor) appendPath(a []string) []string {
 
 func (v *astVisitor) resolve(n *ast.Ident) value {
 	ctx := v.ctx()
-	label := v.label(n.Name, true)
+	name := v.ident(n)
+	label := v.label(name, true)
 	if r := v.resolveRoot; r != nil {
 		for _, a := range r.arcs {
 			if a.feature == label {
@@ -154,7 +155,7 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 			}
 		}
 		if v.inSelector > 0 {
-			if p := getBuiltinShorthandPkg(ctx, n.Name); p != nil {
+			if p := getBuiltinShorthandPkg(ctx, name); p != nil {
 				return &nodeRef{newExpr(n), p, label}
 			}
 		}
@@ -179,6 +180,15 @@ func (v *astVisitor) loadImport(imp *ast.ImportSpec) evaluated {
 	}
 	impInst := v.index.loadInstance(bimp)
 	return impInst.rootValue.evalPartial(ctx)
+}
+
+func (v *astVisitor) ident(n *ast.Ident) string {
+	str, err := ast.ParseIdent(n)
+	if err != nil {
+		v.errf(n, "invalid literal: %v", err)
+		return n.Name
+	}
+	return str
 }
 
 // We probably don't need to call Walk.s
@@ -326,7 +336,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 		case *ast.TemplateLabel:
 			v.sel = "*"
-			f := v.label(x.Ident.Name, true)
+			f := v.label(v.ident(x.Ident), true)
 
 			sig := &params{}
 			sig.add(f, &basicType{newNode(field.Label), stringKind})
@@ -338,7 +348,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			fc.isTemplate = true
 
 		case *ast.BasicLit, *ast.Ident:
-			name, ok := ast.LabelName(x)
+			name, ok := internal.LabelName(x)
 			if !ok {
 				return v.errf(x, "invalid field name: %v", x)
 			}
@@ -374,6 +384,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		opt := n.Optional != token.NoPos
 		isDef := n.Token == token.ISA
 		if isDef {
+			if opt {
+				v.errf(n, "a definition may not be optional")
+			}
 			ctx := v.ctx()
 			ctx.inDefinition++
 			defer func() { ctx.inDefinition-- }()
@@ -397,7 +410,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				v.errf(x, "map element type cannot be a definition")
 			}
 			v.sel = "*"
-			f := v.label(x.Ident.Name, true)
+			f := v.label(v.ident(x.Ident), true)
 
 			sig := &params{}
 			sig.add(f, &basicType{newNode(n.Label), stringKind})
@@ -412,7 +425,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			if internal.DropOptional && opt {
 				break
 			}
-			v.sel, _ = ast.LabelName(x)
+			v.sel, _ = internal.LabelName(x)
 			if v.sel == "_" {
 				if _, ok := x.(*ast.BasicLit); ok {
 					v.sel = "*"
@@ -459,7 +472,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 	// Expressions
 	case *ast.Ident:
-		if n.Name == "_" {
+		name := v.ident(n)
+
+		if name == "_" {
 			ret = &top{newNode(n)}
 			break
 		}
@@ -469,7 +484,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				break
 			}
 
-			switch n.Name {
+			switch name {
 			case "_":
 				return &top{newExpr(n)}
 			case "string":
@@ -496,11 +511,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			case "or":
 				return orBuiltin
 			}
-			if r, ok := predefinedRanges[n.Name]; ok {
+			if r, ok := predefinedRanges[name]; ok {
 				return r
 			}
 
-			ret = v.errf(n, "reference %q not found", n.Name)
+			ret = v.errf(n, "reference %q not found", name)
 			break
 		}
 
@@ -512,7 +527,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			break
 		}
 
-		f := v.label(n.Name, true)
+		f := v.label(name, true)
 		if n.Scope != nil {
 			n2 := v.mapScope(n.Scope)
 			if l, ok := n2.(*lambdaExpr); ok && len(l.params.arcs) == 1 {
@@ -589,7 +604,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		ret = &selectorExpr{
 			newExpr(n),
 			v.walk(n.X),
-			v.label(n.Sel.Name, true),
+			v.label(v.ident(n.Sel), true),
 		}
 		v.inSelector--
 
@@ -702,12 +717,12 @@ func wrapClauses(v *astVisitor, y yielder, clauses []ast.Clause) yielder {
 
 			key := "_"
 			if n.Key != nil {
-				key = n.Key.Name
+				key = v.ident(n.Key)
 			}
 			f := v.label(key, true)
 			fn.add(f, &basicType{newExpr(n.Key), stringKind | intKind})
 
-			f = v.label(n.Value.Name, true)
+			f = v.label(v.ident(n.Value), true)
 			fn.add(f, &top{})
 
 			y = &feed{newExpr(n.Source), v.walk(n.Source), fn}

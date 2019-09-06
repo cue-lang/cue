@@ -51,7 +51,6 @@ func printConfig(t *testing.T) *errors.Config {
 
 func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 	t.Helper()
-	log.SetFlags(0)
 
 	const dir = "./testdata"
 

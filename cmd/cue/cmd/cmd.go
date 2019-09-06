@@ -211,12 +211,13 @@ An example using pipes:
 
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
+			w := cmd.Stderr()
 			if len(args) == 0 {
-				fmt.Println("cmd must be run as one of its subcommands")
+				fmt.Fprintln(w, "cmd must be run as one of its subcommands")
 			} else {
-				fmt.Printf("cmd must be run as one of its subcommands: unknown subcommand %q\n", args[0])
+				fmt.Fprintf(w, "cmd must be run as one of its subcommands: unknown subcommand %q\n", args[0])
 			}
-			fmt.Println("Run 'cue help cmd' for known subcommands.")
+			fmt.Fprintln(w, "Run 'cue help cmd' for known subcommands.")
 			os.Exit(1) // TODO: get rid of this
 			return nil
 		}),

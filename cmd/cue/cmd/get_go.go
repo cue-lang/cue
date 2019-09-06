@@ -337,7 +337,7 @@ func extract(cmd *Command, args []string) error {
 
 	e := extractor{
 		cmd:    cmd,
-		stderr: cmd.OutOrStderr(),
+		stderr: cmd.Stderr(),
 		pkgs:   pkgs,
 		orig:   map[types.Type]*ast.StructType{},
 	}
@@ -474,8 +474,9 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		b, err := format.Source(w.Bytes())
 		if err != nil {
 			_ = ioutil.WriteFile(filepath.Join(dir, file), w.Bytes(), 0644)
-			fmt.Println(w.String())
-			fmt.Println(dir, file)
+			stderr := e.cmd.Stderr()
+			fmt.Fprintln(stderr, w.String())
+			fmt.Fprintln(stderr, dir, file)
 			return err
 		}
 		err = ioutil.WriteFile(filepath.Join(dir, file), b, 0644)
@@ -894,7 +895,7 @@ func (e *extractor) printType(expr types.Type) {
 
 	case *types.Map:
 		if b, ok := x.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
-			log.Panicf("unsupported map key type %T", x.Key())
+			panic(fmt.Sprintf("unsupported map key type %T", x.Key()))
 		}
 		fmt.Fprintf(e.w, "{ <_>: ")
 		e.printType(x.Elem())

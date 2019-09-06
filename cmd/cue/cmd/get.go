@@ -36,12 +36,13 @@ The specifics on how dependencies are fechted and converted vary
 per language and are documented in the respective subcommands.
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
+			stderr := cmd.Stderr()
 			if len(args) == 0 {
-				fmt.Println("get must be run as one of its subcommands")
+				fmt.Fprintln(stderr, "get must be run as one of its subcommands")
 			} else {
-				fmt.Printf("get must be run as one of its subcommands: unknown subcommand %q\n", args[0])
+				fmt.Fprintf(stderr, "get must be run as one of its subcommands: unknown subcommand %q\n", args[0])
 			}
-			fmt.Println("Run 'cue help get' for known subcommands.")
+			fmt.Fprintln(stderr, "Run 'cue help get' for known subcommands.")
 			os.Exit(1) // TODO: get rid of this
 			return nil
 		}),

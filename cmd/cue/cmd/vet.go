@@ -119,7 +119,7 @@ func doVet(cmd *Command, args []string) error {
 			cue.Optional(true),
 			cue.Hidden(true),
 		}
-		w := cmd.OutOrStderr()
+		w := cmd.Stderr()
 		err := inst.Value().Validate(append(opt, cue.Concrete(concrete))...)
 		if err != nil && !hasFlag {
 			err = inst.Value().Validate(append(opt, cue.Concrete(false))...)

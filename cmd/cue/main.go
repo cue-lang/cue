@@ -25,7 +25,9 @@ import (
 func main() {
 	err := cmd.Main(context.Background(), os.Args[1:])
 	if err != nil {
-		fmt.Println(err)
+		if err != cmd.ErrPrintedError {
+			fmt.Println(err)
+		}
 		os.Exit(1)
 	}
 }

@@ -18,7 +18,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	logger "log"
 	"os"
 	"strings"
 
@@ -38,8 +37,6 @@ import (
 //
 // TODO: documentation of concepts
 //   tasks     the key element for cmd, serve, and fix
-
-var log = logger.New(os.Stderr, "", logger.Lshortfile)
 
 type runFunction func(cmd *Command, args []string) error
 
@@ -125,7 +122,36 @@ type Command struct {
 
 	// Subcommands
 	cmd *cobra.Command
+
+	hasErr bool
 }
+
+type errWriter Command
+
+func (w *errWriter) Write(b []byte) (int, error) {
+	c := (*Command)(w)
+	c.hasErr = true
+	return c.Command.OutOrStderr().Write(b)
+}
+
+// Hint: search for uses of OutOrStderr other than the one here to see
+// which output does not trigger a non-zero exit code. os.Stderr may never
+// be used directly.
+
+// Stderr returns a writer that should be used for error messages.
+func (c *Command) Stderr() io.Writer {
+	return (*errWriter)(c)
+}
+
+// TODO: add something similar for Stdout. The output model of Cobra isn't
+// entirely clear, and such a change seems non-trivial.
+
+// Consider overriding these methods from Cobra using OutOrStdErr.
+// We don't use them currently, but may be safer to block. Having them
+// will encourage their usage, and the naming is inconsistent with other CUE APIs.
+// PrintErrf(format string, args ...interface{})
+// PrintErrln(args ...interface{})
+// PrintErr(args ...interface{})
 
 func (c *Command) SetOutput(w io.Writer) {
 	c.root.SetOutput(w)
@@ -136,8 +162,10 @@ func (c *Command) SetInput(r io.Reader) {
 	stdin = r
 }
 
+// ErrPrintedError indicates error messages have been printed to stderr.
+var ErrPrintedError = errors.New("terminating because of errors")
+
 func (c *Command) Run(ctx context.Context) (err error) {
-	log.SetFlags(0)
 	// Three categories of commands:
 	// - normal
 	// - user defined
@@ -145,7 +173,13 @@ func (c *Command) Run(ctx context.Context) (err error) {
 	// For the latter two, we need to use the default loading.
 	defer recoverError(&err)
 
-	return c.root.Execute()
+	if err := c.root.Execute(); err != nil {
+		return err
+	}
+	if c.hasErr {
+		return ErrPrintedError
+	}
+	return nil
 }
 
 func recoverError(err *error) {
@@ -199,8 +233,9 @@ func New(args []string) (cmd *Command, err error) {
 	}
 	_, err = addCustom(cmd, rootCmd, commandSection, args[0], tools)
 	if err != nil {
-		fmt.Printf("command %s %q is not defined\n", commandSection, args[0])
-		fmt.Println("Run 'cue help' to show available commands.")
+		stderr := cmd.Stderr()
+		fmt.Fprintf(stderr, "command %s %q is not defined\n", commandSection, args[0])
+		fmt.Println(stderr, "Run 'cue help' to show available commands.")
 		os.Exit(1)
 	}
 	return cmd, nil

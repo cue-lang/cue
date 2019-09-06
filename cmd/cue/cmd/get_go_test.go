@@ -42,7 +42,7 @@ func TestGetGo(t *testing.T) {
 	cmd.SetArgs([]string{"./testdata/code/go/..."})
 	err = cmd.Execute()
 	if err != nil {
-		log.Fatal(err)
+		t.Fatal(err)
 	}
 
 	// Packages will generate differently in modules versus GOPATH. Search

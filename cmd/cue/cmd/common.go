@@ -74,7 +74,7 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	})
 
 	b := w.Bytes()
-	_, _ = cmd.OutOrStderr().Write(b)
+	_, _ = cmd.Stderr().Write(b)
 	if fatal {
 		exit()
 	}
@@ -89,7 +89,6 @@ func buildFromArgs(cmd *Command, args []string) []*cue.Instance {
 }
 
 func loadFromArgs(cmd *Command, args []string) []*build.Instance {
-	log.SetOutput(cmd.OutOrStderr())
 	binst := load.Instances(args, nil)
 	if len(binst) == 0 {
 		return nil

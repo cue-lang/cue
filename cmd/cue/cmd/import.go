@@ -251,8 +251,6 @@ func getExtInfo(ext string) *encodingInfo {
 }
 
 func runImport(cmd *Command, args []string) error {
-	log.SetOutput(cmd.OutOrStderr())
-
 	var group errgroup.Group
 
 	pkgFlag := flagPackage.String(cmd)
@@ -391,7 +389,10 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 		case os.IsNotExist(err):
 		case err == nil:
 			if !flagForce.Bool(cmd) {
-				log.Printf("skipping file %q: already exists", cueFile)
+				// TODO: mimic old behavior: write to stderr, but do not exit
+				// with error code. Consider what is best to do here.
+				stderr := cmd.Command.OutOrStderr()
+				fmt.Fprintf(stderr, "skipping file %q: already exists\n", cueFile)
 				return nil
 			}
 		default:

@@ -41,7 +41,7 @@ func TestCmd(t *testing.T) {
 		c := newRootCmd()
 		run := func(cmd *cobra.Command, args []string) error {
 			stdout = cmd.OutOrStdout()
-			stderr = cmd.OutOrStderr()
+			stderr = c.Stderr()
 
 			tools, _ := buildTools(c, args)
 			cmd, err := addCustom(c, c.root, "command", name, tools)

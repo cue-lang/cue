@@ -195,7 +195,7 @@ type originalFile struct {
 func restoreOriginals(cmd *Command, originals []originalFile) {
 	for _, fo := range originals {
 		if err := fo.restore(); err != nil {
-			fmt.Fprintln(cmd.OutOrStderr(), "Error restoring file: ", err)
+			fmt.Fprintln(cmd.Stderr(), "Error restoring file: ", err)
 		}
 	}
 }

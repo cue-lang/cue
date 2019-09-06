@@ -69,17 +69,17 @@ func addGlobalFlags(f *pflag.FlagSet) {
 
 type flagName string
 
-func (f flagName) Bool(cmd *cobra.Command) bool {
+func (f flagName) Bool(cmd *Command) bool {
 	v, _ := cmd.Flags().GetBool(string(f))
 	return v
 }
 
-func (f flagName) String(cmd *cobra.Command) string {
+func (f flagName) String(cmd *Command) string {
 	v, _ := cmd.Flags().GetString(string(f))
 	return v
 }
 
-func (f flagName) StringArray(cmd *cobra.Command) []string {
+func (f flagName) StringArray(cmd *Command) []string {
 	v, _ := cmd.Flags().GetStringArray(string(f))
 	return v
 }
@@ -95,7 +95,7 @@ func (f *stringFlag) Add(cmd *cobra.Command) {
 	cmd.Flags().StringP(f.name, f.short, f.def, f.text)
 }
 
-func (f *stringFlag) String(cmd *cobra.Command) string {
+func (f *stringFlag) String(cmd *Command) string {
 	v, err := cmd.Flags().GetString(f.name)
 	if err != nil {
 		return f.def

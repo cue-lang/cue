@@ -25,7 +25,7 @@ import (
 )
 
 // newEvalCmd creates a new eval command
-func newEvalCmd() *cobra.Command {
+func newEvalCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "eval",
 		Short: "evaluate and print a configuration",
@@ -46,7 +46,7 @@ Examples:
   "a"
   "c"
 `,
-		RunE: runEval,
+		RunE: mkRunE(c, runEval),
 	}
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
@@ -77,7 +77,7 @@ const (
 	flagAttributes flagName = "attributes"
 )
 
-func runEval(cmd *cobra.Command, args []string) error {
+func runEval(cmd *Command, args []string) error {
 	instances := buildFromArgs(cmd, args)
 
 	var exprs []ast.Expr

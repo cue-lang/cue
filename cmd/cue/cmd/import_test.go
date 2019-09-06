@@ -19,22 +19,22 @@ import (
 )
 
 func TestImport(t *testing.T) {
-	cmd := newImportCmd()
+	cmd := newImportCmd(newRootCmd())
 	mustParseFlags(t, cmd,
 		"-o", "-", "-f", "--files")
 	runCommand(t, cmd, "import_files")
 
-	cmd = newImportCmd()
+	cmd = newImportCmd(newRootCmd())
 	mustParseFlags(t, cmd,
 		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))" "\(name)"`)
 	runCommand(t, cmd, "import_path")
 
-	cmd = newImportCmd()
+	cmd = newImportCmd(newRootCmd())
 	mustParseFlags(t, cmd,
 		"-o", "-", "-f", "-l", `"\(strings.ToLower(kind))"`, "--list")
 	runCommand(t, cmd, "import_list")
 
-	cmd = newImportCmd()
+	cmd = newImportCmd(newRootCmd())
 	mustParseFlags(t, cmd,
 		"-o", "-", "-f", "--list",
 		"-l", `"\(strings.ToLower(kind))" "\(name)"`, "--recursive")

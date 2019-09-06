@@ -41,6 +41,15 @@ import (
 
 var log = logger.New(os.Stderr, "", logger.Lshortfile)
 
+type runFunction func(cmd *Command, args []string) error
+
+func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		c.Command = cmd
+		return f(c, args)
+	}
+}
+
 // newRootCmd creates the base command when called without any subcommands
 func newRootCmd() *Command {
 	cmd := &cobra.Command{
@@ -69,19 +78,22 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		SilenceUsage: true,
 	}
 
-	cmdCmd := newCmdCmd()
+	c := &Command{Command: cmd, root: cmd}
+
+	cmdCmd := newCmdCmd(c)
+	c.cmd = cmdCmd
 
 	subCommands := []*cobra.Command{
-		newTrimCmd(),
-		newImportCmd(),
-		newEvalCmd(),
-		newGetCmd(),
-		newFmtCmd(),
-		newExportCmd(),
+		newTrimCmd(c),
+		newImportCmd(c),
+		newEvalCmd(c),
+		newGetCmd(c),
+		newFmtCmd(c),
+		newExportCmd(c),
 		cmdCmd,
-		newVersionCmd(),
-		newVetCmd(),
-		newAddCmd(),
+		newVersionCmd(c),
+		newVetCmd(c),
+		newAddCmd(c),
 	}
 
 	addGlobalFlags(cmd.PersistentFlags())
@@ -90,7 +102,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		cmd.AddCommand(sub)
 	}
 
-	return &Command{root: cmd, cmd: cmdCmd}
+	return c
 }
 
 // Main runs the cue tool. It loads the tool flags.
@@ -106,6 +118,9 @@ func Main(ctx context.Context, args []string) (err error) {
 }
 
 type Command struct {
+	// The currently active command.
+	*cobra.Command
+
 	root *cobra.Command
 
 	// Subcommands
@@ -178,11 +193,11 @@ func New(args []string) (cmd *Command, err error) {
 		return cmd, nil // Forces unknown command message from Cobra.
 	}
 
-	tools, err := buildTools(rootCmd, args[1:])
+	tools, err := buildTools(cmd, args[1:])
 	if err != nil {
 		return cmd, err
 	}
-	_, err = addCustom(rootCmd, commandSection, args[0], tools)
+	_, err = addCustom(cmd, rootCmd, commandSection, args[0], tools)
 	if err != nil {
 		fmt.Printf("command %s %q is not defined\n", commandSection, args[0])
 		fmt.Println("Run 'cue help' to show available commands.")
@@ -212,7 +227,7 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error 
 		args = args[1:]
 	}
 
-	tools, err := buildTools(cmd.root, args)
+	tools, err := buildTools(cmd, args)
 	if err != nil {
 		return err
 	}
@@ -230,7 +245,7 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error 
 			return errors.Newf(token.NoPos, "could not create command definitions: %v", err)
 		}
 		for i.Next() {
-			_, _ = addCustom(spec.cmd, spec.name, i.Label(), tools)
+			_, _ = addCustom(cmd, spec.cmd, spec.name, i.Label(), tools)
 		}
 	}
 	return nil

@@ -42,7 +42,7 @@ import (
 	"golang.org/x/sync/errgroup"
 )
 
-func newImportCmd() *cobra.Command {
+func newImportCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "import",
 		Short: "convert other data formats to CUE files",
@@ -193,7 +193,7 @@ Example:
       }
   }
 `,
-		RunE: runImport,
+		RunE: mkRunE(c, runImport),
 	}
 
 	flagOut.Add(cmd)
@@ -220,7 +220,7 @@ const (
 )
 
 type importStreamFunc func(path string, r io.Reader) ([]ast.Expr, error)
-type importFileFunc func(cmd *cobra.Command, path string, r io.Reader) (*ast.File, error)
+type importFileFunc func(cmd *Command, path string, r io.Reader) (*ast.File, error)
 
 type encodingInfo struct {
 	fnStream importStreamFunc
@@ -250,7 +250,7 @@ func getExtInfo(ext string) *encodingInfo {
 	return nil
 }
 
-func runImport(cmd *cobra.Command, args []string) error {
+func runImport(cmd *Command, args []string) error {
 	log.SetOutput(cmd.OutOrStderr())
 
 	var group errgroup.Group
@@ -307,7 +307,7 @@ func runImport(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func handleFile(cmd *cobra.Command, pkg, filename string) (err error) {
+func handleFile(cmd *Command, pkg, filename string) (err error) {
 	re, err := regexp.Compile(flagGlob.String(cmd))
 	if err != nil {
 		return err
@@ -348,7 +348,7 @@ func handleFile(cmd *cobra.Command, pkg, filename string) (err error) {
 	}
 }
 
-func processFile(cmd *cobra.Command, file *ast.File) (err error) {
+func processFile(cmd *Command, file *ast.File) (err error) {
 	name := file.Filename + ".cue"
 
 	b, err := format.Node(file)
@@ -359,7 +359,7 @@ func processFile(cmd *cobra.Command, file *ast.File) (err error) {
 	return ioutil.WriteFile(name, b, 0644)
 }
 
-func processStream(cmd *cobra.Command, pkg, filename string, objs []ast.Expr) error {
+func processStream(cmd *Command, pkg, filename string, objs []ast.Expr) error {
 	if flagFiles.Bool(cmd) {
 		for i, f := range objs {
 			err := combineExpressions(cmd, pkg, newName(filename, i), f)
@@ -379,7 +379,7 @@ func processStream(cmd *cobra.Command, pkg, filename string, objs []ast.Expr) er
 // TODO: implement a more fine-grained approach.
 var mutex sync.Mutex
 
-func combineExpressions(cmd *cobra.Command, pkg, cueFile string, objs ...ast.Expr) error {
+func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -640,7 +640,7 @@ func handleYAML(path string, r io.Reader) (objects []ast.Expr, err error) {
 	return objects, nil
 }
 
-func handleProtoDef(cmd *cobra.Command, path string, r io.Reader) (f *ast.File, err error) {
+func handleProtoDef(cmd *Command, path string, r io.Reader) (f *ast.File, err error) {
 	return protobuf.Extract(path, r, &protobuf.Config{Paths: flagProtoPath.StringArray(cmd)})
 }
 

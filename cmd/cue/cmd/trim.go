@@ -35,7 +35,7 @@ import (
 // - implement verification post-processing as extra safety
 
 // newTrimCmd creates a trim command
-func newTrimCmd() *cobra.Command {
+func newTrimCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "trim",
 		Short: "remove superfluous fields",
@@ -84,14 +84,14 @@ Examples:
 It is guaranteed that the resulting files give the same output as before the
 removal.
 `,
-		RunE: runTrim,
+		RunE: mkRunE(c, runTrim),
 	}
 
 	flagOut.Add(cmd)
 	return cmd
 }
 
-func runTrim(cmd *cobra.Command, args []string) error {
+func runTrim(cmd *Command, args []string) error {
 	// TODO: Do something more fine-grained. Optional fields are mostly not
 	// useful to consider as an optional field will almost never subsume
 	// another value. However, an optional field may subsume and therefore
@@ -167,14 +167,14 @@ func runTrim(cmd *cobra.Command, args []string) error {
 }
 
 type trimSet struct {
-	cmd       *cobra.Command
+	cmd       *Command
 	stack     []string
 	exclude   map[ast.Node]bool // don't remove fields marked here
 	alwaysGen map[ast.Node]bool // node is always from a generated source
 	fromComp  map[ast.Node]bool // node originated from a comprehension
 }
 
-func newTrimSet(cmd *cobra.Command) *trimSet {
+func newTrimSet(cmd *Command) *trimSet {
 	return &trimSet{
 		cmd:       cmd,
 		exclude:   map[ast.Node]bool{},

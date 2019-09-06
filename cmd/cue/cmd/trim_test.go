@@ -19,7 +19,7 @@ import (
 )
 
 func TestTrim(t *testing.T) {
-	cmd := newTrimCmd()
+	cmd := newTrimCmd(newRootCmd())
 	mustParseFlags(t, cmd, "-o", "-")
 	runCommand(t, cmd, "trim")
 }

@@ -38,13 +38,13 @@ func TestCmd(t *testing.T) {
 		stderr = os.Stderr
 	}()
 	for _, name := range testCases {
-		rootCmd := newRootCmd().root
+		c := newRootCmd()
 		run := func(cmd *cobra.Command, args []string) error {
 			stdout = cmd.OutOrStdout()
 			stderr = cmd.OutOrStderr()
 
-			tools, _ := buildTools(rootCmd, args)
-			cmd, err := addCustom(rootCmd, "command", name, tools)
+			tools, _ := buildTools(c, args)
+			cmd, err := addCustom(c, c.root, "command", name, tools)
 			if err != nil {
 				return err
 			}

@@ -24,7 +24,7 @@ import (
 )
 
 // newExportCmd creates and export command
-func newExportCmd() *cobra.Command {
+func newExportCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "export",
 		Short: "output data in a standard format",
@@ -86,7 +86,7 @@ text    output as raw text
         The evaluated value must be of type string.
 `,
 
-		RunE: runExport,
+		RunE: mkRunE(c, runExport),
 	}
 	flagMedia.Add(cmd)
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
@@ -94,7 +94,7 @@ text    output as raw text
 	return cmd
 }
 
-func runExport(cmd *cobra.Command, args []string) error {
+func runExport(cmd *Command, args []string) error {
 	instances := buildFromArgs(cmd, args)
 	w := cmd.OutOrStdout()
 
@@ -117,7 +117,7 @@ func runExport(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func outputJSON(cmd *cobra.Command, w io.Writer, v cue.Value) error {
+func outputJSON(cmd *Command, w io.Writer, v cue.Value) error {
 	e := json.NewEncoder(w)
 	e.SetIndent("", "    ")
 	e.SetEscapeHTML(flagEscape.Bool(cmd))

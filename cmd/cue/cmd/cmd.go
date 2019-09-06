@@ -23,7 +23,7 @@ import (
 
 // TODO: generate long description from documentation.
 
-func newCmdCmd() *cobra.Command {
+func newCmdCmd(c *Command) *cobra.Command {
 	return &cobra.Command{
 		Use:   "cmd <name> [-x] [instances]",
 		Short: "run a user-defined shell command",
@@ -210,7 +210,7 @@ An example using pipes:
 	}
 
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			if len(args) == 0 {
 				fmt.Println("cmd must be run as one of its subcommands")
 			} else {
@@ -219,6 +219,6 @@ An example using pipes:
 			fmt.Println("Run 'cue help cmd' for known subcommands.")
 			os.Exit(1) // TODO: get rid of this
 			return nil
-		},
+		}),
 	}
 }

@@ -58,7 +58,7 @@ var (
 	stderr io.Writer = os.Stderr
 )
 
-func addCustom(parent *cobra.Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
+func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
 	if tools == nil {
 		return nil, errors.New("no commands defined")
 	}
@@ -77,13 +77,13 @@ func addCustom(parent *cobra.Command, typ, name string, tools *cue.Instance) (*c
 		Use:   usage,
 		Short: lookupString(o, "short"),
 		Long:  lookupString(o, "long"),
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			// TODO:
 			// - parse flags and env vars
 			// - constrain current config with config section
 
 			return doTasks(cmd, typ, name, tools)
-		},
+		}),
 	}
 	parent.AddCommand(sub)
 
@@ -121,7 +121,7 @@ func (k *taskKey) lookupTasks(root *cue.Instance) cue.Value {
 	return root.Lookup(k.typ, k.name, taskSection)
 }
 
-func doTasks(cmd *cobra.Command, typ, command string, root *cue.Instance) error {
+func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 	err := executeTasks(typ, command, root)
 	exitIfErr(cmd, root, err, true)
 	return err

@@ -121,5 +121,5 @@ func runCommand(t *testing.T, cmd *cobra.Command, name string, args ...string) {
 }
 
 func TestLoadError(t *testing.T) {
-	runCommand(t, newEvalCmd(), "loaderr", "non-existing", ".")
+	runCommand(t, newEvalCmd(newRootCmd()), "loaderr", "non-existing", ".")
 }

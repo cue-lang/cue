@@ -50,7 +50,7 @@ import (
 //   package foo
 //   Type: enumType
 
-func newGoCmd() *cobra.Command {
+func newGoCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "go [packages]",
 		Short: "add Go dependencies to the current module",
@@ -201,9 +201,7 @@ the more restrictive enum interpretation of Switch remains.
 `,
 		// - TODO: interpret cuego's struct tags and annotations.
 
-		RunE: func(cmd *cobra.Command, args []string) error {
-			return extract(cmd, args)
-		},
+		RunE: mkRunE(c, extract),
 	}
 
 	cmd.Flags().StringP(string(flagExclude), "e", "",
@@ -240,7 +238,7 @@ func (e *extractor) filter(name string) bool {
 }
 
 type extractor struct {
-	cmd *cobra.Command
+	cmd *Command
 
 	stderr io.Writer
 	pkgs   []*packages.Package
@@ -313,7 +311,7 @@ var (
 // TODO:
 // - consider not including types with any dropped fields.
 
-func extract(cmd *cobra.Command, args []string) error {
+func extract(cmd *Command, args []string) error {
 	// determine module root:
 	binst := loadFromArgs(cmd, []string{"."})[0]
 

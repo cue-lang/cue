@@ -40,7 +40,7 @@ func mustParseFlags(t *testing.T, cmd *cobra.Command, flags ...string) {
 	}
 }
 
-func exitIfErr(cmd *cobra.Command, inst *cue.Instance, err error, fatal bool) {
+func exitIfErr(cmd *Command, inst *cue.Instance, err error, fatal bool) {
 	exitOnErr(cmd, err, fatal)
 }
 
@@ -53,7 +53,7 @@ func getLang() language.Tag {
 	return language.Make(loc)
 }
 
-func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
+func exitOnErr(cmd *Command, err error, fatal bool) {
 	if err == nil {
 		return
 	}
@@ -80,7 +80,7 @@ func exitOnErr(cmd *cobra.Command, err error, fatal bool) {
 	}
 }
 
-func buildFromArgs(cmd *cobra.Command, args []string) []*cue.Instance {
+func buildFromArgs(cmd *Command, args []string) []*cue.Instance {
 	binst := loadFromArgs(cmd, args)
 	if binst == nil {
 		return nil
@@ -88,7 +88,7 @@ func buildFromArgs(cmd *cobra.Command, args []string) []*cue.Instance {
 	return buildInstances(cmd, binst)
 }
 
-func loadFromArgs(cmd *cobra.Command, args []string) []*build.Instance {
+func loadFromArgs(cmd *Command, args []string) []*build.Instance {
 	log.SetOutput(cmd.OutOrStderr())
 	binst := load.Instances(args, nil)
 	if len(binst) == 0 {
@@ -97,7 +97,7 @@ func loadFromArgs(cmd *cobra.Command, args []string) []*build.Instance {
 	return binst
 }
 
-func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance {
+func buildInstances(cmd *Command, binst []*build.Instance) []*cue.Instance {
 	instances := cue.Build(binst)
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure
@@ -118,7 +118,7 @@ func buildInstances(cmd *cobra.Command, binst []*build.Instance) []*cue.Instance
 	return instances
 }
 
-func buildToolInstances(cmd *cobra.Command, binst []*build.Instance) ([]*cue.Instance, error) {
+func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance, error) {
 	instances := cue.Build(binst)
 	for _, inst := range instances {
 		if inst.Err != nil {
@@ -135,7 +135,7 @@ func buildToolInstances(cmd *cobra.Command, binst []*build.Instance) ([]*cue.Ins
 	return instances, nil
 }
 
-func buildTools(cmd *cobra.Command, args []string) (*cue.Instance, error) {
+func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 	binst := loadFromArgs(cmd, args)
 	if len(binst) == 0 {
 		return nil, nil

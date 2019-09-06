@@ -23,13 +23,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newFmtCmd() *cobra.Command {
+func newFmtCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "fmt [-s] [packages]",
 		Short: "formats CUE configuration files",
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			for _, inst := range load.Instances(args, nil) {
 				all := []string{}
 				all = append(all, inst.CUEFiles...)
@@ -65,7 +65,7 @@ func newFmtCmd() *cobra.Command {
 				}
 			}
 			return nil
-		},
+		}),
 	}
 	return cmd
 }

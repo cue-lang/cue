@@ -21,12 +21,12 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newVersionCmd() *cobra.Command {
+func newVersionCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "version",
 		Short: "print CUE version",
 		Long:  ``,
-		RunE:  runVersion,
+		RunE:  mkRunE(c, runVersion),
 	}
 	return cmd
 }
@@ -37,7 +37,7 @@ var (
 	version = "custom"
 )
 
-func runVersion(cmd *cobra.Command, args []string) error {
+func runVersion(cmd *Command, args []string) error {
 	w := cmd.OutOrStdout()
 	fmt.Fprintf(w, "cue version %v %s/%s\n",
 		version,

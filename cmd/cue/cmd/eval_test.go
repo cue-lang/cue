@@ -17,13 +17,13 @@ package cmd
 import "testing"
 
 func TestEval(t *testing.T) {
-	runCommand(t, newEvalCmd(), "eval")
+	runCommand(t, newEvalCmd(newRootCmd()), "eval")
 
-	cmd := newEvalCmd()
+	cmd := newEvalCmd(newRootCmd())
 	mustParseFlags(t, cmd, "-c", "-a")
 	runCommand(t, cmd, "eval_conc")
 
-	cmd = newEvalCmd()
+	cmd = newEvalCmd(newRootCmd())
 	mustParseFlags(t, cmd, "-c", "-e", "b.a.b", "-e", "b.idx")
 	runCommand(t, cmd, "eval_expr")
 }

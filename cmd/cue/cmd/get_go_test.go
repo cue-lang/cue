@@ -38,7 +38,7 @@ func TestGetGo(t *testing.T) {
 	cueTestRoot = tmp
 
 	// We don't use runCommand here, as we are interested in generated packages.
-	cmd := newGoCmd()
+	cmd := newGoCmd(newRootCmd())
 	cmd.SetArgs([]string{"./testdata/code/go/..."})
 	err = cmd.Execute()
 	if err != nil {

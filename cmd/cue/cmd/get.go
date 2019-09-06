@@ -21,7 +21,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newGetCmd() *cobra.Command {
+func newGetCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "get <language> [packages]",
 		Short: "add dependencies to the current module",
@@ -35,7 +35,7 @@ the source of the respective language and stored.
 The specifics on how dependencies are fechted and converted vary
 per language and are documented in the respective subcommands.
 `,
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			if len(args) == 0 {
 				fmt.Println("get must be run as one of its subcommands")
 			} else {
@@ -44,8 +44,8 @@ per language and are documented in the respective subcommands.
 			fmt.Println("Run 'cue help get' for known subcommands.")
 			os.Exit(1) // TODO: get rid of this
 			return nil
-		},
+		}),
 	}
-	cmd.AddCommand(newGoCmd())
+	cmd.AddCommand(newGoCmd(c))
 	return cmd
 }

@@ -34,7 +34,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-func newAddCmd() *cobra.Command {
+func newAddCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		// TODO: this command is still experimental, don't show it in
 		// the documentation just yet.
@@ -44,7 +44,7 @@ func newAddCmd() *cobra.Command {
 		Short: "bulk append to CUE files",
 		Long: `Append a common snippet of CUE to many files and commit atomically.
 `,
-		RunE: runAdd,
+		RunE: mkRunE(c, runAdd),
 	}
 
 	f := cmd.Flags()
@@ -56,13 +56,13 @@ func newAddCmd() *cobra.Command {
 	return cmd
 }
 
-func runAdd(cmd *cobra.Command, args []string) (err error) {
+func runAdd(cmd *Command, args []string) (err error) {
 	return doAdd(cmd, stdin, args)
 }
 
 var stdin io.Reader = os.Stdin
 
-func doAdd(cmd *cobra.Command, stdin io.Reader, args []string) (err error) {
+func doAdd(cmd *Command, stdin io.Reader, args []string) (err error) {
 	// Offsets at which to restore original files, if any, if any of the
 	// appends fail.
 	// Ideally this is placed below where it is used, but we want to make
@@ -192,7 +192,7 @@ type originalFile struct {
 	contents []byte
 }
 
-func restoreOriginals(cmd *cobra.Command, originals []originalFile) {
+func restoreOriginals(cmd *Command, originals []originalFile) {
 	for _, fo := range originals {
 		if err := fo.restore(); err != nil {
 			fmt.Fprintln(cmd.OutOrStderr(), "Error restoring file: ", err)
@@ -214,7 +214,7 @@ type fileInfo struct {
 	build    *build.Instance
 }
 
-func initFile(cmd *cobra.Command, file string, getBuild func(path string) *build.Instance) (todo *fileInfo, err error) {
+func initFile(cmd *Command, file string, getBuild func(path string) *build.Instance) (todo *fileInfo, err error) {
 	defer func() {
 		if err != nil {
 			err = fmt.Errorf("init file: %v", err)

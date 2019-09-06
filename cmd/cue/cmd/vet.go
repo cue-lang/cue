@@ -67,12 +67,12 @@ Examples:
 If more than one expression is given, all must match all values.
 `
 
-func newVetCmd() *cobra.Command {
+func newVetCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "vet",
 		Short: "validate data",
 		Long:  vetDoc,
-		RunE:  doVet,
+		RunE:  mkRunE(c, doVet),
 	}
 
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
@@ -84,7 +84,7 @@ func newVetCmd() *cobra.Command {
 	return cmd
 }
 
-func doVet(cmd *cobra.Command, args []string) error {
+func doVet(cmd *Command, args []string) error {
 	builds := loadFromArgs(cmd, args)
 	if builds == nil {
 		return nil
@@ -135,7 +135,7 @@ func doVet(cmd *cobra.Command, args []string) error {
 	return nil
 }
 
-func vetFiles(cmd *cobra.Command, inst *cue.Instance, files []string) {
+func vetFiles(cmd *Command, inst *cue.Instance, files []string) {
 	expressions := flagExpression.StringArray(cmd)
 
 	var check cue.Value

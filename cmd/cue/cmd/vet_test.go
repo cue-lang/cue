@@ -17,16 +17,16 @@ package cmd
 import "testing"
 
 func TestVet(t *testing.T) {
-	runCommand(t, newVetCmd(), "vet")
+	runCommand(t, newVetCmd(newRootCmd()), "vet")
 
-	cmd := newVetCmd()
+	cmd := newVetCmd(newRootCmd())
 	mustParseFlags(t, cmd, "-c")
 	runCommand(t, cmd, "vet_conc")
 
-	cmd = newVetCmd()
+	cmd = newVetCmd(newRootCmd())
 	runCommand(t, cmd, "vet_file", "./testdata/vet/vet.cue", "./testdata/vet/data.yaml")
 
-	cmd = newVetCmd()
+	cmd = newVetCmd(newRootCmd())
 	mustParseFlags(t, cmd, "-e", "File")
 	runCommand(t, cmd, "vet_expr", "./testdata/vet/vet.cue", "./testdata/vet/data.yaml")
 

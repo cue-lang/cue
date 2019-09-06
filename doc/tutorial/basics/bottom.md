@@ -2,7 +2,7 @@
 
 _Types ~~and~~ are Values_
 
-# Bottom
+# Bottom / Error
 
 Specifying duplicate fields with conflicting values results in an error
 or bottom.

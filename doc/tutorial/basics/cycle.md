@@ -2,7 +2,7 @@
 
 _Cycles_
 
-# Reference cycles
+# Reference Cycles
 
 CUE can handle many types of cycles just fine.
 Because all values are final, a field with a concrete value of, say `200`,

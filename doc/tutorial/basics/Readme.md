@@ -23,6 +23,7 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
   - [Comments](comments.md)
   - [Number Literals](numberlit.md)
   - [String Literals](stringlit.md)
+  - ["Raw" Strings](stringraw.md)
   - [Bytes](bytes.md)
 - References and Visibility
   - [References and Scopes](scopes.md)
@@ -49,10 +50,13 @@ Use the `cue eval` or `cue export` commands to evaluate an example.
 - Expressions
   - [Operators](operators.md)
   - [Interpolation](interpolation.md)
-  - [Interpolation in Field Names](interpolfield.md)
+  - [Interpolation of Field Names](interpolfield.md)
   - [List Comprehensions](listcomp.md)
   - [Field Comprehensions](fieldcomp.md)
   - [Conditional Fields](conditional.md)
   - [Null or Error coalescing](coalesce.md)
+- Cycles
+  - [Reference Cycles](cycle.md)
+  - [Cycles in Fields](cycleref.md)
   <!-- - Conversions -->
   <!-- - Functions (simulating) -->

@@ -2,7 +2,7 @@
 
 _Cycles_
 
-# Cycles in fields
+# Cycles in Fields
 
 Also, we know that unifying a field with itself will result in the same value.
 Thus if we have a cycle between some fields, all we need to do is ignore

@@ -179,7 +179,13 @@ func vetFiles(cmd *cobra.Command, inst *cue.Instance, files []string) {
 			body, err := r.CompileExpr(expr)
 			exitIfErr(cmd, inst, err, false)
 			v := body.Value().Unify(check)
-			exitIfErr(cmd, inst, v.Err(), false)
+			if err := v.Err(); err != nil {
+				exitIfErr(cmd, inst, err, false)
+			} else {
+				// Always concrete when checking against concrete files.
+				err = v.Validate(cue.Concrete(true))
+				exitIfErr(cmd, inst, err, false)
+			}
 		}
 	}
 }

@@ -6,6 +6,10 @@ translations:
 ---
 translations:
   hello:
+    text: Hoi
+---
+translations:
+  hello:
     lang: no
     text: Hallo
 ---

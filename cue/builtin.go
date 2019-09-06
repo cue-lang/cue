@@ -574,6 +574,26 @@ func (c *callCtxt) iter(i int) (a Iterator) {
 	return v
 }
 
+func (c *callCtxt) decimalList(i int) (a []*apd.Decimal) {
+	arg := c.args[i]
+	x := newValueRoot(c.ctx, arg)
+	v, err := x.List()
+	if err != nil {
+		c.invalidArgType(c.args[i], i, "list", err)
+		return nil
+	}
+	for j := 0; v.Next(); j++ {
+		num, err := v.Value().getNum(numKind)
+		if err != nil {
+			c.errf(c.src, err, "invalid list element %d in argument %d to %s: %v",
+				j, i, c.name(), err)
+			break
+		}
+		a = append(a, &num.v)
+	}
+	return a
+}
+
 func (c *callCtxt) strList(i int) (a []string) {
 	arg := c.args[i]
 	x := newValueRoot(c.ctx, arg)

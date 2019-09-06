@@ -69,6 +69,9 @@ var GetRuntime func(instance interface{}) interface{}
 // keys.
 var CheckAndForkRuntime func(runtime, value interface{}) interface{}
 
+// BaseContext is used as CUEs default context for arbitrary-precision decimals
+var BaseContext = apd.BaseContext.WithPrecision(24)
+
 // ListEllipsis reports the list type and remaining elements of a list. If we
 // ever relax the usage of ellipsis, this function will likely change. Using
 // this function will ensure keeping correct behavior or causing a compiler

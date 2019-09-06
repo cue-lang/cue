@@ -717,6 +717,118 @@ var builtinPackages = map[string]*builtinPkg{
 					return false
 				}()
 			},
+		}, {
+			Name:   "Avg",
+			Params: []kind{listKind},
+			Result: numKind,
+			Func: func(c *callCtxt) {
+				xs := c.decimalList(0)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if 0 == len(xs) {
+							return nil, fmt.Errorf("empty list")
+						}
+
+						s := apd.New(0, 0)
+						for _, x := range xs {
+							_, err := internal.BaseContext.Add(s, x, s)
+							if err != nil {
+								return nil, err
+							}
+						}
+
+						var d apd.Decimal
+						l := apd.New(int64(len(xs)), 0)
+						_, err := internal.BaseContext.Quo(&d, s, l)
+						if err != nil {
+							return nil, err
+						}
+						return &d, nil
+					}()
+				}
+			},
+		}, {
+			Name:   "Max",
+			Params: []kind{listKind},
+			Result: numKind,
+			Func: func(c *callCtxt) {
+				xs := c.decimalList(0)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if 0 == len(xs) {
+							return nil, fmt.Errorf("empty list")
+						}
+
+						max := xs[0]
+						for _, x := range xs[1:] {
+							if -1 == max.Cmp(x) {
+								max = x
+							}
+						}
+						return max, nil
+					}()
+				}
+			},
+		}, {
+			Name:   "Min",
+			Params: []kind{listKind},
+			Result: numKind,
+			Func: func(c *callCtxt) {
+				xs := c.decimalList(0)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if 0 == len(xs) {
+							return nil, fmt.Errorf("empty list")
+						}
+
+						min := xs[0]
+						for _, x := range xs[1:] {
+							if +1 == min.Cmp(x) {
+								min = x
+							}
+						}
+						return min, nil
+					}()
+				}
+			},
+		}, {
+			Name:   "Product",
+			Params: []kind{listKind},
+			Result: numKind,
+			Func: func(c *callCtxt) {
+				xs := c.decimalList(0)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						d := apd.New(1, 0)
+						for _, x := range xs {
+							_, err := internal.BaseContext.Mul(d, x, d)
+							if err != nil {
+								return nil, err
+							}
+						}
+						return d, nil
+					}()
+				}
+			},
+		}, {
+			Name:   "Sum",
+			Params: []kind{listKind},
+			Result: numKind,
+			Func: func(c *callCtxt) {
+				xs := c.decimalList(0)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						d := apd.New(0, 0)
+						for _, x := range xs {
+							_, err := internal.BaseContext.Add(d, x, d)
+							if err != nil {
+								return nil, err
+							}
+						}
+						return d, nil
+					}()
+				}
+			},
 		}},
 	},
 	"math": &builtinPkg{
@@ -2027,6 +2139,7 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				s, min := c.string(0), c.int(1)
 				c.ret = func() interface{} {
+
 					return len([]rune(s)) >= min
 				}()
 			},

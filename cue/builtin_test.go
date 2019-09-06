@@ -135,6 +135,51 @@ func TestBuiltins(t *testing.T) {
 		test("strconv", `strconv.FormatFloat(3.02, 1.0, 4, 64)`),
 		`_|_(cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat)`,
 	}, {
+		test("list", `list.Avg([1, 2, 3, 4])`),
+		`2.5`,
+	}, {
+		test("list", `list.Avg([])`),
+		`_|_(error in call to list.Avg: empty list)`,
+	}, {
+		test("list", `list.Avg("foo")`),
+		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Avg)`,
+	}, {
+		test("list", `list.Max([1, 2, 3, 4])`),
+		`4`,
+	}, {
+		test("list", `list.Max([])`),
+		`_|_(error in call to list.Max: empty list)`,
+	}, {
+		test("list", `list.Max("foo")`),
+		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Max)`,
+	}, {
+		test("list", `list.Min([1, 2, 3, 4])`),
+		`1`,
+	}, {
+		test("list", `list.Min([])`),
+		`_|_(error in call to list.Min: empty list)`,
+	}, {
+		test("list", `list.Min("foo")`),
+		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Min)`,
+	}, {
+		test("list", `list.Product([1, 2, 3, 4])`),
+		`24`,
+	}, {
+		test("list", `list.Product([])`),
+		`1`,
+	}, {
+		test("list", `list.Product("foo")`),
+		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Product)`,
+	}, {
+		test("list", `list.Sum([1, 2, 3, 4])`),
+		`10`,
+	}, {
+		test("list", `list.Sum([])`),
+		`0`,
+	}, {
+		test("list", `list.Sum("foo")`),
+		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Sum)`,
+	}, {
 		// Panics
 		test("math", `math.Jacobi(1000, 2000)`),
 		`_|_(error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000)`,

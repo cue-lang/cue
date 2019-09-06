@@ -1324,10 +1324,11 @@ a: {
 		`,
 		out: `<0>{` +
 			`A :: <1>C{f1: int, f2: int}, ` +
-			`B :: <2>C{f1: int}, ` +
-			`C :: <3>C{f1: int}, ` +
-			`D :: <4>{f1: int, ...}, ` +
-			`a: <5>C{f1: int, f2: int, f3: int}}`,
+			`a: <2>C{f1: int, f2: int, f3: int}, ` +
+			`B :: <3>C{f1: int}, ` +
+			`C :: <4>C{f1: int}, ` +
+			`D :: <5>{f1: int, ...}` +
+			`}`,
 	}, {
 		desc: "reference to root",
 		in: `
@@ -1580,8 +1581,7 @@ a: {
 				}
 			}
 		`,
-		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield ("sub"): <4>{as: <3>.a}}, ` +
-			`foo: <5>{a: "bar", sub: <6>{as: "bar"}}}}`,
+		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield <4>{sub: <5>{as: <3>.a}}}, foo: <6>{a: "bar", sub: <7>{as: "bar"}}}}`,
 	}, {
 		desc: "builtins",
 		in: `
@@ -1911,7 +1911,7 @@ func TestFullEval(t *testing.T) {
 				}
 			}
 		`,
-		out: `<0>{b: true, c: <1>{a: 3}, a: "foo", d: <2>{a: int if (<2>.a > 1) yield ("a"): 3}}`,
+		out: `<0>{b: true, a: "foo", c: <1>{a: 3}, d: <2>{a: int if (<2>.a > 1) yield <3>{a: 3}}}`,
 	}, {
 		desc: "referencing field in field comprehension",
 		in: `
@@ -2202,7 +2202,7 @@ func TestFullEval(t *testing.T) {
 			`fibRec: <1>{` +
 			`nn: int, ` +
 			`out: (<2>.fib & <3>{n: <4>.nn}).out}, ` +
-			`fib: <5>{n: int if (<5>.n >= 2) yield ("out"): ((<2>.fibRec & <6>{nn: (<5>.n - 2)}).out + (<2>.fibRec & <7>{nn: (<5>.n - 1)}).out),  if (<5>.n < 2) yield ("out"): <5>.n}, ` +
+			`fib: <5>{n: int if (<5>.n >= 2) yield <6>{out: ((<2>.fibRec & <7>{nn: (<5>.n - 2)}).out + (<2>.fibRec & <8>{nn: (<5>.n - 1)}).out)},  if (<5>.n < 2) yield <9>{out: <5>.n}}, ` +
 			`fib2: 1, ` +
 			`fib7: 13, ` +
 			`fib12: 144}`,
@@ -2320,17 +2320,9 @@ func TestX(t *testing.T) {
 	// Don't remove. For debugging.
 	testCases := []testCase{{
 		in: `
-		fnRec: {nn: [...int], out: (fn & {arg: nn}).out}
-		fn: {
-			arg: [...int]
-
-			out: arg[0] + (fnRec & {nn: arg[1:]}).out if len(arg) > 0
-			out: 0 if len(arg) == 0
-		}
-		fn7: (fn & {arg: [1, 2, 3]}).out
-
-
-		`,
+		g1: 1
+		"g\(1)"?: 1
+	`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

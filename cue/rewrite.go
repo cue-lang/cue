@@ -225,24 +225,29 @@ func (x *listComprehension) rewrite(ctx *context, fn rewriteFunc) value {
 	return &listComprehension{x.baseValue, clauses}
 }
 
-func (x *fieldComprehension) rewrite(ctx *context, fn rewriteFunc) value {
+func (x *structComprehension) rewrite(ctx *context, fn rewriteFunc) value {
 	clauses := rewrite(ctx, x.clauses, fn).(yielder)
 	if clauses == x.clauses {
 		return x
 	}
-	return &fieldComprehension{x.baseValue, clauses, x.isTemplate}
+	return &structComprehension{x.baseValue, clauses}
+}
+
+func (x *fieldComprehension) rewrite(ctx *context, fn rewriteFunc) value {
+	key := rewrite(ctx, x.key, fn)
+	val := rewrite(ctx, x.val, fn)
+	if key == x.key && val == x.val {
+		return x
+	}
+	return &fieldComprehension{x.baseValue, key, val, x.opt, x.def, x.doc, x.attrs}
 }
 
 func (x *yield) rewrite(ctx *context, fn rewriteFunc) value {
-	key := x.key
-	if key != nil {
-		key = rewrite(ctx, x.key, fn)
-	}
 	value := rewrite(ctx, x.value, fn)
-	if key == x.key && value == x.value {
+	if value == x.value {
 		return x
 	}
-	return &yield{x.baseValue, x.opt, x.def, key, value}
+	return &yield{x.baseValue, value}
 }
 
 func (x *guard) rewrite(ctx *context, fn rewriteFunc) value {

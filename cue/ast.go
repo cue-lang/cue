@@ -314,71 +314,20 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		return v.errf(n, "ellipsis (...) only allowed at end of list or struct")
 
 	case *ast.Comprehension:
-		st, ok := n.Value.(*ast.StructLit)
-		if !ok || len(st.Elts) != 1 {
-			return v.errf(n, "invalid comprehension: %v", n)
+		yielder := &yield{baseValue: newExpr(n.Value)}
+		sc := &structComprehension{
+			newNode(n),
+			wrapClauses(v, yielder, n.Clauses),
 		}
-		field := st.Elts[0].(*ast.Field)
-		yielder := &yield{
-			baseValue: newExpr(n.Value),
-			opt:       field.Optional != token.NoPos,
-			def:       field.Token == token.ISA,
-		}
-		fc := &fieldComprehension{
-			baseValue: newDecl(n),
-			clauses:   wrapClauses(v, yielder, n.Clauses),
-		}
-		switch x := field.Label.(type) {
-		case *ast.Interpolation:
-			v.sel = "?"
-			yielder.key = v.walk(x)
-			yielder.value = v.walk(field.Value)
-
-		case *ast.TemplateLabel:
-			v.sel = "*"
-			f := v.label(v.ident(x.Ident), true)
-
-			sig := &params{}
-			sig.add(f, &basicType{newNode(field.Label), stringKind})
-			template := &lambdaExpr{newExpr(field.Value), sig, nil}
-
-			v.setScope(field, template)
-			template.value = v.walk(field.Value)
-			yielder.value = template
-			fc.isTemplate = true
-
-		case *ast.BasicLit, *ast.Ident:
-			name, ok := internal.LabelName(x)
-			if !ok {
-				return v.errf(x, "invalid field name: %v", x)
-			}
-			// TODO: is this correct? Just for info, so not very important.
-			v.sel = name
-
-			// TODO: if the clauses do not contain a guard, we know that this
-			// field will always be added and we can move the comprehension one
-			// level down. This, in turn, has the advantage that it is more
-			// likely that the cross-reference limitation for field
-			// comprehensions is not violated. To ensure compatibility between
-			// implementations, though, we should relax the spec as well.
-			// The cross-reference rule is simple and this relaxation seems a
-			// bit more complex.
-
-			// TODO: for now we can also consider making this an error if
-			// the list of clauses does not contain if and make a suggestion
-			// to rewrite it.
-
-			if name != "" {
-				yielder.key = &stringLit{newNode(x), name, nil}
-				yielder.value = v.walk(field.Value)
-			}
-
+		// we don't support key for lists (yet?)
+		switch n.Value.(type) {
+		case *ast.StructLit:
 		default:
-			panic("cue: unknown label type")
+			// Caught by parser, usually.
+			v.errf(n, "comprehension must be struct")
 		}
-		// yielder.key = v.walk(n.Field.Label)
-		// yielder.value = v.walk(n.Field.Value)
-		v.object.comprehensions = append(v.object.comprehensions, fc)
+		yielder.value = v.walk(n.Value)
+		v.object.comprehensions = append(v.object.comprehensions, sc)
 
 	case *ast.Field:
 		opt := n.Optional != token.NoPos
@@ -391,18 +340,31 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			ctx.inDefinition++
 			defer func() { ctx.inDefinition-- }()
 		}
+		attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
+		if err != nil {
+			return v.errf(n, err.format, err.args)
+		}
+		var leftOverDoc *docNode
+		for _, c := range n.Comments() {
+			if c.Position == 0 {
+				leftOverDoc = v.doc
+				v.doc = &docNode{n: n}
+				break
+			}
+		}
 		switch x := n.Label.(type) {
 		case *ast.Interpolation:
 			v.sel = "?"
-			yielder := &yield{baseValue: newNode(x)}
+			// Must be struct comprehension.
 			fc := &fieldComprehension{
 				baseValue: newDecl(n),
-				clauses:   yielder,
+				key:       v.walk(x),
+				val:       v.walk(n.Value),
+				opt:       opt,
+				def:       isDef,
+				doc:       leftOverDoc,
+				attrs:     attrs,
 			}
-			yielder.key = v.walk(x)
-			yielder.value = v.walk(n.Value)
-			yielder.opt = opt
-			yielder.def = isDef
 			v.object.comprehensions = append(v.object.comprehensions, fc)
 
 		case *ast.TemplateLabel:
@@ -431,23 +393,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 					v.sel = "*"
 				}
 			}
-			attrs, err := createAttrs(v.ctx(), newNode(n), n.Attrs)
-			if err != nil {
-				return v.errf(n, err.format, err.args)
-			}
 			f, ok := v.nodeLabel(x)
 			if !ok {
 				return v.errf(n.Label, "invalid field name: %v", n.Label)
 			}
 			if f != 0 {
-				var leftOverDoc *docNode
-				for _, c := range n.Comments() {
-					if c.Position == 0 {
-						leftOverDoc = v.doc
-						v.doc = &docNode{n: n}
-						break
-					}
-				}
 				val := v.walk(n.Value)
 				v.object.insertValue(v.ctx(), f, opt, isDef, val, attrs, v.doc)
 				v.doc = leftOverDoc

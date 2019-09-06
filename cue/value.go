@@ -803,71 +803,47 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	x.expanded = x
 
 	comprehensions := x.comprehensions
-	emit := x.emit
-	template := x.template
-	newArcs := []arc{}
+
+	var n evaluated = &top{x.baseValue}
+	if x.emit != nil {
+		n = x.emit.evalPartial(ctx)
+	}
 
 	for _, x := range comprehensions {
-		switch c := x.(type) {
-		case *fieldComprehension:
-			err := c.clauses.yield(ctx, func(k, v evaluated, opt, def bool) *bottom {
-				if !k.kind().isAnyOf(stringKind) {
-					return ctx.mkErr(k, "key must be of type string")
-				}
+		v := x.evalPartial(ctx)
+		src := binSrc(x.Pos(), opUnify, x, v)
+		n = binOp(ctx, src, opUnifyUnchecked, n, v)
+	}
 
-				if c.isTemplate {
-					// TODO: disallow altogether or only when it refers to fields.
-					if template == nil {
-						template = v
-					} else {
-						template = mkBin(ctx, c.Pos(), opUnify, template, v)
-					}
-					return nil
-				}
-				// TODO(perf): improve big O
-				f := ctx.label(k.strValue(), true)
-				for i, a := range newArcs {
-					if a.feature == f {
-						newArcs[i].v = mkBin(ctx, x.Pos(), opUnify, a.v, v)
-						return nil
-					}
-				}
-				newArcs = append(newArcs, arc{
-					feature:    f,
-					optional:   opt,
-					definition: def,
-					v:          v,
-				})
-				return nil
-			})
-			if err != nil {
-				return nil, err
-			}
+	src := binSrc(x.Pos(), opUnify, x, n)
+	switch n.(type) {
+	case *bottom:
+	case *structLit:
+		orig := *x
+		orig.comprehensions = nil
+		orig.emit = nil
+		n = binOp(ctx, src, opUnifyUnchecked, &orig, n)
+
+	default:
+		if x.emit != nil {
+			v := x.emit.evalPartial(ctx)
+			n = binOp(ctx, src, opUnifyUnchecked, v, n)
 		}
+		return nil, ctx.mkErr(x, "invalid embedding")
 	}
 
-	// TODO: new arcs may be merged with old ones, but only if the old ones were
-	// not referred to in the evaluation of any of the arcs. Or should we relax
-	// the specs?
+	switch v := n.(type) {
+	case *bottom:
+		x.expanded = n
+		return nil, v
+	case *structLit:
+		x.expanded = n
+		return v, nil
 
-	orig := *x
-	orig.comprehensions = nil
-
-	res := orig.binOp(ctx, x, opUnifyUnchecked, &structLit{
-		x.baseValue, // baseValue
-		emit,        // emit
-		template,    // template
-		false,       // isClosed
-		nil,         // comprehensions
-		newArcs,     // arcs
-		nil,         // attributes
-	})
-
-	x.expanded = res
-	if isBottom(res) {
-		return nil, res.(*bottom)
+	default:
+		x.expanded = x
+		return x, nil
 	}
-	return x.expanded.(*structLit), nil
 }
 
 func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (evaluated, *ast.Field) {
@@ -1377,17 +1353,32 @@ func (x *listComprehension) kind() kind {
 	return listKind | nonGround | referenceKind
 }
 
+type structComprehension struct {
+	baseValue
+	clauses yielder
+}
+
+func (x *structComprehension) kind() kind {
+	return structKind | nonGround | referenceKind
+}
+
+// TODO: rename to something better. No longer a comprehension.
+// Generated field, perhaps.
 type fieldComprehension struct {
 	baseValue
-	clauses    yielder
-	isTemplate bool
+	key   value
+	val   value
+	opt   bool
+	def   bool
+	doc   *docNode
+	attrs *attributes
 }
 
 func (x *fieldComprehension) kind() kind {
 	return structKind | nonGround
 }
 
-type yieldFunc func(k, v evaluated, optional, definition bool) *bottom
+type yieldFunc func(v evaluated) *bottom
 
 type yielder interface {
 	value
@@ -1396,29 +1387,17 @@ type yielder interface {
 
 type yield struct {
 	baseValue
-	opt   bool
-	def   bool
-	key   value
 	value value
 }
 
 func (x *yield) kind() kind { return topKind | referenceKind }
 
 func (x *yield) yield(ctx *context, fn yieldFunc) *bottom {
-	var k evaluated
-	if x.key != nil {
-		k = ctx.manifest(x.key)
-		if err, ok := k.(*bottom); ok {
-			return err
-		}
-	} else {
-		k = &top{}
-	}
 	v := x.value.evalPartial(ctx)
 	if err, ok := v.(*bottom); ok {
 		return err
 	}
-	if err := fn(k, v, x.opt, x.def); err != nil {
+	if err := fn(v); err != nil {
 		return err
 	}
 	return nil

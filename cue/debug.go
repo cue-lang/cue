@@ -224,6 +224,12 @@ func (p *printer) str(v interface{}) {
 		write(x.op)
 		p.str(x.x)
 	case *binaryExpr:
+		if x.op == opUnifyUnchecked {
+			p.str(x.left)
+			write(", ")
+			p.str(x.right)
+			break
+		}
 		write("(")
 		p.str(x.left)
 		writef(" %v ", x.op)
@@ -284,6 +290,10 @@ func (p *printer) str(v interface{}) {
 			p.str(x.template)
 			write(", ")
 		}
+		if x.emit != nil {
+			p.str(x.emit)
+			write(", ")
+		}
 		p.str(x.arcs)
 		for i, c := range x.comprehensions {
 			p.str(c)
@@ -332,21 +342,20 @@ func (p *printer) str(v interface{}) {
 		}
 
 	case *fieldComprehension:
-		p.str(x.clauses)
+		p.str(x.key)
+		writef(": ")
+		p.str(x.val)
 
 	case *listComprehension:
 		writef("[")
 		p.str(x.clauses)
 		write(" ]")
 
+	case *structComprehension:
+		p.str(x.clauses)
+
 	case *yield:
 		writef(" yield ")
-		writef("(")
-		p.str(x.key)
-		if x.opt {
-			writef("?")
-		}
-		writef("): ")
 		p.str(x.value)
 
 	case *feed:

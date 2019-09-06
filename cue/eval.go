@@ -258,10 +258,7 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	s := &structLit{baseValue: x.baseValue}
 	list := &list{baseValue: x.baseValue, elem: s}
-	err := x.clauses.yield(ctx, func(k, v evaluated, _, _ bool) *bottom {
-		if !k.kind().isAnyOf(intKind) {
-			return ctx.mkErr(k, "key must be of type int")
-		}
+	err := x.clauses.yield(ctx, func(v evaluated) *bottom {
 		list.elem.arcs = append(list.elem.arcs, arc{
 			feature: label(len(list.elem.arcs)),
 			v:       v.evalPartial(ctx),
@@ -275,11 +272,49 @@ func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	return list
 }
 
+func (x *structComprehension) evalPartial(ctx *context) evaluated {
+	st := &structLit{baseValue: x.baseValue}
+	err := x.clauses.yield(ctx, func(v evaluated) *bottom {
+		embed := v.evalPartial(ctx).(*structLit)
+		embed, err := embed.expandFields(ctx)
+		if err != nil {
+			return err
+		}
+		res := binOp(ctx, x, opUnify, st, embed)
+		switch u := res.(type) {
+		case *bottom:
+			return u
+		case *structLit:
+			st = u
+		default:
+			panic("unreachable")
+		}
+		return nil
+	})
+	if err != nil {
+		return err
+	}
+	return st
+}
+
 func (x *feed) evalPartial(ctx *context) evaluated  { return x }
 func (x *guard) evalPartial(ctx *context) evaluated { return x }
 func (x *yield) evalPartial(ctx *context) evaluated { return x }
 
-func (x *fieldComprehension) evalPartial(ctx *context) evaluated { return x }
+func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
+	k := x.key.evalPartial(ctx)
+	v := x.val.evalPartial(ctx)
+	if err := firstBottom(k, v); err != nil {
+		return err
+	}
+	if !k.kind().isAnyOf(stringKind) {
+		return ctx.mkErr(k, "key must be of type string")
+	}
+	f := ctx.label(k.strValue(), true)
+	st := &structLit{baseValue: x.baseValue}
+	st.insertValue(ctx, f, x.opt, x.def, v, x.attrs, x.doc)
+	return st
+}
 
 func (x *structLit) evalPartial(ctx *context) (result evaluated) {
 	if ctx.trace {
@@ -289,6 +324,9 @@ func (x *structLit) evalPartial(ctx *context) (result evaluated) {
 	x = ctx.deref(x).(*structLit)
 
 	// TODO: Handle cycle?
+
+	// TODO: would be great to be able to expand fields here. But would need
+	// some careful consideration regarding dereferencing.
 
 	return x
 }

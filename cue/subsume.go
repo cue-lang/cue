@@ -90,6 +90,11 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 		if len(x.comprehensions) > 0 { //|| x.template != nil {
 			return false
 		}
+		if x.emit != nil {
+			if o.emit == nil || !subsumes(ctx, x.emit, o.emit, mode) {
+				return false
+			}
+		}
 
 		// all arcs in n must exist in v and its values must subsume.
 		for _, a := range x.arcs {
@@ -471,9 +476,20 @@ func (x *listComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode
 }
 
 // structural equivalence
+func (x *structComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	if b, ok := v.(*structComprehension); ok {
+		return subsumes(ctx, x.clauses, b.clauses, 0)
+	}
+	return isBottom(v)
+}
+
+// structural equivalence
 func (x *fieldComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	if b, ok := v.(*fieldComprehension); ok {
-		return subsumes(ctx, x.clauses, b.clauses, 0)
+		return subsumes(ctx, x.key, b.key, 0) &&
+			subsumes(ctx, x.val, b.val, 0) &&
+			!x.opt && b.opt &&
+			x.def == b.def
 	}
 	return isBottom(v)
 }
@@ -481,8 +497,7 @@ func (x *fieldComprehension) subsumesImpl(ctx *context, v value, mode subsumeMod
 // structural equivalence
 func (x *yield) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	if b, ok := v.(*yield); ok {
-		return subsumes(ctx, x.key, b.key, 0) &&
-			subsumes(ctx, x.value, b.value, 0)
+		return subsumes(ctx, x.value, b.value, 0)
 	}
 	return isBottom(v)
 }

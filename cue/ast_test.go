@@ -31,7 +31,7 @@ func TestCompile(t *testing.T) {
 		in: `{
 		  foo: 1,
 		}`,
-		out: "<0>{}", // emitted value, but no top-level fields
+		out: "<0>{<1>{foo: 1}, }", // emitted value, but no top-level fields
 	}, {
 		in: `
 		foo: 1
@@ -224,19 +224,19 @@ func TestCompile(t *testing.T) {
 			c: 3
 		}
 		`,
-		out: `<0>{a: <1>{ <2>for k, v in <0>.b if (<0>.b.a < <2>.k) yield (""+<2>.k+""): <2>.v}, b: <3>{a: 1, b: 2, c: 3}}`,
+		out: `<0>{a: <1>{ <2>for k, v in <0>.b if (<0>.b.a < <2>.k) yield <3>{""+<2>.k+"": <2>.v}}, b: <4>{a: 1, b: 2, c: 3}}`,
 	}, {
 		in: `
 			a: { for k, v in b {"\(v)": v} }
 			b: { a: "aa", b: "bb", c: "cc" }
 			`,
-		out: `<0>{a: <1>{ <2>for k, v in <0>.b yield (""+<2>.v+""): <2>.v}, b: <3>{a: "aa", b: "bb", c: "cc"}}`,
+		out: `<0>{a: <1>{ <2>for k, v in <0>.b yield <3>{""+<2>.v+"": <2>.v}}, b: <4>{a: "aa", b: "bb", c: "cc"}}`,
 	}, {
 		in: `
 			a: [ v for _, v in b ]
 			b: { a: 1, b: 2, c: 3 }
 			`,
-		out: `<0>{a: [ <1>for _, v in <0>.b yield (*nil*): <1>.v ], b: <2>{a: 1, b: 2, c: 3}}`,
+		out: `<0>{a: [ <1>for _, v in <0>.b yield <1>.v ], b: <2>{a: 1, b: 2, c: 3}}`,
 	}, {
 		in: `
 			a: >=1 & <=2

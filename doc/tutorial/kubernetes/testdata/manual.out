@@ -1559,11 +1559,11 @@ kubernetes: {
                                 name:          "peer"
                                 containerPort: 2380
                             }]
-                            command: ["/usr/local/bin/etcd"]
                             volumeMounts: [{
                                 name:      "etcd3"
                                 mountPath: "/data"
                             }]
+                            command: ["/usr/local/bin/etcd"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/health"
@@ -1650,11 +1650,11 @@ deployment: {
                 template: {
                     spec: {
                         containers: [{
-                            command: ["/usr/local/bin/etcd"]
                             volumeMounts: [{
                                 name:      "etcd3"
                                 mountPath: "/data"
                             }]
+                            command: ["/usr/local/bin/etcd"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/health"
@@ -1859,6 +1859,9 @@ kubernetes: {
                             }]
                             volumeMounts: [_|_ /* non-concrete value bool */]
                         }]
+                        volumes: [{
+                            name: "secret-volume"
+                        }]
                         affinity: {
                             podAntiAffinity: {
                                 requiredDuringSchedulingIgnoredDuringExecution: [{
@@ -1873,9 +1876,6 @@ kubernetes: {
                                 }]
                             }
                         }
-                        volumes: [{
-                            name: "secret-volume"
-                        }]
                     }
                     metadata: {
                         labels: {
@@ -4855,13 +4855,13 @@ kubernetes: {
                                 }
                             }
                         }]
-                        hostNetwork: true
-                        hostPID:     true
                         volumes: [{
                             name: "proc"
                         }, {
                             name: "sys"
                         }]
+                        hostNetwork: true
+                        hostPID:     true
                     }
                     metadata: {
                         labels: {

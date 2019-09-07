@@ -56,11 +56,11 @@ func Runes(s string) []rune {
 // MinRunes reports whether the number of runes (Unicode codepoints) in a string
 // is at least a certain minimum. MinRunes can be used a a field constraint to
 // except all strings for which this property holds.
-func MinRunes(s string, max int) bool {
+func MinRunes(s string, min int) bool {
 	// TODO: CUE strings cannot be invalid UTF-8. In case this changes, we need
 	// to use the following conversion to count properly:
 	// s, _ = unicodeenc.UTF8.NewDecoder().String(s)
-	return len([]rune(s)) <= max
+	return len([]rune(s)) >= min
 }
 
 // MaxRunes reports whether the number of runes (Unicode codepoints) in a string

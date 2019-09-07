@@ -2025,10 +2025,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{stringKind, intKind},
 			Result: boolKind,
 			Func: func(c *callCtxt) {
-				s, max := c.string(0), c.int(1)
+				s, min := c.string(0), c.int(1)
 				c.ret = func() interface{} {
 
-					return len([]rune(s)) <= max
+					fmt.Println(len([]rune(s)))
+					return len([]rune(s)) >= min
 				}()
 			},
 		}, {

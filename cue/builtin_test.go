@@ -304,8 +304,23 @@ func TestBuiltins(t *testing.T) {
 		test("strings", `strings.MinRunes(1) & "e"`),
 		`"e"`,
 	}, {
-		test("strings", `strings.MinRunes(0) & "e"`),
-		`_|_(invalid value "e" (does not satisfy strings.MinRunes(0)))`,
+		test("strings", `strings.MaxRunes(0) & "e"`),
+		`_|_(invalid value "e" (does not satisfy strings.MaxRunes(0)))`,
+	}, {
+		test("strings", `strings.MaxRunes(0) & ""`),
+		`""`,
+	}, {
+		test("strings", `strings.MinRunes(3) & "hello"`),
+		`"hello"`,
+	}, {
+		test("strings", `strings.MaxRunes(10) & "hello"`),
+		`"hello"`,
+	}, {
+		test("strings", `strings.MaxRunes(3) & "hello"`),
+		`_|_(invalid value "hello" (does not satisfy strings.MaxRunes(3)))`,
+	}, {
+		test("strings", `strings.MinRunes(10) & "hello"`),
+		`_|_(invalid value "hello" (does not satisfy strings.MinRunes(10)))`,
 	}, {
 		test("struct", `struct.MinFields(0) & ""`),
 		`_|_(conflicting values MinFields (0) and "" (mismatched types struct and string))`,

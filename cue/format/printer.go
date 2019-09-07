@@ -33,7 +33,8 @@ type printer struct {
 	requested   whiteSpace
 	indentStack []whiteSpace
 
-	pos token.Position // current pos in AST
+	pos     token.Position // current pos in AST
+	lineout line
 
 	lastTok token.Token // last token printed (syntax.ILLEGAL if it's whitespace)
 
@@ -41,6 +42,8 @@ type printer struct {
 	indent      int
 	spaceBefore bool
 }
+
+type line int
 
 func (p *printer) init(cfg *config) {
 	p.cfg = cfg
@@ -69,6 +72,9 @@ func (p *printer) Print(v interface{}) {
 		nextWS       whiteSpace
 	)
 	switch x := v.(type) {
+	case *line:
+		*x = p.lineout
+
 	case token.Token:
 		s := x.String()
 		before, after := mayCombine(p.lastTok, x)
@@ -209,14 +215,17 @@ func (p *printer) writeWhitespace(ws whiteSpace) {
 	case ws&newsection != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\f', 2)
+		p.lineout += 2
 		p.spaceBefore = true
 	case ws&formfeed != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\f', 1)
+		p.lineout++
 		p.spaceBefore = true
 	case ws&newline != 0:
 		p.maybeIndentLine(ws)
 		p.writeByte('\n', 1)
+		p.lineout++
 		p.spaceBefore = true
 	case ws&declcomma != 0:
 		p.writeByte(',', 1)

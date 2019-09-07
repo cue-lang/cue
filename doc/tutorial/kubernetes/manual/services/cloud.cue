@@ -32,7 +32,11 @@ deployment <Name>: _base & {
 	env <Key>: string
 
 	envSpec <Key>: {}
-	envSpec: {"\(k)" value: v for k, v in env}
+	envSpec: {
+		for k, v in env {
+			"\(k)" value: v
+		}
+	}
 
 	volume <Name>: {
 		name:      string | *Name
@@ -60,17 +64,22 @@ configMap <Name>: {
 }
 
 // define services implied by deployments
-service "\(k)": {
+for k, spec in deployment if len(spec.expose.port) > 0 {
+	service "\(k)": {
 
-	// Copy over all ports exposed from containers.
-	port "\(Name)": {
-		// Set default external port to Port. targetPort must be
-		// the respective containerPort (Port) if it differs from port.
-		port:       int | *Port
-		targetPort: Port if port != Port
-	} for Name, Port in spec.expose.port
+		// Copy over all ports exposed from containers.
+		for Name, Port in spec.expose.port {
+			port "\(Name)": {
+				// Set default external port to Port. targetPort must be
+				// the respective containerPort (Port) if it differs from port.
+				port: int | *Port
+				if port != Port {
+					targetPort: Port
+				}
+			}
+		}
 
-	// Copy over the labels
-	label: spec.label
-
-} for k, spec in deployment if len(spec.expose.port) > 0
+		// Copy over the labels
+		label: spec.label
+	}
+}

@@ -96,10 +96,11 @@ func (f *formatter) walkSpecList(list []*ast.ImportSpec) {
 	f.after(nil)
 }
 
-func (f *formatter) walkClauseList(list []ast.Clause) {
+func (f *formatter) walkClauseList(list []ast.Clause, ws whiteSpace) {
 	f.before(nil)
 	for _, x := range list {
 		f.before(x)
+		f.print(ws)
 		f.clause(x)
 		f.after(x)
 	}
@@ -224,20 +225,12 @@ func (f *formatter) decl(decl ast.Decl) {
 		}
 
 	case *ast.Comprehension:
-		st, ok := n.Value.(*ast.StructLit)
-		if !ok || len(st.Elts) != 1 {
-			f.print(n.Value, "*bad decl*", declcomma)
+		if !n.Pos().HasRelPos() || n.Pos().RelPos() >= token.Newline {
+			f.print(formfeed)
 		}
-		field := st.Elts[0]
-		f.decl(field)
-		f.print(blank)
-		if n.Clauses[0].Pos().RelPos() >= token.Newline {
-			f.print(token.ARROW, blank)
-		}
-		f.print(indent)
-		f.walkClauseList(n.Clauses)
-		f.print(unindent)
-		f.print("") // force whitespace to be written
+		f.walkClauseList(n.Clauses, blank)
+		f.print(blank, nooverride)
+		f.expr(n.Value)
 
 	case *ast.BadDecl:
 		f.print(n.From, "*bad decl*", declcomma)
@@ -268,6 +261,9 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.print(newsection, nooverride)
 
 	case *ast.EmbedDecl:
+		if !n.Pos().HasRelPos() || n.Pos().RelPos() >= token.Newline {
+			f.print(formfeed)
+		}
 		f.expr(n.Expr)
 		f.print(newline, newsection, nooverride) // force newline
 
@@ -275,6 +271,9 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.ellipsis(n)
 
 	case *ast.Alias:
+		if !decl.Pos().HasRelPos() || decl.Pos().RelPos() >= token.Newline {
+			f.print(formfeed)
+		}
 		f.expr(n.Ident)
 		f.print(blank, n.Equal, token.BIND, blank)
 		f.expr(n.Expr)
@@ -484,10 +483,21 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		}
 
 	case *ast.StructLit:
-		f.print(x.Lbrace, token.LBRACE, noblank, f.formfeed(), indent)
+		var l line
+		ws := noblank
+		if !x.Lbrace.HasRelPos() || (len(x.Elts) > 0 && !x.Elts[0].Pos().HasRelPos()) {
+			ws |= newline | nooverride
+		}
+		f.print(x.Lbrace, token.LBRACE, &l, ws, f.formfeed(), indent)
+
 		f.walkDeclList(x.Elts)
 		f.matchUnindent()
-		f.print(noblank, x.Rbrace, token.RBRACE)
+
+		ws = noblank
+		if f.lineout != l {
+			ws = newline | nooverride
+		}
+		f.print(ws, x.Rbrace, token.RBRACE)
 
 	case *ast.ListLit:
 		f.print(x.Lbrack, token.LBRACK, indent)
@@ -504,7 +514,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		f.print(x.Lbrack, token.LBRACK, blank, indent)
 		f.expr(x.Expr)
 		f.print(blank)
-		f.walkClauseList(x.Clauses)
+		f.walkClauseList(x.Clauses, blank)
 		f.print(unindent, f.wsOverride(blank), x.Rbrack, token.RBRACK)
 
 	default:
@@ -515,7 +525,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 func (f *formatter) clause(clause ast.Clause) {
 	switch n := clause.(type) {
 	case *ast.ForClause:
-		f.print(blank, n.For, "for", blank)
+		f.print(n.For, "for", blank)
 		if n.Key != nil {
 			f.label(n.Key, false)
 			f.print(n.Colon, token.COMMA, blank)
@@ -528,7 +538,7 @@ func (f *formatter) clause(clause ast.Clause) {
 		f.expr(n.Source)
 
 	case *ast.IfClause:
-		f.print(blank, n.If, "if", blank)
+		f.print(n.If, "if", blank)
 		f.expr(n.Condition)
 
 	default:

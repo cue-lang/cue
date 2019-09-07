@@ -27,7 +27,6 @@ import (
 
 // Specifies the behavior when the client is unable to connect to Mixer.
 NetworkFailPolicy: {
-
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	policy?: NetworkFailPolicy_FailPolicy @protobuf(1,type=FailPolicy)
 

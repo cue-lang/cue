@@ -841,6 +841,19 @@ func (p *parser) parseField() (decl ast.Decl) {
 			p.errf(p.pos, "comprehension not allowed for this field")
 		}
 		clauses, _ := p.parseComprehensionClauses(false)
+		if len(clauses) == 0 {
+			p.errf(p.pos, "empty comprehension")
+			return &ast.BadDecl{From: p.pos, To: p.pos}
+		}
+		// Erase first position to allow fmt to move to recommended style for
+		// new syntax.
+		switch c := clauses[0].(type) {
+		case *ast.ForClause:
+			c.For = token.NoPos
+		case *ast.IfClause:
+			c.If = token.NoPos
+		}
+
 		return &ast.Comprehension{
 			Clauses: clauses,
 			Value: &ast.StructLit{

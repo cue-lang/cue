@@ -411,7 +411,8 @@ d: 2`,
 		"a: &a {c: 1}\nb: *a",
 		`a: {c: 1}
 b: {
-	c: 1}`, // TODO fix this spacing. Expansions low priority though.
+	c: 1
+}`,
 	}, {
 		"a: &a [1, 2]\nb: *a",
 		"a: [1, 2]\nb: [1, 2]", // TODO: a: [1, 2], b: a

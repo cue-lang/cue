@@ -17,7 +17,9 @@ _conditional.cue:_
 price: number
 
 // Require a justification if price is too high
-justification: string if price > 100
+if price > 100 {
+    justification: string
+}
 
 price: 200
 ```

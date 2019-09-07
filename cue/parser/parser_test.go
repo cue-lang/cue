@@ -237,6 +237,15 @@ func TestParse(t *testing.T) {
 			 }`,
 		`{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
 	}, {
+		"legacy comprehensions", // TODO: remove
+		`
+		a: b for a, v in s
+
+		z: 3 // Remove to have some fun.
+		for a, v in t {d:c}
+		`,
+		`for a: v in s {a: b}, z: 3, for a: v in t {d: c}`,
+	}, {
 		"duplicates allowed",
 		`{
 			a b: 3

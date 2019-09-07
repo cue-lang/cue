@@ -1,17 +1,18 @@
 package kube
 
 kubernetes services: {
-	"\(k)": x.kubernetes & {
-		apiVersion: "v1"
-		kind:       "Service"
+	for k, x in service {
+		"\(k)": x.kubernetes & {
+			apiVersion: "v1"
+			kind:       "Service"
 
-		metadata name:   x.name
-		metadata labels: x.label
-		spec selector:   x.label
+			metadata name:   x.name
+			metadata labels: x.label
+			spec selector:   x.label
 
-		spec ports: [ p for p in x.port ]
-// jba: how does [p for p in x.port ] differ from x.port?
-	} for k, x in service
+			spec ports: [ p for p in x.port ] // convert struct to list
+		}
+	}
 	// Note that we cannot write
 	//   kubernetes services "\(k)": {} for k, x in service
 	// "service" is also a field comprehension and the spec prohibits one field
@@ -26,37 +27,45 @@ kubernetes services: {
 // This would look nicer and would allow for superior type checking.
 
 kubernetes deployments: {
-	"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
-		apiVersion: "extensions/v1beta1"
-		kind:       "Deployment"
-		spec replicas: x.replicas
-	} for k, x in deployment if x.kind == "deployment"
+	for k, x in deployment if x.kind == "deployment" {
+		"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
+			apiVersion: "extensions/v1beta1"
+			kind:       "Deployment"
+			spec replicas: x.replicas
+		}
+	}
 }
 
 kubernetes statefulSets: {
-	"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
-		apiVersion: "apps/v1beta1"
-		kind:       "StatefulSet"
-		spec replicas: x.replicas
-	} for k, x in deployment if x.kind == "stateful"
+	for k, x in deployment if x.kind == "stateful" {
+		"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
+			apiVersion: "apps/v1beta1"
+			kind:       "StatefulSet"
+			spec replicas: x.replicas
+		}
+	}
 }
 
 kubernetes daemonSets: {
-	"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
-		apiVersion: "extensions/v1beta1"
-		kind:       "DaemonSet"
-	} for k, x in deployment if x.kind == "daemon"
+	for k, x in deployment if x.kind == "daemon" {
+		"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
+			apiVersion: "extensions/v1beta1"
+			kind:       "DaemonSet"
+		}
+	}
 }
 
 kubernetes configMaps: {
-	"\(k)": {
-		apiVersion: "v1"
-		kind:       "ConfigMap"
+	for k, v in configMap {
+		"\(k)": {
+			apiVersion: "v1"
+			kind:       "ConfigMap"
 
-		metadata name: k
-		metadata labels component: _base.label.component
-		data: v
-	} for k, v in configMap
+			metadata name: k
+			metadata labels component: _base.label.component
+			data: v
+		}
+	}
 }
 
 // _k8sSpec injects Kubernetes definitions into a deployment
@@ -74,7 +83,9 @@ _k8sSpec X kubernetes: {
 			name:  X.name
 			image: X.image
 			args:  X.args
-			env:   [ {name: k} & v for k, v in X.envSpec ] if len(X.envSpec) > 0
+			if len(X.envSpec) > 0 {
+				env: [ {name: k} & v for k, v in X.envSpec ]
+			}
 
 			ports: [ {
 				name:          k
@@ -85,20 +96,28 @@ _k8sSpec X kubernetes: {
 
 	// Volumes
 	spec template spec: {
-		volumes: [
-				v.kubernetes & {name: v.name} for v in X.volume
-		] if len(X.volume) > 0
+		if len(X.volume) > 0 {
+			volumes: [
+					v.kubernetes & {name: v.name} for v in X.volume
+			]
+		}
 
 		containers: [{
 			// TODO: using conversions this would look like:
 			// volumeMounts: [ k8s.VolumeMount(v) for v in d.volume ]
-			volumeMounts: [ {
-				name:      v.name
-				mountPath: v.mountPath
-				subPath:   v.subPath if v.subPath != null | true
-				readOnly:  v.readOnly if v.readOnly
-			} for v in X.volume
-			] if len(X.volume) > 0
+			if len(X.volume) > 0 {
+				volumeMounts: [ {
+					name:      v.name
+					mountPath: v.mountPath
+					if v.subPath != null | true {
+						subPath: v.subPath
+					}
+					if v.readOnly {
+						readOnly: v.readOnly
+					}
+				} for v in X.volume
+				]
+			}
 		}]
 	}
 }

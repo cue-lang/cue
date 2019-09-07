@@ -90,15 +90,16 @@ _spec spec template spec containers: [...{
 	}]
 }]
 
-service "\(k)": {
-	spec selector: v.spec.template.metadata.labels
+for x in [deployment, daemonSet, statefulSet] for k, v in x {
+	service "\(k)": {
+		spec selector: v.spec.template.metadata.labels
 
-	spec ports: [ {
-		Port = p.containerPort // Port is an alias
-		port:       *Port | int
-		targetPort: *Port | int
-	} for c in v.spec.template.spec.containers
-		for p in c.ports
-		if p._export ]
-
-} for x in [deployment, daemonSet, statefulSet] for k, v in x
+		spec ports: [ {
+			Port = p.containerPort // Port is an alias
+			port:       *Port | int
+			targetPort: *Port | int
+		} for c in v.spec.template.spec.containers
+			for p in c.ports
+			if p._export ]
+	}
+}

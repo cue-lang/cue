@@ -489,18 +489,20 @@ _spec spec template spec containers: [...{
     }]
 }]
 
-service "\(k)": {
-    spec selector: v.spec.template.metadata.labels
+for x in [deployment, daemonSet, statefulSet] for k, v in x {
+    service "\(k)": {
+        spec selector: v.spec.template.metadata.labels
 
-    spec ports: [ {
-        Port = p.containerPort // Port is an alias
-        port:       *Port | int
-        targetPort: *Port | int
-    } for c in v.spec.template.spec.containers
-        for p in c.ports
-        if p._export ]
+        spec ports: [ {
+            Port = p.containerPort // Port is an alias
+            port:       *Port | int
+            targetPort: *Port | int
+        } for c in v.spec.template.spec.containers
+            for p in c.ports
+            if p._export ]
 
-} for x in [deployment, daemonSet, statefulSet] for k, v in x
+    }
+}
 EOF
 $ cue fmt
 ```
@@ -704,25 +706,28 @@ $ cat <<EOF >> kitchen/kube.cue
 deployment <ID> spec template spec: {
     hasDisks :: *true | bool
 
-    volumes: [{
-        name: *"\(ID)-disk" | string
-        gcePersistentDisk pdName: *"\(ID)-disk" | string
-        gcePersistentDisk fsType: "ext4"
-    }, {
-        name: *"secret-\(ID)" | string
-        secret secretName: *"\(ID)-secrets" | string
-    }, ...] if hasDisks
-
-    containers: [{
-        volumeMounts: [{
-            name:      *"\(ID)-disk" | string
-            mountPath: *"/logs" | string
+    // field comprehension using just "if"
+    if hasDisks {
+        volumes: [{
+            name: *"\(ID)-disk" | string
+            gcePersistentDisk pdName: *"\(ID)-disk" | string
+            gcePersistentDisk fsType: "ext4"
         }, {
-            mountPath: *"/etc/certs" | string
-            name:      *"secret-\(ID)" | string
-            readOnly:  true
+            name: *"secret-\(ID)" | string
+            secret secretName: *"\(ID)-secrets" | string
         }, ...]
-    }] if hasDisks // field comprehension using just "if"
+
+        containers: [{
+            volumeMounts: [{
+                name:      *"\(ID)-disk" | string
+                mountPath: *"/logs" | string
+            }, {
+                mountPath: *"/etc/certs" | string
+                name:      *"secret-\(ID)" | string
+                readOnly:  true
+            }, ...]
+        }]
+    }
 }
 EOF
 
@@ -1247,16 +1252,18 @@ Converting services is fairly straightforward.
 
 ```
 kubernetes services: {
-	"\(k)": x.kubernetes & {
-		apiVersion: "v1"
-		kind:       "Service"
+    for k, x in service {
+        "\(k)": x.kubernetes & {
+            apiVersion: "v1"
+            kind:       "Service"
 
-		metadata name:   x.name
-		metadata labels: x.label
-		spec selector:   x.label
+            metadata name:   x.name
+            metadata labels: x.label
+            spec selector:   x.label
 
-		spec ports: [ p for p in x.port ]
-	} for k, x in service
+            spec ports: [ p for p in x.port ]
+        }
+    }
 }
 ```
 

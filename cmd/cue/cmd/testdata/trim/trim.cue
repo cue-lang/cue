@@ -46,7 +46,9 @@ foo multipath: {
 
 // TODO: top-level fields are currently not removed.
 group: {
-	comp "\(k)": v for k, v in foo
+	for k, v in foo {
+		comp "\(k)": v
+	}
 
 	comp bar: {
 		aa: 8 // new value

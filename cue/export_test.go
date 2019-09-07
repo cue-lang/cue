@@ -234,7 +234,9 @@ func TestExport(t *testing.T) {
 			{
 				a: [1, 2]
 				b: {
-					"\(k)": v for k, v in a if v > 1
+					for k, v in a if v > 1 {
+						"\(k)": v
+					}
 				}
 			}`),
 	}, {
@@ -399,7 +401,9 @@ func TestExport(t *testing.T) {
 		in: `{
 			b: [{
 				<X>: int
-				f: 4 if a > 4
+				if a > 4 {
+					f: 4
+				}
 			}][a]
 			a: int
 			c: *1 | 2
@@ -409,10 +413,31 @@ func TestExport(t *testing.T) {
 		{
 			b: [{
 				<X>: int
-				f:   4 if a > 4
+				if a > 4 {
+					f: 4
+				}
 			}][a]
 			a: int
 			c: 1
+		}`),
+	}, {
+		raw: true,
+		in: `{
+			if false {
+				{ a: 1 } | { b: 1 }
+			}
+		}`,
+		// reference to a must be redirected to outer a through alias
+		out: unindent(`
+		{
+			if false {
+				{
+					a: 1
+				} | {
+					b: 1
+				}
+		
+			}
 		}`),
 	}}
 	for _, tc := range testCases {

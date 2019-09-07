@@ -47,7 +47,9 @@ package expressions
 		bbbb: 100 @go(Bbbb) /* a */ @xml(,attr) // comment
 	}
 
-	foo: {bar: string @go(-)}
+	foo: {
+		bar: string @go(-)
+	}
 
 	e:  1 + 2*3
 	e:  1 * 2 * 3 // error
@@ -136,23 +138,37 @@ package expressions
 		for x in someObject
 		if x > 9
 	]
-	"\(k)": v for k, v in someObject
-
-	"\(k)": v <-
-		for k, v in someObject
-
-	e: {"\(k)": v <-
-			for k, v in someObject
-			if k > "a"
+	for k, v in someObject {
+		"\(k)": v
+	}
+	for k, v in someObject {
+		"\(k)": v
 	}
 
-	e: {"\(k)": v for k, v in someObject if k > "a"}
-	e: {"\(k)": v <-
-			for k, v in someObject if k > "a"}
+	e: {
+		for k, v in someObject
+		if k > "a" {
+			"\(k)": v
+		}
+	}
 
-	e: {"\(k)": v <-
-			for k, v in someObject
-			if k > "a"}
+	e: {
+		for k, v in someObject if k > "a" {
+			"\(k)": v
+		}
+	}
+	e: {
+		for k, v in someObject if k > "a" {
+			"\(k)": v
+		}
+	}
+
+	e: {
+		for k, v in someObject
+		if k > "a" {
+			"\(k)": v
+		}
+	}
 
 	e: [{
 		a: 1, b: 2

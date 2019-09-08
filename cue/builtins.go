@@ -2027,8 +2027,6 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				s, min := c.string(0), c.int(1)
 				c.ret = func() interface{} {
-
-					fmt.Println(len([]rune(s)))
 					return len([]rune(s)) >= min
 				}()
 			},

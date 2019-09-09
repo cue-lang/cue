@@ -14,7 +14,7 @@ Foozer :: {
 	Int:    int
 	String: string
 
-	(Inline)
+	Inline
 
 	NoInline:   NoInline
 	CustomJSON: CustomJSON

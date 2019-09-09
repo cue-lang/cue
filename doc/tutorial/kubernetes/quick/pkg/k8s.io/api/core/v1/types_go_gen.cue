@@ -27,7 +27,7 @@ Volume :: {
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
-	(VolumeSource)
+	VolumeSource
 
 }
 
@@ -303,7 +303,7 @@ MountOptionAnnotation :: "volume.beta.kubernetes.io/mount-options"
 // It is analogous to a node.
 // More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes
 PersistentVolume :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -331,7 +331,7 @@ PersistentVolumeSpec :: {
 	// +optional
 	capacity?: ResourceList @go(Capacity) @protobuf(1,bytes,rep,casttype=ResourceList,castkey=ResourceName)
 
-	(PersistentVolumeSource)
+	PersistentVolumeSource
 
 	// AccessModes contains all ways the volume can be mounted.
 	// More info: https://kubernetes.io/docs/concepts/storage/persistent-volumes#access-modes
@@ -434,7 +434,7 @@ PersistentVolumeStatus :: {
 
 // PersistentVolumeList is a list of PersistentVolume items.
 PersistentVolumeList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -448,7 +448,7 @@ PersistentVolumeList :: {
 
 // PersistentVolumeClaim is a user's request for and claim to a persistent volume
 PersistentVolumeClaim :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -469,7 +469,7 @@ PersistentVolumeClaim :: {
 
 // PersistentVolumeClaimList is a list of PersistentVolumeClaim items.
 PersistentVolumeClaimList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -1265,7 +1265,7 @@ SecretVolumeSourceDefaultMode :: int32 & 0o644
 // Note that this is identical to a secret volume source without the default
 // mode.
 SecretProjection :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// If unspecified, each key-value pair in the Data field of the referenced
 	// Secret will be projected into the volume as a file whose name is the
@@ -1734,7 +1734,7 @@ StorageOSPersistentVolumeSource :: {
 // the items element is populated with specific mappings of keys to paths.
 // ConfigMap volumes support ownership management and SELinux relabeling.
 ConfigMapVolumeSource :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// If unspecified, each key-value pair in the Data field of the referenced
 	// ConfigMap will be projected into the volume as a file whose name is the
@@ -1769,7 +1769,7 @@ ConfigMapVolumeSourceDefaultMode :: int32 & 0o644
 // Note that this is identical to a configmap volume source without the default
 // mode.
 ConfigMapProjection :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// If unspecified, each key-value pair in the Data field of the referenced
 	// ConfigMap will be projected into the volume as a file whose name is the
@@ -2142,7 +2142,7 @@ ResourceFieldSelector :: {
 
 // Selects a key from a ConfigMap.
 ConfigMapKeySelector :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// The key to select.
 	key: string @go(Key) @protobuf(2,bytes,opt)
@@ -2154,7 +2154,7 @@ ConfigMapKeySelector :: {
 
 // SecretKeySelector selects a key of a Secret.
 SecretKeySelector :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// The key of the secret to select from.  Must be a valid secret key.
 	key: string @go(Key) @protobuf(2,bytes,opt)
@@ -2185,7 +2185,7 @@ EnvFromSource :: {
 // The contents of the target ConfigMap's Data field will represent the
 // key-value pairs as environment variables.
 ConfigMapEnvSource :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// Specify whether the ConfigMap must be defined
 	// +optional
@@ -2198,7 +2198,7 @@ ConfigMapEnvSource :: {
 // The contents of the target Secret's Data field will represent the
 // key-value pairs as environment variables.
 SecretEnvSource :: {
-	(LocalObjectReference)
+	LocalObjectReference
 
 	// Specify whether the Secret must be defined
 	// +optional
@@ -2279,7 +2279,7 @@ ExecAction :: {
 // Probe describes a health check to be performed against a container to determine whether it is
 // alive or ready to receive traffic.
 Probe :: {
-	(Handler)
+	Handler
 
 	// Number of seconds after the container has started before liveness probes are initiated.
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
@@ -3783,7 +3783,7 @@ EphemeralContainerCommon :: {
 // once added.
 // This is an alpha feature enabled by the EphemeralContainers feature flag.
 EphemeralContainer :: {
-	(EphemeralContainerCommon)
+	EphemeralContainerCommon
 
 	// If set, the name of the container from PodSpec that this ephemeral container targets.
 	// The ephemeral container will be run in the namespaces (IPC, PID, etc) of this container.
@@ -3892,7 +3892,7 @@ PodStatus :: {
 
 // PodStatusResult is a wrapper for PodStatus returned by kubelet that can be encode/decoded
 PodStatusResult :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -3911,7 +3911,7 @@ PodStatusResult :: {
 // Pod is a collection of containers that can run on a host. This resource is created
 // by clients and scheduled onto hosts.
 Pod :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -3934,7 +3934,7 @@ Pod :: {
 
 // PodList is a list of Pods.
 PodList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -3961,7 +3961,7 @@ PodTemplateSpec :: {
 
 // PodTemplate describes a template for creating copies of a predefined pod.
 PodTemplate :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -3976,7 +3976,7 @@ PodTemplate :: {
 
 // PodTemplateList is a list of PodTemplates.
 PodTemplateList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -4080,7 +4080,7 @@ ReplicationControllerCondition :: {
 
 // ReplicationController represents the configuration of a replication controller.
 ReplicationController :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// If the Labels of a ReplicationController are empty, they are defaulted to
 	// be the same as the Pod(s) that the replication controller manages.
@@ -4104,7 +4104,7 @@ ReplicationController :: {
 
 // ReplicationControllerList is a collection of replication controllers.
 ReplicationControllerList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -4401,7 +4401,7 @@ ServicePort :: {
 // (for example 3306) that the proxy listens on, and the selector that determines which pods
 // will answer requests sent through the proxy.
 Service :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -4427,7 +4427,7 @@ ClusterIPNone :: "None"
 
 // ServiceList holds a list of services.
 ServiceList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -4443,7 +4443,7 @@ ServiceList :: {
 // * a principal that can be authenticated and authorized
 // * a set of secrets
 ServiceAccount :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -4472,7 +4472,7 @@ ServiceAccount :: {
 
 // ServiceAccountList is a list of ServiceAccount objects
 ServiceAccountList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -4497,7 +4497,7 @@ ServiceAccountList :: {
 //     },
 //  ]
 Endpoints :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -4586,7 +4586,7 @@ EndpointPort :: {
 
 // EndpointsList is a list of endpoints.
 EndpointsList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5027,7 +5027,7 @@ ResourceList :: {<_>: resource.Quantity}
 // Node is a worker node in Kubernetes.
 // Each node will have a unique identifier in the cache (i.e. in etcd).
 Node :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5049,7 +5049,7 @@ Node :: {
 
 // NodeList is the whole list of all Nodes which have been registered with master.
 NodeList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5139,7 +5139,7 @@ NamespaceCondition :: {
 // Namespace provides a scope for Names.
 // Use of multiple namespaces is optional.
 Namespace :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5159,7 +5159,7 @@ Namespace :: {
 
 // NamespaceList is a list of Namespaces.
 NamespaceList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5174,7 +5174,7 @@ NamespaceList :: {
 // Binding ties one object to another; for example, a pod is bound to a node by a scheduler.
 // Deprecated in 1.7, please use the bindings subresource of pods instead.
 Binding :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5187,7 +5187,7 @@ Binding :: {
 
 // A list of ephemeral containers used with the Pod ephemeralcontainers subresource.
 EphemeralContainers :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -5210,7 +5210,7 @@ Preconditions :: {
 
 // PodLogOptions is the query options for a Pod's logs REST call.
 PodLogOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// The container for which to stream logs. Defaults to only container if there is one container in the pod.
 	// +optional
@@ -5260,7 +5260,7 @@ PodLogOptions :: {
 // TODO: merge w/ PodExecOptions below for stdin, stdout, etc
 // and also when we cut V2, we should export a "StreamOptions" or somesuch that contains Stdin, Stdout, Stder and TTY
 PodAttachOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Stdin if true, redirects the standard input stream of the pod for this call.
 	// Defaults to false.
@@ -5295,7 +5295,7 @@ PodAttachOptions :: {
 // TODO: This is largely identical to PodAttachOptions above, make sure they stay in sync and see about merging
 // and also when we cut V2, we should export a "StreamOptions" or somesuch that contains Stdin, Stdout, Stder and TTY
 PodExecOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Redirect the standard input stream of the pod for this call.
 	// Defaults to false.
@@ -5333,7 +5333,7 @@ PodExecOptions :: {
 // Port forwarding over SPDY does not use these options. It requires the port
 // to be passed in the `port` header as part of request.
 PodPortForwardOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// List of ports to forward
 	// Required when using WebSockets
@@ -5343,7 +5343,7 @@ PodPortForwardOptions :: {
 
 // PodProxyOptions is the query options to a Pod's proxy call.
 PodProxyOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Path is the URL path to use for the current proxy request to pod.
 	// +optional
@@ -5352,7 +5352,7 @@ PodProxyOptions :: {
 
 // NodeProxyOptions is the query options to a Node's proxy call.
 NodeProxyOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Path is the URL path to use for the current proxy request to node.
 	// +optional
@@ -5361,7 +5361,7 @@ NodeProxyOptions :: {
 
 // ServiceProxyOptions is the query options to a Service's proxy call.
 ServiceProxyOptions :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Path is the part of URLs that include service endpoints, suffixes,
 	// and parameters to use for the current proxy request to service.
@@ -5444,7 +5444,7 @@ TypedLocalObjectReference :: {
 
 // SerializedReference is a reference to serialized object.
 SerializedReference :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// The reference to an object in the system.
 	// +optional
@@ -5470,7 +5470,7 @@ EventTypeWarning :: "Warning"
 
 // Event is a report of an event somewhere in the cluster.
 Event :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5562,7 +5562,7 @@ EventSeriesStateUnknown ::  EventSeriesState & "Unknown"
 
 // EventList is a list of events.
 EventList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5628,7 +5628,7 @@ LimitRangeSpec :: {
 
 // LimitRange sets resource usage limits for each kind of resource in a Namespace.
 LimitRange :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5643,7 +5643,7 @@ LimitRange :: {
 
 // LimitRangeList is a list of LimitRange items.
 LimitRangeList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5809,7 +5809,7 @@ ResourceQuotaStatus :: {
 
 // ResourceQuota sets aggregate quota restrictions enforced per namespace
 ResourceQuota :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5829,7 +5829,7 @@ ResourceQuota :: {
 
 // ResourceQuotaList is a list of ResourceQuota items.
 ResourceQuotaList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5844,7 +5844,7 @@ ResourceQuotaList :: {
 // Secret holds secret data of a certain type. The total bytes of the values in
 // the Data field must be less than MaxSecretSize bytes.
 Secret :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -5977,7 +5977,7 @@ SecretTypeBootstrapToken :: SecretType & "bootstrap.kubernetes.io/token"
 
 // SecretList is a list of Secret.
 SecretList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5991,7 +5991,7 @@ SecretList :: {
 
 // ConfigMap holds configuration data for pods to consume.
 ConfigMap :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -6019,7 +6019,7 @@ ConfigMap :: {
 
 // ConfigMapList is a resource containing a list of ConfigMap objects.
 ConfigMapList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -6060,7 +6060,7 @@ ComponentCondition :: {
 
 // ComponentStatus (and ComponentStatusList) holds the cluster validation info.
 ComponentStatus :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -6076,7 +6076,7 @@ ComponentStatus :: {
 
 // Status of all the conditions for the component as a list of ComponentStatus objects.
 ComponentStatusList :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -6269,7 +6269,7 @@ WindowsSecurityContextOptions :: {
 
 // RangeAllocation is not a public type.
 RangeAllocation :: {
-	(metav1.TypeMeta)
+	metav1.TypeMeta
 
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata

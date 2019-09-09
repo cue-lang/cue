@@ -1165,22 +1165,17 @@ comprehensions and the ability to generate good error messages, so thread
 carefully.
 -->
 ```
-StructLit       = "{" [ DeclarationList [ "," [ "..." ] ] "}" .
-DeclarationList = Declaration { "," Declaration }
-Declaration     = FieldDecl | DefinitionDecl | AliasDecl | ComprehensionDecl | Embedding .
+StructLit       = "{" { Declaration "," } [ "..." ] "}" .
+Declaration     = FieldDecl | DefinitionDecl | AliasDecl | Comprehension | Embedding .
 FieldDecl       = Label { Label } ":" Expression { attribute } .
 DefinitionDecl  = Label "::" Expression { attribute } .
-Embedding       = Operand .
+Embedding       = Expression .
 
 AliasDecl       = Label "=" Expression .
 BindLabel       = "<" identifier ">" .
 ConcreteLabel   = identifier | simple_string_lit .
 ExpressionLabel = BindLabel
 Label           = ConcreteLabel [ "?" ] | ExpressionLabel .
-
-<!-- (jba) According to this grammar, I must write a "?" after a bind label, so
-"<Name>: name" is illegal.
--->
 
 attribute       = "@" identifier "(" attr_elems ")" .
 attr_elems      = attr_elem { "," attr_elem }
@@ -1301,6 +1296,9 @@ This would not be the case with  per-field definition.
 -->
 A struct resulting from such a unification is closed if either of the involved
 structs were closed.
+
+Syntactically, embeddings may be any expression except that it only
+allows binary expressions with operators `&` or `|`.
 
 ```
 S1: {
@@ -1618,11 +1616,6 @@ For fields an identifier may be declared more than once within the same block,
 resulting in a field with a value that is the result of unifying the values
 of all fields with the same identifier.
 String labels do not bind an identifier to the respective field.
-
-```
-TopLevelDecl   = Declaration | Emit .
-Emit           = Operand .
-```
 
 The _scope_ of a declared identifier is the extent of source text in which the
 identifier denotes the specified field, alias, or package.
@@ -2596,7 +2589,7 @@ As usual, fields in the struct may evaluate to the same label,
 resulting in the unification of their values.
 
 ```
-ComprehensionDecl   = Clauses StructLit .
+Comprehension       = Clauses StructLit .
 ListComprehension   = "[" Expression Clauses "]" .
 
 Clauses             = Clause { Clause } .
@@ -2877,9 +2870,22 @@ followed by a possibly empty set of import declarations that declare
 packages whose contents it wishes to use, followed by a possibly empty set of
 declarations.
 
+Like with a struct, a source file may contain embeddings.
+Unlike with a struct, the embedded expressions may be any value.
+If the result of the unification of all embedded values is not a struct,
+it will be output instead of its enclosing file when exporting CUE
+to a data format
 
 ```
-SourceFile      = [ PackageClause "," ] { ImportDecl "," } { TopLevelDecl "," } .
+SourceFile      = [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
+```
+
+```
+"Hello \(place)!"
+
+place: "world"
+
+// Outputs "Hello world!"
 ```
 
 ### Package clause

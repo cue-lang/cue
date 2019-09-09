@@ -96,6 +96,14 @@ func TestParse(t *testing.T) {
 		`{ V1, V2 }`,
 		`{V1, V2}`,
 	}, {
+		"selector embedding",
+		`Def :: {
+			a.b.c
+
+			foo: 2
+		}`,
+		`Def :: {a.b.c, foo: 2}`,
+	}, {
 		"ellipsis in structs",
 		`Def :: {
 			b: "2"

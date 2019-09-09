@@ -945,9 +945,8 @@ func (e *extractor) printFields(x *types.Struct) {
 				if i > 0 {
 					fmt.Fprintln(e.w)
 				}
-				fmt.Fprint(e.w, "\n(")
+				fmt.Fprint(e.w, "\n")
 				e.printType(typ)
-				fmt.Fprint(e.w, ")")
 			} else {
 				switch x := typ.(type) {
 				case *types.Struct:

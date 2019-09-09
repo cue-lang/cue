@@ -93,9 +93,6 @@ func TestValidate(t *testing.T) {
 					t.Fatal(err)
 				}
 				v = v.Unify(inst.Value())
-				fmt.Println("XXX", v)
-				fmt.Println("XXX", inst.Value())
-				fmt.Println("UUU", v)
 			}
 
 			err = codec.Validate(v, tc.value)

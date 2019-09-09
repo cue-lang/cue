@@ -883,36 +883,28 @@ func (p *parser) parseAttributes() (attrs []*ast.Attribute) {
 }
 
 func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
-	switch p.tok {
-	case token.IDENT:
-		ident := p.parseIdent()
-		f.Label = ident
-		expr = ident
+	tok := p.tok
+	switch tok {
+	case token.IDENT, token.STRING, token.INTERPOLATION,
+		token.NULL, token.TRUE, token.FALSE:
+		expr = p.parsePrimaryExpr()
 
-	case token.STRING:
-		// JSON compatibility.
+		switch x := expr.(type) {
+		case *ast.BasicLit:
+			switch x.Kind {
+			case token.STRING, token.NULL, token.TRUE, token.FALSE:
+				// Keywords that represent operands.
 
-		expr = p.parseOperand()
-		f.Label = expr.(ast.Label)
+				// Allowing keywords to be used as a labels should not interfere with
+				// generating good errors: any keyword can only appear on the RHS of a
+				// field (after a ':'), whereas labels always appear on the LHS.
 
-	case token.INTERPOLATION:
-		expr = p.parseInterpolation()
-		f.Label = expr.(ast.Label)
+				f.Label, ok = x, true
+			}
 
-	case token.NULL, token.TRUE, token.FALSE:
-		// Keywords that represent operands.
-
-		// Allowing keywords to be used as a labels should not interfere with
-		// generating good errors: any keyword can only appear on the RHS of a
-		// field (after a ':'), whereas labels always appear on the LHS.
-		ident := &ast.BasicLit{
-			Kind:     p.tok,
-			ValuePos: p.pos,
-			Value:    p.lit,
+		case ast.Label:
+			f.Label, ok = x, true
 		}
-		p.next()
-		f.Label = ident
-		expr = ident
 
 	case token.IF, token.FOR, token.IN, token.LET:
 		// Keywords representing clauses.
@@ -921,8 +913,9 @@ func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
 			Name:    p.lit,
 		}
 		p.next()
+		ok = true
 
-	case token.LSS: // element templates
+	case token.LSS:
 		pos := p.pos
 		c := p.openComments()
 		p.next()
@@ -934,12 +927,9 @@ func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
 		p.next()
 		label := &ast.TemplateLabel{Langle: pos, Ident: ident, Rangle: gtr}
 		c.closeNode(p, label)
-		f.Label = label
-
-	default:
-		return expr, false
+		f.Label, ok = label, true
 	}
-	return expr, true
+	return expr, ok
 }
 
 func (p *parser) parseStruct() (expr ast.Expr) {

@@ -30,7 +30,7 @@ func Walk(node Node, before func(Node) bool, after func(Node)) {
 }
 
 // A visitor's before method is invoked for each node encountered by Walk.
-// If the result visitor w is not nil, Walk visits each of the children
+// If the result visitor w is true, Walk visits each of the children
 // of node with the visitor w, followed by a call of w.After.
 type visitor interface {
 	Before(node Node) (w visitor)

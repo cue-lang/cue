@@ -663,6 +663,32 @@ var builtinPackages = map[string]*builtinPkg{
 	},
 	"list": &builtinPkg{
 		native: []*builtin{{
+			Name:   "Slice",
+			Params: []kind{listKind, intKind, intKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				a, i, j := c.list(0), c.int(1), c.int(2)
+				c.ret, c.err = func() (interface{}, error) {
+					if i < 0 || j < 0 {
+						return nil, fmt.Errorf("negative slice index")
+					}
+
+					if i > j {
+						return nil, fmt.Errorf("invalid slice index: %v > %v", i, j)
+					}
+
+					if i > len(a) {
+						return nil, fmt.Errorf("slice bounds out of range")
+					}
+
+					if j > len(a) {
+						return nil, fmt.Errorf("slice bounds out of range")
+					}
+
+					return a[i:j], nil
+				}()
+			},
+		}, {
 			Name:   "MinItems",
 			Params: []kind{listKind, intKind},
 			Result: boolKind,

@@ -22,6 +22,37 @@ import (
 	"cuelang.org/go/cue"
 )
 
+// Slice extracts the consecutive elements from a list starting from position i
+// up till, but not including, position j, where 0 <= i < j <= len(a).
+//
+// For instance:
+//
+//    Slice([1, 2, 3, 4], 1, 3)
+//
+// results in
+//
+//    [2, 3]
+//
+func Slice(a []cue.Value, i, j int) ([]cue.Value, error) {
+	if i < 0 {
+		return nil, fmt.Errorf("negative slice index")
+	}
+
+	if i > j {
+		return nil, fmt.Errorf("invalid slice index: %v > %v", i, j)
+	}
+
+	if i > len(a) {
+		return nil, fmt.Errorf("slice bounds out of range")
+	}
+
+	if j > len(a) {
+		return nil, fmt.Errorf("slice bounds out of range")
+	}
+
+	return a[i:j], nil
+}
+
 // MinItems reports whether a has at least n items.
 func MinItems(a []cue.Value, n int) bool {
 	return len(a) <= n

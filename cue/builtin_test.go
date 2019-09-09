@@ -171,6 +171,21 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Product("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Product)`,
 	}, {
+		test("list", `list.Slice([1, 2, 3, 4], 1, 3)`),
+		`[2,3]`,
+	}, {
+		test("list", `list.Slice([1, 2, 3, 4], -1, 3)`),
+		`_|_(error in call to list.Slice: negative slice index)`,
+	}, {
+		test("list", `list.Slice([1, 2, 3, 4], 3, 1)`),
+		`_|_(error in call to list.Slice: invalid slice index: 3 > 1)`,
+	}, {
+		test("list", `list.Slice([1, 2, 3, 4], 5, 5)`),
+		`_|_(error in call to list.Slice: slice bounds out of range)`,
+	}, {
+		test("list", `list.Slice([1, 2, 3, 4], 1, 5)`),
+		`_|_(error in call to list.Slice: slice bounds out of range)`,
+	}, {
 		test("list", `list.Sum([1, 2, 3, 4])`),
 		`10`,
 	}, {

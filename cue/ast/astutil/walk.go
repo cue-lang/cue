@@ -175,9 +175,7 @@ func walk(v visitor, node ast.Node) {
 		walkDeclList(v, n.Decls)
 
 	case *ast.Package:
-		if n.Name != nil {
-			walk(v, n.Name)
-		}
+		// The package identifier isn't really an identifier. Skip it.
 
 	case *ast.ListComprehension:
 		walk(v, n.Expr)

@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/parser"
 	"github.com/spf13/cobra"
 )
 
@@ -53,7 +54,13 @@ func newFmtCmd(c *Command) *cobra.Command {
 						opts = append(opts, format.Simplify())
 					}
 
-					b, err = format.Source(b, opts...)
+					f, err := parser.ParseFile(fullpath, b, parser.ParseComments)
+					if err != nil {
+						return err
+					}
+					n := fix(f)
+
+					b, err = format.Node(n, opts...)
 					if err != nil {
 						return err
 					}

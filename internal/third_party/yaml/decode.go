@@ -323,6 +323,7 @@ func (d *decoder) unmarshal(n *node) (node ast.Expr) {
 
 func (d *decoder) attachDocComments(m yaml_mark_t, pos int8, expr ast.Node) {
 	comments := []*ast.Comment{}
+	line := 0
 	for len(d.p.parser.comments) > 0 {
 		c := d.p.parser.comments[0]
 		if c.mark.index >= m.index {
@@ -333,10 +334,11 @@ func (d *decoder) attachDocComments(m yaml_mark_t, pos int8, expr ast.Node) {
 			Text:  "//" + c.text[1:],
 		})
 		d.p.parser.comments = d.p.parser.comments[1:]
+		line = c.mark.line
 	}
 	if len(comments) > 0 {
 		expr.AddComment(&ast.CommentGroup{
-			Doc:      pos == 0,
+			Doc:      pos == 0 && line+1 == m.line,
 			Position: pos,
 			List:     comments,
 		})

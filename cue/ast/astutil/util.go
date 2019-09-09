@@ -24,3 +24,22 @@ func CopyComments(to, from ast.Node) {
 	}
 	ast.SetComments(to, from.Comments())
 }
+
+// CopyPosition sets the position of one node to another.
+func CopyPosition(to, from ast.Node) {
+	if from == nil {
+		return
+	}
+	ast.SetPos(to, from.Pos())
+}
+
+// CopyMeta copies comments and position information from one node to another.
+// It returns the destination node.
+func CopyMeta(to, from ast.Node) ast.Node {
+	if from == nil {
+		return to
+	}
+	ast.SetComments(to, from.Comments())
+	ast.SetPos(to, from.Pos())
+	return to
+}

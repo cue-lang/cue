@@ -1455,6 +1455,9 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 				ctx.labelStr(a.feature),
 				nil,
 			}
+			if a.definition || a.optional || a.feature&hidden != 0 {
+				continue
+			}
 			val := src.at(ctx, i)
 			v := fn.call(ctx, x, key, val)
 			if err, ok := v.(*bottom); ok {

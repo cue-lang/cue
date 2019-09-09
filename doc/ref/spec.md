@@ -1239,8 +1239,7 @@ A1: A & {
 
 A _closed struct_ `c` is a struct whose instances may not have regular fields
 not defined in `c`.
-For the purpose of unification,
-closing a struct is equivalent to adding an optional field with value `_|_`
+Closing a struct is equivalent to adding an optional field with value `_|_`
 for all undefined fields.
 
 Syntactically, closed structs can be explicitly created with the `close` builtin
@@ -2570,10 +2569,13 @@ bound to be available for the next clause.
 The `for` clause binds the defined identifiers, on each iteration, to the next
 value of some iterable value in a new scope.
 A `for` clause may bind one or two identifiers.
-If there is one identifier, it binds it to the value, for instance
-a list element, a struct field value or a range element.
+If there is one identifier, it binds it to the value of
+a list element or struct field value.
 If there are two identifiers, the first value will be the key or index,
 if available, and the second will be the value.
+
+For lists, `for` iterates over all elements in the list after closing it.
+For structs, `for` iterates over all non-optional regular fields.
 
 An `if` clause, or guard, specifies an expression that terminates the current
 iteration if it evaluates to false.

@@ -1580,8 +1580,12 @@ a: {
 					sub as: a
 				}
 			}
+
+			for k, v in { def :: 1, opt?: 2, _hid: 3, reg: 4 } {
+				"\(k)": v
+			}
 		`,
-		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield <4>{sub: <5>{as: <3>.a}}}, foo: <6>{a: "bar", sub: <7>{as: "bar"}}}}`,
+		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield <4>{sub: <5>{as: <3>.a}}}, foo: <6>{a: "bar", sub: <7>{as: "bar"}}}, reg: 4}`,
 	}, {
 		desc: "builtins",
 		in: `

@@ -14,7 +14,7 @@
 
 // This file implements scopes and the objects they contain.
 
-package parser
+package astutil
 
 import (
 	"bytes"
@@ -25,13 +25,16 @@ import (
 	"cuelang.org/go/internal"
 )
 
-// resolve resolves all identifiers in a file. Unresolved identifiers are
+// An ErrFunc processes errors.
+type ErrFunc func(pos token.Pos, msg string, args ...interface{})
+
+// Resolve resolves all identifiers in a file. Unresolved identifiers are
 // recorded in Unresolved.
-func resolve(f *ast.File, errFn func(pos token.Pos, msg string, args ...interface{})) {
+func Resolve(f *ast.File, errFn ErrFunc) {
 	walk(&scope{errFn: errFn}, f)
 }
 
-func resolveExpr(e ast.Expr, errFn func(pos token.Pos, msg string, args ...interface{})) {
+func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	f := &ast.File{}
 	walk(&scope{file: f, errFn: errFn}, e)
 }

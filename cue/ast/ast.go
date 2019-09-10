@@ -42,7 +42,9 @@ type Node interface {
 	Pos() token.Pos // position of first character belonging to the node
 	End() token.Pos // position of first character immediately after the node
 
-	// TODO: SetPos(p token.RelPos)
+	// pos reports the pointer to the position of first character belonging to
+	// the node or nil if there is no such position.
+	pos() *token.Pos
 
 	// Deprecated: use ast.Comments
 	Comments() []*CommentGroup
@@ -50,6 +52,35 @@ type Node interface {
 	// Deprecated: use ast.AddComment
 	AddComment(*CommentGroup)
 	commentInfo() *comments
+}
+
+func getPos(n Node) token.Pos {
+	p := n.pos()
+	if p == nil {
+		return token.NoPos
+	}
+	return *p
+}
+
+// SetPos sets a node to the given position, if possible.
+func SetPos(n Node, p token.Pos) {
+	ptr := n.pos()
+	if ptr == nil {
+		return
+	}
+	*ptr = p
+}
+
+// SetRelPos sets the relative position of a node without modifying its
+// file position. Setting it to token.NoRelPos allows a node to adopt default
+// formatting.
+func SetRelPos(n Node, p token.RelPos) {
+	ptr := n.pos()
+	if ptr == nil {
+		return
+	}
+	pos := *ptr
+	*ptr = pos.WithRel(p)
 }
 
 // An Expr is implemented by all expression nodes.
@@ -164,8 +195,9 @@ func (c *Comment) Comments() []*CommentGroup { return nil }
 func (c *Comment) AddComment(*CommentGroup)  {}
 func (c *Comment) commentInfo() *comments    { return nil }
 
-func (c *Comment) Pos() token.Pos { return c.Slash }
-func (c *Comment) End() token.Pos { return c.Slash.Add(len(c.Text)) }
+func (c *Comment) Pos() token.Pos  { return c.Slash }
+func (c *Comment) pos() *token.Pos { return &c.Slash }
+func (c *Comment) End() token.Pos  { return c.Slash.Add(len(c.Text)) }
 
 // A CommentGroup represents a sequence of comments
 // with no other tokens and no empty lines between.
@@ -182,8 +214,9 @@ type CommentGroup struct {
 	List     []*Comment // len(List) > 0
 }
 
-func (g *CommentGroup) Pos() token.Pos { return g.List[0].Pos() }
-func (g *CommentGroup) End() token.Pos { return g.List[len(g.List)-1].End() }
+func (g *CommentGroup) Pos() token.Pos  { return getPos(g) }
+func (g *CommentGroup) pos() *token.Pos { return g.List[0].pos() }
+func (g *CommentGroup) End() token.Pos  { return g.List[len(g.List)-1].End() }
 
 func (g *CommentGroup) Comments() []*CommentGroup { return nil }
 func (g *CommentGroup) AddComment(*CommentGroup)  {}
@@ -265,8 +298,9 @@ type Attribute struct {
 	Text string // must be a valid attribute format.
 }
 
-func (a *Attribute) Pos() token.Pos { return a.At }
-func (a *Attribute) End() token.Pos { return a.At.Add(len(a.Text)) }
+func (a *Attribute) Pos() token.Pos  { return a.At }
+func (a *Attribute) pos() *token.Pos { return &a.At }
+func (a *Attribute) End() token.Pos  { return a.At.Add(len(a.Text)) }
 
 // A Field represents a field declaration in a struct.
 type Field struct {
@@ -283,7 +317,8 @@ type Field struct {
 	Attrs []*Attribute
 }
 
-func (d *Field) Pos() token.Pos { return d.Label.Pos() }
+func (d *Field) Pos() token.Pos  { return d.Label.Pos() }
+func (d *Field) pos() *token.Pos { return d.Label.pos() }
 func (d *Field) End() token.Pos {
 	if len(d.Attrs) > 0 {
 		return d.Attrs[len(d.Attrs)-1].End()
@@ -302,8 +337,9 @@ type Alias struct {
 	Expr  Expr      // An Ident or SelectorExpr
 }
 
-func (a *Alias) Pos() token.Pos { return a.Ident.Pos() }
-func (a *Alias) End() token.Pos { return a.Expr.End() }
+func (a *Alias) Pos() token.Pos  { return a.Ident.Pos() }
+func (a *Alias) pos() *token.Pos { return a.Ident.pos() }
+func (a *Alias) End() token.Pos  { return a.Expr.End() }
 
 // A Comprehension node represents a comprehension declaration.
 type Comprehension struct {
@@ -312,7 +348,8 @@ type Comprehension struct {
 	Value   Expr     // Must be a struct
 }
 
-func (x *Comprehension) Pos() token.Pos { return x.Clauses[0].Pos() }
+func (x *Comprehension) Pos() token.Pos  { return getPos(x) }
+func (x *Comprehension) pos() *token.Pos { return x.Clauses[0].pos() }
 func (x *Comprehension) End() token.Pos {
 	return x.Value.End()
 }
@@ -491,31 +528,50 @@ type BinaryExpr struct {
 
 // token.Pos and End implementations for expression/type nodes.
 
-func (x *BadExpr) Pos() token.Pos       { return x.From }
-func (x *Ident) Pos() token.Pos         { return x.NamePos }
-func (x *TemplateLabel) Pos() token.Pos { return x.Langle }
-func (x *BasicLit) Pos() token.Pos      { return x.ValuePos }
-func (x *Interpolation) Pos() token.Pos { return x.Elts[0].Pos() }
-func (x *StructLit) Pos() token.Pos {
+func (x *BadExpr) Pos() token.Pos        { return x.From }
+func (x *BadExpr) pos() *token.Pos       { return &x.From }
+func (x *Ident) Pos() token.Pos          { return x.NamePos }
+func (x *Ident) pos() *token.Pos         { return &x.NamePos }
+func (x *TemplateLabel) Pos() token.Pos  { return x.Langle }
+func (x *TemplateLabel) pos() *token.Pos { return &x.Langle }
+func (x *BasicLit) Pos() token.Pos       { return x.ValuePos }
+func (x *BasicLit) pos() *token.Pos      { return &x.ValuePos }
+func (x *Interpolation) Pos() token.Pos  { return x.Elts[0].Pos() }
+func (x *Interpolation) pos() *token.Pos { return x.Elts[0].pos() }
+func (x *StructLit) Pos() token.Pos      { return getPos(x) }
+func (x *StructLit) pos() *token.Pos {
 	if x.Lbrace == token.NoPos && len(x.Elts) > 0 {
-		return x.Elts[0].Pos()
+		return x.Elts[0].pos()
 	}
-	return x.Lbrace
+	return &x.Lbrace
 }
 
-func (x *ListLit) Pos() token.Pos           { return x.Lbrack }
-func (x *Ellipsis) Pos() token.Pos          { return x.Ellipsis }
-func (x *ListComprehension) Pos() token.Pos { return x.Lbrack }
-func (x *ForClause) Pos() token.Pos         { return x.For }
-func (x *IfClause) Pos() token.Pos          { return x.If }
-func (x *ParenExpr) Pos() token.Pos         { return x.Lparen }
-func (x *SelectorExpr) Pos() token.Pos      { return x.X.Pos() }
-func (x *IndexExpr) Pos() token.Pos         { return x.X.Pos() }
-func (x *SliceExpr) Pos() token.Pos         { return x.X.Pos() }
-func (x *CallExpr) Pos() token.Pos          { return x.Fun.Pos() }
-func (x *UnaryExpr) Pos() token.Pos         { return x.OpPos }
-func (x *BinaryExpr) Pos() token.Pos        { return x.X.Pos() }
-func (x *BottomLit) Pos() token.Pos         { return x.Bottom }
+func (x *ListLit) Pos() token.Pos            { return x.Lbrack }
+func (x *ListLit) pos() *token.Pos           { return &x.Lbrack }
+func (x *Ellipsis) Pos() token.Pos           { return x.Ellipsis }
+func (x *Ellipsis) pos() *token.Pos          { return &x.Ellipsis }
+func (x *ListComprehension) Pos() token.Pos  { return x.Lbrack }
+func (x *ListComprehension) pos() *token.Pos { return &x.Lbrack }
+func (x *ForClause) Pos() token.Pos          { return x.For }
+func (x *ForClause) pos() *token.Pos         { return &x.For }
+func (x *IfClause) Pos() token.Pos           { return x.If }
+func (x *IfClause) pos() *token.Pos          { return &x.If }
+func (x *ParenExpr) Pos() token.Pos          { return x.Lparen }
+func (x *ParenExpr) pos() *token.Pos         { return &x.Lparen }
+func (x *SelectorExpr) Pos() token.Pos       { return x.X.Pos() }
+func (x *SelectorExpr) pos() *token.Pos      { return x.X.pos() }
+func (x *IndexExpr) Pos() token.Pos          { return x.X.Pos() }
+func (x *IndexExpr) pos() *token.Pos         { return x.X.pos() }
+func (x *SliceExpr) Pos() token.Pos          { return x.X.Pos() }
+func (x *SliceExpr) pos() *token.Pos         { return x.X.pos() }
+func (x *CallExpr) Pos() token.Pos           { return x.Fun.Pos() }
+func (x *CallExpr) pos() *token.Pos          { return x.Fun.pos() }
+func (x *UnaryExpr) Pos() token.Pos          { return x.OpPos }
+func (x *UnaryExpr) pos() *token.Pos         { return &x.OpPos }
+func (x *BinaryExpr) Pos() token.Pos         { return x.X.Pos() }
+func (x *BinaryExpr) pos() *token.Pos        { return x.X.pos() }
+func (x *BottomLit) Pos() token.Pos          { return x.Bottom }
+func (x *BottomLit) pos() *token.Pos         { return &x.Bottom }
 
 func (x *BadExpr) End() token.Pos { return x.To }
 func (x *Ident) End() token.Pos {
@@ -579,11 +635,12 @@ type ImportSpec struct {
 
 // Pos and End implementations for spec nodes.
 
-func (s *ImportSpec) Pos() token.Pos {
+func (s *ImportSpec) Pos() token.Pos { return getPos(s) }
+func (s *ImportSpec) pos() *token.Pos {
 	if s.Name != nil {
-		return s.Name.Pos()
+		return s.Name.pos()
 	}
-	return s.Path.Pos()
+	return s.Path.pos()
 }
 
 // func (s *AliasSpec) Pos() token.Pos { return s.Name.Pos() }
@@ -636,9 +693,12 @@ type EmbedDecl struct {
 
 // Pos and End implementations for declaration nodes.
 
-func (d *BadDecl) Pos() token.Pos    { return d.From }
-func (d *ImportDecl) Pos() token.Pos { return d.Import }
-func (d *EmbedDecl) Pos() token.Pos  { return d.Expr.Pos() }
+func (d *BadDecl) Pos() token.Pos     { return d.From }
+func (d *BadDecl) pos() *token.Pos    { return &d.From }
+func (d *ImportDecl) Pos() token.Pos  { return d.Import }
+func (d *ImportDecl) pos() *token.Pos { return &d.Import }
+func (d *EmbedDecl) Pos() token.Pos   { return d.Expr.Pos() }
+func (d *EmbedDecl) pos() *token.Pos  { return d.Expr.pos() }
 
 func (d *BadDecl) End() token.Pos { return d.To }
 func (d *ImportDecl) End() token.Pos {
@@ -680,6 +740,16 @@ func (f *File) Pos() token.Pos {
 	return token.NoPos
 }
 
+func (f *File) pos() *token.Pos {
+	if len(f.Decls) > 0 {
+		return f.Decls[0].pos()
+	}
+	if f.Filename != "" {
+		return nil
+	}
+	return nil
+}
+
 func (f *File) End() token.Pos {
 	if n := len(f.Decls); n > 0 {
 		return f.Decls[n-1].End()
@@ -694,14 +764,15 @@ type Package struct {
 	Name       *Ident    // package name
 }
 
-func (p *Package) Pos() token.Pos {
+func (p *Package) Pos() token.Pos { return getPos(p) }
+func (p *Package) pos() *token.Pos {
 	if p.PackagePos != token.NoPos {
-		return p.PackagePos
+		return &p.PackagePos
 	}
 	if p.Name != nil {
-		return p.Name.Pos()
+		return p.Name.pos()
 	}
-	return token.NoPos
+	return nil
 }
 
 func (p *Package) End() token.Pos {

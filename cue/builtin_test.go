@@ -144,6 +144,18 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Avg("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Avg)`,
 	}, {
+		test("list", `list.Drop([1, 2, 3, 4], 0)`),
+		`[1,2,3,4]`,
+	}, {
+		test("list", `list.Drop([1, 2, 3, 4], 2)`),
+		`[3,4]`,
+	}, {
+		test("list", `list.Drop([1, 2, 3, 4], 10)`),
+		`[]`,
+	}, {
+		test("list", `list.Drop([1, 2, 3, 4], -1)`),
+		`_|_(error in call to list.Drop: negative index)`,
+	}, {
 		test("list", `list.Max([1, 2, 3, 4])`),
 		`4`,
 	}, {
@@ -175,10 +187,10 @@ func TestBuiltins(t *testing.T) {
 		`[2,3]`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], -1, 3)`),
-		`_|_(error in call to list.Slice: negative slice index)`,
+		`_|_(error in call to list.Slice: negative index)`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], 3, 1)`),
-		`_|_(error in call to list.Slice: invalid slice index: 3 > 1)`,
+		`_|_(error in call to list.Slice: invalid index: 3 > 1)`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], 5, 5)`),
 		`_|_(error in call to list.Slice: slice bounds out of range)`,
@@ -194,6 +206,18 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		test("list", `list.Sum("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Sum)`,
+	}, {
+		test("list", `list.Take([1, 2, 3, 4], 0)`),
+		`[]`,
+	}, {
+		test("list", `list.Take([1, 2, 3, 4], 2)`),
+		`[1,2]`,
+	}, {
+		test("list", `list.Take([1, 2, 3, 4], 10)`),
+		`[1,2,3,4]`,
+	}, {
+		test("list", `list.Take([1, 2, 3, 4], -1)`),
+		`_|_(error in call to list.Take: negative index)`,
 	}, {
 		// Panics
 		test("math", `math.Jacobi(1000, 2000)`),

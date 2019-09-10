@@ -663,29 +663,65 @@ var builtinPackages = map[string]*builtinPkg{
 	},
 	"list": &builtinPkg{
 		native: []*builtin{{
+			Name:   "Drop",
+			Params: []kind{listKind, intKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				x, n := c.list(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if n < 0 {
+						return nil, fmt.Errorf("negative index")
+					}
+
+					if n > len(x) {
+						return []Value{}, nil
+					}
+
+					return x[n:], nil
+				}()
+			},
+		}, {
+			Name:   "Take",
+			Params: []kind{listKind, intKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				x, n := c.list(0), c.int(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if n < 0 {
+						return nil, fmt.Errorf("negative index")
+					}
+
+					if n > len(x) {
+						return x, nil
+					}
+
+					return x[:n], nil
+				}()
+			},
+		}, {
 			Name:   "Slice",
 			Params: []kind{listKind, intKind, intKind},
 			Result: listKind,
 			Func: func(c *callCtxt) {
-				a, i, j := c.list(0), c.int(1), c.int(2)
+				x, i, j := c.list(0), c.int(1), c.int(2)
 				c.ret, c.err = func() (interface{}, error) {
-					if i < 0 || j < 0 {
-						return nil, fmt.Errorf("negative slice index")
+					if i < 0 {
+						return nil, fmt.Errorf("negative index")
 					}
 
 					if i > j {
-						return nil, fmt.Errorf("invalid slice index: %v > %v", i, j)
+						return nil, fmt.Errorf("invalid index: %v > %v", i, j)
 					}
 
-					if i > len(a) {
+					if i > len(x) {
 						return nil, fmt.Errorf("slice bounds out of range")
 					}
 
-					if j > len(a) {
+					if j > len(x) {
 						return nil, fmt.Errorf("slice bounds out of range")
 					}
 
-					return a[i:j], nil
+					return x[i:j], nil
 				}()
 			},
 		}, {

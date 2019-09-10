@@ -22,8 +22,53 @@ import (
 	"cuelang.org/go/cue"
 )
 
-// Slice extracts the consecutive elements from a list starting from position i
-// up till, but not including, position j, where 0 <= i < j <= len(a).
+// Drop reports the suffix of list x after the first n elements,
+// or [] if n > len(x).
+//
+// For instance:
+//
+//    Drop([1, 2, 3, 4], 2)
+//
+// results in
+//
+//    [3, 4]
+//
+func Drop(x []cue.Value, n int) ([]cue.Value, error) {
+	if n < 0 {
+		return nil, fmt.Errorf("negative index")
+	}
+
+	if n > len(x) {
+		return []cue.Value{}, nil
+	}
+
+	return x[n:], nil
+}
+
+// Take reports the prefix of length n of list x, or x itself if n > len(x).
+//
+// For instance:
+//
+//    Take([1, 2, 3, 4], 2)
+//
+// results in
+//
+//    [1, 2]
+//
+func Take(x []cue.Value, n int) ([]cue.Value, error) {
+	if n < 0 {
+		return nil, fmt.Errorf("negative index")
+	}
+
+	if n > len(x) {
+		return x, nil
+	}
+
+	return x[:n], nil
+}
+
+// Slice extracts the consecutive elements from list x starting from position i
+// up till, but not including, position j, where 0 <= i < j <= len(x).
 //
 // For instance:
 //
@@ -33,24 +78,24 @@ import (
 //
 //    [2, 3]
 //
-func Slice(a []cue.Value, i, j int) ([]cue.Value, error) {
+func Slice(x []cue.Value, i, j int) ([]cue.Value, error) {
 	if i < 0 {
-		return nil, fmt.Errorf("negative slice index")
+		return nil, fmt.Errorf("negative index")
 	}
 
 	if i > j {
-		return nil, fmt.Errorf("invalid slice index: %v > %v", i, j)
+		return nil, fmt.Errorf("invalid index: %v > %v", i, j)
 	}
 
-	if i > len(a) {
+	if i > len(x) {
 		return nil, fmt.Errorf("slice bounds out of range")
 	}
 
-	if j > len(a) {
+	if j > len(x) {
 		return nil, fmt.Errorf("slice bounds out of range")
 	}
 
-	return a[i:j], nil
+	return x[i:j], nil
 }
 
 // MinItems reports whether a has at least n items.

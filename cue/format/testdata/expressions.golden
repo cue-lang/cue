@@ -155,15 +155,13 @@ package expressions
 	e: {for k, v in someObject if k > "a" {"\(k)": v}}
 	e: {for k, v in someObject if k > "a" {
 		"\(k)": v
-	}
-	}
+	}}
 
 	e: {
 		for k, v in someObject
 		if k > "a" {
 			"\(k)": v
-		}
-	}
+		}}
 
 	e: [{
 		a: 1, b: 2

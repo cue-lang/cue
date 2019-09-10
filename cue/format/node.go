@@ -265,7 +265,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.print(formfeed)
 		}
 		f.expr(n.Expr)
-		f.print(newline, newsection, nooverride) // force newline
+		f.print(newsection, noblank)
 
 	case *ast.Ellipsis:
 		f.ellipsis(n)
@@ -495,7 +495,10 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 		ws = noblank
 		if f.lineout != l {
-			ws = newline | nooverride
+			ws |= newline
+			if f.lastTok != token.RBRACE && f.lastTok != token.RBRACK {
+				ws |= nooverride
+			}
 		}
 		f.print(ws, x.Rbrace, token.RBRACE)
 

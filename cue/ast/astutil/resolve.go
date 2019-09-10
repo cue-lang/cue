@@ -29,11 +29,13 @@ import (
 type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 
 // Resolve resolves all identifiers in a file. Unresolved identifiers are
-// recorded in Unresolved.
+// recorded in Unresolved. It will not overwrite already resolved values.
 func Resolve(f *ast.File, errFn ErrFunc) {
 	walk(&scope{errFn: errFn}, f)
 }
 
+// Resolve resolves all identifiers in an expression.
+// It will not overwrite already resolved values.
 func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	f := &ast.File{}
 	walk(&scope{file: f, errFn: errFn}, e)
@@ -91,6 +93,20 @@ func (s *scope) insert(name string, n ast.Node) {
 		}
 	}
 	s.index[name] = n
+}
+
+func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, ok bool) {
+	last := s
+	for s != nil {
+		if n, ok := s.index[name]; ok && node == n {
+			if last.node == n {
+				return nil, true
+			}
+			return s.node, true
+		}
+		s, last = s.outer, s
+	}
+	return nil, false
 }
 
 func (s *scope) lookup(name string) (obj, node ast.Node) {
@@ -169,8 +185,21 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			break
 		}
 		if obj, node := s.lookup(name); node != nil {
-			x.Node = node
-			x.Scope = obj
+			switch {
+			case x.Node == nil:
+				x.Node = node
+				x.Scope = obj
+
+			case x.Node == node:
+				x.Scope = obj
+
+			default: // x.Node != node
+				scope, ok := s.resolveScope(name, x.Node)
+				if !ok {
+					s.file.Unresolved = append(s.file.Unresolved, x)
+				}
+				x.Scope = scope
+			}
 		} else {
 			s.file.Unresolved = append(s.file.Unresolved, x)
 		}

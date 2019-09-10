@@ -204,6 +204,49 @@ a: "string"
 			}
 			return true
 		},
+	}, {
+		name: "imports",
+		in: `
+a: "string"
+			`,
+		out: `
+import "list"
+
+a: list
+		`,
+		after: func(c astutil.Cursor) bool {
+			switch c.Node().(type) {
+			case *ast.BasicLit:
+				c.Replace(c.Import("list"))
+			}
+			return true
+		},
+	}, {
+		name: "imports",
+		in: `package foo
+
+import "math"
+
+a: 3
+				`,
+		out: `package foo
+
+import (
+	"math"
+	"list"
+)
+
+a: list
+			`,
+		after: func(c astutil.Cursor) bool {
+			switch x := c.Node().(type) {
+			case *ast.BasicLit:
+				if x.Kind == token.INT {
+					c.Replace(c.Import("list"))
+				}
+			}
+			return true
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

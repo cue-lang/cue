@@ -16,9 +16,13 @@ package astutil
 
 import (
 	"fmt"
+	"path"
 	"reflect"
+	"strconv"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 // A Cursor describes a node encountered during Apply.
@@ -41,6 +45,11 @@ type Cursor interface {
 	// list.
 	Index() int
 
+	// Import reports an opaque identifier that refers to the given package. It
+	// may only be called if the input to apply was an ast.File. If the import
+	// does not exist, it will be added.
+	Import(path string) *ast.Ident
+
 	// Replace replaces the current Node with n.
 	// The replacement node is not walked by Apply. Comments of the old node
 	// are copied to the new node if it has not yet an comments associated
@@ -60,9 +69,19 @@ type Cursor interface {
 	// If the current Node is not part of a struct, InsertBefore panics.
 	// Apply will not walk n.
 	InsertBefore(n ast.Node)
+
+	self() *cursor
+}
+
+type info struct {
+	f       *ast.File
+	current *declsCursor
+
+	importPatch []*ast.Ident
 }
 
 type cursor struct {
+	file     *info
 	parent   Cursor
 	node     ast.Node
 	typ      interface{} // the type of the node
@@ -79,9 +98,77 @@ func newCursor(parent Cursor, n ast.Node, typ interface{}) *cursor {
 	}
 }
 
+func fileInfo(c Cursor) (info *info) {
+	for ; c != nil; c = c.Parent() {
+		if i := c.self().file; i != nil {
+			return i
+		}
+	}
+	return nil
+}
+
+func (c *cursor) self() *cursor  { return c }
 func (c *cursor) Parent() Cursor { return c.parent }
 func (c *cursor) Index() int     { return c.index }
 func (c *cursor) Node() ast.Node { return c.node }
+
+func (c *cursor) Import(importPath string) *ast.Ident {
+	info := fileInfo(c)
+	if info == nil {
+		return nil
+	}
+
+	quoted := strconv.Quote(importPath)
+
+	var imports *ast.ImportDecl
+	var spec *ast.ImportSpec
+	decls := info.current.decls
+	i := 0
+outer:
+	for ; i < len(decls); i++ {
+		d := decls[i]
+		switch t := d.(type) {
+		default:
+			break outer
+
+		case *ast.Package:
+		case *ast.CommentGroup:
+		case *ast.ImportDecl:
+			imports = t
+			for _, s := range t.Specs {
+				if s.Path.Value == quoted {
+					spec = s
+					break
+				}
+			}
+		}
+	}
+
+	if spec == nil {
+		// Import not found, add one.
+		if imports == nil {
+			imports = &ast.ImportDecl{}
+			a := append(append(decls[:i], imports), decls[i:]...)
+			decls = a
+			info.current.decls = decls
+		}
+		path := &ast.BasicLit{Kind: token.STRING, Value: quoted}
+		spec = &ast.ImportSpec{Path: path}
+		imports.Specs = append(imports.Specs, spec)
+		ast.SetRelPos(imports.Specs[0], token.NoRelPos)
+	}
+
+	ident := &ast.Ident{Node: spec} // Name is set later.
+	info.importPatch = append(info.importPatch, ident)
+
+	name := path.Base(importPath)
+	if p := strings.LastIndexByte(name, ':'); p > 0 {
+		name = name[p+1:]
+	}
+	ident.Name = name
+
+	return ident
+}
 
 func (c *cursor) Replace(n ast.Node) {
 	// panic if the value cannot convert to the original type.
@@ -166,6 +253,9 @@ func applyDeclList(v applyVisitor, parent Cursor, list []ast.Decl) []ast.Decl {
 		cursor: newCursor(parent, nil, nil),
 		decls:  make([]ast.Decl, 0, len(list)),
 	}
+	if file, ok := parent.Node().(*ast.File); ok {
+		c.cursor.file = &info{f: file, current: c}
+	}
 	for i, x := range list {
 		c.node = x
 		c.typ = &list[i]
@@ -177,6 +267,24 @@ func applyDeclList(v applyVisitor, parent Cursor, list []ast.Decl) []ast.Decl {
 		c.decls = append(c.decls, c.after...)
 		c.after = c.after[:0]
 	}
+
+	// TODO: ultimately, programmatically linked nodes have to be resolved
+	// at the end.
+	// if info := c.cursor.file; info != nil {
+	// 	done := map[*ast.ImportSpec]bool{}
+	// 	for _, ident := range info.importPatch {
+	// 		spec := ident.Node.(*ast.ImportSpec)
+	// 		if done[spec] {
+	// 			continue
+	// 		}
+	// 		done[spec] = true
+
+	// 		path, _ := strconv.Unquote(spec.Path)
+
+	// 		ident.Name =
+	// 	}
+	// }
+
 	return c.decls
 }
 

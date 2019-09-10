@@ -72,6 +72,14 @@ func TestBuild(t *testing.T) {
 		Number: 12
 		`),
 	}
+	pkg3 := &bimport{
+		"example.com/foo/v1:pkg3",
+		files(`
+		package pkg3
+
+		List: [1,2,3]
+		`),
+	}
 
 	testCases := []struct {
 		instances []*bimport
@@ -160,6 +168,29 @@ func TestBuild(t *testing.T) {
 				"Hello \(pkg.Number)!"`),
 		}),
 		`"Hello 12!"`,
+	}, {
+		insts(pkg3, &bimport{"",
+			files(
+				`package test
+
+				import "example.com/foo/v1:pkg3"
+
+				"Hello \(pkg3.List[1])!"`),
+		}),
+		`"Hello 2!"`,
+	}, {
+		insts(pkg3, &bimport{"",
+			files(
+				`package test
+
+				import "example.com/foo/v1:pkg3"
+
+				pkg3: 3
+
+				"Hello \(pkg3.List[1])!"`),
+		}),
+		`pkg3 redeclared as imported package name
+	previous declaration at file0.cue:5:5`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

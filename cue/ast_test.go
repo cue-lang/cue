@@ -19,8 +19,11 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal"
+	"github.com/stretchr/testify/assert"
 )
 
 func TestCompile(t *testing.T) {
@@ -419,6 +422,15 @@ func TestResolution(t *testing.T) {
 		name: "nonexisting import package",
 		in:   `import "doesnotexist"`,
 		err:  `package "doesnotexist" not found`,
+	}, {
+		name: "duplicate with different name okay",
+		in: `
+		import "time"
+		import time2 "time"
+
+		a: time.Time
+		b: time2.Time
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -436,4 +448,54 @@ func TestResolution(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestShadowing(t *testing.T) {
+	spec := &ast.ImportSpec{Path: mustParseExpr(`"list"`).(*ast.BasicLit)}
+	testCases := []struct {
+		file *ast.File
+		want string
+	}{{
+		file: &ast.File{Decls: []ast.Decl{
+			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
+			&ast.Field{
+				Label: mustParseExpr(`list`).(*ast.Ident),
+				Value: &ast.CallExpr{
+					Fun: &ast.SelectorExpr{
+						X: &ast.Ident{
+							Name: "list",
+							Node: spec,
+						},
+						Sel: ast.NewIdent("Min"),
+					},
+				},
+			},
+		}},
+		want: "import listx \"list\", list: listx.Min()",
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			var r Runtime
+			inst, err := r.CompileFile(tc.file)
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			ctx := r.index().newContext()
+
+			n, _ := export(ctx, inst.rootStruct, options{
+				raw: true,
+			})
+			got := internal.DebugStr(n)
+			assert.Equal(t, got, tc.want)
+		})
+	}
+}
+
+func mustParseExpr(expr string) ast.Expr {
+	ex, err := parser.ParseExpr("cue", expr)
+	if err != nil {
+		panic(err)
+	}
+	return ex
 }

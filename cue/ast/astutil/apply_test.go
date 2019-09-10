@@ -116,13 +116,15 @@ foo: {
 	}, {
 		name: "replace",
 		in: `
-		a: "string"
+		// keep comment
+		a: "string" // and this one
 		b: 3
 		c: [ 1, 2, 8, 4 ]
 		d: "\(foo) is \(0)"
 		`,
 		out: `
-a: s
+// keep comment
+a: s // and this one
 b: 4
 c: [4, 4, 4, 4]
 d: "\(foo) is \(4)"

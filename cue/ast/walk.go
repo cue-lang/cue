@@ -64,7 +64,7 @@ func walk(v visitor, node Node) {
 
 	// TODO: record the comment groups and interleave with the values like for
 	// parsing and printing?
-	for _, c := range node.Comments() {
+	for _, c := range Comments(node) {
 		walk(v, c)
 	}
 
@@ -221,7 +221,7 @@ type commentFrame struct {
 func (f *inspector) Before(node Node) visitor {
 	if f.before == nil || f.before(node) {
 		f.commentStack = append(f.commentStack, f.current)
-		f.current = commentFrame{cg: node.Comments()}
+		f.current = commentFrame{cg: Comments(node)}
 		f.visitComments(f.current.pos)
 		return f
 	}

@@ -42,7 +42,9 @@ type Cursor interface {
 	Index() int
 
 	// Replace replaces the current Node with n.
-	// The replacement node is not walked by Apply.
+	// The replacement node is not walked by Apply. Comments of the old node
+	// are copied to the new node if it has not yet an comments associated
+	// with it.
 	Replace(n ast.Node)
 
 	// Delete deletes the current Node from its containing struct.
@@ -84,6 +86,9 @@ func (c *cursor) Node() ast.Node { return c.node }
 func (c *cursor) Replace(n ast.Node) {
 	// panic if the value cannot convert to the original type.
 	reflect.ValueOf(n).Convert(reflect.TypeOf(c.typ).Elem())
+	if ast.Comments(n) != nil {
+		CopyComments(n, c.node)
+	}
 	c.node = n
 	c.replaced = true
 }

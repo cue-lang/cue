@@ -44,8 +44,12 @@ type Node interface {
 
 	// TODO: SetPos(p token.RelPos)
 
+	// Deprecated: use ast.Comments
 	Comments() []*CommentGroup
+
+	// Deprecated: use ast.AddComment
 	AddComment(*CommentGroup)
+	commentInfo() *comments
 }
 
 // An Expr is implemented by all expression nodes.
@@ -117,6 +121,8 @@ type comments struct {
 	groups *[]*CommentGroup
 }
 
+func (c *comments) commentInfo() *comments { return c }
+
 func (c *comments) Comments() []*CommentGroup {
 	if c.groups == nil {
 		return []*CommentGroup{}
@@ -139,14 +145,24 @@ func (c *comments) AddComment(cg *CommentGroup) {
 	*c.groups = append(*c.groups, cg)
 }
 
+func (c *comments) SetComments(cgs []*CommentGroup) {
+	if c.groups == nil {
+		a := cgs
+		c.groups = &a
+		return
+	}
+	*c.groups = cgs
+}
+
 // A Comment node represents a single //-style or /*-style comment.
 type Comment struct {
 	Slash token.Pos // position of "/" starting the comment
 	Text  string    // comment text (excluding '\n' for //-style comments)
 }
 
-func (g *Comment) Comments() []*CommentGroup { return nil }
-func (g *Comment) AddComment(*CommentGroup)  {}
+func (c *Comment) Comments() []*CommentGroup { return nil }
+func (c *Comment) AddComment(*CommentGroup)  {}
+func (c *Comment) commentInfo() *comments    { return nil }
 
 func (c *Comment) Pos() token.Pos { return c.Slash }
 func (c *Comment) End() token.Pos { return c.Slash.Add(len(c.Text)) }
@@ -171,6 +187,7 @@ func (g *CommentGroup) End() token.Pos { return g.List[len(g.List)-1].End() }
 
 func (g *CommentGroup) Comments() []*CommentGroup { return nil }
 func (g *CommentGroup) AddComment(*CommentGroup)  {}
+func (g *CommentGroup) commentInfo() *comments    { return nil }
 
 func isWhitespace(ch byte) bool { return ch == ' ' || ch == '\t' || ch == '\n' || ch == '\r' }
 

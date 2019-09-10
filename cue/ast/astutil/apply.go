@@ -118,6 +118,16 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 		return nil
 	}
 
+	name := path.Base(importPath)
+	if p := strings.LastIndexByte(name, ':'); p > 0 {
+		name = name[p+1:]
+	}
+
+	// TODO: come up with something much better.
+	// For instance, hoist the uniquer form cue/export.go to
+	// here and make export.go use this.
+	name += "530467a1"
+
 	quoted := strconv.Quote(importPath)
 
 	var imports *ast.ImportDecl
@@ -136,10 +146,13 @@ outer:
 		case *ast.ImportDecl:
 			imports = t
 			for _, s := range t.Specs {
-				if s.Path.Value == quoted {
-					spec = s
-					break
+				if s.Path.Value != quoted ||
+					s.Name == nil ||
+					s.Name.Name != name {
+					continue
 				}
+				spec = s
+				break
 			}
 		}
 	}
@@ -153,7 +166,10 @@ outer:
 			info.current.decls = decls
 		}
 		path := &ast.BasicLit{Kind: token.STRING, Value: quoted}
-		spec = &ast.ImportSpec{Path: path}
+		spec = &ast.ImportSpec{
+			Name: ast.NewIdent(name),
+			Path: path,
+		}
 		imports.Specs = append(imports.Specs, spec)
 		ast.SetRelPos(imports.Specs[0], token.NoRelPos)
 	}
@@ -161,10 +177,6 @@ outer:
 	ident := &ast.Ident{Node: spec} // Name is set later.
 	info.importPatch = append(info.importPatch, ident)
 
-	name := path.Base(importPath)
-	if p := strings.LastIndexByte(name, ':'); p > 0 {
-		name = name[p+1:]
-	}
 	ident.Name = name
 
 	return ident

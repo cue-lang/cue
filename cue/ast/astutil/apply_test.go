@@ -205,14 +205,14 @@ a: "string"
 			return true
 		},
 	}, {
-		name: "imports",
+		name: "imports add",
 		in: `
 a: "string"
 			`,
 		out: `
-import "list"
+import list530467a1 "list"
 
-a: list
+a: list530467a1
 		`,
 		after: func(c astutil.Cursor) bool {
 			switch c.Node().(type) {
@@ -222,7 +222,7 @@ a: list
 			return true
 		},
 	}, {
-		name: "imports",
+		name: "imports add to",
 		in: `package foo
 
 import "math"
@@ -233,11 +233,37 @@ a: 3
 
 import (
 	"math"
-	"list"
+	list530467a1 "list"
 )
 
-a: list
+a: list530467a1
 			`,
+		after: func(c astutil.Cursor) bool {
+			switch x := c.Node().(type) {
+			case *ast.BasicLit:
+				if x.Kind == token.INT {
+					c.Replace(c.Import("list"))
+				}
+			}
+			return true
+		},
+	}, {
+		name: "imports duplicate",
+		in: `package foo
+
+import "list"
+
+a: 3
+				`,
+		out: `package foo
+
+import (
+	"list"
+	list530467a1 "list"
+)
+
+a: list530467a1
+					`,
 		after: func(c astutil.Cursor) bool {
 			switch x := c.Node().(type) {
 			case *ast.BasicLit:

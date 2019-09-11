@@ -4,18 +4,14 @@ _JSON Sugar and other Goodness_
 
 # Comments
 
-CUE supports C-style block and line comments.
+CUE supports C-style line comments.
 
 <!-- CUE editor -->
 _comments.cue:_
 ```
-// whole numbers
+// a doc comment
 one: 1
-two: 2
-
-/* fractions
- */
-"two-and-a-half": 2.5
+two: 2 // a line comment
 ```
 
 <!-- JSON result -->
@@ -24,6 +20,5 @@ two: 2
 {
     "one": 1,
     "two": 2,
-    "two-and-a-half": 2.5
 }
 ```

@@ -135,14 +135,12 @@ hex_digit     = "0" … "9" | "A" … "F" | "a" … "f" .
 ## Lexical elements
 
 ### Comments
-Comments serve as program documentation. There are two forms:
+Comments serve as program documentation.
+CUE supports line comments that start with the character sequence //
+and stop at the end of the line.
 
-1. Line comments start with the character sequence // and stop at the end of the line.
-2. General comments start with the character sequence /* and stop with the first subsequent character sequence */.
-
-A comment cannot start inside string literal or inside a comment.
-A general comment containing no newlines acts like a space.
-Any other comment acts like a newline.
+A comment cannot start inside a string literal or inside a comment.
+A comment acts like a newline.
 
 
 ### Tokens
@@ -2013,76 +2011,6 @@ i: int | *1             (int, 1)
 
 v: x[i]                 (x[i], 4)
 ```
-
-
-### Slice expressions
-
-<!-- TODO: consider removing slices alltogether
-Slice is or marginal utility in CUE. Also, it may be that we will use
-other notations to achieve the same.
-
-For now it seems saver to remove and provide slicing as builtins instead:
-
-    list.Slice()
-    strings.Runes().Slice()      // slice by rune
-    strings.Characters().Slice() // slice by character
-    bytes.Slice()                // slice by bytes
--->
-
-Slice expressions construct a slice from a list value.
-
-The primary expression
-```
-a[low : high]
-```
-constructs a slice.
-The indices `low` and `high` must be concrete integers and select
-which elements of operand `a` appear in the result.
-The result has indices starting at 0 and length equal to `high` - `low`.
-After slicing the list `a`
-<!-- TODO(jba): how does slicing open lists work? -->
-
-<!-- TODO: consider this.
-For `a` is a disjunction of the form `a1 | ... | an`, then the result is
-`a1[low:high] | ... | an[low:high]` observing the above rules.
--->
-```
-a := [1, 2, 3, 4, 5]
-s := a[1:4]
-```
-the list s has length 3 and elements
-```
-s[0] == 2
-s[1] == 3
-s[2] == 4
-```
-For convenience, any of the indices may be omitted.
-A missing `low` index defaults to zero; a missing `high` index defaults
-to the length of the sliced operand:
-```
-a[2:]  // same as a[2 : len(a)]
-a[:3]  // same as a[0 : 3]
-a[:]   // same as a[0 : len(a)]
-```
-
-Indices are in range if `0 <= low <= high <= len(a)`,
-otherwise they are out of range.
-
-Both the slice operand and the slice indices may be associated with a default.
-
-<!--
-```
-va[vs:ve]                      =>  va[vs:ve]
-va[vs:(ve, de)]                =>  (va[vs:ve], va[vs:de])
-va[(vs, ds):ve]                =>  (va[vs:ve], va[ds:ve])
-va[(vs, ds):(ve, de)]          =>  (va[vs:ve], va[ds:de])
-(va, da)[vs:ve]                =>  (va[vs:ve], da[vs:ve])
-(va, da)[vs:(ve, de)]          =>  (va[vs:ve], da[vs:de])
-(va, da)[(vs, ds):ve]          =>  (va[vs:ve], da[ds:ve])
-(va, da)[(vs, ds):(ve, de)]    =>  (va[vs:ve], da[ds:de])
-```
--->
-
 
 ### Operators
 

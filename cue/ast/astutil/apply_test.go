@@ -210,9 +210,9 @@ a: "string"
 a: "string"
 			`,
 		out: `
-import list530467a1 "list"
+import list6c6973 "list"
 
-a: list530467a1
+a: list6c6973
 		`,
 		after: func(c astutil.Cursor) bool {
 			switch c.Node().(type) {
@@ -233,10 +233,10 @@ a: 3
 
 import (
 	"math"
-	list530467a1 "list"
+	list6c6973 "list"
 )
 
-a: list530467a1
+a: list6c6973
 			`,
 		after: func(c astutil.Cursor) bool {
 			switch x := c.Node().(type) {
@@ -259,10 +259,10 @@ a: 3
 
 import (
 	"list"
-	list530467a1 "list"
+	list6c6973 "list"
 )
 
-a: list530467a1
+a: list6c6973
 					`,
 		after: func(c astutil.Cursor) bool {
 			switch x := c.Node().(type) {

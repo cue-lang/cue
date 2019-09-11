@@ -15,7 +15,9 @@
 package astutil
 
 import (
+	"encoding/hex"
 	"fmt"
+	"hash/fnv"
 	"path"
 	"reflect"
 	"strconv"
@@ -126,7 +128,8 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 	// TODO: come up with something much better.
 	// For instance, hoist the uniquer form cue/export.go to
 	// here and make export.go use this.
-	name += "530467a1"
+	hash := fnv.New32()
+	name += hex.EncodeToString(hash.Sum([]byte(importPath)))[:6]
 
 	quoted := strconv.Quote(importPath)
 

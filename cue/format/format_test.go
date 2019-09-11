@@ -245,6 +245,7 @@ func TestPackage(t *testing.T) {
 			&ast.Package{Name: ast.NewIdent("foo")},
 			&ast.EmbedDecl{
 				Expr: &ast.BasicLit{
+					Kind:     token.INT,
 					ValuePos: token.NoSpace.Pos(),
 					Value:    "1",
 				},

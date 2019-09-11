@@ -451,7 +451,7 @@ func TestResolution(t *testing.T) {
 }
 
 func TestShadowing(t *testing.T) {
-	spec := &ast.ImportSpec{Path: mustParseExpr(`"list"`).(*ast.BasicLit)}
+	spec := ast.NewImport(nil, "list")
 	testCases := []struct {
 		file *ast.File
 		want string
@@ -460,15 +460,8 @@ func TestShadowing(t *testing.T) {
 			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
 			&ast.Field{
 				Label: mustParseExpr(`list`).(*ast.Ident),
-				Value: &ast.CallExpr{
-					Fun: &ast.SelectorExpr{
-						X: &ast.Ident{
-							Name: "list",
-							Node: spec,
-						},
-						Sel: ast.NewIdent("Min"),
-					},
-				},
+				Value: ast.NewCall(
+					ast.NewSel(&ast.Ident{Name: "list", Node: spec}, "Min")),
 			},
 		}},
 		want: "import listx \"list\", list: listx.Min()",

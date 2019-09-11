@@ -154,9 +154,7 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	p.sorted = imported
 
 	for _, v := range imported {
-		spec := &ast.ImportSpec{
-			Path: &ast.BasicLit{Kind: token.STRING, Value: strconv.Quote(v)},
-		}
+		spec := ast.NewImport(nil, v)
 		imports.Specs = append(imports.Specs, spec)
 		p.file.Imports = append(p.file.Imports, spec)
 	}
@@ -293,13 +291,8 @@ func (p *protoConverter) uniqueTop(name string) string {
 
 func (p *protoConverter) toExpr(pos scanner.Position, name string) (expr ast.Expr) {
 	a := strings.Split(name, ".")
-	for i, s := range a {
-		if i == 0 {
-			expr = &ast.Ident{NamePos: p.toCUEPos(pos), Name: s}
-			continue
-		}
-		expr = &ast.SelectorExpr{X: expr, Sel: ast.NewIdent(s)}
-	}
+	expr = &ast.Ident{NamePos: p.toCUEPos(pos), Name: a[0]}
+	expr = ast.NewSel(expr, a[1:]...)
 	return expr
 }
 

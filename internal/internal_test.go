@@ -19,7 +19,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"github.com/stretchr/testify/assert"
 )
@@ -30,11 +29,11 @@ func TestLabelName(t *testing.T) {
 		out string
 		ok  bool
 	}{{
-		in:  &ast.BasicLit{Kind: token.STRING, Value: `"foo-bar"`},
+		in:  ast.NewString("foo-bar"),
 		out: "foo-bar",
 		ok:  true,
 	}, {
-		in:  &ast.BasicLit{Kind: token.STRING, Value: `"foo bar"`},
+		in:  ast.NewString("foo bar"),
 		out: "foo bar",
 		ok:  true,
 	}, {

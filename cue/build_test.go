@@ -29,12 +29,12 @@ func TestFromExpr(t *testing.T) {
 		expr ast.Expr
 		out  string
 	}{{
-		expr: &ast.BasicLit{Kind: token.STRING, Value: `"Hello"`},
+		expr: ast.NewString("Hello"),
 		out:  `"Hello"`,
 	}, {
 		expr: &ast.ListLit{Elts: []ast.Expr{
-			&ast.BasicLit{Kind: token.STRING, Value: `"Hello"`},
-			&ast.BasicLit{Kind: token.STRING, Value: `"World"`},
+			ast.NewString("Hello"),
+			ast.NewString("World"),
 		}},
 		out: `["Hello","World"]`,
 	}}

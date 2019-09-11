@@ -489,11 +489,8 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 					ident = nil
 				}
 
-				path := fmt.Sprintf(`"encoding/%s"`, short)
-				imports.Specs = append(imports.Specs, &ast.ImportSpec{
-					Name: ident,
-					Path: &ast.BasicLit{Kind: token.STRING, Value: path},
-				})
+				imports.Specs = append(imports.Specs,
+					ast.NewImport(ident, "encoding/"+short))
 			}
 		}
 		f.Decls = append([]ast.Decl{imports}, f.Decls...)
@@ -709,15 +706,9 @@ func (h *hoister) hoist(expr ast.Expr) {
 			// found a replacable string
 			dataField := h.uniqueName(name, "_", "cue_")
 
-			f.Value = &ast.CallExpr{
-				Fun: &ast.SelectorExpr{
-					X:   h.altNames[enc.typ],
-					Sel: ast.NewIdent("Marshal"),
-				},
-				Args: []ast.Expr{
-					ast.NewIdent(dataField),
-				},
-			}
+			f.Value = ast.NewCall(
+				ast.NewSel(h.altNames[enc.typ], "Marshal"),
+				ast.NewIdent(dataField))
 
 			obj.Elts = append(obj.Elts, nil)
 			copy(obj.Elts[i+1:], obj.Elts[i:])

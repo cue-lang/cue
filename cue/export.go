@@ -72,10 +72,7 @@ func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
 				Expr:  ast.NewIdent(info.short),
 			})
 		}
-		importDecl.Specs = append(importDecl.Specs, &ast.ImportSpec{
-			Name: ident,
-			Path: &ast.BasicLit{Kind: token.STRING, Value: quote(k, '"')},
-		})
+		importDecl.Specs = append(importDecl.Specs, ast.NewImport(ident, k))
 	}
 
 	if obj, ok := value.(*ast.StructLit); ok {
@@ -221,10 +218,7 @@ func (p *exporter) closeOrOpen(s *ast.StructLit, isClosed bool) ast.Expr {
 		return s
 	}
 	if isClosed && !p.inDef {
-		return &ast.CallExpr{
-			Fun:  ast.NewIdent("close"),
-			Args: []ast.Expr{s},
-		}
+		return ast.NewCall(ast.NewIdent("close"), s)
 	}
 	if !isClosed && p.inDef && !hasTemplate(s) {
 		s.Elts = append(s.Elts, &ast.Ellipsis{})
@@ -255,14 +249,13 @@ func (p *exporter) expr(v value) ast.Expr {
 	// TODO: also add position information.
 	switch x := v.(type) {
 	case *builtin:
-		name := ast.NewIdent(x.Name)
 		if x.pkg == 0 {
-			return name
+			return ast.NewIdent(x.Name)
 		}
 		pkg := p.ctx.labelStr(x.pkg)
 		inst := builtins[pkg]
 		short := p.shortName(inst, "", pkg)
-		return &ast.SelectorExpr{X: ast.NewIdent(short), Sel: name}
+		return ast.NewSel(ast.NewIdent(short), x.Name)
 
 	case *nodeRef:
 		if x.short == 0 {
@@ -278,7 +271,7 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *selectorExpr:
 		n := p.expr(x.x)
 		if n != nil {
-			return &ast.SelectorExpr{X: n, Sel: p.identifier(x.feature)}
+			return ast.NewSel(n, p.ctx.labelStr(x.feature))
 		}
 		ident := p.identifier(x.feature)
 		node, ok := x.x.(*nodeRef)
@@ -338,7 +331,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		return call
 
 	case *customValidator:
-		call := &ast.CallExpr{Fun: p.expr(x.call)}
+		call := ast.NewCall(p.expr(x.call))
 		for _, a := range x.args {
 			call.Args = append(call.Args, p.expr(a))
 		}

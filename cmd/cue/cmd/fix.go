@@ -119,17 +119,11 @@ func fix(f *ast.File) *ast.File {
 				astutil.CopyMeta(lo, x.Low)
 			}
 			if hi == nil { // a[i:]
-				hi = &ast.CallExpr{
-					Fun:  ast.NewIdent("len"),
-					Args: []ast.Expr{x.X},
-				}
+				hi = ast.NewCall(ast.NewIdent("len"), x.X)
 				astutil.CopyMeta(lo, x.High)
 			}
 			if pkg := c.Import("list"); pkg != nil {
-				c.Replace(&ast.CallExpr{
-					Fun:  &ast.SelectorExpr{X: pkg, Sel: ast.NewIdent("Slice")},
-					Args: []ast.Expr{x.X, lo, hi},
-				})
+				c.Replace(ast.NewCall(ast.NewSel(pkg, "Slice"), x.X, lo, hi))
 			}
 		}
 		return true

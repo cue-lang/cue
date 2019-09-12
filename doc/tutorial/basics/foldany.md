@@ -16,7 +16,7 @@ outer middle1 inner: 3
 outer middle2 inner: 7
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export foldany.cue`
 ```json
 {

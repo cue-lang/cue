@@ -27,7 +27,7 @@ b: """
     """
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export stringlit.cue`
 ```json
 {

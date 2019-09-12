@@ -7,12 +7,7 @@ _Types ~~and~~ are Values_
 CUE defines the following basic types
 
 ```
-null
-bool
-string
-bytes
-int
-float
+null bool string bytes int float
 ```
 in addition to the error type mentioned in the previous section.
 

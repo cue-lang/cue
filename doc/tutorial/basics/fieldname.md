@@ -22,7 +22,7 @@ _fieldname.cue:_
 }
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export fieldname.cue`
 ```json
 {

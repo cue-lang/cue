@@ -17,7 +17,7 @@ two: 2
 "two-and-a-half": 2.5
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export curly.cue`
 ```json
 {

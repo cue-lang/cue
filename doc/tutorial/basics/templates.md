@@ -32,7 +32,7 @@ job nginx: {
 }
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue eval templates.cue`
 ```
 job: {

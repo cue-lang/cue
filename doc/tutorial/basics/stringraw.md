@@ -27,12 +27,11 @@ msg2: ##"""
     """##
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue eval stringraw.cue`
 ```
-{
-    msg1: "The sequence \"\\U0001F604\" renders as 😄."
-    msg2: """
+msg1: "The sequence \"\\U0001F604\" renders as 😄."
+msg2: """
         A regular expression can conveniently be written as:
         
             #\"\\d{3}\"#
@@ -40,5 +39,4 @@ msg2: ##"""
         This construct works for bytes, strings and their
         multi-line variants.
         """
-}
 ```

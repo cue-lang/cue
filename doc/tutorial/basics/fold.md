@@ -12,7 +12,7 @@ _fold.cue:_
 outer middle inner: 3
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export fold.cue`
 ```json
 {

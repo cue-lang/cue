@@ -18,7 +18,7 @@ _commas2.cue:_
 ]
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export commas2.cue`
 ```json
 [

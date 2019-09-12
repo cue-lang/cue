@@ -18,7 +18,7 @@ _numlit.cue:_
 ]
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export numlit.cue`
 ```json
 [

@@ -12,6 +12,7 @@ It is an error for a concrete `conn`
 to define anything else than these two values.
 
 <!-- CUE editor -->
+_disjunctions.cue_
 ```
 conn: {
     address:  string

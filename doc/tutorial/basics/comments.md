@@ -14,11 +14,11 @@ one: 1
 two: 2 // a line comment
 ```
 
-<!-- JSON result -->
+<!-- result -->
 `$ cue export comments.cue`
 ```json
 {
     "one": 1,
-    "two": 2,
+    "two": 2
 }
 ```

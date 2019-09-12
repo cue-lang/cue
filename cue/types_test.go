@@ -1792,6 +1792,10 @@ func TestMashalJSON(t *testing.T) {
 		// are optional
 		value: `{foo?: bar, bar?: foo, baz: 3}`,
 		json:  `{"baz":3}`,
+	}, {
+		// Issue #107
+		value: `a: 1.0/1`,
+		json:  `{"a":1}`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

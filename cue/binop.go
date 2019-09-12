@@ -933,7 +933,7 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 			return y.binOp(ctx, src, op, x)
 		}
 	case *numLit:
-		k := unifyType(x.kind(), y.kind())
+		k, _, _ := matchBinOpKind(op, x.kind(), y.kind())
 		n := newNumBin(k, x, y)
 		switch op {
 		case opUnify, opUnifyUnchecked:

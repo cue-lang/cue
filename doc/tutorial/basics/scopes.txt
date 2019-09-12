@@ -1,0 +1,35 @@
+cue eval scopes.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "References and Scopes"
+description = ""
+
+-- text.md --
+A reference refers to the value of the field defined within nearest
+enclosing scope.
+
+If no field matches the reference within the file, it may match a top-level
+field defined in any other file of the same package.
+
+If there is still no match, it may match a predefined value.
+
+-- scopes.cue --
+v: 1
+a: {
+    v: 2
+    b: v // matches the inner v
+}
+a: {
+    c: v // matches the top-level v
+}
+b: v
+
+-- expect-stdout-cue --
+v: 1
+a: {
+    v: 2
+    b: 2
+    c: 1
+}
+b: 1

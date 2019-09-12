@@ -1,0 +1,29 @@
+cue eval cycleref.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Cycles in Fields"
+description = ""
+
+-- text.md --
+Also, we know that unifying a field with itself will result in the same value.
+Thus if we have a cycle between some fields, all we need to do is ignore
+the cycle and unify their values once to achieve the same result as
+merging them ad infinitum.
+
+-- cycleref.cue --
+labels: selectors
+labels: {app: "foo"}
+
+selectors: labels
+selectors: {name: "bar"}
+
+-- expect-stdout-cue --
+labels: {
+    name: "bar"
+    app:  "foo"
+}
+selectors: {
+    name: "bar"
+    app:  "foo"
+}

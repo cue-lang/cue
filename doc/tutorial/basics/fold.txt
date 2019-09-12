@@ -1,0 +1,21 @@
+cue export fold.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Folding of Single-Field Structs"
+description = ""
+
+-- text.md --
+CUE allows a shorthand for structs with single members.
+
+-- fold.cue --
+outer middle inner: 3
+
+-- expect-stdout-cue --
+{
+    "outer": {
+        "middle": {
+            "inner": 3
+        }
+    }
+}

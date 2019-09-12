@@ -1,0 +1,44 @@
+cue eval fieldcomp.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Field Comprehensions"
+description = ""
+
+-- text.md --
+CUE also supports comprehensions for fields.
+
+One cannot refer to generated fields with references.
+Instead, one must use indexing.
+
+-- fieldcomp.cue --
+import "strings"
+
+a: [ "Barcelona", "Shanghai", "Munich" ]
+
+{
+    for k, v in a {
+        "\( strings.ToLower(v) )": {
+            pos:     k + 1
+            name:    v
+            nameLen: len(v)
+        }
+    }
+}
+
+-- expect-stdout-cue --
+barcelona: {
+    name:    "Barcelona"
+    pos:     1
+    nameLen: 9
+}
+shanghai: {
+    name:    "Shanghai"
+    pos:     2
+    nameLen: 8
+}
+munich: {
+    name:    "Munich"
+    pos:     3
+    nameLen: 6
+}

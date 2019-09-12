@@ -1,0 +1,25 @@
+cue export numlit.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Number Literals"
+description = ""
+
+-- text.md --
+CUE adds a variety of sugar for writing numbers.
+
+-- numlit.cue --
+[
+    1_234,       // 1234
+    5M,          // 5_000_000
+    1.5Gi,       // 1_610_612_736
+    0x1000_0000, // 268_435_456
+]
+
+-- expect-stdout-cue --
+[
+    1234,
+    5000000,
+    1610612736,
+    268435456
+]

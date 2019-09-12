@@ -1,0 +1,27 @@
+cue eval conditional.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Conditional Fields"
+description = ""
+
+-- text.md --
+Field comprehensions can also be used to
+add a single field conditionally.
+
+Converting the resulting configuration to JSON results in an error
+as `justification` is required yet no concrete value is given.
+
+-- conditional.cue --
+price: number
+
+// Require a justification if price is too high
+if price > 100 {
+    justification: string
+}
+
+price: 200
+
+-- expect-stdout-cue --
+price:         200
+justification: string

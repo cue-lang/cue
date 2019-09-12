@@ -1,0 +1,31 @@
+cue export commas.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Commas are Optional after Fields"
+description = ""
+
+-- text.md --
+Commas are optional at the end of fields.
+This is also true for the last field.
+The convention is to omit them.
+
+<!-- Side Note -->
+_CUE borrows a trick from Go to achieve this: the formal grammar still
+requires commas, but the scanner inserts commas according to a small set
+of simple rules._
+
+-- commas.cue --
+{
+    one: 1
+    two: 2
+
+    "two-and-a-half": 2.5
+}
+
+-- expect-stdout-cue --
+{
+    "one": 1,
+    "two": 2,
+    "two-and-a-half": 2.5
+}

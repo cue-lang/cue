@@ -1,0 +1,26 @@
+cue export hidden.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Hidden Fields"
+description = ""
+
+-- text.md --
+A non-quoted field name that starts with an underscore (`_`) is not
+emitted from the output.
+To include fields in the configuration that start with an underscore
+put them in quotes.
+
+Quoted and non-quoted fields share the same namespace unless they start
+with an underscore.
+
+-- hidden.cue --
+"_foo": 2
+_foo:   3
+foo:    4
+
+-- expect-stdout-cue --
+{
+    "_foo": 2,
+    "foo": 4
+}

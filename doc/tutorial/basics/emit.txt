@@ -1,0 +1,22 @@
+cue eval emit.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Emit Values"
+description = ""
+
+-- text.md --
+By default all top-level fields are emitted when evaluating a configuration.
+Embedding a value at top-level will cause that value to be emitted instead.
+
+Emit values allow CUE configurations, like JSON,
+to define any type, instead of just structs, while keeping the common case
+of defining structs light.
+
+-- emit.cue --
+"Hello \(who)!"
+
+who: "world"
+
+-- expect-stdout-cue --
+"Hello world!"

@@ -1,0 +1,21 @@
+cue eval interpolation.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Interpolation"
+description = ""
+
+-- text.md --
+String and bytes literals support interpolation.
+
+Any valid CUE expression may be used inside the escaped parentheses.
+Interpolation may also be used in multiline string and byte literals.
+
+-- interpolation.cue --
+"You are \( cost - budget ) dollars over budget!"
+
+cost:   102
+budget: 88
+
+-- expect-stdout-cue --
+"You are 14 dollars over budget!"

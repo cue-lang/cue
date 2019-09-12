@@ -1,0 +1,27 @@
+cue eval -i genfield.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Interpolation of Field Names"
+description = ""
+
+-- text.md --
+String interpolations may also be used in field names.
+
+One cannot refer to generated fields with references.
+
+-- genfield.cue --
+sandwich: {
+    type:            "Cheese"
+    "has\(type)":    true
+    hasButter:       true
+    butterAndCheese: hasButter && hasCheese
+}
+
+-- expect-stdout-cue --
+sandwich: {
+    type:            "Cheese"
+    hasButter:       true
+    butterAndCheese: _|_ // reference "hasCheese" not found
+    hasCheese:       true
+}

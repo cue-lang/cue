@@ -1,0 +1,27 @@
+cue eval selectors.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Accessing Fields"
+description = ""
+
+-- text.md --
+Selectors access fields within a struct using the `.` notation.
+This only works if a field name is a valid identifier and it is not computed.
+For other cases one can use the indexing notation.
+
+-- selectors.cue --
+a: {
+    b: 2
+    "c-e": 5
+}
+v: a.b
+w: a["c-e"]
+
+-- expect-stdout-cue --
+a: {
+    b:     2
+    "c-e": 5
+}
+v: 2
+w: 5

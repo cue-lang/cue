@@ -15,7 +15,7 @@
 package basics
 
 import (
-	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -23,13 +23,14 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/cuetest"
+	"github.com/rogpeppe/testscript/txtar"
 )
 
 func TestTutorial(t *testing.T) {
-	// t.Skip()
+	t.Skip()
 
 	err := filepath.Walk(".", func(path string, f os.FileInfo, err error) error {
-		if strings.HasSuffix(path, ".md") {
+		if strings.HasSuffix(path, ".md") && !strings.Contains(path, "/") {
 			t.Run(path, func(t *testing.T) { simulateFile(t, path) })
 		}
 		return nil
@@ -45,16 +46,45 @@ func simulateFile(t *testing.T, path string) {
 		t.Fatalf("failed to open file %q: %v", path, err)
 	}
 
-	dir, err := ioutil.TempDir("", "tutbasics")
-	if err != nil {
-		t.Fatal(err)
+	if path == "Readme.md" {
+		return
 	}
-	defer os.Remove(dir)
+
+	archive := &txtar.Archive{}
+
+	addFile := func(filename string, body string) {
+		archive.Files = append(archive.Files, txtar.File{
+			Name: filename,
+			Data: []byte(strings.TrimSpace(body) + "\n\n"),
+		})
+	}
+
+	var (
+		baseName = path[:len(path)-len(".md")]
+		txtFile  = baseName + ".txt"
+	)
+
+	defer func() {
+		err = ioutil.WriteFile(txtFile, txtar.Format(archive), 0644)
+	}()
 
 	c := cuetest.NewChunker(t, b)
 
-	// collect files
-	for c.Find("<!-- CUE editor -->") {
+	c.Find("\n")
+	c.Next("_", "_")
+	section := c.Text()
+	sub := strings.ToLower(strings.Fields(section)[0])
+	sub = strings.TrimRight(sub, ",")
+
+	c.Next("# ", "\n")
+	addFile("frontmatter.toml", fmt.Sprintf(`title = %q
+description = ""
+`, c.Text()))
+
+	for i := 0; c.Find("<!-- CUE editor -->"); i++ {
+		if i == 0 {
+			addFile("text.md", c.Text())
+		}
 		if !c.Next("_", "_") {
 			continue
 		}
@@ -63,9 +93,7 @@ func simulateFile(t *testing.T, path string) {
 		if !c.Next("```", "```") {
 			t.Fatalf("No body for filename %q in file %q", filename, path)
 		}
-		b := bytes.TrimSpace(c.Bytes())
-
-		ioutil.WriteFile(filepath.Join(dir, filename), b, 0644)
+		addFile(filename, c.Text())
 	}
 
 	if !c.Find("<!-- result -->") {
@@ -75,15 +103,21 @@ func simulateFile(t *testing.T, path string) {
 	if !c.Next("`$ ", "`") {
 		t.Fatalf("No command for result section in file %q", path)
 	}
-	command := c.Text()
+	archive.Comment = []byte(c.Text())
+	archive.Comment = append(archive.Comment, `
+cmp stdout expect-stdout-cue
+
+`...)
 
 	if !c.Next("```", "```") {
-		t.Fatalf("No body for result section in file %q", path)
+		return
 	}
 	gold := c.Text()
 	if p := strings.Index(gold, "\n"); p > 0 {
 		gold = gold[p+1:]
 	}
 
-	cuetest.Run(t, dir, command, &cuetest.Config{Golden: gold})
+	gold = strings.TrimSpace(gold) + "\n"
+	// TODO: manually adjust file type and stderr.
+	addFile("expect-stdout-cue", gold)
 }

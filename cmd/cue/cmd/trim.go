@@ -515,9 +515,9 @@ func (t *trimSet) trimDecls(decls []ast.Decl, rm []ast.Node, m cue.Value, allow 
 
 	for _, d := range decls {
 		if f, ok := d.(*ast.Field); ok {
-			label, _ := internal.LabelName(f.Label)
+			label, _, err := ast.LabelName(f.Label)
 			v := m.Lookup(label)
-			if inNodes(rm, f.Value) && (allow || v.Exists()) {
+			if err == nil && inNodes(rm, f.Value) && (allow || v.Exists()) {
 				continue
 			}
 		}

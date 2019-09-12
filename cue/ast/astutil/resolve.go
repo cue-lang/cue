@@ -66,11 +66,16 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
-			name, _ := internal.LabelName(x.Label)
-			s.insert(name, x.Value)
+			// TODO: switch to ast's implementation
+			name, isIdent := internal.LabelName(x.Label)
+			if isIdent {
+				s.insert(name, x.Value)
+			}
 		case *ast.Alias:
-			name, _ := internal.LabelName(x.Ident)
-			s.insert(name, x)
+			name, isIdent, _ := ast.LabelName(x.Ident)
+			if isIdent {
+				s.insert(name, x)
+			}
 			// Handle imports
 		}
 	}
@@ -149,8 +154,10 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			walk(s, label)
 		case *ast.TemplateLabel:
 			s := newScope(s.file, s, x, nil)
-			name, _ := internal.LabelName(label)
-			s.insert(name, x.Label) // Field used for entire lambda.
+			name, err := ast.ParseIdent(label.Ident)
+			if err == nil {
+				s.insert(name, x.Label) // Field used for entire lambda.
+			}
 			walk(s, x.Value)
 			return nil
 		}
@@ -180,7 +187,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		return nil
 
 	case *ast.Ident:
-		name, ok := internal.LabelName(x)
+		name, ok, _ := ast.LabelName(x)
 		if !ok {
 			break
 		}
@@ -214,11 +221,15 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			walk(s, f.Source)
 			s = newScope(s.file, s, f, nil)
 			if f.Key != nil {
-				name, _ := internal.LabelName(f.Key)
-				s.insert(name, f.Key)
+				name, err := ast.ParseIdent(f.Key)
+				if err == nil {
+					s.insert(name, f.Key)
+				}
 			}
-			name, _ := internal.LabelName(f.Value)
-			s.insert(name, f.Value)
+			name, err := ast.ParseIdent(f.Value)
+			if err == nil {
+				s.insert(name, f.Value)
+			}
 		} else {
 			walk(s, c)
 		}

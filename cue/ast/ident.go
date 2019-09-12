@@ -93,3 +93,53 @@ func ParseIdent(n *Ident) (string, error) {
 
 	return ident, nil
 }
+
+// LabelName reports the name of a label, whether it is an identifier
+// (it binds a value to a scope), and whether it is valid.
+// Keywords that are allowed in label positions are interpreted accordingly.
+//
+// Examples:
+//
+//     Label   Result
+//     foo     "foo"  true   nil
+//     `a-b`   "a-b"  true   nil
+//     true    true   true   nil
+//     "foo"   "foo"  false  nil
+//     `a-b    ""     false  invalid identifier
+//     "foo    ""     false  invalid string
+//     "\(x)"  ""     false  errors.Is(err, ErrIsExpression)
+//     <A>     "A"    false  errors.Is(err, ErrIsExpression)
+//
+func LabelName(l Label) (name string, isIdent bool, err error) {
+	switch n := l.(type) {
+	case *Ident:
+		str, err := ParseIdent(n)
+		if err != nil {
+			return "", false, err
+		}
+		return str, true, nil
+
+	case *BasicLit:
+		switch n.Kind {
+		case token.STRING:
+			// Use strconv to only allow double-quoted, single-line strings.
+			str, err := strconv.Unquote(n.Value)
+			if err != nil {
+				err = errors.Newf(l.Pos(), "invalid")
+			}
+			return str, false, err
+
+		case token.NULL, token.TRUE, token.FALSE:
+			return n.Value, true, nil
+
+			// TODO: allow numbers to be fields?
+		}
+	}
+	// This includes interpolation and template labels.
+	return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
+		"label is interpolation or template")
+}
+
+// ErrIsExpression reports whether a label is an expression.
+// This error is never returned directly. Use errors.Is or xerrors.Is.
+var ErrIsExpression = errors.New("not a concrete label")

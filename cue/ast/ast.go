@@ -127,7 +127,7 @@ func (*Ellipsis) declNode()      {}
 func (*Package) declNode()      {}
 func (*CommentGroup) declNode() {}
 
-// A Label is any prduction that can be used as a LHS label.
+// A Label is any production that can be used as a LHS label.
 type Label interface {
 	Node
 	labelNode()

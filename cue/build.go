@@ -267,8 +267,8 @@ func (idx *index) strLabel(str string) label {
 func (idx *index) nodeLabel(n ast.Node) (f label, ok bool) {
 	switch x := n.(type) {
 	case *ast.BasicLit:
-		name, ok := internal.LabelName(x)
-		return idx.label(name, false), ok
+		name, _, err := ast.LabelName(x)
+		return idx.label(name, false), err == nil
 	case *ast.Ident:
 		name, err := ast.ParseIdent(x)
 		return idx.label(name, true), err == nil

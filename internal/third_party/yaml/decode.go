@@ -16,7 +16,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 const (
@@ -697,8 +696,8 @@ outer:
 			key := labelStr(label)
 			for _, decl := range m.Elts {
 				f := decl.(*ast.Field)
-				name, _ := internal.LabelName(f.Label)
-				if name == key {
+				name, _, err := ast.LabelName(f.Label)
+				if err == nil && name == key {
 					f.Value = d.unmarshal(n.children[i+1])
 					continue outer
 				}

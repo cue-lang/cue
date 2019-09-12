@@ -43,7 +43,7 @@ word:     int32
 <!-- result -->
 `$ cue eval -i range.cue`
 ```
-a: _|_ /* invalid value -1 (out of bound int & >=0) */
+a: _|_ // invalid value -1 (out of bound int & >=0)
 b: 128
 c: 2000000000
 ```

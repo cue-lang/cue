@@ -194,10 +194,6 @@ func (p *printer) Print(v interface{}) {
 }
 
 func (p *printer) writeWhitespace(ws whiteSpace) {
-	if debug {
-		p.output = append(p.output, fmt.Sprintf("/*=%x=*/", p.allowed)...) // do not update f.pos!
-	}
-
 	if ws&comma != 0 {
 		switch {
 		case ws&(newsection|newline|formfeed) != 0,
@@ -304,9 +300,6 @@ func (p *printer) writeString(s string, isLit bool) {
 		p.output = append(p.output, tabwriter.Escape)
 	}
 
-	if debug {
-		p.output = append(p.output, fmt.Sprintf("/*%s*/", p.pos)...) // do not update f.pos!
-	}
 	p.output = append(p.output, s...)
 
 	if isLit {

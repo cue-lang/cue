@@ -96,10 +96,18 @@ func TestExport(t *testing.T) {
 					s: "abc"
 				}
 				b: 2.0
-				c: _|_ /* undefined field "c" */
-				d: _|_ /* undefined field "d" */
-				e: _|_ /* undefined field "t" */
+				c: _|_ // undefined field "c"
+				d: _|_ // undefined field "d"
+				e: _|_ // undefined field "t"
 			}`),
+	}, {
+		// Insert comma between error and inserted message.
+		in: `{ a: [ 3&4] }`,
+		out: unindent(`
+		{
+			a: [_|_, // conflicting values 3 and 4
+			]
+		}`),
 	}, {
 		in: `{
 			a: 5*[int]

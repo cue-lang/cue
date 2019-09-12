@@ -25,7 +25,7 @@ sandwich: {
 sandwich: {
     type:            "Cheese"
     hasButter:       true
-    butterAndCheese: _|_ /* reference "hasCheese" not found */
+    butterAndCheese: _|_ // reference "hasCheese" not found
     hasCheese:       true
 }
 ```

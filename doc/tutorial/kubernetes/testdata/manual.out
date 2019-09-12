@@ -31,7 +31,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -81,7 +81,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -248,7 +248,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -417,7 +417,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -584,7 +584,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -751,7 +751,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -920,7 +920,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -1087,7 +1087,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -1256,7 +1256,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -1306,7 +1306,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -1459,7 +1459,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -1785,7 +1785,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -1857,7 +1857,8 @@ kubernetes: {
                                 name:          "grpc"
                                 containerPort: 7788
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -2006,7 +2007,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -2081,7 +2082,8 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 7443
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -2202,7 +2204,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -2271,7 +2273,8 @@ kubernetes: {
                                 name:          "http"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "secret-updater"
@@ -2372,7 +2375,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -2446,7 +2449,8 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 7788
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -2558,7 +2562,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -2608,7 +2612,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -2630,7 +2634,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -2686,7 +2690,10 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -2857,7 +2864,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -2879,7 +2886,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -2935,7 +2942,10 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3103,7 +3113,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -3125,7 +3135,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -3181,7 +3191,9 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3334,7 +3346,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -3356,7 +3368,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -3412,7 +3424,9 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3564,7 +3578,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -3586,7 +3600,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -3642,7 +3656,9 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3798,7 +3814,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -3820,7 +3836,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -3876,7 +3892,9 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -4032,7 +4050,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -4054,7 +4072,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -4226,7 +4244,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -4248,7 +4266,7 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ /* incomplete */
+    volume: _|_ // incomplete
 }
 
 
@@ -4285,7 +4303,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -4365,7 +4383,9 @@ kubernetes: {
                                 name:          "alertmanager"
                                 containerPort: 9093
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "alertmanager"
@@ -4540,7 +4560,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -4622,7 +4642,8 @@ kubernetes: {
                                 name:          "web"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                             resources: {
                                 requests: {
                                     cpu:    "100m"
@@ -4765,7 +4786,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -4843,7 +4864,9 @@ kubernetes: {
                                 containerPort: 9100
                                 hostPort:      9100
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, _|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                _|_, // non-concrete value bool
+                            ]
                             resources: {
                                 requests: {
                                     cpu:    "100m"
@@ -4999,7 +5022,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -5080,7 +5103,8 @@ kubernetes: {
                                 name:          "web"
                                 containerPort: 9090
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "config-volume"
@@ -5690,7 +5714,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -5740,7 +5764,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -5809,7 +5833,8 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 4180
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "config-volume"
@@ -6030,7 +6055,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -6105,7 +6130,8 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 7443
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */]
+                            volumeMounts: [_|_, // non-concrete value bool
+                            ]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -6215,7 +6241,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }
@@ -6293,11 +6319,12 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 443
                             }]
-                            volumeMounts: [_|_ /* non-concrete value bool */, {
-                                name:      "config-volume"
-                                mountPath: "/etc/nginx/nginx.conf"
-                                subPath:   "nginx.conf"
-                            }]
+                            volumeMounts: [_|_, // non-concrete value bool
+                                                {
+                                    name:      "config-volume"
+                                    mountPath: "/etc/nginx/nginx.conf"
+                                    subPath:   "nginx.conf"
+                                }]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -6829,7 +6856,7 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ /* undefined field "volume" */
+                    spec: _|_ // undefined field "volume"
                     metadata: {
                         labels: label
                     }

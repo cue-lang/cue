@@ -35,9 +35,9 @@ rs: >="a" & <"mo"
 `$ cue eval -i bounds.cue`
 ```
 a:  3.5
-b:  _|_ /* conflicting values ri and 3.5 (mismatched types int and float) */
+b:  _|_ // conflicting values ri and 3.5 (mismatched types int and float)
 c:  3
 d:  "ma"
-e:  _|_ /* invalid value "mu" (out of bound <"mo") */
+e:  _|_ // invalid value "mu" (out of bound <"mo")
 r1: >=5 & <8
 ```

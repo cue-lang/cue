@@ -763,6 +763,34 @@ a: {
 			`e8: _|_(conflicting bounds >11 and <=11), ` +
 			`e9: _|_((>"a" & <1):conflicting values >"a" and <1 (mismatched types string and number))}`,
 	}, {
+		desc: "bound conversions",
+		in: `
+		r1: int & >0.1 & <1.9
+		r2: int & >=0.1 & <1.9
+		r3: int & >=-1.9 & <=-0.1
+		r4: int & >-1.9 & <=-0.1
+
+		r5: >=1.1 & <=1.1
+		r6: r5 & 1.1
+
+		c1: (1.2 & >1.3) & <2
+		c2: 1.2 & (>1.3 & <2)
+
+		c3: 1.2 & (>=1 & <2)
+		c4: 1.2 & (>=1 & <2 & int)
+		`,
+		out: `<0>{` +
+			`r1: 1, ` +
+			`r2: 1, ` +
+			`r3: -1, ` +
+			`r4: -1, ` +
+			`r5: 1.1, ` +
+			`r6: 1.1, ` +
+			`c1: _|_((>1.3 & 1.2):invalid value 1.2 (out of bound >1.3)), ` +
+			`c2: _|_((>1.3 & 1.2):invalid value 1.2 (out of bound >1.3)), ` +
+			`c3: 1.2, ` +
+			`c4: _|_((1.2 & ((>=1 & <2) & int)):conflicting values 1.2 and ((>=1 & <2) & int) (mismatched types float and int))}`,
+	}, {
 		desc: "custom validators",
 		in: `
 		import "strings"
@@ -1552,7 +1580,7 @@ a: {
 			`s1: "e", ` +
 			`s2: "ee", ` +
 			`n1: (>=1 & <=2), ` +
-			`n2: (int & >=1.1 & <=1.3), ` +
+			`n2: _|_(conflicting bounds int & >=1.1 and <=1.3), ` +
 			`n3: 2, ` +
 			`n4: 0.09999, ` +
 			`n5: 2.5}`,
@@ -2323,10 +2351,7 @@ func TestX(t *testing.T) {
 
 	// Don't remove. For debugging.
 	testCases := []testCase{{
-		in: `
-		g1: 1
-		"g\(1)"?: 1
-	`,
+		in: ``,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

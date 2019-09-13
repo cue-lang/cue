@@ -394,8 +394,28 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 					break
 				}
 
-				var d apd.Decimal
-				cond, err := apd.BaseContext.Sub(&d, &b.v, &a.v)
+				var d, lo, hi apd.Decimal
+				lo.Set(&a.v)
+				hi.Set(&b.v)
+				if k&floatKind == 0 {
+					// Readjust bounds for integers.
+					if x.op == opGeq {
+						// >=3.4  ==>  >=4
+						_, _ = apd.BaseContext.Ceil(&lo, &a.v)
+					} else {
+						// >3.4  ==>  >3
+						_, _ = apd.BaseContext.Floor(&lo, &a.v)
+					}
+					if y.op == opLeq {
+						// <=2.3  ==>  <= 2
+						_, _ = apd.BaseContext.Floor(&hi, &b.v)
+					} else {
+						// <2.3   ==>  < 3
+						_, _ = apd.BaseContext.Ceil(&hi, &b.v)
+					}
+				}
+
+				cond, err := apd.BaseContext.Sub(&d, &hi, &lo)
 				if cond.Inexact() || err != nil {
 					break
 				}
@@ -432,25 +452,28 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 				case diff == 1:
 					if k&floatKind == 0 {
 						if x.op == opGeq && y.op == opLss {
-							return a
+							return &numLit{numBase: a.numBase, v: lo}
 						}
 						if x.op == opGtr && y.op == opLeq {
-							return b
+							return &numLit{numBase: b.numBase, v: hi}
 						}
 					}
 
 				case diff == 2:
 					if k&floatKind == 0 && x.op == opGtr && y.op == opLss {
-						_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &a.v)
+						_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &lo)
 						n := *a
-						n.k = k
-						n.v = d
+						n.k = k & numKind
+						n.v.Set(&d)
 						return &n
 					}
 
 				case diff == 0:
 					if x.op == opGeq && y.op == opLeq {
-						return a
+						n := *a
+						n.k = k & numKind
+						n.v.Set(&lo)
+						return &n
 					}
 					fallthrough
 

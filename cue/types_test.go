@@ -1796,6 +1796,32 @@ func TestMashalJSON(t *testing.T) {
 		// Issue #107
 		value: `a: 1.0/1`,
 		json:  `{"a":1}`,
+	}, {
+		// Issue #108
+		value: `
+		a: int
+		a: >0
+		a: <2
+
+		b: int
+		b: >=0.9
+		b: <1.1
+
+		c: int
+		c: >1
+		c: <=2
+
+		d: int
+		d: >=1
+		d: <=1.5
+
+		e: int
+		e: >=1
+		e: <=1.32
+
+		f: >=1.1 & <=1.1
+		`,
+		json: `{"a":1,"b":1,"c":2,"d":1,"e":1,"f":1.1}`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

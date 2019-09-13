@@ -96,13 +96,15 @@ func TestParse(t *testing.T) {
 		`{ V1, V2 }`,
 		`{V1, V2}`,
 	}, {
-		"selector embedding",
+		"expression embedding",
 		`Def :: {
 			a.b.c
+			a > b < c
+			-1<2
 
 			foo: 2
 		}`,
-		`Def :: {a.b.c, foo: 2}`,
+		`Def :: {a.b.c, a>b<c, -1<2, foo: 2}`,
 	}, {
 		"ellipsis in structs",
 		`Def :: {

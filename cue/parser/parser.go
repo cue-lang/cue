@@ -749,7 +749,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 		if !ok {
 			if expr == nil {
-				expr = p.parseExpr()
+				expr = p.parseRHS()
 			}
 			e := &ast.EmbedDecl{Expr: expr}
 			if p.atComma("struct literal", token.RBRACE) {
@@ -887,7 +887,7 @@ func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
 	switch tok {
 	case token.IDENT, token.STRING, token.INTERPOLATION,
 		token.NULL, token.TRUE, token.FALSE:
-		expr = p.parsePrimaryExpr()
+		expr = p.parseExpr(true)
 
 		switch x := expr.(type) {
 		case *ast.BasicLit:
@@ -1002,7 +1002,7 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 				Colon:  colon,
 				Value:  value,
 				In:     p.expect(token.IN),
-				Source: p.parseExpr(),
+				Source: p.parseRHS(),
 			}))
 
 		case token.IF:
@@ -1017,7 +1017,7 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 
 			clauses = append(clauses, c.closeClause(p, &ast.IfClause{
 				If:        ifPos,
-				Condition: p.parseExpr(),
+				Condition: p.parseRHS(),
 			}))
 
 		// case token.LET:
@@ -1242,7 +1242,7 @@ func (p *parser) tokPrec() (token.Token, int) {
 }
 
 // If lhs is set and the result is an identifier, it is not resolved.
-func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
+func (p *parser) parseBinaryExpr(lhs bool, prec1 int) ast.Expr {
 	if p.trace {
 		defer un(trace(p, "BinaryExpr"))
 	}
@@ -1253,6 +1253,12 @@ func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
 
 	for {
 		op, prec := p.tokPrec()
+		if lhs && op == token.LSS {
+			// Eagerly interpret this as a template label.
+			if _, ok := x.(ast.Label); ok {
+				return x
+			}
+		}
 		if prec < prec1 {
 			return x
 		}
@@ -1263,7 +1269,8 @@ func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
 			X:     p.checkExpr(x),
 			OpPos: pos,
 			Op:    op,
-			Y:     p.checkExpr(p.parseBinaryExpr(prec + 1))})
+			// Treat nested expressions as RHS.
+			Y: p.checkExpr(p.parseBinaryExpr(false, prec+1))})
 	}
 }
 
@@ -1287,7 +1294,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 		p.expect(token.LPAREN)
 		cc.closeExpr(p, last)
 
-		exprs = append(exprs, p.parseExpr())
+		exprs = append(exprs, p.parseRHS())
 
 		cc = p.openComments()
 		if p.tok != token.RPAREN {
@@ -1308,16 +1315,16 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 }
 
 // Callers must check the result (using checkExpr), depending on context.
-func (p *parser) parseExpr() ast.Expr {
+func (p *parser) parseExpr(lhs bool) ast.Expr {
 	if p.trace {
 		defer un(trace(p, "Expression"))
 	}
 
-	return p.parseBinaryExpr(token.LowestPrec + 1)
+	return p.parseBinaryExpr(lhs, token.LowestPrec+1)
 }
 
 func (p *parser) parseRHS() ast.Expr {
-	x := p.checkExpr(p.parseExpr())
+	x := p.checkExpr(p.parseExpr(false))
 	return x
 }
 

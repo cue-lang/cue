@@ -1295,8 +1295,8 @@ This would not be the case with  per-field definition.
 A struct resulting from such a unification is closed if either of the involved
 structs were closed.
 
-Syntactically, embeddings may be any expression except that it only
-allows binary expressions with operators `&` or `|`.
+Syntactically, embeddings may be any expression, except that `<`
+is eagerly interpreted as a bind label.
 
 ```
 S1: {

@@ -21,7 +21,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/retr0h/go-gilt/copy"
+	"cuelang.org/go/internal/copy"
 )
 
 func TestGetGo(t *testing.T) {

@@ -29,8 +29,8 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/cuetest"
+	"cuelang.org/go/internal/copy"
 	"github.com/kylelemons/godebug/diff"
-	"github.com/retr0h/go-gilt/copy"
 )
 
 var (

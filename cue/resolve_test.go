@@ -839,8 +839,13 @@ a: {
 			e4: [1,2,3][3]
 			e5: [1,2,3][-1]
 			e6: (*[]|{})[1]
+			def: {
+				a: 1
+				b :: 3
+			}
+			e7: def["b"]
 		`,
-		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds)}`,
+		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds), def: <1>{a: 1, b :: 3}, e7: _|_(<2>.def["b"]:field "b" is a definition)}`,
 		// }, {
 		// NOTE: string indexing no longer supported.
 		// Keeping it around until this is no longer an experiment.
@@ -1599,7 +1604,7 @@ a: {
 		out: `<0>{k1: 44, k2: -8000000000, ` +
 			`e1: _|_((int & <=32767 & 100000):invalid value 100000 (out of bound int & <=32767))}`,
 	}, {
-		desc: "field comprehensions",
+		desc: "struct comprehensions",
 		in: `
 			obj foo a: "bar"
 			obj <Name>: {

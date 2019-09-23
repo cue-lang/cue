@@ -1986,7 +1986,8 @@ for `a` of list type:
 for `a` of struct type:
 
 - the index `x` unified with `string` must be concrete.
-- the value of the field named `x` of struct `a`, if this field exists
+- the value of the regular and non-optional field named `x` of struct `a`,
+  if this field exists
 - bottom (an error), otherwise
 
 

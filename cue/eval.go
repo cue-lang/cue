@@ -101,6 +101,10 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 			s := index.strValue()
 			// TODO: must lookup
 			n := v.lookup(ctx, ctx.strLabel(s))
+			if n.definition {
+				return ctx.mkErr(x, index,
+					"field %q is a definition", s)
+			}
 			if n.optional {
 				return ctx.mkErr(x, index, codeIncomplete, "field %q is optional", s)
 			}

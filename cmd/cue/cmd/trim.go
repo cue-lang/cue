@@ -322,7 +322,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 	for _, v := range mSplit {
 		// TODO: consider resolving incomplete values within the current
 		// scope, as we do for fields.
-		if v.IsValid() {
+		if v.Exists() {
 			in = in.Unify(v)
 		}
 		gen = append(gen, v.Source())

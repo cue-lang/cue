@@ -197,13 +197,6 @@ func TestValueType(t *testing.T) {
 			if got := v.IsConcrete(); got != tc.concrete {
 				t.Errorf("IsConcrete: got %v; want %v", got, tc.concrete)
 			}
-			invalid := tc.kind == BottomKind
-			if got := v.IsValid(); got != !invalid {
-				t.Errorf("IsValid: got %v; want %v", got, !invalid)
-			}
-			// if got, want := v.Pos(), tc.pos+1; got != want {
-			// 	t.Errorf("pos: got %v; want %v", got, want)
-			// }
 		})
 	}
 }

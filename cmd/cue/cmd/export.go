@@ -100,9 +100,6 @@ func runExport(cmd *Command, args []string) error {
 
 	for _, inst := range instances {
 		root := inst.Value()
-		if !root.IsValid() {
-			continue
-		}
 		switch media := flagMedia.String(cmd); media {
 		case "json":
 			err := outputJSON(cmd, w, root)

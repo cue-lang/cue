@@ -870,16 +870,6 @@ func (v Value) IsIncomplete() bool {
 	return isIncomplete(x)
 }
 
-// IsValid reports whether this value is defined and evaluates to something
-// other than an error.
-func (v Value) IsValid() bool {
-	if v.path == nil || v.path.cache == nil {
-		return false
-	}
-	k := v.eval(v.ctx()).kind()
-	return k != bottomKind && !v.IsIncomplete()
-}
-
 // Exists reports whether this value existed in the configuration.
 func (v Value) Exists() bool {
 	if v.path == nil {

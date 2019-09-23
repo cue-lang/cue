@@ -78,7 +78,7 @@ func (c *execCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 
 	cmd := exec.CommandContext(ctx.Context, bin, args...)
 
-	if v := v.Lookup("stdin"); v.IsValid() {
+	if v := v.Lookup("stdin"); v.Exists() {
 		if cmd.Stdin, err = v.Reader(); err != nil {
 			return nil, fmt.Errorf("cue: %v", err)
 		}

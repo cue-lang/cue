@@ -378,7 +378,7 @@ func (c Config) complete() (cfg *Config, err error) {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 		}
 		prefix := inst.Lookup("module")
-		if prefix.IsValid() {
+		if prefix.Exists() {
 			name, err := prefix.String()
 			if err != nil {
 				return &c, err

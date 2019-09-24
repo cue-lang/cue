@@ -79,7 +79,7 @@ The form a … b represents the set of characters from a through b as
 alternatives. The horizontal ellipsis … is also used elsewhere in the spec to
 informally denote various enumerations or code snippets that are not further
 specified. The character … (as opposed to the three characters ...) is not a
-token of the Go language.
+token of the CUE language.
 
 
 ## Source code representation
@@ -1896,7 +1896,7 @@ f.p[i].x
 
 ### Selectors
 
-For a [primary expression] `x` that is not a [package name],
+For a [primary expression](#primary-expressions) `x` that is not a [package name](#package-clause),
 the selector expression
 
 ```
@@ -1906,7 +1906,7 @@ x.f
 denotes the field `f` of the value `x`.
 The identifier `f` is called the field selector.
 The type of the selector expression is the type of `f`.
-If `x` is a package name, see the section on [qualified identifiers].
+If `x` is a package name, see the section on [qualified identifiers](#qualified-identifiers).
 
 <!--
 TODO: consider allowing this and also for selectors. It needs to be considered

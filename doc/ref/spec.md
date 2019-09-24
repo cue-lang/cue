@@ -705,7 +705,7 @@ even though `a` resolves to 1 in all cases.
 #### Default values
 
 Any element of a disjunction can be marked as a default
-by prefixing it with an asterisk '*'.
+by prefixing it with an asterisk `*`.
 Intuitively, when an expression needs to be resolved for an operation other
 than unification or disjunctions,
 non-starred elements are dropped in favor of starred ones if the starred ones
@@ -822,7 +822,7 @@ float | *1                       1
 ### Bottom and errors
 
 Any evaluation error in CUE results in a bottom value, respresented by
-the token '_|_'.
+the token `_|_`.
 Bottom is an instance of every other value.
 Any evaluation error is represented as bottom.
 
@@ -832,7 +832,7 @@ logically they all remain the same value.
 
 ### Top
 
-Top is represented by the underscore character '_', lexically an identifier.
+Top is represented by the underscore character `_`, lexically an identifier.
 Unifying any value `v` with top results `v` itself.
 
 ```

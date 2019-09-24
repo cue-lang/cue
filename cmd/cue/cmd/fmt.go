@@ -32,6 +32,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			for _, inst := range load.Instances(args, nil) {
+				if inst.Err != nil {
+					exitOnErr(cmd, inst.Err, false)
+					continue
+				}
 				all := []string{}
 				all = append(all, inst.CUEFiles...)
 				all = append(all, inst.ToolCUEFiles...)

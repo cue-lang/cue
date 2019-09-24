@@ -12,8 +12,8 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package pkg2 does other stuff.
-package pkg2
+// Package pkgtwo does other stuff.
+package pkgtwo
 
 import (
 	"math/big"
@@ -31,6 +31,8 @@ type Barzer struct {
 	G *big.Float
 	H bool `json:"-"`
 	S string
+
+	XY bool `json:"x-y"`
 
 	Err error
 }

@@ -31,6 +31,7 @@ import (
 	"strconv"
 	"strings"
 
+	cueast "cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
@@ -253,12 +254,17 @@ type extractor struct {
 	cmap       ast.CommentMap
 	pkg        *packages.Package
 	consts     map[string][]string
-	pkgNames   map[string]string
+	pkgNames   map[string]pkgInfo
 	usedInFile map[string]bool
 	indent     int
 
 	exclusions []*regexp.Regexp
 	exclude    string
+}
+
+type pkgInfo struct {
+	id   string
+	name string
 }
 
 func (e *extractor) logf(format string, args ...interface{}) {
@@ -405,17 +411,23 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 
 		e.cmap = ast.NewCommentMap(p.Fset, f, f.Comments)
 
-		e.pkgNames = map[string]string{}
+		e.pkgNames = map[string]pkgInfo{}
 		e.usedInFile = map[string]bool{}
 
 		for _, spec := range f.Imports {
-			key, _ := strconv.Unquote(spec.Path.Value)
-			if spec.Name != nil {
-				e.pkgNames[key] = spec.Name.Name
-			} else {
-				// TODO: incorrect, should be name of package clause
-				e.pkgNames[key] = path.Base(key)
+			pkgPath, _ := strconv.Unquote(spec.Path.Value)
+			pkg := p.Imports[pkgPath]
+
+			info := pkgInfo{id: pkgPath, name: pkg.Name}
+			if path.Base(pkgPath) != pkg.Name {
+				info.id += ":" + pkg.Name
 			}
+
+			if spec.Name != nil {
+				info.name = spec.Name.Name
+			}
+
+			e.pkgNames[pkgPath] = info
 		}
 
 		hasEntries := false
@@ -454,11 +466,11 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		if len(pkgs) > 0 {
 			fmt.Fprintln(w, "import (")
 			for _, s := range pkgs {
-				name := e.pkgNames[s]
-				if p.Imports[s].Name == name {
-					fmt.Fprintf(w, "%q\n", s)
+				info := e.pkgNames[s]
+				if p.Imports[s].Name == info.name {
+					fmt.Fprintf(w, "%q\n", info.id)
 				} else {
-					fmt.Fprintf(w, "%v %q\n", name, s)
+					fmt.Fprintf(w, "%v %q\n", info.name, info.id)
 				}
 			}
 			fmt.Fprintln(w, ")")
@@ -828,7 +840,7 @@ func (e *extractor) printType(expr types.Type) {
 		switch obj.Type().String() {
 		case "time.Time":
 			e.usedInFile["time"] = true
-			fmt.Fprint(e.w, e.pkgNames[obj.Pkg().Path()], ".", obj.Name())
+			fmt.Fprint(e.w, e.pkgNames[obj.Pkg().Path()].name, ".", obj.Name())
 			return
 
 		case "math/big.Int":
@@ -846,8 +858,8 @@ func (e *extractor) printType(expr types.Type) {
 			}
 		}
 		if pkg := obj.Pkg(); pkg != nil {
-			if name := e.pkgNames[pkg.Path()]; name != "" {
-				fmt.Fprint(e.w, name, ".")
+			if info := e.pkgNames[pkg.Path()]; info.name != "" {
+				fmt.Fprint(e.w, info.name, ".")
 				e.usedPkg(pkg.Path())
 			}
 		}
@@ -962,6 +974,9 @@ func (e *extractor) printFields(x *types.Struct) {
 		if name == "-" {
 			continue
 		}
+		if x, _ := cueast.QuoteIdent(name); x != name {
+			name = strconv.Quote(name)
+		}
 		e.newLine()
 		kind := cuetoken.COLON
 		if e.isOptional(tag) {
@@ -972,8 +987,8 @@ func (e *extractor) printFields(x *types.Struct) {
 		// Add field tag to convert back to Go.
 		typeName := f.Type().String()
 		// simplify type names:
-		for path, name := range e.pkgNames {
-			typeName = strings.Replace(typeName, path+".", name+".", -1)
+		for path, info := range e.pkgNames {
+			typeName = strings.Replace(typeName, path+".", info.name+".", -1)
 		}
 		typeName = strings.Replace(typeName, e.pkg.Types.Path()+".", "", -1)
 

@@ -5,7 +5,7 @@
 package pkg1
 
 import (
-	p2 "cuelang.org/go/cmd/cue/cmd/testdata/code/go/pkg2"
+	p2 "cuelang.org/go/cmd/cue/cmd/testdata/code/go/pkg2:pkgtwo"
 	"time"
 )
 

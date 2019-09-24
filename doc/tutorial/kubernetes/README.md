@@ -1109,7 +1109,7 @@ We define one top-level file with our generic definitions.
 package cloud
 
 service <Name>: {
-    name: Name | string // the name of the service
+    name: *Name | string // the name of the service
 
     ...
 
@@ -1120,7 +1120,7 @@ service <Name>: {
 }
 
 deployment <Name>: {
-    name: Name | string
+    name: *Name | string
    ...
 }
 ```
@@ -1150,7 +1150,7 @@ rather just have a `deployment` allowing different kinds.
 
 ```
 deployment <Name>: _base & {
-    name:     Name | string
+    name:     *Name | string
     ...
 ```
 
@@ -1202,10 +1202,10 @@ volume spec and volume mount.
 
 ```
     volume <Name>: {
-        name:      Name | string
+        name:      *Name | string
         mountPath: string
         subPath:   null | string
-        readOnly:  false | true
+        readOnly:  bool
         kubernetes: {}
     }
 ```
@@ -1228,8 +1228,8 @@ service "\(k)": {
 
     // Copy over all ports exposed from containers.
     port "\(Name)": {
-        port:       Port | int
-        targetPort: Port | int
+        port:       *Port | int
+        targetPort: *Port | int
     } for Name, Port in spec.expose.port
 
     // Copy over the labels

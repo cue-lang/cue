@@ -58,14 +58,14 @@ Examples:
 	$ cat <<EOF > foo.cue
 	light <Name>: {
 		room:          string
-		brightnessOff: 0.0 | >=0 & <=100.0
-		brightnessOn:  100.0 | >=0 & <=100.0
+		brightnessOff: *0.0 | >=0 & <=100.0
+		brightnessOn:  *100.0 | >=0 & <=100.0
 	}
 
 	light ceiling50: {
-		room:         "MasterBedroom"
-		brightnessOn:  100 // this line
-		brightnessOff: 0   // and this line will be removed
+		room:          "MasterBedroom"
+		brightnessOff: 0.0    // this line
+		brightnessOn:  100.0  // and this line will be removed
 	}
 	EOF
 
@@ -73,8 +73,8 @@ Examples:
 	$ cat foo.cue
 	light <Name>: {
 		room:          string
-		brightnessOff: 0.0 | >=0 & <=100.0
-		brightnessOn:  100.0 | >=0 & <=100.0
+		brightnessOff: *0.0 | >=0 & <=100.0
+		brightnessOn:  *100.0 | >=0 & <=100.0
 	}
 
 	light ceiling50: {

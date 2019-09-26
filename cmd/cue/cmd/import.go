@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"encoding/json"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -35,6 +34,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
@@ -600,20 +600,15 @@ func newName(filename string, i int) string {
 }
 
 func handleJSON(path string, r io.Reader) (objects []ast.Expr, err error) {
-	d := json.NewDecoder(r)
+	d := json.NewDecoder(nil, path, r)
 
 	for {
-		var raw json.RawMessage
-		err := d.Decode(&raw)
+		expr, err := d.Extract()
 		if err == io.EOF {
 			break
 		}
 		if err != nil {
-			return nil, fmt.Errorf("could not parse JSON: %v", err)
-		}
-		expr, err := parser.ParseExpr(path, []byte(raw))
-		if err != nil {
-			return nil, fmt.Errorf("invalid input: %v %q", err, raw)
+			return nil, err
 		}
 		objects = append(objects, expr)
 	}

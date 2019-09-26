@@ -20,6 +20,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
 )
@@ -347,7 +348,15 @@ func (f *formatter) label(l ast.Label, optional bool) {
 				}
 			}
 		}
-		f.print(n.ValuePos, n.Value)
+		str := n.Value
+		// Allow any CUE string in the AST, but ensure it is formatted
+		// according to spec.
+		if strings.HasPrefix(str, `"""`) || strings.HasPrefix(str, "#") {
+			if u, err := literal.Unquote(str); err == nil {
+				str = strconv.Quote(u)
+			}
+		}
+		f.print(n.ValuePos, str)
 
 	case *ast.TemplateLabel:
 		f.print(n.Langle, token.LSS, indent)

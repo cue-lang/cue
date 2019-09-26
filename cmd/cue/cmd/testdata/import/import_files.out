@@ -4,5 +4,8 @@ kind:     "Deployment"
 name:     "booster"
 replicas: 1
 kind: "Service"
-name: "supplement"
+name: """
+		supplement
+		foo
+		"""
 json: "[1, 2]"

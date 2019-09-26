@@ -5,9 +5,12 @@ service: {
 		kind: "Service"
 		name: "booster"
 	}]
-	supplement: [{
+	"supplement\nfoo": [{
 		kind: "Service"
-		name: "supplement"
+		name: """
+		supplement
+		foo
+		"""
 		json: xjson.Marshal(_cue_json)
 		_cue_json = [1, 2]
 	}]

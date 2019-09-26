@@ -71,6 +71,11 @@ var (
 	}
 )
 
+// FileOffset specifies the File position info to use.
+func FileOffset(pos int) Option {
+	return func(p *parser) { p.offset = pos }
+}
+
 // A mode value is a set of flags (or 0).
 // They control the amount of source code parsed and other optional
 // parser functionality.

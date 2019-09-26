@@ -8,8 +8,11 @@ deployment booster: {
 	name:     "booster"
 	replicas: 1
 }
-service supplement: {
+service "supplement\nfoo": {
 	kind: "Service"
-	name: "supplement"
+	name: """
+		supplement
+		foo
+		"""
 	json: "[1, 2]"
 }

@@ -9,6 +9,6 @@
 }
 {
     "kind": "Service",
-    "name": "supplement",
+    "name": "supplement\nfoo",
     "json": "[1, 2]"
 }

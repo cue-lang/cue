@@ -3,7 +3,10 @@ service: [{
 	name: "booster"
 }, {
 	kind: "Service"
-	name: "supplement"
+	name: """
+		supplement
+		foo
+		"""
 	json: "[1, 2]"
 }]
 deployment: [{

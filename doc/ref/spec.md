@@ -1615,7 +1615,9 @@ identifier denotes the specified field, alias, or package.
 CUE is lexically scoped using blocks:
 
 1. The scope of a [predeclared identifier](#predeclared-identifiers) is the universe block.
-1. The scope of an identifier denoting a field or alias
+1. The scope of an identifier denoting a field
+  declared at top level (outside any struct literal) is the package block.
+1. The scope of an identifier denoting an alias
   declared at top level (outside any struct literal) is the file block.
 1. The scope of the package name of an imported package is the file block of the
   file containing the import declaration.
@@ -1695,7 +1697,7 @@ package mypackage
 
 foo: string  // not visible outside mypackage
 
-Foo :: {       // visible outside mypackage
+Foo :: {     // visible outside mypackage
     a: 1     // visible outside mypackage
     B: 2     // visible outside mypackage
 

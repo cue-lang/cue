@@ -16,9 +16,7 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io"
-	"os"
 	"strings"
 
 	"cuelang.org/go/cue/errors"
@@ -233,10 +231,11 @@ func New(args []string) (cmd *Command, err error) {
 	}
 	_, err = addCustom(cmd, rootCmd, commandSection, args[0], tools)
 	if err != nil {
-		stderr := cmd.Stderr()
-		fmt.Fprintf(stderr, "command %s %q is not defined\n", commandSection, args[0])
-		fmt.Println(stderr, "Run 'cue help' to show available commands.")
-		os.Exit(1)
+		return cmd, errors.Newf(token.NoPos,
+			"command %s %q is not defined\n"+
+				"Run 'cue help' to show available commands.",
+			commandSection, args[0],
+		)
 	}
 	return cmd, nil
 }

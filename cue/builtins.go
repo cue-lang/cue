@@ -2871,7 +2871,7 @@ var builtinPackages = map[string]*builtinPkg{
 		}
 		stdout:  *null | string | bytes
 		stderr:  *null | string | bytes
-		stdin?:  string | bytes
+		stdin:   *null | string | bytes
 		success: bool
 	}
 }`,

@@ -78,16 +78,29 @@ func (c *execCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 
 	cmd := exec.CommandContext(ctx.Context, bin, args...)
 
-	if v := v.Lookup("stdin"); v.Exists() {
+	stream := func(name string) (stream cue.Value, ok bool) {
+		c := v.Lookup(name)
+		// Although the schema defines a default versions, older implementations
+		// may not use it yet.
+		if !c.Exists() {
+			return
+		}
+		if err := c.Null(); err == nil {
+			return
+		}
+		return c, true
+	}
+
+	if v, ok := stream("stdin"); ok {
 		if cmd.Stdin, err = v.Reader(); err != nil {
 			return nil, fmt.Errorf("cue: %v", err)
 		}
 	}
-	captureOut := v.Lookup("stdout").Exists()
+	_, captureOut := stream("stdout")
 	if !captureOut {
 		cmd.Stdout = ctx.Stdout
 	}
-	captureErr := v.Lookup("stderr").Exists()
+	_, captureErr := stream("stderr")
 	if !captureErr {
 		cmd.Stderr = ctx.Stderr
 	}

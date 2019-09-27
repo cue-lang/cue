@@ -1,5 +1,7 @@
 package home
 
+import "tool/exec"
+
 command run: runBase & {
 	task echo cmd: "echo \(message)"
 }
@@ -9,7 +11,7 @@ command run_list: runBase & {
 }
 
 command errcode: {
-	task bad: {
+	task bad: exec.Run & {
 		kind:   "exec"
 		cmd:    "ls --badflags"
 		stderr: string // suppress error message
@@ -17,7 +19,7 @@ command errcode: {
 
 // TODO: capture stdout and stderr for tests.
 command runRedirect: {
-	task echo: {
+	task echo: exec.Run & {
 		kind: "exec"
 		cmd:  "echo \(message)"
 	}

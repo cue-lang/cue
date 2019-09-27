@@ -36,8 +36,9 @@ Run: {
 	// stderr is like stdout, but for errors.
 	stderr: *null | string | bytes
 
-	// stdin specifies the input for the process.
-	stdin?: string | bytes
+	// stdin specifies the input for the process. If null, stdin of the current
+	// process is used.
+	stdin: *null | string | bytes
 
 	// success is set to true when the process terminates with with a zero exit
 	// code or false otherwise. The user can explicitly specify the value

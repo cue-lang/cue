@@ -1288,9 +1288,9 @@ func (v Value) Format(state fmt.State, verb rune) {
 	_, _ = io.WriteString(state, ctx.str(v.path.cache))
 }
 
-// Reference returns path from the root of the instance referred to by this
-// value such that inst.Lookup(path) resolves to the same value, or no path if
-// this value is not a reference,
+// Reference returns the instance and path referred to by this value such that
+// inst.Lookup(path) resolves to the same value, or no path if this value is not
+// a reference,
 func (v Value) Reference() (inst *Instance, path []string) {
 	// TODO: don't include references to hidden fields.
 	if v.path == nil {
@@ -1308,6 +1308,9 @@ func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (imp *Instance,
 	switch x := sel.x.(type) {
 	case *selectorExpr:
 		imp, a = mkPath(c, up.parent, x, d+1)
+		if imp == nil {
+			return nil, nil
+		}
 	case *nodeRef:
 		// the parent must exist.
 		for ; up != nil && up.cache != x.node.(value); up = up.parent {
@@ -1319,7 +1322,7 @@ func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (imp *Instance,
 		}
 		imp = c.getImportFromNode(x.node)
 	default:
-		panic("should not happend")
+		return nil, nil
 	}
 	return imp, append(a, c.labelStr(sel.feature))
 }
@@ -1342,6 +1345,8 @@ func mkFromRoot(c *context, up *valueData, d int) (root value, a []string) {
 //
 // Deprecated: can be implemented in terms of Reference and Expr.
 func (v Value) References() [][]string {
+	// TODO: the pathFinder algorithm is quite broken. Using Reference and Expr
+	// will cast a much more accurate net on referenced values.
 	ctx := v.ctx()
 	pf := pathFinder{up: v.path}
 	raw := v.path.v
@@ -1354,7 +1359,7 @@ func (v Value) References() [][]string {
 
 type pathFinder struct {
 	paths [][]string
-	stack []string
+	stack []label
 	up    *valueData
 }
 
@@ -1362,26 +1367,40 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 	switch x := v.(type) {
 	case *selectorExpr:
 		i := len(p.stack)
-		p.stack = append(p.stack, ctx.labelStr(x.feature))
+		p.stack = append(p.stack, x.feature)
 		rewrite(ctx, x.x, p.find)
 		p.stack = p.stack[:i]
 		return v, false
+
 	case *nodeRef:
 		i := len(p.stack)
 		up := p.up
 		for ; up != nil && up.cache != x.node.(value); up = up.parent {
 		}
 		for ; up != nil && up.feature > 0; up = up.parent {
-			p.stack = append(p.stack, ctx.labelStr(up.feature))
+			p.stack = append(p.stack, up.feature)
 		}
 		path := make([]string, len(p.stack))
 		for i, v := range p.stack {
-			path[len(path)-1-i] = v
+			path[len(path)-1-i] = ctx.labelStr(v)
 		}
 		p.paths = append(p.paths, path)
 		p.stack = p.stack[:i]
 		return v, false
-	case *structLit: // handled in sub fields
+
+	case *structLit:
+		// If the stack is empty, we do not descend, as we are not evaluating
+		// sub fields.
+		if len(p.stack) == 0 {
+			return v, false
+		}
+
+		stack := p.stack
+		p.stack = nil
+		for _, a := range x.arcs {
+			rewrite(ctx, a.v, p.find)
+		}
+		p.stack = stack
 		return v, false
 	}
 	return v, true
@@ -1649,8 +1668,7 @@ func (a *Attribute) Lookup(pos int, key string) (val string, found bool, err err
 }
 
 // Expr reports the operation of the underlying expression and the values it
-// operates on. The returned values are appended to the given slice, which may
-// be nil.
+// operates on.
 //
 // For unary expressions, it returns the single value of the expression.
 //
@@ -1660,20 +1678,15 @@ func (a *Attribute) Lookup(pos int, key string) (val string, found bool, err err
 // sequence.
 //
 // For selector and index expressions it returns the subject and then the index.
-// For selectors, the index is the string value of the identifier. For slice
-// expressions, it returns the subject, low value, and high value, in that
-// order.
+// For selectors, the index is the string value of the identifier.
 //
 // For interpolations it returns a sequence of values to be concatenated, some
 // of which will be literal strings and some unevaluated expressions.
 //
 // A builtin call expression returns the value of the builtin followed by the
 // args of the call.
-//
-// If v is not an expression, Partial append v itself.
-// TODO: return v if this is complete? Yes for now
-// TODO: add values if a == nil?
 func (v Value) Expr() (Op, []Value) {
+	// TODO: return v if this is complete? Yes for now
 	if v.path == nil {
 		return NoOp, nil
 	}

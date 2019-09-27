@@ -2000,6 +2000,12 @@ func TestReferences(t *testing.T) {
 	a: { c: 3 }
 	b: { c: int, d: 4 }
 	r: (a & b).c
+	c: {args: s1 + s2}.args
+	s1: string
+	s2: string
+	d: ({arg: b}).arg.c
+	e: f.arg.c
+	f: {arg: b}
 	`
 	testCases := []struct {
 		config string
@@ -2011,6 +2017,9 @@ func TestReferences(t *testing.T) {
 		{config1, "c.f", "a"},
 
 		{config2, "r", "a.c b.c"},
+		{config2, "c", "s1 s2"},
+		// {config2, "d", "b.c"}, // TODO: make this work as well.
+		{config2, "e", "f.arg.c"}, // TODO: should also report b.c.
 	}
 	for _, tc := range testCases {
 		t.Run(tc.in, func(t *testing.T) {

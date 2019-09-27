@@ -32,6 +32,7 @@ func TestCmd(t *testing.T) {
 		"baddisplay",
 		"errcode",
 		"http",
+		"print",
 	}
 	defer func() {
 		stdout = os.Stdout

@@ -50,3 +50,24 @@ command http: {
 		text: task.http.response.body
 	}
 }
+
+command print: {
+	task: {
+		t1: exec.Run & {
+			cmd: ["sh", "-c", "sleep 1; echo t1"]
+			stdout: string
+		}
+		t2: exec.Run & {
+			cmd: ["sh", "-c", "sleep 1; echo t2"]
+			stdout: string
+		}
+		t3: cli.Print & {
+			text: (f & {arg: t1.stdout + t2.stdout}).result
+		}
+	}
+}
+
+f :: {
+    arg: string
+    result: strings.Join(strings.Split(arg, ""), ".")
+}

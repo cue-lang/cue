@@ -86,6 +86,7 @@ func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
 	top := &OrderedMap{}
 	top.Set("openapi", "3.0.0")
 	top.Set("info", &g.Info)
+	top.Set("paths", &OrderedMap{})
 	top.Set("components", schemas)
 
 	return top, nil

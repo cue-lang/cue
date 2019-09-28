@@ -4,6 +4,7 @@
       "title": "test",
       "version": "v1"
    },
+   "paths": {},
    "components": {
       "schemas": {
          "MYSTRING": {

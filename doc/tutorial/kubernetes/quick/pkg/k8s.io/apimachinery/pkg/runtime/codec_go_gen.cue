@@ -13,6 +13,3 @@ NoopEncoder :: {
 NoopDecoder :: {
 	Encoder: Encoder
 }
-
-// GroupVersioners implements GroupVersioner and resolves to the first exact match for any kind.
-GroupVersioners :: [...GroupVersioner]

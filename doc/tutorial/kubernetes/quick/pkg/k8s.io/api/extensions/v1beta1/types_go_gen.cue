@@ -974,7 +974,56 @@ AllowedHostPath :: {
 
 // FSType gives strong typing to different file systems that are used by volumes.
 // Deprecated: use FSType from policy API Group instead.
-FSType :: string
+FSType :: string // enumFSType
+
+enumFSType ::
+	AzureFile |
+	Flocker |
+	FlexVolume |
+	HostPath |
+	EmptyDir |
+	GCEPersistentDisk |
+	AWSElasticBlockStore |
+	GitRepo |
+	Secret |
+	NFS |
+	ISCSI |
+	Glusterfs |
+	PersistentVolumeClaim |
+	RBD |
+	Cinder |
+	CephFS |
+	DownwardAPI |
+	FC |
+	ConfigMap |
+	Quobyte |
+	AzureDisk |
+	CSI |
+	All
+
+AzureFile ::             FSType & "azureFile"
+Flocker ::               FSType & "flocker"
+FlexVolume ::            FSType & "flexVolume"
+HostPath ::              FSType & "hostPath"
+EmptyDir ::              FSType & "emptyDir"
+GCEPersistentDisk ::     FSType & "gcePersistentDisk"
+AWSElasticBlockStore ::  FSType & "awsElasticBlockStore"
+GitRepo ::               FSType & "gitRepo"
+Secret ::                FSType & "secret"
+NFS ::                   FSType & "nfs"
+ISCSI ::                 FSType & "iscsi"
+Glusterfs ::             FSType & "glusterfs"
+PersistentVolumeClaim :: FSType & "persistentVolumeClaim"
+RBD ::                   FSType & "rbd"
+Cinder ::                FSType & "cinder"
+CephFS ::                FSType & "cephFS"
+DownwardAPI ::           FSType & "downwardAPI"
+FC ::                    FSType & "fc"
+ConfigMap ::             FSType & "configMap"
+Quobyte ::               FSType & "quobyte"
+AzureDisk ::             FSType & "azureDisk"
+CSI ::                   FSType & "csi"
+All ::                   FSType & "*"
 
 // AllowedFlexVolume represents a single Flexvolume that is allowed to be used.
 // Deprecated: use AllowedFlexVolume from policy API Group instead.

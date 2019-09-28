@@ -4631,7 +4631,7 @@ NodeSpec :: {
 	// Deprecated. Not all kubelets will set this field. Remove field after 1.13.
 	// see: https://issues.k8s.io/61966
 	// +optional
-	externalID?: string @go(DoNotUse_ExternalID) @protobuf(2,bytes,opt)
+	externalID?: string @go(DoNotUseExternalID) @protobuf(2,bytes,opt)
 }
 
 // NodeConfigSource specifies a source of node configuration. Exactly one subfield (excluding metadata) must be non-nil.
@@ -5107,7 +5107,9 @@ NamespaceConditionType :: string // enumNamespaceConditionType
 enumNamespaceConditionType ::
 	NamespaceDeletionDiscoveryFailure |
 	NamespaceDeletionContentFailure |
-	NamespaceDeletionGVParsingFailure
+	NamespaceDeletionGVParsingFailure |
+	NamespaceContentRemaining |
+	NamespaceFinalizersRemaining
 
 // NamespaceDeletionDiscoveryFailure contains information about namespace deleter errors during resource discovery.
 NamespaceDeletionDiscoveryFailure :: NamespaceConditionType & "NamespaceDeletionDiscoveryFailure"
@@ -5117,6 +5119,12 @@ NamespaceDeletionContentFailure :: NamespaceConditionType & "NamespaceDeletionCo
 
 // NamespaceDeletionGVParsingFailure contains information about namespace deleter errors parsing GV for legacy types.
 NamespaceDeletionGVParsingFailure :: NamespaceConditionType & "NamespaceDeletionGroupVersionParsingFailure"
+
+// NamespaceContentRemaining contains information about resources remaining in a namespace.
+NamespaceContentRemaining :: NamespaceConditionType & "NamespaceContentRemaining"
+
+// NamespaceFinalizersRemaining contains information about which finalizers are on resources remaining in a namespace.
+NamespaceFinalizersRemaining :: NamespaceConditionType & "NamespaceFinalizersRemaining"
 
 // NamespaceCondition contains details about state of namespace.
 NamespaceCondition :: {

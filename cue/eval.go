@@ -248,15 +248,14 @@ func (x *list) evalPartial(ctx *context) (result evaluated) {
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
 	n := x.len.evalPartial(ctx)
-	t := x.typ.evalPartial(ctx)
-	if err := firstBottom(n, t); err != nil {
-		return err
+	if isBottom(n) {
+		return n
 	}
 	s := x.elem.evalPartial(ctx).(*structLit)
-	if s == x.elem && n == x.len && t == x.typ {
+	if s == x.elem && n == x.len {
 		return x
 	}
-	return &list{x.baseValue, s, t, n}
+	return &list{x.baseValue, s, x.typ, n}
 }
 
 func (x *listComprehension) evalPartial(ctx *context) evaluated {

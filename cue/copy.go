@@ -26,7 +26,7 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 		if node == x.node {
 			return x, false
 		}
-		return &nodeRef{x.baseValue, node, x.short}, false
+		return &nodeRef{x.baseValue, node, x.label}, false
 
 	case *structLit:
 		arcs := make(arcs, len(x.arcs))

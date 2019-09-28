@@ -151,7 +151,7 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 		for _, a := range r.arcs {
 			if a.feature == label {
 				return &selectorExpr{newExpr(n),
-					&nodeRef{baseValue: newExpr(n), node: r}, label}
+					&nodeRef{baseValue: newExpr(n), node: r, label: label}, label}
 			}
 		}
 		if v.inSelector > 0 {
@@ -486,12 +486,10 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			ret = &nodeRef{baseValue: newExpr(n), node: n2}
 			ret = &selectorExpr{newExpr(n), ret, f}
 		} else {
+			// Package or direct ancestor node.
 			n2 := v.mapScope(n.Node)
-			ref := &nodeRef{baseValue: newExpr(n), node: n2}
+			ref := &nodeRef{baseValue: newExpr(n), node: n2, label: f}
 			ret = ref
-			if inst := v.ctx().getImportFromNode(n2); inst != nil {
-				ref.short = f
-			}
 		}
 
 	case *ast.BottomLit:

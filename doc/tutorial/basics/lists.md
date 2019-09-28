@@ -39,7 +39,7 @@ yourIP: [11, 1, 2, 3]
 `$ cue eval -i lists.cue`
 ```
 IP: [uint8, uint8, uint8, uint8]
-PrivateIP: [10, uint8, uint8, uint8] | [192, 168, uint8, uint8] | [172, >=16 & <=32, uint8, uint8]
+PrivateIP: [10, uint8, uint8, uint8] | [192, 168, uint8, uint8] | [172, >=16 & <=32 & uint8, uint8, uint8]
 myIP: [10, 2, 3, 4]
 yourIP: _|_ // empty disjunction: [((10 & (int & >=0 & int & <=255)) & 11),((int & >=0 & int & <=255) & 1),((int & >=0 & int & <=255) & 2),((int & >=0 & int & <=255) & 3)]
 ```

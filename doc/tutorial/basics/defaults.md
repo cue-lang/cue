@@ -29,5 +29,5 @@ protocol: *"udp" | "tcp"
 `$ cue eval defaults.cue`
 ```
 replicas: 1
-protocol: "tcp" | "udp"
+protocol: "tcp" | "udp" | *_|_
 ```

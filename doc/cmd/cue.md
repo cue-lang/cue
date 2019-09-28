@@ -260,7 +260,6 @@ Flags:
 ```
       --dryrun        force overwriting existing files
       --files         force overwriting existing files
-      --fix string    apply given fix
   -f, --force         force overwriting existing files
   -h, --help          help for import
       --list          concatenate multiple objects into a list

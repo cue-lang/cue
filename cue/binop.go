@@ -1137,7 +1137,9 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		max, ok := n.(*numLit)
 		if !ok || len(xa) < max.intValue(ctx) {
 			src := mkBin(ctx, src.Pos(), op, x.typ, y.typ)
-			typ = binOp(ctx, src, op, x.typ.(evaluated), y.typ.(evaluated))
+			xt := x.typ.evalPartial(ctx)
+			yt := y.typ.evalPartial(ctx)
+			typ = binOp(ctx, src, op, xt, yt)
 			if isBottom(typ) {
 				return ctx.mkErr(src, "conflicting list element types: %v", typ)
 			}

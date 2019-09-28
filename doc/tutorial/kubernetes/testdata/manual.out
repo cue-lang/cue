@@ -33,14 +33,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -83,14 +83,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -250,14 +250,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -419,14 +419,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -586,14 +586,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -753,14 +753,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -922,14 +922,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -1089,14 +1089,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -1258,14 +1258,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -1308,14 +1308,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -1461,14 +1461,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -1787,14 +1787,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -2009,14 +2009,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -2206,14 +2206,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -2377,14 +2377,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -2564,14 +2564,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -2614,14 +2614,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -2866,14 +2866,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -3115,14 +3115,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -3348,14 +3348,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -3580,14 +3580,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -3816,14 +3816,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -4052,14 +4052,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -4246,14 +4246,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -4305,14 +4305,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -4562,14 +4562,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -4788,14 +4788,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -5024,14 +5024,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -5716,14 +5716,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -5766,14 +5766,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -6057,14 +6057,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -6243,14 +6243,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }
@@ -6858,14 +6858,14 @@ _k8sSpec: {
                 template: {
                     spec: _|_ // undefined field "volume"
                     metadata: {
-                        labels: label
+                        labels: X.label
                     }
                 }
             }
             metadata: {
-                name: name
+                name: X.name
                 labels: {
-                    component: label.component
+                    component: X.label.component
                 }
             }
         }

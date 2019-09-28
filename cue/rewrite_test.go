@@ -80,7 +80,7 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 	case *list:
 		elm := rewriteRec(ctx, x.elem, x.elem, m).(*structLit)
 		len := rewriteRec(ctx, x.len, x.len.(evaluated), m)
-		typ := rewriteRec(ctx, x.typ, x.typ.(evaluated), m)
+		typ := rewriteRec(ctx, x.typ, x.typ.evalPartial(ctx), m)
 		return &list{x.baseValue, elm, typ, len}
 	default:
 		return eval

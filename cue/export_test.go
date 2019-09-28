@@ -198,8 +198,8 @@ func TestExport(t *testing.T) {
 			}`,
 		out: unindent(`
 			{
-				a: 1 | 2
-				b: [1 | 2]
+				a: 1 | 2 | *_|_
+				b: [1 | 2 | *_|_]
 			}`),
 	}, {
 		raw:  true,
@@ -446,6 +446,102 @@ func TestExport(t *testing.T) {
 				}
 		
 			}
+		}`),
+	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+			Foo :: {
+			Bar :: Foo | string
+			}
+		}`,
+		out: unindent(`
+		{
+			Foo :: {
+				Bar :: Foo | string
+			}
+		}`),
+	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+				FindInMap :: {
+					"Fn::FindInMap" :: [string | FindInMap]
+				}
+				a: [...string]
+			}`,
+		out: unindent(`
+			{
+				FindInMap :: {
+					"Fn::FindInMap" :: [string | FindInMap]
+				}
+				a: []
+			}`)}, {
+		raw:  true,
+		eval: true,
+		in: `{
+				And :: {
+					"Fn::And": [...(3 | And)]
+				}
+				Ands: And & {
+					"Fn::And" : [_]
+				}
+			}`,
+		out: unindent(`
+			{
+				And :: {
+					"Fn::And": []
+				}
+				Ands "Fn::And": [3 | And]
+			}`),
+	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+			Foo :: {
+				sgl: Bar
+				ref: null | Foo
+				ext: Bar | null
+				ref: null | Foo
+				ref2: null | Foo.sgl
+				...
+			}
+			Foo :: {
+				Foo: 2
+				...
+			}
+			Bar :: string
+		}`,
+		out: unindent(`
+		{
+			FOO = Foo
+			FOO658221 = Foo
+			Foo :: {
+				Foo: 2
+				sgl: string
+				ref: null | {
+					Foo:  2
+					sgl:  Bar
+					ref:  (null | FOO) & (null | FOO)
+					ext:  Bar | null
+					ref2: null | FOO.sgl
+				}
+				ext:  Bar | null
+				ref2: null | FOO658221.sgl
+			}
+			Bar :: string
+		}`),
+	}, {
+		raw:  true,
+		eval: true,
+		in: `{
+			A: [uint]
+			B: A & ([10] | [192])
+		}`,
+		out: unindent(`
+		{
+			A: [>=0]
+			B: [10] | [192]
 		}`),
 	}}
 	for _, tc := range testCases {

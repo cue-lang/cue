@@ -1317,6 +1317,7 @@ outer:
 				continue outer
 			}
 		}
+		// TODO: do not modify value, but create a new disjunction.
 		x.values[k] = v
 		k++
 	}
@@ -1340,6 +1341,7 @@ outer:
 		v := x.values[0]
 		return mVal{v.val.(evaluated), v.marked}
 	}
+	// TODO: do not modify value, but create a new disjunction.
 	x.values = x.values[:k]
 	return mVal{x, false}
 }

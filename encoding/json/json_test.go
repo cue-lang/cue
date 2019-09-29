@@ -108,7 +108,7 @@ func TestExtract(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			out := &bytes.Buffer{}
-			e, err := Extract(tc.name, tc.in)
+			e, err := Extract(tc.name, []byte(tc.in))
 			toString(out, e, err)
 			assert.Equal(t, tc.out, out.String())
 

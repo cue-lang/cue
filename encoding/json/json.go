@@ -12,11 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package yaml converts JSON to and from CUE.
+// Package json converts JSON to and from CUE.
 package json
 
 import (
-	"bytes"
 	gojson "encoding/json"
 	"io"
 	"strconv"
@@ -29,7 +28,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/source"
 	"cuelang.org/go/pkg/encoding/json"
 )
 
@@ -45,14 +43,14 @@ func Validate(b []byte, v cue.Value) error {
 	return err
 }
 
-// Extract parses the YAML to a CUE expression.
+// Extract parses the JSON to a CUE expression.
 //
 // If src != nil, Extract parses the source from src and the path is for
 // position information. The type of the argument for the src parameter must be
 // string, []byte, or io.Reader. If src == nil, ParseFile parses the file
 // specified by filename.
-func Extract(path string, src interface{}) (ast.Expr, error) {
-	expr, err := extract(path, src)
+func Extract(path string, b []byte) (ast.Expr, error) {
+	expr, err := extract(path, b)
 	if err != nil {
 		return nil, err
 	}
@@ -60,28 +58,23 @@ func Extract(path string, src interface{}) (ast.Expr, error) {
 	return expr, nil
 }
 
-// Decode converts JSON file to a CUE value.
+// Decode converts a JSON file to a CUE value.
 //
 // If src != nil, Extract parses the source from src and the path is for
 // position information. The type of the argument for the src parameter must be
 // string, []byte, or io.Reader. If src == nil, ParseFile parses the file
 // specified by filename.
-func Decode(r *cue.Runtime, path string, src interface{}) (*cue.Instance, error) {
-	expr, err := extract(path, src)
+func Decode(r *cue.Runtime, path string, b []byte) (*cue.Instance, error) {
+	expr, err := extract(path, b)
 	if err != nil {
 		return nil, err
 	}
 	return r.CompileExpr(expr)
 }
 
-func extract(path string, src interface{}) (ast.Expr, error) {
-	b, err := source.Read(path, src)
-	if err != nil {
-		return nil, err
-	}
+func extract(path string, b []byte) (ast.Expr, error) {
 	expr, err := parser.ParseExpr(path, b)
 	if err != nil || !gojson.Valid(b) {
-		// Get JSON-specific error, but
 		p := token.NoPos
 		if pos := errors.Positions(err); len(pos) > 0 {
 			p = pos[0]
@@ -264,7 +257,7 @@ func hasSpaces(n ast.Node) bool {
 }
 
 func quoteMulti(a []string, indent int) string {
-	b := bytes.Buffer{}
+	b := strings.Builder{}
 	prefix := "\n" + strings.Repeat("\t", indent)
 	b.WriteString(`"""`)
 	for _, s := range a {

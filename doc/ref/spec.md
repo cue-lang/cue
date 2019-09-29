@@ -302,7 +302,7 @@ Free tokens: # ; ~ $ ^
 ### Integer literals
 
 An integer literal is a sequence of digits representing an integer value.
-An optional prefix sets a non-decimal base: 0 for octal,
+An optional prefix sets a non-decimal base: 0o for octal,
 0x or 0X for hexadecimal, and 0b for binary.
 In hexadecimal literals, letters a-f and A-F represent values 10 through 15.
 All integers allow interstitial underscores "_";
@@ -321,7 +321,7 @@ si_it       = decimals [ "." decimals ] multiplier |
               "." decimals  multiplier .
 binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
-octal_lit   = "0" [ "o" ] octal_digit { [ "_" ] octal_digit } .
+octal_lit   = "0o" octal_digit { [ "_" ] octal_digit } .
 multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
 
 float_lit   = decimals "." [ decimals ] [ exponent ] |

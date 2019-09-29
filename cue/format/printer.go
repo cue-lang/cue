@@ -107,6 +107,15 @@ func (p *printer) Print(v interface{}) {
 
 	case *ast.BasicLit:
 		data = x.Value
+		switch x.Kind {
+		case token.INT:
+			if len(data) > 1 &&
+				data[0] == '0' &&
+				data[1] >= '0' && data[1] <= '9' {
+				data = "0o" + data[1:]
+			}
+		}
+
 		isLit = true
 		impliedComma = true
 		p.lastTok = x.Kind

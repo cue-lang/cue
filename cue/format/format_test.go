@@ -226,6 +226,45 @@ func init() {
 	}
 }
 
+// TestNodes tests nodes that are that are invalid CUE, but are accepted by
+// format.
+func TestNodes(t *testing.T) {
+	testCases := []struct {
+		name string
+		in   ast.Node
+		out  string
+	}{{
+		name: "old-style octal numbers",
+		in:   &ast.BasicLit{Kind: token.INT, Value: "0123"},
+		out:  "0o123",
+	}, {
+		name: "labels with multi-line strings",
+		in: &ast.Field{
+			Label: &ast.BasicLit{
+				Kind: token.STRING,
+				Value: `"""
+					foo
+					bar
+					"""`,
+			},
+			Value: ast.NewIdent("goo"),
+		},
+		out: `"foo\nbar": goo`,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			b, err := Node(tc.in)
+			if err != nil {
+				t.Fatal(err)
+			}
+			if got := string(b); got != tc.out {
+				t.Errorf("\ngot:  %v; want: %v", got, tc.out)
+			}
+		})
+	}
+
+}
+
 // Verify that the printer doesn't crash if the AST contains BadXXX nodes.
 func TestBadNodes(t *testing.T) {
 	const src = "package p\n("

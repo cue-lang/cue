@@ -15,19 +15,11 @@
 package main
 
 import (
-	"context"
-	"fmt"
 	"os"
 
 	"cuelang.org/go/cmd/cue/cmd"
 )
 
 func main() {
-	err := cmd.Main(context.Background(), os.Args[1:])
-	if err != nil {
-		if err != cmd.ErrPrintedError {
-			fmt.Println(err)
-		}
-		os.Exit(1)
-	}
+	os.Exit(cmd.Main())
 }

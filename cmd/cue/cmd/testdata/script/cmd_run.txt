@@ -1,0 +1,33 @@
+cue cmd run
+cmp stdout run.out
+
+-- run.out --
+Hello world!
+
+-- task.cue --
+package home
+message: "Hello world!"
+
+-- task_tool.cue --
+package home
+
+command run: runBase & {
+	task echo cmd: "echo \(message)"
+}
+
+-- base_tool.cue --
+package home
+
+// deliberately put in another file to test resolving top-level identifiers
+// in different files.
+runBase: {
+	task echo: {
+		kind:   "exec"
+		stdout: string
+	}
+
+	task display: {
+		kind: "print"
+		text: task.echo.stdout
+	}
+}

@@ -1,2 +1,0 @@
-expected 'STRING', found '.':
-    ./testdata/fmt/error.cue:1:9

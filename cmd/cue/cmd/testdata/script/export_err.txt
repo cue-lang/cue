@@ -1,0 +1,11 @@
+cue export ./exporterr
+cmp stdout expect-stdout
+-- expect-stdout --
+cue: marshal error at path a.b.2.c: cannot convert incomplete value "int" to JSON
+-- exporterr/export_err.cue --
+package exporterr
+
+a: {
+	b: [0, 1, {c: int}, 3]
+}
+-- exporterr/cue.mod --

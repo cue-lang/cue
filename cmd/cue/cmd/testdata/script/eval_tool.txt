@@ -1,0 +1,15 @@
+cue eval
+cmp stdout expect-stdout
+
+-- expect-stdout --
+message: "Hello world!"
+-- task.cue --
+package home
+message: "Hello world!"
+
+-- task_tool.cue --
+package home
+
+command run_list: runBase & {
+	task echo cmd: ["echo", message]
+}

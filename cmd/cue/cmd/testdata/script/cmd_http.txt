@@ -1,0 +1,32 @@
+cue cmd http
+cmp stdout cmd_http.out
+-- cmd_http.out --
+{"data":"I'll be back!","when":"now"}
+
+-- task_tool.cue --
+
+package home
+
+command http: {
+	task testserver: {
+		kind: "testserver"
+		url:  string
+	}
+	task http: {
+		kind:   "http"
+		method: "POST"
+		url:    task.testserver.url
+
+		request body:  "I'll be back!"
+		response body: string // TODO: allow this to be a struct, parsing the body.
+	}
+	task print: {
+		kind: "print"
+		text: task.http.response.body
+	}
+}
+
+-- task.cue --
+package home
+
+message: "Hello world!"

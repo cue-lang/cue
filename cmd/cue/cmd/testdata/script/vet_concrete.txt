@@ -1,0 +1,25 @@
+! cue vet -c
+cmp stderr expect-stderr
+-- expect-stderr --
+sum: incomplete value ((1 | 2)):
+    ./partial.cue:4:6
+b.idx: invalid non-ground value string (must be concrete int|string):
+    ./partial.cue:7:9
+b.str: incomplete value (string):
+    ./partial.cue:8:7
+-- partial.cue --
+package partial
+
+def: *1 | int
+sum: 1 | 2
+
+b: {
+	idx: a[str] // should resolve to top-level `a`
+	str: string
+}
+b a b: 4
+a: {
+	b: 3
+	c: 4
+}
+c: b & {str: "b"}

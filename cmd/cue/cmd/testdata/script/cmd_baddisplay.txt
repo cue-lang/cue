@@ -1,0 +1,21 @@
+! cue cmd baddisplay
+! stdout .
+cmp stderr cmd_baddisplay.out
+
+-- cmd_baddisplay.out --
+text: conflicting values 42 and string (mismatched types int and string):
+    ./task_tool.cue:6:9
+    tool/cli:4:9
+-- task.cue --
+package home
+message: "Hello world!"
+
+-- task_tool.cue --
+package home
+
+command baddisplay: {
+	task display: {
+		kind: "print"
+		text: 42
+	}
+}

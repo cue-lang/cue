@@ -1,0 +1,30 @@
+cue import -o - -f --files ./import
+cmp stdout expect-stdout
+-- expect-stdout --
+kind: "Service"
+name: "booster"
+kind:     "Deployment"
+name:     "booster"
+replicas: 1
+kind: "Service"
+name: """
+		supplement
+		foo
+		"""
+json: "[1, 2]"
+-- import/services.jsonl --
+{
+    "kind": "Service",
+    "name": "booster"
+}
+{
+    "kind": "Deployment",
+    "name": "booster",
+    "replicas": 1
+}
+{
+    "kind": "Service",
+    "name": "supplement\nfoo",
+    "json": "[1, 2]"
+}
+-- cue.mod --

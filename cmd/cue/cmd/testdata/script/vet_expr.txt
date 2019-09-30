@@ -1,0 +1,34 @@
+! cue vet -e File vet.cue data.yaml
+cmp stderr expect-stderr
+
+-- expect-stderr --
+field "skip" not allowed in closed struct:
+    ./vet.cue:4:9
+-- vet.cue --
+
+translations <_> lang: string
+
+File :: {
+	translations: {...}
+}
+-- data.yaml --
+# translated messages
+translations:
+  hello:
+    lang: gsw
+    text: Grüetzi
+---
+translations:
+  hello:
+    text: Hoi
+---
+translations:
+  hello:
+    lang: no
+    text: Hallo
+---
+translations:
+  hello:
+    lang: nl
+    text: Hallo
+skip: true

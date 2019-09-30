@@ -1,0 +1,19 @@
+! cue cmd errcode
+! stdout .
+cmp stderr cmd_baddisplay.out
+
+-- cmd_baddisplay.out --
+command "ls --badflags" failed: exit status 2
+-- task.cue --
+package home
+message: "Hello world!"
+
+-- task_tool.cue --
+package home
+
+command errcode: {
+	task bad: exec.Run & {
+		kind:   "exec"
+		cmd:    "ls --badflags"
+		stderr: string // suppress error message
+	}}

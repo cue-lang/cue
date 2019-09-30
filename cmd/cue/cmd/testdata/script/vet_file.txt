@@ -1,0 +1,37 @@
+! cue vet ./vet.cue ./data.yaml
+cmp stderr expect-stderr
+
+-- expect-stderr --
+translations.hello.lang: incomplete value (string):
+    ./vet.cue:2:24
+translations.hello.lang: conflicting values false and string (mismatched types bool and string):
+    ./data.yaml:13:11
+    ./vet.cue:2:24
+-- vet.cue --
+
+translations <_> lang: string
+
+File :: {
+	translations: {...}
+}
+-- data.yaml --
+# translated messages
+translations:
+  hello:
+    lang: gsw
+    text: Grüetzi
+---
+translations:
+  hello:
+    text: Hoi
+---
+translations:
+  hello:
+    lang: no
+    text: Hallo
+---
+translations:
+  hello:
+    lang: nl
+    text: Hallo
+skip: true

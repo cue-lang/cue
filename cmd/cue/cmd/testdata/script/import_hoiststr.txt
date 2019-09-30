@@ -1,0 +1,58 @@
+cue import -o - -f --list -l '"\(strings.ToLower(kind))" "\(name)"' --recursive ./import
+cmp stdout expect-stdout
+-- expect-stdout --
+import xjson "encoding/json"
+
+service: {
+	booster: [{
+		kind: "Service"
+		name: "booster"
+	}]
+	"supplement\nfoo": [{
+		kind: "Service"
+		name: """
+		supplement
+		foo
+		"""
+		json: xjson.Marshal(_cue_json)
+		_cue_json = [1, 2]
+	}]
+}
+deployment booster: [{
+	kind:     "Deployment"
+	name:     "booster"
+	replicas: 1
+}]
+-- import/services.cue --
+service: [{
+	kind: "Service"
+	name: "booster"
+}, {
+	kind: "Service"
+	name: """
+		supplement
+		foo
+		"""
+	json: "[1, 2]"
+}]
+deployment: [{
+	kind:     "Deployment"
+	name:     "booster"
+	replicas: 1
+}]
+-- import/services.jsonl --
+{
+    "kind": "Service",
+    "name": "booster"
+}
+{
+    "kind": "Deployment",
+    "name": "booster",
+    "replicas": 1
+}
+{
+    "kind": "Service",
+    "name": "supplement\nfoo",
+    "json": "[1, 2]"
+}
+-- cue.mod --

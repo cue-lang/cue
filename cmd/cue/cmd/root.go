@@ -16,7 +16,9 @@ package cmd
 
 import (
 	"context"
+	"fmt"
 	"io"
+	"os"
 	"strings"
 
 	"cuelang.org/go/cue/errors"
@@ -100,8 +102,19 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	return c
 }
 
-// Main runs the cue tool. It loads the tool flags.
-func Main(ctx context.Context, args []string) (err error) {
+// Main runs the cue tool and returns the code for passing to os.Exit.
+func Main() int {
+	err := mainErr(context.Background(), os.Args[1:])
+	if err != nil {
+		if err != ErrPrintedError {
+			fmt.Fprintln(os.Stderr, err)
+		}
+		return 1
+	}
+	return 0
+}
+
+func mainErr(ctx context.Context, args []string) error {
 	cmd, err := New(args)
 	if err != nil {
 		return err
@@ -296,5 +309,5 @@ type panicError struct {
 }
 
 func exit() {
-	panic(panicError{errors.New("terminating because of errors")})
+	panic(panicError{ErrPrintedError})
 }

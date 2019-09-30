@@ -1,5 +1,0 @@
-translations.hello.lang: incomplete value (string):
-    ./testdata/vet/vet.cue:2:24
-translations.hello.lang: conflicting values false and string (mismatched types bool and string):
-    ./testdata/vet/data.yaml:13:11
-    ./testdata/vet/vet.cue:2:24

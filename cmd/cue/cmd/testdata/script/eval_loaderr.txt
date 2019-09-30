@@ -1,0 +1,6 @@
+! cue eval non-existing .
+! stdout .
+cmp stderr expect-stderr
+
+-- expect-stderr --
+cannot find package "non-existing"

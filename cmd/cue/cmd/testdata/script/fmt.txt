@@ -1,0 +1,11 @@
+! cue fmt ./fmt
+cmp stderr expect-stderr
+-- expect-stderr --
+expected 'STRING', found '.':
+    ./fmt/error.cue:1:9
+-- fmt/error.cue --
+import a.b "foo"
+
+a: 2
+bb: 3
+-- fmt/cue.mod --

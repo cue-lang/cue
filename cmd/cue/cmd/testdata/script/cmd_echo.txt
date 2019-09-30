@@ -1,0 +1,29 @@
+cue cmd echo
+cmp stdout expect-stdout
+-- expect-stdout --
+Hello World!
+
+-- data.cue --
+package hello
+
+who :: "World"
+-- hello.cue --
+package hello
+
+message: "Hello \(who)!" // who declared in data.cue
+-- hello_tool.cue --
+package hello
+
+command echo: {
+    task echo: {
+        kind:   "exec"
+        cmd:    "echo \(message)"
+        stdout: string
+    }
+
+    task display: {
+        kind: "print"
+        text: task.echo.stdout
+    }
+}
+-- cue.mod --

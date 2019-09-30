@@ -1,0 +1,15 @@
+cue export ./hello
+cmp stdout expect-stdout
+-- expect-stdout --
+{
+    "message": "Hello World!"
+}
+-- hello/data.cue --
+package hello
+
+who :: "World"
+-- hello/hello.cue --
+package hello
+
+message: "Hello \(who)!" // who declared in data.cue
+-- hello/cue.mod --

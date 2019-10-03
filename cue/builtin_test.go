@@ -156,6 +156,12 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Drop([1, 2, 3, 4], -1)`),
 		`_|_(error in call to list.Drop: negative index)`,
 	}, {
+		test("list", `list.Flatten([1, [[2, 3], []], [4]])`),
+		`[1,2,3,4]`,
+	}, {
+		test("list", `list.Flatten("foo")`),
+		`_|_(error in call to list.Flatten: cannot use value "foo" (type string) as list)`,
+	}, {
 		test("list", `list.Max([1, 2, 3, 4])`),
 		`4`,
 	}, {

@@ -45,6 +45,42 @@ func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 	return x[n:], nil
 }
 
+// Flatten reports a flattend sequence of the list x by expanding any elements
+// that are lists.
+//
+// For instance:
+//
+//    Flatten([1, [[2, 3], []], [4]])
+//
+// results in
+//
+//    [1, 2, 3, 4]
+//
+func Flatten(xs cue.Value) ([]cue.Value, error) {
+	var flatten func(cue.Value) ([]cue.Value, error)
+	flatten = func(xs cue.Value) ([]cue.Value, error) {
+		var res []cue.Value
+		iter, err := xs.List()
+		if err != nil {
+			return nil, err
+		}
+		for iter.Next() {
+			val := iter.Value()
+			if val.Kind() == cue.ListKind {
+				vals, err := flatten(val)
+				if err != nil {
+					return nil, err
+				}
+				res = append(res, vals...)
+			} else {
+				res = append(res, val)
+			}
+		}
+		return res, nil
+	}
+	return flatten(xs)
+}
+
 // Take reports the prefix of length n of list x, or x itself if n > len(x).
 //
 // For instance:

@@ -115,6 +115,10 @@ type Config struct {
 	// a package.
 	Tools bool
 
+	// filesMode indicates that files are specified
+	// explicitly on the command line.
+	filesMode bool
+
 	// If DataFiles is set, the loader includes entries for directories that
 	// have no CUE files, but have recognized data files that could be converted
 	// to CUE.

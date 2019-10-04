@@ -98,6 +98,7 @@ func (l *loader) abs(filename string) string {
 func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	pos := token.NoPos
 	cfg := l.cfg
+	cfg.filesMode = true
 	// ModInit() // TODO: support modules
 	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc())
 

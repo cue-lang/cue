@@ -1,0 +1,9 @@
+! cue eval
+cmp stderr expect-stderr
+
+-- expect-stderr --
+build constraints exclude all CUE files in . (ignored: .foo.cue)
+-- .foo.cue --
+package foo
+
+a: 42

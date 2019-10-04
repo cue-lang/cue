@@ -1,4 +1,4 @@
-cue eval
+cue eval .foo.cue
 cmp stdout expect-stdout
 
 -- expect-stdout --

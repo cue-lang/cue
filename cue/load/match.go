@@ -46,6 +46,9 @@ func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allT
 	if strings.HasPrefix(name, "_") {
 		return
 	}
+	if !cfg.filesMode && strings.HasPrefix(name, ".") {
+		return
+	}
 
 	i := strings.LastIndex(name, ".")
 	if i < 0 {

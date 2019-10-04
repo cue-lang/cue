@@ -393,7 +393,7 @@ func (s *Scanner) scanNumber(seenDecimalPoint bool) (token.Token, string) {
 				seenDigits = true
 				s.scanMantissa(10)
 			}
-			if s.ch == '.' || s.ch == 'e' {
+			if s.ch == '.' || s.ch == 'e' || s.ch == 'E' {
 				goto fraction
 			}
 			if seenDigits {
@@ -425,7 +425,7 @@ fraction:
 
 exponent:
 	switch s.ch {
-	case 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y':
+	case 'K', 'M', 'G', 'T', 'P':
 		tok = token.INT // TODO: Or should we allow this to be a float?
 		s.next()
 		if s.ch == 'i' {
@@ -434,8 +434,7 @@ exponent:
 		goto exit
 	}
 
-	// TODO: allow 'E' for exponent? Could be used for Exa
-	if s.ch == 'e' { // || s.ch == 'E' {
+	if s.ch == 'e' || s.ch == 'E' {
 		tok = token.FLOAT
 		s.next()
 		if s.ch == '-' || s.ch == '+' {

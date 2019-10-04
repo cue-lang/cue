@@ -194,6 +194,7 @@ var data = []entry{
 	{"comments.input", "comments.golden", 0},
 	{"simplify.input", "simplify.golden", simplify},
 	{"expressions.input", "expressions.golden", 0},
+	{"values.input", "values.golden", 0},
 	{"imports.input", "imports.golden", sortImps},
 }
 

@@ -322,13 +322,17 @@ si_it       = decimals [ "." decimals ] multiplier |
 binary_lit  = "0b" binary_digit { binary_digit } .
 hex_lit     = "0" ( "x" | "X" ) hex_digit { [ "_" ] hex_digit } .
 octal_lit   = "0o" octal_digit { [ "_" ] octal_digit } .
-multiplier  = ( "K" | "M" | "G" | "T" | "P" | "E" | "Y" | "Z" ) [ "i" ]
+multiplier  = ( "K" | "M" | "G" | "T" | "P" ) [ "i" ]
 
 float_lit   = decimals "." [ decimals ] [ exponent ] |
               decimals exponent |
               "." decimals [ exponent ].
 exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
 ```
+<!--
+TODO: consider allowing Exo (and up), if not followed by a sign
+or number. Alternatively one could only allow Ei, Yi, and Zi.
+-->
 
 ```
 42

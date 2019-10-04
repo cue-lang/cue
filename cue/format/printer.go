@@ -17,6 +17,7 @@ package format
 import (
 	"fmt"
 	"os"
+	"strings"
 	"text/tabwriter"
 
 	"cuelang.org/go/cue/ast"
@@ -113,6 +114,10 @@ func (p *printer) Print(v interface{}) {
 				data[0] == '0' &&
 				data[1] >= '0' && data[1] <= '9' {
 				data = "0o" + data[1:]
+			}
+		case token.FLOAT:
+			if strings.IndexByte(data, 'E') != -1 {
+				data = strings.ToLower(data)
 			}
 		}
 

@@ -264,11 +264,19 @@ func (p *litParser) scanNumber(seenDecimalPoint bool) value {
 		default:
 			// int (base 8 or 10) or float
 			p.scanMantissa(8)
-			if p.ch == '.' || p.ch == 'e' || p.ch == '8' || p.ch == '9' {
+			if p.ch == '8' || p.ch == '9' {
 				p.scanMantissa(10)
-				if p.ch != '.' && p.ch != 'e' {
-					return p.error(p.node, "illegal octal number %q", p.src)
+				if p.ch != '.' && p.ch != 'e' && p.ch != 'E' {
+					return p.error(p.node, "illegal integer number %q", p.src)
 				}
+			}
+			switch p.ch {
+			case 'e', 'E':
+				if len(p.buf) == 0 {
+					p.buf = append(p.buf, '0')
+				}
+				fallthrough
+			case '.':
 				goto fraction
 			}
 			if len(p.buf) > 0 {
@@ -295,7 +303,7 @@ fraction:
 
 exponent:
 	switch p.ch {
-	case 'K', 'M', 'G', 'T', 'P', 'E', 'Z', 'Y':
+	case 'K', 'M', 'G', 'T', 'P':
 		mul := charToMul[p.ch]
 		p.next()
 		if p.ch == 'i' {
@@ -315,7 +323,7 @@ exponent:
 		}
 		return n
 
-	case 'e':
+	case 'e', 'E':
 		isFloat = true
 		p.next()
 		p.buf = append(p.buf, 'e')

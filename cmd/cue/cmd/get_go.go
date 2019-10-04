@@ -319,7 +319,7 @@ var (
 
 func extract(cmd *Command, args []string) error {
 	// determine module root:
-	binst := loadFromArgs(cmd, []string{"."})[0]
+	binst := loadFromArgs(cmd, []string{"."}, nil)[0]
 
 	if err := initInterfaces(); err != nil {
 		return err

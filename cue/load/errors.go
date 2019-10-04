@@ -116,10 +116,10 @@ func (e *noCUEError) Msg() (string, []interface{}) { return e.Error(), nil }
 
 // TODO(localize)
 func (e *noCUEError) Error() string {
-	// Count files beginning with _ and ., which we will pretend don't exist at all.
+	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, name := range e.Package.IgnoredCUEFiles {
-		if strings.HasPrefix(name, "_") || strings.HasPrefix(name, ".") {
+		if strings.HasPrefix(name, "_") {
 			dummy++
 		}
 	}
@@ -129,7 +129,17 @@ func (e *noCUEError) Error() string {
 
 	if len(e.Package.IgnoredCUEFiles) > dummy {
 		// CUE files exist, but they were ignored due to build constraints.
-		return "build constraints exclude all CUE files in " + path
+		msg := "build constraints exclude all CUE files in " + path + " (ignored: "
+		files := e.Package.IgnoredCUEFiles
+		if len(files) > 4 {
+			files = append(files[:4], "...")
+		}
+		for i, f := range files {
+			files[i] = filepath.ToSlash(f)
+		}
+		msg += strings.Join(files, ", ")
+		msg += ")"
+		return msg
 	}
 	// if len(e.Package.TestCUEFiles) > 0 {
 	// 	// Test CUE files exist, but we're not interested in them.

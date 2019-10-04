@@ -1,0 +1,9 @@
+cue eval
+cmp stdout expect-stdout
+
+-- expect-stdout --
+a: 42
+-- .foo.cue --
+package foo
+
+a: 42

@@ -1,0 +1,15 @@
+cue cmd foo
+cmp stdout expect-stdout
+
+-- expect-stdout --
+foo
+-- foo_tool.cue --
+package foo
+
+import "tool/cli"
+
+command foo task: {
+	foo: cli.Print & {
+		text: "foo"
+	}
+}

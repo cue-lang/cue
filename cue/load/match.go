@@ -43,8 +43,7 @@ func matchFileTest(cfg *Config, dir, name string) (match bool, err error) {
 // If allTags is non-nil, matchFile records any encountered build tag
 // by setting allTags[tag] = true.
 func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, filename string, err errors.Error) {
-	if strings.HasPrefix(name, "_") ||
-		strings.HasPrefix(name, ".") {
+	if strings.HasPrefix(name, "_") {
 		return
 	}
 

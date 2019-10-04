@@ -256,12 +256,23 @@ func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
 	}
 }
 
+func countCUEFiles(c *Config, p *build.Instance) int {
+	count := len(p.CUEFiles)
+	if c.Tools {
+		count += len(p.ToolCUEFiles)
+	}
+	if c.Tests {
+		count += len(p.TestCUEFiles)
+	}
+	return count
+}
+
 func (fp *fileProcessor) finalize() errors.Error {
 	p := fp.pkg
 	if fp.err != nil {
 		return fp.err
 	}
-	if len(p.CUEFiles) == 0 && !fp.c.DataFiles {
+	if countCUEFiles(fp.c, p) == 0 && !fp.c.DataFiles {
 		fp.err = errors.Append(fp.err, &noCUEError{Package: p, Dir: p.Dir, Ignored: len(p.IgnoredCUEFiles) > 0})
 		return fp.err
 	}

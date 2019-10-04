@@ -81,15 +81,15 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 }
 
 func buildFromArgs(cmd *Command, args []string) []*cue.Instance {
-	binst := loadFromArgs(cmd, args)
+	binst := loadFromArgs(cmd, args, nil)
 	if binst == nil {
 		return nil
 	}
 	return buildInstances(cmd, binst)
 }
 
-func loadFromArgs(cmd *Command, args []string) []*build.Instance {
-	binst := load.Instances(args, nil)
+func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instance {
+	binst := load.Instances(args, cfg)
 	if len(binst) == 0 {
 		return nil
 	}
@@ -135,7 +135,7 @@ func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance,
 }
 
 func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
-	binst := loadFromArgs(cmd, args)
+	binst := loadFromArgs(cmd, args, &load.Config{Tools: true})
 	if len(binst) == 0 {
 		return nil, nil
 	}

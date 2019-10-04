@@ -37,7 +37,10 @@ func TestLoad(t *testing.T) {
 		t.Fatal(err)
 	}
 	testdataDir := filepath.Join(cwd, testdata)
-	dirCfg := &Config{Dir: testdataDir}
+	dirCfg := &Config{
+		Dir:   testdataDir,
+		Tools: true,
+	}
 
 	args := str.StringList
 	testCases := []struct {
@@ -92,7 +95,7 @@ display:`,
 		cfg:  dirCfg,
 		args: args("./anon"),
 		want: `
-err:    build constraints exclude all CUE files in ./anon
+err:    build constraints exclude all CUE files in ./anon (ignored: anon/anon.cue)
 path:   example.org/test/anon
 module: example.org/test
 root:   $CWD/testdata
@@ -150,7 +153,7 @@ imports:
 		cfg:  dirCfg,
 		args: args("example.org/test/hello:nonexist"),
 		want: `
-err:    build constraints exclude all CUE files in example.org/test/hello:nonexist
+err:    build constraints exclude all CUE files in example.org/test/hello:nonexist (ignored: hello/test.cue, anon.cue, test.cue)
 path:   example.org/test/hello:nonexist
 module: example.org/test
 root:   $CWD/testdata
@@ -215,6 +218,27 @@ files:
 imports:
 	acme.com/catch: $CWD/testdata/pkg/acme.com/catch/catch.cue
 	acme.com/helper:helper1: $CWD/testdata/pkg/acme.com/helper/helper1.cue`,
+	}, {
+		cfg:  dirCfg,
+		args: args("./toolonly"),
+		want: `
+path:   example.org/test/toolonly:foo
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/toolonly
+display:./toolonly`,
+	}, {
+		cfg: &Config{
+			Dir: testdataDir,
+		},
+		args: args("./toolonly"),
+		want: `
+err:    build constraints exclude all CUE files in ./toolonly (ignored: anon.cue, test.cue)
+path:   example.org/test/toolonly:foo
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/toolonly
+display:./toolonly`,
 	}}
 	for i, tc := range testCases {
 		// if i != 5 {

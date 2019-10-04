@@ -1,9 +1,7 @@
 ! cue cmd errcode
 ! stdout .
-cmp stderr cmd_baddisplay.out
+stderr '^command "ls --badflags" failed: exit status [12]$'
 
--- cmd_baddisplay.out --
-command "ls --badflags" failed: exit status 2
 -- task.cue --
 package home
 message: "Hello world!"

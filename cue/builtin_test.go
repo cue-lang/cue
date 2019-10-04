@@ -189,6 +189,30 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Product("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Product)`,
 	}, {
+		test("list", `list.Range(0, 5, 0)`),
+		`_|_(error in call to list.Range: step must be non zero)`,
+	}, {
+		test("list", `list.Range(5, 0, 1)`),
+		`_|_(error in call to list.Range: end must be greater than start when step is positive)`,
+	}, {
+		test("list", `list.Range(0, 5, -1)`),
+		`_|_(error in call to list.Range: end must be less than start when step is negative)`,
+	}, {
+		test("list", `list.Range(0, 5, 1)`),
+		`[0,1,2,3,4]`,
+	}, {
+		test("list", `list.Range(0, 1, 1)`),
+		`[0]`,
+	}, {
+		test("list", `list.Range(0, 5, 2)`),
+		`[0,2,4]`,
+	}, {
+		test("list", `list.Range(5, 0, -1)`),
+		`[5,4,3,2,1]`,
+	}, {
+		test("list", `list.Range(0, 5, 0.5)`),
+		`[0,0.5,1.0,1.5,2.0,2.5,3.0,3.5,4.0,4.5]`,
+	}, {
 		test("list", `list.Slice([1, 2, 3, 4], 1, 3)`),
 		`[2,3]`,
 	}, {

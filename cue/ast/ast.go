@@ -90,24 +90,9 @@ type Expr interface {
 	exprNode()
 }
 
-func (*BadExpr) exprNode()       {}
-func (*Ident) exprNode()         {}
-func (*BasicLit) exprNode()      {}
-func (*Interpolation) exprNode() {}
-func (*StructLit) exprNode()     {}
-func (*ListLit) exprNode()       {}
-func (*Ellipsis) exprNode()      {}
+type expr struct{}
 
-// func (*Comprehension) exprNode() {}
-func (*ListComprehension) exprNode() {}
-func (*ParenExpr) exprNode()         {}
-func (*SelectorExpr) exprNode()      {}
-func (*IndexExpr) exprNode()         {}
-func (*SliceExpr) exprNode()         {}
-func (*CallExpr) exprNode()          {}
-func (*UnaryExpr) exprNode()         {}
-func (*BinaryExpr) exprNode()        {}
-func (*BottomLit) exprNode()         {}
+func (expr) exprNode() {}
 
 // A Decl node is implemented by all declarations.
 type Decl interface {
@@ -115,17 +100,9 @@ type Decl interface {
 	declNode()
 }
 
-func (*Field) declNode()         {}
-func (*Comprehension) declNode() {}
-func (*ImportDecl) declNode()    {}
-func (*BadDecl) declNode()       {}
-func (*EmbedDecl) declNode()     {}
-func (*Alias) declNode()         {}
-func (*Ellipsis) declNode()      {}
+type decl struct{}
 
-// Not technically declarations, but appearing at the same level.
-func (*Package) declNode()      {}
-func (*CommentGroup) declNode() {}
+func (decl) declNode() {}
 
 // A Label is any production that can be used as a LHS label.
 type Label interface {
@@ -142,6 +119,10 @@ type Clause interface {
 	Node
 	clauseNode()
 }
+
+type clause struct{}
+
+func (clause) clauseNode() {}
 
 func (x *ForClause) clauseNode() {}
 func (x *IfClause) clauseNode()  {}
@@ -213,6 +194,8 @@ type CommentGroup struct {
 	//    <0> Label <1> ":" <2> Expr <3> "," <4>
 	Position int8
 	List     []*Comment // len(List) > 0
+
+	decl
 }
 
 func (g *CommentGroup) Pos() token.Pos  { return getPos(g) }
@@ -294,9 +277,10 @@ func (g *CommentGroup) Text() string {
 
 // An Attribute provides meta data about a field.
 type Attribute struct {
-	comments
 	At   token.Pos
 	Text string // must be a valid attribute format.
+
+	comments
 }
 
 func (a *Attribute) Pos() token.Pos  { return a.At }
@@ -305,7 +289,6 @@ func (a *Attribute) End() token.Pos  { return a.At.Add(len(a.Text)) }
 
 // A Field represents a field declaration in a struct.
 type Field struct {
-	comments
 	Label    Label // must have at least one element.
 	Optional token.Pos
 
@@ -316,6 +299,9 @@ type Field struct {
 	Value Expr // the value associated with this field.
 
 	Attrs []*Attribute
+
+	comments
+	decl
 }
 
 func (d *Field) Pos() token.Pos  { return d.Label.Pos() }
@@ -332,10 +318,12 @@ func (d *Field) End() token.Pos {
 
 // An Alias binds another field to the alias name in the current struct.
 type Alias struct {
-	comments
 	Ident *Ident    // field name, always an Ident
 	Equal token.Pos // position of "="
 	Expr  Expr      // An Ident or SelectorExpr
+
+	comments
+	decl
 }
 
 func (a *Alias) Pos() token.Pos  { return a.Ident.Pos() }
@@ -344,9 +332,11 @@ func (a *Alias) End() token.Pos  { return a.Expr.End() }
 
 // A Comprehension node represents a comprehension declaration.
 type Comprehension struct {
-	comments
 	Clauses []Clause // There must be at least one clause.
 	Value   Expr     // Must be a struct
+
+	comments
+	decl
 }
 
 func (x *Comprehension) Pos() token.Pos  { return getPos(x) }
@@ -366,20 +356,22 @@ func (x *Comprehension) End() token.Pos {
 // created. This is different from an ErrorExpr which represents
 // an explicitly marked error in the source.
 type BadExpr struct {
-	comments
 	From, To token.Pos // position range of bad expression
+
+	comments
+	expr
 }
 
 // A BottomLit indicates an error.
 type BottomLit struct {
-	comments
 	Bottom token.Pos
+
+	comments
+	expr
 }
 
 // An Ident node represents an left-hand side identifier.
 type Ident struct {
-	label
-	comments
 	NamePos token.Pos // identifier position
 
 	// This LHS path element may be an identifier. Possible forms:
@@ -390,24 +382,31 @@ type Ident struct {
 
 	Scope Node // scope in which node was found or nil if referring directly
 	Node  Node
+
+	comments
+	label
+	expr
 }
 
 // A TemplateLabel represents a field template declaration in a struct.
 type TemplateLabel struct {
-	label
-	comments
 	Langle token.Pos
 	Ident  *Ident
 	Rangle token.Pos
+
+	comments
+	label
 }
 
 // A BasicLit node represents a literal of basic type.
 type BasicLit struct {
-	label
-	comments
 	ValuePos token.Pos   // literal position
 	Kind     token.Token // INT, FLOAT, DURATION, or STRING
 	Value    string      // literal string; e.g. 42, 0x7f, 3.14, 1_234_567, 1e-9, 2.4i, 'a', '\x7f', "foo", or '\m\n\o'
+
+	comments
+	expr
+	label
 }
 
 // NewString creates a new BasicLit with a string value without position.
@@ -425,45 +424,55 @@ func NewString(str string) *BasicLit {
 
 // A Interpolation node represents a string or bytes interpolation.
 type Interpolation struct {
-	label
-	comments
 	Elts []Expr // interleaving of strings and expressions.
+
+	comments
+	expr
+	label
 }
 
 // A StructLit node represents a literal struct.
 type StructLit struct {
-	comments
 	Lbrace token.Pos // position of "{"
 	Elts   []Decl    // list of elements; or nil
 	Rbrace token.Pos // position of "}"
+
+	comments
+	expr
 }
 
 // A ListLit node represents a literal list.
 type ListLit struct {
-	comments
 	Lbrack token.Pos // position of "["
 	Elts   []Expr    // list of composite elements; or nil
 	Rbrack token.Pos // position of "]"
+
+	comments
+	expr
 }
 
 type Ellipsis struct {
-	comments
 	Ellipsis token.Pos // open list if set
 	Type     Expr      // type for the remaining elements
+
+	comments
+	decl
+	expr
 }
 
 // A ListComprehension node represents as list comprehension.
 type ListComprehension struct {
-	comments
 	Lbrack  token.Pos // position of "["
 	Expr    Expr
 	Clauses []Clause  // Feed or Guard (TODO let)
 	Rbrack  token.Pos // position of "]"
+
+	comments
+	expr
 }
 
 // A ForClause node represents a for clause in a comprehension.
 type ForClause struct {
-	comments
 	For token.Pos
 	Key *Ident // allow pattern matching?
 	// TODO: change to Comma
@@ -471,28 +480,37 @@ type ForClause struct {
 	Value  *Ident // allow pattern matching?
 	In     token.Pos
 	Source Expr
+
+	comments
+	clause
 }
 
 // A IfClause node represents an if guard clause in a comprehension.
 type IfClause struct {
-	comments
 	If        token.Pos
 	Condition Expr
+
+	comments
+	clause
 }
 
 // A ParenExpr node represents a parenthesized expression.
 type ParenExpr struct {
-	comments
 	Lparen token.Pos // position of "("
 	X      Expr      // parenthesized expression
 	Rparen token.Pos // position of ")"
+
+	comments
+	expr
 }
 
 // A SelectorExpr node represents an expression followed by a selector.
 type SelectorExpr struct {
-	comments
 	X   Expr   // expression
 	Sel *Ident // field selector
+
+	comments
+	expr
 }
 
 // NewSel creates a sequence of selectors.
@@ -506,30 +524,36 @@ func NewSel(x Expr, sel ...string) Expr {
 
 // An IndexExpr node represents an expression followed by an index.
 type IndexExpr struct {
-	comments
 	X      Expr      // expression
 	Lbrack token.Pos // position of "["
 	Index  Expr      // index expression
 	Rbrack token.Pos // position of "]"
+
+	comments
+	expr
 }
 
 // An SliceExpr node represents an expression followed by slice indices.
 type SliceExpr struct {
-	comments
 	X      Expr      // expression
 	Lbrack token.Pos // position of "["
 	Low    Expr      // begin of slice range; or nil
 	High   Expr      // end of slice range; or nil
 	Rbrack token.Pos // position of "]"
+
+	comments
+	expr
 }
 
 // A CallExpr node represents an expression followed by an argument list.
 type CallExpr struct {
-	comments
 	Fun    Expr      // function expression
 	Lparen token.Pos // position of "("
 	Args   []Expr    // function arguments; or nil
 	Rparen token.Pos // position of ")"
+
+	comments
+	expr
 }
 
 // NewCall creates a new CallExpr.
@@ -540,19 +564,23 @@ func NewCall(fun Expr, args ...Expr) *CallExpr {
 
 // A UnaryExpr node represents a unary expression.
 type UnaryExpr struct {
-	comments
 	OpPos token.Pos   // position of Op
 	Op    token.Token // operator
 	X     Expr        // operand
+
+	comments
+	expr
 }
 
 // A BinaryExpr node represents a binary expression.
 type BinaryExpr struct {
-	comments
 	X     Expr        // left operand
 	OpPos token.Pos   // position of Op
 	Op    token.Token // operator
 	Y     Expr        // right operand
+
+	comments
+	expr
 }
 
 // token.Pos and End implementations for expression/type nodes.
@@ -641,7 +669,7 @@ func (x *BottomLit) End() token.Pos         { return x.Bottom.Add(1) }
 // NewIdent creates a new Ident without position.
 // Useful for ASTs generated by code other than the Go
 func NewIdent(name string) *Ident {
-	return &Ident{label{}, comments{}, token.NoPos, name, nil, nil}
+	return &Ident{token.NoPos, name, nil, nil, comments{}, label{}, expr{}}
 }
 
 func (id *Ident) String() string {
@@ -656,11 +684,14 @@ func (id *Ident) String() string {
 
 // An ImportSpec node represents a single package import.
 type ImportSpec struct {
-	comments
 	Name   *Ident    // local package name (including "."); or nil
 	Path   *BasicLit // import path
 	EndPos token.Pos // end of spec (overrides Path.Pos if nonzero)
+
+	comments
 }
+
+func (*ImportSpec) specNode() {}
 
 func NewImport(name *Ident, importPath string) *ImportSpec {
 	importPath = strconv.Quote(importPath)
@@ -693,18 +724,22 @@ func (s *ImportSpec) End() token.Pos {
 // syntax errors for which no correct declaration nodes can be
 // created.
 type BadDecl struct {
-	comments
 	From, To token.Pos // position range of bad declaration
+
+	comments
+	decl
 }
 
 // A ImportDecl node represents a series of import declarations. A valid
 // Lparen position (Lparen.Line > 0) indicates a parenthesized declaration.
 type ImportDecl struct {
-	comments
 	Import token.Pos
 	Lparen token.Pos // position of '(', if any
 	Specs  []*ImportSpec
 	Rparen token.Pos // position of ')', if any
+
+	comments
+	decl
 }
 
 type Spec interface {
@@ -712,18 +747,16 @@ type Spec interface {
 	specNode()
 }
 
-func (*ImportSpec) specNode() {}
-
-func (*Package) specNode() {}
-
 // An EmbedDecl node represents a single expression used as a declaration.
 // The expressions in this declaration is what will be emitted as
 // configuration output.
 //
 // An EmbedDecl may only appear at the top level.
 type EmbedDecl struct {
-	comments
 	Expr Expr
+
+	comments
+	decl
 }
 
 // Pos and End implementations for declaration nodes.
@@ -757,11 +790,12 @@ func (d *EmbedDecl) End() token.Pos { return d.Expr.End() }
 // via Doc and Comment fields.
 type File struct {
 	Filename string
-	comments
-	Decls []Decl // top-level declarations; or nil
+	Decls    []Decl // top-level declarations; or nil
 
 	Imports    []*ImportSpec // imports in this file
 	Unresolved []*Ident      // unresolved identifiers in this file
+
+	comments
 }
 
 func (f *File) Pos() token.Pos {
@@ -794,9 +828,11 @@ func (f *File) End() token.Pos {
 
 // A Package represents a package clause.
 type Package struct {
-	comments
 	PackagePos token.Pos // position of "package" pseudo-keyword
 	Name       *Ident    // package name
+
+	comments
+	decl
 }
 
 func (p *Package) Pos() token.Pos { return getPos(p) }

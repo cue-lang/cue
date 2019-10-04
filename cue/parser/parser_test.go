@@ -544,7 +544,7 @@ func TestIncompleteSelection(t *testing.T) {
 			if sel == nil {
 				t.Fatalf("found no *SelectorExpr: %#v %s", f.Decls[0], debugStr(f))
 			}
-			const wantSel = "&{{<nil>} fmt _}"
+			const wantSel = "&{fmt _ {<nil>} {}}"
 			if fmt.Sprint(sel) != wantSel {
 				t.Fatalf("found selector %v, want %s", sel, wantSel)
 			}

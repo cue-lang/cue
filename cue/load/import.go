@@ -376,6 +376,9 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 			if !isTest || fp.c.Tests {
 				fp.imported[path] = append(fp.imported[path], spec.Pos())
 			}
+			if !isTool && strings.HasPrefix(path, "tool/") {
+				badFile(errors.Newf(spec.Pos(), "%s may only be imported in *_tool.cue files", quoted))
+			}
 		}
 	}
 	switch {

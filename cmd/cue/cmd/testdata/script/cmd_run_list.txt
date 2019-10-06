@@ -1,8 +1,5 @@
 cue cmd run_list
-cmp stdout run_list.out
-
--- run_list.out --
-Hello world!
+stdout 'Hello world!'
 
 -- task.cue --
 package home

@@ -1,7 +1,5 @@
 cue cmd echo
-cmp stdout expect-stdout
--- expect-stdout --
-Hello World!
+stdout 'Hello World!'
 
 -- data.cue --
 package hello

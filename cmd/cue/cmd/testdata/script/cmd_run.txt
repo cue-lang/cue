@@ -1,8 +1,5 @@
 cue cmd run
-cmp stdout run.out
-
--- run.out --
-Hello world!
+stdout 'Hello world!'
 
 -- task.cue --
 package home

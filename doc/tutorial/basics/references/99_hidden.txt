@@ -4,6 +4,7 @@ cmp stdout expect-stdout-cue
 -- frontmatter.toml --
 title = "Hidden Fields"
 description = ""
+draft = true
 
 -- text.md --
 A non-quoted field name that starts with an underscore (`_`) is not

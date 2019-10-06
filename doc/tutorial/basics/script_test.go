@@ -3,6 +3,7 @@ package basics
 import (
 	"flag"
 	"os"
+	"path/filepath"
 	"testing"
 
 	"cuelang.org/go/cmd/cue/cmd"
@@ -12,9 +13,15 @@ import (
 var update = flag.Bool("update", false, "update the test files")
 
 func TestScript(t *testing.T) {
-	testscript.Run(t, testscript.Params{
-		Dir:           "",
-		UpdateScripts: *update,
+	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
+		if !info.IsDir() {
+			return nil
+		}
+		testscript.Run(t, testscript.Params{
+			Dir:           path,
+			UpdateScripts: *update,
+		})
+		return nil
 	})
 }
 

@@ -23,4 +23,3 @@ floor: {
     level: -1 | 2 | 3
     hasExit: false
 }
-

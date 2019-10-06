@@ -1,3 +1,6 @@
+cue eval disjunctions.cue
+cmp stdout expect-stdout-cue
+
 -- frontmatter.toml --
 title = "Disjunctions"
 description = ""
@@ -23,3 +26,14 @@ lossy: conn & {
     protocol: "udp"
 }
 
+-- expect-stdout-cue --
+conn: {
+    address:  string
+    port:     int
+    protocol: "tcp" | "udp"
+}
+lossy: {
+    address:  "1.2.3.4"
+    port:     8888
+    protocol: "udp"
+}

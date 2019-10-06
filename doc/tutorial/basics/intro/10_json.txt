@@ -1,4 +1,4 @@
-cue export fieldname.cue
+cue export json.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
@@ -13,16 +13,26 @@ An object member is called a field.
 Double quotes may be omitted from field names if their name contains no
 special characters and does not start with a number:
 
--- fieldname.cue --
-{
-    one: 1,
-    two: 2,
+-- json.cue --
+one: 1
+two: 2
 
-    "two-and-a-half": 2.5
-}
+// A field using quotes.
+"two-and-a-half": 2.5
+
+list: [
+	1,
+	2,
+	3,
+]
 
 -- expect-stdout-cue --
 {
+    "list": [
+        1,
+        2,
+        3
+    ],
     "one": 1,
     "two": 2,
     "two-and-a-half": 2.5

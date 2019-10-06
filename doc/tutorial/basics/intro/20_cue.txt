@@ -1,0 +1,51 @@
+
+-- frontmatter.toml --
+title = "Commas are Optional after Fields"
+description = ""
+
+-- text.md --
+CUE merges the concepts of values and types.
+Below is a demonstration of this concept,
+showing respectively
+some data, a possible schema for this data,
+and something in between: a typical CUE constraint.
+
+{{< blocks/sidebyside >}}
+<div class="col">
+<i>Data</i>
+{{< highlight go >}}
+moscow: {
+  name:    "Moscow"
+  pop:     11.92M
+  capital: true
+}
+{{< /highlight >}}
+</div>
+
+<div class="col">
+<i>Schema</i>
+{{< highlight go >}}
+municipality: {
+  name:    string
+  pop:     int
+  capital: bool
+}
+{{< /highlight >}}
+</div>
+
+<div class="col">
+<i>CUE</i>
+{{< highlight go >}}
+largeCapital: {
+  name:    string
+  pop:     >5M
+  capital: true
+}
+{{< /highlight >}}
+</div>
+{{< /blocks/sidebyside >}}
+
+In general, in CUE one starts with a broad definition of a schema,
+describing all possible instances,
+and then narrows down these definitions for particular use cases
+until a concrete data instance remains.

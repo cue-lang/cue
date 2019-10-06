@@ -1,0 +1,41 @@
+cue eval dup.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Duplicates"
+description = ""
+
+-- text.md --
+Constraints specify what values are allowed.
+To CUE they are just values like anything else,
+but conceptually they can be explained as something in between types and
+concrete values.
+
+Constraints can be used to validate values of concrete instances.
+They can be applied to CUE data, or directly to YAML or JSON.
+
+But constraints can also reduce boilerplate.
+If a constraints defines a concrete value, there is no need
+to specify it in values to which this constraint applies.
+
+-- dup.cue --
+a: 4
+a: 4
+
+s: {
+    x: 1
+}
+s: {
+    y: 2
+}
+
+l: [ 1, 2 ]
+l: [ 1, 2 ]
+
+-- expect-stdout-cue --
+a: 4
+s: {
+    x: 1
+    y: 2
+}
+l: [1, 2]

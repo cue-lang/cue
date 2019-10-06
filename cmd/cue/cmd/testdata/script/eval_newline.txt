@@ -1,0 +1,6 @@
+cue eval ./data.cue
+cmp stdout expect-stdout
+-- data.cue --
+3
+-- expect-stdout --
+3

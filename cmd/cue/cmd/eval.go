@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"bytes"
 	"fmt"
 
 	"cuelang.org/go/cue"
@@ -90,6 +91,14 @@ func runEval(cmd *Command, args []string) error {
 	}
 
 	w := cmd.OutOrStdout()
+	// Always print a trailing newline. format.Node may not write a trailing
+	// newline if the output is single-line expression.
+	writeNode := func(b []byte, err error) {
+		_, _ = w.Write(b)
+		if !bytes.HasSuffix(b, []byte("\n")) {
+			w.Write([]byte{'\n'})
+		}
+	}
 
 	for _, inst := range instances {
 		// TODO: use ImportPath or some other sanitized path.
@@ -122,15 +131,12 @@ func runEval(cmd *Command, args []string) error {
 					continue
 				}
 			}
-			b, _ := format.Node(getSyntax(v, syn), opts...)
-			_, _ = w.Write(b)
+			writeNode(format.Node(getSyntax(v, syn), opts...))
 		}
 		for _, e := range exprs {
 			if len(exprs) > 1 {
 				fmt.Fprint(w, "// ")
-				b, _ := format.Node(e)
-				_, _ = w.Write(b)
-				fmt.Fprintln(w)
+				writeNode(format.Node(e))
 			}
 			v := inst.Eval(e)
 			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
@@ -139,9 +145,7 @@ func runEval(cmd *Command, args []string) error {
 					continue
 				}
 			}
-			b, _ := format.Node(getSyntax(v, syn), opts...)
-			_, _ = w.Write(b)
-			fmt.Fprintln(w)
+			writeNode(format.Node(getSyntax(v, syn), opts...))
 		}
 	}
 	return nil

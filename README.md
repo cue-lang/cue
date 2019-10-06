@@ -14,6 +14,7 @@
  limitations under the License.
 -->
 [![GoDoc](https://godoc.org/cuelang.org/go?status.svg)](https://godoc.org/cuelang.org/go)
+[![Github](https://github.com/cuelang/cue/workflows/Test/badge.svg)](https://github.com/cuelang/cue/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cuelang/cue)](https://goreportcard.com/report/github.com/cuelang/cue)
 [![Go 1.12](https://img.shields.io/badge/go-1.12-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()

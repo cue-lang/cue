@@ -12,6 +12,14 @@ APIVersionInternal :: "__internal"
 // GroupVersioner refines a set of possible conversion targets into a single option.
 GroupVersioner :: _
 
+// Identifier represents an identifier.
+// Identitier of two different objects should be equal if and only if for every
+// input the output they produce is exactly the same.
+Identifier :: string // enumIdentifier
+
+enumIdentifier ::
+	noopEncoderIdentifier
+
 // Encoder writes objects to a serialized form
 Encoder :: _
 
@@ -124,6 +132,10 @@ SelfLinker :: _
 // serializers to set the kind, version, and group the object is represented as. An Object may choose
 // to return a no-op ObjectKindAccessor in cases where it is not expected to be serialized.
 Object :: _
+
+// CacheableObject allows an object to cache its different serializations
+// to avoid performing the same serialization multiple times.
+CacheableObject :: _
 
 // Unstructured objects store values as map[string]interface{}, with only values that can be serialized
 // to JSON allowed.

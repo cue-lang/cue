@@ -76,7 +76,7 @@ func checkKind(ctx *context, x value, want kind) *bottom {
 	}
 	got := x.kind()
 	if got&want&concreteKind == bottomKind && want != bottomKind {
-		return ctx.mkErr(x, "cannot use value %v (type %s) as %s", x, got, want)
+		return ctx.mkErr(x, "cannot use value %v (type %s) as %s", ctx.str(x), got, want)
 	}
 	if !got.isGround() {
 		return ctx.mkErr(x, codeIncomplete,

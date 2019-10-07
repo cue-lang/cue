@@ -408,6 +408,22 @@ func TestParse(t *testing.T) {
 	}
 }
 
+func TestStrict(t *testing.T) {
+	testCases := []struct{ desc, in string }{
+		{"block comments",
+			`a: 1 /* a */`},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			mode := []Option{AllErrors, ParseComments, FromVersion(Latest)}
+			_, err := ParseFile("input", tc.in, mode...)
+			if err == nil {
+				t.Errorf("unexpected success: %v", tc.in)
+			}
+		})
+	}
+}
+
 func TestParseExpr(t *testing.T) {
 	// just kicking the tires:
 	// a valid arithmetic expression

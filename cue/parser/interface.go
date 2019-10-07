@@ -71,6 +71,28 @@ var (
 	}
 )
 
+// FromVersion specifies until which legacy version the parser should provide
+// backwards compatibility.
+func FromVersion(version int) Option {
+	if version >= 0 {
+		version++
+	}
+	// Versions:
+	// <0:  major version 0 (counting -1000 + x, where x = 100*m+p in 0.m.p
+	// >=0: x+1 in 1.x.y
+	return func(p *parser) { p.version = version }
+}
+
+func version0(minor, patch int) int {
+	return -1000 + 100*minor + patch
+}
+
+// Latest specifies the latest version of the parser, effectively setting
+// the strictest implementation.
+const Latest = latest
+
+const latest = 1000
+
 // FileOffset specifies the File position info to use.
 func FileOffset(pos int) Option {
 	return func(p *parser) { p.offset = pos }

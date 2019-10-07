@@ -60,6 +60,7 @@ type parser struct {
 
 	imports []*ast.ImportSpec // list of imports
 
+	version int
 }
 
 func (p *parser) init(filename string, src []byte, mode []Option) {
@@ -255,6 +256,8 @@ func (p *parser) consumeComment() (comment *ast.Comment, endline int) {
 	// Scan the comment for '\n' chars and adjust endline accordingly.
 	endline = p.file.Line(p.pos)
 	if p.lit[1] == '*' {
+		p.assertV0(0, 10, "block quotes")
+
 		// don't use range here - no need to decode Unicode code points
 		for i := 0; i < len(p.lit); i++ {
 			if p.lit[i] == '\n' {
@@ -343,6 +346,12 @@ func (p *parser) next() {
 		} else {
 			p.comments.add(comment)
 		}
+	}
+}
+
+func (p *parser) assertV0(minor, patch int, name string) {
+	if p.version != 0 && p.version > version0(minor, patch) {
+		p.errf(p.pos, "%s deprecated as of v0.%d.%d", name, minor, patch+1)
 	}
 }
 

@@ -969,6 +969,12 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 				label, ok = x, true
 			}
 
+		case *ast.Ident:
+			label, ok = x, true
+			if strings.HasPrefix(x.Name, "__") {
+				p.errf(x.NamePos, "identifiers starting with '__' are reserved")
+			}
+
 		case ast.Label:
 			label, ok = x, true
 		}

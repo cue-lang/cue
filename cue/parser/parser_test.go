@@ -439,6 +439,8 @@ func TestStrict(t *testing.T) {
 			`a: 1 /* a */`},
 		{"space separator",
 			`a b c: 2`},
+		{"reserved identifiers",
+			`__foo: 3`},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

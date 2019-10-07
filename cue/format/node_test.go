@@ -15,7 +15,6 @@
 package format
 
 import (
-	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
@@ -42,9 +41,8 @@ func TestInvalidAST(t *testing.T) {
 			}},
 		}},
 		// Force a new struct.
-		out: `foo: {
-	bar :: {
-	}
+		out: `
+foo: bar :: {
 }`,
 	}}
 	for _, tc := range testCases {
@@ -54,7 +52,7 @@ func TestInvalidAST(t *testing.T) {
 				t.Fatal(err)
 			}
 			got := string(b)
-			want := strings.TrimSpace(tc.out)
+			want := tc.out
 			if got != want {
 				t.Errorf("\ngot  %v;\nwant %v", got, want)
 			}

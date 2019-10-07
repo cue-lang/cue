@@ -1,8 +1,8 @@
 package kube
 
-deployment grafana: {
-	metadata labels app: "grafana"
-	spec template spec: {
+deployment: grafana: {
+	metadata: labels: app: "grafana"
+	spec: template: spec: {
 		volumes: [{
 			name: "grafana-volume"
 			gcePersistentDisk: {
@@ -49,7 +49,7 @@ deployment grafana: {
 		}]
 	}
 }
-service grafana spec ports: [{
+service: grafana: spec: ports: [{
 	name:       "grafana"
 	port:       3000
 	targetPort: 3000

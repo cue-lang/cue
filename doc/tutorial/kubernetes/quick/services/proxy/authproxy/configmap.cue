@@ -1,6 +1,6 @@
 package kube
 
-configMap authproxy: {
+configMap: authproxy: {
 	// To update run:
 	// kubectl apply -f configmap.yaml
 	// kubectl scale --replicas=0 deployment/proxy
@@ -8,7 +8,7 @@ configMap authproxy: {
 
 	apiVersion: "v1"
 	kind:       "ConfigMap"
-	data "authproxy.cfg": """
+	data: "authproxy.cfg": """
 		# Google Auth Proxy Config File
 		## https://github.com/bitly/google_auth_proxy
 

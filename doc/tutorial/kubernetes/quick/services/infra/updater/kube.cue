@@ -1,9 +1,9 @@
 package kube
 
-deployment updater spec template spec: {
+deployment: updater: spec: template: spec: {
 	volumes: [{
 		name: "secret-updater"
-		secret secretName: "updater-secrets"
+		secret: secretName: "updater-secrets"
 	}]
 	containers: [{
 		image: "gcr.io/myproj/updater:v0.1.0"

@@ -1,12 +1,12 @@
 package kube
 
-deployment watcher spec: {
+deployment: watcher: spec: {
 	// podTemplate defines the 'cookie cutter' used for creating
 	// new pods when necessary
-	template spec: {
+	template: spec: {
 		volumes: [{
 			name: "secret-volume"
-			secret secretName: "star-example-com-secrets"
+			secret: secretName: "star-example-com-secrets"
 		}]
 		containers: [{
 			image: "gcr.io/myproj/watcher:v0.1.0"
@@ -23,4 +23,4 @@ deployment watcher spec: {
 	}
 }
 
-deployment watcher spec template spec containers: [{ports: [{_export: false}, _]}]
+deployment: watcher: spec: template: spec: containers: [{ports: [{_export: false}, _]}]

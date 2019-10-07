@@ -1,6 +1,6 @@
 package kube
 
-service goget spec: {
+service: goget: spec: {
 	type:           "LoadBalancer"
 	loadBalancerIP: "1.3.5.7" // static ip
 	ports: [{

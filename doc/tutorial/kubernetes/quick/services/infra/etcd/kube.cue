@@ -1,23 +1,23 @@
 package kube
 
-service etcd spec: {
+service: etcd: spec: {
 	clusterIP: "None"
 	ports: [{
 	}, {
 		name: "peer"
 	}]
 }
-statefulSet etcd spec: {
+statefulSet: etcd: spec: {
 	serviceName: "etcd"
 	replicas:    3
 	template: {
-		metadata annotations: {
+		metadata: annotations: {
 			"prometheus.io.scrape": "true"
 			"prometheus.io.port":   "2379"
 		}
 		spec: {
-			affinity podAntiAffinity requiredDuringSchedulingIgnoredDuringExecution: [{
-				labelSelector matchExpressions: [{
+			affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: [{
+				labelSelector: matchExpressions: [{
 					key:      "app"
 					operator: "In"
 					values: [
@@ -55,10 +55,10 @@ statefulSet etcd spec: {
 					value: "4"
 				}, {
 					name: "NAME"
-					valueFrom fieldRef fieldPath: "metadata.name"
+					valueFrom: fieldRef: fieldPath: "metadata.name"
 				}, {
 					name: "IP"
-					valueFrom fieldRef fieldPath: "status.podIP"
+					valueFrom: fieldRef: fieldPath: "status.podIP"
 				}]
 				command: ["/usr/local/bin/etcd"]
 				args: [
@@ -86,11 +86,11 @@ statefulSet etcd spec: {
 	volumeClaimTemplates: [{
 		metadata: {
 			name: "etcd3"
-			annotations "volume.alpha.kubernetes.io/storage-class": "default"
+			annotations: "volume.alpha.kubernetes.io/storage-class": "default"
 		}
 		spec: {
 			accessModes: ["ReadWriteOnce"]
-			resources requests storage: "10Gi"
+			resources: requests: storage: "10Gi"
 		}
 	}]
 }

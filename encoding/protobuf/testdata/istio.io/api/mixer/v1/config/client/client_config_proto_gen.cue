@@ -46,7 +46,7 @@ NetworkFailPolicy_FailPolicy:
 	// service.
 	"FAIL_OPEN"
 
-NetworkFailPolicy_FailPolicy_value "FAIL_OPEN": 0
+NetworkFailPolicy_FailPolicy_value: "FAIL_OPEN": 0
 
 // Defines the per-service client configuration.
 ServiceConfig: {

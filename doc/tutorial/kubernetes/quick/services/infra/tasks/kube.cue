@@ -1,17 +1,17 @@
 package kube
 
-deployment tasks spec: {
+deployment: tasks: spec: {
 	// podTemplate defines the 'cookie cutter' used for creating
 	// new pods when necessary
 	template: {
-		metadata annotations: {
+		metadata: annotations: {
 			"prometheus.io.scrape": "true"
 			"prometheus.io.port":   "7080"
 		}
 		spec: {
 			volumes: [{
 				name: "secret-volume"
-				secret secretName: "star-example-com-secrets"
+				secret: secretName: "star-example-com-secrets"
 			}]
 			containers: [{
 				image: "gcr.io/myproj/tasks:v0.2.6"
@@ -29,4 +29,4 @@ deployment tasks spec: {
 	}
 }
 
-deployment tasks spec template spec containers: [{ports: [{_export: false}, _]}]
+deployment: tasks: spec: template: spec: containers: [{ports: [{_export: false}, _]}]

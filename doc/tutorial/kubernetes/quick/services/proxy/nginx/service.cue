@@ -1,6 +1,6 @@
 package kube
 
-service nginx spec: {
+service: nginx: spec: {
 	type:           "LoadBalancer"
 	loadBalancerIP: "1.3.4.5"
 	ports: [{

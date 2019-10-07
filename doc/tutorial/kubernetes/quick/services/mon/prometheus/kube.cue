@@ -1,9 +1,9 @@
 package kube
 
-service prometheus: {
+service: prometheus: {
 	metadata: {
-		annotations "prometheus.io/scrape": "true"
-		labels name:                        "prometheus"
+		annotations: "prometheus.io/scrape": "true"
+		labels: name:                        "prometheus"
 	}
 	spec: {
 		type: "NodePort"
@@ -13,7 +13,7 @@ service prometheus: {
 		}]
 	}
 }
-deployment prometheus spec: {
+deployment: prometheus: spec: {
 	strategy: {
 		rollingUpdate: {
 			maxSurge:       0
@@ -21,11 +21,11 @@ deployment prometheus spec: {
 		}
 		type: "RollingUpdate"
 	}
-	selector matchLabels app: "prometheus"
+	selector: matchLabels: app: "prometheus"
 	template: {
 		metadata: {
 			name: "prometheus"
-			annotations "prometheus.io.scrape": "true"
+			annotations: "prometheus.io.scrape": "true"
 		}
 		spec: {
 			containers: [{
@@ -45,7 +45,7 @@ deployment prometheus spec: {
 			}]
 			volumes: [{
 				name: "config-volume"
-				configMap name: "prometheus"
+				configMap: name: "prometheus"
 			}]
 		}
 	}

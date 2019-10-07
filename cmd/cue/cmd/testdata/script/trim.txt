@@ -3,7 +3,7 @@ cmp stdout expect-stdout
 -- expect-stdout --
 package trim
 
-foo <Name>: {
+foo: <Name>: {
 	_value: string
 
 	a: 4
@@ -21,12 +21,12 @@ foo <Name>: {
 	rList: [{a: "a"}]
 	rcList: [{a: "a", c: b}]
 
-	t <Name>: {
+	t: <Name>: {
 		x: >=0 & <=5
 	}
 }
 
-foo bar: {
+foo: bar: {
 	_value: "here"
 	b:      "foo"
 	c:      45
@@ -34,33 +34,33 @@ foo bar: {
 	sList: [{b: "foo"}, {}]
 }
 
-foo baz: {}
+foo: baz: {}
 
-foo multipath: {
-	t <Name>: {
+foo: multipath: {
+	t: <Name>: {
 		// Combined with the other template, we know the value must be 5 and
 		// thus the entry below can be eliminated.
 		x: >=5 & <=8
 	}
 
-	t u: {
+	t: u: {
 	}
 }
 
 // TODO: top-level fields are currently not removed.
 group: {
 	for k, v in foo {
-		comp "\(k)": v
+		comp: "\(k)": v
 	}
 
-	comp bar: {
+	comp: bar: {
 		aa: 8 // new value
 	}
 }
 -- trim/trim.cue --
 package trim
 
-foo <Name>: {
+foo: <Name>: {
 	_value: string
 
 	a: 4
@@ -78,12 +78,12 @@ foo <Name>: {
 	rList: [{a: "a"}]
 	rcList: [{a: "a", c: b}]
 
-	t <Name>: {
+	t: <Name>: {
 		x: >=0 & <=5
 	}
 }
 
-foo bar: {
+foo: bar: {
 	_value: "here"
 	b:      "foo"
 	c:      45
@@ -91,26 +91,26 @@ foo bar: {
 	sList: [{b: "foo"}, {}]
 }
 
-foo baz: {}
+foo: baz: {}
 
-foo multipath: {
-	t <Name>: {
+foo: multipath: {
+	t: <Name>: {
 		// Combined with the other template, we know the value must be 5 and
 		// thus the entry below can be eliminated.
 		x: >=5 & <=8
 	}
 
-	t u: {
+	t: u: {
 	}
 }
 
 // TODO: top-level fields are currently not removed.
 group: {
 	for k, v in foo {
-		comp "\(k)": v
+		comp: "\(k)": v
 	}
 
-	comp bar: {
+	comp: bar: {
 		aa: 8 // new value
 	}
 }

@@ -18,7 +18,6 @@ package format
 
 import (
 	"bytes"
-	"errors"
 	"flag"
 	"fmt"
 	"io/ioutil"
@@ -27,6 +26,7 @@ import (
 	"time"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 )
@@ -71,7 +71,8 @@ func format(src []byte, mode checkMode) ([]byte, error) {
 
 	// make sure formatted output is syntactically correct
 	if _, err := parser.ParseFile("", res, parser.AllErrors); err != nil {
-		return nil, fmt.Errorf("re-parse: %s\n%s", err, res)
+		return nil, errors.Append(err.(errors.Error),
+			errors.Newf(token.NoPos, "re-parse failed: %s", res))
 	}
 
 	return res, nil
@@ -127,7 +128,9 @@ func runcheck(t *testing.T, source, golden string, mode checkMode) {
 
 	res, err := format(src, mode)
 	if err != nil {
-		t.Error(err)
+		b := &bytes.Buffer{}
+		errors.Print(b, err, nil)
+		t.Error(b.String())
 		return
 	}
 

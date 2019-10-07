@@ -20,7 +20,7 @@ b: {
 	idx: a[str] // should resolve to top-level `a`
 	str: string
 }
-b a b: 4
+b: a: b: 4
 a: {
 	b: 3
 	c: 4

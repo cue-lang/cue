@@ -1,6 +1,6 @@
 package kube
 
-deployment breaddispatcher spec template spec containers: [{
+deployment: breaddispatcher: spec: template: spec: containers: [{
 	image: "gcr.io/myproj/breaddispatcher:v0.3.24"
 	args: [
 		"-etcd=etcd:2379",

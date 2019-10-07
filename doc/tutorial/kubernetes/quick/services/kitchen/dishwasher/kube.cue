@@ -1,13 +1,13 @@
 package kube
 
-deployment dishwasher spec: {
+deployment: dishwasher: spec: {
 	replicas: 5
-	template spec: {
+	template: spec: {
 		volumes: [{
 		}, {
 		}, {
 			name: "secret-ssh-key"
-			secret secretName: "dishwasher-secrets"
+			secret: secretName: "dishwasher-secrets"
 		}]
 		containers: [{
 			image: "gcr.io/myproj/dishwasher:v0.2.13"

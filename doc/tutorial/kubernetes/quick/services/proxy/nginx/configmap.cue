@@ -1,9 +1,9 @@
 package kube
 
-configMap nginx: {
+configMap: nginx: {
 	apiVersion: "v1"
 	kind:       "ConfigMap"
-	data "nginx.conf": """
+	data: "nginx.conf": """
 		events {
 		    worker_connections 768;
 		}

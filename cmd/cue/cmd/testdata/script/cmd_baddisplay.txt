@@ -13,8 +13,8 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
-command baddisplay: {
-	task display: {
+command: baddisplay: {
+	task: display: {
 		kind: "print"
 		text: 42
 	}

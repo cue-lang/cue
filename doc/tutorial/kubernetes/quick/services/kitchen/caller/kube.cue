@@ -1,8 +1,8 @@
 package kube
 
-deployment caller spec: {
+deployment: caller: spec: {
 	replicas: 3
-	template spec: {
+	template: spec: {
 		volumes: [{
 			name: "ssd-caller"
 			gcePersistentDisk: {
@@ -12,7 +12,7 @@ deployment caller spec: {
 		}, {
 		}, {
 			name: "secret-ssh-key"
-			secret secretName: "secrets"
+			secret: secretName: "secrets"
 		}]
 		containers: [{
 			image: "gcr.io/myproj/caller:v0.20.14"

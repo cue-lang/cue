@@ -1,10 +1,10 @@
 package kube
 
-deployment linecook spec template spec: {
+deployment: linecook: spec: template: spec: {
 	volumes: [{
 	}, {
 		name: "secret-kitchen"
-		secret secretName: "secrets"
+		secret: secretName: "secrets"
 	}]
 	containers: [{
 		image: "gcr.io/myproj/linecook:v0.1.42"

@@ -1,6 +1,6 @@
 package kube
 
-deployment headchef spec template spec containers: [{
+deployment: headchef: spec: template: spec: containers: [{
 	image: "gcr.io/myproj/headchef:v0.2.16"
 	volumeMounts: [{
 	}, {

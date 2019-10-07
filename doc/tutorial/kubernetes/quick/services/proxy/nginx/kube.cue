@@ -1,15 +1,15 @@
 package kube
 
-deployment nginx spec: {
+deployment: nginx: spec: {
 	// podTemplate defines the 'cookie cutter' used for creating
 	// new pods when necessary
-	template spec: {
+	template: spec: {
 		volumes: [{
 			name: "secret-volume"
-			secret secretName: "proxy-secrets"
+			secret: secretName: "proxy-secrets"
 		}, {
 			name: "config-volume"
-			configMap name: "nginx"
+			configMap: name: "nginx"
 		}]
 		containers: [{
 			image: "nginx:1.11.10-alpine"

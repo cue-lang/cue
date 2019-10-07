@@ -179,6 +179,7 @@ type formatter struct {
 
 type labelEntry struct {
 	label    ast.Label
+	typ      token.Token
 	optional bool
 }
 

@@ -1,7 +1,7 @@
 package kube
 
-service "node-exporter": {
-	metadata annotations "prometheus.io/scrape": "true"
+service: "node-exporter": {
+	metadata: annotations: "prometheus.io/scrape": "true"
 	spec: {
 		type:      "ClusterIP"
 		clusterIP: "None"
@@ -10,8 +10,8 @@ service "node-exporter": {
 		}]
 	}
 }
-daemonSet "node-exporter" spec template: {
-	metadata name: "node-exporter"
+daemonSet: "node-exporter": spec: template: {
+	metadata: name: "node-exporter"
 	spec: {
 		hostNetwork: true
 		hostPID:     true
@@ -48,10 +48,10 @@ daemonSet "node-exporter" spec template: {
 		}]
 		volumes: [{
 			name: "proc"
-			hostPath path: "/proc"
+			hostPath: path: "/proc"
 		}, {
 			name: "sys"
-			hostPath path: "/sys"
+			hostPath: path: "/sys"
 		}]
 	}
 }

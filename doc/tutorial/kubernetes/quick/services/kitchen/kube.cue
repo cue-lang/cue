@@ -2,9 +2,9 @@ package kube
 
 Component :: "kitchen"
 
-deployment <Name> spec template: {
-	metadata annotations "prometheus.io.scrape": "true"
-	spec containers: [{
+deployment: <Name>: spec: template: {
+	metadata: annotations: "prometheus.io.scrape": "true"
+	spec: containers: [{
 		ports: [{
 			containerPort: 8080
 		}]
@@ -19,18 +19,18 @@ deployment <Name> spec template: {
 	}]
 }
 
-deployment <ID> spec template spec: {
+deployment: <ID>: spec: template: spec: {
 	hasDisks :: *true | bool
 
 	// field comprehension using just "if"
 	if hasDisks {
 		volumes: [{
 			name: *"\(ID)-disk" | string
-			gcePersistentDisk pdName: *"\(ID)-disk" | string
-			gcePersistentDisk fsType: "ext4"
+			gcePersistentDisk: pdName: *"\(ID)-disk" | string
+			gcePersistentDisk: fsType: "ext4"
 		}, {
 			name: *"secret-\(ID)" | string
-			secret secretName: *"\(ID)-secrets" | string
+			secret: secretName: *"\(ID)-secrets" | string
 		}, ...]
 
 		containers: [{

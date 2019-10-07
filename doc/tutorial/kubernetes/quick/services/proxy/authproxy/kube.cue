@@ -1,9 +1,9 @@
 package kube
 
-deployment authproxy spec: {
+deployment: authproxy: spec: {
 	// podTemplate defines the 'cookie cutter' used for creating
 	// new pods when necessary
-	template spec: {
+	template: spec: {
 		containers: [{
 			image: "skippy/oauth2_proxy:2.0.1"
 			ports: [{
@@ -20,7 +20,7 @@ deployment authproxy spec: {
 		}]
 		volumes: [{
 			name: "config-volume"
-			configMap name: "authproxy"
+			configMap: name: "authproxy"
 		}]
 	}
 }

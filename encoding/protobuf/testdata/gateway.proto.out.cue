@@ -216,7 +216,7 @@ Gateway: {
 	selector?: {
 		<_>: string
 	} @protobuf(2,type=map<string,string>)
-	selector? <name>: name
+	selector?: <name>: name
 }
 
 // `Server` describes the properties of the proxy on a given load balancer

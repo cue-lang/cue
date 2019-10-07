@@ -1,12 +1,12 @@
 package kube
 
-service alertmanager: {
+service: alertmanager: {
 	metadata: {
 		annotations: {
 			"prometheus.io/scrape": "true"
 			"prometheus.io/path":   "/metrics"
 		}
-		labels name: "alertmanager"
+		labels: name: "alertmanager"
 	}
 	spec: {
 		// type: ClusterIP
@@ -15,10 +15,10 @@ service alertmanager: {
 		}]
 	}
 }
-deployment alertmanager spec: {
-	selector matchLabels app: "alertmanager"
+deployment: alertmanager: spec: {
+	selector: matchLabels: app: "alertmanager"
 	template: {
-		metadata name: "alertmanager"
+		metadata: name: "alertmanager"
 		spec: {
 			containers: [{
 				image: "prom/alertmanager:v0.15.2"
@@ -41,7 +41,7 @@ deployment alertmanager spec: {
 			}]
 			volumes: [{
 				name: "config-volume"
-				configMap name: "alertmanager"
+				configMap: name: "alertmanager"
 			}, {
 				name: "alertmanager"
 				emptyDir: {}

@@ -1,10 +1,10 @@
 package kube
 
-deployment pastrychef spec template spec: {
+deployment: pastrychef: spec: template: spec: {
 	volumes: [{
 	}, {
 		name: "secret-ssh-key"
-		secret secretName: "secrets"
+		secret: secretName: "secrets"
 	}]
 	containers: [{
 		image: "gcr.io/myproj/pastrychef:v0.1.15"

@@ -1,12 +1,12 @@
 package kube
 
-deployment goget spec: {
+deployment: goget: spec: {
 	// podTemplate defines the 'cookie cutter' used for creating
 	// new pods when necessary
-	template spec: {
+	template: spec: {
 		volumes: [{
 			name: "secret-volume"
-			secret secretName: "goget-secrets"
+			secret: secretName: "goget-secrets"
 		}]
 		containers: [{
 			image: "gcr.io/myproj/goget:v0.5.1"

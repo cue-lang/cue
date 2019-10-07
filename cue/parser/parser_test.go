@@ -146,11 +146,12 @@ func TestParse(t *testing.T) {
 		`package k8s, import a "foo", import "bar/baz"`,
 	}, {
 		"collapsed fields",
-		`a b c: 1
+		`a: b:: c?: <Name>: d: 1
+		"g\("en")"?: 4
 		 // job foo { bar: 1 } // TODO error after foo
-		 job "foo": { bar: 1 }
+		 job "foo" <X>: { bar: 1 }
 		`,
-		`a: {b: {c: 1}}, job: {"foo": {bar: 1}}`,
+		`a: {b :: {c?: {<Name>: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {<X>: {bar: 1}}}`,
 	}, {
 		"identifiers",
 		`// 	$_: 1,
@@ -412,6 +413,8 @@ func TestStrict(t *testing.T) {
 	testCases := []struct{ desc, in string }{
 		{"block comments",
 			`a: 1 /* a */`},
+		{"space separator",
+			`a b c: 2`},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -572,7 +575,7 @@ func TestIncompleteSelection(t *testing.T) {
 func TestX(t *testing.T) {
 	t.Skip()
 
-	f, err := ParseFile("input", ``)
+	f, err := ParseFile("input", `a: b:: c?: <Name>: d: 1`)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

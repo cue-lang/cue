@@ -138,11 +138,11 @@ func (f *formatter) decl(decl ast.Decl) {
 		lastSize := len(f.labelBuf)
 		f.labelBuf = f.labelBuf[:0]
 		regular := isRegularField(n.Token)
-		first, opt := n.Label, n.Optional != token.NoPos
+		first, typ, opt := n.Label, n.Token, n.Optional != token.NoPos
 
 		// If the label has a valid position, we assume that an unspecified
 		// Lbrace signals the intend to collapse fields.
-		for (n.Label.Pos().IsValid() || f.printer.cfg.simplify) && regular {
+		for n.Label.Pos().IsValid() || (f.printer.cfg.simplify && regular) {
 			obj, ok := n.Value.(*ast.StructLit)
 			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) || len(n.Attrs) > 0 {
 				break
@@ -164,10 +164,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			if !ok || len(mem.Attrs) > 0 {
 				break
 			}
-			if !isRegularField(mem.Token) {
-				break
-			}
-			entry := labelEntry{mem.Label, mem.Optional != token.NoPos}
+			entry := labelEntry{mem.Label, mem.Token, mem.Optional != token.NoPos}
 			f.labelBuf = append(f.labelBuf, entry)
 			n = mem
 		}
@@ -175,15 +172,18 @@ func (f *formatter) decl(decl ast.Decl) {
 		if lastSize != len(f.labelBuf) {
 			f.print(formfeed)
 		}
-		if !regular && first.Pos().RelPos() < token.Newline && len(f.output) > 0 {
-			f.print(newline, nooverride)
-		}
 
 		f.before(nil)
 		f.label(first, opt)
 		for _, x := range f.labelBuf {
+			if isRegularField(typ) {
+				f.print(n.TokenPos, token.COLON)
+			} else {
+				f.print(blank, nooverride, typ)
+			}
 			f.print(blank, nooverride)
 			f.label(x.label, x.optional)
+			typ = x.typ
 		}
 		f.after(nil)
 

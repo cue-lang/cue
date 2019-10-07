@@ -9,8 +9,8 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
-command errcode: {
-	task bad: exec.Run & {
+command: errcode: {
+	task: bad: exec.Run & {
 		kind:   "exec"
 		cmd:    "ls --badflags"
 		stderr: string // suppress error message

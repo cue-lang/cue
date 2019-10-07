@@ -8,8 +8,8 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
-command run_list: runBase & {
-	task echo cmd: ["echo", message]
+command: run_list: runBase & {
+	task: echo: cmd: ["echo", message]
 }
 
 -- base_tool.cue --
@@ -18,12 +18,12 @@ package home
 // deliberately put in another file to test resolving top-level identifiers
 // in different files.
 runBase: {
-	task echo: {
+	task: echo: {
 		kind:   "exec"
 		stdout: string
 	}
 
-	task display: {
+	task: display: {
 		kind: "print"
 		text: task.echo.stdout
 	}

@@ -18,7 +18,7 @@ service: {
 		_cue_json = [1, 2]
 	}]
 }
-deployment booster: [{
+deployment: booster: [{
 	kind:     "Deployment"
 	name:     "booster"
 	replicas: 1

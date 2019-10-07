@@ -1,18 +1,18 @@
 package kube
 
-service events spec ports: [{
+service: events: spec: ports: [{
 	name: "grpc"
 }]
-deployment events spec: {
+deployment: events: spec: {
 	replicas: 2
 	template: {
-		metadata annotations: {
+		metadata: annotations: {
 			"prometheus.io.scrape": "true"
 			"prometheus.io.port":   "7080"
 		}
 		spec: {
-			affinity podAntiAffinity requiredDuringSchedulingIgnoredDuringExecution: [{
-				labelSelector matchExpressions: [{
+			affinity: podAntiAffinity: requiredDuringSchedulingIgnoredDuringExecution: [{
+				labelSelector: matchExpressions: [{
 					key:      "app"
 					operator: "In"
 					values: [
@@ -23,7 +23,7 @@ deployment events spec: {
 			}]
 			volumes: [{
 				name: "secret-volume"
-				secret secretName: "biz-secrets"
+				secret: secretName: "biz-secrets"
 			}]
 			containers: [{
 				image: "gcr.io/myproj/events:v0.1.31"
@@ -47,4 +47,4 @@ deployment events spec: {
 	}
 }
 
-deployment events spec template spec containers: [{ports: [{_export: false}, _]}]
+deployment: events: spec: template: spec: containers: [{ports: [{_export: false}, _]}]

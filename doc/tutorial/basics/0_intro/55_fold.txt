@@ -23,11 +23,11 @@ members.
 
 -- fold.cue --
 // path-value pairs
-outer middle1 inner: 3
-outer middle2 inner: 7
+outer: middle1: inner: 3
+outer: middle2: inner: 7
 
 // collection-constraint pair
-outer <Any> inner: int
+outer: <Any>: inner: int
 
 -- expect-stdout-cue --
 {

@@ -13,7 +13,7 @@ import (
 	"strings"
 )
 
-command print: {
+command: print: {
 	task: {
 		t1: exec.Run & {
 			cmd: ["sh", "-c", "sleep 1; echo t1"]

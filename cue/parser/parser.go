@@ -757,7 +757,8 @@ func (p *parser) parseField() (decl ast.Decl) {
 	for i := 0; ; i++ {
 		tok := p.tok
 
-		expr, ok := p.parseLabel(m)
+		label, expr, ok := p.parseLabel(false)
+		m.Label = label
 
 		if !ok {
 			if expr == nil {
@@ -805,6 +806,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 		switch p.tok {
 		case token.IDENT, token.STRING, token.LSS, token.INTERPOLATION, token.LBRACK:
+			p.assertV0(0, 12, "space-separated labels")
 			field := &ast.Field{}
 			m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 			m = field
@@ -835,7 +837,38 @@ func (p *parser) parseField() (decl ast.Decl) {
 		p.errorExpected(pos, "':' or '::'")
 	}
 	p.next() // : or ::
-	m.Value = p.parseRHS()
+
+	for {
+		tok := p.tok
+		label, expr, ok := p.parseLabel(true)
+		if !ok || (p.tok != token.COLON && p.tok != token.ISA && p.tok != token.OPTION) {
+			if expr == nil {
+				expr = p.parseRHS()
+			}
+			m.Value = expr
+			break
+		}
+		field := &ast.Field{Label: label}
+		m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
+		m = field
+
+		if tok != token.LSS && p.tok == token.OPTION {
+			m.Optional = p.pos
+			p.next()
+		}
+
+		m.TokenPos = p.pos
+		m.Token = p.tok
+		if p.tok != token.COLON && p.tok != token.ISA {
+			if p.tok.IsLiteral() {
+				p.errf(p.pos, "expected ':' or '::'; found %s", p.lit)
+			} else {
+				p.errf(p.pos, "expected ':' or '::'; found %s", p.tok)
+			}
+			break
+		}
+		p.next()
+	}
 
 	if attrs := p.parseAttributes(); attrs != nil {
 		allowComprehension = false
@@ -894,7 +927,7 @@ func (p *parser) parseAttributes() (attrs []*ast.Attribute) {
 	return attrs
 }
 
-func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
+func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) {
 	tok := p.tok
 	switch tok {
 	case token.IDENT, token.STRING, token.INTERPOLATION,
@@ -911,16 +944,16 @@ func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
 				// generating good errors: any keyword can only appear on the RHS of a
 				// field (after a ':'), whereas labels always appear on the LHS.
 
-				f.Label, ok = x, true
+				label, ok = x, true
 			}
 
 		case ast.Label:
-			f.Label, ok = x, true
+			label, ok = x, true
 		}
 
 	case token.IF, token.FOR, token.IN, token.LET:
 		// Keywords representing clauses.
-		f.Label = &ast.Ident{
+		label = &ast.Ident{
 			NamePos: p.pos,
 			Name:    p.lit,
 		}
@@ -928,20 +961,69 @@ func (p *parser) parseLabel(f *ast.Field) (expr ast.Expr, ok bool) {
 		ok = true
 
 	case token.LSS:
+		p.openList()
+		defer p.closeList()
+
 		pos := p.pos
 		c := p.openComments()
 		p.next()
-		ident := p.parseIdent()
-		gtr := p.pos
-		if p.tok != token.GTR {
-			p.expect(token.GTR)
+		var ident *ast.Ident
+		var gtr token.Pos
+		switch {
+		case rhs:
+			// TODO: remove this code once the <X> notation is out.
+			if p.tok != token.IDENT {
+				// parse RHS and continue binary Expression
+				expr = p.parseUnaryExpr()
+				expr = &ast.UnaryExpr{OpPos: pos, Op: token.LSS, X: expr}
+				expr = c.closeExpr(p, expr)
+				return nil, p.parseBinaryExprTail(false, token.LowestPrec+1, expr), false
+			}
+
+			ident = p.parseIdent()
+			if p.tok != token.GTR {
+				expr = p.parsePrimaryExprTail(ident)
+				expr = &ast.UnaryExpr{OpPos: pos, Op: token.LSS, X: expr}
+				expr = c.closeExpr(p, expr)
+				return nil, p.parseBinaryExprTail(false, token.LowestPrec+1, expr), false
+			}
+			gtr = p.pos
+			p.next()
+
+			// NOTE: at this point, even if there still a syntactically valid
+			// expression, it will always yield bottom, as '>' does not take
+			// boolean arguments.
+			// This code does not allow for `<X>[string]:` and so on. So a
+			// new way to alias labels should be introduced at the time
+			// such constructs are introduced. For instance `(X,Y)=[string]:`.
+			if p.tok != token.COLON && p.tok != token.ISA {
+				expr = &ast.UnaryExpr{OpPos: pos, Op: token.LSS, X: ident}
+				expr = c.closeExpr(p, expr)
+				c := p.openComments()
+				prec := token.GTR.Precedence()
+				expr = c.closeExpr(p, &ast.BinaryExpr{
+					X:     expr,
+					OpPos: gtr,
+					Op:    token.GTR,
+					Y:     p.checkExpr(p.parseBinaryExpr(false, prec)),
+				})
+				return nil, expr, false
+			}
+
+		default:
+			ident = p.parseIdent()
+			gtr = p.pos
+			if p.tok != token.GTR {
+				p.expect(token.GTR)
+			}
+			p.next()
 		}
-		p.next()
-		label := &ast.TemplateLabel{Langle: pos, Ident: ident, Rangle: gtr}
+
+		label = &ast.TemplateLabel{Langle: pos, Ident: ident, Rangle: gtr}
 		c.closeNode(p, label)
-		f.Label, ok = label, true
+		ok = true
 	}
-	return expr, ok
+	return label, expr, ok
 }
 
 func (p *parser) parseStruct() (expr ast.Expr) {
@@ -1177,8 +1259,11 @@ func (p *parser) parsePrimaryExpr() ast.Expr {
 		defer un(trace(p, "PrimaryExpr"))
 	}
 
-	x := p.parseOperand()
+	return p.parsePrimaryExprTail(p.parseOperand())
+}
 
+func (p *parser) parsePrimaryExprTail(operand ast.Expr) ast.Expr {
+	x := operand
 L:
 	for {
 		switch p.tok {
@@ -1261,12 +1346,15 @@ func (p *parser) parseBinaryExpr(lhs bool, prec1 int) ast.Expr {
 	p.openList()
 	defer p.closeList()
 
-	x := p.parseUnaryExpr()
+	return p.parseBinaryExprTail(lhs, prec1, p.parseUnaryExpr())
+}
 
+func (p *parser) parseBinaryExprTail(lhs bool, prec1 int, x ast.Expr) ast.Expr {
 	for {
 		op, prec := p.tokPrec()
 		if lhs && op == token.LSS {
 			// Eagerly interpret this as a template label.
+			// TODO: remove once <X> is deprecated.
 			if _, ok := x.(ast.Label); ok {
 				return x
 			}

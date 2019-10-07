@@ -177,16 +177,9 @@ these rules.
 ### Identifiers
 
 Identifiers name entities such as fields and aliases.
-Identifier may be simple or quoted.
-A simple identifier is a sequence of one or more letters (which includes `_`) and digits.
+An identifier is a sequence of one or more letters (which includes `_`) and digits.
 It may not be `_`.
 The first character in an identifier must be a letter.
-Any sequence of letters, digits or `-` enclosed in
-backticks "`" make an identifier.
-The backticks are not part of the identifier.
-This allows one to refer to fields that are labeled
-with keywords or other identifiers that would
-otherwise not be legal.
 
 <!--
 TODO: allow identifiers as defined in Unicode UAX #31
@@ -196,11 +189,8 @@ Identifiers are normalized using the NFC normal form.
 -->
 
 ```
-identifier        = simple_identifier | quoted_identifier .
-simple_identifier = letter { letter | unicode_digit } .
-quoted_identifier = "`" { letter | unicode_digit | "-" } "`" .
+identifier  = letter { letter | unicode_digit } .
 ```
-<!-- TODO: relax to allow other punctuation -->
 
 ```
 a
@@ -327,7 +317,7 @@ multiplier  = ( "K" | "M" | "G" | "T" | "P" ) [ "i" ]
 float_lit   = decimals "." [ decimals ] [ exponent ] |
               decimals exponent |
               "." decimals [ exponent ].
-exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
+exponent    = ( "e" | "E" ) [ "+" | "-" ] decimals .
 ```
 <!--
 TODO: consider allowing Exo (and up), if not followed by a sign
@@ -1169,16 +1159,14 @@ carefully.
 -->
 ```
 StructLit       = "{" { Declaration "," } [ "..." ] "}" .
-Declaration     = FieldDecl | DefinitionDecl | AliasDecl | Comprehension | Embedding .
-FieldDecl       = Label { Label } ":" Expression { attribute } .
-DefinitionDecl  = Label "::" Expression { attribute } .
+Declaration     = Field | Alias | Comprehension | Embedding .
 Embedding       = Expression .
+Field           = Label { Label } Expression .
+Alias           = identifier "=" Expression .
 
-AliasDecl       = Label "=" Expression .
-BindLabel       = "<" identifier ">" .
-ConcreteLabel   = identifier | simple_string_lit .
-ExpressionLabel = BindLabel
-Label           = ConcreteLabel [ "?" ] | ExpressionLabel .
+Label           = [ identifier "=" ] LabelPath ( ":" | "::" ) .
+LabelPath       = LabelExpr [ "?" ] | [ LabelExpr ] Filters .
+LabelExpr       = identifier | simple_string_lit .
 
 attribute       = "@" identifier "(" attr_elems ")" .
 attr_elems      = attr_elem { "," attr_elem }
@@ -1878,18 +1866,29 @@ bottom, where an incomplete expression is not considered bottom.
 PrimaryExpr =
 	Operand |
 	PrimaryExpr Selector |
+	PrimaryExpr Query |
 	PrimaryExpr Index |
 	PrimaryExpr Slice |
 	PrimaryExpr Arguments .
 
-Selector       = "." identifier .
+Selector       = "." (identifier | simple_string_lit) .
+Query          = "." Filters .
+Filters        = Filter { Filter } .
+Filter         = "[" [ "?" [ ":" ] ] Expression "]" .
 Index          = "[" Expression "]" .
-Slice          = "[" [ Expression ] ":" [ Expression ] "]"
+Slice          = "[" [ Expression ] ":" [ Expression ] [ ":" [Expression] ] "]" .
 Argument       = Expression .
 Arguments      = "(" [ ( Argument { "," Argument } ) [ "," ] ] ")" .
 ```
 <!---
 Argument       = Expression | ( identifer ":" Expression ).
+
+// & expression type
+// string_lit: same as label. Arguments is current node.
+// If selector is applied to list, it performs the operation for each
+// element.
+
+TODO: considering allowing decimal_lit for selectors.
 --->
 
 ```
@@ -1913,9 +1912,24 @@ the selector expression
 x.f
 ```
 
-denotes the field `f` of the value `x`.
+denotes the element of a <!--list or -->struct `x` identified by `f`.
+<!--For structs, -->`f` must be an identifier or a string literal identifying
+any definition or regular non-optional field.
 The identifier `f` is called the field selector.
+
+<!--
+Allowing strings to be used as field selectors obviates the need for
+backquoted identifiers. Note that some standards use names for structs that
+are not standard identifiers (such "Fn::Foo"). Note that indexing does not
+allow access to identifiers.
+-->
+
+<!--
+For lists, `f` must be an integer and follows the same lookup rules as
+for the index operation.
 The type of the selector expression is the type of `f`.
+-->
+
 If `x` is a package name, see the section on [qualified identifiers](#qualified-identifiers).
 
 <!--
@@ -1935,20 +1949,23 @@ For a disjunction of the form `x1 | ... | xn`,
 the selector is applied to each element `x1.f | ... | xn.f`.
 -->
 
-Otherwise, if `x` is not a struct, or if `f` does not exist in `x`,
+Otherwise, if `x` is not a <!--list or -->struct,
+or if `f` does not exist in `x`,
 the result of the expression is bottom (an error).
 In the latter case the expression is incomplete.
 The operand of a selector may be associated with a default.
 
 ```
 T: {
-    x: int
-    y: 3
+    x:     int
+    y:     3
+    "x-y": 4
 }
 
-a: T.x  // int
-b: T.y  // 3
-c: T.z  // _|_ // field 'z' not found in T
+a: T.x     // int
+b: T.y     // 3
+c: T.z     // _|_ // field 'z' not found in T
+d: T."x-y" // 4
 
 e: {a: 1|*2} | *{a: 3|*4}
 f: e.a  // 4 (default value)

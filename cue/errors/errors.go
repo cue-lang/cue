@@ -20,6 +20,7 @@
 package errors // import "cuelang.org/go/cue/errors"
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
@@ -448,6 +449,14 @@ func Print(w io.Writer, err error, cfg *Config) {
 	for _, e := range Errors(err) {
 		printError(w, e, cfg)
 	}
+}
+
+// Details is a convenience wrapper for Print to return the error text as a
+// string.
+func Details(err error, cfg *Config) string {
+	w := &bytes.Buffer{}
+	Print(w, err, cfg)
+	return w.String()
 }
 
 func defaultFprintf(w io.Writer, format string, args ...interface{}) {

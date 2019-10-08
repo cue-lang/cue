@@ -273,7 +273,7 @@ func (p *protoConverter) uniqueTop(name string) string {
 			alias, ok := p.aliases[first]
 			if !ok {
 				// TODO: this is likely to be okay, but find something better.
-				alias = "__" + first
+				alias = "_" + first + "_"
 				p.file.Decls = append(p.file.Decls, &ast.Alias{
 					Ident: ast.NewIdent(alias),
 					Expr:  ast.NewIdent(first),

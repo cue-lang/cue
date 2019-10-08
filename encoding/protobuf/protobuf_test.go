@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"github.com/kr/pretty"
 )
@@ -92,7 +93,7 @@ func TestBuild(t *testing.T) {
 
 	files, err := b.Files()
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal(errors.Details(err, nil))
 	}
 
 	if *update {

@@ -68,7 +68,7 @@ CheckResponse: {
 CheckResponse_PreconditionResult: {
 	// A status code of OK indicates all preconditions were satisfied. Any other code indicates not
 	// all preconditions were satisfied and details describe why.
-	status?: __status.Status @protobuf(1,type=google.rpc.Status,"(gogoproto.nullable)=false")
+	status?: _status_.Status @protobuf(1,type=google.rpc.Status,"(gogoproto.nullable)=false")
 
 	// The amount of time for which this result can be considered valid.
 	validDuration?: time.Duration @protobuf(2,type=google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
@@ -84,7 +84,7 @@ CheckResponse_PreconditionResult: {
 	// whenever all preconditions are satisfied.
 	routeDirective?: RouteDirective @protobuf(6,name=route_directive)
 }
-__status = status
+_status_ = status
 
 // Expresses the result of a quota allocation.
 CheckResponse_QuotaResult: {

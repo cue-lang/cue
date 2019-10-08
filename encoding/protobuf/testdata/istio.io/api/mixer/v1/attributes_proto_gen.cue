@@ -128,17 +128,17 @@ CompressedAttributes: {
 
 	// Holds attributes of type TIMESTAMP
 	time?: {
-		<_>: __time.Time
+		<_>: _time_.Time
 	} @protobuf(6,type=map<sint32,google.protobuf.Timestamp>,"(gogoproto.nullable)=false","(gogoproto.stdtime)")
 
 	// Holds attributes of type DURATION
 	durations?: {
-		<_>: __time.Duration
+		<_>: _time_.Duration
 	} @protobuf(7,type=map<sint32,google.protobuf.Duration>,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
 
 	// Holds attributes of type BYTES
 	bytes?: {
-		<_>: __bytes
+		<_>: _bytes_
 	} @protobuf(8,type=map<sint32,bytes>)
 
 	// Holds attributes of type STRING_MAP
@@ -146,8 +146,8 @@ CompressedAttributes: {
 		<_>: StringMap
 	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
-__time = time
-__bytes = bytes
+_time_ = time
+_bytes_ = bytes
 
 // A map of string to string. The keys and values in this map are dictionary
 // indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)

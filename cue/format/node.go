@@ -266,7 +266,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.print(formfeed)
 		}
 		f.expr(n.Expr)
-		f.print(newsection, noblank)
+		f.print(newline, noblank)
 
 	case *ast.Ellipsis:
 		f.ellipsis(n)

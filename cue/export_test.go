@@ -359,12 +359,10 @@ func TestExport(t *testing.T) {
 			}
 			def :: {
 				emb
-
 				b: 2
 			}
 			e :: {
 				f
-		
 				<_>: <100
 				b:   int
 			}
@@ -444,7 +442,6 @@ func TestExport(t *testing.T) {
 				} | {
 					b: 1
 				}
-		
 			}
 		}`),
 	}, {

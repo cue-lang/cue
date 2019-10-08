@@ -15,7 +15,6 @@ Foozer :: {
 	String: string
 
 	Inline
-
 	NoInline:   NoInline
 	CustomJSON: CustomJSON
 	CustomYAML: null | CustomYAML @go(,*CustomYAML)

@@ -18,6 +18,14 @@ package expressions
 
 	bottom: _|_
 
+	a:
+		b:
+			c: 2
+
+	a: bbbb: c: 3
+	a: b: 3
+	a: bb: cc: 3
+
 	empty: {}
 	emptyNewLine: {
 

@@ -173,14 +173,6 @@ type formatter struct {
 	stack    []frame
 	current  frame
 	nestExpr int
-
-	labelBuf []labelEntry
-}
-
-type labelEntry struct {
-	label    ast.Label
-	typ      token.Token
-	optional bool
 }
 
 func newFormatter(p *printer) *formatter {

@@ -328,10 +328,15 @@ func TestParse(t *testing.T) {
 
 		// about c
 
+		// about d
+		d:
+			// about e
+			e: 3
 		`,
 		"<[d0// a ...] [l5// line a] [5// about a] a: 5>, " +
 			"<[d0// b ...] [l2// lineb] [5// about b] b: 6>, " +
-			"<[5// about c] c: 7>",
+			"<[5// about c] c: 7>, " +
+			"<[d0// about d] d: {<[d0// about e] e>: 3}>",
 	}, {
 		"expr comments",
 		`

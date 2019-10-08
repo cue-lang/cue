@@ -1,7 +1,6 @@
 cue import -o - -f -l '"\(strings.ToLower(kind))" "\(name)"' ./import
 cmp stdout expect-stdout
 -- expect-stdout --
-
 service: booster: {
 	kind: "Service"
 	name: "booster"

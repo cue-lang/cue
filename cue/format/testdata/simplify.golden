@@ -1,6 +1,7 @@
-
 foo: bar: "str"
 
 a: B: 42
 
 "a.b": "foo-": cc_dd: x
+
+a: b: c: 3

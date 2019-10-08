@@ -41,8 +41,7 @@ func TestInvalidAST(t *testing.T) {
 			}},
 		}},
 		// Force a new struct.
-		out: `
-foo: bar :: {
+		out: `foo: bar :: {
 }`,
 	}}
 	for _, tc := range testCases {

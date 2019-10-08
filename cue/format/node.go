@@ -57,13 +57,65 @@ func isRegularField(tok token.Token) bool {
 
 // Helper functions for common node lists. They may be empty.
 
+func nestDepth(f *ast.Field) int {
+	d := 1
+	if s, ok := f.Value.(*ast.StructLit); ok {
+		switch {
+		case len(s.Elts) != 1:
+			d = 0
+		default:
+			if f, ok := s.Elts[0].(*ast.Field); ok {
+				d += nestDepth(f)
+			}
+		}
+	}
+	return d
+}
+
+// TODO: be more accurate and move to astutil
+func hasDocComments(d ast.Decl) bool {
+	if len(d.Comments()) > 0 {
+		return true
+	}
+	switch x := d.(type) {
+	case *ast.Field:
+		return len(x.Label.Comments()) > 0
+	case *ast.Alias:
+		return len(x.Ident.Comments()) > 0
+	}
+	return false
+}
+
 func (f *formatter) walkDeclList(list []ast.Decl) {
 	f.before(nil)
+	d := 0
 	for i, x := range list {
 		if i > 0 {
 			f.print(declcomma)
+			nd := 0
+			if f, ok := x.(*ast.Field); ok {
+				nd = nestDepth(f)
+			}
+			if f.current.parentSep == newline && (d == 0 || nd != d) {
+				f.print(f.formfeed())
+			}
+			if hasDocComments(x) {
+				switch x := list[i-1].(type) {
+				case *ast.Field:
+					if x.Token == token.ISA {
+						f.print(newsection)
+					}
+
+				default:
+					f.print(newsection)
+				}
+			}
 		}
 		f.decl(x)
+		d = 0
+		if f, ok := x.(*ast.Field); ok {
+			d = nestDepth(f)
+		}
 		if j := i + 1; j < len(list) {
 			switch x := list[j].(type) {
 			case *ast.Field:
@@ -125,67 +177,76 @@ func (f *formatter) file(file *ast.File) {
 	f.after(file)
 	f.print(token.EOF)
 }
+
+func (f *formatter) inlineField(n *ast.Field) *ast.Field {
+	regular := isRegularField(n.Token)
+	// shortcut single-element structs.
+	// If the label has a valid position, we assume that an unspecified
+	// Lbrace signals the intend to collapse fields.
+	if !n.Label.Pos().IsValid() && !(f.printer.cfg.simplify && regular) {
+		return nil
+	}
+
+	obj, ok := n.Value.(*ast.StructLit)
+	if !ok || len(obj.Elts) != 1 ||
+		(obj.Lbrace.IsValid() && !f.printer.cfg.simplify) ||
+		len(n.Attrs) > 0 {
+		return nil
+	}
+
+	mem, ok := obj.Elts[0].(*ast.Field)
+	if !ok || len(mem.Attrs) > 0 {
+		return nil
+	}
+
+	if hasDocComments(mem) {
+		// TODO: this inserts curly braces even in spaces where this
+		// may not be desirable, such as:
+		// a:
+		//   // foo
+		//   b: 3
+		return nil
+	}
+	return mem
+}
+
 func (f *formatter) decl(decl ast.Decl) {
+
 	if decl == nil {
 		return
 	}
+	defer f.after(decl)
 	if !f.before(decl) {
-		goto after
+		return
 	}
+
 	switch n := decl.(type) {
 	case *ast.Field:
-		// shortcut single-element structs.
-		lastSize := len(f.labelBuf)
-		f.labelBuf = f.labelBuf[:0]
+		f.label(n.Label, n.Optional != token.NoPos)
+
 		regular := isRegularField(n.Token)
-		first, typ, opt := n.Label, n.Token, n.Optional != token.NoPos
-
-		// If the label has a valid position, we assume that an unspecified
-		// Lbrace signals the intend to collapse fields.
-		for n.Label.Pos().IsValid() || (f.printer.cfg.simplify && regular) {
-			obj, ok := n.Value.(*ast.StructLit)
-			if !ok || len(obj.Elts) != 1 || (obj.Lbrace.IsValid() && !f.printer.cfg.simplify) || len(n.Attrs) > 0 {
-				break
-			}
-
-			// Verify that struct doesn't have inside comments and that
-			// element doesn't have doc comments.
-			hasComments := len(obj.Elts[0].Comments()) > 0
-			for _, c := range obj.Comments() {
-				if c.Position == 1 || c.Position == 2 {
-					hasComments = true
-				}
-			}
-			if hasComments {
-				break
-			}
-
-			mem, ok := obj.Elts[0].(*ast.Field)
-			if !ok || len(mem.Attrs) > 0 {
-				break
-			}
-			entry := labelEntry{mem.Label, mem.Token, mem.Optional != token.NoPos}
-			f.labelBuf = append(f.labelBuf, entry)
-			n = mem
+		if regular {
+			f.print(n.TokenPos, token.COLON)
+		} else {
+			f.print(blank, nooverride, n.Token)
 		}
 
-		if lastSize != len(f.labelBuf) {
-			f.print(formfeed)
-		}
+		if mem := f.inlineField(n); mem != nil {
+			switch {
+			default:
+				fallthrough
 
-		f.before(nil)
-		f.label(first, opt)
-		for _, x := range f.labelBuf {
-			if isRegularField(typ) {
-				f.print(n.TokenPos, token.COLON)
-			} else {
-				f.print(blank, nooverride, typ)
+			case regular && f.cfg.simplify:
+				f.print(blank, nooverride)
+				f.decl(mem)
+
+			case mem.Label.Pos().IsNewline():
+				f.print(indent, formfeed)
+				f.decl(mem)
+				f.indent--
 			}
-			f.print(blank, nooverride)
-			f.label(x.label, x.optional)
-			typ = x.typ
+			return
 		}
-		f.after(nil)
 
 		nextFF := f.nextNeedsFormfeed(n.Value)
 		tab := vtab
@@ -193,11 +254,8 @@ func (f *formatter) decl(decl ast.Decl) {
 			tab = blank
 		}
 
-		if isRegularField(n.Token) {
-			f.print(n.TokenPos, token.COLON, tab)
-		} else {
-			f.print(blank, nooverride, n.Token, tab)
-		}
+		f.print(tab)
+
 		if n.Value != nil {
 			switch n.Value.(type) {
 			case *ast.ListComprehension, *ast.ListLit, *ast.StructLit:
@@ -278,15 +336,13 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.expr(n.Ident)
 		f.print(blank, n.Equal, token.BIND, blank)
 		f.expr(n.Expr)
-		f.print(declcomma, newline) // implied
+		f.print(declcomma) // implied
 
 	case *ast.CommentGroup:
 		f.print(newsection)
 		f.printComment(n)
 		f.print(newsection)
 	}
-after:
-	f.after(decl)
 }
 
 func (f *formatter) nextNeedsFormfeed(n ast.Expr) bool {
@@ -325,6 +381,8 @@ func isValidIdent(ident string) bool {
 }
 
 func (f *formatter) label(l ast.Label, optional bool) {
+	f.before(l)
+	defer f.after(l)
 	switch n := l.(type) {
 	case *ast.Ident:
 		// Escape an identifier that has invalid characters. This may happen,

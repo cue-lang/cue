@@ -73,6 +73,7 @@ a: 3 + /* foo */ 5
 for k, v in src {
 	"\(k)": v
 }
+
 // foo
 // bar
 for k, v in src {

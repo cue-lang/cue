@@ -115,15 +115,17 @@ func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, ok boo
 }
 
 func (s *scope) lookup(name string) (obj, node ast.Node) {
-	last := s
+	// TODO(#152): consider returning nil for obj if it is a reference to root.
+	// last := s
 	for s != nil {
 		if n, ok := s.index[name]; ok {
-			if last.node == n {
-				return nil, n
-			}
+			// if last.node == n {
+			// 	return nil, n
+			// }
 			return s.node, n
 		}
-		s, last = s.outer, s
+		// s, last = s.outer, s
+		s = s.outer
 	}
 	return nil, nil
 }

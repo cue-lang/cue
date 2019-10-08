@@ -1,0 +1,36 @@
+cue eval ./rec.cue -O
+cmp stdout expect-stdout
+-- rec.cue --
+Foo: {
+	foo?: Foo
+	bar:  string
+	baz:  bar + "2"
+}
+
+foo: Foo & {
+	foo: {
+		bar: "barNested"
+	}
+	bar: "barParent"
+}
+-- expect-stdout --
+Foo: {
+    foo?: {
+        bar: string
+        baz: bar + "2"
+    }
+    bar: string
+    baz: bar + "2"
+}
+foo: {
+    foo: {
+        foo?: {
+            bar: string
+            baz: bar + "2"
+        }
+        bar: "barNested"
+        baz: "barNested2"
+    }
+    bar: "barParent"
+    baz: "barParent2"
+}

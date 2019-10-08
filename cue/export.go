@@ -240,9 +240,9 @@ func (p *exporter) isComplete(v value, all bool) bool {
 	return false
 }
 
-func (p *exporter) recExpr(v value, e evaluated) ast.Expr {
+func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
 	m := p.ctx.manifest(e)
-	if !p.isComplete(m, false) && !p.mode.concrete {
+	if optional || (!p.isComplete(m, false) && (!p.mode.concrete)) {
 		// TODO: do something more principled than this hack.
 		// This likely requires disjunctions to keep track of original
 		// values (so using arcs instead of values).
@@ -544,7 +544,7 @@ func (p *exporter) expr(v value) ast.Expr {
 				list.Elts = append(list.Elts, p.expr(a.v))
 			} else {
 				e := x.elem.at(p.ctx, i)
-				list.Elts = append(list.Elts, p.recExpr(a.v, e))
+				list.Elts = append(list.Elts, p.recExpr(a.v, e, false))
 			}
 		}
 		max := maxNum(x.len)
@@ -673,7 +673,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		if !doEval(p.mode) {
 			f.Value = p.expr(a.v)
 		} else {
-			f.Value = p.recExpr(a.v, x.at(p.ctx, i))
+			f.Value = p.recExpr(a.v, x.at(p.ctx, i), a.optional)
 		}
 		p.inDef = oldInDef
 		if a.attrs != nil && !p.mode.omitAttrs {

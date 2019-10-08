@@ -2351,6 +2351,37 @@ func TestFullEval(t *testing.T) {
 		fn1: fn & {arg: [1]}
 		`,
 		out: `<0>{fn: <1>{arg: [1], out: []}, fn1: <2>{arg: [1], out: []}}`,
+	}, {
+		desc: "Issue #94",
+		in: `
+		foo: {
+			opt?: 1
+			"txt": 2
+			def :: 3
+			regular: 4
+			_hidden: 5
+		}
+		comp: { for k, v in foo { "\(k)": v } }
+		select: {
+			opt: foo.opt
+			"txt": foo.txt
+			def :: foo.def
+			regular: foo.regular
+			_hidden: foo._hidden
+		}
+		index: {
+			opt: foo["opt"]
+			"txt": foo["txt"]
+			def :: foo["def"]
+			regular: foo["regular"]
+			_hidden: foo["_hidden"]
+		}
+		`,
+		out: `<0>{` +
+			`foo: <1>{opt?: 1, txt: 2, def :: 3, regular: 4, _hidden: 5}, ` +
+			`comp: <2>{txt: 2, regular: 4}, ` +
+			`select: <3>{opt: <4>.foo.opt, txt: 2, def :: 3, regular: 4, _hidden: 5}, ` +
+			`index: <5>{opt: <4>.foo["opt"], txt: 2, def :: _|_(<4>.foo["def"]:field "def" is a definition), regular: 4, _hidden: <4>.foo["_hidden"]}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

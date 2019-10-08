@@ -1,10 +1,10 @@
-MyString: {
+MyString :: {
 	exact: string
 } | {
 	regex: string
 }
 
-MyInt: int
+MyInt :: int
 
 Foo: {
 	include: MyString

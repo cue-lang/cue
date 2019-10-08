@@ -1,0 +1,40 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Blocks": {
+            "type": "object",
+            "required": [
+               "block1"
+            ],
+            "properties": {
+               "block1": {
+                  "$ref": "#/components/schemas/Block"
+               }
+            }
+         },
+         "Block": {
+            "type": "object",
+            "required": [
+               "a",
+               "b"
+            ],
+            "properties": {
+               "a": {
+                  "type": "number",
+                  "exclusiveMinimum": 50
+               },
+               "b": {
+                  "type": "number",
+                  "exclusiveMaximum": 10
+               }
+            }
+         }
+      }
+   }
+}

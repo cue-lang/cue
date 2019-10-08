@@ -24,6 +24,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"github.com/kylelemons/godebug/diff"
 )
@@ -111,12 +112,21 @@ func TestParseDefinitions(t *testing.T) {
 				return strings.Join(path, ".")
 			},
 		},
+	}, {
+		"issue131.cue",
+		"issue131.json",
+		&Generator{Info: info, SelfContained: true},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {
-			filename := filepath.Join("testdata", filepath.FromSlash(tc.in))
+			filename := filepath.FromSlash(tc.in)
 
-			inst := cue.Build(load.Instances([]string{filename}, nil))[0]
+			inst := cue.Build(load.Instances([]string{filename}, &load.Config{
+				Dir: "./testdata",
+			}))[0]
+			if inst.Err != nil {
+				t.Fatal(errors.Details(inst.Err, nil))
+			}
 
 			b, err := Gen(inst, tc.config)
 			if err != nil {

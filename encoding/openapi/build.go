@@ -101,7 +101,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) 
 
 	// Although paths is empty for now, it makes it valid OpenAPI spec.
 
-	i, err := inst.Value().Fields()
+	i, err := inst.Value().Fields(cue.Definitions(true))
 	if err != nil {
 		return nil, err
 	}
@@ -281,7 +281,11 @@ func (b *builder) resolve(v cue.Value) cue.Value {
 	switch op, a := v.Expr(); op {
 	case cue.SelectorOp:
 		field, _ := a[1].String()
-		v = b.resolve(a[0]).Lookup(field)
+		f, _ := b.resolve(a[0]).LookupField(field)
+		v = cue.Value{}
+		if !f.IsOptional {
+			v = f.Value
+		}
 	}
 	return v
 }
@@ -615,7 +619,7 @@ func (b *builder) object(v cue.Value) {
 	}
 
 	required := []string{}
-	for i, _ := v.Fields(cue.Optional(false), cue.Hidden(false)); i.Next(); {
+	for i, _ := v.Fields(); i.Next(); {
 		required = append(required, i.Label())
 	}
 	if len(required) > 0 {
@@ -631,7 +635,7 @@ func (b *builder) object(v cue.Value) {
 		properties = &OrderedMap{}
 	}
 
-	for i, _ := v.Fields(cue.Optional(true), cue.Hidden(false)); i.Next(); {
+	for i, _ := v.Fields(cue.Optional(true)); i.Next(); {
 		label := i.Label()
 		var core *builder
 		if b.core != nil {

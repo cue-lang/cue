@@ -660,7 +660,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 			f.Optional = token.NoSpace.Pos()
 		}
 		if a.definition {
-			if p.mode.omitHidden || p.mode.concrete {
+			if p.mode.omitDefinitions || p.mode.concrete {
 				continue
 			}
 			f.Token = token.ISA

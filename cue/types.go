@@ -1029,8 +1029,9 @@ func (v Value) Reader() (io.Reader, error) {
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValData(ctx *context) (structValue, *bottom) {
 	return v.structValOpts(ctx, options{
-		omitHidden:   true,
-		omitOptional: true,
+		omitHidden:      true,
+		omitDefinitions: true,
+		omitOptional:    true,
 	})
 }
 
@@ -1054,7 +1055,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 
 	// check if any fields can be omitted
 	needFilter := false
-	if o.omitHidden || o.omitOptional {
+	if o.omitHidden || o.omitOptional || o.omitDefinitions {
 		f := label(0)
 		for _, a := range obj.arcs {
 			f |= a.feature
@@ -1062,7 +1063,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 				needFilter = true
 				break
 			}
-			if a.definition && (o.omitHidden || o.concrete) {
+			if a.definition && (o.omitDefinitions || o.concrete) {
 				needFilter = true
 				break
 			}
@@ -1074,7 +1075,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		arcs := make([]arc, len(obj.arcs))
 		k := 0
 		for _, a := range obj.arcs {
-			if a.definition && (o.omitHidden || o.concrete) {
+			if a.definition && (o.omitDefinitions || o.concrete) {
 				continue
 			}
 			if a.feature&hidden != 0 && o.omitHidden {
@@ -1164,7 +1165,7 @@ func (s *Struct) Fields(opts ...Option) Iterator {
 // Fields creates an iterator over v's fields if v is a struct or an error
 // otherwise.
 func (v Value) Fields(opts ...Option) (Iterator, error) {
-	o := options{omitHidden: true, omitOptional: true}
+	o := options{omitDefinitions: true, omitHidden: true, omitOptional: true}
 	o.updateOptions(opts)
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, o)
@@ -1407,13 +1408,14 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 }
 
 type options struct {
-	concrete       bool // enforce that values are concrete
-	raw            bool // show original values
-	hasHidden      bool
-	omitHidden     bool
-	omitOptional   bool
-	omitAttrs      bool
-	disallowCycles bool // implied by concrete
+	concrete        bool // enforce that values are concrete
+	raw             bool // show original values
+	hasHidden       bool
+	omitHidden      bool
+	omitDefinitions bool
+	omitOptional    bool
+	omitAttrs       bool
+	disallowCycles  bool // implied by concrete
 }
 
 // An Option defines modes of evaluation.
@@ -1435,6 +1437,7 @@ func Concrete(concrete bool) Option {
 			p.concrete = true
 			if !p.hasHidden {
 				p.omitHidden = true
+				p.omitDefinitions = true
 			}
 		}
 	}
@@ -1457,18 +1460,30 @@ func All() Option {
 	return func(p *options) {
 		p.omitAttrs = false
 		p.omitHidden = false
+		p.omitDefinitions = false
 		p.omitOptional = false
 	}
 }
 
-// Hidden indicates that hidden fields should be included.
+// Definitions indicates whether definitions should be included.
 //
-// Hidden fields may still be included if include is false,
-// even if a value is not concrete.
+// Definitions may still be included for certain functions if they are referred
+// to by other other values.
+func Definitions(include bool) Option {
+	return func(p *options) {
+		p.hasHidden = true
+		p.omitDefinitions = !include
+	}
+}
+
+// Hidden indicates that definitions and hidden fields should be included.
+//
+// Deprecated: Hidden fields are deprecated.
 func Hidden(include bool) Option {
 	return func(p *options) {
 		p.hasHidden = true
 		p.omitHidden = !include
+		p.omitDefinitions = !include
 	}
 }
 

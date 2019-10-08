@@ -102,6 +102,12 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	return c
 }
 
+// MainTest is like Main, runs the cue tool and returns the code for passing to os.Exit.
+func MainTest() int {
+	inTest = true
+	return Main()
+}
+
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
 	err := mainErr(context.Background(), os.Args[1:])

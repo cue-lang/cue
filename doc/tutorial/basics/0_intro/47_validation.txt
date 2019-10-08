@@ -1,4 +1,5 @@
 ! cue vet schema.cue data.yaml
+cmp stderr expect-stderr
 
 -- frontmatter.toml --
 title = "Validation"

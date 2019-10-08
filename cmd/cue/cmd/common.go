@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"flag"
 	"io"
 	"os"
 	"strings"
@@ -34,12 +33,6 @@ import (
 var runtime = &cue.Runtime{}
 
 var inTest = false
-
-func init() {
-	if flag.Lookup("test.v") != nil || strings.Contains(os.Args[0], "/_test/") {
-		inTest = true
-	}
-}
 
 func mustParseFlags(t *testing.T, cmd *cobra.Command, flags ...string) {
 	if err := cmd.ParseFlags(flags); err != nil {

@@ -2,16 +2,30 @@ cue export json.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
-title = "Quotes are Optional for Field Names"
+title = "JSON Superset"
 description = ""
 
 -- text.md --
+CUE is a superset of JSON.
+It adds the following conveniences:
+
+- C-style comments,
+- quotes may be omitted from field names without special characters,
+- commas at the end of fields are optional,
+- comma after last element in list is allowed,
+- outer curly braces are optional.
+
+<!--
+{{< alert color="info">}}
+CUE borrows a trick from Go to make commas optional:
+the formal grammar still requires commas,
+but the scanner inserts commas according to a small set
+of simple rules.
+{{< /alert >}}
+-->
+
 JSON objects are called structs in CUE.
 An object member is called a field.
-
-
-Double quotes may be omitted from field names if their name contains no
-special characters and does not start with a number:
 
 -- json.cue --
 one: 1

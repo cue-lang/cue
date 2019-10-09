@@ -13,18 +13,14 @@ For values of basic types this means they must be equal.
 For structs, fields are merged and duplicated fields are handled recursively.
 
 For lists, all elements must match accordingly
-([we discuss open-ended lists later](lists.md).)
+<!-- ([we discuss open-ended lists later](lists.md).) -->
 
 -- dup.cue --
 a: 4
 a: 4
 
-s: {
-    x: 1
-}
-s: {
-    y: 2
-}
+s: { b: 2 }
+s: { c: 2 }
 
 l: [ 1, 2 ]
 l: [ 1, 2 ]
@@ -32,7 +28,7 @@ l: [ 1, 2 ]
 -- expect-stdout-cue --
 a: 4
 s: {
-    x: 1
-    y: 2
+    b: 2
+    c: 2
 }
 l: [1, 2]

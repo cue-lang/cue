@@ -1,6 +1,6 @@
 
 -- frontmatter.toml --
-title = "Commas are Optional after Fields"
+title = "Types are values"
 description = ""
 
 -- text.md --

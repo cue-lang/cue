@@ -1,7 +1,8 @@
 
 -- frontmatter.toml --
-title = "Templating"
+title = "Boilerplate"
 description = ""
+draft = true
 
 -- text.md --
 Constraints specify what values are allowed.

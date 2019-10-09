@@ -13,8 +13,6 @@ This is crucial property of CUE
 that makes it easy for humans _and_ machines to reason over values and
 makes advanced tooling and automation possible.
 
-If you can think of an example where order matters, it is not valid CUE.
-
 -- order.cue --
 a: {x: 1, y: int}
 a: {x: int, y: 2}

@@ -1,0 +1,33 @@
+cue eval -ic defs.cue
+cmp stdout expect-stdout-cue
+
+-- frontmatter.toml --
+title = "Definitions"
+description = ""
+
+-- text.md --
+A definition, denoted with `::` instead of `:`, defines values that
+are not output when converting a configuration to a concrete value.
+They are used to define schemata against which concrete values can
+be validated.
+
+Structs defined by definitions are implicitly closed.
+
+-- defs.cue --
+msg: "Hello \(Name)!"
+
+Name :: "world"
+
+A :: {
+    field: int
+}
+
+a:   A & { field: 3 }
+err: A & { feild: 3 }
+
+-- expect-stdout-cue --
+msg: "Hello world!"
+a: {
+    field: 3
+}
+err: _|_ // field "feild" not allowed in closed struct

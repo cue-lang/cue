@@ -16,6 +16,8 @@ A floating point literal (e.g. `4.0`) is only compatible with `float`.
 In the example, the result of `b` is a `float` and cannot be
 used as an `int` without conversion.
 
+CUE also adds a variety of sugar for writing numbers.
+
 -- numbers.cue --
 a: int
 a: 4 // type int
@@ -28,8 +30,16 @@ c: 4.0
 
 d: 4  // will evaluate to type int (default)
 
+e: [
+    1_234,       // 1234
+    5M,          // 5_000_000
+    1.5Gi,       // 1_610_612_736
+    0x1000_0000, // 268_435_456
+]
+
 -- expect-stdout-cue --
 a: 4
 b: 4.0
 c: _|_ // conflicting values int and 4.0 (mismatched types int and float)
 d: 4
+e: [1234, 5000000, 1610612736, 268435456]

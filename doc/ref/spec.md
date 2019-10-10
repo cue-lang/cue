@@ -1289,6 +1289,11 @@ embedded, but disregarding the restrictions imposed by closed structs.
 A struct resulting from such a unification is closed if either of the involved
 structs were closed.
 
+At the top level, an embedded value may be any type.
+In this case, a CUE program will evaluate to the embedded value
+and the CUE program may not have top-level regular or optional
+fields (definitions and aliases are allowed).
+
 Syntactically, embeddings may be any expression, except that `<`
 is eagerly interpreted as a bind label.
 

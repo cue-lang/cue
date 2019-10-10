@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
 
@@ -100,7 +101,25 @@ func (inst *Instance) eval(ctx *context) evaluated {
 	// TODO: remove manifest here?
 	v := ctx.manifest(inst.rootValue)
 	if s, ok := v.(*structLit); ok && s.emit != nil {
-		return s.emit.evalPartial(ctx)
+		e := s.emit.evalPartial(ctx)
+		src := binSrc(token.NoPos, opUnify, v, e)
+	outer:
+		switch e.(type) {
+		case *structLit, *top:
+			v = binOp(ctx, src, opUnifyUnchecked, v, e)
+			if s, ok := v.(*structLit); ok {
+				s.emit = nil
+			}
+
+		default:
+			for _, a := range s.arcs {
+				if !a.definition {
+					v = binOp(ctx, src, opUnify, v, e)
+					break outer
+				}
+			}
+			return e
+		}
 	}
 	return v
 }

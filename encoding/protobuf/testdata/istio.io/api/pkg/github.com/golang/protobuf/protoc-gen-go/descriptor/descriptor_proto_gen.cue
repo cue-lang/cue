@@ -189,7 +189,7 @@ FieldDescriptorProto: {
 FieldDescriptorProto_Type:
 	// 0 is reserved for errors.
 	// Order is weird for historical reasons.
-	*"TYPE_DOUBLE" |
+	"TYPE_DOUBLE" |
 	"TYPE_FLOAT" |
 
 	// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
@@ -243,7 +243,7 @@ FieldDescriptorProto_Type_value: {
 }
 FieldDescriptorProto_Label:
 	// 0 is reserved for errors
-	*"LABEL_OPTIONAL" |
+	"LABEL_OPTIONAL" |
 	"LABEL_REQUIRED" |
 	"LABEL_REPEATED"
 
@@ -421,8 +421,7 @@ FileOptions: {
 }
 
 // Generated classes can be optimized for speed or code size.
-FileOptions_OptimizeMode:
-	*"SPEED" | // Generate complete code for parsing, serialization,
+FileOptions_OptimizeMode: "SPEED" | // Generate complete code for parsing, serialization,
 
 	// etc.
 	"CODE_SIZE" |
@@ -564,7 +563,7 @@ FieldOptions: {
 }
 FieldOptions_CType:
 	// Default mode.
-	*"STRING" |
+	"STRING" |
 	"CORD" |
 	"STRING_PIECE"
 
@@ -575,7 +574,7 @@ FieldOptions_CType_value: {
 }
 FieldOptions_JSType:
 	// Use the default type.
-	*"JS_NORMAL" |
+	"JS_NORMAL" |
 
 	// Use JavaScript strings.
 	"JS_STRING" |
@@ -658,8 +657,7 @@ MethodOptions: {
 // Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 // or neither? HTTP based RPC implementation may choose GET verb for safe
 // methods, and PUT verb for idempotent methods instead of the default POST.
-MethodOptions_IdempotencyLevel:
-	*"IDEMPOTENCY_UNKNOWN" |
+MethodOptions_IdempotencyLevel: "IDEMPOTENCY_UNKNOWN" |
 	"NO_SIDE_EFFECTS" | // implies idempotent
 	"IDEMPOTENT" // idempotent, but may have side effects
 

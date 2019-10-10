@@ -393,7 +393,7 @@ Server_TLSOptions_TLSmode:
 	// The SNI string presented by the client will be used as the match
 	// criterion in a VirtualService TLS route to determine the
 	// destination service from the service registry.
-	*"PASSTHROUGH" |
+	"PASSTHROUGH" |
 
 	// Secure connections with standard TLS semantics.
 	"SIMPLE" |
@@ -422,8 +422,7 @@ Server_TLSOptions_TLSmode_value: {
 }
 
 // TLS protocol versions.
-Server_TLSOptions_TLSProtocol:
-	*"TLS_AUTO" | // Automatically choose the optimal TLS version.
+Server_TLSOptions_TLSProtocol: "TLS_AUTO" | // Automatically choose the optimal TLS version.
 	"TLSV1_0" | // TLS version 1.0
 	"TLSV1_1" | // TLS version 1.1
 	"TLSV1_2" | // TLS version 1.2

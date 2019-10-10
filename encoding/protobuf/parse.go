@@ -636,12 +636,7 @@ func (p *protoConverter) enum(x *proto.Enum) {
 
 			var e ast.Expr = value
 			// Make the first value the default value.
-			if i == 0 {
-				e = value
-				if numEnums > 1 {
-					e = &ast.UnaryExpr{OpPos: newline, Op: token.MUL, X: value}
-				}
-			} else {
+			if i > 0 {
 				value.ValuePos = newline
 			}
 			addComments(e, i, y.Comment, nil)

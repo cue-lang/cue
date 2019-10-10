@@ -112,8 +112,7 @@ ReferencedAttributes: {
 }
 
 // How an attribute's value was matched
-ReferencedAttributes_Condition:
-	*"CONDITION_UNSPECIFIED" | // should not occur
+ReferencedAttributes_Condition: "CONDITION_UNSPECIFIED" | // should not occur
 	"ABSENCE" | // match when attribute doesn't exist
 	"EXACT" | // match when attribute value is an exact byte-for-byte match
 	"REGEX" // match when attribute value matches the included regex
@@ -167,8 +166,7 @@ HeaderOperation: {
 }
 
 // Operation type.
-HeaderOperation_Operation:
-	*"REPLACE" | // replaces the header with the given name
+HeaderOperation_Operation: "REPLACE" | // replaces the header with the given name
 	"REMOVE" | // removes the header with the given name (the value is ignored)
 	"APPEND" // appends the value to the header value, or sets it if not present
 
@@ -230,7 +228,7 @@ ReportRequest_RepeatedAttributesSemantics:
 	// request size. Each individual set of attributes is used to modify the previous set.
 	// NOTE: There is no way with this encoding to specify attribute value deletion. This
 	// option should be used with extreme caution.
-	*"DELTA_ENCODING" |
+	"DELTA_ENCODING" |
 
 	// Treat each set of compressed attributes as complete - independent from other sets
 	// in this request. This will result in on-wire duplication of attributes and values, but

@@ -625,7 +625,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		binSrc(src.Pos(), op, x, other), // baseValue
 		x.emit,                          // emit
 		nil,                             // template
-		x.isClosed || y.isClosed,        // isClosed
+		x.closeStatus | y.closeStatus,   // closeStatus
 		nil,                             // comprehensions
 		arcs,                            // arcs
 		nil,                             // attributes
@@ -725,7 +725,7 @@ outer:
 	sort.Stable(obj)
 
 	if unchecked && obj.template != nil {
-		obj.isClosed = false
+		obj.closeStatus = 0
 	}
 
 	return obj

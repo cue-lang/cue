@@ -639,8 +639,8 @@ type structLit struct {
 
 	// template must evaluated to a lambda and is applied to all concrete
 	// values in the struct, whether it be open or closed.
-	template value
-	isClosed bool
+	template    value
+	closeStatus byte
 
 	comprehensions []value
 
@@ -648,6 +648,15 @@ type structLit struct {
 	arcs     []arc
 	expanded evaluated
 }
+
+func (x *structLit) isClosed() bool {
+	return x.closeStatus != 0
+}
+
+const (
+	toClose  = 1
+	isClosed = 2
+)
 
 func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
 	if x.template == nil {
@@ -658,7 +667,7 @@ func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
 }
 
 func (x *structLit) allows(f label) bool {
-	return !x.isClosed || f&hidden != 0
+	return x.closeStatus&isClosed == 0 || f&hidden != 0
 }
 
 func newStruct(src source) *structLit {
@@ -679,7 +688,7 @@ func (x *structLit) close() *structLit {
 	}
 
 	newS := *x
-	newS.isClosed = true
+	newS.closeStatus = isClosed
 	return &newS
 }
 
@@ -767,6 +776,11 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		// it is safe to cache the result.
 		ctx.cycleErr = false
 
+		if s, ok := v.(*structLit); ok {
+			if s.closeStatus != 0 {
+				s.closeStatus = 2
+			}
+		}
 		x.arcs[i].cache = v
 		if doc != nil {
 			x.arcs[i].docs = &docNode{n: doc, left: x.arcs[i].docs}
@@ -788,6 +802,10 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 // should not be evaluated until the other fields of a struct are
 // fully evaluated.
 func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
+	if x.closeStatus == toClose {
+		x.closeStatus = isClosed
+	}
+
 	switch v := x.expanded.(type) {
 	case nil:
 	case *structLit:

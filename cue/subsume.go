@@ -113,7 +113,7 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 			}
 		}
 		// For closed structs, all arcs in b must exist in a.
-		if x.isClosed {
+		if x.isClosed() {
 			for _, b := range o.arcs {
 				a := x.lookup(ctx, b.feature)
 				if a.val() == nil {

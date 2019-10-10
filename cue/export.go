@@ -422,13 +422,13 @@ func (p *exporter) expr(v value) ast.Expr {
 		return bin
 
 	case *structLit:
-		st, err := p.structure(x, !x.isClosed)
+		st, err := p.structure(x, !x.isClosed())
 		if err != nil {
 			return p.expr(err)
 		}
-		expr := p.closeOrOpen(st, x.isClosed)
+		expr := p.closeOrOpen(st, x.isClosed())
 		switch {
-		case x.isClosed && x.template != nil:
+		case x.isClosed() && x.template != nil:
 			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
 			if !ok {
 				break
@@ -632,7 +632,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 	case !doEval(p.mode) && x.template != nil && addTempl:
 		l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
 		if ok {
-			if _, ok := l.value.(*top); ok && !x.isClosed {
+			if _, ok := l.value.(*top); ok && !x.isClosed() {
 				break
 			}
 			obj.Elts = append(obj.Elts, &ast.Field{
@@ -735,7 +735,7 @@ func (p *exporter) embedding(s *ast.StructLit, n value) (closed bool) {
 			break
 		}
 		s.Elts = append(s.Elts, st.Elts...)
-		return x.isClosed
+		return x.isClosed()
 
 	case *binaryExpr:
 		if x.op != opUnifyUnchecked {

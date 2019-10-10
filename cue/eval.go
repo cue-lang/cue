@@ -67,7 +67,7 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 		}
 		if n.val() == nil {
 			field := ctx.labelStr(x.feature)
-			if st, ok := sc.(*structLit); ok && !st.isClosed {
+			if st, ok := sc.(*structLit); ok && !st.isClosed() {
 				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
 			}
 			//	m.foo undefined (type map[string]bool has no field or method foo)
@@ -109,7 +109,7 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 				return ctx.mkErr(x, index, codeIncomplete, "field %q is optional", s)
 			}
 			if n.val() == nil {
-				if !v.isClosed {
+				if !v.isClosed() {
 					return ctx.mkErr(x, index, codeIncomplete, "undefined field %q", s)
 				}
 				return ctx.mkErr(x, index, "undefined field %q", s)

@@ -277,7 +277,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		if v.ctx().inDefinition > 0 {
 			// For embeddings this is handled in binOp, in which case the
 			// isClosed bit is cleared if a template is introduced.
-			obj.isClosed = obj.template == nil
+			if obj.template == nil {
+				obj.closeStatus = toClose
+			}
 		}
 		if passDoc {
 			v.doc = v1.doc // signal usage of document back to parent.

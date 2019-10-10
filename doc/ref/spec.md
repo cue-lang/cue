@@ -1330,8 +1330,18 @@ Definitions are not emitted as part of the model and are never required
 to be concrete when emitting data.
 It is illegal to have a regular field and a definition with the same name
 within the same struct.
-Literal structs that are part of a definition's value are implicitly closed.
+Literal structs that are part of a definition's value are implicitly closed,
+but may unify unrestricted with other structs within the field's declaration.
 This excludes literals structs in embeddings and aliases.
+<!--
+This may be a more intuitive definition:
+    Literal structs that are part of a definition's value are implicitly closed.
+    Implicitly closed literal structs that are unified within
+    a single field declaration are considered to be a single literal struct.
+However, this would make unification non-commutative, unless one imposes an
+ordering where literal structs are unified before unifying them with others.
+Imposing such an ordering is complex and error prone.
+-->
 An ellipsis `...` in such literal structs keeps them open,
 as it defines `_` for all labels.
 <!--
@@ -1359,22 +1369,17 @@ closing, aside from embedding.
 -->
 
 ```
-// MyStruct is closed and as there is no expression label or `...`, we know
-// this is the full definition.
 MyStruct :: {
-    field:    string
-    enabled?: bool
+    sub field:    string
 }
 
-// Without the `...`, this field would not unify with its previous declaration.
 MyStruct :: {
-    enabled: bool | *false
-    ...
+    sub enabled?: bool
 }
 
 myValue: MyStruct & {
-    feild:   2     // error, feild not defined in MyStruct
-    enabled: true  // okay
+    sub feild:   2     // error, feild not defined in MyStruct
+    sub enabled: true  // okay
 }
 
 D :: {
@@ -1440,6 +1445,7 @@ Combined: myStruct1 & myStruct2
 // field: string @go(Field)
 // attr:  int    @xml(,attr) @xml(a1,attr) @go(Attr)
 ```
+
 
 #### Aliases
 

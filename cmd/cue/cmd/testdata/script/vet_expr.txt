@@ -2,14 +2,19 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
+translations.hello.lang: incomplete value (string):
+    ./vet.cue:3:11
+translations.hello.lang: conflicting values false and string (mismatched types bool and string):
+    ./data.yaml:13:11
+    ./vet.cue:3:11
 field "skip" not allowed in closed struct:
-    ./vet.cue:4:9
+    ./vet.cue:1:9
 -- vet.cue --
-
-translations <_> lang: string
-
 File :: {
-	translations: {...}
+	translations <_>: {
+    lang: string
+    text: string
+  }
 }
 -- data.yaml --
 # translated messages

@@ -273,7 +273,7 @@ func (p *printer) str(v interface{}) {
 		if p.showNodeRef {
 			p.writef("<%s>", p.ctx.ref(x))
 		}
-		if x.isClosed {
+		if x.closeStatus != 0 {
 			write("C")
 		}
 		write("{")
@@ -301,7 +301,7 @@ func (p *printer) str(v interface{}) {
 				p.write(", ")
 			}
 		}
-		if topDefault && !x.isClosed {
+		if topDefault && x.closeStatus == 0 {
 			if len(x.arcs) > 0 {
 				p.write(", ")
 			}

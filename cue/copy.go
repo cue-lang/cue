@@ -31,7 +31,7 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 	case *structLit:
 		arcs := make(arcs, len(x.arcs))
 
-		obj := &structLit{x.baseValue, nil, nil, x.isClosed, nil, arcs, nil}
+		obj := &structLit{x.baseValue, nil, nil, x.closeStatus, nil, arcs, nil}
 
 		defer ctx.pushForwards(x, obj).popForwards()
 

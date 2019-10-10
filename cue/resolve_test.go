@@ -1155,6 +1155,7 @@ a: {
 				}
 			}
 
+			// Allowed
 			Foo1 :: { field: int }
 			Foo1 :: { field2: string }
 
@@ -1184,13 +1185,55 @@ a: {
 			`,
 		out: `<0>{` +
 			`Foo :: <1>C{field: int, recursive: <2>C{field: string}}, ` +
-			`Foo1 :: _|_((<3>C{field: int} & <4>C{field2: string}):field "field" not allowed in closed struct), ` +
+			`Foo1 :: <3>C{field: int, field2: string}, ` +
 			`foo: _|_(2:field "feild" not allowed in closed struct), ` +
-			`foo1: <5>C{field: 2, recursive: _|_(2:field "feild" not allowed in closed struct)}, ` +
-			`Bar :: <6>{<>: <7>(A: string)->int, field: int}, ` +
-			`bar: <8>{<>: <9>(A: string)->int, field: int, feild: 2}, ` +
+			`foo1: <4>C{field: 2, recursive: _|_(2:field "feild" not allowed in closed struct)}, ` +
+			`Bar :: <5>{<>: <6>(A: string)->int, field: int}, ` +
+			`bar: <7>{<>: <8>(A: string)->int, field: int, feild: 2}, ` +
 			`Mixed: _|_(field "Mixed" declared as definition and regular field), ` +
 			`mixedRec: _|_(field "Mixed" declared as definition and regular field)}`,
+	}, {
+		desc: "combined definitions",
+		in: `
+			// Allow combining of structs within a definition
+			D1 :: {
+				env a: "A"
+				env b: "B"
+				def :: {a: "A"}
+				def :: {b: "B"}
+			}
+
+			d1: D1 & { env c: "C" }
+
+			D2 :: {
+				a: int
+			}
+			D2 :: {
+				b: int
+			}
+
+			D3 :: {
+				env a: "A"
+			}
+			D3 :: {
+				env b: "B"
+			}
+
+			D4 :: {
+				env: DC
+				env b: int
+			}
+
+			DC :: { a: int }
+					`,
+		out: `<0>{` +
+			`D1 :: <1>C{env: <2>C{a: "A", b: "B"}, def :: <3>C{a: "A", b: "B"}}, ` +
+			`d1: <4>C{env: <5>C{a: "A", b: "B", c: "C"}, def :: <6>C{a: "A", b: "B"}}, ` +
+			`D2 :: <7>C{a: int, b: int}, ` +
+			`D3 :: <8>C{env: <9>C{a: "A", b: "B"}}, ` +
+			`D4 :: <10>C{env: _|_(int:field "b" not allowed in closed struct)}, ` +
+			`DC :: <11>C{a: int}` +
+			`}`,
 	}, {
 		desc: "definitions with oneofs",
 		in: `
@@ -1228,20 +1271,16 @@ a: {
 			b: 3
 		}
 
-		// error: literal struct is closed before unify
-		e1 :: S & { a c: 4 }
-		// no such issue here
-		v1: S & { a c: 4 }
-
 		// adding a field to a nested struct that is closed.
-		e2: S & { a d: 4 }
+		e1 :: S & { a d: 4 }
+		// literal struct not closed until after unification.
+		v1 :: S & { a c: 4 }
 		`,
 		out: `<0>{` +
 			`E :: <1>C{a: <2>C{b: int}}, ` +
 			`S :: <3>C{a: <4>C{b: int, c: int}, b: 3}, ` +
-			`e1 :: _|_((<5>.S & <6>C{a: <7>C{c: 4}}):field "b" not allowed in closed struct), ` +
-			`v1: <8>C{a: <9>C{b: int, c: 4}, b: 3}, ` +
-			`e2: <10>C{a: _|_(4:field "d" not allowed in closed struct), b: 3}}`,
+			`e1 :: <5>C{a: _|_(4:field "d" not allowed in closed struct), b: 3}, ` +
+			`v1 :: <6>C{a: <7>C{b: int, c: 4}, b: 3}}`,
 	}, {
 		desc: "closing structs",
 		in: `
@@ -1310,8 +1349,8 @@ a: {
 	}, {
 		desc: "closing with failed optional",
 		in: `
-		k1 :: {a: int, b?: int} & {a: int} // closed({a: int})
-		k2 :: {a: int} & {a: int, b?: int} // closed({a: int})
+		k1 :: {a: int, b?: int} & A // closed({a: int})
+		k2 :: A & {a: int, b?: int} // closed({a: int})
 
 		o1: {a?: 3} & {a?: 4} // {a?: _|_}
 
@@ -1320,14 +1359,18 @@ a: {
 
 		d1 :: {a?: 2, b: 4} | {a?: 3, c: 5}
 		v1: d1 & {a?: 3, b: 4}  // close({b: 4})
+
+		A :: {a: int}
 		`,
 		out: `<0>{` +
 			`k1 :: <1>C{a: int}, ` +
-			`k2 :: <2>C{a: int}, ` +
-			`o1: <3>{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
-			`o2 :: <4>C{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
-			`d1 :: (<5>C{a?: 2, b: 4} | <6>C{a?: 3, c: 5}), ` +
-			`v1: <7>C{a?: _|_((2 & 3):conflicting values 2 and 3), b: 4}}`,
+			`A :: <2>C{a: int}, ` +
+			`k2 :: <3>C{a: int}, ` +
+			`o1: <4>{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
+			`o2 :: <5>C{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
+			`d1 :: (<6>C{a?: 2, b: 4} | <7>C{a?: 3, c: 5}), ` +
+			`v1: <8>C{a?: _|_((2 & 3):conflicting values 2 and 3), b: 4}` +
+			`}`,
 	}, {
 		desc: "closing with comprehensions",
 		in: `
@@ -2392,7 +2435,12 @@ func TestX(t *testing.T) {
 
 	// Don't remove. For debugging.
 	testCases := []testCase{{
-		in: ``,
+		in: `
+		Foo :: { a: int }
+
+		Foo
+		b: int
+		`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

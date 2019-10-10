@@ -1012,6 +1012,7 @@ Any [references](#References) to `a` or `b`
 in their respective field values need to be replaced with references to `c`.
 The result of a unification is bottom (`_|_`) if any of its non-optional
 fields evaluates to bottom, recursively.
+
 <!--NOTE: About bottom values for optional fields being okay.
 
 The proposition ¬P is a close cousin of P → ⊥ and is often used
@@ -1338,6 +1339,7 @@ within the same struct.
 Literal structs that are part of a definition's value are implicitly closed,
 but may unify unrestricted with other structs within the field's declaration.
 This excludes literals structs in embeddings and aliases.
+
 <!--
 This may be a more intuitive definition:
     Literal structs that are part of a definition's value are implicitly closed.
@@ -1349,6 +1351,7 @@ Imposing such an ordering is complex and error prone.
 -->
 An ellipsis `...` in such literal structs keeps them open,
 as it defines `_` for all labels.
+
 <!--
 Excluding embeddings from recursive closing allows comprehensions to be
 interpreted as embeddings without some exception. For instance,
@@ -2037,6 +2040,7 @@ unary_op   = "+" | "-" | "!" | "*" | rel_op .
 
 Comparisons are discussed [elsewhere](#Comparison-operators).
 For any binary operators, the operand types must unify.
+
 <!-- TODO: durations
  unless the operation involves durations.
 
@@ -2047,6 +2051,7 @@ operand.
 
 Operands of unary and binary expressions may be associated with a default using
 the following
+
 <!--
 ```
 O1: op (v1, d1)          => (op v1, op d1)
@@ -2181,6 +2186,7 @@ For integer operands, the unary operators `+` and `-` are defined as follows:
 For decimal floating-point numbers, `+x` is the same as `x`,
 while -x is the negation of x.
 The result of a floating-point division by zero is bottom (an error).
+
 <!-- TODO: consider making it +/- Inf -->
 
 An implementation may combine multiple floating-point operations into a single
@@ -2234,6 +2240,7 @@ A string can be repeated by multiplying it:
 ```
 s: "etc. "*3  // "etc. etc. etc. "
 ```
+
 <!-- jba: Do these work for byte sequences? If not, why not? -->
 
 
@@ -2251,6 +2258,7 @@ Comparison operators compare two operands and yield an untyped boolean value.
 =~    matches regular expression
 !~    does not match regular expression
 ```
+
 <!-- regular expression operator inspired by Bash, Perl, and Ruby. -->
 
 In any comparison, the types of the two operands must unify or one of the
@@ -2278,6 +2286,7 @@ These terms and the result of the comparisons are defined as follows:
   except for `\C`.
 - `s =~ r` is true if `s` matches the regular expression `r`.
 - `s !~ r` is true if `s` does not match regular expression `r`.
+
 <!--- TODO: consider the following
 - For regular expression, named capture groups are interpreted as CUE references
   that must unify with the strings matching this capture group.
@@ -2686,6 +2695,7 @@ Unification is idempotent and unifying a value with itself ad infinitum,
 which is what the cycle represents, results in this value.
 Implementations should detect cycles of this kind, ignore `r`,
 and take `v` as the result of unification.
+
 <!-- Tomabechi's graph unification algorithm
 can detect such cycles at near-zero cost. -->
 

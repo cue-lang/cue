@@ -1,4 +1,4 @@
-cue eval -i bounds.cue
+cue eval -ic bounds.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
@@ -15,20 +15,18 @@ For instance `>5.0` allows all floating point values greater than `5.0`,
 whereas `<0` allows all negative numbers (int or float).
 
 -- bounds.cue --
-rn: >=3 & <8        // type int | float
-ri: >=3 & <8 & int  // type int
-rf: >=3 & <=8.0     // type float
-rs: >="a" & <"mo"
+rn :: >=3 & <8        // type int | float
+ri :: >=3 & <8 & int  // type int
+rf :: >=3 & <=8.0     // type float
+rs :: >="a" & <"mo"
 
-{
-    a: rn & 3.5
-    b: ri & 3.5
-    c: rf & 3
-    d: rs & "ma"
-    e: rs & "mu"
+a: rn & 3.5
+b: ri & 3.5
+c: rf & 3
+d: rs & "ma"
+e: rs & "mu"
 
-    r1: rn & >=5 & <10
-}
+r1: rn & >=5 & <10
 
 -- expect-stdout-cue --
 a:  3.5

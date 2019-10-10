@@ -50,135 +50,135 @@ func TestValueType(t *testing.T) {
 		concrete       bool
 		// pos            token.Pos
 	}{{ // Not a concrete value.
-		value:          `_`,
+		value:          `v: _`,
 		kind:           BottomKind,
 		incompleteKind: nextKind - 1,
 	}, {
-		value:          `_|_`,
+		value:          `v: _|_`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
 	}, {
-		value:          `1&2`,
+		value:          `v: 1&2`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
 	}, { // TODO: should be error{
-		value:          `b`,
+		value:          `v: b`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
 	}, {
-		value:          `(b[a])`,
+		value:          `v: (b[a])`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
 	}, { // TODO: should be error{
-		value: `(b)
+		value: `v: (b)
 			b: bool`,
 		kind:           BottomKind,
 		incompleteKind: BoolKind,
 	}, {
-		value:          `([][b])`,
+		value:          `v: ([][b])`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
 	}, {
-		value:          `null`,
+		value:          `v: null`,
 		kind:           NullKind,
 		incompleteKind: NullKind,
 		concrete:       true,
 	}, {
-		value:          `true`,
+		value:          `v: true`,
 		kind:           BoolKind,
 		incompleteKind: BoolKind,
 		concrete:       true,
 	}, {
-		value:          `false`,
+		value:          `v: false`,
 		kind:           BoolKind,
 		incompleteKind: BoolKind,
 		concrete:       true,
 	}, {
-		value:          `bool`,
+		value:          `v: bool`,
 		kind:           BottomKind,
 		incompleteKind: BoolKind,
 	}, {
-		value:          `2`,
+		value:          `v: 2`,
 		kind:           IntKind,
 		incompleteKind: IntKind,
 		concrete:       true,
 	}, {
-		value:          `2.0`,
+		value:          `v: 2.0`,
 		kind:           FloatKind,
 		incompleteKind: FloatKind,
 		concrete:       true,
 	}, {
-		value:          `2.0Mi`,
+		value:          `v: 2.0Mi`,
 		kind:           IntKind,
 		incompleteKind: IntKind,
 		concrete:       true,
 	}, {
-		value:          `14_000`,
+		value:          `v: 14_000`,
 		kind:           IntKind,
 		incompleteKind: IntKind,
 		concrete:       true,
 	}, {
-		value:          `>=0 & <5`,
+		value:          `v: >=0 & <5`,
 		kind:           BottomKind,
 		incompleteKind: NumberKind,
 	}, {
-		value:          `float`,
+		value:          `v: float`,
 		kind:           BottomKind,
 		incompleteKind: FloatKind,
 	}, {
-		value:          `"str"`,
+		value:          `v: "str"`,
 		kind:           StringKind,
 		incompleteKind: StringKind,
 		concrete:       true,
 	}, {
-		value:          "'''\n'''",
+		value:          "v: '''\n'''",
 		kind:           BytesKind,
 		incompleteKind: BytesKind,
 		concrete:       true,
 	}, {
-		value:          "string",
+		value:          "v: string",
 		kind:           BottomKind,
 		incompleteKind: StringKind,
 	}, {
-		value:          `{}`,
+		value:          `v: {}`,
 		kind:           StructKind,
 		incompleteKind: StructKind,
 		concrete:       true,
 	}, {
-		value:          `[]`,
+		value:          `v: []`,
 		kind:           ListKind,
 		incompleteKind: ListKind,
 		concrete:       true,
 	}, {
-		value:    `{a: int, b: [1][a]}.b`,
+		value:    `v: {a: int, b: [1][a]}.b`,
 		kind:     BottomKind,
 		concrete: false,
 	}, {
 		value: `import "time"
-			{a: time.Time}.a`,
+		v: {a: time.Time}.a`,
 		kind:           BottomKind,
 		incompleteKind: StringKind,
 		concrete:       false,
 	}, {
 		value: `import "time"
-			{a: time.Time & string}.a`,
+			v: {a: time.Time & string}.a`,
 		kind:           BottomKind,
 		incompleteKind: StringKind,
 		concrete:       false,
 	}, {
 		value: `import "strings"
-			{a: strings.ContainsAny("D")}.a`,
+			v: {a: strings.ContainsAny("D")}.a`,
 		kind:           BottomKind,
 		incompleteKind: StringKind,
 		concrete:       false,
 	}, {
 		value: `import "struct"
-		{a: struct.MaxFields(2) & {}}.a`,
+		v: {a: struct.MaxFields(2) & {}}.a`,
 		kind:           StructKind, // Can determine a valid struct already.
 		incompleteKind: StructKind,
 		concrete:       true,
@@ -186,7 +186,7 @@ func TestValueType(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
 			inst := getInstance(t, tc.value)
-			v := inst.Value()
+			v := inst.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
 				t.Errorf("Kind: got %x; want %x", got, tc.kind)
 			}
@@ -423,7 +423,7 @@ func TestString(t *testing.T) {
 		str:   `Hello world!`,
 	}, {
 		value: `"Hello \(world)!"
-		world: "world"`,
+		world :: "world"`,
 		str: `Hello world!`,
 	}, {
 		value: `string`,
@@ -479,20 +479,20 @@ func TestNull(t *testing.T) {
 		value string
 		err   string
 	}{{
-		value: `_|_`,
+		value: `v: _|_`,
 		err:   "from source",
 	}, {
-		value: `"str"`,
+		value: `v: "str"`,
 		err:   "cannot use value \"str\" (type string) as null",
 	}, {
-		value: `null`,
+		value: `v: null`,
 	}, {
-		value: `_`,
+		value: `v: _`,
 		err:   "non-concrete value _",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
-			err := getInstance(t, tc.value).Value().Null()
+			err := getInstance(t, tc.value).Lookup("v").Null()
 			checkErr(t, err, tc.err, "init")
 		})
 	}
@@ -552,7 +552,7 @@ func TestList(t *testing.T) {
 		err:   "incomplete",
 	}, {
 		value: `[x for x in y if x > 1]
-		y: [1,2,3]`,
+		y :: [1,2,3]`,
 		res: "[2,3,]",
 	}, {
 		value: `[int]`,
@@ -603,7 +603,7 @@ func TestFields(t *testing.T) {
 		res:   "{}",
 	}, {
 		value: `{ for k, v in y if v > 1 {"\(k)": v} }
-		y: {a:1,b:2,c:3}`,
+		y :: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
 	}, {
 		value: `{ def :: 1, _hidden: 2, opt?: 3, reg: 4 }`,
@@ -1035,7 +1035,7 @@ func TestDecode(t *testing.T) {
 		want:  *intList(1, 2, 3),
 	}, {
 		value: `[x for x in y if x > 1]
-				y: [1,2,3]`,
+				y :: [1,2,3]`,
 		dst:  intList(),
 		want: *intList(2, 3),
 	}, {

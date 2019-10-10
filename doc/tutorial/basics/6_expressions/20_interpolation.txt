@@ -14,8 +14,8 @@ Interpolation may also be used in multiline string and byte literals.
 -- interpolation.cue --
 "You are \( cost - budget ) dollars over budget!"
 
-cost:   102
-budget: 88
+cost ::   102
+budget :: 88
 
 -- expect-stdout-cue --
 "You are 14 dollars over budget!"

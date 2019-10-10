@@ -16,7 +16,7 @@ of defining structs light.
 -- emit.cue --
 "Hello \(who)!"
 
-who: "world"
+who :: "world"
 
 -- expect-stdout-cue --
 "Hello world!"

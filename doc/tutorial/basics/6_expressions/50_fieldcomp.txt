@@ -1,4 +1,4 @@
-cue eval fieldcomp.cue
+cue eval -c fieldcomp.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
@@ -14,15 +14,13 @@ Instead, one must use indexing.
 -- fieldcomp.cue --
 import "strings"
 
-a: [ "Barcelona", "Shanghai", "Munich" ]
+a:: [ "Barcelona", "Shanghai", "Munich" ]
 
-{
-    for k, v in a {
-        "\( strings.ToLower(v) )": {
-            pos:     k + 1
-            name:    v
-            nameLen: len(v)
-        }
+for k, v in a {
+    "\( strings.ToLower(v) )": {
+        pos:     k + 1
+        name:    v
+        nameLen: len(v)
     }
 }
 

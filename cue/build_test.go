@@ -131,7 +131,7 @@ func TestBuild(t *testing.T) {
 				`package test
 
 				import pkg2 "pkg1"
-				pkg1: pkg2.Object
+				pkg1 :: pkg2.Object
 
 				"Hello \(pkg1)!"`),
 		}),

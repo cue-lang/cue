@@ -162,6 +162,24 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Flatten("foo")`),
 		`_|_(error in call to list.Flatten: cannot use value "foo" (type string) as list)`,
 	}, {
+		test("list", `list.FlattenN([1, [[2, 3], []], [4]], -1)`),
+		`[1,2,3,4]`,
+	}, {
+		test("list", `list.FlattenN([1, [[2, 3], []], [4]], 0)`),
+		`[1,[[2,3],[]],[4]]`,
+	}, {
+		test("list", `list.FlattenN([1, [[2, 3], []], [4]], 1)`),
+		`[1,[2,3],[],4]`,
+	}, {
+		test("list", `list.FlattenN([1, [[2, 3], []], [4]], 2)`),
+		`[1,2,3,4]`,
+	}, {
+		test("list", `list.FlattenN("foo", 1)`),
+		`_|_(error in call to list.FlattenN: cannot use value "foo" (type string) as list)`,
+	}, {
+		test("list", `list.FlattenN([], "foo")`),
+		`_|_(cannot use "foo" (type string) as number in argument 2 to list.FlattenN)`,
+	}, {
 		test("list", `list.Max([1, 2, 3, 4])`),
 		`4`,
 	}, {

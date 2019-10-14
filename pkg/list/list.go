@@ -20,6 +20,8 @@ import (
 	"sort"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal"
+	"github.com/cockroachdb/apd/v2"
 )
 
 // Drop reports the suffix of list x after the first n elements,
@@ -45,7 +47,7 @@ func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 	return x[n:], nil
 }
 
-// Flatten reports a flattend sequence of the list x by expanding any elements
+// Flatten reports a flattend sequence of the list xs by expanding any elements
 // that are lists.
 //
 // For instance:
@@ -79,6 +81,48 @@ func Flatten(xs cue.Value) ([]cue.Value, error) {
 		return res, nil
 	}
 	return flatten(xs)
+}
+
+// FlattenN reports a flattend sequence of the list xs by expanding any elements
+// depth levels deep. If depth is negative all elements are expanded.
+//
+// For instance:
+//
+//    FlattenN([1, [[2, 3], []], [4]], 1)
+//
+// results in
+//
+//    [1, [2, 3], [], 4]
+//
+func FlattenN(xs cue.Value, depth *internal.Decimal) ([]cue.Value, error) {
+	var flattenN func(cue.Value, *internal.Decimal) ([]cue.Value, error)
+	one := apd.New(1, 0)
+	flattenN = func(xs cue.Value, depth *internal.Decimal) ([]cue.Value, error) {
+		var res []cue.Value
+		iter, err := xs.List()
+		if err != nil {
+			return nil, err
+		}
+		for iter.Next() {
+			val := iter.Value()
+			if val.Kind() == cue.ListKind && !depth.IsZero() {
+				d := apd.New(0, 0)
+				_, err := internal.BaseContext.Sub(d, depth, one)
+				if err != nil {
+					return nil, err
+				}
+				vals, err := flattenN(val, d)
+				if err != nil {
+					return nil, err
+				}
+				res = append(res, vals...)
+			} else {
+				res = append(res, val)
+			}
+		}
+		return res, nil
+	}
+	return flattenN(xs, depth)
 }
 
 // Take reports the prefix of length n of list x, or x itself if n > len(x).

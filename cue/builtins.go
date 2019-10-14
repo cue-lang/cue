@@ -717,6 +717,43 @@ var builtinPackages = map[string]*builtinPkg{
 				}()
 			},
 		}, {
+			Name:   "FlattenN",
+			Params: []kind{topKind, numKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				xs, depth := c.value(0), c.decimal(1)
+				c.ret, c.err = func() (interface{}, error) {
+					var flattenN func(Value, *internal.Decimal) ([]Value, error)
+					one := apd.New(1, 0)
+					flattenN = func(xs Value, depth *internal.Decimal) ([]Value, error) {
+						var res []Value
+						iter, err := xs.List()
+						if err != nil {
+							return nil, err
+						}
+						for iter.Next() {
+							val := iter.Value()
+							if val.Kind() == ListKind && !depth.IsZero() {
+								d := apd.New(0, 0)
+								_, err := internal.BaseContext.Sub(d, depth, one)
+								if err != nil {
+									return nil, err
+								}
+								vals, err := flattenN(val, d)
+								if err != nil {
+									return nil, err
+								}
+								res = append(res, vals...)
+							} else {
+								res = append(res, val)
+							}
+						}
+						return res, nil
+					}
+					return flattenN(xs, depth)
+				}()
+			},
+		}, {
 			Name:   "Take",
 			Params: []kind{listKind, intKind},
 			Result: listKind,

@@ -22,6 +22,7 @@ import (
 	"io"
 	"math"
 	"math/big"
+	"math/bits"
 	"strconv"
 	"strings"
 	"unicode"
@@ -66,9 +67,67 @@ const (
 
 	nextKind
 
+	// _numberKind is used as a implementation detail inside
+	// Kind.String to indicate NumberKind.
+	_numberKind
+
 	// NumberKind represents any kind of number.
 	NumberKind = IntKind | FloatKind
 )
+
+// String returns the representation of the Kind as
+// a CUE expression. For example:
+//
+//	(IntKind|ListKind).String()
+//
+// will return:
+//
+//	(int|[...])
+func (k Kind) String() string {
+	if k == BottomKind {
+		return "_|_"
+	}
+	if (k & NumberKind) == NumberKind {
+		k = (k &^ NumberKind) | _numberKind
+	}
+	var buf strings.Builder
+	multiple := bits.OnesCount(uint(k)) > 1
+	if multiple {
+		buf.WriteByte('(')
+	}
+	for count := 0; ; count++ {
+		n := bits.TrailingZeros(uint(k))
+		if n == bits.UintSize {
+			break
+		}
+		bit := Kind(1 << uint(n))
+		k &^= bit
+		s, ok := kindStrs[bit]
+		if !ok {
+			s = fmt.Sprintf("bad(%d)", n)
+		}
+		if count > 0 {
+			buf.WriteByte('|')
+		}
+		buf.WriteString(s)
+	}
+	if multiple {
+		buf.WriteByte(')')
+	}
+	return buf.String()
+}
+
+var kindStrs = map[Kind]string{
+	NullKind:    "null",
+	BoolKind:    "bool",
+	IntKind:     "int",
+	FloatKind:   "float",
+	StringKind:  "string",
+	BytesKind:   "bytes",
+	StructKind:  "{...}",
+	ListKind:    "[...]",
+	_numberKind: "number",
+}
 
 // An structValue represents a JSON object.
 //

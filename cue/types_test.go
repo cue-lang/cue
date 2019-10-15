@@ -764,7 +764,7 @@ func TestLen(t *testing.T) {
 		// 	length: "2",
 	}, {
 		input:  "3",
-		length: "_|_(len not supported for type 4)", // TODO: fix kind name
+		length: "_|_(len not supported for type int)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
@@ -2181,6 +2181,57 @@ func TestExpr(t *testing.T) {
 				got += " "
 				got += debugStr(v.ctx(), v.path.v)
 			}
+			if got != tc.want {
+				t.Errorf("\n got %v;\nwant %v", got, tc.want)
+			}
+		})
+	}
+}
+
+func TestKindString(t *testing.T) {
+	testCases := []struct {
+		input Kind
+		want  string
+	}{{
+		input: BottomKind,
+		want:  "_|_",
+	}, {
+		input: IntKind | ListKind,
+		want:  `(int|[...])`,
+	}, {
+		input: NullKind,
+		want:  "null",
+	}, {
+		input: IntKind,
+		want:  "int",
+	}, {
+		input: FloatKind,
+		want:  "float",
+	}, {
+		input: StringKind,
+		want:  "string",
+	}, {
+		input: BytesKind,
+		want:  "bytes",
+	}, {
+		input: StructKind,
+		want:  "{...}",
+	}, {
+		input: ListKind,
+		want:  "[...]",
+	}, {
+		input: NumberKind,
+		want:  "number",
+	}, {
+		input: BoolKind | NumberKind | ListKind,
+		want:  "(bool|[...]|number)",
+	}, {
+		input: 1 << 20,
+		want:  "bad(20)",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.want, func(t *testing.T) {
+			got := tc.input.String()
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}

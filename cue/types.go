@@ -1107,6 +1107,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 	obj := v.eval(ctx).(*structLit)
 
 	// TODO: This is expansion appropriate?
+	// TODO: return an incomplete error if there are still expansions remaining.
 	obj, err := obj.expandFields(ctx) // expand comprehensions
 	if err != nil {
 		return structValue{}, err
@@ -1571,29 +1572,81 @@ func (o *options) updateOptions(opts []Option) {
 // more than one error, retrievable with errors.Errors, if more than one
 // exists.
 func (v Value) Validate(opts ...Option) error {
-	o := getOptions(opts)
-	var errs errors.Error
-	v.Walk(func(v Value) bool {
-		if err := v.checkKind(v.ctx(), bottomKind); err != nil {
-			if !o.concrete && isIncomplete(err) {
-				if o.disallowCycles && err.code == codeCycle {
-					errs = errors.Append(errs, v.toErr(err))
-				}
-				return false
+	x := validator{}
+	o := options{omitOptional: true}
+	o.updateOptions(opts)
+	x.walk(v, o)
+	return errors.Sanitize(x.errs)
+}
+
+type validator struct {
+	errs  errors.Error
+	depth int
+}
+
+func (x *validator) before(v Value, o options) bool {
+	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
+		if !o.concrete && isIncomplete(err) {
+			if o.disallowCycles && err.code == codeCycle {
+				x.errs = errors.Append(x.errs, v.toErr(err))
 			}
-			errs = errors.Append(errs, v.toErr(err))
-			if len(errors.Errors(errs)) > 50 {
-				return false // mostly to avoid some hypothetical cycle issue
-			}
+			return false
 		}
-		if o.concrete {
-			if err := isGroundRecursive(v.ctx(), v.eval(v.ctx())); err != nil {
-				errs = errors.Append(errs, v.toErr(err))
-			}
+		x.errs = errors.Append(x.errs, v.toErr(err))
+		if len(errors.Errors(x.errs)) > 50 {
+			return false // mostly to avoid some hypothetical cycle issue
 		}
-		return true
-	}, nil)
-	return errors.Sanitize(errs)
+	}
+	if o.concrete {
+		if err := isGroundRecursive(v.ctx(), v.eval(v.ctx())); err != nil {
+			x.errs = errors.Append(x.errs, v.toErr(err))
+		}
+	}
+	return true
+}
+
+func (x *validator) walk(v Value, opts options) {
+	// TODO(#42): we can get rid of the arbitrary evaluation depth once CUE has
+	// proper structural cycle detection. See Issue #42. Currently errors
+	// occuring at a depth > 20 will not be detected.
+	if x.depth > 20 {
+		return
+	}
+	ctx := v.ctx()
+	switch v.Kind() {
+	case StructKind:
+		if !x.before(v, opts) {
+			return
+		}
+		x.depth++
+		obj, err := v.structValOpts(ctx, opts)
+		if err != nil {
+			x.errs = errors.Append(x.errs, v.toErr(err))
+		}
+		for i := 0; i < obj.Len(); i++ {
+			_, v := obj.At(i)
+			opts := opts
+			if obj.n.arcs[i].definition {
+				opts.concrete = false
+			}
+			x.walk(v, opts)
+		}
+		x.depth--
+
+	case ListKind:
+		if !x.before(v, opts) {
+			return
+		}
+		x.depth++
+		list, _ := v.List()
+		for list.Next() {
+			x.walk(list.Value(), opts)
+		}
+		x.depth--
+
+	default:
+		x.before(v, opts)
+	}
 }
 
 func isGroundRecursive(ctx *context, v value) *bottom {

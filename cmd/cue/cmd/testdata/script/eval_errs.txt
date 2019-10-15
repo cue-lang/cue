@@ -1,0 +1,20 @@
+! cue eval errs.cue
+cmp stderr expect-stderr
+cmp stdout expect-stdout
+
+-- expect-stdout --
+-- expect-stderr --
+bar: empty disjunction: conflicting values int and "str" (mismatched types int and string):
+    ./errs.cue:5:10
+    ./errs.cue:6:16
+x.q: conflicting values "hello" and "goodbye":
+    ./errs.cue:1:4
+    ./errs.cue:2:4
+-- errs.cue --
+a: "hello"
+b: "goodbye"
+x: {q: a, q: b}
+
+foo: {a: int} | {b: string}
+bar: foo & {a: "str", b: 2}
+

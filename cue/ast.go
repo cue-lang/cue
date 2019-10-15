@@ -335,9 +335,6 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		opt := n.Optional != token.NoPos
 		isDef := n.Token == token.ISA
 		if isDef {
-			if opt {
-				v.errf(n, "a definition may not be optional")
-			}
 			ctx := v.ctx()
 			ctx.inDefinition++
 			defer func() { ctx.inDefinition-- }()

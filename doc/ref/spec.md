@@ -1010,7 +1010,7 @@ If a field `f` is in both `a` and `b`, `c.f` is optional only if both
 `a.f` and `b.f` are optional.
 Any [references](#References) to `a` or `b`
 in their respective field values need to be replaced with references to `c`.
-The result of a unification is bottom (`_|_`) if any of its required
+The result of a unification is bottom (`_|_`) if any of its non-optional
 fields evaluates to bottom, recursively.
 <!--NOTE: About bottom values for optional fields being okay.
 

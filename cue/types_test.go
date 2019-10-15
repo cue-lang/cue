@@ -1075,6 +1075,29 @@ func TestValidate(t *testing.T) {
 		a: 1
 		b: { c: 2, d: 3 }
 		c d e f: 5
+		g?: int
+		`,
+		opts: []Option{Concrete(true)},
+	}, {
+		desc: "definition error",
+		in: `
+			b :: 1 & 2
+			`,
+		opts: []Option{},
+		err:  true,
+	}, {
+		desc: "definition error okay if optional",
+		in: `
+			b? :: 1 & 2
+			`,
+		opts: []Option{},
+	}, {
+		desc: "definition with optional",
+		in: `
+			b:: {
+				a: int
+				b?: >=0
+			}
 		`,
 		opts: []Option{Concrete(true)},
 	}, {
@@ -1124,6 +1147,12 @@ func TestValidate(t *testing.T) {
 
 		a: { b: time.Duration } | { c: time.Duration }
 		`,
+	}, {
+		desc: "comprehension error",
+		in: `
+			a: { if b == "foo" { field: 2 } }
+			`,
+		err: true,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

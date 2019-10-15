@@ -117,6 +117,7 @@ func doVet(cmd *Command, args []string) error {
 		opt := []cue.Option{
 			cue.Attributes(true),
 			cue.Optional(true),
+			cue.Definitions(true),
 			cue.Hidden(true),
 		}
 		w := cmd.Stderr()

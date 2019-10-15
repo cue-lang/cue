@@ -27,6 +27,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
@@ -402,16 +403,23 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 
 	f := &ast.File{}
 
-	h := hoister{
-		fields:   map[string]bool{},
-		altNames: map[string]*ast.Ident{},
+	if flagRecursive.Bool(cmd) {
+		h := hoister{fields: map[string]bool{}}
+
+		imports := &ast.ImportDecl{}
+
+		h.hoist(&ast.File{Decls: []ast.Decl{
+			imports,
+			&ast.EmbedDecl{Expr: &ast.ListLit{Elts: objs}},
+		}})
+
+		if len(imports.Specs) > 0 {
+			f.Decls = append(f.Decls, imports)
+		}
 	}
 
 	index := newIndex()
 	for _, expr := range objs {
-		if flagRecursive.Bool(cmd) {
-			h.hoist(expr)
-		}
 
 		// Compute a path different from root.
 		var pathElems []ast.Label
@@ -475,25 +483,6 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 			}
 			field.Value = expr
 		}
-	}
-
-	if len(h.altNames) > 0 {
-		imports := &ast.ImportDecl{}
-
-		for _, enc := range encoding.All() {
-			if ident, ok := h.altNames[enc.Name()]; ok {
-				short := enc.Name()
-				name := h.uniqueName(short, "", "")
-				ident.Name = name
-				if name == short {
-					ident = nil
-				}
-
-				imports.Specs = append(imports.Specs,
-					ast.NewImport(ident, "encoding/"+short))
-			}
-		}
-		f.Decls = append([]ast.Decl{imports}, f.Decls...)
 	}
 
 	if pkg != "" {
@@ -638,12 +627,11 @@ func handleProtoDef(cmd *Command, path string, r io.Reader) (f *ast.File, err er
 }
 
 type hoister struct {
-	fields   map[string]bool
-	altNames map[string]*ast.Ident
+	fields map[string]bool
 }
 
-func (h *hoister) hoist(expr ast.Expr) {
-	ast.Walk(expr, nil, func(n ast.Node) {
+func (h *hoister) hoist(f *ast.File) {
+	ast.Walk(f, nil, func(n ast.Node) {
 		name := ""
 		switch x := n.(type) {
 		case *ast.Field:
@@ -656,65 +644,55 @@ func (h *hoister) hoist(expr ast.Expr) {
 		}
 	})
 
-	ast.Walk(expr, func(n ast.Node) bool {
+	_ = astutil.Apply(f, func(c astutil.Cursor) bool {
+		n := c.Node()
 		switch n.(type) {
 		case *ast.Comprehension:
 			return false
 		}
 		return true
 
-	}, func(n ast.Node) {
-		obj, ok := n.(*ast.StructLit)
-		if !ok {
-			return
-		}
-		for i := 0; i < len(obj.Elts); i++ {
-			f, ok := obj.Elts[i].(*ast.Field)
-			if !ok {
-				continue
-			}
-
+	}, func(c astutil.Cursor) bool {
+		switch f := c.Node().(type) {
+		case *ast.Field:
 			name, ident := internal.LabelName(f.Label)
 			if name == "" || !ident {
-				continue
+				return false
 			}
 
 			lit, ok := f.Value.(*ast.BasicLit)
 			if !ok || lit.Kind != token.STRING {
-				continue
+				return false
 			}
 
 			str, err := literal.Unquote(lit.Value)
 			if err != nil {
-				continue
+				return false
 			}
 
 			expr, enc := tryParse(str)
 			if expr == nil {
-				continue
+				return false
 			}
 
-			if h.altNames[enc.typ] == nil {
-				h.altNames[enc.typ] = &ast.Ident{Name: "_cue"} // set name later
+			pkg := c.Import("encoding/" + enc.typ)
+			if pkg == nil {
+				return false
 			}
 
 			// found a replacable string
 			dataField := h.uniqueName(name, "_", "cue_")
 
 			f.Value = ast.NewCall(
-				ast.NewSel(h.altNames[enc.typ], "Marshal"),
+				ast.NewSel(pkg, "Marshal"),
 				ast.NewIdent(dataField))
 
-			obj.Elts = append(obj.Elts, nil)
-			copy(obj.Elts[i+1:], obj.Elts[i:])
-
-			obj.Elts[i+1] = &ast.Alias{
+			c.InsertAfter(astutil.ApplyRecursively(&ast.Alias{
 				Ident: ast.NewIdent(dataField),
 				Expr:  expr,
-			}
-
-			h.hoist(expr)
+			}))
 		}
+		return true
 	})
 }
 

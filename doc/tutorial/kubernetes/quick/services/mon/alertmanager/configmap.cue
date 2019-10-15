@@ -1,12 +1,12 @@
 package kube
 
-import "encoding/yaml"
+import yaml656e63 "encoding/yaml"
 
 configMap alertmanager: {
 	apiVersion: "v1"
 	kind:       "ConfigMap"
 	data: {
-		"alerts.yaml": yaml.Marshal(_cue_alerts_yaml)
+		"alerts.yaml": yaml656e63.Marshal(_cue_alerts_yaml)
 		_cue_alerts_yaml = {
 			receivers: [{
 				name: "pager"

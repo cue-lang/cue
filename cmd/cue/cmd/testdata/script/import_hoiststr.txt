@@ -1,7 +1,7 @@
 cue import -o - -f --list -l '"\(strings.ToLower(kind))" "\(name)"' --recursive ./import
 cmp stdout expect-stdout
 -- expect-stdout --
-import xjson "encoding/json"
+import json656e63 "encoding/json"
 
 service: {
 	booster: [{
@@ -14,7 +14,7 @@ service: {
 		supplement
 		foo
 		"""
-		json: xjson.Marshal(_cue_json)
+		json: json656e63.Marshal(_cue_json)
 		_cue_json = [1, 2]
 	}]
 }

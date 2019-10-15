@@ -1,12 +1,12 @@
 package kube
 
-import "encoding/yaml"
+import yaml656e63 "encoding/yaml"
 
 configMap prometheus: {
 	apiVersion: "v1"
 	kind:       "ConfigMap"
 	data: {
-		"alert.rules": yaml.Marshal(_cue_alert_rules)
+		"alert.rules": yaml656e63.Marshal(_cue_alert_rules)
 		_cue_alert_rules = {
 			groups: [{
 				name: "rules.yaml"
@@ -48,7 +48,7 @@ configMap prometheus: {
 			}]
 		}
 
-		"prometheus.yml": yaml.Marshal(_cue_prometheus_yml)
+		"prometheus.yml": yaml656e63.Marshal(_cue_prometheus_yml)
 		_cue_prometheus_yml = {
 			global scrape_interval: "15s"
 			rule_files: [

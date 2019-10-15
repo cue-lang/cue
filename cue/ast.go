@@ -47,10 +47,8 @@ func (inst *Instance) insertFile(f *ast.File) errors.Error {
 	if isBottom(result) {
 		val := newValueRoot(v.ctx(), result)
 		v.errors = errors.Append(v.errors, val.toErr(result.(*bottom)))
-		return v.errors
 	}
-
-	return nil
+	return v.errors
 }
 
 type astVisitor struct {

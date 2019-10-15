@@ -65,7 +65,7 @@ func TestBuild(t *testing.T) {
 		`),
 	}
 	pkg2 := &bimport{
-		"example.com/foo/pkg2",
+		"example.com/foo/pkg2:pkg",
 		files(`
 		package pkg
 
@@ -152,18 +152,18 @@ func TestBuild(t *testing.T) {
 			files(
 				`package test
 
-				import "example.com/foo/pkg2"
+				import "example.com/foo/pkg2:pkg"
 
 				"Hello \(pkg2.Number)!"`),
 		}),
-		`imported and not used: "example.com/foo/pkg2"`,
+		`imported and not used: "example.com/foo/pkg2:pkg" (and 1 more errors)`,
 		// `file0.cue:5:14: unresolved reference pkg2`,
 	}, {
 		insts(pkg2, &bimport{"",
 			files(
 				`package test
 
-				import "example.com/foo/pkg2"
+				import "example.com/foo/pkg2:pkg"
 
 				"Hello \(pkg.Number)!"`),
 		}),

@@ -323,7 +323,8 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 		// inst.instance.inst = p
 		inst.Err = resolveFiles(idx, p)
 		for _, f := range files {
-			inst.insertFile(f)
+			err := inst.insertFile(f)
+			inst.Err = errors.Append(inst.Err, err)
 		}
 	}
 	inst.ImportPath = p.ImportPath

@@ -255,8 +255,11 @@ func TestCompile(t *testing.T) {
 			a: *1,
 			b: **1 | 2
 		`,
-		out: `<0>{a: _|_(preference mark not allowed at this position), ` +
-			`b: (*_|_(preference mark not allowed at this position) | 2)}`,
+		out: `a: preference mark not allowed at this position:
+    test:2:7
+b: preference mark not allowed at this position:
+    test:3:8
+<0>{}`,
 	}, {
 		in: `
 			a: int @foo(1,"str")

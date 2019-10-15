@@ -1,5 +1,5 @@
-cue eval -i genfield.cue
-cmp stdout expect-stdout-cue
+! cue eval genfield.cue
+cmp stderr expect-stderr
 
 -- frontmatter.toml --
 title = "Interpolation of Field Names"
@@ -18,10 +18,6 @@ sandwich: {
     butterAndCheese: hasButter && hasCheese
 }
 
--- expect-stdout-cue --
-sandwich: {
-    type:            "Cheese"
-    hasButter:       true
-    butterAndCheese: _|_ // reference "hasCheese" not found
-    hasCheese:       true
-}
+-- expect-stderr --
+sandwich.butterAndCheese: reference "hasCheese" not found:
+    ./genfield.cue:5:35

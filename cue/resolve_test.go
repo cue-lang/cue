@@ -28,6 +28,7 @@ func compileFileWithErrors(t *testing.T, body string) (*context, *structLit, err
 }
 
 func compileFile(t *testing.T, body string) (*context, *structLit) {
+	t.Helper()
 	ctx, inst, errs := compileInstance(t, body)
 	if errs != nil {
 		t.Fatal(errs)

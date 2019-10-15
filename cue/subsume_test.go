@@ -173,27 +173,29 @@ func TestSubsume(t *testing.T) {
 
 		// Call
 		113: {subsumes: true, in: `
-			a: fn(),
-			b: fn()`,
+			a: fn()
+			b: fn()
+			fn: _`,
 		},
-		// TODO: allow subsumption of unevaluated values?
-		114: {subsumes: true, in: `
-			a: len(),
-			b: len(1)`,
+		114: {subsumes: false, in: `
+			a: fn(),
+			b: fn(1)
+			fn: _`,
 		},
 		115: {subsumes: true, in: `
 			a: fn(2)
-			b: fn(2)`,
+			b: fn(2)
+			fn: _`,
 		},
-		// TODO: allow subsumption of unevaluated values?
 		116: {subsumes: true, in: `
 			a: fn(number)
-			b: fn(2)`,
+			b: fn(2)
+			fn: _`,
 		},
-		// TODO: allow subsumption of unevaluated values?
-		117: {subsumes: true, in: `
+		117: {subsumes: false, in: `
 			a: fn(2)
-			b: fn(number)`,
+			b: fn(number)
+			fn: _`,
 		},
 
 		// TODO: allow subsumption of unevaluated values?

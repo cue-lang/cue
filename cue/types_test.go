@@ -63,13 +63,13 @@ func TestValueType(t *testing.T) {
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
-	}, { // TODO: should be error{
-		value:          `v: b`,
+	}, {
+		value:          `v: b, b: 1&2`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
 	}, {
-		value:          `v: (b[a])`,
+		value:          `v: (b[a]), b: 1, a: 1`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
@@ -79,7 +79,7 @@ func TestValueType(t *testing.T) {
 		kind:           BottomKind,
 		incompleteKind: BoolKind,
 	}, {
-		value:          `v: ([][b])`,
+		value:          `v: ([][b]), b: "d"`,
 		kind:           BottomKind,
 		incompleteKind: BottomKind,
 		concrete:       true,
@@ -1129,10 +1129,9 @@ func TestValidate(t *testing.T) {
 		t.Run(tc.desc, func(t *testing.T) {
 			r := Runtime{}
 			inst, err := r.Parse("validate", tc.in)
-			if err != nil {
-				t.Fatal(err)
+			if err == nil {
+				err = inst.Value().Validate(tc.opts...)
 			}
-			err = inst.Value().Validate(tc.opts...)
 			if gotErr := err != nil; gotErr != tc.err {
 				t.Errorf("got %v; want %v", err, tc.err)
 			}

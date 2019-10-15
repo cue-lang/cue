@@ -21,6 +21,7 @@ import (
 	"unicode"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -206,6 +207,9 @@ func (inst *Instance) AddFile(filename string, src interface{}) error {
 // AddSyntax adds the given file to list of files for this instance. The package
 // name of the file must match the package name of the instance.
 func (inst *Instance) AddSyntax(file *ast.File) errors.Error {
+	astutil.Resolve(file, func(pos token.Pos, msg string, args ...interface{}) {
+		inst.Err = errors.Append(inst.Err, errors.Newf(pos, msg, args...))
+	})
 	_, pkg, pos := internal.PackageInfo(file)
 	if !inst.setPkg(pkg) && pkg != inst.PkgName {
 		err := errors.Newf(pos,

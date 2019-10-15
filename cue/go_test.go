@@ -125,7 +125,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `"2019-04-01T00:00:00Z"`,
 	}}
-	inst := getInstance(t, "foo")
+	inst := getInstance(t, "{}")
 	b := ast.NewIdent("dummy")
 	for _, tc := range testCases {
 		ctx := inst.newContext()
@@ -228,7 +228,7 @@ func TestConvertType(t *testing.T) {
 		time.Now, // a function
 		"_|_(unsupported Go type (func() time.Time))",
 	}}
-	inst := getInstance(t, "foo")
+	inst := getInstance(t, "{}")
 
 	for _, tc := range testCases {
 		ctx := inst.newContext()

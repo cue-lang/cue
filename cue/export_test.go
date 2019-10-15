@@ -326,6 +326,8 @@ func TestExport(t *testing.T) {
 			}
 		}`),
 	}, {
+		// TODO: positions of embedded structs is not preserved. Use some kind
+		// of topological sort to preserve order.
 		raw: true,
 		in: `{
 			emb :: {
@@ -358,13 +360,13 @@ func TestExport(t *testing.T) {
 				a: 10
 			}
 			def :: {
-				emb
 				b: 2
+				emb
 			}
 			e :: {
-				f
 				<_>: <100
 				b:   int
+				f
 			}
 		}`),
 	}, {

@@ -270,6 +270,27 @@ b: preference mark not allowed at this position:
 			a: int @b('' ,b) // invalid
 		`,
 		out: "attribute missing ')':\n    test:2:16\nmissing ',' in struct literal:\n    test:3:3\n<0>{}",
+	}, {
+		in: `
+		a d: {
+			base
+			info :: {
+				...
+			}
+			Y: info.X
+		}
+
+		base :: {
+			info :: {...}
+		}
+
+		a <Name>: { info :: {
+			X: "foo"
+		}}
+		`,
+		out: `<0>{` +
+			`a: (<1>{d: <2>{info :: <3>{...}, Y: <2>.info.X}, <0>.base} & <4>{<>: <5>(Name: string)-><6>{info :: <7>C{X: "foo"}}, }), ` +
+			`base :: <8>C{info :: <9>{...}}}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

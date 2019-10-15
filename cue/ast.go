@@ -263,9 +263,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 					return v1.errf(x, "can only embed structs (found %v)", e.kind())
 				}
 				ret = mkBin(v1.ctx(), x.Pos(), opUnifyUnchecked, ret, e)
-				obj = &structLit{}
-				v1.object = obj
-				ret = mkBin(v1.ctx(), x.Pos(), opUnifyUnchecked, ret, obj)
+				// TODO: preserve order of embedded fields. We cannot split into
+				// separate unifications here, as recursive references point to
+				// obj and would have to be dereferenced and copied.
+				// Solving this is best done with a generic topological sort
+				// mechanism.
 
 			case *ast.Field, *ast.Alias:
 				v1.walk(e)

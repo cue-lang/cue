@@ -2426,6 +2426,24 @@ func TestFullEval(t *testing.T) {
 			`comp: <2>{txt: 2, regular: 4}, ` +
 			`select: <3>{opt: <4>.foo.opt, txt: 2, def :: 3, regular: 4, _hidden: 5}, ` +
 			`index: <5>{opt: <4>.foo["opt"], txt: 2, def :: _|_(<4>.foo["def"]:field "def" is a definition), regular: 4, _hidden: <4>.foo["_hidden"]}}`,
+	}, {
+		desc: "retain references with interleaved embedding",
+		in: `
+		a d: {
+			base
+			info :: {...}
+			Y: info.X
+		}
+
+		base :: {
+			info :: {...}
+		}
+
+		a <Name>: { info :: {
+			X: "foo"
+		}}
+		`,
+		out: `<0>{a: <1>{<>: <2>(Name: string)-><3>{info :: <4>C{X: "foo"}}, d: <5>C{info :: <6>C{X: "foo"}, Y: "foo"}}, base :: <7>C{info :: <8>{...}}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }
@@ -2436,10 +2454,6 @@ func TestX(t *testing.T) {
 	// Don't remove. For debugging.
 	testCases := []testCase{{
 		in: `
-		Foo :: { a: int }
-
-		Foo
-		b: int
 		`,
 	}}
 	rewriteHelper(t, testCases, evalFull)

@@ -12,6 +12,7 @@ import (
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"html"
 	"io"
@@ -119,6 +120,10 @@ var pathBase = path.Base
 var pathIsAbs = path.IsAbs
 
 var pathDir = path.Dir
+
+var errNoMatch = errors.New("no match")
+
+var errNoNamedGroup = errors.New("no named groups")
 
 func timeFormat(value, layout string) (bool, error) {
 	_, err := time.Parse(layout, value)
@@ -2022,6 +2027,138 @@ var builtinPackages = map[string]*builtinPkg{
 	},
 	"regexp": &builtinPkg{
 		native: []*builtin{{
+			Name:   "Find",
+			Params: []kind{stringKind, stringKind},
+			Result: stringKind,
+			Func: func(c *callCtxt) {
+				pattern, s := c.string(0), c.string(1)
+				c.ret, c.err = func() (interface{}, error) {
+					re, err := regexp.Compile(pattern)
+					if err != nil {
+						return "", err
+					}
+					m := re.FindStringIndex(s)
+					if m == nil {
+						return "", errNoMatch
+					}
+					return s[m[0]:m[1]], nil
+				}()
+			},
+		}, {
+			Name:   "FindAll",
+			Params: []kind{stringKind, stringKind, intKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				pattern, s, n := c.string(0), c.string(1), c.int(2)
+				c.ret, c.err = func() (interface{}, error) {
+					re, err := regexp.Compile(pattern)
+					if err != nil {
+						return nil, err
+					}
+					m := re.FindAllString(s, n)
+					if m == nil {
+						return nil, errNoMatch
+					}
+					return m, nil
+				}()
+			},
+		}, {
+			Name:   "FindSubmatch",
+			Params: []kind{stringKind, stringKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				pattern, s := c.string(0), c.string(1)
+				c.ret, c.err = func() (interface{}, error) {
+					re, err := regexp.Compile(pattern)
+					if err != nil {
+						return nil, err
+					}
+					m := re.FindStringSubmatch(s)
+					if m == nil {
+						return nil, errNoMatch
+					}
+					return m, nil
+				}()
+			},
+		}, {
+			Name:   "FindAllSubmatch",
+			Params: []kind{stringKind, stringKind, intKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				pattern, s, n := c.string(0), c.string(1), c.int(2)
+				c.ret, c.err = func() (interface{}, error) {
+					re, err := regexp.Compile(pattern)
+					if err != nil {
+						return nil, err
+					}
+					m := re.FindAllStringSubmatch(s, n)
+					if m == nil {
+						return nil, errNoMatch
+					}
+					return m, nil
+				}()
+			},
+		}, {
+			Name:   "FindNamedSubmatch",
+			Params: []kind{stringKind, stringKind},
+			Result: structKind,
+			Func: func(c *callCtxt) {
+				pattern, s := c.string(0), c.string(1)
+				c.ret, c.err = func() (interface{}, error) {
+					re, err := regexp.Compile(pattern)
+					if err != nil {
+						return nil, err
+					}
+					names := re.SubexpNames()
+					if len(names) == 0 {
+						return nil, errNoNamedGroup
+					}
+					m := re.FindStringSubmatch(s)
+					if m == nil {
+						return nil, errNoMatch
+					}
+					r := make(map[string]string, len(names)-1)
+					for k, name := range names {
+						if name != "" {
+							r[name] = m[k]
+						}
+					}
+					return r, nil
+				}()
+			},
+		}, {
+			Name:   "FindAllNamedSubmatch",
+			Params: []kind{stringKind, stringKind, intKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				pattern, s, n := c.string(0), c.string(1), c.int(2)
+				c.ret, c.err = func() (interface{}, error) {
+					re, err := regexp.Compile(pattern)
+					if err != nil {
+						return nil, err
+					}
+					names := re.SubexpNames()
+					if len(names) == 0 {
+						return nil, errNoNamedGroup
+					}
+					m := re.FindAllStringSubmatch(s, n)
+					if m == nil {
+						return nil, errNoMatch
+					}
+					result := make([]map[string]string, len(m))
+					for i, m := range m {
+						r := make(map[string]string, len(names)-1)
+						for k, name := range names {
+							if name != "" {
+								r[name] = m[k]
+							}
+						}
+						result[i] = r
+					}
+					return result, nil
+				}()
+			},
+		}, {
 			Name:   "Match",
 			Params: []kind{stringKind, stringKind},
 			Result: boolKind,

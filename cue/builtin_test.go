@@ -277,6 +277,41 @@ func TestBuiltins(t *testing.T) {
 		test("encoding/csv", `csv.Decode("1,2,3\n4,5,6")`),
 		`[["1","2","3"],["4","5","6"]]`,
 	}, {
+		test("regexp", `regexp.Find(#"f\w\w"#, "afoot")`),
+		`"foo"`,
+	}, {
+		test("regexp", `regexp.Find(#"f\w\w"#, "bar")`),
+		`_|_(error in call to regexp.Find: no match)`,
+	}, {
+		test("regexp", `regexp.FindAll(#"f\w\w"#, "afoot afloat from", 2)`),
+		`["foo","flo"]`,
+	}, {
+		test("regexp", `regexp.FindAll(#"f\w\w"#, "afoot afloat from", 2)`),
+		`["foo","flo"]`,
+	}, {
+		test("regexp", `regexp.FindAll(#"f\w\w"#, "bla bla", -1)`),
+		`_|_(error in call to regexp.FindAll: no match)`,
+	}, {
+		test("regexp", `regexp.FindSubmatch(#"f(\w)(\w)"#, "afloat afoot from")`),
+		`["flo","l","o"]`,
+	}, {
+		test("regexp", `regexp.FindAllSubmatch(#"f(\w)(\w)"#, "afloat afoot from", -1)`),
+		`[["flo","l","o"],["foo","o","o"],["fro","r","o"]]`,
+	}, {
+		test("regexp", `regexp.FindAllSubmatch(#"f(\w)(\w)"#, "aglom", -1)`),
+		`_|_(error in call to regexp.FindAllSubmatch: no match)`,
+	}, {
+		test("regexp", `regexp.FindNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from")`),
+		`{A: "l", B: "o"}`,
+	}, {
+		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", -1)`),
+		`[{A: "l", B: "o"},{A: "o", B: "o"},{A: "r", B: "o"}]`,
+	}, {
+		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>optional)?"#, "fbla", -1)`),
+		`[{A: ""}]`}, {
+		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "aglom", -1)`),
+		`_|_(error in call to regexp.FindAllNamedSubmatch: no match)`,
+	}, {
 		test("strconv", `strconv.FormatBool(true)`),
 		`"true"`,
 	}, {

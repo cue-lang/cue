@@ -30,6 +30,8 @@ import (
 //
 // Any operation that involves two Values or Instances should originate from
 // the same Runtime.
+//
+// The zero value of a Runtime is ready to use.
 type Runtime struct {
 	ctx *build.Context // TODO: remove
 	idx *index

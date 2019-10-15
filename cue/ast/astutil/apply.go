@@ -64,15 +64,25 @@ type Cursor interface {
 
 	// InsertAfter inserts n after the current Node in its containing struct.
 	// If the current Node is not part of a struct, InsertAfter panics.
-	// Apply does not walk n.
+	// Unless n is wrapped by ApplyRecursively, Apply does not walk n.
 	InsertAfter(n ast.Node)
 
 	// InsertBefore inserts n before the current Node in its containing struct.
 	// If the current Node is not part of a struct, InsertBefore panics.
-	// Apply will not walk n.
+	// Unless n is wrapped by ApplyRecursively, Apply does not walk n.
 	InsertBefore(n ast.Node)
 
 	self() *cursor
+}
+
+// ApplyRecursively indicates that a node inserted with InsertBefore,
+// or InsertAfter should be processed recursively.
+func ApplyRecursively(n ast.Node) ast.Node {
+	return recursive{n}
+}
+
+type recursive struct {
+	ast.Node
 }
 
 type info struct {
@@ -191,8 +201,12 @@ func (c *cursor) Replace(n ast.Node) {
 	if ast.Comments(n) != nil {
 		CopyComments(n, c.node)
 	}
+	if r, ok := n.(recursive); ok {
+		n = r.Node
+	} else {
+		c.replaced = true
+	}
 	c.node = n
-	c.replaced = true
 }
 
 func (c *cursor) InsertAfter(n ast.Node)  { panic("unsupported") }
@@ -249,15 +263,23 @@ func applyExprList(v applyVisitor, parent Cursor, ptr interface{}, list []ast.Ex
 
 type declsCursor struct {
 	*cursor
-	decls, after []ast.Decl
-	delete       bool
+	decls, after, process []ast.Decl
+	delete                bool
 }
 
 func (c *declsCursor) InsertAfter(n ast.Node) {
+	if r, ok := n.(recursive); ok {
+		n = r.Node
+		c.process = append(c.process, n.(ast.Decl))
+	}
 	c.after = append(c.after, n.(ast.Decl))
 }
 
 func (c *declsCursor) InsertBefore(n ast.Node) {
+	if r, ok := n.(recursive); ok {
+		n = r.Node
+		c.process = append(c.process, n.(ast.Decl))
+	}
 	c.decls = append(c.decls, n.(ast.Decl))
 }
 
@@ -279,8 +301,18 @@ func applyDeclList(v applyVisitor, parent Cursor, list []ast.Decl) []ast.Decl {
 			c.decls = append(c.decls, c.node.(ast.Decl))
 		}
 		c.delete = false
+		for i := 0; i < len(c.process); i++ {
+			x := c.process[i]
+			c.node = x
+			c.typ = &c.process[i]
+			applyCursor(v, c)
+			if c.delete {
+				panic("cannot delete a node that was added with InsertBefore or InsertAfter")
+			}
+		}
 		c.decls = append(c.decls, c.after...)
 		c.after = c.after[:0]
+		c.process = c.process[:0]
 	}
 
 	// TODO: ultimately, programmatically linked nodes have to be resolved

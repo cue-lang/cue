@@ -87,6 +87,56 @@ iam: new
 			return true
 		},
 	}, {
+		name: "insert after recursive",
+		in: `
+			foo: {
+				a: 3 @test()
+			}
+			`,
+		out: `
+foo: {
+	a: 3 @test()
+	iam: {
+		here:  new
+		there: new
+	}
+	everywhere: new
+}
+iam: {
+	here:  new
+	there: new
+}
+everywhere: new
+	`,
+		before: func(c astutil.Cursor) bool {
+			switch x := c.Node().(type) {
+			case *ast.Field:
+				switch x.Label.(*ast.Ident).Name {
+				default:
+					c.InsertAfter(astutil.ApplyRecursively(&ast.Field{
+						Label: ast.NewIdent("iam"),
+						Value: &ast.StructLit{Elts: []ast.Decl{
+							&ast.Field{
+								Label: ast.NewIdent("here"),
+								Value: ast.NewIdent("new"),
+							},
+						}},
+					}))
+				case "iam":
+					c.InsertAfter(&ast.Field{
+						Label: ast.NewIdent("everywhere"),
+						Value: ast.NewIdent("new"),
+					})
+				case "here":
+					c.InsertAfter(&ast.Field{
+						Label: ast.NewIdent("there"),
+						Value: ast.NewIdent("new"),
+					})
+				case "everywhere":
+				}
+			}
+			return true
+		}}, {
 		name: "templates",
 		in: `
 				foo: {

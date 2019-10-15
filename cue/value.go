@@ -640,7 +640,7 @@ type structLit struct {
 	// template must evaluated to a lambda and is applied to all concrete
 	// values in the struct, whether it be open or closed.
 	template    value
-	closeStatus byte
+	closeStatus closeMode
 
 	comprehensions []value
 
@@ -649,14 +649,33 @@ type structLit struct {
 	expanded evaluated
 }
 
-func (x *structLit) isClosed() bool {
-	return x.closeStatus != 0
-}
+type closeMode byte
 
 const (
-	toClose  = 1
-	isClosed = 2
+	shouldFinalize closeMode = 1 << iota
+	toClose
+	isClosed
 )
+
+func (m closeMode) shouldFinalize() bool {
+	return m&shouldFinalize != 0
+}
+
+func (m *closeMode) unclose() {
+	*m &^= (toClose | isClosed)
+}
+
+func (m closeMode) isClosed() bool {
+	return m&isClosed != 0
+}
+
+func (m closeMode) shouldClose() bool {
+	return m >= toClose
+}
+
+func (x *structLit) isClosed() bool {
+	return x.closeStatus.isClosed()
+}
 
 func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
 	if x.template == nil {
@@ -667,7 +686,7 @@ func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
 }
 
 func (x *structLit) allows(f label) bool {
-	return x.closeStatus&isClosed == 0 || f&hidden != 0
+	return !x.closeStatus.isClosed() || f&hidden != 0
 }
 
 func newStruct(src source) *structLit {
@@ -762,6 +781,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 
 		var doc *ast.Field
 		v, doc = x.applyTemplate(ctx, i, v)
+		// only place to apply template?
 
 		if (len(ctx.evalStack) > 0 && ctx.cycleErr) || cycleError(v) != nil {
 			// Don't cache while we're in a evaluation cycle as it will cache
@@ -776,11 +796,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		// it is safe to cache the result.
 		ctx.cycleErr = false
 
-		if s, ok := v.(*structLit); ok {
-			if s.closeStatus != 0 {
-				s.closeStatus = 2
-			}
-		}
+		updateCloseStatus(v)
 		x.arcs[i].cache = v
 		if doc != nil {
 			x.arcs[i].docs = &docNode{n: doc, left: x.arcs[i].docs}
@@ -802,10 +818,6 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 // should not be evaluated until the other fields of a struct are
 // fully evaluated.
 func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
-	if x.closeStatus == toClose {
-		x.closeStatus = isClosed
-	}
-
 	switch v := x.expanded.(type) {
 	case nil:
 	case *structLit:
@@ -822,6 +834,8 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 
 	comprehensions := x.comprehensions
 
+	var incomplete []value
+
 	var n evaluated = &top{x.baseValue}
 	if x.emit != nil {
 		n = x.emit.evalPartial(ctx)
@@ -829,6 +843,14 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 
 	for _, x := range comprehensions {
 		v := x.evalPartial(ctx)
+		if v, ok := v.(*bottom); ok {
+			if isIncomplete(v) {
+				incomplete = append(incomplete, x)
+				continue
+			}
+
+			return nil, v
+		}
 		src := binSrc(x.Pos(), opUnify, x, v)
 		n = binOp(ctx, src, opUnifyUnchecked, n, v)
 	}
@@ -838,16 +860,19 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	case *bottom:
 	case *structLit:
 		orig := *x
-		orig.comprehensions = nil
+		orig.comprehensions = incomplete
 		orig.emit = nil
 		n = binOp(ctx, src, opUnifyUnchecked, &orig, n)
 
 	default:
+		if len(comprehensions) == len(incomplete) {
+			return x, nil
+		}
 		if x.emit != nil {
 			v := x.emit.evalPartial(ctx)
 			n = binOp(ctx, src, opUnifyUnchecked, v, n)
 		}
-		return nil, ctx.mkErr(x, "invalid embedding")
+		return nil, ctx.mkErr(x, n, "invalid embedding")
 	}
 
 	switch v := n.(type) {
@@ -866,7 +891,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 
 func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (evaluated, *ast.Field) {
 	if x.template != nil {
-		fn, err := evalLambda(ctx, x.template)
+		fn, err := evalLambda(ctx, x.template, x.closeStatus != 0)
 		if err != nil {
 			return err, nil
 		}
@@ -953,6 +978,46 @@ func (a *arc) val() evaluated {
 func (a *arc) setValue(v value) {
 	a.v = v
 	a.cache = nil
+}
+
+type closeIfStruct struct {
+	value
+}
+
+func wrapFinalize(v value) value {
+	if v.kind().isAnyOf(structKind | listKind) {
+		switch x := v.(type) {
+		case *top:
+			return v
+		case *structLit, *list, *disjunction:
+			updateCloseStatus(v)
+		case *closeIfStruct:
+			return x
+		}
+		return &closeIfStruct{v}
+	}
+	return v
+}
+
+func updateCloseStatus(v value) {
+	switch x := v.(type) {
+	case *structLit:
+		if x.closeStatus.shouldClose() {
+			x.closeStatus = isClosed
+		}
+		x.closeStatus |= shouldFinalize
+
+	case *disjunction:
+		for _, d := range x.values {
+			d.val = wrapFinalize(d.val)
+		}
+
+	case *list:
+		wrapFinalize(x.elem)
+		if x.typ != nil {
+			wrapFinalize(x.typ)
+		}
+	}
 }
 
 // insertValue is used during initialization but never during evaluation.
@@ -1510,6 +1575,6 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 		if k := source.kind(); k&(structKind|listKind) == bottomKind {
 			return ctx.mkErr(x, x.source, "feed source must be list or struct, found %s", k)
 		}
-		return ctx.mkErr(x, "feed source not fully evaluated to struct or list")
+		return ctx.mkErr(x, x.source, codeIncomplete, "incomplete feed source")
 	}
 }

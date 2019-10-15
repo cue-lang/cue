@@ -34,6 +34,14 @@ func (x *nodeRef) rewrite(ctx *context, fn rewriteFunc) value {
 	return x
 }
 
+func (x *closeIfStruct) rewrite(ctx *context, fn rewriteFunc) value {
+	v := rewrite(ctx, x.value, fn)
+	if v == x.value {
+		return x
+	}
+	return wrapFinalize(v)
+}
+
 func (x *structLit) rewrite(ctx *context, fn rewriteFunc) value {
 	emit := x.emit
 	if emit != nil {

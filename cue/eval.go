@@ -319,6 +319,12 @@ func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
 	return st
 }
 
+func (x *closeIfStruct) evalPartial(ctx *context) evaluated {
+	v := x.value.evalPartial(ctx)
+	updateCloseStatus(v)
+	return v
+}
+
 func (x *structLit) evalPartial(ctx *context) (result evaluated) {
 	if ctx.trace {
 		defer uni(indent(ctx, "struct eval", x))

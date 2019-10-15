@@ -590,7 +590,7 @@ func (x *customValidator) check(ctx *context, v evaluated) evaluated {
 	return nil
 }
 
-func evalLambda(ctx *context, a value) (l *lambdaExpr, err evaluated) {
+func evalLambda(ctx *context, a value, finalize bool) (l *lambdaExpr, err evaluated) {
 	if a == nil {
 		return nil, nil
 	}
@@ -603,7 +603,11 @@ func evalLambda(ctx *context, a value) (l *lambdaExpr, err evaluated) {
 	if !ok {
 		return nil, ctx.mkErr(a, "value must be lambda")
 	}
-	return ctx.deref(l).(*lambdaExpr), nil
+	lambda := ctx.deref(l).(*lambdaExpr)
+	if finalize {
+		lambda.value = wrapFinalize(lambda.value)
+	}
+	return lambda, nil
 }
 
 func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) evaluated {
@@ -632,8 +636,8 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	}
 	defer ctx.pushForwards(x, obj, y, obj).popForwards()
 
-	tx, ex := evalLambda(ctx, x.template)
-	ty, ey := evalLambda(ctx, y.template)
+	tx, ex := evalLambda(ctx, x.template, x.closeStatus.shouldFinalize())
+	ty, ey := evalLambda(ctx, y.template, y.closeStatus.shouldFinalize())
 
 	var t *lambdaExpr
 	switch {
@@ -699,7 +703,14 @@ outer:
 					return ctx.mkErr(src, "field %q declared as definition and regular field",
 						ctx.labelStr(a.feature))
 				}
-				v = mkBin(ctx, src.Pos(), op, b.v, v)
+				w := b.v
+				if x.closeStatus.shouldFinalize() {
+					w = wrapFinalize(w)
+				}
+				if y.closeStatus.shouldFinalize() {
+					v = wrapFinalize(v)
+				}
+				v = mkBin(ctx, src.Pos(), op, w, v)
 				obj.arcs[i].v = v
 				obj.arcs[i].cache = nil
 				obj.arcs[i].optional = a.optional && b.optional
@@ -725,7 +736,7 @@ outer:
 	sort.Stable(obj)
 
 	if unchecked && obj.template != nil {
-		obj.closeStatus = 0
+		obj.closeStatus.unclose()
 	}
 
 	return obj

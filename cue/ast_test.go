@@ -291,6 +291,25 @@ b: preference mark not allowed at this position:
 		out: `<0>{` +
 			`a: (<1>{d: <2>{info :: <3>{...}, Y: <2>.info.X}, <0>.base} & <4>{<>: <5>(Name: string)-><6>{info :: <7>C{X: "foo"}}, }), ` +
 			`base :: <8>C{info :: <9>{...}}}`,
+	}, {
+		in: `
+		def :: {
+			Type: string
+			Text: string
+			Size: int
+		}
+
+		def :: {
+			Type: "B"
+			Size: 0
+		} | {
+			Type: "A"
+			Size: 1
+		}
+		`,
+		out: `<0>{` +
+			`def :: (<1>C{Size: int, Type: string, Text: string} & (<2>C{Size: 0, Type: "B"} | <3>C{Size: 1, Type: "A"}))` +
+			`}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

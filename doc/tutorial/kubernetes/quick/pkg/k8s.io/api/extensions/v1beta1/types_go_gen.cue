@@ -39,7 +39,6 @@ ScaleStatus :: {
 // represents a scaling request for a resource.
 Scale :: {
 	metav1.TypeMeta
-
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -56,7 +55,6 @@ Scale :: {
 // Dummy definition
 ReplicationControllerDummy :: {
 	metav1.TypeMeta
-
 }
 
 // DEPRECATED - This group version of Deployment is deprecated by apps/v1beta2/Deployment. See the release notes for
@@ -64,7 +62,6 @@ ReplicationControllerDummy :: {
 // Deployment enables declarative updates for Pods and ReplicaSets.
 Deployment :: {
 	metav1.TypeMeta
-
 	// Standard object metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -135,7 +132,6 @@ DeploymentSpec :: {
 // DeploymentRollback stores the information required to rollback a deployment.
 DeploymentRollback :: {
 	metav1.TypeMeta
-
 	// Required: This must match the Name of a deployment.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -301,7 +297,6 @@ DeploymentCondition :: {
 // DeploymentList is a list of Deployments.
 DeploymentList :: {
 	metav1.TypeMeta
-
 	// Standard list metadata.
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
@@ -479,7 +474,6 @@ DaemonSetCondition :: {
 // DaemonSet represents the configuration of a daemon set.
 DaemonSet :: {
 	metav1.TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -513,7 +507,6 @@ DefaultDaemonSetUniqueLabelKey :: "controller-revision-hash"
 // DaemonSetList is a collection of daemon sets.
 DaemonSetList :: {
 	metav1.TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -530,7 +523,6 @@ DaemonSetList :: {
 // DEPRECATED - This group version of Ingress is deprecated by networking.k8s.io/v1beta1 Ingress. See the release notes for more information.
 Ingress :: {
 	metav1.TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -550,7 +542,6 @@ Ingress :: {
 // IngressList is a collection of Ingress.
 IngressList :: {
 	metav1.TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -628,7 +619,6 @@ IngressRule :: {
 	host?: string @go(Host) @protobuf(1,bytes,opt)
 
 	IngressRuleValue
-
 }
 
 // IngressRuleValue represents a rule to apply against incoming requests. If the
@@ -682,7 +672,6 @@ IngressBackend :: {
 // ReplicaSet ensures that a specified number of pod replicas are running at any given time.
 ReplicaSet :: {
 	metav1.TypeMeta
-
 	// If the Labels of a ReplicaSet are empty, they are defaulted to
 	// be the same as the Pod(s) that the ReplicaSet manages.
 	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
@@ -706,7 +695,6 @@ ReplicaSet :: {
 // ReplicaSetList is a collection of ReplicaSets.
 ReplicaSetList :: {
 	metav1.TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -811,7 +799,6 @@ ReplicaSetCondition :: {
 // Deprecated: use PodSecurityPolicy from policy API Group instead.
 PodSecurityPolicy :: {
 	metav1.TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1237,7 +1224,6 @@ AllowAllRuntimeClassNames :: "*"
 // Deprecated: use PodSecurityPolicyList from policy API Group instead.
 PodSecurityPolicyList :: {
 	metav1.TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1251,7 +1237,6 @@ PodSecurityPolicyList :: {
 // NetworkPolicy describes what network traffic is allowed for a set of Pods
 NetworkPolicy :: {
 	metav1.TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1424,7 +1409,6 @@ NetworkPolicyPeer :: {
 // Network Policy List is a list of NetworkPolicy objects.
 NetworkPolicyList :: {
 	metav1.TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional

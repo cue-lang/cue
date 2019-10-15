@@ -1151,7 +1151,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 			obj.baseValue,   // baseValue
 			obj.emit,        // emit
 			obj.template,    // template
-			obj.closeStatus, // isClosed
+			obj.closeStatus, // closeStatus
 			nil,             // comprehensions
 			arcs,            // arcs
 			nil,             // attributes

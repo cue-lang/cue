@@ -44,7 +44,6 @@ ScaleStatus :: {
 // Scale represents a scaling request for a resource.
 Scale :: {
 	metav1.TypeMeta
-
 	// Standard object metadata; More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -68,7 +67,6 @@ Scale :: {
 // map to the same storage identity.
 StatefulSet :: {
 	metav1.TypeMeta
-
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -270,7 +268,6 @@ StatefulSetCondition :: {
 // StatefulSetList is a collection of StatefulSets.
 StatefulSetList :: {
 	metav1.TypeMeta
-
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 	items: [...StatefulSet] @go(Items,[]StatefulSet) @protobuf(2,bytes,rep)
@@ -281,7 +278,6 @@ StatefulSetList :: {
 // Deployment enables declarative updates for Pods and ReplicaSets.
 Deployment :: {
 	metav1.TypeMeta
-
 	// Standard object metadata.
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
@@ -349,7 +345,6 @@ DeploymentSpec :: {
 // DeploymentRollback stores the information required to rollback a deployment.
 DeploymentRollback :: {
 	metav1.TypeMeta
-
 	// Required: This must match the Name of a deployment.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -515,7 +510,6 @@ DeploymentCondition :: {
 // DeploymentList is a list of Deployments.
 DeploymentList :: {
 	metav1.TypeMeta
-
 	// Standard list metadata.
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
@@ -537,7 +531,6 @@ DeploymentList :: {
 // depend on its stability. It is primarily for internal use by controllers.
 ControllerRevision :: {
 	metav1.TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -553,7 +546,6 @@ ControllerRevision :: {
 // ControllerRevisionList is a resource containing a list of ControllerRevision objects.
 ControllerRevisionList :: {
 	metav1.TypeMeta
-
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ListMeta @go(ListMeta) @protobuf(1,bytes,opt)

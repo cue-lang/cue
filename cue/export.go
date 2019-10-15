@@ -211,10 +211,14 @@ func hasTemplate(s *ast.StructLit) bool {
 	return false
 }
 
+func (p *exporter) showOptional() bool {
+	return !p.mode.omitOptional && !p.mode.concrete
+}
+
 func (p *exporter) closeOrOpen(s *ast.StructLit, isClosed bool) ast.Expr {
 	// Note, there is no point in printing close if we are dropping optional
 	// fields, as by this the meaning of close will change anyway.
-	if p.mode.omitOptional || p.mode.concrete {
+	if !p.showOptional() {
 		return s
 	}
 	if isClosed && !p.inDef {
@@ -236,6 +240,18 @@ func (p *exporter) isComplete(v value, all bool) bool {
 		return !all
 	case *bottom:
 		return !isIncomplete(x)
+	case *closeIfStruct:
+		return p.isComplete(x.value, all)
+	}
+	return false
+}
+
+func isDisjunction(v value) bool {
+	switch x := v.(type) {
+	case *disjunction:
+		return true
+	case *closeIfStruct:
+		return isDisjunction(x.value)
 	}
 	return false
 }
@@ -247,12 +263,16 @@ func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
 		// This likely requires disjunctions to keep track of original
 		// values (so using arcs instead of values).
 		p := &exporter{p.ctx, options{concrete: true, raw: true}, p.stack, p.top, p.imports, p.inDef}
-		if _, ok := v.(*disjunction); ok || isBottom(e) {
+		if isDisjunction(v) || isBottom(e) {
 			return p.expr(v)
 		}
 		return p.expr(e)
 	}
 	return p.expr(e)
+}
+
+func (p *exporter) isClosed(x *structLit) bool {
+	return x.closeStatus.shouldClose()
 }
 
 func (p *exporter) expr(v value) ast.Expr {
@@ -421,19 +441,30 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 		return bin
 
+	case *closeIfStruct:
+		return p.expr(x.value)
+
 	case *structLit:
-		st, err := p.structure(x, !x.isClosed())
+		st, err := p.structure(x, !p.isClosed(x))
 		if err != nil {
 			return p.expr(err)
 		}
-		expr := p.closeOrOpen(st, x.isClosed())
+		expr := p.closeOrOpen(st, p.isClosed(x))
 		switch {
-		case x.isClosed() && x.template != nil:
+		// If a template is non-nil, we only show it if printing of
+		// optional fields is requested. If a struct is not closed it was
+		// already generated before. Furthermore, if if we are in evaluation
+		// mode, the struct is already unified, so there is no need to print it.
+		case x.template != nil && p.showOptional() && p.isClosed(x) && !doEval(p.mode):
 			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
 			if !ok {
 				break
 			}
-			if _, ok := l.value.(*top); ok {
+			v := l.value
+			if c, ok := v.(*closeIfStruct); ok {
+				v = c.value
+			}
+			if _, ok := v.(*top); ok {
 				break
 			}
 			expr = &ast.BinaryExpr{X: expr, Op: token.AND, Y: &ast.StructLit{
@@ -629,10 +660,10 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
 	}
 	switch {
-	case !doEval(p.mode) && x.template != nil && addTempl:
+	case x.template != nil && p.showOptional() && addTempl:
 		l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
 		if ok {
-			if _, ok := l.value.(*top); ok && !x.isClosed() {
+			if _, ok := l.value.(*top); ok && !p.isClosed(x) {
 				break
 			}
 			obj.Elts = append(obj.Elts, &ast.Field{
@@ -735,7 +766,7 @@ func (p *exporter) embedding(s *ast.StructLit, n value) (closed bool) {
 			break
 		}
 		s.Elts = append(s.Elts, st.Elts...)
-		return x.isClosed()
+		return p.isClosed(x)
 
 	case *binaryExpr:
 		if x.op != opUnifyUnchecked {

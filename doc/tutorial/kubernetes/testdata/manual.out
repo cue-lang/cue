@@ -31,7 +31,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -81,7 +113,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -248,7 +312,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -417,7 +513,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -584,7 +712,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -751,7 +911,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -920,7 +1112,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -1087,7 +1311,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -1256,7 +1512,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -1306,7 +1594,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -1459,7 +1779,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -1785,7 +2137,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -1857,8 +2241,13 @@ kubernetes: {
                                 name:          "grpc"
                                 containerPort: 7788
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -2007,7 +2396,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -2082,8 +2503,13 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 7443
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -2204,7 +2630,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -2273,8 +2731,13 @@ kubernetes: {
                                 name:          "http"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-updater"
+                                mountPath: "/etc/certs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "secret-updater"
@@ -2375,7 +2838,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -2449,8 +2944,13 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 7788
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -2562,7 +3062,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -2612,7 +3144,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -2634,7 +3198,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -2690,10 +3274,27 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "ssd-caller"
+                                mountPath: "/logs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "secret-ssh-key"
+                                mountPath: "/sslcerts"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "secret-caller"
+                                mountPath: "/etc/certs"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -2864,7 +3465,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -2886,7 +3519,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -2942,10 +3595,27 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-ssh-key"
+                                mountPath: "/sslcerts"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "dishwasher-disk"
+                                mountPath: "/logs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "secret-dishwasher"
+                                mountPath: "/etc/certs"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3113,7 +3783,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -3135,7 +3837,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -3191,9 +3913,20 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "expiditer-disk"
+                                mountPath: "/logs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "secret-expiditer"
+                                mountPath: "/etc/certs"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3346,7 +4079,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -3368,7 +4133,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -3424,9 +4209,20 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-headchef"
+                                mountPath: "/sslcerts"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "headchef-disk"
+                                mountPath: "/logs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3578,7 +4374,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -3600,7 +4428,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -3656,9 +4504,20 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-kitchen"
+                                mountPath: "/etc/certs"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "linecook-disk"
+                                mountPath: "/logs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3814,7 +4673,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -3836,7 +4727,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -3892,9 +4803,20 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-ssh-key"
+                                mountPath: "/etc/certs"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "pastrychef-disk"
+                                mountPath: "/logs"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -4050,7 +4972,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -4072,7 +5026,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -4244,7 +5218,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -4266,7 +5272,27 @@ _kitchenDeployment: {
         "event-server": "events:7788"
         logdir:         "/logs"
     }
-    volume: _|_ // incomplete
+    volume: {
+        "\(name)-disk": {
+            name:      string
+            mountPath: "/logs"
+            spec: {
+                gcePersistentDisk: {
+                    pdName: *name | string
+                    fsType: "ext4"
+                }
+            }
+        }
+        "secret-\(name)": {
+            mountPath: "/etc/certs"
+            readOnly:  true
+            spec: {
+                secret: {
+                    secretName: *"\(name)-secrets" | string
+                }
+            }
+        }
+    }
 }
 
 
@@ -4303,7 +5329,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -4383,9 +5441,19 @@ kubernetes: {
                                 name:          "alertmanager"
                                 containerPort: 9093
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "alertmanager"
+                                mountPath: "/alertmanager"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "config-volume"
+                                mountPath: "/etc/alertmanager"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "alertmanager"
@@ -4560,7 +5628,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -4642,8 +5742,13 @@ kubernetes: {
                                 name:          "web"
                                 containerPort: 8080
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "grafana-volume"
+                                mountPath: "/var/lib/grafana"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             resources: {
                                 requests: {
                                     cpu:    "100m"
@@ -4786,7 +5891,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -4864,9 +6001,21 @@ kubernetes: {
                                 containerPort: 9100
                                 hostPort:      9100
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                _|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "proc"
+                                mountPath: "/host/proc"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "sys"
+                                mountPath: "/host/sys"
+                                readOnly:  true
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                             resources: {
                                 requests: {
                                     cpu:    "100m"
@@ -5022,7 +6171,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -5103,8 +6284,13 @@ kubernetes: {
                                 name:          "web"
                                 containerPort: 9090
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "config-volume"
+                                mountPath: "/etc/prometheus"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "config-volume"
@@ -5714,7 +6900,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -5764,7 +6982,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -5833,8 +7083,13 @@ kubernetes: {
                                 name:          "client"
                                 containerPort: 4180
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "config-volume"
+                                mountPath: "/etc/authproxy"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "config-volume"
@@ -6055,7 +7310,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -6130,8 +7417,13 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 7443
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                            ]
+                            volumeMounts: [{
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -6241,7 +7533,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }
@@ -6319,12 +7643,17 @@ kubernetes: {
                                 name:          "https"
                                 containerPort: 443
                             }]
-                            volumeMounts: [_|_, // non-concrete value bool
-                                                {
-                                    name:      "config-volume"
-                                    mountPath: "/etc/nginx/nginx.conf"
-                                    subPath:   "nginx.conf"
-                                }]
+                            volumeMounts: [{
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
+                                if false | true {
+                                    subPath: null
+                                }
+                            }, {
+                                name:      "config-volume"
+                                mountPath: "/etc/nginx/nginx.conf"
+                                subPath:   "nginx.conf"
+                            }]
                         }]
                         volumes: [{
                             name: "secret-volume"
@@ -6856,7 +8185,39 @@ _k8sSpec: {
         kubernetes: {
             spec: {
                 template: {
-                    spec: _|_ // undefined field "volume"
+                    spec: {
+                        containers: [{
+                            name:  X.name
+                            image: X.image
+                            args:  X.args
+                            ports: [ {
+                                name:          k
+                                containerPort: p
+                            } for k, p in X.expose.port & X.port ]
+                            if len(X.envSpec) > 0 {
+                                env: [ {
+                                    name: k
+                                } & v for k, v in X.envSpec ]
+                            }
+                            if len(X.volume) > 0 {
+                                volumeMounts: [ {
+                                    name:      v.name
+                                    mountPath: v.mountPath
+                                    if v.subPath != null | true {
+                                        subPath: v.subPath
+                                    }
+                                    if v.readOnly {
+                                        readOnly: v.readOnly
+                                    }
+                                } for v in X.volume ]
+                            }
+                        }]
+                        if len(X.volume) > 0 {
+                            volumes: [ v.kubernetes & {
+                                name: v.name
+                            } for v in X.volume ]
+                        }
+                    }
                     metadata: {
                         labels: X.label
                     }

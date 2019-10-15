@@ -314,7 +314,6 @@ OwnerReference :: {
 // ListOptions is the query options to a standard REST list call.
 ListOptions :: {
 	TypeMeta
-
 	// A selector to restrict the list of returned objects by their labels.
 	// Defaults to everything.
 	// +optional
@@ -397,7 +396,6 @@ ListOptions :: {
 // Deprecated. Planned for removal in 1.18.
 ExportOptions :: {
 	TypeMeta
-
 	// Should this value be exported.  Export strips fields that a user can not specify.
 	// Deprecated. Planned for removal in 1.18.
 	export: bool @go(Export) @protobuf(1,varint,opt)
@@ -410,7 +408,6 @@ ExportOptions :: {
 // GetOptions is the standard query options to the standard REST get call.
 GetOptions :: {
 	TypeMeta
-
 	// When specified:
 	// - if unset, then the result is returned from remote storage based on quorum-read flag;
 	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
@@ -448,7 +445,6 @@ DryRunAll :: "All"
 // DeleteOptions may be provided when deleting an API object.
 DeleteOptions :: {
 	TypeMeta
-
 	// The duration in seconds before the object should be deleted. Value must be non-negative integer.
 	// The value zero indicates delete immediately. If this value is nil, the default grace period for the
 	// specified type will be used.
@@ -491,7 +487,6 @@ DeleteOptions :: {
 // CreateOptions may be provided when creating an API object.
 CreateOptions :: {
 	TypeMeta
-
 	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
@@ -512,7 +507,6 @@ CreateOptions :: {
 // PatchOptions is meant to be a superset of UpdateOptions.
 PatchOptions :: {
 	TypeMeta
-
 	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
@@ -542,7 +536,6 @@ PatchOptions :: {
 // All fields in UpdateOptions should also be present in PatchOptions.
 UpdateOptions :: {
 	TypeMeta
-
 	// When present, indicates that modifications should not be
 	// persisted. An invalid or unrecognized dryRun directive will
 	// result in an error response and no further processing of the
@@ -573,7 +566,6 @@ Preconditions :: {
 // Status is a return value for calls that don't return other objects.
 Status :: {
 	TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -894,7 +886,6 @@ CauseTypeFieldManagerConflict :: CauseType & "FieldManagerConflict"
 // List holds a list of objects, which may not be known by the server.
 List :: {
 	TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -911,7 +902,6 @@ List :: {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 APIVersions :: {
 	TypeMeta
-
 	// versions are the api versions that are available.
 	versions: [...string] @go(Versions,[]string) @protobuf(1,bytes,rep)
 
@@ -929,7 +919,6 @@ APIVersions :: {
 // /apis.
 APIGroupList :: {
 	TypeMeta
-
 	// groups is a list of APIGroup.
 	groups: [...APIGroup] @go(Groups,[]APIGroup) @protobuf(1,bytes,rep)
 }
@@ -938,7 +927,6 @@ APIGroupList :: {
 // of a group.
 APIGroup :: {
 	TypeMeta
-
 	// name is the name of the group.
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
@@ -1038,7 +1026,6 @@ Verbs :: [...string]
 // is namespaced.
 APIResourceList :: {
 	TypeMeta
-
 	// groupVersion is the group and version this APIResourceList is for.
 	groupVersion: string @go(GroupVersion) @protobuf(1,bytes,opt)
 
@@ -1164,7 +1151,6 @@ FieldsV1 :: _
 // +protobuf=false
 Table :: {
 	TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional
@@ -1292,7 +1278,6 @@ IncludeObject :: IncludeObjectPolicy & "Object"
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 TableOptions :: {
 	TypeMeta
-
 	// includeObject decides whether to include each object along with its columnar information.
 	// Specifying "None" will return no object, specifying "Object" will return the full object contents, and
 	// specifying "Metadata" (the default) will return the object's metadata in the PartialObjectMetadata kind
@@ -1305,7 +1290,6 @@ TableOptions :: {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 PartialObjectMetadata :: {
 	TypeMeta
-
 	// Standard object's metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
@@ -1316,7 +1300,6 @@ PartialObjectMetadata :: {
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 PartialObjectMetadataList :: {
 	TypeMeta
-
 	// Standard list metadata.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
 	// +optional

@@ -496,7 +496,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 	case *ast.BottomLit:
 		// TODO: record inline comment.
-		ret = &bottom{baseValue: newExpr(n), format: "from source"}
+		ret = &bottom{baseValue: newExpr(n), code: codeUser, format: "from source"}
 
 	case *ast.BadDecl:
 		// nothing to do

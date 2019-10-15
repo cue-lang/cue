@@ -2444,6 +2444,19 @@ func TestFullEval(t *testing.T) {
 		}}
 		`,
 		out: `<0>{a: <1>{<>: <2>(Name: string)-><3>{info :: <4>C{X: "foo"}}, d: <5>C{info :: <6>C{X: "foo"}, Y: "foo"}}, base :: <7>C{info :: <8>{...}}}`,
+	}, {
+		desc: "comparison against bottom",
+		in: `
+		a: _|_ == _|_
+		b: err == 1&2 // not a literal error, so not allowed
+		c: err == _|_ // allowed
+		d: err != _|_ // allowed
+		e: err != 1&3
+		// z: err == err // TODO: should infer to be true?
+
+		err: 1 & 2
+		`,
+		out: `<0>{a: true, b: _|_((1 & 2):conflicting values 1 and 2), err: _|_((1 & 2):conflicting values 1 and 2), c: true, d: false, e: _|_((1 & 2):conflicting values 1 and 2)}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

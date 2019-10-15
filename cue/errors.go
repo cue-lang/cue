@@ -100,12 +100,20 @@ const (
 	codeNotExist
 	codeTypeError
 	codeIncomplete
+	codeUser
 	codeCycle
 )
 
 func isIncomplete(v value) bool {
 	if err, ok := v.(*bottom); ok {
 		return err.code == codeIncomplete || err.code == codeCycle
+	}
+	return false
+}
+
+func isLiteralBottom(v value) bool {
+	if err, ok := v.(*bottom); ok {
+		return err.code == codeUser
 	}
 	return false
 }

@@ -428,7 +428,7 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 		// principled perhaps. One should especially take care that two values
 		// evaluating to bottom don't evaluate to true. For now we check for
 		// bottom here and require that one of the values be a bottom literal.
-		if l, r := isBottom(x.left), isBottom(x.right); l || r {
+		if isLiteralBottom(x.left) || isLiteralBottom(x.right) {
 			leftBottom := isBottom(left)
 			rightBottom := isBottom(right)
 			switch x.op {

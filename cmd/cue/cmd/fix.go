@@ -96,38 +96,40 @@ func fix(f *ast.File) *ast.File {
 		return true
 	}, nil).(*ast.File)
 
+	// TODO: we are probably reintroducing slices. Disable for now.
+	//
 	// Rewrite slice expression.
-	f = astutil.Apply(f, func(c astutil.Cursor) bool {
-		n := c.Node()
-		getVal := func(n ast.Expr) ast.Expr {
-			if n == nil {
-				return nil
-			}
-			if id, ok := n.(*ast.Ident); ok && id.Name == "_" {
-				return nil
-			}
-			return n
-		}
-		switch x := n.(type) {
-		case *ast.SliceExpr:
-			ast.SetRelPos(x.X, token.NoRelPos)
+	// f = astutil.Apply(f, func(c astutil.Cursor) bool {
+	// 	n := c.Node()
+	// 	getVal := func(n ast.Expr) ast.Expr {
+	// 		if n == nil {
+	// 			return nil
+	// 		}
+	// 		if id, ok := n.(*ast.Ident); ok && id.Name == "_" {
+	// 			return nil
+	// 		}
+	// 		return n
+	// 	}
+	// 	switch x := n.(type) {
+	// 	case *ast.SliceExpr:
+	// 		ast.SetRelPos(x.X, token.NoRelPos)
 
-			lo := getVal(x.Low)
-			hi := getVal(x.High)
-			if lo == nil { // a[:j]
-				lo = mustParseExpr("0")
-				astutil.CopyMeta(lo, x.Low)
-			}
-			if hi == nil { // a[i:]
-				hi = ast.NewCall(ast.NewIdent("len"), x.X)
-				astutil.CopyMeta(lo, x.High)
-			}
-			if pkg := c.Import("list"); pkg != nil {
-				c.Replace(ast.NewCall(ast.NewSel(pkg, "Slice"), x.X, lo, hi))
-			}
-		}
-		return true
-	}, nil).(*ast.File)
+	// 		lo := getVal(x.Low)
+	// 		hi := getVal(x.High)
+	// 		if lo == nil { // a[:j]
+	// 			lo = mustParseExpr("0")
+	// 			astutil.CopyMeta(lo, x.Low)
+	// 		}
+	// 		if hi == nil { // a[i:]
+	// 			hi = ast.NewCall(ast.NewIdent("len"), x.X)
+	// 			astutil.CopyMeta(lo, x.High)
+	// 		}
+	// 		if pkg := c.Import("list"); pkg != nil {
+	// 			c.Replace(ast.NewCall(ast.NewSel(pkg, "Slice"), x.X, lo, hi))
+	// 		}
+	// 	}
+	// 	return true
+	// }, nil).(*ast.File)
 
 	return f
 }

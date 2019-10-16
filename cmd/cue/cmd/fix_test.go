@@ -107,49 +107,49 @@ a:
 // f
 a: 3 + 5
 `,
-	}, {
-		name: "slice",
-		in: `package foo
+		// 	}, {
+		// 		name: "slice",
+		// 		in: `package foo
 
-// keep comment
-l[3:4] // and this one
+		// // keep comment
+		// l[3:4] // and this one
 
-a: len(l[3:4])
-b: len(l[a:_])
-c: len(l[_:x])
-d: len(l[_:_])
-`,
-		out: `package foo
+		// a: len(l[3:4])
+		// b: len(l[a:_])
+		// c: len(l[_:x])
+		// d: len(l[_:_])
+		// `,
+		// 		out: `package foo
 
-import list6c6973 "list"
+		// import list6c6973 "list"
 
-// keep comment
-list6c6973.Slice(l, 3, 4)// and this one
+		// // keep comment
+		// list6c6973.Slice(l, 3, 4)// and this one
 
-a: len(list6c6973.Slice(l, 3, 4))
-b: len(list6c6973.Slice(l, a, len(l)))
-c: len(list6c6973.Slice(l, 0, x))
-d: len(list6c6973.Slice(l, 0, len(l)))
-`,
-	}, {
-		name: "slice2",
-		in: `package foo
+		// a: len(list6c6973.Slice(l, 3, 4))
+		// b: len(list6c6973.Slice(l, a, len(l)))
+		// c: len(list6c6973.Slice(l, 0, x))
+		// d: len(list6c6973.Slice(l, 0, len(l)))
+		// `,
+		// 	}, {
+		// 		name: "slice2",
+		// 		in: `package foo
 
-import "list"
+		// import "list"
 
-a: list.Contains("foo")
-b: len(l[_:_])
-`,
-		out: `package foo
+		// a: list.Contains("foo")
+		// b: len(l[_:_])
+		// `,
+		// 		out: `package foo
 
-import (
-	"list"
-	list6c6973 "list"
-)
+		// import (
+		// 	"list"
+		// 	list6c6973 "list"
+		// )
 
-a: list.Contains("foo")
-b: len(list6c6973.Slice(l, 0, len(l)))
-`,
+		// a: list.Contains("foo")
+		// b: len(list6c6973.Slice(l, 0, len(l)))
+		// `,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

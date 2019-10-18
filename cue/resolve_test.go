@@ -2556,6 +2556,23 @@ func TestFullEval(t *testing.T) {
 		err: 1 & 2
 		`,
 		out: `<0>{a: true, b: _|_((1 & 2):conflicting values 1 and 2), err: _|_((1 & 2):conflicting values 1 and 2), c: true, d: false, e: _|_((1 & 2):conflicting values 1 and 2)}`,
+	}, {
+		desc: "or builtin should not fail on non-concrete empty list",
+		in: `
+		Workflow :: {
+			jobs: {
+				<jobID>: {
+				}
+			}
+			JobID :: or([ k for k, _ in jobs ])
+		}
+
+		foo: Workflow & {
+			jobs foo: {
+			}
+		}
+		`,
+		out: `<0>{Workflow :: <1>C{jobs: <2>{<>: <3>(jobID: string)-><4>C{}, }, JobID :: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{<>: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, JobID :: "foo"}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

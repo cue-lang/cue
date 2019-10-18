@@ -192,7 +192,7 @@ var andBuiltin = &builtin{
 
 var orBuiltin = &builtin{
 	Name:   "or",
-	Params: []kind{stringKind | bytesKind | listKind | structKind},
+	Params: []kind{listKind},
 	Result: intKind,
 	Func: func(c *callCtxt) {
 		iter := c.iter(0)
@@ -202,7 +202,14 @@ var orBuiltin = &builtin{
 		}
 		c.ret = &disjunction{baseValue{c.src}, d, nil, false}
 		if len(d) == 0 {
-			c.ret = errors.New("empty list in call to or")
+			// TODO(manifest): This should not be unconditionally incomplete,
+			// but it requires results from comprehensions and all to have
+			// some special status. Mayb this can be solved by having results
+			// of list comprehensions be open if they result from iterating over
+			// an open list or struct. This would actually be exactly what
+			// that means. The error here could then only add an incomplete
+			// status if the source is open.
+			c.ret = c.ctx.mkErr(c.src, codeIncomplete, "empty list in call to or")
 		}
 	},
 }

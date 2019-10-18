@@ -355,7 +355,12 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 	if len(ctx.evalStack) > 1 {
 		ctx.inSum++
 	}
-	dn := &disjunction{x.baseValue, make([]dValue, 0, len(x.values)), x.hasDefaults}
+	dn := &disjunction{
+		x.baseValue,
+		make([]dValue, 0, len(x.values)),
+		make([]*bottom, 0, len(x.errors)),
+		x.hasDefaults,
+	}
 	changed := false
 	for _, v := range x.values {
 		n := v.val.evalPartial(ctx)
@@ -413,7 +418,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 		return values[0].val.evalPartial(ctx)
 	}
 
-	x = &disjunction{x.baseValue, values, true}
+	x = &disjunction{x.baseValue, values, x.errors, true}
 	return x.normalize(ctx, x).val
 }
 

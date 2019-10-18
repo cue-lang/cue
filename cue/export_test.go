@@ -858,6 +858,20 @@ func TestExportFile(t *testing.T) {
 					})
 				})
 			}`),
+	}, {
+		eval: true,
+		in: `
+				a?: 1
+				b?: 2
+				b?: 2
+				c?: 3
+				c: 3`,
+		out: unindent(`
+		{
+			a?: 1
+			b?: 2
+			c:  3
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

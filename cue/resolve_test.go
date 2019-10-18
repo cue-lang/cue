@@ -1270,11 +1270,11 @@ a: {
 		`,
 		out: `<0>{` +
 			`S :: <1>{<>: <2>(_: string)-><3>C{a: int}, }, ` +
-			`a: <4>{<>: <5>(_: string)-><6>C{a: int}, v: _|_(<7>{<>: <5>(_: string)-><6>C{a: int}, v: <8>{b: int}}:field "b" not allowed in closed struct)}, ` +
-			`b: <9>{<>: <10>(_: string)->(<11>C{a: int} | <12>C{b: int}), w: _|_(<13>{<>: <10>(_: string)->(<11>C{a: int} | <12>C{b: int}), w: <14>{c: int}}:empty disjunction: field "c" not allowed in closed struct)}, ` +
-			`Q :: <15>{<>: <16>(_: string)->(<17>C{a: int} | <18>C{b: int}), }, ` +
-			`c: <19>{<>: <20>(_: string)->[<21>C{a: int},<22>C{b: int}], w: [_|_((<23>{d: int} & close(<24>C{a: int})):field "d" not allowed in closed struct),<25>C{b: int}]}, ` +
-			`R :: <26>{<>: <27>(_: string)->[<28>C{a: int},<29>C{b: int}], }}`,
+			`a: <4>{<>: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}, ` +
+			`b: <7>{<>: <8>(_: string)->(<9>C{a: int} | <10>C{b: int}), w: _|_(int:empty disjunction: field "c" not allowed in closed struct)}, ` +
+			`Q :: <11>{<>: <12>(_: string)->(<13>C{a: int} | <14>C{b: int}), }, ` +
+			`c: <15>{<>: <16>(_: string)->[<17>C{a: int},<18>C{b: int}], w: [_|_(int:field "d" not allowed in closed struct),<19>C{b: int}]}, ` +
+			`R :: <20>{<>: <21>(_: string)->[<22>C{a: int},<23>C{b: int}], }}`,
 	}, {
 		desc: "definitions with disjunctions",
 		in: `
@@ -1297,8 +1297,8 @@ a: {
 		out: `<0>{` +
 			`Foo :: (<1>C{field: int, a: 1} | <2>C{field: int, b: 2}), ` +
 			`foo: <3>C{field: int, a: 1}, ` +
-			`bar: _|_((<4>.Foo & <5>{c: 2}):empty disjunction: field "c" not allowed in closed struct), ` +
-			`baz: <6>C{field: int, b: 2}}`,
+			`bar: _|_(2:empty disjunction: field "c" not allowed in closed struct), ` +
+			`baz: <4>C{field: int, b: 2}}`,
 	}, {
 		desc: "definitions with disjunctions recurisive",
 		in: `
@@ -1787,7 +1787,7 @@ a: {
 			`a3: <3>{a: _|_((=~"oo" & "bar"):invalid value "bar" (does not match =~"oo")), b: =~"oo", c: =~"fo"}, ` +
 			`o1: <4>{a: string, b: string, c: "bar"}, ` +
 			`o2: <5>{a: "foo", b: string, c: "bar"}, ` +
-			`o3: <6>{a: _|_((or ([<7>.b,<7>.c]) & "foo"):empty disjunction: conflicting values "baz" and "foo"), b: "baz", c: "bar"}}`,
+			`o3: <6>{a: _|_(("baz" & "foo"):empty disjunction: conflicting values "baz" and "foo";("bar" & "foo"):empty disjunction: conflicting values "bar" and "foo"), b: "baz", c: "bar"}}`,
 	}, {
 		desc: "self-reference cycles conflicts with strings",
 		in: `
@@ -2396,7 +2396,7 @@ func TestFullEval(t *testing.T) {
 			x: {a:1}|{a:2}
 			y: x & {a:3}
 		`,
-		out: `<0>{x: (<1>{a: 1} | <2>{a: 2}), y: _|_((<3>.x & <4>{a: 3}):empty disjunction: {a: (1 & 3)})}`,
+		out: `<0>{x: (<1>{a: 1} | <2>{a: 2}), y: _|_((1 & 3):empty disjunction: conflicting values 1 and 3;(2 & 3):empty disjunction: conflicting values 2 and 3)}`,
 	}, {
 		desc: "cannot resolve references that would be ambiguous",
 		in: `

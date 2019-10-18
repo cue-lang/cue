@@ -1317,6 +1317,11 @@ type disjunction struct {
 
 	values []dValue
 
+	// errors is used to keep track of all errors that occurred in
+	// a disjunction for better error reporting down the road.
+	// TODO: consider storing the errors in values.
+	errors []*bottom
+
 	hasDefaults bool // also true if it had elminated defaults.
 
 	// bind is the node that a successful disjunction will bind to. This
@@ -1347,6 +1352,9 @@ func (x *disjunction) Pos() token.Pos { return x.values[0].val.Pos() }
 // add add a value to the disjunction. It is assumed not to be a disjunction.
 func (x *disjunction) add(ctx *context, v value, marked bool) {
 	x.values = append(x.values, dValue{v, marked})
+	if b, ok := v.(*bottom); ok {
+		x.errors = append(x.errors, b)
+	}
 }
 
 // normalize removes redundant element from unification.
@@ -1370,11 +1378,12 @@ func (x *disjunction) normalize(ctx *context, src source) mVal {
 outer:
 	for i, v := range x.values {
 		// TODO: this is pre-evaluation is quite aggressive. Verify whether
-		// this does not trigger structural cycles. If so, this can check for
+		// this does not trigger structural cycles (it does). If so, this can check for
 		// bottom and the validation can be delayed to as late as picking
 		// defaults. The drawback of this approach is that printed intermediate
 		// results will not look great.
 		if err := validate(ctx, v.val); err != nil {
+			x.errors = append(x.errors, err)
 			if v.marked {
 				markedErr = err
 			}
@@ -1419,7 +1428,7 @@ outer:
 			// TODO: use format instead of debugStr.
 			err = ctx.mkErr(src, ctx.str(err))
 		}
-		return mVal{ctx.mkErr(src, "empty disjunction: %v", err), false}
+		return mVal{x.computeError(ctx, src), false}
 	case 1:
 		v := x.values[0]
 		return mVal{v.val.(evaluated), v.marked}
@@ -1427,6 +1436,45 @@ outer:
 	// TODO: do not modify value, but create a new disjunction.
 	x.values = x.values[:k]
 	return mVal{x, false}
+}
+
+func (x *disjunction) computeError(ctx *context, src source) evaluated {
+	var errors []*bottom
+
+	// Ensure every position is visited at least once.
+	// This prevents discriminators fields from showing up too much. A special
+	// "all errors" flag could be used to expand all errors.
+	visited := map[token.Pos]bool{}
+
+	for _, b := range x.errors {
+		positions := b.Positions(ctx)
+		if len(positions) == 0 {
+			positions = append(positions, token.NoPos)
+		}
+		// Include the error if at least one of its positions wasn't covered
+		// before.
+		done := true
+		for _, p := range positions {
+			if !visited[p] {
+				done = false
+			}
+			visited[p] = true
+		}
+		if !done {
+			b := *b
+			b.format = "empty disjunction: " + b.format
+			errors = append(errors, &b)
+		}
+	}
+	switch len(errors) {
+	case 0:
+		// Should never happen.
+		return ctx.mkErr(src, errors, "empty disjunction")
+	case 1:
+		return ctx.mkErr(src, errors, "empty disjunction: %v", errors[0])
+	default:
+		return ctx.mkErr(src, errors, "empty disjunction: %v (and %d other errors)", errors[0], len(errors)-1)
+	}
 }
 
 type listComprehension struct {

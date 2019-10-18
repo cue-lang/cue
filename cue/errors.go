@@ -50,14 +50,26 @@ func (e *nodeError) Path() []string {
 	return e.path
 }
 
-func (v Value) toErr(b *bottom) errors.Error {
-	if b.err != nil {
-		return b.err
+func (v Value) appendErr(err errors.Error, b *bottom) errors.Error {
+	switch {
+	case len(b.sub) > 0:
+		for _, b := range b.sub {
+			err = v.appendErr(err, b)
+		}
+		fallthrough
+	case b.err != nil:
+		err = errors.Append(err, b.err)
+	default:
+		err = errors.Append(err, &valueError{
+			v:   v,
+			err: b,
+		})
 	}
-	return &valueError{
-		v:   v,
-		err: b,
-	}
+	return err
+}
+
+func (v Value) toErr(b *bottom) (err errors.Error) {
+	return v.appendErr(nil, b)
 }
 
 var _ errors.Error = &valueError{}
@@ -77,7 +89,7 @@ func (e *valueError) Position() token.Pos {
 }
 
 func (e *valueError) InputPositions() []token.Pos {
-	return e.err.Positions()
+	return e.err.Positions(e.v.ctx())
 }
 
 func (e *valueError) Msg() (string, []interface{}) {
@@ -139,33 +151,33 @@ type bottom struct {
 	args      []interface{}
 
 	err     errors.Error // pass-through from higher-level API
+	sub     []*bottom    // sub errors
 	value   value
 	wrapped *bottom
 }
 
 func (x *bottom) kind() kind { return bottomKind }
 
-func (x *bottom) Positions() []token.Pos {
+func (x *bottom) Positions(ctx *context) []token.Pos {
 	if x.index != nil { // TODO: remove check?
-		return appendPositions(nil, x.pos)
+		return appendPositions(ctx, nil, x.pos)
 	}
 	return nil
 }
 
-func appendPositions(pos []token.Pos, src source) []token.Pos {
+func appendPositions(ctx *context, pos []token.Pos, src source) []token.Pos {
 	if src != nil {
-		if b, ok := src.(*binaryExpr); ok {
-			if _, isUnify := b.op.unifyType(); isUnify {
-				pos = appendPositions(pos, b.left)
-				pos = appendPositions(pos, b.right)
-			}
-		}
 		if p := src.Pos(); p != token.NoPos {
-			return append(pos, src.Pos())
+			pos = append(pos, src.Pos())
 		}
 		if c := src.computed(); c != nil {
-			pos = appendPositions(pos, c.x)
-			pos = appendPositions(pos, c.y)
+			pos = appendPositions(ctx, pos, c.x)
+			pos = appendPositions(ctx, pos, c.y)
+		}
+		switch x := src.(type) {
+		case evaluated:
+		case value:
+			pos = appendPositions(ctx, pos, x.evalPartial(ctx))
 		}
 	}
 	return pos
@@ -218,6 +230,8 @@ outer:
 			e.code = x
 		case *bottom:
 			e.wrapped = x
+		case []*bottom:
+			e.sub = x
 		case errors.Error:
 			e.err = x
 		case value:

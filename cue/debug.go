@@ -476,11 +476,20 @@ func (p *printer) str(v interface{}) {
 		write("_|_")
 		if x.value != nil || x.format != "" {
 			write("(")
-			if x.value != nil && p.showNodeRef {
-				p.str(x.value)
-				p.write(":")
+			errs := x.sub
+			if errs == nil {
+				errs = []*bottom{x}
 			}
-			write(x.msg())
+			for i, x := range errs {
+				if i > 0 {
+					p.write(";")
+				}
+				if x.value != nil && p.showNodeRef {
+					p.str(x.value)
+					p.write(":")
+				}
+				write(x.msg())
+			}
 			write(")")
 		}
 	case *top:

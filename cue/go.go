@@ -668,6 +668,7 @@ func makeNullable(e value, nullIsDefault bool) value {
 		values: []dValue{
 			{val: &nullLit{}, marked: nullIsDefault},
 			{val: e}},
+		errors:      nil,
 		hasDefaults: nullIsDefault,
 	}
 }

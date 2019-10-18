@@ -8,7 +8,7 @@ translations.hello.lang: conflicting values false and string (mismatched types b
     ./data.yaml:13:11
     ./vet.cue:3:11
 field "skip" not allowed in closed struct:
-    ./vet.cue:1:9
+    ./data.yaml:20:7
 -- vet.cue --
 File :: {
 	translations <_>: {

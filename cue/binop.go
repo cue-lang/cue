@@ -684,7 +684,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			if a.optional {
 				continue
 			}
-			return ctx.mkErr(src, y, "field %q not allowed in closed struct",
+			return ctx.mkErr(a.v, a.v, "field %q not allowed in closed struct",
 				ctx.labelStr(a.feature))
 		}
 		cp := ctx.copy(a.v)

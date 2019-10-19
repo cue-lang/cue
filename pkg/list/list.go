@@ -136,7 +136,7 @@ func Slice(x []cue.Value, i, j int) ([]cue.Value, error) {
 
 // MinItems reports whether a has at least n items.
 func MinItems(a []cue.Value, n int) bool {
-	return len(a) <= n
+	return len(a) >= n
 }
 
 // MaxItems reports whether a has at most n items.

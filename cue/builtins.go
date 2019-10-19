@@ -767,7 +767,7 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				a, n := c.list(0), c.int(1)
 				c.ret = func() interface{} {
-					return len(a) <= n
+					return len(a) >= n
 				}()
 			},
 		}, {

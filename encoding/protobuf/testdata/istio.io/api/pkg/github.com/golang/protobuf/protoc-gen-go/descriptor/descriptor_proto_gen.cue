@@ -187,8 +187,6 @@ FieldDescriptorProto: {
 	options?:  FieldOptions @protobuf(8)
 }
 FieldDescriptorProto_Type:
-	// 0 is reserved for errors.
-	// Order is weird for historical reasons.
 	"TYPE_DOUBLE" |
 	"TYPE_FLOAT" |
 
@@ -219,6 +217,9 @@ FieldDescriptorProto_Type:
 	"TYPE_SFIXED32" |
 	"TYPE_SFIXED64" |
 	"TYPE_SINT32" | // Uses ZigZag encoding.
+
+	// 0 is reserved for errors.
+	// Order is weird for historical reasons.
 	"TYPE_SINT64" // Uses ZigZag encoding.
 
 FieldDescriptorProto_Type_value: {

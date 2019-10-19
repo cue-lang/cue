@@ -356,6 +356,7 @@ func TestParse(t *testing.T) {
 			// end
 		]
 		c: [ 1, 2, 3, 4, // here
+			{ a: 3 }, // here
 			5, 6, 7, 8 // and here
 		]
 		d: {
@@ -370,11 +371,11 @@ func TestParse(t *testing.T) {
 			// comment in struct body
 		}
 		`,
-		"a: <[d2// end] {a: 1, b: 2, c: 3, d: 4}>, " +
-			"b: <[d2// end] [1, 2, 3, 4, 5]>, " +
-			"c: [1, 2, 3, <[l1// here] 4>, 5, 6, 7, <[l1// and here] 8>], " +
+		"a: {a: 1, b: 2, c: 3, <[d5// end] d: 4>}, " +
+			"b: [1, 2, 3, 4, <[d2// end] 5>], " +
+			"c: [1, 2, 3, <[l2// here] 4>, <[l4// here] {a: 3}>, 5, 6, 7, <[l2// and here] 8>], " +
 			"d: {<[2/* 8 */] [l5// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
-			"e1: <[d2// comment in list body] []>, " +
+			"e1: <[d1// comment in list body] []>, " +
 			"e2: <[d1// comment in struct body] {}>",
 	}, {
 		"attribute comments",
@@ -396,6 +397,24 @@ func TestParse(t *testing.T) {
 		// a comment at the end of the file
 		`,
 		"<[0// a comment at the beginning of the file] [0// a second comment] <[d0// comment] a: 5>, <[2// a comment at the end of the file] {}>>",
+	}, {
+		"composite comments 2",
+		`
+	{
+// foo
+
+// fooo
+foo: 1
+
+bar: 2
+	}
+
+[
+	{"name": "value"}, // each element has a long
+	{"name": "next"}   // optional next element
+]
+`,
+		`{<[0// foo] [d0// fooo] foo: 1>, bar: 2}, [<[l4// each element has a long] {"name": "value"}>, <[l4// optional next element] {"name": "next"}>]`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

@@ -103,13 +103,28 @@ type commentState struct {
 func (p *parser) openComments() *commentState {
 	if c := p.comments; c != nil && c.isList > 0 {
 		if c.lastChild != nil {
+			var groups []*ast.CommentGroup
 			for _, cg := range c.groups {
-				cg.Position = c.lastPos
-				c.lastChild.AddComment(cg)
+				if cg.Position == 0 {
+					groups = append(groups, cg)
+				}
 			}
+			groups = append(groups, c.lastChild.Comments()...)
+			for _, cg := range c.groups {
+				if cg.Position != 0 {
+					cg.Position = c.lastPos
+					groups = append(groups, cg)
+				}
+			}
+			ast.SetComments(c.lastChild, groups)
 			c.groups = nil
+		} else {
+			c.lastChild = nil
+			// attach before next
+			for _, cg := range c.groups {
+				cg.Position = 0
+			}
 		}
-		c.lastChild = nil
 	}
 	c := &commentState{
 		parent: p.comments,
@@ -158,7 +173,9 @@ func (p *parser) closeList() {
 		}
 	case c.isList == 0:
 		parent := c.parent
-		parent.groups = append(parent.groups, c.groups...)
+		if len(c.groups) > 0 {
+			parent.groups = append(parent.groups, c.groups...)
+		}
 		parent.pos++
 		p.comments = parent
 	}
@@ -182,7 +199,9 @@ func (c *commentState) closeNode(p *parser, n ast.Node) ast.Node {
 	}
 	for _, cg := range c.groups {
 		if n != nil {
-			n.AddComment(cg)
+			if cg != nil {
+				n.AddComment(cg)
+			}
 		}
 	}
 	c.groups = nil
@@ -668,8 +687,11 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	}
 
 	if p.tok == token.ELLIPSIS {
-		list = append(list, &ast.Ellipsis{Ellipsis: p.pos})
+		c := p.openComments()
+		ellipsis := &ast.Ellipsis{Ellipsis: p.pos}
 		p.next()
+		c.closeNode(p, ellipsis)
+		list = append(list, ellipsis)
 	}
 	return
 }
@@ -1027,9 +1049,6 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 }
 
 func (p *parser) parseStruct() (expr ast.Expr) {
-	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
-
 	lbrace := p.expect(token.LBRACE)
 
 	if p.trace {
@@ -1127,9 +1146,6 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 }
 
 func (p *parser) parseList() (expr ast.Expr) {
-	c := p.openComments()
-	defer func() { c.closeNode(p, expr) }()
-
 	lbrack := p.expect(token.LBRACK)
 
 	if p.trace {
@@ -1185,35 +1201,42 @@ func (p *parser) parseListElements() (list []ast.Expr) {
 	defer p.closeList()
 
 	for p.tok != token.RBRACK && p.tok != token.ELLIPSIS && p.tok != token.EOF {
-		list = append(list, p.parseListElement())
-		// Enforce there is an explicit comma. We could also allow the
-		// omission of commas in lists, but this gives rise to some ambiguities
-		// with list comprehensions.
-		if p.tok == token.COMMA && p.lit != "," {
-			p.next()
-			// Allow missing comma for last element, though, to be compliant
-			// with JSON.
-			if p.tok == token.RBRACK || p.tok == token.FOR || p.tok == token.IF {
-				break
-			}
-			p.errf(p.pos, "missing ',' before newline in list literal")
-		} else if !p.atComma("list literal", token.RBRACK, token.FOR, token.IF) {
+		expr, ok := p.parseListElement()
+		list = append(list, expr)
+		if !ok {
 			break
 		}
-		p.next()
 	}
 
 	return
 }
 
-func (p *parser) parseListElement() (expr ast.Expr) {
+func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 	if p.trace {
 		defer un(trace(p, "ListElement"))
 	}
 	c := p.openComments()
 	defer func() { c.closeNode(p, expr) }()
 
-	return p.parseRHS()
+	expr = p.parseBinaryExprTail(false, token.LowestPrec+1, p.parseUnaryExpr())
+
+	// Enforce there is an explicit comma. We could also allow the
+	// omission of commas in lists, but this gives rise to some ambiguities
+	// with list comprehensions.
+	if p.tok == token.COMMA && p.lit != "," {
+		p.next()
+		// Allow missing comma for last element, though, to be compliant
+		// with JSON.
+		if p.tok == token.RBRACK || p.tok == token.FOR || p.tok == token.IF {
+			return expr, false
+		}
+		p.errf(p.pos, "missing ',' before newline in list literal")
+	} else if !p.atComma("list literal", token.RBRACK, token.FOR, token.IF) {
+		return expr, false
+	}
+	p.next()
+
+	return expr, true
 }
 
 // checkExpr checks that x is an expression (and not a type).
@@ -1415,10 +1438,13 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 }
 
 // Callers must check the result (using checkExpr), depending on context.
-func (p *parser) parseExpr(lhs bool) ast.Expr {
+func (p *parser) parseExpr(lhs bool) (expr ast.Expr) {
 	if p.trace {
 		defer un(trace(p, "Expression"))
 	}
+
+	c := p.openComments()
+	defer func() { c.closeExpr(p, expr) }()
 
 	return p.parseBinaryExpr(lhs, token.LowestPrec+1)
 }

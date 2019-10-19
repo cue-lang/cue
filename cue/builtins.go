@@ -686,46 +686,14 @@ var builtinPackages = map[string]*builtinPkg{
 				}()
 			},
 		}, {
-			Name:   "Flatten",
-			Params: []kind{topKind},
-			Result: listKind,
-			Func: func(c *callCtxt) {
-				xs := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var flatten func(Value) ([]Value, error)
-					flatten = func(xs Value) ([]Value, error) {
-						var res []Value
-						iter, err := xs.List()
-						if err != nil {
-							return nil, err
-						}
-						for iter.Next() {
-							val := iter.Value()
-							if val.Kind() == ListKind {
-								vals, err := flatten(val)
-								if err != nil {
-									return nil, err
-								}
-								res = append(res, vals...)
-							} else {
-								res = append(res, val)
-							}
-						}
-						return res, nil
-					}
-					return flatten(xs)
-				}()
-			},
-		}, {
 			Name:   "FlattenN",
-			Params: []kind{topKind, numKind},
+			Params: []kind{topKind, intKind},
 			Result: listKind,
 			Func: func(c *callCtxt) {
-				xs, depth := c.value(0), c.decimal(1)
+				xs, depth := c.value(0), c.int(1)
 				c.ret, c.err = func() (interface{}, error) {
-					var flattenN func(Value, *internal.Decimal) ([]Value, error)
-					one := apd.New(1, 0)
-					flattenN = func(xs Value, depth *internal.Decimal) ([]Value, error) {
+					var flattenN func(Value, int) ([]Value, error)
+					flattenN = func(xs Value, depth int) ([]Value, error) {
 						var res []Value
 						iter, err := xs.List()
 						if err != nil {
@@ -733,17 +701,13 @@ var builtinPackages = map[string]*builtinPkg{
 						}
 						for iter.Next() {
 							val := iter.Value()
-							if val.Kind() == ListKind && !depth.IsZero() {
-								d := apd.New(0, 0)
-								_, err := internal.BaseContext.Sub(d, depth, one)
+							if val.Kind() == ListKind && depth != 0 {
+								d := depth - 1
+								values, err := flattenN(val, d)
 								if err != nil {
 									return nil, err
 								}
-								vals, err := flattenN(val, d)
-								if err != nil {
-									return nil, err
-								}
-								res = append(res, vals...)
+								res = append(res, values...)
 							} else {
 								res = append(res, val)
 							}

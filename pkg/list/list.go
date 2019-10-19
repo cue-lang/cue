@@ -20,8 +20,6 @@ import (
 	"sort"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/internal"
-	"github.com/cockroachdb/apd/v2"
 )
 
 // Drop reports the suffix of list x after the first n elements,
@@ -47,41 +45,46 @@ func Drop(x []cue.Value, n int) ([]cue.Value, error) {
 	return x[n:], nil
 }
 
-// Flatten reports a flattend sequence of the list xs by expanding any elements
-// that are lists.
+// TODO: disable Flatten until we know the right default for depth.
+//       The right time to determine is at least some point after the query
+//       extensions are introduced, which may provide flatten functionality
+//       natively.
 //
-// For instance:
-//
-//    Flatten([1, [[2, 3], []], [4]])
-//
-// results in
-//
-//    [1, 2, 3, 4]
-//
-func Flatten(xs cue.Value) ([]cue.Value, error) {
-	var flatten func(cue.Value) ([]cue.Value, error)
-	flatten = func(xs cue.Value) ([]cue.Value, error) {
-		var res []cue.Value
-		iter, err := xs.List()
-		if err != nil {
-			return nil, err
-		}
-		for iter.Next() {
-			val := iter.Value()
-			if val.Kind() == cue.ListKind {
-				vals, err := flatten(val)
-				if err != nil {
-					return nil, err
-				}
-				res = append(res, vals...)
-			} else {
-				res = append(res, val)
-			}
-		}
-		return res, nil
-	}
-	return flatten(xs)
-}
+// // Flatten reports a flattend sequence of the list xs by expanding any elements
+// // that are lists.
+// //
+// // For instance:
+// //
+// //    Flatten([1, [[2, 3], []], [4]])
+// //
+// // results in
+// //
+// //    [1, 2, 3, 4]
+// //
+// func Flatten(xs cue.Value) ([]cue.Value, error) {
+// 	var flatten func(cue.Value) ([]cue.Value, error)
+// 	flatten = func(xs cue.Value) ([]cue.Value, error) {
+// 		var res []cue.Value
+// 		iter, err := xs.List()
+// 		if err != nil {
+// 			return nil, err
+// 		}
+// 		for iter.Next() {
+// 			val := iter.Value()
+// 			if val.Kind() == cue.ListKind {
+// 				vals, err := flatten(val)
+// 				if err != nil {
+// 					return nil, err
+// 				}
+// 				res = append(res, vals...)
+// 			} else {
+// 				res = append(res, val)
+// 			}
+// 		}
+// 		return res, nil
+// 	}
+// 	return flatten(xs)
+// }
 
 // FlattenN reports a flattend sequence of the list xs by expanding any elements
 // depth levels deep. If depth is negative all elements are expanded.
@@ -94,10 +97,9 @@ func Flatten(xs cue.Value) ([]cue.Value, error) {
 //
 //    [1, [2, 3], [], 4]
 //
-func FlattenN(xs cue.Value, depth *internal.Decimal) ([]cue.Value, error) {
-	var flattenN func(cue.Value, *internal.Decimal) ([]cue.Value, error)
-	one := apd.New(1, 0)
-	flattenN = func(xs cue.Value, depth *internal.Decimal) ([]cue.Value, error) {
+func FlattenN(xs cue.Value, depth int) ([]cue.Value, error) {
+	var flattenN func(cue.Value, int) ([]cue.Value, error)
+	flattenN = func(xs cue.Value, depth int) ([]cue.Value, error) {
 		var res []cue.Value
 		iter, err := xs.List()
 		if err != nil {
@@ -105,17 +107,13 @@ func FlattenN(xs cue.Value, depth *internal.Decimal) ([]cue.Value, error) {
 		}
 		for iter.Next() {
 			val := iter.Value()
-			if val.Kind() == cue.ListKind && !depth.IsZero() {
-				d := apd.New(0, 0)
-				_, err := internal.BaseContext.Sub(d, depth, one)
+			if val.Kind() == cue.ListKind && depth != 0 {
+				d := depth - 1
+				values, err := flattenN(val, d)
 				if err != nil {
 					return nil, err
 				}
-				vals, err := flattenN(val, d)
-				if err != nil {
-					return nil, err
-				}
-				res = append(res, vals...)
+				res = append(res, values...)
 			} else {
 				res = append(res, val)
 			}

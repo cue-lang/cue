@@ -321,7 +321,7 @@ func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
 
 func (x *closeIfStruct) evalPartial(ctx *context) evaluated {
 	v := x.value.evalPartial(ctx)
-	updateCloseStatus(v)
+	updateCloseStatus(ctx, v)
 	return v
 }
 

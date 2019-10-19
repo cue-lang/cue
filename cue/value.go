@@ -796,7 +796,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		// it is safe to cache the result.
 		ctx.cycleErr = false
 
-		updateCloseStatus(v)
+		updateCloseStatus(ctx, v)
 		x.arcs[i].cache = v
 		if doc != nil {
 			x.arcs[i].docs = &docNode{n: doc, left: x.arcs[i].docs}
@@ -862,7 +862,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 		orig := *x
 		orig.comprehensions = incomplete
 		orig.emit = nil
-		n = binOp(ctx, src, opUnifyUnchecked, &orig, n)
+		n = binOp(ctx, src, opUnify, &orig, n)
 
 	default:
 		if len(comprehensions) == len(incomplete) {
@@ -984,13 +984,13 @@ type closeIfStruct struct {
 	value
 }
 
-func wrapFinalize(v value) value {
+func wrapFinalize(ctx *context, v value) value {
 	if v.kind().isAnyOf(structKind | listKind) {
 		switch x := v.(type) {
 		case *top:
 			return v
 		case *structLit, *list, *disjunction:
-			updateCloseStatus(v)
+			updateCloseStatus(ctx, v)
 		case *closeIfStruct:
 			return x
 		}
@@ -999,23 +999,27 @@ func wrapFinalize(v value) value {
 	return v
 }
 
-func updateCloseStatus(v value) {
+func updateCloseStatus(ctx *context, v value) {
 	switch x := v.(type) {
 	case *structLit:
-		if x.closeStatus.shouldClose() {
-			x.closeStatus = isClosed
+		y, err := x.expandFields(ctx)
+		if err == nil {
+			if x.closeStatus.shouldClose() {
+				x.closeStatus = isClosed
+			}
+			x.closeStatus |= shouldFinalize
+			y.closeStatus = x.closeStatus
 		}
-		x.closeStatus |= shouldFinalize
 
 	case *disjunction:
 		for _, d := range x.values {
-			d.val = wrapFinalize(d.val)
+			d.val = wrapFinalize(ctx, d.val)
 		}
 
 	case *list:
-		wrapFinalize(x.elem)
+		wrapFinalize(ctx, x.elem)
 		if x.typ != nil {
-			wrapFinalize(x.typ)
+			wrapFinalize(ctx, x.typ)
 		}
 	}
 }

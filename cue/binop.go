@@ -605,7 +605,7 @@ func evalLambda(ctx *context, a value, finalize bool) (l *lambdaExpr, err evalua
 	}
 	lambda := ctx.deref(l).(*lambdaExpr)
 	if finalize {
-		lambda.value = wrapFinalize(lambda.value)
+		lambda.value = wrapFinalize(ctx, lambda.value)
 	}
 	return lambda, nil
 }
@@ -705,10 +705,10 @@ outer:
 				}
 				w := b.v
 				if x.closeStatus.shouldFinalize() {
-					w = wrapFinalize(w)
+					w = wrapFinalize(ctx, w)
 				}
 				if y.closeStatus.shouldFinalize() {
-					v = wrapFinalize(v)
+					v = wrapFinalize(ctx, v)
 				}
 				v = mkBin(ctx, src.Pos(), op, w, v)
 				obj.arcs[i].v = v

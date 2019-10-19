@@ -1476,13 +1476,20 @@ a: {
 			}
 			...
 		}
+
+		E :: A & {
+			for k, v in { f3: int } {
+				"\(k)": v
+			}
+		}
 		`,
 		out: `<0>{` +
+			`E :: _|_(int:field "f3" not allowed in closed struct), ` +
 			`A :: <1>C{f1: int, f2: int}, ` +
-			`a: <2>C{f1: int, f2: int, f3: int}, ` +
-			`B :: <3>C{f1: int}, ` +
-			`C :: <4>C{f1: int}, ` +
-			`D :: <5>{f1: int, ...}` +
+			`a: _|_(int:field "f3" not allowed in closed struct), ` +
+			`B :: <2>C{f1: int}, ` +
+			`C :: <3>C{f1: int}, ` +
+			`D :: <4>{f1: int, ...}` +
 			`}`,
 	}, {
 		desc: "incomplete comprehensions",
@@ -2573,6 +2580,30 @@ func TestFullEval(t *testing.T) {
 		}
 		`,
 		out: `<0>{Workflow :: <1>C{jobs: <2>{<>: <3>(jobID: string)-><4>C{}, }, JobID :: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{<>: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, JobID :: "foo"}}`,
+	}, {
+		desc: "Issue #153",
+		in: `
+		Foo: {
+			listOfCloseds: [...Closed]
+		}
+		
+		Closed :: {
+			a: int | *0
+		}
+		
+		Junk: {
+			b: 2
+		}
+		
+		Foo & {
+			listOfCloseds: [{
+				for k, v in Junk {
+					"\(k)": v
+				}
+			 }]
+		}
+		`,
+		out: `<0>{<1>{listOfCloseds: [_|_(2:field "b" not allowed in closed struct)]}, Foo: <2>{listOfCloseds: []}, Closed :: <3>C{a: 0}, Junk: <4>{b: 2}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

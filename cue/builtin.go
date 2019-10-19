@@ -204,7 +204,7 @@ var orBuiltin = &builtin{
 		if len(d) == 0 {
 			// TODO(manifest): This should not be unconditionally incomplete,
 			// but it requires results from comprehensions and all to have
-			// some special status. Mayb this can be solved by having results
+			// some special status. Maybe this can be solved by having results
 			// of list comprehensions be open if they result from iterating over
 			// an open list or struct. This would actually be exactly what
 			// that means. The error here could then only add an incomplete

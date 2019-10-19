@@ -153,14 +153,20 @@ func Repeat(s string, count int) string {
 	return strings.Repeat(s, count)
 }
 
-// ToUpper returns a copy of the string s with all Unicode letters mapped to their upper case.
+// ToUpper returns s with all Unicode letters mapped to their upper case.
 func ToUpper(s string) string {
 	return strings.ToUpper(s)
 }
 
-// ToLower returns a copy of the string s with all Unicode letters mapped to their lower case.
+// ToLower returns s with all Unicode letters mapped to their lower case.
 func ToLower(s string) string {
 	return strings.ToLower(s)
+}
+
+// ToValidUTF8 returns a copy of the string s with each run of invalid UTF-8 byte sequences
+// replaced by the replacement string, which may be empty.
+func ToValidUTF8(s, replacement string) string {
+	return strings.ToValidUTF8(s, replacement)
 }
 
 // Trim returns a slice of the string s with all leading and

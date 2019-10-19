@@ -39,9 +39,13 @@ func FormatBool(b bool) string {
 // When bitSize=32, the result still has type float64, but it will be
 // convertible to float32 without changing its value.
 //
-// If s is well-formed and near a valid floating point number,
-// ParseFloat returns the nearest floating point number rounded
+// ParseFloat accepts decimal and hexadecimal floating-point number syntax.
+// If s is well-formed and near a valid floating-point number,
+// ParseFloat returns the nearest floating-point number rounded
 // using IEEE754 unbiased rounding.
+// (Parsing a hexadecimal floating-point value only rounds when
+// there are more bits in the hexadecimal representation than
+// will fit in the mantissa.)
 //
 // The errors that ParseFloat returns have concrete type *NumError
 // and include err.Num = s.
@@ -51,6 +55,9 @@ func FormatBool(b bool) string {
 // If s is syntactically well-formed but is more than 1/2 ULP
 // away from the largest floating point number of the given size,
 // ParseFloat returns f = ±Inf, err.Err = ErrRange.
+//
+// ParseFloat recognizes the strings "NaN", "+Inf", and "-Inf" as their
+// respective special floating point values. It ignores case when matching.
 func ParseFloat(s string, bitSize int) (float64, error) {
 	return strconv.ParseFloat(s, bitSize)
 }
@@ -67,13 +74,15 @@ func ParseUint(s string, base int, bitSize int) (uint64, error) {
 // bit size (0 to 64) and returns the corresponding value i.
 //
 // If base == 0, the base is implied by the string's prefix:
-// base 16 for "0x", base 8 for "0", and base 10 otherwise.
-// For bases 1, below 0 or above 36 an error is returned.
+// base 2 for "0b", base 8 for "0" or "0o", base 16 for "0x",
+// and base 10 otherwise. Also, for base == 0 only, underscore
+// characters are permitted per the Go integer literal syntax.
+// If base is below 0, is 1, or is above 36, an error is returned.
 //
 // The bitSize argument specifies the integer type
 // that the result must fit into. Bit sizes 0, 8, 16, 32, and 64
 // correspond to int, int8, int16, int32, and int64.
-// For a bitSize below 0 or above 64 an error is returned.
+// If bitSize is below 0 or above 64, an error is returned.
 //
 // The errors that ParseInt returns have concrete type *NumError
 // and include err.Num = s. If s is empty or contains invalid
@@ -101,12 +110,14 @@ func Atoi(s string) (int, error) {
 // 'e' (-d.dddde±dd, a decimal exponent),
 // 'E' (-d.ddddE±dd, a decimal exponent),
 // 'f' (-ddd.dddd, no exponent),
-// 'g' ('e' for large exponents, 'f' otherwise), or
-// 'G' ('E' for large exponents, 'f' otherwise).
+// 'g' ('e' for large exponents, 'f' otherwise),
+// 'G' ('E' for large exponents, 'f' otherwise),
+// 'x' (-0xd.ddddp±ddd, a hexadecimal fraction and binary exponent), or
+// 'X' (-0Xd.ddddP±ddd, a hexadecimal fraction and binary exponent).
 //
 // The precision prec controls the number of digits (excluding the exponent)
-// printed by the 'e', 'E', 'f', 'g', and 'G' formats.
-// For 'e', 'E', and 'f' it is the number of digits after the decimal point.
+// printed by the 'e', 'E', 'f', 'g', 'G', 'x', and 'X' formats.
+// For 'e', 'E', 'f', 'x', and 'X', it is the number of digits after the decimal point.
 // For 'g' and 'G' it is the maximum number of significant digits (trailing
 // zeros are removed).
 // The special precision -1 uses the smallest number of digits

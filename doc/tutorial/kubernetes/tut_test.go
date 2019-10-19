@@ -28,8 +28,8 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/copy"
+	"cuelang.org/go/internal/cuetest"
 	"github.com/kylelemons/godebug/diff"
 )
 

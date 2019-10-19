@@ -469,6 +469,9 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 		} else if len(pathElems) == 0 {
 			obj, ok := expr.(*ast.StructLit)
 			if !ok {
+				if _, ok := expr.(*ast.ListLit); ok {
+					return fmt.Errorf("expected struct as object root, did you mean to use the --list flag?")
+				}
 				return fmt.Errorf("cannot map non-struct to object root")
 			}
 			f.Decls = append(f.Decls, obj.Elts...)

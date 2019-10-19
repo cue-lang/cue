@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo -exclude=Rune$,Func$,^Map$,Special$,EqualFold,Byte,Title$,All$ extract strings
+//go:generate qgo -exclude=Rune$,Func$,^Map$,Special$,EqualFold,Byte,Title$,ToValidUTF8,All$ extract strings
 
 package strings
 
@@ -161,12 +161,6 @@ func ToUpper(s string) string {
 // ToLower returns s with all Unicode letters mapped to their lower case.
 func ToLower(s string) string {
 	return strings.ToLower(s)
-}
-
-// ToValidUTF8 returns a copy of the string s with each run of invalid UTF-8 byte sequences
-// replaced by the replacement string, which may be empty.
-func ToValidUTF8(s, replacement string) string {
-	return strings.ToValidUTF8(s, replacement)
 }
 
 // Trim returns a slice of the string s with all leading and

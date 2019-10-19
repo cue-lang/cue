@@ -107,12 +107,6 @@ func OnesCount(x uint64) int {
 	return bits.OnesCount64(x)
 }
 
-// RotateLeft returns the value of x rotated left by (k mod UintSize) bits.
-// To rotate x right by k bits, call RotateLeft(x, -k).
-func RotateLeft(x uint64, k int) uint64 {
-	return bits.RotateLeft64(x, k)
-}
-
 // Reverse returns the value of x with its bits in reversed order.
 func Reverse(x uint64) uint64 {
 	return bits.Reverse64(x)

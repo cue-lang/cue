@@ -1673,16 +1673,6 @@ var builtinPackages = map[string]*builtinPkg{
 				}()
 			},
 		}, {
-			Name:   "RotateLeft",
-			Params: []kind{intKind, intKind},
-			Result: intKind,
-			Func: func(c *callCtxt) {
-				x, k := c.uint64(0), c.int(1)
-				c.ret = func() interface{} {
-					return bits.RotateLeft64(x, k)
-				}()
-			},
-		}, {
 			Name:   "Reverse",
 			Params: []kind{intKind},
 			Result: intKind,

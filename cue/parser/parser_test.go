@@ -384,6 +384,16 @@ func TestParse(t *testing.T) {
 		`,
 		`<[l5/* c */ // d] a: <[1/* a */] 1> <[1/* b */] @a()> @b()>`,
 	}, {
+		"comprehension comments",
+		`
+		if X {
+			// Comment 1
+			Field: 2
+			// Comment 2
+		}
+		`,
+		`if X <[d2// Comment 2] {<[d0// Comment 1] Field: 2>}>`,
+	}, {
 		"emit comments",
 		`// a comment at the beginning of the file
 

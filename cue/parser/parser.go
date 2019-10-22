@@ -748,7 +748,9 @@ func (p *parser) parseComprehension() (decl ast.Decl) {
 		return decl
 	}
 
+	sc := p.openComments()
 	expr := p.parseStruct()
+	sc.closeExpr(p, expr)
 
 	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
 		p.next()

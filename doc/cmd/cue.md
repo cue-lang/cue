@@ -468,7 +468,7 @@ command hello: {
 
   // starts after ask
   task echo: exec.Run({
-   cmd:    "echo Hello \(task.ask.response)!"]
+   cmd:    "echo Hello \(task.ask.response)!"
    stdout: string // capture stdout
   })
 

@@ -4,14 +4,14 @@ package kube
 _base: {
 	name: string
 
-	label <Key>: string
+	label: [string]: string
 
 	// k8s is a set of Kubernetes-specific settings that will be merged in at
 	// the top-level. The allowed fields are type specfic.
 	kubernetes: {}
 }
 
-deployment <Name>: _base & {
+deployment: [Name=_]: _base & {
 	// Allow any string, but take Name by default.
 	name:     string | *Name
 	kind:     *"deployment" | "stateful" | "daemon"
@@ -20,25 +20,25 @@ deployment <Name>: _base & {
 	image: string
 
 	// expose port defines named ports that is exposed in the service
-	expose port <N>: int
+	expose: port: [string]: int
 
 	// port defines named ports that is not exposed in the service.
-	port <N>: int
+	port: [string]: int
 
-	arg <Key>: string
+	arg: [string]: string
 	args: [ "-\(k)=\(v)" for k, v in arg ] | [...string]
 
 	// Environment variables
-	env <Key>: string
+	env: [string]: string
 
-	envSpec <Key>: {}
+	envSpec: [string]: {}
 	envSpec: {
 		for k, v in env {
-			"\(k)" value: v
+			"\(k)": value: v
 		}
 	}
 
-	volume <Name>: {
+	volume: [Name=_]: {
 		name:      string | *Name
 		mountPath: string
 		subPath:   string | *null
@@ -47,10 +47,10 @@ deployment <Name>: _base & {
 	}
 }
 
-service <Name>: _base & {
+service: [Name=_]: _base & {
 	name: *Name | string
 
-	port <Name>: {
+	port: [Name=_]: {
 		name: string | *Name
 
 		port:     int
@@ -60,16 +60,16 @@ service <Name>: _base & {
 	kubernetes: {}
 }
 
-configMap <Name>: {
+configMap: [string]: {
 }
 
 // define services implied by deployments
 for k, spec in deployment if len(spec.expose.port) > 0 {
-	service "\(k)": {
+	service: "\(k)": {
 
 		// Copy over all ports exposed from containers.
 		for Name, Port in spec.expose.port {
-			port "\(Name)": {
+			port: "\(Name)": {
 				// Set default external port to Port. targetPort must be
 				// the respective containerPort (Port) if it differs from port.
 				port: int | *Port

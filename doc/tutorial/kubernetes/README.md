@@ -145,7 +145,7 @@ package kube
 
 apiVersion: "v1"
 kind:       "ConfigMap"
-metadata name: "prometheus"
+metadata: name: "prometheus"
 data: {
     "alert.rules": """
         groups:
@@ -173,10 +173,10 @@ package kube
 
 import "encoding/yaml"
 
-configMap prometheus: {
+configMap: prometheus: {
     apiVersion: "v1"
     kind:       "ConfigMap"
-    metadata name: "prometheus"
+    metadata: name: "prometheus"
     data: {
         "alert.rules": yaml.Marshal(_cue_alert_rules)
         _cue_alert_rules: {
@@ -247,7 +247,7 @@ Modify this file as below.
 $ cat <<EOF > kube.cue
 package kube
 
-service <ID>: {
+service: [ID=_]: {
     apiVersion: "v1"
     kind:       "Service"
     metadata: {
@@ -269,7 +269,7 @@ service <ID>: {
     }
 }
 
-deployment <ID>: {
+deployment: [ID=_]: {
     apiVersion: "extensions/v1beta1"
     kind:       "Deployment"
     metadata name: ID
@@ -290,8 +290,8 @@ deployment <ID>: {
 EOF
 ```
 
-By replacing the service and deployment name with `<ID>` we have changed the
-definition into a template.
+By replacing the service and deployment name with `[ID=_]` we have changed the
+definition into a template matching any field.
 CUE bind the field name to `ID` as a result.
 During importing we used `metadata.name` as a key for the object names,
 so we can now set this field to `ID`.
@@ -422,42 +422,42 @@ We generalize the top-level template as follows:
 ```
 $ cat <<EOF >> kube.cue
 
-daemonSet <ID>: _spec & {
+daemonSet: [ID=_]: _spec & {
     apiVersion: "extensions/v1beta1"
     kind:       "DaemonSet"
     Name ::     ID
 }
 
-statefulSet <ID>: _spec & {
+statefulSet: [ID=_]: _spec & {
     apiVersion: "apps/v1beta1"
     kind:       "StatefulSet"
     Name ::     ID
 }
 
-deployment <ID>: _spec & {
+deployment: [ID=_]: _spec & {
     apiVersion: "extensions/v1beta1"
     kind:       "Deployment"
     Name ::     ID
     spec replicas: *1 | int
 }
 
-configMap <ID>: {
-    metadata name: ID
-    metadata labels component: Component
+configMap: [ID=_]: {
+    metadata: name: ID
+    metadata: labels: component: Component
 }
 
 _spec: {
     Name :: string
 
-    metadata name: Name
-    metadata labels component: Component
-    spec template: {
-        metadata labels: {
+    metadata: name: Name
+    metadata: labels: component: Component
+    spec: template: {
+        metadata: labels: {
             app:       Name
             component: Component
             domain:    "prod"
         }
-        spec containers: [{name: Name}]
+        spec: containers: [{name: Name}]
     }
 }
 EOF
@@ -483,17 +483,17 @@ $ cat <<EOF >> kube.cue
 
 // Define the _export option and set the default to true
 // for all ports defined in all containers.
-_spec spec template spec containers: [...{
+_spec: spec: template: spec: containers: [...{
     ports: [...{
         _export: *true | false // include the port in the service
     }]
 }]
 
 for x in [deployment, daemonSet, statefulSet] for k, v in x {
-    service "\(k)": {
-        spec selector: v.spec.template.metadata.labels
+    service: "\(k)": {
+        spec: selector: v.spec.template.metadata.labels
 
-        spec ports: [ {
+        spec: ports: [ {
             Port = p.containerPort // Port is an alias
             port:       *Port | int
             targetPort: *Port | int
@@ -536,17 +536,17 @@ For the purpose of this tutorial, here are some quick patches:
 ```
 $ cat <<EOF >> infra/events/kube.cue
 
-deployment events spec template spec containers: [{ ports: [{_export: false}, _] }]
+deployment: events: spec: template: spec: containers: [{ ports: [{_export: false}, _] }]
 EOF
 
 $ cat <<EOF >> infra/tasks/kube.cue
 
-deployment tasks spec template spec containers: [{ ports: [{_export: false}, _] }]
+deployment: tasks: spec: template: spec: containers: [{ ports: [{_export: false}, _] }]
 EOF
 
 $ cat <<EOF >> infra/watcher/kube.cue
 
-deployment watcher spec template spec containers: [{ ports: [{_export: false}, _] }]
+deployment: watcher: spec: template: spec: containers: [{ ports: [{_export: false}, _] }]
 EOF
 ```
 In practice it would be more proper form to add this field in the original
@@ -575,7 +575,7 @@ structs with a single element onto a single line. For instance:
 $ head frontend/breaddispatcher/kube.cue
 package kube
 
-deployment breaddispatcher: {
+deployment: breaddispatcher: {
     spec: {
         template: {
             metadata: {
@@ -587,8 +587,8 @@ $ cue trim ./... -s
 $ head -7 frontend/breaddispatcher/kube.cue
 package kube
 
-deployment breaddispatcher spec template: {
-    metadata annotations: {
+deployment: breaddispatcher: spec: template: {
+    metadata: annotations: {
         "prometheus.io.scrape": "true"
         "prometheus.io.port":   "7080"
     }
@@ -622,12 +622,12 @@ unconditionally.
 ```
 $ cat <<EOF >> frontend/kube.cue
 
-deployment <X> spec template: {
-    metadata annotations: {
+deployment: [string]: spec: template: {
+    metadata: annotations: {
         "prometheus.io.scrape": "true"
         "prometheus.io.port":   "\(spec.containers[0].ports[0].containerPort)"
     }
-    spec containers: [{
+    spec: containers: [{
         ports: [{containerPort: *7080 | int}] // 7080 is the default
     }]
 }
@@ -670,9 +670,9 @@ Let's add everything but the disks for now:
 ```
 $ cat <<EOF >> kitchen/kube.cue
 
-deployment <Name> spec template: {
-    metadata annotations "prometheus.io.scrape": "true"
-    spec containers: [{
+deployment: [string]: spec: template: {
+    metadata: annotations: "prometheus.io.scrape": "true"
+    spec: containers: [{
         ports: [{
             containerPort: 8080
         }]
@@ -702,18 +702,18 @@ directory with two disks), and generalize it:
 ```
 $ cat <<EOF >> kitchen/kube.cue
 
-deployment <ID> spec template spec: {
+deployment: [ID=_]: spec: template: spec: {
     hasDisks :: *true | bool
 
     // field comprehension using just "if"
     if hasDisks {
         volumes: [{
             name: *"\(ID)-disk" | string
-            gcePersistentDisk pdName: *"\(ID)-disk" | string
-            gcePersistentDisk fsType: "ext4"
+            gcePersistentDisk: pdName: *"\(ID)-disk" | string
+            gcePersistentDisk: fsType: "ext4"
         }, {
             name: *"secret-\(ID)" | string
-            secret secretName: *"\(ID)-secrets" | string
+            secret: secretName: *"\(ID)-secrets" | string
         }, ...]
 
         containers: [{
@@ -732,7 +732,7 @@ EOF
 
 $ cat <<EOF >> kitchen/souschef/kube.cue
 
-deployment souschef spec template spec: {
+deployment: souschef: spec: template: spec: {
     hasDisks :: false
 }
 
@@ -854,11 +854,11 @@ package kube
 objects: [ x for v in objectSets for x in v ]
 
 objectSets: [
-    service,
-    deployment,
-    statefulSet,
-    daemonSet,
-    configMap
+	service,
+	deployment,
+	statefulSet,
+	daemonSet,
+	configMap,
 ]
 EOF
 ```
@@ -883,15 +883,15 @@ import (
 	"tool/file"
 )
 
-command ls: {
-	task print: cli.Print & {
+command: ls: {
+	task: print: cli.Print & {
 		text: tabwriter.Write([
 			"\(x.kind)  \t\(x.metadata.labels.component)  \t\(x.metadata.name)"
 			for x in objects
 		])
 	}
 
-	task write: file.Create & {
+	task: write: file.Create & {
 		filename: "foo.txt"
 		contents: task.print.text
 	}
@@ -967,8 +967,8 @@ import (
 	"tool/cli"
 )
 
-command dump: {
-	task print: cli.Print & {
+command: dump: {
+	task: print: cli.Print & {
 		text: yaml.MarshalStream(objects)
 	}
 }
@@ -1001,14 +1001,14 @@ import (
 	"tool/cli"
 )
 
-command create: {
-	task kube: exec.Run & {
+command: create: {
+	task: kube: exec.Run & {
 		cmd:    "kubectl create --dry-run -f -"
 		stdin:  yaml.MarshalStream(objects)
 		stdout: string
 	}
 
-	task display: cli.Print & {
+	task: display: cli.Print & {
 		text: task.kube.stdout
 	}
 }
@@ -1063,10 +1063,10 @@ import (
   apps_v1beta1 "k8s.io/api/apps/v1beta1"
 )
 
-service <Name>: v1.Service
-deployment <Name>: extensions_v1beta1.Deployment
-daemonSet <Name>: extensions_v1beta1.DaemonSet
-statefulSet <Name>: apps_v1beta1.StatefulSet
+service: [string]:     v1.Service
+deployment: [string]:  extensions_v1beta1.Deployment
+daemonSet: [string]:   extensions_v1beta1.DaemonSet
+statefulSet: [string]: apps_v1beta1.StatefulSet
 EOF
 ```
 
@@ -1108,7 +1108,7 @@ We define one top-level file with our generic definitions.
 // file cloud.cue
 package cloud
 
-service <Name>: {
+service: [Name=_]: {
     name: *Name | string // the name of the service
 
     ...
@@ -1119,7 +1119,7 @@ service <Name>: {
     }
 }
 
-deployment <Name>: {
+deployment: [Name=_]: {
     name: *Name | string
    ...
 }
@@ -1149,7 +1149,7 @@ The first step we took is to eliminate `statefulSet` and `daemonSet` and
 rather just have a `deployment` allowing different kinds.
 
 ```
-deployment <Name>: _base & {
+deployment: [Name=_]: _base & {
     name:     *Name | string
     ...
 ```
@@ -1162,7 +1162,7 @@ The next step is to pull common fields, such as `image` to the top level.
 
 Arguments can be specified as a map.
 ```
-    arg <Key>: string
+    arg: [string]: string
     args: [ "-\(k)=\(v)" for k, v in arg ] | [...string]
 ```
 
@@ -1172,10 +1172,10 @@ For ports we define two simple maps from name to port number:
 
 ```
     // expose port defines named ports that is exposed in the service
-    expose port <N>: int
+    expose: port: [string]: int
 
     // port defines a named port that is not exposed in the service.
-    port <N>: int
+    port: [string]: int
 ```
 Both maps get defined in the container definition, but only `port` gets
 included in the service definition.
@@ -1188,9 +1188,9 @@ The testdata uses other options though.
 We define a simple `env` map and an `envSpec` for more elaborate cases:
 
 ```
-    env <Key>: string
+    env: [string]: string
 
-    envSpec <Key>: {}
+    envSpec: [string]: {}
     envSpec: {"\(k)" value: v for k, v in env}
 ```
 The simple map automatically gets mapped into the more elaborate map
@@ -1201,7 +1201,7 @@ to create a single definition for volumes, combining the information for
 volume spec and volume mount.
 
 ```
-    volume <Name>: {
+    volume: [Name=_]: {
         name:      *Name | string
         mountPath: string
         subPath:   null | string
@@ -1224,13 +1224,15 @@ automatically derive a service is now a bit simpler:
 
 ```
 // define services implied by deployments
-service "\(k)": {
+service: "\(k)": {
 
     // Copy over all ports exposed from containers.
-    port "\(Name)": {
-        port:       *Port | int
-        targetPort: *Port | int
-    } for Name, Port in spec.expose.port
+    for Name, Port in spec.expose.port {
+        port: "\(Name)": {
+            port:       *Port | int
+            targetPort: *Port | int
+        }
+    }
 
     // Copy over the labels
     label: spec.label
@@ -1256,11 +1258,11 @@ kubernetes services: {
             apiVersion: "v1"
             kind:       "Service"
 
-            metadata name:   x.name
-            metadata labels: x.label
-            spec selector:   x.label
+            metadata: name:   x.name
+            metadata: labels: x.label
+            spec: selector:   x.label
 
-            spec ports: [ p for p in x.port ]
+            spec: ports: [ p for p in x.port ]
         }
     }
 }

@@ -1,13 +1,13 @@
 package kube
 
-_base label component: "kitchen"
+_base: label: component: "kitchen"
 
-deployment <Name>: {
-	expose port client: 8080
+deployment: [string]: {
+	expose: port: client: 8080
 
-	kubernetes spec template metadata annotations "prometheus.io.scrape": "true"
+	kubernetes: spec: template: metadata: annotations: "prometheus.io.scrape": "true"
 
-	kubernetes spec template spec containers: [{
+	kubernetes: spec: template: spec: containers: [{
 		livenessProbe: {
 			httpGet: {
 				path: "/debug/health"
@@ -23,23 +23,23 @@ deployment <Name>: {
 _kitchenDeployment: {
 	name: string
 
-	arg env:            "prod"
-	arg logdir:         "/logs"
-	arg "event-server": "events:7788"
+	arg: env:            "prod"
+	arg: logdir:         "/logs"
+	arg: "event-server": "events:7788"
 
 	// Volumes
-	volume "\(name)-disk": {
+	volume: "\(name)-disk": {
 		name:      string
 		mountPath: *"/logs" | string
-		spec gcePersistentDisk: {
+		spec: gcePersistentDisk: {
 			pdName: *name | string
 			fsType: "ext4"
 		}
 	}
 
-	volume "secret-\(name)": {
+	volume: "secret-\(name)": {
 		mountPath: *"/etc/certs" | string
 		readOnly:  true
-		spec secret secretName: *"\(name)-secrets" | string
+		spec: secret: secretName: *"\(name)-secrets" | string
 	}
 }

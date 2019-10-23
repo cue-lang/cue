@@ -1,6 +1,6 @@
 package kube
 
-configMap nginx "nginx.conf": """
+configMap: nginx: "nginx.conf": """
 		events {
 		    worker_connections 768;
 		}

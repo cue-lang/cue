@@ -2,7 +2,7 @@ package kube
 
 import "encoding/yaml"
 
-configMap prometheus: {
+configMap: prometheus: {
 	"alert.rules": yaml.Marshal(alert_rules)
 	alert_rules = {
 		groups: [{
@@ -11,7 +11,7 @@ configMap prometheus: {
 				alert: "InstanceDown"
 				expr:  "up == 0"
 				for:   "30s"
-				labels severity: "page"
+				labels: severity: "page"
 				annotations: {
 					description: "{{$labels.app}} of job {{ $labels.job }} has been down for more than 30 seconds."
 					summary:     "Instance {{$labels.app}} down"
@@ -20,7 +20,7 @@ configMap prometheus: {
 				alert: "InsufficientPeers"
 				expr:  "count(up{job=\"etcd\"} == 0) > (count(up{job=\"etcd\"}) / 2 - 1)"
 				for:   "3m"
-				labels severity: "page"
+				labels: severity: "page"
 				annotations: {
 					description: "If one more etcd peer goes down the cluster will be unavailable"
 					summary:     "etcd cluster small"
@@ -29,13 +29,13 @@ configMap prometheus: {
 				alert: "EtcdNoMaster"
 				expr:  "sum(etcd_server_has_leader{app=\"etcd\"}) == 0"
 				for:   "1s"
-				labels severity:     "page"
-				annotations summary: "No ETCD master elected."
+				labels: severity:     "page"
+				annotations: summary: "No ETCD master elected."
 			}, {
 				alert: "PodRestart"
 				expr:  "(max_over_time(pod_container_status_restarts_total[5m]) - min_over_time(pod_container_status_restarts_total[5m])) > 2"
 				for:   "1m"
-				labels severity: "page"
+				labels: severity: "page"
 				annotations: {
 					description: "{{$labels.app}} {{ $labels.container }} resturted {{ $value }} times in 5m."
 					summary:     "Pod for {{$labels.container}} restarts too often"
@@ -45,9 +45,9 @@ configMap prometheus: {
 	}
 	"prometheus.yml": yaml.Marshal(prometheus_yml)
 	prometheus_yml = {
-		global scrape_interval: "15s"
+		global: scrape_interval: "15s"
 		rule_files: ["/etc/prometheus/alert.rules"]
-		alerting alertmanagers: [{
+		alerting: alertmanagers: [{
 			scheme: "http"
 			static_configs: [{
 				targets: ["alertmanager:9093"]
@@ -67,7 +67,7 @@ configMap prometheus: {
 			// Prometheus. The discovery auth config is automatic if Prometheus runs inside
 			// the cluster. Otherwise, more config options have to be provided within the
 			// <kubernetes_sd_config>.
-			tls_config ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+			tls_config: ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 			// If your node certificates are self-signed or use a different CA to the
 			// master CA, then disable certificate verification below. Note that
 			// certificate verification is an integral part of a secure infrastructure
@@ -101,7 +101,7 @@ configMap prometheus: {
 			// Prometheus. The discovery auth config is automatic if Prometheus runs inside
 			// the cluster. Otherwise, more config options have to be provided within the
 			// <kubernetes_sd_config>.
-			tls_config ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+			tls_config: ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 			bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 			kubernetes_sd_configs: [{
 				role: "node"
@@ -143,7 +143,7 @@ configMap prometheus: {
 			// Prometheus. The discovery auth config is automatic if Prometheus runs inside
 			// the cluster. Otherwise, more config options have to be provided within the
 			// <kubernetes_sd_config>.
-			tls_config ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+			tls_config: ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
 			bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 			kubernetes_sd_configs: [{
 				role: "node"
@@ -217,7 +217,7 @@ configMap prometheus: {
 			// * `prometheus.io/probe`: Only probe services that have a value of `true`
 			job_name:     "kubernetes-services"
 			metrics_path: "/probe"
-			params module: ["http_2xx"]
+			params: module: ["http_2xx"]
 			kubernetes_sd_configs: [{
 				role: "service"
 			}]
@@ -253,7 +253,7 @@ configMap prometheus: {
 			// * `prometheus.io/probe`: Only probe services that have a value of `true`
 			job_name:     "kubernetes-ingresses"
 			metrics_path: "/probe"
-			params module: ["http_2xx"]
+			params: module: ["http_2xx"]
 			kubernetes_sd_configs: [{
 				role: "ingress"
 			}]

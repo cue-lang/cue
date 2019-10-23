@@ -1,6 +1,6 @@
 package kube
 
-deployment download: {
+deployment: download: {
 	image: "gcr.io/myproj/download:v0.0.2"
-	expose port client: 7080
+	expose: port: client: 7080
 }

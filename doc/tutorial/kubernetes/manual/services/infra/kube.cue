@@ -1,3 +1,3 @@
 package kube
 
-_base label component: "infra"
+_base: label: component: "infra"

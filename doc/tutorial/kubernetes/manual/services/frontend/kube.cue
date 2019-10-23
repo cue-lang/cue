@@ -1,10 +1,10 @@
 package kube
 
-_base label component: "frontend"
+_base: label: component: "frontend"
 
-deployment <Name>: {
-	expose port http: *7080 | int
-	kubernetes spec template metadata annotations: {
+deployment: [string]: {
+	expose: port: http: *7080 | int
+	kubernetes: spec: template: metadata: annotations: {
 		"prometheus.io.scrape": "true"
 		"prometheus.io.port":   "\(expose.port.http)"
 	}

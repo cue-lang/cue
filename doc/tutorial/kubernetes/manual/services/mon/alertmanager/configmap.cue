@@ -2,7 +2,7 @@ package kube
 
 import "encoding/yaml"
 
-configMap alertmanager: {
+configMap: alertmanager: {
 	"alerts.yaml": yaml.Marshal(alerts_yaml)
 	alerts_yaml = {
 		receivers: [{

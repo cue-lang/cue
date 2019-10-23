@@ -1,12 +1,12 @@
 package kube
 
-deployment goget: {
+deployment: goget: {
 	image: "gcr.io/myproj/goget:v0.5.1"
 
-	expose port https: 7443
+	expose: port: https: 7443
 
-	volume "secret-volume": {
+	volume: "secret-volume": {
 		mountPath: "/etc/ssl"
-		spec secret secretName: "goget-secrets"
+		spec: secret: secretName: "goget-secrets"
 	}
 }

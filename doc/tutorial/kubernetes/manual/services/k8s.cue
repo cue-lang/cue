@@ -1,16 +1,16 @@
 package kube
 
-kubernetes services: {
+kubernetes: services: {
 	for k, x in service {
 		"\(k)": x.kubernetes & {
 			apiVersion: "v1"
 			kind:       "Service"
 
-			metadata name:   x.name
-			metadata labels: x.label
-			spec selector:   x.label
+			metadata: name:   x.name
+			metadata: labels: x.label
+			spec: selector:   x.label
 
-			spec ports: [ p for p in x.port ] // convert struct to list
+			spec: ports: [ p for p in x.port ] // convert struct to list
 		}
 	}
 	// Note that we cannot write
@@ -26,27 +26,27 @@ kubernetes services: {
 // deployments: _k8sSpec(X: x) for x in deployment
 // This would look nicer and would allow for superior type checking.
 
-kubernetes deployments: {
+kubernetes: deployments: {
 	for k, x in deployment if x.kind == "deployment" {
 		"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
 			apiVersion: "extensions/v1beta1"
 			kind:       "Deployment"
-			spec replicas: x.replicas
+			spec: replicas: x.replicas
 		}
 	}
 }
 
-kubernetes statefulSets: {
+kubernetes: statefulSets: {
 	for k, x in deployment if x.kind == "stateful" {
 		"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
 			apiVersion: "apps/v1beta1"
 			kind:       "StatefulSet"
-			spec replicas: x.replicas
+			spec: replicas: x.replicas
 		}
 	}
 }
 
-kubernetes daemonSets: {
+kubernetes: daemonSets: {
 	for k, x in deployment if x.kind == "daemon" {
 		"\(k)": (_k8sSpec & {X: x}).X.kubernetes & {
 			apiVersion: "extensions/v1beta1"
@@ -55,14 +55,14 @@ kubernetes daemonSets: {
 	}
 }
 
-kubernetes configMaps: {
+kubernetes: configMaps: {
 	for k, v in configMap {
 		"\(k)": {
 			apiVersion: "v1"
 			kind:       "ConfigMap"
 
-			metadata name: k
-			metadata labels component: _base.label.component
+			metadata: name: k
+			metadata: labels: component: _base.label.component
 			data: v
 		}
 	}
@@ -72,14 +72,14 @@ kubernetes configMaps: {
 // Unify the deployment at X and read out kubernetes to obtain
 // the conversion.
 // TODO: use alias
-_k8sSpec X kubernetes: {
-	metadata name: X.name
-	metadata labels component: X.label.component
+_k8sSpec: X: kubernetes: {
+	metadata: name: X.name
+	metadata: labels: component: X.label.component
 
-	spec template: {
-		metadata labels: X.label
+	spec: template: {
+		metadata: labels: X.label
 
-		spec containers: [{
+		spec: containers: [{
 			name:  X.name
 			image: X.image
 			args:  X.args
@@ -95,7 +95,7 @@ _k8sSpec X kubernetes: {
 	}
 
 	// Volumes
-	spec template spec: {
+	spec: template: spec: {
 		if len(X.volume) > 0 {
 			volumes: [
 					v.kubernetes & {name: v.name} for v in X.volume

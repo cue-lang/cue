@@ -1,18 +1,18 @@
 package kube
 
-service alertmanager: {
-	label name: "alertmanager"
+service: alertmanager: {
+	label: name: "alertmanager"
 
-	port alertmanager name: "main"
+	port: alertmanager: name: "main"
 
-	kubernetes metadata: {
-		annotations "prometheus.io/scrape": "true"
-		annotations "prometheus.io/path":   "/metrics"
+	kubernetes: metadata: {
+		annotations: "prometheus.io/scrape": "true"
+		annotations: "prometheus.io/path":   "/metrics"
 	}
 }
 
-deployment alertmanager: {
-	kubernetes spec selector matchLabels app: "alertmanager"
+deployment: alertmanager: {
+	kubernetes: spec: selector: matchLabels: app: "alertmanager"
 
 	image: "prom/alertmanager:v0.15.2"
 
@@ -24,14 +24,14 @@ deployment alertmanager: {
 
 	// XXX: adding another label cause an error at the wrong position:
 	// expose port alertmanager configMap
-	expose port alertmanager: 9093
+	expose: port: alertmanager: 9093
 
-	volume "config-volume": {
+	volume: "config-volume": {
 		mountPath: "/etc/alertmanager"
-		spec configMap name: "alertmanager"
+		spec: configMap: name: "alertmanager"
 	}
-	volume alertmanager: {
+	volume: alertmanager: {
 		mountPath: "/alertmanager"
-		spec emptyDir: {}
+		spec: emptyDir: {}
 	}
 }

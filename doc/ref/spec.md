@@ -1024,8 +1024,8 @@ Syntactically, a struct literal may contain multiple fields with
 the same label, the result of which is a single field with the same properties
 as defined as the unification of two fields resulting from unifying two structs.
 
-These examples illustrate required fields only. Examples with
-optional fields follow below.
+These examples illustrate required fields only.
+Examples with optional fields follow below.
 
 ```
 Expression                             Result (without optional fields)
@@ -1040,9 +1040,19 @@ Expression                             Result (without optional fields)
 {a: 1} & {a: 2}                        _|_
 ```
 
-Syntactically, the labels of optional fields are followed by a
-question mark `?`.
+Optional labels are defined in sets with an expression to select all
+labels to which to apply a given constraint.
+Syntactically, the label of an optional field set is an expression in square
+brackets indicating the matching labels.
+The value `string` matches all fields, while a concrete string matches a
+single field.
+As the latter case is common, a concrete label followed by
+a question mark `?` may be used as a shorthand.
+So `foo?: bar` is a shorthand for `["foo"]: bar`.
 The question mark is not part of the field name.
+The token `...` may be used as the last declaration in a struct
+and is a shorthand for `[_]: _`.
+
 Concrete field labels may be an identifier or string, the latter of which may be
 interpolated.
 Fields with identifier labels can be referred to within the scope they are
@@ -1062,58 +1072,8 @@ By default it defines this value for all possible string labels.
 An optional expression limits this to the set of optional fields which
 labels match the expression.
 -->
-A Bind label, written `<identifier>`, is useful for capturing a label as a value
-and for enforcing constraints on all fields of a struct.
-In a field using a bind label, such as
-```
-{
-    <id>: { name: id }
-}
-```
-the label name is bound to the identifier for the scope of the field value, so
-it can be used inside the value to denote the label.
 
-A bind label matches every field of its enclosing struct, so
-```
-{
-    <id>: { name: id }
-    a: { value: 1 }
-}
-```
-evaluates to
 
-```
-{
-    a: { name: "a" }
-    a: { value: 1 }
-}
-```
-Since identical fields in a struct unify, this is equivalent to
-```
-{
-    a: {
-        name: "a"
-        value: 1
-    }
-}
-```
-
-Because bind labels match every field in a struct, they can enforce constraints
-on all fields. The struct
-
-```
-ints: {
-    <_>: int
-}
-```
-can only have integer field values:
-
-```
-ints & { a: 1 } // ok
-ints & { b: "two" } // _|_, because int & "two" == _|_.
-```
-
-The token `...` is a shorthand for `<_>: _`.
 <!-- NOTE: if we allow ...Expr, as in list, it would mean something different. -->
 
 
@@ -1148,25 +1108,13 @@ future extensions and relaxations:
     additionalProperties and additionalItems.
 -->
 
-<!-- TODO: for next round of implementation, replace ExpressionLabel with:
-ExpressionLabel = BindLabel | [ BindLabel ] "[" [ Expression ] "]" .
--->
-
-<!-- TODO: strongly consider relaxing an embedding to be an Expression, instead
-of Operand. This will tie in with using dots instead of spaces on the LHS,
-comprehensions and the ability to generate good error messages, so thread
-carefully.
--->
 ```
 StructLit       = "{" { Declaration "," } [ "..." ] "}" .
-Declaration     = Field | Alias | Comprehension | Embedding .
-Embedding       = Expression .
-Field           = Label { Label } Expression .
-Alias           = identifier "=" Expression .
-
-Label           = [ identifier "=" ] LabelPath ( ":" | "::" ) .
-LabelPath       = LabelExpr [ "?" ] | [ LabelExpr ] Filters .
-LabelExpr       = identifier | simple_string_lit .
+Declaration     = Field | Comprehension | AliasExpr .
+Field           = LabelSpec { LabelSpec } Expression .
+LabelSpec       = Label ( ":" | "::" ) .
+Label           = LabelName [ "?" ] | "[" AliasExpr "]".
+LabelName       = identifier | simple_string_lit  .
 
 attribute       = "@" identifier "(" attr_elems ")" .
 attr_elems      = attr_elem { "," attr_elem }
@@ -1177,6 +1125,9 @@ attr_string     = { attr_char } | string_lit .
 attr_char        = /* an arbitrary Unicode code point except newline, ',', '"', `'`, '#', '=', '(', and ')' */ .
 ```
 
+<!--
+ TODO: Label           = LabelName [ "?" ] | "[" AliasExpr "]" | "(" AliasExpr ")"
+-->
 
 ```
 Expression                             Result (without optional fields)
@@ -1190,7 +1141,30 @@ f: a & c                               {}
 g: a & { foo?: number }                {}
 h: b & { foo?: number }                _|_
 i: c & { foo: string }                 { foo: "bar" }
+
+intMap: [string]: int
+intMap: {
+    t1: 43
+    t2: 2.4  // error: 2.4 is not an integer
+}
+
+nameMap: [string]: {
+    firstName: string
+    nickName:  *firstName | string
+}
+
+nameMap: hank: { firstName: "Hank" }
 ```
+The optional field set defined by `nameMap` matches every field,
+in this case just `hank`, and unifies the associated constraint
+with the matched field, resulting in:
+```
+nameMap: hank: {
+    firstName: "Hank"
+    nickName:  "Hank"
+}
+```
+
 
 #### Closed structs
 
@@ -1249,7 +1223,7 @@ A2: A & {
 }  // _|_ feild1 not defined for A
 
 C: close({
-    <_>: _
+    [_]: _
 })
 
 C2: C & {
@@ -1445,13 +1419,31 @@ Combined: myStruct1 & myStruct2
 
 #### Aliases
 
-In addition to fields, a struct literal may also define aliases.
 Aliases name values that can be referred to
-within the [scope](#declarations-and-scopes) of their
-definition, but are not part of the struct: aliases are irrelevant to
-the partial ordering of values and are not emitted as part of any
-generated data.
-The name of an alias must be unique within the struct literal.
+within the [scope](#declarations-and-scopes) in which they are declared.
+The name of an alias must be unique within its scope.
+
+```
+AliasExpr  = identifier "=" Expression | Expression .
+```
+
+Aliases can appear in several positions:
+
+As a declaration in a struct (`X=expr`):
+
+- binds the value to an identifier without including it in the struct.
+
+In front of a Label (`X=label: value`):
+
+- binds the identifier to the same value as `label` would be bound
+  to if it were a valid identifier.
+- for optional fields (`foo?: bar` and `[foo]: bar`),
+  the bound identifier is only visible within the field value (`value`).
+
+Inside a bracketed label (`[X=expr]: value`):
+
+- binds the identifier to the the concrete label that matches `expr`
+  within the instances of the field value (`value`).
 
 <!-- TODO: explain the difference between aliases and definitions.
      Now that you have definitions, are aliases really necessary?
@@ -1459,28 +1451,30 @@ The name of an alias must be unique within the struct literal.
 -->
 
 ```
-// The empty struct.
-{}
+// An alias declaration
+Alias = 3
+a: Alias  // 3
 
-// A struct with 3 fields and 1 alias.
-{
-    alias = 3
+// A field alias
+foo: X  // 4
+X="not an identifier": 4
 
-    foo: 2
-    bar: "a string"
-
-    "not an ident": 4
-}
+// A label alias
+[Y=string]: { name: Y }
+foo: { value: 1 } // outputs: foo: { name: "foo", value: 1 }
 ```
+
+<!-- TODO: also allow aliases as lists -->
+
 
 #### Shorthand notation for nested structs
 
 A field whose value is a struct with a single field may be written as
-a sequence of the two field names,
+a colon-separated sequence of the two field names,
 followed by a colon and the value of that single field.
 
 ```
-job myTask replicas: 2
+job: myTask: replicas: 2
 ```
 expands to
 ```
@@ -1550,9 +1544,6 @@ and an unlimited number of elements as its upper bound.
 ListLit       = "[" [ ElementList [ "," [ "..." [ Expression ] ] ] "]" .
 ElementList   = Expression { "," Expression } .
 ```
-<!---
-KeyedElement  = Element .
---->
 
 Lists can be thought of as structs:
 
@@ -1866,21 +1857,26 @@ bottom, where an incomplete expression is not considered bottom.
 PrimaryExpr =
 	Operand |
 	PrimaryExpr Selector |
-	PrimaryExpr Query |
 	PrimaryExpr Index |
 	PrimaryExpr Slice |
 	PrimaryExpr Arguments .
 
 Selector       = "." (identifier | simple_string_lit) .
-Query          = "." Filters .
-Filters        = Filter { Filter } .
-Filter         = "[" [ "?" [ ":" ] ] Expression "]" .
 Index          = "[" Expression "]" .
-Slice          = "[" [ Expression ] ":" [ Expression ] [ ":" [Expression] ] "]" .
 Argument       = Expression .
 Arguments      = "(" [ ( Argument { "," Argument } ) [ "," ] ] ")" .
 ```
 <!---
+TODO:
+	PrimaryExpr Query |
+Query          = "." Filters .
+Filters        = Filter { Filter } .
+Filter         = "[" [ "?" ] AliasExpr "]" .
+
+TODO: maybe reintroduce slices, as they are useful in queries, probably this
+time with Python semantics.
+Slice          = "[" [ Expression ] ":" [ Expression ] [ ":" [Expression] ] "]" .
+
 Argument       = Expression | ( identifer ":" Expression ).
 
 // & expression type

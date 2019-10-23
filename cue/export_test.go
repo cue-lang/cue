@@ -348,7 +348,7 @@ func TestExport(t *testing.T) {
 				f
 
 				b: int
-				<_>: <100
+				[_]: <100
 			}
 		}`,
 		out: unindent(`
@@ -365,7 +365,7 @@ func TestExport(t *testing.T) {
 				emb
 			}
 			e :: {
-				<_>: <100
+				[_]: <100
 				b:   int
 				f
 			}
@@ -417,7 +417,7 @@ func TestExport(t *testing.T) {
 		eval: true,
 		in: `{
 			b: [{
-				<X>: int
+				[X=_]: int
 				if a > 4 {
 					f: 4
 				}
@@ -429,7 +429,7 @@ func TestExport(t *testing.T) {
 		out: unindent(`
 		{
 			b: [{
-				<X>: int
+				[X=_]: int
 				if a > 4 {
 					f: 4
 				}
@@ -677,7 +677,7 @@ func TestExportFile(t *testing.T) {
 		}`),
 	}, {
 		in: `A: {
-			<_>: B
+			[_]: B
 		} @protobuf(1,"test")
 
 		B: {}
@@ -686,7 +686,7 @@ func TestExportFile(t *testing.T) {
 		out: unindent(`
 		{
 			A: {
-				<_>: B
+				[_]: B
 			} @protobuf(1,"test")
 			B: {
 			} & ({
@@ -715,7 +715,7 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		in: `
 		A :: { b: int }
-		a: A & { <_>: <10 }
+		a: A & { [_]: <10 }
 		B :: a
 		`,
 		out: unindent(`
@@ -770,7 +770,7 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		in: `
 			T :: {
-				<_>: int64
+				[_]: int64
 			}
 			X :: {
 				x: int
@@ -780,7 +780,7 @@ func TestExportFile(t *testing.T) {
 		out: unindent(`
 		{
 			T :: {
-				<_>: int64
+				[_]: int64
 			}
 			X :: {
 				x: int64
@@ -794,7 +794,7 @@ func TestExportFile(t *testing.T) {
 		opts: []Option{Optional(false)},
 		in: `
 		T :: {
-			<_>: int64
+			[_]: int64
 		}
 		X :: {
 			x: int

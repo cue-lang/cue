@@ -200,10 +200,32 @@ func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 	return short
 }
 
+func mkTemplate(n *ast.Ident) ast.Label {
+	var expr ast.Expr = n
+	switch n.Name {
+	case "":
+		expr = ast.NewIdent("_")
+	case "_":
+	default:
+		expr = &ast.Alias{Ident: n, Expr: ast.NewIdent("_")}
+	}
+	return ast.NewList(expr)
+}
+
 func hasTemplate(s *ast.StructLit) bool {
 	for _, e := range s.Elts {
 		if f, ok := e.(*ast.Field); ok {
-			if _, ok := f.Label.(*ast.TemplateLabel); ok {
+			label := f.Label
+			if _, ok := label.(*ast.TemplateLabel); ok {
+				return true
+			}
+			if a, ok := label.(*ast.Alias); ok {
+				label, ok = a.Expr.(ast.Label)
+				if !ok {
+					return false
+				}
+			}
+			if _, ok := label.(*ast.ListLit); ok {
 				return true
 			}
 		}
@@ -469,9 +491,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			}
 			expr = &ast.BinaryExpr{X: expr, Op: token.AND, Y: &ast.StructLit{
 				Elts: []ast.Decl{&ast.Field{
-					Label: &ast.TemplateLabel{
-						Ident: p.identifier(l.params.arcs[0].feature),
-					},
+					Label: mkTemplate(p.identifier(l.params.arcs[0].feature)),
 					Value: p.expr(l.value),
 				}},
 			}}
@@ -676,9 +696,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 				break
 			}
 			obj.Elts = append(obj.Elts, &ast.Field{
-				Label: &ast.TemplateLabel{
-					Ident: p.identifier(l.params.arcs[0].feature),
-				},
+				Label: mkTemplate(p.identifier(l.params.arcs[0].feature)),
 				Value: p.expr(l.value),
 			})
 		} // TODO: else record error

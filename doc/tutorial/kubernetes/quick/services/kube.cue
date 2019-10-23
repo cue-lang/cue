@@ -1,6 +1,6 @@
 package kube
 
-service: <ID>: {
+service: [ID=_]: {
 	apiVersion: "v1"
 	kind:       "Service"
 	metadata: {
@@ -22,7 +22,7 @@ service: <ID>: {
 	}
 }
 
-deployment: <ID>: {
+deployment: [ID=_]: {
 	apiVersion: "extensions/v1beta1"
 	kind:       "Deployment"
 	metadata: name: ID
@@ -43,26 +43,26 @@ deployment: <ID>: {
 
 Component :: string
 
-daemonSet: <ID>: _spec & {
+daemonSet: [ID=_]: _spec & {
 	apiVersion: "extensions/v1beta1"
 	kind:       "DaemonSet"
 	Name ::     ID
 }
 
-statefulSet: <ID>: _spec & {
+statefulSet: [ID=_]: _spec & {
 	apiVersion: "apps/v1beta1"
 	kind:       "StatefulSet"
 	Name ::     ID
 }
 
-deployment: <ID>: _spec & {
+deployment: [ID=_]: _spec & {
 	apiVersion: "extensions/v1beta1"
 	kind:       "Deployment"
 	Name ::     ID
 	spec: replicas: *1 | int
 }
 
-configMap: <ID>: {
+configMap: [ID=_]: {
 	metadata: name: ID
 	metadata: labels: component: Component
 }

@@ -191,9 +191,9 @@ func TestCompile(t *testing.T) {
 		e2: "a"
 		e2 = "a"
 		`,
-		out: "cannot have two aliases with the same name in the same scope:\n" +
+		out: `alias "e1" redeclared in same scope:` + "\n" +
 			"    test:3:3\n" +
-			"cannot have alias and non-alias with the same name:\n" +
+			`cannot have both alias and field with name "e2" in same scope:` + "\n" +
 			"    test:6:3\n" +
 			"<0>{}",
 	}, {
@@ -204,6 +204,54 @@ func TestCompile(t *testing.T) {
 		}
 		`,
 		out: `<0>{b: <1>{c: <0>.b}}`,
+		// }, {
+		// 	// TODO: Support this:
+		// 	// optional fields
+		// 	in: `
+		// 		X=[string]: { chain: X | null }
+		// 		`,
+		// 	out: `
+		// 		`,
+	}, {
+		// optional fields
+		in: `
+			[ID=string]: { name: ID }
+			A="foo=bar": 3
+			a: A
+			B=bb: 4
+			b1: B
+			b1: bb
+			C="\(a)": 5
+			c: C
+			`,
+		out: `<0>{<>: <1>(ID: string)-><2>{name: <1>.ID}, foo=bar: 3, a: <0>.foo=bar, bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
+	}, {
+		// illegal alias usage
+		in: `
+			[X=string]: { chain: X | null }
+			a: X
+			Y=[string]: 3
+			a: X
+			`,
+		out: `a: invalid label: cannot reference fields with square brackets labels outside the field value:
+    test:3:7
+a: invalid label: cannot reference fields with square brackets labels outside the field value:
+    test:5:7
+<0>{}`,
+	}, {
+		// detect duplicate aliases, even if illegal
+		in: `
+		[X=string]: int
+		X=[string]: int
+		Y=foo: int
+		Y=3
+		Z=[string]: { Z=3, a: int } // allowed
+		`,
+		out: `alias "X" redeclared in same scope:
+    test:3:3
+alias "Y" redeclared in same scope:
+    test:5:3
+<0>{}`,
 	}, {
 		in: `
 		a: {
@@ -211,11 +259,11 @@ func TestCompile(t *testing.T) {
 			k: 1
 		}
 		b: {
-			<x>: { x: 0, y: 1 }
+			<X>: { x: 0, y: 1 }
 			v: {}
 		}
 		`,
-		out: `<0>{a: <1>{<>: <2>(name: string)-><3>{n: <2>.name}, k: 1}, b: <4>{<>: <5>(x: string)-><6>{x: 0, y: 1}, v: <7>{}}}`,
+		out: `<0>{a: <1>{<>: <2>(name: string)-><3>{n: <2>.name}, k: 1}, b: <4>{<>: <5>(X: string)-><6>{x: 0, y: 1}, v: <7>{}}}`,
 	}, {
 		in: `
 		a: {

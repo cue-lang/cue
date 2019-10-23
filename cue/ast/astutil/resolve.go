@@ -66,8 +66,30 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 	for _, d := range decls {
 		switch x := d.(type) {
 		case *ast.Field:
+			label := x.Label
+
+			if a, ok := x.Label.(*ast.Alias); ok {
+				if name, _ := internal.LabelName(a.Ident); name != "" {
+					s.insert(name, x)
+				}
+				label, _ = a.Expr.(ast.Label)
+			}
+
+			switch y := label.(type) {
+			// TODO: support *ast.ParenExpr?
+			case *ast.ListLit:
+				// In this case, it really should be scoped like a template.
+				if len(y.Elts) != 1 {
+					break
+				}
+				if a, ok := y.Elts[0].(*ast.Alias); ok {
+					s.insert(a.Ident.Name, x)
+				}
+			}
+
+			// default:
 			// TODO: switch to ast's implementation
-			name, isIdent := internal.LabelName(x.Label)
+			name, isIdent := internal.LabelName(label)
 			if isIdent {
 				s.insert(name, x.Value)
 			}
@@ -82,19 +104,40 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 	return s
 }
 
+func (s *scope) isAlias(n ast.Node) bool {
+	if _, ok := s.node.(*ast.Field); ok {
+		return true
+	}
+	switch n.(type) {
+	case *ast.Alias:
+		return true
+
+	case *ast.Field:
+		return true
+	}
+	return false
+}
+
 func (s *scope) insert(name string, n ast.Node) {
 	if name == "" {
 		return
 	}
-	if _, existing := s.lookup(name); existing != nil {
-		_, isAlias1 := n.(*ast.Alias)
-		_, isAlias2 := existing.(*ast.Alias)
+	// TODO: record both positions.
+	if outer, _, existing := s.lookup(name); existing != nil {
+		isAlias1 := s.isAlias(n)
+		isAlias2 := outer.isAlias(existing)
 		if isAlias1 != isAlias2 {
-			s.errFn(n.Pos(), "cannot have alias and non-alias with the same name")
+			s.errFn(n.Pos(), "cannot have both alias and field with name %q in same scope", name)
 			return
 		} else if isAlias1 || isAlias2 {
-			s.errFn(n.Pos(), "cannot have two aliases with the same name in the same scope")
-			return
+			if outer == s {
+				s.errFn(n.Pos(), "alias %q redeclared in same scope", name)
+				return
+			}
+			// TODO: Should we disallow shadowing of aliases?
+			// This was the case, but it complicates the transition to
+			// square brackets. The spec says allow it.
+			// s.errFn(n.Pos(), "alias %q already declared in enclosing scope", name)
 		}
 	}
 	s.index[name] = n
@@ -114,7 +157,7 @@ func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, ok boo
 	return nil, false
 }
 
-func (s *scope) lookup(name string) (obj, node ast.Node) {
+func (s *scope) lookup(name string) (p *scope, obj, node ast.Node) {
 	// TODO(#152): consider returning nil for obj if it is a reference to root.
 	// last := s
 	for s != nil {
@@ -122,12 +165,12 @@ func (s *scope) lookup(name string) (obj, node ast.Node) {
 			// if last.node == n {
 			// 	return nil, n
 			// }
-			return s.node, n
+			return s, s.node, n
 		}
 		// s, last = s.outer, s
 		s = s.outer
 	}
-	return nil, nil
+	return nil, nil, nil
 }
 
 func (s *scope) After(n ast.Node) {}
@@ -151,9 +194,45 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		s = scopeClauses(s, x.Clauses)
 
 	case *ast.Field:
-		switch label := x.Label.(type) {
+		var n ast.Node = x.Label
+		alias, ok := x.Label.(*ast.Alias)
+		if ok {
+			n = alias.Expr
+		}
+
+		switch label := n.(type) {
 		case *ast.Interpolation:
 			walk(s, label)
+
+		case *ast.ListLit:
+			if len(label.Elts) != 1 {
+				break
+			}
+			s := newScope(s.file, s, x, nil)
+			if alias != nil {
+				if name, _ := internal.LabelName(alias.Ident); name != "" {
+					s.insert(name, x)
+				}
+			}
+
+			a, ok := label.Elts[0].(*ast.Alias)
+			if ok {
+				// Simulate template label for now, for binding.
+
+				// Add to current scope, instead of the value's, and allow
+				// references to bind to these illegally.
+				// We need this kind of administration anyway to detect
+				// illegal name clashes, and it allows giving better error
+				// messages. This puts the burdon on clients of this library
+				// to detect illegal usage, though.
+				name, err := ast.ParseIdent(a.Ident)
+				if err == nil {
+					s.insert(name, a.Expr)
+				}
+			}
+			walk(s, x.Value)
+			return nil
+
 		case *ast.TemplateLabel:
 			s := newScope(s.file, s, x, nil)
 			name, err := ast.ParseIdent(label.Ident)
@@ -163,7 +242,6 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			walk(s, x.Value)
 			return nil
 		}
-		// Disallow referring to the current LHS name (this applies recursively)
 		if x.Value != nil {
 			walk(s, x.Value)
 		}
@@ -191,9 +269,10 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 	case *ast.Ident:
 		name, ok, _ := ast.LabelName(x)
 		if !ok {
+			// TODO: generate error
 			break
 		}
-		if obj, node := s.lookup(name); node != nil {
+		if _, obj, node := s.lookup(name); node != nil {
 			switch {
 			case x.Node == nil:
 				x.Node = node

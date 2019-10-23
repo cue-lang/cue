@@ -3,7 +3,7 @@ cmp stdout expect-stdout
 -- expect-stdout --
 package trim
 
-foo: <Name>: {
+foo: [string]: {
 	_value: string
 
 	a: 4
@@ -21,7 +21,7 @@ foo: <Name>: {
 	rList: [{a: "a"}]
 	rcList: [{a: "a", c: b}]
 
-	t: <Name>: {
+	t: [string]: {
 		x: >=0 & <=5
 	}
 }
@@ -37,7 +37,7 @@ foo: bar: {
 foo: baz: {}
 
 foo: multipath: {
-	t: <Name>: {
+	t: [string]: {
 		// Combined with the other template, we know the value must be 5 and
 		// thus the entry below can be eliminated.
 		x: >=5 & <=8
@@ -60,7 +60,7 @@ group: {
 -- trim/trim.cue --
 package trim
 
-foo: <Name>: {
+foo: [string]: {
 	_value: string
 
 	a: 4
@@ -78,7 +78,7 @@ foo: <Name>: {
 	rList: [{a: "a"}]
 	rcList: [{a: "a", c: b}]
 
-	t: <Name>: {
+	t: [string]: {
 		x: >=0 & <=5
 	}
 }
@@ -94,7 +94,7 @@ foo: bar: {
 foo: baz: {}
 
 foo: multipath: {
-	t: <Name>: {
+	t: [string]: {
 		// Combined with the other template, we know the value must be 5 and
 		// thus the entry below can be eliminated.
 		x: >=5 & <=8

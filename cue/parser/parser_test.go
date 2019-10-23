@@ -146,11 +146,19 @@ func TestParse(t *testing.T) {
 		`package k8s, import a "foo", import "bar/baz"`,
 	}, {
 		"collapsed fields",
-		`a: b:: c?: <Name>: d: 1
+		`a: b:: c?: [Name=_]: d: 1
 		"g\("en")"?: 4
 		 // job foo { bar: 1 } // TODO error after foo
-		 job "foo" <X>: { bar: 1 }
+		 job: "foo": [_]: { bar: 1 }
 		`,
+		`a: {b :: {c?: {[Name=_]: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {[_]: {bar: 1}}}`,
+	}, {
+		"collapsed fields", // TODO: remove
+		`a: b:: c?: <Name>: d: 1
+			"g\("en")"?: 4
+			 // job foo { bar: 1 } // TODO error after foo
+			 job "foo" <X>: { bar: 1 }
+			`,
 		`a: {b :: {c?: {<Name>: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {<X>: {bar: 1}}}`,
 	}, {
 		"identifiers",
@@ -161,9 +169,9 @@ func TestParse(t *testing.T) {
 			// e: a."b" // TODO: is an error
 			e: a.b.c
 			"f": f,
-			<X>: X
+			[X=_]: X
 		`,
-		"a: {b: {c: d}}, c: a, d: a.b, e: a.b.c, \"f\": f, <X>: X",
+		"a: {b: {c: d}}, c: a, d: a.b, e: a.b.c, \"f\": f, [X=_]: X",
 	}, {
 		"expressions",
 		`	a: (2 + 3) * 5
@@ -264,7 +272,7 @@ func TestParse(t *testing.T) {
 		}`,
 		"{a: {b: 3}, a: {b: 3}}",
 	}, {
-		"templates",
+		"templates", // TODO: remove
 		`{
 			<foo>: { a: int }
 			a:     { a: 1 }
@@ -425,6 +433,26 @@ bar: 2
 ]
 `,
 		`{<[0// foo] [d0// fooo] foo: 1>, bar: 2}, [<[l4// each element has a long] {"name": "value"}>, <[l4// optional next element] {"name": "next"}>]`,
+	}, {
+		desc: "field aliasing",
+		in: `
+		I="\(k)": v
+		S="foo-bar": w
+		L=foo: x
+		X=[0]: {
+			foo: X | null
+		}
+		[Y=string]: { name: Y }
+		X1=[X2=<"d"]: { name: X2 }
+		Y1=foo: Y2=bar: [Y1, Y2]
+		`,
+		out: `I="\(k)": v, ` +
+			`S="foo-bar": w, ` +
+			`L=foo: x, ` +
+			`X=[0]: {foo: X|null}, ` +
+			`[Y=string]: {name: Y}, ` +
+			`X1=[X2=<"d"]: {name: X2}, ` +
+			`Y1=foo: {Y2=bar: [Y1, Y2]}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -599,7 +627,7 @@ func TestIncompleteSelection(t *testing.T) {
 			if sel == nil {
 				t.Fatalf("found no *SelectorExpr: %#v %s", f.Decls[0], debugStr(f))
 			}
-			const wantSel = "&{fmt _ {<nil>} {}}"
+			const wantSel = "&{fmt _ {<nil>} {{}}}"
 			if fmt.Sprint(sel) != wantSel {
 				t.Fatalf("found selector %v, want %s", sel, wantSel)
 			}

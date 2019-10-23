@@ -38,6 +38,7 @@ func TestInvalid(t *testing.T) {
 		`foo !/* ERROR "expected label or ':', found '!'" */`,
 		`{ <Name
 			/* ERROR "expected '>', found newline" */ >: foo }`,
+		`foo: [/* ERROR "square bracket must have exactly one element" */ string, int]: int`,
 		// TODO:
 		// `{ </* ERROR "expected identifier, found newline" */
 		// 	Name>: foo }`,

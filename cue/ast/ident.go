@@ -102,16 +102,26 @@ func ParseIdent(n *Ident) (string, error) {
 //
 //     Label   Result
 //     foo     "foo"  true   nil
-//     `a-b`   "a-b"  true   nil
-//     true    true   true   nil
+//     true    "true" true   nil
 //     "foo"   "foo"  false  nil
-//     `a-b    ""     false  invalid identifier
+//     "x-y"   "x-y"  false  nil
 //     "foo    ""     false  invalid string
 //     "\(x)"  ""     false  errors.Is(err, ErrIsExpression)
-//     <A>     "A"    false  errors.Is(err, ErrIsExpression)
+//     X=foo   "foo"  true   nil
 //
 func LabelName(l Label) (name string, isIdent bool, err error) {
+	// XXX: alias unwrap once only.
 	switch n := l.(type) {
+	case *Alias:
+		if label, ok := n.Expr.(Label); ok {
+			return LabelName(label)
+		}
+
+	case *ListLit:
+		// An expression, but not one can evaluated.
+		return "", false, errors.Newf(l.Pos(),
+			"cannot reference fields with square brackets labels outside the field value")
+
 	case *Ident:
 		str, err := ParseIdent(n)
 		if err != nil {
@@ -137,7 +147,7 @@ func LabelName(l Label) (name string, isIdent bool, err error) {
 	}
 	// This includes interpolation and template labels.
 	return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
-		"label is interpolation or template")
+		"label is an expression")
 }
 
 // ErrIsExpression reports whether a label is an expression.

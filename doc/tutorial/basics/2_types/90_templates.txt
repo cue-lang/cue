@@ -18,7 +18,7 @@ that is unified with each of the siblings.
 -- templates.cue --
 // The following struct is unified with all elements in job.
 // The name of each element is bound to Name and visible in the struct.
-job: <Name>: {
+job: [Name=_]: {
     name:     Name
     replicas: uint | *1
     command:  string

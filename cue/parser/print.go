@@ -51,7 +51,7 @@ func debugStr(x interface{}) (out string) {
 
 	case *ast.Alias:
 		out := debugStr(v.Ident)
-		out += " = "
+		out += "="
 		out += debugStr(v.Expr)
 		return out
 

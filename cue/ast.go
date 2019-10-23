@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"golang.org/x/xerrors"
 )
 
 // insertFile inserts the given file at the root of the instance.
@@ -351,7 +352,15 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				break
 			}
 		}
-		switch x := n.Label.(type) {
+
+		lab := n.Label
+		if a, ok := lab.(*ast.Alias); ok {
+			if lab, ok = a.Expr.(ast.Label); !ok {
+				return v.errf(n, "alias expression is not a valid label")
+			}
+		}
+
+		switch x := lab.(type) {
 		case *ast.Interpolation:
 			v.sel = "?"
 			// Must be struct comprehension.
@@ -366,6 +375,33 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			}
 			v.object.comprehensions = append(v.object.comprehensions, fc)
 
+		case *ast.ListLit:
+			if len(x.Elts) != 1 {
+				return v.errf(x, "optional label expression must have exactly one element; found %d", len(x.Elts))
+			}
+			var f label
+			expr := x.Elts[0]
+			a, ok := expr.(*ast.Alias)
+			if ok {
+				expr = a.Expr
+				f = v.label(v.ident(a.Ident), true)
+			} else {
+				f = v.label("_", true)
+			}
+			if i, ok := expr.(*ast.Ident); !ok || (i.Name != "string" && i.Name != "_") {
+				return v.errf(x, `only 'string' or '_' allowed in this position`)
+			}
+			v.sel = "*"
+
+			sig := &params{}
+			sig.add(f, &basicType{newNode(lab), stringKind})
+			template := &lambdaExpr{newNode(n), sig, nil}
+
+			v.setScope(n, template)
+			template.value = v.walk(n.Value)
+
+			v.object.addTemplate(v.ctx(), token.NoPos, template)
+
 		case *ast.TemplateLabel:
 			if isDef {
 				v.errf(x, "map element type cannot be a definition")
@@ -374,7 +410,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			f := v.label(v.ident(x.Ident), true)
 
 			sig := &params{}
-			sig.add(f, &basicType{newNode(n.Label), stringKind})
+			sig.add(f, &basicType{newNode(lab), stringKind})
 			template := &lambdaExpr{newNode(n), sig, nil}
 
 			v.setScope(n, template)
@@ -394,7 +430,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			}
 			f, ok := v.nodeLabel(x)
 			if !ok {
-				return v.errf(n.Label, "invalid field name: %v", n.Label)
+				return v.errf(lab, "invalid field name: %v", lab)
 			}
 			if f != 0 {
 				val := v.walk(n.Value)
@@ -468,28 +504,71 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			break
 		}
 
-		if a, ok := n.Node.(*ast.Alias); ok {
+		// Type of reference      Scope          Node
+		// Alias declaration      File/Struct    Alias
+		// Illegal Reference      File/Struct
+		// Fields
+		//    Label               File/Struct    ParenExpr, Ident, BasicLit
+		//    Value               File/Struct    Field
+		// Template               Field          Template
+		// Fields inside lambda
+		//    Label               Field          Expr
+		//    Value               Field          Field
+		// Pkg                    nil            ImportSpec
+
+		if x, ok := n.Node.(*ast.Alias); ok {
 			old := v.ctx().inDefinition
 			v.ctx().inDefinition = 0
-			ret = v.walk(a.Expr)
+			ret = v.walk(x.Expr)
 			v.ctx().inDefinition = old
 			break
 		}
 
 		f := v.label(name, true)
-		if n.Scope != nil {
-			n2 := v.mapScope(n.Scope)
-			if l, ok := n2.(*lambdaExpr); ok && len(l.params.arcs) == 1 {
-				f = 0
-			}
-			ret = &nodeRef{baseValue: newExpr(n), node: n2}
-			ret = &selectorExpr{newExpr(n), ret, f}
-		} else {
+		if n.Scope == nil {
 			// Package or direct ancestor node.
 			n2 := v.mapScope(n.Node)
 			ref := &nodeRef{baseValue: newExpr(n), node: n2, label: f}
 			ret = ref
+			break
 		}
+
+		n2 := v.mapScope(n.Scope)
+		ret = &nodeRef{baseValue: newExpr(n), node: n2}
+
+		l, lambda := n2.(*lambdaExpr)
+		if lambda && len(l.params.arcs) == 1 {
+			f = 0
+		}
+
+		if field, ok := n.Node.(*ast.Field); ok {
+			if lambda {
+				// inside bulk optional.
+				ret = v.errf(n, "referencing field (%q) within lambda not yet unsupported", name)
+				break
+			}
+			name, _, err := ast.LabelName(field.Label)
+			switch {
+			case xerrors.Is(err, ast.ErrIsExpression):
+				a := field.Label.(*ast.Alias)
+				ret = &indexExpr{newExpr(n), ret, v.walk(a.Expr)}
+
+			case err != nil:
+				ret = v.errf(n, "invalid label: %v", err)
+
+			case name != "":
+				f = v.label(name, true)
+				ret = &selectorExpr{newExpr(n), ret, f}
+
+			default:
+				// TODO: support dynamically computed label lookup.
+				// Should that also support lookup of definitions?
+				ret = v.errf(n, "unsupported field alias %q", name)
+			}
+			break
+		}
+
+		ret = &selectorExpr{newExpr(n), ret, f}
 
 	case *ast.BottomLit:
 		// TODO: record inline comment.

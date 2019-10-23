@@ -87,10 +87,11 @@ func SetRelPos(n Node, p token.RelPos) {
 // An Expr is implemented by all expression nodes.
 type Expr interface {
 	Node
+	declNode() // An expression can be used as a declaration.
 	exprNode()
 }
 
-type expr struct{}
+type expr struct{ decl }
 
 func (expr) exprNode() {}
 
@@ -324,6 +325,8 @@ type Alias struct {
 
 	comments
 	decl
+	expr
+	label
 }
 
 func (a *Alias) Pos() token.Pos  { return a.Ident.Pos() }
@@ -389,6 +392,8 @@ type Ident struct {
 }
 
 // A TemplateLabel represents a field template declaration in a struct.
+//
+// Deprecated: use square bracket notation through ListLit.
 type TemplateLabel struct {
 	Langle token.Pos
 	Ident  *Ident
@@ -449,6 +454,7 @@ type ListLit struct {
 
 	comments
 	expr
+	label
 }
 
 // NewList creates a list of Expressions.

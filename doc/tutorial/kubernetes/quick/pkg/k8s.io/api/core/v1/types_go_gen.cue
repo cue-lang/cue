@@ -5259,6 +5259,15 @@ PodLogOptions :: {
 	// slightly more or slightly less than the specified limit.
 	// +optional
 	limitBytes?: null | int64 @go(LimitBytes,*int64) @protobuf(8,varint,opt)
+
+	// insecureSkipTLSVerifyBackend indicates that the apiserver should not confirm the validity of the
+	// serving certificate of the backend it is connecting to.  This will make the HTTPS connection between the apiserver
+	// and the backend insecure. This means the apiserver cannot verify the log data it is receiving came from the real
+	// kubelet.  If the kubelet is configured to verify the apiserver's TLS credentials, it does not mean the
+	// connection to the real kubelet is vulnerable to a man in the middle attack (e.g. an attacker could not intercept
+	// the actual log data coming from the real kubelet).
+	// +optional
+	insecureSkipTLSVerifyBackend?: bool @go(InsecureSkipTLSVerifyBackend) @protobuf(9,varint,opt)
 }
 
 // PodAttachOptions is the query options to a Pod's remote attach call.

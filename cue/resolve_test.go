@@ -1640,7 +1640,7 @@ a: {
 				k: 1
 			}
 			b: {
-				<x>: { x: 0, y: *1 | int }
+				<X>: { x: 0, y: *1 | int }
 				v: {}
 				w: { x: 0 }
 			}
@@ -1651,7 +1651,7 @@ a: {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
 		desc: "range unification",
 		in: `
@@ -2041,7 +2041,7 @@ func TestFullEval(t *testing.T) {
 				k: 1
 			}
 			b: {
-				<x>: { x: 0, y: *1 | int }
+				<X>: { x: 0, y: *1 | int }
 				v: {}
 				w: { y: 0 }
 			}
@@ -2052,7 +2052,7 @@ func TestFullEval(t *testing.T) {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(x: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
 		desc: "field comprehension",
 		in: `
@@ -2604,6 +2604,25 @@ func TestFullEval(t *testing.T) {
 		}
 		`,
 		out: `<0>{<1>{listOfCloseds: [_|_(2:field "b" not allowed in closed struct)]}, Foo: <2>{listOfCloseds: []}, Closed :: <3>C{a: 0}, Junk: <4>{b: 2}}`,
+	}, {
+		in: `
+		p: [ID=string]: { name: ID }
+		A="foo=bar": "str"
+		a: A
+		B=bb: 4
+		b1: B
+		b1: bb
+		C="\(a)": 5
+		c: C
+		`,
+		out: `<0>{` +
+			`p: <1>{<>: <2>(ID: string)-><3>{name: <2>.ID}, }, ` +
+			`foo=bar: "str", ` +
+			`a: "str", ` +
+			`bb: 4, ` +
+			`b1: 4, ` +
+			`c: 5, ` +
+			`str: 5}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

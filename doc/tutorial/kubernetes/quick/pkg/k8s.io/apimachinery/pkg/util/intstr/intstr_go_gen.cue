@@ -16,7 +16,7 @@ package intstr
 IntOrString :: _
 
 // Type represents the stored type of IntOrString.
-Type :: int // enumType
+Type :: int64 // enumType
 
 enumType ::
 	Int |

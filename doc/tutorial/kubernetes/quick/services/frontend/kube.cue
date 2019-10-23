@@ -2,7 +2,7 @@ package kube
 
 Component :: "frontend"
 
-deployment: <X>: spec: template: {
+deployment: [string]: spec: template: {
 	metadata: annotations: {
 		"prometheus.io.scrape": "true"
 		"prometheus.io.port":   "\(spec.containers[0].ports[0].containerPort)"

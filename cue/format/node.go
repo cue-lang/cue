@@ -421,6 +421,9 @@ func (f *formatter) label(l ast.Label, optional bool) {
 		f.label(n.Ident, false)
 		f.print(unindent, n.Rangle, token.GTR)
 
+	case *ast.ListLit:
+		f.expr(n)
+
 	case *ast.Interpolation:
 		f.expr(n)
 
@@ -463,6 +466,12 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.BottomLit:
 		f.print(x.Bottom, token.BOTTOM)
+
+	case *ast.Alias:
+		// Aliases in expression positions are printed in short form.
+		f.label(x.Ident, false)
+		f.print(x.Equal, token.BIND)
+		f.expr(x.Expr)
 
 	case *ast.Ident:
 		f.print(x.NamePos, x)

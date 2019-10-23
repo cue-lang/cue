@@ -460,16 +460,13 @@ func TestIncorrectIdent(t *testing.T) {
 // TextX is a skeleton test that can be filled in for debugging one-off cases.
 // Do not remove.
 func TestX(t *testing.T) {
+	t.Skip()
 	const src = `
-	{ e: k <-
-	for a, v in s}
-	a: b
-
 `
 	b, err := format([]byte(src), 0)
 	if err != nil {
 		t.Error(err)
 	}
 	_ = b
-	// t.Error("\n", string(b))
+	t.Error("\n", string(b))
 }

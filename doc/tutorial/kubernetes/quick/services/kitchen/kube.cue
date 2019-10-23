@@ -2,7 +2,7 @@ package kube
 
 Component :: "kitchen"
 
-deployment: <Name>: spec: template: {
+deployment: [string]: spec: template: {
 	metadata: annotations: "prometheus.io.scrape": "true"
 	spec: containers: [{
 		ports: [{
@@ -19,7 +19,7 @@ deployment: <Name>: spec: template: {
 	}]
 }
 
-deployment: <ID>: spec: template: spec: {
+deployment: [ID=_]: spec: template: spec: {
 	hasDisks :: *true | bool
 
 	// field comprehension using just "if"

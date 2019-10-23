@@ -601,9 +601,7 @@ func (p *exporter) expr(v value) ast.Expr {
 					X: &ast.BinaryExpr{
 						X:  p.expr(x.len),
 						Op: token.MUL,
-						Y: &ast.ListLit{Elts: []ast.Expr{
-							p.expr(x.typ),
-						}},
+						Y:  ast.NewList(p.expr(x.typ)),
 					},
 					Op: token.AND,
 					Y:  list,

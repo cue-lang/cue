@@ -32,10 +32,10 @@ func TestFromExpr(t *testing.T) {
 		expr: ast.NewString("Hello"),
 		out:  `"Hello"`,
 	}, {
-		expr: &ast.ListLit{Elts: []ast.Expr{
+		expr: ast.NewList(
 			ast.NewString("Hello"),
 			ast.NewString("World"),
-		}},
+		),
 		out: `["Hello","World"]`,
 	}}
 	for _, tc := range testCases {

@@ -1250,19 +1250,19 @@ a: {
 		desc: "non-closed definition carries over closedness to enclosed template",
 		in: `
 		S :: {
-			<_>: { a: int }
+			[string]: { a: int }
 		}
 		a: S & {
 			v: { b: int }
 		}
 		Q :: {
-			<_>: { a: int } | { b: int }
+			[string]: { a: int } | { b: int }
 		}
 		b: Q & {
 			w: { c: int }
 		}
 		R :: {
-			<_>: [{ a: int }, { b: int }]
+			[string]: [{ a: int }, { b: int }]
 		}
 		c: R & {
 			w: [{ d: int }, ...]

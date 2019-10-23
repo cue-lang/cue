@@ -25,7 +25,7 @@ Foozer :: {
 	// Time is mapped to CUE's internal type.
 	Time:   time.Time
 	Barzer: p2.Barzer
-	Map: {<_>: null | CustomJSON} @go(,map[string]*CustomJSON)
+	Map: {[string]: null | CustomJSON} @go(,map[string]*CustomJSON)
 	Slice1: [...int] @go(,[]int)
 	Slice2: [...] @go(,[]interface{})
 	Slice3: null | [...] @go(,*[]json.Unmarshaler)

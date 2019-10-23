@@ -3,7 +3,7 @@ import "time"
 Attributes: {
 	//  A map of attribute name to its value.
 	attributes: {
-		<_>: AttrValue
+		[string]: AttrValue
 	}
 }
 
@@ -39,6 +39,6 @@ AttrValue: {
 Attributes_StringMap: {
 	//  Holds a set of name/value pairs.
 	entries: {
-		<_>: string
+		[string]: string
 	} @protobuf(1,type=map<string,string>)
 }

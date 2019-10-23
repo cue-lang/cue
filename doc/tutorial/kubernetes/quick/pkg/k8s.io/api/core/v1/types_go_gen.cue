@@ -1132,7 +1132,7 @@ FlexPersistentVolumeSource :: {
 
 	// Optional: Extra command options if any.
 	// +optional
-	options?: {<_>: string} @go(Options,map[string]string) @protobuf(5,bytes,rep)
+	options?: {[string]: string} @go(Options,map[string]string) @protobuf(5,bytes,rep)
 }
 
 // FlexVolume represents a generic volume resource that is
@@ -1162,7 +1162,7 @@ FlexVolumeSource :: {
 
 	// Optional: Extra command options if any.
 	// +optional
-	options?: {<_>: string} @go(Options,map[string]string) @protobuf(5,bytes,rep)
+	options?: {[string]: string} @go(Options,map[string]string) @protobuf(5,bytes,rep)
 }
 
 // Represents a Persistent Disk resource in AWS.
@@ -1903,7 +1903,7 @@ CSIPersistentVolumeSource :: {
 
 	// Attributes of the volume to publish.
 	// +optional
-	volumeAttributes?: {<_>: string} @go(VolumeAttributes,map[string]string) @protobuf(5,bytes,rep)
+	volumeAttributes?: {[string]: string} @go(VolumeAttributes,map[string]string) @protobuf(5,bytes,rep)
 
 	// ControllerPublishSecretRef is a reference to the secret object containing
 	// sensitive information to pass to the CSI driver to complete the CSI
@@ -1959,7 +1959,7 @@ CSIVolumeSource :: {
 	// VolumeAttributes stores driver-specific properties that are passed to the CSI
 	// driver. Consult your driver's documentation for supported values.
 	// +optional
-	volumeAttributes?: {<_>: string} @go(VolumeAttributes,map[string]string) @protobuf(4,bytes,rep)
+	volumeAttributes?: {[string]: string} @go(VolumeAttributes,map[string]string) @protobuf(4,bytes,rep)
 
 	// NodePublishSecretRef is a reference to the secret object containing
 	// sensitive information to pass to the CSI driver to complete the CSI
@@ -3244,7 +3244,7 @@ PodSpec :: {
 	// Selector which must match a node's labels for the pod to be scheduled on that node.
 	// More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 	// +optional
-	nodeSelector?: {<_>: string} @go(NodeSelector,map[string]string) @protobuf(7,bytes,rep)
+	nodeSelector?: {[string]: string} @go(NodeSelector,map[string]string) @protobuf(7,bytes,rep)
 
 	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/configure-service-account/
@@ -4006,7 +4006,7 @@ ReplicationControllerSpec :: {
 	// controller, if empty defaulted to labels on Pod template.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
 	// +optional
-	selector?: {<_>: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
+	selector?: {[string]: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
 
 	// Template is the object that describes the pod that will be created if
 	// insufficient replicas are detected. This takes precedence over a TemplateRef.
@@ -4247,7 +4247,7 @@ ServiceSpec :: {
 	// Ignored if type is ExternalName.
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/
 	// +optional
-	selector?: {<_>: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
+	selector?: {[string]: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
 
 	// clusterIP is the IP address of the service and is usually assigned
 	// randomly by the master. If an address is specified manually and is not in
@@ -5020,7 +5020,7 @@ ResourceHugePagesPrefix :: "hugepages-"
 ResourceAttachableVolumesPrefix :: "attachable-volumes-"
 
 // ResourceList is a set of (resource name, quantity) pairs.
-ResourceList :: {<_>: resource.Quantity}
+ResourceList :: {[string]: resource.Quantity}
 
 // Node is a worker node in Kubernetes.
 // Each node will have a unique identifier in the cache (i.e. in etcd).
@@ -5871,7 +5871,7 @@ Secret :: {
 	// base64 encoded string, representing the arbitrary (possibly non-string)
 	// data value here. Described in https://tools.ietf.org/html/rfc4648#section-4
 	// +optional
-	data?: {<_>: bytes} @go(Data,map[string][]byte) @protobuf(2,bytes,rep)
+	data?: {[string]: bytes} @go(Data,map[string][]byte) @protobuf(2,bytes,rep)
 
 	// stringData allows specifying non-binary secret data in string form.
 	// It is provided as a write-only convenience method.
@@ -5879,7 +5879,7 @@ Secret :: {
 	// It is never output when reading from the API.
 	// +k8s:conversion-gen=false
 	// +optional
-	stringData?: {<_>: string} @go(StringData,map[string]string) @protobuf(4,bytes,rep)
+	stringData?: {[string]: string} @go(StringData,map[string]string) @protobuf(4,bytes,rep)
 
 	// Used to facilitate programmatic handling of secret data.
 	// +optional
@@ -6019,7 +6019,7 @@ ConfigMap :: {
 	// The keys stored in Data must not overlap with the keys in
 	// the BinaryData field, this is enforced during validation process.
 	// +optional
-	data?: {<_>: string} @go(Data,map[string]string) @protobuf(2,bytes,rep)
+	data?: {[string]: string} @go(Data,map[string]string) @protobuf(2,bytes,rep)
 
 	// BinaryData contains the binary data.
 	// Each key must consist of alphanumeric characters, '-', '_' or '.'.
@@ -6029,7 +6029,7 @@ ConfigMap :: {
 	// Using this field will require 1.10+ apiserver and
 	// kubelet.
 	// +optional
-	binaryData?: {<_>: bytes} @go(BinaryData,map[string][]byte) @protobuf(3,bytes,rep)
+	binaryData?: {[string]: bytes} @go(BinaryData,map[string][]byte) @protobuf(3,bytes,rep)
 }
 
 // ConfigMapList is a resource containing a list of ConfigMap objects.

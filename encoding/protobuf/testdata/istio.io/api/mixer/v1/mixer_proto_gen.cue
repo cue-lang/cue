@@ -40,7 +40,7 @@ CheckRequest: {
 
 	// The individual quotas to allocate
 	quotas?: {
-		<_>: CheckRequest_QuotaParams
+		[string]: CheckRequest_QuotaParams
 	} @protobuf(4,type=map<string,QuotaParams>,"(gogoproto.nullable)=false")
 }
 
@@ -60,7 +60,7 @@ CheckResponse: {
 
 	// The resulting quota, one entry per requested quota.
 	quotas?: {
-		<_>: CheckResponse_QuotaResult
+		[string]: CheckResponse_QuotaResult
 	} @protobuf(3,type=map<string,QuotaResult>,"(gogoproto.nullable)=false")
 }
 

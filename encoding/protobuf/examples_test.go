@@ -53,7 +53,7 @@ func ExampleExtract() {
 	// 	method?: [...string] @protobuf(2)
 	// 	method?: [...=~"^[A-Z]"]
 	// 	exmapleMap?: {
-	// 		<_>: string
+	// 		[string]: string
 	// 	} @protobuf(3,type=map<string,string>,exmaple_map)
 	// }
 }

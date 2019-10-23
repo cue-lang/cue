@@ -210,14 +210,14 @@ ObjectMeta :: {
 	// and services.
 	// More info: http://kubernetes.io/docs/user-guide/labels
 	// +optional
-	labels?: {<_>: string} @go(Labels,map[string]string) @protobuf(11,bytes,rep)
+	labels?: {[string]: string} @go(Labels,map[string]string) @protobuf(11,bytes,rep)
 
 	// Annotations is an unstructured key value map stored with a resource that may be
 	// set by external tools to store and retrieve arbitrary metadata. They are not
 	// queryable and should be preserved when modifying objects.
 	// More info: http://kubernetes.io/docs/user-guide/annotations
 	// +optional
-	annotations?: {<_>: string} @go(Annotations,map[string]string) @protobuf(12,bytes,rep)
+	annotations?: {[string]: string} @go(Annotations,map[string]string) @protobuf(12,bytes,rep)
 
 	// List of objects depended by this object. If ALL objects in the list have
 	// been deleted, this object will be garbage collected. If this object is managed by a controller,
@@ -1065,7 +1065,7 @@ LabelSelector :: {
 	// map is equivalent to an element of matchExpressions, whose key field is "key", the
 	// operator is "In", and the values array contains only "value". The requirements are ANDed.
 	// +optional
-	matchLabels?: {<_>: string} @go(MatchLabels,map[string]string) @protobuf(1,bytes,rep)
+	matchLabels?: {[string]: string} @go(MatchLabels,map[string]string) @protobuf(1,bytes,rep)
 
 	// matchExpressions is a list of label selector requirements. The requirements are ANDed.
 	// +optional

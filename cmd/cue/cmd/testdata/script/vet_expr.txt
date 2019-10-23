@@ -11,7 +11,7 @@ field "skip" not allowed in closed struct:
     ./data.yaml:20:7
 -- vet.cue --
 File :: {
-	translations <_>: {
+	translations: [string]: {
     lang: string
     text: string
   }

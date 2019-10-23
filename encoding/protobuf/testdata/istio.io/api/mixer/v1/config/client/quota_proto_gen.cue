@@ -98,7 +98,7 @@ AttributeMatch: {
 	//     request.http_method:
 	//       exact: POST
 	clause?: {
-		<_>: StringMatch
+		[string]: StringMatch
 	} @protobuf(1,type=map<string,StringMatch>)
 }
 

@@ -3,13 +3,13 @@ cmp stderr expect-stderr
 
 -- expect-stderr --
 translations.hello.lang: incomplete value (string):
-    ./vet.cue:2:26
+    ./vet.cue:2:31
 translations.hello.lang: conflicting values false and string (mismatched types bool and string):
     ./data.yaml:13:11
-    ./vet.cue:2:26
+    ./vet.cue:2:31
 -- vet.cue --
 
-translations: <_>: lang: string
+translations: [string]: lang: string
 
 File :: {
 	translations: {...}

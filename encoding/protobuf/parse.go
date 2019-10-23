@@ -519,7 +519,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 
 		// All keys are converted to strings.
 		// TODO: support integer keys.
-		f.Label = &ast.TemplateLabel{Ident: ast.NewIdent("_")}
+		f.Label = ast.NewList(ast.NewIdent("string"))
 		f.Value = p.toExpr(x.Position, p.resolve(x.Position, x.Type, x.Options))
 
 		name := p.ident(x.Position, x.Name)

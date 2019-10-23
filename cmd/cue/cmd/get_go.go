@@ -910,7 +910,7 @@ func (e *extractor) printType(expr types.Type) {
 		if b, ok := x.Key().Underlying().(*types.Basic); !ok || b.Kind() != types.String {
 			panic(fmt.Sprintf("unsupported map key type %T", x.Key()))
 		}
-		fmt.Fprintf(e.w, "{ <_>: ")
+		fmt.Fprintf(e.w, "{ [string]: ")
 		e.printType(x.Elem())
 		fmt.Fprintf(e.w, " }")
 

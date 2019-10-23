@@ -24,7 +24,7 @@ ScaleStatus :: {
 
 	// label query over pods that should match the replicas count. More info: http://kubernetes.io/docs/user-guide/labels#label-selectors
 	// +optional
-	selector?: {<_>: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
+	selector?: {[string]: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
 
 	// label selector for pods that should match the replicas count. This is a serializated
 	// version of both map-based and more expressive set-based selectors. This is done to
@@ -140,7 +140,7 @@ DeploymentRollback :: {
 
 	// The annotations to be updated to a deployment
 	// +optional
-	updatedAnnotations?: {<_>: string} @go(UpdatedAnnotations,map[string]string) @protobuf(2,bytes,rep)
+	updatedAnnotations?: {[string]: string} @go(UpdatedAnnotations,map[string]string) @protobuf(2,bytes,rep)
 
 	// The config of this deployment rollback.
 	rollbackTo: RollbackConfig @go(RollbackTo) @protobuf(3,bytes,opt)

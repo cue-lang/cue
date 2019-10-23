@@ -143,7 +143,7 @@ HttpClientConfig: {
 	// is used to support per-service configuration for cases where a
 	// mixerclient serves multiple services.
 	serviceConfigs?: {
-		<_>: ServiceConfig
+		[string]: ServiceConfig
 	} @protobuf(2,type=map<string,ServiceConfig>,service_configs)
 
 	// Default destination service name if none was specified in the

@@ -43,6 +43,6 @@ IstioService: {
 	// *Note:* When used for a VirtualService destination, labels MUST be empty.
 	//
 	labels?: {
-		<_>: string
+		[string]: string
 	} @protobuf(5,type=map<string,string>)
 }

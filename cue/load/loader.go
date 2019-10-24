@@ -115,7 +115,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		}
 	}
 
-	// TODO: add fiedls directly?
+	// TODO: add fields directly?
 	fp := newFileProcessor(cfg, pkg)
 	for _, file := range files {
 		path := file

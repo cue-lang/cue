@@ -33,6 +33,7 @@ import (
 
 	cueast "cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -394,7 +395,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	}
 
 	pkg := p.PkgPath
-	dir := filepath.Join(root, "pkg", filepath.FromSlash(pkg))
+	dir := filepath.Join(load.GenPath(root), filepath.FromSlash(pkg))
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}

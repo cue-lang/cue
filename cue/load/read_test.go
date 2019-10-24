@@ -55,15 +55,13 @@ var readImportsTests = []readTest{
 		import "x"
 		import _ "x"
 		import a "x"
-		
-		/* comment */
-		
+
 		import (
-			"x" /* comment */
+			"x"
 			_ "x"
 			a "x" // comment
 			` + quote + `x` + quote + `
-			_ /*comment*/ ` + quote + `x` + quote + `
+			_ ` + quote + `x` + quote + `
 			a ` + quote + `x` + quote + `
 		)
 		import (
@@ -93,12 +91,6 @@ var readCommentsTests = []readTest{
 	},
 	{
 		`// foo
-
-		/* bar */
-
-		/* quux */ // baz
-		
-		/*/ zot */
 
 		// asdf
 		ℙHello, world`,

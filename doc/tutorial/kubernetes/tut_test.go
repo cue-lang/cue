@@ -28,6 +28,7 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/copy"
 	"cuelang.org/go/internal/cuetest"
 	"github.com/kylelemons/godebug/diff"
@@ -85,7 +86,7 @@ func TestTutorial(t *testing.T) {
 		}
 	} else {
 		// We only fetch new kubernetes files with when updating.
-		err := copy.Dir(filepath.Join("quick", "pkg"), filepath.Join(dir, "pkg"))
+		err := copy.Dir(load.GenPath("quick"), load.GenPath(dir))
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -86,49 +86,65 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 
 	fp := newFileProcessor(cfg, p)
 
-	root := cfg.Dir
-
 	// If we have an explicit package name, we can ignore other packages.
 	if p.PkgName != "" {
 		fp.ignoreOther = true
 	}
 
-	// TODO: remove: use the pre-determined module root.
-	//       Also consider an additional mechanism that we may merge in packages
-	//       from parents.
-	for dir := p.Dir; ctxt.isDir(dir); {
-		files, err := ctxt.readDir(dir)
-		if err != nil {
-			p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dir))
-			return p
-		}
-		rootFound := false
-		for _, f := range files {
-			if f.IsDir() {
-				continue
-			}
-			if fp.add(pos, dir, f.Name(), importComment) {
-				root = dir
-			}
-			if f.Name() == "cue.mod" {
-				root = dir
-				rootFound = true
-			}
-		}
+	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
+		panic("")
+	}
 
-		if rootFound || filepath.Clean(dir) == l.cfg.ModuleRoot || fp.pkg.PkgName == "" {
-			break
+	var dirs [][2]string
+	genDir := GenPath(cfg.ModuleRoot)
+	if strings.HasPrefix(p.Dir, genDir) {
+		dirs = append(dirs, [2]string{genDir, p.Dir})
+		// TODO(legacy): don't support "pkg"
+		if filepath.Base(genDir) != "pkg" {
+			for _, sub := range []string{"pkg", "src"} {
+				rel, err := filepath.Rel(genDir, p.Dir)
+				if err != nil {
+					// should not happen
+					p.Err = errors.Wrapf(err, token.NoPos, "invalid path")
+					return p
+				}
+				base := filepath.Join(cfg.ModuleRoot, modDir, sub)
+				dir := filepath.Join(base, rel)
+				dirs = append(dirs, [2]string{base, dir})
+			}
 		}
+	} else {
+		dirs = append(dirs, [2]string{cfg.ModuleRoot, p.Dir})
+	}
 
-		// From now on we just ignore files that do not belong to the same
-		// package.
-		fp.ignoreOther = true
+	for _, d := range dirs {
+		for dir := d[1]; ctxt.isDir(dir); {
+			files, err := ctxt.readDir(dir)
+			if err != nil {
+				p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dir))
+				return p
+			}
+			for _, f := range files {
+				if f.IsDir() {
+					continue
+				}
+				fp.add(pos, dir, f.Name(), importComment)
+			}
 
-		parent, _ := filepath.Split(filepath.Clean(dir))
-		if parent == dir {
-			break
+			if filepath.Clean(dir) == d[0] || fp.pkg.PkgName == "" {
+				break
+			}
+
+			// From now on we just ignore files that do not belong to the same
+			// package.
+			fp.ignoreOther = true
+
+			parent, _ := filepath.Split(filepath.Clean(dir))
+			if parent == dir {
+				break
+			}
+			dir = parent
 		}
-		dir = parent
 	}
 
 	impPath, err := addImportQualifier(importPath(p.ImportPath), p.PkgName)
@@ -137,11 +153,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		p.ReportError(err)
 	}
 
-	if strings.HasPrefix(root, cfg.Dir) {
-		root = cfg.Dir
-	}
-
-	rewriteFiles(p, root, false)
+	rewriteFiles(p, cfg.ModuleRoot, false)
 	if errs := fp.finalize(); errs != nil {
 		for _, e := range errors.Errors(errs) {
 			p.ReportError(e)
@@ -151,7 +163,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 
 	for _, f := range p.CUEFiles {
 		if !ctxt.isAbsPath(f) {
-			f = ctxt.joinPath(root, f)
+			f = ctxt.joinPath(cfg.ModuleRoot, f)
 		}
 		r, err := ctxt.openFile(f)
 		if err != nil {
@@ -424,7 +436,7 @@ func findimportComment(data []byte) (s string, line int) {
 	// expect package name
 	_, data = parseWord(data)
 
-	// now ready for import comment, a // or /* */ comment
+	// now ready for import comment, a // comment
 	// beginning and ending on the current line.
 	for len(data) > 0 && (data[0] == ' ' || data[0] == '\t' || data[0] == '\r') {
 		data = data[1:]
@@ -438,17 +450,6 @@ func findimportComment(data []byte) (s string, line int) {
 			i = len(data)
 		}
 		comment = data[2:i]
-	case bytes.HasPrefix(data, slashStar):
-		data = data[2:]
-		i := bytes.Index(data, starSlash)
-		if i < 0 {
-			// malformed comment
-			return "", 0
-		}
-		comment = data[:i]
-		if bytes.Contains(comment, newline) {
-			return "", 0
-		}
 	}
 	comment = bytes.TrimSpace(comment)
 
@@ -464,8 +465,6 @@ func findimportComment(data []byte) (s string, line int) {
 
 var (
 	slashSlash = []byte("//")
-	slashStar  = []byte("/*")
-	starSlash  = []byte("*/")
 	newline    = []byte("\n")
 )
 
@@ -483,15 +482,6 @@ func skipSpaceOrComment(data []byte) []byte {
 					return nil
 				}
 				data = data[i+1:]
-				continue
-			}
-			if bytes.HasPrefix(data, slashStar) {
-				data = data[2:]
-				i := bytes.Index(data, starSlash)
-				if i < 0 {
-					return nil
-				}
-				data = data[i+2:]
 				continue
 			}
 		}

@@ -29,9 +29,9 @@ import (
 
 const (
 	cueSuffix  = ".cue"
-	defaultDir = "cue"
-	modFile    = "cue.mod"
-	pkgDir     = "pkg" // TODO: vendor, third_party, _imports?
+	modDir     = "cue.mod"
+	configFile = "module.cue"
+	pkgDir     = "pkg"
 )
 
 // FromArgsUsage is a partial usage message that applications calling
@@ -68,6 +68,17 @@ It may take one of two forms:
 A '--' argument terminates the list of packages.
 `
 
+// GenPath reports the directory in which to store generated
+// files.
+func GenPath(root string) string {
+	info, err := os.Stat(filepath.Join(root, modDir))
+	if err == nil && info.IsDir() {
+		// TODO(legacy): support legacy cue.mod file.
+		return filepath.Join(root, modDir, "gen")
+	}
+	return filepath.Join(root, "pkg")
+}
+
 // A Config configures load behavior.
 type Config struct {
 	// Context specifies the context for the load operation.
@@ -86,9 +97,6 @@ type Config struct {
 	// Module specifies the module prefix. If not empty, this value must match
 	// the module field of an existing cue.mod file.
 	Module string
-
-	// cache specifies the package cache in which to look for packages.
-	cache string
 
 	// Package defines the name of the package to be loaded. In this is not set,
 	// the package must be uniquely defined from its context.
@@ -313,7 +321,7 @@ func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		absDir = filepath.Join(c.ModuleRoot, sub[len(c.Module)+1:])
 
 	default:
-		absDir = filepath.Join(c.ModuleRoot, "pkg", sub)
+		absDir = filepath.Join(GenPath(c.ModuleRoot), sub)
 	}
 
 	return absDir, name, nil
@@ -364,14 +372,10 @@ func (c Config) complete() (cfg *Config, err error) {
 
 	c.loader = &loader{cfg: &c}
 
-	if c.cache == "" {
-		c.cache = filepath.Join(home(), defaultDir)
-	}
-
 	// TODO: also make this work if run from outside the module?
 	switch {
 	case true:
-		mod := filepath.Join(c.ModuleRoot, modFile)
+		mod := filepath.Join(c.ModuleRoot, modDir)
 		f, cerr := c.fileSystem.openFile(mod)
 		if cerr != nil {
 			break
@@ -412,7 +416,7 @@ func (c Config) findRoot(dir string) (string, error) {
 	}
 	abs := absDir
 	for {
-		info, err := fs.stat(filepath.Join(abs, modFile))
+		info, err := fs.stat(filepath.Join(abs, modDir))
 		if err == nil && !info.IsDir() {
 			return abs, nil
 		}
@@ -423,6 +427,8 @@ func (c Config) findRoot(dir string) (string, error) {
 		abs = d
 	}
 	abs = absDir
+
+	// TODO(legacy): remove this capability at some point.
 	for {
 		info, err := fs.stat(filepath.Join(abs, pkgDir))
 		if err == nil && info.IsDir() {

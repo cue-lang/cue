@@ -179,7 +179,7 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := c.fileSystem.stat(filepath.Join(path, modFile)); err == nil {
+			if _, err := c.fileSystem.stat(filepath.Join(path, modDir)); err == nil {
 				return skipDir
 			}
 		}

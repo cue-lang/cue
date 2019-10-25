@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -58,7 +59,11 @@ func fix(f *ast.File) *ast.File {
 		return true
 	}, nil)
 
+	// Referred nodes and used identifiers.
 	referred := map[ast.Node]string{}
+	used := map[string]bool{}
+	replacement := map[ast.Node]string{}
+
 	ast.Walk(f, func(n ast.Node) bool {
 		if i, ok := n.(*ast.Ident); ok {
 			str, err := ast.ParseIdent(i)
@@ -66,9 +71,21 @@ func fix(f *ast.File) *ast.File {
 				return false
 			}
 			referred[i.Node] = str
+			used[str] = true
 		}
 		return true
 	}, nil)
+
+	num := 0
+	newIdent := func() string {
+		for num++; ; num++ {
+			str := fmt.Sprintf("X%d", num)
+			if !used[str] {
+				used[str] = true
+				return str
+			}
+		}
+	}
 
 	// Rewrite TemplateLabel to ListLit.
 	// Note: there is a chance that the name will clash with the
@@ -99,22 +116,60 @@ func fix(f *ast.File) *ast.File {
 			if !ok {
 				break
 			}
-			b, ok := x.Label.(*ast.BasicLit)
-			if !ok || b.Kind != token.STRING {
-				break
+			switch b := x.Label.(type) {
+			case *ast.BasicLit:
+				if b.Kind != token.STRING {
+					return true
+				}
+				str, err := strconv.Unquote(b.Value)
+				if err != nil || str != m {
+					return true
+				}
+
+			case *ast.Ident:
+				str, err := ast.ParseIdent(b)
+				if err != nil || str != m || str == b.Name {
+					return true
+				}
+				if ast.IsValidIdent(str) {
+					x.Label = astutil.CopyMeta(ast.NewIdent(str), x.Label).(ast.Label)
+					return true
+				}
 			}
-			str, err := strconv.Unquote(b.Value)
-			if err != nil || str != m {
-				break
-			}
-			str, err = ast.QuoteIdent(str)
-			if err != nil {
-				return false
-			}
-			x.Label = astutil.CopyMeta(ast.NewIdent(str), x.Label).(ast.Label)
+
+			ident := newIdent()
+			replacement[x.Value] = ident
+			expr := x.Label.(ast.Expr)
+			expr = &ast.Alias{Ident: ast.NewIdent(ident), Expr: expr}
+			ast.SetRelPos(x.Label, token.NoRelPos)
+			x.Label = astutil.CopyMeta(expr, x.Label).(ast.Label)
 		}
 		return true
 	}, nil).(*ast.File)
+
+	// Replace quoted references with their alias identifier.
+	astutil.Apply(f, func(c astutil.Cursor) bool {
+		n := c.Node()
+		switch x := n.(type) {
+		case *ast.Ident:
+			if r, ok := replacement[x.Node]; ok {
+				c.Replace(astutil.CopyMeta(ast.NewIdent(r), n))
+				break
+			}
+			str, err := ast.ParseIdent(x)
+			if err != nil || str == x.Name {
+				break
+			}
+			// Either the identifier is valid, in which can be replaced simply
+			// as here, or it is a complicated identifier and the original
+			// destination must have been quoted, in which case it is handled
+			// above.
+			if ast.IsValidIdent(str) {
+				c.Replace(astutil.CopyMeta(ast.NewIdent(str), n))
+			}
+		}
+		return true
+	}, nil)
 
 	// TODO: we are probably reintroducing slices. Disable for now.
 	//

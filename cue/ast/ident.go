@@ -32,8 +32,24 @@ func isDigit(ch rune) bool {
 	return '0' <= ch && ch <= '9' || ch >= utf8.RuneSelf && unicode.IsDigit(ch)
 }
 
+// IsValidIdent reports whether str is a valid identifier.
+func IsValidIdent(ident string) bool {
+	for i, r := range ident {
+		if isLetter(r) || r == '_' {
+			continue
+		}
+		if i > 0 && isDigit(r) {
+			continue
+		}
+		return false
+	}
+	return true
+}
+
 // QuoteIdent quotes an identifier, if needed, and reports
 // an error if the identifier is invalid.
+//
+// Deprecated: quoted identifiers are deprecated. Use aliases.
 func QuoteIdent(ident string) (string, error) {
 	if ident != "" && ident[0] == '`' {
 		if _, err := strconv.Unquote(ident); err != nil {
@@ -66,6 +82,8 @@ escape:
 
 // ParseIdent unquotes a possibly quoted identifier and validates
 // if the result is valid.
+//
+// Deprecated: quoted identifiers are deprecated. Use aliases.
 func ParseIdent(n *Ident) (string, error) {
 	ident := n.Name
 	if ident == "" {

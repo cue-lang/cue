@@ -158,13 +158,15 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 		return m
 	}
 
-	pkgDir := filepath.Join(root, "pkg")
+	pkgDir := filepath.Join(root, modDir)
+	// TODO(legacy): remove
+	pkgDir2 := filepath.Join(root, "pkg")
 
 	_ = c.fileSystem.walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
 		if err != nil || !fi.IsDir() {
 			return nil
 		}
-		if path == pkgDir {
+		if path == pkgDir || path == pkgDir2 {
 			return skipDir
 		}
 

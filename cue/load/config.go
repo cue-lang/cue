@@ -242,6 +242,14 @@ func (c *Config) importPathFromAbsDir(absDir fsPath, key, name string) (importPa
 
 	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
 	switch {
+	case strings.HasPrefix(pkg, "/cue.mod/"):
+		pkg = pkg[len("/cue.mod/"):]
+		if pkg == "" {
+			return "", errors.Newf(token.NoPos,
+				"invalid package %q (root of %s)", key, modDir)
+		}
+
+		// TODO(legacy): remove.
 	case strings.HasPrefix(pkg, "/pkg/"):
 		pkg = pkg[len("/pkg/"):]
 		if pkg == "" {
@@ -376,6 +384,13 @@ func (c Config) complete() (cfg *Config, err error) {
 	switch {
 	case true:
 		mod := filepath.Join(c.ModuleRoot, modDir)
+		info, cerr := c.fileSystem.stat(mod)
+		if cerr != nil {
+			break
+		}
+		if info.IsDir() {
+			mod = filepath.Join(mod, configFile)
+		}
 		f, cerr := c.fileSystem.openFile(mod)
 		if cerr != nil {
 			break
@@ -416,8 +431,10 @@ func (c Config) findRoot(dir string) (string, error) {
 	}
 	abs := absDir
 	for {
-		info, err := fs.stat(filepath.Join(abs, modDir))
-		if err == nil && !info.IsDir() {
+		_, err := fs.stat(filepath.Join(abs, modDir))
+		if err == nil {
+			// Note: cue.mod used to be a file. We still allow
+			// both to match.
 			return abs, nil
 		}
 		d := filepath.Dir(abs)

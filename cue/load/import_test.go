@@ -34,32 +34,6 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 	return p, p.Err
 }
 
-// Uncomment this test if we decide to allow relative imports again.
-// func TestDotSlashImport(t *testing.T) {
-// 	c, _ := (&Config{}).complete()
-// 	l := loader{cfg: c}
-// 	p := l.importPkg(token.NoPos, ".", testdata+"other")
-// 	errl := p.Err
-// 	if errl != nil {
-// 		t.Fatal(errl)
-// 	}
-// 	if len(p.ImportPaths) != 1 || p.ImportPaths[0] != "./file" {
-// 		t.Fatalf("testdata/other: Imports=%v, want [./file]", p.ImportPaths)
-// 	}
-
-// 	p1, err := getInst("./file", testdata+"other")
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
-// 	if p1.PkgName != "file" {
-// 		t.Fatalf("./file: Name=%q, want %q", p1.PkgName, "file")
-// 	}
-// 	dir := filepath.Clean(testdata + "other/file") // Clean to use \ on Windows
-// 	if p1.Dir != dir {
-// 		t.Fatalf("./file: Dir=%q, want %q", p1.PkgName, dir)
-// 	}
-// }
-
 func TestEmptyImport(t *testing.T) {
 	p, err := getInst("", "")
 	if err == nil {

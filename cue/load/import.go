@@ -17,6 +17,7 @@ package load
 import (
 	"bytes"
 	"log"
+	"os"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -77,10 +78,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		return p
 	}
 
-	info, err := ctxt.stat(p.Dir)
-	if err != nil || !info.IsDir() {
-		// package was not found
-		p.Err = errors.Newf(token.NoPos, "cannot find package %q", p.DisplayPath)
+	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
+		p.Err = errors.Newf(token.NoPos, "module root not defined", p.DisplayPath)
 		return p
 	}
 
@@ -101,7 +100,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		dirs = append(dirs, [2]string{genDir, p.Dir})
 		// TODO(legacy): don't support "pkg"
 		if filepath.Base(genDir) != "pkg" {
-			for _, sub := range []string{"pkg", "src"} {
+			for _, sub := range []string{"pkg", "usr"} {
 				rel, err := filepath.Rel(genDir, p.Dir)
 				if err != nil {
 					// should not happen
@@ -117,11 +116,25 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		dirs = append(dirs, [2]string{cfg.ModuleRoot, p.Dir})
 	}
 
+	found := false
+	for _, d := range dirs {
+		info, err := ctxt.stat(d[1])
+		if err == nil && info.IsDir() {
+			found = true
+			break
+		}
+	}
+
+	if !found {
+		p.Err = errors.Newf(token.NoPos, "cannot find package %q", p.DisplayPath)
+		return p
+	}
+
 	for _, d := range dirs {
 		for dir := d[1]; ctxt.isDir(dir); {
 			files, err := ctxt.readDir(dir)
-			if err != nil {
-				p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dir))
+			if err != nil && !os.IsNotExist(err) {
+				p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
 				return p
 			}
 			for _, f := range files {

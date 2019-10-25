@@ -66,23 +66,24 @@ We first make a copy of the data directory.
 
 ```
 $ cp -a original tmp
-$ cd tmp/services
+$ cd tmp
 ```
 
-<!-- TODO
-Although not strictly necessary, we mark the root of the configuration tree
-for good measure.
+We initialize a module so that we can treat all our configuration files
+in the subdirectories as part of one package.
+We do that later by giving all the same package name.
 
 ```
-$ touch ../cue.mod
-cue mod init
+$ cue mod init
 ```
--->
+
+Creating a module also allows our packages import external packages.
 
 Let's try to use the `cue import` command to convert the given YAML files
 into CUE.
 
 ```
+$ cd services
 $ cue import ./...
 Import failed: must specify package name with the -p flag
 ```
@@ -1051,7 +1052,7 @@ $ cue get go k8s.io/api/apps/v1beta1
 
 ```
 
-Now that we have the Kubernetes definitions in `pkg`, we can import and use them:
+Now that we have the Kubernetes definitions in our module, we can import and use them:
 
 ```
 $ cat <<EOF > k8s_defs.cue

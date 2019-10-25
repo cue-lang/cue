@@ -89,7 +89,7 @@ err:    relative import paths not allowed ("./file")
 path:   ""
 module: example.org/test
 root:   $CWD/testdata
-dir:    $CWD/testdata/pkg
+dir:    $CWD/testdata/cue.mod/gen
 display:`,
 	}, {
 		cfg:  dirCfg,
@@ -192,7 +192,7 @@ err:    cannot find package "non-existing"
 path:   non-existing
 module: example.org/test
 root:   $CWD/testdata
-dir:    $CWD/testdata/pkg/non-existing
+dir:    $CWD/testdata/cue.mod/gen/non-existing
 display:non-existing`,
 	}, {
 		cfg:  dirCfg,
@@ -216,8 +216,8 @@ display:./imports
 files:
 	$CWD/testdata/imports/imports.cue
 imports:
-	acme.com/catch: $CWD/testdata/pkg/acme.com/catch/catch.cue
-	acme.com/helper:helper1: $CWD/testdata/pkg/acme.com/helper/helper1.cue`,
+	acme.com/catch: $CWD/testdata/cue.mod/pkg/acme.com/catch/catch.cue
+	acme.com/helper:helper1: $CWD/testdata/cue.mod/pkg/acme.com/helper/helper1.cue`,
 	}, {
 		cfg:  dirCfg,
 		args: args("./toolonly"),

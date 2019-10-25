@@ -71,6 +71,10 @@ func TestTutorial(t *testing.T) {
 		t.Fatal(err)
 	}
 
+	cuetest.Run(t, dir, "cue mod init", &cuetest.Config{
+		// Stdin: strings.NewReader(input),
+	})
+
 	if *update {
 		// The test environment won't work in all environments. We create
 		// a fake go.mod so that Go will find the module root. By default
@@ -152,6 +156,11 @@ func TestTutorial(t *testing.T) {
 					// Don't execute the kubernetes dry run.
 					break
 				}
+				if strings.HasPrefix(cmd, "cue mod init") {
+					// Already ran this at setup.
+					break
+				}
+
 				if !*update && strings.HasPrefix(cmd, "cue get") {
 					// Don't fetch stuff in normal mode.
 					break

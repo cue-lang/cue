@@ -38,7 +38,7 @@ foo: baz: {}
 
 foo: multipath: {
 	t: [string]: {
-		// Combined with the other template, we know the value must be 5 and
+		// Combined with the other constraints, we know the value must be 5 and
 		// thus the entry below can be eliminated.
 		x: >=5 & <=8
 	}
@@ -95,7 +95,7 @@ foo: baz: {}
 
 foo: multipath: {
 	t: [string]: {
-		// Combined with the other template, we know the value must be 5 and
+		// Combined with the other constraints, we know the value must be 5 and
 		// thus the entry below can be eliminated.
 		x: >=5 & <=8
 	}

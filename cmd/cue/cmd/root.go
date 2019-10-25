@@ -81,15 +81,18 @@ For more information on writing CUE configuration files see cuelang.org.`,
 	c.cmd = cmdCmd
 
 	subCommands := []*cobra.Command{
-		newTrimCmd(c),
-		newImportCmd(c),
-		newEvalCmd(c),
-		newGetCmd(c),
-		newFmtCmd(c),
-		newExportCmd(c),
 		cmdCmd,
+		newEvalCmd(c),
+		newExportCmd(c),
+		newFmtCmd(c),
+		newGetCmd(c),
+		newImportCmd(c),
+		newModCmd(c),
+		newTrimCmd(c),
 		newVersionCmd(c),
 		newVetCmd(c),
+
+		// Hidden
 		newAddCmd(c),
 	}
 

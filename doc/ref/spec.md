@@ -430,7 +430,7 @@ A `\(` must be followed by a valid CUE Expression, followed by a `)`.
 All other sequences starting with a backslash are illegal inside literals.
 
 ```
-escaped_char     = `\` { `#` } ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | `\` | "'" | `"` ) .
+escaped_char     = `\` { `#` } ( "a" | "b" | "f" | "n" | "r" | "t" | "v" | "/" | `\` | "'" | `"` ) .
 byte_value       = octal_byte_value | hex_byte_value .
 octal_byte_value = `\` octal_digit octal_digit octal_digit .
 hex_byte_value   = `\` "x" hex_digit hex_digit .

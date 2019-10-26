@@ -85,7 +85,7 @@ func newVetCmd(c *Command) *cobra.Command {
 }
 
 func doVet(cmd *Command, args []string) error {
-	builds := loadFromArgs(cmd, args, nil)
+	builds := loadFromArgs(cmd, args, defaultConfig)
 	if builds == nil {
 		return nil
 	}

@@ -104,7 +104,7 @@ func runTrim(cmd *Command, args []string) error {
 	internal.DropOptional = true
 	defer func() { internal.DropOptional = false }()
 
-	binst := loadFromArgs(cmd, args, nil)
+	binst := loadFromArgs(cmd, args, defaultConfig)
 	if binst == nil {
 		return nil
 	}

@@ -22,13 +22,30 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/parser"
 	"github.com/spf13/cobra"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 )
+
+// Disallow
+// - block comments
+// - old-style field comprehensions
+const syntaxVersion = -1000 + 12
+
+var defaultConfig = &load.Config{
+	Context: build.NewContext(
+		build.ParseFile(func(name string, src interface{}) (*ast.File, error) {
+			return parser.ParseFile(name, src,
+				parser.FromVersion(syntaxVersion),
+				parser.ParseComments,
+			)
+		})),
+}
 
 var runtime = &cue.Runtime{}
 
@@ -81,7 +98,7 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 }
 
 func buildFromArgs(cmd *Command, args []string) []*cue.Instance {
-	binst := loadFromArgs(cmd, args, nil)
+	binst := loadFromArgs(cmd, args, defaultConfig)
 	if binst == nil {
 		return nil
 	}
@@ -97,6 +114,9 @@ func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instan
 }
 
 func buildInstances(cmd *Command, binst []*build.Instance) []*cue.Instance {
+	// TODO:
+	// If there are no files and User is true, then use those?
+	// Always use all files in user mode?
 	instances := cue.Build(binst)
 	for _, inst := range instances {
 		// TODO: consider merging errors of multiple files, but ensure

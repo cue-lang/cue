@@ -165,6 +165,13 @@ func (inst *Instance) Context() *Context {
 	return inst.ctxt
 }
 
+func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
+	if inst.ctxt != nil && inst.ctxt.parseFunc != nil {
+		return inst.ctxt.parseFunc(name, src)
+	}
+	return parser.ParseFile(name, src, parser.ParseComments)
+}
+
 // LookupImport defines a mapping from an ImportSpec's ImportPath to Instance.
 func (inst *Instance) LookupImport(path string) *Instance {
 	path = inst.expandPath(path)
@@ -193,7 +200,7 @@ func (inst *Instance) addImport(imp *Instance) {
 // It does not process the file's imports. The package name of the file must
 // match the package name of the instance.
 func (inst *Instance) AddFile(filename string, src interface{}) error {
-	file, err := parser.ParseFile(filename, src, parser.ParseComments)
+	file, err := inst.parse(filename, src)
 	if err != nil {
 		// should always be an errors.List, but just in case.
 		err := errors.Promote(err, "error adding file")

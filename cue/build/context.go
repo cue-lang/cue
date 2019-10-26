@@ -27,13 +27,16 @@ package build
 
 import (
 	"context"
+
+	"cuelang.org/go/cue/ast"
 )
 
 // A Context keeps track of state of building instances and caches work.
 type Context struct {
 	ctxt context.Context
 
-	loader LoadFunc
+	loader    LoadFunc
+	parseFunc func(str string, src interface{}) (*ast.File, error)
 
 	initialized bool
 
@@ -107,4 +110,20 @@ type Option func(c *Context)
 // Loader sets parsing options.
 func Loader(f LoadFunc) Option {
 	return func(c *Context) { c.loader = f }
+}
+
+// ParseFile is called to read and parse each file
+// when building syntax tree.
+// It must be safe to call ParseFile simultaneously from multiple goroutines.
+// If ParseFile is nil, the loader will uses parser.ParseFile.
+//
+// ParseFile should parse the source from src and use filename only for
+// recording position information.
+//
+// An application may supply a custom implementation of ParseFile
+// to change the effective file contents or the behavior of the parser,
+// or to modify the syntax tree. For example, changing the backwards
+// compatibility.
+func ParseFile(f func(filename string, src interface{}) (*ast.File, error)) Option {
+	return func(c *Context) { c.parseFunc = f }
 }

@@ -275,7 +275,7 @@ func (p *parser) consumeComment() (comment *ast.Comment, endline int) {
 	// Scan the comment for '\n' chars and adjust endline accordingly.
 	endline = p.file.Line(p.pos)
 	if p.lit[1] == '*' {
-		p.assertV0(0, 10, "block quotes")
+		p.assertV0(p.pos, 0, 10, "block quotes")
 
 		// don't use range here - no need to decode Unicode code points
 		for i := 0; i < len(p.lit); i++ {
@@ -368,9 +368,12 @@ func (p *parser) next() {
 	}
 }
 
-func (p *parser) assertV0(minor, patch int, name string) {
-	if p.version != 0 && p.version > version0(minor, patch) {
-		p.errf(p.pos, "%s deprecated as of v0.%d.%d", name, minor, patch+1)
+func (p *parser) assertV0(pos token.Pos, minor, patch int, name string) {
+	v := version0(minor, patch)
+	if p.version != 0 && p.version > v {
+		p.errors = errors.Append(p.errors,
+			errors.Wrapf(&DeprecationError{v}, pos,
+				"%s deprecated as of v0.%d.%d", name, minor, patch+1))
 	}
 }
 
@@ -826,7 +829,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 		switch p.tok {
 		case token.IDENT, token.STRING, token.LSS, token.INTERPOLATION, token.LBRACK:
-			p.assertV0(0, 12, "space-separated labels")
+			p.assertV0(p.pos, 0, 12, "space-separated labels")
 			field := &ast.Field{}
 			m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
 			m = field
@@ -909,6 +912,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		fallthrough
 
 	case token.FOR, token.IF:
+		p.assertV0(p.pos, 0, 10, "old-style comprehensions")
 		if !allowComprehension {
 			p.errf(p.pos, "comprehension not allowed for this field")
 		}
@@ -1070,7 +1074,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 			p.next()
 		}
 
-		p.assertV0(0, 12, "template labels")
+		p.assertV0(p.pos, 0, 12, "template labels")
 		label = &ast.TemplateLabel{Langle: pos, Ident: ident, Rangle: gtr}
 		c.closeNode(p, label)
 		ok = true

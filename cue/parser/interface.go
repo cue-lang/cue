@@ -17,6 +17,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
@@ -85,6 +87,16 @@ func FromVersion(version int) Option {
 
 func version0(minor, patch int) int {
 	return -1000 + 100*minor + patch
+}
+
+// DeprecationError is a sentinel error to indicate that an error is
+// related to an unsupported old CUE syntax.
+type DeprecationError struct {
+	Version int
+}
+
+func (e *DeprecationError) Error() string {
+	return fmt.Sprintf("try running `cue fmt` on the file to upgrade.")
 }
 
 // Latest specifies the latest version of the parser, effectively setting

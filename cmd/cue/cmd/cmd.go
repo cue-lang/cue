@@ -49,7 +49,7 @@ now start, and so on until all tasks have completed.
 
 Commands are defined at the top-level of the configuration:
 
-	command <Name>: { // from tool.Command
+	command: [Name=string]: { // from tool.Command
 		// usage gives a short usage pattern of the command.
 		// Example:
 		//    fmt [-n] [-x] [packages]
@@ -68,7 +68,7 @@ Commands are defined at the top-level of the configuration:
 		// Each task can have inputs and outputs, depending on the type
 		// task. The outputs are initially unspecified, but are filled out
 		// by the tooling
-		task <Name>: { // from "tool".Task
+		task: [string]: { // from "tool".Task
 			// supported fields depend on type
 		}
 
@@ -83,7 +83,7 @@ Commands are defined at the top-level of the configuration:
 		// The tool would print documentation of this flag as:
 		//   Flags:
 		//      --env string    environment to run in: test(default) or prod
-		var <Name>: VarValue
+		var: [string]: VarValue
 
 		// flag defines a command line flag.
 		//
@@ -100,7 +100,7 @@ Commands are defined at the top-level of the configuration:
 		//   Flags:
 		//     -e, --env string    environment to run in: test(default), staging, or prod
 		//
-		flag <Name>: { // from "tool".Flag
+		flag [Name=_]: { // from "tool".Flag
 			// value defines the possible values for this flag.
 			// The default is string. Users can define default values by
 			// using disjunctions.
@@ -116,7 +116,9 @@ Commands are defined at the top-level of the configuration:
 		}
 
 		// populate flag with the default values for
-		flag: { "\(k)": { value: v } | null for k, v in var }
+		for k, v in var {
+			flag: { "\(k)": { value: v } | null  }
+		}
 
 		// env defines environment variables. It is populated with values
 		// for var.
@@ -128,7 +130,7 @@ Commands are defined at the top-level of the configuration:
 		//     var foo: string
 		//     env foo: null  // don't use environment variables for foo
 		//
-		env <Name>: {
+		env: [Name=_]: {
 			// name defines the environment variable that sets this flag.
 			name?: *"CUE_VAR_" + strings.Upper(Name) | string
 
@@ -136,7 +138,11 @@ Commands are defined at the top-level of the configuration:
 			// if not set.
 			value?: string | bytes
 		}
-		env: { "\(k)": { value: v } | null for k, v in var }
+		env: {
+			for k, v in var {
+				"\(k)": { value: v } | null
+			}
+		}
 	}
 
 Available tasks can be found in the package documentation at
@@ -157,11 +163,11 @@ A simple file using command line execution:
 	city: "Amsterdam"
 
 	// Say hello!
-	command hello: {
+	command: hello: {
 		// whom to say hello to
-		var who: *"World" | string
+		var: who: *"World" | string
 
-		task print: exec.Run & {
+		task: print: exec.Run & {
 			cmd: "echo Hello \(var.who)! Welcome to \(city)."
 		}
 	}
@@ -183,28 +189,28 @@ An example using pipes:
 	city: "Amsterdam"
 
 	// Say hello!
-	command hello: {
-		var file: "out.txt" | string // save transcript to this file
+	command: hello: {
+		var: file: "out.txt" | string // save transcript to this file
 
-		task ask: cli.Ask & {
+		task: ask: cli.Ask & {
 			prompt:   "What is your name?"
 			response: string
 		}
 
 		// starts after ask
-		task echo: exec.Run & {
+		task: echo: exec.Run & {
 			cmd:    ["echo", "Hello", task.ask.response + "!"]
 			stdout: string // capture stdout
 		}
 
 		// starts after echo
-		task write: file.Append & {
+		task: write: file.Append & {
 			filename: var.file
 			contents: task.echo.stdout
 		}
 
 		// also starts after echo
-		task print: cli.Print & {
+		task: print: cli.Print & {
 			contents: task.echo.stdout
 		}
 	}

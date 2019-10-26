@@ -129,12 +129,12 @@ Examples:
   # base the path values on th input
   $ cue import -f -l '"\(strings.ToLower(kind))" "\(x.name)"' foo.yaml
   $ cat foo.cue
-  service booster: {
+  service: booster: {
       kind: "Service"
       name: "booster"
   }
 
-  deployment booster: {
+  deployment: booster: {
       kind:     "Deployment"
       name:     "booster
       replicas: 1
@@ -184,11 +184,11 @@ Example:
 
   $ cue import -R example.json
   $ cat example.cue
-  import "encode/json"
+  import "encoding/json"
 
   a: {
       data: json.Encode(_data),
-      _data: {
+      _data = {
           foo: 1
           bar: 2
       }
@@ -690,6 +690,7 @@ func (h *hoister) hoist(f *ast.File) {
 				ast.NewSel(pkg, "Marshal"),
 				ast.NewIdent(dataField))
 
+			// TODO: use definitions instead
 			c.InsertAfter(astutil.ApplyRecursively(&ast.Alias{
 				Ident: ast.NewIdent(dataField),
 				Expr:  expr,

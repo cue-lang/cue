@@ -84,7 +84,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 		if len(args) != 1 {
 			return fmt.Errorf("too many arguments")
 		}
-		module := args[0]
+		module = args[0]
 		u, err := url.Parse("https://" + module)
 		if err != nil {
 			return fmt.Errorf("invalid module name: %v", module)

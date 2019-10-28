@@ -68,6 +68,12 @@ type Foozer struct {
 type Level int
 
 const (
+	/*
+		Block comment.
+			Indented.
+
+		Empty line before.
+	*/
 	Unknown Level = iota
 	Low
 	// Medium is neither High nor Low

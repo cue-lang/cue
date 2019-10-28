@@ -55,6 +55,10 @@ enumLevel ::
 	Medium |
 	High
 
+// Block comment.
+//  Indented.
+//
+// Empty line before.
 Unknown :: Level & 0
 Low ::     Level & 1
 

@@ -205,16 +205,19 @@ func TestTutorial(t *testing.T) {
 
 	if *update {
 		// Remove all old cue files.
-		filepath.Walk("", func(path string, info os.FileInfo, err error) error {
+		err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 			if isCUE(path) {
 				if err := os.Remove(path); err != nil {
 					t.Fatal(err)
 				}
 			}
-			return nil
+			return err
 		})
+		if err != nil {
+			t.Fatal(err)
+		}
 
-		err := filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
+		err = filepath.Walk(dir, func(path string, info os.FileInfo, err error) error {
 			if isCUE(path) {
 				dst := path[len(dir)+1:]
 				err := os.MkdirAll(filepath.Dir(dst), 0755)
@@ -223,7 +226,7 @@ func TestTutorial(t *testing.T) {
 				}
 				return copy.File(path, dst)
 			}
-			return nil
+			return err
 		})
 		if err != nil {
 			t.Fatal(err)

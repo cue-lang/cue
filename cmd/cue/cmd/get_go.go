@@ -725,6 +725,65 @@ func (e *extractor) altType(typ types.Type) string {
 	return ""
 }
 
+func writeDoc(w io.Writer, g *ast.CommentGroup) {
+	if g == nil {
+		return
+	}
+
+	for _, comment := range g.List {
+		c := comment.Text
+
+		// Remove comment markers.
+		// The parser has given us exactly the comment text.
+		switch c[1] {
+		case '/':
+			//-style comment (no newline at the end)
+			_, _ = fmt.Fprintf(w, "//%s\n", c[2:])
+
+		case '*':
+			/*-style comment */
+			c = c[2 : len(c)-2]
+			if len(c) > 0 && c[0] == '\n' {
+				c = c[1:]
+			}
+
+			lines := strings.Split(c, "\n")
+
+			// Find common space prefix
+			i := 0
+			line := lines[0]
+			for ; i < len(line); i++ {
+				if c := line[i]; c != ' ' && c != '\t' {
+					break
+				}
+			}
+
+			for _, l := range lines {
+				for j := 0; j < i && j < len(l); j++ {
+					if line[j] != l[j] {
+						i = j
+						break
+					}
+				}
+			}
+
+			// Strip last line if empty.
+			if n := len(lines); n > 1 && len(lines[n-1]) < i {
+				lines = lines[:n-1]
+			}
+
+			// Print lines.
+			for _, l := range lines {
+				if i >= len(l) {
+					_, _ = io.WriteString(w, "//\n")
+					continue
+				}
+				_, _ = fmt.Fprintf(w, "// %s\n", l[i:])
+			}
+		}
+	}
+}
+
 func (e *extractor) printDoc(doc *ast.CommentGroup, newline bool) {
 	if doc == nil {
 		return
@@ -732,10 +791,7 @@ func (e *extractor) printDoc(doc *ast.CommentGroup, newline bool) {
 	if newline {
 		e.newLine()
 	}
-	for _, c := range doc.List {
-		fmt.Fprint(e.w, c.Text)
-		e.newLine()
-	}
+	writeDoc(e.w, doc)
 }
 
 func (e *extractor) newLine() {

@@ -95,7 +95,7 @@ func loadFile(t *testing.T, path string) string {
 		t.Fatalf("could not load file %s", path)
 	}
 	// Strip comments up till package clause. Local packages will generate
-	// differently using GOPATH versuse modules.
+	// differently using GOPATH versus modules.
 	s := string(b)
 	return s[strings.Index(s, "package"):]
 }

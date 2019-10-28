@@ -338,9 +338,6 @@ ListOptions :: {
 	// If this is not a watch, this field is ignored.
 	// If the feature gate WatchBookmarks is not enabled in apiserver,
 	// this field is ignored.
-	//
-	// This field is beta.
-	//
 	// +optional
 	allowWatchBookmarks?: bool @go(AllowWatchBookmarks) @protobuf(9,varint,opt)
 
@@ -1289,6 +1286,7 @@ IncludeMetadata :: IncludeObjectPolicy & "Metadata"
 IncludeObject :: IncludeObjectPolicy & "Object"
 
 // TableOptions are used when a Table is requested by the caller.
+// +k8s:conversion-gen:explicit-from=net/url.Values
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 TableOptions :: {
 	TypeMeta

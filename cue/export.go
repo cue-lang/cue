@@ -200,12 +200,15 @@ func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 	return short
 }
 
-func mkTemplate(n *ast.Ident) ast.Label {
-	var expr ast.Expr = n
-	switch n.Name {
-	case "":
+func (p *exporter) mkTemplate(v value, n *ast.Ident) ast.Label {
+	var expr ast.Expr
+	if v != nil {
+		expr = p.expr(v)
+	} else {
 		expr = ast.NewIdent("_")
-	case "_":
+	}
+	switch n.Name {
+	case "", "_":
 	default:
 		expr = &ast.Alias{Ident: n, Expr: ast.NewIdent("_")}
 	}
@@ -225,8 +228,20 @@ func hasTemplate(s *ast.StructLit) bool {
 					return false
 				}
 			}
-			if _, ok := label.(*ast.ListLit); ok {
-				return true
+			if l, ok := label.(*ast.ListLit); ok {
+				if len(l.Elts) != 1 {
+					return false
+				}
+				expr := l.Elts[0]
+				if a, ok := expr.(*ast.Alias); ok {
+					expr = a.Expr
+				}
+				if i, ok := expr.(*ast.Ident); ok {
+					if i.Name == "_" || i.Name == "string" {
+						return true
+					}
+				}
+				return false
 			}
 		}
 	}
@@ -243,7 +258,7 @@ func (p *exporter) closeOrOpen(s *ast.StructLit, isClosed bool) ast.Expr {
 	if !p.showOptional() {
 		return s
 	}
-	if isClosed && !p.inDef {
+	if isClosed && !p.inDef && !hasTemplate(s) {
 		return ast.NewCall(ast.NewIdent("close"), s)
 	}
 	if !isClosed && p.inDef && !hasTemplate(s) {
@@ -477,24 +492,11 @@ func (p *exporter) expr(v value) ast.Expr {
 		// optional fields is requested. If a struct is not closed it was
 		// already generated before. Furthermore, if if we are in evaluation
 		// mode, the struct is already unified, so there is no need to print it.
-		case x.template != nil && p.showOptional() && p.isClosed(x) && !doEval(p.mode):
-			l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
-			if !ok {
+		case p.showOptional() && p.isClosed(x) && !doEval(p.mode):
+			if x.optionals == nil {
 				break
 			}
-			v := l.value
-			if c, ok := v.(*closeIfStruct); ok {
-				v = c.value
-			}
-			if _, ok := v.(*top); ok {
-				break
-			}
-			expr = &ast.BinaryExpr{X: expr, Op: token.AND, Y: &ast.StructLit{
-				Elts: []ast.Decl{&ast.Field{
-					Label: mkTemplate(p.identifier(l.params.arcs[0].feature)),
-					Value: p.expr(l.value),
-				}},
-			}}
+			p.optionals(st, x.optionals)
 		}
 		return expr
 
@@ -668,6 +670,61 @@ func (p *exporter) expr(v value) ast.Expr {
 	}
 }
 
+func (p *exporter) optionalsExpr(x *optionals, isClosed bool) ast.Expr {
+	st := &ast.StructLit{}
+	// An empty struct has meaning in case of closed structs, where they
+	// indicate no other fields may be added. Non-closed empty structs should
+	// have been optimized away. In case they are not, it is just a no-op.
+	if x != nil {
+		p.optionals(st, x)
+	}
+	if isClosed {
+		return ast.NewCall(ast.NewIdent("close"), st)
+	}
+	return st
+}
+
+func (p *exporter) optionals(st *ast.StructLit, x *optionals) {
+	switch x.op {
+	default:
+		for _, t := range x.fields {
+			l, ok := t.value.evalPartial(p.ctx).(*lambdaExpr)
+			if !ok {
+				// Really should not happen.
+				continue
+			}
+			v := l.value
+			if c, ok := v.(*closeIfStruct); ok {
+				v = c.value
+			}
+			st.Elts = append(st.Elts, &ast.Field{
+				Label: p.mkTemplate(t.key, p.identifier(l.params.arcs[0].feature)),
+				Value: p.expr(l.value),
+			})
+		}
+
+	case opUnify:
+		// Optional constraints added with normal unification are embedded as an
+		// expression. This relies on the fact that a struct embedding a closed
+		// struct will itself be closed.
+		st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: &ast.BinaryExpr{
+			X:  p.optionalsExpr(x.left, x.left.isClosed()),
+			Op: token.AND,
+			Y:  p.optionalsExpr(x.right, x.right.isClosed()),
+		}})
+
+	case opUnifyUnchecked:
+		// Constraints added with unchecked unification are embedded
+		// individually. It doesn't matter here whether this originated from
+		// regular unification of open structs or embedded closed structs.
+		// The result in each case is unchecked unification.
+		left := p.optionalsExpr(x.left, false)
+		right := p.optionalsExpr(x.right, false)
+		st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: left})
+		st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: right})
+	}
+}
+
 func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, err *bottom) {
 	obj := &ast.StructLit{}
 	if doEval(p.mode) {
@@ -688,18 +745,11 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 	if x.emit != nil {
 		obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
 	}
-	switch {
-	case x.template != nil && p.showOptional() && addTempl:
-		l, ok := x.template.evalPartial(p.ctx).(*lambdaExpr)
-		if ok {
-			if _, ok := l.value.(*top); ok && !p.isClosed(x) {
-				break
-			}
-			obj.Elts = append(obj.Elts, &ast.Field{
-				Label: mkTemplate(p.identifier(l.params.arcs[0].feature)),
-				Value: p.expr(l.value),
-			})
-		} // TODO: else record error
+	if p.showOptional() && x.optionals != nil &&
+		// Optional field constraints may be omitted if they were already
+		// applied and no more new fields may be added.
+		!(doEval(p.mode) && x.optionals.isEmpty() && p.isClosed(x)) {
+		p.optionals(obj, x.optionals)
 	}
 	for i, a := range x.arcs {
 		f := &ast.Field{

@@ -783,11 +783,13 @@ func TestExportFile(t *testing.T) {
 				[_]: int64
 			}
 			X :: {
-				x: int64
+				[_]: int64
+				x:   int64
 			}
-			x: close({
-				x: int64
-			})
+			x: {
+				[_]: int64
+				x:   int64
+			}
 		}`),
 	}, {
 		eval: true,
@@ -871,6 +873,42 @@ func TestExportFile(t *testing.T) {
 			a?: 1
 			b?: 2
 			c:  3
+		}`),
+	}, {
+		eval: true,
+		in: `
+		A :: {
+			[=~"^[a-s]*$"]: int
+		}
+		B :: {
+			[=~"^[m-z]+"]: int
+		}
+		C: {A & B}
+		D :: {A & B}
+		`,
+		// TODO: the outer close of C could be optimized away.
+		out: unindent(`
+		{
+			A :: {
+				[=~"^[a-s]*$"]: int
+			}
+			B :: {
+				[=~"^[m-z]+"]: int
+			}
+			C: close({
+				close({
+					[=~"^[a-s]*$"]: int
+				}) & close({
+					[=~"^[m-z]+"]: int
+				})
+			})
+			D :: {
+				close({
+					[=~"^[a-s]*$"]: int
+				}) & close({
+					[=~"^[m-z]+"]: int
+				})
+			}
 		}`),
 	}}
 	for _, tc := range testCases {

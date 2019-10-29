@@ -224,7 +224,19 @@ func TestCompile(t *testing.T) {
 			C="\(a)": 5
 			c: C
 			`,
-		out: `<0>{<>: <1>(ID: string)-><2>{name: <1>.ID}, foo=bar: 3, a: <0>.foo=bar, bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
+		out: `<0>{[]: <1>(ID: string)-><2>{name: <1>.ID}, foo=bar: 3, a: <0>.foo=bar, bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
+	}, {
+		// optional fields with key filters
+		in: `
+			JobID: =~"foo"
+			[JobID]: { name: string }
+
+			[<"s"]: { other: string }
+			`,
+		out: `<0>{` +
+			`[<0>.JobID]: <1>(_: string)-><2>{name: string}, ` +
+			`[<"s"]: <3>(_: string)-><4>{other: string}, ` +
+			`JobID: =~"foo"}`,
 	}, {
 		// illegal alias usage
 		in: `
@@ -263,7 +275,7 @@ alias "Y" redeclared in same scope:
 			v: {}
 		}
 		`,
-		out: `<0>{a: <1>{<>: <2>(name: string)-><3>{n: <2>.name}, k: 1}, b: <4>{<>: <5>(X: string)-><6>{x: 0, y: 1}, v: <7>{}}}`,
+		out: `<0>{a: <1>{[]: <2>(name: string)-><3>{n: <2>.name}, k: 1}, b: <4>{[]: <5>(X: string)-><6>{x: 0, y: 1}, v: <7>{}}}`,
 	}, {
 		in: `
 		a: {
@@ -337,7 +349,7 @@ b: preference mark not allowed at this position:
 		}}
 		`,
 		out: `<0>{` +
-			`a: (<1>{d: <2>{info :: <3>{...}, Y: <2>.info.X}, <0>.base} & <4>{<>: <5>(Name: string)-><6>{info :: <7>C{X: "foo"}}, }), ` +
+			`a: (<1>{d: <2>{info :: <3>{...}, Y: <2>.info.X}, <0>.base} & <4>{[]: <5>(Name: string)-><6>{info :: <7>C{X: "foo"}}, }), ` +
 			`base :: <8>C{info :: <9>{...}}}`,
 	}, {
 		in: `

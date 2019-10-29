@@ -989,18 +989,11 @@ func (v Value) Elem() (Value, bool) {
 	ctx := v.ctx()
 	switch x := v.path.v.(type) {
 	case *structLit:
-		if x.template == nil {
+		t, _ := x.optionals.constraint(ctx, nil)
+		if t == nil {
 			break
 		}
-		fn, ok := ctx.manifest(x.template).(*lambdaExpr)
-		if !ok {
-			// TODO: return an error instead.
-			break
-		}
-		// Note, this template does not maintain the relation between the
-		// the attribute value and the instance.
-		y := fn.call(ctx, x, &basicType{x.baseValue, stringKind})
-		return newValueRoot(ctx, y), true
+		return newValueRoot(ctx, t), true
 	case *list:
 		return newValueRoot(ctx, x.typ), true
 	}
@@ -1151,7 +1144,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		obj = &structLit{
 			obj.baseValue,   // baseValue
 			obj.emit,        // emit
-			obj.template,    // template
+			obj.optionals,   // template
 			obj.closeStatus, // closeStatus
 			nil,             // comprehensions
 			arcs,            // arcs
@@ -1281,17 +1274,17 @@ func (v Value) LookupField(path string) (FieldInfo, error) {
 func (v Value) Template() func(label string) Value {
 	ctx := v.ctx()
 	x, ok := v.path.cache.(*structLit)
-	if !ok || x.template == nil {
+	if !ok || x.optionals.isEmpty() {
 		return nil
 	}
-	fn, ok := ctx.manifest(x.template).(*lambdaExpr)
-	if !ok {
-		return nil
-	}
-	return func(label string) Value {
+
+	return func(label string) (v Value) {
 		arg := &stringLit{x.baseValue, label, nil}
-		y := fn.call(ctx, x, arg)
-		return newValueRoot(ctx, y)
+
+		if v, _ := x.optionals.constraint(ctx, arg); v != nil {
+			return newValueRoot(ctx, v)
+		}
+		return v
 	}
 }
 

@@ -66,13 +66,12 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 			a.setValue(rewriteRec(ctx, a.v, v, m))
 			arcs[i] = a
 		}
-		t := x.template
-		if t != nil {
-			v := rewriteRec(ctx, t, t.evalPartial(ctx), m)
-			if isBottom(v) {
-				return v
-			}
-			t = v
+
+		t, e := x.optionals.rewrite(func(v value) value {
+			return rewriteRec(ctx, v, v.evalPartial(ctx), m)
+		})
+		if e != nil {
+			return err
 		}
 		emit := testResolve(ctx, x.emit, m)
 		obj := &structLit{x.baseValue, emit, t, x.closeStatus, x.comprehensions, arcs, nil}

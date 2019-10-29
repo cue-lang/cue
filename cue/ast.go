@@ -250,7 +250,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				sig := &params{}
 				sig.add(f, &basicType{newNode(x), stringKind})
 				template := &lambdaExpr{newNode(x), sig, &top{newNode(x)}}
-				v1.object.addTemplate(v.ctx(), token.NoPos, template)
+				v1.object.addTemplate(v.ctx(), x.Pos(), nil, template)
 
 			case *ast.EmbedDecl:
 				old := v.ctx().inDefinition
@@ -277,12 +277,10 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				v1.walk(x)
 			}
 		}
-		if v.ctx().inDefinition > 0 {
+		if v.ctx().inDefinition > 0 && !obj.optionals.isFull() {
 			// For embeddings this is handled in binOp, in which case the
 			// isClosed bit is cleared if a template is introduced.
-			if obj.template == nil {
-				obj.closeStatus = toClose
-			}
+			obj.closeStatus = toClose
 		}
 		if passDoc {
 			v.doc = v1.doc // signal usage of document back to parent.
@@ -388,8 +386,12 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			} else {
 				f = v.label("_", true)
 			}
+
+			// Parse the key filter or a bulk-optional field. The special value
+			// of nil to mean "all fields".
+			var key value
 			if i, ok := expr.(*ast.Ident); !ok || (i.Name != "string" && i.Name != "_") {
-				return v.errf(x, `only 'string' or '_' allowed in this position`)
+				key = v.walk(expr)
 			}
 			v.sel = "*"
 
@@ -400,7 +402,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v.setScope(n, template)
 			template.value = v.walk(n.Value)
 
-			v.object.addTemplate(v.ctx(), token.NoPos, template)
+			v.object.addTemplate(v.ctx(), token.NoPos, key, template)
 
 		case *ast.TemplateLabel:
 			if isDef {
@@ -416,7 +418,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v.setScope(n, template)
 			template.value = v.walk(n.Value)
 
-			v.object.addTemplate(v.ctx(), token.NoPos, template)
+			v.object.addTemplate(v.ctx(), token.NoPos, nil, template)
 
 		case *ast.BasicLit, *ast.Ident:
 			if internal.DropOptional && opt {

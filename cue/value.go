@@ -637,9 +637,9 @@ type structLit struct {
 	// templates [][]value
 	// catch_all: value
 
-	// template must evaluated to a lambda and is applied to all concrete
-	// values in the struct, whether it be open or closed.
-	template    value
+	// optionals holds pattern-constraint pairs that
+	// are applied to all concrete values in this struct.
+	optionals   *optionals
 	closeStatus closeMode
 
 	comprehensions []value
@@ -647,6 +647,254 @@ type structLit struct {
 	// TODO: consider hoisting the template arc to its own value.
 	arcs     []arc
 	expanded evaluated
+}
+
+// optionals holds a set of key pattern-constraint pairs, where constraints are
+// to be applied to concrete fields of which the label matches the key pattern.
+//
+// optionals will either hold concrete fields or a couple of nested optional
+// structs combined based on the op type, but not both.
+type optionals struct {
+	closed closeMode
+	op     op
+	left   *optionals // nil means empty closed struct
+	right  *optionals // nil means empty closed struct
+	fields []optionalSet
+}
+
+type optionalSet struct {
+	// A key filter may be nil, in which case it means all strings, or _.
+	key value
+
+	// constraint must evaluate to a lambda and is applied to any concrete
+	// value for which the key matches key.
+	value value
+}
+
+func newOptional(key, value value) *optionals {
+	return &optionals{
+		fields: []optionalSet{{key, value}},
+	}
+}
+
+// isClosed mirrors the closed status of the struct to which
+// this optionals belongs.
+func (o *optionals) isClosed() bool {
+	if o == nil {
+		return true
+	}
+	return o.closed.isClosed()
+}
+
+func (o *optionals) close() *optionals {
+	if o == nil {
+		return nil
+	}
+	o.closed |= isClosed
+	return o
+}
+
+// isEmpty reports whether this optionals may report true for match. Even if an
+// optionals is empty, it may still hold constraints to be applied to already
+// existing concrete fields.
+func (o *optionals) isEmpty() bool {
+	if o == nil {
+		return true
+	}
+	le := o.left.isEmpty()
+	re := o.right.isEmpty()
+
+	if o.op == opUnify {
+		if le && o.left.isClosed() {
+			return true
+		}
+		if re && o.right.isClosed() {
+			return true
+		}
+	}
+	return le && re && len(o.fields) == 0
+}
+
+// isFull reports whether match reports true for all fields.
+func (o *optionals) isFull() bool {
+	found, _ := o.match(nil, nil)
+	return found
+}
+
+// match reports whether a field with the given name may be added in the
+// associated struct as a new field. ok is false, fif there was any closed
+// struct that failed to match. Even if match returns false, there may still be
+// constraints represented by optionals that are to be applied to existing
+// concrete fields.
+func (o *optionals) match(ctx *context, str *stringLit) (found, ok bool) {
+	if o == nil {
+		return false, true
+	}
+
+	found1, ok := o.left.match(ctx, str)
+	if !ok && o.op == opUnify {
+		return false, false
+	}
+
+	found2, ok := o.right.match(ctx, str)
+	if !ok && o.op == opUnify {
+		return false, false
+	}
+
+	if found1 || found2 {
+		return true, true
+	}
+
+	for _, f := range o.fields {
+		if f.key == nil {
+			return true, true
+		}
+		if str != nil {
+			v := binOp(ctx, f.value, opUnify, f.key.evalPartial(ctx), str)
+			if !isBottom(v) {
+				return true, true
+			}
+		}
+	}
+
+	return false, !o.closed.isClosed()
+}
+
+func (o *optionals) allows(ctx *context, f label) bool {
+	if o == nil {
+		return false
+	}
+
+	str := ctx.labelStr(f)
+	arg := &stringLit{str: str}
+
+	found, ok := o.match(ctx, arg)
+	return found && ok
+}
+
+func (o *optionals) add(ctx *context, key, value value) {
+	for i, b := range o.fields {
+		if b.key == key {
+			o.fields[i].value = mkBin(ctx, token.NoPos, opUnify, b.value, value)
+			return
+		}
+	}
+	o.fields = append(o.fields, optionalSet{key, value})
+}
+
+// isDotDotDot reports whether optionals only contains fully-qualified
+// constraints. This is useful for some optimizations.
+func (o *optionals) isDotDotDot() bool {
+	if o == nil {
+		return false
+	}
+	if len(o.fields) > 1 {
+		return false
+	}
+	if len(o.fields) == 1 {
+		f := o.fields[0]
+		if f.key != nil {
+			return false
+		}
+		lambda, ok := f.value.(*lambdaExpr)
+		if ok {
+			if _, ok = lambda.value.(*top); ok {
+				return true
+			}
+		}
+		return false
+	}
+	if o.left == nil {
+		return o.right.isDotDotDot()
+	}
+	if o.right == nil {
+		return o.left.isDotDotDot()
+	}
+	return o.left.isDotDotDot() && o.right.isDotDotDot()
+}
+
+// constraint returns the unification of all constraints for which arg matches
+// the key filter. doc contains the documentation of all applicable fields.
+func (o *optionals) constraint(ctx *context, label evaluated) (u value, doc *docNode) {
+	if o == nil {
+		return nil, nil
+	}
+	add := func(v value) {
+		if v != nil {
+			if u == nil {
+				u = v
+			} else {
+				u = mkBin(ctx, token.NoPos, opUnify, u, v)
+			}
+		}
+	}
+	v, doc1 := o.left.constraint(ctx, label)
+	add(v)
+	v, doc2 := o.right.constraint(ctx, label)
+	add(v)
+
+	if doc1 != nil || doc2 != nil {
+		doc = &docNode{left: doc1, right: doc2}
+	}
+
+	arg := label
+	if arg == nil {
+		arg = &basicType{k: stringKind}
+	}
+
+	for _, s := range o.fields {
+		if s.key != nil {
+			if label == nil {
+				continue
+			}
+			key := s.key.evalPartial(ctx)
+			if v := binOp(ctx, label, opUnify, key, label); isBottom(v) {
+				continue
+			}
+		}
+		fn, ok := ctx.manifest(s.value).(*lambdaExpr)
+		if !ok {
+			// create error
+			continue
+		}
+		add(fn.call(ctx, s.value, arg))
+		if f, _ := s.value.base().syntax().(*ast.Field); f != nil {
+			doc = &docNode{n: f, left: doc}
+		}
+	}
+	return u, doc
+}
+
+func (o *optionals) rewrite(fn func(value) value) (c *optionals, err evaluated) {
+	if o == nil {
+		return nil, nil
+	}
+
+	left, err := o.left.rewrite(fn)
+	if err != nil {
+		return nil, err
+	}
+	right, err := o.right.rewrite(fn)
+	if err != nil {
+		return nil, err
+	}
+
+	fields := make([]optionalSet, len(o.fields))
+	for i, s := range o.fields {
+		if s.key != nil {
+			s.key = fn(s.key)
+			if b, ok := s.key.(*bottom); ok {
+				return nil, b
+			}
+		}
+		s.value = fn(s.value)
+		if b, ok := s.value.(*bottom); ok {
+			return nil, b
+		}
+		fields[i] = s
+	}
+
+	return &optionals{o.closed, o.op, left, right, fields}, nil
 }
 
 type closeMode byte
@@ -677,16 +925,17 @@ func (x *structLit) isClosed() bool {
 	return x.closeStatus.isClosed()
 }
 
-func (x *structLit) addTemplate(ctx *context, pos token.Pos, t value) {
-	if x.template == nil {
-		x.template = t
-	} else {
-		x.template = mkBin(ctx, pos, opUnify, x.template, t)
+func (x *structLit) addTemplate(ctx *context, pos token.Pos, key, value value) {
+	if x.optionals == nil {
+		x.optionals = &optionals{}
 	}
+	x.optionals.add(ctx, key, value)
 }
 
-func (x *structLit) allows(f label) bool {
-	return !x.closeStatus.isClosed() || f&hidden != 0
+func (x *structLit) allows(ctx *context, f label) bool {
+	return !x.closeStatus.isClosed() ||
+		f&hidden != 0 ||
+		x.optionals.allows(ctx, f)
 }
 
 func newStruct(src source) *structLit {
@@ -702,8 +951,8 @@ func (x *structLit) Less(i, j int) bool { return x.arcs[i].feature < x.arcs[j].f
 func (x *structLit) Swap(i, j int)      { x.arcs[i], x.arcs[j] = x.arcs[j], x.arcs[i] }
 
 func (x *structLit) close() *structLit {
-	if x.template != nil {
-		return x // there is nothing to close as it is already fully defined.
+	if x.optionals.isFull() {
+		return x
 	}
 
 	newS := *x
@@ -779,7 +1028,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		v := x.arcs[i].v.evalPartial(ctx)
 		ctx.evalStack = popped
 
-		var doc *ast.Field
+		var doc *docNode
 		v, doc = x.applyTemplate(ctx, i, v)
 		// only place to apply template?
 
@@ -799,7 +1048,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		updateCloseStatus(ctx, v)
 		x.arcs[i].cache = v
 		if doc != nil {
-			x.arcs[i].docs = &docNode{n: doc, left: x.arcs[i].docs}
+			x.arcs[i].docs = &docNode{left: doc, right: x.arcs[i].docs}
 		}
 		if len(ctx.evalStack) == 0 {
 			if err := ctx.processDelayedConstraints(); err != nil {
@@ -889,21 +1138,23 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 	}
 }
 
-func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (evaluated, *ast.Field) {
-	if x.template != nil {
-		fn, err := evalLambda(ctx, x.template, x.closeStatus != 0)
-		if err != nil {
-			return err, nil
-		}
-		name := ctx.labelStr(x.arcs[i].feature)
-		arg := &stringLit{x.baseValue, name, nil}
-		w := fn.call(ctx, x, arg).evalPartial(ctx)
-		v = binOp(ctx, x, opUnify, v, w)
-
-		f, _ := x.template.base().syntax().(*ast.Field)
-		return v, f
+func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated, doc *docNode) {
+	if x.optionals == nil {
+		return v, nil
 	}
-	return v, nil
+
+	name := ctx.labelStr(x.arcs[i].feature)
+	arg := &stringLit{x.baseValue, name, nil}
+
+	val, doc := x.optionals.constraint(ctx, arg)
+	if val != nil {
+		v = binOp(ctx, x, opUnify, v, val.evalPartial(ctx))
+	}
+
+	if x.closeStatus != 0 {
+		updateCloseStatus(ctx, v)
+	}
+	return v, doc
 }
 
 // A label is a canonicalized feature name.
@@ -1006,6 +1257,7 @@ func updateCloseStatus(ctx *context, v value) {
 		if err == nil {
 			if x.closeStatus.shouldClose() {
 				x.closeStatus = isClosed
+				y.optionals = y.optionals.close()
 			}
 			x.closeStatus |= shouldFinalize
 			y.closeStatus = x.closeStatus

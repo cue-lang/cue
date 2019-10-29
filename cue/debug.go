@@ -276,6 +276,46 @@ func (p *printer) str(v interface{}) {
 		p.str(x.value)
 		write(")")
 
+	case *optionals:
+		if x == nil {
+			break
+		}
+		wrap := func(v *optionals) {
+			if x.closed.isClosed() {
+				write("C{")
+			}
+			p.str(v)
+			if x.closed.isClosed() {
+				write("}")
+			}
+		}
+		switch {
+		case x.op == opUnify:
+			write("(")
+			wrap(x.left)
+			write(" & ")
+			wrap(x.right)
+			write(")")
+
+		case x.op == opUnifyUnchecked:
+			wrap(x.left)
+			write(", ")
+			wrap(x.right)
+
+		default:
+			for i, t := range x.fields {
+				if i > 0 {
+					write(", ")
+				}
+				write("[")
+				if t.key != nil {
+					p.str(t.key)
+				}
+				write("]: ")
+				p.str(t.value)
+			}
+		}
+
 	case *structLit:
 		if x == nil {
 			write("*nil node*")
@@ -288,19 +328,12 @@ func (p *printer) str(v interface{}) {
 			write("C")
 		}
 		write("{")
-		topDefault := false
-		switch {
-		case x.template != nil:
-			lambda, ok := x.template.(*lambdaExpr)
-			if ok {
-				if _, topDefault = lambda.value.(*top); topDefault {
-					break
-				}
-			}
-			write("<>: ")
-			p.str(x.template)
+		topDefault := x.optionals.isDotDotDot()
+		if !topDefault && x.optionals != nil {
+			p.str(x.optionals)
 			write(", ")
 		}
+
 		if x.emit != nil {
 			p.str(x.emit)
 			write(", ")

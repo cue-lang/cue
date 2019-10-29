@@ -642,7 +642,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 		if isBottom(v) {
 			return v
 		}
-		obj.template = &lambdaExpr{params: sig, value: v}
+		obj.optionals = newOptional(nil, &lambdaExpr{params: sig, value: v})
 
 		e = wrapOrNull(obj)
 	}

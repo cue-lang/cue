@@ -41,15 +41,12 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 		}
 		obj.emit = emit
 
-		t := x.template
-		if t != nil {
-			v := ctx.copy(t)
-			if isBottom(v) {
-				return t, false
-			}
-			t = v
+		fn := func(v value) value { return ctx.copy(v) }
+		o, err := x.optionals.rewrite(fn)
+		if err != nil {
+			return err, false
 		}
-		obj.template = t
+		obj.optionals = o
 
 		for i, a := range x.arcs {
 			a.setValue(ctx.copy(a.v))

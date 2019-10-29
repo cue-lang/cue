@@ -1188,8 +1188,8 @@ a: {
 			`Foo1 :: <3>C{field: int, field2: string}, ` +
 			`foo: _|_(2:field "feild" not allowed in closed struct), ` +
 			`foo1: <4>C{field: 2, recursive: _|_(2:field "feild" not allowed in closed struct)}, ` +
-			`Bar :: <5>{<>: <6>(A: string)->int, field: int}, ` +
-			`bar: <7>{<>: <8>(A: string)->int, field: int, feild: 2}, ` +
+			`Bar :: <5>{[]: <6>(A: string)->int, field: int}, ` +
+			`bar: <7>{[]: <8>(A: string)->int, field: int, feild: 2}, ` +
 			`Mixed: _|_(field "Mixed" declared as definition and regular field), ` +
 			`mixedRec: _|_(field "Mixed" declared as definition and regular field)}`,
 	}, {
@@ -1269,12 +1269,12 @@ a: {
 		}
 		`,
 		out: `<0>{` +
-			`S :: <1>{<>: <2>(_: string)-><3>C{a: int}, }, ` +
-			`a: <4>{<>: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}, ` +
-			`b: <7>{<>: <8>(_: string)->(<9>C{a: int} | <10>C{b: int}), w: _|_(int:empty disjunction: field "c" not allowed in closed struct)}, ` +
-			`Q :: <11>{<>: <12>(_: string)->(<13>C{a: int} | <14>C{b: int}), }, ` +
-			`c: <15>{<>: <16>(_: string)->[<17>C{a: int},<18>C{b: int}], w: [_|_(int:field "d" not allowed in closed struct),<19>C{b: int}]}, ` +
-			`R :: <20>{<>: <21>(_: string)->[<22>C{a: int},<23>C{b: int}], }}`,
+			`S :: <1>{[]: <2>(_: string)-><3>C{a: int}, }, ` +
+			`a: <4>{[]: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}, ` +
+			`b: <7>{[]: <8>(_: string)->(<9>C{a: int} | <10>C{b: int}), w: _|_(int:empty disjunction: field "c" not allowed in closed struct)}, ` +
+			`Q :: <11>{[]: <12>(_: string)->(<13>C{a: int} | <14>C{b: int}), }, ` +
+			`c: <15>{[]: <16>(_: string)->[<17>C{a: int},<18>C{b: int}], w: [_|_(int:field "d" not allowed in closed struct),<19>C{b: int}]}, ` +
+			`R :: <20>{[]: <21>(_: string)->[<22>C{a: int},<23>C{b: int}], }}`,
 	}, {
 		desc: "definitions with disjunctions",
 		in: `
@@ -1547,7 +1547,7 @@ a: {
 			}
 			t x: { b str: "DDDD" }
 			`,
-		out: `<0>{res: [<1>{<>: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], t: <7>{<>: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
+		out: `<0>{res: [<1>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], t: <7>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
 	}, {
 		desc: "interpolation",
 		in: `
@@ -1644,14 +1644,14 @@ a: {
 				v: {}
 				w: { x: 0 }
 			}
-			b: { <y>: {} } // TODO: allow different name
+			b: { <y>: {} }
 			c: {
 				<Name>: { name: Name, y: 1 }
 				foo: {}
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{[]: <2>(name: string)->int, k: 1}, b: <3>{[]: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{[]: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
 		desc: "range unification",
 		in: `
@@ -1768,7 +1768,7 @@ a: {
 				"\(k)": v
 			}
 		`,
-		out: `<0>{obj: <1>{<>: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield <4>{sub: <5>{as: <3>.a}}}, foo: <6>{a: "bar", sub: <7>{as: "bar"}}}, reg: 4}`,
+		out: `<0>{obj: <1>{[]: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield <4>{sub: <5>{as: <3>.a}}}, foo: <6>{a: "bar", sub: <7>{as: "bar"}}}, reg: 4}`,
 	}, {
 		desc: "builtins",
 		in: `
@@ -2032,7 +2032,7 @@ func TestFullEval(t *testing.T) {
 			service bar: { port: 8000 }
 			service baz: { name: "foobar" }
 			`,
-		out: `<0>{service: <1>{<>: <2>(Name: string)-><3>{name: (string | *<2>.Name), port: (int | *7080)}, foo: <4>{name: "foo", port: 7080}, bar: <5>{name: "bar", port: 8000}, baz: <6>{name: "foobar", port: 7080}}}`,
+		out: `<0>{service: <1>{[]: <2>(Name: string)-><3>{name: (string | *<2>.Name), port: (int | *7080)}, foo: <4>{name: "foo", port: 7080}, bar: <5>{name: "bar", port: 8000}, baz: <6>{name: "foobar", port: 7080}}}`,
 	}, {
 		desc: "field templates",
 		in: `
@@ -2052,7 +2052,7 @@ func TestFullEval(t *testing.T) {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{<>: <2>(name: string)->int, k: 1}, b: <3>{<>: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{<>: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{[]: <2>(name: string)->int, k: 1}, b: <3>{[]: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{[]: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
 	}, {
 		desc: "field comprehension",
 		in: `
@@ -2120,7 +2120,7 @@ func TestFullEval(t *testing.T) {
 		a <Name>: { name: Name }
 		a foo: {}
 		`,
-		out: `<0>{a: <1>{<>: <2>(X: string)->(<3>{name: <2>.X} & <4>{name: <2>.X}), foo: <5>{name: "foo"}}}`,
+		out: `<0>{a: <1>{[]: <2>(X: string)->(<3>{name: <2>.X} & <4>{name: <2>.X}), foo: <5>{name: "foo"}}}`,
 	}, {
 		// TODO: rename EE and FF to E and F to check correct ordering.
 
@@ -2134,12 +2134,12 @@ func TestFullEval(t *testing.T) {
 			a "C" b "D": _
 			a "EE" b "FF": { c: "bar" }
 		`,
-		out: `<0>{a: <1>{<>: <2>(A: string)-><3>{b: <4>{<>: <5>(B: string)-><6>{name: <2>.A, kind: <5>.B}, }}, ` +
-			`A: <7>{b: <8>{<>: <9>(B: string)-><10>{name: <11>.A, kind: <9>.B}, ` +
+		out: `<0>{a: <1>{[]: <2>(A: string)-><3>{b: <4>{[]: <5>(B: string)-><6>{name: <2>.A, kind: <5>.B}, }}, ` +
+			`A: <7>{b: <8>{[]: <9>(B: string)-><10>{name: <11>.A, kind: <9>.B}, ` +
 			`B: <12>{name: "A", kind: "B"}}}, ` +
-			`C: <13>{b: <14>{<>: <15>(B: string)-><16>{name: <17>.A, kind: <15>.B}, ` +
+			`C: <13>{b: <14>{[]: <15>(B: string)-><16>{name: <17>.A, kind: <15>.B}, ` +
 			`D: <18>{name: "C", kind: "D"}}}, ` +
-			`EE: <19>{b: <20>{<>: <21>(B: string)-><22>{name: <23>.A, kind: <21>.B}, ` +
+			`EE: <19>{b: <20>{[]: <21>(B: string)-><22>{name: <23>.A, kind: <21>.B}, ` +
 			`FF: <24>{name: "EE", kind: "FF", c: "bar"}}}}}`,
 	}, {
 		desc: "template unification within one struct",
@@ -2152,7 +2152,7 @@ func TestFullEval(t *testing.T) {
 			a "C": _
 			a "E": { c: "bar" }
 		`,
-		out: `<0>{a: <1>{<>: <2>(A: string)->(<3>{name: <2>.A} & <4>{kind: <2>.A}), ` +
+		out: `<0>{a: <1>{[]: <2>(A: string)->(<3>{name: <2>.A} & <4>{kind: <2>.A}), ` +
 			`E: <5>{name: "E", kind: "E", c: "bar"}, ` +
 			`A: <6>{name: "A", kind: "A"}, ` +
 			`C: <7>{name: "C", kind: "C"}}}`,
@@ -2204,8 +2204,8 @@ func TestFullEval(t *testing.T) {
 			}
 			a b c d: "bar"
 			`,
-		out: `<0>{num: 1, a: <1>{<>: <2>(A: string)-><3>{<>: <4>(B: string)-><5>{name: <2>.A, kind: <4>.B}, }, ` +
-			`b: <6>{<>: <7>(B: string)-><8>{name: <9>.A, kind: <7>.B}, ` +
+		out: `<0>{num: 1, a: <1>{[]: <2>(A: string)-><3>{[]: <4>(B: string)-><5>{name: <2>.A, kind: <4>.B}, }, ` +
+			`b: <6>{[]: <7>(B: string)-><8>{name: <9>.A, kind: <7>.B}, ` +
 			`c: <10>{name: "b", kind: "c", ` +
 			`d: "bar"}}}}`,
 	}, {
@@ -2271,7 +2271,7 @@ func TestFullEval(t *testing.T) {
 			`<3>{name: "foobar", type: "service", port: 7080}], ` +
 
 			`service: <4>{` +
-			`<>: <5>(Name: string)-><6>{name: (*<5>.Name | string), type: "service", port: (*7080 | int)}, ` +
+			`[]: <5>(Name: string)-><6>{name: (*<5>.Name | string), type: "service", port: (*7080 | int)}, ` +
 			`foo: <7>{name: "foo", type: "service", port: 7080}, ` +
 			`bar: <8>{name: "bar", type: "service", port: 8000}, ` +
 			`baz: <9>{name: "foobar", type: "service", port: 7080}}}`,
@@ -2335,7 +2335,7 @@ func TestFullEval(t *testing.T) {
 		`,
 		// TODO(perf): unification should catch shared node.
 		out: `<0>{res: [<1>{d: "b", s: "ab"}], ` +
-			`a: <2>{b: <3>{<>: <4>(C: string)-><5>{d: string, s: ("a" + <5>.d)}, c: <6>{d: string, s: ("a" + <7>.d)}}}}`,
+			`a: <2>{b: <3>{[]: <4>(C: string)-><5>{d: string, s: ("a" + <5>.d)}, c: <6>{d: string, s: ("a" + <7>.d)}}}}`,
 	}, {
 		desc: "complex groundness 2",
 		in: `
@@ -2347,7 +2347,7 @@ func TestFullEval(t *testing.T) {
 			a b <C>: { d: string, s: "a" + d }
 			a b c d: string
 		`,
-		out: `<0>{r1: <1>{y: "c", res: <2>{d: "c", s: "ac"}}, f1: <3>{y: string, res: <4>{d: string, s: (("a" + <5>.d) & ("a" + <5>.d))}}, a: <6>{b: <7>{<>: <8>(C: string)-><9>{d: string, s: ("a" + <9>.d)}, c: <10>{d: string, s: (("a" + <11>.d) & ("a" + <11>.d))}}}}`,
+		out: `<0>{r1: <1>{y: "c", res: <2>{d: "c", s: "ac"}}, f1: <3>{y: string, res: <4>{d: string, s: (("a" + <5>.d) & ("a" + <5>.d))}}, a: <6>{b: <7>{[]: <8>(C: string)-><9>{d: string, s: ("a" + <9>.d)}, c: <10>{d: string, s: (("a" + <11>.d) & ("a" + <11>.d))}}}}`,
 	}, {
 		desc: "references from template to concrete",
 		in: `
@@ -2359,8 +2359,8 @@ func TestFullEval(t *testing.T) {
 				}
 				t x: { b str: "DDDD" }
 				`,
-		out: `<0>{res: [<1>{<>: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], ` +
-			`t: <7>{<>: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
+		out: `<0>{res: [<1>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], ` +
+			`t: <7>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
 	}, {
 		// TODO: A nice property for CUE to have would be that evaluation time
 		// is proportional to the number of output nodes (note that this is
@@ -2549,7 +2549,7 @@ func TestFullEval(t *testing.T) {
 			X: "foo"
 		}}
 		`,
-		out: `<0>{a: <1>{<>: <2>(Name: string)-><3>{info :: <4>C{X: "foo"}}, d: <5>C{info :: <6>C{X: "foo"}, Y: "foo"}}, base :: <7>C{info :: <8>{...}}}`,
+		out: `<0>{a: <1>{[]: <2>(Name: string)-><3>{info :: <4>C{X: "foo"}}, d: <5>C{info :: <6>C{X: "foo"}, Y: "foo"}}, base :: <7>C{info :: <8>{...}}}`,
 	}, {
 		desc: "comparison against bottom",
 		in: `
@@ -2579,7 +2579,7 @@ func TestFullEval(t *testing.T) {
 			}
 		}
 		`,
-		out: `<0>{Workflow :: <1>C{jobs: <2>{<>: <3>(jobID: string)-><4>C{}, }, JobID :: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{<>: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, JobID :: "foo"}}`,
+		out: `<0>{Workflow :: <1>C{jobs: <2>{[]: <3>(jobID: string)-><4>C{}, }, JobID :: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{[]: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, JobID :: "foo"}}`,
 	}, {
 		desc: "Issue #153",
 		in: `
@@ -2605,6 +2605,7 @@ func TestFullEval(t *testing.T) {
 		`,
 		out: `<0>{<1>{listOfCloseds: [_|_(2:field "b" not allowed in closed struct)]}, Foo: <2>{listOfCloseds: []}, Closed :: <3>C{a: 0}, Junk: <4>{b: 2}}`,
 	}, {
+		desc: "label and field aliases",
 		in: `
 		p: [ID=string]: { name: ID }
 		A="foo=bar": "str"
@@ -2616,13 +2617,122 @@ func TestFullEval(t *testing.T) {
 		c: C
 		`,
 		out: `<0>{` +
-			`p: <1>{<>: <2>(ID: string)-><3>{name: <2>.ID}, }, ` +
+			`p: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, }, ` +
 			`foo=bar: "str", ` +
 			`a: "str", ` +
 			`bb: 4, ` +
 			`b1: 4, ` +
 			`c: 5, ` +
 			`str: 5}`,
+	}, {
+		desc: "optionals with label fiters",
+		in: `
+		JobID :: =~"^[a-zA-Z]*$"
+		Job :: {
+			name: string
+			cmd:  string
+		}
+		Jobs :: {
+			[JobID]: Job
+			[=~"Test$"]: name: =~"^test" // Must work without ...
+		}
+
+		jobs: foo: name: "allGood"
+		jobs: foo: name: "allGood"
+
+		jobs1: Jobs
+		jobs1: foo1: {} // faulty
+
+		jobs2: Jobs
+		jobs2: fooTest: name: "badName" // faulty
+
+		jobs3: Jobs
+		jobs3: [string]: Job
+		jobs3: fooTest1: name: "badName" // faulty
+		`,
+		out: `<0>{` +
+			`JobID :: =~"^[a-zA-Z]*$", ` +
+			`Job :: <1>C{name: string, cmd: string}, ` +
+			`Jobs :: <2>C{[=~"^[a-zA-Z]*$"]: <3>(_: string)-><4>.Job, [=~"Test$"]: <5>(_: string)-><6>C{name: =~"^test"}, }, ` +
+			`jobs: <7>{foo: <8>{name: "allGood"}}, ` +
+			`jobs1: _|_(<9>{}:field "foo1" not allowed in closed struct), ` +
+			`jobs2: <10>C{[=~"^[a-zA-Z]*$"]: <11>(_: string)-><4>.Job, [=~"Test$"]: <12>(_: string)-><13>C{name: =~"^test"}, fooTest: _|_(string:field "cmd" not allowed in closed struct)}, ` +
+			`jobs3: _|_(<14>{name: "badName"}:field "fooTest1" not allowed in closed struct)}`,
+	}, {
+		desc: "optionals in open structs",
+		in: `
+		A: {
+			[=~"^[a-s]*$"]: int
+		}
+		B: {
+			[=~"^[m-z]*$"]: int
+		}
+		C :: {A & B}
+		c: C & { aaa: 3 }
+		`,
+		out: `<0>{A: <1>{[=~"^[a-s]*$"]: <2>(_: string)->int, }, B: <3>{[=~"^[m-z]*$"]: <4>(_: string)->int, }, C :: <5>C{[=~"^[a-s]*$"]: <6>(_: string)->int, [=~"^[m-z]*$"]: <7>(_: string)->int, }, c: <8>C{[=~"^[a-s]*$"]: <9>(_: string)->int, [=~"^[m-z]*$"]: <10>(_: string)->int, aaa: 3}}`,
+	}, {
+		desc: "conjunction of optional sets",
+		in: `
+		A :: {
+			[=~"^[a-s]*$"]: int
+		}
+		B :: {
+			[=~"^[m-z]*$"]: int
+		}
+
+		C :: A & B
+		c: C & { aaa: 3 }
+
+		D :: {A & B}
+		d: D & { aaa: 3 }
+		`,
+		out: `<0>{` +
+			`A :: <1>C{[=~"^[a-s]*$"]: <2>(_: string)->int, }, ` +
+			`B :: <3>C{[=~"^[m-z]*$"]: <4>(_: string)->int, }, ` +
+			`C :: <5>C{(C{[=~"^[a-s]*$"]: <6>(_: string)->int} & C{[=~"^[m-z]*$"]: <7>(_: string)->int}), }, ` +
+			`c: _|_(3:field "aaa" not allowed in closed struct), ` +
+			`D :: <8>C{(C{[=~"^[a-s]*$"]: <9>(_: string)->int} & C{[=~"^[m-z]*$"]: <10>(_: string)->int}), }, ` +
+			`d: _|_(3:field "aaa" not allowed in closed struct)` +
+			`}`,
+	}, {
+		desc: "continue recursive closing for optionals",
+		in: `
+		S :: {
+			[string]: { a: int }
+		}
+		a: S & {
+			v: { b: int }
+		}
+		`,
+		out: `<0>{S :: <1>{[]: <2>(_: string)-><3>C{a: int}, }, a: <4>{[]: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}}`,
+	}, {
+		desc: "augment closed optionals",
+		in: `
+		A :: {
+			[=~"^[a-s]*$"]: int
+		}
+		B :: {
+			[=~"^[m-z]*?"]: int
+		}
+		C :: {
+			A & B
+			[=~"^Q*$"]: int
+		}
+		c: C & { QQ: 3 }
+		D :: {
+			A
+			B
+		}
+		d: D & { aaa: 4 }
+		`,
+		out: `<0>{` +
+			`A :: <1>C{[=~"^[a-s]*$"]: <2>(_: string)->int, }, ` +
+			`B :: <3>C{[=~"^[m-z]*?"]: <4>(_: string)->int, }, ` +
+			`C :: <5>C{C{[=~"^Q*$"]: <6>(_: string)->int}, C{(C{[=~"^[a-s]*$"]: <7>(_: string)->int} & C{[=~"^[m-z]*?"]: <8>(_: string)->int})}, }, ` +
+			`c: <9>C{C{[=~"^Q*$"]: <10>(_: string)->int}, C{(C{[=~"^[a-s]*$"]: <11>(_: string)->int} & C{[=~"^[m-z]*?"]: <12>(_: string)->int})}, QQ: 3}, ` +
+			`D :: <13>C{[=~"^[a-s]*$"]: <14>(_: string)->int, [=~"^[m-z]*?"]: <15>(_: string)->int, }, ` +
+			`d: <16>C{[=~"^[a-s]*$"]: <17>(_: string)->int, [=~"^[m-z]*?"]: <18>(_: string)->int, aaa: 4}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

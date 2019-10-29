@@ -212,9 +212,9 @@ func TestConvertType(t *testing.T) {
 	}, {
 		map[string]struct{ A map[string]uint }{},
 		`(*null | ` +
-			`<0>{<>: <1>(_: string)-><2>{` +
+			`<0>{[]: <1>(_: string)-><2>{` +
 			`A?: (*null | ` +
-			`<3>{<>: <4>(_: string)->(int & >=0 & int & <=18446744073709551615), })}, })`,
+			`<3>{[]: <4>(_: string)->(int & >=0 & int & <=18446744073709551615), })}, })`,
 	}, {
 		map[float32]int{},
 		`_|_(unsupported Go type for map key (float32))`,

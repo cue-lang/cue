@@ -215,9 +215,10 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 				}
 			}
 
-			a, ok := label.Elts[0].(*ast.Alias)
-			if ok {
-				// Simulate template label for now, for binding.
+			expr := label.Elts[0]
+
+			if a, ok := expr.(*ast.Alias); ok {
+				expr = a.Expr
 
 				// Add to current scope, instead of the value's, and allow
 				// references to bind to these illegally.
@@ -230,6 +231,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 					s.insert(name, a.Expr)
 				}
 			}
+			walk(s, expr)
 			walk(s, x.Value)
 			return nil
 

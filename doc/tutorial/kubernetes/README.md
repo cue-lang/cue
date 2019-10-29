@@ -85,7 +85,7 @@ into CUE.
 ```
 $ cd services
 $ cue import ./...
-Import failed: must specify package name with the -p flag
+must specify package name with the -p flag
 ```
 
 Since we have multiple packages and files, we need to specify the package to
@@ -93,7 +93,7 @@ which they should belong.
 
 ```
 $ cue import ./... -p kube
-Import failed: list, flag, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
+list, flag, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
 ```
 
 Many of the files contain more than one Kubernetes object.
@@ -328,14 +328,15 @@ Let's compare the result of merging our new template to our original snapshot.
 ```
 $ cue eval ./... -c > snapshot2
 --- ./mon/alertmanager
-non-concrete value (string)*:
-    ./kube.cue:11:15
-
-non-concrete value (string)*:
-    ./kube.cue:11:15
-
-non-concrete value (string)*:
-    ./kube.cue:34:16
+service.alertmanager.metadata.labels.component: incomplete value (string):
+    ./kube.cue:11:24
+service.alertmanager.spec.selector.component: incomplete value (string):
+    ./kube.cue:11:24
+deployment.alertmanager.spec.template.metadata.labels.component: incomplete value (string):
+    ./kube.cue:36:28
+service."node-exporter".metadata.labels.component: incomplete value (string):
+    ./kube.cue:11:24
+...
 ```
 
 <!-- TODO: better error messages -->
@@ -933,23 +934,27 @@ A merge thus gives us a unified view of all objects.
 
 ```
 $ cue ls ./...
-Service         frontend        bartender
-Service         frontend        breaddispatcher
-Service         frontend        host
-Service         frontend        maitred
-Service         frontend        valeter
-Service         frontend        waiter
-Service         frontend        waterdispatcher
-Service         infra           download
-Service         infra           etcd
-Service         infra           events
+Service       infra      tasks
+Service       frontend   bartender
+Service       frontend   breaddispatcher
+Service       frontend   host
+Service       frontend   maitred
+Service       frontend   valeter
+Service       frontend   waiter
+Service       frontend   waterdispatcher
+Service       infra      download
+Service       infra      etcd
+Service       infra      events
 
 ...
 
-Deployment      proxy           goget
-Deployment      proxy           nginx
-StatefulSet     infra           etcd
-DaemonSet       mon     node-exporter
+Deployment    proxy           nginx
+StatefulSet   infra           etcd
+DaemonSet     mon             node-exporter
+ConfigMap     mon        alertmanager
+ConfigMap     mon        prometheus
+ConfigMap     proxy      authproxy
+ConfigMap     proxy      nginx
 ```
 
 ### Dumping a YAML Stream
@@ -1192,7 +1197,11 @@ We define a simple `env` map and an `envSpec` for more elaborate cases:
     env: [string]: string
 
     envSpec: [string]: {}
-    envSpec: {"\(k)" value: v for k, v in env}
+    envSpec: {
+        for k, v in env {
+            "\(k)" value: v
+        }
+    }
 ```
 The simple map automatically gets mapped into the more elaborate map
 which then presents the full picture.
@@ -1203,10 +1212,10 @@ volume spec and volume mount.
 
 ```
     volume: [Name=_]: {
-        name:      *Name | string
-        mountPath: string
-        subPath:   null | string
-        readOnly:  bool
+        name:       *Name | string
+        mountPath:  string
+        subPath:    null | string
+        readOnly:   bool
         kubernetes: {}
     }
 ```
@@ -1225,20 +1234,22 @@ automatically derive a service is now a bit simpler:
 
 ```
 // define services implied by deployments
-service: "\(k)": {
+service: {
+    for k, spec in deployment {
+        "\(k)": {
+            // Copy over all ports exposed from containers.
+            for Name, Port in spec.expose.port {
+                port: "\(Name)": {
+                    port:       *Port | int
+                    targetPort: *Port | int
+                }
+            }
 
-    // Copy over all ports exposed from containers.
-    for Name, Port in spec.expose.port {
-        port: "\(Name)": {
-            port:       *Port | int
-            targetPort: *Port | int
+            // Copy over the labels
+            label: spec.label
         }
     }
-
-    // Copy over the labels
-    label: spec.label
-
-} for k, spec in deployment
+}
 ```
 
 The complete top-level model definitions can be found at
@@ -1253,7 +1264,7 @@ The tailorings for this specific project (the labels) are defined
 Converting services is fairly straightforward.
 
 ```
-kubernetes services: {
+kubernetes: services: {
     for k, x in service {
         "\(k)": x.kubernetes & {
             apiVersion: "v1"

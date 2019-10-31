@@ -239,18 +239,6 @@ module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata/toolonly
 display:./toolonly`,
-	}, {
-		cfg: &Config{
-			Dir: testdataDir,
-		},
-		args: args("./badtool"),
-		want: `
-err:    "tool/cli" may only be imported in *_tool.cue files
-path:   example.org/test/badtool:bad
-module: example.org/test
-root:   $CWD/testdata
-dir:    $CWD/testdata/badtool
-display:./badtool`,
 	}}
 	for i, tc := range testCases {
 		// if i != 5 {

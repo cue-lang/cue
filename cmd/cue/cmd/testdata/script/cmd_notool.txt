@@ -1,0 +1,18 @@
+! cue cmd notool
+! stdout .
+cmp stderr cmd_baddisplay.out
+
+-- cmd_baddisplay.out --
+cmd must be run as one of its subcommands: unknown subcommand "notool"
+Ensure commands are defined in a "_tool.cue" file.
+Run 'cue help cmd' for known subcommands.
+-- task.cue --
+package home
+message: "Hello world!"
+
+command: notool: {
+	task: display: {
+		kind: "print"
+		text: 42
+	}
+}

@@ -221,7 +221,10 @@ An example using pipes:
 			if len(args) == 0 {
 				fmt.Fprintln(w, "cmd must be run as one of its subcommands")
 			} else {
-				fmt.Fprintf(w, "cmd must be run as one of its subcommands: unknown subcommand %q\n", args[0])
+				const msg = `cmd must be run as one of its subcommands: unknown subcommand %q
+Ensure commands are defined in a "_tool.cue" file.
+`
+				fmt.Fprintf(w, msg, args[0])
 			}
 			fmt.Fprintln(w, "Run 'cue help cmd' for known subcommands.")
 			os.Exit(1) // TODO: get rid of this

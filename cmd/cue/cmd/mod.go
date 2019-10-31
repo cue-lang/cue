@@ -36,7 +36,7 @@ func newModCmd(c *Command) *cobra.Command {
 			if len(args) == 0 {
 				fmt.Fprintln(stderr, "mod must be run as one of its subcommands")
 			} else {
-				fmt.Fprintf(stderr, "get must be run as one of its subcommands: unknown subcommand %q\n", args[0])
+				fmt.Fprintf(stderr, "mod must be run as one of its subcommands: unknown subcommand %q\n", args[0])
 			}
 			fmt.Fprintln(stderr, "Run 'cue help mod' for known subcommands.")
 			os.Exit(1) // TODO: get rid of this

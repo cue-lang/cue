@@ -253,11 +253,13 @@ func New(args []string) (cmd *Command, err error) {
 	}
 	_, err = addCustom(cmd, rootCmd, commandSection, args[0], tools)
 	if err != nil {
-		return cmd, errors.Newf(token.NoPos,
-			"command %s %q is not defined\n"+
-				"Run 'cue help' to show available commands.",
+		err = errors.Newf(token.NoPos,
+			`%s %q is not defined
+Ensure commands are defined in a "_tool.cue" file.
+Run 'cue help' to show available commands.`,
 			commandSection, args[0],
 		)
+		return cmd, err
 	}
 	return cmd, nil
 }

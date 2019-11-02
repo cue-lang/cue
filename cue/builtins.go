@@ -3042,7 +3042,7 @@ var builtinPackages = map[string]*builtinPkg{
 		short?: string
 		long?:  string
 		tasks: {
-			<name>: Task
+			[name=_]: Task
 		}
 	}
 	Task: {
@@ -3067,7 +3067,7 @@ var builtinPackages = map[string]*builtinPkg{
 		cmd:      string | [string, ...string]
 		install?: string | [string, ...string]
 		env: {
-			<Key>: string
+			[Key=_]: string
 		}
 		stdout:  *null | string | bytes
 		stderr:  *null | string | bytes
@@ -3115,10 +3115,10 @@ var builtinPackages = map[string]*builtinPkg{
 		response: {
 			body: *bytes | string
 			header: {
-				<Name>: string | [...string]
+				[Name=_]: string | [...string]
 			}
 			trailer: {
-				<Name>: string | [...string]
+				[Name=_]: string | [...string]
 			}
 			status:     string
 			statusCode: int
@@ -3127,10 +3127,10 @@ var builtinPackages = map[string]*builtinPkg{
 		request: {
 			body: *bytes | string
 			header: {
-				<Name>: string | [...string]
+				[Name=_]: string | [...string]
 			}
 			trailer: {
-				<Name>: string | [...string]
+				[Name=_]: string | [...string]
 			}
 		}
 	}

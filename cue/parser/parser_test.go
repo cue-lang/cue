@@ -453,6 +453,12 @@ bar: 2
 			`[Y=string]: {name: Y}, ` +
 			`X1=[X2=<"d"]: {name: X2}, ` +
 			`Y1=foo: {Y2=bar: [Y1, Y2]}`,
+	}, {
+		desc: "error when keyword is used in expression",
+		in: `
+		foo: in & 2
+		`,
+		out: "foo: <*ast.BadExpr>&2\nexpected operand, found 'in'",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -461,10 +467,11 @@ bar: 2
 				mode = append(mode, ParseComments)
 			}
 			f, err := ParseFile("input", tc.in, mode...)
+			got := debugStr(f)
 			if err != nil {
-				t.Errorf("unexpected error: %v", err)
+				got += "\n" + err.Error()
 			}
-			if got := debugStr(f); got != tc.out {
+			if got != tc.out {
 				t.Errorf("\ngot  %q;\nwant %q", got, tc.out)
 			}
 		})
@@ -639,7 +646,8 @@ func TestIncompleteSelection(t *testing.T) {
 func TestX(t *testing.T) {
 	t.Skip()
 
-	f, err := ParseFile("input", `a: b:: c?: <Name>: d: 1`)
+	f, err := ParseFile("input", `
+	`)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

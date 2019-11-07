@@ -1008,11 +1008,25 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 
 	case token.IF, token.FOR, token.IN, token.LET:
 		// Keywords representing clauses.
-		label = &ast.Ident{
-			NamePos: p.pos,
+		pos := p.pos
+		ident := &ast.Ident{
+			NamePos: pos,
 			Name:    p.lit,
 		}
+		c := p.openComments()
 		p.next()
+		expr = c.closeExpr(p, ident)
+
+		if p.tok != token.COLON && p.tok != token.ISA {
+			c = p.openComments()
+			p.errf(pos, "expected operand, found '%s'", ident.Name)
+			expr = &ast.BadExpr{From: pos, To: p.pos}
+			// Sync expression.
+			expr = p.parseBinaryExprTail(false, token.LowestPrec+1, expr)
+			expr = c.closeExpr(p, expr)
+			break
+		}
+		label = ident
 		ok = true
 
 	case token.LSS:

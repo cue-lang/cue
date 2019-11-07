@@ -608,6 +608,7 @@ func (f *formatter) clause(clause ast.Clause) {
 	switch n := clause.(type) {
 	case *ast.ForClause:
 		f.print(n.For, "for", blank)
+		f.print(indent)
 		if n.Key != nil {
 			f.label(n.Key, false)
 			f.print(n.Colon, token.COMMA, blank)
@@ -618,10 +619,13 @@ func (f *formatter) clause(clause ast.Clause) {
 		f.label(n.Value, false)
 		f.print(blank, n.In, "in", blank)
 		f.expr(n.Source)
+		f.markUnindentLine()
 
 	case *ast.IfClause:
 		f.print(n.If, "if", blank)
+		f.print(indent)
 		f.expr(n.Condition)
+		f.markUnindentLine()
 
 	default:
 		panic("unknown clause type")

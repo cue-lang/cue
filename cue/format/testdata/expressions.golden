@@ -171,6 +171,11 @@ package expressions
 			"\(k)": v
 		}}
 
+	if a |
+		b {
+		c: d
+	}
+
 	e: [{
 		a: 1, b: 2
 	}]

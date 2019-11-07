@@ -35,8 +35,6 @@ type context struct {
 	inSum        int
 	cycleErr     bool
 
-	noManifest bool
-
 	// for debug strings
 	nodeRefs map[scope]string
 

@@ -2733,6 +2733,23 @@ func TestFullEval(t *testing.T) {
 			`c: <9>C{C{[=~"^Q*$"]: <10>(_: string)->int}, C{(C{[=~"^[a-s]*$"]: <11>(_: string)->int} & C{[=~"^[m-z]*?"]: <12>(_: string)->int})}, QQ: 3}, ` +
 			`D :: <13>C{[=~"^[a-s]*$"]: <14>(_: string)->int, [=~"^[m-z]*?"]: <15>(_: string)->int, }, ` +
 			`d: <16>C{[=~"^[a-s]*$"]: <17>(_: string)->int, [=~"^[m-z]*?"]: <18>(_: string)->int, aaa: 4}}`,
+	}, {
+		in: `
+		Task :: {
+			{
+				op:          "pull"
+				tag:         *"latest" | string
+				refToTag:    tag
+				tagExpr: tag + "dd"
+				tagInString: "\(tag)"
+			} | {
+				op: "scratch"
+			}
+		}
+
+		foo: Task & {"op": "pull"}
+		`,
+		out: `<0>{Task :: (<1>C{op: "pull", tag: (*"latest" | string), refToTag: <1>.tag, tagExpr: (<1>.tag + "dd"), tagInString: ""+<1>.tag+""} | <2>C{op: "scratch"}), foo: <3>C{op: "pull", tag: "latest", refToTag: "latest", tagExpr: "latestdd", tagInString: "latest"}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

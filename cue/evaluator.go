@@ -16,9 +16,6 @@ package cue
 
 func (c *context) manifest(v value) evaluated {
 	evaluated := v.evalPartial(c)
-	if c.noManifest {
-		return evaluated
-	}
 outer:
 	switch x := evaluated.(type) {
 	case *disjunction:

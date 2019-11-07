@@ -1624,11 +1624,6 @@ func (x *disjunction) normalize(ctx *context, src source) mVal {
 	}
 	k := 0
 
-	// manifesting values should be disabled for recursive evaluation as
-	// these values may still be bound to another value later on, for instance
-	// when the result of this value is unified with another value.
-	noManifest := ctx.noManifest
-	ctx.noManifest = true
 	hasMarked := false
 	var markedErr *bottom
 outer:
@@ -1673,7 +1668,6 @@ outer:
 		x.values[k] = dValue{&bottom{}, true}
 		k++
 	}
-	ctx.noManifest = noManifest
 
 	switch k {
 	case 0:

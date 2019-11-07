@@ -1843,6 +1843,21 @@ func TestMashalJSON(t *testing.T) {
 		f: >=1.1 & <=1.1
 		`,
 		json: `{"a":1,"b":1,"c":2,"d":1,"e":1,"f":1.1}`,
+	}, {
+		value: `
+		Task :: {
+			{
+				op:          "pull"
+				tag:         *"latest" | string
+				tagInString: tag + "dd"
+			} | {
+				op: "scratch"
+			}
+		}
+
+		foo: Task & {"op": "pull"}
+		`,
+		json: `{"foo":{"op":"pull","tag":"latest","tagInString":"latestdd"}}`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

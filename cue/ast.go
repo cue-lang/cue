@@ -424,7 +424,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			if internal.DropOptional && opt {
 				break
 			}
-			v.sel, _ = internal.LabelName(x)
+			v.sel, _, _ = ast.LabelName(x)
 			if v.sel == "_" {
 				if _, ok := x.(*ast.BasicLit); ok {
 					v.sel = "*"

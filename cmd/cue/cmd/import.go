@@ -638,7 +638,7 @@ func (h *hoister) hoist(f *ast.File) {
 		name := ""
 		switch x := n.(type) {
 		case *ast.Field:
-			name, _ = internal.LabelName(x.Label)
+			name, _, _ = ast.LabelName(x.Label)
 		case *ast.Alias:
 			name = x.Ident.Name
 		}
@@ -658,8 +658,8 @@ func (h *hoister) hoist(f *ast.File) {
 	}, func(c astutil.Cursor) bool {
 		switch f := c.Node().(type) {
 		case *ast.Field:
-			name, ident := internal.LabelName(f.Label)
-			if name == "" || !ident {
+			name, _, _ := ast.LabelName(f.Label)
+			if name == "" {
 				return false
 			}
 

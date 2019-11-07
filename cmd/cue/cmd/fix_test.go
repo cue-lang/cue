@@ -27,55 +27,31 @@ func TestFix(t *testing.T) {
 		in   string
 		out  string
 	}{{
-		name: "referenced string fields",
+		name: "referenced quoted fields",
 		in: `package foo
 
-"foo": 3
-"foo-bar": 2
-"baz": ` + "`foo-bar`" + `
-
 a: {
-	// qux
-	"qux": 3 // qux line
-	// qux-quux
-	"qux-quux": qux
-	"qaz": ` + "`qux-quux`" + `
-	qax:  qux
-
 	fiz: 4
 	faz: ` + "`fiz`" + `
-	// fuz
-	fuz: ` + "`qux-quux`" + ` // fuz
 
 	// biz
 	` + "`biz`" + `: 5 // biz
 	buz: ` + "`biz`" + `
-	baz: ` + "`qux`" + `
+	in: 3
+	ref: ` + "`in`" + ` & x
 }
 `,
 		out: `package foo
 
-"foo":        3
-X1="foo-bar": 2
-"baz":        X1
-
 a: {
-	// qux
-	X2="qux": 3 // qux line
-	// qux-quux
-	X3="qux-quux": X2
-	"qaz":         X3
-	qax:           X2
-
 	fiz: 4
 	faz: fiz
-	// fuz
-	fuz: X3 // fuz
 
 	// biz
-	biz: 5 // biz
-	buz: biz
-	baz: X2
+	biz:     5 // biz
+	buz:     biz
+	X1="in": 3
+	ref:     X1 & x
 }
 `,
 	}, {

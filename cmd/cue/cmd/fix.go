@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"fmt"
-	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -107,7 +106,7 @@ func fix(f *ast.File) *ast.File {
 		return true
 	}, nil).(*ast.File)
 
-	// Rewrite strings fields that are referenced.
+	// Rewrite quoted identifier fields that are referenced.
 	f = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
 		switch x := n.(type) {
@@ -116,33 +115,30 @@ func fix(f *ast.File) *ast.File {
 			if !ok {
 				break
 			}
-			switch b := x.Label.(type) {
-			case *ast.BasicLit:
-				if b.Kind != token.STRING {
-					return true
-				}
-				str, err := strconv.Unquote(b.Value)
-				if err != nil || str != m {
-					return true
-				}
 
-			case *ast.Ident:
+			if b, ok := x.Label.(*ast.Ident); ok {
 				str, err := ast.ParseIdent(b)
-				if err != nil || str != m || str == b.Name {
+				var expr ast.Expr = b
+
+				switch {
+				case token.Lookup(str) != token.IDENT:
+					// quote keywords
+					expr = ast.NewString(b.Name)
+
+				case err != nil || str != m || str == b.Name:
 					return true
-				}
-				if ast.IsValidIdent(str) {
+
+				case ast.IsValidIdent(str):
 					x.Label = astutil.CopyMeta(ast.NewIdent(str), x.Label).(ast.Label)
 					return true
 				}
-			}
 
-			ident := newIdent()
-			replacement[x.Value] = ident
-			expr := x.Label.(ast.Expr)
-			expr = &ast.Alias{Ident: ast.NewIdent(ident), Expr: expr}
-			ast.SetRelPos(x.Label, token.NoRelPos)
-			x.Label = astutil.CopyMeta(expr, x.Label).(ast.Label)
+				ident := newIdent()
+				replacement[x.Value] = ident
+				expr = &ast.Alias{Ident: ast.NewIdent(ident), Expr: expr}
+				ast.SetRelPos(x.Label, token.NoRelPos)
+				x.Label = astutil.CopyMeta(expr, x.Label).(ast.Label)
+			}
 		}
 		return true
 	}, nil).(*ast.File)
@@ -164,7 +160,7 @@ func fix(f *ast.File) *ast.File {
 			// as here, or it is a complicated identifier and the original
 			// destination must have been quoted, in which case it is handled
 			// above.
-			if ast.IsValidIdent(str) {
+			if ast.IsValidIdent(str) && token.Lookup(str) == token.IDENT {
 				c.Replace(astutil.CopyMeta(ast.NewIdent(str), n))
 			}
 		}

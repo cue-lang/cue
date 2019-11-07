@@ -128,13 +128,13 @@ func ParseIdent(n *Ident) (string, error) {
 //     X=foo   "foo"  true   nil
 //
 func LabelName(l Label) (name string, isIdent bool, err error) {
-	// XXX: alias unwrap once only.
-	switch n := l.(type) {
-	case *Alias:
-		if label, ok := n.Expr.(Label); ok {
-			return LabelName(label)
+	a, ok := l.(*Alias)
+	if ok {
+		if l, ok = a.Expr.(Label); !ok {
+			goto expressionLabel
 		}
-
+	}
+	switch n := l.(type) {
 	case *ListLit:
 		// An expression, but not one can evaluated.
 		return "", false, errors.Newf(l.Pos(),
@@ -163,6 +163,8 @@ func LabelName(l Label) (name string, isIdent bool, err error) {
 			// TODO: allow numbers to be fields?
 		}
 	}
+
+expressionLabel:
 	// This includes interpolation and template labels.
 	return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
 		"label is an expression")

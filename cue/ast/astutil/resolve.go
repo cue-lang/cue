@@ -22,7 +22,6 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
 // An ErrFunc processes errors.
@@ -69,7 +68,7 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			label := x.Label
 
 			if a, ok := x.Label.(*ast.Alias); ok {
-				if name, _ := internal.LabelName(a.Ident); name != "" {
+				if name, _, _ := ast.LabelName(a.Ident); name != "" {
 					s.insert(name, x)
 				}
 				label, _ = a.Expr.(ast.Label)
@@ -88,8 +87,7 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			}
 
 			// default:
-			// TODO: switch to ast's implementation
-			name, isIdent := internal.LabelName(label)
+			name, isIdent, _ := ast.LabelName(label)
 			if isIdent {
 				s.insert(name, x.Value)
 			}
@@ -210,7 +208,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			}
 			s := newScope(s.file, s, x, nil)
 			if alias != nil {
-				if name, _ := internal.LabelName(alias.Ident); name != "" {
+				if name, _, _ := ast.LabelName(alias.Ident); name != "" {
 					s.insert(name, x)
 				}
 			}

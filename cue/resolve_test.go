@@ -598,7 +598,7 @@ a: {
 	}, {
 		desc: "JSON",
 		in: `
-			"a": 3
+			a="a": 3
 			b: a
 			o: { "a\nb": 2 } // TODO: use $ for root?
 			c: o["a\nb"]

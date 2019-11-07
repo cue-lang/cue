@@ -510,6 +510,55 @@ func TestBuiltins(t *testing.T) {
 		test("struct", `struct.MaxFields(2) & {a: 1}`),
 		`{a: 1}`,
 	}, {
+		test("math", `math.Pow(8, 4)`), `4096`,
+	}, {
+		test("math", `math.Pow10(4)`), `10000`,
+	}, {
+		test("math", `math.Signbit(-4)`), `true`,
+	}, {
+		test("math", `math.Round(2.5)`), `3`,
+	}, {
+		test("math", `math.Round(-2.5)`), `-3`,
+	}, {
+		test("math", `math.RoundToEven(2.5)`), `2`,
+	}, {
+		test("math", `math.RoundToEven(-2.5)`), `-2`,
+	}, {
+		test("math", `math.Abs(2.5)`), `2.5`,
+	}, {
+		test("math", `math.Abs(-2.2)`), `2.2`,
+	}, {
+		test("math", `math.Cbrt(2)`), `1.25992104989487316476721`,
+	}, {
+		test("math", `math.Copysign(5, -2.2)`), `-5`,
+	}, {
+		test("math", `math.Exp(3)`), `20.0855369231876677409285`,
+	}, {
+		test("math", `math.Exp2(3.5)`), `11.3137084989847603904135`,
+	}, {
+		test("math", `math.Log(4)`), `1.38629436111989061883446`,
+	}, {
+		test("math", `math.Log10(4)`), `0.602059991327962390427478`,
+	}, {
+		test("math", `math.Log2(5)`),
+		`2.32192809488736234787032`,
+	}, {
+		test("math", `math.Dim(3, 2.5)`), `0.5`,
+	}, {
+		test("math", `math.Dim(5, 7.2)`), `0`,
+	}, {
+		test("math", `math.Ceil(2.5)`), `3`,
+	}, {
+		test("math", `math.Ceil(-2.2)`), `-2`,
+	}, {
+		test("math", `math.Floor(2.9)`), `2`,
+	}, {
+		test("math", `math.Floor(-2.2)`), `-3`,
+	}, {
+		test("math", `math.Trunc(2.5)`), `2`,
+	}, {
+		test("math", `math.Trunc(-2.9)`), `-2`,
+	}, {
 		test("math/bits", `bits.Lsh(0x8, 4)`), `128`,
 	}, {
 		test("math/bits", `bits.Rsh(0x100, 4)`), `16`,

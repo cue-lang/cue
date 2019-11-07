@@ -16,19 +16,24 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo -exclude=32,^Next,^Max,^Smallest,^Min,bits,Inf,NaN,Round,Trunc,Ceil,Floor$ extract math
-
 package math
 
-import "math"
+import (
+	"math"
+
+	"cuelang.org/go/internal"
+	"github.com/cockroachdb/apd/v2"
+)
+
+var apdContext = apd.BaseContext.WithPrecision(24)
 
 // Abs returns the absolute value of x.
 //
-// Special cases are:
-//	Abs(±Inf) = +Inf
-//	Abs(NaN) = NaN
-func Abs(x float64) float64 {
-	return math.Abs(x)
+// Special case: Abs(±Inf) = +Inf
+func Abs(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Abs(&d, x)
+	return &d, err
 }
 
 // Acosh returns the inverse hyperbolic cosine of x.
@@ -121,8 +126,10 @@ func Atanh(x float64) float64 {
 //	Cbrt(±0) = ±0
 //	Cbrt(±Inf) = ±Inf
 //	Cbrt(NaN) = NaN
-func Cbrt(x float64) float64 {
-	return math.Cbrt(x)
+func Cbrt(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Cbrt(&d, x)
+	return &d, err
 }
 
 // Mathematical constants.
@@ -144,9 +151,14 @@ const (
 
 // Copysign returns a value with the magnitude
 // of x and the sign of y.
-func Copysign(x, y float64) float64 {
-	return math.Copysign(x, y)
+func Copysign(x, y *internal.Decimal) *internal.Decimal {
+	var d internal.Decimal
+	d.Set(x)
+	d.Negative = y.Negative
+	return &d
 }
+
+var zero = apd.New(0, 0)
 
 // Dim returns the maximum of x-y or 0.
 //
@@ -154,8 +166,16 @@ func Copysign(x, y float64) float64 {
 //	Dim(+Inf, +Inf) = NaN
 //	Dim(-Inf, -Inf) = NaN
 //	Dim(x, NaN) = Dim(NaN, x) = NaN
-func Dim(x, y float64) float64 {
-	return math.Dim(x, y)
+func Dim(x, y *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Sub(&d, x, y)
+	if err != nil {
+		return nil, err
+	}
+	if d.Negative {
+		return zero, nil
+	}
+	return &d, nil
 }
 
 // Erf returns the error function of x.
@@ -207,15 +227,21 @@ func Erfcinv(x float64) float64 {
 //	Exp(NaN) = NaN
 // Very large values overflow to 0 or +Inf.
 // Very small values underflow to 1.
-func Exp(x float64) float64 {
-	return math.Exp(x)
+func Exp(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Exp(&d, x)
+	return &d, err
 }
+
+var two = apd.New(2, 0)
 
 // Exp2 returns 2**x, the base-2 exponential of x.
 //
 // Special cases are the same as Exp.
-func Exp2(x float64) float64 {
-	return math.Exp2(x)
+func Exp2(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Pow(&d, two, x)
+	return &d, err
 }
 
 // Expm1 returns e**x - 1, the base-e exponential of x minus 1.
@@ -335,20 +361,31 @@ func Ldexp(frac float64, exp int) float64 {
 //	Log(0) = -Inf
 //	Log(x < 0) = NaN
 //	Log(NaN) = NaN
-func Log(x float64) float64 {
-	return math.Log(x)
+func Log(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Ln(&d, x)
+	return &d, err
 }
 
 // Log10 returns the decimal logarithm of x.
 // The special cases are the same as for Log.
-func Log10(x float64) float64 {
-	return math.Log10(x)
+func Log10(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Log10(&d, x)
+	return &d, err
 }
 
 // Log2 returns the binary logarithm of x.
 // The special cases are the same as for Log.
-func Log2(x float64) float64 {
-	return math.Log2(x)
+func Log2(x *internal.Decimal) (*internal.Decimal, error) {
+	var d, ln2 internal.Decimal
+	_, _ = apdContext.Ln(&ln2, two)
+	_, err := apdContext.Ln(&d, x)
+	if err != nil {
+		return &d, err
+	}
+	_, err = apdContext.Quo(&d, &d, &ln2)
+	return &d, nil
 }
 
 // Log1p returns the natural logarithm of 1 plus its argument x.
@@ -421,17 +458,16 @@ func Mod(x, y float64) float64 {
 //	Pow(+Inf, y) = +0 for y < 0
 //	Pow(-Inf, y) = Pow(-0, -y)
 //	Pow(x, y) = NaN for finite x < 0 and finite non-integer y
-func Pow(x, y float64) float64 {
-	return math.Pow(x, y)
+func Pow(x, y *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Pow(&d, x, y)
+	return &d, err
 }
 
 // Pow10 returns 10**n, the base-10 exponential of n.
 //
-// Special cases are:
-//	Pow10(n) =    0 for n < -323
-//	Pow10(n) = +Inf for n > 308
-func Pow10(n int) float64 {
-	return math.Pow10(n)
+func Pow10(n int32) *internal.Decimal {
+	return apd.New(1, n)
 }
 
 // Remainder returns the IEEE 754 floating-point remainder of x/y.
@@ -447,8 +483,8 @@ func Remainder(x, y float64) float64 {
 }
 
 // Signbit reports whether x is negative or negative zero.
-func Signbit(x float64) bool {
-	return math.Signbit(x)
+func Signbit(x *internal.Decimal) bool {
+	return x.Negative
 }
 
 // Cos returns the cosine of the radian argument x.

@@ -46,7 +46,19 @@ func init() {
 
 var _ io.Reader
 
+var roundTruncContext = apd.Context{Rounding: apd.RoundDown}
+
+var roundUpContext = apd.Context{Rounding: apd.RoundHalfUp}
+
+var roundEvenContext = apd.Context{Rounding: apd.RoundHalfEven}
+
 var mulContext = apd.BaseContext.WithPrecision(1)
+
+var apdContext = apd.BaseContext.WithPrecision(24)
+
+var zero = apd.New(0, 0)
+
+var two = apd.New(2, 0)
 
 var idnaProfile = idna.New(
 	idna.ValidateLabels(true),
@@ -1026,9 +1038,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Floor(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Floor(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1036,9 +1050,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Ceil(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Ceil(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1046,9 +1062,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Trunc(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := roundTruncContext.RoundToIntegralExact(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1056,9 +1074,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Round(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := roundUpContext.RoundToIntegralExact(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1066,9 +1086,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.RoundToEven(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := roundEvenContext.RoundToIntegralExact(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1088,9 +1110,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Abs(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Abs(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1168,9 +1192,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Cbrt(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Cbrt(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1211,9 +1237,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind, numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x, y := c.float64(0), c.float64(1)
+				x, y := c.decimal(0), c.decimal(1)
 				c.ret = func() interface{} {
-					return math.Copysign(x, y)
+					var d internal.Decimal
+					d.Set(x)
+					d.Negative = y.Negative
+					return &d
 				}()
 			},
 		}, {
@@ -1221,9 +1250,17 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind, numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x, y := c.float64(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Dim(x, y)
+				x, y := c.decimal(0), c.decimal(1)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Sub(&d, x, y)
+					if err != nil {
+						return nil, err
+					}
+					if d.Negative {
+						return zero, nil
+					}
+					return &d, nil
 				}()
 			},
 		}, {
@@ -1271,9 +1308,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Exp(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Exp(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1281,9 +1320,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Exp2(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Pow(&d, two, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1391,9 +1432,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Log(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Ln(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1401,9 +1444,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Log10(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Log10(&d, x)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1411,9 +1456,16 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Log2(x)
+				x := c.decimal(0)
+				c.ret, c.err = func() (interface{}, error) {
+					var d, ln2 internal.Decimal
+					_, _ = apdContext.Ln(&ln2, two)
+					_, err := apdContext.Ln(&d, x)
+					if err != nil {
+						return &d, err
+					}
+					_, err = apdContext.Quo(&d, &d, &ln2)
+					return &d, nil
 				}()
 			},
 		}, {
@@ -1461,9 +1513,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind, numKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				x, y := c.float64(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Pow(x, y)
+				x, y := c.decimal(0), c.decimal(1)
+				c.ret, c.err = func() (interface{}, error) {
+					var d internal.Decimal
+					_, err := apdContext.Pow(&d, x, y)
+					return &d, err
 				}()
 			},
 		}, {
@@ -1471,9 +1525,9 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{intKind},
 			Result: numKind,
 			Func: func(c *callCtxt) {
-				n := c.int(0)
+				n := c.int32(0)
 				c.ret = func() interface{} {
-					return math.Pow10(n)
+					return apd.New(1, n)
 				}()
 			},
 		}, {
@@ -1491,9 +1545,9 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{numKind},
 			Result: boolKind,
 			Func: func(c *callCtxt) {
-				x := c.float64(0)
+				x := c.decimal(0)
 				c.ret = func() interface{} {
-					return math.Signbit(x)
+					return x.Negative
 				}()
 			},
 		}, {

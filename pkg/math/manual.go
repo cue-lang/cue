@@ -15,13 +15,9 @@
 package math
 
 import (
-	"math"
-
 	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd/v2"
 )
-
-// TODO: use apd
 
 // Floor returns the greatest integer value less than or equal to x.
 //
@@ -29,8 +25,10 @@ import (
 //	Floor(±0) = ±0
 //	Floor(±Inf) = ±Inf
 //	Floor(NaN) = NaN
-func Floor(x float64) float64 {
-	return math.Floor(x)
+func Floor(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Floor(&d, x)
+	return &d, err
 }
 
 // Ceil returns the least integer value greater than or equal to x.
@@ -39,9 +37,13 @@ func Floor(x float64) float64 {
 //	Ceil(±0) = ±0
 //	Ceil(±Inf) = ±Inf
 //	Ceil(NaN) = NaN
-func Ceil(x float64) float64 {
-	return math.Ceil(x)
+func Ceil(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := apdContext.Ceil(&d, x)
+	return &d, err
 }
+
+var roundTruncContext = apd.Context{Rounding: apd.RoundDown}
 
 // Trunc returns the integer value of x.
 //
@@ -49,9 +51,13 @@ func Ceil(x float64) float64 {
 //	Trunc(±0) = ±0
 //	Trunc(±Inf) = ±Inf
 //	Trunc(NaN) = NaN
-func Trunc(x float64) float64 {
-	return math.Trunc(x)
+func Trunc(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := roundTruncContext.RoundToIntegralExact(&d, x)
+	return &d, err
 }
+
+var roundUpContext = apd.Context{Rounding: apd.RoundHalfUp}
 
 // Round returns the nearest integer, rounding half away from zero.
 //
@@ -59,9 +65,13 @@ func Trunc(x float64) float64 {
 //	Round(±0) = ±0
 //	Round(±Inf) = ±Inf
 //	Round(NaN) = NaN
-func Round(x float64) float64 {
-	return math.Round(x)
+func Round(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := roundUpContext.RoundToIntegralExact(&d, x)
+	return &d, err
 }
+
+var roundEvenContext = apd.Context{Rounding: apd.RoundHalfEven}
 
 // RoundToEven returns the nearest integer, rounding ties to even.
 //
@@ -69,8 +79,10 @@ func Round(x float64) float64 {
 //	RoundToEven(±0) = ±0
 //	RoundToEven(±Inf) = ±Inf
 //	RoundToEven(NaN) = NaN
-func RoundToEven(x float64) float64 {
-	return math.RoundToEven(x)
+func RoundToEven(x *internal.Decimal) (*internal.Decimal, error) {
+	var d internal.Decimal
+	_, err := roundEvenContext.RoundToIntegralExact(&d, x)
+	return &d, err
 }
 
 var mulContext = apd.BaseContext.WithPrecision(1)

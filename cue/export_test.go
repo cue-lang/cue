@@ -365,8 +365,8 @@ func TestExport(t *testing.T) {
 				emb
 			}
 			e :: {
-				[_]: <100
-				b:   int
+				[string]: <100
+				b:        int
 				f
 			}
 		}`),
@@ -429,7 +429,7 @@ func TestExport(t *testing.T) {
 		out: unindent(`
 		{
 			b: [{
-				[X=_]: int
+				[X=string]: int
 				if a > 4 {
 					f: 4
 				}
@@ -686,7 +686,7 @@ func TestExportFile(t *testing.T) {
 		out: unindent(`
 		{
 			A: {
-				[_]: B
+				[string]: B
 			} @protobuf(1,"test")
 			B: {
 			} & ({
@@ -715,7 +715,7 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		in: `
 		A :: { b: int }
-		a: A & { [_]: <10 }
+		a: A & { [string]: <10 }
 		B :: a
 		`,
 		out: unindent(`
@@ -780,15 +780,15 @@ func TestExportFile(t *testing.T) {
 		out: unindent(`
 		{
 			T :: {
-				[_]: int64
+				[string]: int64
 			}
 			X :: {
-				[_]: int64
-				x:   int64
+				[string]: int64
+				x:        int64
 			}
 			x: {
-				[_]: int64
-				x:   int64
+				[string]: int64
+				x:        int64
 			}
 		}`),
 	}, {
@@ -908,6 +908,25 @@ func TestExportFile(t *testing.T) {
 				}) & close({
 					[=~"^[m-z]+"]: int
 				})
+			}
+		}`),
+	}, {
+		eval: true,
+		in: `
+		x: [string]: int
+		a: [P=string]: {
+			b: x[P]
+			c: P
+			e: len(P)
+		}
+		`,
+		out: unindent(`
+		{
+			x: [string]: int
+			a: [P=string]: {
+				b: x[P]
+				c: string
+				e: len(P)
 			}
 		}`),
 	}}

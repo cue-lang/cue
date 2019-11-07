@@ -538,6 +538,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		n2 := v.mapScope(n.Scope)
 		ret = &nodeRef{baseValue: newExpr(n), node: n2}
 
+		// Allow different names to refer to the same field in unification. We
+		// do this by anonymizing the the reference. This then has to be
+		// resolved again when refering to lambdas.
 		l, lambda := n2.(*lambdaExpr)
 		if lambda && len(l.params.arcs) == 1 {
 			f = 0

@@ -205,12 +205,12 @@ func (p *exporter) mkTemplate(v value, n *ast.Ident) ast.Label {
 	if v != nil {
 		expr = p.expr(v)
 	} else {
-		expr = ast.NewIdent("_")
+		expr = ast.NewIdent("string")
 	}
 	switch n.Name {
 	case "", "_":
 	default:
-		expr = &ast.Alias{Ident: n, Expr: ast.NewIdent("_")}
+		expr = &ast.Alias{Ident: n, Expr: ast.NewIdent("string")}
 	}
 	return ast.NewList(expr)
 }
@@ -312,6 +312,16 @@ func (p *exporter) isClosed(x *structLit) bool {
 	return x.closeStatus.shouldClose()
 }
 
+func (p *exporter) badf(msg string, args ...interface{}) ast.Expr {
+	msg = fmt.Sprintf(msg, args...)
+	bad := &ast.BadExpr{}
+	bad.AddComment(&ast.CommentGroup{
+		Doc:  true,
+		List: []*ast.Comment{{Text: "// " + msg}},
+	})
+	return bad
+}
+
 func (p *exporter) expr(v value) ast.Expr {
 	// TODO: use the raw expression for convert incomplete errors downstream
 	// as well.
@@ -365,17 +375,24 @@ func (p *exporter) expr(v value) ast.Expr {
 		if n != nil {
 			return ast.NewSel(n, p.ctx.labelStr(x.feature))
 		}
-		ident := p.identifier(x.feature)
+		f := x.feature
+		ident := p.identifier(f)
 		node, ok := x.x.(*nodeRef)
 		if !ok {
-			// TODO: should not happen: report error
+			return p.badf("selector without node")
+		}
+		if l, ok := node.node.(*lambdaExpr); ok && len(l.arcs) == 1 {
+			f = l.params.arcs[0].feature
+			// TODO: ensure it is shadowed.
+			ident = p.identifier(f)
 			return ident
 		}
-		// TODO: nodes may have changed. Use different algorithm.
+
+		// TODO: nodes may have been shadowed. Use different algorithm.
 		conflict := false
 		for i := len(p.stack) - 1; i >= 0; i-- {
 			e := &p.stack[i]
-			if e.from != x.feature {
+			if e.from != f {
 				continue
 			}
 			if e.key != node.node {
@@ -385,18 +402,17 @@ func (p *exporter) expr(v value) ast.Expr {
 			if conflict {
 				ident = e.to
 				if e.to == nil {
-					name := p.unique(p.ctx.labelStr(x.feature))
+					name := p.unique(p.ctx.labelStr(f))
 					e.syn.Elts = append(e.syn.Elts, &ast.Alias{
 						Ident: p.ident(name),
-						Expr:  p.identifier(x.feature),
+						Expr:  p.identifier(f),
 					})
 					ident = p.ident(name)
 					e.to = ident
 				}
 			}
-			return ident
+			break
 		}
-		// TODO: should not happen: report error
 		return ident
 
 	case *indexExpr:

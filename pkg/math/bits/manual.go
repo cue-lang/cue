@@ -19,105 +19,94 @@
 package bits
 
 import (
+	"fmt"
 	"math/big"
 	"math/bits"
 )
 
-// And returns the bitwise and of a and b (a & b in Go).
-//
+// Lsh returns x shifted left by n bits.
+func Lsh(x *big.Int, n uint) *big.Int {
+	var z big.Int
+	z.Lsh(x, n)
+	return &z
+}
+
+// Rsh returns x shifted right by n bits.
+func Rsh(x *big.Int, n uint) *big.Int {
+	var z big.Int
+	z.Rsh(x, n)
+	return &z
+}
+
+// At returns the value of the i'th bit of x.
+func At(x *big.Int, i uint) (uint, error) {
+	if i > 1<<62 {
+		return 0, fmt.Errorf("bit index too large")
+	}
+	return x.Bit(int(i)), nil
+}
+
+// SetBit returns x with x's i'th bit set to b (0 or 1). That is, if b is 1
+// SetBit returns x with its i'th bit set; if b is 0 SetBit returns x with
+// its i'th bit cleared.
+func Set(x *big.Int, i int, bit uint) *big.Int {
+	var z big.Int
+	z.SetBit(x, i, bit)
+	return &z
+}
+
+// And returns the bitwise and of a and b.
 func And(a, b *big.Int) *big.Int {
-	wa := a.Bits()
-	wb := b.Bits()
-	n := len(wa)
-	if len(wb) < n {
-		n = len(wb)
-	}
-	w := make([]big.Word, n)
-	for i := range w {
-		w[i] = wa[i] & wb[i]
-	}
-	i := &big.Int{}
-	i.SetBits(w)
-	return i
+	var z big.Int
+	z.And(a, b)
+	return &z
 }
 
 // Or returns the bitwise or of a and b (a | b in Go).
-//
 func Or(a, b *big.Int) *big.Int {
-	wa := a.Bits()
-	wb := b.Bits()
-	var w []big.Word
-	n := len(wa)
-	if len(wa) > len(wb) {
-		w = append(w, wa...)
-		n = len(wb)
-	} else {
-		w = append(w, wb...)
-	}
-	for i := 0; i < n; i++ {
-		w[i] = wa[i] | wb[i]
-	}
-	i := &big.Int{}
-	i.SetBits(w)
-	return i
+	var z big.Int
+	z.Or(a, b)
+	return &z
 }
 
 // Xor returns the bitwise xor of a and b (a ^ b in Go).
-//
 func Xor(a, b *big.Int) *big.Int {
-	wa := a.Bits()
-	wb := b.Bits()
-	var w []big.Word
-	n := len(wa)
-	if len(wa) > len(wb) {
-		w = append(w, wa...)
-		n = len(wb)
-	} else {
-		w = append(w, wb...)
-	}
-	for i := 0; i < n; i++ {
-		w[i] = wa[i] ^ wb[i]
-	}
-	i := &big.Int{}
-	i.SetBits(w)
-	return i
+	var z big.Int
+	z.Xor(a, b)
+	return &z
 }
 
 // Clear returns the bitwise and not of a and b (a &^ b in Go).
 //
 func Clear(a, b *big.Int) *big.Int {
-	wa := a.Bits()
-	wb := b.Bits()
-	w := append([]big.Word(nil), wa...)
-	for i, m := range wb {
-		if i >= len(w) {
-			break
-		}
-		w[i] = wa[i] &^ m
-	}
-	i := &big.Int{}
-	i.SetBits(w)
-	return i
+	var z big.Int
+	z.AndNot(a, b)
+	return &z
 }
-
-// TODO: ShiftLeft, maybe trailing and leading zeros
 
 // OnesCount returns the number of one bits ("population count") in x.
-func OnesCount(x uint64) int {
-	return bits.OnesCount64(x)
+func OnesCount(x *big.Int) int {
+	var count int
+	for _, w := range x.Bits() {
+		count += bits.OnesCount64(uint64(w))
+	}
+	return count
 }
 
+// TODO: Reverse, ReverseBytes?
+// Not entirely sure what that means for infinite precision.
 // Reverse returns the value of x with its bits in reversed order.
-func Reverse(x uint64) uint64 {
-	return bits.Reverse64(x)
-}
+// func Reverse(x uint64) uint64 {
+// 	return bits.Reverse64(x)
+// }
 
-// ReverseBytes returns the value of x with its bytes in reversed order.
-func ReverseBytes(x uint64) uint64 {
-	return bits.ReverseBytes64(x)
-}
+// // ReverseBytes returns the value of x with its bytes in reversed order.
+// func ReverseBytes(x uint64) uint64 {
+// 	return bits.ReverseBytes64(x)
+// }
 
-// Len returns the minimum number of bits required to represent x; the result is 0 for x == 0.
-func Len(x uint64) int {
-	return bits.Len64(x)
+// Len returns the length of the absolute value of x in bits. The bit length
+// of 0 is 0.
+func Len(x *big.Int) int {
+	return x.BitLen()
 }

@@ -510,6 +510,18 @@ func TestBuiltins(t *testing.T) {
 		test("struct", `struct.MaxFields(2) & {a: 1}`),
 		`{a: 1}`,
 	}, {
+		test("math/bits", `bits.Lsh(0x8, 4)`), `128`,
+	}, {
+		test("math/bits", `bits.Rsh(0x100, 4)`), `16`,
+	}, {
+		test("math/bits", `bits.At(0x100, 8)`), `1`,
+	}, {
+		test("math/bits", `bits.At(0x100, 9)`), `0`,
+	}, {
+		test("math/bits", `bits.Set(0x100, 7, 1)`), `384`,
+	}, {
+		test("math/bits", `bits.Set(0x100, 8, 0)`), `0`,
+	}, {
 		test("math/bits", `bits.And(0x10000000000000F0E, 0xF0F7)`), `6`,
 	}, {
 		test("math/bits", `bits.Or(0x100000000000000F0, 0x0F)`),

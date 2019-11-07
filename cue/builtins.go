@@ -1570,25 +1570,64 @@ var builtinPackages = map[string]*builtinPkg{
 	},
 	"math/bits": &builtinPkg{
 		native: []*builtin{{
+			Name:   "Lsh",
+			Params: []kind{intKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				x, n := c.bigInt(0), c.uint(1)
+				c.ret = func() interface{} {
+					var z big.Int
+					z.Lsh(x, n)
+					return &z
+				}()
+			},
+		}, {
+			Name:   "Rsh",
+			Params: []kind{intKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				x, n := c.bigInt(0), c.uint(1)
+				c.ret = func() interface{} {
+					var z big.Int
+					z.Rsh(x, n)
+					return &z
+				}()
+			},
+		}, {
+			Name:   "At",
+			Params: []kind{intKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				x, i := c.bigInt(0), c.uint(1)
+				c.ret, c.err = func() (interface{}, error) {
+					if i > 1<<62 {
+						return 0, fmt.Errorf("bit index too large")
+					}
+					return x.Bit(int(i)), nil
+				}()
+			},
+		}, {
+			Name:   "Set",
+			Params: []kind{intKind, intKind, intKind},
+			Result: intKind,
+			Func: func(c *callCtxt) {
+				x, i, bit := c.bigInt(0), c.int(1), c.uint(2)
+				c.ret = func() interface{} {
+					var z big.Int
+					z.SetBit(x, i, bit)
+					return &z
+				}()
+			},
+		}, {
 			Name:   "And",
 			Params: []kind{intKind, intKind},
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
 				c.ret = func() interface{} {
-					wa := a.Bits()
-					wb := b.Bits()
-					n := len(wa)
-					if len(wb) < n {
-						n = len(wb)
-					}
-					w := make([]big.Word, n)
-					for i := range w {
-						w[i] = wa[i] & wb[i]
-					}
-					i := &big.Int{}
-					i.SetBits(w)
-					return i
+					var z big.Int
+					z.And(a, b)
+					return &z
 				}()
 			},
 		}, {
@@ -1598,22 +1637,9 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
 				c.ret = func() interface{} {
-					wa := a.Bits()
-					wb := b.Bits()
-					var w []big.Word
-					n := len(wa)
-					if len(wa) > len(wb) {
-						w = append(w, wa...)
-						n = len(wb)
-					} else {
-						w = append(w, wb...)
-					}
-					for i := 0; i < n; i++ {
-						w[i] = wa[i] | wb[i]
-					}
-					i := &big.Int{}
-					i.SetBits(w)
-					return i
+					var z big.Int
+					z.Or(a, b)
+					return &z
 				}()
 			},
 		}, {
@@ -1623,22 +1649,9 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
 				c.ret = func() interface{} {
-					wa := a.Bits()
-					wb := b.Bits()
-					var w []big.Word
-					n := len(wa)
-					if len(wa) > len(wb) {
-						w = append(w, wa...)
-						n = len(wb)
-					} else {
-						w = append(w, wb...)
-					}
-					for i := 0; i < n; i++ {
-						w[i] = wa[i] ^ wb[i]
-					}
-					i := &big.Int{}
-					i.SetBits(w)
-					return i
+					var z big.Int
+					z.Xor(a, b)
+					return &z
 				}()
 			},
 		}, {
@@ -1648,18 +1661,9 @@ var builtinPackages = map[string]*builtinPkg{
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
 				c.ret = func() interface{} {
-					wa := a.Bits()
-					wb := b.Bits()
-					w := append([]big.Word(nil), wa...)
-					for i, m := range wb {
-						if i >= len(w) {
-							break
-						}
-						w[i] = wa[i] &^ m
-					}
-					i := &big.Int{}
-					i.SetBits(w)
-					return i
+					var z big.Int
+					z.AndNot(a, b)
+					return &z
 				}()
 			},
 		}, {
@@ -1667,29 +1671,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{intKind},
 			Result: intKind,
 			Func: func(c *callCtxt) {
-				x := c.uint64(0)
+				x := c.bigInt(0)
 				c.ret = func() interface{} {
-					return bits.OnesCount64(x)
-				}()
-			},
-		}, {
-			Name:   "Reverse",
-			Params: []kind{intKind},
-			Result: intKind,
-			Func: func(c *callCtxt) {
-				x := c.uint64(0)
-				c.ret = func() interface{} {
-					return bits.Reverse64(x)
-				}()
-			},
-		}, {
-			Name:   "ReverseBytes",
-			Params: []kind{intKind},
-			Result: intKind,
-			Func: func(c *callCtxt) {
-				x := c.uint64(0)
-				c.ret = func() interface{} {
-					return bits.ReverseBytes64(x)
+					var count int
+					for _, w := range x.Bits() {
+						count += bits.OnesCount64(uint64(w))
+					}
+					return count
 				}()
 			},
 		}, {
@@ -1697,9 +1685,9 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{intKind},
 			Result: intKind,
 			Func: func(c *callCtxt) {
-				x := c.uint64(0)
+				x := c.bigInt(0)
 				c.ret = func() interface{} {
-					return bits.Len64(x)
+					return x.BitLen()
 				}()
 			},
 		}},
@@ -3042,7 +3030,7 @@ var builtinPackages = map[string]*builtinPkg{
 		short?: string
 		long?:  string
 		tasks: {
-			[name=_]: Task
+			[name=string]: Task
 		}
 	}
 	Task: {
@@ -3067,7 +3055,7 @@ var builtinPackages = map[string]*builtinPkg{
 		cmd:      string | [string, ...string]
 		install?: string | [string, ...string]
 		env: {
-			[Key=_]: string
+			[Key=string]: string
 		}
 		stdout:  *null | string | bytes
 		stderr:  *null | string | bytes
@@ -3115,10 +3103,10 @@ var builtinPackages = map[string]*builtinPkg{
 		response: {
 			body: *bytes | string
 			header: {
-				[Name=_]: string | [...string]
+				[Name=string]: string | [...string]
 			}
 			trailer: {
-				[Name=_]: string | [...string]
+				[Name=string]: string | [...string]
 			}
 			status:     string
 			statusCode: int
@@ -3127,10 +3115,10 @@ var builtinPackages = map[string]*builtinPkg{
 		request: {
 			body: *bytes | string
 			header: {
-				[Name=_]: string | [...string]
+				[Name=string]: string | [...string]
 			}
 			trailer: {
-				[Name=_]: string | [...string]
+				[Name=string]: string | [...string]
 			}
 		}
 	}

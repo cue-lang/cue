@@ -177,8 +177,9 @@ these rules.
 ### Identifiers
 
 Identifiers name entities such as fields and aliases.
-An identifier is a sequence of one or more letters (which includes `_`) and digits.
-It may not be `_`.
+An identifier is a sequence of one or more letters (which includes `_` and `$`)
+and digits.
+It may not be `_` or `$`.
 The first character in an identifier must be a letter.
 
 <!--

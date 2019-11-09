@@ -282,7 +282,7 @@ func isDigit(ch rune) bool {
 
 func (s *Scanner) scanIdentifier() string {
 	offs := s.offset
-	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' {
+	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' || s.ch == '$' {
 		s.next()
 	}
 	return string(s.src[offs:s.offset])
@@ -798,7 +798,7 @@ scanAgain:
 	// 	lit = string(rune(ch))
 	// 	s.next()
 	// 	fallthrough
-	case isLetter(ch):
+	case isLetter(ch), ch == '$':
 		lit = s.scanIdentifier()
 		if len(lit) > 1 {
 			// keywords are longer than one letter - avoid lookup otherwise

@@ -74,6 +74,7 @@ var testTokens = [...]elt{
 	{token.BOTTOM, "_|_", literal},
 
 	{token.IDENT, "foobar", literal},
+	{token.IDENT, "$foobar", literal},
 	{token.IDENT, "`foobar`", literal},
 	{token.IDENT, "a۰۱۸", literal},
 	{token.IDENT, "foo६४", literal},

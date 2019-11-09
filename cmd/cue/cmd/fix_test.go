@@ -63,52 +63,15 @@ package fix
 
 "\(k)": v <-
  for k, v in src
-
-/* foo
-   bar
- */
-
-a: 3 + /* foo */ 5
 	 `,
 		out: `package fix
 
 for k, v in src {
 	"\(k)": v
 }
-
-// foo
-// bar
 for k, v in src {
 	"\(k)": v
 }
-
-a:
-	// foo
-	3 + 5
-`,
-	}, {
-		name: "comments",
-		in: `package foo
-
-a: /* b */ 3 + 5
-a: 3 /* c */ + 5
-a: 3 + /* d */ 5
-a: 3 + 5 /* e
-f */
-`,
-		out: `package foo
-
-// b
-a: 3 + 5
-a:
-	// c
-	3 + 5
-a:
-	// d
-	3 + 5
-// e
-// f
-a: 3 + 5
 `,
 	}, {
 		name: "templates",

@@ -52,7 +52,7 @@ package expressions
         aa: 8 @go(A) // comment
         bb: 9
         bbb: 10 @go(Bbb) @xml(,attr) // comment
-        bbbb: 100 @go(Bbbb) /* a */ @xml(,attr) // comment
+        bbbb: 100 @go(Bbbb) @xml(,attr) // comment
     }
 
     foo bar: string @go(-)
@@ -171,7 +171,7 @@ package expressions
     b {
         c: d
     }
-    
+
     e: [{
         a: 1, b: 2,
     }]

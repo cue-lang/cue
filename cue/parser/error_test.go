@@ -33,10 +33,7 @@
 package parser
 
 import (
-	"io/ioutil"
-	"path/filepath"
 	"regexp"
-	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -168,21 +165,6 @@ func checkErrors(t *testing.T, filename string, input interface{}) {
 
 	// verify errors returned by the parser
 	compareErrors(t, file, expected, found)
-}
-
-func TestErrors(t *testing.T) {
-	list, err := ioutil.ReadDir(testdata)
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, fi := range list {
-		name := fi.Name()
-		t.Run(name, func(t *testing.T) {
-			if !fi.IsDir() && !strings.HasPrefix(name, ".") && strings.HasSuffix(name, ".src") {
-				checkErrors(t, filepath.Join(testdata, name), nil)
-			}
-		})
-	}
 }
 
 func TestFuzz(t *testing.T) {

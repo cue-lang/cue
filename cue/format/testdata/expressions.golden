@@ -51,8 +51,8 @@ package expressions
 		a:    8 @go(A) // comment
 		aa:   8 @go(A) // comment
 		bb:   9
-		bbb:  10  @go(Bbb) @xml(,attr)          // comment
-		bbbb: 100 @go(Bbbb) /* a */ @xml(,attr) // comment
+		bbb:  10  @go(Bbb) @xml(,attr)  // comment
+		bbbb: 100 @go(Bbbb) @xml(,attr) // comment
 	}
 
 	foo: {

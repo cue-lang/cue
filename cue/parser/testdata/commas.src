@@ -18,9 +18,6 @@ package foo
 
 import "path/to/pkg"
 import name "path/to/pkg"
-import . /* ERROR "expected 'STRING', found '.'" */
-import      /* ERROR "expected 'STRING', found newline" */
-import err  /* ERROR "expected 'STRING', found newline" */
 
 foo: [
 	0 // legal JSON
@@ -33,4 +30,3 @@ bar: [
 	3
 ]
 
-not allowed :: /* ERROR "more than one label before '::'" */ {}

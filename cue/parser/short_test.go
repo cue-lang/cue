@@ -32,18 +32,3 @@ func TestValid(t *testing.T) {
 		})
 	}
 }
-
-func TestInvalid(t *testing.T) {
-	invalids := []string{
-		`foo !/* ERROR "expected label or ':', found '!'" */`,
-		`{ <Name
-			/* ERROR "expected '>', found newline" */ >: foo }`,
-		`foo: [/* ERROR "square bracket must have exactly one element" */ string, int]: int`,
-		// TODO:
-		// `{ </* ERROR "expected identifier, found newline" */
-		// 	Name>: foo }`,
-	}
-	for _, src := range invalids {
-		checkErrors(t, src, src)
-	}
-}

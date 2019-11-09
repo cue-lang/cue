@@ -55,9 +55,7 @@ type elt struct {
 
 var testTokens = [...]elt{
 	// Special tokens
-	{token.COMMENT, "/* a comment */", special},
 	{token.COMMENT, "// a comment \n", special},
-	{token.COMMENT, "/*\r*/", special},
 	{token.COMMENT, "//\r\n", special},
 
 	// Attributes
@@ -420,24 +418,12 @@ var lines = []string{
 
 	"foo^//comment\n",
 	"foo^//comment",
-	"foo^/*comment*/\n",
-	"foo^/*\n*/",
-	"foo^/*comment*/    \n",
-	"foo^/*\n*/    ",
 
 	"foo    ^// comment\n",
 	"foo    ^// comment",
-	"foo    ^/*comment*/\n",
-	"foo    ^/*\n*/",
-	"foo    ^/*  */ /* \n */ bar^/**/\n",
-	"foo    ^/*0*/ /*1*/ /*2*/\n",
 
-	"foo    ^/*comment*/    \n",
-	"foo    ^/*0*/ /*1*/ /*2*/    \n",
-	"foo	^/**/ /*-------------*/       /*----\n*/bar       ^/*  \n*/baa^\n",
-	"foo    ^/* an EOF terminates a line */",
-	"foo    ^/* an EOF terminates a line */ /*",
-	"foo    ^/* an EOF terminates a line */ //",
+	"foo    ^",
+	"foo    ^//",
 
 	"package main^\n\nfoo: bar^",
 	"package main^",
@@ -462,11 +448,10 @@ func TestRelative(t *testing.T) {
 	package foo
 
 	// comment
-	a: /* a */1
-	b :    5 /*
-	   line one
-	   line two
-	*/
+	a: 1 // a
+	b :    5
+	// line one
+	// line two
 	c: "dfs"
 	`
 	want := []string{
@@ -476,14 +461,15 @@ func TestRelative(t *testing.T) {
 		`section COMMENT  // comment`,
 		`newline IDENT    a`,
 		`nospace :        `,
-		`blank   COMMENT  /* a */`,
-		`nospace INT      1`,
+		`blank   INT      1`,
 		"elided  ,        \n",
+		`blank   COMMENT  // a`,
 		`newline IDENT    b`,
 		`blank   :        `,
 		`blank   INT      5`,
 		"elided  ,        \n",
-		"blank   COMMENT  /*\n\t   line one\n\t   line two\n\t*/",
+		"newline COMMENT  // line one",
+		"newline COMMENT  // line two",
 		`newline IDENT    c`,
 		`nospace :        `,
 		`blank   STRING   "dfs"`,
@@ -803,8 +789,6 @@ var errorTests = []struct {
 	{`"\q"`, token.STRING, 2, `"\q"`, "unknown escape sequence"},
 	{`#"\q"#`, token.STRING, 0, `#"\q"#`, ""},
 	{`#"\#q"#`, token.STRING, 4, `#"\#q"#`, "unknown escape sequence"},
-	{"/**/", token.COMMENT, 0, "/**/", ""},
-	{"/*", token.COMMENT, 0, "/*", "comment not terminated"},
 	{"0", token.INT, 0, "0", ""},
 	{"077", token.INT, 0, "077", "illegal integer number"},
 	{"078.", token.FLOAT, 0, "078.", ""},

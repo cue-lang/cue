@@ -368,7 +368,7 @@ func TestParse(t *testing.T) {
 			5, 6, 7, 8 // and here
 		]
 		d: {
-			a: /* 8 */ 1 // Hello
+			a: 1 // Hello
 			// Doc
 			b: 2
 		}
@@ -382,15 +382,15 @@ func TestParse(t *testing.T) {
 		"a: {a: 1, b: 2, c: 3, <[d5// end] d: 4>}, " +
 			"b: [1, 2, 3, 4, <[d2// end] 5>], " +
 			"c: [1, 2, 3, <[l2// here] 4>, <[l4// here] {a: 3}>, 5, 6, 7, <[l2// and here] 8>], " +
-			"d: {<[2/* 8 */] [l5// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
+			"d: {<[l5// Hello] a: 1>, <[d0// Doc] b: 2>}, " +
 			"e1: <[d1// comment in list body] []>, " +
 			"e2: <[d1// comment in struct body] {}>",
 	}, {
 		"attribute comments",
 		`
-		a: 1 /* a */ @a() /* b */ @b() /* c */ // d
+		a: 1 @a() @b() // d
 		`,
-		`<[l5/* c */ // d] a: <[1/* a */] 1> <[1/* b */] @a()> @b()>`,
+		`<[l5// d] a: 1 @a() @b()>`,
 	}, {
 		"comprehension comments",
 		`
@@ -459,6 +459,12 @@ bar: 2
 		foo: in & 2
 		`,
 		out: "foo: <*ast.BadExpr>&2\nexpected operand, found 'in'",
+	}, {
+		desc: "dot import",
+		in: `
+		import . "foo"
+		`,
+		out: "import , \"foo\"\nexpected 'STRING', found '.'",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

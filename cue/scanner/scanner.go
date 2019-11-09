@@ -201,20 +201,6 @@ func (s *Scanner) scanComment() string {
 		goto exit
 	}
 
-	/*-style comment */
-	s.next()
-	for s.ch >= 0 {
-		ch := s.ch
-		if ch == '\r' {
-			hasCR = true
-		}
-		s.next()
-		if ch == '*' && s.ch == '/' {
-			s.next()
-			goto exit
-		}
-	}
-
 	s.errf(offs, "comment not terminated")
 
 exit:
@@ -927,7 +913,7 @@ scanAgain:
 		case '*':
 			tok = token.MUL
 		case '/':
-			if s.ch == '/' || s.ch == '*' {
+			if s.ch == '/' {
 				// comment
 				if s.insertEOL && s.findLineEnd() {
 					// reset position to the beginning of the comment

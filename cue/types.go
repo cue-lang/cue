@@ -1181,6 +1181,7 @@ type Struct struct {
 // FieldInfo contains information about a struct field.
 type FieldInfo struct {
 	Name  string
+	Pos   int
 	Value Value
 
 	IsDefinition bool
@@ -1188,22 +1189,26 @@ type FieldInfo struct {
 	IsHidden     bool
 }
 
+func (s *Struct) Len() int {
+	return len(s.s.arcs)
+}
+
 // field reports information about the ith field, i < o.Len().
-func (s *Struct) field(i int) FieldInfo {
+func (s *Struct) Field(i int) FieldInfo {
 	ctx := s.v.ctx()
 	a := s.s.arcs[i]
 	a.cache = s.s.at(ctx, i)
 
 	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
 	str := ctx.labelStr(a.feature)
-	return FieldInfo{str, v, a.definition, a.optional, a.feature&hidden != 0}
+	return FieldInfo{str, i, v, a.definition, a.optional, a.feature&hidden != 0}
 }
 
 func (s *Struct) FieldByName(name string) (FieldInfo, error) {
 	f := s.v.ctx().strLabel(name)
 	for i, a := range s.s.arcs {
 		if a.feature == f {
-			return s.field(i), nil
+			return s.Field(i), nil
 		}
 	}
 	return FieldInfo{}, errNotFound

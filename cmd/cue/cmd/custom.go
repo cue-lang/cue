@@ -154,9 +154,9 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 
 	// Mark dependencies for unresolved nodes.
 	for _, t := range queue {
-		tasks.Lookup(t.name).Walk(func(v cue.Value) bool {
-			// if v.IsIncomplete() {
-			for _, r := range v.References() {
+		task := tasks.Lookup(t.name)
+		task.Walk(func(v cue.Value) bool {
+			for _, r := range appendReferences(nil, root, v) {
 				if dep, ok := index[keyForReference(r)]; ok {
 					v := root.Lookup(r...)
 					if v.IsIncomplete() && v.Kind() != cue.StructKind {
@@ -164,7 +164,6 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 					}
 				}
 			}
-			// }
 			return true
 		}, nil)
 	}
@@ -214,6 +213,28 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 	return g.Wait()
 }
 
+func appendReferences(a [][]string, root *cue.Instance, v cue.Value) [][]string {
+	inst, path := v.Reference()
+	if path != nil && inst == root {
+		a = append(a, path)
+		return a
+	}
+
+	switch op, args := v.Expr(); op {
+	case cue.NoOp:
+		v.Walk(nil, func(w cue.Value) {
+			if v != w {
+				a = appendReferences(a, root, w)
+			}
+		})
+	default:
+		for _, arg := range args {
+			a = appendReferences(a, root, arg)
+		}
+	}
+	return a
+}
+
 func isCyclic(tasks []*task) bool {
 	cc := cycleChecker{
 		visited: make([]bool, len(tasks)),
@@ -258,7 +279,7 @@ type task struct {
 	dep   map[*task]bool
 }
 
-var oldKinds = map[string]string{
+var legacyKinds = map[string]string{
 	"exec":       "tool/exec.Run",
 	"http":       "tool/http.Do",
 	"print":      "tool/cli.Print",
@@ -272,7 +293,7 @@ func newTask(index int, name string, v cue.Value) (*task, error) {
 	if err != nil {
 		return nil, err
 	}
-	if k, ok := oldKinds[kind]; ok {
+	if k, ok := legacyKinds[kind]; ok {
 		kind = k
 	}
 	rf := itask.Lookup(kind)

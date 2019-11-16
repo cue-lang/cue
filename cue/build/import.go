@@ -15,7 +15,6 @@
 package build
 
 import (
-	"log"
 	"sort"
 	"strconv"
 
@@ -64,8 +63,11 @@ func (inst *Instance) complete() errors.Error {
 				quoted := spec.Path.Value
 				path, err := strconv.Unquote(quoted)
 				if err != nil {
-					// TODO: remove panic
-					log.Panicf("%s: parser returned invalid quoted string: <%s>", f.Filename, quoted)
+					inst.Err = errors.Append(inst.Err,
+						errors.Newf(
+							spec.Path.Pos(),
+							"%s: parser returned invalid quoted string: <%s>",
+							f.Filename, quoted))
 				}
 				imported[path] = append(imported[path], spec.Pos())
 			}

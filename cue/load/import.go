@@ -16,7 +16,6 @@ package load
 
 import (
 	"bytes"
-	"log"
 	"os"
 	"path/filepath"
 	"sort"
@@ -396,7 +395,10 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 			quoted := spec.Path.Value
 			path, err := strconv.Unquote(quoted)
 			if err != nil {
-				log.Panicf("%s: parser returned invalid quoted string: <%s>", filename, quoted)
+				badFile(errors.Newf(
+					spec.Path.Pos(),
+					"%s: parser returned invalid quoted string: <%s>", filename, quoted,
+				))
 			}
 			if !isTest || fp.c.Tests {
 				fp.imported[path] = append(fp.imported[path], spec.Pos())

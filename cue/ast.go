@@ -297,8 +297,15 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 		arcs := []arc{}
 		for i, e := range elts {
+			elem := v1.walk(e)
+			if elem == nil {
+				// TODO: it would be consistent to allow aliasing in lists
+				// as well, with a similar meaning as alias declarations in
+				// structs.
+				return v.errf(n, "alias not allowed in list")
+			}
 			v1.sel = strconv.Itoa(i)
-			arcs = append(arcs, arc{feature: label(i), v: v1.walk(e)})
+			arcs = append(arcs, arc{feature: label(i), v: elem})
 		}
 		s := &structLit{baseValue: newExpr(n), arcs: arcs}
 		list := &list{baseValue: newExpr(n), elem: s}

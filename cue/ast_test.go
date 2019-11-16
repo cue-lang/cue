@@ -370,6 +370,14 @@ b: preference mark not allowed at this position:
 		out: `<0>{` +
 			`def :: (<1>C{Size: int, Type: string, Text: string} & (<2>C{Size: 0, Type: "B"} | <3>C{Size: 1, Type: "A"}))` +
 			`}`,
+	}, {
+		// Issue #172
+		in: `
+		package testenv
+		env_:: [NAME=_]: [VALUE=_]
+		env_:: foo: "bar"
+			`,
+		out: "env_.*: alias not allowed in list:\n    test:3:20\n<0>{}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

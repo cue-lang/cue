@@ -18,6 +18,22 @@ import (
 	"bytes"
 )
 
+type resolver interface {
+	reference(ctx *context) value
+}
+
+var _ resolver = &selectorExpr{}
+var _ resolver = &indexExpr{}
+
+func resolveReference(ctx *context, v value) evaluated {
+	if r, ok := v.(resolver); ok {
+		if st, ok := r.reference(ctx).(*structLit); ok {
+			return st
+		}
+	}
+	return v.evalPartial(ctx)
+}
+
 func eval(idx *index, v value) evaluated {
 	ctx := idx.newContext()
 	return v.evalPartial(ctx)
@@ -74,8 +90,42 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 			// TODO: mention x.x in error message?
 			return ctx.mkErr(x, "undefined field %q", field)
 		}
-		// TODO: do we need to evaluate here?
-		return n.cache.evalPartial(ctx)
+		return n.cache
+	}
+	return e.err(&selectorExpr{x.baseValue, v, x.feature})
+}
+
+func (x *selectorExpr) reference(ctx *context) (result value) {
+	if ctx.trace {
+		defer uni(indent(ctx, "selectorExpr", x))
+		defer func() { ctx.debugPrint("result:", result) }()
+	}
+
+	e := newEval(ctx, true)
+
+	const msgType = "invalid operation: %[5]s (type %[3]s does not support selection)"
+	v := e.eval(x.x, structKind|lambdaKind, msgType, x)
+
+	if e.is(v, structKind|lambdaKind, "") {
+		sc, ok := v.(scope)
+		if !ok {
+			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.kind())
+		}
+		n := sc.lookup(ctx, x.feature)
+		if n.optional {
+			field := ctx.labelStr(x.feature)
+			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
+		}
+		if n.val() == nil {
+			field := ctx.labelStr(x.feature)
+			if st, ok := sc.(*structLit); ok && !st.isClosed() {
+				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
+			}
+			//	m.foo undefined (type map[string]bool has no field or method foo)
+			// TODO: mention x.x in error message?
+			return ctx.mkErr(x, "undefined field %q", field)
+		}
+		return n.v
 	}
 	return e.err(&selectorExpr{x.baseValue, v, x.feature})
 }
@@ -116,6 +166,65 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 			}
 			return n.cache
 		}
+	case atter:
+		if e.is(index, intKind, msgIndexType, k) {
+			i := index.(*numLit).intValue(ctx)
+			if i < 0 {
+				const msg = "invalid %[4]s index %[1]s (index must be non-negative)"
+				return e.mkErr(x.index, index, 0, k, msg)
+			}
+			return v.at(ctx, i)
+		}
+	}
+	return e.err(&indexExpr{x.baseValue, val, index})
+}
+
+func (x *indexExpr) reference(ctx *context) (result value) {
+	if ctx.trace {
+		defer uni(indent(ctx, "indexExpr", x))
+		defer func() { ctx.debugPrint("result:", result) }()
+	}
+
+	e := newEval(ctx, true)
+
+	const msgType = "invalid operation: %[5]s (type %[3]s does not support indexing)"
+	const msgIndexType = "invalid %[5]s index %[1]s (type %[3]s)"
+
+	val := e.eval(x.x, listKind|structKind, msgType, x)
+	k := val.kind()
+	index := e.eval(x.index, stringKind|intKind, msgIndexType, k)
+
+	switch v := val.(type) {
+	case *structLit:
+		if e.is(index, stringKind, msgIndexType, k) {
+			s := index.strValue()
+			// TODO: must lookup
+			n := v.lookup(ctx, ctx.strLabel(s))
+			if n.definition {
+				return ctx.mkErr(x, index,
+					"field %q is a definition", s)
+			}
+			if n.optional {
+				return ctx.mkErr(x, index, codeIncomplete, "field %q is optional", s)
+			}
+			if n.val() == nil {
+				if !v.isClosed() {
+					return ctx.mkErr(x, index, codeIncomplete, "undefined field %q", s)
+				}
+				return ctx.mkErr(x, index, "undefined field %q", s)
+			}
+			return n.v
+		}
+	case *list:
+		if e.is(index, intKind, msgIndexType, k) {
+			i := index.(*numLit).intValue(ctx)
+			if i < 0 {
+				const msg = "invalid %[4]s index %[1]s (index must be non-negative)"
+				return e.mkErr(x.index, index, 0, k, msg)
+			}
+			return v.iterAt(ctx, i).v
+		}
+
 	case atter:
 		if e.is(index, intKind, msgIndexType, k) {
 			i := index.(*numLit).intValue(ctx)
@@ -306,7 +415,7 @@ func (x *yield) evalPartial(ctx *context) evaluated { return x }
 
 func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
 	k := x.key.evalPartial(ctx)
-	v := x.val.evalPartial(ctx)
+	v := x.val
 	if err := firstBottom(k, v); err != nil {
 		return err
 	}
@@ -321,7 +430,7 @@ func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
 
 func (x *closeIfStruct) evalPartial(ctx *context) evaluated {
 	v := x.value.evalPartial(ctx)
-	updateCloseStatus(ctx, v)
+	v = updateCloseStatus(ctx, v)
 	return v
 }
 
@@ -450,8 +559,8 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 			}
 		}
 	} else {
-		left = x.left.evalPartial(ctx)
-		right = x.right.evalPartial(ctx)
+		left = resolveReference(ctx, x.left)
+		right = resolveReference(ctx, x.right)
 
 		if err := cycleError(left); err != nil && ctx.inSum == 0 && right.kind().isAtom() {
 			return ctx.delayConstraint(right, x)

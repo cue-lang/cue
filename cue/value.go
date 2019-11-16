@@ -642,11 +642,24 @@ type structLit struct {
 	optionals   *optionals
 	closeStatus closeMode
 
-	comprehensions []value
+	comprehensions []compValue
 
 	// TODO: consider hoisting the template arc to its own value.
 	arcs     []arc
 	expanded evaluated
+}
+
+// compValue is a temporary stop-gap until the correct unification algorithm is
+// implemented. This implementation is more strict than should be. When two
+// structs, of which at least one is closed, are unified, the fields resolving
+// later from unresolved comprehensions should match the closedness constraints.
+// To relax this constraint, unification could follow the lines of
+// traditional unification with bookkeeping of which fields are
+// allowed, to be applied as constraints after full unification.
+
+type compValue struct {
+	checked bool
+	comp    value
 }
 
 // optionals holds a set of key pattern-constraint pairs, where constraints are
@@ -1045,7 +1058,13 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		// it is safe to cache the result.
 		ctx.cycleErr = false
 
-		updateCloseStatus(ctx, v)
+		v = updateCloseStatus(ctx, v)
+		if st, ok := v.(*structLit); ok {
+			v, err = st.expandFields(ctx)
+			if err != nil {
+				v = err
+			}
+		}
 		x.arcs[i].cache = v
 		if doc != nil {
 			x.arcs[i].docs = &docNode{left: doc, right: x.arcs[i].docs}
@@ -1083,15 +1102,17 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 
 	comprehensions := x.comprehensions
 
-	var incomplete []value
+	var incomplete []compValue
 
 	var n evaluated = &top{x.baseValue}
 	if x.emit != nil {
 		n = x.emit.evalPartial(ctx)
 	}
 
+	var checked evaluated = &top{x.baseValue}
+
 	for _, x := range comprehensions {
-		v := x.evalPartial(ctx)
+		v := x.comp.evalPartial(ctx)
 		if v, ok := v.(*bottom); ok {
 			if isIncomplete(v) {
 				incomplete = append(incomplete, x)
@@ -1100,27 +1121,41 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 
 			return nil, v
 		}
-		src := binSrc(x.Pos(), opUnify, x, v)
-		n = binOp(ctx, src, opUnifyUnchecked, n, v)
+		src := binSrc(x.comp.Pos(), opUnify, x.comp, v)
+		_ = checked
+		if x.checked {
+			checked = binOp(ctx, src, opUnifyUnchecked, checked, v)
+		} else {
+			n = binOp(ctx, src, opUnifyUnchecked, n, v)
+		}
+	}
+	if len(comprehensions) == len(incomplete) {
+		return x, nil
 	}
 
-	src := binSrc(x.Pos(), opUnify, x, n)
 	switch n.(type) {
-	case *bottom:
+	case *bottom, *top:
 	case *structLit:
-		orig := *x
-		orig.comprehensions = incomplete
-		orig.emit = nil
-		n = binOp(ctx, src, opUnify, &orig, n)
+		orig := x.comprehensions
+		x.comprehensions = incomplete
+		src := binSrc(x.Pos(), opUnify, x, n)
+		n = binOp(ctx, src, opUnifyUnchecked, x, n)
+		x.comprehensions = orig
 
 	default:
-		if len(comprehensions) == len(incomplete) {
-			return x, nil
-		}
-		if x.emit != nil {
-			v := x.emit.evalPartial(ctx)
-			n = binOp(ctx, src, opUnifyUnchecked, v, n)
-		}
+		return nil, ctx.mkErr(x, n, "invalid embedding")
+	}
+
+	switch checked.(type) {
+	case *bottom, *top:
+	case *structLit:
+		orig := x.comprehensions
+		x.comprehensions = incomplete
+		src := binSrc(x.Pos(), opUnify, n, checked)
+		n = binOp(ctx, src, opUnify, x, checked)
+		x.comprehensions = orig
+
+	default:
 		return nil, ctx.mkErr(x, n, "invalid embedding")
 	}
 
@@ -1152,7 +1187,7 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 	}
 
 	if x.closeStatus != 0 {
-		updateCloseStatus(ctx, v)
+		v = updateCloseStatus(ctx, v)
 	}
 	return v, doc
 }
@@ -1240,8 +1275,12 @@ func wrapFinalize(ctx *context, v value) value {
 		switch x := v.(type) {
 		case *top:
 			return v
-		case *structLit, *list, *disjunction:
-			updateCloseStatus(ctx, v)
+		case *structLit:
+			v = updateCloseStatus(ctx, x)
+		case *list:
+			v = updateCloseStatus(ctx, x)
+		case *disjunction:
+			v = updateCloseStatus(ctx, x)
 		case *closeIfStruct:
 			return x
 		}
@@ -1250,18 +1289,15 @@ func wrapFinalize(ctx *context, v value) value {
 	return v
 }
 
-func updateCloseStatus(ctx *context, v value) {
+func updateCloseStatus(ctx *context, v evaluated) evaluated {
 	switch x := v.(type) {
 	case *structLit:
-		y, err := x.expandFields(ctx)
-		if err == nil {
-			if x.closeStatus.shouldClose() {
-				x.closeStatus = isClosed
-				y.optionals = y.optionals.close()
-			}
-			x.closeStatus |= shouldFinalize
-			y.closeStatus = x.closeStatus
+		if x.closeStatus.shouldClose() {
+			x.closeStatus = isClosed
+			x.optionals = x.optionals.close()
 		}
+		x.closeStatus |= shouldFinalize
+		return x
 
 	case *disjunction:
 		for _, d := range x.values {
@@ -1274,6 +1310,7 @@ func updateCloseStatus(ctx *context, v value) {
 			wrapFinalize(ctx, x.typ)
 		}
 	}
+	return v
 }
 
 // insertValue is used during initialization but never during evaluation.

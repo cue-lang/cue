@@ -340,7 +340,10 @@ func (p *printer) str(v interface{}) {
 		}
 		p.str(x.arcs)
 		for i, c := range x.comprehensions {
-			p.str(c)
+			if c.checked {
+				p.write("c:")
+			}
+			p.str(c.comp)
 			if i < len(x.comprehensions)-1 {
 				p.write(", ")
 			}

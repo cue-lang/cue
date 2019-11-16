@@ -809,7 +809,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 	}
 
 	for _, v := range x.comprehensions {
-		switch c := v.(type) {
+		switch c := v.comp.(type) {
 		case *fieldComprehension:
 			l := p.expr(c.key)
 			label, _ := l.(ast.Label)

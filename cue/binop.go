@@ -646,12 +646,18 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	// we need to apply the template to all elements.
 
 	sz := len(x.comprehensions) + len(y.comprehensions)
-	obj.comprehensions = make([]value, sz)
+	obj.comprehensions = make([]compValue, sz)
 	for i, c := range x.comprehensions {
-		obj.comprehensions[i] = ctx.copy(c)
+		obj.comprehensions[i] = compValue{
+			checked: c.checked || (!unchecked && y.isClosed()),
+			comp:    ctx.copy(c.comp),
+		}
 	}
 	for i, c := range y.comprehensions {
-		obj.comprehensions[i+len(x.comprehensions)] = ctx.copy(c)
+		obj.comprehensions[i+len(x.comprehensions)] = compValue{
+			checked: c.checked || (!unchecked && x.isClosed()),
+			comp:    ctx.copy(c.comp),
+		}
 	}
 
 	for _, a := range x.arcs {
@@ -666,6 +672,8 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			if a.optional {
 				continue
 			}
+			// TODO: pass position of key, not value. Currently does not have
+			// a position.
 			return ctx.mkErr(a.v, a.v, "field %q not allowed in closed struct",
 				ctx.labelStr(a.feature))
 		}
@@ -709,6 +717,8 @@ outer:
 			if a.optional {
 				continue
 			}
+			// TODO: pass position of key, not value. Currently does not have a
+			// position.
 			return ctx.mkErr(a.v, x, "field %q not allowed in closed struct",
 				ctx.labelStr(a.feature))
 		}

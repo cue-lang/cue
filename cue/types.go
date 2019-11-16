@@ -1349,27 +1349,56 @@ func (v Value) Format(state fmt.State, verb rune) {
 
 // Reference returns the instance and path referred to by this value such that
 // inst.Lookup(path) resolves to the same value, or no path if this value is not
-// a reference,
+// a reference. If a reference contains index selection (foo[bar]), it will
+// only return a reference if the index resolves to a concrete value.
 func (v Value) Reference() (inst *Instance, path []string) {
 	// TODO: don't include references to hidden fields.
 	if v.path == nil {
 		return nil, nil
 	}
-	sel, ok := v.path.v.(*selectorExpr)
-	if !ok {
+	ctx := v.ctx()
+	var x value
+	var feature string
+	switch sel := v.path.v.(type) {
+	case *selectorExpr:
+		x = sel.x
+		feature = ctx.labelStr(sel.feature)
+
+	case *indexExpr:
+		e := sel.index.evalPartial(ctx)
+		s, ok := e.(*stringLit)
+		if !ok {
+			return nil, nil
+		}
+		x = sel.x
+		feature = s.str
+
+	default:
 		return nil, nil
 	}
-	imp, a := mkPath(v.ctx(), v.path, sel, 0)
+	imp, a := mkPath(ctx, v.path, x, feature, 0)
 	return imp, a
 }
 
-func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (imp *Instance, a []string) {
-	switch x := sel.x.(type) {
+func mkPath(c *context, up *valueData, x value, feature string, d int) (imp *Instance, a []string) {
+	switch x := x.(type) {
 	case *selectorExpr:
-		imp, a = mkPath(c, up.parent, x, d+1)
+		imp, a = mkPath(c, up, x.x, c.labelStr(x.feature), d+1)
 		if imp == nil {
 			return nil, nil
 		}
+
+	case *indexExpr:
+		e := x.index.evalPartial(c)
+		s, ok := e.(*stringLit)
+		if !ok {
+			return nil, nil
+		}
+		imp, a = mkPath(c, up, x.x, s.str, d+1)
+		if imp == nil {
+			return nil, nil
+		}
+
 	case *nodeRef:
 		// the parent must exist.
 		for ; up != nil && up.cache != x.node.(value); up = up.parent {
@@ -1379,11 +1408,11 @@ func mkPath(c *context, up *valueData, sel *selectorExpr, d int) (imp *Instance,
 		if v == nil {
 			v = x.node
 		}
-		imp = c.getImportFromNode(x.node)
+		imp = c.getImportFromNode(v)
 	default:
 		return nil, nil
 	}
-	return imp, append(a, c.labelStr(sel.feature))
+	return imp, append(a, feature)
 }
 
 func mkFromRoot(c *context, up *valueData, d int) (root value, a []string) {

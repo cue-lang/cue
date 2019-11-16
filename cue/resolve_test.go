@@ -1484,12 +1484,12 @@ a: {
 		}
 		`,
 		out: `<0>{` +
-			`E :: _|_(int:field "f3" not allowed in closed struct), ` +
-			`A :: <1>C{f1: int, f2: int}, ` +
-			`a: _|_(int:field "f3" not allowed in closed struct), ` +
-			`B :: <2>C{f1: int}, ` +
-			`C :: <3>C{f1: int}, ` +
-			`D :: <4>{f1: int, ...}` +
+			`E :: _|_(<1>.v:field "f3" not allowed in closed struct), ` +
+			`A :: <2>C{f1: int, f2: int}, ` +
+			`a: _|_(<3>.v:field "f3" not allowed in closed struct), ` +
+			`B :: <4>C{f1: int}, ` +
+			`C :: <5>C{f1: int}, ` +
+			`D :: <6>{f1: int, ...}` +
 			`}`,
 	}, {
 		desc: "incomplete comprehensions",
@@ -2603,7 +2603,7 @@ func TestFullEval(t *testing.T) {
 			 }]
 		}
 		`,
-		out: `<0>{<1>{listOfCloseds: [_|_(2:field "b" not allowed in closed struct)]}, Foo: <2>{listOfCloseds: []}, Closed :: <3>C{a: 0}, Junk: <4>{b: 2}}`,
+		out: `<0>{<1>{listOfCloseds: [_|_(<2>.v:field "b" not allowed in closed struct)]}, Foo: <3>{listOfCloseds: []}, Closed :: <4>C{a: 0}, Junk: <5>{b: 2}}`,
 	}, {
 		desc: "label and field aliases",
 		in: `
@@ -2750,6 +2750,37 @@ func TestFullEval(t *testing.T) {
 		foo: Task & {"op": "pull"}
 		`,
 		out: `<0>{Task :: (<1>C{op: "pull", tag: (*"latest" | string), refToTag: <1>.tag, tagExpr: (<1>.tag + "dd"), tagInString: ""+<1>.tag+""} | <2>C{op: "scratch"}), foo: <3>C{op: "pull", tag: "latest", refToTag: "latest", tagExpr: "latestdd", tagInString: "latest"}}`,
+	}, {
+		in: `
+		t: {
+			ok :: *true | bool
+			if ok {
+				x: int
+			}
+		}
+		s: t & {
+			ok :: false
+		}`,
+		out: `<0>{t: <1>{ok :: true, x: int}, s: <2>{ok :: false}}`,
+	}, {
+		// TODO(eval): fix: c should ultimately be allowed the struct. Current
+		// semantics require, however, that generated fields are not available
+		// for evaluation. This, however, does not have to hold, for closedness
+		// checks and allowing this would be more intuitive.
+		// Until that time, ensure that the behavior is at commutative.
+		in: `
+		a :: {
+			if b {
+				c: 4
+			}
+			b: bool
+		}
+		x: (a & { b: true}) & {c: 4 }
+		y: x
+		`,
+		// c should not be allowed, as it would break commutativiy.
+		// See comments above.
+		out: `<0>{a :: <1>C{b: bool if <2>.b yield <3>C{c: 4}}, x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct)}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

@@ -328,7 +328,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v.errf(n, "comprehension must be struct")
 		}
 		yielder.value = v.walk(n.Value)
-		v.object.comprehensions = append(v.object.comprehensions, sc)
+		v.object.comprehensions = append(v.object.comprehensions, compValue{comp: sc})
 
 	case *ast.Field:
 		opt := n.Optional != token.NoPos
@@ -371,7 +371,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				doc:       leftOverDoc,
 				attrs:     attrs,
 			}
-			v.object.comprehensions = append(v.object.comprehensions, fc)
+			v.object.comprehensions = append(v.object.comprehensions, compValue{comp: fc})
 
 		case *ast.ListLit:
 			if len(x.Elts) != 1 {

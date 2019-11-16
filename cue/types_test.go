@@ -1998,21 +1998,41 @@ func TestReference(t *testing.T) {
 		input string
 		want  string
 	}{{
-		input: "v: _|_",
+		input: "v: w: x: _|_",
 		want:  "",
 	}, {
-		input: "v: 2",
+		input: "v: w: x: 2",
 		want:  "",
 	}, {
-		input: "v: a, a: 1",
+		input: "v: w: x: a, a: 1",
 		want:  "a",
 	}, {
-		input: "v: a.b.c, a b c: 1",
+		input: "v: w: x: a.b.c, a: b: c: 1",
 		want:  "a b c",
+	}, {
+		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
+		want:  "v w a b c",
+	}, {
+		input: `v: w: x: w.a.b.c, v: w: a: b: c: 1, D :: 3, opt?: 3, "v\(D)": 3, X: {a: 3}, X`,
+		want:  "v w a b c",
+	}, {
+		input: `v: w: x: w.a[bb]["c"], v: w: a: b: c: 1, bb: "b"`,
+		want:  "v w a b c",
+	}, {
+		input: `v: {
+			for t in src {
+				w: "t\(t)": 1
+				w: "\(t)": w["t\(t)"]
+			}
+		},
+		src: ["x", "y"]`,
+		want: "v w tx",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			v := getInstance(t, tc.input).Lookup("v")
+			var r Runtime
+			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
+			v := inst.Lookup("v", "w", "x")
 			inst, a := v.Reference()
 			if got := strings.Join(a, " "); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)

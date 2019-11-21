@@ -7,7 +7,7 @@ description = ""
 
 -- text.md --
 Bounds define a lower bound, upper bound, or inequality for a certain value.
-They work on numbers, strings, bytes, and and null.
+They work on numbers, strings, bytes and null.
 
 The bound is defined for all values for which the corresponding comparison
 operation is define.

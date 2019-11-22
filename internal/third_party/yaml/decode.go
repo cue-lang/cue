@@ -443,7 +443,11 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		}
 	}
 	if resolved == nil {
-		return d.ident(n, "null")
+		return &ast.BasicLit{
+			ValuePos: d.start(n),
+			Kind:     token.NULL,
+			Value:    "null",
+		}
 	}
 	switch tag {
 	// TODO: use parse literal or parse expression instead.

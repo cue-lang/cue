@@ -448,7 +448,7 @@ string_lit       = simple_string_lit |
                    `#` string_lit `#` .
 
 simple_string_lit    = `"` { unicode_value | interpolation } `"` .
-simple_bytes_lit     = `"` { unicode_value | interpolation | byte_value } `"` .
+simple_bytes_lit     = `'` { unicode_value | interpolation | byte_value } `'` .
 multiline_string_lit = `"""` newline
                              { unicode_value | interpolation | newline }
                              newline `"""` .

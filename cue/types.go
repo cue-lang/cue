@@ -1600,8 +1600,13 @@ func (o *options) updateOptions(opts []Option) {
 // exists.
 func (v Value) Validate(opts ...Option) error {
 	x := validator{}
-	o := options{omitOptional: true}
+	o := options{}
 	o.updateOptions(opts)
+	// Logically, errors are always permitted in logical fields, so we
+	// force-disable them.
+	// TODO: consider whether we should honor the option to allow checking
+	// optional fields.
+	o.omitOptional = true
 	x.walk(v, o)
 	return errors.Sanitize(x.errs)
 }

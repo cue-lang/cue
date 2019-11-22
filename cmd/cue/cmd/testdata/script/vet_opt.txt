@@ -1,0 +1,9 @@
+cue vet -c vet.cue
+cmp stdout expect-stdout
+
+-- expect-stdout --
+-- vet.cue --
+Schema1 :: {
+  a?: int
+}
+instance1: Schema1

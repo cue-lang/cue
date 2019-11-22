@@ -1153,6 +1153,15 @@ func TestValidate(t *testing.T) {
 			a: { if b == "foo" { field: 2 } }
 			`,
 		err: true,
+	}, {
+		desc: "ignore optional in schema",
+		in: `
+		Schema1 :: {
+			a?: int
+		}
+		instance1: Schema1
+		`,
+		opts: []Option{Concrete(true)},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

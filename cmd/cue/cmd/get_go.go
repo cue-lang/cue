@@ -458,9 +458,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		fmt.Fprintln(w, "//cue:generate cue get go", args)
 		fmt.Fprintln(w)
 		if f.Doc != nil {
-			for _, c := range f.Doc.List {
-				fmt.Fprintln(w, c.Text)
-			}
+			writeDoc(w, f.Doc)
 		}
 		fmt.Fprintf(w, "package %s\n", p.Name)
 		fmt.Fprintln(w)

@@ -2,6 +2,7 @@
 
 //cue:generate cue get go cuelang.org/go/cmd/cue/cmd/testdata/code/go/pkg1
 
+// block comment
 package pkg1
 
 import (

@@ -625,14 +625,20 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		return x
 	}
 	arcs := make(arcs, 0, len(x.arcs)+len(y.arcs))
+	var base baseValue
+	if src.computed() != nil {
+		base = baseValue{src.computed()}
+	} else {
+		base = binSrc(src.Pos(), op, x, other)
+	}
 	obj := &structLit{
-		binSrc(src.Pos(), op, x, other), // baseValue
-		x.emit,                          // emit
-		nil,                             // template
-		x.closeStatus | y.closeStatus,   // closeStatus
-		nil,                             // comprehensions
-		arcs,                            // arcs
-		nil,                             // attributes
+		base,                          // baseValue
+		x.emit,                        // emit
+		nil,                           // template
+		x.closeStatus | y.closeStatus, // closeStatus
+		nil,                           // comprehensions
+		arcs,                          // arcs
+		nil,                           // attributes
 	}
 	defer ctx.pushForwards(x, obj, y, obj).popForwards()
 

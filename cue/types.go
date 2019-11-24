@@ -649,7 +649,10 @@ func (v Value) Default() (Value, bool) {
 	if v.path == nil {
 		return v, false
 	}
-	u := v.path.v.evalPartial(v.ctx())
+	u := v.path.cache
+	if u == nil {
+		u = v.path.v.evalPartial(v.ctx())
+	}
 	x := v.ctx().manifest(u)
 	if x != u {
 		return remakeValue(v, x), true
@@ -675,7 +678,11 @@ func (v Value) Kind() Kind {
 	if v.path == nil {
 		return BottomKind
 	}
-	k := v.path.v.evalPartial(v.ctx()).kind()
+	c := v.path.cache
+	if c == nil {
+		c = v.path.v.evalPartial(v.ctx())
+	}
+	k := c.kind()
 	if k.isGround() {
 		switch {
 		case k.isAnyOf(nullKind):

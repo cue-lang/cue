@@ -12,7 +12,7 @@ path-value pairs.
 
 In CUE one defines a set of paths to which to apply
 a concrete value or constraint all at once.
-Because or CUE's order independence, values get merged
+Because of CUE's order independence, values get merged
 
 This example shows some path-value pairs, as well as
 a constraint that is applied to those to validate them.

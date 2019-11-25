@@ -6,7 +6,7 @@ title = "References and Scopes"
 description = ""
 
 -- text.md --
-A reference refers to the value of the field defined within nearest
+A reference refers to the value of the field defined within the nearest
 enclosing scope.
 
 If no field matches the reference within the file, it may match a top-level

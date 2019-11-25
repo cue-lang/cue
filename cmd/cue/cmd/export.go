@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"cuelang.org/go/pkg/encoding/yaml"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -107,6 +108,9 @@ func runExport(cmd *Command, args []string) error {
 		case "text":
 			err := outputText(w, root)
 			exitIfErr(cmd, inst, err, true)
+		case "yaml":
+			err := outputYAML(w, root)
+			exitIfErr(cmd, inst, err, true)
 		default:
 			return fmt.Errorf("export: unknown format %q", media)
 		}
@@ -131,6 +135,15 @@ func outputJSON(cmd *Command, w io.Writer, v cue.Value) error {
 
 func outputText(w io.Writer, v cue.Value) error {
 	str, err := v.String()
+	if err != nil {
+		return err
+	}
+	_, err = fmt.Fprint(w, str)
+	return err
+}
+
+func outputYAML(w io.Writer, v cue.Value) error {
+	str, err := yaml.Marshal(v)
 	if err != nil {
 		return err
 	}

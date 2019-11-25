@@ -42,7 +42,7 @@ const (
 
 var flagMedia = stringFlag{
 	name: "out",
-	text: "output format (json or text)",
+	text: "output format (json, yaml or text)",
 	def:  "json",
 }
 

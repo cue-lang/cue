@@ -30,6 +30,7 @@ foo: bar: {
 	_value: "here"
 	b:      "foo"
 	c:      45
+	f:      ">> here <<" // TODO: remove
 
 	sList: [{b: "foo"}, {}]
 }
@@ -40,7 +41,7 @@ foo: multipath: {
 	t: [string]: {
 		// Combined with the other constraints, we know the value must be 5 and
 		// thus the entry below can be eliminated.
-		x: >=5 & <=8
+		x: >=5 & <=8 & int
 	}
 
 	t: u: {
@@ -85,10 +86,23 @@ foo: [string]: {
 
 foo: bar: {
 	_value: "here"
-	b:      "foo"
-	c:      45
 
-	sList: [{b: "foo"}, {}]
+	a: 4
+	b: "foo"
+	c: 45
+	e: string
+	f: ">> here <<"  // TODO: remove
+
+	// 5 is an integer, so this can be removed.
+	n: int
+
+	struct: {a: 3.0}
+
+	list: ["foo", float]
+
+	sList: [{a: 8, b: "foo"}, {b: "foo"}]
+	rList: [{a: string}]
+	rcList: [{a: "a", c: "foo"}]
 }
 
 foo: baz: {}
@@ -97,10 +111,11 @@ foo: multipath: {
 	t: [string]: {
 		// Combined with the other constraints, we know the value must be 5 and
 		// thus the entry below can be eliminated.
-		x: >=5 & <=8
+		x: >=5 & <=8 & int
 	}
 
 	t: u: {
+		x: 5
 	}
 }
 
@@ -111,7 +126,10 @@ group: {
 	}
 
 	comp: bar: {
+		a:  4
 		aa: 8 // new value
 	}
+
+	comp: baz: {} // removed: fully implied by comprehension above
 }
 -- cue.mod --

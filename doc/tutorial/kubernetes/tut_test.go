@@ -167,7 +167,8 @@ func TestTutorial(t *testing.T) {
 				}
 
 				cuetest.Run(t, wd, cmd, &cuetest.Config{
-					Stdin: strings.NewReader(input),
+					Stdin:  strings.NewReader(input),
+					Stdout: os.Stdout,
 				})
 
 			case strings.HasPrefix(cmd, "sed "):

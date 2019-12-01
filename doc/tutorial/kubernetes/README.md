@@ -109,7 +109,7 @@ To accomplish this, we tell `cue` to put each object in the configuration
 tree at the path with the "kind" as first element and "name" as second.
 
 ```
-$ cue import ./... -p kube -l '"\(strings.ToCamel(kind))" "\(metadata.name)"' -f
+$ cue import ./... -p kube -l '"\(strings.ToCamel(kind))": "\(metadata.name)"' -f
 ```
 
 The added `-l` flag defines the labels for each object, based on values from
@@ -162,8 +162,10 @@ the majority of it was a string containing, hopefully, valid YAML.
 The `-R` option attempts to detect structured YAML or JSON strings embedded
 in the configuration files and then converts these recursively.
 
+<-- TODO: update import label format -->
+
 ```
-$ cue import ./... -p kube -l '"\(strings.ToCamel(kind))" "\(metadata.name)"' -f -R
+$ cue import ./... -p kube -l '"\(strings.ToCamel(kind))": "\(metadata.name)"' -f -R
 ```
 
 Now the file looks like:
@@ -273,18 +275,18 @@ service: [ID=_]: {
 deployment: [ID=_]: {
     apiVersion: "apps/v1"
     kind:       "Deployment"
-    metadata name: ID
+    metadata: name: ID
     spec: {
         // 1 is the default, but we allow any number
         replicas: *1 | int
         template: {
-            metadata labels: {
+            metadata: labels: {
                 app:       ID
                 domain:    "prod"
                 component: string
             }
             // we always have one namesake container
-            spec containers: [{ name: ID }]
+            spec: containers: [{ name: ID }]
         }
     }
 }
@@ -440,7 +442,7 @@ deployment: [ID=_]: _spec & {
     apiVersion: "apps/v1"
     kind:       "Deployment"
     Name ::     ID
-    spec replicas: *1 | int
+    spec: replicas: *1 | int
 }
 
 configMap: [ID=_]: {

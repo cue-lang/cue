@@ -96,7 +96,7 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 	rm := gen.trim("root", root, cue.Value{}, root)
 
 	for _, f := range files {
-		f.Decls = gen.trimDecls(f.Decls, rm, root, false)
+		f.Decls = gen.trimDecls(f.Decls, rm, cue.Value{}, true)
 	}
 	return nil
 }
@@ -267,24 +267,32 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		gen = append(gen, v.Source())
 	}
 
+	// Identify generated components and unify them with the mixin value.
+	exists := false
+	for _, v := range vSplit {
+		if src := v.Source(); t.alwaysGen[src] || inNodes(gen, src) {
+			if !v.IsConcrete() {
+				// The template has an expression that cannot be fully
+				// resolved. Attempt to complete the expression by
+				// evaluting it within the struct to which the template
+				// is applied.
+				expr := v.Syntax()
+				// TODO: this only resolves references contained in scope.
+				v = internal.EvalExpr(scope, expr).(cue.Value)
+			}
+
+			if w := in.Unify(v); w.Err() == nil {
+				in = w
+			}
+			// One of the sources of this struct is generated. That means
+			// we can safely delete a non-generated version.
+			exists = true
+			gen = append(gen, src)
+		}
+	}
+
 	switch v.Kind() {
 	case cue.StructKind:
-		// TODO: merge optional field preprocessing with that of fields.
-
-		// Identify generated components and unify them with the mixin value.
-		exists := false
-		for _, v := range v.Split() {
-			if src := v.Source(); t.alwaysGen[src] {
-				if w := in.Unify(v); w.Err() == nil {
-					in = w
-				}
-				// One of the sources of this struct is generated. That means
-				// we can safely delete a non-generated version.
-				exists = true
-				gen = append(gen, src)
-			}
-		}
-
 		// Build map of mixin fields.
 		valueMap := map[key]cue.Value{}
 		for mIter, _ := in.Fields(cue.All(), cue.Optional(false)); mIter.Next(); {
@@ -392,28 +400,12 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		fallthrough
 
 	default:
-		for _, v := range vSplit {
-			src := v.Source()
-			if t.alwaysGen[src] || inNodes(gen, src) {
-				if v.IsIncomplete() {
-					// The template has an expression that cannot be fully
-					// resolved. Attempt to complete the expression by
-					// evaluting it within the struct to which the template
-					// is applied.
-					expr := v.Syntax()
-					// TODO: this only resolves references contained in scope.
-					v = internal.EvalExpr(scope, expr).(cue.Value)
-				}
-				in = in.Unify(v)
-				gen = append(gen, src)
-			}
-		}
-
 		// Mark any subsumed part that is covered by generated config.
 		if in.Err() == nil && v.Subsumes(in) {
 			for _, v := range vSplit {
 				src := v.Source()
-				if t.canRemove(src) && !inNodes(gen, src) {
+				if t.canRemove(src) && !inNodes(gen, src) &&
+					exists {
 					rmSet = append(rmSet, src)
 				}
 			}

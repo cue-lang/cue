@@ -1475,7 +1475,7 @@ AzureFilePersistentVolumeSource :: {
 	// the namespace of the secret that contains Azure Storage Account Name and Key
 	// default is the same as the Pod
 	// +optional
-	secretNamespace: null | string @go(SecretNamespace,*string) @protobuf(4,bytes,opt)
+	secretNamespace?: null | string @go(SecretNamespace,*string) @protobuf(4,bytes,opt)
 }
 
 // Represents a vSphere volume resource.
@@ -1583,7 +1583,7 @@ ScaleIOVolumeSource :: {
 
 	// SecretRef references to the secret for ScaleIO user and other
 	// sensitive information. If this is not provided, Login operation will fail.
-	secretRef: null | LocalObjectReference @go(SecretRef,*LocalObjectReference) @protobuf(3,bytes,opt)
+	secretRef?: null | LocalObjectReference @go(SecretRef,*LocalObjectReference) @protobuf(3,bytes,opt)
 
 	// Flag to enable/disable SSL communication with Gateway, default false
 	// +optional
@@ -1629,7 +1629,7 @@ ScaleIOPersistentVolumeSource :: {
 
 	// SecretRef references to the secret for ScaleIO user and other
 	// sensitive information. If this is not provided, Login operation will fail.
-	secretRef: null | SecretReference @go(SecretRef,*SecretReference) @protobuf(3,bytes,opt)
+	secretRef?: null | SecretReference @go(SecretRef,*SecretReference) @protobuf(3,bytes,opt)
 
 	// Flag to enable/disable SSL communication with Gateway, default false
 	// +optional
@@ -5472,7 +5472,7 @@ TypedLocalObjectReference :: {
 	// If APIGroup is not specified, the specified Kind must be in the core API group.
 	// For any other third-party types, APIGroup is required.
 	// +optional
-	apiGroup: null | string @go(APIGroup,*string) @protobuf(1,bytes,opt)
+	apiGroup?: null | string @go(APIGroup,*string) @protobuf(1,bytes,opt)
 
 	// Kind is the type of resource being referenced
 	kind: string @go(Kind) @protobuf(2,bytes,opt)

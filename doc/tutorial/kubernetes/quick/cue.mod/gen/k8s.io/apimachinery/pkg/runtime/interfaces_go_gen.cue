@@ -66,7 +66,7 @@ SerializerInfo :: {
 
 	// StreamSerializer, if set, describes the streaming serialization format
 	// for this media type.
-	StreamSerializer: null | StreamSerializerInfo @go(,*StreamSerializerInfo)
+	StreamSerializer?: null | StreamSerializerInfo @go(,*StreamSerializerInfo)
 }
 
 // StreamSerializerInfo contains information about a specific stream serialization format

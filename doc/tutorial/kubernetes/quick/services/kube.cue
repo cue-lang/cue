@@ -23,7 +23,7 @@ service: [ID=_]: {
 }
 
 deployment: [ID=_]: {
-	apiVersion: "extensions/v1beta1"
+	apiVersion: "apps/v1"
 	kind:       "Deployment"
 	metadata: name: ID
 	spec: {
@@ -44,19 +44,19 @@ deployment: [ID=_]: {
 Component :: string
 
 daemonSet: [ID=_]: _spec & {
-	apiVersion: "extensions/v1beta1"
+	apiVersion: "apps/v1"
 	kind:       "DaemonSet"
 	Name ::     ID
 }
 
 statefulSet: [ID=_]: _spec & {
-	apiVersion: "apps/v1beta1"
+	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
 	Name ::     ID
 }
 
 deployment: [ID=_]: _spec & {
-	apiVersion: "extensions/v1beta1"
+	apiVersion: "apps/v1"
 	kind:       "Deployment"
 	Name ::     ID
 	spec: replicas: *1 | int

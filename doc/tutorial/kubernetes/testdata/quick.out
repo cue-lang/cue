@@ -109,7 +109,7 @@ deployment: {
     bartender: {
         kind:       "Deployment"
         Name ::     "bartender"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "bartender"
             labels: {
@@ -211,7 +211,7 @@ deployment: {
     breaddispatcher: {
         kind:       "Deployment"
         Name ::     "breaddispatcher"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "breaddispatcher"
             labels: {
@@ -313,7 +313,7 @@ deployment: {
     host: {
         kind:       "Deployment"
         Name ::     "host"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "host"
             labels: {
@@ -415,7 +415,7 @@ deployment: {
     maitred: {
         kind:       "Deployment"
         Name ::     "maitred"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "maitred"
             labels: {
@@ -517,7 +517,7 @@ deployment: {
     valeter: {
         kind:       "Deployment"
         Name ::     "valeter"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "valeter"
             labels: {
@@ -619,7 +619,7 @@ deployment: {
     waiter: {
         kind:       "Deployment"
         Name ::     "waiter"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "waiter"
             labels: {
@@ -720,7 +720,7 @@ deployment: {
     waterdispatcher: {
         kind:       "Deployment"
         Name ::     "waterdispatcher"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "waterdispatcher"
             labels: {
@@ -861,7 +861,7 @@ deployment: {
     download: {
         kind:       "Deployment"
         Name ::     "download"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "download"
             labels: {
@@ -968,7 +968,7 @@ statefulSet: {
     etcd: {
         kind:       "StatefulSet"
         Name ::     "etcd"
-        apiVersion: "apps/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "etcd"
             labels: {
@@ -1053,8 +1053,7 @@ statefulSet: {
                     }
                 }
             }
-            replicas:    3
-            serviceName: "etcd"
+            replicas: 3
             volumeClaimTemplates: [{
                 metadata: {
                     name: "etcd3"
@@ -1071,6 +1070,7 @@ statefulSet: {
                     accessModes: ["ReadWriteOnce"]
                 }
             }]
+            serviceName: "etcd"
         }
     }
 }
@@ -1136,7 +1136,7 @@ deployment: {
     events: {
         kind:       "Deployment"
         Name ::     "events"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "events"
             labels: {
@@ -1267,7 +1267,7 @@ deployment: {
     tasks: {
         kind:       "Deployment"
         Name ::     "tasks"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "tasks"
             labels: {
@@ -1381,7 +1381,7 @@ deployment: {
     updater: {
         kind:       "Deployment"
         Name ::     "updater"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "updater"
             labels: {
@@ -1491,7 +1491,7 @@ deployment: {
     watcher: {
         kind:       "Deployment"
         Name ::     "watcher"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "watcher"
             labels: {
@@ -1640,7 +1640,7 @@ deployment: {
     caller: {
         kind:       "Deployment"
         Name ::     "caller"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "caller"
             labels: {
@@ -1779,7 +1779,7 @@ deployment: {
     dishwasher: {
         kind:       "Deployment"
         Name ::     "dishwasher"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "dishwasher"
             labels: {
@@ -1918,7 +1918,7 @@ deployment: {
     expiditer: {
         kind:       "Deployment"
         Name ::     "expiditer"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "expiditer"
             labels: {
@@ -2048,7 +2048,7 @@ deployment: {
     headchef: {
         kind:       "Deployment"
         Name ::     "headchef"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "headchef"
             labels: {
@@ -2178,7 +2178,7 @@ deployment: {
     linecook: {
         kind:       "Deployment"
         Name ::     "linecook"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "linecook"
             labels: {
@@ -2308,7 +2308,7 @@ deployment: {
     pastrychef: {
         kind:       "Deployment"
         Name ::     "pastrychef"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "pastrychef"
             labels: {
@@ -2438,7 +2438,7 @@ deployment: {
     souschef: {
         kind:       "Deployment"
         Name ::     "souschef"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "souschef"
             labels: {
@@ -2620,7 +2620,7 @@ deployment: {
     alertmanager: {
         kind:       "Deployment"
         Name ::     "alertmanager"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "alertmanager"
             labels: {
@@ -2742,7 +2742,7 @@ deployment: {
     grafana: {
         kind:       "Deployment"
         Name ::     "grafana"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "grafana"
             labels: {
@@ -2878,7 +2878,7 @@ daemonSet: {
     "node-exporter": {
         kind:       "DaemonSet"
         Name ::     "node-exporter"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "node-exporter"
             labels: {
@@ -3254,7 +3254,7 @@ deployment: {
     prometheus: {
         kind:       "Deployment"
         Name ::     "prometheus"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "prometheus"
             labels: {
@@ -3483,7 +3483,7 @@ deployment: {
     authproxy: {
         kind:       "Deployment"
         Name ::     "authproxy"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "authproxy"
             labels: {
@@ -3593,7 +3593,7 @@ deployment: {
     goget: {
         kind:       "Deployment"
         Name ::     "goget"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "goget"
             labels: {
@@ -3873,7 +3873,7 @@ deployment: {
     nginx: {
         kind:       "Deployment"
         Name ::     "nginx"
-        apiVersion: "extensions/v1beta1"
+        apiVersion: "apps/v1"
         metadata: {
             name: "nginx"
             labels: {

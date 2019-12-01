@@ -271,7 +271,7 @@ service: [ID=_]: {
 }
 
 deployment: [ID=_]: {
-    apiVersion: "extensions/v1beta1"
+    apiVersion: "apps/v1"
     kind:       "Deployment"
     metadata name: ID
     spec: {
@@ -425,19 +425,19 @@ We generalize the top-level template as follows:
 $ cat <<EOF >> kube.cue
 
 daemonSet: [ID=_]: _spec & {
-    apiVersion: "extensions/v1beta1"
+    apiVersion: "apps/v1"
     kind:       "DaemonSet"
     Name ::     ID
 }
 
 statefulSet: [ID=_]: _spec & {
-    apiVersion: "apps/v1beta1"
+    apiVersion: "apps/v1"
     kind:       "StatefulSet"
     Name ::     ID
 }
 
 deployment: [ID=_]: _spec & {
-    apiVersion: "extensions/v1beta1"
+    apiVersion: "apps/v1"
     kind:       "Deployment"
     Name ::     ID
     spec replicas: *1 | int
@@ -1036,13 +1036,13 @@ service "maitred" created (dry run)
 service "valeter" created (dry run)
 service "waiter" created (dry run)
 service "waterdispatcher" created (dry run)
-deployment.extensions "bartender" created (dry run)
-deployment.extensions "breaddispatcher" created (dry run)
-deployment.extensions "host" created (dry run)
-deployment.extensions "maitred" created (dry run)
-deployment.extensions "valeter" created (dry run)
-deployment.extensions "waiter" created (dry run)
-deployment.extensions "waterdispatcher" created (dry run)
+deployment.apps "bartender" created (dry run)
+deployment.apps "breaddispatcher" created (dry run)
+deployment.apps "host" created (dry run)
+deployment.apps "maitred" created (dry run)
+deployment.apps "valeter" created (dry run)
+deployment.apps "waiter" created (dry run)
+deployment.apps "waterdispatcher" created (dry run)
 ```
 
 A production real-life version of this could should omit the `--dry-run` flag
@@ -1054,14 +1054,11 @@ In order for `cue get go` to generate the CUE templates from Go sources, you fir
 
 ```
 $ go get k8s.io/api/apps/v1
-$ go get k8s.io/api/extensions/v1beta1
-$ go get k8s.io/api/apps/v1beta1
 ```
 
 ```
 $ cue get go k8s.io/api/core/v1
-$ cue get go k8s.io/api/extensions/v1beta1
-$ cue get go k8s.io/api/apps/v1beta1
+$ cue get go k8s.io/api/apps/v1
 
 ```
 
@@ -1073,14 +1070,13 @@ package kube
 
 import (
   "k8s.io/api/core/v1"
-  extensions_v1beta1 "k8s.io/api/extensions/v1beta1"
-  apps_v1beta1 "k8s.io/api/apps/v1beta1"
+  apps_v1 "k8s.io/api/apps/v1"
 )
 
 service: [string]:     v1.Service
-deployment: [string]:  extensions_v1beta1.Deployment
-daemonSet: [string]:   extensions_v1beta1.DaemonSet
-statefulSet: [string]: apps_v1beta1.StatefulSet
+deployment: [string]:  apps_v1.Deployment
+daemonSet: [string]:   apps_v1.DaemonSet
+statefulSet: [string]: apps_v1.StatefulSet
 EOF
 ```
 

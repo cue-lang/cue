@@ -13,10 +13,10 @@ import (
 Barzer :: {
 	a:     int @go(A) @protobuf(2,varint,)
 	T:     t.Time
-	B:     null | int    @go(,*big.Int)
+	B?:    null | int    @go(,*big.Int)
 	C:     int           @go(,big.Int)
 	F:     string        @go(,big.Float) @xml(,attr)
-	G:     null | string @go(,*big.Float)
+	G?:    null | string @go(,*big.Float)
 	S:     string
 	"x-y": bool @go(XY)
 	Err:   _    @go(,error)

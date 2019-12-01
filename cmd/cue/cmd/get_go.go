@@ -1037,6 +1037,9 @@ func (e *extractor) printFields(x *types.Struct) {
 		if e.isOptional(tag) {
 			kind = cuetoken.OPTION
 		}
+		if _, ok := f.Type().(*types.Pointer); ok {
+			kind = cuetoken.OPTION
+		}
 		cueType := e.printField(name, kind, f.Type(), docs[i], count > 0)
 
 		// Add field tag to convert back to Go.

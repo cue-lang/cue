@@ -16,12 +16,12 @@ Foozer :: {
 	String: string
 
 	Inline
-	NoInline:   NoInline
-	CustomJSON: CustomJSON
-	CustomYAML: null | CustomYAML @go(,*CustomYAML)
-	AnyJSON:    _                 @go(,json.Marshaler)
-	AnyText:    string            @go(,encoding.TextMarshaler)
-	bar?:       int               @go(Bar)
+	NoInline:    NoInline
+	CustomJSON:  CustomJSON
+	CustomYAML?: null | CustomYAML @go(,*CustomYAML)
+	AnyJSON:     _                 @go(,json.Marshaler)
+	AnyText:     string            @go(,encoding.TextMarshaler)
+	bar?:        int               @go(Bar)
 
 	// Time is mapped to CUE's internal type.
 	Time:   time.Time
@@ -29,12 +29,12 @@ Foozer :: {
 	Map: {[string]: null | CustomJSON} @go(,map[string]*CustomJSON)
 	Slice1: [...int] @go(,[]int)
 	Slice2: [...] @go(,[]interface{})
-	Slice3: null | [...] @go(,*[]json.Unmarshaler)
-	Array1: 5 * [int]    @go(,[5]int)
-	Array2: 5 * [_]      @go(,[5]interface{})
-	Array3: null | 5*[_] @go(,*[5]json.Marshaler)
-	Intf:   Interface    @protobuf(2,varint,name=intf)
-	Intf2:  _            @go(,interface{})
+	Slice3?: null | [...] @go(,*[]json.Unmarshaler)
+	Array1:  5 * [int]    @go(,[5]int)
+	Array2:  5 * [_]      @go(,[5]interface{})
+	Array3?: null | 5*[_] @go(,*[5]json.Marshaler)
+	Intf:    Interface    @protobuf(2,varint,name=intf)
+	Intf2:   _            @go(,interface{})
 	Intf3: {
 		Interface: Interface
 	} @go(,struct{Interface})

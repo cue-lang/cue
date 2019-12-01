@@ -455,6 +455,7 @@ DeleteOptions :: {
 
 	// Must be fulfilled before a deletion is carried out. If not possible, a 409 Conflict status will be
 	// returned.
+	// +k8s:conversion-gen=false
 	// +optional
 	preconditions?: null | Preconditions @go(Preconditions,*Preconditions) @protobuf(2,bytes,opt)
 

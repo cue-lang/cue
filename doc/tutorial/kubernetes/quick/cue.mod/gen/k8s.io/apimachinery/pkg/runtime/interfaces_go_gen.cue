@@ -86,6 +86,11 @@ StreamSerializerInfo :: {
 // that performs HTTP content negotiation to accept multiple formats.
 NegotiatedSerializer :: _
 
+// ClientNegotiator handles turning an HTTP content type into the appropriate encoder.
+// Use NewClientNegotiator or NewVersionedClientNegotiator to create this interface from
+// a NegotiatedSerializer.
+ClientNegotiator :: _
+
 // StorageSerializer is an interface used for obtaining encoders, decoders, and serializers
 // that can read and write data at rest. This would commonly be used by client tools that must
 // read files, or server side storage interfaces that persist restful objects.

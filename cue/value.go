@@ -984,7 +984,18 @@ func (x *structLit) lookup(ctx *context, f label) arc {
 	// noderef will have ensured that the ancestors were evaluated.
 	for i, a := range x.arcs {
 		if a.feature == f {
-			a.cache = x.at(ctx, i)
+			a := x.iterAt(ctx, i)
+			// TODO: adding more technical debt here. The evaluator should be
+			// rewritten.
+			if x.optionals != nil {
+				name := ctx.labelStr(x.arcs[i].feature)
+				arg := &stringLit{x.baseValue, name, nil}
+
+				val, _ := x.optionals.constraint(ctx, arg)
+				if val != nil {
+					a.v = mkBin(ctx, x.Pos(), opUnify, a.v, val)
+				}
+			}
 			return a
 		}
 	}
@@ -1014,13 +1025,8 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 	//
 	// Allow import of CUE files. These cannot have a package clause.
 
-	x, err := x.expandFields(ctx)
-	if err != nil {
-		return err
-	}
-	// if x.emit != nil && isBottom(x.emit) {
-	// 	return x.emit.(evaluated)
-	// }
+	var err *bottom
+
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.

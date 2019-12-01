@@ -2763,6 +2763,7 @@ func TestFullEval(t *testing.T) {
 		}`,
 		out: `<0>{t: <1>{ok :: true, x: int}, s: <2>{ok :: false}}`,
 	}, {
+		desc: "cross-dependent comprehension",
 		// TODO(eval): fix: c should ultimately be allowed the struct. Current
 		// semantics require, however, that generated fields are not available
 		// for evaluation. This, however, does not have to hold, for closedness
@@ -2781,6 +2782,21 @@ func TestFullEval(t *testing.T) {
 		// c should not be allowed, as it would break commutativiy.
 		// See comments above.
 		out: `<0>{a :: <1>C{b: bool if <2>.b yield <3>C{c: 4}}, x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct)}`,
+	}, {
+		desc: "optional expanded before lookup",
+		in: `
+		test: [ID=_]: {
+			name: ID
+		}
+
+		test: A: {
+			field1: "1"
+			field2: "2"
+		}
+
+		B: test.A & {}
+		`,
+		out: `<0>{test: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, A: <4>{name: "A", field1: "1", field2: "2"}}, B: <5>{name: "A", field1: "1", field2: "2"}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

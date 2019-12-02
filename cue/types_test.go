@@ -17,6 +17,7 @@ package cue
 import (
 	"bytes"
 	"fmt"
+	"go/parser"
 	"io/ioutil"
 	"math"
 	"math/big"
@@ -684,6 +685,69 @@ func TestAllFields(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.res)
 			}
 		})
+	}
+}
+
+func TestLookup(t *testing.T) {
+	_ = parser.ParseFile
+	var runtime = new(Runtime)
+	inst, err := runtime.Compile("x.cue", `
+V :: {
+	x: int
+}
+X :: {
+	<_>: int64
+} & V
+v: X
+`)
+	if err != nil {
+		t.Fatalf("compile: %v", err)
+	}
+	// expr, err := parser.ParseExpr("lookup.cue", `v`, parser.DeclarationErrors, parser.AllErrors)
+	// if err != nil {
+	// 	log.Fatalf("parseExpr: %v", err)
+	// }
+	// v := inst.Eval(expr)
+	testCases := []struct {
+		ref  []string
+		raw  string
+		eval string
+	}{{
+		ref:  []string{"v", "x"},
+		raw:  "(int & <=9223372036854775807 & int & >=-9223372036854775808)",
+		eval: "int64",
+	}}
+	for _, tc := range testCases {
+		v := inst.Lookup(tc.ref...)
+
+		if got := fmt.Sprint(v); got != tc.raw {
+			t.Errorf("got %v; want %v", got, tc.raw)
+		}
+
+		if got := fmt.Sprint(v.Eval().Syntax()); got != tc.eval {
+			t.Errorf("got %v; want %v", got, tc.eval)
+		}
+
+		v = inst.Lookup()
+		for _, ref := range tc.ref {
+			s, err := v.Struct()
+			if err != nil {
+				t.Fatal(err)
+			}
+			fi, err := s.FieldByName(ref)
+			if err != nil {
+				t.Fatal(err)
+			}
+			v = fi.Value
+		}
+
+		if got := fmt.Sprint(v); got != tc.raw {
+			t.Errorf("got %v; want %v", got, tc.raw)
+		}
+
+		if got := fmt.Sprint(v.Eval().Syntax()); got != tc.eval {
+			t.Errorf("got %v; want %v", got, tc.eval)
+		}
 	}
 }
 
@@ -1745,7 +1809,7 @@ func docStr(docs []*ast.CommentGroup) string {
 	return doc
 }
 
-func TestMashalJSON(t *testing.T) {
+func TestMarshalJSON(t *testing.T) {
 	testCases := []struct {
 		value string
 		json  string

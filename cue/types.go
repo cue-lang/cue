@@ -135,21 +135,20 @@ var kindStrs = map[Kind]string{
 type structValue struct {
 	ctx  *context
 	path *valueData
-	obj  *structLit
-	arcs arcs
+	n    *structLit
 }
 
 // Len reports the number of fields in this struct.
 func (o *structValue) Len() int {
-	if o.obj == nil {
+	if o.n == nil {
 		return 0
 	}
-	return len(o.arcs)
+	return len(o.n.arcs)
 }
 
 // At reports the key and value of the ith field, i < o.Len().
 func (o *structValue) At(i int) (key string, v Value) {
-	a := o.arcs[i]
+	a := o.n.arcs[i]
 	v = newChildValue(o, i)
 	return o.ctx.labelStr(a.feature), v
 }
@@ -161,17 +160,19 @@ func (o *structValue) Lookup(key string) Value {
 	i := 0
 	len := o.Len()
 	for ; i < len; i++ {
-		if o.arcs[i].feature == f {
+		if o.n.arcs[i].feature == f {
 			break
 		}
 	}
 	if i == len {
 		// TODO: better message.
 		ctx := o.ctx
-		x := ctx.mkErr(o.obj, codeNotExist, "value %q not found", key)
+		x := ctx.mkErr(o.n, codeNotExist, "value %q not found", key)
 		v := x.evalPartial(ctx)
 		return Value{ctx.index, &valueData{o.path, 0, arc{cache: v, v: x}}}
 	}
+	// v, _ := o.n.lookup(o.ctx, f)
+	// v = o.ctx.manifest(v)
 	return newChildValue(o, i)
 }
 
@@ -605,26 +606,8 @@ func newValueRoot(ctx *context, x value) Value {
 }
 
 func newChildValue(obj *structValue, i int) Value {
-	a := obj.arcs[i]
-	for j, b := range obj.obj.arcs {
-		if b.feature == a.feature {
-			a = obj.obj.iterAt(obj.ctx, j)
-			// TODO: adding more technical debt here. The evaluator should be
-			// rewritten.
-			x := obj.obj
-			ctx := obj.ctx
-			if x.optionals != nil {
-				name := ctx.labelStr(x.arcs[i].feature)
-				arg := &stringLit{x.baseValue, name, nil}
-
-				val, _ := x.optionals.constraint(ctx, arg)
-				if val != nil {
-					a.v = mkBin(ctx, x.Pos(), opUnify, a.v, val)
-				}
-			}
-			break
-		}
-	}
+	a := obj.n.arcs[i]
+	a.cache = obj.n.at(obj.ctx, i)
 
 	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
 }
@@ -657,8 +640,7 @@ func (v Value) Eval() Value {
 	if v.path == nil {
 		return v
 	}
-	fmt.Println(v)
-	return remakeValue(v, v.path.v)
+	return remakeValue(v, v.path.v.evalPartial(v.ctx()))
 }
 
 // Default reports the default value and whether it existed. It returns the
@@ -1166,9 +1148,17 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 			k++
 		}
 		arcs = arcs[:k]
-		return structValue{ctx, v.path, obj, arcs}, nil
+		obj = &structLit{
+			obj.baseValue,   // baseValue
+			obj.emit,        // emit
+			obj.optionals,   // template
+			obj.closeStatus, // closeStatus
+			nil,             // comprehensions
+			arcs,            // arcs
+			nil,             // attributes
+		}
 	}
-	return structValue{ctx, v.path, obj, obj.arcs}, nil
+	return structValue{ctx, v.path, obj}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
@@ -1216,19 +1206,6 @@ func (s *Struct) Field(i int) FieldInfo {
 	a := s.s.arcs[i]
 	a.cache = s.s.at(ctx, i)
 
-	// TODO: adding more technical debt here. The evaluator should be
-	// rewritten.
-	x := s.s
-	if x.optionals != nil {
-		name := ctx.labelStr(x.arcs[i].feature)
-		arg := &stringLit{x.baseValue, name, nil}
-
-		val, _ := x.optionals.constraint(ctx, arg)
-		if val != nil {
-			a.v = mkBin(ctx, x.Pos(), opUnify, a.v, val)
-		}
-	}
-
 	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
 	str := ctx.labelStr(a.feature)
 	return FieldInfo{str, i, v, a.definition, a.optional, a.feature&hidden != 0}
@@ -1260,16 +1237,7 @@ func (v Value) Fields(opts ...Option) (Iterator, error) {
 	if err != nil {
 		return Iterator{ctx: ctx}, v.toErr(err)
 	}
-	n := &structLit{
-		obj.obj.baseValue,   // baseValue
-		obj.obj.emit,        // emit
-		obj.obj.optionals,   // template
-		obj.obj.closeStatus, // closeStatus
-		nil,                 // comprehensions
-		obj.arcs,            // arcs
-		nil,                 // attributes
-	}
-	return Iterator{ctx: ctx, val: v, iter: n, len: len(n.arcs)}, nil
+	return Iterator{ctx: ctx, val: v, iter: obj.n, len: len(obj.n.arcs)}, nil
 }
 
 // Lookup reports the value at a path starting from v.
@@ -1697,7 +1665,7 @@ func (x *validator) walk(v Value, opts options) {
 		for i := 0; i < obj.Len(); i++ {
 			_, v := obj.At(i)
 			opts := opts
-			if obj.arcs[i].definition {
+			if obj.n.arcs[i].definition {
 				opts.concrete = false
 			}
 			x.walk(v, opts)

@@ -163,10 +163,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := md5.Sum(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := md5.Sum(data)
+						return a[:]
+					}()
+				}
 			},
 		}},
 	},
@@ -183,10 +185,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha1.Sum(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha1.Sum(data)
+						return a[:]
+					}()
+				}
 			},
 		}},
 	},
@@ -206,10 +210,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha256.Sum256(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha256.Sum256(data)
+						return a[:]
+					}()
+				}
 			},
 		}, {
 			Name:   "Sum224",
@@ -217,10 +223,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha256.Sum224(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha256.Sum224(data)
+						return a[:]
+					}()
+				}
 			},
 		}},
 	},
@@ -246,10 +254,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha512.Sum512(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha512.Sum512(data)
+						return a[:]
+					}()
+				}
 			},
 		}, {
 			Name:   "Sum384",
@@ -257,10 +267,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha512.Sum384(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha512.Sum384(data)
+						return a[:]
+					}()
+				}
 			},
 		}, {
 			Name:   "Sum512_224",
@@ -268,10 +280,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha512.Sum512_224(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha512.Sum512_224(data)
+						return a[:]
+					}()
+				}
 			},
 		}, {
 			Name:   "Sum512_256",
@@ -279,10 +293,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					a := sha512.Sum512_256(data)
-					return a[:]
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						a := sha512.Sum512_256(data)
+						return a[:]
+					}()
+				}
 			},
 		}},
 	},
@@ -293,12 +309,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				encoding, n := c.value(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if err := encoding.Null(); err != nil {
-						return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
-					}
-					return base64.StdEncoding.EncodedLen(n), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if err := encoding.Null(); err != nil {
+							return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
+						}
+						return base64.StdEncoding.EncodedLen(n), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "DecodedLen",
@@ -306,12 +324,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				encoding, x := c.value(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if err := encoding.Null(); err != nil {
-						return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
-					}
-					return base64.StdEncoding.DecodedLen(x), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if err := encoding.Null(); err != nil {
+							return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
+						}
+						return base64.StdEncoding.DecodedLen(x), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Encode",
@@ -319,12 +339,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				encoding, src := c.value(0), c.bytes(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if err := encoding.Null(); err != nil {
-						return "", fmt.Errorf("base64: unsupported encoding: %v", err)
-					}
-					return base64.StdEncoding.EncodeToString(src), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if err := encoding.Null(); err != nil {
+							return "", fmt.Errorf("base64: unsupported encoding: %v", err)
+						}
+						return base64.StdEncoding.EncodeToString(src), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Decode",
@@ -332,12 +354,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				encoding, s := c.value(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if err := encoding.Null(); err != nil {
-						return nil, fmt.Errorf("base64: unsupported encoding: %v", err)
-					}
-					return base64.StdEncoding.DecodeString(s)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if err := encoding.Null(); err != nil {
+							return nil, fmt.Errorf("base64: unsupported encoding: %v", err)
+						}
+						return base64.StdEncoding.DecodeString(s)
+					}()
+				}
 			},
 		}},
 	},
@@ -348,36 +372,38 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				x := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					buf := &bytes.Buffer{}
-					w := csv.NewWriter(buf)
-					iter, err := x.List()
-					if err != nil {
-						return "", err
-					}
-					for iter.Next() {
-						row, err := iter.Value().List()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						buf := &bytes.Buffer{}
+						w := csv.NewWriter(buf)
+						iter, err := x.List()
 						if err != nil {
 							return "", err
 						}
-						a := []string{}
-						for row.Next() {
-							col := row.Value()
-							if str, err := col.String(); err == nil {
-								a = append(a, str)
-							} else {
-								b, err := col.MarshalJSON()
-								if err != nil {
-									return "", err
-								}
-								a = append(a, string(b))
+						for iter.Next() {
+							row, err := iter.Value().List()
+							if err != nil {
+								return "", err
 							}
+							a := []string{}
+							for row.Next() {
+								col := row.Value()
+								if str, err := col.String(); err == nil {
+									a = append(a, str)
+								} else {
+									b, err := col.MarshalJSON()
+									if err != nil {
+										return "", err
+									}
+									a = append(a, string(b))
+								}
+							}
+							_ = w.Write(a)
 						}
-						_ = w.Write(a)
-					}
-					w.Flush()
-					return buf.String(), nil
-				}()
+						w.Flush()
+						return buf.String(), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Decode",
@@ -385,9 +411,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				r := c.reader(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return csv.NewReader(r).ReadAll()
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return csv.NewReader(r).ReadAll()
+					}()
+				}
 			},
 		}},
 	},
@@ -398,9 +426,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				n := c.int(0)
-				c.ret = func() interface{} {
-					return hex.EncodedLen(n)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return hex.EncodedLen(n)
+					}()
+				}
 			},
 		}, {
 			Name:   "DecodedLen",
@@ -408,9 +438,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x := c.int(0)
-				c.ret = func() interface{} {
-					return hex.DecodedLen(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return hex.DecodedLen(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Decode",
@@ -418,9 +450,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return hex.DecodeString(s)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return hex.DecodeString(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "Dump",
@@ -428,9 +462,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					return hex.Dump(data)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return hex.Dump(data)
+					}()
+				}
 			},
 		}, {
 			Name:   "Encode",
@@ -438,9 +474,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				src := c.bytes(0)
-				c.ret = func() interface{} {
-					return hex.EncodeToString(src)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return hex.EncodeToString(src)
+					}()
+				}
 			},
 		}},
 	},
@@ -451,9 +489,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret = func() interface{} {
-					return json.Valid(data)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return json.Valid(data)
+					}()
+				}
 			},
 		}, {
 			Name:   "Compact",
@@ -461,13 +501,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				src := c.bytes(0)
-				c.ret, c.err = func() (interface{}, error) {
-					dst := bytes.Buffer{}
-					if err := json.Compact(&dst, src); err != nil {
-						return "", err
-					}
-					return dst.String(), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						dst := bytes.Buffer{}
+						if err := json.Compact(&dst, src); err != nil {
+							return "", err
+						}
+						return dst.String(), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Indent",
@@ -475,13 +517,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				src, prefix, indent := c.bytes(0), c.string(1), c.string(2)
-				c.ret, c.err = func() (interface{}, error) {
-					dst := bytes.Buffer{}
-					if err := json.Indent(&dst, src, prefix, indent); err != nil {
-						return "", err
-					}
-					return dst.String(), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						dst := bytes.Buffer{}
+						if err := json.Indent(&dst, src, prefix, indent); err != nil {
+							return "", err
+						}
+						return dst.String(), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "HTMLEscape",
@@ -489,11 +533,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				src := c.bytes(0)
-				c.ret = func() interface{} {
-					dst := &bytes.Buffer{}
-					json.HTMLEscape(dst, src)
-					return dst.String()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						dst := &bytes.Buffer{}
+						json.HTMLEscape(dst, src)
+						return dst.String()
+					}()
+				}
 			},
 		}, {
 			Name:   "Marshal",
@@ -501,10 +547,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				v := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					b, err := json.Marshal(v)
-					return string(b), err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						b, err := json.Marshal(v)
+						return string(b), err
+					}()
+				}
 			},
 		}, {
 			Name:   "MarshalStream",
@@ -512,23 +560,25 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				v := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
 
-					iter, err := v.List()
-					if err != nil {
-						return "", err
-					}
-					buf := &bytes.Buffer{}
-					for iter.Next() {
-						b, err := json.Marshal(iter.Value())
+						iter, err := v.List()
 						if err != nil {
 							return "", err
 						}
-						buf.Write(b)
-						buf.WriteByte('\n')
-					}
-					return buf.String(), nil
-				}()
+						buf := &bytes.Buffer{}
+						for iter.Next() {
+							b, err := json.Marshal(iter.Value())
+							if err != nil {
+								return "", err
+							}
+							buf.Write(b)
+							buf.WriteByte('\n')
+						}
+						return buf.String(), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Unmarshal",
@@ -536,17 +586,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: topKind,
 			Func: func(c *callCtxt) {
 				b := c.bytes(0)
-				c.ret, c.err = func() (interface{}, error) {
-					if !json.Valid(b) {
-						return nil, fmt.Errorf("json: invalid JSON")
-					}
-					expr, err := parser.ParseExpr("json", b)
-					if err != nil {
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if !json.Valid(b) {
+							return nil, fmt.Errorf("json: invalid JSON")
+						}
+						expr, err := parser.ParseExpr("json", b)
+						if err != nil {
 
-						return nil, fmt.Errorf("json: could not parse JSON: %v", err)
-					}
-					return expr, nil
-				}()
+							return nil, fmt.Errorf("json: could not parse JSON: %v", err)
+						}
+						return expr, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Validate",
@@ -554,22 +606,24 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				b, v := c.bytes(0), c.value(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if !json.Valid(b) {
-						return false, fmt.Errorf("json: invalid JSON")
-					}
-					r := internal.GetRuntime(v).(*Runtime)
-					inst, err := r.Compile("json.Validate", b)
-					if err != nil {
-						return false, err
-					}
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if !json.Valid(b) {
+							return false, fmt.Errorf("json: invalid JSON")
+						}
+						r := internal.GetRuntime(v).(*Runtime)
+						inst, err := r.Compile("json.Validate", b)
+						if err != nil {
+							return false, err
+						}
 
-					v = v.Unify(inst.Value())
-					if v.Err() != nil {
-						return false, v.Err()
-					}
-					return true, nil
-				}()
+						v = v.Unify(inst.Value())
+						if v.Err() != nil {
+							return false, v.Err()
+						}
+						return true, nil
+					}()
+				}
 			},
 		}},
 	},
@@ -580,10 +634,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				v := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					b, err := goyaml.Marshal(v)
-					return string(b), err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						b, err := goyaml.Marshal(v)
+						return string(b), err
+					}()
+				}
 			},
 		}, {
 			Name:   "MarshalStream",
@@ -591,25 +647,27 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				v := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
 
-					iter, err := v.List()
-					if err != nil {
-						return "", err
-					}
-					buf := &bytes.Buffer{}
-					for i := 0; iter.Next(); i++ {
-						if i > 0 {
-							buf.WriteString("---\n")
-						}
-						b, err := goyaml.Marshal(iter.Value())
+						iter, err := v.List()
 						if err != nil {
 							return "", err
 						}
-						buf.Write(b)
-					}
-					return buf.String(), nil
-				}()
+						buf := &bytes.Buffer{}
+						for i := 0; iter.Next(); i++ {
+							if i > 0 {
+								buf.WriteString("---\n")
+							}
+							b, err := goyaml.Marshal(iter.Value())
+							if err != nil {
+								return "", err
+							}
+							buf.Write(b)
+						}
+						return buf.String(), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Unmarshal",
@@ -617,9 +675,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: topKind,
 			Func: func(c *callCtxt) {
 				data := c.bytes(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return yaml.Unmarshal("", data)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return yaml.Unmarshal("", data)
+					}()
+				}
 			},
 		}, {
 			Name:   "Validate",
@@ -627,31 +687,33 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				b, v := c.bytes(0), c.value(1)
-				c.ret, c.err = func() (interface{}, error) {
-					d, err := yaml.NewDecoder("yaml.Validate", b)
-					if err != nil {
-						return false, err
-					}
-					r := internal.GetRuntime(v).(*Runtime)
-					for {
-						expr, err := d.Decode()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						d, err := yaml.NewDecoder("yaml.Validate", b)
 						if err != nil {
-							if err == io.EOF {
-								return true, nil
+							return false, err
+						}
+						r := internal.GetRuntime(v).(*Runtime)
+						for {
+							expr, err := d.Decode()
+							if err != nil {
+								if err == io.EOF {
+									return true, nil
+								}
+								return false, err
 							}
-							return false, err
-						}
 
-						inst, err := r.CompileExpr(expr)
-						if err != nil {
-							return false, err
-						}
+							inst, err := r.CompileExpr(expr)
+							if err != nil {
+								return false, err
+							}
 
-						if x := v.Unify(inst.Value()); x.Err() != nil {
-							return false, x.Err()
+							if x := v.Unify(inst.Value()); x.Err() != nil {
+								return false, x.Err()
+							}
 						}
-					}
-				}()
+					}()
+				}
 			},
 		}},
 	},
@@ -662,9 +724,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return html.EscapeString(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return html.EscapeString(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "Unescape",
@@ -672,9 +736,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return html.UnescapeString(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return html.UnescapeString(s)
+					}()
+				}
 			},
 		}},
 	},
@@ -685,17 +751,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				x, n := c.list(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if n < 0 {
-						return nil, fmt.Errorf("negative index")
-					}
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if n < 0 {
+							return nil, fmt.Errorf("negative index")
+						}
 
-					if n > len(x) {
-						return []Value{}, nil
-					}
+						if n > len(x) {
+							return []Value{}, nil
+						}
 
-					return x[n:], nil
-				}()
+						return x[n:], nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FlattenN",
@@ -703,31 +771,33 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				xs, depth := c.value(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					var flattenN func(Value, int) ([]Value, error)
-					flattenN = func(xs Value, depth int) ([]Value, error) {
-						var res []Value
-						iter, err := xs.List()
-						if err != nil {
-							return nil, err
-						}
-						for iter.Next() {
-							val := iter.Value()
-							if val.Kind() == ListKind && depth != 0 {
-								d := depth - 1
-								values, err := flattenN(val, d)
-								if err != nil {
-									return nil, err
-								}
-								res = append(res, values...)
-							} else {
-								res = append(res, val)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var flattenN func(Value, int) ([]Value, error)
+						flattenN = func(xs Value, depth int) ([]Value, error) {
+							var res []Value
+							iter, err := xs.List()
+							if err != nil {
+								return nil, err
 							}
+							for iter.Next() {
+								val := iter.Value()
+								if val.Kind() == ListKind && depth != 0 {
+									d := depth - 1
+									values, err := flattenN(val, d)
+									if err != nil {
+										return nil, err
+									}
+									res = append(res, values...)
+								} else {
+									res = append(res, val)
+								}
+							}
+							return res, nil
 						}
-						return res, nil
-					}
-					return flattenN(xs, depth)
-				}()
+						return flattenN(xs, depth)
+					}()
+				}
 			},
 		}, {
 			Name:   "Take",
@@ -735,17 +805,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				x, n := c.list(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if n < 0 {
-						return nil, fmt.Errorf("negative index")
-					}
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if n < 0 {
+							return nil, fmt.Errorf("negative index")
+						}
 
-					if n > len(x) {
-						return x, nil
-					}
+						if n > len(x) {
+							return x, nil
+						}
 
-					return x[:n], nil
-				}()
+						return x[:n], nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Slice",
@@ -753,25 +825,27 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				x, i, j := c.list(0), c.int(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					if i < 0 {
-						return nil, fmt.Errorf("negative index")
-					}
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if i < 0 {
+							return nil, fmt.Errorf("negative index")
+						}
 
-					if i > j {
-						return nil, fmt.Errorf("invalid index: %v > %v", i, j)
-					}
+						if i > j {
+							return nil, fmt.Errorf("invalid index: %v > %v", i, j)
+						}
 
-					if i > len(x) {
-						return nil, fmt.Errorf("slice bounds out of range")
-					}
+						if i > len(x) {
+							return nil, fmt.Errorf("slice bounds out of range")
+						}
 
-					if j > len(x) {
-						return nil, fmt.Errorf("slice bounds out of range")
-					}
+						if j > len(x) {
+							return nil, fmt.Errorf("slice bounds out of range")
+						}
 
-					return x[i:j], nil
-				}()
+						return x[i:j], nil
+					}()
+				}
 			},
 		}, {
 			Name:   "MinItems",
@@ -779,9 +853,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				a, n := c.list(0), c.int(1)
-				c.ret = func() interface{} {
-					return len(a) >= n
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return len(a) >= n
+					}()
+				}
 			},
 		}, {
 			Name:   "MaxItems",
@@ -789,9 +865,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				a, n := c.list(0), c.int(1)
-				c.ret = func() interface{} {
-					return len(a) <= n
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return len(a) <= n
+					}()
+				}
 			},
 		}, {
 			Name:   "UniqueItems",
@@ -799,19 +877,21 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				a := c.list(0)
-				c.ret = func() interface{} {
-					b := []string{}
-					for _, v := range a {
-						b = append(b, fmt.Sprint(v))
-					}
-					sort.Strings(b)
-					for i := 1; i < len(b); i++ {
-						if b[i-1] == b[i] {
-							return false
+				if c.do() {
+					c.ret = func() interface{} {
+						b := []string{}
+						for _, v := range a {
+							b = append(b, fmt.Sprint(v))
 						}
-					}
-					return true
-				}()
+						sort.Strings(b)
+						for i := 1; i < len(b); i++ {
+							if b[i-1] == b[i] {
+								return false
+							}
+						}
+						return true
+					}()
+				}
 			},
 		}, {
 			Name:   "Contains",
@@ -819,14 +899,16 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				a, v := c.list(0), c.value(1)
-				c.ret = func() interface{} {
-					for _, w := range a {
-						if v.Equals(w) {
-							return true
+				if c.do() {
+					c.ret = func() interface{} {
+						for _, w := range a {
+							if v.Equals(w) {
+								return true
+							}
 						}
-					}
-					return false
-				}()
+						return false
+					}()
+				}
 			},
 		}, {
 			Name:   "Avg",
@@ -927,40 +1009,42 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				start, limit, step := c.decimal(0), c.decimal(1), c.decimal(2)
-				c.ret, c.err = func() (interface{}, error) {
-					if step.IsZero() {
-						return nil, fmt.Errorf("step must be non zero")
-					}
-
-					if !step.Negative && +1 == start.Cmp(limit) {
-						return nil, fmt.Errorf("end must be greater than start when step is positive")
-					}
-
-					if step.Negative && -1 == start.Cmp(limit) {
-						return nil, fmt.Errorf("end must be less than start when step is negative")
-					}
-
-					var vals []*internal.Decimal
-					num := start
-					for {
-						if !step.Negative && -1 != num.Cmp(limit) {
-							break
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if step.IsZero() {
+							return nil, fmt.Errorf("step must be non zero")
 						}
 
-						if step.Negative && +1 != num.Cmp(limit) {
-							break
+						if !step.Negative && +1 == start.Cmp(limit) {
+							return nil, fmt.Errorf("end must be greater than start when step is positive")
 						}
 
-						vals = append(vals, num)
-						d := apd.New(0, 0)
-						_, err := internal.BaseContext.Add(d, step, num)
-						if err != nil {
-							return nil, err
+						if step.Negative && -1 == start.Cmp(limit) {
+							return nil, fmt.Errorf("end must be less than start when step is negative")
 						}
-						num = d
-					}
-					return vals, nil
-				}()
+
+						var vals []*internal.Decimal
+						num := start
+						for {
+							if !step.Negative && -1 != num.Cmp(limit) {
+								break
+							}
+
+							if step.Negative && +1 != num.Cmp(limit) {
+								break
+							}
+
+							vals = append(vals, num)
+							d := apd.New(0, 0)
+							_, err := internal.BaseContext.Add(d, step, num)
+							if err != nil {
+								return nil, err
+							}
+							num = d
+						}
+						return vals, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Sum",
@@ -1026,9 +1110,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x, y := c.bigInt(0), c.bigInt(1)
-				c.ret = func() interface{} {
-					return big.Jacobi(x, y)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return big.Jacobi(x, y)
+					}()
+				}
 			},
 		}, {
 			Name:  "MaxBase",
@@ -1039,11 +1125,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Floor(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Floor(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Ceil",
@@ -1051,11 +1139,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Ceil(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Ceil(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Trunc",
@@ -1063,11 +1153,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := roundTruncContext.RoundToIntegralExact(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := roundTruncContext.RoundToIntegralExact(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Round",
@@ -1075,11 +1167,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := roundUpContext.RoundToIntegralExact(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := roundUpContext.RoundToIntegralExact(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "RoundToEven",
@@ -1087,11 +1181,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := roundEvenContext.RoundToIntegralExact(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := roundEvenContext.RoundToIntegralExact(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "MultipleOf",
@@ -1099,11 +1195,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				x, y := c.decimal(0), c.decimal(1)
-				c.ret, c.err = func() (interface{}, error) {
-					var d apd.Decimal
-					cond, err := mulContext.Quo(&d, x, y)
-					return !cond.Inexact(), err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d apd.Decimal
+						cond, err := mulContext.Quo(&d, x, y)
+						return !cond.Inexact(), err
+					}()
+				}
 			},
 		}, {
 			Name:   "Abs",
@@ -1111,11 +1209,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Abs(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Abs(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Acosh",
@@ -1123,9 +1223,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Acosh(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Acosh(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Asin",
@@ -1133,9 +1235,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Asin(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Asin(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Acos",
@@ -1143,9 +1247,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Acos(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Acos(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Asinh",
@@ -1153,9 +1259,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Asinh(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Asinh(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Atan",
@@ -1163,9 +1271,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Atan(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Atan(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Atan2",
@@ -1173,9 +1283,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				y, x := c.float64(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Atan2(y, x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Atan2(y, x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Atanh",
@@ -1183,9 +1295,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Atanh(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Atanh(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Cbrt",
@@ -1193,11 +1307,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Cbrt(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Cbrt(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:  "E",
@@ -1238,12 +1354,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x, y := c.decimal(0), c.decimal(1)
-				c.ret = func() interface{} {
-					var d internal.Decimal
-					d.Set(x)
-					d.Negative = y.Negative
-					return &d
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var d internal.Decimal
+						d.Set(x)
+						d.Negative = y.Negative
+						return &d
+					}()
+				}
 			},
 		}, {
 			Name:   "Dim",
@@ -1251,17 +1369,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x, y := c.decimal(0), c.decimal(1)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Sub(&d, x, y)
-					if err != nil {
-						return nil, err
-					}
-					if d.Negative {
-						return zero, nil
-					}
-					return &d, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Sub(&d, x, y)
+						if err != nil {
+							return nil, err
+						}
+						if d.Negative {
+							return zero, nil
+						}
+						return &d, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Erf",
@@ -1269,9 +1389,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Erf(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Erf(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Erfc",
@@ -1279,9 +1401,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Erfc(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Erfc(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Erfinv",
@@ -1289,9 +1413,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Erfinv(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Erfinv(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Erfcinv",
@@ -1299,9 +1425,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Erfcinv(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Erfcinv(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Exp",
@@ -1309,11 +1437,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Exp(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Exp(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Exp2",
@@ -1321,11 +1451,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Pow(&d, two, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Pow(&d, two, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Expm1",
@@ -1333,9 +1465,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Expm1(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Expm1(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Gamma",
@@ -1343,9 +1477,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Gamma(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Gamma(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Hypot",
@@ -1353,9 +1489,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				p, q := c.float64(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Hypot(p, q)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Hypot(p, q)
+					}()
+				}
 			},
 		}, {
 			Name:   "J0",
@@ -1363,9 +1501,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.J0(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.J0(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Y0",
@@ -1373,9 +1513,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Y0(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Y0(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "J1",
@@ -1383,9 +1525,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.J1(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.J1(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Y1",
@@ -1393,9 +1537,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Y1(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Y1(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Jn",
@@ -1403,9 +1549,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				n, x := c.int(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Jn(n, x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Jn(n, x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Yn",
@@ -1413,9 +1561,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				n, x := c.int(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Yn(n, x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Yn(n, x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Ldexp",
@@ -1423,9 +1573,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				frac, exp := c.float64(0), c.int(1)
-				c.ret = func() interface{} {
-					return math.Ldexp(frac, exp)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Ldexp(frac, exp)
+					}()
+				}
 			},
 		}, {
 			Name:   "Log",
@@ -1433,11 +1585,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Ln(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Ln(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Log10",
@@ -1445,11 +1599,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Log10(&d, x)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Log10(&d, x)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Log2",
@@ -1457,16 +1613,18 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret, c.err = func() (interface{}, error) {
-					var d, ln2 internal.Decimal
-					_, _ = apdContext.Ln(&ln2, two)
-					_, err := apdContext.Ln(&d, x)
-					if err != nil {
-						return &d, err
-					}
-					_, err = apdContext.Quo(&d, &d, &ln2)
-					return &d, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d, ln2 internal.Decimal
+						_, _ = apdContext.Ln(&ln2, two)
+						_, err := apdContext.Ln(&d, x)
+						if err != nil {
+							return &d, err
+						}
+						_, err = apdContext.Quo(&d, &d, &ln2)
+						return &d, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Log1p",
@@ -1474,9 +1632,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Log1p(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Log1p(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Logb",
@@ -1484,9 +1644,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Logb(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Logb(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Ilogb",
@@ -1494,9 +1656,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Ilogb(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Ilogb(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Mod",
@@ -1504,9 +1668,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x, y := c.float64(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Mod(x, y)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Mod(x, y)
+					}()
+				}
 			},
 		}, {
 			Name:   "Pow",
@@ -1514,11 +1680,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x, y := c.decimal(0), c.decimal(1)
-				c.ret, c.err = func() (interface{}, error) {
-					var d internal.Decimal
-					_, err := apdContext.Pow(&d, x, y)
-					return &d, err
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var d internal.Decimal
+						_, err := apdContext.Pow(&d, x, y)
+						return &d, err
+					}()
+				}
 			},
 		}, {
 			Name:   "Pow10",
@@ -1526,9 +1694,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				n := c.int32(0)
-				c.ret = func() interface{} {
-					return apd.New(1, n)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return apd.New(1, n)
+					}()
+				}
 			},
 		}, {
 			Name:   "Remainder",
@@ -1536,9 +1706,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x, y := c.float64(0), c.float64(1)
-				c.ret = func() interface{} {
-					return math.Remainder(x, y)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Remainder(x, y)
+					}()
+				}
 			},
 		}, {
 			Name:   "Signbit",
@@ -1546,9 +1718,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				x := c.decimal(0)
-				c.ret = func() interface{} {
-					return x.Negative
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return x.Negative
+					}()
+				}
 			},
 		}, {
 			Name:   "Cos",
@@ -1556,9 +1730,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Cos(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Cos(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Sin",
@@ -1566,9 +1742,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Sin(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Sin(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Sinh",
@@ -1576,9 +1754,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Sinh(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Sinh(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Cosh",
@@ -1586,9 +1766,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Cosh(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Cosh(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Sqrt",
@@ -1596,9 +1778,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Sqrt(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Sqrt(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Tan",
@@ -1606,9 +1790,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Tan(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Tan(x)
+					}()
+				}
 			},
 		}, {
 			Name:   "Tanh",
@@ -1616,9 +1802,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				x := c.float64(0)
-				c.ret = func() interface{} {
-					return math.Tanh(x)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return math.Tanh(x)
+					}()
+				}
 			},
 		}},
 	},
@@ -1629,11 +1817,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x, n := c.bigInt(0), c.uint(1)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.Lsh(x, n)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.Lsh(x, n)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "Rsh",
@@ -1641,11 +1831,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x, n := c.bigInt(0), c.uint(1)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.Rsh(x, n)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.Rsh(x, n)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "At",
@@ -1653,12 +1845,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x, i := c.bigInt(0), c.uint(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if i > 1<<62 {
-						return 0, fmt.Errorf("bit index too large")
-					}
-					return x.Bit(int(i)), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if i > 1<<62 {
+							return 0, fmt.Errorf("bit index too large")
+						}
+						return x.Bit(int(i)), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Set",
@@ -1666,11 +1860,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x, i, bit := c.bigInt(0), c.int(1), c.uint(2)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.SetBit(x, i, bit)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.SetBit(x, i, bit)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "And",
@@ -1678,11 +1874,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.And(a, b)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.And(a, b)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "Or",
@@ -1690,11 +1888,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.Or(a, b)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.Or(a, b)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "Xor",
@@ -1702,11 +1902,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.Xor(a, b)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.Xor(a, b)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "Clear",
@@ -1714,11 +1916,13 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				a, b := c.bigInt(0), c.bigInt(1)
-				c.ret = func() interface{} {
-					var z big.Int
-					z.AndNot(a, b)
-					return &z
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var z big.Int
+						z.AndNot(a, b)
+						return &z
+					}()
+				}
 			},
 		}, {
 			Name:   "OnesCount",
@@ -1726,13 +1930,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x := c.bigInt(0)
-				c.ret = func() interface{} {
-					var count int
-					for _, w := range x.Bits() {
-						count += bits.OnesCount64(uint64(w))
-					}
-					return count
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						var count int
+						for _, w := range x.Bits() {
+							count += bits.OnesCount64(uint64(w))
+						}
+						return count
+					}()
+				}
 			},
 		}, {
 			Name:   "Len",
@@ -1740,9 +1946,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				x := c.bigInt(0)
-				c.ret = func() interface{} {
-					return x.BitLen()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return x.BitLen()
+					}()
+				}
 			},
 		}},
 	},
@@ -1753,13 +1961,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					host, port, err := net.SplitHostPort(s)
-					if err != nil {
-						return nil, err
-					}
-					return []string{host, port}, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						host, port, err := net.SplitHostPort(s)
+						if err != nil {
+							return nil, err
+						}
+						return []string{host, port}, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "JoinHostPort",
@@ -1767,46 +1977,48 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				host, port := c.value(0), c.value(1)
-				c.ret, c.err = func() (interface{}, error) {
-					var err error
-					hostStr := ""
-					switch host.Kind() {
-					case ListKind:
-						ipdata := netGetIP(host)
-						if len(ipdata) != 4 && len(ipdata) != 16 {
-							err = fmt.Errorf("invalid host %q", host)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						var err error
+						hostStr := ""
+						switch host.Kind() {
+						case ListKind:
+							ipdata := netGetIP(host)
+							if len(ipdata) != 4 && len(ipdata) != 16 {
+								err = fmt.Errorf("invalid host %q", host)
+							}
+							hostStr = ipdata.String()
+						case BytesKind:
+							var b []byte
+							b, err = host.Bytes()
+							hostStr = string(b)
+						default:
+							hostStr, err = host.String()
 						}
-						hostStr = ipdata.String()
-					case BytesKind:
-						var b []byte
-						b, err = host.Bytes()
-						hostStr = string(b)
-					default:
-						hostStr, err = host.String()
-					}
-					if err != nil {
-						return "", err
-					}
+						if err != nil {
+							return "", err
+						}
 
-					portStr := ""
-					switch port.Kind() {
-					case StringKind:
-						portStr, err = port.String()
-					case BytesKind:
-						var b []byte
-						b, err = port.Bytes()
-						portStr = string(b)
-					default:
-						var i int64
-						i, err = port.Int64()
-						portStr = strconv.Itoa(int(i))
-					}
-					if err != nil {
-						return "", err
-					}
+						portStr := ""
+						switch port.Kind() {
+						case StringKind:
+							portStr, err = port.String()
+						case BytesKind:
+							var b []byte
+							b, err = port.Bytes()
+							portStr = string(b)
+						default:
+							var i int64
+							i, err = port.Int64()
+							portStr = strconv.Itoa(int(i))
+						}
+						if err != nil {
+							return "", err
+						}
 
-					return net.JoinHostPort(hostStr, portStr), nil
-				}()
+						return net.JoinHostPort(hostStr, portStr), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FQDN",
@@ -1814,15 +2026,17 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					for i := 0; i < len(s); i++ {
-						if s[i] >= utf8.RuneSelf {
-							return false
+				if c.do() {
+					c.ret = func() interface{} {
+						for i := 0; i < len(s); i++ {
+							if s[i] >= utf8.RuneSelf {
+								return false
+							}
 						}
-					}
-					_, err := idnaProfile.ToASCII(s)
-					return err == nil
-				}()
+						_, err := idnaProfile.ToASCII(s)
+						return err == nil
+					}()
+				}
 			},
 		}, {
 			Name:  "IPv4len",
@@ -1836,13 +2050,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					goip := net.ParseIP(s)
-					if goip == nil {
-						return nil, fmt.Errorf("invalid IP address %q", s)
-					}
-					return netToList(goip), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						goip := net.ParseIP(s)
+						if goip == nil {
+							return nil, fmt.Errorf("invalid IP address %q", s)
+						}
+						return netToList(goip), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "IPv4",
@@ -1850,10 +2066,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
+				if c.do() {
+					c.ret = func() interface{} {
 
-					return netGetIP(ip).To4() != nil
-				}()
+						return netGetIP(ip).To4() != nil
+					}()
+				}
 			},
 		}, {
 			Name:   "IP",
@@ -1861,10 +2079,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
+				if c.do() {
+					c.ret = func() interface{} {
 
-					return netGetIP(ip) != nil
-				}()
+						return netGetIP(ip) != nil
+					}()
+				}
 			},
 		}, {
 			Name:   "LoopbackIP",
@@ -1872,9 +2092,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsLoopback()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsLoopback()
+					}()
+				}
 			},
 		}, {
 			Name:   "MulticastIP",
@@ -1882,9 +2104,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsMulticast()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsMulticast()
+					}()
+				}
 			},
 		}, {
 			Name:   "InterfaceLocalMulticastIP",
@@ -1892,9 +2116,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsInterfaceLocalMulticast()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsInterfaceLocalMulticast()
+					}()
+				}
 			},
 		}, {
 			Name:   "LinkLocalMulticastIP",
@@ -1902,9 +2128,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsLinkLocalMulticast()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsLinkLocalMulticast()
+					}()
+				}
 			},
 		}, {
 			Name:   "LinkLocalUnicastIP",
@@ -1912,9 +2140,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsLinkLocalUnicast()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsLinkLocalUnicast()
+					}()
+				}
 			},
 		}, {
 			Name:   "GlobalUnicastIP",
@@ -1922,9 +2152,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsGlobalUnicast()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsGlobalUnicast()
+					}()
+				}
 			},
 		}, {
 			Name:   "UnspecifiedIP",
@@ -1932,9 +2164,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret = func() interface{} {
-					return netGetIP(ip).IsUnspecified()
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return netGetIP(ip).IsUnspecified()
+					}()
+				}
 			},
 		}, {
 			Name:   "ToIP4",
@@ -1942,17 +2176,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					ipdata := netGetIP(ip)
-					if ipdata == nil {
-						return nil, fmt.Errorf("invalid IP %q", ip)
-					}
-					ipv4 := ipdata.To4()
-					if ipv4 == nil {
-						return nil, fmt.Errorf("cannot convert %q to IPv4", ipdata)
-					}
-					return netToList(ipv4), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						ipdata := netGetIP(ip)
+						if ipdata == nil {
+							return nil, fmt.Errorf("invalid IP %q", ip)
+						}
+						ipv4 := ipdata.To4()
+						if ipv4 == nil {
+							return nil, fmt.Errorf("cannot convert %q to IPv4", ipdata)
+						}
+						return netToList(ipv4), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "ToIP16",
@@ -1960,13 +2196,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					ipdata := netGetIP(ip)
-					if ipdata == nil {
-						return nil, fmt.Errorf("invalid IP %q", ip)
-					}
-					return netToList(ipdata), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						ipdata := netGetIP(ip)
+						if ipdata == nil {
+							return nil, fmt.Errorf("invalid IP %q", ip)
+						}
+						return netToList(ipdata), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "IPString",
@@ -1974,13 +2212,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				ip := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					ipdata := netGetIP(ip)
-					if ipdata == nil {
-						return "", fmt.Errorf("invalid IP %q", ip)
-					}
-					return ipdata.String(), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						ipdata := netGetIP(ip)
+						if ipdata == nil {
+							return "", fmt.Errorf("invalid IP %q", ip)
+						}
+						return ipdata.String(), nil
+					}()
+				}
 			},
 		}},
 	},
@@ -1991,10 +2231,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				path := c.string(0)
-				c.ret = func() interface{} {
-					file, dir := split(path)
-					return []string{file, dir}
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						file, dir := split(path)
+						return []string{file, dir}
+					}()
+				}
 			},
 		}, {
 			Name:   "Match",
@@ -2002,9 +2244,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				pattern, name := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					return path.Match(pattern, name)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return path.Match(pattern, name)
+					}()
+				}
 			},
 		}, {
 			Name:   "Clean",
@@ -2012,9 +2256,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				path := c.string(0)
-				c.ret = func() interface{} {
-					return pathClean(path)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return pathClean(path)
+					}()
+				}
 			},
 		}, {
 			Name:   "Ext",
@@ -2022,9 +2268,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				path := c.string(0)
-				c.ret = func() interface{} {
-					return pathExt(path)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return pathExt(path)
+					}()
+				}
 			},
 		}, {
 			Name:   "Base",
@@ -2032,9 +2280,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				path := c.string(0)
-				c.ret = func() interface{} {
-					return pathBase(path)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return pathBase(path)
+					}()
+				}
 			},
 		}, {
 			Name:   "IsAbs",
@@ -2042,9 +2292,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				path := c.string(0)
-				c.ret = func() interface{} {
-					return pathIsAbs(path)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return pathIsAbs(path)
+					}()
+				}
 			},
 		}, {
 			Name:   "Dir",
@@ -2052,9 +2304,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				path := c.string(0)
-				c.ret = func() interface{} {
-					return pathDir(path)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return pathDir(path)
+					}()
+				}
 			},
 		}},
 	},
@@ -2065,17 +2319,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				pattern, s := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					re, err := regexp.Compile(pattern)
-					if err != nil {
-						return "", err
-					}
-					m := re.FindStringIndex(s)
-					if m == nil {
-						return "", errNoMatch
-					}
-					return s[m[0]:m[1]], nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						re, err := regexp.Compile(pattern)
+						if err != nil {
+							return "", err
+						}
+						m := re.FindStringIndex(s)
+						if m == nil {
+							return "", errNoMatch
+						}
+						return s[m[0]:m[1]], nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FindAll",
@@ -2083,17 +2339,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				pattern, s, n := c.string(0), c.string(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					re, err := regexp.Compile(pattern)
-					if err != nil {
-						return nil, err
-					}
-					m := re.FindAllString(s, n)
-					if m == nil {
-						return nil, errNoMatch
-					}
-					return m, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						re, err := regexp.Compile(pattern)
+						if err != nil {
+							return nil, err
+						}
+						m := re.FindAllString(s, n)
+						if m == nil {
+							return nil, errNoMatch
+						}
+						return m, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FindSubmatch",
@@ -2101,17 +2359,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				pattern, s := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					re, err := regexp.Compile(pattern)
-					if err != nil {
-						return nil, err
-					}
-					m := re.FindStringSubmatch(s)
-					if m == nil {
-						return nil, errNoMatch
-					}
-					return m, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						re, err := regexp.Compile(pattern)
+						if err != nil {
+							return nil, err
+						}
+						m := re.FindStringSubmatch(s)
+						if m == nil {
+							return nil, errNoMatch
+						}
+						return m, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FindAllSubmatch",
@@ -2119,17 +2379,19 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				pattern, s, n := c.string(0), c.string(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					re, err := regexp.Compile(pattern)
-					if err != nil {
-						return nil, err
-					}
-					m := re.FindAllStringSubmatch(s, n)
-					if m == nil {
-						return nil, errNoMatch
-					}
-					return m, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						re, err := regexp.Compile(pattern)
+						if err != nil {
+							return nil, err
+						}
+						m := re.FindAllStringSubmatch(s, n)
+						if m == nil {
+							return nil, errNoMatch
+						}
+						return m, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FindNamedSubmatch",
@@ -2137,27 +2399,29 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: structKind,
 			Func: func(c *callCtxt) {
 				pattern, s := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					re, err := regexp.Compile(pattern)
-					if err != nil {
-						return nil, err
-					}
-					names := re.SubexpNames()
-					if len(names) == 0 {
-						return nil, errNoNamedGroup
-					}
-					m := re.FindStringSubmatch(s)
-					if m == nil {
-						return nil, errNoMatch
-					}
-					r := make(map[string]string, len(names)-1)
-					for k, name := range names {
-						if name != "" {
-							r[name] = m[k]
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						re, err := regexp.Compile(pattern)
+						if err != nil {
+							return nil, err
 						}
-					}
-					return r, nil
-				}()
+						names := re.SubexpNames()
+						if len(names) == 0 {
+							return nil, errNoNamedGroup
+						}
+						m := re.FindStringSubmatch(s)
+						if m == nil {
+							return nil, errNoMatch
+						}
+						r := make(map[string]string, len(names)-1)
+						for k, name := range names {
+							if name != "" {
+								r[name] = m[k]
+							}
+						}
+						return r, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "FindAllNamedSubmatch",
@@ -2165,31 +2429,33 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				pattern, s, n := c.string(0), c.string(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					re, err := regexp.Compile(pattern)
-					if err != nil {
-						return nil, err
-					}
-					names := re.SubexpNames()
-					if len(names) == 0 {
-						return nil, errNoNamedGroup
-					}
-					m := re.FindAllStringSubmatch(s, n)
-					if m == nil {
-						return nil, errNoMatch
-					}
-					result := make([]map[string]string, len(m))
-					for i, m := range m {
-						r := make(map[string]string, len(names)-1)
-						for k, name := range names {
-							if name != "" {
-								r[name] = m[k]
-							}
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						re, err := regexp.Compile(pattern)
+						if err != nil {
+							return nil, err
 						}
-						result[i] = r
-					}
-					return result, nil
-				}()
+						names := re.SubexpNames()
+						if len(names) == 0 {
+							return nil, errNoNamedGroup
+						}
+						m := re.FindAllStringSubmatch(s, n)
+						if m == nil {
+							return nil, errNoMatch
+						}
+						result := make([]map[string]string, len(m))
+						for i, m := range m {
+							r := make(map[string]string, len(names)-1)
+							for k, name := range names {
+								if name != "" {
+									r[name] = m[k]
+								}
+							}
+							result[i] = r
+						}
+						return result, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Match",
@@ -2197,9 +2463,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				pattern, s := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					return regexp.MatchString(pattern, s)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return regexp.MatchString(pattern, s)
+					}()
+				}
 			},
 		}, {
 			Name:   "QuoteMeta",
@@ -2207,9 +2475,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return regexp.QuoteMeta(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return regexp.QuoteMeta(s)
+					}()
+				}
 			},
 		}},
 	},
@@ -2220,9 +2490,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return literal.Unquote(s)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return literal.Unquote(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "ParseBool",
@@ -2230,9 +2502,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				str := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return strconv.ParseBool(str)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return strconv.ParseBool(str)
+					}()
+				}
 			},
 		}, {
 			Name:   "FormatBool",
@@ -2240,9 +2514,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				b := c.bool(0)
-				c.ret = func() interface{} {
-					return strconv.FormatBool(b)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.FormatBool(b)
+					}()
+				}
 			},
 		}, {
 			Name:   "ParseFloat",
@@ -2250,9 +2526,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: numKind,
 			Func: func(c *callCtxt) {
 				s, bitSize := c.string(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					return strconv.ParseFloat(s, bitSize)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return strconv.ParseFloat(s, bitSize)
+					}()
+				}
 			},
 		}, {
 			Name:  "IntSize",
@@ -2263,9 +2541,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, base, bitSize := c.string(0), c.int(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					return strconv.ParseUint(s, base, bitSize)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return strconv.ParseUint(s, base, bitSize)
+					}()
+				}
 			},
 		}, {
 			Name:   "ParseInt",
@@ -2273,9 +2553,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, base, bitSize := c.string(0), c.int(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					return strconv.ParseInt(s, base, bitSize)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return strconv.ParseInt(s, base, bitSize)
+					}()
+				}
 			},
 		}, {
 			Name:   "Atoi",
@@ -2283,9 +2565,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return strconv.Atoi(s)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return strconv.Atoi(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "FormatFloat",
@@ -2293,9 +2577,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				f, fmt, prec, bitSize := c.float64(0), c.byte(1), c.int(2), c.int(3)
-				c.ret = func() interface{} {
-					return strconv.FormatFloat(f, fmt, prec, bitSize)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.FormatFloat(f, fmt, prec, bitSize)
+					}()
+				}
 			},
 		}, {
 			Name:   "FormatUint",
@@ -2303,9 +2589,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				i, base := c.uint64(0), c.int(1)
-				c.ret = func() interface{} {
-					return strconv.FormatUint(i, base)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.FormatUint(i, base)
+					}()
+				}
 			},
 		}, {
 			Name:   "FormatInt",
@@ -2313,9 +2601,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				i, base := c.int64(0), c.int(1)
-				c.ret = func() interface{} {
-					return strconv.FormatInt(i, base)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.FormatInt(i, base)
+					}()
+				}
 			},
 		}, {
 			Name:   "Quote",
@@ -2323,9 +2613,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strconv.Quote(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.Quote(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "QuoteToASCII",
@@ -2333,9 +2625,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strconv.QuoteToASCII(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.QuoteToASCII(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "QuoteToGraphic",
@@ -2343,9 +2637,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strconv.QuoteToGraphic(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.QuoteToGraphic(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "QuoteRune",
@@ -2353,9 +2649,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				r := c.rune(0)
-				c.ret = func() interface{} {
-					return strconv.QuoteRune(r)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.QuoteRune(r)
+					}()
+				}
 			},
 		}, {
 			Name:   "QuoteRuneToASCII",
@@ -2363,9 +2661,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				r := c.rune(0)
-				c.ret = func() interface{} {
-					return strconv.QuoteRuneToASCII(r)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.QuoteRuneToASCII(r)
+					}()
+				}
 			},
 		}, {
 			Name:   "QuoteRuneToGraphic",
@@ -2373,9 +2673,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				r := c.rune(0)
-				c.ret = func() interface{} {
-					return strconv.QuoteRuneToGraphic(r)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.QuoteRuneToGraphic(r)
+					}()
+				}
 			},
 		}, {
 			Name:   "IsPrint",
@@ -2383,9 +2685,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				r := c.rune(0)
-				c.ret = func() interface{} {
-					return strconv.IsPrint(r)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.IsPrint(r)
+					}()
+				}
 			},
 		}, {
 			Name:   "IsGraphic",
@@ -2393,9 +2697,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				r := c.rune(0)
-				c.ret = func() interface{} {
-					return strconv.IsGraphic(r)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strconv.IsGraphic(r)
+					}()
+				}
 			},
 		}},
 	},
@@ -2406,12 +2712,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				b, i := c.bytes(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					if i < 0 || i >= len(b) {
-						return 0, fmt.Errorf("index out of range")
-					}
-					return b[i], nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if i < 0 || i >= len(b) {
+							return 0, fmt.Errorf("index out of range")
+						}
+						return b[i], nil
+					}()
+				}
 			},
 		}, {
 			Name:   "ByteSlice",
@@ -2419,12 +2727,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: bytesKind | stringKind,
 			Func: func(c *callCtxt) {
 				b, start, end := c.bytes(0), c.int(1), c.int(2)
-				c.ret, c.err = func() (interface{}, error) {
-					if start < 0 || start > end || end > len(b) {
-						return nil, fmt.Errorf("index out of range")
-					}
-					return b[start:end], nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if start < 0 || start > end || end > len(b) {
+							return nil, fmt.Errorf("index out of range")
+						}
+						return b[start:end], nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Runes",
@@ -2432,9 +2742,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return []rune(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return []rune(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "MinRunes",
@@ -2442,10 +2754,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s, min := c.string(0), c.int(1)
-				c.ret = func() interface{} {
+				if c.do() {
+					c.ret = func() interface{} {
 
-					return len([]rune(s)) >= min
-				}()
+						return len([]rune(s)) >= min
+					}()
+				}
 			},
 		}, {
 			Name:   "MaxRunes",
@@ -2453,10 +2767,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s, max := c.string(0), c.int(1)
-				c.ret = func() interface{} {
+				if c.do() {
+					c.ret = func() interface{} {
 
-					return len([]rune(s)) <= max
-				}()
+						return len([]rune(s)) <= max
+					}()
+				}
 			},
 		}, {
 			Name:   "ToTitle",
@@ -2464,20 +2780,22 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
+				if c.do() {
+					c.ret = func() interface{} {
 
-					prev := ' '
-					return strings.Map(
-						func(r rune) rune {
-							if unicode.IsSpace(prev) {
+						prev := ' '
+						return strings.Map(
+							func(r rune) rune {
+								if unicode.IsSpace(prev) {
+									prev = r
+									return unicode.ToTitle(r)
+								}
 								prev = r
-								return unicode.ToTitle(r)
-							}
-							prev = r
-							return r
-						},
-						s)
-				}()
+								return r
+							},
+							s)
+					}()
+				}
 			},
 		}, {
 			Name:   "ToCamel",
@@ -2485,20 +2803,22 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
+				if c.do() {
+					c.ret = func() interface{} {
 
-					prev := ' '
-					return strings.Map(
-						func(r rune) rune {
-							if unicode.IsSpace(prev) {
+						prev := ' '
+						return strings.Map(
+							func(r rune) rune {
+								if unicode.IsSpace(prev) {
+									prev = r
+									return unicode.ToLower(r)
+								}
 								prev = r
-								return unicode.ToLower(r)
-							}
-							prev = r
-							return r
-						},
-						s)
-				}()
+								return r
+							},
+							s)
+					}()
+				}
 			},
 		}, {
 			Name:   "Compare",
@@ -2506,9 +2826,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				a, b := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.Compare(a, b)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Compare(a, b)
+					}()
+				}
 			},
 		}, {
 			Name:   "Count",
@@ -2516,9 +2838,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, substr := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.Count(s, substr)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Count(s, substr)
+					}()
+				}
 			},
 		}, {
 			Name:   "Contains",
@@ -2526,9 +2850,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s, substr := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.Contains(s, substr)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Contains(s, substr)
+					}()
+				}
 			},
 		}, {
 			Name:   "ContainsAny",
@@ -2536,9 +2862,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s, chars := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.ContainsAny(s, chars)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.ContainsAny(s, chars)
+					}()
+				}
 			},
 		}, {
 			Name:   "LastIndex",
@@ -2546,9 +2874,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, substr := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.LastIndex(s, substr)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.LastIndex(s, substr)
+					}()
+				}
 			},
 		}, {
 			Name:   "IndexAny",
@@ -2556,9 +2886,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, chars := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.IndexAny(s, chars)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.IndexAny(s, chars)
+					}()
+				}
 			},
 		}, {
 			Name:   "LastIndexAny",
@@ -2566,9 +2898,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, chars := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.LastIndexAny(s, chars)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.LastIndexAny(s, chars)
+					}()
+				}
 			},
 		}, {
 			Name:   "SplitN",
@@ -2576,9 +2910,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s, sep, n := c.string(0), c.string(1), c.int(2)
-				c.ret = func() interface{} {
-					return strings.SplitN(s, sep, n)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.SplitN(s, sep, n)
+					}()
+				}
 			},
 		}, {
 			Name:   "SplitAfterN",
@@ -2586,9 +2922,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s, sep, n := c.string(0), c.string(1), c.int(2)
-				c.ret = func() interface{} {
-					return strings.SplitAfterN(s, sep, n)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.SplitAfterN(s, sep, n)
+					}()
+				}
 			},
 		}, {
 			Name:   "Split",
@@ -2596,9 +2934,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s, sep := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.Split(s, sep)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Split(s, sep)
+					}()
+				}
 			},
 		}, {
 			Name:   "SplitAfter",
@@ -2606,9 +2946,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s, sep := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.SplitAfter(s, sep)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.SplitAfter(s, sep)
+					}()
+				}
 			},
 		}, {
 			Name:   "Fields",
@@ -2616,9 +2958,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: listKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strings.Fields(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Fields(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "Join",
@@ -2638,9 +2982,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s, prefix := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.HasPrefix(s, prefix)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.HasPrefix(s, prefix)
+					}()
+				}
 			},
 		}, {
 			Name:   "HasSuffix",
@@ -2648,9 +2994,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s, suffix := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.HasSuffix(s, suffix)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.HasSuffix(s, suffix)
+					}()
+				}
 			},
 		}, {
 			Name:   "Repeat",
@@ -2658,9 +3006,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, count := c.string(0), c.int(1)
-				c.ret = func() interface{} {
-					return strings.Repeat(s, count)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Repeat(s, count)
+					}()
+				}
 			},
 		}, {
 			Name:   "ToUpper",
@@ -2668,9 +3018,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strings.ToUpper(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.ToUpper(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "ToLower",
@@ -2678,9 +3030,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strings.ToLower(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.ToLower(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "Trim",
@@ -2688,9 +3042,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, cutset := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.Trim(s, cutset)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Trim(s, cutset)
+					}()
+				}
 			},
 		}, {
 			Name:   "TrimLeft",
@@ -2698,9 +3054,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, cutset := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.TrimLeft(s, cutset)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.TrimLeft(s, cutset)
+					}()
+				}
 			},
 		}, {
 			Name:   "TrimRight",
@@ -2708,9 +3066,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, cutset := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.TrimRight(s, cutset)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.TrimRight(s, cutset)
+					}()
+				}
 			},
 		}, {
 			Name:   "TrimSpace",
@@ -2718,9 +3078,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return strings.TrimSpace(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.TrimSpace(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "TrimPrefix",
@@ -2728,9 +3090,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, prefix := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.TrimPrefix(s, prefix)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.TrimPrefix(s, prefix)
+					}()
+				}
 			},
 		}, {
 			Name:   "TrimSuffix",
@@ -2738,9 +3102,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, suffix := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.TrimSuffix(s, suffix)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.TrimSuffix(s, suffix)
+					}()
+				}
 			},
 		}, {
 			Name:   "Replace",
@@ -2748,9 +3114,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s, old, new, n := c.string(0), c.string(1), c.string(2), c.int(3)
-				c.ret = func() interface{} {
-					return strings.Replace(s, old, new, n)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Replace(s, old, new, n)
+					}()
+				}
 			},
 		}, {
 			Name:   "Index",
@@ -2758,9 +3126,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s, substr := c.string(0), c.string(1)
-				c.ret = func() interface{} {
-					return strings.Index(s, substr)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return strings.Index(s, substr)
+					}()
+				}
 			},
 		}},
 	},
@@ -2771,14 +3141,16 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				object, n := c.structVal(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					iter := object.Fields(Hidden(false), Optional(false))
-					count := 0
-					for iter.Next() {
-						count++
-					}
-					return count >= n, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						iter := object.Fields(Hidden(false), Optional(false))
+						count := 0
+						for iter.Next() {
+							count++
+						}
+						return count >= n, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "MaxFields",
@@ -2786,14 +3158,16 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				object, n := c.structVal(0), c.int(1)
-				c.ret, c.err = func() (interface{}, error) {
-					iter := object.Fields(Hidden(false), Optional(false))
-					count := 0
-					for iter.Next() {
-						count++
-					}
-					return count <= n, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						iter := object.Fields(Hidden(false), Optional(false))
+						count := 0
+						for iter.Next() {
+							count++
+						}
+						return count <= n, nil
+					}()
+				}
 			},
 		}},
 	},
@@ -2804,41 +3178,43 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				data := c.value(0)
-				c.ret, c.err = func() (interface{}, error) {
-					buf := &bytes.Buffer{}
-					tw := tabwriter.NewWriter(buf, 0, 4, 1, ' ', 0)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						buf := &bytes.Buffer{}
+						tw := tabwriter.NewWriter(buf, 0, 4, 1, ' ', 0)
 
-					write := func(v Value) error {
-						b, err := v.Bytes()
-						if err != nil {
-							return err
+						write := func(v Value) error {
+							b, err := v.Bytes()
+							if err != nil {
+								return err
+							}
+							_, err = tw.Write(b)
+							if err != nil {
+								return err
+							}
+							return nil
 						}
-						_, err = tw.Write(b)
-						if err != nil {
-							return err
-						}
-						return nil
-					}
 
-					switch data.Kind() {
-					case BytesKind, StringKind:
-						if err := write(data); err != nil {
-							return "", err
-						}
-					case ListKind:
-						for i, _ := data.List(); i.Next(); {
-							if err := write(i.Value()); err != nil {
+						switch data.Kind() {
+						case BytesKind, StringKind:
+							if err := write(data); err != nil {
 								return "", err
 							}
-							_, _ = tw.Write([]byte{'\n'})
+						case ListKind:
+							for i, _ := data.List(); i.Next(); {
+								if err := write(i.Value()); err != nil {
+									return "", err
+								}
+								_, _ = tw.Write([]byte{'\n'})
+							}
+						default:
+							return "", fmt.Errorf("tabwriter.Write: unsupported type %v", data.Kind())
 						}
-					default:
-						return "", fmt.Errorf("tabwriter.Write: unsupported type %v", data.Kind())
-					}
 
-					err := tw.Flush()
-					return buf.String(), err
-				}()
+						err := tw.Flush()
+						return buf.String(), err
+					}()
+				}
 			},
 		}},
 	},
@@ -2849,21 +3225,23 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				templ, data := c.string(0), c.value(1)
-				c.ret, c.err = func() (interface{}, error) {
-					t, err := template.New("").Parse(templ)
-					if err != nil {
-						return "", err
-					}
-					var x interface{}
-					if err := data.Decode(&x); err != nil {
-						return "", err
-					}
-					buf := &bytes.Buffer{}
-					if err := t.Execute(buf, x); err != nil {
-						return "", err
-					}
-					return buf.String(), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						t, err := template.New("").Parse(templ)
+						if err != nil {
+							return "", err
+						}
+						var x interface{}
+						if err := data.Decode(&x); err != nil {
+							return "", err
+						}
+						buf := &bytes.Buffer{}
+						if err := t.Execute(buf, x); err != nil {
+							return "", err
+						}
+						return buf.String(), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "HTMLEscape",
@@ -2871,9 +3249,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return template.HTMLEscapeString(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return template.HTMLEscapeString(s)
+					}()
+				}
 			},
 		}, {
 			Name:   "JSEscape",
@@ -2881,9 +3261,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret = func() interface{} {
-					return template.JSEscapeString(s)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						return template.JSEscapeString(s)
+					}()
+				}
 			},
 		}},
 	},
@@ -2912,12 +3294,14 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					if _, err := time.ParseDuration(s); err != nil {
-						return false, err
-					}
-					return true, nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						if _, err := time.ParseDuration(s); err != nil {
+							return false, err
+						}
+						return true, nil
+					}()
+				}
 			},
 		}, {
 			Name:   "ParseDuration",
@@ -2925,13 +3309,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: intKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					d, err := time.ParseDuration(s)
-					if err != nil {
-						return 0, err
-					}
-					return int64(d), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						d, err := time.ParseDuration(s)
+						if err != nil {
+							return 0, err
+						}
+						return int64(d), nil
+					}()
+				}
 			},
 		}, {
 			Name:  "ANSIC",
@@ -3035,9 +3421,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				s := c.string(0)
-				c.ret, c.err = func() (interface{}, error) {
-					return timeFormat(s, time.RFC3339Nano)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return timeFormat(s, time.RFC3339Nano)
+					}()
+				}
 			},
 		}, {
 			Name:   "Format",
@@ -3045,9 +3433,11 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: boolKind,
 			Func: func(c *callCtxt) {
 				value, layout := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					return timeFormat(value, layout)
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						return timeFormat(value, layout)
+					}()
+				}
 			},
 		}, {
 			Name:   "Parse",
@@ -3055,13 +3445,15 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				layout, value := c.string(0), c.string(1)
-				c.ret, c.err = func() (interface{}, error) {
-					t, err := time.Parse(layout, value)
-					if err != nil {
-						return "", err
-					}
-					return t.UTC().Format(time.RFC3339Nano), nil
-				}()
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						t, err := time.Parse(layout, value)
+						if err != nil {
+							return "", err
+						}
+						return t.UTC().Format(time.RFC3339Nano), nil
+					}()
+				}
 			},
 		}, {
 			Name:   "Unix",
@@ -3069,10 +3461,12 @@ var builtinPackages = map[string]*builtinPkg{
 			Result: stringKind,
 			Func: func(c *callCtxt) {
 				sec, nsec := c.int64(0), c.int64(1)
-				c.ret = func() interface{} {
-					t := time.Unix(sec, nsec)
-					return t.UTC().Format(time.RFC3339Nano)
-				}()
+				if c.do() {
+					c.ret = func() interface{} {
+						t := time.Unix(sec, nsec)
+						return t.UTC().Format(time.RFC3339Nano)
+					}()
+				}
 			},
 		}},
 	},

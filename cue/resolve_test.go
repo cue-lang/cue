@@ -2797,6 +2797,19 @@ func TestFullEval(t *testing.T) {
 		B: test.A & {}
 		`,
 		out: `<0>{test: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, A: <4>{name: "A", field1: "1", field2: "2"}}, B: <5>{name: "A", field1: "1", field2: "2"}}`,
+	}, {
+		desc: "Issue #178",
+		in: `
+		import "encoding/csv"
+		import "encoding/hex"
+
+		foo: csv.Decode(data)
+		data: bytes
+
+		len: int
+		bar: hex.EncodedLen(len)
+		`,
+		out: `<0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

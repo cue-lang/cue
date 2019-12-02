@@ -38,6 +38,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 )
@@ -196,7 +197,8 @@ func (g *generator) processCUE(dir string) {
 
 	if err := instances[0].Err; err != nil {
 		if !strings.Contains(err.Error(), "no CUE files") {
-			log.Fatal(err)
+			errors.Print(os.Stderr, err, nil)
+			log.Fatalf("error processing %s: %v", dir, err)
 		}
 		return
 	}
@@ -341,14 +343,10 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 	args := []string{}
 	vals := []string{}
 	kind := []string{}
-	omitCheck := true
 	for _, f := range x.Type.Params.List {
 		for _, name := range f.Names {
 			typ := g.goKind(f.Type)
-			argKind, ground := g.goToCUE(f.Type)
-			if !ground {
-				omitCheck = false
-			}
+			argKind := g.goToCUE(f.Type)
 			vals = append(vals, fmt.Sprintf("c.%s(%d)", typ, len(args)))
 			args = append(args, name.Name)
 			kind = append(kind, argKind)
@@ -356,7 +354,7 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 	}
 
 	fmt.Fprintf(g.w, "Params: []kind{%s},\n", strings.Join(kind, ", "))
-	result, _ := g.goToCUE(x.Type.Results.List[0].Type)
+	result := g.goToCUE(x.Type.Results.List[0].Type)
 	fmt.Fprintf(g.w, "Result: %s,\n", result)
 	argList := strings.Join(args, ", ")
 	valList := strings.Join(vals, ", ")
@@ -371,10 +369,8 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 	if init != "" {
 		fmt.Fprintln(g.w, init)
 	}
-	if !omitCheck {
-		fmt.Fprintln(g.w, "if c.do() {")
-		defer fmt.Fprintln(g.w, "}")
-	}
+	fmt.Fprintln(g.w, "if c.do() {")
+	defer fmt.Fprintln(g.w, "}")
 	if len(types) == 1 {
 		fmt.Fprint(g.w, "c.ret = func() interface{} ")
 	} else {
@@ -422,9 +418,8 @@ func (g *generator) goKind(expr ast.Expr) string {
 	}
 }
 
-func (g *generator) goToCUE(expr ast.Expr) (cueKind string, omitCheck bool) {
+func (g *generator) goToCUE(expr ast.Expr) (cueKind string) {
 	// TODO: detect list and structs types for return values.
-	omitCheck = true
 	switch k := g.goKind(expr); k {
 	case "error":
 		cueKind += "bottomKind"
@@ -440,13 +435,7 @@ func (g *generator) goToCUE(expr ast.Expr) (cueKind string, omitCheck bool) {
 		cueKind += "intKind"
 	case "float64", "bigRat", "bigFloat", "decimal":
 		cueKind += "numKind"
-	case "list":
-		cueKind += "listKind"
-	case "decimalList":
-		omitCheck = false
-		cueKind += "listKind"
-	case "strList":
-		omitCheck = false
+	case "list", "decimalList", "strList":
 		cueKind += "listKind"
 	case "structVal":
 		cueKind += "structKind"
@@ -463,8 +452,7 @@ func (g *generator) goToCUE(expr ast.Expr) (cueKind string, omitCheck bool) {
 			// log.Println("Unknown type:", k)
 			// Must use callCtxt.value method for these types and resolve manually.
 			cueKind += "topKind" // TODO: can be more precise
-			omitCheck = false
 		}
 	}
-	return cueKind, omitCheck
+	return cueKind
 }

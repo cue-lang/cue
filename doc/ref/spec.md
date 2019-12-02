@@ -1118,13 +1118,12 @@ LabelSpec       = Label ( ":" | "::" ) .
 Label           = LabelName [ "?" ] | "[" AliasExpr "]".
 LabelName       = identifier | simple_string_lit  .
 
-attribute       = "@" identifier "(" attr_elems ")" .
-attr_elems      = attr_elem { "," attr_elem }
-attr_elem       =  attr_string | attr_label | attr_nest .
-attr_label      = identifier "=" attr_string .
-attr_nest       = identifier "(" attr_elems ")" .
-attr_string     = { attr_char } | string_lit .
-attr_char        = /* an arbitrary Unicode code point except newline, ',', '"', `'`, '#', '=', '(', and ')' */ .
+attribute       = "@" identifier "(" attr_tokens ")" .
+attr_tokens     = { attr_token |
+                    "(" attr_tokens ")" |
+                    "[" attr_tokens "]" |
+                    "{" attr_tokens "}" } .
+attr_token      = /* any token except '(', ')', '[', ']', '{', or '}' */
 ```
 
 <!--

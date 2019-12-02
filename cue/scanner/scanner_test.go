@@ -69,6 +69,8 @@ var testTokens = [...]elt{
 	{token.ATTRIBUTE, `@foo(",a=b")`, special},
 	{token.ATTRIBUTE, `@foo(##"\(),a=b"##)`, special},
 	{token.ATTRIBUTE, `@foo("",a="")`, special},
+	{token.ATTRIBUTE, `@foo(2,bytes,a.b=c)`, special},
+	{token.ATTRIBUTE, `@foo([{()}]())`, special},
 
 	// Identifiers and basic type literals
 	{token.BOTTOM, "_|_", literal},
@@ -747,9 +749,9 @@ var errorTests = []struct {
 	{`@foo`, token.ATTRIBUTE, 4, `@foo`, "invalid attribute: expected '('"},
 	{`@foo(`, token.ATTRIBUTE, 5, `@foo(`, "attribute missing ')'"},
 	{`@foo( `, token.ATTRIBUTE, 6, `@foo( `, "attribute missing ')'"},
-	{`@foo( "")`, token.ATTRIBUTE, 6, `@foo( "")`, "illegal character in attribute"},
-	{`@foo(a=b=c)`, token.ATTRIBUTE, 8, `@foo(a=b=c)`, "illegal character in attribute"},
-	{`@foo("" )`, token.ATTRIBUTE, 7, `@foo(""`, "attribute missing ')'"},
+	{`@foo( ""])`, token.ATTRIBUTE, 9, `@foo( ""])`, "unexpected ']'"},
+	{`@foo(3})`, token.ATTRIBUTE, 7, `@foo(3})`, "unexpected '}'"},
+	{`@foo(["")])`, token.ATTRIBUTE, 9, `@foo(["")])`, "unexpected ')'"},
 	{`@foo(""`, token.ATTRIBUTE, 7, `@foo(""`, "attribute missing ')'"},
 	{`@foo(aa`, token.ATTRIBUTE, 7, `@foo(aa`, "attribute missing ')'"},
 	{`@foo("\(())")`, token.ATTRIBUTE, 7, `@foo("\(())")`, "interpolation not allowed in attribute"},

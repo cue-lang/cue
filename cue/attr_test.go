@@ -52,6 +52,9 @@ func TestAttributeBody(t *testing.T) {
 		in:  `bar="str"`,
 		out: "[{bar=str 3}]",
 	}, {
+		in:  `foo.bar="str"`,
+		out: "[{foo.bar=str 7}]",
+	}, {
 		in:  `bar=,baz=`,
 		out: "[{bar= 3} {baz= 3}]",
 	}, {

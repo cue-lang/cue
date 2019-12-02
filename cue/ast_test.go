@@ -327,9 +327,9 @@ b: preference mark not allowed at this position:
 		out: "<0>{a: int @foo(1,\"str\")}",
 	}, {
 		in: `
-			a: int @b('' ,b) // invalid
+			a: int @b([,b) // invalid
 		`,
-		out: "attribute missing ')':\n    test:2:16\nmissing ',' in struct literal:\n    test:3:3\n<0>{}",
+		out: "unexpected ')':\n    test:2:18\nattribute missing ')':\n    test:3:3\n<0>{}",
 	}, {
 		in: `
 		a d: {

@@ -619,64 +619,37 @@ func (s *Scanner) scanAttribute() (tok token.Token, lit string) {
 
 	s.scanIdentifier()
 
-	if s.ch != '(' {
-		s.errf(s.offset, "invalid attribute: expected '('")
-		return token.ATTRIBUTE, string(s.src[offs:s.offset])
-	}
-	s.next()
-
-	for {
-		s.scanAttributeElem()
-		if s.ch != ',' {
-			break
-		}
-		s.next()
-	}
-
-	if s.ch == ')' {
-		s.next()
+	if _, tok, _ := s.Scan(); tok == token.LPAREN {
+		s.scanAttributeTokens(token.RPAREN)
 	} else {
-		s.errf(s.offset, "attribute missing ')'")
+		s.errf(s.offset, "invalid attribute: expected '('")
 	}
 	return token.ATTRIBUTE, string(s.src[offs:s.offset])
 }
 
-func (s *Scanner) scanAttributeElem() {
-	// try CUE string
-	if s.scanAttributeString() {
-		return
-	}
-
-	// try key-value pair
-	if s.scanIdentifier() != "" && s.ch == '=' {
-		s.next()
-		if s.scanAttributeString() {
+func (s *Scanner) scanAttributeTokens(close token.Token) {
+	for {
+		switch _, tok, _ := s.Scan(); tok {
+		case close:
 			return
-		}
-	}
-
-	// raw element or key-value pair with raw value
-	for s.ch != ',' && s.ch != ')' && s.ch != '\n' && s.ch != -1 {
-		switch s.ch {
-		case '#', '\'', '"', '(', '=':
-			s.errf(s.offset, "illegal character in attribute")
-			s.recoverParen(1)
+		case token.EOF:
+			s.errf(s.offset, "attribute missing '%s'", close)
 			return
-		}
-		s.next()
-	}
-}
 
-func (s *Scanner) scanAttributeString() bool {
-	if s.ch == '#' || s.ch == '"' || s.ch == '\'' {
-		if _, tok, _ := s.Scan(); tok == token.INTERPOLATION {
+		case token.INTERPOLATION:
 			s.errf(s.offset, "interpolation not allowed in attribute")
 			s.popInterpolation()
 			s.recoverParen(1)
+		case token.LPAREN:
+			s.scanAttributeTokens(token.RPAREN)
+		case token.LBRACE:
+			s.scanAttributeTokens(token.RBRACE)
+		case token.LBRACK:
+			s.scanAttributeTokens(token.RBRACK)
+		case token.RPAREN, token.RBRACK, token.RBRACE:
+			s.errf(s.offset, "unexpected '%s'", tok)
 		}
-		return true
 	}
-	return false
 }
 
 // recoverParen is an approximate recovery mechanism to recover from invalid

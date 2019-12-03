@@ -87,7 +87,7 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	if o, ok := v.(*structLit); ok {
 		// TODO: consider what to do with templates. Perhaps we should always
 		// do subsumption on fully evaluated structs.
-		if len(x.comprehensions) > 0 { //|| x.template != nil {
+		if len(x.comprehensions) > 0 || x.optionals != nil {
 			return false
 		}
 		if x.emit != nil {
@@ -114,6 +114,9 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 		}
 		// For closed structs, all arcs in b must exist in a.
 		if x.closeStatus.shouldClose() {
+			if !o.closeStatus.shouldClose() {
+				return false
+			}
 			for _, b := range o.arcs {
 				a := x.lookup(ctx, b.feature)
 				if a.val() == nil {

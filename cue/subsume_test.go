@@ -364,7 +364,13 @@ func TestSubsume(t *testing.T) {
 
 		// The one exception of the rule: there is no value of foo that can be
 		// added to b which would cause the unification of a and b to fail.
+		// So an optional field with a value of top is equivalent to not
+		// defining one at all.
 		420: {subsumes: true, in: `a: {foo?: _}, b: {}`},
+
+		430: {subsumes: false, in: `a: {[_]: 4}, b: {[_]: int}`},
+		// TODO: handle optionals.
+		431: {subsumes: false, in: `a: {[_]: int}, b: {[_]: 2}`},
 
 		// Lists
 		506: {subsumes: true, in: `a: [], b: [] `},
@@ -379,11 +385,13 @@ func TestSubsume(t *testing.T) {
 
 		// Closed structs.
 		600: {subsumes: false, in: `a: close({}), b: {a: 1}`},
-		601: {subsumes: true, in: `a: close({a: 1}), b: {a: 1}`},
+		601: {subsumes: false, in: `a: close({a: 1}), b: {a: 1}`},
 		602: {subsumes: false, in: `a: close({a: 1, b: 1}), b: {a: 1}`},
 		603: {subsumes: false, in: `a: {a: 1}, b: close({})`},
 		604: {subsumes: true, in: `a: {a: 1}, b: close({a: 1})`},
 		605: {subsumes: true, in: `a: {a: 1}, b: close({a: 1, b: 1})`},
+		606: {subsumes: true, in: `a: close({b?: 1}), b: close({b: 1})`},
+		607: {subsumes: false, in: `a: close({b: 1}), b: close({b?: 1})`},
 
 		// Definitions are not values.
 		610: {subsumes: false, in: `a: {a :: 1}, b: {a: 1}`},

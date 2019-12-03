@@ -2635,10 +2635,12 @@ The built-in function `and` takes a list and returns the result of applying
 the `&` operator to all elements in the list.
 It returns top for the empty list.
 
+```
 Expression:          Result
 and([a, b])          a & b
 and([a])             a
 and([])              _
+```
 
 ### `or`
 
@@ -2648,9 +2650,9 @@ It returns bottom for the empty list.
 
 ```
 Expression:          Result
-and([a, b])          a | b
-and([a])             a
-and([])              _|_
+or([a, b])           a | b
+or([a])              a
+or([])               _|_
 ```
 
 

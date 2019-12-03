@@ -129,8 +129,18 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		return p
 	}
 
+	// This algorithm assumes that multiple directories within cue.mod/*/
+	// have the same module scope and that there are no invalid modules.
+	inModule := false
 	for _, d := range dirs {
-		for dir := d[1]; ctxt.isDir(dir); {
+		if l.cfg.findRoot(d[1]) != "" {
+			inModule = true
+			break
+		}
+	}
+
+	for _, d := range dirs {
+		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
 			files, err := ctxt.readDir(dir)
 			if err != nil && !os.IsNotExist(err) {
 				p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
@@ -143,7 +153,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 				fp.add(pos, dir, f.Name(), importComment)
 			}
 
-			if filepath.Clean(dir) == d[0] || fp.pkg.PkgName == "" {
+			if fp.pkg.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
 				break
 			}
 
@@ -151,8 +161,10 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 			// package.
 			fp.ignoreOther = true
 
-			parent, _ := filepath.Split(filepath.Clean(dir))
-			if parent == dir {
+			parent, _ := filepath.Split(dir)
+			parent = filepath.Clean(parent)
+
+			if parent == dir || len(parent) < len(d[0]) {
 				break
 			}
 			dir = parent

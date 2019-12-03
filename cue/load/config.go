@@ -369,12 +369,10 @@ func (c Config) complete() (cfg *Config, err error) {
 	// pkgname.cue.mod
 	// Look to see if there is a cue.mod.
 	if c.ModuleRoot == "" {
-		abs, err := c.findRoot(c.Dir)
-		if err != nil {
-			// Not using modules: only consider the current directory.
-			c.ModuleRoot = c.Dir
-		} else {
-			c.ModuleRoot = abs
+		// Only consider the current directory by default
+		c.ModuleRoot = c.Dir
+		if root := c.findRoot(c.Dir); root != "" {
+			c.ModuleRoot = root
 		}
 	}
 
@@ -422,22 +420,32 @@ func (c Config) complete() (cfg *Config, err error) {
 	return &c, nil
 }
 
-func (c Config) findRoot(dir string) (string, error) {
+func (c Config) isRoot(dir string) bool {
+	fs := &c.fileSystem
+	// Note: cue.mod used to be a file. We still allow both to match.
+	_, err := fs.stat(filepath.Join(dir, modDir))
+	return err == nil
+}
+
+// findRoot returns the module root or "" if none was found.
+func (c Config) findRoot(dir string) string {
 	fs := &c.fileSystem
 
 	absDir, err := filepath.Abs(dir)
 	if err != nil {
-		return "", err
+		return ""
 	}
 	abs := absDir
 	for {
-		_, err := fs.stat(filepath.Join(abs, modDir))
-		if err == nil {
-			// Note: cue.mod used to be a file. We still allow
-			// both to match.
-			return abs, nil
+		if c.isRoot(abs) {
+			return abs
 		}
 		d := filepath.Dir(abs)
+		if filepath.Base(filepath.Dir(abs)) == modDir {
+			// The package was located within a "cue.mod" dir and there was
+			// not cue.mod found until now. So there is no root.
+			return ""
+		}
 		if len(d) >= len(abs) {
 			break // reached top of file system, no cue.mod
 		}
@@ -449,11 +457,11 @@ func (c Config) findRoot(dir string) (string, error) {
 	for {
 		info, err := fs.stat(filepath.Join(abs, pkgDir))
 		if err == nil && info.IsDir() {
-			return abs, nil
+			return abs
 		}
 		d := filepath.Dir(abs)
 		if len(d) >= len(abs) {
-			return "", err // reached top of file system, no pkg dir.
+			return "" // reached top of file system, no pkg dir.
 		}
 		abs = d
 	}

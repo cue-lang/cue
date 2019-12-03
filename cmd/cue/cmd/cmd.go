@@ -173,10 +173,10 @@ A simple file using command line execution:
 	}
 	EOF
 
-	$ cue cmd echo
+	$ cue cmd hello
 	Hello World! Welcome to Amsterdam.
 
-	$ cue cmd echo -who you
+	$ cue cmd hello -who you  # Setting arguments is not supported yet by cue
 	Hello you! Welcome to Amsterdam.
 
 

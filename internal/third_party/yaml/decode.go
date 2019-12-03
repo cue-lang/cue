@@ -395,6 +395,9 @@ func (d *decoder) absPos(m yaml_mark_t) token.Pos {
 }
 
 func (d *decoder) start(n *node) token.Pos {
+	if n.startPos == n.endPos {
+		return token.NoPos
+	}
 	return d.pos(n.startPos)
 }
 
@@ -444,7 +447,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 	}
 	if resolved == nil {
 		return &ast.BasicLit{
-			ValuePos: d.start(n),
+			ValuePos: d.start(n).WithRel(token.Blank),
 			Kind:     token.NULL,
 			Value:    "null",
 		}
@@ -517,7 +520,7 @@ func (d *decoder) scalar(n *node) ast.Expr {
 
 	case yaml_NULL_TAG:
 		return &ast.BasicLit{
-			ValuePos: d.start(n),
+			ValuePos: d.start(n).WithRel(token.Blank),
 			Kind:     token.NULL,
 			Value:    "null",
 		}

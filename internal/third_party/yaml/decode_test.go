@@ -153,6 +153,11 @@ var unmarshalTests = []struct {
 	}, {
 		"~: null key",
 		`"~": "null key"`,
+	}, {
+		`empty:
+apple: "newline"`,
+		`empty: null
+apple: "newline"`,
 	},
 
 	// Flow sequence

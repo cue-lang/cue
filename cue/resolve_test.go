@@ -2810,6 +2810,18 @@ func TestFullEval(t *testing.T) {
 		bar: hex.EncodedLen(len)
 		`,
 		out: `<0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}`,
+	}, {
+		// This resulted in an issue in an older version. Prevent regression.
+		desc: "comprehension and skipped field",
+		in: `
+		for key, value in {x: v: 1} {
+			"\(key)": {
+				v: *{for pod, _ in value.v {}} | {"\(value.v)": 2}
+				_p: 3
+			}
+		}
+		`,
+		out: `<0>{x: <1>{v: <2>{1: 2}, _p: 3}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

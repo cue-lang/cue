@@ -49,12 +49,14 @@ func TestExport(t *testing.T) {
 			multiSep + `"""`,
 	}, {
 		in: `{
+			$type: 3
 			"_": int
 			"_foo": int
 			_bar: int
 		}`,
 		out: unindent(`
 		{
+			$type:  3
 			"_":    int
 			"_foo": int
 			_bar:   int

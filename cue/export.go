@@ -127,7 +127,7 @@ func (p *exporter) label(f label) ast.Label {
 		return &ast.BasicLit{Value: str}
 	}
 	for i, r := range orig {
-		if unicode.IsLetter(r) || r == '_' {
+		if unicode.IsLetter(r) || r == '_' || r == '$' {
 			continue
 		}
 		if i > 0 && unicode.IsDigit(r) {

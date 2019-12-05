@@ -24,7 +24,17 @@ const (
 	// subChoose ensures values are elected before doing a subsumption. This
 	// feature is on the conservative side and may result in false negatives.
 	subChoose subsumeMode = 1 << iota
+
+	// subNoOptional ignores optional fields for the purpose of subsumption.
+	// This option is predominantly intended for implementing equality checks.
+	subNoOptional
 )
+
+// TODO: improve upon this highly inefficient implementation. There should
+// be a dedicated equal function once the dust settles.
+func equals(c *context, x, y value) bool {
+	return subsumes(c, x, y, subNoOptional) && subsumes(c, y, x, subNoOptional)
+}
 
 // subsumes checks gt subsumes lt. If any of the values contains references or
 // unevaluated expressions, structural subsumption is performed. This means
@@ -84,10 +94,14 @@ func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
 }
 
 func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+	ignoreOptional := mode&subNoOptional != 0
 	if o, ok := v.(*structLit); ok {
 		// TODO: consider what to do with templates. Perhaps we should always
 		// do subsumption on fully evaluated structs.
-		if len(x.comprehensions) > 0 || x.optionals != nil {
+		if x.optionals != nil && !ignoreOptional {
+			return false
+		}
+		if len(x.comprehensions) > 0 {
 			return false
 		}
 		if x.emit != nil {
@@ -98,6 +112,9 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 
 		// all arcs in n must exist in v and its values must subsume.
 		for _, a := range x.arcs {
+			if a.optional && ignoreOptional {
+				continue
+			}
 			b := o.lookup(ctx, a.feature)
 			if !a.optional && b.optional {
 				return false
@@ -114,10 +131,13 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 		}
 		// For closed structs, all arcs in b must exist in a.
 		if x.closeStatus.shouldClose() {
-			if !o.closeStatus.shouldClose() {
+			if !ignoreOptional && !o.closeStatus.shouldClose() {
 				return false
 			}
 			for _, b := range o.arcs {
+				if ignoreOptional && b.optional {
+					continue
+				}
 				a := x.lookup(ctx, b.feature)
 				if a.val() == nil {
 					return false

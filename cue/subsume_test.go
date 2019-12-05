@@ -372,6 +372,16 @@ func TestSubsume(t *testing.T) {
 		// TODO: handle optionals.
 		431: {subsumes: false, in: `a: {[_]: int}, b: {[_]: 2}`},
 
+		440: {subsumes: true, in: `a: {foo?: 1}, b: {}`, mode: subNoOptional},
+		441: {subsumes: true, in: `a: {}, b: {foo?: 1}`, mode: subNoOptional},
+		442: {subsumes: true, in: `a: {foo?: 1}, b: {foo: 1}`, mode: subNoOptional},
+		443: {subsumes: true, in: `a: {foo?: 1}, b: {foo?: 1}`, mode: subNoOptional},
+		444: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subNoOptional},
+		445: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subNoOptional},
+		446: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subNoOptional},
+		447: {subsumes: true, in: `a: {}, b: close({})`, mode: subNoOptional},
+		448: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subNoOptional},
+
 		// Lists
 		506: {subsumes: true, in: `a: [], b: [] `},
 		507: {subsumes: true, in: `a: [1], b: [1] `},
@@ -392,8 +402,10 @@ func TestSubsume(t *testing.T) {
 		605: {subsumes: true, in: `a: {a: 1}, b: close({a: 1, b: 1})`},
 		606: {subsumes: true, in: `a: close({b?: 1}), b: close({b: 1})`},
 		607: {subsumes: false, in: `a: close({b: 1}), b: close({b?: 1})`},
+		608: {subsumes: true, in: `a: {}, b: close({})`},
+		609: {subsumes: true, in: `a: {}, b: close({foo?: 1})`},
 
-		// Definitions are not values.
+		// Definitions are not regular fields.
 		610: {subsumes: false, in: `a: {a :: 1}, b: {a: 1}`},
 		611: {subsumes: false, in: `a: {a: 1}, b: {a :: 1}`},
 	}

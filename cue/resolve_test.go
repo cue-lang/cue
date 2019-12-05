@@ -2559,10 +2559,14 @@ func TestFullEval(t *testing.T) {
 		d: err != _|_ // allowed
 		e: err != 1&3
 		// z: err == err // TODO: should infer to be true?
+		f: ({a: 1} & {a: 2}) == _|_
+		g: ({a: 1} & {b: 2}) == _|_
+		h: _|_ == ({a: 1} & {a: 2})
+		i: _|_ == ({a: 1} & {b: 2})
 
 		err: 1 & 2
 		`,
-		out: `<0>{a: true, b: _|_((1 & 2):conflicting values 1 and 2), err: _|_((1 & 2):conflicting values 1 and 2), c: true, d: false, e: _|_((1 & 2):conflicting values 1 and 2)}`,
+		out: `<0>{a: true, b: _|_((1 & 2):conflicting values 1 and 2), err: _|_((1 & 2):conflicting values 1 and 2), c: true, d: false, e: _|_((1 & 2):conflicting values 1 and 2), f: true, g: false, h: true, i: false}`,
 	}, {
 		desc: "or builtin should not fail on non-concrete empty list",
 		in: `

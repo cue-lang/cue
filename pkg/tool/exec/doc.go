@@ -6,7 +6,7 @@
 //
 //     // Run executes the given shell command.
 //     Run: {
-//     	kind: *"tool/exec.Run" | "exec" // exec for backwards compatibility
+//     	$id: *"tool/exec.Run" | "exec" // exec for backwards compatibility
 //
 //     	// cmd is the command to run.
 //     	cmd: string | [string, ...string]
@@ -16,7 +16,7 @@
 //     	install?: string | [string, ...string]
 //
 //     	// env defines the environment variables to use for this system.
-//     	env <Key>: string
+//     	env: [string]: string
 //
 //     	// stdout captures the output from stdout if it is of type bytes or string.
 //     	// The default value of null indicates it is redirected to the stdout of the

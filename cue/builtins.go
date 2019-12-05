@@ -3484,7 +3484,8 @@ var builtinPackages = map[string]*builtinPkg{
 		$long?:  string
 	}
 	Task: {
-		kind: =~"\\."
+		$type: "tool.Task"
+		$id:   =~"\\."
 	}
 }`,
 	},
@@ -3492,7 +3493,7 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Print: {
-		kind: *"tool/cli.Print" | "print"
+		$id:  *"tool/cli.Print" | "print"
 		text: string
 	}
 }`,
@@ -3501,11 +3502,11 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Run: {
-		kind:     *"tool/exec.Run" | "exec"
+		$id:      *"tool/exec.Run" | "exec"
 		cmd:      string | [string, ...string]
 		install?: string | [string, ...string]
 		env: {
-			[Key=string]: string
+			[string]: string
 		}
 		stdout:  *null | string | bytes
 		stderr:  *null | string | bytes
@@ -3518,24 +3519,24 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Read: {
-		kind:     "tool/file.Read"
+		$id:      "tool/file.Read"
 		filename: !=""
 		contents: *bytes | string
 	}
 	Create: {
-		kind:        "tool/file.Create"
+		$id:         "tool/file.Create"
 		filename:    !=""
 		contents:    bytes | string
 		permissions: int | *420
 	}
 	Append: {
-		kind:        "tool/file.Append"
+		$id:         "tool/file.Append"
 		filename:    !=""
 		contents:    bytes | string
 		permissions: int | *420
 	}
 	Glob: {
-		kind: "tool/file.Glob"
+		$id:  "tool/file.Glob"
 		glob: !=""
 		files: [...string]
 	}
@@ -3548,7 +3549,7 @@ var builtinPackages = map[string]*builtinPkg{
 		method: "GET"
 	}
 	Do: {
-		kind:   *"tool/http.Do" | "http"
+		$id:    *"tool/http.Do" | "http"
 		method: string
 		response: {
 			body: *bytes | string

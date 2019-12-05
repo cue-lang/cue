@@ -52,14 +52,15 @@
 //     	// tasks specifies the list of things to do to run command. Tasks are
 //     	// typically underspecified and completed by the particular internal
 //     	// handler that is running them. Task de
-//     	tasks <name>: Task
+//     	tasks: [name=string]: Task
 //     }
 //
 //     // A Task defines a step in the execution of a command.
 //     Task: {
 //     	// kind indicates the operation to run. It must be of the form
 //     	// packagePath.Operation.
-//     	kind: =~#"\."#
+//     	$id:   =~#"\."#
+//     	$type: "tool.Task" // legacy field 'kind' still supported for now.
 //     }
 //
 package tool

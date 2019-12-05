@@ -16,7 +16,7 @@ package file
 
 // Read reads the contents of a file.
 Read: {
-	kind: "tool/file.Read"
+	$id: "tool/file.Read"
 
 	// filename names the file to read.
 	//
@@ -32,7 +32,7 @@ Read: {
 
 // Append writes contents to the given file.
 Append: {
-	kind: "tool/file.Append"
+	$id: "tool/file.Append"
 
 	// filename names the file to append.
 	//
@@ -49,7 +49,7 @@ Append: {
 
 // Create writes contents to the given file.
 Create: {
-	kind: "tool/file.Create"
+	$id: "tool/file.Create"
 
 	// filename names the file to write.
 	//
@@ -66,7 +66,7 @@ Create: {
 
 // Glob returns a list of files.
 Glob: {
-	kind: "tool/file.Glob"
+	$id: "tool/file.Glob"
 
 	// glob specifies the pattern to match files with.
 	//

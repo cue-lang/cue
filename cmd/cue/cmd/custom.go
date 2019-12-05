@@ -357,11 +357,14 @@ var legacyKinds = map[string]string{
 }
 
 func newTask(index int, name string, v cue.Value) (*task, error) {
-	// Lookup kind for backwards compatibility.
-	// TODO: consider at some point whether kind can be removed.
-	kind, err := v.Lookup("kind").String()
+	kind, err := v.Lookup("$id").String()
 	if err != nil {
-		return nil, err
+		// Lookup kind for backwards compatibility.
+		// TODO: consider at some point whether kind can be removed.
+		kind, err = v.Lookup("kind").String()
+		if err != nil {
+			return nil, err
+		}
 	}
 	if k, ok := legacyKinds[kind]; ok {
 		kind = k

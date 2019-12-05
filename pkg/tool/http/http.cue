@@ -20,7 +20,7 @@ Put:    Do & {method: "PUT"}
 Delete: Do & {method: "DELETE"}
 
 Do: {
-	kind: *"tool/http.Do" | "http" // http for backwards compatibility
+	$id: *"tool/http.Do" | "http" // http for backwards compatibility
 
 	method: string
 	url:    string // TODO: make url.URL type
@@ -47,7 +47,7 @@ Do: {
 //  cert: string
 //  key:  string
 //
-//  handle <Pattern>: Message & {
+//  handle: [Pattern=string]: Message & {
 //   pattern: Pattern
 //  }
 // }

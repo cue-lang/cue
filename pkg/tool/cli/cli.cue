@@ -16,7 +16,7 @@ package cli
 
 // Print sends text to the stdout of the current process.
 Print: {
-	kind: *"tool/cli.Print" | "print" // for backwards compatibility
+	$id: *"tool/cli.Print" | "print" // for backwards compatibility
 
 	// text is the text to be printed.
 	text: string
@@ -26,7 +26,7 @@ Print: {
 // Ask prompts the current console with a message and waits for input.
 //
 // Example:
-//     task ask: cli.Ask({
+//     task: ask: cli.Ask({
 //         prompt:   "Are you okay?"
 //         repsonse: bool
 //     })

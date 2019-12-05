@@ -2822,6 +2822,15 @@ func TestFullEval(t *testing.T) {
 		}
 		`,
 		out: `<0>{x: <1>{v: <2>{1: 2}, _p: 3}}`,
+	}, {
+		desc: "non-structural direct cycles",
+		in: `
+		c1: {bar: baz: 2} & c1.bar
+		c2: {bar: 1} & c2.bar
+		`,
+		out: `<0>{` +
+			`c1: <1>{bar: <2>{baz: 2}, baz: 2}, ` +
+			`c2: _|_(<3>{bar: 1<3>.bar}:cannot embed value 1 of type int in struct)}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

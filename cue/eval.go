@@ -25,10 +25,58 @@ type resolver interface {
 var _ resolver = &selectorExpr{}
 var _ resolver = &indexExpr{}
 
+// decycleRef rewrites a reference that resolves to an evaluation cycle to
+// an embedding that can be unified as is.
+func decycleRef(ctx *context, v value) (value, scope) {
+	switch x := v.(type) {
+	case *selectorExpr:
+		v, sc := decycleRef(ctx, x.x)
+		if v == nil {
+			e := x.evalPartial(ctx)
+			v = e
+			if cycleError(e) != nil {
+				sc = &structLit{baseValue: x.base()}
+				return &nodeRef{x.base(), sc, x.feature}, sc
+			}
+			return nil, nil
+		}
+		return &selectorExpr{x.baseValue, v, x.feature}, sc
+	case *indexExpr:
+		v, sc := decycleRef(ctx, x.x)
+		if v == x {
+			return nil, nil
+		}
+		return &indexExpr{x.baseValue, v, x.index}, sc
+	case *nodeRef:
+		return nil, nil
+	}
+	return v, nil
+}
+
 func resolveReference(ctx *context, v value) evaluated {
 	if r, ok := v.(resolver); ok {
-		if st, ok := r.reference(ctx).(*structLit); ok {
+		e := r.reference(ctx)
+		if st, ok := e.(*structLit); ok {
 			return st
+		}
+		if b, ok := e.(*bottom); ok {
+			if b := cycleError(b); b != nil {
+				// This is only called if we are unifying. The value referenced
+				// is either a struct or not. In case the other value is not a
+				// struct, we ensure an error by returning a struct. In case the
+				// value is a struct, we postpone the evaluation of this
+				// reference by creating an embedding for it (which are
+				// evaluated after evaluating the struct itself.)
+				if y, sc := decycleRef(ctx, v); y != v {
+					st := &structLit{baseValue: v.base()}
+					ctx.pushForwards(sc, st)
+					cp := ctx.copy(y)
+					ctx.popForwards()
+					st.comprehensions = []compValue{{comp: cp}}
+					return st
+				}
+				return b
+			}
 		}
 	}
 	return v.evalPartial(ctx)

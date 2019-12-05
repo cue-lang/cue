@@ -1149,7 +1149,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 		x.comprehensions = orig
 
 	default:
-		return nil, ctx.mkErr(x, n, "invalid embedding")
+		return nil, ctx.mkErr(x, n, "cannot embed value %s of type %s in struct", ctx.str(n), n.kind())
 	}
 
 	switch checked.(type) {
@@ -1162,7 +1162,7 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 		x.comprehensions = orig
 
 	default:
-		return nil, ctx.mkErr(x, n, "invalid embedding")
+		return nil, ctx.mkErr(x, n, "cannot embed value %s of type %s in struct", ctx.str(n), n.kind())
 	}
 
 	switch v := n.(type) {

@@ -100,7 +100,7 @@ func ParseIdent(n *Ident) (string, error) {
 	}
 
 	for _, r := range ident {
-		if isLetter(r) || isDigit(r) || r == '_' {
+		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
 			continue
 		}
 		if r == '-' && quoted {

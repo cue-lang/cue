@@ -2,6 +2,7 @@ cue export ./hello
 cmp stdout expect-stdout
 -- expect-stdout --
 {
+    "$type": "demo",
     "message": "Hello World!"
 }
 -- hello/data.cue --
@@ -11,5 +12,6 @@ who :: "World"
 -- hello/hello.cue --
 package hello
 
+$type:   "demo"
 message: "Hello \(who)!" // who declared in data.cue
 -- hello/cue.mod --

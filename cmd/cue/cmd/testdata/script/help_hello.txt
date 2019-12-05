@@ -1,0 +1,37 @@
+cue help cmd hello
+cmp stdout expect-stdout
+
+-- cue.mod --
+-- task_tool.cue --
+package home
+
+import "tool/cli"
+
+// say hello to someone
+//
+//   Usage: hello
+//
+// Hello can be used to say hello to the world.
+command: hello: {
+    task: say: {
+        cli.Print
+        text: "Hello world!"
+    }
+}
+
+-- expect-stdout --
+Hello can be used to say hello to the world.
+
+Usage:
+  cue cmd hello [flags]
+
+Flags:
+  -h, --help   help for hello
+
+Global Flags:
+      --debug            give detailed error info
+  -i, --ignore           proceed in the presence of errors
+  -p, --package string   CUE package to evaluate
+  -s, --simplify         simplify output
+      --trace            trace computation
+  -v, --verbose          print information about progress

@@ -17,30 +17,29 @@
 //
 //     	request: {
 //     		body: *bytes | string
-//     		header <Name>:  string | [...string]
-//     		trailer <Name>: string | [...string]
+//     		header: [string]:  string | [...string]
+//     		trailer: [string]: string | [...string]
 //     	}
 //     	response: {
 //     		status:     string
 //     		statusCode: int
 //
 //     		body: *bytes | string
-//     		header <Name>:  string | [...string]
-//     		trailer <Name>: string | [...string]
+//     		header: [string]:  string | [...string]
+//     		trailer: [string]: string | [...string]
 //     	}
 //     }
 //
-//     /* TODO: support serving once we have the cue serve command.
-//     Serve: {
-//     	port: int
-//
-//     	cert: string
-//     	key:  string
-//
-//     	handle <Pattern>: Message & {
-//     		pattern: Pattern
-//     	}
-//     }
-//     */
+//     //  TODO: support serving once we have the cue serve command.
+//     // Serve: {
+//     //  port: int
+//     //
+//     //  cert: string
+//     //  key:  string
+//     //
+//     //  handle <Pattern>: Message & {
+//     //   pattern: Pattern
+//     //  }
+//     // }
 //
 package http

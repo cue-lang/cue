@@ -57,10 +57,12 @@ to user-defined commands for processing.
 
 Commands are defined in CUE as follows:
 
-	command deploy: {
+	import "tool/exec"
+	command: deploy: {
+		exec.Run
 		cmd:   "kubectl"
 		args:  [ "-f", "deploy" ]
-		in:    json.Encode($) // encode the emitted configuration.
+		in:    json.Encode(userValue) // encode the emitted configuration.
 	}
 
 cue can also combine the results of http or grpc request with the input
@@ -270,12 +272,10 @@ type subSpec struct {
 }
 
 func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error {
-	if len(args) == 0 {
-		return nil
-	}
-
-	if _, ok := sub[args[0]]; ok {
-		args = args[1:]
+	if len(args) > 0 {
+		if _, ok := sub[args[0]]; ok {
+			args = args[1:]
+		}
 	}
 
 	if len(args) > 0 {

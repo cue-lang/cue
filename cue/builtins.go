@@ -3474,12 +3474,14 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Command: {
-		usage?: string
-		short?: string
-		long?:  string
 		tasks: {
 			[name=string]: Task
 		}
+		$type:   "tool.Command"
+		$name:   !=""
+		$usage?: =~"^\($name) "
+		$short?: string
+		$long?:  string
 	}
 	Task: {
 		kind: =~"\\."
@@ -3551,10 +3553,10 @@ var builtinPackages = map[string]*builtinPkg{
 		response: {
 			body: *bytes | string
 			header: {
-				[Name=string]: string | [...string]
+				[string]: string | [...string]
 			}
 			trailer: {
-				[Name=string]: string | [...string]
+				[string]: string | [...string]
 			}
 			status:     string
 			statusCode: int
@@ -3563,10 +3565,10 @@ var builtinPackages = map[string]*builtinPkg{
 		request: {
 			body: *bytes | string
 			header: {
-				[Name=string]: string | [...string]
+				[string]: string | [...string]
 			}
 			trailer: {
-				[Name=string]: string | [...string]
+				[string]: string | [...string]
 			}
 		}
 	}

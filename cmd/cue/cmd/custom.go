@@ -26,6 +26,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"os"
+	"strings"
 	"sync"
 
 	"cuelang.org/go/cue"
@@ -44,12 +45,21 @@ const (
 	taskSection    = "task"
 )
 
-func lookupString(obj cue.Value, key string) string {
+func lookupString(obj cue.Value, key, def string) string {
 	str, err := obj.Lookup(key).String()
-	if err != nil {
-		return ""
+	if err == nil {
+		def = str
 	}
-	return str
+	return strings.TrimSpace(def)
+}
+
+// splitLine splits the first line and the rest of the string.
+func splitLine(s string) (line, tail string) {
+	line = s
+	if p := strings.IndexByte(s, '\n'); p >= 0 {
+		line, tail = strings.TrimSpace(s[:p]), strings.TrimSpace(s[p+1:])
+	}
+	return
 }
 
 // Variables used for testing.
@@ -68,15 +78,26 @@ func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.I
 	if !o.Exists() {
 		return nil, o.Err()
 	}
-
-	usage := lookupString(o, "usage")
-	if usage == "" {
+	docs := o.Doc()
+	var usage, short, long string
+	if len(docs) > 0 {
+		txt := docs[0].Text()
+		short, txt = splitLine(txt)
+		short = lookupString(o, "short", short)
+		if strings.HasPrefix(txt, "Usage:") {
+			usage, txt = splitLine(txt[len("Usage:"):])
+		}
+		usage = lookupString(o, "usage", usage)
+		usage = lookupString(o, "$usage", usage)
+		long = lookupString(o, "long", txt)
+	}
+	if !strings.HasPrefix(usage, name+" ") {
 		usage = name
 	}
 	sub := &cobra.Command{
 		Use:   usage,
-		Short: lookupString(o, "short"),
-		Long:  lookupString(o, "long"),
+		Short: lookupString(o, "$short", short),
+		Long:  lookupString(o, "$long", long),
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
 			// TODO:
 			// - parse flags and env vars

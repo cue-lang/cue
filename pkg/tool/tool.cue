@@ -15,20 +15,34 @@
 package tool
 
 // A Command specifies a user-defined command.
+//
+// Descriptions are derived from the doc comment, if they are not provided
+// structurally, using the following format:
+//
+//    // short description on one line
+//    //
+//    // Usage: <name> usage (optional)
+//    //
+//    // long description covering the remainder of the doc comment.
+//
 Command: {
+	$type: "tool.Command"
+
+	$name: !=""
+
 	//
 	// Example:
 	//     mycmd [-n] names
-	usage?: string
+	$usage?: =~"^\($name) "
 
 	// short is short description of what the command does.
-	short?: string
+	$short?: string
 
 	// long is a longer description that spans multiple lines and
 	// likely contain examples of usage of the command.
-	long?: string
+	$long?: string
 
-	// TODO: define flags and environment variables.
+	// TODO: child commands.
 
 	// tasks specifies the list of things to do to run command. Tasks are
 	// typically underspecified and completed by the particular internal

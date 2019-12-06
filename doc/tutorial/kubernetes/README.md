@@ -34,7 +34,7 @@ The given YAML files are ordered in following directory
 (you can use `find` if you don't have tree):
 
 ```
-$ tree ./testdata | head
+$ tree ./original | head
 .
 └── services
     ├── frontend
@@ -455,6 +455,7 @@ _spec: {
 
     metadata: name: Name
     metadata: labels: component: Component
+    spec: selector: {}
     spec: template: {
         metadata: labels: {
             app:       Name

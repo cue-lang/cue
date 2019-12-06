@@ -18,6 +18,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -57,6 +59,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -117,6 +121,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -159,6 +165,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -219,6 +227,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -261,6 +271,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -321,6 +333,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -363,6 +377,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -423,6 +439,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -465,6 +483,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -525,6 +545,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -567,6 +589,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -627,6 +651,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -668,6 +694,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -728,6 +756,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -770,6 +800,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -809,6 +841,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -869,6 +903,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -906,6 +942,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -976,6 +1014,8 @@ statefulSet: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1084,6 +1124,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1144,6 +1186,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1213,6 +1257,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1275,6 +1321,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1329,6 +1377,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1389,6 +1439,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1437,6 +1489,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1499,6 +1553,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1549,6 +1605,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1588,6 +1646,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1648,6 +1708,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1727,6 +1789,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1787,6 +1851,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1866,6 +1932,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -1926,6 +1994,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -1996,6 +2066,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2056,6 +2128,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -2126,6 +2200,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2186,6 +2262,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -2256,6 +2334,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2316,6 +2396,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -2386,6 +2468,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2446,6 +2530,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -2495,6 +2581,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2534,6 +2622,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2690,6 +2780,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2751,6 +2843,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -2819,6 +2913,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -2886,6 +2982,8 @@ daemonSet: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     name: "node-exporter"
@@ -2956,6 +3054,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -3327,6 +3427,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -3366,6 +3468,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -3491,6 +3595,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -3539,6 +3645,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -3601,6 +3709,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -3648,6 +3758,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {
@@ -3881,6 +3993,8 @@ deployment: {
             }
         }
         spec: {
+            selector: {
+            }
             template: {
                 metadata: {
                     labels: {
@@ -3940,6 +4054,8 @@ _spec: {
         }
     }
     spec: {
+        selector: {
+        }
         template: {
             metadata: {
                 labels: {

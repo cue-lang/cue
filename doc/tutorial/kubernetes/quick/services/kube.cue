@@ -72,6 +72,7 @@ _spec: {
 
 	metadata: name: Name
 	metadata: labels: component: Component
+	spec: selector: {}
 	spec: template: {
 		metadata: labels: {
 			app:       Name

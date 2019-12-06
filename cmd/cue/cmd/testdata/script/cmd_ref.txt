@@ -1,0 +1,29 @@
+cue cmd ref
+cmp stdout expect-stdout
+
+-- expect-stdout --
+hello
+
+-- task_tool.cue --
+package home
+
+import (
+	"tool/cli"
+)
+
+command: ref: {
+	task: {
+		t1: exec.Run & {
+				ref: task.t1.stdout
+				cmd: ["sh", "-c", "echo hello"]
+				stdout: string
+		}
+		t2: cli.Print & {
+			text: task.t1.stdout
+		}
+	}
+}
+
+-- task.cue --
+package home
+-- cue.mod --

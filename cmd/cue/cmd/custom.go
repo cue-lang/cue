@@ -127,6 +127,16 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 	return err
 }
 
+func isTask(index map[taskKey]*task, root *cue.Instance, value cue.Value) (*task, bool) {
+	inst, path := value.Reference()
+	if path != nil && inst == root {
+		if task, ok := index[keyForReference(path)]; ok {
+			return task, true
+		}
+	}
+	return nil, false
+}
+
 // executeTasks runs user-defined tasks as part of a user-defined command.
 //
 // All tasks are started at once, but will block until tasks that they depend
@@ -155,9 +165,48 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 	// Mark dependencies for unresolved nodes.
 	for _, t := range queue {
 		task := tasks.Lookup(t.name)
+
+		// Inject dependency in `$after` field
+		after := task.Lookup("$after")
+		if after.Err() == nil {
+			if dep, ok := isTask(index, root, after); ok {
+				t.dep[dep] = true
+			}
+			iter, err := after.List()
+			if err == nil {
+				for iter.Next() {
+					if dep, ok := isTask(index, root, iter.Value()); ok {
+						t.dep[dep] = true
+					}
+				}
+			}
+		}
+
+		// Inject reverse dependency in `$before` field
+		before := task.Lookup("$before")
+		if before.Err() == nil {
+			if dep, ok := isTask(index, root, before); ok {
+				dep.dep[t] = true
+			}
+			iter, err := before.List()
+			if err == nil {
+				for iter.Next() {
+					if dep, ok := isTask(index, root, iter.Value()); ok {
+						dep.dep[t] = true
+					}
+				}
+			}
+		}
+
 		task.Walk(func(v cue.Value) bool {
+			if v == task {
+				return true
+			}
+			if (after.Err() == nil && v.Equals(after)) || (before.Err() == nil && v.Equals(before)) {
+				return false
+			}
 			for _, r := range appendReferences(nil, root, v) {
-				if dep, ok := index[keyForReference(r)]; ok {
+				if dep, ok := index[keyForReference(r)]; ok && t != dep {
 					v := root.Lookup(r...)
 					if v.IsIncomplete() && v.Kind() != cue.StructKind {
 						t.dep[dep] = true

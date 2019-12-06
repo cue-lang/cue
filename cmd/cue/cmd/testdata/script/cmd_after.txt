@@ -1,0 +1,40 @@
+cue cmd after
+cmp stdout expect-stdout
+
+-- expect-stdout --
+true
+
+-- after_tool.cue --
+package home
+
+import (
+	"tool/exec"
+	"tool/cli"
+	"strings"
+)
+
+command: after: {
+	task: {
+		t1: exec.Run & {
+			cmd: ["sh", "-c", "sleep 2; date +%s"]
+			stdout: string
+		}
+		t2: exec.Run & {
+			cmd: ["sh", "-c", "date +%s"]
+			stdout: string
+			$after: task.t1
+		}
+		t3: exec.Run & {
+			cmd: ["sh", "-c", "a=\(strings.TrimSpace(task.t1.stdout));b=\(strings.TrimSpace(task.t2.stdout));if [ $a -le $b ]; then echo 'true'; fi"]
+			stdout: string
+		}
+		t4: cli.Print & {
+				text: task.t3.stdout
+		}
+	}
+}
+
+-- task.cue --
+package home
+
+-- cue.mod --

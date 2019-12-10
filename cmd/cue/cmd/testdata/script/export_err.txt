@@ -1,7 +1,10 @@
-cue export ./exporterr
+! cue export ./exporterr
 cmp stdout expect-stdout
+cmp stderr expect-stderr
+-- expect-stderr --
+a.b.2.c: cue: marshal error at path a.b.2.c: cannot convert incomplete value "int" to JSON:
+    ./exporterr/export_err.cue:4:16
 -- expect-stdout --
-cue: marshal error at path a.b.2.c: cannot convert incomplete value "int" to JSON
 -- exporterr/export_err.cue --
 package exporterr
 

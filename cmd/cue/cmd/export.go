@@ -15,12 +15,12 @@
 package cmd
 
 import (
-	"cuelang.org/go/pkg/encoding/yaml"
 	"encoding/json"
 	"fmt"
 	"io"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/pkg/encoding/yaml"
 	"github.com/spf13/cobra"
 )
 
@@ -128,7 +128,7 @@ func outputJSON(cmd *Command, w io.Writer, v cue.Value) error {
 		if x, ok := err.(*json.MarshalerError); ok {
 			err = x.Err
 		}
-		fmt.Fprintln(w, err)
+		return err
 	}
 	return nil
 }

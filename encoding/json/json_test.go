@@ -104,6 +104,10 @@ func TestExtract(t *testing.T) {
 		name: "invalid JSON",
 		in:   `[3_]`,
 		out:  "invalid JSON for file \"invalid JSON\": invalid character '_' after array element",
+	}, {
+		name: "numeric keys: Issue #219",
+		in:   `{"20": "a"}`,
+		out:  `{"20": "a"}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

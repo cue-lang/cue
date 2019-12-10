@@ -218,8 +218,8 @@ func patchExpr(n ast.Node) {
 					break // should not happen: implies invalid JSON
 				}
 
-				if q, err := ast.QuoteIdent(u); err != nil || q != u {
-					break
+				if !ast.IsValidIdent(u) {
+					break // keep string
 				}
 
 				x.Label = ast.NewIdent(u)

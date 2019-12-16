@@ -5,9 +5,7 @@
 // Package pkgtwo does other stuff.
 package pkgtwo
 
-import (
-	t "time"
-)
+import t "time"
 
 // A Barzer barzes.
 Barzer :: {

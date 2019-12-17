@@ -400,7 +400,13 @@ func (c *callCtxt) errf(src source, underlying error, format string, args ...int
 }
 
 func (c *callCtxt) value(i int) Value {
-	return newValueRoot(c.ctx, c.args[i])
+	v := newValueRoot(c.ctx, c.args[i])
+	v, _ = v.Default()
+	if !v.IsConcrete() {
+		c.errf(c.src, v.toErr(c.ctx.mkErr(c.src, codeIncomplete,
+			"non-concrete value")), "incomplete")
+	}
+	return v
 }
 
 func (c *callCtxt) structVal(i int) *Struct {

@@ -2845,6 +2845,15 @@ func TestFullEval(t *testing.T) {
 			}
 			`,
 		out: `<0>{x: 1, y: <1>{x: 2, z: 1}}`,
+	}, {
+		desc: "don't pass incomplete values to builtins",
+		in: `
+		import "encoding/json"
+
+		input: string
+		foo: json.Marshal(input)
+		`,
+		out: `<0>{input: string, foo: <1>.Marshal (<2>.input)}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

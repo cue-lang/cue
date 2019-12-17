@@ -128,46 +128,55 @@ func ParseIdent(n *Ident) (string, error) {
 //     X=foo   "foo"  true   nil
 //
 func LabelName(l Label) (name string, isIdent bool, err error) {
-	a, ok := l.(*Alias)
-	if ok {
-		if l, ok = a.Expr.(Label); !ok {
-			goto expressionLabel
-		}
+	if a, ok := l.(*Alias); ok {
+		l, _ = a.Expr.(Label)
 	}
 	switch n := l.(type) {
 	case *ListLit:
-		// An expression, but not one can evaluated.
+		// An expression, but not one that can evaluated.
 		return "", false, errors.Newf(l.Pos(),
 			"cannot reference fields with square brackets labels outside the field value")
 
 	case *Ident:
-		str, err := ParseIdent(n)
+		// TODO(legacy): use name = n.Name
+		name, err = ParseIdent(n)
 		if err != nil {
 			return "", false, err
 		}
-		return str, true, nil
+		isIdent = true
+		// TODO(legacy): remove this return once quoted identifiers are removed.
+		return name, isIdent, err
 
 	case *BasicLit:
 		switch n.Kind {
 		case token.STRING:
 			// Use strconv to only allow double-quoted, single-line strings.
-			str, err := strconv.Unquote(n.Value)
+			name, err = strconv.Unquote(n.Value)
 			if err != nil {
 				err = errors.Newf(l.Pos(), "invalid")
 			}
-			return str, false, err
 
 		case token.NULL, token.TRUE, token.FALSE:
-			return n.Value, true, nil
+			name = n.Value
+			isIdent = true
 
-			// TODO: allow numbers to be fields?
+		default:
+			// TODO: allow numbers to be fields
+			// This includes interpolation and template labels.
+			return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
+				"cannot use numbers as fields")
 		}
-	}
 
-expressionLabel:
-	// This includes interpolation and template labels.
-	return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
-		"label is an expression")
+	default:
+		// This includes interpolation and template labels.
+		return "", false, errors.Wrapf(ErrIsExpression, l.Pos(),
+			"label is an expression")
+	}
+	if !IsValidIdent(name) {
+		isIdent = false
+	}
+	return name, isIdent, err
+
 }
 
 // ErrIsExpression reports whether a label is an expression.

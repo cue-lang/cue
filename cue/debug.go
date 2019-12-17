@@ -432,11 +432,7 @@ func (p *printer) str(v interface{}) {
 		str = str[1 : len(str)-1]
 		writef("'%s'", str)
 	case *numLit:
-		if x.k&intKind != 0 {
-			write(x.v.Text('f')) // also render info
-		} else {
-			write(x.v.Text('g')) // also render info
-		}
+		write(x.String())
 	case *durationLit:
 		write(x.d.String())
 	case *bound:

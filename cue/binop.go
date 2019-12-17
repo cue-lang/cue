@@ -452,10 +452,16 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 				case diff == 1:
 					if k&floatKind == 0 {
 						if x.op == opGeq && y.op == opLss {
-							return &numLit{numBase: a.numBase, v: lo}
+							n := *a
+							n.k = k & numKind
+							n.v.Set(&lo)
+							return &n
 						}
 						if x.op == opGtr && y.op == opLeq {
-							return &numLit{numBase: b.numBase, v: hi}
+							n := *b
+							n.k = k & numKind
+							n.v.Set(&hi)
+							return &n
 						}
 					}
 
@@ -1047,7 +1053,6 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 			if cond.DivisionByZero() {
 				return ctx.mkErr(src, "division by zero")
 			}
-			_, _, _ = ctx.Reduce(&n.v, &n.v)
 			n.k = floatKind
 		case opIDiv:
 			if y.v.IsZero() {

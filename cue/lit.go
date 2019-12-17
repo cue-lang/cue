@@ -47,11 +47,6 @@ func newNumInfo(k kind, m multiplier, base int, sep bool) numInfo {
 	return numInfo{m, k}
 }
 
-func unifyNuminfo(a, b numInfo) numInfo {
-	k := unifyType(a.k, b.k)
-	return numInfo{a.rep | b.rep, k}
-}
-
 func (n numInfo) isValid() bool          { return n.k != bottomKind }
 func (n numInfo) multiplier() multiplier { return n.rep & (hasSeparators - 1) }
 

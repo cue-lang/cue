@@ -315,7 +315,7 @@ func newNumBin(k kind, a, b *numLit) *numLit {
 	n := &numLit{
 		numBase: numBase{
 			baseValue: a.baseValue,
-			numInfo:   unifyNuminfo(a.numInfo, b.numInfo),
+			numInfo:   numInfo{a.rep | b.rep, k},
 		},
 	}
 	return n
@@ -324,6 +324,17 @@ func newNumBin(k kind, a, b *numLit) *numLit {
 type numLit struct {
 	numBase
 	v apd.Decimal
+}
+
+func (n *numLit) String() string {
+	if n.k&intKind != 0 {
+		return n.v.Text('f') // also render info
+	}
+	s := n.v.Text('g')
+	if len(s) == 1 {
+		s += "."
+	}
+	return s // also render info
 }
 
 func parseInt(k kind, s string) *numLit {

@@ -452,7 +452,7 @@ func toInt(ctx *context, src source, x int64) evaluated {
 }
 
 func toUint(ctx *context, src source, x uint64) evaluated {
-	n := newNum(src, floatKind)
+	n := newNum(src, intKind)
 	n.v.Coeff.SetUint64(x)
 	return n
 }

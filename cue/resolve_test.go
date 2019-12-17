@@ -137,9 +137,11 @@ func TestBasicRewrite(t *testing.T) {
 			sum: -1 + +2        // 1
 			div1: 2.0 / 3 * 6   // 4
 			div2: 2 / 3 * 6     // 4
+			div3: 1.00 / 1.00
 			divZero: 1.0 / 0
 			div00: 0 / 0
 			b: 1 != 4
+			add: div1 + 1.0
 
 			idiv00: 0 div 0
 			imod00: 0 mod 0
@@ -166,14 +168,16 @@ func TestBasicRewrite(t *testing.T) {
 			`sum: 1, ` +
 			`div1: 4.00000000000000000000000, ` +
 			`div2: 4.00000000000000000000000, ` +
+			`div3: 1., ` +
 			`divZero: _|_((1.0 / 0):division by zero), ` +
 			`div00: _|_((0 / 0):division undefined), ` +
 			`b: true, ` +
+			`add: 5.00000000000000000000000, ` +
 			`idiv00: _|_((0 div 0):division by zero), ` +
 			`imod00: _|_((0 mod 0):division by zero), ` +
 			`iquo00: _|_((0 quo 0):division by zero), ` +
 			`irem00: _|_((0 rem 0):division by zero), ` +
-			`v1: 5e+11, ` +
+			`v1: 5.0000000000e+11, ` +
 			`v2: true, ` +
 			`v3: 0.666666666666666666666667, ` +
 			`v5: 0, ` +
@@ -611,9 +615,10 @@ a: {
 				v2: 2.0 == 2
 				n1: 1
 				v5: 2.0 / n1
+				v6: 1.0 / 1.0
 				e2: int & 4.0/2.0
 				`,
-		out: `<0>{v1: 5e+11, v2: true, n1: 1, v5: 2, e2: _|_((int & (4.0 / 2.0)):conflicting values int and (4.0 / 2.0) (mismatched types int and float))}`,
+		out: `<0>{v1: 5.0000000000e+11, v2: true, n1: 1, v5: 2.0, v6: 1., e2: _|_((int & (4.0 / 2.0)):conflicting values int and (4.0 / 2.0) (mismatched types int and float))}`,
 	}, {
 		desc: "inequality",
 		in: `
@@ -768,6 +773,7 @@ a: {
 	}, {
 		desc: "bound conversions",
 		in: `
+		r0: int & >0.1 &  <=1.9
 		r1: int & >0.1 & <1.9
 		r2: int & >=0.1 & <1.9
 		r3: int & >=-1.9 & <=-0.1
@@ -783,6 +789,7 @@ a: {
 		c4: 1.2 & (>=1 & <2 & int)
 		`,
 		out: `<0>{` +
+			`r0: 1, ` +
 			`r1: 1, ` +
 			`r2: 1, ` +
 			`r3: -1, ` +

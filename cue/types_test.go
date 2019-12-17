@@ -1891,7 +1891,7 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		// Issue #107
 		value: `a: 1.0/1`,
-		json:  `{"a":1}`,
+		json:  `{"a":1.0}`,
 	}, {
 		// Issue #108
 		value: `

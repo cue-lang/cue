@@ -550,16 +550,11 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 
 	case *numLit:
+		kind := token.FLOAT
 		if x.k&intKind != 0 {
-			return &ast.BasicLit{
-				Kind:  token.INT,
-				Value: x.v.Text('f'),
-			}
+			kind = token.INT
 		}
-		return &ast.BasicLit{
-			Kind:  token.FLOAT,
-			Value: x.v.Text('g'),
-		}
+		return &ast.BasicLit{Kind: kind, Value: x.String()}
 
 	case *durationLit:
 		panic("unimplemented")

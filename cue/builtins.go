@@ -1847,7 +1847,7 @@ var builtinPackages = map[string]*builtinPkg{
 				x, i := c.bigInt(0), c.uint(1)
 				if c.do() {
 					c.ret, c.err = func() (interface{}, error) {
-						if i > 1<<62 {
+						if i > math.MaxInt32 {
 							return 0, fmt.Errorf("bit index too large")
 						}
 						return x.Bit(int(i)), nil

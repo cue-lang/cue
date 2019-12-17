@@ -20,6 +20,7 @@ package bits
 
 import (
 	"fmt"
+	"math"
 	"math/big"
 	"math/bits"
 )
@@ -40,7 +41,7 @@ func Rsh(x *big.Int, n uint) *big.Int {
 
 // At returns the value of the i'th bit of x.
 func At(x *big.Int, i uint) (uint, error) {
-	if i > 1<<62 {
+	if i > math.MaxInt32 {
 		return 0, fmt.Errorf("bit index too large")
 	}
 	return x.Bit(int(i)), nil

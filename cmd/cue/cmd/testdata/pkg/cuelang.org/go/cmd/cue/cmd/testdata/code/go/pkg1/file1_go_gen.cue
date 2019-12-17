@@ -16,12 +16,12 @@ Foozer :: {
 	String: string
 
 	Inline
-	NoInline:    NoInline
-	CustomJSON:  CustomJSON
-	CustomYAML?: null | CustomYAML @go(,*CustomYAML)
-	AnyJSON:     _                 @go(,json.Marshaler)
-	AnyText:     string            @go(,encoding.TextMarshaler)
-	bar?:        int               @go(Bar)
+	"NoInline":    NoInline
+	"CustomJSON":  CustomJSON
+	"CustomYAML"?: null | CustomYAML @go(,*CustomYAML)
+	AnyJSON:       _                 @go(,json.Marshaler)
+	AnyText:       string            @go(,encoding.TextMarshaler)
+	bar?:          int               @go(Bar)
 
 	// Time is mapped to CUE's internal type.
 	Time:   time.Time
@@ -36,14 +36,14 @@ Foozer :: {
 	Intf:    Interface    @protobuf(2,varint,name=intf)
 	Intf2:   _            @go(,interface{})
 	Intf3: {
-		Interface: Interface
+		"Interface": Interface
 	} @go(,struct{Interface})
 	Intf4: _ @go(,"interface{Foo()}")
 
 	// Even though this struct as a type implements MarshalJSON, it is known
 	// that it is really only implemented by the embedded field.
 	Embed: {
-		CustomJSON: CustomJSON
+		"CustomJSON": CustomJSON
 	} @go(,struct{CustomJSON})
 }
 
@@ -72,12 +72,8 @@ CustomJSON :: _
 CustomYAML :: {
 }
 
-Inline :: {
-	Kind: string
-}
+Inline :: Kind: string
 
-NoInline :: {
-	Kind: string
-}
+NoInline :: Kind: string
 
 Interface :: _

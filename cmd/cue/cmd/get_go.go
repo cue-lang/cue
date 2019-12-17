@@ -475,7 +475,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 
 		file = strings.Replace(file, ".go", "_go", 1)
 		file += "_gen.cue"
-		b, err := format.Node(f)
+		b, err := format.Node(f, format.Simplify())
 		if err != nil {
 			return err
 		}
@@ -557,11 +557,8 @@ func (e *extractor) recordConsts(x *ast.GenDecl) {
 	}
 }
 
-func (e *extractor) label(name string) cueast.Label {
-	if !cueast.IsValidIdent(name) {
-		return cueast.NewString(name)
-	}
-	return cueast.NewIdent(name)
+func (e *extractor) strLabel(name string) cueast.Label {
+	return cueast.NewString(name)
 }
 
 func (e *extractor) ident(name string) *cueast.Ident {
@@ -570,7 +567,7 @@ func (e *extractor) ident(name string) *cueast.Ident {
 
 func (e *extractor) def(doc *ast.CommentGroup, name string, value cueast.Expr, newline bool) *cueast.Field {
 	f := &cueast.Field{
-		Label: e.label(name),
+		Label: e.ident(name), // Go identifiers are always valid CUE identifiers.
 		Token: cuetoken.ISA,
 		Value: value,
 	}
@@ -866,11 +863,13 @@ func supportedType(stack []types.Type, t types.Type) (ok bool) {
 
 func (e *extractor) makeField(name string, kind cuetoken.Token, expr types.Type, doc *ast.CommentGroup, newline bool) (f *cueast.Field, typename string) {
 	typ := e.makeType(expr)
-	f = &cueast.Field{
-		Label: e.label(name),
-		Token: kind,
-		Value: typ,
+	var label cueast.Label
+	if kind == cuetoken.ISA {
+		label = e.ident(name)
+	} else {
+		label = e.strLabel(name)
 	}
+	f = &cueast.Field{Label: label, Token: kind, Value: typ}
 	if doc := makeDoc(doc, newline); doc != nil {
 		f.AddComment(doc)
 		cueast.SetRelPos(doc, cuetoken.NewSection)

@@ -2835,6 +2835,16 @@ func TestFullEval(t *testing.T) {
 		out: `<0>{` +
 			`c1: <1>{bar: <2>{baz: 2}, baz: 2}, ` +
 			`c2: _|_(<3>{bar: 1<3>.bar}:cannot embed value 1 of type int in struct)}`,
+	}, {
+		desc: "don't bind to string labels",
+		in: `
+			x: 1
+			y: {
+				"x": 2
+				z: x
+			}
+			`,
+		out: `<0>{x: 1, y: <1>{x: 2, z: 1}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

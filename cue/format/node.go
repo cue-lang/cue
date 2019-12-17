@@ -28,18 +28,32 @@ import (
 func printNode(node interface{}, f *printer) error {
 	s := newFormatter(f)
 
+	ls := labelSimplifier{scope: map[string]bool{}}
+
 	// format node
 	f.allowed = nooverride // gobble initial whitespace.
 	switch x := node.(type) {
 	case *ast.File:
+		if f.cfg.simplify {
+			ls.markReferences(x)
+		}
 		s.file(x)
 	case ast.Expr:
+		if f.cfg.simplify {
+			ls.markReferences(x)
+		}
 		s.expr(x)
 	case ast.Decl:
+		if f.cfg.simplify {
+			ls.markReferences(x)
+		}
 		s.decl(x)
 	// case ast.Node: // TODO: do we need this?
 	// 	s.walk(x)
 	case []ast.Decl:
+		if f.cfg.simplify {
+			ls.processDecls(x)
+		}
 		s.walkDeclList(x)
 	default:
 		goto unsupported
@@ -397,18 +411,6 @@ func (f *formatter) label(l ast.Label, optional bool) {
 		f.print(n.NamePos, name)
 
 	case *ast.BasicLit:
-		if f.cfg.simplify && n.Kind == token.STRING && len(n.Value) > 2 {
-			s := n.Value
-			unquoted, err := strconv.Unquote(s)
-			if err == nil {
-				// TODO: only do this when requested and
-				// if this doesn't unshadow anything.
-				if isValidIdent(unquoted) {
-					f.print(n.ValuePos, unquoted)
-					break
-				}
-			}
-		}
 		str := n.Value
 		// Allow any CUE string in the AST, but ensure it is formatted
 		// according to spec.

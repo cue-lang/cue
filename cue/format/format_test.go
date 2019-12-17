@@ -463,7 +463,7 @@ func TestX(t *testing.T) {
 	t.Skip()
 	const src = `
 `
-	b, err := format([]byte(src), 0)
+	b, err := format([]byte(src), simplify)
 	if err != nil {
 		t.Error(err)
 	}

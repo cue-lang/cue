@@ -40,7 +40,7 @@ func (inst *Instance) insertFile(f *ast.File) errors.Error {
 	// TODO: insert by converting to value first so that the trim command can
 	// also remove top-level fields.
 	// First process single file.
-	v := newVisitor(inst.index, inst.inst, inst.rootStruct, inst.scope)
+	v := newVisitor(inst.index, inst.inst, inst.rootStruct, inst.scope, false)
 	v.astState.astMap[f] = inst.rootStruct
 	// TODO: fix cmd/import to resolve references in the AST before
 	// inserting. For now, we accept errors that did not make it up to the tree.
@@ -80,6 +80,7 @@ type astState struct {
 
 	litParser   *litParser
 	resolveRoot *structLit
+	allowAuto   bool // allow builtin packages without import
 
 	// make unique per level to avoid reuse of structs being an issue.
 	astMap map[ast.Node]scope
@@ -102,12 +103,12 @@ func (s *astState) setScope(n ast.Node, v scope) {
 	s.astMap[n] = v
 }
 
-func newVisitor(idx *index, inst *build.Instance, obj, resolveRoot *structLit) *astVisitor {
+func newVisitor(idx *index, inst *build.Instance, obj, resolveRoot *structLit, allowAuto bool) *astVisitor {
 	ctx := idx.newContext()
-	return newVisitorCtx(ctx, inst, obj, resolveRoot)
+	return newVisitorCtx(ctx, inst, obj, resolveRoot, allowAuto)
 }
 
-func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structLit) *astVisitor {
+func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structLit, allowAuto bool) *astVisitor {
 	v := &astVisitor{
 		object: obj,
 	}
@@ -117,6 +118,7 @@ func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structL
 		inst:        inst,
 		litParser:   &litParser{ctx: ctx},
 		resolveRoot: resolveRoot,
+		allowAuto:   allowAuto,
 		astMap:      map[ast.Node]scope{},
 	}
 	return v
@@ -153,7 +155,7 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 					&nodeRef{baseValue: newExpr(n), node: r, label: label}, label}
 			}
 		}
-		if v.inSelector > 0 {
+		if v.inSelector > 0 && v.allowAuto {
 			if p := getBuiltinShorthandPkg(ctx, name); p != nil {
 				return &nodeRef{newExpr(n), p, label}
 			}

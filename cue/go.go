@@ -71,7 +71,7 @@ func parseTag(ctx *context, obj *structLit, field label, tag string) value {
 		field := ctx.labelStr(field)
 		return ctx.mkErr(baseValue{}, "invalid tag %q for field %q: %v", tag, field, err)
 	}
-	v := newVisitor(ctx.index, nil, nil, obj)
+	v := newVisitor(ctx.index, nil, nil, obj, true)
 	return v.walk(expr)
 }
 
@@ -159,7 +159,7 @@ func parseJSON(ctx *context, b []byte) evaluated {
 	if err != nil {
 		panic(err) // cannot happen
 	}
-	v := newVisitor(ctx.index, nil, nil, nil)
+	v := newVisitor(ctx.index, nil, nil, nil, false)
 	return v.walk(expr).evalPartial(ctx)
 }
 
@@ -206,7 +206,7 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 		return makeNullable(&top{src.base()}, false).(evaluated)
 
 	case ast.Expr:
-		x := newVisitorCtx(ctx, nil, nil, nil)
+		x := newVisitorCtx(ctx, nil, nil, nil, false)
 		return ctx.manifest(x.walk(v))
 
 	case *big.Int:

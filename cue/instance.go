@@ -142,7 +142,7 @@ func evalExpr(idx *index, x value, expr ast.Expr) evaluated {
 		return idx.mkErr(obj, "instance is not a struct")
 	}
 
-	v := newVisitor(idx, nil, nil, obj)
+	v := newVisitor(idx, nil, nil, obj, true)
 	return eval(idx, v.walk(expr))
 }
 
@@ -155,7 +155,7 @@ func (inst *Instance) evalExpr(ctx *context, expr ast.Expr) evaluated {
 	if !ok {
 		return ctx.mkErr(obj, "instance is not a struct")
 	}
-	v := newVisitor(ctx.index, inst.inst, nil, obj)
+	v := newVisitor(ctx.index, inst.inst, nil, obj, true)
 	return v.walk(expr).evalPartial(ctx)
 }
 

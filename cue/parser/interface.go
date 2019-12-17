@@ -179,7 +179,7 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 	f.Filename = filename
 	astutil.Resolve(f, pp.errf)
 
-	return
+	return f, pp.errors
 }
 
 // ParseExpr is a convenience function for parsing an expression.
@@ -223,7 +223,7 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 	}
 	astutil.ResolveExpr(e, p.errf)
 
-	return e, nil
+	return e, p.errors
 }
 
 // parseExprString is a convenience function for obtaining the AST of an

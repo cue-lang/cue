@@ -9,6 +9,8 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
+import "tool/exec"
+
 command: errcode: {
 	task: bad: exec.Run & {
 		kind:   "exec"

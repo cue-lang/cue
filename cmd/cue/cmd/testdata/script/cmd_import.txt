@@ -1,0 +1,19 @@
+! cue cmd pkg
+cmp stderr expect-stderr
+
+-- expect-stderr --
+reference "cli" not found
+-- task_tool.cue --
+package home
+
+// missing imports
+
+command: pkg: {
+	task: {
+		t2: cli.Print & {
+			text: "Hello world!"
+		}
+	}
+}
+
+-- cue.mod --

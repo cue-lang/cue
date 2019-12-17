@@ -106,7 +106,7 @@ func mustParseConstBuiltin(ctx *context, name, val string) evaluated {
 	if err != nil {
 		panic(err)
 	}
-	v := newVisitor(ctx.index, nil, nil, nil)
+	v := newVisitor(ctx.index, nil, nil, nil, false)
 	value := v.walk(expr)
 	return value.evalPartial(ctx)
 }

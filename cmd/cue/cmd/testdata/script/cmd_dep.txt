@@ -2,12 +2,13 @@ cue cmd do
 cmp stdout expect-stdout
 
 -- expect-stdout --
-{"b":"cue\n"}
+{"b":"cue"}
 -- task_tool.cue --
 package home
 
 import (
     "encoding/json"
+    "strings"
     "tool/cli"
     "tool/exec"
 )
@@ -23,7 +24,9 @@ command: do: {
         stdout: string
     }
     task: out: cli.Print & {
-        text:  json.Marshal(foo & { a :: task.name.stdout })
+        text:  json.Marshal(foo & {
+            a :: strings.TrimSpace(task.name.stdout)
+        })
     }
 }
 

@@ -108,6 +108,10 @@ func TestExtract(t *testing.T) {
 		name: "numeric keys: Issue #219",
 		in:   `{"20": "a"}`,
 		out:  `{"20": "a"}`,
+	}, {
+		name: "legacy: hidden fields",
+		in:   `{"_legacy": 1}`,
+		out:  `{"_legacy": 1}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

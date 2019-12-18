@@ -218,7 +218,9 @@ func patchExpr(n ast.Node) {
 					break // should not happen: implies invalid JSON
 				}
 
-				if !ast.IsValidIdent(u) {
+				// TODO(legacy): remove checking for '_' prefix once hidden
+				// fields are removed.
+				if !ast.IsValidIdent(u) || strings.HasPrefix(u, "_") {
 					break // keep string
 				}
 

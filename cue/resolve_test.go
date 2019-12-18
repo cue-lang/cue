@@ -2854,6 +2854,31 @@ func TestFullEval(t *testing.T) {
 		foo: json.Marshal(input)
 		`,
 		out: `<0>{input: string, foo: <1>.Marshal (<2>.input)}`,
+	}, {
+		desc: "alias reuse in nested scope",
+		in: `
+		Foo :: {
+			X = or([ k for k, _ in {} ])
+			connection: [X]: X
+		}
+		A :: {
+			foo: "key"
+			X = foo
+			a: foo: [X]: X
+		}
+		B :: {
+			foo: string
+			X = foo
+			a: foo: [X]: X
+		}
+		b: B & { foo: "key" }
+		`,
+		out: `<0>{` +
+			`Foo :: <1>C{connection: <2>C{[or ([ <3>for k, _ in <4>{} yield <3>.k ])]: <5>(_: string)->or ([ <3>for k, _ in <4>{} yield <3>.k ]), }}, ` +
+			`A :: <6>C{foo: "key", a: <7>C{foo: <8>C{["key"]: <9>(_: string)-><10>.foo, }}}, ` +
+			`B :: <11>C{foo: string, a: <12>C{foo: <13>C{[string]: <14>(_: string)-><15>.foo, }}}, ` +
+			`b: <16>C{foo: "key", a: <17>C{foo: <18>C{["key"]: <19>(_: string)-><20>.foo, }}}` +
+			`}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

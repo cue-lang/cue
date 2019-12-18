@@ -83,7 +83,8 @@ type astState struct {
 	allowAuto   bool // allow builtin packages without import
 
 	// make unique per level to avoid reuse of structs being an issue.
-	astMap map[ast.Node]scope
+	astMap   map[ast.Node]scope
+	aliasMap map[ast.Node]value
 
 	errors errors.Error
 }
@@ -120,6 +121,7 @@ func newVisitorCtx(ctx *context, inst *build.Instance, obj, resolveRoot *structL
 		resolveRoot: resolveRoot,
 		allowAuto:   allowAuto,
 		astMap:      map[ast.Node]scope{},
+		aliasMap:    map[ast.Node]value{},
 	}
 	return v
 }
@@ -528,9 +530,15 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		// Pkg                    nil            ImportSpec
 
 		if x, ok := n.Node.(*ast.Alias); ok {
+			// TODO(lang): should we exempt definitions? The substitution
+			// principle says we should not.
+			if ret = v.aliasMap[x.Expr]; ret != nil {
+				break
+			}
 			old := v.ctx().inDefinition
 			v.ctx().inDefinition = 0
 			ret = v.walk(x.Expr)
+			v.aliasMap[x.Expr] = ret
 			v.ctx().inDefinition = old
 			break
 		}

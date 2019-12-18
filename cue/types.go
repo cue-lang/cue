@@ -985,10 +985,7 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 }
 
 func makeInt(v Value, x int64) Value {
-	n := &numLit{numBase: numBase{baseValue: v.path.v.base()}}
-	n.v.SetInt64(x)
-	n.k = intKind
-	return remakeValue(v, n)
+	return remakeValue(v, newInt(v.path.v.base(), base10).setInt64(x))
 }
 
 // Len returns the number of items of the underlying value.

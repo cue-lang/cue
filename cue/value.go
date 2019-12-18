@@ -216,9 +216,7 @@ func (x *bytesLit) at(ctx *context, i int) evaluated {
 		return ctx.mkErr(x, "index %d out of bounds", i)
 	}
 	// TODO: this is incorrect.
-	n := newNum(x, intKind)
-	n.v.SetInt64(int64(x.b[i]))
-	return n
+	return newInt(x, 0).setUInt64(uint64(x.b[i]))
 }
 
 func (x *bytesLit) len() int { return len(x.b) }
@@ -302,28 +300,59 @@ func (x *stringLit) slice(ctx *context, lo, hi *numLit) evaluated {
 	return &stringLit{x.baseValue, string(runes[lox:hix]), nil}
 }
 
-type numBase struct {
+type numLit struct {
 	baseValue
-	numInfo
+	rep multiplier
+	k   kind
+	v   apd.Decimal
 }
 
-func newNumBase(n ast.Expr, info numInfo) numBase {
-	return numBase{newExpr(n), info}
-}
-
-func newNumBin(k kind, a, b *numLit) *numLit {
-	n := &numLit{
-		numBase: numBase{
-			baseValue: a.baseValue,
-			numInfo:   numInfo{a.rep | b.rep, k},
-		},
+func newNum(src source, k kind, rep multiplier) *numLit {
+	if rep&base2|base8|base10|base16 == 0 {
+		rep |= base10
 	}
+	if k&numKind == 0 {
+		panic("not a number")
+	}
+	return &numLit{baseValue: src.base(), rep: rep, k: k}
+}
+
+func newInt(src source, rep multiplier) *numLit {
+	return newNum(src, intKind, rep)
+}
+
+func newFloat(src source, rep multiplier) *numLit {
+	return newNum(src, floatKind, rep)
+}
+
+func (n numLit) specialize(k kind) *numLit {
+	n.k = k
+	return &n
+}
+
+func (n *numLit) set(d *apd.Decimal) *numLit {
+	n.v.Set(d)
 	return n
 }
 
-type numLit struct {
-	numBase
-	v apd.Decimal
+func (n *numLit) setInt(x int) *numLit {
+	n.v.SetInt64(int64(x))
+	return n
+}
+
+func (n *numLit) setInt64(x int64) *numLit {
+	n.v.SetInt64(x)
+	return n
+}
+
+func (n *numLit) setUInt64(x uint64) *numLit {
+	n.v.Coeff.SetUint64(x)
+	return n
+}
+
+func (n *numLit) setString(s string) *numLit {
+	_, _, _ = n.v.SetString(s)
+	return n
 }
 
 func (n *numLit) String() string {
@@ -342,7 +371,7 @@ func parseInt(k kind, s string) *numLit {
 		Kind:  token.INT,
 		Value: s,
 	}
-	num := newNum(newExpr(n), k)
+	num := newInt(newExpr(n), 0)
 	_, _, err := num.v.SetString(s)
 	if err != nil {
 		panic(err)
@@ -355,18 +384,12 @@ func parseFloat(s string) *numLit {
 		Kind:  token.FLOAT,
 		Value: s,
 	}
-	num := newNum(newExpr(n), floatKind)
+	num := newFloat(newExpr(n), 0)
 	_, _, err := num.v.SetString(s)
 	if err != nil {
 		panic(err)
 	}
 	return num
-}
-
-func newNum(src source, k kind) *numLit {
-	n := &numLit{numBase: numBase{baseValue: src.base()}}
-	n.k = k
-	return n
 }
 
 var ten = big.NewInt(10)
@@ -508,9 +531,7 @@ type list struct {
 
 // initLit initializes a literal list.
 func (x *list) initLit() {
-	n := newNum(x, intKind)
-	n.v.SetInt64(int64(len(x.elem.arcs)))
-	x.len = n
+	x.len = newInt(x, 0).setInt(len(x.elem.arcs))
 	x.typ = &top{x.baseValue}
 }
 
@@ -520,8 +541,7 @@ func (x *list) manifest(ctx *context) evaluated {
 	}
 	// A list is ground if its length is ground, or if the current length
 	// meets matches the cap.
-	n := newNum(x, intKind)
-	n.v.SetInt64(int64(len(x.elem.arcs)))
+	n := newInt(x, 0).setInt(len(x.elem.arcs))
 	if n := binOp(ctx, x, opUnify, n, x.len.evalPartial(ctx)); !isBottom(n) {
 		return &list{
 			baseValue: x.baseValue,
@@ -1908,8 +1928,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 
 	case *list:
 		for i := range src.elem.arcs {
-			idx := newNum(x, intKind)
-			idx.v.SetInt64(int64(i))
+			idx := newInt(x, 0).setInt(i)
 			v := fn.call(ctx, x, idx, src.at(ctx, i))
 			if err, ok := v.(*bottom); ok {
 				return err

@@ -25,6 +25,8 @@ import (
 	"github.com/cockroachdb/apd/v2"
 )
 
+func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
+
 func TestConvert(t *testing.T) {
 	i34 := big.NewInt(34)
 	d34 := mkBigInt(34)

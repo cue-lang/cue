@@ -268,9 +268,7 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 			if k == y.k {
 				return y
 			}
-			i := *y
-			i.k = k
-			return &i
+			return y.specialize(k)
 		}
 		src = mkBin(ctx, src.Pos(), op, x, other)
 		return ctx.mkErr(src, codeIncomplete, "%s with incomplete values", op)
@@ -446,40 +444,30 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 				//     a+1 if b-a == 2
 				//     _|_ if b <= a
 
+				n := newNum(src, k&numKind, a.rep|b.rep)
 				switch diff, err := d.Int64(); {
 				case err != nil:
 
 				case diff == 1:
 					if k&floatKind == 0 {
 						if x.op == opGeq && y.op == opLss {
-							n := *a
-							n.k = k & numKind
-							n.v.Set(&lo)
-							return &n
+							return n.set(&lo)
 						}
 						if x.op == opGtr && y.op == opLeq {
-							n := *b
-							n.k = k & numKind
-							n.v.Set(&hi)
-							return &n
+							return n.set(&hi)
 						}
 					}
 
 				case diff == 2:
 					if k&floatKind == 0 && x.op == opGtr && y.op == opLss {
 						_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &lo)
-						n := *a
-						n.k = k & numKind
-						n.v.Set(&d)
-						return &n
+						return n.set(&d)
+
 					}
 
 				case diff == 0:
 					if x.op == opGeq && y.op == opLeq {
-						n := *a
-						n.k = k & numKind
-						n.v.Set(&lo)
-						return &n
+						return n.set(&lo)
 					}
 					fallthrough
 
@@ -506,9 +494,7 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 			}
 			// Narrow down number type.
 			if y.k != k {
-				n := *y
-				n.k = k
-				return &n
+				return y.specialize(k)
 			}
 			return other
 
@@ -552,9 +538,7 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 			}
 			// Narrow down number type.
 			if y.k != k {
-				n := *y
-				n.k = k
-				return &n
+				return y.specialize(k)
 			}
 			return other
 
@@ -1024,7 +1008,14 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		}
 	case *numLit:
 		k, _, _ := matchBinOpKind(op, x.kind(), y.kind())
-		n := newNumBin(k, x, y)
+		if k == bottomKind {
+			break
+		}
+		switch op {
+		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
+			return cmpTonode(src, op, x.v.Cmp(&y.v))
+		}
+		n := newNum(src.base(), k, x.rep|y.rep)
 		switch op {
 		case opUnify, opUnifyUnchecked:
 			if x.v.Cmp(&y.v) != 0 {
@@ -1037,8 +1028,6 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 				return n
 			}
 			return x
-		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
-			return cmpTonode(src, op, x.v.Cmp(&y.v))
 		case opAdd:
 			_, _ = ctx.Add(&n.v, &x.v, &y.v)
 		case opSub:
@@ -1140,19 +1129,13 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 		case opSub:
 			return &durationLit{binSrc(src.Pos(), op, x, other), x.d - y.d}
 		case opQuo:
-			n := &numLit{
-				numBase: newNumBase(nil, newNumInfo(floatKind, 0, 10, false)),
-			}
-			n.v.SetInt64(int64(x.d))
+			n := newFloat(src.base(), base10).setInt64(int64(x.d))
 			d := apd.New(int64(y.d), 0)
 			// TODO: check result if this code becomes undead.
 			_, _ = ctx.Quo(&n.v, &n.v, d)
 			return n
 		case opIRem:
-			n := &numLit{
-				numBase: newNumBase(nil, newNumInfo(intKind, 0, 10, false)),
-			}
-			n.v.SetInt64(int64(x.d % y.d))
+			n := newInt(src.base(), base10).setInt64(int64(x.d % y.d))
 			n.v.Exponent = -9
 			return n
 		}
@@ -1254,9 +1237,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		switch v := y.len.(type) {
 		case *numLit:
 			// Closed list
-			ln := &numLit{numBase: v.numBase}
-			ln.v.SetInt64(int64(len(arcs)))
-			n.len = ln
+			n.len = newInt(v.base(), v.rep).setInt(len(arcs))
 		default:
 			// Open list
 			n.len = y.len // TODO: add length of x?
@@ -1290,9 +1271,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		switch v := x.len.(type) {
 		case *numLit:
 			// Closed list
-			ln := &numLit{numBase: v.numBase}
-			ln.v.SetInt64(int64(len(arcs)))
-			n.len = ln
+			n.len = newInt(v.base(), v.rep).setInt(len(arcs))
 		default:
 			// Open list
 			n.len = x.len // TODO: multiply length?

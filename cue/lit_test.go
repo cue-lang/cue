@@ -25,27 +25,17 @@ import (
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
 
-var defIntBase = newNumBase(&ast.BasicLit{}, newNumInfo(intKind, 0, 10, false))
-var defRatBase = newNumBase(&ast.BasicLit{}, newNumInfo(floatKind, 0, 10, false))
+var testBase = newExpr(&ast.BasicLit{})
 
 func mkInt(a int64) *numLit {
-	x := &numLit{numBase: defIntBase}
-	x.v.SetInt64(a)
-	return x
+	return newInt(testBase, base10).setInt64(a)
 }
 func mkIntString(a string) *numLit {
-	x := &numLit{numBase: defIntBase}
-	x.v.SetString(a)
-	return x
+	return newInt(testBase, base10).setString(a)
 }
 func mkFloat(a string) *numLit {
-	x := &numLit{numBase: defRatBase}
-	x.v.SetString(a)
-	return x
+	return newFloat(testBase, base10).setString(a)
 }
-func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
-
-func mkBigFloat(a string) (v apd.Decimal) { v.SetString(a); return }
 
 var diffOpts = []cmp.Option{
 	cmp.Comparer(func(x, y big.Rat) bool {
@@ -60,8 +50,6 @@ var diffOpts = []cmp.Option{
 		stringLit{},
 		bytesLit{},
 		numLit{},
-		numBase{},
-		numInfo{},
 	),
 	cmpopts.IgnoreUnexported(
 		bottom{},
@@ -78,15 +66,9 @@ var (
 
 func TestLiterals(t *testing.T) {
 	mkMul := func(x int64, m multiplier, base int) *numLit {
-		return &numLit{
-			newNumBase(&ast.BasicLit{}, newNumInfo(intKind, m, base, false)),
-			mkBigInt(x),
-		}
+		return newInt(testBase, newRepresentation(m, base, false)).setInt64(x)
 	}
-	hk := &numLit{
-		newNumBase(&ast.BasicLit{}, newNumInfo(intKind, 0, 10, true)),
-		mkBigInt(100000),
-	}
+	hk := newInt(testBase, newRepresentation(0, 10, true)).setInt64(100000)
 	testCases := []struct {
 		lit  string
 		node value

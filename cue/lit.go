@@ -22,33 +22,24 @@ import (
 	"github.com/cockroachdb/apd/v2"
 )
 
-type numInfo struct {
-	rep multiplier
-	k   kind
-}
-
-func newNumInfo(k kind, m multiplier, base int, sep bool) numInfo {
+func newRepresentation(m multiplier, base int, sep bool) multiplier {
 	switch base {
 	case 10:
 		m |= base10
 	case 2:
 		m |= base2
-		k = intKind
 	case 8:
 		m |= base8
-		k = intKind
 	case 16:
 		m |= base16
-		k = intKind
 	}
 	if sep {
 		m |= hasSeparators
 	}
-	return numInfo{m, k}
+	return m
 }
 
-func (n numInfo) isValid() bool          { return n.k != bottomKind }
-func (n numInfo) multiplier() multiplier { return n.rep & (hasSeparators - 1) }
+func (m multiplier) multiplier() multiplier { return m & (hasSeparators - 1) }
 
 type multiplier uint16
 
@@ -307,9 +298,7 @@ exponent:
 		} else {
 			mul |= mulDec
 		}
-		n := &numLit{
-			numBase: newNumBase(p.node, newNumInfo(intKind, mul, 10, p.useSep)),
-		}
+		n := newInt(newExpr(p.node), newRepresentation(mul, 10, p.useSep))
 		n.v.UnmarshalText(p.buf)
 		p.ctx.Mul(&n.v, &n.v, mulToRat[mul])
 		cond, _ := p.ctx.RoundToIntegralExact(&n.v, &n.v)
@@ -331,13 +320,11 @@ exponent:
 
 exit:
 	if isFloat {
-		f := &numLit{
-			numBase: newNumBase(p.node, newNumInfo(floatKind, 0, 10, p.useSep)),
-		}
+		f := newFloat(newExpr(p.node), newRepresentation(0, 10, p.useSep))
 		f.v.UnmarshalText(p.buf)
 		return f
 	}
-	i := &numLit{numBase: newNumBase(p.node, newNumInfo(intKind, 0, base, p.useSep))}
+	i := newInt(newExpr(p.node), newRepresentation(0, base, p.useSep))
 	i.v.Coeff.SetString(string(p.buf), base)
 	return i
 }

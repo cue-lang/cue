@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal"
 	itask "cuelang.org/go/internal/task"
+	"cuelang.org/go/internal/walk"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
 	_ "cuelang.org/go/pkg/tool/exec"
 	_ "cuelang.org/go/pkg/tool/file"
@@ -292,10 +293,13 @@ func appendReferences(a [][]string, root *cue.Instance, v cue.Value) [][]string 
 
 	switch op, args := v.Expr(); op {
 	case cue.NoOp:
-		v.Walk(nil, func(w cue.Value) {
-			if v != w {
-				a = appendReferences(a, root, w)
-			}
+		walk.Value(v, &walk.Config{
+			Opts: []cue.Option{cue.All()},
+			After: func(w cue.Value) {
+				if v != w {
+					a = appendReferences(a, root, w)
+				}
+			},
 		})
 	default:
 		for _, arg := range args {

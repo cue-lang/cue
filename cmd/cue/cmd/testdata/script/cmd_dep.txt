@@ -1,0 +1,32 @@
+cue cmd do
+cmp stdout expect-stdout
+
+-- expect-stdout --
+{"b":"cue\n"}
+-- task_tool.cue --
+package home
+
+import (
+    "encoding/json"
+    "tool/cli"
+    "tool/exec"
+)
+
+foo: {
+  a :: string
+  b: a
+}
+
+command: do: {
+    task: name: exec.Run & {
+        cmd: "echo cue"
+        stdout: string
+    }
+    task: out: cli.Print & {
+        text:  json.Marshal(foo & { a :: task.name.stdout })
+    }
+}
+
+-- task.cue --
+package home
+-- cue.mod --

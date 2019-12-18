@@ -13,15 +13,13 @@ import (
 )
 
 command: ref: {
-	task: {
-		t1: exec.Run & {
-				ref: task.t1.stdout
-				cmd: ["sh", "-c", "echo hello"]
-				stdout: string
-		}
-		t2: cli.Print & {
-			text: task.t1.stdout
-		}
+	t1: exec.Run & {
+			ref: t1.stdout
+			cmd: ["sh", "-c", "echo hello"]
+			stdout: string
+	}
+	t2: cli.Print & {
+		text: t1.stdout
 	}
 }
 

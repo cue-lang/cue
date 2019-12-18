@@ -13,7 +13,7 @@ message: "Hello \(who)!" // who declared in data.cue
 package hello
 
 command: echo: {
-    task: echo: {
+    echo: {
         kind:   "exec"
         cmd:    "echo \(message)"
         stdout: string
@@ -21,7 +21,7 @@ command: echo: {
 
     task: display: {
         kind: "print"
-        text: task.echo.stdout
+        text: echo.stdout
     }
 }
 -- cue.mod --

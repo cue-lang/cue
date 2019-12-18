@@ -14,28 +14,26 @@ import (
 )
 
 command: before: {
-	task: {
-		t1: exec.Run & {
-			cmd: ["sh", "-c", "sleep 2; date +%s"]
-			stdout: string
-			$before: [task.t2, task.t3]
-		}
-		t2: exec.Run & {
-			cmd: ["sh", "-c", "date +%s"]
-			stdout: string
-			$before: task.t4
-		}
-		t3: exec.Run & {
-			cmd: ["sh", "-c", "date +%s"]
-			stdout: string
-		}
-		t4: exec.Run & {
-			cmd: ["sh", "-c", "a=\(strings.TrimSpace(task.t1.stdout));b=\(strings.TrimSpace(task.t2.stdout));if [ $a -le $b ]; then echo 'true'; fi"]
-			stdout: string
-		}
-		t5: cli.Print & {
-				text: task.t4.stdout
-		}
+	t1: exec.Run & {
+		cmd: ["sh", "-c", "sleep 2; date +%s"]
+		stdout: string
+		$before: [t2, t3]
+	}
+	t2: exec.Run & {
+		cmd: ["sh", "-c", "date +%s"]
+		stdout: string
+		$before: t4
+	}
+	t3: exec.Run & {
+		cmd: ["sh", "-c", "date +%s"]
+		stdout: string
+	}
+	t4: exec.Run & {
+		cmd: ["sh", "-c", "a=\(strings.TrimSpace(t1.stdout));b=\(strings.TrimSpace(t2.stdout));if [ $a -le $b ]; then echo 'true'; fi"]
+		stdout: string
+	}
+	t5: cli.Print & {
+			text: t4.stdout
 	}
 }
 

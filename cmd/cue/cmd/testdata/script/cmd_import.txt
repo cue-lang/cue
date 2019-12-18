@@ -9,10 +9,8 @@ package home
 // missing imports
 
 command: pkg: {
-	task: {
-		t2: cli.Print & {
-			text: "Hello world!"
-		}
+	t: cli.Print & {
+		text: "Hello world!"
 	}
 }
 

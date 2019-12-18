@@ -15,18 +15,16 @@ import (
 )
 
 command: print: {
-	task: {
-		t1: exec.Run & {
-			cmd: ["sh", "-c", "sleep 1; echo t1"]
-			stdout: string
-		}
-		t2: exec.Run & {
-			cmd: ["sh", "-c", "sleep 1; echo t2"]
-			stdout: string
-		}
-		t3: cli.Print & {
-			text: (f & {arg: t1.stdout + t2.stdout}).result
-		}
+	runs: t1: exec.Run & {
+		cmd: ["sh", "-c", "sleep 1; echo t1"]
+		stdout: string
+	}
+	runs: t2: exec.Run & {
+		cmd: ["sh", "-c", "sleep 1; echo t2"]
+		stdout: string
+	}
+	print: cli.Print & {
+		text: (f & {arg: runs.t1.stdout + runs.t2.stdout}).result
 	}
 }
 

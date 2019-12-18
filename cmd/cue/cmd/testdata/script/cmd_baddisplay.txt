@@ -14,7 +14,7 @@ message: "Hello world!"
 package home
 
 command: baddisplay: {
-	task: display: {
+	display: {
 		kind: "print"
 		text: 42
 	}

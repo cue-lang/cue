@@ -43,7 +43,6 @@ import (
 
 const (
 	commandSection = "command"
-	taskSection    = "task"
 )
 
 func lookupString(obj cue.Value, key, def string) string {
@@ -113,91 +112,112 @@ func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.I
 	return sub, nil
 }
 
-type taskKey struct {
-	typ  string
+type customRunner struct {
 	name string
-	task string
+	root *cue.Instance
+
+	index map[taskKey]*task
 }
 
-func (k taskKey) keyForTask(taskName string) taskKey {
-	k.task = taskName
-	return k
+type taskKey string
+
+func (r *customRunner) keyForTask(t *task) taskKey {
+	a := []string{commandSection, r.name}
+	return keyForReference(append(a, t.path...)...)
 }
 
-func keyForReference(ref []string) (k taskKey) {
-	// command <command> task <task>
-	if len(ref) >= 4 && ref[2] == taskSection {
-		k.typ = ref[0]
-		k.name = ref[1]
-		k.task = ref[3]
-	}
-	return k
+func keyForReference(ref ...string) (k taskKey) {
+	return taskKey(strings.Join(ref, "\000"))
 }
 
-func (k taskKey) taskPath(task string) []string {
-	k.task = task
-	return []string{k.typ, k.name, taskSection, task}
+func (r *customRunner) taskPath(t *task) []string {
+	return append([]string{commandSection, r.name}, t.path...)
 }
 
-func (k *taskKey) lookupTasks(root *cue.Instance) cue.Value {
-	return root.Lookup(k.typ, k.name, taskSection)
+func (r *customRunner) lookupTasks() cue.Value {
+	return r.root.Lookup(commandSection, r.name)
 }
 
 func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
-	err := executeTasks(typ, command, root)
+	err := executeTasks(cmd, typ, command, root)
 	exitIfErr(cmd, root, err, true)
 	return err
 }
 
-func isTask(index map[taskKey]*task, root *cue.Instance, value cue.Value) (*task, bool) {
-	inst, path := value.Reference()
-	if path != nil && inst == root {
-		if task, ok := index[keyForReference(path)]; ok {
+func (r *customRunner) referredTask(ref cue.Value) (t *task, ok bool) {
+	inst, path := ref.Reference()
+	if path != nil && inst == r.root {
+		if task := r.findTask(path); task != nil {
 			return task, true
 		}
 	}
 	return nil, false
 }
 
+func (r *customRunner) findTask(ref []string) *task {
+	for ; len(ref) > 2; ref = ref[:len(ref)-1] {
+		if t := r.index[keyForReference(ref...)]; t != nil {
+			return t
+		}
+	}
+	return nil
+}
+
+func getTasks(q []*task, v cue.Value, stack []string) ([]*task, error) {
+	if v.Lookup("$id").Exists() || v.Lookup("kind").Exists() {
+		t, err := newTask(len(q), stack, v)
+		if err != nil {
+			return nil, err
+		}
+		return append(q, t), nil
+	}
+
+	for iter, _ := v.Fields(); iter.Next(); {
+		var err error
+		q, err = getTasks(q, iter.Value(), append(stack, iter.Label()))
+		if err != nil {
+			return nil, err
+		}
+	}
+	return q, nil
+}
+
 // executeTasks runs user-defined tasks as part of a user-defined command.
 //
 // All tasks are started at once, but will block until tasks that they depend
 // on will continue.
-func executeTasks(typ, command string, root *cue.Instance) (err error) {
-	spec := taskKey{typ, command, ""}
-	tasks := spec.lookupTasks(root)
-
-	index := map[taskKey]*task{}
+func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err error) {
+	cr := &customRunner{
+		name:  command,
+		root:  inst,
+		index: map[taskKey]*task{},
+	}
+	tasks := cr.lookupTasks()
 
 	// Create task entries from spec.
-	queue := []*task{}
-	iter, err := tasks.Fields()
+	queue, err := getTasks(nil, tasks, nil)
 	if err != nil {
 		return err
 	}
-	for i := 0; iter.Next(); i++ {
-		t, err := newTask(i, iter.Label(), iter.Value())
-		if err != nil {
-			return err
-		}
-		queue = append(queue, t)
-		index[spec.keyForTask(iter.Label())] = t
+
+	for _, t := range queue {
+		cr.index[cr.keyForTask(t)] = t
 	}
 
 	// Mark dependencies for unresolved nodes.
 	for _, t := range queue {
-		task := tasks.Lookup(t.name)
+		task := tasks.Lookup(t.path...)
 
 		// Inject dependency in `$after` field
 		after := task.Lookup("$after")
 		if after.Err() == nil {
-			if dep, ok := isTask(index, root, after); ok {
+			if dep, ok := cr.referredTask(after); ok {
 				t.dep[dep] = true
 			}
 			iter, err := after.List()
 			if err == nil {
 				for iter.Next() {
-					if dep, ok := isTask(index, root, iter.Value()); ok {
+					if dep, ok := cr.referredTask(iter.Value()); ok {
 						t.dep[dep] = true
 					}
 				}
@@ -207,13 +227,13 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 		// Inject reverse dependency in `$before` field
 		before := task.Lookup("$before")
 		if before.Err() == nil {
-			if dep, ok := isTask(index, root, before); ok {
+			if dep, ok := cr.referredTask(before); ok {
 				dep.dep[t] = true
 			}
 			iter, err := before.List()
 			if err == nil {
 				for iter.Next() {
-					if dep, ok := isTask(index, root, iter.Value()); ok {
+					if dep, ok := cr.referredTask(iter.Value()); ok {
 						dep.dep[t] = true
 					}
 				}
@@ -227,9 +247,9 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 			if (after.Err() == nil && v.Equals(after)) || (before.Err() == nil && v.Equals(before)) {
 				return false
 			}
-			for _, r := range appendReferences(nil, root, v) {
-				if dep, ok := index[keyForReference(r)]; ok && t != dep {
-					v := root.Lookup(r...)
+			for _, r := range appendReferences(nil, cr.root, v) {
+				if dep := cr.findTask(r); dep != nil && t != dep {
+					v := cr.root.Lookup(r...)
 					if v.IsIncomplete() && v.Kind() != cue.StructKind {
 						t.dep[dep] = true
 					}
@@ -261,16 +281,16 @@ func executeTasks(typ, command string, root *cue.Instance) (err error) {
 			// code does not look up new strings in the index and that the
 			// full configuration, as used by the tasks, is pre-evaluated.
 			m.Lock()
-			obj := tasks.Lookup(t.name)
+			obj := tasks.Lookup(t.path...)
 			// NOTE: ignore the linter warning for the following line:
 			// itask.Context is an internal type and we want to break if any
 			// fields are added.
 			update, err := t.Run(&itask.Context{ctx, stdout, stderr}, obj)
 			if err == nil && update != nil {
-				root, err = root.Fill(update, spec.taskPath(t.name)...)
+				cr.root, err = cr.root.Fill(update, cr.taskPath(t)...)
 
 				if err == nil {
-					tasks = spec.lookupTasks(root)
+					tasks = cr.lookupTasks()
 				}
 			}
 			m.Unlock()
@@ -348,7 +368,7 @@ type task struct {
 	itask.Runner
 
 	index int
-	name  string
+	path  []string
 	done  chan error
 	dep   map[*task]bool
 }
@@ -360,7 +380,7 @@ var legacyKinds = map[string]string{
 	"testserver": "cmd/cue/cmd.Test",
 }
 
-func newTask(index int, name string, v cue.Value) (*task, error) {
+func newTask(index int, path []string, v cue.Value) (*task, error) {
 	kind, err := v.Lookup("$id").String()
 	if err != nil {
 		// Lookup kind for backwards compatibility.
@@ -391,7 +411,7 @@ func newTask(index int, name string, v cue.Value) (*task, error) {
 	return &task{
 		Runner: runner,
 		index:  index,
-		name:   name,
+		path:   path,
 		done:   make(chan error),
 		dep:    make(map[*task]bool),
 	}, nil

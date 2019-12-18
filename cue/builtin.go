@@ -18,6 +18,7 @@
 package cue
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"math/big"
@@ -289,6 +290,10 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		case nil:
 		case *callError:
 			ret = err.b
+		case *json.MarshalerError:
+			if err, ok := err.Err.(*marshalError); ok && err.b != nil {
+				ret = err.b
+			}
 		default:
 			// TODO: store the underlying error explicitly
 			ret = ctx.mkErr(src, x, "error in call to %s: %v", x.name(ctx), err)

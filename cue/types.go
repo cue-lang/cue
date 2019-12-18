@@ -205,14 +205,15 @@ var _ errors.Error = &marshalError{}
 
 type marshalError struct {
 	err errors.Error
+	b   *bottom
 }
 
 func toMarshalErr(v Value, b *bottom) error {
-	return &marshalError{v.toErr(b)}
+	return &marshalError{v.toErr(b), b}
 }
 
-func marshalErrf(v Value, src source, msg string, args ...interface{}) error {
-	arguments := append([]interface{}{msg}, args...)
+func marshalErrf(v Value, src source, code errCode, msg string, args ...interface{}) error {
+	arguments := append([]interface{}{code, msg}, args...)
 	b := v.idx.mkErr(src, arguments...)
 	return toMarshalErr(v, b)
 }
@@ -240,9 +241,9 @@ func unwrapJSONError(err error) errors.Error {
 	case *marshalError:
 		return x
 	case errors.Error:
-		return &marshalError{x}
+		return &marshalError{x, nil}
 	default:
-		return &marshalError{errors.Wrapf(err, token.NoPos, "json error")}
+		return &marshalError{errors.Wrapf(err, token.NoPos, "json error"), nil}
 	}
 }
 
@@ -805,12 +806,12 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		return nil, toMarshalErr(v, x.(*bottom))
 	default:
 		if k.hasReferences() {
-			return nil, marshalErrf(v, x, "value %q contains unresolved references", ctx.str(x))
+			return nil, marshalErrf(v, x, codeIncomplete, "value %q contains unresolved references", ctx.str(x))
 		}
 		if !k.isGround() {
-			return nil, marshalErrf(v, x, "cannot convert incomplete value %q to JSON", ctx.str(x))
+			return nil, marshalErrf(v, x, codeIncomplete, "cannot convert incomplete value %q to JSON", ctx.str(x))
 		}
-		return nil, marshalErrf(v, x, "cannot convert value %q of type %T to JSON", ctx.str(x), x)
+		return nil, marshalErrf(v, x, 0, "cannot convert value %q of type %T to JSON", ctx.str(x), x)
 	}
 }
 

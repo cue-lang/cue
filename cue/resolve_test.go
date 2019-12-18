@@ -16,6 +16,7 @@ package cue
 
 import (
 	"flag"
+	"strings"
 	"testing"
 )
 
@@ -2886,17 +2887,30 @@ func TestFullEval(t *testing.T) {
 			`B :: <11>C{foo: string, a: <12>C{foo: <13>C{[string]: <14>(_: string)-><15>.foo, }}}, ` +
 			`b: <16>C{foo: "key", a: <17>C{foo: <18>C{["key"]: <19>(_: string)-><20>.foo, }}}` +
 			`}`,
+	}, {
+		desc: "json Marshaling detects incomplete",
+		in: `
+		import "encoding/json"
+		a: json.Marshal({ a: string} )
+
+		foo: { a: 3, b: foo.c }
+		b: json.Marshal(foo)
+		`,
+		out: `<0>{` +
+			`a: <1>.Marshal (<2>{a: string}), ` +
+			`foo: <3>{a: 3, b: <4>.foo.c}, ` +
+			`b: <1>.Marshal (<4>.foo)}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }
 
 func TestX(t *testing.T) {
-	t.Skip()
-
 	// Don't remove. For debugging.
-	testCases := []testCase{{
-		in: `
-		`,
-	}}
-	rewriteHelper(t, testCases, evalFull)
+	in := `
+	`
+
+	if strings.TrimSpace(in) == "" {
+		t.Skip()
+	}
+	rewriteHelper(t, []testCase{{in: in}}, evalFull)
 }

@@ -58,7 +58,7 @@ func TestLabelName(t *testing.T) {
 		isIdent: false,
 		err:     true,
 	}, {
-		in:      &ast.BasicLit{Kind: token.TRUE, Value: "true"},
+		in:      ast.NewBool(true),
 		out:     "true",
 		isIdent: true,
 	}, {

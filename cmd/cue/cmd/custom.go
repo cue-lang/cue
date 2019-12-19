@@ -37,6 +37,7 @@ import (
 	_ "cuelang.org/go/pkg/tool/exec"
 	_ "cuelang.org/go/pkg/tool/file"
 	_ "cuelang.org/go/pkg/tool/http"
+	_ "cuelang.org/go/pkg/tool/os"
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 )
@@ -249,8 +250,11 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			}
 			for _, r := range appendReferences(nil, cr.root, v) {
 				if dep := cr.findTask(r); dep != nil && t != dep {
+					// TODO(string): consider adding dependencies
+					// unconditionally here.
+					// Something like IsFinal would be the right semantics here.
 					v := cr.root.Lookup(r...)
-					if v.IsIncomplete() && v.Kind() != cue.StructKind {
+					if !v.IsConcrete() && v.Kind() != cue.StructKind {
 						t.dep[dep] = true
 					}
 				}
@@ -385,8 +389,9 @@ func newTask(index int, path []string, v cue.Value) (*task, error) {
 	if err != nil {
 		// Lookup kind for backwards compatibility.
 		// TODO: consider at some point whether kind can be removed.
-		kind, err = v.Lookup("kind").String()
-		if err != nil {
+		var err1 error
+		kind, err1 = v.Lookup("kind").String()
+		if err1 != nil {
 			return nil, err
 		}
 	}

@@ -1,0 +1,39 @@
+cue cmd env
+cmp stdout cmd_env.out
+-- cmd_env.out --
+Hello World!
+Hello someone else!
+-- task_tool.cue --
+package home
+
+import (
+    "tool/os"
+    "tool/cli"
+)
+
+command: env: {
+	setenv1: os.Setenv & {
+        TESTNUM: 10
+        MYTEXT:  "World"
+	}
+	env1: os.Getenv & {
+        $after: setenv1
+
+        TESTNUM: *<10 | string
+        MYTEXT:  string
+	}
+	print1: cli.Print & {
+		text: "Hello \(env1.MYTEXT)!"
+	}
+    setenv2: os.Clearenv & {
+        $after: print1
+    }
+    env2: os.Environ & {
+        $after: setenv2
+
+        MYTEXT: string | *"someone else"
+    }
+	print2: cli.Print & {
+		text: "Hello \(env2.MYTEXT)!"
+	}
+}

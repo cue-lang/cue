@@ -923,6 +923,8 @@ func (v Value) Pos() token.Pos {
 	return pos
 }
 
+// TODO: IsFinal: this value can never be changed.
+
 // IsConcrete reports whether the current value is a concrete scalar value
 // (not relying on default values), a terminal error, a list, or a struct.
 // It does not verify that values of lists or structs are concrete themselves.

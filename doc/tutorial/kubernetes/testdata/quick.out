@@ -111,8 +111,8 @@ service: {
 }
 deployment: {
     bartender: {
-        kind:       "Deployment"
         Name ::     "bartender"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "bartender"
@@ -217,8 +217,8 @@ service: {
 }
 deployment: {
     breaddispatcher: {
-        kind:       "Deployment"
         Name ::     "breaddispatcher"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "breaddispatcher"
@@ -323,8 +323,8 @@ service: {
 }
 deployment: {
     host: {
-        kind:       "Deployment"
         Name ::     "host"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "host"
@@ -429,8 +429,8 @@ service: {
 }
 deployment: {
     maitred: {
-        kind:       "Deployment"
         Name ::     "maitred"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "maitred"
@@ -535,8 +535,8 @@ service: {
 }
 deployment: {
     valeter: {
-        kind:       "Deployment"
         Name ::     "valeter"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "valeter"
@@ -641,8 +641,8 @@ service: {
 }
 deployment: {
     waiter: {
-        kind:       "Deployment"
         Name ::     "waiter"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "waiter"
@@ -746,8 +746,8 @@ service: {
 }
 deployment: {
     waterdispatcher: {
-        kind:       "Deployment"
         Name ::     "waterdispatcher"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "waterdispatcher"
@@ -893,8 +893,8 @@ service: {
 }
 deployment: {
     download: {
-        kind:       "Deployment"
         Name ::     "download"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "download"
@@ -1004,8 +1004,8 @@ daemonSet: {
 }
 statefulSet: {
     etcd: {
-        kind:       "StatefulSet"
         Name ::     "etcd"
+        kind:       "StatefulSet"
         apiVersion: "apps/v1"
         metadata: {
             name: "etcd"
@@ -1176,8 +1176,8 @@ service: {
 }
 deployment: {
     events: {
-        kind:       "Deployment"
         Name ::     "events"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "events"
@@ -1311,8 +1311,8 @@ service: {
 }
 deployment: {
     tasks: {
-        kind:       "Deployment"
         Name ::     "tasks"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "tasks"
@@ -1429,8 +1429,8 @@ service: {
 }
 deployment: {
     updater: {
-        kind:       "Deployment"
         Name ::     "updater"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "updater"
@@ -1543,8 +1543,8 @@ service: {
 }
 deployment: {
     watcher: {
-        kind:       "Deployment"
         Name ::     "watcher"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "watcher"
@@ -1698,8 +1698,8 @@ service: {
 }
 deployment: {
     caller: {
-        kind:       "Deployment"
         Name ::     "caller"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "caller"
@@ -1841,8 +1841,8 @@ service: {
 }
 deployment: {
     dishwasher: {
-        kind:       "Deployment"
         Name ::     "dishwasher"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "dishwasher"
@@ -1984,8 +1984,8 @@ service: {
 }
 deployment: {
     expiditer: {
-        kind:       "Deployment"
         Name ::     "expiditer"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "expiditer"
@@ -2118,8 +2118,8 @@ service: {
 }
 deployment: {
     headchef: {
-        kind:       "Deployment"
         Name ::     "headchef"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "headchef"
@@ -2252,8 +2252,8 @@ service: {
 }
 deployment: {
     linecook: {
-        kind:       "Deployment"
         Name ::     "linecook"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "linecook"
@@ -2386,8 +2386,8 @@ service: {
 }
 deployment: {
     pastrychef: {
-        kind:       "Deployment"
         Name ::     "pastrychef"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "pastrychef"
@@ -2520,8 +2520,8 @@ service: {
 }
 deployment: {
     souschef: {
-        kind:       "Deployment"
         Name ::     "souschef"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "souschef"
@@ -2708,8 +2708,8 @@ service: {
 }
 deployment: {
     alertmanager: {
-        kind:       "Deployment"
         Name ::     "alertmanager"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "alertmanager"
@@ -2832,8 +2832,8 @@ service: {
 }
 deployment: {
     grafana: {
-        kind:       "Deployment"
         Name ::     "grafana"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "grafana"
@@ -2972,8 +2972,8 @@ deployment: {
 }
 daemonSet: {
     "node-exporter": {
-        kind:       "DaemonSet"
         Name ::     "node-exporter"
+        kind:       "DaemonSet"
         apiVersion: "apps/v1"
         metadata: {
             name: "node-exporter"
@@ -3352,8 +3352,8 @@ service: {
 }
 deployment: {
     prometheus: {
-        kind:       "Deployment"
         Name ::     "prometheus"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "prometheus"
@@ -3585,8 +3585,8 @@ service: {
 }
 deployment: {
     authproxy: {
-        kind:       "Deployment"
         Name ::     "authproxy"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "authproxy"
@@ -3699,8 +3699,8 @@ service: {
 }
 deployment: {
     goget: {
-        kind:       "Deployment"
         Name ::     "goget"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "goget"
@@ -3983,8 +3983,8 @@ service: {
 }
 deployment: {
     nginx: {
-        kind:       "Deployment"
         Name ::     "nginx"
+        kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
             name: "nginx"

@@ -9,12 +9,10 @@ MultiObjectTyper :: [...ObjectTyper]
 
 // WithVersionEncoder serializes an object and ensures the GVK is set.
 WithVersionEncoder :: {
-	Version:     GroupVersioner
-	Encoder:     Encoder
-	ObjectTyper: ObjectTyper
+	Version:       GroupVersioner
+	"Encoder":     Encoder
+	"ObjectTyper": ObjectTyper
 }
 
 // WithoutVersionDecoder clears the group version kind of a deserialized object.
-WithoutVersionDecoder :: {
-	Decoder: Decoder
-}
+WithoutVersionDecoder :: "Decoder": Decoder

@@ -12,7 +12,6 @@ import (
 	"encoding/csv"
 	"encoding/hex"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"html"
 	"io"
@@ -31,6 +30,7 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
@@ -144,6 +144,21 @@ func timeFormat(value, layout string) (bool, error) {
 		return false, fmt.Errorf("invalid time %q", value)
 	}
 	return true, nil
+}
+
+var boolValues = map[string]bool{
+	"1":     true,
+	"0":     false,
+	"t":     true,
+	"f":     false,
+	"T":     true,
+	"F":     false,
+	"true":  true,
+	"false": false,
+	"TRUE":  true,
+	"FALSE": false,
+	"True":  true,
+	"False": false,
 }
 
 var builtinPackages = map[string]*builtinPkg{
@@ -3581,6 +3596,28 @@ var builtinPackages = map[string]*builtinPkg{
 	}
 	Delete: Do & {
 		method: "DELETE"
+	}
+}`,
+	},
+	"tool/os": &builtinPkg{
+		native: []*builtin{{}},
+		cue: `{
+	Value :: bool | number | *string | null
+	Name ::  !="" & !~"^[$]"
+	Setenv: {
+		[Name]: Value
+		$id:    "tool/os.Setenv"
+	}
+	Getenv: {
+		[Name]: Value
+		$id:    "tool/os.Getenv"
+	}
+	Environ: {
+		[Name]: Value
+		$id:    "tool/os.Environ"
+	}
+	Clearenv: {
+		$id: "tool/os.Clearenv"
 	}
 }`,
 	},

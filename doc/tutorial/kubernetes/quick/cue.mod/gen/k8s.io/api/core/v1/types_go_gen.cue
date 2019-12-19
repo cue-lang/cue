@@ -2134,7 +2134,7 @@ ResourceFieldSelector :: {
 	containerName?: string @go(ContainerName) @protobuf(1,bytes,opt)
 
 	// Required: resource to select
-	resource: string @go(Resource) @protobuf(2,bytes,opt)
+	"resource": string @go(Resource) @protobuf(2,bytes,opt)
 
 	// Specifies the output format of the exposed resources, defaults to "1"
 	// +optional
@@ -5040,7 +5040,7 @@ ResourceHugePagesPrefix :: "hugepages-"
 ResourceAttachableVolumesPrefix :: "attachable-volumes-"
 
 // ResourceList is a set of (resource name, quantity) pairs.
-ResourceList :: {[string]: resource.Quantity}
+ResourceList :: [string]: resource.Quantity
 
 // Node is a worker node in Kubernetes.
 // Each node will have a unique identifier in the cache (i.e. in etcd).

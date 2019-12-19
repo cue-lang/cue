@@ -17,12 +17,12 @@ package exec
 //go:generate go run gen.go
 
 import (
-	"errors"
 	"fmt"
 	"os/exec"
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
 	"golang.org/x/xerrors"
 )

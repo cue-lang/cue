@@ -58,7 +58,7 @@ SerializerInfo :: {
 	EncodesAsText: bool
 
 	// Serializer is the individual object serializer for this media type.
-	Serializer: Serializer
+	"Serializer": Serializer
 
 	// PrettySerializer, if set, can serialize this object in a form biased towards
 	// readability.
@@ -75,10 +75,10 @@ StreamSerializerInfo :: {
 	EncodesAsText: bool
 
 	// Serializer is the top level object serializer for this type when streaming
-	Serializer: Serializer
+	"Serializer": Serializer
 
 	// Framer is the factory for retrieving streams that separate objects on the wire
-	Framer: Framer
+	"Framer": Framer
 }
 
 // NegotiatedSerializer is an interface used for obtaining encoders, decoders, and serializers

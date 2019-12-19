@@ -31,7 +31,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			for _, inst := range load.Instances(args, nil) {
+			for _, inst := range load.Instances(args, &load.Config{
+				Tests: true,
+				Tools: true,
+			}) {
 				if inst.Err != nil {
 					exitOnErr(cmd, inst.Err, false)
 					continue

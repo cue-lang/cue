@@ -61,14 +61,7 @@ func Sort(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 // SortStable sorts data while keeping the original order of equal elements.
 // It does O(n*log(n)) comparisons.
 //
-// cmp is a struct of the form {T :: _, a: T, b: T, less: bool}, where
-// less should reflect a < b.
-//
-// Example:
-//
-//    Sort([2, 3, 1], list.Ascending)
-//
-//    Sort{{a: 2}, {a: 3}, {a: 1}, {a: {}, b: {}, less: x.a < y.a}}
+// See Sort for an example usage.
 //
 func SortStable(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 	s := valueSorter{list, cmp, nil}

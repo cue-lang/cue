@@ -784,11 +784,11 @@ func TestExportFile(t *testing.T) {
 			T :: {
 				[string]: int64
 			}
-			X :: {
+			x: {
 				[string]: int64
 				x:        int64
 			}
-			x: {
+			X :: {
 				[string]: int64
 				x:        int64
 			}
@@ -809,10 +809,10 @@ func TestExportFile(t *testing.T) {
 		{
 			T :: {
 			}
+			x: x: int64
 			X :: {
 				x: int64
 			}
-			x: x: int64
 		}`),
 	}, {
 		eval: true,

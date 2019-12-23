@@ -518,9 +518,9 @@ func TestBasicRewrite(t *testing.T) {
 			x: x + 1
 		`,
 		out: `<0>{` +
+			`x: _|_((100 & 101):conflicting values 100 and 101), ` +
 			`a: _|_((210 & 200):conflicting values 210 and 200), ` +
-			`b: _|_((210 & 200):conflicting values 210 and 200), ` +
-			`x: _|_((100 & 101):conflicting values 100 and 101)}`,
+			`b: _|_((210 & 200):conflicting values 210 and 200)}`,
 		// TODO: find a way to mark error in data.
 	}}
 	rewriteHelper(t, testCases, evalPartial)
@@ -557,7 +557,7 @@ func TestChooseDefault(t *testing.T) {
 			x: a & b
 			y: b & c
 			`,
-		out: `<0>{a: "a", b: "a", c: (*"a" | *"b"), x: "a", y: (*"a" | *"b")}`,
+		out: `<0>{x: "a", y: (*"a" | *"b"), a: "a", b: "a", c: (*"a" | *"b")}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }
@@ -577,7 +577,7 @@ func TestResolve(t *testing.T) {
 		out: "<0>{a: 3, b: <1>{c: <2>{d: 3}}, c: <3>{c: 2}, d: <4>{d: 2}}",
 	}, {
 		in:  "`foo-bar`: 3\n x: `foo-bar`,",
-		out: `<0>{foo-bar: 3, x: 3}`,
+		out: `<0>{x: 3, foo-bar: 3}`,
 	}, {
 		desc: "resolution of quoted identifiers",
 		in: `
@@ -1541,7 +1541,7 @@ a: {
 			w: v & { b: 100 }
 			wp: v & { b: 100 }
 			`,
-		out: `<0>{a: <1>{b: int}, c: <2>{b: 100, d: (<3>.a.b + 3)}, x: <4>{b: int, c: (<5>.b + 5)}, y: <6>{b: 100, c: 105}, v: <7>{b: int, c: (<3>.v.b + 5)}, w: <8>{b: 100, c: (<3>.v.b + 5)}, wp: <9>{b: 100, c: (<3>.v.b + 5)}}`,
+		out: `<0>{x: <1>{b: int, c: (<2>.b + 5)}, y: <3>{b: 100, c: 105}, a: <4>{b: int}, c: <5>{b: 100, d: (<6>.a.b + 3)}, v: <7>{b: int, c: (<6>.v.b + 5)}, w: <8>{b: 100, c: (<6>.v.b + 5)}, wp: <9>{b: 100, c: (<6>.v.b + 5)}}`,
 		// TODO(#152): should be
 		// out: `<0>{a: <1>{b: int}, c: <2>{b: 100, d: (<3>.a.b + 3)}, x: <4>{b: int, c: (<5>.b + 5)}, y: <6>{b: 100, c: 105}, v: <7>{b: int, c: (<8>.b + 5)}, w: <9>{b: 100, c: 105}, wp: <10>{b: 100, c: 105}}`,
 	}, {
@@ -1639,7 +1639,7 @@ a: {
 				d: 4, // Combines constraints S.A, S.B, T.A, and T.B
 			}
 		}`,
-		out: "<0>{S: <1>{A: <2>{a: 1}, B: <3>{a: 1, b: 2}}, T: <4>{A: <5>{a: 1, c: 3}, B: <6>{a: 1, b: 2, c: 3, d: 4}}}",
+		out: "<0>{T: <1>{A: <2>{a: 1, c: 3}, B: <3>{a: 1, b: 2, c: 3, d: 4}}, S: <4>{A: <5>{a: 1}, B: <6>{a: 1, b: 2}}}",
 	}, {
 		desc: "field templates",
 		in: `
@@ -1659,7 +1659,7 @@ a: {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{[]: <2>(name: string)->int, k: 1}, b: <3>{[]: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{[]: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{[]: <2>(name: string)->int, k: 1}, b: <3>{[]: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: (*1 | int)}, w: <8>{x: 0, y: (*1 | int)}}, c: <9>{[]: <10>(Name: string)-><11>{y: 1, name: <10>.Name}, foo: <12>{y: 1, name: "foo"}, bar: <13>{y: 1, name: "bar"}}}`,
 	}, {
 		desc: "range unification",
 		in: `
@@ -2060,7 +2060,7 @@ func TestFullEval(t *testing.T) {
 				bar: _
 			}
 			`,
-		out: `<0>{a: <1>{[]: <2>(name: string)->int, k: 1}, b: <3>{[]: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{[]: <10>(Name: string)-><11>{name: <10>.Name, y: 1}, foo: <12>{name: "foo", y: 1}, bar: <13>{name: "bar", y: 1}}}`,
+		out: `<0>{a: <1>{[]: <2>(name: string)->int, k: 1}, b: <3>{[]: <4>(X: string)->(<5>{x: 0, y: (*1 | int)} & <6>{}), v: <7>{x: 0, y: 1}, w: <8>{x: 0, y: 0}}, c: <9>{[]: <10>(Name: string)-><11>{y: 1, name: <10>.Name}, foo: <12>{y: 1, name: "foo"}, bar: <13>{y: 1, name: "bar"}}}`,
 	}, {
 		desc: "field comprehension",
 		in: `
@@ -2773,7 +2773,7 @@ func TestFullEval(t *testing.T) {
 		s: t & {
 			ok :: false
 		}`,
-		out: `<0>{t: <1>{ok :: true, x: int}, s: <2>{ok :: false}}`,
+		out: `<0>{t: <1>{x: int, ok :: true}, s: <2>{ok :: false}}`,
 	}, {
 		desc: "cross-dependent comprehension",
 		// TODO(eval): fix: c should ultimately be allowed the struct. Current
@@ -2793,7 +2793,7 @@ func TestFullEval(t *testing.T) {
 		`,
 		// c should not be allowed, as it would break commutativiy.
 		// See comments above.
-		out: `<0>{a :: <1>C{b: bool if <2>.b yield <3>C{c: 4}}, x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct)}`,
+		out: `<0>{x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct), a :: <1>C{b: bool if <2>.b yield <3>C{c: 4}}}`,
 	}, {
 		desc: "optional expanded before lookup",
 		in: `

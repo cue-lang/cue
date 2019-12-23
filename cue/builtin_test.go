@@ -240,6 +240,28 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Slice([1, 2, 3, 4], 1, 5)`),
 		`_|_(error in call to list.Slice: slice bounds out of range)`,
 	}, {
+		test("list", `list.Sort([], list.Ascending)`),
+		`[]`,
+	}, {
+		test("list", `list.Sort([2, 3, 1, 4], {x:_, y:_, less: (x<y)})`),
+		`[1,2,3,4]`,
+	}, {
+		test("list", `list.SortStable([{a:2,v:1}, {a:1,v:2}, {a:1,v:3}], {
+			x:_,
+			y:_,
+			less: (x.a < y.a)
+		})`),
+		`[{a: 1, v: 2},{a: 1, v: 3},{a: 2, v: 1}]`,
+	}, {
+		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
+		`_|_(error in call to list.Sort: conflicting values close(T, close(T)) and {b: 2} (mismatched types number|string and struct))`,
+	}, {
+		test("list", `list.SortStrings(["b", "a"])`),
+		`["a","b"]`,
+	}, {
+		test("list", `list.SortStrings([1, 2])`),
+		`_|_(invalid list element 0 in argument 0 to list.SortStrings: cannot use value 1 (type int) as string)`,
+	}, {
 		test("list", `list.Sum([1, 2, 3, 4])`),
 		`10`,
 	}, {

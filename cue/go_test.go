@@ -170,13 +170,13 @@ func TestConvertType(t *testing.T) {
 			T time.Time
 			G func()
 		}{},
-		`(*null | <0>{A: ((int & >=-32768 & int & <=32767) & (>=0 & <100)), ` +
+		`(*null | <0>{T: _, ` +
+			`A: ((int & >=-32768 & int & <=32767) & (>=0 & <100)), ` +
 			`C: string, ` +
 			`D: bool, ` +
 			`F: float, ` +
 			`b: null, ` +
-			`L?: (*null | bytes), ` +
-			`T: _})`,
+			`L?: (*null | bytes)})`,
 	}, {
 		struct {
 			A int `cue:"<"` // invalid
@@ -191,7 +191,7 @@ func TestConvertType(t *testing.T) {
 			T string `cue:""` // allowed
 			h int
 		}{},
-		"<0>{D?: number, T: string, P?: (*null | number), I?: _}",
+		"<0>{T: string, D?: number, P?: (*null | number), I?: _}",
 	}, {
 		struct {
 			A int8 `cue:"C-B"`

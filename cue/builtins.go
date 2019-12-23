@@ -1080,7 +1080,96 @@ var builtinPackages = map[string]*builtinPkg{
 					}()
 				}
 			},
+		}, {
+			Name:   "Sort",
+			Params: []kind{listKind, topKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				list, cmp := c.list(0), c.value(1)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						s := valueSorter{list, cmp, nil}
+
+						sort.Sort(&s)
+						return s.ret()
+					}()
+				}
+			},
+		}, {
+			Name:   "SortStable",
+			Params: []kind{listKind, topKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				list, cmp := c.list(0), c.value(1)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						s := valueSorter{list, cmp, nil}
+						sort.Stable(&s)
+						return s.ret()
+					}()
+				}
+			},
+		}, {
+			Name:   "SortStrings",
+			Params: []kind{listKind},
+			Result: listKind,
+			Func: func(c *callCtxt) {
+				a := c.strList(0)
+				if c.do() {
+					c.ret = func() interface{} {
+						sort.Strings(a)
+						return a
+					}()
+				}
+			},
+		}, {
+			Name:   "IsSorted",
+			Params: []kind{listKind, topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				list, cmp := c.list(0), c.value(1)
+				if c.do() {
+					c.ret = func() interface{} {
+						s := valueSorter{list, cmp, nil}
+						return sort.IsSorted(&s)
+					}()
+				}
+			},
+		}, {
+			Name:   "IsSortedStrings",
+			Params: []kind{listKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				a := c.strList(0)
+				if c.do() {
+					c.ret = func() interface{} {
+						return sort.StringsAreSorted(a)
+					}()
+				}
+			},
 		}},
+		cue: `{
+	Comparer :: {
+		T ::  _
+		less: bool
+		x:    T
+		y:    T
+	}
+	Ascending :: {
+		T ::  number | string
+		less: true && x < y
+		x:    T
+		y:    T
+		Comparer
+	}
+	Descending :: {
+		T ::  number | string
+		less: x > y
+		x:    T
+		y:    T
+		Comparer
+	}
+}`,
 	},
 	"math": &builtinPkg{
 		native: []*builtin{{

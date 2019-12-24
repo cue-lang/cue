@@ -46,6 +46,8 @@ func TestConvert(t *testing.T) {
 	}, {
 		"foo", `"foo"`,
 	}, {
+		"\x80", `_|_(cannot convert result to string: invalid UTF-8)`,
+	}, {
 		3, "3",
 	}, {
 		uint(3), "3",

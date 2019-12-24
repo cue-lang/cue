@@ -22,6 +22,7 @@ import (
 	"reflect"
 	"sort"
 	"strings"
+	"unicode/utf8"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
@@ -264,6 +265,10 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 	case bool:
 		return &boolLit{src.base(), v}
 	case string:
+		if !utf8.ValidString(v) {
+			return ctx.mkErr(src,
+				"cannot convert result to string: invalid UTF-8")
+		}
 		return &stringLit{src.base(), v, nil}
 	case []byte:
 		return &bytesLit{src.base(), v, nil}
@@ -306,7 +311,12 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 			return &boolLit{src.base(), value.Bool()}
 
 		case reflect.String:
-			return &stringLit{src.base(), value.String(), nil}
+			str := value.String()
+			if !utf8.ValidString(str) {
+				return ctx.mkErr(src,
+					"cannot convert result to string: invalid UTF-8")
+			}
+			return &stringLit{src.base(), str, nil}
 
 		case reflect.Int, reflect.Int8, reflect.Int16,
 			reflect.Int32, reflect.Int64:

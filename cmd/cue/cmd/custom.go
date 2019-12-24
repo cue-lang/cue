@@ -165,6 +165,14 @@ func (r *customRunner) findTask(ref []string) *task {
 }
 
 func getTasks(q []*task, v cue.Value, stack []string) ([]*task, error) {
+	// Allow non-task values, but do not allow errors.
+	if err := v.Err(); err != nil {
+		return nil, err
+	}
+	if v.Kind()&cue.StructKind == 0 {
+		return q, nil
+	}
+
 	if v.Lookup("$id").Exists() || v.Lookup("kind").Exists() {
 		t, err := newTask(len(q), stack, v)
 		if err != nil {
@@ -289,7 +297,11 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			// NOTE: ignore the linter warning for the following line:
 			// itask.Context is an internal type and we want to break if any
 			// fields are added.
-			update, err := t.Run(&itask.Context{ctx, stdout, stderr}, obj)
+			c := &itask.Context{ctx, stdout, stderr, obj, nil}
+			update, err := t.Run(c)
+			if c.Err != nil {
+				err = c.Err
+			}
 			if err == nil && update != nil {
 				cr.root, err = cr.root.Fill(update, cr.taskPath(t)...)
 
@@ -448,6 +460,6 @@ func newTestServerCmd(v cue.Value) (itask.Runner, error) {
 
 type testServerCmd string
 
-func (s testServerCmd) Run(ctx *itask.Context, v cue.Value) (x interface{}, err error) {
+func (s testServerCmd) Run(ctx *itask.Context) (x interface{}, err error) {
 	return map[string]interface{}{"url": string(s)}, nil
 }

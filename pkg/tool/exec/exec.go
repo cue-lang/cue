@@ -40,17 +40,18 @@ func newExecCmd(v cue.Value) (task.Runner, error) {
 	return &execCmd{}, nil
 }
 
-func (c *execCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
+func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	// TODO: set environment variables, if defined.
 	var bin string
 	var args []string
 	doc := ""
-	switch v := v.Lookup("cmd"); v.Kind() {
+	v := ctx.Lookup("cmd")
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+	switch v.Kind() {
 	case cue.StringKind:
-		str, _ := v.String()
-		if str == "" {
-			return cue.Value{}, errors.New("empty command")
-		}
+		str := ctx.String("cmd")
 		doc = str
 		list := strings.Fields(str)
 		bin = list[0]
@@ -76,16 +77,20 @@ func (c *execCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 		}
 	}
 
+	if bin == "" {
+		return cue.Value{}, errors.New("empty command")
+	}
+
 	cmd := exec.CommandContext(ctx.Context, bin, args...)
 
 	stream := func(name string) (stream cue.Value, ok bool) {
-		c := v.Lookup(name)
+		c := ctx.Obj.Lookup(name)
 		// Although the schema defines a default versions, older implementations
 		// may not use it yet.
 		if !c.Exists() {
 			return
 		}
-		if err := c.Null(); err == nil {
+		if err := c.Null(); ctx.Err != nil || err == nil {
 			return
 		}
 		return c, true

@@ -42,32 +42,35 @@ type cmdAppend struct{}
 type cmdCreate struct{}
 type cmdGlob struct{}
 
-func lookupStr(v cue.Value, str string) string {
-	str, _ = v.Lookup(str).String()
-	return str
-}
+func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
+	filename := ctx.String("filename")
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
 
-func (c *cmdRead) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	b, err := ioutil.ReadFile(lookupStr(v, "filename"))
+	b, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
 	update := map[string]interface{}{"contents": b}
 
-	switch v.Lookup("contents").IncompleteKind() {
+	switch v := ctx.Lookup("contents"); v.IncompleteKind() {
 	case cue.BytesKind:
+		// already set above
 	case cue.StringKind:
 		update["contents"] = string(b)
 	}
 	return update, nil
 }
 
-func (c *cmdAppend) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	filename := lookupStr(v, "filename")
-	filename = filepath.FromSlash(filename)
-	mode, err := v.Lookup("permissions").Int64()
-	if err != nil {
-		return nil, err
+func (c *cmdAppend) Run(ctx *task.Context) (res interface{}, err error) {
+	var (
+		filename = filepath.FromSlash(ctx.String("filename"))
+		mode     = ctx.Int64("permissions")
+		b        = ctx.Bytes("contents")
+	)
+	if ctx.Err != nil {
+		return nil, ctx.Err
 	}
 
 	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, os.FileMode(mode))
@@ -76,27 +79,30 @@ func (c *cmdAppend) Run(ctx *task.Context, v cue.Value) (res interface{}, err er
 	}
 	defer f.Close()
 
-	b, _ := v.Lookup("contents").Bytes()
 	if _, err := f.Write(b); err != nil {
 		return nil, err
 	}
 	return nil, nil
 }
 
-func (c *cmdCreate) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	filename := lookupStr(v, "filename")
-	filename = filepath.FromSlash(filename)
-	mode, err := v.Lookup("permissions").Int64()
-	if err != nil {
-		return nil, err
+func (c *cmdCreate) Run(ctx *task.Context) (res interface{}, err error) {
+	var (
+		filename = filepath.FromSlash(ctx.String("filename"))
+		mode     = ctx.Int64("permissions")
+		b        = ctx.Bytes("contents")
+	)
+	if ctx.Err != nil {
+		return nil, ctx.Err
 	}
 
-	b, _ := v.Lookup("contents").Bytes()
 	return nil, ioutil.WriteFile(filename, b, os.FileMode(mode))
 }
 
-func (c *cmdGlob) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	glob := filepath.FromSlash(lookupStr(v, "glob"))
+func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
+	glob := ctx.String("glob")
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
 	m, err := filepath.Glob(glob)
 	for i, s := range m {
 		m[i] = filepath.ToSlash(s)

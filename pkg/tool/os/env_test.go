@@ -38,7 +38,7 @@ func TestSetenv(t *testing.T) {
 		CUEOSTESTNUM:   34K
 		CUEOSTESTUNSET: null
 	}`)
-	_, err := (*setenvCmd).Run(nil, nil, v)
+	_, err := (*setenvCmd).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -61,7 +61,7 @@ func TestSetenv(t *testing.T) {
 	v = parse(t, "tool/os.Setenv", `{
 		CUEOSTESTMOOD: string
 	}`)
-	_, err = (*setenvCmd).Run(nil, nil, v)
+	_, err = (*setenvCmd).Run(nil, &task.Context{Obj: v})
 	if err == nil {
 		t.Fatal("expected incomplete error")
 	}
@@ -124,7 +124,7 @@ func TestGetenv(t *testing.T) {
 		{"tool/os.Environ", &environCmd{}},
 	} {
 		v := parse(t, tc.pkg, config)
-		got, err := tc.runner.Run(nil, v)
+		got, err := tc.runner.Run(&task.Context{Obj: v})
 		if err != nil {
 			t.Fatal(err)
 		}
@@ -157,7 +157,7 @@ func TestGetenv(t *testing.T) {
 		}} {
 			t.Run(etc.err, func(t *testing.T) {
 				v = parse(t, tc.pkg, etc.config)
-				if _, err = tc.runner.Run(nil, v); err == nil {
+				if _, err = tc.runner.Run(&task.Context{Obj: v}); err == nil {
 					t.Error(etc.err)
 				}
 			})

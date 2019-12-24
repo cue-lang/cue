@@ -21,6 +21,7 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 )
 
 // A Context provides context for running a task.
@@ -28,6 +29,61 @@ type Context struct {
 	Context context.Context
 	Stdout  io.Writer
 	Stderr  io.Writer
+	Obj     cue.Value
+	Err     errors.Error
+}
+
+func (c *Context) Lookup(field string) cue.Value {
+	f := c.Obj.Lookup(field)
+	if !f.Exists() {
+		c.Err = errors.Append(c.Err, errors.Newf(c.Obj.Pos(),
+			"could not find field %q", field))
+		return cue.Value{}
+	}
+	if err := f.Err(); err != nil {
+		c.Err = errors.Append(c.Err, errors.Promote(err, "lookup"))
+	}
+	return f
+}
+
+func (c *Context) Int64(field string) int64 {
+	f := c.Obj.Lookup(field)
+	value, err := f.Int64()
+	if err != nil {
+		// TODO: use v for position for now, as f has not yet a
+		// position associated with it.
+		c.Err = errors.Append(c.Err, errors.Wrapf(err, c.Obj.Pos(),
+			"invalid integer argument for field %q", field))
+		return 0
+	}
+	return value
+}
+
+func (c *Context) String(field string) string {
+	f := c.Obj.Lookup(field)
+	value, err := f.String()
+	if err != nil {
+		// TODO: use v for position for now, as f has not yet a
+		// position associated with it.
+		c.Err = errors.Append(c.Err, errors.Wrapf(err, c.Obj.Pos(),
+			"invalid string argument for field %q", field))
+		c.Err = errors.Promote(err, "ddd")
+		return ""
+	}
+	return value
+}
+
+func (c *Context) Bytes(field string) []byte {
+	f := c.Obj.Lookup(field)
+	value, err := f.Bytes()
+	if err != nil {
+		// TODO: use v for position for now, as f has not yet a
+		// position associated with it.
+		c.Err = errors.Append(c.Err, errors.Wrapf(err, c.Obj.Pos(),
+			"invalid bytes argument for field %q", field))
+		return nil
+	}
+	return value
 }
 
 // A RunnerFunc creates a Runner.
@@ -42,7 +98,7 @@ type Runner interface {
 
 	// Runner runs given the current value and returns a new value which is to
 	// be unified with the original result.
-	Run(ctx *Context, v cue.Value) (results interface{}, err error)
+	Run(ctx *Context) (results interface{}, err error)
 }
 
 // Register registers a task for cue commands.

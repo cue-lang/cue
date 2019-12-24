@@ -38,20 +38,14 @@ func newHTTPCmd(v cue.Value) (task.Runner, error) {
 	return &httpCmd{}, nil
 }
 
-func lookupString(obj cue.Value, key string) string {
-	str, err := obj.Lookup(key).String()
-	if err != nil {
-		return ""
-	}
-	return str
-}
-
-func (c *httpCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
+func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	var header, trailer http.Header
-	method := lookupString(v, "method")
-	u := lookupString(v, "url")
+	var (
+		method = ctx.String("method")
+		u      = ctx.String("url")
+	)
 	var r io.Reader
-	if obj := v.Lookup("request"); v.Exists() {
+	if obj := ctx.Obj.Lookup("request"); obj.Exists() {
 		if v := obj.Lookup("body"); v.Exists() {
 			r, err = v.Reader()
 			if err != nil {
@@ -65,6 +59,10 @@ func (c *httpCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err erro
 			return nil, err
 		}
 	}
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+
 	req, err := http.NewRequest(method, u, r)
 	if err != nil {
 		return nil, err

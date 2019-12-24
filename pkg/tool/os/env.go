@@ -51,7 +51,7 @@ func newClearenvCmd(v cue.Value) (task.Runner, error) {
 	return &clearenvCmd{}, nil
 }
 
-func (c *clearenvCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
+func (c *clearenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	os.Clearenv()
 	return map[string]interface{}{}, nil
 }
@@ -62,8 +62,8 @@ func newSetenvCmd(v cue.Value) (task.Runner, error) {
 	return &setenvCmd{}, nil
 }
 
-func (c *setenvCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	iter, err := v.Fields()
+func (c *setenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	iter, err := ctx.Obj.Fields()
 	if err != nil {
 		return nil, err
 	}
@@ -117,8 +117,8 @@ func newGetenvCmd(v cue.Value) (task.Runner, error) {
 	return &getenvCmd{}, nil
 }
 
-func (c *getenvCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	iter, err := v.Fields()
+func (c *getenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	iter, err := ctx.Obj.Fields()
 	if err != nil {
 		return nil, err
 	}
@@ -157,8 +157,8 @@ func newEnvironCmd(v cue.Value) (task.Runner, error) {
 	return &environCmd{}, nil
 }
 
-func (c *environCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	iter, err := v.Fields()
+func (c *environCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	iter, err := ctx.Obj.Fields()
 	if err != nil {
 		return nil, err
 	}
@@ -171,7 +171,7 @@ func (c *environCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err e
 		name := a[0]
 		str := a[1]
 
-		if v := v.Lookup(name); v.Exists() {
+		if v := ctx.Obj.Lookup(name); v.Exists() {
 			update[name], err = fromString(name, str, v)
 			if err != nil {
 				return nil, err

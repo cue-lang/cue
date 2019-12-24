@@ -36,10 +36,10 @@ func newPrintCmd(v cue.Value) (task.Runner, error) {
 	return &printCmd{}, nil
 }
 
-func (c *printCmd) Run(ctx *task.Context, v cue.Value) (res interface{}, err error) {
-	str, err := v.Lookup("text").String()
-	if err != nil {
-		return nil, err
+func (c *printCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	str := ctx.String("text")
+	if ctx.Err != nil {
+		return nil, ctx.Err
 	}
 	fmt.Fprintln(ctx.Stdout, str)
 	return nil, nil

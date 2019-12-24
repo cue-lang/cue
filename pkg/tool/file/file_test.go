@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/task"
 )
 
 func parse(t *testing.T, kind, expr string) cue.Value {
@@ -43,7 +44,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 }
 func TestRead(t *testing.T) {
 	v := parse(t, "tool/file.Read", `{filename: "testdata/input.foo"}`)
-	got, err := (*cmdRead).Run(nil, nil, v)
+	got, err := (*cmdRead).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -56,7 +57,7 @@ func TestRead(t *testing.T) {
 		filename: "testdata/input.foo"
 		contents: string
 	}`)
-	got, err = (*cmdRead).Run(nil, nil, v)
+	got, err = (*cmdRead).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -80,7 +81,7 @@ func TestAppend(t *testing.T) {
 		filename: "%s"
 		contents: "This is a test."
 	}`, name))
-	_, err = (*cmdAppend).Run(nil, nil, v)
+	_, err = (*cmdAppend).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -109,7 +110,7 @@ func TestCreate(t *testing.T) {
 		filename: "%s"
 		contents: "This is a test."
 	}`, name))
-	_, err = (*cmdCreate).Run(nil, nil, v)
+	_, err = (*cmdCreate).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -128,7 +129,7 @@ func TestGlob(t *testing.T) {
 	v := parse(t, "tool/file.Glob", fmt.Sprintf(`{
 		glob: "testdata/input.*"
 	}`))
-	got, err := (*cmdGlob).Run(nil, nil, v)
+	got, err := (*cmdGlob).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
 	}

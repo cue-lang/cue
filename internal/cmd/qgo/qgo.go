@@ -47,7 +47,7 @@ extract		Extract one-line signature of exported types of
 
 // Even though all of the code is generated, the documentation is copied as is.
 // So for proper measure, include both the CUE and Go licenses.
-const copyright = `// Copyright 2018 The CUE Authors
+const copyright = `// Copyright 2020 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.

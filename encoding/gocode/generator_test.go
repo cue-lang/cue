@@ -23,10 +23,11 @@ import (
 	"regexp"
 	"testing"
 
+	"github.com/kylelemons/godebug/diff"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
-	"github.com/kylelemons/godebug/diff"
 )
 
 var update = flag.Bool("update", false, "update test files")

@@ -19,10 +19,11 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/tools/trim"
-	"github.com/spf13/cobra"
 )
 
 // TODO:

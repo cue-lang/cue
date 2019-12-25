@@ -19,9 +19,10 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/spf13/cobra"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/pkg/encoding/yaml"
-	"github.com/spf13/cobra"
 )
 
 // newExportCmd creates and export command

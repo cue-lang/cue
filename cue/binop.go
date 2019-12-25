@@ -23,8 +23,9 @@ import (
 	"strings"
 	"time"
 
-	"cuelang.org/go/cue/token"
 	"github.com/cockroachdb/apd/v2"
+
+	"cuelang.org/go/cue/token"
 )
 
 // binSrc returns a baseValue representing a binary expression of the given

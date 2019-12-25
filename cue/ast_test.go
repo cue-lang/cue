@@ -19,11 +19,12 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestCompile(t *testing.T) {

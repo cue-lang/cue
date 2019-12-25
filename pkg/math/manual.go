@@ -15,8 +15,9 @@
 package math
 
 import (
-	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd/v2"
+
+	"cuelang.org/go/internal"
 )
 
 // Floor returns the greatest integer value less than or equal to x.

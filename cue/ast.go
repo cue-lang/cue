@@ -19,13 +19,14 @@ import (
 	"strconv"
 	"strings"
 
+	"golang.org/x/xerrors"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"golang.org/x/xerrors"
 )
 
 // insertFile inserts the given file at the root of the instance.

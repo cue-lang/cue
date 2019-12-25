@@ -18,11 +18,12 @@ import (
 	"bytes"
 	"io"
 
+	goyaml "github.com/ghodss/yaml"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
-	goyaml "github.com/ghodss/yaml"
 )
 
 // Marshal returns the YAML encoding of v.

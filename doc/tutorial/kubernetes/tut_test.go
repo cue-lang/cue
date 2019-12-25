@@ -28,10 +28,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kylelemons/godebug/diff"
+
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/copy"
 	"cuelang.org/go/internal/cuetest"
-	"github.com/kylelemons/godebug/diff"
 )
 
 var (

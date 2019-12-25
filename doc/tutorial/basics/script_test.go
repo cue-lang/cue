@@ -8,10 +8,11 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cmd/cue/cmd"
-	"cuelang.org/go/cue/parser"
 	"github.com/rogpeppe/testscript"
 	"github.com/rogpeppe/testscript/txtar"
+
+	"cuelang.org/go/cmd/cue/cmd"
+	"cuelang.org/go/cue/parser"
 )
 
 var update = flag.Bool("update", false, "update the test files")

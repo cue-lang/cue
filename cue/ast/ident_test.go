@@ -17,11 +17,12 @@ package ast_test
 import (
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"golang.org/x/xerrors"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/xerrors"
 )
 
 func TestLabelName(t *testing.T) {

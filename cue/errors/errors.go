@@ -28,9 +28,10 @@ import (
 	"sort"
 	"strings"
 
-	"cuelang.org/go/cue/token"
 	"github.com/mpvl/unique"
 	"golang.org/x/xerrors"
+
+	"cuelang.org/go/cue/token"
 )
 
 // New is a convenience wrapper for errors.New in the core library.

@@ -20,8 +20,9 @@ import (
 	"strconv"
 	"unicode/utf8"
 
-	"cuelang.org/go/cue"
 	"golang.org/x/net/idna"
+
+	"cuelang.org/go/cue"
 )
 
 var idnaProfile = idna.New(

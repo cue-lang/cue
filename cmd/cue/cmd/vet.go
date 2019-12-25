@@ -20,13 +20,14 @@ import (
 	"io/ioutil"
 	"path/filepath"
 
+	"github.com/spf13/cobra"
+	"golang.org/x/text/message"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
-	"github.com/spf13/cobra"
-	"golang.org/x/text/message"
 )
 
 const vetDoc = `vet validates CUE and other data files

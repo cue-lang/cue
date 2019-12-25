@@ -24,10 +24,11 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"github.com/cockroachdb/apd/v2"
 )
 
 type buildContext struct {

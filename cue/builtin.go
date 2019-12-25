@@ -26,11 +26,12 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"github.com/cockroachdb/apd/v2"
 )
 
 // A builtin is a builtin function or constant.

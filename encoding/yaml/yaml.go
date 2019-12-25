@@ -20,11 +20,12 @@ import (
 	"bytes"
 	"io"
 
+	goyaml "github.com/ghodss/yaml"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal/third_party/yaml"
 	pkgyaml "cuelang.org/go/pkg/encoding/yaml"
-	goyaml "github.com/ghodss/yaml"
 )
 
 // TODO: replace the ghodss YAML encoder. It has a few major issues:

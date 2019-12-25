@@ -17,9 +17,10 @@ package cue
 import (
 	"math/big"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
-	"github.com/cockroachdb/apd/v2"
 )
 
 func newRepresentation(m multiplier, base int, sep bool) multiplier {

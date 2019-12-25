@@ -9,10 +9,11 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"github.com/rogpeppe/testscript"
 	"github.com/rogpeppe/testscript/txtar"
+
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 )
 
 // TestLatest checks that the examples match the latest language standard,

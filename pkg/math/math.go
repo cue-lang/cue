@@ -21,8 +21,9 @@ package math
 import (
 	"math"
 
-	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd/v2"
+
+	"cuelang.org/go/internal"
 )
 
 var apdContext = apd.BaseContext.WithPrecision(24)

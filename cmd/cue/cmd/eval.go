@@ -18,11 +18,12 @@ import (
 	"bytes"
 	"fmt"
 
+	"github.com/spf13/cobra"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
-	"github.com/spf13/cobra"
 )
 
 // newEvalCmd creates a new eval command

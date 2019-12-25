@@ -31,14 +31,15 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/spf13/cobra"
+	"golang.org/x/tools/go/packages"
+
 	cueast "cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"github.com/spf13/cobra"
-	"golang.org/x/tools/go/packages"
 )
 
 // TODO:

@@ -17,8 +17,9 @@ package list
 import (
 	"fmt"
 
-	"cuelang.org/go/internal"
 	"github.com/cockroachdb/apd/v2"
+
+	"cuelang.org/go/internal"
 )
 
 // Avg returns the average value of a non empty list xs.

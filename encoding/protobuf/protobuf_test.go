@@ -24,10 +24,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kr/pretty"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"github.com/kr/pretty"
 )
 
 var update = flag.Bool("update", false, "update the test output")

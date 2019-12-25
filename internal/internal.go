@@ -23,9 +23,10 @@ import (
 	"bufio"
 	"strings"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"github.com/cockroachdb/apd/v2"
 )
 
 // A Decimal is an arbitrary-precision binary-coded decimal number.

@@ -29,6 +29,9 @@ import (
 	"strings"
 	"sync"
 
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal"
 	itask "cuelang.org/go/internal/task"
@@ -38,8 +41,6 @@ import (
 	_ "cuelang.org/go/pkg/tool/file"
 	_ "cuelang.org/go/pkg/tool/http"
 	_ "cuelang.org/go/pkg/tool/os"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
 )
 
 const (

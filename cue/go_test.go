@@ -20,9 +20,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
-	"github.com/cockroachdb/apd/v2"
 )
 
 func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }

@@ -18,10 +18,11 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/spf13/cobra"
+
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
-	"github.com/spf13/cobra"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {

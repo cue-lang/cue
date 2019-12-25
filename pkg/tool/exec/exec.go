@@ -21,10 +21,11 @@ import (
 	"os/exec"
 	"strings"
 
+	"golang.org/x/xerrors"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
-	"golang.org/x/xerrors"
 )
 
 func init() {

@@ -19,8 +19,9 @@ import (
 	"reflect"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"github.com/google/go-cmp/cmp"
+
+	"cuelang.org/go/cue"
 )
 
 type Sum struct {

@@ -24,11 +24,12 @@ import (
 	"strings"
 	"unicode/utf8"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"github.com/cockroachdb/apd/v2"
 )
 
 // This file contains functionality for converting Go to CUE.

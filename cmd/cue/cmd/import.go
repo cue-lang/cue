@@ -25,6 +25,9 @@ import (
 	"sync"
 	"unicode"
 
+	"github.com/spf13/cobra"
+	"golang.org/x/sync/errgroup"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -39,8 +42,6 @@ import (
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
-	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
 )
 
 func newImportCmd(c *Command) *cobra.Command {

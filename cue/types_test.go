@@ -26,9 +26,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
-	"github.com/google/go-cmp/cmp"
 )
 
 func getInstance(t *testing.T, body ...string) *Instance {

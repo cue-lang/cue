@@ -24,8 +24,9 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cmd/cue/cmd"
 	"github.com/kylelemons/godebug/diff"
+
+	"cuelang.org/go/cmd/cue/cmd"
 )
 
 type Config struct {

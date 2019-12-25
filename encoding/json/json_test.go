@@ -21,9 +21,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
-	"github.com/stretchr/testify/assert"
 )
 
 func TestExtract(t *testing.T) {

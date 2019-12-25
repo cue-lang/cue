@@ -26,12 +26,13 @@ import (
 	"text/scanner"
 	"unicode"
 
+	"github.com/emicklei/proto"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/source"
-	"github.com/emicklei/proto"
 )
 
 func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, err error) {

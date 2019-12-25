@@ -23,9 +23,10 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"github.com/cockroachdb/apd/v2"
 )
 
 func doEval(m options) bool {

@@ -91,6 +91,8 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/mpvl/unique"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -98,7 +100,6 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"github.com/mpvl/unique"
 )
 
 // Config specifies the environment into which to parse a proto definition file.

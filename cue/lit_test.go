@@ -19,10 +19,11 @@ import (
 	"math/big"
 	"testing"
 
-	"cuelang.org/go/cue/ast"
 	"github.com/cockroachdb/apd/v2"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
+
+	"cuelang.org/go/cue/ast"
 )
 
 var testBase = newExpr(&ast.BasicLit{})

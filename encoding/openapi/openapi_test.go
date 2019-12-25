@@ -23,10 +23,11 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/kylelemons/godebug/diff"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
-	"github.com/kylelemons/godebug/diff"
 )
 
 var update *bool = flag.Bool("update", false, "update the test output")

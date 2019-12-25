@@ -30,14 +30,15 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/cockroachdb/apd/v2"
+	goyaml "github.com/ghodss/yaml"
+	"golang.org/x/net/idna"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
-	"github.com/cockroachdb/apd/v2"
-	goyaml "github.com/ghodss/yaml"
-	"golang.org/x/net/idna"
 )
 
 func init() {

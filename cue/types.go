@@ -27,10 +27,11 @@ import (
 	"strings"
 	"unicode"
 
+	"github.com/cockroachdb/apd/v2"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"github.com/cockroachdb/apd/v2"
 )
 
 // Kind determines the underlying type of a Value.

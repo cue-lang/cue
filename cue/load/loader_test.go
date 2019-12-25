@@ -24,10 +24,11 @@ import (
 	"text/template"
 	"unicode"
 
+	"github.com/kylelemons/godebug/diff"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/str"
-	"github.com/kylelemons/godebug/diff"
 )
 
 // TestLoad is an end-to-end test.

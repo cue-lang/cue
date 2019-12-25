@@ -25,7 +25,7 @@ import (
 	"strings"
 	"unicode"
 
-	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"

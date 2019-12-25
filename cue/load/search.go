@@ -23,7 +23,7 @@ import (
 	"regexp"
 	"strings"
 
-	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )

@@ -19,7 +19,7 @@ import (
 	"reflect"
 	"testing"
 
-	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/token"
 	"golang.org/x/xerrors"
 )

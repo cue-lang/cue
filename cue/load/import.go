@@ -25,7 +25,7 @@ import (
 	"unicode/utf8"
 
 	"cuelang.org/go/cue/ast"
-	build "cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"

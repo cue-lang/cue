@@ -81,7 +81,6 @@ func (c *Context) init() {
 	if !c.initialized {
 		c.initialized = true
 		c.ctxt = context.Background()
-		c.initialized = true
 		c.imports = map[string]*Instance{}
 	}
 }

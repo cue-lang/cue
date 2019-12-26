@@ -28,7 +28,7 @@ import (
 func newModCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "mod <cmd> [arguments]",
-		Short: "module maintenace",
+		Short: "module maintenance",
 		Long: `
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
@@ -51,7 +51,7 @@ func newModCmd(c *Command) *cobra.Command {
 func newModInitCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "init [module]",
-		Short: "initialize new module in current director",
+		Short: "initialize new module in current directory",
 		Long: `Init initializes a cue.mod directory in the current directory,
 in effect creating a new module rooted at the current directory.
 The cue.mod directory must not already exist.

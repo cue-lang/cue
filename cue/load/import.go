@@ -185,16 +185,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		return p
 	}
 
-	for _, f := range p.CUEFiles {
-		if !ctxt.isAbsPath(f) {
-			f = ctxt.joinPath(cfg.ModuleRoot, f)
-		}
-		r, err := ctxt.openFile(f)
-		if err != nil {
-			p.ReportError(err)
-		}
-		_ = p.AddFile(f, r)
-	}
+	l.addFiles(cfg.ModuleRoot, p)
 	p.Complete()
 	return p
 }

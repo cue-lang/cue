@@ -152,17 +152,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	// 	bp.ImportPath = ModDirImportPath(dir)
 	// }
 
-	for _, f := range pkg.CUEFiles {
-		fs := &l.cfg.fileSystem
-		if !fs.isAbsPath(f) {
-			f = fs.joinPath(cfg.Dir, f)
-		}
-		r, err := fs.openFile(f)
-		if err != nil {
-			pkg.ReportError(err)
-		}
-		_ = pkg.AddFile(f, r)
-	}
+	l.addFiles(cfg.Dir, pkg)
 
 	pkg.Local = true
 	l.stk.Push("user")
@@ -174,6 +164,23 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 	pkg.Match = files
 
 	return pkg
+}
+
+func (l *loader) addFiles(dir string, p *build.Instance) {
+	files := p.CUEFiles
+	fs := &l.cfg.fileSystem
+
+	for _, f := range files {
+		if !fs.isAbsPath(f) {
+			f = fs.joinPath(dir, f)
+		}
+		r, err := fs.openFile(f)
+		if err != nil {
+			p.ReportError(err)
+		}
+
+		_ = p.AddFile(f, r)
+	}
 }
 
 func cleanImport(path string) string {

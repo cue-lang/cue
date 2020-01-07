@@ -241,9 +241,6 @@ dir:    $CWD/testdata/toolonly
 display:./toolonly`,
 	}}
 	for i, tc := range testCases {
-		// if i != 5 {
-		// 	continue
-		// }
 		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {
 			pkgs := Instances(tc.args, tc.cfg)
 
@@ -261,7 +258,7 @@ display:./toolonly`,
 			want := strings.TrimSpace(tc.want)
 			want = strings.Replace(want, "\t", "    ", -1)
 			if got != want {
-				t.Errorf("\n%s", diff.Diff(got, want))
+				t.Errorf("\n%s", diff.Diff(want, got))
 				t.Logf("\n%s", got)
 			}
 		})

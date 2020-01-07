@@ -12,10 +12,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package ast
+package ast_test
 
 import (
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/parser"
 )
 
 func TestCommentText(t *testing.T) {
@@ -47,14 +52,47 @@ func TestCommentText(t *testing.T) {
 	}
 
 	for i, c := range testCases {
-		list := make([]*Comment, len(c.list))
+		list := make([]*ast.Comment, len(c.list))
 		for i, s := range c.list {
-			list[i] = &Comment{Text: s}
+			list[i] = &ast.Comment{Text: s}
 		}
 
-		text := (&CommentGroup{List: list}).Text()
+		text := (&ast.CommentGroup{List: list}).Text()
 		if text != c.text {
 			t.Errorf("case %d: got %q; expected %q", i, text, c.text)
 		}
+	}
+}
+
+func TestPackageName(t *testing.T) {
+	testCases := []struct {
+		input string
+		pkg   string
+	}{{
+		input: `
+		package foo
+		`,
+		pkg: "foo",
+	}, {
+		input: `
+		a: 2
+		`,
+	}, {
+		input: `
+		// Comment
+
+		// Package foo ...
+		package foo
+		`,
+		pkg: "foo",
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			f, err := parser.ParseFile("test", tc.input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			assert.Equal(t, f.PackageName(), tc.pkg)
+		})
 	}
 }

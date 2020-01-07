@@ -824,6 +824,21 @@ type File struct {
 	comments
 }
 
+// PackageName returns the package name associated with this file or "" if no
+// package is associated.
+func (f *File) PackageName() string {
+	for _, d := range f.Decls {
+		switch x := d.(type) {
+		case *Package:
+			return x.Name.Name
+		case *CommentGroup:
+		default:
+			return ""
+		}
+	}
+	return ""
+}
+
 func (f *File) Pos() token.Pos {
 	if len(f.Decls) > 0 {
 		return f.Decls[0].Pos()

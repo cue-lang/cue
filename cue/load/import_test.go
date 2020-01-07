@@ -29,7 +29,7 @@ const testdata = "./testdata/"
 func getInst(pkg, cwd string) (*build.Instance, error) {
 	c, _ := (&Config{Dir: cwd}).complete()
 	l := loader{cfg: c}
-	inst := c.newRelInstance(token.NoPos, pkg)
+	inst := c.newRelInstance(token.NoPos, pkg, c.Package)
 	p := l.importPkg(token.NoPos, inst)
 	return p, p.Err
 }

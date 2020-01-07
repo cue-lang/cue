@@ -50,9 +50,11 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	// TODO: this is work in progress. We aim to replace the original Go
 	// implementation, which is not ideal for CUE.
-
-	if len(args) > 0 && encoding.MapExtension(filepath.Ext(args[0])) != nil {
-		return []*build.Instance{l.cueFilesPackage(args)}
+	if len(args) > 0 {
+		arg := strings.Split(args[0], ":")[0]
+		if arg == "-" || encoding.MapExtension(filepath.Ext(arg)) != nil {
+			return []*build.Instance{l.cueFilesPackage(args)}
+		}
 	}
 
 	a := []*build.Instance{}

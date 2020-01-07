@@ -39,7 +39,7 @@ type match struct {
 // TODO: should be matched from module file only.
 // The pattern is either "all" (all packages), "std" (standard packages),
 // "cmd" (standard commands), or a path including "...".
-func (l *loader) matchPackages(pattern string) *match {
+func (l *loader) matchPackages(pattern, pkgName string) *match {
 	// cfg := l.cfg
 	m := &match{
 		Pattern: pattern,
@@ -132,7 +132,7 @@ func (l *loader) matchPackages(pattern string) *match {
 // beginning ./ or ../, meaning it should scan the tree rooted
 // at the given directory. There are ... in the pattern too.
 // (See go help packages for pattern syntax.)
-func (l *loader) matchPackagesInFS(pattern string) *match {
+func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 	c := l.cfg
 	m := &match{
 		Pattern: pattern,
@@ -204,7 +204,7 @@ func (l *loader) matchPackagesInFS(pattern string) *match {
 			dir = "./" + dir
 		}
 		// TODO: consider not doing these checks here.
-		inst := c.newRelInstance(token.NoPos, dir)
+		inst := c.newRelInstance(token.NoPos, dir, pkgName)
 		p := l.importPkg(token.NoPos, inst)
 		if err := p.Err; err != nil && (p == nil || len(p.InvalidCUEFiles) == 0) {
 			switch err.(type) {
@@ -333,23 +333,36 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 	var out []*match
 	for _, a := range cleanPatterns(patterns) {
 		if isMetaPackage(a) {
-			out = append(out, l.matchPackages(a))
+			out = append(out, l.matchPackages(a, l.cfg.Package))
 			continue
 		}
+
+		orig := a
+		pkgName := l.cfg.Package
+		switch p := strings.IndexByte(a, ':'); {
+		case p < 0:
+		case p == 0:
+			pkgName = a[1:]
+			a = "."
+		default:
+			pkgName = a[p+1:]
+			a = a[:p]
+		}
+
 		if strings.Contains(a, "...") {
 			if isLocalImport(a) {
-				out = append(out, l.matchPackagesInFS(a))
+				out = append(out, l.matchPackagesInFS(a, pkgName))
 			} else {
-				out = append(out, l.matchPackages(a))
+				out = append(out, l.matchPackages(a, pkgName))
 			}
 			continue
 		}
 
 		var p *build.Instance
 		if isLocalImport(a) {
-			p = l.cfg.newRelInstance(token.NoPos, a)
+			p = l.cfg.newRelInstance(token.NoPos, a, pkgName)
 		} else {
-			p = l.cfg.newInstance(token.NoPos, importPath(a))
+			p = l.cfg.newInstance(token.NoPos, importPath(orig))
 		}
 
 		pkg := l.importPkg(token.NoPos, p)

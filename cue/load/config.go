@@ -165,14 +165,14 @@ func (c *Config) newInstance(pos token.Pos, p importPath) *build.Instance {
 	return i
 }
 
-func (c *Config) newRelInstance(pos token.Pos, path string) *build.Instance {
+func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
 	fs := c.fileSystem
 
 	var err errors.Error
 	dir := path
 
 	p := c.Context.NewInstance(path, c.loadFunc)
-	p.PkgName = c.Package
+	p.PkgName = pkgName
 	p.DisplayPath = filepath.ToSlash(path)
 	// p.ImportPath = string(dir) // compute unique ID.
 	p.Root = c.ModuleRoot

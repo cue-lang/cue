@@ -66,7 +66,7 @@ func ExampleValue_Decode() {
 	// json: cannot unmarshal string into Go struct field ab.B of type int
 }
 
-func ExampleSubsumes() {
+func ExampleValue_Subsumes() {
 	// Check compatibility of successive APIs.
 	var r cue.Runtime
 

@@ -25,7 +25,6 @@ import (
 	"strings"
 	"unicode"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
@@ -53,10 +52,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// implementation, which is not ideal for CUE.
 	if len(args) > 0 {
 		arg := args[0]
-		p := strings.LastIndexByte(arg, ':')
-		if p >= 0 && ast.IsValidIdent(arg[p+1:]) {
-			arg = arg[:p]
-		}
 		if arg == "-" || encoding.MapExtension(filepath.Ext(arg)) != nil {
 			return []*build.Instance{l.cueFilesPackage(args)}
 		}

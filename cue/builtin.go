@@ -13,7 +13,7 @@
 // limitations under the License.
 
 //go:generate go run gen.go
-//go:generate goimports -w builtins.go
+//go:generate goimports -w -local cuelang.org/go builtins.go
 
 package cue
 

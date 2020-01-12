@@ -298,7 +298,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			// NOTE: ignore the linter warning for the following line:
 			// itask.Context is an internal type and we want to break if any
 			// fields are added.
-			c := &itask.Context{ctx, stdout, stderr, obj, nil}
+			c := &itask.Context{ctx, stdin, stdout, stderr, obj, nil}
 			update, err := t.Run(c)
 			if c.Err != nil {
 				err = c.Err

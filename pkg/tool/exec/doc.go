@@ -26,8 +26,9 @@
 //     	// stderr is like stdout, but for errors.
 //     	stderr: *null | string | bytes
 //
-//     	// stdin specifies the input for the process. If null, stdin of the current
-//     	// process is used.
+//     	// stdin specifies the input for the process. If stdin is not a concrete
+//     	// value, it will capture the input from stdin. Otherwise, if it is null,
+//     	// there is no input. Otherwise it will read from the given value.
 //     	stdin: *null | string | bytes
 //
 //     	// success is set to true when the process terminates with with a zero exit

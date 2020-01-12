@@ -27,6 +27,7 @@ import (
 // A Context provides context for running a task.
 type Context struct {
 	Context context.Context
+	Stdin   io.Reader
 	Stdout  io.Writer
 	Stderr  io.Writer
 	Obj     cue.Value

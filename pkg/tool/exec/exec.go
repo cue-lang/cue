@@ -98,7 +98,9 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	if v, ok := stream("stdin"); ok {
-		if cmd.Stdin, err = v.Reader(); err != nil {
+		if !v.IsConcrete() {
+			cmd.Stdin = ctx.Stdin
+		} else if cmd.Stdin, err = v.Reader(); err != nil {
 			return nil, fmt.Errorf("cue: %v", err)
 		}
 	}

@@ -5,7 +5,6 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 Hello World!
-
 -- stdin.txt --
 Hello World!
 -- hello_tool.cue --
@@ -15,13 +14,13 @@ command: echo: {
     echo: {
         kind:   "exec"
         cmd:    "cat"
-        stdin: string
         stdout: string
     }
 
-    task: display: {
-        kind: "print"
-        text: echo.stdout
+    pass: {
+        kind:   "exec"
+        cmd:    "cat"
+        stdin:  echo.stdout
     }
 }
 -- cue.mod --

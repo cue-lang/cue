@@ -271,7 +271,7 @@ func (p *list) Add(err Error) {
 }
 
 // Reset resets an List to no errors.
-func (p *list) Reset() { *p = (*p)[0:0] }
+func (p *list) Reset() { *p = (*p)[:0] }
 
 // List implements the sort Interface.
 func (p list) Len() int      { return len(p) }

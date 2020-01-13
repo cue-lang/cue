@@ -210,7 +210,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 			switch err.(type) {
 			case nil:
 				break
-			case *noCUEError:
+			case *NoFilesError:
 				if c.DataFiles && len(p.DataFiles) > 0 {
 					break
 				}

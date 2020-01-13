@@ -50,31 +50,31 @@ func TestEmptyImport(t *testing.T) {
 
 func TestEmptyFolderImport(t *testing.T) {
 	_, err := getInst(".", testdata+"empty")
-	if _, ok := err.(*noCUEError); !ok {
+	if _, ok := err.(*NoFilesError); !ok {
 		t.Fatal(`Import("testdata/empty") did not return NoCUEError.`)
 	}
 }
 
 func TestIgnoredCUEFilesImport(t *testing.T) {
 	_, err := getInst(".", testdata+"ignored")
-	var e *noCUEError
+	var e *NoFilesError
 	ok := xerrors.As(err, &e)
 	if !ok {
 		t.Fatal(`Import("testdata/ignored") did not return NoCUEError.`)
 	}
-	if !e.Ignored {
+	if !e.ignored {
 		t.Fatal(`Import("testdata/ignored") should have ignored CUE files.`)
 	}
 }
 
 func TestMultiplePackageImport(t *testing.T) {
 	_, err := getInst(".", testdata+"multi")
-	mpe, ok := err.(*multiplePackageError)
+	mpe, ok := err.(*MultiplePackageError)
 	if !ok {
 		t.Fatal(`Import("testdata/multi") did not return MultiplePackageError.`)
 	}
 	mpe.Dir = ""
-	want := &multiplePackageError{
+	want := &MultiplePackageError{
 		Packages: []string{"main", "test_package"},
 		Files:    []string{"file.cue", "file_appengine.cue"},
 	}

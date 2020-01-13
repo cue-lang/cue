@@ -24,49 +24,37 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
-func lastError(p *build.Instance) *packageError {
+func lastError(p *build.Instance) *PackageError {
 	if p == nil {
 		return nil
 	}
 	switch v := p.Err.(type) {
-	case *packageError:
+	case *PackageError:
 		return v
 	}
 	return nil
 }
 
-func report(p *build.Instance, err *packageError) {
+func report(p *build.Instance, err *PackageError) {
 	if err != nil {
 		p.ReportError(err)
 	}
 }
 
-// shortPath returns an absolute or relative name for path, whatever is shorter.
-func shortPath(cwd, path string) string {
-	if cwd == "" {
-		return path
-	}
-	if rel, err := filepath.Rel(cwd, path); err == nil && len(rel) < len(path) {
-		return rel
-	}
-	return path
-}
-
-// A packageError describes an error loading information about a package.
-type packageError struct {
+// A PackageError describes an error loading information about a package.
+type PackageError struct {
 	ImportStack    []string  // shortest path from package named on command line to this one
 	Pos            token.Pos // position of error
 	errors.Message           // the error itself
-	IsImportCycle  bool      `json:"-"` // the error is an import cycle
-	Hard           bool      `json:"-"` // whether the error is soft or hard; soft errors are ignored in some places
+	IsImportCycle  bool      // the error is an import cycle
 }
 
-func (p *packageError) Position() token.Pos         { return p.Pos }
-func (p *packageError) InputPositions() []token.Pos { return nil }
-func (p *packageError) Path() []string              { return nil }
+func (p *PackageError) Position() token.Pos         { return p.Pos }
+func (p *PackageError) InputPositions() []token.Pos { return nil }
+func (p *PackageError) Path() []string              { return nil }
 
-func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *packageError {
-	err := &packageError{
+func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
+	err := &PackageError{
 		ImportStack: l.stk.Copy(),
 		Message:     errors.NewMessage(format, args),
 	}
@@ -74,14 +62,14 @@ func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface
 	return err
 }
 
-func (p *packageError) fillPos(cwd string, positions []token.Pos) {
+func (p *PackageError) fillPos(cwd string, positions []token.Pos) {
 	if len(positions) > 0 && !p.Pos.IsValid() {
 		p.Pos = positions[0]
 	}
 }
 
 // TODO(localize)
-func (p *packageError) Error() string {
+func (p *PackageError) Error() string {
 	// Import cycles deserve special treatment.
 	if p.IsImportCycle {
 		return fmt.Sprintf("%s\npackage %s\n", p.Message, strings.Join(p.ImportStack, "\n\timports "))
@@ -97,25 +85,24 @@ func (p *packageError) Error() string {
 	return "package " + strings.Join(p.ImportStack, "\n\timports ") + ": " + p.Message.Error()
 }
 
-// noCUEError is the error used by Import to describe a directory
-// containing no buildable Go source files. (It may still contain
-// test files, files hidden by build tags, and so on.)
-type noCUEError struct {
+// NoFilesError is the error used by Import to describe a directory
+// containing no usable source files. (It may still contain
+// tool files, files hidden by build tags, and so on.)
+type NoFilesError struct {
 	Package *build.Instance
 
-	Dir     string
-	Ignored bool // whether any Go files were ignored due to build tags
+	ignored bool // whether any Go files were ignored due to build tags
 }
 
-func (e *noCUEError) Position() token.Pos         { return token.NoPos }
-func (e *noCUEError) InputPositions() []token.Pos { return nil }
-func (e *noCUEError) Path() []string              { return nil }
+func (e *NoFilesError) Position() token.Pos         { return token.NoPos }
+func (e *NoFilesError) InputPositions() []token.Pos { return nil }
+func (e *NoFilesError) Path() []string              { return nil }
 
 // TODO(localize)
-func (e *noCUEError) Msg() (string, []interface{}) { return e.Error(), nil }
+func (e *NoFilesError) Msg() (string, []interface{}) { return e.Error(), nil }
 
 // TODO(localize)
-func (e *noCUEError) Error() string {
+func (e *NoFilesError) Error() string {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, name := range e.Package.IgnoredCUEFiles {
@@ -150,19 +137,19 @@ func (e *noCUEError) Error() string {
 	return "no CUE files in " + path
 }
 
-// multiplePackageError describes a directory containing
-// multiple buildable Go source files for multiple packages.
-type multiplePackageError struct {
+// MultiplePackageError describes an attempt to build a package composed of
+// CUE files from different packages.
+type MultiplePackageError struct {
 	Dir      string   // directory containing files
 	Packages []string // package names found
 	Files    []string // corresponding files: Files[i] declares package Packages[i]
 }
 
-func (e *multiplePackageError) Position() token.Pos         { return token.NoPos }
-func (e *multiplePackageError) InputPositions() []token.Pos { return nil }
-func (e *multiplePackageError) Path() []string              { return nil }
+func (e *MultiplePackageError) Position() token.Pos         { return token.NoPos }
+func (e *MultiplePackageError) InputPositions() []token.Pos { return nil }
+func (e *MultiplePackageError) Path() []string              { return nil }
 
-func (e *multiplePackageError) Msg() (string, []interface{}) {
+func (e *MultiplePackageError) Msg() (string, []interface{}) {
 	return "found packages %s (%s) and %s (%s) in %s", []interface{}{
 		e.Packages[0],
 		e.Files[0],
@@ -172,7 +159,7 @@ func (e *multiplePackageError) Msg() (string, []interface{}) {
 	}
 }
 
-func (e *multiplePackageError) Error() string {
+func (e *MultiplePackageError) Error() string {
 	// Error string limited to two entries for compatibility.
 	format, args := e.Msg()
 	return fmt.Sprintf(format, args...)

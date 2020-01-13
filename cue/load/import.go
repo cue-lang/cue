@@ -300,7 +300,7 @@ func (fp *fileProcessor) finalize() errors.Error {
 		return fp.err
 	}
 	if countCUEFiles(fp.c, p) == 0 && !fp.c.DataFiles {
-		fp.err = errors.Append(fp.err, &noCUEError{Package: p, Dir: p.Dir, Ignored: len(p.IgnoredCUEFiles) > 0})
+		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredCUEFiles) > 0})
 		return fp.err
 	}
 
@@ -364,7 +364,7 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 			p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
 			return false
 		}
-		return badFile(&multiplePackageError{
+		return badFile(&MultiplePackageError{
 			Dir:      p.Dir,
 			Packages: []string{p.PkgName, pkg},
 			Files:    []string{fp.firstFile, name},

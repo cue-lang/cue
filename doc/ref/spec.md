@@ -1112,8 +1112,8 @@ future extensions and relaxations:
 
 ```
 StructLit       = "{" { Declaration "," } [ "..." ] "}" .
-Declaration     = Field | Comprehension | AliasExpr .
-Field           = LabelSpec { LabelSpec } Expression .
+Declaration     = Field | Comprehension | AliasExpr | attribute .
+Field           = LabelSpec { LabelSpec } Expression { attribute } .
 LabelSpec       = Label ( ":" | "::" ) .
 Label           = LabelName [ "?" ] | "[" AliasExpr "]".
 LabelName       = identifier | simple_string_lit  .
@@ -1375,34 +1375,37 @@ package internal.
 --->
 
 
-#### Field attributes
+#### Attributes
 
-Fields may be associated with attributes.
-Attributes define additional information about a field,
+Attributes allow associating meta information with values.
+Their primary purpose is to define mappings between CUE and
+other representations.
+Attributes do not influence the evaluation of CUE.
+
+An attribute associates an identifier with a value, a balanced token sequence,
+which is a sequence of CUE tokens with balanced brackets (`()`, `[]`, and `{}`).
+The sequence may not contain interpolations.
+
+Fields, structs and packages can be associated with a set of attributes.
+Attributes accumulate during unification, but implementations may remove
+duplicates that have the same source string representation.
+The interpretation of an attribute, including the handling of multiple
+attributes for a given identifier, is up to the consumer of the attribute.
+
+Field attributes define additional information about a field,
 such as a mapping to a protocol buffer <!-- TODO: add link --> tag or alternative
 name of the field when mapping to a different language.
 
-<!-- TODO define attribute syntax here, before getting into semantics. -->
-
-If a field has multiple attributes their identifiers must be unique.
-Attributes accumulate when unifying two fields, removing duplicate entries.
-It is an error for the resulting field to have two different attributes
-with the same identifier.
-
-Attributes are not directly part of the data model, but may be
-accessed through the API or other means of reflection.
-The interpretation of the attribute value
-(a comma-separated list of attribute elements) depends on the attribute.
-Interpolations are not allowed in attribute strings.
-
-The recommended convention, however, is to interpret the first
-`n` arguments as positional arguments,
-where duplicate conflicting entries are an error,
-and the remaining arguments as a combination of flags
-(an identifier) and key value pairs, separated by a `=`.
 
 ```
+// Package attribute
+@protobuf(proto3)
+
 myStruct1: {
+    // Struct attribute:
+    @jsonschema(id="https://example.org/mystruct1.json")
+
+    // Field attributes
     field: string @go(Field)
     attr:  int    @xml(,attr) @go(Attr)
 }
@@ -2839,7 +2842,7 @@ it will be output instead of its enclosing file when exporting CUE
 to a data format
 
 ```
-SourceFile      = [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
+SourceFile      = { attribute "," } [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
 ```
 
 ```

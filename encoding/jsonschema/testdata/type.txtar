@@ -1,0 +1,44 @@
+-- type.json --
+{
+  "type": "object",
+  "title": "Main schema",
+
+  "properties": {
+    "intString": {
+      "description": "an integer or string.",
+      "type": [ "string", "integer", "boolean", "array", "null" ]
+    },
+    "object": {
+        "type": "object",
+        "default": {
+            "foo": "bar",
+            "baz": 1.3
+        }
+    },
+    "numOrList": {
+      "oneOf": [
+        { "type": "number" },
+        { "items": { "type": "number" } }
+      ],
+      "default": [ 1, 2, 3 ]
+    }
+  },
+  "additionalProperties": false
+}
+
+-- out.cue --
+// Main schema
+package type
+
+Schema :: {
+	// an integer or string.
+	intString?: string | int | bool | [...] | null
+	object?:    {
+			...
+	} | *{
+		foo: "bar"
+		baz: 1.3
+		...
+	}
+	numOrList?: number | [...number] | *[1, 2, 3]
+}

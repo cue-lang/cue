@@ -1,0 +1,36 @@
+-- list.yaml --
+type: object
+
+properties:
+  foo:
+    items:
+      type: string
+
+  tuple:
+    items:
+      - type: string
+      - type: integer
+      - const: 2
+
+  has:
+    contains:
+      const: 3
+
+  size:
+    minItems: 3
+    maxItems: 9
+    uniqueItems: true
+
+additionalProperties: false
+
+-- out.cue --
+package list
+
+import "list"
+
+Schema :: {
+	foo?: [...string]
+	tuple?: [string, int, 2]
+	has?:  list.Contains(3)
+	size?: list.MinItems(3) & list.MaxItems(9) & list.UniqueItems()
+}

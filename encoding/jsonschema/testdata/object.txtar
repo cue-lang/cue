@@ -1,0 +1,103 @@
+-- type.json --
+{
+  "type": "object",
+  "title": "Main schema",
+
+  "properties": {
+    "fields" : {
+      "type": "object",
+      "minProperties": 3,
+      "maxProperties": 10,
+      "propertyNames": {
+        "pattern": "^\\P{Lu}"
+      }
+    },
+    "additional": {
+      "type": "object",
+      "properties": {
+        "foo": { "type": "number" },
+        "bar": { "type": "number" }
+      },
+      "additionalProperties": { "type": "string" }
+    },
+    "map": {
+      "type": "object",
+      "additionalProperties": { "type": "string" }
+    },
+    "patterns": {
+      "type": "object",
+      "properties": {
+        "foo": { "type": "number" },
+        "bar": { "type": "number" }
+      },
+      "patternProperties": {
+        "^\\P{Lu}": { "type": "string" },
+        "^\\P{Lo}": { "type": "integer" }
+      }
+    },
+    "patternsNoProps": {
+      "type": "object",
+      "patternProperties": {
+        "^\\P{Lu}": { "type": "string" },
+        "^\\P{Lo}": { "type": "integer" }
+      }
+    },
+    "complex": {
+      "type": "object",
+      "properties": {
+        "foo": { "type": "number" },
+        "bar": { "type": "number" }
+      },
+      "patternProperties": {
+        "^\\P{Lu}": { "type": "string" },
+        "^\\P{Lo}": { "type": "integer" }
+      },
+      "additionalProperties": { "type": "string" }
+    }
+  },
+  "additionalProperties": false
+}
+
+-- out.cue --
+// Main schema
+package object
+
+import "struct"
+
+Schema :: {
+	fields?: struct.MinFields(3) & struct.MaxFields(10) & {
+		[=~"^\\P{Lu}"]: _
+	}
+	additional?: {
+		foo?: number
+		bar?: number
+
+		[!~"^(foo|bar)$"]: string
+	}
+	map?: [string]: string
+	patterns?: {
+		foo?: number
+		bar?: number
+
+		[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string
+
+		[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int
+		...
+	}
+	patternsNoProps?: {
+		[=~"^\\P{Lu}" & !~"^()$"]: string
+
+		[=~"^\\P{Lo}" & !~"^()$"]: int
+		...
+	}
+	complex?: {
+		foo?: number
+		bar?: number
+
+		[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string
+
+		[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int
+
+		[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string
+	}
+}

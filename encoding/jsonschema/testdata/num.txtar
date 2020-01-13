@@ -1,0 +1,37 @@
+-- type.json --
+{
+  "type": "object",
+
+  "properties": {
+    "constant":  { "const": 2 },
+    "several": {
+      "enum": [ 1, 2, 3, 4 ]
+    },
+    "inclusive": {
+        "type": "number",
+        "minimum": 2,
+        "maximum": 3
+    },
+    "exclusive": {
+        "exclusiveMinimum": 2,
+        "exclusiveMaximum": 3
+    },
+    "cents": {
+      "multipleOf": 0.05
+    }
+  },
+  "additionalProperties": false
+}
+
+-- out.cue --
+package num
+
+import "math"
+
+Schema :: {
+	constant?:  2
+	several?:   1 | 2 | 3 | 4
+	inclusive?: >=2 & <=3
+	exclusive?: >2 & <3
+	cents?:     math.MultipleOf(0.05)
+}

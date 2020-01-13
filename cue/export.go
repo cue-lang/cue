@@ -456,10 +456,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			s := &ast.StructLit{}
 			return p.closeOrOpen(s, p.embedding(s, x))
 		}
-		return &ast.BinaryExpr{
-			X:  p.expr(x.left),
-			Op: opMap[x.op], Y: p.expr(x.right),
-		}
+		return ast.NewBinExpr(opMap[x.op], p.expr(x.left), p.expr(x.right))
 
 	case *bound:
 		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.value)}
@@ -491,7 +488,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 		bin := expr(x.values[0])
 		for _, v := range x.values[1:] {
-			bin = &ast.BinaryExpr{X: bin, Op: token.OR, Y: expr(v)}
+			bin = ast.NewBinExpr(token.OR, bin, expr(v))
 		}
 		return bin
 
@@ -631,15 +628,14 @@ func (p *exporter) expr(v value) ast.Expr {
 		if !ok || ln > len(x.elem.arcs) {
 			list.Elts = append(list.Elts, &ast.Ellipsis{Type: p.expr(x.typ)})
 			if !open && !isTop(x.typ) {
-				expr = &ast.BinaryExpr{
-					X: &ast.BinaryExpr{
-						X:  p.expr(x.len),
-						Op: token.MUL,
-						Y:  ast.NewList(p.expr(x.typ)),
-					},
-					Op: token.AND,
-					Y:  list,
-				}
+				expr = ast.NewBinExpr(
+					token.AND,
+					ast.NewBinExpr(
+						token.MUL,
+						p.expr(x.len),
+						ast.NewList(p.expr(x.typ))),
+					list,
+				)
 
 			}
 		}
@@ -1159,9 +1155,5 @@ func wrapBin(a, b ast.Expr, op op) ast.Expr {
 	if b == nil {
 		return a
 	}
-	return &ast.BinaryExpr{
-		X:  a,
-		Op: opMap[op],
-		Y:  b,
-	}
+	return ast.NewBinExpr(opMap[op], a, b)
 }

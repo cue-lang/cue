@@ -627,7 +627,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				for _, v := range enums[1:] {
 					y := e.ident(v)
 					cueast.SetRelPos(y, cuetoken.Newline)
-					x = &cueast.BinaryExpr{X: x, Op: cuetoken.OR, Y: y}
+					x = cueast.NewBinExpr(cuetoken.OR, x, y)
 				}
 				a = append(a, e.def(nil, enumName, x, true))
 			}
@@ -678,11 +678,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					switch s {
 					case "byte", "string", "error":
 					default:
-						cv = &cueast.BinaryExpr{
-							X:  e.makeType(typ),
-							Op: cuetoken.AND,
-							Y:  cv,
-						}
+						cv = cueast.NewBinExpr(cuetoken.AND, e.makeType(typ), cv)
 					}
 				}
 

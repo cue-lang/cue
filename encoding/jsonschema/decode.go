@@ -21,6 +21,7 @@ package jsonschema
 import (
 	"fmt"
 	"path"
+	"path/filepath"
 	"sort"
 	"strings"
 
@@ -68,7 +69,7 @@ func (d *decoder) decode(filename string, inst *cue.Instance) *ast.File {
 
 	var a []ast.Decl
 
-	name := filename
+	name := filepath.ToSlash(filename)
 	if state.id != "" {
 		name = strings.Trim(name, "#")
 	}

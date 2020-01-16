@@ -230,14 +230,28 @@ func TestCompile(t *testing.T) {
 		// optional fields with key filters
 		in: `
 			JobID: =~"foo"
-			[JobID]: { name: string }
+			a: [JobID]: { name: string }
 
 			[<"s"]: { other: string }
 			`,
 		out: `<0>{` +
-			`[<0>.JobID]: <1>(_: string)-><2>{name: string}, ` +
-			`[<"s"]: <3>(_: string)-><4>{other: string}, ` +
-			`JobID: =~"foo"}`,
+			`[<"s"]: <1>(_: string)-><2>{other: string}, ` +
+			`JobID: =~"foo", a: <3>{` +
+			`[<0>.JobID]: <4>(_: string)-><5>{name: string}, ` +
+			`}}`,
+	}, {
+		// Issue #251
+		// TODO: the is one of the cases where it is relatively easy to catch
+		// a structural cycle. We should be able, however, to break the cycle
+		// with a post-validation constraint. Clean this up with the evaluator
+		// update.
+		in: `
+		{
+			[x]: 3
+		}
+		x:   "x"
+		`,
+		out: "reference \"x\" in label expression refers to field against which it would be matched:\n    test:3:5\n<0>{}",
 	}, {
 		// illegal alias usage
 		in: `

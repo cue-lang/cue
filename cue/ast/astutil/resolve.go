@@ -45,10 +45,11 @@ func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 // scope.
 //
 type scope struct {
-	file  *ast.File
-	outer *scope
-	node  ast.Node
-	index map[string]ast.Node
+	file    *ast.File
+	outer   *scope
+	node    ast.Node
+	index   map[string]ast.Node
+	inField bool
 
 	errFn func(p token.Pos, msg string, args ...interface{})
 }
@@ -208,7 +209,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			if len(label.Elts) != 1 {
 				break
 			}
-			s := newScope(s.file, s, x, nil)
+			s = newScope(s.file, s, x, nil)
 			if alias != nil {
 				if name, _, _ := ast.LabelName(alias.Ident); name != "" {
 					s.insert(name, x)
@@ -231,22 +232,33 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 					s.insert(name, a.Expr)
 				}
 			}
+
+			ast.Walk(expr, nil, func(n ast.Node) {
+				if x, ok := n.(*ast.Ident); ok {
+					for s := s; s != nil && !s.inField; s = s.outer {
+						if _, ok := s.index[x.Name]; ok {
+							s.errFn(n.Pos(),
+								"reference %q in label expression refers to field against which it would be matched", x.Name)
+						}
+					}
+				}
+			})
 			walk(s, expr)
-			walk(s, x.Value)
-			return nil
 
 		case *ast.TemplateLabel:
-			s := newScope(s.file, s, x, nil)
+			s = newScope(s.file, s, x, nil)
 			name, err := ast.ParseIdent(label.Ident)
 			if err == nil {
 				s.insert(name, x.Label) // Field used for entire lambda.
 			}
-			walk(s, x.Value)
-			return nil
 		}
+
 		if x.Value != nil {
+			s.inField = true
 			walk(s, x.Value)
+			s.inField = false
 		}
+
 		return nil
 
 	case *ast.Alias:

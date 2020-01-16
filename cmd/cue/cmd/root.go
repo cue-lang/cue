@@ -44,7 +44,11 @@ type runFunction func(cmd *Command, args []string) error
 func mkRunE(c *Command, f runFunction) func(*cobra.Command, []string) error {
 	return func(cmd *cobra.Command, args []string) error {
 		c.Command = cmd
-		return f(c, args)
+		err := f(c, args)
+		if err != nil {
+			exitOnErr(c, err, true)
+		}
+		return err
 	}
 }
 

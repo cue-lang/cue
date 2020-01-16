@@ -140,6 +140,9 @@ func runEval(cmd *Command, args []string) error {
 				writeNode(format.Node(e))
 			}
 			v := inst.Eval(e)
+			if err := v.Err(); err != nil {
+				return err
+			}
 			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
 					exitIfErr(cmd, inst, err, false)

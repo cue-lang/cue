@@ -1,0 +1,12 @@
+! cue eval -e nonExist
+cmp stderr expect-stderr
+cmp stdout expect-stdout
+
+-- expect-stdout --
+-- expect-stderr --
+reference "nonExist" not found:
+    <expression flag>:1:1
+-- partial.cue --
+package exitcode
+
+a: 1

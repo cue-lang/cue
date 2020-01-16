@@ -178,7 +178,7 @@ func vetFiles(cmd *Command, inst *cue.Instance, files []string) {
 		r := internal.GetRuntime(inst).(*cue.Runtime)
 		for _, expr := range exprs {
 			body, err := r.CompileExpr(expr)
-			exitIfErr(cmd, inst, err, false)
+			exitIfErr(cmd, inst, err, true)
 			v := body.Value().Unify(check)
 			if err := v.Err(); err != nil {
 				exitIfErr(cmd, inst, err, false)

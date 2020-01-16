@@ -224,28 +224,9 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			if dep, ok := cr.referredTask(after); ok {
 				t.dep[dep] = true
 			}
-			iter, err := after.List()
-			if err == nil {
-				for iter.Next() {
-					if dep, ok := cr.referredTask(iter.Value()); ok {
-						t.dep[dep] = true
-					}
-				}
-			}
-		}
-
-		// Inject reverse dependency in `$before` field
-		before := task.Lookup("$before")
-		if before.Err() == nil {
-			if dep, ok := cr.referredTask(before); ok {
-				dep.dep[t] = true
-			}
-			iter, err := before.List()
-			if err == nil {
-				for iter.Next() {
-					if dep, ok := cr.referredTask(iter.Value()); ok {
-						dep.dep[t] = true
-					}
+			for iter, _ := after.List(); iter.Next(); {
+				if dep, ok := cr.referredTask(iter.Value()); ok {
+					t.dep[dep] = true
 				}
 			}
 		}
@@ -254,7 +235,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			if v == task {
 				return true
 			}
-			if (after.Err() == nil && v.Equals(after)) || (before.Err() == nil && v.Equals(before)) {
+			if after.Err() == nil && v.Equals(after) {
 				return false
 			}
 			for _, r := range appendReferences(nil, cr.root, v) {

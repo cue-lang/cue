@@ -31,14 +31,20 @@
 //     //    // long description covering the remainder of the doc comment.
 //     //
 //     Command: {
-//     	$type: "tool.Command"
-//
-//     	$name: !=""
+//     	// Tasks specifies the things to run to complete a command. Tasks are
+//     	// typically underspecified and completed by the particular internal
+//     	// handler that is running them. Tasks can be a single task, or a full
+//     	// hierarchy of tasks.
+//     	//
+//     	// Tasks that depend on the output of other tasks are run after such tasks.
+//     	// Use `$after` if a task needs to run after another task but does not
+//     	// otherwise depend on its output.
+//     	Tasks
 //
 //     	//
 //     	// Example:
 //     	//     mycmd [-n] names
-//     	$usage?: =~"^\($name) "
+//     	$usage?: string
 //
 //     	// short is short description of what the command does.
 //     	$short?: string
@@ -48,19 +54,24 @@
 //     	$long?: string
 //
 //     	// TODO: child commands.
-//
-//     	// tasks specifies the list of things to do to run command. Tasks are
-//     	// typically underspecified and completed by the particular internal
-//     	// handler that is running them. Task de
-//     	tasks: [name=string]: Task
 //     }
+//
+//     // Tasks defines a hierarchy of tasks. A command completes if all tasks have
+//     // run to completion.
+//     Tasks: Task | {
+//     	[name=Name]: Tasks
+//     }
+//
+//     // Name defines a valid task or command sname.
+//     Name :: =~#"^\PL(\PL|\PN|-(\PL|\PN))*$"#
 //
 //     // A Task defines a step in the execution of a command.
 //     Task: {
+//     	$type: "tool.Task" // legacy field 'kind' still supported for now.
+//
 //     	// kind indicates the operation to run. It must be of the form
 //     	// packagePath.Operation.
-//     	$id:   =~#"\."#
-//     	$type: "tool.Task" // legacy field 'kind' still supported for now.
+//     	$id: =~#"\."#
 //     }
 //
 package tool

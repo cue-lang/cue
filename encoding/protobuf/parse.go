@@ -291,9 +291,11 @@ func (p *protoConverter) uniqueTop(name string) string {
 }
 
 func (p *protoConverter) toExpr(pos scanner.Position, name string) (expr ast.Expr) {
-	a := strings.Split(name, ".")
-	expr = &ast.Ident{NamePos: p.toCUEPos(pos), Name: a[0]}
-	expr = ast.NewSel(expr, a[1:]...)
+	expr, err := parser.ParseExpr("", name, parser.ParseComments)
+	if err != nil {
+		panic(err)
+	}
+	ast.SetPos(expr, p.toCUEPos(pos))
 	return expr
 }
 

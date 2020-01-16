@@ -21,7 +21,8 @@ import (
 )
 
 StructWrap: {
-	struct?: {} @protobuf(1,type=google.protobuf.Struct)
+	struct?: {
+	} @protobuf(1,type=google.protobuf.Struct)
 	any?: _ @protobuf(2,type=google.protobuf.Value)
 	listVal?: [...] @protobuf(3,type=google.protobuf.ListValue)
 	boolVal?:   bool   @protobuf(4,type=google.protobuf.BoolValue)

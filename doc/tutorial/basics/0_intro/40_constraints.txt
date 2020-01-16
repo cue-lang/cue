@@ -2,7 +2,7 @@ cue eval check.cue
 cmp stdout expect-stdout-cue
 
 -- frontmatter.toml --
-title = "Duplicates"
+title = "Constraints"
 description = ""
 
 -- text.md --

@@ -4,6 +4,8 @@ package expressions
 	a:   1  // comment
 	aaa: 22 // comment
 
+	"": 3
+
 	b: 3
 
 	c: b: a:       4

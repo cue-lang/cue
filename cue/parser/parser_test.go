@@ -173,6 +173,12 @@ func TestParse(t *testing.T) {
 		`,
 		"a: {b: {c: d}}, c: a, d: a.b, e: a.b.c, \"f\": f, [X=_]: X",
 	}, {
+		"empty fields",
+		`
+		"": 3
+		`,
+		`"": 3`,
+	}, {
 		"expressions",
 		`	a: (2 + 3) * 5
 			b: (2 + 3) + 4

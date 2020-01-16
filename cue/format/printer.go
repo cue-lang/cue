@@ -21,6 +21,7 @@ import (
 	"text/tabwriter"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -42,6 +43,8 @@ type printer struct {
 	output      []byte
 	indent      int
 	spaceBefore bool
+
+	errs errors.Error
 }
 
 type line int
@@ -49,6 +52,10 @@ type line int
 func (p *printer) init(cfg *config) {
 	p.cfg = cfg
 	p.pos = token.Position{Line: 1, Column: 1}
+}
+
+func (p *printer) errf(n ast.Node, format string, args ...interface{}) {
+	p.errs = errors.Append(p.errs, errors.Newf(n.Pos(), format, args...))
 }
 
 const debug = false
@@ -127,8 +134,9 @@ func (p *printer) Print(v interface{}) {
 
 	case *ast.Ident:
 		data = x.Name
-		if q, err := ast.QuoteIdent(data); err == nil {
-			data = q
+		if !ast.IsValidIdent(data) {
+			p.errf(x, "invalid identifier %q", x.Name)
+			data = "*bad identifier*"
 		}
 		impliedComma = true
 		p.lastTok = token.IDENT

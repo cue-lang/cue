@@ -34,6 +34,9 @@ func isDigit(ch rune) bool {
 
 // IsValidIdent reports whether str is a valid identifier.
 func IsValidIdent(ident string) bool {
+	if ident == "" {
+		return false
+	}
 	for i, r := range ident {
 		if isLetter(r) || r == '_' || r == '$' {
 			continue

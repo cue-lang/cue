@@ -15,6 +15,7 @@
 package format
 
 import (
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
@@ -43,6 +44,11 @@ func TestInvalidAST(t *testing.T) {
 		// Force a new struct.
 		out: `foo: bar :: {
 }`,
+	}, {
+		desc: "label with invalid identifier",
+		node: &ast.Field{Label: &ast.Ident{}, Value: ast.NewString("foo")},
+		// Force a new struct.
+		out: `"": "foo"`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -54,6 +60,30 @@ func TestInvalidAST(t *testing.T) {
 			want := tc.out
 			if got != want {
 				t.Errorf("\ngot  %v;\nwant %v", got, want)
+			}
+		})
+	}
+}
+
+func TestErrors(t *testing.T) {
+	testCases := []struct {
+		desc string
+		node ast.Node
+		err  string
+	}{{
+		desc: "empty identifier",
+		node: ast.NewIdent(""),
+		err:  "invalid identifier",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			b, err := Node(tc.node)
+			if err == nil {
+				t.Fatalf("expected error, found %q", b)
+			}
+			got := err.Error()
+			if !strings.Contains(got, tc.err) {
+				t.Errorf("\ngot  %v;\nwant %v", got, tc.err)
 			}
 		})
 	}

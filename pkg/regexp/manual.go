@@ -22,6 +22,13 @@ import (
 
 var errNoMatch = errors.New("no match")
 
+// Valid reports whether the given regular expression
+// is valid.
+func Valid(pattern string) (bool, error) {
+	_, err := regexp.Compile(pattern)
+	return err == nil, err
+}
+
 // Find returns a string holding the text of the leftmost match in s of
 // the regular expression. It returns bottom if there was no match.
 func Find(pattern, s string) (string, error) {

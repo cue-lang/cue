@@ -354,9 +354,16 @@ func TestBuiltins(t *testing.T) {
 		`[{A: "l", B: "o"},{A: "o", B: "o"},{A: "r", B: "o"}]`,
 	}, {
 		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>optional)?"#, "fbla", -1)`),
-		`[{A: ""}]`}, {
+		`[{A: ""}]`,
+	}, {
 		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "aglom", -1)`),
 		`_|_(error in call to regexp.FindAllNamedSubmatch: no match)`,
+	}, {
+		test("regexp", `regexp.Valid & "valid"`),
+		`"valid"`,
+	}, {
+		test("regexp", `regexp.Valid & "invalid)"`),
+		"_|_(error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`)",
 	}, {
 		test("strconv", `strconv.FormatBool(true)`),
 		`"true"`,

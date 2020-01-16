@@ -6,17 +6,8 @@ title = "Validation"
 description = ""
 
 -- text.md --
-Constraints specify what values are allowed.
-To CUE they are just values like anything else,
-but conceptually they can be explained as something in between types and
-concrete values.
-
 Constraints can be used to validate values of concrete instances.
 They can be applied to CUE data, or directly to YAML or JSON.
-
-But constraints can also reduce boilerplate.
-If a constraint defines a concrete value, there is no need
-to specify it in values to which this constraint applies.
 
 -- schema.cue --
 Language :: {

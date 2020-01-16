@@ -42,48 +42,12 @@ func newExecCmd(v cue.Value) (task.Runner, error) {
 }
 
 func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	cmd, doc, err := mkCommand(ctx)
+	if err != nil {
+		return cue.Value{}, err
+	}
+
 	// TODO: set environment variables, if defined.
-	var bin string
-	var args []string
-	doc := ""
-	v := ctx.Lookup("cmd")
-	if ctx.Err != nil {
-		return nil, ctx.Err
-	}
-	switch v.Kind() {
-	case cue.StringKind:
-		str := ctx.String("cmd")
-		doc = str
-		list := strings.Fields(str)
-		bin = list[0]
-		args = append(args, list[1:]...)
-
-	case cue.ListKind:
-		list, _ := v.List()
-		if !list.Next() {
-			return cue.Value{}, errors.New("empty command list")
-		}
-		bin, err = list.Value().String()
-		if err != nil {
-			return cue.Value{}, err
-		}
-		doc += bin
-		for list.Next() {
-			str, err := list.Value().String()
-			if err != nil {
-				return cue.Value{}, err
-			}
-			args = append(args, str)
-			doc += " " + str
-		}
-	}
-
-	if bin == "" {
-		return cue.Value{}, errors.New("empty command")
-	}
-
-	cmd := exec.CommandContext(ctx.Context, bin, args...)
-
 	stream := func(name string) (stream cue.Value, ok bool) {
 		c := ctx.Obj.Lookup(name)
 		// Although the schema defines a default versions, older implementations
@@ -100,7 +64,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	if v, ok := stream("stdin"); !ok {
 		cmd.Stdin = ctx.Stdin
 	} else if cmd.Stdin, err = v.Reader(); err != nil {
-		return nil, fmt.Errorf("cue: %v", err)
+		return nil, errors.Wrapf(err, v.Pos(), "invalid input")
 	}
 	_, captureOut := stream("stdout")
 	if !captureOut {
@@ -129,4 +93,74 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		err = fmt.Errorf("command %q failed: %v", doc, err)
 	}
 	return update, err
+}
+
+func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
+	var bin string
+	var args []string
+
+	v := ctx.Lookup("cmd")
+	if ctx.Err != nil {
+		return nil, "", ctx.Err
+	}
+
+	switch v.Kind() {
+	case cue.StringKind:
+		str := ctx.String("cmd")
+		doc = str
+		list := strings.Fields(str)
+		bin = list[0]
+		args = append(args, list[1:]...)
+
+	case cue.ListKind:
+		list, _ := v.List()
+		if !list.Next() {
+			return nil, "", errors.New("empty command list")
+		}
+		bin, err = list.Value().String()
+		if err != nil {
+			return nil, "", err
+		}
+		doc += bin
+		for list.Next() {
+			str, err := list.Value().String()
+			if err != nil {
+				return nil, "", err
+			}
+			args = append(args, str)
+			doc += " " + str
+		}
+	}
+
+	if bin == "" {
+		return nil, "", errors.New("empty command")
+	}
+
+	cmd := exec.CommandContext(ctx.Context, bin, args...)
+
+	env := ctx.Obj.Lookup("env")
+
+	// List case.
+	for iter, _ := env.List(); iter.Next(); {
+		str, err := iter.Value().String()
+		if err != nil {
+			return nil, "", errors.Wrapf(err, v.Pos(),
+				"invalid environment variable value %q", v)
+		}
+		cmd.Env = append(cmd.Env, str)
+	}
+
+	// Struct case.
+	for iter, _ := ctx.Obj.Lookup("env").Fields(); iter.Next(); {
+		label := iter.Label()
+		v := iter.Value()
+		str, err := v.String()
+		if err != nil {
+			return nil, "", errors.Wrapf(err, v.Pos(),
+				"invalid environment variable value %q", v)
+		}
+		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", label, str))
+	}
+
+	return cmd, doc, nil
 }

@@ -11,12 +11,11 @@
 //     	// cmd is the command to run.
 //     	cmd: string | [string, ...string]
 //
-//     	// install is an optional command to install the binaries needed
-//     	// to run the command.
-//     	install?: string | [string, ...string]
-//
 //     	// env defines the environment variables to use for this system.
-//     	env: [string]: string
+//     	// If the value is a list, the entries mus be of the form key=value,
+//     	// where the last value takes precendence in the case of multiple
+//     	// occurrances of the same key.
+//     	env: [string]: string | [...=~"="]
 //
 //     	// stdout captures the output from stdout if it is of type bytes or string.
 //     	// The default value of null indicates it is redirected to the stdout of the

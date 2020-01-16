@@ -36,7 +36,8 @@ import (
 // Disallow
 // - block comments
 // - old-style field comprehensions
-const syntaxVersion = -1000 + 12
+// - space separator syntax
+const syntaxVersion = -1000 + 13
 
 var defaultConfig = &load.Config{
 	Context: build.NewContext(

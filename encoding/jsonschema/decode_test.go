@@ -75,8 +75,7 @@ func TestDecode(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			// TODO: use actual API.
-			expr, err := decode(fullpath, in)
+			expr, err := Extract(in, &Config{ID: fullpath})
 			if err != nil && errout == nil {
 				t.Fatal(errors.Details(err, nil))
 			}

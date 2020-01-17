@@ -34,19 +34,10 @@ import (
 
 const rootDefs = "def"
 
-func decode(filename string, inst *cue.Instance) (*ast.File, errors.Error) {
-	d := &decoder{
-		imports: map[string]*ast.Ident{},
-	}
-	e := d.decode(filename, inst)
-	if d.errs != nil {
-		return nil, d.errs
-	}
-	return e, nil
-}
-
 // A decoder converts JSON schema to CUE.
 type decoder struct {
+	cfg *Config
+
 	errs    errors.Error
 	imports map[string]*ast.Ident
 
@@ -63,12 +54,13 @@ func (d *decoder) addImport(pkg string) *ast.Ident {
 	return ident
 }
 
-func (d *decoder) decode(filename string, inst *cue.Instance) *ast.File {
+func (d *decoder) decode(inst *cue.Instance) *ast.File {
 	root := state{decoder: d}
 	expr, state := root.schemaState(inst.Value())
 
 	var a []ast.Decl
 
+	filename := d.cfg.ID
 	name := filepath.ToSlash(filename)
 	if state.id != "" {
 		name = strings.Trim(name, "#")

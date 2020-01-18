@@ -20,8 +20,17 @@ jobs:
       uses: actions/setup-go@v1
       with:
         go-version: ${{ matrix.go-version }}
+
     - name: Checkout code
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
+
+    - name: Cache Go modules
+      uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.go-version }}-go-
 
     - name: Test
       run: go test ./...

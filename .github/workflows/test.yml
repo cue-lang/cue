@@ -1,5 +1,12 @@
-on: [push, pull_request]
 name: Test
+
+on:
+  push:
+    branches:
+      - '*'
+    tags-ignore:
+      - 'v*'
+  pull_request:
 
 jobs:
   test:

@@ -39,13 +39,13 @@ func TestEnv(t *testing.T) {
 			WHEN: "Now!"
 		}
 		`,
-		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!" },
+		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
 	}, {
 		val: `
 		cmd: "echo"
 		env: [ "WHO=World", "WHAT=Hello", "WHEN=Now!" ]
 		`,
-		env: []string{ "WHO=World", "WHAT=Hello", "WHEN=Now!" },
+		env: []string{"WHO=World", "WHAT=Hello", "WHEN=Now!"},
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

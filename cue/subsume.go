@@ -30,17 +30,21 @@ func subsumes(v, w Value, mode subsumeMode) error {
 	s := subsumer{ctx: ctx, mode: mode}
 	if !s.subsumes(gt, lt) {
 		var b *bottom
-		var ok bool
 		src := binSrc(token.NoPos, opUnify, gt, lt)
-		src2 := src
 		if s.gt != nil && s.lt != nil {
 			src := binSrc(token.NoPos, opUnify, s.gt, s.lt)
-			b, ok = binOp(ctx, src, opUnify, s.gt, s.lt).(*bottom)
+			var ok bool
+			if s.missing != 0 {
+				b = ctx.mkErr(src, "missing field %q", ctx.labelStr(s.missing))
+			} else if b, ok = binOp(ctx, src, opUnify, s.gt, s.lt).(*bottom); !ok {
+				b = ctx.mkErr(src, "value not an instance")
+			}
 		}
-		if !ok {
+		if b == nil {
 			b = ctx.mkErr(src, "value not an instance")
+		} else {
+			b = ctx.mkErr(src, b, "%v", b)
 		}
-		b = ctx.mkErr(src2, b, "%v", b)
 		return w.toErr(b)
 	}
 	return nil
@@ -51,7 +55,8 @@ type subsumer struct {
 	mode subsumeMode
 
 	// recorded values where an error occurred.
-	gt, lt evaluated
+	gt, lt  evaluated
+	missing label
 }
 
 type subsumeMode int
@@ -196,7 +201,9 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				if a.optional && isTop(a.v) {
 					continue
 				}
+				s.missing = a.feature
 				s.gt = a.val()
+				s.lt = o
 				return false
 			} else if a.definition != b.definition {
 				return false

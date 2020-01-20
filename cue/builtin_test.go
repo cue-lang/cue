@@ -120,6 +120,18 @@ func TestBuiltins(t *testing.T) {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
 	}, {
+		test("encoding/yaml", `yaml.Validate("a: 2\n", {a:<5, b:int})`),
+		`_|_(error in call to encoding/yaml.Validate: value not an instance)`,
+	}, {
+		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<3})`),
+		`_|_(error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3))`,
+	}, {
+		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<5})`),
+		`true`,
+	}, {
+		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n", {a:<5, b:int})`),
+		`true`,
+	}, {
 		test("strconv", `strconv.FormatUint(64, 16)`),
 		`"40"`,
 	}, {

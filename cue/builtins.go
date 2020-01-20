@@ -30,14 +30,15 @@ import (
 	"unicode"
 	"unicode/utf8"
 
+	"github.com/cockroachdb/apd/v2"
+	goyaml "github.com/ghodss/yaml"
+	"golang.org/x/net/idna"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
-	"github.com/cockroachdb/apd/v2"
-	goyaml "github.com/ghodss/yaml"
-	"golang.org/x/net/idna"
 )
 
 func init() {
@@ -705,6 +706,40 @@ var builtinPackages = map[string]*builtinPkg{
 				if c.do() {
 					c.ret, c.err = func() (interface{}, error) {
 						d, err := yaml.NewDecoder("yaml.Validate", b)
+						if err != nil {
+							return false, err
+						}
+						r := internal.GetRuntime(v).(*Runtime)
+						for {
+							expr, err := d.Decode()
+							if err != nil {
+								if err == io.EOF {
+									return true, nil
+								}
+								return false, err
+							}
+
+							inst, err := r.CompileExpr(expr)
+							if err != nil {
+								return false, err
+							}
+
+							if err := v.Subsume(inst.Value(), Final()); err != nil {
+								return false, err
+							}
+						}
+					}()
+				}
+			},
+		}, {
+			Name:   "ValidatePartial",
+			Params: []kind{bytesKind | stringKind, topKind},
+			Result: boolKind,
+			Func: func(c *callCtxt) {
+				b, v := c.bytes(0), c.value(1)
+				if c.do() {
+					c.ret, c.err = func() (interface{}, error) {
+						d, err := yaml.NewDecoder("yaml.ValidatePartial", b)
 						if err != nil {
 							return false, err
 						}
@@ -3591,19 +3626,20 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Command: {
-		tasks: {
-			[name=string]: Task
-		}
-		$type:   "tool.Command"
-		$name:   !=""
-		$usage?: =~"^\($name) "
+		$usage?: string
 		$short?: string
 		$long?:  string
+		Tasks
+	}
+	Tasks: Task | {
+		[name=string]: Tasks
 	}
 	Task: {
-		$type: "tool.Task"
-		$id:   =~"\\."
+		$type:   "tool.Task"
+		$id:     =~"\\."
+		$after?: Task | [...Task]
 	}
+	Name :: =~"^\\PL([-](\\PL|\\PN))*$"
 }`,
 	},
 	"tool/cli": &builtinPkg{
@@ -3619,11 +3655,10 @@ var builtinPackages = map[string]*builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
 	Run: {
-		$id:      *"tool/exec.Run" | "exec"
-		cmd:      string | [string, ...string]
-		install?: string | [string, ...string]
+		$id: *"tool/exec.Run" | "exec"
+		cmd: string | [string, ...string]
 		env: {
-			[string]: string
+			[string]: string | [...=~"="]
 		}
 		stdout:  *null | string | bytes
 		stderr:  *null | string | bytes
@@ -3704,8 +3739,8 @@ var builtinPackages = map[string]*builtinPkg{
 	"tool/os": &builtinPkg{
 		native: []*builtin{{}},
 		cue: `{
-	Value :: bool | number | *string | null
 	Name ::  !="" & !~"^[$]"
+	Value :: bool | number | *string | null
 	Setenv: {
 		[Name]: Value
 		$id:    "tool/os.Setenv"

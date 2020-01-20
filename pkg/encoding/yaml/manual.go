@@ -58,10 +58,40 @@ func Unmarshal(data []byte) (ast.Expr, error) {
 	return yaml.Unmarshal("", data)
 }
 
-// Validate validates YAML and confirms it matches the constraints
+// Validate validates YAML and confirms it is an instance of the schema
 // specified by v. If the YAML source is a stream, every object must match v.
 func Validate(b []byte, v cue.Value) (bool, error) {
 	d, err := yaml.NewDecoder("yaml.Validate", b)
+	if err != nil {
+		return false, err
+	}
+	r := internal.GetRuntime(v).(*cue.Runtime)
+	for {
+		expr, err := d.Decode()
+		if err != nil {
+			if err == io.EOF {
+				return true, nil
+			}
+			return false, err
+		}
+
+		inst, err := r.CompileExpr(expr)
+		if err != nil {
+			return false, err
+		}
+
+		if err := v.Subsume(inst.Value(), cue.Final()); err != nil {
+			return false, err
+		}
+	}
+}
+
+// ValidatePartial validates YAML and confirms it matches the constraints
+// specified by v using unification. This means that b must be consistent with,
+// but does not have to be an instance of v. If the YAML source is a stream,
+// every object must match v.
+func ValidatePartial(b []byte, v cue.Value) (bool, error) {
+	d, err := yaml.NewDecoder("yaml.ValidatePartial", b)
 	if err != nil {
 		return false, err
 	}

@@ -1,0 +1,43 @@
+! cue vet ./yaml.cue
+cmp stderr expect-stderr
+
+-- expect-stderr --
+phrases: error in call to encoding/yaml.Validate: missing field "text":
+    ./yaml.cue:19:10
+    ./yaml.cue:4:12
+    ./yaml.cue:11:17
+    yaml.Validate:4:6
+-- yaml.cue --
+import "encoding/yaml"
+
+// Phrases defines a schema for a valid phrase.
+Phrases :: {
+	phrases: {
+		[string]: Phrase
+	}
+
+	Phrase :: {
+		lang:         LanguageTag
+		text:         !=""
+		attribution?: !="" // must be non-empty when specified
+	}
+	LanguageTag :: =~"^[a-zA-Z0-9-_]{2,}$" | false
+}
+
+// phrases is a YAML string with a field phrases that is a map of Phrase
+// objects.
+phrases: yaml.Validate(Phrases)
+
+phrases: """
+    phrases:
+      # A quote from Mark Twain.
+      quote1:
+        lang: en
+        attribution: Mark Twain
+
+      # A Norwegian proverb.
+      proverb:
+        lang: no
+        text: Stemmen som sier at du ikke klarer det, lyver.
+    """
+

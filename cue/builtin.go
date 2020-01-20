@@ -231,7 +231,7 @@ func (x *builtin) evalPartial(ctx *context) evaluated {
 	return x
 }
 
-func (x *builtin) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *builtin) subsumesImpl(s *subsumer, v value) bool {
 	if y, ok := v.(*builtin); ok {
 		return x == y
 	}
@@ -295,6 +295,9 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 			if err, ok := err.Err.(*marshalError); ok && err.b != nil {
 				ret = err.b
 			}
+		case *valueError:
+			ret = err.err
+			ret = ctx.mkErr(src, x, ret, "error in call to %s: %v", x.name(ctx), err)
 		default:
 			// TODO: store the underlying error explicitly
 			ret = ctx.mkErr(src, x, "error in call to %s: %v", x.name(ctx), err)

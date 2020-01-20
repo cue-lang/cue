@@ -1333,13 +1333,40 @@ func (v Value) Template() func(label string) Value {
 	}
 }
 
-// Subsumes reports whether w is an instance of v.
+// Subsume reports nil when w is an instance of v or an error otherwise.
+//
+// Without options, the entire value is considered for assumption, which means
+// Subsume tests whether  v is a backwards compatible (newer) API version of w.
+// Use the Final() to indicate that the subsumed value is data, and that
+//
+// Use the Final option to check subsumption if a w is known to be final,
+// and should assumed to be closed.
+//
+// Options are currently ignored and the function will panic if any are passed.
 //
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
+func (v Value) Subsume(w Value, opts ...Option) error {
+	var mode subsumeMode
+	o := getOptions(opts)
+	if o.final {
+		mode |= subFinal | subChoose
+	}
+	return subsumes(v, w, mode)
+}
+
+// Deprecated: use Subsume.
+//
+// Subsumes reports whether w is an instance of v.
+//
+// Without options, Subsumes checks whether v is a backwards compatbile schema
+// of w.
+//
+// By default, Subsumes tests whether two values are compatib
+// Value v and w must be obtained from the same build.
+// TODO: remove this requirement.
 func (v Value) Subsumes(w Value) bool {
-	ctx := v.ctx()
-	return subsumes(ctx, v.eval(ctx), w.eval(ctx), subChoose)
+	return subsumes(v, w, subChoose) == nil
 }
 
 // Unify reports the greatest lower bound of v and w.
@@ -1541,6 +1568,7 @@ type options struct {
 	omitDefinitions bool
 	omitOptional    bool
 	omitAttrs       bool
+	final           bool
 	disallowCycles  bool // implied by concrete
 }
 
@@ -1549,9 +1577,11 @@ type Option option
 
 type option func(p *options)
 
-// Used in Iter, Validate, Subsume?, Fields() Syntax, Export
-
-// TODO: could also be used for subsumption.
+// Final indicates a value is final. It implicitly closes all structs and lists
+// in a value and selects defaults.
+func Final() Option {
+	return func(o *options) { o.final = true }
+}
 
 // Concrete ensures that all values are concrete.
 //
@@ -1915,7 +1945,8 @@ func (v Value) Expr() (Op, []Value) {
 		for _, disjunct := range x.values {
 			if disjunct.marked {
 				for _, n := range x.values {
-					if !n.marked && subsumes(v.ctx(), n.val, disjunct.val, 0) {
+					s := subsumer{ctx: v.ctx()}
+					if !n.marked && s.subsumes(n.val, disjunct.val) {
 						continue outer
 					}
 				}

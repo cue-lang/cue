@@ -39,7 +39,7 @@ type value interface {
 
 	// subsumesImpl is only defined for non-reference types.
 	// It should only be called by the subsumes function.
-	subsumesImpl(*context, value, subsumeMode) bool
+	subsumesImpl(*subsumer, value) bool
 }
 
 type evaluated interface {
@@ -767,7 +767,7 @@ func (o *optionals) isFull() bool {
 }
 
 // match reports whether a field with the given name may be added in the
-// associated struct as a new field. ok is false, fif there was any closed
+// associated struct as a new field. ok is false if there was any closed
 // struct that failed to match. Even if match returns false, there may still be
 // constraints represented by optionals that are to be applied to existing
 // concrete fields.
@@ -1695,7 +1695,8 @@ func (x *disjunction) normalize(ctx *context, src source) mVal {
 		if isBottom(lt.val) {
 			return true
 		}
-		return (!lt.marked || gt.marked) && subsumes(ctx, gt.val, lt.val, 0)
+		s := subsumer{ctx: ctx}
+		return (!lt.marked || gt.marked) && s.subsumes(gt.val, lt.val)
 	}
 	k := 0
 

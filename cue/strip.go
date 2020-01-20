@@ -124,6 +124,6 @@ func (x *mergedValues) rewrite(ctx *context, fn rewriteFunc) value {
 	return &mergedValues{x.baseValue, vs}
 }
 
-func (x *mergedValues) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *mergedValues) subsumesImpl(s *subsumer, v value) bool {
 	return false
 }

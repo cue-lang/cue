@@ -401,7 +401,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 
 	default:
 		// Mark any subsumed part that is covered by generated config.
-		if in.Err() == nil && v.Subsumes(in) {
+		if in.Err() == nil && v.Subsume(in) == nil {
 			for _, v := range vSplit {
 				src := v.Source()
 				if t.canRemove(src) && !inNodes(gen, src) &&

@@ -16,7 +16,43 @@ package cue
 
 import (
 	"bytes"
+
+	"cuelang.org/go/cue/token"
 )
+
+// TODO: it probably makes sense to have only two modes left: subsuming a schema
+// and subsuming a final value.
+
+func subsumes(v, w Value, mode subsumeMode) error {
+	ctx := v.ctx()
+	gt := v.eval(ctx)
+	lt := w.eval(ctx)
+	s := subsumer{ctx: ctx, mode: mode}
+	if !s.subsumes(gt, lt) {
+		var b *bottom
+		var ok bool
+		src := binSrc(token.NoPos, opUnify, gt, lt)
+		src2 := src
+		if s.gt != nil && s.lt != nil {
+			src := binSrc(token.NoPos, opUnify, s.gt, s.lt)
+			b, ok = binOp(ctx, src, opUnify, s.gt, s.lt).(*bottom)
+		}
+		if !ok {
+			b = ctx.mkErr(src, "value not an instance")
+		}
+		b = ctx.mkErr(src2, b, "%v", b)
+		return w.toErr(b)
+	}
+	return nil
+}
+
+type subsumer struct {
+	ctx  *context
+	mode subsumeMode
+
+	// recorded values where an error occurred.
+	gt, lt evaluated
+}
 
 type subsumeMode int
 
@@ -27,13 +63,18 @@ const (
 
 	// subNoOptional ignores optional fields for the purpose of subsumption.
 	// This option is predominantly intended for implementing equality checks.
+	// TODO: may be unnecessary now subFinal is available.
 	subNoOptional
+
+	// the subsumed value is final
+	subFinal
 )
 
 // TODO: improve upon this highly inefficient implementation. There should
 // be a dedicated equal function once the dust settles.
 func equals(c *context, x, y value) bool {
-	return subsumes(c, x, y, subNoOptional) && subsumes(c, y, x, subNoOptional)
+	s := subsumer{ctx: c, mode: subNoOptional}
+	return s.subsumes(x, y) && s.subsumes(y, x)
 }
 
 // subsumes checks gt subsumes lt. If any of the values contains references or
@@ -41,9 +82,10 @@ func equals(c *context, x, y value) bool {
 // subsumption is conservative; it may return false when a guarantee for
 // subsumption could be proven. For concreted values it returns the exact
 // relation. It never returns a false positive.
-func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
-	var v, w value
-	if mode&subChoose == 0 {
+func (s *subsumer) subsumes(gt, lt value) (result bool) {
+	ctx := s.ctx
+	var v, w evaluated
+	if s.mode&subChoose == 0 {
 		v = gt.evalPartial(ctx)
 		w = lt.evalPartial(ctx)
 	} else {
@@ -62,7 +104,7 @@ func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
 	case b&^(a&b) != 0:
 		// a does not have strictly more bits. This implies any ground kind
 		// subsuming a non-ground type.
-		return false
+		goto exit
 		// TODO: consider not supporting references.
 		// case (a|b)&(referenceKind) != 0:
 		// 	// no resolution if references are in play.
@@ -72,17 +114,17 @@ func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
 	case *unification:
 		if _, ok := gt.(*unification); !ok {
 			for _, x := range lt.values {
-				if subsumes(ctx, gt, x, mode) {
+				if s.subsumes(gt, x) {
 					return true
 				}
 			}
-			return false
+			goto exit
 		}
 
 	case *disjunction:
 		if _, ok := gt.(*disjunction); !ok {
 			for _, x := range lt.values {
-				if !subsumes(ctx, gt, x.val, mode) {
+				if !s.subsumes(gt, x.val) {
 					return false
 				}
 			}
@@ -90,22 +132,41 @@ func subsumes(ctx *context, gt, lt value, mode subsumeMode) bool {
 		}
 	}
 
-	return gt.subsumesImpl(ctx, lt, mode)
+	result = gt.subsumesImpl(s, lt)
+exit:
+	if !result && s.gt == nil && s.lt == nil {
+		s.gt = v
+		s.lt = w
+	}
+	return result
 }
 
-func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
-	ignoreOptional := mode&subNoOptional != 0
+func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
+	ctx := s.ctx
+	ignoreOptional := s.mode&subNoOptional != 0
 	if o, ok := v.(*structLit); ok {
-		// TODO: consider what to do with templates. Perhaps we should always
-		// do subsumption on fully evaluated structs.
 		if x.optionals != nil && !ignoreOptional {
-			return false
+			if s.mode&subFinal == 0 {
+				// TODO: also cross-validate optional fields in the schema case.
+				return false
+			}
+			for _, b := range o.arcs {
+				if b.optional || b.definition {
+					continue
+				}
+				name := ctx.labelStr(b.feature)
+				arg := &stringLit{x.baseValue, name, nil}
+				u, _ := x.optionals.constraint(ctx, arg)
+				if u != nil && !s.subsumes(u, b.v) {
+					return false
+				}
+			}
 		}
 		if len(x.comprehensions) > 0 {
 			return false
 		}
 		if x.emit != nil {
-			if o.emit == nil || !subsumes(ctx, x.emit, o.emit, mode) {
+			if o.emit == nil || !s.subsumes(x.emit, o.emit) {
 				return false
 			}
 		}
@@ -118,29 +179,50 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 			b := o.lookup(ctx, a.feature)
 			if !a.optional && b.optional {
 				return false
-			} else if a.definition != b.definition {
-				return false
 			} else if b.val() == nil {
+				if a.definition && s.mode&subFinal != 0 {
+					continue
+				}
+				// if o is closed, the field is implicitly defined as _|_ and
+				// thus subsumed. Technically, this is even true if a is not
+				// optional, but in that case it means that o is invalid, so
+				// return false regardless
+				if a.optional && (o.closeStatus.shouldClose() || s.mode&subFinal != 0) {
+					continue
+				}
 				// If field a is optional and has value top, neither the
 				// omission of the field nor the field defined with any value
 				// may cause unification to fail.
-				return a.optional && isTop(a.v)
-			} else if !subsumes(ctx, a.v, b.val(), mode) {
+				if a.optional && isTop(a.v) {
+					continue
+				}
+				s.gt = a.val()
+				return false
+			} else if a.definition != b.definition {
+				return false
+			} else if !s.subsumes(a.v, b.val()) {
 				return false
 			}
 		}
 		// For closed structs, all arcs in b must exist in a.
 		if x.closeStatus.shouldClose() {
-			if !ignoreOptional && !o.closeStatus.shouldClose() {
+			if !ignoreOptional && !o.closeStatus.shouldClose() && s.mode&subFinal == 0 {
 				return false
 			}
+			ignoreOptional = ignoreOptional || s.mode&subFinal != 0
 			for _, b := range o.arcs {
 				if ignoreOptional && b.optional {
 					continue
 				}
 				a := x.lookup(ctx, b.feature)
 				if a.val() == nil {
-					return false
+					name := ctx.labelStr(b.feature)
+					arg := &stringLit{x.baseValue, name, nil}
+					u, _ := x.optionals.constraint(ctx, arg)
+					if u == nil { // subsumption already checked
+						s.lt = b.val()
+						return false
+					}
 				}
 			}
 		}
@@ -148,20 +230,21 @@ func (x *structLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	return !isBottom(v)
 }
 
-func (*top) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (*top) subsumesImpl(s *subsumer, v value) bool {
 	return true
 }
 
-func (x *bottom) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *bottom) subsumesImpl(s *subsumer, v value) bool {
 	// never called.
 	return v.kind() == bottomKind
 }
 
-func (x *basicType) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *basicType) subsumesImpl(s *subsumer, v value) bool {
 	return true
 }
 
-func (x *bound) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *bound) subsumesImpl(s *subsumer, v value) bool {
+	ctx := s.ctx
 	if isBottom(v) {
 		return true
 	}
@@ -243,81 +326,81 @@ func (x *bound) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 	return false
 }
 
-func (x *nullLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *nullLit) subsumesImpl(s *subsumer, v value) bool {
 	return true
 }
 
-func (x *boolLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *boolLit) subsumesImpl(s *subsumer, v value) bool {
 	return x.b == v.(*boolLit).b
 }
 
-func (x *stringLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *stringLit) subsumesImpl(s *subsumer, v value) bool {
 	return x.str == v.(*stringLit).str
 }
 
-func (x *bytesLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *bytesLit) subsumesImpl(s *subsumer, v value) bool {
 	return bytes.Equal(x.b, v.(*bytesLit).b)
 }
 
-func (x *numLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *numLit) subsumesImpl(s *subsumer, v value) bool {
 	b := v.(*numLit)
 	return x.v.Cmp(&b.v) == 0
 }
 
-func (x *durationLit) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *durationLit) subsumesImpl(s *subsumer, v value) bool {
 	return x.d == v.(*durationLit).d
 }
 
-func (x *list) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *list) subsumesImpl(s *subsumer, v value) bool {
 	switch y := v.(type) {
 	case *list:
-		if !subsumes(ctx, x.len, y.len, mode) {
+		if !s.subsumes(x.len, y.len) {
 			return false
 		}
 		// TODO: need to handle case where len(x.elem) > len(y.elem) explicitly
 		// if we introduce cap().
-		if !subsumes(ctx, x.elem, y.elem, mode) {
+		if !s.subsumes(x.elem, y.elem) {
 			return false
 		}
 		// TODO: assuming continuous indices, use merge sort if we allow
 		// sparse arrays.
 		for _, a := range y.elem.arcs[len(x.elem.arcs):] {
-			if !subsumes(ctx, x.typ, a.v, mode) {
+			if !s.subsumes(x.typ, a.v) {
 				return false
 			}
 		}
 		if y.isOpen() { // implies from first check that x.IsOpen.
-			return subsumes(ctx, x.typ, y.typ, 0)
+			return s.subsumes(x.typ, y.typ)
 		}
 		return true
 	}
 	return isBottom(v)
 }
 
-func (x *params) subsumes(ctx *context, y *params, mode subsumeMode) bool {
+func (x *params) subsumes(s *subsumer, y *params) bool {
 	// structural equivalence
 	// TODO: make agnostic to argument names.
 	if len(y.arcs) != len(x.arcs) {
 		return false
 	}
 	for i, a := range x.arcs {
-		if !subsumes(ctx, a.v, y.arcs[i].v, 0) {
+		if !s.subsumes(a.v, y.arcs[i].v) {
 			return false
 		}
 	}
 	return true
 }
 
-func (x *lambdaExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *lambdaExpr) subsumesImpl(s *subsumer, v value) bool {
 	// structural equivalence
 	if y, ok := v.(*lambdaExpr); ok {
-		return x.params.subsumes(ctx, y.params, 0) &&
-			subsumes(ctx, x.value, y.value, 0)
+		return x.params.subsumes(s, y.params) &&
+			s.subsumes(x.value, y.value)
 	}
 	return isBottom(v)
 }
 
-func (x *unification) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *unification) subsumesImpl(s *subsumer, v value) bool {
 	if y, ok := v.(*unification); ok {
 		// A unification subsumes another unification if for all values a in x
 		// there is a value b in y such that a subsumes b.
@@ -328,7 +411,7 @@ func (x *unification) subsumesImpl(ctx *context, v value, mode subsumeMode) bool
 	outer:
 		for _, vx := range x.values {
 			for _, vy := range y.values {
-				if subsumes(ctx, vx, vy, mode) {
+				if s.subsumes(vx, vy) {
 					continue outer
 				}
 			}
@@ -338,14 +421,14 @@ func (x *unification) subsumesImpl(ctx *context, v value, mode subsumeMode) bool
 	}
 	subsumed := true
 	for _, vx := range x.values {
-		subsumed = subsumed && subsumes(ctx, vx, v, mode)
+		subsumed = subsumed && s.subsumes(vx, v)
 	}
 	return subsumed
 }
 
 // subsumes for disjunction is logically precise. However, just like with
 // structural subsumption, it should not have to be called after evaluation.
-func (x *disjunction) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *disjunction) subsumesImpl(s *subsumer, v value) bool {
 	// A disjunction subsumes another disjunction if all values of v are
 	// subsumed by any of the values of x, and default values in v are subsumed
 	// by the default values of x.
@@ -358,7 +441,7 @@ func (x *disjunction) subsumesImpl(ctx *context, v value, mode subsumeMode) bool
 		for _, vd := range d.values {
 			// v is subsumed if any value in x subsumes v.
 			for _, vx := range x.values {
-				if (vx.marked || !vd.marked) && subsumes(ctx, vx.val, vd.val, 0) {
+				if (vx.marked || !vd.marked) && s.subsumes(vx.val, vd.val) {
 					continue outer
 				}
 			}
@@ -368,7 +451,7 @@ func (x *disjunction) subsumesImpl(ctx *context, v value, mode subsumeMode) bool
 	}
 	// v is subsumed if any value in x subsumes v.
 	for _, vx := range x.values {
-		if subsumes(ctx, vx.val, v, 0) {
+		if s.subsumes(vx.val, v) {
 			return true
 		}
 	}
@@ -379,7 +462,7 @@ func (x *disjunction) subsumesImpl(ctx *context, v value, mode subsumeMode) bool
 // evaluation.
 
 // structural equivalence
-func (x *nodeRef) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *nodeRef) subsumesImpl(s *subsumer, v value) bool {
 	if r, ok := v.(*nodeRef); ok {
 		return x.node == r.node
 	}
@@ -387,14 +470,14 @@ func (x *nodeRef) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
 }
 
 // structural equivalence
-func (x *selectorExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *selectorExpr) subsumesImpl(s *subsumer, v value) bool {
 	if r, ok := v.(*selectorExpr); ok {
-		return x.feature == r.feature && subsumes(ctx, x.x, r.x, subChoose)
+		return x.feature == r.feature && s.subsumes(x.x, r.x) // subChoose
 	}
 	return isBottom(v)
 }
 
-func (x *interpolation) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *interpolation) subsumesImpl(s *subsumer, v value) bool {
 	switch v := v.(type) {
 	case *stringLit:
 		// Be conservative if not ground.
@@ -406,7 +489,7 @@ func (x *interpolation) subsumesImpl(ctx *context, v value, mode subsumeMode) bo
 			return false
 		}
 		for i, p := range x.parts {
-			if !subsumes(ctx, p, v.parts[i], 0) {
+			if !s.subsumes(p, v.parts[i]) {
 				return false
 			}
 		}
@@ -416,31 +499,31 @@ func (x *interpolation) subsumesImpl(ctx *context, v value, mode subsumeMode) bo
 }
 
 // structural equivalence
-func (x *indexExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *indexExpr) subsumesImpl(s *subsumer, v value) bool {
 	// TODO: what does it mean to subsume if the index value is not known?
 	if r, ok := v.(*indexExpr); ok {
 		// TODO: could be narrowed down if we know the exact value of the index
 		// and referenced value.
-		return subsumes(ctx, x.x, r.x, mode) && subsumes(ctx, x.index, r.index, 0)
+		return s.subsumes(x.x, r.x) && s.subsumes(x.index, r.index)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *sliceExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *sliceExpr) subsumesImpl(s *subsumer, v value) bool {
 	// TODO: what does it mean to subsume if the index value is not known?
 	if r, ok := v.(*sliceExpr); ok {
 		// TODO: could be narrowed down if we know the exact value of the index
 		// and referenced value.
-		return subsumes(ctx, x.x, r.x, 0) &&
-			subsumes(ctx, x.lo, r.lo, 0) &&
-			subsumes(ctx, x.hi, r.hi, 0)
+		return s.subsumes(x.x, r.x) &&
+			s.subsumes(x.lo, r.lo) &&
+			s.subsumes(x.hi, r.hi)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *customValidator) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *customValidator) subsumesImpl(s *subsumer, v value) bool {
 	y, ok := v.(*customValidator)
 	if !ok {
 		return isBottom(v)
@@ -449,7 +532,7 @@ func (x *customValidator) subsumesImpl(ctx *context, v value, mode subsumeMode) 
 		return false
 	}
 	for i, v := range x.args {
-		if !subsumes(ctx, v, y.args[i], mode) {
+		if !s.subsumes(v, y.args[i]) {
 			return false
 		}
 	}
@@ -457,60 +540,60 @@ func (x *customValidator) subsumesImpl(ctx *context, v value, mode subsumeMode) 
 }
 
 // structural equivalence
-func (x *callExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *callExpr) subsumesImpl(s *subsumer, v value) bool {
 	if c, ok := v.(*callExpr); ok {
 		if len(x.args) != len(c.args) {
 			return false
 		}
 		for i, a := range x.args {
-			if !subsumes(ctx, a, c.args[i], 0) {
+			if !s.subsumes(a, c.args[i]) {
 				return false
 			}
 		}
-		return subsumes(ctx, x.x, c.x, 0)
+		return s.subsumes(x.x, c.x)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *unaryExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *unaryExpr) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*unaryExpr); ok {
-		return x.op == b.op && subsumes(ctx, x.x, b.x, 0)
+		return x.op == b.op && s.subsumes(x.x, b.x)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *binaryExpr) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *binaryExpr) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*binaryExpr); ok {
 		return x.op == b.op &&
-			subsumes(ctx, x.left, b.left, 0) &&
-			subsumes(ctx, x.right, b.right, 0)
+			s.subsumes(x.left, b.left) &&
+			s.subsumes(x.right, b.right)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *listComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *listComprehension) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*listComprehension); ok {
-		return subsumes(ctx, x.clauses, b.clauses, 0)
+		return s.subsumes(x.clauses, b.clauses)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *structComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *structComprehension) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*structComprehension); ok {
-		return subsumes(ctx, x.clauses, b.clauses, 0)
+		return s.subsumes(x.clauses, b.clauses)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *fieldComprehension) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *fieldComprehension) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*fieldComprehension); ok {
-		return subsumes(ctx, x.key, b.key, 0) &&
-			subsumes(ctx, x.val, b.val, 0) &&
+		return s.subsumes(x.key, b.key) &&
+			s.subsumes(x.val, b.val) &&
 			!x.opt && b.opt &&
 			x.def == b.def
 	}
@@ -518,27 +601,27 @@ func (x *fieldComprehension) subsumesImpl(ctx *context, v value, mode subsumeMod
 }
 
 // structural equivalence
-func (x *yield) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *yield) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*yield); ok {
-		return subsumes(ctx, x.value, b.value, 0)
+		return s.subsumes(x.value, b.value)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *feed) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *feed) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*feed); ok {
-		return subsumes(ctx, x.source, b.source, 0) &&
-			subsumes(ctx, x.fn, b.fn, 0)
+		return s.subsumes(x.source, b.source) &&
+			s.subsumes(x.fn, b.fn)
 	}
 	return isBottom(v)
 }
 
 // structural equivalence
-func (x *guard) subsumesImpl(ctx *context, v value, mode subsumeMode) bool {
+func (x *guard) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*guard); ok {
-		return subsumes(ctx, x.condition, b.condition, 0) &&
-			subsumes(ctx, x.value, b.value, 0)
+		return s.subsumes(x.condition, b.condition) &&
+			s.subsumes(x.value, b.value)
 	}
 	return isBottom(v)
 }

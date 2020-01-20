@@ -159,10 +159,17 @@ type bottom struct {
 func (x *bottom) kind() kind { return bottomKind }
 
 func (x *bottom) Positions(ctx *context) []token.Pos {
+	var a []token.Pos
 	if x.index != nil { // TODO: remove check?
-		return appendPositions(ctx, nil, x.pos)
+		a = appendPositions(ctx, nil, x.pos)
 	}
-	return nil
+	if w := x.wrapped; w != nil {
+		a = append(a, w.Positions(ctx)...)
+	}
+	for _, sub := range x.sub {
+		a = append(a, sub.Positions(ctx)...)
+	}
+	return a
 }
 
 func appendPositions(ctx *context, pos []token.Pos, src source) []token.Pos {

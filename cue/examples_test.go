@@ -66,7 +66,7 @@ func ExampleValue_Decode() {
 	// json: cannot unmarshal string into Go struct field ab.B of type int
 }
 
-func ExampleValue_Subsumes() {
+func ExampleValue_Subsume() {
 	// Check compatibility of successive APIs.
 	var r cue.Runtime
 
@@ -105,13 +105,13 @@ func ExampleValue_Subsumes() {
 	}
 
 	// Is V2 backwards compatible with V1? In other words, does V2 subsume V1?
-	pass := v2.Value.Subsumes(v1.Value)
-	fmt.Println("V2 is backwards compatible with V1:", pass)
+	err = v2.Value.Subsume(v1.Value)
+	fmt.Println("V2 is backwards compatible with V1:", err)
 
-	pass = v3.Value.Subsumes(v2.Value)
-	fmt.Println("V3 is backwards compatible with V2:", pass)
+	err = v3.Value.Subsume(v2.Value)
+	fmt.Println("V3 is backwards compatible with V2:", err)
 
 	// Output:
-	// V2 is backwards compatible with V1: true
-	// V3 is backwards compatible with V2: false
+	// V2 is backwards compatible with V1: <nil>
+	// V3 is backwards compatible with V2: conflicting values <=150 and string (mismatched types number and string)
 }

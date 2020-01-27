@@ -106,7 +106,7 @@ func FlattenN(xs cue.Value, depth int) ([]cue.Value, error) {
 			return nil, err
 		}
 		for iter.Next() {
-			val := iter.Value()
+			val, _ := iter.Value().Default()
 			if val.Kind() == cue.ListKind && depth != 0 {
 				d := depth - 1
 				values, err := flattenN(val, d)

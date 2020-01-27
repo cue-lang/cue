@@ -831,7 +831,7 @@ var builtinPackages = map[string]*builtinPkg{
 								return nil, err
 							}
 							for iter.Next() {
-								val := iter.Value()
+								val, _ := iter.Value().Default()
 								if val.Kind() == ListKind && depth != 0 {
 									d := depth - 1
 									values, err := flattenN(val, d)

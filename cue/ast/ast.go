@@ -282,6 +282,7 @@ type Attribute struct {
 	Text string // must be a valid attribute format.
 
 	comments
+	decl
 }
 
 func (a *Attribute) Pos() token.Pos  { return a.At }

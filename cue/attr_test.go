@@ -146,7 +146,7 @@ func TestCreateAttrs(t *testing.T) {
 			attrs, err := createAttrs(&context{}, baseValue{}, a)
 
 			if tc.err != "" {
-				if !strings.Contains(debugStr(&context{}, err), tc.err) {
+				if err == nil || !strings.Contains(debugStr(&context{}, err), tc.err) {
 					t.Errorf("error was %v; want %v", err, tc.err)
 				}
 				return

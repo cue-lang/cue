@@ -684,9 +684,17 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 		case token.FOR, token.IF, token.LET:
 			list = append(list, p.parseComprehension())
 
+		case token.ATTRIBUTE:
+			list = append(list, p.parseAttribute())
+			if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
+				p.next()
+			}
+
 		default:
 			list = append(list, p.parseField())
 		}
+
+		// TODO: handle next comma here, after disallowing non-colon separator.
 	}
 
 	if p.tok == token.ELLIPSIS {
@@ -948,14 +956,28 @@ func (p *parser) parseField() (decl ast.Decl) {
 func (p *parser) parseAttributes() (attrs []*ast.Attribute) {
 	p.openList()
 	for p.tok == token.ATTRIBUTE {
-		c := p.openComments()
-		a := &ast.Attribute{At: p.pos, Text: p.lit}
-		p.next()
-		c.closeNode(p, a)
-		attrs = append(attrs, a)
+		attrs = append(attrs, p.parseAttribute())
 	}
 	p.closeList()
 	return attrs
+}
+
+func (p *parser) parseAttributeDecls() (a []ast.Decl) {
+	for p.tok == token.ATTRIBUTE {
+		a = append(a, p.parseAttribute())
+		if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
+			p.next()
+		}
+	}
+	return a
+}
+
+func (p *parser) parseAttribute() *ast.Attribute {
+	c := p.openComments()
+	a := &ast.Attribute{At: p.pos, Text: p.lit}
+	p.next()
+	c.closeNode(p, a)
+	return a
 }
 
 func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) {

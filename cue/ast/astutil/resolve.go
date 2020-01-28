@@ -276,6 +276,10 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 	case *ast.ImportSpec:
 		return nil
 
+	case *ast.Attribute:
+		// TODO: tokenize attributes, resolve identifiers and store the ones
+		// that resolve in a list.
+
 	case *ast.SelectorExpr:
 		walk(s, x.X)
 		return nil

@@ -280,6 +280,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 			case *ast.Comprehension:
 				v1.walk(x)
+
+			case *ast.Attribute:
+				// Nothing to do.
 			}
 		}
 		if v.ctx().inDefinition > 0 && !obj.optionals.isFull() {

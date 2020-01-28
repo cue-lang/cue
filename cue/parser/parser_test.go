@@ -471,6 +471,24 @@ bar: 2
 		import . "foo"
 		`,
 		out: "import , \"foo\"\nexpected 'STRING', found '.'",
+	}, {
+		desc: "attributes",
+		in: `
+		package name
+
+		@t1(v1)
+
+		{
+			@t2(v2)
+		}
+		a: {
+			a: 1
+			@t3(v3)
+			@t4(v4)
+			c: 2
+		}
+		`,
+		out: "package name, @t1(v1), {@t2(v2)}, a: {a: 1, @t3(v3), @t4(v4), c: 2}",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

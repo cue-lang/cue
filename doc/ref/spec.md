@@ -2842,7 +2842,7 @@ it will be output instead of its enclosing file when exporting CUE
 to a data format
 
 ```
-SourceFile      = { attribute "," } [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
+SourceFile      = [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
 ```
 
 ```

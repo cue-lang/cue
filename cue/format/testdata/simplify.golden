@@ -6,6 +6,8 @@ a: B: 42
 
 "a.b": "foo-": cc_dd: x
 
+@attr(3)
+
 a: b: c: 3
 
 // references to bar are all shadowed and this can be safely turned into
@@ -26,10 +28,13 @@ quux: 5
 "_foo": 3
 
 x: {
+	@tag0(foo)
 	r1: baz1
 	bar: r2: bar
-	r3:           bar
-	E=quux:       3
+	r3:     bar
+	E=quux: 3
+
+	@tag1(bar)
 	r4:           quux
 	[baz2="str"]: 4
 	r5:           baz2

@@ -63,7 +63,8 @@ func createAttrs(ctx *context, src source, attrs []*ast.Attribute) (a *attribute
 		}
 	}
 
-	sort.Slice(as, func(i, j int) bool { return as[i].text < as[j].text })
+	sort.SliceStable(as, func(i, j int) bool { return as[i].text < as[j].text })
+	// TODO: remove these restrictions.
 	for i := 1; i < len(as); i++ {
 		if ai, aj := as[i-1], as[i]; ai.key() == aj.key() {
 			n := newNode(attrs[0])

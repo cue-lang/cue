@@ -60,7 +60,7 @@ func TestIgnoredCUEFilesImport(t *testing.T) {
 	var e *NoFilesError
 	ok := xerrors.As(err, &e)
 	if !ok {
-		t.Fatal(`Import("testdata/ignored") did not return NoCUEError.`)
+		t.Fatal(`Import("testdata/ignored") did not return NoFilesError.`)
 	}
 	if !e.ignored {
 		t.Fatal(`Import("testdata/ignored") should have ignored CUE files.`)

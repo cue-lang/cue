@@ -352,6 +352,9 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.expr(n.Expr)
 		f.print(declcomma) // implied
 
+	case *ast.Attribute:
+		f.print(n.At, n)
+
 	case *ast.CommentGroup:
 		f.print(newsection)
 		f.printComment(n)

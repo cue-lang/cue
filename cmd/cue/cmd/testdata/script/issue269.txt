@@ -1,0 +1,25 @@
+! cue eval ./struct.cue
+cmp stderr expect-stderr
+-- struct.cue --
+type :: {
+    x: 0
+    y: 0
+
+    if x == 0 {i: 0}
+    if y == 0 {j: 0}
+}
+
+data: {
+    a: type
+    b: type
+
+    b: x: a.x
+    a: y: b.y
+}
+-- expect-stderr --
+data.a: conflicting values 0 and a.x (mismatched types int and struct):
+    ./struct.cue:2:8
+    ./struct.cue:13:11
+data.b: conflicting values 0 and a.x (mismatched types int and struct):
+    ./struct.cue:2:8
+    ./struct.cue:13:11

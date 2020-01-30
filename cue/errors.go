@@ -173,6 +173,9 @@ func (x *bottom) Positions(ctx *context) []token.Pos {
 }
 
 func appendPositions(ctx *context, pos []token.Pos, src source) []token.Pos {
+	if len(pos) > 15 {
+		return pos
+	}
 	if src != nil {
 		if p := src.Pos(); p != token.NoPos {
 			pos = append(pos, src.Pos())

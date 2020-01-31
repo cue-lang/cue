@@ -310,7 +310,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 	case *valueError:
 		return v.err
 	}
-	return convert(ctx, x, false, call.ret)
+	return convert(ctx, x, true, call.ret)
 }
 
 // callCtxt is passed to builtin implementations.

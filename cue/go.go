@@ -38,8 +38,8 @@ import (
 // optimized.
 
 func init() {
-	internal.FromGoValue = func(runtime, x interface{}, allowDefault bool) interface{} {
-		return convertValue(runtime.(*Runtime), x, allowDefault)
+	internal.FromGoValue = func(runtime, x interface{}, nilIsTop bool) interface{} {
+		return convertValue(runtime.(*Runtime), x, nilIsTop)
 	}
 
 	internal.FromGoType = func(runtime, x interface{}) interface{} {
@@ -47,9 +47,9 @@ func init() {
 	}
 }
 
-func convertValue(r *Runtime, x interface{}, allowDefault bool) Value {
+func convertValue(r *Runtime, x interface{}, nilIsTop bool) Value {
 	ctx := r.index().newContext()
-	v := convert(ctx, baseValue{}, allowDefault, x)
+	v := convert(ctx, baseValue{}, nilIsTop, x)
 	return newValueRoot(ctx, v)
 }
 
@@ -189,23 +189,30 @@ func isZero(v reflect.Value) bool {
 	}
 }
 
-func convert(ctx *context, src source, allowDefault bool, x interface{}) evaluated {
-	v := convertRec(ctx, src, allowDefault, x)
+func convert(ctx *context, src source, nilIsTop bool, x interface{}) evaluated {
+	v := convertRec(ctx, src, nilIsTop, x)
 	if v == nil {
 		return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", v)
 	}
 	return v
 }
 
-func convertRec(ctx *context, src source, allowDefault bool, x interface{}) evaluated {
+func isNil(x reflect.Value) bool {
+	switch x.Kind() {
+	// Only check for supported types; ignore func and chan.
+	case reflect.Ptr, reflect.Map, reflect.Slice, reflect.Interface:
+		return x.IsNil()
+	}
+	return false
+}
+
+func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluated {
 	switch v := x.(type) {
 	case nil:
-		if !allowDefault {
-			return &nullLit{src.base()}
+		if nilIsTop {
+			return &top{src.base()}
 		}
-		// Interpret a nil pointer as an undefined value that is only
-		// null by default, but may still be set: *null | _.
-		return makeNullable(&top{src.base()}, false).(evaluated)
+		return &nullLit{src.base()}
 
 	case ast.Expr:
 		x := newVisitorCtx(ctx, nil, nil, nil, false)
@@ -302,7 +309,7 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 
 	case reflect.Value:
 		if v.CanInterface() {
-			return convertRec(ctx, src, allowDefault, v.Interface())
+			return convertRec(ctx, src, nilIsTop, v.Interface())
 		}
 
 	default:
@@ -328,19 +335,16 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 			return toUint(ctx, src, value.Uint())
 
 		case reflect.Float32, reflect.Float64:
-			return convertRec(ctx, src, allowDefault, value.Float())
+			return convertRec(ctx, src, nilIsTop, value.Float())
 
 		case reflect.Ptr:
 			if value.IsNil() {
-				if !allowDefault {
-					return &nullLit{src.base()}
+				if nilIsTop {
+					return &top{src.base()}
 				}
-				// Interpret a nil pointer as an undefined value that is only
-				// null by default, but may still be set: *null | _.
-				elem := goTypeToValue(ctx, false, reflect.TypeOf(v).Elem())
-				return makeNullable(elem, false).(evaluated)
+				return &nullLit{src.base()}
 			}
-			return convertRec(ctx, src, allowDefault, value.Elem().Interface())
+			return convertRec(ctx, src, nilIsTop, value.Elem().Interface())
 
 		case reflect.Struct:
 			obj := newStruct(src)
@@ -351,10 +355,13 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 					continue
 				}
 				val := value.Field(i)
+				if !nilIsTop && isNil(val) {
+					continue
+				}
 				if isOmitEmpty(&t) && isZero(val) {
 					continue
 				}
-				sub := convertRec(ctx, src, allowDefault, val.Interface())
+				sub := convertRec(ctx, src, nilIsTop, val.Interface())
 				if sub == nil {
 					// mimic behavior of encoding/json: skip fields of unsupported types
 					continue
@@ -388,12 +395,12 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 				reflect.Uint, reflect.Uint8, reflect.Uint16,
 				reflect.Uint32, reflect.Uint64, reflect.Uintptr:
 				for _, k := range value.MapKeys() {
-					s := fmt.Sprint(k)
-					keys = append(keys, s)
-					sorted = append(sorted, s)
+					val := value.MapIndex(k)
+					// if isNil(val) {
+					// 	continue
+					// }
 
-					val := value.MapIndex(k).Interface()
-					sub := convertRec(ctx, src, allowDefault, val)
+					sub := convertRec(ctx, src, nilIsTop, val.Interface())
 					// mimic behavior of encoding/json: report error of
 					// unsupported type.
 					if sub == nil {
@@ -402,6 +409,10 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 					if isBottom(sub) {
 						return sub
 					}
+
+					s := fmt.Sprint(k)
+					keys = append(keys, s)
+					sorted = append(sorted, s)
 
 					// Set feature later.
 					obj.arcs = append(obj.arcs, arc{feature: 0, v: sub})
@@ -428,8 +439,8 @@ func convertRec(ctx *context, src source, allowDefault bool, x interface{}) eval
 			list := &list{baseValue: src.base()}
 			arcs := []arc{}
 			for i := 0; i < value.Len(); i++ {
-				val := value.Index(i).Interface()
-				x := convertRec(ctx, src, allowDefault, val)
+				val := value.Index(i)
+				x := convertRec(ctx, src, nilIsTop, val.Interface())
 				if x == nil {
 					return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", val)
 				}

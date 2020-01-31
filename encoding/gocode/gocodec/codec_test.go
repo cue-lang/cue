@@ -20,6 +20,7 @@ import (
 	"testing"
 
 	"github.com/google/go-cmp/cmp"
+	"github.com/kr/pretty"
 
 	"cuelang.org/go/cue"
 )
@@ -219,7 +220,7 @@ func TestComplete(t *testing.T) {
 			err = codec.Complete(v, tc.value)
 			checkErr(t, err, tc.err)
 			if !reflect.DeepEqual(tc.value, tc.result) {
-				t.Errorf("value:\n got: %#v;\nwant: %#v", tc.value, tc.result)
+				t.Error(pretty.Diff(tc.value, tc.result))
 			}
 		})
 	}

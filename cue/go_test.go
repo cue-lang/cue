@@ -37,7 +37,7 @@ func TestConvert(t *testing.T) {
 		goVal interface{}
 		want  string
 	}{{
-		nil, "(null | _)",
+		nil, "_",
 	}, {
 		true, "true",
 	}, {
@@ -85,7 +85,17 @@ func TestConvert(t *testing.T) {
 	}, {
 		[]int{1, 2, 3, 4}, "[1,2,3,4]",
 	}, {
+		struct {
+			A int
+			B *int
+		}{3, nil},
+		"<0>{A: 3}",
+	}, {
 		[]interface{}{}, "[]",
+	}, {
+		[]interface{}{nil}, "[_]",
+	}, {
+		map[string]interface{}{"a": 1, "x": nil}, "<0>{x: _, a: 1}",
 	}, {
 		map[string][]int{
 			"a": []int{1},
@@ -124,7 +134,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		&struct{ A int }{3}, "<0>{A: 3}",
 	}, {
-		(*struct{ A int })(nil), "(null | <0>{A: (int & >=-9223372036854775808 & int & <=9223372036854775807)})",
+		(*struct{ A int })(nil), "_",
 	}, {
 		reflect.ValueOf(3), "3",
 	}, {

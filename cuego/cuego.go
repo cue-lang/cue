@@ -171,12 +171,12 @@ func init() {
 }
 
 // fromGoValue converts a Go value to CUE
-func fromGoValue(x interface{}, allowDefault bool) (v cue.Value, err error) {
+func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {
 	// TODO: remove the need to have a lock here. We could use a new index (new
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v = internal.FromGoValue(runtime, x, allowDefault).(cue.Value)
+	v = internal.FromGoValue(runtime, x, nilIsNull).(cue.Value)
 	mutex.Unlock()
 	if err := v.Err(); err != nil {
 		return v, err

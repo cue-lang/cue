@@ -1,8 +1,11 @@
 package cmd
 
 import (
+	"bufio"
 	"bytes"
+	"context"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"path"
 	"path/filepath"
@@ -57,6 +60,59 @@ func TestScript(t *testing.T) {
 		Dir:           "testdata/script",
 		UpdateScripts: *update,
 	})
+}
+
+// TestScriptDebug takes a single testscript file and then runs it within the
+// same process so it can be used for debugging. It runs the first cue command
+// it finds.
+//
+// Usage Comment out t.Skip() and set file to test.
+func TestX(t *testing.T) {
+	t.Skip()
+	const path = "./testdata/script/help_hello.txt"
+
+	check := func(err error) {
+		t.Helper()
+		if err != nil {
+			t.Fatal(err)
+		}
+	}
+
+	tmpdir, err := ioutil.TempDir("", "cue-script")
+	check(err)
+	defer os.Remove(tmpdir)
+
+	a, err := txtar.ParseFile(filepath.FromSlash(path))
+	check(err)
+
+	for _, f := range a.Files {
+		name := filepath.Join(tmpdir, f.Name)
+		check(os.MkdirAll(filepath.Dir(name), 0777))
+		check(ioutil.WriteFile(name, f.Data, 0666))
+	}
+
+	cwd, err := os.Getwd()
+	check(err)
+	defer os.Chdir(cwd)
+	_ = os.Chdir(tmpdir)
+
+	for s := bufio.NewScanner(bytes.NewReader(a.Comment)); s.Scan(); {
+		cmd := s.Text()
+		cmd = strings.TrimLeft(cmd, "! ")
+		if !strings.HasPrefix(cmd, "cue ") {
+			continue
+		}
+
+		c, err := New(strings.Split(cmd, " ")[1:])
+		check(err)
+		b := &bytes.Buffer{}
+		c.SetOutput(b)
+		err = c.Run(context.Background())
+		// Always create an error to show
+		t.Error(err, "\n", b.String())
+		return
+	}
+	t.Fatal("NO COMMAND FOUND")
 }
 
 func TestMain(m *testing.M) {

@@ -93,6 +93,9 @@ text    output as raw text
 	flagMedia.Add(cmd)
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 
+	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
+		"set the value of a tagged field")
+
 	return cmd
 }
 

@@ -30,6 +30,7 @@ const (
 	flagSimplify flagName = "simplify"
 	flagPackage  flagName = "package"
 	flagDebug    flagName = "debug"
+	flagTags     flagName = "tags"
 
 	flagExpression flagName = "expression"
 	flagEscape     flagName = "escape"

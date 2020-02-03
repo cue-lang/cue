@@ -1,0 +1,18 @@
+cue eval -t env=staging -t name=bar
+cmp stdout expect-stdout
+
+-- expect-stdout --
+var: {
+    name: "bar"
+    env:  "staging"
+}
+-- tags.cue --
+package tags
+
+
+var: env: "prod" | "staging" @tag(env,short=prod|staging)
+var: name: string @tag(name)
+
+// This is prohibited as for now.
+// foo: [string]: string @tag(all)
+// foo: bar: string

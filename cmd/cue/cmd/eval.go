@@ -68,6 +68,9 @@ Examples:
 	cmd.Flags().BoolP(string(flagAll), "a", false,
 		"show optional and hidden fields")
 
+	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
+		"set the value of a tagged field")
+
 	// TODO: Option to include comments in output.
 	return cmd
 }

@@ -82,6 +82,9 @@ func newVetCmd(c *Command) *cobra.Command {
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil,
 		"use this expression to validate non-CUE files")
 
+	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
+		"set the value of a tagged field")
+
 	return cmd
 }
 
@@ -90,6 +93,7 @@ func doVet(cmd *Command, args []string) error {
 	if builds == nil {
 		return nil
 	}
+	decorateInstances(cmd, flagTags.StringArray(cmd), builds)
 	instances := buildInstances(cmd, builds)
 
 	// Go into a special vet mode if the user explicitly specified non-cue

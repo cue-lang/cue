@@ -225,10 +225,10 @@ func New(args []string) (cmd *Command, err error) {
 
 	cmd = newRootCmd()
 	rootCmd := cmd.root
-	rootCmd.SetArgs(args)
 	if len(args) == 0 {
 		return cmd, nil
 	}
+	rootCmd.SetArgs(args)
 
 	var sub = map[string]*subSpec{
 		"cmd": {commandSection, cmd.cmd},
@@ -238,13 +238,26 @@ func New(args []string) (cmd *Command, err error) {
 
 	if args[0] == "help" {
 		// Allow errors.
-		_ = addSubcommands(cmd, sub, args[1:])
+		_ = addSubcommands(cmd, sub, args[1:], true)
 		return cmd, nil
 	}
 
 	if _, ok := sub[args[0]]; ok {
-		return cmd, addSubcommands(cmd, sub, args)
+		return cmd, addSubcommands(cmd, sub, args, false)
 	}
+
+	// TODO: clean this up once we either use Cobra properly or when we remove
+	// it.
+	err = cmd.cmd.ParseFlags(args)
+	if err != nil {
+		return nil, err
+	}
+	tags, err := cmd.cmd.Flags().GetStringArray(string(flagTags))
+	if err != nil {
+		return nil, err
+	}
+	args = cmd.cmd.Flags().Args()
+	rootCmd.SetArgs(args)
 
 	if c, _, err := rootCmd.Find(args); err == nil && c != nil {
 		return cmd, nil
@@ -254,7 +267,7 @@ func New(args []string) (cmd *Command, err error) {
 		return cmd, nil // Forces unknown command message from Cobra.
 	}
 
-	tools, err := buildTools(cmd, args[1:])
+	tools, err := buildTools(cmd, tags, args[1:])
 	if err != nil {
 		return cmd, err
 	}
@@ -276,10 +289,25 @@ type subSpec struct {
 	cmd  *cobra.Command
 }
 
-func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error {
+func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string, isHelp bool) error {
+	var tags []string
 	if len(args) > 0 {
 		if _, ok := sub[args[0]]; ok {
+			oldargs := []string{args[0]}
 			args = args[1:]
+
+			if !isHelp {
+				err := cmd.cmd.ParseFlags(args)
+				if err != nil {
+					return err
+				}
+				tags, err = cmd.cmd.Flags().GetStringArray(string(flagTags))
+				if err != nil {
+					return err
+				}
+				args = cmd.cmd.Flags().Args()
+				cmd.root.SetArgs(append(oldargs, args...))
+			}
 		}
 	}
 
@@ -290,7 +318,7 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string) error 
 		args = args[1:]
 	}
 
-	tools, err := buildTools(cmd, args)
+	tools, err := buildTools(cmd, tags, args)
 	if err != nil {
 		return err
 	}

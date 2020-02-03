@@ -1,0 +1,19 @@
+cue cmd -t prod -t name=bar tag tags.cue tags_tool.cue
+cmp stdout expect-stdout
+
+-- expect-stdout --
+prod: bar
+-- tags.cue --
+package tags
+
+var: env: "prod" | "staging" @tag(env,short=prod|staging)
+var: name: string  @tag(name)
+
+-- tags_tool.cue --
+package tags
+
+import "tool/cli"
+
+command: tag: cli.Print & {
+    text: "\(var.env): \(var.name)"
+}

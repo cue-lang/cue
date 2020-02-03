@@ -290,6 +290,15 @@ func (a *Attribute) Pos() token.Pos  { return a.At }
 func (a *Attribute) pos() *token.Pos { return &a.At }
 func (a *Attribute) End() token.Pos  { return a.At.Add(len(a.Text)) }
 
+func (a *Attribute) Split() (key, body string) {
+	s := a.Text
+	p := strings.IndexByte(s, '(')
+	if p < 0 || !strings.HasPrefix(s, "@") || !strings.HasSuffix(s, ")") {
+		return "", ""
+	}
+	return a.Text[1:p], a.Text[p+1 : len(s)-1]
+}
+
 // A Field represents a field declaration in a struct.
 type Field struct {
 	Label    Label // must have at least one element.

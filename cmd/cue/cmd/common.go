@@ -104,6 +104,7 @@ func buildFromArgs(cmd *Command, args []string) []*cue.Instance {
 	if binst == nil {
 		return nil
 	}
+	decorateInstances(cmd, flagTags.StringArray(cmd), binst)
 	return buildInstances(cmd, binst)
 }
 
@@ -112,6 +113,7 @@ func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instan
 	if len(binst) == 0 {
 		return nil
 	}
+
 	return binst
 }
 
@@ -125,6 +127,8 @@ func buildInstances(cmd *Command, binst []*build.Instance) []*cue.Instance {
 		// duplicates are removed.
 		exitIfErr(cmd, inst, inst.Err, true)
 	}
+
+	decorateInstances(cmd, flagTags.StringArray(cmd), binst)
 
 	if flagIgnore.Bool(cmd) {
 		return instances
@@ -156,12 +160,11 @@ func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance,
 	return instances, nil
 }
 
-func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
+func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 	binst := loadFromArgs(cmd, args, &load.Config{Tools: true})
 	if len(binst) == 0 {
 		return nil, nil
 	}
-
 	included := map[string]bool{}
 
 	ti := binst[0].Context().NewInstance(binst[0].Root, nil)
@@ -173,6 +176,7 @@ func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 			}
 		}
 	}
+	decorateInstances(cmd, tags, append(binst, ti))
 
 	insts, err := buildToolInstances(cmd, binst)
 	if err != nil {

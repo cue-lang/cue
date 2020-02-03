@@ -24,8 +24,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/cli"
 	"cuelang.org/go/internal/task"
 )
 
@@ -205,70 +204,7 @@ func validateEntry(name string, v cue.Value) error {
 	return nil
 }
 
-func fromString(name, str string, v cue.Value) (x interface{}, err error) {
+func fromString(name, str string, v cue.Value) (x ast.Node, err error) {
 	k := v.IncompleteKind()
-
-	var expr ast.Expr
-	var errs errors.Error
-
-	if k&cue.NumberKind != 0 {
-		expr, err = parser.ParseExpr(name, str)
-		if err != nil {
-			errs = errors.Wrapf(err, v.Pos(),
-				"invalid number for environment variable %s", name)
-		}
-	}
-
-	if k&cue.BoolKind != 0 {
-		str = strings.TrimSpace(str)
-		b, ok := boolValues[str]
-		if !ok {
-			errors.Append(errs, errors.Newf(v.Pos(),
-				"invalid boolean value %q for environment variable %s", str, name))
-		} else if expr != nil || k&cue.StringKind != 0 {
-			// Convert into an expression
-			bl := ast.NewBool(b)
-			if expr != nil {
-				expr = &ast.BinaryExpr{Op: token.OR, X: expr, Y: bl}
-			} else {
-				expr = bl
-			}
-		} else {
-			x = b
-		}
-	}
-
-	if k&cue.StringKind != 0 {
-		if expr != nil {
-			expr = &ast.BinaryExpr{Op: token.OR, X: expr, Y: ast.NewString(str)}
-		} else {
-			x = str
-		}
-	}
-
-	switch {
-	case expr != nil:
-		return expr, nil
-	case x != nil:
-		return x, nil
-	case errs == nil:
-		return nil, errors.Newf(v.Pos(),
-			"invalid type for environment variable %s", name)
-	}
-	return nil, errs
-}
-
-var boolValues = map[string]bool{
-	"1":     true,
-	"0":     false,
-	"t":     true,
-	"f":     false,
-	"T":     true,
-	"F":     false,
-	"true":  true,
-	"false": false,
-	"TRUE":  true,
-	"FALSE": false,
-	"True":  true,
-	"False": false,
+	return cli.ParseValue(v.Pos(), name, str, k)
 }

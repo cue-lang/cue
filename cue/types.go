@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // Kind determines the underlying type of a Value.
@@ -1804,95 +1805,55 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 // The returned attribute will return an error for any of its methods if there
 // is no attribute for the requested key.
 func (v Value) Attribute(key string) Attribute {
-	const msgNotExist = "attribute %q does not exist"
 	// look up the attributes
 	if v.path == nil || v.path.attrs == nil {
-		return Attribute{err: errors.Newf(token.NoPos, msgNotExist, key)}
+		return Attribute{internal.NewNonExisting(key)}
 	}
 	for _, a := range v.path.attrs.attr {
 		if a.key() != key {
 			continue
 		}
-		at := Attribute{}
-		if err := parseAttrBody(v.ctx(), nil, a.body(), &at.attr); err != nil {
-			return Attribute{err: v.toErr(err)}
-		}
-		return at
+		return Attribute{internal.ParseAttrBody(token.NoPos, a.body())}
 	}
-	return Attribute{err: errors.Newf(token.NoPos, msgNotExist, key)}
+	return Attribute{internal.NewNonExisting(key)}
 }
 
 // An Attribute contains meta data about a field.
 type Attribute struct {
-	attr parsedAttr
-	err  error
+	attr internal.Attr
 }
 
 // Err returns the error associated with this Attribute or nil if this
 // attribute is valid.
 func (a *Attribute) Err() error {
-	return a.err
-}
-
-func (a *Attribute) hasPos(p int) error {
-	if a.err != nil {
-		return a.err
-	}
-	if p >= len(a.attr.fields) {
-		return fmt.Errorf("field does not exist")
-	}
-	return nil
+	return a.attr.Err
 }
 
 // String reports the possibly empty string value at the given position or
 // an error the attribute is invalid or if the position does not exist.
 func (a *Attribute) String(pos int) (string, error) {
-	if err := a.hasPos(pos); err != nil {
-		return "", err
-	}
-	return a.attr.fields[pos].text(), nil
+	return a.attr.String(pos)
 }
 
 // Int reports the integer at the given position or an error if the attribute is
 // invalid, the position does not exist, or the value at the given position is
 // not an integer.
 func (a *Attribute) Int(pos int) (int64, error) {
-	if err := a.hasPos(pos); err != nil {
-		return 0, err
-	}
-	// TODO: use CUE's literal parser once it exists, allowing any of CUE's
-	// number types.
-	return strconv.ParseInt(a.attr.fields[pos].text(), 10, 64)
+	return a.attr.Int(pos)
 }
 
 // Flag reports whether an entry with the given name exists at position pos or
 // onwards or an error if the attribute is invalid or if the first pos-1 entries
 // are not defined.
 func (a *Attribute) Flag(pos int, key string) (bool, error) {
-	if err := a.hasPos(pos - 1); err != nil {
-		return false, err
-	}
-	for _, kv := range a.attr.fields[pos:] {
-		if kv.text() == key {
-			return true, nil
-		}
-	}
-	return false, nil
+	return a.attr.Flag(pos, key)
 }
 
 // Lookup searches for an entry of the form key=value from position pos onwards
 // and reports the value if found. It reports an error if the attribute is
 // invalid or if the first pos-1 entries are not defined.
 func (a *Attribute) Lookup(pos int, key string) (val string, found bool, err error) {
-	if err := a.hasPos(pos - 1); err != nil {
-		return "", false, err
-	}
-	for _, kv := range a.attr.fields[pos:] {
-		if kv.key() == key {
-			return kv.value(), true, nil
-		}
-	}
-	return "", false, nil
+	return a.attr.Lookup(pos, key)
 }
 
 // Expr reports the operation of the underlying expression and the values it

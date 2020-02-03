@@ -19,7 +19,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/internal"
 )
 
 // This file includes functionality for parsing attributes.
@@ -58,8 +58,8 @@ func createAttrs(ctx *context, src source, attrs []*ast.Attribute) (a *attribute
 		}
 		as = append(as, attr{a.Text[:n], index})
 
-		if err := parseAttrBody(ctx, src, a.Text[index+1:n-1], nil); err != nil {
-			return nil, err
+		if err := internal.ParseAttrBody(src.Pos(), a.Text[index+1:n-1]).Err; err != nil {
+			return nil, ctx.mkErr(newNode(a), err)
 		}
 	}
 
@@ -130,99 +130,3 @@ type keyValue struct {
 func (kv *keyValue) text() string  { return kv.data }
 func (kv *keyValue) key() string   { return kv.data[:kv.equal] }
 func (kv *keyValue) value() string { return kv.data[kv.equal+1:] }
-
-func parseAttrBody(ctx *context, src source, s string, a *parsedAttr) (err *bottom) {
-	i := 0
-	for {
-		// always scan at least one, possibly empty element.
-		n, err := scanAttributeElem(ctx, src, s[i:], a)
-		if err != nil {
-			return err
-		}
-		if i += n; i >= len(s) {
-			break
-		}
-		if s[i] != ',' {
-			return ctx.mkErr(src, "invalid attribute: expected comma")
-		}
-		i++
-	}
-	return nil
-}
-
-func scanAttributeElem(ctx *context, src source, s string, a *parsedAttr) (n int, err *bottom) {
-	// try CUE string
-	kv := keyValue{}
-	if n, kv.data, err = scanAttributeString(ctx, src, s); n == 0 {
-		// try key-value pair
-		p := strings.IndexAny(s, ",=") // ) is assumed to be stripped.
-		switch {
-		case p < 0:
-			kv.data = s
-			n = len(s)
-
-		default: // ','
-			n = p
-			kv.data = s[:n]
-
-		case s[p] == '=':
-			kv.equal = p
-			offset := p + 1
-			var str string
-			if p, str, err = scanAttributeString(ctx, src, s[offset:]); p > 0 {
-				n = offset + p
-				kv.data = s[:offset] + str
-			} else {
-				n = len(s)
-				if p = strings.IndexByte(s[offset:], ','); p >= 0 {
-					n = offset + p
-				}
-				kv.data = s[:n]
-			}
-		}
-	}
-	if a != nil {
-		a.fields = append(a.fields, kv)
-	}
-	return n, err
-}
-
-func scanAttributeString(ctx *context, src source, s string) (n int, str string, err *bottom) {
-	if s == "" || (s[0] != '#' && s[0] != '"' && s[0] != '\'') {
-		return 0, "", nil
-	}
-
-	nHash := 0
-	for {
-		if nHash < len(s) {
-			if s[nHash] == '#' {
-				nHash++
-				continue
-			}
-			if s[nHash] == '\'' || s[nHash] == '"' {
-				break
-			}
-		}
-		return nHash, s[:nHash], ctx.mkErr(src, "invalid attribute string")
-	}
-
-	// Determine closing quote.
-	nQuote := 1
-	if c := s[nHash]; nHash+6 < len(s) && s[nHash+1] == c && s[nHash+2] == c {
-		nQuote = 3
-	}
-	close := s[nHash:nHash+nQuote] + s[:nHash]
-
-	// Search for closing quote.
-	index := strings.Index(s[len(close):], close)
-	if index == -1 {
-		return len(s), "", ctx.mkErr(src, "attribute string not terminated")
-	}
-
-	index += 2 * len(close)
-	s, err2 := literal.Unquote(s[:index])
-	if err2 != nil {
-		return index, "", ctx.mkErr(src, "invalid attribute string: %v", err2)
-	}
-	return index, s, nil
-}

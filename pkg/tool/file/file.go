@@ -107,5 +107,6 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	for i, s := range m {
 		m[i] = filepath.ToSlash(s)
 	}
-	return m, err
+	files := map[string]interface{}{"files": m}
+	return files, err
 }

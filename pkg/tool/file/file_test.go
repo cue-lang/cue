@@ -133,8 +133,7 @@ func TestGlob(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	if want := []string{"testdata/input.foo"}; !reflect.DeepEqual(got, want) {
+	if want := map[string]interface{}{"files": []string{"testdata/input.foo"}}; !reflect.DeepEqual(got, want) {
 		t.Errorf("got %v; want %v", got, want)
 	}
 }

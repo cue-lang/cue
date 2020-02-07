@@ -29,11 +29,9 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/encoding"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
@@ -125,13 +123,13 @@ Examples:
   }
 
   # include the parsed file at the root of the CUE file:
-  $ cue import -f -l "" foo.yaml
+  $ cue import -f foo.yaml
   $ cat foo.cue
   kind: Service
   name: booster
 
   # include the import config at the mystuff path
-  $ cue import -f -l mystuff foo.yaml
+  $ cue import -f -l '"mystuff"' foo.yaml
   $ cat foo.cue
   myStuff: {
       kind: Service
@@ -145,8 +143,8 @@ Examples:
   name: booster
   replicas: 1
 
-  # base the path values on th input
-  $ cue import -f -l '"\(strings.ToLower(kind))" "\(x.name)"' foo.yaml
+  # base the path values on the input
+  $ cue import -f -l 'strings.ToLower(kind)' -l name foo.yaml
   $ cat foo.cue
   service: booster: {
       kind: "Service"
@@ -154,7 +152,7 @@ Examples:
   }
 
   # base the path values on the input and file name
-  $ cue import -f --with-context -l '"\(path.Base(filename))" "\(data.kind)"' foo.yaml
+  $ cue import -f --with-context -l 'path.Base(filename)' -l data.kind foo.yaml
   $ cat foo.cue
   "foo.yaml": Service: {
       kind: "Service"
@@ -167,7 +165,7 @@ Examples:
       replicas: 1
   }
 
-  # base the path values on th input
+  # include all files as list elements
   $ cue import -f -list -foo.yaml
   $ cat foo.cue
   [{
@@ -179,8 +177,8 @@ Examples:
       replicas: 1
   }]
 
-  # base the path values on th input
-  $ cue import -f -list -l '"\(strings.ToLower(kind))"' foo.yaml
+  # collate files with the same path into a list
+  $ cue import -f -list -l 'strings.ToLower(kind)' foo.yaml
   $ cat foo.cue
   service: [{
       kind: "Service"
@@ -230,7 +228,7 @@ Example:
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 
-	cmd.Flags().StringP(string(flagPath), "l", "", "path to include root")
+	cmd.Flags().StringArrayP(string(flagPath), "l", nil, "CUE expression for single path component")
 	cmd.Flags().Bool(string(flagList), false, "concatenate multiple objects into a list")
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
@@ -397,7 +395,7 @@ func processStream(cmd *Command, pkg, filename string, objs []ast.Expr) error {
 		}
 		return nil
 	} else if len(objs) > 1 {
-		if !flagList.Bool(cmd) && flagPath.String(cmd) == "" && !flagFiles.Bool(cmd) {
+		if !flagList.Bool(cmd) && len(flagPath.StringArray(cmd)) == 0 && !flagFiles.Bool(cmd) {
 			return fmt.Errorf("list, flag, or files flag needed to handle multiple objects in file %q", filename)
 		}
 	}
@@ -456,7 +454,7 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 		var pathElems []ast.Label
 
 		switch {
-		case flagPath.String(cmd) != "":
+		case len(flagPath.StringArray(cmd)) > 0:
 			expr := expr
 			if flagWithContext.Bool(cmd) {
 				expr = ast.NewStruct(
@@ -471,25 +469,17 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 				return err
 			}
 
-			labels, err := parsePath(flagPath.String(cmd))
-			if err != nil {
-				return err
-			}
-			for _, l := range labels {
-				switch x := l.(type) {
-				case *ast.Interpolation:
-					v := inst.Eval(x)
-					if v.Kind() == cue.BottomKind {
-						return v.Err()
-					}
-					pathElems = append(pathElems, v.Syntax().(ast.Label))
-
-				case *ast.Ident, *ast.BasicLit:
-					pathElems = append(pathElems, x)
-
-				case *ast.TemplateLabel:
-					return fmt.Errorf("template labels not supported in path flag")
+			for _, str := range flagPath.StringArray(cmd) {
+				l, err := parser.ParseExpr("<path flag>", str)
+				if err != nil {
+					return fmt.Errorf(`labels are of form "cue import -l foo -l 'strings.ToLower(bar)'": %v`, err)
 				}
+
+				str, err := inst.Eval(l).String()
+				if err != nil {
+					return fmt.Errorf("unsupported label path type: %v", err)
+				}
+				pathElems = append(pathElems, ast.NewString(str))
 			}
 		}
 
@@ -585,40 +575,6 @@ func (x *listIndex) label(label ast.Label) *listIndex {
 		x.index[key] = idx
 	}
 	return idx
-}
-
-func parsePath(exprs string) (p []ast.Label, err error) {
-	f, err := parser.ParseFile("<path flag>", exprs+": _")
-	if err != nil {
-		return nil, fmt.Errorf("parser error in path %q: %v", exprs, err)
-	}
-
-	if len(f.Decls) != 1 {
-		return nil, errors.New("path flag must be a space-separated sequence of labels")
-	}
-
-	for d := f.Decls[0]; ; {
-		field, ok := d.(*ast.Field)
-		if !ok {
-			// This should never happen
-			return nil, errors.New("%q not a sequence of labels")
-		}
-
-		p = append(p, field.Label)
-
-		v, ok := field.Value.(*ast.StructLit)
-		if !ok {
-			break
-		}
-
-		if len(v.Elts) != 1 {
-			// This should never happen
-			return nil, errors.New("path value may not contain a struct")
-		}
-
-		d = v.Elts[0]
-	}
-	return p, nil
 }
 
 func newName(filename string, i int) string {

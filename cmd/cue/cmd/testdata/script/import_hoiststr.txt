@@ -1,4 +1,4 @@
-cue import -o - -f --list -l '"\(strings.ToLower(kind))" "\(name)"' --recursive ./import
+cue import -o - -f --list -l 'strings.ToLower(kind)' -l name --recursive ./import
 cmp stdout expect-stdout
 -- expect-stdout --
 import json656e63 "encoding/json"

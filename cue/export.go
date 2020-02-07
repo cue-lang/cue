@@ -125,7 +125,7 @@ func (p *exporter) label(f label) ast.Label {
 	orig := p.ctx.labelStr(f)
 	str := strconv.Quote(orig)
 	if len(orig)+2 < len(str) || (strings.HasPrefix(orig, "_") && f&1 == 0) {
-		return &ast.BasicLit{Value: str}
+		return ast.NewLit(token.STRING, str)
 	}
 	for i, r := range orig {
 		if unicode.IsLetter(r) || r == '_' || r == '$' {
@@ -134,7 +134,7 @@ func (p *exporter) label(f label) ast.Label {
 		if i > 0 && unicode.IsDigit(r) {
 			continue
 		}
-		return &ast.BasicLit{Value: str}
+		return ast.NewLit(token.STRING, str)
 	}
 	return &ast.Ident{Name: orig}
 }

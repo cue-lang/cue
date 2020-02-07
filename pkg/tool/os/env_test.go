@@ -104,14 +104,14 @@ func TestGetenv(t *testing.T) {
 		},
 		"CUEOSTESTBI": &ast.BinaryExpr{
 			Op: token.OR,
-			X:  &ast.BasicLit{Kind: token.INT, Value: "1"},
+			X:  ast.NewLit(token.INT, "1"),
 			Y:  ast.NewBool(true),
 		},
 		"CUEOSTESTNUM":  &ast.BasicLit{Kind: token.INT, Value: "34K"},
 		"CUEOSTESTNUMD": ast.NewString("not a num"),
 		"CUEOSTESTMULTI": &ast.BinaryExpr{
 			Op: token.OR,
-			X:  &ast.BasicLit{Kind: token.INT, Value: "10"},
+			X:  ast.NewLit(token.INT, "10"),
 			Y:  ast.NewString("10"),
 		},
 		"CUEOSTESTNULL": nil,

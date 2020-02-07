@@ -630,7 +630,7 @@ func (p *protoConverter) enum(x *proto.Enum) {
 			// Add enum value to map
 			f := &ast.Field{
 				Label: p.stringLit(y.Position, y.Name),
-				Value: &ast.BasicLit{Value: strconv.Itoa(y.Integer)},
+				Value: ast.NewLit(token.INT, strconv.Itoa(y.Integer)),
 			}
 			valueMap.Elts = append(valueMap.Elts, f)
 

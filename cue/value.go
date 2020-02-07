@@ -368,11 +368,7 @@ func (n *numLit) String() string {
 }
 
 func parseInt(k kind, s string) *numLit {
-	n := &ast.BasicLit{
-		Kind:  token.INT,
-		Value: s,
-	}
-	num := newInt(newExpr(n), 0)
+	num := newInt(newExpr(ast.NewLit(token.INT, s)), 0)
 	_, _, err := num.v.SetString(s)
 	if err != nil {
 		panic(err)
@@ -381,11 +377,7 @@ func parseInt(k kind, s string) *numLit {
 }
 
 func parseFloat(s string) *numLit {
-	n := &ast.BasicLit{
-		Kind:  token.FLOAT,
-		Value: s,
-	}
-	num := newFloat(newExpr(n), 0)
+	num := newFloat(newExpr(ast.NewLit(token.FLOAT, s)), 0)
 	_, _, err := num.v.SetString(s)
 	if err != nil {
 		panic(err)

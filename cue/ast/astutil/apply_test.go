@@ -184,7 +184,7 @@ d: "\(foo) is \(4)"
 						c.Replace(ast.NewIdent("s"))
 					}
 				case token.INT:
-					c.Replace(&ast.BasicLit{Kind: token.INT, Value: "4"})
+					c.Replace(ast.NewLit(token.INT, "4"))
 				}
 			}
 			return true

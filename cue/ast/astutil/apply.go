@@ -178,7 +178,7 @@ outer:
 			decls = a
 			info.current.decls = decls
 		}
-		path := &ast.BasicLit{Kind: token.STRING, Value: quoted}
+		path := ast.NewLit(token.STRING, quoted)
 		spec = &ast.ImportSpec{
 			Name: ast.NewIdent(name),
 			Path: path,

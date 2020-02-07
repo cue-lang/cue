@@ -239,18 +239,17 @@ func TestNodes(t *testing.T) {
 		out  string
 	}{{
 		name: "old-style octal numbers",
-		in:   &ast.BasicLit{Kind: token.INT, Value: "0123"},
+		in:   ast.NewLit(token.INT, "0123"),
 		out:  "0o123",
 	}, {
 		name: "labels with multi-line strings",
 		in: &ast.Field{
-			Label: &ast.BasicLit{
-				Kind: token.STRING,
-				Value: `"""
+			Label: ast.NewLit(token.STRING,
+				`"""
 					foo
 					bar
 					"""`,
-			},
+			),
 			Value: ast.NewIdent("goo"),
 		},
 		out: `"foo\nbar": goo`,

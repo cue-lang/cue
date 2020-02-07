@@ -21,6 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
+	"strconv"
 	"strings"
 	"sync"
 	"unicode"
@@ -70,7 +71,7 @@ Examples:
   $ cue import ./... -type=json
 
 
-The -path flag
+The --path flag
 
 By default the parsed files are included as emit values. This default can be
 overridden by specifying a sequence of labels as you would in a CUE file.
@@ -78,15 +79,32 @@ An identifier or string label are interpreted as usual. A label expression is
 evaluated within the context of the imported file. label expressions may also
 refer to builtin packages, which will be implicitly imported.
 
+The --with-context flag can be used to evaluate the label expression within
+a struct with the following fields:
+
+{
+	// data holds the original source data
+	// (perhaps one of several records in a file).
+	data: _
+	// filename holds the full path to the file.
+	filename: string
+	// index holds the 0-based index element of the
+	// record within the file. For files containing only
+	// one record, this will be 0.
+	index: uint & <recordCount
+	// recordCount holds the total number of records
+	// within the file.
+	recordCount: int & >=1
+}
 
 Handling multiple documents or streams
 
 To handle Multi-document files, such as concatenated JSON objects or
 YAML files with document separators (---) the user must specify either the
--path, -list, or -files flag. The -path flag assign each element to a path
+--path, --list, or --files flag. The -path flag assign each element to a path
 (identical paths are treated as usual); -list concatenates the entries, and
--files causes each entry to be written to a different file. The -files flag
-may only be used if files are explicitly imported. The -list flag may be
+--files causes each entry to be written to a different file. The -files flag
+may only be used if files are explicitly imported. The --list flag may be
 used in combination with the -path flag, concatenating each entry to the
 mapped location.
 
@@ -135,7 +153,15 @@ Examples:
       name: "booster"
   }
 
-  deployment: booster: {
+  # base the path values on the input and file name
+  $ cue import -f --with-context -l '"\(path.Base(filename))" "\(data.kind)"' foo.yaml
+  $ cat foo.cue
+  "foo.yaml": Service: {
+      kind: "Service"
+      name: "booster"
+  }
+
+  "foo.yaml": Deployment: {
       kind:     "Deployment"
       name:     "booster
       replicas: 1
@@ -208,6 +234,7 @@ Example:
 	cmd.Flags().Bool(string(flagList), false, "concatenate multiple objects into a list")
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
+	cmd.Flags().Bool(string(flagWithContext), false, "import as object with contextual data")
 
 	cmd.Flags().String("fix", "", "apply given fix")
 
@@ -217,8 +244,9 @@ Example:
 }
 
 const (
-	flagFiles     flagName = "files"
-	flagProtoPath flagName = "proto_path"
+	flagFiles       flagName = "files"
+	flagProtoPath   flagName = "proto_path"
+	flagWithContext flagName = "with-context"
 )
 
 type importStreamFunc func(path string, r io.Reader) ([]ast.Expr, error)
@@ -362,7 +390,7 @@ func processFile(cmd *Command, file *ast.File) (err error) {
 func processStream(cmd *Command, pkg, filename string, objs []ast.Expr) error {
 	if flagFiles.Bool(cmd) {
 		for i, f := range objs {
-			err := combineExpressions(cmd, pkg, newName(filename, i), f)
+			err := combineExpressions(cmd, pkg, filename, i, f)
 			if err != nil {
 				return err
 			}
@@ -373,13 +401,15 @@ func processStream(cmd *Command, pkg, filename string, objs []ast.Expr) error {
 			return fmt.Errorf("list, flag, or files flag needed to handle multiple objects in file %q", filename)
 		}
 	}
-	return combineExpressions(cmd, pkg, newName(filename, 0), objs...)
+	return combineExpressions(cmd, pkg, filename, 0, objs...)
 }
 
 // TODO: implement a more fine-grained approach.
 var mutex sync.Mutex
 
-func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) error {
+func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast.Expr) error {
+	cueFile := newName(filename, idx)
+
 	mutex.Lock()
 	defer mutex.Unlock()
 
@@ -420,13 +450,22 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 	}
 
 	index := newIndex()
-	for _, expr := range objs {
+	for i, expr := range objs {
 
 		// Compute a path different from root.
 		var pathElems []ast.Label
 
 		switch {
 		case flagPath.String(cmd) != "":
+			expr := expr
+			if flagWithContext.Bool(cmd) {
+				expr = ast.NewStruct(
+					"data", expr,
+					"filename", ast.NewString(filename),
+					"index", ast.NewLit(token.INT, strconv.Itoa(i)),
+					"recordCount", ast.NewLit(token.INT, strconv.Itoa(len(objs))),
+				)
+			}
 			inst, err := runtime.CompileExpr(expr)
 			if err != nil {
 				return err

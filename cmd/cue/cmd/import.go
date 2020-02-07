@@ -481,7 +481,7 @@ func combineExpressions(cmd *Command, pkg, cueFile string, objs ...ast.Expr) err
 			f.Decls = append(f.Decls, field)
 			for _, e := range pathElems[1:] {
 				newField := &ast.Field{Label: e}
-				newVal := &ast.StructLit{Elts: []ast.Decl{newField}}
+				newVal := ast.NewStruct(newField)
 				field.Value = newVal
 				field = newField
 			}

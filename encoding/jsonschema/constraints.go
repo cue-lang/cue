@@ -108,7 +108,7 @@ func addDefinitions(n cue.Value, s *state) {
 		}
 		f = &ast.Field{
 			Label: ast.NewIdent(rootDefs),
-			Value: &ast.StructLit{Elts: []ast.Decl{f}},
+			Value: ast.NewStruct(f),
 		}
 		ast.SetRelPos(f, token.NewSection)
 		s.definitions = append(s.definitions, f)
@@ -386,10 +386,7 @@ var constraints = []*constraint{
 	p0d("propertyNames", 6, func(n cue.Value, s *state) {
 		s.kind |= cue.StructKind
 		// [=~pattern]: _
-		s.add(&ast.StructLit{Elts: []ast.Decl{&ast.Field{
-			Label: ast.NewList(s.schema(n)),
-			Value: ast.NewIdent("_"),
-		}}})
+		s.add(ast.NewStruct(ast.NewList(s.schema(n)), ast.NewIdent("_")))
 	}),
 
 	p0("minProperties", func(n cue.Value, s *state) {

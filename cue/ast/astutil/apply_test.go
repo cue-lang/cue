@@ -116,12 +116,7 @@ everywhere: new
 				default:
 					c.InsertAfter(astutil.ApplyRecursively(&ast.Field{
 						Label: ast.NewIdent("iam"),
-						Value: &ast.StructLit{Elts: []ast.Decl{
-							&ast.Field{
-								Label: ast.NewIdent("here"),
-								Value: ast.NewIdent("new"),
-							},
-						}},
+						Value: ast.NewStruct(ast.NewIdent("here"), ast.NewIdent("new")),
 					}))
 				case "iam":
 					c.InsertAfter(&ast.Field{

@@ -34,13 +34,9 @@ func TestInvalidAST(t *testing.T) {
 		out  string
 	}{{
 		desc: "label sequence for definition",
-		node: &ast.Field{Label: ident("foo"), Value: &ast.StructLit{
-			Elts: []ast.Decl{&ast.Field{
-				Label: ident("bar"),
-				Token: token.ISA,
-				Value: &ast.StructLit{},
-			}},
-		}},
+		node: &ast.Field{Label: ident("foo"), Value: ast.NewStruct(
+			ident("bar"), token.ISA, &ast.StructLit{},
+		)},
 		// Force a new struct.
 		out: `foo: bar :: {
 }`,

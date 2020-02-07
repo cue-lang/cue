@@ -528,7 +528,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		name := p.ident(x.Position, x.Name)
 		f = &ast.Field{
 			Label: name,
-			Value: &ast.StructLit{Elts: []ast.Decl{f}},
+			Value: ast.NewStruct(f),
 		}
 		addComments(f, i, x.Comment, x.InlineComment)
 

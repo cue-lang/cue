@@ -226,9 +226,7 @@ func (s *state) finalize() (e ast.Expr) {
 				add(ast.NewList(&ast.Ellipsis{}))
 			}
 		case "object":
-			elps := &ast.Ellipsis{}
-			st := &ast.StructLit{Elts: []ast.Decl{elps}}
-			add(st)
+			add(ast.NewStruct(&ast.Ellipsis{}))
 		default:
 			s.errf(n, "unknown type %q", n)
 		}

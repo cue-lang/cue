@@ -4,6 +4,7 @@ cmp stdout expect-stdout
 -- expect-stdout --
 true
 
+SUCCESS
 -- after_tool.cue --
 package home
 
@@ -14,21 +15,25 @@ import (
 )
 
 command: after: {
-	t1: exec.Run & {
-		cmd: ["sh", "-c", "sleep 2; date +%s"]
-		stdout: string
-	}
-	t2: exec.Run & {
-		cmd: ["sh", "-c", "date +%s"]
-		stdout: string
-		$after: t1
+	group: {
+		t1: exec.Run & {
+			cmd: ["sh", "-c", "sleep 2; date +%s"]
+			stdout: string
+		}
+		t2: exec.Run & {
+			cmd: ["sh", "-c", "date +%s"]
+			stdout: string
+			$after: t1
+		}
 	}
 	t3: exec.Run & {
-		cmd: ["sh", "-c", "a=\(strings.TrimSpace(t1.stdout));b=\(strings.TrimSpace(t2.stdout));if [ $a -le $b ]; then echo 'true'; fi"]
+		cmd: ["sh", "-c", "a=\(strings.TrimSpace(group.t1.stdout));b=\(strings.TrimSpace(group.t2.stdout));if [ $a -le $b ]; then echo 'true'; fi"]
 		stdout: string
 	}
-	t4: cli.Print & {
-			text: t3.stdout
+	t4: cli.Print & { text: t3.stdout }
+	t5: cli.Print & {
+		text: "SUCCESS"
+		$after: [ group, t4 ]
 	}
 }
 

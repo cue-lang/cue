@@ -19,7 +19,6 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"errors"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -33,6 +32,7 @@ import (
 	"golang.org/x/sync/errgroup"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/walk"
@@ -129,7 +129,7 @@ func (r *customRunner) keyForTask(t *task) taskKey {
 }
 
 func keyForReference(ref ...string) (k taskKey) {
-	return taskKey(strings.Join(ref, "\000"))
+	return taskKey(strings.Join(ref, "\000") + "\000")
 }
 
 func (r *customRunner) taskPath(t *task) []string {
@@ -146,14 +146,38 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 	return err
 }
 
-func (r *customRunner) referredTask(ref cue.Value) (t *task, ok bool) {
+func (r *customRunner) tagReference(t *task, ref cue.Value) error {
 	inst, path := ref.Reference()
-	if path != nil && inst == r.root {
-		if task := r.findTask(path); task != nil {
-			return task, true
+	if len(path) == 0 {
+		return errors.Newf(ref.Pos(),
+			"$after must be a reference or list of references, found %s", ref)
+	}
+	if inst != r.root {
+		return errors.Newf(ref.Pos(),
+			"reference in $after must refer to value in same package")
+	}
+	// TODO: allow referring to group of tasks.
+	if !r.tagDependencies(t, path) {
+		return errors.Newf(ref.Pos(),
+			"reference %s does not refer to task or task group",
+			strings.Join(path, "."), // TODO: more correct representation.
+		)
+
+	}
+	return nil
+}
+
+// tagDependencies marks dependencies in t correpsoning to ref
+func (r *customRunner) tagDependencies(t *task, ref []string) bool {
+	found := false
+	prefix := keyForReference(ref...)
+	for key, task := range r.index {
+		if strings.HasPrefix(string(key), string(prefix)) {
+			found = true
+			t.dep[task] = true
 		}
 	}
-	return nil, false
+	return found
 }
 
 func (r *customRunner) findTask(ref []string) *task {
@@ -221,14 +245,15 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 		// Inject dependency in `$after` field
 		after := task.Lookup("$after")
 		if after.Err() == nil {
-			if dep, ok := cr.referredTask(after); ok {
-				t.dep[dep] = true
-			}
-			for iter, _ := after.List(); iter.Next(); {
-				if dep, ok := cr.referredTask(iter.Value()); ok {
-					t.dep[dep] = true
+			if after.Kind() != cue.ListKind {
+				err = cr.tagReference(t, after)
+			} else {
+				for iter, _ := after.List(); iter.Next(); {
+					err = cr.tagReference(t, iter.Value())
+					exitIfErr(cmd, inst, err, true)
 				}
 			}
+			exitIfErr(cmd, inst, err, true)
 		}
 
 		task.Walk(func(v cue.Value) bool {

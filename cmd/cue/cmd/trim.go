@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -22,7 +23,9 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/diff"
 	"cuelang.org/go/tools/trim"
 )
 
@@ -117,6 +120,8 @@ func runTrim(cmd *Command, args []string) error {
 		}
 	}
 
+	overlay := map[string]load.Source{}
+
 	for i, inst := range binst {
 		root := instances[i]
 		err := trim.Files(inst.Files, root, &trim.Config{
@@ -126,10 +131,35 @@ func runTrim(cmd *Command, args []string) error {
 			return err
 		}
 
-		if flagDryrun.Bool(cmd) {
-			continue
+		for _, f := range inst.Files {
+			overlay[f.Filename] = load.FromFile(f)
 		}
 
+	}
+
+	cfg := *defaultConfig
+	cfg.Overlay = overlay
+	tinsts := buildInstances(cmd, load.Instances(args, &cfg))
+	if len(tinsts) != len(binst) {
+		return errors.New("unexpected number of new instances")
+	}
+	if !flagIgnore.Bool(cmd) {
+		for i, p := range instances {
+			k, script := diff.Final.Diff(p.Value(), tinsts[i].Value())
+			if k != diff.Identity {
+				diff.Print(os.Stdout, script)
+				fmt.Println("Aborting trim, output differs after trimming. This is a bug! Use -i to force trim.")
+				fmt.Println("You can file a bug here: https://github.com/cuelang/cue/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=")
+				os.Exit(1)
+			}
+		}
+	}
+
+	if flagDryrun.Bool(cmd) {
+		return nil
+	}
+
+	for _, inst := range binst {
 		for _, f := range inst.Files {
 			filename := f.Filename
 

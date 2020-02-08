@@ -8,23 +8,26 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
-command: run: runBase & {
+command: run: RunBase & {
 	task: echo: cmd: "echo \(message)"
 }
 
 -- base_tool.cue --
 package home
 
+import (
+	"tool/cli"
+	"tool/exec"
+)
+
 // deliberately put in another file to test resolving top-level identifiers
 // in different files.
-runBase: {
-	task: echo: {
-		kind:   "exec"
+RunBase :: {
+	task: echo: exec.Run & {
 		stdout: string
 	}
 
-	task: display: {
-		kind: "print"
+	task: display: cli.Print & {
 		text: task.echo.stdout
 	}
 }

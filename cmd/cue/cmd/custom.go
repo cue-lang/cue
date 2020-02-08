@@ -124,20 +124,11 @@ type customRunner struct {
 type taskKey string
 
 func (r *customRunner) keyForTask(t *task) taskKey {
-	a := []string{commandSection, r.name}
-	return keyForReference(append(a, t.path...)...)
+	return keyForReference(t.path...)
 }
 
 func keyForReference(ref ...string) (k taskKey) {
 	return taskKey(strings.Join(ref, "\000") + "\000")
-}
-
-func (r *customRunner) taskPath(t *task) []string {
-	return append([]string{commandSection, r.name}, t.path...)
-}
-
-func (r *customRunner) lookupTasks() cue.Value {
-	return r.root.Lookup(commandSection, r.name)
 }
 
 func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
@@ -181,7 +172,7 @@ func (r *customRunner) tagDependencies(t *task, ref []string) bool {
 }
 
 func (r *customRunner) findTask(ref []string) *task {
-	for ; len(ref) > 2; ref = ref[:len(ref)-1] {
+	for ; len(ref) > 0; ref = ref[:len(ref)-1] {
 		if t := r.index[keyForReference(ref...)]; t != nil {
 			return t
 		}
@@ -207,8 +198,12 @@ func getTasks(q []*task, v cue.Value, stack []string) ([]*task, error) {
 	}
 
 	for iter, _ := v.Fields(); iter.Next(); {
+		l := iter.Label()
+		if strings.HasPrefix(l, "$") || l == "command" || l == "commands" {
+			continue
+		}
 		var err error
-		q, err = getTasks(q, iter.Value(), append(stack, iter.Label()))
+		q, err = getTasks(q, iter.Value(), append(stack, l))
 		if err != nil {
 			return nil, err
 		}
@@ -226,10 +221,10 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 		root:  inst,
 		index: map[taskKey]*task{},
 	}
-	tasks := cr.lookupTasks()
 
 	// Create task entries from spec.
-	queue, err := getTasks(nil, tasks, nil)
+	base := []string{commandSection, cr.name}
+	queue, err := getTasks(nil, cr.root.Lookup(base...), base)
 	if err != nil {
 		return err
 	}
@@ -240,7 +235,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 
 	// Mark dependencies for unresolved nodes.
 	for _, t := range queue {
-		task := tasks.Lookup(t.path...)
+		task := cr.root.Lookup(t.path...)
 
 		// Inject dependency in `$after` field
 		after := task.Lookup("$after")
@@ -300,7 +295,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			// code does not look up new strings in the index and that the
 			// full configuration, as used by the tasks, is pre-evaluated.
 			m.Lock()
-			obj := tasks.Lookup(t.path...)
+			obj := cr.root.Lookup(t.path...)
 			// NOTE: ignore the linter warning for the following line:
 			// itask.Context is an internal type and we want to break if any
 			// fields are added.
@@ -310,11 +305,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 				err = c.Err
 			}
 			if err == nil && update != nil {
-				cr.root, err = cr.root.Fill(update, cr.taskPath(t)...)
-
-				if err == nil {
-					tasks = cr.lookupTasks()
-				}
+				cr.root, err = cr.root.Fill(update, t.path...)
 			}
 			m.Unlock()
 
@@ -435,7 +426,7 @@ func newTask(index int, path []string, v cue.Value) (*task, error) {
 	return &task{
 		Runner: runner,
 		index:  index,
-		path:   path,
+		path:   append([]string{}, path...), // make a copy.
 		done:   make(chan error),
 		dep:    make(map[*task]bool),
 	}, nil

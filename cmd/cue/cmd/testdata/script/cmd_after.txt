@@ -2,6 +2,8 @@ cue cmd after
 cmp stdout expect-stdout
 
 -- expect-stdout --
+run also
+run
 true
 
 SUCCESS
@@ -14,11 +16,17 @@ import (
 	"strings"
 )
 
+top0: cli.Print & { text: "run also" }
+top1: cli.Print & { text: "run", $after: top0 }
+top2: cli.Print & { text: "don't run also" }
+top3: cli.Print & { text: "don't", $after: top2 }
+
 command: after: {
 	group: {
 		t1: exec.Run & {
 			cmd: ["sh", "-c", "sleep 2; date +%s"]
 			stdout: string
+			$after: top1
 		}
 		t2: exec.Run & {
 			cmd: ["sh", "-c", "date +%s"]

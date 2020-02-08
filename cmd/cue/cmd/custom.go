@@ -19,7 +19,6 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -118,7 +117,10 @@ type customRunner struct {
 	name string
 	root *cue.Instance
 
+	tasks []*task
 	index map[taskKey]*task
+
+	allErrors errors.Error
 }
 
 type taskKey string
@@ -135,6 +137,18 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 	err := executeTasks(cmd, typ, command, root)
 	exitIfErr(cmd, root, err, true)
 	return err
+}
+
+func (r *customRunner) insert(stack []string, v cue.Value) *task {
+	t, err := newTask(stack, v)
+	if err != nil {
+		r.allErrors = errors.Append(r.allErrors, err)
+		return nil
+	}
+	t.index = len(r.tasks)
+	r.tasks = append(r.tasks, t)
+	r.index[r.keyForTask(t)] = t
+	return t
 }
 
 func (r *customRunner) tagReference(t *task, ref cue.Value) error {
@@ -168,33 +182,54 @@ func (r *customRunner) tagDependencies(t *task, ref []string) bool {
 			t.dep[task] = true
 		}
 	}
-	return found
+	if found {
+		return true
+	}
+
+	v := r.root.Lookup(ref...)
+	if isTask(v) {
+		if task := r.insert(ref, v); task != nil {
+			t.dep[task] = true
+			return true
+		}
+	}
+
+	return false
 }
 
 func (r *customRunner) findTask(ref []string) *task {
-	for ; len(ref) > 0; ref = ref[:len(ref)-1] {
+	for ref := ref; len(ref) > 0; ref = ref[:len(ref)-1] {
 		if t := r.index[keyForReference(ref...)]; t != nil {
 			return t
+		}
+	}
+	for ref := ref; len(ref) > 0; ref = ref[:len(ref)-1] {
+		v := r.root.Lookup(ref...)
+		if isTask(v) {
+			return r.insert(ref, v)
 		}
 	}
 	return nil
 }
 
-func getTasks(q []*task, v cue.Value, stack []string) ([]*task, error) {
+func isTask(v cue.Value) bool {
+	return v.Kind() == cue.StructKind &&
+		(v.Lookup("$id").Exists() || v.Lookup("kind").Exists())
+}
+
+func (r *customRunner) getTasks(v cue.Value, stack []string) {
 	// Allow non-task values, but do not allow errors.
 	if err := v.Err(); err != nil {
-		return nil, err
+		r.allErrors = errors.Append(r.allErrors, errors.Promote(err, "getTasks"))
+		return
 	}
 	if v.Kind()&cue.StructKind == 0 {
-		return q, nil
+		return
 	}
 
-	if v.Lookup("$id").Exists() || v.Lookup("kind").Exists() {
-		t, err := newTask(len(q), stack, v)
-		if err != nil {
-			return nil, err
-		}
-		return append(q, t), nil
+	if isTask(v) {
+		_ = r.insert(stack, v)
+		return
 	}
 
 	for iter, _ := v.Fields(); iter.Next(); {
@@ -202,13 +237,11 @@ func getTasks(q []*task, v cue.Value, stack []string) ([]*task, error) {
 		if strings.HasPrefix(l, "$") || l == "command" || l == "commands" {
 			continue
 		}
-		var err error
-		q, err = getTasks(q, iter.Value(), append(stack, l))
-		if err != nil {
-			return nil, err
+		r.getTasks(iter.Value(), append(stack, l))
+		if r.allErrors != nil {
+			return
 		}
 	}
-	return q, nil
 }
 
 // executeTasks runs user-defined tasks as part of a user-defined command.
@@ -224,17 +257,16 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 
 	// Create task entries from spec.
 	base := []string{commandSection, cr.name}
-	queue, err := getTasks(nil, cr.root.Lookup(base...), base)
-	if err != nil {
-		return err
+	cr.getTasks(cr.root.Lookup(base...), base)
+	if cr.allErrors != nil {
+		return cr.allErrors
 	}
 
-	for _, t := range queue {
-		cr.index[cr.keyForTask(t)] = t
-	}
+	// Mark dependencies for unresolved nodes. Note that cr.tasks may grow
+	// during iteration, which is why we don't use range.
+	for i := 0; i < len(cr.tasks); i++ {
+		t := cr.tasks[i]
 
-	// Mark dependencies for unresolved nodes.
-	for _, t := range queue {
 		task := cr.root.Lookup(t.path...)
 
 		// Inject dependency in `$after` field
@@ -272,8 +304,11 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			return true
 		}, nil)
 	}
+	if cr.allErrors != nil {
+		return cr.allErrors
+	}
 
-	if isCyclic(queue) {
+	if isCyclic(cr.tasks) {
 		return errors.New("cyclic dependency in tasks") // TODO: better message.
 	}
 
@@ -284,7 +319,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 	var m sync.Mutex
 
 	g, ctx := errgroup.WithContext(ctx)
-	for _, t := range queue {
+	for _, t := range cr.tasks {
 		t := t
 		g.Go(func() error {
 			for d := range t.dep {
@@ -394,7 +429,7 @@ var legacyKinds = map[string]string{
 	"testserver": "cmd/cue/cmd.Test",
 }
 
-func newTask(index int, path []string, v cue.Value) (*task, error) {
+func newTask(path []string, v cue.Value) (*task, errors.Error) {
 	kind, err := v.Lookup("$id").String()
 	if err != nil {
 		// Lookup kind for backwards compatibility.
@@ -402,7 +437,7 @@ func newTask(index int, path []string, v cue.Value) (*task, error) {
 		var err1 error
 		kind, err1 = v.Lookup("kind").String()
 		if err1 != nil {
-			return nil, err
+			return nil, errors.Promote(err1, "newTask")
 		}
 	}
 	if k, ok := legacyKinds[kind]; ok {
@@ -410,22 +445,21 @@ func newTask(index int, path []string, v cue.Value) (*task, error) {
 	}
 	rf := itask.Lookup(kind)
 	if rf == nil {
-		return nil, fmt.Errorf("runner of kind %q not found", kind)
+		return nil, errors.Newf(v.Pos(), "runner of kind %q not found", kind)
 	}
 
 	// Verify entry against template.
 	v = internal.UnifyBuiltin(v, kind).(cue.Value)
 	if err := v.Err(); err != nil {
-		return nil, err
+		return nil, errors.Promote(err, "newTask")
 	}
 
 	runner, err := rf(v)
 	if err != nil {
-		return nil, err
+		return nil, errors.Promote(err, "errors running task")
 	}
 	return &task{
 		Runner: runner,
-		index:  index,
 		path:   append([]string{}, path...), // make a copy.
 		done:   make(chan error),
 		dep:    make(map[*task]bool),

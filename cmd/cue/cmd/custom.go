@@ -283,13 +283,23 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			exitIfErr(cmd, inst, err, true)
 		}
 
+		visited := make(map[string]bool)
 		task.Walk(func(v cue.Value) bool {
 			if v == task {
 				return true
 			}
-			if after.Err() == nil && v.Equals(after) {
-				return false
+
+			// Prevent inifinite walks
+			_, vPath := v.Reference()
+			if vPath != nil {
+				vPath := string(keyForReference(vPath...))
+				_, isVisited := visited[vPath]
+				if isVisited {
+					return false
+				}
+				visited[vPath] = true
 			}
+
 			for _, r := range appendReferences(nil, cr.root, v) {
 				if dep := cr.findTask(r); dep != nil && t != dep {
 					// TODO(string): consider adding dependencies

@@ -1,0 +1,33 @@
+! cue cmd cycle
+cmp stderr expect-stderr
+! cue cmd aftercycle
+cmp stderr expect-stderr
+cue cmd interlockedTasks
+cmp stdout interlocked-stdout
+
+-- expect-stderr --
+cyclic dependency in tasks
+-- interlocked-stdout --
+v
+v
+-- after_tool.cue --
+package home
+
+import (
+	"tool/cli"
+)
+
+command: interlockedTasks: {
+  t1: cli.Print & { text: ref.value, ref: t2, value: "v" }
+  t2: cli.Print & { text: ref.value, ref: t1, value: "v" }
+}
+
+command: aftercycle: {
+	t1: cli.Print & { $after: t2, text: "t1" }
+	t2: cli.Print & { $after: t1, text: "t2" }
+}
+
+command: cycle: {
+	t1: cli.Print & { text: t2.text }
+	t2: cli.Print & { text: t1.text }
+}

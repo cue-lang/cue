@@ -1050,10 +1050,20 @@ The value `string` matches all fields, while a concrete string matches a
 single field.
 As the latter case is common, a concrete label followed by
 a question mark `?` may be used as a shorthand.
-So `foo?: bar` is a shorthand for `["foo"]: bar`.
+So
+```
+foo?: bar
+```
+is a shorthand for
+```
+["foo"]: bar
+```
 The question mark is not part of the field name.
 The token `...` may be used as the last declaration in a struct
-and is a shorthand for `[_]: _`.
+and is a shorthand for
+```
+[_]: _
+```
 
 Concrete field labels may be an identifier or string, the latter of which may be
 interpolated.

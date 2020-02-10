@@ -9,7 +9,7 @@ description = ""
 CUE supports many common arithmetic and boolean operators.
 
 The operators for division and remainder are different for `int` and `float`.
-For `float` CUE supports the `/` and `%`  operators with the usual meaning.
+For `float` CUE supports the `/` operator with the usual meaning.
 For `int` CUE supports both Euclidean division (`div` and `mod`)
 and truncated division (`quo` and `rem`).
 

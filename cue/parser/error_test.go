@@ -42,8 +42,6 @@ import (
 	"cuelang.org/go/internal/source"
 )
 
-const testdata = "testdata"
-
 func getPos(f *token.File, offset int) token.Pos {
 	if f != nil {
 		return f.Pos(offset, 0)

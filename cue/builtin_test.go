@@ -24,12 +24,12 @@ import (
 
 func TestBuiltins(t *testing.T) {
 	test := func(pkg, expr string) []*bimport {
-		return []*bimport{&bimport{"",
+		return []*bimport{{"",
 			[]string{fmt.Sprintf("import %q\n(%s)", pkg, expr)},
 		}}
 	}
 	testExpr := func(expr string) []*bimport {
-		return []*bimport{&bimport{"",
+		return []*bimport{{"",
 			[]string{fmt.Sprintf("(%s)", expr)},
 		}}
 	}

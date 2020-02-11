@@ -15,7 +15,6 @@
 package load
 
 import (
-	"io"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -95,14 +94,6 @@ func TestShouldBuild(t *testing.T) {
 	if !reflect.DeepEqual(m, want3) {
 		t.Errorf("shouldBuild(file3) tags = %v, want %v", m, want3)
 	}
-}
-
-type readNopCloser struct {
-	io.Reader
-}
-
-func (r readNopCloser) Close() error {
-	return nil
 }
 
 var (

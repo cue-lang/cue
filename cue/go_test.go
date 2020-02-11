@@ -98,13 +98,13 @@ func TestConvert(t *testing.T) {
 		map[string]interface{}{"a": 1, "x": nil}, "<0>{x: _, a: 1}",
 	}, {
 		map[string][]int{
-			"a": []int{1},
-			"b": []int{3, 4},
+			"a": {1},
+			"b": {3, 4},
 		}, "<0>{a: [1], b: [3,4]}",
 	}, {
 		map[bool]int{}, "_|_(unsupported Go type for map key (bool))",
 	}, {
-		map[struct{}]int{struct{}{}: 2}, "_|_(unsupported Go type for map key (struct {}))",
+		map[struct{}]int{{}: 2}, "_|_(unsupported Go type for map key (struct {}))",
 	}, {
 		map[int]int{1: 2}, `<0>{"1": 2}`,
 	}, {

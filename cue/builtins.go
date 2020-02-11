@@ -163,10 +163,10 @@ var boolValues = map[string]bool{
 }
 
 var builtinPackages = map[string]*builtinPkg{
-	"": &builtinPkg{
+	"": {
 		native: []*builtin{{}},
 	},
-	"crypto/md5": &builtinPkg{
+	"crypto/md5": {
 		native: []*builtin{{
 			Name:  "Size",
 			Const: "16",
@@ -188,7 +188,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"crypto/sha1": &builtinPkg{
+	"crypto/sha1": {
 		native: []*builtin{{
 			Name:  "Size",
 			Const: "20",
@@ -210,7 +210,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"crypto/sha256": &builtinPkg{
+	"crypto/sha256": {
 		native: []*builtin{{
 			Name:  "Size",
 			Const: "32",
@@ -248,7 +248,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"crypto/sha512": &builtinPkg{
+	"crypto/sha512": {
 		native: []*builtin{{
 			Name:  "Size",
 			Const: "64",
@@ -318,7 +318,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"encoding/base64": &builtinPkg{
+	"encoding/base64": {
 		native: []*builtin{{
 			Name:   "EncodedLen",
 			Params: []kind{topKind, intKind},
@@ -381,7 +381,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"encoding/csv": &builtinPkg{
+	"encoding/csv": {
 		native: []*builtin{{
 			Name:   "Encode",
 			Params: []kind{topKind},
@@ -435,7 +435,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"encoding/hex": &builtinPkg{
+	"encoding/hex": {
 		native: []*builtin{{
 			Name:   "EncodedLen",
 			Params: []kind{intKind},
@@ -498,7 +498,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"encoding/json": &builtinPkg{
+	"encoding/json": {
 		native: []*builtin{{
 			Name:   "Valid",
 			Params: []kind{bytesKind | stringKind},
@@ -643,7 +643,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"encoding/yaml": &builtinPkg{
+	"encoding/yaml": {
 		native: []*builtin{{
 			Name:   "Marshal",
 			Params: []kind{topKind},
@@ -767,7 +767,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"html": &builtinPkg{
+	"html": {
 		native: []*builtin{{
 			Name:   "Escape",
 			Params: []kind{stringKind},
@@ -794,7 +794,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"list": &builtinPkg{
+	"list": {
 		native: []*builtin{{
 			Name:   "Drop",
 			Params: []kind{listKind, intKind},
@@ -1206,7 +1206,7 @@ var builtinPackages = map[string]*builtinPkg{
 	}
 }`,
 	},
-	"math": &builtinPkg{
+	"math": {
 		native: []*builtin{{
 			Name:  "MaxExp",
 			Const: "2147483647",
@@ -1949,7 +1949,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"math/bits": &builtinPkg{
+	"math/bits": {
 		native: []*builtin{{
 			Name:   "Lsh",
 			Params: []kind{intKind, intKind},
@@ -2093,7 +2093,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"net": &builtinPkg{
+	"net": {
 		native: []*builtin{{
 			Name:   "SplitHostPort",
 			Params: []kind{stringKind},
@@ -2363,7 +2363,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"path": &builtinPkg{
+	"path": {
 		native: []*builtin{{
 			Name:   "Split",
 			Params: []kind{stringKind},
@@ -2451,7 +2451,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"regexp": &builtinPkg{
+	"regexp": {
 		native: []*builtin{{
 			Name:   "Valid",
 			Params: []kind{stringKind},
@@ -2635,7 +2635,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"strconv": &builtinPkg{
+	"strconv": {
 		native: []*builtin{{
 			Name:   "Unquote",
 			Params: []kind{stringKind},
@@ -2857,7 +2857,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"strings": &builtinPkg{
+	"strings": {
 		native: []*builtin{{
 			Name:   "ByteAt",
 			Params: []kind{bytesKind | stringKind, intKind},
@@ -3286,7 +3286,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"struct": &builtinPkg{
+	"struct": {
 		native: []*builtin{{
 			Name:   "MinFields",
 			Params: []kind{structKind, intKind},
@@ -3323,7 +3323,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"text/tabwriter": &builtinPkg{
+	"text/tabwriter": {
 		native: []*builtin{{
 			Name:   "Write",
 			Params: []kind{topKind},
@@ -3370,7 +3370,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"text/template": &builtinPkg{
+	"text/template": {
 		native: []*builtin{{
 			Name:   "Execute",
 			Params: []kind{stringKind, topKind},
@@ -3421,7 +3421,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"time": &builtinPkg{
+	"time": {
 		native: []*builtin{{
 			Name:  "Nanosecond",
 			Const: "1",
@@ -3622,7 +3622,7 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 	},
-	"tool": &builtinPkg{
+	"tool": {
 		native: []*builtin{{}},
 		cue: `{
 	Command: {
@@ -3642,7 +3642,7 @@ var builtinPackages = map[string]*builtinPkg{
 	Name :: =~"^\\PL([-](\\PL|\\PN))*$"
 }`,
 	},
-	"tool/cli": &builtinPkg{
+	"tool/cli": {
 		native: []*builtin{{}},
 		cue: `{
 	Print: {
@@ -3651,7 +3651,7 @@ var builtinPackages = map[string]*builtinPkg{
 	}
 }`,
 	},
-	"tool/exec": &builtinPkg{
+	"tool/exec": {
 		native: []*builtin{{}},
 		cue: `{
 	Run: {
@@ -3667,7 +3667,7 @@ var builtinPackages = map[string]*builtinPkg{
 	}
 }`,
 	},
-	"tool/file": &builtinPkg{
+	"tool/file": {
 		native: []*builtin{{}},
 		cue: `{
 	Read: {
@@ -3694,7 +3694,7 @@ var builtinPackages = map[string]*builtinPkg{
 	}
 }`,
 	},
-	"tool/http": &builtinPkg{
+	"tool/http": {
 		native: []*builtin{{}},
 		cue: `{
 	Get: Do & {
@@ -3736,7 +3736,7 @@ var builtinPackages = map[string]*builtinPkg{
 	}
 }`,
 	},
-	"tool/os": &builtinPkg{
+	"tool/os": {
 		native: []*builtin{{}},
 		cue: `{
 	Name ::  !="" & !~"^[$]"

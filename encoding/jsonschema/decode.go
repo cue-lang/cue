@@ -407,7 +407,7 @@ func addTag(field, tag, value string) *ast.Field {
 		Token: token.ISA,
 		Value: ast.NewIdent("_"),
 		Attrs: []*ast.Attribute{
-			&ast.Attribute{Text: fmt.Sprintf("@%s(%s)", tag, value)},
+			{Text: fmt.Sprintf("@%s(%s)", tag, value)},
 		},
 	}
 }

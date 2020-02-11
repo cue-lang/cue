@@ -2258,7 +2258,7 @@ done consistently.)
 
 Strings can be concatenated using the `+` operator:
 ```
-s := "hi " + name + " and good bye"
+s: "hi " + name + " and good bye"
 ```
 String addition creates a new string by concatenating the operands.
 

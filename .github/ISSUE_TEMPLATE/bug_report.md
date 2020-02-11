@@ -19,11 +19,12 @@ $ cue version
 
 </pre>
 
+<!--
+If you built from source, specify what git tag or commit was used.
+-->
+
 ### Does this issue reproduce with the latest release?
 
-
-
-### What operating system are you using?
 
 
 ### What did you do?

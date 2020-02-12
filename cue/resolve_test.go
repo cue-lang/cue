@@ -577,7 +577,7 @@ func TestResolve(t *testing.T) {
 		out: "<0>{a: 3, b: <1>{c: <2>{d: 3}}, c: <3>{c: 2}, d: <4>{d: 2}}",
 	}, {
 		in:  "`foo-bar`: 3\n x: `foo-bar`,",
-		out: `<0>{x: 3, foo-bar: 3}`,
+		out: `<0>{x: 3, "foo-bar": 3}`,
 	}, {
 		desc: "resolution of quoted identifiers",
 		in: `
@@ -591,7 +591,7 @@ a: {
 	` + "`qux-quux`" + `: qux
 	"qaz":      ` + "`qux-quux`" + `
 }`,
-		out: "<0>{foo-bar: 2, baz: 2, a: <1>{qux: 3, qux-quux: 3, qaz: 3}}",
+		out: `<0>{"foo-bar": 2, baz: 2, a: <1>{qux: 3, "qux-quux": 3, qaz: 3}}`,
 	}, {
 		in: `
 			a: _
@@ -2288,7 +2288,7 @@ func TestFullEval(t *testing.T) {
 		in: `
 			a: { for _, b in ["c"] { "\(b + ".")": "a" } }
 			`,
-		out: `<0>{a: <1>{c.: "a"}}`,
+		out: `<0>{a: <1>{"c.": "a"}}`,
 	}, {
 		desc: "recursive evaluation within list",
 		in: `
@@ -2630,7 +2630,7 @@ func TestFullEval(t *testing.T) {
 		`,
 		out: `<0>{` +
 			`p: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, }, ` +
-			`foo=bar: "str", ` +
+			`"foo=bar": "str", ` +
 			`a: "str", ` +
 			`bb: 4, ` +
 			`b1: 4, ` +
@@ -2833,7 +2833,7 @@ func TestFullEval(t *testing.T) {
 			}
 		}
 		`,
-		out: `<0>{x: <1>{v: <2>{1: 2}, _p: 3}}`,
+		out: `<0>{x: <1>{v: <2>{"1": 2}, _p: 3}}`,
 	}, {
 		desc: "non-structural direct cycles",
 		in: `

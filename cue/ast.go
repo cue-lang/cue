@@ -449,11 +449,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			if !ok {
 				return v.errf(lab, "invalid field name: %v", lab)
 			}
-			if f != 0 {
-				val := v.walk(n.Value)
-				v.object.insertValue(v.ctx(), f, opt, isDef, val, attrs, v.doc)
-				v.doc = leftOverDoc
-			}
+			val := v.walk(n.Value)
+			v.object.insertValue(v.ctx(), f, opt, isDef, val, attrs, v.doc)
+			v.doc = leftOverDoc
 
 		default:
 			panic("cue: unknown label type")

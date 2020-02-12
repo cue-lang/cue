@@ -48,8 +48,9 @@ func TestCompile(t *testing.T) {
 		c: 4_5
 		d: "abc"
 		e: 3e2 // 3h1m2ss
+		"": 8
 		`,
-		out: "<0>{a: true, b: 2000, c: 45, d: \"abc\", e: 3e+2}",
+		out: `<0>{"": 8, a: true, b: 2000, c: 45, d: "abc", e: 3e+2}`,
 	}, {
 		in: `
 		a: null
@@ -99,10 +100,9 @@ func TestCompile(t *testing.T) {
 		b: int
 		c: float
 		d: bool
-		e: duration
-		f: string
+		e: string
 		`,
-		out: "<0>{a: _, b: int, c: float, d: bool, e: duration, f: string}",
+		out: "<0>{a: _, b: int, c: float, d: bool, e: string}",
 	}, {
 		in: `
 		a: null
@@ -225,7 +225,7 @@ func TestCompile(t *testing.T) {
 			C="\(a)": 5
 			c: C
 			`,
-		out: `<0>{[]: <1>(ID: string)-><2>{name: <1>.ID}, foo=bar: 3, a: <0>.foo=bar, bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
+		out: `<0>{[]: <1>(ID: string)-><2>{name: <1>.ID}, "foo=bar": 3, a: <0>.foo=bar, bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
 	}, {
 		// optional fields with key filters
 		in: `

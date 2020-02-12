@@ -106,7 +106,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		map[struct{}]int{struct{}{}: 2}, "_|_(unsupported Go type for map key (struct {}))",
 	}, {
-		map[int]int{1: 2}, "<0>{1: 2}",
+		map[int]int{1: 2}, `<0>{"1": 2}`,
 	}, {
 		struct {
 			a int

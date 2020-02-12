@@ -16,6 +16,7 @@ package cue
 
 import (
 	"bytes"
+	"cuelang.org/go/cue/ast"
 	"fmt"
 	"strconv"
 	"strings"
@@ -367,10 +368,9 @@ func (p *printer) str(v interface{}) {
 
 	case arc:
 		n := x.v
-		orig := p.label(x.feature)
-		str := strconv.Quote(orig)
-		if len(orig)+2 == len(str) {
-			str = str[1 : len(str)-1]
+		str := p.label(x.feature)
+		if !ast.IsValidIdent(str) {
+			str = strconv.Quote(str)
 		}
 		p.writef(str)
 		if x.optional {

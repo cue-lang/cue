@@ -33,6 +33,10 @@ type nodeError struct {
 	errors.Message
 }
 
+func (n *nodeError) Error() string {
+	return errors.String(n)
+}
+
 func nodeErrorf(n ast.Node, format string, args ...interface{}) *nodeError {
 	return &nodeError{
 		n:       n,
@@ -81,7 +85,7 @@ type valueError struct {
 }
 
 func (e *valueError) Error() string {
-	return fmt.Sprint(e.err)
+	return errors.String(e)
 }
 
 func (e *valueError) Position() token.Pos {

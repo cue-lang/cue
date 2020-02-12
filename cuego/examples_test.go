@@ -91,6 +91,6 @@ func ExampleConstrain() {
 	//Output:
 	// error: <nil>
 	// validate: <nil>
-	// validate: invalid value 39 (out of bound <=12)
-	// validate: invalid value "foo.jso" (does not match =~".json$")
+	// validate: MinCount: invalid value 39 (out of bound <=12)
+	// validate: Filename: invalid value "foo.jso" (does not match =~".json$")
 }

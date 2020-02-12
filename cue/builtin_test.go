@@ -112,7 +112,7 @@ func TestBuiltins(t *testing.T) {
 		`true`,
 	}, {
 		test("encoding/json", `json.Validate("{\"a\":10}", {a:<3})`),
-		`_|_(error in call to encoding/json.Validate: invalid value 10 (out of bound <3))`,
+		`_|_(error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<3})`),
 		`_|_(error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3))`,
@@ -124,7 +124,7 @@ func TestBuiltins(t *testing.T) {
 		`_|_(error in call to encoding/yaml.Validate: value not an instance)`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3))`,
+		`_|_(error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3))`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
@@ -269,13 +269,13 @@ func TestBuiltins(t *testing.T) {
 		`[{a: 1, v: 2},{a: 1, v: 3},{a: 2, v: 1}]`,
 	}, {
 		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
-		`_|_(error in call to list.Sort: conflicting values close(T, close(T)) and {b: 2} (mismatched types number|string and struct))`,
+		`_|_(error in call to list.Sort: less: conflicting values close(T, close(T)) and {b: 2} (mismatched types number|string and struct))`,
 	}, {
 		test("list", `list.SortStrings(["b", "a"])`),
 		`["a","b"]`,
 	}, {
 		test("list", `list.SortStrings([1, 2])`),
-		`_|_(invalid list element 0 in argument 0 to list.SortStrings: cannot use value 1 (type int) as string)`,
+		`_|_(invalid list element 0 in argument 0 to list.SortStrings: 0: cannot use value 1 (type int) as string)`,
 	}, {
 		test("list", `list.Sum([1, 2, 3, 4])`),
 		`10`,
@@ -387,7 +387,7 @@ func TestBuiltins(t *testing.T) {
 		`"Hello World!"`,
 	}, {
 		test("strings", `strings.Join([1, 2], " ")`),
-		`_|_(invalid list element 0 in argument 0 to strings.Join: cannot use value 1 (type int) as string)`,
+		`_|_(invalid list element 0 in argument 0 to strings.Join: 0: cannot use value 1 (type int) as string)`,
 	}, {
 		test("strings", `strings.ByteAt("a", 0)`),
 		strconv.Itoa('a'),

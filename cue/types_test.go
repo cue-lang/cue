@@ -1880,7 +1880,7 @@ func TestMarshalJSON(t *testing.T) {
 		err:   `c.0: cannot convert incomplete value`,
 	}, {
 		value: `{a: [{b: [0, {c: string}] }] }`,
-		err:   `path a.0.b.1.c: cannot convert incomplete value`,
+		err:   `a.0.b.1.c: cannot convert incomplete value`,
 	}, {
 		value: `{foo?: 1, bar?: 2, baz: 3}`,
 		json:  `{"baz":3}`,

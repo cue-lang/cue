@@ -172,7 +172,7 @@ func (o *structValue) Lookup(key string) Value {
 		ctx := o.ctx
 		x := ctx.mkErr(o.obj, codeNotExist, "value %q not found", key)
 		v := x.evalPartial(ctx)
-		return Value{ctx.index, &valueData{o.path, 0, arc{cache: v, v: x}}}
+		return Value{ctx.index, &valueData{o.path.parent, 0, arc{feature: o.path.feature, cache: v, v: x}}}
 	}
 	return newChildValue(o, i)
 }
@@ -221,12 +221,7 @@ func marshalErrf(v Value, src source, code errCode, msg string, args ...interfac
 }
 
 func (e *marshalError) Error() string {
-	path := e.Path()
-	if len(path) == 0 {
-		return fmt.Sprintf("cue: marshal error: %v", e.err)
-	}
-	p := strings.Join(path, ".")
-	return fmt.Sprintf("cue: marshal error at path %s: %v", p, e.err)
+	return fmt.Sprintf("cue: marshal error: %v", e.err)
 }
 
 func (e *marshalError) Path() []string               { return e.err.Path() }
@@ -600,6 +595,22 @@ func isNumber(s string) bool {
 type Value struct {
 	idx  *index
 	path *valueData
+}
+
+func newErrValue(v Value, b *bottom) Value {
+	ctx := v.ctx()
+	p := v.path
+	if p == nil {
+		return newValueRoot(ctx, b)
+	}
+	return Value{
+		ctx.index,
+		&valueData{p.parent, p.index, arc{
+			feature: p.arc.feature,
+			cache:   b,
+			v:       b,
+		}},
+	}
 }
 
 func newValueRoot(ctx *context, x value) Value {
@@ -1175,20 +1186,28 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
-func (v Value) Struct(opts ...Option) (*Struct, error) {
+func (v Value) Struct() (*Struct, error) {
+	obj, err := v.getStruct()
+	if err != nil {
+		return nil, v.toErr(err)
+	}
+	return &Struct{v, obj}, nil
+}
+
+func (v Value) getStruct() (*structLit, *bottom) {
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, structKind); err != nil {
-		return nil, v.toErr(err)
+		return nil, err
 	}
 	obj := v.eval(ctx).(*structLit)
 
 	// TODO: This is expansion appropriate?
 	obj, err := obj.expandFields(ctx)
 	if err != nil {
-		return nil, v.toErr(err)
+		return nil, err
 	}
 
-	return &Struct{v, obj}, nil
+	return obj, nil
 }
 
 // Struct represents a CUE struct value.
@@ -1285,7 +1304,7 @@ func (v Value) Lookup(path ...string) Value {
 		obj, err := v.structValData(ctx)
 		if err != nil {
 			// TODO: return a Value at the same location and a new error?
-			return newValueRoot(ctx, err)
+			return newErrValue(v, err)
 		}
 		v = obj.Lookup(k)
 	}
@@ -1381,6 +1400,13 @@ func (v Value) Unify(w Value) Value {
 	}
 	if w.path == nil {
 		return v
+	}
+	if v.Err() != nil {
+		// TODO: perhaps keep both errors.
+		return v
+	}
+	if w.Err() != nil {
+		return w
 	}
 	a := v.path.v
 	b := w.path.v

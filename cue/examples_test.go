@@ -113,5 +113,5 @@ func ExampleValue_Subsume() {
 
 	// Output:
 	// V2 is backwards compatible with V1: <nil>
-	// V3 is backwards compatible with V2: conflicting values <=150 and string (mismatched types number and string)
+	// V3 is backwards compatible with V2: V2: conflicting values <=150 and string (mismatched types number and string)
 }

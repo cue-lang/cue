@@ -460,6 +460,44 @@ func Details(err error, cfg *Config) string {
 	return w.String()
 }
 
+// String generates a short message from a given Error.
+func String(err Error) string {
+	w := &strings.Builder{}
+	writeErr(w, err)
+	return w.String()
+}
+
+func writeErr(w io.Writer, err Error) {
+	if path := strings.Join(err.Path(), "."); path != "" {
+		_, _ = io.WriteString(w, path)
+		_, _ = io.WriteString(w, ": ")
+	}
+
+	for {
+		u := errors.Unwrap(err)
+
+		printed := false
+		msg, args := err.Msg()
+		if msg != "" || u == nil { // print at least something
+			fmt.Fprintf(w, msg, args...)
+			printed = true
+		}
+
+		if u == nil {
+			break
+		}
+
+		if printed {
+			_, _ = io.WriteString(w, ": ")
+		}
+		err, _ = u.(Error)
+		if err == nil {
+			fmt.Fprint(w, u)
+			break
+		}
+	}
+}
+
 func defaultFprintf(w io.Writer, format string, args ...interface{}) {
 	fmt.Fprintf(w, format, args...)
 }
@@ -503,16 +541,18 @@ func printError(w io.Writer, err error, cfg *Config) {
 		positions = append(positions, s)
 	}
 
-	if path := Path(err); path != nil {
-		fprintf(w, "%s: ", strings.Join(path, "."))
+	if e, ok := err.(Error); ok {
+		writeErr(w, e)
+	} else {
+		fprintf(w, "%v", err)
 	}
 
 	if len(positions) == 0 {
-		fprintf(w, "%v\n", err)
+		fprintf(w, "\n")
 		return
 	}
 
-	fprintf(w, "%v:\n", err)
+	fprintf(w, ":\n")
 	for _, pos := range positions {
 		fprintf(w, "    %s\n", pos)
 	}

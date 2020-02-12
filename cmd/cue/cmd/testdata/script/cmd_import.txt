@@ -2,7 +2,7 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-reference "cli" not found
+command.pkg.t: reference "cli" not found
 -- task_tool.cue --
 package home
 

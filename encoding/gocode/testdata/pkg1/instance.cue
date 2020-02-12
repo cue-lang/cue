@@ -22,6 +22,8 @@ String: !="" @go(,validate=ValidateCUE)
 
 SpecialString: =~"special" @go(,type=string)
 
+IgnoreThis: =~"foo" // No corresponding Go type
+
 Omit: int @go(-)
 
 // NonExisting will be omitted as there is no equivalent Go type.

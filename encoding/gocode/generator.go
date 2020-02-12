@@ -139,7 +139,7 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 		pkgName = g.pkg.Name
 
 		for _, obj := range g.pkg.TypesInfo.Defs {
-			if obj == nil || obj.Pkg() != g.pkg.Types {
+			if obj == nil || obj.Pkg() != g.pkg.Types || obj.Parent() == nil {
 				continue
 			}
 			g.typeMap[obj.Name()] = obj.Type()
@@ -152,7 +152,7 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 		"pkgName": pkgName,
 	})
 
-	iter, err := inst.Value().Fields()
+	iter, err := inst.Value().Fields(cue.Definitions(true))
 	g.addErr(err)
 
 	for iter.Next() {
@@ -231,7 +231,10 @@ func (g *generator) decl(name string, v cue.Value) {
 
 	zero := "nil"
 
-	typ := g.typeMap[goTypeName]
+	typ, ok := g.typeMap[goTypeName]
+	if !ok && !mappedGoTypes(goTypeName) {
+		return
+	}
 	if goType == "" {
 		goType = goTypeName
 		if typ != nil {
@@ -275,4 +278,14 @@ func strValue(have, fallback string) string {
 		return fallback
 	}
 	return have
+}
+
+func mappedGoTypes(s string) bool {
+	switch s {
+	case "bool", "float32", "float64",
+		"int", "int8", "int16", "int32", "int64", "string",
+		"uint", "uint8", "uint16", "uint32", "uint64":
+		return true
+	}
+	return false
 }

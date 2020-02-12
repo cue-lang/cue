@@ -1,0 +1,10 @@
+cue export data.cue -e a+c -e d.e.f --out yaml
+cmp stdout expect-stdout
+-- expect-stdout --
+4
+---
+jam
+-- data.cue --
+a: 1
+c: 3
+d: e: f: "jam"

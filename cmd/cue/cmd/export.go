@@ -22,6 +22,8 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/pkg/encoding/yaml"
 )
 
@@ -93,6 +95,8 @@ text    output as raw text
 	flagMedia.Add(cmd)
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 
+	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")
+
 	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
 		"set the value of a tagged field")
 
@@ -103,23 +107,47 @@ func runExport(cmd *Command, args []string) error {
 	instances := buildFromArgs(cmd, args)
 	w := cmd.OutOrStdout()
 
+	var exprs []ast.Expr
+	for _, e := range flagExpression.StringArray(cmd) {
+		expr, err := parser.ParseExpr("<expression flag>", e)
+		if err != nil {
+			return err
+		}
+		exprs = append(exprs, expr)
+	}
+
+	count := 0
+
 	for _, inst := range instances {
 		root := inst.Value()
-		switch media := flagMedia.String(cmd); media {
-		case "json":
-			err := outputJSON(cmd, w, root)
+		if exprs == nil {
+			err := exportValue(cmd, w, root, count)
 			exitIfErr(cmd, inst, err, true)
-		case "text":
-			err := outputText(w, root)
+			count++
+			continue
+		}
+		for _, e := range exprs {
+			v := inst.Eval(e)
+			exitIfErr(cmd, inst, v.Err(), true)
+			err := exportValue(cmd, w, v, count)
+			count++
 			exitIfErr(cmd, inst, err, true)
-		case "yaml":
-			err := outputYAML(w, root)
-			exitIfErr(cmd, inst, err, true)
-		default:
-			return fmt.Errorf("export: unknown format %q", media)
 		}
 	}
 	return nil
+}
+
+func exportValue(cmd *Command, w io.Writer, v cue.Value, i int) error {
+	switch media := flagMedia.String(cmd); media {
+	case "json":
+		return outputJSON(cmd, w, v)
+	case "text":
+		return outputText(w, v)
+	case "yaml":
+		return outputYAML(w, v, i)
+	default:
+		return fmt.Errorf("export: unknown format %q", media)
+	}
 }
 
 func outputJSON(cmd *Command, w io.Writer, v cue.Value) error {
@@ -146,7 +174,10 @@ func outputText(w io.Writer, v cue.Value) error {
 	return err
 }
 
-func outputYAML(w io.Writer, v cue.Value) error {
+func outputYAML(w io.Writer, v cue.Value, i int) error {
+	if i > 0 {
+		fmt.Fprintln(w, "---")
+	}
 	str, err := yaml.Marshal(v)
 	if err != nil {
 		return err

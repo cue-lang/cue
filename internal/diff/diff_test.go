@@ -287,6 +287,21 @@ func TestDiff(t *testing.T) {
 +     oc? :: 5
   }
 `,
+	}, {
+		x: `[_]: x: "hello"
+
+a: x: "hello"
+		`,
+		y: `[_]: x: "hello"
+
+		`,
+		kind: Modified,
+		diff: `  {
+-     a: {
+-     	x: "hello"
+-     }
+  }
+`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -310,7 +325,7 @@ func TestDiff(t *testing.T) {
 					t.Fatal(err)
 				}
 				if got := w.String(); got != tc.diff {
-					t.Errorf("got\n%s;\nwant\n%s", got, tc.diff)
+					t.Errorf("\ngot\n%s;\nwant\n%s", got, tc.diff)
 				}
 			}
 		})

@@ -193,7 +193,7 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 
 	var xi, yi int
 	var xf, yf cue.FieldInfo
-	for xi < sx.Len() || yi < sx.Len() {
+	for xi < sx.Len() || yi < sy.Len() {
 		// Process zero nodes
 		for ; xi < sx.Len(); xi++ {
 			xf = sx.Field(xi)

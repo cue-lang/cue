@@ -474,7 +474,7 @@ func writeErr(w io.Writer, err Error) {
 	}
 
 	for {
-		u := errors.Unwrap(err)
+		u := xerrors.Unwrap(err)
 
 		printed := false
 		msg, args := err.Msg()

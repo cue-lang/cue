@@ -17,7 +17,6 @@ package os
 //go:generate go run gen.go
 
 import (
-	"fmt"
 	"os"
 	"strings"
 
@@ -29,10 +28,8 @@ import (
 )
 
 func init() {
-	task.Register("tool/os.Setenv", newSetenvCmd)
 	task.Register("tool/os.Getenv", newGetenvCmd)
 	task.Register("tool/os.Environ", newEnvironCmd)
-	task.Register("tool/os.Clearenv", newClearenvCmd)
 
 	// TODO:
 	// Tasks:
@@ -42,72 +39,6 @@ func init() {
 	// Functions:
 	// - Hostname
 	// - UserCache/Home/Config (or in os/user?)
-}
-
-type clearenvCmd struct{}
-
-func newClearenvCmd(v cue.Value) (task.Runner, error) {
-	return &clearenvCmd{}, nil
-}
-
-func (c *clearenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
-	os.Clearenv()
-	return map[string]interface{}{}, nil
-}
-
-type setenvCmd struct{}
-
-func newSetenvCmd(v cue.Value) (task.Runner, error) {
-	return &setenvCmd{}, nil
-}
-
-func (c *setenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
-	iter, err := ctx.Obj.Fields()
-	if err != nil {
-		return nil, err
-	}
-
-	for iter.Next() {
-		name := iter.Label()
-		if strings.HasPrefix(name, "$") {
-			continue
-		}
-
-		v, _ := iter.Value().Default()
-
-		if !v.IsConcrete() {
-			return nil, errors.Newf(v.Pos(),
-				"non-concrete environment variable %s", name)
-		}
-		switch k := v.IncompleteKind(); k {
-		case cue.ListKind, cue.StructKind:
-			return nil, errors.Newf(v.Pos(),
-				"unsupported type %s for environment variable %s", k, name)
-
-		case cue.NullKind:
-			err = os.Unsetenv(name)
-
-		case cue.BoolKind:
-			if b, _ := v.Bool(); b {
-				err = os.Setenv(name, "1")
-			} else {
-				err = os.Setenv(name, "0")
-			}
-
-		case cue.StringKind:
-			s, _ := v.String()
-			err = os.Setenv(name, s)
-
-		default:
-			err = os.Setenv(name, fmt.Sprint(v))
-		}
-
-		if err != nil {
-			return nil, err
-		}
-	}
-
-	return map[string]interface{}{}, err
 }
 
 type getenvCmd struct{}

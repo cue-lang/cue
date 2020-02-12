@@ -154,9 +154,14 @@ func mkCommand(ctx *task.Context) (c *exec.Cmd, doc string, err error) {
 	for iter, _ := ctx.Obj.Lookup("env").Fields(); iter.Next(); {
 		label := iter.Label()
 		v := iter.Value()
-		str, err := v.String()
-		if err != nil {
-			return nil, "", errors.Wrapf(err, v.Pos(),
+		var str string
+		switch v.Kind() {
+		case cue.StringKind:
+			str, _ = v.String()
+		case cue.IntKind, cue.FloatKind, cue.NumberKind:
+			str = fmt.Sprint(v)
+		default:
+			return nil, "", errors.Newf(v.Pos(),
 				"invalid environment variable value %q", v)
 		}
 		cmd.Env = append(cmd.Env, fmt.Sprintf("%s=%s", label, str))

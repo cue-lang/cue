@@ -30,45 +30,6 @@ import (
 	"cuelang.org/go/internal/task"
 )
 
-func TestSetenv(t *testing.T) {
-	os.Setenv("CUEOSTESTUNSET", "SET")
-	v := parse(t, "tool/os.Setenv", `{
-		CUEOSTESTMOOD:  "yippie"
-		CUEOSTESTTRUE:  true
-		CUEOSTESTFALSE: false
-		CUEOSTESTNUM:   34K
-		CUEOSTESTUNSET: null
-	}`)
-	_, err := (*setenvCmd).Run(nil, &task.Context{Obj: v})
-	if err != nil {
-		t.Fatal(err)
-	}
-	for _, p := range [][2]string{
-		{"CUEOSTESTMOOD", "yippie"},
-		{"CUEOSTESTTRUE", "1"},
-		{"CUEOSTESTFALSE", "0"},
-		{"CUEOSTESTNUM", "34000"},
-	} {
-		got := os.Getenv(p[0])
-		if got != p[1] {
-			t.Errorf("got %v; want %v", got, p[1])
-		}
-	}
-
-	if _, ok := os.LookupEnv("CUEOSTESTUNSET"); ok {
-		t.Error("CUEOSTESTUNSET should have been unset")
-	}
-
-	v = parse(t, "tool/os.Setenv", `{
-		CUEOSTESTMOOD: string
-	}`)
-	_, err = (*setenvCmd).Run(nil, &task.Context{Obj: v})
-	if err == nil {
-		t.Fatal("expected incomplete error")
-	}
-	// XXX: ensure error is not concrete.
-}
-
 func TestGetenv(t *testing.T) {
 
 	for _, p := range [][2]string{

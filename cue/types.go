@@ -1293,14 +1293,16 @@ func (v Value) Fields(opts ...Option) (Iterator, error) {
 	return Iterator{ctx: ctx, val: v, iter: n, len: len(n.arcs)}, nil
 }
 
-// Lookup reports the value at a path starting from v.
-// The empty path returns v itself.
+// Lookup reports the value at a path starting from v. The empty path returns v
+// itself. Use LookupDef for definitions or LookupField for any kind of field.
 //
 // The Exists() method can be used to verify if the returned value existed.
 // Lookup cannot be used to look up hidden or optional fields or definitions.
 func (v Value) Lookup(path ...string) Value {
 	ctx := v.ctx()
 	for _, k := range path {
+		// TODO(eval) TODO(error): always search in full data and change error
+		// message if a field is found but is of the incorrect type.
 		obj, err := v.structValData(ctx)
 		if err != nil {
 			// TODO: return a Value at the same location and a new error?
@@ -1311,23 +1313,67 @@ func (v Value) Lookup(path ...string) Value {
 	return v
 }
 
+// LookupDef reports the definition with the given name within struct v. The
+// Exists method of the returned value will report false if the definition did
+// not exist. The Err method reports if any error occurred during evaluation.
+func (v Value) LookupDef(name string) Value {
+	ctx := v.ctx()
+	o, err := v.structValFull(ctx)
+	if err != nil {
+		return newErrValue(v, err)
+	}
+
+	f := v.ctx().strLabel(name)
+	for i, a := range o.arcs {
+		if a.feature == f {
+			if !a.definition || a.optional {
+				break
+			}
+			return newChildValue(&o, i)
+		}
+	}
+	return newErrValue(v, ctx.mkErr(v.path.v,
+		"defintion %q not found", name))
+}
+
 var errNotFound = errors.Newf(token.NoPos, "field not found")
 
 // LookupField reports information about a field of v.
-func (v Value) LookupField(path string) (FieldInfo, error) {
+func (v Value) LookupField(name string) (FieldInfo, error) {
 	s, err := v.Struct()
 	if err != nil {
 		// TODO: return a Value at the same location and a new error?
 		return FieldInfo{}, err
 	}
-	f, err := s.FieldByName(path)
+	f, err := s.FieldByName(name)
 	if err != nil {
 		return f, err
 	}
-	if f.IsHidden || f.IsDefinition && !goast.IsExported(path) {
+	if f.IsHidden || f.IsDefinition && !goast.IsExported(name) {
 		return f, errNotFound
 	}
 	return f, err
+}
+
+// Fill creates a new value by unifying v with the value of x at the given path.
+//
+// Any reference in v referring to the value at the given path will resolve
+// to x in the newly created value. The resulting value is not validated.
+func (v Value) Fill(x interface{}, path ...string) Value {
+	if v.path == nil {
+		return v
+	}
+	ctx := v.ctx()
+	root := v.path.val()
+	for i := len(path) - 1; i >= 0; i-- {
+		x = map[string]interface{}{path[i]: x}
+	}
+	value := convert(ctx, root, true, x)
+	a := v.path.arc
+	a.v = mkBin(ctx, v.Pos(), opUnify, root, value)
+	a.cache = a.v.evalPartial(ctx)
+	// TODO: validate recursively?
+	return Value{v.idx, &valueData{v.path.parent, v.path.index, a}}
 }
 
 // Template returns a function that represents the template definition for a
@@ -1337,6 +1383,8 @@ func (v Value) LookupField(path string) (FieldInfo, error) {
 // The returned function returns the value that would be unified with field
 // given its name.
 func (v Value) Template() func(label string) Value {
+	// TODO: rename to optional.
+
 	ctx := v.ctx()
 	x, ok := v.path.cache.(*structLit)
 	if !ok || x.optionals.isEmpty() {

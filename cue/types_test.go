@@ -752,6 +752,68 @@ v: X
 	}
 }
 
+func compile(t *testing.T, r *Runtime, s string) *Instance {
+	t.Helper()
+	inst, err := r.Compile("", s)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return inst
+}
+
+func goValue(v Value) interface{} {
+	var x interface{}
+	err := v.Decode(&x)
+	if err != nil {
+		return err
+	}
+	return x
+}
+
+func TestFill(t *testing.T) {
+	testCases := []struct {
+		in   string
+		x    interface{}
+		path string // comma-separated path
+		out  string
+	}{{
+		in: `
+		foo: int
+		bar: foo
+		`,
+		x:    3,
+		path: "foo",
+		out: `
+		foo: 3
+		bar: 3
+		`,
+	}, {
+		in: `
+		string
+		`,
+		x:    "foo",
+		path: "",
+		out: `
+		"foo"
+		`,
+	}}
+
+	for _, tc := range testCases {
+		var path []string
+		if tc.path != "" {
+			path = strings.Split(tc.path, ",")
+		}
+
+		r := &Runtime{}
+		v := compile(t, r, tc.in).Value().Fill(tc.x, path...)
+		w := compile(t, r, tc.out).Value()
+
+		if !reflect.DeepEqual(goValue(v), goValue(w)) {
+			t.Errorf("\ngot:  %s\nwant: %s", v, w)
+		}
+	}
+}
+
 func TestDefaults(t *testing.T) {
 	testCases := []struct {
 		value string

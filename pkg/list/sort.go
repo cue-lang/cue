@@ -49,7 +49,7 @@ func (s *valueSorter) Less(i, j int) bool { panic("implemented in cue/builtinuti
 //
 //    Sort([2, 3, 1], list.Ascending)
 //
-//    Sort{{a: 2}, {a: 3}, {a: 1}, {a: {}, b: {}, less: x.a < y.a}}
+//    Sort{{a: 2}, {a: 3}, {a: 1}, {x: {}, y: {}, less: x.a < y.a}}
 //
 func Sort(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 	s := valueSorter{list, cmp, nil}

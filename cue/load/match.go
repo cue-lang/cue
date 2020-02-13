@@ -16,6 +16,7 @@ package load
 
 import (
 	"bytes"
+	"path"
 	"strings"
 	"unicode"
 
@@ -50,11 +51,7 @@ func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allT
 		return
 	}
 
-	i := strings.LastIndex(name, ".")
-	if i < 0 {
-		i = len(name)
-	}
-	ext := name[i:]
+	ext := path.Ext(name)
 
 	switch ext {
 	case cueSuffix:

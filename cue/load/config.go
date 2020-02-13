@@ -40,13 +40,52 @@ const (
 // Some of the aspects of this documentation, like flags and handling '--' need
 // to be implemented by the tools.
 const FromArgsUsage = `
-<args> is a list of arguments denoting a set of instances.
-It may take one of two forms:
+<args> is a list of arguments denoting a set of instances of the form:
 
-1. A list of *.cue source files.
+   <package>* <file_args>*
 
-   All of the specified files are loaded, parsed and type-checked
-   as a single instance.
+1. A list of source files
+
+   CUE files are parsed, loaded and unified into a single instance. All files
+   must have the same package name.
+
+   Data files, like YAML or JSON, are handled in one of two ways:
+
+   a. Explicitly mapped into a single CUE namespace, using the --path, --files
+      and --list flags. In this case these are unified into a single instance
+      along with any other CUE files.
+
+   b. Treated as a stream of data elements that each is optionally unified with
+      a single instance, which either consists of the other CUE files specified
+       on the command line or a single package.
+
+   By default, the format of files is derived from the file extension.
+   This behavior may be modified with file arguments of the form <qualifiers>:
+   For instance,
+
+      cue eval foo.cue json: bar.data
+
+   indicates that the bar.data file should be interpreted as a JSON file.
+   A qualifier applies to all files following it until the next qualifier.
+
+   The following qualifiers are available:
+
+      encodings
+      cue           CUE definitions and data
+      json          JSON data, one value only
+      jsonl         newline-separated JSON values
+      yaml          a YAML file, may contain a stream
+      proto         Protobuf definitions
+
+      interpretations
+      jsonschema   data encoding describes JSON Schema
+      openapi      data encoding describes Open API
+
+      formats
+      data         output as -- or only accept -- data
+      graph        data allowing references or anchors
+      schema       output as schema; defaults JSON files to JSON Schema
+      def          full definitions, including documentation
 
 2. A list of relative directories to denote a package instance.
 
@@ -54,18 +93,21 @@ It may take one of two forms:
    The instance contains all files in this directory and ancestor directories,
    up to the module root, with the same package name. The package name must
    be either uniquely determined by the files in the given directory, or
-   explicitly defined using the '-p' flag.
+   explicitly defined using a package name qualifier. For instance, ./...:foo
+   selects all packages named foo in the any subdirectory of the current
+   working directory.
 
-   Files without a package clause are ignored.
+   3. An import path referring to a directory within the current module
 
-   Files ending in *_test.cue files are only loaded when testing.
+   All CUE files in that directory, and all the ancestor directories up to the
+   module root (if applicable), with a package name corresponding to the base
+   name of the directory or the optional explicit package name are loaded into
+   a single instance.
 
-3. A list of import paths, each denoting a package.
-
-   The package's directory is loaded from the package cache. The version of the
-   package is defined in the modules cue.mod file.
-
-A '--' argument terminates the list of packages.
+   Examples, assume a module name of acme.org/root:
+      example.com/foo   package in cue.mod
+      ./foo             package corresponding to foo directory
+      .:bar             package in current directory with package name bar
 `
 
 // GenPath reports the directory in which to store generated
@@ -179,7 +221,6 @@ func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 	p.Module = c.Module
 
 	if isLocalImport(path) {
-		p.Local = true
 		if c.Dir == "" {
 			err = errors.Append(err, errors.Newf(pos, "cwd unknown"))
 		}

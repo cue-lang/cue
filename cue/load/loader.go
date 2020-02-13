@@ -25,10 +25,11 @@ import (
 	"strings"
 	"unicode"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // Instances returns the instances named by the command line arguments 'args'.
@@ -48,25 +49,68 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	l := c.loader
 
-	// TODO: this is work in progress. We aim to replace the original Go
-	// implementation, which is not ideal for CUE.
-	if len(args) > 0 {
-		arg := args[0]
-		if arg == "-" || encoding.MapExtension(filepath.Ext(arg)) != nil {
-			return []*build.Instance{l.cueFilesPackage(args)}
-		}
+	// TODO: require packages to be placed before files. At some point this
+	// could be relaxed.
+	i := 0
+	for ; i < len(args) && isPkg(args[i]); i++ {
 	}
 
 	a := []*build.Instance{}
-	for _, m := range l.importPaths(args) {
-		if m.Err != nil {
-			inst := c.newErrInstance(token.NoPos, "", m.Err)
-			a = append(a, inst)
-			continue
+
+	if len(args) == 0 || i > 0 {
+		for _, m := range l.importPaths(args[:i]) {
+			if m.Err != nil {
+				inst := c.newErrInstance(token.NoPos, "", m.Err)
+				a = append(a, inst)
+				continue
+			}
+			a = append(a, m.Pkgs...)
 		}
-		a = append(a, m.Pkgs...)
 	}
+
+	if args = args[i:]; len(args) > 0 {
+		files, err := filetypes.ParseArgs(args[i:])
+		if err != nil {
+			return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
+		}
+		a = append(a, l.cueFilesPackage(files))
+	}
+
 	return a
+}
+
+func isPkg(s string) bool {
+	if s == "." || s == ".." {
+		return true
+	}
+	if s == "-" {
+		return false
+	}
+
+	// This goes of the assumption that file names may not have a `:` in their
+	// name in cue.
+	// A filename must have an extension or be preceded by a qualifier argument.
+	// So strings of the form foo/bar:baz, where bar is a valid identifier and
+	// absolute package
+	if p := strings.LastIndexByte(s, ':'); p > 0 {
+		if !ast.IsValidIdent(s[p+1:]) {
+			return false
+		}
+		// For a non-pkg, the part before : may only be lowercase and '+'.
+		// In addition, a package necessarily must have a slash of some form.
+		return strings.ContainsAny(s[:p], `/.\`)
+	}
+
+	// Assuming we terminate search for packages once a scoped qualifier is
+	// found, we know that any file without an extension (except maybe '-')
+	// is invalid. We can therefore assume it is a package.
+	// The section may still contain a dot, for instance ./foo/. or ./foo/...
+	return strings.TrimLeft(filepath.Ext(s), ".") == ""
+
+	// NOTE/TODO: we have not needed to check whether it is an absolute package
+	// or whether the package starts with a dot. Potentially we could thus relax
+	// the requirement that packages be dots if it is clear that the package
+	// name will not interfere with command names in all circumstances.
 }
 
 // Mode flags for loadImport and download (in get.go).
@@ -97,32 +141,27 @@ func (l *loader) abs(filename string) string {
 
 // cueFilesPackage creates a package for building a collection of CUE files
 // (typically named on the command line).
-func (l *loader) cueFilesPackage(files []string) *build.Instance {
+func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	pos := token.NoPos
 	cfg := l.cfg
 	cfg.filesMode = true
 	// ModInit() // TODO: support modules
 	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc())
 
-	for _, f := range files {
+	for _, bf := range files {
+		f := bf.Filename
 		if cfg.isDir(f) {
 			return cfg.newErrInstance(token.NoPos, toImportPath(f),
-				errors.Newf(pos, "cannot mix files with directories %v", f))
-		}
-		ext := filepath.Ext(f)
-		enc := encoding.MapExtension(ext)
-		if enc == nil {
-			return cfg.newErrInstance(token.NoPos, toImportPath(f),
-				errors.Newf(pos, "unrecognized extension %q", ext))
+				errors.Newf(pos, "file is a directory %v", f))
 		}
 	}
 
 	// TODO: add fields directly?
 	fp := newFileProcessor(cfg, pkg)
 	for _, file := range files {
-		path := file
-		if !filepath.IsAbs(file) {
-			path = filepath.Join(cfg.Dir, file)
+		path := file.Filename
+		if !filepath.IsAbs(path) {
+			path = filepath.Join(cfg.Dir, path)
 		}
 		fi, err := cfg.fileSystem.stat(path)
 		if err != nil {
@@ -131,7 +170,7 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 		}
 		if fi.IsDir() {
 			return cfg.newErrInstance(pos, toImportPath(path),
-				errors.Newf(pos, "%s is a directory, should be a CUE file", file))
+				errors.Newf(pos, "%s is a directory, should be a CUE file", file.Filename))
 		}
 		fp.add(pos, cfg.Dir, file, allowAnonymous)
 	}
@@ -156,14 +195,13 @@ func (l *loader) cueFilesPackage(files []string) *build.Instance {
 
 	l.addFiles(cfg.Dir, pkg)
 
-	pkg.Local = true
+	pkg.User = true
 	l.stk.Push("user")
-	pkg.Complete()
+	_ = pkg.Complete()
 	l.stk.Pop()
-	pkg.Local = true
+	pkg.User = true
 	//pkg.LocalPrefix = dirToImportPath(dir)
 	pkg.DisplayPath = "command-line-arguments"
-	pkg.Match = files
 
 	return pkg
 }

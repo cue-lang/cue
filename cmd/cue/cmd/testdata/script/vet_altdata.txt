@@ -1,0 +1,8 @@
+cue vet schema.cue json: foo.data
+! stderr .
+
+-- schema.cue --
+[string]: string
+
+-- foo.data --
+{ "a": "b" }

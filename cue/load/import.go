@@ -26,11 +26,11 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/encoding"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // An importMode controls the behavior of the Import method.
@@ -150,7 +150,14 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 				if f.IsDir() {
 					continue
 				}
-				fp.add(pos, dir, f.Name(), importComment)
+				file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
+				if err != nil {
+					p.UnknownFiles = append(p.UnknownFiles, &build.File{
+						Filename: f.Name(),
+					})
+					continue // skip unrecognized file types
+				}
+				fp.add(pos, dir, file, importComment)
 			}
 
 			if fp.pkg.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
@@ -314,20 +321,23 @@ func (fp *fileProcessor) finalize() errors.Error {
 	return nil
 }
 
-func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) (added bool) {
+func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode importMode) (added bool) {
+	path := file.Filename
 	fullPath := path
 	if !filepath.IsAbs(path) {
 		fullPath = filepath.Join(root, path)
 	}
+	file.Filename = fullPath
+
 	name := filepath.Base(fullPath)
 	dir := filepath.Dir(fullPath)
 
-	ext := nameExt(name)
 	p := fp.pkg
 
 	badFile := func(err errors.Error) bool {
 		fp.err = errors.Append(fp.err, err)
 		p.InvalidCUEFiles = append(p.InvalidCUEFiles, fullPath)
+		p.InvalidFiles = append(p.InvalidFiles, file)
 		return true
 	}
 
@@ -336,9 +346,11 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 		return badFile(err)
 	}
 	if !match {
-		if ext == cueSuffix {
+		if file.Encoding == build.CUE && file.Interpretation == "" {
 			p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
-		} else if encoding.MapExtension(ext) != nil {
+			p.IgnoredFiles = append(p.IgnoredFiles, file)
+		} else {
+			p.OrphanedFiles = append(p.OrphanedFiles, file)
 			p.DataFiles = append(p.DataFiles, fullPath)
 		}
 		return false // don't mark as added
@@ -353,6 +365,7 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 	_, pkg, _ := internal.PackageInfo(pf)
 	if pkg == "" && mode&allowAnonymous == 0 {
 		p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
+		p.IgnoredFiles = append(p.IgnoredFiles, file)
 		return false // don't mark as added
 	}
 
@@ -362,6 +375,7 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 	} else if pkg != p.PkgName {
 		if fp.ignoreOther {
 			p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
+			p.IgnoredFiles = append(p.IgnoredFiles, file)
 			return false
 		}
 		return badFile(&MultiplePackageError{
@@ -411,10 +425,13 @@ func (fp *fileProcessor) add(pos token.Pos, root, path string, mode importMode) 
 	switch {
 	case isTest:
 		p.TestCUEFiles = append(p.TestCUEFiles, fullPath)
+		// TODO: what is the BuildFiles equivalent?
 	case isTool:
 		p.ToolCUEFiles = append(p.ToolCUEFiles, fullPath)
+		// TODO: what is the BuildFiles equivalent?
 	default:
 		p.CUEFiles = append(p.CUEFiles, fullPath)
+		p.BuildFiles = append(p.BuildFiles, file)
 	}
 	return true
 }

@@ -35,7 +35,14 @@ import (
 type Instance struct {
 	ctxt *Context
 
+	BuildFiles    []*File // files to be inclduded in the build
+	IgnoredFiles  []*File // files excluded for this build
+	OrphanedFiles []*File // recognized file formats not part of any build
+	InvalidFiles  []*File // could not parse these files
+	UnknownFiles  []*File // unknown file types
+
 	// Files contains the AST for all files part of this instance.
+	// TODO: the intent is to deprecate this in favor of BuildFiles.
 	Files []*ast.File
 
 	loadFunc LoadFunc
@@ -97,11 +104,15 @@ type Instance struct {
 	AllTags []string
 
 	Standard bool // Is a builtin package
-	Local    bool
+	User     bool // True if package was created from individual files.
 
-	// Relative to Dir
-	CUEFiles        []string // .cue source files
-	DataFiles       []string // recognized data files (.json, .yaml, etc.)
+	// Deprecated: use BuildFiles
+	CUEFiles []string // .cue source files
+	// Deprecated: use BuildFiles and OrphanedFiles
+	DataFiles []string // recognized data files (.json, .yaml, etc.)
+
+	// The intent is to also deprecate the following fields in favor of
+	// IgnoredFiles and UnknownFiles.
 	TestCUEFiles    []string // .cue test files (_test.cue)
 	ToolCUEFiles    []string // .cue tool files (_tool.cue)
 	IgnoredCUEFiles []string // .cue source files ignored for this build

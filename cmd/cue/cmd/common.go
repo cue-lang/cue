@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 )
 
 // Disallow
@@ -115,6 +116,100 @@ func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instan
 	}
 
 	return binst
+}
+
+// A buildPlan defines what should be done based on command line
+// arguments and flags.
+//
+// TODO: allow --merge/-m to mix in other packages.
+type buildPlan struct {
+	cmd   *Command
+	insts []*build.Instance
+
+	// If orphanFiles are mixed with CUE files and/or if placement flags are used,
+	// the instance is also included in insts.
+	orphanedData   []*build.File
+	orphanedSchema []*build.File
+	orphanInstance *build.Instance
+
+	merge []*build.Instance
+}
+
+func (b *buildPlan) instances() []*cue.Instance {
+	if len(b.insts) == 0 {
+		return nil
+	}
+	return buildInstances(b.cmd, b.insts)
+}
+
+func parseArgs(cmd *Command, args []string, cfg *load.Config) (*buildPlan, error) {
+	if cfg == nil {
+		cfg = defaultConfig
+	}
+	builds := loadFromArgs(cmd, args, cfg)
+	if builds == nil {
+		return nil, errors.Newf(token.NoPos, "invalid args")
+	}
+	decorateInstances(cmd, flagTags.StringArray(cmd), builds)
+
+	return splitBuilds(cmd, builds)
+}
+
+func splitBuilds(cmd *Command, builds []*build.Instance) (*buildPlan, errors.Error) {
+	p := &buildPlan{cmd: cmd}
+
+	for _, b := range builds {
+		if !b.User {
+			p.insts = append(p.insts, b)
+			continue
+		}
+
+		if len(b.BuildFiles) > 0 {
+			p.insts = append(p.insts, b)
+		}
+
+		if len(b.OrphanedFiles) > 0 {
+			if p.orphanInstance != nil {
+				return nil, errors.Newf(token.NoPos,
+					"builds contain two file packages")
+			}
+			p.orphanInstance = b
+		}
+
+		for _, f := range b.OrphanedFiles {
+			switch f.Interpretation {
+			case build.JSONSchema, build.OpenAPI:
+				p.orphanedSchema = append(p.orphanedSchema, f)
+				continue
+			}
+			switch f.Encoding {
+			case build.Protobuf:
+				p.orphanedSchema = append(p.orphanedSchema, f)
+			case build.YAML, build.JSON, build.Text:
+				p.orphanedData = append(p.orphanedData, f)
+			default:
+				return nil, errors.Newf(token.NoPos,
+					"unsupported encoding %q", f.Encoding)
+			}
+		}
+	}
+
+	return p, nil
+}
+
+func (b *buildPlan) singleInstance() *cue.Instance {
+	var p *build.Instance
+	switch len(b.insts) {
+	case 0:
+		return nil
+	case 1:
+		p = b.insts[0]
+	default:
+		exitOnErr(b.cmd, errors.Newf(token.NoPos,
+			"cannot combine data streaming with multiple instances"), true)
+		return nil
+	}
+	return buildInstances(b.cmd, []*build.Instance{p})[0]
 }
 
 func buildInstances(cmd *Command, binst []*build.Instance) []*cue.Instance {

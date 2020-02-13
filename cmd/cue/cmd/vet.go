@@ -15,19 +15,14 @@
 package cmd
 
 import (
-	"bytes"
-	"fmt"
-	"io/ioutil"
-	"path/filepath"
-
 	"github.com/spf13/cobra"
 	"golang.org/x/text/message"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/encoding"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding"
 )
 
 const vetDoc = `vet validates CUE and other data files
@@ -44,6 +39,7 @@ currently supported:
   Format       Extensions
 	JSON       .json .jsonl .ndjson
 	YAML       .yaml .yml
+	TEXT       .txt  (validate a single string value)
 
 To activate this mode, the non-cue files must be explicitly mentioned on the
 command line. There must also be at least one CUE file to hold the constraints.
@@ -79,6 +75,7 @@ func newVetCmd(c *Command) *cobra.Command {
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete")
 
+	// TODO: change to -d as -e means something different here as then in eval.
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil,
 		"use this expression to validate non-CUE files")
 
@@ -88,27 +85,29 @@ func newVetCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
+// doVet validates instances. There are two modes:
+// - Only packages: vet all these packages
+// - Data files: compare each data instance against a single package.
+//
+// It is invalid to have data files with other than exactly one package.
+//
+// TODO: allow unrooted schema, such as JSON schema to compare against
+// other values.
 func doVet(cmd *Command, args []string) error {
-	builds := loadFromArgs(cmd, args, defaultConfig)
-	if builds == nil {
-		return nil
-	}
-	decorateInstances(cmd, flagTags.StringArray(cmd), builds)
-	instances := buildInstances(cmd, builds)
+	b, err := parseArgs(cmd, args, nil)
+	exitOnErr(cmd, err, true)
 
 	// Go into a special vet mode if the user explicitly specified non-cue
 	// files on the command line.
-	for _, a := range args {
-		enc := encoding.MapExtension(filepath.Ext(a))
-		if enc != nil && enc.Name() != "cue" {
-			vetFiles(cmd, instances[0], builds[0].DataFiles)
-			return nil
-		}
+	// TODO: unify these two modes.
+	if len(b.orphanedData) > 0 {
+		vetFiles(cmd, b)
+		return nil
 	}
 
 	shown := false
 
-	for _, inst := range instances {
+	for _, inst := range b.instances() {
 		// TODO: use ImportPath or some other sanitized path.
 
 		concrete := true
@@ -140,10 +139,16 @@ func doVet(cmd *Command, args []string) error {
 	return nil
 }
 
-func vetFiles(cmd *Command, inst *cue.Instance, files []string) {
+func vetFiles(cmd *Command, b *buildPlan) {
+	// Use -r type root, instead of -e
 	expressions := flagExpression.StringArray(cmd)
 
 	var check cue.Value
+
+	inst := b.singleInstance()
+	if inst == nil {
+		exitOnErr(cmd, errors.New("data files specified without a schema"), true)
+	}
 
 	if len(expressions) == 0 {
 		check = inst.Value()
@@ -158,30 +163,17 @@ func vetFiles(cmd *Command, inst *cue.Instance, files []string) {
 		check = check.Unify(v)
 	}
 
-	for _, f := range files {
-		b, err := ioutil.ReadFile(f)
-		exitIfErr(cmd, inst, err, true)
+	r := internal.GetRuntime(inst).(*cue.Runtime)
 
-		ext := filepath.Ext(filepath.Ext(f))
-		enc := encoding.MapExtension(ext)
-		if enc == nil {
-			exitIfErr(cmd, inst, fmt.Errorf("unrecognized extension %q", ext), true)
-		}
-
-		var exprs []ast.Expr
-		switch enc.Name() {
-		case "json":
-			exprs, err = handleJSON(f, bytes.NewReader(b))
-		case "yaml":
-			exprs, err = handleYAML(f, bytes.NewReader(b))
-		default:
-			exitIfErr(cmd, inst, fmt.Errorf("vet does not support %q", enc.Name()), true)
-		}
-		exitIfErr(cmd, inst, err, true)
-
-		r := internal.GetRuntime(inst).(*cue.Runtime)
-		for _, expr := range exprs {
-			body, err := r.CompileExpr(expr)
+	for _, f := range b.orphanedData {
+		i := encoding.NewDecoder(f, &encoding.Config{
+			Stdin:     stdin,
+			Stdout:    stdout,
+			ProtoPath: flagProtoPath.StringArray(cmd),
+		})
+		defer i.Close()
+		for ; !i.Done(); i.Next() {
+			body, err := r.CompileExpr(i.Expr())
 			exitIfErr(cmd, inst, err, true)
 			v := body.Value().Unify(check)
 			if err := v.Err(); err != nil {
@@ -192,5 +184,6 @@ func vetFiles(cmd *Command, inst *cue.Instance, files []string) {
 				exitIfErr(cmd, inst, err, false)
 			}
 		}
+		exitIfErr(cmd, inst, i.Err(), false)
 	}
 }

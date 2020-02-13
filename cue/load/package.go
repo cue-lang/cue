@@ -16,9 +16,6 @@ package load
 
 import (
 	"unicode/utf8"
-
-	"cuelang.org/go/cue/build"
-	"cuelang.org/go/internal/str"
 )
 
 // Package rules:
@@ -33,20 +30,6 @@ import (
 // The contents of a namespace depends on the directory that is selected as the
 // starting point to load a package. An instance defines a package-directory
 // pair.
-
-// allFiles returns the names of all the files considered for the package.
-// This is used for sanity and security checks, so we include all files,
-// even IgnoredGoFiles, because some subcommands consider them.
-func allFiles(p *build.Instance) []string {
-	return str.StringList(
-		p.CUEFiles,
-		p.ToolCUEFiles,
-		p.TestCUEFiles,
-		p.IgnoredCUEFiles,
-		p.InvalidCUEFiles,
-		p.DataFiles,
-	)
-}
 
 // safeArg reports whether arg is a "safe" command-line argument,
 // meaning that when it appears in a command-line, it probably

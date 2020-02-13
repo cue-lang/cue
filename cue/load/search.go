@@ -211,7 +211,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 			case nil:
 				break
 			case *NoFilesError:
-				if c.DataFiles && len(p.DataFiles) > 0 {
+				if c.DataFiles && len(p.OrphanedFiles) > 0 {
 					break
 				}
 				return nil

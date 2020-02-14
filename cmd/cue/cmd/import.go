@@ -31,7 +31,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/cue/encoding"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
@@ -40,6 +40,7 @@ import (
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -247,93 +248,56 @@ const (
 	flagWithContext flagName = "with-context"
 )
 
-type importStreamFunc func(path string, r io.Reader) ([]ast.Expr, error)
-type importFileFunc func(cmd *Command, path string, r io.Reader) (*ast.File, error)
+// TODO: factor out rooting of orphaned files.
 
-type encodingInfo struct {
-	fnStream importStreamFunc
-	fnFile   importFileFunc
-	typ      string
-}
-
-var (
-	jsonEnc     = &encodingInfo{fnStream: handleJSON, typ: "json"}
-	yamlEnc     = &encodingInfo{fnStream: handleYAML, typ: "yaml"}
-	protodefEnc = &encodingInfo{fnFile: handleProtoDef, typ: "proto"}
-)
-
-func getExtInfo(ext string) *encodingInfo {
-	enc := encoding.MapExtension(ext)
-	if enc == nil {
-		return nil
-	}
-	switch enc.Name() {
-	case "json":
-		return jsonEnc
-	case "yaml":
-		return yamlEnc
-	case "protobuf":
-		return protodefEnc
-	}
-	return nil
-}
-
-func runImport(cmd *Command, args []string) error {
+func runImport(cmd *Command, args []string) (err error) {
 	var group errgroup.Group
 
 	pkgFlag := flagPackage.String(cmd)
 
-	group.Go(func() (err error) {
-		if len(args) > 0 && len(filepath.Ext(args[0])) > len(".") {
-			for _, a := range args {
-				group.Go(func() error { return handleFile(cmd, pkgFlag, a) })
-			}
-			return nil
+	done := map[string]bool{}
+
+	b, err := parseArgs(cmd, args, &load.Config{DataFiles: true})
+	if err != nil {
+		return err
+	}
+	builds := b.insts
+	if b.orphanInstance != nil {
+		builds = append(builds, b.orphanInstance)
+	}
+	for _, pkg := range builds {
+		pkgName := pkgFlag
+		if pkgName == "" {
+			pkgName = pkg.PkgName
 		}
-
-		done := map[string]bool{}
-
-		inst := load.Instances(args, &load.Config{DataFiles: true})
-		for _, pkg := range inst {
-			pkgName := pkgFlag
-			if pkgName == "" {
-				pkgName = pkg.PkgName
-			}
-			if pkgName == "" && len(inst) > 1 {
-				return fmt.Errorf("must specify package name with the -p flag")
-			}
-			dir := pkg.Dir
-			if err := pkg.Err; err != nil {
-				return err
-			}
-			if done[dir] {
-				continue
-			}
-			done[dir] = true
-
-			files, err := ioutil.ReadDir(dir)
-			if err != nil {
-				return err
-			}
-			for _, file := range files {
-				ext := filepath.Ext(file.Name())
-				typ := flagType.String(cmd)
-				if enc := getExtInfo(ext); enc == nil || (typ != "" && typ != enc.typ) {
-					continue
-				}
-				path := filepath.Join(dir, file.Name())
-				group.Go(func() error { return handleFile(cmd, pkgName, path) })
-			}
+		// TODO: allow if there is a unique package name.
+		if pkgName == "" && len(builds) > 1 {
+			err = fmt.Errorf("must specify package name with the -p flag")
+			break
 		}
-		return nil
-	})
+		if err = pkg.Err; err != nil {
+			break
+		}
+		if done[pkg.Dir] {
+			continue
+		}
+		done[pkg.Dir] = true
 
-	err := group.Wait()
+		for _, f := range pkg.OrphanedFiles {
+			f := f // capture range var
+			group.Go(func() error { return handleFile(cmd, pkgName, f) })
+		}
+	}
+
+	err2 := group.Wait()
 	exitOnErr(cmd, err, true)
+	exitOnErr(cmd, err2, true)
 	return nil
 }
 
-func handleFile(cmd *Command, pkg, filename string) (err error) {
+func handleFile(cmd *Command, pkg string, file *build.File) (err error) {
+	filename := file.Filename
+	// filter file names
 	re, err := regexp.Compile(flagGlob.String(cmd))
 	if err != nil {
 		return err
@@ -341,37 +305,31 @@ func handleFile(cmd *Command, pkg, filename string) (err error) {
 	if !re.MatchString(filepath.Base(filename)) {
 		return nil
 	}
-	f, err := os.Open(filename)
-	if err != nil {
-		return fmt.Errorf("error opening file: %v", err)
-	}
-	defer f.Close()
 
-	ext := filepath.Ext(filename)
-	handler := getExtInfo(ext)
-
-	switch {
-	case handler == nil:
-		return fmt.Errorf("unsupported extension %q", ext)
-
-	case handler.fnFile != nil:
-		file, err := handler.fnFile(cmd, filename, f)
-		if err != nil {
+	// TODO: consider unifying the two modes.
+	var objs []ast.Expr
+	i := encoding.NewDecoder(file, &encoding.Config{
+		Stdin:     stdin,
+		Stdout:    stdout,
+		ProtoPath: flagProtoPath.StringArray(cmd),
+	})
+	defer i.Close()
+	for ; !i.Done(); i.Next() {
+		if expr := i.Expr(); expr != nil {
+			objs = append(objs, expr)
+			continue
+		}
+		if err := processFile(cmd, i.File()); err != nil {
 			return err
 		}
-		file.Filename = filename
-		return processFile(cmd, file)
+	}
 
-	case handler.fnStream != nil:
-		objs, err := handler.fnStream(filename, f)
-		if err != nil {
+	if len(objs) > 0 {
+		if err := processStream(cmd, pkg, filename, objs); err != nil {
 			return err
 		}
-		return processStream(cmd, pkg, filename, objs)
-
-	default:
-		panic("incorrect handler")
 	}
+	return i.Err()
 }
 
 func processFile(cmd *Command, file *ast.File) (err error) {
@@ -587,40 +545,6 @@ func newName(filename string, i int) string {
 	return filename
 }
 
-func handleJSON(path string, r io.Reader) (objects []ast.Expr, err error) {
-	d := json.NewDecoder(nil, path, r)
-
-	for {
-		expr, err := d.Extract()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		objects = append(objects, expr)
-	}
-	return objects, nil
-}
-
-func handleYAML(path string, r io.Reader) (objects []ast.Expr, err error) {
-	d, err := yaml.NewDecoder(path, r)
-	if err != nil {
-		return nil, err
-	}
-	for i := 0; ; i++ {
-		expr, err := d.Decode()
-		if err == io.EOF {
-			break
-		}
-		if err != nil {
-			return nil, err
-		}
-		objects = append(objects, expr)
-	}
-	return objects, nil
-}
-
 func handleProtoDef(cmd *Command, path string, r io.Reader) (f *ast.File, err error) {
 	return protobuf.Extract(path, r, &protobuf.Config{Paths: flagProtoPath.StringArray(cmd)})
 }
@@ -674,7 +598,7 @@ func (h *hoister) hoist(f *ast.File) {
 				return false
 			}
 
-			pkg := c.Import("encoding/" + enc.typ)
+			pkg := c.Import("encoding/" + enc)
 			if pkg == nil {
 				return false
 			}
@@ -696,32 +620,32 @@ func (h *hoister) hoist(f *ast.File) {
 	})
 }
 
-func tryParse(str string) (s ast.Expr, format *encodingInfo) {
+func tryParse(str string) (s ast.Expr, pkg string) {
 	b := []byte(str)
 	if json.Valid(b) {
 		expr, err := parser.ParseExpr("", b)
 		if err != nil {
 			// TODO: report error
-			return nil, nil
+			return nil, ""
 		}
 		switch expr.(type) {
 		case *ast.StructLit, *ast.ListLit:
 		default:
-			return nil, nil
+			return nil, ""
 		}
-		return expr, jsonEnc
+		return expr, "json"
 	}
 
 	if expr, err := yaml.Unmarshal("", b); err == nil {
 		switch expr.(type) {
 		case *ast.StructLit, *ast.ListLit:
 		default:
-			return nil, nil
+			return nil, ""
 		}
-		return expr, yamlEnc
+		return expr, "yaml"
 	}
 
-	return nil, nil
+	return nil, ""
 }
 
 func (h *hoister) uniqueName(base, prefix, typ string) string {

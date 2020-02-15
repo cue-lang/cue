@@ -57,12 +57,12 @@ Examples:
 		"require the evaluation to be concrete")
 
 	cmd.Flags().BoolP(string(flagHidden), "H", false,
-		"display hidden attributes")
+		"display hidden fields")
 
 	cmd.Flags().BoolP(string(flagOptional), "O", false,
-		"display optional attributes")
+		"display optional fields")
 
-	cmd.Flags().BoolP(string(flagAttributes), "l", false,
+	cmd.Flags().BoolP(string(flagAttributes), "A", false,
 		"display field attributes")
 
 	cmd.Flags().BoolP(string(flagAll), "a", false,
@@ -79,7 +79,7 @@ const (
 	flagConcrete   flagName = "concrete"
 	flagHidden     flagName = "show-hidden"
 	flagOptional   flagName = "show-optional"
-	flagAttributes flagName = "attributes"
+	flagAttributes flagName = "show-attributes"
 )
 
 func runEval(cmd *Command, args []string) error {

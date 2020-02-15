@@ -15,16 +15,12 @@
 package cmd
 
 import (
-	"encoding/json"
-	"fmt"
-	"io"
-
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/pkg/encoding/yaml"
+	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // newExportCmd creates and export command
@@ -104,7 +100,8 @@ text    output as raw text
 }
 
 func runExport(cmd *Command, args []string) error {
-	instances := buildFromArgs(cmd, args)
+	b, err := parseArgs(cmd, args, nil)
+	exitOnErr(cmd, err, true)
 	w := cmd.OutOrStdout()
 
 	var exprs []ast.Expr
@@ -116,72 +113,30 @@ func runExport(cmd *Command, args []string) error {
 		exprs = append(exprs, expr)
 	}
 
-	count := 0
+	format := flagMedia.String(cmd) + ":-"
+	f, err := filetypes.ParseFile(format, filetypes.Export)
+	exitOnErr(cmd, err, true)
 
-	for _, inst := range instances {
-		root := inst.Value()
+	cfg := &encoding.Config{
+		Out: w,
+	}
+
+	enc, err := encoding.NewEncoder(f, cfg)
+	exitOnErr(cmd, err, true)
+	defer enc.Close()
+
+	for _, inst := range b.instances() {
 		if exprs == nil {
-			err := exportValue(cmd, w, root, count)
-			exitIfErr(cmd, inst, err, true)
-			count++
+			err = enc.Encode(inst.Value())
+			exitOnErr(cmd, err, true)
 			continue
 		}
 		for _, e := range exprs {
 			v := inst.Eval(e)
-			exitIfErr(cmd, inst, v.Err(), true)
-			err := exportValue(cmd, w, v, count)
-			count++
-			exitIfErr(cmd, inst, err, true)
+			exitOnErr(cmd, v.Err(), true)
+			err = enc.Encode(v)
+			exitOnErr(cmd, err, true)
 		}
 	}
 	return nil
-}
-
-func exportValue(cmd *Command, w io.Writer, v cue.Value, i int) error {
-	switch media := flagMedia.String(cmd); media {
-	case "json":
-		return outputJSON(cmd, w, v)
-	case "text":
-		return outputText(w, v)
-	case "yaml":
-		return outputYAML(w, v, i)
-	default:
-		return fmt.Errorf("export: unknown format %q", media)
-	}
-}
-
-func outputJSON(cmd *Command, w io.Writer, v cue.Value) error {
-	e := json.NewEncoder(w)
-	e.SetIndent("", "    ")
-	e.SetEscapeHTML(flagEscape.Bool(cmd))
-
-	err := e.Encode(v)
-	if err != nil {
-		if x, ok := err.(*json.MarshalerError); ok {
-			err = x.Err
-		}
-		return err
-	}
-	return nil
-}
-
-func outputText(w io.Writer, v cue.Value) error {
-	str, err := v.String()
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprint(w, str)
-	return err
-}
-
-func outputYAML(w io.Writer, v cue.Value, i int) error {
-	if i > 0 {
-		fmt.Fprintln(w, "---")
-	}
-	str, err := yaml.Marshal(v)
-	if err != nil {
-		return err
-	}
-	_, err = fmt.Fprint(w, str)
-	return err
 }

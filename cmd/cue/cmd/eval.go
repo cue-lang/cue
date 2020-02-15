@@ -83,7 +83,8 @@ const (
 )
 
 func runEval(cmd *Command, args []string) error {
-	instances := buildFromArgs(cmd, args)
+	b, err := parseArgs(cmd, args, nil)
+	exitOnErr(cmd, err, false)
 
 	var exprs []ast.Expr
 	for _, e := range flagExpression.StringArray(cmd) {
@@ -104,6 +105,7 @@ func runEval(cmd *Command, args []string) error {
 		}
 	}
 
+	instances := b.instances()
 	for _, inst := range instances {
 		// TODO: use ImportPath or some other sanitized path.
 		if len(instances) > 1 {

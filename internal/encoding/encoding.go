@@ -22,10 +22,12 @@ import (
 	"os"
 	"strings"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
+	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -51,20 +53,33 @@ func (i *Decoder) Next() {
 	}
 }
 
-func (i *Decoder) File() *ast.File {
-	if i.file != nil {
-		return i.file
-	}
-	switch x := i.expr.(type) {
+func toFile(x ast.Expr) *ast.File {
+	switch x := x.(type) {
 	case nil:
 		return nil
 	case *ast.StructLit:
 		return &ast.File{Decls: x.Elts}
 	default:
-		return &ast.File{
-			Decls: []ast.Decl{&ast.EmbedDecl{Expr: i.expr}},
-		}
+		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
 	}
+}
+
+func valueToFile(v cue.Value) *ast.File {
+	switch x := v.Syntax().(type) {
+	case *ast.File:
+		return x
+	case ast.Expr:
+		return toFile(x)
+	default:
+		panic("unrreachable")
+	}
+}
+
+func (i *Decoder) File() *ast.File {
+	if i.file != nil {
+		return i.file
+	}
+	return toFile(i.expr)
 }
 
 func (i *Decoder) Err() error {
@@ -79,9 +94,17 @@ func (i *Decoder) Close() {
 }
 
 type Config struct {
-	Stdin     io.Reader
-	Stdout    io.Writer
-	ProtoPath []string
+	Mode filetypes.Mode
+
+	// Out specifies an overwrite destination.
+	Out    io.Writer
+	Stdin  io.Reader
+	Stdout io.Writer
+
+	Force bool // overwrite existing files.
+
+	EscapeHTML bool
+	ProtoPath  []string
 }
 
 // NewDecoder returns a stream of non-rooted data expressions. The encoding

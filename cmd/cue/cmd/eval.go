@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/parser"
 )
 
 // newEvalCmd creates a new eval command
@@ -86,15 +85,6 @@ func runEval(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, nil)
 	exitOnErr(cmd, err, false)
 
-	var exprs []ast.Expr
-	for _, e := range flagExpression.StringArray(cmd) {
-		expr, err := parser.ParseExpr("<expression flag>", e)
-		if err != nil {
-			return err
-		}
-		exprs = append(exprs, expr)
-	}
-
 	w := cmd.OutOrStdout()
 	// Always print a trailing newline. format.Node may not write a trailing
 	// newline if the output is single-line expression.
@@ -131,7 +121,7 @@ func runEval(cmd *Command, args []string) error {
 			opts = append(opts, format.Simplify())
 		}
 
-		if exprs == nil {
+		if b.expressions == nil {
 			v := inst.Value()
 			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
@@ -141,8 +131,8 @@ func runEval(cmd *Command, args []string) error {
 			}
 			writeNode(format.Node(getSyntax(v, syn), opts...))
 		}
-		for _, e := range exprs {
-			if len(exprs) > 1 {
+		for _, e := range b.expressions {
+			if len(b.expressions) > 1 {
 				fmt.Fprint(w, "// ")
 				writeNode(format.Node(e))
 			}

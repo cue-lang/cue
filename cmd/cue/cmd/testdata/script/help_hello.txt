@@ -29,9 +29,7 @@ Flags:
   -h, --help   help for hello
 
 Global Flags:
-      --debug            give detailed error info
-  -i, --ignore           proceed in the presence of errors
-  -p, --package string   CUE package to evaluate
-  -s, --simplify         simplify output
-      --trace            trace computation
-  -v, --verbose          print information about progress
+  -i, --ignore     proceed in the presence of errors
+  -s, --simplify   simplify output
+      --trace      trace computation
+  -v, --verbose    print information about progress

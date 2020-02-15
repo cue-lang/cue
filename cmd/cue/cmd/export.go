@@ -17,8 +17,6 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -102,36 +100,22 @@ text    output as raw text
 func runExport(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, nil)
 	exitOnErr(cmd, err, true)
-	w := cmd.OutOrStdout()
-
-	var exprs []ast.Expr
-	for _, e := range flagExpression.StringArray(cmd) {
-		expr, err := parser.ParseExpr("<expression flag>", e)
-		if err != nil {
-			return err
-		}
-		exprs = append(exprs, expr)
-	}
 
 	format := flagMedia.String(cmd) + ":-"
 	f, err := filetypes.ParseFile(format, filetypes.Export)
 	exitOnErr(cmd, err, true)
 
-	cfg := &encoding.Config{
-		Out: w,
-	}
-
-	enc, err := encoding.NewEncoder(f, cfg)
+	enc, err := encoding.NewEncoder(f, b.encConfig)
 	exitOnErr(cmd, err, true)
 	defer enc.Close()
 
 	for _, inst := range b.instances() {
-		if exprs == nil {
+		if b.expressions == nil {
 			err = enc.Encode(inst.Value())
 			exitOnErr(cmd, err, true)
 			continue
 		}
-		for _, e := range exprs {
+		for _, e := range b.expressions {
 			v := inst.Eval(e)
 			exitOnErr(cmd, v.Err(), true)
 			err = enc.Encode(v)

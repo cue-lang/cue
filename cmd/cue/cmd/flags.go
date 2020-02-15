@@ -29,10 +29,10 @@ const (
 	flagIgnore   flagName = "ignore"
 	flagSimplify flagName = "simplify"
 	flagPackage  flagName = "package"
-	flagDebug    flagName = "debug"
 	flagTags     flagName = "tags"
 
 	flagExpression flagName = "expression"
+	flagSchema     flagName = "schema"
 	flagEscape     flagName = "escape"
 	flagGlob       flagName = "name"
 	flagRecursive  flagName = "recursive"
@@ -54,18 +54,24 @@ var flagOut = stringFlag{
 }
 
 func addGlobalFlags(f *pflag.FlagSet) {
-	f.Bool(string(flagDebug), false,
-		"give detailed error info")
 	f.Bool(string(flagTrace), false,
 		"trace computation")
-	f.StringP(string(flagPackage), "p", "",
-		"CUE package to evaluate")
 	f.BoolP(string(flagSimplify), "s", false,
 		"simplify output")
 	f.BoolP(string(flagIgnore), "i", false,
 		"proceed in the presence of errors")
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
+}
+
+func addOrphanFlags(f *pflag.FlagSet) {
+	f.StringP(string(flagPackage), "p", "", "package name for non-CUE files")
+	f.StringArrayP(string(flagPath), "l", nil, "CUE expression for single path component")
+	f.Bool(string(flagList), false, "concatenate multiple objects into a list")
+	f.Bool(string(flagFiles), false, "split multiple entries into different files")
+	f.Bool(string(flagWithContext), false, "import as object with contextual data")
+	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
+	f.StringP(string(flagGlob), "n", "", "glob filter for file names")
 }
 
 type flagName string

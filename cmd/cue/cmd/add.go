@@ -53,6 +53,7 @@ func newAddCmd(c *Command) *cobra.Command {
 		"text executed as Go template with instance info")
 	f.BoolP(string(flagDryrun), "n", false,
 		"only run simulation")
+	f.StringP(string(flagPackage), "p", "", "package to append to")
 
 	return cmd
 }

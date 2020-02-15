@@ -32,6 +32,7 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/encoding"
 )
 
 // Disallow
@@ -100,15 +101,6 @@ func exitOnErr(cmd *Command, err error, fatal bool) {
 	}
 }
 
-func buildFromArgs(cmd *Command, args []string) []*cue.Instance {
-	binst := loadFromArgs(cmd, args, defaultConfig)
-	if binst == nil {
-		return nil
-	}
-	decorateInstances(cmd, flagTags.StringArray(cmd), binst)
-	return buildInstances(cmd, binst)
-}
-
 func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instance {
 	binst := load.Instances(args, cfg)
 	if len(binst) == 0 {
@@ -132,7 +124,11 @@ type buildPlan struct {
 	orphanedSchema []*build.File
 	orphanInstance *build.Instance
 
-	merge []*build.Instance
+	expressions []ast.Expr // only evaluate these expressions within results
+	schema      ast.Expr   // selects schema in instance for orphaned values
+
+	encConfig *encoding.Config
+	merge     []*build.Instance
 }
 
 func (b *buildPlan) instances() []*cue.Instance {
@@ -152,11 +148,11 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (*buildPlan, error
 	}
 	decorateInstances(cmd, flagTags.StringArray(cmd), builds)
 
-	return splitBuilds(cmd, builds)
-}
-
-func splitBuilds(cmd *Command, builds []*build.Instance) (*buildPlan, errors.Error) {
 	p := &buildPlan{cmd: cmd}
+
+	if err := p.parseFlags(); err != nil {
+		return nil, err
+	}
 
 	for _, b := range builds {
 		if !b.User {
@@ -195,6 +191,28 @@ func splitBuilds(cmd *Command, builds []*build.Instance) (*buildPlan, errors.Err
 	}
 
 	return p, nil
+}
+
+func (b *buildPlan) parseFlags() (err error) {
+	for _, e := range flagExpression.StringArray(b.cmd) {
+		expr, err := parser.ParseExpr("--expression", e)
+		if err != nil {
+			return err
+		}
+		b.expressions = append(b.expressions, expr)
+	}
+	if s := flagSchema.String(b.cmd); s != "" {
+		b.schema, err = parser.ParseExpr("--schema", s)
+		if err != nil {
+			return err
+		}
+	}
+	b.encConfig = &encoding.Config{
+		Stdin:     stdin,
+		Stdout:    b.cmd.OutOrStdout(),
+		ProtoPath: flagProtoPath.StringArray(b.cmd),
+	}
+	return nil
 }
 
 func (b *buildPlan) singleInstance() *cue.Instance {

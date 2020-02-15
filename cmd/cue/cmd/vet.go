@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding"
 )
@@ -75,9 +74,8 @@ func newVetCmd(c *Command) *cobra.Command {
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete")
 
-	// TODO: change to -d as -e means something different here as then in eval.
-	cmd.Flags().StringArrayP(string(flagExpression), "e", nil,
-		"use this expression to validate non-CUE files")
+	cmd.Flags().StringP(string(flagSchema), "d", "",
+		"expression to select schema for evaluating values in non-CUE files")
 
 	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
 		"set the value of a tagged field")
@@ -141,7 +139,7 @@ func doVet(cmd *Command, args []string) error {
 
 func vetFiles(cmd *Command, b *buildPlan) {
 	// Use -r type root, instead of -e
-	expressions := flagExpression.StringArray(cmd)
+	expr := flagSchema.String(cmd)
 
 	var check cue.Value
 
@@ -150,27 +148,17 @@ func vetFiles(cmd *Command, b *buildPlan) {
 		exitOnErr(cmd, errors.New("data files specified without a schema"), true)
 	}
 
-	if len(expressions) == 0 {
+	if expr == "" {
 		check = inst.Value()
-	}
-
-	for _, e := range expressions {
-		expr, err := parser.ParseExpr("<expression flag>", e)
-		exitIfErr(cmd, inst, err, true)
-
-		v := inst.Eval(expr)
-		exitIfErr(cmd, inst, v.Err(), true)
-		check = check.Unify(v)
+	} else {
+		check = inst.Eval(b.schema)
+		exitIfErr(cmd, inst, check.Err(), true)
 	}
 
 	r := internal.GetRuntime(inst).(*cue.Runtime)
 
 	for _, f := range b.orphanedData {
-		i := encoding.NewDecoder(f, &encoding.Config{
-			Stdin:     stdin,
-			Stdout:    stdout,
-			ProtoPath: flagProtoPath.StringArray(cmd),
-		})
+		i := encoding.NewDecoder(f, b.encConfig)
 		defer i.Close()
 		for ; !i.Done(); i.Next() {
 			body, err := r.CompileExpr(i.Expr())

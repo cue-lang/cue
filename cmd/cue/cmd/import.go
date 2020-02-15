@@ -224,20 +224,14 @@ Example:
 	}
 
 	flagOut.Add(cmd)
-	cmd.Flags().StringP(string(flagGlob), "n", "", "glob filter for file names")
+
+	addOrphanFlags(cmd.Flags())
+
 	cmd.Flags().String(string(flagType), "", "only apply to files of this type")
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
-
-	cmd.Flags().StringArrayP(string(flagPath), "l", nil, "CUE expression for single path component")
-	cmd.Flags().Bool(string(flagList), false, "concatenate multiple objects into a list")
-	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
-	cmd.Flags().Bool(string(flagWithContext), false, "import as object with contextual data")
-
 	cmd.Flags().String("fix", "", "apply given fix")
-
-	cmd.Flags().StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
 
 	return cmd
 }
@@ -285,7 +279,7 @@ func runImport(cmd *Command, args []string) (err error) {
 
 		for _, f := range pkg.OrphanedFiles {
 			f := f // capture range var
-			group.Go(func() error { return handleFile(cmd, pkgName, f) })
+			group.Go(func() error { return handleFile(b, pkgName, f) })
 		}
 	}
 
@@ -295,10 +289,10 @@ func runImport(cmd *Command, args []string) (err error) {
 	return nil
 }
 
-func handleFile(cmd *Command, pkg string, file *build.File) (err error) {
+func handleFile(b *buildPlan, pkg string, file *build.File) (err error) {
 	filename := file.Filename
 	// filter file names
-	re, err := regexp.Compile(flagGlob.String(cmd))
+	re, err := regexp.Compile(flagGlob.String(b.cmd))
 	if err != nil {
 		return err
 	}
@@ -308,24 +302,20 @@ func handleFile(cmd *Command, pkg string, file *build.File) (err error) {
 
 	// TODO: consider unifying the two modes.
 	var objs []ast.Expr
-	i := encoding.NewDecoder(file, &encoding.Config{
-		Stdin:     stdin,
-		Stdout:    stdout,
-		ProtoPath: flagProtoPath.StringArray(cmd),
-	})
+	i := encoding.NewDecoder(file, b.encConfig)
 	defer i.Close()
 	for ; !i.Done(); i.Next() {
 		if expr := i.Expr(); expr != nil {
 			objs = append(objs, expr)
 			continue
 		}
-		if err := processFile(cmd, i.File()); err != nil {
+		if err := processFile(b.cmd, i.File()); err != nil {
 			return err
 		}
 	}
 
 	if len(objs) > 0 {
-		if err := processStream(cmd, pkg, filename, objs); err != nil {
+		if err := processStream(b.cmd, pkg, filename, objs); err != nil {
 			return err
 		}
 	}

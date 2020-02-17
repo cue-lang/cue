@@ -16,31 +16,24 @@ package cmd
 
 import (
 	"fmt"
-	"io"
 	"io/ioutil"
 	"os"
 	"path/filepath"
-	"regexp"
 	"strconv"
 	"strings"
-	"sync"
 	"unicode"
 
 	"github.com/spf13/cobra"
-	"golang.org/x/sync/errgroup"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
-	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -231,7 +224,7 @@ Example:
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
-	cmd.Flags().String("fix", "", "apply given fix")
+	cmd.Flags().String("fix", "", "apply given fix") // XXX
 
 	return cmd
 }
@@ -245,131 +238,48 @@ const (
 // TODO: factor out rooting of orphaned files.
 
 func runImport(cmd *Command, args []string) (err error) {
-	var group errgroup.Group
-
-	pkgFlag := flagPackage.String(cmd)
-
-	done := map[string]bool{}
-
 	b, err := parseArgs(cmd, args, &load.Config{DataFiles: true})
 	if err != nil {
 		return err
 	}
-	builds := b.insts
-	if b.orphanInstance != nil {
-		builds = append(builds, b.orphanInstance)
-	}
-	for _, pkg := range builds {
+
+	pkgFlag := flagPackage.String(cmd)
+	for _, pkg := range b.insts {
 		pkgName := pkgFlag
 		if pkgName == "" {
 			pkgName = pkg.PkgName
 		}
 		// TODO: allow if there is a unique package name.
-		if pkgName == "" && len(builds) > 1 {
+		if pkgName == "" && len(b.insts) > 1 {
 			err = fmt.Errorf("must specify package name with the -p flag")
-			break
-		}
-		if err = pkg.Err; err != nil {
-			break
-		}
-		if done[pkg.Dir] {
-			continue
-		}
-		done[pkg.Dir] = true
-
-		for _, f := range pkg.OrphanedFiles {
-			f := f // capture range var
-			group.Go(func() error { return handleFile(b, pkgName, f) })
+			exitOnErr(cmd, err, true)
 		}
 	}
 
-	err2 := group.Wait()
+	for _, f := range b.imported {
+		err := handleFile(b, f)
+		if err != nil {
+			return err
+		}
+	}
+
 	exitOnErr(cmd, err, true)
-	exitOnErr(cmd, err2, true)
 	return nil
 }
 
-func handleFile(b *buildPlan, pkg string, file *build.File) (err error) {
-	filename := file.Filename
-	// filter file names
-	re, err := regexp.Compile(flagGlob.String(b.cmd))
-	if err != nil {
-		return err
-	}
-	if !re.MatchString(filepath.Base(filename)) {
-		return nil
-	}
-
-	// TODO: consider unifying the two modes.
-	var objs []ast.Expr
-	i := encoding.NewDecoder(file, b.encConfig)
-	defer i.Close()
-	for ; !i.Done(); i.Next() {
-		if expr := i.Expr(); expr != nil {
-			objs = append(objs, expr)
-			continue
-		}
-		if err := processFile(b.cmd, i.File()); err != nil {
-			return err
-		}
-	}
-
-	if len(objs) > 0 {
-		if err := processStream(b.cmd, pkg, filename, objs); err != nil {
-			return err
-		}
-	}
-	return i.Err()
-}
-
-func processFile(cmd *Command, file *ast.File) (err error) {
-	name := file.Filename + ".cue"
-
-	b, err := format.Node(file)
-	if err != nil {
-		return err
-	}
-
-	return ioutil.WriteFile(name, b, 0644)
-}
-
-func processStream(cmd *Command, pkg, filename string, objs []ast.Expr) error {
-	if flagFiles.Bool(cmd) {
-		for i, f := range objs {
-			err := combineExpressions(cmd, pkg, filename, i, f)
-			if err != nil {
-				return err
-			}
-		}
-		return nil
-	} else if len(objs) > 1 {
-		if !flagList.Bool(cmd) && len(flagPath.StringArray(cmd)) == 0 && !flagFiles.Bool(cmd) {
-			return fmt.Errorf("list, flag, or files flag needed to handle multiple objects in file %q", filename)
-		}
-	}
-	return combineExpressions(cmd, pkg, filename, 0, objs...)
-}
-
-// TODO: implement a more fine-grained approach.
-var mutex sync.Mutex
-
-func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast.Expr) error {
-	cueFile := newName(filename, idx)
-
-	mutex.Lock()
-	defer mutex.Unlock()
-
-	if out := flagOut.String(cmd); out != "" {
+func handleFile(b *buildPlan, f *ast.File) (err error) {
+	cueFile := f.Filename
+	if out := flagOut.String(b.cmd); out != "" {
 		cueFile = out
 	}
 	if cueFile != "-" {
 		switch _, err := os.Stat(cueFile); {
 		case os.IsNotExist(err):
 		case err == nil:
-			if !flagForce.Bool(cmd) {
+			if !flagForce.Bool(b.cmd) {
 				// TODO: mimic old behavior: write to stderr, but do not exit
 				// with error code. Consider what is best to do here.
-				stderr := cmd.Command.OutOrStderr()
+				stderr := b.cmd.Command.OutOrStderr()
 				fmt.Fprintf(stderr, "skipping file %q: already exists\n", cueFile)
 				return nil
 			}
@@ -378,16 +288,15 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 		}
 	}
 
-	f, err := placeOrphans(cmd, filename, pkg, objs)
-	if err != nil {
-		return err
-	}
-
-	if flagRecursive.Bool(cmd) {
+	if flagRecursive.Bool(b.cmd) {
 		h := hoister{fields: map[string]bool{}}
 		h.hoist(f)
 	}
 
+	return writeFile(b.cmd, f, cueFile)
+}
+
+func writeFile(cmd *Command, f *ast.File, cueFile string) error {
 	b, err := format.Node(f, format.Simplify())
 	if err != nil {
 		return fmt.Errorf("error formatting file: %v", err)
@@ -400,7 +309,7 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 	return ioutil.WriteFile(cueFile, b, 0644)
 }
 
-func placeOrphans(cmd *Command, filename, pkg string, objs []ast.Expr) (*ast.File, error) {
+func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.File, error) {
 	f := &ast.File{}
 
 	index := newIndex()
@@ -532,10 +441,6 @@ func newName(filename string, i int) string {
 	}
 	filename += ".cue"
 	return filename
-}
-
-func handleProtoDef(cmd *Command, path string, r io.Reader) (f *ast.File, err error) {
-	return protobuf.Extract(path, r, &protobuf.Config{Paths: flagProtoPath.StringArray(cmd)})
 }
 
 type hoister struct {

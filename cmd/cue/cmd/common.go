@@ -16,11 +16,8 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
-	"path/filepath"
-	"regexp"
 	"strings"
 	"testing"
 
@@ -230,100 +227,6 @@ func (b *buildPlan) parseFlags() (err error) {
 		ProtoPath: flagProtoPath.StringArray(b.cmd),
 	}
 	return nil
-}
-
-func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
-	var (
-		perFile    = flagFiles.Bool(b.cmd)
-		useList    = flagList.Bool(b.cmd)
-		path       = flagPath.StringArray(b.cmd)
-		useContext = flagWithContext.Bool(b.cmd)
-		pkg        = flagPackage.String(b.cmd)
-		match      = flagGlob.String(b.cmd)
-	)
-	if !b.forceOrphanProcessing && !perFile && !useList && len(path) == 0 {
-		if useContext {
-			return false, fmt.Errorf(
-				"flag %q must be used with at least one of flag %q, %q, or %q",
-				flagWithContext, flagPath, flagList, flagFiles,
-			)
-		}
-		return false, err
-	}
-
-	if pkg == "" {
-		pkg = i.PkgName
-	} else if pkg != "" && i.PkgName != pkg && !flagForce.Bool(b.cmd) {
-		return false, fmt.Errorf(
-			"%q flag clashes with existing package name (%s vs %s)",
-			flagPackage, pkg, i.PkgName,
-		)
-	}
-
-	var files []*ast.File
-
-	re, err := regexp.Compile(match)
-	if err != nil {
-		return false, err
-	}
-
-	for _, f := range i.OrphanedFiles {
-		if !re.MatchString(filepath.Base(f.Filename)) {
-			return false, nil
-		}
-
-		d := encoding.NewDecoder(f, b.encConfig)
-		defer d.Close()
-
-		var objs []ast.Expr
-
-		for ; !d.Done(); d.Next() {
-			if expr := d.Expr(); expr != nil {
-				objs = append(objs, expr)
-				continue
-			}
-			f := d.File()
-			f.Filename = newName(d.Filename(), d.Index())
-			files = append(files, f)
-		}
-
-		if perFile {
-			for i, obj := range objs {
-				f, err := placeOrphans(b.cmd, d.Filename(), pkg, obj)
-				if err != nil {
-					return false, err
-				}
-				f.Filename = newName(d.Filename(), i)
-				files = append(files, f)
-			}
-			continue
-		}
-		if len(objs) > 1 && len(path) == 0 && useList {
-			return false, fmt.Errorf(
-				"%s, %s, or %s flag needed to handle multiple objects in file %s",
-				flagPath, flagList, flagFiles, f.Filename)
-		}
-
-		f, err := placeOrphans(b.cmd, d.Filename(), pkg, objs...)
-		if err != nil {
-			return false, err
-		}
-		f.Filename = newName(d.Filename(), 0)
-		files = append(files, f)
-	}
-
-	b.imported = append(b.imported, files...)
-	for _, f := range files {
-		if err := i.AddSyntax(f); err != nil {
-			return false, err
-		}
-		i.BuildFiles = append(i.BuildFiles, &build.File{
-			Filename: f.Filename,
-			Encoding: build.CUE,
-			Source:   f,
-		})
-	}
-	return true, nil
 }
 
 func (b *buildPlan) singleInstance() *cue.Instance {

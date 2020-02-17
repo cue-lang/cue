@@ -86,6 +86,9 @@ text    output as raw text
 
 		RunE: mkRunE(c, runExport),
 	}
+
+	addOrphanFlags(cmd.Flags())
+
 	flagMedia.Add(cmd)
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 

@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/filetypes"
+	"golang.org/x/xerrors"
 )
 
 // Instances returns the instances named by the command line arguments 'args'.
@@ -184,7 +185,10 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	pkg.Dir = cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
 	for _, err := range errors.Errors(fp.finalize()) { // ImportDir(&ctxt, dir, 0)
-		pkg.ReportError(err)
+		var x *NoFilesError
+		if len(pkg.OrphanedFiles) > 0 && !xerrors.As(err, &x) {
+			pkg.ReportError(err)
+		}
 	}
 	// TODO: Support module importing.
 	// if ModDirImportPath != nil {

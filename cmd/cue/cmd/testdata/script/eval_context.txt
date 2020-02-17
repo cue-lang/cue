@@ -1,0 +1,29 @@
+cue eval --with-context -l '"\(path.Ext(filename)):\(index+1)/\(recordCount)"' -l 'data["@name"]' -s services.jsonl
+cmp stdout expect-stdout
+-- expect-stdout --
+".jsonl:1/3": elem1: {
+    kind:    "Service"
+    "@name": "elem1"
+}
+".jsonl:2/3": elem2: {
+    kind:    "Deployment"
+    "@name": "elem2"
+}
+".jsonl:3/3": elem3: {
+    kind:    "Service"
+    "@name": "elem3"
+}
+-- services.jsonl --
+{
+    "kind": "Service",
+    "@name": "elem1"
+}
+{
+    "kind": "Deployment",
+    "@name": "elem2"
+}
+{
+    "kind": "Service",
+    "@name": "elem3"
+}
+-- cue.mod --

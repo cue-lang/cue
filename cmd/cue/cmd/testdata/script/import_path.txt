@@ -18,23 +18,6 @@ service: "supplement\nfoo": {
 		"""
 	json: "[1, 2]"
 }
--- import/services.cue --
-service: [{
-	kind: "Service"
-	name: "booster"
-}, {
-	kind: "Service"
-	name: """
-		supplement
-		foo
-		"""
-	json: "[1, 2]"
-}]
-deployment: [{
-	kind:     "Deployment"
-	name:     "booster"
-	replicas: 1
-}]
 -- import/services.jsonl --
 {
     "kind": "Service",

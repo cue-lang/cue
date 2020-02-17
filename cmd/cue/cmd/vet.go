@@ -71,6 +71,8 @@ func newVetCmd(c *Command) *cobra.Command {
 		RunE:  mkRunE(c, doVet),
 	}
 
+	addOrphanFlags(cmd.Flags())
+
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete")
 

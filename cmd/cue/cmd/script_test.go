@@ -69,7 +69,7 @@ func TestScript(t *testing.T) {
 // Usage Comment out t.Skip() and set file to test.
 func TestX(t *testing.T) {
 	t.Skip()
-	const path = "./testdata/script/help_hello.txt"
+	const path = "./testdata/script/eval_context.txt"
 
 	check := func(err error) {
 		t.Helper()
@@ -103,7 +103,13 @@ func TestX(t *testing.T) {
 			continue
 		}
 
-		c, err := New(strings.Split(cmd, " ")[1:])
+		// TODO: Ugly hack to get args. Do more principled parsing.
+		var args []string
+		for _, a := range strings.Split(cmd, " ")[1:] {
+			args = append(args, strings.Trim(a, "'"))
+		}
+
+		c, err := New(args)
 		check(err)
 		b := &bytes.Buffer{}
 		c.SetOutput(b)

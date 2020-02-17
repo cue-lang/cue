@@ -1,0 +1,39 @@
+cue export -l "\(strings.ToLower(kind))" --list import/services.jsonl
+cmp stdout expect-stdout
+-- expect-stdout --
+{
+    "service": [
+        {
+            "name": "booster",
+            "kind": "Service"
+        },
+        {
+            "name": "supplement\nfoo",
+            "kind": "Service",
+            "json": "[1, 2]"
+        }
+    ],
+    "deployment": [
+        {
+            "name": "booster",
+            "kind": "Deployment",
+            "replicas": 1
+        }
+    ]
+}
+-- import/services.jsonl --
+{
+    "kind": "Service",
+    "name": "booster"
+}
+{
+    "kind": "Deployment",
+    "name": "booster",
+    "replicas": 1
+}
+{
+    "kind": "Service",
+    "name": "supplement\nfoo",
+    "json": "[1, 2]"
+}
+-- cue.mod --

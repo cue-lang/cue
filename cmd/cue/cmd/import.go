@@ -388,22 +388,30 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 		}
 	}
 
-	f := &ast.File{}
+	f, err := placeOrphans(cmd, filename, pkg, objs)
+	if err != nil {
+		return err
+	}
 
 	if flagRecursive.Bool(cmd) {
 		h := hoister{fields: map[string]bool{}}
-
-		imports := &ast.ImportDecl{}
-
-		h.hoist(&ast.File{Decls: []ast.Decl{
-			imports,
-			&ast.EmbedDecl{Expr: &ast.ListLit{Elts: objs}},
-		}})
-
-		if len(imports.Specs) > 0 {
-			f.Decls = append(f.Decls, imports)
-		}
+		h.hoist(f)
 	}
+
+	b, err := format.Node(f, format.Simplify())
+	if err != nil {
+		return fmt.Errorf("error formatting file: %v", err)
+	}
+
+	if cueFile == "-" {
+		_, err := cmd.OutOrStdout().Write(b)
+		return err
+	}
+	return ioutil.WriteFile(cueFile, b, 0644)
+}
+
+func placeOrphans(cmd *Command, filename, pkg string, objs []ast.Expr) (*ast.File, error) {
+	f := &ast.File{}
 
 	index := newIndex()
 	for i, expr := range objs {
@@ -424,18 +432,18 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 			}
 			inst, err := runtime.CompileExpr(expr)
 			if err != nil {
-				return err
+				return nil, err
 			}
 
 			for _, str := range flagPath.StringArray(cmd) {
-				l, err := parser.ParseExpr("<path flag>", str)
+				l, err := parser.ParseExpr("--path", str)
 				if err != nil {
-					return fmt.Errorf(`labels are of form "cue import -l foo -l 'strings.ToLower(bar)'": %v`, err)
+					return nil, fmt.Errorf(`labels are of form "cue import -l foo -l 'strings.ToLower(bar)'": %v`, err)
 				}
 
 				str, err := inst.Eval(l).String()
 				if err != nil {
-					return fmt.Errorf("unsupported label path type: %v", err)
+					return nil, fmt.Errorf("unsupported label path type: %v", err)
 				}
 				pathElems = append(pathElems, ast.NewString(str))
 			}
@@ -458,9 +466,9 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 			obj, ok := expr.(*ast.StructLit)
 			if !ok {
 				if _, ok := expr.(*ast.ListLit); ok {
-					return fmt.Errorf("expected struct as object root, did you mean to use the --list flag?")
+					return nil, fmt.Errorf("expected struct as object root, did you mean to use the --list flag?")
 				}
-				return fmt.Errorf("cannot map non-struct to object root")
+				return nil, fmt.Errorf("cannot map non-struct to object root")
 			}
 			f.Decls = append(f.Decls, obj.Elts...)
 		} else {
@@ -492,16 +500,7 @@ func combineExpressions(cmd *Command, pkg, filename string, idx int, objs ...ast
 		}
 	}
 
-	b, err := format.Node(f, format.Simplify())
-	if err != nil {
-		return fmt.Errorf("error formatting file: %v", err)
-	}
-
-	if cueFile == "-" {
-		_, err := cmd.OutOrStdout().Write(b)
-		return err
-	}
-	return ioutil.WriteFile(cueFile, b, 0644)
+	return f, nil
 }
 
 type listIndex struct {

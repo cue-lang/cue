@@ -70,6 +70,7 @@ func (x *index) getImportFromNode(v value) *Instance {
 
 // newInstance creates a new instance. Use Insert to populate the instance.
 func (x *index) newInstance(p *build.Instance) *Instance {
+	// TODO: associate root source with structLit.
 	st := &structLit{baseValue: baseValue{nil}}
 	i := &Instance{
 		rootStruct: st,

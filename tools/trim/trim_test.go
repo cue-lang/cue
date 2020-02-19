@@ -94,6 +94,16 @@ z: {
 	}
 }
 `,
+	}, {
+		name: "do not remove field",
+		in: `
+		[_]: x: "hello"
+		a: x: "hello"
+		`,
+		out: `[_]: x: "hello"
+a: {
+}
+`,
 		// TODO: This used to work.
 		// 	name: "remove implied interpolations",
 		// 	in: `

@@ -88,6 +88,7 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 	defer func() { internal.DropOptional = false }()
 
 	gen := newTrimSet(cfg)
+	gen.files = files
 	for _, f := range files {
 		gen.markNodes(f)
 	}
@@ -103,6 +104,7 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 
 type trimSet struct {
 	cfg       Config
+	files     []*ast.File
 	stack     []string
 	exclude   map[ast.Node]bool // don't remove fields marked here
 	alwaysGen map[ast.Node]bool // node is always from a generated source
@@ -337,9 +339,14 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 					}
 
 				default:
+					// Currently the ast.Files are not associated with the
+					// nodes. We detect this case here and iterate over all
+					// files.
+					// TODO: fix this. See cue/instance.go.
 					if len(t.stack) == 1 {
-						// TODO: fix this hack to pass down the fields to remove
-						return rm
+						for _, x := range t.files {
+							x.Decls = t.trimDecls(x.Decls, rm, m, canRemove)
+						}
 					}
 				}
 			}

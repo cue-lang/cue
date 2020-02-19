@@ -393,6 +393,12 @@ b: preference mark not allowed at this position:
 		env_:: foo: "bar"
 			`,
 		out: "env_.*: alias not allowed in list:\n    test:3:20\n<0>{}",
+	}, {
+		// Issue #276
+		in: `
+			a:     int=<100
+			`,
+		out: "alias \"int\" not allowed as value:\n    test:2:11\n<0>{}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

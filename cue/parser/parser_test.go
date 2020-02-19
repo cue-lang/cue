@@ -489,6 +489,12 @@ bar: 2
 		}
 		`,
 		out: "package name, @t1(v1), {@t2(v2)}, a: {a: 1, @t3(v3), @t4(v4), c: 2}",
+	}, {
+		desc: "Issue #276",
+		in: `
+		a: int=>2
+		`,
+		out: "a: int=>2\nalias \"int\" not allowed as value",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

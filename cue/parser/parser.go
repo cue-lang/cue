@@ -883,6 +883,9 @@ func (p *parser) parseField() (decl ast.Decl) {
 			if expr == nil {
 				expr = p.parseRHS()
 			}
+			if a, ok := expr.(*ast.Alias); ok {
+				p.errf(expr.Pos(), "alias %q not allowed as value", debugStr(a.Ident))
+			}
 			m.Value = expr
 			break
 		}

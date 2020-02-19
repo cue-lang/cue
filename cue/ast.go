@@ -450,6 +450,10 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				return v.errf(lab, "invalid field name: %v", lab)
 			}
 			val := v.walk(n.Value)
+			if val == nil {
+				return v.errf(lab, "invalid field value: %v",
+					internal.DebugStr(n.Value))
+			}
 			v.object.insertValue(v.ctx(), f, opt, isDef, val, attrs, v.doc)
 			v.doc = leftOverDoc
 

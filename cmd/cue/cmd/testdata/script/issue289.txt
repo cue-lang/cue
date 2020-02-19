@@ -1,0 +1,13 @@
+! cue import test.yaml -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f
+cmp stderr expect-stderr
+
+-- test.yaml --
+apiVersion: v1
+kind: Service
+metadata:
+  name: ingress-nginx
+spec:
+  type: NodePort
+---
+-- expect-stderr --
+unsupported label path type: instance is not a struct, found null

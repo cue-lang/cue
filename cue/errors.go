@@ -232,8 +232,10 @@ func (c *context) mkIncompatible(src source, op op, a, b evaluated) evaluated {
 }
 
 func (idx *index) mkErr(src source, args ...interface{}) *bottom {
-	e := &bottom{baseValue: src.base(), index: idx, pos: src}
-
+	e := &bottom{index: idx, pos: src}
+	if src != nil {
+		e.baseValue = src.base()
+	}
 	if v, ok := src.(value); ok {
 		e.value = v
 	}

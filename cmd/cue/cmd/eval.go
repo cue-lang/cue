@@ -60,7 +60,7 @@ Examples:
 		"display hidden attributes")
 
 	cmd.Flags().BoolP(string(flagOptional), "O", false,
-		"display hidden attributes")
+		"display optional attributes")
 
 	cmd.Flags().BoolP(string(flagAttributes), "l", false,
 		"display field attributes")

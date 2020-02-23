@@ -17,6 +17,7 @@ package cmd
 import (
 	"fmt"
 	goruntime "runtime"
+	"runtime/debug"
 
 	"github.com/spf13/cobra"
 )
@@ -31,14 +32,22 @@ func newVersionCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
+const (
+	defaultVersion = "devel"
+)
+
 // set by goreleaser or other builder using
 // -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=<version>'
 var (
-	version = "custom"
+	version = defaultVersion
 )
 
 func runVersion(cmd *Command, args []string) error {
 	w := cmd.OutOrStdout()
+	if bi, ok := debug.ReadBuildInfo(); ok && version == defaultVersion {
+		// No specific version provided via version
+		version = bi.Main.Version
+	}
 	fmt.Fprintf(w, "cue version %v %s/%s\n",
 		version,
 		goruntime.GOOS, goruntime.GOARCH,

@@ -20,8 +20,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/encoding"
 )
 
 const vetDoc = `vet validates CUE and other data files
@@ -107,7 +105,10 @@ func doVet(cmd *Command, args []string) error {
 
 	shown := false
 
-	for _, inst := range b.instances() {
+	iter := b.instances()
+	defer iter.close()
+	for iter.scan() {
+		inst := iter.instance()
 		// TODO: use ImportPath or some other sanitized path.
 
 		concrete := true
@@ -134,46 +135,27 @@ func doVet(cmd *Command, args []string) error {
 					"some instances are incomplete; use the -c flag to show errors or suppress this message")
 			}
 		}
-		exitIfErr(cmd, inst, err, false)
+		exitOnErr(cmd, err, false)
 	}
+	exitOnErr(cmd, iter.err(), true)
 	return nil
 }
 
 func vetFiles(cmd *Command, b *buildPlan) {
 	// Use -r type root, instead of -e
-	expr := flagSchema.String(cmd)
 
-	var check cue.Value
-
-	inst := b.singleInstance()
-	if inst == nil {
+	if len(b.insts) == 0 {
 		exitOnErr(cmd, errors.New("data files specified without a schema"), true)
 	}
 
-	if expr == "" {
-		check = inst.Value()
-	} else {
-		check = inst.Eval(b.schema)
-		exitIfErr(cmd, inst, check.Err(), true)
-	}
+	iter := b.instances()
+	defer iter.close()
+	for iter.scan() {
+		v := iter.instance().Value()
 
-	r := internal.GetRuntime(inst).(*cue.Runtime)
-
-	for _, f := range b.orphanedData {
-		i := encoding.NewDecoder(f, b.encConfig)
-		defer i.Close()
-		for ; !i.Done(); i.Next() {
-			body, err := r.CompileExpr(i.Expr())
-			exitIfErr(cmd, inst, err, true)
-			v := body.Value().Unify(check)
-			if err := v.Err(); err != nil {
-				exitIfErr(cmd, inst, err, false)
-			} else {
-				// Always concrete when checking against concrete files.
-				err = v.Validate(cue.Concrete(true))
-				exitIfErr(cmd, inst, err, false)
-			}
-		}
-		exitIfErr(cmd, inst, i.Err(), false)
+		// Always concrete when checking against concrete files.
+		err := v.Validate(cue.Concrete(true))
+		exitOnErr(cmd, err, false)
 	}
+	exitOnErr(cmd, iter.err(), false)
 }

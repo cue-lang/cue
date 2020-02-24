@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal"
 )
 
 // newEvalCmd creates a new eval command
@@ -97,12 +98,17 @@ func runEval(cmd *Command, args []string) error {
 		}
 	}
 
-	instances := b.instances()
-	for _, inst := range instances {
+	iter := b.instances()
+	defer iter.close()
+	for iter.scan() {
+		inst := iter.instance().Value()
+
 		// TODO: use ImportPath or some other sanitized path.
-		if len(instances) > 1 {
-			fmt.Fprintf(w, "\n// %s\n", inst.Dir)
+		if len(b.insts) > 1 {
+			fmt.Fprintf(w, "\n// %s\n", iter.id())
 		}
+		v := iter.instance().Value()
+
 		syn := []cue.Option{
 			cue.Final(), // for backwards compatibility
 			cue.Definitions(true),
@@ -124,10 +130,10 @@ func runEval(cmd *Command, args []string) error {
 		}
 
 		if b.expressions == nil {
-			v := inst.Value()
+			v := v
 			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
-					exitIfErr(cmd, inst, err, false)
+					exitOnErr(cmd, err, false)
 					continue
 				}
 			}
@@ -138,19 +144,20 @@ func runEval(cmd *Command, args []string) error {
 				fmt.Fprint(w, "// ")
 				writeNode(format.Node(e))
 			}
-			v := inst.Eval(e)
+			v := internal.EvalExpr(inst, e).(cue.Value)
 			if err := v.Err(); err != nil {
 				return err
 			}
 			if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 				if err := v.Validate(cue.Concrete(true)); err != nil {
-					exitIfErr(cmd, inst, err, false)
+					exitOnErr(cmd, err, false)
 					continue
 				}
 			}
 			writeNode(format.Node(getSyntax(v, syn), opts...))
 		}
 	}
+	exitOnErr(cmd, iter.err(), true)
 	return nil
 }
 

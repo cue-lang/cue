@@ -1,5 +1,8 @@
 ! cue vet schema.cue data.yaml
-cmp stderr expect-stderr
+cmp stderr vet-stderr
+
+! cue export schema.cue data.yaml
+cmp stderr export-stderr
 
 -- schema.cue --
 Language :: {
@@ -17,10 +20,14 @@ languages:
   - tag: no
     name: Norwegian
 
--- expect-stderr --
+-- vet-stderr --
 languages.2.tag: conflicting values string and false (mismatched types string and bool):
     ./data.yaml:6:11
     ./schema.cue:2:8
+languages.1.name: invalid value "dutch" (does not match =~"^\\p{Lu}"):
+    ./schema.cue:3:8
+    ./data.yaml:5:12
+-- export-stderr --
 languages.1.name: invalid value "dutch" (does not match =~"^\\p{Lu}"):
     ./schema.cue:3:8
     ./data.yaml:5:12

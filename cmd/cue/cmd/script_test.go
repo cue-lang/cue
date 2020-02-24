@@ -93,7 +93,7 @@ func TestX(t *testing.T) {
 
 	cwd, err := os.Getwd()
 	check(err)
-	defer os.Chdir(cwd)
+	defer func() { _ = os.Chdir(cwd) }()
 	_ = os.Chdir(tmpdir)
 
 	for s := bufio.NewScanner(bytes.NewReader(a.Comment)); s.Scan(); {

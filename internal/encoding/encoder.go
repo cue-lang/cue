@@ -36,7 +36,7 @@ import (
 type Encoder struct {
 	cfg          *Config
 	closer       io.Closer
-	interpret    func(cue.Value) (*ast.File, error)
+	interpret    func(*cue.Instance) (*ast.File, error)
 	encFile      func(*ast.File) error
 	encValue     func(cue.Value) error
 	autoSimplify bool
@@ -184,26 +184,22 @@ func (e *Encoder) EncodeFile(f *ast.File) error {
 	return e.encodeFile(f, e.interpret)
 }
 
-func (e *Encoder) EncodeExpr(x ast.Expr) error {
-	return e.EncodeFile(toFile(x))
-}
-
-func (e *Encoder) Encode(v cue.Value) error {
+func (e *Encoder) Encode(inst *cue.Instance) error {
 	e.autoSimplify = true
 	if e.interpret != nil {
-		f, err := e.interpret(v)
+		f, err := e.interpret(inst)
 		if err != nil {
 			return err
 		}
 		return e.encodeFile(f, nil)
 	}
 	if e.encValue != nil {
-		return e.encValue(v)
+		return e.encValue(inst.Value())
 	}
-	return e.encFile(valueToFile(v))
+	return e.encFile(valueToFile(inst.Value()))
 }
 
-func (e *Encoder) encodeFile(f *ast.File, interpret func(cue.Value) (*ast.File, error)) error {
+func (e *Encoder) encodeFile(f *ast.File, interpret func(*cue.Instance) (*ast.File, error)) error {
 	if interpret == nil && e.encFile != nil {
 		return e.encFile(f)
 	}
@@ -213,7 +209,7 @@ func (e *Encoder) encodeFile(f *ast.File, interpret func(cue.Value) (*ast.File, 
 		return err
 	}
 	if interpret != nil {
-		return e.Encode(inst.Value())
+		return e.Encode(inst)
 	}
 	return e.encValue(inst.Value())
 }

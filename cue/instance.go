@@ -147,34 +147,19 @@ func init() {
 		v := value.(Value)
 		e := expr.(ast.Expr)
 		ctx := v.idx.newContext()
-		return newValueRoot(ctx, evalExpr(v.idx, v.eval(ctx), e))
+		return newValueRoot(ctx, evalExpr(ctx, v.eval(ctx), e))
 	}
 }
 
-func evalExpr(idx *index, x value, expr ast.Expr) evaluated {
+func evalExpr(ctx *context, x value, expr ast.Expr) evaluated {
 	if isBottom(x) {
-		return idx.mkErr(x, "error evaluating instance: %v", x)
+		return ctx.mkErr(x, "error evaluating instance: %v", x)
 	}
 	obj, ok := x.(*structLit)
 	if !ok {
-		return idx.mkErr(obj, "instance is not a struct")
+		return ctx.mkErr(x, "instance is not a struct, found %s", x.kind())
 	}
-
-	v := newVisitor(idx, nil, nil, obj, true)
-	return eval(idx, v.walk(expr))
-}
-
-func (inst *Instance) evalExpr(ctx *context, expr ast.Expr) evaluated {
-	root := inst.eval(ctx)
-	if isBottom(root) {
-		return ctx.mkErr(root, "error evaluating instance")
-	}
-	obj, ok := root.(*structLit)
-	if !ok {
-		return ctx.mkErr(root, "instance is not a struct, found %s",
-			root.kind())
-	}
-	v := newVisitor(ctx.index, inst.inst, nil, obj, true)
+	v := newVisitor(ctx.index, nil, nil, obj, true)
 	return v.walk(expr).evalPartial(ctx)
 }
 
@@ -215,7 +200,7 @@ func (inst *Instance) Value() Value {
 // Expressions may refer to builtin packages if they can be uniquely identified.
 func (inst *Instance) Eval(expr ast.Expr) Value {
 	ctx := inst.newContext()
-	result := inst.evalExpr(ctx, expr)
+	result := evalExpr(ctx, inst.eval(ctx), expr)
 	return newValueRoot(ctx, result)
 }
 

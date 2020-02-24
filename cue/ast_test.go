@@ -515,7 +515,7 @@ func TestEval(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			evaluated := inst.evalExpr(ctx, expr)
+			evaluated := evalExpr(ctx, inst.eval(ctx), expr)
 			v := testResolve(ctx, evaluated, evalFull)
 			if got := debugStr(ctx, v); got != tc.out {
 				t.Errorf("output differs:\ngot  %q\nwant %q", got, tc.out)

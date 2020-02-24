@@ -91,7 +91,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit
 		if err != nil {
 			panic(fmt.Errorf("could not parse %v: %v", p.cue, err))
 		}
-		pkg := evalExpr(ctx.index, obj, expr).(*structLit)
+		pkg := evalExpr(ctx, obj, expr).(*structLit)
 		for _, a := range pkg.arcs {
 			// Discard option status and attributes at top level.
 			// TODO: filter on capitalized fields?

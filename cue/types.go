@@ -1359,6 +1359,18 @@ func (v Value) LookupField(name string) (FieldInfo, error) {
 	return f, err
 }
 
+// TODO: expose this API?
+//
+// // EvalExpr evaluates an expression within the scope of v, which must be
+// // a struct.
+// //
+// // Expressions may refer to builtin packages if they can be uniquely identified.
+// func (v Value) EvalExpr(expr ast.Expr) Value {
+// 	ctx := v.ctx()
+// 	result := evalExpr(ctx, v.eval(ctx), expr)
+// 	return newValueRoot(ctx, result)
+// }
+
 // Fill creates a new value by unifying v with the value of x at the given path.
 //
 // Values may be any Go value that can be converted to CUE, an ast.Expr or

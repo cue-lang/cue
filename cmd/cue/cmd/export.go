@@ -17,8 +17,6 @@ package cmd
 import (
 	"github.com/spf13/cobra"
 
-	"cuelang.org/go/cue"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -121,18 +119,8 @@ func runExport(cmd *Command, args []string) error {
 	defer iter.close()
 	for iter.scan() {
 		inst := iter.instance()
-
-		if b.expressions == nil {
-			err = enc.Encode(inst)
-			exitOnErr(cmd, err, true)
-			continue
-		}
-		for _, e := range b.expressions {
-			v := internal.MakeInstance(inst.Eval(e)).(*cue.Instance)
-			exitOnErr(cmd, v.Err, true)
-			err = enc.Encode(v)
-			exitOnErr(cmd, err, true)
-		}
+		err = enc.Encode(inst)
+		exitOnErr(cmd, err, true)
 	}
 	exitOnErr(cmd, iter.err(), true)
 	return nil

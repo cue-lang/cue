@@ -95,7 +95,7 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	case *ast.Ident:
 		s.scope[x.Name] = true
 
-	case *ast.ListLit:
+	case *ast.ListLit, *ast.Interpolation:
 		return false
 	}
 	return true

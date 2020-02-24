@@ -29,6 +29,9 @@ a:
 // TODO(legacy): Don't simplify "hidden" fields for now.
 "_foo": 3
 
+// Issue #294
+"\("x")": "x"
+
 x: {
 @tag0(foo)
     r1: baz1

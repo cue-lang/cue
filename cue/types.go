@@ -1636,15 +1636,16 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 }
 
 type options struct {
-	concrete        bool // enforce that values are concrete
-	raw             bool // show original values
-	hasHidden       bool
-	omitHidden      bool
-	omitDefinitions bool
-	omitOptional    bool
-	omitAttrs       bool
-	final           bool
-	disallowCycles  bool // implied by concrete
+	concrete          bool // enforce that values are concrete
+	raw               bool // show original values
+	hasHidden         bool
+	omitHidden        bool
+	omitDefinitions   bool
+	omitOptional      bool
+	omitAttrs         bool
+	resolveReferences bool
+	final             bool
+	disallowCycles    bool // implied by concrete
 }
 
 // An Option defines modes of evaluation.
@@ -1655,7 +1656,12 @@ type option func(p *options)
 // Final indicates a value is final. It implicitly closes all structs and lists
 // in a value and selects defaults.
 func Final() Option {
-	return func(o *options) { o.final = true }
+	return func(o *options) {
+		o.final = true
+		o.omitDefinitions = true
+		o.omitOptional = true
+		o.omitHidden = true
+	}
 }
 
 // Concrete ensures that all values are concrete.
@@ -1666,6 +1672,7 @@ func Concrete(concrete bool) Option {
 	return func(p *options) {
 		if concrete {
 			p.concrete = true
+			p.final = true
 			if !p.hasHidden {
 				p.omitHidden = true
 				p.omitDefinitions = true
@@ -1678,6 +1685,12 @@ func Concrete(concrete bool) Option {
 // non-concrete values are allowed. This is implied by Concrete(true).
 func DisallowCycles(disallow bool) Option {
 	return func(p *options) { p.disallowCycles = disallow }
+}
+
+// ResolveReferences forces the evaluation of references when outputting.
+// This implies the input cannot have cycles.
+func ResolveReferences(resolve bool) Option {
+	return func(p *options) { p.resolveReferences = resolve }
 }
 
 // Raw tells Syntax to generate the value as is without any simplifications.

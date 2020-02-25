@@ -318,7 +318,7 @@ func TestExport(t *testing.T) {
 			job: {
 				list: {
 					name:     "list"
-					replicas: 1 @protobuf(10)
+					replicas: >=0 | *1 @protobuf(10)
 					command:  "ls"
 				}
 				nginx: {
@@ -396,23 +396,14 @@ func TestExport(t *testing.T) {
 				bar: baz: 3
 			}
 			def :: {
-				a: 1
-				sub: {
-					foo: 1
-					bar: baz: 3
-				}
+				a:   1
+				sub: reg
 			}
-			val: {
-				a: 1
-				sub: {
-					foo: 1
-					bar: baz: 3
-				}
-			}
+			val: def
 			def2 :: {
 				a: b: int
 			}
-			val2: a: b: int
+			val2: def2
 		}`),
 	}, {
 		raw:  true,
@@ -437,7 +428,7 @@ func TestExport(t *testing.T) {
 				}
 			}][a]
 			a: int
-			c: 1
+			c: *1 | 2
 		}`),
 	}, {
 		raw: true,
@@ -485,7 +476,7 @@ func TestExport(t *testing.T) {
 				FindInMap :: {
 					"Fn::FindInMap" :: [string | FindInMap]
 				}
-				a: []
+				a: [...string]
 			}`)}, {
 		raw:   true,
 		eval:  true,
@@ -501,14 +492,15 @@ func TestExport(t *testing.T) {
 		out: unindent(`
 			{
 				And :: {
-					"Fn::And": []
+					"Fn::And": [...3 | And]
 				}
-				Ands: "Fn::And": [3 | And]
+				Ands: And & {
+					"Fn::And": [_]
+				}
 			}`),
 	}, {
-		raw:   true,
-		eval:  true,
-		noOpt: true,
+		raw:  true,
+		eval: true,
 		in: `{
 			Foo :: {
 				sgl: Bar
@@ -527,19 +519,13 @@ func TestExport(t *testing.T) {
 		out: unindent(`
 		{
 			FOO = Foo
-			FOO658221 = Foo
 			Foo :: {
-				Foo: 2
-				sgl: string
-				ref: null | {
-					Foo:  2
-					sgl:  Bar
-					ref:  (null | FOO) & (null | FOO)
-					ext:  Bar | null
-					ref2: null | FOO.sgl
-				}
+				Foo:  2
+				sgl:  Bar
+				ref:  (null | FOO) & (null | FOO)
 				ext:  Bar | null
-				ref2: null | FOO658221.sgl
+				ref2: null | FOO.sgl
+				...
 			}
 			Bar :: string
 		}`),
@@ -553,7 +539,7 @@ func TestExport(t *testing.T) {
 		out: unindent(`
 		{
 			A: [>=0]
-			B: [10] | [192]
+			B: A & ([10] | [192])
 		}`),
 	}, {
 		in: `{
@@ -694,6 +680,9 @@ func TestExportFile(t *testing.T) {
 
 		B: {}
 		B: {a: int} | {b: int}
+
+		C :: [D]: int
+		D :: string
 		`,
 		out: unindent(`
 		{
@@ -706,6 +695,11 @@ func TestExportFile(t *testing.T) {
 			} | {
 				b: int
 			})
+			C :: {
+				[D]: int
+				[D]: int
+			}
+			D :: string
 		}`),
 	}, {
 		in: `
@@ -725,6 +719,7 @@ func TestExportFile(t *testing.T) {
 		// a closed struct unified with a struct with a template restrictions is
 		// exported as a conjunction of two structs.
 		eval: true,
+		opts: []Option{ResolveReferences(true)},
 		in: `
 		A :: { b: int }
 		a: A & { [string]: <10 }
@@ -744,6 +739,7 @@ func TestExportFile(t *testing.T) {
 		}`),
 	}, {
 		eval: true,
+		opts: []Option{Final()},
 		in: `{
 			reg: { foo: 1, bar: { baz: 3 } }
 			def :: {
@@ -759,27 +755,17 @@ func TestExportFile(t *testing.T) {
 				foo: 1
 				bar: baz: 3
 			}
-			def :: {
-				a: 1
-				sub: {
-					foo: 1
-					bar: {
-						baz: 3
-						...
-					}
-					...
-				}
-			}
-			val: close({
+			val: {
 				a: 1
 				sub: {
 					foo: 1
 					bar: baz: 3
 				}
-			})
+			}
 		}`),
 	}, {
 		eval: true,
+		opts: []Option{ResolveReferences(true)},
 		in: `
 			T :: {
 				[_]: int64
@@ -805,7 +791,7 @@ func TestExportFile(t *testing.T) {
 		}`),
 	}, {
 		eval: true,
-		opts: []Option{Optional(false)},
+		opts: []Option{Optional(false), ResolveReferences(true)},
 		in: `
 		T :: {
 			[_]: int64
@@ -826,6 +812,7 @@ func TestExportFile(t *testing.T) {
 		}`),
 	}, {
 		eval: true,
+		opts: []Option{ResolveReferences(true)},
 		in: `{
 				reg: { foo: 1, bar: { baz: 3 } }
 				def :: {
@@ -888,6 +875,7 @@ func TestExportFile(t *testing.T) {
 		}`),
 	}, {
 		eval: true,
+		opts: []Option{ResolveReferences(true)},
 		in: `
 		A :: {
 			[=~"^[a-s]*$"]: int
@@ -937,8 +925,91 @@ func TestExportFile(t *testing.T) {
 			x: [string]: int
 			a: [P=string]: {
 				b: x[P]
-				c: string
+				c: P
 				e: len(P)
+			}
+		}`),
+	}, {
+		eval: true,
+		in: `
+		list: [...string]
+		foo: 1 | 2 | *3
+		foo: int
+		`,
+		out: unindent(`
+		{
+			list: [...string]
+			foo: 1 | 2 | *3
+		}`),
+	}, {
+		eval: true,
+		opts: []Option{Final()},
+		in: `
+		list: [...string]
+		foo: 1 | 2 | *3
+		foo: int
+		`,
+		out: unindent(`
+		{
+			list: []
+			foo: 3
+		}`),
+	}, {
+		// Expand final values, not values that may still be incomplete.
+		eval: true,
+		in: `
+		import "math"
+		import "tool/exec"
+
+		A :: {
+			b: 3
+		}
+
+		a:   A
+		pi:  math.Pi
+		run: exec.Run
+		`,
+		out: unindent(`
+		import "tool/exec"
+
+		A :: {
+			b: 3
+		}
+		a:   A
+		pi:  3.14159265358979323846264338327950288419716939937510582097494459
+		run: exec.Run`),
+	}, {
+		// Change mode midway to break cycle.
+		eval: true,
+		opts: []Option{Final(), Optional(true)},
+		in: `
+		Foo: {
+			foo?: Foo
+			bar:  string
+			baz:  bar + "2"
+		}
+
+		foo: Foo & {
+			foo: {
+				bar: "barNested"
+			}
+			bar: "barParent"
+		}`,
+		out: unindent(`
+		{
+			Foo: {
+				foo?: Foo
+				bar:  string
+				baz:  bar + "2"
+			}
+			foo: {
+				foo: {
+					foo?: Foo
+					bar:  "barNested"
+					baz:  "barNested2"
+				}
+				bar: "barParent"
+				baz: "barParent2"
 			}
 		}`),
 	}}

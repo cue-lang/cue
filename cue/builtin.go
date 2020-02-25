@@ -299,8 +299,12 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 			ret = err.err
 			ret = ctx.mkErr(src, x, ret, "error in call to %s: %v", x.name(ctx), err)
 		default:
-			// TODO: store the underlying error explicitly
-			ret = ctx.mkErr(src, x, "error in call to %s: %v", x.name(ctx), err)
+			if call.err == internal.ErrIncomplete {
+				ret = ctx.mkErr(src, codeIncomplete, "incomplete value")
+			} else {
+				// TODO: store the underlying error explicitly
+				ret = ctx.mkErr(src, x, "error in call to %s: %v", x.name(ctx), err)
+			}
 		}
 	}()
 	x.Func(&call)

@@ -26,6 +26,7 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -36,6 +37,10 @@ type Decimal = apd.Decimal
 
 // DebugStr prints a syntax node.
 var DebugStr func(x interface{}) string
+
+// ErrIncomplete can be used by builtins to signal the evaluation was
+// incomplete.
+var ErrIncomplete = errors.New("incomplete value")
 
 // EvalExpr evaluates an expression within an existing struct value.
 // Identifiers only resolve to values defined within the struct.

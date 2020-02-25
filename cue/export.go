@@ -35,7 +35,7 @@ func doEval(m options) bool {
 }
 
 func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
-	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}, false}
+	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}, false, nil}
 	top, ok := v.evalPartial(ctx).(*structLit)
 	if ok {
 		top, err := top.expandFields(ctx)
@@ -94,6 +94,12 @@ type exporter struct {
 	top     map[label]bool        // label to alias or ""
 	imports map[string]importInfo // pkg path to info
 	inDef   bool                  // TODO(recclose):use count instead
+
+	incomplete []source
+}
+
+func (p *exporter) addIncomplete(v value) {
+	// TODO: process incomplete values
 }
 
 type importInfo struct {
@@ -260,7 +266,7 @@ func (p *exporter) showOptional() bool {
 func (p *exporter) closeOrOpen(s *ast.StructLit, isClosed bool) ast.Expr {
 	// Note, there is no point in printing close if we are dropping optional
 	// fields, as by this the meaning of close will change anyway.
-	if !p.showOptional() {
+	if !p.showOptional() || p.mode.final {
 		return s
 	}
 	if isClosed && !p.inDef && !hasTemplate(s) {
@@ -277,9 +283,20 @@ func (p *exporter) isComplete(v value, all bool) bool {
 	case *numLit, *stringLit, *bytesLit, *nullLit, *boolLit:
 		return true
 	case *list:
+		if p.mode.final || !all {
+			return true
+		}
+		if x.isOpen() {
+			return false
+		}
+		for i := range x.elem.arcs {
+			if !p.isComplete(x.at(p.ctx, i), all) {
+				return false
+			}
+		}
 		return true
 	case *structLit:
-		return !all
+		return !all && p.mode.final
 	case *bottom:
 		return !isIncomplete(x)
 	case *closeIfStruct:
@@ -299,16 +316,39 @@ func isDisjunction(v value) bool {
 }
 
 func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
-	m := p.ctx.manifest(e)
-	if optional || (!p.isComplete(m, false) && (!p.mode.concrete)) {
+	var m evaluated
+	if !p.mode.final {
+		m = e.evalPartial(p.ctx)
+	} else {
+		m = p.ctx.manifest(e)
+	}
+	isComplete := p.isComplete(m, false)
+	if optional || (!isComplete && (!p.mode.concrete)) {
+		resolve := p.mode.resolveReferences && !optional
+		if !p.mode.final && v.kind().hasReferences() && !resolve {
+			return p.expr(v)
+		}
+		if p.mode.concrete && !m.kind().isGround() {
+			p.addIncomplete(v)
+		}
 		// TODO: do something more principled than this hack.
 		// This likely requires disjunctions to keep track of original
 		// values (so using arcs instead of values).
-		p := &exporter{p.ctx, options{concrete: true, raw: true}, p.stack, p.top, p.imports, p.inDef}
+		opts := options{concrete: true, raw: true}
+		p := &exporter{p.ctx, opts, p.stack, p.top, p.imports, p.inDef, nil}
 		if isDisjunction(v) || isBottom(e) {
 			return p.expr(v)
 		}
-		return p.expr(e)
+		if v.kind()&structKind == 0 {
+			return p.expr(e)
+		}
+		if optional {
+			// Break cycles: final and resolveReferences really should not be
+			// used with optional.
+			p.mode.resolveReferences = false
+			p.mode.final = false
+			return p.expr(v)
+		}
 	}
 	return p.expr(e)
 }
@@ -332,14 +372,25 @@ func (p *exporter) expr(v value) ast.Expr {
 	// as well.
 	if doEval(p.mode) || p.mode.concrete {
 		e := v.evalPartial(p.ctx)
-		x := p.ctx.manifest(e)
+		x := e
+		if p.mode.final {
+			x = p.ctx.manifest(e)
+		}
 
 		if !p.isComplete(x, true) {
+			if p.mode.concrete && !x.kind().isGround() {
+				p.addIncomplete(v)
+			}
 			if isBottom(e) {
-				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports, p.inDef}
+				if p.mode.concrete {
+					p.addIncomplete(v)
+				}
+				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports, p.inDef, nil}
 				return p.expr(v)
 			}
-			if doEval(p.mode) {
+			switch {
+			case !p.mode.final && v.kind().hasReferences() && !p.mode.resolveReferences:
+			case doEval(p.mode):
 				v = e
 			}
 		} else {

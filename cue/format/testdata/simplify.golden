@@ -30,6 +30,11 @@ quux: 5
 // Issue #294
 "\("x")": "x"
 
+a :: {
+	foo: 2
+	...
+}
+
 x: {
 	@tag0(foo)
 	r1: baz1

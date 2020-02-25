@@ -27,6 +27,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 func doEval(m options) bool {
@@ -218,6 +219,9 @@ func (p *exporter) mkTemplate(v value, n *ast.Ident) ast.Label {
 
 func hasTemplate(s *ast.StructLit) bool {
 	for _, e := range s.Elts {
+		if _, ok := e.(*ast.Ellipsis); ok {
+			return true
+		}
 		if f, ok := e.(*ast.Field); ok {
 			label := f.Label
 			if _, ok := label.(*ast.TemplateLabel); ok {
@@ -692,7 +696,7 @@ func (p *exporter) optionalsExpr(x *optionals, isClosed bool) ast.Expr {
 	return st
 }
 
-func (p *exporter) optionals(st *ast.StructLit, x *optionals) {
+func (p *exporter) optionals(st *ast.StructLit, x *optionals) (skippedEllipsis bool) {
 	switch x.op {
 	default:
 		for _, t := range x.fields {
@@ -705,10 +709,15 @@ func (p *exporter) optionals(st *ast.StructLit, x *optionals) {
 			if c, ok := v.(*closeIfStruct); ok {
 				v = c.value
 			}
-			st.Elts = append(st.Elts, &ast.Field{
+			f := &ast.Field{
 				Label: p.mkTemplate(t.key, p.identifier(l.params.arcs[0].feature)),
 				Value: p.expr(l.value),
-			})
+			}
+			if internal.IsEllipsis(f) {
+				skippedEllipsis = true
+				continue
+			}
+			st.Elts = append(st.Elts, f)
 		}
 
 	case opUnify:
@@ -731,6 +740,7 @@ func (p *exporter) optionals(st *ast.StructLit, x *optionals) {
 		st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: left})
 		st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: right})
 	}
+	return skippedEllipsis
 }
 
 func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, err *bottom) {
@@ -753,11 +763,12 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 	if x.emit != nil {
 		obj.Elts = append(obj.Elts, &ast.EmbedDecl{Expr: p.expr(x.emit)})
 	}
+	hasEllipsis := false
 	if p.showOptional() && x.optionals != nil &&
 		// Optional field constraints may be omitted if they were already
 		// applied and no more new fields may be added.
 		!(doEval(p.mode) && x.optionals.isEmpty() && p.isClosed(x)) {
-		p.optionals(obj, x.optionals)
+		hasEllipsis = p.optionals(obj, x.optionals)
 	}
 	for i, a := range x.arcs {
 		f := &ast.Field{
@@ -838,6 +849,10 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 				clauses = append(clauses, y)
 			}
 		}
+	}
+
+	if hasEllipsis {
+		obj.Elts = append(obj.Elts, &ast.Ellipsis{})
 	}
 	return obj, nil
 }

@@ -126,3 +126,30 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 	}
 	return cg
 }
+
+// IsEllipsis reports whether the declaration can be represented as an ellipsis.
+func IsEllipsis(x ast.Decl) bool {
+	// ...
+	if _, ok := x.(*ast.Ellipsis); ok {
+		return true
+	}
+
+	// [string]: _ or [_]: _
+	f, ok := x.(*ast.Field)
+	if !ok {
+		return false
+	}
+	v, ok := f.Value.(*ast.Ident)
+	if !ok || v.Name != "_" {
+		return false
+	}
+	l, ok := f.Label.(*ast.ListLit)
+	if !ok || len(l.Elts) != 1 {
+		return false
+	}
+	i, ok := l.Elts[0].(*ast.Ident)
+	if !ok {
+		return false
+	}
+	return i.Name == "string" || i.Name == "_"
+}

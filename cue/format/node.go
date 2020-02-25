@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 func printNode(node interface{}, f *printer) error {
@@ -103,6 +104,7 @@ func hasDocComments(d ast.Decl) bool {
 func (f *formatter) walkDeclList(list []ast.Decl) {
 	f.before(nil)
 	d := 0
+	hasEllipsis := false
 	for i, x := range list {
 		if i > 0 {
 			f.print(declcomma)
@@ -124,6 +126,10 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 					f.print(newsection)
 				}
 			}
+		}
+		if f.printer.cfg.simplify && internal.IsEllipsis(x) {
+			hasEllipsis = true
+			continue
 		}
 		f.decl(x)
 		d = 0
@@ -148,6 +154,10 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 				}
 			}
 		}
+		f.print(f.current.parentSep)
+	}
+	if hasEllipsis {
+		f.decl(&ast.Ellipsis{})
 		f.print(f.current.parentSep)
 	}
 	f.after(nil)

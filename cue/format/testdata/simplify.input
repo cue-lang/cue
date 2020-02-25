@@ -32,6 +32,11 @@ a:
 // Issue #294
 "\("x")": "x"
 
+a :: {
+    [string]: _
+    foo: 2
+}
+
 x: {
 @tag0(foo)
     r1: baz1

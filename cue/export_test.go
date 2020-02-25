@@ -300,15 +300,15 @@ func TestExport(t *testing.T) {
 		eval:  true,
 		noOpt: true,
 		in: `{
-			job <Name>: {
+			job: [Name=_]: {
 				name:     Name
 				replicas: uint | *1 @protobuf(10)
 				command:  string
 			}
-			
-			job list command: "ls"
 
-			job nginx: {
+			job: list: command: "ls"
+
+			job: nginx: {
 				command:  "nginx"
 				replicas: 2
 			}
@@ -554,6 +554,16 @@ func TestExport(t *testing.T) {
 		{
 			A: [>=0]
 			B: [10] | [192]
+		}`),
+	}, {
+		in: `{
+			[string]: _
+			foo: 3
+		}`,
+		out: unindent(`
+		{
+			foo: 3
+			...
 		}`),
 	}}
 	for _, tc := range testCases {

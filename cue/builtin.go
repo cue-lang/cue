@@ -14,6 +14,7 @@
 
 //go:generate go run gen.go
 //go:generate goimports -w -local cuelang.org/go builtins.go
+//go:generate gofmt -s -w builtins.go
 
 package cue
 

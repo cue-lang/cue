@@ -31,13 +31,13 @@ import (
 	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v2"
-	goyaml "github.com/ghodss/yaml"
 	"golang.org/x/net/idna"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -145,21 +145,6 @@ func timeFormat(value, layout string) (bool, error) {
 		return false, fmt.Errorf("invalid time %q", value)
 	}
 	return true, nil
-}
-
-var boolValues = map[string]bool{
-	"1":     true,
-	"0":     false,
-	"t":     true,
-	"f":     false,
-	"T":     true,
-	"F":     false,
-	"true":  true,
-	"false": false,
-	"TRUE":  true,
-	"FALSE": false,
-	"True":  true,
-	"False": false,
 }
 
 var builtinPackages = map[string]*builtinPkg{
@@ -652,7 +637,14 @@ var builtinPackages = map[string]*builtinPkg{
 				v := c.value(0)
 				if c.do() {
 					c.ret, c.err = func() (interface{}, error) {
-						b, err := goyaml.Marshal(v)
+						if err := v.Validate(Concrete(true)); err != nil {
+							if err := v.Validate(); err != nil {
+								return "", err
+							}
+							return "", internal.ErrIncomplete
+						}
+						n := v.Syntax(Final())
+						b, err := cueyaml.Encode(n)
 						return string(b), err
 					}()
 				}
@@ -675,7 +667,15 @@ var builtinPackages = map[string]*builtinPkg{
 							if i > 0 {
 								buf.WriteString("---\n")
 							}
-							b, err := goyaml.Marshal(iter.Value())
+							v := iter.Value()
+							if err := v.Validate(Concrete(true)); err != nil {
+								if err := v.Validate(); err != nil {
+									return "", err
+								}
+								return "", internal.ErrIncomplete
+							}
+							n := v.Syntax(Final())
+							b, err := cueyaml.Encode(n)
 							if err != nil {
 								return "", err
 							}

@@ -20,18 +20,12 @@ import (
 	"bytes"
 	"io"
 
-	goyaml "github.com/ghodss/yaml"
-
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/third_party/yaml"
 	pkgyaml "cuelang.org/go/pkg/encoding/yaml"
 )
-
-// TODO: replace the ghodss YAML encoder. It has a few major issues:
-//   - it does not expose the underlying error, which means we lose valuable
-//     information.
-//   - comments and other meta data are lost.
 
 // Extract parses the YAML to a CUE expression. Streams are returned as a list
 // of the streamed values.
@@ -79,7 +73,8 @@ func Decode(r *cue.Runtime, filename string, src interface{}) (*cue.Instance, er
 
 // Encode returns the YAML encoding of v.
 func Encode(v cue.Value) ([]byte, error) {
-	b, err := goyaml.Marshal(v)
+	n := v.Syntax(cue.Final())
+	b, err := cueyaml.Encode(n)
 	return b, err
 }
 
@@ -92,7 +87,8 @@ func EncodeStream(iter cue.Iterator) ([]byte, error) {
 		if i > 0 {
 			buf.WriteString("---\n")
 		}
-		b, err := goyaml.Marshal(iter.Value())
+		n := iter.Value().Syntax(cue.Final())
+		b, err := cueyaml.Encode(n)
 		if err != nil {
 			return nil, err
 		}

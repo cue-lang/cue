@@ -18,17 +18,23 @@ import (
 	"bytes"
 	"io"
 
-	goyaml "github.com/ghodss/yaml"
-
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
+	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
 // Marshal returns the YAML encoding of v.
 func Marshal(v cue.Value) (string, error) {
-	b, err := goyaml.Marshal(v)
+	if err := v.Validate(cue.Concrete(true)); err != nil {
+		if err := v.Validate(); err != nil {
+			return "", err
+		}
+		return "", internal.ErrIncomplete
+	}
+	n := v.Syntax(cue.Final())
+	b, err := cueyaml.Encode(n)
 	return string(b), err
 }
 
@@ -44,7 +50,15 @@ func MarshalStream(v cue.Value) (string, error) {
 		if i > 0 {
 			buf.WriteString("---\n")
 		}
-		b, err := goyaml.Marshal(iter.Value())
+		v := iter.Value()
+		if err := v.Validate(cue.Concrete(true)); err != nil {
+			if err := v.Validate(); err != nil {
+				return "", err
+			}
+			return "", internal.ErrIncomplete
+		}
+		n := v.Syntax(cue.Final())
+		b, err := cueyaml.Encode(n)
 		if err != nil {
 			return "", err
 		}

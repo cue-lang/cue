@@ -2900,6 +2900,50 @@ func TestFullEval(t *testing.T) {
 			`a: <1>.Marshal (<2>{a: string}), ` +
 			`foo: <3>{a: 3, b: <4>.foo.c}, ` +
 			`b: <1>.Marshal (<4>.foo)}`,
+	}, {
+		desc: "detectIncompleteYAML",
+		in: `
+		package foobar
+
+		import yaml "encoding/yaml"
+	
+		Spec :: {
+			_vars: {something: string}
+			data: {
+				foo :: {
+					use: _vars.something
+				}
+				baz:    yaml.Marshal(_vars.something)
+				foobar: yaml.Marshal(foo)
+			}
+		}
+		Val: Spec & {
+			_vars: something: "var-string"
+		}
+		`,
+		out: `<0>{Spec :: <1>C{_vars: <2>C{something: string}, data: <3>C{foo :: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{foo :: <11>C{use: "var-string"}, baz: "var-string\n", foobar: "use: var-string\n"}}}`,
+	}, {
+		desc: "detectIncompleteJSON",
+		in: `
+			package foobar
+	
+			import "encoding/json"
+		
+			Spec :: {
+				_vars: {something: string}
+				data: {
+					foo :: {
+						use: _vars.something
+					}
+					baz:    json.Marshal(_vars.something)
+					foobar: json.Marshal(foo)
+				}
+			}
+			Val: Spec & {
+				_vars: something: "var-string"
+			}
+			`,
+		out: `<0>{Spec :: <1>C{_vars: <2>C{something: string}, data: <3>C{foo :: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{foo :: <11>C{use: "var-string"}, baz: "\"var-string\"", foobar: "{\"use\":\"var-string\"}"}}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

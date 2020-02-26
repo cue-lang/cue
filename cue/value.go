@@ -24,6 +24,7 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
@@ -303,26 +304,23 @@ func (x *stringLit) slice(ctx *context, lo, hi *numLit) evaluated {
 
 type numLit struct {
 	baseValue
-	rep multiplier
+	rep literal.Multiplier
 	k   kind
 	v   apd.Decimal
 }
 
-func newNum(src source, k kind, rep multiplier) *numLit {
-	if rep&base2|base8|base10|base16 == 0 {
-		rep |= base10
-	}
+func newNum(src source, k kind, rep literal.Multiplier) *numLit {
 	if k&numKind == 0 {
 		panic("not a number")
 	}
 	return &numLit{baseValue: src.base(), rep: rep, k: k}
 }
 
-func newInt(src source, rep multiplier) *numLit {
+func newInt(src source, rep literal.Multiplier) *numLit {
 	return newNum(src, intKind, rep)
 }
 
-func newFloat(src source, rep multiplier) *numLit {
+func newFloat(src source, rep literal.Multiplier) *numLit {
 	return newNum(src, floatKind, rep)
 }
 

@@ -1,0 +1,23 @@
+cue def
+cmp stdout expect-stdout
+
+-- schema.cue --
+// foo
+package foo
+
+A :: {
+    // a is an integer
+    a: int
+    b: int
+}
+
+-- expect-stdout --
+
+// foo
+package foo
+
+A :: {
+    // a is an integer
+    a: int
+    b: int
+}

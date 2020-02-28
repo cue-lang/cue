@@ -31,24 +31,31 @@ File :: {
 	tags?: {[string]: string}
 }
 
+// Default is the file used for stdin and stdout. The settings depend
+// on the file mode.
+Default :: File & {
+	filename: *"-" | string
+}
+
 // A FileInfo defines how a file is encoded and interpreted.
 FileInfo :: {
 	File
 
-	// Settings
-	data:       *true | false
-	references: *true | false
-	cycles:     *true | false
+	// For each of these fields it is explained what a true value means
+	// for encoding/decoding.
 
-	definitions:  bool
-	optional:     bool
-	constraints:  bool
-	keepDefaults: bool
-	incomplete:   bool
-	imports:      bool
-	stream:       bool
-	docs:         bool
-	attributes:   true | *false
+	data:         *true | false // include/allow regular fields
+	references:   *true | false // don't resolve/allow references
+	cycles:       *true | false // cycles are permitted
+	definitions:  bool          // include/allow definition fields
+	optional:     bool          // include/allow definition fields
+	constraints:  bool          // include/allow constraints
+	keepDefaults: bool          // select/allow default values
+	incomplete:   bool          // permit incomplete values
+	imports:      bool          // don't expand/allow imports
+	stream:       bool          // permit streaming
+	docs:         bool          // show/allow docs
+	attributes:   true | *false // include/allow attributes
 }
 
 // modes sets defaults for different operational modes.
@@ -61,6 +68,11 @@ modes: _
 // In input mode, settings flags are interpreted as what is allowed to occur
 // in the input. The default settings, therefore, tend to be permissive.
 modes: input: {
+	Default :: {
+		encoding: *"cue" | _
+		...
+	}
+
 	FileInfo :: x, x = {
 		docs: *true | false
 	}
@@ -70,6 +82,20 @@ modes: input: {
 }
 
 modes: export: {
+	Default :: {
+		encoding: *"json" | _
+		...
+	}
+
+	FileInfo :: x, x = {
+		docs: true | *false
+	}
+	encodings: cue: {
+		*forms.data | _
+	}
+}
+
+modes: ouptut: {
 	FileInfo :: x, x = {
 		docs: true | *false
 	}
@@ -79,6 +105,11 @@ modes: export: {
 }
 
 modes: def: {
+	Default :: {
+		encoding: *"cue" | _
+		...
+	}
+
 	FileInfo :: x, x = {
 		docs: *true | false
 	}
@@ -160,8 +191,14 @@ tags: {
 		tags: lang: string
 	}
 
-	jsonschema: interpretation: "jsonschema"
-	openapi: interpretation:    "openapi"
+	jsonschema: {
+		interpretation: "jsonschema"
+		encoding:       *"json" | _
+	}
+	openapi: {
+		interpretation: "openapi"
+		encoding:       *"json" | _
+	}
 }
 
 // forms defines schema for all forms. It does not include the form ID.
@@ -278,10 +315,10 @@ interpretations: "": _
 
 interpretations: jsonschema: {
 	forms.schema
-	encoding: *"yaml" | _
+	encoding: *"json" | _
 }
 
 interpretations: openapi: {
 	forms.schema
-	encoding: *"yaml" | _
+	encoding: *"json" | _
 }

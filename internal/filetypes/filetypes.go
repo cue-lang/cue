@@ -50,25 +50,24 @@ func (m Mode) String() string {
 // FileInfo defines the parsing plan for a file.
 type FileInfo struct {
 	*build.File
-	// Filename string `json:"filename"`
 
-	// Tags map[string]string `json:"tags"` // code=go
-
-	Definitions bool `json:"definitions"`
-	Data        bool `json:"data"`
-	Optional    bool `json:"optional"`
-	Constraints bool `json:"constraints"`
-	References  bool `json:"references"`
-	Cycles      bool `json:"cycles"`
-	Imports     bool `json:"imports"`
-	Stream      bool `json:"stream"`
-
-	Docs       bool `json:"docs"`
-	Attributes bool `json:"attributes"`
+	Definitions  bool `json:"definitions"`  // include/allow definition fields
+	Data         bool `json:"data"`         // include/allow regular fields
+	Optional     bool `json:"optional"`     // include/allow definition fields
+	Constraints  bool `json:"constraints"`  // include/allow constraints
+	References   bool `json:"references"`   // don't resolve/allow references
+	Cycles       bool `json:"cycles"`       // cycles are permitted
+	KeepDefaults bool `json:"keepDefaults"` // select/allow default values
+	Incomplete   bool `json:"incomplete"`   // permit incomplete values
+	Imports      bool `json:"imports"`      // don't expand/allow imports
+	Stream       bool `json:"stream"`       // permit streaming
+	Docs         bool `json:"docs"`         // show/allow docs
+	Attributes   bool `json:"attributes"`   // include/allow attributes
 }
 
 // FromFile return detailed file info for a given build file.
 // Encoding must be specified.
+// TODO: mode should probably not be necessary here.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 	i := cuegenInstance.Value()
 	i = i.Unify(i.Lookup("modes", mode.String()))
@@ -121,7 +120,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 //     json: foo.data bar.data json+schema: bar.schema
 //
 func ParseArgs(args []string) (files []*build.File, err error) {
-	v := parseType("", Input)
+	inst, v := parseType("", Input)
 
 	qualifier := ""
 	hasFiles := false
@@ -130,7 +129,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		a := strings.Split(s, ":")
 		switch {
 		case len(a) == 1 || len(a[0]) == 1: // filename
-			f, err := toFile(v, s)
+			f, err := toFile(inst, v, s)
 			if err != nil {
 				return nil, err
 			}
@@ -152,7 +151,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 			case qualifier != "" && !hasFiles:
 				return nil, errors.Newf(token.NoPos, "scoped qualifier %q without file", qualifier+":")
 			}
-			v = parseType(a[0], Input)
+			inst, v = parseType(a[0], Input)
 			qualifier = a[0]
 			hasFiles = false
 		}
@@ -183,14 +182,17 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 		return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
 	}
 
-	return toFile(parseType(scope, mode), file)
+	inst, val := parseType(scope, mode)
+	return toFile(inst, val, file)
 }
 
-func toFile(v cue.Value, filename string) (*build.File, error) {
+func toFile(i, v cue.Value, filename string) (*build.File, error) {
 	v = v.Fill(filename, "filename")
-	if len(filename) > 1 { // omit "" and -
-		if s, _ := v.Lookup("encoding").String(); s == "" {
-			v = v.Unify(cuegenInstance.Lookup("extensions", filepath.Ext(filename)))
+	if s, _ := v.Lookup("encoding").String(); s == "" {
+		if len(filename) > 1 { // omit "" and -
+			v = v.Unify(i.Lookup("extensions", filepath.Ext(filename)))
+		} else {
+			v = v.Unify(i.LookupDef("Default"))
 		}
 	}
 	f := &build.File{}
@@ -200,9 +202,9 @@ func toFile(v cue.Value, filename string) (*build.File, error) {
 	return f, nil
 }
 
-func parseType(s string, mode Mode) cue.Value {
+func parseType(s string, mode Mode) (inst, val cue.Value) {
 	i := cuegenInstance.Value()
-	i = i.Unify(i.Lookup("modes", "def"))
+	i = i.Unify(i.Lookup("modes", mode.String()))
 	v := i.LookupDef("File")
 
 	if s != "" {
@@ -215,5 +217,5 @@ func parseType(s string, mode Mode) cue.Value {
 		}
 	}
 
-	return v
+	return i, v
 }

@@ -73,7 +73,6 @@ b:
 		int: 1K
 		bin: 0b11
 		hex: 0x11
-		oct: 0o11
 		dec: .3
 		dat: '\x80'
 		nil: null
@@ -87,7 +86,6 @@ str: str
 int: 1000
 bin: 0b11
 hex: 0x11
-oct: 0o11
 dec: .3
 dat: !!binary gA==
 nil: null
@@ -148,13 +146,13 @@ f4: {} # line 4
 		// TODO: support this at some point
 		name: "embed",
 		in: `
-	// octal
-	0o755 // line
+	// hex
+	0xabc // line
 	// trail
 	`,
 		out: `
-# octal
-0o755 # line
+# hex
+0xabc # line
 # trail
 `,
 	}, {

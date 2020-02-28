@@ -185,6 +185,7 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err
 					"builds contain two file packages")
 			}
 			p.orphanInstance = b
+			p.encConfig.Stream = true
 		}
 
 		for _, f := range b.OrphanedFiles {
@@ -205,6 +206,9 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err
 		}
 	}
 
+	if len(p.expressions) > 1 {
+		p.encConfig.Stream = true
+	}
 	return p, nil
 }
 

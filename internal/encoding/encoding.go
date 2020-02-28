@@ -25,6 +25,8 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal/filetypes"
@@ -101,10 +103,12 @@ type Config struct {
 	Stdin  io.Reader
 	Stdout io.Writer
 
-	Force bool // overwrite existing files.
+	Force  bool // overwrite existing files.
+	Stream bool // will potentially write more than one document per file
 
 	EscapeHTML bool
 	ProtoPath  []string
+	Format     []format.Option
 }
 
 // NewDecoder returns a stream of non-rooted data expressions. The encoding
@@ -129,6 +133,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 
 	path := f.Filename
 	switch f.Encoding {
+	case build.CUE:
+		i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
+		// TODO: verify input format
 	case build.JSON, build.JSONL:
 		i.next = json.NewDecoder(nil, path, r).Extract
 		i.Next()

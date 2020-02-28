@@ -19,27 +19,27 @@ import (
 	"fmt"
 	"io"
 	"os"
+	"path/filepath"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/pkg/encoding/yaml"
 )
-
-// file.Format
-// file.Info
 
 // An Encoder converts CUE to various file formats, including CUE itself.
 // An Encoder allows
 type Encoder struct {
-	cfg       *Config
-	closer    io.Closer
-	interpret func(cue.Value) (*ast.File, error)
-	encFile   func(*ast.File) error
-	encValue  func(cue.Value) error
-	encInst   func(*cue.Instance) error
+	cfg          *Config
+	closer       io.Closer
+	interpret    func(cue.Value) (*ast.File, error)
+	encFile      func(*ast.File) error
+	encValue     func(cue.Value) error
+	autoSimplify bool
 }
 
 func (e Encoder) Close() error {
@@ -79,6 +79,60 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 	}
 
 	switch f.Encoding {
+	case build.CUE:
+		fi, err := filetypes.FromFile(f, cfg.Mode)
+		if err != nil {
+			return nil, err
+		}
+
+		synOpts := []cue.Option{}
+		if !fi.KeepDefaults || !fi.Incomplete {
+			synOpts = append(synOpts, cue.Final())
+		}
+
+		synOpts = append(synOpts,
+			cue.Docs(fi.Docs),
+			cue.Attributes(fi.Attributes),
+			cue.Optional(fi.Optional),
+			cue.Concrete(!fi.Incomplete),
+			cue.Definitions(fi.Definitions),
+			cue.ResolveReferences(!fi.References),
+			cue.DisallowCycles(!fi.Cycles),
+		)
+
+		opts := []format.Option{
+			format.UseSpaces(4),
+			format.TabIndent(false),
+		}
+		opts = append(opts, cfg.Format...)
+
+		useSep := false
+		format := func(name string, n ast.Node) error {
+			if name != "" && cfg.Stream {
+				// TODO: make this relative to DIR
+				fmt.Fprintf(w, "--- %s\n", filepath.Base(name))
+			} else if useSep {
+				fmt.Println("---")
+			}
+			useSep = true
+
+			opts := opts
+			if e.autoSimplify {
+				opts = append(opts, format.Simplify())
+			}
+
+			b, err := format.Node(n, opts...)
+			if err != nil {
+				return err
+			}
+			_, err = w.Write(b)
+			return err
+		}
+		e.encValue = func(v cue.Value) error {
+			return format("", v.Syntax(synOpts...))
+		}
+		e.encFile = func(f *ast.File) error { return format(f.Filename, f) }
+
 	case build.JSON, build.JSONL:
 		// SetEscapeHTML
 		d := json.NewEncoder(w)
@@ -126,6 +180,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 }
 
 func (e *Encoder) EncodeFile(f *ast.File) error {
+	e.autoSimplify = false
 	return e.encodeFile(f, e.interpret)
 }
 
@@ -134,6 +189,7 @@ func (e *Encoder) EncodeExpr(x ast.Expr) error {
 }
 
 func (e *Encoder) Encode(v cue.Value) error {
+	e.autoSimplify = true
 	if e.interpret != nil {
 		f, err := e.interpret(v)
 		if err != nil {

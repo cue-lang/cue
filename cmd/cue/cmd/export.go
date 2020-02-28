@@ -78,10 +78,13 @@ Formats
 The following formats are recognized:
 
 json    output as JSON
-		Outputs any CUE value.
+               Outputs any CUE value.
 
 text    output as raw text
-        The evaluated value must be of type string.
+                The evaluated value must be of type string.
+
+yaml    output as YAML
+                Outputs any CUE value.
 `,
 
 		RunE: mkRunE(c, runExport),

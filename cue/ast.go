@@ -488,31 +488,32 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				break
 			}
 
+			// TODO: consider supporting GraphQL-style names:
+			// String, Bytes, Boolean, Integer, Number.
+			// These names will not conflict with idiomatic camel-case JSON.
 			switch name {
 			case "_":
 				return &top{newExpr(n)}
-			case "string":
+			case "string", "__string":
 				return &basicType{newExpr(n), stringKind}
-			case "bytes":
+			case "bytes", "__bytes":
 				return &basicType{newExpr(n), bytesKind}
-			case "bool":
+			case "bool", "__bool":
 				return &basicType{newExpr(n), boolKind}
-			case "int":
+			case "int", "__int":
 				return &basicType{newExpr(n), intKind}
-			case "float":
+			case "float", "__float":
 				return &basicType{newExpr(n), floatKind}
-			case "number":
+			case "number", "__number":
 				return &basicType{newExpr(n), numKind}
-			case "duration":
-				return &basicType{newExpr(n), durationKind}
 
-			case "len":
+			case "len", "__len":
 				return lenBuiltin
-			case "close":
+			case "close", "__close":
 				return closeBuiltin
-			case "and":
+			case "and", "__and":
 				return andBuiltin
-			case "or":
+			case "or", "__or":
 				return orBuiltin
 			}
 			if r, ok := predefinedRanges[name]; ok {

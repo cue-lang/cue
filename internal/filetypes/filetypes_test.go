@@ -295,6 +295,12 @@ func TestParseArgs(t *testing.T) {
 			},
 		},
 	}, {
+		in: `json: c:\foo.json c:\path\to\file.dat`,
+		out: []*build.File{
+			{Filename: `c:\foo.json`, Encoding: "json"},
+			{Filename: `c:\path\to\file.dat`, Encoding: "json"},
+		},
+	}, {
 		in:  "json: json+schema: bar.schema",
 		out: `scoped qualifier "json:" without file`,
 	}, {

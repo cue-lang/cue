@@ -129,7 +129,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 	for i, s := range args {
 		a := strings.Split(s, ":")
 		switch {
-		case len(a) == 1: // filename
+		case len(a) == 1 || len(a[0]) == 1: // filename
 			f, err := toFile(v, s)
 			if err != nil {
 				return nil, err

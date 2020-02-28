@@ -330,13 +330,13 @@ func TestOverlays(t *testing.T) {
 			t.Error(inst.Err)
 			continue
 		}
-		b, err := format.Node(inst.Value().Syntax())
+		b, err := format.Node(inst.Value().Syntax(cue.Final()))
 		if err != nil {
 			t.Error(err)
 			continue
 		}
 		if got := string(bytes.Map(rmSpace, b)); got != want[i] {
-			t.Errorf("%s: got %s; want %s", inst.Dir, got, want)
+			t.Errorf("%s: got %s; want %s", inst.Dir, got, want[i])
 		}
 	}
 }

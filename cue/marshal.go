@@ -137,7 +137,8 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 		if p, ok := done[i.ImportPath]; ok {
 			return p
 		}
-		n, imports := export(ctx, i.rootValue, options{raw: true})
+		// TODO: support exporting instance
+		n, imports := export(ctx, nil, i.rootValue, options{raw: true})
 
 		file, ok := n.(*ast.File)
 		if !ok {

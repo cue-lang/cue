@@ -123,7 +123,7 @@ func (d *decoder) warnf(n cue.Value, format string, args ...interface{}) {
 }
 
 func (d *decoder) number(n cue.Value) ast.Expr {
-	return n.Syntax().(ast.Expr)
+	return n.Syntax(cue.Final()).(ast.Expr)
 }
 
 func (d *decoder) uint(n cue.Value) ast.Expr {
@@ -131,11 +131,11 @@ func (d *decoder) uint(n cue.Value) ast.Expr {
 	if err != nil {
 		d.errf(n, "invalid uint")
 	}
-	return n.Syntax().(ast.Expr)
+	return n.Syntax(cue.Final()).(ast.Expr)
 }
 
 func (d *decoder) bool(n cue.Value) ast.Expr {
-	return n.Syntax().(ast.Expr)
+	return n.Syntax(cue.Final()).(ast.Expr)
 }
 
 func (d *decoder) boolValue(n cue.Value) bool {
@@ -147,7 +147,7 @@ func (d *decoder) boolValue(n cue.Value) bool {
 }
 
 func (d *decoder) string(n cue.Value) ast.Expr {
-	return n.Syntax().(ast.Expr)
+	return n.Syntax(cue.Final()).(ast.Expr)
 }
 
 func (d *decoder) strValue(n cue.Value) (s string, ok bool) {
@@ -343,7 +343,7 @@ func (s *state) value(n cue.Value) ast.Expr {
 		if !n.IsConcrete() {
 			s.errf(n, "invalid non-concerte value")
 		}
-		return n.Syntax().(ast.Expr)
+		return n.Syntax(cue.Final()).(ast.Expr)
 	}
 }
 

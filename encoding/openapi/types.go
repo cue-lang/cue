@@ -51,7 +51,7 @@ func extractFormat(v cue.Value) string {
 	default:
 		return ""
 	}
-	b, err := format.Node(v.Syntax())
+	b, err := format.Node(v.Syntax(cue.Final()))
 	if err != nil {
 		return ""
 	}

@@ -567,7 +567,7 @@ func TestExport(t *testing.T) {
 			v := newValueRoot(ctx, n)
 
 			opts := options{raw: !tc.eval, omitOptional: tc.noOpt}
-			node, _ := export(ctx, v.eval(ctx), opts)
+			node, _ := export(ctx, nil, v.eval(ctx), opts)
 			b, err := format.Node(node, format.Simplify())
 			if err != nil {
 				log.Fatal(err)
@@ -585,22 +585,36 @@ func TestExportFile(t *testing.T) {
 		in, out string
 		opts    []Option
 	}{{
+		eval: true,
+		opts: []Option{Docs(true)},
 		in: `
+		// Hello foo
+		package foo
+
 		import "strings"
 
 		a: strings.ContainsAny("c")
 		`,
 		out: unindent(`
+		// Hello foo
+		package foo
+
 		import "strings"
 
 		a: strings.ContainsAny("c")`),
 	}, {
+		eval: true,
 		in: `
+		// Drop this comment
+		package foo
+
 		import "time"
 
 		a: time.Time
 		`,
 		out: unindent(`
+		package foo
+
 		import "time"
 
 		a: time.Time`),
@@ -669,10 +683,8 @@ func TestExportFile(t *testing.T) {
 			b: a + 100
 		`,
 		out: unindent(`
-		{
-			a: b - 100
-			b: a + 100
-		}`),
+		a: b - 100
+		b: a + 100`),
 	}, {
 		in: `A: {
 			[_]: B
@@ -685,22 +697,20 @@ func TestExportFile(t *testing.T) {
 		D :: string
 		`,
 		out: unindent(`
-		{
-			A: {
-				[string]: B
-			} @protobuf(1,"test")
-			B: {
-			} & ({
-				a: int
-			} | {
-				b: int
-			})
-			C :: {
-				[D]: int
-				[D]: int
-			}
-			D :: string
-		}`),
+		A: {
+			[string]: B
+		} @protobuf(1,"test")
+		B: {
+		} & ({
+			a: int
+		} | {
+			b: int
+		})
+		C :: {
+			[D]: int
+			[D]: int
+		}
+		D :: string`),
 	}, {
 		in: `
 		import "time"
@@ -726,16 +736,14 @@ func TestExportFile(t *testing.T) {
 		B :: a
 		`,
 		out: unindent(`
-		{
-			A :: {
-				b: int
-			}
-			a: close({
-				b: <10
-			})
-			B :: {
-				b: <10
-			}
+		A :: {
+			b: int
+		}
+		a: close({
+			b: <10
+		})
+		B :: {
+			b: <10
 		}`),
 	}, {
 		eval: true,
@@ -776,18 +784,16 @@ func TestExportFile(t *testing.T) {
 			x: X
 			`,
 		out: unindent(`
-		{
-			T :: {
-				[string]: int64
-			}
-			x: {
-				[string]: int64
-				x:        int64
-			}
-			X :: {
-				[string]: int64
-				x:        int64
-			}
+		T :: {
+			[string]: int64
+		}
+		x: {
+			[string]: int64
+			x:        int64
+		}
+		X :: {
+			[string]: int64
+			x:        int64
 		}`),
 	}, {
 		eval: true,
@@ -802,13 +808,11 @@ func TestExportFile(t *testing.T) {
 		x: X
 		`,
 		out: unindent(`
-		{
-			T :: {
-			}
-			x: x: int64
-			X :: {
-				x: int64
-			}
+		T :: {
+		}
+		x: x: int64
+		X :: {
+			x: int64
 		}`),
 	}, {
 		eval: true,
@@ -868,11 +872,9 @@ func TestExportFile(t *testing.T) {
 				c?: 3
 				c: 3`,
 		out: unindent(`
-		{
-			a?: 1
-			b?: 2
-			c:  3
-		}`),
+		a?: 1
+		b?: 2
+		c:  3`),
 	}, {
 		eval: true,
 		opts: []Option{ResolveReferences(true)},
@@ -888,28 +890,49 @@ func TestExportFile(t *testing.T) {
 		`,
 		// TODO: the outer close of C could be optimized away.
 		out: unindent(`
-		{
-			A :: {
+		A :: {
+			[=~"^[a-s]*$"]: int
+		}
+		B :: {
+			[=~"^[m-z]+"]: int
+		}
+		C: close({
+			close({
 				[=~"^[a-s]*$"]: int
-			}
-			B :: {
+			}) & close({
 				[=~"^[m-z]+"]: int
-			}
-			C: close({
-				close({
-					[=~"^[a-s]*$"]: int
-				}) & close({
-					[=~"^[m-z]+"]: int
-				})
 			})
-			D :: {
-				close({
-					[=~"^[a-s]*$"]: int
-				}) & close({
-					[=~"^[m-z]+"]: int
-				})
-			}
+		})
+		D :: {
+			close({
+				[=~"^[a-s]*$"]: int
+			}) & close({
+				[=~"^[m-z]+"]: int
+			})
 		}`),
+	}, {
+		eval: true,
+		opts: []Option{Docs(true)},
+		in: `
+		// Definition
+		A :: {
+			// TODO: support
+			[string]: int
+		}
+		// Field
+		a: A
+
+		// Pick first comment only.
+		a: _
+		`,
+		out: unindent(`
+		// Definition
+		A :: {
+			[string]: int
+		}
+
+		// Field
+		a: A`),
 	}, {
 		eval: true,
 		in: `
@@ -921,13 +944,11 @@ func TestExportFile(t *testing.T) {
 		}
 		`,
 		out: unindent(`
-		{
-			x: [string]: int
-			a: [P=string]: {
-				b: x[P]
-				c: P
-				e: len(P)
-			}
+		x: [string]: int
+		a: [P=string]: {
+			b: x[P]
+			c: P
+			e: len(P)
 		}`),
 	}, {
 		eval: true,
@@ -937,10 +958,8 @@ func TestExportFile(t *testing.T) {
 		foo: int
 		`,
 		out: unindent(`
-		{
-			list: [...string]
-			foo: 1 | 2 | *3
-		}`),
+		list: [...string]
+		foo: 1 | 2 | *3`),
 	}, {
 		eval: true,
 		opts: []Option{Final()},

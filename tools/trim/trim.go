@@ -278,7 +278,14 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 				// resolved. Attempt to complete the expression by
 				// evaluting it within the struct to which the template
 				// is applied.
-				expr := v.Syntax()
+				var expr ast.Expr
+				switch x := v.Syntax().(type) {
+				case ast.Expr:
+					expr = x
+				case *ast.File:
+					expr = &ast.StructLit{Elts: x.Decls}
+				}
+
 				// TODO: this only resolves references contained in scope.
 				v = internal.EvalExpr(scope, expr).(cue.Value)
 			}

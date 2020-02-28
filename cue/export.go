@@ -34,7 +34,7 @@ func doEval(m options) bool {
 	return !m.raw
 }
 
-func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
+func export(ctx *context, inst *Instance, v value, m options) (n ast.Node, imports []string) {
 	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}, false, nil}
 	top, ok := v.evalPartial(ctx).(*structLit)
 	if ok {
@@ -49,32 +49,49 @@ func export(ctx *context, v value, m options) (n ast.Node, imports []string) {
 	}
 
 	value := e.expr(v)
-	if len(e.imports) == 0 {
+	if len(e.imports) == 0 && inst == nil {
 		// TODO: unwrap structs?
 		return value, nil
 	}
+
+	file := &ast.File{}
+	if inst != nil {
+		if inst.Name != "" {
+			p := &ast.Package{Name: ast.NewIdent(inst.Name)}
+			file.Decls = append(file.Decls, p)
+			if m.docs {
+				for _, d := range inst.Doc() {
+					p.AddComment(d)
+					break
+				}
+			}
+		}
+	}
+
 	imports = make([]string, 0, len(e.imports))
 	for k := range e.imports {
 		imports = append(imports, k)
 	}
 	sort.Strings(imports)
 
-	importDecl := &ast.ImportDecl{}
-	file := &ast.File{Decls: []ast.Decl{importDecl}}
+	if len(imports) > 0 {
+		importDecl := &ast.ImportDecl{}
+		file.Decls = append(file.Decls, importDecl)
 
-	for _, k := range imports {
-		info := e.imports[k]
-		ident := (*ast.Ident)(nil)
-		if info.name != "" {
-			ident = ast.NewIdent(info.name)
+		for _, k := range imports {
+			info := e.imports[k]
+			ident := (*ast.Ident)(nil)
+			if info.name != "" {
+				ident = ast.NewIdent(info.name)
+			}
+			if info.alias != "" {
+				file.Decls = append(file.Decls, &ast.Alias{
+					Ident: ast.NewIdent(info.alias),
+					Expr:  ast.NewIdent(info.short),
+				})
+			}
+			importDecl.Specs = append(importDecl.Specs, ast.NewImport(ident, k))
 		}
-		if info.alias != "" {
-			file.Decls = append(file.Decls, &ast.Alias{
-				Ident: ast.NewIdent(info.alias),
-				Expr:  ast.NewIdent(info.short),
-			})
-		}
-		importDecl.Specs = append(importDecl.Specs, ast.NewImport(ident, k))
 	}
 
 	if obj, ok := value.(*ast.StructLit); ok {
@@ -857,6 +874,12 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		if a.attrs != nil && !p.mode.omitAttrs {
 			for _, at := range a.attrs.attr {
 				f.Attrs = append(f.Attrs, &ast.Attribute{Text: at.text})
+			}
+		}
+		if p.mode.docs {
+			for _, d := range a.docs.appendDocs(nil) {
+				ast.AddComment(f, d)
+				break
 			}
 		}
 		obj.Elts = append(obj.Elts, f)

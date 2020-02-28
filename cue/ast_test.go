@@ -610,7 +610,7 @@ func TestShadowing(t *testing.T) {
 
 			ctx := r.index().newContext()
 
-			n, _ := export(ctx, inst.rootStruct, options{
+			n, _ := export(ctx, inst, inst.rootStruct, options{
 				raw: true,
 			})
 			got := internal.DebugStr(n)

@@ -30,6 +30,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 )
 
 func getInstance(t *testing.T, body ...string) *Instance {
@@ -697,7 +698,7 @@ V :: {
 	x: int
 }
 X :: {
-	<_>: int64
+	[string]: int64
 } & V
 v: X
 `)
@@ -725,7 +726,8 @@ v: X
 			t.Errorf("got %v; want %v", got, tc.raw)
 		}
 
-		if got := fmt.Sprint(v.Eval().Syntax()); got != tc.eval {
+		got := fmt.Sprint(internal.DebugStr(v.Eval().Syntax()))
+		if got != tc.eval {
 			t.Errorf("got %v; want %v", got, tc.eval)
 		}
 
@@ -746,7 +748,8 @@ v: X
 			t.Errorf("got %v; want %v", got, tc.raw)
 		}
 
-		if got := fmt.Sprint(v.Eval().Syntax()); got != tc.eval {
+		got = fmt.Sprint(internal.DebugStr(v.Eval().Syntax()))
+		if got != tc.eval {
 			t.Errorf("got %v; want %v", got, tc.eval)
 		}
 	}

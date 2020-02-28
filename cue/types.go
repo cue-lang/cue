@@ -839,11 +839,15 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 	}
 	ctx := v.ctx()
 	o := getOptions(opts)
+	var inst *Instance
+	if !o.final && !o.concrete {
+		inst = v.instance()
+	}
 	if o.raw {
-		n, _ := export(ctx, v.path.v, o)
+		n, _ := export(ctx, inst, v.path.v, o)
 		return n
 	}
-	n, _ := export(ctx, v.path.cache, o)
+	n, _ := export(ctx, inst, v.path.cache, o)
 	return n
 }
 
@@ -1488,6 +1492,13 @@ func (v Value) Format(state fmt.State, verb rune) {
 	_, _ = io.WriteString(state, ctx.str(v.path.cache))
 }
 
+func (v Value) instance() *Instance {
+	if v.path == nil {
+		return nil
+	}
+	return v.ctx().getImportFromNode(v.path.v)
+}
+
 // Reference returns the instance and path referred to by this value such that
 // inst.Lookup(path) resolves to the same value, or no path if this value is not
 // a reference. If a reference contains index selection (foo[bar]), it will
@@ -1645,6 +1656,7 @@ type options struct {
 	omitAttrs         bool
 	resolveReferences bool
 	final             bool
+	docs              bool
 	disallowCycles    bool // implied by concrete
 }
 
@@ -1707,6 +1719,11 @@ func All() Option {
 		p.omitDefinitions = false
 		p.omitOptional = false
 	}
+}
+
+// Docs indicates whether docs should be included.
+func Docs(include bool) Option {
+	return func(p *options) { p.docs = true }
 }
 
 // Definitions indicates whether definitions should be included.

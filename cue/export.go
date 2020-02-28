@@ -534,10 +534,10 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 
 	case *nullLit:
-		return p.ident("null")
+		return &ast.BasicLit{Kind: token.NULL, Value: "null"}
 
 	case *boolLit:
-		return p.ident(fmt.Sprint(x.b))
+		return ast.NewBool(x.b)
 
 	case *stringLit:
 		return &ast.BasicLit{

@@ -1,9 +1,8 @@
 name: Release
 
 on:
-  push:
-    tags:
-      - 'v*'
+  release:
+    types: [published]
 
 jobs:
   goreleaser:
@@ -21,3 +20,34 @@ jobs:
         args: release --rm-dist
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+
+  docker:
+    name: docker
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the repo
+        uses: actions/checkout@v2
+
+      - name: Set version environment
+        run: |
+          CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
+          echo "CUE_VERSION=$CUE_VERSION"
+          echo "::set-env name=CUE_VERSION::$(echo $CUE_VERSION)"
+
+      - name: Push to Docker Hub
+        uses: docker/build-push-action@v1
+        env:
+          DOCKER_BUILDKIT: 1
+          GOLANG_VERSION: 1.14
+          CUE_VERSION: ${{ env.CUE_VERSION }}
+        with:
+          repository: cuelang/cue
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+          tags: ${{ env.CUE_VERSION }},latest
+          tag_with_ref: false
+          tag_with_sha: false
+          target: cue
+          always_pull: true
+          build_args: GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=${{ env.CUE_VERSION }}
+          add_git_labels: true

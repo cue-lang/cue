@@ -1,0 +1,30 @@
+cue eval
+cmp stdout eval-stdout
+
+cue def
+cmp stdout def-stdout
+
+-- schema.cue --
+package tst
+
+x: {
+	a: A
+	b: A
+}
+
+A :: string | [A]
+
+-- def-stdout --
+package tst
+
+x: {
+    a: A
+    b: A
+}
+A :: string | [A]
+-- eval-stdout --
+x: {
+    a: A
+    b: A
+}
+A :: string | [A]

@@ -359,7 +359,7 @@ func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
 		if v.kind()&structKind == 0 {
 			return p.expr(e)
 		}
-		if optional {
+		if optional || isDisjunction(e) {
 			// Break cycles: final and resolveReferences really should not be
 			// used with optional.
 			p.mode.resolveReferences = false

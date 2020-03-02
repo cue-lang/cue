@@ -1029,6 +1029,27 @@ func TestExportFile(t *testing.T) {
 				baz: "barParent2"
 			}
 		}`),
+	}, {
+		eval: true,
+		opts: []Option{Final(), Definitions(true)},
+		in: `
+		package tst
+
+		x: {
+			a: A
+			b: A
+		}
+		A :: string | [A]
+
+		`,
+		out: unindent(`
+		{
+			x: {
+				a: A
+				b: A
+			}
+			A :: string | [A]
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

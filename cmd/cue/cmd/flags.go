@@ -65,9 +65,10 @@ func addGlobalFlags(f *pflag.FlagSet) {
 
 func addOrphanFlags(f *pflag.FlagSet) {
 	f.StringP(string(flagPackage), "p", "", "package name for non-CUE files")
+	f.StringP(string(flagSchema), "d", "",
+		"expression to select schema for evaluating values in non-CUE files")
 	f.StringArrayP(string(flagPath), "l", nil, "CUE expression for single path component")
 	f.Bool(string(flagList), false, "concatenate multiple objects into a list")
-	f.Bool(string(flagFiles), false, "split multiple entries into different files")
 	f.Bool(string(flagWithContext), false, "import as object with contextual data")
 	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
 	f.StringP(string(flagGlob), "n", "", "glob filter for file names")

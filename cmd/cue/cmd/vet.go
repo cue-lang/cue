@@ -74,9 +74,6 @@ func newVetCmd(c *Command) *cobra.Command {
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete")
 
-	cmd.Flags().StringP(string(flagSchema), "d", "",
-		"expression to select schema for evaluating values in non-CUE files")
-
 	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
 		"set the value of a tagged field")
 

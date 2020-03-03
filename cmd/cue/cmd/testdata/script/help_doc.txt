@@ -1,0 +1,43 @@
+# Print the data for the current package a yaml.
+cue export --out=yaml
+cmp stdout stdout-export
+
+# Print the string value of the name field as a string.
+cue export -e name --out=text
+cmp stdout expect-stdout
+
+# Write the string value of the name field to a txt file.
+cue export -e name -o=foo.txt
+cmp stdout-foo foo.txt
+
+# Write the string value of the name field to a file foo.
+cue export -e name -o=text:foo
+cmp stdout-foo foo
+
+# Interpret bar.cue and foo.yaml as OpenAPI data.
+# cue def openapi: bar.cue foo.yaml
+
+# Write a CUE package as openapi encoded as YAML, using
+# an alternate file extension.
+# cue def -o openapi+yaml:foo.openapi
+
+-- foo.cue --
+package bar
+
+name: "foo"
+D :: int
+
+-- bar.cue --
+3
+
+-- foo.yaml --
+3
+
+-- stdout-export --
+name: foo
+-- stdout-foo --
+foo
+-- stdout-name --
+"foo"
+-- expect-stdout --
+foo

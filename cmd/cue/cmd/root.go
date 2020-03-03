@@ -103,6 +103,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 		// Hidden
 		newAddCmd(c),
 	}
+	subCommands = append(subCommands, newHelpTopics(c)...)
 
 	addGlobalFlags(cmd.PersistentFlags())
 

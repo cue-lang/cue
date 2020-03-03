@@ -26,7 +26,7 @@ import (
 
 func newFmtCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "fmt [-s] [packages]",
+		Use:   "fmt [-s] [inputs]",
 		Short: "formats CUE configuration files",
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,

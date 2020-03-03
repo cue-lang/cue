@@ -164,11 +164,15 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 
 	case build.Text:
 		e.encValue = func(v cue.Value) error {
-			str, err := v.String()
+			s, err := v.String()
 			if err != nil {
 				return err
 			}
-			_, err = fmt.Fprint(w, str)
+			_, err = fmt.Fprint(w, s)
+			if err != nil {
+				return err
+			}
+			_, err = fmt.Fprintln(w)
 			return err
 		}
 

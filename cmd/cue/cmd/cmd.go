@@ -25,7 +25,7 @@ import (
 
 func newCmdCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "cmd <name> [-x] [instances]",
+		Use:   "cmd <name> [inputs]",
 		Short: "run a user-defined shell command",
 		Long: `cmd executes defined the named command for each of the named instances.
 
@@ -52,7 +52,7 @@ Commands are defined at the top-level of the configuration:
 	command: [Name=string]: { // from tool.Command
 		// usage gives a short usage pattern of the command.
 		// Example:
-		//    fmt [-n] [-x] [packages]
+		//    fmt [-s] [inputs]
 		usage?: Name | string
 
 		// short gives a brief on-line description of the command.

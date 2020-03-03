@@ -47,9 +47,10 @@ The following file formats are currently supported:
 	YAML       .yaml .yml
 	protobuf   .proto
 
-Files can either be specified explicitly, or inferred from the specified
-packages. In either case, the file extension is replaced with .cue. It will
-fail if the file already exists by default. The -f flag overrides this.
+Files can either be specified explicitly, or inferred from the
+specified packages. In either case, the file extension is
+replaced with .cue. It will fail if the file already exists by
+default. The -f flag overrides this.
 
 Examples:
 
@@ -59,44 +60,8 @@ Examples:
   # Convert all json files in the indicated directories:
   $ cue import ./... -type=json
 
-
-The --path flag
-
-By default the parsed files are included as emit values. This default can be
-overridden by specifying a sequence of labels as you would in a CUE file.
-An identifier or string label are interpreted as usual. A label expression is
-evaluated within the context of the imported file. label expressions may also
-refer to builtin packages, which will be implicitly imported.
-
-The --with-context flag can be used to evaluate the label expression within
-a struct with the following fields:
-
-{
-	// data holds the original source data
-	// (perhaps one of several records in a file).
-	data: _
-	// filename holds the full path to the file.
-	filename: string
-	// index holds the 0-based index element of the
-	// record within the file. For files containing only
-	// one record, this will be 0.
-	index: uint & <recordCount
-	// recordCount holds the total number of records
-	// within the file.
-	recordCount: int & >=1
-}
-
-Handling multiple documents or streams
-
-To handle Multi-document files, such as concatenated JSON objects or
-YAML files with document separators (---) the user must specify either the
---path, --list, or --files flag. The -path flag assign each element to a path
-(identical paths are treated as usual); -list concatenates the entries, and
---files causes each entry to be written to a different file. The -files flag
-may only be used if files are explicitly imported. The --list flag may be
-used in combination with the -path flag, concatenating each entry to the
-mapped location.
-
+The "flags" help topic describes how to assign values to a
+specific path within a CUE namespace. Some examples of that
 
 Examples:
 
@@ -214,14 +179,13 @@ Example:
 	}
 
 	addOutFlags(cmd.Flags(), false)
-
 	addOrphanFlags(cmd.Flags())
 
+	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().String(string(flagType), "", "only apply to files of this type")
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
-	cmd.Flags().String("fix", "", "apply given fix") // XXX
 
 	return cmd
 }

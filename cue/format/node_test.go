@@ -38,8 +38,7 @@ func TestInvalidAST(t *testing.T) {
 			ident("bar"), token.ISA, &ast.StructLit{},
 		)},
 		// Force a new struct.
-		out: `foo: bar :: {
-}`,
+		out: `foo: bar :: {}`,
 	}, {
 		desc: "label with invalid identifier",
 		node: &ast.Field{Label: &ast.Ident{}, Value: ast.NewString("foo")},

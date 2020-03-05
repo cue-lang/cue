@@ -700,8 +700,7 @@ func TestExportFile(t *testing.T) {
 		A: {
 			[string]: B
 		} @protobuf(1,"test")
-		B: {
-		} & ({
+		B: {} & ({
 			a: int
 		} | {
 			b: int
@@ -808,8 +807,7 @@ func TestExportFile(t *testing.T) {
 		x: X
 		`,
 		out: unindent(`
-		T :: {
-		}
+		T :: {}
 		x: x: int64
 		X :: {
 			x: int64

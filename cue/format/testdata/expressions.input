@@ -57,7 +57,7 @@ package expressions
         bbbb: 100 @go(Bbbb) @xml(,attr) // comment
     }
 
-    foo bar: string @go(-)
+    foo: bar: string @go(-)
 
     e: 1+2*3
     e: 1*2*3 // error

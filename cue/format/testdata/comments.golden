@@ -17,3 +17,9 @@ a: 3 // a line comment
 
 b:  4   // line comment that is last in the file.
 cc: 555 // align comments
+
+m: {
+}
+m: {
+	// empty with comment
+}

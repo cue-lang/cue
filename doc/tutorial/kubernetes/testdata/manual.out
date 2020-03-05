@@ -5,27 +5,18 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
-    services: {
-    }
-    deployments: {
-    }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    services: {}
+    deployments: {}
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
-deployment: {
-}
-service: {
-}
-configMap: {
-}
+deployment: {}
+service: {}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -87,27 +78,18 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
-    services: {
-    }
-    deployments: {
-    }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    services: {}
+    deployments: {}
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
-deployment: {
-}
-service: {
-}
-configMap: {
-}
+deployment: {}
+service: {}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -169,8 +151,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -238,18 +219,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     bartender: {
         name: "bartender"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "bartender"
@@ -275,15 +252,11 @@ deployment: {
                 http: 7080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -294,8 +267,7 @@ service: {
             app:       "bartender"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -305,8 +277,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -368,8 +339,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -437,18 +407,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     breaddispatcher: {
         name: "breaddispatcher"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "breaddispatcher"
@@ -474,17 +440,14 @@ deployment: {
                 http: 7080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             etcd:           "etcd:2379"
             "event-server": "events:7788"
         }
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -495,8 +458,7 @@ service: {
             app:       "breaddispatcher"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -506,8 +468,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -569,8 +530,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -638,18 +598,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     host: {
         name: "host"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "host"
@@ -675,15 +631,11 @@ deployment: {
                 http: 7080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -694,8 +646,7 @@ service: {
             app:       "host"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -705,8 +656,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -768,8 +718,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -837,18 +786,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     maitred: {
         name: "maitred"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "maitred"
@@ -874,15 +819,11 @@ deployment: {
                 http: 7080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -893,8 +834,7 @@ service: {
             app:       "maitred"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -904,8 +844,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -967,8 +906,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -1036,18 +974,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     valeter: {
         name: "valeter"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "valeter"
@@ -1073,17 +1007,14 @@ deployment: {
                 http: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             http: ":8080"
             etcd: "etcd:2379"
         }
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -1094,8 +1025,7 @@ service: {
             app:       "valeter"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -1105,8 +1035,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -1168,8 +1097,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -1237,18 +1165,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     waiter: {
         name: "waiter"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "waiter"
@@ -1274,15 +1198,11 @@ deployment: {
                 http: 7080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -1293,8 +1213,7 @@ service: {
             app:       "waiter"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -1304,8 +1223,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -1367,8 +1285,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -1436,18 +1353,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     waterdispatcher: {
         name: "waterdispatcher"
-        env: {
-        }
+        env: {}
         label: {
             component: "frontend"
             app:       "waterdispatcher"
@@ -1473,17 +1386,14 @@ deployment: {
                 http: 7080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             http: ":8080"
             etcd: "etcd:2379"
         }
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -1494,8 +1404,7 @@ service: {
             app:       "waterdispatcher"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -1505,8 +1414,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -1568,27 +1476,18 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
-    services: {
-    }
-    deployments: {
-    }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    services: {}
+    deployments: {}
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
-deployment: {
-}
-service: {
-}
-configMap: {
-}
+deployment: {}
+service: {}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -1650,8 +1549,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -1715,25 +1613,20 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     download: {
         name: "download"
-        env: {
-        }
+        env: {}
         label: {
             component: "infra"
             app:       "download"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         kind:     "deployment"
         replicas: 1
         image:    "gcr.io/myproj/download:v0.0.2"
@@ -1742,15 +1635,11 @@ deployment: {
                 client: 7080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -1761,8 +1650,7 @@ service: {
             app:       "download"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -1772,8 +1660,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -1835,8 +1722,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -1870,8 +1756,7 @@ kubernetes: {
             }
         }
     }
-    deployments: {
-    }
+    deployments: {}
     statefulSets: {
         etcd: {
             kind: "StatefulSet"
@@ -1979,10 +1864,8 @@ kubernetes: {
             }
         }
     }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     etcd: {
@@ -2065,8 +1948,7 @@ deployment: {
                 peer:   2380
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             name:                          "$(NAME)"
             "data-dir":                    "/data/etcd3"
@@ -2099,8 +1981,7 @@ deployment: {
                 }
             }
         }
-        volume: {
-        }
+        volume: {}
     }
 }
 service: {
@@ -2130,8 +2011,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -2193,8 +2073,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -2289,18 +2168,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     events: {
         name: "events"
-        env: {
-        }
+        env: {}
         label: {
             component: "infra"
             app:       "events"
@@ -2351,13 +2226,11 @@ deployment: {
             grpc: ":7788"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-volume": {
                 name: "secret-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/ssl"
                 subPath:   null
                 readOnly:  false
@@ -2378,8 +2251,7 @@ service: {
             app:       "events"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             grpc: {
                 name:     "grpc"
@@ -2389,8 +2261,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -2452,8 +2323,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -2537,18 +2407,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     tasks: {
         name: "tasks"
-        env: {
-        }
+        env: {}
         label: {
             component: "infra"
             app:       "tasks"
@@ -2577,16 +2443,13 @@ deployment: {
         port: {
             http: 7080
         }
-        arg: {
-        }
+        arg: {}
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-volume": {
                 name: "secret-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/ssl"
                 subPath:   null
                 readOnly:  false
@@ -2623,8 +2486,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -2686,8 +2548,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -2761,25 +2622,20 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     updater: {
         name: "updater"
-        env: {
-        }
+        env: {}
         label: {
             component: "infra"
             app:       "updater"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         kind:     "deployment"
         replicas: 1
         image:    "gcr.io/myproj/updater:v0.1.0"
@@ -2788,18 +2644,14 @@ deployment: {
                 http: 8080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: ["-key=/etc/certs/updater.pem"]
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-updater": {
                 name: "secret-updater"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  false
@@ -2820,8 +2672,7 @@ service: {
             app:       "updater"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             http: {
                 name:     "http"
@@ -2831,8 +2682,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -2894,8 +2744,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -2974,25 +2823,20 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     watcher: {
         name: "watcher"
-        env: {
-        }
+        env: {}
         label: {
             component: "infra"
             app:       "watcher"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         kind:     "deployment"
         replicas: 1
         image:    "gcr.io/myproj/watcher:v0.1.0"
@@ -3004,16 +2848,13 @@ deployment: {
         port: {
             http: 7080
         }
-        arg: {
-        }
+        arg: {}
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-volume": {
                 name: "secret-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/ssl"
                 subPath:   null
                 readOnly:  false
@@ -3055,8 +2896,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -3118,27 +2958,18 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
-    services: {
-    }
-    deployments: {
-    }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    services: {}
+    deployments: {}
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
-deployment: {
-}
-service: {
-}
-configMap: {
-}
+deployment: {}
+service: {}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -3229,8 +3060,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -3333,18 +3163,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     caller: {
         name: "caller"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "caller"
@@ -3381,8 +3207,7 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             env:              "prod"
             "event-server":   "events:7788"
@@ -3393,13 +3218,11 @@ deployment: {
             "ssh-tunnel-key": "/sslcerts/tunnel-private.pem"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "caller-disk": {
                 name: "ssd-caller"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
@@ -3412,8 +3235,7 @@ deployment: {
             }
             "secret-ssh-key": {
                 name: "secret-ssh-key"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/sslcerts"
                 subPath:   null
                 readOnly:  true
@@ -3425,8 +3247,7 @@ deployment: {
             }
             "secret-caller": {
                 name: "secret-caller"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  true
@@ -3447,8 +3268,7 @@ service: {
             app:       "caller"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -3458,8 +3278,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -3550,8 +3369,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -3654,18 +3472,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     dishwasher: {
         name: "dishwasher"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "dishwasher"
@@ -3702,8 +3516,7 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             env:              "prod"
             "event-server":   "events:7788"
@@ -3711,13 +3524,11 @@ deployment: {
             "ssh-tunnel-key": "/etc/certs/tunnel-private.pem"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-ssh-key": {
                 name: "secret-ssh-key"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/sslcerts"
                 subPath:   null
                 readOnly:  true
@@ -3729,8 +3540,7 @@ deployment: {
             }
             "dishwasher-disk": {
                 name: "dishwasher-disk"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
@@ -3743,8 +3553,7 @@ deployment: {
             }
             "secret-dishwasher": {
                 name: "secret-dishwasher"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  true
@@ -3765,8 +3574,7 @@ service: {
             app:       "dishwasher"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -3776,8 +3584,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -3868,8 +3675,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -3963,18 +3769,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     expiditer: {
         name: "expiditer"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "expiditer"
@@ -4011,8 +3813,7 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             env:              "prod"
             "event-server":   "events:7788"
@@ -4020,13 +3821,11 @@ deployment: {
             "ssh-tunnel-key": "/etc/certs/tunnel-private.pem"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "expiditer-disk": {
                 name: "expiditer-disk"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
@@ -4039,8 +3838,7 @@ deployment: {
             }
             "secret-expiditer": {
                 name: "secret-expiditer"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  true
@@ -4061,8 +3859,7 @@ service: {
             app:       "expiditer"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -4072,8 +3869,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -4164,8 +3960,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -4259,18 +4054,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     headchef: {
         name: "headchef"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "headchef"
@@ -4307,21 +4098,18 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             env:            "prod"
             "event-server": "events:7788"
             logdir:         "/logs"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-headchef": {
                 name: "secret-headchef"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/sslcerts"
                 subPath:   null
                 readOnly:  true
@@ -4333,8 +4121,7 @@ deployment: {
             }
             "headchef-disk": {
                 name: "headchef-disk"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
@@ -4356,8 +4143,7 @@ service: {
             app:       "headchef"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -4367,8 +4153,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -4459,8 +4244,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -4554,18 +4338,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     linecook: {
         name: "linecook"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "linecook"
@@ -4602,8 +4382,7 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             name:                "linecook"
             env:                 "prod"
@@ -4614,13 +4393,11 @@ deployment: {
             "-recovery-overlap": "100000"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-linecook": {
                 name: "secret-kitchen"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  true
@@ -4632,8 +4409,7 @@ deployment: {
             }
             "linecook-disk": {
                 name: "linecook-disk"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
@@ -4655,8 +4431,7 @@ service: {
             app:       "linecook"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -4666,8 +4441,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -4758,8 +4532,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -4853,18 +4626,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     pastrychef: {
         name: "pastrychef"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "pastrychef"
@@ -4901,8 +4670,7 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
+        port: {}
         arg: {
             env:                "prod"
             etcd:               "etcd:2379"
@@ -4913,13 +4681,11 @@ deployment: {
             "recovery-overlap": "10000"
         }
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-pastrychef": {
                 name: "secret-ssh-key"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  true
@@ -4931,8 +4697,7 @@ deployment: {
             }
             "pastrychef-disk": {
                 name: "pastrychef-disk"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
@@ -4954,8 +4719,7 @@ service: {
             app:       "pastrychef"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -4965,8 +4729,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -5057,8 +4820,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -5133,18 +4895,14 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     souschef: {
         name: "souschef"
-        env: {
-        }
+        env: {}
         label: {
             component: "kitchen"
             app:       "souschef"
@@ -5181,15 +4939,11 @@ deployment: {
                 client: 8080
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
-        volume: {
-        }
+        envSpec: {}
+        volume: {}
     }
 }
 service: {
@@ -5200,8 +4954,7 @@ service: {
             app:       "souschef"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -5211,8 +4964,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -5303,27 +5055,18 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
-    services: {
-    }
-    deployments: {
-    }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    services: {}
+    deployments: {}
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
-deployment: {
-}
-service: {
-}
-configMap: {
-}
+deployment: {}
+service: {}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -5385,8 +5128,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -5479,10 +5221,8 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
+    statefulSets: {}
+    daemonSets: {}
     configMaps: {
         alertmanager: {
             kind:       "ConfigMap"
@@ -5517,8 +5257,7 @@ kubernetes: {
 deployment: {
     alertmanager: {
         name: "alertmanager"
-        env: {
-        }
+        env: {}
         label: {
             component: "mon"
             app:       "alertmanager"
@@ -5541,30 +5280,24 @@ deployment: {
                 alertmanager: 9093
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: ["--config.file=/etc/alertmanager/alerts.yaml", "--storage.path=/alertmanager", "--web.external-url=https://alertmanager.example.com"]
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             alertmanager: {
                 name: "alertmanager"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/alertmanager"
                 subPath:   null
                 readOnly:  false
                 spec: {
-                    emptyDir: {
-                    }
+                    emptyDir: {}
                 }
             }
             "config-volume": {
                 name: "config-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/alertmanager"
                 subPath:   null
                 readOnly:  false
@@ -5684,8 +5417,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -5782,12 +5514,9 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     grafana: {
@@ -5833,8 +5562,7 @@ deployment: {
         port: {
             web: 8080
         }
-        arg: {
-        }
+        arg: {}
         args: []
         envSpec: {
             GF_AUTH_BASIC_ENABLED: {
@@ -5850,8 +5578,7 @@ deployment: {
         volume: {
             "grafana-volume": {
                 name: "grafana-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/var/lib/grafana"
                 subPath:   null
                 readOnly:  false
@@ -5873,8 +5600,7 @@ service: {
             app:       "grafana"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             grafana: {
                 name:     "grafana"
@@ -5884,8 +5610,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -5947,8 +5672,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -5982,10 +5706,8 @@ kubernetes: {
             }
         }
     }
-    deployments: {
-    }
-    statefulSets: {
-    }
+    deployments: {}
+    statefulSets: {}
     daemonSets: {
         "node-exporter": {
             kind: "DaemonSet"
@@ -6053,14 +5775,12 @@ kubernetes: {
             }
         }
     }
-    configMaps: {
-    }
+    configMaps: {}
 }
 deployment: {
     "node-exporter": {
         name: "node-exporter"
-        env: {
-        }
+        env: {}
         label: {
             component: "mon"
             app:       "node-exporter"
@@ -6099,18 +5819,14 @@ deployment: {
                 scrape: 9100
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             proc: {
                 name: "proc"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/host/proc"
                 subPath:   null
                 readOnly:  true
@@ -6122,8 +5838,7 @@ deployment: {
             }
             sys: {
                 name: "sys"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/host/sys"
                 subPath:   null
                 readOnly:  true
@@ -6164,8 +5879,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -6227,8 +5941,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -6324,10 +6037,8 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
+    statefulSets: {}
+    daemonSets: {}
     configMaps: {
         prometheus: {
             kind:       "ConfigMap"
@@ -6573,8 +6284,7 @@ kubernetes: {
 deployment: {
     prometheus: {
         name: "prometheus"
-        env: {
-        }
+        env: {}
         label: {
             component: "mon"
             app:       "prometheus"
@@ -6611,18 +6321,14 @@ deployment: {
                 web: 9090
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "config-volume": {
                 name: "config-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/prometheus"
                 subPath:   null
                 readOnly:  false
@@ -6956,27 +6662,18 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
-    services: {
-    }
-    deployments: {
-    }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    services: {}
+    deployments: {}
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
-deployment: {
-}
-service: {
-}
-configMap: {
-}
+deployment: {}
+service: {}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -7038,8 +6735,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -7113,10 +6809,8 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
+    statefulSets: {}
+    daemonSets: {}
     configMaps: {
         authproxy: {
             kind:       "ConfigMap"
@@ -7188,15 +6882,13 @@ kubernetes: {
 deployment: {
     authproxy: {
         name: "authproxy"
-        env: {
-        }
+        env: {}
         label: {
             component: "proxy"
             app:       "authproxy"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         kind:     "deployment"
         replicas: 1
         image:    "skippy/oauth2_proxy:2.0.1"
@@ -7205,18 +6897,14 @@ deployment: {
                 client: 4180
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: ["--config=/etc/authproxy/authproxy.cfg"]
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "config-volume": {
                 name: "config-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/authproxy"
                 subPath:   null
                 readOnly:  false
@@ -7237,8 +6925,7 @@ service: {
             app:       "authproxy"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         port: {
             client: {
                 name:     "client"
@@ -7366,8 +7053,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -7447,25 +7133,20 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
-    configMaps: {
-    }
+    statefulSets: {}
+    daemonSets: {}
+    configMaps: {}
 }
 deployment: {
     goget: {
         name: "goget"
-        env: {
-        }
+        env: {}
         label: {
             component: "proxy"
             app:       "goget"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         kind:     "deployment"
         replicas: 1
         image:    "gcr.io/myproj/goget:v0.5.1"
@@ -7474,18 +7155,14 @@ deployment: {
                 https: 7443
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-volume": {
                 name: "secret-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/ssl"
                 subPath:   null
                 readOnly:  false
@@ -7526,8 +7203,7 @@ service: {
         }
     }
 }
-configMap: {
-}
+configMap: {}
 _k8sSpec: {
     X: {
         kubernetes: {
@@ -7589,8 +7265,7 @@ _base: {
         app:       string
         domain:    "prod"
     }
-    kubernetes: {
-    }
+    kubernetes: {}
 }
 kubernetes: {
     services: {
@@ -7679,10 +7354,8 @@ kubernetes: {
             }
         }
     }
-    statefulSets: {
-    }
-    daemonSets: {
-    }
+    statefulSets: {}
+    daemonSets: {}
     configMaps: {
         nginx: {
             kind:       "ConfigMap"
@@ -7897,15 +7570,13 @@ kubernetes: {
 deployment: {
     nginx: {
         name: "nginx"
-        env: {
-        }
+        env: {}
         label: {
             component: "proxy"
             app:       "nginx"
             domain:    "prod"
         }
-        kubernetes: {
-        }
+        kubernetes: {}
         kind:     "deployment"
         replicas: 1
         image:    "nginx:1.11.10-alpine"
@@ -7915,18 +7586,14 @@ deployment: {
                 https: 443
             }
         }
-        port: {
-        }
-        arg: {
-        }
+        port: {}
+        arg: {}
         args: []
-        envSpec: {
-        }
+        envSpec: {}
         volume: {
             "secret-volume": {
                 name: "secret-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/ssl"
                 subPath:   null
                 readOnly:  false
@@ -7938,8 +7605,7 @@ deployment: {
             }
             "config-volume": {
                 name: "config-volume"
-                kubernetes: {
-                }
+                kubernetes: {}
                 mountPath: "/etc/nginx/nginx.conf"
                 subPath:   "nginx.conf"
                 readOnly:  false

@@ -1,13 +1,8 @@
-configMap: {
-}
-service: {
-}
-deployment: {
-}
-daemonSet: {
-}
-statefulSet: {
-}
+configMap: {}
+service: {}
+deployment: {}
+daemonSet: {}
+statefulSet: {}
 Component :: string
 _spec: {
     Name :: string
@@ -18,8 +13,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -39,16 +33,11 @@ _spec: {
 }
 
 
-configMap: {
-}
-service: {
-}
-deployment: {
-}
-daemonSet: {
-}
-statefulSet: {
-}
+configMap: {}
+service: {}
+deployment: {}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -59,8 +48,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -80,8 +68,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     bartender: {
         kind:       "Service"
@@ -121,8 +108,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -151,10 +137,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -165,8 +149,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -186,8 +169,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     breaddispatcher: {
         kind:       "Service"
@@ -227,8 +209,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -257,10 +238,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -271,8 +250,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -292,8 +270,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     host: {
         kind:       "Service"
@@ -333,8 +310,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -363,10 +339,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -377,8 +351,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -398,8 +371,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     maitred: {
         kind:       "Service"
@@ -439,8 +411,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -469,10 +440,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -483,8 +452,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -504,8 +472,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     valeter: {
         kind:       "Service"
@@ -545,8 +512,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -575,10 +541,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -589,8 +553,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -610,8 +573,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     waiter: {
         kind:       "Service"
@@ -651,8 +613,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -680,10 +641,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -694,8 +653,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -715,8 +673,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     waterdispatcher: {
         kind:       "Service"
@@ -756,8 +713,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -786,10 +742,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "frontend"
 _spec: {
     Name :: string
@@ -800,8 +754,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -821,16 +774,11 @@ _spec: {
 }
 
 
-configMap: {
-}
-service: {
-}
-deployment: {
-}
-daemonSet: {
-}
-statefulSet: {
-}
+configMap: {}
+service: {}
+deployment: {}
+daemonSet: {}
+statefulSet: {}
 Component :: "infra"
 _spec: {
     Name :: string
@@ -841,8 +789,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -862,8 +809,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     download: {
         kind:       "Service"
@@ -903,8 +849,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -928,10 +873,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "infra"
 _spec: {
     Name :: string
@@ -942,8 +885,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -963,8 +905,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     etcd: {
         kind:       "Service"
@@ -998,10 +939,8 @@ service: {
         }
     }
 }
-deployment: {
-}
-daemonSet: {
-}
+deployment: {}
+daemonSet: {}
 statefulSet: {
     etcd: {
         Name ::     "etcd"
@@ -1014,8 +953,7 @@ statefulSet: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1124,8 +1062,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1145,8 +1082,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     events: {
         kind:       "Service"
@@ -1186,8 +1122,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1243,10 +1178,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "infra"
 _spec: {
     Name :: string
@@ -1257,8 +1190,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1278,8 +1210,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     tasks: {
         kind:       "Service"
@@ -1321,8 +1252,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1363,10 +1293,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "infra"
 _spec: {
     Name :: string
@@ -1377,8 +1305,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1398,8 +1325,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     updater: {
         kind:       "Service"
@@ -1439,8 +1365,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1475,10 +1400,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "infra"
 _spec: {
     Name :: string
@@ -1489,8 +1412,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1510,8 +1432,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     watcher: {
         kind:       "Service"
@@ -1553,8 +1474,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1591,10 +1511,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "infra"
 _spec: {
     Name :: string
@@ -1605,8 +1523,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1626,16 +1543,11 @@ _spec: {
 }
 
 
-configMap: {
-}
-service: {
-}
-deployment: {
-}
-daemonSet: {
-}
-statefulSet: {
-}
+configMap: {}
+service: {}
+deployment: {}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -1646,8 +1558,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1667,8 +1578,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     caller: {
         kind:       "Service"
@@ -1708,8 +1618,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1775,10 +1684,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -1789,8 +1696,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1810,8 +1716,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     dishwasher: {
         kind:       "Service"
@@ -1851,8 +1756,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -1918,10 +1822,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -1932,8 +1834,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -1953,8 +1854,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     expiditer: {
         kind:       "Service"
@@ -1994,8 +1894,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -2052,10 +1951,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -2066,8 +1963,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2087,8 +1983,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     headchef: {
         kind:       "Service"
@@ -2128,8 +2023,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -2186,10 +2080,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -2200,8 +2092,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2221,8 +2112,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     linecook: {
         kind:       "Service"
@@ -2262,8 +2152,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -2320,10 +2209,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -2334,8 +2221,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2355,8 +2241,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     pastrychef: {
         kind:       "Service"
@@ -2396,8 +2281,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -2454,10 +2338,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -2468,8 +2350,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2489,8 +2370,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     souschef: {
         kind:       "Service"
@@ -2530,8 +2410,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -2567,10 +2446,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "kitchen"
 _spec: {
     Name :: string
@@ -2581,8 +2458,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2602,16 +2478,11 @@ _spec: {
 }
 
 
-configMap: {
-}
-service: {
-}
-deployment: {
-}
-daemonSet: {
-}
-statefulSet: {
-}
+configMap: {}
+service: {}
+deployment: {}
+daemonSet: {}
+statefulSet: {}
 Component :: "mon"
 _spec: {
     Name :: string
@@ -2622,8 +2493,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2740,8 +2610,7 @@ deployment: {
                         }
                     }, {
                         name: "alertmanager"
-                        emptyDir: {
-                        }
+                        emptyDir: {}
                     }]
                     containers: [{
                         name:  "alertmanager"
@@ -2766,10 +2635,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "mon"
 _spec: {
     Name :: string
@@ -2780,8 +2647,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2801,8 +2667,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     grafana: {
         kind:       "Service"
@@ -2843,8 +2708,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -2899,10 +2763,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "mon"
 _spec: {
     Name :: string
@@ -2913,8 +2775,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -2934,8 +2795,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     "node-exporter": {
         kind:       "Service"
@@ -2968,8 +2828,7 @@ service: {
         }
     }
 }
-deployment: {
-}
+deployment: {}
 daemonSet: {
     "node-exporter": {
         Name ::     "node-exporter"
@@ -2982,8 +2841,7 @@ daemonSet: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     name: "node-exporter"
@@ -3042,8 +2900,7 @@ daemonSet: {
         }
     }
 }
-statefulSet: {
-}
+statefulSet: {}
 Component :: "mon"
 _spec: {
     Name :: string
@@ -3054,8 +2911,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -3413,10 +3269,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "mon"
 _spec: {
     Name :: string
@@ -3427,8 +3281,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -3448,16 +3301,11 @@ _spec: {
 }
 
 
-configMap: {
-}
-service: {
-}
-deployment: {
-}
-daemonSet: {
-}
-statefulSet: {
-}
+configMap: {}
+service: {}
+deployment: {}
+daemonSet: {}
+statefulSet: {}
 Component :: "proxy"
 _spec: {
     Name :: string
@@ -3468,8 +3316,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -3595,8 +3442,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -3631,10 +3477,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "proxy"
 _spec: {
     Name :: string
@@ -3645,8 +3489,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -3666,8 +3509,7 @@ _spec: {
 }
 
 
-configMap: {
-}
+configMap: {}
 service: {
     goget: {
         kind:       "Service"
@@ -3709,8 +3551,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -3744,10 +3585,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "proxy"
 _spec: {
     Name :: string
@@ -3758,8 +3597,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {
@@ -3993,8 +3831,7 @@ deployment: {
             }
         }
         spec: {
-            selector: {
-            }
+            selector: {}
             template: {
                 metadata: {
                     labels: {
@@ -4040,10 +3877,8 @@ deployment: {
         }
     }
 }
-daemonSet: {
-}
-statefulSet: {
-}
+daemonSet: {}
+statefulSet: {}
 Component :: "proxy"
 _spec: {
     Name :: string
@@ -4054,8 +3889,7 @@ _spec: {
         }
     }
     spec: {
-        selector: {
-        }
+        selector: {}
         template: {
             metadata: {
                 labels: {

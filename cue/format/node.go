@@ -579,10 +579,24 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 	case *ast.StructLit:
 		var l line
 		ws := noblank
-		if !x.Lbrace.HasRelPos() || (len(x.Elts) > 0 && !x.Elts[0].Pos().HasRelPos()) {
+		ff := f.formfeed()
+
+		switch {
+		case len(x.Elts) == 0:
+			if !x.Rbrace.HasRelPos() {
+				// collapse curly braces if the body is empty.
+				ffAlt := blank | nooverride
+				for _, c := range x.Comments() {
+					if c.Position == 1 {
+						ffAlt = ff
+					}
+				}
+				ff = ffAlt
+			}
+		case !x.Rbrace.HasRelPos() || !x.Elts[0].Pos().HasRelPos():
 			ws |= newline | nooverride
 		}
-		f.print(x.Lbrace, token.LBRACE, &l, ws, f.formfeed(), indent)
+		f.print(x.Lbrace, token.LBRACE, &l, ws, ff, indent)
 
 		f.walkDeclList(x.Elts)
 		f.matchUnindent()

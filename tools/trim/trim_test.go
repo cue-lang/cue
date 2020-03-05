@@ -62,8 +62,7 @@ aFoo:     _
 		foo: b: a: 1
 		`,
 		out: `foo: [string]: a: *1 | int
-foo: b: {
-}
+foo: b: {}
 `,
 	}, {
 		name: "remove top-level struct",
@@ -101,8 +100,7 @@ z: {
 		a: x: "hello"
 		`,
 		out: `[_]: x: "hello"
-a: {
-}
+a: {}
 `,
 		// TODO: This used to work.
 		// 	name: "remove implied interpolations",

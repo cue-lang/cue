@@ -347,7 +347,7 @@ func initBuiltins(pkgs map[string]*builtinPkg) {
 
 		i := sharedIndex.addInst(&Instance{
 			ImportPath: k,
-			Name:       path.Base(k),
+			PkgName:    path.Base(k),
 			rootStruct: e,
 			rootValue:  e,
 		})

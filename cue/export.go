@@ -56,8 +56,8 @@ func export(ctx *context, inst *Instance, v value, m options) (n ast.Node, impor
 
 	file := &ast.File{}
 	if inst != nil {
-		if inst.Name != "" {
-			p := &ast.Package{Name: ast.NewIdent(inst.Name)}
+		if inst.PkgName != "" {
+			p := &ast.Package{Name: ast.NewIdent(inst.PkgName)}
 			file.Decls = append(file.Decls, p)
 			if m.docs {
 				for _, d := range inst.Doc() {
@@ -195,7 +195,7 @@ func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 	info, ok := p.imports[pkg]
 	short := info.short
 	if !ok {
-		short = inst.Name
+		short = inst.PkgName
 		if _, ok := p.top[p.ctx.label(short, true)]; ok && preferred != "" {
 			short = preferred
 			info.name = short

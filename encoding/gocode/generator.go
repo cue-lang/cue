@@ -111,7 +111,7 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 		typeMap: map[string]types.Type{},
 	}
 
-	pkgName := inst.Name
+	pkgName := inst.PkgName
 
 	if pkgPath != "" {
 		loadCfg := &packages.Config{

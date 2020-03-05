@@ -149,8 +149,8 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 				file.Decls = append(file.Decls, &ast.EmbedDecl{Expr: n.(ast.Expr)})
 			}
 		}
-		if i.Name != "" {
-			pkg := &ast.Package{Name: ast.NewIdent(i.Name)}
+		if i.PkgName != "" {
+			pkg := &ast.Package{Name: ast.NewIdent(i.PkgName)}
 			file.Decls = append([]ast.Decl{pkg}, file.Decls...)
 		}
 

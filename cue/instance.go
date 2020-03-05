@@ -36,9 +36,10 @@ type Instance struct {
 	// and the predeclared identifiers.
 	scope *structLit
 
-	ImportPath string
-	Dir        string
-	Name       string
+	ImportPath  string
+	Dir         string
+	PkgName     string
+	DisplayName string
 
 	Incomplete bool         // true if Pkg and all its dependencies are free of errors
 	Err        errors.Error // non-nil if the package had errors
@@ -80,7 +81,8 @@ func (x *index) newInstance(p *build.Instance) *Instance {
 	if p != nil {
 		i.ImportPath = p.ImportPath
 		i.Dir = p.Dir
-		i.Name = p.PkgName
+		i.PkgName = p.PkgName
+		i.DisplayName = p.ImportPath
 		if p.Err != nil {
 			i.setListOrError(p.Err)
 		}
@@ -357,9 +359,9 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 		rootValue:  st,
 		inst:       nil,
 
-		// TODO: somehow indicate this is not an original
-		ImportPath: inst.ImportPath,
-		Name:       inst.Name,
+		// Omit ImportPath to indicate this is not an importable package.
+		Dir:        inst.Dir,
+		PkgName:    inst.PkgName,
 		Incomplete: inst.Incomplete,
 		Err:        err,
 

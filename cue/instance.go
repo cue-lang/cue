@@ -69,6 +69,21 @@ func (x *index) getImportFromNode(v value) *Instance {
 	return imp
 }
 
+func init() {
+	internal.MakeInstance = func(value interface{}) interface{} {
+		v := value.(Value)
+		x := v.eval(v.ctx())
+		st, ok := x.(*structLit)
+		if !ok {
+			st = &structLit{baseValue: x.base(), emit: x}
+		}
+		return v.ctx().index.addInst(&Instance{
+			rootStruct: st,
+			rootValue:  v.path.v,
+		})
+	}
+}
+
 // newInstance creates a new instance. Use Insert to populate the instance.
 func (x *index) newInstance(p *build.Instance) *Instance {
 	// TODO: associate root source with structLit.

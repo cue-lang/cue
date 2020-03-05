@@ -156,7 +156,7 @@ func (r *Runtime) Build(instance *build.Instance) (*Instance, error) {
 // may be incomplete, in which case its Err field is set.
 //
 // Example:
-//	inst := cue.Build(load.Load(args))
+//	inst := cue.Build(load.Instances(args))
 //
 func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {

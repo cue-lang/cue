@@ -250,7 +250,7 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		regular := isRegularField(n.Token)
 		if regular {
-			f.print(n.TokenPos, token.COLON)
+			f.print(noblank, nooverride, n.TokenPos, token.COLON)
 		} else {
 			f.print(blank, nooverride, n.Token)
 		}

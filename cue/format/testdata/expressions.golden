@@ -208,4 +208,6 @@ package expressions
 	f: 3
 	a: [1, 2, // add comma
 	]
+
+	foo: bar
 }

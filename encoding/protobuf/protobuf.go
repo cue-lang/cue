@@ -114,11 +114,16 @@ type Config struct {
 	Root string
 
 	// Module is the Go package import path of the module root. It is the value
-	// as after "module" in a go.mod file, if a module file is present.
+	// as after "module" in a cue.mod/modules.cue file, if a module file is
+	// present.
 	Module string // TODO: determine automatically if unspecified.
 
 	// Paths defines the include directory in which to search for imports.
 	Paths []string
+
+	// PkgName specifies the package name for a generated CUE file. A value
+	// will be derived from the Go package name if undefined.
+	PkgName string
 }
 
 // An Extractor converts a collection of proto files, typically belonging to one
@@ -132,10 +137,11 @@ type Config struct {
 // according to their Go package import path.
 //
 type Extractor struct {
-	root   string
-	cwd    string
-	module string
-	paths  []string
+	root    string
+	cwd     string
+	module  string
+	paths   []string
+	pkgName string
 
 	fileCache map[string]result
 	imports   map[string]*build.Instance
@@ -158,6 +164,7 @@ func NewExtractor(c *Config) *Extractor {
 		root:      c.Root,
 		cwd:       cwd,
 		paths:     c.Paths,
+		pkgName:   c.PkgName,
 		module:    c.Module,
 		fileCache: map[string]result{},
 		imports:   map[string]*build.Instance{},

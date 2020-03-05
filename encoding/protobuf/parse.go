@@ -210,6 +210,9 @@ func (p *protoConverter) importPath() string {
 }
 
 func (p *protoConverter) shortName() string {
+	if p.state.pkgName != "" {
+		return p.state.pkgName
+	}
 	if p.shortPkgName == "" && p.protoPkg != "" {
 		split := strings.Split(p.protoPkg, ".")
 		p.shortPkgName = split[len(split)-1]

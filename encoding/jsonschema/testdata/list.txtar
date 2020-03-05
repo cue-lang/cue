@@ -24,8 +24,6 @@ properties:
 additionalProperties: false
 
 -- out.cue --
-package list
-
 import "list"
 
 Schema :: {

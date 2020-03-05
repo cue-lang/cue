@@ -28,7 +28,6 @@
 
 -- out.cue --
 // Main schema
-package type
 
 Schema :: {
 	// an integer or string.

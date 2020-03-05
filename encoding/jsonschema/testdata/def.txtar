@@ -39,8 +39,6 @@
 }
 
 -- out.cue --
-package def
-
 Schema :: _ @jsonschema(schema="http://json-schema.org/draft-07/schema#",id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
 Schema :: {
 	person?:           def.person

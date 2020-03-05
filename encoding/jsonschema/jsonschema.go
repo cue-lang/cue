@@ -53,6 +53,8 @@ func Extract(data *cue.Instance, cfg *Config) (*ast.File, error) {
 
 // A Config configures a JSON Schema encoding or decoding.
 type Config struct {
+	PkgName string
+
 	ID string // URL of the original source, corresponding to the $id field.
 
 	// TODO: configurability to make it compatible with OpenAPI, such as

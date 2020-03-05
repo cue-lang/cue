@@ -20,8 +20,6 @@ package jsonschema
 
 import (
 	"fmt"
-	"path"
-	"path/filepath"
 	"sort"
 	"strings"
 
@@ -60,17 +58,14 @@ func (d *decoder) decode(inst *cue.Instance) *ast.File {
 
 	var a []ast.Decl
 
-	filename := d.cfg.ID
-	name := filepath.ToSlash(filename)
-	if state.id != "" {
-		name = strings.Trim(name, "#")
-	}
-	pkgName := path.Base(name)
-	pkgName = pkgName[:len(pkgName)-len(path.Ext(pkgName))]
-	pkg := &ast.Package{Name: ast.NewIdent(pkgName)}
-	state.doc(pkg)
+	if pkgName := d.cfg.PkgName; pkgName != "" {
+		pkg := &ast.Package{Name: ast.NewIdent(pkgName)}
+		state.doc(pkg)
 
-	a = append(a, pkg)
+		a = append(a, pkg)
+	} else if doc := state.comment(); doc != nil {
+		a = append(a, doc)
+	}
 
 	var imports []string
 	for k := range d.imports {
@@ -263,7 +258,7 @@ func (s *state) finalize() (e ast.Expr) {
 	return e
 }
 
-func (s *state) doc(n ast.Node) {
+func (s *state) comment() *ast.CommentGroup {
 	// Create documentation.
 	doc := strings.TrimSpace(s.title)
 	if s.description != "" {
@@ -273,13 +268,18 @@ func (s *state) doc(n ast.Node) {
 		doc += s.description
 		doc = strings.TrimSpace(doc)
 	}
-	if doc != "" {
-		ast.SetComments(n, []*ast.CommentGroup{
-			internal.NewComment(true, doc),
-		})
-	}
-
 	// TODO: add examples as well?
+	if doc == "" {
+		return nil
+	}
+	return internal.NewComment(true, doc)
+}
+
+func (s *state) doc(n ast.Node) {
+	doc := s.comment()
+	if doc != nil {
+		ast.SetComments(n, []*ast.CommentGroup{doc})
+	}
 }
 
 func (s *state) add(e ast.Expr) {

@@ -24,8 +24,6 @@
 }
 
 -- out.cue --
-package num
-
 import "math"
 
 Schema :: {

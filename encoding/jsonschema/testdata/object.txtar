@@ -60,7 +60,6 @@
 
 -- out.cue --
 // Main schema
-package object
 
 import "struct"
 

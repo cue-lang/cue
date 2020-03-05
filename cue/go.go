@@ -214,6 +214,10 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 		}
 		return &nullLit{src.base()}
 
+	case *ast.File:
+		x := newVisitorCtx(ctx, nil, nil, nil, false)
+		return ctx.manifest(x.walk(v))
+
 	case ast.Expr:
 		x := newVisitorCtx(ctx, nil, nil, nil, false)
 		return ctx.manifest(x.walk(v))

@@ -17,7 +17,6 @@ package cue
 import (
 	"bytes"
 	"fmt"
-	"go/parser"
 	"io/ioutil"
 	"math"
 	"math/big"
@@ -691,7 +690,6 @@ func TestAllFields(t *testing.T) {
 }
 
 func TestLookup(t *testing.T) {
-	_ = parser.ParseFile
 	var runtime = new(Runtime)
 	inst, err := runtime.Compile("x.cue", `
 V :: {
@@ -774,6 +772,13 @@ func goValue(v Value) interface{} {
 }
 
 func TestFill(t *testing.T) {
+	r := &Runtime{}
+
+	inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
+	if err != nil {
+		t.Fatal(err)
+	}
+
 	testCases := []struct {
 		in   string
 		x    interface{}
@@ -799,6 +804,15 @@ func TestFill(t *testing.T) {
 		out: `
 		"foo"
 		`,
+	}, {
+		in: `
+		foo: _
+		`,
+		x:    inst.Value(),
+		path: "foo",
+		out: `
+		{foo: {bar: "baz"}}
+		`,
 	}}
 
 	for _, tc := range testCases {
@@ -807,7 +821,6 @@ func TestFill(t *testing.T) {
 			path = strings.Split(tc.path, ",")
 		}
 
-		r := &Runtime{}
 		v := compile(t, r, tc.in).Value().Fill(tc.x, path...)
 		w := compile(t, r, tc.out).Value()
 

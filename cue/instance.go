@@ -334,29 +334,48 @@ func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
 
 // Fill creates a new instance with the values of the old instance unified with
 // the given value. It is not possible to update the emit value.
+//
+// Values may be any Go value that can be converted to CUE, an ast.Expr or
+// a Value. In the latter case, it will panic if the Value is not from the same
+// Runtime.
 func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	ctx := inst.newContext()
 	root := ctx.manifest(inst.rootValue)
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convert(ctx, root, true, x)
+	var value evaluated
+	if v, ok := x.(Value); ok {
+		if inst.index != v.ctx().index {
+			panic("value of type Value is not created with same Runtime as Instance")
+		}
+		value = v.eval(ctx)
+	} else {
+		value = convert(ctx, root, true, x)
+	}
 	eval := binOp(ctx, baseValue{}, opUnify, root, value)
 	// TODO: validate recursively?
 	err := inst.Err
 	var st *structLit
+	var stVal evaluated
 	switch x := eval.(type) {
 	case *structLit:
 		st = x
+		stVal = x
 	default:
 		// This should not happen.
-		err = errors.Newf(x.Pos(), "error filling struct")
+		b := ctx.mkErr(eval, "error filling struct")
+		err = inst.Value().toErr(b)
+		st = &structLit{emit: b}
+		stVal = b
 	case *bottom:
 		err = inst.Value().toErr(x)
+		st = &structLit{emit: x}
+		stVal = x
 	}
 	inst = inst.index.addInst(&Instance{
 		rootStruct: st,
-		rootValue:  st,
+		rootValue:  stVal,
 		inst:       nil,
 
 		// Omit ImportPath to indicate this is not an importable package.

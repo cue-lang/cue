@@ -43,14 +43,10 @@ func Validate(b []byte, v cue.Value) error {
 	return err
 }
 
-// Extract parses the JSON to a CUE expression.
-//
-// If src != nil, Extract parses the source from src and the path is for
-// position information. The type of the argument for the src parameter must be
-// string, []byte, or io.Reader. If src == nil, ParseFile parses the file
-// specified by filename.
-func Extract(path string, b []byte) (ast.Expr, error) {
-	expr, err := extract(path, b)
+// Extract parses JSON-encoded data to a CUE expression, using path for
+// position information.
+func Extract(path string, data []byte) (ast.Expr, error) {
+	expr, err := extract(path, data)
 	if err != nil {
 		return nil, err
 	}
@@ -58,14 +54,10 @@ func Extract(path string, b []byte) (ast.Expr, error) {
 	return expr, nil
 }
 
-// Decode converts a JSON file to a CUE value.
-//
-// If src != nil, Extract parses the source from src and the path is for
-// position information. The type of the argument for the src parameter must be
-// string, []byte, or io.Reader. If src == nil, ParseFile parses the file
-// specified by filename.
-func Decode(r *cue.Runtime, path string, b []byte) (*cue.Instance, error) {
-	expr, err := extract(path, b)
+// Decode parses JSON-encoded data to a CUE value, using path for position
+// information.
+func Decode(r *cue.Runtime, path string, data []byte) (*cue.Instance, error) {
+	expr, err := extract(path, data)
 	if err != nil {
 		return nil, err
 	}

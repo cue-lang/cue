@@ -18,13 +18,18 @@ import (
 	"encoding/json"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	cuejson "cuelang.org/go/encoding/json"
 )
 
-// A Generator converts CUE to OpenAPI.
-type Generator struct {
+// A Config defines options for converting CUE to and from OpenAPI.
+type Config struct {
 	// Info specifies the info section of the OpenAPI document. To be a valid
 	// OpenAPI document, it must include at least the title and version fields.
-	Info OrderedMap
+	// Info may be a *ast.StructLit or any type that marshals to JSON.
+	Info interface{}
 
 	// ReferenceFunc allows users to specify an alternative representation
 	// for references. An empty string tells the generator to expand the type
@@ -55,8 +60,7 @@ type Generator struct {
 	ExpandReferences bool
 }
 
-// Config is now Generator
-type Config = Generator
+type Generator = Config
 
 // Gen generates the set OpenAPI schema for all top-level types of the
 // given instance.
@@ -71,25 +75,64 @@ func Gen(inst *cue.Instance, c *Config) ([]byte, error) {
 	return json.Marshal(all)
 }
 
-// All generates an OpenAPI definition from the given instance.
+// Generate generates the set of OpenAPI schema for all top-level types of the
+// given instance.
 //
 // Note: only a limited number of top-level types are supported so far.
-func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
-	all, err := g.Schemas(inst)
+func Generate(inst *cue.Instance, c *Config) (*ast.File, error) {
+	all, err := schemas(c, inst)
 	if err != nil {
 		return nil, err
 	}
+	top, err := c.compose(all)
+	if err != nil {
+		return nil, err
+	}
+	return &ast.File{Decls: top.Elts}, nil
+}
 
-	schemas := &OrderedMap{}
-	schemas.Set("schemas", all)
+// All generates an OpenAPI definition from the given instance.
+//
+// Note: only a limited number of top-level types are supported so far.
+// Deprecated: use Generate
+func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
+	all, err := schemas(g, inst)
+	if err != nil {
+		return nil, err
+	}
+	top, err := g.compose(all)
+	return (*OrderedMap)(top), err
+}
 
-	top := &OrderedMap{}
-	top.Set("openapi", "3.0.0")
-	top.Set("info", &g.Info)
-	top.Set("paths", &OrderedMap{})
-	top.Set("components", schemas)
+func (c *Config) compose(schemas *ast.StructLit) (*ast.StructLit, error) {
+	// Support of OrderedMap is mostly for backwards compatibility.
+	var info ast.Expr
+	switch x := c.Info.(type) {
+	case nil:
+		info = ast.NewStruct()
+	case ast.Expr:
+		info = x
+	case *OrderedMap:
+		info = (*ast.StructLit)(x)
+	case OrderedMap:
+		info = (*ast.StructLit)(&x)
+	default:
+		b, err := json.Marshal(x)
+		if err == nil {
+			info, err = cuejson.Extract("info", b)
+		}
+		if err != nil {
+			return nil, errors.Wrapf(err, token.NoPos,
+				"openapi: could not encode info section")
+		}
+	}
 
-	return top, nil
+	return ast.NewStruct(
+		"openapi", ast.NewString("3.0.0"),
+		"info", info,
+		"paths", ast.NewStruct(),
+		"components", ast.NewStruct("schemas", schemas),
+	), nil
 }
 
 // Schemas extracts component/schemas from the CUE top-level types.
@@ -98,7 +141,7 @@ func (g *Generator) Schemas(inst *cue.Instance) (*OrderedMap, error) {
 	if err != nil {
 		return nil, err
 	}
-	return comps, err
+	return (*OrderedMap)(comps), err
 }
 
 var defaultConfig = &Config{}

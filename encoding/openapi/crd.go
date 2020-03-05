@@ -45,6 +45,7 @@ package openapi
 
 import (
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 )
 
 // newCoreBuilder returns a builder that represents a structural schema.
@@ -55,7 +56,7 @@ func newCoreBuilder(c *buildContext) *builder {
 }
 
 // coreSchema creates the core part of a structural OpenAPI.
-func (b *builder) coreSchema(name string) *oaSchema {
+func (b *builder) coreSchema(name string) *ast.StructLit {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
 	defer func() { b.ctx.path = oldPath }()
@@ -74,11 +75,11 @@ func (b *builder) coreSchema(name string) *oaSchema {
 			sub := b.properties[k]
 			p.Set(k, sub.coreSchema(k))
 		}
-		if len(p.kvs) > 0 || b.items != nil {
+		if p.len() > 0 || b.items != nil {
 			b.setType("object", "")
 		}
-		if len(p.kvs) > 0 {
-			b.setSingle("properties", p, false)
+		if p.len() > 0 {
+			b.setSingle("properties", (*ast.StructLit)(p), false)
 		}
 		// TODO: in Structural schema only one of these is allowed.
 		if b.items != nil {

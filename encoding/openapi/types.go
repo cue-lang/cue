@@ -20,7 +20,10 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
+	"cuelang.org/go/cue/token"
 )
 
 // See https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#format
@@ -69,7 +72,7 @@ func getDeprecated(v cue.Value) bool {
 	return r
 }
 
-func simplify(b *builder, t *OrderedMap) {
+func simplify(b *builder, t *ast.StructLit) {
 	if b.format == "" {
 		return
 	}
@@ -79,62 +82,62 @@ func simplify(b *builder, t *OrderedMap) {
 	}
 }
 
-func simplifyNumber(t *OrderedMap, format string) string {
-	pairs := t.kvs
+func simplifyNumber(t *ast.StructLit, format string) string {
+	fields := t.Elts
 	k := 0
-	for i, kv := range pairs {
-		switch kv.Key {
+	for i, d := range fields {
+		switch label(d) {
 		case "minimum":
-			if decimalEqual(minMap[format], kv.Value) {
+			if decimalEqual(minMap[format], value(d)) {
 				continue
 			}
 		case "maximum":
-			if decimalEqual(maxMap[format], kv.Value) {
+			if decimalEqual(maxMap[format], value(d)) {
 				continue
 			}
 		}
-		pairs[k] = pairs[i]
+		fields[k] = fields[i]
 		k++
 	}
-	t.kvs = pairs[:k]
+	t.Elts = fields[:k]
 	return format
 }
 
-func decimalEqual(d *decimal, v interface{}) bool {
+func decimalEqual(d *apd.Decimal, v ast.Expr) bool {
 	if d == nil {
 		return false
 	}
-	b, ok := v.(*decimal)
-	if !ok {
+	lit, ok := v.(*ast.BasicLit)
+	if !ok || (lit.Kind != token.INT && lit.Kind != token.FLOAT) {
 		return false
 	}
-	return d.Cmp(b.Decimal) == 0
+	n := literal.NumInfo{}
+	if literal.ParseNum(lit.Value, &n) != nil {
+		return false
+	}
+	var b apd.Decimal
+	if n.Decimal(&b) != nil {
+		return false
+	}
+	return d.Cmp(&b) == 0
 }
 
-type decimal struct {
-	*apd.Decimal
-}
-
-func (d *decimal) MarshalJSON() (b []byte, err error) {
-	return d.MarshalText()
-}
-
-func mustDecimal(s string) *decimal {
+func mustDecimal(s string) *apd.Decimal {
 	d, _, err := apd.NewFromString(s)
 	if err != nil {
 		panic(err)
 	}
-	return &decimal{d}
+	return d
 }
 
 var (
-	minMap = map[string]*decimal{
+	minMap = map[string]*apd.Decimal{
 		"int32":  mustDecimal("-2147483648"),
 		"int64":  mustDecimal("-9223372036854775808"),
 		"float":  mustDecimal("-3.40282346638528859811704183484516925440e+38"),
 		"double": mustDecimal("-1.797693134862315708145274237317043567981e+308"),
 	}
-	maxMap = map[string]*decimal{
+	maxMap = map[string]*apd.Decimal{
 		"int32":  mustDecimal("2147483647"),
 		"int64":  mustDecimal("9223372036854775807"),
 		"float":  mustDecimal("+3.40282346638528859811704183484516925440e+38"),

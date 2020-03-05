@@ -26,6 +26,7 @@ import (
 	"github.com/kylelemons/godebug/diff"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 )
@@ -33,7 +34,10 @@ import (
 var update *bool = flag.Bool("update", false, "update the test output")
 
 func TestParseDefinitions(t *testing.T) {
-	info := OrderedMap{kvs: []KeyValue{{"title", "test"}, {"version", "v1"}}}
+	info := *(*OrderedMap)(ast.NewStruct(
+		"title", ast.NewString("test"),
+		"version", ast.NewString("v1"),
+	))
 	defaultConfig := &Config{}
 	resolveRefs := &Config{Info: info, ExpandReferences: true}
 

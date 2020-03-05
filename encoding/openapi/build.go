@@ -17,16 +17,14 @@ package openapi
 import (
 	"fmt"
 	"math"
-	"math/big"
 	"path"
 	"regexp"
 	"sort"
 	"strconv"
 	"strings"
 
-	"github.com/cockroachdb/apd/v2"
-
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -60,7 +58,7 @@ type oaSchema = OrderedMap
 
 type typeFunc func(b *builder, a cue.Value)
 
-func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) {
+func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err error) {
 	var fieldFilter *regexp.Regexp
 	if g.FieldFilter != "" {
 		fieldFilter, err = regexp.Compile(g.FieldFilter)
@@ -136,10 +134,10 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *OrderedMap, err error) 
 		}
 	}
 
-	return c.schemas, nil
+	return (*ast.StructLit)(c.schemas), nil
 }
 
-func (c *buildContext) build(name string, v cue.Value) *oaSchema {
+func (c *buildContext) build(name string, v cue.Value) *ast.StructLit {
 	return newCoreBuilder(c).schema(nil, name, v)
 }
 
@@ -171,7 +169,7 @@ func (b *builder) checkArgs(a []cue.Value, n int) {
 	}
 }
 
-func (b *builder) schema(core *builder, name string, v cue.Value) *oaSchema {
+func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
 	defer func() { b.ctx.path = oldPath }()
@@ -202,11 +200,11 @@ func (b *builder) getDoc(v cue.Value) {
 	}
 	if len(doc) > 0 {
 		str := strings.TrimSpace(strings.Join(doc, "\n\n"))
-		b.setSingle("description", str, true)
+		b.setSingle("description", ast.NewString(str), true)
 	}
 }
 
-func (b *builder) fillSchema(v cue.Value) *oaSchema {
+func (b *builder) fillSchema(v cue.Value) *ast.StructLit {
 	if b.filled != nil {
 		return b.filled
 	}
@@ -227,23 +225,36 @@ func (b *builder) fillSchema(v cue.Value) *oaSchema {
 	}
 
 	schema := b.finish()
+	s := (*ast.StructLit)(schema)
 
-	simplify(b, schema)
+	simplify(b, s)
 
-	sortSchema(schema)
+	sortSchema(s)
 
-	b.filled = schema
-	return schema
+	b.filled = s
+	return s
 }
 
-func sortSchema(s *oaSchema) {
-	sort.Slice(s.kvs, func(i, j int) bool {
-		pi := fieldOrder[s.kvs[i].Key]
-		pj := fieldOrder[s.kvs[j].Key]
+func label(d ast.Decl) string {
+	f := d.(*ast.Field)
+	s, _, _ := ast.LabelName(f.Label)
+	return s
+}
+
+func value(d ast.Decl) ast.Expr {
+	return d.(*ast.Field).Value
+}
+
+func sortSchema(s *ast.StructLit) {
+	sort.Slice(s.Elts, func(i, j int) bool {
+		iName := label(s.Elts[i])
+		jName := label(s.Elts[j])
+		pi := fieldOrder[iName]
+		pj := fieldOrder[jName]
 		if pi != pj {
 			return pi > pj
 		}
-		return s.kvs[i].Key < s.kvs[j].Key
+		return iName < jName
 	})
 }
 
@@ -343,7 +354,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			case isConcrete(v):
 				b.dispatch(f, v)
 				if !b.isNonCore() {
-					b.set("enum", []interface{}{b.decode(v)})
+					b.set("enum", ast.NewList(b.decode(v)))
 				}
 			default:
 				if a := appendSplit(nil, cue.OrOp, v); len(a) > 1 {
@@ -373,7 +384,8 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			fallthrough
 		default:
 			if !b.isNonCore() {
-				b.setFilter("Schema", "default", v)
+				e := v.Syntax().(ast.Expr)
+				b.setFilter("Schema", "default", e)
 			}
 		}
 	}
@@ -439,8 +451,8 @@ func isConcrete(v cue.Value) bool {
 
 func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 	disjuncts := []cue.Value{}
-	enums := []interface{}{} // TODO: unique the enums
-	nullable := false        // Only supported in OpenAPI, not JSON schema
+	enums := []ast.Expr{} // TODO: unique the enums
+	nullable := false     // Only supported in OpenAPI, not JSON schema
 
 	for _, v := range a {
 		switch {
@@ -462,17 +474,17 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 			b.value(disjuncts[0], f)
 		}
 		if len(enums) > 0 && !b.isNonCore() {
-			b.set("enum", enums)
+			b.set("enum", ast.NewList(enums...))
 		}
 		if nullable {
-			b.setSingle("nullable", true, true) // allowed in Structural
+			b.setSingle("nullable", ast.NewBool(true), true) // allowed in Structural
 		}
 		return
 	}
 
-	anyOf := []*oaSchema{}
+	anyOf := []ast.Expr{}
 	if len(enums) > 0 {
-		anyOf = append(anyOf, b.kv("enum", enums))
+		anyOf = append(anyOf, b.kv("enum", ast.NewList(enums...)))
 	}
 
 	hasEmpty := false
@@ -480,21 +492,21 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 		c := newOASBuilder(b)
 		c.value(v, f)
 		t := c.finish()
-		if len(t.kvs) == 0 {
+		if len(t.Elts) == 0 {
 			hasEmpty = true
 		}
-		anyOf = append(anyOf, t)
+		anyOf = append(anyOf, (*ast.StructLit)(t))
 	}
 
 	// If any of the types was "any", a oneOf may be discarded.
 	if !hasEmpty {
-		b.set("oneOf", anyOf)
+		b.set("oneOf", ast.NewList(anyOf...))
 	}
 
 	// TODO: analyze CUE structs to figure out if it should be oneOf or
 	// anyOf. As the source is protobuf for now, it is always oneOf.
 	if nullable {
-		b.setSingle("nullable", true, true)
+		b.setSingle("nullable", ast.NewBool(true), true)
 	}
 }
 
@@ -531,7 +543,7 @@ func (b *builder) dispatch(f typeFunc, v cue.Value) {
 	case cue.NullKind:
 		// TODO: for JSON schema we would set the type here. For OpenAPI,
 		// it must be nullable.
-		b.setSingle("nullable", true, true)
+		b.setSingle("nullable", ast.NewBool(true), true)
 
 	case cue.BoolKind:
 		b.setType("boolean", "")
@@ -619,12 +631,12 @@ func (b *builder) object(v cue.Value) {
 		return
 	}
 
-	required := []string{}
+	required := []ast.Expr{}
 	for i, _ := v.Fields(); i.Next(); {
-		required = append(required, i.Label())
+		required = append(required, ast.NewString(i.Label()))
 	}
 	if len(required) > 0 {
-		b.setFilter("Schema", "required", required)
+		b.setFilter("Schema", "required", ast.NewList(required...))
 	}
 
 	var properties *OrderedMap
@@ -643,18 +655,18 @@ func (b *builder) object(v cue.Value) {
 			core = b.core.properties[label]
 		}
 		schema := b.schema(core, label, i.Value())
-		if !b.isNonCore() || len(schema.kvs) > 0 {
+		if !b.isNonCore() || len(schema.Elts) > 0 {
 			properties.Set(label, schema)
 		}
 	}
 
-	if !hasProps && len(properties.kvs) > 0 {
-		b.setSingle("properties", properties, false)
+	if !hasProps && properties.len() > 0 {
+		b.setSingle("properties", (*ast.StructLit)(properties), false)
 	}
 
 	if t, ok := v.Elem(); ok && (b.core == nil || b.core.items == nil) {
 		schema := b.schema(nil, "*", t)
-		if len(schema.kvs) > 0 {
+		if len(schema.Elts) > 0 {
 			b.setSingle("additionalProperties", schema, true) // Not allowed in structural.
 		}
 	}
@@ -693,7 +705,7 @@ func (b *builder) array(v cue.Value) {
 		switch name {
 		case "list.UniqueItems":
 			b.checkArgs(a, 0)
-			b.setFilter("Schema", "uniqueItems", true)
+			b.setFilter("Schema", "uniqueItems", ast.NewBool(true))
 			return
 
 		case "list.MinItems":
@@ -725,7 +737,7 @@ func (b *builder) array(v cue.Value) {
 	//   - unique items: at most one, but idempotent if multiple.
 	// There is never a need for allOf or anyOf. Note that a CUE list
 	// corresponds almost one-to-one to OpenAPI lists.
-	items := []*oaSchema{}
+	items := []ast.Expr{}
 	count := 0
 	for i, _ := v.List(); i.Next(); count++ {
 		items = append(items, b.schema(nil, strconv.Itoa(count), i.Value()))
@@ -734,7 +746,7 @@ func (b *builder) array(v cue.Value) {
 		// TODO: per-item schema are not allowed in OpenAPI, only in JSON Schema.
 		// Perhaps we should turn this into an OR after first normalizing
 		// the entries.
-		b.set("items", items)
+		b.set("items", ast.NewList(items...))
 		// panic("per-item types not supported in OpenAPI")
 	}
 
@@ -761,7 +773,7 @@ func (b *builder) array(v cue.Value) {
 			t := b.schema(core, "*", typ)
 			if len(items) > 0 {
 				b.setFilter("Schema", "additionalItems", t) // Not allowed in structural.
-			} else if !b.isNonCore() || len(t.kvs) > 0 {
+			} else if !b.isNonCore() || len(t.Elts) > 0 {
 				b.setSingle("items", t, true)
 			}
 		}
@@ -771,23 +783,23 @@ func (b *builder) array(v cue.Value) {
 func (b *builder) listCap(v cue.Value) {
 	switch op, a := v.Expr(); op {
 	case cue.LessThanOp:
-		b.setFilter("Schema", "maxItems", b.int(a[0])-1)
+		b.setFilter("Schema", "maxItems", b.inta(a[0], -1))
 	case cue.LessThanEqualOp:
-		b.setFilter("Schema", "maxItems", b.int(a[0]))
+		b.setFilter("Schema", "maxItems", b.inta(a[0], 0))
 	case cue.GreaterThanOp:
-		b.setFilter("Schema", "minItems", b.int(a[0])+1)
+		b.setFilter("Schema", "minItems", b.inta(a[0], 1))
 	case cue.GreaterThanEqualOp:
-		if b.int(a[0]) > 0 {
-			b.setFilter("Schema", "minItems", b.int(a[0]))
+		if b.int64(a[0]) > 0 {
+			b.setFilter("Schema", "minItems", b.inta(a[0], 0))
 		}
 	case cue.NoOp:
 		// must be type, so okay.
 	case cue.NotEqualOp:
 		i := b.int(a[0])
-		b.setNot("allOff", []*oaSchema{
+		b.setNot("allOff", ast.NewList(
 			b.kv("minItems", i),
 			b.kv("maxItems", i),
-		})
+		))
 
 	default:
 		b.failf(v, "unsupported op for list capacity %v", op)
@@ -814,10 +826,10 @@ func (b *builder) number(v cue.Value) {
 
 	case cue.NotEqualOp:
 		i := b.big(a[0])
-		b.setNot("allOff", []*oaSchema{
+		b.setNot("allOff", ast.NewList(
 			b.kv("minimum", i),
 			b.kv("maximum", i),
-		})
+		))
 
 	case cue.CallOp:
 		name := fmt.Sprint(a[0])
@@ -891,9 +903,9 @@ func (b *builder) string(v cue.Value) {
 			return
 		}
 		if op == cue.RegexMatchOp {
-			b.setFilter("Schema", "pattern", s)
+			b.setFilter("Schema", "pattern", ast.NewString(s))
 		} else {
-			b.setNot("pattern", s)
+			b.setNot("pattern", ast.NewString(s))
 		}
 
 	case cue.NoOp, cue.SelectorOp:
@@ -934,10 +946,11 @@ func (b *builder) bytes(v cue.Value) {
 			return
 		}
 
+		e := ast.NewString(string(s))
 		if op == cue.RegexMatchOp {
-			b.setFilter("Schema", "pattern", s)
+			b.setFilter("Schema", "pattern", e)
 		} else {
-			b.setNot("pattern", s)
+			b.setNot("pattern", e)
 		}
 
 		// TODO: support the following JSON schema constraints
@@ -957,13 +970,13 @@ type builder struct {
 	format       string
 	singleFields *oaSchema
 	current      *oaSchema
-	allOf        []*oaSchema
+	allOf        []*ast.StructLit
 	deprecated   bool
 
 	// Building structural schema
 	core       *builder
 	kind       cue.Kind
-	filled     *oaSchema
+	filled     *ast.StructLit
 	values     []cue.Value // in structural mode, all values of not and *Of.
 	keys       []string
 	properties map[string]*builder
@@ -1005,19 +1018,19 @@ func setType(t *oaSchema, b *builder) {
 	if b.typ != "" {
 		if b.core == nil || (b.core.typ != b.typ && !b.ctx.structural) {
 			if !t.exists("type") {
-				t.Set("type", b.typ)
+				t.Set("type", ast.NewString(b.typ))
 			}
 		}
 	}
 	if b.format != "" {
 		if b.core == nil || b.core.format != b.format {
-			t.Set("format", b.format)
+			t.Set("format", ast.NewString(b.format))
 		}
 	}
 }
 
 // setFilter is like set, but allows the key-value pair to be filtered.
-func (b *builder) setFilter(schema, key string, v interface{}) {
+func (b *builder) setFilter(schema, key string, v ast.Expr) {
 	if re := b.ctx.fieldFilter; re != nil && re.MatchString(path.Join(schema, key)) {
 		return
 	}
@@ -1025,7 +1038,7 @@ func (b *builder) setFilter(schema, key string, v interface{}) {
 }
 
 // setSingle sets a value of which there should only be one.
-func (b *builder) setSingle(key string, v interface{}, drop bool) {
+func (b *builder) setSingle(key string, v ast.Expr, drop bool) {
 	if b.singleFields == nil {
 		b.singleFields = &OrderedMap{}
 	}
@@ -1037,30 +1050,28 @@ func (b *builder) setSingle(key string, v interface{}, drop bool) {
 	b.singleFields.Set(key, v)
 }
 
-func (b *builder) set(key string, v interface{}) {
+func (b *builder) set(key string, v ast.Expr) {
 	if b.current == nil {
 		b.current = &OrderedMap{}
-		b.allOf = append(b.allOf, b.current)
+		b.allOf = append(b.allOf, (*ast.StructLit)(b.current))
 	} else if b.current.exists(key) {
 		b.current = &OrderedMap{}
-		b.allOf = append(b.allOf, b.current)
+		b.allOf = append(b.allOf, (*ast.StructLit)(b.current))
 	}
 	b.current.Set(key, v)
 }
 
-func (b *builder) kv(key string, value interface{}) *oaSchema {
-	constraint := &OrderedMap{}
-	constraint.Set(key, value)
-	return constraint
+func (b *builder) kv(key string, value ast.Expr) *ast.StructLit {
+	return ast.NewStruct(key, value)
 }
 
-func (b *builder) setNot(key string, value interface{}) {
-	not := &OrderedMap{}
-	not.Set("not", b.kv(key, value))
-	b.add(not)
+func (b *builder) setNot(key string, value ast.Expr) {
+	b.add(ast.NewStruct("not", b.kv(key, value)))
 }
 
-func (b *builder) finish() (t *oaSchema) {
+func (b *builder) finish() *ast.StructLit {
+	var t *OrderedMap
+
 	if b.filled != nil {
 		return b.filled
 	}
@@ -1069,38 +1080,42 @@ func (b *builder) finish() (t *oaSchema) {
 		t = &OrderedMap{}
 
 	case 1:
-		t = b.allOf[0]
+		t = (*OrderedMap)(b.allOf[0])
 
 	default:
+		exprs := []ast.Expr{}
+		for _, s := range b.allOf {
+			exprs = append(exprs, s)
+		}
 		t = &OrderedMap{}
-		t.Set("allOf", b.allOf)
+		t.Set("allOf", ast.NewList(exprs...))
 	}
 	if b.singleFields != nil {
-		b.singleFields.kvs = append(b.singleFields.kvs, t.kvs...)
+		b.singleFields.Elts = append(b.singleFields.Elts, t.Elts...)
 		t = b.singleFields
 	}
 	if b.deprecated {
-		t.Set("deprecated", true)
+		t.Set("deprecated", ast.NewBool(true))
 	}
 	setType(t, b)
-	sortSchema(t)
-	return t
+	sortSchema((*ast.StructLit)(t))
+	return (*ast.StructLit)(t)
 }
 
-func (b *builder) add(t *oaSchema) {
+func (b *builder) add(t *ast.StructLit) {
 	b.allOf = append(b.allOf, t)
 }
 
 func (b *builder) addConjunct(f func(*builder)) {
 	c := newOASBuilder(b)
 	f(c)
-	b.add(c.finish())
+	b.add((*ast.StructLit)(c.finish()))
 }
 
 func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
 	name := b.ctx.makeRef(inst, ref)
 	b.addConjunct(func(b *builder) {
-		b.set("$ref", path.Join("#", b.ctx.refPrefix, name))
+		b.set("$ref", ast.NewString(path.Join("#", b.ctx.refPrefix, name)))
 	})
 
 	if b.ctx.inst != inst {
@@ -1123,7 +1138,8 @@ func (b *buildContext) makeRef(inst *cue.Instance, ref []string) string {
 	return path.Join(a...)
 }
 
-func (b *builder) int(v cue.Value) int64 {
+func (b *builder) int64(v cue.Value) int64 {
+	v, _ = v.Default()
 	i, err := v.Int64()
 	if err != nil {
 		b.failf(v, "could not retrieve int: %v", err)
@@ -1131,20 +1147,27 @@ func (b *builder) int(v cue.Value) int64 {
 	return i
 }
 
-func (b *builder) decode(v cue.Value) interface{} {
-	var d interface{}
-	if err := v.Decode(&d); err != nil {
-		b.failf(v, "decode error: %v", err)
+func (b *builder) intExpr(i int64) ast.Expr {
+	return &ast.BasicLit{
+		Kind:  token.INT,
+		Value: fmt.Sprint(i),
 	}
-	return d
 }
 
-func (b *builder) big(v cue.Value) interface{} {
-	var mant big.Int
-	exp, err := v.MantExp(&mant)
-	if err != nil {
-		b.failf(v, "value not a number: %v", err)
-		return nil
-	}
-	return &decimal{apd.NewWithBigInt(&mant, int32(exp))}
+func (b *builder) int(v cue.Value) ast.Expr {
+	return b.intExpr(b.int64(v))
+}
+
+func (b *builder) inta(v cue.Value, offset int64) ast.Expr {
+	return b.intExpr(b.int64(v) + offset)
+}
+
+func (b *builder) decode(v cue.Value) ast.Expr {
+	v, _ = v.Default()
+	return v.Syntax().(ast.Expr)
+}
+
+func (b *builder) big(v cue.Value) ast.Expr {
+	v, _ = v.Default()
+	return v.Syntax().(ast.Expr)
 }

@@ -1,0 +1,105 @@
+cue def foo.cue -o openapi:-
+cmp stdout expect-json
+
+cue def foo.cue -o openapi+cue:-
+cmp stdout expect-cue
+
+cue def foo.cue -o openapi+yaml:-
+cmp stdout expect-yaml
+
+-- foo.cue --
+Foo :: {
+    a: int
+    b: uint & <10
+}
+
+Bar :: {
+    foo: Foo
+}
+
+-- expect-json --
+{
+    "openapi": "3.0.0",
+    "info": {},
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Foo": {
+                "type": "object",
+                "required": [
+                    "a",
+                    "b"
+                ],
+                "properties": {
+                    "a": {
+                        "type": "integer"
+                    },
+                    "b": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMaximum": 10
+                    }
+                }
+            },
+            "Bar": {
+                "type": "object",
+                "required": [
+                    "foo"
+                ],
+                "properties": {
+                    "foo": {
+                        "$ref": "#/components/schemas/Foo"
+                    }
+                }
+            }
+        }
+    }
+}
+-- expect-cue --
+openapi: "3.0.0"
+info: {}
+paths: {}
+components: schemas: {
+	Foo: {
+		type: "object"
+		required: ["a", "b"]
+		properties: {
+			a: type: "integer"
+			b: {
+				type:             "integer"
+				minimum:          0
+				exclusiveMaximum: 10
+			}
+		}
+	}
+	Bar: {
+		type: "object"
+		required: ["foo"]
+		properties: foo: $ref: "#/components/schemas/Foo"
+	}
+}
+-- expect-yaml --
+openapi: 3.0.0
+info: {}
+paths: {}
+components:
+    schemas:
+        Foo:
+            type: object
+            required:
+              - a
+              - b
+            properties:
+                a:
+                    type: integer
+                b:
+                    type: integer
+                    minimum: 0
+                    exclusiveMaximum: 10
+        Bar:
+            type: object
+            required:
+              - foo
+            properties:
+                foo:
+                    $ref: '#/components/schemas/Foo'

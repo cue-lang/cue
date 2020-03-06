@@ -23,6 +23,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -38,7 +39,6 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 		useList    = flagList.Bool(b.cmd)
 		path       = flagPath.StringArray(b.cmd)
 		useContext = flagWithContext.Bool(b.cmd)
-		pkg        = flagPackage.String(b.cmd)
 		match      = flagGlob.String(b.cmd)
 	)
 	if !b.forceOrphanProcessing && !perFile && !useList && len(path) == 0 {
@@ -51,6 +51,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 		return false, err
 	}
 
+	pkg := b.encConfig.PkgName
 	if pkg == "" {
 		pkg = i.PkgName
 	} else if pkg != "" && i.PkgName != "" && i.PkgName != pkg && !flagForce.Bool(b.cmd) {
@@ -75,16 +76,13 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 		d := encoding.NewDecoder(f, b.encConfig)
 		defer d.Close()
 
-		var objs []ast.Expr
+		var objs []*ast.File
 
 		for ; !d.Done(); d.Next() {
-			if expr := d.Expr(); expr != nil {
+			if expr := d.File(); expr != nil {
 				objs = append(objs, expr)
 				continue
 			}
-			f := d.File()
-			f.Filename = newName(d.Filename(), d.Index())
-			files = append(files, f)
 		}
 
 		if perFile {
@@ -126,13 +124,30 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 	return true, nil
 }
 
-func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.File, error) {
+func toExpr(f *ast.File) (expr ast.Expr, pkg *ast.Package) {
+	var p int
+outer:
+	for i, d := range f.Decls {
+		switch x := d.(type) {
+		case *ast.Package:
+			pkg = x
+		case *ast.ImportDecl:
+			p = i + 1
+		case *ast.CommentGroup:
+		default:
+			break outer
+		}
+	}
+	return &ast.StructLit{Elts: f.Decls[p:]}, pkg
+}
+
+func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.File, error) {
 	f := &ast.File{}
 
 	index := newIndex()
-	for i, expr := range objs {
+	for i, file := range objs {
+		expr, p := toExpr(file)
 
-		// Compute a path different from root.
 		var pathElems []ast.Label
 		var pathTokens []token.Token
 
@@ -200,6 +215,9 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.Fi
 			field := &ast.Field{Label: pathElems[0]}
 			field.Token = pathTokens[0]
 			f.Decls = append(f.Decls, field)
+			if p != nil {
+				astutil.CopyComments(field, p)
+			}
 			for i, e := range pathElems[1:] {
 				newField := &ast.Field{Label: e}
 				newVal := ast.NewStruct(newField)

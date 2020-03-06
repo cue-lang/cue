@@ -12,6 +12,9 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// TODO: make this package public in cuelang.org/go/encoding
+// once stabalized.
+
 package encoding
 
 import (
@@ -36,25 +39,47 @@ import (
 )
 
 type Decoder struct {
-	cfg      *Config
-	closer   io.Closer
-	next     func() (ast.Expr, error)
-	expr     ast.Expr
-	file     *ast.File
-	filename string // may change on iteration for some formats
-	index    int
-	err      error
+	cfg       *Config
+	closer    io.Closer
+	next      func() (ast.Expr, error)
+	interpret func(*cue.Instance) (file *ast.File, id string, err error)
+	expr      ast.Expr
+	file      *ast.File
+	filename  string // may change on iteration for some formats
+	id        string
+	index     int
+	err       error
 }
 
-func (i *Decoder) Expr() ast.Expr   { return i.expr }
+// ID returns a canonical identifier for the decoded object or "" if no such
+// identifier could be found.
+func (i *Decoder) ID() string {
+	return i.id
+}
+
 func (i *Decoder) Filename() string { return i.filename }
 func (i *Decoder) Index() int       { return i.index }
 func (i *Decoder) Done() bool       { return i.err != nil }
 
 func (i *Decoder) Next() {
-	if i.err == nil {
-		i.expr, i.err = i.next()
-		i.index++
+	if i.err != nil {
+		return
+	}
+	// Decoder level
+	i.expr, i.err = i.next()
+	i.index++
+	if i.err != nil {
+		return
+	}
+	// Interpretations
+	if i.interpret != nil {
+		var r cue.Runtime
+		inst, err := r.CompileFile(i.File())
+		if err != nil {
+			i.err = err
+			return
+		}
+		i.file, i.id, i.err = i.interpret(inst)
 	}
 }
 
@@ -105,6 +130,8 @@ type Config struct {
 	Out    io.Writer
 	Stdin  io.Reader
 	Stdout io.Writer
+
+	PkgName string // package name for files to generate
 
 	Force     bool // overwrite existing files.
 	Stream    bool // will potentially write more than one document per file
@@ -162,10 +189,13 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		i.err = err
 		i.expr = ast.NewString(string(b))
 	case build.Protobuf:
-		paths := &protobuf.Config{Paths: cfg.ProtoPath}
+		paths := &protobuf.Config{
+			Paths:   cfg.ProtoPath,
+			PkgName: cfg.PkgName,
+		}
 		i.file, i.err = protobuf.Extract(path, r, paths)
 	default:
-		i.err = fmt.Errorf("unsupported stream type %q", f.Encoding)
+		i.err = fmt.Errorf("unsupported encoding %q", f.Encoding)
 	}
 
 	return i

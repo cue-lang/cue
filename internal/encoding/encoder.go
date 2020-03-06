@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/pkg/encoding/yaml"
 )
@@ -62,12 +63,12 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 
 	switch f.Interpretation {
 	case "":
-	// case build.OpenAPI:
-	// 	// TODO: get encoding options
-	// 	cfg := openapi.Config{}
-	// 	i.interpret = func(inst *cue.Instance) (*ast.File, error) {
-	// 		return openapi.Generate(inst, cfg)
-	// 	}
+	case build.OpenAPI:
+		// TODO: get encoding options
+		cfg := &openapi.Config{}
+		e.interpret = func(i *cue.Instance) (*ast.File, error) {
+			return openapi.Generate(i, cfg)
+		}
 	// case build.JSONSchema:
 	// 	// TODO: get encoding options
 	// 	cfg := openapi.Config{}
@@ -131,7 +132,6 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		e.encFile = func(f *ast.File) error { return format(f.Filename, f) }
 
 	case build.JSON, build.JSONL:
-		// SetEscapeHTML
 		d := json.NewEncoder(w)
 		d.SetIndent("", "    ")
 		d.SetEscapeHTML(cfg.EscapeHTML)

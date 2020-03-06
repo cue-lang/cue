@@ -405,6 +405,21 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err
 					"unsupported encoding %q", f.Encoding)
 			}
 		}
+
+		switch {
+		case len(p.insts) > 0 && len(p.orphanedSchema) > 0:
+			return nil, errors.Newf(token.NoPos,
+				"cannot define packages and schema")
+		case len(p.orphanedData) > 0 && len(p.orphanedSchema) > 1:
+			// TODO: allow this when schema have ID specified.
+			return nil, errors.Newf(token.NoPos,
+				"cannot define data with more than one schema")
+		case len(p.orphanedData) > 0 && len(p.orphanedSchema) == 1:
+			b.BuildFiles = append(b.BuildFiles, p.orphanedSchema...)
+			p.insts = append(p.insts, b)
+		case len(p.orphanedSchema) > 0:
+			p.orphanedData = p.orphanedSchema
+		}
 	}
 
 	if len(p.expressions) > 1 {
@@ -449,6 +464,7 @@ func (b *buildPlan) parseFlags() (err error) {
 		Stdout:    b.cmd.OutOrStdout(),
 		ProtoPath: flagProtoPath.StringArray(b.cmd),
 		AllErrors: flagAllErrors.Bool(b.cmd),
+		PkgName:   flagPackage.String(b.cmd),
 	}
 	return nil
 }

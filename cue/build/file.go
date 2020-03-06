@@ -35,7 +35,7 @@ const (
 	YAML     Encoding = "yaml"
 	JSONL    Encoding = "jsonl"
 	Text     Encoding = "text"
-	Protobuf Encoding = "protobuf"
+	Protobuf Encoding = "proto"
 
 	// TODO:
 	// TOML

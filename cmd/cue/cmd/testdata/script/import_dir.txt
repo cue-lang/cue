@@ -1,0 +1,9 @@
+cue import -p foo ./...
+cmp x.cue expect.cue
+
+-- x.yml --
+x: yyy
+-- expect.cue --
+package foo
+
+x: "yyy"

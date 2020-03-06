@@ -51,7 +51,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 
 	if pkg == "" {
 		pkg = i.PkgName
-	} else if pkg != "" && i.PkgName != pkg && !flagForce.Bool(b.cmd) {
+	} else if pkg != "" && i.PkgName != "" && i.PkgName != pkg && !flagForce.Bool(b.cmd) {
 		return false, fmt.Errorf(
 			"%q flag clashes with existing package name (%s vs %s)",
 			flagPackage, pkg, i.PkgName,

@@ -15,11 +15,13 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
 	"strconv"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/parser"
@@ -132,6 +134,7 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.Fi
 
 		// Compute a path different from root.
 		var pathElems []ast.Label
+		var pathTokens []token.Token
 
 		switch {
 		case len(flagPath.StringArray(cmd)) > 0:
@@ -152,7 +155,14 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.Fi
 			for _, str := range flagPath.StringArray(cmd) {
 				l, err := parser.ParseExpr("--path", str)
 				if err != nil {
-					return nil, fmt.Errorf(`labels are of form "cue import -l foo -l 'strings.ToLower(bar)'": %v`, err)
+					labels, tokens, err := parseFullPath(inst, str)
+					if err != nil {
+						return nil, fmt.Errorf(
+							`labels must be expressions (-l foo -l 'strings.ToLower(bar)') or full paths (-l '"foo": "\(strings.ToLower(bar))":) : %v`, err)
+					}
+					pathElems = append(pathElems, labels...)
+					pathTokens = append(pathTokens, tokens...)
+					continue
 				}
 
 				str, err := inst.Eval(l).String()
@@ -160,6 +170,7 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.Fi
 					return nil, fmt.Errorf("unsupported label path type: %v", err)
 				}
 				pathElems = append(pathElems, ast.NewString(str))
+				pathTokens = append(pathTokens, 0)
 			}
 		}
 
@@ -187,10 +198,12 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.Fi
 			f.Decls = append(f.Decls, obj.Elts...)
 		} else {
 			field := &ast.Field{Label: pathElems[0]}
+			field.Token = pathTokens[0]
 			f.Decls = append(f.Decls, field)
-			for _, e := range pathElems[1:] {
+			for i, e := range pathElems[1:] {
 				newField := &ast.Field{Label: e}
 				newVal := ast.NewStruct(newField)
+				newField.Token = pathTokens[i+1]
 				field.Value = newVal
 				field = newField
 			}
@@ -215,6 +228,55 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...ast.Expr) (*ast.Fi
 	}
 
 	return f, nil
+}
+
+func parseFullPath(inst *cue.Instance, exprs string) (p []ast.Label, t []token.Token, err error) {
+	f, err := parser.ParseFile("--path", exprs+"_")
+	if err != nil {
+		return nil, nil, fmt.Errorf("parser error in path %q: %v", exprs, err)
+	}
+
+	if len(f.Decls) != 1 {
+		return nil, nil, errors.New("path flag must be a space-separated sequence of labels")
+	}
+
+	for d := f.Decls[0]; ; {
+		field, ok := d.(*ast.Field)
+		if !ok {
+			// This should never happen
+			return nil, nil, errors.New("%q not a sequence of labels")
+		}
+
+		t = append(t, field.Token)
+
+		switch x := field.Label.(type) {
+		case *ast.Ident, *ast.BasicLit:
+			p = append(p, x)
+
+		case *ast.TemplateLabel:
+			return nil, nil, fmt.Errorf("template labels not supported in path flag")
+
+		case ast.Expr:
+			v := inst.Eval(x)
+			if v.Kind() == cue.BottomKind {
+				return nil, nil, v.Err()
+			}
+			p = append(p, v.Syntax().(ast.Label))
+
+		}
+
+		v, ok := field.Value.(*ast.StructLit)
+		if !ok {
+			break
+		}
+
+		if len(v.Elts) != 1 {
+			return nil, nil, errors.New("path value may not contain a struct")
+		}
+
+		d = v.Elts[0]
+	}
+	return p, t, nil
 }
 
 type listIndex struct {

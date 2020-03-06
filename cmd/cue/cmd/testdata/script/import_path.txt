@@ -1,3 +1,6 @@
+cue import -o - -f -l '"\(strings.ToLower(kind))": "\(name)":' ./import
+cmp stdout expect-stdout
+
 cue import -o - -f -l 'strings.ToLower(kind)' -l name ./import
 cmp stdout expect-stdout
 -- expect-stdout --

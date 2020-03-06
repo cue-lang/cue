@@ -301,6 +301,8 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err
 	if cfg == nil {
 		cfg = defaultConfig
 	}
+	cfg.Stdin = stdin
+
 	builds := loadFromArgs(cmd, args, cfg)
 	if builds == nil {
 		return nil, errors.Newf(token.NoPos, "invalid args")

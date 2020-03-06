@@ -15,6 +15,7 @@
 package load
 
 import (
+	"io"
 	"os"
 	pathpkg "path"
 	"path/filepath"
@@ -178,15 +179,23 @@ type Config struct {
 	// If the file  with the given path already exists, the parser will use the
 	// alternative file contents provided by the map.
 	//
-	// Overlays provide incomplete support for when a given file doesn't
-	// already exist on disk. See the package doc above for more details.
-	//
 	// If the value must be of type string, []byte, io.Reader, or *ast.File.
 	Overlay map[string]Source
+
+	// Stdin defines an alternative for os.Stdin for the file "-". When used,
+	// the corresponding build.File will be associated with the full buffer.
+	Stdin io.Reader
 
 	fileSystem
 
 	loadFunc build.LoadFunc
+}
+
+func (c *Config) stdin() io.Reader {
+	if c.Stdin == nil {
+		return os.Stdin
+	}
+	return c.Stdin
 }
 
 func (c *Config) newInstance(pos token.Pos, p importPath) *build.Instance {

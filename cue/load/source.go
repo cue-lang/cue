@@ -21,7 +21,7 @@ import (
 
 // A Source represents file contents.
 type Source interface {
-	contents() ([]byte, error)
+	contents() ([]byte, *ast.File, error)
 }
 
 // FromString creates a Source from the given string.
@@ -43,18 +43,21 @@ func FromFile(f *ast.File) Source {
 
 type stringSource string
 
-func (s stringSource) contents() ([]byte, error) {
-	return []byte(s), nil
+func (s stringSource) contents() ([]byte, *ast.File, error) {
+	return []byte(s), nil, nil
 }
 
 type bytesSource []byte
 
-func (s bytesSource) contents() ([]byte, error) {
-	return []byte(s), nil
+func (s bytesSource) contents() ([]byte, *ast.File, error) {
+	return []byte(s), nil, nil
 }
 
 type fileSource ast.File
 
-func (s *fileSource) contents() ([]byte, error) {
-	return format.Node((*ast.File)(s))
+func (s *fileSource) contents() ([]byte, *ast.File, error) {
+	f := (*ast.File)(s)
+	// TODO: wasteful formatting, but needed for now.
+	b, err := format.Node(f)
+	return b, f, err
 }

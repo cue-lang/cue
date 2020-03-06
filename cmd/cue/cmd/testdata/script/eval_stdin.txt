@@ -1,0 +1,12 @@
+stdin stdin.cue
+cue eval t.cue -
+cmp stdout expect-stdout
+
+-- stdin.cue --
+foo:3
+-- t.cue --
+foo: int
+bar: 3
+-- expect-stdout --
+foo: 3
+bar: 3

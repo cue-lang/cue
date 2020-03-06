@@ -16,7 +16,6 @@ package load
 
 import (
 	"bytes"
-	"go/ast"
 	"io"
 	"io/ioutil"
 	"os"
@@ -25,6 +24,7 @@ import (
 	"strings"
 	"time"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -73,13 +73,14 @@ func (fs *fileSystem) init(c *Config) error {
 		dir, base := filepath.Split(filename)
 		m := fs.getDir(dir, true)
 
-		b, err := src.contents()
+		b, file, err := src.contents()
 		if err != nil {
 			return err
 		}
 		m[base] = &overlayFile{
 			basename: base,
 			contents: b,
+			file:     file,
 			modtime:  time.Now(),
 		}
 

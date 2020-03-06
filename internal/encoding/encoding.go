@@ -115,18 +115,24 @@ type Config struct {
 // type of f must be a data type, but does not have to be an encoding that
 // can stream. stdin is used in case the file is "-".
 func NewDecoder(f *build.File, cfg *Config) *Decoder {
-	r, err := reader(f, cfg.Stdin)
-	i := &Decoder{
-		closer:   r,
-		err:      err,
-		filename: f.Filename,
-		next: func() (ast.Expr, error) {
-			if err == nil {
-				err = io.EOF
-			}
-			return nil, io.EOF
-		},
+	i := &Decoder{filename: f.Filename}
+	i.next = func() (ast.Expr, error) {
+		if i.err != nil {
+			return nil, i.err
+		}
+		return nil, io.EOF
 	}
+
+	if f, ok := f.Source.(*ast.File); ok {
+		i.file = f
+		i.closer = ioutil.NopCloser(strings.NewReader(""))
+		// TODO: verify input format for CUE.
+		return i
+	}
+
+	r, err := reader(f, cfg.Stdin)
+	i.closer = r
+	i.err = err
 	if err != nil {
 		return i
 	}

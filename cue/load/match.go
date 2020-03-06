@@ -16,12 +16,15 @@ package load
 
 import (
 	"bytes"
-	"path"
+	"io/ioutil"
+	"path/filepath"
 	"strings"
 	"unicode"
 
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // matchFileTest reports whether the file with the given name in the given directory
@@ -31,7 +34,11 @@ import (
 // matchFileTest considers the name of the file and may use cfg.Build.OpenFile to
 // read some or all of the file's content.
 func matchFileTest(cfg *Config, dir, name string) (match bool, err error) {
-	match, _, _, err = matchFile(cfg, dir, name, false, false, nil)
+	file, err := filetypes.ParseFile(filepath.Join(dir, name), filetypes.Input)
+	if err != nil {
+		return false, nil
+	}
+	match, _, err = matchFile(cfg, file, false, false, nil)
 	return
 }
 
@@ -43,38 +50,49 @@ func matchFileTest(cfg *Config, dir, name string) (match bool, err error) {
 // considers text until the first non-comment.
 // If allTags is non-nil, matchFile records any encountered build tag
 // by setting allTags[tag] = true.
-func matchFile(cfg *Config, dir, name string, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, filename string, err errors.Error) {
-	if strings.HasPrefix(name, "_") {
+func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, err errors.Error) {
+	if fi := cfg.fileSystem.getOverlay(file.Filename); fi != nil {
+		if fi.file != nil {
+			file.Source = fi.file
+		} else {
+			file.Source = fi.contents
+		}
+	}
+
+	if file.Encoding != build.CUE {
 		return
 	}
+
+	if file.Filename == "-" {
+		b, err2 := ioutil.ReadAll(cfg.stdin())
+		if err2 != nil {
+			err = errors.Newf(token.NoPos, "read stdin: %v", err)
+			return
+		}
+		file.Source = b
+		data = b
+		match = true // don't check shouldBuild for stdin
+		return
+	}
+
+	name := filepath.Base(file.Filename)
 	if !cfg.filesMode && strings.HasPrefix(name, ".") {
 		return
 	}
 
-	ext := path.Ext(name)
-
-	switch ext {
-	case cueSuffix:
-		// tentatively okay - read to make sure
-	default:
-		// skip
+	if strings.HasPrefix(name, "_") {
 		return
 	}
 
-	filename = cfg.fileSystem.joinPath(dir, name)
-	f, err := cfg.fileSystem.openFile(filename)
+	f, err := cfg.fileSystem.openFile(file.Filename)
 	if err != nil {
 		return
 	}
 
-	if strings.HasSuffix(filename, cueSuffix) {
-		data, err = readImports(f, false, nil)
-	} else {
-		data, err = readComments(f)
-	}
+	data, err = readImports(f, false, nil)
 	f.Close()
 	if err != nil {
-		err = errors.Newf(token.NoPos, "read %s: %v", filename, err)
+		err = errors.Newf(token.NoPos, "read %s: %v", file.Filename, err)
 		return
 	}
 

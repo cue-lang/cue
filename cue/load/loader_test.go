@@ -154,7 +154,7 @@ imports:
 		cfg:  dirCfg,
 		args: args("example.org/test/hello:nonexist"),
 		want: `
-err:    build constraints exclude all CUE files in example.org/test/hello:nonexist (ignored: hello/test.cue, anon.cue, test.cue)
+err:    build constraints exclude all CUE files in example.org/test/hello:nonexist (ignored: anon.cue, test.cue, hello/test.cue)
 path:   example.org/test/hello:nonexist
 module: example.org/test
 root:   $CWD/testdata
@@ -183,7 +183,18 @@ root:   $CWD/testdata
 dir:    $CWD/testdata
 display:command-line-arguments
 files:
-	$CWD/testdata/anon.cue`,
+    $CWD/testdata/anon.cue`,
+	}, {
+		cfg:  dirCfg,
+		args: args("-"),
+		want: `
+path:   ""
+module: ""
+root:   $CWD/testdata
+dir:    $CWD/testdata
+display:command-line-arguments
+files:
+    -`,
 	}, {
 		// NOTE: dir should probably be set to $CWD/testdata, but either way.
 		cfg:  dirCfg,

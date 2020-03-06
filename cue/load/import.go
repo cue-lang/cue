@@ -238,32 +238,38 @@ func normPrefix(root, path string, isLocal bool) string {
 
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	p.Root = root
-	for i, path := range p.CUEFiles {
-		p.CUEFiles[i] = normPrefix(root, path, isLocal)
-		sortParentsFirst(p.CUEFiles)
-	}
-	for i, path := range p.TestCUEFiles {
-		p.TestCUEFiles[i] = normPrefix(root, path, isLocal)
-		sortParentsFirst(p.TestCUEFiles)
-	}
-	for i, path := range p.ToolCUEFiles {
-		p.ToolCUEFiles[i] = normPrefix(root, path, isLocal)
-		sortParentsFirst(p.ToolCUEFiles)
-	}
-	for i, path := range p.IgnoredCUEFiles {
+
+	normalizeFilenames(root, p.CUEFiles, isLocal)
+	normalizeFilenames(root, p.TestCUEFiles, isLocal)
+	normalizeFilenames(root, p.ToolCUEFiles, isLocal)
+	normalizeFilenames(root, p.IgnoredCUEFiles, isLocal)
+	normalizeFilenames(root, p.InvalidCUEFiles, isLocal)
+
+	normalizeFiles(p.BuildFiles)
+	normalizeFiles(p.IgnoredFiles)
+	normalizeFiles(p.OrphanedFiles)
+	normalizeFiles(p.InvalidFiles)
+	normalizeFiles(p.UnknownFiles)
+}
+
+func normalizeFilenames(root string, a []string, isLocal bool) {
+	for i, path := range a {
 		if strings.HasPrefix(path, root) {
-			p.IgnoredCUEFiles[i] = normPrefix(root, path, isLocal)
+			a[i] = normPrefix(root, path, isLocal)
 		}
 	}
-	for i, path := range p.InvalidCUEFiles {
-		p.InvalidCUEFiles[i] = normPrefix(root, path, isLocal)
-		sortParentsFirst(p.InvalidCUEFiles)
-	}
+	sortParentsFirst(a)
 }
 
 func sortParentsFirst(s []string) {
 	sort.Slice(s, func(i, j int) bool {
 		return len(filepath.Dir(s[i])) < len(filepath.Dir(s[j]))
+	})
+}
+
+func normalizeFiles(a []*build.File) {
+	sort.Slice(a, func(i, j int) bool {
+		return len(filepath.Dir(a[i].Filename)) < len(filepath.Dir(a[j].Filename))
 	})
 }
 
@@ -322,15 +328,15 @@ func (fp *fileProcessor) finalize() errors.Error {
 }
 
 func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode importMode) (added bool) {
-	path := file.Filename
-	fullPath := path
-	if !filepath.IsAbs(path) {
-		fullPath = filepath.Join(root, path)
+	fullPath := file.Filename
+	if fullPath != "-" {
+		if !filepath.IsAbs(fullPath) {
+			fullPath = filepath.Join(root, fullPath)
+		}
 	}
 	file.Filename = fullPath
 
-	name := filepath.Base(fullPath)
-	dir := filepath.Dir(fullPath)
+	base := filepath.Base(fullPath)
 
 	p := fp.pkg
 
@@ -341,7 +347,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return true
 	}
 
-	match, data, filename, err := matchFile(fp.c, dir, name, true, fp.allFiles, fp.allTags)
+	match, data, err := matchFile(fp.c, file, true, fp.allFiles, fp.allTags)
 	if err != nil {
 		return badFile(err)
 	}
@@ -356,7 +362,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return false // don't mark as added
 	}
 
-	pf, perr := parser.ParseFile(filename, data, parser.ImportsOnly, parser.ParseComments)
+	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly, parser.ParseComments)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
 		return true
@@ -371,7 +377,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 
 	if p.PkgName == "" {
 		p.PkgName = pkg
-		fp.firstFile = name
+		fp.firstFile = base
 	} else if pkg != p.PkgName {
 		if fp.ignoreOther {
 			p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
@@ -381,24 +387,24 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return badFile(&MultiplePackageError{
 			Dir:      p.Dir,
 			Packages: []string{p.PkgName, pkg},
-			Files:    []string{fp.firstFile, name},
+			Files:    []string{fp.firstFile, base},
 		})
 	}
 
-	isTest := strings.HasSuffix(name, "_test"+cueSuffix)
-	isTool := strings.HasSuffix(name, "_tool"+cueSuffix)
+	isTest := strings.HasSuffix(base, "_test"+cueSuffix)
+	isTool := strings.HasSuffix(base, "_tool"+cueSuffix)
 
 	if mode&importComment != 0 {
 		qcom, line := findimportComment(data)
 		if line != 0 {
 			com, err := strconv.Unquote(qcom)
 			if err != nil {
-				badFile(errors.Newf(pos, "%s:%d: cannot parse import comment", filename, line))
+				badFile(errors.Newf(pos, "%s:%d: cannot parse import comment", fullPath, line))
 			} else if p.ImportComment == "" {
 				p.ImportComment = com
-				fp.firstCommentFile = name
+				fp.firstCommentFile = base
 			} else if p.ImportComment != com {
-				badFile(errors.Newf(pos, "found import comments %q (%s) and %q (%s) in %s", p.ImportComment, fp.firstCommentFile, com, name, p.Dir))
+				badFile(errors.Newf(pos, "found import comments %q (%s) and %q (%s) in %s", p.ImportComment, fp.firstCommentFile, com, base, p.Dir))
 			}
 		}
 	}
@@ -414,7 +420,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 			if err != nil {
 				badFile(errors.Newf(
 					spec.Path.Pos(),
-					"%s: parser returned invalid quoted string: <%s>", filename, quoted,
+					"%s: parser returned invalid quoted string: <%s>", fullPath, quoted,
 				))
 			}
 			if !isTest || fp.c.Tests {

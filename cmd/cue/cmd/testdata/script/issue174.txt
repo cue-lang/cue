@@ -1,0 +1,8 @@
+! cue export ./issue174
+cmp stderr expect-stderr
+-- expect-stderr --
+build constraints exclude all CUE files in ./issue174 (ignored: issue174/issue174.cue)
+-- issue174/issue174.cue --
+import 'foo'
+
+a: 1

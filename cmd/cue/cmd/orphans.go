@@ -96,10 +96,10 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 			}
 			continue
 		}
-		if len(objs) > 1 && len(path) == 0 && useList {
+		if len(objs) > 1 && len(path) == 0 && !useList {
 			return false, fmt.Errorf(
 				"%s, %s, or %s flag needed to handle multiple objects in file %s",
-				flagPath, flagList, flagFiles, f.Filename)
+				flagPath, flagList, flagFiles, shortFile(i.Root, f))
 		}
 
 		f, err := placeOrphans(b.cmd, d.Filename(), pkg, objs...)

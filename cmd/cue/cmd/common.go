@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"io"
 	"os"
+	"path/filepath"
 	"strings"
 	"testing"
 
@@ -310,4 +311,15 @@ func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 
 	inst := cue.Merge(insts...).Build(ti)
 	return inst, inst.Err
+}
+
+func shortFile(root string, f *build.File) string {
+	dir, _ := filepath.Rel(root, f.Filename)
+	if dir == "" {
+		return f.Filename
+	}
+	if !filepath.IsAbs(dir) {
+		dir = "." + string(filepath.Separator) + dir
+	}
+	return dir
 }

@@ -413,7 +413,7 @@ In doing so it removed over 500 lines of configuration, or over 30%!
 The following is proof that nothing changed semantically:
 
 ```
-$ cue eval ./... > snapshot2
+$ cue eval -c ./... > snapshot2
 $ diff snapshot snapshot2 | wc
        0       0       0
 ```
@@ -640,7 +640,7 @@ EOF
 $ cue fmt ./frontend
 
 # check differences
-$ cue eval ./... > snapshot2
+$ cue eval -c ./... > snapshot2
 $ diff snapshot snapshot2
 368a369
 >                             prometheus.io.port:   "7080"

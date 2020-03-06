@@ -1,0 +1,9 @@
+stdin feed
+cue fmt -
+cmp stdout expect-stdout
+
+-- feed --
+foo : 2
+-- expect-stdout --
+foo: 2
+-- fmt/cue.mod --

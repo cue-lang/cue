@@ -15,14 +15,13 @@
 package cmd
 
 import (
-	"io/ioutil"
-	"os"
-
 	"github.com/spf13/cobra"
 
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/encoding"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {
@@ -32,51 +31,56 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			for _, inst := range load.Instances(args, &load.Config{
+			plan, err := parseArgs(cmd, args, &load.Config{
 				Tests: true,
 				Tools: true,
-			}) {
+			})
+			exitOnErr(cmd, err, false)
+
+			opts := []format.Option{}
+			if flagSimplify.Bool(cmd) {
+				opts = append(opts, format.Simplify())
+			}
+
+			cfg := *plan.encConfig
+			cfg.Format = opts
+			cfg.Force = true
+
+			for _, inst := range plan.insts {
 				if inst.Err != nil {
 					exitOnErr(cmd, inst.Err, false)
 					continue
 				}
-				all := []string{}
-				all = append(all, inst.CUEFiles...)
-				all = append(all, inst.ToolCUEFiles...)
-				all = append(all, inst.TestCUEFiles...)
-				for _, path := range all {
-					fullpath := inst.Abs(path)
+				all := []*build.File{}
+				all = append(all, inst.BuildFiles...)
+				for _, name := range append(inst.ToolCUEFiles, inst.TestCUEFiles...) {
+					all = append(all, &build.File{
+						Filename: name,
+						Encoding: build.CUE,
+					})
+				}
+				for _, file := range all {
+					files := []*ast.File{}
+					d := encoding.NewDecoder(file, &cfg)
+					defer d.Close()
+					for ; !d.Done(); d.Next() {
+						f := d.File()
 
-					stat, err := os.Stat(fullpath)
-					if err != nil {
-						return err
+						if file.Encoding == build.CUE {
+							f = fix(f)
+						}
+
+						files = append(files, f)
 					}
 
-					b, err := ioutil.ReadFile(fullpath)
-					if err != nil {
-						return err
-					}
+					e, err := encoding.NewEncoder(file, &cfg)
+					exitOnErr(cmd, err, true)
 
-					opts := []format.Option{}
-					if flagSimplify.Bool(cmd) {
-						opts = append(opts, format.Simplify())
+					for _, f := range files {
+						err := e.EncodeFile(f)
+						exitOnErr(cmd, err, false)
 					}
-
-					f, err := parser.ParseFile(fullpath, b, parser.ParseComments)
-					if err != nil {
-						return err
-					}
-					n := fix(f)
-
-					b, err = format.Node(n, opts...)
-					if err != nil {
-						return err
-					}
-
-					err = ioutil.WriteFile(fullpath, b, stat.Mode())
-					if err != nil {
-						return err
-					}
+					e.Close()
 				}
 			}
 			return nil

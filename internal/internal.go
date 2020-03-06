@@ -21,6 +21,8 @@ package internal // import "cuelang.org/go/internal"
 
 import (
 	"bufio"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
@@ -160,4 +162,14 @@ func IsEllipsis(x ast.Decl) bool {
 		return false
 	}
 	return i.Name == "string" || i.Name == "_"
+}
+
+// GenPath reports the directory in which to store generated files.
+func GenPath(root string) string {
+	info, err := os.Stat(filepath.Join(root, "cue.mod"))
+	if err == nil && info.IsDir() {
+		// TODO(legacy): support legacy cue.mod file.
+		return filepath.Join(root, "cue.mod", "gen")
+	}
+	return filepath.Join(root, "pkg")
 }

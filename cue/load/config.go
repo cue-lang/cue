@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 const (
@@ -113,12 +114,7 @@ const FromArgsUsage = `
 // GenPath reports the directory in which to store generated
 // files.
 func GenPath(root string) string {
-	info, err := os.Stat(filepath.Join(root, modDir))
-	if err == nil && info.IsDir() {
-		// TODO(legacy): support legacy cue.mod file.
-		return filepath.Join(root, modDir, "gen")
-	}
-	return filepath.Join(root, "pkg")
+	return internal.GenPath(root)
 }
 
 // A Config configures load behavior.

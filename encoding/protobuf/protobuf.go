@@ -97,9 +97,9 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // Config specifies the environment into which to parse a proto definition file.
@@ -323,7 +323,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	dir := b.root
 	path := importPath
 	if !strings.HasPrefix(path, b.module) {
-		dir = filepath.Join(load.GenPath(dir), path)
+		dir = filepath.Join(internal.GenPath(dir), path)
 	} else {
 		dir = filepath.Join(dir, path[len(b.module)+1:])
 		want := filepath.Dir(p.file.Filename)

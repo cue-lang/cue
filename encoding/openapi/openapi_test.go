@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package openapi
+package openapi_test
 
 import (
 	"bytes"
@@ -29,21 +29,22 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/encoding/openapi"
 )
 
 var update *bool = flag.Bool("update", false, "update the test output")
 
 func TestParseDefinitions(t *testing.T) {
-	info := *(*OrderedMap)(ast.NewStruct(
+	info := *(*openapi.OrderedMap)(ast.NewStruct(
 		"title", ast.NewString("test"),
 		"version", ast.NewString("v1"),
 	))
-	defaultConfig := &Config{}
-	resolveRefs := &Config{Info: info, ExpandReferences: true}
+	defaultConfig := &openapi.Config{}
+	resolveRefs := &openapi.Config{Info: info, ExpandReferences: true}
 
 	testCases := []struct {
 		in, out string
-		config  *Config
+		config  *openapi.Config
 	}{{
 		"structural.cue",
 		"structural.json",
@@ -55,7 +56,7 @@ func TestParseDefinitions(t *testing.T) {
 	}, {
 		"simple.cue",
 		"simple-filter.json",
-		&Config{Info: info, FieldFilter: "min.*|max.*"},
+		&openapi.Config{Info: info, FieldFilter: "min.*|max.*"},
 	}, {
 		"array.cue",
 		"array.json",
@@ -95,7 +96,7 @@ func TestParseDefinitions(t *testing.T) {
 	}, {
 		"oneof.cue",
 		"oneof-funcs.json",
-		&Generator{
+		&openapi.Config{
 			Info: info,
 			ReferenceFunc: func(inst *cue.Instance, path []string) string {
 				return strings.ToUpper(strings.Join(path, "_"))
@@ -107,7 +108,7 @@ func TestParseDefinitions(t *testing.T) {
 	}, {
 		"refs.cue",
 		"refs.json",
-		&Generator{
+		&openapi.Config{
 			Info: info,
 			ReferenceFunc: func(inst *cue.Instance, path []string) string {
 				switch {
@@ -120,7 +121,7 @@ func TestParseDefinitions(t *testing.T) {
 	}, {
 		"issue131.cue",
 		"issue131.json",
-		&Generator{Info: info, SelfContained: true},
+		&openapi.Config{Info: info, SelfContained: true},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {
@@ -133,7 +134,7 @@ func TestParseDefinitions(t *testing.T) {
 				t.Fatal(errors.Details(inst.Err, nil))
 			}
 
-			b, err := Gen(inst, tc.config)
+			b, err := openapi.Gen(inst, tc.config)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -170,7 +171,7 @@ func TestX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	b, err := Gen(inst, &Config{
+	b, err := openapi.Gen(inst, &openapi.Config{
 		ExpandReferences: true,
 	})
 	if err != nil {

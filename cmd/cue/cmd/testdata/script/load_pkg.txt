@@ -1,0 +1,45 @@
+# mixing two anonymous packages
+cue eval t.cue data.cue
+cmp stdout stdout-t
+
+# allow mixing named with anonymous package in files mode
+cue eval kube.cue data.cue
+cmp stdout stdout-files
+
+# allow mixing named with anonymous package in files mode
+cue eval kube.cue data.cue t.cue
+cmp stdout stdout-files
+
+# don't pick up the unnamed package in directory mode
+cue eval .
+cmp stdout stdout-pkg
+
+# don't allow mixing two differently named packages
+! cue eval kube.cue foo/kube2.cue
+
+-- data.cue --
+foo:3
+-- t.cue --
+package _
+
+foo: int
+bar: 3
+-- kube.cue --
+package kube
+
+foo: int
+bar: 3
+-- foo/kube2.cue --
+package kube2
+
+foo: int
+bar: 3
+-- stdout-t --
+foo: 3
+bar: 3
+-- stdout-files --
+foo: 3
+bar: 3
+-- stdout-pkg --
+foo: int
+bar: 3

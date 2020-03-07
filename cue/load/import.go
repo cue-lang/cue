@@ -375,20 +375,22 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return false // don't mark as added
 	}
 
-	if p.PkgName == "" {
-		p.PkgName = pkg
-		fp.firstFile = base
-	} else if pkg != p.PkgName {
-		if fp.ignoreOther {
-			p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
-			p.IgnoredFiles = append(p.IgnoredFiles, file)
-			return false
+	if pkg != "" && pkg != "_" {
+		if p.PkgName == "" {
+			p.PkgName = pkg
+			fp.firstFile = base
+		} else if pkg != p.PkgName {
+			if fp.ignoreOther {
+				p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
+				p.IgnoredFiles = append(p.IgnoredFiles, file)
+				return false
+			}
+			return badFile(&MultiplePackageError{
+				Dir:      p.Dir,
+				Packages: []string{p.PkgName, pkg},
+				Files:    []string{fp.firstFile, base},
+			})
 		}
-		return badFile(&MultiplePackageError{
-			Dir:      p.Dir,
-			Packages: []string{p.PkgName, pkg},
-			Files:    []string{fp.firstFile, base},
-		})
 	}
 
 	isTest := strings.HasSuffix(base, "_test"+cueSuffix)

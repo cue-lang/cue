@@ -35,8 +35,7 @@ The --expression flag is used to only print parts of a configuration.
 		RunE: mkRunE(c, runDef),
 	}
 
-	flagOut.Add(cmd)
-
+	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
@@ -57,11 +56,7 @@ func runDef(cmd *Command, args []string) error {
 
 	b.encConfig.Mode = filetypes.Def
 
-	out := flagOut.String(cmd)
-	if out == "" {
-		out = "-"
-	}
-	f, err := filetypes.ParseFile(out, filetypes.Def)
+	f, err := b.out("-", filetypes.Def)
 	exitOnErr(cmd, err, true)
 
 	e, err := encoding.NewEncoder(f, b.encConfig)

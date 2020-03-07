@@ -90,9 +90,9 @@ yaml    output as YAML
 		RunE: mkRunE(c, runExport),
 	}
 
+	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
 
-	flagMedia.Add(cmd)
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")
@@ -107,8 +107,7 @@ func runExport(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, nil)
 	exitOnErr(cmd, err, true)
 
-	format := flagMedia.String(cmd) + ":-"
-	f, err := filetypes.ParseFile(format, filetypes.Export)
+	f, err := b.out("-", filetypes.Export)
 	exitOnErr(cmd, err, true)
 
 	enc, err := encoding.NewEncoder(f, b.encConfig)

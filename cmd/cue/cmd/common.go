@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // Disallow
@@ -410,6 +411,23 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err
 		p.encConfig.Stream = true
 	}
 	return p, nil
+}
+
+func (b *buildPlan) out(def string, mode filetypes.Mode) (*build.File, error) {
+	out := flagOut.String(b.cmd)
+	outFile := flagOutFile.String(b.cmd)
+
+	if strings.Contains(out, ":") && strings.Contains(outFile, ":") {
+		return nil, errors.Newf(token.NoPos,
+			"cannot specify qualifier in both --out and --outfile")
+	}
+	if outFile == "" {
+		outFile = def
+	}
+	if out != "" {
+		outFile = out + ":" + outFile
+	}
+	return filetypes.ParseFile(outFile, mode)
 }
 
 func (b *buildPlan) parseFlags() (err error) {

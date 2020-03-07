@@ -213,7 +213,7 @@ Example:
 		RunE: mkRunE(c, runImport),
 	}
 
-	flagOut.Add(cmd)
+	addOutFlags(cmd.Flags(), false)
 
 	addOrphanFlags(cmd.Flags())
 
@@ -266,7 +266,7 @@ func runImport(cmd *Command, args []string) (err error) {
 
 func handleFile(b *buildPlan, f *ast.File) (err error) {
 	cueFile := f.Filename
-	if out := flagOut.String(b.cmd); out != "" {
+	if out := flagOutFile.String(b.cmd); out != "" {
 		cueFile = out
 	}
 	if cueFile != "-" {

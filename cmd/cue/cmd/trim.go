@@ -88,7 +88,8 @@ removal.
 		RunE: mkRunE(c, runTrim),
 	}
 
-	flagOut.Add(cmd)
+	addOutFlags(cmd.Flags(), false)
+
 	return cmd
 }
 
@@ -109,8 +110,7 @@ func runTrim(cmd *Command, args []string) error {
 	}
 	instances := buildInstances(cmd, binst)
 
-	// dst := flagName("o").String(cmd)
-	dst := flagOut.String(cmd)
+	dst := flagOutFile.String(cmd)
 	if dst != "" && dst != "-" {
 		switch _, err := os.Stat(dst); {
 		case os.IsNotExist(err):

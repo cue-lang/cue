@@ -39,18 +39,17 @@ const (
 	flagType       flagName = "type"
 	flagList       flagName = "list"
 	flagPath       flagName = "path"
+	flagOut        flagName = "out"
+	flagOutFile    flagName = "outfile"
 )
 
-var flagMedia = stringFlag{
-	name: "out",
-	text: "output format (json, yaml or text)",
-	def:  "json",
-}
-
-var flagOut = stringFlag{
-	name:  "out",
-	short: "o",
-	text:  "alternative output or - for stdout",
+func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
+	if allowNonCUE {
+		f.String(string(flagOut), "",
+			`output format (run 'cue filetype' for more info)`)
+	}
+	f.StringP(string(flagOutFile), "o", "",
+		`filename or - for stdout with optional file prefix (run 'cue filetype' for more info)`)
 }
 
 func addGlobalFlags(f *pflag.FlagSet) {

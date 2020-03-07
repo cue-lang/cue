@@ -50,6 +50,7 @@ Examples:
 		RunE: mkRunE(c, runEval),
 	}
 
+	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")

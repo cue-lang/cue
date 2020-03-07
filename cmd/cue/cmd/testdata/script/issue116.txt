@@ -1,0 +1,24 @@
+stdin in
+cue import yaml: -
+cmp stdout stdout-cue
+
+stdin in
+cue export yaml: -
+cmp stdout stdout-json
+
+stdin in
+cue eval yaml: -
+cmp stdout stdout-cue
+
+stdin in
+cue def yaml: -
+cmp stdout stdout-cue
+
+-- in --
+foo: bar
+-- stdout-cue --
+foo: "bar"
+-- stdout-json --
+{
+    "foo": "bar"
+}

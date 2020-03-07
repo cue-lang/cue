@@ -311,6 +311,9 @@ func (x *listIndex) label(label ast.Label) *listIndex {
 }
 
 func newName(filename string, i int) string {
+	if filename == "-" {
+		return filename
+	}
 	ext := filepath.Ext(filename)
 	filename = filename[:len(filename)-len(ext)]
 	if i > 0 {

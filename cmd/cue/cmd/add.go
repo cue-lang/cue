@@ -59,12 +59,10 @@ func newAddCmd(c *Command) *cobra.Command {
 }
 
 func runAdd(cmd *Command, args []string) (err error) {
-	return doAdd(cmd, stdin, args)
+	return doAdd(cmd, args)
 }
 
-var stdin io.Reader = os.Stdin
-
-func doAdd(cmd *Command, stdin io.Reader, args []string) (err error) {
+func doAdd(cmd *Command, args []string) (err error) {
 	// Offsets at which to restore original files, if any, if any of the
 	// appends fail.
 	// Ideally this is placed below where it is used, but we want to make
@@ -128,7 +126,7 @@ func doAdd(cmd *Command, stdin io.Reader, args []string) (err error) {
 	}
 
 	// Read text to be appended.
-	text, err := ioutil.ReadAll(stdin)
+	text, err := ioutil.ReadAll(cmd.InOrStdin())
 	if err != nil {
 		return err
 	}

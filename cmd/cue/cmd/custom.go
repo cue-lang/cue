@@ -19,11 +19,9 @@ package cmd
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"io/ioutil"
 	"net/http"
 	"net/http/httptest"
-	"os"
 	"strings"
 	"sync"
 
@@ -62,12 +60,6 @@ func splitLine(s string) (line, tail string) {
 	}
 	return
 }
-
-// Variables used for testing.
-var (
-	stdout io.Writer = os.Stdout
-	stderr io.Writer = os.Stderr
-)
 
 func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.Instance) (*cobra.Command, error) {
 	if tools == nil {
@@ -344,7 +336,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 			// NOTE: ignore the linter warning for the following line:
 			// itask.Context is an internal type and we want to break if any
 			// fields are added.
-			c := &itask.Context{ctx, stdin, stdout, stderr, obj, nil}
+			c := &itask.Context{ctx, cmd.InOrStdin(), cmd.OutOrStdout(), cmd.OutOrStderr(), obj, nil}
 			update, err := t.Run(c)
 			if c.Err != nil {
 				err = c.Err

@@ -137,10 +137,7 @@ func mainErr(ctx context.Context, args []string) error {
 	if err != nil {
 		return err
 	}
-	err = cmd.Run(ctx)
-	// TODO: remove this ugly hack. Either fix Cobra or use something else.
-	stdin = nil
-	return err
+	return cmd.Run(ctx)
 }
 
 type Command struct {
@@ -183,12 +180,11 @@ func (c *Command) Stderr() io.Writer {
 // PrintErr(args ...interface{})
 
 func (c *Command) SetOutput(w io.Writer) {
-	c.root.SetOutput(w)
+	c.root.SetOut(w)
 }
 
 func (c *Command) SetInput(r io.Reader) {
-	// TODO: ugly hack. Cobra does not have a way to pass the stdin.
-	stdin = r
+	c.root.SetIn(r)
 }
 
 // ErrPrintedError indicates error messages have been printed to stderr.

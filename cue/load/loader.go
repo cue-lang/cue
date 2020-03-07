@@ -71,7 +71,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	if args = args[i:]; len(args) > 0 {
-		files, err := filetypes.ParseArgs(args[i:])
+		files, err := filetypes.ParseArgs(args)
 		if err != nil {
 			return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
 		}

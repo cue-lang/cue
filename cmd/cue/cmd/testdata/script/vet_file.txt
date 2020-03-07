@@ -1,13 +1,17 @@
 ! cue vet ./vet.cue ./data.yaml
 cmp stderr expect-stderr
 
+! cue vet . ./data.yaml
+cmp stderr expect-stderr
+
 -- expect-stderr --
 translations.hello.lang: incomplete value (string):
-    ./vet.cue:2:31
+    ./vet.cue:3:31
 translations.hello.lang: conflicting values false and string (mismatched types bool and string):
     ./data.yaml:13:11
-    ./vet.cue:2:31
+    ./vet.cue:3:31
 -- vet.cue --
+package foo
 
 translations: [string]: lang: string
 

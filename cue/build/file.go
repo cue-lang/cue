@@ -23,7 +23,7 @@ type File struct {
 	Form           Form              `json:"form,omitempty"`
 	Tags           map[string]string `json:"tags,omitempty"` // code=go
 
-	Source interface{} // TODO: swap out with concrete type.
+	Source interface{} `json:"-"` // TODO: swap out with concrete type.
 }
 
 // A Encoding indicates a file format for representing a program.

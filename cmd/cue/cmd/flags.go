@@ -21,15 +21,16 @@ import (
 
 // Common flags
 const (
-	flagAll      flagName = "all"
-	flagDryrun   flagName = "dryrun"
-	flagVerbose  flagName = "verbose"
-	flagTrace    flagName = "trace"
-	flagForce    flagName = "force"
-	flagIgnore   flagName = "ignore"
-	flagSimplify flagName = "simplify"
-	flagPackage  flagName = "package"
-	flagTags     flagName = "tags"
+	flagAll       flagName = "all"
+	flagDryrun    flagName = "dryrun"
+	flagVerbose   flagName = "verbose"
+	flagAllErrors flagName = "all-errors"
+	flagTrace     flagName = "trace"
+	flagForce     flagName = "force"
+	flagIgnore    flagName = "ignore"
+	flagSimplify  flagName = "simplify"
+	flagPackage   flagName = "package"
+	flagTags      flagName = "tags"
 
 	flagExpression flagName = "expression"
 	flagSchema     flagName = "schema"
@@ -61,6 +62,7 @@ func addGlobalFlags(f *pflag.FlagSet) {
 		"proceed in the presence of errors")
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
+	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")
 }
 
 func addOrphanFlags(f *pflag.FlagSet) {

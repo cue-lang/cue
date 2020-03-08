@@ -25,8 +25,10 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal/filetypes"
@@ -34,6 +36,7 @@ import (
 )
 
 type Decoder struct {
+	cfg      *Config
 	closer   io.Closer
 	next     func() (ast.Expr, error)
 	expr     ast.Expr
@@ -103,8 +106,9 @@ type Config struct {
 	Stdin  io.Reader
 	Stdout io.Writer
 
-	Force  bool // overwrite existing files.
-	Stream bool // will potentially write more than one document per file
+	Force     bool // overwrite existing files.
+	Stream    bool // will potentially write more than one document per file
+	AllErrors bool
 
 	EscapeHTML bool
 	ProtoPath  []string
@@ -115,7 +119,10 @@ type Config struct {
 // type of f must be a data type, but does not have to be an encoding that
 // can stream. stdin is used in case the file is "-".
 func NewDecoder(f *build.File, cfg *Config) *Decoder {
-	i := &Decoder{filename: f.Filename}
+	if cfg == nil {
+		cfg = &Config{}
+	}
+	i := &Decoder{filename: f.Filename, cfg: cfg}
 	i.next = func() (ast.Expr, error) {
 		if i.err != nil {
 			return nil, i.err
@@ -123,10 +130,10 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		return nil, io.EOF
 	}
 
-	if f, ok := f.Source.(*ast.File); ok {
-		i.file = f
+	if file, ok := f.Source.(*ast.File); ok {
+		i.file = file
 		i.closer = ioutil.NopCloser(strings.NewReader(""))
-		// TODO: verify input format for CUE.
+		i.validate(file, f)
 		return i
 	}
 
@@ -141,7 +148,7 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	switch f.Encoding {
 	case build.CUE:
 		i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
-		// TODO: verify input format
+		i.validate(i.file, f)
 	case build.JSON, build.JSONL:
 		i.next = json.NewDecoder(nil, path, r).Extract
 		i.Next()
@@ -185,4 +192,122 @@ func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
 		return ioutil.NopCloser(stdin), nil
 	}
 	return os.Open(f.Filename)
+}
+
+func shouldValidate(i *filetypes.FileInfo) bool {
+	// TODO: We ignore attributes for now. They should be enabled by default.
+	return false ||
+		!i.Definitions ||
+		!i.Data ||
+		!i.Optional ||
+		!i.Constraints ||
+		!i.References ||
+		!i.Cycles ||
+		!i.KeepDefaults ||
+		!i.Incomplete ||
+		!i.Imports ||
+		!i.Docs
+}
+
+type validator struct {
+	allErrors bool
+	count     int
+	errs      errors.Error
+	fileinfo  *filetypes.FileInfo
+}
+
+func (d *Decoder) validate(f *ast.File, b *build.File) {
+	if d.err != nil {
+		return
+	}
+	fi, err := filetypes.FromFile(b, filetypes.Input)
+	if err != nil {
+		d.err = err
+		return
+	}
+	if !shouldValidate(fi) {
+		return
+	}
+
+	v := validator{fileinfo: fi, allErrors: d.cfg.AllErrors}
+	ast.Walk(f, v.validate, nil)
+	d.err = v.errs
+}
+
+func (v *validator) validate(n ast.Node) bool {
+	if v.count > 10 {
+		return false
+	}
+
+	i := v.fileinfo
+
+	// TODO: Cycles
+
+	ok := true
+	check := func(n ast.Node, option bool, s string, cond bool) {
+		if !option && cond {
+			v.errs = errors.Append(v.errs, errors.Newf(n.Pos(),
+				"%s not allowed in %s mode", s, v.fileinfo.Form))
+			v.count++
+			ok = false
+		}
+	}
+
+	// For now we don't make any distinction between these modes.
+
+	constraints := i.Constraints && i.Incomplete && i.Optional && i.References
+
+	check(n, i.Docs, "comments", len(ast.Comments(n)) > 0)
+
+	switch x := n.(type) {
+	case *ast.CommentGroup:
+		check(n, i.Docs, "comments", len(ast.Comments(n)) > 0)
+		return false
+
+	case *ast.ImportDecl, *ast.ImportSpec:
+		check(n, i.Imports, "imports", true)
+
+	case *ast.Field:
+		check(n, i.Definitions, "definitions", x.Token == token.ISA)
+		check(n, i.Data, "regular fields", x.Token != token.ISA)
+		check(n, constraints, "optional fields", x.Optional != token.NoPos)
+
+		_, _, err := ast.LabelName(x.Label)
+		check(n, constraints, "optional fields", err != nil)
+
+		check(n, i.Attributes, "attributes", len(x.Attrs) > 0)
+		ast.Walk(x.Value, v.validate, nil)
+		return false
+
+	case *ast.UnaryExpr:
+		switch x.Op {
+		case token.MUL:
+			check(n, i.KeepDefaults, "default values", true)
+		case token.SUB, token.ADD:
+			// The parser represents negative numbers as an unary expression.
+			// Allow one `-` or `+`.
+			_, ok := x.X.(*ast.BasicLit)
+			check(n, constraints, "expressions", !ok)
+		case token.LSS, token.LEQ, token.EQL, token.GEQ, token.GTR,
+			token.NEQ, token.NMAT, token.MAT:
+			check(n, constraints, "constraints", true)
+		default:
+			check(n, constraints, "expressions", true)
+		}
+
+	case *ast.BinaryExpr, *ast.ParenExpr, *ast.IndexExpr, *ast.SliceExpr,
+		*ast.CallExpr, *ast.Comprehension, *ast.ListComprehension,
+		*ast.Interpolation:
+		check(n, constraints, "expressions", true)
+
+	case *ast.Ellipsis:
+		check(n, constraints, "ellipsis", true)
+
+	case *ast.Ident, *ast.SelectorExpr, *ast.Alias:
+		check(n, i.References, "references", true)
+
+	default:
+		// Other types are either always okay or handled elsewhere.
+	}
+	return ok
 }

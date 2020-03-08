@@ -362,6 +362,9 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 				if !nilIsTop && isNil(val) {
 					continue
 				}
+				if tag, _ := t.Tag.Lookup("json"); tag == "-" {
+					continue
+				}
 				if isOmitEmpty(&t) && isZero(val) {
 					continue
 				}

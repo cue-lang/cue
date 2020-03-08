@@ -116,6 +116,13 @@ func TestConvert(t *testing.T) {
 	}, {
 		struct {
 			A int
+			B int `json:"-"`
+			C int `json:",omitempty"`
+		}{3, 4, 0},
+		"<0>{A: 3}",
+	}, {
+		struct {
+			A int
 			B int
 		}{3, 4},
 		"<0>{A: 3, B: 4}",

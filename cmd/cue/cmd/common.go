@@ -448,6 +448,7 @@ func (b *buildPlan) parseFlags() (err error) {
 		Stdin:     stdin,
 		Stdout:    b.cmd.OutOrStdout(),
 		ProtoPath: flagProtoPath.StringArray(b.cmd),
+		AllErrors: flagAllErrors.Bool(b.cmd),
 	}
 	return nil
 }

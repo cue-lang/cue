@@ -1,0 +1,39 @@
+cue eval data: foo.cue
+cmp stdout expect-data-foo
+
+! cue eval data: bar.cue
+cmp stderr expect-data-bar
+
+cue eval graph: bar.cue
+cmp stdout expect-graph-bar
+
+-- foo.cue --
+a: 4
+b: {
+    c: 1
+}
+// Duplicates are still allowed.
+b: {
+    d: 2
+}
+
+-- bar.cue --
+a: 4
+b: {
+    c: a
+}
+
+-- expect-data-foo --
+a: 4
+b: {
+    c: 1
+    d: 2
+}
+-- expect-data-bar --
+references not allowed in data mode:
+    ./bar.cue:3:8
+-- expect-graph-bar --
+a: 4
+b: {
+    c: 4
+}

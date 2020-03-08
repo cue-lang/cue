@@ -178,9 +178,10 @@ these rules.
 
 Identifiers name entities such as fields and aliases.
 An identifier is a sequence of one or more letters (which includes `_` and `$`)
-and digits.
-It may not be `_` or `$`.
-The first character in an identifier must be a letter.
+and digits, optionally preceded by a `#`.
+It may not be `_`, `$`, or `#`.
+The first character in an identifier must be a letter or `#`.
+Identifiers starting with a `#` or `_` are reserved for definitions.
 
 <!--
 TODO: allow identifiers as defined in Unicode UAX #31
@@ -190,7 +191,7 @@ Identifiers are normalized using the NFC normal form.
 -->
 
 ```
-identifier  = letter { letter | unicode_digit } .
+identifier  = [ "#" ] letter { letter | unicode_digit } .
 ```
 
 ```
@@ -273,14 +274,12 @@ The following character sequences represent operators and punctuation:
 
 ```
 +     div   &&    ==    <     =     (     )
--     mod   ||    !=    >     ::    {     }
-*     quo   &     =~    <=    :     [     ]
-/     rem   |     !~    >=    .     ...   ,
-            _|_   !
+-     mod   ||    !=    >     :     {     }
+*     quo   &     =~    <=    ?     [     ]     ,
+/     rem   |     !~    >=    !     _|_   ...   .
 ```
 <!--
-Free tokens: # ; ~ $ ^
-
+Free tokens:  ; ~ ^
 // To be used:
   @   at: associative lists.
 
@@ -1123,9 +1122,8 @@ future extensions and relaxations:
 ```
 StructLit       = "{" { Declaration "," } [ "..." ] "}" .
 Declaration     = Field | Comprehension | AliasExpr | attribute .
-Field           = LabelSpec { LabelSpec } Expression { attribute } .
-LabelSpec       = Label ( ":" | "::" ) .
-Label           = LabelName [ "?" ] | "[" AliasExpr "]".
+Field           = Label ":" { Label ":" } Expression { attribute } .
+Label           = LabelName [ "?" ] | "[" AliasExpr "]" .
 LabelName       = identifier | simple_string_lit  .
 
 attribute       = "@" identifier "(" attr_tokens ")" .
@@ -1303,13 +1301,11 @@ S3: {
 
 #### Definitions
 
-A field of a struct may be declared as a regular field (using `:`)
-or as a _definition_ (using `::`).
+A field is a _definition_ if its identifier starts with `#` or `_`.
 Definitions are not emitted as part of the model and are never required
 to be concrete when emitting data.
-It is illegal to have a regular field and a definition with the same name
-within the same struct.
-Literal structs that are part of a definition's value are implicitly closed,
+For definitions with identifiers starting with `#`,
+literal structs that are part of a definition's value are implicitly closed,
 but may unify unrestricted with other structs within the field's declaration.
 This excludes literals structs in embeddings and aliases.
 
@@ -1337,7 +1333,7 @@ opened when included in a closed struct.
 Finally, excluding embeddings from recursive closing allows for
 a mechanism to not recursively close, without needing an additional language
 construct, such as a triple colon or something else:
-foo :: {
+#foo: {
     {
         // not recursively closed
     }
@@ -1350,30 +1346,30 @@ closing, aside from embedding.
 -->
 
 ```
-MyStruct :: {
-    sub field:    string
+#MyStruct: {
+    sub: field:    string
 }
 
-MyStruct :: {
-    sub enabled?: bool
+#MyStruct: {
+    sub: enabled?: bool
 }
 
-myValue: MyStruct & {
-    sub feild:   2     // error, feild not defined in MyStruct
-    sub enabled: true  // okay
+myValue: #MyStruct & {
+    sub: feild:   2     // error, feild not defined in #MyStruct
+    sub: enabled: true  // okay
 }
 
-D :: {
-    OneOf
+#D: {
+    #OneOf
 
     c: int // adds this field.
 }
 
-OneOf :: { a: int } | { b: int }
+#OneOf: { a: int } | { b: int }
 
 
-D1: D & { a: 12, c: 22 }  // { a: 12, c: 22 }
-D2: D & { a: 12, b: 33 }  // _|_ // cannot define both `a` and `b`
+D1: #D & { a: 12, c: 22 }  // { a: 12, c: 22 }
+D2: #D & { a: 12, b: 33 }  // _|_ // cannot define both `a` and `b`
 ```
 
 
@@ -1683,35 +1679,30 @@ float64   >=-1.797693134862315708145274237317043567981e+308 &
 
 ### Exported identifiers
 
+<!-- move to a more logical spot -->
+
 An identifier of a package may be exported to permit access to it
 from another package.
-An identifier is exported if
-the first character of the identifier's name is a Unicode upper case letter
-(Unicode class "Lu"); and
-the identifier is declared in the file block.
-All other top-level identifiers used for fields not exported.
-
-In addition, any definition declared anywhere within a package of which
-the first character of the identifier's name is a Unicode upper case letter
-(Unicode class "Lu") is visible outside this package.
+All identifiers of regular fields (those not starting with a `#` or `_`)
+are exported.
+A definition identifier is exported if it does not start with `_` or `#_`.
 Any other defintion is not visible outside the package and resides
 in a separate namespace than namesake identifiers of other packages.
-This is in contrast to ordinary field declarations that do not begin with
-an upper-case letter, which are visible outside the package.
 
 ```
 package mypackage
 
-foo: string  // not visible outside mypackage
+foo:   string  // visible outside mypackage
+"bar": string  // visible outside mypackage
 
-Foo :: {     // visible outside mypackage
-    a: 1     // visible outside mypackage
-    B: 2     // visible outside mypackage
+#Foo: {      // visible outside mypackage
+    a:  1    // visible outside mypackage
+    _b: 2    // not visible outside mypackage
 
-    C :: {   // visible outside mypackage
+    #C: {    // visible outside mypackage
         d: 4 // visible outside mypackage
     }
-    e :: foo // not visible outside mypackage
+    #_E: foo // not visible outside mypackage
 }
 ```
 
@@ -2873,7 +2864,7 @@ PackageClause  = "package" PackageName .
 PackageName    = identifier .
 ```
 
-The PackageName must not be the blank identifier.
+The PackageName must not be the blank identifier or a definition identifier.
 
 ```
 package math

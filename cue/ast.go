@@ -436,9 +436,6 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			v.object.addTemplate(v.ctx(), token.NoPos, nil, template)
 
 		case *ast.BasicLit, *ast.Ident:
-			if internal.DropOptional && opt {
-				break
-			}
 			v.sel, _, _ = ast.LabelName(x)
 			if v.sel == "_" {
 				if _, ok := x.(*ast.BasicLit); ok {

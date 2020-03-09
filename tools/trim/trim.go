@@ -84,9 +84,6 @@ type Config struct {
 // Trimming is done on a best-effort basis and only when the removed field
 // is clearly implied by another field, rather than equal sibling fields.
 func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
-	internal.DropOptional = true
-	defer func() { internal.DropOptional = false }()
-
 	gen := newTrimSet(cfg)
 	gen.files = files
 	for _, f := range files {

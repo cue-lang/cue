@@ -24,7 +24,6 @@ import (
 
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/diff"
 	"cuelang.org/go/tools/trim"
 )
@@ -94,16 +93,6 @@ removal.
 }
 
 func runTrim(cmd *Command, args []string) error {
-	// TODO: Do something more fine-grained. Optional fields are mostly not
-	// useful to consider as an optional field will almost never subsume
-	// another value. However, an optional field may subsume and therefore
-	// trigger the removal of another optional field.
-	// For now this is the better approach: trimming is not 100% accurate,
-	// and optional fields are just more likely to cause edge cases that may
-	// block a removal.
-	internal.DropOptional = true
-	defer func() { internal.DropOptional = false }()
-
 	binst := loadFromArgs(cmd, args, defaultConfig)
 	if binst == nil {
 		return nil

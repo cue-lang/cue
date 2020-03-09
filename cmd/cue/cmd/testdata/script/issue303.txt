@@ -1,0 +1,16 @@
+cue trim foo.cue
+cmp foo.cue rewritten
+
+-- foo.cue --
+package example
+
+foo: c: true
+foo: M
+M :: c?: bool
+
+-- rewritten --
+package example
+
+foo: c: true
+foo: M
+M :: c?: bool

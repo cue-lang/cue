@@ -102,6 +102,17 @@ z: {
 		out: `[_]: x: "hello"
 a: {}
 `,
+	}, {
+		name: "issue303",
+		in: `
+		foo: c: true
+		foo: M
+		M :: c?: bool
+		`,
+		out: `foo: c: true
+foo: M
+M :: c?: bool
+`,
 		// TODO: This used to work.
 		// 	name: "remove implied interpolations",
 		// 	in: `

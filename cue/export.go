@@ -340,31 +340,48 @@ func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
 		m = p.ctx.manifest(e)
 	}
 	isComplete := p.isComplete(m, false)
-	if optional || (!isComplete && (!p.mode.concrete)) {
-		resolve := p.mode.resolveReferences && !optional
-		if !p.mode.final && v.kind().hasReferences() && !resolve {
-			return p.expr(v)
-		}
-		if p.mode.concrete && !m.kind().isGround() {
-			p.addIncomplete(v)
-		}
-		// TODO: do something more principled than this hack.
-		// This likely requires disjunctions to keep track of original
-		// values (so using arcs instead of values).
-		opts := options{concrete: true, raw: true}
-		p := &exporter{p.ctx, opts, p.stack, p.top, p.imports, p.inDef, nil}
-		if isDisjunction(v) || isBottom(e) {
-			return p.expr(v)
-		}
-		if v.kind()&structKind == 0 {
-			return p.expr(e)
-		}
-		if optional || isDisjunction(e) {
-			// Break cycles: final and resolveReferences really should not be
-			// used with optional.
-			p.mode.resolveReferences = false
-			p.mode.final = false
-			return p.expr(v)
+	if optional || (!isComplete && !p.mode.concrete) {
+		if !p.mode.final {
+			// Schema mode.
+
+			// Print references as they are, if applicable.
+			//
+			// TODO: We probably should not allow resolving references in
+			// schema mode, or at most allow resolving _some_ references, like
+			// those defined outside of packages.
+			noResolve := !p.mode.resolveReferences
+			if optional {
+				// Don't resolve references when a field is optional.
+				// This may break some unnecessary cycles.
+				noResolve = true
+			}
+			if isBottom(e) || (v.kind().hasReferences() && noResolve) {
+				return p.expr(v)
+			}
+		} else {
+			// Data mode.
+
+			if p.mode.concrete && !m.kind().isGround() {
+				p.addIncomplete(v)
+			}
+			// TODO: do something more principled than this hack.
+			// This likely requires disjunctions to keep track of original
+			// values (so using arcs instead of values).
+			opts := options{concrete: true, raw: true}
+			p := &exporter{p.ctx, opts, p.stack, p.top, p.imports, p.inDef, nil}
+			if isDisjunction(v) || isBottom(e) {
+				return p.expr(v)
+			}
+			if v.kind()&structKind == 0 {
+				return p.expr(e)
+			}
+			if optional || isDisjunction(e) {
+				// Break cycles: final and resolveReferences really should not be
+				// used with optional.
+				p.mode.resolveReferences = false
+				p.mode.final = false
+				return p.expr(v)
+			}
 		}
 	}
 	return p.expr(e)
@@ -398,15 +415,14 @@ func (p *exporter) expr(v value) ast.Expr {
 			if p.mode.concrete && !x.kind().isGround() {
 				p.addIncomplete(v)
 			}
-			if isBottom(e) {
+			switch {
+			case isBottom(e):
 				if p.mode.concrete {
 					p.addIncomplete(v)
 				}
 				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports, p.inDef, nil}
 				return p.expr(v)
-			}
-			switch {
-			case !p.mode.final && v.kind().hasReferences() && !p.mode.resolveReferences:
+			case v.kind().hasReferences() && !p.mode.resolveReferences:
 			case doEval(p.mode):
 				v = e
 			}

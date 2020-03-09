@@ -1,0 +1,22 @@
+cue def -e Foo x.cue
+cmp stdout expect-stdout
+
+-- expect-stdout --
+
+close({
+    x:     int
+    body?: close({
+        a:  int
+        b?: string
+    })
+})
+-- x.cue --
+package example
+
+Foo :: {
+	x: int
+	body?: {
+		a: int
+		b?: string
+	}
+}

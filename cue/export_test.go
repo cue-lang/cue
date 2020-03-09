@@ -1050,6 +1050,20 @@ func TestExportFile(t *testing.T) {
 			}
 			A :: string | [A]
 		}`),
+	}, {
+		eval: true,
+		opts: []Option{Definitions(true)},
+		in: `
+		body?: {
+			a: int
+			b?: string
+		}
+		`,
+		out: unindent(`
+		body?: {
+			a:  int
+			b?: string
+		}`),
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

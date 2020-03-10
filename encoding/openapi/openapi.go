@@ -26,6 +26,9 @@ import (
 
 // A Config defines options for converting CUE to and from OpenAPI.
 type Config struct {
+	// PkgName defines to package name for a generated CUE package.
+	PkgName string
+
 	// Info specifies the info section of the OpenAPI document. To be a valid
 	// OpenAPI document, it must include at least the title and version fields.
 	// Info may be a *ast.StructLit or any type that marshals to JSON.

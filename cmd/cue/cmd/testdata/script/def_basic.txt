@@ -17,7 +17,7 @@ A :: {
 package foo
 
 A :: {
-    // a is an integer
-    a: int
-    b: int
+	// a is an integer
+	a: int
+	b: int
 }

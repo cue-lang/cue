@@ -4,11 +4,11 @@ cmp stdout expect-stdout
 -- expect-stdout --
 
 close({
-    x:     int
-    body?: close({
-        a:  int
-        b?: string
-    })
+	x:     int
+	body?: close({
+		a:  int
+		b?: string
+	})
 })
 -- x.cue --
 package example

@@ -18,8 +18,8 @@ A :: string | [A]
 package tst
 
 x: {
-    a: A
-    b: A
+	a: A
+	b: A
 }
 A :: string | [A]
 -- eval-stdout --

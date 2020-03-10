@@ -100,10 +100,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 			cue.DisallowCycles(!fi.Cycles),
 		)
 
-		opts := []format.Option{
-			format.UseSpaces(4),
-			format.TabIndent(false),
-		}
+		opts := []format.Option{}
 		opts = append(opts, cfg.Format...)
 
 		useSep := false

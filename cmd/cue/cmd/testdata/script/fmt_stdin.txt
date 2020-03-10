@@ -4,6 +4,8 @@ cmp stdout expect-stdout
 
 -- feed --
 foo : 2
+a: {b: 3} // a comment
 -- expect-stdout --
 foo: 2
+a: {b: 3} // a comment
 -- fmt/cue.mod --

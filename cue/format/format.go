@@ -15,6 +15,13 @@
 // Package format implements standard formatting of CUE configurations.
 package format // import "cuelang.org/go/cue/format"
 
+// TODO: this package is in need of a rewrite. When doing so, the API should
+// allow for reformatting an AST, without actually writing bytes.
+//
+// In essence, formatting determines the relative spacing to tokens. It should
+// be possible to have an abstract implementation providing such information
+// that can be used to either format or update an AST in a single walk.
+
 import (
 	"bytes"
 	"fmt"

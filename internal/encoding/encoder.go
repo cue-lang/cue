@@ -204,6 +204,7 @@ func (e *Encoder) encodeFile(f *ast.File, interpret func(*cue.Instance) (*ast.Fi
 	if interpret == nil && e.encFile != nil {
 		return e.encFile(f)
 	}
+	e.autoSimplify = true
 	var r cue.Runtime
 	inst, err := r.CompileFile(f)
 	if err != nil {

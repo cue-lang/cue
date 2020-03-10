@@ -1,11 +1,14 @@
 cue def foo.cue -o openapi:-
-cmp stdout expect-json
+cmp stdout expect-json-out
 
 cue def foo.cue -o openapi+cue:-
-cmp stdout expect-cue
+cmp stdout expect-cue-out
 
 cue def foo.cue -o openapi+yaml:-
-cmp stdout expect-yaml
+cmp stdout expect-yaml-out
+
+cue def -p foo openapi: expect-json-out
+cmp stdout expect-cue
 
 -- foo.cue --
 Foo :: {
@@ -17,7 +20,7 @@ Bar :: {
     foo: Foo
 }
 
--- expect-json --
+-- expect-json-out --
 {
     "openapi": "3.0.0",
     "info": {},
@@ -55,30 +58,7 @@ Bar :: {
         }
     }
 }
--- expect-cue --
-openapi: "3.0.0"
-info: {}
-paths: {}
-components: schemas: {
-	Foo: {
-		type: "object"
-		required: ["a", "b"]
-		properties: {
-			a: type: "integer"
-			b: {
-				type:             "integer"
-				minimum:          0
-				exclusiveMaximum: 10
-			}
-		}
-	}
-	Bar: {
-		type: "object"
-		required: ["foo"]
-		properties: foo: $ref: "#/components/schemas/Foo"
-	}
-}
--- expect-yaml --
+-- expect-yaml-out --
 openapi: 3.0.0
 info: {}
 paths: {}
@@ -103,3 +83,38 @@ components:
             properties:
                 foo:
                     $ref: '#/components/schemas/Foo'
+-- expect-cue-out --
+openapi: "3.0.0"
+info: {}
+paths: {}
+components: schemas: {
+	Foo: {
+		type: "object"
+		required: ["a", "b"]
+		properties: {
+			a: type: "integer"
+			b: {
+				type:             "integer"
+				minimum:          0
+				exclusiveMaximum: 10
+			}
+		}
+	}
+	Bar: {
+		type: "object"
+		required: ["foo"]
+		properties: foo: $ref: "#/components/schemas/Foo"
+	}
+}
+-- expect-cue --
+package foo
+
+Foo :: {
+	a: int
+	b: >=0 & <10
+	...
+}
+Bar :: {
+	foo: Foo
+	...
+}

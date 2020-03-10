@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"net/url"
 	"os"
 	"strings"
 
@@ -33,6 +34,8 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
+	"cuelang.org/go/encoding/jsonschema"
+	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/third_party/yaml"
@@ -169,6 +172,39 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	i.err = err
 	if err != nil {
 		return i
+	}
+
+	switch f.Interpretation {
+	case "":
+	case build.OpenAPI:
+		i.interpret = func(i *cue.Instance) (file *ast.File, id string, err error) {
+			cfg := &openapi.Config{PkgName: cfg.PkgName}
+			file, err = simplify(openapi.Extract(i, cfg))
+			return file, "", err
+		}
+	case build.JSONSchema:
+		i.interpret = func(i *cue.Instance) (file *ast.File, id string, err error) {
+			id = f.Tags["id"]
+			if id == "" {
+				id, _ = i.Lookup("$id").String()
+			}
+			if id != "" {
+				u, err := url.Parse(id)
+				if err != nil {
+					return nil, "", errors.Wrapf(err, token.NoPos, "invalid id")
+				}
+				u.Scheme = ""
+				id = strings.TrimPrefix(u.String(), "//")
+			}
+			cfg := &jsonschema.Config{
+				ID:      id,
+				PkgName: cfg.PkgName,
+			}
+			file, err = simplify(jsonschema.Extract(i, cfg))
+			return file, id, err
+		}
+	default:
+		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}
 
 	path := f.Filename
@@ -340,4 +376,20 @@ func (v *validator) validate(n ast.Node) bool {
 		// Other types are either always okay or handled elsewhere.
 	}
 	return ok
+}
+
+// simplify reformats a File. To be used as a wrapper for Extract functions.
+//
+// It currently does so by formatting the file using fmt.Format and then
+// reparsing it. This is not ideal, but the package format does not provide a
+// way to do so differently.
+func simplify(f *ast.File, err error) (*ast.File, error) {
+	if err != nil {
+		return nil, err
+	}
+	b, err := format.Node(f, format.Simplify())
+	if err != nil {
+		return nil, err
+	}
+	return parser.ParseFile(f.Filename, b, parser.ParseComments)
 }

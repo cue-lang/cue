@@ -33,7 +33,7 @@ func Marshal(v cue.Value) (string, error) {
 		}
 		return "", internal.ErrIncomplete
 	}
-	n := v.Syntax(cue.Final())
+	n := v.Syntax(cue.Final(), cue.Concrete(true))
 	b, err := cueyaml.Encode(n)
 	return string(b), err
 }
@@ -57,7 +57,7 @@ func MarshalStream(v cue.Value) (string, error) {
 			}
 			return "", internal.ErrIncomplete
 		}
-		n := v.Syntax(cue.Final())
+		n := v.Syntax(cue.Final(), cue.Concrete(true))
 		b, err := cueyaml.Encode(n)
 		if err != nil {
 			return "", err

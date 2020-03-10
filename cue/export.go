@@ -901,42 +901,44 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		obj.Elts = append(obj.Elts, f)
 	}
 
-	for _, v := range x.comprehensions {
-		switch c := v.comp.(type) {
-		case *fieldComprehension:
-			l := p.expr(c.key)
-			label, _ := l.(ast.Label)
-			opt := token.NoPos
-			if c.opt {
-				opt = token.NoSpace.Pos() // anything but token.NoPos
-			}
-			tok := token.COLON
-			if c.def {
-				tok = token.ISA
-			}
-			f := &ast.Field{
-				Label:    label,
-				Optional: opt,
-				Token:    tok,
-				Value:    p.expr(c.val),
-			}
-			obj.Elts = append(obj.Elts, f)
-
-		case *structComprehension:
-			var clauses []ast.Clause
-			next := c.clauses
-			for {
-				if yield, ok := next.(*yield); ok {
-					obj.Elts = append(obj.Elts, &ast.Comprehension{
-						Clauses: clauses,
-						Value:   p.expr(yield.value),
-					})
-					break
+	if !p.mode.concrete {
+		for _, v := range x.comprehensions {
+			switch c := v.comp.(type) {
+			case *fieldComprehension:
+				l := p.expr(c.key)
+				label, _ := l.(ast.Label)
+				opt := token.NoPos
+				if c.opt {
+					opt = token.NoSpace.Pos() // anything but token.NoPos
 				}
+				tok := token.COLON
+				if c.def {
+					tok = token.ISA
+				}
+				f := &ast.Field{
+					Label:    label,
+					Optional: opt,
+					Token:    tok,
+					Value:    p.expr(c.val),
+				}
+				obj.Elts = append(obj.Elts, f)
 
-				var y ast.Clause
-				y, next = p.clause(next)
-				clauses = append(clauses, y)
+			case *structComprehension:
+				var clauses []ast.Clause
+				next := c.clauses
+				for {
+					if yield, ok := next.(*yield); ok {
+						obj.Elts = append(obj.Elts, &ast.Comprehension{
+							Clauses: clauses,
+							Value:   p.expr(yield.value),
+						})
+						break
+					}
+
+					var y ast.Clause
+					y, next = p.clause(next)
+					clauses = append(clauses, y)
+				}
 			}
 		}
 	}

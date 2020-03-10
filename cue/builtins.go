@@ -643,7 +643,7 @@ var builtinPackages = map[string]*builtinPkg{
 							}
 							return "", internal.ErrIncomplete
 						}
-						n := v.Syntax(Final())
+						n := v.Syntax(Final(), Concrete(true))
 						b, err := cueyaml.Encode(n)
 						return string(b), err
 					}()
@@ -674,7 +674,7 @@ var builtinPackages = map[string]*builtinPkg{
 								}
 								return "", internal.ErrIncomplete
 							}
-							n := v.Syntax(Final())
+							n := v.Syntax(Final(), Concrete(true))
 							b, err := cueyaml.Encode(n)
 							if err != nil {
 								return "", err

@@ -1064,6 +1064,31 @@ func TestExportFile(t *testing.T) {
 			a:  int
 			b?: string
 		}`),
+	}, {
+		// Drop comprehensions in final mode.
+		eval: true,
+		opts: []Option{Final(), Concrete(true)},
+		in: `
+		foo: _
+		a: {
+			if len(foo.bar) > 0 {
+				command: ["envoy-lifecycle", string]
+			}
+		}
+		`,
+		out: unindent(`
+		{
+			foo: _
+			a: {}
+		}`),
+	}, {
+		// Don't output hidden fields in concrete and final mode.
+		eval: true,
+		opts: []Option{Final(), Concrete(true)},
+		in: `
+			_foo: _
+			`,
+		out: `{}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

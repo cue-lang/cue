@@ -2,6 +2,7 @@ cue export --out yaml ./hello
 cmp stdout expect-stdout
 -- expect-stdout --
 message: Hello World!
+test: {}
 -- hello/data.cue --
 package hello
 
@@ -10,4 +11,11 @@ who :: "World"
 package hello
 
 message: "Hello \(who)!" // who declared in data.cue
+
+test: {
+	_foo: string // technically in error, but test anyway.
+	if len(_foo) > 0 {
+		command: ["foo", "bar"]
+	}
+}
 -- hello/cue.mod --

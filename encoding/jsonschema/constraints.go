@@ -16,13 +16,11 @@ package jsonschema
 
 import (
 	"math/big"
-	"net/url"
-	"path"
-	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 type constraint struct {
@@ -193,48 +191,16 @@ var constraints = []*constraint{
 	p0("$def", addDefinitions),
 	p0("definitions", addDefinitions),
 	p0("$ref", func(n cue.Value, s *state) {
-		if str, ok := s.strValue(n); ok {
-			u, err := url.Parse(str)
-			if err != nil {
-				s.add(s.errf(n, "invalid JSON reference: %s", err))
-				return
-			}
-
-			if u.Host != "" || u.Path != "" {
-				s.add(s.errf(n, "external references (%s) not supported", str))
-				// TODO: handle
-				//    host:
-				//      If the host corresponds to a package known to cue,
-				//      load it from there. It would prefer schema converted to
-				//      CUE, although we could consider loading raw JSON schema
-				//      if present.
-				//      If not present, advise the user to run cue get.
-				//    path:
-				//      Look up on file system or relatively to authority location.
-				return
-			}
-
-			if !path.IsAbs(u.Fragment) {
-				s.add(s.errf(n, "anchors (%s) not supported", u.Fragment))
-				// TODO: support anchors
-				return
-			}
-
-			// NOTE: Go bug?: url.URL has no raw representation of the fragment.
-			// This means that %2F gets translated to `/` before it can be
-			// split. This, in turn, means that field names cannot have a `/`
-			// as name.
-			a := strings.Split(u.Fragment[1:], "/")
-			if a[0] != "definitions" && a[0] != "$def" {
-				s.add(s.errf(n, "reference %q must resolve to definition", u.Fragment))
-				return
-			}
-			s.add(ast.NewSel(ast.NewIdent(rootDefs), a[1:]...))
-
-			// TODO: technically, a references could reference a non-definition.
-			// In that case this will not resolve. We should detect cases that
-			// are not definitions and then resolve those as literal values.
+		str, _ := s.strValue(n)
+		a := s.parseRef(n.Pos(), str)
+		if a != nil {
+			a = s.mapRef(n.Pos(), str, a)
 		}
+		if a == nil {
+			s.add(&ast.BadExpr{From: n.Pos()})
+			return
+		}
+		s.add(ast.NewSel(ast.NewIdent(a[0]), a[1:]...))
 	}),
 
 	// Combinators
@@ -345,6 +311,14 @@ var constraints = []*constraint{
 				// TODO: change formatter such that either a a NewSection on the
 				// field or doc comment will cause a new section.
 				ast.SetRelPos(f.Comments()[0], token.NewSection)
+			}
+			if state.deprecated {
+				switch expr.(type) {
+				case *ast.StructLit:
+					s.obj.Elts = append(s.obj.Elts, addTag(key, "deprecated", ""))
+				default:
+					f.Attrs = append(f.Attrs, internal.NewAttr("deprecated", ""))
+				}
 			}
 			s.obj.Elts = append(s.obj.Elts, f)
 		})

@@ -1,0 +1,30 @@
+openapi
+
+-- type.yaml --
+components:
+  schemas:
+    User:
+      description: "A User uses something."
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        address:
+          $ref: "#/components/schemas/PhoneNumber"
+    PhoneNumber:
+      description: "The number to dial."
+      type: string
+
+-- out.cue --
+// A User uses something.
+User :: {
+	name?:    string
+	id?:      int
+	address?: PhoneNumber
+	...
+}
+
+// The number to dial.
+PhoneNumber :: string

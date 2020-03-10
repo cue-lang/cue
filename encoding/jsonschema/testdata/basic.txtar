@@ -35,7 +35,6 @@
 // Main schema
 // 
 // Specify who you are and all.
-
 Schema :: _ @jsonschema(schema="http://json-schema.org/draft-07/schema#")
 Schema :: {
 	// A person is a human being.
@@ -45,7 +44,7 @@ Schema :: {
 		// where does this person live?
 		address?: string
 		children?: [...string]
-		"home phone"?: string
+		"home phone"?: string @deprecated()
 		...
 	}
 	...

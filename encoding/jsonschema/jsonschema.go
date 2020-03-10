@@ -33,22 +33,24 @@ package jsonschema
 import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
 )
 
 // Extract converts JSON Schema data into an equivalent CUE representation.
 //
 // The generated CUE schema is guaranteed to deem valid any value that is
 // a valid instance of the source JSON schema.
-func Extract(data *cue.Instance, cfg *Config) (*ast.File, error) {
+func Extract(data *cue.Instance, cfg *Config) (f *ast.File, err error) {
 	d := &decoder{
 		cfg:     cfg,
 		imports: map[string]*ast.Ident{},
 	}
-	e := d.decode(data)
+
+	f = d.decode(data.Value())
 	if d.errs != nil {
 		return nil, d.errs
 	}
-	return e, nil
+	return f, nil
 }
 
 // A Config configures a JSON Schema encoding or decoding.
@@ -56,6 +58,23 @@ type Config struct {
 	PkgName string
 
 	ID string // URL of the original source, corresponding to the $id field.
+
+	// JSON reference of location containing schema. The empty string indicates
+	// that there is a single schema at the root.
+	//
+	// Examples:
+	//  "#/"                     top-level fields are schemas.
+	//  "#/components/schemas"   the canonical OpenAPI location.
+	Root string
+
+	// Map maps the locations of schemas and definitions to a new location.
+	// References are updated accordingly.
+	//
+	// The default mapping is
+	//    {}                     {"Schema"}
+	//    {"definitions", foo}   {"Defs", strings.Title(foo)}
+	//    {"$defs", foo}         {"Defs", strings.Title(foo)}
+	Map func(pos token.Pos, path []string) ([]string, error)
 
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.

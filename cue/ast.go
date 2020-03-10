@@ -724,6 +724,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 	case *ast.CommentGroup:
 		// Nothing to do for a free-floating comment group.
 
+	case *ast.Attribute:
+		// Nothing to do for now.
+
 	// nothing to do
 	// case *syntax.EmbedDecl:
 	default:

@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
 	"github.com/google/go-cmp/cmp"
@@ -53,6 +54,16 @@ func TestDecode(t *testing.T) {
 				t.Fatal(err)
 			}
 
+			cfg := &Config{ID: fullpath}
+
+			if bytes.Contains(a.Comment, []byte("openapi")) {
+				cfg.Root = "#/components/schemas/"
+				cfg.Map = func(p token.Pos, a []string) ([]string, error) {
+					// Just for testing: does not validate the path.
+					return []string{a[len(a)-1]}, nil
+				}
+			}
+
 			r := &cue.Runtime{}
 			var in *cue.Instance
 			var out, errout []byte
@@ -75,7 +86,7 @@ func TestDecode(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			expr, err := Extract(in, &Config{ID: fullpath})
+			expr, err := Extract(in, cfg)
 			if err != nil && errout == nil {
 				t.Fatal(errors.Details(err, nil))
 			}

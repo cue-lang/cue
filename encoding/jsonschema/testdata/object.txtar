@@ -59,10 +59,9 @@
 }
 
 -- out.cue --
-// Main schema
-
 import "struct"
 
+// Main schema
 Schema :: {
 	fields?: struct.MinFields(3) & struct.MaxFields(10) & {
 		[=~"^\\P{Lu}"]: _

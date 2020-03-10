@@ -52,19 +52,37 @@ func (d *decoder) addImport(pkg string) *ast.Ident {
 	return ident
 }
 
-func (d *decoder) decode(inst *cue.Instance) *ast.File {
-	root := state{decoder: d}
-	expr, state := root.schemaState(inst.Value())
-
-	var a []ast.Decl
+func (d *decoder) decode(v cue.Value) *ast.File {
+	f := &ast.File{}
 
 	if pkgName := d.cfg.PkgName; pkgName != "" {
 		pkg := &ast.Package{Name: ast.NewIdent(pkgName)}
-		state.doc(pkg)
+		f.Decls = append(f.Decls, pkg)
+	}
 
-		a = append(a, pkg)
-	} else if doc := state.comment(); doc != nil {
-		a = append(a, doc)
+	var a []ast.Decl
+
+	if d.cfg.Root == "" {
+		a = append(a, d.schema([]string{"Schema"}, v)...)
+	} else {
+		ref := d.parseRef(token.NoPos, d.cfg.Root)
+		if ref == nil {
+			return f
+		}
+		i, err := v.Lookup(ref...).Fields()
+		if err != nil {
+			d.errs = errors.Append(d.errs, errors.Promote(err, ""))
+			return nil
+		}
+		for i.Next() {
+			ref := append(ref, i.Label())
+			ref = d.mapRef(i.Value().Pos(), "", ref)
+			if len(ref) == 0 {
+				return nil
+			}
+			decls := d.schema(ref, i.Value())
+			a = append(a, decls...)
+		}
 	}
 
 	var imports []string
@@ -78,8 +96,22 @@ func (d *decoder) decode(inst *cue.Instance) *ast.File {
 		for _, p := range imports {
 			x.Specs = append(x.Specs, ast.NewImport(nil, p))
 		}
-		a = append(a, x)
+		f.Decls = append(f.Decls, x)
 	}
+
+	f.Decls = append(f.Decls, a...)
+	f.Decls = append(f.Decls, d.definitions...)
+
+	return f
+}
+
+func (d *decoder) schema(ref []string, v cue.Value) (a []ast.Decl) {
+	root := state{decoder: d}
+
+	inner := len(ref) - 1
+	name := ref[inner]
+
+	expr, state := root.schemaState(v)
 
 	tags := []string{}
 	if state.jsonschema != "" {
@@ -89,32 +121,45 @@ func (d *decoder) decode(inst *cue.Instance) *ast.File {
 		tags = append(tags, fmt.Sprintf("id=%q", state.id))
 	}
 	if len(tags) > 0 {
-		a = append(a, addTag("Schema", "jsonschema", strings.Join(tags, ",")))
+		a = append(a, addTag(name, "jsonschema", strings.Join(tags, ",")))
 	}
 
 	if state.deprecated {
-		a = append(a, addTag("Schema", "deprecated", ""))
+		a = append(a, addTag(name, "deprecated", ""))
 	}
 
 	f := &ast.Field{
-		Label: ast.NewIdent("Schema"),
+		Label: ast.NewIdent(name),
+		Token: token.ISA,
 		Value: expr,
 	}
 
-	f.Token = token.ISA
 	a = append(a, f)
-	a = append(a, d.definitions...)
+	state.doc(a[0])
 
-	return &ast.File{Decls: a}
+	for i := inner - 1; i >= 0; i-- {
+		a = []ast.Decl{&ast.Field{
+			Label: ast.NewIdent(ref[i]),
+			Token: token.ISA,
+			Value: &ast.StructLit{Elts: a},
+		}}
+		expr = ast.NewStruct(ref[i], token.ISA, expr)
+	}
+
+	return a
 }
 
 func (d *decoder) errf(n cue.Value, format string, args ...interface{}) ast.Expr {
-	d.warnf(n, format, args...)
+	d.warnf(n.Pos(), format, args...)
 	return &ast.BadExpr{From: n.Pos()}
 }
 
-func (d *decoder) warnf(n cue.Value, format string, args ...interface{}) {
-	d.errs = errors.Append(d.errs, errors.Newf(n.Pos(), format, args...))
+func (d *decoder) warnf(p token.Pos, format string, args ...interface{}) {
+	d.addErr(errors.Newf(p, format, args...))
+}
+
+func (d *decoder) addErr(err errors.Error) {
+	d.errs = errors.Append(d.errs, err)
 }
 
 func (d *decoder) number(n cue.Value) ast.Expr {
@@ -306,7 +351,7 @@ func (s *state) schemaState(n cue.Value) (ast.Expr, *state) {
 			c := constraintMap[key]
 			if c == nil {
 				if pass == 0 {
-					s.warnf(n, "unsupported constraint %q", key)
+					s.warnf(n.Pos(), "unsupported constraint %q", key)
 				}
 				return
 			}

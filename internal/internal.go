@@ -21,6 +21,7 @@ package internal // import "cuelang.org/go/internal"
 
 import (
 	"bufio"
+	"fmt"
 	"os"
 	"path/filepath"
 	"strings"
@@ -131,6 +132,17 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 		cg.List = cg.List[:last]
 	}
 	return cg
+}
+
+func NewAttr(name, str string) *ast.Attribute {
+	buf := &strings.Builder{}
+	buf.WriteByte('@')
+	buf.WriteString(name)
+	buf.WriteByte('(')
+	fmt.Fprintf(buf, str)
+	buf.WriteByte(')')
+
+	return &ast.Attribute{Text: buf.String()}
 }
 
 // IsEllipsis reports whether the declaration can be represented as an ellipsis.

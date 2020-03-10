@@ -28,7 +28,6 @@
 
 -- out.cue --
 // Main schema
-
 Schema :: {
 	// an integer or string.
 	intString?: string | int | bool | [...] | null

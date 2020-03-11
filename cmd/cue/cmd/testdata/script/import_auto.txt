@@ -1,0 +1,47 @@
+cue import -o - ./openapi.yaml
+cmp stdout expect-openapi
+
+-- expect-openapi --
+// An OpenAPI file
+
+info: {
+	title:   "An OpenAPI file"
+	version: "v1beta1"
+}
+
+Foo :: {
+	a: int
+	b: >=0 & <10
+	...
+}
+Bar :: {
+	foo: Foo
+	...
+}
+-- openapi.yaml --
+openapi: 3.0.0
+info:
+    title: An OpenAPI file
+    version: v1beta1
+paths: {}
+components:
+    schemas:
+        Foo:
+            type: object
+            required:
+              - a
+              - b
+            properties:
+                a:
+                    type: integer
+                b:
+                    type: integer
+                    minimum: 0
+                    exclusiveMaximum: 10
+        Bar:
+            type: object
+            required:
+              - foo
+            properties:
+                foo:
+                    $ref: '#/components/schemas/Foo'

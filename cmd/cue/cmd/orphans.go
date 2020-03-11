@@ -39,9 +39,8 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 		useList    = flagList.Bool(b.cmd)
 		path       = flagPath.StringArray(b.cmd)
 		useContext = flagWithContext.Bool(b.cmd)
-		match      = flagGlob.String(b.cmd)
 	)
-	if !b.forceOrphanProcessing && !perFile && !useList && len(path) == 0 {
+	if !b.importing && !perFile && !useList && len(path) == 0 {
 		if useContext {
 			return false, fmt.Errorf(
 				"flag %q must be used with at least one of flag %q, %q, or %q",
@@ -63,25 +62,31 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 
 	var files []*ast.File
 
-	re, err := regexp.Compile(match)
+	re, err := regexp.Compile(b.cfg.fileFilter)
 	if err != nil {
 		return false, err
 	}
 
 	for _, f := range i.OrphanedFiles {
-		if !re.MatchString(filepath.Base(f.Filename)) {
+		if !i.User && !re.MatchString(filepath.Base(f.Filename)) {
 			return false, nil
 		}
 
-		d := encoding.NewDecoder(f, b.encConfig)
+		// We add the module root to the path if there is a module defined.
+		c := *b.encConfig
+		if i.Module != "" {
+			c.ProtoPath = append(c.ProtoPath, i.Root)
+		}
+
+		d := encoding.NewDecoder(f, &c)
 		defer d.Close()
 
 		var objs []*ast.File
 
+		// Filter only need to filter files that can stream:
 		for ; !d.Done(); d.Next() {
 			if expr := d.File(); expr != nil {
 				objs = append(objs, expr)
-				continue
 			}
 		}
 		if err := d.Err(); err != nil {

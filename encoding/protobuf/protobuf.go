@@ -322,22 +322,39 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 
 	dir := b.root
 	path := importPath
+	file := p.file.Filename
+	if !filepath.IsAbs(file) {
+		file = filepath.Join(b.root, p.file.Filename)
+	}
+	// Determine whether the generated file should be included in place, or
+	// within cue.mod.
+	inPlace := strings.HasPrefix(file, b.root)
 	if !strings.HasPrefix(path, b.module) {
+		// b.module is either "", in which case we assume the setting for
+		// inPlace, or not, in which case the module in the protobuf must
+		// correspond with that of the proto package.
+		inPlace = false
+	}
+	if !inPlace {
 		dir = filepath.Join(internal.GenPath(dir), path)
 	} else {
-		dir = filepath.Join(dir, path[len(b.module)+1:])
-		want := filepath.Dir(p.file.Filename)
-		if !filepath.IsAbs(want) {
-			want = filepath.Join(b.root, want)
-		}
-		if dir != want {
-			err := errors.Newf(token.NoPos,
-				"file %s mapped to inconsistent path %s; module name %q may be inconsistent with root dir %s",
-				want, dir, b.module, b.root,
-			)
-			b.errs = errors.Append(b.errs, err)
-		}
+		dir = filepath.Dir(p.file.Filename)
 	}
+
+	// TODO: verify module name from go_package option against that of actual
+	// CUE module. Maybe keep this old code for some strict mode?
+	// want := filepath.Dir(p.file.Filename)
+	// dir = filepath.Join(dir, path[len(b.module)+1:])
+	// if !filepath.IsAbs(want) {
+	// 	want = filepath.Join(b.root, want)
+	// }
+	// if dir != want {
+	// 	err := errors.Newf(token.NoPos,
+	// 		"file %s mapped to inconsistent path %s; module name %q may be inconsistent with root dir %s",
+	// 		want, dir, b.module, b.root,
+	// 	)
+	// 	b.errs = errors.Append(b.errs, err)
+	// }
 
 	inst := b.imports[importPath]
 	if inst == nil {

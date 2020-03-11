@@ -3,3 +3,5 @@ cmp stderr expect-stderr
 
 -- expect-stderr --
 no encoding specified for file "ut"
+-- x.cue --
+a: 1

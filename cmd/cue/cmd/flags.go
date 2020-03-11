@@ -32,16 +32,18 @@ const (
 	flagPackage   flagName = "package"
 	flagInject    flagName = "inject"
 
-	flagExpression flagName = "expression"
-	flagSchema     flagName = "schema"
-	flagEscape     flagName = "escape"
-	flagGlob       flagName = "name"
-	flagRecursive  flagName = "recursive"
-	flagType       flagName = "type"
-	flagList       flagName = "list"
-	flagPath       flagName = "path"
-	flagOut        flagName = "out"
-	flagOutFile    flagName = "outfile"
+	flagExpression  flagName = "expression"
+	flagSchema      flagName = "schema"
+	flagEscape      flagName = "escape"
+	flagGlob        flagName = "name"
+	flagRecursive   flagName = "recursive"
+	flagList        flagName = "list"
+	flagPath        flagName = "path"
+	flagFiles       flagName = "files"
+	flagProtoPath   flagName = "proto_path"
+	flagWithContext flagName = "with-context"
+	flagOut         flagName = "out"
+	flagOutFile     flagName = "outfile"
 )
 
 func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {

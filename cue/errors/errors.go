@@ -447,6 +447,9 @@ func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {
 		cfg = &Config{}
 	}
+	if e, ok := err.(Error); ok {
+		err = Sanitize(e)
+	}
 	for _, e := range Errors(err) {
 		printError(w, e, cfg)
 	}

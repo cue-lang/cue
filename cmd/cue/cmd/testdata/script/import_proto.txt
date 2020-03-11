@@ -1,0 +1,230 @@
+cd root
+cue import proto -I ../include ./...
+cd ..
+
+cmp stderr expect-stderr
+cmp stdout expect-stdout
+cmp expect-attributes_proto_gen.cue root/mixer/v1/attributes_proto_gen.cue
+cmp expect-client_config_proto_gen.cue root/mixer/v1/config/client/client_config_proto_gen.cue
+cmp expect-test_proto_gen.cue root/cue.mod/gen/googleapis.com/acme/test/test_proto_gen.cue
+
+-- expect-stdout --
+-- expect-stderr --
+Skipping file "cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue": already exists.
+Use -Rf to override.
+-- root/cue.mod/module.cue --
+module: "acme.com/api"
+
+-- root/cue.mod/module.cue --
+module: "acme.com/api"
+
+-- root/cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue --
+package test_test
+
+AnotherTest: {
+	test?: int32 @protobuf(1)
+}
+-- root/mixer/v1/attributes.proto --
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "acme/test.proto";
+import "acme/test/test.proto";
+
+package acme.mixer.v1;
+
+option go_package = "acme.com/api/mixer/v1";
+
+// Attributes defines attributes.
+message Attributes {
+  // A map of attribute name to its value.
+  map<string, AttributeValue> attributes = 1;
+
+  // Specifies one attribute value with different type.
+  message AttributeValue {
+    // The attribute value.
+    oneof value {
+      string string_value = 2;
+      int64 int64_value = 3;
+      double double_value = 4;
+      bool bool_value = 5;
+      bytes bytes_value = 6;
+      google.protobuf.Timestamp timestamp_value = 7;
+
+      // Used for values of type STRING_MAP
+      StringMap string_map_value = 9;
+
+      acme.test.Test test_value = 10;
+      acme.test.test.AnotherTest test_value = 11;
+    }
+  }
+
+  // Defines a string map.
+  message StringMap {
+    // Holds a set of name/value pairs.
+    map<string, string> entries = 1;
+  }
+}
+
+-- root/mixer/v1/config/client/client_config.proto --
+syntax = "proto3";
+
+import "mixer/v1/attributes.proto";
+
+// Describes the configuration state for the Mixer client library that's built into Envoy.
+package acme.mixer.v1.config.client;
+
+option go_package = "acme.com/api/mixer/v1/config/client";
+
+// Defines the per-service client configuration.
+message ServiceConfig {
+  bool disable_check_calls = 1;
+  bool disable_report_calls = 2;
+  Attributes mixer_attributes = 3;
+}
+-- include/acme/test.proto --
+syntax = "proto3";
+
+package acme.test;
+
+message Test {
+  int32 test = 1;
+}
+
+-- include/acme/test/test.proto --
+syntax = "proto3";
+
+package acme.test.test;
+
+// Override the short name only of this package. This notation is seen in some
+// gogoproto files.
+option go_package = "test_test"
+
+message AnotherTest {
+  int32 test = 1;
+}
+
+-- include/google/protobuf/timestamp.proto --
+// Protocol Buffers - Google's data interchange format
+// Copyright 2008 Google Inc.  All rights reserved.
+// https://developers.google.com/protocol-buffers/
+//
+// Redistribution and use in source and binary forms, with or without
+// modification, are permitted provided that the following conditions are
+// met:
+//
+//     * Redistributions of source code must retain the above copyright
+// notice, this list of conditions and the following disclaimer.
+//     * Redistributions in binary form must reproduce the above
+// copyright notice, this list of conditions and the following disclaimer
+// in the documentation and/or other materials provided with the
+// distribution.
+//     * Neither the name of Google Inc. nor the names of its
+// contributors may be used to endorse or promote products derived from
+// this software without specific prior written permission.
+//
+// THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+// "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+// LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+// A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+// OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+// SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+// LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+// DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+// THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+// (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+// OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+syntax = "proto3";
+
+package google.protobuf;
+
+option csharp_namespace = "Google.Protobuf.WellKnownTypes";
+option cc_enable_arenas = true;
+option go_package = "github.com/golang/protobuf/ptypes/timestamp";
+option java_package = "com.google.protobuf";
+option java_outer_classname = "TimestampProto";
+option java_multiple_files = true;
+option objc_class_prefix = "GPB";
+
+message Timestamp {
+  // Represents seconds of UTC time since Unix epoch
+  // 1970-01-01T00:00:00Z. Must be from 0001-01-01T00:00:00Z to
+  // 9999-12-31T23:59:59Z inclusive.
+  int64 seconds = 1;
+
+  // Non-negative fractions of a second at nanosecond resolution. Negative
+  // second values with fractions must still have non-negative nanos values
+  // that count forward in time. Must be from 0 to 999,999,999
+  // inclusive.
+  int32 nanos = 2;
+}
+
+-- expect-attributes_proto_gen.cue --
+package v1
+
+import (
+	"googleapis.com/acme/test"
+	"googleapis.com/acme/test/test"
+	"time"
+)
+
+// Attributes defines attributes.
+Attributes :: {
+	// A map of attribute name to its value.
+	attributes?: {
+		[string]: AttributeValue
+	} @protobuf(1,type=map<string,AttributeValue>)
+
+	// Specifies one attribute value with different type.
+	AttributeValue :: {
+		// The attribute value.
+		close({}) | close({
+			stringValue: string @protobuf(2,name=string_value)
+		}) | close({
+			int64Value: int64 @protobuf(3,name=int64_value)
+		}) | close({
+			doubleValue: float64 @protobuf(4,type=double,name=double_value)
+		}) | close({
+			boolValue: bool @protobuf(5,name=bool_value)
+		}) | close({
+			bytesValue: bytes @protobuf(6,name=bytes_value)
+		}) | close({
+			timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
+		}) | close({
+			// Used for values of type STRING_MAP
+			stringMapValue: StringMap @protobuf(9,name=string_map_value)
+		}) | close({
+			testValue: test.Test @protobuf(10,type=acme.test.Test,name=test_value)
+		}) | close({
+			testValue: test_test.AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
+		})
+	}
+
+	// Defines a string map.
+	StringMap :: {
+		// Holds a set of name/value pairs.
+		entries?: {
+			[string]: string
+		} @protobuf(1,type=map<string,string>)
+	}
+}
+-- expect-client_config_proto_gen.cue --
+
+// Describes the configuration state for the Mixer client library that's built into Envoy.
+package client
+
+import "acme.com/api/mixer/v1"
+
+// Defines the per-service client configuration.
+ServiceConfig :: {
+	disableCheckCalls?:  bool          @protobuf(1,name=disable_check_calls)
+	disableReportCalls?: bool          @protobuf(2,name=disable_report_calls)
+	mixerAttributes?:    v1.Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
+}
+-- expect-test_proto_gen.cue --
+package test
+
+Test :: {
+	test?: int32 @protobuf(1)
+}

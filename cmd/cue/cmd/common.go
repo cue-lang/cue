@@ -128,10 +128,10 @@ type buildPlan struct {
 
 	// If orphanFiles are mixed with CUE files and/or if placement flags are used,
 	// the instance is also included in insts.
-	forceOrphanProcessing bool
-	orphanedData          []*build.File
-	orphanedSchema        []*build.File
-	orphanInstance        *build.Instance
+	importing      bool
+	orphanedData   []*build.File
+	orphanedSchema []*build.File
+	orphanInstance *build.Instance
 	// imported files are files that were orphaned in the build instance, but
 	// were placed in the instance by using one the --files, --list or --path
 	// flags.
@@ -350,6 +350,7 @@ func (i *expressionIter) instance() *cue.Instance {
 type config struct {
 	outMode filetypes.Mode
 
+	fileFilter     string
 	interpretation build.Interpretation
 
 	loadCfg *load.Config
@@ -370,15 +371,18 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	}
 	decorateInstances(cmd, flagInject.StringArray(cmd), builds)
 
-	p = &buildPlan{cfg: cfg, cmd: cmd, forceOrphanProcessing: cfg.loadCfg.DataFiles}
+	p = &buildPlan{cfg: cfg, cmd: cmd, importing: cfg.loadCfg.DataFiles}
 
 	if err := p.parseFlags(); err != nil {
 		return nil, err
 	}
 
 	for _, b := range builds {
+		if b.Err != nil {
+			return nil, b.Err
+		}
 		var ok bool
-		if b.User || p.forceOrphanProcessing {
+		if b.User || p.importing {
 			ok, err = p.placeOrphans(b)
 			if err != nil {
 				return nil, err
@@ -473,6 +477,10 @@ func (b *buildPlan) parseFlags() (err error) {
 		if err != nil {
 			return err
 		}
+	}
+	if s := flagGlob.String(b.cmd); s != "" {
+		// Set a default file filter to only include json and yaml files
+		b.cfg.fileFilter = s
 	}
 	b.encConfig = &encoding.Config{
 		Mode:      b.cfg.outMode,

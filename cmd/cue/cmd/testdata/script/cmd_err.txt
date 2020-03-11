@@ -3,10 +3,10 @@
 cmp stderr cmd_badfields.out
 
 -- cmd_badfields.out --
-command.ref.task.display.filename: non-concrete value string:
-    tool/file:9:16
 command.ref.task.display.contents: invalid bytes argument for field "contents": non-concrete value string|bytes:
     ./task_tool.cue:6:17
+command.ref.task.display.filename: non-concrete value string:
+    tool/file:9:16
 -- task_tool.cue --
 package home
 

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"path/filepath"
 	"strings"
 	"unicode"
 
@@ -25,40 +26,103 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
+	"cuelang.org/go/encoding/protobuf"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
 func newImportCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "import",
-		Short: "convert other data formats to CUE files",
-		Long: `import converts other data formats, like JSON and YAML to CUE files
-
-The following file formats are currently supported:
-
-  Format       Extensions
-	JSON       .json .jsonl .ndjson
-	YAML       .yaml .yml
-	protobuf   .proto
+		Use:   "import [mode] [inputs]",
+		Short: "convert other formats to CUE files",
+		Long: `import converts other formats, like JSON and YAML to CUE files
 
 Files can either be specified explicitly, or inferred from the
-specified packages. In either case, the file extension is
-replaced with .cue. It will fail if the file already exists by
-default. The -f flag overrides this.
+specified packages. Within packages, import only looks for JSON
+and YAML files by default (see the "filetypes" help topic for
+more info). This behavior can be overridden by specifying one of
+the following modes:
+
+   Mode       Extensions
+   json       Look for JSON files (.json, .jsonl, .ldjson).
+   yaml       Look for YAML files (.yaml .yml).
+   text       Look for text files (.txt).
+   jsonschema Interpret JSON, YAML or CUE files as JSON Schema.
+   openapi    Interpret JSON, YAML or CUE files as OpenAPI.
+   auto       Look for JSON or YAML files and interpret them as
+              data, JSON Schema, or OpenAPI, depending on
+              existing fields.
+   data       Look for JSON or YAML files and interpret them
+              as data.
+   proto      Convert Protocol buffer definition files and
+              transitive dependencies.
+
+For user-specified files the modes only affect the
+
+auto mode
+
+In auto mode, data files are interpreted based on some marker
+fields. JSON Schema is identified by a top-level "$schema" field
+with a URL of the form "https?://json-schema.org/.*schema#?".
+OpenAPI is identified by the existence of a top-level field
+"openapi", which must have a major semantic version of 3, and
+the info.title and info.version fields.
+
+
+proto mode
+
+Proto mode converts .proto files containing Prototcol Buffer
+definitions to CUE. The -I defines the path for includes. The
+module root is added implicitly if it exists.
+
+The package name for a converted file is derived from the
+go_package option. It can be overridden with the -p flag.
+
+A module root must be specified if a .proto files includes other
+files within the module. Files include from outside the module
+are also imported and stored within the cue.mod directory. The
+import path is defined by either the go_package option or, in the
+absence of this option, the googleapis.com/<proto package>
+convention.
+
+The following command imports all .proto files in all
+subdirectories as well all dependencies.
+
+   cue import proto -I ../include ./...
+
+The module root is implicitly added as an import path.
+
+
+JSON/YAML mode
+
+The -f option allows overwriting of existing files. This only
+applies to files generated for explicitly specified files or
+files contained in explicitly specified packages.
+
+Use the -R option in addition to overwrite files generated for
+transitive dependencies (files written to cue.mod/gen/...).
+
+The -n option is a regexp used to filter file names in the
+matched package directories.
+
+The -I flag is used to specify import paths for proto mode.
+The module root is implicitly added as an import if it exists.
 
 Examples:
 
   # Convert individual files:
-  $ cue import foo.json bar.json  # create foo.yaml and bar.yaml
+  $ cue import foo.json bar.json  # create foo.cue and bar.cue
 
   # Convert all json files in the indicated directories:
-  $ cue import ./... -type=json
+  $ cue import json ./...
 
 The "flags" help topic describes how to assign values to a
 specific path within a CUE namespace. Some examples of that
@@ -182,7 +246,6 @@ Example:
 	addOrphanFlags(cmd.Flags())
 
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
-	cmd.Flags().String(string(flagType), "", "only apply to files of this type")
 	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
@@ -190,22 +253,135 @@ Example:
 	return cmd
 }
 
-const (
-	flagFiles       flagName = "files"
-	flagProtoPath   flagName = "proto_path"
-	flagWithContext flagName = "with-context"
-)
-
 // TODO: factor out rooting of orphaned files.
 
 func runImport(cmd *Command, args []string) (err error) {
-	b, err := parseArgs(cmd, args, &config{
-		loadCfg: &load.Config{DataFiles: true},
-	})
+	c := &config{
+		fileFilter:     `\.(json|yaml|yml|jsonl|ldjson)$`,
+		interpretation: build.Auto,
+		loadCfg:        &load.Config{DataFiles: true},
+	}
+	var mode string
+	if len(args) >= 1 && !strings.ContainsAny(args[0], `/\:.`) {
+		c.interpretation = ""
+		mode = args[0]
+		args = args[1:]
+		switch mode {
+		case "proto":
+			c.fileFilter = `\.proto$`
+		case "json":
+			c.fileFilter = `\.(json|jsonl|ldjson)$`
+		case "yaml":
+			c.fileFilter = `\.(yaml|yml)$`
+		case "text":
+			c.fileFilter = `\.txt$`
+		case "auto", "openapi", "jsonschema":
+			c.interpretation = build.Interpretation(mode)
+		case "data":
+			// default mode for encoding/ no interpretation.
+		default:
+			return errors.Newf(token.NoPos, "unknown mode %q", mode)
+		}
+	}
+
+	b, err := parseArgs(cmd, args, c)
+	exitOnErr(cmd, err, true)
+
+	switch mode {
+	default:
+		err = genericMode(cmd, b)
+	case "proto":
+		err = protoMode(b)
+	}
+
+	exitOnErr(cmd, err, true)
+	return nil
+}
+
+func protoMode(b *buildPlan) error {
+	var prev *build.Instance
+	root := ""
+	module := ""
+	protoFiles := []*build.File{}
+
+	for _, b := range b.insts {
+		hasProto := false
+		for _, f := range b.OrphanedFiles {
+			if f.Encoding == "proto" {
+				protoFiles = append(protoFiles, f)
+				hasProto = true
+			}
+		}
+		if !hasProto {
+			continue
+		}
+
+		// check dirs, all must have same root.
+		switch {
+		case root != "":
+			if b.Root != "" && root != b.Root {
+				return errors.Newf(token.NoPos,
+					"instances must have same root in proto mode; "+
+						"found %q (%s) and %q (%s)",
+					prev.Root, prev.DisplayPath, b.Root, b.DisplayPath)
+			}
+		case b.Root != "":
+			root = b.Root
+			module = b.Module
+			prev = b
+		}
+	}
+
+	c := &protobuf.Config{
+		Root:    root,
+		Module:  module,
+		Paths:   b.encConfig.ProtoPath,
+		PkgName: b.encConfig.PkgName,
+	}
+	if module != "" {
+		// We only allow imports from packages within the module if an actual
+		// module is allowed.
+		c.Paths = append([]string{root}, c.Paths...)
+	}
+	p := protobuf.NewExtractor(c)
+	for _, f := range protoFiles {
+		_ = p.AddFile(f.Filename, f.Source)
+	}
+
+	files, err := p.Files()
 	if err != nil {
 		return err
 	}
 
+	modDir := ""
+	if root != "" {
+		modDir = internal.GenPath(root)
+	}
+
+	for _, f := range files {
+		// Only write the cue.mod files if they don't exist or if -Rf is used.
+		abs := f.Filename
+		if !filepath.IsAbs(abs) {
+			abs = filepath.Join(root, abs)
+		}
+		force := flagForce.Bool(b.cmd)
+		if flagRecursive.Bool(b.cmd) && strings.HasPrefix(abs, modDir) {
+			force = false
+		}
+
+		cueFile, err := getFilename(b, f, root, force)
+		if cueFile == "" {
+			return err
+		}
+		err = writeFile(b, f, cueFile)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
+func genericMode(cmd *Command, b *buildPlan) error {
 	pkgFlag := flagPackage.String(cmd)
 	for _, pkg := range b.insts {
 		pkgName := pkgFlag
@@ -214,7 +390,7 @@ func runImport(cmd *Command, args []string) (err error) {
 		}
 		// TODO: allow if there is a unique package name.
 		if pkgName == "" && len(b.insts) > 1 {
-			err = fmt.Errorf("must specify package name with the -p flag")
+			err := fmt.Errorf("must specify package name with the -p flag")
 			exitOnErr(cmd, err, true)
 		}
 	}
@@ -225,30 +401,46 @@ func runImport(cmd *Command, args []string) (err error) {
 			return err
 		}
 	}
-
-	exitOnErr(cmd, err, true)
 	return nil
 }
 
-func handleFile(b *buildPlan, f *ast.File) (err error) {
+func getFilename(b *buildPlan, f *ast.File, root string, force bool) (filename string, err error) {
 	cueFile := f.Filename
 	if out := flagOutFile.String(b.cmd); out != "" {
 		cueFile = out
 	}
+
 	if cueFile != "-" {
 		switch _, err := os.Stat(cueFile); {
 		case os.IsNotExist(err):
 		case err == nil:
-			if !flagForce.Bool(b.cmd) {
+			if !force {
 				// TODO: mimic old behavior: write to stderr, but do not exit
 				// with error code. Consider what is best to do here.
 				stderr := b.cmd.Command.OutOrStderr()
-				fmt.Fprintf(stderr, "skipping file %q: already exists\n", cueFile)
-				return nil
+				if root != "" {
+					cueFile, _ = filepath.Rel(root, cueFile)
+				}
+				fmt.Fprintf(stderr, "Skipping file %q: already exists.\n", cueFile)
+				if strings.HasPrefix(cueFile, "cue.mod") {
+					fmt.Fprintln(stderr, "Use -Rf to override.")
+				} else {
+					fmt.Fprintln(stderr, "Use -f to override.")
+				}
+				return "", nil
 			}
 		default:
-			return fmt.Errorf("error creating file: %v", err)
+			return "", fmt.Errorf("error creating file: %v", err)
 		}
+	}
+	return cueFile, nil
+}
+
+func handleFile(b *buildPlan, f *ast.File) (err error) {
+	// TODO: fill out root.
+	cueFile, err := getFilename(b, f, "", flagForce.Bool(b.cmd))
+	if cueFile == "" {
+		return err
 	}
 
 	if flagRecursive.Bool(b.cmd) {
@@ -256,19 +448,20 @@ func handleFile(b *buildPlan, f *ast.File) (err error) {
 		h.hoist(f)
 	}
 
-	return writeFile(b.cmd, f, cueFile)
+	return writeFile(b, f, cueFile)
 }
 
-func writeFile(cmd *Command, f *ast.File, cueFile string) error {
+func writeFile(p *buildPlan, f *ast.File, cueFile string) error {
 	b, err := format.Node(f, format.Simplify())
 	if err != nil {
 		return fmt.Errorf("error formatting file: %v", err)
 	}
 
 	if cueFile == "-" {
-		_, err := cmd.OutOrStdout().Write(b)
+		_, err := p.cmd.OutOrStdout().Write(b)
 		return err
 	}
+	_ = os.MkdirAll(filepath.Dir(cueFile), 0755)
 	return ioutil.WriteFile(cueFile, b, 0644)
 }
 

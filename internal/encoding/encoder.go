@@ -107,9 +107,9 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		format := func(name string, n ast.Node) error {
 			if name != "" && cfg.Stream {
 				// TODO: make this relative to DIR
-				fmt.Fprintf(w, "--- %s\n", filepath.Base(name))
+				fmt.Fprintf(w, "// %s\n", filepath.Base(name))
 			} else if useSep {
-				fmt.Println("---")
+				fmt.Println("// ---")
 			}
 			useSep = true
 

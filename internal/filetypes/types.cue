@@ -104,6 +104,20 @@ modes: ouptut: {
 	}
 }
 
+// eval is a legacy mode
+modes: eval: {
+	Default :: {
+		encoding: *"cue" | _
+		...
+	}
+	FileInfo :: x, x = {
+		docs: true | *false
+	}
+	encodings: cue: {
+		*forms.final | _
+	}
+}
+
 modes: def: {
 	Default :: {
 		encoding: *"cue" | _
@@ -155,7 +169,6 @@ file: FileInfo & {
 // tags maps command line tags to file properties.
 tags: {
 	schema: form: "schema"
-	final: form:  "final"
 	graph: form:  "graph"
 	dag: form:    "dag"
 	data: form:   "data"

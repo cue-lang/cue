@@ -31,8 +31,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {}
 deployment: {}
@@ -66,8 +64,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     bartender: {
@@ -167,8 +163,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     breaddispatcher: {
@@ -268,8 +262,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     host: {
@@ -369,8 +361,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     maitred: {
@@ -470,8 +460,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     valeter: {
@@ -571,8 +559,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     waiter: {
@@ -671,8 +657,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     waterdispatcher: {
@@ -772,8 +756,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {}
 deployment: {}
@@ -807,8 +789,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     download: {
@@ -903,8 +883,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     etcd: {
@@ -1080,8 +1058,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     events: {
@@ -1208,8 +1184,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     tasks: {
@@ -1323,8 +1297,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     updater: {
@@ -1430,8 +1402,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     watcher: {
@@ -1541,8 +1511,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {}
 deployment: {}
@@ -1576,8 +1544,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     caller: {
@@ -1714,8 +1680,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     dishwasher: {
@@ -1852,8 +1816,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     expiditer: {
@@ -1981,8 +1943,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     headchef: {
@@ -2110,8 +2070,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     linecook: {
@@ -2239,8 +2197,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     pastrychef: {
@@ -2368,8 +2324,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     souschef: {
@@ -2476,8 +2430,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {}
 deployment: {}
@@ -2511,8 +2463,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {
     alertmanager: {
         kind:       "ConfigMap"
@@ -2665,8 +2615,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     grafana: {
@@ -2793,8 +2741,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     "node-exporter": {
@@ -2929,8 +2875,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {
     prometheus: {
         kind:       "ConfigMap"
@@ -3299,8 +3243,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {}
 deployment: {}
@@ -3334,8 +3276,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {
     authproxy: {
         kind:       "ConfigMap"
@@ -3507,8 +3447,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {}
 service: {
     goget: {
@@ -3615,8 +3553,6 @@ _spec: {
         }
     }
 }
-
-
 configMap: {
     nginx: {
         kind:       "ConfigMap"

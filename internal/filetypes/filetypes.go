@@ -34,12 +34,15 @@ const (
 	Input Mode = iota // The default
 	Export
 	Def
+	Eval
 )
 
 func (m Mode) String() string {
 	switch m {
 	default:
 		return "input"
+	case Eval:
+		return "eval"
 	case Export:
 		return "export"
 	case Def:

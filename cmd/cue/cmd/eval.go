@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"bytes"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -23,6 +22,9 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/internal/filetypes"
 )
 
 // newEvalCmd creates a new eval command
@@ -88,69 +90,91 @@ func runEval(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, nil)
 	exitOnErr(cmd, err, false)
 
-	w := cmd.OutOrStdout()
-	// Always print a trailing newline. format.Node may not write a trailing
-	// newline if the output is single-line expression.
-	writeNode := func(b []byte, err error) {
-		_, _ = w.Write(b)
-		if !bytes.HasSuffix(b, []byte("\n")) {
-			w.Write([]byte{'\n'})
-		}
+	syn := []cue.Option{
+		cue.Final(), // for backwards compatibility
+		cue.Definitions(true),
+		cue.Attributes(flagAttributes.Bool(cmd)),
+		cue.Optional(flagAll.Bool(cmd) || flagOptional.Bool(cmd)),
 	}
+
+	// Keep for legacy reasons. Note that `cue eval` is to be deprecated by
+	// `cue` eventually.
+	opts := []format.Option{
+		format.UseSpaces(4),
+		format.TabIndent(false),
+	}
+	if flagSimplify.Bool(cmd) {
+		opts = append(opts, format.Simplify())
+	}
+	b.encConfig.Format = opts
+
+	f, err := b.out("-", filetypes.Eval)
+	exitOnErr(cmd, err, true)
+
+	e, err := encoding.NewEncoder(f, b.encConfig)
+	exitOnErr(cmd, err, true)
 
 	iter := b.instances()
 	defer iter.close()
 	for i := 0; iter.scan(); i++ {
-		// TODO: use ImportPath or some other sanitized path.
+		id := ""
 		if len(b.insts) > 1 {
-			fmt.Fprintf(w, "\n// %s\n", iter.id())
+			id = iter.id()
 		}
 		v := iter.instance().Value()
 
-		syn := []cue.Option{
-			cue.Final(), // for backwards compatibility
-			cue.Definitions(true),
-			cue.Attributes(flagAttributes.Bool(cmd)),
-			cue.Optional(flagAll.Bool(cmd) || flagOptional.Bool(cmd)),
-		}
 		if flagConcrete.Bool(cmd) {
 			syn = append(syn, cue.Concrete(true))
 		}
 		if flagHidden.Bool(cmd) || flagAll.Bool(cmd) {
 			syn = append(syn, cue.Hidden(true))
 		}
-		opts := []format.Option{
-			format.UseSpaces(4),
-			format.TabIndent(false),
-		}
-		if flagSimplify.Bool(cmd) {
-			opts = append(opts, format.Simplify())
+
+		errHeader := func() {
+			if id != "" {
+				fmt.Fprintf(cmd.OutOrStderr(), "// %s\n", id)
+			}
 		}
 
 		if len(b.expressions) > 1 {
-			fmt.Fprint(w, "// ")
-			writeNode(format.Node(b.expressions[i%len(b.expressions)]))
+			b, _ := format.Node(b.expressions[i%len(b.expressions)])
+			id = string(b)
 		}
 		if err := v.Err(); err != nil {
+			errHeader()
 			return err
 		}
 		if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
 			if err := v.Validate(cue.Concrete(true)); err != nil {
+				errHeader()
 				exitOnErr(cmd, err, false)
 				continue
 			}
 		}
-		writeNode(format.Node(getSyntax(v, syn), opts...))
+
+		f := getSyntax(v, syn)
+		f.Filename = id
+		err := e.EncodeFile(f)
+		if err != nil {
+			errHeader()
+			exitOnErr(cmd, err, false)
+		}
 	}
 	exitOnErr(cmd, iter.err(), true)
 	return nil
 }
 
-func getSyntax(v cue.Value, opts []cue.Option) ast.Node {
+func getSyntax(v cue.Value, opts []cue.Option) *ast.File {
 	n := v.Syntax(opts...)
 	switch x := n.(type) {
+	case *ast.File:
+		return x
 	case *ast.StructLit:
-		n = &ast.File{Decls: x.Elts}
+		return &ast.File{Decls: x.Elts}
+	case ast.Expr:
+		ast.SetRelPos(x, token.NoSpace)
+		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
+	default:
+		panic("unreachable")
 	}
-	return n
 }

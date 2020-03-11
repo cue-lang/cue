@@ -1,8 +1,13 @@
 cue eval -c -a
-cmp stdout eval_conc.out
+cmp stdout eval_conc.cue
 
--- eval_conc.out --
+cue eval --out yaml
+cmp stdout eval_conc.yaml
+
+-- eval_conc.cue --
 message: "Hello World!"
+-- eval_conc.yaml --
+message: Hello World!
 -- cmd_echo.out --
 Hello World!
 

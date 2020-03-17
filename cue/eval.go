@@ -433,22 +433,21 @@ func (x *listComprehension) evalPartial(ctx *context) evaluated {
 }
 
 func (x *structComprehension) evalPartial(ctx *context) evaluated {
-	st := &structLit{baseValue: x.baseValue}
+	var st evaluated = &structLit{baseValue: x.baseValue}
 	err := x.clauses.yield(ctx, func(v evaluated) *bottom {
-		embed := v.evalPartial(ctx).(*structLit)
-		embed, err := embed.expandFields(ctx)
-		if err != nil {
-			return err
+		embed := v.evalPartial(ctx)
+		if st, ok := embed.(*structLit); ok {
+			x, err := st.expandFields(ctx)
+			if err != nil {
+				return err
+			}
+			embed = x
 		}
 		res := binOp(ctx, x, opUnify, st, embed)
-		switch u := res.(type) {
-		case *bottom:
-			return u
-		case *structLit:
-			st = u
-		default:
-			panic("unreachable")
+		if b, ok := res.(*bottom); ok {
+			return b
 		}
+		st = res
 		return nil
 	})
 	if err != nil {

@@ -1163,28 +1163,22 @@ func (x *structLit) expandFields(ctx *context) (st *structLit, err *bottom) {
 
 	switch n.(type) {
 	case *bottom, *top:
-	case *structLit:
+	default:
 		orig := x.comprehensions
 		x.comprehensions = incomplete
 		src := binSrc(x.Pos(), opUnify, x, n)
 		n = binOp(ctx, src, opUnifyUnchecked, x, n)
 		x.comprehensions = orig
-
-	default:
-		return nil, ctx.mkErr(x, n, "cannot embed value %s of type %s in struct", ctx.str(n), n.kind())
 	}
 
 	switch checked.(type) {
 	case *bottom, *top:
-	case *structLit:
+	default:
 		orig := x.comprehensions
 		x.comprehensions = incomplete
 		src := binSrc(x.Pos(), opUnify, n, checked)
 		n = binOp(ctx, src, opUnify, x, checked)
 		x.comprehensions = orig
-
-	default:
-		return nil, ctx.mkErr(x, n, "cannot embed value %s of type %s in struct", ctx.str(n), n.kind())
 	}
 
 	switch v := n.(type) {

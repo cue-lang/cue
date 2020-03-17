@@ -2842,7 +2842,7 @@ func TestFullEval(t *testing.T) {
 		`,
 		out: `<0>{` +
 			`c1: <1>{bar: <2>{baz: 2}, baz: 2}, ` +
-			`c2: _|_(<3>{bar: 1<3>.bar}:cannot embed value 1 of type int in struct)}`,
+			`c2: _|_(conflicting values {bar: 1} and 1 (mismatched types struct and int))}`,
 	}, {
 		desc: "don't bind to string labels",
 		in: `
@@ -2944,6 +2944,24 @@ func TestFullEval(t *testing.T) {
 			}
 			`,
 		out: `<0>{Spec :: <1>C{_vars: <2>C{something: string}, data: <3>C{foo :: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{foo :: <11>C{use: "var-string"}, baz: "\"var-string\"", foobar: "{\"use\":\"var-string\"}"}}}`,
+	}, {
+		desc: "issue312",
+		in: `
+		for x in [1] {
+			*close({}) | { [_]: null }
+		}
+		`,
+		out: `<0>{ <1>for _, x in [1] yield <2>{}, (*close (<3>{}) | <4>{[]: <5>(_: string)->null, })}`,
+	}, {
+		// TODO(eval): note that this behavior is incompatible with allowing
+		// non-struct as emit values. If we ever want to do this, we need to
+		// do it soon.
+		desc: "issue312",
+		in: `
+		y: *1 | {a: 2}
+		for x in [1] { y }
+		`,
+		out: `<0>{y: 1, a: 2}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

@@ -107,7 +107,20 @@ func (g *Generator) All(inst *cue.Instance) (*OrderedMap, error) {
 	return (*OrderedMap)(top), err
 }
 
-func (c *Config) compose(schemas *ast.StructLit) (*ast.StructLit, error) {
+func toCUE(name string, x interface{}) (v ast.Expr, err error) {
+	b, err := json.Marshal(x)
+	if err == nil {
+		v, err = cuejson.Extract(name, b)
+	}
+	if err != nil {
+		return nil, errors.Wrapf(err, token.NoPos,
+			"openapi: could not encode %s", name)
+	}
+	return v, nil
+
+}
+
+func (c *Config) compose(schemas *ast.StructLit) (x *ast.StructLit, err error) {
 	// Support of OrderedMap is mostly for backwards compatibility.
 	var info ast.Expr
 	switch x := c.Info.(type) {
@@ -120,13 +133,9 @@ func (c *Config) compose(schemas *ast.StructLit) (*ast.StructLit, error) {
 	case OrderedMap:
 		info = (*ast.StructLit)(&x)
 	default:
-		b, err := json.Marshal(x)
-		if err == nil {
-			info, err = cuejson.Extract("info", b)
-		}
+		info, err = toCUE("info section", x)
 		if err != nil {
-			return nil, errors.Wrapf(err, token.NoPos,
-				"openapi: could not encode info section")
+			return nil, err
 		}
 	}
 

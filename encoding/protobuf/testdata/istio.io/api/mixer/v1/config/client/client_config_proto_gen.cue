@@ -25,7 +25,7 @@ import (
 )
 
 // Specifies the behavior when the client is unable to connect to Mixer.
-NetworkFailPolicy: {
+NetworkFailPolicy :: {
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	policy?: NetworkFailPolicy_FailPolicy @protobuf(1,type=FailPolicy)
 
@@ -41,15 +41,15 @@ NetworkFailPolicy: {
 }
 
 // Example of single-value enum.
-NetworkFailPolicy_FailPolicy:
+NetworkFailPolicy_FailPolicy ::
 	// If network connection fails, request is allowed and delivered to the
 	// service.
 	"FAIL_OPEN"
 
-NetworkFailPolicy_FailPolicy_value: "FAIL_OPEN": 0
+NetworkFailPolicy_FailPolicy_value :: "FAIL_OPEN": 0
 
 // Defines the per-service client configuration.
-ServiceConfig: {
+ServiceConfig :: {
 	// If true, do not call Mixer Check.
 	disableCheckCalls?: bool @protobuf(1,name=disable_check_calls)
 
@@ -90,7 +90,7 @@ ServiceConfig: {
 }
 
 // Defines the transport config on how to call Mixer.
-TransportConfig: {
+TransportConfig :: {
 	// The flag to disable check cache.
 	disableCheckCache?: bool @protobuf(1,name=disable_check_cache)
 
@@ -135,7 +135,7 @@ TransportConfig: {
 }
 
 // Defines the client config for HTTP.
-HttpClientConfig: {
+HttpClientConfig :: {
 	// The transport config.
 	transport?: TransportConfig @protobuf(1)
 
@@ -161,7 +161,7 @@ HttpClientConfig: {
 }
 
 // Defines the client config for TCP.
-TcpClientConfig: {
+TcpClientConfig :: {
 	// The transport config.
 	transport?: TransportConfig @protobuf(1)
 

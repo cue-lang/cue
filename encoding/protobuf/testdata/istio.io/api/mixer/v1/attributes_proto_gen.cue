@@ -20,7 +20,7 @@ import (
 	"time"
 )
 
-StructWrap: {
+StructWrap :: {
 	struct?: {} @protobuf(1,type=google.protobuf.Struct)
 	any?: _ @protobuf(2,type=google.protobuf.Value)
 	listVal?: [...] @protobuf(3,type=google.protobuf.ListValue)
@@ -46,7 +46,7 @@ StructWrap: {
 // target.service: example
 // ```
 //
-Attributes: {
+Attributes :: {
 	// A map of attribute name to its value.
 	attributes?: {
 		[string]: Attributes_AttributeValue
@@ -54,10 +54,11 @@ Attributes: {
 }
 
 // Specifies one attribute value with different type.
-Attributes_AttributeValue: {
+Attributes_AttributeValue :: {
 }
+
 // The attribute value.
-Attributes_AttributeValue: {
+Attributes_AttributeValue :: {
 	// Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI
 	stringValue: string @protobuf(2,name=string_value)
 } | {
@@ -88,7 +89,7 @@ Attributes_AttributeValue: {
 }
 
 // Defines a string map.
-Attributes_StringMap: {
+Attributes_StringMap :: {
 	// Holds a set of name/value pairs.
 	entries?: {
 		[string]: string
@@ -102,7 +103,7 @@ Attributes_StringMap: {
 // dictionary instead. The message-level dictionary is carried by the
 // `words` field of this message, the deployment-wide dictionary is determined via
 // configuration.
-CompressedAttributes: {
+CompressedAttributes :: {
 	// The message-level dictionary.
 	words?: [...string] @protobuf(1)
 
@@ -151,7 +152,7 @@ _bytes_ = bytes
 
 // A map of string to string. The keys and values in this map are dictionary
 // indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)
-StringMap: {
+StringMap :: {
 	// Holds a set of name/value pairs.
 	entries?: {
 		[string]: int32

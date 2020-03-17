@@ -28,6 +28,34 @@
                         "format": "string"
                      }
                   }
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "exact"
+                           ],
+                           "properties": {
+                              "exact": {
+                                 "type": "string",
+                                 "format": "string"
+                              }
+                           }
+                        },
+                        {
+                           "required": [
+                              "regex"
+                           ],
+                           "properties": {
+                              "regex": {
+                                 "type": "string",
+                                 "format": "string"
+                              }
+                           }
+                        }
+                     ]
+                  }
                }
             ]
          },

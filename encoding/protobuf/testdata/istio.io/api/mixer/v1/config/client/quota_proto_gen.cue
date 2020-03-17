@@ -54,14 +54,14 @@
 package client
 
 // Determines the quotas used for individual requests.
-QuotaSpec: {
+QuotaSpec :: {
 	// A list of Quota rules.
 	rules?: [...QuotaRule] @protobuf(1)
 }
 
 // Specifies a rule with list of matches and list of quotas.
 // If any clause matched, the list of quotas will be used.
-QuotaRule: {
+QuotaRule :: {
 	// If empty, match all request.
 	// If any of match is true, it is matched.
 	match?: [...AttributeMatch] @protobuf(1)
@@ -72,9 +72,9 @@ QuotaRule: {
 
 // Describes how to match a given string in HTTP headers. Match is
 // case-sensitive.
-StringMatch: {
+StringMatch :: {
 }
-StringMatch: {
+StringMatch :: {
 	// exact string match
 	exact: string @protobuf(1)
 } | {
@@ -86,7 +86,7 @@ StringMatch: {
 }
 
 // Specifies a match clause to match Istio attributes
-AttributeMatch: {
+AttributeMatch :: {
 	// Map of attribute names to StringMatch type.
 	// Each map element specifies one condition to match.
 	//
@@ -103,7 +103,7 @@ AttributeMatch: {
 }
 
 // Specifies a quota to use with quota name and amount.
-Quota: {
+Quota :: {
 	// The quota name to charge
 	quota?: string @protobuf(1)
 
@@ -113,7 +113,7 @@ Quota: {
 
 // QuotaSpecBinding defines the binding between QuotaSpecs and one or more
 // IstioService.
-QuotaSpecBinding: {
+QuotaSpecBinding :: {
 	// REQUIRED. One or more services to map the listed QuotaSpec onto.
 	services?: [...IstioService] @protobuf(1)
 
@@ -125,7 +125,7 @@ QuotaSpecBinding: {
 
 // QuotaSpecReference uniquely identifies the QuotaSpec used in the
 // Binding.
-QuotaSpecBinding_QuotaSpecReference: {
+QuotaSpecBinding_QuotaSpecReference :: {
 	// REQUIRED. The short name of the QuotaSpec. This is the resource
 	// name defined by the metadata name field.
 	name?: string @protobuf(1)

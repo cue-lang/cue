@@ -74,12 +74,12 @@ package descriptor
 
 // The protocol compiler can output a FileDescriptorSet containing the .proto
 // files it parses.
-FileDescriptorSet: {
+FileDescriptorSet :: {
 	file?: [...FileDescriptorProto] @protobuf(1)
 }
 
 // Describes a complete .proto file.
-FileDescriptorProto: {
+FileDescriptorProto :: {
 	name?:    string @protobuf(1) // file name, relative to root of source tree
 	package?: string @protobuf(2) // e.g. "foo", "foo.bar", etc.
 
@@ -112,7 +112,7 @@ FileDescriptorProto: {
 }
 
 // Describes a message type.
-DescriptorProto: {
+DescriptorProto :: {
 	name?: string @protobuf(1)
 	field?: [...FieldDescriptorProto] @protobuf(2)
 	extension?: [...FieldDescriptorProto] @protobuf(6)
@@ -128,7 +128,7 @@ DescriptorProto: {
 	reservedName?: [...string] @protobuf(10,name=reserved_name)
 }
 
-DescriptorProto_ExtensionRange: {
+DescriptorProto_ExtensionRange :: {
 	start?:   int32                 @protobuf(1) // Inclusive.
 	end?:     int32                 @protobuf(2) // Exclusive.
 	options?: ExtensionRangeOptions @protobuf(3)
@@ -137,18 +137,18 @@ DescriptorProto_ExtensionRange: {
 // Range of reserved tag numbers. Reserved tag numbers may not be used by
 // fields or extension ranges in the same message. Reserved ranges may
 // not overlap.
-DescriptorProto_ReservedRange: {
+DescriptorProto_ReservedRange :: {
 	start?: int32 @protobuf(1) // Inclusive.
 	end?:   int32 @protobuf(2) // Exclusive.
 }
 
-ExtensionRangeOptions: {
+ExtensionRangeOptions :: {
 	// The parser stores options it doesn't recognize here. See above.
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
 // Describes a field within a message.
-FieldDescriptorProto: {
+FieldDescriptorProto :: {
 	name?:   string                     @protobuf(1)
 	number?: int32                      @protobuf(3)
 	label?:  FieldDescriptorProto_Label @protobuf(4,type=Label)
@@ -186,7 +186,8 @@ FieldDescriptorProto: {
 	jsonName?: string       @protobuf(10,name=json_name)
 	options?:  FieldOptions @protobuf(8)
 }
-FieldDescriptorProto_Type:
+
+FieldDescriptorProto_Type ::
 	"TYPE_DOUBLE" |
 	"TYPE_FLOAT" |
 
@@ -222,7 +223,7 @@ FieldDescriptorProto_Type:
 	// Order is weird for historical reasons.
 	"TYPE_SINT64" // Uses ZigZag encoding.
 
-FieldDescriptorProto_Type_value: {
+FieldDescriptorProto_Type_value :: {
 	"TYPE_DOUBLE":   1
 	"TYPE_FLOAT":    2
 	"TYPE_INT64":    3
@@ -242,26 +243,26 @@ FieldDescriptorProto_Type_value: {
 	"TYPE_SINT32":   17
 	"TYPE_SINT64":   18
 }
-FieldDescriptorProto_Label:
+FieldDescriptorProto_Label ::
 	// 0 is reserved for errors
 	"LABEL_OPTIONAL" |
 	"LABEL_REQUIRED" |
 	"LABEL_REPEATED"
 
-FieldDescriptorProto_Label_value: {
+FieldDescriptorProto_Label_value :: {
 	"LABEL_OPTIONAL": 1
 	"LABEL_REQUIRED": 2
 	"LABEL_REPEATED": 3
 }
 
 // Describes a oneof.
-OneofDescriptorProto: {
+OneofDescriptorProto :: {
 	name?:    string       @protobuf(1)
 	options?: OneofOptions @protobuf(2)
 }
 
 // Describes an enum type.
-EnumDescriptorProto: {
+EnumDescriptorProto :: {
 	name?: string @protobuf(1)
 	value?: [...EnumValueDescriptorProto] @protobuf(2)
 	options?: EnumOptions @protobuf(3)
@@ -282,27 +283,27 @@ EnumDescriptorProto: {
 // Note that this is distinct from DescriptorProto.ReservedRange in that it
 // is inclusive such that it can appropriately represent the entire int32
 // domain.
-EnumDescriptorProto_EnumReservedRange: {
+EnumDescriptorProto_EnumReservedRange :: {
 	start?: int32 @protobuf(1) // Inclusive.
 	end?:   int32 @protobuf(2) // Inclusive.
 }
 
 // Describes a value within an enum.
-EnumValueDescriptorProto: {
+EnumValueDescriptorProto :: {
 	name?:    string           @protobuf(1)
 	number?:  int32            @protobuf(2)
 	options?: EnumValueOptions @protobuf(3)
 }
 
 // Describes a service.
-ServiceDescriptorProto: {
+ServiceDescriptorProto :: {
 	name?: string @protobuf(1)
 	method?: [...MethodDescriptorProto] @protobuf(2)
 	options?: ServiceOptions @protobuf(3)
 }
 
 // Describes a method of a service.
-MethodDescriptorProto: {
+MethodDescriptorProto :: {
 	name?: string @protobuf(1)
 
 	// Input and output type names.  These are resolved in the same way as
@@ -318,7 +319,7 @@ MethodDescriptorProto: {
 	serverStreaming?: bool @protobuf(6,name=server_streaming,"default=false")
 }
 
-FileOptions: {
+FileOptions :: {
 	// Sets the Java package where classes generated from this .proto will be
 	// placed.  By default, the proto package is used, but this is often
 	// inappropriate because proto packages do not normally start with backwards
@@ -422,19 +423,19 @@ FileOptions: {
 }
 
 // Generated classes can be optimized for speed or code size.
-FileOptions_OptimizeMode: "SPEED" | // Generate complete code for parsing, serialization,
+FileOptions_OptimizeMode :: "SPEED" | // Generate complete code for parsing, serialization,
 
 	// etc.
 	"CODE_SIZE" |
 	"LITE_RUNTIME" // Generate code using MessageLite and the lite runtime.
 
-FileOptions_OptimizeMode_value: {
+FileOptions_OptimizeMode_value :: {
 	"SPEED":        1
 	"CODE_SIZE":    2 // Use ReflectionOps to implement these methods.
 	"LITE_RUNTIME": 3
 }
 
-MessageOptions: {
+MessageOptions :: {
 	// Set true to use the old proto1 MessageSet wire format for extensions.
 	// This is provided for backwards-compatibility with the MessageSet wire
 	// format.  You should not use this for any other reason:  It's less
@@ -493,7 +494,7 @@ MessageOptions: {
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
-FieldOptions: {
+FieldOptions :: {
 	// The ctype option instructs the C++ code generator to use a different
 	// representation of the field than it normally would.  See the specific
 	// options below.  This option is not yet implemented in the open source
@@ -562,18 +563,18 @@ FieldOptions: {
 	// The parser stores options it doesn't recognize here. See above.
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
-FieldOptions_CType:
+FieldOptions_CType ::
 	// Default mode.
 	"STRING" |
 	"CORD" |
 	"STRING_PIECE"
 
-FieldOptions_CType_value: {
+FieldOptions_CType_value :: {
 	"STRING":       0
 	"CORD":         1
 	"STRING_PIECE": 2
 }
-FieldOptions_JSType:
+FieldOptions_JSType ::
 	// Use the default type.
 	"JS_NORMAL" |
 
@@ -583,18 +584,18 @@ FieldOptions_JSType:
 	// Use JavaScript numbers.
 	"JS_NUMBER"
 
-FieldOptions_JSType_value: {
+FieldOptions_JSType_value :: {
 	"JS_NORMAL": 0
 	"JS_STRING": 1
 	"JS_NUMBER": 2
 }
 
-OneofOptions: {
+OneofOptions :: {
 	// The parser stores options it doesn't recognize here. See above.
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
-EnumOptions: {
+EnumOptions :: {
 	// Set this option to true to allow mapping different tag names to the same
 	// value.
 	allowAlias?: bool @protobuf(2,name=allow_alias)
@@ -609,7 +610,7 @@ EnumOptions: {
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
-EnumValueOptions: {
+EnumValueOptions :: {
 	// Is this enum value deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the enum value, or it will be completely ignored; in the very least,
@@ -620,7 +621,7 @@ EnumValueOptions: {
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
-ServiceOptions: {
+ServiceOptions :: {
 
 	// Note:  Field numbers 1 through 32 are reserved for Google's internal RPC
 	//   framework.  We apologize for hoarding these numbers to ourselves, but
@@ -637,7 +638,7 @@ ServiceOptions: {
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
-MethodOptions: {
+MethodOptions :: {
 
 	// Note:  Field numbers 1 through 32 are reserved for Google's internal RPC
 	//   framework.  We apologize for hoarding these numbers to ourselves, but
@@ -658,11 +659,11 @@ MethodOptions: {
 // Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 // or neither? HTTP based RPC implementation may choose GET verb for safe
 // methods, and PUT verb for idempotent methods instead of the default POST.
-MethodOptions_IdempotencyLevel: "IDEMPOTENCY_UNKNOWN" |
+MethodOptions_IdempotencyLevel :: "IDEMPOTENCY_UNKNOWN" |
 	"NO_SIDE_EFFECTS" | // implies idempotent
 	"IDEMPOTENT" // idempotent, but may have side effects
 
-MethodOptions_IdempotencyLevel_value: {
+MethodOptions_IdempotencyLevel_value :: {
 	"IDEMPOTENCY_UNKNOWN": 0
 	"NO_SIDE_EFFECTS":     1
 	"IDEMPOTENT":          2
@@ -674,7 +675,7 @@ MethodOptions_IdempotencyLevel_value: {
 // options protos in descriptor objects (e.g. returned by Descriptor::options(),
 // or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
 // in them.
-UninterpretedOption: {
+UninterpretedOption :: {
 	name?: [...UninterpretedOption_NamePart] @protobuf(2,type=NamePart)
 
 	// The value of the uninterpreted option, in whatever type the tokenizer
@@ -692,14 +693,14 @@ UninterpretedOption: {
 // extension (denoted with parentheses in options specs in .proto files).
 // E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
 // "foo.(bar.baz).qux".
-UninterpretedOption_NamePart: {
+UninterpretedOption_NamePart :: {
 	namePart?:    string @protobuf(1,name=name_part)
 	isExtension?: bool   @protobuf(2,name=is_extension)
 }
 
 // Encapsulates information about the original source file from which a
 // FileDescriptorProto was generated.
-SourceCodeInfo: {
+SourceCodeInfo :: {
 	// A Location identifies a piece of source code in a .proto file which
 	// corresponds to a particular definition.  This information is intended
 	// to be useful to IDEs, code indexers, documentation generators, and similar
@@ -746,7 +747,7 @@ SourceCodeInfo: {
 	location?: [...SourceCodeInfo_Location] @protobuf(1,type=Location)
 }
 
-SourceCodeInfo_Location: {
+SourceCodeInfo_Location :: {
 	// Identifies which part of the FileDescriptorProto was defined at this
 	// location.
 	//
@@ -834,13 +835,13 @@ SourceCodeInfo_Location: {
 // Describes the relationship between generated code and its original source
 // file. A GeneratedCodeInfo message is associated with only one generated
 // source file, but may contain references to different source .proto files.
-GeneratedCodeInfo: {
+GeneratedCodeInfo :: {
 	// An Annotation connects some span of text in generated code to an element
 	// of its generating .proto file.
 	annotation?: [...GeneratedCodeInfo_Annotation] @protobuf(1,type=Annotation)
 }
 
-GeneratedCodeInfo_Annotation: {
+GeneratedCodeInfo_Annotation :: {
 	// Identifies the element in the original source .proto file. This field
 	// is formatted the same as SourceCodeInfo.Location.path.
 	path?: [...int32] @protobuf(1,packed)

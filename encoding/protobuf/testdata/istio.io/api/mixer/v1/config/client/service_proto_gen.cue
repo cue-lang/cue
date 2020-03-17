@@ -25,7 +25,7 @@ package client
 // IstioService identifies a service and optionally service version.
 // The FQDN of the service is composed from the name, namespace, and implementation-specific domain suffix
 // (e.g. on Kubernetes, "reviews" + "default" + "svc.cluster.local" -> "reviews.default.svc.cluster.local").
-IstioService: {
+IstioService :: {
 	// The short name of the service such as "foo".
 	name?: string @protobuf(1)
 

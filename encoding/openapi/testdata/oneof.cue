@@ -1,4 +1,4 @@
-MyString :: {
+MyString :: {} | {
 	exact: string
 } | {
 	regex: string

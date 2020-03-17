@@ -492,7 +492,7 @@ func (p *protoConverter) message(v *proto.Message) {
 	if v.Comment == nil {
 		ref.NamePos = newSection
 	}
-	f := &ast.Field{Label: ref, Value: s}
+	f := &ast.Field{Label: ref, Token: token.ISA, Value: s}
 	addComments(f, 1, v.Comment, nil)
 
 	p.file.Decls = append(p.file.Decls, f)
@@ -602,14 +602,14 @@ func (p *protoConverter) enum(x *proto.Enum) {
 	}
 
 	// Top-level enum entry.
-	enum := &ast.Field{Label: name}
+	enum := &ast.Field{Label: name, Token: token.ISA}
 	addComments(enum, 1, x.Comment, nil)
 
 	// Top-level enum values entry.
 	valueName := ast.NewIdent(name.Name + "_value")
 	valueName.NamePos = newSection
 	valueMap := &ast.StructLit{}
-	d := &ast.Field{Label: valueName, Value: valueMap}
+	d := &ast.Field{Label: valueName, Token: token.ISA, Value: valueMap}
 	// addComments(valueMap, 1, x.Comment, nil)
 
 	if strings.Contains(name.Name, "google") {
@@ -682,6 +682,7 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 		// For now we just specify the required fields. This is not correct
 		// but more practical.
 		// Value: &ast.StructLit{}, // Remove to make at least one required.
+		Token: token.ISA,
 	}
 	f.AddComment(comment(x.Comment, true))
 

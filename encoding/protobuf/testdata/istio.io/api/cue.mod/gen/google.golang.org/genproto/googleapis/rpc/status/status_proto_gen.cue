@@ -67,7 +67,7 @@ package status
 //
 // - Logging. If some API errors are stored in logs, the message `Status` could
 //     be used directly after any stripping needed for security/privacy reasons.
-Status: {
+Status :: {
 	// The status code, which should be an enum value of
 	// [google.rpc.Code][google.rpc.Code].
 	code?: int32 @protobuf(1)

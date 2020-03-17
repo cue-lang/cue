@@ -29,6 +29,22 @@
                   "required": [
                      "regex"
                   ]
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "exact"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "regex"
+                           ]
+                        }
+                     ]
+                  }
                }
             ]
          },
@@ -65,6 +81,22 @@
                         "required": [
                            "regex"
                         ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "exact"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "regex"
+                                 ]
+                              }
+                           ]
+                        }
                      }
                   ]
                },
@@ -92,6 +124,22 @@
                            "required": [
                               "regex"
                            ]
+                        },
+                        {
+                           "not": {
+                              "anyOf": [
+                                 {
+                                    "required": [
+                                       "exact"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "regex"
+                                    ]
+                                 }
+                              ]
+                           }
                         }
                      ]
                   }

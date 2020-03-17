@@ -487,24 +487,33 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 		anyOf = append(anyOf, b.kv("enum", ast.NewList(enums...)))
 	}
 
-	hasEmpty := false
+	hasAny := false
 	for _, v := range disjuncts {
 		c := newOASBuilder(b)
 		c.value(v, f)
 		t := c.finish()
 		if len(t.Elts) == 0 {
-			hasEmpty = true
+			if c.typ == "" {
+				hasAny = true
+			}
+			continue
 		}
 		anyOf = append(anyOf, (*ast.StructLit)(t))
 	}
 
 	// If any of the types was "any", a oneOf may be discarded.
-	if !hasEmpty {
-		b.set("oneOf", ast.NewList(anyOf...))
+	if !hasAny {
+		// TODO: analyze CUE structs to figure out if it should be oneOf or
+		// anyOf. More precisely, if non of the elements subsume each other,
+		// it is oneOf, if some do, it is anyOf. For closed structs, the
+		// structure needs to be oneOf(X, not(anyOf(X))).
+		// As the source is protobuf for now, it is always the latter form.
+		b.set("oneOf", ast.NewList(
+			append(anyOf,
+				ast.NewStruct("not",
+					ast.NewStruct("anyOf", ast.NewList(anyOf...))))...))
 	}
 
-	// TODO: analyze CUE structs to figure out if it should be oneOf or
-	// anyOf. As the source is protobuf for now, it is always oneOf.
 	if nullable {
 		b.setSingle("nullable", ast.NewBool(true), true)
 	}

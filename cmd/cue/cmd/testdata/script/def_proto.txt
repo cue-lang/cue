@@ -8,7 +8,7 @@ package api
 import "time"
 
 // Attributes defines attributes.
-Attributes: {
+Attributes :: {
 	// A map of attribute name to its value.
 	attributes?: {
 		[string]: Attributes_AttributeValue
@@ -16,10 +16,11 @@ Attributes: {
 }
 
 // Specifies one attribute value with different type.
-Attributes_AttributeValue: {
+Attributes_AttributeValue :: {
 }
+
 // The attribute value.
-Attributes_AttributeValue: {
+Attributes_AttributeValue :: {
 	stringValue: string @protobuf(2,name=string_value)
 } | {
 	int64Value: int64 @protobuf(3,name=int64_value)
@@ -37,7 +38,7 @@ Attributes_AttributeValue: {
 }
 
 // Defines a string map.
-Attributes_StringMap: {
+Attributes_StringMap :: {
 	// Holds a set of name/value pairs.
 	entries?: {
 		[string]: string

@@ -110,6 +110,52 @@
                            "required": [
                               "stringMapValue"
                            ]
+                        },
+                        {
+                           "not": {
+                              "anyOf": [
+                                 {
+                                    "required": [
+                                       "stringValue"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "int64Value"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "doubleValue"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "boolValue"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "bytesValue"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "timestampValue"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "durationValue"
+                                    ]
+                                 },
+                                 {
+                                    "required": [
+                                       "stringMapValue"
+                                    ]
+                                 }
+                              ]
+                           }
                         }
                      ]
                   }
@@ -211,6 +257,52 @@
                   "required": [
                      "stringMapValue"
                   ]
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "stringValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "int64Value"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "doubleValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "boolValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "bytesValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "timestampValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "durationValue"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "stringMapValue"
+                           ]
+                        }
+                     ]
+                  }
                }
             ]
          },

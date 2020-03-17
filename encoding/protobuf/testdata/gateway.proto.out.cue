@@ -204,7 +204,7 @@
 //
 package v1alpha3
 
-Gateway: {
+Gateway :: {
 	// REQUIRED: A list of server specifications.
 	servers?: [...Server] @protobuf(1)
 
@@ -280,7 +280,7 @@ Gateway: {
 //       serverCertificate: /etc/certs/server.pem
 //       privateKey: /etc/certs/privatekey.pem
 // ```
-Server: {
+Server :: {
 	// REQUIRED: The Port on which the proxy should listen for incoming
 	// connections.
 	port?: Port @protobuf(1)
@@ -330,7 +330,7 @@ Server: {
 	defaultEndpoint?: string @protobuf(5,name=default_endpoint)
 }
 
-Server_TLSOptions: {
+Server_TLSOptions :: {
 	// If set to true, the load balancer will send a 301 redirect for all
 	// http connections, asking the clients to use HTTPS.
 	httpsRedirect?: bool @protobuf(1,name=https_redirect)
@@ -389,7 +389,7 @@ Server_TLSOptions: {
 }
 
 // TLS modes enforced by the proxy
-Server_TLSOptions_TLSmode:
+Server_TLSOptions_TLSmode ::
 	// The SNI string presented by the client will be used as the match
 	// criterion in a VirtualService TLS route to determine the
 	// destination service from the service registry.
@@ -414,7 +414,7 @@ Server_TLSOptions_TLSmode:
 	// source and the destination are using Istio mTLS to secure traffic.
 	"AUTO_PASSTHROUGH"
 
-Server_TLSOptions_TLSmode_value: {
+Server_TLSOptions_TLSmode_value :: {
 	PASSTHROUGH:      0
 	SIMPLE:           1
 	MUTUAL:           2
@@ -422,13 +422,13 @@ Server_TLSOptions_TLSmode_value: {
 }
 
 // TLS protocol versions.
-Server_TLSOptions_TLSProtocol: "TLS_AUTO" | // Automatically choose the optimal TLS version.
+Server_TLSOptions_TLSProtocol :: "TLS_AUTO" | // Automatically choose the optimal TLS version.
 	"TLSV1_0" | // TLS version 1.0
 	"TLSV1_1" | // TLS version 1.1
 	"TLSV1_2" | // TLS version 1.2
 	"TLSV1_3" // TLS version 1.3
 
-Server_TLSOptions_TLSProtocol_value: {
+Server_TLSOptions_TLSProtocol_value :: {
 	TLS_AUTO: 0
 	TLSV1_0:  1
 	TLSV1_1:  2
@@ -437,7 +437,7 @@ Server_TLSOptions_TLSProtocol_value: {
 }
 
 // Port describes the properties of a specific port of a service.
-Port: {
+Port :: {
 	// REQUIRED: A valid non-negative integer port number.
 	number?: uint32 @protobuf(1)
 

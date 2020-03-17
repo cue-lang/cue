@@ -232,7 +232,10 @@ var constraints = []*constraint{
 	}),
 
 	p0("oneOf", func(n cue.Value, s *state) {
-		combineSequence("allOf", n, s, token.OR, s.schema)
+		combineSequence("oneOf", n, s, token.OR, s.schema)
+
+		// TODO: oneOf({a:x}, {b:y}, ..., not(anyOf({a:x}, {b:y}, ...))),
+		// can be translated to {} | {a:x}, {b:y}, ...
 	}),
 
 	// String constraints

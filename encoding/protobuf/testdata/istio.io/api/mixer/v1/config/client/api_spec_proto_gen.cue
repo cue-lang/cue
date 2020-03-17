@@ -71,7 +71,7 @@ import "istio.io/api/mixer/v1"
 //   api_keys:
 //   - query: api-key
 // ```
-HTTPAPISpec: {
+HTTPAPISpec :: {
 	// List of attributes that are generated when *any* of the HTTP
 	// patterns match. This list typically includes the "api.service"
 	// and "api.version" attributes.
@@ -105,7 +105,7 @@ HTTPAPISpec: {
 //   httpMethod: GET
 //   uriTemplate: /foo/bar
 // ```
-HTTPAPISpecPattern: {
+HTTPAPISpecPattern :: {
 	// List of attributes that are generated if the HTTP request matches
 	// the specified http_method and uri_template. This typically
 	// includes the "api.operation" attribute.
@@ -116,7 +116,7 @@ HTTPAPISpecPattern: {
 	// example: GET, HEAD, POST, PUT, DELETE.
 	httpMethod?: string @protobuf(2,name=http_method)
 }
-HTTPAPISpecPattern: {
+HTTPAPISpecPattern :: {
 	// URI template to match against as defined by
 	// [rfc6570](https://tools.ietf.org/html/rfc6570). For example, the
 	// following are valid URI templates:
@@ -144,9 +144,9 @@ HTTPAPISpecPattern: {
 //
 // See [API Keys](https://swagger.io/docs/specification/authentication/api-keys)
 // for a general overview of API keys as defined by OpenAPI.
-APIKey: {
+APIKey :: {
 }
-APIKey: {
+APIKey :: {
 	// API Key is sent as a query parameter. `query` represents the
 	// query string parameter name.
 	//
@@ -189,7 +189,7 @@ APIKey: {
 // - name: foo
 //   namespace: bar
 // ```
-HTTPAPISpecReference: {
+HTTPAPISpecReference :: {
 	// REQUIRED. The short name of the HTTPAPISpec. This is the resource
 	// name defined by the metadata name field.
 	name?: string @protobuf(1)
@@ -217,7 +217,7 @@ HTTPAPISpecReference: {
 //   - name: petstore
 //     namespace: default
 // ```
-HTTPAPISpecBinding: {
+HTTPAPISpecBinding :: {
 	// REQUIRED. One or more services to map the listed HTTPAPISpec onto.
 	services?: [...IstioService] @protobuf(1)
 

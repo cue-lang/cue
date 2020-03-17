@@ -34,6 +34,36 @@
                         "format": "string"
                      }
                   }
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "exact"
+                           ],
+                           "properties": {
+                              "exact": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "string",
+                                 "format": "string"
+                              }
+                           }
+                        },
+                        {
+                           "required": [
+                              "regex"
+                           ],
+                           "properties": {
+                              "regex": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "string",
+                                 "format": "string"
+                              }
+                           }
+                        }
+                     ]
+                  }
                }
             ]
          },

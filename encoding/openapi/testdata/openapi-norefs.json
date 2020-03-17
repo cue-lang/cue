@@ -67,6 +67,22 @@
                   "required": [
                      "b"
                   ]
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "a"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "b"
+                           ]
+                        }
+                     ]
+                  }
                }
             ]
          },
@@ -113,6 +129,22 @@
                   "required": [
                      "b"
                   ]
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "b"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "b"
+                           ]
+                        }
+                     ]
+                  }
                }
             ]
          },
@@ -150,6 +182,22 @@
                         "required": [
                            "b"
                         ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "a"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "b"
+                                 ]
+                              }
+                           ]
+                        }
                      }
                   ]
                },
@@ -164,6 +212,22 @@
                         "required": [
                            "d"
                         ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "c"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "d"
+                                 ]
+                              }
+                           ]
+                        }
                      }
                   ]
                },
@@ -178,6 +242,22 @@
                         "required": [
                            "f"
                         ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "e"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "f"
+                                 ]
+                              }
+                           ]
+                        }
                      }
                   ]
                }
@@ -204,6 +284,22 @@
                   "required": [
                      "a"
                   ]
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "b"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "a"
+                           ]
+                        }
+                     ]
+                  }
                }
             ]
          },
@@ -251,6 +347,23 @@
                   "required": [
                      "port"
                   ]
+               },
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "port",
+                              "obj"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "port"
+                           ]
+                        }
+                     ]
+                  }
                }
             ]
          }

@@ -1,0 +1,5 @@
+! cue export -out x.cue
+cmp stderr expect-stderr
+
+-- expect-stderr --
+no encoding specified for file "ut"

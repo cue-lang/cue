@@ -50,6 +50,7 @@ func TestValueType(t *testing.T) {
 		json           string
 		valid          bool
 		concrete       bool
+		closed         bool
 		// pos            token.Pos
 	}{{ // Not a concrete value.
 		value:          `v: _`,
@@ -152,10 +153,17 @@ func TestValueType(t *testing.T) {
 		incompleteKind: StructKind,
 		concrete:       true,
 	}, {
+		value:          `v: close({})`,
+		kind:           StructKind,
+		incompleteKind: StructKind,
+		concrete:       true,
+		closed:         true,
+	}, {
 		value:          `v: []`,
 		kind:           ListKind,
 		incompleteKind: ListKind,
 		concrete:       true,
+		closed:         true,
 	}, {
 		value:    `v: {a: int, b: [1][a]}.b`,
 		kind:     BottomKind,
@@ -198,6 +206,9 @@ func TestValueType(t *testing.T) {
 			}
 			if got := v.IsConcrete(); got != tc.concrete {
 				t.Errorf("IsConcrete: got %v; want %v", got, tc.concrete)
+			}
+			if got := v.IsClosed(); got != tc.closed {
+				t.Errorf("IsClosed: got %v; want %v", got, tc.closed)
 			}
 		})
 	}

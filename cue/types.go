@@ -984,6 +984,24 @@ func (v Value) Pos() token.Pos {
 
 // TODO: IsFinal: this value can never be changed.
 
+// IsClosed reports whether a list of struct is closed. It reports false when
+// when the value is not a list or struct.
+func (v Value) IsClosed() bool {
+	switch v.Kind() {
+	case StructKind:
+		if st, ok := v.path.val().(*structLit); ok {
+			return st.closeStatus.shouldClose()
+		}
+	case ListKind:
+		if l, ok := v.path.val().(*list); ok {
+			if n, ok := l.len.(*numLit); ok {
+				return n.intValue(v.ctx()) == len(l.elem.arcs)
+			}
+		}
+	}
+	return false
+}
+
 // IsConcrete reports whether the current value is a concrete scalar value
 // (not relying on default values), a terminal error, a list, or a struct.
 // It does not verify that values of lists or structs are concrete themselves.

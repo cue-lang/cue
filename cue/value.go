@@ -397,7 +397,6 @@ func (x *numLit) isInt(ctx *context) bool {
 func (x *numLit) intValue(ctx *context) int {
 	v, err := x.v.Int64()
 	if err != nil {
-		ctx.mkErr(x, "intValue: %v", err)
 		return 0
 	}
 	return int(v)

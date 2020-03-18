@@ -657,14 +657,18 @@ func (b *builder) object(v cue.Value) {
 		properties = &OrderedMap{}
 	}
 
-	for i, _ := v.Fields(cue.Optional(true)); i.Next(); {
+	for i, _ := v.Fields(cue.Optional(true), cue.Definitions(true)); i.Next(); {
 		label := i.Label()
 		var core *builder
 		if b.core != nil {
 			core = b.core.properties[label]
 		}
 		schema := b.schema(core, label, i.Value())
-		if !b.isNonCore() || len(schema.Elts) > 0 {
+		switch {
+		case i.IsDefinition():
+			ref := strings.Join(append(b.ctx.path, label), ".")
+			b.ctx.schemas.Set(ref, schema)
+		case !b.isNonCore() || len(schema.Elts) > 0:
 			properties.Set(label, schema)
 		}
 	}
@@ -1144,7 +1148,7 @@ func (b *buildContext) makeRef(inst *cue.Instance, ref []string) string {
 	} else {
 		a = append(a, ref...)
 	}
-	return path.Join(a...)
+	return strings.Join(a, ".")
 }
 
 func (b *builder) int64(v cue.Value) int64 {

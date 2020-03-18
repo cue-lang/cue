@@ -50,6 +50,10 @@ func TestParseDefinitions(t *testing.T) {
 		"structural.json",
 		resolveRefs,
 	}, {
+		"nested.cue",
+		"nested.json",
+		defaultConfig,
+	}, {
 		"simple.cue",
 		"simple.json",
 		resolveRefs,

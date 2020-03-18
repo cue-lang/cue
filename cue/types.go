@@ -295,6 +295,11 @@ func (i *Iterator) IsOptional() bool {
 	return i.cur.path.arc.optional
 }
 
+// IsDefinition reports if a field is a definition.
+func (i *Iterator) IsDefinition() bool {
+	return i.cur.path.arc.definition
+}
+
 // marshalJSON iterates over the list and generates JSON output. HasNext
 // will return false after this operation.
 func marshalList(l *Iterator) (b []byte, err errors.Error) {

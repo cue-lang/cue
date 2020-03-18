@@ -2962,6 +2962,24 @@ func TestFullEval(t *testing.T) {
 		for x in [1] { y }
 		`,
 		out: `<0>{y: 1, a: 2}`,
+	}, {
+		desc: "issue318",
+		in: `
+		T :: {
+			arg: x: string
+			out1: "\(arg.x) \(arg.y)"
+			out2: "\(arg.y)"
+			vx: arg.x
+			vy: arg.y
+		}
+		`,
+		out: `<0>{` +
+			`T :: <1>C{` +
+			`arg: <2>C{x: string}, ` +
+			`out1: _|_(<3>.arg.y:undefined field "y"), ` +
+			`out2: _|_(<3>.arg.y:undefined field "y"), ` +
+			`vx: string, ` +
+			`vy: _|_(<3>.arg.y:undefined field "y")}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

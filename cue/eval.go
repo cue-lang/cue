@@ -380,6 +380,7 @@ func (x *interpolation) evalPartial(ctx *context) (result evaluated) {
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
 	buf := bytes.Buffer{}
+	var incomplete value
 	for _, v := range x.parts {
 		switch e := ctx.manifest(v).(type) {
 		case *bottom:
@@ -392,9 +393,13 @@ func (x *interpolation) evalPartial(ctx *context) (result evaluated) {
 				return ctx.mkErr(e, "expression in interpolation must evaluate to a number kind or string (found %v)", k)
 			}
 			if !k.isGround() {
-				return ctx.mkErr(e, codeIncomplete, "incomplete")
+				incomplete = v
 			}
 		}
+	}
+	if incomplete != nil {
+		return ctx.mkErr(incomplete, codeIncomplete,
+			"incomplete value %s in interpolation", ctx.str(incomplete))
 	}
 	return &stringLit{x.baseValue, buf.String(), nil}
 }

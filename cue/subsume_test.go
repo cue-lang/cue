@@ -422,6 +422,17 @@ func TestSubsume(t *testing.T) {
 		708: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subFinal},
 		709: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subFinal},
 		710: {subsumes: false, in: `a: {foo: [...string]}, b: {}`, mode: subFinal},
+
+		// Schema values
+		800: {subsumes: true, in: `a: close({}), b: {foo: 1}`, mode: subSchema},
+		// TODO(eval): FIX
+		// 801: {subsumes: true, in: `a: {[string]: int}, b: {foo: 1}`, mode: subSchema},
+		804: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subSchema},
+		805: {subsumes: true, in: `a: close({}), b: {foo?: 1}`, mode: subSchema},
+		806: {subsumes: true, in: `a: close({}), b: close({foo?: 1})`, mode: subSchema},
+		807: {subsumes: true, in: `a: {}, b: close({})`, mode: subSchema},
+		808: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subSchema},
+		809: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subSchema},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)

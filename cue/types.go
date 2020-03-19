@@ -663,11 +663,31 @@ func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
 	return Value{v.idx, &valueData{v.path, i, a}}
 }
 
+func (v Value) makeElem(x value) Value {
+	return Value{v.idx, &valueData{v.path, 0, arc{
+		optional: true,
+		v:        x,
+		cache:    evalValue(v.ctx(), x),
+	}}}
+}
+
 func (v Value) eval(ctx *context) evaluated {
 	if v.path == nil || v.path.cache == nil {
 		panic("undefined value")
 	}
 	return ctx.manifest(v.path.cache)
+}
+
+func evalValue(ctx *context, v value) evaluated {
+	x := v.evalPartial(ctx)
+	if st, ok := x.(*structLit); ok {
+		var err *bottom
+		x, err = st.expandFields(ctx)
+		if err != nil {
+			x = err
+		}
+	}
+	return x
 }
 
 // Eval resolves the references of a value and returns the result.
@@ -676,7 +696,7 @@ func (v Value) Eval() Value {
 	if v.path == nil {
 		return v
 	}
-	return remakeValue(v, v.path.v.evalPartial(v.ctx()))
+	return remakeValue(v, evalValue(v.ctx(), v.path.v))
 }
 
 // Default reports the default value and whether it existed. It returns the
@@ -687,7 +707,7 @@ func (v Value) Default() (Value, bool) {
 	}
 	u := v.path.cache
 	if u == nil {
-		u = v.path.v.evalPartial(v.ctx())
+		u = evalValue(v.ctx(), v.path.v)
 	}
 	x := v.ctx().manifest(u)
 	if x != u {
@@ -1040,9 +1060,9 @@ func (v Value) Elem() (Value, bool) {
 		if t == nil {
 			break
 		}
-		return newValueRoot(ctx, t), true
+		return v.makeElem(t), true
 	case *list:
-		return newValueRoot(ctx, x.typ), true
+		return v.makeElem(x.typ), true
 	}
 	return Value{}, false
 }
@@ -1453,6 +1473,9 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 	if o.final {
 		mode |= subFinal | subChoose
 	}
+	if o.ignoreClosedness {
+		mode |= subSchema
+	}
 	return subsumes(v, w, mode)
 }
 
@@ -1685,6 +1708,7 @@ type options struct {
 	omitAttrs         bool
 	resolveReferences bool
 	final             bool
+	ignoreClosedness  bool // used for comparing APIs
 	docs              bool
 	disallowCycles    bool // implied by concrete
 }
@@ -1702,6 +1726,13 @@ func Final() Option {
 		o.omitDefinitions = true
 		o.omitOptional = true
 		o.omitHidden = true
+	}
+}
+
+// Schema specifies the input is a Schema. Used by Subsume.
+func Schema() Option {
+	return func(o *options) {
+		o.ignoreClosedness = true
 	}
 }
 

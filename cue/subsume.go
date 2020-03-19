@@ -18,6 +18,7 @@ import (
 	"bytes"
 
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // TODO: it probably makes sense to have only two modes left: subsuming a schema
@@ -45,7 +46,11 @@ func subsumes(v, w Value, mode subsumeMode) error {
 		} else {
 			b = ctx.mkErr(src, b, "%v", b)
 		}
-		return w.toErr(b)
+		err := w.toErr(b)
+		if s.inexact {
+			err = internal.DecorateError(internal.ErrInexact, err)
+		}
+		return err
 	}
 	return nil
 }
@@ -53,6 +58,8 @@ func subsumes(v, w Value, mode subsumeMode) error {
 type subsumer struct {
 	ctx  *context
 	mode subsumeMode
+
+	inexact bool // If true, the result could be a false negative.
 
 	// recorded values where an error occurred.
 	gt, lt  evaluated
@@ -71,8 +78,11 @@ const (
 	// TODO: may be unnecessary now subFinal is available.
 	subNoOptional
 
-	// the subsumed value is final
+	// The subsumed value is final.
 	subFinal
+
+	// subSchema is used to compare schema. It should ignore closedness.
+	subSchema
 )
 
 // TODO: improve upon this highly inefficient implementation. There should
@@ -153,6 +163,7 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 		if x.optionals != nil && !ignoreOptional {
 			if s.mode&subFinal == 0 {
 				// TODO: also cross-validate optional fields in the schema case.
+				s.inexact = true
 				return false
 			}
 			for _, b := range o.arcs {
@@ -168,6 +179,7 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 			}
 		}
 		if len(x.comprehensions) > 0 {
+			s.inexact = true
 			return false
 		}
 		if x.emit != nil {
@@ -175,6 +187,9 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				return false
 			}
 		}
+
+		xClosed := x.closeStatus.shouldClose() && s.mode&subSchema == 0
+		oClosed := o.closeStatus.shouldClose() && s.mode&subSchema == 0
 
 		// all arcs in n must exist in v and its values must subsume.
 		for _, a := range x.arcs {
@@ -192,7 +207,7 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				// thus subsumed. Technically, this is even true if a is not
 				// optional, but in that case it means that o is invalid, so
 				// return false regardless
-				if a.optional && (o.closeStatus.shouldClose() || s.mode&subFinal != 0) {
+				if a.optional && (oClosed || s.mode&subFinal != 0) {
 					continue
 				}
 				// If field a is optional and has value top, neither the
@@ -212,8 +227,8 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 			}
 		}
 		// For closed structs, all arcs in b must exist in a.
-		if x.closeStatus.shouldClose() {
-			if !ignoreOptional && !o.closeStatus.shouldClose() && s.mode&subFinal == 0 {
+		if xClosed {
+			if !ignoreOptional && !oClosed && s.mode&subFinal == 0 {
 				return false
 			}
 			ignoreOptional = ignoreOptional || s.mode&subFinal != 0
@@ -422,6 +437,7 @@ func (x *unification) subsumesImpl(s *subsumer, v value) bool {
 					continue outer
 				}
 			}
+			// TODO: should this be marked as inexact?
 			return false
 		}
 		return true
@@ -462,6 +478,7 @@ func (x *disjunction) subsumesImpl(s *subsumer, v value) bool {
 			return true
 		}
 	}
+	// TODO: should this be marked as inexact?
 	return false
 }
 
@@ -488,6 +505,7 @@ func (x *interpolation) subsumesImpl(s *subsumer, v value) bool {
 	switch v := v.(type) {
 	case *stringLit:
 		// Be conservative if not ground.
+		s.inexact = true
 		return false
 
 	case *interpolation:

@@ -27,6 +27,7 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
+	"golang.org/x/xerrors"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -186,4 +187,22 @@ func GenPath(root string) string {
 		}
 	}
 	return filepath.Join(root, "cue.mod", "gen")
+}
+
+var ErrInexact = errors.New("inexact subsumption")
+
+func DecorateError(info error, err errors.Error) errors.Error {
+	return &decorated{cueError: err, info: info}
+}
+
+type cueError = errors.Error
+
+type decorated struct {
+	cueError
+
+	info error
+}
+
+func (e *decorated) Is(err error) bool {
+	return xerrors.Is(e.info, err) || xerrors.Is(e.cueError, err)
 }

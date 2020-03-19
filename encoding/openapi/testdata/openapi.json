@@ -61,37 +61,6 @@
                         "format": "string"
                      }
                   }
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "a"
-                           ],
-                           "properties": {
-                              "a": {
-                                 "description": "Field a.",
-                                 "type": "integer",
-                                 "enum": [
-                                    1
-                                 ]
-                              }
-                           }
-                        },
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "b": {
-                                 "type": "string",
-                                 "format": "string"
-                              }
-                           }
-                        }
-                     ]
-                  }
                }
             ]
          },
@@ -119,16 +88,18 @@
          },
          "YourMessage": {
             "type": "object",
+            "properties": {
+               "a": {
+                  "type": "string",
+                  "format": "string"
+               }
+            },
             "oneOf": [
                {
                   "required": [
                      "b"
                   ],
                   "properties": {
-                     "a": {
-                        "type": "string",
-                        "format": "string"
-                     },
                      "b": {
                         "type": "string",
                         "format": "string"
@@ -140,48 +111,9 @@
                      "b"
                   ],
                   "properties": {
-                     "a": {
-                        "type": "string",
-                        "format": "string"
-                     },
                      "b": {
                         "type": "number"
                      }
-                  }
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "a": {
-                                 "type": "string",
-                                 "format": "string"
-                              },
-                              "b": {
-                                 "type": "string",
-                                 "format": "string"
-                              }
-                           }
-                        },
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "a": {
-                                 "type": "string",
-                                 "format": "string"
-                              },
-                              "b": {
-                                 "type": "number"
-                              }
-                           }
-                        }
-                     ]
                   }
                }
             ]
@@ -210,32 +142,6 @@
                               "type": "number"
                            }
                         }
-                     },
-                     {
-                        "not": {
-                           "anyOf": [
-                              {
-                                 "required": [
-                                    "a"
-                                 ],
-                                 "properties": {
-                                    "a": {
-                                       "type": "number"
-                                    }
-                                 }
-                              },
-                              {
-                                 "required": [
-                                    "b"
-                                 ],
-                                 "properties": {
-                                    "b": {
-                                       "type": "number"
-                                    }
-                                 }
-                              }
-                           ]
-                        }
                      }
                   ]
                },
@@ -260,32 +166,6 @@
                               "type": "number"
                            }
                         }
-                     },
-                     {
-                        "not": {
-                           "anyOf": [
-                              {
-                                 "required": [
-                                    "c"
-                                 ],
-                                 "properties": {
-                                    "c": {
-                                       "type": "number"
-                                    }
-                                 }
-                              },
-                              {
-                                 "required": [
-                                    "d"
-                                 ],
-                                 "properties": {
-                                    "d": {
-                                       "type": "number"
-                                    }
-                                 }
-                              }
-                           ]
-                        }
                      }
                   ]
                },
@@ -309,32 +189,6 @@
                            "f": {
                               "type": "number"
                            }
-                        }
-                     },
-                     {
-                        "not": {
-                           "anyOf": [
-                              {
-                                 "required": [
-                                    "e"
-                                 ],
-                                 "properties": {
-                                    "e": {
-                                       "type": "number"
-                                    }
-                                 }
-                              },
-                              {
-                                 "required": [
-                                    "f"
-                                 ],
-                                 "properties": {
-                                    "f": {
-                                       "type": "number"
-                                    }
-                                 }
-                              }
-                           ]
                         }
                      }
                   ]
@@ -363,33 +217,6 @@
                         "type": "string",
                         "format": "string"
                      }
-                  }
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "b": {
-                                 "type": "number"
-                              }
-                           }
-                        },
-                        {
-                           "required": [
-                              "a"
-                           ],
-                           "properties": {
-                              "a": {
-                                 "type": "string",
-                                 "format": "string"
-                              }
-                           }
-                        }
-                     ]
                   }
                }
             ]
@@ -433,28 +260,6 @@
                            1
                         ]
                      }
-                  }
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "$ref": "#/components/schemas/Port"
-                        },
-                        {
-                           "required": [
-                              "port"
-                           ],
-                           "properties": {
-                              "port": {
-                                 "type": "integer",
-                                 "enum": [
-                                    1
-                                 ]
-                              }
-                           }
-                        }
-                     ]
                   }
                }
             ]

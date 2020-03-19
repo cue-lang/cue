@@ -4,58 +4,126 @@
    "paths": {},
    "components": {
       "schemas": {
-         "MyString": {
+         "T": {
             "type": "object",
-            "oneOf": [
+            "properties": {
+               "shared": {
+                  "type": "integer"
+               },
+               "shared2": {
+                  "type": "integer"
+               }
+            },
+            "allOf": [
                {
                   "required": [
-                     "exact"
+                     "shared"
                   ],
-                  "properties": {
-                     "exact": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
-               },
-               {
-                  "required": [
-                     "regex"
-                  ],
-                  "properties": {
-                     "regex": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "exact"
-                           ],
-                           "properties": {
-                              "exact": {
-                                 "type": "string",
-                                 "format": "string"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "exact"
+                                 ],
+                                 "properties": {
+                                    "exact": {
+                                       "type": "string",
+                                       "format": "string"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "regex"
+                                 ],
+                                 "properties": {
+                                    "regex": {
+                                       "type": "string",
+                                       "format": "string"
+                                    }
+                                 }
                               }
-                           }
-                        },
-                        {
-                           "required": [
-                              "regex"
-                           ],
-                           "properties": {
-                              "regex": {
-                                 "type": "string",
-                                 "format": "string"
-                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "exact"
+                        ],
+                        "properties": {
+                           "exact": {
+                              "type": "string",
+                              "format": "string"
                            }
                         }
-                     ]
-                  }
+                     },
+                     {
+                        "required": [
+                           "regex"
+                        ],
+                        "properties": {
+                           "regex": {
+                              "type": "string",
+                              "format": "string"
+                           }
+                        }
+                     }
+                  ]
+               },
+               {
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "count"
+                                 ],
+                                 "properties": {
+                                    "count": {
+                                       "type": "integer"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "amount"
+                                 ],
+                                 "properties": {
+                                    "amount": {
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "count"
+                        ],
+                        "properties": {
+                           "count": {
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "required": [
+                           "amount"
+                        ],
+                        "properties": {
+                           "amount": {
+                              "type": "integer"
+                           }
+                        }
+                     }
+                  ],
+                  "required": [
+                     "shared2"
+                  ]
                }
             ]
          },
@@ -65,24 +133,261 @@
          "Foo": {
             "type": "object",
             "required": [
+               "count",
                "include",
-               "exclude",
-               "count"
+               "exclude"
             ],
             "properties": {
+               "count": {
+                  "$ref": "#/components/schemas/MyInt"
+               },
                "include": {
-                  "$ref": "#/components/schemas/MyString"
+                  "$ref": "#/components/schemas/T"
                },
                "exclude": {
                   "type": "array",
                   "items": {
-                     "$ref": "#/components/schemas/MyString"
+                     "$ref": "#/components/schemas/T"
                   }
-               },
-               "count": {
-                  "$ref": "#/components/schemas/MyInt"
                }
             }
+         },
+         "Incompatible": {
+            "type": "object",
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra1"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "type": "integer"
+                                    },
+                                    "extra1": {
+                                       "type": "integer"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra2"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "type": "integer"
+                                    },
+                                    "extra2": {
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra1"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "type": "integer"
+                     },
+                     "extra1": {
+                        "type": "integer"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra2"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "type": "integer"
+                     },
+                     "extra2": {
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
+         },
+         "WithMap": {
+            "type": "object",
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "type": "object",
+                              "additionalProperties": {
+                                 "type": "integer"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "type": "object",
+                                       "additionalProperties": {
+                                          "type": "integer"
+                                       }
+                                    },
+                                    "extra": {
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared",
+                           "extra"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "type": "object",
+                              "additionalProperties": {
+                                 "type": "integer"
+                              }
+                           },
+                           "extra": {
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "type": "object",
+                                       "additionalProperties": {
+                                          "type": "integer"
+                                       }
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "type": "string",
+                        "format": "string"
+                     },
+                     "extra": {
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
+         },
+         "Embed": {
+            "type": "object",
+            "properties": {
+               "a": {
+                  "type": "integer"
+               }
+            },
+            "oneOf": [
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "b"
+                           ],
+                           "properties": {
+                              "b": {
+                                 "type": "integer"
+                              }
+                           }
+                        },
+                        {
+                           "required": [
+                              "c"
+                           ],
+                           "properties": {
+                              "c": {
+                                 "type": "integer"
+                              }
+                           }
+                        }
+                     ]
+                  }
+               },
+               {
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "b": {
+                        "type": "integer"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "c"
+                  ],
+                  "properties": {
+                     "c": {
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
          }
       }
    }

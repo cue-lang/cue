@@ -27,6 +27,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
+	"golang.org/x/xerrors"
 )
 
 type buildContext struct {
@@ -339,17 +341,14 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	}
 
 	if count > 0 { // TODO: implement IsAny.
-		// NOTE: Eval is not necessary here. Removing it will yield
-		// different results that also are correct. The difference is that
-		// Eval detects and eliminates impossible combinations at the
-		// expense of having potentially much larger configurations due to
-		// a combinatorial explosion. This rudimentary check picks the least
-		// fo the two extreme forms.
-		if eval := values.Eval(); countNodes(eval) < countNodes(values) {
-			values = eval
+		// TODO: perhaps find optimal representation. For now we assume the
+		// representation as is is already optimized for human consumption.
+		if values.IncompleteKind()&cue.StructKind != cue.StructKind && !isRef {
+			values = values.Eval()
 		}
 
-		for _, v := range appendSplit(nil, cue.AndOp, values) {
+		conjuncts := appendSplit(nil, cue.AndOp, values)
+		for i, v := range conjuncts {
 			switch {
 			case isConcrete(v):
 				b.dispatch(f, v)
@@ -357,15 +356,46 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 					b.set("enum", ast.NewList(b.decode(v)))
 				}
 			default:
-				if a := appendSplit(nil, cue.OrOp, v); len(a) > 1 {
-					b.disjunction(a, f)
-				} else {
+				a := appendSplit(nil, cue.OrOp, v)
+				for i, v := range a {
+					if _, r := v.Reference(); len(r) == 0 {
+						a[i] = v.Eval()
+					}
+				}
+
+				if len(a) > 1 {
+					// Filter disjuncts that cannot unify with other conjuncts,
+					// and thus can never be satisfied.
+					// TODO: there should be generalized simplification logic
+					// in CUE (outside of the usual implicit simplifications).
+					k := 0
+				outer:
+					for _, d := range a {
+						for j, w := range conjuncts {
+							if i == j {
+								continue
+							}
+							if d.Unify(w).Err() != nil {
+								continue outer
+							}
+						}
+						a[k] = d
+						k++
+					}
+					a = a[:k]
+				}
+				switch len(a) {
+				case 0:
+					// Conjunct entirely eliminated.
+				case 1:
 					v = a[0]
 					if err := v.Err(); err != nil {
 						b.failf(v, "openapi: %v", err)
 						return
 					}
 					b.dispatch(f, v)
+				default:
+					b.disjunction(a, f)
 				}
 			}
 		}
@@ -487,36 +517,58 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 		anyOf = append(anyOf, b.kv("enum", ast.NewList(enums...)))
 	}
 
-	hasAny := false
-	for _, v := range disjuncts {
-		c := newOASBuilder(b)
-		c.value(v, f)
-		t := c.finish()
-		if len(t.Elts) == 0 {
-			if c.typ == "" {
-				hasAny = true
-			}
-			continue
-		}
-		anyOf = append(anyOf, (*ast.StructLit)(t))
-	}
-
-	// If any of the types was "any", a oneOf may be discarded.
-	if !hasAny {
-		// TODO: analyze CUE structs to figure out if it should be oneOf or
-		// anyOf. More precisely, if non of the elements subsume each other,
-		// it is oneOf, if some do, it is anyOf. For closed structs, the
-		// structure needs to be oneOf(X, not(anyOf(X))).
-		// As the source is protobuf for now, it is always the latter form.
-		b.set("oneOf", ast.NewList(
-			append(anyOf,
-				ast.NewStruct("not",
-					ast.NewStruct("anyOf", ast.NewList(anyOf...))))...))
-	}
-
 	if nullable {
 		b.setSingle("nullable", ast.NewBool(true), true)
 	}
+
+	schemas := make([]*ast.StructLit, len(disjuncts))
+	for i, v := range disjuncts {
+		c := newOASBuilder(b)
+		c.value(v, f)
+		t := c.finish()
+		schemas[i] = (*ast.StructLit)(t)
+		if len(t.Elts) == 0 {
+			if c.typ == "" {
+				return
+			}
+		}
+	}
+
+	for i, v := range disjuncts {
+		// In OpenAPI schema are open by default. To ensure forward compability,
+		// we do not represent closed structs with additionalProperties: false
+		// (this is discouraged and often disallowed by implementions), but
+		// rather enforce this by ensuring uniqueness of the disjuncts.
+		//
+		// TODO: subsumption may currently give false negatives. We are extra
+		// conservative in these instances.
+		subsumed := []ast.Expr{}
+		for j, w := range disjuncts {
+			if i == j {
+				continue
+			}
+			err := v.Subsume(w, cue.Schema())
+			if err == nil || xerrors.Is(err, internal.ErrInexact) {
+				subsumed = append(subsumed, schemas[j])
+			}
+		}
+
+		t := schemas[i]
+		if len(subsumed) > 0 {
+			// TODO: elide anyOf if there is only one element. This should be
+			// rare if originating from oneOf.
+			exclude := ast.NewStruct("not",
+				ast.NewStruct("anyOf", ast.NewList(subsumed...)))
+			if len(t.Elts) == 0 {
+				t = exclude
+			} else {
+				t = ast.NewStruct("allOf", ast.NewList(t, exclude))
+			}
+		}
+		anyOf = append(anyOf, t)
+	}
+
+	b.set("oneOf", ast.NewList(anyOf...))
 }
 
 func (b *builder) setValueType(v cue.Value) {

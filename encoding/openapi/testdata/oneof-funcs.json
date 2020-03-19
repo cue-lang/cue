@@ -7,63 +7,137 @@
    "paths": {},
    "components": {
       "schemas": {
-         "MYSTRING": {
+         "T": {
             "description": "Randomly picked description from a set of size one.",
             "type": "object",
-            "oneOf": [
+            "properties": {
+               "shared": {
+                  "description": "Randomly picked description from a set of size one.",
+                  "type": "integer"
+               },
+               "shared2": {
+                  "description": "Randomly picked description from a set of size one.",
+                  "type": "integer"
+               }
+            },
+            "allOf": [
                {
                   "required": [
-                     "exact"
+                     "shared"
                   ],
-                  "properties": {
-                     "exact": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
-               },
-               {
-                  "required": [
-                     "regex"
-                  ],
-                  "properties": {
-                     "regex": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "exact"
-                           ],
-                           "properties": {
-                              "exact": {
-                                 "description": "Randomly picked description from a set of size one.",
-                                 "type": "string",
-                                 "format": "string"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "exact"
+                                 ],
+                                 "properties": {
+                                    "exact": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "string",
+                                       "format": "string"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "regex"
+                                 ],
+                                 "properties": {
+                                    "regex": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "string",
+                                       "format": "string"
+                                    }
+                                 }
                               }
-                           }
-                        },
-                        {
-                           "required": [
-                              "regex"
-                           ],
-                           "properties": {
-                              "regex": {
-                                 "description": "Randomly picked description from a set of size one.",
-                                 "type": "string",
-                                 "format": "string"
-                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "exact"
+                        ],
+                        "properties": {
+                           "exact": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "string",
+                              "format": "string"
                            }
                         }
-                     ]
-                  }
+                     },
+                     {
+                        "required": [
+                           "regex"
+                        ],
+                        "properties": {
+                           "regex": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "string",
+                              "format": "string"
+                           }
+                        }
+                     }
+                  ]
+               },
+               {
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "count"
+                                 ],
+                                 "properties": {
+                                    "count": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "amount"
+                                 ],
+                                 "properties": {
+                                    "amount": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "count"
+                        ],
+                        "properties": {
+                           "count": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "required": [
+                           "amount"
+                        ],
+                        "properties": {
+                           "amount": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
+                     }
+                  ],
+                  "required": [
+                     "shared2"
+                  ]
                }
             ]
          },
@@ -75,25 +149,291 @@
             "description": "Randomly picked description from a set of size one.",
             "type": "object",
             "required": [
+               "count",
                "include",
-               "exclude",
-               "count"
+               "exclude"
             ],
             "properties": {
+               "count": {
+                  "$ref": "#/components/schemas/MYINT"
+               },
                "include": {
-                  "$ref": "#/components/schemas/MYSTRING"
+                  "$ref": "#/components/schemas/T"
                },
                "exclude": {
                   "description": "Randomly picked description from a set of size one.",
                   "type": "array",
                   "items": {
-                     "$ref": "#/components/schemas/MYSTRING"
+                     "$ref": "#/components/schemas/T"
                   }
-               },
-               "count": {
-                  "$ref": "#/components/schemas/MYINT"
                }
             }
+         },
+         "INCOMPATIBLE": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra1"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    },
+                                    "extra1": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra2"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    },
+                                    "extra2": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra1"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     },
+                     "extra1": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra2"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     },
+                     "extra2": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
+         },
+         "WITHMAP": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "object",
+                              "additionalProperties": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "integer"
+                              }
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "object",
+                                       "additionalProperties": {
+                                          "description": "Randomly picked description from a set of size one.",
+                                          "type": "integer"
+                                       }
+                                    },
+                                    "extra": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared",
+                           "extra"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "object",
+                              "additionalProperties": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "integer"
+                              }
+                           },
+                           "extra": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "object",
+                                       "additionalProperties": {
+                                          "description": "Randomly picked description from a set of size one.",
+                                          "type": "integer"
+                                       }
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "string",
+                        "format": "string"
+                     },
+                     "extra": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
+         },
+         "EMBED": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "properties": {
+               "a": {
+                  "description": "Randomly picked description from a set of size one.",
+                  "type": "integer"
+               }
+            },
+            "oneOf": [
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "b"
+                           ],
+                           "properties": {
+                              "b": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "integer"
+                              }
+                           }
+                        },
+                        {
+                           "required": [
+                              "c"
+                           ],
+                           "properties": {
+                              "c": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "integer"
+                              }
+                           }
+                        }
+                     ]
+                  }
+               },
+               {
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "b": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "c"
+                  ],
+                  "properties": {
+                     "c": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
          }
       }
    }

@@ -7,9 +7,21 @@
    "paths": {},
    "components": {
       "schemas": {
-         "MyString": {
+         "T": {
             "type": "object",
             "properties": {
+               "shared": {
+                  "type": "integer"
+               },
+               "shared2": {
+                  "type": "integer"
+               },
+               "count": {
+                  "type": "integer"
+               },
+               "amount": {
+                  "type": "integer"
+               },
                "exact": {
                   "type": "string",
                   "format": "string"
@@ -19,69 +31,12 @@
                   "format": "string"
                }
             },
-            "oneOf": [
+            "allOf": [
                {
                   "required": [
-                     "exact"
-                  ]
-               },
-               {
-                  "required": [
-                     "regex"
-                  ]
-               },
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "exact"
-                           ]
-                        },
-                        {
-                           "required": [
-                              "regex"
-                           ]
-                        }
-                     ]
-                  }
-               }
-            ]
-         },
-         "MyInt": {
-            "type": "integer"
-         },
-         "Foo": {
-            "type": "object",
-            "required": [
-               "include",
-               "exclude",
-               "count"
-            ],
-            "properties": {
-               "include": {
-                  "type": "object",
-                  "properties": {
-                     "exact": {
-                        "type": "string",
-                        "format": "string"
-                     },
-                     "regex": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  },
+                     "shared"
+                  ],
                   "oneOf": [
-                     {
-                        "required": [
-                           "exact"
-                        ]
-                     },
-                     {
-                        "required": [
-                           "regex"
-                        ]
-                     },
                      {
                         "not": {
                            "anyOf": [
@@ -97,6 +52,158 @@
                               }
                            ]
                         }
+                     },
+                     {
+                        "required": [
+                           "exact"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "regex"
+                        ]
+                     }
+                  ]
+               },
+               {
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "count"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "amount"
+                                 ]
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "count"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "amount"
+                        ]
+                     }
+                  ],
+                  "required": [
+                     "shared2"
+                  ]
+               }
+            ]
+         },
+         "MyInt": {
+            "type": "integer"
+         },
+         "Foo": {
+            "type": "object",
+            "required": [
+               "count",
+               "include",
+               "exclude"
+            ],
+            "properties": {
+               "count": {
+                  "type": "integer"
+               },
+               "include": {
+                  "type": "object",
+                  "properties": {
+                     "shared": {
+                        "type": "integer"
+                     },
+                     "shared2": {
+                        "type": "integer"
+                     },
+                     "count": {
+                        "type": "integer"
+                     },
+                     "amount": {
+                        "type": "integer"
+                     },
+                     "exact": {
+                        "type": "string",
+                        "format": "string"
+                     },
+                     "regex": {
+                        "type": "string",
+                        "format": "string"
+                     }
+                  },
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ],
+                        "oneOf": [
+                           {
+                              "not": {
+                                 "anyOf": [
+                                    {
+                                       "required": [
+                                          "exact"
+                                       ]
+                                    },
+                                    {
+                                       "required": [
+                                          "regex"
+                                       ]
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "required": [
+                                 "exact"
+                              ]
+                           },
+                           {
+                              "required": [
+                                 "regex"
+                              ]
+                           }
+                        ]
+                     },
+                     {
+                        "oneOf": [
+                           {
+                              "not": {
+                                 "anyOf": [
+                                    {
+                                       "required": [
+                                          "count"
+                                       ]
+                                    },
+                                    {
+                                       "required": [
+                                          "amount"
+                                       ]
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "required": [
+                                 "count"
+                              ]
+                           },
+                           {
+                              "required": [
+                                 "amount"
+                              ]
+                           }
+                        ],
+                        "required": [
+                           "shared2"
+                        ]
                      }
                   ]
                },
@@ -105,6 +212,18 @@
                   "items": {
                      "type": "object",
                      "properties": {
+                        "shared": {
+                           "type": "integer"
+                        },
+                        "shared2": {
+                           "type": "integer"
+                        },
+                        "count": {
+                           "type": "integer"
+                        },
+                        "amount": {
+                           "type": "integer"
+                        },
                         "exact": {
                            "type": "string",
                            "format": "string"
@@ -114,40 +233,239 @@
                            "format": "string"
                         }
                      },
-                     "oneOf": [
+                     "allOf": [
                         {
                            "required": [
-                              "exact"
-                           ]
-                        },
-                        {
-                           "required": [
-                              "regex"
-                           ]
-                        },
-                        {
-                           "not": {
-                              "anyOf": [
-                                 {
-                                    "required": [
-                                       "exact"
-                                    ]
-                                 },
-                                 {
-                                    "required": [
-                                       "regex"
+                              "shared"
+                           ],
+                           "oneOf": [
+                              {
+                                 "not": {
+                                    "anyOf": [
+                                       {
+                                          "required": [
+                                             "exact"
+                                          ]
+                                       },
+                                       {
+                                          "required": [
+                                             "regex"
+                                          ]
+                                       }
                                     ]
                                  }
-                              ]
-                           }
+                              },
+                              {
+                                 "required": [
+                                    "exact"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "regex"
+                                 ]
+                              }
+                           ]
+                        },
+                        {
+                           "oneOf": [
+                              {
+                                 "not": {
+                                    "anyOf": [
+                                       {
+                                          "required": [
+                                             "count"
+                                          ]
+                                       },
+                                       {
+                                          "required": [
+                                             "amount"
+                                          ]
+                                       }
+                                    ]
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "count"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "amount"
+                                 ]
+                              }
+                           ],
+                           "required": [
+                              "shared2"
+                           ]
+                        }
+                     ]
+                  }
+               }
+            }
+         },
+         "Incompatible": {
+            "type": "object",
+            "properties": {
+               "shared": {
+                  "type": "integer"
+               },
+               "extra1": {
+                  "type": "integer"
+               },
+               "extra2": {
+                  "type": "integer"
+               }
+            },
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra1"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra2"
+                                 ]
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra1"
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra2"
+                  ]
+               }
+            ]
+         },
+         "WithMap": {
+            "type": "object",
+            "properties": {
+               "shared": {
+                  "type": "object",
+                  "format": "string",
+                  "additionalProperties": {
+                     "type": "integer"
+                  }
+               },
+               "extra": {
+                  "type": "integer"
+               }
+            },
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra"
+                                 ]
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared",
+                           "extra"
+                        ]
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared"
+                                 ]
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra"
+                  ]
+               }
+            ]
+         },
+         "Embed": {
+            "type": "object",
+            "properties": {
+               "a": {
+                  "type": "integer"
+               },
+               "b": {
+                  "type": "integer"
+               },
+               "c": {
+                  "type": "integer"
+               }
+            },
+            "oneOf": [
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "b"
+                           ]
+                        },
+                        {
+                           "required": [
+                              "c"
+                           ]
                         }
                      ]
                   }
                },
-               "count": {
-                  "type": "integer"
+               {
+                  "required": [
+                     "b"
+                  ]
+               },
+               {
+                  "required": [
+                     "c"
+                  ]
                }
-            }
+            ]
          }
       }
    }

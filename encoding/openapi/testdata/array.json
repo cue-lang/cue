@@ -10,36 +10,13 @@
                "bar": {
                   "type": "array",
                   "items": {
-                     "type": "string",
-                     "enum": [
-                        "1",
-                        "2",
-                        "3"
-                     ],
-                     "default": "1"
+                     "$ref": "#/components/schemas/MyEnum"
                   }
                },
                "foo": {
                   "type": "array",
                   "items": {
-                     "type": "object",
-                     "properties": {
-                        "a": {
-                           "type": "integer"
-                        },
-                        "e": {
-                           "type": "array",
-                           "items": {
-                              "type": "string",
-                              "enum": [
-                                 "1",
-                                 "2",
-                                 "3"
-                              ],
-                              "default": "1"
-                           }
-                        }
-                     }
+                     "$ref": "#/components/schemas/MyStruct"
                   }
                },
                "baz": {

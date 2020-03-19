@@ -484,7 +484,7 @@ func (p *protoConverter) message(v *proto.Message) {
 
 	s := &ast.StructLit{
 		Lbrace: p.toCUEPos(v.Position),
-		// TOOD: set proto file position.
+		// TODO: set proto file position.
 		Rbrace: token.Newline.Pos(),
 	}
 
@@ -677,11 +677,7 @@ func (p *protoConverter) enum(x *proto.Enum) {
 func (p *protoConverter) oneOf(x *proto.Oneof) {
 	f := &ast.Field{
 		Label: p.ref(x.Position),
-		// TODO: Once we have closed structs, a oneOf is represented as a
-		// disjunction of empty structs and closed structs with required fields.
-		// For now we just specify the required fields. This is not correct
-		// but more practical.
-		// Value: &ast.StructLit{}, // Remove to make at least one required.
+		Value: &ast.StructLit{},
 		Token: token.ISA,
 	}
 	f.AddComment(comment(x.Comment, true))

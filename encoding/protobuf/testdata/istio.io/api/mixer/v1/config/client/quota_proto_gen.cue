@@ -74,7 +74,7 @@ QuotaRule :: {
 // case-sensitive.
 StringMatch :: {
 }
-StringMatch :: {
+StringMatch :: {} | {
 	// exact string match
 	exact: string @protobuf(1)
 } | {

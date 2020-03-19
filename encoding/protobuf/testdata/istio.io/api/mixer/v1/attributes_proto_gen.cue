@@ -58,7 +58,7 @@ Attributes_AttributeValue :: {
 }
 
 // The attribute value.
-Attributes_AttributeValue :: {
+Attributes_AttributeValue :: {} | {
 	// Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI
 	stringValue: string @protobuf(2,name=string_value)
 } | {

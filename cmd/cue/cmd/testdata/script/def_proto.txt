@@ -20,7 +20,7 @@ Attributes_AttributeValue :: {
 }
 
 // The attribute value.
-Attributes_AttributeValue :: {
+Attributes_AttributeValue :: {} | {
 	stringValue: string @protobuf(2,name=string_value)
 } | {
 	int64Value: int64 @protobuf(3,name=int64_value)

@@ -116,7 +116,7 @@ HTTPAPISpecPattern :: {
 	// example: GET, HEAD, POST, PUT, DELETE.
 	httpMethod?: string @protobuf(2,name=http_method)
 }
-HTTPAPISpecPattern :: {
+HTTPAPISpecPattern :: {} | {
 	// URI template to match against as defined by
 	// [rfc6570](https://tools.ietf.org/html/rfc6570). For example, the
 	// following are valid URI templates:
@@ -146,7 +146,7 @@ HTTPAPISpecPattern :: {
 // for a general overview of API keys as defined by OpenAPI.
 APIKey :: {
 }
-APIKey :: {
+APIKey :: {} | {
 	// API Key is sent as a query parameter. `query` represents the
 	// query string parameter name.
 	//

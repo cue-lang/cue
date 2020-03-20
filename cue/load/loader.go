@@ -25,7 +25,6 @@ import (
 	"strings"
 	"unicode"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -54,7 +53,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 	// TODO: require packages to be placed before files. At some point this
 	// could be relaxed.
 	i := 0
-	for ; i < len(args) && isPkg(args[i]); i++ {
+	for ; i < len(args) && filetypes.IsPackage(args[i]); i++ {
 	}
 
 	a := []*build.Instance{}
@@ -79,40 +78,6 @@ func Instances(args []string, c *Config) []*build.Instance {
 	}
 
 	return a
-}
-
-func isPkg(s string) bool {
-	if s == "." || s == ".." {
-		return true
-	}
-	if s == "-" {
-		return false
-	}
-
-	// This goes of the assumption that file names may not have a `:` in their
-	// name in cue.
-	// A filename must have an extension or be preceded by a qualifier argument.
-	// So strings of the form foo/bar:baz, where bar is a valid identifier and
-	// absolute package
-	if p := strings.LastIndexByte(s, ':'); p > 0 {
-		if !ast.IsValidIdent(s[p+1:]) {
-			return false
-		}
-		// For a non-pkg, the part before : may only be lowercase and '+'.
-		// In addition, a package necessarily must have a slash of some form.
-		return strings.ContainsAny(s[:p], `/.\`)
-	}
-
-	// Assuming we terminate search for packages once a scoped qualifier is
-	// found, we know that any file without an extension (except maybe '-')
-	// is invalid. We can therefore assume it is a package.
-	// The section may still contain a dot, for instance ./foo/. or ./foo/...
-	return strings.TrimLeft(filepath.Ext(s), ".") == ""
-
-	// NOTE/TODO: we have not needed to check whether it is an absolute package
-	// or whether the package starts with a dot. Potentially we could thus relax
-	// the requirement that packages be dots if it is clear that the package
-	// name will not interfere with command names in all circumstances.
 }
 
 // Mode flags for loadImport and download (in get.go).

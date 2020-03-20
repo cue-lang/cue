@@ -351,34 +351,3 @@ func TestOverlays(t *testing.T) {
 		}
 	}
 }
-
-func TestIsPkg(t *testing.T) {
-	testCases := []struct {
-		in  string
-		out bool
-	}{
-		{".", true},
-		{"..", true},
-		{"../.../foo", true},
-		{".../foo", true},
-		{"./:foo", true},
-		{"foo.bar/foo", true},
-
-		// Not supported yet, but could be and isn't anything else valid.
-		{":foo", true},
-
-		{"foo.bar", false},
-		{"foo:", false},
-		{"foo:bar:baz", false},
-		{"-", false},
-		{"-:foo", false},
-	}
-	for _, tc := range testCases {
-		t.Run(tc.in, func(t *testing.T) {
-			got := isPkg(tc.in)
-			if got != tc.out {
-				t.Errorf("got %v; want %v", got, tc.out)
-			}
-		})
-	}
-}

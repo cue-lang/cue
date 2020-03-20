@@ -45,14 +45,16 @@ import (
 // - space separator syntax
 const syntaxVersion = -1000 + 13
 
-var defaultConfig = &load.Config{
-	Context: build.NewContext(
-		build.ParseFile(func(name string, src interface{}) (*ast.File, error) {
-			return parser.ParseFile(name, src,
-				parser.FromVersion(syntaxVersion),
-				parser.ParseComments,
-			)
-		})),
+var defaultConfig = config{
+	loadCfg: &load.Config{
+		Context: build.NewContext(
+			build.ParseFile(func(name string, src interface{}) (*ast.File, error) {
+				return parser.ParseFile(name, src,
+					parser.FromVersion(syntaxVersion),
+					parser.ParseComments,
+				)
+			})),
+	},
 }
 
 var runtime = &cue.Runtime{}
@@ -121,6 +123,8 @@ func loadFromArgs(cmd *Command, args []string, cfg *load.Config) []*build.Instan
 type buildPlan struct {
 	cmd   *Command
 	insts []*build.Instance
+
+	cfg *config
 
 	// If orphanFiles are mixed with CUE files and/or if placement flags are used,
 	// the instance is also included in insts.
@@ -343,19 +347,27 @@ func (i *expressionIter) instance() *cue.Instance {
 	return ni
 }
 
-func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err error) {
-	if cfg == nil {
-		cfg = defaultConfig
-	}
-	cfg.Stdin = stdin
+type config struct {
+	outMode filetypes.Mode
+	loadCfg *load.Config
+}
 
-	builds := loadFromArgs(cmd, args, cfg)
+func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
+	if cfg == nil {
+		cfg = &defaultConfig
+	}
+	if cfg.loadCfg == nil {
+		cfg.loadCfg = defaultConfig.loadCfg
+	}
+	cfg.loadCfg.Stdin = stdin
+
+	builds := loadFromArgs(cmd, args, cfg.loadCfg)
 	if builds == nil {
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
 	decorateInstances(cmd, flagTags.StringArray(cmd), builds)
 
-	p = &buildPlan{cmd: cmd, forceOrphanProcessing: cfg.DataFiles}
+	p = &buildPlan{cfg: cfg, cmd: cmd, forceOrphanProcessing: cfg.loadCfg.DataFiles}
 
 	if err := p.parseFlags(); err != nil {
 		return nil, err
@@ -428,7 +440,7 @@ func parseArgs(cmd *Command, args []string, cfg *load.Config) (p *buildPlan, err
 	return p, nil
 }
 
-func (b *buildPlan) out(def string, mode filetypes.Mode) (*build.File, error) {
+func (b *buildPlan) out(def string) (*build.File, error) {
 	out := flagOut.String(b.cmd)
 	outFile := flagOutFile.String(b.cmd)
 
@@ -442,7 +454,7 @@ func (b *buildPlan) out(def string, mode filetypes.Mode) (*build.File, error) {
 	if out != "" {
 		outFile = out + ":" + outFile
 	}
-	return filetypes.ParseFile(outFile, mode)
+	return filetypes.ParseFile(outFile, b.cfg.outMode)
 }
 
 func (b *buildPlan) parseFlags() (err error) {
@@ -460,6 +472,7 @@ func (b *buildPlan) parseFlags() (err error) {
 		}
 	}
 	b.encConfig = &encoding.Config{
+		Mode:      b.cfg.outMode,
 		Stdin:     stdin,
 		Stdout:    b.cmd.OutOrStdout(),
 		ProtoPath: flagProtoPath.StringArray(b.cmd),

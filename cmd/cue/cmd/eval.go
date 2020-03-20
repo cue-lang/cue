@@ -87,7 +87,7 @@ const (
 )
 
 func runEval(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, nil)
+	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Eval})
 	exitOnErr(cmd, err, false)
 
 	syn := []cue.Option{
@@ -108,7 +108,7 @@ func runEval(cmd *Command, args []string) error {
 	}
 	b.encConfig.Format = opts
 
-	f, err := b.out("-", filetypes.Eval)
+	f, err := b.out("-")
 	exitOnErr(cmd, err, true)
 
 	e, err := encoding.NewEncoder(f, b.encConfig)

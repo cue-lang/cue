@@ -31,10 +31,10 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			plan, err := parseArgs(cmd, args, &load.Config{
+			plan, err := parseArgs(cmd, args, &config{loadCfg: &load.Config{
 				Tests: true,
 				Tools: true,
-			})
+			}})
 			exitOnErr(cmd, err, false)
 
 			opts := []format.Option{}

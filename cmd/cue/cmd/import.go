@@ -199,7 +199,9 @@ const (
 // TODO: factor out rooting of orphaned files.
 
 func runImport(cmd *Command, args []string) (err error) {
-	b, err := parseArgs(cmd, args, &load.Config{DataFiles: true})
+	b, err := parseArgs(cmd, args, &config{
+		loadCfg: &load.Config{DataFiles: true},
+	})
 	if err != nil {
 		return err
 	}

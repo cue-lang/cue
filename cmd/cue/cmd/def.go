@@ -51,12 +51,10 @@ The --expression flag is used to only print parts of a configuration.
 }
 
 func runDef(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, nil)
+	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Def})
 	exitOnErr(cmd, err, true)
 
-	b.encConfig.Mode = filetypes.Def
-
-	f, err := b.out("-", filetypes.Def)
+	f, err := b.out("-")
 	exitOnErr(cmd, err, true)
 
 	e, err := encoding.NewEncoder(f, b.encConfig)

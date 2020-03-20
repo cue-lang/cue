@@ -104,10 +104,10 @@ yaml    output as YAML
 }
 
 func runExport(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, nil)
+	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Export})
 	exitOnErr(cmd, err, true)
 
-	f, err := b.out("-", filetypes.Export)
+	f, err := b.out("-")
 	exitOnErr(cmd, err, true)
 
 	enc, err := encoding.NewEncoder(f, b.encConfig)

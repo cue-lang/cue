@@ -361,9 +361,9 @@ func resolveFiles(idx *index, p *build.Instance) errors.Error {
 }
 
 func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[string]ast.Node) errors.Error {
-	index := map[string][]*ast.Ident{}
+	unresolved := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
-		index[u.Name] = append(index[u.Name], u)
+		unresolved[u.Name] = append(unresolved[u.Name], u)
 	}
 	fields := map[string]ast.Node{}
 	for _, d := range f.Decls {
@@ -373,7 +373,9 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 			}
 		}
 	}
-	var errUnused errors.Error
+	var errs errors.Error
+
+	specs := []*ast.ImportSpec{}
 
 	for _, spec := range f.Imports {
 		id, err := strconv.Unquote(spec.Path.Value)
@@ -384,34 +386,65 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 		if imp := p.LookupImport(id); imp != nil {
 			name = imp.PkgName
 		} else if _, ok := builtins[id]; !ok {
-			// continue
-			return nodeErrorf(spec, "package %q not found", id)
+			errs = errors.Append(errs,
+				nodeErrorf(spec, "package %q not found", id))
+			continue
 		}
 		if spec.Name != nil {
 			name = spec.Name.Name
 		}
 		if n, ok := fields[name]; ok {
-			return nodeErrorf(spec,
+			errs = errors.Append(errs, nodeErrorf(spec,
 				"%s redeclared as imported package name\n"+
-					"\tprevious declaration at %v", name, lineStr(idx, n))
+					"\tprevious declaration at %v", name, lineStr(idx, n)))
+			continue
 		}
 		fields[name] = spec
 		used := false
-		for _, u := range index[name] {
+		for _, u := range unresolved[name] {
 			used = true
 			u.Node = spec
 		}
 		if !used {
+			specs = append(specs, spec)
+		}
+	}
+
+	// Verify each import is used.
+	if len(specs) > 0 {
+		// Find references to imports. This assumes that identifiers in labels
+		// are not resolved or that such errors are caught elsewhere.
+		ast.Walk(f, nil, func(n ast.Node) {
+			if x, ok := n.(*ast.Ident); ok {
+				// As we also visit labels, most nodes will be nil.
+				if x.Node == nil {
+					return
+				}
+				for i, s := range specs {
+					if s == x.Node {
+						specs[i] = nil
+						return
+					}
+				}
+			}
+		})
+
+		// Add errors for unused imports.
+		for _, spec := range specs {
+			if spec == nil {
+				continue
+			}
 			if spec.Name == nil {
-				errUnused = nodeErrorf(spec,
-					"imported and not used: %s", spec.Path.Value)
+				errs = errors.Append(errs, nodeErrorf(spec,
+					"imported and not used: %s", spec.Path.Value))
 			} else {
-				errUnused = nodeErrorf(spec,
-					"imported and not used: %s as %s", spec.Path.Value, spec.Name)
+				errs = errors.Append(errs, nodeErrorf(spec,
+					"imported and not used: %s as %s", spec.Path.Value, spec.Name))
 			}
 		}
 	}
-	i := 0
+
+	k := 0
 	for _, u := range f.Unresolved {
 		if u.Node != nil {
 			continue
@@ -421,17 +454,14 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 			u.Scope = f
 			continue
 		}
-		f.Unresolved[i] = u
-		i++
+		f.Unresolved[k] = u
+		k++
 	}
-	f.Unresolved = f.Unresolved[:i]
+	f.Unresolved = f.Unresolved[:k]
 	// TODO: also need to resolve types.
 	// if len(f.Unresolved) > 0 {
 	// 	n := f.Unresolved[0]
 	// 	return ctx.mkErr(newBase(n), "unresolved reference %s", n.Name)
 	// }
-	if errUnused != nil {
-		return errUnused
-	}
-	return nil
+	return errs
 }

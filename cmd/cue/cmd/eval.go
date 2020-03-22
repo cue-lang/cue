@@ -88,7 +88,7 @@ const (
 
 func runEval(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Eval})
-	exitOnErr(cmd, err, false)
+	exitOnErr(cmd, err, true)
 
 	syn := []cue.Option{
 		cue.Final(), // for backwards compatibility

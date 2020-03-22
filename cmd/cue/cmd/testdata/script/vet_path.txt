@@ -1,15 +1,18 @@
 ! cue vet -l 'strings.ToLower(kind)' -l name services.jsonl services.cue
 cmp stderr expect-stderr
 -- expect-stderr --
-deployment.Booster.name: invalid value "Booster" (excluded by !~"[A-Z]*"):
+deployment.Booster.name: invalid value "Booster" (excluded by !~"^[A-Z]"):
     ./services.cue:1:29
     ./services.jsonl:3:13
-service.booster.name: invalid value "booster" (excluded by !~"[A-Z]*"):
+service."""
+        Supplement
+        foo
+        """.name: invalid value "Supplement\nfoo" (excluded by !~"^[A-Z]"):
     ./services.cue:2:26
     ./services.jsonl:3:13
 -- services.cue --
-deployment: [string]: name: !~"[A-Z]*"
-service: [string]: name: !~"[A-Z]*"
+deployment: [string]: name: !~"^[A-Z]"
+service: [string]: name: !~"^[A-Z]"
 
 -- services.jsonl --
 {
@@ -23,5 +26,5 @@ service: [string]: name: !~"[A-Z]*"
 }
 {
     "kind": "Service",
-    "name": "supplement\nfoo",
+    "name": "Supplement\nfoo"
 }

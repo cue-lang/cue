@@ -35,7 +35,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 				Tests: true,
 				Tools: true,
 			}})
-			exitOnErr(cmd, err, false)
+			exitOnErr(cmd, err, true)
 
 			opts := []format.Option{}
 			if flagSimplify.Bool(cmd) {

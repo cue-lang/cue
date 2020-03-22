@@ -84,6 +84,9 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 				continue
 			}
 		}
+		if err := d.Err(); err != nil {
+			return false, err
+		}
 
 		if perFile {
 			for i, obj := range objs {
@@ -146,6 +149,9 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 
 	index := newIndex()
 	for i, file := range objs {
+		if i == 0 {
+			astutil.CopyMeta(f, file)
+		}
 		expr, p := toExpr(file)
 
 		var pathElems []ast.Label

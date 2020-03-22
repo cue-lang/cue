@@ -2181,6 +2181,20 @@ func TestReference(t *testing.T) {
 		},
 		src: ["x", "y"]`,
 		want: "v w tx",
+	}, {
+		input: `
+		v: w: x: a
+		a: 1
+		for i in [] {
+		}
+		`,
+		want: "a",
+	}, {
+		input: `
+		v: w: close({x: a})
+		a: 1
+		`,
+		want: "a",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -2199,6 +2213,29 @@ func TestReference(t *testing.T) {
 				}
 			}
 		})
+	}
+}
+
+func TestPathCorrection(t *testing.T) {
+	var r Runtime
+	inst, err := r.Compile("in", `
+	a: b: {
+		c: d: b
+	}
+	`)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, a := inst.Lookup("a", "b", "c", "d").Expr()
+	v := a[0].Lookup("b", "c", "d")
+	gotInst, ref := v.Reference()
+	if gotInst != inst {
+		t.Error("reference not in original instance")
+	}
+	gotPath := strings.Join(ref, ".")
+	wantPath := "a.b"
+	if gotPath != wantPath {
+		t.Errorf("got path %s; want %s", gotPath, wantPath)
 	}
 }
 
@@ -2374,10 +2411,10 @@ func TestExpr(t *testing.T) {
 		input: "v: 2 mod 5",
 		want:  "mod 2 5",
 	}, {
-		input: "v: a.b, a b: 4",
+		input: "v: a.b, a: b: 4",
 		want:  `. <0>.a "b"`,
 	}, {
-		input: `v: a["b"], a b: 3 `,
+		input: `v: a["b"], a: b: 3 `,
 		want:  `[] <0>.a "b"`,
 	}, {
 		input: "v: a[2:5], a: [1, 2, 3, 4, 5]",

@@ -649,10 +649,23 @@ func newChildValue(obj *structValue, i int) Value {
 }
 
 func remakeValue(base Value, v value) Value {
-	path := *base.path
+	p := base.path
+	if n, ok := v.(*nodeRef); ok {
+		if q := locateNode(p, n); q != nil {
+			p = q
+		}
+	}
+	path := *p
 	path.v = v
 	path.cache = v.evalPartial(base.ctx())
 	return Value{base.idx, &path}
+}
+
+func locateNode(p *valueData, n *nodeRef) *valueData {
+	// the parent must exist.
+	for ; p != nil && p.cache != n.node.(value); p = p.parent {
+	}
+	return p
 }
 
 func (v Value) ctx() *context {
@@ -664,10 +677,11 @@ func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
 }
 
 func (v Value) makeElem(x value) Value {
+	v, e := v.evalFull(x)
 	return Value{v.idx, &valueData{v.path, 0, arc{
 		optional: true,
 		v:        x,
-		cache:    evalValue(v.ctx(), x),
+		cache:    e,
 	}}}
 }
 
@@ -678,16 +692,22 @@ func (v Value) eval(ctx *context) evaluated {
 	return ctx.manifest(v.path.cache)
 }
 
-func evalValue(ctx *context, v value) evaluated {
-	x := v.evalPartial(ctx)
+func (v Value) evalFull(u value) (Value, evaluated) {
+	ctx := v.ctx()
+	x := u.evalPartial(ctx)
 	if st, ok := x.(*structLit); ok {
 		var err *bottom
 		x, err = st.expandFields(ctx)
 		if err != nil {
 			x = err
 		}
+		if x != st {
+			p := *v.path
+			p.cache = x
+			v.path = &p
+		}
 	}
-	return x
+	return v, x
 }
 
 // Eval resolves the references of a value and returns the result.
@@ -696,7 +716,7 @@ func (v Value) Eval() Value {
 	if v.path == nil {
 		return v
 	}
-	return remakeValue(v, evalValue(v.ctx(), v.path.v))
+	return remakeValue(v.evalFull(v.path.v))
 }
 
 // Default reports the default value and whether it existed. It returns the
@@ -705,10 +725,7 @@ func (v Value) Default() (Value, bool) {
 	if v.path == nil {
 		return v, false
 	}
-	u := v.path.cache
-	if u == nil {
-		u = evalValue(v.ctx(), v.path.v)
-	}
+	v, u := v.evalFull(v.path.v)
 	x := v.ctx().manifest(u)
 	if x != u {
 		return remakeValue(v, x), true
@@ -1161,14 +1178,8 @@ func (v Value) structValFull(ctx *context) (structValue, *bottom) {
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 	v, _ = v.Default() // TODO: remove?
-	if err := v.checkKind(ctx, structKind); err != nil {
-		return structValue{}, err
-	}
-	obj := v.eval(ctx).(*structLit)
 
-	// TODO: This is expansion appropriate?
-	// TODO: return an incomplete error if there are still expansions remaining.
-	obj, err := obj.expandFields(ctx) // expand comprehensions
+	obj, path, err := v.getStruct()
 	if err != nil {
 		return structValue{}, err
 	}
@@ -1208,35 +1219,42 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 			k++
 		}
 		arcs = arcs[:k]
-		return structValue{ctx, v.path, obj, arcs}, nil
+		return structValue{ctx, path, obj, arcs}, nil
 	}
-	return structValue{ctx, v.path, obj, obj.arcs}, nil
+	return structValue{ctx, path, obj, obj.arcs}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
 func (v Value) Struct() (*Struct, error) {
-	obj, err := v.getStruct()
+	obj, path, err := v.getStruct()
 	if err != nil {
 		return nil, v.toErr(err)
 	}
-	return &Struct{v, obj}, nil
+	return &Struct{Value{v.idx, path}, obj}, nil
 }
 
-func (v Value) getStruct() (*structLit, *bottom) {
+func (v Value) getStruct() (*structLit, *valueData, *bottom) {
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, structKind); err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	obj := v.eval(ctx).(*structLit)
+	orig := v.eval(ctx).(*structLit)
 
 	// TODO: This is expansion appropriate?
-	obj, err := obj.expandFields(ctx)
+	obj, err := orig.expandFields(ctx)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
-	return obj, nil
+	path := v.path
+	if obj != orig {
+		p := *path
+		p.arc.cache = obj
+		path = &p
+	}
+
+	return obj, path, nil
 }
 
 // Struct represents a CUE struct value.
@@ -1605,8 +1623,7 @@ func mkPath(c *context, up *valueData, x value, feature string, d int) (imp *Ins
 
 	case *nodeRef:
 		// the parent must exist.
-		for ; up != nil && up.cache != x.node.(value); up = up.parent {
-		}
+		up = locateNode(up, x)
 		var v value
 		v, a = mkFromRoot(c, up, d+2)
 		if v == nil {

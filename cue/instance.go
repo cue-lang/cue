@@ -54,7 +54,7 @@ func (x *index) addInst(p *Instance) *Instance {
 		panic("struct must not be nil")
 	}
 	p.index = x
-	x.imports[p.rootStruct] = p
+	x.imports[p.rootValue] = p
 	if p.ImportPath != "" {
 		x.importsByPath[p.ImportPath] = p
 	}
@@ -277,12 +277,11 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	return i
 }
 
-// Lookup reports the value at a path starting from the top level struct (not
-// the emitted value). The Exists method of the returned value will report false
-// if the path did not exist. The Err method reports if any error occurred
-// during evaluation. The empty path returns the top-level configuration struct,
-// regardless of whether an emit value was specified.
-// Use LookupDef for definitions or LookupField for any kind of field.
+// Lookup reports the value at a path starting from the top level struct. The
+// Exists method of the returned value will report false if the path did not
+// exist. The Err method reports if any error occurred during evaluation. The
+// empty path returns the top-level configuration struct. Use LookupDef for definitions or LookupField for
+// any kind of field.
 func (inst *Instance) Lookup(path ...string) Value {
 	idx := inst.index
 	ctx := idx.newContext()

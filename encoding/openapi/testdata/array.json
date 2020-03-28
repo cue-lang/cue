@@ -50,13 +50,7 @@
                "e": {
                   "type": "array",
                   "items": {
-                     "type": "string",
-                     "enum": [
-                        "1",
-                        "2",
-                        "3"
-                     ],
-                     "default": "1"
+                     "$ref": "#/components/schemas/MyEnum"
                   }
                }
             }

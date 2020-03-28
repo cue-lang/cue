@@ -954,7 +954,7 @@ a: {
 			`t0: [<3>{a: 8}], ` +
 			`t1: [, ...int], ` +
 			`e0: _|_(([<4>{},<4>{}] & [<5>{}]):conflicting list lengths: conflicting values 2 and 1), ` +
-			`e1: _|_((int & float):conflicting list element types: conflicting values int and float (mismatched types int and float))` +
+			`e1: [, ..._|_((int & float):conflicting values int and float (mismatched types int and float))]` +
 			`}`,
 	}, {
 		// TODO: consider removing list arithmetic altogether. It is no longer

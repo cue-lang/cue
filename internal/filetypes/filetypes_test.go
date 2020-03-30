@@ -42,7 +42,7 @@ func TestFromFile(t *testing.T) {
 	}{{
 		name: "must specify encoding",
 		in:   build.File{},
-		out:  `encoding: non-concrete value string`,
+		out:  `FileInfo.encoding: non-concrete value string`,
 	}, {
 		// Default without any
 		name: "cue",

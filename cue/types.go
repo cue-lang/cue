@@ -648,6 +648,82 @@ func newChildValue(obj *structValue, i int) Value {
 	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
 }
 
+// Dereference reports to the value v refers to if v is a reference or v itself
+// otherwise.
+func Dereference(v Value) Value {
+	if v.path == nil {
+		return v
+	}
+
+	ctx := v.ctx()
+	a, n := appendPath(ctx, make([]label, 0, 3), v.path.v)
+
+	if n == nil {
+		return v
+
+	}
+
+	p := locateNode(v.path, n)
+
+	if p == nil {
+
+		imp := ctx.getImportFromNode(n.node)
+		if imp == nil {
+			// TODO(eval): embedded structs are currently represented at the
+			// same level as the enclosing struct. This means that the parent
+			// of an embedded struct skips the struct in which it is embedded.
+			// Treat embedded structs as "anonymous" fields.
+			// See TestPathCorrection.
+			return v
+		}
+		p = &valueData{arc: arc{v: imp.rootValue, cache: imp.rootStruct}}
+	}
+
+	cached := p.cache
+	if cached != nil {
+		cached = p.v.evalPartial(ctx)
+	}
+	s := cached.(*structLit)
+	for _, f := range a {
+		a := s.lookup(ctx, f)
+		p = &valueData{parent: p, arc: a} // index
+		s, _ = a.cache.(*structLit)
+	}
+
+	v = Value{v.idx, p}
+	return v
+}
+
+func appendPath(ctx *context, a []label, v value) (path []label, n *nodeRef) {
+	switch x := v.(type) {
+	case *selectorExpr:
+		a, n = appendPath(ctx, a, x.x)
+		if n == nil {
+			return nil, nil
+		}
+
+		a = append(a, x.feature)
+
+	case *indexExpr:
+		e := x.index.evalPartial(ctx)
+		s, ok := e.(*stringLit)
+		if !ok {
+			return nil, nil
+		}
+
+		a, n = appendPath(ctx, a, x.x)
+		if n == nil {
+			return nil, nil
+		}
+
+		a = append(a, ctx.label(s.str, false))
+
+	case *nodeRef:
+		n = x
+	}
+	return a, n
+}
+
 func remakeValue(base Value, v value) Value {
 	p := base.path
 	if n, ok := v.(*nodeRef); ok {
@@ -1100,7 +1176,7 @@ func (v Value) Len() Value {
 // Elem returns the value of undefined element types of lists and structs.
 func (v Value) Elem() (Value, bool) {
 	ctx := v.ctx()
-	switch x := v.path.v.(type) {
+	switch x := v.path.cache.(type) {
 	case *structLit:
 		t, _ := x.optionals.constraint(ctx, nil)
 		if t == nil {
@@ -1491,11 +1567,11 @@ func (v Value) Template() func(label string) Value {
 		return nil
 	}
 
-	return func(label string) (v Value) {
+	return func(label string) Value {
 		arg := &stringLit{x.baseValue, label, nil}
 
-		if v, _ := x.optionals.constraint(ctx, arg); v != nil {
-			return newValueRoot(ctx, v)
+		if val, _ := x.optionals.constraint(ctx, arg); val != nil {
+			return remakeValue(v, val)
 		}
 		return v
 	}
@@ -1563,7 +1639,7 @@ func (v Value) Unify(w Value) Value {
 	b := w.path.v
 	src := binSrc(token.NoPos, opUnify, a, b)
 	val := mkBin(ctx, src.Pos(), opUnify, a, b)
-	u := newValueRoot(ctx, val)
+	u := remakeValue(v, val)
 	if err := u.Validate(); err != nil {
 		u = newValueRoot(ctx, ctx.mkErr(src, err))
 	}
@@ -1588,7 +1664,14 @@ func (v Value) Format(state fmt.State, verb rune) {
 		fmt.Fprint(state, "<nil>")
 		return
 	}
-	_, _ = io.WriteString(state, ctx.str(v.path.cache))
+	switch {
+	case state.Flag('#'):
+		_, _ = io.WriteString(state, ctx.str(v.path.v))
+	case state.Flag('+'):
+		_, _ = io.WriteString(state, debugStr(ctx, v.path.v))
+	default:
+		_, _ = io.WriteString(state, ctx.str(v.path.cache))
+	}
 }
 
 func (v Value) instance() *Instance {
@@ -1652,9 +1735,18 @@ func mkPath(c *context, up *valueData, x value, feature string, d int) (imp *Ins
 
 	case *nodeRef:
 		// the parent must exist.
-		up = locateNode(up, x)
 		var v value
-		v, a = mkFromRoot(c, up, d+2)
+		if p := locateNode(up, x); p != nil {
+			v, a = mkFromRoot(c, p, d+2)
+		} else {
+			// Either this references another parent, or it is an embedding.
+			imp = c.getImportFromNode(x.node)
+			if imp != nil {
+				break
+			}
+			// This must be an embedding, go one up.
+			v, a = mkFromRoot(c, up.parent, d+2)
+		}
 		if v == nil {
 			v = x.node
 		}

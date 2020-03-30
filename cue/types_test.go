@@ -2267,25 +2267,194 @@ func TestReference(t *testing.T) {
 }
 
 func TestPathCorrection(t *testing.T) {
-	var r Runtime
-	inst, err := r.Compile("in", `
-	a: b: {
-		c: d: b
-	}
-	`)
-	if err != nil {
-		t.Fatal(err)
-	}
-	_, a := inst.Lookup("a", "b", "c", "d").Expr()
-	v := a[0].Lookup("b", "c", "d")
-	gotInst, ref := v.Reference()
-	if gotInst != inst {
-		t.Error("reference not in original instance")
-	}
-	gotPath := strings.Join(ref, ".")
-	wantPath := "a.b"
-	if gotPath != wantPath {
-		t.Errorf("got path %s; want %s", gotPath, wantPath)
+	testCases := []struct {
+		input  string
+		lookup func(i *Instance) Value
+		want   string
+		skip   bool
+	}{{
+		input: `
+		a: b: {
+			c: d: b
+		}
+		`,
+		lookup: func(i *Instance) Value {
+			_, a := i.Lookup("a", "b", "c", "d").Expr()
+			return a[0].Lookup("b", "c", "d")
+		},
+		want: "a.b",
+	}, {
+		input: `
+		a: {
+			c: 3
+			{x: c}
+		}
+		`,
+		lookup: func(i *Instance) Value {
+			_, a := i.Lookup("a").Expr()
+			return a[1].Lookup("x")
+		},
+		want: "a.c",
+	}, {
+		input: `
+		a: b: [...T]
+		a: b: [...T]
+		T: 1
+		`,
+		lookup: func(i *Instance) Value {
+			v, _ := i.Lookup("a", "b").Elem()
+			_, a := v.Expr()
+			return a[0]
+		},
+		want: "T",
+	}, {
+		input: `
+			a :: {
+				T :: {b: 3}
+				close({}) | close({c: T}) | close({d: string})
+			}
+			`,
+		lookup: func(i *Instance) Value {
+			f, _ := i.LookupField("a")
+			_, a := f.Value.Expr() // &
+			_, a = a[1].Expr()     // |
+			return a[1].Lookup("c")
+		},
+		want: "a.T",
+	}, {
+		input: `
+		package foo
+
+		Struct :: {
+			T :: int
+
+			{b?: T}
+		}`,
+		want: "Struct.T",
+		lookup: func(inst *Instance) Value {
+			// Locate Struct
+			i, _ := inst.Value().Fields(Definitions(true))
+			if !i.Next() {
+				t.Fatal("no fields")
+			}
+			// Locate b
+			i, _ = i.Value().Fields(Definitions(true), Optional(true))
+			if !(i.Next() && i.Next()) {
+				t.Fatal("no fields")
+			}
+			v := i.Value()
+			return v
+		},
+	}, {
+		input: `
+		package foo
+
+		A :: B :: T
+
+		T :: {
+			a: S.U
+			S :: U:: {}
+		}
+		`,
+		want: "T.S.U",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("A")
+			f, _ = f.Value.LookupField("B")
+			v := f.Value
+			v = Dereference(v)
+			v = v.Lookup("a")
+			return v
+		},
+	}, {
+		input: `
+		package foo
+
+		A :: B :: T
+
+		T :: {
+			a: [...S]
+			S :: {}
+		}
+		`,
+		want: "T.S",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("A")
+			f, _ = f.Value.LookupField("B")
+			v := f.Value
+			v = Dereference(v)
+			v, _ = v.Lookup("a").Elem()
+			return v
+		},
+	}, {
+		input: `
+		A :: {
+			b: T
+		}
+
+		T :: {
+			a: S
+			S :: {}
+		}
+		`,
+		want: "T.S",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("A")
+			v := f.Value.Lookup("b")
+			v = Dereference(v)
+			v = v.Lookup("a")
+			return v
+		},
+	}, {
+		// TODO(eval): embedded structs are currently represented at the same
+		// level as the enclosing struct. This means that the parent of an
+		// embedded struct skips the struct in which it is embedded. Treat
+		// embedded structs as "anonymous" fields.
+		// This could perhaps be made fixed with dereferencing as well.
+		skip: true,
+		input: `
+		Tracing :: {
+			T :: { address?: string }
+			S :: { ip?: string }
+
+			close({}) | close({
+				t: T
+			}) | close({
+				s: S
+			})
+		}
+		X :: {}
+		X // Disconnect top-level struct from the one visible by close.
+		`,
+		want: "",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("Tracing")
+			v := f.Value.Eval()
+			_, args := v.Expr()
+			v = args[1].Lookup("t")
+			v = Dereference(v)
+			return v
+		},
+	}}
+	for _, tc := range testCases {
+		if tc.skip {
+			continue
+		}
+		t.Run("", func(t *testing.T) {
+			var r Runtime
+			inst, err := r.Compile("in", tc.input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			v := tc.lookup(inst)
+			gotInst, ref := v.Reference()
+			if gotInst != inst {
+				t.Error("reference not in original instance")
+			}
+			gotPath := strings.Join(ref, ".")
+			if gotPath != tc.want {
+				t.Errorf("got path %s; want %s", gotPath, tc.want)
+			}
+		})
 	}
 }
 

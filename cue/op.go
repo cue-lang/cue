@@ -64,7 +64,10 @@ const (
 )
 
 var opToOp = map[op]Op{
-	opUnify:          AndOp,
+	opUnify: AndOp,
+	// TODO(eval): opUnifyUnchecked is not the same as opUnify and should have its own
+	// category, if needed. More likely opUnifyUnchecked, should be
+	// represented as a separate embedding method.
 	opUnifyUnchecked: AndOp,
 	opDisjunction:    OrOp,
 	opLand:           BooleanAndOp,

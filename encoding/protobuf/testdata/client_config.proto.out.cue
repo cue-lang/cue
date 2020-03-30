@@ -27,8 +27,16 @@ import (
 
 // Specifies the behavior when the client is unable to connect to Mixer.
 NetworkFailPolicy :: {
+	// Example of single-value enum.
+	FailPolicy ::
+		// If network connection fails, request is allowed and delivered to the
+		// service.
+		"FAIL_OPEN"
+
+	FailPolicy_value :: FAIL_OPEN: 0
+
 	// Specifies the behavior when the client is unable to connect to Mixer.
-	policy?: NetworkFailPolicy_FailPolicy @protobuf(1,type=FailPolicy)
+	policy?: FailPolicy @protobuf(1)
 
 	// Max retries on transport error.
 	maxRetry?: uint32 @protobuf(2,name=max_retry)
@@ -40,14 +48,6 @@ NetworkFailPolicy :: {
 	// Max time to wait between retries.
 	maxRetryWait?: time.Duration @protobuf(4,type=google.protobuf.Duration,name=max_retry_wait)
 }
-
-// Example of single-value enum.
-NetworkFailPolicy_FailPolicy ::
-	// If network connection fails, request is allowed and delivered to the
-	// service.
-	"FAIL_OPEN"
-
-NetworkFailPolicy_FailPolicy_value :: FAIL_OPEN: 0
 
 // Defines the per-service client configuration.
 ServiceConfig :: {

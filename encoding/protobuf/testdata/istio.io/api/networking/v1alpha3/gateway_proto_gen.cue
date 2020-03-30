@@ -318,121 +318,121 @@ Server :: {
 	// `DestinationRule`, and `ServiceEntry` configurations for details.
 	hosts?: [...string] @protobuf(2)
 
+	TLSOptions :: {
+		// If set to true, the load balancer will send a 301 redirect for all
+		// http connections, asking the clients to use HTTPS.
+		httpsRedirect?: bool @protobuf(1,name=https_redirect)
+
+		// TLS modes enforced by the proxy
+		TLSmode ::
+			// The SNI string presented by the client will be used as the match
+			// criterion in a VirtualService TLS route to determine the
+			// destination service from the service registry.
+			"PASSTHROUGH" |
+
+			// Secure connections with standard TLS semantics.
+			"SIMPLE" |
+
+			// Secure connections to the upstream using mutual TLS by presenting
+			// client certificates for authentication.
+			"MUTUAL" |
+
+			// Similar to the passthrough mode, except servers with this TLS mode
+			// do not require an associated VirtualService to map from the SNI
+			// value to service in the registry. The destination details such as
+			// the service/subset/port are encoded in the SNI value. The proxy
+			// will forward to the upstream (Envoy) cluster (a group of
+			// endpoints) specified by the SNI value. This server is typically
+			// used to provide connectivity between services in disparate L3
+			// networks that otherwise do not have direct connectivity between
+			// their respective endpoints. Use of this mode assumes that both the
+			// source and the destination are using Istio mTLS to secure traffic.
+			"AUTO_PASSTHROUGH"
+
+		TLSmode_value :: {
+			"PASSTHROUGH":      0
+			"SIMPLE":           1
+			"MUTUAL":           2
+			"AUTO_PASSTHROUGH": 3
+		}
+
+		// Optional: Indicates whether connections to this port should be
+		// secured using TLS. The value of this field determines how TLS is
+		// enforced.
+		mode?: TLSmode @protobuf(2)
+
+		// Extra comment.
+
+		// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file
+		// holding the server-side TLS certificate to use.
+		serverCertificate?: string @protobuf(3,name=server_certificate)
+
+		// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file
+		// holding the server's private key.
+		privateKey?: string @protobuf(4,name=private_key)
+
+		// REQUIRED if mode is `MUTUAL`. The path to a file containing
+		// certificate authority certificates to use in verifying a presented
+		// client side certificate.
+		caCertificates?: string @protobuf(5,name=ca_certificates)
+
+		// The credentialName stands for a unique identifier that can be used
+		// to identify the serverCertificate and the privateKey. The
+		// credentialName appended with suffix "-cacert" is used to identify
+		// the CaCertificates associated with this server. Gateway workloads
+		// capable of fetching credentials from a remote credential store such
+		// as Kubernetes secrets, will be configured to retrieve the
+		// serverCertificate and the privateKey using credentialName, instead
+		// of using the file system paths specified above. If using mutual TLS,
+		// gateway workload instances will retrieve the CaCertificates using
+		// credentialName-cacert. The semantics of the name are platform
+		// dependent.  In Kubernetes, the default Istio supplied credential
+		// server expects the credentialName to match the name of the
+		// Kubernetes secret that holds the server certificate, the private
+		// key, and the CA certificate (if using mutual TLS). Set the
+		// `ISTIO_META_USER_SDS` metadata variable in the gateway's proxy to
+		// enable the dynamic credential fetching feature.
+		credentialName?: string @protobuf(10,name=credential_name)
+
+		// A list of alternate names to verify the subject identity in the
+		// certificate presented by the client.
+		subjectAltNames?: [...string] @protobuf(6,name=subject_alt_names)
+
+		// TLS protocol versions.
+		TLSProtocol :: "TLS_AUTO" | // Automatically choose the optimal TLS version.
+			"TLSV1_0" | // TLS version 1.0
+			"TLSV1_1" | // TLS version 1.1
+			"TLSV1_2" | // TLS version 1.2
+			"TLSV1_3" // TLS version 1.3
+
+		TLSProtocol_value :: {
+			"TLS_AUTO": 0
+			"TLSV1_0":  1
+			"TLSV1_1":  2
+			"TLSV1_2":  3
+			"TLSV1_3":  4
+		}
+
+		// Optional: Minimum TLS protocol version.
+		minProtocolVersion?: TLSProtocol @protobuf(7,name=min_protocol_version)
+
+		// Optional: Maximum TLS protocol version.
+		maxProtocolVersion?: TLSProtocol @protobuf(8,name=max_protocol_version)
+
+		// Optional: If specified, only support the specified cipher list.
+		// Otherwise default to the default cipher list supported by Envoy.
+		cipherSuites?: [...string] @protobuf(9,name=cipher_suites)
+	}
+
 	// Set of TLS related options that govern the server's behavior. Use
 	// these options to control if all http requests should be redirected to
 	// https, and the TLS modes to use.
-	tls?: Server_TLSOptions @protobuf(3,type=TLSOptions)
+	tls?: TLSOptions @protobuf(3)
 
 	// The loopback IP endpoint or Unix domain socket to which traffic should
 	// be forwarded to by default. Format should be `127.0.0.1:PORT` or
 	// `unix:///path/to/socket` or `unix://@foobar` (Linux abstract namespace).
 	defaultEndpoint?: string @protobuf(5,name=default_endpoint)
-}
-
-Server_TLSOptions :: {
-	// If set to true, the load balancer will send a 301 redirect for all
-	// http connections, asking the clients to use HTTPS.
-	httpsRedirect?: bool @protobuf(1,name=https_redirect)
-
-	// Optional: Indicates whether connections to this port should be
-	// secured using TLS. The value of this field determines how TLS is
-	// enforced.
-	mode?: Server_TLSOptions_TLSmode @protobuf(2,type=TLSmode)
-
-	// Extra comment.
-
-	// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file
-	// holding the server-side TLS certificate to use.
-	serverCertificate?: string @protobuf(3,name=server_certificate)
-
-	// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file
-	// holding the server's private key.
-	privateKey?: string @protobuf(4,name=private_key)
-
-	// REQUIRED if mode is `MUTUAL`. The path to a file containing
-	// certificate authority certificates to use in verifying a presented
-	// client side certificate.
-	caCertificates?: string @protobuf(5,name=ca_certificates)
-
-	// The credentialName stands for a unique identifier that can be used
-	// to identify the serverCertificate and the privateKey. The
-	// credentialName appended with suffix "-cacert" is used to identify
-	// the CaCertificates associated with this server. Gateway workloads
-	// capable of fetching credentials from a remote credential store such
-	// as Kubernetes secrets, will be configured to retrieve the
-	// serverCertificate and the privateKey using credentialName, instead
-	// of using the file system paths specified above. If using mutual TLS,
-	// gateway workload instances will retrieve the CaCertificates using
-	// credentialName-cacert. The semantics of the name are platform
-	// dependent.  In Kubernetes, the default Istio supplied credential
-	// server expects the credentialName to match the name of the
-	// Kubernetes secret that holds the server certificate, the private
-	// key, and the CA certificate (if using mutual TLS). Set the
-	// `ISTIO_META_USER_SDS` metadata variable in the gateway's proxy to
-	// enable the dynamic credential fetching feature.
-	credentialName?: string @protobuf(10,name=credential_name)
-
-	// A list of alternate names to verify the subject identity in the
-	// certificate presented by the client.
-	subjectAltNames?: [...string] @protobuf(6,name=subject_alt_names)
-
-	// Optional: Minimum TLS protocol version.
-	minProtocolVersion?: Server_TLSOptions_TLSProtocol @protobuf(7,type=TLSProtocol,name=min_protocol_version)
-
-	// Optional: Maximum TLS protocol version.
-	maxProtocolVersion?: Server_TLSOptions_TLSProtocol @protobuf(8,type=TLSProtocol,name=max_protocol_version)
-
-	// Optional: If specified, only support the specified cipher list.
-	// Otherwise default to the default cipher list supported by Envoy.
-	cipherSuites?: [...string] @protobuf(9,name=cipher_suites)
-}
-
-// TLS modes enforced by the proxy
-Server_TLSOptions_TLSmode ::
-	// The SNI string presented by the client will be used as the match
-	// criterion in a VirtualService TLS route to determine the
-	// destination service from the service registry.
-	"PASSTHROUGH" |
-
-	// Secure connections with standard TLS semantics.
-	"SIMPLE" |
-
-	// Secure connections to the upstream using mutual TLS by presenting
-	// client certificates for authentication.
-	"MUTUAL" |
-
-	// Similar to the passthrough mode, except servers with this TLS mode
-	// do not require an associated VirtualService to map from the SNI
-	// value to service in the registry. The destination details such as
-	// the service/subset/port are encoded in the SNI value. The proxy
-	// will forward to the upstream (Envoy) cluster (a group of
-	// endpoints) specified by the SNI value. This server is typically
-	// used to provide connectivity between services in disparate L3
-	// networks that otherwise do not have direct connectivity between
-	// their respective endpoints. Use of this mode assumes that both the
-	// source and the destination are using Istio mTLS to secure traffic.
-	"AUTO_PASSTHROUGH"
-
-Server_TLSOptions_TLSmode_value :: {
-	"PASSTHROUGH":      0
-	"SIMPLE":           1
-	"MUTUAL":           2
-	"AUTO_PASSTHROUGH": 3
-}
-
-// TLS protocol versions.
-Server_TLSOptions_TLSProtocol :: "TLS_AUTO" | // Automatically choose the optimal TLS version.
-	"TLSV1_0" | // TLS version 1.0
-	"TLSV1_1" | // TLS version 1.1
-	"TLSV1_2" | // TLS version 1.2
-	"TLSV1_3" // TLS version 1.3
-
-Server_TLSOptions_TLSProtocol_value :: {
-	"TLS_AUTO": 0
-	"TLSV1_0":  1
-	"TLSV1_1":  2
-	"TLSV1_2":  3
-	"TLSV1_3":  4
 }
 
 // Port describes the properties of a specific port of a service.

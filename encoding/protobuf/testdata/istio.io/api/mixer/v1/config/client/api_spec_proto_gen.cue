@@ -115,28 +115,28 @@ HTTPAPISpecPattern :: {
 	// [rfc7231](https://tools.ietf.org/html/rfc7231#page-21). For
 	// example: GET, HEAD, POST, PUT, DELETE.
 	httpMethod?: string @protobuf(2,name=http_method)
-}
-HTTPAPISpecPattern :: {} | {
-	// URI template to match against as defined by
-	// [rfc6570](https://tools.ietf.org/html/rfc6570). For example, the
-	// following are valid URI templates:
-	//
-	//     /pets
-	//     /pets/{id}
-	//     /dictionary/{term:1}/{term}
-	//     /search{?q*,lang}
-	//
-	uriTemplate: string @protobuf(3,name=uri_template)
-} | {
-	// EXPERIMENTAL:
-	//
-	// ecmascript style regex-based match as defined by
-	// [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript). For
-	// example,
-	//
-	//     "^/pets/(.*?)?"
-	//
-	regex: string @protobuf(4)
+	close({}) | close({
+		// URI template to match against as defined by
+		// [rfc6570](https://tools.ietf.org/html/rfc6570). For example, the
+		// following are valid URI templates:
+		//
+		//     /pets
+		//     /pets/{id}
+		//     /dictionary/{term:1}/{term}
+		//     /search{?q*,lang}
+		//
+		uriTemplate: string @protobuf(3,name=uri_template)
+	}) | close({
+		// EXPERIMENTAL:
+		//
+		// ecmascript style regex-based match as defined by
+		// [EDCA-262](http://en.cppreference.com/w/cpp/regex/ecmascript). For
+		// example,
+		//
+		//     "^/pets/(.*?)?"
+		//
+		regex: string @protobuf(4)
+	})
 }
 
 // APIKey defines the explicit configuration for generating the
@@ -145,39 +145,39 @@ HTTPAPISpecPattern :: {} | {
 // See [API Keys](https://swagger.io/docs/specification/authentication/api-keys)
 // for a general overview of API keys as defined by OpenAPI.
 APIKey :: {
-}
-APIKey :: {} | {
-	// API Key is sent as a query parameter. `query` represents the
-	// query string parameter name.
-	//
-	// For example, `query=api_key` should be used with the
-	// following request:
-	//
-	//     GET /something?api_key=abcdef12345
-	//
-	query: string @protobuf(1)
-} | {
-	// API key is sent in a request header. `header` represents the
-	// header name.
-	//
-	// For example, `header=X-API-KEY` should be used with the
-	// following request:
-	//
-	//     GET /something HTTP/1.1
-	//     X-API-Key: abcdef12345
-	//
-	header: string @protobuf(2)
-} | {
-	// API key is sent in a
-	// [cookie](https://swagger.io/docs/specification/authentication/cookie-authentication),
-	//
-	// For example, `cookie=X-API-KEY` should be used for the
-	// following request:
-	//
-	//     GET /something HTTP/1.1
-	//     Cookie: X-API-KEY=abcdef12345
-	//
-	cookie: string @protobuf(3)
+	close({}) | close({
+		// API Key is sent as a query parameter. `query` represents the
+		// query string parameter name.
+		//
+		// For example, `query=api_key` should be used with the
+		// following request:
+		//
+		//     GET /something?api_key=abcdef12345
+		//
+		query: string @protobuf(1)
+	}) | close({
+		// API key is sent in a request header. `header` represents the
+		// header name.
+		//
+		// For example, `header=X-API-KEY` should be used with the
+		// following request:
+		//
+		//     GET /something HTTP/1.1
+		//     X-API-Key: abcdef12345
+		//
+		header: string @protobuf(2)
+	}) | close({
+		// API key is sent in a
+		// [cookie](https://swagger.io/docs/specification/authentication/cookie-authentication),
+		//
+		// For example, `cookie=X-API-KEY` should be used for the
+		// following request:
+		//
+		//     GET /something HTTP/1.1
+		//     Cookie: X-API-KEY=abcdef12345
+		//
+		cookie: string @protobuf(3)
+	})
 }
 
 // HTTPAPISpecReference defines a reference to an HTTPAPISpec. This is

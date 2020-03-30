@@ -118,28 +118,28 @@ DescriptorProto :: {
 	extension?: [...FieldDescriptorProto] @protobuf(6)
 	nestedType?: [...DescriptorProto] @protobuf(3,name=nested_type)
 	enumType?: [...EnumDescriptorProto] @protobuf(4,name=enum_type)
-	extensionRange?: [...DescriptorProto_ExtensionRange] @protobuf(5,type=ExtensionRange,name=extension_range)
+
+	ExtensionRange :: {
+		start?:   int32                 @protobuf(1) // Inclusive.
+		end?:     int32                 @protobuf(2) // Exclusive.
+		options?: ExtensionRangeOptions @protobuf(3)
+	}
+	extensionRange?: [...ExtensionRange] @protobuf(5,name=extension_range)
 	oneofDecl?: [...OneofDescriptorProto] @protobuf(8,name=oneof_decl)
 	options?: MessageOptions @protobuf(7)
-	reservedRange?: [...DescriptorProto_ReservedRange] @protobuf(9,type=ReservedRange,name=reserved_range)
+
+	// Range of reserved tag numbers. Reserved tag numbers may not be used by
+	// fields or extension ranges in the same message. Reserved ranges may
+	// not overlap.
+	ReservedRange :: {
+		start?: int32 @protobuf(1) // Inclusive.
+		end?:   int32 @protobuf(2) // Exclusive.
+	}
+	reservedRange?: [...ReservedRange] @protobuf(9,name=reserved_range)
 
 	// Reserved field names, which may not be used by fields in the same message.
 	// A given name may only be reserved once.
 	reservedName?: [...string] @protobuf(10,name=reserved_name)
-}
-
-DescriptorProto_ExtensionRange :: {
-	start?:   int32                 @protobuf(1) // Inclusive.
-	end?:     int32                 @protobuf(2) // Exclusive.
-	options?: ExtensionRangeOptions @protobuf(3)
-}
-
-// Range of reserved tag numbers. Reserved tag numbers may not be used by
-// fields or extension ranges in the same message. Reserved ranges may
-// not overlap.
-DescriptorProto_ReservedRange :: {
-	start?: int32 @protobuf(1) // Inclusive.
-	end?:   int32 @protobuf(2) // Exclusive.
 }
 
 ExtensionRangeOptions :: {
@@ -149,13 +149,80 @@ ExtensionRangeOptions :: {
 
 // Describes a field within a message.
 FieldDescriptorProto :: {
-	name?:   string                     @protobuf(1)
-	number?: int32                      @protobuf(3)
-	label?:  FieldDescriptorProto_Label @protobuf(4,type=Label)
+	Type ::
+		"TYPE_DOUBLE" |
+		"TYPE_FLOAT" |
+
+		// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
+		// negative values are likely.
+		"TYPE_INT64" |
+		"TYPE_UINT64" |
+
+		// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
+		// negative values are likely.
+		"TYPE_INT32" |
+		"TYPE_FIXED64" |
+		"TYPE_FIXED32" |
+		"TYPE_BOOL" |
+		"TYPE_STRING" |
+
+		// Tag-delimited aggregate.
+		// Group type is deprecated and not supported in proto3. However, Proto3
+		// implementations should still be able to parse the group wire format and
+		// treat group fields as unknown fields.
+		"TYPE_GROUP" |
+		"TYPE_MESSAGE" | // Length-delimited aggregate.
+
+		// New in version 2.
+		"TYPE_BYTES" |
+		"TYPE_UINT32" |
+		"TYPE_ENUM" |
+		"TYPE_SFIXED32" |
+		"TYPE_SFIXED64" |
+		"TYPE_SINT32" | // Uses ZigZag encoding.
+
+		// 0 is reserved for errors.
+		// Order is weird for historical reasons.
+		"TYPE_SINT64" // Uses ZigZag encoding.
+
+	Type_value :: {
+		"TYPE_DOUBLE":   1
+		"TYPE_FLOAT":    2
+		"TYPE_INT64":    3
+		"TYPE_UINT64":   4
+		"TYPE_INT32":    5
+		"TYPE_FIXED64":  6
+		"TYPE_FIXED32":  7
+		"TYPE_BOOL":     8
+		"TYPE_STRING":   9
+		"TYPE_GROUP":    10
+		"TYPE_MESSAGE":  11
+		"TYPE_BYTES":    12
+		"TYPE_UINT32":   13
+		"TYPE_ENUM":     14
+		"TYPE_SFIXED32": 15
+		"TYPE_SFIXED64": 16
+		"TYPE_SINT32":   17
+		"TYPE_SINT64":   18
+	}
+	Label ::
+		// 0 is reserved for errors
+		"LABEL_OPTIONAL" |
+		"LABEL_REQUIRED" |
+		"LABEL_REPEATED"
+
+	Label_value :: {
+		"LABEL_OPTIONAL": 1
+		"LABEL_REQUIRED": 2
+		"LABEL_REPEATED": 3
+	}
+	name?:   string @protobuf(1)
+	number?: int32  @protobuf(3)
+	label?:  Label  @protobuf(4)
 
 	// If type_name is set, this need not be set.  If both this and type_name
 	// are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
-	type?: FieldDescriptorProto_Type @protobuf(5,type=Type)
+	type?: Type @protobuf(5)
 
 	// For message and enum types, this is the name of the type.  If the name
 	// starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
@@ -187,74 +254,6 @@ FieldDescriptorProto :: {
 	options?:  FieldOptions @protobuf(8)
 }
 
-FieldDescriptorProto_Type ::
-	"TYPE_DOUBLE" |
-	"TYPE_FLOAT" |
-
-	// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
-	// negative values are likely.
-	"TYPE_INT64" |
-	"TYPE_UINT64" |
-
-	// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
-	// negative values are likely.
-	"TYPE_INT32" |
-	"TYPE_FIXED64" |
-	"TYPE_FIXED32" |
-	"TYPE_BOOL" |
-	"TYPE_STRING" |
-
-	// Tag-delimited aggregate.
-	// Group type is deprecated and not supported in proto3. However, Proto3
-	// implementations should still be able to parse the group wire format and
-	// treat group fields as unknown fields.
-	"TYPE_GROUP" |
-	"TYPE_MESSAGE" | // Length-delimited aggregate.
-
-	// New in version 2.
-	"TYPE_BYTES" |
-	"TYPE_UINT32" |
-	"TYPE_ENUM" |
-	"TYPE_SFIXED32" |
-	"TYPE_SFIXED64" |
-	"TYPE_SINT32" | // Uses ZigZag encoding.
-
-	// 0 is reserved for errors.
-	// Order is weird for historical reasons.
-	"TYPE_SINT64" // Uses ZigZag encoding.
-
-FieldDescriptorProto_Type_value :: {
-	"TYPE_DOUBLE":   1
-	"TYPE_FLOAT":    2
-	"TYPE_INT64":    3
-	"TYPE_UINT64":   4
-	"TYPE_INT32":    5
-	"TYPE_FIXED64":  6
-	"TYPE_FIXED32":  7
-	"TYPE_BOOL":     8
-	"TYPE_STRING":   9
-	"TYPE_GROUP":    10
-	"TYPE_MESSAGE":  11
-	"TYPE_BYTES":    12
-	"TYPE_UINT32":   13
-	"TYPE_ENUM":     14
-	"TYPE_SFIXED32": 15
-	"TYPE_SFIXED64": 16
-	"TYPE_SINT32":   17
-	"TYPE_SINT64":   18
-}
-FieldDescriptorProto_Label ::
-	// 0 is reserved for errors
-	"LABEL_OPTIONAL" |
-	"LABEL_REQUIRED" |
-	"LABEL_REPEATED"
-
-FieldDescriptorProto_Label_value :: {
-	"LABEL_OPTIONAL": 1
-	"LABEL_REQUIRED": 2
-	"LABEL_REPEATED": 3
-}
-
 // Describes a oneof.
 OneofDescriptorProto :: {
 	name?:    string       @protobuf(1)
@@ -267,25 +266,25 @@ EnumDescriptorProto :: {
 	value?: [...EnumValueDescriptorProto] @protobuf(2)
 	options?: EnumOptions @protobuf(3)
 
+	// Range of reserved numeric values. Reserved values may not be used by
+	// entries in the same enum. Reserved ranges may not overlap.
+	//
+	// Note that this is distinct from DescriptorProto.ReservedRange in that it
+	// is inclusive such that it can appropriately represent the entire int32
+	// domain.
+	EnumReservedRange :: {
+		start?: int32 @protobuf(1) // Inclusive.
+		end?:   int32 @protobuf(2) // Inclusive.
+	}
+
 	// Range of reserved numeric values. Reserved numeric values may not be used
 	// by enum values in the same enum declaration. Reserved ranges may not
 	// overlap.
-	reservedRange?: [...EnumDescriptorProto_EnumReservedRange] @protobuf(4,type=EnumReservedRange,name=reserved_range)
+	reservedRange?: [...EnumReservedRange] @protobuf(4,name=reserved_range)
 
 	// Reserved enum value names, which may not be reused. A given name may only
 	// be reserved once.
 	reservedName?: [...string] @protobuf(5,name=reserved_name)
-}
-
-// Range of reserved numeric values. Reserved values may not be used by
-// entries in the same enum. Reserved ranges may not overlap.
-//
-// Note that this is distinct from DescriptorProto.ReservedRange in that it
-// is inclusive such that it can appropriately represent the entire int32
-// domain.
-EnumDescriptorProto_EnumReservedRange :: {
-	start?: int32 @protobuf(1) // Inclusive.
-	end?:   int32 @protobuf(2) // Inclusive.
 }
 
 // Describes a value within an enum.
@@ -350,8 +349,21 @@ FileOptions :: {
 	// Message reflection will do the same.
 	// However, an extension field still accepts non-UTF-8 byte sequences.
 	// This option has no effect on when used with the lite runtime.
-	javaStringCheckUtf8?: bool                     @protobuf(27,name=java_string_check_utf8,"default=false")
-	optimizeFor?:         FileOptions_OptimizeMode @protobuf(9,type=OptimizeMode,name=optimize_for,"default=SPEED")
+	javaStringCheckUtf8?: bool @protobuf(27,name=java_string_check_utf8,"default=false")
+
+	// Generated classes can be optimized for speed or code size.
+	OptimizeMode :: "SPEED" | // Generate complete code for parsing, serialization,
+
+		// etc.
+		"CODE_SIZE" |
+		"LITE_RUNTIME" // Generate code using MessageLite and the lite runtime.
+
+	OptimizeMode_value :: {
+		"SPEED":        1
+		"CODE_SIZE":    2 // Use ReflectionOps to implement these methods.
+		"LITE_RUNTIME": 3
+	}
+	optimizeFor?: OptimizeMode @protobuf(9,name=optimize_for,"default=SPEED")
 
 	// Sets the Go package where structs generated from this .proto will be
 	// placed. If omitted, the Go package will be derived from the following:
@@ -422,19 +434,6 @@ FileOptions :: {
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
 }
 
-// Generated classes can be optimized for speed or code size.
-FileOptions_OptimizeMode :: "SPEED" | // Generate complete code for parsing, serialization,
-
-	// etc.
-	"CODE_SIZE" |
-	"LITE_RUNTIME" // Generate code using MessageLite and the lite runtime.
-
-FileOptions_OptimizeMode_value :: {
-	"SPEED":        1
-	"CODE_SIZE":    2 // Use ReflectionOps to implement these methods.
-	"LITE_RUNTIME": 3
-}
-
 MessageOptions :: {
 	// Set true to use the old proto1 MessageSet wire format for extensions.
 	// This is provided for backwards-compatibility with the MessageSet wire
@@ -499,7 +498,18 @@ FieldOptions :: {
 	// representation of the field than it normally would.  See the specific
 	// options below.  This option is not yet implemented in the open source
 	// release -- sorry, we'll try to include it in a future version!
-	ctype?: FieldOptions_CType @protobuf(1,type=CType,"default=STRING")
+	ctype?: CType @protobuf(1,"default=STRING")
+	CType ::
+		// Default mode.
+		"STRING" |
+		"CORD" |
+		"STRING_PIECE"
+
+	CType_value :: {
+		"STRING":       0
+		"CORD":         1
+		"STRING_PIECE": 2
+	}
 
 	// The packed option can be enabled for repeated primitive fields to enable
 	// a more efficient representation on the wire. Rather than repeatedly
@@ -519,7 +529,22 @@ FieldOptions :: {
 	//
 	// This option is an enum to permit additional types to be added, e.g.
 	// goog.math.Integer.
-	jstype?: FieldOptions_JSType @protobuf(6,type=JSType,"default=JS_NORMAL")
+	jstype?: JSType @protobuf(6,"default=JS_NORMAL")
+	JSType ::
+		// Use the default type.
+		"JS_NORMAL" |
+
+		// Use JavaScript strings.
+		"JS_STRING" |
+
+		// Use JavaScript numbers.
+		"JS_NUMBER"
+
+	JSType_value :: {
+		"JS_NORMAL": 0
+		"JS_STRING": 1
+		"JS_NUMBER": 2
+	}
 
 	// Should this field be parsed lazily?  Lazy applies only to message-type
 	// fields.  It means that when the outer message is initially parsed, the
@@ -562,32 +587,6 @@ FieldOptions :: {
 
 	// The parser stores options it doesn't recognize here. See above.
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
-}
-FieldOptions_CType ::
-	// Default mode.
-	"STRING" |
-	"CORD" |
-	"STRING_PIECE"
-
-FieldOptions_CType_value :: {
-	"STRING":       0
-	"CORD":         1
-	"STRING_PIECE": 2
-}
-FieldOptions_JSType ::
-	// Use the default type.
-	"JS_NORMAL" |
-
-	// Use JavaScript strings.
-	"JS_STRING" |
-
-	// Use JavaScript numbers.
-	"JS_NUMBER"
-
-FieldOptions_JSType_value :: {
-	"JS_NORMAL": 0
-	"JS_STRING": 1
-	"JS_NUMBER": 2
 }
 
 OneofOptions :: {
@@ -649,24 +648,24 @@ MethodOptions :: {
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the method, or it will be completely ignored; in the very least,
 	// this is a formalization for deprecating methods.
-	deprecated?:       bool                           @protobuf(33,"default=false")
-	idempotencyLevel?: MethodOptions_IdempotencyLevel @protobuf(34,type=IdempotencyLevel,name=idempotency_level,"default=IDEMPOTENCY_UNKNOWN")
+	deprecated?: bool @protobuf(33,"default=false")
+
+	// Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
+	// or neither? HTTP based RPC implementation may choose GET verb for safe
+	// methods, and PUT verb for idempotent methods instead of the default POST.
+	IdempotencyLevel :: "IDEMPOTENCY_UNKNOWN" |
+		"NO_SIDE_EFFECTS" | // implies idempotent
+		"IDEMPOTENT" // idempotent, but may have side effects
+
+	IdempotencyLevel_value :: {
+		"IDEMPOTENCY_UNKNOWN": 0
+		"NO_SIDE_EFFECTS":     1
+		"IDEMPOTENT":          2
+	}
+	idempotencyLevel?: IdempotencyLevel @protobuf(34,name=idempotency_level,"default=IDEMPOTENCY_UNKNOWN")
 
 	// The parser stores options it doesn't recognize here. See above.
 	uninterpretedOption?: [...UninterpretedOption] @protobuf(999,name=uninterpreted_option)
-}
-
-// Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
-// or neither? HTTP based RPC implementation may choose GET verb for safe
-// methods, and PUT verb for idempotent methods instead of the default POST.
-MethodOptions_IdempotencyLevel :: "IDEMPOTENCY_UNKNOWN" |
-	"NO_SIDE_EFFECTS" | // implies idempotent
-	"IDEMPOTENT" // idempotent, but may have side effects
-
-MethodOptions_IdempotencyLevel_value :: {
-	"IDEMPOTENCY_UNKNOWN": 0
-	"NO_SIDE_EFFECTS":     1
-	"IDEMPOTENT":          2
 }
 
 // A message representing a option the parser does not recognize. This only
@@ -676,7 +675,16 @@ MethodOptions_IdempotencyLevel_value :: {
 // or produced by Descriptor::CopyTo()) will never have UninterpretedOptions
 // in them.
 UninterpretedOption :: {
-	name?: [...UninterpretedOption_NamePart] @protobuf(2,type=NamePart)
+	// The name of the uninterpreted option.  Each string represents a segment in
+	// a dot-separated name.  is_extension is true iff a segment represents an
+	// extension (denoted with parentheses in options specs in .proto files).
+	// E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
+	// "foo.(bar.baz).qux".
+	NamePart :: {
+		namePart?:    string @protobuf(1,name=name_part)
+		isExtension?: bool   @protobuf(2,name=is_extension)
+	}
+	name?: [...NamePart] @protobuf(2)
 
 	// The value of the uninterpreted option, in whatever type the tokenizer
 	// identified it as during parsing. Exactly one of these should be set.
@@ -686,16 +694,6 @@ UninterpretedOption :: {
 	doubleValue?:      float64 @protobuf(6,type=double,name=double_value)
 	stringValue?:      bytes   @protobuf(7,name=string_value)
 	aggregateValue?:   string  @protobuf(8,name=aggregate_value)
-}
-
-// The name of the uninterpreted option.  Each string represents a segment in
-// a dot-separated name.  is_extension is true iff a segment represents an
-// extension (denoted with parentheses in options specs in .proto files).
-// E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
-// "foo.(bar.baz).qux".
-UninterpretedOption_NamePart :: {
-	namePart?:    string @protobuf(1,name=name_part)
-	isExtension?: bool   @protobuf(2,name=is_extension)
 }
 
 // Encapsulates information about the original source file from which a
@@ -744,92 +742,92 @@ SourceCodeInfo :: {
 	// - Code which tries to interpret locations should probably be designed to
 	//   ignore those that it doesn't understand, as more types of locations could
 	//   be recorded in the future.
-	location?: [...SourceCodeInfo_Location] @protobuf(1,type=Location)
-}
+	location?: [...Location] @protobuf(1)
 
-SourceCodeInfo_Location :: {
-	// Identifies which part of the FileDescriptorProto was defined at this
-	// location.
-	//
-	// Each element is a field number or an index.  They form a path from
-	// the root FileDescriptorProto to the place where the definition.  For
-	// example, this path:
-	//   [ 4, 3, 2, 7, 1 ]
-	// refers to:
-	//   file.message_type(3)  // 4, 3
-	//       .field(7)         // 2, 7
-	//       .name()           // 1
-	// This is because FileDescriptorProto.message_type has field number 4:
-	//   repeated DescriptorProto message_type = 4;
-	// and DescriptorProto.field has field number 2:
-	//   repeated FieldDescriptorProto field = 2;
-	// and FieldDescriptorProto.name has field number 1:
-	//   optional string name = 1;
-	//
-	// Thus, the above path gives the location of a field name.  If we removed
-	// the last element:
-	//   [ 4, 3, 2, 7 ]
-	// this path refers to the whole field declaration (from the beginning
-	// of the label to the terminating semicolon).
-	path?: [...int32] @protobuf(1,packed)
+	Location :: {
+		// Identifies which part of the FileDescriptorProto was defined at this
+		// location.
+		//
+		// Each element is a field number or an index.  They form a path from
+		// the root FileDescriptorProto to the place where the definition.  For
+		// example, this path:
+		//   [ 4, 3, 2, 7, 1 ]
+		// refers to:
+		//   file.message_type(3)  // 4, 3
+		//       .field(7)         // 2, 7
+		//       .name()           // 1
+		// This is because FileDescriptorProto.message_type has field number 4:
+		//   repeated DescriptorProto message_type = 4;
+		// and DescriptorProto.field has field number 2:
+		//   repeated FieldDescriptorProto field = 2;
+		// and FieldDescriptorProto.name has field number 1:
+		//   optional string name = 1;
+		//
+		// Thus, the above path gives the location of a field name.  If we removed
+		// the last element:
+		//   [ 4, 3, 2, 7 ]
+		// this path refers to the whole field declaration (from the beginning
+		// of the label to the terminating semicolon).
+		path?: [...int32] @protobuf(1,packed)
 
-	// Always has exactly three or four elements: start line, start column,
-	// end line (optional, otherwise assumed same as start line), end column.
-	// These are packed into a single field for efficiency.  Note that line
-	// and column numbers are zero-based -- typically you will want to add
-	// 1 to each before displaying to a user.
-	span?: [...int32] @protobuf(2,packed)
+		// Always has exactly three or four elements: start line, start column,
+		// end line (optional, otherwise assumed same as start line), end column.
+		// These are packed into a single field for efficiency.  Note that line
+		// and column numbers are zero-based -- typically you will want to add
+		// 1 to each before displaying to a user.
+		span?: [...int32] @protobuf(2,packed)
 
-	// If this SourceCodeInfo represents a complete declaration, these are any
-	// comments appearing before and after the declaration which appear to be
-	// attached to the declaration.
-	//
-	// A series of line comments appearing on consecutive lines, with no other
-	// tokens appearing on those lines, will be treated as a single comment.
-	//
-	// leading_detached_comments will keep paragraphs of comments that appear
-	// before (but not connected to) the current element. Each paragraph,
-	// separated by empty lines, will be one comment element in the repeated
-	// field.
-	//
-	// Only the comment content is provided; comment markers (e.g. //) are
-	// stripped out.  For block comments, leading whitespace and an asterisk
-	// will be stripped from the beginning of each line other than the first.
-	// Newlines are included in the output.
-	//
-	// Examples:
-	//
-	//   optional int32 foo = 1;  // Comment attached to foo.
-	//   // Comment attached to bar.
-	//   optional int32 bar = 2;
-	//
-	//   optional string baz = 3;
-	//   // Comment attached to baz.
-	//   // Another line attached to baz.
-	//
-	//   // Comment attached to qux.
-	//   //
-	//   // Another line attached to qux.
-	//   optional double qux = 4;
-	//
-	//   // Detached comment for corge. This is not leading or trailing comments
-	//   // to qux or corge because there are blank lines separating it from
-	//   // both.
-	//
-	//   // Detached comment for corge paragraph 2.
-	//
-	//   optional string corge = 5;
-	//   /* Block comment attached
-	//    * to corge.  Leading asterisks
-	//    * will be removed. */
-	//   /* Block comment attached to
-	//    * grault. */
-	//   optional int32 grault = 6;
-	//
-	//   // ignored detached comments.
-	leadingComments?:  string @protobuf(3,name=leading_comments)
-	trailingComments?: string @protobuf(4,name=trailing_comments)
-	leadingDetachedComments?: [...string] @protobuf(6,name=leading_detached_comments)
+		// If this SourceCodeInfo represents a complete declaration, these are any
+		// comments appearing before and after the declaration which appear to be
+		// attached to the declaration.
+		//
+		// A series of line comments appearing on consecutive lines, with no other
+		// tokens appearing on those lines, will be treated as a single comment.
+		//
+		// leading_detached_comments will keep paragraphs of comments that appear
+		// before (but not connected to) the current element. Each paragraph,
+		// separated by empty lines, will be one comment element in the repeated
+		// field.
+		//
+		// Only the comment content is provided; comment markers (e.g. //) are
+		// stripped out.  For block comments, leading whitespace and an asterisk
+		// will be stripped from the beginning of each line other than the first.
+		// Newlines are included in the output.
+		//
+		// Examples:
+		//
+		//   optional int32 foo = 1;  // Comment attached to foo.
+		//   // Comment attached to bar.
+		//   optional int32 bar = 2;
+		//
+		//   optional string baz = 3;
+		//   // Comment attached to baz.
+		//   // Another line attached to baz.
+		//
+		//   // Comment attached to qux.
+		//   //
+		//   // Another line attached to qux.
+		//   optional double qux = 4;
+		//
+		//   // Detached comment for corge. This is not leading or trailing comments
+		//   // to qux or corge because there are blank lines separating it from
+		//   // both.
+		//
+		//   // Detached comment for corge paragraph 2.
+		//
+		//   optional string corge = 5;
+		//   /* Block comment attached
+		//    * to corge.  Leading asterisks
+		//    * will be removed. */
+		//   /* Block comment attached to
+		//    * grault. */
+		//   optional int32 grault = 6;
+		//
+		//   // ignored detached comments.
+		leadingComments?:  string @protobuf(3,name=leading_comments)
+		trailingComments?: string @protobuf(4,name=trailing_comments)
+		leadingDetachedComments?: [...string] @protobuf(6,name=leading_detached_comments)
+	}
 }
 
 // Describes the relationship between generated code and its original source
@@ -838,23 +836,23 @@ SourceCodeInfo_Location :: {
 GeneratedCodeInfo :: {
 	// An Annotation connects some span of text in generated code to an element
 	// of its generating .proto file.
-	annotation?: [...GeneratedCodeInfo_Annotation] @protobuf(1,type=Annotation)
-}
+	annotation?: [...Annotation] @protobuf(1)
 
-GeneratedCodeInfo_Annotation :: {
-	// Identifies the element in the original source .proto file. This field
-	// is formatted the same as SourceCodeInfo.Location.path.
-	path?: [...int32] @protobuf(1,packed)
+	Annotation :: {
+		// Identifies the element in the original source .proto file. This field
+		// is formatted the same as SourceCodeInfo.Location.path.
+		path?: [...int32] @protobuf(1,packed)
 
-	// Identifies the filesystem path to the original source .proto.
-	sourceFile?: string @protobuf(2,name=source_file)
+		// Identifies the filesystem path to the original source .proto.
+		sourceFile?: string @protobuf(2,name=source_file)
 
-	// Identifies the starting offset in bytes in the generated code
-	// that relates to the identified object.
-	begin?: int32 @protobuf(3)
+		// Identifies the starting offset in bytes in the generated code
+		// that relates to the identified object.
+		begin?: int32 @protobuf(3)
 
-	// Identifies the ending offset in bytes in the generated code that
-	// relates to the identified offset. The end offset should be one past
-	// the last relevant byte (so the length of the text = end - begin).
-	end?: int32 @protobuf(4)
+		// Identifies the ending offset in bytes in the generated code that
+		// relates to the identified offset. The end offset should be one past
+		// the last relevant byte (so the length of the text = end - begin).
+		end?: int32 @protobuf(4)
+	}
 }

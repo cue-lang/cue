@@ -182,9 +182,8 @@ type protoConverter struct {
 	shortPkgName string
 	cuePkgPath   string
 
-	// w bytes.Buffer
-	file   *ast.File
-	inBody bool
+	file    *ast.File
+	current *ast.StructLit
 
 	sorted   []string
 	imported map[string]bool
@@ -224,12 +223,12 @@ func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
 	return p.tfile.Pos(pos.Offset, 0)
 }
 
-func (p *protoConverter) addRef(pos scanner.Position, from, to string) {
+func (p *protoConverter) addRef(pos scanner.Position, name string) {
 	top := p.scope[len(p.scope)-1]
-	if _, ok := top[from]; ok {
-		failf(pos, "entity %q already defined", from)
+	if _, ok := top[name]; ok {
+		failf(pos, "entity %q already defined", name)
 	}
-	top[from] = mapping{ref: to}
+	top[name] = mapping{ref: name}
 }
 
 func (p *protoConverter) addNames(elems []proto.Visitee) {
@@ -261,7 +260,7 @@ func (p *protoConverter) addNames(elems []proto.Visitee) {
 		}
 		sym := strings.Join(append(p.path, name), ".")
 		p.symbols[sym] = true
-		p.addRef(pos, name, strings.Join(append(p.path, name), "_"))
+		p.addRef(pos, name)
 	}
 }
 
@@ -311,8 +310,7 @@ func (p *protoConverter) resolve(pos scanner.Position, name string, options []*p
 	}
 	for i := len(p.scope) - 1; i > 0; i-- {
 		if m, ok := p.scope[i][name]; ok {
-			cueName := strings.Replace(m.ref, ".", "_", -1)
-			return cueName
+			return m.ref
 		}
 	}
 	return p.resolveTopScope(pos, name, options)
@@ -330,7 +328,7 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 				p.imported[m.pkg.importPath()] = true
 				// TODO: do something more principled.
 			}
-			cueName := strings.Replace(name[i:], ".", "_", -1)
+			cueName := name[i:]
 			return p.uniqueTop(m.ref + cueName)
 		}
 	}
@@ -414,13 +412,13 @@ func (p *protoConverter) ident(pos scanner.Position, name string) *ast.Ident {
 }
 
 func (p *protoConverter) ref(pos scanner.Position) *ast.Ident {
-	return &ast.Ident{NamePos: p.toCUEPos(pos), Name: strings.Join(p.path, "_")}
+	return &ast.Ident{NamePos: p.toCUEPos(pos), Name: p.path[len(p.path)-1]}
 }
 
 func (p *protoConverter) subref(pos scanner.Position, name string) *ast.Ident {
 	return &ast.Ident{
 		NamePos: p.toCUEPos(pos),
-		Name:    strings.Join(append(p.path, name), "_"),
+		Name:    name,
 	}
 }
 
@@ -435,11 +433,7 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 		p.proto3 = x.Value == "proto3"
 
 	case *proto.Comment:
-		if p.inBody {
-			p.file.Decls = append(p.file.Decls, comment(x, true))
-		} else {
-			addComments(p.file, 0, x, nil)
-		}
+		addComments(p.file, 0, x, nil)
 
 	case *proto.Enum:
 		p.enum(x)
@@ -448,7 +442,6 @@ func (p *protoConverter) topElement(v proto.Visitee) {
 		if doc := x.Doc(); doc != nil {
 			addComments(p.file, 0, doc, nil)
 		}
-		// p.inBody bool
 
 	case *proto.Message:
 		p.message(x)
@@ -495,10 +488,22 @@ func (p *protoConverter) message(v *proto.Message) {
 	f := &ast.Field{Label: ref, Token: token.ISA, Value: s}
 	addComments(f, 1, v.Comment, nil)
 
-	p.file.Decls = append(p.file.Decls, f)
+	p.addDecl(f)
+	defer func(current *ast.StructLit) {
+		p.current = current
+	}(p.current)
+	p.current = s
 
 	for i, e := range v.Elements {
 		p.messageField(s, i, e)
+	}
+}
+
+func (p *protoConverter) addDecl(d ast.Decl) {
+	if p.current == nil {
+		p.file.Decls = append(p.file.Decls, d)
+	} else {
+		p.current.Elts = append(p.current.Elts, d)
 	}
 }
 
@@ -615,7 +620,8 @@ func (p *protoConverter) enum(x *proto.Enum) {
 	if strings.Contains(name.Name, "google") {
 		panic(name.Name)
 	}
-	p.file.Decls = append(p.file.Decls, enum, d)
+	p.addDecl(enum)
+	p.addDecl(d)
 
 	numEnums := 0
 	for _, v := range x.Elements {
@@ -675,14 +681,12 @@ func (p *protoConverter) enum(x *proto.Enum) {
 // disjunction allowing no fields. This makes it easier to constrain the
 // result to include at least one of the values.
 func (p *protoConverter) oneOf(x *proto.Oneof) {
-	f := &ast.Field{
-		Label: p.ref(x.Position),
-		Value: &ast.StructLit{},
-		Token: token.ISA,
+	embed := &ast.EmbedDecl{
+		Expr: ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
 	}
-	f.AddComment(comment(x.Comment, true))
+	embed.AddComment(comment(x.Comment, true))
 
-	p.file.Decls = append(p.file.Decls, f)
+	p.addDecl(embed)
 
 	for _, v := range x.Elements {
 		s := &ast.StructLit{
@@ -697,11 +701,12 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 		default:
 			p.messageField(s, 1, v)
 		}
-		var e ast.Expr = s
-		if f.Value != nil {
-			e = &ast.BinaryExpr{X: f.Value, Op: token.OR, Y: s}
+
+		embed.Expr = &ast.BinaryExpr{
+			X:  embed.Expr,
+			Op: token.OR,
+			Y:  ast.NewCall(ast.NewIdent("close"), s),
 		}
-		f.Value = e
 	}
 }
 

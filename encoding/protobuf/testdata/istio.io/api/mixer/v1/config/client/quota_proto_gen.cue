@@ -73,16 +73,16 @@ QuotaRule :: {
 // Describes how to match a given string in HTTP headers. Match is
 // case-sensitive.
 StringMatch :: {
-}
-StringMatch :: {} | {
-	// exact string match
-	exact: string @protobuf(1)
-} | {
-	// prefix-based match
-	prefix: string @protobuf(2)
-} | {
-	// ECMAscript style regex-based match
-	regex: string @protobuf(3)
+	close({}) | close({
+		// exact string match
+		exact: string @protobuf(1)
+	}) | close({
+		// prefix-based match
+		prefix: string @protobuf(2)
+	}) | close({
+		// ECMAscript style regex-based match
+		regex: string @protobuf(3)
+	})
 }
 
 // Specifies a match clause to match Istio attributes
@@ -117,20 +117,20 @@ QuotaSpecBinding :: {
 	// REQUIRED. One or more services to map the listed QuotaSpec onto.
 	services?: [...IstioService] @protobuf(1)
 
+	// QuotaSpecReference uniquely identifies the QuotaSpec used in the
+	// Binding.
+	QuotaSpecReference :: {
+		// REQUIRED. The short name of the QuotaSpec. This is the resource
+		// name defined by the metadata name field.
+		name?: string @protobuf(1)
+
+		// Optional namespace of the QuotaSpec. Defaults to the value of the
+		// metadata namespace field.
+		namespace?: string @protobuf(2)
+	}
+
 	// REQUIRED. One or more QuotaSpec references that should be mapped to
 	// the specified service(s). The aggregate collection of match
 	// conditions defined in the QuotaSpecs should not overlap.
-	quotaSpecs?: [...QuotaSpecBinding_QuotaSpecReference] @protobuf(2,type=QuotaSpecReference,name=quota_specs)
-}
-
-// QuotaSpecReference uniquely identifies the QuotaSpec used in the
-// Binding.
-QuotaSpecBinding_QuotaSpecReference :: {
-	// REQUIRED. The short name of the QuotaSpec. This is the resource
-	// name defined by the metadata name field.
-	name?: string @protobuf(1)
-
-	// Optional namespace of the QuotaSpec. Defaults to the value of the
-	// metadata namespace field.
-	namespace?: string @protobuf(2)
+	quotaSpecs?: [...QuotaSpecReference] @protobuf(2,name=quota_specs)
 }

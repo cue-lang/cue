@@ -7,6 +7,81 @@
    "paths": {},
    "components": {
       "schemas": {
+         "DefaultStruct": {
+            "type": "object",
+            "properties": {
+               "port": {},
+               "obj": {
+                  "type": "array",
+                  "items": {
+                     "type": "integer"
+                  }
+               }
+            },
+            "default": {
+               "port": 1
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "port",
+                     "obj"
+                  ]
+               },
+               {
+                  "required": [
+                     "port"
+                  ]
+               }
+            ]
+         },
+         "Enum": {
+            "type": "string",
+            "enum": [
+               "foo",
+               "bar",
+               "baz"
+            ]
+         },
+         "Int32": {
+            "type": "integer",
+            "format": "int32"
+         },
+         "List": {
+            "type": "array",
+            "items": {
+               "type": "number"
+            },
+            "default": [
+               1,
+               2,
+               3
+            ]
+         },
+         "Msg2": {
+            "type": "object",
+            "properties": {
+               "b": {
+                  "type": "number"
+               },
+               "a": {
+                  "type": "string",
+                  "format": "string"
+               }
+            },
+            "oneOf": [
+               {
+                  "required": [
+                     "b"
+                  ]
+               },
+               {
+                  "required": [
+                     "a"
+                  ]
+               }
+            ]
+         },
          "MyMessage": {
             "description": "MyMessage is my message.",
             "type": "object",
@@ -87,10 +162,6 @@
                   }
                }
             }
-         },
-         "Int32": {
-            "type": "integer",
-            "format": "int32"
          },
          "YourMessage": {
             "type": "object",
@@ -179,77 +250,6 @@
                            "f"
                         ]
                      }
-                  ]
-               }
-            ]
-         },
-         "Msg2": {
-            "type": "object",
-            "properties": {
-               "b": {
-                  "type": "number"
-               },
-               "a": {
-                  "type": "string",
-                  "format": "string"
-               }
-            },
-            "oneOf": [
-               {
-                  "required": [
-                     "b"
-                  ]
-               },
-               {
-                  "required": [
-                     "a"
-                  ]
-               }
-            ]
-         },
-         "Enum": {
-            "type": "string",
-            "enum": [
-               "foo",
-               "bar",
-               "baz"
-            ]
-         },
-         "List": {
-            "type": "array",
-            "items": {
-               "type": "number"
-            },
-            "default": [
-               1,
-               2,
-               3
-            ]
-         },
-         "DefaultStruct": {
-            "type": "object",
-            "properties": {
-               "port": {},
-               "obj": {
-                  "type": "array",
-                  "items": {
-                     "type": "integer"
-                  }
-               }
-            },
-            "default": {
-               "port": 1
-            },
-            "oneOf": [
-               {
-                  "required": [
-                     "port",
-                     "obj"
-                  ]
-               },
-               {
-                  "required": [
-                     "port"
                   ]
                }
             ]

@@ -4,6 +4,79 @@
    "paths": {},
    "components": {
       "schemas": {
+         "DefaultStruct": {
+            "type": "object",
+            "default": {
+               "port": 1
+            },
+            "oneOf": [
+               {
+                  "$ref": "#/components/schemas/Port"
+               },
+               {
+                  "required": [
+                     "port"
+                  ],
+                  "properties": {
+                     "port": {
+                        "type": "integer",
+                        "enum": [
+                           1
+                        ]
+                     }
+                  }
+               }
+            ]
+         },
+         "Enum": {
+            "type": "string",
+            "enum": [
+               "foo",
+               "bar",
+               "baz"
+            ]
+         },
+         "Int32": {
+            "type": "integer",
+            "format": "int32"
+         },
+         "List": {
+            "type": "array",
+            "items": {
+               "type": "number"
+            },
+            "default": [
+               1,
+               2,
+               3
+            ]
+         },
+         "Msg2": {
+            "type": "object",
+            "oneOf": [
+               {
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "b": {
+                        "type": "number"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "a"
+                  ],
+                  "properties": {
+                     "a": {
+                        "type": "string",
+                        "format": "string"
+                     }
+                  }
+               }
+            ]
+         },
          "MyMessage": {
             "description": "MyMessage is my message.",
             "type": "object",
@@ -81,10 +154,6 @@
                   }
                }
             }
-         },
-         "Int32": {
-            "type": "integer",
-            "format": "int32"
          },
          "YourMessage": {
             "type": "object",
@@ -192,75 +261,6 @@
                         }
                      }
                   ]
-               }
-            ]
-         },
-         "Msg2": {
-            "type": "object",
-            "oneOf": [
-               {
-                  "required": [
-                     "b"
-                  ],
-                  "properties": {
-                     "b": {
-                        "type": "number"
-                     }
-                  }
-               },
-               {
-                  "required": [
-                     "a"
-                  ],
-                  "properties": {
-                     "a": {
-                        "type": "string",
-                        "format": "string"
-                     }
-                  }
-               }
-            ]
-         },
-         "Enum": {
-            "type": "string",
-            "enum": [
-               "foo",
-               "bar",
-               "baz"
-            ]
-         },
-         "List": {
-            "type": "array",
-            "items": {
-               "type": "number"
-            },
-            "default": [
-               1,
-               2,
-               3
-            ]
-         },
-         "DefaultStruct": {
-            "type": "object",
-            "default": {
-               "port": 1
-            },
-            "oneOf": [
-               {
-                  "$ref": "#/components/schemas/Port"
-               },
-               {
-                  "required": [
-                     "port"
-                  ],
-                  "properties": {
-                     "port": {
-                        "type": "integer",
-                        "enum": [
-                           1
-                        ]
-                     }
-                  }
                }
             ]
          }

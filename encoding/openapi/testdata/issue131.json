@@ -7,17 +7,6 @@
    "paths": {},
    "components": {
       "schemas": {
-         "Blocks": {
-            "type": "object",
-            "required": [
-               "block1"
-            ],
-            "properties": {
-               "block1": {
-                  "$ref": "#/components/schemas/Block"
-               }
-            }
-         },
          "Block": {
             "type": "object",
             "required": [
@@ -32,6 +21,17 @@
                "b": {
                   "type": "number",
                   "exclusiveMaximum": 10
+               }
+            }
+         },
+         "Blocks": {
+            "type": "object",
+            "required": [
+               "block1"
+            ],
+            "properties": {
+               "block1": {
+                  "$ref": "#/components/schemas/Block"
                }
             }
          }

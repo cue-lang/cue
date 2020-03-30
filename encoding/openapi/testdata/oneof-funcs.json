@@ -7,6 +7,187 @@
    "paths": {},
    "components": {
       "schemas": {
+         "EMBED": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "properties": {
+               "a": {
+                  "description": "Randomly picked description from a set of size one.",
+                  "type": "integer"
+               }
+            },
+            "oneOf": [
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "b"
+                           ],
+                           "properties": {
+                              "b": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "integer"
+                              }
+                           }
+                        },
+                        {
+                           "required": [
+                              "c"
+                           ],
+                           "properties": {
+                              "c": {
+                                 "description": "Randomly picked description from a set of size one.",
+                                 "type": "integer"
+                              }
+                           }
+                        }
+                     ]
+                  }
+               },
+               {
+                  "required": [
+                     "b"
+                  ],
+                  "properties": {
+                     "b": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "c"
+                  ],
+                  "properties": {
+                     "c": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
+         },
+         "FOO": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "required": [
+               "count",
+               "include",
+               "exclude"
+            ],
+            "properties": {
+               "count": {
+                  "$ref": "#/components/schemas/MYINT"
+               },
+               "include": {
+                  "$ref": "#/components/schemas/T"
+               },
+               "exclude": {
+                  "description": "Randomly picked description from a set of size one.",
+                  "type": "array",
+                  "items": {
+                     "$ref": "#/components/schemas/T"
+                  }
+               }
+            }
+         },
+         "INCOMPATIBLE": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "oneOf": [
+               {
+                  "allOf": [
+                     {
+                        "required": [
+                           "shared"
+                        ],
+                        "properties": {
+                           "shared": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
+                     },
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra1"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    },
+                                    "extra1": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "shared",
+                                    "extra2"
+                                 ],
+                                 "properties": {
+                                    "shared": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    },
+                                    "extra2": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     }
+                  ]
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra1"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     },
+                     "extra1": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               },
+               {
+                  "required": [
+                     "shared",
+                     "extra2"
+                  ],
+                  "properties": {
+                     "shared": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     },
+                     "extra2": {
+                        "description": "Randomly picked description from a set of size one.",
+                        "type": "integer"
+                     }
+                  }
+               }
+            ]
+         },
+         "MYINT": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "integer"
+         },
          "T": {
             "description": "Randomly picked description from a set of size one.",
             "type": "object",
@@ -141,125 +322,6 @@
                }
             ]
          },
-         "MYINT": {
-            "description": "Randomly picked description from a set of size one.",
-            "type": "integer"
-         },
-         "FOO": {
-            "description": "Randomly picked description from a set of size one.",
-            "type": "object",
-            "required": [
-               "count",
-               "include",
-               "exclude"
-            ],
-            "properties": {
-               "count": {
-                  "$ref": "#/components/schemas/MYINT"
-               },
-               "include": {
-                  "$ref": "#/components/schemas/T"
-               },
-               "exclude": {
-                  "description": "Randomly picked description from a set of size one.",
-                  "type": "array",
-                  "items": {
-                     "$ref": "#/components/schemas/T"
-                  }
-               }
-            }
-         },
-         "INCOMPATIBLE": {
-            "description": "Randomly picked description from a set of size one.",
-            "type": "object",
-            "oneOf": [
-               {
-                  "allOf": [
-                     {
-                        "required": [
-                           "shared"
-                        ],
-                        "properties": {
-                           "shared": {
-                              "description": "Randomly picked description from a set of size one.",
-                              "type": "integer"
-                           }
-                        }
-                     },
-                     {
-                        "not": {
-                           "anyOf": [
-                              {
-                                 "required": [
-                                    "shared",
-                                    "extra1"
-                                 ],
-                                 "properties": {
-                                    "shared": {
-                                       "description": "Randomly picked description from a set of size one.",
-                                       "type": "integer"
-                                    },
-                                    "extra1": {
-                                       "description": "Randomly picked description from a set of size one.",
-                                       "type": "integer"
-                                    }
-                                 }
-                              },
-                              {
-                                 "required": [
-                                    "shared",
-                                    "extra2"
-                                 ],
-                                 "properties": {
-                                    "shared": {
-                                       "description": "Randomly picked description from a set of size one.",
-                                       "type": "integer"
-                                    },
-                                    "extra2": {
-                                       "description": "Randomly picked description from a set of size one.",
-                                       "type": "integer"
-                                    }
-                                 }
-                              }
-                           ]
-                        }
-                     }
-                  ]
-               },
-               {
-                  "required": [
-                     "shared",
-                     "extra1"
-                  ],
-                  "properties": {
-                     "shared": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     },
-                     "extra1": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     }
-                  }
-               },
-               {
-                  "required": [
-                     "shared",
-                     "extra2"
-                  ],
-                  "properties": {
-                     "shared": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     },
-                     "extra2": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     }
-                  }
-               }
-            ]
-         },
          "WITHMAP": {
             "description": "Randomly picked description from a set of size one.",
             "type": "object",
@@ -366,68 +428,6 @@
                         "format": "string"
                      },
                      "extra": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     }
-                  }
-               }
-            ]
-         },
-         "EMBED": {
-            "description": "Randomly picked description from a set of size one.",
-            "type": "object",
-            "properties": {
-               "a": {
-                  "description": "Randomly picked description from a set of size one.",
-                  "type": "integer"
-               }
-            },
-            "oneOf": [
-               {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "b": {
-                                 "description": "Randomly picked description from a set of size one.",
-                                 "type": "integer"
-                              }
-                           }
-                        },
-                        {
-                           "required": [
-                              "c"
-                           ],
-                           "properties": {
-                              "c": {
-                                 "description": "Randomly picked description from a set of size one.",
-                                 "type": "integer"
-                              }
-                           }
-                        }
-                     ]
-                  }
-               },
-               {
-                  "required": [
-                     "b"
-                  ],
-                  "properties": {
-                     "b": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     }
-                  }
-               },
-               {
-                  "required": [
-                     "c"
-                  ],
-                  "properties": {
-                     "c": {
                         "description": "Randomly picked description from a set of size one.",
                         "type": "integer"
                      }

@@ -27,6 +27,17 @@ Bar :: {
     "paths": {},
     "components": {
         "schemas": {
+            "Bar": {
+                "type": "object",
+                "required": [
+                    "foo"
+                ],
+                "properties": {
+                    "foo": {
+                        "$ref": "#/components/schemas/Foo"
+                    }
+                }
+            },
             "Foo": {
                 "type": "object",
                 "required": [
@@ -43,17 +54,6 @@ Bar :: {
                         "exclusiveMaximum": 10
                     }
                 }
-            },
-            "Bar": {
-                "type": "object",
-                "required": [
-                    "foo"
-                ],
-                "properties": {
-                    "foo": {
-                        "$ref": "#/components/schemas/Foo"
-                    }
-                }
             }
         }
     }
@@ -64,6 +64,13 @@ info: {}
 paths: {}
 components:
     schemas:
+        Bar:
+            type: object
+            required:
+              - foo
+            properties:
+                foo:
+                    $ref: '#/components/schemas/Foo'
         Foo:
             type: object
             required:
@@ -76,18 +83,16 @@ components:
                     type: integer
                     minimum: 0
                     exclusiveMaximum: 10
-        Bar:
-            type: object
-            required:
-              - foo
-            properties:
-                foo:
-                    $ref: '#/components/schemas/Foo'
 -- expect-cue-out --
 openapi: "3.0.0"
 info: {}
 paths: {}
 components: schemas: {
+	Bar: {
+		type: "object"
+		required: ["foo"]
+		properties: foo: $ref: "#/components/schemas/Foo"
+	}
 	Foo: {
 		type: "object"
 		required: ["a", "b"]
@@ -100,21 +105,16 @@ components: schemas: {
 			}
 		}
 	}
-	Bar: {
-		type: "object"
-		required: ["foo"]
-		properties: foo: $ref: "#/components/schemas/Foo"
-	}
 }
 -- expect-cue --
 package foo
 
+Bar :: {
+	foo: Foo
+	...
+}
 Foo :: {
 	a: int
 	b: >=0 & <10
-	...
-}
-Bar :: {
-	foo: Foo
 	...
 }

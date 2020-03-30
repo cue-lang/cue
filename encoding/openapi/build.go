@@ -136,6 +136,13 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		}
 	}
 
+	a := c.schemas.Elts
+	sort.Slice(a, func(i, j int) bool {
+		x, _, _ := ast.LabelName(a[i].(*ast.Field).Label)
+		y, _, _ := ast.LabelName(a[j].(*ast.Field).Label)
+		return x < y
+	})
+
 	return (*ast.StructLit)(c.schemas), nil
 }
 

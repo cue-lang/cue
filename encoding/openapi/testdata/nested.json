@@ -4,9 +4,6 @@
    "paths": {},
    "components": {
       "schemas": {
-         "Struct.T": {
-            "type": "integer"
-         },
          "Struct": {
             "type": "object",
             "properties": {
@@ -17,6 +14,9 @@
                   "$ref": "#/components/schemas/Struct.T"
                }
             }
+         },
+         "Struct.T": {
+            "type": "integer"
          }
       }
    }

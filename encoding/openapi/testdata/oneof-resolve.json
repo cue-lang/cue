@@ -13,41 +13,99 @@
                "a": {
                   "type": "integer"
                },
-               "b": {
+               "d": {
+                  "type": "object",
+                  "properties": {
+                     "b": {
+                        "type": "integer"
+                     }
+                  }
+               },
+               "e": {
                   "type": "integer"
+               },
+               "b": {
+                  "type": "object",
+                  "properties": {
+                     "b": {
+                        "type": "integer"
+                     }
+                  }
                },
                "c": {
                   "type": "integer"
                }
             },
-            "oneOf": [
+            "allOf": [
                {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "b"
-                           ]
-                        },
-                        {
-                           "required": [
-                              "c"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "b"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "c"
+                                 ]
+                              }
                            ]
                         }
-                     ]
-                  }
-               },
-               {
-                  "required": [
-                     "b"
+                     },
+                     {
+                        "required": [
+                           "b"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "c"
+                        ]
+                     }
                   ]
                },
                {
-                  "required": [
-                     "c"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "d"
+                                 ]
+                              },
+                              {
+                                 "required": [
+                                    "e"
+                                 ]
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "d"
+                        ]
+                     },
+                     {
+                        "required": [
+                           "e"
+                        ]
+                     }
                   ]
                }
             ]
+         },
+         "Embed.T": {
+            "type": "object",
+            "properties": {
+               "b": {
+                  "type": "integer"
+               }
+            }
          },
          "Foo": {
             "type": "object",

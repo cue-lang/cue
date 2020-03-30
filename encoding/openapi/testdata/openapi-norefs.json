@@ -177,6 +177,11 @@
             "oneOf": [
                {
                   "required": [
+                     "a"
+                  ]
+               },
+               {
+                  "required": [
                      "b"
                   ]
                },

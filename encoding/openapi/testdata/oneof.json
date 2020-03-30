@@ -11,54 +11,116 @@
                   "type": "integer"
                }
             },
-            "oneOf": [
+            "allOf": [
                {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "b": {
-                                 "type": "integer"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "b"
+                                 ],
+                                 "properties": {
+                                    "b": {
+                                       "$ref": "#/components/schemas/Embed.T"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "c"
+                                 ],
+                                 "properties": {
+                                    "c": {
+                                       "type": "integer"
+                                    }
+                                 }
                               }
-                           }
-                        },
-                        {
-                           "required": [
-                              "c"
-                           ],
-                           "properties": {
-                              "c": {
-                                 "type": "integer"
-                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "b"
+                        ],
+                        "properties": {
+                           "b": {
+                              "$ref": "#/components/schemas/Embed.T"
                            }
                         }
-                     ]
-                  }
+                     },
+                     {
+                        "required": [
+                           "c"
+                        ],
+                        "properties": {
+                           "c": {
+                              "type": "integer"
+                           }
+                        }
+                     }
+                  ]
                },
                {
-                  "required": [
-                     "b"
-                  ],
-                  "properties": {
-                     "b": {
-                        "type": "integer"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "d"
+                                 ],
+                                 "properties": {
+                                    "d": {
+                                       "$ref": "#/components/schemas/Embed.T"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "e"
+                                 ],
+                                 "properties": {
+                                    "e": {
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "d"
+                        ],
+                        "properties": {
+                           "d": {
+                              "$ref": "#/components/schemas/Embed.T"
+                           }
+                        }
+                     },
+                     {
+                        "required": [
+                           "e"
+                        ],
+                        "properties": {
+                           "e": {
+                              "type": "integer"
+                           }
+                        }
                      }
-                  }
-               },
-               {
-                  "required": [
-                     "c"
-                  ],
-                  "properties": {
-                     "c": {
-                        "type": "integer"
-                     }
-                  }
+                  ]
                }
             ]
+         },
+         "Embed.T": {
+            "type": "object",
+            "properties": {
+               "b": {
+                  "type": "integer"
+               }
+            }
          },
          "Foo": {
             "type": "object",

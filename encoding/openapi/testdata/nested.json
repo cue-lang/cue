@@ -10,6 +10,12 @@
                "a": {
                   "$ref": "#/components/schemas/Struct.T"
                },
+               "c": {
+                  "type": "array",
+                  "items": {
+                     "$ref": "#/components/schemas/Struct.T"
+                  }
+               },
                "b": {
                   "$ref": "#/components/schemas/Struct.T"
                }

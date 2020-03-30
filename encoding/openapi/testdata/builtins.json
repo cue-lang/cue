@@ -5,7 +5,6 @@
    "components": {
       "schemas": {
          "Duration": {
-            "description": "This is not an OpenAPI type and has no format. In this case\nwe map to a type so that it can be documented properly (without\nrepeating it).",
             "type": "string"
          },
          "MyStruct": {

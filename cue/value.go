@@ -1260,7 +1260,7 @@ func (d *docNode) appendDocs(docs []*ast.CommentGroup) []*ast.CommentGroup {
 
 func appendDocComments(docs []*ast.CommentGroup, n ast.Node) []*ast.CommentGroup {
 	for _, c := range n.Comments() {
-		if c.Position == 0 {
+		if c.Doc {
 			docs = append(docs, c)
 		}
 	}

@@ -47,8 +47,14 @@ Embed :: {
 	a?: int
 
 	close({}) |
-	close({b: int}) |
+	close({b: T}) |
 	close({c: int})
+
+	T :: {b?: int}
+
+	close({}) |
+	close({d: T}) |
+	close({e: int})
 
 	// TODO: maybe support builtin to write this as
 	// oneof({},

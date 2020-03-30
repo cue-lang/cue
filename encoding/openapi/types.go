@@ -16,6 +16,7 @@ package openapi
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/cockroachdb/apd/v2"
 
@@ -38,7 +39,6 @@ var cueToOpenAPI = map[string]string{
 	"bytes":  "binary",
 
 	"time.Time":                  "dateTime",
-	"time.Time ()":               "dateTime",
 	`time.Format ("2006-01-02")`: "date",
 
 	// TODO: if a format is more strict (e.g. using zeros instead of nines
@@ -54,11 +54,26 @@ func extractFormat(v cue.Value) string {
 	default:
 		return ""
 	}
-	b, err := format.Node(v.Syntax(cue.Final()))
-	if err != nil {
-		return ""
+	var expr, arg string
+	op, a := v.Expr()
+	if op == cue.CallOp {
+		v = a[0]
+		if len(a) == 2 {
+			arg = fmt.Sprintf(" (%s)", a[1].Eval())
+		}
 	}
-	if s, ok := cueToOpenAPI[string(b)]; ok {
+	if inst, ref := v.Reference(); len(ref) > 0 {
+		expr = inst.ImportPath + "." + strings.Join(ref, ".")
+		expr += arg
+	} else {
+		// TODO: have some function to extract normalized builtin types.
+		b, err := format.Node(v.Syntax(cue.Final()))
+		if err != nil {
+			return ""
+		}
+		expr = string(b)
+	}
+	if s, ok := cueToOpenAPI[expr]; ok {
 		return s
 	}
 	s := fmt.Sprint(v)

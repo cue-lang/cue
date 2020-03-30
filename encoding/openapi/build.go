@@ -33,6 +33,7 @@ import (
 
 type buildContext struct {
 	inst      *cue.Instance
+	instExt   *cue.Instance
 	refPrefix string
 	path      []string
 
@@ -80,6 +81,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 
 	c := buildContext{
 		inst:         inst,
+		instExt:      inst,
 		refPrefix:    "components/schemas",
 		expandRefs:   g.ExpandReferences,
 		structural:   g.ExpandReferences,
@@ -132,7 +134,11 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 
 		for _, k := range external {
 			ext := c.externalRefs[k]
-			c.schemas.Set(ext.ref, c.build(ext.ref, ext.value.Eval()))
+			c.instExt = ext.inst
+			last := len(ext.path) - 1
+			c.path = ext.path[:last]
+			name := ext.path[last]
+			c.schemas.Set(ext.ref, c.build(name, cue.Dereference(ext.value)))
 		}
 	}
 
@@ -288,35 +294,12 @@ var fieldOrder = map[string]int{
 	"default":          12,
 }
 
-func (b *builder) resolve(v cue.Value) cue.Value {
-	// Cycles are not allowed when expanding references. Right now we just
-	// cap the depth of evaluation at 30.
-	// TODO: do something more principled.
-	const maxDepth = 30
-	if b.ctx.evalDepth > maxDepth {
-		b.failf(v, "maximum stack depth of %d reached", maxDepth)
-	}
-	b.ctx.evalDepth++
-	defer func() { b.ctx.evalDepth-- }()
-
-	switch op, a := v.Expr(); op {
-	case cue.SelectorOp:
-		field, _ := a[1].String()
-		f, _ := b.resolve(a[0]).LookupField(field)
-		v = cue.Value{}
-		if !f.IsOptional {
-			v = f.Value
-		}
-	}
-	return v
-}
-
 func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	count := 0
 	disallowDefault := false
 	var values cue.Value
 	if b.ctx.expandRefs || b.format != "" {
-		values = b.resolve(v)
+		values = cue.Dereference(v)
 		count = 1
 	} else {
 		dedup := map[string]bool{}
@@ -328,7 +311,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			case len(r) > 0:
 				ref := b.ctx.makeRef(p, r)
 				if ref == "" {
-					v = b.resolve(v)
+					v = cue.Dereference(v)
 					break
 				}
 				if dedup[ref] {
@@ -370,27 +353,32 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 					}
 				}
 
-				if len(a) > 1 {
-					// Filter disjuncts that cannot unify with other conjuncts,
-					// and thus can never be satisfied.
-					// TODO: there should be generalized simplification logic
-					// in CUE (outside of the usual implicit simplifications).
-					k := 0
-				outer:
-					for _, d := range a {
-						for j, w := range conjuncts {
-							if i == j {
-								continue
-							}
-							if d.Unify(w).Err() != nil {
-								continue outer
-							}
-						}
-						a[k] = d
-						k++
-					}
-					a = a[:k]
-				}
+				_ = i
+				// TODO: it matters here whether a conjunct is obtained
+				// from embedding or normal unification. Fix this at some
+				// point.
+				//
+				// if len(a) > 1 {
+				// 	// Filter disjuncts that cannot unify with other conjuncts,
+				// 	// and thus can never be satisfied.
+				// 	// TODO: there should be generalized simplification logic
+				// 	// in CUE (outside of the usual implicit simplifications).
+				// 	k := 0
+				// outer:
+				// 	for _, d := range a {
+				// 		for j, w := range conjuncts {
+				// 			if i == j {
+				// 				continue
+				// 			}
+				// 			if d.Unify(w).Err() != nil {
+				// 				continue outer
+				// 			}
+				// 		}
+				// 		a[k] = d
+				// 		k++
+				// 	}
+				// 	a = a[:k]
+				// }
 				switch len(a) {
 				case 0:
 					// Conjunct entirely eliminated.
@@ -431,7 +419,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 
 func appendSplit(a []cue.Value, splitBy cue.Op, v cue.Value) []cue.Value {
 	op, args := v.Expr()
-	if op == cue.NoOp && len(args) > 0 {
+	if op == cue.NoOp && len(args) == 1 {
 		// TODO: this is to deal with default value removal. This may change
 		// whe we completely separate default values from values.
 		a = append(a, args...)
@@ -718,6 +706,9 @@ func (b *builder) object(v cue.Value) {
 
 	for i, _ := v.Fields(cue.Optional(true), cue.Definitions(true)); i.Next(); {
 		label := i.Label()
+		if b.ctx.isInternal(label) {
+			continue
+		}
 		var core *builder
 		if b.core != nil {
 			core = b.core.properties[label]
@@ -725,7 +716,10 @@ func (b *builder) object(v cue.Value) {
 		schema := b.schema(core, label, i.Value())
 		switch {
 		case i.IsDefinition():
-			ref := strings.Join(append(b.ctx.path, label), ".")
+			ref := b.ctx.makeRef(b.ctx.instExt, append(b.ctx.path, label))
+			if ref == "" {
+				continue
+			}
 			b.ctx.schemas.Set(ref, schema)
 		case !b.isNonCore() || len(schema.Elts) > 0:
 			properties.Set(label, schema)

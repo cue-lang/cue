@@ -16,58 +16,122 @@
                   "type": "integer"
                }
             },
-            "oneOf": [
+            "allOf": [
                {
-                  "not": {
-                     "anyOf": [
-                        {
-                           "required": [
-                              "b"
-                           ],
-                           "properties": {
-                              "b": {
-                                 "description": "Randomly picked description from a set of size one.",
-                                 "type": "integer"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "b"
+                                 ],
+                                 "properties": {
+                                    "b": {
+                                       "$ref": "#/components/schemas/EMBED_T"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "c"
+                                 ],
+                                 "properties": {
+                                    "c": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
                               }
-                           }
-                        },
-                        {
-                           "required": [
-                              "c"
-                           ],
-                           "properties": {
-                              "c": {
-                                 "description": "Randomly picked description from a set of size one.",
-                                 "type": "integer"
-                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "b"
+                        ],
+                        "properties": {
+                           "b": {
+                              "$ref": "#/components/schemas/EMBED_T"
                            }
                         }
-                     ]
-                  }
+                     },
+                     {
+                        "required": [
+                           "c"
+                        ],
+                        "properties": {
+                           "c": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
+                     }
+                  ]
                },
                {
-                  "required": [
-                     "b"
-                  ],
-                  "properties": {
-                     "b": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
+                  "oneOf": [
+                     {
+                        "not": {
+                           "anyOf": [
+                              {
+                                 "required": [
+                                    "d"
+                                 ],
+                                 "properties": {
+                                    "d": {
+                                       "$ref": "#/components/schemas/EMBED_T"
+                                    }
+                                 }
+                              },
+                              {
+                                 "required": [
+                                    "e"
+                                 ],
+                                 "properties": {
+                                    "e": {
+                                       "description": "Randomly picked description from a set of size one.",
+                                       "type": "integer"
+                                    }
+                                 }
+                              }
+                           ]
+                        }
+                     },
+                     {
+                        "required": [
+                           "d"
+                        ],
+                        "properties": {
+                           "d": {
+                              "$ref": "#/components/schemas/EMBED_T"
+                           }
+                        }
+                     },
+                     {
+                        "required": [
+                           "e"
+                        ],
+                        "properties": {
+                           "e": {
+                              "description": "Randomly picked description from a set of size one.",
+                              "type": "integer"
+                           }
+                        }
                      }
-                  }
-               },
-               {
-                  "required": [
-                     "c"
-                  ],
-                  "properties": {
-                     "c": {
-                        "description": "Randomly picked description from a set of size one.",
-                        "type": "integer"
-                     }
-                  }
+                  ]
                }
             ]
+         },
+         "EMBED_T": {
+            "description": "Randomly picked description from a set of size one.",
+            "type": "object",
+            "properties": {
+               "b": {
+                  "description": "Randomly picked description from a set of size one.",
+                  "type": "integer"
+               }
+            }
          },
          "FOO": {
             "description": "Randomly picked description from a set of size one.",

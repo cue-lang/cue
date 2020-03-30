@@ -4,5 +4,8 @@ Struct :: {
 	T :: int
 
 	a?: T
-	b?: T
+
+	{b?: T}
+
+	c?: [...T]
 }

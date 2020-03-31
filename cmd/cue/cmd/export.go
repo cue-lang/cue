@@ -97,7 +97,7 @@ yaml    output as YAML
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")
 
-	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
+	cmd.Flags().StringArrayP(string(flagInject), "t", nil,
 		"set the value of a tagged field")
 
 	return cmd

@@ -19,7 +19,7 @@ import (
 )
 
 // TODO: intersperse the examples at the end of the texts in the
-// body of text to make things more concerte for the user early on?
+// body of text to make things more concrete for the user early on?
 // The current approach works will if users just print the text without
 // "more" or "less", in which case the examples show more prominently.
 // The user can then scroll up to get a more in-depth explanation. But is
@@ -30,6 +30,7 @@ func newHelpTopics(c *Command) []*cobra.Command {
 		inputsHelp,
 		flagsHelp,
 		filetypeHelp,
+		injectHelp,
 	}
 }
 
@@ -254,6 +255,51 @@ $ cue export -e name -o=text:foo
 `,
 }
 
+var injectHelp = &cobra.Command{
+	Use:   "injection",
+	Short: "inject values from the command line",
+	Long: `Many of the cue commands allow injecting values
+from the command line using the --inject/-t flag.
+
+The injection mechanism allows values to be injected into fields
+that are marked with a "tag" attribute. For any field of the form
+
+   field: x @tag(key)
+
+an "--inject key=value" flag will modify the field to
+
+   field: x & "value"
+
+By default, the injected value is treated as a string.
+Alternatively, the "type" option allows a value to be interpreted
+as an int, number, or bool. For instance, for a field
+
+   field: x @tag(key,type=int)
+
+the flag "-t key=2" modifies the field to
+
+   field: x & 2
+
+Valid values for type are "int", "number", "bool", and "string".
+
+A tag attribute can also define shorthand values, which can be
+injected into the fields without having to specify the key. For
+instance, for
+
+   environment: string @tag(env,short=prod|staging)
+
+"-t prod" sets the environment field to the value "prod". It is
+still possible to specify "-t env=prod" in this case.
+
+Use the usual CUE constraints to limit the possible values of a
+field. For instance
+
+   environment: "prod" | "staging" @tag(env,short=prod|staging)
+
+ensures the user may only specify "prod" or "staging".
+`,
+}
+
 // TODO: tags
 // - doc/nodoc
 // - attr/noattr
@@ -262,8 +308,5 @@ $ cue export -e name -o=text:foo
 // TODO: filetypes:
 // - textpb
 // - binpb
-
-// TODO: document
-// <tag>['='<value>]{'+'<tag>['='<value>]}':'
 
 // TODO: cue.mod help topic

@@ -30,7 +30,7 @@ const (
 	flagIgnore    flagName = "ignore"
 	flagSimplify  flagName = "simplify"
 	flagPackage   flagName = "package"
-	flagTags      flagName = "tags"
+	flagInject    flagName = "inject"
 
 	flagExpression flagName = "expression"
 	flagSchema     flagName = "schema"

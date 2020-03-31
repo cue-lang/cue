@@ -74,7 +74,7 @@ func newVetCmd(c *Command) *cobra.Command {
 	cmd.Flags().BoolP(string(flagConcrete), "c", false,
 		"require the evaluation to be concrete")
 
-	cmd.Flags().StringArrayP(string(flagTags), "t", nil,
+	cmd.Flags().StringArrayP(string(flagInject), "t", nil,
 		"set the value of a tagged field")
 
 	return cmd

@@ -254,7 +254,7 @@ func New(args []string) (cmd *Command, err error) {
 	if err != nil {
 		return nil, err
 	}
-	tags, err := cmd.cmd.Flags().GetStringArray(string(flagTags))
+	tags, err := cmd.cmd.Flags().GetStringArray(string(flagInject))
 	if err != nil {
 		return nil, err
 	}
@@ -303,7 +303,7 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string, isHelp
 				if err != nil {
 					return err
 				}
-				tags, err = cmd.cmd.Flags().GetStringArray(string(flagTags))
+				tags, err = cmd.cmd.Flags().GetStringArray(string(flagInject))
 				if err != nil {
 					return err
 				}

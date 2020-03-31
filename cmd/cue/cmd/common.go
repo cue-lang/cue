@@ -365,7 +365,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	if builds == nil {
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
-	decorateInstances(cmd, flagTags.StringArray(cmd), builds)
+	decorateInstances(cmd, flagInject.StringArray(cmd), builds)
 
 	p = &buildPlan{cfg: cfg, cmd: cmd, forceOrphanProcessing: cfg.loadCfg.DataFiles}
 

@@ -70,6 +70,7 @@ func TestFromFile(t *testing.T) {
 		},
 	}, {
 		name: "yaml",
+		mode: Def,
 		in: build.File{
 			Filename: "foo.yaml",
 		},
@@ -111,22 +112,33 @@ func TestFromFile(t *testing.T) {
 		},
 	}, {
 		name: "JSONDefault",
+		mode: Input,
 		in: build.File{
 			Filename: "data.json",
 		},
 		out: &FileInfo{
 			File: &build.File{
-				Filename: "data.json",
-				Encoding: "json",
-				Form:     "data",
+				Filename:       "data.json",
+				Encoding:       "json",
+				Interpretation: "auto",
+				Form:           "schema",
 			},
-			Data: true,
+			Definitions:  true,
+			Data:         true,
+			Optional:     true,
+			Constraints:  true,
+			References:   true,
+			Cycles:       true,
+			KeepDefaults: true,
+			Incomplete:   true,
+			Imports:      true,
+			Docs:         true,
 		},
 	}, {
-		name: "JSONSchemaDefault",
+		name: "JSONSchema",
 		in: build.File{
-			Filename: "foo.json",
-			Form:     "schema",
+			Filename:       "foo.json",
+			Interpretation: "jsonschema",
 		},
 		out: &FileInfo{
 			File: &build.File{
@@ -236,7 +248,16 @@ func TestParseFile(t *testing.T) {
 		mode Mode
 		out  interface{}
 	}{{
-		in: "file.json",
+		in:   "file.json",
+		mode: Input,
+		out: &build.File{
+			Filename:       "file.json",
+			Encoding:       "json",
+			Interpretation: "auto",
+		},
+	}, {
+		in:   "file.json",
+		mode: Def,
 		out: &build.File{
 			Filename: "file.json",
 			Encoding: "json",
@@ -246,7 +267,7 @@ func TestParseFile(t *testing.T) {
 		out: &build.File{
 			Filename:       "file.json",
 			Encoding:       "json",
-			Interpretation: "jsonschema",
+			Interpretation: "auto",
 			Form:           "schema",
 		},
 	}, {
@@ -298,19 +319,31 @@ func TestParseArgs(t *testing.T) {
 	}{{
 		in: "foo.json baz.yaml",
 		out: []*build.File{
-			{Filename: "foo.json", Encoding: "json"},
-			{Filename: "baz.yaml", Encoding: "yaml"},
+			{
+				Filename:       "foo.json",
+				Encoding:       "json",
+				Interpretation: "auto",
+			},
+			{
+				Filename:       "baz.yaml",
+				Encoding:       "yaml",
+				Interpretation: "auto",
+			},
 		},
 	}, {
-		in: "json: foo.data bar.data json+schema: bar.schema",
+		in: "data: foo.cue",
 		out: []*build.File{
-			{Filename: "foo.data", Encoding: "json"},
+			{Filename: "foo.cue", Encoding: "cue", Form: "data"},
+		},
+	}, {
+		in: "json: foo.json bar.data jsonschema: bar.schema",
+		out: []*build.File{
+			{Filename: "foo.json", Encoding: "json"}, // no auto!
 			{Filename: "bar.data", Encoding: "json"},
 			{
 				Filename:       "bar.schema",
 				Encoding:       "json",
 				Interpretation: "jsonschema",
-				Form:           "schema",
 			},
 		},
 	}, {

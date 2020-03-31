@@ -349,6 +349,9 @@ func (i *expressionIter) instance() *cue.Instance {
 
 type config struct {
 	outMode filetypes.Mode
+
+	interpretation build.Interpretation
+
 	loadCfg *load.Config
 }
 

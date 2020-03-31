@@ -51,6 +51,18 @@ const (
 type Interpretation string
 
 const (
+	// Auto interprets the underlying data file as data, JSON Schema or OpenAPI,
+	// depending on the existence of certain marker fields.
+	//
+	// JSON Schema is identified by a top-level "$schema" field with a URL
+	// of the form "https?://json-schema.org/.*schema#?".
+	//
+	// OpenAPI is identified by the existence of a top-level field "openapi"
+	// with a major semantic version of 3, as well as the existence of
+	// the info.title and info.version fields.
+	//
+	// In all other cases, the underlying data is interpreted as is.
+	Auto       Interpretation = "auto"
 	JSONSchema Interpretation = "jsonschema"
 	OpenAPI    Interpretation = "openapi"
 )

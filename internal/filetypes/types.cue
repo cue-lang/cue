@@ -79,6 +79,9 @@ modes: input: {
 	encodings: cue: {
 		*forms.schema | _
 	}
+	extensions: ".json": interpretation: *"auto" | _
+	extensions: ".yaml": interpretation: *"auto" | _
+	extensions: ".yml": interpretation:  *"auto" | _
 }
 
 modes: export: {
@@ -175,15 +178,7 @@ tags: {
 
 	cue: encoding: "cue"
 
-	json: encoding: "json"
-	json: *{
-		form: *"" | "data"
-	} | {
-		form: *"schema" | "final"
-
-		interpretation: *"jsonschema" | _
-	}
-
+	json: encoding:  "json"
 	jsonl: encoding: "jsonl"
 	yaml: encoding:  "yaml"
 	proto: encoding: "proto"
@@ -204,6 +199,10 @@ tags: {
 		tags: lang: string
 	}
 
+	auto: {
+		interpretation: "auto"
+		encoding:       *"json" | _
+	}
 	jsonschema: {
 		interpretation: "jsonschema"
 		encoding:       *"json" | _
@@ -325,6 +324,10 @@ encodings: code: {
 interpretations: [Name=string]: FileInfo
 
 interpretations: "": _
+
+interpretations: auto: {
+	forms.schema
+}
 
 interpretations: jsonschema: {
 	forms.schema

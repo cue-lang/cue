@@ -7,7 +7,11 @@ cmp stdout expect-cue-out
 cue def foo.cue -o openapi+yaml:-
 cmp stdout expect-yaml-out
 
-cue def -p foo openapi: expect-json-out
+cue def -p foo openapi: openapi.json
+cmp stdout expect-cue
+
+# auto mode
+cue def -p foo openapi.json
 cmp stdout expect-cue
 
 -- foo.cue --
@@ -24,6 +28,47 @@ Bar :: {
     foo: Foo
 }
 
+-- openapi.json --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title":   "My OpenAPI",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Bar": {
+                "type": "object",
+                "required": [
+                    "foo"
+                ],
+                "properties": {
+                    "foo": {
+                        "$ref": "#/components/schemas/Foo"
+                    }
+                }
+            },
+            "Foo": {
+                "type": "object",
+                "required": [
+                    "a",
+                    "b"
+                ],
+                "properties": {
+                    "a": {
+                        "type": "integer"
+                    },
+                    "b": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMaximum": 10
+                    }
+                }
+            }
+        }
+    }
+}
 -- expect-json-out --
 {
     "openapi": "3.0.0",
@@ -120,12 +165,12 @@ components: schemas: {
 }
 -- expect-cue --
 
-// Some clever title.
+// My OpenAPI
 package foo
 
 info: {
-	title:   "Some clever title."
-	version: "v1"
+	title:   "My OpenAPI"
+	version: "v1alpha1"
 }
 
 Bar :: {

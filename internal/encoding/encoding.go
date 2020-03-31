@@ -45,7 +45,7 @@ type Decoder struct {
 	cfg       *Config
 	closer    io.Closer
 	next      func() (ast.Expr, error)
-	interpret func(*cue.Instance) (file *ast.File, id string, err error)
+	interpret interpretFunc
 	expr      ast.Expr
 	file      *ast.File
 	filename  string // may change on iteration for some formats
@@ -53,6 +53,8 @@ type Decoder struct {
 	index     int
 	err       error
 }
+
+type interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
 
 // ID returns a canonical identifier for the decoded object or "" if no such
 // identifier could be found.
@@ -69,6 +71,7 @@ func (i *Decoder) Next() {
 		return
 	}
 	// Decoder level
+	i.file = nil
 	i.expr, i.err = i.next()
 	i.index++
 	if i.err != nil {
@@ -77,7 +80,8 @@ func (i *Decoder) Next() {
 	// Interpretations
 	if i.interpret != nil {
 		var r cue.Runtime
-		inst, err := r.CompileFile(i.File())
+		i.file = i.File()
+		inst, err := r.CompileFile(i.file)
 		if err != nil {
 			i.err = err
 			return
@@ -176,33 +180,22 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 
 	switch f.Interpretation {
 	case "":
+	case build.Auto:
+		openAPI := openAPIFunc(cfg, f)
+		jsonSchema := jsonSchemaFunc(cfg, f)
+		i.interpret = func(inst *cue.Instance) (file *ast.File, id string, err error) {
+			switch Detect(inst.Value()) {
+			case build.JSONSchema:
+				return jsonSchema(inst)
+			case build.OpenAPI:
+				return openAPI(inst)
+			}
+			return i.file, "", i.err
+		}
 	case build.OpenAPI:
-		i.interpret = func(i *cue.Instance) (file *ast.File, id string, err error) {
-			cfg := &openapi.Config{PkgName: cfg.PkgName}
-			file, err = simplify(openapi.Extract(i, cfg))
-			return file, "", err
-		}
+		i.interpret = openAPIFunc(cfg, f)
 	case build.JSONSchema:
-		i.interpret = func(i *cue.Instance) (file *ast.File, id string, err error) {
-			id = f.Tags["id"]
-			if id == "" {
-				id, _ = i.Lookup("$id").String()
-			}
-			if id != "" {
-				u, err := url.Parse(id)
-				if err != nil {
-					return nil, "", errors.Wrapf(err, token.NoPos, "invalid id")
-				}
-				u.Scheme = ""
-				id = strings.TrimPrefix(u.String(), "//")
-			}
-			cfg := &jsonschema.Config{
-				ID:      id,
-				PkgName: cfg.PkgName,
-			}
-			file, err = simplify(jsonschema.Extract(i, cfg))
-			return file, id, err
-		}
+		i.interpret = jsonSchemaFunc(cfg, f)
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}
@@ -235,6 +228,37 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	}
 
 	return i
+}
+
+func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
+	return func(i *cue.Instance) (file *ast.File, id string, err error) {
+		id = f.Tags["id"]
+		if id == "" {
+			id, _ = i.Lookup("$id").String()
+		}
+		if id != "" {
+			u, err := url.Parse(id)
+			if err != nil {
+				return nil, "", errors.Wrapf(err, token.NoPos, "invalid id")
+			}
+			u.Scheme = ""
+			id = strings.TrimPrefix(u.String(), "//")
+		}
+		cfg := &jsonschema.Config{
+			ID:      id,
+			PkgName: cfg.PkgName,
+		}
+		file, err = simplify(jsonschema.Extract(i, cfg))
+		return file, id, err
+	}
+}
+
+func openAPIFunc(c *Config, f *build.File) interpretFunc {
+	cfg := &openapi.Config{PkgName: c.PkgName}
+	return func(i *cue.Instance) (file *ast.File, id string, err error) {
+		file, err = simplify(openapi.Extract(i, cfg))
+		return file, "", err
+	}
 }
 
 func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {

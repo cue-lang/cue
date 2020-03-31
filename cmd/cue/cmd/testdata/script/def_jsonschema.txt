@@ -1,4 +1,8 @@
-cue def jsonschema: schema.json -p schema -l '"Person"::'
+cue def jsonschema: schema.json -p schema -l 'Person::'
+cmp stdout expect-stdout
+
+# auto mode
+cue def schema.json -p schema -l 'Person::'
 cmp stdout expect-stdout
 
 -- expect-stdout --

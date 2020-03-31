@@ -84,18 +84,20 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 		}
 	}
 
-	if s, _ := v.Lookup("interpretation").String(); s != "" {
-		v = v.Unify(i.Lookup("interpretations", s))
-	} else {
+	interpretation, _ := v.Lookup("interpretation").String()
+	if b.Form != "" {
+		v = v.Unify(i.Lookup("forms", string(b.Form)))
+		// may leave some encoding-dependent options open in data mode.
+	} else if interpretation != "" {
+		// always sets schema form.
+		v = v.Unify(i.Lookup("interpretations", interpretation))
+	}
+	if interpretation == "" {
 		s, err := v.Lookup("encoding").String()
 		if err != nil {
 			return nil, err
 		}
 		v = v.Unify(i.Lookup("encodings", s))
-
-	}
-	if b.Form != "" {
-		v = v.Unify(i.Lookup("forms", string(b.Form)))
 	}
 
 	fi := &FileInfo{}
@@ -189,20 +191,30 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 	return toFile(inst, val, file)
 }
 
+func hasEncoding(v cue.Value) (concrete, hasDefault bool) {
+	enc := v.Lookup("encoding")
+	d, _ := enc.Default()
+	return enc.IsConcrete(), d.IsConcrete()
+}
+
 func toFile(i, v cue.Value, filename string) (*build.File, error) {
 	v = v.Fill(filename, "filename")
-	if s, _ := v.Lookup("encoding").String(); s == "" {
-		if filename != "-" {
-			ext := filepath.Ext(filename)
-			if ext == "" {
-				return nil, errors.Newf(token.NoPos,
-					"no encoding specified for file %q", filename)
+
+	if concrete, hasDefault := hasEncoding(v); !concrete {
+		if filename == "-" {
+			if !hasDefault {
+				v = v.Unify(i.LookupDef("Default"))
 			}
-			v = v.Unify(i.Lookup("extensions", ext))
-		} else {
-			v = v.Unify(i.LookupDef("Default"))
+		} else if ext := filepath.Ext(filename); ext != "" {
+			if x := i.Lookup("extensions", ext); x.Exists() || !hasDefault {
+				v = v.Unify(x)
+			}
+		} else if !hasDefault {
+			return nil, errors.Newf(token.NoPos,
+				"no encoding specified for file %q", filename)
 		}
 	}
+
 	f := &build.File{}
 	if err := v.Decode(&f); err != nil {
 		return nil, err

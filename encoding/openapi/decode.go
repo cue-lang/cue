@@ -100,28 +100,6 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 	return f, nil
 }
 
-func newField(key, value string) *ast.Field {
-	return &ast.Field{
-		Label: ast.NewIdent(key),
-		Value: ast.NewString(value),
-	}
-}
-
-func fieldsInfo(v cue.Value, name string, fields ...string) ast.Decl {
-	group := v.Lookup(name)
-	if !group.Exists() {
-		return nil
-	}
-
-	a := []interface{}{}
-	for _, f := range fields {
-		if s, _ := group.Lookup(f).String(); s != "" {
-			a = append(a, ast.NewIdent(f), ast.NewString(s))
-		}
-	}
-	return &ast.Field{Label: ast.NewIdent("$" + name), Value: ast.NewStruct(a...)}
-}
-
 const oapiSchemas = "#/components/schemas/"
 
 func openAPIMapping(pos token.Pos, a []string) ([]string, error) {

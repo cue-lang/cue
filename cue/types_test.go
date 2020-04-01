@@ -2023,6 +2023,36 @@ func TestMarshalJSON(t *testing.T) {
 		foo: Task & {"op": "pull"}
 		`,
 		json: `{"foo":{"op":"pull","tag":"latest","tagInString":"latestdd"}}`,
+	}, {
+		// Issue #326
+		value: `x: "\(string)": "v"`,
+		err:   `x: incomplete value 'string' in interpolation`,
+	}, {
+		// Issue #326
+		value: `x: "\(bool)": "v"`,
+		err:   `x: expression in interpolation must evaluate to a number kind or string (found bool)`,
+	}, {
+		// Issue #326
+		value: `
+		x: {
+			for k, v in y {
+				"\(k)": v
+			}
+		}
+		y: {}
+		`,
+		json: `{"x":{},"y":{}}`,
+	}, {
+		// Issue #326
+		value: `
+		x: {
+			for k, v in y {
+				"\(k)": v
+			}
+		}
+		y: _
+		`,
+		err: `x: incomplete feed source`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

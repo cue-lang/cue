@@ -399,7 +399,7 @@ func (x *interpolation) evalPartial(ctx *context) (result evaluated) {
 	}
 	if incomplete != nil {
 		return ctx.mkErr(incomplete, codeIncomplete,
-			"incomplete value %s in interpolation", ctx.str(incomplete))
+			"incomplete value '%s' in interpolation", ctx.str(incomplete))
 	}
 	return &stringLit{x.baseValue, buf.String(), nil}
 }

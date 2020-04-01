@@ -1910,7 +1910,8 @@ func (x *validator) before(v Value, o options) bool {
 		}
 	}
 	if o.concrete {
-		if err := isGroundRecursive(v.ctx(), v.eval(v.ctx())); err != nil {
+		ctx := v.ctx()
+		if err := isGroundRecursive(ctx, v.eval(ctx)); err != nil {
 			x.errs = errors.Append(x.errs, v.toErr(err))
 		}
 	}
@@ -1963,6 +1964,10 @@ func (x *validator) walk(v Value, opts options) {
 
 func isGroundRecursive(ctx *context, v value) *bottom {
 	switch x := v.(type) {
+	case *bottom:
+		if isIncomplete(x) {
+			return x
+		}
 	case *list:
 		for i := 0; i < len(x.elem.arcs); i++ {
 			v := ctx.manifest(x.at(ctx, i))

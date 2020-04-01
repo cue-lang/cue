@@ -1318,6 +1318,15 @@ func TestValidate(t *testing.T) {
 		instance1: Schema1
 		`,
 		opts: []Option{Concrete(true)},
+	}, {
+		desc: "issue324",
+		in: `
+		import "encoding/yaml"
+
+		x: string
+		a: b: c: *["\(x)"] | _
+		d: yaml.Marshal(a.b)
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

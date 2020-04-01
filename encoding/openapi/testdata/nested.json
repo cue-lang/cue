@@ -1,6 +1,9 @@
 {
    "openapi": "3.0.0",
-   "info": {},
+   "info": {
+      "title": "File comment.",
+      "version": "no version"
+   },
    "paths": {},
    "components": {
       "schemas": {

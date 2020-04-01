@@ -27,9 +27,14 @@ components:
 // Users schema
 package foo
 
-@version(v1beta1)
-@contact(name="The CUE Authors",url="https://cuelang.org")
-
+info: {
+	title:   "Users schema"
+	version: "v1beta1"
+	contact: {
+		name: "The CUE Authors"
+		url:  "https://cuelang.org"
+	}
+}
 // A User uses something.
 User :: {
 	name?:    string

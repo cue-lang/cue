@@ -1,4 +1,4 @@
-MyStruct: {
+MyStruct :: {
 	mediumNum: int32
 	smallNum:  int8
 

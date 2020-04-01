@@ -1,4 +1,4 @@
-package foo
+// File comment.
 
 Struct :: {
 	T :: int

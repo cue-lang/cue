@@ -11,6 +11,10 @@ cue def -p foo openapi: expect-json-out
 cmp stdout expect-cue
 
 -- foo.cue --
+// Some clever title.
+
+$version: "v1"
+
 Foo :: {
     a: int
     b: uint & <10
@@ -23,7 +27,10 @@ Bar :: {
 -- expect-json-out --
 {
     "openapi": "3.0.0",
-    "info": {},
+    "info": {
+        "title": "Some clever title.",
+        "version": "v1"
+    },
     "paths": {},
     "components": {
         "schemas": {
@@ -60,7 +67,9 @@ Bar :: {
 }
 -- expect-yaml-out --
 openapi: 3.0.0
-info: {}
+info:
+    title: Some clever title.
+    version: v1
 paths: {}
 components:
     schemas:
@@ -85,7 +94,10 @@ components:
                     exclusiveMaximum: 10
 -- expect-cue-out --
 openapi: "3.0.0"
-info: {}
+info: {
+	title:   "Some clever title."
+	version: "v1"
+}
 paths: {}
 components: schemas: {
 	Bar: {
@@ -107,7 +119,14 @@ components: schemas: {
 	}
 }
 -- expect-cue --
+
+// Some clever title.
 package foo
+
+info: {
+	title:   "Some clever title."
+	version: "v1"
+}
 
 Bar :: {
 	foo: Foo

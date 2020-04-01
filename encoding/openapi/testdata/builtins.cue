@@ -5,7 +5,7 @@ import (
 
 _time = time
 
-MyStruct: {
+MyStruct :: {
 	timestamp1?: time.Time
 	timestamp2?: time.Time()
 	timestamp3?: time.Format(time.RFC3339Nano)

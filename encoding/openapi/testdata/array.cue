@@ -1,6 +1,6 @@
 import "list"
 
-Arrays: {
+Arrays :: {
 	bar?: [...MyEnum]
 	foo?: [...MyStruct]
 
@@ -9,17 +9,17 @@ Arrays: {
 	qux?: list.MinItems(1) & list.MaxItems(3)
 }
 
-Arrays: {
+Arrays :: {
 	bar?: [...MyEnum]
 	foo?: [...MyStruct]
 }
 
 // MyStruct
-MyStruct: {
+MyStruct :: {
 	a?: int
 	e?: [...MyEnum]
 	e?: [...MyEnum]
 }
 
 // MyEnum
-MyEnum: *"1" | "2" | "3"
+MyEnum :: *"1" | "2" | "3"

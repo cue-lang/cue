@@ -15,7 +15,6 @@
 package openapi
 
 import (
-	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -86,14 +85,12 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 	// 	add(internal.NewAttr("openapi", "version="+ version))
 	// }
 
-	info := v.Lookup("info")
-	if version, _ := info.Lookup("version").String(); version != "" {
-		add(internal.NewAttr("version", version))
+	if info := v.Lookup("info"); info.Exists() {
+		add(&ast.Field{
+			Label: ast.NewIdent("info"),
+			Value: info.Syntax().(ast.Expr),
+		})
 	}
-
-	add(fieldsAttr(info, "license", "name", "url"))
-	add(fieldsAttr(info, "contact", "name", "url", "email"))
-	// TODO: terms of service.
 
 	if i < len(js.Decls) {
 		ast.SetRelPos(js.Decls[i], token.NewSection)
@@ -103,22 +100,26 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 	return f, nil
 }
 
-func fieldsAttr(v cue.Value, name string, fields ...string) ast.Decl {
+func newField(key, value string) *ast.Field {
+	return &ast.Field{
+		Label: ast.NewIdent(key),
+		Value: ast.NewString(value),
+	}
+}
+
+func fieldsInfo(v cue.Value, name string, fields ...string) ast.Decl {
 	group := v.Lookup(name)
 	if !group.Exists() {
 		return nil
 	}
 
-	buf := &strings.Builder{}
+	a := []interface{}{}
 	for _, f := range fields {
 		if s, _ := group.Lookup(f).String(); s != "" {
-			if buf.Len() > 0 {
-				buf.WriteByte(',')
-			}
-			_, _ = fmt.Fprintf(buf, "%s=%q", f, s)
+			a = append(a, ast.NewIdent(f), ast.NewString(s))
 		}
 	}
-	return internal.NewAttr(name, buf.String())
+	return &ast.Field{Label: ast.NewIdent("$" + name), Value: ast.NewStruct(a...)}
 }
 
 const oapiSchemas = "#/components/schemas/"

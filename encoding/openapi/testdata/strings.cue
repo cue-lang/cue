@@ -1,6 +1,6 @@
 import "strings"
 
-MyType: {
+MyType :: {
 	myString: strings.MinRunes(1) & strings.MaxRunes(5)
 
 	myPattern: =~"foo.*bar"

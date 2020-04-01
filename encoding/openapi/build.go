@@ -109,6 +109,9 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		return nil, err
 	}
 	for i.Next() {
+		if !i.IsDefinition() {
+			continue
+		}
 		// message, enum, or constant.
 		label := i.Label()
 		if c.isInternal(label) {
@@ -409,7 +412,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			fallthrough
 		default:
 			if !b.isNonCore() {
-				e := v.Syntax().(ast.Expr)
+				e := v.Syntax(cue.Concrete(true)).(ast.Expr)
 				b.setFilter("Schema", "default", e)
 			}
 		}

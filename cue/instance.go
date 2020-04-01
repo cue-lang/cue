@@ -171,11 +171,25 @@ func (inst *Instance) Doc() []*ast.CommentGroup {
 	}
 	for _, f := range inst.inst.Files {
 		pkg, _, _ := internal.PackageInfo(f)
-		if pkg == nil {
-			continue
+		var cgs []*ast.CommentGroup
+		if pkg != nil {
+			cgs = pkg.Comments()
+		} else if cgs = f.Comments(); len(cgs) > 0 {
+			// Use file comment.
+		} else {
+			// Use first comment declaration before any package or import.
+			for _, d := range f.Decls {
+				switch x := d.(type) {
+				case *ast.Attribute:
+					continue
+				case *ast.CommentGroup:
+					cgs = append(cgs, x)
+				}
+				break
+			}
 		}
 		var cg *ast.CommentGroup
-		for _, c := range pkg.Comments() {
+		for _, c := range cgs {
 			if c.Position == 0 {
 				cg = c
 			}

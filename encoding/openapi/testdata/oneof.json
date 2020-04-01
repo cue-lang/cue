@@ -1,6 +1,9 @@
 {
    "openapi": "3.0.0",
-   "info": {},
+   "info": {
+      "title": "OpenAPI title.",
+      "version": "v1alpha1"
+   },
    "paths": {},
    "components": {
       "schemas": {

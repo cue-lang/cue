@@ -1,6 +1,6 @@
 import "time"
 
-Attributes: {
+Attributes :: {
 	//  A map of attribute name to its value.
 	attributes: {
 		[string]: AttrValue
@@ -8,9 +8,9 @@ Attributes: {
 }
 
 //  The attribute value.
-AttrValue: {}
+AttrValue :: {}
 
-AttrValue: {
+AttrValue :: {
 	//  Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI
 	stringValue: string @protobuf(2,name=string_value)
 } | {
@@ -36,7 +36,7 @@ AttrValue: {
 	stringMapValue: Attributes_StringMap @protobuf(9,type=StringMap,name=string_map_value)
 }
 
-Attributes_StringMap: {
+Attributes_StringMap :: {
 	//  Holds a set of name/value pairs.
 	entries: {
 		[string]: string

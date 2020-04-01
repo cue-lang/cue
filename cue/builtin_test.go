@@ -452,6 +452,12 @@ func TestBuiltins(t *testing.T) {
 		test("encoding/json", `json.MarshalStream([{a: 1}, {b: 2}])`),
 		`"{\"a\":1}\n{\"b\":2}\n"`,
 	}, {
+		test("encoding/json", `{
+			x: int
+			y: json.Marshal({a: x})
+		}`),
+		`{x: int, y: Marshal ({a: x})}`,
+	}, {
 		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),
 		`"a: 1\n---\nb: 2\n"`,
 	}, {
@@ -654,8 +660,8 @@ func TestBuiltins(t *testing.T) {
 		test("time", `time.Unix(1500000000, 123456)`),
 		`"2017-07-14T02:40:00.000123456Z"`,
 	}}
-	for _, tc := range testCases {
-		t.Run("", func(t *testing.T) {
+	for i, tc := range testCases {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
 			insts := Build(makeInstances(tc.instances))
 			if err := insts[0].Err; err != nil {
 				t.Fatal(err)

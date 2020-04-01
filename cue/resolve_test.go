@@ -2980,6 +2980,41 @@ func TestFullEval(t *testing.T) {
 			`out2: _|_(<3>.arg.y:undefined field "y"), ` +
 			`vx: string, ` +
 			`vy: _|_(<3>.arg.y:undefined field "y")}}`,
+	}, {
+		desc: "issue314",
+		in: `
+		import (
+			"text/template"
+			"encoding/yaml"
+			"encoding/json"
+		)
+
+		x: {
+			s: "myname"
+			T
+		}
+
+		T :: {
+			s: string
+			out: template.Execute("{{.s}}", {
+				"s": s
+			})
+		}
+
+		V :: {
+			s: string
+			out: json.Marshal({"s": s})
+		}
+
+		U :: {
+			s: string
+			out: yaml.Marshal({"s": s})
+		}`,
+		out: `<0>{` +
+			`T :: <1>C{s: string, out: <2>.Execute ("{{.s}}",<3>C{s: <4>.s})}, ` +
+			`x: <5>C{s: "myname", out: "myname"}, ` +
+			`V :: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, ` +
+			`U :: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

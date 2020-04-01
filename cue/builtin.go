@@ -288,6 +288,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		if err := recover(); err != nil {
 			errVal = err
 		}
+		const msg = "error in call to %s: %v"
 		switch err := errVal.(type) {
 		case nil:
 		case *callError:
@@ -296,15 +297,18 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 			if err, ok := err.Err.(*marshalError); ok && err.b != nil {
 				ret = err.b
 			}
+		case *marshalError:
+			ret = err.b
+			ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
 		case *valueError:
 			ret = err.err
-			ret = ctx.mkErr(src, x, ret, "error in call to %s: %v", x.name(ctx), err)
+			ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
 		default:
 			if call.err == internal.ErrIncomplete {
 				ret = ctx.mkErr(src, codeIncomplete, "incomplete value")
 			} else {
 				// TODO: store the underlying error explicitly
-				ret = ctx.mkErr(src, x, "error in call to %s: %v", x.name(ctx), err)
+				ret = ctx.mkErr(src, x, msg, x.name(ctx), err)
 			}
 		}
 	}()

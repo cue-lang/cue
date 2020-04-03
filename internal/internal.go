@@ -206,3 +206,12 @@ type decorated struct {
 func (e *decorated) Is(err error) bool {
 	return xerrors.Is(e.info, err) || xerrors.Is(e.cueError, err)
 }
+
+// MaxDepth indicates the maximum evaluation depth. This is there to break
+// cycles in the absence of cycle detection.
+//
+// It is registered in a central place to make it easy to find all spots where
+// cycles are broken in this brute-force manner.
+//
+// TODO(eval): have cycle detection.
+const MaxDepth = 20

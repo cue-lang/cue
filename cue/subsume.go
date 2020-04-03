@@ -64,6 +64,10 @@ type subsumer struct {
 	// recorded values where an error occurred.
 	gt, lt  evaluated
 	missing label
+
+	// depth is used to work around undetected cycles.
+	// TODO(eval): remove once cycle detection is implemented.
+	depth int
 }
 
 type subsumeMode int
@@ -98,6 +102,12 @@ func equals(c *context, x, y value) bool {
 // subsumption could be proven. For concreted values it returns the exact
 // relation. It never returns a false positive.
 func (s *subsumer) subsumes(gt, lt value) (result bool) {
+	if s.depth > internal.MaxDepth {
+		return true
+	}
+	s.depth++
+	defer func() { s.depth-- }()
+
 	ctx := s.ctx
 	var v, w evaluated
 	if s.mode&subChoose == 0 {

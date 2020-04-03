@@ -2013,8 +2013,8 @@ func (x *validator) before(v Value, o options) bool {
 func (x *validator) walk(v Value, opts options) {
 	// TODO(#42): we can get rid of the arbitrary evaluation depth once CUE has
 	// proper structural cycle detection. See Issue #42. Currently errors
-	// occuring at a depth > 20 will not be detected.
-	if x.depth > 20 {
+	// occuring at a depth > internal.MaxDepth will not be detected.
+	if x.depth > internal.MaxDepth {
 		return
 	}
 	ctx := v.ctx()

@@ -23,10 +23,11 @@ import (
 
 func TestDiff(t *testing.T) {
 	testCases := []struct {
-		name string
-		x, y string
-		kind Kind
-		diff string
+		name    string
+		x, y    string
+		kind    Kind
+		diff    string
+		profile *Profile
 	}{{
 		name: "identity struct",
 		x: `{
@@ -302,6 +303,69 @@ a: x: "hello"
 -     }
   }
 `,
+	}, {
+		x: `
+		Directory :: {
+			{
+					// Directory from another directory (e.g. subdirectory)
+					from: Directory
+			} | {
+					// Reference to remote directory
+					ref: string
+			} | {
+					// Use a local directory
+					local: string
+			}
+			path: string | *"/"
+	}
+		`,
+		y: `
+	Directory :: {
+        {
+                // Directory from another directory (e.g. subdirectory)
+                from: Directory
+        } | {
+                // Reference to remote directory
+                ref: string
+        } | {
+                // Use a local directory
+                local: string
+        }
+        path: string | *"/"
+	}
+	`,
+		profile: Final,
+	}, {
+		x: `
+		Directory :: {
+			{
+					// Directory from another directory (e.g. subdirectory)
+					from: Directory
+			} | {
+					// Reference to remote directory
+					ref: string
+			} | {
+					// Use a local directory
+					local: string
+			}
+			path: string | *"/"
+	}
+		`,
+		y: `
+	Directory :: {
+        {
+                // Directory from another directory (e.g. subdirectory)
+                from: Directory
+        } | {
+                // Reference to remote directory
+                ref: string
+        } | {
+                // Use a local directory
+                local: string
+        }
+        path: string | *"/"
+	}
+	`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -314,7 +378,11 @@ a: x: "hello"
 			if err != nil {
 				t.Fatal(err)
 			}
-			kind, script := Diff(x.Value(), y.Value())
+			p := tc.profile
+			if p == nil {
+				p = Schema
+			}
+			kind, script := p.Diff(x.Value(), y.Value())
 			if kind != tc.kind {
 				t.Fatalf("got %d; want %d", kind, tc.kind)
 			}

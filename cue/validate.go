@@ -14,6 +14,8 @@
 
 package cue
 
+import "cuelang.org/go/internal"
+
 // validate returns whether there is any error, recursively.
 func validate(ctx *context, v value) (err *bottom) {
 	eval := v.evalPartial(ctx)
@@ -26,7 +28,7 @@ func validate(ctx *context, v value) (err *bottom) {
 		if err != nil {
 			return err
 		}
-		if ctx.maxDepth++; ctx.maxDepth > 20 {
+		if ctx.maxDepth++; ctx.maxDepth > internal.MaxDepth {
 			return nil
 		}
 		for i, a := range x.arcs {

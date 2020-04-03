@@ -44,7 +44,7 @@ func Diff(x, y cue.Value) (Kind, *EditScript) {
 
 // Diff returns an edit script representing the difference between x and y.
 func (p *Profile) Diff(x, y cue.Value) (Kind, *EditScript) {
-	d := differ{cfg: p}
+	d := differ{cfg: *p}
 	return d.diffValue(x, y)
 }
 
@@ -157,7 +157,7 @@ func (e Edit) XPos() int  { return int(e.xPos - 1) }
 func (e Edit) YPos() int  { return int(e.yPos - 1) }
 
 type differ struct {
-	cfg     *Profile
+	cfg     Profile
 	options []cue.Option
 	errs    errors.Error
 }
@@ -186,6 +186,11 @@ func (d *differ) diffValue(x, y cue.Value) (Kind, *EditScript) {
 		fallthrough
 
 	default:
+		// In concrete mode we do not care about non-concrete values.
+		if d.cfg.Concrete {
+			return Identity, nil
+		}
+
 		if !x.Equals(y) {
 			return Modified, nil
 		}

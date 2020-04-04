@@ -220,7 +220,7 @@ message Gateway {
   // label search is restricted to the configuration namespace in which the
   // the resource is present. In other words, the Gateway resource must
   // reside in the same namespace as the gateway workload instance.
-  map<string, string> selector = 2 [ (cue.val) = "{<name>: name}"];
+  map<string, string> selector = 2 [ (cue.val) = "{[name=_]: name}"];
 }
 
 // `Server` describes the properties of the proxy on a given load balancer

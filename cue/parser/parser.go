@@ -786,7 +786,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 	this := &ast.Field{Label: nil}
 	m := this
 
-	multipleLabels := false
 	allowComprehension := true
 
 	for i := 0; ; i++ {
@@ -816,18 +815,14 @@ func (p *parser) parseField() (decl ast.Decl) {
 			return e
 		}
 
-		if tok != token.LSS && p.tok == token.OPTION {
+		if p.tok == token.OPTION {
 			m.Optional = p.pos
 			p.next()
 		}
 
 		if p.tok == token.COLON || p.tok == token.ISA {
-			if p.tok == token.ISA && multipleLabels {
-				p.errf(p.pos, "more than one label before '::' (only one allowed)")
-			}
 			break
 		}
-		multipleLabels = true
 
 		// TODO: consider disallowing comprehensions with more than one label.
 		// This can be a bit awkward in some cases, but it would naturally
@@ -836,12 +831,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 		// allowComprehension = false
 
 		switch p.tok {
-		case token.IDENT, token.STRING, token.LSS, token.INTERPOLATION, token.LBRACK:
-			p.assertV0(p.pos, 0, 12, "space-separated labels")
-			field := &ast.Field{}
-			m.Value = &ast.StructLit{Elts: []ast.Decl{field}}
-			m = field
-
 		case token.COMMA:
 			p.expectComma() // sync parser.
 			fallthrough
@@ -988,7 +977,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 	switch tok {
 	case token.IDENT, token.STRING, token.INTERPOLATION,
 		token.NULL, token.TRUE, token.FALSE:
-		expr = p.parseExpr(true)
+		expr = p.parseExpr()
 
 		switch x := expr.(type) {
 		case *ast.BasicLit:
@@ -1047,75 +1036,11 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 			p.errf(pos, "expected operand, found '%s'", ident.Name)
 			expr = &ast.BadExpr{From: pos, To: p.pos}
 			// Sync expression.
-			expr = p.parseBinaryExprTail(false, token.LowestPrec+1, expr)
+			expr = p.parseBinaryExprTail(token.LowestPrec+1, expr)
 			expr = c.closeExpr(p, expr)
 			break
 		}
 		label = ident
-		ok = true
-
-	case token.LSS:
-		p.openList()
-		defer p.closeList()
-
-		pos := p.pos
-		c := p.openComments()
-		p.next()
-		var ident *ast.Ident
-		var gtr token.Pos
-		switch {
-		case rhs:
-			// TODO: remove this code once the <X> notation is out.
-			if p.tok != token.IDENT {
-				// parse RHS and continue binary Expression
-				expr = p.parseUnaryExpr()
-				expr = &ast.UnaryExpr{OpPos: pos, Op: token.LSS, X: expr}
-				expr = c.closeExpr(p, expr)
-				return nil, p.parseBinaryExprTail(false, token.LowestPrec+1, expr), false
-			}
-
-			ident = p.parseIdent()
-			if p.tok != token.GTR {
-				expr = p.parsePrimaryExprTail(ident)
-				expr = &ast.UnaryExpr{OpPos: pos, Op: token.LSS, X: expr}
-				expr = c.closeExpr(p, expr)
-				return nil, p.parseBinaryExprTail(false, token.LowestPrec+1, expr), false
-			}
-			gtr = p.pos
-			p.next()
-
-			// NOTE: at this point, even if there still a syntactically valid
-			// expression, it will always yield bottom, as '>' does not take
-			// boolean arguments.
-			// This code does not allow for `<X>[string]:` and so on. So a
-			// new way to alias labels should be introduced at the time
-			// such constructs are introduced. For instance `(X,Y)=[string]:`.
-			if p.tok != token.COLON && p.tok != token.ISA {
-				expr = &ast.UnaryExpr{OpPos: pos, Op: token.LSS, X: ident}
-				expr = c.closeExpr(p, expr)
-				c := p.openComments()
-				prec := token.GTR.Precedence()
-				expr = c.closeExpr(p, &ast.BinaryExpr{
-					X:     expr,
-					OpPos: gtr,
-					Op:    token.GTR,
-					Y:     p.checkExpr(p.parseBinaryExpr(false, prec)),
-				})
-				return nil, expr, false
-			}
-
-		default:
-			ident = p.parseIdent()
-			gtr = p.pos
-			if p.tok != token.GTR {
-				p.expect(token.GTR)
-			}
-			p.next()
-		}
-
-		p.assertV0(p.pos, 0, 12, "template labels")
-		label = &ast.TemplateLabel{Langle: pos, Ident: ident, Rangle: gtr}
-		c.closeNode(p, label)
 		ok = true
 	}
 	return label, expr, ok
@@ -1291,7 +1216,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 	c := p.openComments()
 	defer func() { c.closeNode(p, expr) }()
 
-	expr = p.parseBinaryExprTail(false, token.LowestPrec+1, p.parseUnaryExpr())
+	expr = p.parseBinaryExprTail(token.LowestPrec+1, p.parseUnaryExpr())
 	expr = p.parseAlias(expr)
 
 	// Enforce there is an explicit comma. We could also allow the
@@ -1455,26 +1380,19 @@ func (p *parser) tokPrec() (token.Token, int) {
 }
 
 // If lhs is set and the result is an identifier, it is not resolved.
-func (p *parser) parseBinaryExpr(lhs bool, prec1 int) ast.Expr {
+func (p *parser) parseBinaryExpr(prec1 int) ast.Expr {
 	if p.trace {
 		defer un(trace(p, "BinaryExpr"))
 	}
 	p.openList()
 	defer p.closeList()
 
-	return p.parseBinaryExprTail(lhs, prec1, p.parseUnaryExpr())
+	return p.parseBinaryExprTail(prec1, p.parseUnaryExpr())
 }
 
-func (p *parser) parseBinaryExprTail(lhs bool, prec1 int, x ast.Expr) ast.Expr {
+func (p *parser) parseBinaryExprTail(prec1 int, x ast.Expr) ast.Expr {
 	for {
 		op, prec := p.tokPrec()
-		if lhs && op == token.LSS {
-			// Eagerly interpret this as a template label.
-			// TODO: remove once <X> is deprecated.
-			if _, ok := x.(ast.Label); ok {
-				return x
-			}
-		}
 		if prec < prec1 {
 			return x
 		}
@@ -1486,7 +1404,7 @@ func (p *parser) parseBinaryExprTail(lhs bool, prec1 int, x ast.Expr) ast.Expr {
 			OpPos: pos,
 			Op:    op,
 			// Treat nested expressions as RHS.
-			Y: p.checkExpr(p.parseBinaryExpr(false, prec+1))})
+			Y: p.checkExpr(p.parseBinaryExpr(prec + 1))})
 	}
 }
 
@@ -1531,7 +1449,7 @@ func (p *parser) parseInterpolation() (expr ast.Expr) {
 }
 
 // Callers must check the result (using checkExpr), depending on context.
-func (p *parser) parseExpr(lhs bool) (expr ast.Expr) {
+func (p *parser) parseExpr() (expr ast.Expr) {
 	if p.trace {
 		defer un(trace(p, "Expression"))
 	}
@@ -1539,11 +1457,11 @@ func (p *parser) parseExpr(lhs bool) (expr ast.Expr) {
 	c := p.openComments()
 	defer func() { c.closeExpr(p, expr) }()
 
-	return p.parseBinaryExpr(lhs, token.LowestPrec+1)
+	return p.parseBinaryExpr(token.LowestPrec + 1)
 }
 
 func (p *parser) parseRHS() ast.Expr {
-	x := p.checkExpr(p.parseExpr(false))
+	x := p.checkExpr(p.parseExpr())
 	return x
 }
 

@@ -183,7 +183,7 @@ func TestBuild(t *testing.T) {
 				import bar "pkg1"
 				import baz "example.com/foo/pkg2:pkg"
 
-				pkg1 Object: 3
+				pkg1: Object: 3
 				"Hello \(pkg1.Object)!"`),
 		}),
 		`imported and not used: "pkg1" as bar (and 1 more errors)`,

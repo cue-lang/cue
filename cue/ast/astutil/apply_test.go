@@ -136,12 +136,12 @@ everywhere: new
 		name: "templates",
 		in: `
 				foo: {
-					a: <b>: c: 3
+					a: [string]: c: 3
 				}
 				`,
 		out: `
 foo: {
-	a: <b>: {
+	a: [string]: {
 		c:   3
 		iam: new
 	}

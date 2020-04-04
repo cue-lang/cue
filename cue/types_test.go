@@ -940,32 +940,32 @@ func TestTemplate(t *testing.T) {
 		want  string
 	}{{
 		value: `
-		a <Name>: Name
+		a: [Name=string]: Name
 		`,
 		path: []string{"a", ""},
 		want: `"label"`,
 	}, {
 		value: `
-		<Name>: { a: Name }
+		[Name=string]: { a: Name }
 		`,
 		path: []string{"", "a"},
 		want: `"label"`,
 	}, {
 		value: `
-		<Name>: { a: Name }
+		[Name=string]: { a: Name }
 		`,
 		path: []string{""},
 		want: `{"a":"label"}`,
 	}, {
 		value: `
-		a <Foo> <Bar>: { b: Foo+Bar }
+		a: [Foo=string]: [Bar=string]: { b: Foo+Bar }
 		`,
 		path: []string{"a", "", ""},
 		want: `{"b":"labellabel"}`,
 	}, {
 		value: `
-		a <Foo> b <Bar>: { c: Foo+Bar }
-		a foo b <Bar>: { d: Bar }
+		a: [Foo=string]: b: [Bar=string]: { c: Foo+Bar }
+		a: foo: b: [Bar=string]: { d: Bar }
 		`,
 		path: []string{"a", "foo", "b", ""},
 		want: `{"c":"foolabel","d":"label"}`,
@@ -1222,8 +1222,8 @@ func TestValidate(t *testing.T) {
 	}{{
 		desc: "issue #51",
 		in: `
-		a <Name>: foo
-		a b: {}
+		a: [string]: foo
+		a: b: {}
 		`,
 		err: true,
 	}, {
@@ -1231,7 +1231,7 @@ func TestValidate(t *testing.T) {
 		in: `
 		a: 1
 		b: { c: 2, d: 3 }
-		c d e f: 5
+		c: d: e: f: 5
 		g?: int
 		`,
 		opts: []Option{Concrete(true)},
@@ -1345,7 +1345,7 @@ func TestValidate(t *testing.T) {
 
 func TestPath(t *testing.T) {
 	config := `
-	a b c: 5
+	a: b: c: 5
 	b: {
 		b1: 3
 		b2: 4
@@ -1779,10 +1779,10 @@ func TestValueDoc(t *testing.T) {
 	}
 
 	// foos are instances of Foo.
-	foos <foo>: Foo
+	foos: [string]: Foo
 
 	// My first little foo.
-	foos MyFoo: {
+	foos: MyFoo: {
 		// local field comment.
 		field1: 0
 

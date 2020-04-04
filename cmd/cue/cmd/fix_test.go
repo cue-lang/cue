@@ -73,18 +73,6 @@ for k, v in src {
 	"\(k)": v
 }
 `,
-	}, {
-		name: "templates",
-		in: `package foo
-
-a: <Name>: { name: Name }
-b: <X>:    { name: string }
-`,
-		out: `package foo
-
-a: [Name=_]: {name: Name}
-b: [string]: {name: string}
-`,
 		// 	}, {
 		// 		name: "slice",
 		// 		in: `package foo

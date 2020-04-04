@@ -153,14 +153,6 @@ func TestParse(t *testing.T) {
 		`,
 		`a: {b :: {c?: {[Name=_]: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {[_]: {bar: 1}}}`,
 	}, {
-		"collapsed fields", // TODO: remove
-		`a: b:: c?: <Name>: d: 1
-			"g\("en")"?: 4
-			 // job foo { bar: 1 } // TODO error after foo
-			 job "foo" <X>: { bar: 1 }
-			`,
-		`a: {b :: {c?: {<Name>: {d: 1}}}}, "g\("en")"?: 4, job: {"foo": {<X>: {bar: 1}}}`,
-	}, {
 		"identifiers",
 		`// 	$_: 1,
 			a: {b: {c: d}}
@@ -273,17 +265,17 @@ func TestParse(t *testing.T) {
 	}, {
 		"duplicates allowed",
 		`{
-			a b: 3
+			a: b: 3
 			a: { b: 3 }
 		}`,
 		"{a: {b: 3}, a: {b: 3}}",
 	}, {
 		"templates", // TODO: remove
 		`{
-			<foo>: { a: int }
+			[foo=_]: { a: int }
 			a:     { a: 1 }
 		}`,
-		"{<foo>: {a: int}, a: {a: 1}}",
+		"{[foo=_]: {a: int}, a: {a: 1}}",
 	}, {
 		"foo",
 		`[

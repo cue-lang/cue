@@ -21,7 +21,7 @@ import "testing"
 var valids = []string{
 	"\n",
 	`{}`,
-	`{ <Name>: foo }`,
+	`{ [Name=_]: foo }`,
 	`{ a: 3 }`,
 }
 

@@ -258,7 +258,7 @@ func TestBuiltins(t *testing.T) {
 		test("list", `list.Sort([], list.Ascending)`),
 		`[]`,
 	}, {
-		test("list", `list.Sort([2, 3, 1, 4], {x:_, y:_, less: (x<y)})`),
+		test("list", `list.Sort([2, 3, 1, 4], {x:_, y:_, less: x<y})`),
 		`[1,2,3,4]`,
 	}, {
 		test("list", `list.SortStable([{a:2,v:1}, {a:1,v:2}, {a:1,v:3}], {
@@ -404,7 +404,7 @@ func TestBuiltins(t *testing.T) {
 		testExpr(`len({})`),
 		`0`,
 	}, {
-		testExpr(`len({a: 1, b: 2, <foo>: int, _c: 3})`),
+		testExpr(`len({a: 1, b: 2, [foo=_]: int, _c: 3})`),
 		`2`,
 	}, {
 		testExpr(`len([1, 2, 3])`),

@@ -281,8 +281,8 @@ func TestExport(t *testing.T) {
 				idx: a[str]
 				str: string
 			}
-			b a b: 4
-			a b: 3
+			b: a: b: 4
+			a: b: 3
 		}`,
 		// reference to a must be redirected to outer a through alias
 		out: unindent(`

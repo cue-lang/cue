@@ -150,7 +150,7 @@ func TestCompile(t *testing.T) {
 		in: `
 		a: 5 | "a" | true
 		aa: 5 | *"a" | true
-		b c: {
+		b: c: {
 			cc: { ccc: 3 }
 		}
 		d: true
@@ -158,8 +158,8 @@ func TestCompile(t *testing.T) {
 		out: "<0>{a: (5 | \"a\" | true), aa: (5 | *\"a\" | true), b: <1>{c: <2>{cc: <3>{ccc: 3}}}, d: true}",
 	}, {
 		in: `
-		a a: { b: a } // referencing ancestor nodes is legal.
-		a b: a.a      // do lookup before merging of nodes
+		a: a: { b: a } // referencing ancestor nodes is legal.
+		a: b: a.a      // do lookup before merging of nodes
 		b: a.a        // different node as a.a.b, as first node counts
 		c: a          // same node as b, as first node counts
 		d: a["a"]
@@ -282,11 +282,11 @@ alias "Y" redeclared in same scope:
 	}, {
 		in: `
 		a: {
-			<name>: { n: name }
+			[name=_]: { n: name }
 			k: 1
 		}
 		b: {
-			<X>: { x: 0, y: 1 }
+			[X=_]: { x: 0, y: 1 }
 			v: {}
 		}
 		`,
@@ -347,7 +347,7 @@ b: preference mark not allowed at this position:
 		out: "unexpected ')':\n    test:2:18\nattribute missing ')':\n    test:3:3\n<0>{}",
 	}, {
 		in: `
-		a d: {
+		a: d: {
 			base
 			info :: {
 				...
@@ -359,7 +359,7 @@ b: preference mark not allowed at this position:
 			info :: {...}
 		}
 
-		a <Name>: { info :: {
+		a: [Name=string]: { info :: {
 			X: "foo"
 		}}
 		`,

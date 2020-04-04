@@ -54,12 +54,12 @@ func TestMerge(t *testing.T) {
 	}, {
 		desc: "templates",
 		instances: insts(`
-			obj <X>: { a: "A" }
-			obj alpha: { b: 2 }
+			obj: [string]: { a: "A" }
+			obj: alpha: { b: 2 }
 			`,
 			`
-			obj <X>: { a: "B" }
-			obj beta: { b: 3 }
+			obj: [string]: { a: "B" }
+			obj: beta: { b: 3 }
 			`,
 		),
 		out: `{obj:{alpha:{a:A,b:2},beta:{a:B,b:3}}}`,
@@ -71,13 +71,13 @@ func TestMerge(t *testing.T) {
 		desc: "shared struct",
 		instances: insts(`
 			_shared: { a: "A" }
-			obj <X>: _shared & {}
-			obj alpha: { b: 2 }
+			obj: [string]: _shared & {}
+			obj: alpha: { b: 2 }
 			`,
 			`
 			_shared: { a: "B" }
-			obj <X>: _shared & {}
-			obj beta: { b: 3 }
+			obj: [string]: _shared & {}
+			obj: beta: { b: 3 }
 			`,
 		),
 		out: `{obj:{alpha:{a:A,b:2},beta:{a:B,b:3}}}`,
@@ -85,13 +85,13 @@ func TestMerge(t *testing.T) {
 		desc: "top-level comprehensions",
 		instances: insts(`
 			t: { for k, x in s {"\(k)": 10} }
-			s <Name>: {}
-			s foo a: 1
+			s: [string]: {}
+			s: foo: a: 1
 			`,
 			`
 			t: { for k, x in s {"\(k)": 10 } }
-			s <Name>: {}
-			s bar b: 2
+			s: [string]: {}
+			s: bar: b: 2
 			`,
 		),
 		out: `{t:{foo:10,bar:10},s:{foo:{a:1},bar:{b:2}}}`,

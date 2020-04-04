@@ -531,7 +531,7 @@ func TestChooseDefault(t *testing.T) {
 		desc: "pick first",
 		in: `
 		a: *5 | "a" | true
-		b c: *{
+		b: c: *{
 			a: 2
 		} | {
 			a : 3
@@ -565,12 +565,12 @@ func TestChooseDefault(t *testing.T) {
 func TestResolve(t *testing.T) {
 	testCases := []testCase{{
 		desc: "convert _ to top",
-		in:   `a: { <_>: _ }`,
+		in:   `a: { [_]: _ }`,
 		out:  `<0>{a: <1>{...}}`,
 	}, {
 		in: `
 			a: b.c.d
-			b c: { d: 3 }
+			b: c: { d: 3 }
 			c: { c: d.d, }
 			d: { d: 2 }
 			`,
@@ -1180,7 +1180,7 @@ a: {
 
 			Bar :: {
 				field: int
-				<A>:   int
+				[A=_]:   int
 			}
 			bar: Bar
 			bar: { feild: 2 }
@@ -1205,13 +1205,13 @@ a: {
 		in: `
 			// Allow combining of structs within a definition
 			D1 :: {
-				env a: "A"
-				env b: "B"
+				env: a: "A"
+				env: b: "B"
 				def :: {a: "A"}
 				def :: {b: "B"}
 			}
 
-			d1: D1 & { env c: "C" }
+			d1: D1 & { env: c: "C" }
 
 			D2 :: {
 				a: int
@@ -1221,15 +1221,15 @@ a: {
 			}
 
 			D3 :: {
-				env a: "A"
+				env: a: "A"
 			}
 			D3 :: {
-				env b: "B"
+				env: b: "B"
 			}
 
 			D4 :: {
 				env: DC
-				env b: int
+				env: b: int
 			}
 
 			DC :: { a: int }
@@ -1245,13 +1245,13 @@ a: {
 	}, {
 		desc: "recursive closing starting at non-definition",
 		in: `
-			z a: {
+			z: a: {
 				B:: {
-					c d: 1
-					c f: 1
+					c: d: 1
+					c: f: 1
 				}
 			}
-			A: z & { a: { B :: { c e: 2 } } }
+			A: z & { a: { B :: { c: e: 2 } } }
 			`,
 		out: `<0>{z: <1>{a: <2>{B :: <3>C{c: <4>C{d: 1, f: 1}}}}, A: <5>{a: <6>{B :: <7>C{c: _|_(2:field "e" not allowed in closed struct)}}}}`,
 	}, {
@@ -1317,7 +1317,7 @@ a: {
 					{ a: 1 } |
 					{ b: 2 }
 				}
-				x c: 3
+				x: c: 3
 			}
 					`,
 		out: `<0>{` +
@@ -1337,9 +1337,9 @@ a: {
 		}
 
 		// adding a field to a nested struct that is closed.
-		e1 :: S & { a d: 4 }
+		e1 :: S & { a: d: 4 }
 		// literal struct not closed until after unification.
-		v1 :: S & { a c: 4 }
+		v1 :: S & { a: c: 4 }
 		`,
 		out: `<0>{` +
 			`E :: <1>C{a: <2>C{b: int}}, ` +
@@ -1418,8 +1418,8 @@ a: {
 			b: B
 		}
 		V: S & {
-			c e: int
-			b extra: int
+			c: e: int
+			b: extra: int
 		}
 		`,
 		out: `<0>{` +
@@ -1548,12 +1548,12 @@ a: {
 		desc: "references from template to concrete",
 		in: `
 			res: [t]
-			t <X>: {
+			t: [X=string]: {
 				a: c + b.str
-				b str: string
+				b: str: string
 				c: "X"
 			}
-			t x: { b str: "DDDD" }
+			t: x: { b: str: "DDDD" }
 			`,
 		out: `<0>{res: [<1>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], t: <7>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
 	}, {
@@ -1644,17 +1644,17 @@ a: {
 		desc: "field templates",
 		in: `
 			a: {
-				<name>: int
+				[name=_]: int
 				k: 1
 			}
 			b: {
-				<X>: { x: 0, y: *1 | int }
+				[X=_]: { x: 0, y: *1 | int }
 				v: {}
 				w: { x: 0 }
 			}
-			b: { <y>: {} }
+			b: { [y=_]: {} }
 			c: {
-				<Name>: { name: Name, y: 1 }
+				[Name=_]: { name: Name, y: 1 }
 				foo: {}
 				bar: _
 			}
@@ -1764,11 +1764,11 @@ a: {
 	}, {
 		desc: "struct comprehensions",
 		in: `
-			obj foo a: "bar"
-			obj <Name>: {
+			obj: foo: a: "bar"
+			obj: [Name=string]: {
 				a: *"dummy" | string
 				if true {
-					sub as: a
+					sub: as: a
 				}
 			}
 
@@ -1810,7 +1810,7 @@ a: {
 				x: y+"?"
 				y: x+"!"
 			}
-			a x: "hey"
+			a: x: "hey"
 		`,
 		out: `<0>{a: <1>{x: _|_(("hey!?" & "hey"):conflicting values "hey!?" and "hey"), y: "hey!"}}`,
 	}, {
@@ -2032,30 +2032,30 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "resolve all disjunctions",
 		in: `
-			service <Name>: {
+			service: [Name=string]: {
 				name: string | *Name
 				port: int | *7080
 			}
-			service foo: _
-			service bar: { port: 8000 }
-			service baz: { name: "foobar" }
+			service: foo: _
+			service: bar: { port: 8000 }
+			service: baz: { name: "foobar" }
 			`,
 		out: `<0>{service: <1>{[]: <2>(Name: string)-><3>{name: (string | *<2>.Name), port: (int | *7080)}, foo: <4>{name: "foo", port: 7080}, bar: <5>{name: "bar", port: 8000}, baz: <6>{name: "foobar", port: 7080}}}`,
 	}, {
 		desc: "field templates",
 		in: `
 			a: {
-				<name>: int
+				[name=_]: int
 				k: 1
 			}
 			b: {
-				<X>: { x: 0, y: *1 | int }
+				[X=_]: { x: 0, y: *1 | int }
 				v: {}
 				w: { y: 0 }
 			}
-			b: { <y>: {} } // TODO: allow different name
+			b: { [y=_]: {} } // TODO: allow different name
 			c: {
-				<Name>: { name: Name, y: 1 }
+				[Name=_]: { name: Name, y: 1 }
 				foo: {}
 				bar: _
 			}
@@ -2112,9 +2112,9 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "referencing field in field comprehension",
 		in: `
-		a: { b c: 4 }
+		a: { b: c: 4 }
 		a: {
-			b d: 5
+			b: d: 5
 			for k, v in b {
 				"\(k)": v
 			}
@@ -2124,9 +2124,9 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "different labels for templates",
 		in: `
-		a <X>: { name: X }
-		a <Name>: { name: Name }
-		a foo: {}
+		a: [X=string]: { name: X }
+		a: [Name=string]: { name: Name }
+		a: foo: {}
 		`,
 		out: `<0>{a: <1>{[]: <2>(X: string)->(<3>{name: <2>.X} & <4>{name: <2>.X}), foo: <5>{name: "foo"}}}`,
 	}, {
@@ -2134,13 +2134,13 @@ func TestFullEval(t *testing.T) {
 
 		desc: "nested templates in one field",
 		in: `
-			a <A> b <B>: {
+			a: [A=string]: b: [B=string]: {
 				name: A
 				kind: B
 			}
-			a "A" b "B": _
-			a "C" b "D": _
-			a "EE" b "FF": { c: "bar" }
+			a: "A": b: "B": _
+			a: "C": b: "D": _
+			a: "EE": b: "FF": { c: "bar" }
 		`,
 		out: `<0>{a: <1>{[]: <2>(A: string)-><3>{b: <4>{[]: <5>(B: string)-><6>{name: <2>.A, kind: <5>.B}, }}, ` +
 			`A: <7>{b: <8>{[]: <9>(B: string)-><10>{name: <11>.A, kind: <9>.B}, ` +
@@ -2153,12 +2153,13 @@ func TestFullEval(t *testing.T) {
 		desc: "template unification within one struct",
 		in: `
 			a: {
-				<A>: { name: A }
-				<A>: { kind: A }
+				[A=string]: { name: A }
+				// TODO: allow duplicate alias here
+				[X=string]: { kind: X }
 			}
-			a "A": _
-			a "C": _
-			a "E": { c: "bar" }
+			a: "A": _
+			a: "C": _
+			a: "E": { c: "bar" }
 		`,
 		out: `<0>{a: <1>{[]: <2>(A: string)->(<3>{name: <2>.A} & <4>{kind: <2>.A}), ` +
 			`E: <5>{name: "E", kind: "E", c: "bar"}, ` +
@@ -2172,7 +2173,7 @@ func TestFullEval(t *testing.T) {
 				{a: "C", b: "D" },
 				{a: "E", b: "F" },
 			] {
-				a "\(x.a)" b "\(x.b)": x
+				a: "\(x.a)": b: "\(x.b)": x
 			}
 
 			for x in [
@@ -2180,7 +2181,7 @@ func TestFullEval(t *testing.T) {
 				{a: "C", b: "D" },
 				{a: "E", b: "F" },
 			] {
-				"\(x.a)" "\(x.b)": x
+				"\(x.a)": "\(x.b)": x
 			}
 			`,
 		out: `<0>{E: <1>{F: <2>{a: "E", b: "F"}}, ` +
@@ -2204,13 +2205,13 @@ func TestFullEval(t *testing.T) {
 			num: 1
 			a: {
 				if num < 5 {
-					<A> <B>: {
+					[A=string]: [B=string]: {
 						name: A
 						kind: B
 					}
 				}
 			}
-			a b c d: "bar"
+			a: b: c: d: "bar"
 			`,
 		out: `<0>{num: 1, a: <1>{[]: <2>(A: string)-><3>{[]: <4>(B: string)-><5>{name: <2>.A, kind: <4>.B}, }, ` +
 			`b: <6>{[]: <7>(B: string)-><8>{name: <9>.A, kind: <7>.B}, ` +
@@ -2264,14 +2265,14 @@ func TestFullEval(t *testing.T) {
 		in: `
 			result: [ v for _, v in service ]
 
-			service <Name>: {
+			service: [Name=string]: {
 				name: *Name | string
 				type: "service"
 				port: *7080 | int
 			}
-			service foo: {}
-			service bar: { port: 8000 }
-			service baz: { name: "foobar" }
+			service: foo: {}
+			service: bar: { port: 8000 }
+			service: baz: { name: "foobar" }
 			`,
 		out: `<0>{result: [` +
 			`<1>{name: "foo", type: "service", port: 7080},` +
@@ -2338,8 +2339,8 @@ func TestFullEval(t *testing.T) {
 			res: [ y & { d: "b" } for x in a for y in x ]
 			res: [ a.b.c & { d: "b" } ]
 
-			a b <C>: { d: string, s: "a" + d }
-			a b c d: string
+			a: b: [C=string]: { d: string, s: "a" + d }
+			a: b: c: d: string
 		`,
 		// TODO(perf): unification should catch shared node.
 		out: `<0>{res: [<1>{d: "b", s: "ab"}], ` +
@@ -2351,21 +2352,21 @@ func TestFullEval(t *testing.T) {
 
 			f1: { y: string, res: a.b.c & { d: y } }
 
-			a b c: { d: string, s: "a" + d }
-			a b <C>: { d: string, s: "a" + d }
-			a b c d: string
+			a: b: c: { d: string, s: "a" + d }
+			a: b: [C=string]: { d: string, s: "a" + d }
+			a: b: c: d: string
 		`,
 		out: `<0>{r1: <1>{y: "c", res: <2>{d: "c", s: "ac"}}, f1: <3>{y: string, res: <4>{d: string, s: (("a" + <5>.d) & ("a" + <5>.d))}}, a: <6>{b: <7>{[]: <8>(C: string)-><9>{d: string, s: ("a" + <9>.d)}, c: <10>{d: string, s: (("a" + <11>.d) & ("a" + <11>.d))}}}}`,
 	}, {
 		desc: "references from template to concrete",
 		in: `
 				res: [t]
-				t <X>: {
+				t: [X=string]: {
 					a: c + b.str
-					b str: string
+					b: str: string
 					c: "X"
 				}
-				t x: { b str: "DDDD" }
+				t: x: { b: str: "DDDD" }
 				`,
 		out: `<0>{res: [<1>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], ` +
 			`t: <7>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}`,
@@ -2543,7 +2544,7 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "retain references with interleaved embedding",
 		in: `
-		a d: {
+		a: d: {
 			base
 			info :: {...}
 			Y: info.X
@@ -2553,7 +2554,7 @@ func TestFullEval(t *testing.T) {
 			info :: {...}
 		}
 
-		a <Name>: { info :: {
+		a: [Name=string]: { info :: {
 			X: "foo"
 		}}
 		`,
@@ -2580,14 +2581,14 @@ func TestFullEval(t *testing.T) {
 		in: `
 		Workflow :: {
 			jobs: {
-				<jobID>: {
+				[jobID=string]: {
 				}
 			}
 			JobID :: or([ k for k, _ in jobs ])
 		}
 
 		foo: Workflow & {
-			jobs foo: {
+			jobs: foo: {
 			}
 		}
 		`,

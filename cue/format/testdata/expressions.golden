@@ -10,7 +10,7 @@ package expressions
 
 	c: b: a:       4
 	c?: bb?: aaa?: 5
-	c: b: <Name>: a: int
+	c: b: [Name=string]: a: int
 	alias = 3.14
 	"g\("en")"?: 4
 

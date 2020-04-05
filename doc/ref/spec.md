@@ -214,7 +214,8 @@ as keywords.
 These are typically targets of pre-declared identifiers.
 
 All keywords may be used as labels (field names).
-They cannot, however, be used as identifiers to refer to the same name.
+Unless noted otherwise, they can also be used as identifiers to refer to
+the same name.
 
 
 #### Values
@@ -247,9 +248,6 @@ The following keywords are used in comprehensions.
 for          in           if           let
 ```
 
-The keywords `for`, `if` and `let` cannot be used as identifiers to
-refer to fields.
-
 <!--
 TODO:
     reduce [to]
@@ -264,9 +262,6 @@ The following pseudo keywords can be used as operators in expressions.
 ```
 div          mod          quo          rem
 ```
-
-These may be used as identifiers to refer to fields in all other contexts.
-
 
 ### Operators and punctuation
 
@@ -1121,9 +1116,11 @@ future extensions and relaxations:
 
 ```
 StructLit       = "{" { Declaration "," } [ "..." ] "}" .
-Declaration     = Field | Comprehension | AliasExpr | attribute .
+Declaration     = Field | Embedding | LetClause | attribute .
+Embedding       = Comprehension | AliasExpr .
 Field           = Label ":" { Label ":" } Expression { attribute } .
-Label           = LabelName [ "?" ] | "[" AliasExpr "]" .
+Label           = identifier "=" LabelExpr .
+LabelExpr       = LabelName [ "?" ] | "[" AliasExpr "]" .
 LabelName       = identifier | simple_string_lit  .
 
 attribute       = "@" identifier "(" attr_tokens ")" .
@@ -1133,10 +1130,6 @@ attr_tokens     = { attr_token |
                     "{" attr_tokens "}" } .
 attr_token      = /* any token except '(', ')', '[', ']', '{', or '}' */
 ```
-
-<!--
- TODO: Label           = LabelName [ "?" ] | "[" AliasExpr "]" | "(" AliasExpr ")"
--->
 
 ```
 Expression                             Result (without optional fields)
@@ -1434,26 +1427,35 @@ within the [scope](#declarations-and-scopes) in which they are declared.
 The name of an alias must be unique within its scope.
 
 ```
-AliasExpr  = identifier "=" Expression | Expression .
+AliasExpr  = Expression | identifier "=" Expression .
 ```
 
 Aliases can appear in several positions:
 
-As a declaration in a struct (`X=expr`):
+<!--- TODO: consider allowing this. It should be considered whether
+having field aliases isn't already sufficient.
 
-- binds the value to an identifier without including it in the struct.
+As a declaration in a struct (`X=value`):
+
+- binds identifier `X` to a value embedded within the struct.
+--->
 
 In front of a Label (`X=label: value`):
 
 - binds the identifier to the same value as `label` would be bound
   to if it were a valid identifier.
 - for optional fields (`foo?: bar` and `[foo]: bar`),
-  the bound identifier is only visible within the field value (`value`).
+  the bound identifier is only visible within the field value (`bar`).
 
 Inside a bracketed label (`[X=expr]: value`):
 
 - binds the identifier to the the concrete label that matches `expr`
   within the instances of the field value (`value`).
+
+Before a list element (`[ X=value, X+1 ]`) (Not yet implemented)
+
+- binds the identifier to the list element it precedes within the scope of the
+  list expression.
 
 <!-- TODO: explain the difference between aliases and definitions.
      Now that you have definitions, are aliases really necessary?
@@ -1476,6 +1478,20 @@ foo: { value: 1 } // outputs: foo: { name: "foo", value: 1 }
 
 <!-- TODO: also allow aliases as lists -->
 
+
+#### Let declarations
+
+_Let declarations_ bind an identifier to an expression.
+The identifier is visible within the [scope](#declarations-and-scopes)
+in which it is declared.
+The identifier must be unique within its scope.
+
+```
+let x = expr
+
+a: x + 1
+b: x + 2
+```
 
 #### Shorthand notation for nested structs
 
@@ -1551,8 +1567,8 @@ The length of an open list is the its number of elements as a lower bound
 and an unlimited number of elements as its upper bound.
 
 ```
-ListLit       = "[" [ ElementList [ "," [ "..." [ Expression ] ] ] "]" .
-ElementList   = Expression { "," Expression } .
+ListLit       = "[" [ ElementList [ "," [ "..." [ Expression ] ] ] [ "," ] "]" .
+ElementList   = Embedding { "," Embedding } .
 ```
 
 Lists can be thought of as structs:
@@ -1624,8 +1640,8 @@ CUE is lexically scoped using blocks:
   declared at top level (outside any struct literal) is the file block.
 1. The scope of the package name of an imported package is the file block of the
   file containing the import declaration.
-1. The scope of a field or alias identifier declared inside a struct literal
-  is the innermost containing block.
+1. The scope of a field, alias or let identifier declared inside a struct
+   literal is the innermost containing block.
 
 An identifier declared in a block may be redeclared in an inner block.
 While the identifier of the inner declaration is in scope, it denotes the entity
@@ -1752,12 +1768,12 @@ to these directly.
 -->
 
 
-### Alias declarations
+### Let declarations
 
-An alias declaration binds an identifier to the given expression.
+Within a struct, a let clause binds an identifier to the given expression.
 
-Within the scope of the identifier, it serves as an _alias_ for that
-expression.
+Within the scope of the identifier, the identifier refers to the
+_locally declared_ expression.
 The expression is evaluated in the scope it was declared.
 
 
@@ -1776,10 +1792,10 @@ requested at the application level.
 
 Operands denote the elementary values in an expression.
 An operand may be a literal, a (possibly qualified) identifier denoting
-field, alias, or a parenthesized expression.
+field, alias, or let declaration, or a parenthesized expression.
 
 ```
-Operand     = Literal | OperandName | ListComprehension | "(" Expression ")" .
+Operand     = Literal | OperandName | "(" Expression ")" .
 Literal     = BasicLit | ListLit | StructLit .
 BasicLit    = int_lit | float_lit | string_lit |
               null_lit | bool_lit | bottom_lit | top_lit .
@@ -2517,8 +2533,9 @@ function returns.
 
 Lists and fields can be constructed using comprehensions.
 
-Each define a clause sequence that consists of a sequence of `for`, `if`, and
-`let` clauses, nesting from left to right.
+Comprehensions define a clause sequence that consists of a sequence of
+`for`, `if`, and `let` clauses, nesting from left to right.
+The sequence must start with a `for` or `if` clause.
 The `for` and `let` clauses each define a new scope in which new values are
 bound to be available for the next clause.
 
@@ -2541,30 +2558,30 @@ in a new scope.
 
 A current iteration is said to complete if the innermost block of the clause
 sequence is reached.
+Syntactically, the comprehension value is a struct.
+A comprehension can generate non-struct values by embedding such values within
+this struct.
 
-_List comprehensions_ specify a single expression that is evaluated and included
-in the list for each completed iteration.
-
-_Field comprehensions_ follow a clause sequence with a struct literal,
-where the struct literal is evaluated and embedded at the point of
-declaration of the comprehension for each complete iteration.
-As usual, fields in the struct may evaluate to the same label,
-resulting in the unification of their values.
+Within lists, the values yielded by a comprehension are inserted in the list
+at the position of the comprehension.
+Within structs, the values yielded by a comprehension are embedded within the
+struct.
+Both structs and lists may contain multiple comprehensions.
 
 ```
 Comprehension       = Clauses StructLit .
-ListComprehension   = "[" Expression Clauses "]" .
 
-Clauses             = Clause { Clause } .
-Clause              = ForClause | GuardClause | LetClause .
-ForClause           = "for" identifier [ ", " identifier] "in" Expression .
+Clauses             = StartClause { [ "," ] Clause } .
+StartClause         = ForClause | GuardClause .
+Clause              = StartClause | LetClause .
+ForClause           = "for" identifier [ "," identifier ] "in" Expression .
 GuardClause         = "if" Expression .
 LetClause           = "let" identifier "=" Expression .
 ```
 
 ```
 a: [1, 2, 3, 4]
-b: [ x+1 for x in a if x > 1]  // [3, 4, 5]
+b: [ for x in a if x > 1 { x+1 } ]  // [3, 4, 5]
 
 c: {
     for x in a

@@ -421,7 +421,8 @@ func getFilename(b *buildPlan, f *ast.File, root string, force bool) (filename s
 				if root != "" {
 					cueFile, _ = filepath.Rel(root, cueFile)
 				}
-				fmt.Fprintf(stderr, "Skipping file %q: already exists.\n", cueFile)
+				fmt.Fprintf(stderr, "Skipping file %q: already exists.\n",
+					filepath.ToSlash(cueFile))
 				if strings.HasPrefix(cueFile, "cue.mod") {
 					fmt.Fprintln(stderr, "Use -Rf to override.")
 				} else {

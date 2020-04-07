@@ -1418,20 +1418,20 @@ func (s *Struct) FieldByName(name string) (FieldInfo, error) {
 }
 
 // Fields creates an iterator over the Struct's fields.
-func (s *Struct) Fields(opts ...Option) Iterator {
+func (s *Struct) Fields(opts ...Option) *Iterator {
 	iter, _ := s.v.Fields(opts...)
 	return iter
 }
 
 // Fields creates an iterator over v's fields if v is a struct or an error
 // otherwise.
-func (v Value) Fields(opts ...Option) (Iterator, error) {
+func (v Value) Fields(opts ...Option) (*Iterator, error) {
 	o := options{omitDefinitions: true, omitHidden: true, omitOptional: true}
 	o.updateOptions(opts)
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, o)
 	if err != nil {
-		return Iterator{ctx: ctx}, v.toErr(err)
+		return &Iterator{ctx: ctx}, v.toErr(err)
 	}
 	n := &structLit{
 		obj.obj.baseValue,   // baseValue
@@ -1442,7 +1442,7 @@ func (v Value) Fields(opts ...Option) (Iterator, error) {
 		obj.arcs,            // arcs
 		nil,                 // attributes
 	}
-	return Iterator{ctx: ctx, val: v, iter: n, len: len(n.arcs)}, nil
+	return &Iterator{ctx: ctx, val: v, iter: n, len: len(n.arcs)}, nil
 }
 
 // Lookup reports the value at a path starting from v. The empty path returns v

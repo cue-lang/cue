@@ -680,6 +680,7 @@ func TestAllFields(t *testing.T) {
 		t.Run(tc.value, func(t *testing.T) {
 			obj := getInstance(t, tc.value).Value()
 
+			var iter *Iterator // Verify that the returned iterator is a pointer.
 			iter, err := obj.Fields(All())
 			checkFatal(t, err, tc.err, "init")
 

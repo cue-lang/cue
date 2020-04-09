@@ -22,7 +22,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 )
@@ -165,16 +165,5 @@ func runEval(cmd *Command, args []string) error {
 }
 
 func getSyntax(v cue.Value, opts []cue.Option) *ast.File {
-	n := v.Syntax(opts...)
-	switch x := n.(type) {
-	case *ast.File:
-		return x
-	case *ast.StructLit:
-		return &ast.File{Decls: x.Elts}
-	case ast.Expr:
-		ast.SetRelPos(x, token.NoSpace)
-		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
-	default:
-		panic("unreachable")
-	}
+	return internal.ToFile(v.Syntax(opts...))
 }

@@ -146,6 +146,53 @@ func NewAttr(name, str string) *ast.Attribute {
 	return &ast.Attribute{Text: buf.String()}
 }
 
+// ToExpr converts a node to an expression. If it is a file, it will return
+// it as a struct. If is an expression, it will return it as is. Otherwise
+// it panics.
+func ToExpr(n ast.Node) ast.Expr {
+	switch x := n.(type) {
+	case nil:
+		return nil
+
+	case ast.Expr:
+		return x
+
+	case *ast.File:
+		start := 0
+	outer:
+		for i, d := range x.Decls {
+			switch d.(type) {
+			case *ast.Package, *ast.ImportDecl:
+				start = i + 1
+			case *ast.CommentGroup, *ast.Attribute:
+			default:
+				break outer
+			}
+		}
+		return &ast.StructLit{Elts: x.Decls[start:]}
+
+	default:
+		panic(fmt.Sprintf("Unsupported node type %T", x))
+	}
+}
+
+// ToFile converts an expression to a file.
+//
+// Adjusts the spacing of x when needed.
+func ToFile(n ast.Node) *ast.File {
+	switch x := n.(type) {
+	case nil:
+		return nil
+	case *ast.StructLit:
+		return &ast.File{Decls: x.Elts}
+	case ast.Expr:
+		ast.SetRelPos(x, token.NoSpace)
+		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
+	default:
+		panic(fmt.Sprintf("Unsupported node type %T", x))
+	}
+}
+
 // IsEllipsis reports whether the declaration can be represented as an ellipsis.
 func IsEllipsis(x ast.Decl) bool {
 	// ...

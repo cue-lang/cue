@@ -41,6 +41,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/internal"
 )
 
 const prefix = "../pkg/"
@@ -203,7 +204,7 @@ func (g *generator) processCUE(dir string) {
 		return
 	}
 
-	n := instances[0].Value().Syntax(cue.Raw())
+	n := internal.ToExpr(instances[0].Value().Syntax(cue.Raw()))
 	b, err := cueformat.Node(n)
 	if err != nil {
 		log.Fatal(err)

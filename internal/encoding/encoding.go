@@ -37,6 +37,7 @@ import (
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/third_party/yaml"
 )
@@ -91,25 +92,11 @@ func (i *Decoder) Next() {
 }
 
 func toFile(x ast.Expr) *ast.File {
-	switch x := x.(type) {
-	case nil:
-		return nil
-	case *ast.StructLit:
-		return &ast.File{Decls: x.Elts}
-	default:
-		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
-	}
+	return internal.ToFile(x)
 }
 
 func valueToFile(v cue.Value) *ast.File {
-	switch x := v.Syntax().(type) {
-	case *ast.File:
-		return x
-	case ast.Expr:
-		return toFile(x)
-	default:
-		panic("unrreachable")
-	}
+	return internal.ToFile(v.Syntax())
 }
 
 func (i *Decoder) File() *ast.File {

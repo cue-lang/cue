@@ -43,8 +43,5 @@ Event :: {
 	Object: runtime.Object
 }
 
-// FakeWatcher lets you test anything that consumes a watch.Interface; threadsafe.
-FakeWatcher :: Stopped: bool
-
 // RaceFreeFakeWatcher lets you test anything that consumes a watch.Interface; threadsafe.
 RaceFreeFakeWatcher :: Stopped: bool

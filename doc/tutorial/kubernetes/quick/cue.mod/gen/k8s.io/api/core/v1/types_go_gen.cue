@@ -368,7 +368,6 @@ PersistentVolumeSpec :: {
 
 	// volumeMode defines if a volume is intended to be used with a formatted filesystem
 	// or to remain in raw block state. Value of Filesystem is implied when not included in spec.
-	// This is a beta feature.
 	// +optional
 	volumeMode?: null | PersistentVolumeMode @go(VolumeMode,*PersistentVolumeMode) @protobuf(8,bytes,opt,casttype=PersistentVolumeMode)
 
@@ -511,15 +510,18 @@ PersistentVolumeClaimSpec :: {
 
 	// volumeMode defines what type of volume is required by the claim.
 	// Value of Filesystem is implied when not included in claim spec.
-	// This is a beta feature.
 	// +optional
 	volumeMode?: null | PersistentVolumeMode @go(VolumeMode,*PersistentVolumeMode) @protobuf(6,bytes,opt,casttype=PersistentVolumeMode)
 
-	// This field requires the VolumeSnapshotDataSource alpha feature gate to be
-	// enabled and currently VolumeSnapshot is the only supported data source.
-	// If the provisioner can support VolumeSnapshot data source, it will create
-	// a new volume and data will be restored to the volume at the same time.
-	// If the provisioner does not support VolumeSnapshot data source, volume will
+	// This field can be used to specify either:
+	// * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot - Beta)
+	// * An existing PVC (PersistentVolumeClaim)
+	// * An existing custom resource/object that implements data population (Alpha)
+	// In order to use VolumeSnapshot object types, the appropriate feature gate
+	// must be enabled (VolumeSnapshotDataSource or AnyVolumeDataSource)
+	// If the provisioner or an external controller can support the specified data source,
+	// it will create a new volume based on the contents of the specified data source.
+	// If the specified data source is not supported, the volume will
 	// not be created and the failure will be reported as an event.
 	// In the future, we plan to support more data source types and the behavior
 	// of the provisioner may change.
@@ -1019,11 +1021,13 @@ StorageMedium :: string // enumStorageMedium
 enumStorageMedium ::
 	StorageMediumDefault |
 	StorageMediumMemory |
-	StorageMediumHugePages
+	StorageMediumHugePages |
+	StorageMediumHugePagesPrefix
 
-StorageMediumDefault ::   StorageMedium & ""
-StorageMediumMemory ::    StorageMedium & "Memory"
-StorageMediumHugePages :: StorageMedium & "HugePages"
+StorageMediumDefault ::         StorageMedium & ""
+StorageMediumMemory ::          StorageMedium & "Memory"
+StorageMediumHugePages ::       StorageMedium & "HugePages"
+StorageMediumHugePagesPrefix :: StorageMedium & "HugePages-"
 
 // Protocol defines network protocols supported for things like container ports.
 Protocol :: string // enumProtocol
@@ -2475,7 +2479,6 @@ Container :: {
 	volumeMounts?: [...VolumeMount] @go(VolumeMounts,[]VolumeMount) @protobuf(9,bytes,rep)
 
 	// volumeDevices is the list of block devices to be used by the container.
-	// This is a beta feature.
 	// +patchMergeKey=devicePath
 	// +patchStrategy=merge
 	// +optional
@@ -2501,7 +2504,7 @@ Container :: {
 	// This can be used to provide different probe parameters at the beginning of a Pod's lifecycle,
 	// when it might take a long time to load data or warm a cache, than during steady-state operation.
 	// This cannot be updated.
-	// This is an alpha feature enabled by the StartupProbe feature flag.
+	// This is a beta feature enabled by the StartupProbe feature flag.
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
 	// +optional
 	startupProbe?: null | Probe @go(StartupProbe,*Probe) @protobuf(22,bytes,opt)
@@ -3081,7 +3084,7 @@ Taint :: {
 	// Required. The taint key to be applied to a node.
 	key: string @go(Key) @protobuf(1,bytes,opt)
 
-	// Required. The taint value corresponding to the taint key.
+	// The taint value corresponding to the taint key.
 	// +optional
 	value?: string @go(Value) @protobuf(2,bytes,opt)
 
@@ -3407,8 +3410,7 @@ PodSpec :: {
 
 	// TopologySpreadConstraints describes how a group of pods ought to spread across topology
 	// domains. Scheduler will schedule pods in a way which abides by the constraints.
-	// This field is alpha-level and is only honored by clusters that enables the EvenPodsSpread
-	// feature.
+	// This field is only honored by clusters that enable the EvenPodsSpread feature.
 	// All topologySpreadConstraints are ANDed.
 	// +optional
 	// +patchMergeKey=topologyKey
@@ -3499,6 +3501,25 @@ HostAlias :: {
 	hostnames?: [...string] @go(Hostnames,[]string) @protobuf(2,bytes,rep)
 }
 
+// PodFSGroupChangePolicy holds policies that will be used for applying fsGroup to a volume
+// when volume is mounted.
+PodFSGroupChangePolicy :: string // enumPodFSGroupChangePolicy
+
+enumPodFSGroupChangePolicy ::
+	FSGroupChangeOnRootMismatch |
+	FSGroupChangeAlways
+
+// FSGroupChangeOnRootMismatch indicates that volume's ownership and permissions will be changed
+// only when permission and ownership of root directory does not match with expected
+// permissions on the volume. This can help shorten the time it takes to change
+// ownership and permissions of a volume.
+FSGroupChangeOnRootMismatch :: PodFSGroupChangePolicy & "OnRootMismatch"
+
+// FSGroupChangeAlways indicates that volume's ownership and permissions
+// should always be changed whenever volume is mounted inside a Pod. This the default
+// behavior.
+FSGroupChangeAlways :: PodFSGroupChangePolicy & "Always"
+
 // PodSecurityContext holds pod-level security attributes and common container settings.
 // Some fields are also present in container.securityContext.  Field values of
 // container.securityContext take precedence over field values of PodSecurityContext.
@@ -3564,6 +3585,15 @@ PodSecurityContext :: {
 	// sysctls (by the container runtime) might fail to launch.
 	// +optional
 	sysctls?: [...Sysctl] @go(Sysctls,[]Sysctl) @protobuf(7,bytes,rep)
+
+	// fsGroupChangePolicy defines behavior of changing ownership and permission of the volume
+	// before being exposed inside Pod. This field will only apply to
+	// volume types which support fsGroup based ownership(and permissions).
+	// It will have no effect on ephemeral volume types such as: secret, configmaps
+	// and emptydir.
+	// Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".
+	// +optional
+	fsGroupChangePolicy?: null | PodFSGroupChangePolicy @go(FSGroupChangePolicy,*PodFSGroupChangePolicy) @protobuf(9,bytes,opt)
 }
 
 // PodQOSClass defines the supported qos classes of Pods.
@@ -3697,7 +3727,6 @@ EphemeralContainerCommon :: {
 	volumeMounts?: [...VolumeMount] @go(VolumeMounts,[]VolumeMount) @protobuf(9,bytes,rep)
 
 	// volumeDevices is the list of block devices to be used by the container.
-	// This is a beta feature.
 	// +patchMergeKey=devicePath
 	// +patchStrategy=merge
 	// +optional
@@ -4392,6 +4421,16 @@ ServicePort :: {
 	// +optional
 	protocol?: Protocol @go(Protocol) @protobuf(2,bytes,opt,casttype=Protocol)
 
+	// The application protocol for this port.
+	// This field follows standard Kubernetes label syntax.
+	// Un-prefixed names are reserved for IANA standard service names (as per
+	// RFC-6335 and http://www.iana.org/assignments/service-names).
+	// Non-standard protocols should use prefixed names such as
+	// mycompany.com/my-custom-protocol.
+	// Field can be enabled with ServiceAppProtocol feature gate.
+	// +optional
+	appProtocol?: null | string @go(AppProtocol,*string) @protobuf(6,bytes,opt)
+
 	// The port that will be exposed by this service.
 	port: int32 @go(Port) @protobuf(3,varint,opt)
 
@@ -4600,6 +4639,16 @@ EndpointPort :: {
 	// Default is TCP.
 	// +optional
 	protocol?: Protocol @go(Protocol) @protobuf(3,bytes,opt,casttype=Protocol)
+
+	// The application protocol for this port.
+	// This field follows standard Kubernetes label syntax.
+	// Un-prefixed names are reserved for IANA standard service names (as per
+	// RFC-6335 and http://www.iana.org/assignments/service-names).
+	// Non-standard protocols should use prefixed names such as
+	// mycompany.com/my-custom-protocol.
+	// Field can be enabled with ServiceAppProtocol feature gate.
+	// +optional
+	appProtocol?: null | string @go(AppProtocol,*string) @protobuf(4,bytes,opt)
 }
 
 // EndpointsList is a list of endpoints.
@@ -5412,6 +5461,20 @@ ServiceProxyOptions :: {
 }
 
 // ObjectReference contains enough information to let you inspect or modify the referred object.
+// ---
+// New uses of this type are discouraged because of difficulty describing its usage when embedded in APIs.
+//  1. Ignored fields.  It includes many fields which are not generally honored.  For instance, ResourceVersion and FieldPath are both very rarely valid in actual usage.
+//  2. Invalid usage help.  It is impossible to add specific help for individual usage.  In most embedded usages, there are particular
+//     restrictions like, "must refer only to types A and B" or "UID not honored" or "name must be restricted".
+//     Those cannot be well described when embedded.
+//  3. Inconsistent validation.  Because the usages are different, the validation rules are different by usage, which makes it hard for users to predict what will happen.
+//  4. The fields are both imprecise and overly precise.  Kind is not a precise mapping to a URL. This can produce ambiguity
+//     during interpretation and require a REST mapping.  In most cases, the dependency is on the group,resource tuple
+//     and the version of the actual struct is irrelevant.
+//  5. We cannot easily change it.  Because this type is embedded in many locations, updates to this type
+//     will affect numerous schemas.  Don't make new APIs embed an underspecified API type they do not control.
+// Instead of using this type, create a locally provided and used type that is well-focused on your reference.
+// For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 .
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 ObjectReference :: {
 	// Kind of the referent.
@@ -5635,8 +5698,7 @@ LimitTypePersistentVolumeClaim :: LimitType & "PersistentVolumeClaim"
 // LimitRangeItem defines a min/max usage limit for any resource that matches on kind.
 LimitRangeItem :: {
 	// Type of resource that this limit applies to.
-	// +optional
-	type?: LimitType @go(Type) @protobuf(1,bytes,opt,casttype=LimitType)
+	type: LimitType @go(Type) @protobuf(1,bytes,opt,casttype=LimitType)
 
 	// Max usage constraints on this kind by resource name.
 	// +optional
@@ -5890,6 +5952,14 @@ Secret :: {
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
+	// Immutable, if set to true, ensures that data stored in the Secret cannot
+	// be updated (only object metadata can be modified).
+	// If not set to true, the field can be modified at any time.
+	// Defaulted to nil.
+	// This is an alpha field enabled by ImmutableEphemeralVolumes feature gate.
+	// +optional
+	immutable?: null | bool @go(Immutable,*bool) @protobuf(5,varint,opt)
+
 	// Data contains the secret data. Each key must consist of alphanumeric
 	// characters, '-', '_' or '.'. The serialized form of the secret data is a
 	// base64 encoded string, representing the arbitrary (possibly non-string)
@@ -6036,6 +6106,14 @@ ConfigMap :: {
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
+
+	// Immutable, if set to true, ensures that data stored in the ConfigMap cannot
+	// be updated (only object metadata can be modified).
+	// If not set to true, the field can be modified at any time.
+	// Defaulted to nil.
+	// This is an alpha field enabled by ImmutableEphemeralVolumes feature gate.
+	// +optional
+	immutable?: null | bool @go(Immutable,*bool) @protobuf(4,varint,opt)
 
 	// Data contains the configuration data.
 	// Each key must consist of alphanumeric characters, '-', '_' or '.'.
@@ -6286,14 +6364,12 @@ SELinuxOptions :: {
 // WindowsSecurityContextOptions contain Windows-specific options and credentials.
 WindowsSecurityContextOptions :: {
 	// GMSACredentialSpecName is the name of the GMSA credential spec to use.
-	// This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
 	// +optional
 	gmsaCredentialSpecName?: null | string @go(GMSACredentialSpecName,*string) @protobuf(1,bytes,opt)
 
 	// GMSACredentialSpec is where the GMSA admission webhook
 	// (https://github.com/kubernetes-sigs/windows-gmsa) inlines the contents of the
 	// GMSA credential spec named by the GMSACredentialSpecName field.
-	// This field is alpha-level and is only honored by servers that enable the WindowsGMSA feature flag.
 	// +optional
 	gmsaCredentialSpec?: null | string @go(GMSACredentialSpec,*string) @protobuf(2,bytes,opt)
 
@@ -6301,7 +6377,6 @@ WindowsSecurityContextOptions :: {
 	// Defaults to the user specified in image metadata if unspecified.
 	// May also be set in PodSecurityContext. If set in both SecurityContext and
 	// PodSecurityContext, the value specified in SecurityContext takes precedence.
-	// This field is beta-level and may be disabled with the WindowsRunAsUserName feature flag.
 	// +optional
 	runAsUserName?: null | string @go(RunAsUserName,*string) @protobuf(3,bytes,opt)
 }

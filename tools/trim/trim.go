@@ -476,6 +476,6 @@ type key struct {
 	hidden bool
 }
 
-func iterKey(v cue.Iterator) key {
+func iterKey(v *cue.Iterator) key {
 	return key{v.Label(), v.IsHidden()}
 }

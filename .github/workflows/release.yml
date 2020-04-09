@@ -49,5 +49,5 @@ jobs:
           tag_with_sha: false
           target: cue
           always_pull: true
-          build_args: GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=${{ env.CUE_VERSION }}
+          build_args: GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=v${{ env.CUE_VERSION }}
           add_git_labels: true

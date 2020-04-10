@@ -1,0 +1,15 @@
+cue eval ./in.cue
+cmp stdout expect-stdout
+-- expect-stdout --
+import "list"
+
+def: {
+    types :: list.MinItems(1)
+}
+-- in.cue --
+import (
+	"list"
+)
+
+def: types :: list.MinItems(1)
+

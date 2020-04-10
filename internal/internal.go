@@ -188,6 +188,8 @@ func ToFile(n ast.Node) *ast.File {
 	case ast.Expr:
 		ast.SetRelPos(x, token.NoSpace)
 		return &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: x}}}
+	case *ast.File:
+		return x
 	default:
 		panic(fmt.Sprintf("Unsupported node type %T", x))
 	}

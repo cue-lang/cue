@@ -23,6 +23,7 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -174,6 +175,19 @@ type Config struct {
 	// StdRoot specifies an alternative directory for standard libaries.
 	// This is mostly used for bootstrapping.
 	StdRoot string
+
+	// ParseFile is called to read and parse each file when preparing a
+	// package's syntax tree. It must be safe to call ParseFile simultaneously
+	// from multiple goroutines. If ParseFile is nil, the loader will uses
+	// parser.ParseFile.
+	//
+	// ParseFile should parse the source from src and use filename only for
+	// recording position information.
+	//
+	// An application may supply a custom implementation of ParseFile to change
+	// the effective file contents or the behavior of the parser, or to modify
+	// the syntax tree.
+	ParseFile func(name string, src interface{}) (*ast.File, error)
 
 	// Overlay provides a mapping of absolute file paths to file contents.
 	// If the file  with the given path already exists, the parser will use the

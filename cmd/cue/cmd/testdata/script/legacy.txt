@@ -1,0 +1,22 @@
+! cue eval foo.cue
+cmp stderr expect-stderr
+
+! cue export foo.cue
+cmp stderr expect-stderr
+
+cue fmt foo.cue
+cmp foo.cue foo-new.cue
+
+-- expect-stderr --
+space-separated labels deprecated as of v0.0.13: try running `cue fmt` on the file to upgrade.:
+    ./foo.cue:1:3
+old-style comprehensions deprecated as of v0.0.11: try running `cue fmt` on the file to upgrade.:
+    ./foo.cue:2:8
+-- foo.cue --
+a b: 2
+"x": 3 for x in a
+-- foo-new.cue --
+a: b: 2
+for x in a {
+	"x": 3
+}

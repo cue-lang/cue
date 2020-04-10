@@ -134,6 +134,7 @@ type Config struct {
 	EscapeHTML bool
 	ProtoPath  []string
 	Format     []format.Option
+	ParseFile  func(name string, src interface{}) (*ast.File, error)
 }
 
 // NewDecoder returns a stream of non-rooted data expressions. The encoding
@@ -190,7 +191,11 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	path := f.Filename
 	switch f.Encoding {
 	case build.CUE:
-		i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
+		if cfg.ParseFile == nil {
+			i.file, i.err = parser.ParseFile(path, r, parser.ParseComments)
+		} else {
+			i.file, i.err = cfg.ParseFile(path, r)
+		}
 		i.validate(i.file, f)
 	case build.JSON, build.JSONL:
 		i.next = json.NewDecoder(nil, path, r).Extract

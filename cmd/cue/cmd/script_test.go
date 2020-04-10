@@ -23,7 +23,8 @@ import (
 // even if still valid in backwards compatibility mode.
 func TestLatest(t *testing.T) {
 	filepath.Walk("testdata/script", func(fullpath string, info os.FileInfo, err error) error {
-		if !strings.HasSuffix(fullpath, ".txt") {
+		if !strings.HasSuffix(fullpath, ".txt") ||
+			strings.HasPrefix(filepath.Base(fullpath), "legacy") {
 			return nil
 		}
 

@@ -47,13 +47,12 @@ const syntaxVersion = -1000 + 13
 
 var defaultConfig = config{
 	loadCfg: &load.Config{
-		Context: build.NewContext(
-			build.ParseFile(func(name string, src interface{}) (*ast.File, error) {
-				return parser.ParseFile(name, src,
-					parser.FromVersion(syntaxVersion),
-					parser.ParseComments,
-				)
-			})),
+		ParseFile: func(name string, src interface{}) (*ast.File, error) {
+			return parser.ParseFile(name, src,
+				parser.FromVersion(syntaxVersion),
+				parser.ParseComments,
+			)
+		},
 	},
 }
 

@@ -176,7 +176,10 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 
 func (l *loader) addFiles(dir string, p *build.Instance) {
 	for _, f := range p.BuildFiles {
-		d := encoding.NewDecoder(f, &encoding.Config{Stdin: l.cfg.stdin()})
+		d := encoding.NewDecoder(f, &encoding.Config{
+			Stdin:     l.cfg.stdin(),
+			ParseFile: l.cfg.ParseFile,
+		})
 		for ; !d.Done(); d.Next() {
 			_ = p.AddSyntax(d.File())
 		}

@@ -31,6 +31,7 @@ func newHelpTopics(c *Command) []*cobra.Command {
 		flagsHelp,
 		filetypeHelp,
 		injectHelp,
+		commandsHelp,
 	}
 }
 

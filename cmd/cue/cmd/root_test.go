@@ -17,7 +17,32 @@ package cmd
 import "testing"
 
 func TestHelp(t *testing.T) {
-	cmd, err := New([]string{"help", "cmd"})
+	cmd, err := New([]string{"help"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
+	cmd, err = New([]string{"--help"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
+	cmd, err = New([]string{"help", "cmd"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
+	cmd, err = New([]string{"cmd", "--help"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
+	cmd, err = New([]string{"help", "eval"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
+	cmd, err = New([]string{"eval", "--help"})
 	if err != nil || cmd == nil {
 		t.Error("help command failed unexpectedly")
 	}

@@ -107,10 +107,7 @@ func runExport(cmd *Command, args []string) error {
 	b, err := parseArgs(cmd, args, &config{outMode: filetypes.Export})
 	exitOnErr(cmd, err, true)
 
-	f, err := b.out("-")
-	exitOnErr(cmd, err, true)
-
-	enc, err := encoding.NewEncoder(f, b.encConfig)
+	enc, err := encoding.NewEncoder(b.outFile, b.encConfig)
 	exitOnErr(cmd, err, true)
 	defer enc.Close()
 

@@ -281,7 +281,7 @@ func executeTasks(cmd *Command, typ, command string, inst *cue.Instance) (err er
 				return true
 			}
 
-			// Prevent inifinite walks
+			// Prevent infinite walks
 			_, vPath := v.Reference()
 			if vPath != nil {
 				vPath := string(keyForReference(vPath...))

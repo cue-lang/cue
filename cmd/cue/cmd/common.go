@@ -139,6 +139,9 @@ type buildPlan struct {
 	expressions []ast.Expr // only evaluate these expressions within results
 	schema      ast.Expr   // selects schema in instance for orphaned values
 
+	// outFile defines the file to output to. Default is CUE stdout.
+	outFile *build.File
+
 	encConfig *encoding.Config
 	merge     []*build.Instance
 }
@@ -364,17 +367,17 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	}
 	cfg.loadCfg.Stdin = cmd.InOrStdin()
 
-	builds := loadFromArgs(cmd, args, cfg.loadCfg)
-	if builds == nil {
-		return nil, errors.Newf(token.NoPos, "invalid args")
-	}
-	decorateInstances(cmd, flagInject.StringArray(cmd), builds)
-
 	p = &buildPlan{cfg: cfg, cmd: cmd, importing: cfg.loadCfg.DataFiles}
 
 	if err := p.parseFlags(); err != nil {
 		return nil, err
 	}
+
+	builds := loadFromArgs(cmd, args, cfg.loadCfg)
+	if builds == nil {
+		return nil, errors.Newf(token.NoPos, "invalid args")
+	}
+	decorateInstances(cmd, flagInject.StringArray(cmd), builds)
 
 	for _, b := range builds {
 		if b.Err != nil {
@@ -446,24 +449,25 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	return p, nil
 }
 
-func (b *buildPlan) out(def string) (*build.File, error) {
+func (b *buildPlan) parseFlags() (err error) {
 	out := flagOut.String(b.cmd)
 	outFile := flagOutFile.String(b.cmd)
 
 	if strings.Contains(out, ":") && strings.Contains(outFile, ":") {
-		return nil, errors.Newf(token.NoPos,
+		return errors.Newf(token.NoPos,
 			"cannot specify qualifier in both --out and --outfile")
 	}
 	if outFile == "" {
-		outFile = def
+		outFile = "-"
 	}
 	if out != "" {
 		outFile = out + ":" + outFile
 	}
-	return filetypes.ParseFile(outFile, b.cfg.outMode)
-}
+	b.outFile, err = filetypes.ParseFile(outFile, b.cfg.outMode)
+	if err != nil {
+		return err
+	}
 
-func (b *buildPlan) parseFlags() (err error) {
 	for _, e := range flagExpression.StringArray(b.cmd) {
 		expr, err := parser.ParseExpr("--expression", e)
 		if err != nil {

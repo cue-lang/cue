@@ -319,7 +319,7 @@ func (f *formatter) printComment(cg *ast.CommentGroup) {
 	f.Print(cg)
 
 	printBlank := false
-	if cg.Doc {
+	if cg.Doc && len(f.output) > 0 {
 		f.Print(newline)
 		printBlank = true
 	}

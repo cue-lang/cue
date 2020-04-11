@@ -1,5 +1,8 @@
 cue def
-cmp stdout expect-stdout
+cmp stdout expect-stdout1
+
+cue def data.cue
+cmp stdout expect-stdout2
 
 -- schema.cue --
 // foo
@@ -8,16 +11,19 @@ package foo
 A :: {
     // a is an integer
     a: int
-    b: int
+    b: { c: int } // TODO: should we _not_ simplify?
 }
 
--- expect-stdout --
-
+-- data.cue --
+3
+-- expect-stdout2 --
+3
+-- expect-stdout1 --
 // foo
 package foo
 
 A :: {
 	// a is an integer
 	a: int
-	b: int
+	b: c: int
 }

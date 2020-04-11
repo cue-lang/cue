@@ -210,7 +210,6 @@ Attributes :: {
 	}
 }
 -- expect-client_config_proto_gen.cue --
-
 // Describes the configuration state for the Mixer client library that's built into Envoy.
 package client
 

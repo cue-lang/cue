@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/openapi"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/pkg/encoding/yaml"
 )
@@ -119,7 +120,9 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 				opts = append(opts, format.Simplify())
 			}
 
-			b, err := format.Node(n, opts...)
+			// Casting an ast.Expr to an ast.File ensures that it always ends
+			// with a newline.
+			b, err := format.Node(internal.ToFile(n), opts...)
 			if err != nil {
 				return err
 			}

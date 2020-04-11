@@ -164,7 +164,6 @@ components: schemas: {
 	}
 }
 -- expect-cue --
-
 // My OpenAPI
 package foo
 

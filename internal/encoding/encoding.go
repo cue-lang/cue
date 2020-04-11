@@ -78,6 +78,10 @@ func (i *Decoder) Next() {
 	if i.err != nil {
 		return
 	}
+	i.doInterpret()
+}
+
+func (i *Decoder) doInterpret() {
 	// Interpretations
 	if i.interpret != nil {
 		var r cue.Runtime
@@ -197,6 +201,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 			i.file, i.err = cfg.ParseFile(path, r)
 		}
 		i.validate(i.file, f)
+		if i.err == nil {
+			i.doInterpret()
+		}
 	case build.JSON, build.JSONL:
 		i.next = json.NewDecoder(nil, path, r).Extract
 		i.Next()

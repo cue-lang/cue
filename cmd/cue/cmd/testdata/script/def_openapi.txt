@@ -14,6 +14,10 @@ cmp stdout expect-cue
 cue def -p foo openapi.json
 cmp stdout expect-cue
 
+# cue to openapi
+cue def openapi+cue: expect-cue-out -o -
+cmp stdout expect-cue2
+
 -- foo.cue --
 // Some clever title.
 
@@ -172,6 +176,20 @@ info: {
 	version: "v1alpha1"
 }
 
+Bar :: {
+	foo: Foo
+	...
+}
+Foo :: {
+	a: int
+	b: >=0 & <10
+	...
+}
+-- expect-cue2 --
+info: {
+	title:   "Some clever title."
+	version: "v1"
+}
 Bar :: {
 	foo: Foo
 	...

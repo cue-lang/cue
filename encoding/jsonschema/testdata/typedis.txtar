@@ -1,0 +1,56 @@
+-- type.json --
+{
+  "type": "object",
+  "title": "Main schema",
+
+  "properties": {
+    "intOrString1": {
+      "type": [ "string", "integer" ]
+    },
+    "intOrString2": {
+      "oneOf": [
+          { "type": "integer" },
+          { "type": "string" }
+      ]
+    },
+    "intOrString3": {
+      "anyOf": [
+          { "type": "integer" },
+          { "type": "string" }
+      ]
+    },
+
+    "disjunction": {
+      "oneOf": [
+        {
+            "anyOf": [
+                { "type": "integer" },
+                { "type": "string" }
+            ]
+        },
+        {
+            "type": "integer",
+            "minimum": 3
+        }
+      ]
+    },
+
+
+    "empty": {
+        "allOf": [
+            { "type": "object" },
+            { "type": "string" }
+        ]
+    }
+  }
+}
+-- out.cue --
+// Main schema
+Schema :: {
+	intOrString1?: int | string
+	intOrString2?: int | string
+	intOrString3?: int | string
+	disjunction?:  int | string | >=3
+	empty?:        _|_
+	...
+}

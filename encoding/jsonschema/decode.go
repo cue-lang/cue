@@ -20,6 +20,7 @@ package jsonschema
 
 import (
 	"fmt"
+	"math/bits"
 	"sort"
 	"strings"
 
@@ -111,7 +112,7 @@ func (d *decoder) schema(ref []string, v cue.Value) (a []ast.Decl) {
 	inner := len(ref) - 1
 	name := ref[inner]
 
-	expr, state := root.schemaState(v)
+	expr, state := root.schemaState(v, allTypes, false)
 
 	tags := []string{}
 	if state.jsonschema != "" {
@@ -204,13 +205,15 @@ func (d *decoder) strValue(n cue.Value) (s string, ok bool) {
 type state struct {
 	*decoder
 
+	parent *state
+
 	path []string
 
 	pos cue.Value
 
-	types        []cue.Value
 	typeOptional bool
-	kind         cue.Kind
+	usedTypes    cue.Kind
+	allowedTypes cue.Kind
 
 	default_    ast.Expr
 	examples    []ast.Expr
@@ -229,50 +232,55 @@ type state struct {
 	list *ast.ListLit
 }
 
+func (s *state) hasConstraints() bool {
+	return len(s.conjuncts) > 0 ||
+		len(s.patterns) > 0 ||
+		s.title != "" ||
+		s.description != "" ||
+		s.obj != nil ||
+		s.list != nil
+}
+
+const allTypes = cue.NullKind | cue.BoolKind | cue.NumberKind | cue.IntKind |
+	cue.StringKind | cue.ListKind | cue.StructKind
+
 // finalize constructs a CUE type from the collected constraints.
 func (s *state) finalize() (e ast.Expr) {
-	if s.typeOptional || s.kind != 0 {
-		if len(s.types) > 1 {
-			s.errf(s.pos, "constraints require specific type")
-		}
-		s.types = nil
-	}
-
 	conjuncts := []ast.Expr{}
 	disjuncts := []ast.Expr{}
-	for _, n := range s.types {
-		add := func(e ast.Expr) {
-			disjuncts = append(disjuncts, setPos(e, n))
-		}
-		str, ok := s.strValue(n)
-		if !ok {
-			s.errf(n, "type value should be a string")
-			return
-		}
-		switch str {
-		case "null":
+
+	add := func(e ast.Expr) {
+		disjuncts = append(disjuncts, e) // TODO: use setPos
+	}
+
+	types := s.allowedTypes &^ s.usedTypes
+	if types == allTypes {
+		add(ast.NewIdent("_"))
+		types = 0
+	}
+	if types&cue.FloatKind != 0 {
+		add(ast.NewIdent("number"))
+		types &^= cue.IntKind
+	}
+	for types != 0 {
+		k := cue.Kind(1 << uint(bits.TrailingZeros(uint(types))))
+		types &^= k
+
+		switch k {
+		case cue.NullKind:
 			// TODO: handle OpenAPI restrictions.
 			add(ast.NewIdent("null"))
-		case "boolean":
+		case cue.BoolKind:
 			add(ast.NewIdent("bool"))
-		case "string":
+		case cue.StringKind:
 			add(ast.NewIdent("string"))
-		case "number":
-			add(ast.NewIdent("number"))
-		case "integer":
+		case cue.IntKind:
 			add(ast.NewIdent("int"))
-		case "array":
-			if s.kind&cue.ListKind == 0 {
-				add(ast.NewList(&ast.Ellipsis{}))
-			}
-		case "object":
+		case cue.ListKind:
+			add(ast.NewList(&ast.Ellipsis{}))
+		case cue.StructKind:
 			add(ast.NewStruct(&ast.Ellipsis{}))
-		default:
-			s.errf(n, "unknown type %q", n)
 		}
-	}
-	if len(disjuncts) > 0 {
-		conjuncts = append(conjuncts, ast.NewBinExpr(token.OR, disjuncts...))
 	}
 
 	conjuncts = append(conjuncts, s.conjuncts...)
@@ -284,23 +292,33 @@ func (s *state) finalize() (e ast.Expr) {
 		conjuncts = append(conjuncts, s.obj)
 	}
 
-	if len(conjuncts) == 0 {
-		return ast.NewString(fmt.Sprint(s.pos))
+	if len(conjuncts) > 0 {
+		disjuncts = append(disjuncts,
+			ast.NewBinExpr(token.AND, conjuncts...))
 	}
 
-	e = ast.NewBinExpr(token.AND, conjuncts...)
+	if len(disjuncts) == 0 {
+		e = &ast.BottomLit{}
+	} else {
+		e = ast.NewBinExpr(token.OR, disjuncts...)
+	}
 
 	if s.default_ != nil {
 		// check conditions where default can be skipped.
 		switch x := s.default_.(type) {
 		case *ast.ListLit:
-			if s.kind == cue.ListKind && len(x.Elts) == 0 {
+			if s.usedTypes == cue.ListKind && len(x.Elts) == 0 {
 				return e
 			}
 		}
 		e = ast.NewBinExpr(token.OR, e, &ast.UnaryExpr{Op: token.MUL, X: s.default_})
 	}
 	return e
+}
+
+func isAny(s ast.Expr) bool {
+	i, ok := s.(*ast.Ident)
+	return ok && i.Name == "_"
 }
 
 func (s *state) comment() *ast.CommentGroup {
@@ -327,18 +345,30 @@ func (s *state) doc(n ast.Node) {
 	}
 }
 
-func (s *state) add(e ast.Expr) {
-	s.conjuncts = append(s.conjuncts, e)
+func (s *state) addConjunct(e ast.Expr) {
+	if !isAny(e) {
+		s.conjuncts = append(s.conjuncts, e)
+	}
 }
 
 func (s *state) schema(n cue.Value) ast.Expr {
-	expr, _ := s.schemaState(n)
+	expr, _ := s.schemaState(n, allTypes, false)
 	// TODO: report unused doc.
 	return expr
 }
 
-func (s *state) schemaState(n cue.Value) (ast.Expr, *state) {
-	state := &state{path: s.path, pos: n, decoder: s.decoder}
+// schemaState is a low-level API for schema. isLogical specifies whether the
+// caller is a logical operator like anyOf, allOf, oneOf, or not.
+func (s *state) schemaState(n cue.Value, types cue.Kind, isLogical bool) (ast.Expr, *state) {
+	state := &state{
+		decoder:      s.decoder,
+		allowedTypes: types,
+		path:         s.path,
+		pos:          n,
+	}
+	if isLogical {
+		state.parent = s
+	}
 
 	if n.Kind() != cue.StructKind {
 		return s.errf(n, "schema expects mapping node, found %s", n.Kind()), state
@@ -365,7 +395,10 @@ func (s *state) schemaState(n cue.Value) (ast.Expr, *state) {
 }
 
 func (s *state) value(n cue.Value) ast.Expr {
-	switch n.Kind() {
+	k := n.Kind()
+	s.usedTypes |= k
+	s.allowedTypes &= k
+	switch k {
 	case cue.ListKind:
 		a := []ast.Expr{}
 		for i, _ := n.List(); i.Next(); {
@@ -409,9 +442,15 @@ func (s *state) processMap(n cue.Value, f func(key string, n cue.Value)) {
 	}
 }
 
-func list(n cue.Value) (a []cue.Value) {
+func (s *state) listItems(name string, n cue.Value, allowEmpty bool) (a []cue.Value) {
+	if n.Kind() != cue.ListKind {
+		s.errf(n, `value of %q must be an array, found %v`, name, n.Kind())
+	}
 	for i, _ := n.List(); i.Next(); {
 		a = append(a, i.Value())
+	}
+	if !allowEmpty && len(a) == 0 {
+		s.errf(n, `array for %q must be non-empty`, name)
 	}
 	return a
 }

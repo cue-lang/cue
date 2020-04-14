@@ -3,20 +3,24 @@ type: object
 
 properties:
   foo:
+    type: array
     items:
       type: string
 
   tuple:
+    type: array
     items:
       - type: string
       - type: integer
       - const: 2
 
   has:
+    type: array
     contains:
       const: 3
 
   size:
+    type: array
     minItems: 3
     maxItems: 9
     uniqueItems: true

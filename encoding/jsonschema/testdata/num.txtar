@@ -13,10 +13,12 @@
         "maximum": 3
     },
     "exclusive": {
+        "type": "number",
         "exclusiveMinimum": 2,
         "exclusiveMaximum": 3
     },
     "cents": {
+      "type": "number",
       "multipleOf": 0.05
     }
   },

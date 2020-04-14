@@ -18,7 +18,10 @@
     "numOrList": {
       "oneOf": [
         { "type": "number" },
-        { "items": { "type": "number" } }
+        {
+          "type": "array",
+          "items": { "type": "number" }
+        }
       ],
       "default": [ 1, 2, 3 ]
     }
@@ -30,9 +33,9 @@
 // Main schema
 Schema :: {
 	// an integer or string.
-	intString?: string | int | bool | [...] | null
+	intString?: null | bool | int | string | [...]
 	object?:    {
-			...
+		...
 	} | *{
 		foo: "bar"
 		baz: 1.3

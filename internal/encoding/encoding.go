@@ -132,6 +132,7 @@ type Config struct {
 	PkgName string // package name for files to generate
 
 	Force     bool // overwrite existing files.
+	Strict    bool
 	Stream    bool // will potentially write more than one document per file
 	AllErrors bool
 
@@ -246,6 +247,8 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 		cfg := &jsonschema.Config{
 			ID:      id,
 			PkgName: cfg.PkgName,
+
+			Strict: cfg.Strict,
 		}
 		file, err = simplify(jsonschema.Extract(i, cfg))
 		return file, id, err

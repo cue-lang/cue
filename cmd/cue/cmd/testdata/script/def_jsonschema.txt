@@ -5,6 +5,11 @@ cmp stdout expect-stdout
 cue def schema.json -p schema -l 'Person::'
 cmp stdout expect-stdout
 
+cue def jsonschema: bad.json
+
+! cue def jsonschema: bad.json --strict
+cmp stderr expect-stderr
+
 -- expect-stdout --
 package schema
 
@@ -45,4 +50,13 @@ Person :: {
   }
 }
 
+-- bad.json --
+{
+  "type": "number",
+  "foo": "bar"
+}
+
+-- expect-stderr --
+unsupported constraint "foo":
+    ./bad.json:3:10
 -- cue.mod --

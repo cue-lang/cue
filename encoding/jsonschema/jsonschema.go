@@ -57,7 +57,8 @@ func Extract(data *cue.Instance, cfg *Config) (f *ast.File, err error) {
 type Config struct {
 	PkgName string
 
-	ID string // URL of the original source, corresponding to the $id field.
+	// ID sets the URL of the original source, corresponding to the $id field.
+	ID string
 
 	// JSON reference of location containing schema. The empty string indicates
 	// that there is a single schema at the root.
@@ -80,6 +81,10 @@ type Config struct {
 	// - locations of definitions: #/components/schemas, for instance.
 	// - selection and definition of formats
 	// - documentation hooks.
+
+	// Strict reports an error for unsupported features, rather than ignoring
+	// them.
+	Strict bool
 
 	_ struct{} // prohibit casting from different type.
 }

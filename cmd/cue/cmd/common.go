@@ -492,6 +492,7 @@ func (b *buildPlan) parseFlags() (err error) {
 		ProtoPath: flagProtoPath.StringArray(b.cmd),
 		AllErrors: flagAllErrors.Bool(b.cmd),
 		PkgName:   flagPackage.String(b.cmd),
+		Strict:    flagStrict.Bool(b.cmd),
 	}
 	return nil
 }

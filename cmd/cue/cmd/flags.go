@@ -28,6 +28,7 @@ const (
 	flagTrace     flagName = "trace"
 	flagForce     flagName = "force"
 	flagIgnore    flagName = "ignore"
+	flagStrict    flagName = "strict"
 	flagSimplify  flagName = "simplify"
 	flagPackage   flagName = "package"
 	flagInject    flagName = "inject"
@@ -62,6 +63,8 @@ func addGlobalFlags(f *pflag.FlagSet) {
 		"simplify output")
 	f.BoolP(string(flagIgnore), "i", false,
 		"proceed in the presence of errors")
+	f.Bool(string(flagStrict), false,
+		"report errors for lossy mappings")
 	f.BoolP(string(flagVerbose), "v", false,
 		"print information about progress")
 	f.BoolP(string(flagAllErrors), "E", false, "print all available errors")

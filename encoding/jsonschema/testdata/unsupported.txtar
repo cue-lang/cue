@@ -1,0 +1,49 @@
+-- unsupported.json --
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "ref": {
+      "properties": {
+        "branches": {
+          "type": "object"
+        },
+        "branches-ignore": {
+          "type": "object"
+        }
+      },
+      "oneOf": [
+        {
+          "type": "object",
+          "allOf": [
+            {
+              "not": {
+                "required": [
+                  "branches",
+                  "branches-ignore"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "type": "null"
+        }
+      ]
+    }
+  }
+}
+
+
+-- out.cue --
+Schema :: _ @jsonschema(schema="http://json-schema.org/draft-07/schema")
+Schema :: _
+
+def: ref :: null | {
+	branches?: {
+		...
+	}
+	"branches-ignore"?: {
+		...
+	}
+	...
+}

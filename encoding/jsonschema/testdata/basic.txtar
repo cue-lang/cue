@@ -15,7 +15,9 @@
         "name": { "type": "string" },
         "address": {
             "description": "where does this person live?",
-            "type": "string"
+            "type": "string",
+			"minLength": 4,
+			"maxLength": 20
         },
         "children": {
           "description": "A very large comment that will be wrapped after a certain line length. Let's keep on going and see what happens.",
@@ -33,6 +35,8 @@
 }
 
 -- out.cue --
+import "strings"
+
 // Main schema
 //
 // Specify who you are and all.
@@ -43,7 +47,7 @@ Schema :: {
 		name: string
 
 		// where does this person live?
-		address?: string
+		address?: strings.MinRunes(4) & strings.MaxRunes(20)
 
 		// A very large comment that will be wrapped after a certain line
 		// length. Let's keep on going and see what happens.

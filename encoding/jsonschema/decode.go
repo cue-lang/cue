@@ -237,8 +237,7 @@ func (s *state) hasConstraints() bool {
 		len(s.patterns) > 0 ||
 		s.title != "" ||
 		s.description != "" ||
-		s.obj != nil ||
-		s.list != nil
+		s.obj != nil
 }
 
 const allTypes = cue.NullKind | cue.BoolKind | cue.NumberKind | cue.IntKind |

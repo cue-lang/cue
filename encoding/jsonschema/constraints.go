@@ -307,6 +307,21 @@ var constraints = []*constraint{
 		s.addConjunct(&ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
 	}),
 
+	p0("minLength", func(n cue.Value, s *state) {
+		s.usedTypes |= cue.StringKind
+		min := s.number(n)
+		strings := s.addImport("strings")
+		s.addConjunct(ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
+
+	}),
+
+	p0("maxLength", func(n cue.Value, s *state) {
+		s.usedTypes |= cue.StringKind
+		max := s.number(n)
+		strings := s.addImport("strings")
+		s.addConjunct(ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
+	}),
+
 	p0d("contentMediaType", 7, func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 	}),
@@ -530,9 +545,6 @@ var constraints = []*constraint{
 
 	p0("items", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
-		if s.list != nil {
-			s.errf(n, `"items" declared more than once, previous declaration at %s`, s.list.Pos())
-		}
 		switch n.Kind() {
 		case cue.StructKind:
 			elem := s.schema(n)
@@ -546,10 +558,19 @@ var constraints = []*constraint{
 				ast.SetRelPos(v, token.NoRelPos)
 				a = append(a, v)
 			}
-			s.addConjunct(ast.NewList(a...))
+			s.list = ast.NewList(a...)
+			s.addConjunct(s.list)
 
 		default:
 			s.errf(n, `value of "items" must be an object or array`)
+		}
+	}),
+
+	p0("additionalItems", func(n cue.Value, s *state) {
+		s.usedTypes |= cue.ListKind
+		if s.list != nil {
+			elem := s.schema(n)
+			s.list.Elts = append(s.list.Elts, &ast.Ellipsis{Type: elem})
 		}
 	}),
 
@@ -561,6 +582,8 @@ var constraints = []*constraint{
 			s.addConjunct(ast.NewCall(ast.NewSel(list, "Contains"), clearPos(x)))
 		}
 	}),
+
+	// TODO: min/maxContains
 
 	p0("minItems", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind

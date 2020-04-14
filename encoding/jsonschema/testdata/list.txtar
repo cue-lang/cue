@@ -25,6 +25,14 @@ properties:
     maxItems: 9
     uniqueItems: true
 
+  additional:
+    type: array
+    items:
+      - type: integer
+      - type: integer
+    additionalItems:
+      type: string
+
 additionalProperties: false
 
 -- out.cue --
@@ -35,4 +43,5 @@ Schema :: {
 	tuple?: [string, int, 2]
 	has?:  list.Contains(3)
 	size?: list.MinItems(3) & list.MaxItems(9) & list.UniqueItems()
+	additional?: [int, int, ...string]
 }

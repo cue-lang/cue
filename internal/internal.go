@@ -127,9 +127,28 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 	}
 	scanner := bufio.NewScanner(strings.NewReader(s))
 	for scanner.Scan() {
-		cg.List = append(cg.List, &ast.Comment{Text: "// " + scanner.Text()})
+		scanner := bufio.NewScanner(strings.NewReader(scanner.Text()))
+		scanner.Split(bufio.ScanWords)
+		const maxRunesPerLine = 66
+		count := 2
+		buf := strings.Builder{}
+		buf.WriteString("//")
+		for scanner.Scan() {
+			s := scanner.Text()
+			n := len([]rune(s)) + 1
+			if count+n > maxRunesPerLine && count > 3 {
+				cg.List = append(cg.List, &ast.Comment{Text: buf.String()})
+				count = 3
+				buf.Reset()
+				buf.WriteString("//")
+			}
+			buf.WriteString(" ")
+			buf.WriteString(s)
+			count += n
+		}
+		cg.List = append(cg.List, &ast.Comment{Text: buf.String()})
 	}
-	if last := len(cg.List) - 1; cg.List[last].Text == "// " {
+	if last := len(cg.List) - 1; cg.List[last].Text == "//" {
 		cg.List = cg.List[:last]
 	}
 	return cg

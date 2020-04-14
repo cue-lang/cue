@@ -456,12 +456,13 @@ var constraints = []*constraint{
 		}
 	}),
 
-	p0("minProperties", func(n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
+	// TODO: reenable when we have proper non-monotonic contraint validation.
+	// p0("minProperties", func(n cue.Value, s *state) {
+	// 	s.usedTypes |= cue.StructKind
 
-		pkg := s.addImport("struct")
-		s.addConjunct(ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n)))
-	}),
+	// 	pkg := s.addImport("struct")
+	// 	s.addConjunct(ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n)))
+	// }),
 
 	p0("maxProperties", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
@@ -587,8 +588,19 @@ var constraints = []*constraint{
 
 	p0("minItems", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
-		list := s.addImport("list")
-		s.addConjunct(ast.NewCall(ast.NewSel(list, "MinItems"), clearPos(s.uint(n))))
+		a := []ast.Expr{}
+		p, err := n.Uint64()
+		if err != nil {
+			s.errf(n, "invalid uint")
+		}
+		for ; p > 0; p-- {
+			a = append(a, ast.NewIdent("_"))
+		}
+		s.addConjunct(ast.NewList(append(a, &ast.Ellipsis{})...))
+
+		// TODO: use this once constraint resolution is properly implemented.
+		// list := s.addImport("list")
+		// s.addConjunct(ast.NewCall(ast.NewSel(list, "MinItems"), clearPos(s.uint(n))))
 	}),
 
 	p0("maxItems", func(n cue.Value, s *state) {

@@ -98,7 +98,7 @@ CheckResponse :: {
 		[string]: QuotaResult
 	} @protobuf(3,type=map<string,QuotaResult>,"(gogoproto.nullable)=false")
 }
-_status_ = status
+let _status_ = status
 
 // Describes the attributes that were used to determine the response.
 // This can be used to construct a response cache.

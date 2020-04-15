@@ -183,6 +183,10 @@ func walk(v visitor, node ast.Node) {
 			walk(v, c)
 		}
 
+	case *ast.LetClause:
+		walk(v, n.Ident)
+		walk(v, n.Expr)
+
 	case *ast.ForClause:
 		if n.Key != nil {
 			walk(v, n.Key)

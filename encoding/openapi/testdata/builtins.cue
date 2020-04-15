@@ -3,7 +3,7 @@ import (
 	"list"
 )
 
-_time = time
+let _time = time
 
 MyStruct :: {
 	timestamp1?: time.Time

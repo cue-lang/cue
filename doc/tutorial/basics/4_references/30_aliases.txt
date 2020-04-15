@@ -14,7 +14,7 @@ Aliases are not members of a struct. They can be referred to only within the
 struct, and they do not appear in the output.
 
 -- alias.cue --
-A = a  // A is an alias for a
+let A = a  // A is an alias for a
 a: {
     d: 3
 }

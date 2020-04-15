@@ -355,8 +355,8 @@ import (
 	"regexp"
 )
 
-pi = 3.14  // TODO: allow on same line
-xx = 0
+let pi = 3.14
+let xx = 0
 t: {
 	x: int
 	y: int
@@ -429,7 +429,7 @@ e2: c*t.z
 
 var decls = []string{
 	"package p\n\n" + `import "fmt"`,
-	"package p\n\n" + "pi = 3.1415\ne = 2.71828\n\nx = pi",
+	"package p\n\n" + "let pi = 3.1415\nlet e = 2.71828\n\nlet x = pi",
 }
 
 func TestDeclLists(t *testing.T) {

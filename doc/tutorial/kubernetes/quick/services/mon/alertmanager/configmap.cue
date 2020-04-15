@@ -7,7 +7,7 @@ configMap: alertmanager: {
 	kind:       "ConfigMap"
 	data: {
 		"alerts.yaml": yaml656e63.Marshal(_cue_alerts_yaml)
-		_cue_alerts_yaml = {
+		let _cue_alerts_yaml = {
 			receivers: [{
 				name: "pager"
 				// email_configs:

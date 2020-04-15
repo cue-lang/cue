@@ -99,7 +99,7 @@ for x in [deployment, daemonSet, statefulSet] for k, v in x {
 			for c in v.spec.template.spec.containers
 			for p in c.ports
 			if p._export {
-				Port = p.containerPort // Port is an alias
+				let Port = p.containerPort // Port is an alias
 				port:       *Port | int
 				targetPort: *Port | int
 			},

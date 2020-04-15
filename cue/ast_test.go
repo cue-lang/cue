@@ -170,10 +170,10 @@ func TestCompile(t *testing.T) {
 	}, {
 		// bunch of aliases
 		in: `
-		a1 = a2
-		a2 = 5
+		let a1 = a2
+		let a2 = 5
 		b: a1
-		a3 = d
+		let a3 = d
 		c: {
 			d: {
 				r: a3
@@ -186,11 +186,11 @@ func TestCompile(t *testing.T) {
 	}, {
 		// aliases with errors
 		in: `
-		e1 = 1
-		e1 = 2
+		let e1 = 1
+		let e1 = 2
 		e1v: e1
 		e2: "a"
-		e2 = "a"
+		let e2 = "a"
 		`,
 		out: `alias "e1" redeclared in same scope:` + "\n" +
 			"    test:3:3\n" +
@@ -199,7 +199,7 @@ func TestCompile(t *testing.T) {
 			"<0>{}",
 	}, {
 		in: `
-		a = b
+		let a = b
 		b: {
 			c: a // reference to own root.
 		}
@@ -271,7 +271,7 @@ a: invalid label: cannot reference fields with square brackets labels outside th
 		[X=string]: int
 		X=[string]: int
 		Y=foo: int
-		Y=3
+		let Y=3
 		Z=[string]: { Z=3, a: int } // allowed
 		`,
 		out: `alias "X" redeclared in same scope:

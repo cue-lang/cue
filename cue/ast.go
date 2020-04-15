@@ -275,7 +275,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				// Solving this is best done with a generic topological sort
 				// mechanism.
 
-			case *ast.Field, *ast.Alias:
+			case *ast.Field, *ast.Alias, *ast.LetClause:
 				v1.walk(e)
 
 			case *ast.Comprehension:
@@ -487,7 +487,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			panic("cue: unknown label type")
 		}
 
-	case *ast.Alias:
+	case *ast.Alias, *ast.LetClause:
 		// parsed verbatim at reference.
 
 	case *ast.ListComprehension:
@@ -551,7 +551,8 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		}
 
 		// Type of reference      Scope          Node
-		// Alias declaration      File/Struct    Alias
+		// Let Clause             File/Struct    LetClause
+		// Alias declaration      File/Struct    Alias (deprecated)
 		// Illegal Reference      File/Struct
 		// Fields
 		//    Label               File/Struct    ParenExpr, Ident, BasicLit
@@ -561,17 +562,24 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		//    Label               Field          Expr
 		//    Value               Field          Field
 		// Pkg                    nil            ImportSpec
+		var expr ast.Expr
+		switch x := n.Node.(type) {
+		case *ast.Alias:
+			expr = x.Expr
+		case *ast.LetClause:
+			expr = x.Expr
+		}
 
-		if x, ok := n.Node.(*ast.Alias); ok {
+		if expr != nil {
 			// TODO(lang): should we exempt definitions? The substitution
 			// principle says we should not.
-			if ret = v.aliasMap[x.Expr]; ret != nil {
+			if ret = v.aliasMap[expr]; ret != nil {
 				break
 			}
 			old := v.ctx().inDefinition
 			v.ctx().inDefinition = 0
-			ret = v.walk(x.Expr)
-			v.aliasMap[x.Expr] = ret
+			ret = v.walk(expr)
+			v.aliasMap[expr] = ret
 			v.ctx().inDefinition = old
 			break
 		}

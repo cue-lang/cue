@@ -165,6 +165,10 @@ func walk(v visitor, node Node) {
 	case *EmbedDecl:
 		walk(v, n.Expr)
 
+	case *LetClause:
+		walk(v, n.Ident)
+		walk(v, n.Expr)
+
 	case *Alias:
 		walk(v, n.Ident)
 		walk(v, n.Expr)

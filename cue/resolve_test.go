@@ -2866,17 +2866,17 @@ func TestFullEval(t *testing.T) {
 		desc: "alias reuse in nested scope",
 		in: `
 		Foo :: {
-			X = or([ for k, _ in {} { k } ])
+			let X = or([ for k, _ in {} { k } ])
 			connection: [X]: X
 		}
 		A :: {
 			foo: "key"
-			X = foo
+			let X = foo
 			a: foo: [X]: X
 		}
 		B :: {
 			foo: string
-			X = foo
+			let X = foo
 			a: foo: [X]: X
 		}
 		b: B & { foo: "key" }

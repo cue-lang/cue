@@ -666,7 +666,7 @@ func TestExportFile(t *testing.T) {
 		in: `
 		import "strings"
 
-		stringsx = strings
+		let stringsx = strings
 
 		a: {
 			strings: stringsx.ContainsAny("c")
@@ -675,7 +675,7 @@ func TestExportFile(t *testing.T) {
 		out: unindent(`
 		import "strings"
 
-		STRINGS = strings
+		let STRINGS = strings
 		a: strings: STRINGS.ContainsAny("c")`),
 	}, {
 		in: `

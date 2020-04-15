@@ -614,6 +614,18 @@ type IfClause struct {
 	clause
 }
 
+// A LetClause node represents a let clause in a comprehension.
+type LetClause struct {
+	Let   token.Pos
+	Ident *Ident
+	Equal token.Pos
+	Expr  Expr
+
+	comments
+	clause
+	decl
+}
+
 // A ParenExpr node represents a parenthesized expression.
 type ParenExpr struct {
 	Lparen token.Pos // position of "("
@@ -744,6 +756,8 @@ func (x *Ellipsis) Pos() token.Pos           { return x.Ellipsis }
 func (x *Ellipsis) pos() *token.Pos          { return &x.Ellipsis }
 func (x *ListComprehension) Pos() token.Pos  { return x.Lbrack }
 func (x *ListComprehension) pos() *token.Pos { return &x.Lbrack }
+func (x *LetClause) Pos() token.Pos          { return x.Let }
+func (x *LetClause) pos() *token.Pos         { return &x.Let }
 func (x *ForClause) Pos() token.Pos          { return x.For }
 func (x *ForClause) pos() *token.Pos         { return &x.For }
 func (x *IfClause) Pos() token.Pos           { return x.If }
@@ -787,6 +801,7 @@ func (x *Ellipsis) End() token.Pos {
 	return x.Ellipsis.Add(3) // len("...")
 }
 func (x *ListComprehension) End() token.Pos { return x.Rbrack }
+func (x *LetClause) End() token.Pos         { return x.Expr.End() }
 func (x *ForClause) End() token.Pos         { return x.Source.End() }
 func (x *IfClause) End() token.Pos          { return x.Condition.End() }
 func (x *ParenExpr) End() token.Pos         { return x.Rparen.Add(1) }

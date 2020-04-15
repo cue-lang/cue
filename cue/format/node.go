@@ -97,6 +97,8 @@ func hasDocComments(d ast.Decl) bool {
 		return len(x.Label.Comments()) > 0
 	case *ast.Alias:
 		return len(x.Ident.Comments()) > 0
+	case *ast.LetClause:
+		return len(x.Ident.Comments()) > 0
 	}
 	return false
 }
@@ -363,6 +365,16 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.print(unindent, newline, n.Rparen, token.RPAREN, newline)
 		}
 		f.print(newsection, nooverride)
+
+	case *ast.LetClause:
+		if !decl.Pos().HasRelPos() || decl.Pos().RelPos() >= token.Newline {
+			f.print(formfeed)
+		}
+		f.print(n.Let, token.LET, blank, nooverride)
+		f.expr(n.Ident)
+		f.print(blank, nooverride, n.Equal, token.BIND, blank)
+		f.expr(n.Expr)
+		f.print(declcomma) // implied
 
 	case *ast.EmbedDecl:
 		if !n.Pos().HasRelPos() || n.Pos().RelPos() >= token.Newline {

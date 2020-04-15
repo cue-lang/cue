@@ -11,11 +11,11 @@ package expressions
 	c: b: a:       4
 	c?: bb?: aaa?: 5
 	c: b: [Name=string]: a: int
-	alias = 3.14
+	let alias = 3.14
 	"g\("en")"?: 4
 
-	alias2 = foo // with comment
-	aaalias = foo
+	let alias2 = foo // with comment
+	let aaalias = foo
 	b: bar
 
 	bottom: _|_

@@ -478,6 +478,8 @@ func (h *hoister) hoist(f *ast.File) {
 			name, _, _ = ast.LabelName(x.Label)
 		case *ast.Alias:
 			name = x.Ident.Name
+		case *ast.LetClause:
+			name = x.Ident.Name
 		}
 		if name != "" {
 			h.fields[name] = true
@@ -528,7 +530,7 @@ func (h *hoister) hoist(f *ast.File) {
 				ast.NewIdent(dataField))
 
 			// TODO: use definitions instead
-			c.InsertAfter(astutil.ApplyRecursively(&ast.Alias{
+			c.InsertAfter(astutil.ApplyRecursively(&ast.LetClause{
 				Ident: ast.NewIdent(dataField),
 				Expr:  expr,
 			}))

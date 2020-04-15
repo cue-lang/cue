@@ -18,7 +18,7 @@ service: {
 		foo
 		"""
 		json: json656e63.Marshal(_cue_json)
-		_cue_json = [1, 2]
+		let _cue_json = [1, 2]
 	}]
 }
 deployment: booster: [{

@@ -254,6 +254,14 @@ func TestParse(t *testing.T) {
 			 }`,
 		`{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
 	}, {
+		"let declaration",
+		`{
+			let X = 42
+			let Y = "42",
+			let Z = 10 + 12
+		}`,
+		`{let X=42, let Y="42", let Z=10+12}`,
+	}, {
 		"duplicates allowed",
 		`{
 			a: b: 3

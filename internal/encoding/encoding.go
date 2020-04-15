@@ -395,7 +395,7 @@ func (v *validator) validate(n ast.Node) bool {
 	case *ast.Ellipsis:
 		check(n, constraints, "ellipsis", true)
 
-	case *ast.Ident, *ast.SelectorExpr, *ast.Alias:
+	case *ast.Ident, *ast.SelectorExpr, *ast.Alias, *ast.LetClause:
 		check(n, i.References, "references", true)
 
 	default:

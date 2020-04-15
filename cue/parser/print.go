@@ -49,6 +49,13 @@ func debugStr(x interface{}) (out string) {
 		out += debugStr(v.Name)
 		return out
 
+	case *ast.LetClause:
+		out := "let "
+		out += debugStr(v.Ident)
+		out += "="
+		out += debugStr(v.Expr)
+		return out
+
 	case *ast.Alias:
 		out := debugStr(v.Ident)
 		out += "="

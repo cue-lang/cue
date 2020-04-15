@@ -461,6 +461,10 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.EmbedDecl:
 		apply(v, c, &n.Expr)
 
+	case *ast.LetClause:
+		apply(v, c, &n.Ident)
+		apply(v, c, &n.Expr)
+
 	case *ast.Alias:
 		apply(v, c, &n.Ident)
 		apply(v, c, &n.Expr)

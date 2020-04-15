@@ -7,7 +7,7 @@ configMap: prometheus: {
 	kind:       "ConfigMap"
 	data: {
 		"alert.rules": yaml656e63.Marshal(_cue_alert_rules)
-		_cue_alert_rules = {
+		let _cue_alert_rules = {
 			groups: [{
 				name: "rules.yaml"
 				rules: [{
@@ -49,7 +49,7 @@ configMap: prometheus: {
 		}
 
 		"prometheus.yml": yaml656e63.Marshal(_cue_prometheus_yml)
-		_cue_prometheus_yml = {
+		let _cue_prometheus_yml = {
 			global: scrape_interval: "15s"
 			rule_files: [
 				"/etc/prometheus/alert.rules",

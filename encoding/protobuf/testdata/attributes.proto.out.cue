@@ -145,8 +145,8 @@ CompressedAttributes :: {
 		[string]: StringMap
 	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
-_time_ = time
-_bytes_ = bytes
+let _time_ = time
+let _bytes_ = bytes
 
 // A map of string to string. The keys and values in this map are dictionary
 // indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)

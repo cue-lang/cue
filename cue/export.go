@@ -85,7 +85,7 @@ func export(ctx *context, inst *Instance, v value, m options) (n ast.Node, impor
 				ident = ast.NewIdent(info.name)
 			}
 			if info.alias != "" {
-				file.Decls = append(file.Decls, &ast.Alias{
+				file.Decls = append(file.Decls, &ast.LetClause{
 					Ident: ast.NewIdent(info.alias),
 					Expr:  ast.NewIdent(info.short),
 				})

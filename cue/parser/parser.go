@@ -701,6 +701,9 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 		case token.FOR, token.IF:
 			list = append(list, p.parseComprehension())
 
+		case token.LET:
+			list = append(list, p.parseLetDecl())
+
 		case token.ATTRIBUTE:
 			list = append(list, p.parseAttribute())
 			if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
@@ -724,9 +727,38 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	return
 }
 
-func (p *parser) parseComprehension() (decl ast.Decl) {
+func (p *parser) parseLetDecl() (decl ast.Decl) {
 	if p.trace {
 		defer un(trace(p, "Field"))
+	}
+
+	c := p.openComments()
+	defer func() { c.closeNode(p, decl) }()
+
+	letPos := p.expect(token.LET)
+	if p.tok != token.IDENT {
+		return &ast.Ident{
+			NamePos: letPos,
+			Name:    "let",
+		}
+	}
+
+	ident := p.parseIdent()
+	assign := p.expect(token.BIND)
+	expr := p.parseRHS()
+	p.expectComma()
+
+	return &ast.LetClause{
+		Let:   letPos,
+		Ident: ident,
+		Equal: assign,
+		Expr:  expr,
+	}
+}
+
+func (p *parser) parseComprehension() (decl ast.Decl) {
+	if p.trace {
+		defer un(trace(p, "Comprehension"))
 	}
 
 	c := p.openComments()
@@ -862,6 +894,8 @@ func (p *parser) parseField() (decl ast.Decl) {
 		case token.RBRACE, token.EOF:
 			if i == 0 {
 				if a, ok := expr.(*ast.Alias); ok {
+					p.assertV0(p.pos, 1, 3, `old-style alias; use "let X = expr"`)
+
 					return a
 				}
 				switch tok {

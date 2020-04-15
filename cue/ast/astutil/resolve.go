@@ -94,6 +94,11 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			if isIdent {
 				s.insert(name, x.Value)
 			}
+		case *ast.LetClause:
+			name, isIdent, _ := ast.LabelName(x.Ident)
+			if isIdent {
+				s.insert(name, x)
+			}
 		case *ast.Alias:
 			name, isIdent, _ := ast.LabelName(x.Ident)
 			if isIdent {
@@ -105,11 +110,14 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 	return s
 }
 
-func (s *scope) isAlias(n ast.Node) bool {
+func (s *scope) isLet(n ast.Node) bool {
 	if _, ok := s.node.(*ast.Field); ok {
 		return true
 	}
 	switch n.(type) {
+	case *ast.LetClause:
+		return true
+
 	case *ast.Alias:
 		return true
 
@@ -125,8 +133,8 @@ func (s *scope) insert(name string, n ast.Node) {
 	}
 	// TODO: record both positions.
 	if outer, _, existing := s.lookup(name); existing != nil {
-		isAlias1 := s.isAlias(n)
-		isAlias2 := outer.isAlias(existing)
+		isAlias1 := s.isLet(n)
+		isAlias2 := outer.isLet(existing)
 		if isAlias1 != isAlias2 {
 			s.errFn(n.Pos(), "cannot have both alias and field with name %q in same scope", name)
 			return
@@ -259,6 +267,18 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			s.inField = false
 		}
 
+		return nil
+
+	case *ast.LetClause:
+		// Disallow referring to the current LHS name.
+		name := x.Ident.Name
+		saved := s.index[name]
+		delete(s.index, name) // The same name may still appear in another scope
+
+		if x.Expr != nil {
+			walk(s, x.Expr)
+		}
+		s.index[name] = saved
 		return nil
 
 	case *ast.Alias:

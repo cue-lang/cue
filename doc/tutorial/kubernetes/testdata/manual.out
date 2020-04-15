@@ -27,17 +27,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -46,13 +47,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -98,17 +100,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -117,13 +120,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -284,17 +288,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -303,13 +308,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -473,17 +479,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -492,13 +499,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -659,17 +667,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -678,13 +687,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -845,17 +855,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -864,13 +875,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -1034,17 +1046,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -1053,13 +1066,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -1220,17 +1234,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -1239,13 +1254,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -1409,17 +1425,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -1428,13 +1445,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -1480,17 +1498,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -1499,13 +1518,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -1651,17 +1671,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -1670,13 +1691,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -2000,17 +2022,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -2019,13 +2042,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -2248,17 +2272,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -2267,13 +2292,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -2471,17 +2497,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -2490,13 +2517,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -2665,17 +2693,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -2684,13 +2713,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -2877,17 +2907,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -2896,13 +2927,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -2948,17 +2980,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -2967,13 +3000,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -3255,17 +3289,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -3274,13 +3309,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -3559,17 +3595,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -3578,13 +3615,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -3842,17 +3880,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -3861,13 +3900,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -4124,17 +4164,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -4143,13 +4184,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -4410,17 +4452,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -4429,13 +4472,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -4696,17 +4740,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -4715,13 +4760,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -4929,17 +4975,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -4948,13 +4995,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -5029,17 +5077,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -5048,13 +5097,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -5316,17 +5366,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -5335,13 +5386,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -5569,17 +5621,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -5588,13 +5641,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -5836,17 +5890,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -5855,13 +5910,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -6555,17 +6611,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -6574,13 +6631,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -6626,17 +6684,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -6645,13 +6704,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -6942,17 +7002,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -6961,13 +7022,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -7152,17 +7214,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -7171,13 +7234,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {
@@ -7792,17 +7856,18 @@ _k8sSpec: {
                             name:  X.name
                             image: X.image
                             args:  X.args
-                            ports: [ {
+                            ports: [ for k, p in X.expose.port & X.port {
                                 name:          k
                                 containerPort: p
-                            } for k, p in X.expose.port & X.port ]
+                            } ]
                             if len(X.envSpec) > 0 {
-                                env: [ {
+                                env: [ for k, v in X.envSpec {
                                     name: k
-                                } & v for k, v in X.envSpec ]
+                                    v
+                                } ]
                             }
                             if len(X.volume) > 0 {
-                                volumeMounts: [ {
+                                volumeMounts: [ for v in X.volume {
                                     name:      v.name
                                     mountPath: v.mountPath
                                     if v.subPath != null | true {
@@ -7811,13 +7876,14 @@ _k8sSpec: {
                                     if v.readOnly {
                                         readOnly: v.readOnly
                                     }
-                                } for v in X.volume ]
+                                } ]
                             }
                         }]
                         if len(X.volume) > 0 {
-                            volumes: [ v.kubernetes & {
+                            volumes: [ for v in X.volume {
                                 name: v.name
-                            } for v in X.volume ]
+                                v.kubernetes
+                            } ]
                         }
                     }
                     metadata: {

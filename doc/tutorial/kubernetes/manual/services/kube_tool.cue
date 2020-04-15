@@ -1,6 +1,6 @@
 package kube
 
-objects: [ x for v in objectSets for x in v ]
+objects: [ for v in objectSets for x in v { x } ]
 
 objectSets: [
 	kubernetes.services,

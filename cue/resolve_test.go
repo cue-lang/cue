@@ -2248,22 +2248,21 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "list comprehension",
 		in: `
-			// a: [ k for k: v in b if k < "d" if v > b.a ] // TODO test error using common iso colon
-			a: [ k for k, v in b if k < "d" if v > b.a ]
+			a: [ for k, v in b if k < "d" if v > b.a { k }]
 			b: {
 				a: 1
 				b: 2
 				c: 3
 				d: 4
 			}
-			c: [ x for _, x in b for _, y in b  if x < y ]
-			d: [ x for x, _ in a ]
+			c: [ for _, x in b for _, y in b  if x < y { x } ]
+			d: [ for x, _ in a { x } ]
 			`,
 		out: `<0>{a: ["b","c"], b: <1>{a: 1, b: 2, c: 3, d: 4}, c: [1,1,1,2,2,3], d: [0,1]}`,
 	}, {
 		desc: "struct comprehension with template",
 		in: `
-			result: [ v for _, v in service ]
+			result: [ for _, v in service { v } ]
 
 			service: [Name=string]: {
 				name: *Name | string
@@ -2336,7 +2335,7 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "complex interaction of groundness",
 		in: `
-			res: [ y & { d: "b" } for x in a for y in x ]
+			res: [ for x in a for y in x { y & { d: "b" } }]
 			res: [ a.b.c & { d: "b" } ]
 
 			a: b: [C=string]: { d: string, s: "a" + d }
@@ -2584,7 +2583,7 @@ func TestFullEval(t *testing.T) {
 				[jobID=string]: {
 				}
 			}
-			JobID :: or([ k for k, _ in jobs ])
+			JobID :: or([ for k, _ in jobs { k } ])
 		}
 
 		foo: Workflow & {
@@ -2867,7 +2866,7 @@ func TestFullEval(t *testing.T) {
 		desc: "alias reuse in nested scope",
 		in: `
 		Foo :: {
-			X = or([ k for k, _ in {} ])
+			X = or([ for k, _ in {} { k } ])
 			connection: [X]: X
 		}
 		A :: {

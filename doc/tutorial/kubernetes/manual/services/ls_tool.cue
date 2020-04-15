@@ -6,8 +6,10 @@ command: ls: {
 	task: print: {
 		kind: "print"
 		Lines = [
-			"\(x.kind)  \t\(x.metadata.labels.component)   \t\(x.metadata.name)"
-			for x in objects ]
+			for x in objects {
+				"\(x.kind)  \t\(x.metadata.labels.component)   \t\(x.metadata.name)"
+			}
+		]
 		text: strings.Join(Lines, "\n")
 	}
 }

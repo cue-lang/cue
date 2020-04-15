@@ -419,7 +419,7 @@ func (s *state) value(n cue.Value) ast.Expr {
 
 	default:
 		if !n.IsConcrete() {
-			s.errf(n, "invalid non-concerte value")
+			s.errf(n, "invalid non-concrete value")
 		}
 		return n.Syntax(cue.Final()).(ast.Expr)
 	}

@@ -34,7 +34,7 @@ func TestParse(t *testing.T) {
 	}, {
 		"basic lits", `"a","b", 3,3.4,5,2_3`, `"a", "b", 3, 3.4, 5, 2_3`,
 	}, {
-		"keyword basic lits", `true,false,null`, `true, false, null`,
+		"keyword basic lits", `true,false,null,for,in,if,let`, `true, false, null, for, in, if, let`,
 	}, {
 		"keywords as labels",
 		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5`,
@@ -239,9 +239,9 @@ func TestParse(t *testing.T) {
 		"list comprehensions",
 		`{
 				y: [1,2,3]
-				b: [ x for x in y if x == 1 ],
+				b: [ for x in y if x == 1 { x } ],
 			}`,
-		`{y: [1, 2, 3], b: [x for x in y if x==1 ]}`,
+		`{y: [1, 2, 3], b: [for x in y if x==1 {x}]}`,
 	}, {
 		"field comprehensions",
 		`{
@@ -443,11 +443,11 @@ bar: 2
 			`X1=[X2=<"d"]: {name: X2}, ` +
 			`Y1=foo: {Y2=bar: [Y1, Y2]}`,
 	}, {
-		desc: "error when keyword is used in expression",
+		desc: "allow keyword in expression",
 		in: `
 		foo: in & 2
 		`,
-		out: "foo: <*ast.BadExpr>&2\nexpected operand, found 'in'",
+		out: "foo: in&2",
 	}, {
 		desc: "dot import",
 		in: `

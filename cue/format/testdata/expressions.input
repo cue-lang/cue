@@ -14,7 +14,7 @@ package expressions
     alias = 3.14
     "g\("en")"?: 4
 
-    alias2 = foo
+    alias2 = foo // with comment
     aaalias = foo
     b: bar
 
@@ -138,6 +138,9 @@ package expressions
     e: [...int]
     e: [...int,]
     e: [...int | float]
+    e: [ for x in someObject if x > 9 {
+        x
+    }]
     e: [ x for x in someObject if x > 9 ]
     e: [ x
     for x in someObject
@@ -159,11 +162,11 @@ package expressions
             "\(k)":v
         }
     }
-
+    
     e: { for k, v in someObject if k > "a" {"\(k)":v} }
     e: { for k, v in someObject if k > "a" {
         "\(k)":v }}
-    
+
     e: {
     for k, v in someObject
     if k > "a" {

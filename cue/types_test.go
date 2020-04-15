@@ -564,7 +564,7 @@ func TestList(t *testing.T) {
 		value: `>=5*[1,2,3, ...int]`,
 		err:   "incomplete",
 	}, {
-		value: `[x for x in y if x > 1]
+		value: `[for x in y if x > 1 { x }]
 		y :: [1,2,3]`,
 		res: "[2,3,]",
 	}, {
@@ -1191,7 +1191,7 @@ func TestDecode(t *testing.T) {
 		dst:   intList(),
 		want:  *intList(1, 2, 3),
 	}, {
-		value: `[x for x in y if x > 1]
+		value: `[for x in y if x > 1 { x }]
 				y :: [1,2,3]`,
 		dst:  intList(),
 		want: *intList(2, 3),

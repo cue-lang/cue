@@ -184,7 +184,36 @@ func (f *formatter) walkClauseList(list []ast.Clause, ws whiteSpace) {
 	f.after(nil)
 }
 
-func (f *formatter) walkExprList(list []ast.Expr, depth int) {
+func (f *formatter) walkListElems(list []ast.Expr) {
+	f.before(nil)
+	for _, x := range list {
+		f.before(x)
+		switch n := x.(type) {
+		case *ast.Comprehension:
+			f.walkClauseList(n.Clauses, blank)
+			f.print(blank, nooverride)
+			f.expr(n.Value)
+
+		case *ast.Ellipsis:
+			f.ellipsis(n)
+
+		case *ast.Alias:
+			f.expr(n.Ident)
+			f.print(n.Equal, token.BIND)
+			f.expr(n.Expr)
+
+			// TODO: ast.CommentGroup: allows comment groups in ListLits.
+
+		case ast.Expr:
+			f.exprRaw(n, token.LowestPrec, 1)
+		}
+		f.print(comma, blank)
+		f.after(x)
+	}
+	f.after(nil)
+}
+
+func (f *formatter) walkArgsList(list []ast.Expr, depth int) {
 	f.before(nil)
 	for _, x := range list {
 		f.before(x)
@@ -235,7 +264,6 @@ func (f *formatter) inlineField(n *ast.Field) *ast.Field {
 }
 
 func (f *formatter) decl(decl ast.Decl) {
-
 	if decl == nil {
 		return
 	}
@@ -307,14 +335,6 @@ func (f *formatter) decl(decl ast.Decl) {
 			f.print(formfeed)
 		}
 
-	case *ast.Comprehension:
-		if !n.Pos().HasRelPos() || n.Pos().RelPos() >= token.Newline {
-			f.print(formfeed)
-		}
-		f.walkClauseList(n.Clauses, blank)
-		f.print(blank, nooverride)
-		f.expr(n.Value)
-
 	case *ast.BadDecl:
 		f.print(n.From, "*bad decl*", declcomma)
 
@@ -350,6 +370,29 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.expr(n.Expr)
 		f.print(newline, noblank)
 
+	case *ast.Attribute:
+		f.print(n.At, n)
+
+	case *ast.CommentGroup:
+		f.print(newsection)
+		f.printComment(n)
+		f.print(newsection)
+
+	case ast.Expr:
+		f.embedding(n)
+	}
+}
+
+func (f *formatter) embedding(decl ast.Expr) {
+	switch n := decl.(type) {
+	case *ast.Comprehension:
+		if !n.Pos().HasRelPos() || n.Pos().RelPos() >= token.Newline {
+			f.print(formfeed)
+		}
+		f.walkClauseList(n.Clauses, blank)
+		f.print(blank, nooverride)
+		f.expr(n.Value)
+
 	case *ast.Ellipsis:
 		f.ellipsis(n)
 
@@ -362,13 +405,10 @@ func (f *formatter) decl(decl ast.Decl) {
 		f.expr(n.Expr)
 		f.print(declcomma) // implied
 
-	case *ast.Attribute:
-		f.print(n.At, n)
+		// TODO: ast.CommentGroup: allows comment groups in ListLits.
 
-	case *ast.CommentGroup:
-		f.print(newsection)
-		f.printComment(n)
-		f.print(newsection)
+	case ast.Expr:
+		f.exprRaw(n, token.LowestPrec, 1)
 	}
 }
 
@@ -570,7 +610,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 		}
 		wasIndented := f.possibleSelectorExpr(x.Fun, token.HighestPrec, depth)
 		f.print(x.Lparen, token.LPAREN)
-		f.walkExprList(x.Args, depth)
+		f.walkArgsList(x.Args, depth)
 		f.print(trailcomma, noblank, x.Rparen, token.RPAREN)
 		if wasIndented {
 			f.print(unindent)
@@ -612,7 +652,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.ListLit:
 		f.print(x.Lbrack, token.LBRACK, indent)
-		f.walkExprList(x.Elts, 1)
+		f.walkListElems(x.Elts)
 		f.print(trailcomma, noblank)
 		f.visitComments(f.current.pos)
 		f.matchUnindent()
@@ -623,9 +663,16 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.ListComprehension:
 		f.print(x.Lbrack, token.LBRACK, blank, indent)
-		f.expr(x.Expr)
 		f.print(blank)
 		f.walkClauseList(x.Clauses, blank)
+		f.print(blank, nooverride)
+		if _, ok := x.Expr.(*ast.StructLit); ok {
+			f.expr(x.Expr)
+		} else {
+			f.print(token.LBRACE, blank)
+			f.expr(x.Expr)
+			f.print(blank, token.RBRACE)
+		}
 		f.print(unindent, f.wsOverride(blank), x.Rbrack, token.RBRACK)
 
 	default:

@@ -313,7 +313,7 @@ alias "Y" redeclared in same scope:
 		out: `<0>{a: <1>{ <2>for k, v in <0>.b yield <3>{""+<2>.v+"": <2>.v}}, b: <4>{a: "aa", b: "bb", c: "cc"}}`,
 	}, {
 		in: `
-			a: [ v for _, v in b ]
+			a: [ for _, v in b { v } ]
 			b: { a: 1, b: 2, c: 3 }
 			`,
 		out: `<0>{a: [ <1>for _, v in <0>.b yield <1>.v ], b: <2>{a: 1, b: 2, c: 3}}`,

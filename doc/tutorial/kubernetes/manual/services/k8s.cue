@@ -84,13 +84,13 @@ _k8sSpec: X: kubernetes: {
 			image: X.image
 			args:  X.args
 			if len(X.envSpec) > 0 {
-				env: [ {name: k} & v for k, v in X.envSpec ]
+				env: [ for k, v in X.envSpec {v, name: k} ]
 			}
 
-			ports: [ {
+			ports: [ for k, p in X.expose.port & X.port {
 				name:          k
 				containerPort: p
-			} for k, p in X.expose.port & X.port ]
+			} ]
 		}]
 	}
 
@@ -98,7 +98,11 @@ _k8sSpec: X: kubernetes: {
 	spec: template: spec: {
 		if len(X.volume) > 0 {
 			volumes: [
-					v.kubernetes & {name: v.name} for v in X.volume
+				for v in X.volume {
+					v.kubernetes
+
+					name: v.name
+				}
 			]
 		}
 
@@ -106,16 +110,17 @@ _k8sSpec: X: kubernetes: {
 			// TODO: using conversions this would look like:
 			// volumeMounts: [ k8s.VolumeMount(v) for v in d.volume ]
 			if len(X.volume) > 0 {
-				volumeMounts: [ {
-					name:      v.name
-					mountPath: v.mountPath
-					if v.subPath != null | true {
-						subPath: v.subPath
+				volumeMounts: [
+					for v in X.volume {
+						name:      v.name
+						mountPath: v.mountPath
+						if v.subPath != null | true {
+							subPath: v.subPath
+						}
+						if v.readOnly {
+							readOnly: v.readOnly
+						}
 					}
-					if v.readOnly {
-						readOnly: v.readOnly
-					}
-				} for v in X.volume
 				]
 			}
 		}]

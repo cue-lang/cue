@@ -26,7 +26,7 @@ deployment: [Name=_]: _base & {
 	port: [string]: int
 
 	arg: [string]: string
-	args: [ "-\(k)=\(v)" for k, v in arg ] | [...string]
+	args: [ for k, v in arg { "-\(k)=\(v)" } ] | [...string]
 
 	// Environment variables
 	env: [string]: string

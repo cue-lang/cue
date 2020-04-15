@@ -301,10 +301,39 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			parent:   v,
 		}
 
+		if len(n.Elts) == 1 {
+			if c, ok := n.Elts[0].(*ast.Comprehension); ok {
+				yielder := &yield{baseValue: newExpr(c.Value)}
+				lc := &listComprehension{
+					newExpr(c),
+					wrapClauses(v, yielder, c.Clauses),
+				}
+				// we don't support key for lists (yet?)
+
+				// TODO(hack): unwrap struct lit if embedding of one element.
+				// We do this as we do not yet support embedding of scalar
+				// values in general. This prohibits:
+				// - having fields alongside embedded values
+				// - having more than one embedded value.
+				// The latter would not be too hard to circumvent.
+				expr := c.Value
+				if s, ok := expr.(*ast.StructLit); ok && len(s.Elts) == 1 {
+					if e, ok := s.Elts[0].(*ast.EmbedDecl); ok {
+						expr = e.Expr
+					}
+				}
+				yielder.value = v.walk(expr)
+				return lc
+			}
+		}
+
 		elts, ellipsis := internal.ListEllipsis(n)
 
 		arcs := []arc{}
 		for i, e := range elts {
+			if _, ok := e.(*ast.Comprehension); ok {
+				return v.errf(e, "comprehensions must be a single element within list (for now)")
+			}
 			elem := v1.walk(e)
 			if elem == nil {
 				// TODO: it would be consistent to allow aliasing in lists

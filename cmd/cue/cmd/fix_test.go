@@ -54,6 +54,14 @@ a: {
 	ref:     X1 & x
 }
 `,
+	}, {
+		in: `
+		y: [1, 2, 3, 4]
+		a: [ x for x in y ]
+		`,
+		out: `y: [1, 2, 3, 4]
+a: [ for x in y { x } ]
+`,
 		// 	}, {
 		// 		name: "slice",
 		// 		in: `package foo

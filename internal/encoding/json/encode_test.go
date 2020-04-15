@@ -154,9 +154,9 @@ f4: {
 				a: 1
 				b: 3
 			}
-			c: [1, [ x for x in m ]]
+			c: [1, [ for x in m { x } ]]
 			`,
-		out: "json: unsupported node [x for x in m ] (*ast.ListComprehension)",
+		out: "json: unsupported node for x in m {x} (*ast.Comprehension)",
 	}, {
 		name: "disallowMultipleEmbeddings",
 		in: `

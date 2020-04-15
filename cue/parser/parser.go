@@ -368,6 +368,8 @@ func (p *parser) next() {
 	}
 }
 
+// assertV0 indicates the last version at which a certain feature was
+// supported.
 func (p *parser) assertV0(pos token.Pos, minor, patch int, name string) {
 	v := version0(minor, patch)
 	if p.version != 0 && p.version > v {
@@ -539,6 +541,16 @@ func (p *parser) parseIdent() *ast.Ident {
 	return ident
 }
 
+func (p *parser) parseKeyIdent() *ast.Ident {
+	c := p.openComments()
+	pos := p.pos
+	name := p.lit
+	p.next()
+	ident := &ast.Ident{NamePos: pos, Name: name}
+	c.closeNode(p, ident)
+	return ident
+}
+
 // ----------------------------------------------------------------------------
 // Expressions
 
@@ -589,6 +601,11 @@ func (p *parser) parseOperand() (expr ast.Expr) {
 			Lparen: lparen,
 			X:      x,
 			Rparen: rparen}
+
+	default:
+		if p.tok.IsKeyword() {
+			return p.parseKeyIdent()
+		}
 	}
 
 	// we have an error
@@ -681,7 +698,7 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 
 	for p.tok != token.RBRACE && p.tok != token.ELLIPSIS && p.tok != token.EOF {
 		switch p.tok {
-		case token.FOR, token.IF, token.LET:
+		case token.FOR, token.IF:
 			list = append(list, p.parseComprehension())
 
 		case token.ATTRIBUTE:
@@ -726,33 +743,42 @@ func (p *parser) parseComprehension() (decl ast.Decl) {
 		opt := token.NoPos
 		tok = p.tok
 		pos = p.pos
-		if p.tok == token.OPTION {
+		switch p.tok {
+		case token.COMMA, token.EOF:
+			decl = &ast.EmbedDecl{Expr: lab}
+
+		case token.OPTION:
 			opt = pos
 			p.next()
 			tok = p.tok
 			pos = p.pos
-		}
-		p.next()
-		rhs := p.parseRHS()
 
-		// Field or alias.
-		switch tok {
-		case token.BIND:
-			decl = &ast.Alias{Ident: lab, Equal: pos, Expr: rhs}
-		case token.ISA, token.COLON:
-			decl = &ast.Field{
-				Label:    lab,
-				Optional: opt,
-				TokenPos: pos,
-				Token:    tok,
-				Value:    rhs,
-				Attrs:    p.parseAttributes(),
-			}
+			fallthrough
+
 		default:
-			decl = &ast.BadDecl{From: lab.Pos(), To: rhs.End()}
+			p.next()
+			rhs := p.parseRHS()
+
+			// Field or alias.
+			switch tok {
+			case token.BIND:
+				decl = &ast.Alias{Ident: lab, Equal: pos, Expr: rhs}
+			case token.ISA, token.COLON:
+				decl = &ast.Field{
+					Label:    lab,
+					Optional: opt,
+					TokenPos: pos,
+					Token:    tok,
+					Value:    rhs,
+					Attrs:    p.parseAttributes(),
+				}
+			default:
+				decl = &ast.BadDecl{From: lab.Pos(), To: rhs.End()}
+			}
 		}
+
 		fc.closeNode(p, decl)
-		if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
+		if p.atComma("struct literal", token.RBRACE, token.EOF) {
 			p.next()
 		}
 
@@ -833,14 +859,15 @@ func (p *parser) parseField() (decl ast.Decl) {
 			p.expectComma() // sync parser.
 			fallthrough
 
-		case token.RBRACE:
+		case token.RBRACE, token.EOF:
 			if i == 0 {
 				if a, ok := expr.(*ast.Alias); ok {
 					return a
 				}
 				switch tok {
 				case token.IDENT, token.LBRACK, token.STRING, token.INTERPOLATION,
-					token.NULL, token.TRUE, token.FALSE:
+					token.NULL, token.TRUE, token.FALSE,
+					token.FOR, token.IF, token.LET, token.IN:
 					return &ast.EmbedDecl{Expr: expr}
 				}
 			}
@@ -940,7 +967,8 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 	tok := p.tok
 	switch tok {
 	case token.IDENT, token.STRING, token.INTERPOLATION,
-		token.NULL, token.TRUE, token.FALSE:
+		token.NULL, token.TRUE, token.FALSE,
+		token.FOR, token.IF, token.LET, token.IN:
 		expr = p.parseExpr()
 
 		switch x := expr.(type) {
@@ -983,29 +1011,6 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 			// Note: caller must verify this list is suitable as a label.
 			label, ok = x, true
 		}
-
-	case token.IF, token.FOR, token.IN, token.LET:
-		// Keywords representing clauses.
-		pos := p.pos
-		ident := &ast.Ident{
-			NamePos: pos,
-			Name:    p.lit,
-		}
-		c := p.openComments()
-		p.next()
-		expr = c.closeExpr(p, ident)
-
-		if p.tok != token.COLON && p.tok != token.ISA {
-			c = p.openComments()
-			p.errf(pos, "expected operand, found '%s'", ident.Name)
-			expr = &ast.BadExpr{From: pos, To: p.pos}
-			// Sync expression.
-			expr = p.parseBinaryExprTail(token.LowestPrec+1, expr)
-			expr = c.closeExpr(p, expr)
-			break
-		}
-		label = ident
-		ok = true
 	}
 	return label, expr, ok
 }
@@ -1056,7 +1061,8 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 			forPos := p.expect(token.FOR)
 			if first {
 				switch p.tok {
-				case token.COLON, token.ISA, token.BIND, token.OPTION:
+				case token.COLON, token.ISA, token.BIND, token.OPTION,
+					token.COMMA, token.EOF:
 					return nil, c
 				}
 			}
@@ -1085,7 +1091,8 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 			ifPos := p.expect(token.IF)
 			if first {
 				switch p.tok {
-				case token.COLON, token.ISA, token.BIND, token.OPTION:
+				case token.COLON, token.ISA, token.BIND, token.OPTION,
+					token.COMMA, token.EOF:
 					return nil, c
 				}
 			}
@@ -1095,7 +1102,12 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 				Condition: p.parseRHS(),
 			}))
 
+		// TODO:
 		// case token.LET:
+		// 	c := p.openComments()
+		// 	p.expect(token.LET)
+		// 	return nil, c
+
 		default:
 			return clauses, nil
 		}
@@ -1118,6 +1130,7 @@ func (p *parser) parseList() (expr ast.Expr) {
 
 	if clauses, _ := p.parseComprehensionClauses(false); clauses != nil {
 		var expr ast.Expr
+		p.assertV0(p.pos, 1, 1, "old-style list comprehensions")
 		if len(elts) != 1 {
 			p.errf(lbrack.Add(1), "list comprehension must have exactly one element")
 		}
@@ -1170,6 +1183,12 @@ func (p *parser) parseListElements() (list []ast.Expr) {
 		}
 	}
 
+	for _, v := range list {
+		if _, ok := v.(*ast.Comprehension); ok && len(list) != 1 {
+			p.errf(v.Pos(), "multiple comprehensions per list not yet supported")
+		}
+	}
+
 	return
 }
 
@@ -1180,7 +1199,37 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 	c := p.openComments()
 	defer func() { c.closeNode(p, expr) }()
 
-	expr = p.parseBinaryExprTail(token.LowestPrec+1, p.parseUnaryExpr())
+	switch p.tok {
+	case token.FOR, token.IF:
+		tok := p.tok
+		pos := p.pos
+		clauses, fc := p.parseComprehensionClauses(true)
+		if clauses != nil {
+			sc := p.openComments()
+			expr := p.parseStruct()
+			sc.closeExpr(p, expr)
+
+			if p.atComma("struct literal", token.RBRACK) { // TODO: may be EOF
+				p.next()
+			}
+
+			return &ast.Comprehension{
+				Clauses: clauses,
+				Value:   expr,
+			}, true
+		}
+
+		expr = &ast.Ident{
+			NamePos: pos,
+			Name:    tok.String(),
+		}
+		fc.closeNode(p, expr)
+
+	default:
+		expr = p.parseUnaryExpr()
+	}
+
+	expr = p.parseBinaryExprTail(token.LowestPrec+1, expr)
 	expr = p.parseAlias(expr)
 
 	// Enforce there is an explicit comma. We could also allow the

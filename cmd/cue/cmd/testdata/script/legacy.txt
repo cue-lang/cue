@@ -1,14 +1,16 @@
-! cue eval foo.cue
+cue eval foo.cue
 cmp stderr expect-stderr
 
-! cue export foo.cue
+cue export foo.cue
 cmp stderr expect-stderr
 
-! cue fmt foo.cue
-cmp stderr expect-stderr
+cue fmt foo.cue
+cmp foo.cue bar.cue
 
 -- expect-stderr --
-missing ',' in struct literal:
-    ./foo.cue:1:8
 -- foo.cue --
-"x": 3 for x in a
+a: [1]
+b: [ x for x in a ]
+-- bar.cue --
+a: [1]
+b: [ for x in a { x } ]

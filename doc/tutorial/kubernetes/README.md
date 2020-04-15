@@ -498,13 +498,15 @@ for x in [deployment, daemonSet, statefulSet] for k, v in x {
     service: "\(k)": {
         spec: selector: v.spec.template.metadata.labels
 
-        spec: ports: [ {
-            Port = p.containerPort // Port is an alias
-            port:       *Port | int
-            targetPort: *Port | int
-        } for c in v.spec.template.spec.containers
+        spec: ports: [
+            for c in v.spec.template.spec.containers
             for p in c.ports
-            if p._export ]
+            if p._export {
+                Port = p.containerPort // Port is an alias
+                port:       *Port | int
+                targetPort: *Port | int
+            }  
+        ]
     }
 }
 EOF
@@ -856,7 +858,7 @@ We create the tool file to do just that.
 $ cat <<EOF > kube_tool.cue
 package kube
 
-objects: [ x for v in objectSets for x in v ]
+objects: [ for v in objectSets for x in v { x } ]
 
 objectSets: [
 	service,
@@ -891,8 +893,9 @@ import (
 command: ls: {
 	task: print: cli.Print & {
 		text: tabwriter.Write([
-			"\(x.kind)  \t\(x.metadata.labels.component)  \t\(x.metadata.name)"
-			for x in objects
+			for x in objects {
+				"\(x.kind)  \t\(x.metadata.labels.component)  \t\(x.metadata.name)"
+			}
 		])
 	}
 
@@ -1176,7 +1179,7 @@ The next step is to pull common fields, such as `image` to the top level.
 Arguments can be specified as a map.
 ```
     arg: [string]: string
-    args: [ "-\(k)=\(v)" for k, v in arg ] | [...string]
+    args: [ for k, v in arg { "-\(k)=\(v)" } ] | [...string]
 ```
 
 If order matters, users could explicitly specify the list as well.
@@ -1281,7 +1284,7 @@ kubernetes: services: {
             metadata: labels: x.label
             spec: selector:   x.label
 
-            spec: ports: [ p for p in x.port ]
+            spec: ports: [ for p in x.port { p } ]
         }
     }
 }

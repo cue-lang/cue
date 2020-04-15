@@ -347,10 +347,11 @@ func (a *Alias) End() token.Pos  { return a.Expr.End() }
 // A Comprehension node represents a comprehension declaration.
 type Comprehension struct {
 	Clauses []Clause // There must be at least one clause.
-	Value   Expr     // Must be a struct
+	Value   Expr     // Must be a struct TODO: change to Struct
 
 	comments
 	decl
+	expr // TODO: only allow Comprehension in "Embedding" productions.
 }
 
 func (x *Comprehension) Pos() token.Pos  { return getPos(x) }
@@ -551,6 +552,8 @@ func NewStruct(fields ...interface{}) *StructLit {
 // A ListLit node represents a literal list.
 type ListLit struct {
 	Lbrack token.Pos // position of "["
+
+	// TODO: change to embedding or similar.
 	Elts   []Expr    // list of composite elements; or nil
 	Rbrack token.Pos // position of "]"
 

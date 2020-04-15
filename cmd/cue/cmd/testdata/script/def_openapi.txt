@@ -117,30 +117,30 @@ Bar :: {
 -- expect-yaml-out --
 openapi: 3.0.0
 info:
-    title: Some clever title.
-    version: v1
+  title: Some clever title.
+  version: v1
 paths: {}
 components:
-    schemas:
-        Bar:
-            type: object
-            required:
-              - foo
-            properties:
-                foo:
-                    $ref: '#/components/schemas/Foo'
-        Foo:
-            type: object
-            required:
-              - a
-              - b
-            properties:
-                a:
-                    type: integer
-                b:
-                    type: integer
-                    minimum: 0
-                    exclusiveMaximum: 10
+  schemas:
+    Bar:
+      type: object
+      required:
+      - foo
+      properties:
+        foo:
+          $ref: '#/components/schemas/Foo'
+    Foo:
+      type: object
+      required:
+      - a
+      - b
+      properties:
+        a:
+          type: integer
+        b:
+          type: integer
+          minimum: 0
+          exclusiveMaximum: 10
 -- expect-cue-out --
 openapi: "3.0.0"
 info: {

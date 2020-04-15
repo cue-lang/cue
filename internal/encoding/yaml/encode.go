@@ -15,6 +15,7 @@
 package yaml
 
 import (
+	"bytes"
 	"math/big"
 	"strings"
 
@@ -45,7 +46,14 @@ func Encode(n ast.Node) (b []byte, err error) {
 	if err != nil {
 		return nil, err
 	}
-	return yaml.Marshal(y)
+	w := &bytes.Buffer{}
+	enc := yaml.NewEncoder(w)
+	// Use idiomatic indentation.
+	enc.SetIndent(2)
+	if err = enc.Encode(y); err != nil {
+		return nil, err
+	}
+	return w.Bytes(), nil
 }
 
 func encode(n ast.Node) (y *yaml.Node, err error) {

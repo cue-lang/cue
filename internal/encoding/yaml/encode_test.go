@@ -51,18 +51,18 @@ func TestEncodeFile(t *testing.T) {
 		`,
 		out: `
 seq:
-  - 1
-  - 2
-  - 3
-  - a: 1
-    b: 2
+- 1
+- 2
+- 3
+- a: 1
+  b: 2
 a:
-    b:
-        c: 3
+  b:
+    c: 3
 b:
-    x: 0
-    y: 1
-    z: 2
+  x: 0
+  y: 1
+  z: 2
 		`,
 	}, {
 		name: "oneLineFields",
@@ -136,8 +136,8 @@ f2: 2 # line 2
 
 # head 3
 f3:
-    # struct doc
-    a: 1
+  # struct doc
+  a: 1
 f4: {} # line 4
 
 # Trailing
@@ -229,16 +229,16 @@ f4: {} # line 4
 		}`,
 		out: `
 receivers:
-  - name: pager
-    slack_configs:
-      - text: |-
-            {{ range .Alerts }}{{ .Annotations.description }}
-            {{ end }}
-        channel: '#cloudmon'
-        send_resolved: true
+- name: pager
+  slack_configs:
+  - text: |-
+      {{ range .Alerts }}{{ .Annotations.description }}
+      {{ end }}
+    channel: '#cloudmon'
+    send_resolved: true
 route:
-    receiver: pager
-    group_by: [alertname, cluster]
+  receiver: pager
+  group_by: [alertname, cluster]
 		`,
 	}}
 	for _, tc := range testCases {

@@ -54,25 +54,6 @@ a: {
 	ref:     X1 & x
 }
 `,
-	}, {
-		name: "comprehensions",
-		in: `
-package fix
-
-"\(k)": v for k, v in src
-
-"\(k)": v <-
- for k, v in src
-	 `,
-		out: `package fix
-
-for k, v in src {
-	"\(k)": v
-}
-for k, v in src {
-	"\(k)": v
-}
-`,
 		// 	}, {
 		// 		name: "slice",
 		// 		in: `package foo

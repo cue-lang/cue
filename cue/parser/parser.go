@@ -786,8 +786,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 	this := &ast.Field{Label: nil}
 	m := this
 
-	allowComprehension := true
-
 	for i := 0; ; i++ {
 		tok := p.tok
 
@@ -901,48 +899,14 @@ func (p *parser) parseField() (decl ast.Decl) {
 	}
 
 	if attrs := p.parseAttributes(); attrs != nil {
-		allowComprehension = false
 		m.Attrs = attrs
-	}
-
-	decl = this
-	switch p.tok {
-	case token.ARROW:
-		p.expect(token.ARROW)
-		fallthrough
-
-	case token.FOR, token.IF:
-		p.assertV0(p.pos, 0, 10, "old-style comprehensions")
-		if !allowComprehension {
-			p.errf(p.pos, "comprehension not allowed for this field")
-		}
-		clauses, _ := p.parseComprehensionClauses(false)
-		if len(clauses) == 0 {
-			p.errf(p.pos, "empty comprehension")
-			return &ast.BadDecl{From: p.pos, To: p.pos}
-		}
-		// Erase first position to allow fmt to move to recommended style for
-		// new syntax.
-		switch c := clauses[0].(type) {
-		case *ast.ForClause:
-			c.For = token.NoPos
-		case *ast.IfClause:
-			c.If = token.NoPos
-		}
-
-		return &ast.Comprehension{
-			Clauses: clauses,
-			Value: &ast.StructLit{
-				Elts: []ast.Decl{this},
-			},
-		}
 	}
 
 	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
 		p.next()
 	}
 
-	return decl
+	return this
 }
 
 func (p *parser) parseAttributes() (attrs []*ast.Attribute) {

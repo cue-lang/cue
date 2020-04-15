@@ -11,6 +11,10 @@ cmp foo.cue bar.cue
 -- foo.cue --
 a: [1]
 b: [ x for x in a ]
+
+X = foo
 -- bar.cue --
 a: [1]
 b: [ for x in a { x } ]
+
+let X = foo

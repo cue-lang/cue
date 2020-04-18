@@ -756,7 +756,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 	// - interpret CUE options.
 	for _, o := range options {
 		switch o.Name {
-		case "(cue_opt).required":
+		case "(cue.opt).required":
 			p.required = true
 			// TODO: Dropping comments. Maybe add a dummy tag?
 

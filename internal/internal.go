@@ -154,6 +154,36 @@ func NewComment(isDoc bool, s string) *ast.CommentGroup {
 	return cg
 }
 
+func FileComment(f *ast.File) *ast.CommentGroup {
+	pkg, _, _ := PackageInfo(f)
+	var cgs []*ast.CommentGroup
+	if pkg != nil {
+		cgs = pkg.Comments()
+	} else if cgs = f.Comments(); len(cgs) > 0 {
+		// Use file comment.
+	} else {
+		// Use first comment before any declaration.
+		for _, d := range f.Decls {
+			if cg, ok := d.(*ast.CommentGroup); ok {
+				return cg
+			}
+			if cgs = ast.Comments(d); cgs != nil {
+				break
+			}
+			if _, ok := d.(*ast.Attribute); !ok {
+				break
+			}
+		}
+	}
+	var cg *ast.CommentGroup
+	for _, c := range cgs {
+		if c.Position == 0 {
+			cg = c
+		}
+	}
+	return cg
+}
+
 func NewAttr(name, str string) *ast.Attribute {
 	buf := &strings.Builder{}
 	buf.WriteByte('@')

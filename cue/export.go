@@ -541,7 +541,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		// opUnifyUnchecked: represented as embedding. The two arguments must
 		// be structs.
 		if x.op == opUnifyUnchecked {
-			s := &ast.StructLit{}
+			s := ast.NewStruct()
 			return p.closeOrOpen(s, p.embedding(s, x))
 		}
 		return ast.NewBinExpr(opMap[x.op], p.expr(x.left), p.expr(x.right))
@@ -767,7 +767,7 @@ func (p *exporter) expr(v value) ast.Expr {
 }
 
 func (p *exporter) optionalsExpr(x *optionals, isClosed bool) ast.Expr {
-	st := &ast.StructLit{}
+	st := ast.NewStruct()
 	// An empty struct has meaning in case of closed structs, where they
 	// indicate no other fields may be added. Non-closed empty structs should
 	// have been optimized away. In case they are not, it is just a no-op.
@@ -828,7 +828,7 @@ func (p *exporter) optionals(st *ast.StructLit, x *optionals) (skippedEllipsis b
 }
 
 func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, err *bottom) {
-	obj := &ast.StructLit{}
+	obj := ast.NewStruct()
 	if doEval(p.mode) {
 		x, err = x.expandFields(p.ctx)
 		if err != nil {

@@ -29,6 +29,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 var (
@@ -253,10 +254,24 @@ func TestNodes(t *testing.T) {
 			Value: ast.NewIdent("goo"),
 		},
 		out: `"foo\nbar": goo`,
+	}, {
+		name: "foo",
+		in: func() ast.Node {
+			st := ast.NewStruct("version", ast.NewString("foo"))
+			st = ast.NewStruct("info", st)
+			ast.AddComment(st.Elts[0], internal.NewComment(true, "FOO"))
+			return st
+		}(),
+		out: `{
+	// FOO
+	info: {
+		version: "foo"
+	}
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			b, err := Node(tc.in)
+			b, err := Node(tc.in, Simplify())
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -461,6 +476,7 @@ func TestIncorrectIdent(t *testing.T) {
 func TestX(t *testing.T) {
 	t.Skip()
 	const src = `
+
 `
 	b, err := format([]byte(src), simplify)
 	if err != nil {

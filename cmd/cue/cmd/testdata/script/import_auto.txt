@@ -5,8 +5,8 @@ cmp stdout expect-openapi
 // An OpenAPI file
 
 info: {
-	title:   "An OpenAPI file"
-	version: "v1beta1"
+	title:   *"An OpenAPI file" | string
+	version: *"v1beta1" | string
 }
 
 Foo :: {

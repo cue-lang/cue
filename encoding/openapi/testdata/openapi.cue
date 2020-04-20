@@ -1,4 +1,3 @@
-
 // An OpenAPI testing package.
 package openapi
 

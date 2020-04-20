@@ -1,3 +1,5 @@
+cue def openapi+cue: expect-cue-out -o -
+
 cue def foo.cue -o openapi:-
 cmp stdout expect-json-out
 
@@ -172,8 +174,8 @@ components: schemas: {
 package foo
 
 info: {
-	title:   "My OpenAPI"
-	version: "v1alpha1"
+	title:   *"My OpenAPI" | string
+	version: *"v1alpha1" | string
 }
 
 Bar :: {
@@ -187,8 +189,8 @@ Foo :: {
 }
 -- expect-cue2 --
 info: {
-	title:   "Some clever title."
-	version: "v1"
+	title:   *"Some clever title." | string
+	version: *"v1" | string
 }
 Bar :: {
 	foo: Foo

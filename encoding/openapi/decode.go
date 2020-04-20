@@ -61,7 +61,7 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 		p := &ast.Package{Name: ast.NewIdent(c.PkgName)}
 		p.AddComment(cg)
 		add(p)
-	} else if cg != nil {
+	} else {
 		add(cg)
 	}
 
@@ -86,10 +86,30 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 	// }
 
 	if info := v.Lookup("info"); info.Exists() {
-		add(&ast.Field{
-			Label: ast.NewIdent("info"),
-			Value: info.Syntax().(ast.Expr),
-		})
+		decls := []interface{}{}
+		if st, ok := info.Syntax().(*ast.StructLit); ok {
+			// Remove title.
+			for _, d := range st.Elts {
+				if f, ok := d.(*ast.Field); ok {
+					switch name, _, _ := ast.LabelName(f.Label); name {
+					case "title", "version":
+						// title: *"title" | string
+						decls = append(decls, &ast.Field{
+							Label: f.Label,
+							Value: ast.NewBinExpr(token.OR,
+								&ast.UnaryExpr{Op: token.MUL, X: f.Value},
+								ast.NewIdent("string")),
+						})
+						continue
+					}
+				}
+				decls = append(decls, d)
+			}
+			add(&ast.Field{
+				Label: ast.NewIdent("info"),
+				Value: ast.NewStruct(decls...),
+			})
+		}
 	}
 
 	if i < len(js.Decls) {

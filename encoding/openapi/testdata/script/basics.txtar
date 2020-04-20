@@ -28,8 +28,8 @@ components:
 package foo
 
 info: {
-	title:   "Users schema"
-	version: "v1beta1"
+	title:   *"Users schema" | string
+	version: *"v1beta1" | string
 	contact: {
 		name: "The CUE Authors"
 		url:  "https://cuelang.org"

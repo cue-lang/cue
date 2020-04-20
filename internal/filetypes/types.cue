@@ -55,7 +55,7 @@ FileInfo :: {
 	imports:      bool          // don't expand/allow imports
 	stream:       bool          // permit streaming
 	docs:         bool          // show/allow docs
-	attributes:   true | *false // include/allow attributes
+	attributes:   bool          // include/allow attributes
 }
 
 // modes sets defaults for different operational modes.
@@ -74,7 +74,8 @@ modes: input: {
 	}
 
 	FileInfo :: x, x = {
-		docs: *true | false
+		docs:       *true | false
+		attributes: *true | false
 	}
 	encodings: cue: {
 		*forms.schema | _
@@ -91,7 +92,8 @@ modes: export: {
 	}
 
 	FileInfo :: x, x = {
-		docs: true | *false
+		docs:       true | *false
+		attributes: true | *false
 	}
 	encodings: cue: {
 		*forms.data | _
@@ -100,7 +102,8 @@ modes: export: {
 
 modes: ouptut: {
 	FileInfo :: x, x = {
-		docs: true | *false
+		docs:       true | *false
+		attributes: true | *false
 	}
 	encodings: cue: {
 		*forms.data | _
@@ -114,7 +117,8 @@ modes: eval: {
 		...
 	}
 	FileInfo :: x, x = {
-		docs: true | *false
+		docs:       true | *false
+		attributes: true | *false
 	}
 	encodings: cue: {
 		*forms.final | _
@@ -128,7 +132,8 @@ modes: def: {
 	}
 
 	FileInfo :: x, x = {
-		docs: *true | false
+		docs:       *true | false
+		attributes: *true | false
 	}
 	encodings: cue: {
 		*forms.schema | _
@@ -277,8 +282,9 @@ encodings: cue: {
 
 encodings: json: {
 	forms.data
-	stream: *false | true
-	docs:   false
+	stream:     *false | true
+	docs:       false
+	attributes: false
 }
 
 encodings: yaml: {

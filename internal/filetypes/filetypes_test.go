@@ -67,6 +67,7 @@ func TestFromFile(t *testing.T) {
 			Incomplete:   true,
 			Imports:      true,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}, {
 		name: "yaml",
@@ -85,6 +86,7 @@ func TestFromFile(t *testing.T) {
 			Cycles:     true,
 			Stream:     true,
 			Docs:       true,
+			Attributes: true,
 		},
 	}, {
 		name: "yaml+openapi",
@@ -109,6 +111,7 @@ func TestFromFile(t *testing.T) {
 			Incomplete:   true,
 			Imports:      true,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}, {
 		name: "JSONDefault",
@@ -133,6 +136,7 @@ func TestFromFile(t *testing.T) {
 			Incomplete:   true,
 			Imports:      true,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}, {
 		name: "JSONSchema",
@@ -157,6 +161,7 @@ func TestFromFile(t *testing.T) {
 			Incomplete:   true,
 			Imports:      true,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}, {
 		name: "JSONOpenAPI",
@@ -182,6 +187,7 @@ func TestFromFile(t *testing.T) {
 			Incomplete:   true,
 			Imports:      true,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}, {
 		name: "OpenAPIDefaults",
@@ -207,6 +213,7 @@ func TestFromFile(t *testing.T) {
 			Incomplete:   true,
 			Imports:      true,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}, {
 		name: "Go",
@@ -232,6 +239,7 @@ func TestFromFile(t *testing.T) {
 			Imports:      true,
 			Stream:       false,
 			Docs:         true,
+			Attributes:   true,
 		},
 	}}
 	for _, tc := range testCases {

@@ -79,7 +79,9 @@ configMap: prometheus: {
 				// Prometheus. The discovery auth config is automatic if Prometheus runs inside
 				// the cluster. Otherwise, more config options have to be provided within the
 				// <kubernetes_sd_config>.
-				tls_config: ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+				tls_config: {
+					ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+				}
 				// If your node certificates are self-signed or use a different CA to the
 				// master CA, then disable certificate verification below. Note that
 				// certificate verification is an integral part of a secure infrastructure
@@ -116,7 +118,9 @@ configMap: prometheus: {
 				// Prometheus. The discovery auth config is automatic if Prometheus runs inside
 				// the cluster. Otherwise, more config options have to be provided within the
 				// <kubernetes_sd_config>.
-				tls_config: ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+				tls_config: {
+					ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+				}
 				bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 				kubernetes_sd_configs: [{
@@ -162,7 +166,9 @@ configMap: prometheus: {
 				// Prometheus. The discovery auth config is automatic if Prometheus runs inside
 				// the cluster. Otherwise, more config options have to be provided within the
 				// <kubernetes_sd_config>.
-				tls_config: ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+				tls_config: {
+					ca_file: "/var/run/secrets/kubernetes.io/serviceaccount/ca.crt"
+				}
 				bearer_token_file: "/var/run/secrets/kubernetes.io/serviceaccount/token"
 
 				kubernetes_sd_configs: [{

@@ -18,6 +18,31 @@ a: 3 // a line comment
 b: 4 // line comment that is last in the file.
 cc: 555 // align comments
 
+// don't simplify
+a: {
+    b: 2
+}
+
+// simplify
+a: {
+    b: c: {
+        d: 1
+    }
+}
+
+// unchanged
+a: b: [1]
+
+// don't simplify
+a: b: {
+    c: 2
+}
+
+// rewrite okay
+a: b: c: {
+    d: 2
+}
+
 m: {
 }
 m: {

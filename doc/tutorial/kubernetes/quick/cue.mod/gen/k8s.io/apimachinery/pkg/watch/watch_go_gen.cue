@@ -44,4 +44,6 @@ Event :: {
 }
 
 // RaceFreeFakeWatcher lets you test anything that consumes a watch.Interface; threadsafe.
-RaceFreeFakeWatcher :: Stopped: bool
+RaceFreeFakeWatcher :: {
+	Stopped: bool
+}

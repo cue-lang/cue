@@ -15,4 +15,6 @@ WithVersionEncoder :: {
 }
 
 // WithoutVersionDecoder clears the group version kind of a deserialized object.
-WithoutVersionDecoder :: "Decoder": Decoder
+WithoutVersionDecoder :: {
+	"Decoder": Decoder
+}

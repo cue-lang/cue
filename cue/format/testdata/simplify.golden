@@ -46,6 +46,6 @@ x: {
 	r4:           quux
 	[baz2="str"]: 4
 	r5:           baz2
-	[baz3="bar"]: name: baz3 // TODO: treat baz3 as shadowed.
+	[baz3="bar"]: name: baz3
 	Time: time.Time
 }

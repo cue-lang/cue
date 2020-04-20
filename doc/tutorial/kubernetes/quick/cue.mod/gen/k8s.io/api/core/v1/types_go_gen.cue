@@ -5089,7 +5089,7 @@ ResourceHugePagesPrefix :: "hugepages-"
 ResourceAttachableVolumesPrefix :: "attachable-volumes-"
 
 // ResourceList is a set of (resource name, quantity) pairs.
-ResourceList :: [string]: resource.Quantity
+ResourceList :: {[string]: resource.Quantity}
 
 // Node is a worker node in Kubernetes.
 // Each node will have a unique identifier in the cache (i.e. in etcd).

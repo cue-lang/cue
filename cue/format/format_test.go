@@ -194,7 +194,7 @@ type entry struct {
 
 // Use go test -update to create/update the respective golden files.
 var data = []entry{
-	{"comments.input", "comments.golden", 0},
+	{"comments.input", "comments.golden", simplify},
 	{"simplify.input", "simplify.golden", simplify},
 	{"expressions.input", "expressions.golden", 0},
 	{"values.input", "values.golden", 0},

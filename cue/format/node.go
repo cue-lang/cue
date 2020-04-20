@@ -243,6 +243,7 @@ func (f *formatter) inlineField(n *ast.Field) *ast.Field {
 	obj, ok := n.Value.(*ast.StructLit)
 	if !ok || len(obj.Elts) != 1 ||
 		(obj.Lbrace.IsValid() && !f.printer.cfg.simplify) ||
+		(obj.Lbrace.IsValid() && hasDocComments(n)) ||
 		len(n.Attrs) > 0 {
 		return nil
 	}

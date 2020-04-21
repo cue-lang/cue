@@ -538,6 +538,11 @@ func TestStrict(t *testing.T) {
 			`a b c: 2`},
 		{"reserved identifiers",
 			`__foo: 3`},
+		{"bulk optional fields",
+			`a: {
+			foo: "bar"
+			[string]: string
+		}`},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

@@ -404,7 +404,7 @@ func TestBuiltins(t *testing.T) {
 		testExpr(`len({})`),
 		`0`,
 	}, {
-		testExpr(`len({a: 1, b: 2, [foo=_]: int, _c: 3})`),
+		testExpr(`len({a: 1, b: 2, {[foo=_]: int}, _c: 3})`),
 		`2`,
 	}, {
 		testExpr(`len([1, 2, 3])`),

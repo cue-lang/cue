@@ -3742,16 +3742,16 @@ var builtinPackages = map[string]*builtinPkg{
 	Name ::  !="" & !~"^[$]"
 	Value :: bool | number | *string | null
 	Setenv: {
-		[Name]: Value
-		$id:    "tool/os.Setenv"
+		$id: "tool/os.Setenv"
+		{[Name]: Value}
 	}
 	Getenv: {
-		[Name]: Value
-		$id:    "tool/os.Getenv"
+		$id: "tool/os.Getenv"
+		{[Name]: Value}
 	}
 	Environ: {
-		[Name]: Value
-		$id:    "tool/os.Environ"
+		$id: "tool/os.Environ"
+		{[Name]: Value}
 	}
 	Clearenv: {
 		$id: "tool/os.Clearenv"

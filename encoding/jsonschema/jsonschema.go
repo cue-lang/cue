@@ -17,7 +17,7 @@
 // Mapping and Linking
 //
 // JSON Schema are often defined in a single file. CUE, on the other hand
-// idomatically defines schema as a definition.
+// idiomatically defines schema as a definition.
 //
 // CUE:
 //    $schema: which schema is used for validation.

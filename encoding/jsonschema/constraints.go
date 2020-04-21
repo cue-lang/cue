@@ -499,12 +499,12 @@ var constraints = []*constraint{
 			// [!~(properties) & pattern]: schema
 			s.patterns = append(s.patterns,
 				&ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(key)})
-			f := &ast.Field{
+			f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 				Label: ast.NewList(ast.NewBinExpr(token.AND,
 					&ast.UnaryExpr{Op: token.MAT, X: ast.NewString(key)},
 					existing)),
 				Value: s.schema(n),
-			}
+			}))
 			ast.SetRelPos(f, token.NewSection)
 			s.obj.Elts = append(s.obj.Elts, f)
 		})
@@ -530,10 +530,10 @@ var constraints = []*constraint{
 			}
 			// [!~(properties|patternProperties)]: schema
 			existing := append(s.patterns, excludeFields(s.obj.Elts))
-			f := &ast.Field{
+			f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 				Label: ast.NewList(ast.NewBinExpr(token.AND, existing...)),
 				Value: s.schema(n),
-			}
+			}))
 			ast.SetRelPos(f, token.NewSection)
 			s.obj.Elts = append(s.obj.Elts, f)
 

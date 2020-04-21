@@ -22,9 +22,33 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 func fix(f *ast.File) *ast.File {
+	// Isolate bulk optional fields into a single struct.
+	ast.Walk(f, func(n ast.Node) bool {
+		var decls []ast.Decl
+		switch x := n.(type) {
+		case *ast.StructLit:
+			decls = x.Elts
+		case *ast.File:
+			decls = x.Decls
+		}
+
+		if len(decls) <= 1 {
+			return true
+		}
+
+		for i, d := range decls {
+			if internal.IsBulkField(d) {
+				decls[i] = internal.EmbedStruct(ast.NewStruct(d))
+			}
+		}
+
+		return true
+	}, nil)
+
 	// Rewrite an old-style alias to a let clause.
 	ast.Walk(f, func(n ast.Node) bool {
 		var decls []ast.Decl

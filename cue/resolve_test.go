@@ -1180,7 +1180,7 @@ a: {
 
 			Bar :: {
 				field: int
-				[A=_]:   int
+				{[A=_]:   int}
 			}
 			bar: Bar
 			bar: { feild: 2 }
@@ -1664,17 +1664,17 @@ a: {
 		desc: "field templates",
 		in: `
 			a: {
-				[name=_]: int
+				{[name=_]: int}
 				k: 1
 			}
 			b: {
-				[X=_]: { x: 0, y: *1 | int }
+				{[X=_]: { x: 0, y: *1 | int }}
 				v: {}
 				w: { x: 0 }
 			}
 			b: { [y=_]: {} }
 			c: {
-				[Name=_]: { name: Name, y: 1 }
+				{[Name=_]: { name: Name, y: 1 }}
 				foo: {}
 				bar: _
 			}

@@ -233,10 +233,15 @@ func (p *exporter) mkTemplate(v value, n *ast.Ident) ast.Label {
 
 func hasTemplate(s *ast.StructLit) bool {
 	for _, e := range s.Elts {
-		if _, ok := e.(*ast.Ellipsis); ok {
+		switch f := e.(type) {
+		case *ast.Ellipsis:
 			return true
-		}
-		if f, ok := e.(*ast.Field); ok {
+
+		case *ast.EmbedDecl:
+			if st, ok := f.Expr.(*ast.StructLit); ok && hasTemplate(st) {
+				return true
+			}
+		case *ast.Field:
 			label := f.Label
 			if _, ok := label.(*ast.TemplateLabel); ok {
 				return true
@@ -260,7 +265,6 @@ func hasTemplate(s *ast.StructLit) bool {
 						return true
 					}
 				}
-				return false
 			}
 		}
 	}
@@ -589,7 +593,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			if x.optionals == nil {
 				break
 			}
-			p.optionals(st, x.optionals)
+			p.optionals(len(x.arcs) > 0, st, x.optionals)
 		}
 		return expr
 
@@ -763,7 +767,7 @@ func (p *exporter) optionalsExpr(x *optionals, isClosed bool) ast.Expr {
 	// indicate no other fields may be added. Non-closed empty structs should
 	// have been optimized away. In case they are not, it is just a no-op.
 	if x != nil {
-		p.optionals(st, x)
+		p.optionals(false, st, x)
 	}
 	if isClosed {
 		return ast.NewCall(ast.NewIdent("close"), st)
@@ -771,7 +775,8 @@ func (p *exporter) optionalsExpr(x *optionals, isClosed bool) ast.Expr {
 	return st
 }
 
-func (p *exporter) optionals(st *ast.StructLit, x *optionals) (skippedEllipsis bool) {
+func (p *exporter) optionals(wrap bool, st *ast.StructLit, x *optionals) (skippedEllipsis bool) {
+	wrap = wrap || len(x.fields) > 1
 	switch x.op {
 	default:
 		for _, t := range x.fields {
@@ -792,7 +797,11 @@ func (p *exporter) optionals(st *ast.StructLit, x *optionals) (skippedEllipsis b
 				skippedEllipsis = true
 				continue
 			}
-			st.Elts = append(st.Elts, f)
+			if !wrap {
+				st.Elts = append(st.Elts, f)
+				continue
+			}
+			st.Elts = append(st.Elts, internal.EmbedStruct(ast.NewStruct(f)))
 		}
 
 	case opUnify:
@@ -843,7 +852,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		// Optional field constraints may be omitted if they were already
 		// applied and no more new fields may be added.
 		!(doEval(p.mode) && x.optionals.isEmpty() && p.isClosed(x)) {
-		hasEllipsis = p.optionals(obj, x.optionals)
+		hasEllipsis = p.optionals(len(x.arcs) > 0, obj, x.optionals)
 	}
 	for i, a := range x.arcs {
 		f := &ast.Field{
@@ -942,6 +951,15 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 	return obj, nil
 }
 
+func hasBulk(a []ast.Decl) bool {
+	for _, d := range a {
+		if internal.IsBulkField(d) {
+			return true
+		}
+	}
+	return false
+}
+
 func (p *exporter) embedding(s *ast.StructLit, n value) (closed bool) {
 	switch x := n.(type) {
 	case *structLit:
@@ -950,7 +968,11 @@ func (p *exporter) embedding(s *ast.StructLit, n value) (closed bool) {
 			n = err
 			break
 		}
-		s.Elts = append(s.Elts, st.Elts...)
+		if hasBulk(st.Elts) {
+			s.Elts = append(s.Elts, internal.EmbedStruct(st))
+		} else {
+			s.Elts = append(s.Elts, st.Elts...)
+		}
 		return p.isClosed(x)
 
 	case *binaryExpr:

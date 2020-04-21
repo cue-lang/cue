@@ -289,7 +289,8 @@ func TestDiff(t *testing.T) {
   }
 `,
 	}, {
-		x: `[_]: x: "hello"
+		name: "bulk optional",
+		x: `{[_]: x: "hello"}
 
 a: x: "hello"
 		`,

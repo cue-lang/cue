@@ -69,6 +69,48 @@ a: [ for x in y { x } ]
 		out: `
 let y = foo
 `,
+	}, {
+		name: "wrap bulk fields",
+		in: `
+		a: {
+			[allGood]: int
+		}
+		b: {
+			a: int
+
+			b: [string]: string
+			[string]: wrap
+
+			// Comment
+			[string]: wrap
+			...
+		}
+		c: {
+			a: int
+
+			{[string]: alreadyGreat}
+		}
+
+		`,
+		out: `a: {
+	[allGood]: int
+}
+b: {
+	a: int
+
+	b: [string]: string
+	{[string]: wrap}
+
+	// Comment
+	{[string]: wrap}
+	...
+}
+c: {
+	a: int
+
+	{[string]: alreadyGreat}
+}
+`,
 		// 	}, {
 		// 		name: "slice",
 		// 		in: `package foo

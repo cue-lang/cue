@@ -29,14 +29,14 @@ Name :: !="" & !~"^[$]"
 Setenv: {
 	$id: "tool/os.Setenv"
 
-	[Name]: Value
+	{[Name]: Value}
 }
 
 // Getenv gets and parses the specific command line variables.
 Getenv: {
 	$id: "tool/os.Getenv"
 
-	[Name]: Value
+	{[Name]: Value}
 }
 
 // Environ populates a struct with all environment variables.
@@ -47,7 +47,7 @@ Environ: {
 	// Individual entries may be specified ahead of time to enable
 	// validation and parsing. Values that are marked as required
 	// will fail the task if they are not found.
-	[Name]: Value
+	{[Name]: Value}
 }
 
 // Clearenv clears all environment variables.

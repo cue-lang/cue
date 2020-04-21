@@ -271,6 +271,32 @@ func ToFile(n ast.Node) *ast.File {
 	}
 }
 
+func IsBulkField(d ast.Decl) bool {
+	if f, ok := d.(*ast.Field); ok {
+		if _, ok := f.Label.(*ast.ListLit); ok {
+			return true
+		}
+	}
+	return false
+}
+
+func EmbedStruct(s *ast.StructLit) *ast.EmbedDecl {
+	e := &ast.EmbedDecl{Expr: s}
+	if len(s.Elts) == 1 {
+		d := s.Elts[0]
+		astutil.CopyPosition(e, d)
+		ast.SetRelPos(d, token.NoSpace)
+		astutil.CopyComments(e, d)
+		ast.SetComments(d, nil)
+		if f, ok := d.(*ast.Field); ok {
+			ast.SetRelPos(f.Label, token.NoSpace)
+		}
+	}
+	s.Lbrace = token.Newline.Pos()
+	s.Rbrace = token.NoSpace.Pos()
+	return e
+}
+
 // IsEllipsis reports whether the declaration can be represented as an ellipsis.
 func IsEllipsis(x ast.Decl) bool {
 	// ...

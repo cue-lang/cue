@@ -351,6 +351,7 @@ func TestExport(t *testing.T) {
 
 				b: int
 				[_]: <100
+				{[_]: <300}
 			}
 		}`,
 		out: unindent(`
@@ -367,9 +368,10 @@ func TestExport(t *testing.T) {
 				emb
 			}
 			e :: {
-				[string]: <100
-				b:        int
+				{[string]: <100}
+				b: int
 				f
+				{[string]: <300}
 			}
 		}`),
 	}, {
@@ -712,6 +714,18 @@ func TestExportFile(t *testing.T) {
 		D :: string`),
 	}, {
 		in: `
+		a: {
+			foo: 3
+			[=~"foo"]: int
+		}
+		`,
+		out: unindent(`
+		a: {
+			{[=~"foo"]: int}
+			foo: 3
+		}`),
+	}, {
+		in: `
 		import "time"
 
 		a: { b: time.Duration } | { c: time.Duration }
@@ -787,12 +801,12 @@ func TestExportFile(t *testing.T) {
 			[string]: int64
 		}
 		x: {
-			[string]: int64
-			x:        int64
+			{[string]: int64}
+			x: int64
 		}
 		X :: {
-			[string]: int64
-			x:        int64
+			{[string]: int64}
+			x: int64
 		}`),
 	}, {
 		eval: true,
@@ -937,25 +951,25 @@ func TestExportFile(t *testing.T) {
 		// It is okay to allow bulk-optional fields along-side definitions.
 		in: `
 		"#A": {
-			[string]: int
+			{[string]: int}
 			"#B": 4
 		}
 		// Definition
 		#A: {
-			[string]: int
+			{[string]: int}
 			#B: 4
 		}
 		a: #A.#B
 		`,
 		out: unindent(`
 		"#A": {
-			[string]: int
-			"#B":     4
+			{[string]: int}
+			"#B": 4
 		}
 		// Definition
 		#A: {
-			[string]: int
-			#B:       4
+			{[string]: int}
+			#B: 4
 		}
 		a: 4`),
 	}, {

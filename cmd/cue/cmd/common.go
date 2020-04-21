@@ -128,8 +128,8 @@ type buildPlan struct {
 	// If orphanFiles are mixed with CUE files and/or if placement flags are used,
 	// the instance is also included in insts.
 	importing      bool
-	orphanedData   []*build.File
-	orphanedSchema []*build.File
+	mergeData      bool // do not merge individual data files.
+	orphaned       []*build.File
 	orphanInstance *build.Instance
 	// imported files are files that were orphaned in the build instance, but
 	// were placed in the instance by using one the --files, --list or --path
@@ -151,7 +151,7 @@ type buildPlan struct {
 // instance, with which the data instance may be merged.
 func (b *buildPlan) instances() iterator {
 	var i iterator
-	if len(b.orphanedData) == 0 && len(b.orphanedSchema) == 0 {
+	if len(b.orphaned) == 0 {
 		i = &instanceIterator{a: buildInstances(b.cmd, b.insts), i: -1}
 	} else {
 		i = newStreamingIterator(b)
@@ -208,7 +208,7 @@ type streamingIterator struct {
 func newStreamingIterator(b *buildPlan) *streamingIterator {
 	i := &streamingIterator{
 		cfg: b.encConfig,
-		a:   b.orphanedData,
+		a:   b.orphaned,
 		b:   b,
 	}
 
@@ -355,6 +355,8 @@ type config struct {
 	fileFilter     string
 	interpretation build.Interpretation
 
+	noMerge bool // do not merge individual data files.
+
 	loadCfg *load.Config
 }
 
@@ -394,53 +396,85 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			p.insts = append(p.insts, b)
 			continue
 		}
+		addedUser := false
 		if len(b.BuildFiles) > 0 {
+			addedUser = true
 			p.insts = append(p.insts, b)
 		}
 		if ok {
 			continue
 		}
 
-		if len(b.OrphanedFiles) > 0 {
-			if p.orphanInstance != nil {
-				return nil, errors.Newf(token.NoPos,
-					"builds contain two file packages")
-			}
-			p.orphanInstance = b
-			p.encConfig.Stream = true
+		if len(b.OrphanedFiles) == 0 {
+			continue
 		}
 
+		if p.orphanInstance != nil {
+			return nil, errors.Newf(token.NoPos,
+				"builds contain two file packages")
+		}
+		p.orphanInstance = b
+		p.encConfig.Stream = true
+
 		for _, f := range b.OrphanedFiles {
-			switch f.Interpretation {
-			case build.JSONSchema, build.OpenAPI:
-				p.orphanedSchema = append(p.orphanedSchema, f)
-				continue
-			}
 			switch f.Encoding {
-			case build.Protobuf:
-				p.orphanedSchema = append(p.orphanedSchema, f)
-			case build.YAML, build.JSON, build.Text:
-				p.orphanedData = append(p.orphanedData, f)
+			case build.Protobuf, build.YAML, build.JSON, build.Text:
 			default:
 				return nil, errors.Newf(token.NoPos,
 					"unsupported encoding %q", f.Encoding)
 			}
 		}
 
-		switch {
-		case len(p.insts) > 0 && len(p.orphanedSchema) > 0:
-			return nil, errors.Newf(token.NoPos,
-				"cannot define packages and schema")
-		case len(p.orphanedData) > 0 && len(p.orphanedSchema) > 1:
-			// TODO: allow this when schema have ID specified.
-			return nil, errors.Newf(token.NoPos,
-				"cannot define data with more than one schema")
-		case len(p.orphanedData) > 0 && len(p.orphanedSchema) == 1:
-			b.BuildFiles = append(b.BuildFiles, p.orphanedSchema...)
-			p.insts = append(p.insts, b)
-		case len(p.orphanedSchema) > 0:
-			p.orphanedData = p.orphanedSchema
+		if !p.mergeData && p.schema == nil {
+			p.orphaned = append(p.orphaned, b.OrphanedFiles...)
+			continue
 		}
+
+		// TODO: this processing could probably be delayed, or at least
+		// simplified. The main reason to do this here is to allow interpreting
+		// the --schema/-d flag, while allowing to use this for OpenAPI and
+		// JSON Schema in auto-detect mode.
+		buildFiles := []*build.File{}
+		for _, f := range b.OrphanedFiles {
+			d := encoding.NewDecoder(f, p.encConfig)
+			for ; !d.Done(); d.Next() {
+				file := d.File()
+				sub := &build.File{
+					Filename:       d.Filename(),
+					Encoding:       f.Encoding,
+					Interpretation: d.Interpretation(),
+					Form:           f.Form,
+					Tags:           f.Tags,
+					Source:         file,
+				}
+				if p.schema != nil && d.Interpretation() == "" {
+					switch sub.Encoding {
+					case build.YAML, build.JSON, build.Text:
+						p.orphaned = append(p.orphaned, sub)
+						continue
+					}
+				}
+				buildFiles = append(buildFiles, sub)
+				if err := b.AddSyntax(file); err != nil {
+					return nil, err
+				}
+			}
+			if err := d.Err(); err != nil {
+				return nil, err
+			}
+		}
+
+		if !addedUser && len(b.Files) > 1 {
+			p.insts = append(p.insts, b)
+		} else if len(p.orphaned) == 0 {
+			// Instance with only a single build: just print the file.
+			p.orphaned = append(p.orphaned, buildFiles...)
+		}
+	}
+
+	if len(p.insts) > 1 && p.schema != nil {
+		return nil, errors.Newf(token.NoPos,
+			"cannot use --schema/-d flag more than one schema")
 	}
 
 	if len(p.expressions) > 1 {
@@ -450,6 +484,8 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 }
 
 func (b *buildPlan) parseFlags() (err error) {
+	b.mergeData = !b.cfg.noMerge && flagMerge.Bool(b.cmd)
+
 	out := flagOut.String(b.cmd)
 	outFile := flagOutFile.String(b.cmd)
 

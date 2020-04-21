@@ -30,6 +30,7 @@ import (
 	"golang.org/x/xerrors"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -111,6 +112,32 @@ func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
 		}
 	}
 	return nil, "", f.Pos()
+}
+
+func SetPackage(f *ast.File, name string, overwrite bool) {
+	p, str, _ := PackageInfo(f)
+	if p != nil {
+		if !overwrite || str == name {
+			return
+		}
+		ident := ast.NewIdent(name)
+		astutil.CopyMeta(ident, p.Name)
+		return
+	}
+
+	decls := make([]ast.Decl, len(f.Decls)+1)
+	k := 0
+	for _, d := range f.Decls {
+		if _, ok := d.(*ast.CommentGroup); ok {
+			decls[k] = d
+			k++
+			continue
+		}
+		break
+	}
+	decls[k] = &ast.Package{Name: ast.NewIdent(name)}
+	copy(decls[k+1:], f.Decls[k:])
+	f.Decls = decls
 }
 
 // NewComment creates a new CommentGroup from the given text.

@@ -13,8 +13,6 @@ cmp stdout export-stdout
 
 -- export-stdout --
 {
-    "a": "b"
-}
-{
+    "a": "b",
     "c": "d"
 }

@@ -43,16 +43,17 @@ import (
 )
 
 type Decoder struct {
-	cfg       *Config
-	closer    io.Closer
-	next      func() (ast.Expr, error)
-	interpret interpretFunc
-	expr      ast.Expr
-	file      *ast.File
-	filename  string // may change on iteration for some formats
-	id        string
-	index     int
-	err       error
+	cfg            *Config
+	closer         io.Closer
+	next           func() (ast.Expr, error)
+	interpretFunc  interpretFunc
+	interpretation build.Interpretation
+	expr           ast.Expr
+	file           *ast.File
+	filename       string // may change on iteration for some formats
+	id             string
+	index          int
+	err            error
 }
 
 type interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
@@ -62,10 +63,14 @@ type interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
 func (i *Decoder) ID() string {
 	return i.id
 }
-
 func (i *Decoder) Filename() string { return i.filename }
-func (i *Decoder) Index() int       { return i.index }
-func (i *Decoder) Done() bool       { return i.err != nil }
+
+// Interpretation returns the current interpretation detected by Detect.
+func (i *Decoder) Interpretation() build.Interpretation {
+	return i.interpretation
+}
+func (i *Decoder) Index() int { return i.index }
+func (i *Decoder) Done() bool { return i.err != nil }
 
 func (i *Decoder) Next() {
 	if i.err != nil {
@@ -83,7 +88,7 @@ func (i *Decoder) Next() {
 
 func (i *Decoder) doInterpret() {
 	// Interpretations
-	if i.interpret != nil {
+	if i.interpretFunc != nil {
 		var r cue.Runtime
 		i.file = i.File()
 		inst, err := r.CompileFile(i.file)
@@ -91,7 +96,7 @@ func (i *Decoder) doInterpret() {
 			i.err = err
 			return
 		}
-		i.file, i.id, i.err = i.interpret(inst)
+		i.file, i.id, i.err = i.interpretFunc(inst)
 	}
 }
 
@@ -176,8 +181,8 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	case build.Auto:
 		openAPI := openAPIFunc(cfg, f)
 		jsonSchema := jsonSchemaFunc(cfg, f)
-		i.interpret = func(inst *cue.Instance) (file *ast.File, id string, err error) {
-			switch Detect(inst.Value()) {
+		i.interpretFunc = func(inst *cue.Instance) (file *ast.File, id string, err error) {
+			switch i.interpretation = Detect(inst.Value()); i.interpretation {
 			case build.JSONSchema:
 				return jsonSchema(inst)
 			case build.OpenAPI:
@@ -186,9 +191,11 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 			return i.file, "", i.err
 		}
 	case build.OpenAPI:
-		i.interpret = openAPIFunc(cfg, f)
+		i.interpretation = build.OpenAPI
+		i.interpretFunc = openAPIFunc(cfg, f)
 	case build.JSONSchema:
-		i.interpret = jsonSchemaFunc(cfg, f)
+		i.interpretation = build.JSONSchema
+		i.interpretFunc = jsonSchemaFunc(cfg, f)
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}

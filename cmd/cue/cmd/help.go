@@ -69,23 +69,20 @@ regular packages.
 
 Non-cue files are interpreted based on their file extension or,
 if present, an explicit file qualifier (see the "filetypes"
-help topic). Non-cue files may be interpreted as concrete data
-or schema. Schema are treated as single-file packages by default.
-See the "filetypes" and "flags" help topics on how to combine
-schema into a single package.
+help topic). By default, all recognized files are unified at
+their root value. See the "filetypes" and "flags" help topics
+on how to treat each file individually or how to combine them
+differently.
 
-Data files can be combined into a single package, in which case
-each file is unified into a defined location within this single
-package. If a data file has multiple values, such as allowed
-with JSON Lines or YAML, each value is interpreted as a separate
-file.
+If a data file has multiple values, such as allowed with JSON
+Lines or YAML, each value is interpreted as a separate file.
 
-The --schema/-d flag can be used to unify each data file against
-a specific schema within a non-data package. For OpenAPI, the -d
-flag specifies a schema name. For JSON Schema the -d flag
-specifies a schema defined in "definitions". In all other cases,
-the -d flag is a CUE expression that is evaluated within the
-package.
+If the --schema/-d is specified, data files are not merged, and
+are compared against the specified schema within a package or
+non-data file. For OpenAPI, the -d flag specifies a schema name.
+For JSON Schema the -d flag specifies a schema defined in
+"definitions". In all other cases, the -d flag is a CUE
+expression that is evaluated within the package.
 
 Examples (also see also "flags" and "filetypes" help topics):
 
@@ -104,9 +101,16 @@ $ cue export data.json schema: schema.json
 var flagsHelp = &cobra.Command{
 	Use:   "flags",
 	Short: "common flags for composing packages",
-	Long: `Non-CUE files are treated as individual files by
-default, but can be combined into a single package using a
-combination of the following flags.
+	Long: `Non-CUE files are merged at their roots by default.
+The can be combined differently or treated as different files
+by using a combination of the following flags.
+
+
+Individual files
+
+To treat non-cue files as individual files, use --no-merge flag.
+This is the default for vet. This flag only applies to data files
+when used in combination with the --schema/-d flag.
 
 
 Assigning values to a CUE path

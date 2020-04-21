@@ -20,6 +20,10 @@ cmp stdout expect-cue
 cue def openapi+cue: expect-cue-out -o -
 cmp stdout expect-cue2
 
+# combine
+cue def -p foo openapi.json openapi2.json
+cmp stdout expect-cue3
+
 -- foo.cue --
 // Some clever title.
 
@@ -56,6 +60,36 @@ Bar :: {
                 }
             },
             "Foo": {
+                "type": "object",
+                "required": [
+                    "a",
+                    "b"
+                ],
+                "properties": {
+                    "a": {
+                        "type": "integer"
+                    },
+                    "b": {
+                        "type": "integer",
+                        "minimum": 0,
+                        "exclusiveMaximum": 10
+                    }
+                }
+            }
+        }
+    }
+}
+-- openapi2.json --
+{
+    "openapi": "3.0.0",
+    "info": {
+        "title":   "My OpenAPI2",
+        "version": "v1alpha1"
+    },
+    "paths": {},
+    "components": {
+        "schemas": {
+            "Baz": {
                 "type": "object",
                 "required": [
                     "a",
@@ -197,6 +231,42 @@ Bar :: {
 	...
 }
 Foo :: {
+	a: int
+	b: >=0 & <10
+	...
+}
+-- expect-cue2 --
+info: {
+	title:   *"Some clever title." | string
+	version: *"v1" | string
+}
+Bar :: {
+	foo: Foo
+	...
+}
+Foo :: {
+	a: int
+	b: >=0 & <10
+	...
+}
+-- expect-cue3 --
+// My OpenAPI
+package foo
+
+info: {
+	title:   string | *_|_
+	version: *"v1alpha1" | string
+}
+Bar :: {
+	foo: Foo
+	...
+}
+Foo :: {
+	a: int
+	b: >=0 & <10
+	...
+}
+Baz :: {
 	a: int
 	b: >=0 & <10
 	...

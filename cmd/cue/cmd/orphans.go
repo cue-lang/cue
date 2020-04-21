@@ -47,7 +47,11 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 				flagWithContext, flagPath, flagList, flagFiles,
 			)
 		}
-		return false, err
+		// TODO: should we remove this optimization? This is really added as a
+		// conversion safety.
+		if len(i.OrphanedFiles)+len(i.BuildFiles) <= 1 || b.cfg.noMerge {
+			return false, err
+		}
 	}
 
 	pkg := b.encConfig.PkgName
@@ -85,8 +89,9 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 
 		// Filter only need to filter files that can stream:
 		for ; !d.Done(); d.Next() {
-			if expr := d.File(); expr != nil {
-				objs = append(objs, expr)
+			if f := d.File(); f != nil {
+				f.Filename = newName(d.Filename(), 0)
+				objs = append(objs, f)
 			}
 		}
 		if err := d.Err(); err != nil {
@@ -104,18 +109,31 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 			}
 			continue
 		}
-		if len(objs) > 1 && len(path) == 0 && !useList {
+		// TODO: consider getting rid of this requirement. It is important that
+		// import will catch conflicts ahead of time then, though, and report
+		// this messages as a possible solution if there are conflicts.
+		if b.importing && len(objs) > 1 && len(path) == 0 && !useList {
 			return false, fmt.Errorf(
 				"%s, %s, or %s flag needed to handle multiple objects in file %s",
 				flagPath, flagList, flagFiles, shortFile(i.Root, f))
 		}
 
-		f, err := placeOrphans(b.cmd, d.Filename(), pkg, objs...)
-		if err != nil {
-			return false, err
+		if !useList && len(path) == 0 && !useContext {
+			for _, f := range objs {
+				if pkg := c.PkgName; pkg != "" {
+					internal.SetPackage(f, pkg, false)
+				}
+				files = append(files, f)
+			}
+		} else {
+			// TODO: handle imports correctly, i.e. for proto.
+			f, err := placeOrphans(b.cmd, d.Filename(), pkg, objs...)
+			if err != nil {
+				return false, err
+			}
+			f.Filename = newName(d.Filename(), 0)
+			files = append(files, f)
 		}
-		f.Filename = newName(d.Filename(), 0)
-		files = append(files, f)
 	}
 
 	b.imported = append(b.imported, files...)
@@ -241,8 +259,7 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 	}
 
 	if pkg != "" {
-		p := &ast.Package{Name: ast.NewIdent(pkg)}
-		f.Decls = append([]ast.Decl{p}, f.Decls...)
+		internal.SetPackage(f, pkg, false)
 	}
 
 	if flagList.Bool(cmd) {

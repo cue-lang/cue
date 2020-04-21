@@ -38,6 +38,7 @@ const (
 	flagEscape      flagName = "escape"
 	flagGlob        flagName = "name"
 	flagRecursive   flagName = "recursive"
+	flagMerge       flagName = "merge"
 	flagList        flagName = "list"
 	flagPath        flagName = "path"
 	flagFiles       flagName = "files"
@@ -79,6 +80,7 @@ func addOrphanFlags(f *pflag.FlagSet) {
 	f.Bool(string(flagWithContext), false, "import as object with contextual data")
 	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
 	f.StringP(string(flagGlob), "n", "", "glob filter for file names")
+	f.Bool(string(flagMerge), true, "merge non-CUE files")
 }
 
 type flagName string

@@ -89,13 +89,15 @@ func newVetCmd(c *Command) *cobra.Command {
 // TODO: allow unrooted schema, such as JSON schema to compare against
 // other values.
 func doVet(cmd *Command, args []string) error {
-	b, err := parseArgs(cmd, args, nil)
+	b, err := parseArgs(cmd, args, &config{
+		noMerge: true,
+	})
 	exitOnErr(cmd, err, true)
 
 	// Go into a special vet mode if the user explicitly specified non-cue
 	// files on the command line.
 	// TODO: unify these two modes.
-	if len(b.orphanedData) > 0 {
+	if len(b.orphaned) > 0 {
 		vetFiles(cmd, b)
 		return nil
 	}

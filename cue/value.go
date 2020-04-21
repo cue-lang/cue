@@ -1351,6 +1351,11 @@ func (x *structLit) insertValue(ctx *context, f label, optional, isDef bool, val
 			isDef = false
 		}
 		x.arcs[i].definition = isDef
+		attrs, err := unifyAttrs(ctx, x, x.arcs[i].attrs, a)
+		if err != nil {
+			x.arcs[i].v = err
+		}
+		x.arcs[i].attrs = attrs
 		// TODO: should we warn if there is a mixed mode of optional and non
 		// optional fields at this point?
 		return

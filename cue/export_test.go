@@ -1089,6 +1089,21 @@ func TestExportFile(t *testing.T) {
 			_foo: _
 			`,
 		out: `{}`,
+	}, {
+		eval: true,
+		in: `
+		A :: {
+			foo: int @tag2(2)
+		} @tag2(1)
+
+		A :: {
+			foo: 2 @tag(2)
+		} @tag(1)
+
+		`,
+		out: `A :: {
+	foo: 2 @tag(2) @tag2(2)
+} @tag(1) @tag2(1)`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

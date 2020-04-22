@@ -34,11 +34,31 @@ func TestParse(t *testing.T) {
 	}, {
 		"basic lits", `"a","b", 3,3.4,5,2_3`, `"a", "b", 3, 3.4, 5, 2_3`,
 	}, {
-		"keyword basic lits", `true,false,null,for,in,if,let`, `true, false, null, for, in, if, let`,
+		"keyword basic lits", `true,false,null,for,in,if,let,if`, `true, false, null, for, in, if, let, if`,
+	}, {
+		"keyword basic newline", `
+		true
+		false
+		null
+		for
+		in
+		if
+		let
+		if
+		`, `true, false, null, for, in, if, let, if`,
 	}, {
 		"keywords as labels",
-		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5`,
-		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5`,
+		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5
+		for: if: let: 3
+		`,
+		`if: 0, for: 1, in: 2, where: 3, div: 4, quo: 5, for: {if: {let: 3}}`,
+	}, {
+		"keywords as alias",
+		`if=foo: 0
+		for=bar: 2
+		let=bar: 3
+		`,
+		`if=foo: 0, for=bar: 2, let=bar: 3`,
 	}, {
 		"json",
 		`{
@@ -398,6 +418,10 @@ func TestParse(t *testing.T) {
 		}
 		`,
 		`if X <[d2// Comment 2] {<[d0// Comment 1] Field: 2>}>`,
+	}, {
+		"let comments",
+		`let X = foo // Comment 1`,
+		`<[5// Comment 1] let X=foo>`,
 	}, {
 		"emit comments",
 		`// a comment at the beginning of the file

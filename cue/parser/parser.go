@@ -689,6 +689,14 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
 		Rparen: rparen}
 }
 
+// TODO: inline this function in parseFieldList once we no longer user comment
+// position information in parsing.
+func (p *parser) consumeDeclComma() {
+	if p.atComma("struct literal", token.RBRACE, token.EOF) {
+		p.next()
+	}
+}
+
 func (p *parser) parseFieldList() (list []ast.Decl) {
 	if p.trace {
 		defer un(trace(p, "FieldList"))
@@ -698,23 +706,16 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 
 	for p.tok != token.RBRACE && p.tok != token.ELLIPSIS && p.tok != token.EOF {
 		switch p.tok {
-		case token.FOR, token.IF:
-			list = append(list, p.parseComprehension())
-
-		case token.LET:
-			list = append(list, p.parseLetDecl())
-
 		case token.ATTRIBUTE:
 			list = append(list, p.parseAttribute())
-			if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
-				p.next()
-			}
+			p.consumeDeclComma()
 
 		default:
 			list = append(list, p.parseField())
 		}
 
-		// TODO: handle next comma here, after disallowing non-colon separator.
+		// TODO: handle next comma here, after disallowing non-colon separator
+		// and we have eliminated the need comment positions.
 	}
 
 	if p.tok == token.ELLIPSIS {
@@ -727,36 +728,38 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	return
 }
 
-func (p *parser) parseLetDecl() (decl ast.Decl) {
+func (p *parser) parseLetDecl() (decl ast.Decl, ident *ast.Ident) {
 	if p.trace {
 		defer un(trace(p, "Field"))
 	}
 
 	c := p.openComments()
-	defer func() { c.closeNode(p, decl) }()
 
 	letPos := p.expect(token.LET)
 	if p.tok != token.IDENT {
-		return &ast.Ident{
+		c.closeNode(p, ident)
+		return nil, &ast.Ident{
 			NamePos: letPos,
 			Name:    "let",
 		}
 	}
+	defer func() { c.closeNode(p, decl) }()
 
-	ident := p.parseIdent()
+	ident = p.parseIdent()
 	assign := p.expect(token.BIND)
 	expr := p.parseRHS()
-	p.expectComma()
+
+	p.consumeDeclComma()
 
 	return &ast.LetClause{
 		Let:   letPos,
 		Ident: ident,
 		Equal: assign,
 		Expr:  expr,
-	}
+	}, nil
 }
 
-func (p *parser) parseComprehension() (decl ast.Decl) {
+func (p *parser) parseComprehension() (decl ast.Decl, ident *ast.Ident) {
 	if p.trace {
 		defer un(trace(p, "Comprehension"))
 	}
@@ -768,53 +771,12 @@ func (p *parser) parseComprehension() (decl ast.Decl) {
 	pos := p.pos
 	clauses, fc := p.parseComprehensionClauses(true)
 	if fc != nil {
-		lab := &ast.Ident{
+		ident = &ast.Ident{
 			NamePos: pos,
 			Name:    tok.String(),
 		}
-		opt := token.NoPos
-		tok = p.tok
-		pos = p.pos
-		switch p.tok {
-		case token.COMMA, token.EOF:
-			decl = &ast.EmbedDecl{Expr: lab}
-
-		case token.OPTION:
-			opt = pos
-			p.next()
-			tok = p.tok
-			pos = p.pos
-
-			fallthrough
-
-		default:
-			p.next()
-			rhs := p.parseRHS()
-
-			// Field or alias.
-			switch tok {
-			case token.BIND:
-				decl = &ast.Alias{Ident: lab, Equal: pos, Expr: rhs}
-			case token.ISA, token.COLON:
-				decl = &ast.Field{
-					Label:    lab,
-					Optional: opt,
-					TokenPos: pos,
-					Token:    tok,
-					Value:    rhs,
-					Attrs:    p.parseAttributes(),
-				}
-			default:
-				decl = &ast.BadDecl{From: lab.Pos(), To: rhs.End()}
-			}
-		}
-
-		fc.closeNode(p, decl)
-		if p.atComma("struct literal", token.RBRACE, token.EOF) {
-			p.next()
-		}
-
-		return decl
+		fc.closeNode(p, ident)
+		return nil, ident
 	}
 
 	sc := p.openComments()
@@ -828,7 +790,7 @@ func (p *parser) parseComprehension() (decl ast.Decl) {
 	return &ast.Comprehension{
 		Clauses: clauses,
 		Value:   expr,
-	}
+	}, nil
 }
 
 func (p *parser) parseField() (decl ast.Decl) {
@@ -847,7 +809,10 @@ func (p *parser) parseField() (decl ast.Decl) {
 	for i := 0; ; i++ {
 		tok := p.tok
 
-		label, expr, ok := p.parseLabel(false)
+		label, expr, decl, ok := p.parseLabel(false)
+		if decl != nil {
+			return decl
+		}
 		m.Label = label
 
 		if !ok {
@@ -859,15 +824,11 @@ func (p *parser) parseField() (decl ast.Decl) {
 					p.errorExpected(p.pos, "label or ':'")
 					return &ast.BadDecl{From: pos, To: p.pos}
 				}
-				if p.atComma("struct literal", token.RBRACE) {
-					p.next()
-				}
+				p.consumeDeclComma()
 				return a
 			}
 			e := &ast.EmbedDecl{Expr: expr}
-			if p.atComma("struct literal", token.RBRACE) {
-				p.next()
-			}
+			p.consumeDeclComma()
 			return e
 		}
 
@@ -926,7 +887,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		}
 
 		tok := p.tok
-		label, expr, ok := p.parseLabel(true)
+		label, expr, _, ok := p.parseLabel(true)
 		if !ok || (p.tok != token.COLON && p.tok != token.ISA && p.tok != token.OPTION) {
 			if expr == nil {
 				expr = p.parseRHS()
@@ -963,9 +924,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		m.Attrs = attrs
 	}
 
-	if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
-		p.next()
-	}
+	p.consumeDeclComma()
 
 	return this
 }
@@ -979,16 +938,6 @@ func (p *parser) parseAttributes() (attrs []*ast.Attribute) {
 	return attrs
 }
 
-func (p *parser) parseAttributeDecls() (a []ast.Decl) {
-	for p.tok == token.ATTRIBUTE {
-		a = append(a, p.parseAttribute())
-		if p.atComma("struct literal", token.RBRACE) { // TODO: may be EOF
-			p.next()
-		}
-	}
-	return a
-}
-
 func (p *parser) parseAttribute() *ast.Attribute {
 	c := p.openComments()
 	a := &ast.Attribute{At: p.pos, Text: p.lit}
@@ -997,46 +946,31 @@ func (p *parser) parseAttribute() *ast.Attribute {
 	return a
 }
 
-func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) {
+func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.Decl, ok bool) {
 	tok := p.tok
 	switch tok {
-	case token.IDENT, token.STRING, token.INTERPOLATION,
-		token.NULL, token.TRUE, token.FALSE,
-		token.FOR, token.IF, token.LET, token.IN:
-		expr = p.parseExpr()
 
-		switch x := expr.(type) {
-		case *ast.BasicLit:
-			switch x.Kind {
-			case token.STRING, token.NULL, token.TRUE, token.FALSE:
-				// Keywords that represent operands.
-
-				// Allowing keywords to be used as a labels should not interfere with
-				// generating good errors: any keyword can only appear on the RHS of a
-				// field (after a ':'), whereas labels always appear on the LHS.
-
-				label, ok = x, true
-			}
-
-		case *ast.Ident:
-			if strings.HasPrefix(x.Name, "__") {
-				p.errf(x.NamePos, "identifiers starting with '__' are reserved")
-			}
-
-			expr = p.parseAlias(x)
-			if a, ok := expr.(*ast.Alias); ok {
-				if _, ok = a.Expr.(ast.Label); !ok {
-					break
-				}
-				label = a
-			} else {
-				label = x
-			}
-			ok = true
-
-		case ast.Label:
-			label, ok = x, true
+	case token.FOR, token.IF:
+		if rhs {
+			expr = p.parseExpr()
+			break
 		}
+		comp, ident := p.parseComprehension()
+		if comp != nil {
+			return nil, nil, comp, false
+		}
+		expr = ident
+
+	case token.LET:
+		let, ident := p.parseLetDecl()
+		if let != nil {
+			return nil, nil, let, false
+		}
+		expr = ident
+
+	case token.IDENT, token.STRING, token.INTERPOLATION,
+		token.NULL, token.TRUE, token.FALSE, token.IN:
+		expr = p.parseExpr()
 
 	case token.LBRACK:
 		expr = p.parseRHS()
@@ -1046,7 +980,40 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, ok bool) 
 			label, ok = x, true
 		}
 	}
-	return label, expr, ok
+
+	switch x := expr.(type) {
+	case *ast.BasicLit:
+		switch x.Kind {
+		case token.STRING, token.NULL, token.TRUE, token.FALSE:
+			// Keywords that represent operands.
+
+			// Allowing keywords to be used as a labels should not interfere with
+			// generating good errors: any keyword can only appear on the RHS of a
+			// field (after a ':'), whereas labels always appear on the LHS.
+
+			label, ok = x, true
+		}
+
+	case *ast.Ident:
+		if strings.HasPrefix(x.Name, "__") {
+			p.errf(x.NamePos, "identifiers starting with '__' are reserved")
+		}
+
+		expr = p.parseAlias(x)
+		if a, ok := expr.(*ast.Alias); ok {
+			if _, ok = a.Expr.(ast.Label); !ok {
+				break
+			}
+			label = a
+		} else {
+			label = x
+		}
+		ok = true
+
+	case ast.Label:
+		label, ok = x, true
+	}
+	return label, expr, nil, ok
 }
 
 func (p *parser) parseStruct() (expr ast.Expr) {
@@ -1243,7 +1210,7 @@ func (p *parser) parseListElement() (expr ast.Expr, ok bool) {
 			expr := p.parseStruct()
 			sc.closeExpr(p, expr)
 
-			if p.atComma("struct literal", token.RBRACK) { // TODO: may be EOF
+			if p.atComma("list literal", token.RBRACK) { // TODO: may be EOF
 				p.next()
 			}
 

@@ -762,13 +762,10 @@ scanAgain:
 		if len(lit) > 1 {
 			// keywords are longer than one letter - avoid lookup otherwise
 			tok = token.Lookup(lit)
-			switch tok {
-			case token.IDENT, token.TRUE, token.FALSE, token.NULL, token.BOTTOM:
-				insertEOL = true
-			}
-		} else {
 			insertEOL = true
+		} else {
 			tok = token.IDENT
+			insertEOL = true
 		}
 	case '0' <= ch && ch <= '9':
 		insertEOL = true

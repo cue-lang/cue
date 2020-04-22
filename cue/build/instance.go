@@ -31,7 +31,7 @@ import (
 // An Instance describes the collection of files, and its imports, necessary
 // to build a CUE instance.
 //
-// A typical way to create an Instance is to use the loader package.
+// A typical way to create an Instance is to use the cue/load package.
 type Instance struct {
 	ctxt *Context
 

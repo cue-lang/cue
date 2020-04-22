@@ -37,11 +37,17 @@ func IsValidIdent(ident string) bool {
 	if ident == "" {
 		return false
 	}
-	for i, r := range ident {
-		if isLetter(r) || r == '_' || r == '$' {
-			continue
-		}
-		if i > 0 && isDigit(r) {
+
+	r, sz := utf8.DecodeRuneInString(ident)
+	switch {
+	case isDigit(r):
+		return false
+	case r == '#':
+		ident = ident[sz:]
+	}
+
+	for _, r := range ident {
+		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
 			continue
 		}
 		return false
@@ -72,15 +78,13 @@ func QuoteIdent(ident string) (string, error) {
 			continue
 		}
 		if r == '-' {
-			goto escape
+			return "`" + ident + "`", nil
 		}
 		return "", errors.Newf(token.NoPos, "invalid character '%s' in identifier", string(r))
 	}
 
-	return ident, nil
-
-escape:
-	return "`" + ident + "`", nil
+	_, err := parseIdent(token.NoPos, ident)
+	return ident, err
 }
 
 // ParseIdent unquotes a possibly quoted identifier and validates
@@ -88,28 +92,40 @@ escape:
 //
 // Deprecated: quoted identifiers are deprecated. Use aliases.
 func ParseIdent(n *Ident) (string, error) {
-	ident := n.Name
+	return parseIdent(n.NamePos, n.Name)
+}
+
+func parseIdent(pos token.Pos, ident string) (string, error) {
 	if ident == "" {
-		return "", errors.Newf(n.Pos(), "empty identifier")
+		return "", errors.Newf(pos, "empty identifier")
 	}
 	quoted := false
 	if ident[0] == '`' {
 		u, err := strconv.Unquote(ident)
 		if err != nil {
-			return "", errors.Newf(n.Pos(), "invalid quoted identifier")
+			return "", errors.Newf(pos, "invalid quoted identifier")
 		}
 		ident = u
 		quoted = true
 	}
 
-	for _, r := range ident {
+	r, sz := utf8.DecodeRuneInString(ident)
+	switch {
+	case isDigit(r):
+		return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
+	case r == '#':
+	default:
+		sz = 0
+	}
+
+	for _, r := range ident[sz:] {
 		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
 			continue
 		}
 		if r == '-' && quoted {
 			continue
 		}
-		return "", errors.Newf(n.Pos(), "invalid character '%s' in identifier", string(r))
+		return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
 	}
 
 	return ident, nil

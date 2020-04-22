@@ -266,6 +266,17 @@ func isDigit(ch rune) bool {
 	return '0' <= ch && ch <= '9' || ch >= utf8.RuneSelf && unicode.IsDigit(ch)
 }
 
+func (s *Scanner) scanFieldIdentifier() string {
+	offs := s.offset
+	if s.ch == '#' {
+		s.next()
+	}
+	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' || s.ch == '$' {
+		s.next()
+	}
+	return string(s.src[offs:s.offset])
+}
+
 func (s *Scanner) scanIdentifier() string {
 	offs := s.offset
 	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' || s.ch == '$' {
@@ -752,27 +763,28 @@ scanAgain:
 
 	// determine token value
 	insertEOL := false
+	var quote quoteInfo
 	switch ch := s.ch; {
-	// case ch == '$':
-	// 	lit = string(rune(ch))
-	// 	s.next()
-	// 	fallthrough
-	case isLetter(ch), ch == '$':
-		lit = s.scanIdentifier()
+	case '0' <= ch && ch <= '9':
+		insertEOL = true
+		tok, lit = s.scanNumber(false)
+	case isLetter(ch), ch == '$', ch == '#':
+		lit = s.scanFieldIdentifier()
 		if len(lit) > 1 {
 			// keywords are longer than one letter - avoid lookup otherwise
 			tok = token.Lookup(lit)
 			insertEOL = true
-		} else {
+			break
+		} else if ch != '#' {
 			tok = token.IDENT
 			insertEOL = true
+			break
 		}
-	case '0' <= ch && ch <= '9':
-		insertEOL = true
-		tok, lit = s.scanNumber(false)
+		quote.numHash = 1
+		ch = s.ch
+		fallthrough
 	default:
 		s.next() // always make progress
-		var quote quoteInfo
 		switch ch {
 		case -1:
 			if s.insertEOL {
@@ -813,7 +825,7 @@ scanAgain:
 			s.insertEOL = false // newline consumed
 			return s.file.Pos(offset, token.Elided), token.COMMA, "\n"
 		case '#':
-			for quote.numHash = 1; s.ch == '#'; quote.numHash++ {
+			for quote.numHash++; s.ch == '#'; quote.numHash++ {
 				s.next()
 			}
 			ch = s.ch

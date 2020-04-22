@@ -16,10 +16,11 @@ package cue
 
 import (
 	"bytes"
-	"cuelang.org/go/cue/ast"
 	"fmt"
 	"strconv"
 	"strings"
+
+	"cuelang.org/go/cue/ast"
 )
 
 func debugStr(ctx *context, v value) string {
@@ -140,7 +141,14 @@ func (p *printer) label(f label) string {
 	if p.ctx == nil {
 		return strconv.Itoa(int(f))
 	}
-	return p.ctx.labelStr(f)
+
+	str := p.ctx.labelStr(f)
+	if strings.HasPrefix(str, "#") && f&definition == 0 ||
+		strings.HasPrefix(str, "_") && f&hidden == 0 ||
+		!ast.IsValidIdent(str) {
+		return strconv.Quote(str)
+	}
+	return str
 }
 
 func (p *printer) writef(format string, args ...interface{}) {
@@ -369,14 +377,11 @@ func (p *printer) str(v interface{}) {
 	case arc:
 		n := x.v
 		str := p.label(x.feature)
-		if !ast.IsValidIdent(str) {
-			str = strconv.Quote(str)
-		}
 		p.writef(str)
 		if x.optional {
 			p.write("?")
 		}
-		if x.definition {
+		if x.definition && x.feature&definition == 0 {
 			p.write(" :: ")
 		} else {
 			p.write(": ")

@@ -17,6 +17,7 @@ package cue
 import (
 	"path"
 	"strconv"
+	"strings"
 	"sync"
 
 	"cuelang.org/go/cue/ast"
@@ -295,15 +296,20 @@ func (idx *index) label(s string, isIdent bool) label {
 		idx.labelMap[s] = f
 		idx.labels = append(idx.labels, s)
 	}
-	f <<= 1
-	if isIdent && s != "" && s[0] == '_' {
-		f |= 1
+	f <<= labelShift
+	if isIdent {
+		if strings.HasPrefix(s, "#") {
+			f |= definition
+		}
+		if strings.HasPrefix(s, "_") || strings.HasPrefix(s, "#_") {
+			f |= hidden
+		}
 	}
 	return f
 }
 
 func (idx *index) labelStr(l label) string {
-	l >>= 1
+	l >>= labelShift
 	for ; l < idx.offset; idx = idx.parent {
 	}
 	return idx.labels[l-idx.offset]

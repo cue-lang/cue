@@ -933,6 +933,43 @@ func TestExportFile(t *testing.T) {
 		a: A`),
 	}, {
 		eval: true,
+		opts: []Option{Docs(true)},
+		// It is okay to allow bulk-optional fields along-side definitions.
+		in: `
+		"#A": {
+			[string]: int
+			"#B": 4
+		}
+		// Definition
+		#A: {
+			[string]: int
+			#B: 4
+		}
+		a: #A.#B
+		`,
+		out: unindent(`
+		"#A": {
+			[string]: int
+			"#B":     4
+		}
+		// Definition
+		#A: {
+			[string]: int
+			#B:       4
+		}
+		a: 4`),
+	}, {
+		in: `
+		#A: {
+			#B: 4
+		}
+		a: #A.#B
+		`,
+		out: unindent(`
+		#A: #B: 4
+		a: #A.#B`),
+	}, {
+		eval: true,
 		in: `
 		x: [string]: int
 		a: [P=string]: {

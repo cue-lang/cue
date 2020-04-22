@@ -20,7 +20,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode"
 	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v2"
@@ -146,21 +145,13 @@ func (p *exporter) unique(s string) string {
 }
 
 func (p *exporter) label(f label) ast.Label {
-	orig := p.ctx.labelStr(f)
-	str := strconv.Quote(orig)
-	if len(orig)+2 < len(str) || (strings.HasPrefix(orig, "_") && f&1 == 0) {
-		return ast.NewLit(token.STRING, str)
+	str := p.ctx.labelStr(f)
+	if strings.HasPrefix(str, "#") && f&definition == 0 ||
+		strings.HasPrefix(str, "_") && f&hidden == 0 ||
+		!ast.IsValidIdent(str) {
+		return ast.NewLit(token.STRING, strconv.Quote(str))
 	}
-	for i, r := range orig {
-		if unicode.IsLetter(r) || r == '_' || r == '$' {
-			continue
-		}
-		if i > 0 && unicode.IsDigit(r) {
-			continue
-		}
-		return ast.NewLit(token.STRING, str)
-	}
-	return &ast.Ident{Name: orig}
+	return &ast.Ident{Name: str}
 }
 
 func (p *exporter) identifier(f label) *ast.Ident {
@@ -874,7 +865,9 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 			if p.mode.omitDefinitions || p.mode.concrete {
 				continue
 			}
-			f.Token = token.ISA
+			if !isDef(f) {
+				f.Token = token.ISA
+			}
 		}
 		if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
 			continue

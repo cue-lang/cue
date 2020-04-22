@@ -109,8 +109,9 @@ func TestParse(t *testing.T) {
 
 			 embedding
 		}
+		#Def: {}
 		`,
-		`Def :: {b: "2", c: 3, embedding}`,
+		`Def :: {b: "2", c: 3, embedding}, #Def: {}`,
 	}, {
 		"one-line embedding",
 		`{ V1, V2 }`,

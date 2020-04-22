@@ -87,7 +87,10 @@ func (s *labelSimplifier) markStrings(n ast.Node) bool {
 	switch x := n.(type) {
 	case *ast.BasicLit:
 		str, err := strconv.Unquote(x.Value)
-		if err != nil || !ast.IsValidIdent(str) || strings.HasPrefix(str, "_") {
+		if err != nil ||
+			!ast.IsValidIdent(str) ||
+			strings.HasPrefix(str, "_") ||
+			strings.HasPrefix(str, "#") {
 			return false
 		}
 		s.scope[str] = true
@@ -105,7 +108,10 @@ func (s *labelSimplifier) replace(c astutil.Cursor) bool {
 	switch x := c.Node().(type) {
 	case *ast.BasicLit:
 		str, err := strconv.Unquote(x.Value)
-		if err == nil && s.scope[str] && !strings.HasPrefix(str, "_") {
+		if err == nil &&
+			s.scope[str] &&
+			!strings.HasPrefix(str, "_") &&
+			!strings.HasPrefix(str, "#") {
 			c.Replace(ast.NewIdent(str))
 		}
 	}

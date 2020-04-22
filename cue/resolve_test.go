@@ -1243,6 +1243,26 @@ a: {
 			`DC :: <10>C{a: int}` +
 			`}`,
 	}, {
+		desc: "new-style definitions",
+		in: `
+		#Foo: {
+			a: 1
+			b: int
+		}
+		"#Foo": #Foo & {b: 1}
+
+		bulk: {[string]: string} & {
+			#def: 4 // Different namespace, so bulk option does not apply.
+			_hid: 3
+			a: "foo"
+		}
+		`,
+		out: `<0>{` +
+			`"#Foo": <1>C{a: 1, b: 1}, ` +
+			`#Foo: <2>C{a: 1, b: int}, ` +
+			`bulk: <3>{[]: <4>(_: string)->string, a: "foo", #def: 4, _hid: 3}` +
+			`}`,
+	}, {
 		desc: "recursive closing starting at non-definition",
 		in: `
 			z: a: {

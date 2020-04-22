@@ -225,7 +225,7 @@ func TestCompile(t *testing.T) {
 			C="\(a)": 5
 			c: C
 			`,
-		out: `<0>{[]: <1>(ID: string)-><2>{name: <1>.ID}, "foo=bar": 3, a: <0>.foo=bar, bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
+		out: `<0>{[]: <1>(ID: string)-><2>{name: <1>.ID}, "foo=bar": 3, a: <0>."foo=bar", bb: 4, b1: (<0>.bb & <0>.bb), c: <0>[""+<0>.a+""]""+<0>.a+"": 5}`,
 	}, {
 		// optional fields with key filters
 		in: `
@@ -366,6 +366,27 @@ b: preference mark not allowed at this position:
 		out: `<0>{` +
 			`a: (<1>{d: <2>{info :: <3>{...}, Y: <2>.info.X}, <0>.base} & <4>{[]: <5>(Name: string)-><6>{info :: <7>C{X: "foo"}}, }), ` +
 			`base :: <8>C{info :: <9>{...}}}`,
+	}, {
+		in: `
+		a: d: {
+			#base
+			#info: {
+				...
+			}
+			Y: #info.X
+		}
+
+		#base: {
+			#info: {...}
+		}
+
+		a: [Name=string]: { #info: {
+			X: "foo"
+		}}
+		`,
+		out: `<0>{` +
+			`a: (<1>{d: <2>{#info: <3>{...}, Y: <2>.#info.X}, <0>.#base} & <4>{[]: <5>(Name: string)-><6>{#info: <7>C{X: "foo"}}, }), ` +
+			`#base: <8>C{#info: <9>{...}}}`,
 	}, {
 		in: `
 		def :: {

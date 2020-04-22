@@ -195,6 +195,21 @@ func (v *astVisitor) ident(n *ast.Ident) string {
 	return str
 }
 
+func isDef(f *ast.Field) bool {
+	if f.Token == token.ISA {
+		return true
+	}
+	switch x := f.Label.(type) {
+	case *ast.Alias:
+		if ident, ok := x.Expr.(*ast.Ident); ok {
+			return strings.HasPrefix(ident.Name, "#")
+		}
+	case *ast.Ident:
+		return strings.HasPrefix(x.Name, "#")
+	}
+	return false
+}
+
 // We probably don't need to call Walk.s
 func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 	switch n := astNode.(type) {
@@ -376,7 +391,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 	case *ast.Field:
 		opt := n.Optional != token.NoPos
-		isDef := n.Token == token.ISA
+		isDef := isDef(n)
 		if isDef {
 			ctx := v.ctx()
 			ctx.inDefinition++

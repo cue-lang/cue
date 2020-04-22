@@ -799,6 +799,10 @@ func (o *optionals) allows(ctx *context, f label) bool {
 		return false
 	}
 
+	if f&(hidden|definition) != 0 {
+		return false
+	}
+
 	str := ctx.labelStr(f)
 	arg := &stringLit{str: str}
 
@@ -1199,12 +1203,15 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 		return v, nil
 	}
 
-	name := ctx.labelStr(x.arcs[i].feature)
-	arg := &stringLit{x.baseValue, name, nil}
+	if x.arcs[i].feature&(hidden|definition) == 0 {
+		name := ctx.labelStr(x.arcs[i].feature)
+		arg := &stringLit{x.baseValue, name, nil}
 
-	val, doc := x.optionals.constraint(ctx, arg)
-	if val != nil {
-		v = binOp(ctx, x, opUnify, v, val.evalPartial(ctx))
+		var val value
+		val, doc = x.optionals.constraint(ctx, arg)
+		if val != nil {
+			v = binOp(ctx, x, opUnify, v, val.evalPartial(ctx))
+		}
 	}
 
 	if x.closeStatus != 0 {
@@ -1216,7 +1223,12 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 // A label is a canonicalized feature name.
 type label uint32
 
-const hidden label = 0x01 // only set iff identifier starting with _
+const (
+	hidden     label = 0x01 // only set iff identifier starting with _ or #_
+	definition label = 0x02 // only set iff identifier starting with #
+
+	labelShift = 2
+)
 
 // An arc holds the label-value pair.
 //

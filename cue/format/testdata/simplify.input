@@ -37,6 +37,8 @@ a :: {
     foo: 2
 }
 
+"#A": dontSimplify
+
 x: {
 @tag0(foo)
     r1: baz1

@@ -10,7 +10,7 @@ kubernetes: services: {
 			metadata: labels: x.label
 			spec: selector:   x.label
 
-			spec: ports: [ p for p in x.port ] // convert struct to list
+			spec: ports: [ for p in x.port {p}] // convert struct to list
 		}
 	}
 	// Note that we cannot write
@@ -84,13 +84,13 @@ _k8sSpec: X: kubernetes: {
 			image: X.image
 			args:  X.args
 			if len(X.envSpec) > 0 {
-				env: [ for k, v in X.envSpec {v, name: k} ]
+				env: [ for k, v in X.envSpec {v, name: k}]
 			}
 
 			ports: [ for k, p in X.expose.port & X.port {
 				name:          k
 				containerPort: p
-			} ]
+			}]
 		}]
 	}
 
@@ -102,7 +102,7 @@ _k8sSpec: X: kubernetes: {
 					v.kubernetes
 
 					name: v.name
-				}
+				},
 			]
 		}
 
@@ -120,7 +120,7 @@ _k8sSpec: X: kubernetes: {
 						if v.readOnly {
 							readOnly: v.readOnly
 						}
-					}
+					},
 				]
 			}
 		}]

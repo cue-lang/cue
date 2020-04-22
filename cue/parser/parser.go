@@ -366,6 +366,10 @@ func (p *parser) next() {
 			p.comments.add(comment)
 		}
 	}
+
+	if p.tok == token.IDENT && p.lit[0] == '`' {
+		p.assertV0(p.pos, 0, 13, "quoted identifiers")
+	}
 }
 
 // assertV0 indicates the last version at which a certain feature was
@@ -1131,7 +1135,7 @@ func (p *parser) parseList() (expr ast.Expr) {
 
 	if clauses, _ := p.parseComprehensionClauses(false); clauses != nil {
 		var expr ast.Expr
-		p.assertV0(p.pos, 1, 1, "old-style list comprehensions")
+		p.assertV0(p.pos, 1, 3, "old-style list comprehensions")
 		if len(elts) != 1 {
 			p.errf(lbrack.Add(1), "list comprehension must have exactly one element")
 		}

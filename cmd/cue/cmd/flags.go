@@ -51,10 +51,10 @@ const (
 func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
 	if allowNonCUE {
 		f.String(string(flagOut), "",
-			`output format (run 'cue filetype' for more info)`)
+			`output format (run 'cue filetypes' for more info)`)
 	}
 	f.StringP(string(flagOutFile), "o", "",
-		`filename or - for stdout with optional file prefix (run 'cue filetype' for more info)`)
+		`filename or - for stdout with optional file prefix (run 'cue filetypes' for more info)`)
 }
 
 func addGlobalFlags(f *pflag.FlagSet) {

@@ -842,6 +842,41 @@ func TestFill(t *testing.T) {
 	}
 }
 
+func TestValue_LookupDef(t *testing.T) {
+	r := &Runtime{}
+
+	testCases := []struct {
+		in     string
+		def    string // comma-separated path
+		exists bool
+		out    string
+	}{{
+		in:  `#foo: 3`,
+		def: "#foo",
+		out: `3`,
+	}, {
+		in:  `_foo: 3`,
+		def: "_foo",
+		out: `_|_(defintion "_foo" not found)`,
+	}, {
+		in:  `#_foo: 3`,
+		def: "#_foo",
+		out: `_|_(defintion "#_foo" not found)`,
+	}}
+
+	for _, tc := range testCases {
+		t.Run(tc.def, func(t *testing.T) {
+			v := compile(t, r, tc.in).Value()
+			v = v.LookupDef(tc.def)
+			got := fmt.Sprint(v)
+
+			if got != tc.out {
+				t.Errorf("\ngot:  %s\nwant: %s", got, tc.out)
+			}
+		})
+	}
+}
+
 func TestDefaults(t *testing.T) {
 	testCases := []struct {
 		value string

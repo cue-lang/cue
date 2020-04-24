@@ -1475,10 +1475,10 @@ func (v Value) LookupDef(name string) Value {
 		return newErrValue(v, err)
 	}
 
-	f := v.ctx().strLabel(name)
+	f := v.ctx().label(name, true)
 	for i, a := range o.arcs {
 		if a.feature == f {
-			if !a.definition || a.optional {
+			if f&hidden != 0 || !a.definition || a.optional {
 				break
 			}
 			return newChildValue(&o, i)

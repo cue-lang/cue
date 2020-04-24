@@ -22,12 +22,15 @@ import (
 )
 
 func TestSubsume(t *testing.T) {
-	testCases := []struct {
+	// Do not inline: the named struct is used as a marker in
+	// testdata/gen.go.
+	type subsumeTest struct {
 		// the result of b ⊑ a, where a and b are defined in "in"
 		subsumes bool
 		in       string
 		mode     subsumeMode
-	}{
+	}
+	testCases := []subsumeTest{
 		// Top subsumes everything
 		0: {subsumes: true, in: `a: _, b: _ `},
 		1: {subsumes: true, in: `a: _, b: null `},

@@ -24,12 +24,15 @@ import (
 )
 
 func TestExport(t *testing.T) {
-	testCases := []struct {
+	// Do not inline: the named struct is used as a marker in
+	// testdata/gen.go.
+	type exportTest struct {
 		raw     bool // skip evaluation the root, fully raw
 		eval    bool // evaluate the full export
 		noOpt   bool
 		in, out string
-	}{{
+	}
+	testCases := []exportTest{{
 		in:  `"hello"`,
 		out: `"hello"`,
 	}, {

@@ -936,8 +936,9 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		if len(st.comprehensions) > 0 {
 			// This should always evaluate to incomplete. However, fall back
 			// to a bad error message, rather than crashing, in case it doesn't.
-			err, _ := st.comprehensions[0].comp.evalPartial(ctx).(*bottom)
-			return nil, toMarshalErr(v, err)
+			if err, ok := st.comprehensions[0].comp.evalPartial(ctx).(*bottom); ok {
+				return nil, toMarshalErr(v, err)
+			}
 		}
 
 		if err != nil {

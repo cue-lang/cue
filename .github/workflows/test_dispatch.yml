@@ -1,0 +1,90 @@
+name: Test
+
+on: [repository_dispatch]
+
+jobs:
+  start:
+    runs-on: ubuntu-latest
+    steps:
+
+    # Go is required for the cue-sh/trybot action
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.14.x
+
+    - name: Update Gerrit CL message with starting message
+      uses: cue-sh/trybot@latest
+      with:
+        mode: start
+        runID: ${{ github.run_id }}
+        ref: ${{ github.event.client_payload.ref }}
+        changeID: ${{ github.event.client_payload.changeID }}
+        jobStatus: ${{ job.status }}
+        repo: ${{ github.event.repository.html_url }}
+        gerritCookie: ${{ secrets.gerritCookie }}
+
+  test:
+    needs: start
+    strategy:
+      matrix:
+        go-version: [1.13.x, 1.14.x]
+        platform: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.platform }}
+    steps:
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Cache Go modules
+      uses: actions/cache@v1
+      with:
+        path: ~/go/pkg/mod
+        key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}
+        restore-keys: |
+          ${{ runner.os }}-${{ matrix.go-version }}-go-
+
+    - name: Test
+      run: go test ./...
+    - name: Test with -race
+      run: go test -race ./...
+
+    - name: Update Gerrit CL message with failure message
+      if: ${{ failure() }}
+      uses: cue-sh/trybot@latest
+      with:
+        mode: end
+        runID: ${{ github.run_id }}
+        ref: ${{ github.event.client_payload.ref }}
+        changeID: ${{ github.event.client_payload.changeID }}
+        jobStatus: "failure"
+        matrixDesc: "${{ runner.os }}-${{ matrix.go-version }}"
+        repo: ${{ github.event.repository.html_url }}
+        gerritCookie: ${{ secrets.gerritCookie }}
+
+  end:
+    needs: test
+    runs-on: ubuntu-latest
+    steps:
+
+    # Go is required for the cue-sh/trybot action
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.14.x
+
+    - name: Update Gerrit CL message with success message
+      uses: cue-sh/trybot@latest
+      with:
+        mode: end
+        runID: ${{ github.run_id }}
+        ref: ${{ github.event.client_payload.ref }}
+        changeID: ${{ github.event.client_payload.changeID }}
+        jobStatus: "success"
+        repo: ${{ github.event.repository.html_url }}
+        gerritCookie: ${{ secrets.gerritCookie }}
+

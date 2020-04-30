@@ -4,7 +4,7 @@
 
 The files in this directory are used to generate the tour in
 
-    https://cuelang.org/docs/tutorials/tour/
+    https://cuelang.org/docs/tutorials/tour/intro/
 
 They are kept here to ensure the examples are in sync with the latest update
 of CUE.

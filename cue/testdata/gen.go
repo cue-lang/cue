@@ -251,7 +251,8 @@ func (e *extractor) extractTest(x *ast.CompositeLit) {
 	if e.name != "" {
 		name += "_" + e.name
 	}
-	// name = strings.ReplaceAll(name, " ", "_")
+	name = strings.ReplaceAll(name, " ", "_")
+	name = strings.ReplaceAll(name, ":", "_")
 	filename := filepath.Join(e.dir, name+".txtar")
 	err := ioutil.WriteFile(filename, txtar.Format(e.a), 0644)
 	if err != nil {

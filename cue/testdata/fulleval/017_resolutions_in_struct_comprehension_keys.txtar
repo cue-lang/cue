@@ -19,3 +19,14 @@ a:
 {"a":{"c.":"a"}}
 -- out/legacy-debug --
 <0>{a: <1>{"c.": "a"}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    for _, b in [
+      "c",
+    ] {
+      "\((〈1;b〉 + "."))": "a"
+    }
+  }
+}

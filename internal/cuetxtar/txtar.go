@@ -193,8 +193,9 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 			return nil
 		}
 
-		p := strings.Index(fullpath, "/testdata/")
-		testName := fullpath[p+len("/testdata/") : len(fullpath)-len(".txtar")]
+		str := filepath.ToSlash(fullpath)
+		p := strings.Index(str, "/testdata/")
+		testName := str[p+len("/testdata/") : len(str)-len(".txtar")]
 
 		t.Run(testName, func(t *testing.T) {
 			a, err := txtar.ParseFile(fullpath)

@@ -1,0 +1,67 @@
+-- in.cue --
+a: {
+    {{
+      b
+      c
+      d: b
+      e: c
+    }}
+    c: {}
+}
+b: {
+
+}
+s: "foo"
+c: s
+
+// s is technically in a new struct here so it will have a one higher count than
+// the one before.
+d: [s]: 3
+
+e: { }
+e & { // Is this allowed? Probably not as per comprehension rule (ref fixes.)
+    e: {}
+}
+
+{X=["foo"]: b: X | null}
+{[Y="bar"]: b: Y}
+
+B = {open: int}
+f: B
+
+-- out/compile --
+--- in.cue
+{
+  a: {
+    {
+      {
+        〈3;b〉
+        〈2;c〉
+        d: 〈3;b〉
+        e: 〈2;c〉
+      }
+    }
+    c: {}
+  }
+  b: {}
+  s: "foo"
+  c: 〈0;s〉
+  d: {
+    [〈1;s〉]: 3
+  }
+  e: {}
+  (〈0;e〉 & {
+    e: {}
+  })
+  {
+    ["foo"]: {
+      b: (〈1;(〈1;-〉)〉|null)
+    }
+  }
+  {
+    ["bar"]: {
+      b: 〈1;-〉
+    }
+  }
+  f: 〈0;let B〉
+}

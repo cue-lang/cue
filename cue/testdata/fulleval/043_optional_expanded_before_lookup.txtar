@@ -52,3 +52,19 @@ B:
 {"test":{"A":{"name":"A","field1":"1","field2":"2"}},"B":{"name":"A","field1":"1","field2":"2"}}
 -- out/legacy-debug --
 <0>{test: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, A: <4>{name: "A", field1: "1", field2: "2"}}, B: <5>{name: "A", field1: "1", field2: "2"}}
+-- out/compile --
+--- in.cue
+{
+  test: {
+    [_]: {
+      name: 〈1;-〉
+    }
+  }
+  test: {
+    A: {
+      field1: "1"
+      field2: "2"
+    }
+  }
+  B: (〈0;test〉.A & {})
+}

@@ -46,3 +46,35 @@ fib7:  13
 fib12: 144
 -- out/legacy-debug --
 <0>{fibRec: <1>{nn: int, out: (<2>.fib & <3>{n: <4>.nn}).out}, fib: <5>{n: int if (<6>.n >= 2) yield <7>{out: ((<2>.fibRec & <8>{nn: (<6>.n - 2)}).out + (<2>.fibRec & <9>{nn: (<6>.n - 1)}).out)},  if (<6>.n < 2) yield <10>{out: <6>.n}}, fib2: 1, fib7: 13, fib12: 144}
+-- out/compile --
+--- in.cue
+{
+  fibRec: {
+    nn: int
+    out: (〈1;fib〉 & {
+      n: 〈1;nn〉
+    }).out
+  }
+  fib: {
+    n: int
+    if (〈0;n〉 >= 2) {
+      out: ((〈2;fibRec〉 & {
+        nn: (〈2;n〉 - 2)
+      }).out + (〈2;fibRec〉 & {
+        nn: (〈2;n〉 - 1)
+      }).out)
+    }
+    if (〈0;n〉 < 2) {
+      out: 〈1;n〉
+    }
+  }
+  fib2: (〈0;fib〉 & {
+    n: 2
+  }).out
+  fib7: (〈0;fib〉 & {
+    n: 7
+  }).out
+  fib12: (〈0;fib〉 & {
+    n: 12
+  }).out
+}

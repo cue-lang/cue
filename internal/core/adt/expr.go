@@ -251,7 +251,7 @@ func (x *BoundExpr) Source() ast.Node { return x.Src }
 //    =~"Name$"
 //
 type BoundValue struct {
-	Src   ast.Node
+	Src   ast.Expr
 	Op    Op
 	Value Value
 	K     Kind
@@ -467,6 +467,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 // A Conjunction is a conjunction of values that cannot be represented as a
 // single value. It is the result of unification.
 type Conjunction struct {
+	Src    ast.Expr
 	Values []Value
 }
 

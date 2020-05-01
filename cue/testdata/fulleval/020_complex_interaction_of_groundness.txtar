@@ -28,3 +28,34 @@ a: {
 }
 -- out/legacy-debug --
 <0>{res: [<1>{d: "b", s: "ab"}], a: <2>{b: <3>{[]: <4>(C: string)-><5>{d: string, s: ("a" + <5>.d)}, c: <6>{d: string, s: ("a" + <7>.d)}}}}
+-- out/compile --
+--- in.cue
+{
+  res: [
+    for _, x in 〈0;a〉 for _, y in 〈0;x〉 {
+      (〈1;y〉 & {
+        d: "b"
+      })
+    },
+  ]
+  res: [
+    (〈0;a〉.b.c & {
+      d: "b"
+    }),
+  ]
+  a: {
+    b: {
+      [string]: {
+        d: string
+        s: ("a" + 〈0;d〉)
+      }
+    }
+  }
+  a: {
+    b: {
+      c: {
+        d: string
+      }
+    }
+  }
+}

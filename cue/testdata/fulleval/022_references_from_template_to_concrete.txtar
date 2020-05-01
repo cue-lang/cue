@@ -62,3 +62,26 @@ t:
 {"res":[{"x":{"a":"XDDDD","c":"X","b":{"str":"DDDD"}}}],"t":{"x":{"a":"XDDDD","c":"X","b":{"str":"DDDD"}}}}
 -- out/legacy-debug --
 <0>{res: [<1>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <5>{a: "XDDDD", c: "X", b: <6>{str: "DDDD"}}}], t: <7>{[]: <2>(X: string)-><3>{a: (<3>.c + <3>.b.str), c: "X", b: <4>{str: string}}, x: <8>{a: "XDDDD", c: "X", b: <9>{str: "DDDD"}}}}
+-- out/compile --
+--- in.cue
+{
+  res: [
+    〈0;t〉,
+  ]
+  t: {
+    [string]: {
+      a: (〈0;c〉 + 〈0;b〉.str)
+      b: {
+        str: string
+      }
+      c: "X"
+    }
+  }
+  t: {
+    x: {
+      b: {
+        str: "DDDD"
+      }
+    }
+  }
+}

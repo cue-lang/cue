@@ -29,3 +29,33 @@ h: true
 i: false
 -- out/legacy-debug --
 <0>{a: true, b: _|_((1 & 2):conflicting values 1 and 2), err: _|_((1 & 2):conflicting values 1 and 2), c: true, d: false, e: _|_((1 & 2):conflicting values 1 and 2), f: true, g: false, h: true, i: false}
+-- out/compile --
+--- in.cue
+{
+  a: (_|_ == _|_)
+  b: ((〈0;err〉 == 1) & 2)
+  c: (〈0;err〉 == _|_)
+  d: (〈0;err〉 != _|_)
+  e: ((〈0;err〉 != 1) & 3)
+  f: (({
+    a: 1
+  } & {
+    a: 2
+  }) == _|_)
+  g: (({
+    a: 1
+  } & {
+    b: 2
+  }) == _|_)
+  h: (_|_ == ({
+    a: 1
+  } & {
+    a: 2
+  }))
+  i: (_|_ == ({
+    a: 1
+  } & {
+    b: 2
+  }))
+  err: (1 & 2)
+}

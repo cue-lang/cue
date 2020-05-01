@@ -9,8 +9,8 @@ A: {
 B: {
 	[=~"^[m-z]*$"]: int
 }
-C :: {A & B}
-c: C & {aaa: 3}
+#C: {A & B}
+c: #C & {aaa: 3}
 -- out/def --
 A: {
 	[=~"^[a-s]*$"]: int
@@ -18,10 +18,10 @@ A: {
 B: {
 	[=~"^[m-z]*$"]: int
 }
-C :: {
+#C: {
 	A & B
 }
-c: C & {
+c: #C & {
 	aaa: 3
 }
 -- out/export --
@@ -38,4 +38,20 @@ c:
 -- out/json --
 {"A":{},"B":{},"c":{"aaa":3}}
 -- out/legacy-debug --
-<0>{A: <1>{[=~"^[a-s]*$"]: <2>(_: string)->int, }, B: <3>{[=~"^[m-z]*$"]: <4>(_: string)->int, }, C :: <5>C{[=~"^[a-s]*$"]: <6>(_: string)->int, [=~"^[m-z]*$"]: <7>(_: string)->int, }, c: <8>C{[=~"^[a-s]*$"]: <9>(_: string)->int, [=~"^[m-z]*$"]: <10>(_: string)->int, aaa: 3}}
+<0>{A: <1>{[=~"^[a-s]*$"]: <2>(_: string)->int, }, B: <3>{[=~"^[m-z]*$"]: <4>(_: string)->int, }, #C: <5>C{[=~"^[a-s]*$"]: <6>(_: string)->int, [=~"^[m-z]*$"]: <7>(_: string)->int, }, c: <8>C{[=~"^[a-s]*$"]: <9>(_: string)->int, [=~"^[m-z]*$"]: <10>(_: string)->int, aaa: 3}}
+-- out/compile --
+--- in.cue
+{
+  A: {
+    [=~"^[a-s]*$"]: int
+  }
+  B: {
+    [=~"^[m-z]*$"]: int
+  }
+  #C: {
+    (〈1;A〉 & 〈1;B〉)
+  }
+  c: (〈0;#C〉 & {
+    aaa: 3
+  })
+}

@@ -12,3 +12,13 @@ $type:  3
 "_":    int
 "_foo": int
 _bar:   int
+-- out/compile --
+--- in.cue
+{
+  {
+    $type: 3
+    "_": int
+    "_foo": int
+    _bar: int
+  }
+}

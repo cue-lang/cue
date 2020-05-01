@@ -16,3 +16,12 @@ r: {
 }
 -- out/legacy-debug --
 <0>{r: <1>{a?: 3, b: <2>.a, c: <3>.r["a"]}}
+-- out/compile --
+--- in.cue
+{
+  r: {
+    a?: 3
+    b: 〈0;a〉
+    c: 〈1;r〉["a"]
+  }
+}

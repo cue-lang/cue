@@ -4,9 +4,10 @@
 #evalFull
 -- in.cue --
 a: {
-	[A=string]: {name: A}
+	{[A=string]: {name: A}}
+
 	// TODO: allow duplicate alias here
-	[X=string]: {kind: X}
+	{[X=string]: {kind: X}}
 }
 a: "A": _
 a: "C": _
@@ -62,3 +63,30 @@ a:
 {"a":{"E":{"name":"E","kind":"E","c":"bar"},"A":{"name":"A","kind":"A"},"C":{"name":"C","kind":"C"}}}
 -- out/legacy-debug --
 <0>{a: <1>{[]: <2>(A: string)->(<3>{name: <2>.A} & <4>{kind: <2>.A}), E: <5>{name: "E", kind: "E", c: "bar"}, A: <6>{name: "A", kind: "A"}, C: <7>{name: "C", kind: "C"}}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    {
+      [string]: {
+        name: 〈1;-〉
+      }
+    }
+    {
+      [string]: {
+        kind: 〈1;-〉
+      }
+    }
+  }
+  a: {
+    A: _
+  }
+  a: {
+    C: _
+  }
+  a: {
+    E: {
+      c: "bar"
+    }
+  }
+}

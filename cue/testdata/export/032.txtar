@@ -2,8 +2,8 @@
 #
 -- in.cue --
 {
-	[string]: _
-	foo:      3
+	{[string]: _}
+	foo: 3
 }
 -- out/def --
 foo: 3
@@ -14,3 +14,13 @@ foo: 3
 foo: 3
 -- out/json --
 {"foo":3}
+-- out/compile --
+--- in.cue
+{
+  {
+    {
+      [string]: _
+    }
+    foo: 3
+  }
+}

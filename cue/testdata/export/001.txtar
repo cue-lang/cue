@@ -12,3 +12,8 @@ hello
 "aGVsbG8="
 -- out/legacy-debug --
 'hello'
+-- out/compile --
+--- in.cue
+{
+  'hello'
+}

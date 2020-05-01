@@ -11,7 +11,7 @@ obj: [Name=string]: {
 	}
 }
 
-for k, v in {def :: 1, opt?: 2, _hid: 3, reg: 4} {
+for k, v in {#def: 1, opt?: 2, _hid: 3, reg: 4} {
 	"\(k)": v
 }
 -- out/def --
@@ -50,3 +50,30 @@ reg: 4
 {"obj":{"foo":{"a":"bar","sub":{"as":"bar"}}},"reg":4}
 -- out/legacy-debug --
 <0>{obj: <1>{[]: <2>(Name: string)-><3>{a: (*"dummy" | string) if true yield <4>{sub: <5>{as: <3>.a}}}, foo: <6>{a: "bar", sub: <7>{as: "bar"}}}, reg: 4}
+-- out/compile --
+--- in.cue
+{
+  obj: {
+    foo: {
+      a: "bar"
+    }
+  }
+  obj: {
+    [string]: {
+      a: (*"dummy"|string)
+      if true {
+        sub: {
+          as: 〈2;a〉
+        }
+      }
+    }
+  }
+  for k, v in {
+    #def: 1
+    opt?: 2
+    _hid: 3
+    reg: 4
+  } {
+    "\(〈1;k〉)": 〈1;v〉
+  }
+}

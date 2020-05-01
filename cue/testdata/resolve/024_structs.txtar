@@ -23,3 +23,20 @@ ti: t & {
 }
 -- out/legacy-debug --
 <0>{a: <1>{c: 5, d: 15}, t: <2>{c: number, d: (<3>.c * 3)}, b: <4>{c: 7, d: 21}, ti: <5>{c: int, d: (<6>.c * 3)}}
+-- out/compile --
+--- in.cue
+{
+  a: (〈0;t〉 & {
+    c: 5
+  })
+  b: (〈0;ti〉 & {
+    c: 7
+  })
+  t: {
+    c: number
+    d: (〈0;c〉 * 3)
+  }
+  ti: (〈0;t〉 & {
+    c: int
+  })
+}

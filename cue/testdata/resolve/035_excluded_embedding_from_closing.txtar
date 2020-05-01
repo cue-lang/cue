@@ -3,20 +3,20 @@
 #name: excluded embedding from closing
 #evalPartial
 -- in.cue --
-S :: {
+#S: {
 	a: {c: int}
 	{
 		c: {d: int}
 	}
-	B = {open: int}
+	let B = {open: int}
 	b: B
 }
-V: S & {
+V: #S & {
 	c: e:     int
 	b: extra: int
 }
 -- out/def --
-S :: {
+#S: {
 	a: {
 		c: int
 	}
@@ -29,7 +29,7 @@ S :: {
 		...
 	}
 }
-V: S & {
+V: #S & {
 	c: {
 		e: int
 	}
@@ -38,4 +38,27 @@ V: S & {
 	}
 }
 -- out/legacy-debug --
-<0>{S :: <1>C{a: <2>C{c: int}, c: <3>{d: int}, b: <4>{open: int}}, V: <5>C{a: <6>C{c: int}, c: <7>{d: int, e: int}, b: <8>{open: int, extra: int}}}
+<0>{#S: <1>C{a: <2>C{c: int}, c: <3>{d: int}, b: <4>{open: int}}, V: <5>C{a: <6>C{c: int}, c: <7>{d: int, e: int}, b: <8>{open: int, extra: int}}}
+-- out/compile --
+--- in.cue
+{
+  #S: {
+    a: {
+      c: int
+    }
+    {
+      c: {
+        d: int
+      }
+    }
+    b: 〈0;let B〉
+  }
+  V: (〈0;#S〉 & {
+    c: {
+      e: int
+    }
+    b: {
+      extra: int
+    }
+  })
+}

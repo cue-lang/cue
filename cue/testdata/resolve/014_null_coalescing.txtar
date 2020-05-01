@@ -22,3 +22,10 @@ c: c
 {"a":null,"b":"b","c":"c"}
 -- out/legacy-debug --
 <0>{a: null, b: "b", c: "c"}
+-- out/compile --
+--- in.cue
+{
+  a: null
+  b: (〈0;a〉.x|"b")
+  c: (〈0;a〉["x"]|"c")
+}

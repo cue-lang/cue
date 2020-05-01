@@ -34,3 +34,13 @@ f: true
 {"a":true,"b":true,"c":false,"d":true,"e":false,"f":true}
 -- out/legacy-debug --
 <0>{a: true, b: true, c: false, d: true, e: false, f: true}
+-- out/compile --
+--- in.cue
+{
+  a: (1 != 2)
+  b: (1 != null)
+  c: (true == null)
+  d: (null != {})
+  e: (null == [])
+  f: (0 == 0.0)
+}

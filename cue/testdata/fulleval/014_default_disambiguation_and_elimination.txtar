@@ -17,3 +17,12 @@ d: b & a
 e: 1
 -- out/legacy-debug --
 <0>{a: 1, b: 3, c: int, d: int, e: 1}
+-- out/compile --
+--- in.cue
+{
+  a: (*1|int)
+  b: (*3|int)
+  c: (〈0;a〉 & 〈0;b〉)
+  d: (〈0;b〉 & 〈0;a〉)
+  e: (*1|*1)
+}

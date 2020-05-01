@@ -106,3 +106,32 @@ service:
 {"result":[{"name":"foo","type":"service","port":7080},{"name":"bar","type":"service","port":8000},{"name":"foobar","type":"service","port":7080}],"service":{"foo":{"name":"foo","type":"service","port":7080},"bar":{"name":"bar","type":"service","port":8000},"baz":{"name":"foobar","type":"service","port":7080}}}
 -- out/legacy-debug --
 <0>{result: [<1>{name: "foo", type: "service", port: 7080},<2>{name: "bar", type: "service", port: 8000},<3>{name: "foobar", type: "service", port: 7080}], service: <4>{[]: <5>(Name: string)-><6>{name: (*<5>.Name | string), type: "service", port: (*7080 | int)}, foo: <7>{name: "foo", type: "service", port: 7080}, bar: <8>{name: "bar", type: "service", port: 8000}, baz: <9>{name: "foobar", type: "service", port: 7080}}}
+-- out/compile --
+--- in.cue
+{
+  result: [
+    for _, v in 〈0;service〉 {
+      〈1;v〉
+    },
+  ]
+  service: {
+    [string]: {
+      name: (*〈1;-〉|string)
+      type: "service"
+      port: (*7080|int)
+    }
+  }
+  service: {
+    foo: {}
+  }
+  service: {
+    bar: {
+      port: 8000
+    }
+  }
+  service: {
+    baz: {
+      name: "foobar"
+    }
+  }
+}

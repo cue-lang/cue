@@ -15,3 +15,13 @@ f: false
 e: _|_ // conflicting values true and false
 -- out/legacy-debug --
 <0>{t: true, f: false, e: _|_(true:conflicting values true and false)}
+-- out/compile --
+--- in.cue
+{
+  t: true
+  t: !false
+  f: false
+  f: !〈0;t〉
+  e: true
+  e: !true
+}

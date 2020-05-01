@@ -2457,7 +2457,7 @@ func TestFullEval(t *testing.T) {
 			`c1: (<2>{a: 1, b: 2} | <3>{a: 2, b: 1}), ` +
 			`c2: (<4>{a: 2, b: 1} | <5>{a: 1, b: 2})}`,
 	}, {
-		desc: "don't convert incomplete errors to non-incomplete",
+		desc: "dont convert incomplete errors to non-incomplete",
 		in: `
 		import "strings"
 
@@ -2865,7 +2865,7 @@ func TestFullEval(t *testing.T) {
 			`c1: <1>{bar: <2>{baz: 2}, baz: 2}, ` +
 			`c2: _|_(conflicting values {bar: 1} and 1 (mismatched types struct and int))}`,
 	}, {
-		desc: "don't bind to string labels",
+		desc: "dont bind to string labels",
 		in: `
 			x: 1
 			y: {
@@ -2875,7 +2875,7 @@ func TestFullEval(t *testing.T) {
 			`,
 		out: `<0>{x: 1, y: <1>{x: 2, z: 1}}`,
 	}, {
-		desc: "don't pass incomplete values to builtins",
+		desc: "dont pass incomplete values to builtins",
 		in: `
 		import "encoding/json"
 

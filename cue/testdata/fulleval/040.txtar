@@ -2,7 +2,7 @@
 #
 #evalFull
 -- in.cue --
-Task :: {
+#Task: {
 	{
 		op:          "pull"
 		tag:         *"latest" | string
@@ -14,9 +14,9 @@ Task :: {
 	}
 }
 
-foo: Task & {"op": "pull"}
+foo: #Task & {"op": "pull"}
 -- out/def --
-Task :: {
+#Task: {
 	op:          "pull"
 	tag:         *"latest" | string
 	refToTag:    tag
@@ -25,7 +25,7 @@ Task :: {
 } | {
 	op: "scratch"
 }
-foo: Task & {
+foo: #Task & {
 	op: "pull"
 }
 -- out/export --
@@ -46,4 +46,22 @@ foo:
 -- out/json --
 {"foo":{"op":"pull","tag":"latest","refToTag":"latest","tagExpr":"latestdd","tagInString":"latest"}}
 -- out/legacy-debug --
-<0>{Task :: (<1>C{op: "pull", tag: (*"latest" | string), refToTag: <1>.tag, tagExpr: (<1>.tag + "dd"), tagInString: ""+<1>.tag+""} | <2>C{op: "scratch"}), foo: <3>C{op: "pull", tag: "latest", refToTag: "latest", tagExpr: "latestdd", tagInString: "latest"}}
+<0>{#Task: (<1>C{op: "pull", tag: (*"latest" | string), refToTag: <1>.tag, tagExpr: (<1>.tag + "dd"), tagInString: ""+<1>.tag+""} | <2>C{op: "scratch"}), foo: <3>C{op: "pull", tag: "latest", refToTag: "latest", tagExpr: "latestdd", tagInString: "latest"}}
+-- out/compile --
+--- in.cue
+{
+  #Task: {
+    ({
+      op: "pull"
+      tag: (*"latest"|string)
+      refToTag: 〈0;tag〉
+      tagExpr: (〈0;tag〉 + "dd")
+      tagInString: "\(〈0;tag〉)"
+    }|{
+      op: "scratch"
+    })
+  }
+  foo: (〈0;#Task〉 & {
+    op: "pull"
+  })
+}

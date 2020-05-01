@@ -4,35 +4,35 @@
 #evalFull
 -- in.cue --
 a: d: {
-	base
-	info :: {...}
-	Y: info.X
+	#base
+	#info: {...}
+	Y: #info.X
 }
 
-base :: {
-	info :: {...}
+#base: {
+	#info: {...}
 }
 
-a: [Name=string]: {info :: {
+a: [Name=string]: {#info: {
 	X: "foo"
 }}
 -- out/def --
 a: {
 	{[Name=string]: {
-		info :: {
+		#info: {
 			X: "foo"
 		}
 	}}
 	d: {
-		info :: {
+		#info: {
 			...
 		}
-		Y: info.X
-		base
+		Y: #info.X
+		#base
 	}
 }
-base :: {
-	info :: {
+#base: {
+	#info: {
 		...
 	}
 }
@@ -49,4 +49,29 @@ a:
 -- out/json --
 {"a":{"d":{"Y":"foo"}}}
 -- out/legacy-debug --
-<0>{a: <1>{[]: <2>(Name: string)-><3>{info :: <4>C{X: "foo"}}, d: <5>C{info :: <6>C{X: "foo"}, Y: "foo"}}, base :: <7>C{info :: <8>{...}}}
+<0>{a: <1>{[]: <2>(Name: string)-><3>{#info: <4>C{X: "foo"}}, d: <5>C{#info: <6>C{X: "foo"}, Y: "foo"}}, #base: <7>C{#info: <8>{...}}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    d: {
+      〈2;#base〉
+      #info: {
+        ...
+      }
+      Y: 〈0;#info〉.X
+    }
+  }
+  #base: {
+    #info: {
+      ...
+    }
+  }
+  a: {
+    [string]: {
+      #info: {
+        X: "foo"
+      }
+    }
+  }
+}

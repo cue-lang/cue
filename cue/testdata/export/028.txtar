@@ -4,14 +4,16 @@ raw: true
 eval: true
 -- in.cue --
 {
-	FindInMap :: {
-		"Fn::FindInMap" :: [string | FindInMap]
+	#FindInMap: {
+		#: "Fn::FindInMap": [string | #FindInMap]
 	}
 	a: [...string]
 }
 -- out/def --
-FindInMap :: {
-	"Fn::FindInMap" :: [string | FindInMap]
+#FindInMap: {
+	#: {
+		"Fn::FindInMap": [string | #FindInMap]
+	}
 }
 a: [...string]
 -- out/export --
@@ -20,3 +22,19 @@ a: []
 a: []
 -- out/json --
 {"a":[]}
+-- out/compile --
+--- in.cue
+{
+  {
+    #FindInMap: {
+      #: {
+        "Fn::FindInMap": [
+          (string|〈2;#FindInMap〉),
+        ]
+      }
+    }
+    a: [
+      ...string,
+    ]
+  }
+}

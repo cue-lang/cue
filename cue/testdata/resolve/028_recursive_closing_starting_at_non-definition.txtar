@@ -4,16 +4,16 @@
 #evalPartial
 -- in.cue --
 z: a: {
-	B :: {
+	#B: {
 		c: d: 1
 		c: f: 1
 	}
 }
-A: z & {a: {B :: {c: e: 2}}}
+A: z & {a: {#B: {c: e: 2}}}
 -- out/def --
 z: {
 	a: {
-		B :: {
+		#B: {
 			c: {
 				d: 1
 				f: 1
@@ -23,7 +23,7 @@ z: {
 }
 A: z & {
 	a: {
-		B :: {
+		#B: {
 			c: {
 				e: 2
 			}
@@ -45,4 +45,29 @@ A:
 -- out/json --
 {"z":{"a":{}},"A":{"a":{}}}
 -- out/legacy-debug --
-<0>{z: <1>{a: <2>{B :: <3>C{c: <4>C{d: 1, f: 1}}}}, A: <5>{a: <6>{B :: <7>C{c: _|_(2:field "e" not allowed in closed struct)}}}}
+<0>{z: <1>{a: <2>{#B: <3>C{c: <4>C{d: 1, f: 1}}}}, A: <5>{a: <6>{#B: <7>C{c: _|_(2:field "e" not allowed in closed struct)}}}}
+-- out/compile --
+--- in.cue
+{
+  z: {
+    a: {
+      #B: {
+        c: {
+          d: 1
+        }
+        c: {
+          f: 1
+        }
+      }
+    }
+  }
+  A: (〈0;z〉 & {
+    a: {
+      #B: {
+        c: {
+          e: 2
+        }
+      }
+    }
+  })
+}

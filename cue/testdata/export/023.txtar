@@ -3,45 +3,45 @@
 raw: true
 -- in.cue --
 {
-	emb :: {
+	#emb: {
 		a: 1
 
 		sub: {
 			f: 3
 		}
 	}
-	def :: {
-		emb
+	#def: {
+		#emb
 
 		b: 2
 	}
-	f :: {a: 10}
-	e :: {
-		f
+	#f: a: 10
+	#e: {
+		#f
 
-		b:   int
-		[_]: <100
+		b: int
+		{[_]: <100}
 		{[_]: <300}
 	}
 }
 -- out/def --
-emb :: {
+#emb: {
 	a: 1
 	sub: {
 		f: 3
 	}
 }
-f :: {
+#def: {
+	b: 2
+	#emb
+}
+#f: {
 	a: 10
 }
-def :: {
-	b: 2
-	emb
-}
-e :: {
+#e: {
+	b: int
+	#f
 	{[string]: <100}
-	b: <100
-	f
 	{[string]: <300}
 }
 -- out/export --
@@ -50,3 +50,32 @@ e :: {
 {}
 -- out/json --
 {}
+-- out/compile --
+--- in.cue
+{
+  {
+    #emb: {
+      a: 1
+      sub: {
+        f: 3
+      }
+    }
+    #def: {
+      〈1;#emb〉
+      b: 2
+    }
+    #f: {
+      a: 10
+    }
+    #e: {
+      〈1;#f〉
+      b: int
+      {
+        [_]: <100
+      }
+      {
+        [_]: <300
+      }
+    }
+  }
+}

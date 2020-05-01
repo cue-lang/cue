@@ -46,3 +46,21 @@ bulk:
 {"#Foo":{"a":1,"b":1},"bulk":{"a":"foo"}}
 -- out/legacy-debug --
 <0>{"#Foo": <1>C{a: 1, b: 1}, #Foo: <2>C{a: 1, b: int}, bulk: <3>{[]: <4>(_: string)->string, a: "foo", #def: 4, _hid: 3}}
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    a: 1
+    b: int
+  }
+  "#Foo": (〈0;#Foo〉 & {
+    b: 1
+  })
+  bulk: ({
+    [string]: string
+  } & {
+    #def: 4
+    _hid: 3
+    a: "foo"
+  })
+}

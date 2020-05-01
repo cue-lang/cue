@@ -3,7 +3,7 @@
 #name: definitions with disjunctions recurisive
 #evalPartial
 -- in.cue --
-Foo :: {
+#Foo: {
 	x: {
 		field: int
 
@@ -13,7 +13,7 @@ Foo :: {
 	x: c: 3
 }
 -- out/def --
-Foo :: {
+#Foo: {
 	x: {
 		field: int
 		a:     1
@@ -31,4 +31,21 @@ Foo :: {
 -- out/json --
 {}
 -- out/legacy-debug --
-<0>{Foo :: <1>C{x: (<2>C{field: int, a: 1, c: 3} | <3>C{field: int, b: 2, c: 3})}}
+<0>{#Foo: <1>C{x: (<2>C{field: int, a: 1, c: 3} | <3>C{field: int, b: 2, c: 3})}}
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    x: {
+      field: int
+      ({
+        a: 1
+      }|{
+        b: 2
+      })
+    }
+    x: {
+      c: 3
+    }
+  }
+}

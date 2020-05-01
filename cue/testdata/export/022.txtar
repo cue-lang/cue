@@ -59,3 +59,27 @@ job:
     command: nginx
 -- out/json --
 {"job":{"list":{"name":"list","replicas":1,"command":"ls"},"nginx":{"name":"nginx","replicas":2,"command":"nginx"}}}
+-- out/compile --
+--- in.cue
+{
+  {
+    job: {
+      [_]: {
+        name: 〈1;-〉
+        replicas: (&(int, >=0)|*1)
+        command: string
+      }
+    }
+    job: {
+      list: {
+        command: "ls"
+      }
+    }
+    job: {
+      nginx: {
+        command: "nginx"
+        replicas: 2
+      }
+    }
+  }
+}

@@ -20,3 +20,15 @@ a: 2
 {"y":1,"a":2}
 -- out/legacy-debug --
 <0>{y: 1, a: 2}
+-- out/compile --
+--- in.cue
+{
+  y: (*1|{
+    a: 2
+  })
+  for _, x in [
+    1,
+  ] {
+    〈2;y〉
+  }
+}

@@ -12,3 +12,8 @@ hello
 "hello"
 -- out/legacy-debug --
 "hello"
+-- out/compile --
+--- in.cue
+{
+  "hello"
+}

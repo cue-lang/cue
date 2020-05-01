@@ -27,3 +27,14 @@ b:
 {"a":{"d":1},"b":{"d":1}}
 -- out/legacy-debug --
 <0>{a: <1>{d: 1}, b: <2>{d: 1}}
+-- out/compile --
+--- in.cue
+{
+  a: _
+  b: 〈0;a〉
+  a: {
+    d: 1
+    d: _
+  }
+  b: _
+}

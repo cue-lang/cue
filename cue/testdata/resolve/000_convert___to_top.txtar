@@ -16,3 +16,10 @@ a: {}
 {"a":{}}
 -- out/legacy-debug --
 <0>{a: <1>{...}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    [_]: _
+  }
+}

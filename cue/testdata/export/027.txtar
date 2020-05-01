@@ -4,13 +4,13 @@ raw: true
 eval: true
 -- in.cue --
 {
-	Foo :: {
-		Bar :: Foo | string
+	#Foo: {
+		#Bar: #Foo | string
 	}
 }
 -- out/def --
-Foo :: {
-	Bar :: Foo | string
+#Foo: {
+	#Bar: #Foo | string
 }
 -- out/export --
 
@@ -18,3 +18,12 @@ Foo :: {
 {}
 -- out/json --
 {}
+-- out/compile --
+--- in.cue
+{
+  {
+    #Foo: {
+      #Bar: (〈1;#Foo〉|string)
+    }
+  }
+}

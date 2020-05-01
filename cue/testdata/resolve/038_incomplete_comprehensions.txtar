@@ -28,3 +28,22 @@ B: A & {
 }
 -- out/legacy-debug --
 <0>{A: <1>{src: _, baz: "baz" <2>for _, v in <3>.src yield <4>{""+<2>.v+"": <2>.v}}, B: <5>{src: ["foo","bar"], baz: "baz", foo: "foo", bar: "bar"}}
+-- out/compile --
+--- in.cue
+{
+  A: {
+    for _, v in 〈0;src〉 {
+      "\(〈1;v〉)": 〈1;v〉
+    }
+    src: _
+    if true {
+      baz: "baz"
+    }
+  }
+  B: (〈0;A〉 & {
+    src: [
+      "foo",
+      "bar",
+    ]
+  })
+}

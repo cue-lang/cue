@@ -36,3 +36,9 @@ b: |-
 {"a":"foo\nbar","b":"foo\nbar"}
 -- out/legacy-debug --
 <0>{a: "foo\nbar", b: "foo\nbar"}
+-- out/compile --
+--- in.cue
+{
+  a: "foo\nbar"
+  b: 〈0;a〉
+}

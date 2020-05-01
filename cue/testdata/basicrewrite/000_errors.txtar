@@ -16,3 +16,12 @@ d: false
 e: true
 -- out/legacy-debug --
 <0>{a: _|_(from source), b: _|_(from source), c: true, d: false, e: true}
+-- out/compile --
+--- in.cue
+{
+  a: (_|_ & _|_)
+  b: (null & _|_)
+  c: (〈0;b〉.a == _|_)
+  d: (_|_ != 〈0;b〉.a)
+  e: (_|_ == _|_)
+}

@@ -34,9 +34,14 @@ import (
 	"cuelang.org/go/cue"
 	cueast "cuelang.org/go/cue/ast"
 	cueformat "cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/pkg/encoding/yaml"
+	"cuelang.org/go/tools/fix"
 )
+
+//go:generate go run gen.go
+//go:generate go test ../internal/compile --update
 
 func main() {
 	flag.Parse()
@@ -213,6 +218,15 @@ func (e *extractor) extractTest(x *ast.CompositeLit) {
 		case "in":
 			src := []byte(e.stringConst(f.Value))
 			src, err := cueformat.Source(src)
+
+			if f, err := parser.ParseFile("in.cue", src, parser.ParseComments); err == nil {
+				f = fix.File(f)
+				b, err := cueformat.Node(f)
+				if err == nil {
+					src = b
+				}
+			}
+
 			if err != nil {
 				fmt.Fprintln(e.header, "#skip")
 				e.warnf("Skipped: %v", err)

@@ -55,3 +55,25 @@ a:
 {"num":1,"a":{"b":{"c":{"name":"b","kind":"c","d":"bar"}}}}
 -- out/legacy-debug --
 <0>{num: 1, a: <1>{[]: <2>(A: string)-><3>{[]: <4>(B: string)-><5>{name: <2>.A, kind: <4>.B}, }, b: <6>{[]: <7>(B: string)-><8>{name: <9>.A, kind: <7>.B}, c: <10>{name: "b", kind: "c", d: "bar"}}}}
+-- out/compile --
+--- in.cue
+{
+  num: 1
+  a: {
+    if (〈1;num〉 < 5) {
+      [string]: {
+        [string]: {
+          name: 〈2;-〉
+          kind: 〈1;-〉
+        }
+      }
+    }
+  }
+  a: {
+    b: {
+      c: {
+        d: "bar"
+      }
+    }
+  }
+}

@@ -43,3 +43,19 @@ str: 5
 {"p":{},"foo=bar":"str","a":"str","bb":4,"b1":4,"c":5,"str":5}
 -- out/legacy-debug --
 <0>{p: <1>{[]: <2>(ID: string)-><3>{name: <2>.ID}, }, "foo=bar": "str", a: "str", bb: 4, b1: 4, c: 5, str: 5}
+-- out/compile --
+--- in.cue
+{
+  p: {
+    [string]: {
+      name: 〈1;-〉
+    }
+  }
+  "foo=bar": "str"
+  a: 〈0;"foo=bar"〉
+  bb: 4
+  b1: 〈0;bb〉
+  b1: 〈0;bb〉
+  "\(〈0;a〉)": 5
+  c: 〈0;("\(〈0;a〉)")〉
+}

@@ -23,3 +23,8 @@
         hello
         world
         '''
+-- out/compile --
+--- in.cue
+{
+  'hello\nworld'
+}

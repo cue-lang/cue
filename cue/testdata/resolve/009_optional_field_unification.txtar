@@ -46,3 +46,20 @@ g1: 1
 {"a":{},"b":{"foo":"foo"},"c":{"foo":"foo"},"d":{},"g1":1}
 -- out/legacy-debug --
 <0>{a: <1>{foo?: string}, b: <2>{foo: "foo"}, c: <3>{foo: "foo"}, d: <4>{foo?: "bar"}, g1: 1, g2?: 2}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    foo?: string
+  }
+  b: {
+    foo: "foo"
+  }
+  c: (〈0;a〉 & 〈0;b〉)
+  d: (〈0;a〉 & {
+    foo?: "bar"
+  })
+  g1: 1
+  "g\(1)"?: 1
+  "g\(2)"?: 2
+}

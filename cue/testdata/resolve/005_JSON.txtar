@@ -34,3 +34,13 @@ c: 2
 {"a":3,"b":3,"o":{"a\nb":2},"c":2}
 -- out/legacy-debug --
 <0>{a: 3, b: 3, o: <1>{"a\nb": 2}, c: 2}
+-- out/compile --
+--- in.cue
+{
+  a: 3
+  b: 〈0;a〉
+  o: {
+    "a\nb": 2
+  }
+  c: 〈0;o〉["a\nb"]
+}

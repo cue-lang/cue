@@ -34,3 +34,27 @@ b1: {
 }
 -- out/legacy-debug --
 <0>{l: [<1>{c: "t", d: "t"}], a: <2>{c: "t", d: "t"}, b: <3>{c: string, d: string}, l1: [<4>{c: "t", d: "st"}], a1: <5>{c: "t", d: "st"}, b1: <6>{c: string, d: ("s" + <7>.c)}}
+-- out/compile --
+--- in.cue
+{
+  l: [
+    〈0;a〉,
+  ]
+  a: (〈0;b〉 & {
+    c: "t"
+  })
+  b: {
+    d: 〈0;c〉
+    c: string
+  }
+  l1: [
+    〈0;a1〉,
+  ]
+  a1: (〈0;b1〉 & {
+    c: "t"
+  })
+  b1: {
+    d: ("s" + 〈0;c〉)
+    c: string
+  }
+}

@@ -104,3 +104,40 @@ a:
 {"a":{"A":{"b":{"B":{"name":"A","kind":"B"}}},"C":{"b":{"D":{"name":"C","kind":"D"}}},"EE":{"b":{"FF":{"name":"EE","kind":"FF","c":"bar"}}}}}
 -- out/legacy-debug --
 <0>{a: <1>{[]: <2>(A: string)-><3>{b: <4>{[]: <5>(B: string)-><6>{name: <2>.A, kind: <5>.B}, }}, A: <7>{b: <8>{[]: <9>(B: string)-><10>{name: <11>.A, kind: <9>.B}, B: <12>{name: "A", kind: "B"}}}, C: <13>{b: <14>{[]: <15>(B: string)-><16>{name: <17>.A, kind: <15>.B}, D: <18>{name: "C", kind: "D"}}}, EE: <19>{b: <20>{[]: <21>(B: string)-><22>{name: <23>.A, kind: <21>.B}, FF: <24>{name: "EE", kind: "FF", c: "bar"}}}}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    [string]: {
+      b: {
+        [string]: {
+          name: 〈3;-〉
+          kind: 〈1;-〉
+        }
+      }
+    }
+  }
+  a: {
+    A: {
+      b: {
+        B: _
+      }
+    }
+  }
+  a: {
+    C: {
+      b: {
+        D: _
+      }
+    }
+  }
+  a: {
+    EE: {
+      b: {
+        FF: {
+          c: "bar"
+        }
+      }
+    }
+  }
+}

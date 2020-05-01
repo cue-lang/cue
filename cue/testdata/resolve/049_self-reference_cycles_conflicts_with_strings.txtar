@@ -15,3 +15,14 @@ a: {
 }
 -- out/legacy-debug --
 <0>{a: <1>{x: _|_(("hey!?" & "hey"):conflicting values "hey!?" and "hey"), y: "hey!"}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    x: (〈0;y〉 + "?")
+    y: (〈0;x〉 + "!")
+  }
+  a: {
+    x: "hey"
+  }
+}

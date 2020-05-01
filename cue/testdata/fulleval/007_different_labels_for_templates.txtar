@@ -29,3 +29,20 @@ a:
 {"a":{"foo":{"name":"foo"}}}
 -- out/legacy-debug --
 <0>{a: <1>{[]: <2>(X: string)->(<3>{name: <2>.X} & <4>{name: <2>.X}), foo: <5>{name: "foo"}}}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    [string]: {
+      name: 〈1;-〉
+    }
+  }
+  a: {
+    [string]: {
+      name: 〈1;-〉
+    }
+  }
+  a: {
+    foo: {}
+  }
+}

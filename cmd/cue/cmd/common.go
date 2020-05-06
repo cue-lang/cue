@@ -21,9 +21,7 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"testing"
 
-	"github.com/spf13/cobra"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 
@@ -59,12 +57,6 @@ var defaultConfig = config{
 var runtime = &cue.Runtime{}
 
 var inTest = false
-
-func mustParseFlags(t *testing.T, cmd *cobra.Command, flags ...string) {
-	if err := cmd.ParseFlags(flags); err != nil {
-		t.Fatal(err)
-	}
-}
 
 func exitIfErr(cmd *Command, inst *cue.Instance, err error, fatal bool) {
 	exitOnErr(cmd, err, fatal)

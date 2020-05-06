@@ -219,7 +219,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			astState: v.astState,
 			object:   obj,
 		}
-		for _, e := range n.Decls {
+		for i, e := range n.Decls {
 			switch x := e.(type) {
 			case *ast.EmbedDecl:
 				if v1.object.emit == nil {
@@ -227,6 +227,11 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				} else {
 					v1.object.emit = mkBin(v.ctx(), token.NoPos, opUnify, v1.object.emit, v1.walk(x.Expr))
 				}
+			case *ast.Ellipsis:
+				if i != len(n.Decls)-1 {
+					return v1.walk(x.Type) // Generate an error
+				}
+
 			default:
 				v1.walk(e)
 			}

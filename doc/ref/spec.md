@@ -2859,8 +2859,9 @@ If the result of the unification of all embedded values is not a struct,
 it will be output instead of its enclosing file when exporting CUE
 to a data format
 
+<!-- TODO: allow ... anywhere in SourceFile and struct. -->
 ```
-SourceFile      = [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
+SourceFile = [ PackageClause "," ] { ImportDecl "," } { Declaration "," }  [ "..." ] .
 ```
 
 ```

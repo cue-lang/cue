@@ -25,6 +25,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
@@ -58,9 +59,9 @@ func TestDecode(t *testing.T) {
 
 			if bytes.Contains(a.Comment, []byte("openapi")) {
 				cfg.Root = "#/components/schemas/"
-				cfg.Map = func(p token.Pos, a []string) ([]string, error) {
+				cfg.Map = func(p token.Pos, a []string) ([]ast.Label, error) {
 					// Just for testing: does not validate the path.
-					return []string{a[len(a)-1]}, nil
+					return []ast.Label{ast.NewIdent("#" + a[len(a)-1])}, nil
 				}
 			}
 

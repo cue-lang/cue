@@ -9,13 +9,13 @@ info: {
 	version: *"v1beta1" | string
 }
 
-Foo :: {
+#Foo: {
 	a: int
 	b: >=0 & <10
 	...
 }
-Bar :: {
-	foo: Foo
+#Bar: {
+	foo: #Foo
 	...
 }
 -- openapi.yaml --

@@ -36,12 +36,12 @@ info: {
 	}
 }
 // A User uses something.
-User :: {
+#User: {
 	name?:    string
 	id?:      int
-	address?: PhoneNumber
+	address?: #PhoneNumber
 	...
 }
 
 // The number to dial.
-PhoneNumber :: string
+#PhoneNumber: string

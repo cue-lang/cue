@@ -78,16 +78,19 @@ func addDefinitions(n cue.Value, s *state) {
 		s.errf(n, `"definitions" expected an object, found %v`, n.Kind)
 	}
 
+	old := s.isSchema
+	s.isSchema = true
+	defer func() { s.isSchema = old }()
+
 	s.processMap(n, func(key string, n cue.Value) {
-		f := &ast.Field{
-			Label: ast.NewString(s.path[len(s.path)-1]),
-			Token: token.ISA,
-			Value: s.schema(n),
+		name := s.path[len(s.path)-1]
+		a, _ := jsonSchemaRef(n.Pos(), []string{"definitions", name})
+
+		f := &ast.Field{Label: a[len(a)-1], Value: s.schema(n)}
+		for i := len(a) - 2; i >= 0; i-- {
+			f = &ast.Field{Label: a[i], Value: ast.NewStruct(f)}
 		}
-		f = &ast.Field{
-			Label: ast.NewIdent(rootDefs),
-			Value: ast.NewStruct(f),
-		}
+
 		ast.SetRelPos(f, token.NewSection)
 		s.definitions = append(s.definitions, f)
 	})
@@ -211,15 +214,29 @@ var constraints = []*constraint{
 	p0("$ref", func(n cue.Value, s *state) {
 		s.usedTypes = allTypes
 		str, _ := s.strValue(n)
-		a := s.parseRef(n.Pos(), str)
-		if a != nil {
-			a = s.mapRef(n.Pos(), str, a)
+		refs := s.parseRef(n.Pos(), str)
+		var a []ast.Label
+		if refs != nil {
+			a = s.mapRef(n.Pos(), str, refs)
 		}
 		if a == nil {
 			s.addConjunct(&ast.BadExpr{From: n.Pos()})
 			return
 		}
-		s.addConjunct(ast.NewSel(ast.NewIdent(a[0]), a[1:]...))
+		sel, ok := a[0].(ast.Expr)
+		if !ok {
+			sel = &ast.BadExpr{}
+		}
+		for _, l := range a[1:] {
+			switch x := l.(type) {
+			case *ast.Ident:
+				sel = &ast.SelectorExpr{X: sel, Sel: x}
+
+			case *ast.BasicLit:
+				sel = &ast.IndexExpr{X: sel, Index: x}
+			}
+		}
+		s.addConjunct(sel)
 	}),
 
 	// Combinators
@@ -384,8 +401,9 @@ var constraints = []*constraint{
 
 		s.processMap(n, func(key string, n cue.Value) {
 			// property?: value
+			label := ast.NewString(key)
 			expr, state := s.schemaState(n, allTypes, false)
-			f := &ast.Field{Label: ast.NewString(key), Value: expr}
+			f := &ast.Field{Label: label, Value: expr}
 			state.doc(f)
 			f.Optional = token.Blank.Pos()
 			if len(s.obj.Elts) > 0 && len(f.Comments()) > 0 {
@@ -396,7 +414,7 @@ var constraints = []*constraint{
 			if state.deprecated {
 				switch expr.(type) {
 				case *ast.StructLit:
-					s.obj.Elts = append(s.obj.Elts, addTag(key, "deprecated", ""))
+					s.obj.Elts = append(s.obj.Elts, addTag(label, "deprecated", ""))
 				default:
 					f.Attrs = append(f.Attrs, internal.NewAttr("deprecated", ""))
 				}

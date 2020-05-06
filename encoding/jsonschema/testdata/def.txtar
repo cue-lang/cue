@@ -16,13 +16,13 @@
       },
       "required": ["street_address", "city", "state"]
     },
-    "person": {
+    "per-son": {
       "type": "object",
       "properties": {
         "name": { "type": "string" },
         "children": {
           "type": "array",
-          "items": { "$ref": "#/definitions/person" },
+          "items": { "$ref": "#/definitions/per-son" },
           "default": []
         }
       }
@@ -32,30 +32,28 @@
   "type": "object",
 
   "properties": {
-    "person": { "$ref": "#/definitions/person" },
+    "person": { "$ref": "#/definitions/per-son" },
     "billing_address": { "$ref": "#/definitions/address" },
     "shipping_address": { "$ref": "#/definitions/address" }
   }
 }
 
 -- out.cue --
-Schema :: _ @jsonschema(schema="http://json-schema.org/draft-07/schema#",id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
-Schema :: {
-	person?:           def.person
-	billing_address?:  def.address
-	shipping_address?: def.address
-	...
-}
+@jsonschema(schema="http://json-schema.org/draft-07/schema#",id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
+person?:           #def["per-son"]
+billing_address?:  #address
+shipping_address?: #address
 
-def: address :: {
+#address: {
 	street_address: string
 	city:           string
 	state:          string
 	...
 }
 
-def: person :: {
+#def: "per-son": {
 	name?: string
-	children?: [...def.person]
+	children?: [...#def["per-son"]]
 	...
 }
+...

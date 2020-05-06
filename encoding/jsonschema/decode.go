@@ -31,7 +31,11 @@ import (
 	"cuelang.org/go/internal"
 )
 
-const rootDefs = "def"
+// rootDefs defines the top-level name of the map of definitions that do not
+// have a valid identifier name.
+//
+// TODO: find something more principled, like allowing #."a-b" or `#a-b`.
+const rootDefs = "#def"
 
 // A decoder converts JSON schema to CUE.
 type decoder struct {
@@ -64,7 +68,7 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 	var a []ast.Decl
 
 	if d.cfg.Root == "" {
-		a = append(a, d.schema([]string{"Schema"}, v)...)
+		a = append(a, d.schema(nil, v)...)
 	} else {
 		ref := d.parseRef(token.NoPos, d.cfg.Root)
 		if ref == nil {
@@ -77,11 +81,11 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		}
 		for i.Next() {
 			ref := append(ref, i.Label())
-			ref = d.mapRef(i.Value().Pos(), "", ref)
-			if len(ref) == 0 {
+			lab := d.mapRef(i.Value().Pos(), "", ref)
+			if len(lab) == 0 {
 				return nil
 			}
-			decls := d.schema(ref, i.Value())
+			decls := d.schema(lab, i.Value())
 			a = append(a, decls...)
 		}
 	}
@@ -106,11 +110,16 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 	return f
 }
 
-func (d *decoder) schema(ref []string, v cue.Value) (a []ast.Decl) {
+func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 	root := state{decoder: d}
 
+	var name ast.Label
 	inner := len(ref) - 1
-	name := ref[inner]
+
+	if inner >= 0 {
+		name = ref[inner]
+		root.isSchema = true
+	}
 
 	expr, state := root.schemaState(v, allTypes, false)
 
@@ -121,30 +130,48 @@ func (d *decoder) schema(ref []string, v cue.Value) (a []ast.Decl) {
 	if state.id != "" {
 		tags = append(tags, fmt.Sprintf("id=%q", state.id))
 	}
-	if len(tags) > 0 {
-		a = append(a, addTag(name, "jsonschema", strings.Join(tags, ",")))
+
+	if name == nil {
+		if len(tags) > 0 {
+			body := strings.Join(tags, ",")
+			a = append(a, &ast.Attribute{
+				Text: fmt.Sprintf("@jsonschema(%s)", body)})
+		}
+
+		if state.deprecated {
+			a = append(a, &ast.Attribute{Text: "@deprecated()"})
+		}
+	} else {
+		if len(tags) > 0 {
+			a = append(a, addTag(name, "jsonschema", strings.Join(tags, ",")))
+		}
+
+		if state.deprecated {
+			a = append(a, addTag(name, "deprecated", ""))
+		}
 	}
 
-	if state.deprecated {
-		a = append(a, addTag(name, "deprecated", ""))
+	if name != nil {
+		f := &ast.Field{
+			Label: name,
+			Value: expr,
+		}
+
+		a = append(a, f)
+	} else if st, ok := expr.(*ast.StructLit); ok {
+		a = append(a, st.Elts...)
+	} else {
+		a = append(a, &ast.EmbedDecl{Expr: expr})
 	}
 
-	f := &ast.Field{
-		Label: ast.NewIdent(name),
-		Token: token.ISA,
-		Value: expr,
-	}
-
-	a = append(a, f)
 	state.doc(a[0])
 
 	for i := inner - 1; i >= 0; i-- {
 		a = []ast.Decl{&ast.Field{
-			Label: ast.NewIdent(ref[i]),
-			Token: token.ISA,
+			Label: ref[i],
 			Value: &ast.StructLit{Elts: a},
 		}}
-		expr = ast.NewStruct(ref[i], token.ISA, expr)
+		expr = ast.NewStruct(ref[i], expr)
 	}
 
 	return a
@@ -204,6 +231,8 @@ func (d *decoder) strValue(n cue.Value) (s string, ok bool) {
 
 type state struct {
 	*decoder
+
+	isSchema bool // for omitting ellipsis in an ast.File
 
 	parent *state
 
@@ -285,6 +314,7 @@ func (s *state) finalize() (e ast.Expr) {
 	conjuncts = append(conjuncts, s.conjuncts...)
 
 	if s.obj != nil {
+		// TODO: may need to explicitly close.
 		if !s.closeStruct {
 			s.obj.Elts = append(s.obj.Elts, &ast.Ellipsis{})
 		}
@@ -360,6 +390,7 @@ func (s *state) schema(n cue.Value) ast.Expr {
 // caller is a logical operator like anyOf, allOf, oneOf, or not.
 func (s *state) schemaState(n cue.Value, types cue.Kind, isLogical bool) (ast.Expr, *state) {
 	state := &state{
+		isSchema:     s.isSchema,
 		decoder:      s.decoder,
 		allowedTypes: types,
 		path:         s.path,
@@ -414,6 +445,7 @@ func (s *state) value(n cue.Value) ast.Expr {
 				Value: s.value(n),
 			})
 		})
+		// TODO: only open when s.isSchema?
 		a = append(a, &ast.Ellipsis{})
 		return setPos(&ast.StructLit{Elts: a}, n)
 
@@ -485,10 +517,9 @@ func excludeFields(decls []ast.Decl) ast.Expr {
 	return &ast.UnaryExpr{Op: token.NMAT, X: ast.NewString(re)}
 }
 
-func addTag(field, tag, value string) *ast.Field {
+func addTag(field ast.Label, tag, value string) *ast.Field {
 	return &ast.Field{
-		Label: ast.NewIdent(field),
-		Token: token.ISA,
+		Label: field,
 		Value: ast.NewIdent("_"),
 		Attrs: []*ast.Attribute{
 			{Text: fmt.Sprintf("@%s(%s)", tag, value)},

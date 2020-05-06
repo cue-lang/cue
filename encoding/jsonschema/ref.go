@@ -19,6 +19,7 @@ import (
 	"path"
 	"strings"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -58,7 +59,7 @@ func (d *decoder) parseRef(p token.Pos, str string) []string {
 	return strings.Split(s, "/")
 }
 
-func (d *decoder) mapRef(p token.Pos, str string, ref []string) []string {
+func (d *decoder) mapRef(p token.Pos, str string, ref []string) []ast.Label {
 	fn := d.cfg.Map
 	if fn == nil {
 		fn = jsonSchemaRef
@@ -83,7 +84,7 @@ func (d *decoder) mapRef(p token.Pos, str string, ref []string) []string {
 	return a
 }
 
-func jsonSchemaRef(p token.Pos, a []string) ([]string, error) {
+func jsonSchemaRef(p token.Pos, a []string) ([]ast.Label, error) {
 	// TODO: technically, references could reference a
 	// non-definition. We disallow this case for the standard
 	// JSON Schema interpretation. We could detect cases that
@@ -95,5 +96,12 @@ func jsonSchemaRef(p token.Pos, a []string) ([]string, error) {
 			// to already have been withdrawn from the JSON Schema spec.
 			"$ref must be of the form #/definitions/...")
 	}
-	return append([]string{rootDefs}, a[1:]...), nil
+	name := a[1]
+	if ast.IsValidIdent(name) &&
+		name != rootDefs[1:] &&
+		!strings.HasPrefix(name, "#") &&
+		!strings.HasPrefix(name, "_") {
+		return []ast.Label{ast.NewIdent("#" + name)}, nil
+	}
+	return []ast.Label{ast.NewIdent(rootDefs), ast.NewString(name)}, nil
 }

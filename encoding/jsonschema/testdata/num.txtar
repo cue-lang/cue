@@ -28,10 +28,8 @@
 -- out.cue --
 import "math"
 
-Schema :: {
-	constant?:  2
-	several?:   1 | 2 | 3 | 4
-	inclusive?: >=2 & <=3
-	exclusive?: >2 & <3
-	cents?:     math.MultipleOf(0.05)
-}
+constant?:  2
+several?:   1 | 2 | 3 | 4
+inclusive?: >=2 & <=3
+exclusive?: >2 & <3
+cents?:     math.MultipleOf(0.05)

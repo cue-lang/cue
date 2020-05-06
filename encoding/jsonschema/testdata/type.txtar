@@ -31,15 +31,12 @@
 
 -- out.cue --
 // Main schema
-Schema :: {
-	// an integer or string.
-	intString?: null | bool | int | string | [...]
-	object?:    {
-		...
-	} | *{
-		foo: "bar"
-		baz: 1.3
-		...
-	}
-	numOrList?: number | [...number] | *[1, 2, 3]
+intString?: null | bool | int | string | [...]
+object?:    {
+	...
+} | *{
+	foo: "bar"
+	baz: 1.3
+	...
 }
+numOrList?: number | [...number] | *[1, 2, 3]

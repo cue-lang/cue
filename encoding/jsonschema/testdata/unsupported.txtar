@@ -35,10 +35,10 @@
 
 
 -- out.cue --
-Schema :: _ @jsonschema(schema="http://json-schema.org/draft-07/schema")
-Schema :: _
+@jsonschema(schema="http://json-schema.org/draft-07/schema")
+_
 
-def: ref :: null | {
+#ref: null | {
 	branches?: {
 		...
 	}

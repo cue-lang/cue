@@ -69,13 +69,14 @@ type Config struct {
 	Root string
 
 	// Map maps the locations of schemas and definitions to a new location.
-	// References are updated accordingly.
+	// References are updated accordingly. A returned label must be
+	// an identifier or string literal.
 	//
 	// The default mapping is
-	//    {}                     {"Schema"}
-	//    {"definitions", foo}   {"Defs", strings.Title(foo)}
-	//    {"$defs", foo}         {"Defs", strings.Title(foo)}
-	Map func(pos token.Pos, path []string) ([]string, error)
+	//    {}                     {}
+	//    {"definitions", foo}   {#foo} or {#def, foo}
+	//    {"$defs", foo}         {#foo} or {#def, foo}
+	Map func(pos token.Pos, path []string) ([]ast.Label, error)
 
 	// TODO: configurability to make it compatible with OpenAPI, such as
 	// - locations of definitions: #/components/schemas, for instance.

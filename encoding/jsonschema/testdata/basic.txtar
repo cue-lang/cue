@@ -40,20 +40,19 @@ import "strings"
 // Main schema
 //
 // Specify who you are and all.
-Schema :: _ @jsonschema(schema="http://json-schema.org/draft-07/schema#")
-Schema :: {
-	// A person is a human being.
-	person?: {
-		name: string
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
 
-		// where does this person live?
-		address?: strings.MinRunes(4) & strings.MaxRunes(20)
+// A person is a human being.
+person?: {
+	name: string
 
-		// A very large comment that will be wrapped after a certain line
-		// length. Let's keep on going and see what happens.
-		children?: [...string]
-		"home phone"?: string @deprecated()
-		...
-	}
+	// where does this person live?
+	address?: strings.MinRunes(4) & strings.MaxRunes(20)
+
+	// A very large comment that will be wrapped after a certain line
+	// length. Let's keep on going and see what happens.
+	children?: [...string]
+	"home phone"?: string @deprecated()
 	...
 }
+...

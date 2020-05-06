@@ -38,10 +38,8 @@ additionalProperties: false
 -- out.cue --
 import "list"
 
-Schema :: {
-	foo?: [...string]
-	tuple?: [string, int, 2]
-	has?:  list.Contains(3)
-	size?: [_, _, _, ...] & list.MaxItems(9) & list.UniqueItems()
-	additional?: [int, int, ...string]
-}
+foo?: [...string]
+tuple?: [string, int, 2]
+has?:  list.Contains(3)
+size?: [_, _, _, ...] & list.MaxItems(9) & list.UniqueItems()
+additional?: [int, int, ...string]

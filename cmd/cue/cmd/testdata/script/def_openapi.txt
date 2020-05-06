@@ -212,11 +212,11 @@ info: {
 	version: *"v1alpha1" | string
 }
 
-Bar :: {
-	foo: Foo
+#Bar: {
+	foo: #Foo
 	...
 }
-Foo :: {
+#Foo: {
 	a: int
 	b: >=0 & <10
 	...
@@ -226,11 +226,11 @@ info: {
 	title:   *"Some clever title." | string
 	version: *"v1" | string
 }
-Bar :: {
-	foo: Foo
+#Bar: {
+	foo: #Foo
 	...
 }
-Foo :: {
+#Foo: {
 	a: int
 	b: >=0 & <10
 	...
@@ -240,11 +240,11 @@ info: {
 	title:   *"Some clever title." | string
 	version: *"v1" | string
 }
-Bar :: {
-	foo: Foo
+#Bar: {
+	foo: #Foo
 	...
 }
-Foo :: {
+#Foo: {
 	a: int
 	b: >=0 & <10
 	...
@@ -257,16 +257,16 @@ info: {
 	title:   string | *_|_
 	version: *"v1alpha1" | string
 }
-Bar :: {
-	foo: Foo
+#Bar: {
+	foo: #Foo
 	...
 }
-Foo :: {
+#Foo: {
 	a: int
 	b: >=0 & <10
 	...
 }
-Baz :: {
+#Baz: {
 	a: int
 	b: >=0 & <10
 	...

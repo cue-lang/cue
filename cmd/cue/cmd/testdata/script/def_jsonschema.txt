@@ -1,8 +1,8 @@
-cue def jsonschema: schema.json -p schema -l 'Person::'
+cue def jsonschema: schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
 
 # auto mode
-cue def schema.json -p schema -l 'Person::'
+cue def schema.json -p schema -l '#Person:'
 cmp stdout expect-stdout
 
 cue def jsonschema: bad.json
@@ -10,22 +10,22 @@ cue def jsonschema: bad.json
 ! cue def jsonschema: bad.json --strict
 cmp stderr expect-stderr
 
+! cue eval data.yaml schema.json
+cmp stderr expect-stderr2
+
 -- expect-stdout --
 package schema
 
-Person :: {
-	// Person
-	Schema :: {
-		// The person's first name.
-		firstName?: string
+#Person: {
+	// The person's first name.
+	firstName?: string
 
-		// The person's last name.
-		lastName?: string
+	// The person's last name.
+	lastName?: string
 
-		// Age in years which must be equal to or greater than zero.
-		age?: >=0
-		...
-	} @jsonschema(schema="http://json-schema.org/draft-07/schema#",id="https://example.com/person.schema.json")
+	// Age in years which must be equal to or greater than zero.
+	age?: >=0
+	...
 }
 -- schema.json --
 {
@@ -55,8 +55,14 @@ Person :: {
   "type": "number",
   "foo": "bar"
 }
-
 -- expect-stderr --
 unsupported constraint "foo":
     ./bad.json:3:10
+-- data.yaml --
+age: twenty
+
+-- expect-stderr2 --
+age: conflicting values "twenty" and >=0 (mismatched types string and number):
+    11:7
+    ./data.yaml:1:7
 -- cue.mod --

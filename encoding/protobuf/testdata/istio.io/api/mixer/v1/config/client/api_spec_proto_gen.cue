@@ -70,14 +70,14 @@ import "istio.io/api/mixer/v1"
 //   api_keys:
 //   - query: api-key
 // ```
-HTTPAPISpec :: {
+#HTTPAPISpec: {
 	// List of attributes that are generated when *any* of the HTTP
 	// patterns match. This list typically includes the "api.service"
 	// and "api.version" attributes.
-	attributes?: v1.Attributes @protobuf(1,type=Attributes)
+	attributes?: v1.#Attributes @protobuf(1,type=Attributes)
 
 	// List of HTTP patterns to match.
-	patterns?: [...HTTPAPISpecPattern] @protobuf(2)
+	patterns?: [...#HTTPAPISpecPattern] @protobuf(2)
 
 	// List of APIKey that describes how to extract an API-KEY from an
 	// HTTP request. The first API-Key match found in the list is used,
@@ -88,7 +88,7 @@ HTTPAPISpec :: {
 	//
 	//     `query: key, `query: api_key`, and then `header: x-api-key`
 	//
-	apiKeys?: [...APIKey] @protobuf(3,name=api_keys)
+	apiKeys?: [...#APIKey] @protobuf(3,name=api_keys)
 }
 
 // HTTPAPISpecPattern defines a single pattern to match against
@@ -104,11 +104,11 @@ HTTPAPISpec :: {
 //   httpMethod: GET
 //   uriTemplate: /foo/bar
 // ```
-HTTPAPISpecPattern :: {
+#HTTPAPISpecPattern: {
 	// List of attributes that are generated if the HTTP request matches
 	// the specified http_method and uri_template. This typically
 	// includes the "api.operation" attribute.
-	attributes?: v1.Attributes @protobuf(1,type=Attributes)
+	attributes?: v1.#Attributes @protobuf(1,type=Attributes)
 
 	// HTTP request method to match against as defined by
 	// [rfc7231](https://tools.ietf.org/html/rfc7231#page-21). For
@@ -143,7 +143,7 @@ HTTPAPISpecPattern :: {
 //
 // See [API Keys](https://swagger.io/docs/specification/authentication/api-keys)
 // for a general overview of API keys as defined by OpenAPI.
-APIKey :: {
+#APIKey: {
 	close({}) | close({
 		// API Key is sent as a query parameter. `query` represents the
 		// query string parameter name.
@@ -188,7 +188,7 @@ APIKey :: {
 // - name: foo
 //   namespace: bar
 // ```
-HTTPAPISpecReference :: {
+#HTTPAPISpecReference: {
 	// REQUIRED. The short name of the HTTPAPISpec. This is the resource
 	// name defined by the metadata name field.
 	name?: string @protobuf(1)
@@ -216,12 +216,12 @@ HTTPAPISpecReference :: {
 //   - name: petstore
 //     namespace: default
 // ```
-HTTPAPISpecBinding :: {
+#HTTPAPISpecBinding: {
 	// REQUIRED. One or more services to map the listed HTTPAPISpec onto.
-	services?: [...IstioService] @protobuf(1)
+	services?: [...#IstioService] @protobuf(1)
 
 	// REQUIRED. One or more HTTPAPISpec references that should be mapped to
 	// the specified service(s). The aggregate collection of match
 	// conditions defined in the HTTPAPISpecs should not overlap.
-	apiSpecs?: [...HTTPAPISpecReference] @protobuf(2,name=api_specs)
+	apiSpecs?: [...#HTTPAPISpecReference] @protobuf(2,name=api_specs)
 }

@@ -1,5 +1,5 @@
 package test_test
 
-AnotherTest :: {
+#AnotherTest: {
 	test?: int32 @protobuf(1)
 }

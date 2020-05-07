@@ -21,7 +21,7 @@ module: "acme.com/api"
 -- root/cue.mod/gen/googleapis.com/acme/test/test/test_proto_gen.cue --
 package test_test
 
-AnotherTest: {
+#AnotherTest: {
 	test?: int32 @protobuf(1)
 }
 -- root/mixer/v1/attributes.proto --
@@ -170,14 +170,14 @@ import (
 )
 
 // Attributes defines attributes.
-Attributes :: {
+#Attributes: {
 	// A map of attribute name to its value.
 	attributes?: {
-		[string]: AttributeValue
+		[string]: #AttributeValue
 	} @protobuf(1,type=map<string,AttributeValue>)
 
 	// Specifies one attribute value with different type.
-	AttributeValue :: {
+	#AttributeValue: {
 		// The attribute value.
 		close({}) | close({
 			stringValue: string @protobuf(2,name=string_value)
@@ -193,16 +193,16 @@ Attributes :: {
 			timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
 		}) | close({
 			// Used for values of type STRING_MAP
-			stringMapValue: StringMap @protobuf(9,name=string_map_value)
+			stringMapValue: #StringMap @protobuf(9,name=string_map_value)
 		}) | close({
-			testValue: test.Test @protobuf(10,type=acme.test.Test,name=test_value)
+			testValue: test.#Test @protobuf(10,type=acme.test.Test,name=test_value)
 		}) | close({
-			testValue: test_test.AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
+			testValue: test_test.#AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
 		})
 	}
 
 	// Defines a string map.
-	StringMap :: {
+	#StringMap: {
 		// Holds a set of name/value pairs.
 		entries?: {
 			[string]: string
@@ -216,14 +216,14 @@ package client
 import "acme.com/api/mixer/v1"
 
 // Defines the per-service client configuration.
-ServiceConfig :: {
-	disableCheckCalls?:  bool          @protobuf(1,name=disable_check_calls)
-	disableReportCalls?: bool          @protobuf(2,name=disable_report_calls)
-	mixerAttributes?:    v1.Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
+#ServiceConfig: {
+	disableCheckCalls?:  bool           @protobuf(1,name=disable_check_calls)
+	disableReportCalls?: bool           @protobuf(2,name=disable_report_calls)
+	mixerAttributes?:    v1.#Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
 }
 -- expect-test_proto_gen.cue --
 package test
 
-Test :: {
+#Test: {
 	test?: int32 @protobuf(1)
 }

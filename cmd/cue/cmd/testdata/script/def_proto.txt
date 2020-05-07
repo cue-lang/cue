@@ -8,14 +8,14 @@ package api
 import "time"
 
 // Attributes defines attributes.
-Attributes :: {
+#Attributes: {
 	// A map of attribute name to its value.
 	attributes?: {
-		[string]: AttributeValue
+		[string]: #AttributeValue
 	} @protobuf(1,type=map<string,AttributeValue>)
 
 	// Specifies one attribute value with different type.
-	AttributeValue :: {
+	#AttributeValue: {
 		// The attribute value.
 		close({}) | close({
 			stringValue: string @protobuf(2,name=string_value)
@@ -31,12 +31,12 @@ Attributes :: {
 			timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
 		}) | close({
 			// Used for values of type STRING_MAP
-			stringMapValue: StringMap @protobuf(9,name=string_map_value)
+			stringMapValue: #StringMap @protobuf(9,name=string_map_value)
 		})
 	}
 
 	// Defines a string map.
-	StringMap :: {
+	#StringMap: {
 		// Holds a set of name/value pairs.
 		entries?: {
 			[string]: string

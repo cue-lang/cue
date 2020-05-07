@@ -19,7 +19,7 @@ import (
 	"time"
 )
 
-StructWrap :: {
+#StructWrap: {
 	struct?: {} @protobuf(1,type=google.protobuf.Struct)
 	any?: _ @protobuf(2,type=google.protobuf.Value)
 	listVal?: [...] @protobuf(3,type=google.protobuf.ListValue)
@@ -45,14 +45,14 @@ StructWrap :: {
 // target.service: example
 // ```
 //
-Attributes :: {
+#Attributes: {
 	// A map of attribute name to its value.
 	attributes?: {
-		[string]: AttributeValue
+		[string]: #AttributeValue
 	} @protobuf(1,type=map<string,AttributeValue>)
 
 	// Specifies one attribute value with different type.
-	AttributeValue :: {
+	#AttributeValue: {
 		// The attribute value.
 		close({}) | close({
 			// Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI
@@ -77,16 +77,16 @@ Attributes :: {
 			durationValue: time.Duration @protobuf(8,type=google.protobuf.Duration,name=duration_value)
 		}) | close({
 			// Used for values of type STRING_MAP
-			stringMapValue: StringMap @protobuf(9,name=string_map_value)
+			stringMapValue: #StringMap @protobuf(9,name=string_map_value)
 		}) | close({
-			testValue: test.Test @protobuf(10,type=acme.test.Test,name=test_value)
+			testValue: test.#Test @protobuf(10,type=acme.test.Test,name=test_value)
 		}) | close({
-			testValue: test_test.AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
+			testValue: test_test.#AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
 		})
 	}
 
 	// Defines a string map.
-	StringMap :: {
+	#StringMap: {
 		// Holds a set of name/value pairs.
 		entries?: {
 			[string]: string
@@ -101,7 +101,7 @@ Attributes :: {
 // dictionary instead. The message-level dictionary is carried by the
 // `words` field of this message, the deployment-wide dictionary is determined via
 // configuration.
-CompressedAttributes :: {
+#CompressedAttributes: {
 	// The message-level dictionary.
 	words?: [...string] @protobuf(1)
 
@@ -142,7 +142,7 @@ CompressedAttributes :: {
 
 	// Holds attributes of type STRING_MAP
 	stringMaps?: {
-		[string]: StringMap
+		[string]: #StringMap
 	} @protobuf(9,type=map<sint32,StringMap>,string_maps,"(gogoproto.nullable)=false")
 }
 let _time_ = time
@@ -150,7 +150,7 @@ let _bytes_ = bytes
 
 // A map of string to string. The keys and values in this map are dictionary
 // indices (see the [Attributes][istio.mixer.v1.CompressedAttributes] message for an explanation)
-StringMap :: {
+#StringMap: {
 	// Holds a set of name/value pairs.
 	entries?: {
 		[string]: int32

@@ -49,7 +49,7 @@ var scalars = map[string]string{
 }
 
 func (p *protoConverter) setBuiltin(from, to string, pkg *protoConverter) {
-	p.scope[0][from] = mapping{to, "", pkg}
+	p.scope[0][from] = mapping{to, to, "", pkg}
 }
 
 var (

@@ -46,7 +46,7 @@ func ExampleExtract() {
 	// package basic
 	//
 	// // This is my type.
-	// MyType :: {
+	// #MyType: {
 	// 	stringValue?: string @protobuf(1,name=string_value) // just any 'ole string
 	//
 	// 	// A method must start with a capital letter.

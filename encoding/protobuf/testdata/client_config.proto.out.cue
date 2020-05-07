@@ -25,17 +25,17 @@ import (
 )
 
 // Specifies the behavior when the client is unable to connect to Mixer.
-NetworkFailPolicy :: {
+#NetworkFailPolicy: {
 	// Example of single-value enum.
-	FailPolicy ::
+	#FailPolicy:
 		// If network connection fails, request is allowed and delivered to the
 		// service.
 		"FAIL_OPEN"
 
-	FailPolicy_value :: FAIL_OPEN: 0
+	#FailPolicy_value: FAIL_OPEN: 0
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
-	policy?: FailPolicy @protobuf(1)
+	policy?: #FailPolicy @protobuf(1)
 
 	// Max retries on transport error.
 	maxRetry?: uint32 @protobuf(2,name=max_retry)
@@ -49,7 +49,7 @@ NetworkFailPolicy :: {
 }
 
 // Defines the per-service client configuration.
-ServiceConfig :: {
+#ServiceConfig: {
 	// If true, do not call Mixer Check.
 	disableCheckCalls?: bool @protobuf(1,name=disable_check_calls)
 
@@ -60,19 +60,19 @@ ServiceConfig :: {
 	// typically includes the "destination.service" attribute.
 	// In case of a per-route override, per-route attributes take precedence
 	// over the attributes supplied in the client configuration.
-	mixerAttributes?: v1.Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
+	mixerAttributes?: v1.#Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
 
 	// HTTP API specifications to generate API attributes.
-	httpApiSpec?: [...HTTPAPISpec] @protobuf(4,name=http_api_spec)
+	httpApiSpec?: [...#HTTPAPISpec] @protobuf(4,name=http_api_spec)
 
 	// Quota specifications to generate quota requirements.
-	quotaSpec?: [...QuotaSpec] @protobuf(5,name=quota_spec)
+	quotaSpec?: [...#QuotaSpec] @protobuf(5,name=quota_spec)
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	// This is the service-level policy. It overrides
 	// [mesh-level
 	// policy][istio.mixer.v1.config.client.TransportConfig.network_fail_policy].
-	networkFailPolicy?: NetworkFailPolicy @protobuf(7,name=network_fail_policy)
+	networkFailPolicy?: #NetworkFailPolicy @protobuf(7,name=network_fail_policy)
 
 	// Default attributes to forward to upstream. This typically
 	// includes the "source.ip" and "source.uid" attributes.
@@ -86,11 +86,11 @@ ServiceConfig :: {
 	// 3. forwarded attributes from the source filter config (if any);
 	// 4. forwarded attributes from the source route config (if any);
 	// 5. derived attributes from the request metadata.
-	forwardAttributes?: v1.Attributes @protobuf(8,type=Attributes,name=forward_attributes)
+	forwardAttributes?: v1.#Attributes @protobuf(8,type=Attributes,name=forward_attributes)
 }
 
 // Defines the transport config on how to call Mixer.
-TransportConfig :: {
+#TransportConfig: {
 	// The flag to disable check cache.
 	disableCheckCache?: bool @protobuf(1,name=disable_check_cache)
 
@@ -102,7 +102,7 @@ TransportConfig :: {
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	// This is the mesh level policy. The default value for policy is FAIL_OPEN.
-	networkFailPolicy?: NetworkFailPolicy @protobuf(4,name=network_fail_policy)
+	networkFailPolicy?: #NetworkFailPolicy @protobuf(4,name=network_fail_policy)
 
 	// Specify refresh interval to write Mixer client statistics to Envoy share
 	// memory. If not specified, the interval is 10 seconds.
@@ -131,19 +131,19 @@ TransportConfig :: {
 	// Default attributes to forward to Mixer upstream. This typically
 	// includes the "source.ip" and "source.uid" attributes. These
 	// attributes are consumed by the proxy in front of mixer.
-	attributesForMixerProxy?: v1.Attributes @protobuf(8,type=Attributes,name=attributes_for_mixer_proxy)
+	attributesForMixerProxy?: v1.#Attributes @protobuf(8,type=Attributes,name=attributes_for_mixer_proxy)
 }
 
 // Defines the client config for HTTP.
-HttpClientConfig :: {
+#HttpClientConfig: {
 	// The transport config.
-	transport?: TransportConfig @protobuf(1)
+	transport?: #TransportConfig @protobuf(1)
 
 	// Map of control configuration indexed by destination.service. This
 	// is used to support per-service configuration for cases where a
 	// mixerclient serves multiple services.
 	serviceConfigs?: {
-		[string]: ServiceConfig
+		[string]: #ServiceConfig
 	} @protobuf(2,type=map<string,ServiceConfig>,service_configs)
 
 	// Default destination service name if none was specified in the
@@ -153,22 +153,22 @@ HttpClientConfig :: {
 	// Default attributes to send to Mixer in both Check and
 	// Report. This typically includes "destination.ip" and
 	// "destination.uid" attributes.
-	mixerAttributes?: v1.Attributes @protobuf(4,type=Attributes,name=mixer_attributes)
+	mixerAttributes?: v1.#Attributes @protobuf(4,type=Attributes,name=mixer_attributes)
 
 	// Default attributes to forward to upstream. This typically
 	// includes the "source.ip" and "source.uid" attributes.
-	forwardAttributes?: v1.Attributes @protobuf(5,type=Attributes,name=forward_attributes)
+	forwardAttributes?: v1.#Attributes @protobuf(5,type=Attributes,name=forward_attributes)
 }
 
 // Defines the client config for TCP.
-TcpClientConfig :: {
+#TcpClientConfig: {
 	// The transport config.
-	transport?: TransportConfig @protobuf(1)
+	transport?: #TransportConfig @protobuf(1)
 
 	// Default attributes to send to Mixer in both Check and
 	// Report. This typically includes "destination.ip" and
 	// "destination.uid" attributes.
-	mixerAttributes?: v1.Attributes @protobuf(2,type=Attributes,name=mixer_attributes)
+	mixerAttributes?: v1.#Attributes @protobuf(2,type=Attributes,name=mixer_attributes)
 
 	// If set to true, disables Mixer check calls.
 	disableCheckCalls?: bool @protobuf(3,name=disable_check_calls)
@@ -178,7 +178,7 @@ TcpClientConfig :: {
 
 	// Quota specifications to generate quota requirements.
 	// It applies on the new TCP connections.
-	connectionQuotaSpec?: QuotaSpec @protobuf(5,name=connection_quota_spec)
+	connectionQuotaSpec?: #QuotaSpec @protobuf(5,name=connection_quota_spec)
 
 	// Specify report interval to send periodical reports for long TCP
 	// connections. If not specified, the interval is 10 seconds. This interval

@@ -203,9 +203,9 @@
 //
 package v1alpha3
 
-Gateway :: {
+#Gateway: {
 	// REQUIRED: A list of server specifications.
-	servers?: [...Server] @protobuf(1)
+	servers?: [...#Server] @protobuf(1)
 
 	// REQUIRED: One or more labels that indicate a specific set of pods/VMs
 	// on which this gateway configuration should be applied. The scope of
@@ -279,10 +279,10 @@ Gateway :: {
 //       serverCertificate: /etc/certs/server.pem
 //       privateKey: /etc/certs/privatekey.pem
 // ```
-Server :: {
+#Server: {
 	// REQUIRED: The Port on which the proxy should listen for incoming
 	// connections.
-	port?: Port @protobuf(1)
+	port?: #Port @protobuf(1)
 	port?: >10 & <100
 
 	// $hide_from_docs
@@ -318,13 +318,13 @@ Server :: {
 	// `DestinationRule`, and `ServiceEntry` configurations for details.
 	hosts?: [...string] @protobuf(2)
 
-	TLSOptions :: {
+	#TLSOptions: {
 		// If set to true, the load balancer will send a 301 redirect for all
 		// http connections, asking the clients to use HTTPS.
 		httpsRedirect?: bool @protobuf(1,name=https_redirect)
 
 		// TLS modes enforced by the proxy
-		TLSmode ::
+		#TLSmode:
 			// The SNI string presented by the client will be used as the match
 			// criterion in a VirtualService TLS route to determine the
 			// destination service from the service registry.
@@ -349,7 +349,7 @@ Server :: {
 			// source and the destination are using Istio mTLS to secure traffic.
 			"AUTO_PASSTHROUGH"
 
-		TLSmode_value :: {
+		#TLSmode_value: {
 			PASSTHROUGH:      0
 			SIMPLE:           1
 			MUTUAL:           2
@@ -359,7 +359,7 @@ Server :: {
 		// Optional: Indicates whether connections to this port should be
 		// secured using TLS. The value of this field determines how TLS is
 		// enforced.
-		mode?: TLSmode @protobuf(2)
+		mode?: #TLSmode @protobuf(2)
 
 		// Extra comment.
 
@@ -399,13 +399,13 @@ Server :: {
 		subjectAltNames?: [...string] @protobuf(6,name=subject_alt_names)
 
 		// TLS protocol versions.
-		TLSProtocol :: "TLS_AUTO" | // Automatically choose the optimal TLS version.
+		#TLSProtocol: "TLS_AUTO" | // Automatically choose the optimal TLS version.
 			"TLSV1_0" | // TLS version 1.0
 			"TLSV1_1" | // TLS version 1.1
 			"TLSV1_2" | // TLS version 1.2
 			"TLSV1_3" // TLS version 1.3
 
-		TLSProtocol_value :: {
+		#TLSProtocol_value: {
 			TLS_AUTO: 0
 			TLSV1_0:  1
 			TLSV1_1:  2
@@ -414,10 +414,10 @@ Server :: {
 		}
 
 		// Optional: Minimum TLS protocol version.
-		minProtocolVersion?: TLSProtocol @protobuf(7,name=min_protocol_version)
+		minProtocolVersion?: #TLSProtocol @protobuf(7,name=min_protocol_version)
 
 		// Optional: Maximum TLS protocol version.
-		maxProtocolVersion?: TLSProtocol @protobuf(8,name=max_protocol_version)
+		maxProtocolVersion?: #TLSProtocol @protobuf(8,name=max_protocol_version)
 
 		// Optional: If specified, only support the specified cipher list.
 		// Otherwise default to the default cipher list supported by Envoy.
@@ -427,7 +427,7 @@ Server :: {
 	// Set of TLS related options that govern the server's behavior. Use
 	// these options to control if all http requests should be redirected to
 	// https, and the TLS modes to use.
-	tls?: TLSOptions @protobuf(3)
+	tls?: #TLSOptions @protobuf(3)
 
 	// The loopback IP endpoint or Unix domain socket to which traffic should
 	// be forwarded to by default. Format should be `127.0.0.1:PORT` or
@@ -436,7 +436,7 @@ Server :: {
 }
 
 // Port describes the properties of a specific port of a service.
-Port :: {
+#Port: {
 	// REQUIRED: A valid non-negative integer port number.
 	number?: uint32 @protobuf(1)
 

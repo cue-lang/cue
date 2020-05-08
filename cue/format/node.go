@@ -120,7 +120,7 @@ func (f *formatter) walkDeclList(list []ast.Decl) {
 			if hasDocComments(x) {
 				switch x := list[i-1].(type) {
 				case *ast.Field:
-					if x.Token == token.ISA {
+					if x.Token == token.ISA || internal.IsDefinition(x.Label) {
 						f.print(newsection)
 					}
 

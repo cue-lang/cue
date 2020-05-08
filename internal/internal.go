@@ -280,6 +280,38 @@ func IsBulkField(d ast.Decl) bool {
 	return false
 }
 
+func IsDefinition(label ast.Label) bool {
+	switch x := label.(type) {
+	case *ast.Alias:
+		if ident, ok := x.Expr.(*ast.Ident); ok {
+			return strings.HasPrefix(ident.Name, "#")
+		}
+	case *ast.Ident:
+		return strings.HasPrefix(x.Name, "#")
+	}
+	return false
+}
+
+func IsRegularField(f *ast.Field) bool {
+	if f.Token == token.ISA {
+		return false
+	}
+	var ident *ast.Ident
+	switch x := f.Label.(type) {
+	case *ast.Alias:
+		ident, _ = x.Expr.(*ast.Ident)
+	case *ast.Ident:
+		ident = x
+	}
+	if ident == nil {
+		return true
+	}
+	if strings.HasPrefix(ident.Name, "#") || strings.HasPrefix(ident.Name, "_") {
+		return false
+	}
+	return true
+}
+
 func EmbedStruct(s *ast.StructLit) *ast.EmbedDecl {
 	e := &ast.EmbedDecl{Expr: s}
 	if len(s.Elts) == 1 {

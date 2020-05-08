@@ -874,7 +874,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 			if p.mode.omitDefinitions || p.mode.concrete {
 				continue
 			}
-			if !isDef(f) {
+			if !internal.IsDefinition(f.Label) {
 				f.Token = token.ISA
 			}
 		}
@@ -914,7 +914,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 					opt = token.NoSpace.Pos() // anything but token.NoPos
 				}
 				tok := token.COLON
-				if c.def {
+				if c.def && !internal.IsDefinition(label) {
 					tok = token.ISA
 				}
 				f := &ast.Field{

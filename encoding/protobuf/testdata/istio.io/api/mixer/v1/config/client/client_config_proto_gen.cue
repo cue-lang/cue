@@ -20,8 +20,8 @@
 package client
 
 import (
-	"istio.io/api/mixer/v1"
 	"time"
+	"istio.io/api/mixer/v1"
 )
 
 // Specifies the behavior when the client is unable to connect to Mixer.

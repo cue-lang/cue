@@ -16,12 +16,14 @@ cmp stderr expect-stderr2
 -- expect-stdout --
 package schema
 
+import "strings"
+
 #Person: {
 	// The person's first name.
 	firstName?: string
 
 	// The person's last name.
-	lastName?: string
+	lastName?: strings.MinRunes(1)
 
 	// Age in years which must be equal to or greater than zero.
 	age?: >=0
@@ -40,7 +42,8 @@ package schema
     },
     "lastName": {
       "type": "string",
-      "description": "The person's last name."
+      "description": "The person's last name.",
+      "minLength": 1
     },
     "age": {
       "description": "Age in years which must be equal to or greater than zero.",
@@ -63,6 +66,6 @@ age: twenty
 
 -- expect-stderr2 --
 age: conflicting values "twenty" and >=0 (mismatched types string and number):
-    11:7
+    13:7
     ./data.yaml:1:7
 -- cue.mod --

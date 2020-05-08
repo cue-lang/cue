@@ -20,7 +20,6 @@ import (
 	"os"
 	"path"
 	"path/filepath"
-	"sort"
 	"strconv"
 	"strings"
 	"text/scanner"
@@ -29,7 +28,9 @@ import (
 	"github.com/emicklei/proto"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/source"
@@ -69,7 +70,6 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		tfile:    tfile,
 		imported: map[string]bool{},
 		symbols:  map[string]bool{},
-		aliases:  map[string]string{},
 	}
 
 	defer func() {
@@ -139,34 +139,13 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		}
 	}
 
-	imports := &ast.ImportDecl{}
-	importIdx := len(p.file.Decls)
-	p.file.Decls = append(p.file.Decls, imports)
-
 	for _, e := range d.Elements {
 		p.topElement(e)
 	}
 
-	imported := []string{}
-	for k := range p.imported {
-		imported = append(imported, k)
-	}
-	sort.Strings(imported)
-	p.sorted = imported
+	err = astutil.Sanitize(p.file)
 
-	for _, v := range imported {
-		spec := ast.NewImport(nil, v)
-		imports.Specs = append(imports.Specs, spec)
-		p.file.Imports = append(p.file.Imports, spec)
-	}
-
-	if len(imports.Specs) == 0 {
-		a := p.file.Decls
-		copy(a[importIdx:], a[importIdx+1:])
-		p.file.Decls = a[:len(a)-1]
-	}
-
-	return p, nil
+	return p, err
 }
 
 // A protoConverter converts a proto definition to CUE. Proto files map to
@@ -185,20 +164,24 @@ type protoConverter struct {
 	file    *ast.File
 	current *ast.StructLit
 
-	sorted   []string
 	imported map[string]bool
 
 	path    []string
 	scope   []map[string]mapping // for symbols resolution within package.
 	symbols map[string]bool      // symbols provided by package
-	aliases map[string]string    // for shadowed packages
 }
 
 type mapping struct {
-	ref     string
-	cueName string
-	alias   string // alias for the type, if exists.
-	pkg     *protoConverter
+	cue func() ast.Expr // needs to be a new copy as position changes
+	pkg *protoConverter
+}
+
+func (p *protoConverter) qualifiedImportPath() string {
+	s := p.importPath()
+	if short := p.shortPkgName; short != "" && short != path.Base(s) {
+		s += ":" + short
+	}
+	return s
 }
 
 func (p *protoConverter) importPath() string {
@@ -224,12 +207,12 @@ func (p *protoConverter) toCUEPos(pos scanner.Position) token.Pos {
 	return p.tfile.Pos(pos.Offset, 0)
 }
 
-func (p *protoConverter) addRef(pos scanner.Position, name, cuename string) {
+func (p *protoConverter) addRef(pos scanner.Position, name string, cue func() ast.Expr) {
 	top := p.scope[len(p.scope)-1]
 	if _, ok := top[name]; ok {
 		failf(pos, "entity %q already defined", name)
 	}
-	top[name] = mapping{ref: name, cueName: cuename}
+	top[name] = mapping{cue: cue}
 }
 
 func (p *protoConverter) addNames(elems []proto.Visitee) {
@@ -261,7 +244,7 @@ func (p *protoConverter) addNames(elems []proto.Visitee) {
 		}
 		sym := strings.Join(append(p.path, name), ".")
 		p.symbols[sym] = true
-		p.addRef(pos, name, "#"+name)
+		p.addRef(pos, name, func() ast.Expr { return ast.NewIdent("#" + name) })
 	}
 }
 
@@ -269,68 +252,24 @@ func (p *protoConverter) popNames() {
 	p.scope = p.scope[:len(p.scope)-1]
 }
 
-func (p *protoConverter) uniqueTop(name string, asIs bool) string {
-	a := strings.SplitN(name, ".", 2)
-	for i := len(p.scope) - 1; i > 0; i-- {
-		if _, ok := p.scope[i][a[0]]; ok {
-			first := a[0]
-			alias, ok := p.aliases[first]
-			if !ok {
-				// TODO: this is likely to be okay, but find something better.
-				alias = "_" + first + "_"
-				p.file.Decls = append(p.file.Decls, &ast.LetClause{
-					Ident: ast.NewIdent(alias),
-					Expr:  ast.NewIdent(first),
-				})
-				p.aliases[first] = alias
-			}
-			a[0] = alias
-			if len(a) > 1 && !asIs {
-				a[1] = "#" + a[1]
-			}
-			return strings.Join(a, ".")
-		}
-	}
-
-	if e, ok := p.scope[0][name]; ok {
-		return e.cueName
-	}
-	// TODO: do something more principled.
-	switch name {
-	case "time.Time", "time.Duration":
-		return name
-	}
-	if !asIs {
-		a[len(a)-1] = "#" + a[len(a)-1]
-	}
-	return strings.Join(a, ".")
-}
-
-func (p *protoConverter) toExpr(pos scanner.Position, name string) (expr ast.Expr) {
-	expr, err := parser.ParseExpr("", name, parser.ParseComments)
-	if err != nil {
-		panic(fmt.Sprintf("error parsing name %q: %v", name, err))
-	}
-	ast.SetPos(expr, p.toCUEPos(pos))
-	return expr
-}
-
-func (p *protoConverter) resolve(pos scanner.Position, name string, options []*proto.Option) string {
-	if s, ok := protoToCUE(name, options); ok {
-		return p.uniqueTop(s, true)
+func (p *protoConverter) resolve(pos scanner.Position, name string, options []*proto.Option) ast.Expr {
+	if expr := protoToCUE(name, options); expr != nil {
+		ast.SetPos(expr, p.toCUEPos(pos))
+		return expr
 	}
 	if strings.HasPrefix(name, ".") {
 		return p.resolveTopScope(pos, name[1:], options)
 	}
 	for i := len(p.scope) - 1; i > 0; i-- {
 		if m, ok := p.scope[i][name]; ok {
-			return m.cueName
+			return m.cue()
 		}
 	}
-	return p.resolveTopScope(pos, name, options)
+	expr := p.resolveTopScope(pos, name, options)
+	return expr
 }
 
-func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, options []*proto.Option) string {
+func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, options []*proto.Option) ast.Expr {
 	for i := 0; i < len(name); i++ {
 		k := strings.IndexByte(name[i:], '.')
 		i += k
@@ -338,18 +277,23 @@ func (p *protoConverter) resolveTopScope(pos scanner.Position, name string, opti
 			i = len(name)
 		}
 		if m, ok := p.scope[0][name[:i]]; ok {
-			isPkg := false
 			if m.pkg != nil {
-				p.imported[m.pkg.importPath()] = true
-				// TODO: do something more principled.
-				isPkg = true
+				p.imported[m.pkg.qualifiedImportPath()] = true
 			}
-			cueName := name[i:]
-			return p.uniqueTop(m.ref+cueName, !isPkg || m.ref == m.cueName)
+			expr := m.cue()
+			for i < len(name) {
+				name = name[i+1:]
+				if i = strings.IndexByte(name, '.'); i == -1 {
+					i = len(name)
+				}
+				expr = ast.NewSel(expr, "#"+name[:i])
+			}
+			ast.SetPos(expr, p.toCUEPos(pos))
+			return expr
 		}
 	}
 	failf(pos, "name %q not found", name)
-	return ""
+	return nil
 }
 
 func (p *protoConverter) doImport(v *proto.Import) error {
@@ -383,11 +327,6 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 		fail(v.Position, err)
 	}
 
-	prefix := ""
-	if imp.importPath() != p.importPath() {
-		prefix = imp.shortName() + "."
-	}
-
 	pkgNamespace := strings.Split(imp.protoPkg, ".")
 	curNamespace := strings.Split(p.protoPkg, ".")
 	for {
@@ -398,10 +337,23 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 			}
 			if _, ok := p.scope[0][ref]; !ok {
 				pkg := imp
-				if imp.importPath() == p.importPath() {
+				a := toCue(k)
+
+				var f func() ast.Expr
+
+				if imp.qualifiedImportPath() == p.qualifiedImportPath() {
 					pkg = nil
+					f = func() ast.Expr { return ast.NewIdent(a[0]) }
+				} else {
+					f = func() ast.Expr {
+						ident := &ast.Ident{
+							Name: imp.shortName(),
+							Node: ast.NewImport(nil, imp.qualifiedImportPath()),
+						}
+						return ast.NewSel(ident, a[0])
+					}
 				}
-				p.scope[0][ref] = mapping{prefix + k, prefix + toCue(k), "", pkg}
+				p.scope[0][ref] = mapping{f, pkg}
 			}
 		}
 		if len(pkgNamespace) == 0 {
@@ -417,12 +369,12 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 }
 
 // TODO: this doesn't work. Do something more principled.
-func toCue(name string) string {
+func toCue(name string) []string {
 	a := strings.Split(name, ".")
 	for i, s := range a {
 		a[i] = "#" + s
 	}
-	return strings.Join(a, ".")
+	return a
 }
 
 func (p *protoConverter) stringLit(pos scanner.Position, s string) *ast.BasicLit {
@@ -557,7 +509,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		// All keys are converted to strings.
 		// TODO: support integer keys.
 		f.Label = ast.NewList(ast.NewIdent("string"))
-		f.Value = p.toExpr(x.Position, p.resolve(x.Position, x.Type, x.Options))
+		f.Value = p.resolve(x.Position, x.Type, x.Options)
 
 		name := p.ident(x.Position, x.Name)
 		f = &ast.Field{
@@ -746,14 +698,16 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 	name := p.ident(x.Position, x.Name)
 	f.Label = name
 	typ := p.resolve(x.Position, x.Type, x.Options)
-	f.Value = p.toExpr(x.Position, typ)
+	f.Value = typ
 	s.Elts = append(s.Elts, f)
 
 	o := optionParser{message: s, field: f}
 
 	// body of @protobuf tag: sequence[,type][,name=<name>][,...]
 	o.tags += fmt.Sprint(x.Sequence)
-	if x.Type != strings.TrimLeft(typ, "#") {
+	b, _ := format.Node(typ)
+	str := string(b)
+	if x.Type != strings.TrimLeft(str, "#") {
 		o.tags += ",type=" + x.Type
 	}
 	if x.Name != name.Name {

@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -25,6 +24,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -191,7 +191,18 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 					"recordCount", ast.NewLit(token.INT, strconv.Itoa(len(objs))),
 				)
 			}
-			inst, err := runtime.CompileExpr(expr)
+			var f *ast.File
+			if s, ok := expr.(*ast.StructLit); ok {
+				f = &ast.File{Decls: s.Elts}
+			} else {
+				f = &ast.File{Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}}}
+			}
+			err := astutil.Sanitize(f)
+			if err != nil {
+				return nil, errors.Wrapf(err, token.NoPos,
+					"invalid combination of input files")
+			}
+			inst, err := runtime.CompileFile(f)
 			if err != nil {
 				return nil, err
 			}
@@ -273,7 +284,7 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 		}
 	}
 
-	return f, nil
+	return f, astutil.Sanitize(f)
 }
 
 func parseFullPath(inst *cue.Instance, exprs string) (p []ast.Label, t []token.Token, err error) {

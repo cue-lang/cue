@@ -17,7 +17,7 @@
 package v1
 
 import (
-	"google.golang.org/genproto/googleapis/rpc/status"
+	status_1 "google.golang.org/genproto/googleapis/rpc/status"
 	"time"
 )
 
@@ -59,7 +59,7 @@ import (
 	#PreconditionResult: {
 		// A status code of OK indicates all preconditions were satisfied. Any other code indicates not
 		// all preconditions were satisfied and details describe why.
-		status?: _status_.#Status @protobuf(1,type=google.rpc.Status,"(gogoproto.nullable)=false")
+		status?: status_1.#Status @protobuf(1,type=google.rpc.Status,"(gogoproto.nullable)=false")
 
 		// The amount of time for which this result can be considered valid.
 		validDuration?: time.Duration @protobuf(2,type=google.protobuf.Duration,name=valid_duration,"(gogoproto.nullable)=false","(gogoproto.stdduration)")
@@ -98,7 +98,6 @@ import (
 		[string]: #QuotaResult
 	} @protobuf(3,type=map<string,QuotaResult>,"(gogoproto.nullable)=false")
 }
-let _status_ = status
 
 // Describes the attributes that were used to determine the response.
 // This can be used to construct a response cache.

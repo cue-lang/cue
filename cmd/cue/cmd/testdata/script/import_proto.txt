@@ -164,9 +164,9 @@ message Timestamp {
 package v1
 
 import (
-	"googleapis.com/acme/test"
-	"googleapis.com/acme/test/test"
 	"time"
+	"googleapis.com/acme/test"
+	"googleapis.com/acme/test/test:test_test"
 )
 
 // Attributes defines attributes.

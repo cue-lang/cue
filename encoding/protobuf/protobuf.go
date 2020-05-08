@@ -272,11 +272,6 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 		}
 
 		inst.Files = append(inst.Files, f)
-		// inst.CUEFiles = append(inst.CUEFiles, f.Filename)
-		// err := parser.Resolve(f)
-		// if err != nil {
-		// 	return nil, err
-		// }
 
 		for pkg := range r.p.imported {
 			inst.ImportPaths = append(inst.ImportPaths, pkg)
@@ -311,7 +306,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	if b.errs != nil {
 		return nil
 	}
-	importPath := p.importPath()
+	importPath := p.qualifiedImportPath()
 	if importPath == "" {
 		err := errors.Newf(token.NoPos,
 			"no package clause for proto package %q in file %s", p.id, p.file.Filename)
@@ -321,7 +316,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	}
 
 	dir := b.root
-	path := importPath
+	path := p.importPath()
 	file := p.file.Filename
 	if !filepath.IsAbs(file) {
 		file = filepath.Join(b.root, p.file.Filename)

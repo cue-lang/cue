@@ -18,13 +18,9 @@ import (
 	"encoding/hex"
 	"fmt"
 	"hash/fnv"
-	"path"
 	"reflect"
-	"strconv"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/token"
 )
 
 // A Cursor describes a node encountered during Apply.
@@ -130,10 +126,7 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 		return nil
 	}
 
-	name := path.Base(importPath)
-	if p := strings.LastIndexByte(name, ':'); p > 0 {
-		name = name[p+1:]
-	}
+	name := importPathName(importPath)
 
 	// TODO: come up with something much better.
 	// For instance, hoist the uniquer form cue/export.go to
@@ -141,51 +134,10 @@ func (c *cursor) Import(importPath string) *ast.Ident {
 	hash := fnv.New32()
 	name += hex.EncodeToString(hash.Sum([]byte(importPath)))[:6]
 
-	quoted := strconv.Quote(importPath)
-
-	var imports *ast.ImportDecl
-	var spec *ast.ImportSpec
-	decls := info.current.decls
-	i := 0
-outer:
-	for ; i < len(decls); i++ {
-		d := decls[i]
-		switch t := d.(type) {
-		default:
-			break outer
-
-		case *ast.Package:
-		case *ast.CommentGroup:
-		case *ast.ImportDecl:
-			imports = t
-			for _, s := range t.Specs {
-				if s.Path.Value != quoted ||
-					s.Name == nil ||
-					s.Name.Name != name {
-					continue
-				}
-				spec = s
-				break
-			}
-		}
-	}
-
-	if spec == nil {
-		// Import not found, add one.
-		if imports == nil {
-			imports = &ast.ImportDecl{}
-			a := append(append(decls[:i], imports), decls[i:]...)
-			decls = a
-			info.current.decls = decls
-		}
-		path := ast.NewLit(token.STRING, quoted)
-		spec = &ast.ImportSpec{
-			Name: ast.NewIdent(name),
-			Path: path,
-		}
-		imports.Specs = append(imports.Specs, spec)
-		ast.SetRelPos(imports.Specs[0], token.NoRelPos)
-	}
+	spec := insertImport(&info.current.decls, &ast.ImportSpec{
+		Name: ast.NewIdent(name),
+		Path: ast.NewString(importPath),
+	})
 
 	ident := &ast.Ident{Node: spec} // Name is set later.
 	info.importPatch = append(info.importPatch, ident)

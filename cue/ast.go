@@ -600,6 +600,14 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		}
 
 		f := v.label(name, true)
+		if _, ok := n.Node.(*ast.ImportSpec); ok {
+			n2 := v.mapScope(n.Node)
+			ref := &nodeRef{baseValue: newExpr(n), node: n2, label: f}
+			ret = ref
+			break
+		}
+
+		// TODO: probably unused. Verify and remove.
 		if n.Scope == nil {
 			// Package or direct ancestor node.
 			n2 := v.mapScope(n.Node)

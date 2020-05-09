@@ -613,13 +613,30 @@ func TestShadowing(t *testing.T) {
 	}{{
 		file: &ast.File{Decls: []ast.Decl{
 			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
+			&ast.EmbedDecl{
+				Expr: ast.NewStruct(
+					&ast.Field{
+						Label: mustParseExpr(`list`).(*ast.Ident),
+						Value: ast.NewCall(
+							ast.NewSel(
+								&ast.Ident{Name: "list", Node: spec},
+								"Min")),
+					})},
+		}},
+		want: "import \"list\", let LIST=list, {list: LIST.Min()}",
+	}, {
+		file: &ast.File{Decls: []ast.Decl{
+			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec}},
 			&ast.Field{
-				Label: mustParseExpr(`list`).(*ast.Ident),
-				Value: ast.NewCall(
-					ast.NewSel(&ast.Ident{Name: "list", Node: spec}, "Min")),
+				Label: ast.NewIdent("a"),
+				Value: ast.NewStruct(&ast.Field{
+					Label: mustParseExpr(`list`).(*ast.Ident),
+					Value: ast.NewCall(
+						ast.NewSel(&ast.Ident{Name: "list", Node: spec}, "Min")),
+				}),
 			},
 		}},
-		want: "import listx \"list\", list: listx.Min()",
+		want: "import \"list\", let LIST=list, a: {list: LIST.Min()}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

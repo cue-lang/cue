@@ -27,17 +27,59 @@ import (
 // An ErrFunc processes errors.
 type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 
+// TODO: future development
+//
+// Resolution currently assigns values along the table below. This is based on
+// Go's resolver and is not quite convenient for CUE's purposes. For one, CUE
+// allows manually setting resolution and than call astutil.Sanitize to
+// normalize the ast.File. Manually assigning resolutions according to the
+// below table is rather tedious though.
+//
+// Instead of using the Scope and Node fields in identifiers, we suggest the
+// following assignments:
+//
+//    Reference Node // an Decl or Clause
+//    Ident *Ident   // The identifier in References (optional)
+//
+// References always refers to the direct element in the scope in which the
+// identifier occurs, not the final value, so: *Field, *LetClause, *ForClause,
+// etc. In case Ident is defined, it must be the same pointer as the
+// referencing identifier. In case it is not defined, the Name of the
+// referencing identifier can be used to locate the proper identifier in the
+// referenced node.
+//
+// The Scope field in the original design then loses its function.
+//
+// Type of reference      Scope          Node
+// Let Clause             File/Struct    LetClause
+// Alias declaration      File/Struct    Alias (deprecated)
+// Illegal Reference      File/Struct
+// Fields
+//   X in X: y            File/Struct    Expr (y)
+//   X in X=x: y          File/Struct    Field
+//   X in X="\(x)": y     File/Struct    Field
+//   X in [X=x]: y        Field          Expr (x)
+//   X in X=[x]: y        Field          Field
+//
+// for k, v in            Field          ForClause
+//
+// Template               Field          Template
+// Fields inside lambda
+//    Label               Field          Expr
+//    Value               Field          Field
+// Pkg                    nil            ImportSpec
+
 // Resolve resolves all identifiers in a file. Unresolved identifiers are
 // recorded in Unresolved. It will not overwrite already resolved values.
 func Resolve(f *ast.File, errFn ErrFunc) {
-	walk(&scope{errFn: errFn}, f)
+	walk(&scope{errFn: errFn, identFn: resolveIdent}, f)
 }
 
 // Resolve resolves all identifiers in an expression.
 // It will not overwrite already resolved values.
 func ResolveExpr(e ast.Expr, errFn ErrFunc) {
 	f := &ast.File{}
-	walk(&scope{file: f, errFn: errFn}, e)
+	walk(&scope{file: f, errFn: errFn, identFn: resolveIdent}, e)
 }
 
 // A Scope maintains the set of named language entities declared
@@ -48,20 +90,29 @@ type scope struct {
 	file    *ast.File
 	outer   *scope
 	node    ast.Node
-	index   map[string]ast.Node
+	index   map[string]entry
 	inField bool
 
-	errFn func(p token.Pos, msg string, args ...interface{})
+	identFn func(s *scope, n *ast.Ident) bool
+	nameFn  func(name string)
+	errFn   func(p token.Pos, msg string, args ...interface{})
+}
+
+type entry struct {
+	node ast.Node
+	link ast.Node // Alias, LetClause, or Field
 }
 
 func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope {
 	const n = 4 // initial scope capacity
 	s := &scope{
-		file:  f,
-		outer: outer,
-		node:  node,
-		index: make(map[string]ast.Node, n),
-		errFn: outer.errFn,
+		file:    f,
+		outer:   outer,
+		node:    node,
+		index:   make(map[string]entry, n),
+		identFn: outer.identFn,
+		nameFn:  outer.nameFn,
+		errFn:   outer.errFn,
 	}
 	for _, d := range decls {
 		switch x := d.(type) {
@@ -72,7 +123,7 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 				// TODO(legacy): use name := a.Ident.Name once quoted
 				// identifiers are no longer supported.
 				if name, _, _ := ast.LabelName(a.Ident); name != "" {
-					s.insert(name, x)
+					s.insert(name, x, a)
 				}
 				label, _ = a.Expr.(ast.Label)
 			}
@@ -85,26 +136,30 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 					break
 				}
 				if a, ok := y.Elts[0].(*ast.Alias); ok {
-					s.insert(a.Ident.Name, x)
+					s.insert(a.Ident.Name, x, a)
 				}
 			}
 
 			// default:
 			name, isIdent, _ := ast.LabelName(label)
 			if isIdent {
-				s.insert(name, x.Value)
+				s.insert(name, x.Value, x)
 			}
 		case *ast.LetClause:
 			name, isIdent, _ := ast.LabelName(x.Ident)
 			if isIdent {
-				s.insert(name, x)
+				s.insert(name, x, x)
 			}
 		case *ast.Alias:
 			name, isIdent, _ := ast.LabelName(x.Ident)
 			if isIdent {
-				s.insert(name, x)
+				s.insert(name, x, x)
 			}
-			// Handle imports
+		case *ast.ImportDecl:
+			for _, spec := range x.Specs {
+				info, _ := ParseImportSpec(spec)
+				s.insert(info.Ident, spec, spec)
+			}
 		}
 	}
 	return s
@@ -115,32 +170,48 @@ func (s *scope) isLet(n ast.Node) bool {
 		return true
 	}
 	switch n.(type) {
-	case *ast.LetClause:
-		return true
-
-	case *ast.Alias:
-		return true
-
-	case *ast.Field:
+	case *ast.LetClause, *ast.Alias, *ast.Field:
 		return true
 	}
 	return false
 }
 
-func (s *scope) insert(name string, n ast.Node) {
+func (s *scope) mustBeUnique(n ast.Node) bool {
+	if _, ok := s.node.(*ast.Field); ok {
+		return true
+	}
+	switch n.(type) {
+	// TODO: add *ast.ImportSpec when some implementations are moved over to
+	// Sanitize.
+	case *ast.ImportSpec, *ast.LetClause, *ast.Alias, *ast.Field:
+		return true
+	}
+	return false
+}
+
+func (s *scope) insert(name string, n, link ast.Node) {
 	if name == "" {
 		return
 	}
+	if s.nameFn != nil {
+		s.nameFn(name)
+	}
 	// TODO: record both positions.
-	if outer, _, existing := s.lookup(name); existing != nil {
-		isAlias1 := s.isLet(n)
-		isAlias2 := outer.isLet(existing)
-		if isAlias1 != isAlias2 {
+	if outer, _, existing := s.lookup(name); existing.node != nil {
+		if s.isLet(n) != outer.isLet(existing.node) {
 			s.errFn(n.Pos(), "cannot have both alias and field with name %q in same scope", name)
 			return
-		} else if isAlias1 || isAlias2 {
+		} else if s.mustBeUnique(n) || outer.mustBeUnique(existing.node) {
 			if outer == s {
-				s.errFn(n.Pos(), "alias %q redeclared in same scope", name)
+				if _, ok := existing.node.(*ast.ImportSpec); ok {
+					return
+					// TODO:
+					s.errFn(n.Pos(), "conflicting declaration %s\n"+
+						"\tprevious declaration at %s",
+						name, existing.node.Pos())
+				} else {
+					s.errFn(n.Pos(), "alias %q redeclared in same scope", name)
+				}
 				return
 			}
 			// TODO: Should we disallow shadowing of aliases?
@@ -149,37 +220,37 @@ func (s *scope) insert(name string, n ast.Node) {
 			// s.errFn(n.Pos(), "alias %q already declared in enclosing scope", name)
 		}
 	}
-	s.index[name] = n
+	s.index[name] = entry{node: n, link: link}
 }
 
-func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, ok bool) {
+func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, e entry, ok bool) {
 	last := s
 	for s != nil {
-		if n, ok := s.index[name]; ok && node == n {
-			if last.node == n {
-				return nil, true
+		if n, ok := s.index[name]; ok && node == n.node {
+			if last.node == n.node {
+				return nil, n, true
 			}
-			return s.node, true
+			return s.node, n, true
 		}
 		s, last = s.outer, s
 	}
-	return nil, false
+	return nil, entry{}, false
 }
 
-func (s *scope) lookup(name string) (p *scope, obj, node ast.Node) {
+func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 	// TODO(#152): consider returning nil for obj if it is a reference to root.
 	// last := s
 	for s != nil {
 		if n, ok := s.index[name]; ok {
-			// if last.node == n {
-			// 	return nil, n
-			// }
+			if _, ok := n.node.(*ast.ImportSpec); ok {
+				return s, nil, n
+			}
 			return s, s.node, n
 		}
 		// s, last = s.outer, s
 		s = s.outer
 	}
-	return nil, nil, nil
+	return nil, nil, entry{}
 }
 
 func (s *scope) After(n ast.Node) {}
@@ -220,7 +291,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			s = newScope(s.file, s, x, nil)
 			if alias != nil {
 				if name, _, _ := ast.LabelName(alias.Ident); name != "" {
-					s.insert(name, x)
+					s.insert(name, x, alias)
 				}
 			}
 
@@ -237,7 +308,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 				// to detect illegal usage, though.
 				name, err := ast.ParseIdent(a.Ident)
 				if err == nil {
-					s.insert(name, a.Expr)
+					s.insert(name, a.Expr, a)
 				}
 			}
 
@@ -257,7 +328,7 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			s = newScope(s.file, s, x, nil)
 			name, err := ast.ParseIdent(label.Ident)
 			if err == nil {
-				s.insert(name, x.Label) // Field used for entire lambda.
+				s.insert(name, x.Label, x) // Field used for entire lambda.
 			}
 		}
 
@@ -305,33 +376,39 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		return nil
 
 	case *ast.Ident:
-		name, ok, _ := ast.LabelName(x)
-		if !ok {
-			// TODO: generate error
-			break
+		if s.identFn(s, x) {
+			return nil
 		}
-		if _, obj, node := s.lookup(name); node != nil {
-			switch {
-			case x.Node == nil:
-				x.Node = node
-				x.Scope = obj
-
-			case x.Node == node:
-				x.Scope = obj
-
-			default: // x.Node != node
-				scope, ok := s.resolveScope(name, x.Node)
-				if !ok {
-					s.file.Unresolved = append(s.file.Unresolved, x)
-				}
-				x.Scope = scope
-			}
-		} else {
-			s.file.Unresolved = append(s.file.Unresolved, x)
-		}
-		return nil
 	}
 	return s
+}
+
+func resolveIdent(s *scope, x *ast.Ident) bool {
+	name, ok, _ := ast.LabelName(x)
+	if !ok {
+		// TODO: generate error
+		return false
+	}
+	if _, obj, node := s.lookup(name); node.node != nil {
+		switch {
+		case x.Node == nil:
+			x.Node = node.node
+			x.Scope = obj
+
+		case x.Node == node.node:
+			x.Scope = obj
+
+		default: // x.Node != node
+			scope, _, ok := s.resolveScope(name, x.Node)
+			if !ok {
+				s.file.Unresolved = append(s.file.Unresolved, x)
+			}
+			x.Scope = scope
+		}
+	} else {
+		s.file.Unresolved = append(s.file.Unresolved, x)
+	}
+	return true
 }
 
 func scopeClauses(s *scope, clauses []ast.Clause) *scope {
@@ -342,12 +419,12 @@ func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 			if f.Key != nil {
 				name, err := ast.ParseIdent(f.Key)
 				if err == nil {
-					s.insert(name, f.Key)
+					s.insert(name, f.Key, f)
 				}
 			}
 			name, err := ast.ParseIdent(f.Value)
 			if err == nil {
-				s.insert(name, f.Value)
+				s.insert(name, f.Value, f)
 			}
 		} else {
 			walk(s, c)

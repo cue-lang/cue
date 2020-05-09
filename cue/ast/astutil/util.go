@@ -14,7 +14,63 @@
 
 package astutil
 
-import "cuelang.org/go/cue/ast"
+import (
+	"path"
+	"strconv"
+	"strings"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
+)
+
+// importPathName derives the name from the given import path.
+//
+// Examples:
+//      string           string
+//      foo.com/bar      bar
+//      foo.com/bar:baz  baz
+//
+func importPathName(id string) string {
+	name := path.Base(id)
+	if p := strings.LastIndexByte(name, ':'); p > 0 {
+		name = name[p+1:]
+	}
+	return name
+}
+
+// ImportInfo describes the information contained in an ImportSpec.
+type ImportInfo struct {
+	Ident   string // identifier used to refer to the import
+	PkgName string // name of the package
+	ID      string // full import path, including the name
+	Dir     string // import path, excluding the name
+}
+
+// ParseImportSpec returns the name and full path of an ImportSpec.
+func ParseImportSpec(spec *ast.ImportSpec) (info ImportInfo, err error) {
+	str, err := strconv.Unquote(spec.Path.Value)
+	if err != nil {
+		return info, err
+	}
+
+	info.ID = str
+
+	if p := strings.LastIndexByte(str, ':'); p > 0 {
+		info.Dir = str[:p]
+		info.PkgName = str[p+1:]
+	} else {
+		info.Dir = str
+		info.PkgName = path.Base(str)
+	}
+
+	if spec.Name != nil {
+		info.Ident = spec.Name.Name
+	} else {
+		info.Ident = info.PkgName
+	}
+
+	return info, nil
+}
 
 // CopyComments associates comments of one node with another.
 // It may change the relative position of comments.
@@ -42,4 +98,55 @@ func CopyMeta(to, from ast.Node) ast.Node {
 	ast.SetComments(to, from.Comments())
 	ast.SetPos(to, from.Pos())
 	return to
+}
+
+// insertImport looks up an existing import with the given name and path or will
+// add spec if it doesn't exist. It returns a spec in decls matching spec.
+func insertImport(decls *[]ast.Decl, spec *ast.ImportSpec) *ast.ImportSpec {
+	x, _ := ParseImportSpec(spec)
+
+	a := *decls
+
+	var imports *ast.ImportDecl
+	var orig *ast.ImportSpec
+	i := 0
+outer:
+	for ; i < len(a); i++ {
+		d := a[i]
+		switch t := d.(type) {
+		default:
+			break outer
+
+		case *ast.Package:
+		case *ast.CommentGroup:
+		case *ast.ImportDecl:
+			imports = t
+			for _, s := range t.Specs {
+				y, _ := ParseImportSpec(s)
+				if y.ID != x.ID {
+					continue
+				}
+				orig = s
+				if x.Ident == "" || y.Ident == x.Ident {
+					return s
+				}
+			}
+		}
+	}
+
+	// Import not found, add one.
+	if imports == nil {
+		imports = &ast.ImportDecl{}
+		preamble := append(a[:i:i], imports)
+		a = append(preamble, a[i:]...)
+		*decls = a
+	}
+
+	if orig != nil {
+		CopyComments(spec, orig)
+	}
+	imports.Specs = append(imports.Specs, spec)
+	ast.SetRelPos(imports.Specs[0], token.NoRelPos)
+
+	return spec
 }

@@ -7,7 +7,7 @@ import (
 )
 
 import (
-	"time"
+	time1 "time"
 
 	// comment f2
 	f2 "cuelang.org/go/foo"
@@ -15,10 +15,10 @@ import (
 )
 
 import (
-	"time"
+	time2 "time"
 
-	same "cuelang.org/go/foo" // comment 2
-	same "cuelang.org/go/foo" // comment 1
+	same "cuelang.org/go/foo"  // comment 1
+	same2 "cuelang.org/go/foo" // comment 2
 )
 
 a: time.time

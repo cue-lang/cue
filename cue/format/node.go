@@ -352,7 +352,7 @@ func (f *formatter) decl(decl ast.Decl) {
 			break
 		}
 		switch {
-		case len(n.Specs) == 1:
+		case len(n.Specs) == 1 && len(n.Specs[0].Comments()) == 0:
 			if !n.Lparen.IsValid() {
 				f.print(blank)
 				f.walkSpecList(n.Specs)

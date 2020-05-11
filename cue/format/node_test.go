@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // TestInvalidAST verifies behavior for various invalid AST inputs. In some
@@ -46,6 +47,17 @@ func TestInvalidAST(t *testing.T) {
 		node: &ast.Field{Label: &ast.Ident{}, Value: ast.NewString("foo")},
 		// Force a new struct.
 		out: `"": "foo"`,
+	}, {
+		desc: "ImportDecl without parens, but imports with comments",
+		node: func() ast.Node {
+			n := ast.NewImport(nil, "time")
+			ast.AddComment(n, internal.NewComment(true, "hello"))
+			return &ast.ImportDecl{Specs: []*ast.ImportSpec{n}}
+		}(),
+		out: `import (
+	// hello
+	"time"
+)`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

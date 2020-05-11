@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"strings"
@@ -122,10 +121,14 @@ func MainTest() int {
 
 // Main runs the cue tool and returns the code for passing to os.Exit.
 func Main() int {
+	cwd, _ := os.Getwd()
 	err := mainErr(context.Background(), os.Args[1:])
 	if err != nil {
 		if err != ErrPrintedError {
-			fmt.Fprintln(os.Stderr, err)
+			errors.Print(os.Stderr, err, &errors.Config{
+				Cwd:     cwd,
+				ToSlash: inTest,
+			})
 		}
 		return 1
 	}

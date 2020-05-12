@@ -38,7 +38,7 @@ package expressions
 		aaa: 10
 	}
 
-	someDefinition :: {
+	#someDefinition: {
 		embedding
 
 		field: 2

@@ -52,9 +52,10 @@
 //     	// long is a longer description that spans multiple lines and
 //     	// likely contain examples of usage of the command.
 //     	$long?: string
-//
-//     	// TODO: child commands.
 //     }
+//
+//     // TODO:
+//     // - child commands?
 //
 //     // Tasks defines a hierarchy of tasks. A command completes if all tasks have
 //     // run to completion.
@@ -62,8 +63,8 @@
 //     	[name=Name]: Tasks
 //     }
 //
-//     // Name defines a valid task or command sname.
-//     Name :: =~#"^\PL(\PL|\PN|-(\PL|\PN))*$"#
+//     // #Name defines a valid task or command name.
+//     Name: =~#"^\PL([-](\PL|\PN))*$"#
 //
 //     // A Task defines a step in the execution of a command.
 //     Task: {
@@ -72,6 +73,15 @@
 //     	// kind indicates the operation to run. It must be of the form
 //     	// packagePath.Operation.
 //     	$id: =~#"\."#
+//
+//     	// $after can be used to specify a task is run after another one, when
+//     	// it does not otherwise refer to an output of that task.
+//     	$after?: Task | [...Task]
 //     }
+//
+//     // TODO: consider these options:
+//     //   $success: bool
+//     //   $runif: a.b.$success or $guard: a.b.$success
+//     // With this `$after: a.b` would just be a shorthand for `$guard: a.b.$success`.
 //
 package tool

@@ -15,8 +15,6 @@
 package cue
 
 import (
-	goast "go/ast"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -299,21 +297,24 @@ func (inst *Instance) LookupDef(path string) Value {
 // path is not. The empty path returns v itself.
 //
 // It cannot look up hidden or unexported fields.
+//
+// Deprecated: this API does not work with new-style definitions. Use
+// FieldByName defined on inst.Value().
 func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
 	idx := inst.index
 	ctx := idx.newContext()
 	v := newValueRoot(ctx, inst.rootValue)
-	for i, k := range path {
+	for _, k := range path {
 		s, err := v.Struct()
 		if err != nil {
 			return f, err
 		}
 
-		f, err = s.FieldByName(k)
+		f, err = s.FieldByName(k, true)
 		if err != nil {
 			return f, err
 		}
-		if f.IsHidden || (i == 0 || f.IsDefinition) && !goast.IsExported(f.Name) {
+		if f.IsHidden {
 			return f, errNotFound
 		}
 		v = f.Value

@@ -3639,7 +3639,7 @@ var builtinPackages = map[string]*builtinPkg{
 		$id:     =~"\\."
 		$after?: Task | [...Task]
 	}
-	Name :: =~"^\\PL([-](\\PL|\\PN))*$"
+	Name: =~"^\\PL([-](\\PL|\\PN))*$"
 }`,
 	},
 	"tool/cli": {
@@ -3739,8 +3739,8 @@ var builtinPackages = map[string]*builtinPkg{
 	"tool/os": {
 		native: []*builtin{{}},
 		cue: `{
-	Name ::  !="" & !~"^[$]"
-	Value :: bool | number | *string | null
+	Name:  !="" & !~"^[$]"
+	Value: bool | number | *string | null
 	Setenv: {
 		$id: "tool/os.Setenv"
 		{[Name]: Value}

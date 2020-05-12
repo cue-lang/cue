@@ -416,7 +416,7 @@ cuelang.org/go/pkg/tool/tool.cue.
 
 	command: [Name]: Command
 
-	Command :: {
+	Command: {
 		// Tasks specifies the things to run to complete a command. Tasks are
 		// typically underspecified and completed by the particular internal
 		// handler that is running them. Tasks can be a single task, or a full
@@ -447,7 +447,7 @@ cuelang.org/go/pkg/tool/tool.cue.
 	}
 
 	// Name defines a valid task or command name.
-	Name :: =~#"^\PL([-](\PL|\PN))*$"#
+	Name: =~#"^\PL([-](\PL|\PN))*$"#
 
 	// A Task defines a step in the execution of a command.
 	Task: {

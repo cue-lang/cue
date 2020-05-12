@@ -6,10 +6,10 @@
 //
 //     // A Value are all possible values allowed in flags.
 //     // A null value unsets an environment variable.
-//     Value :: bool | number | *string | null
+//     Value: bool | number | *string | null
 //
 //     // Name indicates a valid flag name.
-//     Name :: !="" & !~"^[$]"
+//     Name: !="" & !~"^[$]"
 //
 //     // Setenv defines a set of command line flags, the values of which will be set
 //     // at run time. The doc comment of the flag is presented to the user in help.
@@ -19,14 +19,14 @@
 //     Setenv: {
 //         $id: "tool/os.Setenv"
 //
-//         [Name]: Value
+//         {[Name]: Value}
 //     }
 //
 //     // Getenv gets and parses the specific command line variables.
 //     Getenv: {
 //         $id: "tool/os.Getenv"
 //
-//         [Name]: Value
+//         {[Name]: Value}
 //     }
 //
 //     // Environ populates a struct with all environment variables.
@@ -37,7 +37,7 @@
 //         // Individual entries may be specified ahead of time to enable
 //         // validation and parsing. Values that are marked as required
 //         // will fail the task if they are not found.
-//         [Name]: Value
+//         {[Name]: Value}
 //     }
 //
 //     // Clearenv clears all environment variables.

@@ -704,13 +704,13 @@ func TestAllFields(t *testing.T) {
 func TestLookup(t *testing.T) {
 	var runtime = new(Runtime)
 	inst, err := runtime.Compile("x.cue", `
-V :: {
+#V: {
 	x: int
 }
-X :: {
+#X: {
 	[string]: int64
-} & V
-v: X
+} & #V
+v: #X
 `)
 	if err != nil {
 		t.Fatalf("compile: %v", err)
@@ -747,7 +747,7 @@ v: X
 			if err != nil {
 				t.Fatal(err)
 			}
-			fi, err := s.FieldByName(ref)
+			fi, err := s.FieldByName(ref, false)
 			if err != nil {
 				t.Fatal(err)
 			}

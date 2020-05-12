@@ -93,10 +93,10 @@ func TestExport(t *testing.T) {
 	}, {
 		// Here the failed lookups are permanent failures as the structs are
 		// closed.
-		in: `{ a :: { b: 2.0, s: "abc" }, b: a.b, c: a.c, d: a["d"], e: a.t[2:3] }`,
+		in: `{ #a: { b: 2.0, s: "abc" }, b: #a.b, c: #a.c, d: #a["d"], e: #a.t[2:3] }`,
 		out: unindent(`
 			{
-				a :: {
+				#a: {
 					b: 2.0
 					s: "abc"
 				}

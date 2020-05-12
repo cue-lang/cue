@@ -73,7 +73,7 @@ func ExampleValue_Subsume() {
 	inst, err := r.Compile("apis", `
 	// Release notes:
 	// - You can now specify your age and your hobby!
-	V1 :: {
+	#V1: {
 		age:   >=0 & <=100
 		hobby: string
 	}
@@ -81,7 +81,7 @@ func ExampleValue_Subsume() {
 	// Release notes:
 	// - People get to be older than 100, so we relaxed it.
 	// - It seems not many people have a hobby, so we made it optional.
-	V2 :: {
+	#V2: {
 		age:    >=0 & <=150 // people get older now
 		hobby?: string      // some people don't have a hobby
 	}
@@ -89,7 +89,7 @@ func ExampleValue_Subsume() {
 	// Release notes:
 	// - Actually no one seems to have a hobby nowadays anymore,
 	//   so we dropped the field.
-	V3 :: {
+	#V3: {
 		age: >=0 & <=150
 	}`)
 
@@ -97,9 +97,9 @@ func ExampleValue_Subsume() {
 		fmt.Println(err)
 		// handle error
 	}
-	v1, err1 := inst.LookupField("V1")
-	v2, err2 := inst.LookupField("V2")
-	v3, err3 := inst.LookupField("V3")
+	v1, err1 := inst.Value().FieldByName("#V1", true)
+	v2, err2 := inst.Value().FieldByName("#V2", true)
+	v3, err3 := inst.Value().FieldByName("#V3", true)
 	if err1 != nil || err2 != nil || err3 != nil {
 		log.Println(err1, err2, err3)
 	}
@@ -113,5 +113,5 @@ func ExampleValue_Subsume() {
 
 	// Output:
 	// V2 is backwards compatible with V1: <nil>
-	// V3 is backwards compatible with V2: V2: conflicting values <=150 and string (mismatched types number and string)
+	// V3 is backwards compatible with V2: #V2: conflicting values <=150 and string (mismatched types number and string)
 }

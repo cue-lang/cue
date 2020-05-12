@@ -18,7 +18,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
-	goast "go/ast"
 	"io"
 	"math"
 	"math/big"
@@ -565,8 +564,10 @@ func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
 		a = append(a, strconv.FormatInt(int64(v.index), 10))
 	case structKind:
 		f := idx.labelStr(v.arc.feature)
-		if !isIdent(f) && !isNumber(f) {
-			f = quote(f, '"')
+		if v.arc.feature&(hidden|definition) == 0 {
+			if !isIdent(f) && !isNumber(f) {
+				f = quote(f, '"')
+			}
 		}
 		a = append(a, f)
 	}
@@ -648,7 +649,7 @@ func newChildValue(obj *structValue, i int) Value {
 	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
 }
 
-// Dereference reports to the value v refers to if v is a reference or v itself
+// Dereference reports the value v refers to if v is a reference or v itself
 // otherwise.
 func Dereference(v Value) Value {
 	if v.path == nil {
@@ -680,12 +681,15 @@ func Dereference(v Value) Value {
 	}
 
 	cached := p.cache
-	if cached != nil {
+	if cached == nil {
 		cached = p.v.evalPartial(ctx)
 	}
 	s := cached.(*structLit)
 	for _, f := range a {
 		a := s.lookup(ctx, f)
+		if a.v == nil {
+			return Value{}
+		}
 		p = &valueData{parent: p, arc: a} // index
 		s, _ = a.cache.(*structLit)
 	}
@@ -1408,8 +1412,11 @@ func (s *Struct) Field(i int) FieldInfo {
 	return FieldInfo{str, i, v, a.definition, a.optional, a.feature&hidden != 0}
 }
 
-func (s *Struct) FieldByName(name string) (FieldInfo, error) {
-	f := s.v.ctx().strLabel(name)
+// FieldByName looks up a field for the given name. If isIdent is true, it will
+// look up a definition or hidden field (starting with `_` or `_#`). Otherwise
+// it interprets name as an arbitrary string for a regular field.
+func (s *Struct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
+	f := s.v.ctx().label(name, isIdent)
 	for i, a := range s.s.arcs {
 		if a.feature == f {
 			return s.Field(i), nil
@@ -1491,18 +1498,31 @@ func (v Value) LookupDef(name string) Value {
 
 var errNotFound = errors.Newf(token.NoPos, "field not found")
 
+// FieldByName looks up a field for the given name. If isIdent is true, it will
+// look up a definition or hidden field (starting with `_` or `_#`). Otherwise
+// it interprets name as an arbitrary string for a regular field.
+func (v Value) FieldByName(name string, isIdent bool) (f FieldInfo, err error) {
+	s, err := v.Struct()
+	if err != nil {
+		return f, err
+	}
+	return s.FieldByName(name, isIdent)
+}
+
 // LookupField reports information about a field of v.
+//
+// Deprecated: this API does not work with new-style definitions. Use FieldByName.
 func (v Value) LookupField(name string) (FieldInfo, error) {
 	s, err := v.Struct()
 	if err != nil {
 		// TODO: return a Value at the same location and a new error?
 		return FieldInfo{}, err
 	}
-	f, err := s.FieldByName(name)
+	f, err := s.FieldByName(name, true)
 	if err != nil {
 		return f, err
 	}
-	if f.IsHidden || f.IsDefinition && !goast.IsExported(name) {
+	if f.IsHidden {
 		return f, errNotFound
 	}
 	return f, err

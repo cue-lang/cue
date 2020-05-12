@@ -6,9 +6,9 @@ service: [ID=_]: {
 	metadata: {
 		name: ID
 		labels: {
-			app:       ID        // by convention
-			domain:    "prod"    // always the same in the given files
-			component: Component // varies per directory
+			app:       ID         // by convention
+			domain:    "prod"     // always the same in the given files
+			component: #Component // varies per directory
 		}
 	}
 	spec: {
@@ -33,7 +33,7 @@ deployment: [ID=_]: {
 			metadata: labels: {
 				app:       ID
 				domain:    "prod"
-				component: Component
+				component: #Component
 			}
 			// we always have one namesake container
 			spec: containers: [{name: ID}]
@@ -41,45 +41,45 @@ deployment: [ID=_]: {
 	}
 }
 
-Component :: string
+#Component: string
 
 daemonSet: [ID=_]: _spec & {
 	apiVersion: "apps/v1"
 	kind:       "DaemonSet"
-	Name ::     ID
+	_name:      ID
 }
 
 statefulSet: [ID=_]: _spec & {
 	apiVersion: "apps/v1"
 	kind:       "StatefulSet"
-	Name ::     ID
+	_name:      ID
 }
 
 deployment: [ID=_]: _spec & {
 	apiVersion: "apps/v1"
 	kind:       "Deployment"
-	Name ::     ID
+	_name:      ID
 	spec: replicas: *1 | int
 }
 
 configMap: [ID=_]: {
 	metadata: name: ID
-	metadata: labels: component: Component
+	metadata: labels: component: #Component
 }
 
 _spec: {
-	Name :: string
+	_name: string
 
-	metadata: name: Name
-	metadata: labels: component: Component
+	metadata: name: _name
+	metadata: labels: component: #Component
 	spec: selector: {}
 	spec: template: {
 		metadata: labels: {
-			app:       Name
-			component: Component
+			app:       _name
+			component: #Component
 			domain:    "prod"
 		}
-		spec: containers: [{name: Name}]
+		spec: containers: [{name: _name}]
 	}
 }
 

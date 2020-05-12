@@ -14,9 +14,9 @@ to define any type, instead of just structs, while keeping the common case
 of defining structs light.
 
 -- emit.cue --
-"Hello \(who)!"
+"Hello \(#who)!"
 
-who :: "world"
+#who: "world"
 
 -- expect-stdout-cue --
 "Hello world!"

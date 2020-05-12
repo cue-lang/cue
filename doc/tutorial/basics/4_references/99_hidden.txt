@@ -4,7 +4,6 @@ cmp stdout expect-stdout-cue
 -- frontmatter.toml --
 title = "Hidden Fields"
 description = ""
-draft = true
 
 -- text.md --
 A non-quoted field name that starts with an underscore (`_`) is not
@@ -19,6 +18,7 @@ with an underscore.
 "_foo": 2
 _foo:   3
 foo:    4
+_#foo:  5
 
 -- expect-stdout-cue --
 {

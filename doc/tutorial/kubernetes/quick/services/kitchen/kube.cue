@@ -1,6 +1,6 @@
 package kube
 
-Component :: "kitchen"
+#Component: "kitchen"
 
 deployment: [string]: spec: template: {
 	metadata: annotations: "prometheus.io.scrape": "true"
@@ -20,10 +20,10 @@ deployment: [string]: spec: template: {
 }
 
 deployment: [ID=_]: spec: template: spec: {
-	hasDisks :: *true | bool
+	_hasDisks: *true | bool
 
 	// field comprehension using just "if"
-	if hasDisks {
+	if _hasDisks {
 		volumes: [{
 			name: *"\(ID)-disk" | string
 			gcePersistentDisk: pdName: *"\(ID)-disk" | string

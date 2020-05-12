@@ -1,3 +1,3 @@
 package kube
 
-Component :: "infra"
+#Component: "infra"

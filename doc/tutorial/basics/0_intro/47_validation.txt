@@ -10,11 +10,11 @@ Constraints can be used to validate values of concrete instances.
 They can be applied to CUE data, or directly to YAML or JSON.
 
 -- schema.cue --
-Language :: {
+#Language: {
 	tag:  string
 	name: =~"^\\p{Lu}" // Must start with an uppercase letter.
 }
-languages: [...Language]
+languages: [...#Language]
 
 -- data.yaml --
 languages:

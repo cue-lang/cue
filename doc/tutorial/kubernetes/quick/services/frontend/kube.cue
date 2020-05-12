@@ -1,6 +1,6 @@
 package kube
 
-Component :: "frontend"
+#Component: "frontend"
 
 deployment: [string]: spec: template: {
 	metadata: annotations: {

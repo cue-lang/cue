@@ -19,12 +19,12 @@ It is okay for an optional field to be bottom (`_|_`).
 This just means that field may not be specified.
 
 -- structs.cue --
-a :: {
+#a: {
     foo?: int
     bar?: string
     baz?: string
 }
-b: a & {
+b: #a & {
     foo:  3
     baz?: 2  // baz?: _|_
 }

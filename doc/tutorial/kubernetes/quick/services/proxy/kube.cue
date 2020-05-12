@@ -1,3 +1,3 @@
 package kube
 
-Component :: "proxy"
+#Component: "proxy"

@@ -6,7 +6,7 @@ package runtime
 
 // NegotiateError is returned when a ClientNegotiator is unable to locate
 // a serializer for the requested operation.
-NegotiateError :: {
+#NegotiateError: {
 	ContentType: string
 	Stream:      bool
 }

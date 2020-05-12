@@ -14,20 +14,20 @@ It is an error for a concrete `Conn`
 to define anything else than these two values.
 
 -- disjunctions.cue --
-Conn :: {
+#Conn: {
     address:  string
     port:     int
     protocol: "tcp" | "udp"
 }
 
-lossy: Conn & {
+lossy: #Conn & {
     address:  "1.2.3.4"
     port:     8888
     protocol: "udp"
 }
 
 -- expect-stdout-cue --
-Conn :: {
+#Conn: {
     address:  string
     port:     int
     protocol: "tcp" | "udp"

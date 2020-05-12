@@ -3,9 +3,8 @@ service: {}
 deployment: {}
 daemonSet: {}
 statefulSet: {}
-Component :: string
+#Component: string
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -30,15 +29,15 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {}
 deployment: {}
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -63,6 +62,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -94,7 +94,6 @@ service: {
 }
 deployment: {
     bartender: {
-        Name ::     "bartender"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -131,13 +130,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "bartender"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -162,6 +161,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -193,7 +193,6 @@ service: {
 }
 deployment: {
     breaddispatcher: {
-        Name ::     "breaddispatcher"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -230,13 +229,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "breaddispatcher"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -261,6 +260,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -292,7 +292,6 @@ service: {
 }
 deployment: {
     host: {
-        Name ::     "host"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -329,13 +328,13 @@ deployment: {
             }
             replicas: 2
         }
+        _name: "host"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -360,6 +359,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -391,7 +391,6 @@ service: {
 }
 deployment: {
     maitred: {
-        Name ::     "maitred"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -428,13 +427,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "maitred"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -459,6 +458,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -490,7 +490,6 @@ service: {
 }
 deployment: {
     valeter: {
-        Name ::     "valeter"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -527,13 +526,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "valeter"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -558,6 +557,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -589,7 +589,6 @@ service: {
 }
 deployment: {
     waiter: {
-        Name ::     "waiter"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -625,13 +624,13 @@ deployment: {
             }
             replicas: 5
         }
+        _name: "waiter"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -656,6 +655,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -687,7 +687,6 @@ service: {
 }
 deployment: {
     waterdispatcher: {
-        Name ::     "waterdispatcher"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -724,13 +723,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "waterdispatcher"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "frontend"
+#Component: "frontend"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -755,15 +754,15 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {}
 deployment: {}
 daemonSet: {}
 statefulSet: {}
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -788,6 +787,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -819,7 +819,6 @@ service: {
 }
 deployment: {
     download: {
-        Name ::     "download"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -851,13 +850,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "download"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -882,6 +881,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -921,7 +921,6 @@ deployment: {}
 daemonSet: {}
 statefulSet: {
     etcd: {
-        Name ::     "etcd"
         kind:       "StatefulSet"
         apiVersion: "apps/v1"
         metadata: {
@@ -1028,11 +1027,11 @@ statefulSet: {
             }]
             serviceName: "etcd"
         }
+        _name: "etcd"
     }
 }
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1057,6 +1056,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1088,7 +1088,6 @@ service: {
 }
 deployment: {
     events: {
-        Name ::     "events"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1152,13 +1151,13 @@ deployment: {
             }
             replicas: 2
         }
+        _name: "events"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1183,6 +1182,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1216,7 +1216,6 @@ service: {
 }
 deployment: {
     tasks: {
-        Name ::     "tasks"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1265,13 +1264,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "tasks"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1296,6 +1295,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1327,7 +1327,6 @@ service: {
 }
 deployment: {
     updater: {
-        Name ::     "updater"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1370,13 +1369,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "updater"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1401,6 +1400,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1434,7 +1434,6 @@ service: {
 }
 deployment: {
     watcher: {
-        Name ::     "watcher"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1479,13 +1478,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "watcher"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "infra"
+#Component: "infra"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1510,15 +1509,15 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {}
 deployment: {}
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1543,6 +1542,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1574,7 +1574,6 @@ service: {
 }
 deployment: {
     caller: {
-        Name ::     "caller"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1643,18 +1642,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: true
+                    _hasDisks: true
                 }
             }
             replicas: 3
         }
+        _name: "caller"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1679,6 +1678,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1710,7 +1710,6 @@ service: {
 }
 deployment: {
     dishwasher: {
-        Name ::     "dishwasher"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1779,18 +1778,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: true
+                    _hasDisks: true
                 }
             }
             replicas: 5
         }
+        _name: "dishwasher"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1815,6 +1814,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1846,7 +1846,6 @@ service: {
 }
 deployment: {
     expiditer: {
-        Name ::     "expiditer"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -1906,18 +1905,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: true
+                    _hasDisks: true
                 }
             }
             replicas: 1
         }
+        _name: "expiditer"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -1942,6 +1941,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -1973,7 +1973,6 @@ service: {
 }
 deployment: {
     headchef: {
-        Name ::     "headchef"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -2033,18 +2032,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: true
+                    _hasDisks: true
                 }
             }
             replicas: 1
         }
+        _name: "headchef"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2069,6 +2068,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -2100,7 +2100,6 @@ service: {
 }
 deployment: {
     linecook: {
-        Name ::     "linecook"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -2160,18 +2159,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: true
+                    _hasDisks: true
                 }
             }
             replicas: 1
         }
+        _name: "linecook"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2196,6 +2195,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -2227,7 +2227,6 @@ service: {
 }
 deployment: {
     pastrychef: {
-        Name ::     "pastrychef"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -2287,18 +2286,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: true
+                    _hasDisks: true
                 }
             }
             replicas: 1
         }
+        _name: "pastrychef"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2323,6 +2322,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -2354,7 +2354,6 @@ service: {
 }
 deployment: {
     souschef: {
-        Name ::     "souschef"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -2393,18 +2392,18 @@ deployment: {
                             }
                         }
                     }]
-                    hasDisks :: false
+                    _hasDisks: false
                 }
             }
             replicas: 1
         }
+        _name: "souschef"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "kitchen"
+#Component: "kitchen"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2429,15 +2428,15 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {}
 deployment: {}
 daemonSet: {}
 statefulSet: {}
-Component :: "mon"
+#Component: "mon"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2462,6 +2461,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {
     alertmanager: {
@@ -2528,7 +2528,6 @@ service: {
 }
 deployment: {
     alertmanager: {
-        Name ::     "alertmanager"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -2583,13 +2582,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "alertmanager"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "mon"
+#Component: "mon"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2614,6 +2613,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -2645,7 +2645,6 @@ service: {
 }
 deployment: {
     grafana: {
-        Name ::     "grafana"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -2709,13 +2708,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "grafana"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "mon"
+#Component: "mon"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2740,6 +2739,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -2777,7 +2777,6 @@ service: {
 deployment: {}
 daemonSet: {
     "node-exporter": {
-        Name ::     "node-exporter"
         kind:       "DaemonSet"
         apiVersion: "apps/v1"
         metadata: {
@@ -2844,12 +2843,12 @@ daemonSet: {
                 }
             }
         }
+        _name: "node-exporter"
     }
 }
 statefulSet: {}
-Component :: "mon"
+#Component: "mon"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -2874,6 +2873,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {
     prometheus: {
@@ -3152,7 +3152,6 @@ service: {
 }
 deployment: {
     prometheus: {
-        Name ::     "prometheus"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -3211,13 +3210,13 @@ deployment: {
                 }
             }
         }
+        _name: "prometheus"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "mon"
+#Component: "mon"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -3242,15 +3241,15 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {}
 deployment: {}
 daemonSet: {}
 statefulSet: {}
-Component :: "proxy"
+#Component: "proxy"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -3275,6 +3274,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {
     authproxy: {
@@ -3372,7 +3372,6 @@ service: {
 }
 deployment: {
     authproxy: {
-        Name ::     "authproxy"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -3415,13 +3414,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "authproxy"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "proxy"
+#Component: "proxy"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -3446,6 +3445,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {}
 service: {
@@ -3479,7 +3479,6 @@ service: {
 }
 deployment: {
     goget: {
-        Name ::     "goget"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -3521,13 +3520,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "goget"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "proxy"
+#Component: "proxy"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -3552,6 +3551,7 @@ _spec: {
             }
         }
     }
+    _name: string
 }
 configMap: {
     nginx: {
@@ -3757,7 +3757,6 @@ service: {
 }
 deployment: {
     nginx: {
-        Name ::     "nginx"
         kind:       "Deployment"
         apiVersion: "apps/v1"
         metadata: {
@@ -3811,13 +3810,13 @@ deployment: {
             }
             replicas: 1
         }
+        _name: "nginx"
     }
 }
 daemonSet: {}
 statefulSet: {}
-Component :: "proxy"
+#Component: "proxy"
 _spec: {
-    Name :: string
     metadata: {
         name: string
         labels: {
@@ -3842,4 +3841,5 @@ _spec: {
             }
         }
     }
+    _name: string
 }

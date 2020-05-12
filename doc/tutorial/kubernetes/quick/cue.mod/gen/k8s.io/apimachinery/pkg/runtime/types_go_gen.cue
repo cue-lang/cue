@@ -18,7 +18,7 @@ package runtime
 // +k8s:deepcopy-gen=false
 // +protobuf=true
 // +k8s:openapi-gen=true
-TypeMeta :: {
+#TypeMeta: {
 	// +optional
 	apiVersion?: string @go(APIVersion) @protobuf(1,bytes,opt)
 
@@ -26,9 +26,9 @@ TypeMeta :: {
 	kind?: string @go(Kind) @protobuf(2,bytes,opt)
 }
 
-ContentTypeJSON ::     "application/json"
-ContentTypeYAML ::     "application/yaml"
-ContentTypeProtobuf :: "application/vnd.kubernetes.protobuf"
+#ContentTypeJSON:     "application/json"
+#ContentTypeYAML:     "application/yaml"
+#ContentTypeProtobuf: "application/vnd.kubernetes.protobuf"
 
 // RawExtension is used to hold extensions in external versions.
 //
@@ -75,7 +75,7 @@ ContentTypeProtobuf :: "application/vnd.kubernetes.protobuf"
 // +k8s:deepcopy-gen=true
 // +protobuf=true
 // +k8s:openapi-gen=true
-RawExtension :: _
+#RawExtension: _
 
 // Unknown allows api objects with unknown types to be passed-through. This can be used
 // to deal with the API objects from a plug-in. Unknown objects still have functioning
@@ -87,4 +87,4 @@ RawExtension :: _
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
 // +protobuf=true
 // +k8s:openapi-gen=true
-Unknown :: _
+#Unknown: _

@@ -30,6 +30,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"github.com/spf13/cobra"
 	"golang.org/x/tools/go/packages"
@@ -90,7 +91,7 @@ Go structs are converted to cue structs adhering to the following conventions:
 
 	  translates to the CUE struct
 
-		 MyStruct: Common & {
+		 #MyStruct: Common & {
 			 Field: string
 		 }
 
@@ -139,7 +140,7 @@ contents to allow IP4String to assume only valid IP4 addresses:
 	package foo
 
 	// IP4String defines a valid IP4 address.
-	IP4String: =~#"^\#(byte)\.\#(byte)\.\#(byte)\.\#(byte)$"#
+	#IP4String: =~#"^\#(byte)\.\#(byte)\.\#(byte)\.\#(byte)$"#
 
 	// byte defines string allowing integer values of 0-255.
 	byte = #"([01]?\d?\d|2[0-4]\d|25[0-5])"#
@@ -178,7 +179,7 @@ translates into the following CUE definitions:
 
 	package foo
 
-	Switch: int // enumSwitch
+	#Switch: int // enumSwitch
 
 	enumSwitch: Off | On
 
@@ -195,7 +196,7 @@ source directory or the generated directory:
 
 	// limit the valid values for Switch to those existing as constants with
 	// the same type.
-	Switch: enumSwitch
+	#Switch: enumSwitch
 
 This tells CUE that only the values enumerated by enumSwitch are valid
 values for Switch. Note that there are now two definitions of Switch.
@@ -446,7 +447,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 		sort.Strings(pkgs)
 
-		pkg := &cueast.Package{Name: e.ident(p.Name)}
+		pkg := &cueast.Package{Name: e.ident(p.Name, false)}
 		addDoc(f.Doc, pkg)
 
 		f := &cueast.File{Decls: []cueast.Decl{
@@ -464,7 +465,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 				info := e.pkgNames[s]
 				spec := cueast.NewImport(nil, info.id)
 				if p.Imports[s].Name != info.name {
-					spec.Name = e.ident(info.name)
+					spec.Name = e.ident(info.name, false)
 				}
 				imports.Specs = append(imports.Specs, spec)
 			}
@@ -562,14 +563,20 @@ func (e *extractor) strLabel(name string) cueast.Label {
 	return cueast.NewString(name)
 }
 
-func (e *extractor) ident(name string) *cueast.Ident {
+func (e *extractor) ident(name string, isDef bool) *cueast.Ident {
+	if isDef {
+		r := []rune(name)[0]
+		name = "#" + name
+		if !unicode.Is(unicode.Lu, r) {
+			name = "_" + name
+		}
+	}
 	return cueast.NewIdent(name)
 }
 
 func (e *extractor) def(doc *ast.CommentGroup, name string, value cueast.Expr, newline bool) *cueast.Field {
 	f := &cueast.Field{
-		Label: e.ident(name), // Go identifiers are always valid CUE identifiers.
-		Token: cuetoken.ISA,
+		Label: e.ident(name, true), // Go identifiers are always valid CUE identifiers.
 		Value: value,
 	}
 	addDoc(doc, f)
@@ -619,17 +626,24 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			if len(enums) > 0 {
-				enumName := "enum" + name
-				a[len(a)-1].AddComment(internal.NewComment(false, enumName))
+				enumName := "#enum" + name
+				cueast.AddComment(a[len(a)-1], internal.NewComment(false, enumName))
 
-				var x cueast.Expr = e.ident(enums[0])
+				// Constants are mapped as definitions.
+				var x cueast.Expr = e.ident(enums[0], true)
 				cueast.SetRelPos(x, cuetoken.Newline)
 				for _, v := range enums[1:] {
-					y := e.ident(v)
+					y := e.ident(v, true)
 					cueast.SetRelPos(y, cuetoken.Newline)
 					x = cueast.NewBinExpr(cuetoken.OR, x, y)
 				}
-				a = append(a, e.def(nil, enumName, x, true))
+				// a = append(a, e.def(nil, enumName, x, true))
+				f := &cueast.Field{
+					Label: cueast.NewIdent(enumName),
+					Value: x,
+				}
+				a = append(a, f)
+				cueast.SetRelPos(f, cuetoken.NewSection)
 			}
 		}
 
@@ -703,7 +717,7 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 		if types.Implements(typ, i) || types.Implements(ptr, i) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to _", t, x)
-			return e.ident("_")
+			return e.ident("_", false)
 		}
 	}
 	for _, x := range toString {
@@ -711,7 +725,7 @@ func (e *extractor) altType(typ types.Type) cueast.Expr {
 		if types.Implements(typ, i) || types.Implements(ptr, i) {
 			t := shortTypeName(typ)
 			e.logf("    %v implements %s; setting type to string", t, x)
-			return e.ident("string")
+			return e.ident("string", false)
 		}
 	}
 	return nil
@@ -862,11 +876,11 @@ func (e *extractor) makeField(name string, kind cuetoken.Token, expr types.Type,
 	typ := e.makeType(expr)
 	var label cueast.Label
 	if kind == cuetoken.ISA {
-		label = e.ident(name)
+		label = e.ident(name, true)
 	} else {
 		label = e.strLabel(name)
 	}
-	f = &cueast.Field{Label: label, Token: kind, Value: typ}
+	f = &cueast.Field{Label: label, Value: typ}
 	if doc := makeDoc(doc, newline); doc != nil {
 		f.AddComment(doc)
 		cueast.SetRelPos(doc, cuetoken.NewSection)
@@ -884,7 +898,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 	if x, ok := expr.(*types.Named); ok {
 		obj := x.Obj()
 		if obj.Pkg() == nil {
-			return e.ident("_")
+			return e.ident("_", false)
 		}
 		// Check for builtin packages.
 		// TODO: replace these literal types with a reference to the fixed
@@ -892,11 +906,12 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		switch obj.Type().String() {
 		case "time.Time":
 			e.usedInFile["time"] = true
-			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name)
+			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
+			ref.Node = cueast.NewImport(nil, "time")
 			return cueast.NewSel(ref, obj.Name())
 
 		case "math/big.Int":
-			return e.ident("int")
+			return e.ident("int", false)
 
 		default:
 			if !strings.ContainsAny(obj.Pkg().Path(), ".") {
@@ -908,10 +923,16 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 				}
 			}
 		}
-		result = e.ident(obj.Name())
+
+		result = e.ident(obj.Name(), true)
 		if pkg := obj.Pkg(); pkg != nil {
 			if info := e.pkgNames[pkg.Path()]; info.name != "" {
-				result = cueast.NewSel(e.ident(info.name), obj.Name())
+				p := e.ident(info.name, false)
+				// TODO: set package name et. at.
+				p.Node = cueast.NewImport(nil, pkg.Path())
+				// makeType is always called to describe a type, so whatever
+				// this is referring to, it must be a definition.
+				result = cueast.NewSel(p, "#"+obj.Name())
 				e.usedPkg(pkg.Path())
 			}
 		}
@@ -921,7 +942,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 	switch x := expr.(type) {
 	case *types.Pointer:
 		return &cueast.BinaryExpr{
-			X:  e.ident("null"),
+			X:  e.ident("null", false),
 			Op: cuetoken.OR,
 			Y:  e.makeType(x.Elem()),
 		}
@@ -938,7 +959,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		// TODO: should this be x.Elem().Underlying().String()? One could
 		// argue either way.
 		if x.Elem().String() == "byte" {
-			return e.ident("bytes")
+			return e.ident("bytes", false)
 		}
 		return cueast.NewList(&cueast.Ellipsis{Type: e.makeType(x.Elem())})
 
@@ -949,7 +970,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 			//     fmt.Fprint(e.w, fmt.Sprintf("=~ '^\C{%d}$'", x.Len())),
 			// but regexp does not support that.
 			// But translate to bytes, instead of [...byte] to be consistent.
-			return e.ident("bytes")
+			return e.ident("bytes", false)
 		} else {
 			return &cueast.BinaryExpr{
 				X: &cueast.BasicLit{
@@ -967,7 +988,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 
 		f := &cueast.Field{
-			Label: cueast.NewList(e.ident("string")),
+			Label: cueast.NewList(e.ident("string", false)),
 			Value: e.makeType(x.Elem()),
 		}
 		cueast.SetRelPos(f, cuetoken.Blank)
@@ -978,10 +999,10 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 
 	case *types.Basic:
-		return e.ident(x.String())
+		return e.ident(x.String(), false)
 
 	case *types.Interface:
-		return e.ident("_")
+		return e.ident("_", false)
 
 	default:
 		// record error
@@ -1062,13 +1083,17 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		}
 		typeName = strings.Replace(typeName, e.pkg.Types.Path()+".", "", -1)
 
+		cueStr := strings.Replace(cueType, "_#", "", -1)
+		cueStr = strings.Replace(cueStr, "#", "", -1)
+
 		// TODO: remove fields in @go attr that are the same as printed?
-		if name != f.Name() || typeName != cueType {
+		if name != f.Name() || typeName != cueStr {
 			buf := &strings.Builder{}
 			if name != f.Name() {
 				buf.WriteString(f.Name())
 			}
-			if typeName != cueType {
+
+			if typeName != cueStr {
 				if strings.ContainsAny(typeName, `#"',()=`) {
 					typeName = strconv.Quote(typeName)
 				}

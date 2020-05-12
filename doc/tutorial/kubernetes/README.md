@@ -356,25 +356,25 @@ to the directory name and modify our master template file to use it.
 <!--
 ```
 $ cue add */kube.cue -p kube --list <<EOF
-Component :: "{{.DisplayPath}}"
+#Component: "{{.DisplayPath}}"
 EOF
 ```
 -->
 
 ```
 # set the component label to our new top-level field
-$ sed -i.bak 's/component:.*string/component: Component/' kube.cue && rm kube.cue.bak
+$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue && rm kube.cue.bak
 
 # add the new top-level field to our previous template definitions
 $ cat <<EOF >> kube.cue
 
-Component :: string
+#Component: string
 EOF
 
 # add a file with the component label to each directory
 $ ls -d */ | sed 's/.$//' | xargs -I DIR sh -c 'cd DIR; echo "package kube
 
-Component :: \"DIR\"
+#Component: \"DIR\"
 " > kube.cue; cd ..'
 
 # format the files
@@ -429,40 +429,40 @@ $ cat <<EOF >> kube.cue
 daemonSet: [ID=_]: _spec & {
     apiVersion: "apps/v1"
     kind:       "DaemonSet"
-    Name ::     ID
+    _name:      ID
 }
 
 statefulSet: [ID=_]: _spec & {
     apiVersion: "apps/v1"
     kind:       "StatefulSet"
-    Name ::     ID
+    _name:      ID
 }
 
 deployment: [ID=_]: _spec & {
     apiVersion: "apps/v1"
     kind:       "Deployment"
-    Name ::     ID
+    _name:      ID
     spec: replicas: *1 | int
 }
 
 configMap: [ID=_]: {
     metadata: name: ID
-    metadata: labels: component: Component
+    metadata: labels: component: #Component
 }
 
 _spec: {
-    Name :: string
+    _name: string
 
-    metadata: name: Name
-    metadata: labels: component: Component
+    metadata: name: _name
+    metadata: labels: component: #Component
     spec: selector: {}
     spec: template: {
         metadata: labels: {
-            app:       Name
-            component: Component
+            app:       _name
+            component: #Component
             domain:    "prod"
         }
-        spec: containers: [{name: Name}]
+        spec: containers: [{name: _name}]
     }
 }
 EOF
@@ -470,7 +470,7 @@ $ cue fmt
 ```
 
 The common configuration has been factored out into `_spec`.
-We introduced `Name` to aid both specifying and referring
+We introduced `_name` to aid both specifying and referring
 to the name of an object.
 For completeness, we added `configMap` as a top-level entry.
 
@@ -710,10 +710,10 @@ directory with two disks), and generalize it:
 $ cat <<EOF >> kitchen/kube.cue
 
 deployment: [ID=_]: spec: template: spec: {
-    hasDisks :: *true | bool
+    _hasDisks: *true | bool
 
     // field comprehension using just "if"
-    if hasDisks {
+    if _hasDisks {
         volumes: [{
             name: *"\(ID)-disk" | string
             gcePersistentDisk: pdName: *"\(ID)-disk" | string
@@ -740,7 +740,7 @@ EOF
 $ cat <<EOF >> kitchen/souschef/kube.cue
 
 deployment: souschef: spec: template: spec: {
-    hasDisks :: false
+    _hasDisks: false
 }
 
 EOF
@@ -933,7 +933,7 @@ Different instances of a package are typically not compatible:
 different subdirectories may have different specializations.
 A merge pre-expands templates of each instance and then merges their root
 values.
-The result may contain conflicts, such as our top-level `Component` field,
+The result may contain conflicts, such as our top-level `#Component` field,
 but our per-type maps of Kubernetes objects should be free of conflict
 (if there is, we have a problem with Kubernetes down the line).
 A merge thus gives us a unified view of all objects.
@@ -1079,10 +1079,10 @@ import (
   apps_v1 "k8s.io/api/apps/v1"
 )
 
-service: [string]:     v1.Service
-deployment: [string]:  apps_v1.Deployment
-daemonSet: [string]:   apps_v1.DaemonSet
-statefulSet: [string]: apps_v1.StatefulSet
+service: [string]:     v1.#Service
+deployment: [string]:  apps_v1.#Deployment
+daemonSet: [string]:   apps_v1.#DaemonSet
+statefulSet: [string]: apps_v1.#StatefulSet
 EOF
 ```
 

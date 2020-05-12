@@ -7,29 +7,29 @@ package watch
 import "k8s.io/apimachinery/pkg/runtime"
 
 // Interface can be implemented by anything that knows how to watch and report changes.
-Interface :: _
+#Interface: _
 
 // EventType defines the possible types of events.
-EventType :: string // enumEventType
+#EventType: string // #enumEventType
 
-enumEventType ::
-	Added |
-	Modified |
-	Deleted |
-	Bookmark |
-	Error
+#enumEventType:
+	#Added |
+	#Modified |
+	#Deleted |
+	#Bookmark |
+	#Error
 
-Added ::           EventType & "ADDED"
-Modified ::        EventType & "MODIFIED"
-Deleted ::         EventType & "DELETED"
-Bookmark ::        EventType & "BOOKMARK"
-Error ::           EventType & "ERROR"
-DefaultChanSize :: int32 & 100
+#Added:           #EventType & "ADDED"
+#Modified:        #EventType & "MODIFIED"
+#Deleted:         #EventType & "DELETED"
+#Bookmark:        #EventType & "BOOKMARK"
+#Error:           #EventType & "ERROR"
+#DefaultChanSize: int32 & 100
 
 // Event represents a single event to a watched resource.
 // +k8s:deepcopy-gen=true
-Event :: {
-	Type: EventType
+#Event: {
+	Type: #EventType
 
 	// Object is:
 	//  * If Type is Added or Modified: the new state of the object.
@@ -40,10 +40,10 @@ Event :: {
 	//    nor miss any events.
 	//  * If Type is Error: *api.Status is recommended; other types may make sense
 	//    depending on context.
-	Object: runtime.Object
+	Object: runtime.#Object
 }
 
 // RaceFreeFakeWatcher lets you test anything that consumes a watch.Interface; threadsafe.
-RaceFreeFakeWatcher :: {
+#RaceFreeFakeWatcher: {
 	Stopped: bool
 }

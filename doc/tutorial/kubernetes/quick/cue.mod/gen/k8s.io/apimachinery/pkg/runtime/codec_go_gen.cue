@@ -5,11 +5,11 @@
 package runtime
 
 // NoopEncoder converts an Decoder to a Serializer or Codec for code that expects them but only uses decoding.
-NoopEncoder :: {
-	"Decoder": Decoder
+#NoopEncoder: {
+	Decoder: #Decoder
 }
 
 // NoopDecoder converts an Encoder to a Serializer or Codec for code that expects them but only uses encoding.
-NoopDecoder :: {
-	"Encoder": Encoder
+#NoopDecoder: {
+	Encoder: #Encoder
 }

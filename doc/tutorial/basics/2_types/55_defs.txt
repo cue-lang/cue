@@ -6,7 +6,8 @@ title = "Definitions"
 description = ""
 
 -- text.md --
-A definition, denoted with `::` instead of `:`, defines values that
+A definition, indicated by an identifier starting with `#` or `_#`,
+defines values that
 are not output when converting a configuration to a concrete value.
 They are used to define schemata against which concrete values can
 be validated.
@@ -14,16 +15,16 @@ be validated.
 Structs defined by definitions are implicitly closed.
 
 -- defs.cue --
-msg: "Hello \(Name)!"
+msg: "Hello \(#Name)!"
 
-Name :: "world"
+#Name: "world"
 
-A :: {
+#A: {
     field: int
 }
 
-a:   A & { field: 3 }
-err: A & { feild: 3 }
+a:   #A & { field: 3 }
+err: #A & { feild: 3 }
 
 -- expect-stdout-cue --
 msg: "Hello world!"

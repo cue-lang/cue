@@ -6,29 +6,29 @@ package v1
 
 // TaintNodeNotReady will be added when node is not ready
 // and removed when node becomes ready.
-TaintNodeNotReady :: "node.kubernetes.io/not-ready"
+#TaintNodeNotReady: "node.kubernetes.io/not-ready"
 
 // TaintNodeUnreachable will be added when node becomes unreachable
 // (corresponding to NodeReady status ConditionUnknown)
 // and removed when node becomes reachable (NodeReady status ConditionTrue).
-TaintNodeUnreachable :: "node.kubernetes.io/unreachable"
+#TaintNodeUnreachable: "node.kubernetes.io/unreachable"
 
 // TaintNodeUnschedulable will be added when node becomes unschedulable
 // and removed when node becomes scheduable.
-TaintNodeUnschedulable :: "node.kubernetes.io/unschedulable"
+#TaintNodeUnschedulable: "node.kubernetes.io/unschedulable"
 
 // TaintNodeMemoryPressure will be added when node has memory pressure
 // and removed when node has enough memory.
-TaintNodeMemoryPressure :: "node.kubernetes.io/memory-pressure"
+#TaintNodeMemoryPressure: "node.kubernetes.io/memory-pressure"
 
 // TaintNodeDiskPressure will be added when node has disk pressure
 // and removed when node has enough disk.
-TaintNodeDiskPressure :: "node.kubernetes.io/disk-pressure"
+#TaintNodeDiskPressure: "node.kubernetes.io/disk-pressure"
 
 // TaintNodeNetworkUnavailable will be added when node's network is unavailable
 // and removed when network becomes ready.
-TaintNodeNetworkUnavailable :: "node.kubernetes.io/network-unavailable"
+#TaintNodeNetworkUnavailable: "node.kubernetes.io/network-unavailable"
 
 // TaintNodePIDPressure will be added when node has pid pressure
 // and removed when node has enough disk.
-TaintNodePIDPressure :: "node.kubernetes.io/pid-pressure"
+#TaintNodePIDPressure: "node.kubernetes.io/pid-pressure"

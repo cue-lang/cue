@@ -14,7 +14,7 @@ import (
 // +protobuf=true
 // +k8s:deepcopy-gen=true
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
-WatchEvent :: {
+#WatchEvent: {
 	type: string @go(Type) @protobuf(1,bytes,opt)
 
 	// Object is:
@@ -22,9 +22,9 @@ WatchEvent :: {
 	//  * If Type is Deleted: the state of the object immediately before deletion.
 	//  * If Type is Error: *Status is recommended; other types may make sense
 	//    depending on context.
-	object: runtime.RawExtension @go(Object) @protobuf(2,bytes,opt)
+	object: runtime.#RawExtension @go(Object) @protobuf(2,bytes,opt)
 }
 
 // InternalEvent makes watch.Event versioned
 // +protobuf=false
-InternalEvent :: watch.Event
+#InternalEvent: watch.#Event

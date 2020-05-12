@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 func (d *decoder) parseRef(p token.Pos, str string) []string {
@@ -99,8 +100,7 @@ func jsonSchemaRef(p token.Pos, a []string) ([]ast.Label, error) {
 	name := a[1]
 	if ast.IsValidIdent(name) &&
 		name != rootDefs[1:] &&
-		!strings.HasPrefix(name, "#") &&
-		!strings.HasPrefix(name, "_") {
+		!internal.IsDefOrHidden(name) {
 		return []ast.Label{ast.NewIdent("#" + name)}, nil
 	}
 	return []ast.Label{ast.NewIdent(rootDefs), ast.NewString(name)}, nil

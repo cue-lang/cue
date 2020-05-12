@@ -15,6 +15,7 @@
 package ast_test
 
 import (
+	"strings"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -49,6 +50,25 @@ func TestLabelName(t *testing.T) {
 		out:     "foo",
 		isIdent: true,
 	}, {
+		in:      &ast.Ident{Name: ""},
+		out:     "",
+		isIdent: false,
+		err:     true,
+	}, {
+		in:      &ast.Ident{Name: "#"},
+		out:     "",
+		isIdent: false,
+		err:     true,
+	}, {
+		in:      &ast.Ident{Name: "_#"},
+		out:     "",
+		isIdent: false,
+		err:     true,
+	}, {
+		in:      &ast.Ident{Name: "_"},
+		out:     "_",
+		isIdent: true,
+	}, {
 		in:      &ast.Ident{Name: "8ball"},
 		out:     "",
 		isIdent: false,
@@ -58,8 +78,20 @@ func TestLabelName(t *testing.T) {
 		out:     "_hidden",
 		isIdent: true,
 	}, {
+		in:      &ast.Ident{Name: "#A"},
+		out:     "#A",
+		isIdent: true,
+	}, {
 		in:      &ast.Ident{Name: "#Def"},
 		out:     "#Def",
+		isIdent: true,
+	}, {
+		in:      &ast.Ident{Name: "_#Def"},
+		out:     "_#Def",
+		isIdent: true,
+	}, {
+		in:      &ast.Ident{Name: "#_Def"},
+		out:     "#_Def",
 		isIdent: true,
 	}, {
 		in:      &ast.Ident{Name: "`foo-bar`"},
@@ -94,6 +126,10 @@ func TestLabelName(t *testing.T) {
 	for _, tc := range testCases {
 		b, _ := format.Node(tc.in)
 		t.Run(string(b), func(t *testing.T) {
+			if id, ok := tc.in.(*ast.Ident); ok && !strings.HasPrefix(id.Name, "`") {
+				assert.Equal(t, tc.isIdent, ast.IsValidIdent(id.Name))
+			}
+
 			str, isIdent, err := ast.LabelName(tc.in)
 			assert.Equal(t, tc.out, str, "value")
 			assert.Equal(t, tc.isIdent, isIdent, "isIdent")

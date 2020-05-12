@@ -268,6 +268,9 @@ func isDigit(ch rune) bool {
 
 func (s *Scanner) scanFieldIdentifier() string {
 	offs := s.offset
+	if s.ch == '_' {
+		s.next()
+	}
 	if s.ch == '#' {
 		s.next()
 	}
@@ -810,7 +813,7 @@ scanAgain:
 				lit = "_|_"
 			} else {
 				tok = token.IDENT
-				lit = "_" + s.scanIdentifier()
+				lit = "_" + s.scanFieldIdentifier()
 			}
 			insertEOL = true
 		case '`':

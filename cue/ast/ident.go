@@ -21,6 +21,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/pkg/strings"
 )
 
 func isLetter(ch rune) bool {
@@ -38,12 +39,26 @@ func IsValidIdent(ident string) bool {
 		return false
 	}
 
-	r, sz := utf8.DecodeRuneInString(ident)
-	switch {
-	case isDigit(r):
-		return false
-	case r == '#':
-		ident = ident[sz:]
+	consumed := false
+	if strings.HasPrefix(ident, "_") {
+		ident = ident[1:]
+		consumed = true
+		if len(ident) == 0 {
+			return true
+		}
+	}
+	if strings.HasPrefix(ident, "#") {
+		ident = ident[1:]
+		consumed = true
+		if len(ident) == 0 {
+			return false
+		}
+	}
+
+	if !consumed {
+		if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
+			return false
+		}
 	}
 
 	for _, r := range ident {
@@ -109,16 +124,27 @@ func parseIdent(pos token.Pos, ident string) (string, error) {
 		quoted = true
 	}
 
-	r, sz := utf8.DecodeRuneInString(ident)
-	switch {
-	case isDigit(r):
-		return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
-	case r == '#':
-	default:
-		sz = 0
+	p := 0
+	if strings.HasPrefix(ident, "_") {
+		p++
+		if len(ident) == 1 {
+			return ident, nil
+		}
+	}
+	if strings.HasPrefix(ident[p:], "#") {
+		p++
+		if len(ident) == p {
+			return "", errors.Newf(pos, "invalid identifier '_#'")
+		}
 	}
 
-	for _, r := range ident[sz:] {
+	if p == 0 {
+		if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
+			return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
+		}
+	}
+
+	for _, r := range ident[p:] {
 		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
 			continue
 		}

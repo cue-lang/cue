@@ -17,7 +17,6 @@ package cue
 import (
 	"path"
 	"strconv"
-	"strings"
 	"sync"
 
 	"cuelang.org/go/cue/ast"
@@ -298,10 +297,10 @@ func (idx *index) label(s string, isIdent bool) label {
 	}
 	f <<= labelShift
 	if isIdent {
-		if strings.HasPrefix(s, "#") {
+		if internal.IsDef(s) {
 			f |= definition
 		}
-		if strings.HasPrefix(s, "_") || strings.HasPrefix(s, "#_") {
+		if internal.IsHidden(s) {
 			f |= hidden
 		}
 	}

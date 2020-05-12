@@ -295,14 +295,26 @@ func IsBulkField(d ast.Decl) bool {
 	return false
 }
 
+func IsDef(s string) bool {
+	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_#")
+}
+
+func IsHidden(s string) bool {
+	return strings.HasPrefix(s, "_")
+}
+
+func IsDefOrHidden(s string) bool {
+	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_")
+}
+
 func IsDefinition(label ast.Label) bool {
 	switch x := label.(type) {
 	case *ast.Alias:
 		if ident, ok := x.Expr.(*ast.Ident); ok {
-			return strings.HasPrefix(ident.Name, "#")
+			return IsDef(ident.Name)
 		}
 	case *ast.Ident:
-		return strings.HasPrefix(x.Name, "#")
+		return IsDef(x.Name)
 	}
 	return false
 }

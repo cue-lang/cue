@@ -178,10 +178,11 @@ these rules.
 
 Identifiers name entities such as fields and aliases.
 An identifier is a sequence of one or more letters (which includes `_` and `$`)
-and digits, optionally preceded by a `#`.
-It may not be `_`, `$`, or `#`.
+and digits, optionally preceded by `#` or `_#`.
+It may not be `_`, `$`, `#`, or `_#`.
 The first character in an identifier must be a letter or `#`.
-Identifiers starting with a `#` or `_` are reserved for definitions.
+Identifiers starting with a `#` or `_` are reserved for definitions and hidden
+fields.
 
 <!--
 TODO: allow identifiers as defined in Unicode UAX #31
@@ -191,7 +192,7 @@ Identifiers are normalized using the NFC normal form.
 -->
 
 ```
-identifier  = [ "#" ] letter { letter | unicode_digit } .
+identifier  = [ "#" | "_#" ] letter { letter | unicode_digit } .
 ```
 
 ```
@@ -1292,12 +1293,13 @@ S3: {
 ```
 
 
-#### Definitions
+#### Definitions and hidden fields
 
-A field is a _definition_ if its identifier starts with `#` or `_`.
-Definitions are not emitted as part of the model and are never required
-to be concrete when emitting data.
-For definitions with identifiers starting with `#`,
+A field is a _definition_ if its identifier starts with `#` or `_#`.
+A field is _hidden_ if its starts with a `_`.
+Definitions and hidden fields are not emitted when converting a CUE program
+to data and are never required to be concrete.
+For definitions
 literal structs that are part of a definition's value are implicitly closed,
 but may unify unrestricted with other structs within the field's declaration.
 This excludes literals structs in embeddings and aliases.
@@ -1699,10 +1701,9 @@ float64   >=-1.797693134862315708145274237317043567981e+308 &
 
 An identifier of a package may be exported to permit access to it
 from another package.
-All identifiers of regular fields (those not starting with a `#` or `_`)
-are exported.
-A definition identifier is exported if it does not start with `_` or `#_`.
-Any other defintion is not visible outside the package and resides
+All identifiers not starting with `_` (so all regular fields and definitions
+starting with `#`) are exported.
+Any identifier starting with `_` is not visible outside the package and resides
 in a separate namespace than namesake identifiers of other packages.
 
 ```
@@ -1718,7 +1719,7 @@ foo:   string  // visible outside mypackage
     #C: {    // visible outside mypackage
         d: 4 // visible outside mypackage
     }
-    #_E: foo // not visible outside mypackage
+    _#E: foo // not visible outside mypackage
 }
 ```
 

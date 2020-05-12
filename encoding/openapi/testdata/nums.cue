@@ -1,5 +1,5 @@
 import "math"
 
-mul :: math.MultipleOf(5)
+#mul: math.MultipleOf(5)
 
-neq :: !=4
+#neq: !=4

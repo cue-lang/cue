@@ -117,6 +117,9 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		if c.isInternal(label) {
 			continue
 		}
+		if i.IsDefinition() && strings.HasPrefix(label, "#") {
+			label = label[1:]
+		}
 		ref := c.makeRef(inst, []string{label})
 		if ref == "" {
 			continue
@@ -712,6 +715,9 @@ func (b *builder) object(v cue.Value) {
 		if b.ctx.isInternal(label) {
 			continue
 		}
+		if i.IsDefinition() && strings.HasPrefix(label, "#") {
+			label = label[1:]
+		}
 		var core *builder
 		if b.core != nil {
 			core = b.core.properties[label]
@@ -1198,6 +1204,12 @@ func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
 }
 
 func (b *buildContext) makeRef(inst *cue.Instance, ref []string) string {
+	ref = append([]string{}, ref...)
+	for i, s := range ref {
+		if strings.HasPrefix(s, "#") {
+			ref[i] = s[1:]
+		}
+	}
 	a := make([]string, 0, len(ref)+3)
 	if b.nameFunc != nil {
 		a = append(a, b.nameFunc(inst, ref))

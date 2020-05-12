@@ -2,32 +2,32 @@
 
 $version: "v1alpha1"
 
-T :: {
+#T: {
 	shared: int
 }
-T :: {} | {
+#T: {} | {
 	exact: string
 } | {
 	regex: string
 }
-T :: {} | {
+#T: {} | {
 	count: int
 } | {
 	amount: int
 }
-T :: {
+#T: {
 	shared2: int
 }
 
-MyInt :: int
+#MyInt: int
 
-Foo :: {
-	include: T
-	exclude: [...T]
-	count: MyInt
+#Foo: {
+	include: #T
+	exclude: [...#T]
+	count: #MyInt
 }
 
-Incompatible :: {
+#Incompatible: {
 	shared: int
 } | {
 	shared: int
@@ -37,7 +37,7 @@ Incompatible :: {
 	extra2: int
 }
 
-WithMap :: {
+#WithMap: {
 	shared: [string]: int
 } | {
 	shared: [string]: int
@@ -47,17 +47,17 @@ WithMap :: {
 	extra:  int
 }
 
-Embed :: {
+#Embed: {
 	a?: int
 
 	close({}) |
-	close({b: T}) |
+	close({b: #T}) |
 	close({c: int})
 
-	T :: {b?: int}
+	#T: {b?: int}
 
 	close({}) |
-	close({d: T}) |
+	close({d: #T}) |
 	close({e: int})
 
 	// TODO: maybe support builtin to write this as

@@ -1,6 +1,6 @@
 package blocks
 
-Block :: {
+#Block: {
 	a: >50
 	b: <10
 }

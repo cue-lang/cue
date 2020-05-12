@@ -1,11 +1,11 @@
 // File comment.
 
-Struct :: {
-	T :: int
+#Struct: {
+	#T: int
 
-	a?: T
+	a?: #T
 
-	{b?: T}
+	{b?: #T}
 
-	c?: [...T]
+	c?: [...#T]
 }

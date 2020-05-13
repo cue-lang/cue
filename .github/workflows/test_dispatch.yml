@@ -1,37 +1,33 @@
-name: Test
-
 on: [repository_dispatch]
-
+name: Test
+env:
+  GERRIT_COOKIE: "${{ secrets.gerritCookie }}"
+defaults:
+  run:
+    shell: bash
 jobs:
   start:
     runs-on: ubuntu-latest
     steps:
-
-    # Go is required for the cue-sh/trybot action
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.14.x
+    - name: Write the gitcookies file
+      run: echo "$GERRIT_COOKIE" > ~/.gitcookies
 
     - name: Update Gerrit CL message with starting message
-      uses: cue-sh/trybot@latest
-      with:
-        mode: start
-        runID: ${{ github.run_id }}
-        ref: ${{ github.event.client_payload.ref }}
-        changeID: ${{ github.event.client_payload.changeID }}
-        jobStatus: ${{ job.status }}
-        repo: ${{ github.event.repository.html_url }}
-        gerritCookie: ${{ secrets.gerritCookie }}
+      run: >
+        curl -s -H "Content-Type: application/json" --request POST --data '{"message":"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
 
   test:
     needs: start
     strategy:
+      fail-fast: false
       matrix:
         go-version: [1.13.x, 1.14.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
+    - name: Write the gitcookies file
+      run: echo "$GERRIT_COOKIE" > ~/.gitcookies
+
     - name: Install Go
       uses: actions/setup-go@v2
       with:
@@ -39,6 +35,11 @@ jobs:
 
     - name: Checkout code
       uses: actions/checkout@v2
+
+    - name: Checkout ref
+      run: |
+        git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
+        git checkout FETCH_HEAD
 
     - name: Cache Go modules
       uses: actions/cache@v1
@@ -53,38 +54,18 @@ jobs:
     - name: Test with -race
       run: go test -race ./...
 
-    - name: Update Gerrit CL message with failure message
+    - name: Post any failures for this matrix entry
       if: ${{ failure() }}
-      uses: cue-sh/trybot@latest
-      with:
-        mode: end
-        runID: ${{ github.run_id }}
-        ref: ${{ github.event.client_payload.ref }}
-        changeID: ${{ github.event.client_payload.changeID }}
-        jobStatus: "failure"
-        matrixDesc: "${{ runner.os }}-${{ matrix.go-version }}"
-        repo: ${{ github.event.repository.html_url }}
-        gerritCookie: ${{ secrets.gerritCookie }}
+      run: >
+        curl -s -H "Content-Type: application/json" --request POST --data '{"labels": { "Code-Review": -1 }, "message":"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
 
   end:
     needs: test
     runs-on: ubuntu-latest
     steps:
-
-    # Go is required for the cue-sh/trybot action
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.14.x
+    - name: Write the gitcookies file
+      run: echo "$GERRIT_COOKIE" > ~/.gitcookies
 
     - name: Update Gerrit CL message with success message
-      uses: cue-sh/trybot@latest
-      with:
-        mode: end
-        runID: ${{ github.run_id }}
-        ref: ${{ github.event.client_payload.ref }}
-        changeID: ${{ github.event.client_payload.changeID }}
-        jobStatus: "success"
-        repo: ${{ github.event.repository.html_url }}
-        gerritCookie: ${{ secrets.gerritCookie }}
-
+      run: >
+        curl -s -H "Content-Type: application/json" --request POST --data '{"labels": { "Code-Review": 1 }, "message":"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review

@@ -211,7 +211,6 @@ info: {
 	title:   *"My OpenAPI" | string
 	version: *"v1alpha1" | string
 }
-
 #Bar: {
 	foo: #Foo
 	...

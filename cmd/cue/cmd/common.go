@@ -417,11 +417,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			}
 		}
 
-		if !p.mergeData && p.schema == nil {
-			p.orphaned = append(p.orphaned, b.OrphanedFiles...)
-			continue
-		}
-
 		// TODO: this processing could probably be delayed, or at least
 		// simplified. The main reason to do this here is to allow interpreting
 		// the --schema/-d flag, while allowing to use this for OpenAPI and
@@ -439,7 +434,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 					Tags:           f.Tags,
 					Source:         file,
 				}
-				if p.schema != nil && d.Interpretation() == "" {
+				if (!p.mergeData || p.schema != nil) && d.Interpretation() == "" {
 					switch sub.Encoding {
 					case build.YAML, build.JSON, build.Text:
 						p.orphaned = append(p.orphaned, sub)
@@ -456,7 +451,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			}
 		}
 
-		if !addedUser && len(b.Files) > 1 {
+		if !addedUser && len(b.Files) > 0 {
 			p.insts = append(p.insts, b)
 		} else if len(p.orphaned) == 0 {
 			// Instance with only a single build: just print the file.

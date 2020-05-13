@@ -10,8 +10,11 @@ cue def jsonschema: bad.json
 ! cue def jsonschema: bad.json --strict
 cmp stderr expect-stderr
 
-! cue eval data.yaml schema.json
+! cue export data.yaml schema.json
 cmp stderr expect-stderr2
+
+! cue vet data.yaml schema.json
+cmp stderr expect-stderr3
 
 -- expect-stdout --
 package schema
@@ -65,6 +68,10 @@ unsupported constraint "foo":
 age: twenty
 
 -- expect-stderr2 --
+age: conflicting values "twenty" and >=0 (mismatched types string and number):
+    13:7
+    ./data.yaml:1:7
+-- expect-stderr3 --
 age: conflicting values "twenty" and >=0 (mismatched types string and number):
     13:7
     ./data.yaml:1:7

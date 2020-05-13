@@ -376,7 +376,7 @@ Workflow :: {
 					// Each run keyword represents a new process and shell in the
 					// virtual environment. When you provide multi-line commands,
 					// each line runs in the same shell.
-					run?: string, shell?: #shell, "working-directory"?: #def["working-directory"]
+					run?: string, shell?: #shell, "working-directory"?: #["working-directory"]
 
 					// You can use the if conditional to prevent a step from running
 					// unless a condition is met. You can use any supported context
@@ -547,12 +547,12 @@ Workflow :: {
 
 	#defaults: run?: {
 		shell?:               #shell
-		"working-directory"?: #def["working-directory"]
+		"working-directory"?: #["working-directory"]
 	}
 
 	#shell: string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")
 
-	#def: "working-directory": string
+	#: "working-directory": string
 
 	#event: "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "member" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "push" | "registry_package" | "release" | "status" | "watch" | "repository_dispatch"
 

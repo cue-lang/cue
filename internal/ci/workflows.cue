@@ -111,7 +111,7 @@ test_dispatch: json.Workflow & {
 			}, {
 				name: "Update Gerrit CL message with starting message"
 				run: """
-					curl -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
+					curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
 					"""
 			}]
 		}
@@ -167,7 +167,7 @@ test_dispatch: json.Workflow & {
 			}, {
 				name: "Post any failures for this matrix entry"
 				run: """
-					curl -s -H \"Content-Type: application/json\" --request POST --data '{\"labels\": { \"Code-Review\": -1 }, \"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
+					curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"labels\": { \"Code-Review\": -1 }, \"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
 					"""
 				if: "${{ failure() }}"
 			}]
@@ -189,7 +189,7 @@ test_dispatch: json.Workflow & {
 			}, {
 				name: "Update Gerrit CL message with success message"
 				run: """
-					curl -s -H \"Content-Type: application/json\" --request POST --data '{\"labels\": { \"Code-Review\": 1 }, \"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
+					curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"labels\": { \"Code-Review\": 1 }, \"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
 					"""
 			}]
 			needs: "test"
@@ -260,7 +260,7 @@ rebuild_tip_cuelang_org: json.Workflow & {
 		"runs-on": "ubuntu-latest"
 		steps: [{
 			name: "Rebuild tip.cuelang.org"
-			run:  "curl -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
+			run:  "curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
 		}]
 	}
 }

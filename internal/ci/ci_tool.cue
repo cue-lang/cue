@@ -25,10 +25,10 @@ command: genworkflows: task: {
 command: vendorgithubschema: {
 	get: http.Get & {
 		request: body: ""
-		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/master/src/schemas/json/github-workflow.json"
+		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
 	}
 	convert: exec.Run & {
 		stdin: get.response.body
-		cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l Workflow:: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/schemas/json/github-workflow.cue"
+		cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l Workflow:: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/schemas/json/github-workflow.cue"
 	}
 }

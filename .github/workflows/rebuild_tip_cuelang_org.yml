@@ -10,5 +10,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Rebuild tip.cuelang.org
-      run: curl -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook
+      run: curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook
         }}

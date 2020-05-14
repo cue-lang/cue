@@ -2592,109 +2592,123 @@ func TestExpr(t *testing.T) {
 		want  string
 	}{{
 		input: "v: 3",
-		want:  " 3",
+		want:  "3",
 	}, {
 		input: "v: 3 + 4",
-		want:  "+ 3 4",
+		want:  "+(3 4)",
 	}, {
 		input: "v: !a, a: 3",
-		want:  "! <0>.a",
+		want:  `!(.(<0> "a"))`,
 	}, {
 		input: "v: 1 | 2 | 3 | *4",
-		want:  "| 1 2 3 4",
+		want:  "|(1 2 3 4)",
 	}, {
 		input: "v: 2 & 5",
-		want:  "& 2 5",
+		want:  "&(2 5)",
 	}, {
 		input: "v: 2 | 5",
-		want:  "| 2 5",
+		want:  "|(2 5)",
 	}, {
 		input: "v: 2 && 5",
-		want:  "&& 2 5",
+		want:  "&&(2 5)",
 	}, {
 		input: "v: 2 || 5",
-		want:  "|| 2 5",
+		want:  "||(2 5)",
 	}, {
 		input: "v: 2 == 5",
-		want:  "== 2 5",
+		want:  "==(2 5)",
 	}, {
 		input: "v: !b, b: true",
-		want:  "! <0>.b",
+		want:  `!(.(<0> "b"))`,
 	}, {
 		input: "v: 2 != 5",
-		want:  "!= 2 5",
+		want:  "!=(2 5)",
 	}, {
 		input: "v: <5",
-		want:  "< 5",
+		want:  "<(5)",
 	}, {
 		input: "v: 2 <= 5",
-		want:  "<= 2 5",
+		want:  "<=(2 5)",
 	}, {
 		input: "v: 2 > 5",
-		want:  "> 2 5",
+		want:  ">(2 5)",
 	}, {
 		input: "v: 2 >= 5",
-		want:  ">= 2 5",
+		want:  ">=(2 5)",
 	}, {
 		input: "v: 2 =~ 5",
-		want:  "=~ 2 5",
+		want:  "=~(2 5)",
 	}, {
 		input: "v: 2 !~ 5",
-		want:  "!~ 2 5",
+		want:  "!~(2 5)",
 	}, {
 		input: "v: 2 + 5",
-		want:  "+ 2 5",
+		want:  "+(2 5)",
 	}, {
 		input: "v: 2 - 5",
-		want:  "- 2 5",
+		want:  "-(2 5)",
 	}, {
 		input: "v: 2 * 5",
-		want:  "* 2 5",
+		want:  "*(2 5)",
 	}, {
 		input: "v: 2 / 5",
-		want:  "/ 2 5",
+		want:  "/(2 5)",
 	}, {
 		input: "v: 2 quo 5",
-		want:  "quo 2 5",
+		want:  "quo(2 5)",
 	}, {
 		input: "v: 2 rem 5",
-		want:  "rem 2 5",
+		want:  "rem(2 5)",
 	}, {
 		input: "v: 2 div 5",
-		want:  "div 2 5",
+		want:  "div(2 5)",
 	}, {
 		input: "v: 2 mod 5",
-		want:  "mod 2 5",
+		want:  "mod(2 5)",
 	}, {
 		input: "v: a.b, a: b: 4",
-		want:  `. <0>.a "b"`,
+		want:  `.(.(<0> "a") "b")`,
 	}, {
 		input: `v: a["b"], a: b: 3 `,
-		want:  `[] <0>.a "b"`,
+		want:  `[](.(<0> "a") "b")`,
 	}, {
 		input: "v: a[2:5], a: [1, 2, 3, 4, 5]",
-		want:  "[:] <0>.a 2 5",
+		want:  `[:](.(<0> "a") 2 5)`,
 	}, {
 		input: "v: len([])",
-		want:  "() len []",
+		want:  "()(len [])",
+	}, {
+		input: "v: a.b, a: { b: string }",
+		want:  `.(.(<0> "a") "b")`,
 	}, {
 		input: `v: "Hello, \(x)! Welcome to \(place)", place: string, x: string`,
-		want:  `\() "Hello, " <0>.x "! Welcome to " <0>.place ""`,
+		want:  `\()("Hello, " .(<0> "x") "! Welcome to " .(<0> "place") "")`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
 			v := getInstance(t, tc.input).Lookup("v")
-			op, operands := v.Expr()
-			got := opToString[op]
-			for _, v := range operands {
-				got += " "
-				got += debugStr(v.ctx(), v.path.v)
-			}
+			got := exprStr(v)
 			if got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}
 		})
 	}
+}
+func exprStr(v Value) string {
+	op, operands := v.Expr()
+	if op == NoOp {
+		return debugStr(v.ctx(), v.path.v)
+	}
+	s := opToString[op]
+	s += "("
+	for i, v := range operands {
+		if i > 0 {
+			s += " "
+		}
+		s += exprStr(v)
+	}
+	s += ")"
+	return s
 }
 
 func TestKindString(t *testing.T) {

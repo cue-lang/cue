@@ -105,7 +105,7 @@ func (inst *Instance) complete() errors.Error {
 					continue
 				}
 				if imp.Err != nil {
-					return imp.Err
+					return errors.Wrapf(imp.Err, pos, "import failed")
 				}
 				imp.ImportPath = path
 				// imp.parent = inst

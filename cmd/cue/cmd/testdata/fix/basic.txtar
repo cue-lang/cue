@@ -1,0 +1,61 @@
+-- cue.mod/module.cue --
+module: "acme.com"
+
+-- bar/bar.cue --
+package bar
+
+import "acme.com/foo"
+
+A :: foo.Def & {
+    a: >10
+
+    B :: { c: int }
+}
+
+b: A & { a: 11 }
+
+c: foo.Def & { a: 11 }
+
+d: A.B.c
+e: [...A.B.c]
+
+-- foo/foo.cue --
+package foo
+
+Def :: {
+    a: int
+    b: string
+}
+
+a: Def
+c: [Def.b]: int
+
+-- out/fixmod --
+--- bar/bar.cue
+package bar
+
+import "acme.com/foo"
+
+#A: foo.#Def & {
+	a: >10
+	#B: {c: int}
+}
+
+b: #A & {a: 11}
+
+c: foo.#Def & {a: 11}
+
+d: #A.#B.c
+e: [...#A.#B.c]
+
+--- foo/foo.cue
+package foo
+
+#Def: {
+	a: int
+	b: string
+}
+
+a: #Def
+c: [#Def.b]: int
+

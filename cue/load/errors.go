@@ -51,7 +51,7 @@ type PackageError struct {
 
 func (p *PackageError) Position() token.Pos         { return p.Pos }
 func (p *PackageError) InputPositions() []token.Pos { return nil }
-func (p *PackageError) Path() []string              { return nil }
+func (p *PackageError) Path() []string              { return p.ImportStack }
 
 func (l *loader) errPkgf(importPos []token.Pos, format string, args ...interface{}) *PackageError {
 	err := &PackageError{

@@ -1194,6 +1194,38 @@ func (v Value) Elem() (Value, bool) {
 	return Value{}, false
 }
 
+// BulkOptionals returns all bulk optional fields as key-value pairs.
+// See also Elem and Template.
+func (v Value) BulkOptionals() [][2]Value {
+	x, ok := v.path.cache.(*structLit)
+	if !ok {
+		return nil
+	}
+	return v.appendBulk(nil, x.optionals)
+}
+
+func (v Value) appendBulk(a [][2]Value, x *optionals) [][2]Value {
+	if x == nil {
+		return a
+	}
+	a = v.appendBulk(a, x.left)
+	a = v.appendBulk(a, x.right)
+	for _, set := range x.fields {
+		if set.key != nil {
+			ctx := v.ctx()
+			fn, ok := ctx.manifest(set.value).(*lambdaExpr)
+			if !ok {
+				// create error
+				continue
+			}
+			x := fn.call(ctx, set.value, &basicType{k: stringKind})
+
+			a = append(a, [2]Value{v.makeElem(set.key), v.makeElem(x)})
+		}
+	}
+	return a
+}
+
 // List creates an iterator over the values of a list or reports an error if
 // v is not a list.
 func (v Value) List() (Iterator, error) {
@@ -1581,6 +1613,9 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 // given its name.
 func (v Value) Template() func(label string) Value {
 	// TODO: rename to optional.
+	if v.path == nil {
+		return nil
+	}
 
 	ctx := v.ctx()
 	x, ok := v.path.cache.(*structLit)

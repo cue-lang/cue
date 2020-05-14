@@ -1,0 +1,74 @@
+-- cue.mod/module.cue --
+module: "acme.com"
+
+-- bar/bar.cue --
+package bar
+
+A :: {
+    foo: [string]: {
+        B :: {
+            foo: int
+        }
+
+        bar: {
+            C :: { D :: int }
+        }
+
+        c: B.foo
+        d: B
+        e: B & { foo: 3 }
+        f: bar.C
+        g: bar.C.D
+    }
+
+    used: [=~"Foo"]: {
+        C :: {}
+        c: C
+    }
+    used: "FooBar": {}
+
+    unused: [=~"Foo"]: {
+        X :: {
+
+        }
+        x: X
+    }
+}
+
+-- out/fixmod --
+--- bar/bar.cue
+package bar
+
+#A: {
+	foo: [string]: {
+		#B: {
+			foo: int
+		}
+
+		bar: {
+			#C: {
+				#D: int
+			}
+		}
+
+		c: #B.foo
+		d: #B
+		e: #B & {foo: 3}
+		f: bar.#C
+		g: bar.#C.#D
+	}
+
+	used: [=~"Foo"]: {
+		#C: {}
+		c: #C
+	}
+	used: "FooBar": {}
+
+	unused: [=~"Foo"]: {
+		#X: {
+
+		}
+		x: #X
+	}
+}
+

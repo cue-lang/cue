@@ -1,0 +1,21 @@
+
+-- cue.mod/module.cue --
+module: "acme.com"
+
+-- bar/bar.cue --
+package bar
+
+a: [X=b.c]: int
+a: Y=[X=b.c]: int
+
+b: c :: int
+
+-- out/fixmod --
+--- bar/bar.cue
+package bar
+
+a: [X=b.#c]:   int
+a: Y=[X=b.#c]: int
+
+b: #c: int
+

@@ -1,0 +1,34 @@
+This file contains cases that could be supported but aren't,
+as the cost for supporting them is likely too high.
+
+-- cue.mod/module.cue --
+module: "acme.com"
+
+
+-- foo/foo.cue --
+package foo
+
+Def :: {
+    a: int
+    b: "foo"
+}
+
+"\(Def.b)": int
+b: "\(Def.b)": int
+
+-- out/fixmod --
+--- foo/foo.cue
+package foo
+
+// Possible references to this location:
+// /Users/mpvl/Cloud/dev/cue/cmd/cue/cmd/testdata/fix/foo/foo.cue:8:4
+// /Users/mpvl/Cloud/dev/cue/cmd/cue/cmd/testdata/fix/foo/foo.cue:9:7
+#Def: {
+	a: int
+	b: "foo"
+}
+Def: #Def @tmpNoExportNewDef(7aca)
+
+"\(Def.b)": int
+b: "\(Def.b)": int
+

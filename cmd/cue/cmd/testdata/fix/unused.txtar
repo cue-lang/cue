@@ -1,0 +1,22 @@
+-- cue.mod/module.cue --
+module: "acme.com"
+
+-- bar/bar.cue --
+package bar
+
+a: [string]: {
+    D :: int
+}
+
+b: a.str.D
+
+-- out/fixmod --
+--- bar/bar.cue
+package bar
+
+a: [string]: {
+	#D: int
+}
+
+b: a.str.#D
+

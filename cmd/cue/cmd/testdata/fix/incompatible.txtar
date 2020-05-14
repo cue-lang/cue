@@ -1,0 +1,38 @@
+Things currently possible not supported by new-style
+definitions.
+
+-- foo/bar.cue --
+package bar
+
+"\(foo)" :: int
+foo: string
+
+"foo-bar" :: int
+
+-- out/fixmod --
+Incompatible definitions detected:
+
+A trick that can be used is to rename this to a regular identifier and then
+move the definition to a sub field. For instance, rewrite
+
+			"foo-bar" :: baz
+			"foo\(bar)" :: baz
+
+		to
+
+			#defmap: "foo-bar": baz
+			#defmap: "foo\(bar)": baz
+
+Errors:
+cannot convert dynamic definition for '"\(foo)"':
+    ./foo/bar.cue:3:1
+invalid identifier "foo-bar"; definition must be valid label:
+    ./foo/bar.cue:6:1
+--- foo/bar.cue
+package bar
+
+"\(foo)" :: int
+foo:        string
+
+"foo-bar" :: int
+

@@ -86,7 +86,7 @@ imports:
 		cfg:  dirCfg,
 		args: args("./other/..."),
 		want: `
-err:    relative import paths not allowed ("./file")
+err:    import failed: relative import paths not allowed ("./file")
 path:   ""
 module: example.org/test
 root:   $CWD/testdata
@@ -108,7 +108,7 @@ display:./anon`,
 		cfg:  dirCfg,
 		args: args("./other"),
 		want: `
-err:    relative import paths not allowed ("./file")
+err:    import failed: relative import paths not allowed ("./file")
 path:   example.org/test/other:main
 module: example.org/test
 root:   $CWD/testdata

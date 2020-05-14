@@ -1,0 +1,87 @@
+cue fix ./foo/foo.cue ./bar/bar.cue
+
+cmp foo/foo.cue expect/foo/foo_cue
+cmp bar/bar.cue expect/bar/bar_cue
+cmp cue.mod/pkg/foobar.org/notimported/notimported.cue expect/cue.mod/pkg/foobar.org/notimported/notimported.cue
+cmp cue.mod/gen/foobar.org/imported/imported.cue expect/cue.mod/gen/foobar.org/imported/imported.cue
+
+-- cue.mod/module.cue --
+module: "acme.com"
+-- cue.mod/pkg/foobar.org/notimported/notimported.cue --
+package notimported
+
+Foo :: {
+    x: int
+}
+a: Foo
+-- cue.mod/gen/foobar.org/imported/imported.cue --
+package imported
+
+Bar :: {
+    x: int
+}
+-- bar/bar.cue --
+package bar
+
+import (
+    "foobar.org/imported"
+)
+
+A :: {
+    B :: { c: int }
+}
+
+b: A & { a: 11 }
+
+d: imported.Bar & { a: 11 }
+
+d: A.B.c
+e: [...A.B.c]
+
+-- foo/foo.cue --
+Def :: {
+    a: int
+    b: string
+}
+
+a: Def
+c: [Def.b]: int
+
+-- expect/bar/bar_cue --
+package bar
+
+import (
+	"foobar.org/imported"
+)
+
+#A: {
+	#B: {c: int}
+}
+
+b: #A & {a: 11}
+
+d: imported.#Bar & {a: 11}
+
+d: #A.#B.c
+e: [...#A.#B.c]
+-- expect/foo/foo_cue --
+#Def: {
+	a: int
+	b: string
+}
+
+a: #Def
+c: [#Def.b]: int
+-- expect/cue.mod/pkg/foobar.org/notimported/notimported.cue --
+package notimported
+
+Foo :: {
+    x: int
+}
+a: Foo
+-- expect/cue.mod/gen/foobar.org/imported/imported.cue --
+package imported
+
+Bar :: {
+    x: int
+}

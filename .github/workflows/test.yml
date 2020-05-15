@@ -23,7 +23,7 @@ jobs:
     runs-on: ${{ matrix.platform }}
     steps:
     - name: Install Go
-      uses: actions/setup-go@v1
+      uses: actions/setup-go@v2
       with:
         go-version: ${{ matrix.go-version }}
 
@@ -39,6 +39,9 @@ jobs:
           ${{ runner.os }}-${{ matrix.go-version }}-go-
 
     - name: Generate
+      # The Go version corresponds to the precise 1.14.x version specified in
+      # the matrix. Skip windows for now until we work out why re-gen is flaky
+      if: matrix.go-version == "1.14.3" && matrix.platform != "windows-latest"
       run: go generate ./...
 
     - name: Test
@@ -58,4 +61,4 @@ jobs:
         v=$(git rev-parse HEAD)
         cd $(mktemp -d)
         go mod init mod.com
-        GOPROXY=https://proxy.golang.org go get cuelang.org/go@$v
+        GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v

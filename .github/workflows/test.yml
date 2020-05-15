@@ -47,7 +47,7 @@ jobs:
       run: go test -race ./...
 
     - name: gorelease check
-      run: go run -modfile=./.tools/go.mod golang.org/x/exp/cmd/gorelease
+      run: go run golang.org/x/exp/cmd/gorelease
 
     - name: Check that git is clean post generate and tests
       run: test -z "$(git status --porcelain)" || (git status; git diff; false)

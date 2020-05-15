@@ -1,4 +1,4 @@
-// Copyright 2018 The CUE Authors
+// Copyright 2020 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo -exclude=Rune$,Func$,^Map$,Special$,EqualFold,Byte,Title$,ToValidUTF8,All$ extract strings
+//go:generate go run cuelang.org/go/internal/cmd/qgo -exclude=Rune$,Func$,^Map$,Special$,EqualFold,Byte,Title$,ToValidUTF8,All$ extract strings
 
 package strings
 
@@ -129,10 +129,10 @@ func Fields(s string) []string {
 	return strings.Fields(s)
 }
 
-// Join concatenates the elements of a to create a single string. The separator string
-// sep is placed between elements in the resulting string.
-func Join(a []string, sep string) string {
-	return strings.Join(a, sep)
+// Join concatenates the elements of its first argument to create a single string. The separator
+// string sep is placed between elements in the resulting string.
+func Join(elems []string, sep string) string {
+	return strings.Join(elems, sep)
 }
 
 // HasPrefix tests whether the string s begins with prefix.

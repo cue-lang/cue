@@ -3121,10 +3121,10 @@ var builtinPackages = map[string]*builtinPkg{
 			Params: []kind{listKind, stringKind},
 			Result: stringKind,
 			Func: func(c *callCtxt) {
-				a, sep := c.strList(0), c.string(1)
+				elems, sep := c.strList(0), c.string(1)
 				if c.do() {
 					c.ret = func() interface{} {
-						return strings.Join(a, sep)
+						return strings.Join(elems, sep)
 					}()
 				}
 			},

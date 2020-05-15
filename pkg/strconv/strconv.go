@@ -1,4 +1,4 @@
-// Copyright 2018 The CUE Authors
+// Copyright 2020 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-//go:generate qgo -exclude=Append,Unquote,Itoa,CanBackquote extract strconv
+//go:generate go run cuelang.org/go/internal/cmd/qgo -exclude=Append,Unquote,Itoa,CanBackquote extract strconv
 
 package strconv
 
@@ -155,8 +155,9 @@ func QuoteToASCII(s string) string {
 }
 
 // QuoteToGraphic returns a double-quoted Go string literal representing s.
-// The returned string uses Go escape sequences (\t, \n, \xFF, \u0100) for
-// non-ASCII characters and non-printable characters as defined by IsGraphic.
+// The returned string leaves Unicode graphic characters, as defined by
+// IsGraphic, unchanged and uses Go escape sequences (\t, \n, \xFF, \u0100)
+// for non-graphic characters.
 func QuoteToGraphic(s string) string {
 	return strconv.QuoteToGraphic(s)
 }
@@ -177,9 +178,9 @@ func QuoteRuneToASCII(r rune) string {
 }
 
 // QuoteRuneToGraphic returns a single-quoted Go character literal representing
-// the rune. The returned string uses Go escape sequences (\t, \n, \xFF,
-// \u0100) for non-ASCII characters and non-printable characters as defined
-// by IsGraphic.
+// the rune. If the rune is not a Unicode graphic character,
+// as defined by IsGraphic, the returned string will use a Go escape sequence
+// (\t, \n, \xFF, \u0100).
 func QuoteRuneToGraphic(r rune) string {
 	return strconv.QuoteRuneToGraphic(r)
 }

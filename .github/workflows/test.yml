@@ -8,11 +8,16 @@ on:
       - 'v*'
   pull_request:
 
+defaults:
+  run:
+    shell: bash
+
 jobs:
   test:
     strategy:
+      fail-fast: false
       matrix:
-        go-version: [1.12.x, 1.13.x]
+        go-version: [1.13.x, 1.14.x]
         platform: [ubuntu-latest, macos-latest, windows-latest]
     runs-on: ${{ matrix.platform }}
     steps:
@@ -36,3 +41,14 @@ jobs:
       run: go test ./...
     - name: Test with -race
       run: go test -race ./...
+
+    - name: gorelease check
+      run: go run -modfile=./.tools/go.mod golang.org/x/exp/cmd/gorelease
+
+    - name: Pull this commit through the proxy on master
+      if: github.ref == 'refs/heads/master'
+      run: |
+        v=$(git rev-parse HEAD)
+        cd $(mktemp -d)
+        go mod init mod.com
+        GOPROXY=https://proxy.golang.org go get cuelang.org/go@$v

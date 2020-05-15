@@ -126,7 +126,7 @@ the second to standard output (i.e. it echos it again).
 
 		// also starts after echo
 		print: cli.Print & {
-			contents: echo.stdout
+			text: echo.stdout
 		}
 	}
 

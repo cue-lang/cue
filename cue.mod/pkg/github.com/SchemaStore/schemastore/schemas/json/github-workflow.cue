@@ -2,7 +2,7 @@ package json
 
 import "strings"
 
-Workflow :: {
+#Workflow: {
 	@jsonschema(schema="http://json-schema.org/draft-07/schema")
 	number | null | bool | string | [...] | {
 		// The name of your workflow. GitHub displays the names of your

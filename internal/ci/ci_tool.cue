@@ -29,6 +29,6 @@ command: vendorgithubschema: {
 	}
 	convert: exec.Run & {
 		stdin: get.response.body
-		cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l Workflow:: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/schemas/json/github-workflow.cue"
+		cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/schemas/json/github-workflow.cue"
 	}
 }

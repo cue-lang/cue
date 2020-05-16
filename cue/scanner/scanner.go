@@ -273,6 +273,10 @@ func (s *Scanner) scanFieldIdentifier() string {
 	}
 	if s.ch == '#' {
 		s.next()
+		// TODO: remove this block to allow #<num>
+		if isDigit(s.ch) {
+			return string(s.src[offs:s.offset])
+		}
 	}
 	for isLetter(s.ch) || isDigit(s.ch) || s.ch == '_' || s.ch == '$' {
 		s.next()
@@ -778,7 +782,8 @@ scanAgain:
 			tok = token.Lookup(lit)
 			insertEOL = true
 			break
-		} else if ch != '#' {
+		}
+		if ch != '#' || (s.ch != '\'' && s.ch != '"' && s.ch != '#') {
 			tok = token.IDENT
 			insertEOL = true
 			break

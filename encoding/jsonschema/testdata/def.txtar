@@ -40,7 +40,7 @@
 
 -- out.cue --
 @jsonschema(schema="http://json-schema.org/draft-07/schema#",id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
-person?:           #def["per-son"]
+person?:           #["per-son"]
 billing_address?:  #address
 shipping_address?: #address
 
@@ -51,9 +51,9 @@ shipping_address?: #address
 	...
 }
 
-#def: "per-son": {
+#: "per-son": {
 	name?: string
-	children?: [...#def["per-son"]]
+	children?: [...#["per-son"]]
 	...
 }
 ...

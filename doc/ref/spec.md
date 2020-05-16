@@ -179,8 +179,9 @@ these rules.
 Identifiers name entities such as fields and aliases.
 An identifier is a sequence of one or more letters (which includes `_` and `$`)
 and digits, optionally preceded by `#` or `_#`.
-It may not be `_`, `$`, `#`, or `_#`.
-The first character in an identifier must be a letter or `#`.
+It may not be `_` or `$`.
+The first character in an identifier, or after an `#` if it contains one,
+must be a letter.
 Identifiers starting with a `#` or `_` are reserved for definitions and hidden
 fields.
 

@@ -39,27 +39,25 @@ func IsValidIdent(ident string) bool {
 		return false
 	}
 
-	consumed := false
+	// TODO: use consumed again to allow #0.
+	// consumed := false
 	if strings.HasPrefix(ident, "_") {
 		ident = ident[1:]
-		consumed = true
+		// consumed = true
 		if len(ident) == 0 {
 			return true
 		}
 	}
 	if strings.HasPrefix(ident, "#") {
 		ident = ident[1:]
-		consumed = true
-		if len(ident) == 0 {
-			return false
-		}
+		// consumed = true
 	}
 
-	if !consumed {
-		if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
-			return false
-		}
+	// if !consumed {
+	if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
+		return false
 	}
+	// }
 
 	for _, r := range ident {
 		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
@@ -133,13 +131,13 @@ func parseIdent(pos token.Pos, ident string) (string, error) {
 	}
 	if strings.HasPrefix(ident[p:], "#") {
 		p++
-		if len(ident) == p {
-			return "", errors.Newf(pos, "invalid identifier '_#'")
-		}
+		// if len(ident) == p {
+		// 	return "", errors.Newf(pos, "invalid identifier '_#'")
+		// }
 	}
 
-	if p == 0 {
-		if r, _ := utf8.DecodeRuneInString(ident); isDigit(r) {
+	if p == 0 || ident[p-1] == '#' {
+		if r, _ := utf8.DecodeRuneInString(ident[p:]); isDigit(r) {
 			return "", errors.Newf(pos, "invalid character '%s' in identifier", string(r))
 		}
 	}

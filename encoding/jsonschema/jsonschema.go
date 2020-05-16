@@ -74,8 +74,8 @@ type Config struct {
 	//
 	// The default mapping is
 	//    {}                     {}
-	//    {"definitions", foo}   {#foo} or {#def, foo}
-	//    {"$defs", foo}         {#foo} or {#def, foo}
+	//    {"definitions", foo}   {#foo} or {#, foo}
+	//    {"$defs", foo}         {#foo} or {#, foo}
 	Map func(pos token.Pos, path []string) ([]ast.Label, error)
 
 	// TODO: configurability to make it compatible with OpenAPI, such as

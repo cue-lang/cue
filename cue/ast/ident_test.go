@@ -56,14 +56,18 @@ func TestLabelName(t *testing.T) {
 		err:     true,
 	}, {
 		in:      &ast.Ident{Name: "#"},
+		out:     "#",
+		isIdent: true,
+	}, {
+		in:      &ast.Ident{Name: "#0"},
 		out:     "",
 		isIdent: false,
 		err:     true,
 	}, {
 		in:      &ast.Ident{Name: "_#"},
-		out:     "",
-		isIdent: false,
-		err:     true,
+		out:     "_#",
+		isIdent: true,
+		err:     false,
 	}, {
 		in:      &ast.Ident{Name: "_"},
 		out:     "_",

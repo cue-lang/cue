@@ -35,7 +35,7 @@ import (
 // have a valid identifier name.
 //
 // TODO: find something more principled, like allowing #."a-b" or `#a-b`.
-const rootDefs = "#def"
+const rootDefs = "#"
 
 // A decoder converts JSON schema to CUE.
 type decoder struct {

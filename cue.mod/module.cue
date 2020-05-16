@@ -1,0 +1,1 @@
+module: "cuelang.org/go"

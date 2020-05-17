@@ -1363,6 +1363,19 @@ func TestValidate(t *testing.T) {
 		a: b: c: *["\(x)"] | _
 		d: yaml.Marshal(a.b)
 		`,
+	}, {
+		desc: "allow non-concrete values for definitions",
+		in: `
+		variables: #variables
+
+		{[!~"^[.]"]: #job}
+
+		#variables: [string]: int | string
+
+		#job: ({a: int} | {b: int}) & {
+			"variables"?: #variables
+		}
+		`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

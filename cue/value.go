@@ -198,7 +198,9 @@ func boolTonode(src source, b bool) evaluated {
 
 type bytesLit struct {
 	baseValue
-	b  []byte
+	b []byte
+	// Also support https://github.com/dlclark/regexp2 to
+	// accommodate JSON Schema?
 	re *regexp.Regexp // only set if needed
 }
 

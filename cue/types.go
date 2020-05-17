@@ -2047,7 +2047,9 @@ func (x *validator) walk(v Value, opts options) {
 		x.depth++
 		obj, err := v.structValOpts(ctx, opts)
 		if err != nil {
-			x.errs = errors.Append(x.errs, v.toErr(err))
+			if !isIncomplete(err) && opts.concrete {
+				x.errs = errors.Append(x.errs, v.toErr(err))
+			}
 		}
 		for i := 0; i < obj.Len(); i++ {
 			_, v := obj.At(i)

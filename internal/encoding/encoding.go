@@ -40,6 +40,8 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/third_party/yaml"
+	"golang.org/x/text/encoding/unicode"
+	"golang.org/x/text/transform"
 )
 
 type Decoder struct {
@@ -169,12 +171,20 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		return i
 	}
 
-	r, err := reader(f, cfg.Stdin)
-	i.closer = r
+	rc, err := reader(f, cfg.Stdin)
+	i.closer = rc
 	i.err = err
 	if err != nil {
 		return i
 	}
+
+	// For now we assume that all encodings require UTF-8. This will not be the
+	// case for some binary protocols. We need to exempt those explicitly here
+	// once we introduce them.
+	// TODO: this code also allows UTF16, which is too permissive for some
+	// encodings. Switch to unicode.UTF8Sig once available.
+	t := unicode.BOMOverride(unicode.UTF8.NewDecoder())
+	r := transform.NewReader(rc, t)
 
 	switch f.Interpretation {
 	case "":

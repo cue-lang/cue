@@ -23,6 +23,9 @@ import (
 	"cuelang.org/go/internal"
 )
 
+// TODO: skip invalid regexps containing ?! and foes.
+// alternatively, fall back to  https://github.com/dlclark/regexp2
+
 type constraint struct {
 	key string
 
@@ -71,11 +74,11 @@ func init() {
 
 func addDefinitions(n cue.Value, s *state) {
 	if n.Kind() != cue.StructKind {
-		s.errf(n, `"definitions" expected an object, found %v`, n.Kind)
+		s.errf(n, `"definitions" expected an object, found %s`, n.Kind())
 	}
 
 	if len(s.path) != 1 {
-		s.errf(n, `"definitions" expected an object, found %v`, n.Kind)
+		s.errf(n, `"definitions" only allowed at root`)
 	}
 
 	old := s.isSchema
@@ -191,11 +194,12 @@ var constraints = []*constraint{
 		if n.Kind() != cue.ListKind {
 			s.errf(n, `value of "examples" must be an array, found %v`, n.Kind)
 		}
-		for _, n := range s.listItems("examples", n, true) {
-			if ex := s.schema(n); !isAny(ex) {
-				s.examples = append(s.examples, ex)
-			}
-		}
+		// TODO: implement examples properly.
+		// for _, n := range s.listItems("examples", n, true) {
+		// 	if ex := s.value(n); !isAny(ex) {
+		// 		s.examples = append(s.examples, ex)
+		// 	}
+		// }
 	}),
 
 	p0("description", func(n cue.Value, s *state) {
@@ -340,11 +344,13 @@ var constraints = []*constraint{
 	}),
 
 	p0d("contentMediaType", 7, func(n cue.Value, s *state) {
-		s.usedTypes |= cue.StringKind
+		// TODO: only mark as used if it generates something.
+		// s.usedTypes |= cue.StringKind
 	}),
 
 	p0d("contentEncoding", 7, func(n cue.Value, s *state) {
-		s.usedTypes |= cue.StringKind
+		// TODO: only mark as used if it generates something.
+		// s.usedTypes |= cue.StringKind
 		// 7bit, 8bit, binary, quoted-printable and base64.
 		// RFC 2054, part 6.1.
 		// https://tools.ietf.org/html/rfc2045
@@ -424,11 +430,12 @@ var constraints = []*constraint{
 	}),
 
 	p1("required", func(n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
 		if n.Kind() != cue.ListKind {
 			s.errf(n, `value of "required" must be list of strings, found %v`, n.Kind)
 			return
 		}
+
+		s.usedTypes |= cue.StructKind
 
 		if s.obj == nil {
 			s.obj = &ast.StructLit{}
@@ -439,7 +446,10 @@ var constraints = []*constraint{
 		// Create field map
 		fields := map[string]*ast.Field{}
 		for _, d := range s.obj.Elts {
-			f := d.(*ast.Field)
+			f, ok := d.(*ast.Field)
+			if !ok {
+				continue // Could be embedding? See cirrus.json
+			}
 			str, _, err := ast.LabelName(f.Label)
 			if err == nil {
 				fields[str] = f
@@ -466,10 +476,9 @@ var constraints = []*constraint{
 	}),
 
 	p0d("propertyNames", 6, func(n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
-
 		// [=~pattern]: _
 		if names, _ := s.schemaState(n, cue.StringKind, false); !isAny(names) {
+			s.usedTypes |= cue.StructKind
 			s.addConjunct(ast.NewStruct(ast.NewList((names)), ast.NewIdent("_")))
 		}
 	}),
@@ -529,12 +538,15 @@ var constraints = []*constraint{
 	}),
 
 	p2("additionalProperties", func(n cue.Value, s *state) {
-		s.usedTypes |= cue.StructKind
 		switch n.Kind() {
 		case cue.BoolKind:
 			s.closeStruct = !s.boolValue(n)
+			if !s.closeStruct {
+				s.usedTypes |= cue.StructKind
+			}
 
 		case cue.StructKind:
+			s.usedTypes |= cue.StructKind
 			s.closeStruct = true
 			if s.obj == nil {
 				s.obj = &ast.StructLit{}
@@ -586,10 +598,19 @@ var constraints = []*constraint{
 	}),
 
 	p0("additionalItems", func(n cue.Value, s *state) {
-		s.usedTypes |= cue.ListKind
-		if s.list != nil {
-			elem := s.schema(n)
-			s.list.Elts = append(s.list.Elts, &ast.Ellipsis{Type: elem})
+		switch n.Kind() {
+		case cue.BoolKind:
+			// TODO: support
+
+		case cue.StructKind:
+			if s.list != nil {
+				s.usedTypes |= cue.ListKind
+				elem := s.schema(n)
+				s.list.Elts = append(s.list.Elts, &ast.Ellipsis{Type: elem})
+			}
+
+		default:
+			s.errf(n, `value of "additionalItems" must be an object or boolean`)
 		}
 	}),
 

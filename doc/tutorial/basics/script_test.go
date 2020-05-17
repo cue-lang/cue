@@ -8,8 +8,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rogpeppe/testscript"
-	"github.com/rogpeppe/testscript/txtar"
+	"github.com/rogpeppe/go-internal/testscript"
+	"github.com/rogpeppe/go-internal/txtar"
 
 	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue/parser"
@@ -49,8 +49,8 @@ func TestLatest(t *testing.T) {
 
 func TestScript(t *testing.T) {
 	filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
-		if !info.IsDir() {
-			return nil
+		if info.IsDir() {
+			return filepath.SkipDir
 		}
 		testscript.Run(t, testscript.Params{
 			Dir:           path,

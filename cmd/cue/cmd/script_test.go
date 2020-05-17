@@ -12,8 +12,8 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/rogpeppe/testscript"
-	"github.com/rogpeppe/testscript/txtar"
+	"github.com/rogpeppe/go-internal/testscript"
+	"github.com/rogpeppe/go-internal/txtar"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"

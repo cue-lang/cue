@@ -12,15 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package trim removes defintiions that may be inferred from
+// Package trim removes definitions that may be inferred from
 // templates.
 //
-// trim removes fields from structs that can be inferred from constraints
-
 // A field, struct, or list is removed if it is implied by a constraint, such
-// as from an optional field maching a required field, a list type value,
+// as from an optional field matching a required field, a list type value,
 // a comprehension or any other implied content. It will modify the files in place.
-
+//
 // Limitations
 //
 // Removal is on a best effort basis. Some caveats:
@@ -29,7 +27,7 @@
 // - Disjunctions that contain structs in implied content cannot be used to
 //   remove fields.
 // - There is currently no verification step: manual verification is required.
-
+//
 // Examples:
 //
 // 	light: [string]: {
@@ -37,7 +35,7 @@
 // 		brightnessOff: *0.0 | >=0 & <=100.0
 // 		brightnessOn:  *100.0 | >=0 & <=100.0
 // 	}
-
+//
 // 	light: ceiling50: {
 // 		room:          "MasterBedroom"
 // 		brightnessOff: 0.0    // this line

@@ -21,11 +21,11 @@ package jsonschema
 import (
 	"fmt"
 	"math/bits"
-	"sort"
 	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -41,19 +41,21 @@ const rootDefs = "#"
 type decoder struct {
 	cfg *Config
 
-	errs    errors.Error
-	imports map[string]*ast.Ident
+	errs errors.Error
 
 	definitions []ast.Decl
 }
 
 // addImport registers
 func (d *decoder) addImport(pkg string) *ast.Ident {
-	ident, ok := d.imports[pkg]
-	if !ok {
-		ident = ast.NewIdent(pkg)
-		d.imports[pkg] = ident
+	spec := ast.NewImport(nil, pkg)
+	info, err := astutil.ParseImportSpec(spec)
+	if err != nil {
+		d.errf(cue.Value{}, "invalid import %q", pkg)
 	}
+	ident := ast.NewIdent(info.Ident)
+	ident.Node = spec
+
 	return ident
 }
 
@@ -90,22 +92,10 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 		}
 	}
 
-	var imports []string
-	for k := range d.imports {
-		imports = append(imports, k)
-	}
-	sort.Strings(imports)
-
-	if len(imports) > 0 {
-		x := &ast.ImportDecl{}
-		for _, p := range imports {
-			x.Specs = append(x.Specs, ast.NewImport(nil, p))
-		}
-		f.Decls = append(f.Decls, x)
-	}
-
 	f.Decls = append(f.Decls, a...)
 	f.Decls = append(f.Decls, d.definitions...)
+
+	_ = astutil.Sanitize(f)
 
 	return f
 }

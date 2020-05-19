@@ -291,7 +291,13 @@ func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {
 			var isNew bool
 			name, isNew = z.addRename(y.Name, x)
 			if isNew {
-				x.Label = &ast.Alias{Ident: ast.NewIdent(name), Expr: y}
+				ident := ast.NewIdent(name)
+				// Move formatting and comments from original label to alias
+				// identifier.
+				CopyMeta(ident, y)
+				ast.SetRelPos(y, token.NoRelPos)
+				ast.SetComments(y, nil)
+				x.Label = &ast.Alias{Ident: ident, Expr: y}
 			}
 
 		default:

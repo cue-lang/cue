@@ -15,10 +15,14 @@
 package jsonschema
 
 import (
+	"fmt"
 	"math/big"
+	"path"
+	"regexp"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -81,25 +85,32 @@ func addDefinitions(n cue.Value, s *state) {
 		s.errf(n, `"definitions" expected an object, found %s`, n.Kind())
 	}
 
-	if len(s.path) != 1 {
-		s.errf(n, `"definitions" only allowed at root`)
-	}
-
 	old := s.isSchema
 	s.isSchema = true
 	defer func() { s.isSchema = old }()
 
 	s.processMap(n, func(key string, n cue.Value) {
-		name := s.path[len(s.path)-1]
-		a, _ := jsonSchemaRef(n.Pos(), []string{"definitions", name})
+		name := key
 
-		f := &ast.Field{Label: a[len(a)-1], Value: s.schema(n)}
-		for i := len(a) - 2; i >= 0; i-- {
-			f = &ast.Field{Label: a[i], Value: ast.NewStruct(f)}
+		var f *ast.Field
+
+		ident := "#" + name
+		if ast.IsValidIdent(ident) {
+			f = &ast.Field{Value: s.schema(n, label{ident, true})}
+			f.Label = ast.NewIdent(ident)
+		} else {
+			f = &ast.Field{Value: s.schema(n, label{"#", true}, label{name: name})}
+			f.Label = ast.NewString(name)
+			ident = "#"
+			f = &ast.Field{
+				Label: ast.NewIdent("#"),
+				Value: ast.NewStruct(f),
+			}
 		}
 
 		ast.SetRelPos(f, token.NewSection)
 		s.definitions = append(s.definitions, f)
+		s.setField(label{name: ident, isDef: true}, f)
 	})
 }
 
@@ -114,11 +125,32 @@ var constraints = []*constraint{
 
 	p0("$id", func(n cue.Value, s *state) {
 		// URL: https://domain.com/schemas/foo.json
-		// Use Title(foo) as CUE identifier.
 		// anchors: #identifier
 		//
 		// TODO: mark identifiers.
-		s.id, _ = s.strValue(n)
+
+		// Resolution must be relative to parent $id
+		// https://tools.ietf.org/html/draft-handrews-json-schema-02#section-8.2.2
+		u := s.resolveURI(n)
+		if u == nil {
+			return
+		}
+
+		if u.Fragment != "" {
+			if s.cfg.Strict {
+				s.errf(n, "$id URI may not contain a fragment")
+			}
+			return
+		}
+		s.id = u
+
+		if s.obj == nil {
+			s.obj = &ast.StructLit{}
+		}
+		// TODO: handle the case where this is always defined and we don't want
+		// to include the default value.
+		s.obj.Elts = append(s.obj.Elts, &ast.Attribute{
+			Text: fmt.Sprintf("@jsonschema(id=%q)", u)})
 	}),
 
 	// Generic constraint
@@ -221,30 +253,22 @@ var constraints = []*constraint{
 	p1("definitions", addDefinitions),
 	p1("$ref", func(n cue.Value, s *state) {
 		s.usedTypes = allTypes
-		str, _ := s.strValue(n)
-		refs := s.parseRef(n.Pos(), str)
-		var a []ast.Label
-		if refs != nil {
-			a = s.mapRef(n.Pos(), str, refs)
-		}
-		if a == nil {
-			s.addConjunct(&ast.BadExpr{From: n.Pos()})
+
+		u := s.resolveURI(n)
+
+		if u.Fragment != "" && !path.IsAbs(u.Fragment) {
+			s.addErr(errors.Newf(n.Pos(), "anchors (%s) not supported", u.Fragment))
+			// TODO: support anchors
 			return
 		}
-		sel, ok := a[0].(ast.Expr)
-		if !ok {
-			sel = &ast.BadExpr{}
-		}
-		for _, l := range a[1:] {
-			switch x := l.(type) {
-			case *ast.Ident:
-				sel = &ast.SelectorExpr{X: sel, Sel: x}
 
-			case *ast.BasicLit:
-				sel = &ast.IndexExpr{X: sel, Index: x}
-			}
+		expr := s.makeCUERef(n, u)
+
+		if expr == nil {
+			expr = &ast.BadExpr{From: n.Pos()}
 		}
-		s.addConjunct(sel)
+
+		s.addConjunct(expr)
 	}),
 
 	// Combinators
@@ -270,7 +294,7 @@ var constraints = []*constraint{
 	p2("allOf", func(n cue.Value, s *state) {
 		var a []ast.Expr
 		for _, v := range s.listItems("allOf", n, false) {
-			x, sub := s.schemaState(v, s.allowedTypes, true)
+			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 			s.allowedTypes &= sub.allowedTypes
 			s.usedTypes |= sub.usedTypes
 			if sub.hasConstraints() {
@@ -286,7 +310,7 @@ var constraints = []*constraint{
 		var types cue.Kind
 		var a []ast.Expr
 		for _, v := range s.listItems("anyOf", n, false) {
-			x, sub := s.schemaState(v, s.allowedTypes, true)
+			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 			types |= sub.allowedTypes
 			if sub.hasConstraints() {
 				a = append(a, x)
@@ -303,7 +327,7 @@ var constraints = []*constraint{
 		var a []ast.Expr
 		hasSome := false
 		for _, v := range s.listItems("oneOf", n, false) {
-			x, sub := s.schemaState(v, s.allowedTypes, true)
+			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 			types |= sub.allowedTypes
 
 			// TODO: make more finegrained by making it two pass.
@@ -328,6 +352,13 @@ var constraints = []*constraint{
 	// String constraints
 
 	p1("pattern", func(n cue.Value, s *state) {
+		str, _ := n.String()
+		if _, err := regexp.Compile(str); err != nil {
+			if s.cfg.Strict {
+				s.errf(n, "unsupported regexp: %v", err)
+			}
+			return
+		}
 		s.usedTypes |= cue.StringKind
 		s.addConjunct(&ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
 	}),
@@ -411,9 +442,9 @@ var constraints = []*constraint{
 
 		s.processMap(n, func(key string, n cue.Value) {
 			// property?: value
-			label := ast.NewString(key)
-			expr, state := s.schemaState(n, allTypes, false)
-			f := &ast.Field{Label: label, Value: expr}
+			name := ast.NewString(key)
+			expr, state := s.schemaState(n, allTypes, []label{{name: key}}, false)
+			f := &ast.Field{Label: name, Value: expr}
 			state.doc(f)
 			f.Optional = token.Blank.Pos()
 			if len(s.obj.Elts) > 0 && len(f.Comments()) > 0 {
@@ -424,12 +455,13 @@ var constraints = []*constraint{
 			if state.deprecated {
 				switch expr.(type) {
 				case *ast.StructLit:
-					s.obj.Elts = append(s.obj.Elts, addTag(label, "deprecated", ""))
+					s.obj.Elts = append(s.obj.Elts, addTag(name, "deprecated", ""))
 				default:
 					f.Attrs = append(f.Attrs, internal.NewAttr("deprecated", ""))
 				}
 			}
 			s.obj.Elts = append(s.obj.Elts, f)
+			s.setField(label{name: key}, f)
 		})
 	}),
 
@@ -481,14 +513,14 @@ var constraints = []*constraint{
 
 	p1d("propertyNames", 6, func(n cue.Value, s *state) {
 		// [=~pattern]: _
-		if names, _ := s.schemaState(n, cue.StringKind, false); !isAny(names) {
+		if names, _ := s.schemaState(n, cue.StringKind, nil, false); !isAny(names) {
 			s.usedTypes |= cue.StructKind
 			s.addConjunct(ast.NewStruct(ast.NewList((names)), ast.NewIdent("_")))
 		}
 	}),
 
 	// TODO: reenable when we have proper non-monotonic contraint validation.
-	// p0("minProperties", func(n cue.Value, s *state) {
+	// p1("minProperties", func(n cue.Value, s *state) {
 	// 	s.usedTypes |= cue.StructKind
 
 	// 	pkg := s.addImport("struct")
@@ -589,7 +621,7 @@ var constraints = []*constraint{
 		case cue.ListKind:
 			var a []ast.Expr
 			for _, n := range s.listItems("items", n, true) {
-				v := s.schema(n)
+				v := s.schema(n) // TODO: label with number literal.
 				ast.SetRelPos(v, token.NoRelPos)
 				a = append(a, v)
 			}

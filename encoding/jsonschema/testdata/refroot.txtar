@@ -1,0 +1,27 @@
+// This test tests the conversion and ordering of $defs.
+
+-- definition.json --
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "$id": "http://cuelang.org/go/encoding/openapi/testdata/order.json",
+
+  "properties": {
+    "value": {},
+    "next": { "$ref": "#" }
+  }
+}
+
+-- out.cue --
+_schema
+_schema: {
+	@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+	number | null | bool | string | [...] | {
+		@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
+		value?: _
+		next?:  _schema_1
+		...
+	}
+}
+
+let _schema_1 = _schema

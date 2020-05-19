@@ -21,6 +21,7 @@ package jsonschema
 import (
 	"fmt"
 	"math/bits"
+	"net/url"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -39,11 +40,9 @@ const rootDefs = "#"
 
 // A decoder converts JSON schema to CUE.
 type decoder struct {
-	cfg *Config
-
-	errs errors.Error
-
-	definitions []ast.Decl
+	cfg   *Config
+	errs  errors.Error
+	numID int // for creating unique numbers: increment on each use
 }
 
 // addImport registers
@@ -93,7 +92,6 @@ func (d *decoder) decode(v cue.Value) *ast.File {
 	}
 
 	f.Decls = append(f.Decls, a...)
-	f.Decls = append(f.Decls, d.definitions...)
 
 	_ = astutil.Sanitize(f)
 
@@ -111,14 +109,11 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 		root.isSchema = true
 	}
 
-	expr, state := root.schemaState(v, allTypes, false)
+	expr, state := root.schemaState(v, allTypes, nil, false)
 
 	tags := []string{}
 	if state.jsonschema != "" {
 		tags = append(tags, fmt.Sprintf("schema=%q", state.jsonschema))
-	}
-	if state.id != "" {
-		tags = append(tags, fmt.Sprintf("id=%q", state.id))
 	}
 
 	if name == nil {
@@ -162,6 +157,16 @@ func (d *decoder) schema(ref []ast.Label, v cue.Value) (a []ast.Decl) {
 			Value: &ast.StructLit{Elts: a},
 		}}
 		expr = ast.NewStruct(ref[i], expr)
+	}
+
+	if root.hasSelfReference {
+		return []ast.Decl{
+			&ast.EmbedDecl{Expr: ast.NewIdent(topSchema)},
+			&ast.Field{
+				Label: ast.NewIdent(topSchema),
+				Value: &ast.StructLit{Elts: a},
+			},
+		}
 	}
 
 	return a
@@ -224,9 +229,13 @@ type state struct {
 
 	isSchema bool // for omitting ellipsis in an ast.File
 
+	up     *state
 	parent *state
 
 	path []string
+
+	// idRef is used to refer to this schema in case it defines an $id.
+	idRef []label
 
 	pos cue.Value
 
@@ -240,15 +249,33 @@ type state struct {
 	description string
 	deprecated  bool
 	jsonschema  string
-	id          string
+	id          *url.URL // base URI for $ref
+
+	definitions []ast.Decl
 
 	conjuncts []ast.Expr
 
-	obj         *ast.StructLit
+	// Used for inserting definitions, properties, etc.
+	hasSelfReference bool
+	obj              *ast.StructLit
+	// Complete at finalize.
+	fieldRefs map[label]refs
+
 	closeStruct bool
 	patterns    []ast.Expr
 
 	list *ast.ListLit
+}
+
+type label struct {
+	name  string
+	isDef bool
+}
+
+type refs struct {
+	field *ast.Field
+	ident string
+	refs  []*ast.Ident
 }
 
 func (s *state) hasConstraints() bool {
@@ -332,6 +359,20 @@ func (s *state) finalize() (e ast.Expr) {
 		}
 		e = ast.NewBinExpr(token.OR, e, &ast.UnaryExpr{Op: token.MUL, X: s.default_})
 	}
+
+	if len(s.definitions) > 0 {
+		if st, ok := e.(*ast.StructLit); ok {
+			st.Elts = append(st.Elts, s.definitions...)
+		} else {
+			st = ast.NewStruct()
+			st.Elts = append(st.Elts, &ast.EmbedDecl{Expr: e})
+			st.Elts = append(st.Elts, s.definitions...)
+			e = st
+		}
+	}
+
+	s.linkReferences()
+
 	return e
 }
 
@@ -370,20 +411,22 @@ func (s *state) addConjunct(e ast.Expr) {
 	}
 }
 
-func (s *state) schema(n cue.Value) ast.Expr {
-	expr, _ := s.schemaState(n, allTypes, false)
+func (s *state) schema(n cue.Value, idRef ...label) ast.Expr {
+	expr, _ := s.schemaState(n, allTypes, idRef, false)
 	// TODO: report unused doc.
 	return expr
 }
 
 // schemaState is a low-level API for schema. isLogical specifies whether the
 // caller is a logical operator like anyOf, allOf, oneOf, or not.
-func (s *state) schemaState(n cue.Value, types cue.Kind, isLogical bool) (ast.Expr, *state) {
+func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogical bool) (ast.Expr, *state) {
 	state := &state{
+		up:           s,
 		isSchema:     s.isSchema,
 		decoder:      s.decoder,
 		allowedTypes: types,
 		path:         s.path,
+		idRef:        idRef,
 		pos:          n,
 	}
 	if isLogical {

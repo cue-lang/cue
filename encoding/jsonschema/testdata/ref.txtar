@@ -1,0 +1,111 @@
+// This test tests the conversion and ordering of $defs.
+
+#noverify
+
+-- definition.json --
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+
+  "$id": "http://cuelang.org/go/encoding/openapi/testdata/order.json",
+
+  "$defs": {
+    "address": {
+      "type": "object",
+      "properties": {
+        "city": { "type": "string" }
+      }
+    },
+    "int": {
+      "type": "integer"
+    },
+    "string-int": {
+      "type": [ "integer", "string" ]
+    },
+    "person": {
+      "type": "object",
+      "properties": {
+        "name": { "type": "string" },
+        "children": {
+          "type": "object",
+          "properties": {
+              "x": { "$ref": "http://acme.com/external.json#/properties/foo" },
+
+              "a": { "$ref": "#/$defs/int" },
+              "b": { "$ref": "http://cuelang.org/person.json#/$defs/int" },
+              "c": { "$ref": "http://cuelang.org/go/encoding/openapi/testdata/order.json#/$defs/int" },
+              "d": { "$ref": "http://cuelang.org/go/encoding/openapi/testdata/order.json#/$defs/address" },
+              "e": { "$ref": "http://cuelang.org/go/encoding/openapi/testdata/order.json#/$defs/string-int" },
+              "f": { "$ref": "http://cuelang.org/person.json" },
+              "g": { "$ref": "http://acme.com/external.json#/definitions/foo" },
+              "h": { "$ref": "http://acme.com/external.json#/properties/foo" },
+              "i": { "$ref": "http://acme.com/external.json" },
+              "j": { "$ref": "http://acme.com/external-foo.json" },
+              "k": { "$ref": "http://acme.com/external-bar.json" },
+              "z": {}
+          }
+        }
+      },
+      "$id": "http://cuelang.org/person.json",
+      "$defs": {
+        "int": {
+          "type": "integer"
+        }
+      }
+    }
+  },
+
+  "type": "object",
+
+  "properties": {
+    "person": { "$ref": "#/$defs/person" },
+    "billing_address": { "$ref": "#/$defs/address" },
+    "shipping_address": { "$ref": "#/$defs/address" }
+  }
+}
+
+-- out.cue --
+import (
+	"acme.com/external.json:external"
+	"acme.com/external-foo.json:schema"
+	schema_5 "acme.com/external-bar.json:schema"
+)
+
+@jsonschema(schema="http://json-schema.org/draft-07/schema#")
+@jsonschema(id="http://cuelang.org/go/encoding/openapi/testdata/order.json")
+person?:           #person
+billing_address?:  #address
+shipping_address?: #address
+
+#int_1=#int: int
+
+#address: {
+	city?: string
+	...
+}
+
+#: "string-int": int | string
+
+#person: {
+	@jsonschema(id="http://cuelang.org/person.json")
+	name?: string
+	children?: {
+		x?: external.foo
+		a?: #int
+		b?: #int
+		c?: #int_1
+		d?: #address
+		e?: #["string-int"]
+		f?: #person
+		g?: external.#foo
+		h?: external.foo
+		i?: external
+		j?: schema
+		k?: schema_5
+		z?: _
+		...
+	}
+
+	#int: int
+	...
+}
+...

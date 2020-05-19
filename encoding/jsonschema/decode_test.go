@@ -102,12 +102,14 @@ func TestDecode(t *testing.T) {
 			if expr != nil {
 				b, err := format.Node(expr, format.Simplify())
 				if err != nil {
-					t.Fatal(err)
+					t.Fatal(errors.Details(err, nil))
 				}
 
 				// verify the generated CUE.
-				if _, err = r.Compile(fullpath, b); err != nil {
-					t.Fatal(errors.Details(err, nil))
+				if !bytes.Contains(a.Comment, []byte("#noverify")) {
+					if _, err = r.Compile(fullpath, b); err != nil {
+						t.Fatal(errors.Details(err, nil))
+					}
 				}
 
 				b = bytes.TrimSpace(b)

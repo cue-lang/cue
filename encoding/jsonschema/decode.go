@@ -395,7 +395,7 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, isLogical bool) (ast.Ex
 	}
 
 	// do multiple passes over the constraints to ensure they are done in order.
-	for pass := 0; pass < 3; pass++ {
+	for pass := 0; pass < 4; pass++ {
 		state.processMap(n, func(key string, value cue.Value) {
 			// Convert each constraint into a either a value or a functor.
 			c := constraintMap[key]

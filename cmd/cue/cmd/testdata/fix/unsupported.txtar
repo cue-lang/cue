@@ -21,8 +21,8 @@ b: "\(Def.b)": int
 package foo
 
 // Possible references to this location:
-// /Users/mpvl/Cloud/dev/cue/cmd/cue/cmd/testdata/fix/foo/foo.cue:8:4
-// /Users/mpvl/Cloud/dev/cue/cmd/cue/cmd/testdata/fix/foo/foo.cue:9:7
+// testdata/fix/foo/foo.cue:8:4
+// testdata/fix/foo/foo.cue:9:7
 #Def: {
 	a: int
 	b: "foo"

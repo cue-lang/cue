@@ -17,6 +17,8 @@ package cmd
 import (
 	"fmt"
 	"hash/fnv"
+	"os"
+	"path/filepath"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -30,9 +32,12 @@ import (
 )
 
 func fixAll(a []*build.Instance) errors.Error {
+	cwd, _ := os.Getwd()
+
 	// Collect all
 	p := processor{
 		instances: a,
+		cwd:       cwd,
 
 		done:      map[ast.Node]bool{},
 		rename:    map[*ast.Ident]string{},
@@ -52,6 +57,7 @@ func fixAll(a []*build.Instance) errors.Error {
 
 type processor struct {
 	instances []*build.Instance
+	cwd       string
 
 	done map[ast.Node]bool
 	// Evidence for rewrites. Rewrite in a later pass.
@@ -246,8 +252,13 @@ func (p *processor) renameFields(f *ast.File) {
 
 				b := &strings.Builder{}
 				fmt.Fprintln(b, "Possible references to this location:")
-				for _, p := range refs {
-					fmt.Fprintf(b, "\t%s\n", p)
+				for _, r := range refs {
+					s, err := filepath.Rel(p.cwd, r.String())
+					if err != nil {
+						s = r.String()
+					}
+					s = filepath.ToSlash(s)
+					fmt.Fprintf(b, "\t%s\n", s)
 				}
 
 				cg := internal.NewComment(true, b.String())

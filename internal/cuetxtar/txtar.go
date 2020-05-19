@@ -117,7 +117,7 @@ func (t *Test) Rel(filename string) string {
 	if err != nil {
 		return filepath.Base(filename)
 	}
-	return rel
+	return filepath.ToSlash(rel)
 }
 
 // WriteErrors writes strings and

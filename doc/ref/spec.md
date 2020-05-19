@@ -1121,7 +1121,7 @@ StructLit       = "{" { Declaration "," } [ "..." ] "}" .
 Declaration     = Field | Embedding | LetClause | attribute .
 Embedding       = Comprehension | AliasExpr .
 Field           = Label ":" { Label ":" } Expression { attribute } .
-Label           = identifier "=" LabelExpr .
+Label           = [ identifier "=" ] LabelExpr .
 LabelExpr       = LabelName [ "?" ] | "[" AliasExpr "]" .
 LabelName       = identifier | simple_string_lit  .
 

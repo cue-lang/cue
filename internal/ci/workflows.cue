@@ -36,7 +36,7 @@ workflows: [
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": ["1.13.x", "1.14.3"]
+		"go-version": ["1.12.x", "1.13.x", "1.14.3"]
 		os: ["ubuntu-latest", "macos-latest", "windows-latest"]
 	}
 }

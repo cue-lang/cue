@@ -15,8 +15,8 @@
 package list
 
 // A Comparer specifies whether one value is strictly less than another value.
-Comparer :: {
-	T ::  _
+Comparer: {
+	T:    _
 	x:    T
 	y:    T
 	less: bool // true if x < y
@@ -26,11 +26,11 @@ Comparer :: {
 //
 // Example:
 //     list.Sort(a, list.Ascending)
-Ascending :: {
+Ascending: {
 	Comparer
-	T :: number | string
-	x:   T
-	y:   T
+	T: number | string
+	x: T
+	y: T
 	// TODO: the following will be fixed when removing old-school templating.
 	less: true && (x < y)
 }
@@ -39,9 +39,9 @@ Ascending :: {
 //
 // Example:
 //     list.Sort(a, list.Descending)
-Descending :: {
+Descending: {
 	Comparer
-	T ::  number | string
+	T:    number | string
 	x:    T
 	y:    T
 	less: (x > y)

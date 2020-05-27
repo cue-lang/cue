@@ -42,7 +42,7 @@ func (s *valueSorter) Less(i, j int) bool { panic("implemented in cue/builtinuti
 // Sort sorts data. It does O(n*log(n)) comparisons.
 // The sort is not guaranteed to be stable.
 //
-// cmp is a struct of the form {T :: _, x: T, y: T, less: bool}, where
+// cmp is a struct of the form {T: _, x: T, y: T, less: bool}, where
 // less should reflect x < y.
 //
 // Example:

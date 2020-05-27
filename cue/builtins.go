@@ -1184,21 +1184,21 @@ var builtinPackages = map[string]*builtinPkg{
 			},
 		}},
 		cue: `{
-	Comparer :: {
-		T ::  _
+	Comparer: {
+		T:    _
 		less: bool
 		x:    T
 		y:    T
 	}
-	Ascending :: {
-		T ::  number | string
+	Ascending: {
+		T:    number | string
 		less: true && x < y
 		x:    T
 		y:    T
 		Comparer
 	}
-	Descending :: {
-		T ::  number | string
+	Descending: {
+		T:    number | string
 		less: x > y
 		x:    T
 		y:    T

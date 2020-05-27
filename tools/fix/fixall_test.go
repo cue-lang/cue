@@ -12,9 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package fix
 
 import (
+	"flag"
 	"fmt"
 	"testing"
 
@@ -22,16 +23,18 @@ import (
 	"cuelang.org/go/internal/cuetxtar"
 )
 
-func TestFixAll(t *testing.T) {
+var update = flag.Bool("update", false, "update the test files")
+
+func TestInstances(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/fix",
+		Root:   "./testdata",
 		Name:   "fixmod",
 		Update: *update,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances("./...")
-		err := fixAll(a)
+		err := Instances(a)
 		t.WriteErrors(err)
 		for _, b := range a {
 			for _, f := range b.Files {

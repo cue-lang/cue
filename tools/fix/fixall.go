@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package fix
 
 import (
 	"fmt"
@@ -31,7 +31,10 @@ import (
 	"cuelang.org/go/internal"
 )
 
-func fixAll(a []*build.Instance) errors.Error {
+// Instances modifies all files contained in the given build instances at once.
+//
+// It also applies fix.File.
+func Instances(a []*build.Instance) errors.Error {
 	cwd, _ := os.Getwd()
 
 	// Collect all
@@ -44,7 +47,7 @@ func fixAll(a []*build.Instance) errors.Error {
 		ambiguous: map[string][]token.Pos{},
 	}
 
-	p.visitAll(func(f *ast.File) { fix(f) })
+	p.visitAll(func(f *ast.File) { File(f) })
 
 	instances := cue.Build(a)
 	p.updateValues(instances)

@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/encoding"
+	"cuelang.org/go/tools/fix"
 )
 
 func newFmtCmd(c *Command) *cobra.Command {
@@ -67,7 +68,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 						f := d.File()
 
 						if file.Encoding == build.CUE {
-							f = fix(f)
+							f = fix.File(f)
 						}
 
 						files = append(files, f)

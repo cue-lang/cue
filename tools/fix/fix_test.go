@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package fix
 
 import (
 	"testing"
@@ -21,7 +21,7 @@ import (
 	"cuelang.org/go/cue/parser"
 )
 
-func TestFix(t *testing.T) {
+func TestFile(t *testing.T) {
 	testCases := []struct {
 		name string
 		in   string
@@ -161,7 +161,7 @@ c: {
 			if err != nil {
 				t.Fatal(err)
 			}
-			n := fix(f)
+			n := File(f)
 			b, err := format.Node(n)
 			if err != nil {
 				t.Fatal(err)

@@ -29,13 +29,13 @@ cmp stdout expect-cue3
 
 $version: "v1"
 
-Foo :: {
+#Foo: {
     a: int
     b: uint & <10
 }
 
-Bar :: {
-    foo: Foo
+#Bar: {
+    foo: #Foo
 }
 
 -- openapi.json --

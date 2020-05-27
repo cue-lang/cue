@@ -1,4 +1,4 @@
-cue def -e Foo x.cue
+cue def -e '#Foo' x.cue
 cmp stdout expect-stdout
 
 -- expect-stdout --
@@ -13,7 +13,7 @@ close({
 -- x.cue --
 package example
 
-Foo :: {
+#Foo: {
 	x: int
 	body?: {
 		a: int

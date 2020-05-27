@@ -5,11 +5,11 @@ cmp stderr vet-stderr
 cmp stderr export-stderr
 
 -- schema.cue --
-Language :: {
+#Language: {
 	tag:  string
 	name: =~"^\\p{Lu}" // Must start with an uppercase letter.
 }
-languages: [...Language]
+languages: [...#Language]
 
 -- data.yaml --
 languages:

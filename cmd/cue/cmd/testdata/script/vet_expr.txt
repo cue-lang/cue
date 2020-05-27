@@ -1,4 +1,4 @@
-! cue vet -d File vet.cue data.yaml
+! cue vet -d '#File' vet.cue data.yaml
 cmp stderr expect-stderr
 
 -- expect-stderr --
@@ -10,7 +10,7 @@ translations.hello.lang: conflicting values false and string (mismatched types b
 field "skip" not allowed in closed struct:
     ./data.yaml:20:7
 -- vet.cue --
-File :: {
+#File: {
 	translations: [string]: {
     lang: string
     text: string

@@ -8,7 +8,7 @@ cmp stdout expect-stdout2
 // foo
 package foo
 
-A :: {
+#A: {
     // a is an integer
     a: int
     b: { c: int } // TODO: should we _not_ simplify?
@@ -22,7 +22,7 @@ A :: {
 // foo
 package foo
 
-A :: {
+#A: {
 	// a is an integer
 	a: int
 	b: c: int

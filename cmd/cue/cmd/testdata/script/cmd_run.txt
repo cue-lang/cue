@@ -8,7 +8,7 @@ message: "Hello world!"
 -- task_tool.cue --
 package home
 
-command: run: RunBase & {
+command: run: #RunBase & {
 	task: echo: cmd: "echo \(message)"
 }
 
@@ -22,7 +22,7 @@ import (
 
 // deliberately put in another file to test resolving top-level identifiers
 // in different files.
-RunBase :: {
+#RunBase: {
 	task: echo: exec.Run & {
 		stdout: string
 	}

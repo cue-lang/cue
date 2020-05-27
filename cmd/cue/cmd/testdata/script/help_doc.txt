@@ -25,7 +25,7 @@ cmp stdout-foo foo
 package bar
 
 name: "foo"
-D :: int
+_D: int
 
 -- bar.cue --
 3

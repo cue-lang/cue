@@ -8,23 +8,23 @@ cmp stdout def-stdout
 package tst
 
 x: {
-	a: A
-	b: A
+	a: #A
+	b: #A
 }
 
-A :: string | [A]
+#A: string | [#A]
 
 -- def-stdout --
 package tst
 
 x: {
-	a: A
-	b: A
+	a: #A
+	b: #A
 }
-A :: string | [A]
+#A: string | [#A]
 -- eval-stdout --
 x: {
-    a: A
-    b: A
+    a: #A
+    b: #A
 }
-A :: string | [A]
+#A: string | [#A]

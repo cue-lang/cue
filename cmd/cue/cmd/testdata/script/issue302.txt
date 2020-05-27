@@ -4,13 +4,13 @@ cmp foo.cue rewritten
 -- foo.cue --
 package p
 
-foo?: Foo
+foo?: #Foo
 
-Foo :: "hello"
+#Foo: "hello"
 
 -- rewritten --
 package p
 
-foo?: Foo
+foo?: #Foo
 
-Foo :: "hello"
+#Foo: "hello"

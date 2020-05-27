@@ -5,12 +5,12 @@ cmp foo.cue rewritten
 package example
 
 foo: c: true
-foo: M
-M :: c?: bool
+foo: #M
+#M: c?: bool
 
 -- rewritten --
 package example
 
 foo: c: true
-foo: M
-M :: c?: bool
+foo: #M
+#M: c?: bool

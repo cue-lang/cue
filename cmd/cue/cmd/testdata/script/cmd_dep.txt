@@ -14,8 +14,8 @@ import (
 )
 
 foo: {
-  a :: string
-  b: a
+  #a: string
+  b: #a
 }
 
 command: do: {
@@ -25,7 +25,7 @@ command: do: {
     }
     outputs: print: cli.Print & {
         text:  json.Marshal(foo & {
-            a :: strings.TrimSpace(inputs.name.stdout)
+            #a: strings.TrimSpace(inputs.name.stdout)
         })
     }
 }

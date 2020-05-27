@@ -3,17 +3,17 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-incomplete value 'X.y' in interpolation:
+incomplete value '#X.y' in interpolation:
     ./file.cue:16:3
     ./file.cue:3:5
 -- file.cue --
-X :: {
+#X: {
 	x: string
 	y: string
 	z: string
 }
 
-X :: {
+#X: {
 	x: "x"
 	z: "z"
 }
@@ -21,7 +21,7 @@ X :: {
 """
 hello
 world
-\(X.x)
-\(X.y)
-\(X.z)
+\(#X.x)
+\(#X.y)
+\(#X.z)
 """

@@ -8,10 +8,10 @@ cmp stdout expect-stdout
 -- hello/data.cue --
 package hello
 
-who :: "World"
+#who: "World"
 -- hello/hello.cue --
 package hello
 
 $type:   "demo"
-message: "Hello \(who)!" // who declared in data.cue
+message: "Hello \(#who)!" // who declared in data.cue
 -- hello/cue.mod --

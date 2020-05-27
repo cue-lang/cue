@@ -233,8 +233,8 @@ This is way too subtle, though.
 
 Alternatively: use Haskell's approach:
 
-a :: MyStruct // define a to be MyStruct any other features are allowed but
-              // discarded from the model. Unused features are an error.
+#a: MyStruct // define a to be MyStruct any other features are allowed but
+             // discarded from the model. Unused features are an error.
 
 Let's first try to see if we can get away with static usage analysis.
 A variant would be to define appropriate features unconditionally, but enforce

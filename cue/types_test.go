@@ -435,8 +435,8 @@ func TestString(t *testing.T) {
 		value: `"Hello world!"`,
 		str:   `Hello world!`,
 	}, {
-		value: `"Hello \(world)!"
-		world :: "world"`,
+		value: `"Hello \(#world)!"
+		#world: "world"`,
 		str: `Hello world!`,
 	}, {
 		value: `string`,
@@ -564,8 +564,8 @@ func TestList(t *testing.T) {
 		value: `>=5*[1,2,3, ...int]`,
 		err:   "incomplete",
 	}, {
-		value: `[for x in y if x > 1 { x }]
-		y :: [1,2,3]`,
+		value: `[for x in #y if x > 1 { x }]
+		#y: [1,2,3]`,
 		res: "[2,3,]",
 	}, {
 		value: `[int]`,
@@ -615,11 +615,11 @@ func TestFields(t *testing.T) {
 		value: `{_a:"a"}`,
 		res:   "{}",
 	}, {
-		value: `{ for k, v in y if v > 1 {"\(k)": v} }
-		y :: {a:1,b:2,c:3}`,
+		value: `{ for k, v in #y if v > 1 {"\(k)": v} }
+		#y: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
 	}, {
-		value: `{ def :: 1, _hidden: 2, opt?: 3, reg: 4 }`,
+		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
 		res:   "{reg:4,}",
 	}, {
 		value: `{a:1,b:2,c:int}`,
@@ -1226,8 +1226,8 @@ func TestDecode(t *testing.T) {
 		dst:   intList(),
 		want:  *intList(1, 2, 3),
 	}, {
-		value: `[for x in y if x > 1 { x }]
-				y :: [1,2,3]`,
+		value: `[for x in #y if x > 1 { x }]
+				#y: [1,2,3]`,
 		dst:  intList(),
 		want: *intList(2, 3),
 	}, {
@@ -1273,20 +1273,20 @@ func TestValidate(t *testing.T) {
 	}, {
 		desc: "definition error",
 		in: `
-			b :: 1 & 2
+			#b: 1 & 2
 			`,
 		opts: []Option{},
 		err:  true,
 	}, {
 		desc: "definition error okay if optional",
 		in: `
-			b? :: 1 & 2
+			#b?: 1 & 2
 			`,
 		opts: []Option{},
 	}, {
 		desc: "definition with optional",
 		in: `
-			b:: {
+			#b: {
 				a: int
 				b?: >=0
 			}
@@ -1348,10 +1348,10 @@ func TestValidate(t *testing.T) {
 	}, {
 		desc: "ignore optional in schema",
 		in: `
-		Schema1 :: {
+		#Schema1: {
 			a?: int
 		}
-		instance1: Schema1
+		instance1: #Schema1
 		`,
 		opts: []Option{Concrete(true)},
 	}, {
@@ -2068,7 +2068,7 @@ func TestMarshalJSON(t *testing.T) {
 		json: `{"a":1,"b":1,"c":2,"d":1,"e":1,"f":1.1}`,
 	}, {
 		value: `
-		Task :: {
+		#Task: {
 			{
 				op:          "pull"
 				tag:         *"latest" | string
@@ -2078,7 +2078,7 @@ func TestMarshalJSON(t *testing.T) {
 			}
 		}
 
-		foo: Task & {"op": "pull"}
+		foo: #Task & {"op": "pull"}
 		`,
 		json: `{"foo":{"op":"pull","tag":"latest","tagInString":"latestdd"}}`,
 	}, {
@@ -2266,7 +2266,7 @@ func TestReference(t *testing.T) {
 		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
 		want:  "v w a b c",
 	}, {
-		input: `v: w: x: w.a.b.c, v: w: a: b: c: 1, D :: 3, opt?: 3, "v\(D)": 3, X: {a: 3}, X`,
+		input: `v: w: x: w.a.b.c, v: w: a: b: c: 1, #D: 3, opt?: 3, "v\(#D)": 3, X: {a: 3}, X`,
 		want:  "v w a b c",
 	}, {
 		input: `v: w: x: w.a[bb]["c"], v: w: a: b: c: 1, bb: "b"`,
@@ -2358,28 +2358,28 @@ func TestPathCorrection(t *testing.T) {
 		want: "T",
 	}, {
 		input: `
-			a :: {
-				T :: {b: 3}
-				close({}) | close({c: T}) | close({d: string})
+			#a: {
+				#T: {b: 3}
+				close({}) | close({c: #T}) | close({d: string})
 			}
 			`,
 		lookup: func(i *Instance) Value {
-			f, _ := i.LookupField("a")
+			f, _ := i.LookupField("#a")
 			_, a := f.Value.Expr() // &
 			_, a = a[1].Expr()     // |
 			return a[1].Lookup("c")
 		},
-		want: "a.T",
+		want: "#a.#T",
 	}, {
 		input: `
 		package foo
 
-		Struct :: {
-			T :: int
+		#Struct: {
+			#T: int
 
-			{b?: T}
+			{b?: #T}
 		}`,
-		want: "Struct.T",
+		want: "#Struct.#T",
 		lookup: func(inst *Instance) Value {
 			// Locate Struct
 			i, _ := inst.Value().Fields(Definitions(true))
@@ -2398,17 +2398,17 @@ func TestPathCorrection(t *testing.T) {
 		input: `
 		package foo
 
-		A :: B :: T
+		#A: #B: #T
 
-		T :: {
-			a: S.U
-			S :: U:: {}
+		#T: {
+			a: #S.#U
+			#S: #U: {}
 		}
 		`,
-		want: "T.S.U",
+		want: "#T.#S.#U",
 		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("A")
-			f, _ = f.Value.LookupField("B")
+			f, _ := inst.Value().LookupField("#A")
+			f, _ = f.Value.LookupField("#B")
 			v := f.Value
 			v = Dereference(v)
 			v = v.Lookup("a")
@@ -2418,17 +2418,17 @@ func TestPathCorrection(t *testing.T) {
 		input: `
 		package foo
 
-		A :: B :: T
+		#A: #B: #T
 
-		T :: {
-			a: [...S]
-			S :: {}
+		#T: {
+			a: [...#S]
+			#S: {}
 		}
 		`,
-		want: "T.S",
+		want: "#T.#S",
 		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("A")
-			f, _ = f.Value.LookupField("B")
+			f, _ := inst.Value().LookupField("#A")
+			f, _ = f.Value.LookupField("#B")
 			v := f.Value
 			v = Dereference(v)
 			v, _ = v.Lookup("a").Elem()
@@ -2436,18 +2436,18 @@ func TestPathCorrection(t *testing.T) {
 		},
 	}, {
 		input: `
-		A :: {
-			b: T
+		#A: {
+			b: #T
 		}
 
-		T :: {
-			a: S
-			S :: {}
+		#T: {
+			a: #S
+			#S: {}
 		}
 		`,
-		want: "T.S",
+		want: "#T.#S",
 		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("A")
+			f, _ := inst.Value().LookupField("#A")
 			v := f.Value.Lookup("b")
 			v = Dereference(v)
 			v = v.Lookup("a")
@@ -2461,22 +2461,22 @@ func TestPathCorrection(t *testing.T) {
 		// This could perhaps be made fixed with dereferencing as well.
 		skip: true,
 		input: `
-		Tracing :: {
-			T :: { address?: string }
-			S :: { ip?: string }
+		#Tracing: {
+			#T: { address?: string }
+			#S: { ip?: string }
 
 			close({}) | close({
-				t: T
+				t: #T
 			}) | close({
 				s: S
 			})
 		}
-		X :: {}
-		X // Disconnect top-level struct from the one visible by close.
+		#X: {}
+		#X // Disconnect top-level struct from the one visible by close.
 		`,
 		want: "",
 		lookup: func(inst *Instance) Value {
-			f, _ := inst.Value().LookupField("Tracing")
+			f, _ := inst.Value().LookupField("#Tracing")
 			v := f.Value.Eval()
 			_, args := v.Expr()
 			v = args[1].Lookup("t")

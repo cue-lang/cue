@@ -103,7 +103,7 @@ func TestParse(t *testing.T) {
 		`a: true, b?: "2", c?: 3, "g\("en")"?: 4`,
 	}, {
 		"definition",
-		`Def :: {
+		`#Def: {
 			 b: "2"
 			 c: 3
 
@@ -111,7 +111,7 @@ func TestParse(t *testing.T) {
 		}
 		#Def: {}
 		`,
-		`Def :: {b: "2", c: 3, embedding}, #Def: {}`,
+		`#Def: {b: "2", c: 3, embedding}, #Def: {}`,
 	}, {
 		"one-line embedding",
 		`{ V1, V2 }`,

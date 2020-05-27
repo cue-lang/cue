@@ -336,21 +336,21 @@ func TestExport(t *testing.T) {
 		// of topological sort to preserve order.
 		raw: true,
 		in: `{
-			emb :: {
+			#emb: {
 				a: 1
 
 				sub: {
 					f: 3
 				}
 			}
-			def :: {
-				emb
+			#def: {
+				#emb
 
 				b: 2
 			}
-			f :: { a: 10 }
-			e :: {
-				f
+			#f: a: 10
+			#e: {
+				#f
 
 				b: int
 				[_]: <100
@@ -359,21 +359,21 @@ func TestExport(t *testing.T) {
 		}`,
 		out: unindent(`
 		{
-			emb :: {
+			#emb: {
 				a: 1
 				sub: f: 3
 			}
-			f :: {
+			#def: {
+				b: 2
+				#emb
+			}
+			#f: {
 				a: 10
 			}
-			def :: {
-				b: 2
-				emb
-			}
-			e :: {
+			#e: {
 				{[string]: <100}
 				b: int
-				f
+				#f
 				{[string]: <300}
 			}
 		}`),
@@ -383,16 +383,16 @@ func TestExport(t *testing.T) {
 		noOpt: true,
 		in: `{
 				reg: { foo: 1, bar: { baz: 3 } }
-				def :: {
+				#def: {
 					a: 1
 
 					sub: reg
 				}
-				val: def
-				def2 :: {
+				val: #def
+				#def2: {
 					a: { b: int }
 				}
-				val2: def2
+				val2: #def2
 			}`,
 		out: unindent(`
 		{
@@ -400,15 +400,15 @@ func TestExport(t *testing.T) {
 				foo: 1
 				bar: baz: 3
 			}
-			def :: {
+			#def: {
 				a:   1
 				sub: reg
 			}
-			val: def
-			def2 :: {
+			val: #def
+			#def2: {
 				a: b: int
 			}
-			val2: def2
+			val2: #def2
 		}`),
 	}, {
 		raw:  true,
@@ -457,82 +457,88 @@ func TestExport(t *testing.T) {
 		raw:  true,
 		eval: true,
 		in: `{
-			Foo :: {
-			Bar :: Foo | string
+			#Foo: {
+			#Bar: #Foo | string
 			}
 		}`,
 		out: unindent(`
 		{
-			Foo :: {
-				Bar :: Foo | string
+			#Foo: {
+				#Bar: #Foo | string
 			}
 		}`),
 	}, {
 		raw:  true,
 		eval: true,
 		in: `{
-				FindInMap :: {
-					"Fn::FindInMap" :: [string | FindInMap]
+				#FindInMap: {
+					#: "Fn::FindInMap": [string | #FindInMap]
 				}
 				a: [...string]
 			}`,
 		out: unindent(`
 			{
-				FindInMap :: {
-					"Fn::FindInMap" :: [string | FindInMap]
+				#FindInMap: {
+					#: {
+						"Fn::FindInMap": [string | #FindInMap]
+					}
 				}
 				a: [...string]
-			}`)}, {
+			}`),
+	}, {
 		raw:   true,
 		eval:  true,
 		noOpt: true,
 		in: `{
-				And :: {
-					"Fn::And": [...(3 | And)]
+				#And: {
+					#: "Fn::And": [...(3 | #And)]
 				}
-				Ands: And & {
-					"Fn::And" : [_]
+				#Ands: #And & {
+					#: "Fn::And" : [_]
 				}
 			}`,
 		out: unindent(`
 			{
-				And :: {
-					"Fn::And": [...3 | And]
+				#And: {
+					#: {
+						"Fn::And": [...3 | #And]
+					}
 				}
-				Ands: And & {
-					"Fn::And": [_]
+				#Ands: #And & {
+					#: {
+						"Fn::And": [_]
+					}
 				}
 			}`),
 	}, {
 		raw:  true,
 		eval: true,
 		in: `{
-			Foo :: {
-				sgl: Bar
-				ref: null | Foo
-				ext: Bar | null
-				ref: null | Foo
-				ref2: null | Foo.sgl
+			#Foo: {
+				sgl: #Bar
+				ref: null | #Foo
+				ext: #Bar | null
+				ref: null | #Foo
+				ref2: null | #Foo.sgl
 				...
 			}
-			Foo :: {
-				Foo: 2
+			#Foo: {
+				"#Foo": 2
 				...
 			}
-			Bar :: string
+			#Bar: string
 		}`,
 		out: unindent(`
 		{
-			FOO = Foo
-			Foo :: {
-				Foo:  2
-				sgl:  Bar
-				ref:  (null | FOO) & (null | FOO)
-				ext:  Bar | null
-				ref2: null | FOO.sgl
+			#Foo: {
+				"#Foo": 2
+				sgl:    #Bar
+				ref:    (null | #Foo) & (null | #Foo)
+				ext:    #Bar | null
+				ref2:   null | #Foo.sgl
 				...
 			}
-			Bar :: string
+			#Bar: string
 		}`),
 	}, {
 		raw:  true,
@@ -698,8 +704,8 @@ func TestExportFile(t *testing.T) {
 		B: {}
 		B: {a: int} | {b: int}
 
-		C :: [D]: int
-		D :: string
+		#C: [#D]: int
+		#D: string
 		`,
 		out: unindent(`
 		A: {
@@ -710,11 +716,11 @@ func TestExportFile(t *testing.T) {
 		} | {
 			b: int
 		})
-		C :: {
-			[D]: int
-			[D]: int
+		#C: {
+			[#D]: int
+			[#D]: int
 		}
-		D :: string`),
+		#D: string`),
 	}, {
 		in: `
 		a: {
@@ -747,18 +753,18 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		opts: []Option{ResolveReferences(true)},
 		in: `
-		A :: { b: int }
-		a: A & { [string]: <10 }
-		B :: a
+		#A: { b: int }
+		a: #A & { [string]: <10 }
+		#B: a
 		`,
 		out: unindent(`
-		A :: {
+		#A: {
 			b: int
 		}
 		a: close({
 			b: <10
 		})
-		B :: {
+		#B: {
 			b: <10
 		}`),
 	}, {
@@ -766,12 +772,12 @@ func TestExportFile(t *testing.T) {
 		opts: []Option{Final()},
 		in: `{
 			reg: { foo: 1, bar: { baz: 3 } }
-			def :: {
+			#def: {
 				a: 1
 
 				sub: reg
 			}
-			val: def
+			val: #def
 		}`,
 		out: unindent(`
 		{
@@ -791,23 +797,23 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		opts: []Option{ResolveReferences(true)},
 		in: `
-			T :: {
+			#T: {
 				[_]: int64
 			}
-			X :: {
+			#X: {
 				x: int
-			} & T
-			x: X
+			} & #T
+			x: #X
 			`,
 		out: unindent(`
-		T :: {
-			[string]: int64
-		}
 		x: {
 			{[string]: int64}
 			x: int64
 		}
-		X :: {
+		#T: {
+			[string]: int64
+		}
+		#X: {
 			{[string]: int64}
 			x: int64
 		}`),
@@ -815,18 +821,18 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		opts: []Option{Optional(false), ResolveReferences(true)},
 		in: `
-		T :: {
+		#T: {
 			[_]: int64
 		}
-		X :: {
+		#X: {
 			x: int
-		} & T
-		x: X
+		} & #T
+		x: #X
 		`,
 		out: unindent(`
-		T :: {}
 		x: x: int64
-		X :: {
+		#T: {}
+		#X: {
 			x: int64
 		}`),
 	}, {
@@ -834,16 +840,16 @@ func TestExportFile(t *testing.T) {
 		opts: []Option{ResolveReferences(true)},
 		in: `{
 				reg: { foo: 1, bar: { baz: 3 } }
-				def :: {
+				#def: {
 					a: 1
-	
+
 					sub: reg
 				}
-				val: def
-				def2 :: {
+				val: #def
+				#def2: {
 					a: { b: int }
 				}
-				val2: def2
+				val2: #def2
 			}`,
 		out: unindent(`
 			{
@@ -851,7 +857,7 @@ func TestExportFile(t *testing.T) {
 					foo: 1
 					bar: baz: 3
 				}
-				def :: {
+				#def: {
 					a: 1
 					sub: {
 						foo: 1
@@ -869,7 +875,7 @@ func TestExportFile(t *testing.T) {
 						bar: baz: 3
 					}
 				})
-				def2 :: {
+				#def2: {
 					a: b: int
 				}
 				val2: close({
@@ -894,21 +900,21 @@ func TestExportFile(t *testing.T) {
 		eval: true,
 		opts: []Option{ResolveReferences(true)},
 		in: `
-		A :: {
+		#A: {
 			[=~"^[a-s]*$"]: int
 		}
-		B :: {
+		#B: {
 			[=~"^[m-z]+"]: int
 		}
-		C: {A & B}
-		D :: {A & B}
+		C: {#A & #B}
+		#D: {#A & #B}
 		`,
 		// TODO: the outer close of C could be optimized away.
 		out: unindent(`
-		A :: {
+		#A: {
 			[=~"^[a-s]*$"]: int
 		}
-		B :: {
+		#B: {
 			[=~"^[m-z]+"]: int
 		}
 		C: close({
@@ -918,7 +924,7 @@ func TestExportFile(t *testing.T) {
 				[=~"^[m-z]+"]: int
 			})
 		})
-		D :: {
+		#D: {
 			close({
 				[=~"^[a-s]*$"]: int
 			}) & close({
@@ -930,24 +936,24 @@ func TestExportFile(t *testing.T) {
 		opts: []Option{Docs(true)},
 		in: `
 		// Definition
-		A :: {
+		#A: {
 			// TODO: support
 			[string]: int
 		}
 		// Field
-		a: A
+		a: #A
 
 		// Pick first comment only.
 		a: _
 		`,
 		out: unindent(`
 		// Definition
-		A :: {
+		#A: {
 			[string]: int
 		}
 
 		// Field
-		a: A`),
+		a: #A`),
 	}, {
 		eval: true,
 		opts: []Option{Docs(true)},
@@ -983,7 +989,9 @@ func TestExportFile(t *testing.T) {
 		a: #A.#B
 		`,
 		out: unindent(`
-		#A: #B: 4
+		#A: {
+			#B: 4
+		}
 		a: #A.#B`),
 	}, {
 		eval: true,
@@ -1032,21 +1040,21 @@ func TestExportFile(t *testing.T) {
 		import "math"
 		import "tool/exec"
 
-		A :: {
+		#A: {
 			b: 3
 		}
 
-		a:   A
+		a:   #A
 		pi:  math.Pi
 		run: exec.Run
 		`,
 		out: unindent(`
 		import "tool/exec"
 
-		A :: {
+		#A: {
 			b: 3
 		}
-		a:   A
+		a:   #A
 		pi:  3.14159265358979323846264338327950288419716939937510582097494459
 		run: exec.Run`),
 	}, {
@@ -1090,19 +1098,19 @@ func TestExportFile(t *testing.T) {
 		package tst
 
 		x: {
-			a: A
-			b: A
+			a: #A
+			b: #A
 		}
-		A :: string | [A]
+		#A: string | [#A]
 
 		`,
 		out: unindent(`
 		{
 			x: {
-				a: A
-				b: A
+				a: #A
+				b: #A
 			}
-			A :: string | [A]
+			#A: string | [#A]
 		}`),
 	}, {
 		eval: true,
@@ -1146,16 +1154,16 @@ func TestExportFile(t *testing.T) {
 	}, {
 		eval: true,
 		in: `
-		A :: {
+		#A: {
 			foo: int @tag2(2)
 		} @tag2(1)
 
-		A :: {
+		#A: {
 			foo: 2 @tag(2)
 		} @tag(1)
 
 		`,
-		out: `A :: {
+		out: `#A: {
 	foo: 2 @tag(2) @tag2(2)
 } @tag(1) @tag2(1)`,
 	}}

@@ -3,7 +3,7 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 -- vet.cue --
-Schema1 :: {
+#Schema1: {
   a?: int
 }
-instance1: Schema1
+instance1: #Schema1

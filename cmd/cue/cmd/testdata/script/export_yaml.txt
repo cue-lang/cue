@@ -6,11 +6,11 @@ test: {}
 -- hello/data.cue --
 package hello
 
-who :: "World"
+_who: "World"
 -- hello/hello.cue --
 package hello
 
-message: "Hello \(who)!" // who declared in data.cue
+message: "Hello \(_who)!" // who declared in data.cue
 
 test: {
 	_foo: string // technically in error, but test anyway.

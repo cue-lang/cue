@@ -21,7 +21,7 @@ package foo
 
 translations: [string]: lang: string
 
-File :: {
+#File: {
 	translations: {...}
 }
 -- data.yaml --

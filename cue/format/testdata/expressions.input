@@ -44,7 +44,7 @@ package expressions
         field: 2
     }
 
-    openDef :: {
+    #openDef: {
         a: int
         ...
     }

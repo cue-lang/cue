@@ -410,8 +410,8 @@ func TestSubsume(t *testing.T) {
 		610: {subsumes: true, in: `a: {foo?:1}, b: close({})`},
 
 		// Definitions are not regular fields.
-		630: {subsumes: false, in: `a: {a :: 1}, b: {a: 1}`},
-		631: {subsumes: false, in: `a: {a: 1}, b: {a :: 1}`},
+		630: {subsumes: false, in: `a: {#a: 1}, b: {a: 1}`},
+		631: {subsumes: false, in: `a: {a: 1}, b: {#a: 1}`},
 
 		// Subsuming final values.
 		700: {subsumes: true, in: `a: {[string]: 1}, b: {foo: 1}`, mode: subFinal},

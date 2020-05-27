@@ -234,7 +234,7 @@ func (f *formatter) file(file *ast.File) {
 }
 
 func (f *formatter) inlineField(n *ast.Field) *ast.Field {
-	regular := isRegularField(n.Token)
+	regular := internal.IsRegularField(n)
 	// shortcut single-element structs.
 	// If the label has a valid position, we assume that an unspecified
 	// Lbrace signals the intend to collapse fields.

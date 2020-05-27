@@ -852,11 +852,11 @@ a: {
 			e6: (*[]|{})[1]
 			def: {
 				a: 1
-				b :: 3
+				#b: 3
 			}
 			e7: def["b"]
 		`,
-		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds), def: <1>{a: 1, b :: 3}, e7: _|_(<2>.def["b"]:field "b" is a definition)}`,
+		out: `<0>{a: 2, b: "bar", c: _|_("3":invalid list index "3" (type string)), l: [], d: _|_([]:index 0 out of bounds), e1: _|_("":invalid list index "" (type string)), e2: _|_(2:invalid operation: 2[2] (type int does not support indexing)), e3: _|_(true:invalid list index true (type bool)), e4: _|_([1,2,3]:index 3 out of bounds), e5: _|_(-1:invalid list index -1 (index must be non-negative)), e6: _|_([]:index 1 out of bounds), def: <1>{a: 1, #b: 3}, e7: <2>.def["b"]}`,
 		// }, {
 		// NOTE: string indexing no longer supported.
 		// Keeping it around until this is no longer an experiment.
@@ -1156,7 +1156,7 @@ a: {
 	}, {
 		desc: "definitions",
 		in: `
-			Foo :: {
+			#Foo: {
 				field: int
 				recursive: {
 					field: string
@@ -1164,13 +1164,13 @@ a: {
 			}
 
 			// Allowed
-			Foo1 :: { field: int }
-			Foo1 :: { field2: string }
+			#Foo1: { field: int }
+			#Foo1: { field2: string }
 
-			foo: Foo
+			foo: #Foo
 			foo: { feild: 2 }
 
-			foo1: Foo
+			foo1: #Foo
 			foo1: {
 				field: 2
 				recursive: {
@@ -1178,69 +1178,70 @@ a: {
 				}
 			}
 
-			Bar :: {
+			#Bar: {
 				field: int
 				{[A=_]:   int}
 			}
-			bar: Bar
+			bar: #Bar
 			bar: { feild: 2 }
 
-			Mixed :: string
+			#Mixed: string
 			Mixed: string
 
-			mixedRec: { Mixed :: string }
+			mixedRec: { #Mixed: string }
 			mixedRec: { Mixed: string }
 			`,
 		out: `<0>{` +
-			`Foo :: <1>C{field: int, recursive: <2>C{field: string}}, ` +
-			`Foo1 :: <3>C{field: int, field2: string}, ` +
+			`#Foo: <1>C{field: int, recursive: <2>C{field: string}}, ` +
+			`#Foo1: <3>C{field: int, field2: string}, ` +
 			`foo: _|_(2:field "feild" not allowed in closed struct), ` +
 			`foo1: <4>C{field: 2, recursive: _|_(2:field "feild" not allowed in closed struct)}, ` +
-			`Bar :: <5>{[]: <6>(A: string)->int, field: int}, ` +
+			`#Bar: <5>{[]: <6>(A: string)->int, field: int}, ` +
 			`bar: <7>{[]: <8>(A: string)->int, field: int, feild: 2}, ` +
-			`Mixed: _|_(field "Mixed" declared as definition and regular field), ` +
-			`mixedRec: _|_(field "Mixed" declared as definition and regular field)}`,
+			`#Mixed: string, ` +
+			`Mixed: string, ` +
+			`mixedRec: <9>{#Mixed: string, Mixed: string}}`,
 	}, {
 		desc: "combined definitions",
 		in: `
 			// Allow combining of structs within a definition
-			D1 :: {
+			#D1: {
 				env: a: "A"
 				env: b: "B"
-				def :: {a: "A"}
-				def :: {b: "B"}
+				#def: {a: "A"}
+				#def: {b: "B"}
 			}
 
-			d1: D1 & { env: c: "C" }
+			d1: #D1 & { env: c: "C" }
 
-			D2 :: {
+			#D2: {
 				a: int
 			}
-			D2 :: {
+			#D2: {
 				b: int
 			}
 
-			D3 :: {
+			#D3: {
 				env: a: "A"
 			}
-			D3 :: {
+			#D3: {
 				env: b: "B"
 			}
 
-			D4 :: {
-				env: DC
+			#D4: {
+				env: #DC
 				env: b: int
 			}
 
-			DC :: { a: int }
+			#DC: { a: int }
 					`,
 		out: `<0>{` +
-			`D1 :: <1>C{env: <2>C{a: "A", b: "B"}, def :: <3>C{a: "A", b: "B"}}, ` +
-			`d1: <4>C{env: _|_("C":field "c" not allowed in closed struct), def :: <5>C{a: "A", b: "B"}}, ` +
-			`D2 :: <6>C{a: int, b: int}, ` +
-			`D3 :: <7>C{env: <8>C{a: "A", b: "B"}}, ` +
-			`D4 :: <9>C{env: _|_(int:field "b" not allowed in closed struct)}, ` +
-			`DC :: <10>C{a: int}` +
+			`#D1: <1>C{env: <2>C{a: "A", b: "B"}, #def: <3>C{a: "A", b: "B"}}, ` +
+			`d1: <4>C{env: _|_("C":field "c" not allowed in closed struct), #def: <5>C{a: "A", b: "B"}}, ` +
+			`#D2: <6>C{a: int, b: int}, ` +
+			`#D3: <7>C{env: <8>C{a: "A", b: "B"}}, ` +
+			`#D4: <9>C{env: _|_(int:field "b" not allowed in closed struct)}, ` +
+			`#DC: <10>C{a: int}` +
 			`}`,
 	}, {
 		desc: "new-style definitions",
@@ -1266,71 +1267,71 @@ a: {
 		desc: "recursive closing starting at non-definition",
 		in: `
 			z: a: {
-				B:: {
+				#B: {
 					c: d: 1
 					c: f: 1
 				}
 			}
-			A: z & { a: { B :: { c: e: 2 } } }
+			A: z & { a: { #B: { c: e: 2 } } }
 			`,
-		out: `<0>{z: <1>{a: <2>{B :: <3>C{c: <4>C{d: 1, f: 1}}}}, A: <5>{a: <6>{B :: <7>C{c: _|_(2:field "e" not allowed in closed struct)}}}}`,
+		out: `<0>{z: <1>{a: <2>{#B: <3>C{c: <4>C{d: 1, f: 1}}}}, A: <5>{a: <6>{#B: <7>C{c: _|_(2:field "e" not allowed in closed struct)}}}}`,
 	}, {
 		desc: "non-closed definition carries over closedness to enclosed template",
 		in: `
-		S :: {
+		#S: {
 			[string]: { a: int }
 		}
-		a: S & {
+		a: #S & {
 			v: { b: int }
 		}
-		Q :: {
+		#Q: {
 			[string]: { a: int } | { b: int }
 		}
-		b: Q & {
+		b: #Q & {
 			w: { c: int }
 		}
-		R :: {
+		#R: {
 			[string]: [{ a: int }, { b: int }]
 		}
-		c: R & {
+		c: #R & {
 			w: [{ d: int }, ...]
 		}
 		`,
 		out: `<0>{` +
-			`S :: <1>{[]: <2>(_: string)-><3>C{a: int}, }, ` +
+			`#S: <1>{[]: <2>(_: string)-><3>C{a: int}, }, ` +
 			`a: <4>{[]: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}, ` +
 			`b: <7>{[]: <8>(_: string)->(<9>C{a: int} | <10>C{b: int}), w: _|_(int:empty disjunction: field "c" not allowed in closed struct)}, ` +
-			`Q :: <11>{[]: <12>(_: string)->(<13>C{a: int} | <14>C{b: int}), }, ` +
+			`#Q: <11>{[]: <12>(_: string)->(<13>C{a: int} | <14>C{b: int}), }, ` +
 			`c: <15>{[]: <16>(_: string)->[<17>C{a: int},<18>C{b: int}], w: [_|_(int:field "d" not allowed in closed struct),<19>C{b: int}]}, ` +
-			`R :: <20>{[]: <21>(_: string)->[<22>C{a: int},<23>C{b: int}], }}`,
+			`#R: <20>{[]: <21>(_: string)->[<22>C{a: int},<23>C{b: int}], }}`,
 	}, {
 		desc: "definitions with disjunctions",
 		in: `
-			Foo :: {
+			#Foo: {
 				field: int
 
 				{ a: 1 } |
 				{ b: 2 }
 			}
 
-			foo: Foo
+			foo: #Foo
 			foo: { a: 1 }
 
-			bar: Foo
+			bar: #Foo
 			bar: { c: 2 }
 
-			baz: Foo
+			baz: #Foo
 			baz: { b: 2 }
 			`,
 		out: `<0>{` +
-			`Foo :: (<1>C{field: int, a: 1} | <2>C{field: int, b: 2}), ` +
+			`#Foo: (<1>C{field: int, a: 1} | <2>C{field: int, b: 2}), ` +
 			`foo: <3>C{field: int, a: 1}, ` +
 			`bar: _|_(2:empty disjunction: field "c" not allowed in closed struct), ` +
 			`baz: <4>C{field: int, b: 2}}`,
 	}, {
 		desc: "definitions with disjunctions recurisive",
 		in: `
-			Foo :: {
+			#Foo: {
 				x: {
 					field: int
 
@@ -1341,41 +1342,41 @@ a: {
 			}
 					`,
 		out: `<0>{` +
-			`Foo :: <1>C{x: (<2>C{field: int, a: 1, c: 3} | <3>C{field: int, b: 2, c: 3})}` +
+			`#Foo: <1>C{x: (<2>C{field: int, a: 1, c: 3} | <3>C{field: int, b: 2, c: 3})}` +
 			`}`,
 	}, {
 		desc: "definitions with embedding",
 		in: `
-		E :: {
+		#E: {
 			a: { b: int }
 		}
 
-		S :: {
-			E
+		#S: {
+			#E
 			a: { c: int }
 			b: 3
 		}
 
 		// adding a field to a nested struct that is closed.
-		e1 :: S & { a: d: 4 }
+		#e1: #S & { a: d: 4 }
 		// literal struct not closed until after unification.
-		v1 :: S & { a: c: 4 }
+		#v1: #S & { a: c: 4 }
 		`,
 		out: `<0>{` +
-			`E :: <1>C{a: <2>C{b: int}}, ` +
-			`S :: <3>C{a: <4>C{b: int, c: int}, b: 3}, ` +
-			`e1 :: <5>C{a: _|_(4:field "d" not allowed in closed struct), b: 3}, ` +
-			`v1 :: <6>C{a: <7>C{b: int, c: 4}, b: 3}}`,
+			`#E: <1>C{a: <2>C{b: int}}, ` +
+			`#S: <3>C{a: <4>C{b: int, c: int}, b: 3}, ` +
+			`#e1: <5>C{a: _|_(4:field "d" not allowed in closed struct), b: 3}, ` +
+			`#v1: <6>C{a: <7>C{b: int, c: 4}, b: 3}}`,
 	}, {
 		desc: "top-level definition with struct and disjunction",
 		in: `
-		def :: {
+		#def: {
 			Type: string
 			Text: string
 			Size: int
 		}
 
-		def :: {
+		#def: {
 			Type: "B"
 			Size: 0
 		} | {
@@ -1383,7 +1384,7 @@ a: {
 			Size: 1
 		}`,
 		out: `<0>{` +
-			`def :: (<1>C{Size: (0 & int), Type: ("B" & string), Text: string} | ` +
+			`#def: (<1>C{Size: (0 & int), Type: ("B" & string), Text: string} | ` +
 			`<2>C{Size: (1 & int), Type: ("A" & string), Text: string})` +
 			`}`,
 	}, {
@@ -1429,7 +1430,7 @@ a: {
 	}, {
 		desc: "excluded embedding from closing",
 		in: `
-		S :: {
+		#S: {
 			a: { c: int }
 			{
 				c: { d: int }
@@ -1437,13 +1438,13 @@ a: {
 			B = { open: int }
 			b: B
 		}
-		V: S & {
+		V: #S & {
 			c: e: int
 			b: extra: int
 		}
 		`,
 		out: `<0>{` +
-			`S :: <1>C{` +
+			`#S: <1>C{` +
 			`a: <2>C{c: int}, ` +
 			`c: <3>{d: int}, ` +
 			`b: <4>{open: int}}, ` +
@@ -1454,70 +1455,70 @@ a: {
 	}, {
 		desc: "closing with failed optional",
 		in: `
-		k1 :: {a: int, b?: int} & A // closed({a: int})
-		k2 :: A & {a: int, b?: int} // closed({a: int})
+		#k1: {a: int, b?: int} & #A // closed({a: int})
+		#k2: #A & {a: int, b?: int} // closed({a: int})
 
 		o1: {a?: 3} & {a?: 4} // {a?: _|_}
 
 		// Optional fields with error values can be elimintated when closing
-		o2 :: {a?: 3} & {a?: 4} // close({})
+		#o2: {a?: 3} & {a?: 4} // close({})
 
-		d1 :: {a?: 2, b: 4} | {a?: 3, c: 5}
-		v1: d1 & {a?: 3, b: 4}  // close({b: 4})
+		#d1: {a?: 2, b: 4} | {a?: 3, c: 5}
+		v1: #d1 & {a?: 3, b: 4}  // close({b: 4})
 
-		A :: {a: int}
+		#A: {a: int}
 		`,
 		out: `<0>{` +
-			`k1 :: <1>C{a: int}, ` +
-			`A :: <2>C{a: int}, ` +
-			`k2 :: <3>C{a: int}, ` +
+			`#k1: <1>C{a: int}, ` +
+			`#A: <2>C{a: int}, ` +
+			`#k2: <3>C{a: int}, ` +
 			`o1: <4>{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
-			`o2 :: <5>C{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
-			`d1 :: (<6>C{a?: 2, b: 4} | <7>C{a?: 3, c: 5}), ` +
+			`#o2: <5>C{a?: _|_((3 & 4):conflicting values 3 and 4)}, ` +
+			`#d1: (<6>C{a?: 2, b: 4} | <7>C{a?: 3, c: 5}), ` +
 			`v1: <8>C{a?: _|_((2 & 3):conflicting values 2 and 3), b: 4}` +
 			`}`,
 	}, {
 		desc: "closing with comprehensions",
 		in: `
-		A :: {f1: int, f2: int}
+		#A: {f1: int, f2: int}
 
 		for k, v in {f3 : int} {
-			a: A & { "\(k)": v }
+			a: #A & { "\(k)": v }
 		}
 
-		B :: {
+		#B: {
 			for k, v in {f1: int} {
 				"\(k)": v
 			}
 		}
 
-		C :: {
+		#C: {
 			f1: _
 			for k, v in {f1: int} {
 				"\(k)": v
 			}
 		}
 
-		D :: {
+		#D: {
 			for k, v in {f1: int} {
 				"\(k)": v
 			}
 			...
 		}
 
-		E :: A & {
+		#E: #A & {
 			for k, v in { f3: int } {
 				"\(k)": v
 			}
 		}
 		`,
 		out: `<0>{` +
-			`E :: _|_(<1>.v:field "f3" not allowed in closed struct), ` +
-			`A :: <2>C{f1: int, f2: int}, ` +
-			`a: _|_(<3>.v:field "f3" not allowed in closed struct), ` +
-			`B :: <4>C{f1: int}, ` +
-			`C :: <5>C{f1: int}, ` +
-			`D :: <6>{f1: int, ...}` +
+			`#A: <1>C{f1: int, f2: int}, ` +
+			`a: _|_(<2>.v:field "f3" not allowed in closed struct), ` +
+			`#B: <3>C{f1: int}, ` +
+			`#C: <4>C{f1: int}, ` +
+			`#D: <5>{f1: int, ...}, ` +
+			`#E: _|_(<6>.v:field "f3" not allowed in closed struct)` +
 			`}`,
 	}, {
 		desc: "incomplete comprehensions",
@@ -1792,7 +1793,7 @@ a: {
 				}
 			}
 
-			for k, v in { def :: 1, opt?: 2, _hid: 3, reg: 4 } {
+			for k, v in { #def: 1, opt?: 2, _hid: 3, reg: 4 } {
 				"\(k)": v
 			}
 		`,
@@ -2535,7 +2536,7 @@ func TestFullEval(t *testing.T) {
 		foo: {
 			opt?: 1
 			"txt": 2
-			def :: 3
+			#def: 3
 			regular: 4
 			_hidden: 5
 		}
@@ -2543,41 +2544,41 @@ func TestFullEval(t *testing.T) {
 		select: {
 			opt: foo.opt
 			"txt": foo.txt
-			def :: foo.def
+			#def: foo.#def
 			regular: foo.regular
 			_hidden: foo._hidden
 		}
 		index: {
 			opt: foo["opt"]
 			"txt": foo["txt"]
-			def :: foo["def"]
+			#def: foo["#def"]
 			regular: foo["regular"]
 			_hidden: foo["_hidden"]
 		}
 		`,
 		out: `<0>{` +
-			`foo: <1>{opt?: 1, txt: 2, def :: 3, regular: 4, _hidden: 5}, ` +
+			`foo: <1>{opt?: 1, txt: 2, #def: 3, regular: 4, _hidden: 5}, ` +
 			`comp: <2>{txt: 2, regular: 4}, ` +
-			`select: <3>{opt: <4>.foo.opt, txt: 2, def :: 3, regular: 4, _hidden: 5}, ` +
-			`index: <5>{opt: <4>.foo["opt"], txt: 2, def :: _|_(<4>.foo["def"]:field "def" is a definition), regular: 4, _hidden: <4>.foo["_hidden"]}}`,
+			`select: <3>{opt: <4>.foo.opt, txt: 2, #def: 3, regular: 4, _hidden: 5}, ` +
+			`index: <5>{opt: <4>.foo["opt"], txt: 2, #def: <4>.foo["#def"], regular: 4, _hidden: <4>.foo["_hidden"]}}`,
 	}, {
 		desc: "retain references with interleaved embedding",
 		in: `
 		a: d: {
-			base
-			info :: {...}
-			Y: info.X
+			#base
+			#info: {...}
+			Y: #info.X
 		}
 
-		base :: {
-			info :: {...}
+		#base: {
+			#info: {...}
 		}
 
-		a: [Name=string]: { info :: {
+		a: [Name=string]: { #info: {
 			X: "foo"
 		}}
 		`,
-		out: `<0>{a: <1>{[]: <2>(Name: string)-><3>{info :: <4>C{X: "foo"}}, d: <5>C{info :: <6>C{X: "foo"}, Y: "foo"}}, base :: <7>C{info :: <8>{...}}}`,
+		out: `<0>{a: <1>{[]: <2>(Name: string)-><3>{#info: <4>C{X: "foo"}}, d: <5>C{#info: <6>C{X: "foo"}, Y: "foo"}}, #base: <7>C{#info: <8>{...}}}`,
 	}, {
 		desc: "comparison against bottom",
 		in: `
@@ -2598,35 +2599,35 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "or builtin should not fail on non-concrete empty list",
 		in: `
-		Workflow :: {
+		#Workflow: {
 			jobs: {
 				[jobID=string]: {
 				}
 			}
-			JobID :: or([ for k, _ in jobs { k } ])
+			#JobID: or([ for k, _ in jobs { k } ])
 		}
 
-		foo: Workflow & {
+		foo: #Workflow & {
 			jobs: foo: {
 			}
 		}
 		`,
-		out: `<0>{Workflow :: <1>C{jobs: <2>{[]: <3>(jobID: string)-><4>C{}, }, JobID :: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{[]: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, JobID :: "foo"}}`,
+		out: `<0>{#Workflow: <1>C{jobs: <2>{[]: <3>(jobID: string)-><4>C{}, }, #JobID: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{[]: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, #JobID: "foo"}}`,
 	}, {
 		desc: "Issue #153",
 		in: `
 		Foo: {
-			listOfCloseds: [...Closed]
+			listOfCloseds: [...#Closed]
 		}
-		
-		Closed :: {
+
+		#Closed: {
 			a: int | *0
 		}
-		
+
 		Junk: {
 			b: 2
 		}
-		
+
 		Foo & {
 			listOfCloseds: [{
 				for k, v in Junk {
@@ -2635,7 +2636,7 @@ func TestFullEval(t *testing.T) {
 			 }]
 		}
 		`,
-		out: `<0>{<1>{listOfCloseds: [_|_(<2>.v:field "b" not allowed in closed struct)]}, Foo: <3>{listOfCloseds: []}, Closed :: <4>C{a: 0}, Junk: <5>{b: 2}}`,
+		out: `<0>{<1>{listOfCloseds: [_|_(<2>.v:field "b" not allowed in closed struct)]}, Foo: <3>{listOfCloseds: []}, #Closed: <4>C{a: 0}, Junk: <5>{b: 2}}`,
 	}, {
 		desc: "label and field aliases",
 		in: `
@@ -2657,38 +2658,38 @@ func TestFullEval(t *testing.T) {
 			`c: 5, ` +
 			`str: 5}`,
 	}, {
-		desc: "optionals with label fiters",
+		desc: "optionals with label filters",
 		in: `
-		JobID :: =~"^[a-zA-Z]*$"
-		Job :: {
+		#JobID: =~"^[a-zA-Z]*$"
+		#Job: {
 			name: string
 			cmd:  string
 		}
-		Jobs :: {
-			[JobID]: Job
+		#Jobs: {
+			[#JobID]: #Job
 			[=~"Test$"]: name: =~"^test" // Must work without ...
 		}
 
 		jobs: foo: name: "allGood"
 		jobs: foo: name: "allGood"
 
-		jobs1: Jobs
+		jobs1: #Jobs
 		jobs1: foo1: {} // faulty
 
-		jobs2: Jobs
+		jobs2: #Jobs
 		jobs2: fooTest: name: "badName" // faulty
 
-		jobs3: Jobs
-		jobs3: [string]: Job
+		jobs3: #Jobs
+		jobs3: [string]: #Job
 		jobs3: fooTest1: name: "badName" // faulty
 		`,
 		out: `<0>{` +
-			`JobID :: =~"^[a-zA-Z]*$", ` +
-			`Job :: <1>C{name: string, cmd: string}, ` +
-			`Jobs :: <2>C{[=~"^[a-zA-Z]*$"]: <3>(_: string)-><4>.Job, [=~"Test$"]: <5>(_: string)-><6>C{name: =~"^test"}, }, ` +
+			`#JobID: =~"^[a-zA-Z]*$", ` +
+			`#Job: <1>C{name: string, cmd: string}, ` +
+			`#Jobs: <2>C{[=~"^[a-zA-Z]*$"]: <3>(_: string)-><4>.#Job, [=~"Test$"]: <5>(_: string)-><6>C{name: =~"^test"}, }, ` +
 			`jobs: <7>{foo: <8>{name: "allGood"}}, ` +
 			`jobs1: _|_(<9>{}:field "foo1" not allowed in closed struct), ` +
-			`jobs2: <10>C{[=~"^[a-zA-Z]*$"]: <11>(_: string)-><4>.Job, [=~"Test$"]: <12>(_: string)-><13>C{name: =~"^test"}, fooTest: _|_(string:field "cmd" not allowed in closed struct)}, ` +
+			`jobs2: <10>C{[=~"^[a-zA-Z]*$"]: <11>(_: string)-><4>.#Job, [=~"Test$"]: <12>(_: string)-><13>C{name: =~"^test"}, fooTest: _|_(string:field "cmd" not allowed in closed struct)}, ` +
 			`jobs3: _|_(<14>{name: "badName"}:field "fooTest1" not allowed in closed struct)}`,
 	}, {
 		desc: "optionals in open structs",
@@ -2699,75 +2700,75 @@ func TestFullEval(t *testing.T) {
 		B: {
 			[=~"^[m-z]*$"]: int
 		}
-		C :: {A & B}
-		c: C & { aaa: 3 }
+		#C: {A & B}
+		c: #C & { aaa: 3 }
 		`,
-		out: `<0>{A: <1>{[=~"^[a-s]*$"]: <2>(_: string)->int, }, B: <3>{[=~"^[m-z]*$"]: <4>(_: string)->int, }, C :: <5>C{[=~"^[a-s]*$"]: <6>(_: string)->int, [=~"^[m-z]*$"]: <7>(_: string)->int, }, c: <8>C{[=~"^[a-s]*$"]: <9>(_: string)->int, [=~"^[m-z]*$"]: <10>(_: string)->int, aaa: 3}}`,
+		out: `<0>{A: <1>{[=~"^[a-s]*$"]: <2>(_: string)->int, }, B: <3>{[=~"^[m-z]*$"]: <4>(_: string)->int, }, #C: <5>C{[=~"^[a-s]*$"]: <6>(_: string)->int, [=~"^[m-z]*$"]: <7>(_: string)->int, }, c: <8>C{[=~"^[a-s]*$"]: <9>(_: string)->int, [=~"^[m-z]*$"]: <10>(_: string)->int, aaa: 3}}`,
 	}, {
 		desc: "conjunction of optional sets",
 		in: `
-		A :: {
+		#A: {
 			[=~"^[a-s]*$"]: int
 		}
-		B :: {
+		#B: {
 			[=~"^[m-z]*$"]: int
 		}
 
-		C :: A & B
-		c: C & { aaa: 3 }
+		#C: #A & #B
+		c: #C & { aaa: 3 }
 
-		D :: {A & B}
-		d: D & { aaa: 3 }
+		#D: {#A & #B}
+		d: #D & { aaa: 3 }
 		`,
 		out: `<0>{` +
-			`A :: <1>C{[=~"^[a-s]*$"]: <2>(_: string)->int, }, ` +
-			`B :: <3>C{[=~"^[m-z]*$"]: <4>(_: string)->int, }, ` +
-			`C :: <5>C{(C{[=~"^[a-s]*$"]: <6>(_: string)->int} & C{[=~"^[m-z]*$"]: <7>(_: string)->int}), }, ` +
+			`#A: <1>C{[=~"^[a-s]*$"]: <2>(_: string)->int, }, ` +
+			`#B: <3>C{[=~"^[m-z]*$"]: <4>(_: string)->int, }, ` +
+			`#C: <5>C{(C{[=~"^[a-s]*$"]: <6>(_: string)->int} & C{[=~"^[m-z]*$"]: <7>(_: string)->int}), }, ` +
 			`c: _|_(3:field "aaa" not allowed in closed struct), ` +
-			`D :: <8>C{(C{[=~"^[a-s]*$"]: <9>(_: string)->int} & C{[=~"^[m-z]*$"]: <10>(_: string)->int}), }, ` +
+			`#D: <8>C{(C{[=~"^[a-s]*$"]: <9>(_: string)->int} & C{[=~"^[m-z]*$"]: <10>(_: string)->int}), }, ` +
 			`d: _|_(3:field "aaa" not allowed in closed struct)` +
 			`}`,
 	}, {
 		desc: "continue recursive closing for optionals",
 		in: `
-		S :: {
+		#S: {
 			[string]: { a: int }
 		}
-		a: S & {
+		a: #S & {
 			v: { b: int }
 		}
 		`,
-		out: `<0>{S :: <1>{[]: <2>(_: string)-><3>C{a: int}, }, a: <4>{[]: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}}`,
+		out: `<0>{#S: <1>{[]: <2>(_: string)-><3>C{a: int}, }, a: <4>{[]: <5>(_: string)-><6>C{a: int}, v: _|_(int:field "b" not allowed in closed struct)}}`,
 	}, {
 		desc: "augment closed optionals",
 		in: `
-		A :: {
+		#A: {
 			[=~"^[a-s]*$"]: int
 		}
-		B :: {
+		#B: {
 			[=~"^[m-z]*?"]: int
 		}
-		C :: {
-			A & B
+		#C: {
+			#A & #B
 			[=~"^Q*$"]: int
 		}
-		c: C & { QQ: 3 }
-		D :: {
-			A
-			B
+		c: #C & { QQ: 3 }
+		#D: {
+			#A
+			#B
 		}
-		d: D & { aaa: 4 }
+		d: #D & { aaa: 4 }
 		`,
 		out: `<0>{` +
-			`A :: <1>C{[=~"^[a-s]*$"]: <2>(_: string)->int, }, ` +
-			`B :: <3>C{[=~"^[m-z]*?"]: <4>(_: string)->int, }, ` +
-			`C :: <5>C{C{[=~"^Q*$"]: <6>(_: string)->int}, C{(C{[=~"^[a-s]*$"]: <7>(_: string)->int} & C{[=~"^[m-z]*?"]: <8>(_: string)->int})}, }, ` +
+			`#A: <1>C{[=~"^[a-s]*$"]: <2>(_: string)->int, }, ` +
+			`#B: <3>C{[=~"^[m-z]*?"]: <4>(_: string)->int, }, ` +
+			`#C: <5>C{C{[=~"^Q*$"]: <6>(_: string)->int}, C{(C{[=~"^[a-s]*$"]: <7>(_: string)->int} & C{[=~"^[m-z]*?"]: <8>(_: string)->int})}, }, ` +
 			`c: <9>C{C{[=~"^Q*$"]: <10>(_: string)->int}, C{(C{[=~"^[a-s]*$"]: <11>(_: string)->int} & C{[=~"^[m-z]*?"]: <12>(_: string)->int})}, QQ: 3}, ` +
-			`D :: <13>C{[=~"^[a-s]*$"]: <14>(_: string)->int, [=~"^[m-z]*?"]: <15>(_: string)->int, }, ` +
+			`#D: <13>C{[=~"^[a-s]*$"]: <14>(_: string)->int, [=~"^[m-z]*?"]: <15>(_: string)->int, }, ` +
 			`d: <16>C{[=~"^[a-s]*$"]: <17>(_: string)->int, [=~"^[m-z]*?"]: <18>(_: string)->int, aaa: 4}}`,
 	}, {
 		in: `
-		Task :: {
+		#Task: {
 			{
 				op:          "pull"
 				tag:         *"latest" | string
@@ -2779,21 +2780,21 @@ func TestFullEval(t *testing.T) {
 			}
 		}
 
-		foo: Task & {"op": "pull"}
+		foo: #Task & {"op": "pull"}
 		`,
-		out: `<0>{Task :: (<1>C{op: "pull", tag: (*"latest" | string), refToTag: <1>.tag, tagExpr: (<1>.tag + "dd"), tagInString: ""+<1>.tag+""} | <2>C{op: "scratch"}), foo: <3>C{op: "pull", tag: "latest", refToTag: "latest", tagExpr: "latestdd", tagInString: "latest"}}`,
+		out: `<0>{#Task: (<1>C{op: "pull", tag: (*"latest" | string), refToTag: <1>.tag, tagExpr: (<1>.tag + "dd"), tagInString: ""+<1>.tag+""} | <2>C{op: "scratch"}), foo: <3>C{op: "pull", tag: "latest", refToTag: "latest", tagExpr: "latestdd", tagInString: "latest"}}`,
 	}, {
 		in: `
 		t: {
-			ok :: *true | bool
-			if ok {
+			#ok: *true | bool
+			if #ok {
 				x: int
 			}
 		}
 		s: t & {
-			ok :: false
+			#ok: false
 		}`,
-		out: `<0>{t: <1>{x: int, ok :: true}, s: <2>{ok :: false}}`,
+		out: `<0>{t: <1>{x: int, #ok: true}, s: <2>{#ok: false}}`,
 	}, {
 		desc: "cross-dependent comprehension",
 		// TODO(eval): fix: c should ultimately be allowed the struct. Current
@@ -2802,18 +2803,18 @@ func TestFullEval(t *testing.T) {
 		// checks and allowing this would be more intuitive.
 		// Until that time, ensure that the behavior is at commutative.
 		in: `
-		a :: {
+		#a: {
 			if b {
 				c: 4
 			}
 			b: bool
 		}
-		x: (a & { b: true}) & {c: 4 }
+		x: (#a & { b: true}) & {c: 4 }
 		y: x
 		`,
 		// c should not be allowed, as it would break commutativiy.
 		// See comments above.
-		out: `<0>{x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct), a :: <1>C{b: bool if <2>.b yield <3>C{c: 4}}}`,
+		out: `<0>{x: _|_(4:field "c" not allowed in closed struct), y: _|_(4:field "c" not allowed in closed struct), #a: <1>C{b: bool if <2>.b yield <3>C{c: 4}}}`,
 	}, {
 		desc: "optional expanded before lookup",
 		in: `
@@ -2885,26 +2886,26 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "alias reuse in nested scope",
 		in: `
-		Foo :: {
+		#Foo: {
 			let X = or([ for k, _ in {} { k } ])
 			connection: [X]: X
 		}
-		A :: {
+		#A: {
 			foo: "key"
 			let X = foo
 			a: foo: [X]: X
 		}
-		B :: {
+		#B: {
 			foo: string
 			let X = foo
 			a: foo: [X]: X
 		}
-		b: B & { foo: "key" }
+		b: #B & { foo: "key" }
 		`,
 		out: `<0>{` +
-			`Foo :: <1>C{connection: <2>C{[or ([ <3>for k, _ in <4>{} yield <3>.k ])]: <5>(_: string)->or ([ <3>for k, _ in <4>{} yield <3>.k ]), }}, ` +
-			`A :: <6>C{foo: "key", a: <7>C{foo: <8>C{["key"]: <9>(_: string)-><10>.foo, }}}, ` +
-			`B :: <11>C{foo: string, a: <12>C{foo: <13>C{[string]: <14>(_: string)-><15>.foo, }}}, ` +
+			`#Foo: <1>C{connection: <2>C{[or ([ <3>for k, _ in <4>{} yield <3>.k ])]: <5>(_: string)->or ([ <3>for k, _ in <4>{} yield <3>.k ]), }}, ` +
+			`#A: <6>C{foo: "key", a: <7>C{foo: <8>C{["key"]: <9>(_: string)-><10>.foo, }}}, ` +
+			`#B: <11>C{foo: string, a: <12>C{foo: <13>C{[string]: <14>(_: string)-><15>.foo, }}}, ` +
 			`b: <16>C{foo: "key", a: <17>C{foo: <18>C{["key"]: <19>(_: string)-><20>.foo, }}}` +
 			`}`,
 	}, {
@@ -2926,22 +2927,22 @@ func TestFullEval(t *testing.T) {
 		package foobar
 
 		import yaml "encoding/yaml"
-	
-		Spec :: {
+
+		#Spec: {
 			_vars: {something: string}
 			data: {
-				foo :: {
+				#foo: {
 					use: _vars.something
 				}
 				baz:    yaml.Marshal(_vars.something)
-				foobar: yaml.Marshal(foo)
+				foobar: yaml.Marshal(#foo)
 			}
 		}
-		Val: Spec & {
+		Val: #Spec & {
 			_vars: something: "var-string"
 		}
 		`,
-		out: `<0>{Spec :: <1>C{_vars: <2>C{something: string}, data: <3>C{foo :: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{foo :: <11>C{use: "var-string"}, baz: "var-string\n", foobar: "use: var-string\n"}}}`,
+		out: `<0>{#Spec: <1>C{_vars: <2>C{something: string}, data: <3>C{#foo: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.#foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{#foo: <11>C{use: "var-string"}, baz: "var-string\n", foobar: "use: var-string\n"}}}`,
 	}, {
 		desc: "detectIncompleteJSON",
 		in: `
@@ -2949,21 +2950,21 @@ func TestFullEval(t *testing.T) {
 	
 			import "encoding/json"
 		
-			Spec :: {
+			#Spec: {
 				_vars: {something: string}
 				data: {
-					foo :: {
+					#foo: {
 						use: _vars.something
 					}
 					baz:    json.Marshal(_vars.something)
-					foobar: json.Marshal(foo)
+					foobar: json.Marshal(#foo)
 				}
 			}
-			Val: Spec & {
+			Val: #Spec & {
 				_vars: something: "var-string"
 			}
 			`,
-		out: `<0>{Spec :: <1>C{_vars: <2>C{something: string}, data: <3>C{foo :: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{foo :: <11>C{use: "var-string"}, baz: "\"var-string\"", foobar: "{\"use\":\"var-string\"}"}}}`,
+		out: `<0>{#Spec: <1>C{_vars: <2>C{something: string}, data: <3>C{#foo: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.#foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{#foo: <11>C{use: "var-string"}, baz: "\"var-string\"", foobar: "{\"use\":\"var-string\"}"}}}`,
 	}, {
 		desc: "issue312",
 		in: `
@@ -2985,7 +2986,7 @@ func TestFullEval(t *testing.T) {
 	}, {
 		desc: "issue318",
 		in: `
-		T :: {
+		#T: {
 			arg: x: string
 			out1: "\(arg.x) \(arg.y)"
 			out2: "\(arg.y)"
@@ -2994,7 +2995,7 @@ func TestFullEval(t *testing.T) {
 		}
 		`,
 		out: `<0>{` +
-			`T :: <1>C{` +
+			`#T: <1>C{` +
 			`arg: <2>C{x: string}, ` +
 			`out1: _|_(<3>.arg.y:undefined field "y"), ` +
 			`out2: _|_(<3>.arg.y:undefined field "y"), ` +
@@ -3011,30 +3012,30 @@ func TestFullEval(t *testing.T) {
 
 		x: {
 			s: "myname"
-			T
+			#T
 		}
 
-		T :: {
+		#T: {
 			s: string
 			out: template.Execute("{{.s}}", {
 				"s": s
 			})
 		}
 
-		V :: {
+		#V: {
 			s: string
 			out: json.Marshal({"s": s})
 		}
 
-		U :: {
+		#U: {
 			s: string
 			out: yaml.Marshal({"s": s})
 		}`,
 		out: `<0>{` +
-			`T :: <1>C{s: string, out: <2>.Execute ("{{.s}}",<3>C{s: <4>.s})}, ` +
-			`x: <5>C{s: "myname", out: "myname"}, ` +
-			`V :: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, ` +
-			`U :: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}`,
+			`x: <1>C{s: "myname", out: "myname"}, ` +
+			`#T: <2>C{s: string, out: <3>.Execute ("{{.s}}",<4>C{s: <5>.s})}, ` +
+			`#V: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, ` +
+			`#U: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}`,
 	}}
 	rewriteHelper(t, testCases, evalFull)
 }

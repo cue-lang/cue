@@ -1,7 +1,7 @@
 ! cue eval ./struct.cue
 cmp stderr expect-stderr
 -- struct.cue --
-type :: {
+#type: {
     x: 0
     y: 0
 
@@ -10,8 +10,8 @@ type :: {
 }
 
 data: {
-    a: type
-    b: type
+    a: #type
+    b: #type
 
     b: x: a.x
     a: y: b.y

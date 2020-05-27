@@ -348,27 +348,6 @@ b: preference mark not allowed at this position:
 	}, {
 		in: `
 		a: d: {
-			base
-			info :: {
-				...
-			}
-			Y: info.X
-		}
-
-		base :: {
-			info :: {...}
-		}
-
-		a: [Name=string]: { info :: {
-			X: "foo"
-		}}
-		`,
-		out: `<0>{` +
-			`a: (<1>{d: <2>{info :: <3>{...}, Y: <2>.info.X}, <0>.base} & <4>{[]: <5>(Name: string)-><6>{info :: <7>C{X: "foo"}}, }), ` +
-			`base :: <8>C{info :: <9>{...}}}`,
-	}, {
-		in: `
-		a: d: {
 			#base
 			#info: {
 				...
@@ -389,13 +368,13 @@ b: preference mark not allowed at this position:
 			`#base: <8>C{#info: <9>{...}}}`,
 	}, {
 		in: `
-		def :: {
+		#def: {
 			Type: string
 			Text: string
 			Size: int
 		}
 
-		def :: {
+		#def: {
 			Type: "B"
 			Size: 0
 		} | {
@@ -404,16 +383,16 @@ b: preference mark not allowed at this position:
 		}
 		`,
 		out: `<0>{` +
-			`def :: (<1>C{Size: int, Type: string, Text: string} & (<2>C{Size: 0, Type: "B"} | <3>C{Size: 1, Type: "A"}))` +
+			`#def: (<1>C{Size: int, Type: string, Text: string} & (<2>C{Size: 0, Type: "B"} | <3>C{Size: 1, Type: "A"}))` +
 			`}`,
 	}, {
 		// Issue #172
 		in: `
 		package testenv
-		env_:: [NAME=_]: [VALUE=_]
-		env_:: foo: "bar"
+		#env_: [NAME=_]: [VALUE=_]
+		#env_: foo: "bar"
 			`,
-		out: "env_.*: alias not allowed in list:\n    test:3:20\n<0>{}",
+		out: "#env_.*: alias not allowed in list:\n    test:3:20\n<0>{}",
 	}, {
 		// Issue #276
 		in: `

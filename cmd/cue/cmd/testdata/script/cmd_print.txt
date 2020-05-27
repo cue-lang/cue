@@ -24,11 +24,11 @@ command: print: {
 		stdout: string
 	}
 	print: cli.Print & {
-		text: (f & {arg: runs.t1.stdout + runs.t2.stdout}).result
+		text: (#f & {arg: runs.t1.stdout + runs.t2.stdout}).result
 	}
 }
 
-f :: {
+#f: {
     arg: string
     result: strings.Join(strings.Split(arg, ""), ".")
 }

@@ -1,7 +1,7 @@
 package ci
 
 import (
-	"github.com/SchemaStore/schemastore/schemas/json"
+	"github.com/SchemaStore/schemastore/src/schemas/json"
 	encjson "encoding/json"
 )
 

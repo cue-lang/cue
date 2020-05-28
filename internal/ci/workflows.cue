@@ -32,11 +32,13 @@ workflows: [
 #job:  (json.#Workflow.jobs & {x: _}).x
 #step: ((#job & {steps:           _}).steps & [_])[0]
 
+#latestGo: "1.14.3"
+
 #testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": ["1.12.x", "1.13.x", "1.14.3"]
+		"go-version": ["1.12.x", "1.13.x", #latestGo]
 		os: ["ubuntu-latest", "macos-latest", "windows-latest"]
 	}
 }
@@ -67,13 +69,10 @@ workflows: [
 
 #goGenerate: #step & {
 	name: "Generate"
-	run: """
-				go generate ./...
-				go generate ./.github/workflows
-				"""
+	run:  "go generate ./..."
 	// The Go version corresponds to the precise 1.14.x version specified in
 	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '1.14.3' && matrix.os != 'windows-latest'"
+	if: "matrix.go-version == '\(#latestGo)' && matrix.os != 'windows-latest'"
 }
 
 #goTest: #step & {
@@ -89,6 +88,9 @@ workflows: [
 #goReleaseCheck: #step & {
 	name: "gorelease check"
 	run:  "go run golang.org/x/exp/cmd/gorelease"
+	// Only run on 1.13.x and latest Go for now. Bug with Go 1.12.x means
+	// this check fails
+	if: "matrix.go-version == '\(#latestGo)' || matrix.go-version == '1.13.x'"
 }
 
 #checkGitClean: #step & {

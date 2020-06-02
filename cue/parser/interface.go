@@ -17,8 +17,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
@@ -96,7 +94,7 @@ type DeprecationError struct {
 }
 
 func (e *DeprecationError) Error() string {
-	return fmt.Sprintf("try running `cue fmt` on the file to upgrade.")
+	return "try running `cue fix` on the file or module to upgrade"
 }
 
 // Latest specifies the latest version of the parser, effectively setting

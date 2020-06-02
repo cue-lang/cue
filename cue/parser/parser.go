@@ -726,7 +726,7 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	if len(list) > 1 {
 		for _, d := range list {
 			if internal.IsBulkField(d) {
-				p.assertV0(p.pos, 1, 3, `only one bulk optional field allowed per struct`)
+				p.assertV0(p.pos, 2, 0, `combining bulk optional fields with other fields`)
 				break
 			}
 		}
@@ -890,6 +890,9 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 	m.TokenPos = p.pos
 	m.Token = p.tok
+	if p.tok == token.ISA {
+		p.assertV0(p.pos, 2, 0, "use of '::'")
+	}
 	if p.tok != token.COLON && p.tok != token.ISA {
 		p.errorExpected(pos, "':' or '::'")
 	}
@@ -923,6 +926,9 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 		m.TokenPos = p.pos
 		m.Token = p.tok
+		if p.tok == token.ISA {
+			p.assertV0(p.pos, 2, 0, "use of '::'")
+		}
 		if p.tok != token.COLON && p.tok != token.ISA {
 			if p.tok.IsLiteral() {
 				p.errf(p.pos, "expected ':' or '::'; found %s", p.lit)

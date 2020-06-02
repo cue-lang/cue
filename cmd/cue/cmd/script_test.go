@@ -24,7 +24,7 @@ import (
 func TestLatest(t *testing.T) {
 	filepath.Walk("testdata/script", func(fullpath string, info os.FileInfo, err error) error {
 		if !strings.HasSuffix(fullpath, ".txt") ||
-			strings.HasPrefix(filepath.Base(fullpath), "legacy") {
+			strings.HasPrefix(filepath.Base(fullpath), "fix") {
 			return nil
 		}
 

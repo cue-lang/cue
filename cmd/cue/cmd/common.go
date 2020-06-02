@@ -41,7 +41,7 @@ import (
 // - block comments
 // - old-style field comprehensions
 // - space separator syntax
-const syntaxVersion = -1000 + 100*1 + 2
+const syntaxVersion = -1000 + 100*2 + 1
 
 var defaultConfig = config{
 	loadCfg: &load.Config{

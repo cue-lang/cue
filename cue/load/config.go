@@ -474,7 +474,10 @@ func (c Config) complete() (cfg *Config, err error) {
 	c.loadFunc = c.loader.loadFunc()
 
 	if c.Context == nil {
-		c.Context = build.NewContext(build.Loader(c.loadFunc))
+		c.Context = build.NewContext(
+			build.Loader(c.loadFunc),
+			build.ParseFile(c.loader.cfg.ParseFile),
+		)
 	}
 
 	return &c, nil

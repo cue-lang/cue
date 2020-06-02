@@ -1524,6 +1524,13 @@ func (v Value) LookupDef(name string) Value {
 			return newChildValue(&o, i)
 		}
 	}
+	if !strings.HasPrefix(name, "#") {
+		alt := v.LookupDef("#" + name)
+		// Use the original error message if this resulted in an error as well.
+		if alt.Err() == nil {
+			return alt
+		}
+	}
 	return newErrValue(v, ctx.mkErr(v.path.v,
 		"defintion %q not found", name))
 }

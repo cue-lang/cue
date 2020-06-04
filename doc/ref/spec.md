@@ -1018,7 +1018,9 @@ It could be a role of vet checkers to identify such cases (and suggest users
 to explicitly use `_|_` to discard a field, for instance).
 -->
 
-Syntactically, a struct literal may contain multiple fields with
+Syntactically, a field is marked as optional by following its label with a `?`.
+The question mark is not part of the field name.
+A struct literal may contain multiple fields with
 the same label, the result of which is a single field with the same properties
 as defined as the unification of two fields resulting from unifying two structs.
 
@@ -1038,28 +1040,58 @@ Expression                             Result (without optional fields)
 {a: 1} & {a: 2}                        _|_
 ```
 
-Optional labels are defined in sets with an expression to select all
-labels to which to apply a given constraint.
-Syntactically, the label of an optional field set is an expression in square
-brackets indicating the matching labels.
-The value `string` matches all fields, while a concrete string matches a
-single field.
-As the latter case is common, a concrete label followed by
-a question mark `?` may be used as a shorthand.
-So
+A struct may define constraints that apply to fields that are added when unified
+with another struct using pattern or default constraints.
+
+A _pattern constraint_, denoted `[pattern]: value`, defines a pattern, which
+is a value of type string, and a value to unify with fields whose label
+match that pattern.
+When unifying structs `a` and `b`,
+a pattern constraint `[p]: v` declared in `a`
+defines that the value `v` should unify with any field in the resulting struct `c`
+whose label unifies with pattern `p` and for which there exists no
+field in `a` with the same label.
+
+Additionally, a _default constraint_, denoted `...value`, defines a value
+to unify with any field for which there is no other declaration in a struct.
+When unifying structs `a` and `b`,
+a default constraint `...v` declared in `a`
+defines that the value `v` should unify with any field in the resulting struct `c`
+whose label does not unify with any of the patterns of the pattern
+constraints defined for `a` _and_ for which there exists no field in `a`
+with that label.
+The token `...` is a shorthand for `..._`.
+
+
 ```
-foo?: bar
+a: {
+    foo:    string  // foo is a string
+    ["^i"]: int     // all other fields starting with i are integers
+    ["^b"]: bool    // all other fields starting with b are booleans
+    ...string       // all other fields must be a string
+}
+
+b: a & {
+    i3:    3
+    bar:   true
+    other: "a string"
+}
 ```
-is a shorthand for
-```
-["foo"]: bar
-```
-The question mark is not part of the field name.
-The token `...` may be used as the last declaration in a struct
-and is a shorthand for
-```
-[_]: _
-```
+
+<!-- NOTE: pattern and default constraints can be made to apply to all
+fields by embedding them as a struct:
+    x: {
+        a: 2
+        b: 3
+        {[string]: int}
+    }
+or by writing
+    x: [string]: int
+    x: {
+        a: 2
+        b: 3
+    }
+-->
 
 Concrete field labels may be an identifier or string, the latter of which may be
 interpolated.
@@ -1117,8 +1149,9 @@ future extensions and relaxations:
 -->
 
 ```
-StructLit       = "{" { Declaration "," } [ "..." ] "}" .
-Declaration     = Field | Embedding | LetClause | attribute .
+StructLit       = "{" { Declaration "," } "}" .
+Declaration     = Field | Ellipsis | Embedding | LetClause | attribute .
+Ellipsis        = "..." [ Expression ] .
 Embedding       = Comprehension | AliasExpr .
 Field           = Label ":" { Label ":" } Expression { attribute } .
 Label           = [ identifier "=" ] LabelExpr .
@@ -1202,12 +1235,15 @@ A1: A & {
 ```
 
 A _closed struct_ `c` is a struct whose instances may not have regular fields
-not defined in `c`.
-Closing a struct is equivalent to adding an optional field with value `_|_`
-for all undefined fields.
+with a name that does not match the name of a regular or optional field
+or the pattern of a pattern constraint defined in `c`.
+A struct that is the result of unifying any struct with a [`...`](#Structs)
+declaration is defined for all fields.
+Recursively closing a struct is equivalent to adding `..._|_` to its its root
+and any of its substructures that are not defined for all fields.
 
-Syntactically, closed structs can be explicitly created with the `close` builtin
-or implicitly by [definitions](#Definitions).
+Syntactically, structs are recursively closed explicitly with
+the `close` builtin or implicitly by [definitions](#Definitions).
 
 
 ```
@@ -1247,6 +1283,8 @@ D: close({
 <!-- (jba) Somewhere it should be said that optional fields are only
      interesting inside closed structs. -->
 
+<!-- TODO: move embedding section to above the previous one -->
+
 #### Embedding
 
 A struct may contain an _embedded value_, an operand used
@@ -1261,8 +1299,7 @@ In this case, a CUE program will evaluate to the embedded value
 and the CUE program may not have top-level regular or optional
 fields (definitions and aliases are allowed).
 
-Syntactically, embeddings may be any expression, except that `<`
-is eagerly interpreted as a bind label.
+Syntactically, embeddings may be any expression.
 
 ```
 S1: {
@@ -1300,46 +1337,14 @@ A field is a _definition_ if its identifier starts with `#` or `_#`.
 A field is _hidden_ if its starts with a `_`.
 Definitions and hidden fields are not emitted when converting a CUE program
 to data and are never required to be concrete.
-For definitions
-literal structs that are part of a definition's value are implicitly closed,
-but may unify unrestricted with other structs within the field's declaration.
-This excludes literals structs in embeddings and aliases.
 
-<!--
-This may be a more intuitive definition:
-    Literal structs that are part of a definition's value are implicitly closed.
-    Implicitly closed literal structs that are unified within
-    a single field declaration are considered to be a single literal struct.
-However, this would make unification non-commutative, unless one imposes an
-ordering where literal structs are unified before unifying them with others.
-Imposing such an ordering is complex and error prone.
--->
-An ellipsis `...` in such literal structs keeps them open,
-as it defines `_` for all labels.
+Referencing a definition will implicitely [close](#ClosedStructs) it.
+A struct that embeds a referenced definition will itself be closed
+after first allowing any other fields or embedded structs to unify.
+The result of `{ #A }` is `#A` for any `#A`.
 
-<!--
-Excluding embeddings from recursive closing allows comprehensions to be
-interpreted as embeddings without some exception. For instance,
-    if x > 2 {
-        foo: string
-    }
-should not cause any failure. It is also consistent with embeddings being
-opened when included in a closed struct.
-
-Finally, excluding embeddings from recursive closing allows for
-a mechanism to not recursively close, without needing an additional language
-construct, such as a triple colon or something else:
-#foo: {
-    {
-        // not recursively closed
-    }
-    ... // include this to not close outer struct
-}
-
-Including aliases from this exclusion, which are more a separate definition
-than embedding seems sensible, and allows for an easy mechanism to avoid
-closing, aside from embedding.
--->
+If referencing a definition would always result in an error, implementations
+may report this inconsistency at the point of its declaration.
 
 ```
 #MyStruct: {
@@ -1570,7 +1575,7 @@ The length of an open list is the its number of elements as a lower bound
 and an unlimited number of elements as its upper bound.
 
 ```
-ListLit       = "[" [ ElementList [ "," [ "..." [ Expression ] ] ] [ "," ] "]" .
+ListLit       = "[" [ ElementList [ "," [ Ellipsis ] ] [ "," ] "]" .
 ElementList   = Embedding { "," Embedding } .
 ```
 
@@ -2861,9 +2866,8 @@ If the result of the unification of all embedded values is not a struct,
 it will be output instead of its enclosing file when exporting CUE
 to a data format
 
-<!-- TODO: allow ... anywhere in SourceFile and struct. -->
 ```
-SourceFile = [ PackageClause "," ] { ImportDecl "," } { Declaration "," }  [ "..." ] .
+SourceFile = [ PackageClause "," ] { ImportDecl "," } { Declaration "," } .
 ```
 
 ```

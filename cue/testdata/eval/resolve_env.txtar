@@ -1,0 +1,65 @@
+-- in.cue --
+a: {
+  d: int
+  b: {
+    c: d
+  }
+}
+x: {
+  d: 2
+  b: a.b.c // should be int, not 2
+}
+a1: y: 5
+a1: a2: a3: a4: a5: a1.y
+b: a1.a2.a3.a4.a5
+-- out/eval --
+(struct){
+  a: (struct){
+    d: (int){ int }
+    b: (struct){
+      c: (int){ int }
+    }
+  }
+  x: (struct){
+    d: (int){ 2 }
+    b: (int){ int }
+  }
+  a1: (struct){
+    y: (int){ 5 }
+    a2: (struct){
+      a3: (struct){
+        a4: (struct){
+          a5: (int){ 5 }
+        }
+      }
+    }
+  }
+  b: (int){ 5 }
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    d: int
+    b: {
+      c: 〈1;d〉
+    }
+  }
+  x: {
+    d: 2
+    b: 〈1;a〉.b.c
+  }
+  a1: {
+    y: 5
+  }
+  a1: {
+    a2: {
+      a3: {
+        a4: {
+          a5: 〈4;a1〉.y
+        }
+      }
+    }
+  }
+  b: 〈0;a1〉.a2.a3.a4.a5
+}

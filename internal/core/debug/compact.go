@@ -133,8 +133,7 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string(`_|_`)
 		if x.Err != nil {
 			w.string("(")
-			msg, args := x.Err.Msg()
-			w.string(fmt.Sprintf(msg, args...))
+			w.string(x.Err.Error())
 			w.string(")")
 		}
 

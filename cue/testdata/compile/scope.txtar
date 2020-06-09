@@ -65,3 +65,25 @@ f: B
   }
   f: 〈0;let B〉
 }
+-- out/eval --
+(struct){
+  e: (struct){
+  }
+  a: (struct){
+    d: (struct){
+    }
+    e: (struct){
+    }
+    c: (struct){
+    }
+  }
+  b: (struct){
+  }
+  s: (string){ "foo" }
+  c: (string){ "foo" }
+  d: (struct){
+  }
+  f: (struct){
+    open: (int){ int }
+  }
+}

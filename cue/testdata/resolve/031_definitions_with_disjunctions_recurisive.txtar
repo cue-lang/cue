@@ -49,3 +49,17 @@
     }
   }
 }
+-- out/eval --
+(struct){
+  #Foo: (#struct){
+    x: (struct){ |((#struct){
+        field: (int){ int }
+        c: (int){ 3 }
+        a: (int){ 1 }
+      }, (#struct){
+        field: (int){ int }
+        c: (int){ 3 }
+        b: (int){ 2 }
+      }) }
+  }
+}

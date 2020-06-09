@@ -45,3 +45,14 @@ b: {
     })
   }
 }
+-- out/eval --
+(struct){
+  a: ((bool|int|string)){ |(*(int){ 5 }, (string){ "a" }, (bool){ true }) }
+  b: (struct){
+    c: (struct){ |(*(struct){
+        a: (int){ 2 }
+      }, (struct){
+        a: (int){ 3 }
+      }) }
+  }
+}

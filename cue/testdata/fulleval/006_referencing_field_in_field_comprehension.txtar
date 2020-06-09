@@ -56,3 +56,14 @@ a:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    b: (struct){
+      c: (int){ 4 }
+      d: (int){ 5 }
+    }
+    c: (int){ 4 }
+    d: (int){ 5 }
+  }
+}

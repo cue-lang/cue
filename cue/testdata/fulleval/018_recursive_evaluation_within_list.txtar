@@ -58,3 +58,37 @@ b1: {
     c: string
   }
 }
+-- out/eval --
+(struct){
+  l: (#list){
+    0: (struct){
+      d: (string){ "t" }
+      c: (string){ "t" }
+    }
+  }
+  a: (struct){
+    d: (string){ "t" }
+    c: (string){ "t" }
+  }
+  b: (struct){
+    d: (string){ string }
+    c: (string){ string }
+  }
+  l1: (#list){
+    0: (struct){
+      d: (string){ "st" }
+      c: (string){ "t" }
+    }
+  }
+  a1: (struct){
+    d: (string){ "st" }
+    c: (string){ "t" }
+  }
+  b1: (struct){
+    d: (_|_){
+      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      //     ./in.cue:10:5
+    }
+    c: (string){ string }
+  }
+}

@@ -43,3 +43,43 @@ e: _|_ // negative number -1 multiplies list
   mul1_2: (〈0;list1〉 * 2)
   e: (〈0;list〉 * -1)
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  list: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  mul0: (#list){
+  }
+  mul1: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  mul2: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 1 }
+    4: (int){ 2 }
+    5: (int){ 3 }
+  }
+  list1: (#list){
+    0: (int){ 1 }
+  }
+  mul1_0: (#list){
+  }
+  mul1_1: (#list){
+    0: (int){ 1 }
+  }
+  mul1_2: (#list){
+    0: (int){ 1 }
+    1: (int){ 1 }
+  }
+  e: (_|_){
+    // [eval] cannot convert negative number to uint64:
+    //     ./in.cue:9:9
+  }
+}

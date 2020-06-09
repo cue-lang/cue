@@ -17,3 +17,5 @@ hello
 {
   'hello'
 }
+-- out/eval --
+(bytes){ 'hello' }

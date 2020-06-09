@@ -90,3 +90,21 @@ a:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    A: (struct){
+      name: (string){ "A" }
+      kind: (string){ "A" }
+    }
+    C: (struct){
+      name: (string){ "C" }
+      kind: (string){ "C" }
+    }
+    E: (struct){
+      c: (string){ "bar" }
+      name: (string){ "E" }
+      kind: (string){ "E" }
+    }
+  }
+}

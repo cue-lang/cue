@@ -93,3 +93,63 @@ e8: _|_ // invalid operation 1.0 mod 1 (mismatched types float and int)
   e7: (2 quo 2.0)
   e8: (1.0 mod 1)
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  i1: (int){ 1 }
+  i2: (int){ 2 }
+  sum: (int){ 1 }
+  div1: (float){ 4.00000000000000000000000 }
+  div2: (float){ 4.00000000000000000000000 }
+  div3: (float){ 1 }
+  divZero: (_|_){
+    // [eval] failed arithmetic: division by zero:
+    //     ./in.cue:8:10
+  }
+  div00: (_|_){
+    // [eval] failed arithmetic: division undefined:
+    //     ./in.cue:9:10
+  }
+  b: (bool){ true }
+  add: (float){ 5.00000000000000000000000 }
+  idiv00: (_|_){
+    // [eval] division by zero:
+    //     ./in.cue:13:9
+  }
+  imod00: (_|_){
+    // [eval] division by zero:
+    //     ./in.cue:14:9
+  }
+  iquo00: (_|_){
+    // [eval] division by zero:
+    //     ./in.cue:15:9
+  }
+  irem00: (_|_){
+    // [eval] division by zero:
+    //     ./in.cue:16:9
+  }
+  v1: (float){ 5.0000000000E+11 }
+  v2: (bool){ true }
+  v3: (float){ 0.666666666666666666666667 }
+  v5: (int){ 0 }
+  e0: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.String to '+' (type int and string):
+    //     ./in.cue:23:5
+  }
+  e5: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'div' (type float and int):
+    //     ./in.cue:29:5
+  }
+  e6: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'rem' (type int and float):
+    //     ./in.cue:30:5
+  }
+  e7: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'quo' (type int and float):
+    //     ./in.cue:31:5
+  }
+  e8: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'mod' (type float and int):
+    //     ./in.cue:32:5
+  }
+}

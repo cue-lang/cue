@@ -62,3 +62,34 @@ V: #S & {
     }
   })
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #S: (#struct){
+    c: (#struct){
+      d: (int){ int }
+    }
+    a: (#struct){
+      c: (int){ int }
+    }
+    b: (#struct){
+      open: (int){ int }
+    }
+  }
+  V: (_|_){
+    // [eval]
+    c: (_|_){
+      // [eval] field `e` not allowed
+      d: (int){ int }
+      e: (int){ int }
+    }
+    a: (#struct){
+      c: (int){ int }
+    }
+    b: (_|_){
+      // [eval] field `extra` not allowed
+      open: (int){ int }
+      extra: (int){ int }
+    }
+  }
+}

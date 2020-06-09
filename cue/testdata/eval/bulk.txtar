@@ -1,0 +1,50 @@
+-- in.cue --
+a: {
+	foo: a: 1
+	[X = =~"foo"]: {
+		b: 1
+		name: X
+	}
+}
+d: a & {
+	"foobar": {
+		c: 2
+	}
+}
+
+-- out/eval --
+(struct){
+  a: (struct){
+    foo: (struct){
+      a: (int){ 1 }
+    }
+  }
+  d: (struct){
+    foo: (struct){
+      a: (int){ 1 }
+    }
+    foobar: (struct){
+      c: (int){ 2 }
+      b: (int){ 1 }
+      name: (string){ "foobar" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    foo: {
+      a: 1
+    }
+    [=~"foo"]: {
+      b: 1
+      name: 〈1;-〉
+    }
+  }
+  d: (〈0;a〉 & {
+    foobar: {
+      c: 2
+    }
+  })
+}

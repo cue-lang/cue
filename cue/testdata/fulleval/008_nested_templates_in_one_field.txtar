@@ -141,3 +141,33 @@ a:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    A: (struct){
+      b: (struct){
+        B: (struct){
+          name: (string){ "A" }
+          kind: (string){ "B" }
+        }
+      }
+    }
+    C: (struct){
+      b: (struct){
+        D: (struct){
+          name: (string){ "C" }
+          kind: (string){ "D" }
+        }
+      }
+    }
+    EE: (struct){
+      b: (struct){
+        FF: (struct){
+          c: (string){ "bar" }
+          name: (string){ "EE" }
+          kind: (string){ "FF" }
+        }
+      }
+    }
+  }
+}

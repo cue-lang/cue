@@ -79,3 +79,26 @@ raw: true
     }
   }
 }
+-- out/eval --
+(struct){
+  #emb: (#struct){
+    a: (int){ 1 }
+    sub: (#struct){
+      f: (int){ 3 }
+    }
+  }
+  #def: (#struct){
+    a: (int){ 1 }
+    sub: (#struct){
+      f: (int){ 3 }
+    }
+    b: (int){ 2 }
+  }
+  #f: (#struct){
+    a: (int){ 10 }
+  }
+  #e: (#struct){
+    a: (int){ 10 }
+    b: (int){ &(<100, int) }
+  }
+}

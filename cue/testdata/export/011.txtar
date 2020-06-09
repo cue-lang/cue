@@ -33,3 +33,14 @@ d: []
     d: 〈0;a〉["b"]
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    b: (#list){
+    }
+  }
+  c: (#list){
+  }
+  d: (#list){
+  }
+}

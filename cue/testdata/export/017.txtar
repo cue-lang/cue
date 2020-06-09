@@ -36,3 +36,13 @@ b:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  b: (struct){
+    "1": (int){ 2 }
+  }
+}

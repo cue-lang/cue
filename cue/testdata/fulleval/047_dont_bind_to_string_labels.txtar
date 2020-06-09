@@ -38,3 +38,11 @@ y:
     z: 〈1;x〉
   }
 }
+-- out/eval --
+(struct){
+  x: (int){ 1 }
+  y: (struct){
+    x: (int){ 2 }
+    z: (int){ 1 }
+  }
+}

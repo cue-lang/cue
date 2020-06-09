@@ -1,0 +1,63 @@
+-- in.cue --
+#E: {
+    c: int
+}
+#A: {
+    b: int
+    q: {
+        #E
+        d: int
+    }
+}
+a: #A & {
+    b: 3
+    q: {
+        c: 2
+        e: 43
+    }
+}
+-- out/eval --
+(_|_){
+  // [eval]
+  #E: (#struct){
+    c: (int){ int }
+  }
+  #A: (#struct){
+    b: (int){ int }
+    q: (#struct){
+      c: (int){ int }
+      d: (int){ int }
+    }
+  }
+  a: (_|_){
+    // [eval]
+    b: (int){ 3 }
+    q: (_|_){
+      // [eval] field `e` not allowed
+      c: (int){ 2 }
+      d: (int){ int }
+      e: (int){ 43 }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #E: {
+    c: int
+  }
+  #A: {
+    b: int
+    q: {
+      〈2;#E〉
+      d: int
+    }
+  }
+  a: (〈0;#A〉 & {
+    b: 3
+    q: {
+      c: 2
+      e: 43
+    }
+  })
+}

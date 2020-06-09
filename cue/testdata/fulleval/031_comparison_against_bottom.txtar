@@ -32,30 +32,53 @@ i: false
 -- out/compile --
 --- in.cue
 {
-  a: (_|_ == _|_)
+  a: (_|_(from source) == _|_(from source))
   b: ((〈0;err〉 == 1) & 2)
-  c: (〈0;err〉 == _|_)
-  d: (〈0;err〉 != _|_)
+  c: (〈0;err〉 == _|_(from source))
+  d: (〈0;err〉 != _|_(from source))
   e: ((〈0;err〉 != 1) & 3)
   f: (({
     a: 1
   } & {
     a: 2
-  }) == _|_)
+  }) == _|_(from source))
   g: (({
     a: 1
   } & {
     b: 2
-  }) == _|_)
-  h: (_|_ == ({
+  }) == _|_(from source))
+  h: (_|_(from source) == ({
     a: 1
   } & {
     a: 2
   }))
-  i: (_|_ == ({
+  i: (_|_(from source) == ({
     a: 1
   } & {
     b: 2
   }))
   err: (1 & 2)
+}
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (bool){ true }
+  b: (_|_){
+    // [eval] incompatible values *adt.Num and *adt.Num:
+    //     ./in.cue:2:4
+  }
+  c: (bool){ true }
+  d: (bool){ false }
+  e: (_|_){
+    // [eval] incompatible values *adt.Num and *adt.Num:
+    //     ./in.cue:2:4
+  }
+  f: (bool){ true }
+  g: (bool){ false }
+  h: (bool){ true }
+  i: (bool){ false }
+  err: (_|_){
+    // [eval] incompatible values *adt.Num and *adt.Num:
+    //     ./in.cue:2:4
+  }
 }

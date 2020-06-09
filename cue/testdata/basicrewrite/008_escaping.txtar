@@ -42,3 +42,8 @@ b: |-
   a: "foo\nbar"
   b: 〈0;a〉
 }
+-- out/eval --
+(struct){
+  a: (string){ "foo\nbar" }
+  b: (string){ "foo\nbar" }
+}

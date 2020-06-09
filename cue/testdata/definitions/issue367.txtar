@@ -1,0 +1,55 @@
+TODO: l4 should be allowed
+
+-- in.cue --
+#def1: l1: ["l2"]: {l3: int, l4: 26}
+#special1: #def1     & {l1: l2: l3: <100}
+instance:  #special1 & {l1: l2: l3: 34}
+-- out/eval --
+(struct){
+  #def1: (#struct){
+    l1: (#struct){
+    }
+  }
+  #special1: (#struct){
+    l1: (#struct){
+      l2: (#struct){
+        l3: (int){ &(<100, int) }
+        l4: (int){ 26 }
+      }
+    }
+  }
+  instance: (#struct){
+    l1: (#struct){
+      l2: (#struct){
+        l3: (int){ 34 }
+        l4: (int){ 26 }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #def1: {
+    l1: {
+      ["l2"]: {
+        l3: int
+        l4: 26
+      }
+    }
+  }
+  #special1: (〈0;#def1〉 & {
+    l1: {
+      l2: {
+        l3: <100
+      }
+    }
+  })
+  instance: (〈0;#special1〉 & {
+    l1: {
+      l2: {
+        l3: 34
+      }
+    }
+  })
+}

@@ -33,3 +33,18 @@ e: _|_ // conflicting attributes for key "foo"
     foo: 1
   })
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    foo: (int){ 1 }
+  }
+  b: (struct){
+    foo: (int){ 1 }
+  }
+  c: (struct){
+    foo: (int){ 1 }
+  }
+  e: (struct){
+    foo: (int){ 1 }
+  }
+}

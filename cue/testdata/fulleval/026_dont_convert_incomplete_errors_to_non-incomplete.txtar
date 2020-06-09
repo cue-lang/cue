@@ -44,3 +44,58 @@ s2:  strings.ContainsAny("dd")
 s3:  strings.ContainsAny(str, "dd")
 -- out/legacy-debug --
 <0>{n1: <1>{min: <<2>.max, max: ><2>.min}, n2: -<3>.num, num: <4, n3: +<3>.num, n4: (<3>.num + <3>.num), n5: (<3>.num - <3>.num), n6: (<3>.num * <3>.num), n7: (<3>.num / <3>.num), b1: !<3>.is, is: bool, s1: ""+<3>.str+"", str: string, s2: strings.ContainsAny ("dd"), s3: <4>.ContainsAny (<3>.str,"dd")}
+-- out/eval --
+(_|_){
+  // [eval]
+  n1: (struct){
+    min: (_|_){
+      // [cycle] cycle error
+    }
+    max: (_|_){
+      // [cycle] cycle error
+    }
+  }
+  n2: (_|_){
+    // [incomplete] operand *adt.UnaryExpr of '-' not concrete (was number):
+    //     ./in.cue:4:6
+  }
+  n3: (_|_){
+    // [incomplete] operand *adt.UnaryExpr of '+' not concrete (was number):
+    //     ./in.cue:5:6
+  }
+  n4: (_|_){
+    // [incomplete] non-concrete value *adt.BoundValue in operand to +:
+    //     ./in.cue:6:5
+  }
+  n5: (_|_){
+    // [incomplete] non-concrete value *adt.BoundValue in operand to -:
+    //     ./in.cue:7:5
+  }
+  n6: (_|_){
+    // [incomplete] non-concrete value *adt.BoundValue in operand to *:
+    //     ./in.cue:8:5
+  }
+  n7: (_|_){
+    // [incomplete] non-concrete value *adt.BoundValue in operand to /:
+    //     ./in.cue:9:5
+  }
+  b1: (_|_){
+    // [incomplete] operand *adt.UnaryExpr of '!' not concrete (was bool):
+    //     ./in.cue:11:6
+  }
+  s1: (_|_){
+    // [incomplete] invalid interpolation: incomplete string value '*adt.BasicType':
+    //     ./in.cue:13:5
+  }
+  s2: (_|_){
+    // [eval] cannot call non-function *adt.SelectorExpr (type nil):
+    //     ./in.cue:14:5
+  }
+  s3: (_|_){
+    // [eval] cannot call non-function *adt.SelectorExpr (type nil):
+    //     ./in.cue:15:5
+  }
+  str: (string){ string }
+  num: (number){ <4 }
+  is: (bool){ bool }
+}

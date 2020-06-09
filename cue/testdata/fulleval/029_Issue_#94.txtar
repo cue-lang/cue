@@ -83,3 +83,42 @@ index: {
     _hidden: 〈1;foo〉["_hidden"]
   }
 }
+-- out/eval --
+(struct){
+  foo: (struct){
+    txt: (int){ 2 }
+    #def: (int){ 3 }
+    regular: (int){ 4 }
+    _hidden: (int){ 5 }
+  }
+  comp: (struct){
+    txt: (int){ 2 }
+    regular: (int){ 4 }
+  }
+  select: (struct){
+    opt: (_|_){
+      // [incomplete] undefined field opt:
+      //     ./in.cue:10:15
+    }
+    txt: (int){ 2 }
+    #def: (int){ 3 }
+    regular: (int){ 4 }
+    _hidden: (int){ 5 }
+  }
+  index: (struct){
+    opt: (_|_){
+      // [incomplete] undefined field opt:
+      //     ./in.cue:17:15
+    }
+    txt: (int){ 2 }
+    #def: (_|_){
+      // [incomplete] undefined field "#def":
+      //     ./in.cue:19:15
+    }
+    regular: (int){ 4 }
+    _hidden: (_|_){
+      // [incomplete] undefined field "_hidden":
+      //     ./in.cue:21:15
+    }
+  }
+}

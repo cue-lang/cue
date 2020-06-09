@@ -79,3 +79,22 @@ i1: "c"
     2,
   ][3]|"c")
 }
+-- out/eval --
+(struct){
+  o1: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
+  o2: (int){ 1 }
+  o3: (int){ 2 }
+  o4: (int){ |((int){ 2 }, (int){ 1 }, (int){ 3 }) }
+  o5: (int){ |(*(int){ 2 }, (int){ 1 }, (int){ 3 }) }
+  o6: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
+  o7: (int){ |((int){ 2 }, (int){ 3 }) }
+  o8: (int){ |((int){ 2 }, (int){ 3 }) }
+  o9: (int){ |((int){ 2 }, (int){ 3 }) }
+  o10: (int){ |(*(int){ 2 }, (int){ 3 }) }
+  m1: (int){ |(*(int){ 2 }, (int){ 3 }) }
+  m2: (int){ |(*(int){ 2 }, (int){ 3 }) }
+  m3: (int){ |(*(int){ 2 }, (int){ 3 }) }
+  m4: (int){ |(*(int){ 2 }, (int){ 3 }) }
+  m5: (int){ |(*(int){ 2 }, (int){ 3 }) }
+  i1: (string){ "c" }
+}

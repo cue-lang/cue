@@ -64,3 +64,19 @@ bulk:
     a: "foo"
   })
 }
+-- out/eval --
+(struct){
+  #Foo: (#struct){
+    a: (int){ 1 }
+    b: (int){ int }
+  }
+  "#Foo": (#struct){
+    a: (int){ 1 }
+    b: (int){ 1 }
+  }
+  bulk: (struct){
+    #def: (int){ 4 }
+    _hid: (int){ 3 }
+    a: (string){ "foo" }
+  }
+}

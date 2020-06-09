@@ -25,3 +25,24 @@ e: _|_ // undefined field "t"
     e: 〈0;#a〉.t[2:3]
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #a: (#struct){
+    b: (float){ 2.0 }
+    s: (string){ "abc" }
+  }
+  b: (float){ 2.0 }
+  c: (_|_){
+    // [eval] undefined field c:
+    //     ./in.cue:1:41
+  }
+  d: (_|_){
+    // [eval] undefined field d:
+    //     ./in.cue:1:50
+  }
+  e: (_|_){
+    // [eval] undefined field t:
+    //     ./in.cue:1:62
+  }
+}

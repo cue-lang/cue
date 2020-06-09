@@ -1,0 +1,60 @@
+These should all be an incomplete errors.
+
+-- in.cue --
+s: string
+
+e1: s + s
+e2: >"bar" & s // TODO
+e3: >s & "foo" // TODO
+
+e4: >e1 & s
+e5: <e5 & s
+
+E: {
+  a: c-b
+  b: c-a
+  c: a+b & >=5
+}
+-- out/eval --
+(struct){
+  s: (string){ string }
+  e1: (_|_){
+    // [incomplete] non-concrete value *adt.BasicType in operand to +:
+    //     ./in.cue:3:5
+  }
+  e2: (string){ >"bar" }
+  e3: (string){ "foo" }
+  e4: (_|_){
+    // [incomplete] non-concrete value *adt.BasicType in operand to +:
+    //     ./in.cue:3:5
+  }
+  e5: (_|_){
+    // [cycle] cycle error
+  }
+  E: (struct){
+    a: (_|_){
+      // [cycle] cycle error
+    }
+    b: (_|_){
+      // [cycle] cycle error
+    }
+    c: (_|_){
+      // [cycle] cycle error
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  s: string
+  e1: (〈0;s〉 + 〈0;s〉)
+  e2: (>"bar" & 〈0;s〉)
+  e3: (>〈0;s〉 & "foo")
+  e4: (>〈0;e1〉 & 〈0;s〉)
+  e5: (<〈0;e5〉 & 〈0;s〉)
+  E: {
+    a: (〈0;c〉 - 〈0;b〉)
+    b: (〈0;c〉 - 〈0;a〉)
+    c: ((〈0;a〉 + 〈0;b〉) & >=5)
+  }
+}

@@ -55,3 +55,20 @@ fn1:
     ]
   })
 }
+-- out/eval --
+(struct){
+  fn: (struct){
+    arg: (#list){
+      0: (int){ 1 }
+    }
+    out: (#list){
+    }
+  }
+  fn1: (struct){
+    arg: (#list){
+      0: (int){ 1 }
+    }
+    out: (#list){
+    }
+  }
+}

@@ -60,3 +60,30 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
   e2: ("foo" !~ true)
   e3: (!="a" & <5)
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  c1: (bool){ true }
+  c2: (bool){ true }
+  c3: (bool){ false }
+  c4: (bool){ true }
+  b1: (string){ "a" }
+  b2: (string){ "foo" }
+  b3: (_|_){
+    // [eval] invalid value *adt.Vertex (out of bound *adt.BoundValue)
+  }
+  b4: (string){ "foo" }
+  s1: (string){ &(!="b", =~"c") }
+  s2: (string){ &(!="b", =~"[a-z]") }
+  e1: (_|_){
+    // [eval] cannot use *adt.Num (type int) as type (string|bytes):
+    //     ./in.cue:18:5
+  }
+  e2: (_|_){
+    // [eval] cannot use *adt.Bool (type bool) as type (string|bytes):
+    //     ./in.cue:19:5
+  }
+  e3: (_|_){
+    // [eval] invalid value *adt.BoundValue (mismatched types number and string)
+  }
+}

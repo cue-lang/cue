@@ -129,3 +129,29 @@ c:
     bar: _
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    k: (int){ 1 }
+  }
+  b: (struct){
+    v: (struct){
+      x: (int){ 0 }
+      y: (int){ |(*(int){ 1 }, (int){ int }) }
+    }
+    w: (struct){
+      y: (int){ 0 }
+      x: (int){ 0 }
+    }
+  }
+  c: (struct){
+    foo: (struct){
+      name: (string){ "foo" }
+      y: (int){ 1 }
+    }
+    bar: (struct){
+      name: (string){ "bar" }
+      y: (int){ 1 }
+    }
+  }
+}

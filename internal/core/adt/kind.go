@@ -80,6 +80,13 @@ const (
 		IntKind | FloatKind | StringKind | BytesKind
 )
 
+func kind(v Value) Kind {
+	if v == nil {
+		return BottomKind
+	}
+	return v.Kind()
+}
+
 // IsAnyOf reports whether k is any of the given kinds.
 //
 // For instances, k.IsAnyOf(String|Bytes) reports whether k overlaps with

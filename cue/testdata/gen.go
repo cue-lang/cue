@@ -42,6 +42,7 @@ import (
 
 //go:generate go run gen.go
 //go:generate go test ../internal/compile --update
+//go:generate go test ../internal/eval --update
 
 func main() {
 	flag.Parse()

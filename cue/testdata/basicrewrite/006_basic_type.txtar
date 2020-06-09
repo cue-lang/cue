@@ -32,3 +32,15 @@ f: true
   f: true
   f: bool
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (int){ 1 }
+  b: (int){ 1 }
+  c: (float){ 1.0 }
+  d: (_|_){
+    // [eval] invalid value *adt.BasicType (mismatched types float and int)
+  }
+  e: (string){ "4" }
+  f: (bool){ true }
+}

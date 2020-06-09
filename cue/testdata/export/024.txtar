@@ -58,3 +58,40 @@ val2: #def2
     val2: 〈0;#def2〉
   }
 }
+-- out/eval --
+(struct){
+  reg: (struct){
+    foo: (int){ 1 }
+    bar: (struct){
+      baz: (int){ 3 }
+    }
+  }
+  #def: (#struct){
+    a: (int){ 1 }
+    sub: (#struct){
+      foo: (int){ 1 }
+      bar: (#struct){
+        baz: (int){ 3 }
+      }
+    }
+  }
+  val: (#struct){
+    a: (int){ 1 }
+    sub: (#struct){
+      foo: (int){ 1 }
+      bar: (#struct){
+        baz: (int){ 3 }
+      }
+    }
+  }
+  #def2: (#struct){
+    a: (#struct){
+      b: (int){ int }
+    }
+  }
+  val2: (#struct){
+    a: (#struct){
+      b: (int){ int }
+    }
+  }
+}

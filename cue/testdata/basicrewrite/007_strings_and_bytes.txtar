@@ -39,3 +39,21 @@ e1: _|_ // invalid operation 'b' + "c" (mismatched types bytes and string)
   e0: ("a" + '')
   e1: ('b' + "c")
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  s0: (string){ "foobar" }
+  s1: (string){ "abcabcabc" }
+  s2: (string){ "abcabc" }
+  b0: (bytes){ 'foobar' }
+  b1: (bytes){ 'abcabcabc' }
+  b2: (bytes){ 'abcabc' }
+  e0: (_|_){
+    // [eval] invalid operands *adt.String and *adt.Bytes to '+' (type string and bytes):
+    //     ./in.cue:10:5
+  }
+  e1: (_|_){
+    // [eval] invalid operands *adt.Bytes and *adt.String to '+' (type bytes and string):
+    //     ./in.cue:11:5
+  }
+}

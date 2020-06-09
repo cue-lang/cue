@@ -37,3 +37,29 @@ m:  _|_ // invalid operation -false (- bool)
   p: +true
   m: -false
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  i: (int){ int }
+  j: (int){ 3 }
+  s: (string){ string }
+  t: (string){ "s" }
+  e: (_|_){
+    // [eval] invalid value *adt.BasicType (mismatched types string and int)
+  }
+  e2: (_|_){
+    // [eval] invalid value *adt.BasicType (mismatched types string and int)
+  }
+  b: (_|_){
+    // [eval] value can never become concrete:
+    //     ./in.cue:7:5
+  }
+  p: (_|_){
+    // [eval] invalid operation +*adt.UnaryExpr (+ bool):
+    //     ./in.cue:8:5
+  }
+  m: (_|_){
+    // [eval] invalid operation -*adt.UnaryExpr (- bool):
+    //     ./in.cue:9:5
+  }
+}

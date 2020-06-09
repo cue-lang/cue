@@ -14,3 +14,13 @@ a: [_|_, // conflicting values 3 and 4
     ]
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval]
+    0: (_|_){
+      // [eval] incompatible values *adt.Num and *adt.Num
+    }
+  }
+}

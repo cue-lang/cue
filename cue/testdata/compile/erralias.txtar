@@ -22,11 +22,11 @@ for[].a: reference "E" not found:
 --- in.cue
 {
   ["foo"]: 3
-  a: _|_
+  a: _|_(illegal reference Y)
   "\(〈0;b〉)": 3
   b: "foo"
   c: {}
   for _, x in 〈0;c〉 {
-    a: _|_
+    a: _|_(reference "E" not found)
   }
 }

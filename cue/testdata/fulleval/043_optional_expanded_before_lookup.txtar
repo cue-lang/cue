@@ -68,3 +68,18 @@ B:
   }
   B: (〈0;test〉.A & {})
 }
+-- out/eval --
+(struct){
+  test: (struct){
+    A: (struct){
+      field1: (string){ "1" }
+      field2: (string){ "2" }
+      name: (string){ "A" }
+    }
+  }
+  B: (struct){
+    field1: (string){ "1" }
+    field2: (string){ "2" }
+    name: (string){ "A" }
+  }
+}

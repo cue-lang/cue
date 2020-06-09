@@ -1,0 +1,27 @@
+-- in.cue --
+#Value: int
+
+foo: #Value
+foo: != bar
+bar: #Value
+bar: != foo
+
+bar: 0
+foo: 1
+-- out/compile --
+--- in.cue
+{
+  #Value: int
+  foo: 〈0;#Value〉
+  foo: !=〈0;bar〉
+  bar: 〈0;#Value〉
+  bar: !=〈0;foo〉
+  bar: 0
+  foo: 1
+}
+-- out/eval --
+(struct){
+  #Value: (int){ int }
+  foo: (int){ 1 }
+  bar: (int){ 0 }
+}

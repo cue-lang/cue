@@ -42,7 +42,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 		case strings.HasPrefix(s, "_"):
 			t = adt.HiddenLabel
 		}
-		f, err := adt.MakeLabel(n.Pos(), i, t)
+		f, err := adt.MakeLabel(n, i, t)
 		if err != nil {
 			c.errf(n, "invalid identifier label: %v", err)
 			return adt.InvalidLabel
@@ -60,7 +60,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 			}
 
 			i := int64(index.StringToIndex(norm.NFC.String(s)))
-			f, err := adt.MakeLabel(n.Pos(), i, adt.StringLabel)
+			f, err := adt.MakeLabel(n, i, adt.StringLabel)
 			if err != nil {
 				c.errf(n, msg, err)
 			}
@@ -85,7 +85,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 				return adt.InvalidLabel
 			}
 
-			f, err := adt.MakeLabel(n.Pos(), i, adt.IntLabel)
+			f, err := adt.MakeLabel(n, i, adt.IntLabel)
 			if err != nil {
 				c.errf(n, msg, err)
 				return adt.InvalidLabel
@@ -98,7 +98,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 
 		default: // keywords (null, true, false, for, in, if, let)
 			i := index.StringToIndex(x.Kind.String())
-			f, err := adt.MakeLabel(n.Pos(), i, adt.StringLabel)
+			f, err := adt.MakeLabel(n, i, adt.StringLabel)
 			if err != nil {
 				c.errf(n, "invalid string label: %v", err)
 			}

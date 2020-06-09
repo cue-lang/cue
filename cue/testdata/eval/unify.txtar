@@ -1,0 +1,54 @@
+-- in.cue --
+a: d: {
+    #base
+    #info: {...}
+    Y: #info.X
+}
+
+#base: {
+    #info: {...}
+}
+
+a: [Name=string]: {#info: {
+    X: "foo"
+}}
+-- out/eval --
+(struct){
+  a: (struct){
+    d: (#struct){
+      #info: (#struct){
+        X: (string){ "foo" }
+      }
+      Y: (string){ "foo" }
+    }
+  }
+  #base: (#struct){
+    #info: (#struct){
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    d: {
+      〈2;#base〉
+      #info: {
+        ...
+      }
+      Y: 〈0;#info〉.X
+    }
+  }
+  #base: {
+    #info: {
+      ...
+    }
+  }
+  a: {
+    [string]: {
+      #info: {
+        X: "foo"
+      }
+    }
+  }
+}

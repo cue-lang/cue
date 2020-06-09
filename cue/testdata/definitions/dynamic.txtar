@@ -1,0 +1,21 @@
+-- in.cue --
+#A: {
+	a:      "foo"
+	"\(a)": 3
+}
+
+-- out/eval --
+(struct){
+  #A: (#struct){
+    a: (string){ "foo" }
+    foo: (int){ 3 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    a: "foo"
+    "\(〈0;a〉)": 3
+  }
+}

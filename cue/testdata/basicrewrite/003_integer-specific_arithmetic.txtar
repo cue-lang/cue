@@ -85,3 +85,55 @@ me2: _|_ // invalid operation 2 mod 1.0 (mismatched types int and float)
   me1: (2.0 mod 1)
   me2: (2 mod 1.0)
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  q1: (int){ 2 }
+  q2: (int){ -2 }
+  q3: (int){ -2 }
+  q4: (int){ 2 }
+  qe1: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'quo' (type float and int):
+    //     ./in.cue:5:6
+  }
+  qe2: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'quo' (type int and float):
+    //     ./in.cue:6:6
+  }
+  r1: (int){ 1 }
+  r2: (int){ 1 }
+  r3: (int){ -1 }
+  r4: (int){ -1 }
+  re1: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'rem' (type float and int):
+    //     ./in.cue:12:6
+  }
+  re2: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'rem' (type int and float):
+    //     ./in.cue:13:6
+  }
+  d1: (int){ 2 }
+  d2: (int){ -2 }
+  d3: (int){ -3 }
+  d4: (int){ 3 }
+  de1: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'div' (type float and int):
+    //     ./in.cue:19:6
+  }
+  de2: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'div' (type int and float):
+    //     ./in.cue:20:6
+  }
+  m1: (int){ 1 }
+  m2: (int){ 1 }
+  m3: (int){ 1 }
+  m4: (int){ 1 }
+  me1: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'mod' (type float and int):
+    //     ./in.cue:26:6
+  }
+  me2: (_|_){
+    // [eval] invalid operands *adt.Num and *adt.Num to 'mod' (type int and float):
+    //     ./in.cue:27:6
+  }
+}

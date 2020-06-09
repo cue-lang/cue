@@ -59,3 +59,23 @@ a: {
     }
   }
 }
+-- out/eval --
+(struct){
+  res: (#list){
+    0: (struct){
+      d: (string){ "b" }
+      s: (string){ "ab" }
+    }
+  }
+  a: (struct){
+    b: (struct){
+      c: (struct){
+        d: (string){ string }
+        s: (_|_){
+          // [incomplete] non-concrete value *adt.BasicType in operand to +:
+          //     ./in.cue:4:34
+        }
+      }
+    }
+  }
+}

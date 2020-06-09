@@ -59,6 +59,12 @@ func predeclared(n *ast.Ident) adt.Expr {
 	return nil
 }
 
+// LookupRange returns a CUE expressions for the given predeclared identifier
+// representing a range, such as uint8, int128, and float64.
+func LookupRange(name string) adt.Expr {
+	return predefinedRanges[name]
+}
+
 var predefinedRanges = map[string]adt.Expr{
 	"rune":  mkIntRange("0", strconv.Itoa(0x10FFFF)),
 	"int8":  mkIntRange("-128", "127"),
@@ -90,7 +96,13 @@ var predefinedRanges = map[string]adt.Expr{
 	),
 }
 
-// TODO: use an adt.BoundValue here.
+func init() {
+	for k, v := range predefinedRanges {
+		predefinedRanges["__"+k] = v
+	}
+}
+
+// TODO: use an adt.BoundValue here. and conjunctions here.
 
 func mkUint() adt.Expr {
 	from := newBound(adt.GreaterEqualOp, adt.IntKind, parseInt("0"))
@@ -107,25 +119,38 @@ func mkUint() adt.Expr {
 func mkIntRange(a, b string) adt.Expr {
 	from := newBound(adt.GreaterEqualOp, adt.IntKind, parseInt(a))
 	to := newBound(adt.LessEqualOp, adt.IntKind, parseInt(b))
-	return &adt.BinaryExpr{nil, adt.AndOp, from, to}
+	ident := ast.NewIdent("__int")
+	src := ast.NewBinExpr(token.AND, ident, from.Src, to.Src)
+	return &adt.Conjunction{
+		Src: src,
+		Values: []adt.Value{
+			&adt.BasicType{Src: ident, K: adt.IntKind}, from, to,
+		},
+	}
 }
 
 func mkFloatRange(a, b string) adt.Expr {
 	from := newBound(adt.GreaterEqualOp, adt.NumKind, parseFloat(a))
 	to := newBound(adt.LessEqualOp, adt.NumKind, parseFloat(b))
-	return &adt.BinaryExpr{nil, adt.AndOp, from, to}
+	src := ast.NewBinExpr(token.AND, from.Src, to.Src)
+	return &adt.Conjunction{Src: src, Values: []adt.Value{from, to}}
 }
 
 func newBound(op adt.Op, k adt.Kind, v adt.Value) *adt.BoundValue {
-	return &adt.BoundValue{Op: op, Value: v}
+	src := &ast.UnaryExpr{Op: op.Token(), X: v.Source().(ast.Expr)}
+	return &adt.BoundValue{Src: src, Op: op, Value: v}
 }
 
 func parseInt(s string) *adt.Num {
-	return parseNum(adt.IntKind, s)
+	n := parseNum(adt.IntKind, s)
+	n.Src = &ast.BasicLit{Kind: token.INT, Value: s}
+	return n
 }
 
 func parseFloat(s string) *adt.Num {
-	return parseNum(adt.FloatKind, s)
+	n := parseNum(adt.FloatKind, s)
+	n.Src = &ast.BasicLit{Kind: token.FLOAT, Value: s}
+	return n
 }
 
 func parseNum(k adt.Kind, s string) *adt.Num {

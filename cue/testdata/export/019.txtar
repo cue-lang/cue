@@ -14,3 +14,12 @@ b: "Count: \(a) times"
     b: "Count: \(〈0;a〉) times"
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (number){ &(>=0, <=10) }
+  b: (_|_){
+    // [eval] invalid interpolation: cannot use *adt.Conjunction (type number) as type string:
+    //     ./in.cue:1:20
+  }
+}

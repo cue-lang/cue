@@ -1,0 +1,54 @@
+-- in.cue --
+#A: {
+	a: string
+}
+
+#B: {
+	_b: string
+}
+
+#X: #A | #B
+
+l: [...#X]
+
+l: [
+	{_b: "bar"}
+]
+-- out/eval --
+(struct){
+  #A: (#struct){
+    a: (string){ string }
+  }
+  #B: (#struct){
+    _b: (string){ string }
+  }
+  #X: (struct){ |((#struct){
+      a: (string){ string }
+    }, (#struct){
+      _b: (string){ string }
+    }) }
+  l: (#list){
+    0: (#struct){
+      _b: (string){ "bar" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    a: string
+  }
+  #B: {
+    _b: string
+  }
+  #X: (〈0;#A〉|〈0;#B〉)
+  l: [
+    ...〈0;#X〉,
+  ]
+  l: [
+    {
+      _b: "bar"
+    },
+  ]
+}

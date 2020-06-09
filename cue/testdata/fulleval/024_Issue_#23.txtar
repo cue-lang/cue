@@ -26,3 +26,18 @@ y: _|_ // ; empty disjunction: conflicting values 2 and 3
     a: 3
   })
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  x: (struct){ |((struct){
+      a: (int){ 1 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  y: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] incompatible values *adt.Num and *adt.Num
+    }
+  }
+}

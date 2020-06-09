@@ -77,3 +77,15 @@ reg: 4
     "\(〈1;k〉)": 〈1;v〉
   }
 }
+-- out/eval --
+(struct){
+  obj: (struct){
+    foo: (struct){
+      a: (string){ "bar" }
+      sub: (struct){
+        as: (string){ "bar" }
+      }
+    }
+  }
+  reg: (int){ 4 }
+}

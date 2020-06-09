@@ -38,3 +38,12 @@ b:
   }
   b: _
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    d: (int){ 1 }
+  }
+  b: (struct){
+    d: (int){ 1 }
+  }
+}

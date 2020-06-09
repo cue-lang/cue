@@ -80,3 +80,20 @@ e:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (int){ 2 }
+  b: (int){ 2 }
+  d: (struct){
+    d: (int){ 3 }
+    e: (int){ 3 }
+  }
+  e: (struct){
+    e: (struct){
+      v: (int){ 1 }
+    }
+    f: (struct){
+      v: (int){ 1 }
+    }
+  }
+}

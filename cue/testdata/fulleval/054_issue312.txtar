@@ -32,3 +32,9 @@ a: 2
     〈2;y〉
   }
 }
+-- out/eval --
+(struct){
+  y: ((int|struct)){ |(*(int){ 1 }, (struct){
+      a: (int){ 2 }
+    }) }
+}

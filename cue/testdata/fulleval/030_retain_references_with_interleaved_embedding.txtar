@@ -75,3 +75,18 @@ a:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    d: (#struct){
+      #info: (#struct){
+        X: (string){ "foo" }
+      }
+      Y: (string){ "foo" }
+    }
+  }
+  #base: (#struct){
+    #info: (#struct){
+    }
+  }
+}

@@ -26,3 +26,11 @@ e: 1
   d: (〈0;b〉 & 〈0;a〉)
   e: (*1|*1)
 }
+-- out/eval --
+(struct){
+  a: (int){ |(*(int){ 1 }, (int){ int }) }
+  b: (int){ |(*(int){ 3 }, (int){ int }) }
+  c: (int){ |((int){ 1 }, (int){ 3 }, (int){ int }) }
+  d: (int){ |((int){ 3 }, (int){ 1 }, (int){ int }) }
+  e: (int){ 1 }
+}

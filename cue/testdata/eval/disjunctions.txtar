@@ -1,0 +1,76 @@
+-- in.cue --
+a: *1 | int
+aa: *1 | *2 | int
+
+b: {
+	name: "int"
+	val: int
+} | {
+	name: "str"
+	val: string
+}
+
+d: b & { val: 3 }
+c: b & { name: "int", val: 3 }
+e: b & { val: "foo" }
+f: b & { name: "str", val: 3 }
+
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (int){ |(*(int){ 1 }, (int){ int }) }
+  aa: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ int }) }
+  b: (struct){ |((struct){
+      name: (string){ "int" }
+      val: (int){ int }
+    }, (struct){
+      name: (string){ "str" }
+      val: (string){ string }
+    }) }
+  d: (struct){
+    val: (int){ 3 }
+    name: (string){ "int" }
+  }
+  c: (struct){
+    name: (string){ "int" }
+    val: (int){ 3 }
+  }
+  e: (struct){
+    val: (string){ "foo" }
+    name: (string){ "str" }
+  }
+  f: (_|_){
+    // [eval]
+    name: (string){ "str" }
+    val: (_|_){
+      // [eval] invalid value *adt.BasicType (mismatched types string and int)
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: (*1|int)
+  aa: (*1|*2|int)
+  b: ({
+    name: "int"
+    val: int
+  }|{
+    name: "str"
+    val: string
+  })
+  d: (〈0;b〉 & {
+    val: 3
+  })
+  c: (〈0;b〉 & {
+    name: "int"
+    val: 3
+  })
+  e: (〈0;b〉 & {
+    val: "foo"
+  })
+  f: (〈0;b〉 & {
+    name: "str"
+    val: 3
+  })
+}

@@ -28,3 +28,6 @@ raw: true
     }
   }
 }
+-- out/eval --
+(struct){
+}

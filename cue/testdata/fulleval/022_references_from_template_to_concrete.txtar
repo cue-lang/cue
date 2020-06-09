@@ -85,3 +85,26 @@ t:
     }
   }
 }
+-- out/eval --
+(struct){
+  res: (#list){
+    0: (struct){
+      x: (struct){
+        b: (struct){
+          str: (string){ "DDDD" }
+        }
+        a: (string){ "XDDDD" }
+        c: (string){ "X" }
+      }
+    }
+  }
+  t: (struct){
+    x: (struct){
+      b: (struct){
+        str: (string){ "DDDD" }
+      }
+      a: (string){ "XDDDD" }
+      c: (string){ "X" }
+    }
+  }
+}

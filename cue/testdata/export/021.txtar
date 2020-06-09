@@ -42,3 +42,18 @@ a: {
     }
   }
 }
+-- out/eval --
+(struct){
+  b: (struct){
+    idx: (_|_){
+      // [incomplete] invalid non-ground value *adt.BasicType (must be concrete string)
+    }
+    str: (string){ string }
+    a: (struct){
+      b: (int){ 4 }
+    }
+  }
+  a: (struct){
+    b: (int){ 3 }
+  }
+}

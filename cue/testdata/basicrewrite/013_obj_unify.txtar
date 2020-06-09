@@ -73,3 +73,27 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
     a: 3
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  o1: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  o2: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  o3: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  o4: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  e: (_|_){
+    // [eval] conflicting values struct and int
+    a: (int){ 3 }
+  }
+}

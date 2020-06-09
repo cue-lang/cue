@@ -34,3 +34,13 @@ s: t & {
     #ok: false
   })
 }
+-- out/eval --
+(struct){
+  t: (struct){
+    #ok: (bool){ true }
+    x: (int){ int }
+  }
+  s: (struct){
+    #ok: (bool){ false }
+  }
+}

@@ -98,3 +98,27 @@ S:
     }
   })
 }
+-- out/eval --
+(struct){
+  S: (struct){
+    A: (struct){
+      a: (int){ 1 }
+    }
+    B: (struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+  }
+  T: (struct){
+    A: (struct){
+      a: (int){ 1 }
+      c: (int){ 3 }
+    }
+    B: (struct){
+      a: (int){ 1 }
+      c: (int){ 3 }
+      b: (int){ 2 }
+      d: (int){ 4 }
+    }
+  }
+}

@@ -58,3 +58,29 @@ h: _|_ // invalid operation: [3].b (type list does not support selection)
     3,
   ].b
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  obj: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  index: (int){ 2 }
+  mulidx: (int){ 3 }
+  e: (_|_){
+    // [eval] invalid struct selector 4 (type int):
+    //     ./in.cue:4:16
+  }
+  f: (_|_){
+    // [incomplete] undefined field b:
+    //     ./in.cue:5:16
+  }
+  g: (_|_){
+    // [incomplete] undefined field b:
+    //     ./in.cue:6:16
+  }
+  h: (_|_){
+    // [eval] invalid list index b (type string):
+    //     ./in.cue:7:13
+  }
+}

@@ -1,0 +1,42 @@
+-- in.cue --
+a: b + 100
+b: a - 100
+a: 200
+
+
+c: d & { b: 2 }
+d: e
+e: { a: 1 }
+e: c
+-- out/eval --
+(struct){
+  a: (int){ 200 }
+  b: (int){ 100 }
+  c: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  d: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  e: (struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: (〈0;b〉 + 100)
+  b: (〈0;a〉 - 100)
+  a: 200
+  c: (〈0;d〉 & {
+    b: 2
+  })
+  d: 〈0;e〉
+  e: {
+    a: 1
+  }
+  e: 〈0;c〉
+}

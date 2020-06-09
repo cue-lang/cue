@@ -25,3 +25,11 @@ c: *"a" | *"b" | "c"
   x: (〈0;a〉 & 〈0;b〉)
   y: (〈0;b〉 & 〈0;c〉)
 }
+-- out/eval --
+(struct){
+  a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  c: (string){ |(*(string){ "a" }, *(string){ "b" }, (string){ "c" }) }
+  x: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+  y: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+}

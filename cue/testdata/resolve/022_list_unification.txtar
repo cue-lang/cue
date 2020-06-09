@@ -32,3 +32,20 @@ b: a & {
     ]
   })
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    l: (#list){
+      0: (string){ "foo" }
+      1: (_){ _ }
+    }
+    v: (_){ _ }
+  }
+  b: (struct){
+    l: (#list){
+      0: (string){ "foo" }
+      1: (string){ "bar" }
+    }
+    v: (string){ "bar" }
+  }
+}

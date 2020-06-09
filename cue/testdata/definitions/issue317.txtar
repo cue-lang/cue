@@ -1,0 +1,210 @@
+# Allow otherField
+
+-- in.cue --
+#T: {
+	#Schema: [_]: #D
+	concrete: #Schema
+}
+#D: {
+	fieldWithDefault: *0 | int
+	...
+}
+s: #T & {
+	#Schema: {
+		foo: otherField: string
+	}
+	concrete: foo: otherField: "hello"
+}
+
+#Container: {
+	Env: [Name=string]: {
+			name:  string
+			value: string
+	}
+}
+#Deployment: {
+        #Containers: [Name=string]: #Container
+        containers: [ for c in #Containers { c } ] // Problem is here.
+}
+Something: {
+        #Deployment
+        #Containers: {
+                // Does not allow entries other than value. Either add ... or embed
+                "a thing": Env: foobar: value: "foo"
+        }
+}
+x: Something & #Deployment
+
+-- out/eval --
+(struct){
+  #T: (#struct){
+    #Schema: (#struct){
+    }
+    concrete: (#struct){
+    }
+  }
+  #D: (#struct){
+    fieldWithDefault: (int){ |(*(int){ 0 }, (int){ int }) }
+  }
+  s: (#struct){
+    #Schema: (#struct){
+      foo: (#struct){
+        otherField: (string){ string }
+        fieldWithDefault: (int){ |(*(int){ 0 }, (int){ int }) }
+      }
+    }
+    concrete: (#struct){
+      foo: (#struct){
+        otherField: (string){ "hello" }
+        fieldWithDefault: (int){ |(*(int){ 0 }, (int){ int }) }
+      }
+    }
+  }
+  #Container: (#struct){
+    Env: (#struct){
+    }
+  }
+  #Deployment: (#struct){
+    #Containers: (#struct){
+    }
+    containers: (#list){
+    }
+  }
+  Something: (#struct){
+    #Containers: (#struct){
+      "a thing": (#struct){
+        Env: (#struct){
+          foobar: (#struct){
+            value: (string){ "foo" }
+            name: (string){ string }
+          }
+        }
+      }
+    }
+    containers: (#list){
+      0: (#struct){
+        Env: (#struct){
+          foobar: (#struct){
+            value: (string){ "foo" }
+            name: (string){ string }
+          }
+        }
+      }
+    }
+  }
+  x: (#struct){
+    #Containers: (#struct){
+      "a thing": (#struct){
+        Env: (#struct){
+          foobar: (#struct){
+            value: (string){ "foo" }
+            name: (string){ string }
+          }
+        }
+      }
+    }
+    containers: (#list){
+      0: (#struct){
+        Env: (#struct){
+          foobar: (#struct){
+            value: (string){ "foo" }
+            name: (string){ string }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/export --
+#T: {
+	#Schema: [_]: #D
+	concrete: #Schema
+}
+#D: {
+	fieldWithDefault: *0 | int
+	...
+}
+s: #T & {
+	#Schema: {
+		foo: otherField: string
+	}
+	concrete: foo: otherField: "hello"
+}
+
+#Container: {
+	Env: [Name=string]: {
+		name:  string
+		value: string
+	}
+}
+#Deployment: {
+	#Containers: [Name=string]: #Container
+
+	containers: [ for c in #Containers {c}] // Problem is here.
+}
+Something: {
+	#Deployment
+	#Containers: {
+		// Does not allow entries other than value. Either add ... or embed
+		"a thing": Env: foobar: value: "foo"
+	}
+}
+x: Something & #Deployment
+
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    #Schema: {
+      [_]: 〈2;#D〉
+    }
+    concrete: 〈0;#Schema〉
+  }
+  #D: {
+    fieldWithDefault: (*0|int)
+    ...
+  }
+  s: (〈0;#T〉 & {
+    #Schema: {
+      foo: {
+        otherField: string
+      }
+    }
+    concrete: {
+      foo: {
+        otherField: "hello"
+      }
+    }
+  })
+  #Container: {
+    Env: {
+      [string]: {
+        name: string
+        value: string
+      }
+    }
+  }
+  #Deployment: {
+    #Containers: {
+      [string]: 〈2;#Container〉
+    }
+    containers: [
+      for _, c in 〈0;#Containers〉 {
+        〈1;c〉
+      },
+    ]
+  }
+  Something: {
+    〈1;#Deployment〉
+    #Containers: {
+      "a thing": {
+        Env: {
+          foobar: {
+            value: "foo"
+          }
+        }
+      }
+    }
+  }
+  x: (〈0;Something〉 & 〈0;#Deployment〉)
+}

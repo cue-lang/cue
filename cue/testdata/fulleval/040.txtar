@@ -65,3 +65,22 @@ foo:
     op: "pull"
   })
 }
+-- out/eval --
+(struct){
+  #Task: (struct){ |((#struct){
+      op: (string){ "pull" }
+      tag: (string){ |(*(string){ "latest" }, (string){ string }) }
+      refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }
+      tagExpr: (string){ "latestdd" }
+      tagInString: (string){ "latest" }
+    }, (#struct){
+      op: (string){ "scratch" }
+    }) }
+  foo: (#struct){
+    op: (string){ "pull" }
+    tag: (string){ |(*(string){ "latest" }, (string){ string }) }
+    refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }
+    tagExpr: (string){ "latestdd" }
+    tagInString: (string){ "latest" }
+  }
+}

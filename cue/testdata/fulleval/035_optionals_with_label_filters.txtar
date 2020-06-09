@@ -100,3 +100,42 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
     }
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #JobID: (string){ =~"^[a-zA-Z]*$" }
+  #Job: (#struct){
+    name: (string){ string }
+    cmd: (string){ string }
+  }
+  #Jobs: (#struct){
+  }
+  jobs: (struct){
+    foo: (struct){
+      name: (string){ "allGood" }
+    }
+  }
+  jobs1: (_|_){
+    // [eval] field `foo1` not allowed
+    foo1: (#struct){
+    }
+  }
+  jobs2: (_|_){
+    // [eval]
+    fooTest: (_|_){
+      // [eval]
+      name: (_|_){
+        // [eval] invalid value *adt.Vertex (out of bound *adt.BoundValue)
+      }
+      cmd: (string){ string }
+    }
+  }
+  jobs3: (_|_){
+    // [eval] field `fooTest1` not allowed
+    fooTest1: (_|_){
+      // [eval] field `cmd` not allowed
+      name: (string){ "badName" }
+      cmd: (string){ string }
+    }
+  }
+}

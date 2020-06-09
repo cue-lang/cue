@@ -1,0 +1,47 @@
+-- in.cue --
+a: "foo"
+"\(a)": b: c: d: e
+e: 2
+
+b: "bar"
+X="\(b)": {
+	a: 1
+}
+c: X
+-- out/eval --
+(struct){
+  a: (string){ "foo" }
+  e: (int){ 2 }
+  b: (string){ "bar" }
+  c: (struct){
+    a: (int){ 1 }
+  }
+  foo: (struct){
+    b: (struct){
+      c: (struct){
+        d: (int){ 2 }
+      }
+    }
+  }
+  bar: (struct){
+    a: (int){ 1 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: "foo"
+  "\(〈0;a〉)": {
+    b: {
+      c: {
+        d: 〈3;e〉
+      }
+    }
+  }
+  e: 2
+  b: "bar"
+  "\(〈0;b〉)": {
+    a: 1
+  }
+  c: 〈0;("\(〈0;b〉)")〉
+}

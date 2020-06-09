@@ -1,0 +1,61 @@
+-- in.cue --
+#a: {
+    val: string
+    result: string
+}
+
+a: #a & {
+    val: *"default" | string
+    result: *"not-matched" | string
+    if (val == "match") {
+        result: "matched"
+    }
+}
+
+match: a & {
+    val: "match"
+}
+
+not: a & {
+    val: "other"
+}
+-- out/eval --
+(struct){
+  #a: (#struct){
+    val: (string){ string }
+    result: (string){ string }
+  }
+  a: (#struct){
+    val: (string){ "default" }
+    result: (string){ |(*(string){ "not-matched" }, (string){ string }) }
+  }
+  match: (#struct){
+    val: (string){ "match" }
+    result: (string){ "matched" }
+  }
+  not: (#struct){
+    val: (string){ "other" }
+    result: (string){ |(*(string){ "not-matched" }, (string){ string }) }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #a: {
+    val: string
+    result: string
+  }
+  a: (〈0;#a〉 & {
+    val: (*"default"|string)
+    result: (*"not-matched"|string)
+    if (〈0;val〉 == "match") {
+      result: "matched"
+    }
+  })
+  match: (〈0;a〉 & {
+    val: "match"
+  })
+  not: (〈0;a〉 & {
+    val: "other"
+  })
+}

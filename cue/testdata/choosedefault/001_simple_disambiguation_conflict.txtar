@@ -19,3 +19,9 @@ c: a & b
   b: (*"b"|"a")
   c: (〈0;a〉 & 〈0;b〉)
 }
+-- out/eval --
+(struct){
+  a: (string){ |(*(string){ "a" }, (string){ "b" }) }
+  b: (string){ |(*(string){ "b" }, (string){ "a" }) }
+  c: (string){ |((string){ "a" }, (string){ "b" }) }
+}

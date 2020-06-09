@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
 	"golang.org/x/xerrors"
 )
 
@@ -37,7 +36,7 @@ type Config struct {
 // the packages names are consistent.
 //
 // Files may return a completed parse even if it has errors.
-func Files(cfg *Config, r *runtime.Runtime, files ...*ast.File) (*adt.Vertex, errors.Error) {
+func Files(cfg *Config, r adt.Runtime, files ...*ast.File) (*adt.Vertex, errors.Error) {
 	c := &compiler{index: r}
 
 	v := c.compileFiles(files)
@@ -74,7 +73,7 @@ func (c *compiler) errf(n ast.Node, format string, args ...interface{}) *adt.Bot
 		Message: errors.NewMessage(format, args),
 	}
 	c.errs = errors.Append(c.errs, err)
-	return &adt.Bottom{}
+	return &adt.Bottom{Err: err}
 }
 
 func (c *compiler) path() []string {
@@ -387,7 +386,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				name, isIdent, err := ast.LabelName(lab)
 				if err == nil && isIdent {
 					idx := c.index.StringToIndex(name)
-					label, _ = adt.MakeLabel(x.Pos(), idx, adt.DefinitionLabel)
+					label, _ = adt.MakeLabel(x, idx, adt.DefinitionLabel)
 				}
 			}
 
@@ -667,7 +666,11 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		return slice
 
 	case *ast.BottomLit:
-		return &adt.Bottom{Src: n}
+		return &adt.Bottom{
+			Src:  n,
+			Code: adt.UserError,
+			Err:  errors.Newf(n.Pos(), "from source"),
+		}
 
 	case *ast.BadExpr:
 		return c.errf(n, "invalid expression")
@@ -786,6 +789,8 @@ func (c *compiler) addDisjunctionElem(d *adt.DisjunctionExpr, n ast.Expr, mark b
 	}
 	d.Values = append(d.Values, adt.Disjunct{Val: c.expr(n), Default: mark})
 }
+
+// TODO(perf): validate that regexps are cached at the right time.
 
 func (c *compiler) parse(l *ast.BasicLit) (n adt.Expr) {
 	s := l.Value

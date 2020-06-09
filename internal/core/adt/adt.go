@@ -56,27 +56,28 @@ type Value interface {
 // An Evaluator provides a method to convert to a value.
 type Evaluator interface {
 	Node
-	// TODO: Eval(c Context, env *Environment) Value
+	evaluate(ctx *OpContext) Value
 }
 
 // A Resolver represents a reference somewhere else within a tree that resolves
 // a value.
 type Resolver interface {
 	Node
-	// TODO: Resolve(c Context, env *Environment) Arc
+	resolve(ctx *OpContext) *Vertex
 }
+
+type YieldFunc func(env *Environment, s *StructLit)
 
 // A Yielder represents 0 or more labeled values of structs or lists.
 type Yielder interface {
 	Node
-	yielderNode()
-	// TODO: Yield()
+	yield(ctx *OpContext, fn YieldFunc)
 }
 
 // A Validator validates a Value. All Validators are Values.
 type Validator interface {
-	// TODO: Validate(c Context, v Value) *Bottom
 	Value
+	validate(c *OpContext, v Value) *Bottom
 }
 
 // Value
@@ -164,8 +165,7 @@ func (x *DynamicField) expr() Expr      { return x.Value }
 
 // Decl and Yielder
 
-func (*LetClause) declNode()    {}
-func (*LetClause) yielderNode() {}
+func (*LetClause) declNode() {}
 
 // Decl and Elem
 
@@ -236,16 +236,12 @@ func (*DisjunctionExpr) elemNode()  {}
 
 // Decl, Elem, and Yielder
 
-func (*ForClause) declNode()    {}
-func (*ForClause) elemNode()    {}
-func (*ForClause) yielderNode() {}
-func (*IfClause) declNode()     {}
-func (*IfClause) elemNode()     {}
-func (*IfClause) yielderNode()  {}
+func (*ForClause) declNode() {}
+func (*ForClause) elemNode() {}
+func (*IfClause) declNode()  {}
+func (*IfClause) elemNode()  {}
 
-// Yielder
-
-func (*ValueClause) yielderNode() {}
+// Yielder only: ValueClause
 
 // Node
 

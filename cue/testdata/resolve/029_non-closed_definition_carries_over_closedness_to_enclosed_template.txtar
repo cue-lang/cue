@@ -102,3 +102,43 @@ c: #R & {
     ]
   })
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #S: (#struct){
+  }
+  a: (_|_){
+    // [eval]
+    v: (_|_){
+      // [eval] field `b` not allowed
+      b: (int){ int }
+      a: (int){ int }
+    }
+  }
+  #Q: (#struct){
+  }
+  b: (_|_){
+    // [eval]
+    w: (_|_){
+      // [eval] field `c` not allowed
+      c: (int){ int }
+      b: (int){ int }
+    }
+  }
+  #R: (#struct){
+  }
+  c: (_|_){
+    // [eval]
+    w: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval] field `d` not allowed
+        d: (int){ int }
+        a: (int){ int }
+      }
+      1: (#struct){
+        b: (int){ int }
+      }
+    }
+  }
+}

@@ -136,3 +136,64 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
   e8: (>11 & <=11)
   e9: (>"a" & <1)
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  i1: (int){ 5 }
+  i2: (int){ 5 }
+  i3: (#list){
+  }
+  i4: (number){ &(!=2, !=4) }
+  s1: (number){ &(>=0, <=10, !=1) }
+  s2: (number){ &(>=0, <=10) }
+  s3: (number){ >5 }
+  s4: (number){ <10 }
+  s5: (number){ &(!=2, !=2) }
+  s6: (number){ &(>=2, !=2) }
+  s7: (number){ &(>=2, !=2) }
+  s8: (number){ >5 }
+  s10: (number){ &(>1, <=10) }
+  s11: (number){ &(>0, <12) }
+  s20: (number){ 10 }
+  s22: (number){ &(>5, <=6) }
+  s22a: (int){ 6 }
+  s22b: (int){ 6 }
+  s22c: (int){ 5 }
+  s22d: (int){ 5 }
+  s22e: (int){ 5 }
+  s22f: (int){ 5 }
+  s23: (number){ &(>0, <2) }
+  s23a: (int){ 1 }
+  s23b: (int){ 1 }
+  s23c: (int){ 1 }
+  s23d: (int){ 1 }
+  s23e: (number){ &(>0.0, <2.0) }
+  s30: (int){ &(>0, int) }
+  e1: (_|_){
+    // [eval] invalid value *adt.BoundValue (mismatched types (bool|string|bytes|list|struct|number) and null)
+  }
+  e2: (_|_){
+    // [eval] invalid value *adt.Null (mismatched types null and (bool|string|bytes|list|struct|number))
+  }
+  e3: (_|_){
+    // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+  }
+  e4: (_|_){
+    // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+  }
+  e5: (_|_){
+    // [eval] bounds *adt.BoundValue *adt.BoundValue
+  }
+  e6: (_|_){
+    // [eval] bounds *adt.BoundValue *adt.BoundValue
+  }
+  e7: (_|_){
+    // [eval] bounds *adt.BoundValue *adt.BoundValue
+  }
+  e8: (_|_){
+    // [eval] bounds *adt.BoundValue *adt.BoundValue
+  }
+  e9: (_|_){
+    // [eval] invalid value *adt.BoundValue (mismatched types number and string)
+  }
+}

@@ -21,3 +21,12 @@ f: string
     f: string
   }
 }
+-- out/eval --
+(struct){
+  a: (int){ 1 }
+  b: (int){ 3 }
+  c: (null){ null }
+  d: (bool){ true }
+  e: (_){ _ }
+  f: (string){ string }
+}

@@ -59,3 +59,28 @@ baz: #Foo & {
     b: 2
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #Foo: (struct){ |((#struct){
+      field: (int){ int }
+      a: (int){ 1 }
+    }, (#struct){
+      field: (int){ int }
+      b: (int){ 2 }
+    }) }
+  foo: (#struct){
+    field: (int){ int }
+    a: (int){ 1 }
+  }
+  bar: (_|_){
+    // [eval] field `c` not allowed
+    field: (int){ int }
+    c: (int){ 2 }
+    b: (int){ 2 }
+  }
+  baz: (#struct){
+    field: (int){ int }
+    b: (int){ 2 }
+  }
+}

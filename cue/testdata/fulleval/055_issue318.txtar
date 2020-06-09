@@ -41,3 +41,26 @@
     vy: 〈0;arg〉.y
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #T: (_|_){
+    // [eval]
+    arg: (#struct){
+      x: (string){ string }
+    }
+    out1: (_|_){
+      // [eval] invalid interpolation: undefined field y:
+      //     ./in.cue:3:8
+    }
+    out2: (_|_){
+      // [eval] invalid interpolation: undefined field y:
+      //     ./in.cue:4:8
+    }
+    vx: (string){ string }
+    vy: (_|_){
+      // [eval] undefined field y:
+      //     ./in.cue:6:12
+    }
+  }
+}

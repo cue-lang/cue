@@ -59,3 +59,14 @@ str: 5
   "\(〈0;a〉)": 5
   c: 〈0;("\(〈0;a〉)")〉
 }
+-- out/eval --
+(struct){
+  p: (struct){
+  }
+  "foo=bar": (string){ "str" }
+  a: (string){ "str" }
+  bb: (int){ 4 }
+  b1: (int){ 4 }
+  c: (int){ 5 }
+  str: (int){ 5 }
+}

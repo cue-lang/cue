@@ -74,3 +74,47 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
     ...(>=4 & <=5),
   ])
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  list: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  index: (int){ 2 }
+  unify: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+  }
+  e: (_|_){
+    // [eval] conflicting types
+  }
+  e2: (_|_){
+    // [eval] invalid list index d (type string):
+    //     ./in.cue:5:12
+  }
+  e3: (_|_){
+    // [eval] invalid negative index *adt.Num:
+    //     ./in.cue:6:8
+  }
+  e4: (_|_){
+    // [eval]
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 4 }
+    3: (_|_){
+      // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+    }
+  }
+  e5: (_|_){
+    // [eval]
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 4 }
+    3: (_|_){
+      // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+    }
+  }
+}

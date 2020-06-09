@@ -22,3 +22,10 @@ _bar:   int
     _bar: int
   }
 }
+-- out/eval --
+(struct){
+  $type: (int){ 3 }
+  "_": (int){ int }
+  "_foo": (int){ int }
+  _bar: (int){ int }
+}

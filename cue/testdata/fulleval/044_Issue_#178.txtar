@@ -24,3 +24,17 @@ len:  int
 bar:  hex.EncodedLen(len)
 -- out/legacy-debug --
 <0>{foo: <1>.Decode (<2>.data), data: bytes, len: int, bar: <3>.EncodedLen (<2>.len)}
+-- out/eval --
+(_|_){
+  // [eval]
+  foo: (_|_){
+    // [eval] cannot call non-function *adt.SelectorExpr (type nil):
+    //     ./in.cue:5:7
+  }
+  data: (bytes){ bytes }
+  len: (int){ int }
+  bar: (_|_){
+    // [eval] cannot call non-function *adt.SelectorExpr (type nil):
+    //     ./in.cue:9:6
+  }
+}

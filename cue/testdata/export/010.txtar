@@ -73,3 +73,33 @@ f: [1, 2, ...]
     ]
   }
 }
+-- out/eval --
+(struct){
+  a: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ int }
+    3: (int){ int }
+    4: (int){ int }
+  }
+  b: (list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  c: (list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  d: (list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  e: (list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  f: (list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+}

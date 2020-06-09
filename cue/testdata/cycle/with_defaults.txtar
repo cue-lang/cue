@@ -1,0 +1,45 @@
+-- in.cue --
+range1: {
+	min: *1 | int
+	range: >min
+	range: 8
+}
+range2: {
+	min: *1 | int
+	max: int & >min
+}
+rg: range2 & {
+//	min: 1
+	max: 8
+}
+-- out/eval --
+(struct){
+  range1: (struct){
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    range: (int){ 8 }
+  }
+  range2: (struct){
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    max: (int){ &(>1, int) }
+  }
+  rg: (struct){
+    min: (int){ |(*(int){ 1 }, (int){ int }) }
+    max: (int){ 8 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  range1: {
+    min: (*1|int)
+    range: >〈0;min〉
+    range: 8
+  }
+  range2: {
+    min: (*1|int)
+    max: (int & >〈0;min〉)
+  }
+  rg: (〈0;range2〉 & {
+    max: 8
+  })
+}

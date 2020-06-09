@@ -50,3 +50,15 @@
     Size: 1
   })
 }
+-- out/eval --
+(struct){
+  #def: (struct){ |((#struct){
+      Type: (string){ "B" }
+      Text: (string){ string }
+      Size: (int){ 0 }
+    }, (#struct){
+      Type: (string){ "A" }
+      Text: (string){ string }
+      Size: (int){ 1 }
+    }) }
+}

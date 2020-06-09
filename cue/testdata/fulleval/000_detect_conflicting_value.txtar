@@ -15,3 +15,9 @@ a: _|_ // conflicting values 8000.9 and int (mismatched types float and int)
   a: 8000.9
   a: (7080|int)
 }
+-- out/eval --
+(struct){
+  a: (_|_){
+    // [incomplete] empty disjunction
+  }
+}

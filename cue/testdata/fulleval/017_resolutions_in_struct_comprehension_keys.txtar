@@ -30,3 +30,9 @@ a:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    "c.": (string){ "a" }
+  }
+}

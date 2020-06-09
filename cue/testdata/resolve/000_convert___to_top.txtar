@@ -23,3 +23,8 @@ a: {}
     [_]: _
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+  }
+}

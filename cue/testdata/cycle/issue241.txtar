@@ -1,0 +1,79 @@
+-- in.cue --
+#Value: 0 | 1
+
+foo: #Value
+foo: != bar
+bar: #Value
+bar: != foo
+
+#Value: 0 | 1
+
+Foo: #Value
+Foo: != Bar
+Bar: #Value
+Bar: != Foo
+Bar: 0
+
+cell: a:  0 | 1
+cell: a:  != cell.b
+cell: b:  0 | 1
+cell: b:  != cell.a
+cell: a:  0
+cell: b:  _
+
+a: cell.a
+b: cell.b
+
+-- out/eval --
+(struct){
+  #Value: (int){ |((int){ 0 }, (int){ 1 }) }
+  foo: (_|_){
+    // [incomplete] incomplete cause disjunction
+  }
+  bar: (_|_){
+    // [incomplete] incomplete cause disjunction
+  }
+  Foo: (int){ 1 }
+  Bar: (int){ 0 }
+  cell: (struct){
+    a: (int){ 0 }
+    b: (int){ 1 }
+  }
+  a: (int){ 0 }
+  b: (int){ 1 }
+}
+-- out/compile --
+--- in.cue
+{
+  #Value: (0|1)
+  foo: 〈0;#Value〉
+  foo: !=〈0;bar〉
+  bar: 〈0;#Value〉
+  bar: !=〈0;foo〉
+  #Value: (0|1)
+  Foo: 〈0;#Value〉
+  Foo: !=〈0;Bar〉
+  Bar: 〈0;#Value〉
+  Bar: !=〈0;Foo〉
+  Bar: 0
+  cell: {
+    a: (0|1)
+  }
+  cell: {
+    a: !=〈1;cell〉.b
+  }
+  cell: {
+    b: (0|1)
+  }
+  cell: {
+    b: !=〈1;cell〉.a
+  }
+  cell: {
+    a: 0
+  }
+  cell: {
+    b: _
+  }
+  a: 〈0;cell〉.a
+  b: 〈0;cell〉.b
+}

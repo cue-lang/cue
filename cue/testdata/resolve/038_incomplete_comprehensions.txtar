@@ -47,3 +47,21 @@ B: A & {
     ]
   })
 }
+-- out/eval --
+(struct){
+  A: (_|_){
+    // [incomplete] incomplete feed source value src (type _):
+    //     ./in.cue:2:11
+    src: (_){ _ }
+    baz: (string){ "baz" }
+  }
+  B: (struct){
+    src: (#list){
+      0: (string){ "foo" }
+      1: (string){ "bar" }
+    }
+    baz: (string){ "baz" }
+    foo: (string){ "foo" }
+    bar: (string){ "bar" }
+  }
+}

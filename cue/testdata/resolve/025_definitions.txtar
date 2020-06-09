@@ -117,3 +117,47 @@ mixedRec: {
     Mixed: string
   }
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  #Foo: (#struct){
+    field: (int){ int }
+    recursive: (#struct){
+      field: (string){ string }
+    }
+  }
+  #Foo1: (#struct){
+    field: (int){ int }
+    field2: (string){ string }
+  }
+  foo: (_|_){
+    // [eval] field `feild` not allowed
+    field: (int){ int }
+    recursive: (#struct){
+      field: (string){ string }
+    }
+    feild: (int){ 2 }
+  }
+  foo1: (_|_){
+    // [eval]
+    field: (int){ 2 }
+    recursive: (_|_){
+      // [eval] field `feild` not allowed
+      field: (string){ string }
+      feild: (int){ 2 }
+    }
+  }
+  #Bar: (#struct){
+    field: (int){ int }
+  }
+  bar: (#struct){
+    field: (int){ int }
+    feild: (int){ 2 }
+  }
+  #Mixed: (string){ string }
+  Mixed: (string){ string }
+  mixedRec: (struct){
+    #Mixed: (string){ string }
+    Mixed: (string){ string }
+  }
+}

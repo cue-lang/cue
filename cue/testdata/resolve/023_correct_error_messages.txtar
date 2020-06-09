@@ -13,3 +13,10 @@ a: _|_ // conflicting values "a" and 1 (mismatched types string and int)
 {
   a: ("a" & 1)
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval] invalid value *adt.Num (mismatched types int and string)
+  }
+}

@@ -76,3 +76,51 @@ e7: def["b"]
   }
   e7: 〈0;def〉["b"]
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (int){ 2 }
+  b: (string){ "bar" }
+  c: (_|_){
+    // [eval] invalid list index "3" (type string):
+    //     ./in.cue:3:20
+  }
+  d: (_|_){
+    // [eval] undefined field 0:
+    //     ./in.cue:4:16
+  }
+  l: (#list){
+  }
+  e1: (_|_){
+    // [eval] invalid list index _ (type string):
+    //     ./in.cue:6:9
+  }
+  e2: (_|_){
+    // [eval] invalid operand 2 (found int, want list or struct):
+    //     ./in.cue:7:5
+  }
+  e3: (_|_){
+    // [eval] invalid label type bool:
+    //     ./in.cue:8:5
+  }
+  e4: (_|_){
+    // [eval] undefined field 3:
+    //     ./in.cue:9:15
+  }
+  e5: (_|_){
+    // [eval] invalid negative index *adt.Num:
+    //     ./in.cue:10:5
+  }
+  e6: (_|_){
+    // [eval] invalid list index 1 (out of bounds):
+    //     ./in.cue:11:16
+  }
+  def: (struct){
+    a: (int){ 1 }
+    #b: (int){ 3 }
+  }
+  e7: (_|_){
+    // [incomplete] undefined field b:
+    //     ./in.cue:16:9
+  }
+}

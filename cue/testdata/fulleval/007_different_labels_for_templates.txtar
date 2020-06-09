@@ -46,3 +46,11 @@ a:
     foo: {}
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    foo: (struct){
+      name: (string){ "foo" }
+    }
+  }
+}

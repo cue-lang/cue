@@ -77,3 +77,16 @@ a:
     }
   }
 }
+-- out/eval --
+(struct){
+  num: (int){ 1 }
+  a: (struct){
+    b: (struct){
+      c: (struct){
+        d: (string){ "bar" }
+        name: (string){ "b" }
+        kind: (string){ "c" }
+      }
+    }
+  }
+}

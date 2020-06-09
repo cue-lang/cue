@@ -29,3 +29,9 @@ c: c
   b: (〈0;a〉.x|"b")
   c: (〈0;a〉["x"]|"c")
 }
+-- out/eval --
+(struct){
+  a: (null){ null }
+  b: (string){ "b" }
+  c: (string){ "c" }
+}

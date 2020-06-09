@@ -109,39 +109,63 @@ func (w *printer) node(n adt.Node) {
 		}
 
 		kindStr := kind.String()
-		kindStr = strings.ReplaceAll(kindStr, "{...}", "struct")
-		kindStr = strings.ReplaceAll(kindStr, "[...]", "list")
+
+		// TODO: replace with showing full closedness data.
+		if x.IsClosed(nil) {
+			if kind == adt.ListKind || kind == adt.StructKind {
+				kindStr = "#" + kindStr
+			}
+		}
 
 		fmt.Fprintf(w, "(%s){", kindStr)
 
-		if x.Value != nil && kind&^(adt.StructKind|adt.ListKind) != 0 {
-			w.string(" ")
-			w.node(x.Value)
-			w.string(" }")
-			return
-		}
-
 		saved := w.indent
 		w.indent += "  "
+		defer func() { w.indent = saved }()
 
-		if b, ok := x.Value.(*adt.Bottom); ok {
+		switch v := x.Value.(type) {
+		case nil:
+		case *adt.Bottom:
+			// TODO: reuse bottom.
 			saved := w.indent
 			w.indent += "// "
 			w.string("\n")
-			w.string(strings.TrimSpace(errors.Details(b.Err, &errors.Config{
-				Cwd:     w.cfg.Cwd,
-				ToSlash: true,
-			})))
+			fmt.Fprintf(w, "[%v]", v.Code)
+			if !v.ChildError {
+				msg := errors.Details(v.Err, &errors.Config{
+					Cwd:     w.cfg.Cwd,
+					ToSlash: true,
+				})
+				msg = strings.TrimSpace(msg)
+				if msg != "" {
+					w.string(" ")
+					w.string(msg)
+				}
+			}
 			w.indent = saved
+
+		case *adt.StructMarker, *adt.ListMarker:
+			// if len(x.Arcs) == 0 {
+			// 	// w.string("}")
+			// 	// return
+			// }
+
+		default:
+			if len(x.Arcs) == 0 {
+				w.string(" ")
+				w.node(x.Value)
+				w.string(" }")
+				return
+			}
+			w.string("\n")
+			w.node(x.Value)
 		}
 
-		if len(x.Arcs) > 0 {
-			for _, a := range x.Arcs {
-				w.string("\n")
-				w.label(a.Label)
-				w.string(": ")
-				w.node(a)
-			}
+		for _, a := range x.Arcs {
+			w.string("\n")
+			w.label(a.Label)
+			w.string(": ")
+			w.node(a)
 		}
 
 		if x.Value == nil {

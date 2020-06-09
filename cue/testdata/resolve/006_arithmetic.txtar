@@ -28,3 +28,15 @@ e2: _|_ // conflicting values int and (4.0 / 2.0) (mismatched types int and floa
   v6: (1.0 / 1.0)
   e2: (int & (4.0 / 2.0))
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  v1: (float){ 5.0000000000E+11 }
+  v2: (bool){ true }
+  n1: (int){ 1 }
+  v5: (float){ 2.0 }
+  v6: (float){ 1 }
+  e2: (_|_){
+    // [eval] invalid value *adt.Num (mismatched types float and int)
+  }
+}

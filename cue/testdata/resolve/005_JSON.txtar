@@ -44,3 +44,12 @@ c: 2
   }
   c: 〈0;o〉["a\nb"]
 }
+-- out/eval --
+(struct){
+  a: (int){ 3 }
+  b: (int){ 3 }
+  o: (struct){
+    "a\nb": (int){ 2 }
+  }
+  c: (int){ 2 }
+}

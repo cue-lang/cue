@@ -1,0 +1,51 @@
+-- in.cue --
+a: { x: 10, y: 100, z: 50 }
+b: {
+	for k, v in a if v <= 50 {
+		"\(k)": v
+	}
+	x: int
+	if x > 3 {
+		k: 20
+	}
+	k: int
+	if k > 0 {
+		l: 40
+	}
+}
+-- out/eval --
+(struct){
+  a: (struct){
+    x: (int){ 10 }
+    y: (int){ 100 }
+    z: (int){ 50 }
+  }
+  b: (struct){
+    x: (int){ 10 }
+    k: (int){ 20 }
+    z: (int){ 50 }
+    l: (int){ 40 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    x: 10
+    y: 100
+    z: 50
+  }
+  b: {
+    for k, v in 〈1;a〉 if (〈0;v〉 <= 50) {
+      "\(〈1;k〉)": 〈1;v〉
+    }
+    x: int
+    if (〈0;x〉 > 3) {
+      k: 20
+    }
+    k: int
+    if (〈0;k〉 > 0) {
+      l: 40
+    }
+  }
+}

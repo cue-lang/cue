@@ -63,3 +63,18 @@ g1: 1
   "g\(1)"?: 1
   "g\(2)"?: 2
 }
+-- out/eval --
+(struct){
+  a: (struct){
+  }
+  b: (struct){
+    foo: (string){ "foo" }
+  }
+  c: (struct){
+    foo: (string){ "foo" }
+  }
+  d: (struct){
+  }
+  g1: (int){ 1 }
+  g2: (int){ 2 }
+}

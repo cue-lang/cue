@@ -51,3 +51,39 @@ e7: _|_ // invalid slice index "9" (type string)
     2,
   ][:"9"]
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  a: (#list){
+  }
+  b: (#list){
+  }
+  e1: (_|_){
+    // [eval] index 1 out of range:
+    //     ./in.cue:3:5
+  }
+  e2: (_|_){
+    // [eval] cannot convert negative number to uint64:
+    //     ./in.cue:4:5
+  }
+  e3: (_|_){
+    // [eval] invalid slice index: 1 > 0:
+    //     ./in.cue:5:5
+  }
+  e4: (_|_){
+    // [eval] index 2 out of range:
+    //     ./in.cue:6:5
+  }
+  e5: (_|_){
+    // [eval] cannot slice *adt.Num (type int):
+    //     ./in.cue:7:5
+  }
+  e6: (_|_){
+    // [eval] cannot use *adt.String (type string) as type int in slice index:
+    //     ./in.cue:8:5
+  }
+  e7: (_|_){
+    // [eval] cannot use *adt.String (type string) as type int in slice index:
+    //     ./in.cue:9:5
+  }
+}

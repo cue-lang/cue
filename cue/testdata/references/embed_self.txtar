@@ -1,0 +1,16 @@
+-- in.cue --
+Foo: {
+}
+
+Foo
+-- out/eval --
+(struct){
+  Foo: (struct){
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  Foo: {}
+  〈0;Foo〉
+}

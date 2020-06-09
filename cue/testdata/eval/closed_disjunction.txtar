@@ -1,0 +1,52 @@
+-- in.cue --
+#A: {
+    b?: int
+    *{} | {c?: int} | {d?: int} | {e?: int}
+}
+
+a: #A & {
+    b: 3
+    c: 3
+}
+
+b: #A & {
+    c: 3
+    d: 4
+}
+-- out/eval --
+(_|_){
+  // [eval]
+  #A: (#struct){
+  }
+  a: (#struct){
+    b: (int){ 3 }
+    c: (int){ 3 }
+  }
+  b: (_|_){
+    // [eval] field `d` not allowed
+    c: (int){ 3 }
+    d: (int){ 4 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    b?: int
+    (*{}|{
+      c?: int
+    }|{
+      d?: int
+    }|{
+      e?: int
+    })
+  }
+  a: (〈0;#A〉 & {
+    b: 3
+    c: 3
+  })
+  b: (〈0;#A〉 & {
+    c: 3
+    d: 4
+  })
+}

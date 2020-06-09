@@ -40,3 +40,28 @@ ti: t & {
     c: int
   })
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    c: (int){ 5 }
+    d: (int){ 15 }
+  }
+  b: (struct){
+    c: (int){ 7 }
+    d: (int){ 21 }
+  }
+  t: (struct){
+    c: (number){ number }
+    d: (_|_){
+      // [incomplete] non-concrete value *adt.BasicType in operand to *:
+      //     ./in.cue:3:19
+    }
+  }
+  ti: (struct){
+    c: (int){ int }
+    d: (_|_){
+      // [incomplete] non-concrete value *adt.BasicType in operand to *:
+      //     ./in.cue:3:19
+    }
+  }
+}

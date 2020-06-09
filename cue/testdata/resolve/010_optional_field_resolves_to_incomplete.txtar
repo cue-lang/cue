@@ -25,3 +25,16 @@ r: {
     c: 〈1;r〉["a"]
   }
 }
+-- out/eval --
+(struct){
+  r: (struct){
+    b: (_|_){
+      // [incomplete] undefined field a:
+      //     ./in.cue:3:6
+    }
+    c: (_|_){
+      // [incomplete] undefined field a:
+      //     ./in.cue:4:8
+    }
+  }
+}

@@ -1,0 +1,43 @@
+-- in.cue --
+c: #R & {
+    w: [{}, {b: int}]
+}
+#R: {
+    w: [{}, ...]
+}
+-- out/eval --
+(struct){
+  c: (#struct){
+    w: (#list){
+      0: (#struct){
+      }
+      1: (#struct){
+        b: (int){ int }
+      }
+    }
+  }
+  #R: (#struct){
+    w: (list){
+      0: (#struct){
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  c: (〈0;#R〉 & {
+    w: [
+      {},
+      {
+        b: int
+      },
+    ]
+  })
+  #R: {
+    w: [
+      {},
+      ...,
+    ]
+  }
+}

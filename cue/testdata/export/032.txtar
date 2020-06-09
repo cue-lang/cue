@@ -24,3 +24,7 @@ foo: 3
     foo: 3
   }
 }
+-- out/eval --
+(struct){
+  foo: (int){ 3 }
+}

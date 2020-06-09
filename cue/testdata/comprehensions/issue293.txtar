@@ -1,0 +1,30 @@
+-- in.cue --
+t: #C
+#C: {
+	if true {
+		p: _
+	}
+}
+t: p: "foo"
+-- out/eval --
+(struct){
+  t: (#struct){
+    p: (string){ "foo" }
+  }
+  #C: (#struct){
+    p: (_){ _ }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t: 〈0;#C〉
+  #C: {
+    if true {
+      p: _
+    }
+  }
+  t: {
+    p: "foo"
+  }
+}

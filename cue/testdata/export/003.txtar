@@ -28,3 +28,5 @@
 {
   "hello\nworld"
 }
+-- out/eval --
+(string){ "hello\nworld" }

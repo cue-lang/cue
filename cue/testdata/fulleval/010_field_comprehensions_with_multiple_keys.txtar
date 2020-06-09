@@ -168,3 +168,50 @@ C:
     }
   }
 }
+-- out/eval --
+(struct){
+  a: (struct){
+    A: (struct){
+      b: (struct){
+        B: (struct){
+          a: (string){ "A" }
+          b: (string){ "B" }
+        }
+      }
+    }
+    C: (struct){
+      b: (struct){
+        D: (struct){
+          a: (string){ "C" }
+          b: (string){ "D" }
+        }
+      }
+    }
+    E: (struct){
+      b: (struct){
+        F: (struct){
+          a: (string){ "E" }
+          b: (string){ "F" }
+        }
+      }
+    }
+  }
+  A: (struct){
+    B: (struct){
+      a: (string){ "A" }
+      b: (string){ "B" }
+    }
+  }
+  C: (struct){
+    D: (struct){
+      a: (string){ "C" }
+      b: (string){ "D" }
+    }
+  }
+  E: (struct){
+    F: (struct){
+      a: (string){ "E" }
+      b: (string){ "F" }
+    }
+  }
+}

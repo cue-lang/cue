@@ -34,3 +34,16 @@ c: d & {
     b?: 4
   })
 }
+-- out/eval --
+(struct){
+  d: (struct){ |((struct){
+      a: (int){ 1 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  c: (struct){ |((struct){
+      a: (int){ 1 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+}

@@ -54,3 +54,15 @@ d: {
     }
   }
 }
+-- out/eval --
+(struct){
+  b: (bool){ true }
+  c: (struct){
+    a: (int){ 3 }
+  }
+  d: (_|_){
+    // [incomplete] incomplete
+    a: (int){ int }
+  }
+  a: (string){ "foo" }
+}

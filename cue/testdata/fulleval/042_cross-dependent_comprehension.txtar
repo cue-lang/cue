@@ -38,3 +38,18 @@ y: _|_ // field "c" not allowed in closed struct
   })
   y: 〈0;x〉
 }
+-- out/eval --
+(struct){
+  #a: (_|_){
+    // [incomplete] incomplete
+    b: (bool){ bool }
+  }
+  x: (#struct){
+    b: (bool){ true }
+    c: (int){ 4 }
+  }
+  y: (#struct){
+    b: (bool){ true }
+    c: (int){ 4 }
+  }
+}

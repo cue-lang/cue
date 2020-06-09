@@ -25,3 +25,12 @@ e: _|_ // conflicting values true and false
   e: true
   e: !true
 }
+-- out/eval --
+(_|_){
+  // [eval]
+  t: (bool){ true }
+  f: (bool){ false }
+  e: (_|_){
+    // [eval] incompatible values *adt.Bool and *adt.Bool
+  }
+}

@@ -15,7 +15,11 @@
 package runtime
 
 import (
+	"reflect"
 	"sync"
+
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal/core/adt"
 )
 
 // index maps conversions from label names to internal codes.
@@ -70,4 +74,26 @@ func (x *index) StringToIndex(s string) int64 {
 	x.labelMap[s] = index
 	x.labels = append(x.labels, s)
 	return int64(index)
+}
+
+func (x *index) StoreType(t reflect.Type, src ast.Expr, expr adt.Expr) {
+	if expr == nil {
+		x.typeCache.Store(t, src)
+	} else {
+		x.typeCache.Store(t, expr)
+	}
+}
+
+func (x *index) LoadType(t reflect.Type) (src ast.Expr, expr adt.Expr, ok bool) {
+	v, ok := x.typeCache.Load(t)
+	if ok {
+		switch x := v.(type) {
+		case ast.Expr:
+			return x, nil, true
+		case adt.Expr:
+			src, _ = x.Source().(ast.Expr)
+			return src, x, true
+		}
+	}
+	return nil, nil, false
 }

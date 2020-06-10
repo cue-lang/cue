@@ -10,6 +10,8 @@ b: "foo"
 c: {}
 for x in c { a: E }
 
+Z1=[Z2=string]: Z1+Z2
+
 -- out/compile --
 unreferenced alias or let clause X:
     ./in.cue:1:1
@@ -29,4 +31,5 @@ for[].a: reference "E" not found:
   for _, x in 〈0;c〉 {
     a: _|_(reference "E" not found)
   }
+  [string]: (〈0;(〈0;-〉)〉 + 〈0;-〉)
 }

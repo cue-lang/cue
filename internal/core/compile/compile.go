@@ -29,6 +29,12 @@ import (
 
 // Config configures a compilation.
 type Config struct {
+	// Scope specifies a node in which to look up unresolved references. This
+	// is useful for evaluating expressions within an already evaluated
+	// configuration.
+	//
+	// TODO
+	Scope *adt.Vertex
 }
 
 // Files compiles the given files as a single instance. It disregards
@@ -40,6 +46,23 @@ func Files(cfg *Config, r adt.Runtime, files ...*ast.File) (*adt.Vertex, errors.
 	c := newCompiler(cfg, r)
 
 	v := c.compileFiles(files)
+
+	if c.errs != nil {
+		return v, c.errs
+	}
+	return v, nil
+}
+
+func Expr(cfg *Config, r adt.Runtime, x ast.Expr) (adt.Conjunct, errors.Error) {
+	if cfg == nil {
+		cfg = &Config{}
+	}
+	c := &compiler{
+		Config: *cfg,
+		index:  r,
+	}
+
+	v := c.compileExpr(x)
 
 	if c.errs != nil {
 		return v, c.errs
@@ -204,8 +227,11 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	return res
 }
 
-func (c *compiler) compileExpr(x ast.Expr) adt.Expr {
-	return c.expr(x)
+func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
+	expr := c.expr(x)
+
+	env := &adt.Environment{}
+	return adt.MakeConjunct(env, expr)
 }
 
 // resolve assumes that all existing resolutions are legal. Validation should
@@ -379,7 +405,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			e := aliasEntry{source: a}
 
 			switch lab.(type) {
-			case *ast.Ident, *ast.BasicLit:
+			case *ast.Ident, *ast.BasicLit, *ast.ListLit:
 				// Even though we won't need the alias, we still register it
 				// for duplicate and failed reference detection.
 			default:
@@ -425,10 +451,12 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				// error
 				return c.errf(x, "list label must have one element")
 			}
+			var label adt.Feature
 			elem := l.Elts[0]
 			// TODO: record alias for error handling? In principle it is okay
 			// to have duplicates, but we do want it to be used.
 			if a, ok := elem.(*ast.Alias); ok {
+				label = c.label(a.Ident)
 				elem = a.Expr
 			}
 
@@ -436,6 +464,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				Src:    x,
 				Filter: c.expr(elem),
 				Value:  value,
+				Label:  label,
 			}
 
 		case *ast.Interpolation: // *ast.ParenExpr,

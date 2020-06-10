@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"reflect"
 	"regexp"
 
 	"github.com/cockroachdb/apd/v2"
@@ -64,6 +65,13 @@ type Runtime interface {
 	// LoadImport loads a unique Vertex associated with a given import path. It
 	// returns an error if no import for this package could be found.
 	LoadImport(importPath string) (*Vertex, errors.Error)
+
+	// StoreType associates a CUE expression with a Go type.
+	StoreType(t reflect.Type, src ast.Expr, expr Expr)
+
+	// LoadType retrieves a previously stored CUE expression for a given Go
+	// type if available.
+	LoadType(t reflect.Type) (src ast.Expr, expr Expr, ok bool)
 }
 
 type Config struct {

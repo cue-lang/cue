@@ -1,0 +1,208 @@
+
+-- in.cue --
+// foobar defines at least foo.
+package foobar
+
+// A Foo fooses stuff.
+Foo: {
+    // field1 is an int.
+    field1: int
+
+    field2: int
+
+    // duplicate field comment
+    dup3: int
+}
+
+// foos are instances of Foo.
+foos: [string]: Foo
+
+// My first little foo.
+foos: MyFoo: {
+    // local field comment.
+    field1: 0
+
+    // Dangling comment.
+
+    // other field comment.
+    field2: 1
+
+    // duplicate field comment
+    dup3: int
+}
+
+bar: {
+    // comment from bar on field 1
+    field1: int
+    // comment from bar on field 2
+    field2: int // don't include this
+}
+
+baz: bar & {
+    // comment from baz on field 1
+    field1: int
+    field2: int
+}
+
+-- out.txt --
+-- out/doc --
+[]
+[Foo]
+- A Foo fooses stuff.
+
+[Foo field1]
+- field1 is an int.
+
+[Foo field2]
+[Foo dup3]
+- duplicate field comment
+
+[foos]
+- foos are instances of Foo.
+
+[foos MyFoo]
+- My first little foo.
+
+[foos MyFoo field1]
+- local field comment.
+
+- field1 is an int.
+
+[foos MyFoo field2]
+- other field comment.
+
+[foos MyFoo dup3]
+- duplicate field comment
+
+[bar]
+[bar field1]
+- comment from bar on field 1
+
+[bar field2]
+- comment from bar on field 2
+
+[baz]
+[baz field1]
+- comment from bar on field 1
+
+- comment from baz on field 1
+
+[baz field2]
+- comment from bar on field 2
+
+-- out/definition --
+Foo: {
+	field1: int
+	field2: int
+	dup3:   int
+}
+foos: {
+	{
+		[string]: Foo_1
+	}
+	MyFoo: {
+		field1: 0
+		field2: 1
+		dup3:   int
+	}
+}
+bar: {
+	field1: int
+	field2: int
+}
+baz: {
+	bar_5
+	field1: int
+	field2: int
+}
+
+let Foo_1 = Foo
+
+let bar_5 = bar
+-- out/value --
+== Simplified
+{
+	// A Foo fooses stuff.
+	Foo: {
+		// field1 is an int.
+		field1: int
+		field2: int
+
+		// duplicate field comment
+		dup3: int
+	}
+
+	// foos are instances of Foo.
+	foos: {
+		// My first little foo.
+		MyFoo: {
+			// local field comment.
+
+			// field1 is an int.
+			field1: 0
+
+			// other field comment.
+			field2: 1
+
+			// duplicate field comment
+			dup3: int
+		}
+	}
+	bar: {
+		// comment from bar on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int
+	}
+	baz: {
+		// comment from bar on field 1
+
+		// comment from baz on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int
+	}
+}
+== Raw
+{
+	// A Foo fooses stuff.
+	Foo: {
+		// field1 is an int.
+		field1: int
+		field2: int
+
+		// duplicate field comment
+		dup3: int
+	}
+
+	// foos are instances of Foo.
+	foos: {
+		// My first little foo.
+		MyFoo: {
+			// local field comment.
+
+			// field1 is an int.
+			field1: 0
+
+			// other field comment.
+			field2: 1
+
+			// duplicate field comment
+			dup3: int
+		}
+	}
+	bar: {
+		// comment from bar on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int
+	}
+	baz: {
+		// comment from bar on field 1
+
+		// comment from baz on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int
+	}
+}

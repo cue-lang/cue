@@ -1,0 +1,49 @@
+TODO: right now precedence goes to the first list. Perhaps we should give
+precedence to the longest list. In that case, `b` would be sorted before `a`.
+
+-- a.cue --
+a: 1
+c: 2
+e: 3
+g: 4
+
+-- b.cue --
+b: 1 // unanchored
+c: 2
+e: 3
+f: 4
+g: 4
+-- out/definition --
+a: 1
+b: 1
+c: 2
+e: 3
+f: 4
+g: 4
+-- out/doc --
+[]
+[a]
+[c]
+[e]
+[g]
+[b]
+[f]
+-- out/value --
+== Simplified
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}
+== Raw
+{
+	a: 1
+	b: 1
+	c: 2
+	e: 3
+	f: 4
+	g: 4
+}

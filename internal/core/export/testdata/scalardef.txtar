@@ -1,0 +1,28 @@
+cue eval ./pkg:foo
+
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- in.cue --
+package test
+
+import pkg2 "example.com/foo/pkg1"
+#pkg1: pkg2.Object
+
+"Hello \(#pkg1)!"
+
+-- foo/pkg1/file.cue --
+package pkg1
+
+Object: "World"
+
+-- out/eval --
+(string){ "Hello World!" }
+-- out/doc --
+[]
+[#pkg1]
+-- out/definition --
+import pkg2 "example.com/foo/pkg1"
+
+"Hello \(#pkg1)!"
+#pkg1: pkg2.Object

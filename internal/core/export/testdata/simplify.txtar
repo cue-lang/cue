@@ -1,0 +1,30 @@
+-- in.cue --
+
+x: [string]: int64
+x: {
+    y: int
+}
+-- out/definition --
+x: {
+	{
+		[string]: int64
+	}
+	y: int
+}
+-- out/doc --
+[]
+[x]
+[x y]
+-- out/value --
+== Simplified
+{
+	x: {
+		y: int64
+	}
+}
+== Raw
+{
+	x: {
+		y: >=-9223372036854775808 & <=9223372036854775807 & int
+	}
+}

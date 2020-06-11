@@ -203,12 +203,12 @@ var constraints = []*constraint{
 		for _, x := range s.listItems("enum", n, true) {
 			a = append(a, s.value(x))
 		}
-		s.addConjunct(ast.NewBinExpr(token.OR, a...))
+		s.addConjunct(n, ast.NewBinExpr(token.OR, a...))
 		s.typeOptional = true
 	}),
 
 	p1d("const", 6, func(n cue.Value, s *state) {
-		s.addConjunct(s.value(n))
+		s.addConjunct(n, s.value(n))
 	}),
 
 	p1("default", func(n cue.Value, s *state) {
@@ -268,7 +268,7 @@ var constraints = []*constraint{
 			expr = &ast.BadExpr{From: n.Pos()}
 		}
 
-		s.addConjunct(expr)
+		s.addConjunct(n, expr)
 	}),
 
 	// Combinators
@@ -360,22 +360,22 @@ var constraints = []*constraint{
 			return
 		}
 		s.usedTypes |= cue.StringKind
-		s.addConjunct(&ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
+		s.addConjunct(n, &ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
 	}),
 
 	p1("minLength", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 		min := s.number(n)
-		strings := s.addImport("strings")
-		s.addConjunct(ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
+		strings := s.addImport(n, "strings")
+		s.addConjunct(n, ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
 
 	}),
 
 	p1("maxLength", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 		max := s.number(n)
-		strings := s.addImport("strings")
-		s.addConjunct(ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
+		strings := s.addImport(n, "strings")
+		s.addConjunct(n, ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
 	}),
 
 	p1d("contentMediaType", 7, func(n cue.Value, s *state) {
@@ -396,24 +396,24 @@ var constraints = []*constraint{
 
 	p1("minimum", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(&ast.UnaryExpr{Op: token.GEQ, X: s.number(n)})
+		s.addConjunct(n, &ast.UnaryExpr{Op: token.GEQ, X: s.number(n)})
 	}),
 
 	p1("exclusiveMinimum", func(n cue.Value, s *state) {
 		// TODO: should we support Draft 4 booleans?
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(&ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
+		s.addConjunct(n, &ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
 	}),
 
 	p1("maximum", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(&ast.UnaryExpr{Op: token.LEQ, X: s.number(n)})
+		s.addConjunct(n, &ast.UnaryExpr{Op: token.LEQ, X: s.number(n)})
 	}),
 
 	p1("exclusiveMaximum", func(n cue.Value, s *state) {
 		// TODO: should we support Draft 4 booleans?
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(&ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
+		s.addConjunct(n, &ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
 	}),
 
 	p1("multipleOf", func(n cue.Value, s *state) {
@@ -424,8 +424,8 @@ var constraints = []*constraint{
 		if x.Cmp(big.NewInt(0)) != 1 {
 			s.errf(n, `"multipleOf" value must be < 0; found %s`, n)
 		}
-		math := s.addImport("math")
-		s.addConjunct(ast.NewCall(ast.NewSel(math, "MultipleOf"), multiple))
+		math := s.addImport(n, "math")
+		s.addConjunct(n, ast.NewCall(ast.NewSel(math, "MultipleOf"), multiple))
 	}),
 
 	// Object constraints
@@ -515,7 +515,7 @@ var constraints = []*constraint{
 		// [=~pattern]: _
 		if names, _ := s.schemaState(n, cue.StringKind, nil, false); !isAny(names) {
 			s.usedTypes |= cue.StructKind
-			s.addConjunct(ast.NewStruct(ast.NewList((names)), ast.NewIdent("_")))
+			s.addConjunct(n, ast.NewStruct(ast.NewList((names)), ast.NewIdent("_")))
 		}
 	}),
 
@@ -523,15 +523,15 @@ var constraints = []*constraint{
 	// p1("minProperties", func(n cue.Value, s *state) {
 	// 	s.usedTypes |= cue.StructKind
 
-	// 	pkg := s.addImport("struct")
-	// 	s.addConjunct(ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n)))
+	// 	pkg := s.addImport(n, "struct")
+	// 	s.addConjunct(n, ast.NewCall(ast.NewSel(pkg, "MinFields"), s.uint(n)))
 	// }),
 
 	p1("maxProperties", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
 
-		pkg := s.addImport("struct")
-		s.addConjunct(ast.NewCall(ast.NewSel(pkg, "MaxFields"), s.uint(n)))
+		pkg := s.addImport(n, "struct")
+		s.addConjunct(n, ast.NewCall(ast.NewSel(pkg, "MaxFields"), s.uint(n)))
 	}),
 
 	p1("dependencies", func(n cue.Value, s *state) {
@@ -616,7 +616,7 @@ var constraints = []*constraint{
 		case cue.StructKind:
 			elem := s.schema(n)
 			ast.SetRelPos(elem, token.NoRelPos)
-			s.addConjunct(ast.NewList(&ast.Ellipsis{Type: elem}))
+			s.addConjunct(n, ast.NewList(&ast.Ellipsis{Type: elem}))
 
 		case cue.ListKind:
 			var a []ast.Expr
@@ -626,7 +626,7 @@ var constraints = []*constraint{
 				a = append(a, v)
 			}
 			s.list = ast.NewList(a...)
-			s.addConjunct(s.list)
+			s.addConjunct(n, s.list)
 
 		default:
 			s.errf(n, `value of "items" must be an object or array`)
@@ -652,10 +652,10 @@ var constraints = []*constraint{
 
 	p1("contains", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
-		list := s.addImport("list")
+		list := s.addImport(n, "list")
 		// TODO: Passing non-concrete values is not yet supported in CUE.
 		if x := s.schema(n); !isAny(x) {
-			s.addConjunct(ast.NewCall(ast.NewSel(list, "Contains"), clearPos(x)))
+			s.addConjunct(n, ast.NewCall(ast.NewSel(list, "Contains"), clearPos(x)))
 		}
 	}),
 
@@ -671,24 +671,24 @@ var constraints = []*constraint{
 		for ; p > 0; p-- {
 			a = append(a, ast.NewIdent("_"))
 		}
-		s.addConjunct(ast.NewList(append(a, &ast.Ellipsis{})...))
+		s.addConjunct(n, ast.NewList(append(a, &ast.Ellipsis{})...))
 
 		// TODO: use this once constraint resolution is properly implemented.
-		// list := s.addImport("list")
-		// s.addConjunct(ast.NewCall(ast.NewSel(list, "MinItems"), clearPos(s.uint(n))))
+		// list := s.addImport(n, "list")
+		// s.addConjunct(n, ast.NewCall(ast.NewSel(list, "MinItems"), clearPos(s.uint(n))))
 	}),
 
 	p1("maxItems", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
-		list := s.addImport("list")
-		s.addConjunct(ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n))))
+		list := s.addImport(n, "list")
+		s.addConjunct(n, ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n))))
 	}),
 
 	p1("uniqueItems", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		if s.boolValue(n) {
-			list := s.addImport("list")
-			s.addConjunct(ast.NewCall(ast.NewSel(list, "UniqueItems")))
+			list := s.addImport(n, "list")
+			s.addConjunct(n, ast.NewCall(ast.NewSel(list, "UniqueItems")))
 		}
 	}),
 }

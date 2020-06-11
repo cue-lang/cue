@@ -46,7 +46,7 @@ type decoder struct {
 }
 
 // addImport registers
-func (d *decoder) addImport(pkg string) *ast.Ident {
+func (d *decoder) addImport(n cue.Value, pkg string) *ast.Ident {
 	spec := ast.NewImport(nil, pkg)
 	info, err := astutil.ParseImportSpec(spec)
 	if err != nil {
@@ -54,6 +54,7 @@ func (d *decoder) addImport(pkg string) *ast.Ident {
 	}
 	ident := ast.NewIdent(info.Ident)
 	ident.Node = spec
+	ast.SetPos(ident, n.Pos())
 
 	return ident
 }
@@ -405,8 +406,10 @@ func (s *state) doc(n ast.Node) {
 	}
 }
 
-func (s *state) addConjunct(e ast.Expr) {
+func (s *state) addConjunct(n cue.Value, e ast.Expr) {
 	if !isAny(e) {
+		ast.SetPos(e, n.Pos())
+		ast.SetRelPos(e, token.NoRelPos)
 		s.conjuncts = append(s.conjuncts, e)
 	}
 }

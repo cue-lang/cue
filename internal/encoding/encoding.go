@@ -267,7 +267,9 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 
 			Strict: cfg.Strict,
 		}
-		file, err = simplify(jsonschema.Extract(i, cfg))
+		file, err = jsonschema.Extract(i, cfg)
+		// TODO: simplify currently erases file line info. Reintroduce after fix.
+		// file, err = simplify(file, err)
 		return file, id, err
 	}
 }
@@ -275,7 +277,9 @@ func jsonSchemaFunc(cfg *Config, f *build.File) interpretFunc {
 func openAPIFunc(c *Config, f *build.File) interpretFunc {
 	cfg := &openapi.Config{PkgName: c.PkgName}
 	return func(i *cue.Instance) (file *ast.File, id string, err error) {
-		file, err = simplify(openapi.Extract(i, cfg))
+		file, err = openapi.Extract(i, cfg)
+		// TODO: simplify currently erases file line info. Reintroduce after fix.
+		// file, err = simplify(file, err)
 		return file, "", err
 	}
 }
@@ -431,6 +435,8 @@ func simplify(f *ast.File, err error) (*ast.File, error) {
 	if err != nil {
 		return nil, err
 	}
+	// This needs to be a function that modifies f in order to maintain line
+	// number information.
 	b, err := format.Node(f, format.Simplify())
 	if err != nil {
 		return nil, err

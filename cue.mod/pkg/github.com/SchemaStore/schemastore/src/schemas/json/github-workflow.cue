@@ -424,8 +424,7 @@ import "strings"
 					// environment variables. The variable is prefixed with INPUT_
 					// and converted to upper case.
 					with?: #env & {
-						args?: string, entrypoint?: string
-						...
+						args?: string, entrypoint?: string, ...
 					}
 
 					// Prevents a job from failing when a step fails. Set to true to
@@ -466,7 +465,7 @@ import "strings"
 					// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
 					matrix: {
 						{[=~"^(in|ex)clude$" & !~"^()$"]: [...{
-							[string]: #configuration
+											[string]: #configuration
 						}] & [_, ...]}
 
 						{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...]}

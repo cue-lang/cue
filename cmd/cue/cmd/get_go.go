@@ -942,7 +942,7 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 	switch x := expr.(type) {
 	case *types.Pointer:
 		return &cueast.BinaryExpr{
-			X:  e.ident("null", false),
+			X:  cueast.NewNull(),
 			Op: cuetoken.OR,
 			Y:  e.makeType(x.Elem()),
 		}

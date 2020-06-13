@@ -613,7 +613,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 
 	case *nullLit:
-		return &ast.BasicLit{Kind: token.NULL, Value: "null"}
+		return ast.NewNull()
 
 	case *boolLit:
 		return ast.NewBool(x.b)

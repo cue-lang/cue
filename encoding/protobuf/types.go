@@ -99,7 +99,7 @@ func (p *protoConverter) mapBuiltinPackage(pos scanner.Position, file string, re
 		}, nil)
 
 		p.setBuiltin("google.protobuf.NullValue", func() ast.Expr {
-			return ast.NewLit(token.NULL, "null")
+			return ast.NewNull()
 		}, nil)
 
 		p.setBuiltin("google.protobuf.ListValue", func() ast.Expr {

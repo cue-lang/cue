@@ -314,7 +314,7 @@ func (s *state) finalize() (e ast.Expr) {
 		switch k {
 		case cue.NullKind:
 			// TODO: handle OpenAPI restrictions.
-			add(ast.NewIdent("null"))
+			add(ast.NewNull())
 		case cue.BoolKind:
 			add(ast.NewIdent("bool"))
 		case cue.StringKind:

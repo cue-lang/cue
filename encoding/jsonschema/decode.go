@@ -20,8 +20,8 @@ package jsonschema
 
 import (
 	"fmt"
-	"math/bits"
 	"net/url"
+	"sort"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -225,6 +225,85 @@ func (d *decoder) strValue(n cue.Value) (s string, ok bool) {
 
 // const draftCutoff = 5
 
+type coreType int
+
+const (
+	nullType coreType = iota
+	boolType
+	numType
+	stringType
+	arrayType
+	objectType
+
+	numCoreTypes
+)
+
+var coreToCUE = []cue.Kind{
+	nullType:   cue.NullKind,
+	boolType:   cue.BoolKind,
+	numType:    cue.FloatKind,
+	stringType: cue.StringKind,
+	arrayType:  cue.ListKind,
+	objectType: cue.StructKind,
+}
+
+func kindToAST(k cue.Kind) ast.Expr {
+	switch k {
+	case cue.NullKind:
+		// TODO: handle OpenAPI restrictions.
+		return ast.NewNull()
+	case cue.BoolKind:
+		return ast.NewIdent("bool")
+	case cue.FloatKind:
+		return ast.NewIdent("number")
+	case cue.StringKind:
+		return ast.NewIdent("string")
+	case cue.ListKind:
+		return ast.NewList(&ast.Ellipsis{})
+	case cue.StructKind:
+		return ast.NewStruct(&ast.Ellipsis{})
+	}
+	return nil
+}
+
+var coreTypeName = []string{
+	nullType:   "null",
+	boolType:   "bool",
+	numType:    "number",
+	stringType: "string",
+	arrayType:  "array",
+	objectType: "object",
+}
+
+type constraintInfo struct {
+	// typ is an identifier for the root type, if present.
+	// This can be omitted if there are constraints.
+	typ         ast.Expr
+	constraints []ast.Expr
+}
+
+func (c *constraintInfo) setTypeUsed(n cue.Value, t coreType) {
+	c.typ = kindToAST(coreToCUE[t])
+	setPos(c.typ, n)
+	ast.SetRelPos(c.typ, token.NoRelPos)
+}
+
+func (c *constraintInfo) add(n cue.Value, x ast.Expr) {
+	if !isAny(x) {
+		setPos(x, n)
+		ast.SetRelPos(x, token.NoRelPos)
+		c.constraints = append(c.constraints, x)
+	}
+}
+
+func (s *state) add(n cue.Value, t coreType, x ast.Expr) {
+	s.types[t].add(n, x)
+}
+
+func (s *state) setTypeUsed(n cue.Value, t coreType) {
+	s.types[t].setTypeUsed(n, t)
+}
+
 type state struct {
 	*decoder
 
@@ -240,7 +319,10 @@ type state struct {
 
 	pos cue.Value
 
-	typeOptional bool
+	// The constraints in types represent disjunctions per type.
+	types [numCoreTypes]constraintInfo
+	all   constraintInfo // values and oneOf etc.
+
 	usedTypes    cue.Kind
 	allowedTypes cue.Kind
 
@@ -253,8 +335,6 @@ type state struct {
 	id          *url.URL // base URI for $ref
 
 	definitions []ast.Decl
-
-	conjuncts []ast.Expr
 
 	// Used for inserting definitions, properties, etc.
 	hasSelfReference bool
@@ -279,9 +359,24 @@ type refs struct {
 	refs  []*ast.Ident
 }
 
+func (s *state) object(n cue.Value) *ast.StructLit {
+	if s.obj == nil {
+		s.obj = &ast.StructLit{}
+		s.add(n, objectType, s.obj)
+	}
+	return s.obj
+}
+
 func (s *state) hasConstraints() bool {
-	return len(s.conjuncts) > 0 ||
-		len(s.patterns) > 0 ||
+	if len(s.all.constraints) > 0 {
+		return true
+	}
+	for _, t := range s.types {
+		if len(t.constraints) > 0 {
+			return true
+		}
+	}
+	return len(s.patterns) > 0 ||
 		s.title != "" ||
 		s.description != "" ||
 		s.obj != nil
@@ -295,59 +390,77 @@ func (s *state) finalize() (e ast.Expr) {
 	conjuncts := []ast.Expr{}
 	disjuncts := []ast.Expr{}
 
-	add := func(e ast.Expr) {
-		disjuncts = append(disjuncts, e) // TODO: use setPos
-	}
-
 	types := s.allowedTypes &^ s.usedTypes
 	if types == allTypes {
-		add(ast.NewIdent("_"))
+		disjuncts = append(disjuncts, ast.NewIdent("_"))
 		types = 0
 	}
-	if types&cue.FloatKind != 0 {
-		add(ast.NewIdent("number"))
-		types &^= cue.IntKind
-	}
-	for types != 0 {
-		k := cue.Kind(1 << uint(bits.TrailingZeros(uint(types))))
-		types &^= k
 
-		switch k {
-		case cue.NullKind:
-			// TODO: handle OpenAPI restrictions.
-			add(ast.NewNull())
-		case cue.BoolKind:
-			add(ast.NewIdent("bool"))
-		case cue.StringKind:
-			add(ast.NewIdent("string"))
-		case cue.IntKind:
-			add(ast.NewIdent("int"))
-		case cue.ListKind:
-			add(ast.NewList(&ast.Ellipsis{}))
-		case cue.StructKind:
-			add(ast.NewStruct(&ast.Ellipsis{}))
+	// Sort literal structs and list last for nicer formatting.
+	sort.SliceStable(s.types[arrayType].constraints, func(i, j int) bool {
+		_, ok := s.types[arrayType].constraints[i].(*ast.ListLit)
+		return !ok
+	})
+	sort.SliceStable(s.types[objectType].constraints, func(i, j int) bool {
+		_, ok := s.types[objectType].constraints[i].(*ast.StructLit)
+		return !ok
+	})
+
+	for i, t := range s.types {
+		k := coreToCUE[i]
+		isAllowed := s.allowedTypes&k != 0
+		if len(t.constraints) > 0 {
+			if t.typ == nil && !isAllowed {
+				for _, c := range t.constraints {
+					s.addErr(errors.Newf(c.Pos(),
+						"constraint not allowed because type %s is excluded",
+						coreTypeName[i],
+					))
+				}
+				continue
+			}
+			x := ast.NewBinExpr(token.AND, t.constraints...)
+			disjuncts = append(disjuncts, x)
+		} else if s.usedTypes&k != 0 {
+			continue
+		} else if t.typ != nil {
+			if !isAllowed {
+				s.addErr(errors.Newf(t.typ.Pos(),
+					"constraint not allowed because type %s is excluded",
+					coreTypeName[i],
+				))
+				continue
+			}
+			disjuncts = append(disjuncts, t.typ)
+		} else if types&k != 0 {
+			x := kindToAST(k)
+			if x != nil {
+				disjuncts = append(disjuncts, x)
+			}
 		}
 	}
 
-	conjuncts = append(conjuncts, s.conjuncts...)
+	conjuncts = append(conjuncts, s.all.constraints...)
 
-	if s.obj != nil {
+	obj := s.obj
+	if obj == nil {
+		obj, _ = s.types[objectType].typ.(*ast.StructLit)
+	}
+	if obj != nil {
 		// TODO: may need to explicitly close.
 		if !s.closeStruct {
-			s.obj.Elts = append(s.obj.Elts, &ast.Ellipsis{})
+			obj.Elts = append(obj.Elts, &ast.Ellipsis{})
 		}
-		conjuncts = append(conjuncts, s.obj)
 	}
 
-	if len(conjuncts) > 0 {
-		disjuncts = append(disjuncts,
-			ast.NewBinExpr(token.AND, conjuncts...))
+	if len(disjuncts) > 0 {
+		conjuncts = append(conjuncts, ast.NewBinExpr(token.OR, disjuncts...))
 	}
 
-	if len(disjuncts) == 0 {
+	if len(conjuncts) == 0 {
 		e = &ast.BottomLit{}
 	} else {
-		e = ast.NewBinExpr(token.OR, disjuncts...)
+		e = ast.NewBinExpr(token.AND, conjuncts...)
 	}
 
 	if s.default_ != nil {
@@ -403,14 +516,6 @@ func (s *state) doc(n ast.Node) {
 	doc := s.comment()
 	if doc != nil {
 		ast.SetComments(n, []*ast.CommentGroup{doc})
-	}
-}
-
-func (s *state) addConjunct(n cue.Value, e ast.Expr) {
-	if !isAny(e) {
-		ast.SetPos(e, n.Pos())
-		ast.SetRelPos(e, token.NoRelPos)
-		s.conjuncts = append(s.conjuncts, e)
 	}
 }
 

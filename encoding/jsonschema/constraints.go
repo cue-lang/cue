@@ -144,12 +144,11 @@ var constraints = []*constraint{
 		}
 		s.id = u
 
-		if s.obj == nil {
-			s.obj = &ast.StructLit{}
-		}
+		obj := s.object(n)
+
 		// TODO: handle the case where this is always defined and we don't want
 		// to include the default value.
-		s.obj.Elts = append(s.obj.Elts, &ast.Attribute{
+		obj.Elts = append(obj.Elts, &ast.Attribute{
 			Text: fmt.Sprintf("@jsonschema(id=%q)", u)})
 	}),
 
@@ -165,19 +164,27 @@ var constraints = []*constraint{
 			switch str {
 			case "null":
 				types |= cue.NullKind
+				s.setTypeUsed(n, nullType)
 				// TODO: handle OpenAPI restrictions.
 			case "boolean":
 				types |= cue.BoolKind
+				s.setTypeUsed(n, boolType)
 			case "string":
 				types |= cue.StringKind
+				s.setTypeUsed(n, stringType)
 			case "number":
 				types |= cue.NumberKind
+				s.setTypeUsed(n, numType)
 			case "integer":
 				types |= cue.IntKind
+				s.setTypeUsed(n, numType)
+				s.add(n, numType, ast.NewIdent("int"))
 			case "array":
 				types |= cue.ListKind
+				s.setTypeUsed(n, arrayType)
 			case "object":
 				types |= cue.StructKind
+				s.setTypeUsed(n, objectType)
 
 			default:
 				s.errf(n, "unknown type %q", n)
@@ -203,19 +210,17 @@ var constraints = []*constraint{
 		for _, x := range s.listItems("enum", n, true) {
 			a = append(a, s.value(x))
 		}
-		s.addConjunct(n, ast.NewBinExpr(token.OR, a...))
-		s.typeOptional = true
+		s.all.add(n, ast.NewBinExpr(token.OR, a...))
 	}),
 
 	p1d("const", 6, func(n cue.Value, s *state) {
-		s.addConjunct(n, s.value(n))
+		s.all.add(n, s.value(n))
 	}),
 
 	p1("default", func(n cue.Value, s *state) {
-		allowed, used := s.allowedTypes, s.usedTypes
-		s.default_ = s.value(n)
-		s.allowedTypes, s.usedTypes = allowed, used
-		// must validate that the default is subsumed by the normal value,
+		sc := *s
+		s.default_ = sc.value(n)
+		// TODO: must validate that the default is subsumed by the normal value,
 		// as CUE will otherwise broaden the accepted values with the default.
 		s.examples = append(s.examples, s.default_)
 	}),
@@ -268,7 +273,7 @@ var constraints = []*constraint{
 			expr = &ast.BadExpr{From: n.Pos()}
 		}
 
-		s.addConjunct(n, expr)
+		s.all.add(n, expr)
 	}),
 
 	// Combinators
@@ -302,7 +307,7 @@ var constraints = []*constraint{
 			}
 		}
 		if len(a) > 0 {
-			s.conjuncts = append(s.conjuncts, ast.NewBinExpr(token.AND, a...))
+			s.all.add(n, ast.NewBinExpr(token.AND, a...))
 		}
 	}),
 
@@ -312,13 +317,11 @@ var constraints = []*constraint{
 		for _, v := range s.listItems("anyOf", n, false) {
 			x, sub := s.schemaState(v, s.allowedTypes, nil, true)
 			types |= sub.allowedTypes
-			if sub.hasConstraints() {
-				a = append(a, x)
-			}
+			a = append(a, x)
 		}
 		s.allowedTypes &= types
 		if len(a) > 0 {
-			s.conjuncts = append(s.conjuncts, ast.NewBinExpr(token.OR, a...))
+			s.all.add(n, ast.NewBinExpr(token.OR, a...))
 		}
 	}),
 
@@ -342,7 +345,7 @@ var constraints = []*constraint{
 		s.allowedTypes &= types
 		if len(a) > 0 && hasSome {
 			s.usedTypes = allTypes
-			s.conjuncts = append(s.conjuncts, ast.NewBinExpr(token.OR, a...))
+			s.all.add(n, ast.NewBinExpr(token.OR, a...))
 		}
 
 		// TODO: oneOf({a:x}, {b:y}, ..., not(anyOf({a:x}, {b:y}, ...))),
@@ -360,22 +363,21 @@ var constraints = []*constraint{
 			return
 		}
 		s.usedTypes |= cue.StringKind
-		s.addConjunct(n, &ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
+		s.add(n, stringType, &ast.UnaryExpr{Op: token.MAT, X: s.string(n)})
 	}),
 
 	p1("minLength", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 		min := s.number(n)
 		strings := s.addImport(n, "strings")
-		s.addConjunct(n, ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
-
+		s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MinRunes"), min))
 	}),
 
 	p1("maxLength", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StringKind
 		max := s.number(n)
 		strings := s.addImport(n, "strings")
-		s.addConjunct(n, ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
+		s.add(n, stringType, ast.NewCall(ast.NewSel(strings, "MaxRunes"), max))
 	}),
 
 	p1d("contentMediaType", 7, func(n cue.Value, s *state) {
@@ -396,24 +398,24 @@ var constraints = []*constraint{
 
 	p1("minimum", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(n, &ast.UnaryExpr{Op: token.GEQ, X: s.number(n)})
+		s.add(n, numType, &ast.UnaryExpr{Op: token.GEQ, X: s.number(n)})
 	}),
 
 	p1("exclusiveMinimum", func(n cue.Value, s *state) {
 		// TODO: should we support Draft 4 booleans?
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(n, &ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
+		s.add(n, numType, &ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
 	}),
 
 	p1("maximum", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(n, &ast.UnaryExpr{Op: token.LEQ, X: s.number(n)})
+		s.add(n, numType, &ast.UnaryExpr{Op: token.LEQ, X: s.number(n)})
 	}),
 
 	p1("exclusiveMaximum", func(n cue.Value, s *state) {
 		// TODO: should we support Draft 4 booleans?
 		s.usedTypes |= cue.NumberKind
-		s.addConjunct(n, &ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
+		s.add(n, numType, &ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
 	}),
 
 	p1("multipleOf", func(n cue.Value, s *state) {
@@ -425,17 +427,15 @@ var constraints = []*constraint{
 			s.errf(n, `"multipleOf" value must be < 0; found %s`, n)
 		}
 		math := s.addImport(n, "math")
-		s.addConjunct(n, ast.NewCall(ast.NewSel(math, "MultipleOf"), multiple))
+		s.add(n, numType, ast.NewCall(ast.NewSel(math, "MultipleOf"), multiple))
 	}),
 
 	// Object constraints
 
 	p1("properties", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.StructKind
+		obj := s.object(n)
 
-		if s.obj == nil {
-			s.obj = &ast.StructLit{}
-		}
 		if n.Kind() != cue.StructKind {
 			s.errf(n, `"properties" expected an object, found %v`, n.Kind)
 		}
@@ -447,7 +447,7 @@ var constraints = []*constraint{
 			f := &ast.Field{Label: name, Value: expr}
 			state.doc(f)
 			f.Optional = token.Blank.Pos()
-			if len(s.obj.Elts) > 0 && len(f.Comments()) > 0 {
+			if len(obj.Elts) > 0 && len(f.Comments()) > 0 {
 				// TODO: change formatter such that either a a NewSection on the
 				// field or doc comment will cause a new section.
 				ast.SetRelPos(f.Comments()[0], token.NewSection)
@@ -455,12 +455,12 @@ var constraints = []*constraint{
 			if state.deprecated {
 				switch expr.(type) {
 				case *ast.StructLit:
-					s.obj.Elts = append(s.obj.Elts, addTag(name, "deprecated", ""))
+					obj.Elts = append(obj.Elts, addTag(name, "deprecated", ""))
 				default:
 					f.Attrs = append(f.Attrs, internal.NewAttr("deprecated", ""))
 				}
 			}
-			s.obj.Elts = append(s.obj.Elts, f)
+			obj.Elts = append(obj.Elts, f)
 			s.setField(label{name: key}, f)
 		})
 	}),
@@ -473,15 +473,13 @@ var constraints = []*constraint{
 
 		s.usedTypes |= cue.StructKind
 
-		if s.obj == nil {
-			s.obj = &ast.StructLit{}
-			// TODO: detect that properties is defined somewhere.
-			// s.errf(n, `"required" without a "properties" field`)
-		}
+		// TODO: detect that properties is defined somewhere.
+		// s.errf(n, `"required" without a "properties" field`)
+		obj := s.object(n)
 
 		// Create field map
 		fields := map[string]*ast.Field{}
-		for _, d := range s.obj.Elts {
+		for _, d := range obj.Elts {
 			f, ok := d.(*ast.Field)
 			if !ok {
 				continue // Could be embedding? See cirrus.json
@@ -501,7 +499,7 @@ var constraints = []*constraint{
 					Value: ast.NewIdent("_"),
 				}
 				fields[str] = f
-				s.obj.Elts = append(s.obj.Elts, f)
+				obj.Elts = append(obj.Elts, f)
 				continue
 			}
 			if f.Optional == token.NoPos {
@@ -515,7 +513,8 @@ var constraints = []*constraint{
 		// [=~pattern]: _
 		if names, _ := s.schemaState(n, cue.StringKind, nil, false); !isAny(names) {
 			s.usedTypes |= cue.StructKind
-			s.addConjunct(n, ast.NewStruct(ast.NewList((names)), ast.NewIdent("_")))
+			x := ast.NewStruct(ast.NewList(names), ast.NewIdent("_"))
+			s.add(n, objectType, x)
 		}
 	}),
 
@@ -531,7 +530,8 @@ var constraints = []*constraint{
 		s.usedTypes |= cue.StructKind
 
 		pkg := s.addImport(n, "struct")
-		s.addConjunct(n, ast.NewCall(ast.NewSel(pkg, "MaxFields"), s.uint(n)))
+		x := ast.NewCall(ast.NewSel(pkg, "MaxFields"), s.uint(n))
+		s.add(n, objectType, x)
 	}),
 
 	p1("dependencies", func(n cue.Value, s *state) {
@@ -554,9 +554,7 @@ var constraints = []*constraint{
 		if n.Kind() != cue.StructKind {
 			s.errf(n, `value of "patternProperties" must be an an object, found %v`, n.Kind)
 		}
-		if s.obj == nil {
-			s.obj = &ast.StructLit{}
-		}
+		obj := s.object(n)
 		existing := excludeFields(s.obj.Elts)
 		s.processMap(n, func(key string, n cue.Value) {
 			// [!~(properties) & pattern]: schema
@@ -569,7 +567,7 @@ var constraints = []*constraint{
 				Value: s.schema(n),
 			}))
 			ast.SetRelPos(f, token.NewSection)
-			s.obj.Elts = append(s.obj.Elts, f)
+			obj.Elts = append(obj.Elts, f)
 		})
 	}),
 
@@ -584,24 +582,21 @@ var constraints = []*constraint{
 		case cue.StructKind:
 			s.usedTypes |= cue.StructKind
 			s.closeStruct = true
-			if s.obj == nil {
-				s.obj = &ast.StructLit{}
-			}
-			if len(s.obj.Elts) == 0 {
-				s.obj.Elts = append(s.obj.Elts, &ast.Field{
+			obj := s.object(n)
+			if len(obj.Elts) == 0 {
+				obj.Elts = append(obj.Elts, &ast.Field{
 					Label: ast.NewList(ast.NewIdent("string")),
 					Value: s.schema(n),
 				})
 				return
 			}
 			// [!~(properties|patternProperties)]: schema
-			existing := append(s.patterns, excludeFields(s.obj.Elts))
+			existing := append(s.patterns, excludeFields(obj.Elts))
 			f := internal.EmbedStruct(ast.NewStruct(&ast.Field{
 				Label: ast.NewList(ast.NewBinExpr(token.AND, existing...)),
 				Value: s.schema(n),
 			}))
-			ast.SetRelPos(f, token.NewSection)
-			s.obj.Elts = append(s.obj.Elts, f)
+			obj.Elts = append(obj.Elts, f)
 
 		default:
 			s.errf(n, `value of "additionalProperties" must be an object or boolean`)
@@ -616,7 +611,7 @@ var constraints = []*constraint{
 		case cue.StructKind:
 			elem := s.schema(n)
 			ast.SetRelPos(elem, token.NoRelPos)
-			s.addConjunct(n, ast.NewList(&ast.Ellipsis{Type: elem}))
+			s.add(n, arrayType, ast.NewList(&ast.Ellipsis{Type: elem}))
 
 		case cue.ListKind:
 			var a []ast.Expr
@@ -626,7 +621,7 @@ var constraints = []*constraint{
 				a = append(a, v)
 			}
 			s.list = ast.NewList(a...)
-			s.addConjunct(n, s.list)
+			s.add(n, arrayType, s.list)
 
 		default:
 			s.errf(n, `value of "items" must be an object or array`)
@@ -655,7 +650,8 @@ var constraints = []*constraint{
 		list := s.addImport(n, "list")
 		// TODO: Passing non-concrete values is not yet supported in CUE.
 		if x := s.schema(n); !isAny(x) {
-			s.addConjunct(n, ast.NewCall(ast.NewSel(list, "Contains"), clearPos(x)))
+			x := ast.NewCall(ast.NewSel(list, "Contains"), clearPos(x))
+			s.add(n, arrayType, x)
 		}
 	}),
 
@@ -671,7 +667,7 @@ var constraints = []*constraint{
 		for ; p > 0; p-- {
 			a = append(a, ast.NewIdent("_"))
 		}
-		s.addConjunct(n, ast.NewList(append(a, &ast.Ellipsis{})...))
+		s.add(n, arrayType, ast.NewList(append(a, &ast.Ellipsis{})...))
 
 		// TODO: use this once constraint resolution is properly implemented.
 		// list := s.addImport(n, "list")
@@ -681,14 +677,16 @@ var constraints = []*constraint{
 	p1("maxItems", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		list := s.addImport(n, "list")
-		s.addConjunct(n, ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n))))
+		x := ast.NewCall(ast.NewSel(list, "MaxItems"), clearPos(s.uint(n)))
+		s.add(n, arrayType, x)
+
 	}),
 
 	p1("uniqueItems", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.ListKind
 		if s.boolValue(n) {
 			list := s.addImport(n, "list")
-			s.addConjunct(n, ast.NewCall(ast.NewSel(list, "UniqueItems")))
+			s.add(n, arrayType, ast.NewCall(ast.NewSel(list, "UniqueItems")))
 		}
 	}),
 }

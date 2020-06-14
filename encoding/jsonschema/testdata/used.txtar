@@ -1,0 +1,48 @@
+-- used.json --
+{
+    "$defs": {
+        "enum": {
+            "type": "string",
+            "enum": [ "a", "b", "c" ]
+        },
+        "lists": {
+            "description": "Single item or lists of various lengths.",
+            "oneOf": [
+                {
+                    "type": "string",
+                    "enum": [ "a", "b", "c" ]
+                },
+                {
+                    "type": "array",
+                    "oneOf": [
+                        {
+                            "items": [ { "const": "X" } ]
+                        },
+                        {
+                            "items": [
+                                { "const": "X" },
+                                {
+                                    "type": "string",
+                                    "enum": [ "a", "b", "c" ]
+                                }
+                            ]
+                        },
+                        {
+                            "items": [
+                                { "const": "X" },
+                                { "enum": [ "d", "e", "f" ] }
+                            ]
+                        }
+                    ],
+                    "additionalItems": false
+                }
+            ]
+        }
+    }
+}
+-- out.cue --
+_
+
+#enum: "a" | "b" | "c"
+
+#lists: "a" | "b" | "c" | (["X"] | ["X", "a" | "b" | "c"] | ["X", "d" | "e" | "f"])

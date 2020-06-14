@@ -217,7 +217,7 @@ info: {
 }
 #Foo: {
 	a: int
-	b: >=0 & <10
+	b: uint & <10
 	...
 }
 -- expect-cue2 --
@@ -231,7 +231,7 @@ info: {
 }
 #Foo: {
 	a: int
-	b: >=0 & <10
+	b: uint & <10
 	...
 }
 -- expect-cue2 --
@@ -245,7 +245,7 @@ info: {
 }
 #Foo: {
 	a: int
-	b: >=0 & <10
+	b: uint & <10
 	...
 }
 -- expect-cue3 --
@@ -262,11 +262,11 @@ info: {
 }
 #Foo: {
 	a: int
-	b: >=0 & <10
+	b: uint & <10
 	...
 }
 #Baz: {
 	a: int
-	b: >=0 & <10
+	b: uint & <10
 	...
 }

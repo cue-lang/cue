@@ -41,5 +41,5 @@ import "list"
 foo?: [...string]
 tuple?: [string, int, 2]
 has?:  list.Contains(3)
-size?: [_, _, _, ...] & list.MaxItems(9) & list.UniqueItems()
+size?: list.UniqueItems() & list.MaxItems(9) & [_, _, _, ...]
 additional?: [int, int, ...string]

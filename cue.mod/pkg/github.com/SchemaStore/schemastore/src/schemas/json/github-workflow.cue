@@ -4,7 +4,7 @@ import "strings"
 
 #Workflow: {
 	@jsonschema(schema="http://json-schema.org/draft-07/schema")
-	number | null | bool | string | [...] | {
+	null | bool | number | string | [...] | {
 		// The name of your workflow. GitHub displays the names of your
 		// workflows on your repository's actions page. If you omit this
 		// field, GitHub sets the name to the workflow's filename.
@@ -237,10 +237,9 @@ import "strings"
 			// commit object. You can retrieve the full commit object using
 			// the REST API. For more information, see
 			// https://developer.github.com/v3/repos/commits/#get-a-single-commit.
-			push?: #ref &
-				{
-					{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^()$"]: _}
-				}
+			push?: #ref & {
+				{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^()$"]: _}
+			}
 
 			// Runs your workflow anytime a package is published or updated.
 			// For more information, see
@@ -289,7 +288,7 @@ import "strings"
 			// generate your cron syntax and confirm what time it will run.
 			// To help you get started, there is also a list of crontab guru
 			// examples (https://crontab.guru/examples.html).
-			schedule?: [...number | null | bool | string | [...] | {
+			schedule?: [...null | bool | number | string | [...] | {
 				cron?: =~"^(((\\d+,)+\\d+|((\\d+|\\*)\\/\\d+)|(\\d+-\\d+)|\\d+|\\*) ?){5,7}$"
 			}] & [_, ...]
 		}
@@ -320,7 +319,9 @@ import "strings"
 				// If you do not set a container, all steps will run directly on
 				// the host specified by runs-on unless a step refers to an
 				// action configured to run in a container.
-				container?: [string]: string | #container
+				container?: {
+					[string]: string | #container
+				}
 
 				// A map of default settings that will apply to all steps in the
 				// job.
@@ -338,7 +339,9 @@ import "strings"
 
 				// A map of outputs for a job. Job outputs are available to all
 				// downstream jobs that depend on this job.
-				outputs?: [string]: string
+				outputs?: {
+					[string]: string
+				}
 
 				// You can use the if conditional to prevent a job from running
 				// unless a condition is met. You can use any supported context
@@ -467,7 +470,6 @@ import "strings"
 						{[=~"^(in|ex)clude$" & !~"^()$"]: [...{
 											[string]: #configuration
 						}] & [_, ...]}
-
 						{[!~"^(in|ex)clude$" & !~"^()$"]: [...#configuration] & [_, ...]}
 					}
 
@@ -496,7 +498,9 @@ import "strings"
 				// is automatically mapped to the service name.
 				// When a step does not use a container action, you must access
 				// the service using localhost and bind the ports.
-				services?: [string]: #container
+				services?: {
+					[string]: #container
+				}
 			}}
 		}
 	}
@@ -505,7 +509,7 @@ import "strings"
 
 	#name: =~"^[_a-zA-Z][a-zA-Z0-9_-]*$"
 
-	#env: [string]: number | bool | string
+	#env: [string]: bool | number | string
 
 	#architecture: "ARM32" | "x64" | "x86"
 
@@ -549,7 +553,7 @@ import "strings"
 		"working-directory"?: #["working-directory"]
 	}
 
-	#shell: string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")
+	#shell: (string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")) & string
 
 	#: "working-directory": string
 

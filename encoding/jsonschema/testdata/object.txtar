@@ -53,6 +53,15 @@
         "^\\P{Lo}": { "type": "integer" }
       },
       "additionalProperties": { "type": "string" }
+    },
+    "multi": {
+      "type": [ "object", "number" ],
+      "properties": {
+        "foo": { "type": "number" },
+        "bar": { "type": "number" }
+      },
+      "maxProperties": 5,
+      "minimum": 7
     }
   },
   "additionalProperties": false
@@ -68,7 +77,6 @@ fields?: struct.MaxFields(10) & {
 additional?: {
 	foo?: number
 	bar?: number
-
 	{[!~"^(foo|bar)$"]: string}
 }
 map?: [string]: string
@@ -94,6 +102,10 @@ complex?: {
 	{[=~"^\\P{Lu}" & !~"^(foo|bar)$"]: string}
 
 	{[=~"^\\P{Lo}" & !~"^(foo|bar)$"]: int}
-
 	{[!~"^\\P{Lu}" & !~"^\\P{Lo}" & !~"^(foo|bar)$"]: string}
+}
+multi?: >=7 | struct.MaxFields(5) & {
+	foo?: number
+	bar?: number
+	...
 }

@@ -1,0 +1,26 @@
+-- emptyanyof.json --
+{
+ "$defs": {
+   "shell": {
+      "description": "Specify a shell.",
+      "type": "string",
+      "anyOf": [
+        {
+        },
+        {
+          "enum": [
+            "bash",
+            "sh",
+            "cmd",
+            "powershell"
+          ]
+        }
+      ]
+   }
+ }
+}
+
+-- out.cue --
+_
+
+#shell: (string | ("bash" | "sh" | "cmd" | "powershell")) & string

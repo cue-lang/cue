@@ -34,8 +34,6 @@
         }
       ]
     },
-
-
     "empty": {
         "allOf": [
             { "type": "object" },
@@ -44,11 +42,14 @@
     }
   }
 }
+-- out.err --
+constraint not allowed because type string is excluded:
+    type.json:39:23
 -- out.cue --
 // Main schema
 intOrString1?: int | string
 intOrString2?: int | string
-intOrString3?: int | string
-disjunction?:  int | string | >=3
+intOrString3?: string | int
+disjunction?:  string | int | int & >=3
 empty?:        _|_
 ...

@@ -69,6 +69,7 @@ func TestDecode(t *testing.T) {
 			var in *cue.Instance
 			var out, errout []byte
 			outIndex := -1
+			errIndex := -1
 
 			for i, f := range a.Files {
 				switch path.Ext(f.Name) {
@@ -81,22 +82,31 @@ func TestDecode(t *testing.T) {
 					outIndex = i
 				case ".err":
 					errout = f.Data
+					errIndex = i
 				}
 			}
 			if err != nil {
 				t.Fatal(err)
 			}
 
+			updated := false
+
 			expr, err := Extract(in, cfg)
-			if err != nil && errout == nil {
-				t.Fatal(errors.Details(err, nil))
-			}
-			got := []byte(nil)
 			if err != nil {
-				got = []byte(err.Error())
-			}
-			if !cmp.Equal(errout, got) {
-				t.Error(cmp.Diff(string(got), string(errout)))
+				got := []byte(errors.Details(err, nil))
+
+				got = bytes.TrimSpace(got)
+				errout = bytes.TrimSpace(errout)
+
+				switch {
+				case !cmp.Equal(errout, got):
+					if *update {
+						a.Files[errIndex].Data = got
+						updated = true
+						break
+					}
+					t.Error(cmp.Diff(string(got), string(errout)))
+				}
 			}
 
 			if expr != nil {
@@ -115,17 +125,22 @@ func TestDecode(t *testing.T) {
 				b = bytes.TrimSpace(b)
 				out = bytes.TrimSpace(out)
 
-				if !cmp.Equal(b, out) {
+				switch {
+				case !cmp.Equal(b, out):
 					if *update {
+						updated = true
 						a.Files[outIndex].Data = b
-						b = txtar.Format(a)
-						err = ioutil.WriteFile(fullpath, b, 0644)
-						if err != nil {
-							t.Fatal(err)
-						}
-						return
+						break
 					}
 					t.Error(cmp.Diff(string(out), string(b)))
+				}
+			}
+
+			if updated {
+				b := txtar.Format(a)
+				err = ioutil.WriteFile(fullpath, b, 0644)
+				if err != nil {
+					t.Fatal(err)
 				}
 			}
 		})

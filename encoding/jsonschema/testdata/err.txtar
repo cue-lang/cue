@@ -1,0 +1,20 @@
+-- type.json --
+{
+  "type": "object",
+
+  "properties": {
+    "multi": {
+        "type": [ "integer" ],
+        "minimum": 2,
+        "maximum": 3,
+        "maxLength": 5
+    }
+  },
+  "additionalProperties": false
+}
+
+-- out.err --
+constraint not allowed because type string is excluded:
+    type.json:9:22
+-- out.cue --
+multi?: int & >=2 & <=3

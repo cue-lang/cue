@@ -110,38 +110,14 @@ workflows: [
 }
 
 test: json.#Workflow & {
-	name: "Test"
-	on: {
-		push: {
-			branches: ["*"]
-			"tags-ignore": ["v*"]
-		}
-	}
-	defaults: run: shell: "bash"
-	jobs: test: {
-		strategy:  #testStrategy
-		"runs-on": "${{ matrix.os }}"
-		steps: [
-			#installGo,
-			#checkoutCode,
-			#cacheGoModules,
-			#goGenerate,
-			#goTest,
-			#goTestRace,
-			#goReleaseCheck,
-			#checkGitClean,
-			#pullThroughProxy,
-		]
-	}
-}
-
-test_dispatch: json.#Workflow & {
-	#checkoutRef: #step & {
-		name: "Checkout ref"
-		run: """
-		  git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-		  git checkout FETCH_HEAD
-		  """
+	#setCUEEnv: #step & {
+		name: "Set build branch env vars"
+		run: #"""
+			echo "::set-env name=CUE_IS_BUILD_BRANCH::$(echo $GITHUB_REF | grep -q '^refs\/heads\/[[:digit:]]\{14\}-I[0-9a-f]\+-[0-9a-f]\+-refs_changes_[[:digit:]]\{2\}_[[:digit:]]\+_[[:digit:]]\+$' && echo true || echo false)"
+			echo "::set-env name=CUE_CHANGE_ID::$(echo $GITHUB_REF | cut -d '-' -f 2)"
+			echo "::set-env name=CUE_COMMIT::$(echo $GITHUB_REF | cut -d '-' -f 3)"
+			echo "::set-env name=CUE_REF::$(echo $GITHUB_REF | cut -d '-' -f 4 | sed 's/_/\//g')"
+			"""#
 	}
 	#writeCookiesFile: #step & {
 		name: "Write the gitcookies file"
@@ -156,21 +132,28 @@ test_dispatch: json.#Workflow & {
 				}
 			}
 			res: #"""
-			curl -f -s -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
+			curl -f -s -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$CUE_CHANGE_ID/revisions/$CUE_COMMIT/review
 			"""#
 		}
 	}
 
-	name: "Test"
 	env: GERRIT_COOKIE: "${{ secrets.gerritCookie }}"
-	on: ["repository_dispatch"]
+	name: "Test"
+	on: {
+		push: {
+			branches: ["*"]
+			"tags-ignore": ["v*"]
+		}
+	}
 	defaults: run: shell: "bash"
 	jobs: {
 		start: {
 			"runs-on": "ubuntu-latest"
 			steps: [
+				#setCUEEnv,
 				#writeCookiesFile,
 				#step & {
+					if:   "${{ env.CUE_IS_BUILD_BRANCH == 'true' }}"
 					name: "Update Gerrit CL message with starting message"
 					run:  (#gerrit.#setCodeReview & {
 						#args: message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
@@ -179,20 +162,23 @@ test_dispatch: json.#Workflow & {
 			]
 		}
 		test: {
+			needs:     "start"
+			strategy:  #testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
+				#setCUEEnv,
 				#writeCookiesFile,
 				#installGo,
 				#checkoutCode,
-				#checkoutRef,
 				#cacheGoModules,
 				#goGenerate,
 				#goTest,
 				#goTestRace,
 				#goReleaseCheck,
 				#checkGitClean,
+				#pullThroughProxy,
 				#step & {
-					if:   "${{ failure() }}"
+					if:   "${{ env.CUE_IS_BUILD_BRANCH == 'true' && failure() }}"
 					name: "Post any failures for this matrix entry"
 					run:  (#gerrit.#setCodeReview & {
 						#args: {
@@ -204,14 +190,14 @@ test_dispatch: json.#Workflow & {
 					}).res
 				},
 			]
-			needs:    "start"
-			strategy: #testStrategy
 		}
 		end: {
 			"runs-on": "ubuntu-latest"
 			steps: [
+				#setCUEEnv,
 				#writeCookiesFile,
 				#step & {
+					if:   "${{ env.CUE_IS_BUILD_BRANCH == 'true' }}"
 					name: "Update Gerrit CL message with success message"
 					run:  (#gerrit.#setCodeReview & {
 						#args: {
@@ -227,6 +213,37 @@ test_dispatch: json.#Workflow & {
 		}
 	}
 }
+
+test_dispatch: json.#Workflow & {
+	name: "Dispatch build branch"
+	on: ["repository_dispatch"]
+	defaults: run: shell: "bash"
+	jobs: {
+		create_build_branch: {
+			"runs-on": "ubuntu-latest"
+			steps: [
+				#checkoutCode,
+				#step & {
+					name: "Checkout ref"
+					run: """
+					  git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
+					  git checkout FETCH_HEAD
+					  """
+				},
+				#step & {
+					name: "Create build branch"
+					run: #"""
+					ref=$(echo ${{ github.event.client_payload.ref }} | sed -e 's/\//_/g')
+					branch=$( $(date -u +%Y%m%d%H%M%S)-${{ github.event.client_payload.changeID }}-${{ github.event.client_payload.commit }}-$ref)
+					git checkout -b $branch
+					git push origin $branch
+					"""#
+				},
+			]
+		}
+	}
+}
+
 release: {
 	name: "Release"
 	on: push: tags: ["v*"]

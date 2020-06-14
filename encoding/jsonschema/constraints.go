@@ -213,6 +213,13 @@ var constraints = []*constraint{
 		s.all.add(n, ast.NewBinExpr(token.OR, a...))
 	}),
 
+	// TODO: only allow for OpenAPI.
+	p1("nullable", func(n cue.Value, s *state) {
+		null := ast.NewNull()
+		setPos(null, n)
+		s.nullable = null
+	}),
+
 	p1d("const", 6, func(n cue.Value, s *state) {
 		s.all.add(n, s.value(n))
 	}),

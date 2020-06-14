@@ -13,6 +13,7 @@ components:
           type: string
         address:
           $ref: "#/components/schemas/PhoneNumber"
+          nullable: true
     PhoneNumber:
       description: "The number to dial."
       type: string
@@ -22,7 +23,7 @@ components:
 #User: {
 	name?:    string
 	id?:      int
-	address?: #PhoneNumber
+	address?: null | #PhoneNumber
 	...
 }
 

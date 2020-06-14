@@ -320,8 +320,9 @@ type state struct {
 	pos cue.Value
 
 	// The constraints in types represent disjunctions per type.
-	types [numCoreTypes]constraintInfo
-	all   constraintInfo // values and oneOf etc.
+	types    [numCoreTypes]constraintInfo
+	all      constraintInfo // values and oneOf etc.
+	nullable *ast.BasicLit  // nullable
 
 	usedTypes    cue.Kind
 	allowedTypes cue.Kind
@@ -463,16 +464,25 @@ func (s *state) finalize() (e ast.Expr) {
 		e = ast.NewBinExpr(token.AND, conjuncts...)
 	}
 
-	if s.default_ != nil {
+	a := []ast.Expr{e}
+	if s.nullable != nil {
+		a = []ast.Expr{s.nullable, e}
+	}
+
+outer:
+	switch {
+	case s.default_ != nil:
 		// check conditions where default can be skipped.
 		switch x := s.default_.(type) {
 		case *ast.ListLit:
 			if s.usedTypes == cue.ListKind && len(x.Elts) == 0 {
-				return e
+				break outer
 			}
 		}
-		e = ast.NewBinExpr(token.OR, e, &ast.UnaryExpr{Op: token.MUL, X: s.default_})
+		a = append(a, &ast.UnaryExpr{Op: token.MUL, X: s.default_})
 	}
+
+	e = ast.NewBinExpr(token.OR, a...)
 
 	if len(s.definitions) > 0 {
 		if st, ok := e.(*ast.StructLit); ok {

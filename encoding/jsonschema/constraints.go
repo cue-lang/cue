@@ -444,7 +444,7 @@ var constraints = []*constraint{
 		obj := s.object(n)
 
 		if n.Kind() != cue.StructKind {
-			s.errf(n, `"properties" expected an object, found %v`, n.Kind)
+			s.errf(n, `"properties" expected an object, found %v`, n.Kind())
 		}
 
 		s.processMap(n, func(key string, n cue.Value) {

@@ -215,6 +215,7 @@ test: json.#Workflow & {
 }
 
 test_dispatch: json.#Workflow & {
+	env: CUECKOO_PAT: "${{ secrets.cueckooPAT }}"
 	name: "Dispatch build branch"
 	on: ["repository_dispatch"]
 	defaults: run: shell: "bash"
@@ -233,6 +234,9 @@ test_dispatch: json.#Workflow & {
 				#step & {
 					name: "Create build branch"
 					run: #"""
+					git config user.email cueckoo@cuelang.org
+					git config user.name cueckoo
+					git config http.https://github.com/.extraheader "AUTHORIZATION basic $(echo cueckoo:$CUECKOO_PAT | base64)"
 					ref=$(echo ${{ github.event.client_payload.ref }} | sed -e 's/\//_/g')
 					branch="$(date -u +%Y%m%d%H%M%S)-${{ github.event.client_payload.changeID }}-${{ github.event.client_payload.commit }}-$ref"
 					git checkout -b $branch

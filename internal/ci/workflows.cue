@@ -110,14 +110,38 @@ workflows: [
 }
 
 test: json.#Workflow & {
-	#setCUEEnv: #step & {
-		name: "Set build branch env vars"
-		run: #"""
-			echo "::set-env name=CUE_IS_BUILD_BRANCH::$(echo $GITHUB_REF | grep -q '^refs\/heads\/[[:digit:]]\{14\}-I[0-9a-f]\+-[0-9a-f]\+-refs_changes_[[:digit:]]\{2\}_[[:digit:]]\+_[[:digit:]]\+$' && echo true || echo false)"
-			echo "::set-env name=CUE_CHANGE_ID::$(echo $GITHUB_REF | cut -d '-' -f 2)"
-			echo "::set-env name=CUE_COMMIT::$(echo $GITHUB_REF | cut -d '-' -f 3)"
-			echo "::set-env name=CUE_REF::$(echo $GITHUB_REF | cut -d '-' -f 4 | sed 's/_/\//g')"
-			"""#
+	name: "Test"
+	on: {
+		push: {
+			branches: ["*"]
+			"tags-ignore": ["v*"]
+		}
+	}
+	defaults: run: shell: "bash"
+	jobs: test: {
+		strategy:  #testStrategy
+		"runs-on": "${{ matrix.os }}"
+		steps: [
+			#installGo,
+			#checkoutCode,
+			#cacheGoModules,
+			#goGenerate,
+			#goTest,
+			#goTestRace,
+			#goReleaseCheck,
+			#checkGitClean,
+			#pullThroughProxy,
+		]
+	}
+}
+
+test_dispatch: json.#Workflow & {
+	#checkoutRef: #step & {
+		name: "Checkout ref"
+		run: """
+		  git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
+		  git checkout FETCH_HEAD
+		  """
 	}
 	#writeCookiesFile: #step & {
 		name: "Write the gitcookies file"
@@ -132,28 +156,21 @@ test: json.#Workflow & {
 				}
 			}
 			res: #"""
-			curl -f -s -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$CUE_CHANGE_ID/revisions/$CUE_COMMIT/review
+			curl -f -s -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
 			"""#
 		}
 	}
 
-	env: GERRIT_COOKIE: "${{ secrets.gerritCookie }}"
 	name: "Test"
-	on: {
-		push: {
-			branches: ["*"]
-			"tags-ignore": ["v*"]
-		}
-	}
+	env: GERRIT_COOKIE: "${{ secrets.gerritCookie }}"
+	on: ["repository_dispatch"]
 	defaults: run: shell: "bash"
 	jobs: {
 		start: {
 			"runs-on": "ubuntu-latest"
 			steps: [
-				#setCUEEnv,
 				#writeCookiesFile,
 				#step & {
-					if:   "${{ env.CUE_IS_BUILD_BRANCH == 'true' }}"
 					name: "Update Gerrit CL message with starting message"
 					run:  (#gerrit.#setCodeReview & {
 						#args: message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
@@ -162,23 +179,20 @@ test: json.#Workflow & {
 			]
 		}
 		test: {
-			needs:     "start"
-			strategy:  #testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
-				#setCUEEnv,
 				#writeCookiesFile,
 				#installGo,
 				#checkoutCode,
+				#checkoutRef,
 				#cacheGoModules,
 				#goGenerate,
 				#goTest,
 				#goTestRace,
 				#goReleaseCheck,
 				#checkGitClean,
-				#pullThroughProxy,
 				#step & {
-					if:   "${{ env.CUE_IS_BUILD_BRANCH == 'true' && failure() }}"
+					if:   "${{ failure() }}"
 					name: "Post any failures for this matrix entry"
 					run:  (#gerrit.#setCodeReview & {
 						#args: {
@@ -190,14 +204,14 @@ test: json.#Workflow & {
 					}).res
 				},
 			]
+			needs:    "start"
+			strategy: #testStrategy
 		}
 		end: {
 			"runs-on": "ubuntu-latest"
 			steps: [
-				#setCUEEnv,
 				#writeCookiesFile,
 				#step & {
-					if:   "${{ env.CUE_IS_BUILD_BRANCH == 'true' }}"
 					name: "Update Gerrit CL message with success message"
 					run:  (#gerrit.#setCodeReview & {
 						#args: {
@@ -213,41 +227,6 @@ test: json.#Workflow & {
 		}
 	}
 }
-
-test_dispatch: json.#Workflow & {
-	env: CUECKOO_PAT: "${{ secrets.cueckooPAT }}"
-	name: "Dispatch build branch"
-	on: ["repository_dispatch"]
-	defaults: run: shell: "bash"
-	jobs: {
-		create_build_branch: {
-			"runs-on": "ubuntu-latest"
-			steps: [
-				#checkoutCode,
-				#step & {
-					name: "Checkout ref"
-					run: """
-					  git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-					  git checkout FETCH_HEAD
-					  """
-				},
-				#step & {
-					name: "Create build branch"
-					run: #"""
-					git config user.email cueckoo@cuelang.org
-					git config user.name cueckoo
-					git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:$CUECKOO_PAT | base64)"
-					ref=$(echo ${{ github.event.client_payload.ref }} | sed -e 's/\//_/g')
-					branch="$(date -u +%Y%m%d%H%M%S)-${{ github.event.client_payload.changeID }}-${{ github.event.client_payload.commit }}-$ref"
-					git checkout -b $branch
-					git push origin $branch
-					"""#
-				},
-			]
-		}
-	}
-}
-
 release: {
 	name: "Release"
 	on: push: tags: ["v*"]

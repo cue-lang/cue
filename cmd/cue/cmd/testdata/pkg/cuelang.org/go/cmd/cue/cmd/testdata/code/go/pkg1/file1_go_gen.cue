@@ -21,7 +21,7 @@ import (
 	CustomYAML?: null | #CustomYAML @go(,*CustomYAML)
 	AnyJSON:     _                  @go(,json.Marshaler)
 	AnyText:     string             @go(,encoding.TextMarshaler)
-	bar?:        int                @go(Bar)
+	bar?:        int & >10          @go(Bar)
 
 	// Time is mapped to CUE's internal type.
 	Time:   time.Time

@@ -38,7 +38,7 @@ type Foozer struct {
 	AnyJSON    json.Marshaler
 	AnyText    encoding.TextMarshaler
 
-	Bar int `json:"bar,omitempty"`
+	Bar int `json:"bar,omitempty" cue:">10"`
 
 	exclude int
 

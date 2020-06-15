@@ -211,11 +211,15 @@ the more restrictive enum interpretation of Switch remains.
 	cmd.Flags().StringP(string(flagExclude), "e", "",
 		"comma-separated list of regexps of entries")
 
+	cmd.Flags().Bool(string(flagLocal), false,
+		"generates files in the main module locally")
+
 	return cmd
 }
 
 const (
 	flagExclude flagName = "exclude"
+	flagLocal   flagName = "local"
 )
 
 var cueTestRoot string // the CUE module root for test purposes.
@@ -335,7 +339,7 @@ func extract(cmd *Command, args []string) error {
 	}
 
 	cfg := &packages.Config{
-		Mode: packages.LoadAllSyntax,
+		Mode: packages.LoadAllSyntax | packages.NeedModule,
 	}
 	pkgs, err := packages.Load(cfg, args...)
 	if err != nil {
@@ -396,6 +400,16 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 
 	pkg := p.PkgPath
 	dir := filepath.Join(load.GenPath(root), filepath.FromSlash(pkg))
+
+	isMain := flagLocal.Bool(e.cmd) && p.Module != nil && p.Module.Main
+	if isMain {
+		dir = p.Module.Dir
+		sub := p.PkgPath[len(p.Module.Path):]
+		if sub != "" {
+			dir = filepath.FromSlash(dir + sub)
+		}
+	}
+
 	if err := os.MkdirAll(dir, 0755); err != nil {
 		return err
 	}
@@ -487,6 +501,26 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 	}
 
+	if !isMain {
+		if err := e.importCUEFiles(p, dir, args); err != nil {
+			return err
+		}
+	}
+
+	for path := range e.usedPkgs {
+		if !e.done[path] {
+			e.done[path] = true
+			p := p.Imports[path]
+			if err := e.extractPkg(root, p); err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
+}
+
+func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error {
 	for _, o := range p.CompiledGoFiles {
 		root := filepath.Dir(o)
 		err := filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
@@ -529,17 +563,6 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			return err
 		}
 	}
-
-	for path := range e.usedPkgs {
-		if !e.done[path] {
-			e.done[path] = true
-			p := p.Imports[path]
-			if err := e.extractPkg(root, p); err != nil {
-				return err
-			}
-		}
-	}
-
 	return nil
 }
 

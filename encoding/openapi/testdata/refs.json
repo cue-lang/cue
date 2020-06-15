@@ -7,6 +7,18 @@
    "paths": {},
    "components": {
       "schemas": {
+         "BaseType": {
+            "type": "object",
+            "required": [
+               "b"
+            ],
+            "properties": {
+               "b": {
+                  "type": "string",
+                  "format": "string"
+               }
+            }
+         },
          "Keep": {
             "type": "object",
             "required": [
@@ -30,6 +42,20 @@
                   "type": "integer"
                }
             }
+         },
+         "Type": {
+            "type": "object",
+            "properties": {
+               "a": {
+                  "type": "string",
+                  "format": "string"
+               }
+            },
+            "allOf": [
+               {
+                  "$ref": "#/components/schemas/BaseType"
+               }
+            ]
          }
       }
    }

@@ -1155,10 +1155,24 @@ func (b *builder) finish() *ast.StructLit {
 		t = &OrderedMap{}
 
 	case 1:
-		t = (*OrderedMap)(b.allOf[0])
+		hasRef := false
+		for _, e := range b.allOf[0].Elts {
+			if f, ok := e.(*ast.Field); ok {
+				name, _, _ := ast.LabelName(f.Label)
+				hasRef = hasRef || name == "$ref"
+			}
+		}
+		if !hasRef || b.singleFields == nil {
+			t = (*OrderedMap)(b.allOf[0])
+			break
+		}
+		fallthrough
 
 	default:
 		exprs := []ast.Expr{}
+		if t != nil {
+			exprs = append(exprs, (*ast.StructLit)(t))
+		}
 		for _, s := range b.allOf {
 			exprs = append(exprs, s)
 		}
@@ -1190,7 +1204,8 @@ func (b *builder) addConjunct(f func(*builder)) {
 func (b *builder) addRef(v cue.Value, inst *cue.Instance, ref []string) {
 	name := b.ctx.makeRef(inst, ref)
 	b.addConjunct(func(b *builder) {
-		b.set("$ref", ast.NewString(path.Join("#", b.ctx.refPrefix, name)))
+		b.allOf = append(b.allOf, ast.NewStruct(
+			"$ref", ast.NewString(path.Join("#", b.ctx.refPrefix, name))))
 	})
 
 	if b.ctx.inst != inst {

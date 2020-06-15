@@ -11,3 +11,11 @@
 
 // ExcludedInt is not included in the output.
 #ExcludedInt: int
+
+#Type: {
+	a?: string
+	#BaseType
+}
+#BaseType: {
+	b: string
+}

@@ -236,7 +236,7 @@ test_dispatch: json.#Workflow & {
 					run: #"""
 					git config user.email cueckoo@cuelang.org
 					git config user.name cueckoo
-					git config http.https://github.com/.extraheader "AUTHORIZATION basic $(echo cueckoo:$CUECKOO_PAT | base64)"
+					git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:$CUECKOO_PAT | base64)"
 					ref=$(echo ${{ github.event.client_payload.ref }} | sed -e 's/\//_/g')
 					branch="$(date -u +%Y%m%d%H%M%S)-${{ github.event.client_payload.changeID }}-${{ github.event.client_payload.commit }}-$ref"
 					git checkout -b $branch

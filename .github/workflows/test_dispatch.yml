@@ -19,6 +19,6 @@ jobs:
     - name: Create build branch
       run: |-
         ref=$(echo ${{ github.event.client_payload.ref }} | sed -e 's/\//_/g')
-        branch=$( $(date -u +%Y%m%d%H%M%S)-${{ github.event.client_payload.changeID }}-${{ github.event.client_payload.commit }}-$ref)
+        branch="$(date -u +%Y%m%d%H%M%S)-${{ github.event.client_payload.changeID }}-${{ github.event.client_payload.commit }}-$ref"
         git checkout -b $branch
         git push origin $branch

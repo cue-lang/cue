@@ -93,6 +93,30 @@ func (c *Codec) Encode(v cue.Value, x interface{}) error {
 	return v.Decode(x)
 }
 
+var defaultCodec = New(&cue.Runtime{}, nil)
+
+// Validate calls Validate on a default Codec for the type of x.
+func Validate(x interface{}) error {
+	c := defaultCodec
+	c.mutex.RLock()
+	defer c.mutex.RUnlock()
+
+	r := defaultCodec.runtime
+	v, err := fromGoType(r, x)
+	if err != nil {
+		return err
+	}
+	w, err := fromGoValue(r, x, false)
+	if err != nil {
+		return err
+	}
+	v = v.Unify(w)
+	if err := v.Validate(); err != nil {
+		return err
+	}
+	return nil
+}
+
 // Validate checks whether x satisfies the constraints defined by v.
 //
 // The given value must be created using the same Runtime with which c was

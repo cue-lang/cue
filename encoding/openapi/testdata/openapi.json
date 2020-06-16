@@ -103,8 +103,10 @@
                         "$ref": "#/components/schemas/Int32"
                      },
                      {
-                        "exclusiveMinimum": 10,
-                        "exclusiveMaximum": 1000
+                        "exclusiveMinimum": true,
+                        "minimum": 10,
+                        "exclusiveMaximum": true,
+                        "maximum": 1000
                      }
                   ]
                },

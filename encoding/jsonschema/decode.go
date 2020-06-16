@@ -327,13 +327,15 @@ type state struct {
 	usedTypes    cue.Kind
 	allowedTypes cue.Kind
 
-	default_    ast.Expr
-	examples    []ast.Expr
-	title       string
-	description string
-	deprecated  bool
-	jsonschema  string
-	id          *url.URL // base URI for $ref
+	default_     ast.Expr
+	examples     []ast.Expr
+	title        string
+	description  string
+	deprecated   bool
+	exclusiveMin bool // For OpenAPI and legacy support.
+	exclusiveMax bool // For OpenAPI and legacy support.
+	jsonschema   string
+	id           *url.URL // base URI for $ref
 
 	definitions []ast.Decl
 

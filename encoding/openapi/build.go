@@ -37,12 +37,13 @@ type buildContext struct {
 	refPrefix string
 	path      []string
 
-	expandRefs  bool
-	structural  bool
-	nameFunc    func(inst *cue.Instance, path []string) string
-	descFunc    func(v cue.Value) string
-	fieldFilter *regexp.Regexp
-	evalDepth   int // detect cycles when resolving references
+	expandRefs    bool
+	structural    bool
+	exclusiveBool bool
+	nameFunc      func(inst *cue.Instance, path []string) string
+	descFunc      func(v cue.Value) string
+	fieldFilter   *regexp.Regexp
+	evalDepth     int // detect cycles when resolving references
 
 	schemas *OrderedMap
 
@@ -79,6 +80,10 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		}
 	}
 
+	if g.Version == "" {
+		g.Version = "3.0.0"
+	}
+
 	c := buildContext{
 		inst:         inst,
 		instExt:      inst,
@@ -90,6 +95,14 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		schemas:      &OrderedMap{},
 		externalRefs: map[string]*externalType{},
 		fieldFilter:  fieldFilter,
+	}
+
+	switch g.Version {
+	case "3.0.0":
+		c.exclusiveBool = true
+	case "3.1.0":
+	default:
+		return nil, errors.Newf(token.NoPos, "unsupported version %s", g.Version)
 	}
 
 	defer func() {
@@ -888,13 +901,23 @@ func (b *builder) number(v cue.Value) {
 
 	switch op, a := v.Expr(); op {
 	case cue.LessThanOp:
-		b.setFilter("Schema", "exclusiveMaximum", b.big(a[0]))
+		if b.ctx.exclusiveBool {
+			b.setFilter("Schema", "exclusiveMaximum", ast.NewBool(true))
+			b.setFilter("Schema", "maximum", b.big(a[0]))
+		} else {
+			b.setFilter("Schema", "exclusiveMaximum", b.big(a[0]))
+		}
 
 	case cue.LessThanEqualOp:
 		b.setFilter("Schema", "maximum", b.big(a[0]))
 
 	case cue.GreaterThanOp:
-		b.setFilter("Schema", "exclusiveMinimum", b.big(a[0]))
+		if b.ctx.exclusiveBool {
+			b.setFilter("Schema", "exclusiveMinimum", ast.NewBool(true))
+			b.setFilter("Schema", "minimum", b.big(a[0]))
+		} else {
+			b.setFilter("Schema", "exclusiveMinimum", b.big(a[0]))
+		}
 
 	case cue.GreaterThanEqualOp:
 		b.setFilter("Schema", "minimum", b.big(a[0]))

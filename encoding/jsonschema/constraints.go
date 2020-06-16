@@ -403,24 +403,38 @@ var constraints = []*constraint{
 
 	// Number constraints
 
-	p1("minimum", func(n cue.Value, s *state) {
+	p2("minimum", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
-		s.add(n, numType, &ast.UnaryExpr{Op: token.GEQ, X: s.number(n)})
+		op := token.GEQ
+		if s.exclusiveMin {
+			op = token.GTR
+		}
+		s.add(n, numType, &ast.UnaryExpr{Op: op, X: s.number(n)})
 	}),
 
 	p1("exclusiveMinimum", func(n cue.Value, s *state) {
-		// TODO: should we support Draft 4 booleans?
+		if n.Kind() == cue.BoolKind {
+			s.exclusiveMin = true
+			return
+		}
 		s.usedTypes |= cue.NumberKind
 		s.add(n, numType, &ast.UnaryExpr{Op: token.GTR, X: s.number(n)})
 	}),
 
-	p1("maximum", func(n cue.Value, s *state) {
+	p2("maximum", func(n cue.Value, s *state) {
 		s.usedTypes |= cue.NumberKind
-		s.add(n, numType, &ast.UnaryExpr{Op: token.LEQ, X: s.number(n)})
+		op := token.LEQ
+		if s.exclusiveMax {
+			op = token.LSS
+		}
+		s.add(n, numType, &ast.UnaryExpr{Op: op, X: s.number(n)})
 	}),
 
 	p1("exclusiveMaximum", func(n cue.Value, s *state) {
-		// TODO: should we support Draft 4 booleans?
+		if n.Kind() == cue.BoolKind {
+			s.exclusiveMax = true
+			return
+		}
 		s.usedTypes |= cue.NumberKind
 		s.add(n, numType, &ast.UnaryExpr{Op: token.LSS, X: s.number(n)})
 	}),

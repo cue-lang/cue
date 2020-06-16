@@ -51,6 +51,9 @@ type Config struct {
 	// in this document.
 	SelfContained bool
 
+	// OpenAPI version to use. Supported as of v3.0.0.
+	Version string
+
 	// FieldFilter defines a regular expression of all fields to omit from the
 	// output. It is only allowed to filter fields that add additional
 	// constraints. Fields that indicate basic types cannot be removed. It is
@@ -203,7 +206,7 @@ func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit) (x *ast.Str
 	}
 
 	return ast.NewStruct(
-		"openapi", ast.NewString("3.0.0"),
+		"openapi", ast.NewString(c.Version),
 		"info", info,
 		"paths", ast.NewStruct(),
 		"components", ast.NewStruct("schemas", schemas),

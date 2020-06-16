@@ -23,6 +23,13 @@
         "maximum": 3,
         "maxLength": 5
     },
+    "legacy": {
+        "type": "number",
+        "exclusiveMinimum": true,
+        "minimum": 2,
+        "exclusiveMaximum": true,
+        "maximum": 3
+    },
     "cents": {
       "type": "number",
       "multipleOf": 0.05
@@ -42,4 +49,5 @@ several?:   1 | 2 | 3 | 4
 inclusive?: >=2 & <=3
 exclusive?: int & >2 & <3
 multi?:     int & >=2 & <=3 | strings.MaxRunes(5)
+legacy?:    >2 & <3
 cents?:     math.MultipleOf(0.05)

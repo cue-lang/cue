@@ -78,6 +78,10 @@ func TestParseDefinitions(t *testing.T) {
 		"nums.json",
 		defaultConfig,
 	}, {
+		"nums.cue",
+		"nums-v3.1.0.json",
+		&openapi.Config{Info: info, Version: "3.1.0"},
+	}, {
 		"builtins.cue",
 		"builtins.json",
 		defaultConfig,

@@ -110,8 +110,10 @@
                },
                "foo": {
                   "type": "number",
-                  "exclusiveMinimum": 10,
-                  "exclusiveMaximum": 1000
+                  "minimum": 10,
+                  "exclusiveMinimum": true,
+                  "maximum": 1000,
+                  "exclusiveMaximum": true
                },
                "bar": {
                   "type": "array",

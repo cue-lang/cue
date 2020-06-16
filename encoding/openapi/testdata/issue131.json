@@ -16,11 +16,13 @@
             "properties": {
                "a": {
                   "type": "number",
-                  "exclusiveMinimum": 50
+                  "minimum": 50,
+                  "exclusiveMinimum": true
                },
                "b": {
                   "type": "number",
-                  "exclusiveMaximum": 10
+                  "maximum": 10,
+                  "exclusiveMaximum": true
                }
             }
          },

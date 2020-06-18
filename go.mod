@@ -11,7 +11,7 @@ require (
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/pkg/errors v0.8.1 // indirect
 	github.com/rogpeppe/go-internal v1.6.0
-	github.com/spf13/cobra v0.0.7
+	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/testify v1.2.2
 	golang.org/x/exp v0.0.0-20200513190911-00229845015e

@@ -88,6 +88,7 @@ For more information on writing CUE configuration files see cuelang.org.`,
 
 	subCommands := []*cobra.Command{
 		cmdCmd,
+		newCompletionCmd(c),
 		newEvalCmd(c),
 		newDefCmd(c),
 		newExportCmd(c),

@@ -1,6 +1,8 @@
 cue fix
 
 cmp foo/foo.cue expect/foo/foo_cue
+cmp foo/foo_test.cue expect/foo/foo_test_cue
+cmp foo/foo_tool.cue expect/foo/foo_tool_cue
 cmp bar/bar.cue expect/bar/bar_cue
 cmp cue.mod/pkg/foobar.org/notimported/notimported.cue expect/cue.mod/pkg/foobar.org/notimported/notimported.cue
 cmp cue.mod/gen/foobar.org/imported/imported.cue expect/cue.mod/gen/foobar.org/imported/imported.cue
@@ -52,6 +54,24 @@ Def :: {
 a: Def
 c: [Def.b]: int
 
+-- foo/foo_test.cue --
+package foo
+
+A :: int
+
+-- expect/foo/foo_test_cue --
+package foo
+
+#A: int
+-- foo/foo_tool.cue --
+package foo
+
+B :: int
+
+-- expect/foo/foo_tool_cue --
+package foo
+
+#B: int
 -- expect/bar/bar_cue --
 package bar
 

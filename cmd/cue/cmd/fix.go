@@ -76,9 +76,17 @@ func runFixAll(cmd *Command, args []string) error {
 		}
 	}
 
-	instances := load.Instances(args, &load.Config{})
+	instances := load.Instances(args, &load.Config{
+		Tests: true,
+		Tools: true,
+	})
 
 	for _, i := range instances {
+		a := append(i.ToolCUEFiles, i.TestCUEFiles...)
+		for _, f := range a {
+			file := i.Abs(f)
+			_ = i.AddFile(file, nil)
+		}
 		if i.Err != nil {
 			return i.Err
 		}

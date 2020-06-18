@@ -134,12 +134,10 @@
                         "type": "integer"
                      },
                      "exact": {
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      },
                      "regex": {
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      }
                   },
                   "allOf": [
@@ -229,12 +227,10 @@
                            "type": "integer"
                         },
                         "exact": {
-                           "type": "string",
-                           "format": "string"
+                           "type": "string"
                         },
                         "regex": {
-                           "type": "string",
-                           "format": "string"
+                           "type": "string"
                         }
                      },
                      "allOf": [
@@ -383,12 +379,10 @@
                   "type": "integer"
                },
                "exact": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                },
                "regex": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                }
             },
             "allOf": [
@@ -463,13 +457,7 @@
          "WithMap": {
             "type": "object",
             "properties": {
-               "shared": {
-                  "type": "object",
-                  "format": "string",
-                  "additionalProperties": {
-                     "type": "integer"
-                  }
-               },
+               "shared": {},
                "extra": {
                   "type": "integer"
                }

@@ -65,8 +65,7 @@
                   "type": "number"
                },
                "a": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                }
             },
             "oneOf": [
@@ -118,8 +117,7 @@
                "bar": {
                   "type": "array",
                   "items": {
-                     "type": "string",
-                     "format": "string"
+                     "type": "string"
                   }
                },
                "a": {
@@ -130,8 +128,7 @@
                   ]
                },
                "b": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                }
             },
             "oneOf": [
@@ -169,12 +166,9 @@
             "type": "object",
             "properties": {
                "a": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                },
-               "b": {
-                  "format": "string"
-               }
+               "b": {}
             },
             "oneOf": [
                {

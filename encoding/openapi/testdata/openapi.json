@@ -77,8 +77,7 @@
                   ],
                   "properties": {
                      "a": {
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      }
                   }
                }
@@ -113,8 +112,7 @@
                "bar": {
                   "type": "array",
                   "items": {
-                     "type": "string",
-                     "format": "string"
+                     "type": "string"
                   }
                }
             },
@@ -139,8 +137,7 @@
                   ],
                   "properties": {
                      "b": {
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      }
                   }
                }
@@ -168,8 +165,7 @@
             "type": "object",
             "properties": {
                "a": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                }
             },
             "oneOf": [
@@ -189,8 +185,7 @@
                   ],
                   "properties": {
                      "b": {
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      }
                   }
                },

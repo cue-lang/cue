@@ -14,8 +14,7 @@
             ],
             "properties": {
                "b": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                }
             }
          },
@@ -47,8 +46,7 @@
             "type": "object",
             "properties": {
                "a": {
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                }
             },
             "allOf": [

@@ -281,8 +281,7 @@
                                  "properties": {
                                     "exact": {
                                        "description": "Randomly picked description from a set of size one.",
-                                       "type": "string",
-                                       "format": "string"
+                                       "type": "string"
                                     }
                                  }
                               },
@@ -293,8 +292,7 @@
                                  "properties": {
                                     "regex": {
                                        "description": "Randomly picked description from a set of size one.",
-                                       "type": "string",
-                                       "format": "string"
+                                       "type": "string"
                                     }
                                  }
                               }
@@ -308,8 +306,7 @@
                         "properties": {
                            "exact": {
                               "description": "Randomly picked description from a set of size one.",
-                              "type": "string",
-                              "format": "string"
+                              "type": "string"
                            }
                         }
                      },
@@ -320,8 +317,7 @@
                         "properties": {
                            "regex": {
                               "description": "Randomly picked description from a set of size one.",
-                              "type": "string",
-                              "format": "string"
+                              "type": "string"
                            }
                         }
                      }
@@ -488,8 +484,7 @@
                   "properties": {
                      "shared": {
                         "description": "Randomly picked description from a set of size one.",
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      },
                      "extra": {
                         "description": "Randomly picked description from a set of size one.",

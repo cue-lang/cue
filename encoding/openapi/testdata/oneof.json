@@ -256,8 +256,7 @@
                                  ],
                                  "properties": {
                                     "exact": {
-                                       "type": "string",
-                                       "format": "string"
+                                       "type": "string"
                                     }
                                  }
                               },
@@ -267,8 +266,7 @@
                                  ],
                                  "properties": {
                                     "regex": {
-                                       "type": "string",
-                                       "format": "string"
+                                       "type": "string"
                                     }
                                  }
                               }
@@ -281,8 +279,7 @@
                         ],
                         "properties": {
                            "exact": {
-                              "type": "string",
-                              "format": "string"
+                              "type": "string"
                            }
                         }
                      },
@@ -292,8 +289,7 @@
                         ],
                         "properties": {
                            "regex": {
-                              "type": "string",
-                              "format": "string"
+                              "type": "string"
                            }
                         }
                      }
@@ -444,8 +440,7 @@
                   ],
                   "properties": {
                      "shared": {
-                        "type": "string",
-                        "format": "string"
+                        "type": "string"
                      },
                      "extra": {
                         "type": "integer"

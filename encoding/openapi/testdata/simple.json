@@ -36,7 +36,6 @@
                },
                "deprecatedField": {
                   "type": "string",
-                  "format": "string",
                   "deprecated": true
                }
             }

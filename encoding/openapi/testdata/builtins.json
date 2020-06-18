@@ -18,19 +18,19 @@
             "properties": {
                "timestamp1": {
                   "type": "string",
-                  "format": "dateTime"
+                  "format": "date-time"
                },
                "timestamp2": {
                   "type": "string",
-                  "format": "dateTime"
+                  "format": "date-time"
                },
                "timestamp3": {
                   "type": "string",
-                  "format": "dateTime"
+                  "format": "date-time"
                },
                "timestamp4": {
                   "type": "string",
-                  "format": "dateTime"
+                  "format": "date-time"
                },
                "date1": {
                   "type": "string",

@@ -13,8 +13,7 @@
             "properties": {
                "stringValue": {
                   "description": "Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI",
-                  "type": "string",
-                  "format": "string"
+                  "type": "string"
                },
                "int64Value": {
                   "description": "Used for values of type INT64",
@@ -38,7 +37,7 @@
                "timestampValue": {
                   "description": "Used for values of type TIMESTAMP",
                   "type": "string",
-                  "format": "dateTime"
+                  "format": "date-time"
                },
                "durationValue": {
                   "description": "Used for values of type DURATION",
@@ -55,8 +54,7 @@
                         "description": "Holds a set of name/value pairs.",
                         "type": "object",
                         "additionalProperties": {
-                           "type": "string",
-                           "format": "string"
+                           "type": "string"
                         }
                      }
                   }
@@ -119,8 +117,7 @@
                      "properties": {
                         "stringValue": {
                            "description": "Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI",
-                           "type": "string",
-                           "format": "string"
+                           "type": "string"
                         },
                         "int64Value": {
                            "description": "Used for values of type INT64",
@@ -144,7 +141,7 @@
                         "timestampValue": {
                            "description": "Used for values of type TIMESTAMP",
                            "type": "string",
-                           "format": "dateTime"
+                           "format": "date-time"
                         },
                         "durationValue": {
                            "description": "Used for values of type DURATION",
@@ -161,8 +158,7 @@
                                  "description": "Holds a set of name/value pairs.",
                                  "type": "object",
                                  "additionalProperties": {
-                                    "type": "string",
-                                    "format": "string"
+                                    "type": "string"
                                  }
                               }
                            }
@@ -224,8 +220,7 @@
                   "description": "Holds a set of name/value pairs.",
                   "type": "object",
                   "additionalProperties": {
-                     "type": "string",
-                     "format": "string"
+                     "type": "string"
                   }
                }
             }

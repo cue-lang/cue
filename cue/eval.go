@@ -126,11 +126,11 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 		}
 		n := sc.lookup(ctx, x.feature)
 		if n.optional {
-			field := ctx.labelStr(x.feature)
+			field := ctx.LabelStr(x.feature)
 			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
 		}
 		if n.val() == nil {
-			field := ctx.labelStr(x.feature)
+			field := ctx.LabelStr(x.feature)
 			if st, ok := sc.(*structLit); ok && !st.isClosed() {
 				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
 			}
@@ -161,11 +161,11 @@ func (x *selectorExpr) reference(ctx *context) (result value) {
 		}
 		n := sc.lookup(ctx, x.feature)
 		if n.optional {
-			field := ctx.labelStr(x.feature)
+			field := ctx.LabelStr(x.feature)
 			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
 		}
 		if n.val() == nil {
-			field := ctx.labelStr(x.feature)
+			field := ctx.LabelStr(x.feature)
 			if st, ok := sc.(*structLit); ok && !st.isClosed() {
 				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
 			}
@@ -198,7 +198,7 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 		if e.is(index, stringKind, msgIndexType, k) {
 			s := index.strValue()
 			// TODO: must lookup
-			n := v.lookup(ctx, ctx.strLabel(s))
+			n := v.lookup(ctx, ctx.StrLabel(s))
 			if n.definition {
 				return ctx.mkErr(x, index,
 					"field %q is a definition", s)
@@ -247,7 +247,7 @@ func (x *indexExpr) reference(ctx *context) (result value) {
 		if e.is(index, stringKind, msgIndexType, k) {
 			s := index.strValue()
 			// TODO: must lookup
-			n := v.lookup(ctx, ctx.strLabel(s))
+			n := v.lookup(ctx, ctx.StrLabel(s))
 			if n.definition {
 				return ctx.mkErr(x, index,
 					"field %q is a definition", s)
@@ -474,7 +474,7 @@ func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
 	if !k.kind().isAnyOf(stringKind) {
 		return ctx.mkErr(k, "key must be of type string")
 	}
-	f := ctx.label(k.strValue(), true)
+	f := ctx.Label(k.strValue(), true)
 	st := &structLit{baseValue: x.baseValue}
 	st.insertValue(ctx, f, x.opt, x.def, v, x.attrs, x.doc)
 	return st

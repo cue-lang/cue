@@ -26,6 +26,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
 )
 
 type value interface {
@@ -805,7 +806,7 @@ func (o *optionals) allows(ctx *context, f label) bool {
 		return false
 	}
 
-	str := ctx.labelStr(f)
+	str := ctx.LabelStr(f)
 	arg := &stringLit{str: str}
 
 	found, ok := o.match(ctx, arg)
@@ -1015,7 +1016,7 @@ func (x *structLit) lookup(ctx *context, f label) arc {
 			// TODO: adding more technical debt here. The evaluator should be
 			// rewritten.
 			if x.optionals != nil {
-				name := ctx.labelStr(x.arcs[i].feature)
+				name := ctx.LabelStr(x.arcs[i].feature)
 				arg := &stringLit{x.baseValue, name, nil}
 
 				val, _ := x.optionals.constraint(ctx, arg)
@@ -1206,7 +1207,7 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 	}
 
 	if x.arcs[i].feature&(hidden|definition) == 0 {
-		name := ctx.labelStr(x.arcs[i].feature)
+		name := ctx.LabelStr(x.arcs[i].feature)
 		arg := &stringLit{x.baseValue, name, nil}
 
 		var val value
@@ -1223,7 +1224,7 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 }
 
 // A label is a canonicalized feature name.
-type label uint32
+type label = adt.Feature
 
 const (
 	hidden     label = 0x01 // only set iff identifier starting with _ or #_
@@ -1361,7 +1362,7 @@ func (x *structLit) insertValue(ctx *context, f label, optional, isDef bool, val
 			src := binSrc(token.NoPos, opUnify, p.v, value)
 			x.arcs[i].v = ctx.mkErr(src,
 				"field %q declared as definition and regular field",
-				ctx.labelStr(f))
+				ctx.LabelStr(f))
 			isDef = false
 		}
 		x.arcs[i].definition = isDef
@@ -1913,7 +1914,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 		for i, a := range src.arcs {
 			key := &stringLit{
 				x.baseValue,
-				ctx.labelStr(a.feature),
+				ctx.LabelStr(a.feature),
 				nil,
 			}
 			if a.definition || a.optional || a.feature&hidden != 0 {

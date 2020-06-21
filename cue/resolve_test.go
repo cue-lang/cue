@@ -39,10 +39,10 @@ func compileFile(t *testing.T, body string) (*context, *structLit) {
 
 func compileInstance(t *testing.T, body string) (*context, *Instance, error) {
 	var r Runtime
-	inst, err := r.Parse("test", body)
+	inst, err := r.Compile("test", body)
 
 	if err != nil {
-		x := newIndex(sharedIndex).newInstance(nil)
+		x := newInstance(newIndex(sharedIndex), nil)
 		ctx := x.newContext()
 		return ctx, x, err
 	}

@@ -85,7 +85,7 @@ func TestPartiallyResolved(t *testing.T) {
 			ImportPath: importPath,
 			PkgName:    "foo",
 		}},
-	}, map[string]ast.Node{})
+	}, map[string]ast.Node{}, isBuiltin)
 
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)

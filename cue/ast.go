@@ -150,7 +150,7 @@ func (v *astVisitor) appendPath(a []string) []string {
 func (v *astVisitor) resolve(n *ast.Ident) value {
 	ctx := v.ctx()
 	name := v.ident(n)
-	label := v.label(name, true)
+	label := v.Label(name, true)
 	if r := v.resolveRoot; r != nil {
 		for _, a := range r.arcs {
 			if a.feature == label {
@@ -254,7 +254,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				if i != len(n.Elts)-1 {
 					return v1.walk(x.Type) // Generate an error
 				}
-				f := v.ctx().label("_", true)
+				f := v.ctx().Label("_", true)
 				sig := &params{}
 				sig.add(f, &basicType{newNode(x), stringKind})
 				template := &lambdaExpr{newNode(x), sig, &top{newNode(x)}}
@@ -429,9 +429,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			a, ok := expr.(*ast.Alias)
 			if ok {
 				expr = a.Expr
-				f = v.label(v.ident(a.Ident), true)
+				f = v.Label(v.ident(a.Ident), true)
 			} else {
-				f = v.label("_", true)
+				f = v.Label("_", true)
 			}
 
 			// Parse the key filter or a bulk-optional field. The special value
@@ -456,7 +456,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				v.errf(x, "map element type cannot be a definition")
 			}
 			v.sel = "*"
-			f := v.label(v.ident(x.Ident), true)
+			f := v.Label(v.ident(x.Ident), true)
 
 			sig := &params{}
 			sig.add(f, &basicType{newNode(lab), stringKind})
@@ -474,7 +474,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 					v.sel = "*"
 				}
 			}
-			f, ok := v.nodeLabel(x)
+			f, ok := v.NodeLabel(x)
 			if !ok {
 				return v.errf(lab, "invalid field name: %v", lab)
 			}
@@ -587,7 +587,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			break
 		}
 
-		f := v.label(name, true)
+		f := v.Label(name, true)
 		if _, ok := n.Node.(*ast.ImportSpec); ok {
 			n2 := v.mapScope(n.Node)
 			ref := &nodeRef{baseValue: newExpr(n), node: n2, label: f}
@@ -631,7 +631,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				ret = v.errf(n, "invalid label: %v", err)
 
 			case name != "":
-				f = v.label(name, true)
+				f = v.Label(name, true)
 				ret = &selectorExpr{newExpr(n), ret, f}
 
 			default:
@@ -704,7 +704,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		ret = &selectorExpr{
 			newExpr(n),
 			v.walk(n.X),
-			v.label(v.ident(n.Sel), true),
+			v.Label(v.ident(n.Sel), true),
 		}
 		v.inSelector--
 
@@ -822,10 +822,10 @@ func wrapClauses(v *astVisitor, y yielder, clauses []ast.Clause) yielder {
 			if n.Key != nil {
 				key = v.ident(n.Key)
 			}
-			f := v.label(key, true)
+			f := v.Label(key, true)
 			fn.add(f, &basicType{newExpr(n.Key), stringKind | intKind})
 
-			f = v.label(v.ident(n.Value), true)
+			f = v.Label(v.ident(n.Value), true)
 			fn.add(f, &top{})
 
 			y = &feed{newExpr(n.Source), v.walk(n.Source), fn}

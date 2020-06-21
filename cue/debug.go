@@ -142,7 +142,7 @@ func (p *printer) label(f label) string {
 		return strconv.Itoa(int(f))
 	}
 
-	str := p.ctx.labelStr(f)
+	str := p.ctx.LabelStr(f)
 	if strings.HasPrefix(str, "#") && f&definition == 0 ||
 		strings.HasPrefix(str, "_") && f&hidden == 0 ||
 		!ast.IsValidIdent(str) {

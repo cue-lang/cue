@@ -70,7 +70,7 @@ func parseTag(ctx *context, obj *structLit, field label, tag string) value {
 	}
 	expr, err := parser.ParseExpr("<field:>", tag)
 	if err != nil {
-		field := ctx.labelStr(field)
+		field := ctx.LabelStr(field)
 		return ctx.mkErr(baseValue{}, "invalid tag %q for field %q: %v", tag, field, err)
 	}
 	v := newVisitor(ctx.index, nil, nil, obj, true)
@@ -389,7 +389,7 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 				if name == "-" {
 					continue
 				}
-				f := ctx.strLabel(name)
+				f := ctx.StrLabel(name)
 				obj.arcs = append(obj.arcs, arc{feature: f, v: sub})
 			}
 			sort.Sort(obj)
@@ -438,12 +438,12 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 			// Assign label in normalized order.
 			sort.Strings(sorted)
 			for _, k := range sorted {
-				ctx.strLabel(k)
+				ctx.StrLabel(k)
 			}
 
 			// Now assign the labels to the arcs.
 			for i, k := range keys {
-				obj.arcs[i].feature = ctx.strLabel(k)
+				obj.arcs[i].feature = ctx.StrLabel(k)
 			}
 			sort.Sort(obj)
 			return obj
@@ -597,7 +597,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 			if name == "-" {
 				continue
 			}
-			l := ctx.strLabel(name)
+			l := ctx.StrLabel(name)
 			obj.arcs = append(obj.arcs, arc{
 				feature: l,
 				// The GO JSON decoder always allows a value to be undefined.
@@ -658,7 +658,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 
 		obj := newStruct(baseValue{})
 		sig := &params{}
-		sig.add(ctx.label("_", true), &basicType{k: stringKind})
+		sig.add(ctx.Label("_", true), &basicType{k: stringKind})
 		v := goTypeToValueRec(ctx, allowNullDefault, t.Elem())
 		if v == nil {
 			return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", t.Elem())

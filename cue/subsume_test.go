@@ -454,9 +454,9 @@ func TestSubsume(t *testing.T) {
 			var a, b value
 			for _, arc := range root.arcs {
 				switch arc.feature {
-				case ctx.strLabel("a"):
+				case ctx.StrLabel("a"):
 					a = arc.v
-				case ctx.strLabel("b"):
+				case ctx.StrLabel("b"):
 					b = arc.v
 				}
 			}

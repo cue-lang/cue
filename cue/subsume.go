@@ -36,7 +36,7 @@ func subsumes(v, w Value, mode subsumeMode) error {
 			src := binSrc(token.NoPos, opUnify, s.gt, s.lt)
 			var ok bool
 			if s.missing != 0 {
-				b = ctx.mkErr(src, "missing field %q", ctx.labelStr(s.missing))
+				b = ctx.mkErr(src, "missing field %q", ctx.LabelStr(s.missing))
 			} else if b, ok = binOp(ctx, src, opUnify, s.gt, s.lt).(*bottom); !ok {
 				b = ctx.mkErr(src, "value not an instance")
 			}
@@ -180,7 +180,7 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				if b.optional || b.definition {
 					continue
 				}
-				name := ctx.labelStr(b.feature)
+				name := ctx.LabelStr(b.feature)
 				arg := &stringLit{x.baseValue, name, nil}
 				u, _ := x.optionals.constraint(ctx, arg)
 				if u != nil && !s.subsumes(u, b.v) {
@@ -248,7 +248,7 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				}
 				a := x.lookup(ctx, b.feature)
 				if a.val() == nil {
-					name := ctx.labelStr(b.feature)
+					name := ctx.LabelStr(b.feature)
 					arg := &stringLit{x.baseValue, name, nil}
 					u, _ := x.optionals.constraint(ctx, arg)
 					if u == nil { // subsumption already checked

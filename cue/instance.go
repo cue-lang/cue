@@ -83,7 +83,7 @@ func init() {
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.
-func (x *index) newInstance(p *build.Instance) *Instance {
+func newInstance(x *index, p *build.Instance) *Instance {
 	// TODO: associate root source with structLit.
 	st := &structLit{baseValue: baseValue{nil}}
 	i := &Instance{
@@ -237,7 +237,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 
 	idx := inst.index
 
-	i := idx.newInstance(p)
+	i := newInstance(idx, p)
 	if i.Err != nil {
 		return i
 	}
@@ -251,7 +251,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	}
 	i.scope = v.obj
 
-	if err := resolveFiles(idx, p); err != nil {
+	if err := resolveFiles(idx, p, isBuiltin); err != nil {
 		i.setError(err)
 		return i
 	}

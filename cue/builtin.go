@@ -71,11 +71,11 @@ type builtinPkg struct {
 
 func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit {
 	obj := &structLit{}
-	pkgLabel := ctx.label(pkgName, false)
+	pkgLabel := ctx.Label(pkgName, false)
 	for _, b := range p.native {
 		b.pkg = pkgLabel
 
-		f := ctx.label(b.Name, false) // never starts with _
+		f := ctx.Label(b.Name, false) // never starts with _
 		// n := &node{baseValue: newBase(imp.Path)}
 		var v evaluated = b
 		if b.Const != "" {
@@ -243,7 +243,7 @@ func (x *builtin) name(ctx *context) string {
 	if x.pkg == 0 {
 		return x.Name
 	}
-	return fmt.Sprintf("%s.%s", ctx.labelStr(x.pkg), x.Name)
+	return fmt.Sprintf("%s.%s", ctx.LabelStr(x.pkg), x.Name)
 }
 
 func (x *builtin) isValidator() bool {
@@ -288,29 +288,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		if err := recover(); err != nil {
 			errVal = err
 		}
-		const msg = "error in call to %s: %v"
-		switch err := errVal.(type) {
-		case nil:
-		case *callError:
-			ret = err.b
-		case *json.MarshalerError:
-			if err, ok := err.Err.(*marshalError); ok && err.b != nil {
-				ret = err.b
-			}
-		case *marshalError:
-			ret = err.b
-			ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
-		case *valueError:
-			ret = err.err
-			ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
-		default:
-			if call.err == internal.ErrIncomplete {
-				ret = ctx.mkErr(src, codeIncomplete, "incomplete value")
-			} else {
-				// TODO: store the underlying error explicitly
-				ret = ctx.mkErr(src, x, msg, x.name(ctx), err)
-			}
-		}
+		ret = processErr(&call, errVal, ret)
 	}()
 	x.Func(&call)
 	switch v := call.ret.(type) {
@@ -320,6 +298,36 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 		return v.err
 	}
 	return convert(ctx, x, true, call.ret)
+}
+
+func processErr(call *callCtxt, errVal interface{}, ret value) value {
+	ctx := call.ctx
+	x := call.builtin
+	src := call.src
+	const msg = "error in call to %s: %v"
+	switch err := errVal.(type) {
+	case nil:
+	case *callError:
+		ret = err.b
+	case *json.MarshalerError:
+		if err, ok := err.Err.(*marshalError); ok && err.b != nil {
+			ret = err.b
+		}
+	case *marshalError:
+		ret = err.b
+		ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
+	case *valueError:
+		ret = err.err
+		ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
+	default:
+		if call.err == internal.ErrIncomplete {
+			ret = ctx.mkErr(src, codeIncomplete, "incomplete value")
+		} else {
+			// TODO: store the underlying error explicitly
+			ret = ctx.mkErr(src, x, msg, x.name(ctx), err)
+		}
+	}
+	return ret
 }
 
 // callCtxt is passed to builtin implementations.
@@ -384,7 +392,7 @@ func init() {
 		if s == nil {
 			return v
 		}
-		a := s.lookup(ctx, ctx.label(name, false))
+		a := s.lookup(ctx, ctx.Label(name, false))
 		if a.v == nil {
 			return v
 		}

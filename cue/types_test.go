@@ -770,7 +770,7 @@ v: #X
 	}
 }
 
-func compile(t *testing.T, r *Runtime, s string) *Instance {
+func compileT(t *testing.T, r *Runtime, s string) *Instance {
 	t.Helper()
 	inst, err := r.Compile("", s)
 	if err != nil {
@@ -838,8 +838,8 @@ func TestFill(t *testing.T) {
 			path = strings.Split(tc.path, ",")
 		}
 
-		v := compile(t, r, tc.in).Value().Fill(tc.x, path...)
-		w := compile(t, r, tc.out).Value()
+		v := compileT(t, r, tc.in).Value().Fill(tc.x, path...)
+		w := compileT(t, r, tc.out).Value()
 
 		if !reflect.DeepEqual(goValue(v), goValue(w)) {
 			t.Errorf("\ngot:  %s\nwant: %s", v, w)
@@ -899,7 +899,7 @@ func TestValue_LookupDef(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.def, func(t *testing.T) {
-			v := compile(t, r, tc.in).Value()
+			v := compileT(t, r, tc.in).Value()
 			v = v.LookupDef(tc.def)
 			got := fmt.Sprint(v)
 

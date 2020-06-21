@@ -152,13 +152,13 @@ func (o *structValue) Len() int {
 func (o *structValue) At(i int) (key string, v Value) {
 	a := o.arcs[i]
 	v = newChildValue(o, i)
-	return o.ctx.labelStr(a.feature), v
+	return o.ctx.LabelStr(a.feature), v
 }
 
 // Lookup reports the field for the given key. The returned Value is invalid
 // if it does not exist.
 func (o *structValue) Lookup(key string) Value {
-	f := o.ctx.strLabel(key)
+	f := o.ctx.StrLabel(key)
 	i := 0
 	len := o.Len()
 	for ; i < len; i++ {
@@ -281,7 +281,7 @@ func (i *Iterator) Label() string {
 	if i.f == 0 {
 		return ""
 	}
-	return i.ctx.labelStr(i.f)
+	return i.ctx.LabelStr(i.f)
 }
 
 // IsHidden reports if a field is hidden from the data model.
@@ -563,7 +563,7 @@ func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
 	case listKind:
 		a = append(a, strconv.FormatInt(int64(v.index), 10))
 	case structKind:
-		f := idx.labelStr(v.arc.feature)
+		f := idx.LabelStr(v.arc.feature)
 		if v.arc.feature&(hidden|definition) == 0 {
 			if !isIdent(f) && !isNumber(f) {
 				f = quote(f, '"')
@@ -634,7 +634,7 @@ func newChildValue(obj *structValue, i int) Value {
 			x := obj.obj
 			ctx := obj.ctx
 			if x.optionals != nil {
-				name := ctx.labelStr(x.arcs[i].feature)
+				name := ctx.LabelStr(x.arcs[i].feature)
 				arg := &stringLit{x.baseValue, name, nil}
 
 				val, _ := x.optionals.constraint(ctx, arg)
@@ -720,7 +720,7 @@ func appendPath(ctx *context, a []label, v value) (path []label, n *nodeRef) {
 			return nil, nil
 		}
 
-		a = append(a, ctx.label(s.str, false))
+		a = append(a, ctx.Label(s.str, false))
 
 	case *nodeRef:
 		n = x
@@ -821,7 +821,7 @@ func (v Value) Label() (string, bool) {
 	if v.path.feature == 0 {
 		return "", false
 	}
-	return v.idx.labelStr(v.path.feature), true
+	return v.idx.LabelStr(v.path.feature), true
 }
 
 // Kind returns the kind of value. It returns BottomKind for atomic values that
@@ -1430,7 +1430,7 @@ func (s *Struct) Field(i int) FieldInfo {
 	// rewritten.
 	x := s.s
 	if x.optionals != nil {
-		name := ctx.labelStr(x.arcs[i].feature)
+		name := ctx.LabelStr(x.arcs[i].feature)
 		arg := &stringLit{x.baseValue, name, nil}
 
 		val, _ := x.optionals.constraint(ctx, arg)
@@ -1440,7 +1440,7 @@ func (s *Struct) Field(i int) FieldInfo {
 	}
 
 	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
-	str := ctx.labelStr(a.feature)
+	str := ctx.LabelStr(a.feature)
 	return FieldInfo{str, i, v, a.definition, a.optional, a.feature&hidden != 0}
 }
 
@@ -1448,7 +1448,7 @@ func (s *Struct) Field(i int) FieldInfo {
 // look up a definition or hidden field (starting with `_` or `_#`). Otherwise
 // it interprets name as an arbitrary string for a regular field.
 func (s *Struct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
-	f := s.v.ctx().label(name, isIdent)
+	f := s.v.ctx().Label(name, isIdent)
 	for i, a := range s.s.arcs {
 		if a.feature == f {
 			return s.Field(i), nil
@@ -1515,7 +1515,7 @@ func (v Value) LookupDef(name string) Value {
 		return newErrValue(v, err)
 	}
 
-	f := v.ctx().label(name, true)
+	f := v.ctx().Label(name, true)
 	for i, a := range o.arcs {
 		if a.feature == f {
 			if f&hidden != 0 || !a.definition || a.optional {
@@ -1751,7 +1751,7 @@ func (v Value) Reference() (inst *Instance, path []string) {
 	switch sel := v.path.v.(type) {
 	case *selectorExpr:
 		x = sel.x
-		feature = ctx.labelStr(sel.feature)
+		feature = ctx.LabelStr(sel.feature)
 
 	case *indexExpr:
 		e := sel.index.evalPartial(ctx)
@@ -1772,7 +1772,7 @@ func (v Value) Reference() (inst *Instance, path []string) {
 func mkPath(c *context, up *valueData, x value, feature string, d int) (imp *Instance, a []string) {
 	switch x := x.(type) {
 	case *selectorExpr:
-		imp, a = mkPath(c, up, x.x, c.labelStr(x.feature), d+1)
+		imp, a = mkPath(c, up, x.x, c.LabelStr(x.feature), d+1)
 		if imp == nil {
 			return nil, nil
 		}
@@ -1818,7 +1818,7 @@ func mkFromRoot(c *context, up *valueData, d int) (root value, a []string) {
 	}
 	root, a = mkFromRoot(c, up.parent, d+1)
 	if up.parent != nil {
-		a = append(a, c.labelStr(up.feature))
+		a = append(a, c.LabelStr(up.feature))
 	} else {
 		root = up.v
 	}
@@ -1867,7 +1867,7 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 		}
 		path := make([]string, len(p.stack))
 		for i, v := range p.stack {
-			path[len(path)-1-i] = ctx.labelStr(v)
+			path[len(path)-1-i] = ctx.LabelStr(v)
 		}
 		p.paths = append(p.paths, path)
 		p.stack = p.stack[:i]
@@ -2291,7 +2291,7 @@ func (v Value) Expr() (Op, []Value) {
 		a = append(a, remakeValue(v, x.x))
 		a = append(a, remakeValue(v, &stringLit{
 			x.baseValue,
-			v.ctx().labelStr(x.feature),
+			v.ctx().LabelStr(x.feature),
 			nil,
 		}))
 		op = SelectorOp

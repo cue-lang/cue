@@ -135,8 +135,8 @@ func (p *exporter) unique(s string) string {
 	s = strings.ToUpper(s)
 	lab := s
 	for {
-		if _, ok := p.ctx.findLabel(lab); !ok {
-			p.ctx.label(lab, true)
+		if !p.ctx.HasLabel(lab) {
+			p.ctx.Label(lab, true)
 			break
 		}
 		lab = s + fmt.Sprintf("%0.6x", rand.Intn(1<<24))
@@ -145,7 +145,7 @@ func (p *exporter) unique(s string) string {
 }
 
 func (p *exporter) label(f label) ast.Label {
-	str := p.ctx.labelStr(f)
+	str := p.ctx.LabelStr(f)
 	if strings.HasPrefix(str, "#") && f&definition == 0 ||
 		strings.HasPrefix(str, "_") && f&hidden == 0 ||
 		!ast.IsValidIdent(str) {
@@ -155,7 +155,7 @@ func (p *exporter) label(f label) ast.Label {
 }
 
 func (p *exporter) identifier(f label) *ast.Ident {
-	str := p.ctx.labelStr(f)
+	str := p.ctx.LabelStr(f)
 	return &ast.Ident{Name: str}
 }
 
@@ -171,7 +171,7 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 			Source: p.expr(x.source),
 		}
 		key := x.fn.params.arcs[0]
-		if p.ctx.labelStr(key.feature) != "_" {
+		if p.ctx.LabelStr(key.feature) != "_" {
 			feed.Key = p.identifier(key.feature)
 		}
 		return feed, x.fn.value.(yielder)
@@ -187,22 +187,22 @@ func (p *exporter) shortName(inst *Instance, preferred, pkg string) string {
 	short := info.short
 	if !ok {
 		short = inst.PkgName
-		if _, ok := p.top[p.ctx.label(short, true)]; ok && preferred != "" {
+		if _, ok := p.top[p.ctx.Label(short, true)]; ok && preferred != "" {
 			short = preferred
 			info.name = short
 		}
 		for {
-			if _, ok := p.top[p.ctx.label(short, true)]; !ok {
+			if _, ok := p.top[p.ctx.Label(short, true)]; !ok {
 				break
 			}
 			short += "x"
 			info.name = short
 		}
 		info.short = short
-		p.top[p.ctx.label(short, true)] = true
+		p.top[p.ctx.Label(short, true)] = true
 		p.imports[pkg] = info
 	}
-	f := p.ctx.label(short, true)
+	f := p.ctx.Label(short, true)
 	for _, e := range p.stack {
 		if e.from == f {
 			if info.alias == "" {
@@ -435,7 +435,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		if x.pkg == 0 {
 			return ast.NewIdent(x.Name)
 		}
-		pkg := p.ctx.labelStr(x.pkg)
+		pkg := p.ctx.LabelStr(x.pkg)
 		inst := builtins[pkg]
 		short := p.shortName(inst, "", pkg)
 		return ast.NewSel(ast.NewIdent(short), x.Name)
@@ -445,7 +445,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			// NOTE: this nodeRef is used within a selector.
 			return nil
 		}
-		short := p.ctx.labelStr(x.label)
+		short := p.ctx.LabelStr(x.label)
 
 		if inst := p.ctx.getImportFromNode(x.node); inst != nil {
 			return ast.NewIdent(p.shortName(inst, short, inst.ImportPath))
@@ -457,7 +457,7 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *selectorExpr:
 		n := p.expr(x.x)
 		if n != nil {
-			return ast.NewSel(n, p.ctx.labelStr(x.feature))
+			return ast.NewSel(n, p.ctx.LabelStr(x.feature))
 		}
 		f := x.feature
 		ident := p.identifier(f)
@@ -486,7 +486,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			if conflict {
 				ident = e.to
 				if e.to == nil {
-					name := p.unique(p.ctx.labelStr(f))
+					name := p.unique(p.ctx.LabelStr(f))
 					e.syn.Elts = append(e.syn.Elts, &ast.Alias{
 						Ident: p.ident(name),
 						Expr:  p.identifier(f),

@@ -570,7 +570,7 @@ func (x *customValidator) check(ctx *context, v evaluated) evaluated {
 		return ctx.mkErr(x, "invalid custom validator")
 	} else if !b.b {
 		var buf bytes.Buffer
-		fmt.Fprintf(&buf, "%s.%s", ctx.labelStr(x.call.pkg), x.call.Name)
+		fmt.Fprintf(&buf, "%s.%s", ctx.LabelStr(x.call.pkg), x.call.Name)
 		buf.WriteString("(")
 		for _, a := range x.args {
 			buf.WriteString(ctx.str(a))
@@ -672,7 +672,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 			// TODO: pass position of key, not value. Currently does not have
 			// a position.
 			return ctx.mkErr(a.v, a.v, "field %q not allowed in closed struct",
-				ctx.labelStr(a.feature))
+				ctx.LabelStr(a.feature))
 		}
 		cp := ctx.copy(a.v)
 		obj.arcs = append(obj.arcs,
@@ -688,7 +688,7 @@ outer:
 				if a.definition != b.definition {
 					src := binSrc(x.Pos(), op, a.v, b.v)
 					return ctx.mkErr(src, "field %q declared as definition and regular field",
-						ctx.labelStr(a.feature))
+						ctx.LabelStr(a.feature))
 				}
 				w := b.v
 				if x.closeStatus.shouldFinalize() {
@@ -717,7 +717,7 @@ outer:
 			// TODO: pass position of key, not value. Currently does not have a
 			// position.
 			return ctx.mkErr(a.v, x, "field %q not allowed in closed struct",
-				ctx.labelStr(a.feature))
+				ctx.LabelStr(a.feature))
 		}
 		a.setValue(v)
 		obj.arcs = append(obj.arcs, a)

@@ -20,6 +20,7 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -121,20 +122,11 @@ func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
 // may import builtin packages. Use Build to allow importing non-builtin
 // packages.
 func (r *Runtime) CompileExpr(expr ast.Expr) (*Instance, error) {
-	ctx := r.buildContext()
-	p := ctx.NewInstance("", dummyLoad)
-	switch x := expr.(type) {
-	case *ast.StructLit:
-		_ = p.AddSyntax(&ast.File{Decls: x.Elts})
-	default:
-		_ = p.AddSyntax(&ast.File{
-			Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
-		})
+	f, err := astutil.ToFile(expr)
+	if err != nil {
+		return nil, err
 	}
-	if p.Err != nil {
-		return nil, p.Err
-	}
-	return r.complete(p)
+	return r.CompileFile(f)
 }
 
 // Parse parses a CUE source value into a CUE Instance. The source code may
@@ -192,14 +184,9 @@ func (r *Runtime) build(instances []*build.Instance) ([]*Instance, error) {
 //
 // Deprecated: use CompileExpr
 func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
-	i := r.index().newInstance(nil)
-	err := i.insertFile(&ast.File{
+	return r.CompileFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
 	})
-	if err != nil {
-		return nil, err
-	}
-	return i, nil
 }
 
 // index maps conversions from label names to internal codes.
@@ -239,7 +226,6 @@ func newSharedIndex() *index {
 	// FileSet idea from the API. Just take the hit of the extra pointers for
 	// positions in the ast, and then optimize the storage in an abstract
 	// machine implementation for storing graphs.
-	token.NewFile("dummy", sharedOffset, 0)
 	i := &index{
 		labelMap:      map[string]label{"": 0},
 		labels:        []string{""},
@@ -262,20 +248,30 @@ func newIndex(parent *index) *index {
 	return i
 }
 
-func (idx *index) strLabel(str string) label {
-	return idx.label(str, false)
+func (idx *index) StrLabel(str string) label {
+	return idx.Label(str, false)
 }
 
-func (idx *index) nodeLabel(n ast.Node) (f label, ok bool) {
+func (idx *index) NodeLabel(n ast.Node) (f label, ok bool) {
 	switch x := n.(type) {
 	case *ast.BasicLit:
 		name, _, err := ast.LabelName(x)
-		return idx.label(name, false), err == nil
+		return idx.Label(name, false), err == nil
 	case *ast.Ident:
 		name, err := ast.ParseIdent(x)
-		return idx.label(name, true), err == nil
+		return idx.Label(name, true), err == nil
 	}
 	return 0, false
+}
+
+func (idx *index) HasLabel(s string) (ok bool) {
+	for x := idx; x != nil; x = x.parent {
+		_, ok = x.labelMap[s]
+		if ok {
+			break
+		}
+	}
+	return ok
 }
 
 func (idx *index) findLabel(s string) (f label, ok bool) {
@@ -288,7 +284,7 @@ func (idx *index) findLabel(s string) (f label, ok bool) {
 	return f, ok
 }
 
-func (idx *index) label(s string, isIdent bool) label {
+func (idx *index) Label(s string, isIdent bool) label {
 	f, ok := idx.findLabel(s)
 	if !ok {
 		f = label(len(idx.labelMap)) + idx.offset
@@ -307,11 +303,16 @@ func (idx *index) label(s string, isIdent bool) label {
 	return f
 }
 
-func (idx *index) labelStr(l label) string {
+func (idx *index) LabelStr(l label) string {
 	l >>= labelShift
 	for ; l < idx.offset; idx = idx.parent {
 	}
 	return idx.labels[l-idx.offset]
+}
+
+func isBuiltin(s string) bool {
+	_, ok := builtins[s]
+	return ok
 }
 
 func (idx *index) loadInstance(p *build.Instance) *Instance {
@@ -324,11 +325,13 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 		return inst
 	}
 	files := p.Files
-	inst := idx.newInstance(p)
+	inst := newInstance(idx, p)
+	idx.loaded[p] = inst
+
 	if inst.Err == nil {
 		// inst.instance.index.state = s
 		// inst.instance.inst = p
-		inst.Err = resolveFiles(idx, p)
+		inst.Err = resolveFiles(idx, p, isBuiltin)
 		for _, f := range files {
 			err := inst.insertFile(f)
 			inst.Err = errors.Append(inst.Err, err)
@@ -344,7 +347,11 @@ func lineStr(idx *index, n ast.Node) string {
 	return n.Pos().String()
 }
 
-func resolveFiles(idx *index, p *build.Instance) errors.Error {
+func resolveFiles(
+	idx *index,
+	p *build.Instance,
+	isBuiltin func(s string) bool,
+) errors.Error {
 	// Link top-level declarations. As top-level entries get unified, an entry
 	// may be linked to any top-level entry of any of the files.
 	allFields := map[string]ast.Node{}
@@ -358,14 +365,20 @@ func resolveFiles(idx *index, p *build.Instance) errors.Error {
 		}
 	}
 	for _, f := range p.Files {
-		if err := resolveFile(idx, f, p, allFields); err != nil {
+		if err := resolveFile(idx, f, p, allFields, isBuiltin); err != nil {
 			return err
 		}
 	}
 	return nil
 }
 
-func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[string]ast.Node) errors.Error {
+func resolveFile(
+	idx *index,
+	f *ast.File,
+	p *build.Instance,
+	allFields map[string]ast.Node,
+	isBuiltin func(s string) bool,
+) errors.Error {
 	unresolved := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
 		unresolved[u.Name] = append(unresolved[u.Name], u)
@@ -390,7 +403,7 @@ func resolveFile(idx *index, f *ast.File, p *build.Instance, allFields map[strin
 		name := path.Base(id)
 		if imp := p.LookupImport(id); imp != nil {
 			name = imp.PkgName
-		} else if _, ok := builtins[id]; !ok {
+		} else if !isBuiltin(id) {
 			errs = errors.Append(errs,
 				nodeErrorf(spec, "package %q not found", id))
 			continue

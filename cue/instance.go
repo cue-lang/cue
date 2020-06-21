@@ -20,6 +20,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // An Instance defines a single configuration based on a collection of
@@ -48,23 +49,25 @@ type Instance struct {
 }
 
 func (x *index) addInst(p *Instance) *Instance {
-	if p.rootStruct == nil {
-		panic("struct must not be nil")
-	}
+	x.Index.AddInst(p.ImportPath, p.rootStruct, p)
 	p.index = x
-	x.imports[p.rootValue] = p
-	if p.ImportPath != "" {
-		x.importsByPath[p.ImportPath] = p
-	}
 	return p
 }
 
 func (x *index) getImportFromNode(v value) *Instance {
-	imp := x.imports[v]
-	if imp == nil && x.parent != nil {
-		return x.parent.getImportFromNode(v)
+	p := x.Index.GetImportFromNode(v)
+	if p == nil {
+		return nil
 	}
-	return imp
+	return p.(*Instance)
+}
+
+func (x *index) getImportFromPath(id string) *Instance {
+	node := x.Index.GetImportFromPath(id)
+	if node == nil {
+		return nil
+	}
+	return x.Index.GetImportFromNode(node).(*Instance)
 }
 
 func init() {
@@ -251,7 +254,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	}
 	i.scope = v.obj
 
-	if err := resolveFiles(idx, p, isBuiltin); err != nil {
+	if err := runtime.ResolveFiles(idx.Index, p, isBuiltin); err != nil {
 		i.setError(err)
 		return i
 	}

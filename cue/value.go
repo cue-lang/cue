@@ -801,8 +801,7 @@ func (o *optionals) allows(ctx *context, f label) bool {
 	if o == nil {
 		return false
 	}
-
-	if f&(hidden|definition) != 0 {
+	if f.IsDef() || f.IsHidden() {
 		return false
 	}
 
@@ -975,7 +974,7 @@ func (x *structLit) addTemplate(ctx *context, pos token.Pos, key, value value) {
 
 func (x *structLit) allows(ctx *context, f label) bool {
 	return !x.closeStatus.isClosed() ||
-		f&hidden != 0 ||
+		f.IsHidden() ||
 		x.optionals.allows(ctx, f)
 }
 
@@ -1206,7 +1205,7 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 		return v, nil
 	}
 
-	if x.arcs[i].feature&(hidden|definition) == 0 {
+	if f := x.arcs[i].feature; !f.IsHidden() && !f.IsDef() {
 		name := ctx.LabelStr(x.arcs[i].feature)
 		arg := &stringLit{x.baseValue, name, nil}
 
@@ -1225,13 +1224,6 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 
 // A label is a canonicalized feature name.
 type label = adt.Feature
-
-const (
-	hidden     label = 0x01 // only set iff identifier starting with _ or #_
-	definition label = 0x02 // only set iff identifier starting with #
-
-	labelShift = 2
-)
 
 // An arc holds the label-value pair.
 //
@@ -1917,7 +1909,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 				ctx.LabelStr(a.feature),
 				nil,
 			}
-			if a.definition || a.optional || a.feature&hidden != 0 {
+			if a.definition || a.optional || a.feature.IsHidden() {
 				continue
 			}
 			val := src.at(ctx, i)

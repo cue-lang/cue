@@ -19,6 +19,7 @@ import (
 	"compress/gzip"
 	"encoding/gob"
 	"path/filepath"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
@@ -183,8 +184,8 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 		p := len(staged) - 1
 
 		for _, imp := range imports {
-			i := ctx.importsByPath[imp]
-			if i == nil {
+			i := ctx.getImportFromPath(imp)
+			if i == nil || !strings.Contains(imp, ".") {
 				continue // a builtin package.
 			}
 			stageInstance(i)

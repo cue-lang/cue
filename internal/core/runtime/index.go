@@ -19,81 +19,158 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
-// index maps conversions from label names to internal codes.
+// Index maps conversions from label names to internal codes.
 //
-// All instances belonging to the same package should share this index.
-type index struct {
-	labelMap map[string]int
+// All instances belonging to the same package should share this Index.
+//
+// INDEX IS A TRANSITIONAL TYPE TO BRIDGE THE OLD AND NEW
+// IMPLEMENTATIONS. USE RUNTIME.
+type Index struct {
+	labelMap map[string]int64
 	labels   []string
 
-	offset int
-	parent *index
+	// Change this to Instance at some point.
+	// From *structLit/*Vertex -> Instance
+	imports       map[interface{}]interface{}
+	importsByPath map[string]interface{}
+	// imports map[string]*adt.Vertex
 
-	mutex     sync.Mutex
+	offset int64
+	parent *Index
+
+	// mutex     sync.Mutex
 	typeCache sync.Map // map[reflect.Type]evaluated
 }
 
-// sharedIndex is used for indexing builtins and any other labels common to
+// SharedIndex is used for indexing builtins and any other labels common to
 // all instances.
-var sharedIndex = newSharedIndex()
+var SharedIndex = newSharedIndex()
 
-func newSharedIndex() *index {
-	i := &index{
-		labelMap: map[string]int{"": 0},
-		labels:   []string{"_"},
+var SharedIndexNew = newSharedIndex()
+
+func newSharedIndex() *Index {
+	i := &Index{
+		labelMap:      map[string]int64{"": 0},
+		labels:        []string{""},
+		imports:       map[interface{}]interface{}{},
+		importsByPath: map[string]interface{}{},
 	}
 	return i
 }
 
-// newIndex creates a new index.
-func newIndex(parent *index) *index {
-	i := &index{
-		labelMap: map[string]int{},
-		offset:   len(parent.labels) + parent.offset,
-		parent:   parent,
+// NewIndex creates a new index.
+func NewIndex(parent *Index) *Index {
+	i := &Index{
+		labelMap:      map[string]int64{},
+		imports:       map[interface{}]interface{}{},
+		importsByPath: map[string]interface{}{},
+		offset:        int64(len(parent.labels)) + parent.offset,
+		parent:        parent,
 	}
 	return i
 }
 
-func (x *index) IndexToString(i int64) string {
-	for ; int(i) < x.offset; x = x.parent {
+func (x *Index) IndexToString(i int64) string {
+	for ; i < x.offset; x = x.parent {
 	}
-	return x.labels[int(i)-x.offset]
+	return x.labels[i-x.offset]
 }
 
-func (x *index) StringToIndex(s string) int64 {
+func (x *Index) StringToIndex(s string) int64 {
 	for p := x; p != nil; p = p.parent {
 		if f, ok := p.labelMap[s]; ok {
 			return int64(f)
 		}
 	}
-	index := len(x.labelMap) + x.offset
+	index := int64(len(x.labelMap)) + x.offset
 	x.labelMap[s] = index
 	x.labels = append(x.labels, s)
 	return int64(index)
 }
 
-func (x *index) StoreType(t reflect.Type, src ast.Expr, expr adt.Expr) {
-	if expr == nil {
-		x.typeCache.Store(t, src)
-	} else {
-		x.typeCache.Store(t, expr)
+func (x *Index) HasLabel(s string) (ok bool) {
+	for c := x; c != nil; c = c.parent {
+		_, ok = c.labelMap[s]
+		if ok {
+			break
+		}
+	}
+	return ok
+}
+
+func (x *Index) StoreType(t reflect.Type, v interface{}) {
+	x.typeCache.Store(t, v)
+}
+
+func (x *Index) LoadType(t reflect.Type) (v interface{}, ok bool) {
+	v, ok = x.typeCache.Load(t)
+	return v, ok
+}
+
+func (x *Index) StrLabel(str string) adt.Feature {
+	return x.Label(str, false)
+}
+
+func (x *Index) NodeLabel(n ast.Node) (f adt.Feature, ok bool) {
+	switch label := n.(type) {
+	case *ast.BasicLit:
+		name, _, err := ast.LabelName(label)
+		return x.Label(name, false), err == nil
+	case *ast.Ident:
+		name, err := ast.ParseIdent(label)
+		return x.Label(name, true), err == nil
+	}
+	return 0, false
+}
+
+func (x *Index) Label(s string, isIdent bool) adt.Feature {
+	index := x.StringToIndex(s)
+	typ := adt.StringLabel
+	if isIdent {
+		switch {
+		case internal.IsDef(s) && internal.IsHidden(s):
+			typ = adt.HiddenDefinitionLabel
+		case internal.IsDef(s):
+			typ = adt.DefinitionLabel
+		case internal.IsHidden(s):
+			typ = adt.HiddenLabel
+		}
+	}
+	f, _ := adt.MakeLabel(nil, index, typ)
+	return f
+}
+
+func (idx *Index) LabelStr(l adt.Feature) string {
+	index := int64(l.Index())
+	return idx.IndexToString(index)
+}
+
+func (x *Index) AddInst(path string, key, p interface{}) {
+	if key == nil {
+		panic("key must not be nil")
+	}
+	x.imports[key] = p
+	if path != "" {
+		x.importsByPath[path] = key
 	}
 }
 
-func (x *index) LoadType(t reflect.Type) (src ast.Expr, expr adt.Expr, ok bool) {
-	v, ok := x.typeCache.Load(t)
-	if ok {
-		switch x := v.(type) {
-		case ast.Expr:
-			return x, nil, true
-		case adt.Expr:
-			src, _ = x.Source().(ast.Expr)
-			return src, x, true
-		}
+func (x *Index) GetImportFromNode(key interface{}) interface{} {
+	imp := x.imports[key]
+	if imp == nil && x.parent != nil {
+		return x.parent.GetImportFromNode(key)
 	}
-	return nil, nil, false
+	return imp
+}
+
+func (x *Index) GetImportFromPath(id string) interface{} {
+	key := x.importsByPath[id]
+	if key == nil && x.parent != nil {
+		return x.parent.GetImportFromPath(id)
+	}
+	return key
 }

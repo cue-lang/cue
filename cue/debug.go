@@ -143,8 +143,8 @@ func (p *printer) label(f label) string {
 	}
 
 	str := p.ctx.LabelStr(f)
-	if strings.HasPrefix(str, "#") && f&definition == 0 ||
-		strings.HasPrefix(str, "_") && f&hidden == 0 ||
+	if strings.HasPrefix(str, "#") && !f.IsDef() ||
+		strings.HasPrefix(str, "_") && !f.IsHidden() ||
 		!ast.IsValidIdent(str) {
 		return strconv.Quote(str)
 	}
@@ -381,7 +381,7 @@ func (p *printer) str(v interface{}) {
 		if x.optional {
 			p.write("?")
 		}
-		if x.definition && x.feature&definition == 0 {
+		if x.definition && !x.feature.IsDef() {
 			p.write(" :: ")
 		} else {
 			p.write(": ")

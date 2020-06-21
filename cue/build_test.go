@@ -53,45 +53,6 @@ func TestFromExpr(t *testing.T) {
 	}
 }
 
-// TestPartiallyResolved tests that the resolve will detect the usage of
-// imports that are referenced by previously resolved nodes.
-func TestPartiallyResolved(t *testing.T) {
-	const importPath = "acme.com/foo"
-	spec1 := &ast.ImportSpec{
-		Path: ast.NewString(importPath),
-	}
-	spec2 := &ast.ImportSpec{
-		Name: ast.NewIdent("bar"),
-		Path: ast.NewString(importPath),
-	}
-
-	f := &ast.File{
-		Decls: []ast.Decl{
-			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec1, spec2}},
-			&ast.Field{
-				Label: ast.NewIdent("X"),
-				Value: &ast.Ident{Name: "foo", Node: spec1},
-			},
-			&ast.Alias{
-				Ident: ast.NewIdent("Y"),
-				Expr:  &ast.Ident{Name: "bar", Node: spec2},
-			},
-		},
-		Imports: []*ast.ImportSpec{spec1, spec2},
-	}
-
-	err := resolveFile(nil, f, &build.Instance{
-		Imports: []*build.Instance{{
-			ImportPath: importPath,
-			PkgName:    "foo",
-		}},
-	}, map[string]ast.Node{}, isBuiltin)
-
-	if err != nil {
-		t.Errorf("exected no error, found %v", err)
-	}
-}
-
 func TestBuild(t *testing.T) {
 	files := func(s ...string) []string { return s }
 	insts := func(i ...*bimport) []*bimport { return i }

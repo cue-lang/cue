@@ -15,8 +15,6 @@
 package cue
 
 import (
-	"path"
-	"strconv"
 	"sync"
 
 	"cuelang.org/go/cue/ast"
@@ -25,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // A Runtime is used for creating CUE interpretations.
@@ -193,121 +192,25 @@ func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 //
 // All instances belonging to the same package should share this index.
 type index struct {
-	labelMap map[string]label
-	labels   []string
+	*runtime.Index
 
-	loaded        map[*build.Instance]*Instance
-	imports       map[value]*Instance // key is always a *structLit
-	importsByPath map[string]*Instance
-
-	offset label
-	parent *index
-
-	mutex     sync.Mutex
-	typeCache sync.Map // map[reflect.Type]evaluated
+	loaded map[*build.Instance]*Instance
+	mutex  sync.Mutex
 }
-
-// work around golang-ci linter bug: fields are used.
-func init() {
-	var i index
-	i.mutex.Lock()
-	i.mutex.Unlock()
-	i.typeCache.Load(1)
-}
-
-const sharedOffset = 0x40000000
 
 // sharedIndex is used for indexing builtins and any other labels common to
 // all instances.
-var sharedIndex = newSharedIndex()
-
-func newSharedIndex() *index {
-	// TODO: nasty hack to indicate FileSet of shared index. Remove the whole
-	// FileSet idea from the API. Just take the hit of the extra pointers for
-	// positions in the ast, and then optimize the storage in an abstract
-	// machine implementation for storing graphs.
-	i := &index{
-		labelMap:      map[string]label{"": 0},
-		labels:        []string{""},
-		imports:       map[value]*Instance{},
-		importsByPath: map[string]*Instance{},
-	}
-	return i
+var sharedIndex = &index{
+	Index:  runtime.SharedIndex,
+	loaded: map[*build.Instance]*Instance{},
 }
 
 // newIndex creates a new index.
 func newIndex(parent *index) *index {
-	i := &index{
-		labelMap:      map[string]label{},
-		loaded:        map[*build.Instance]*Instance{},
-		imports:       map[value]*Instance{},
-		importsByPath: map[string]*Instance{},
-		offset:        label(len(parent.labels)) + parent.offset,
-		parent:        parent,
+	return &index{
+		Index:  runtime.NewIndex(parent.Index),
+		loaded: map[*build.Instance]*Instance{},
 	}
-	return i
-}
-
-func (idx *index) StrLabel(str string) label {
-	return idx.Label(str, false)
-}
-
-func (idx *index) NodeLabel(n ast.Node) (f label, ok bool) {
-	switch x := n.(type) {
-	case *ast.BasicLit:
-		name, _, err := ast.LabelName(x)
-		return idx.Label(name, false), err == nil
-	case *ast.Ident:
-		name, err := ast.ParseIdent(x)
-		return idx.Label(name, true), err == nil
-	}
-	return 0, false
-}
-
-func (idx *index) HasLabel(s string) (ok bool) {
-	for x := idx; x != nil; x = x.parent {
-		_, ok = x.labelMap[s]
-		if ok {
-			break
-		}
-	}
-	return ok
-}
-
-func (idx *index) findLabel(s string) (f label, ok bool) {
-	for x := idx; x != nil; x = x.parent {
-		f, ok = x.labelMap[s]
-		if ok {
-			break
-		}
-	}
-	return f, ok
-}
-
-func (idx *index) Label(s string, isIdent bool) label {
-	f, ok := idx.findLabel(s)
-	if !ok {
-		f = label(len(idx.labelMap)) + idx.offset
-		idx.labelMap[s] = f
-		idx.labels = append(idx.labels, s)
-	}
-	f <<= labelShift
-	if isIdent {
-		if internal.IsDef(s) {
-			f |= definition
-		}
-		if internal.IsHidden(s) {
-			f |= hidden
-		}
-	}
-	return f
-}
-
-func (idx *index) LabelStr(l label) string {
-	l >>= labelShift
-	for ; l < idx.offset; idx = idx.parent {
-	}
-	return idx.labels[l-idx.offset]
 }
 
 func isBuiltin(s string) bool {
@@ -331,7 +234,7 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 	if inst.Err == nil {
 		// inst.instance.index.state = s
 		// inst.instance.inst = p
-		inst.Err = resolveFiles(idx, p, isBuiltin)
+		inst.Err = runtime.ResolveFiles(idx.Index, p, isBuiltin)
 		for _, f := range files {
 			err := inst.insertFile(f)
 			inst.Err = errors.Append(inst.Err, err)
@@ -341,145 +244,4 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 
 	inst.complete = true
 	return inst
-}
-
-func lineStr(idx *index, n ast.Node) string {
-	return n.Pos().String()
-}
-
-func resolveFiles(
-	idx *index,
-	p *build.Instance,
-	isBuiltin func(s string) bool,
-) errors.Error {
-	// Link top-level declarations. As top-level entries get unified, an entry
-	// may be linked to any top-level entry of any of the files.
-	allFields := map[string]ast.Node{}
-	for _, file := range p.Files {
-		for _, d := range file.Decls {
-			if f, ok := d.(*ast.Field); ok && f.Value != nil {
-				if ident, ok := f.Label.(*ast.Ident); ok {
-					allFields[ident.Name] = f.Value
-				}
-			}
-		}
-	}
-	for _, f := range p.Files {
-		if err := resolveFile(idx, f, p, allFields, isBuiltin); err != nil {
-			return err
-		}
-	}
-	return nil
-}
-
-func resolveFile(
-	idx *index,
-	f *ast.File,
-	p *build.Instance,
-	allFields map[string]ast.Node,
-	isBuiltin func(s string) bool,
-) errors.Error {
-	unresolved := map[string][]*ast.Ident{}
-	for _, u := range f.Unresolved {
-		unresolved[u.Name] = append(unresolved[u.Name], u)
-	}
-	fields := map[string]ast.Node{}
-	for _, d := range f.Decls {
-		if f, ok := d.(*ast.Field); ok && f.Value != nil {
-			if ident, ok := f.Label.(*ast.Ident); ok {
-				fields[ident.Name] = d
-			}
-		}
-	}
-	var errs errors.Error
-
-	specs := []*ast.ImportSpec{}
-
-	for _, spec := range f.Imports {
-		id, err := strconv.Unquote(spec.Path.Value)
-		if err != nil {
-			continue // quietly ignore the error
-		}
-		name := path.Base(id)
-		if imp := p.LookupImport(id); imp != nil {
-			name = imp.PkgName
-		} else if !isBuiltin(id) {
-			errs = errors.Append(errs,
-				nodeErrorf(spec, "package %q not found", id))
-			continue
-		}
-		if spec.Name != nil {
-			name = spec.Name.Name
-		}
-		if n, ok := fields[name]; ok {
-			errs = errors.Append(errs, nodeErrorf(spec,
-				"%s redeclared as imported package name\n"+
-					"\tprevious declaration at %v", name, lineStr(idx, n)))
-			continue
-		}
-		fields[name] = spec
-		used := false
-		for _, u := range unresolved[name] {
-			used = true
-			u.Node = spec
-		}
-		if !used {
-			specs = append(specs, spec)
-		}
-	}
-
-	// Verify each import is used.
-	if len(specs) > 0 {
-		// Find references to imports. This assumes that identifiers in labels
-		// are not resolved or that such errors are caught elsewhere.
-		ast.Walk(f, nil, func(n ast.Node) {
-			if x, ok := n.(*ast.Ident); ok {
-				// As we also visit labels, most nodes will be nil.
-				if x.Node == nil {
-					return
-				}
-				for i, s := range specs {
-					if s == x.Node {
-						specs[i] = nil
-						return
-					}
-				}
-			}
-		})
-
-		// Add errors for unused imports.
-		for _, spec := range specs {
-			if spec == nil {
-				continue
-			}
-			if spec.Name == nil {
-				errs = errors.Append(errs, nodeErrorf(spec,
-					"imported and not used: %s", spec.Path.Value))
-			} else {
-				errs = errors.Append(errs, nodeErrorf(spec,
-					"imported and not used: %s as %s", spec.Path.Value, spec.Name))
-			}
-		}
-	}
-
-	k := 0
-	for _, u := range f.Unresolved {
-		if u.Node != nil {
-			continue
-		}
-		if n, ok := allFields[u.Name]; ok {
-			u.Node = n
-			u.Scope = f
-			continue
-		}
-		f.Unresolved[k] = u
-		k++
-	}
-	f.Unresolved = f.Unresolved[:k]
-	// TODO: also need to resolve types.
-	// if len(f.Unresolved) > 0 {
-	// 	n := f.Unresolved[0]
-	// 	return ctx.mkErr(newBase(n), "unresolved reference %s", n.Name)
-	// }
-	return errs
 }

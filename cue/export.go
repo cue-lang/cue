@@ -146,8 +146,8 @@ func (p *exporter) unique(s string) string {
 
 func (p *exporter) label(f label) ast.Label {
 	str := p.ctx.LabelStr(f)
-	if strings.HasPrefix(str, "#") && f&definition == 0 ||
-		strings.HasPrefix(str, "_") && f&hidden == 0 ||
+	if strings.HasPrefix(str, "#") && !f.IsDef() ||
+		strings.HasPrefix(str, "_") && !f.IsHidden() ||
 		!ast.IsValidIdent(str) {
 		return ast.NewLit(token.STRING, strconv.Quote(str))
 	}
@@ -878,7 +878,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 				f.Token = token.ISA
 			}
 		}
-		if a.feature&hidden != 0 && p.mode.concrete && p.mode.omitHidden {
+		if a.feature.IsHidden() && p.mode.concrete && p.mode.omitHidden {
 			continue
 		}
 		oldInDef := p.inDef

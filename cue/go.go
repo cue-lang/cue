@@ -508,7 +508,7 @@ func goTypeToValue(ctx *context, allowNullDefault bool, t reflect.Type) value {
 }
 
 func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e value) {
-	if e, ok := ctx.typeCache.Load(t); ok {
+	if e, ok := ctx.LoadType(t); ok {
 		return e.(value)
 	}
 
@@ -578,7 +578,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 		// resolve field tags to allow field tags to refer to the struct fields.
 		tags := map[label]string{}
 		obj := newStruct(baseValue{})
-		ctx.typeCache.Store(t, obj)
+		ctx.StoreType(t, obj)
 
 		for i := 0; i < t.NumField(); i++ {
 			f := t.Field(i)
@@ -674,7 +674,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 store:
 	// TODO: store error if not nil?
 	if e != nil {
-		ctx.typeCache.Store(t, e)
+		ctx.StoreType(t, e)
 	}
 	return e
 }

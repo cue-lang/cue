@@ -286,7 +286,7 @@ func (i *Iterator) Label() string {
 
 // IsHidden reports if a field is hidden from the data model.
 func (i *Iterator) IsHidden() bool {
-	return i.f&hidden != 0
+	return i.f.IsHidden()
 }
 
 // IsOptional reports if a field is optional.
@@ -564,7 +564,7 @@ func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
 		a = append(a, strconv.FormatInt(int64(v.index), 10))
 	case structKind:
 		f := idx.LabelStr(v.arc.feature)
-		if v.arc.feature&(hidden|definition) == 0 {
+		if l := v.arc.feature; !l.IsDef() && !l.IsHidden() {
 			if !isIdent(f) && !isNumber(f) {
 				f = quote(f, '"')
 			}
@@ -1341,7 +1341,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 				break
 			}
 		}
-		needFilter = needFilter || f&hidden != 0
+		needFilter = needFilter || f.IsHidden()
 	}
 
 	if needFilter {
@@ -1351,7 +1351,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 			if a.definition && (o.omitDefinitions || o.concrete) {
 				continue
 			}
-			if a.feature&hidden != 0 && o.omitHidden {
+			if a.feature.IsHidden() && o.omitHidden {
 				continue
 			}
 			if o.omitOptional && a.optional {
@@ -1441,7 +1441,7 @@ func (s *Struct) Field(i int) FieldInfo {
 
 	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
 	str := ctx.LabelStr(a.feature)
-	return FieldInfo{str, i, v, a.definition, a.optional, a.feature&hidden != 0}
+	return FieldInfo{str, i, v, a.definition, a.optional, a.feature.IsHidden()}
 }
 
 // FieldByName looks up a field for the given name. If isIdent is true, it will
@@ -1518,7 +1518,7 @@ func (v Value) LookupDef(name string) Value {
 	f := v.ctx().Label(name, true)
 	for i, a := range o.arcs {
 		if a.feature == f {
-			if f&hidden != 0 || !a.definition || a.optional {
+			if f.IsHidden() || !a.definition || a.optional {
 				break
 			}
 			return newChildValue(&o, i)

@@ -49,7 +49,7 @@ func init() {
 
 func convertValue(r *Runtime, x interface{}, nilIsTop bool) Value {
 	ctx := r.index().newContext()
-	v := convert(ctx, baseValue{}, nilIsTop, x)
+	v := convertVal(ctx, baseValue{}, nilIsTop, x)
 	return newValueRoot(ctx, v)
 }
 
@@ -189,7 +189,7 @@ func isZero(v reflect.Value) bool {
 	}
 }
 
-func convert(ctx *context, src source, nilIsTop bool, x interface{}) evaluated {
+func convertVal(ctx *context, src source, nilIsTop bool, x interface{}) evaluated {
 	v := convertRec(ctx, src, nilIsTop, x)
 	if v == nil {
 		return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", v)

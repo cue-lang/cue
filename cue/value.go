@@ -1444,8 +1444,8 @@ func (x *callExpr) Kind() kind {
 type customValidator struct {
 	baseValue
 
-	Args    []evaluated // any but the first value
 	Builtin *builtin    // function must return a bool
+	Args    []evaluated // any but the first value
 }
 
 func (x *customValidator) Kind() kind {

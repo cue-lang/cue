@@ -51,7 +51,7 @@ func fill(v Value, x interface{}, path ...string) Value {
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convert(ctx, root, false, x)
+	value := convertVal(ctx, root, false, x)
 	eval := binOp(ctx, baseValue{}, opUnify, root, value)
 	return newValueRoot(ctx, eval)
 }

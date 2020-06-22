@@ -253,7 +253,7 @@ func (x *builtin) isValidator() bool {
 func convertBuiltin(v evaluated) evaluated {
 	x, ok := v.(*builtin)
 	if ok && x.isValidator() {
-		return &customValidator{v.base(), []evaluated{}, x}
+		return &customValidator{v.base(), x, []evaluated{}}
 	}
 	return v
 }
@@ -264,7 +264,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 	}
 	if len(x.Params)-1 == len(args) && x.Result == boolKind {
 		// We have a custom builtin
-		return &customValidator{src.base(), args, x}
+		return &customValidator{src.base(), x, args}
 	}
 	switch {
 	case len(x.Params) < len(args):
@@ -297,7 +297,7 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 	case *valueError:
 		return v.err
 	}
-	return convert(ctx, x, true, call.ret)
+	return convertVal(ctx, x, true, call.ret)
 }
 
 func processErr(call *callCtxt, errVal interface{}, ret value) value {

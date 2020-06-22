@@ -152,7 +152,7 @@ func TestConvert(t *testing.T) {
 	for _, tc := range testCases {
 		ctx := inst.newContext()
 		t.Run("", func(t *testing.T) {
-			v := convert(ctx, newNode(b), true, tc.goVal)
+			v := convertVal(ctx, newNode(b), true, tc.goVal)
 			got := debugStr(ctx, v)
 			if got != tc.want {
 				t.Errorf("got %q; want %q", got, tc.want)

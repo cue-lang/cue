@@ -21,7 +21,6 @@ import (
 	"io"
 	"math"
 	"math/big"
-	"math/bits"
 	"strconv"
 	"strings"
 	"unicode"
@@ -32,103 +31,49 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 )
 
 // Kind determines the underlying type of a Value.
-type Kind int
+type Kind = adt.Kind
 
 const BottomKind Kind = 0
 
 const (
 	// NullKind indicates a null value.
-	NullKind Kind = 1 << iota
+	NullKind Kind = adt.NullKind
 
 	// BoolKind indicates a boolean value.
-	BoolKind
+	BoolKind = adt.BoolKind
 
 	// IntKind represents an integral number.
-	IntKind
+	IntKind = adt.IntKind
 
 	// FloatKind represents a decimal float point number that cannot be
 	// converted to an integer. The underlying number may still be integral,
 	// but resulting from an operation that enforces the float type.
-	FloatKind
+	FloatKind = adt.FloatKind
 
 	// StringKind indicates any kind of string.
-	StringKind
+	StringKind = adt.StringKind
 
 	// BytesKind is a blob of data.
-	BytesKind
+	BytesKind = adt.BytesKind
 
 	// StructKind is a kev-value map.
-	StructKind
+	StructKind = adt.StructKind
 
 	// ListKind indicates a list of values.
-	ListKind
-
-	nextKind
+	ListKind = adt.ListKind
 
 	// _numberKind is used as a implementation detail inside
 	// Kind.String to indicate NumberKind.
-	_numberKind
 
 	// NumberKind represents any kind of number.
 	NumberKind = IntKind | FloatKind
+
+	TopKind = Kind(adt.TopKind)
 )
-
-// String returns the representation of the Kind as
-// a CUE expression. For example:
-//
-//	(IntKind|ListKind).String()
-//
-// will return:
-//
-//	(int|[...])
-func (k Kind) String() string {
-	if k == BottomKind {
-		return "_|_"
-	}
-	if (k & NumberKind) == NumberKind {
-		k = (k &^ NumberKind) | _numberKind
-	}
-	var buf strings.Builder
-	multiple := bits.OnesCount(uint(k)) > 1
-	if multiple {
-		buf.WriteByte('(')
-	}
-	for count := 0; ; count++ {
-		n := bits.TrailingZeros(uint(k))
-		if n == bits.UintSize {
-			break
-		}
-		bit := Kind(1 << uint(n))
-		k &^= bit
-		s, ok := kindStrs[bit]
-		if !ok {
-			s = fmt.Sprintf("bad(%d)", n)
-		}
-		if count > 0 {
-			buf.WriteByte('|')
-		}
-		buf.WriteString(s)
-	}
-	if multiple {
-		buf.WriteByte(')')
-	}
-	return buf.String()
-}
-
-var kindStrs = map[Kind]string{
-	NullKind:    "null",
-	BoolKind:    "bool",
-	IntKind:     "int",
-	FloatKind:   "float",
-	StringKind:  "string",
-	BytesKind:   "bytes",
-	StructKind:  "{...}",
-	ListKind:    "[...]",
-	_numberKind: "number",
-}
 
 // An structValue represents a JSON object.
 //
@@ -1596,7 +1541,7 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convert(ctx, root, true, x)
+	value := convertVal(ctx, root, true, x)
 	a := v.path.arc
 	a.v = mkBin(ctx, v.Pos(), opUnify, root, value)
 	a.cache = a.v.evalPartial(ctx)

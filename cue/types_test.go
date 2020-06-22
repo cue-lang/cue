@@ -55,7 +55,7 @@ func TestValueType(t *testing.T) {
 	}{{ // Not a concrete value.
 		value:          `v: _`,
 		kind:           BottomKind,
-		incompleteKind: nextKind - 1,
+		incompleteKind: TopKind,
 	}, {
 		value:          `v: _|_`,
 		kind:           BottomKind,
@@ -2770,7 +2770,7 @@ func exprStr(v Value) string {
 	if op == NoOp {
 		return debugStr(v.ctx(), v.path.v)
 	}
-	s := opToString[op]
+	s := op.String()
 	s += "("
 	for i, v := range operands {
 		if i > 0 {
@@ -2780,55 +2780,4 @@ func exprStr(v Value) string {
 	}
 	s += ")"
 	return s
-}
-
-func TestKindString(t *testing.T) {
-	testCases := []struct {
-		input Kind
-		want  string
-	}{{
-		input: BottomKind,
-		want:  "_|_",
-	}, {
-		input: IntKind | ListKind,
-		want:  `(int|[...])`,
-	}, {
-		input: NullKind,
-		want:  "null",
-	}, {
-		input: IntKind,
-		want:  "int",
-	}, {
-		input: FloatKind,
-		want:  "float",
-	}, {
-		input: StringKind,
-		want:  "string",
-	}, {
-		input: BytesKind,
-		want:  "bytes",
-	}, {
-		input: StructKind,
-		want:  "{...}",
-	}, {
-		input: ListKind,
-		want:  "[...]",
-	}, {
-		input: NumberKind,
-		want:  "number",
-	}, {
-		input: BoolKind | NumberKind | ListKind,
-		want:  "(bool|[...]|number)",
-	}, {
-		input: 1 << 20,
-		want:  "bad(20)",
-	}}
-	for _, tc := range testCases {
-		t.Run(tc.want, func(t *testing.T) {
-			got := tc.input.String()
-			if got != tc.want {
-				t.Errorf("\n got %v;\nwant %v", got, tc.want)
-			}
-		})
-	}
 }

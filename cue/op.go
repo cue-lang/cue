@@ -14,53 +14,51 @@
 
 package cue
 
-import "cuelang.org/go/cue/token"
+import (
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
+)
 
 // Op indicates the operation at the top of an expression tree of the expression
 // use to evaluate a value.
-type Op int
-
-func (o Op) String() string {
-	return opToString[o]
-}
+type Op = adt.Op
 
 // Values of Op.
 const (
-	NoOp Op = iota
+	NoOp = adt.NoOp
 
-	AndOp
-	OrOp
+	AndOp = adt.AndOp
+	OrOp  = adt.OrOp
 
-	SelectorOp
-	IndexOp
-	SliceOp
-	CallOp
+	SelectorOp = adt.SelectorOp
+	IndexOp    = adt.IndexOp
+	SliceOp    = adt.SliceOp
+	CallOp     = adt.CallOp
 
-	BooleanAndOp
-	BooleanOrOp
+	BooleanAndOp = adt.BoolAndOp
+	BooleanOrOp  = adt.BoolOrOp
 
-	EqualOp
-	NotOp
-	NotEqualOp
-	LessThanOp
-	LessThanEqualOp
-	GreaterThanOp
-	GreaterThanEqualOp
+	EqualOp            = adt.EqualOp
+	NotOp              = adt.NotOp
+	NotEqualOp         = adt.NotEqualOp
+	LessThanOp         = adt.LessThanOp
+	LessThanEqualOp    = adt.LessEqualOp
+	GreaterThanOp      = adt.GreaterThanOp
+	GreaterThanEqualOp = adt.GreaterEqualOp
 
-	RegexMatchOp
-	NotRegexMatchOp
+	RegexMatchOp    = adt.MatchOp
+	NotRegexMatchOp = adt.NotMatchOp
 
-	AddOp
-	SubtractOp
-	MultiplyOp
-	FloatQuotientOp
-	FloatRemainOp
-	IntQuotientOp
-	IntRemainderOp
-	IntDivideOp
-	IntModuloOp
+	AddOp           = adt.AddOp
+	SubtractOp      = adt.SubtractOp
+	MultiplyOp      = adt.MultiplyOp
+	FloatQuotientOp = adt.FloatQuotientOp
+	IntQuotientOp   = adt.IntQuotientOp
+	IntRemainderOp  = adt.IntRemainderOp
+	IntDivideOp     = adt.IntDivideOp
+	IntModuloOp     = adt.IntModuloOp
 
-	InterpolationOp
+	InterpolationOp = adt.InterpolationOp
 )
 
 var opToOp = map[op]Op{
@@ -85,42 +83,10 @@ var opToOp = map[op]Op{
 	opSub:            SubtractOp,
 	opMul:            MultiplyOp,
 	opQuo:            FloatQuotientOp,
-	opRem:            FloatRemainOp,
 	opIQuo:           IntQuotientOp,
 	opIRem:           IntRemainderOp,
 	opIDiv:           IntDivideOp,
 	opIMod:           IntModuloOp,
-}
-
-var opToString = map[Op]string{
-	AndOp:              "&",
-	OrOp:               "|",
-	BooleanAndOp:       "&&",
-	BooleanOrOp:        "||",
-	EqualOp:            "==",
-	NotOp:              "!",
-	NotEqualOp:         "!=",
-	LessThanOp:         "<",
-	LessThanEqualOp:    "<=",
-	GreaterThanOp:      ">",
-	GreaterThanEqualOp: ">=",
-	RegexMatchOp:       "=~",
-	NotRegexMatchOp:    "!~",
-	AddOp:              "+",
-	SubtractOp:         "-",
-	MultiplyOp:         "*",
-	FloatQuotientOp:    "/",
-	FloatRemainOp:      "%",
-	IntQuotientOp:      "quo",
-	IntRemainderOp:     "rem",
-	IntDivideOp:        "div",
-	IntModuloOp:        "mod",
-
-	SelectorOp:      ".",
-	IndexOp:         "[]",
-	SliceOp:         "[:]",
-	CallOp:          "()",
-	InterpolationOp: `\()`,
 }
 
 func opIn(op op, anyOf ...op) bool {

@@ -52,7 +52,7 @@ type evaluated interface {
 
 type scope interface {
 	value
-	lookup(*context, label) arc
+	Lookup(*context, label) arc
 }
 
 type atter interface {
@@ -213,7 +213,7 @@ func (x *bytesLit) iterAt(ctx *context, i int) arc {
 		return arc{}
 	}
 	v := x.at(ctx, i)
-	return arc{v: v, cache: v}
+	return arc{v: v, Value: v}
 }
 
 func (x *bytesLit) at(ctx *context, i int) evaluated {
@@ -267,7 +267,7 @@ func (x *stringLit) iterAt(ctx *context, i int) arc {
 		return arc{}
 	}
 	v := x.at(ctx, i)
-	return arc{v: v, cache: v}
+	return arc{v: v, Value: v}
 }
 
 func (x *stringLit) at(ctx *context, i int) evaluated {
@@ -524,7 +524,7 @@ type list struct {
 
 // initLit initializes a literal list.
 func (x *list) initLit() {
-	x.len = newInt(x, 0).setInt(len(x.elem.arcs))
+	x.len = newInt(x, 0).setInt(len(x.elem.Arcs))
 	x.typ = &top{x.baseValue}
 }
 
@@ -534,7 +534,7 @@ func (x *list) manifest(ctx *context) evaluated {
 	}
 	// A list is ground if its length is ground, or if the current length
 	// meets matches the cap.
-	n := newInt(x, 0).setInt(len(x.elem.arcs))
+	n := newInt(x, 0).setInt(len(x.elem.Arcs))
 	if n := binOp(ctx, x, opUnify, n, x.len.evalPartial(ctx)); !isBottom(n) {
 		return &list{
 			baseValue: x.baseValue,
@@ -559,10 +559,10 @@ func (x *list) Kind() kind {
 // issue evaluating the list itself.
 func (x *list) at(ctx *context, i int) evaluated {
 	arc := x.iterAt(ctx, i)
-	if arc.cache == nil {
+	if arc.Value == nil {
 		return ctx.mkErr(x, "index %d out of bounds", i)
 	}
-	return arc.cache
+	return arc.Value
 }
 
 // iterAt returns the evaluated and original value of position i. List x must
@@ -571,25 +571,25 @@ func (x *list) at(ctx *context, i int) evaluated {
 func (x *list) iterAt(ctx *context, i int) arc {
 	if i < 0 {
 		v := ctx.mkErr(x, "index %d out of bounds", i)
-		return arc{cache: v}
+		return arc{Value: v}
 	}
-	if i < len(x.elem.arcs) {
+	if i < len(x.elem.Arcs) {
 		a := x.elem.iterAt(ctx, i)
-		a.feature = 0
+		a.Label = 0
 		return a
 	}
 	max := maxNum(x.len.(evaluated))
 	if max.Kind().isGround() {
 		if max.Kind()&intKind == bottomKind {
 			v := ctx.mkErr(max, "length indicator of list not of type int")
-			return arc{cache: v}
+			return arc{Value: v}
 		}
 		n := max.(*numLit).intValue(ctx)
 		if i >= n {
 			return arc{}
 		}
 	}
-	return arc{cache: x.typ.evalPartial(ctx), v: x.typ}
+	return arc{Value: x.typ.evalPartial(ctx), v: x.typ}
 }
 
 func (x *list) isOpen() bool {
@@ -598,7 +598,7 @@ func (x *list) isOpen() bool {
 
 // lo and hi must be nil or a ground integer.
 func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
-	a := x.elem.arcs
+	a := x.elem.Arcs
 	max := maxNum(x.len).evalPartial(ctx)
 	if hi != nil {
 		n := hi.intValue(ctx)
@@ -634,9 +634,9 @@ func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
 	}
 	arcs := make([]arc, len(a))
 	for i, a := range a {
-		arcs[i] = arc{feature: label(i), v: a.v, docs: a.docs}
+		arcs[i] = arc{Label: label(i), v: a.v, docs: a.docs}
 	}
-	s := &structLit{baseValue: x.baseValue, arcs: arcs}
+	s := &structLit{baseValue: x.baseValue, Arcs: arcs}
 	return &list{baseValue: x.baseValue, elem: s, typ: x.typ, len: max}
 }
 
@@ -669,7 +669,7 @@ type structLit struct {
 	comprehensions []compValue
 
 	// TODO: consider hoisting the template arc to its own value.
-	arcs     []arc
+	Arcs     []arc
 	expanded evaluated
 }
 
@@ -986,9 +986,9 @@ func (x *structLit) Kind() kind { return structKind }
 
 type arcs []arc
 
-func (x *structLit) Len() int           { return len(x.arcs) }
-func (x *structLit) Less(i, j int) bool { return x.arcs[i].feature < x.arcs[j].feature }
-func (x *structLit) Swap(i, j int)      { x.arcs[i], x.arcs[j] = x.arcs[j], x.arcs[i] }
+func (x *structLit) Len() int           { return len(x.Arcs) }
+func (x *structLit) Less(i, j int) bool { return x.Arcs[i].Label < x.Arcs[j].Label }
+func (x *structLit) Swap(i, j int)      { x.Arcs[i], x.Arcs[j] = x.Arcs[j], x.Arcs[i] }
 
 func (x *structLit) close() *structLit {
 	if x.optionals.isFull() {
@@ -1001,7 +1001,7 @@ func (x *structLit) close() *structLit {
 }
 
 // lookup returns the node for the given label f, if present, or nil otherwise.
-func (x *structLit) lookup(ctx *context, f label) arc {
+func (x *structLit) Lookup(ctx *context, f label) arc {
 	x, err := x.expandFields(ctx)
 	if err != nil {
 		return arc{}
@@ -1009,13 +1009,13 @@ func (x *structLit) lookup(ctx *context, f label) arc {
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.
-	for i, a := range x.arcs {
-		if a.feature == f {
+	for i, a := range x.Arcs {
+		if a.Label == f {
 			a := x.iterAt(ctx, i)
 			// TODO: adding more technical debt here. The evaluator should be
 			// rewritten.
 			if x.optionals != nil {
-				name := ctx.LabelStr(x.arcs[i].feature)
+				name := ctx.LabelStr(x.Arcs[i].Label)
 				arg := &stringLit{x.baseValue, name, nil}
 
 				val, _ := x.optionals.constraint(ctx, arg)
@@ -1031,11 +1031,11 @@ func (x *structLit) lookup(ctx *context, f label) arc {
 
 func (x *structLit) iterAt(ctx *context, i int) arc {
 	x, err := x.expandFields(ctx)
-	if err != nil || i >= len(x.arcs) {
+	if err != nil || i >= len(x.Arcs) {
 		return arc{}
 	}
-	a := x.arcs[i]
-	a.cache = x.at(ctx, i) // TODO: return template & v for original?
+	a := x.Arcs[i]
+	a.Value = x.at(ctx, i) // TODO: return template & v for original?
 	return a
 }
 
@@ -1057,7 +1057,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.
-	if v := x.arcs[i].cache; v == nil {
+	if v := x.Arcs[i].Value; v == nil {
 
 		// cycle detection
 
@@ -1066,12 +1066,12 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 			baseValue: x.base(),
 			index:     ctx.index,
 			Code:      codeCycle,
-			value:     x.arcs[i].v,
+			value:     x.Arcs[i].v,
 			format:    "cycle detected",
 		})
-		x.arcs[i].cache = &(ctx.evalStack[len(ctx.evalStack)-1])
+		x.Arcs[i].Value = &(ctx.evalStack[len(ctx.evalStack)-1])
 
-		v := x.arcs[i].v.evalPartial(ctx)
+		v := x.Arcs[i].v.evalPartial(ctx)
 		ctx.evalStack = popped
 
 		var doc *docNode
@@ -1083,7 +1083,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 			// partial results. Each field involved in the cycle will have to
 			// reevaluated the values from scratch. As the result will be
 			// cached after one cycle, it will evaluate the cycle at most twice.
-			x.arcs[i].cache = nil
+			x.Arcs[i].Value = nil
 			return v
 		}
 
@@ -1098,20 +1098,20 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 				v = err
 			}
 		}
-		x.arcs[i].cache = v
+		x.Arcs[i].Value = v
 		if doc != nil {
-			x.arcs[i].docs = &docNode{left: doc, right: x.arcs[i].docs}
+			x.Arcs[i].docs = &docNode{left: doc, right: x.Arcs[i].docs}
 		}
 		if len(ctx.evalStack) == 0 {
 			if err := ctx.processDelayedConstraints(); err != nil {
-				x.arcs[i].cache = err
+				x.Arcs[i].Value = err
 			}
 		}
 	} else if b := cycleError(v); b != nil {
 		copy := *b
 		return &copy
 	}
-	return x.arcs[i].cache
+	return x.Arcs[i].Value
 }
 
 // expandFields merges in embedded and interpolated fields.
@@ -1205,8 +1205,8 @@ func (x *structLit) applyTemplate(ctx *context, i int, v evaluated) (e evaluated
 		return v, nil
 	}
 
-	if f := x.arcs[i].feature; !f.IsHidden() && !f.IsDef() {
-		name := ctx.LabelStr(x.arcs[i].feature)
+	if f := x.Arcs[i].Label; !f.IsHidden() && !f.IsDef() {
+		name := ctx.LabelStr(x.Arcs[i].Label)
 		arg := &stringLit{x.baseValue, name, nil}
 
 		var val value
@@ -1231,7 +1231,7 @@ type label = adt.Feature
 // however, may have both. In this case, the value must ultimately evaluate
 // to a node, which will then be merged with the existing one.
 type arc struct {
-	feature    label
+	Label      label
 	optional   bool
 	definition bool // field is a definition
 
@@ -1241,7 +1241,7 @@ type arc struct {
 	// a linear search in fields.
 
 	v     value
-	cache evaluated // also used as newValue during unification.
+	Value evaluated // also used as newValue during unification.
 	attrs *attributes
 	docs  *docNode
 }
@@ -1286,12 +1286,12 @@ func mergeDocs(a, b *docNode) *docNode {
 }
 
 func (a *arc) val() evaluated {
-	return a.cache
+	return a.Value
 }
 
 func (a *arc) setValue(v value) {
 	a.v = v
-	a.cache = nil
+	a.Value = nil
 }
 
 type closeIfStruct struct {
@@ -1343,31 +1343,31 @@ func updateCloseStatus(ctx *context, v evaluated) evaluated {
 
 // insertValue is used during initialization but never during evaluation.
 func (x *structLit) insertValue(ctx *context, f label, optional, isDef bool, value value, a *attributes, docs *docNode) {
-	for i, p := range x.arcs {
-		if f != p.feature {
+	for i, p := range x.Arcs {
+		if f != p.Label {
 			continue
 		}
-		x.arcs[i].optional = x.arcs[i].optional && optional
-		x.arcs[i].docs = mergeDocs(x.arcs[i].docs, docs)
-		x.arcs[i].v = mkBin(ctx, token.NoPos, opUnify, p.v, value)
+		x.Arcs[i].optional = x.Arcs[i].optional && optional
+		x.Arcs[i].docs = mergeDocs(x.Arcs[i].docs, docs)
+		x.Arcs[i].v = mkBin(ctx, token.NoPos, opUnify, p.v, value)
 		if isDef != p.definition {
 			src := binSrc(token.NoPos, opUnify, p.v, value)
-			x.arcs[i].v = ctx.mkErr(src,
+			x.Arcs[i].v = ctx.mkErr(src,
 				"field %q declared as definition and regular field",
 				ctx.LabelStr(f))
 			isDef = false
 		}
-		x.arcs[i].definition = isDef
-		attrs, err := unifyAttrs(ctx, x, x.arcs[i].attrs, a)
+		x.Arcs[i].definition = isDef
+		attrs, err := unifyAttrs(ctx, x, x.Arcs[i].attrs, a)
 		if err != nil {
-			x.arcs[i].v = err
+			x.Arcs[i].v = err
 		}
-		x.arcs[i].attrs = attrs
+		x.Arcs[i].attrs = attrs
 		// TODO: should we warn if there is a mixed mode of optional and non
 		// optional fields at this point?
 		return
 	}
-	x.arcs = append(x.arcs, arc{f, optional, isDef, value, nil, a, docs})
+	x.Arcs = append(x.Arcs, arc{f, optional, isDef, value, nil, a, docs})
 	sort.Stable(x)
 }
 
@@ -1463,7 +1463,7 @@ func (x *params) add(f label, v value) {
 	if v == nil {
 		panic("nil node")
 	}
-	x.arcs = append(x.arcs, arc{feature: f, v: v})
+	x.arcs = append(x.arcs, arc{Label: f, v: v})
 }
 
 func (x *params) iterAt(ctx *context, i int) (evaluated, value) {
@@ -1478,26 +1478,26 @@ func (x *params) at(ctx *context, i int) evaluated {
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.
-	if x.arcs[i].cache == nil {
-		x.arcs[i].cache = x.arcs[i].v.evalPartial(ctx)
+	if x.arcs[i].Value == nil {
+		x.arcs[i].Value = x.arcs[i].v.evalPartial(ctx)
 	}
-	return x.arcs[i].cache
+	return x.arcs[i].Value
 }
 
 // lookup returns the node for the given label f, if present, or nil otherwise.
-func (x *params) lookup(ctx *context, f label) arc {
+func (x *params) Lookup(ctx *context, f label) arc {
 	if f == 0 && len(x.arcs) == 1 {
 		// A template binding.
 		a := x.arcs[0]
-		a.cache = x.at(ctx, 0)
+		a.Value = x.at(ctx, 0)
 		return a
 	}
 	// Lookup is done by selector or index references. Either this is done on
 	// literal nodes or nodes obtained from references. In the later case,
 	// noderef will have ensured that the ancestors were evaluated.
 	for i, a := range x.arcs {
-		if a.feature == f {
-			a.cache = x.at(ctx, i)
+		if a.Label == f {
+			a.Value = x.at(ctx, i)
 			return a
 		}
 	}
@@ -1532,7 +1532,7 @@ func (x *lambdaExpr) call(ctx *context, p source, args ...evaluated) value {
 		if isBottom(v) {
 			return v
 		}
-		arcs[i] = arc{feature: a.feature, v: v, cache: v}
+		arcs[i] = arc{Label: a.Label, v: v, Value: v}
 	}
 	lambda := &lambdaExpr{x.baseValue, &params{arcs}, nil}
 	defer ctx.pushForwards(x, lambda).popForwards()
@@ -1903,13 +1903,13 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 		if err != nil {
 			return err
 		}
-		for i, a := range src.arcs {
+		for i, a := range src.Arcs {
 			key := &stringLit{
 				x.baseValue,
-				ctx.LabelStr(a.feature),
+				ctx.LabelStr(a.Label),
 				nil,
 			}
-			if a.definition || a.optional || a.feature.IsHidden() {
+			if a.definition || a.optional || a.Label.IsHidden() {
 				continue
 			}
 			val := src.at(ctx, i)
@@ -1924,7 +1924,7 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 		return nil
 
 	case *list:
-		for i := range src.elem.arcs {
+		for i := range src.elem.Arcs {
 			idx := newInt(x, 0).setInt(i)
 			v := fn.call(ctx, x, idx, src.at(ctx, i))
 			if err, ok := v.(*bottom); ok {

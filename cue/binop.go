@@ -615,7 +615,7 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 	if x == y {
 		return x
 	}
-	arcs := make(arcs, 0, len(x.arcs)+len(y.arcs))
+	arcs := make(arcs, 0, len(x.Arcs)+len(y.Arcs))
 	var base baseValue
 	if src.computed() != nil {
 		base = baseValue{src.computed()}
@@ -657,38 +657,38 @@ func (x *structLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		}
 	}
 
-	for _, a := range x.arcs {
+	for _, a := range x.Arcs {
 		found := false
-		for _, b := range y.arcs {
-			if a.feature == b.feature {
+		for _, b := range y.Arcs {
+			if a.Label == b.Label {
 				found = true
 				break
 			}
 		}
-		if !unchecked && !found && !y.allows(ctx, a.feature) && !a.definition {
+		if !unchecked && !found && !y.allows(ctx, a.Label) && !a.definition {
 			if a.optional {
 				continue
 			}
 			// TODO: pass position of key, not value. Currently does not have
 			// a position.
 			return ctx.mkErr(a.v, a.v, "field %q not allowed in closed struct",
-				ctx.LabelStr(a.feature))
+				ctx.LabelStr(a.Label))
 		}
 		cp := ctx.copy(a.v)
-		obj.arcs = append(obj.arcs,
-			arc{a.feature, a.optional, a.definition, cp, nil, a.attrs, a.docs})
+		obj.Arcs = append(obj.Arcs,
+			arc{a.Label, a.optional, a.definition, cp, nil, a.attrs, a.docs})
 	}
 outer:
-	for _, a := range y.arcs {
+	for _, a := range y.Arcs {
 		v := ctx.copy(a.v)
 		found := false
-		for i, b := range obj.arcs {
-			if a.feature == b.feature {
+		for i, b := range obj.Arcs {
+			if a.Label == b.Label {
 				found = true
 				if a.definition != b.definition {
 					src := binSrc(x.Pos(), op, a.v, b.v)
 					return ctx.mkErr(src, "field %q declared as definition and regular field",
-						ctx.LabelStr(a.feature))
+						ctx.LabelStr(a.Label))
 				}
 				w := b.v
 				if x.closeStatus.shouldFinalize() {
@@ -698,29 +698,29 @@ outer:
 					v = wrapFinalize(ctx, v)
 				}
 				v = mkBin(ctx, src.Pos(), op, w, v)
-				obj.arcs[i].v = v
-				obj.arcs[i].cache = nil
-				obj.arcs[i].optional = a.optional && b.optional
-				obj.arcs[i].docs = mergeDocs(a.docs, b.docs)
+				obj.Arcs[i].v = v
+				obj.Arcs[i].Value = nil
+				obj.Arcs[i].optional = a.optional && b.optional
+				obj.Arcs[i].docs = mergeDocs(a.docs, b.docs)
 				attrs, err := unifyAttrs(ctx, src, a.attrs, b.attrs)
 				if err != nil {
 					return err
 				}
-				obj.arcs[i].attrs = attrs
+				obj.Arcs[i].attrs = attrs
 				continue outer
 			}
 		}
-		if !unchecked && !found && !x.allows(ctx, a.feature) && !a.definition {
+		if !unchecked && !found && !x.allows(ctx, a.Label) && !a.definition {
 			if a.optional {
 				continue
 			}
 			// TODO: pass position of key, not value. Currently does not have a
 			// position.
 			return ctx.mkErr(a.v, x, "field %q not allowed in closed struct",
-				ctx.LabelStr(a.feature))
+				ctx.LabelStr(a.Label))
 		}
 		a.setValue(v)
-		obj.arcs = append(obj.arcs, a)
+		obj.Arcs = append(obj.Arcs, a)
 	}
 	sort.Stable(obj)
 
@@ -1174,15 +1174,15 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			src = mkBin(ctx, src.Pos(), op, x, other)
 			return ctx.mkErr(src, "conflicting list lengths: %v", n)
 		}
-		sx := x.elem.arcs
+		sx := x.elem.Arcs
 		xa := sx
-		sy := y.elem.arcs
+		sy := y.elem.Arcs
 		ya := sy
 		for len(xa) < len(ya) {
-			xa = append(xa, arc{feature: label(len(xa)), v: x.typ})
+			xa = append(xa, arc{Label: label(len(xa)), v: x.typ})
 		}
 		for len(ya) < len(xa) {
-			ya = append(ya, arc{feature: label(len(ya)), v: y.typ})
+			ya = append(ya, arc{Label: label(len(ya)), v: y.typ})
 		}
 
 		typ := x.typ
@@ -1192,11 +1192,11 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		}
 
 		// TODO: use forwarding instead of this mild hack.
-		x.elem.arcs = xa
-		y.elem.arcs = ya
+		x.elem.Arcs = xa
+		y.elem.Arcs = ya
 		s := binOp(ctx, src, op, x.elem, y.elem).(*structLit)
-		x.elem.arcs = sx
-		y.elem.arcs = sy
+		x.elem.Arcs = sx
+		y.elem.Arcs = sy
 
 		base := binSrc(src.Pos(), op, x, other)
 		return &list{baseValue: base, elem: s, typ: typ, len: n}
@@ -1206,10 +1206,10 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		if !ok {
 			break
 		}
-		if len(x.elem.arcs) != len(y.elem.arcs) {
+		if len(x.elem.Arcs) != len(y.elem.Arcs) {
 			return boolTonode(src, false)
 		}
-		for i := range x.elem.arcs {
+		for i := range x.elem.Arcs {
 			if !test(ctx, src, op, x.at(ctx, i), y.at(ctx, i)) {
 				return boolTonode(src, false)
 			}
@@ -1223,11 +1223,11 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		}
 		n := &list{baseValue: binSrc(src.Pos(), op, x, other), typ: y.typ}
 		arcs := []arc{}
-		for _, v := range x.elem.arcs {
-			arcs = append(arcs, arc{feature: label(len(arcs)), v: v.v})
+		for _, v := range x.elem.Arcs {
+			arcs = append(arcs, arc{Label: label(len(arcs)), v: v.v})
 		}
-		for _, v := range y.elem.arcs {
-			arcs = append(arcs, arc{feature: label(len(arcs)), v: v.v})
+		for _, v := range y.elem.Arcs {
+			arcs = append(arcs, arc{Label: label(len(arcs)), v: v.v})
 		}
 		switch v := y.len.(type) {
 		case *numLit:
@@ -1237,7 +1237,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			// Open list
 			n.len = y.len // TODO: add length of x?
 		}
-		n.elem = &structLit{baseValue: n.baseValue, arcs: arcs}
+		n.elem = &structLit{baseValue: n.baseValue, Arcs: arcs}
 		return n
 
 	case opMul:
@@ -1247,7 +1247,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		}
 		n := &list{baseValue: binSrc(src.Pos(), op, x, other), typ: x.typ}
 		arcs := []arc{}
-		if len(x.elem.arcs) > 0 {
+		if len(x.elem.Arcs) > 0 {
 			if !k.isGround() {
 				// should never reach here.
 				break
@@ -1255,8 +1255,8 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			if ln := other.(*numLit).intValue(ctx); ln > 0 {
 				for i := 0; i < ln; i++ {
 					// TODO: copy values
-					for _, a := range x.elem.arcs {
-						arcs = append(arcs, arc{feature: label(len(arcs)), v: a.v})
+					for _, a := range x.elem.Arcs {
+						arcs = append(arcs, arc{Label: label(len(arcs)), v: a.v})
 					}
 				}
 			} else if ln < 0 {
@@ -1271,7 +1271,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 			// Open list
 			n.len = x.len // TODO: multiply length?
 		}
-		n.elem = &structLit{baseValue: n.baseValue, arcs: arcs}
+		n.elem = &structLit{baseValue: n.baseValue, Arcs: arcs}
 		return n
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -1301,7 +1301,7 @@ func (x *lambdaExpr) binOp(ctx *context, src source, op op, other evaluated) eva
 			if isBottom(v) {
 				return v
 			}
-			arcs[i] = arc{feature: x.arcs[i].feature, v: v}
+			arcs[i] = arc{Label: x.arcs[i].Label, v: v}
 		}
 
 		return lambda

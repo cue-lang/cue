@@ -152,8 +152,8 @@ func (v *astVisitor) resolve(n *ast.Ident) value {
 	name := v.ident(n)
 	label := v.Label(name, true)
 	if r := v.resolveRoot; r != nil {
-		for _, a := range r.arcs {
-			if a.feature == label {
+		for _, a := range r.Arcs {
+			if a.Label == label {
 				return &selectorExpr{newExpr(n),
 					&nodeRef{baseValue: newExpr(n), node: r, label: label}, label}
 			}
@@ -345,9 +345,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				return v.errf(n, "alias not allowed in list")
 			}
 			v1.sel = strconv.Itoa(i)
-			arcs = append(arcs, arc{feature: label(i), v: elem})
+			arcs = append(arcs, arc{Label: label(i), v: elem})
 		}
-		s := &structLit{baseValue: newExpr(n), arcs: arcs}
+		s := &structLit{baseValue: newExpr(n), Arcs: arcs}
 		list := &list{baseValue: newExpr(n), elem: s}
 		list.initLit()
 		if ellipsis != nil {

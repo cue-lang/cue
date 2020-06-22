@@ -574,7 +574,7 @@ func TestExport(t *testing.T) {
 			}
 			t.Log(debugStr(ctx, root))
 
-			n := root.(*structLit).arcs[0].v
+			n := root.(*structLit).Arcs[0].v
 			v := newValueRoot(ctx, n)
 
 			opts := options{raw: !tc.eval, omitOptional: tc.noOpt}

@@ -31,7 +31,7 @@ func validate(ctx *context, v value) (err *bottom) {
 		if ctx.maxDepth++; ctx.maxDepth > internal.MaxDepth {
 			return nil
 		}
-		for i, a := range x.arcs {
+		for i, a := range x.Arcs {
 			if a.optional {
 				continue
 			}

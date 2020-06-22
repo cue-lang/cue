@@ -124,7 +124,7 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 		if !ok {
 			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.Kind())
 		}
-		n := sc.lookup(ctx, x.Sel)
+		n := sc.Lookup(ctx, x.Sel)
 		if n.optional {
 			field := ctx.LabelStr(x.Sel)
 			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
@@ -138,7 +138,7 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 			// TODO: mention x.x in error message?
 			return ctx.mkErr(x, "undefined field %q", field)
 		}
-		return n.cache
+		return n.Value
 	}
 	return e.err(&selectorExpr{x.baseValue, v, x.Sel})
 }
@@ -159,7 +159,7 @@ func (x *selectorExpr) reference(ctx *context) (result value) {
 		if !ok {
 			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.Kind())
 		}
-		n := sc.lookup(ctx, x.Sel)
+		n := sc.Lookup(ctx, x.Sel)
 		if n.optional {
 			field := ctx.LabelStr(x.Sel)
 			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
@@ -198,7 +198,7 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 		if e.is(index, stringKind, msgIndexType, k) {
 			s := index.strValue()
 			// TODO: must lookup
-			n := v.lookup(ctx, ctx.StrLabel(s))
+			n := v.Lookup(ctx, ctx.StrLabel(s))
 			if n.definition {
 				return ctx.mkErr(x, index,
 					"field %q is a definition", s)
@@ -212,7 +212,7 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 				}
 				return ctx.mkErr(x, index, "undefined field %q", s)
 			}
-			return n.cache
+			return n.Value
 		}
 	case atter:
 		if e.is(index, intKind, msgIndexType, k) {
@@ -247,7 +247,7 @@ func (x *indexExpr) reference(ctx *context) (result value) {
 		if e.is(index, stringKind, msgIndexType, k) {
 			s := index.strValue()
 			// TODO: must lookup
-			n := v.lookup(ctx, ctx.StrLabel(s))
+			n := v.Lookup(ctx, ctx.StrLabel(s))
 			if n.definition {
 				return ctx.mkErr(x, index,
 					"field %q is a definition", s)
@@ -424,9 +424,9 @@ func (x *listComprehension) evalPartial(ctx *context) evaluated {
 	s := &structLit{baseValue: x.baseValue}
 	list := &list{baseValue: x.baseValue, elem: s}
 	err := x.clauses.yield(ctx, func(v evaluated) *bottom {
-		list.elem.arcs = append(list.elem.arcs, arc{
-			feature: label(len(list.elem.arcs)),
-			v:       v.evalPartial(ctx),
+		list.elem.Arcs = append(list.elem.Arcs, arc{
+			Label: label(len(list.elem.Arcs)),
+			v:     v.evalPartial(ctx),
 		})
 		return nil
 	})

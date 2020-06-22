@@ -176,11 +176,11 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				s.inexact = true
 				return false
 			}
-			for _, b := range o.arcs {
+			for _, b := range o.Arcs {
 				if b.optional || b.definition {
 					continue
 				}
-				name := ctx.LabelStr(b.feature)
+				name := ctx.LabelStr(b.Label)
 				arg := &stringLit{x.baseValue, name, nil}
 				u, _ := x.optionals.constraint(ctx, arg)
 				if u != nil && !s.subsumes(u, b.v) {
@@ -202,11 +202,11 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 		oClosed := o.closeStatus.shouldClose() && s.mode&subSchema == 0
 
 		// all arcs in n must exist in v and its values must subsume.
-		for _, a := range x.arcs {
+		for _, a := range x.Arcs {
 			if a.optional && ignoreOptional {
 				continue
 			}
-			b := o.lookup(ctx, a.feature)
+			b := o.Lookup(ctx, a.Label)
 			if !a.optional && b.optional {
 				return false
 			} else if b.val() == nil {
@@ -226,7 +226,7 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				if a.optional && isTop(a.v) {
 					continue
 				}
-				s.missing = a.feature
+				s.missing = a.Label
 				s.gt = a.val()
 				s.lt = o
 				return false
@@ -242,13 +242,13 @@ func (x *structLit) subsumesImpl(s *subsumer, v value) bool {
 				return false
 			}
 			ignoreOptional = ignoreOptional || s.mode&subFinal != 0
-			for _, b := range o.arcs {
+			for _, b := range o.Arcs {
 				if ignoreOptional && b.optional {
 					continue
 				}
-				a := x.lookup(ctx, b.feature)
+				a := x.Lookup(ctx, b.Label)
 				if a.val() == nil {
-					name := ctx.LabelStr(b.feature)
+					name := ctx.LabelStr(b.Label)
 					arg := &stringLit{x.baseValue, name, nil}
 					u, _ := x.optionals.constraint(ctx, arg)
 					if u == nil { // subsumption already checked
@@ -396,7 +396,7 @@ func (x *list) subsumesImpl(s *subsumer, v value) bool {
 		}
 		// TODO: assuming continuous indices, use merge sort if we allow
 		// sparse arrays.
-		for _, a := range y.elem.arcs[len(x.elem.arcs):] {
+		for _, a := range y.elem.Arcs[len(x.elem.Arcs):] {
 			if !s.subsumes(x.typ, a.v) {
 				return false
 			}

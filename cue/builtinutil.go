@@ -47,7 +47,7 @@ func (s *valueSorter) Less(i, j int) bool {
 // TODO: consider making this a method on Value.
 func fill(v Value, x interface{}, path ...string) Value {
 	ctx := v.ctx()
-	root := v.path.val()
+	root := v.v.val()
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}

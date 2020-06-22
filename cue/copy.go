@@ -29,7 +29,7 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 		return &nodeRef{x.baseValue, node, x.label}, false
 
 	case *structLit:
-		arcs := make(arcs, len(x.arcs))
+		arcs := make(arcs, len(x.Arcs))
 
 		obj := &structLit{x.baseValue, nil, nil, x.closeStatus, nil, arcs, nil}
 
@@ -48,7 +48,7 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 		}
 		obj.optionals = o
 
-		for i, a := range x.arcs {
+		for i, a := range x.Arcs {
 			a.setValue(ctx.copy(a.v))
 			arcs[i] = a
 		}
@@ -63,7 +63,7 @@ func rewriteCopy(ctx *context, v value) (value, bool) {
 	case *lambdaExpr:
 		arcs := make([]arc, len(x.arcs))
 		for i, a := range x.arcs {
-			arcs[i] = arc{feature: a.feature, v: ctx.copy(a.v)}
+			arcs[i] = arc{Label: a.Label, v: ctx.copy(a.v)}
 		}
 		lambda := &lambdaExpr{x.baseValue, &params{arcs}, nil}
 		defer ctx.pushForwards(x, lambda).popForwards()

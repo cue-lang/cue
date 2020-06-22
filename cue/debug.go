@@ -165,7 +165,7 @@ func lambdaName(f label, v value) label {
 		return lambdaName(f, x.node)
 	case *lambdaExpr:
 		if f == 0 && len(x.params.arcs) == 1 {
-			return x.params.arcs[0].feature
+			return x.params.arcs[0].Label
 		}
 	}
 	return f
@@ -347,7 +347,7 @@ func (p *printer) str(v interface{}) {
 			p.str(x.emit)
 			write(", ")
 		}
-		p.str(x.arcs)
+		p.str(x.Arcs)
 		for i, c := range x.comprehensions {
 			if c.checked {
 				p.write("c:")
@@ -358,7 +358,7 @@ func (p *printer) str(v interface{}) {
 			}
 		}
 		if topDefault && !x.closeStatus.shouldClose() {
-			if len(x.arcs) > 0 {
+			if len(x.Arcs) > 0 {
 				p.write(", ")
 			}
 			p.write("...")
@@ -376,12 +376,12 @@ func (p *printer) str(v interface{}) {
 
 	case arc:
 		n := x.v
-		str := p.label(x.feature)
+		str := p.label(x.Label)
 		p.writef(str)
 		if x.optional {
 			p.write("?")
 		}
-		if x.definition && !x.feature.IsDef() {
+		if x.definition && !x.Label.IsDef() {
 			p.write(" :: ")
 		} else {
 			p.write(": ")
@@ -413,10 +413,10 @@ func (p *printer) str(v interface{}) {
 	case *feed:
 		writef(" <%s>for ", p.ctx.ref(x.fn))
 		a := x.fn.params.arcs[0]
-		p.writef(p.label(a.feature))
+		p.writef(p.label(a.Label))
 		writef(", ")
 		a = x.fn.params.arcs[1]
-		p.writef(p.label(a.feature))
+		p.writef(p.label(a.Label))
 		writef(" in ")
 		p.str(x.Src)
 		p.str(x.fn.value)
@@ -477,13 +477,13 @@ func (p *printer) str(v interface{}) {
 		case *top, *basicType:
 			open = true
 		}
-		if !ok || ln > len(x.elem.arcs) {
+		if !ok || ln > len(x.elem.Arcs) {
 			if !open && !isTop(x.typ) {
 				p.str(x.len)
 				write("*[")
 				p.str(x.typ)
 				write("]")
-				if len(x.elem.arcs) == 0 {
+				if len(x.elem.Arcs) == 0 {
 					break
 				}
 				write("(")
@@ -492,9 +492,9 @@ func (p *printer) str(v interface{}) {
 			ellipsis = true
 		}
 		write("[")
-		for i, a := range x.elem.arcs {
+		for i, a := range x.elem.Arcs {
 			p.str(a.v)
-			if i < len(x.elem.arcs)-1 {
+			if i < len(x.elem.Arcs)-1 {
 				write(",")
 			}
 		}

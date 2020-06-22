@@ -47,10 +47,10 @@ func (x *structLit) rewrite(ctx *context, fn rewriteFunc) value {
 	if emit != nil {
 		emit = rewrite(ctx, x.emit, fn)
 	}
-	arcs := make(arcs, len(x.arcs))
-	obj := &structLit{baseValue: x.baseValue, emit: emit, arcs: arcs}
+	arcs := make(arcs, len(x.Arcs))
+	obj := &structLit{baseValue: x.baseValue, emit: emit, Arcs: arcs}
 	changed := emit == x.emit
-	for i, a := range x.arcs {
+	for i, a := range x.Arcs {
 		a.setValue(rewrite(ctx, a.v, fn))
 		changed = changed || arcs[i].v != a.v
 		arcs[i] = a
@@ -171,7 +171,7 @@ func (x *lambdaExpr) rewrite(ctx *context, fn rewriteFunc) value {
 	changed := false
 	for i, a := range x.arcs {
 		v := rewrite(ctx, a.v, fn)
-		arcs[i] = arc{feature: a.feature, v: v}
+		arcs[i] = arc{Label: a.Label, v: v}
 		changed = changed || v != a.v
 	}
 	value := rewrite(ctx, x.value, fn)

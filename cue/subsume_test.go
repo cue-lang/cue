@@ -452,8 +452,8 @@ func TestSubsume(t *testing.T) {
 
 			// Use low-level lookup to avoid evaluation.
 			var a, b value
-			for _, arc := range root.arcs {
-				switch arc.feature {
+			for _, arc := range root.Arcs {
+				switch arc.Label {
 				case ctx.StrLabel("a"):
 					a = arc.v
 				case ctx.StrLabel("b"):

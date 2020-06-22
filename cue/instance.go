@@ -80,7 +80,7 @@ func init() {
 		}
 		return v.ctx().index.addInst(&Instance{
 			rootStruct: st,
-			rootValue:  v.path.v,
+			rootValue:  v.v.v,
 		})
 	}
 }
@@ -131,7 +131,7 @@ func (inst *Instance) eval(ctx *context) evaluated {
 			}
 
 		default:
-			for _, a := range s.arcs {
+			for _, a := range s.Arcs {
 				if !a.definition {
 					v = binOp(ctx, src, opUnify, v, e)
 					break outer
@@ -280,7 +280,7 @@ func (inst *Instance) Lookup(path ...string) Value {
 	for _, k := range path {
 		obj, err := v.structValData(ctx)
 		if err != nil {
-			return Value{idx, &valueData{arc: arc{cache: err, v: err}}}
+			return Value{idx, &valueData{arc: arc{Value: err, v: err}}}
 		}
 		v = obj.Lookup(k)
 	}

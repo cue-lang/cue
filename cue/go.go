@@ -390,7 +390,7 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 					continue
 				}
 				f := ctx.StrLabel(name)
-				obj.arcs = append(obj.arcs, arc{feature: f, v: sub})
+				obj.Arcs = append(obj.Arcs, arc{Label: f, v: sub})
 			}
 			sort.Sort(obj)
 			return obj
@@ -428,7 +428,7 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 					sorted = append(sorted, s)
 
 					// Set feature later.
-					obj.arcs = append(obj.arcs, arc{feature: 0, v: sub})
+					obj.Arcs = append(obj.Arcs, arc{Label: 0, v: sub})
 				}
 
 			default:
@@ -443,7 +443,7 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 
 			// Now assign the labels to the arcs.
 			for i, k := range keys {
-				obj.arcs[i].feature = ctx.StrLabel(k)
+				obj.Arcs[i].Label = ctx.StrLabel(k)
 			}
 			sort.Sort(obj)
 			return obj
@@ -460,9 +460,9 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 				if isBottom(x) {
 					return x
 				}
-				arcs = append(arcs, arc{feature: label(len(arcs)), v: x})
+				arcs = append(arcs, arc{Label: label(len(arcs)), v: x})
 			}
-			list.elem = &structLit{baseValue: list.baseValue, arcs: arcs}
+			list.elem = &structLit{baseValue: list.baseValue, Arcs: arcs}
 			list.initLit()
 			// There is no need to set the type of the list, as the list will
 			// be of fixed size and all elements will already have a defined
@@ -598,8 +598,8 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 				continue
 			}
 			l := ctx.StrLabel(name)
-			obj.arcs = append(obj.arcs, arc{
-				feature: l,
+			obj.Arcs = append(obj.Arcs, arc{
+				Label: l,
 				// The GO JSON decoder always allows a value to be undefined.
 				optional: isOptional(&f),
 				v:        elem,
@@ -616,12 +616,12 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 			if isBottom(v) {
 				return v
 			}
-			for i, a := range obj.arcs {
-				if a.feature == label {
+			for i, a := range obj.Arcs {
+				if a.Label == label {
 					// Instead of unifying with the existing type, we substitute
 					// with the constraints from the tags. The type constraints
 					// will be implied when unified with a concrete value.
-					obj.arcs[i].v = mkBin(ctx, token.NoPos, opUnify, a.v, v)
+					obj.Arcs[i].v = mkBin(ctx, token.NoPos, opUnify, a.v, v)
 				}
 			}
 		}

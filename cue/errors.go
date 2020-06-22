@@ -102,10 +102,10 @@ func (e *valueError) Msg() (string, []interface{}) {
 }
 
 func (e *valueError) Path() (a []string) {
-	if e.v.path == nil {
+	if e.v.v == nil {
 		return nil
 	}
-	a, _ = e.v.path.appendPath(a, e.v.idx)
+	a, _ = e.v.v.appendPath(a, e.v.idx)
 	return a
 }
 

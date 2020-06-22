@@ -56,12 +56,12 @@ func (x *mergedValues) evalPartial(ctx *context) evaluated {
 	}
 	var arcs arcs
 	for _, v := range structs {
-		for i := 0; i < len(v.arcs); i++ {
+		for i := 0; i < len(v.Arcs); i++ {
 			w := v.iterAt(ctx, i)
 			arcs = append(arcs, w)
 		}
 	}
-	obj.arcs = arcs
+	obj.Arcs = arcs
 	sort.Stable(obj)
 
 	values := []value{}
@@ -86,7 +86,7 @@ func (x *mergedValues) evalPartial(ctx *context) evaluated {
 		// versus having more information tradeoff. It results in the same
 		// value.
 		values := []value{a.v}
-		for i++; i < len(arcs) && a.feature == arcs[i].feature; i++ {
+		for i++; i < len(arcs) && a.Label == arcs[i].Label; i++ {
 			values = append(values, arcs[i].v)
 			a.optional = a.optional && arcs[i].optional
 			var err evaluated
@@ -100,11 +100,11 @@ func (x *mergedValues) evalPartial(ctx *context) evaluated {
 			arcs[k] = a
 			continue
 		}
-		a.cache = nil
+		a.Value = nil
 		a.v = &mergedValues{a.v.base(), values}
 		arcs[k] = a
 	}
-	obj.arcs = arcs[:k]
+	obj.Arcs = arcs[:k]
 	return obj
 }
 

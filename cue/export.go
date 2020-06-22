@@ -41,8 +41,8 @@ func export(ctx *context, inst *Instance, v value, m options) (n ast.Node, impor
 		if err != nil {
 			v = err
 		} else {
-			for _, a := range top.arcs {
-				e.top[a.feature] = true
+			for _, a := range top.Arcs {
+				e.top[a.Label] = true
 			}
 		}
 	}
@@ -167,12 +167,12 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 	switch x := v.(type) {
 	case *feed:
 		feed := &ast.ForClause{
-			Value:  p.identifier(x.fn.params.arcs[1].feature),
+			Value:  p.identifier(x.fn.params.arcs[1].Label),
 			Source: p.expr(x.Src),
 		}
 		key := x.fn.params.arcs[0]
-		if p.ctx.LabelStr(key.feature) != "_" {
-			feed.Key = p.identifier(key.feature)
+		if p.ctx.LabelStr(key.Label) != "_" {
+			feed.Key = p.identifier(key.Label)
 		}
 		return feed, x.fn.value.(yielder)
 
@@ -301,7 +301,7 @@ func (p *exporter) isComplete(v value, all bool) bool {
 		if x.isOpen() {
 			return false
 		}
-		for i := range x.elem.arcs {
+		for i := range x.elem.Arcs {
 			if !p.isComplete(x.at(p.ctx, i), all) {
 				return false
 			}
@@ -466,7 +466,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			return p.badf("selector without node")
 		}
 		if l, ok := node.node.(*lambdaExpr); ok && len(l.arcs) == 1 {
-			f = l.params.arcs[0].feature
+			f = l.params.arcs[0].Label
 			// TODO: ensure it is shadowed.
 			ident = p.identifier(f)
 			return ident
@@ -593,7 +593,7 @@ func (p *exporter) expr(v value) ast.Expr {
 			if x.optionals == nil {
 				break
 			}
-			p.optionals(len(x.arcs) > 0, st, x.optionals)
+			p.optionals(len(x.Arcs) > 0, st, x.optionals)
 		}
 		return expr
 
@@ -684,7 +684,7 @@ func (p *exporter) expr(v value) ast.Expr {
 	case *list:
 		list := &ast.ListLit{}
 		var expr ast.Expr = list
-		for i, a := range x.elem.arcs {
+		for i, a := range x.elem.Arcs {
 			if !doEval(p.mode) {
 				list.Elts = append(list.Elts, p.expr(a.v))
 			} else {
@@ -708,7 +708,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		case *top, *basicType:
 			open = true
 		}
-		if !ok || ln > len(x.elem.arcs) {
+		if !ok || ln > len(x.elem.Arcs) {
 			list.Elts = append(list.Elts, &ast.Ellipsis{Type: p.expr(x.typ)})
 			if !open && !isTop(x.typ) {
 				expr = ast.NewBinExpr(
@@ -790,7 +790,7 @@ func (p *exporter) optionals(wrap bool, st *ast.StructLit, x *optionals) (skippe
 				v = c.value
 			}
 			f := &ast.Field{
-				Label: p.mkTemplate(t.key, p.identifier(l.params.arcs[0].feature)),
+				Label: p.mkTemplate(t.key, p.identifier(l.params.arcs[0].Label)),
 				Value: p.expr(l.value),
 			}
 			if internal.IsEllipsis(f) {
@@ -836,10 +836,10 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		}
 	}
 
-	for _, a := range x.arcs {
+	for _, a := range x.Arcs {
 		p.stack = append(p.stack, remap{
 			key:  x,
-			from: a.feature,
+			from: a.Label,
 			to:   nil,
 			syn:  obj,
 		})
@@ -852,11 +852,11 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 		// Optional field constraints may be omitted if they were already
 		// applied and no more new fields may be added.
 		!(doEval(p.mode) && x.optionals.isEmpty() && p.isClosed(x)) {
-		hasEllipsis = p.optionals(len(x.arcs) > 0, obj, x.optionals)
+		hasEllipsis = p.optionals(len(x.Arcs) > 0, obj, x.optionals)
 	}
-	for i, a := range x.arcs {
+	for i, a := range x.Arcs {
 		f := &ast.Field{
-			Label: p.label(a.feature),
+			Label: p.label(a.Label),
 		}
 		// TODO: allow the removal of hidden fields. However, hidden fields
 		// that still used in incomplete expressions should not be removed
@@ -878,7 +878,7 @@ func (p *exporter) structure(x *structLit, addTempl bool) (ret *ast.StructLit, e
 				f.Token = token.ISA
 			}
 		}
-		if a.feature.IsHidden() && p.mode.concrete && p.mode.omitHidden {
+		if a.Label.IsHidden() && p.mode.concrete && p.mode.omitHidden {
 			continue
 		}
 		oldInDef := p.inDef

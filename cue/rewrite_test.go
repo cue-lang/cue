@@ -60,8 +60,8 @@ func rewriteRec(ctx *context, raw value, eval evaluated, m rewriteMode) (result 
 			}
 			return err
 		}
-		arcs := make(arcs, len(x.arcs))
-		for i, a := range x.arcs {
+		arcs := make(arcs, len(x.Arcs))
+		for i, a := range x.Arcs {
 			v := x.at(ctx, i)
 			a.setValue(rewriteRec(ctx, a.v, v, m))
 			arcs[i] = a

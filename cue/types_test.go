@@ -1475,7 +1475,7 @@ func TestPath(t *testing.T) {
 					v = v.Lookup(e)
 				}
 			}
-			got, _ := v.path.appendPath(nil, v.idx)
+			got, _ := v.v.appendPath(nil, v.idx)
 			if !reflect.DeepEqual(got, tc) {
 				t.Errorf("got %v; want %v", got, tc)
 			}
@@ -2768,7 +2768,7 @@ func TestExpr(t *testing.T) {
 func exprStr(v Value) string {
 	op, operands := v.Expr()
 	if op == NoOp {
-		return debugStr(v.ctx(), v.path.v)
+		return debugStr(v.ctx(), v.v.v)
 	}
 	s := op.String()
 	s += "("

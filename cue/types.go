@@ -82,7 +82,7 @@ type structValue struct {
 	ctx  *context
 	path *valueData
 	obj  *structLit
-	arcs arcs
+	Arcs arcs
 }
 
 // Len reports the number of fields in this struct.
@@ -90,14 +90,14 @@ func (o *structValue) Len() int {
 	if o.obj == nil {
 		return 0
 	}
-	return len(o.arcs)
+	return len(o.Arcs)
 }
 
 // At reports the key and value of the ith field, i < o.Len().
 func (o *structValue) At(i int) (key string, v Value) {
-	a := o.arcs[i]
+	a := o.Arcs[i]
 	v = newChildValue(o, i)
-	return o.ctx.LabelStr(a.feature), v
+	return o.ctx.LabelStr(a.Label), v
 }
 
 // Lookup reports the field for the given key. The returned Value is invalid
@@ -107,7 +107,7 @@ func (o *structValue) Lookup(key string) Value {
 	i := 0
 	len := o.Len()
 	for ; i < len; i++ {
-		if o.arcs[i].feature == f {
+		if o.Arcs[i].Label == f {
 			break
 		}
 	}
@@ -116,7 +116,7 @@ func (o *structValue) Lookup(key string) Value {
 		ctx := o.ctx
 		x := ctx.mkErr(o.obj, codeNotExist, "value %q not found", key)
 		v := x.evalPartial(ctx)
-		return Value{ctx.index, &valueData{o.path.parent, 0, arc{feature: o.path.feature, cache: v, v: x}}}
+		return Value{ctx.index, &valueData{o.path.parent, 0, arc{Label: o.path.Label, Value: v, v: x}}}
 	}
 	return newChildValue(o, i)
 }
@@ -209,7 +209,7 @@ func (i *Iterator) Next() bool {
 	}
 	arc := i.iter.iterAt(i.ctx, i.p)
 	i.cur = i.val.makeChild(i.ctx, uint32(i.p), arc)
-	i.f = arc.feature
+	i.f = arc.Label
 	i.p++
 	return true
 }
@@ -236,12 +236,12 @@ func (i *Iterator) IsHidden() bool {
 
 // IsOptional reports if a field is optional.
 func (i *Iterator) IsOptional() bool {
-	return i.cur.path.arc.optional
+	return i.cur.v.arc.optional
 }
 
 // IsDefinition reports if a field is a definition.
 func (i *Iterator) IsDefinition() bool {
-	return i.cur.path.arc.definition
+	return i.cur.v.arc.definition
 }
 
 // marshalJSON iterates over the list and generates JSON output. HasNext
@@ -270,7 +270,7 @@ func (v Value) getNum(k kind) (*numLit, errors.Error) {
 	if err := v.checkKind(v.ctx(), k); err != nil {
 		return nil, v.toErr(err)
 	}
-	n, _ := v.path.cache.(*numLit)
+	n, _ := v.v.Value.(*numLit)
 	return n, nil
 }
 
@@ -508,15 +508,15 @@ func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
 	case listKind:
 		a = append(a, strconv.FormatInt(int64(v.index), 10))
 	case structKind:
-		f := idx.LabelStr(v.arc.feature)
-		if l := v.arc.feature; !l.IsDef() && !l.IsHidden() {
+		f := idx.LabelStr(v.arc.Label)
+		if l := v.arc.Label; !l.IsDef() && !l.IsHidden() {
 			if !isIdent(f) && !isNumber(f) {
 				f = quote(f, '"')
 			}
 		}
 		a = append(a, f)
 	}
-	return a, v.arc.cache.Kind()
+	return a, v.arc.Value.Kind()
 }
 
 var validIdent = []*unicode.RangeTable{unicode.L, unicode.N}
@@ -544,42 +544,42 @@ func isNumber(s string) bool {
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,
 // Struct, or String.
 type Value struct {
-	idx  *index
-	path *valueData
+	idx *index
+	v   *valueData
 }
 
 func newErrValue(v Value, b *bottom) Value {
 	ctx := v.ctx()
-	p := v.path
+	p := v.v
 	if p == nil {
 		return newValueRoot(ctx, b)
 	}
 	return Value{
 		ctx.index,
 		&valueData{p.parent, p.index, arc{
-			feature: p.arc.feature,
-			cache:   b,
-			v:       b,
+			Label: p.arc.Label,
+			Value: b,
+			v:     b,
 		}},
 	}
 }
 
 func newValueRoot(ctx *context, x value) Value {
 	v := x.evalPartial(ctx)
-	return Value{ctx.index, &valueData{nil, 0, arc{cache: v, v: x}}}
+	return Value{ctx.index, &valueData{nil, 0, arc{Value: v, v: x}}}
 }
 
 func newChildValue(obj *structValue, i int) Value {
-	a := obj.arcs[i]
-	for j, b := range obj.obj.arcs {
-		if b.feature == a.feature {
+	a := obj.Arcs[i]
+	for j, b := range obj.obj.Arcs {
+		if b.Label == a.Label {
 			a = obj.obj.iterAt(obj.ctx, j)
 			// TODO: adding more technical debt here. The evaluator should be
 			// rewritten.
 			x := obj.obj
 			ctx := obj.ctx
 			if x.optionals != nil {
-				name := ctx.LabelStr(x.arcs[i].feature)
+				name := ctx.LabelStr(x.Arcs[i].Label)
 				arg := &stringLit{x.baseValue, name, nil}
 
 				val, _ := x.optionals.constraint(ctx, arg)
@@ -597,19 +597,19 @@ func newChildValue(obj *structValue, i int) Value {
 // Dereference reports the value v refers to if v is a reference or v itself
 // otherwise.
 func Dereference(v Value) Value {
-	if v.path == nil {
+	if v.v == nil {
 		return v
 	}
 
 	ctx := v.ctx()
-	a, n := appendPath(ctx, make([]label, 0, 3), v.path.v)
+	a, n := appendPath(ctx, make([]label, 0, 3), v.v.v)
 
 	if n == nil {
 		return v
 
 	}
 
-	p := locateNode(v.path, n)
+	p := locateNode(v.v, n)
 
 	if p == nil {
 
@@ -622,21 +622,21 @@ func Dereference(v Value) Value {
 			// See TestPathCorrection.
 			return v
 		}
-		p = &valueData{arc: arc{v: imp.rootValue, cache: imp.rootStruct}}
+		p = &valueData{arc: arc{v: imp.rootValue, Value: imp.rootStruct}}
 	}
 
-	cached := p.cache
+	cached := p.Value
 	if cached == nil {
 		cached = p.v.evalPartial(ctx)
 	}
 	s := cached.(*structLit)
 	for _, f := range a {
-		a := s.lookup(ctx, f)
+		a := s.Lookup(ctx, f)
 		if a.v == nil {
 			return Value{}
 		}
 		p = &valueData{parent: p, arc: a} // index
-		s, _ = a.cache.(*structLit)
+		s, _ = a.Value.(*structLit)
 	}
 
 	v = Value{v.idx, p}
@@ -674,7 +674,7 @@ func appendPath(ctx *context, a []label, v value) (path []label, n *nodeRef) {
 }
 
 func remakeValue(base Value, v value) Value {
-	p := base.path
+	p := base.v
 	if n, ok := v.(*nodeRef); ok {
 		if q := locateNode(p, n); q != nil {
 			p = q
@@ -682,13 +682,13 @@ func remakeValue(base Value, v value) Value {
 	}
 	path := *p
 	path.v = v
-	path.cache = v.evalPartial(base.ctx())
+	path.Value = v.evalPartial(base.ctx())
 	return Value{base.idx, &path}
 }
 
 func locateNode(p *valueData, n *nodeRef) *valueData {
 	// the parent must exist.
-	for ; p != nil && p.cache != n.node.(value); p = p.parent {
+	for ; p != nil && p.Value != n.node.(value); p = p.parent {
 	}
 	return p
 }
@@ -698,23 +698,23 @@ func (v Value) ctx() *context {
 }
 
 func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
-	return Value{v.idx, &valueData{v.path, i, a}}
+	return Value{v.idx, &valueData{v.v, i, a}}
 }
 
 func (v Value) makeElem(x value) Value {
 	v, e := v.evalFull(x)
-	return Value{v.idx, &valueData{v.path, 0, arc{
+	return Value{v.idx, &valueData{v.v, 0, arc{
 		optional: true,
 		v:        x,
-		cache:    e,
+		Value:    e,
 	}}}
 }
 
 func (v Value) eval(ctx *context) evaluated {
-	if v.path == nil || v.path.cache == nil {
+	if v.v == nil || v.v.Value == nil {
 		panic("undefined value")
 	}
-	return ctx.manifest(v.path.cache)
+	return ctx.manifest(v.v.Value)
 }
 
 func (v Value) evalFull(u value) (Value, evaluated) {
@@ -727,9 +727,9 @@ func (v Value) evalFull(u value) (Value, evaluated) {
 			x = err
 		}
 		if x != st {
-			p := *v.path
-			p.cache = x
-			v.path = &p
+			p := *v.v
+			p.Value = x
+			v.v = &p
 		}
 	}
 	return v, x
@@ -738,19 +738,19 @@ func (v Value) evalFull(u value) (Value, evaluated) {
 // Eval resolves the references of a value and returns the result.
 // This method is not necessary to obtain concrete values.
 func (v Value) Eval() Value {
-	if v.path == nil {
+	if v.v == nil {
 		return v
 	}
-	return remakeValue(v.evalFull(v.path.v))
+	return remakeValue(v.evalFull(v.v.v))
 }
 
 // Default reports the default value and whether it existed. It returns the
 // normal value if there is no default.
 func (v Value) Default() (Value, bool) {
-	if v.path == nil {
+	if v.v == nil {
 		return v, false
 	}
-	v, u := v.evalFull(v.path.v)
+	v, u := v.evalFull(v.v.v)
 	x := v.ctx().manifest(u)
 	if x != u {
 		return remakeValue(v, x), true
@@ -763,22 +763,22 @@ func (v Value) Default() (Value, bool) {
 // TODO: get rid of this somehow. Probably by including a FieldInfo struct
 // or the like.
 func (v Value) Label() (string, bool) {
-	if v.path.feature == 0 {
+	if v.v.Label == 0 {
 		return "", false
 	}
-	return v.idx.LabelStr(v.path.feature), true
+	return v.idx.LabelStr(v.v.Label), true
 }
 
 // Kind returns the kind of value. It returns BottomKind for atomic values that
 // are not concrete. For instance, it will return BottomKind for the bounds
 // >=0.
 func (v Value) Kind() Kind {
-	if v.path == nil {
+	if v.v == nil {
 		return BottomKind
 	}
-	c := v.path.cache
+	c := v.v.Value
 	if c == nil {
-		c = v.path.v.evalPartial(v.ctx())
+		c = v.v.v.evalPartial(v.ctx())
 	}
 	k := c.Kind()
 	if k.isGround() {
@@ -808,11 +808,11 @@ func (v Value) Kind() Kind {
 
 // IncompleteKind returns a mask of all kinds that this value may be.
 func (v Value) IncompleteKind() Kind {
-	if v.path == nil {
+	if v.v == nil {
 		return BottomKind
 	}
 	var k kind
-	x := v.path.v.evalPartial(v.ctx())
+	x := v.v.v.evalPartial(v.ctx())
 	switch x := convertBuiltin(x).(type) {
 	case *builtin:
 		k = x.representedKind()
@@ -858,7 +858,7 @@ func (v Value) MarshalJSON() (b []byte, err error) {
 
 func (v Value) marshalJSON() (b []byte, err error) {
 	v, _ = v.Default()
-	if v.path == nil {
+	if v.v == nil {
 		return json.Marshal(nil)
 	}
 	ctx := v.idx.newContext()
@@ -877,7 +877,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		return json.Marshal(x.(*bytesLit).B)
 	case listKind:
 		l := x.(*list)
-		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}
+		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.Arcs)}
 		return marshalList(&i)
 	case structKind:
 		obj, err := v.structValData(ctx)
@@ -913,7 +913,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 	// TODO: the default should ideally be simplified representation that
 	// exactly represents the value. The latter can currently only be
 	// ensured with Raw().
-	if v.path == nil || v.path.cache == nil {
+	if v.v == nil || v.v.Value == nil {
 		return nil
 	}
 	ctx := v.ctx()
@@ -923,10 +923,10 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		inst = v.instance()
 	}
 	if o.raw {
-		n, _ := export(ctx, inst, v.path.v, o)
+		n, _ := export(ctx, inst, v.v.v, o)
 		return n
 	}
-	n, _ := export(ctx, inst, v.path.cache, o)
+	n, _ := export(ctx, inst, v.v.Value, o)
 	return n
 }
 
@@ -949,10 +949,10 @@ func (v Value) Decode(x interface{}) error {
 // Doc returns all documentation comments associated with the field from which
 // the current value originates.
 func (v Value) Doc() []*ast.CommentGroup {
-	if v.path == nil {
+	if v.v == nil {
 		return nil
 	}
-	return v.path.docs.appendDocs(nil)
+	return v.v.docs.appendDocs(nil)
 }
 
 // Split returns a list of values from which v originated such that
@@ -963,14 +963,14 @@ func (v Value) Doc() []*ast.CommentGroup {
 //
 // Deprecated: use Expr.
 func (v Value) Split() []Value {
-	if v.path == nil {
+	if v.v == nil {
 		return nil
 	}
 	ctx := v.ctx()
 	a := []Value{}
-	for _, x := range separate(v.path.v) {
-		path := *v.path
-		path.cache = x.evalPartial(ctx)
+	for _, x := range separate(v.v.v) {
+		path := *v.v
+		path.Value = x.evalPartial(ctx)
 		path.v = x
 		a = append(a, Value{v.idx, &path})
 	}
@@ -996,10 +996,10 @@ func separate(v value) (a []value) {
 // struct literal, a field comprehension, or a file. It returns nil for
 // computed nodes. Use Split to get all source values that apply to a field.
 func (v Value) Source() ast.Node {
-	if v.path == nil {
+	if v.v == nil {
 		return nil
 	}
-	return v.path.v.Source()
+	return v.v.v.Source()
 }
 
 // Err returns the error represented by v or nil v is not an error.
@@ -1012,7 +1012,7 @@ func (v Value) Err() error {
 
 // Pos returns position information.
 func (v Value) Pos() token.Pos {
-	if v.path == nil || v.Source() == nil {
+	if v.v == nil || v.Source() == nil {
 		return token.NoPos
 	}
 	pos := v.Source().Pos()
@@ -1026,13 +1026,13 @@ func (v Value) Pos() token.Pos {
 func (v Value) IsClosed() bool {
 	switch v.Kind() {
 	case StructKind:
-		if st, ok := v.path.val().(*structLit); ok {
+		if st, ok := v.v.val().(*structLit); ok {
 			return st.closeStatus.shouldClose()
 		}
 	case ListKind:
-		if l, ok := v.path.val().(*list); ok {
+		if l, ok := v.v.val().(*list); ok {
 			if n, ok := l.len.(*numLit); ok {
-				return n.intValue(v.ctx()) == len(l.elem.arcs)
+				return n.intValue(v.ctx()) == len(l.elem.Arcs)
 			}
 		}
 	}
@@ -1044,10 +1044,10 @@ func (v Value) IsClosed() bool {
 // It does not verify that values of lists or structs are concrete themselves.
 // To check whether there is a concrete default, use v.Default().IsConcrete().
 func (v Value) IsConcrete() bool {
-	if v.path == nil {
+	if v.v == nil {
 		return false // any is neither concrete, not a list or struct.
 	}
-	x := v.path.v.evalPartial(v.ctx())
+	x := v.v.v.evalPartial(v.ctx())
 
 	// Errors marked as incomplete are treated as not complete.
 	if isIncomplete(x) {
@@ -1072,14 +1072,14 @@ func (v Value) IsIncomplete() bool {
 
 // Exists reports whether this value existed in the configuration.
 func (v Value) Exists() bool {
-	if v.path == nil {
+	if v.v == nil {
 		return false
 	}
 	return exists(v.eval(v.ctx()))
 }
 
 func (v Value) checkKind(ctx *context, want kind) *bottom {
-	if v.path == nil {
+	if v.v == nil {
 		return errNotExists
 	}
 	// TODO: use checkKind
@@ -1102,15 +1102,15 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 }
 
 func makeInt(v Value, x int64) Value {
-	return remakeValue(v, newInt(v.path.v.base(), base10).setInt64(x))
+	return remakeValue(v, newInt(v.v.v.base(), base10).setInt64(x))
 }
 
 // Len returns the number of items of the underlying value.
 // For lists it reports the capacity of the list. For structs it indicates the
 // number of fields, for bytes the number of bytes.
 func (v Value) Len() Value {
-	if v.path != nil {
-		switch x := v.path.v.evalPartial(v.ctx()).(type) {
+	if v.v != nil {
+		switch x := v.v.v.evalPartial(v.ctx()).(type) {
 		case *list:
 			return remakeValue(v, x.len.evalPartial(v.ctx()))
 		case *bytesLit:
@@ -1120,13 +1120,13 @@ func (v Value) Len() Value {
 		}
 	}
 	const msg = "len not supported for type %v"
-	return remakeValue(v, v.ctx().mkErr(v.path.v, msg, v.Kind()))
+	return remakeValue(v, v.ctx().mkErr(v.v.v, msg, v.Kind()))
 }
 
 // Elem returns the value of undefined element types of lists and structs.
 func (v Value) Elem() (Value, bool) {
 	ctx := v.ctx()
-	switch x := v.path.cache.(type) {
+	switch x := v.v.Value.(type) {
 	case *structLit:
 		t, _ := x.optionals.constraint(ctx, nil)
 		if t == nil {
@@ -1142,7 +1142,7 @@ func (v Value) Elem() (Value, bool) {
 // BulkOptionals returns all bulk optional fields as key-value pairs.
 // See also Elem and Template.
 func (v Value) BulkOptionals() [][2]Value {
-	x, ok := v.path.cache.(*structLit)
+	x, ok := v.v.Value.(*structLit)
 	if !ok {
 		return nil
 	}
@@ -1180,7 +1180,7 @@ func (v Value) List() (Iterator, error) {
 		return Iterator{ctx: ctx}, v.toErr(err)
 	}
 	l := v.eval(ctx).(*list)
-	return Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}, nil
+	return Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.Arcs)}, nil
 }
 
 // Null reports an error if v is not null.
@@ -1275,8 +1275,8 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 	needFilter := false
 	if o.omitHidden || o.omitOptional || o.omitDefinitions {
 		f := label(0)
-		for _, a := range obj.arcs {
-			f |= a.feature
+		for _, a := range obj.Arcs {
+			f |= a.Label
 			if a.optional && o.omitOptional {
 				needFilter = true
 				break
@@ -1290,13 +1290,13 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 	}
 
 	if needFilter {
-		arcs := make([]arc, len(obj.arcs))
+		arcs := make([]arc, len(obj.Arcs))
 		k := 0
-		for _, a := range obj.arcs {
+		for _, a := range obj.Arcs {
 			if a.definition && (o.omitDefinitions || o.concrete) {
 				continue
 			}
-			if a.feature.IsHidden() && o.omitHidden {
+			if a.Label.IsHidden() && o.omitHidden {
 				continue
 			}
 			if o.omitOptional && a.optional {
@@ -1308,7 +1308,7 @@ func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
 		arcs = arcs[:k]
 		return structValue{ctx, path, obj, arcs}, nil
 	}
-	return structValue{ctx, path, obj, obj.arcs}, nil
+	return structValue{ctx, path, obj, obj.Arcs}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
@@ -1334,10 +1334,10 @@ func (v Value) getStruct() (*structLit, *valueData, *bottom) {
 		return nil, nil, err
 	}
 
-	path := v.path
+	path := v.v
 	if obj != orig {
 		p := *path
-		p.arc.cache = obj
+		p.arc.Value = obj
 		path = &p
 	}
 
@@ -1362,20 +1362,20 @@ type FieldInfo struct {
 }
 
 func (s *Struct) Len() int {
-	return len(s.s.arcs)
+	return len(s.s.Arcs)
 }
 
 // field reports information about the ith field, i < o.Len().
 func (s *Struct) Field(i int) FieldInfo {
 	ctx := s.v.ctx()
-	a := s.s.arcs[i]
-	a.cache = s.s.at(ctx, i)
+	a := s.s.Arcs[i]
+	a.Value = s.s.at(ctx, i)
 
 	// TODO: adding more technical debt here. The evaluator should be
 	// rewritten.
 	x := s.s
 	if x.optionals != nil {
-		name := ctx.LabelStr(x.arcs[i].feature)
+		name := ctx.LabelStr(x.Arcs[i].Label)
 		arg := &stringLit{x.baseValue, name, nil}
 
 		val, _ := x.optionals.constraint(ctx, arg)
@@ -1384,9 +1384,9 @@ func (s *Struct) Field(i int) FieldInfo {
 		}
 	}
 
-	v := Value{ctx.index, &valueData{s.v.path, uint32(i), a}}
-	str := ctx.LabelStr(a.feature)
-	return FieldInfo{str, i, v, a.definition, a.optional, a.feature.IsHidden()}
+	v := Value{ctx.index, &valueData{s.v.v, uint32(i), a}}
+	str := ctx.LabelStr(a.Label)
+	return FieldInfo{str, i, v, a.definition, a.optional, a.Label.IsHidden()}
 }
 
 // FieldByName looks up a field for the given name. If isIdent is true, it will
@@ -1394,8 +1394,8 @@ func (s *Struct) Field(i int) FieldInfo {
 // it interprets name as an arbitrary string for a regular field.
 func (s *Struct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
 	f := s.v.ctx().Label(name, isIdent)
-	for i, a := range s.s.arcs {
-		if a.feature == f {
+	for i, a := range s.s.Arcs {
+		if a.Label == f {
 			return s.Field(i), nil
 		}
 	}
@@ -1424,10 +1424,10 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 		obj.obj.optionals,   // template
 		obj.obj.closeStatus, // closeStatus
 		nil,                 // comprehensions
-		obj.arcs,            // arcs
+		obj.Arcs,            // arcs
 		nil,                 // attributes
 	}
-	return &Iterator{ctx: ctx, val: v, iter: n, len: len(n.arcs)}, nil
+	return &Iterator{ctx: ctx, val: v, iter: n, len: len(n.Arcs)}, nil
 }
 
 // Lookup reports the value at a path starting from v. The empty path returns v
@@ -1461,8 +1461,8 @@ func (v Value) LookupDef(name string) Value {
 	}
 
 	f := v.ctx().Label(name, true)
-	for i, a := range o.arcs {
-		if a.feature == f {
+	for i, a := range o.Arcs {
+		if a.Label == f {
 			if f.IsHidden() || !a.definition || a.optional {
 				break
 			}
@@ -1476,7 +1476,7 @@ func (v Value) LookupDef(name string) Value {
 			return alt
 		}
 	}
-	return newErrValue(v, ctx.mkErr(v.path.v,
+	return newErrValue(v, ctx.mkErr(v.v.v,
 		"defintion %q not found", name))
 }
 
@@ -1533,20 +1533,20 @@ func (v Value) LookupField(name string) (FieldInfo, error) {
 // Any reference in v referring to the value at the given path will resolve
 // to x in the newly created value. The resulting value is not validated.
 func (v Value) Fill(x interface{}, path ...string) Value {
-	if v.path == nil {
+	if v.v == nil {
 		return v
 	}
 	ctx := v.ctx()
-	root := v.path.val()
+	root := v.v.val()
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
 	value := convertVal(ctx, root, true, x)
-	a := v.path.arc
+	a := v.v.arc
 	a.v = mkBin(ctx, v.Pos(), opUnify, root, value)
-	a.cache = a.v.evalPartial(ctx)
+	a.Value = a.v.evalPartial(ctx)
 	// TODO: validate recursively?
-	return Value{v.idx, &valueData{v.path.parent, v.path.index, a}}
+	return Value{v.idx, &valueData{v.v.parent, v.v.index, a}}
 }
 
 // Template returns a function that represents the template definition for a
@@ -1557,12 +1557,12 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 // given its name.
 func (v Value) Template() func(label string) Value {
 	// TODO: rename to optional.
-	if v.path == nil {
+	if v.v == nil {
 		return nil
 	}
 
 	ctx := v.ctx()
-	x, ok := v.path.cache.(*structLit)
+	x, ok := v.v.Value.(*structLit)
 	if !ok || x.optionals.isEmpty() {
 		return nil
 	}
@@ -1622,10 +1622,10 @@ func (v Value) Subsumes(w Value) bool {
 // TODO: remove this requirement.
 func (v Value) Unify(w Value) Value {
 	ctx := v.ctx()
-	if v.path == nil {
+	if v.v == nil {
 		return w
 	}
-	if w.path == nil {
+	if w.v == nil {
 		return v
 	}
 	if v.Err() != nil {
@@ -1635,8 +1635,8 @@ func (v Value) Unify(w Value) Value {
 	if w.Err() != nil {
 		return w
 	}
-	a := v.path.v
-	b := w.path.v
+	a := v.v.v
+	b := w.v.v
 	src := binSrc(token.NoPos, opUnify, a, b)
 	val := mkBin(ctx, src.Pos(), opUnify, a, b)
 	u := remakeValue(v, val)
@@ -1649,36 +1649,36 @@ func (v Value) Unify(w Value) Value {
 // Equals reports whether two values are equal, ignoring optional fields.
 // The result is undefined for incomplete values.
 func (v Value) Equals(other Value) bool {
-	if v.path == nil || other.path == nil {
+	if v.v == nil || other.v == nil {
 		return false
 	}
-	x := v.path.val()
-	y := other.path.val()
+	x := v.v.val()
+	y := other.v.val()
 	return equals(v.ctx(), x, y)
 }
 
 // Format prints a debug version of a value.
 func (v Value) Format(state fmt.State, verb rune) {
 	ctx := v.ctx()
-	if v.path == nil {
+	if v.v == nil {
 		fmt.Fprint(state, "<nil>")
 		return
 	}
 	switch {
 	case state.Flag('#'):
-		_, _ = io.WriteString(state, ctx.str(v.path.v))
+		_, _ = io.WriteString(state, ctx.str(v.v.v))
 	case state.Flag('+'):
-		_, _ = io.WriteString(state, debugStr(ctx, v.path.v))
+		_, _ = io.WriteString(state, debugStr(ctx, v.v.v))
 	default:
-		_, _ = io.WriteString(state, ctx.str(v.path.cache))
+		_, _ = io.WriteString(state, ctx.str(v.v.Value))
 	}
 }
 
 func (v Value) instance() *Instance {
-	if v.path == nil {
+	if v.v == nil {
 		return nil
 	}
-	return v.ctx().getImportFromNode(v.path.v)
+	return v.ctx().getImportFromNode(v.v.v)
 }
 
 // Reference returns the instance and path referred to by this value such that
@@ -1687,13 +1687,13 @@ func (v Value) instance() *Instance {
 // only return a reference if the index resolves to a concrete value.
 func (v Value) Reference() (inst *Instance, path []string) {
 	// TODO: don't include references to hidden fields.
-	if v.path == nil {
+	if v.v == nil {
 		return nil, nil
 	}
 	ctx := v.ctx()
 	var x value
 	var feature string
-	switch sel := v.path.v.(type) {
+	switch sel := v.v.v.(type) {
 	case *selectorExpr:
 		x = sel.X
 		feature = ctx.LabelStr(sel.Sel)
@@ -1710,7 +1710,7 @@ func (v Value) Reference() (inst *Instance, path []string) {
 	default:
 		return nil, nil
 	}
-	imp, a := mkPath(ctx, v.path, x, feature, 0)
+	imp, a := mkPath(ctx, v.v, x, feature, 0)
 	return imp, a
 }
 
@@ -1763,7 +1763,7 @@ func mkFromRoot(c *context, up *valueData, d int) (root value, a []string) {
 	}
 	root, a = mkFromRoot(c, up.parent, d+1)
 	if up.parent != nil {
-		a = append(a, c.LabelStr(up.feature))
+		a = append(a, c.LabelStr(up.Label))
 	} else {
 		root = up.v
 	}
@@ -1778,8 +1778,8 @@ func (v Value) References() [][]string {
 	// TODO: the pathFinder algorithm is quite broken. Using Reference and Expr
 	// will cast a much more accurate net on referenced values.
 	ctx := v.ctx()
-	pf := pathFinder{up: v.path}
-	raw := v.path.v
+	pf := pathFinder{up: v.v}
+	raw := v.v.v
 	if raw == nil {
 		return nil
 	}
@@ -1805,10 +1805,10 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 	case *nodeRef:
 		i := len(p.stack)
 		up := p.up
-		for ; up != nil && up.cache != x.node.(value); up = up.parent {
+		for ; up != nil && up.Value != x.node.(value); up = up.parent {
 		}
-		for ; up != nil && up.feature > 0; up = up.parent {
-			p.stack = append(p.stack, up.feature)
+		for ; up != nil && up.Label > 0; up = up.parent {
+			p.stack = append(p.stack, up.Label)
 		}
 		path := make([]string, len(p.stack))
 		for i, v := range p.stack {
@@ -1827,7 +1827,7 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 
 		stack := p.stack
 		p.stack = nil
-		for _, a := range x.arcs {
+		for _, a := range x.Arcs {
 			rewrite(ctx, a.v, p.find)
 		}
 		p.stack = stack
@@ -2033,7 +2033,7 @@ func (x *validator) walk(v Value, opts options) {
 		for i := 0; i < obj.Len(); i++ {
 			_, v := obj.At(i)
 			opts := opts
-			if obj.arcs[i].definition {
+			if obj.Arcs[i].definition {
 				opts.concrete = false
 			}
 			x.walk(v, opts)
@@ -2063,7 +2063,7 @@ func isGroundRecursive(ctx *context, v value) *bottom {
 			return x
 		}
 	case *list:
-		for i := 0; i < len(x.elem.arcs); i++ {
+		for i := 0; i < len(x.elem.Arcs); i++ {
 			v := ctx.manifest(x.at(ctx, i))
 			if err := isGroundRecursive(ctx, v); err != nil {
 				return err
@@ -2115,10 +2115,10 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 // is no attribute for the requested key.
 func (v Value) Attribute(key string) Attribute {
 	// look up the attributes
-	if v.path == nil || v.path.attrs == nil {
+	if v.v == nil || v.v.attrs == nil {
 		return Attribute{internal.NewNonExisting(key)}
 	}
-	for _, a := range v.path.attrs.attr {
+	for _, a := range v.v.attrs.attr {
 		if a.key() != key {
 			continue
 		}
@@ -2185,13 +2185,13 @@ func (a *Attribute) Lookup(pos int, key string) (val string, found bool, err err
 // args of the call.
 func (v Value) Expr() (Op, []Value) {
 	// TODO: return v if this is complete? Yes for now
-	if v.path == nil {
+	if v.v == nil {
 		return NoOp, nil
 	}
 	// TODO: replace appends with []Value{}. For not leave.
 	a := []Value{}
 	op := NoOp
-	switch x := v.path.v.(type) {
+	switch x := v.v.v.(type) {
 	case *binaryExpr:
 		a = append(a, remakeValue(v, x.X))
 		a = append(a, remakeValue(v, x.Y))

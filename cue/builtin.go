@@ -81,7 +81,7 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit
 		if b.Const != "" {
 			v = mustParseConstBuiltin(ctx, b.Name, b.Const)
 		}
-		obj.arcs = append(obj.arcs, arc{feature: f, v: v})
+		obj.Arcs = append(obj.Arcs, arc{Label: f, v: v})
 	}
 	sort.Sort(obj)
 
@@ -92,10 +92,10 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit
 			panic(fmt.Errorf("could not parse %v: %v", p.cue, err))
 		}
 		pkg := evalExpr(ctx, obj, expr).(*structLit)
-		for _, a := range pkg.arcs {
+		for _, a := range pkg.Arcs {
 			// Discard option status and attributes at top level.
 			// TODO: filter on capitalized fields?
-			obj.insertValue(ctx, a.feature, false, false, a.v, nil, a.docs)
+			obj.insertValue(ctx, a.Label, false, false, a.v, nil, a.docs)
 		}
 	}
 
@@ -185,9 +185,9 @@ var andBuiltin = &builtin{
 			c.ret = &top{baseValue{c.src}}
 			return
 		}
-		u := iter.Value().path.v
+		u := iter.Value().v.v
 		for iter.Next() {
-			u = mkBin(c.ctx, c.src.Pos(), opUnify, u, iter.Value().path.v)
+			u = mkBin(c.ctx, c.src.Pos(), opUnify, u, iter.Value().v.v)
 		}
 		c.ret = u
 	},
@@ -201,7 +201,7 @@ var orBuiltin = &builtin{
 		iter := c.iter(0)
 		d := []dValue{}
 		for iter.Next() {
-			d = append(d, dValue{iter.Value().path.v, false})
+			d = append(d, dValue{iter.Value().v.v, false})
 		}
 		c.ret = &disjunction{baseValue{c.src}, d, nil, false}
 		if len(d) == 0 {
@@ -392,7 +392,7 @@ func init() {
 		if s == nil {
 			return v
 		}
-		a := s.lookup(ctx, ctx.Label(name, false))
+		a := s.Lookup(ctx, ctx.Label(name, false))
 		if a.v == nil {
 			return v
 		}

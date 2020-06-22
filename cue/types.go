@@ -876,8 +876,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	case bytesKind:
 		return json.Marshal(x.(*bytesLit).B)
 	case listKind:
-		l := x.(*list)
-		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.Arcs)}
+		i, _ := v.List()
 		return marshalList(&i)
 	case structKind:
 		obj, err := v.structValData(ctx)

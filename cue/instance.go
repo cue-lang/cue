@@ -268,32 +268,24 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	return i
 }
 
+func (inst *Instance) value() Value {
+	return newValueRoot(inst.newContext(), inst.rootValue)
+}
+
 // Lookup reports the value at a path starting from the top level struct. The
 // Exists method of the returned value will report false if the path did not
 // exist. The Err method reports if any error occurred during evaluation. The
 // empty path returns the top-level configuration struct. Use LookupDef for definitions or LookupField for
 // any kind of field.
 func (inst *Instance) Lookup(path ...string) Value {
-	idx := inst.index
-	ctx := idx.newContext()
-	v := newValueRoot(ctx, inst.rootValue)
-	for _, k := range path {
-		obj, err := v.structValData(ctx)
-		if err != nil {
-			return Value{idx, &valueData{arc: arc{Value: err, v: err}}}
-		}
-		v = obj.Lookup(k)
-	}
-	return v
+	return inst.value().Lookup(path...)
 }
 
 // LookupDef reports the definition with the given name within struct v. The
 // Exists method of the returned value will report false if the definition did
 // not exist. The Err method reports if any error occurred during evaluation.
 func (inst *Instance) LookupDef(path string) Value {
-	ctx := inst.index.newContext()
-	v := newValueRoot(ctx, inst.rootValue.evalPartial(ctx))
-	return v.LookupDef(path)
+	return inst.value().LookupDef(path)
 }
 
 // LookupField reports a Field at a path starting from v, or an error if the
@@ -304,9 +296,7 @@ func (inst *Instance) LookupDef(path string) Value {
 // Deprecated: this API does not work with new-style definitions. Use
 // FieldByName defined on inst.Value().
 func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
-	idx := inst.index
-	ctx := idx.newContext()
-	v := newValueRoot(ctx, inst.rootValue)
+	v := inst.value()
 	for _, k := range path {
 		s, err := v.Struct()
 		if err != nil {

@@ -22,10 +22,12 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 // root.
@@ -139,17 +141,15 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 			return p
 		}
 		// TODO: support exporting instance
-		n, imports := export(ctx, nil, i.rootValue, options{raw: true})
-
-		file, ok := n.(*ast.File)
-		if !ok {
-			file = &ast.File{}
-			if obj, ok := n.(*ast.StructLit); ok {
-				file.Decls = append(file.Decls, obj.Elts...)
-			} else {
-				file.Decls = append(file.Decls, &ast.EmbedDecl{Expr: n.(ast.Expr)})
+		file, _ := exportFile(ctx, nil, i.rootValue, options{raw: true})
+		imports := []string{}
+		for _, i := range internal.Imports(file) {
+			for _, spec := range i.(*ast.ImportDecl).Specs {
+				info, _ := astutil.ParseImportSpec(spec)
+				imports = append(imports, info.ID)
 			}
 		}
+
 		if i.PkgName != "" {
 			pkg := &ast.Package{Name: ast.NewIdent(i.PkgName)}
 			file.Decls = append([]ast.Decl{pkg}, file.Decls...)

@@ -33,6 +33,24 @@ func doEval(m options) bool {
 	return !m.raw
 }
 
+func exportFile(ctx *context, inst *Instance, v value, m options) (f *ast.File, imports []string) {
+	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}, false, nil}
+	top, ok := v.evalPartial(ctx).(*structLit)
+	if ok {
+		top, err := top.expandFields(ctx)
+		if err != nil {
+			v = err
+		} else {
+			for _, a := range top.Arcs {
+				e.top[a.Label] = true
+			}
+		}
+	}
+
+	value := e.expr(v)
+	return e.toFile(inst, value, m)
+}
+
 func export(ctx *context, inst *Instance, v value, m options) (n ast.Node, imports []string) {
 	e := exporter{ctx, m, nil, map[label]bool{}, map[string]importInfo{}, false, nil}
 	top, ok := v.evalPartial(ctx).(*structLit)
@@ -52,7 +70,10 @@ func export(ctx *context, inst *Instance, v value, m options) (n ast.Node, impor
 		// TODO: unwrap structs?
 		return value, nil
 	}
+	return e.toFile(inst, value, m)
+}
 
+func (e *exporter) toFile(inst *Instance, value ast.Expr, m options) (n *ast.File, imports []string) {
 	file := &ast.File{}
 	if inst != nil {
 		if inst.PkgName != "" {

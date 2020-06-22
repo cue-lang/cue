@@ -15,6 +15,7 @@
 package cue
 
 import (
+	"strings"
 	"sync"
 
 	"cuelang.org/go/cue/ast"
@@ -23,6 +24,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -38,7 +41,7 @@ type Runtime struct {
 }
 
 func init() {
-	internal.GetRuntime = func(instance interface{}) interface{} {
+	internal.GetRuntimeNew = func(instance interface{}) interface{} {
 		switch x := instance.(type) {
 		case Value:
 			return &Runtime{idx: x.idx}
@@ -51,13 +54,20 @@ func init() {
 		}
 	}
 
-	internal.CheckAndForkRuntime = func(runtime, value interface{}) interface{} {
+	internal.CheckAndForkRuntimeNew = func(runtime, value interface{}) interface{} {
 		r := runtime.(*Runtime)
 		idx := value.(Value).ctx().index
 		if idx != r.idx {
 			panic("value not from same runtime")
 		}
 		return &Runtime{idx: newIndex(idx)}
+	}
+
+	internal.CoreValue = func(value interface{}) (runtime, vertex interface{}) {
+		if v, ok := value.(Value); ok && v.v != nil {
+			return v.idx.Index, v.v
+		}
+		return nil, nil
 	}
 }
 
@@ -192,6 +202,7 @@ func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 //
 // All instances belonging to the same package should share this index.
 type index struct {
+	adt.Runtime
 	*runtime.Index
 
 	loaded map[*build.Instance]*Instance
@@ -201,16 +212,35 @@ type index struct {
 // sharedIndex is used for indexing builtins and any other labels common to
 // all instances.
 var sharedIndex = &index{
-	Index:  runtime.SharedIndex,
-	loaded: map[*build.Instance]*Instance{},
+	Runtime: runtime.SharedRuntimeNew,
+	Index:   runtime.SharedIndexNew,
+	loaded:  map[*build.Instance]*Instance{},
+}
+
+// NewRuntime creates a *runtime.Runtime with builtins preloaded.
+func NewRuntime() *runtime.Runtime {
+	idx := runtime.NewIndex(sharedIndex.Index)
+	r := runtime.NewWithIndex(idx)
+	i := &index{
+		Runtime: r,
+		Index:   idx,
+		loaded:  map[*build.Instance]*Instance{},
+	}
+	r.Data = i
+	return r
 }
 
 // newIndex creates a new index.
 func newIndex(parent *index) *index {
-	return &index{
-		Index:  runtime.NewIndex(parent.Index),
-		loaded: map[*build.Instance]*Instance{},
+	idx := runtime.NewIndex(parent.Index)
+	r := runtime.NewWithIndex(idx)
+	i := &index{
+		Runtime: r,
+		Index:   idx,
+		loaded:  map[*build.Instance]*Instance{},
 	}
+	r.Data = i
+	return i
 }
 
 func isBuiltin(s string) bool {
@@ -219,30 +249,93 @@ func isBuiltin(s string) bool {
 }
 
 func (idx *index) loadInstance(p *build.Instance) *Instance {
-	if inst := idx.loaded[p]; inst != nil {
-		if !inst.complete {
-			// cycles should be detected by the builder and it should not be
-			// possible to construct a build.Instance that has them.
-			panic("cue: cycle")
+	_ = visitInstances(p, func(p *build.Instance, errs errors.Error) errors.Error {
+		if inst := idx.loaded[p]; inst != nil {
+			if !inst.complete {
+				// cycles should be detected by the builder and it should not be
+				// possible to construct a build.Instance that has them.
+				panic("cue: cycle")
+			}
+			return inst.Err
 		}
-		return inst
-	}
-	errs := runtime.ResolveFiles(idx.Index, p, isBuiltin)
-	files := p.Files
-	inst := newInstance(idx, p)
-	idx.loaded[p] = inst
 
-	if inst.Err == nil {
-		// inst.instance.index.state = s
-		// inst.instance.inst = p
+		err := runtime.ResolveFiles(idx.Index, p, isBuiltin)
+		errs = errors.Append(errs, err)
+
+		v, err := compile.Files(nil, idx.Runtime, p.Files...)
+		errs = errors.Append(errs, err)
+
+		inst := newInstance(idx, p, v)
+		idx.loaded[p] = inst
 		inst.Err = errs
-		for _, f := range files {
-			err := inst.insertFile(f)
-			inst.Err = errors.Append(inst.Err, err)
+
+		inst.ImportPath = p.ImportPath
+		inst.complete = true
+
+		return inst.Err
+	})
+
+	return idx.loaded[p]
+}
+
+// TODO: runtime.Runtime has a similar, much simpler, implementation. This
+// code should go.
+
+type visitFunc func(b *build.Instance, err errors.Error) (errs errors.Error)
+
+// visitInstances calls f for each transitive dependency.
+//
+// It passes any errors that occur in transitive dependencies to the visitFunc.
+// visitFunc must return the errors it is passed or return nil to ignore it.
+func visitInstances(b *build.Instance, f visitFunc) (errs errors.Error) {
+	v := visitor{b: b, f: f, errs: b.Err}
+	for _, file := range b.Files {
+		v.file(file)
+	}
+	return v.f(b, v.errs)
+}
+
+type visitor struct {
+	b    *build.Instance
+	f    visitFunc
+	errs errors.Error
+}
+
+func (v *visitor) addErr(e errors.Error) {
+	v.errs = errors.Append(v.errs, e)
+}
+
+func (v *visitor) file(file *ast.File) {
+	for _, d := range file.Decls {
+		switch x := d.(type) {
+		case *ast.Package:
+		case *ast.ImportDecl:
+			for _, s := range x.Specs {
+				v.spec(s)
+			}
+		case *ast.CommentGroup:
+		default:
+			return
 		}
 	}
-	inst.ImportPath = p.ImportPath
+}
 
-	inst.complete = true
-	return inst
+func (v *visitor) spec(spec *ast.ImportSpec) {
+	info, err := astutil.ParseImportSpec(spec)
+	if err != nil {
+		v.addErr(errors.Promote(err, "invalid import path"))
+		return
+	}
+
+	pkg := v.b.LookupImport(info.ID)
+	if pkg == nil {
+		if strings.Contains(info.ID, ".") {
+			v.addErr(errors.Newf(spec.Pos(),
+				"package %q imported but not defined in %s",
+				info.ID, v.b.ImportPath))
+		}
+		return
+	}
+
+	v.addErr(visitInstances(pkg, v.f))
 }

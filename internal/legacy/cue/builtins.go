@@ -148,9 +148,9 @@ func timeFormat(value, layout string) (bool, error) {
 }
 
 var builtinPackages = map[string]*builtinPkg{
-	"": {
-		native: []*builtin{},
-	},
+	// "": {
+	// 	native: []*builtin{},
+	// },
 	"crypto/md5": {
 		native: []*builtin{{
 			Name:  "Size",
@@ -612,13 +612,15 @@ var builtinPackages = map[string]*builtinPkg{
 						if !json.Valid(b) {
 							return false, fmt.Errorf("json: invalid JSON")
 						}
-						r := internal.GetRuntime(v).(*Runtime)
+						r := internal.GetRuntimeNew(v).(*Runtime)
 						inst, err := r.Compile("json.Validate", b)
 						if err != nil {
 							return false, err
 						}
 
-						v = v.Unify(inst.Value())
+						t := inst.Value()
+
+						v = v.Unify(t)
 						if v.Err() != nil {
 							return false, v.Err()
 						}
@@ -709,7 +711,7 @@ var builtinPackages = map[string]*builtinPkg{
 						if err != nil {
 							return false, err
 						}
-						r := internal.GetRuntime(v).(*Runtime)
+						r := internal.GetRuntimeNew(v).(*Runtime)
 						for {
 							expr, err := d.Decode()
 							if err != nil {
@@ -748,7 +750,7 @@ var builtinPackages = map[string]*builtinPkg{
 						if err != nil {
 							return false, err
 						}
-						r := internal.GetRuntime(v).(*Runtime)
+						r := internal.GetRuntimeNew(v).(*Runtime)
 						for {
 							expr, err := d.Decode()
 							if err != nil {

@@ -100,7 +100,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 	insts := func(i ...*instanceData) []*instanceData { return i }
 	pkg1 := &instanceData{
 		true,
-		"pkg1",
+		"example.com/foo/pkg1",
 		files(`
 		package pkg1
 
@@ -137,7 +137,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 			files(
 				`package test
 
-			import "pkg1"
+			import "example.com/foo/pkg1"
 
 			"Hello \(pkg1.Object)!"`),
 		}),
@@ -147,7 +147,7 @@ func TestMarshalMultiPackage(t *testing.T) {
 			files(
 				`package test
 
-		import pkg2 "pkg1"
+		import pkg2 "example.com/foo/pkg1"
 		pkg1: pkg2.Object
 
 		"Hello \(pkg1)!"`),

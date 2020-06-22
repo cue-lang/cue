@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package convert
+package convert_test
 
 import (
 	"math/big"
@@ -25,9 +25,11 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	_ "cuelang.org/go/internal/legacy/cue" // set internal.CoreValue
 )
 
 func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
@@ -187,7 +189,7 @@ func TestConvert(t *testing.T) {
 		e := eval.New(r)
 		ctx := adt.NewContext(r, e, &adt.Vertex{})
 		t.Run("", func(t *testing.T) {
-			v := GoValueToValue(ctx, tc.goVal, true)
+			v := convert.GoValueToValue(ctx, tc.goVal, true)
 			got := debug.NodeString(ctx, v, nil)
 			if got != tc.want {
 				t.Error(cmp.Diff(got, tc.want))
@@ -205,7 +207,7 @@ func TestX(t *testing.T) {
 	e := eval.New(r)
 	ctx := adt.NewContext(r, e, &adt.Vertex{})
 
-	v := GoValueToValue(ctx, x, false)
+	v := convert.GoValueToValue(ctx, x, false)
 	// if err != nil {
 	// 	t.Fatal(err)
 	// }
@@ -327,7 +329,7 @@ func TestConvertType(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 			e := eval.New(r)
 			ctx := adt.NewContext(r, e, &adt.Vertex{})
-			v, _ := GoTypeToExpr(ctx, tc.goTyp)
+			v, _ := convert.GoTypeToExpr(ctx, tc.goTyp)
 			got := debug.NodeString(ctx, v, nil)
 			if got != tc.want {
 				t.Errorf("\n got %q;\nwant %q", got, tc.want)

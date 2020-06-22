@@ -33,8 +33,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // This file contains functionality for converting Go to CUE.
@@ -220,6 +222,15 @@ func isNil(x reflect.Value) bool {
 }
 
 func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
+	if internal.CoreValue != nil {
+		if ii, iv := internal.CoreValue(x); ii != nil {
+			i := ii.(*runtime.Index)
+			v := iv.(*adt.Vertex)
+			// TODO: panic if nto the same runtime.
+			_ = i
+			return v
+		}
+	}
 	src := ctx.Source()
 	switch v := x.(type) {
 	case nil:

@@ -27,10 +27,17 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/core/subsume"
+	"cuelang.org/go/internal/core/validate"
 )
 
 // Kind determines the underlying type of a Value.
@@ -71,17 +78,17 @@ const (
 	// NumberKind represents any kind of number.
 	NumberKind = IntKind | FloatKind
 
-	TopKind = Kind(adt.TopKind)
+	TopKind = adt.TopKind
 )
 
 // An structValue represents a JSON object.
 //
 // TODO: remove
 type structValue struct {
-	ctx  *context
-	path *valueData
-	obj  *structLit
-	Arcs arcs
+	ctx      *context
+	v        Value
+	obj      *adt.Vertex
+	features []adt.Feature
 }
 
 // Len reports the number of fields in this struct.
@@ -89,14 +96,28 @@ func (o *structValue) Len() int {
 	if o.obj == nil {
 		return 0
 	}
-	return len(o.Arcs)
+	return len(o.features)
 }
 
 // At reports the key and value of the ith field, i < o.Len().
 func (o *structValue) At(i int) (key string, v Value) {
-	a := o.Arcs[i]
-	v = newChildValue(o, i)
-	return o.ctx.LabelStr(a.Label), v
+	f := o.features[i]
+	return o.ctx.LabelStr(f), newChildValue(o, i)
+}
+
+func (o *structValue) at(i int) (v *adt.Vertex, isOpt bool) {
+	f := o.features[i]
+	arc := o.obj.Lookup(f)
+	if arc == nil {
+		arc = &adt.Vertex{
+			Parent: o.v.v,
+			Label:  f,
+		}
+		o.obj.MatchAndInsert(o.ctx.opCtx, arc)
+		arc.Finalize(o.ctx.opCtx)
+		isOpt = true
+	}
+	return arc, isOpt
 }
 
 // Lookup reports the field for the given key. The returned Value is invalid
@@ -106,7 +127,7 @@ func (o *structValue) Lookup(key string) Value {
 	i := 0
 	len := o.Len()
 	for ; i < len; i++ {
-		if o.Arcs[i].Label == f {
+		if o.features[i] == f {
 			break
 		}
 	}
@@ -114,8 +135,7 @@ func (o *structValue) Lookup(key string) Value {
 		// TODO: better message.
 		ctx := o.ctx
 		x := ctx.mkErr(o.obj, codeNotExist, "value %q not found", key)
-		v := x.evalPartial(ctx)
-		return Value{ctx.index, &valueData{o.path.parent, 0, arc{Label: o.path.Label, Value: v, v: x}}}
+		return newErrValue(o.v, x)
 	}
 	return newChildValue(o, i)
 }
@@ -190,25 +210,32 @@ func unwrapJSONError(err error) errors.Error {
 // An Iterator iterates over values.
 //
 type Iterator struct {
-	val  Value
-	ctx  *context
-	iter iterAtter
-	len  int
-	p    int
-	cur  Value
-	f    label
+	val   Value
+	ctx   *context
+	arcs  []field
+	p     int
+	cur   Value
+	f     label
+	isOpt bool
+}
+
+type field struct {
+	arc        *adt.Vertex
+	isOptional bool
 }
 
 // Next advances the iterator to the next value and reports whether there was
 // any. It must be called before the first call to Value or Key.
 func (i *Iterator) Next() bool {
-	if i.p >= i.len {
+	if i.p >= len(i.arcs) {
 		i.cur = Value{}
 		return false
 	}
-	arc := i.iter.iterAt(i.ctx, i.p)
-	i.cur = i.val.makeChild(i.ctx, uint32(i.p), arc)
-	i.f = arc.Label
+	f := i.arcs[i.p]
+	f.arc.Finalize(i.ctx.opCtx)
+	i.cur = makeValue(i.val.idx, f.arc)
+	i.f = f.arc.Label
+	i.isOpt = f.isOptional
 	i.p++
 	return true
 }
@@ -217,6 +244,10 @@ func (i *Iterator) Next() bool {
 // past the last entry.
 func (i *Iterator) Value() Value {
 	return i.cur
+}
+
+func (i *Iterator) Feature() adt.Feature {
+	return i.f
 }
 
 // Label reports the label of the value if i iterates over struct fields and
@@ -235,12 +266,12 @@ func (i *Iterator) IsHidden() bool {
 
 // IsOptional reports if a field is optional.
 func (i *Iterator) IsOptional() bool {
-	return i.cur.v.arc.optional
+	return i.isOpt
 }
 
 // IsDefinition reports if a field is a definition.
 func (i *Iterator) IsDefinition() bool {
-	return i.cur.v.arc.definition
+	return i.f.IsDef()
 }
 
 // marshalJSON iterates over the list and generates JSON output. HasNext
@@ -266,10 +297,11 @@ func marshalList(l *Iterator) (b []byte, err errors.Error) {
 
 func (v Value) getNum(k kind) (*numLit, errors.Error) {
 	v, _ = v.Default()
-	if err := v.checkKind(v.ctx(), k); err != nil {
+	ctx := v.ctx()
+	if err := v.checkKind(ctx, k); err != nil {
 		return nil, v.toErr(err)
 	}
-	n, _ := v.v.Value.(*numLit)
+	n, _ := v.eval(ctx).(*numLit)
 	return n, nil
 }
 
@@ -491,183 +523,111 @@ func (v Value) Float64() (float64, error) {
 	return f, nil
 }
 
-type valueData struct {
-	parent *valueData
-	index  uint32
-	arc
-}
+func (v Value) appendPath(a []string) []string {
+	for _, f := range v.v.Path() {
+		switch f.Typ() {
+		case adt.IntLabel:
+			a = append(a, strconv.FormatInt(int64(f.Index()), 10))
 
-// path returns the path of the value.
-func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
-	var k kind
-	if v.parent != nil {
-		a, k = v.parent.appendPath(a, idx)
-	}
-	switch k {
-	case listKind:
-		a = append(a, strconv.FormatInt(int64(v.index), 10))
-	case structKind:
-		label := idx.LabelStr(v.arc.Label)
-		if f := v.arc.Label; !f.IsDef() && !f.IsHidden() {
-			if !ast.IsValidIdent(label) {
-				label = strconv.Quote(label)
+		case adt.StringLabel:
+			label := v.idx.LabelStr(f)
+			if !f.IsDef() && !f.IsHidden() {
+				if !ast.IsValidIdent(label) {
+					label = strconv.Quote(label)
+				}
 			}
+			a = append(a, label)
+		default:
+			a = append(a, f.SelectorString(v.idx.Index))
 		}
-		a = append(a, label)
 	}
-	return a, v.arc.Value.Kind()
+	return a
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,
 // Struct, or String.
 type Value struct {
 	idx *index
-	v   *valueData
+	v   *adt.Vertex
 }
 
 func newErrValue(v Value, b *bottom) Value {
-	ctx := v.ctx()
-	p := v.v
-	if p == nil {
-		return newValueRoot(ctx, b)
+	node := &adt.Vertex{Value: b}
+	if v.v != nil {
+		node.Label = v.v.Label
+		node.Parent = v.v.Parent
 	}
-	return Value{
-		ctx.index,
-		&valueData{p.parent, p.index, arc{
-			Label: p.arc.Label,
-			Value: b,
-			v:     b,
-		}},
+	node.UpdateStatus(adt.Finalized)
+	node.AddConjunct(adt.MakeConjunct(nil, b))
+	return makeValue(v.idx, node)
+}
+
+func newVertexRoot(ctx *context, x *adt.Vertex) Value {
+	if ctx.opCtx != nil {
+		// This is indicative of an zero Value. In some cases this is called
+		// with an error value.
+		x.Finalize(ctx.opCtx)
+	} else {
+		x.UpdateStatus(adt.Finalized)
 	}
+	return makeValue(ctx.index, x)
 }
 
 func newValueRoot(ctx *context, x value) Value {
-	v := x.evalPartial(ctx)
-	return Value{ctx.index, &valueData{nil, 0, arc{Value: v, v: x}}}
+	if n, ok := x.(*adt.Vertex); ok {
+		return newVertexRoot(ctx, n)
+	}
+	node := &adt.Vertex{}
+	node.AddConjunct(adt.MakeConjunct(nil, x))
+	return newVertexRoot(ctx, node)
 }
 
-func newChildValue(obj *structValue, i int) Value {
-	a := obj.Arcs[i]
-	for j, b := range obj.obj.Arcs {
-		if b.Label == a.Label {
-			a = obj.obj.iterAt(obj.ctx, j)
-			// TODO: adding more technical debt here. The evaluator should be
-			// rewritten.
-			x := obj.obj
-			ctx := obj.ctx
-			if x.optionals != nil {
-				name := ctx.LabelStr(x.Arcs[i].Label)
-				arg := &stringLit{x.baseValue, name, nil}
-
-				val, _ := x.optionals.constraint(ctx, arg)
-				if val != nil {
-					a.v = mkBin(ctx, x.Pos(), opUnify, a.v, val)
-				}
-			}
-			break
-		}
-	}
-
-	return Value{obj.ctx.index, &valueData{obj.path, uint32(i), a}}
+func newChildValue(o *structValue, i int) Value {
+	arc, _ := o.at(i)
+	return makeValue(o.v.idx, arc)
 }
 
 // Dereference reports the value v refers to if v is a reference or v itself
 // otherwise.
 func Dereference(v Value) Value {
-	if v.v == nil {
+	n := v.v
+	if n == nil || len(n.Conjuncts) != 1 {
+		return v
+	}
+
+	c := n.Conjuncts[0]
+	r, _ := c.Expr().(adt.Resolver)
+	if r == nil {
 		return v
 	}
 
 	ctx := v.ctx()
-	a, n := appendPath(ctx, make([]label, 0, 3), v.v.v)
-
-	if n == nil {
-		return v
-
+	n, b := ctx.opCtx.Resolve(c.Env, r)
+	if b != nil {
+		return newErrValue(v, b)
 	}
-
-	p := locateNode(v.v, n)
-
-	if p == nil {
-
-		imp := ctx.getImportFromNode(n.node)
-		if imp == nil {
-			// TODO(eval): embedded structs are currently represented at the
-			// same level as the enclosing struct. This means that the parent
-			// of an embedded struct skips the struct in which it is embedded.
-			// Treat embedded structs as "anonymous" fields.
-			// See TestPathCorrection.
-			return v
-		}
-		p = &valueData{arc: arc{v: imp.rootValue, Value: imp.rootStruct}}
-	}
-
-	cached := p.Value
-	if cached == nil {
-		cached = p.v.evalPartial(ctx)
-	}
-	s := cached.(*structLit)
-	for _, f := range a {
-		a := s.Lookup(ctx, f)
-		if a.v == nil {
-			return Value{}
-		}
-		p = &valueData{parent: p, arc: a} // index
-		s, _ = a.Value.(*structLit)
-	}
-
-	v = Value{v.idx, p}
-	return v
+	return makeValue(v.idx, n)
 }
 
-func appendPath(ctx *context, a []label, v value) (path []label, n *nodeRef) {
-	switch x := v.(type) {
-	case *selectorExpr:
-		a, n = appendPath(ctx, a, x.X)
-		if n == nil {
-			return nil, nil
-		}
-
-		a = append(a, x.Sel)
-
-	case *indexExpr:
-		e := x.Index.evalPartial(ctx)
-		s, ok := e.(*stringLit)
-		if !ok {
-			return nil, nil
-		}
-
-		a, n = appendPath(ctx, a, x.X)
-		if n == nil {
-			return nil, nil
-		}
-
-		a = append(a, ctx.Label(s.Str, false))
-
-	case *nodeRef:
-		n = x
+func makeValue(idx *index, v *adt.Vertex) Value {
+	if v.Status() == 0 || v.Value == nil {
+		panic(fmt.Sprintf("not properly initialized (state: %v, value: %T)",
+			v.Status(), v.Value))
 	}
-	return a, n
+	return Value{idx, v}
 }
 
-func remakeValue(base Value, v value) Value {
-	p := base.v
-	if n, ok := v.(*nodeRef); ok {
-		if q := locateNode(p, n); q != nil {
-			p = q
-		}
-	}
-	path := *p
-	path.v = v
-	path.Value = v.evalPartial(base.ctx())
-	return Value{base.idx, &path}
+func remakeValue(base Value, env *adt.Environment, v value) Value {
+	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label}
+	n.AddConjunct(adt.MakeConjunct(env, v))
+	n = base.ctx().manifest(n)
+	return makeValue(base.idx, n)
 }
 
-func locateNode(p *valueData, n *nodeRef) *valueData {
-	// the parent must exist.
-	for ; p != nil && p.Value != n.node.(value); p = p.parent {
-	}
-	return p
+func remakeFinal(base Value, env *adt.Environment, v adt.Value) Value {
+	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label, Value: v}
+	n.UpdateStatus(adt.Finalized)
+	return makeValue(base.idx, n)
 }
 
 func (v Value) ctx() *context {
@@ -675,41 +635,8 @@ func (v Value) ctx() *context {
 }
 
 func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
-	return Value{v.idx, &valueData{v.v, i, a}}
-}
-
-func (v Value) makeElem(x value) Value {
-	v, e := v.evalFull(x)
-	return Value{v.idx, &valueData{v.v, 0, arc{
-		optional: true,
-		v:        x,
-		Value:    e,
-	}}}
-}
-
-func (v Value) eval(ctx *context) evaluated {
-	if v.v == nil || v.v.Value == nil {
-		panic("undefined value")
-	}
-	return ctx.manifest(v.v.Value)
-}
-
-func (v Value) evalFull(u value) (Value, evaluated) {
-	ctx := v.ctx()
-	x := u.evalPartial(ctx)
-	if st, ok := x.(*structLit); ok {
-		var err *bottom
-		x, err = st.expandFields(ctx)
-		if err != nil {
-			x = err
-		}
-		if x != st {
-			p := *v.v
-			p.Value = x
-			v.v = &p
-		}
-	}
-	return v, x
+	a.Parent = v.v
+	return makeValue(v.idx, a)
 }
 
 // Eval resolves the references of a value and returns the result.
@@ -718,7 +645,12 @@ func (v Value) Eval() Value {
 	if v.v == nil {
 		return v
 	}
-	return remakeValue(v.evalFull(v.v.v))
+	x := v.v
+	// x = eval.FinalizeValue(v.idx.Runtime, v.v)
+	// x.Finalize(v.ctx().opCtx)
+	x = x.ToDataSingle()
+	return makeValue(v.idx, x)
+	// return remakeValue(v, nil, ctx.value(x))
 }
 
 // Default reports the default value and whether it existed. It returns the
@@ -727,12 +659,139 @@ func (v Value) Default() (Value, bool) {
 	if v.v == nil {
 		return v, false
 	}
-	v, u := v.evalFull(v.v.v)
-	x := v.ctx().manifest(u)
-	if x != u {
-		return remakeValue(v, x), true
+
+	d := v.v.Default()
+	if d == v.v {
+		return v, false
 	}
-	return v, false
+	return makeValue(v.idx, d), true
+
+	// d, ok := v.v.Value.(*adt.Disjunction)
+	// if !ok {
+	// 	return v, false
+	// }
+
+	// var w *adt.Vertex
+
+	// switch d.NumDefaults {
+	// case 0:
+	// 	return v, false
+
+	// case 1:
+	// 	w = d.Values[0]
+
+	// default:
+	// 	x := *v.v
+	// 	x.Value = &adt.Disjunction{
+	// 		Src:         d.Src,
+	// 		Values:      d.Values[:d.NumDefaults],
+	// 		NumDefaults: 0,
+	// 	}
+	// 	w = &x
+	// }
+
+	// w.Conjuncts = nil
+	// for _, c := range v.v.Conjuncts {
+	// 	// TODO: preserve field information.
+	// 	expr, _ := stripNonDefaults(c.Expr())
+	// 	w.AddConjunct(adt.MakeConjunct(c.Env, expr))
+	// }
+
+	// return makeValue(v.idx, w), true
+
+	// if !stripped {
+	// 	return v, false
+	// }
+
+	// n := *v.v
+	// n.Conjuncts = conjuncts
+	// return Value{v.idx, &n}, true
+
+	// isDefault := false
+	// for _, c := range v.v.Conjuncts {
+	// 	if hasDisjunction(c.Expr()) {
+	// 		isDefault = true
+	// 		break
+	// 	}
+	// }
+
+	// if !isDefault {
+	// 	return v, false
+	// }
+
+	// TODO: record expanded disjunctions in output.
+	// - Rename Disjunction to DisjunctionExpr
+	// - Introduce Disjuncts with Values.
+	// - In Expr introduce Star
+	// - Don't pick default by default?
+
+	// Evaluate the value.
+	// 	x := eval.FinalizeValue(v.idx.Runtime, v.v)
+	// 	if b, _ := x.Value.(*adt.Bottom); b != nil { // && b.IsIncomplete() {
+	// 		return v, false
+	// 	}
+	// 	// Finalize and return here.
+	// 	return Value{v.idx, x}, isDefault
+}
+
+// TODO: this should go: record preexpanded disjunctions in Vertex.
+func hasDisjunction(expr adt.Expr) bool {
+	switch x := expr.(type) {
+	case *adt.DisjunctionExpr:
+		return true
+	case *adt.Conjunction:
+		for _, v := range x.Values {
+			if hasDisjunction(v) {
+				return true
+			}
+		}
+	case *adt.BinaryExpr:
+		switch x.Op {
+		case adt.OrOp:
+			return true
+		case adt.AndOp:
+			return hasDisjunction(x.X) || hasDisjunction(x.Y)
+		}
+	}
+	return false
+}
+
+// TODO: this should go: record preexpanded disjunctions in Vertex.
+func stripNonDefaults(expr adt.Expr) (r adt.Expr, stripped bool) {
+	switch x := expr.(type) {
+	case *adt.DisjunctionExpr:
+		if !x.HasDefaults {
+			return x, false
+		}
+		d := *x
+		d.Values = []adt.Disjunct{}
+		for _, v := range x.Values {
+			if v.Default {
+				d.Values = append(d.Values, v)
+			}
+		}
+		if len(d.Values) == 1 {
+			return d.Values[0].Val, true
+		}
+		return &d, true
+
+	case *adt.BinaryExpr:
+		if x.Op != adt.AndOp {
+			return x, false
+		}
+		a, sa := stripNonDefaults(x.X)
+		b, sb := stripNonDefaults(x.Y)
+		if sa || sb {
+			bin := *x
+			bin.X = a
+			bin.Y = b
+			return &bin, true
+		}
+		return x, false
+
+	default:
+		return x, false
+	}
 }
 
 // Label reports he label used to obtain this value from the enclosing struct.
@@ -740,7 +799,7 @@ func (v Value) Default() (Value, bool) {
 // TODO: get rid of this somehow. Probably by including a FieldInfo struct
 // or the like.
 func (v Value) Label() (string, bool) {
-	if v.v.Label == 0 {
+	if v.v == nil || v.v.Label == 0 {
 		return "", false
 	}
 	return v.idx.LabelStr(v.v.Label), true
@@ -754,33 +813,13 @@ func (v Value) Kind() Kind {
 		return BottomKind
 	}
 	c := v.v.Value
-	if c == nil {
-		c = v.v.v.evalPartial(v.ctx())
+	if !adt.IsConcrete(c) {
+		return BottomKind
 	}
-	k := c.Kind()
-	if k.isGround() {
-		switch {
-		case k.isAnyOf(nullKind):
-			return NullKind
-		case k.isAnyOf(boolKind):
-			return BoolKind
-		case k&numKind == (intKind):
-			return IntKind
-		case k&numKind == (floatKind):
-			return FloatKind
-		case k.isAnyOf(numKind):
-			return NumberKind
-		case k.isAnyOf(bytesKind):
-			return BytesKind
-		case k.isAnyOf(stringKind):
-			return StringKind
-		case k.isAnyOf(structKind):
-			return StructKind
-		case k.isAnyOf(listKind):
-			return ListKind
-		}
+	if v.IncompleteKind() == adt.ListKind && !v.IsClosed() {
+		return BottomKind
 	}
-	return BottomKind
+	return c.Kind()
 }
 
 // IncompleteKind returns a mask of all kinds that this value may be.
@@ -788,40 +827,7 @@ func (v Value) IncompleteKind() Kind {
 	if v.v == nil {
 		return BottomKind
 	}
-	var k kind
-	x := v.v.v.evalPartial(v.ctx())
-	switch x := convertBuiltin(x).(type) {
-	case *builtin:
-		k = x.representedKind()
-	case *customValidator:
-		k = x.Builtin.Params[0]
-	default:
-		k = x.Kind()
-	}
-	vk := BottomKind // Everything is a bottom kind.
-	for i := kind(1); i < nonGround; i <<= 1 {
-		if k&i != 0 {
-			switch i {
-			case nullKind:
-				vk |= NullKind
-			case boolKind:
-				vk |= BoolKind
-			case intKind:
-				vk |= IntKind
-			case floatKind:
-				vk |= FloatKind
-			case stringKind:
-				vk |= StringKind
-			case bytesKind:
-				vk |= BytesKind
-			case structKind:
-				vk |= StructKind
-			case listKind:
-				vk |= ListKind
-			}
-		}
-	}
-	return vk
+	return v.v.Kind()
 }
 
 // MarshalJSON marshalls this value into valid JSON.
@@ -840,6 +846,14 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	}
 	ctx := v.idx.newContext()
 	x := v.eval(ctx)
+
+	if _, ok := x.(adt.Resolver); ok {
+		return nil, marshalErrf(v, x, codeIncomplete, "value %q contains unresolved references", ctx.str(x))
+	}
+	if !adt.IsConcrete(x) {
+		return nil, marshalErrf(v, x, codeIncomplete, "cannot convert incomplete value %q to JSON", ctx.str(x))
+	}
+
 	// TODO: implement marshalles in value.
 	switch k := x.Kind(); k {
 	case nullKind:
@@ -847,7 +861,9 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	case boolKind:
 		return json.Marshal(x.(*boolLit).B)
 	case intKind, floatKind, numKind:
-		return x.(*numLit).X.MarshalText()
+		b, err := x.(*numLit).X.MarshalText()
+		b = bytes.TrimLeft(b, "+")
+		return b, err
 	case stringKind:
 		return json.Marshal(x.(*stringLit).Str)
 	case bytesKind:
@@ -857,15 +873,6 @@ func (v Value) marshalJSON() (b []byte, err error) {
 		return marshalList(&i)
 	case structKind:
 		obj, err := v.structValData(ctx)
-		st := obj.obj
-		if len(st.comprehensions) > 0 {
-			// This should always evaluate to incomplete. However, fall back
-			// to a bad error message, rather than crashing, in case it doesn't.
-			if err, ok := st.comprehensions[0].comp.evalPartial(ctx).(*bottom); ok {
-				return nil, toMarshalErr(v, err)
-			}
-		}
-
 		if err != nil {
 			return nil, toMarshalErr(v, err)
 		}
@@ -873,12 +880,6 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	case bottomKind:
 		return nil, toMarshalErr(v, x.(*bottom))
 	default:
-		if k.hasReferences() {
-			return nil, marshalErrf(v, x, codeIncomplete, "value %q contains unresolved references", ctx.str(x))
-		}
-		if !k.isGround() {
-			return nil, marshalErrf(v, x, codeIncomplete, "cannot convert incomplete value %q to JSON", ctx.str(x))
-		}
 		return nil, marshalErrf(v, x, 0, "cannot convert value %q of type %T to JSON", ctx.str(x), x)
 	}
 }
@@ -889,21 +890,57 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 	// TODO: the default should ideally be simplified representation that
 	// exactly represents the value. The latter can currently only be
 	// ensured with Raw().
-	if v.v == nil || v.v.Value == nil {
+	if v.v == nil {
 		return nil
 	}
-	ctx := v.ctx()
-	o := getOptions(opts)
-	var inst *Instance
-	if !o.final && !o.concrete {
-		inst = v.instance()
+	var o options = getOptions(opts)
+	// var inst *Instance
+
+	p := export.Profile{
+		Simplify:        !o.raw,
+		ShowOptional:    !o.omitOptional && !o.concrete,
+		ShowDefinitions: !o.omitDefinitions && !o.concrete,
+		ShowHidden:      !o.omitHidden && !o.concrete,
+		ShowAttributes:  !o.omitAttrs,
+		ShowDocs:        o.docs,
 	}
-	if o.raw {
-		n, _ := export(ctx, inst, v.v.v, o)
-		return n
+
+	// var expr ast.Expr
+	var err error
+	var f *ast.File
+	if o.concrete || o.final {
+		// inst = v.instance()
+		var expr ast.Expr
+		expr, err = p.Value(v.idx.Runtime, v.v)
+		if err != nil {
+			return nil
+		}
+
+		// This introduces gratuitous unshadowing!
+		f, err = astutil.ToFile(expr)
+		if err != nil {
+			return nil
+		}
+		// return expr
+	} else {
+		f, err = p.Def(v.idx.Runtime, v.v)
+		if err != nil {
+			panic(err)
+		}
 	}
-	n, _ := export(ctx, inst, v.v.Value, o)
-	return n
+
+	if d := internal.Imports(f); len(d) == 0 {
+		if len(f.Decls) == 1 {
+			if e, ok := f.Decls[0].(*ast.EmbedDecl); ok {
+				return e.Expr
+			}
+		}
+		return &ast.StructLit{
+			Elts: f.Decls,
+		}
+	}
+
+	return f
 }
 
 // Decode initializes x with Value v. If x is a struct, it will validate the
@@ -928,7 +965,7 @@ func (v Value) Doc() []*ast.CommentGroup {
 	if v.v == nil {
 		return nil
 	}
-	return v.v.docs.appendDocs(nil)
+	return export.ExtractDoc(v.v)
 }
 
 // Split returns a list of values from which v originated such that
@@ -942,27 +979,9 @@ func (v Value) Split() []Value {
 	if v.v == nil {
 		return nil
 	}
-	ctx := v.ctx()
 	a := []Value{}
-	for _, x := range separate(v.v.v) {
-		path := *v.v
-		path.Value = x.evalPartial(ctx)
-		path.v = x
-		a = append(a, Value{v.idx, &path})
-	}
-	return a
-}
-
-func separate(v value) (a []value) {
-	c := v.computed()
-	if c == nil || (c.op != opUnify && c.op != opUnifyUnchecked) {
-		return []value{v}
-	}
-	if c.x != nil {
-		a = append(a, separate(c.x)...)
-	}
-	if c.y != nil {
-		a = append(a, separate(c.y)...)
+	for _, x := range v.v.Conjuncts {
+		a = append(a, remakeValue(v, x.Env, x.Expr()))
 	}
 	return a
 }
@@ -975,7 +994,10 @@ func (v Value) Source() ast.Node {
 	if v.v == nil {
 		return nil
 	}
-	return v.v.v.Source()
+	if len(v.v.Conjuncts) == 1 {
+		return v.v.Conjuncts[0].Source()
+	}
+	return v.v.Value.Source()
 }
 
 // Err returns the error represented by v or nil v is not an error.
@@ -1000,19 +1022,10 @@ func (v Value) Pos() token.Pos {
 // IsClosed reports whether a list of struct is closed. It reports false when
 // when the value is not a list or struct.
 func (v Value) IsClosed() bool {
-	switch v.Kind() {
-	case StructKind:
-		if st, ok := v.v.val().(*structLit); ok {
-			return st.closeStatus.shouldClose()
-		}
-	case ListKind:
-		if l, ok := v.v.val().(*list); ok {
-			if n, ok := l.len.(*numLit); ok {
-				return n.intValue(v.ctx()) == len(l.elem.Arcs)
-			}
-		}
+	if v.v == nil {
+		return false
 	}
-	return false
+	return v.v.IsClosed(v.ctx().opCtx)
 }
 
 // IsConcrete reports whether the current value is a concrete scalar value
@@ -1023,35 +1036,32 @@ func (v Value) IsConcrete() bool {
 	if v.v == nil {
 		return false // any is neither concrete, not a list or struct.
 	}
-	x := v.v.v.evalPartial(v.ctx())
-
-	// Errors marked as incomplete are treated as not complete.
-	if isIncomplete(x) {
+	if b, ok := v.v.Value.(*adt.Bottom); ok {
+		return !b.IsIncomplete()
+	}
+	if !adt.IsConcrete(v.v) {
 		return false
 	}
-	// Other errors are considered ground.
-	return x.Kind().isConcrete()
+	if v.IncompleteKind() == adt.ListKind && !v.IsClosed() {
+		return false
+	}
+	return true
 }
 
-// Deprecated: IsIncomplete
-//
-// It indicates that the value cannot be fully evaluated due to
-// insufficient information.
-func (v Value) IsIncomplete() bool {
-	// TODO: remove
-	x := v.eval(v.ctx())
-	if !x.Kind().isConcrete() {
-		return true
-	}
-	return isIncomplete(x)
-}
+// // Deprecated: IsIncomplete
+// //
+// // It indicates that the value cannot be fully evaluated due to
+// // insufficient information.
+// func (v Value) IsIncomplete() bool {
+// 	panic("deprecated")
+// }
 
 // Exists reports whether this value existed in the configuration.
 func (v Value) Exists() bool {
 	if v.v == nil {
 		return false
 	}
-	return exists(v.eval(v.ctx()))
+	return exists(v.v.Value)
 }
 
 func (v Value) checkKind(ctx *context, want kind) *bottom {
@@ -1063,22 +1073,23 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 	if b, ok := x.(*bottom); ok {
 		return b
 	}
-	got := x.Kind()
+	k := x.Kind()
 	if want != bottomKind {
-		if got&want&concreteKind == bottomKind {
+		if k&want == bottomKind {
 			return ctx.mkErr(x, "cannot use value %v (type %s) as %s",
-				v.ctx().str(x), got, want)
+				ctx.opCtx.Str(x), k, want)
 		}
-		if !got.isGround() {
-			return ctx.mkErr(x, codeIncomplete,
-				"non-concrete value %v", got)
+		if !adt.IsConcrete(x) {
+			return ctx.mkErr(x, codeIncomplete, "non-concrete value %v", k)
 		}
 	}
 	return nil
 }
 
 func makeInt(v Value, x int64) Value {
-	return remakeValue(v, newInt(v.v.v.base(), base10).setInt64(x))
+	n := &adt.Num{K: intKind}
+	n.X.SetInt64(int64(x))
+	return remakeFinal(v, nil, n)
 }
 
 // Len returns the number of items of the underlying value.
@@ -1086,17 +1097,35 @@ func makeInt(v Value, x int64) Value {
 // number of fields, for bytes the number of bytes.
 func (v Value) Len() Value {
 	if v.v != nil {
-		switch x := v.v.v.evalPartial(v.ctx()).(type) {
-		case *list:
-			return remakeValue(v, x.len.evalPartial(v.ctx()))
+		switch x := v.eval(v.ctx()).(type) {
+		case *adt.Vertex:
+			if x.IsList() {
+				ctx := v.ctx()
+				n := &adt.Num{K: intKind}
+				n.X.SetInt64(int64(len(x.Elems())))
+				if x.IsClosed(ctx.opCtx) {
+					return remakeFinal(v, nil, n)
+				}
+				// Note: this HAS to be a Conjunction value and cannot be
+				// an adt.BinaryExpr, as the expressions would be considered
+				// to be self-contained and unresolvable when evaluated
+				// (can never become concrete).
+				c := &adt.Conjunction{Values: []adt.Value{
+					&adt.BasicType{K: adt.IntKind},
+					&adt.BoundValue{Op: adt.GreaterEqualOp, Value: n},
+				}}
+				return remakeFinal(v, nil, c)
+
+			}
 		case *bytesLit:
-			return makeInt(v, int64(x.len()))
+			return makeInt(v, int64(len(x.B)))
 		case *stringLit:
-			return makeInt(v, int64(x.len()))
+			return makeInt(v, int64(len([]rune(x.Str))))
 		}
 	}
 	const msg = "len not supported for type %v"
-	return remakeValue(v, v.ctx().mkErr(v.v.v, msg, v.Kind()))
+	return remakeValue(v, nil, v.ctx().mkErr(v.v, msg, v.Kind()))
+
 }
 
 // Elem returns the value of undefined element types of lists and structs.
@@ -1104,51 +1133,51 @@ func (v Value) Elem() (Value, bool) {
 	if v.v == nil {
 		return Value{}, false
 	}
-	ctx := v.ctx()
-	switch x := v.v.Value.(type) {
-	case *structLit:
-		t, _ := x.optionals.constraint(ctx, nil)
-		if t == nil {
-			break
-		}
-		return v.makeElem(t), true
-	case *list:
-		return v.makeElem(x.typ), true
+	ctx := v.ctx().opCtx
+	x := &adt.Vertex{
+		Parent: v.v,
+		Label:  0,
 	}
-	return Value{}, false
+	v.v.Finalize(ctx)
+	v.v.MatchAndInsert(ctx, x)
+	if len(x.Conjuncts) == 0 {
+		return Value{}, false
+	}
+	x.Finalize(ctx)
+	return makeValue(v.idx, x), true
 }
 
-// BulkOptionals returns all bulk optional fields as key-value pairs.
-// See also Elem and Template.
-func (v Value) BulkOptionals() [][2]Value {
-	x, ok := v.v.Value.(*structLit)
-	if !ok {
-		return nil
-	}
-	return v.appendBulk(nil, x.optionals)
-}
+// // BulkOptionals returns all bulk optional fields as key-value pairs.
+// // See also Elem and Template.
+// func (v Value) BulkOptionals() [][2]Value {
+// 	x, ok := v.path.cache.(*structLit)
+// 	if !ok {
+// 		return nil
+// 	}
+// 	return v.appendBulk(nil, x.optionals)
+// }
 
-func (v Value) appendBulk(a [][2]Value, x *optionals) [][2]Value {
-	if x == nil {
-		return a
-	}
-	a = v.appendBulk(a, x.left)
-	a = v.appendBulk(a, x.right)
-	for _, set := range x.fields {
-		if set.key != nil {
-			ctx := v.ctx()
-			fn, ok := ctx.manifest(set.value).(*lambdaExpr)
-			if !ok {
-				// create error
-				continue
-			}
-			x := fn.call(ctx, set.value, &basicType{K: stringKind})
+// func (v Value) appendBulk(a [][2]Value, x *optionals) [][2]Value {
+// 	if x == nil {
+// 		return a
+// 	}
+// 	a = v.appendBulk(a, x.left)
+// 	a = v.appendBulk(a, x.right)
+// 	for _, set := range x.fields {
+// 		if set.key != nil {
+// 			ctx := v.ctx()
+// 			fn, ok := ctx.manifest(set.value).(*lambdaExpr)
+// 			if !ok {
+// 				// create error
+// 				continue
+// 			}
+// 			x := fn.call(ctx, set.value, &basicType{K: stringKind})
 
-			a = append(a, [2]Value{v.makeElem(set.key), v.makeElem(x)})
-		}
-	}
-	return a
-}
+// 			a = append(a, [2]Value{v.makeElem(set.key), v.makeElem(x)})
+// 		}
+// 	}
+// 	return a
+// }
 
 // List creates an iterator over the values of a list or reports an error if
 // v is not a list.
@@ -1158,8 +1187,13 @@ func (v Value) List() (Iterator, error) {
 	if err := v.checkKind(ctx, listKind); err != nil {
 		return Iterator{ctx: ctx}, v.toErr(err)
 	}
-	l := v.eval(ctx).(*list)
-	return Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.Arcs)}, nil
+	arcs := []field{}
+	for _, a := range v.v.Elems() {
+		if a.Label.IsInt() {
+			arcs = append(arcs, field{arc: a})
+		}
+	}
+	return Iterator{ctx: ctx, val: v, arcs: arcs}, nil
 }
 
 // Null reports an error if v is not null.
@@ -1243,97 +1277,78 @@ func (v Value) structValFull(ctx *context) (structValue, *bottom) {
 
 // structVal returns an structVal or an error if v is not a struct.
 func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
-	v, _ = v.Default() // TODO: remove?
+	v, _ = v.Default()
 
-	obj, path, err := v.getStruct()
+	obj, err := v.getStruct()
 	if err != nil {
 		return structValue{}, err
 	}
 
-	// check if any fields can be omitted
-	needFilter := false
-	if o.omitHidden || o.omitOptional || o.omitDefinitions {
-		f := label(0)
-		for _, a := range obj.Arcs {
-			f |= a.Label
-			if a.optional && o.omitOptional {
-				needFilter = true
-				break
-			}
-			if a.definition && (o.omitDefinitions || o.concrete) {
-				needFilter = true
-				break
-			}
-		}
-		needFilter = needFilter || f.IsHidden()
-	}
+	features := export.VertexFeatures(obj)
 
-	if needFilter {
-		arcs := make([]arc, len(obj.Arcs))
-		k := 0
-		for _, a := range obj.Arcs {
-			if a.definition && (o.omitDefinitions || o.concrete) {
-				continue
-			}
-			if a.Label.IsHidden() && o.omitHidden {
-				continue
-			}
-			if o.omitOptional && a.optional {
-				continue
-			}
-			arcs[k] = a
-			k++
+	k := 0
+	for _, f := range features {
+		if f.IsDef() && (o.omitDefinitions || o.concrete) {
+			continue
 		}
-		arcs = arcs[:k]
-		return structValue{ctx, path, obj, arcs}, nil
+		if f.IsHidden() && o.omitHidden {
+			continue
+		}
+		if arc := obj.Lookup(f); arc == nil {
+			if o.omitOptional {
+				continue
+			}
+			// ensure it really exists.
+			v := adt.Vertex{
+				Parent: obj,
+				Label:  f,
+			}
+			obj.MatchAndInsert(ctx.opCtx, &v)
+			if len(v.Conjuncts) == 0 {
+				continue
+			}
+		}
+		features[k] = f
+		k++
 	}
-	return structValue{ctx, path, obj, obj.Arcs}, nil
+	features = features[:k]
+	return structValue{ctx, v, obj, features}, nil
 }
 
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
 func (v Value) Struct() (*Struct, error) {
-	obj, path, err := v.getStruct()
+	ctx := v.ctx()
+	obj, err := v.structValOpts(ctx, options{})
 	if err != nil {
 		return nil, v.toErr(err)
 	}
-	return &Struct{Value{v.idx, path}, obj}, nil
+	return &Struct{obj}, nil
 }
 
-func (v Value) getStruct() (*structLit, *valueData, *bottom) {
+func (v Value) getStruct() (*structLit, *bottom) {
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, structKind); err != nil {
-		return nil, nil, err
+		if !err.HasRecursive ||
+			err.Value == nil ||
+			err.Value.Kind() != StructKind {
+			return nil, err
+		}
 	}
-	orig := v.eval(ctx).(*structLit)
-
-	// TODO: This is expansion appropriate?
-	obj, err := orig.expandFields(ctx)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	path := v.v
-	if obj != orig {
-		p := *path
-		p.arc.Value = obj
-		path = &p
-	}
-
-	return obj, path, nil
+	return v.v, nil
 }
 
 // Struct represents a CUE struct value.
 type Struct struct {
-	v Value
-	s *structLit
+	structValue
 }
 
 // FieldInfo contains information about a struct field.
 type FieldInfo struct {
-	Name  string
-	Pos   int
-	Value Value
+	Selector string
+	Name     string // Deprecated: use Selector
+	Pos      int
+	Value    Value
 
 	IsDefinition bool
 	IsOptional   bool
@@ -1341,31 +1356,18 @@ type FieldInfo struct {
 }
 
 func (s *Struct) Len() int {
-	return len(s.s.Arcs)
+	return s.structValue.Len()
 }
 
 // field reports information about the ith field, i < o.Len().
 func (s *Struct) Field(i int) FieldInfo {
+	a, opt := s.at(i)
 	ctx := s.v.ctx()
-	a := s.s.Arcs[i]
-	a.Value = s.s.at(ctx, i)
 
-	// TODO: adding more technical debt here. The evaluator should be
-	// rewritten.
-	x := s.s
-	if x.optionals != nil {
-		name := ctx.LabelStr(x.Arcs[i].Label)
-		arg := &stringLit{x.baseValue, name, nil}
-
-		val, _ := x.optionals.constraint(ctx, arg)
-		if val != nil {
-			a.v = mkBin(ctx, x.Pos(), opUnify, a.v, val)
-		}
-	}
-
-	v := Value{ctx.index, &valueData{s.v.v, uint32(i), a}}
-	str := ctx.LabelStr(a.Label)
-	return FieldInfo{str, i, v, a.definition, a.optional, a.Label.IsHidden()}
+	v := makeValue(s.v.idx, a)
+	name := ctx.LabelStr(a.Label)
+	str := a.Label.SelectorString(ctx.opCtx)
+	return FieldInfo{str, name, i, v, a.Label.IsDef(), opt, a.Label.IsHidden()}
 }
 
 // FieldByName looks up a field for the given name. If isIdent is true, it will
@@ -1373,8 +1375,8 @@ func (s *Struct) Field(i int) FieldInfo {
 // it interprets name as an arbitrary string for a regular field.
 func (s *Struct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
 	f := s.v.ctx().Label(name, isIdent)
-	for i, a := range s.s.Arcs {
-		if a.Label == f {
+	for i, a := range s.features {
+		if a == f {
 			return s.Field(i), nil
 		}
 	}
@@ -1397,16 +1399,13 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 	if err != nil {
 		return &Iterator{ctx: ctx}, v.toErr(err)
 	}
-	n := &structLit{
-		obj.obj.baseValue,   // baseValue
-		obj.obj.emit,        // emit
-		obj.obj.optionals,   // template
-		obj.obj.closeStatus, // closeStatus
-		nil,                 // comprehensions
-		obj.Arcs,            // arcs
-		nil,                 // attributes
+
+	arcs := []field{}
+	for i := range obj.features {
+		arc, isOpt := obj.at(i)
+		arcs = append(arcs, field{arc: arc, isOptional: isOpt})
 	}
-	return &Iterator{ctx: ctx, val: v, iter: n, len: len(n.Arcs)}, nil
+	return &Iterator{ctx: ctx, val: v, arcs: arcs}, nil
 }
 
 // Lookup reports the value at a path starting from v. The empty path returns v
@@ -1440,9 +1439,9 @@ func (v Value) LookupDef(name string) Value {
 	}
 
 	f := v.ctx().Label(name, true)
-	for i, a := range o.Arcs {
-		if a.Label == f {
-			if f.IsHidden() || !a.definition || a.optional {
+	for i, a := range o.features {
+		if a == f {
+			if f.IsHidden() || !f.IsDef() { // optional not possible for now
 				break
 			}
 			return newChildValue(&o, i)
@@ -1455,8 +1454,7 @@ func (v Value) LookupDef(name string) Value {
 			return alt
 		}
 	}
-	return newErrValue(v, ctx.mkErr(v.v.v,
-		"definition %q not found", name))
+	return newErrValue(v, ctx.mkErr(v.v, "definition %q not found", name))
 }
 
 var errNotFound = errors.Newf(token.NoPos, "field not found")
@@ -1516,16 +1514,15 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 		return v
 	}
 	ctx := v.ctx()
-	root := v.v.val()
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convertVal(ctx, root, true, x)
-	a := v.v.arc
-	a.v = mkBin(ctx, v.Pos(), opUnify, root, value)
-	a.Value = a.v.evalPartial(ctx)
-	// TODO: validate recursively?
-	return Value{v.idx, &valueData{v.v.parent, v.v.index, a}}
+	var value = convert.GoValueToExpr(ctx.opCtx, true, x)
+	n := &adt.Vertex{Parent: v.v.Parent}
+	n.AddConjunct(adt.MakeConjunct(nil, value))
+	n.Finalize(ctx.opCtx)
+	w := makeValue(v.idx, n)
+	return v.Unify(w)
 }
 
 // Template returns a function that represents the template definition for a
@@ -1536,23 +1533,18 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 // given its name.
 func (v Value) Template() func(label string) Value {
 	// TODO: rename to optional.
-	if v.v == nil {
+	if v.v == nil || v.v.Closed == nil {
 		return nil
 	}
 
-	ctx := v.ctx()
-	x, ok := v.v.Value.(*structLit)
-	if !ok || x.optionals.isEmpty() {
-		return nil
-	}
-
+	parent := v.v
+	ctx := v.ctx().opCtx
 	return func(label string) Value {
-		arg := &stringLit{x.baseValue, label, nil}
-
-		if val, _ := x.optionals.constraint(ctx, arg); val != nil {
-			return remakeValue(v, val)
-		}
-		return Value{}
+		f := ctx.StringLabel(label)
+		arc := &adt.Vertex{Parent: parent, Label: f}
+		v.v.MatchAndInsert(ctx, arc)
+		arc.Finalize(ctx)
+		return makeValue(v.idx, arc)
 	}
 }
 
@@ -1570,15 +1562,19 @@ func (v Value) Template() func(label string) Value {
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
 func (v Value) Subsume(w Value, opts ...Option) error {
-	var mode subsumeMode
 	o := getOptions(opts)
-	if o.final {
-		mode |= subFinal | subChoose
+	p := subsume.CUE
+	switch {
+	case o.final && o.ignoreClosedness:
+		p = subsume.FinalOpen
+	case o.final:
+		p = subsume.Final
+	case o.ignoreClosedness:
+		p = subsume.API
 	}
-	if o.ignoreClosedness {
-		mode |= subSchema
-	}
-	return subsumes(v, w, mode)
+	p.Defaults = true
+	ctx := v.ctx().opCtx
+	return p.Value(ctx, v.v, w.v)
 }
 
 // Deprecated: use Subsume.
@@ -1588,11 +1584,12 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 // Without options, Subsumes checks whether v is a backwards compatbile schema
 // of w.
 //
-// By default, Subsumes tests whether two values are compatib
+// By default, Subsumes tests whether two values are compatible
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
 func (v Value) Subsumes(w Value) bool {
-	return subsumes(v, w, subChoose) == nil
+	p := subsume.Profile{Defaults: true}
+	return p.Check(v.ctx().opCtx, v.v, w.v)
 }
 
 // Unify reports the greatest lower bound of v and w.
@@ -1600,29 +1597,20 @@ func (v Value) Subsumes(w Value) bool {
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
 func (v Value) Unify(w Value) Value {
-	ctx := v.ctx()
+	// ctx := v.ctx()
 	if v.v == nil {
 		return w
 	}
 	if w.v == nil {
 		return v
 	}
-	if v.Err() != nil {
-		// TODO: perhaps keep both errors.
-		return v
-	}
-	if w.Err() != nil {
-		return w
-	}
-	a := v.v.v
-	b := w.v.v
-	src := binSrc(token.NoPos, opUnify, a, b)
-	val := mkBin(ctx, src.Pos(), opUnify, a, b)
-	u := remakeValue(v, val)
-	if err := u.Validate(); err != nil {
-		u = newValueRoot(ctx, ctx.mkErr(src, err))
-	}
-	return u
+	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
+	n.AddConjunct(adt.MakeConjunct(nil, v.v))
+	n.AddConjunct(adt.MakeConjunct(nil, w.v))
+
+	ctx := v.idx.newContext()
+	n.Finalize(ctx.opCtx)
+	return makeValue(v.idx, n)
 }
 
 // Equals reports whether two values are equal, ignoring optional fields.
@@ -1631,9 +1619,8 @@ func (v Value) Equals(other Value) bool {
 	if v.v == nil || other.v == nil {
 		return false
 	}
-	x := v.v.val()
-	y := other.v.val()
-	return equals(v.ctx(), x, y)
+	return eval.Equal(v.ctx().opCtx, v.v, other.v)
+
 }
 
 // Format prints a debug version of a value.
@@ -1645,11 +1632,13 @@ func (v Value) Format(state fmt.State, verb rune) {
 	}
 	switch {
 	case state.Flag('#'):
-		_, _ = io.WriteString(state, ctx.str(v.v.v))
+		_, _ = io.WriteString(state, ctx.str(v.v))
 	case state.Flag('+'):
-		_, _ = io.WriteString(state, debugStr(ctx, v.v.v))
+		_, _ = io.WriteString(state, debugStr(ctx, v.v))
 	default:
-		_, _ = io.WriteString(state, ctx.str(v.v.Value))
+		n, _ := export.Raw.Expr(v.idx.Runtime, v.v)
+		b, _ := format.Node(n)
+		_, _ = state.Write(b)
 	}
 }
 
@@ -1657,7 +1646,7 @@ func (v Value) instance() *Instance {
 	if v.v == nil {
 		return nil
 	}
-	return v.ctx().getImportFromNode(v.v.v)
+	return v.ctx().getImportFromNode(v.v)
 }
 
 // Reference returns the instance and path referred to by this value such that
@@ -1666,154 +1655,72 @@ func (v Value) instance() *Instance {
 // only return a reference if the index resolves to a concrete value.
 func (v Value) Reference() (inst *Instance, path []string) {
 	// TODO: don't include references to hidden fields.
-	if v.v == nil {
+	if v.v == nil || len(v.v.Conjuncts) != 1 {
 		return nil, nil
 	}
 	ctx := v.ctx()
-	var x value
-	var feature string
-	switch sel := v.v.v.(type) {
-	case *selectorExpr:
-		x = sel.X
-		feature = ctx.LabelStr(sel.Sel)
+	c := v.v.Conjuncts[0]
 
-	case *indexExpr:
-		e := sel.Index.evalPartial(ctx)
-		s, ok := e.(*stringLit)
-		if !ok {
-			return nil, nil
-		}
-		x = sel.X
-		feature = s.Str
+	return reference(ctx, c.Env, c.Expr())
+}
 
-	default:
+func reference(c *context, env *adt.Environment, r adt.Expr) (inst *Instance, path []string) {
+	ctx := c.opCtx
+	defer ctx.PopState(ctx.PushState(env, r.Source()))
+
+	switch x := r.(type) {
+	case *adt.FieldReference:
+		env := ctx.Env(x.UpCount)
+		inst, path = mkPath(c, nil, env.Vertex)
+		path = append(path, x.Label.SelectorString(c.Index))
+
+	case *adt.LabelReference:
+		env := ctx.Env(x.UpCount)
+		return mkPath(c, nil, env.Vertex)
+
+	case *adt.DynamicReference:
+		env := ctx.Env(x.UpCount)
+		inst, path = mkPath(c, nil, env.Vertex)
+		v, _ := ctx.Evaluate(env, x.Label)
+		str := ctx.StringValue(v)
+		path = append(path, str)
+
+	case *adt.ImportReference:
+		imp := x.ImportPath.StringValue(ctx)
+		inst = c.index.getImportFromPath(imp)
+
+	case *adt.SelectorExpr:
+		inst, path = reference(c, env, x.X)
+		path = append(path, x.Sel.SelectorString(ctx))
+
+	case *adt.IndexExpr:
+		inst, path = reference(c, env, x.X)
+		v, _ := ctx.Evaluate(env, x.Index)
+		str := ctx.StringValue(v)
+		path = append(path, str)
+	}
+	if inst == nil {
 		return nil, nil
 	}
-	imp, a := mkPath(ctx, v.v, x, feature, 0)
-	return imp, a
+	return inst, path
 }
 
-func mkPath(c *context, up *valueData, x value, feature string, d int) (imp *Instance, a []string) {
-	switch x := x.(type) {
-	case *selectorExpr:
-		imp, a = mkPath(c, up, x.X, c.LabelStr(x.Sel), d+1)
-		if imp == nil {
-			return nil, nil
-		}
-
-	case *indexExpr:
-		e := x.Index.evalPartial(c)
-		s, ok := e.(*stringLit)
-		if !ok {
-			return nil, nil
-		}
-		imp, a = mkPath(c, up, x.X, s.Str, d+1)
-		if imp == nil {
-			return nil, nil
-		}
-
-	case *nodeRef:
-		// the parent must exist.
-		var v value
-		if p := locateNode(up, x); p != nil {
-			v, a = mkFromRoot(c, p, d+2)
-		} else {
-			// Either this references another parent, or it is an embedding.
-			imp = c.getImportFromNode(x.node)
-			if imp != nil {
-				break
-			}
-			// This must be an embedding, go one up.
-			v, a = mkFromRoot(c, up.parent, d+2)
-		}
-		if v == nil {
-			v = x.node
-		}
-		imp = c.getImportFromNode(v)
-	default:
-		return nil, nil
+func mkPath(ctx *context, a []string, v *adt.Vertex) (inst *Instance, path []string) {
+	if v.Parent == nil {
+		return ctx.index.getImportFromNode(v), a
 	}
-	return imp, append(a, feature)
+	inst, path = mkPath(ctx, a, v.Parent)
+	path = append(path, v.Label.SelectorString(ctx.opCtx))
+	return inst, path
 }
 
-func mkFromRoot(c *context, up *valueData, d int) (root value, a []string) {
-	if up == nil {
-		return nil, make([]string, 0, d)
-	}
-	root, a = mkFromRoot(c, up.parent, d+1)
-	if up.parent != nil {
-		a = append(a, c.LabelStr(up.Label))
-	} else {
-		root = up.v
-	}
-	return root, a
-}
-
-// References reports all references used to evaluate this value. It does not
-// report references for sub fields if v is a struct.
-//
-// Deprecated: can be implemented in terms of Reference and Expr.
-func (v Value) References() [][]string {
-	// TODO: the pathFinder algorithm is quite broken. Using Reference and Expr
-	// will cast a much more accurate net on referenced values.
-	ctx := v.ctx()
-	pf := pathFinder{up: v.v}
-	raw := v.v.v
-	if raw == nil {
-		return nil
-	}
-	rewrite(ctx, raw, pf.find)
-	return pf.paths
-}
-
-type pathFinder struct {
-	paths [][]string
-	stack []label
-	up    *valueData
-}
-
-func (p *pathFinder) find(ctx *context, v value) (value, bool) {
-	switch x := v.(type) {
-	case *selectorExpr:
-		i := len(p.stack)
-		p.stack = append(p.stack, x.Sel)
-		rewrite(ctx, x.X, p.find)
-		p.stack = p.stack[:i]
-		return v, false
-
-	case *nodeRef:
-		i := len(p.stack)
-		up := p.up
-		for ; up != nil && up.Value != x.node.(value); up = up.parent {
-		}
-		for ; up != nil && up.Label > 0; up = up.parent {
-			p.stack = append(p.stack, up.Label)
-		}
-		path := make([]string, len(p.stack))
-		for i, v := range p.stack {
-			path[len(path)-1-i] = ctx.LabelStr(v)
-		}
-		p.paths = append(p.paths, path)
-		p.stack = p.stack[:i]
-		return v, false
-
-	case *structLit:
-		// If the stack is empty, we do not descend, as we are not evaluating
-		// sub fields.
-		if len(p.stack) == 0 {
-			return v, false
-		}
-
-		stack := p.stack
-		p.stack = nil
-		for _, a := range x.Arcs {
-			rewrite(ctx, a.v, p.find)
-		}
-		p.stack = stack
-		return v, false
-	}
-	return v, true
-}
+// // References reports all references used to evaluate this value. It does not
+// // report references for sub fields if v is a struct.
+// //
+// // Deprecated: can be implemented in terms of Reference and Expr.
+// func (v Value) References() [][]string {
+// 	panic("deprecated")
+// }
 
 type options struct {
 	concrete          bool // enforce that values are concrete
@@ -1950,108 +1857,18 @@ func (o *options) updateOptions(opts []Option) {
 // more than one error, retrievable with errors.Errors, if more than one
 // exists.
 func (v Value) Validate(opts ...Option) error {
-	x := validator{}
 	o := options{}
 	o.updateOptions(opts)
-	// Logically, errors are always permitted in logical fields, so we
-	// force-disable them.
-	// TODO: consider whether we should honor the option to allow checking
-	// optional fields.
-	o.omitOptional = true
-	x.walk(v, o)
-	return errors.Sanitize(x.errs)
-}
 
-type validator struct {
-	errs  errors.Error
-	depth int
-}
-
-func (x *validator) before(v Value, o options) bool {
-	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
-		if !o.concrete && isIncomplete(err) {
-			if o.disallowCycles && err.Code == codeCycle {
-				x.errs = errors.Append(x.errs, v.toErr(err))
-			}
-			return false
-		}
-		x.errs = errors.Append(x.errs, v.toErr(err))
-		if len(errors.Errors(x.errs)) > 50 {
-			return false // mostly to avoid some hypothetical cycle issue
-		}
+	cfg := &validate.Config{
+		Concrete:       o.concrete,
+		DisallowCycles: o.disallowCycles,
+		AllErrors:      true,
 	}
-	if o.concrete {
-		ctx := v.ctx()
-		if err := isGroundRecursive(ctx, v.eval(ctx)); err != nil {
-			x.errs = errors.Append(x.errs, v.toErr(err))
-		}
-	}
-	return true
-}
 
-func (x *validator) walk(v Value, opts options) {
-	// TODO(#42): we can get rid of the arbitrary evaluation depth once CUE has
-	// proper structural cycle detection. See Issue #42. Currently errors
-	// occurring at a depth > internal.MaxDepth will not be detected.
-	if x.depth > internal.MaxDepth {
-		return
-	}
-	ctx := v.ctx()
-	switch v.Kind() {
-	case StructKind:
-		if !x.before(v, opts) {
-			return
-		}
-		x.depth++
-		obj, err := v.structValOpts(ctx, opts)
-		if err != nil {
-			if !isIncomplete(err) && opts.concrete {
-				x.errs = errors.Append(x.errs, v.toErr(err))
-			}
-		}
-		for i := 0; i < obj.Len(); i++ {
-			_, v := obj.At(i)
-			opts := opts
-			if obj.Arcs[i].definition {
-				opts.concrete = false
-			}
-			x.walk(v, opts)
-		}
-		x.depth--
-
-	case ListKind:
-		if !x.before(v, opts) {
-			return
-		}
-		x.depth++
-		list, _ := v.List()
-		for list.Next() {
-			x.walk(list.Value(), opts)
-		}
-		x.depth--
-
-	default:
-		x.before(v, opts)
-	}
-}
-
-func isGroundRecursive(ctx *context, v value) *bottom {
-	switch x := v.(type) {
-	case *bottom:
-		if isIncomplete(x) {
-			return x
-		}
-	case *list:
-		for i := 0; i < len(x.elem.Arcs); i++ {
-			v := ctx.manifest(x.at(ctx, i))
-			if err := isGroundRecursive(ctx, v); err != nil {
-				return err
-			}
-		}
-	default:
-		if !x.Kind().isGround() {
-			return ctx.mkErr(v, "incomplete value (%v)", ctx.str(v))
-		}
+	b := validate.Validate(v.idx.Runtime, v.v, cfg)
+	if b != nil {
+		return b.Err
 	}
 	return nil
 }
@@ -2094,15 +1911,18 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 // is no attribute for the requested key.
 func (v Value) Attribute(key string) Attribute {
 	// look up the attributes
-	if v.v == nil || v.v.attrs == nil {
+	if v.v == nil {
 		return Attribute{internal.NewNonExisting(key)}
 	}
-	for _, a := range v.v.attrs.attr {
-		if a.key() != key {
+	// look up the attributes
+	for _, a := range export.ExtractFieldAttrs(v.v.Conjuncts) {
+		k, body := a.Split()
+		if key != k {
 			continue
 		}
-		return Attribute{internal.ParseAttrBody(token.NoPos, a.body())}
+		return Attribute{internal.ParseAttrBody(token.NoPos, body)}
 	}
+
 	return Attribute{internal.NewNonExisting(key)}
 }
 
@@ -2167,79 +1987,193 @@ func (v Value) Expr() (Op, []Value) {
 	if v.v == nil {
 		return NoOp, nil
 	}
+
+	var expr adt.Expr
+	var env *adt.Environment
+
+	if v.v.IsData() {
+		switch x := v.v.Value.(type) {
+		case *adt.ListMarker, *adt.StructMarker:
+			expr = v.v
+		default:
+			expr = x
+		}
+
+	} else {
+		switch len(v.v.Conjuncts) {
+		case 0:
+			if v.v.Value == nil {
+				return NoOp, []Value{makeValue(v.idx, v.v)}
+			}
+			expr = v.v.Value
+
+		case 1:
+			// the default case, processed below.
+			c := v.v.Conjuncts[0]
+			env = c.Env
+			expr = c.Expr()
+			if v, ok := expr.(*adt.Vertex); ok {
+				switch x := v.Value.(type) {
+				case *adt.ListMarker, *adt.StructMarker:
+				default:
+					expr = x
+				}
+			}
+
+		default:
+			a := []Value{}
+			ctx := v.ctx().opCtx
+			for _, c := range v.v.Conjuncts {
+				n := &adt.Vertex{
+					Parent: v.v.Parent,
+					Label:  v.v.Label,
+				}
+				n.AddConjunct(c)
+				n.Finalize(ctx)
+				a = append(a, makeValue(v.idx, n))
+			}
+			return adt.AndOp, a
+		}
+	}
+
 	// TODO: replace appends with []Value{}. For not leave.
 	a := []Value{}
 	op := NoOp
-	switch x := v.v.v.(type) {
+	switch x := expr.(type) {
 	case *binaryExpr:
-		a = append(a, remakeValue(v, x.X))
-		a = append(a, remakeValue(v, x.Y))
-		op = opToOp[x.Op]
+		a = append(a, remakeValue(v, env, x.X))
+		a = append(a, remakeValue(v, env, x.Y))
+		op = x.Op
 	case *unaryExpr:
-		a = append(a, remakeValue(v, x.X))
-		op = opToOp[x.Op]
-	case *bound:
-		a = append(a, remakeValue(v, x.Expr))
-		op = opToOp[x.Op]
-	case *unification:
+		a = append(a, remakeValue(v, env, x.X))
+		op = x.Op
+	case *boundExpr:
+		a = append(a, remakeValue(v, env, x.Expr))
+		op = x.Op
+	case *boundValue:
+		a = append(a, remakeValue(v, env, x.Value))
+		op = x.Op
+	case *adt.Conjunction:
 		// pre-expanded unification
 		for _, conjunct := range x.Values {
-			a = append(a, remakeValue(v, conjunct))
+			a = append(a, remakeValue(v, env, conjunct))
 		}
 		op = AndOp
-	case *disjunction:
+	case *adt.Disjunction:
+		for _, disjunct := range x.Values {
+			a = append(a, makeValue(v.idx, disjunct))
+		}
+		op = OrOp
+
+	case *adt.DisjunctionExpr:
 		// Filter defaults that are subsumed by another value.
 		count := 0
-	outer:
+		// outer:
 		for _, disjunct := range x.Values {
-			if disjunct.Default {
-				for _, n := range x.Values {
-					s := subsumer{ctx: v.ctx()}
-					if !n.Default && s.subsumes(n.Val, disjunct.Val) {
-						continue outer
-					}
-				}
-			}
+			// if disjunct.marked {
+			// 	for _, n := range x.Values {
+			// 		s := subsumer{ctx: v.ctx()}
+			// 		if !n.marked && s.subsumes(n.val, disjunct.val) {
+			// 			continue outer
+			// 		}
+			// 	}
+			// }
 			count++
-			a = append(a, remakeValue(v, disjunct.Val))
+			a = append(a, remakeValue(v, env, disjunct.Val))
 		}
 		if count > 1 {
-			op = OrOp
+			op = adt.OrOp
 		}
 	case *interpolation:
 		for _, p := range x.Parts {
-			a = append(a, remakeValue(v, p))
+			a = append(a, remakeValue(v, env, p))
 		}
 		op = InterpolationOp
+
+	case *adt.FieldReference:
+		// TODO: allow hard link
+		ctx := v.ctx().opCtx
+		f := ctx.PushState(env, x.Src)
+		env := ctx.Env(x.UpCount)
+		a = append(a, remakeValue(v, nil, &adt.NodeLink{Node: env.Vertex}))
+		a = append(a, remakeValue(v, nil, ctx.NewString(x.Label.SelectorString(ctx))))
+		_ = ctx.PopState(f)
+		op = SelectorOp
+
 	case *selectorExpr:
-		a = append(a, remakeValue(v, x.X))
-		a = append(a, remakeValue(v, &stringLit{
-			x.baseValue,
-			v.ctx().LabelStr(x.Sel),
-			nil,
+		a = append(a, remakeValue(v, env, x.X))
+		// A string selector is quoted.
+		a = append(a, remakeValue(v, env, &adt.String{
+			Str: x.Sel.SelectorString(v.idx.Index),
 		}))
 		op = SelectorOp
+
 	case *indexExpr:
-		a = append(a, remakeValue(v, x.X))
-		a = append(a, remakeValue(v, x.Index))
+		a = append(a, remakeValue(v, env, x.X))
+		a = append(a, remakeValue(v, env, x.Index))
 		op = IndexOp
 	case *sliceExpr:
-		a = append(a, remakeValue(v, x.X))
-		a = append(a, remakeValue(v, x.Lo))
-		a = append(a, remakeValue(v, x.Hi))
+		a = append(a, remakeValue(v, env, x.X))
+		a = append(a, remakeValue(v, env, x.Lo))
+		a = append(a, remakeValue(v, env, x.Hi))
 		op = SliceOp
 	case *callExpr:
-		a = append(a, remakeValue(v, x.Fun))
+		a = append(a, remakeValue(v, env, x.Fun))
 		for _, arg := range x.Args {
-			a = append(a, remakeValue(v, arg))
+			a = append(a, remakeValue(v, env, arg))
 		}
 		op = CallOp
 	case *customValidator:
-		a = append(a, remakeValue(v, x.Builtin))
+		a = append(a, remakeValue(v, env, x.Builtin))
 		for _, arg := range x.Args {
-			a = append(a, remakeValue(v, arg))
+			a = append(a, remakeValue(v, env, arg))
 		}
 		op = CallOp
+
+	case *adt.StructLit:
+		// Simulate old embeddings.
+		envEmbed := &adt.Environment{
+			Up:     env,
+			Vertex: v.v,
+		}
+		fields := []adt.Decl{}
+		ctx := v.ctx().opCtx
+		for _, d := range x.Decls {
+			switch x := d.(type) {
+			case adt.Expr:
+				// embedding
+				n := &adt.Vertex{
+					Parent: v.v.Parent,
+					Label:  v.v.Label}
+				c := adt.MakeConjunct(envEmbed, x)
+				n.AddConjunct(c)
+				n.Finalize(ctx)
+				a = append(a, makeValue(v.idx, n))
+
+			default:
+				fields = append(fields, d)
+			}
+		}
+		if len(a) == 0 {
+			a = append(a, v)
+			break
+		}
+
+		if len(fields) > 0 {
+			n := &adt.Vertex{
+				Parent: v.v.Parent,
+				Label:  v.v.Label,
+			}
+			c := adt.MakeConjunct(env, &adt.StructLit{
+				Decls: fields,
+			})
+			n.AddConjunct(c)
+			n.Finalize(ctx)
+			a = append(a, makeValue(v.idx, n))
+		}
+
+		op = adt.AndOp
+
 	default:
 		a = append(a, v)
 	}

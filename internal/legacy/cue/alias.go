@@ -19,34 +19,34 @@ import "cuelang.org/go/internal/core/adt"
 type (
 	bottom    = adt.Bottom
 	source    = adt.Node
-	errCode   = adt.ErrorCode
 	kind      = adt.Kind
 	nullLit   = adt.Null
 	boolLit   = adt.Bool
 	numLit    = adt.Num
 	stringLit = adt.String
 	bytesLit  = adt.Bytes
-	context   = adt.OpContext
 	structLit = adt.Vertex
 
 	arc       = *adt.Vertex
 	value     = adt.Expr
 	evaluated = adt.Value
 	label     = adt.Feature
-	Op        = adt.Op
 
-	listLit       = adt.ListLit
-	top           = adt.Top
-	basicType     = adt.BasicType
-	boundExpr     = adt.BoundExpr
-	boundValue    = adt.BoundValue
-	selectorExpr  = adt.SelectorExpr
-	indexExpr     = adt.IndexExpr
-	sliceExpr     = adt.SliceExpr
-	interpolation = adt.Interpolation
-	unaryExpr     = adt.UnaryExpr
-	binaryExpr    = adt.BinaryExpr
-	callExpr      = adt.CallExpr
+	listLit         = adt.ListLit
+	top             = adt.Top
+	basicType       = adt.BasicType
+	boundExpr       = adt.BoundExpr
+	boundValue      = adt.BoundValue
+	selectorExpr    = adt.SelectorExpr
+	indexExpr       = adt.IndexExpr
+	sliceExpr       = adt.SliceExpr
+	interpolation   = adt.Interpolation
+	unaryExpr       = adt.UnaryExpr
+	binaryExpr      = adt.BinaryExpr
+	callExpr        = adt.CallExpr
+	disjunction     = adt.DisjunctionExpr
+	dValue          = adt.Disjunct
+	customValidator = adt.BuiltinValidator
 )
 
 const (
@@ -61,9 +61,4 @@ const (
 	listKind   = adt.ListKind
 	structKind = adt.StructKind
 	bottomKind = adt.BottomKind
-
-	NoOp = adt.NoOp
-
-	codeIncomplete = adt.IncompleteError
-	codeNotExist   = adt.IncompleteError
 )

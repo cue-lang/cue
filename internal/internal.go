@@ -77,6 +77,10 @@ var GetRuntime func(instance interface{}) interface{}
 // GetRuntime reports the runtime for an Instance or Value.
 var GetRuntimeNew func(instance interface{}) interface{}
 
+// CoreValue returns an *runtime.Index and *adt.Vertex for a cue.Value.
+// It returns nil if value is not a cue.Value.
+var CoreValue func(value interface{}) (runtime, vertex interface{})
+
 // MakeInstance makes a new instance from a value.
 var MakeInstance func(value interface{}) (instance interface{})
 

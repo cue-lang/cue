@@ -49,7 +49,7 @@ func TestBuiltins(t *testing.T) {
 		`3`,
 	}, {
 		test("math", "math.Pi(3)"),
-		`_|_(cannot call non-function Pi (type float))`,
+		`_|_(cannot call non-function math.Pi (type float))`,
 	}, {
 		test("math", "math.Floor(3, 5)"),
 		`_|_(too many arguments in call to math.Floor (have 2, want 1))`,
@@ -91,10 +91,10 @@ func TestBuiltins(t *testing.T) {
 		`'foo'`,
 	}, {
 		test("encoding/base64", `base64.Decode(null, "foo")`),
-		`_|_(error in call to encoding/base64.Decode: illegal base64 data at input byte 0)`,
+		`_|_(error in call to encoding/base64.Decode: illegal base64 data at input byte 0 (and 1 more errors))`,
 	}, {
 		test("encoding/base64", `base64.Decode({}, "foo")`),
-		`_|_(error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null)`,
+		`_|_(error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null (and 1 more errors))`,
 	}, {
 		test("encoding/hex", `hex.Encode("foo")`),
 		`"666f6f"`,
@@ -103,7 +103,7 @@ func TestBuiltins(t *testing.T) {
 		`'foo'`,
 	}, {
 		test("encoding/hex", `hex.Decode("foo")`),
-		`_|_(error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o')`,
+		`_|_(error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o' (and 1 more errors))`,
 	}, {
 		test("encoding/hex", `hex.Dump('foo')`),
 		`"00000000  66 6f 6f                                          |foo|\n"`,
@@ -112,19 +112,19 @@ func TestBuiltins(t *testing.T) {
 		`true`,
 	}, {
 		test("encoding/json", `json.Validate("{\"a\":10}", {a:<3})`),
-		`_|_(error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3))`,
+		`_|_(error in call to encoding/json.Validate: invalid value 10 (out of bound <3) (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3))`,
+		`_|_(error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3) (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n", {a:<5, b:int})`),
-		`_|_(error in call to encoding/yaml.Validate: b: incomplete value (int))`,
+		`_|_(error in call to encoding/yaml.Validate: incomplete value int (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3))`,
+		`_|_(error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3) (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
@@ -137,11 +137,11 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		// Find a better alternative, as this call should go.
 		test("strconv", `strconv.FormatFloat(3.02, 300, 4, 64)`),
-		`_|_(int 300 overflows byte in argument 1 in call to strconv.FormatFloat)`,
+		`_|_(int 300 overflows byte in argument 1 in call to strconv.FormatFloat (and 1 more errors))`,
 	}, {
 		// Find a better alternative, as this call should go.
 		test("strconv", `strconv.FormatFloat(3.02, -1, 4, 64)`),
-		`_|_(cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat)`,
+		`_|_(cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat (and 1 more errors))`,
 	}, {
 		// Find a better alternative, as this call should go.
 		test("strconv", `strconv.FormatFloat(3.02, 1.0, 4, 64)`),
@@ -151,7 +151,7 @@ func TestBuiltins(t *testing.T) {
 		`2.5`,
 	}, {
 		test("list", `list.Avg([])`),
-		`_|_(error in call to list.Avg: empty list)`,
+		`_|_(error in call to list.Avg: empty list (and 1 more errors))`,
 	}, {
 		test("list", `list.Avg("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Avg)`,
@@ -166,7 +166,7 @@ func TestBuiltins(t *testing.T) {
 		`[]`,
 	}, {
 		test("list", `list.Drop([1, 2, 3, 4], -1)`),
-		`_|_(error in call to list.Drop: negative index)`,
+		`_|_(error in call to list.Drop: negative index (and 1 more errors))`,
 	}, {
 		test("list", `list.FlattenN([1, [[2, 3], []], [4]], -1)`),
 		`[1,2,3,4]`,
@@ -184,7 +184,7 @@ func TestBuiltins(t *testing.T) {
 		`[]`,
 	}, {
 		test("list", `list.FlattenN("foo", 1)`),
-		`_|_(error in call to list.FlattenN: cannot use value "foo" (type string) as list)`,
+		`_|_(error in call to list.FlattenN: cannot use value "foo" (type string) as list (and 1 more errors))`,
 	}, {
 		test("list", `list.FlattenN([], "foo")`),
 		`_|_(cannot use "foo" (type string) as int in argument 2 to list.FlattenN)`,
@@ -193,7 +193,7 @@ func TestBuiltins(t *testing.T) {
 		`4`,
 	}, {
 		test("list", `list.Max([])`),
-		`_|_(error in call to list.Max: empty list)`,
+		`_|_(error in call to list.Max: empty list (and 1 more errors))`,
 	}, {
 		test("list", `list.Max("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Max)`,
@@ -202,7 +202,7 @@ func TestBuiltins(t *testing.T) {
 		`1`,
 	}, {
 		test("list", `list.Min([])`),
-		`_|_(error in call to list.Min: empty list)`,
+		`_|_(error in call to list.Min: empty list (and 1 more errors))`,
 	}, {
 		test("list", `list.Min("foo")`),
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Min)`,
@@ -217,13 +217,13 @@ func TestBuiltins(t *testing.T) {
 		`_|_(cannot use "foo" (type string) as list in argument 1 to list.Product)`,
 	}, {
 		test("list", `list.Range(0, 5, 0)`),
-		`_|_(error in call to list.Range: step must be non zero)`,
+		`_|_(error in call to list.Range: step must be non zero (and 1 more errors))`,
 	}, {
 		test("list", `list.Range(5, 0, 1)`),
-		`_|_(error in call to list.Range: end must be greater than start when step is positive)`,
+		`_|_(error in call to list.Range: end must be greater than start when step is positive (and 1 more errors))`,
 	}, {
 		test("list", `list.Range(0, 5, -1)`),
-		`_|_(error in call to list.Range: end must be less than start when step is negative)`,
+		`_|_(error in call to list.Range: end must be less than start when step is negative (and 1 more errors))`,
 	}, {
 		test("list", `list.Range(0, 5, 1)`),
 		`[0,1,2,3,4]`,
@@ -244,16 +244,16 @@ func TestBuiltins(t *testing.T) {
 		`[2,3]`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], -1, 3)`),
-		`_|_(error in call to list.Slice: negative index)`,
+		`_|_(error in call to list.Slice: negative index (and 1 more errors))`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], 3, 1)`),
-		`_|_(error in call to list.Slice: invalid index: 3 > 1)`,
+		`_|_(error in call to list.Slice: invalid index: 3 > 1 (and 1 more errors))`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], 5, 5)`),
-		`_|_(error in call to list.Slice: slice bounds out of range)`,
+		`_|_(error in call to list.Slice: slice bounds out of range (and 1 more errors))`,
 	}, {
 		test("list", `list.Slice([1, 2, 3, 4], 1, 5)`),
-		`_|_(error in call to list.Slice: slice bounds out of range)`,
+		`_|_(error in call to list.Slice: slice bounds out of range (and 1 more errors))`,
 	}, {
 		test("list", `list.Sort([], list.Ascending)`),
 		`[]`,
@@ -266,16 +266,16 @@ func TestBuiltins(t *testing.T) {
 			y:_,
 			less: (x.a < y.a)
 		})`),
-		`[{a: 1, v: 2},{a: 1, v: 3},{a: 2, v: 1}]`,
+		`[{a:1,v:2},{a:1,v:3},{a:2,v:1}]`,
 	}, {
 		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
-		`_|_(error in call to list.Sort: less: conflicting values close(T, close(T)) and {b: 2} (mismatched types number|string and struct))`,
+		`_|_(error in call to list.Sort: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
 	}, {
 		test("list", `list.SortStrings(["b", "a"])`),
 		`["a","b"]`,
 	}, {
 		test("list", `list.SortStrings([1, 2])`),
-		`_|_(invalid list element 0 in argument 0 to list.SortStrings: 0: cannot use value 1 (type int) as string)`,
+		`_|_(error in call to list.SortStrings: element 0 of list argument 0: 0: cannot use value 1 (type int) as string (and 1 more errors))`,
 	}, {
 		test("list", `list.Sum([1, 2, 3, 4])`),
 		`10`,
@@ -296,7 +296,7 @@ func TestBuiltins(t *testing.T) {
 		`[1,2,3,4]`,
 	}, {
 		test("list", `list.Take([1, 2, 3, 4], -1)`),
-		`_|_(error in call to list.Take: negative index)`,
+		`_|_(error in call to list.Take: negative index (and 1 more errors))`,
 	}, {
 		test("list", `list.MinItems([1, 2, 3, 4], 2)`),
 		`true`,
@@ -312,20 +312,20 @@ func TestBuiltins(t *testing.T) {
 	}, {
 		// Panics
 		test("math", `math.Jacobi(1000, 2000)`),
-		`_|_(error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000)`,
+		`_|_(error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000 (and 1 more errors))`,
 	}, {
 		test("math", `math.Jacobi(1000, 201)`),
 		`1`,
 	}, {
 		test("math", `math.Asin(2.0e400)`),
-		`_|_(cannot use 2.0e+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up)`,
+		`_|_(cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up (and 1 more errors))`,
 	}, {
 		test("math", `math.MultipleOf(4, 2)`), `true`,
 	}, {
 		test("math", `math.MultipleOf(5, 2)`), `false`,
 	}, {
 		test("math", `math.MultipleOf(5, 0)`),
-		`_|_(error in call to math.MultipleOf: division by zero)`,
+		`_|_(error in call to math.MultipleOf: division by zero (and 1 more errors))`,
 	}, {
 		test("math", `math.MultipleOf(100, 1.00001)`), `false`,
 	}, {
@@ -342,7 +342,7 @@ func TestBuiltins(t *testing.T) {
 		`"foo"`,
 	}, {
 		test("regexp", `regexp.Find(#"f\w\w"#, "bar")`),
-		`_|_(error in call to regexp.Find: no match)`,
+		`_|_(error in call to regexp.Find: no match (and 1 more errors))`,
 	}, {
 		test("regexp", `regexp.FindAll(#"f\w\w"#, "afoot afloat from", 2)`),
 		`["foo","flo"]`,
@@ -351,7 +351,7 @@ func TestBuiltins(t *testing.T) {
 		`["foo","flo"]`,
 	}, {
 		test("regexp", `regexp.FindAll(#"f\w\w"#, "bla bla", -1)`),
-		`_|_(error in call to regexp.FindAll: no match)`,
+		`_|_(error in call to regexp.FindAll: no match (and 1 more errors))`,
 	}, {
 		test("regexp", `regexp.FindSubmatch(#"f(\w)(\w)"#, "afloat afoot from")`),
 		`["flo","l","o"]`,
@@ -360,19 +360,19 @@ func TestBuiltins(t *testing.T) {
 		`[["flo","l","o"],["foo","o","o"],["fro","r","o"]]`,
 	}, {
 		test("regexp", `regexp.FindAllSubmatch(#"f(\w)(\w)"#, "aglom", -1)`),
-		`_|_(error in call to regexp.FindAllSubmatch: no match)`,
+		`_|_(error in call to regexp.FindAllSubmatch: no match (and 1 more errors))`,
 	}, {
 		test("regexp", `regexp.FindNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from")`),
-		`{A: "l", B: "o"}`,
+		`{A:"l",B:"o"}`,
 	}, {
 		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", -1)`),
-		`[{A: "l", B: "o"},{A: "o", B: "o"},{A: "r", B: "o"}]`,
+		`[{A:"l",B:"o"},{A:"o",B:"o"},{A:"r",B:"o"}]`,
 	}, {
 		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>optional)?"#, "fbla", -1)`),
-		`[{A: ""}]`,
+		`[{A:""}]`,
 	}, {
 		test("regexp", `regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "aglom", -1)`),
-		`_|_(error in call to regexp.FindAllNamedSubmatch: no match)`,
+		`_|_(error in call to regexp.FindAllNamedSubmatch: no match (and 1 more errors))`,
 	}, {
 		test("regexp", `regexp.Valid & "valid"`),
 		`"valid"`,
@@ -387,7 +387,7 @@ func TestBuiltins(t *testing.T) {
 		`"Hello World!"`,
 	}, {
 		test("strings", `strings.Join([1, 2], " ")`),
-		`_|_(invalid list element 0 in argument 0 to strings.Join: 0: cannot use value 1 (type int) as string)`,
+		`_|_(error in call to strings.Join: element 0 of list argument 0: 0: cannot use value 1 (type int) as string (and 1 more errors))`,
 	}, {
 		test("strings", `strings.ByteAt("a", 0)`),
 		strconv.Itoa('a'),
@@ -432,7 +432,7 @@ func TestBuiltins(t *testing.T) {
 		`2`,
 	}, {
 		testExpr(`or([])`),
-		`_|_(empty list in call to or)`,
+		`_|_(empty list in call to or (and 1 more errors))`,
 	}, {
 		test("encoding/csv", `csv.Encode([[1,2,3],[4,5],[7,8,9]])`),
 		`"1,2,3\n4,5\n7,8,9\n"`,
@@ -459,7 +459,7 @@ func TestBuiltins(t *testing.T) {
 			x: int
 			y: json.Marshal({a: x})
 		}`),
-		`{x: int, y: Marshal ({a: x})}`,
+		`{x:int,y:_|_(cannot convert incomplete value "int" to JSON (and 1 more errors))}`,
 	}, {
 		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),
 		`"a: 1\n---\nb: 2\n"`,
@@ -482,14 +482,15 @@ func TestBuiltins(t *testing.T) {
 		test("net", `net.JoinHostPort([192,30,4,2], 80)`),
 		`"192.30.4.2:80"`,
 	}, {
-		test("net", `net.JoinHostPort([192,30,4], 80)`),
-		`_|_(error in call to net.JoinHostPort: invalid host [192,30,4])`,
+		// TODO: why is this not printing compactly?
+		test("net", `net.JoinHostPort([192, 30, 4], 80)`),
+		`_|_(error in call to net.JoinHostPort: invalid host [192, 30, 4] (and 1 more errors))`,
 	}, {
 		test("net", `net.IP("23.23.23.23")`),
 		`true`,
 	}, {
 		test("net", `net.IPv4 & "23.23.23.2333"`),
-		`_|_(invalid value "23.23.23.2333" (does not satisfy net.IPv4()))`,
+		`_|_(invalid value "23.23.23.2333" (does not satisfy net.IPv4))`,
 	}, {
 		test("net", `net.IP("23.23.23.23")`),
 		`true`,
@@ -501,7 +502,7 @@ func TestBuiltins(t *testing.T) {
 		`false`,
 	}, {
 		test("net", `net.IPv4() & "ff02::1:3"`),
-		`_|_(invalid value "ff02::1:3" (does not satisfy net.IPv4()))`,
+		`_|_(invalid value "ff02::1:3" (does not satisfy net.IPv4))`,
 	}, {
 		test("net", `net.LoopbackIP([127, 0, 0, 1])`),
 		`true`,
@@ -549,23 +550,23 @@ func TestBuiltins(t *testing.T) {
 		`_|_(invalid value "hello" (does not satisfy strings.MinRunes(10)))`,
 	}, {
 		test("struct", `struct.MinFields(0) & ""`),
-		`_|_(conflicting values MinFields (0) and "" (mismatched types struct and string))`,
+		`_|_(invalid value "" (mismatched types string and struct))`,
 	}, {
 		test("struct", `struct.MinFields(0) & {a: 1}`),
-		`{a: 1}`,
+		`{a:1}`,
 	}, {
 		test("struct", `struct.MinFields(2) & {a: 1}`),
-		`_|_(invalid value {a: 1} (does not satisfy struct.MinFields(2)))`,
+		`_|_(invalid value {a:1} (does not satisfy struct.MinFields(2)))`,
 	}, {
 		test("struct", `struct.MaxFields(0) & {a: 1}`),
-		`_|_(invalid value {a: 1} (does not satisfy struct.MaxFields(0)))`,
+		`_|_(invalid value {a:1} (does not satisfy struct.MaxFields(0)))`,
 	}, {
 		test("struct", `struct.MaxFields(2) & {a: 1}`),
-		`{a: 1}`,
+		`{a:1}`,
 	}, {
 		test("math", `math.Pow(8, 4)`), `4096`,
 	}, {
-		test("math", `math.Pow10(4)`), `10000`,
+		test("math", `math.Pow10(4)`), `1E+4`,
 	}, {
 		test("math", `math.Signbit(-4)`), `true`,
 	}, {
@@ -669,7 +670,41 @@ func TestBuiltins(t *testing.T) {
 			if err := insts[0].Err; err != nil {
 				t.Fatal(err)
 			}
-			got := strings.TrimSpace(fmt.Sprintf("%s\n", insts[0].Value()))
+			v := insts[0].Value()
+			ctx := v.ctx()
+			got := ctx.opCtx.Str(v.v)
+			if got != tc.emit {
+				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)
+			}
+		})
+	}
+}
+
+// For debugging purposes. Do not remove.
+func TestSingleBuiltin(t *testing.T) {
+	// t.Skip()
+
+	test := func(pkg, expr string) []*bimport {
+		return []*bimport{{"",
+			[]string{fmt.Sprintf("import %q\n(%s)", pkg, expr)},
+		}}
+	}
+	testCases := []struct {
+		instances []*bimport
+		emit      string
+	}{{
+		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
+		`_|_(error in call to list.Sort: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
+	}}
+	for i, tc := range testCases {
+		t.Run(fmt.Sprint(i), func(t *testing.T) {
+			insts := Build(makeInstances(tc.instances))
+			if err := insts[0].Err; err != nil {
+				t.Fatal(err)
+			}
+			v := insts[0].Value()
+			ctx := v.ctx()
+			got := ctx.opCtx.Str(v.v)
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)
 			}

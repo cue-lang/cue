@@ -33,6 +33,10 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // A builtin is a builtin function or constant.
@@ -54,7 +58,6 @@ import (
 //   map[string]T
 //
 type builtin struct {
-	baseValue
 	Name   string
 	pkg    label
 	Params []kind
@@ -69,21 +72,27 @@ type builtinPkg struct {
 	cue    string
 }
 
-func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit {
-	obj := &structLit{}
+func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *adt.Vertex {
+	obj := &adt.Vertex{}
 	pkgLabel := ctx.Label(pkgName, false)
+	st := &adt.StructLit{}
+	if len(p.native) > 0 {
+		obj.AddConjunct(adt.MakeConjunct(nil, st))
+	}
 	for _, b := range p.native {
 		b.pkg = pkgLabel
 
 		f := ctx.Label(b.Name, false) // never starts with _
 		// n := &node{baseValue: newBase(imp.Path)}
-		var v evaluated = b
+		var v adt.Expr = toBuiltin(ctx, b)
 		if b.Const != "" {
 			v = mustParseConstBuiltin(ctx, b.Name, b.Const)
 		}
-		obj.Arcs = append(obj.Arcs, arc{Label: f, v: v})
+		st.Decls = append(st.Decls, &adt.Field{
+			Label: f,
+			Value: v,
+		})
 	}
-	sort.Sort(obj)
 
 	// Parse builtin CUE
 	if p.cue != "" {
@@ -91,32 +100,77 @@ func mustCompileBuiltins(ctx *context, p *builtinPkg, pkgName string) *structLit
 		if err != nil {
 			panic(fmt.Errorf("could not parse %v: %v", p.cue, err))
 		}
-		v := newVisitor(ctx.index, nil, nil, nil, false)
-		value := v.walk(expr)
-		pkg := value.evalPartial(ctx).(*structLit)
-		for _, a := range pkg.Arcs {
-			// Discard option status and attributes at top level.
-			// TODO: filter on capitalized fields?
-			obj.insertValue(ctx, a.Label, false, false, a.v, nil, a.docs)
+		c, err := compile.Expr(nil, ctx.opCtx.Runtime, expr)
+		if err != nil {
+			panic(fmt.Errorf("could compile parse %v: %v", p.cue, err))
 		}
+		obj.AddConjunct(c)
+	}
+
+	// We could compile lazily, but this is easier for debugging.
+	obj.Finalize(ctx.opCtx)
+	if err := obj.Err(ctx.opCtx, adt.Finalized); err != nil {
+		panic(err.Err)
 	}
 
 	return obj
 }
 
+func toBuiltin(ctx *context, b *builtin) *adt.Builtin {
+	x := &adt.Builtin{
+		Params:  b.Params,
+		Result:  b.Result,
+		Package: b.pkg,
+		Name:    b.Name,
+	}
+	x.Func = func(ctx *adt.OpContext, args []adt.Value) (ret adt.Expr) {
+		runtime := ctx.Impl().(*runtime.Runtime)
+		index := runtime.Data.(*index)
+
+		// call, _ := ctx.Source().(*ast.CallExpr)
+		c := &callCtxt{
+			idx: index,
+			// src:  call,
+			ctx:     index.newContext(),
+			args:    args,
+			builtin: b,
+		}
+		defer func() {
+			var errVal interface{} = c.err
+			if err := recover(); err != nil {
+				errVal = err
+			}
+			ret = processErr(c, errVal, ret)
+		}()
+		b.Func(c)
+		switch v := c.ret.(type) {
+		case adt.Value:
+			return v
+		case *valueError:
+			return v.err
+		}
+		if c.err != nil {
+			return nil
+		}
+		return convert.GoValueToValue(ctx, c.ret, true)
+	}
+	return x
+}
+
 // newConstBuiltin parses and creates any CUE expression that does not have
 // fields.
-func mustParseConstBuiltin(ctx *context, name, val string) evaluated {
+func mustParseConstBuiltin(ctx *context, name, val string) adt.Expr {
 	expr, err := parser.ParseExpr("<builtin:"+name+">", val)
 	if err != nil {
 		panic(err)
 	}
-	v := newVisitor(ctx.index, nil, nil, nil, false)
-	value := v.walk(expr)
-	return value.evalPartial(ctx)
-}
+	c, err := compile.Expr(nil, ctx.Runtime, expr)
+	if err != nil {
+		panic(err)
+	}
+	return c.Expr()
 
-var _ caller = &builtin{}
+}
 
 var lenBuiltin = &builtin{
 	Name:   "len",
@@ -163,17 +217,34 @@ var lenBuiltin = &builtin{
 	},
 }
 
+func pos(n adt.Node) (p token.Pos) {
+	if n == nil {
+		return
+	}
+	src := n.Source()
+	if src == nil {
+		return
+	}
+	return src.Pos()
+}
+
 var closeBuiltin = &builtin{
 	Name:   "close",
 	Params: []kind{structKind},
 	Result: structKind,
 	Func: func(c *callCtxt) {
-		s, ok := c.args[0].(*structLit)
+		s, ok := c.args[0].(*adt.Vertex)
 		if !ok {
-			c.ret = errors.Newf(c.args[0].Pos(), "struct argument must be concrete")
+			c.ret = errors.Newf(pos(c.args[0]), "struct argument must be concrete")
 			return
 		}
-		c.ret = s.close()
+		if s.IsClosed(c.ctx.opCtx) {
+			c.ret = s
+		} else {
+			v := *s
+			v.Closed = nil // TODO: set dedicated Closer.
+			c.ret = &v
+		}
 	},
 }
 
@@ -184,12 +255,12 @@ var andBuiltin = &builtin{
 	Func: func(c *callCtxt) {
 		iter := c.iter(0)
 		if !iter.Next() {
-			c.ret = &top{baseValue{c.src}}
+			c.ret = &top{}
 			return
 		}
-		u := iter.Value().v.v
+		var u adt.Expr = iter.Value().v
 		for iter.Next() {
-			u = mkBin(c.ctx, c.src.Pos(), opUnify, u, iter.Value().v.v)
+			u = &adt.BinaryExpr{Op: adt.AndOp, X: u, Y: iter.Value().v}
 		}
 		c.ret = u
 	},
@@ -201,11 +272,11 @@ var orBuiltin = &builtin{
 	Result: intKind,
 	Func: func(c *callCtxt) {
 		iter := c.iter(0)
-		d := []dValue{}
+		d := []adt.Disjunct{}
 		for iter.Next() {
-			d = append(d, dValue{iter.Value().v.v, false})
+			d = append(d, adt.Disjunct{iter.Value().v, false})
 		}
-		c.ret = &disjunction{baseValue{c.src}, d, nil, false}
+		c.ret = &adt.DisjunctionExpr{nil, d, false}
 		if len(d) == 0 {
 			// TODO(manifest): This should not be unconditionally incomplete,
 			// but it requires results from comprehensions and all to have
@@ -214,31 +285,12 @@ var orBuiltin = &builtin{
 			// an open list or struct. This would actually be exactly what
 			// that means. The error here could then only add an incomplete
 			// status if the source is open.
-			c.ret = c.ctx.mkErr(c.src, codeIncomplete, "empty list in call to or")
+			c.ret = &adt.Bottom{
+				Code: adt.IncompleteError,
+				Err:  errors.Newf(c.Pos(), "empty list in call to or"),
+			}
 		}
 	},
-}
-
-func (x *builtin) representedKind() kind {
-	if x.isValidator() {
-		return x.Params[0]
-	}
-	return x.Kind()
-}
-
-func (x *builtin) Kind() kind {
-	return lambdaKind
-}
-
-func (x *builtin) evalPartial(ctx *context) evaluated {
-	return x
-}
-
-func (x *builtin) subsumesImpl(s *subsumer, v value) bool {
-	if y, ok := v.(*builtin); ok {
-		return x == y
-	}
-	return false
 }
 
 func (x *builtin) name(ctx *context) string {
@@ -252,61 +304,9 @@ func (x *builtin) isValidator() bool {
 	return len(x.Params) == 1 && x.Result == boolKind
 }
 
-func convertBuiltin(v evaluated) evaluated {
-	x, ok := v.(*builtin)
-	if ok && x.isValidator() {
-		return &customValidator{v.base(), x, []evaluated{}}
-	}
-	return v
-}
-
-func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) {
-	if x.Func == nil {
-		return ctx.mkErr(x, "builtin %s is not a function", x.name(ctx))
-	}
-	if len(x.Params)-1 == len(args) && x.Result == boolKind {
-		// We have a custom builtin
-		return &customValidator{src.base(), x, args}
-	}
-	switch {
-	case len(x.Params) < len(args):
-		return ctx.mkErr(src, x, "too many arguments in call to %s (have %d, want %d)",
-			x.name(ctx), len(args), len(x.Params))
-	case len(x.Params) > len(args):
-		return ctx.mkErr(src, x, "not enough arguments in call to %s (have %d, want %d)",
-			x.name(ctx), len(args), len(x.Params))
-	}
-	for i, a := range args {
-		if x.Params[i] != bottomKind {
-			if unifyType(x.Params[i], a.Kind()) == bottomKind {
-				const msg = "cannot use %s (type %s) as %s in argument %d to %s"
-				return ctx.mkErr(src, x, msg, ctx.str(a), a.Kind(), x.Params[i], i+1, x.name(ctx))
-			}
-		}
-	}
-	call := callCtxt{src: src, ctx: ctx, builtin: x, args: args}
-	defer func() {
-		var errVal interface{} = call.err
-		if err := recover(); err != nil {
-			errVal = err
-		}
-		ret = processErr(&call, errVal, ret)
-	}()
-	x.Func(&call)
-	switch v := call.ret.(type) {
-	case value:
-		return v
-	case *valueError:
-		return v.err
-	}
-	return convertVal(ctx, x, true, call.ret)
-}
-
-func processErr(call *callCtxt, errVal interface{}, ret value) value {
+func processErr(call *callCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	ctx := call.ctx
-	x := call.builtin
 	src := call.src
-	const msg = "error in call to %s: %v"
 	switch err := errVal.(type) {
 	case nil:
 	case *callError:
@@ -316,30 +316,92 @@ func processErr(call *callCtxt, errVal interface{}, ret value) value {
 			ret = err.b
 		}
 	case *marshalError:
-		ret = err.b
-		ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
+		ret = wrapCallErr(call, err.b)
 	case *valueError:
-		ret = err.err
-		ret = ctx.mkErr(src, x, ret, msg, x.name(ctx), err)
-	default:
+		ret = wrapCallErr(call, err.err)
+	case errors.Error:
+		ret = wrapCallErr(call, &adt.Bottom{Err: err})
+	case error:
 		if call.err == internal.ErrIncomplete {
 			ret = ctx.mkErr(src, codeIncomplete, "incomplete value")
 		} else {
 			// TODO: store the underlying error explicitly
-			ret = ctx.mkErr(src, x, msg, x.name(ctx), err)
+			ret = wrapCallErr(call, &adt.Bottom{Err: errors.Promote(err, "")})
 		}
+	default:
+		// Likely a string passed to panic.
+		ret = wrapCallErr(call, &adt.Bottom{
+			Err: errors.Newf(call.Pos(), "%s", err),
+		})
 	}
 	return ret
 }
 
+func wrapCallErr(c *callCtxt, b *adt.Bottom) *adt.Bottom {
+	pos := token.NoPos
+	if c.src != nil {
+		if src := c.src.Source(); src != nil {
+			pos = src.Pos()
+		}
+	}
+	const msg = "error in call to %s"
+	return &adt.Bottom{
+		Code: b.Code,
+		Err:  errors.Wrapf(b.Err, pos, msg, c.builtin.name(c.ctx)),
+	}
+}
+
+func (c *callCtxt) convertError(x interface{}, name string) *adt.Bottom {
+	var err errors.Error
+	switch v := x.(type) {
+	case nil:
+		return nil
+
+	case *adt.Bottom:
+		return v
+
+	case *json.MarshalerError:
+		err = errors.Promote(v, "marshal error")
+
+	case errors.Error:
+		err = v
+
+	case error:
+		if name != "" {
+			err = errors.Newf(c.Pos(), "%s: %v", name, v)
+		} else {
+			err = errors.Newf(c.Pos(), "error in call to %s: %v", c.name(), v)
+		}
+
+	default:
+		err = errors.Newf(token.NoPos, "%s", name)
+	}
+	if err != internal.ErrIncomplete {
+		return &adt.Bottom{
+			// Wrap to preserve position information.
+			Err: errors.Wrapf(err, c.Pos(), "error in call to %s", c.name()),
+		}
+	}
+	return &adt.Bottom{
+		Code: adt.IncompleteError,
+		Err:  errors.Newf(c.Pos(), "incomplete values in call to %s", c.name()),
+	}
+}
+
 // callCtxt is passed to builtin implementations.
 type callCtxt struct {
-	src     source
+	idx     *index
+	src     adt.Expr // *adt.CallExpr
 	ctx     *context
 	builtin *builtin
-	args    []evaluated
-	err     error
+	err     interface{}
 	ret     interface{}
+
+	args []adt.Value
+}
+
+func (c *callCtxt) Pos() token.Pos {
+	return c.ctx.opCtx.Pos()
 }
 
 func (c *callCtxt) name() string {
@@ -362,8 +424,7 @@ func initBuiltins(pkgs map[string]*builtinPkg) {
 		i := sharedIndex.addInst(&Instance{
 			ImportPath: k,
 			PkgName:    path.Base(k),
-			rootStruct: e,
-			rootValue:  e,
+			root:       e,
 		})
 
 		builtins[k] = i
@@ -380,7 +441,7 @@ func getBuiltinPkg(ctx *context, path string) *structLit {
 	if !ok {
 		return nil
 	}
-	return p.rootStruct
+	return p.root
 }
 
 func init() {
@@ -394,12 +455,12 @@ func init() {
 		if s == nil {
 			return v
 		}
-		a := s.Lookup(ctx, ctx.Label(name, false))
-		if a.v == nil {
+		a := s.Lookup(ctx.Label(name, false))
+		if a == nil {
 			return v
 		}
 
-		return v.Unify(newValueRoot(ctx, a.v.evalPartial(ctx)))
+		return v.Unify(makeValue(v.idx, a))
 	}
 }
 
@@ -427,12 +488,21 @@ func (c *callCtxt) errf(src source, underlying error, format string, args ...int
 	c.err = &callError{err}
 }
 
+func (c *callCtxt) errcf(src source, code adt.ErrorCode, format string, args ...interface{}) {
+	a := make([]interface{}, 0, 2+len(args))
+	a = append(a, code)
+	a = append(a, format)
+	a = append(a, args...)
+	err := c.ctx.mkErr(src, a...)
+	c.err = &callError{err}
+}
+
 func (c *callCtxt) value(i int) Value {
 	v := newValueRoot(c.ctx, c.args[i])
-	v, _ = v.Default()
+	// TODO: remove default
+	// v, _ = v.Default()
 	if !v.IsConcrete() {
-		c.errf(c.src, v.toErr(c.ctx.mkErr(c.src, codeIncomplete,
-			"non-concrete value")), "incomplete")
+		c.errcf(c.src, adt.IncompleteError, "non-concrete argument %d", i)
 	}
 	return v
 }
@@ -448,12 +518,26 @@ func (c *callCtxt) structVal(i int) *Struct {
 }
 
 func (c *callCtxt) invalidArgType(arg value, i int, typ string, err error) {
+	if ve, ok := err.(*valueError); ok && ve.err.IsIncomplete() {
+		c.err = ve
+		return
+	}
+	v, ok := arg.(adt.Value)
+	// TODO: make these permanent errors if the value did not originate from
+	// a reference.
+	if !ok {
+		c.errf(c.src, nil,
+			"cannot use incomplete value %s as %s in argument %d to %s: %v",
+			c.ctx.str(arg), typ, i, c.name(), err)
+	}
 	if err != nil {
-		c.errf(c.src, err, "cannot use %s (type %s) as %s in argument %d to %s: %v",
-			c.ctx.str(arg), arg.Kind(), typ, i, c.name(), err)
+		c.errf(c.src, err,
+			"cannot use %s (type %s) as %s in argument %d to %s: %v",
+			c.ctx.str(arg), v.Kind(), typ, i, c.name(), err)
 	} else {
-		c.errf(c.src, nil, "cannot use %s (type %s) as %s in argument %d to %s",
-			c.ctx.str(arg), arg.Kind(), typ, i, c.name())
+		c.errf(c.src, err,
+			"cannot use %s (type %s) as %s in argument %d to %s",
+			c.ctx.str(arg), v.Kind(), typ, i, c.name())
 	}
 }
 
@@ -530,6 +614,8 @@ func (c *callCtxt) bigInt(i int) *big.Int {
 	}
 	return n
 }
+
+var ten = big.NewInt(10)
 
 func (c *callCtxt) bigFloat(i int) *big.Float {
 	x := newValueRoot(c.ctx, c.args[i])
@@ -646,8 +732,8 @@ func (c *callCtxt) strList(i int) (a []string) {
 	for j := 0; v.Next(); j++ {
 		str, err := v.Value().String()
 		if err != nil {
-			c.errf(c.src, err, "invalid list element %d in argument %d to %s: %v",
-				j, i, c.name(), err)
+			c.err = errors.Wrapf(err, c.Pos(),
+				"element %d of list argument %d", j, i)
 			break
 		}
 		a = append(a, str)

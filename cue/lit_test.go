@@ -63,8 +63,8 @@ var diffOpts = []cmp.Option{
 
 var (
 	nullSentinel  = &nullLit{}
-	trueSentinel  = &boolLit{b: true}
-	falseSentinel = &boolLit{b: false}
+	trueSentinel  = &boolLit{B: true}
+	falseSentinel = &boolLit{B: false}
 )
 
 func TestLiterals(t *testing.T) {
@@ -82,29 +82,29 @@ func TestLiterals(t *testing.T) {
 		{"true", trueSentinel},
 		{"false", falseSentinel},
 		{"fls", &bottom{}},
-		{`"foo"`, &stringLit{str: "foo"}},
-		{`#"foo"#`, &stringLit{str: "foo"}},
-		{`#""foo"#`, &stringLit{str: `"foo`}},
-		{`#" ""#`, &stringLit{str: ` "`}},
-		{`"\"foo\""`, &stringLit{str: `"foo"`}},
-		{`"foo\u0032"`, &stringLit{str: `foo2`}},
-		{`"foo\U00000033"`, &stringLit{str: `foo3`}},
-		{`"foo\U0001f499"`, &stringLit{str: `foo💙`}},
-		{`"\a\b\f\n\r\t\v"`, &stringLit{str: "\a\b\f\n\r\t\v"}},
+		{`"foo"`, &stringLit{Str: "foo"}},
+		{`#"foo"#`, &stringLit{Str: "foo"}},
+		{`#""foo"#`, &stringLit{Str: `"foo`}},
+		{`#" ""#`, &stringLit{Str: ` "`}},
+		{`"\"foo\""`, &stringLit{Str: `"foo"`}},
+		{`"foo\u0032"`, &stringLit{Str: `foo2`}},
+		{`"foo\U00000033"`, &stringLit{Str: `foo3`}},
+		{`"foo\U0001f499"`, &stringLit{Str: `foo💙`}},
+		{`"\a\b\f\n\r\t\v"`, &stringLit{Str: "\a\b\f\n\r\t\v"}},
 		{`"""
-		"""`, &stringLit{str: ""}},
+		"""`, &stringLit{Str: ""}},
 		{`"""
 			abc
-			"""`, &stringLit{str: "abc"}},
+			"""`, &stringLit{Str: "abc"}},
 		{`"""
 			abc
 			def
-			"""`, &stringLit{str: "abc\ndef"}},
+			"""`, &stringLit{Str: "abc\ndef"}},
 		{`"""
 			abc
 				def
-			"""`, &stringLit{str: "abc\n\tdef"}},
-		{`'\xff'`, &bytesLit{b: []byte("\xff")}},
+			"""`, &stringLit{Str: "abc\n\tdef"}},
+		{`'\xff'`, &bytesLit{B: []byte("\xff")}},
 		{"1", mkInt(1)},
 		{"100_000", hk},
 		{"1.", mkFloat("1")},

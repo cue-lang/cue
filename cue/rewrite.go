@@ -62,17 +62,17 @@ func (x *structLit) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *selectorExpr) rewrite(ctx *context, fn rewriteFunc) value {
-	v := rewrite(ctx, x.x, fn)
-	if v == x.x {
+	v := rewrite(ctx, x.X, fn)
+	if v == x.X {
 		return x
 	}
-	return &selectorExpr{x.baseValue, v, x.feature}
+	return &selectorExpr{x.baseValue, v, x.Sel}
 }
 
 func (x *indexExpr) rewrite(ctx *context, fn rewriteFunc) value {
-	v := rewrite(ctx, x.x, fn)
-	index := rewrite(ctx, x.index, fn)
-	if v == x.x && index == x.index {
+	v := rewrite(ctx, x.X, fn)
+	index := rewrite(ctx, x.Index, fn)
+	if v == x.X && index == x.Index {
 		return x
 	}
 	return &indexExpr{x.baseValue, v, index}
@@ -92,9 +92,9 @@ func (x *numLit) rewrite(ctx *context, fn rewriteFunc) value      { return x }
 func (x *durationLit) rewrite(ctx *context, fn rewriteFunc) value { return x }
 
 func (x *customValidator) rewrite(ctx *context, fn rewriteFunc) value {
-	args := make([]evaluated, len(x.args))
+	args := make([]evaluated, len(x.Args))
 	changed := false
-	for i, a := range x.args {
+	for i, a := range x.Args {
 		v := rewrite(ctx, a, fn)
 		args[i] = v.(evaluated)
 		changed = changed || v != a
@@ -102,28 +102,28 @@ func (x *customValidator) rewrite(ctx *context, fn rewriteFunc) value {
 	if !changed {
 		return x
 	}
-	return &customValidator{baseValue: x.baseValue, args: args, call: x.call}
+	return &customValidator{baseValue: x.baseValue, Args: args, Builtin: x.Builtin}
 }
 
 func (x *bound) rewrite(ctx *context, fn rewriteFunc) value {
-	v := rewrite(ctx, x.value, fn)
-	if v == x.value {
+	v := rewrite(ctx, x.Expr, fn)
+	if v == x.Expr {
 		return x
 	}
-	return newBound(ctx, x.baseValue, x.op, x.k, v)
+	return newBound(ctx, x.baseValue, x.Op, x.k, v)
 }
 
 func (x *interpolation) rewrite(ctx *context, fn rewriteFunc) value {
-	parts := make([]value, len(x.parts))
+	parts := make([]value, len(x.Parts))
 	changed := false
-	for i, p := range x.parts {
+	for i, p := range x.Parts {
 		parts[i] = rewrite(ctx, p, fn)
 		changed = changed || parts[i] != p
 	}
 	if !changed {
 		return x
 	}
-	return &interpolation{x.baseValue, x.k, parts}
+	return &interpolation{x.baseValue, x.K, parts}
 }
 
 func (x *list) rewrite(ctx *context, fn rewriteFunc) value {
@@ -137,33 +137,33 @@ func (x *list) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *sliceExpr) rewrite(ctx *context, fn rewriteFunc) value {
-	v := rewrite(ctx, x.x, fn)
+	v := rewrite(ctx, x.X, fn)
 	var lo, hi value
-	if x.lo != nil {
-		lo = rewrite(ctx, x.lo, fn)
+	if x.Lo != nil {
+		lo = rewrite(ctx, x.Lo, fn)
 	}
-	if x.hi != nil {
-		hi = rewrite(ctx, x.hi, fn)
+	if x.Hi != nil {
+		hi = rewrite(ctx, x.Hi, fn)
 	}
-	if v == x.x && lo == x.lo && hi == x.hi {
+	if v == x.X && lo == x.Lo && hi == x.Hi {
 		return x
 	}
 	return &sliceExpr{x.baseValue, v, lo, hi}
 }
 
 func (x *callExpr) rewrite(ctx *context, fn rewriteFunc) value {
-	args := make([]value, len(x.args))
+	args := make([]value, len(x.Args))
 	changed := false
-	for i, a := range x.args {
+	for i, a := range x.Args {
 		v := rewrite(ctx, a, fn)
 		args[i] = v
 		changed = changed || v != a
 	}
-	v := rewrite(ctx, x.x, fn)
-	if !changed && v == x.x {
+	v := rewrite(ctx, x.Fun, fn)
+	if !changed && v == x.Fun {
 		return x
 	}
-	return &callExpr{baseValue: x.baseValue, x: v, args: args}
+	return &callExpr{baseValue: x.baseValue, Fun: v, Args: args}
 }
 
 func (x *lambdaExpr) rewrite(ctx *context, fn rewriteFunc) value {
@@ -182,26 +182,26 @@ func (x *lambdaExpr) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *unaryExpr) rewrite(ctx *context, fn rewriteFunc) value {
-	v := rewrite(ctx, x.x, fn)
-	if v == x.x {
+	v := rewrite(ctx, x.X, fn)
+	if v == x.X {
 		return x
 	}
-	return &unaryExpr{x.baseValue, x.op, v}
+	return &unaryExpr{x.baseValue, x.Op, v}
 }
 
 func (x *binaryExpr) rewrite(ctx *context, fn rewriteFunc) value {
-	left := rewrite(ctx, x.left, fn)
-	right := rewrite(ctx, x.right, fn)
-	if left == x.left && right == x.right {
+	left := rewrite(ctx, x.X, fn)
+	right := rewrite(ctx, x.Y, fn)
+	if left == x.X && right == x.Y {
 		return x
 	}
-	return updateBin(ctx, &binaryExpr{x.baseValue, x.op, left, right})
+	return updateBin(ctx, &binaryExpr{x.baseValue, x.Op, left, right})
 }
 
 func (x *unification) rewrite(ctx *context, fn rewriteFunc) value {
-	values := make([]evaluated, len(x.values))
+	values := make([]evaluated, len(x.Values))
 	changed := false
-	for i, v := range x.values {
+	for i, v := range x.Values {
 		values[i] = rewrite(ctx, v, fn).(evaluated)
 		changed = changed || v != values[i]
 	}
@@ -212,17 +212,17 @@ func (x *unification) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *disjunction) rewrite(ctx *context, fn rewriteFunc) value {
-	values := make([]dValue, len(x.values))
+	values := make([]dValue, len(x.Values))
 	changed := false
-	for i, d := range x.values {
-		v := rewrite(ctx, d.val, fn)
-		values[i] = dValue{v, d.marked}
-		changed = changed || v != d.val
+	for i, d := range x.Values {
+		v := rewrite(ctx, d.Val, fn)
+		values[i] = dValue{v, d.Default}
+		changed = changed || v != d.Val
 	}
 	if !changed {
 		return x
 	}
-	return &disjunction{x.baseValue, values, x.errors, x.hasDefaults}
+	return &disjunction{x.baseValue, values, x.errors, x.HasDefaults}
 }
 
 func (x *listComprehension) rewrite(ctx *context, fn rewriteFunc) value {
@@ -259,18 +259,18 @@ func (x *yield) rewrite(ctx *context, fn rewriteFunc) value {
 }
 
 func (x *guard) rewrite(ctx *context, fn rewriteFunc) value {
-	condition := rewrite(ctx, x.condition, fn)
-	value := rewrite(ctx, x.value, fn).(yielder)
-	if condition == x.condition && value == x.value {
+	condition := rewrite(ctx, x.Condition, fn)
+	value := rewrite(ctx, x.Dst, fn).(yielder)
+	if condition == x.Condition && value == x.Dst {
 		return x
 	}
 	return &guard{x.baseValue, condition, value}
 }
 
 func (x *feed) rewrite(ctx *context, fn rewriteFunc) value {
-	source := rewrite(ctx, x.source, fn)
+	source := rewrite(ctx, x.Src, fn)
 	lambda := rewrite(ctx, x.fn, fn).(*lambdaExpr)
-	if source == x.source && lambda == x.fn {
+	if source == x.Src && lambda == x.fn {
 		return x
 	}
 	return &feed{x.baseValue, source, lambda}

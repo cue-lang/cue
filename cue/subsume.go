@@ -121,8 +121,8 @@ func (s *subsumer) subsumes(gt, lt value) (result bool) {
 		gt = v
 		lt = w
 	}
-	a := gt.kind()
-	b := lt.kind()
+	a := gt.Kind()
+	b := lt.Kind()
 	switch {
 	case b == bottomKind:
 		return true
@@ -138,7 +138,7 @@ func (s *subsumer) subsumes(gt, lt value) (result bool) {
 	switch lt := lt.(type) {
 	case *unification:
 		if _, ok := gt.(*unification); !ok {
-			for _, x := range lt.values {
+			for _, x := range lt.Values {
 				if s.subsumes(gt, x) {
 					return true
 				}
@@ -148,8 +148,8 @@ func (s *subsumer) subsumes(gt, lt value) (result bool) {
 
 	case *disjunction:
 		if _, ok := gt.(*disjunction); !ok {
-			for _, x := range lt.values {
-				if !s.subsumes(gt, x.val) {
+			for _, x := range lt.Values {
+				if !s.subsumes(gt, x.Val) {
 					return false
 				}
 			}
@@ -268,7 +268,7 @@ func (*top) subsumesImpl(s *subsumer, v value) bool {
 
 func (x *bottom) subsumesImpl(s *subsumer, v value) bool {
 	// never called.
-	return v.kind() == bottomKind
+	return v.Kind() == bottomKind
 }
 
 func (x *basicType) subsumesImpl(s *subsumer, v value) bool {
@@ -280,14 +280,14 @@ func (x *bound) subsumesImpl(s *subsumer, v value) bool {
 	if isBottom(v) {
 		return true
 	}
-	kx := x.value.kind()
+	kx := x.Expr.Kind()
 	if !kx.isDone() || !kx.isGround() {
 		return false
 	}
 
 	switch y := v.(type) {
 	case *bound:
-		if ky := y.value.kind(); ky.isDone() && ky.isGround() {
+		if ky := y.Expr.Kind(); ky.isDone() && ky.isGround() {
 			if (kx&ky)&^kx != 0 {
 				return false
 			}
@@ -303,29 +303,29 @@ func (x *bound) subsumesImpl(s *subsumer, v value) bool {
 			//
 			// false if types or op direction doesn't match
 
-			xv := x.value.(evaluated)
-			yv := y.value.(evaluated)
-			switch x.op {
+			xv := x.Expr.(evaluated)
+			yv := y.Expr.(evaluated)
+			switch x.Op {
 			case opGtr:
-				if y.op == opGeq {
+				if y.Op == opGeq {
 					return test(ctx, x, opLss, xv, yv)
 				}
 				fallthrough
 			case opGeq:
-				if y.op == opGtr || y.op == opGeq {
+				if y.Op == opGtr || y.Op == opGeq {
 					return test(ctx, x, opLeq, xv, yv)
 				}
 			case opLss:
-				if y.op == opLeq {
+				if y.Op == opLeq {
 					return test(ctx, x, opGtr, xv, yv)
 				}
 				fallthrough
 			case opLeq:
-				if y.op == opLss || y.op == opLeq {
+				if y.Op == opLss || y.Op == opLeq {
 					return test(ctx, x, opGeq, xv, yv)
 				}
 			case opNeq:
-				switch y.op {
+				switch y.Op {
 				case opNeq:
 					return test(ctx, x, opEql, xv, yv)
 				case opGeq:
@@ -340,7 +340,7 @@ func (x *bound) subsumesImpl(s *subsumer, v value) bool {
 
 			case opMat, opNMat:
 				// these are just approximations
-				if y.op == x.op {
+				if y.Op == x.Op {
 					return test(ctx, x, opEql, xv, yv)
 				}
 
@@ -353,7 +353,7 @@ func (x *bound) subsumesImpl(s *subsumer, v value) bool {
 		return false
 
 	case *numLit, *stringLit, *durationLit, *boolLit:
-		return test(ctx, x, x.op, y.(evaluated), x.value.(evaluated))
+		return test(ctx, x, x.Op, y.(evaluated), x.Expr.(evaluated))
 	}
 	return false
 }
@@ -363,20 +363,20 @@ func (x *nullLit) subsumesImpl(s *subsumer, v value) bool {
 }
 
 func (x *boolLit) subsumesImpl(s *subsumer, v value) bool {
-	return x.b == v.(*boolLit).b
+	return x.B == v.(*boolLit).B
 }
 
 func (x *stringLit) subsumesImpl(s *subsumer, v value) bool {
-	return x.str == v.(*stringLit).str
+	return x.Str == v.(*stringLit).Str
 }
 
 func (x *bytesLit) subsumesImpl(s *subsumer, v value) bool {
-	return bytes.Equal(x.b, v.(*bytesLit).b)
+	return bytes.Equal(x.B, v.(*bytesLit).B)
 }
 
 func (x *numLit) subsumesImpl(s *subsumer, v value) bool {
 	b := v.(*numLit)
-	return x.v.Cmp(&b.v) == 0
+	return x.X.Cmp(&b.X) == 0
 }
 
 func (x *durationLit) subsumesImpl(s *subsumer, v value) bool {
@@ -441,8 +441,8 @@ func (x *unification) subsumesImpl(s *subsumer, v value) bool {
 		// not the case, subsumes will return a false negative, which is
 		// allowed.
 	outer:
-		for _, vx := range x.values {
-			for _, vy := range y.values {
+		for _, vx := range x.Values {
+			for _, vy := range y.Values {
 				if s.subsumes(vx, vy) {
 					continue outer
 				}
@@ -453,7 +453,7 @@ func (x *unification) subsumesImpl(s *subsumer, v value) bool {
 		return true
 	}
 	subsumed := true
-	for _, vx := range x.values {
+	for _, vx := range x.Values {
 		subsumed = subsumed && s.subsumes(vx, v)
 	}
 	return subsumed
@@ -471,10 +471,10 @@ func (x *disjunction) subsumesImpl(s *subsumer, v value) bool {
 	if d, ok := v.(*disjunction); ok {
 		// at least one value in x should subsume each value in d.
 	outer:
-		for _, vd := range d.values {
+		for _, vd := range d.Values {
 			// v is subsumed if any value in x subsumes v.
-			for _, vx := range x.values {
-				if (vx.marked || !vd.marked) && s.subsumes(vx.val, vd.val) {
+			for _, vx := range x.Values {
+				if (vx.Default || !vd.Default) && s.subsumes(vx.Val, vd.Val) {
 					continue outer
 				}
 			}
@@ -483,8 +483,8 @@ func (x *disjunction) subsumesImpl(s *subsumer, v value) bool {
 		return true
 	}
 	// v is subsumed if any value in x subsumes v.
-	for _, vx := range x.values {
-		if s.subsumes(vx.val, v) {
+	for _, vx := range x.Values {
+		if s.subsumes(vx.Val, v) {
 			return true
 		}
 	}
@@ -506,7 +506,7 @@ func (x *nodeRef) subsumesImpl(s *subsumer, v value) bool {
 // structural equivalence
 func (x *selectorExpr) subsumesImpl(s *subsumer, v value) bool {
 	if r, ok := v.(*selectorExpr); ok {
-		return x.feature == r.feature && s.subsumes(x.x, r.x) // subChoose
+		return x.Sel == r.Sel && s.subsumes(x.X, r.X) // subChoose
 	}
 	return isBottom(v)
 }
@@ -520,11 +520,11 @@ func (x *interpolation) subsumesImpl(s *subsumer, v value) bool {
 
 	case *interpolation:
 		// structural equivalence
-		if len(x.parts) != len(v.parts) {
+		if len(x.Parts) != len(v.Parts) {
 			return false
 		}
-		for i, p := range x.parts {
-			if !s.subsumes(p, v.parts[i]) {
+		for i, p := range x.Parts {
+			if !s.subsumes(p, v.Parts[i]) {
 				return false
 			}
 		}
@@ -539,7 +539,7 @@ func (x *indexExpr) subsumesImpl(s *subsumer, v value) bool {
 	if r, ok := v.(*indexExpr); ok {
 		// TODO: could be narrowed down if we know the exact value of the index
 		// and referenced value.
-		return s.subsumes(x.x, r.x) && s.subsumes(x.index, r.index)
+		return s.subsumes(x.X, r.X) && s.subsumes(x.Index, r.Index)
 	}
 	return isBottom(v)
 }
@@ -550,9 +550,9 @@ func (x *sliceExpr) subsumesImpl(s *subsumer, v value) bool {
 	if r, ok := v.(*sliceExpr); ok {
 		// TODO: could be narrowed down if we know the exact value of the index
 		// and referenced value.
-		return s.subsumes(x.x, r.x) &&
-			s.subsumes(x.lo, r.lo) &&
-			s.subsumes(x.hi, r.hi)
+		return s.subsumes(x.X, r.X) &&
+			s.subsumes(x.Lo, r.Lo) &&
+			s.subsumes(x.Hi, r.Hi)
 	}
 	return isBottom(v)
 }
@@ -563,11 +563,11 @@ func (x *customValidator) subsumesImpl(s *subsumer, v value) bool {
 	if !ok {
 		return isBottom(v)
 	}
-	if x.call != y.call {
+	if x.Builtin != y.Builtin {
 		return false
 	}
-	for i, v := range x.args {
-		if !s.subsumes(v, y.args[i]) {
+	for i, v := range x.Args {
+		if !s.subsumes(v, y.Args[i]) {
 			return false
 		}
 	}
@@ -577,15 +577,15 @@ func (x *customValidator) subsumesImpl(s *subsumer, v value) bool {
 // structural equivalence
 func (x *callExpr) subsumesImpl(s *subsumer, v value) bool {
 	if c, ok := v.(*callExpr); ok {
-		if len(x.args) != len(c.args) {
+		if len(x.Args) != len(c.Args) {
 			return false
 		}
-		for i, a := range x.args {
-			if !s.subsumes(a, c.args[i]) {
+		for i, a := range x.Args {
+			if !s.subsumes(a, c.Args[i]) {
 				return false
 			}
 		}
-		return s.subsumes(x.x, c.x)
+		return s.subsumes(x.Fun, c.Fun)
 	}
 	return isBottom(v)
 }
@@ -593,7 +593,7 @@ func (x *callExpr) subsumesImpl(s *subsumer, v value) bool {
 // structural equivalence
 func (x *unaryExpr) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*unaryExpr); ok {
-		return x.op == b.op && s.subsumes(x.x, b.x)
+		return x.Op == b.Op && s.subsumes(x.X, b.X)
 	}
 	return isBottom(v)
 }
@@ -601,9 +601,9 @@ func (x *unaryExpr) subsumesImpl(s *subsumer, v value) bool {
 // structural equivalence
 func (x *binaryExpr) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*binaryExpr); ok {
-		return x.op == b.op &&
-			s.subsumes(x.left, b.left) &&
-			s.subsumes(x.right, b.right)
+		return x.Op == b.Op &&
+			s.subsumes(x.X, b.X) &&
+			s.subsumes(x.Y, b.Y)
 	}
 	return isBottom(v)
 }
@@ -646,7 +646,7 @@ func (x *yield) subsumesImpl(s *subsumer, v value) bool {
 // structural equivalence
 func (x *feed) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*feed); ok {
-		return s.subsumes(x.source, b.source) &&
+		return s.subsumes(x.Src, b.Src) &&
 			s.subsumes(x.fn, b.fn)
 	}
 	return isBottom(v)
@@ -655,8 +655,8 @@ func (x *feed) subsumesImpl(s *subsumer, v value) bool {
 // structural equivalence
 func (x *guard) subsumesImpl(s *subsumer, v value) bool {
 	if b, ok := v.(*guard); ok {
-		return s.subsumes(x.condition, b.condition) &&
-			s.subsumes(x.value, b.value)
+		return s.subsumes(x.Condition, b.Condition) &&
+			s.subsumes(x.Dst, b.Dst)
 	}
 	return isBottom(v)
 }

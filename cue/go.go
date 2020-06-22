@@ -230,22 +230,22 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 
 	case *big.Int:
 		n := newInt(src.base(), 0)
-		n.v.Coeff.Set(v)
+		n.X.Coeff.Set(v)
 		if v.Sign() < 0 {
-			n.v.Coeff.Neg(&n.v.Coeff)
-			n.v.Negative = true
+			n.X.Coeff.Neg(&n.X.Coeff)
+			n.X.Negative = true
 		}
 		return n
 
 	case *big.Rat:
 		// should we represent this as a binary operation?
 		n := newNum(src, numKind, 0)
-		_, err := ctx.Quo(&n.v, apd.NewWithBigInt(v.Num(), 0), apd.NewWithBigInt(v.Denom(), 0))
+		_, err := ctx.Quo(&n.X, apd.NewWithBigInt(v.Num(), 0), apd.NewWithBigInt(v.Denom(), 0))
 		if err != nil {
 			return ctx.mkErr(src, err)
 		}
 		if !v.IsInt() {
-			n.k = floatKind
+			n.K = floatKind
 		}
 		return n
 
@@ -255,7 +255,7 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 	case *apd.Decimal:
 		n := newNum(src, numKind, 0).set(v)
 		if !n.isInt(ctx) {
-			n.k = floatKind
+			n.K = floatKind
 		}
 		return n
 
@@ -514,15 +514,15 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 
 	switch reflect.Zero(t).Interface().(type) {
 	case *big.Int, big.Int:
-		e = &basicType{k: intKind}
+		e = &basicType{K: intKind}
 		goto store
 
 	case *big.Float, big.Float, *big.Rat, big.Rat:
-		e = &basicType{k: numKind}
+		e = &basicType{K: numKind}
 		goto store
 
 	case *apd.Decimal, apd.Decimal:
-		e = &basicType{k: numKind}
+		e = &basicType{K: numKind}
 		goto store
 	}
 
@@ -565,13 +565,13 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 		e = predefinedRanges["int64"]
 
 	case reflect.String:
-		e = &basicType{k: stringKind}
+		e = &basicType{K: stringKind}
 
 	case reflect.Bool:
-		e = &basicType{k: boolKind}
+		e = &basicType{K: boolKind}
 
 	case reflect.Float32, reflect.Float64:
-		e = &basicType{k: floatKind}
+		e = &basicType{K: floatKind}
 
 	case reflect.Struct:
 		// First iterate to create struct, then iterate another time to
@@ -630,7 +630,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 
 	case reflect.Array, reflect.Slice:
 		if t.Elem().Kind() == reflect.Uint8 {
-			e = &basicType{k: bytesKind}
+			e = &basicType{K: bytesKind}
 		} else {
 			elem := goTypeToValueRec(ctx, allowNullDefault, t.Elem())
 			if elem == nil {
@@ -658,7 +658,7 @@ func goTypeToValueRec(ctx *context, allowNullDefault bool, t reflect.Type) (e va
 
 		obj := newStruct(baseValue{})
 		sig := &params{}
-		sig.add(ctx.Label("_", true), &basicType{k: stringKind})
+		sig.add(ctx.Label("_", true), &basicType{K: stringKind})
 		v := goTypeToValueRec(ctx, allowNullDefault, t.Elem())
 		if v == nil {
 			return ctx.mkErr(baseValue{}, "unsupported Go type (%v)", t.Elem())
@@ -680,7 +680,7 @@ store:
 }
 
 func wrapOrNull(e value) value {
-	if e == nil || isBottom(e) || e.kind().isAnyOf(nullKind) {
+	if e == nil || isBottom(e) || e.Kind().isAnyOf(nullKind) {
 		return e
 	}
 	return makeNullable(e, true)
@@ -689,10 +689,10 @@ func wrapOrNull(e value) value {
 func makeNullable(e value, nullIsDefault bool) value {
 	return &disjunction{
 		baseValue: baseValue{e},
-		values: []dValue{
-			{val: &nullLit{}, marked: nullIsDefault},
-			{val: e}},
+		Values: []dValue{
+			{Val: &nullLit{}, Default: nullIsDefault},
+			{Val: e}},
 		errors:      nil,
-		hasDefaults: nullIsDefault,
+		HasDefaults: nullIsDefault,
 	}
 }

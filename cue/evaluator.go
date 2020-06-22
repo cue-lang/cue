@@ -58,7 +58,7 @@ func (e *evaluator) mkErr(orig, eval value, code errCode, want kind, desc string
 		desc,        // format string
 		eval,        // 1
 		orig,        // 2
-		eval.kind(), // 3
+		eval.Kind(), // 3
 		want},       // 4
 		args...)
 	for i := 3; i < len(args); i++ {
@@ -86,7 +86,7 @@ func (e *evaluator) eval(v value, want kind, desc string, extraArgs ...interface
 		e.bottom = append(e.bottom, eval.(*bottom))
 		return eval
 	}
-	got := eval.kind()
+	got := eval.Kind()
 	if got&want == bottomKind {
 		return e.mkErr(v, eval, codeTypeError, want, desc, extraArgs...)
 	}
@@ -103,7 +103,7 @@ func (e *evaluator) evalPartial(v value, want kind, desc string, extraArgs ...in
 		e.bottom = append(e.bottom, eval.(*bottom))
 		return eval
 	}
-	got := eval.kind()
+	got := eval.Kind()
 	if got&want == bottomKind {
 		return e.mkErr(v, eval, codeTypeError, want, desc, extraArgs...)
 	}
@@ -122,7 +122,7 @@ func (e *evaluator) is(v value, want kind, desc string, args ...interface{}) boo
 		// Even though errors are ground, we treat them as not allowed.
 		return false
 	}
-	got := v.kind()
+	got := v.Kind()
 	if got&want == bottomKind {
 		e.mkErr(v, v, codeTypeError, want, desc, args...)
 		return false
@@ -136,11 +136,11 @@ func (e *evaluator) err(v value) evaluated {
 	// otherwise, try to extract a fatal error from the given value.
 	// otherwise return an incomplete error with the given value as offending.
 	for _, b := range e.bottom {
-		if b.code != codeIncomplete {
+		if b.Code != codeIncomplete {
 			return b
 		}
 	}
 	b := *e.bottom[0]
-	b.code = codeIncomplete
+	b.Code = codeIncomplete
 	return &b
 }

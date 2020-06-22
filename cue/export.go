@@ -168,7 +168,7 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 	case *feed:
 		feed := &ast.ForClause{
 			Value:  p.identifier(x.fn.params.arcs[1].feature),
-			Source: p.expr(x.source),
+			Source: p.expr(x.Src),
 		}
 		key := x.fn.params.arcs[0]
 		if p.ctx.LabelStr(key.feature) != "_" {
@@ -177,7 +177,7 @@ func (p *exporter) clause(v value) (n ast.Clause, next yielder) {
 		return feed, x.fn.value.(yielder)
 
 	case *guard:
-		return &ast.IfClause{Condition: p.expr(x.condition)}, x.value
+		return &ast.IfClause{Condition: p.expr(x.Condition)}, x.Dst
 	}
 	panic(fmt.Sprintf("unsupported clause type %T", v))
 }
@@ -350,13 +350,13 @@ func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
 				// This may break some unnecessary cycles.
 				noResolve = true
 			}
-			if isBottom(e) || (v.kind().hasReferences() && noResolve) {
+			if isBottom(e) || (v.Kind().hasReferences() && noResolve) {
 				return p.expr(v)
 			}
 		} else {
 			// Data mode.
 
-			if p.mode.concrete && !m.kind().isGround() {
+			if p.mode.concrete && !m.Kind().isGround() {
 				p.addIncomplete(v)
 			}
 			// TODO: do something more principled than this hack.
@@ -367,7 +367,7 @@ func (p *exporter) recExpr(v value, e evaluated, optional bool) ast.Expr {
 			if isDisjunction(v) || isBottom(e) {
 				return p.expr(v)
 			}
-			if v.kind()&structKind == 0 {
+			if v.Kind()&structKind == 0 {
 				return p.expr(e)
 			}
 			if optional || isDisjunction(e) {
@@ -407,7 +407,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 
 		if !p.isComplete(x, true) {
-			if p.mode.concrete && !x.kind().isGround() {
+			if p.mode.concrete && !x.Kind().isGround() {
 				p.addIncomplete(v)
 			}
 			switch {
@@ -417,7 +417,7 @@ func (p *exporter) expr(v value) ast.Expr {
 				}
 				p = &exporter{p.ctx, options{raw: true}, p.stack, p.top, p.imports, p.inDef, nil}
 				return p.expr(v)
-			case v.kind().hasReferences() && !p.mode.resolveReferences:
+			case v.Kind().hasReferences() && !p.mode.resolveReferences:
 			case doEval(p.mode):
 				v = e
 			}
@@ -455,13 +455,13 @@ func (p *exporter) expr(v value) ast.Expr {
 		return ast.NewIdent(short)
 
 	case *selectorExpr:
-		n := p.expr(x.x)
+		n := p.expr(x.X)
 		if n != nil {
-			return ast.NewSel(n, p.ctx.LabelStr(x.feature))
+			return ast.NewSel(n, p.ctx.LabelStr(x.Sel))
 		}
-		f := x.feature
+		f := x.Sel
 		ident := p.identifier(f)
-		node, ok := x.x.(*nodeRef)
+		node, ok := x.X.(*nodeRef)
 		if !ok {
 			return p.badf("selector without node")
 		}
@@ -500,54 +500,54 @@ func (p *exporter) expr(v value) ast.Expr {
 		return ident
 
 	case *indexExpr:
-		return &ast.IndexExpr{X: p.expr(x.x), Index: p.expr(x.index)}
+		return &ast.IndexExpr{X: p.expr(x.X), Index: p.expr(x.Index)}
 
 	case *sliceExpr:
 		return &ast.SliceExpr{
-			X:    p.expr(x.x),
-			Low:  p.expr(x.lo),
-			High: p.expr(x.hi),
+			X:    p.expr(x.X),
+			Low:  p.expr(x.Lo),
+			High: p.expr(x.Hi),
 		}
 
 	case *callExpr:
 		call := &ast.CallExpr{}
-		b := x.x.evalPartial(p.ctx)
+		b := x.Fun.evalPartial(p.ctx)
 		if b, ok := b.(*builtin); ok {
 			call.Fun = p.expr(b)
 		} else {
-			call.Fun = p.expr(x.x)
+			call.Fun = p.expr(x.Fun)
 		}
-		for _, a := range x.args {
+		for _, a := range x.Args {
 			call.Args = append(call.Args, p.expr(a))
 		}
 		return call
 
 	case *customValidator:
-		call := ast.NewCall(p.expr(x.call))
-		for _, a := range x.args {
+		call := ast.NewCall(p.expr(x.Builtin))
+		for _, a := range x.Args {
 			call.Args = append(call.Args, p.expr(a))
 		}
 		return call
 
 	case *unaryExpr:
-		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.x)}
+		return &ast.UnaryExpr{Op: opMap[x.Op], X: p.expr(x.X)}
 
 	case *binaryExpr:
 		// opUnifyUnchecked: represented as embedding. The two arguments must
 		// be structs.
-		if x.op == opUnifyUnchecked {
+		if x.Op == opUnifyUnchecked {
 			s := ast.NewStruct()
 			return p.closeOrOpen(s, p.embedding(s, x))
 		}
-		return ast.NewBinExpr(opMap[x.op], p.expr(x.left), p.expr(x.right))
+		return ast.NewBinExpr(opMap[x.Op], p.expr(x.X), p.expr(x.Y))
 
 	case *bound:
-		return &ast.UnaryExpr{Op: opMap[x.op], X: p.expr(x.value)}
+		return &ast.UnaryExpr{Op: opMap[x.Op], X: p.expr(x.Expr)}
 
 	case *unification:
 		b := boundSimplifier{p: p}
 		vals := make([]evaluated, 0, 3)
-		for _, v := range x.values {
+		for _, v := range x.Values {
 			if !b.add(v) {
 				vals = append(vals, v)
 			}
@@ -559,18 +559,18 @@ func (p *exporter) expr(v value) ast.Expr {
 		return e
 
 	case *disjunction:
-		if len(x.values) == 1 {
-			return p.expr(x.values[0].val)
+		if len(x.Values) == 1 {
+			return p.expr(x.Values[0].Val)
 		}
 		expr := func(v dValue) ast.Expr {
-			e := p.expr(v.val)
-			if v.marked {
+			e := p.expr(v.Val)
+			if v.Default {
 				e = &ast.UnaryExpr{Op: token.MUL, X: e}
 			}
 			return e
 		}
-		bin := expr(x.values[0])
-		for _, v := range x.values[1:] {
+		bin := expr(x.Values[0])
+		for _, v := range x.Values[1:] {
 			bin = ast.NewBinExpr(token.OR, bin, expr(v))
 		}
 		return bin
@@ -616,23 +616,23 @@ func (p *exporter) expr(v value) ast.Expr {
 		return ast.NewNull()
 
 	case *boolLit:
-		return ast.NewBool(x.b)
+		return ast.NewBool(x.B)
 
 	case *stringLit:
 		return &ast.BasicLit{
 			Kind:  token.STRING,
-			Value: quote(x.str, '"'),
+			Value: quote(x.Str, '"'),
 		}
 
 	case *bytesLit:
 		return &ast.BasicLit{
 			Kind:  token.STRING,
-			Value: quote(string(x.b), '\''),
+			Value: quote(string(x.B), '\''),
 		}
 
 	case *numLit:
 		kind := token.FLOAT
-		if x.k&intKind != 0 {
+		if x.K&intKind != 0 {
 			kind = token.INT
 		}
 		return &ast.BasicLit{Kind: kind, Value: x.String()}
@@ -644,8 +644,8 @@ func (p *exporter) expr(v value) ast.Expr {
 		t := &ast.Interpolation{}
 		multiline := false
 		// TODO: mark formatting in interpolation itself.
-		for i := 0; i < len(x.parts); i += 2 {
-			str := x.parts[i].(*stringLit).str
+		for i := 0; i < len(x.Parts); i += 2 {
+			str := x.Parts[i].(*stringLit).Str
 			if strings.IndexByte(str, '\n') >= 0 {
 				multiline = true
 				break
@@ -657,15 +657,15 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 		prefix := quote
 		suffix := `\(`
-		for i, e := range x.parts {
+		for i, e := range x.Parts {
 			if i%2 == 1 {
 				t.Elts = append(t.Elts, p.expr(e))
 			} else {
 				buf := []byte(prefix)
-				if i == len(x.parts)-1 {
+				if i == len(x.Parts)-1 {
 					suffix = quote
 				}
-				str := e.(*stringLit).str
+				str := e.(*stringLit).Str
 				if multiline {
 					buf = appendEscapeMulti(buf, str, '"')
 				} else {
@@ -700,7 +700,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		}
 		ln := 0
 		if num != nil {
-			x, _ := num.v.Int64()
+			x, _ := num.X.Int64()
 			ln = int(x)
 		}
 		open := false
@@ -751,7 +751,7 @@ func (p *exporter) expr(v value) ast.Expr {
 		return p.ident("_")
 
 	case *basicType:
-		return p.ident(x.k.String())
+		return p.ident(x.K.String())
 
 	case *lambdaExpr:
 		return p.ident("TODO: LAMBDA")
@@ -976,13 +976,13 @@ func (p *exporter) embedding(s *ast.StructLit, n value) (closed bool) {
 		return p.isClosed(x)
 
 	case *binaryExpr:
-		if x.op != opUnifyUnchecked {
+		if x.Op != opUnifyUnchecked {
 			// should not happen
 			s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: p.expr(x)})
 			return false
 		}
-		leftClosed := p.embedding(s, x.left)
-		rightClosed := p.embedding(s, x.right)
+		leftClosed := p.embedding(s, x.X)
+		rightClosed := p.embedding(s, x.Y)
 		return leftClosed || rightClosed
 	}
 	s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: p.expr(n)})
@@ -1103,7 +1103,7 @@ type boundSimplifier struct {
 func (s *boundSimplifier) add(v value) (used bool) {
 	switch x := v.(type) {
 	case *basicType:
-		switch x.k & scalarKinds {
+		switch x.K & scalarKinds {
 		case intKind:
 			s.isInt = true
 			return true
@@ -1113,10 +1113,10 @@ func (s *boundSimplifier) add(v value) (used bool) {
 		if x.k&concreteKind == intKind {
 			s.isInt = true
 		}
-		switch x.op {
+		switch x.Op {
 		case opGtr:
-			if n, ok := x.value.(*numLit); ok {
-				if s.min == nil || s.minNum.v.Cmp(&n.v) != 1 {
+			if n, ok := x.Expr.(*numLit); ok {
+				if s.min == nil || s.minNum.X.Cmp(&n.X) != 1 {
 					s.min = x
 					s.minNum = n
 				}
@@ -1124,8 +1124,8 @@ func (s *boundSimplifier) add(v value) (used bool) {
 			}
 
 		case opGeq:
-			if n, ok := x.value.(*numLit); ok {
-				if s.min == nil || s.minNum.v.Cmp(&n.v) == -1 {
+			if n, ok := x.Expr.(*numLit); ok {
+				if s.min == nil || s.minNum.X.Cmp(&n.X) == -1 {
 					s.min = x
 					s.minNum = n
 				}
@@ -1133,8 +1133,8 @@ func (s *boundSimplifier) add(v value) (used bool) {
 			}
 
 		case opLss:
-			if n, ok := x.value.(*numLit); ok {
-				if s.max == nil || s.maxNum.v.Cmp(&n.v) != -1 {
+			if n, ok := x.Expr.(*numLit); ok {
+				if s.max == nil || s.maxNum.X.Cmp(&n.X) != -1 {
 					s.max = x
 					s.maxNum = n
 				}
@@ -1142,8 +1142,8 @@ func (s *boundSimplifier) add(v value) (used bool) {
 			}
 
 		case opLeq:
-			if n, ok := x.value.(*numLit); ok {
-				if s.max == nil || s.maxNum.v.Cmp(&n.v) == 1 {
+			if n, ok := x.Expr.(*numLit); ok {
+				if s.max == nil || s.maxNum.X.Cmp(&n.X) == 1 {
 					s.max = x
 					s.maxNum = n
 				}
@@ -1180,12 +1180,12 @@ func (s *boundSimplifier) expr(ctx *context) (e ast.Expr) {
 			e = ast.NewIdent(t)
 			break
 		}
-		if sign := s.minNum.v.Sign(); sign == -1 {
+		if sign := s.minNum.X.Sign(); sign == -1 {
 			e = ast.NewIdent("int")
 
 		} else {
 			e = ast.NewIdent("uint")
-			if sign == 0 && s.min.op == opGeq {
+			if sign == 0 && s.min.Op == opGeq {
 				s.min = nil
 				break
 			}
@@ -1209,26 +1209,26 @@ func (s *boundSimplifier) expr(ctx *context) (e ast.Expr) {
 
 func (s *boundSimplifier) matchRange(ranges []builtinRange) (t string) {
 	for _, r := range ranges {
-		if !s.minNum.v.IsZero() && s.min.op == opGeq && s.minNum.v.Cmp(r.lo) == 0 {
-			switch s.maxNum.v.Cmp(r.hi) {
+		if !s.minNum.X.IsZero() && s.min.Op == opGeq && s.minNum.X.Cmp(r.lo) == 0 {
+			switch s.maxNum.X.Cmp(r.hi) {
 			case 0:
-				if s.max.op == opLeq {
+				if s.max.Op == opLeq {
 					s.max = nil
 				}
 				s.min = nil
 				return r.typ
 			case -1:
-				if !s.minNum.v.IsZero() {
+				if !s.minNum.X.IsZero() {
 					s.min = nil
 					return r.typ
 				}
 			case 1:
 			}
-		} else if s.max.op == opLeq && s.maxNum.v.Cmp(r.hi) == 0 {
-			switch s.minNum.v.Cmp(r.lo) {
+		} else if s.max.Op == opLeq && s.maxNum.X.Cmp(r.hi) == 0 {
+			switch s.minNum.X.Cmp(r.lo) {
 			case -1:
 			case 0:
-				if s.min.op == opGeq {
+				if s.min.Op == opGeq {
 					s.min = nil
 				}
 				fallthrough

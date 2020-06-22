@@ -158,7 +158,7 @@ func evalExpr(ctx *context, x value, expr ast.Expr) evaluated {
 	}
 	obj, ok := x.(*structLit)
 	if !ok {
-		return ctx.mkErr(x, "instance is not a struct, found %s", x.kind())
+		return ctx.mkErr(x, "instance is not a struct, found %s", x.Kind())
 	}
 	v := newVisitor(ctx.index, nil, nil, obj, true)
 	return v.walk(expr).evalPartial(ctx)

@@ -221,10 +221,10 @@ func (x *builtin) representedKind() kind {
 	if x.isValidator() {
 		return x.Params[0]
 	}
-	return x.kind()
+	return x.Kind()
 }
 
-func (x *builtin) kind() kind {
+func (x *builtin) Kind() kind {
 	return lambdaKind
 }
 
@@ -276,9 +276,9 @@ func (x *builtin) call(ctx *context, src source, args ...evaluated) (ret value) 
 	}
 	for i, a := range args {
 		if x.Params[i] != bottomKind {
-			if unifyType(x.Params[i], a.kind()) == bottomKind {
+			if unifyType(x.Params[i], a.Kind()) == bottomKind {
 				const msg = "cannot use %s (type %s) as %s in argument %d to %s"
-				return ctx.mkErr(src, x, msg, ctx.str(a), a.kind(), x.Params[i], i+1, x.name(ctx))
+				return ctx.mkErr(src, x, msg, ctx.str(a), a.Kind(), x.Params[i], i+1, x.name(ctx))
 			}
 		}
 	}
@@ -448,10 +448,10 @@ func (c *callCtxt) structVal(i int) *Struct {
 func (c *callCtxt) invalidArgType(arg value, i int, typ string, err error) {
 	if err != nil {
 		c.errf(c.src, err, "cannot use %s (type %s) as %s in argument %d to %s: %v",
-			c.ctx.str(arg), arg.kind(), typ, i, c.name(), err)
+			c.ctx.str(arg), arg.Kind(), typ, i, c.name(), err)
 	} else {
 		c.errf(c.src, nil, "cannot use %s (type %s) as %s in argument %d to %s",
-			c.ctx.str(arg), arg.kind(), typ, i, c.name())
+			c.ctx.str(arg), arg.Kind(), typ, i, c.name())
 	}
 }
 
@@ -506,7 +506,7 @@ func (c *callCtxt) decimal(i int) *apd.Decimal {
 		c.invalidArgType(c.args[i], i, "Decimal", err)
 		return nil
 	}
-	return &c.args[i].(*numLit).v
+	return &c.args[i].(*numLit).X
 }
 
 func (c *callCtxt) float64(i int) float64 {
@@ -628,7 +628,7 @@ func (c *callCtxt) decimalList(i int) (a []*apd.Decimal) {
 				j, i, c.name(), err)
 			break
 		}
-		a = append(a, &num.v)
+		a = append(a, &num.X)
 	}
 	return a
 }

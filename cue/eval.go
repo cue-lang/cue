@@ -30,23 +30,23 @@ var _ resolver = &indexExpr{}
 func decycleRef(ctx *context, v value) (value, scope) {
 	switch x := v.(type) {
 	case *selectorExpr:
-		v, sc := decycleRef(ctx, x.x)
+		v, sc := decycleRef(ctx, x.X)
 		if v == nil {
 			e := x.evalPartial(ctx)
 			v = e
 			if cycleError(e) != nil {
 				sc = &structLit{baseValue: x.base()}
-				return &nodeRef{x.base(), sc, x.feature}, sc
+				return &nodeRef{x.base(), sc, x.Sel}, sc
 			}
 			return nil, nil
 		}
-		return &selectorExpr{x.baseValue, v, x.feature}, sc
+		return &selectorExpr{x.baseValue, v, x.Sel}, sc
 	case *indexExpr:
-		v, sc := decycleRef(ctx, x.x)
+		v, sc := decycleRef(ctx, x.X)
 		if v == x {
 			return nil, nil
 		}
-		return &indexExpr{x.baseValue, v, x.index}, sc
+		return &indexExpr{x.baseValue, v, x.Index}, sc
 	case *nodeRef:
 		return nil, nil
 	}
@@ -117,20 +117,20 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 	e := newEval(ctx, true)
 
 	const msgType = "invalid operation: %[5]s (type %[3]s does not support selection)"
-	v := e.eval(x.x, structKind|lambdaKind, msgType, x)
+	v := e.eval(x.X, structKind|lambdaKind, msgType, x)
 
 	if e.is(v, structKind|lambdaKind, "") {
 		sc, ok := v.(scope)
 		if !ok {
-			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.kind())
+			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.Kind())
 		}
-		n := sc.lookup(ctx, x.feature)
+		n := sc.lookup(ctx, x.Sel)
 		if n.optional {
-			field := ctx.LabelStr(x.feature)
+			field := ctx.LabelStr(x.Sel)
 			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
 		}
 		if n.val() == nil {
-			field := ctx.LabelStr(x.feature)
+			field := ctx.LabelStr(x.Sel)
 			if st, ok := sc.(*structLit); ok && !st.isClosed() {
 				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
 			}
@@ -140,7 +140,7 @@ func (x *selectorExpr) evalPartial(ctx *context) (result evaluated) {
 		}
 		return n.cache
 	}
-	return e.err(&selectorExpr{x.baseValue, v, x.feature})
+	return e.err(&selectorExpr{x.baseValue, v, x.Sel})
 }
 
 func (x *selectorExpr) reference(ctx *context) (result value) {
@@ -152,20 +152,20 @@ func (x *selectorExpr) reference(ctx *context) (result value) {
 	e := newEval(ctx, true)
 
 	const msgType = "invalid operation: %[5]s (type %[3]s does not support selection)"
-	v := e.eval(x.x, structKind|lambdaKind, msgType, x)
+	v := e.eval(x.X, structKind|lambdaKind, msgType, x)
 
 	if e.is(v, structKind|lambdaKind, "") {
 		sc, ok := v.(scope)
 		if !ok {
-			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.kind())
+			return ctx.mkErr(x, "invalid subject to selector (found %v)", v.Kind())
 		}
-		n := sc.lookup(ctx, x.feature)
+		n := sc.lookup(ctx, x.Sel)
 		if n.optional {
-			field := ctx.LabelStr(x.feature)
+			field := ctx.LabelStr(x.Sel)
 			return ctx.mkErr(x, codeIncomplete, "field %q is optional", field)
 		}
 		if n.val() == nil {
-			field := ctx.LabelStr(x.feature)
+			field := ctx.LabelStr(x.Sel)
 			if st, ok := sc.(*structLit); ok && !st.isClosed() {
 				return ctx.mkErr(x, codeIncomplete, "undefined field %q", field)
 			}
@@ -175,7 +175,7 @@ func (x *selectorExpr) reference(ctx *context) (result value) {
 		}
 		return n.v
 	}
-	return e.err(&selectorExpr{x.baseValue, v, x.feature})
+	return e.err(&selectorExpr{x.baseValue, v, x.Sel})
 }
 
 func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
@@ -189,9 +189,9 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 	const msgType = "invalid operation: %[5]s (type %[3]s does not support indexing)"
 	const msgIndexType = "invalid %[5]s index %[1]s (type %[3]s)"
 
-	val := e.eval(x.x, listKind|structKind, msgType, x)
-	k := val.kind()
-	index := e.eval(x.index, stringKind|intKind, msgIndexType, k)
+	val := e.eval(x.X, listKind|structKind, msgType, x)
+	k := val.Kind()
+	index := e.eval(x.Index, stringKind|intKind, msgIndexType, k)
 
 	switch v := val.(type) {
 	case *structLit:
@@ -219,7 +219,7 @@ func (x *indexExpr) evalPartial(ctx *context) (result evaluated) {
 			i := index.(*numLit).intValue(ctx)
 			if i < 0 {
 				const msg = "invalid %[4]s index %[1]s (index must be non-negative)"
-				return e.mkErr(x.index, index, 0, k, msg)
+				return e.mkErr(x.Index, index, 0, k, msg)
 			}
 			return v.at(ctx, i)
 		}
@@ -238,9 +238,9 @@ func (x *indexExpr) reference(ctx *context) (result value) {
 	const msgType = "invalid operation: %[5]s (type %[3]s does not support indexing)"
 	const msgIndexType = "invalid %[5]s index %[1]s (type %[3]s)"
 
-	val := e.eval(x.x, listKind|structKind, msgType, x)
-	k := val.kind()
-	index := e.eval(x.index, stringKind|intKind, msgIndexType, k)
+	val := e.eval(x.X, listKind|structKind, msgType, x)
+	k := val.Kind()
+	index := e.eval(x.Index, stringKind|intKind, msgIndexType, k)
 
 	switch v := val.(type) {
 	case *structLit:
@@ -268,7 +268,7 @@ func (x *indexExpr) reference(ctx *context) (result value) {
 			i := index.(*numLit).intValue(ctx)
 			if i < 0 {
 				const msg = "invalid %[4]s index %[1]s (index must be non-negative)"
-				return e.mkErr(x.index, index, 0, k, msg)
+				return e.mkErr(x.Index, index, 0, k, msg)
 			}
 			return v.iterAt(ctx, i).v
 		}
@@ -278,7 +278,7 @@ func (x *indexExpr) reference(ctx *context) (result value) {
 			i := index.(*numLit).intValue(ctx)
 			if i < 0 {
 				const msg = "invalid %[4]s index %[1]s (index must be non-negative)"
-				return e.mkErr(x.index, index, 0, k, msg)
+				return e.mkErr(x.Index, index, 0, k, msg)
 			}
 			return v.at(ctx, i)
 		}
@@ -297,9 +297,9 @@ func (x *sliceExpr) evalPartial(ctx *context) (result evaluated) {
 	e := newEval(ctx, true)
 	const msgType = "cannot slice %[2]s (type %[3]s)"
 	const msgInvalidIndex = "invalid slice index %[1]s (type %[3]s)"
-	val := e.eval(x.x, listKind, msgType)
-	lo := e.evalAllowNil(x.lo, intKind, msgInvalidIndex)
-	hi := e.evalAllowNil(x.hi, intKind, msgInvalidIndex)
+	val := e.eval(x.X, listKind, msgType)
+	lo := e.evalAllowNil(x.Lo, intKind, msgInvalidIndex)
+	hi := e.evalAllowNil(x.Hi, intKind, msgInvalidIndex)
 	var low, high *numLit
 	if lo != nil && e.is(lo, intKind, msgInvalidIndex) {
 		low = lo.(*numLit)
@@ -329,9 +329,9 @@ func (x *callExpr) evalPartial(ctx *context) (result evaluated) {
 
 	e := newEval(ctx, true)
 
-	fn := e.eval(x.x, lambdaKind, "cannot call non-function %[2]s (type %[3]s)")
-	args := make([]evaluated, len(x.args))
-	for i, a := range x.args {
+	fn := e.eval(x.Fun, lambdaKind, "cannot call non-function %[2]s (type %[3]s)")
+	args := make([]evaluated, len(x.Args))
+	for i, a := range x.Args {
 		args[i] = e.evalPartial(a, typeKinds, "never triggers")
 	}
 	if !e.hasErr() {
@@ -343,7 +343,7 @@ func (x *callExpr) evalPartial(ctx *context) (result evaluated) {
 	// Construct a simplified call for reporting purposes.
 	err := &callExpr{x.baseValue, fn, nil}
 	for _, a := range args {
-		err.args = append(err.args, a)
+		err.Args = append(err.Args, a)
 	}
 	return e.err(err)
 }
@@ -361,17 +361,17 @@ func (x *bound) evalPartial(ctx *context) (result evaluated) {
 		defer uni(indent(ctx, "bound", x))
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
-	v := x.value.evalPartial(ctx)
+	v := x.Expr.evalPartial(ctx)
 	if isBottom(v) {
 		if isIncomplete(v) {
 			return v
 		}
 		return ctx.mkErr(x, v, "error evaluating bound")
 	}
-	if v == x.value {
+	if v == x.Expr {
 		return x
 	}
-	return newBound(ctx, x.baseValue, x.op, x.k, v)
+	return newBound(ctx, x.baseValue, x.Op, x.k, v)
 }
 
 func (x *interpolation) evalPartial(ctx *context) (result evaluated) {
@@ -381,14 +381,14 @@ func (x *interpolation) evalPartial(ctx *context) (result evaluated) {
 	}
 	buf := bytes.Buffer{}
 	var incomplete value
-	for _, v := range x.parts {
+	for _, v := range x.Parts {
 		switch e := ctx.manifest(v).(type) {
 		case *bottom:
 			return e
 		case *stringLit, *numLit, *durationLit:
 			buf.WriteString(e.strValue())
 		default:
-			k := e.kind()
+			k := e.Kind()
 			if k&stringableKind == bottomKind {
 				return ctx.mkErr(e, "expression in interpolation must evaluate to a number kind or string (found %v)", k)
 			}
@@ -471,7 +471,7 @@ func (x *fieldComprehension) evalPartial(ctx *context) evaluated {
 	if err := firstBottom(k, v); err != nil {
 		return err
 	}
-	if !k.kind().isAnyOf(stringKind) {
+	if !k.Kind().isAnyOf(stringKind) {
 		return ctx.mkErr(k, "key must be of type string")
 	}
 	f := ctx.Label(k.strValue(), true)
@@ -518,23 +518,23 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 	}
 	dn := &disjunction{
 		x.baseValue,
-		make([]dValue, 0, len(x.values)),
+		make([]dValue, 0, len(x.Values)),
 		make([]*bottom, 0, len(x.errors)),
-		x.hasDefaults,
+		x.HasDefaults,
 	}
 	changed := false
-	for _, v := range x.values {
-		n := v.val.evalPartial(ctx)
-		changed = changed || n != v.val
+	for _, v := range x.Values {
+		n := v.Val.evalPartial(ctx)
+		changed = changed || n != v.Val
 		// Including elements of disjunctions recursively makes default handling
 		// associative (*a | (*b|c)) == ((*a|*b) | c).
 		if d, ok := n.(*disjunction); ok {
 			changed = true
-			for _, dv := range d.values {
-				dn.add(ctx, dv.val, dv.marked)
+			for _, dv := range d.Values {
+				dn.add(ctx, dv.Val, dv.Default)
 			}
 		} else {
-			dn.add(ctx, n, v.marked)
+			dn.add(ctx, n, v.Default)
 		}
 	}
 	if !changed {
@@ -547,12 +547,12 @@ func (x *disjunction) evalPartial(ctx *context) (result evaluated) {
 }
 
 func (x *disjunction) manifest(ctx *context) (result evaluated) {
-	values := make([]dValue, 0, len(x.values))
+	values := make([]dValue, 0, len(x.Values))
 	validValue := false
-	for _, dv := range x.values {
+	for _, dv := range x.Values {
 		switch {
-		case isBottom(dv.val):
-		case dv.marked:
+		case isBottom(dv.Val):
+		case dv.Default:
 			values = append(values, dv)
 		default:
 			validValue = true
@@ -565,8 +565,8 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 	case !validValue:
 		return x
 	default:
-		for _, dv := range x.values {
-			dv.marked = false
+		for _, dv := range x.Values {
+			dv.Default = false
 			values = append(values, dv)
 		}
 	}
@@ -576,7 +576,7 @@ func (x *disjunction) manifest(ctx *context) (result evaluated) {
 		return x
 
 	case 1:
-		return values[0].val.evalPartial(ctx)
+		return values[0].Val.evalPartial(ctx)
 	}
 
 	x = &disjunction{x.baseValue, values, x.errors, true}
@@ -590,17 +590,17 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 	}
 	var left, right evaluated
 
-	if _, isUnify := x.op.unifyType(); !isUnify {
+	if _, isUnify := x.Op.unifyType(); !isUnify {
 		ctx.incEvalDepth()
-		left = ctx.manifest(x.left)
-		right = ctx.manifest(x.right)
+		left = ctx.manifest(x.X)
+		right = ctx.manifest(x.Y)
 		ctx.decEvalDepth()
 
 		// TODO: allow comparing to a literal bottom only. Find something more
 		// principled perhaps. One should especially take care that two values
 		// evaluating to bottom don't evaluate to true. For now we check for
 		// bottom here and require that one of the values be a bottom literal.
-		if isLiteralBottom(x.left) || isLiteralBottom(x.right) {
+		if isLiteralBottom(x.X) || isLiteralBottom(x.Y) {
 			if b := validate(ctx, left); b != nil {
 				left = b
 			}
@@ -609,7 +609,7 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 			}
 			leftBottom := isBottom(left)
 			rightBottom := isBottom(right)
-			switch x.op {
+			switch x.Op {
 			case opEql:
 				return &boolLit{x.baseValue, leftBottom == rightBottom}
 			case opNeq:
@@ -617,13 +617,13 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 			}
 		}
 	} else {
-		left = resolveReference(ctx, x.left)
-		right = resolveReference(ctx, x.right)
+		left = resolveReference(ctx, x.X)
+		right = resolveReference(ctx, x.Y)
 
-		if err := cycleError(left); err != nil && ctx.inSum == 0 && right.kind().isAtom() {
+		if err := cycleError(left); err != nil && ctx.inSum == 0 && right.Kind().isAtom() {
 			return ctx.delayConstraint(right, x)
 		}
-		if err := cycleError(right); err != nil && ctx.inSum == 0 && left.kind().isAtom() {
+		if err := cycleError(right); err != nil && ctx.inSum == 0 && left.Kind().isAtom() {
 			return ctx.delayConstraint(left, x)
 		}
 
@@ -631,7 +631,7 @@ func (x *binaryExpr) evalPartial(ctx *context) (result evaluated) {
 		// If other value is a cycle or list, return the original forwarded,
 		// but ensure the value is not cached. Object/list error?
 	}
-	return binOp(ctx, x, x.op, left, right)
+	return binOp(ctx, x, x.Op, left, right)
 }
 
 func (x *unaryExpr) evalPartial(ctx *context) (result evaluated) {
@@ -640,14 +640,14 @@ func (x *unaryExpr) evalPartial(ctx *context) (result evaluated) {
 		defer func() { ctx.debugPrint("result:", result) }()
 	}
 
-	return evalUnary(ctx, x, x.op, x.x)
+	return evalUnary(ctx, x, x.Op, x.X)
 }
 
 func evalUnary(ctx *context, src source, op op, x value) evaluated {
 	v := ctx.manifest(x)
 
 	const numeric = numKind | durationKind
-	kind := v.kind()
+	kind := v.Kind()
 	switch op {
 	case opSub:
 		if kind&numeric == bottomKind {
@@ -656,7 +656,7 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 		switch v := v.(type) {
 		case *numLit:
 			f := *v
-			f.v.Neg(&v.v)
+			f.X.Neg(&v.X)
 			return &f
 		case *durationLit:
 			d := *v
@@ -675,7 +675,7 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 		case *top:
 			return &basicType{v.baseValue, numeric | nonGround}
 		case *basicType:
-			return &basicType{v.baseValue, (v.k & numeric) | nonGround}
+			return &basicType{v.baseValue, (v.K & numeric) | nonGround}
 		}
 		return ctx.mkErr(src, codeIncomplete, "operand %s of '+' not concrete (was %s)", ctx.str(x), kind)
 
@@ -685,7 +685,7 @@ func evalUnary(ctx *context, src source, op op, x value) evaluated {
 		}
 		switch v := v.(type) {
 		case *boolLit:
-			return &boolLit{src.base(), !v.b}
+			return &boolLit{src.base(), !v.B}
 		}
 		return ctx.mkErr(src, codeIncomplete, "operand %s of '!' not concrete (was %s)", ctx.str(x), kind)
 	}

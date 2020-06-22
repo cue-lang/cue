@@ -463,7 +463,7 @@ func TestSubsume(t *testing.T) {
 			s := subsumer{ctx: ctx, mode: tc.mode}
 			got := s.subsumes(a, b)
 			if got != tc.subsumes {
-				t.Errorf("got %v; want %v (%v vs %v)", got, tc.subsumes, a.kind(), b.kind())
+				t.Errorf("got %v; want %v (%v vs %v)", got, tc.subsumes, a.Kind(), b.Kind())
 			}
 		})
 	}

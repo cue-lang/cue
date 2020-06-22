@@ -37,7 +37,7 @@ type value interface {
 	// evalPartial evaluates a value without choosing default values.
 	evalPartial(*context) evaluated
 
-	kind() kind
+	Kind() kind
 
 	// subsumesImpl is only defined for non-reference types.
 	// It should only be called by the subsumes function.
@@ -77,7 +77,7 @@ func checkKind(ctx *context, x value, want kind) *bottom {
 	if b, ok := x.(*bottom); ok {
 		return b
 	}
-	got := x.kind()
+	got := x.Kind()
 	if got&want&concreteKind == bottomKind && want != bottomKind {
 		return ctx.mkErr(x, "cannot use value %v (type %s) as %s", ctx.str(x), got, want)
 	}
@@ -112,7 +112,7 @@ func newNode(n ast.Node) baseValue {
 type source interface {
 	// syntax returns the parsed file of the underlying node or a computed
 	// node indicating that it is a computed binary expression.
-	syntax() ast.Node
+	Source() ast.Node
 	computed() *computedSource
 	Pos() token.Pos
 	base() baseValue
@@ -152,7 +152,7 @@ func (b baseValue) computed() *computedSource {
 	return nil
 }
 
-func (b baseValue) syntax() ast.Node {
+func (b baseValue) Source() ast.Node {
 	switch x := b.pos.(type) {
 	case ast.Node:
 		return x
@@ -170,28 +170,28 @@ func (b baseValue) returnKind() kind { panic("unimplemented") }
 // top is the top of the value lattice. It subsumes all possible values.
 type top struct{ baseValue }
 
-func (x *top) kind() kind { return topKind }
+func (x *top) Kind() kind { return topKind }
 
 // basicType represents the root class of any specific type.
 type basicType struct {
 	baseValue
-	k kind
+	K kind
 }
 
-func (x *basicType) kind() kind { return x.k | nonGround }
+func (x *basicType) Kind() kind { return x.K | nonGround }
 
 // Literals
 
 type nullLit struct{ baseValue }
 
-func (x *nullLit) kind() kind { return nullKind }
+func (x *nullLit) Kind() kind { return nullKind }
 
 type boolLit struct {
 	baseValue
-	b bool
+	B bool
 }
 
-func (x *boolLit) kind() kind { return boolKind }
+func (x *boolLit) Kind() kind { return boolKind }
 
 func boolTonode(src source, b bool) evaluated {
 	return &boolLit{src.base(), b}
@@ -199,17 +199,17 @@ func boolTonode(src source, b bool) evaluated {
 
 type bytesLit struct {
 	baseValue
-	b []byte
+	B []byte
 	// Also support https://github.com/dlclark/regexp2 to
 	// accommodate JSON Schema?
-	re *regexp.Regexp // only set if needed
+	RE *regexp.Regexp // only set if needed
 }
 
-func (x *bytesLit) kind() kind       { return bytesKind }
-func (x *bytesLit) strValue() string { return string(x.b) }
+func (x *bytesLit) Kind() kind       { return bytesKind }
+func (x *bytesLit) strValue() string { return string(x.B) }
 
 func (x *bytesLit) iterAt(ctx *context, i int) arc {
-	if i >= len(x.b) {
+	if i >= len(x.B) {
 		return arc{}
 	}
 	v := x.at(ctx, i)
@@ -217,18 +217,18 @@ func (x *bytesLit) iterAt(ctx *context, i int) arc {
 }
 
 func (x *bytesLit) at(ctx *context, i int) evaluated {
-	if i < 0 || i >= len(x.b) {
+	if i < 0 || i >= len(x.B) {
 		return ctx.mkErr(x, "index %d out of bounds", i)
 	}
 	// TODO: this is incorrect.
-	return newInt(x, 0).setUInt64(uint64(x.b[i]))
+	return newInt(x, 0).setUInt64(uint64(x.B[i]))
 }
 
-func (x *bytesLit) len() int { return len(x.b) }
+func (x *bytesLit) len() int { return len(x.B) }
 
 func (x *bytesLit) slice(ctx *context, lo, hi *numLit) evaluated {
 	lox := 0
-	hix := len(x.b)
+	hix := len(x.B)
 	if lo != nil {
 		lox = lo.intValue(ctx)
 	}
@@ -244,25 +244,25 @@ func (x *bytesLit) slice(ctx *context, lo, hi *numLit) evaluated {
 	if hix < lox {
 		return ctx.mkErr(x, "invalid slice index: %d > %d", lox, hix)
 	}
-	if len(x.b) < hix {
+	if len(x.B) < hix {
 		return ctx.mkErr(hi, "slice bounds out of range")
 	}
-	return &bytesLit{x.baseValue, x.b[lox:hix], nil}
+	return &bytesLit{x.baseValue, x.B[lox:hix], nil}
 }
 
 type stringLit struct {
 	baseValue
-	str string
-	re  *regexp.Regexp // only set if needed
+	Str string
+	RE  *regexp.Regexp // only set if needed
 
 	// TODO: maintain extended grapheme index cache.
 }
 
-func (x *stringLit) kind() kind       { return stringKind }
-func (x *stringLit) strValue() string { return x.str }
+func (x *stringLit) Kind() kind       { return stringKind }
+func (x *stringLit) strValue() string { return x.Str }
 
 func (x *stringLit) iterAt(ctx *context, i int) arc {
-	runes := []rune(x.str)
+	runes := []rune(x.Str)
 	if i >= len(runes) {
 		return arc{}
 	}
@@ -271,17 +271,17 @@ func (x *stringLit) iterAt(ctx *context, i int) arc {
 }
 
 func (x *stringLit) at(ctx *context, i int) evaluated {
-	runes := []rune(x.str)
+	runes := []rune(x.Str)
 	if i < 0 || i >= len(runes) {
 		return ctx.mkErr(x, "index %d out of bounds", i)
 	}
 	// TODO: this is incorrect.
 	return &stringLit{x.baseValue, string(runes[i : i+1]), nil}
 }
-func (x *stringLit) len() int { return len([]rune(x.str)) }
+func (x *stringLit) len() int { return len([]rune(x.Str)) }
 
 func (x *stringLit) slice(ctx *context, lo, hi *numLit) evaluated {
-	runes := []rune(x.str)
+	runes := []rune(x.Str)
 	lox := 0
 	hix := len(runes)
 	if lo != nil {
@@ -308,15 +308,15 @@ func (x *stringLit) slice(ctx *context, lo, hi *numLit) evaluated {
 type numLit struct {
 	baseValue
 	rep literal.Multiplier
-	k   kind
-	v   apd.Decimal
+	K   kind
+	X   apd.Decimal
 }
 
 func newNum(src source, k kind, rep literal.Multiplier) *numLit {
 	if k&numKind == 0 {
 		panic("not a number")
 	}
-	return &numLit{baseValue: src.base(), rep: rep, k: k}
+	return &numLit{baseValue: src.base(), rep: rep, K: k}
 }
 
 func newInt(src source, rep literal.Multiplier) *numLit {
@@ -328,40 +328,40 @@ func newFloat(src source, rep literal.Multiplier) *numLit {
 }
 
 func (n numLit) specialize(k kind) *numLit {
-	n.k = k
+	n.K = k
 	return &n
 }
 
 func (n *numLit) set(d *apd.Decimal) *numLit {
-	n.v.Set(d)
+	n.X.Set(d)
 	return n
 }
 
 func (n *numLit) setInt(x int) *numLit {
-	n.v.SetInt64(int64(x))
+	n.X.SetInt64(int64(x))
 	return n
 }
 
 func (n *numLit) setInt64(x int64) *numLit {
-	n.v.SetInt64(x)
+	n.X.SetInt64(x)
 	return n
 }
 
 func (n *numLit) setUInt64(x uint64) *numLit {
-	n.v.Coeff.SetUint64(x)
+	n.X.Coeff.SetUint64(x)
 	return n
 }
 
 func (n *numLit) setString(s string) *numLit {
-	_, _, _ = n.v.SetString(s)
+	_, _, _ = n.X.SetString(s)
 	return n
 }
 
 func (n *numLit) String() string {
-	if n.k&intKind != 0 {
-		return n.v.Text('f') // also render info
+	if n.K&intKind != 0 {
+		return n.X.Text('f') // also render info
 	}
-	s := n.v.Text('g')
+	s := n.X.Text('g')
 	if len(s) == 1 {
 		s += "."
 	}
@@ -370,7 +370,7 @@ func (n *numLit) String() string {
 
 func parseInt(k kind, s string) *numLit {
 	num := newInt(newExpr(ast.NewLit(token.INT, s)), 0)
-	_, _, err := num.v.SetString(s)
+	_, _, err := num.X.SetString(s)
 	if err != nil {
 		panic(err)
 	}
@@ -379,7 +379,7 @@ func parseInt(k kind, s string) *numLit {
 
 func parseFloat(s string) *numLit {
 	num := newFloat(newExpr(ast.NewLit(token.FLOAT, s)), 0)
-	_, _, err := num.v.SetString(s)
+	_, _, err := num.X.SetString(s)
 	if err != nil {
 		panic(err)
 	}
@@ -390,15 +390,15 @@ var ten = big.NewInt(10)
 
 var one = parseInt(intKind, "1")
 
-func (x *numLit) kind() kind       { return x.k }
-func (x *numLit) strValue() string { return x.v.String() }
+func (x *numLit) Kind() kind       { return x.K }
+func (x *numLit) strValue() string { return x.X.String() }
 
 func (x *numLit) isInt(ctx *context) bool {
-	return x.kind()&intKind != 0
+	return x.Kind()&intKind != 0
 }
 
 func (x *numLit) intValue(ctx *context) int {
-	v, err := x.v.Int64()
+	v, err := x.X.Int64()
 	if err != nil {
 		return 0
 	}
@@ -410,18 +410,18 @@ type durationLit struct {
 	d time.Duration
 }
 
-func (x *durationLit) kind() kind       { return durationKind }
+func (x *durationLit) Kind() kind       { return durationKind }
 func (x *durationLit) strValue() string { return x.d.String() }
 
 type bound struct {
 	baseValue
-	op    op   // opNeq, opLss, opLeq, opGeq, or opGtr
-	k     kind // mostly used for number kind
-	value value
+	Op   op   // opNeq, opLss, opLeq, opGeq, or opGtr
+	k    kind // mostly used for number kind
+	Expr value
 }
 
 func newBound(ctx *context, base baseValue, op op, k kind, v value) evaluated {
-	kv := v.kind()
+	kv := v.Kind()
 	if kv.isAnyOf(numKind) {
 		kv |= numKind
 	} else if op == opNeq && kv&atomKind == nullKind {
@@ -436,7 +436,7 @@ func newBound(ctx *context, base baseValue, op op, k kind, v value) evaluated {
 	return &bound{base, op, unifyType(k&topKind, kv) | nonGround, v}
 }
 
-func (x *bound) kind() kind {
+func (x *bound) Kind() kind {
 	return x.k
 }
 
@@ -505,11 +505,11 @@ var predefinedRanges = map[string]evaluated{
 
 type interpolation struct {
 	baseValue
-	k     kind    // string or bytes
-	parts []value // odd: strings, even expressions
+	K     kind    // string or bytes
+	Parts []value // odd: strings, even expressions
 }
 
-func (x *interpolation) kind() kind { return x.k | nonGround }
+func (x *interpolation) Kind() kind { return x.K | nonGround }
 
 type list struct {
 	baseValue
@@ -529,7 +529,7 @@ func (x *list) initLit() {
 }
 
 func (x *list) manifest(ctx *context) evaluated {
-	if x.kind().isGround() {
+	if x.Kind().isGround() {
 		return x
 	}
 	// A list is ground if its length is ground, or if the current length
@@ -546,7 +546,7 @@ func (x *list) manifest(ctx *context) evaluated {
 	return x
 }
 
-func (x *list) kind() kind {
+func (x *list) Kind() kind {
 	k := listKind
 	if _, ok := x.len.(*numLit); ok {
 		return k
@@ -579,8 +579,8 @@ func (x *list) iterAt(ctx *context, i int) arc {
 		return a
 	}
 	max := maxNum(x.len.(evaluated))
-	if max.kind().isGround() {
-		if max.kind()&intKind == bottomKind {
+	if max.Kind().isGround() {
+		if max.Kind()&intKind == bottomKind {
 			v := ctx.mkErr(max, "length indicator of list not of type int")
 			return arc{cache: v}
 		}
@@ -593,7 +593,7 @@ func (x *list) iterAt(ctx *context, i int) arc {
 }
 
 func (x *list) isOpen() bool {
-	return !x.len.kind().isGround()
+	return !x.len.Kind().isGround()
 }
 
 // lo and hi must be nil or a ground integer.
@@ -605,7 +605,7 @@ func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
 		if n < 0 {
 			return ctx.mkErr(x, "negative slice index")
 		}
-		if max.kind().isGround() && !leq(ctx, hi, hi, max) {
+		if max.Kind().isGround() && !leq(ctx, hi, hi, max) {
 			return ctx.mkErr(hi, "slice bounds out of range")
 		}
 		max = hi
@@ -619,7 +619,7 @@ func (x *list) slice(ctx *context, lo, hi *numLit) evaluated {
 		if n < 0 {
 			return ctx.mkErr(x, "negative slice index")
 		}
-		if n > 0 && max.kind().isGround() {
+		if n > 0 && max.Kind().isGround() {
 			if !leq(ctx, lo, lo, max) {
 				max := max.(*numLit).intValue(ctx)
 				return ctx.mkErr(x, "invalid slice index: %v > %v", n, max)
@@ -806,7 +806,7 @@ func (o *optionals) allows(ctx *context, f label) bool {
 	}
 
 	str := ctx.LabelStr(f)
-	arg := &stringLit{str: str}
+	arg := &stringLit{Str: str}
 
 	found, ok := o.match(ctx, arg)
 	return found && ok
@@ -879,7 +879,7 @@ func (o *optionals) constraint(ctx *context, label evaluated) (u value, doc *doc
 
 	arg := label
 	if arg == nil {
-		arg = &basicType{k: stringKind}
+		arg = &basicType{K: stringKind}
 	}
 
 	for _, s := range o.fields {
@@ -898,7 +898,7 @@ func (o *optionals) constraint(ctx *context, label evaluated) (u value, doc *doc
 			continue
 		}
 		add(fn.call(ctx, s.value, arg))
-		if f, _ := s.value.base().syntax().(*ast.Field); f != nil {
+		if f, _ := s.value.base().Source().(*ast.Field); f != nil {
 			doc = &docNode{n: f, left: doc}
 		}
 	}
@@ -982,7 +982,7 @@ func newStruct(src source) *structLit {
 	return &structLit{baseValue: src.base()}
 }
 
-func (x *structLit) kind() kind { return structKind }
+func (x *structLit) Kind() kind { return structKind }
 
 type arcs []arc
 
@@ -1065,7 +1065,7 @@ func (x *structLit) at(ctx *context, i int) evaluated {
 		ctx.evalStack = append(ctx.evalStack, bottom{
 			baseValue: x.base(),
 			index:     ctx.index,
-			code:      codeCycle,
+			Code:      codeCycle,
 			value:     x.arcs[i].v,
 			format:    "cycle detected",
 		})
@@ -1299,7 +1299,7 @@ type closeIfStruct struct {
 }
 
 func wrapFinalize(ctx *context, v value) value {
-	if v.kind().isAnyOf(structKind | listKind) {
+	if v.Kind().isAnyOf(structKind | listKind) {
 		switch x := v.(type) {
 		case *top:
 			return v
@@ -1328,8 +1328,8 @@ func updateCloseStatus(ctx *context, v evaluated) evaluated {
 		return x
 
 	case *disjunction:
-		for _, d := range x.values {
-			d.val = wrapFinalize(ctx, d.val)
+		for _, d := range x.Values {
+			d.Val = wrapFinalize(ctx, d.Val)
 		}
 
 	case *list:
@@ -1378,57 +1378,57 @@ type nodeRef struct {
 	label label // for direct ancestor nodes
 }
 
-func (x *nodeRef) kind() kind {
+func (x *nodeRef) Kind() kind {
 	// TODO(REWORK): no context available
 	// n := x.node.deref(nil)
 	n := x.node
-	return n.kind() | nonGround | referenceKind
+	return n.Kind() | nonGround | referenceKind
 }
 
 type selectorExpr struct {
 	baseValue
-	x       value
-	feature label
+	X   value
+	Sel label
 }
 
 // TODO: could this be narrowed down?
-func (x *selectorExpr) kind() kind {
-	isRef := x.x.kind() & referenceKind
+func (x *selectorExpr) Kind() kind {
+	isRef := x.X.Kind() & referenceKind
 	return topKind | isRef
 }
 
 type indexExpr struct {
 	baseValue
-	x     value
-	index value
+	X     value
+	Index value
 }
 
 // TODO: narrow this down when we have list types.
-func (x *indexExpr) kind() kind { return topKind | referenceKind }
+func (x *indexExpr) Kind() kind { return topKind | referenceKind }
 
 type sliceExpr struct {
 	baseValue
-	x  value
-	lo value
-	hi value
+	X  value
+	Lo value
+	Hi value
 }
 
 // TODO: narrow this down when we have list types.
-func (x *sliceExpr) kind() kind { return topKind | referenceKind }
+func (x *sliceExpr) Kind() kind { return topKind | referenceKind }
 
 type callExpr struct {
 	baseValue
-	x    value
-	args []value
+	Fun  value
+	Args []value
 }
 
-func (x *callExpr) kind() kind {
+func (x *callExpr) Kind() kind {
 	// TODO: could this be narrowed down?
-	switch c := x.x.(type) {
+	switch c := x.Fun.(type) {
 	case *lambdaExpr:
 		return c.returnKind() | nonGround
 	case *builtin:
-		switch len(x.args) {
+		switch len(x.Args) {
 		case len(c.Params):
 			return c.Result
 		case len(c.Params) - 1:
@@ -1444,15 +1444,15 @@ func (x *callExpr) kind() kind {
 type customValidator struct {
 	baseValue
 
-	args []evaluated // any but the first value
-	call *builtin    // function must return a bool
+	Args    []evaluated // any but the first value
+	Builtin *builtin    // function must return a bool
 }
 
-func (x *customValidator) kind() kind {
-	if len(x.call.Params) == 0 {
+func (x *customValidator) Kind() kind {
+	if len(x.Builtin.Params) == 0 {
 		return bottomKind
 	}
-	return x.call.Params[0] | nonGround
+	return x.Builtin.Params[0] | nonGround
 }
 
 type params struct {
@@ -1511,8 +1511,8 @@ type lambdaExpr struct {
 }
 
 // TODO: could this be narrowed down?
-func (x *lambdaExpr) kind() kind       { return lambdaKind }
-func (x *lambdaExpr) returnKind() kind { return x.value.kind() }
+func (x *lambdaExpr) Kind() kind       { return lambdaKind }
+func (x *lambdaExpr) returnKind() kind { return x.value.Kind() }
 
 // call calls and evaluates a  lambda expression. It is assumed that x may be
 // destroyed, either because it is copied as a result of a reference or because
@@ -1544,27 +1544,27 @@ func (x *lambdaExpr) call(ctx *context, p source, args ...evaluated) value {
 
 type unaryExpr struct {
 	baseValue
-	op op
-	x  value
+	Op op
+	X  value
 }
 
-func (x *unaryExpr) kind() kind { return x.x.kind() }
+func (x *unaryExpr) Kind() kind { return x.X.Kind() }
 
 func compileRegexp(ctx *context, v value) value {
 	var err error
 	switch x := v.(type) {
 	case *stringLit:
-		if x.re == nil {
-			x.re, err = regexp.Compile(x.str)
+		if x.RE == nil {
+			x.RE, err = regexp.Compile(x.Str)
 			if err != nil {
-				return ctx.mkErr(v, "could not compile regular expression %q: %v", x.str, err)
+				return ctx.mkErr(v, "could not compile regular expression %q: %v", x.Str, err)
 			}
 		}
 	case *bytesLit:
-		if x.re == nil {
-			x.re, err = regexp.Compile(string(x.b))
+		if x.RE == nil {
+			x.RE, err = regexp.Compile(string(x.B))
 			if err != nil {
-				return ctx.mkErr(v, "could not compile regular expression %q: %v", x.b, err)
+				return ctx.mkErr(v, "could not compile regular expression %q: %v", x.B, err)
 			}
 		}
 	}
@@ -1573,9 +1573,9 @@ func compileRegexp(ctx *context, v value) value {
 
 type binaryExpr struct {
 	baseValue
-	op    op
-	left  value
-	right value
+	Op op
+	X  value
+	Y  value
 }
 
 func mkBin(ctx *context, pos token.Pos, op op, left, right value) value {
@@ -1605,19 +1605,19 @@ func mkBin(ctx *context, pos token.Pos, op op, left, right value) value {
 }
 
 func updateBin(ctx *context, bin *binaryExpr) value {
-	switch bin.op {
+	switch bin.Op {
 	case opMat, opNMat:
-		bin.right = compileRegexp(ctx, bin.right)
-		if isBottom(bin.right) {
-			return bin.right
+		bin.Y = compileRegexp(ctx, bin.Y)
+		if isBottom(bin.Y) {
+			return bin.Y
 		}
 	}
 	return bin
 }
 
-func (x *binaryExpr) kind() kind {
+func (x *binaryExpr) Kind() kind {
 	// TODO: cache results
-	kind, _, _ := matchBinOpKind(x.op, x.left.kind(), x.right.kind())
+	kind, _, _ := matchBinOpKind(x.Op, x.X.Kind(), x.Y.Kind())
 	return kind | nonGround
 }
 
@@ -1627,13 +1627,13 @@ func (x *binaryExpr) kind() kind {
 // resolve into a single value.
 type unification struct {
 	baseValue
-	values []evaluated
+	Values []evaluated
 }
 
-func (x *unification) kind() kind {
+func (x *unification) Kind() kind {
 	k := topKind
-	for _, v := range x.values {
-		k &= v.kind()
+	for _, v := range x.Values {
+		k &= v.Kind()
 	}
 	return k | nonGround
 }
@@ -1641,14 +1641,14 @@ func (x *unification) kind() kind {
 type disjunction struct {
 	baseValue
 
-	values []dValue
+	Values []dValue
 
 	// errors is used to keep track of all errors that occurred in
 	// a disjunction for better error reporting down the road.
 	// TODO: consider storing the errors in values.
 	errors []*bottom
 
-	hasDefaults bool // also true if it had elminated defaults.
+	HasDefaults bool // also true if it had elminated defaults.
 
 	// bind is the node that a successful disjunction will bind to. This
 	// allows other arcs to point to this node before the disjunction is
@@ -1658,14 +1658,14 @@ type disjunction struct {
 }
 
 type dValue struct {
-	val    value
-	marked bool
+	Val     value
+	Default bool
 }
 
-func (x *disjunction) kind() kind {
+func (x *disjunction) Kind() kind {
 	k := kind(0)
-	for _, v := range x.values {
-		k |= v.val.kind()
+	for _, v := range x.Values {
+		k |= v.Val.Kind()
 	}
 	if k != bottomKind {
 		k |= nonGround
@@ -1673,11 +1673,11 @@ func (x *disjunction) kind() kind {
 	return k
 }
 
-func (x *disjunction) Pos() token.Pos { return x.values[0].val.Pos() }
+func (x *disjunction) Pos() token.Pos { return x.Values[0].Val.Pos() }
 
 // add add a value to the disjunction. It is assumed not to be a disjunction.
 func (x *disjunction) add(ctx *context, v value, marked bool) {
-	x.values = append(x.values, dValue{v, marked})
+	x.Values = append(x.Values, dValue{v, marked})
 	if b, ok := v.(*bottom); ok {
 		x.errors = append(x.errors, b)
 	}
@@ -1687,34 +1687,34 @@ func (x *disjunction) add(ctx *context, v value, marked bool) {
 // x must already have been evaluated.
 func (x *disjunction) normalize(ctx *context, src source) mVal {
 	leq := func(ctx *context, lt, gt dValue) bool {
-		if isBottom(lt.val) {
+		if isBottom(lt.Val) {
 			return true
 		}
 		s := subsumer{ctx: ctx}
-		return (!lt.marked || gt.marked) && s.subsumes(gt.val, lt.val)
+		return (!lt.Default || gt.Default) && s.subsumes(gt.Val, lt.Val)
 	}
 	k := 0
 
 	hasMarked := false
 	var markedErr *bottom
 outer:
-	for i, v := range x.values {
+	for i, v := range x.Values {
 		// TODO: this is pre-evaluation is quite aggressive. Verify whether
 		// this does not trigger structural cycles (it does). If so, this can check for
 		// bottom and the validation can be delayed to as late as picking
 		// defaults. The drawback of this approach is that printed intermediate
 		// results will not look great.
-		if err := validate(ctx, v.val); err != nil {
+		if err := validate(ctx, v.Val); err != nil {
 			x.errors = append(x.errors, err)
-			if v.marked {
+			if v.Default {
 				markedErr = err
 			}
 			continue
 		}
-		if v.marked {
+		if v.Default {
 			hasMarked = true
 		}
-		for j, w := range x.values {
+		for j, w := range x.Values {
 			if i == j {
 				continue
 			}
@@ -1727,16 +1727,16 @@ outer:
 		// If there was a three-way equality, an element w, where w == v could
 		// already have been added.
 		for j := 0; j < k; j++ {
-			if leq(ctx, v, x.values[j]) {
+			if leq(ctx, v, x.Values[j]) {
 				continue outer
 			}
 		}
 		// TODO: do not modify value, but create a new disjunction.
-		x.values[k] = v
+		x.Values[k] = v
 		k++
 	}
-	if !hasMarked && markedErr != nil && (k > 1 || !x.values[0].val.kind().isGround()) {
-		x.values[k] = dValue{&bottom{}, true}
+	if !hasMarked && markedErr != nil && (k > 1 || !x.Values[0].Val.Kind().isGround()) {
+		x.Values[k] = dValue{&bottom{}, true}
 		k++
 	}
 
@@ -1744,18 +1744,18 @@ outer:
 	case 0:
 		// Empty disjunction. All elements must be errors.
 		// Take the first error as an example.
-		err := x.values[0].val
+		err := x.Values[0].Val
 		if !isBottom(err) {
 			// TODO: use format instead of debugStr.
 			err = ctx.mkErr(src, ctx.str(err))
 		}
 		return mVal{x.computeError(ctx, src), false}
 	case 1:
-		v := x.values[0]
-		return mVal{v.val.(evaluated), v.marked}
+		v := x.Values[0]
+		return mVal{v.Val.(evaluated), v.Default}
 	}
 	// TODO: do not modify value, but create a new disjunction.
-	x.values = x.values[:k]
+	x.Values = x.Values[:k]
 	return mVal{x, false}
 }
 
@@ -1803,7 +1803,7 @@ type listComprehension struct {
 	clauses yielder
 }
 
-func (x *listComprehension) kind() kind {
+func (x *listComprehension) Kind() kind {
 	return listKind | nonGround | referenceKind
 }
 
@@ -1812,7 +1812,7 @@ type structComprehension struct {
 	clauses yielder
 }
 
-func (x *structComprehension) kind() kind {
+func (x *structComprehension) Kind() kind {
 	return structKind | nonGround | referenceKind
 }
 
@@ -1828,7 +1828,7 @@ type fieldComprehension struct {
 	attrs *attributes
 }
 
-func (x *fieldComprehension) kind() kind {
+func (x *fieldComprehension) Kind() kind {
 	return structKind | nonGround
 }
 
@@ -1844,7 +1844,7 @@ type yield struct {
 	value value
 }
 
-func (x *yield) kind() kind { return topKind | referenceKind }
+func (x *yield) Kind() kind { return topKind | referenceKind }
 
 func (x *yield) yield(ctx *context, fn yieldFunc) *bottom {
 	v := x.value.evalPartial(ctx)
@@ -1859,22 +1859,22 @@ func (x *yield) yield(ctx *context, fn yieldFunc) *bottom {
 
 type guard struct { // rename to guard
 	baseValue
-	condition value
-	value     yielder
+	Condition value
+	Dst       yielder
 }
 
-func (x *guard) kind() kind { return topKind | referenceKind }
+func (x *guard) Kind() kind { return topKind | referenceKind }
 
 func (x *guard) yield(ctx *context, fn yieldFunc) *bottom {
-	filter := ctx.manifest(x.condition)
+	filter := ctx.manifest(x.Condition)
 	if err, ok := filter.(*bottom); ok {
 		return err
 	}
 	if err := checkKind(ctx, filter, boolKind); err != nil {
 		return err
 	}
-	if filter.(*boolLit).b {
-		if err := x.value.yield(ctx, fn); err != nil {
+	if filter.(*boolLit).B {
+		if err := x.Dst.yield(ctx, fn); err != nil {
 			return err
 		}
 	}
@@ -1883,17 +1883,17 @@ func (x *guard) yield(ctx *context, fn yieldFunc) *bottom {
 
 type feed struct {
 	baseValue
-	source value
-	fn     *lambdaExpr
+	Src value
+	fn  *lambdaExpr
 }
 
-func (x *feed) kind() kind { return topKind | referenceKind }
+func (x *feed) Kind() kind { return topKind | referenceKind }
 
 func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 	if ctx.trace {
 		defer uni(indent(ctx, "feed", x))
 	}
-	source := ctx.manifest(x.source)
+	source := ctx.manifest(x.Src)
 	fn := x.fn // no need to evaluate eval
 
 	switch src := source.(type) {
@@ -1940,9 +1940,9 @@ func (x *feed) yield(ctx *context, yfn yieldFunc) (result *bottom) {
 		if err, ok := source.(*bottom); ok {
 			return err
 		}
-		if k := source.kind(); k&(structKind|listKind) == bottomKind {
-			return ctx.mkErr(x, x.source, "feed source must be list or struct, found %s", k)
+		if k := source.Kind(); k&(structKind|listKind) == bottomKind {
+			return ctx.mkErr(x, x.Src, "feed source must be list or struct, found %s", k)
 		}
-		return ctx.mkErr(x, x.source, codeIncomplete, "incomplete feed source")
+		return ctx.mkErr(x, x.Src, codeIncomplete, "incomplete feed source")
 	}
 }

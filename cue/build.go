@@ -227,6 +227,7 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 		}
 		return inst
 	}
+	errs := runtime.ResolveFiles(idx.Index, p, isBuiltin)
 	files := p.Files
 	inst := newInstance(idx, p)
 	idx.loaded[p] = inst
@@ -234,7 +235,7 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 	if inst.Err == nil {
 		// inst.instance.index.state = s
 		// inst.instance.inst = p
-		inst.Err = runtime.ResolveFiles(idx.Index, p, isBuiltin)
+		inst.Err = errs
 		for _, f := range files {
 			err := inst.insertFile(f)
 			inst.Err = errors.Append(inst.Err, err)

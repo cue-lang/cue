@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
 )
 
 var _ errors.Error = &nodeError{}
@@ -108,37 +109,37 @@ func (e *valueError) Path() (a []string) {
 	return a
 }
 
-type errCode int
+type errCode = adt.ErrorCode
 
 const (
-	codeNone errCode = iota
-	codeFatal
-	codeNotExist
-	codeTypeError
-	codeIncomplete
-	codeUser
-	codeCycle
+	codeNone       errCode = 0
+	codeFatal              = adt.EvalError
+	codeNotExist           = adt.NotExistError
+	codeTypeError          = adt.EvalError
+	codeIncomplete         = adt.IncompleteError
+	codeUser               = adt.UserError
+	codeCycle              = adt.CycleError
 )
 
 func isIncomplete(v value) bool {
 	if err, ok := v.(*bottom); ok {
-		return err.code == codeIncomplete || err.code == codeCycle
+		return err.Code == codeIncomplete || err.Code == codeCycle
 	}
 	return false
 }
 
 func isLiteralBottom(v value) bool {
 	if err, ok := v.(*bottom); ok {
-		return err.code == codeUser
+		return err.Code == codeUser
 	}
 	return false
 }
 
-var errNotExists = &bottom{code: codeNotExist, format: "undefined value"}
+var errNotExists = &bottom{Code: codeNotExist, format: "undefined value"}
 
 func exists(v value) bool {
 	if err, ok := v.(*bottom); ok {
-		return err.code != codeNotExist
+		return err.Code != codeNotExist
 	}
 	return true
 }
@@ -148,7 +149,7 @@ type bottom struct {
 	baseValue
 
 	index     *index
-	code      errCode
+	Code      errCode
 	exprDepth int
 	pos       source
 	format    string
@@ -160,7 +161,7 @@ type bottom struct {
 	wrapped *bottom
 }
 
-func (x *bottom) kind() kind { return bottomKind }
+func (x *bottom) Kind() kind { return bottomKind }
 
 func (x *bottom) Positions(ctx *context) []token.Pos {
 	var a []token.Pos
@@ -216,7 +217,7 @@ func (x *bottom) Format(s fmt.State, verb rune) {
 }
 
 func cycleError(v evaluated) *bottom {
-	if err, ok := v.(*bottom); ok && err.code == codeCycle {
+	if err, ok := v.(*bottom); ok && err.Code == codeCycle {
 		return err
 	}
 	return nil
@@ -228,7 +229,7 @@ func (c *context) mkIncompatible(src source, op op, a, b evaluated) evaluated {
 	}
 	e := mkBin(c, src.Pos(), op, a, b)
 	return c.mkErr(e, "invalid operation %s %s %s (mismatched types %s and %s)",
-		c.str(a), op, c.str(b), a.kind(), b.kind())
+		c.str(a), op, c.str(b), a.Kind(), b.Kind())
 }
 
 func (idx *index) mkErr(src source, args ...interface{}) *bottom {
@@ -243,7 +244,7 @@ outer:
 	for i, a := range args {
 		switch x := a.(type) {
 		case errCode:
-			e.code = x
+			e.Code = x
 		case *bottom:
 			e.wrapped = x
 		case []*bottom:
@@ -261,8 +262,8 @@ outer:
 			break outer
 		}
 	}
-	if e.code == codeNone && e.wrapped != nil {
-		e.code = e.wrapped.code
+	if e.Code == codeNone && e.wrapped != nil {
+		e.Code = e.wrapped.Code
 	}
 	return e
 }
@@ -297,7 +298,7 @@ func preEvalArgs(ctx *context, args []interface{}) {
 }
 
 func isBottom(n value) bool {
-	return n.kind() == bottomKind
+	return n.Kind() == bottomKind
 }
 
 func firstBottom(v ...value) *bottom {

@@ -268,8 +268,8 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 				if isBottom(e) {
 					return e
 				}
-				if e.kind()&structKind == 0 {
-					return v1.errf(x, "can only embed structs (found %v)", e.kind())
+				if e.Kind()&structKind == 0 {
+					return v1.errf(x, "can only embed structs (found %v)", e.Kind())
 				}
 				ret = mkBin(v1.ctx(), x.Pos(), opUnifyUnchecked, ret, e)
 				// TODO: preserve order of embedded fields. We cannot split into
@@ -646,7 +646,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 	case *ast.BottomLit:
 		// TODO: record inline comment.
-		ret = &bottom{baseValue: newExpr(n), code: codeUser, format: "from source"}
+		ret = &bottom{baseValue: newExpr(n), Code: codeUser, format: "from source"}
 
 	case *ast.BadDecl:
 		// nothing to do
@@ -670,7 +670,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			ret = v.walk(n.Elts[0])
 			break
 		}
-		lit := &interpolation{baseValue: newExpr(n), k: stringKind}
+		lit := &interpolation{baseValue: newExpr(n), K: stringKind}
 		ret = lit
 		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)
 		if err != nil {
@@ -688,9 +688,9 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 			}
 			s = l.Value[prefixLen:]
 			x := parseString(v.ctx(), l, info, s)
-			lit.parts = append(lit.parts, x)
+			lit.Parts = append(lit.Parts, x)
 			if i+1 < len(n.Elts) {
-				lit.parts = append(lit.parts, v.walk(n.Elts[i+1]))
+				lit.Parts = append(lit.Parts, v.walk(n.Elts[i+1]))
 			}
 			prefix = ")"
 			prefixLen = 1
@@ -712,19 +712,19 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 		ret = &indexExpr{newExpr(n), v.walk(n.X), v.walk(n.Index)}
 
 	case *ast.SliceExpr:
-		slice := &sliceExpr{baseValue: newExpr(n), x: v.walk(n.X)}
+		slice := &sliceExpr{baseValue: newExpr(n), X: v.walk(n.X)}
 		if n.Low != nil {
-			slice.lo = v.walk(n.Low)
+			slice.Lo = v.walk(n.Low)
 		}
 		if n.High != nil {
-			slice.hi = v.walk(n.High)
+			slice.Hi = v.walk(n.High)
 		}
 		ret = slice
 
 	case *ast.CallExpr:
-		call := &callExpr{baseValue: newExpr(n), x: v.walk(n.Fun)}
+		call := &callExpr{baseValue: newExpr(n), Fun: v.walk(n.Fun)}
 		for _, a := range n.Args {
-			call.args = append(call.args, v.walk(a))
+			call.Args = append(call.Args, v.walk(a))
 		}
 		ret = call
 
@@ -799,9 +799,9 @@ func (v *astVisitor) addDisjunctionElem(d *disjunction, n ast.Node, mark bool) {
 			mark = true
 			n = x.X
 		}
-		d.hasDefaults = true
+		d.HasDefaults = true
 	}
-	d.values = append(d.values, dValue{v.walk(n), mark})
+	d.Values = append(d.Values, dValue{v.walk(n), mark})
 }
 
 func wrapClauses(v *astVisitor, y yielder, clauses []ast.Clause) yielder {

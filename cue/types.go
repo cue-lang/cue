@@ -342,16 +342,16 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 	if err != nil {
 		return 0, err
 	}
-	if n.v.Form != 0 {
+	if n.X.Form != 0 {
 		return 0, ErrInfinite
 	}
 	if mant != nil {
-		mant.Set(&n.v.Coeff)
-		if n.v.Negative {
+		mant.Set(&n.X.Coeff)
+		if n.X.Negative {
 			mant.Neg(mant)
 		}
 	}
-	return int(n.v.Exponent), nil
+	return int(n.X.Exponent), nil
 }
 
 // AppendInt appends the string representation of x in the given base to buf and
@@ -373,9 +373,9 @@ func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
 		return nil, err
 	}
 	ctx := apd.BaseContext
-	nd := int(apd.NumDigits(&n.v.Coeff)) + int(n.v.Exponent)
-	if n.v.Form == apd.Infinite {
-		if n.v.Negative {
+	nd := int(apd.NumDigits(&n.X.Coeff)) + int(n.X.Exponent)
+	if n.X.Form == apd.Infinite {
+		if n.X.Negative {
 			buf = append(buf, '-')
 		}
 		return append(buf, string('∞')...), nil
@@ -386,7 +386,7 @@ func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
 		ctx.Precision = uint32(prec)
 	}
 	var d apd.Decimal
-	ctx.Round(&d, &n.v)
+	ctx.Round(&d, &n.X)
 	return d.Append(buf, fmt), nil
 }
 
@@ -413,11 +413,11 @@ func (v Value) Int(z *big.Int) (*big.Int, error) {
 	if z == nil {
 		z = &big.Int{}
 	}
-	if n.v.Exponent != 0 {
+	if n.X.Exponent != 0 {
 		panic("cue: exponent should always be nil for integer types")
 	}
-	z.Set(&n.v.Coeff)
-	if n.v.Negative {
+	z.Set(&n.X.Coeff)
+	if n.X.Negative {
 		z.Neg(z)
 	}
 	return z, nil
@@ -432,14 +432,14 @@ func (v Value) Int64() (int64, error) {
 	if err != nil {
 		return 0, err
 	}
-	if !n.v.Coeff.IsInt64() {
-		if n.v.Negative {
+	if !n.X.Coeff.IsInt64() {
+		if n.X.Negative {
 			return math.MinInt64, ErrAbove
 		}
 		return math.MaxInt64, ErrBelow
 	}
-	i := n.v.Coeff.Int64()
-	if n.v.Negative {
+	i := n.X.Coeff.Int64()
+	if n.X.Negative {
 		i = -i
 	}
 	return i, nil
@@ -454,13 +454,13 @@ func (v Value) Uint64() (uint64, error) {
 	if err != nil {
 		return 0, err
 	}
-	if n.v.Negative {
+	if n.X.Negative {
 		return 0, ErrAbove
 	}
-	if !n.v.Coeff.IsUint64() {
+	if !n.X.Coeff.IsUint64() {
 		return math.MaxUint64, ErrBelow
 	}
-	i := n.v.Coeff.Uint64()
+	i := n.X.Coeff.Uint64()
 	return i, nil
 }
 
@@ -528,22 +528,22 @@ func (v Value) Float64() (float64, error) {
 	if err != nil {
 		return 0, err
 	}
-	if n.v.Negative {
-		if n.v.Cmp(smallestNegFloat64) == 1 {
+	if n.X.Negative {
+		if n.X.Cmp(smallestNegFloat64) == 1 {
 			return -0, ErrAbove
 		}
-		if n.v.Cmp(maxNegFloat64) == -1 {
+		if n.X.Cmp(maxNegFloat64) == -1 {
 			return math.Inf(-1), ErrBelow
 		}
 	} else {
-		if n.v.Cmp(smallestPosFloat64) == -1 {
+		if n.X.Cmp(smallestPosFloat64) == -1 {
 			return 0, ErrBelow
 		}
-		if n.v.Cmp(maxPosFloat64) == 1 {
+		if n.X.Cmp(maxPosFloat64) == 1 {
 			return math.Inf(1), ErrAbove
 		}
 	}
-	f, _ := n.v.Float64()
+	f, _ := n.X.Float64()
 	return f, nil
 }
 
@@ -571,7 +571,7 @@ func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
 		}
 		a = append(a, f)
 	}
-	return a, v.arc.cache.kind()
+	return a, v.arc.cache.Kind()
 }
 
 var validIdent = []*unicode.RangeTable{unicode.L, unicode.N}
@@ -701,26 +701,26 @@ func Dereference(v Value) Value {
 func appendPath(ctx *context, a []label, v value) (path []label, n *nodeRef) {
 	switch x := v.(type) {
 	case *selectorExpr:
-		a, n = appendPath(ctx, a, x.x)
+		a, n = appendPath(ctx, a, x.X)
 		if n == nil {
 			return nil, nil
 		}
 
-		a = append(a, x.feature)
+		a = append(a, x.Sel)
 
 	case *indexExpr:
-		e := x.index.evalPartial(ctx)
+		e := x.Index.evalPartial(ctx)
 		s, ok := e.(*stringLit)
 		if !ok {
 			return nil, nil
 		}
 
-		a, n = appendPath(ctx, a, x.x)
+		a, n = appendPath(ctx, a, x.X)
 		if n == nil {
 			return nil, nil
 		}
 
-		a = append(a, ctx.Label(s.str, false))
+		a = append(a, ctx.Label(s.Str, false))
 
 	case *nodeRef:
 		n = x
@@ -835,7 +835,7 @@ func (v Value) Kind() Kind {
 	if c == nil {
 		c = v.path.v.evalPartial(v.ctx())
 	}
-	k := c.kind()
+	k := c.Kind()
 	if k.isGround() {
 		switch {
 		case k.isAnyOf(nullKind):
@@ -872,9 +872,9 @@ func (v Value) IncompleteKind() Kind {
 	case *builtin:
 		k = x.representedKind()
 	case *customValidator:
-		k = x.call.Params[0]
+		k = x.Builtin.Params[0]
 	default:
-		k = x.kind()
+		k = x.Kind()
 	}
 	vk := BottomKind // Everything is a bottom kind.
 	for i := kind(1); i < nonGround; i <<= 1 {
@@ -919,17 +919,17 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	ctx := v.idx.newContext()
 	x := v.eval(ctx)
 	// TODO: implement marshalles in value.
-	switch k := x.kind(); k {
+	switch k := x.Kind(); k {
 	case nullKind:
 		return json.Marshal(nil)
 	case boolKind:
-		return json.Marshal(x.(*boolLit).b)
+		return json.Marshal(x.(*boolLit).B)
 	case intKind, floatKind, numKind:
-		return x.(*numLit).v.MarshalText()
+		return x.(*numLit).X.MarshalText()
 	case stringKind:
-		return json.Marshal(x.(*stringLit).str)
+		return json.Marshal(x.(*stringLit).Str)
 	case bytesKind:
-		return json.Marshal(x.(*bytesLit).b)
+		return json.Marshal(x.(*bytesLit).B)
 	case listKind:
 		l := x.(*list)
 		i := Iterator{ctx: ctx, val: v, iter: l, len: len(l.elem.arcs)}
@@ -1054,7 +1054,7 @@ func (v Value) Source() ast.Node {
 	if v.path == nil {
 		return nil
 	}
-	return v.path.v.syntax()
+	return v.path.v.Source()
 }
 
 // Err returns the error represented by v or nil v is not an error.
@@ -1109,7 +1109,7 @@ func (v Value) IsConcrete() bool {
 		return false
 	}
 	// Other errors are considered ground.
-	return x.kind().isConcrete()
+	return x.Kind().isConcrete()
 }
 
 // Deprecated: IsIncomplete
@@ -1119,7 +1119,7 @@ func (v Value) IsConcrete() bool {
 func (v Value) IsIncomplete() bool {
 	// TODO: remove
 	x := v.eval(v.ctx())
-	if !x.kind().isConcrete() {
+	if !x.Kind().isConcrete() {
 		return true
 	}
 	return isIncomplete(x)
@@ -1142,7 +1142,7 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 	if b, ok := x.(*bottom); ok {
 		return b
 	}
-	got := x.kind()
+	got := x.Kind()
 	if want != bottomKind {
 		if got&want&concreteKind == bottomKind {
 			return ctx.mkErr(x, "cannot use value %v (type %s) as %s",
@@ -1218,7 +1218,7 @@ func (v Value) appendBulk(a [][2]Value, x *optionals) [][2]Value {
 				// create error
 				continue
 			}
-			x := fn.call(ctx, set.value, &basicType{k: stringKind})
+			x := fn.call(ctx, set.value, &basicType{K: stringKind})
 
 			a = append(a, [2]Value{v.makeElem(set.key), v.makeElem(x)})
 		}
@@ -1259,7 +1259,7 @@ func (v Value) Bool() (bool, error) {
 	if err := v.checkKind(ctx, boolKind); err != nil {
 		return false, v.toErr(err)
 	}
-	return v.eval(ctx).(*boolLit).b, nil
+	return v.eval(ctx).(*boolLit).B, nil
 }
 
 // String returns the string value if v is a string or an error otherwise.
@@ -1269,7 +1269,7 @@ func (v Value) String() (string, error) {
 	if err := v.checkKind(ctx, stringKind); err != nil {
 		return "", v.toErr(err)
 	}
-	return v.eval(ctx).(*stringLit).str, nil
+	return v.eval(ctx).(*stringLit).Str, nil
 }
 
 // Bytes returns a byte slice if v represents a list of bytes or an error
@@ -1279,9 +1279,9 @@ func (v Value) Bytes() ([]byte, error) {
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
 	case *bytesLit:
-		return append([]byte(nil), x.b...), nil
+		return append([]byte(nil), x.B...), nil
 	case *stringLit:
-		return []byte(x.str), nil
+		return []byte(x.Str), nil
 	}
 	return nil, v.toErr(v.checkKind(ctx, bytesKind|stringKind))
 }
@@ -1293,9 +1293,9 @@ func (v Value) Reader() (io.Reader, error) {
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
 	case *bytesLit:
-		return bytes.NewReader(x.b), nil
+		return bytes.NewReader(x.B), nil
 	case *stringLit:
-		return strings.NewReader(x.str), nil
+		return strings.NewReader(x.Str), nil
 	}
 	return nil, v.toErr(v.checkKind(ctx, stringKind|bytesKind))
 }
@@ -1750,17 +1750,17 @@ func (v Value) Reference() (inst *Instance, path []string) {
 	var feature string
 	switch sel := v.path.v.(type) {
 	case *selectorExpr:
-		x = sel.x
-		feature = ctx.LabelStr(sel.feature)
+		x = sel.X
+		feature = ctx.LabelStr(sel.Sel)
 
 	case *indexExpr:
-		e := sel.index.evalPartial(ctx)
+		e := sel.Index.evalPartial(ctx)
 		s, ok := e.(*stringLit)
 		if !ok {
 			return nil, nil
 		}
-		x = sel.x
-		feature = s.str
+		x = sel.X
+		feature = s.Str
 
 	default:
 		return nil, nil
@@ -1772,18 +1772,18 @@ func (v Value) Reference() (inst *Instance, path []string) {
 func mkPath(c *context, up *valueData, x value, feature string, d int) (imp *Instance, a []string) {
 	switch x := x.(type) {
 	case *selectorExpr:
-		imp, a = mkPath(c, up, x.x, c.LabelStr(x.feature), d+1)
+		imp, a = mkPath(c, up, x.X, c.LabelStr(x.Sel), d+1)
 		if imp == nil {
 			return nil, nil
 		}
 
 	case *indexExpr:
-		e := x.index.evalPartial(c)
+		e := x.Index.evalPartial(c)
 		s, ok := e.(*stringLit)
 		if !ok {
 			return nil, nil
 		}
-		imp, a = mkPath(c, up, x.x, s.str, d+1)
+		imp, a = mkPath(c, up, x.X, s.Str, d+1)
 		if imp == nil {
 			return nil, nil
 		}
@@ -1852,8 +1852,8 @@ func (p *pathFinder) find(ctx *context, v value) (value, bool) {
 	switch x := v.(type) {
 	case *selectorExpr:
 		i := len(p.stack)
-		p.stack = append(p.stack, x.feature)
-		rewrite(ctx, x.x, p.find)
+		p.stack = append(p.stack, x.Sel)
+		rewrite(ctx, x.X, p.find)
 		p.stack = p.stack[:i]
 		return v, false
 
@@ -2046,7 +2046,7 @@ type validator struct {
 func (x *validator) before(v Value, o options) bool {
 	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
 		if !o.concrete && isIncomplete(err) {
-			if o.disallowCycles && err.code == codeCycle {
+			if o.disallowCycles && err.Code == codeCycle {
 				x.errs = errors.Append(x.errs, v.toErr(err))
 			}
 			return false
@@ -2125,7 +2125,7 @@ func isGroundRecursive(ctx *context, v value) *bottom {
 			}
 		}
 	default:
-		if !x.kind().isGround() {
+		if !x.Kind().isGround() {
 			return ctx.mkErr(v, "incomplete value (%v)", ctx.str(v))
 		}
 	}
@@ -2248,18 +2248,18 @@ func (v Value) Expr() (Op, []Value) {
 	op := NoOp
 	switch x := v.path.v.(type) {
 	case *binaryExpr:
-		a = append(a, remakeValue(v, x.left))
-		a = append(a, remakeValue(v, x.right))
-		op = opToOp[x.op]
+		a = append(a, remakeValue(v, x.X))
+		a = append(a, remakeValue(v, x.Y))
+		op = opToOp[x.Op]
 	case *unaryExpr:
-		a = append(a, remakeValue(v, x.x))
-		op = opToOp[x.op]
+		a = append(a, remakeValue(v, x.X))
+		op = opToOp[x.Op]
 	case *bound:
-		a = append(a, remakeValue(v, x.value))
-		op = opToOp[x.op]
+		a = append(a, remakeValue(v, x.Expr))
+		op = opToOp[x.Op]
 	case *unification:
 		// pre-expanded unification
-		for _, conjunct := range x.values {
+		for _, conjunct := range x.Values {
 			a = append(a, remakeValue(v, conjunct))
 		}
 		op = AndOp
@@ -2267,52 +2267,52 @@ func (v Value) Expr() (Op, []Value) {
 		// Filter defaults that are subsumed by another value.
 		count := 0
 	outer:
-		for _, disjunct := range x.values {
-			if disjunct.marked {
-				for _, n := range x.values {
+		for _, disjunct := range x.Values {
+			if disjunct.Default {
+				for _, n := range x.Values {
 					s := subsumer{ctx: v.ctx()}
-					if !n.marked && s.subsumes(n.val, disjunct.val) {
+					if !n.Default && s.subsumes(n.Val, disjunct.Val) {
 						continue outer
 					}
 				}
 			}
 			count++
-			a = append(a, remakeValue(v, disjunct.val))
+			a = append(a, remakeValue(v, disjunct.Val))
 		}
 		if count > 1 {
 			op = OrOp
 		}
 	case *interpolation:
-		for _, p := range x.parts {
+		for _, p := range x.Parts {
 			a = append(a, remakeValue(v, p))
 		}
 		op = InterpolationOp
 	case *selectorExpr:
-		a = append(a, remakeValue(v, x.x))
+		a = append(a, remakeValue(v, x.X))
 		a = append(a, remakeValue(v, &stringLit{
 			x.baseValue,
-			v.ctx().LabelStr(x.feature),
+			v.ctx().LabelStr(x.Sel),
 			nil,
 		}))
 		op = SelectorOp
 	case *indexExpr:
-		a = append(a, remakeValue(v, x.x))
-		a = append(a, remakeValue(v, x.index))
+		a = append(a, remakeValue(v, x.X))
+		a = append(a, remakeValue(v, x.Index))
 		op = IndexOp
 	case *sliceExpr:
-		a = append(a, remakeValue(v, x.x))
-		a = append(a, remakeValue(v, x.lo))
-		a = append(a, remakeValue(v, x.hi))
+		a = append(a, remakeValue(v, x.X))
+		a = append(a, remakeValue(v, x.Lo))
+		a = append(a, remakeValue(v, x.Hi))
 		op = SliceOp
 	case *callExpr:
-		a = append(a, remakeValue(v, x.x))
-		for _, arg := range x.args {
+		a = append(a, remakeValue(v, x.Fun))
+		for _, arg := range x.Args {
 			a = append(a, remakeValue(v, arg))
 		}
 		op = CallOp
 	case *customValidator:
-		a = append(a, remakeValue(v, x.call))
-		for _, arg := range x.args {
+		a = append(a, remakeValue(v, x.Builtin))
+		for _, arg := range x.Args {
 			a = append(a, remakeValue(v, arg))
 		}
 		op = CallOp

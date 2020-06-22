@@ -19,7 +19,7 @@ import "cuelang.org/go/internal"
 // validate returns whether there is any error, recursively.
 func validate(ctx *context, v value) (err *bottom) {
 	eval := v.evalPartial(ctx)
-	if err, ok := eval.(*bottom); ok && err.code != codeIncomplete && err.code != codeCycle {
+	if err, ok := eval.(*bottom); ok && err.Code != codeIncomplete && err.Code != codeCycle {
 		return eval.(*bottom)
 	}
 	switch x := eval.(type) {

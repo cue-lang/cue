@@ -186,67 +186,67 @@ func (p *printer) str(v interface{}) {
 			writef("<%s>", p.ctx.ref(x.node))
 		}
 	case *selectorExpr:
-		f := lambdaName(x.feature, x.x)
-		if _, ok := x.x.(*nodeRef); ok && !p.showNodeRef {
+		f := lambdaName(x.Sel, x.X)
+		if _, ok := x.X.(*nodeRef); ok && !p.showNodeRef {
 			write(p.label(f))
 		} else {
-			p.str(x.x)
+			p.str(x.X)
 			writef(".%v", p.label(f))
 		}
 	case *indexExpr:
-		p.str(x.x)
+		p.str(x.X)
 		write("[")
-		p.str(x.index)
+		p.str(x.Index)
 		write("]")
 	case *sliceExpr:
-		p.str(x.x)
+		p.str(x.X)
 		write("[")
-		if x.lo != nil {
-			p.str(x.lo)
+		if x.Lo != nil {
+			p.str(x.Lo)
 		}
 		write(":")
-		if x.hi != nil {
-			p.str(x.hi)
+		if x.Hi != nil {
+			p.str(x.Hi)
 		}
 		write("]")
 	case *callExpr:
-		p.str(x.x)
+		p.str(x.Fun)
 		write(" (")
-		for i, a := range x.args {
+		for i, a := range x.Args {
 			p.str(a)
-			if i < len(x.args)-1 {
+			if i < len(x.Args)-1 {
 				write(",")
 			}
 		}
 		write(")")
 	case *customValidator:
-		p.str(x.call)
+		p.str(x.Builtin)
 		write(" (")
-		for i, a := range x.args {
+		for i, a := range x.Args {
 			p.str(a)
-			if i < len(x.args)-1 {
+			if i < len(x.Args)-1 {
 				write(",")
 			}
 		}
 		write(")")
 	case *unaryExpr:
-		write(x.op)
-		p.str(x.x)
+		write(x.Op)
+		p.str(x.X)
 	case *binaryExpr:
-		if x.op == opUnifyUnchecked {
-			p.str(x.left)
+		if x.Op == opUnifyUnchecked {
+			p.str(x.X)
 			write(", ")
-			p.str(x.right)
+			p.str(x.Y)
 			break
 		}
 		write("(")
-		p.str(x.left)
-		writef(" %v ", x.op)
-		p.str(x.right)
+		p.str(x.X)
+		writef(" %v ", x.Op)
+		p.str(x.Y)
 		write(")")
 	case *unification:
 		write("(")
-		for i, v := range x.values {
+		for i, v := range x.Values {
 			if i != 0 {
 				writef(" & ")
 			}
@@ -255,14 +255,14 @@ func (p *printer) str(v interface{}) {
 		write(")")
 	case *disjunction:
 		write("(")
-		for i, v := range x.values {
+		for i, v := range x.Values {
 			if i != 0 {
 				writef(" | ")
 			}
-			if v.marked {
+			if v.Default {
 				writef("*")
 			}
-			p.str(v.val)
+			p.str(v.Val)
 		}
 		write(")")
 	case *lambdaExpr:
@@ -418,22 +418,22 @@ func (p *printer) str(v interface{}) {
 		a = x.fn.params.arcs[1]
 		p.writef(p.label(a.feature))
 		writef(" in ")
-		p.str(x.source)
+		p.str(x.Src)
 		p.str(x.fn.value)
 
 	case *guard:
 		writef(" if ")
-		p.str(x.condition)
-		p.str(x.value)
+		p.str(x.Condition)
+		p.str(x.Dst)
 
 	case *nullLit:
 		write("null")
 	case *boolLit:
-		writef("%v", x.b)
+		writef("%v", x.B)
 	case *stringLit:
-		writef("%q", x.str)
+		writef("%q", x.Str)
 	case *bytesLit:
-		str := strconv.Quote(string(x.b))
+		str := strconv.Quote(string(x.B))
 		str = str[1 : len(str)-1]
 		writef("'%s'", str)
 	case *numLit:
@@ -447,10 +447,10 @@ func (p *printer) str(v interface{}) {
 		case floatKind:
 			p.writef("float & ")
 		}
-		p.writef("%v", x.op)
-		p.str(x.value)
+		p.writef("%v", x.Op)
+		p.str(x.Expr)
 	case *interpolation:
-		for i, e := range x.parts {
+		for i, e := range x.Parts {
 			if i != 0 {
 				write("+")
 			}
@@ -469,7 +469,7 @@ func (p *printer) str(v interface{}) {
 		}
 		ln := 0
 		if n != nil {
-			x, _ := n.v.Int64()
+			x, _ := n.X.Int64()
 			ln = int(x)
 		}
 		open := false
@@ -532,7 +532,7 @@ func (p *printer) str(v interface{}) {
 	case *top:
 		write("_") // ⊤
 	case *basicType:
-		write(x.k.String())
+		write(x.K.String())
 
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))

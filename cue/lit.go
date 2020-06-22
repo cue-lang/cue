@@ -52,7 +52,7 @@ func (p *litParser) parse(l *ast.BasicLit) (n value) {
 			kind = intKind
 		}
 		n := newNum(newExpr(l), kind, 0)
-		if err = p.num.Decimal(&n.v); err != nil {
+		if err = p.num.Decimal(&n.X); err != nil {
 			return ctx.mkErr(newNode(l), err)
 		}
 		return n

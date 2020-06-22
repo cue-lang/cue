@@ -54,8 +54,8 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 	left = convertBuiltin(left)
 	right = convertBuiltin(right)
 
-	leftKind := left.kind()
-	rightKind := right.kind()
+	leftKind := left.Kind()
+	rightKind := right.Kind()
 	kind, invert, msg := matchBinOpKind(op, leftKind, rightKind)
 	if kind == bottomKind {
 		simplify := func(v, orig value) value {
@@ -63,7 +63,7 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 			case *disjunction:
 				return orig
 			case *binaryExpr:
-				if x.op == opDisjunction {
+				if x.Op == opDisjunction {
 					return orig
 				}
 			default:
@@ -73,8 +73,8 @@ func binOp(ctx *context, src source, op op, left, right evaluated) (result evalu
 		}
 		var l, r value = left, right
 		if x, ok := src.(*binaryExpr); ok {
-			l = simplify(x.left, left)
-			r = simplify(x.right, right)
+			l = simplify(x.X, left)
+			r = simplify(x.Y, right)
 		}
 		return ctx.mkErr(src, msg, op, ctx.str(l), ctx.str(r), leftKind, rightKind)
 	}
@@ -151,24 +151,24 @@ func distribute(ctx *context, src source, op op, x, y evaluated) evaluated {
 
 func dist(ctx *context, d *disjunction, mark bool, op op, x, y mVal) {
 	if dx, ok := x.val.(*disjunction); ok {
-		if dx.hasDefaults {
+		if dx.HasDefaults {
 			mark = true
-			d.hasDefaults = true
+			d.HasDefaults = true
 		}
-		for _, dxv := range dx.values {
-			m := dxv.marked || !dx.hasDefaults
-			dist(ctx, d, mark, op, mVal{dxv.val.evalPartial(ctx), m}, y)
+		for _, dxv := range dx.Values {
+			m := dxv.Default || !dx.HasDefaults
+			dist(ctx, d, mark, op, mVal{dxv.Val.evalPartial(ctx), m}, y)
 		}
 		return
 	}
 	if dy, ok := y.val.(*disjunction); ok {
-		if dy.hasDefaults {
+		if dy.HasDefaults {
 			mark = true
-			d.hasDefaults = true
+			d.HasDefaults = true
 		}
-		for _, dxy := range dy.values {
-			m := dxy.marked || !dy.hasDefaults
-			dist(ctx, d, mark, op, x, mVal{dxy.val.evalPartial(ctx), m})
+		for _, dxy := range dy.Values {
+			m := dxy.Default || !dy.HasDefaults
+			dist(ctx, d, mark, op, x, mVal{dxy.Val.evalPartial(ctx), m})
 		}
 		return
 	}
@@ -191,7 +191,7 @@ func (x *unification) add(ctx *context, src source, v evaluated) evaluated {
 		progress = false
 		k := 0
 
-		for i, vx := range x.values {
+		for i, vx := range x.Values {
 			a := binOp(ctx, src, opUnify, vx, v)
 			switch _, isUnify := a.(*unification); {
 			case isBottom(a):
@@ -200,7 +200,7 @@ func (x *unification) add(ctx *context, src source, v evaluated) evaluated {
 				}
 				fallthrough
 			case isUnify:
-				x.values[k] = x.values[i]
+				x.Values[k] = x.Values[i]
 				k++
 				continue
 			}
@@ -214,9 +214,9 @@ func (x *unification) add(ctx *context, src source, v evaluated) evaluated {
 		if k == 0 {
 			return v
 		}
-		x.values = x.values[:k]
+		x.Values = x.Values[:k]
 	}
-	x.values = append(x.values, v)
+	x.Values = append(x.Values, v)
 	return nil
 }
 
@@ -224,9 +224,9 @@ func (x *unification) binOp(ctx *context, src source, op op, other evaluated) ev
 	if _, isUnify := op.unifyType(); isUnify {
 		// Cannot be checked unification.
 		u := &unification{baseValue: baseValue{src}}
-		u.values = append(u.values, x.values...)
+		u.Values = append(u.Values, x.Values...)
 		if y, ok := other.(*unification); ok {
-			for _, vy := range y.values {
+			for _, vy := range y.Values {
 				if v := u.add(ctx, src, vy); v != nil {
 					return v
 				}
@@ -249,7 +249,7 @@ func (x *top) binOp(ctx *context, src source, op op, other evaluated) evaluated 
 }
 
 func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) evaluated {
-	k := unifyType(x.kind(), other.kind())
+	k := unifyType(x.Kind(), other.Kind())
 	switch y := other.(type) {
 	case *basicType:
 		switch op {
@@ -266,7 +266,7 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 
 	case *numLit:
 		if op == opUnify || op == opUnifyUnchecked {
-			if k == y.k {
+			if k == y.K {
 				return y
 			}
 			return y.specialize(k)
@@ -284,7 +284,7 @@ func (x *basicType) binOp(ctx *context, src source, op op, other evaluated) eval
 
 func checkBounds(ctx *context, src source, r *bound, op op, a, b evaluated) evaluated {
 	v := binOp(ctx, src, op, a, b)
-	if isBottom(v) || !v.(*boolLit).b {
+	if isBottom(v) || !v.(*boolLit).B {
 		return errOutOfBounds(ctx, src.Pos(), r, a)
 	}
 	return nil
@@ -296,7 +296,7 @@ func errOutOfBounds(ctx *context, pos token.Pos, r *bound, v evaluated) *bottom 
 	}
 	e := mkBin(ctx, pos, opUnify, r, v)
 	msg := "invalid value %v (out of bound %v)"
-	switch r.op {
+	switch r.Op {
 	case opNeq, opNMat:
 		msg = "invalid value %v (excluded by %v)"
 	case opMat:
@@ -326,35 +326,35 @@ func opInfo(op op) (cmp op, norm int) {
 }
 
 func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluated {
-	xv := x.value.(evaluated)
+	xv := x.Expr.(evaluated)
 
 	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
 	case opUnify, opUnifyUnchecked:
-		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
+		k, _, msg := matchBinOpKind(opUnify, x.Kind(), other.Kind())
 		if k == bottomKind {
-			return ctx.mkErr(src, msg, opUnify, ctx.str(x), ctx.str(other), x.kind(), other.kind())
+			return ctx.mkErr(src, msg, opUnify, ctx.str(x), ctx.str(other), x.Kind(), other.Kind())
 		}
 		switch y := other.(type) {
 		case *basicType:
-			k := unifyType(x.k, y.kind())
+			k := unifyType(x.k, y.Kind())
 			if k == x.k {
 				return x
 			}
-			return newBound(ctx, newSrc.base(), x.op, k, xv)
+			return newBound(ctx, newSrc.base(), x.Op, k, xv)
 
 		case *bound:
-			yv := y.value.(evaluated)
-			if !xv.kind().isGround() || !yv.kind().isGround() {
+			yv := y.Expr.(evaluated)
+			if !xv.Kind().isGround() || !yv.Kind().isGround() {
 				return ctx.mkErr(newSrc, codeIncomplete, "cannot add incomplete values")
 			}
 
-			cmp, xCat := opInfo(x.op)
-			_, yCat := opInfo(y.op)
+			cmp, xCat := opInfo(x.Op)
+			_, yCat := opInfo(y.Op)
 
 			switch {
 			case xCat == yCat:
-				if x.op == opNeq || x.op == opMat || x.op == opNMat {
+				if x.Op == opNeq || x.Op == opMat || x.Op == opNMat {
 					if test(ctx, x, opEql, xv, yv) {
 						return x
 					}
@@ -386,31 +386,31 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 				if xCat == -1 {
 					x, y = y, x
 				}
-				a, aOK := x.value.(evaluated).(*numLit)
-				b, bOK := y.value.(evaluated).(*numLit)
+				a, aOK := x.Expr.(evaluated).(*numLit)
+				b, bOK := y.Expr.(evaluated).(*numLit)
 
 				if !aOK || !bOK {
 					break
 				}
 
 				var d, lo, hi apd.Decimal
-				lo.Set(&a.v)
-				hi.Set(&b.v)
+				lo.Set(&a.X)
+				hi.Set(&b.X)
 				if k&floatKind == 0 {
 					// Readjust bounds for integers.
-					if x.op == opGeq {
+					if x.Op == opGeq {
 						// >=3.4  ==>  >=4
-						_, _ = apd.BaseContext.Ceil(&lo, &a.v)
+						_, _ = apd.BaseContext.Ceil(&lo, &a.X)
 					} else {
 						// >3.4  ==>  >3
-						_, _ = apd.BaseContext.Floor(&lo, &a.v)
+						_, _ = apd.BaseContext.Floor(&lo, &a.X)
 					}
-					if y.op == opLeq {
+					if y.Op == opLeq {
 						// <=2.3  ==>  <= 2
-						_, _ = apd.BaseContext.Floor(&hi, &b.v)
+						_, _ = apd.BaseContext.Floor(&hi, &b.X)
 					} else {
 						// <2.3   ==>  < 3
-						_, _ = apd.BaseContext.Ceil(&hi, &b.v)
+						_, _ = apd.BaseContext.Ceil(&hi, &b.X)
 					}
 				}
 
@@ -451,23 +451,23 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 
 				case diff == 1:
 					if k&floatKind == 0 {
-						if x.op == opGeq && y.op == opLss {
+						if x.Op == opGeq && y.Op == opLss {
 							return n.set(&lo)
 						}
-						if x.op == opGtr && y.op == opLeq {
+						if x.Op == opGtr && y.Op == opLeq {
 							return n.set(&hi)
 						}
 					}
 
 				case diff == 2:
-					if k&floatKind == 0 && x.op == opGtr && y.op == opLss {
+					if k&floatKind == 0 && x.Op == opGtr && y.Op == opLss {
 						_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &lo)
 						return n.set(&d)
 
 					}
 
 				case diff == 0:
-					if x.op == opGeq && y.op == opLeq {
+					if x.Op == opGeq && y.Op == opLeq {
 						return n.set(&lo)
 					}
 					fallthrough
@@ -477,24 +477,24 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 						ctx.str(x), ctx.str(y))
 				}
 
-			case x.op == opNeq:
-				if !test(ctx, x, y.op, xv, yv) {
+			case x.Op == opNeq:
+				if !test(ctx, x, y.Op, xv, yv) {
 					return y
 				}
 
-			case y.op == opNeq:
-				if !test(ctx, x, x.op, yv, xv) {
+			case y.Op == opNeq:
+				if !test(ctx, x, x.Op, yv, xv) {
 					return x
 				}
 			}
 			return &unification{newSrc, []evaluated{x, y}}
 
 		case *numLit:
-			if err := checkBounds(ctx, src, x, x.op, y, xv); err != nil {
+			if err := checkBounds(ctx, src, x, x.Op, y, xv); err != nil {
 				return err
 			}
 			// Narrow down number type.
-			if y.k != k {
+			if y.K != k {
 				return y.specialize(k)
 			}
 			return other
@@ -502,7 +502,7 @@ func (x *bound) binOp(ctx *context, src source, op op, other evaluated) evaluate
 		case *nullLit, *boolLit, *durationLit, *list, *structLit, *stringLit, *bytesLit:
 			// All remaining concrete types. This includes non-comparable types
 			// for comparison to null.
-			if err := checkBounds(ctx, src, x, x.op, y, xv); err != nil {
+			if err := checkBounds(ctx, src, x, x.Op, y, xv); err != nil {
 				return err
 			}
 			return y
@@ -515,14 +515,14 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 	newSrc := binSrc(src.Pos(), op, x, other)
 	switch op {
 	case opUnify, opUnifyUnchecked:
-		k, _, msg := matchBinOpKind(opUnify, x.kind(), other.kind())
+		k, _, msg := matchBinOpKind(opUnify, x.Kind(), other.Kind())
 		if k == bottomKind {
-			return ctx.mkErr(src, msg, op, ctx.str(x), ctx.str(other), x.kind(), other.kind())
+			return ctx.mkErr(src, msg, op, ctx.str(x), ctx.str(other), x.Kind(), other.Kind())
 		}
 		switch y := other.(type) {
 		case *basicType:
-			k := unifyType(x.kind(), y.kind())
-			if k == x.kind() {
+			k := unifyType(x.Kind(), y.Kind())
+			if k == x.Kind() {
 				return x
 			}
 			return &unification{newSrc, []evaluated{x, y}}
@@ -538,7 +538,7 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 				return err
 			}
 			// Narrow down number type.
-			if y.k != k {
+			if y.K != k {
 				return y.specialize(k)
 			}
 			return other
@@ -556,23 +556,23 @@ func (x *customValidator) binOp(ctx *context, src source, op op, other evaluated
 }
 
 func (x *customValidator) check(ctx *context, v evaluated) evaluated {
-	args := make([]evaluated, 1+len(x.args))
+	args := make([]evaluated, 1+len(x.Args))
 	args[0] = v
-	for i, v := range x.args {
+	for i, v := range x.Args {
 		args[1+i] = v.(evaluated)
 	}
-	res := x.call.call(ctx, x, args...)
+	res := x.Builtin.call(ctx, x, args...)
 	if isBottom(res) {
 		return res.(evaluated)
 	}
 	if b, ok := res.(*boolLit); !ok {
 		// should never reach here
 		return ctx.mkErr(x, "invalid custom validator")
-	} else if !b.b {
+	} else if !b.B {
 		var buf bytes.Buffer
-		fmt.Fprintf(&buf, "%s.%s", ctx.LabelStr(x.call.pkg), x.call.Name)
+		fmt.Fprintf(&buf, "%s.%s", ctx.LabelStr(x.Builtin.pkg), x.Builtin.Name)
 		buf.WriteString("(")
-		for _, a := range x.args {
+		for _, a := range x.Args {
 			buf.WriteString(ctx.str(a))
 		}
 		buf.WriteString(")")
@@ -791,9 +791,9 @@ func (x *nullLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 	case *nullLit:
 		switch op {
 		case opEql:
-			return &boolLit{baseValue: src.base(), b: true}
+			return &boolLit{baseValue: src.base(), B: true}
 		case opNeq:
-			return &boolLit{baseValue: src.base(), b: false}
+			return &boolLit{baseValue: src.base(), B: false}
 		case opUnify, opUnifyUnchecked:
 			return x
 		}
@@ -808,9 +808,9 @@ func (x *nullLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 	default:
 		switch op {
 		case opEql:
-			return &boolLit{baseValue: src.base(), b: false}
+			return &boolLit{baseValue: src.base(), B: false}
 		case opNeq:
-			return &boolLit{baseValue: src.base(), b: true}
+			return &boolLit{baseValue: src.base(), B: true}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -825,18 +825,18 @@ func (x *boolLit) binOp(ctx *context, src source, op op, other evaluated) evalua
 	case *boolLit:
 		switch op {
 		case opUnify, opUnifyUnchecked:
-			if x.b != y.b {
-				return ctx.mkErr(x, "conflicting values %v and %v", x.b, y.b)
+			if x.B != y.B {
+				return ctx.mkErr(x, "conflicting values %v and %v", x.B, y.B)
 			}
 			return x
 		case opLand:
-			return boolTonode(src, x.b && y.b)
+			return boolTonode(src, x.B && y.B)
 		case opLor:
-			return boolTonode(src, x.b || y.b)
+			return boolTonode(src, x.B || y.B)
 		case opEql:
-			return boolTonode(src, x.b == y.b)
+			return boolTonode(src, x.B == y.B)
 		case opNeq:
-			return boolTonode(src, x.b != y.b)
+			return boolTonode(src, x.B != y.B)
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -854,43 +854,43 @@ func (x *stringLit) binOp(ctx *context, src source, op op, other evaluated) eval
 		switch op {
 		case opUnify, opUnifyUnchecked:
 			str := other.strValue()
-			if x.str != str {
+			if x.Str != str {
 				src := mkBin(ctx, src.Pos(), op, x, other)
 				return ctx.mkErr(src, "conflicting values %v and %v",
 					ctx.str(x), ctx.str(y))
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
-			return cmpTonode(src, op, strings.Compare(x.str, str))
+			return cmpTonode(src, op, strings.Compare(x.Str, str))
 		case opAdd:
 			src := binSrc(src.Pos(), op, x, other)
-			return &stringLit{src, x.str + str, nil}
+			return &stringLit{src, x.Str + str, nil}
 		case opMat:
-			if y.re == nil {
+			if y.RE == nil {
 				// This really should not happen, but leave in for safety.
-				b, err := regexp.MatchString(str, x.str)
+				b, err := regexp.MatchString(str, x.Str)
 				if err != nil {
 					return ctx.mkErr(src, "error parsing regexp: %v", err)
 				}
 				return boolTonode(src, b)
 			}
-			return boolTonode(src, y.re.MatchString(x.str))
+			return boolTonode(src, y.RE.MatchString(x.Str))
 		case opNMat:
-			if y.re == nil {
+			if y.RE == nil {
 				// This really should not happen, but leave in for safety.
-				b, err := regexp.MatchString(str, x.str)
+				b, err := regexp.MatchString(str, x.Str)
 				if err != nil {
 					return ctx.mkErr(src, "error parsing regexp: %v", err)
 				}
 				return boolTonode(src, !b)
 			}
-			return boolTonode(src, !y.re.MatchString(x.str))
+			return boolTonode(src, !y.RE.MatchString(x.Str))
 		}
 	case *numLit:
 		switch op {
 		case opMul:
 			src := binSrc(src.Pos(), op, x, other)
-			return &stringLit{src, strings.Repeat(x.str, y.intValue(ctx)), nil}
+			return &stringLit{src, strings.Repeat(x.Str, y.intValue(ctx)), nil}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -904,18 +904,18 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 	// TODO: rangelit
 
 	case *bytesLit:
-		b := y.b
+		b := y.B
 		switch op {
 		case opUnify, opUnifyUnchecked:
-			if !bytes.Equal(x.b, b) {
+			if !bytes.Equal(x.B, b) {
 				return ctx.mkErr(x, "conflicting values %v and %v",
 					ctx.str(x), ctx.str(y))
 			}
 			return x
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
-			return cmpTonode(src, op, bytes.Compare(x.b, b))
+			return cmpTonode(src, op, bytes.Compare(x.B, b))
 		case opAdd:
-			copy := append([]byte(nil), x.b...)
+			copy := append([]byte(nil), x.B...)
 			copy = append(copy, b...)
 			return &bytesLit{binSrc(src.Pos(), op, x, other), copy, nil}
 		}
@@ -924,7 +924,7 @@ func (x *bytesLit) binOp(ctx *context, src source, op op, other evaluated) evalu
 		switch op {
 		case opMul:
 			src := binSrc(src.Pos(), op, x, other)
-			return &bytesLit{src, bytes.Repeat(x.b, y.intValue(ctx)), nil}
+			return &bytesLit{src, bytes.Repeat(x.B, y.intValue(ctx)), nil}
 		}
 	}
 	return ctx.mkIncompatible(src, op, x, other)
@@ -935,7 +935,7 @@ func test(ctx *context, src source, op op, a, b evaluated) bool {
 	if isBottom(v) {
 		return false
 	}
-	return v.(*boolLit).b
+	return v.(*boolLit).B
 }
 
 func leq(ctx *context, src source, a, b evaluated) bool {
@@ -946,7 +946,7 @@ func leq(ctx *context, src source, a, b evaluated) bool {
 	if isBottom(v) {
 		return false
 	}
-	return v.(*boolLit).b
+	return v.(*boolLit).B
 }
 
 // TODO: should these go?
@@ -955,11 +955,11 @@ func maxNum(v value) value {
 	case *numLit:
 		return x
 	case *bound:
-		switch x.op {
+		switch x.Op {
 		case opLeq:
-			return x.value
+			return x.Expr
 		case opLss:
-			return &binaryExpr{x.baseValue, opSub, x.value, one}
+			return &binaryExpr{x.baseValue, opSub, x.Expr, one}
 		}
 		return &basicType{x.baseValue, intKind}
 	}
@@ -971,11 +971,11 @@ func minNum(v value) value {
 	case *numLit:
 		return x
 	case *bound:
-		switch x.op {
+		switch x.Op {
 		case opGeq:
-			return x.value
+			return x.Expr
 		case opGtr:
-			return &binaryExpr{x.baseValue, opAdd, x.value, one}
+			return &binaryExpr{x.baseValue, opAdd, x.Expr, one}
 		}
 		return &basicType{x.baseValue, intKind}
 	}
@@ -1008,59 +1008,59 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 			return y.binOp(ctx, src, op, x)
 		}
 	case *numLit:
-		k, _, _ := matchBinOpKind(op, x.kind(), y.kind())
+		k, _, _ := matchBinOpKind(op, x.Kind(), y.Kind())
 		if k == bottomKind {
 			break
 		}
 		switch op {
 		case opLss, opLeq, opEql, opNeq, opGeq, opGtr:
-			return cmpTonode(src, op, x.v.Cmp(&y.v))
+			return cmpTonode(src, op, x.X.Cmp(&y.X))
 		}
 		n := newNum(src.base(), k, x.rep|y.rep)
 		switch op {
 		case opUnify, opUnifyUnchecked:
-			if x.v.Cmp(&y.v) != 0 {
+			if x.X.Cmp(&y.X) != 0 {
 				src = mkBin(ctx, src.Pos(), op, x, other)
 				return ctx.mkErr(src, "conflicting values %v and %v",
 					ctx.str(x), ctx.str(y))
 			}
-			if k != x.k {
-				n.v = x.v
+			if k != x.K {
+				n.X = x.X
 				return n
 			}
 			return x
 		case opAdd:
-			_, _ = ctx.Add(&n.v, &x.v, &y.v)
+			_, _ = ctx.Add(&n.X, &x.X, &y.X)
 		case opSub:
-			_, _ = ctx.Sub(&n.v, &x.v, &y.v)
+			_, _ = ctx.Sub(&n.X, &x.X, &y.X)
 		case opMul:
-			_, _ = ctx.Mul(&n.v, &x.v, &y.v)
+			_, _ = ctx.Mul(&n.X, &x.X, &y.X)
 		case opQuo:
-			cond, err := ctx.Quo(&n.v, &x.v, &y.v)
+			cond, err := ctx.Quo(&n.X, &x.X, &y.X)
 			if err != nil {
 				return ctx.mkErr(src, err.Error())
 			}
 			if cond.DivisionByZero() {
 				return ctx.mkErr(src, "division by zero")
 			}
-			n.k = floatKind
+			n.K = floatKind
 		case opIDiv:
-			if y.v.IsZero() {
+			if y.X.IsZero() {
 				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Div, x, y)
 		case opIMod:
-			if y.v.IsZero() {
+			if y.X.IsZero() {
 				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Mod, x, y)
 		case opIQuo:
-			if y.v.IsZero() {
+			if y.X.IsZero() {
 				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Quo, x, y)
 		case opIRem:
-			if y.v.IsZero() {
+			if y.X.IsZero() {
 				return ctx.mkErr(src, "division by zero")
 			}
 			intOp(ctx, n, (*big.Int).Rem, x, y)
@@ -1071,7 +1071,7 @@ func (x *numLit) binOp(ctx *context, src source, op op, other evaluated) evaluat
 		if op == opMul {
 			fd := float64(y.d)
 			// TODO: check range
-			f, _ := x.v.Float64()
+			f, _ := x.X.Float64()
 			d := time.Duration(f * fd)
 			return &durationLit{binSrc(src.Pos(), op, x, other), d}
 		}
@@ -1083,20 +1083,20 @@ type intFunc func(z, x, y *big.Int) *big.Int
 
 func intOp(ctx *context, n *numLit, fn intFunc, a, b *numLit) {
 	var x, y apd.Decimal
-	_, _ = ctx.RoundToIntegralValue(&x, &a.v)
+	_, _ = ctx.RoundToIntegralValue(&x, &a.X)
 	if x.Negative {
 		x.Coeff.Neg(&x.Coeff)
 	}
-	_, _ = ctx.RoundToIntegralValue(&y, &b.v)
+	_, _ = ctx.RoundToIntegralValue(&y, &b.X)
 	if y.Negative {
 		y.Coeff.Neg(&y.Coeff)
 	}
-	fn(&n.v.Coeff, &x.Coeff, &y.Coeff)
-	if n.v.Coeff.Sign() < 0 {
-		n.v.Coeff.Neg(&n.v.Coeff)
-		n.v.Negative = true
+	fn(&n.X.Coeff, &x.Coeff, &y.Coeff)
+	if n.X.Coeff.Sign() < 0 {
+		n.X.Coeff.Neg(&n.X.Coeff)
+		n.X.Negative = true
 	}
-	n.k = intKind
+	n.K = intKind
 }
 
 // TODO: check overflow
@@ -1133,11 +1133,11 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 			n := newFloat(src.base(), base10).setInt64(int64(x.d))
 			d := apd.New(int64(y.d), 0)
 			// TODO: check result if this code becomes undead.
-			_, _ = ctx.Quo(&n.v, &n.v, d)
+			_, _ = ctx.Quo(&n.X, &n.X, d)
 			return n
 		case opIRem:
 			n := newInt(src.base(), base10).setInt64(int64(x.d % y.d))
-			n.v.Exponent = -9
+			n.X.Exponent = -9
 			return n
 		}
 
@@ -1145,12 +1145,12 @@ func (x *durationLit) binOp(ctx *context, src source, op op, other evaluated) ev
 		switch op {
 		case opMul:
 			// TODO: check range
-			f, _ := y.v.Float64()
+			f, _ := y.X.Float64()
 			d := time.Duration(float64(x.d) * f)
 			return &durationLit{binSrc(src.Pos(), op, x, other), d}
 		case opQuo:
 			// TODO: check range
-			f, _ := y.v.Float64()
+			f, _ := y.X.Float64()
 			d := time.Duration(float64(x.d) * f)
 			return &durationLit{binSrc(src.Pos(), op, x, other), d}
 		case opIRem:
@@ -1241,7 +1241,7 @@ func (x *list) binOp(ctx *context, src source, op op, other evaluated) evaluated
 		return n
 
 	case opMul:
-		k := other.kind()
+		k := other.Kind()
 		if !k.isAnyOf(intKind) {
 			panic("multiplication must be int type")
 		}

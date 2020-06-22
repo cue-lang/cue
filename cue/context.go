@@ -87,7 +87,7 @@ func (c *context) processDelayedConstraints() evaluated {
 	cons := c.constraints
 	c.constraints = c.constraints[:0]
 	for _, dc := range cons {
-		v := binOp(c, dc, dc.op, dc.left.evalPartial(c), dc.right.evalPartial(c))
+		v := binOp(c, dc, dc.Op, dc.X.evalPartial(c), dc.Y.evalPartial(c))
 		if isBottom(v) {
 			return v
 		}

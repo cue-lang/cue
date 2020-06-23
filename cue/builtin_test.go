@@ -115,13 +115,13 @@ func TestBuiltins(t *testing.T) {
 		`_|_(error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3))`,
+		`_|_(error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n", {a:<5, b:int})`),
-		`_|_(error in call to encoding/yaml.Validate: value not an instance)`,
+		`_|_(error in call to encoding/yaml.Validate: b: incomplete value (int))`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<3})`),
 		`_|_(error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3))`,

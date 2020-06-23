@@ -94,9 +94,23 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 			return false, err
 		}
 
-		if err := v.Subsume(inst.Value(), cue.Final()); err != nil {
+		// TODO: consider using subsumption again here.
+		// Alternatives:
+		// - allow definition of non-concrete list,
+		//   like list.Of(int), or []int.
+		// - Introduce ! in addition to ?, allowing:
+		//   list!: [...]
+		// if err := v.Subsume(inst.Value(), cue.Final()); err != nil {
+		// 	return false, err
+		// }
+		x := v.Unify(inst.Value())
+		if err := x.Err(); err != nil {
 			return false, err
 		}
+		if err := x.Validate(cue.Concrete(true)); err != nil {
+			return false, err
+		}
+
 	}
 }
 

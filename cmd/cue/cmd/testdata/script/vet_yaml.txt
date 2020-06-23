@@ -2,11 +2,9 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-phrases: error in call to encoding/yaml.Validate: missing field "text":
+phrases: error in call to encoding/yaml.Validate: phrases.quote1.text: incomplete value (!=""):
     ./yaml.cue:19:10
-    ./yaml.cue:4:11
     ./yaml.cue:11:17
-    yaml.Validate:4:6
 -- yaml.cue --
 import "encoding/yaml"
 

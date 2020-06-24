@@ -23,7 +23,6 @@ import (
 	"math/big"
 	"strconv"
 	"strings"
-	"unicode"
 
 	"github.com/cockroachdb/apd/v2"
 
@@ -508,37 +507,15 @@ func (v *valueData) appendPath(a []string, idx *index) ([]string, kind) {
 	case listKind:
 		a = append(a, strconv.FormatInt(int64(v.index), 10))
 	case structKind:
-		f := idx.LabelStr(v.arc.Label)
-		if l := v.arc.Label; !l.IsDef() && !l.IsHidden() {
-			if !isIdent(f) && !isNumber(f) {
-				f = quote(f, '"')
+		label := idx.LabelStr(v.arc.Label)
+		if f := v.arc.Label; !f.IsDef() && !f.IsHidden() {
+			if !ast.IsValidIdent(label) {
+				label = strconv.Quote(label)
 			}
 		}
-		a = append(a, f)
+		a = append(a, label)
 	}
 	return a, v.arc.Value.Kind()
-}
-
-var validIdent = []*unicode.RangeTable{unicode.L, unicode.N}
-
-func isIdent(s string) bool {
-	valid := []*unicode.RangeTable{unicode.Letter}
-	for _, r := range s {
-		if !unicode.In(r, valid...) && r != '_' {
-			return false
-		}
-		valid = validIdent
-	}
-	return true
-}
-
-func isNumber(s string) bool {
-	for _, r := range s {
-		if r < '0' || '9' < r {
-			return false
-		}
-	}
-	return true
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,

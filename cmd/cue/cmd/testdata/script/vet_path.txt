@@ -4,10 +4,7 @@ cmp stderr expect-stderr
 deployment.Booster.name: invalid value "Booster" (excluded by !~"^[A-Z]"):
     ./services.cue:1:29
     ./services.jsonl:3:13
-service."""
-        Supplement
-        foo
-        """.name: invalid value "Supplement\nfoo" (excluded by !~"^[A-Z]"):
+service."Supplement\nfoo".name: invalid value "Supplement\nfoo" (excluded by !~"^[A-Z]"):
     ./services.cue:2:26
     ./services.jsonl:3:13
 -- services.cue --

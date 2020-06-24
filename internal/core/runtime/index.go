@@ -52,6 +52,8 @@ var SharedIndex = newSharedIndex()
 
 var SharedIndexNew = newSharedIndex()
 
+var SharedRuntimeNew = &Runtime{index: SharedIndexNew}
+
 func newSharedIndex() *Index {
 	i := &Index{
 		labelMap:      map[string]int64{"": 0},

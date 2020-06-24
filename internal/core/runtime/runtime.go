@@ -34,6 +34,10 @@ func New() *Runtime {
 	}
 }
 
+func NewWithIndex(x *Index) *Runtime {
+	return &Runtime{index: x}
+}
+
 func (x *Runtime) IndexToString(i int64) string {
 	return x.index.IndexToString(i)
 }

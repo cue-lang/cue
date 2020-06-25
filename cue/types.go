@@ -1596,15 +1596,7 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	var value evaluated
-	if v, ok := x.(Value); ok {
-		if ctx.index != v.ctx().index {
-			panic("value of type Value is not created with same Runtime as Instance")
-		}
-		value = v.eval(ctx)
-	} else {
-		value = convert(ctx, root, true, x)
-	}
+	value := convert(ctx, root, true, x)
 	a := v.path.arc
 	a.v = mkBin(ctx, v.Pos(), opUnify, root, value)
 	a.cache = a.v.evalPartial(ctx)

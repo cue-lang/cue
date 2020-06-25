@@ -842,6 +842,34 @@ func TestFill(t *testing.T) {
 	}
 }
 
+func TestFill2(t *testing.T) {
+	r := &Runtime{}
+
+	root, err := r.Compile("test", `
+	#Provider: {
+		ID: string
+		notConcrete: bool
+	}
+	`)
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	spec := root.LookupDef("#Provider")
+	providerInstance := spec.Fill("12345", "ID")
+	root, err = root.Fill(providerInstance, "providers", "myprovider")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	got := fmt.Sprint(root.Value())
+
+	if got != `{#Provider: C{ID: string, notConcrete: bool}, providers: {myprovider: C{ID: (string & "12345"), notConcrete: bool}}}` {
+		t.Error(got)
+	}
+}
+
 func TestValue_LookupDef(t *testing.T) {
 	r := &Runtime{}
 

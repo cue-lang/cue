@@ -214,6 +214,12 @@ func convertRec(ctx *context, src source, nilIsTop bool, x interface{}) evaluate
 		}
 		return &nullLit{src.base()}
 
+	case Value:
+		if ctx.index != v.ctx().index {
+			panic("value of type Value is not created with same Runtime as Instance")
+		}
+		return v.eval(ctx)
+
 	case *ast.File:
 		x := newVisitorCtx(ctx, nil, nil, nil, false)
 		return ctx.manifest(x.walk(v))

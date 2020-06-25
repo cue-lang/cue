@@ -198,11 +198,11 @@ func TestValueType(t *testing.T) {
 			inst := getInstance(t, tc.value)
 			v := inst.Lookup("v")
 			if got := v.Kind(); got != tc.kind {
-				t.Errorf("Kind: got %x; want %x", got, tc.kind)
+				t.Errorf("Kind: got %x; want %x", int(got), int(tc.kind))
 			}
 			want := tc.incompleteKind | BottomKind
 			if got := v.IncompleteKind(); got != want {
-				t.Errorf("IncompleteKind: got %x; want %x", got, want)
+				t.Errorf("IncompleteKind: got %x; want %x", int(got), int(want))
 			}
 			if got := v.IsConcrete(); got != tc.concrete {
 				t.Errorf("IsConcrete: got %v; want %v", got, tc.concrete)

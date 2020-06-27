@@ -25,6 +25,10 @@ b: _|_ // conflicting values 210 and 200
   x: (〈0;x〉 + 1)
 }
 -- out/eval --
+Errors:
+incompatible values *adt.Num and *adt.Num
+
+Result:
 (_|_){
   // [eval]
   a: (int){ 100 }

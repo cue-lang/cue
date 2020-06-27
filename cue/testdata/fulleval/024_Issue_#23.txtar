@@ -27,6 +27,10 @@ y: _|_ // ; empty disjunction: conflicting values 2 and 3
   })
 }
 -- out/eval --
+Errors:
+incompatible values *adt.Num and *adt.Num
+
+Result:
 (_|_){
   // [eval]
   x: (struct){ |((struct){

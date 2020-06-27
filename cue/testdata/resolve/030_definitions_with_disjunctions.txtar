@@ -60,6 +60,10 @@ baz: #Foo & {
   }
 }
 -- out/eval --
+Errors:
+field `c` not allowed
+
+Result:
 (_|_){
   // [eval]
   #Foo: (struct){ |((#struct){

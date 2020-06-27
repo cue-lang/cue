@@ -51,6 +51,10 @@ d: _|_ // field "aaa" not allowed in closed struct
   })
 }
 -- out/eval --
+Errors:
+field `aaa` not allowed
+
+Result:
 (_|_){
   // [eval]
   #A: (#struct){

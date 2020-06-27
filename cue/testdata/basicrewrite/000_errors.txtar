@@ -26,6 +26,13 @@ e: true
   e: (_|_(from source) == _|_(from source))
 }
 -- out/eval --
+Errors:
+from source:
+    ./in.cue:1:4
+from source:
+    ./in.cue:2:11
+
+Result:
 (_|_){
   // [user]
   a: (_|_){

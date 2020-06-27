@@ -33,6 +33,10 @@ f: true
   f: bool
 }
 -- out/eval --
+Errors:
+invalid value *adt.BasicType (mismatched types float and int)
+
+Result:
 (_|_){
   // [eval]
   a: (int){ 1 }

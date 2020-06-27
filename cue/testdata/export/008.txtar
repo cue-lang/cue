@@ -15,6 +15,10 @@ a: [_|_, // conflicting values 3 and 4
   }
 }
 -- out/eval --
+Errors:
+incompatible values *adt.Num and *adt.Num
+
+Result:
 (_|_){
   // [eval]
   a: (_|_){

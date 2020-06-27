@@ -8,6 +8,11 @@ y: {} // check that empty struct after reference works.
 k: { for v in e { v } }
 e: int
 -- out/eval --
+Errors:
+invalid operand e (found int, want list or struct):
+    ./in.cue:7:15
+
+Result:
 (_|_){
   // [eval]
   b: (struct){

@@ -63,6 +63,11 @@ V: #S & {
   })
 }
 -- out/eval --
+Errors:
+field `e` not allowed
+field `extra` not allowed
+
+Result:
 (_|_){
   // [eval]
   #S: (#struct){

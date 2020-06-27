@@ -103,6 +103,11 @@ a: _|_ // field "f3" not allowed in closed struct
   })
 }
 -- out/eval --
+Errors:
+cannot mix bulk optional fields with dynamic fields, embeddings, or comprehensions within the same struct
+field `f3` not allowed
+
+Result:
 (_|_){
   // [eval]
   #A: (#struct){

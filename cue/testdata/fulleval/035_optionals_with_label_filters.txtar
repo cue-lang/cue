@@ -101,6 +101,13 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
   }
 }
 -- out/eval --
+Errors:
+field `cmd` not allowed
+field `foo1` not allowed
+field `fooTest1` not allowed
+invalid value *adt.Vertex (out of bound *adt.BoundValue)
+
+Result:
 (_|_){
   // [eval]
   #JobID: (string){ =~"^[a-zA-Z]*$" }

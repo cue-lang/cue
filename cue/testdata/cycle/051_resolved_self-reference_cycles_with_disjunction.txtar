@@ -158,6 +158,11 @@ z3:  z1-3 & 8
   z3: 8
 }
 -- out/eval --
+Errors:
+incompatible values *adt.Num and *adt.Num:
+    ./in.cue:44:6
+
+Result:
 (_|_){
   // [eval]
   xa1: (int){ 8 }

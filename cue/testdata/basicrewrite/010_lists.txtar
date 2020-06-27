@@ -75,6 +75,15 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
   ])
 }
 -- out/eval --
+Errors:
+conflicting types
+invalid value *adt.Num (out of bound *adt.BoundValue)
+invalid list index d (type string):
+    ./in.cue:5:12
+invalid negative index *adt.Num:
+    ./in.cue:6:8
+
+Result:
 (_|_){
   // [eval]
   list: (#list){

@@ -38,6 +38,16 @@ m:  _|_ // invalid operation -false (- bool)
   m: -false
 }
 -- out/eval --
+Errors:
+invalid value *adt.BasicType (mismatched types string and int)
+value can never become concrete:
+    ./in.cue:7:5
+invalid operation +*adt.UnaryExpr (+ bool):
+    ./in.cue:8:5
+invalid operation -*adt.UnaryExpr (- bool):
+    ./in.cue:9:5
+
+Result:
 (_|_){
   // [eval]
   i: (int){ int }

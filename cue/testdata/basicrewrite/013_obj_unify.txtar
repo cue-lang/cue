@@ -74,6 +74,10 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
   }
 }
 -- out/eval --
+Errors:
+conflicting values struct and int
+
+Result:
 (_|_){
   // [eval]
   o1: (struct){

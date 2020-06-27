@@ -60,6 +60,11 @@ i: false
   err: (1 & 2)
 }
 -- out/eval --
+Errors:
+incompatible values *adt.Num and *adt.Num:
+    ./in.cue:2:4
+
+Result:
 (_|_){
   // [eval]
   a: (bool){ true }

@@ -17,6 +17,10 @@ a: #A & {
     }
 }
 -- out/eval --
+Errors:
+field `e` not allowed
+
+Result:
 (_|_){
   // [eval]
   #E: (#struct){

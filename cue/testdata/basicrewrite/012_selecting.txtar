@@ -59,6 +59,13 @@ h: _|_ // invalid operation: [3].b (type list does not support selection)
   ].b
 }
 -- out/eval --
+Errors:
+invalid struct selector 4 (type int):
+    ./in.cue:4:16
+invalid list index b (type string):
+    ./in.cue:7:13
+
+Result:
 (_|_){
   // [eval]
   obj: (struct){

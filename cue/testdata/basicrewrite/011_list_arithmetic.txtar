@@ -46,6 +46,11 @@ e: _|_ // negative number -1 multiplies list
   e: (〈0;list〉 * -1)
 }
 -- out/eval --
+Errors:
+cannot convert negative number to uint64:
+    ./in.cue:10:9
+
+Result:
 (_|_){
   // [eval]
   list: (#list){

@@ -26,6 +26,10 @@ e: _|_ // conflicting values true and false
   e: !true
 }
 -- out/eval --
+Errors:
+incompatible values *adt.Bool and *adt.Bool
+
+Result:
 (_|_){
   // [eval]
   t: (bool){ true }

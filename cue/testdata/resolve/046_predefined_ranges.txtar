@@ -28,6 +28,10 @@ e1: _|_ // invalid value 100000 (out of bound int & <=32767)
   e1: 100000
 }
 -- out/eval --
+Errors:
+invalid value *adt.Num (out of bound *adt.BoundValue)
+
+Result:
 (_|_){
   // [eval]
   k1: (int){ 44 }

@@ -32,6 +32,11 @@ e: _|_ // expression in interpolation must evaluate to a number kind or string (
   e: "\([])"
 }
 -- out/eval --
+Errors:
+invalid interpolation: cannot use *adt.Vertex (type list) as type string:
+    ./in.cue:7:4
+
+Result:
 (_|_){
   // [eval]
   a: (string){ "4" }

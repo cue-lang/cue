@@ -47,6 +47,11 @@ c4: _|_ // conflicting values 1.2 and ((>=1 & <2) & int) (mismatched types float
   c4: (1.2 & ((>=1 & <2) & int))
 }
 -- out/eval --
+Errors:
+invalid value *adt.BasicType (mismatched types int and float)
+invalid value *adt.Num (out of bound *adt.BoundValue)
+
+Result:
 (_|_){
   // [eval]
   r0: (int){ 1 }

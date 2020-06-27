@@ -137,6 +137,14 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
   e9: (>"a" & <1)
 }
 -- out/eval --
+Errors:
+bounds *adt.BoundValue *adt.BoundValue
+invalid value *adt.BoundValue (mismatched types (bool|string|bytes|list|struct|number) and null)
+invalid value *adt.BoundValue (mismatched types number and string)
+invalid value *adt.Null (mismatched types null and (bool|string|bytes|list|struct|number))
+invalid value *adt.Num (out of bound *adt.BoundValue)
+
+Result:
 (_|_){
   // [eval]
   i1: (int){ 5 }

@@ -16,6 +16,10 @@ e: b & { val: "foo" }
 f: b & { name: "str", val: 3 }
 
 -- out/eval --
+Errors:
+invalid value *adt.BasicType (mismatched types string and int)
+
+Result:
 (_|_){
   // [eval]
   a: (int){ |(*(int){ 1 }, (int){ int }) }

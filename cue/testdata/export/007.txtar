@@ -26,6 +26,11 @@ e: _|_ // undefined field "t"
   }
 }
 -- out/eval --
+Errors:
+undefined field c:
+    ./in.cue:1:41
+
+Result:
 (_|_){
   // [eval]
   #a: (#struct){

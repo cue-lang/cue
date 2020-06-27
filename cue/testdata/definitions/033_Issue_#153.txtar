@@ -61,6 +61,10 @@ Junk: {
   })
 }
 -- out/eval --
+Errors:
+field `b` not allowed
+
+Result:
 (_|_){
   // [eval]
   listOfCloseds: (_|_){

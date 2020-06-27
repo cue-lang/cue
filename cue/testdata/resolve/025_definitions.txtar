@@ -118,6 +118,10 @@ mixedRec: {
   }
 }
 -- out/eval --
+Errors:
+field `feild` not allowed
+
+Result:
 (_|_){
   // [eval]
   #Foo: (#struct){

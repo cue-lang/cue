@@ -94,6 +94,31 @@ e8: _|_ // invalid operation 1.0 mod 1 (mismatched types float and int)
   e8: (1.0 mod 1)
 }
 -- out/eval --
+Errors:
+failed arithmetic: division by zero:
+    ./in.cue:8:10
+failed arithmetic: division undefined:
+    ./in.cue:9:10
+division by zero:
+    ./in.cue:13:9
+division by zero:
+    ./in.cue:14:9
+division by zero:
+    ./in.cue:15:9
+division by zero:
+    ./in.cue:16:9
+invalid operands *adt.Num and *adt.String to '+' (type int and string):
+    ./in.cue:23:5
+invalid operands *adt.Num and *adt.Num to 'div' (type float and int):
+    ./in.cue:29:5
+invalid operands *adt.Num and *adt.Num to 'rem' (type int and float):
+    ./in.cue:30:5
+invalid operands *adt.Num and *adt.Num to 'quo' (type int and float):
+    ./in.cue:31:5
+invalid operands *adt.Num and *adt.Num to 'mod' (type float and int):
+    ./in.cue:32:5
+
+Result:
 (_|_){
   // [eval]
   i1: (int){ 1 }

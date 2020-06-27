@@ -40,6 +40,13 @@ e1: _|_ // invalid operation 'b' + "c" (mismatched types bytes and string)
   e1: ('b' + "c")
 }
 -- out/eval --
+Errors:
+invalid operands *adt.String and *adt.Bytes to '+' (type string and bytes):
+    ./in.cue:10:5
+invalid operands *adt.Bytes and *adt.String to '+' (type bytes and string):
+    ./in.cue:11:5
+
+Result:
 (_|_){
   // [eval]
   s0: (string){ "foobar" }

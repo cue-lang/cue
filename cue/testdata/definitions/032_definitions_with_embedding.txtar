@@ -80,6 +80,10 @@
   })
 }
 -- out/eval --
+Errors:
+field `d` not allowed
+
+Result:
 (_|_){
   // [eval]
   #E: (#struct){

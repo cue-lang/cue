@@ -133,6 +133,13 @@ n5: 2.5
   n5: ((>=1 & <=5) & 2.5)
 }
 -- out/eval --
+Errors:
+bounds *adt.BoundValue *adt.BoundValue
+invalid value *adt.BasicType (mismatched types string and number)
+invalid value *adt.BoundValue (mismatched types number and string)
+invalid value *adt.Num (out of bound *adt.BoundValue)
+
+Result:
 (_|_){
   // [eval]
   a1: (int){ 3 }

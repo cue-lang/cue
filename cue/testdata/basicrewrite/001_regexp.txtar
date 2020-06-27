@@ -61,6 +61,15 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
   e3: (!="a" & <5)
 }
 -- out/eval --
+Errors:
+invalid value *adt.BoundValue (mismatched types number and string)
+invalid value *adt.Vertex (out of bound *adt.BoundValue)
+cannot use *adt.Num (type int) as type (string|bytes):
+    ./in.cue:18:5
+cannot use *adt.Bool (type bool) as type (string|bytes):
+    ./in.cue:19:5
+
+Result:
 (_|_){
   // [eval]
   c1: (bool){ true }

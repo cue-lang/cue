@@ -45,6 +45,10 @@ o3: o1 & {
 -- out/legacy-debug --
 <0>{a1: <1>{a: (=~"oo" & =~"fo"), b: =~"oo", c: =~"fo"}, a2: <2>{a: "foo", b: =~"oo", c: =~"fo"}, a3: <3>{a: _|_((=~"oo" & "bar"):invalid value "bar" (does not match =~"oo")), b: =~"oo", c: =~"fo"}, o1: <4>{a: string, b: string, c: "bar"}, o2: <5>{a: "foo", b: string, c: "bar"}, o3: <6>{a: _|_(("baz" & "foo"):empty disjunction: conflicting values "baz" and "foo";("bar" & "foo"):empty disjunction: conflicting values "bar" and "foo"), b: "baz", c: "bar"}}
 -- out/eval --
+Errors:
+invalid value *adt.Vertex (out of bound *adt.BoundValue)
+
+Result:
 (_|_){
   // [eval]
   a1: (struct){

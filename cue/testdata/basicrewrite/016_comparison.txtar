@@ -37,6 +37,11 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
   err: (2 == "s")
 }
 -- out/eval --
+Errors:
+invalid operands *adt.Num and *adt.String to '==' (type int and string):
+    ./in.cue:9:6
+
+Result:
 (_|_){
   // [eval]
   lss: (bool){ true }

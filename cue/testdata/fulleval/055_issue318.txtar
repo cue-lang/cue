@@ -42,6 +42,15 @@
   }
 }
 -- out/eval --
+Errors:
+invalid interpolation: undefined field y:
+    ./in.cue:3:8
+invalid interpolation: undefined field y:
+    ./in.cue:4:8
+undefined field y:
+    ./in.cue:6:12
+
+Result:
 (_|_){
   // [eval]
   #T: (_|_){

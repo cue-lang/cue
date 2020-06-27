@@ -27,6 +27,10 @@ a: {
   }
 }
 -- out/eval --
+Errors:
+incompatible values *adt.String and *adt.String
+
+Result:
 (_|_){
   // [eval]
   a: (_|_){

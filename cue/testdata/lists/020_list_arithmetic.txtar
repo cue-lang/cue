@@ -337,6 +337,11 @@ s35: [1, 2, 1, 2]
   ])
 }
 -- out/eval --
+Errors:
+value can never become concrete:
+    ./in.cue:6:12
+
+Result:
 (_|_){
   // [eval]
   l0: (#list){

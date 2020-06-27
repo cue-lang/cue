@@ -25,6 +25,7 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/pkg/strings"
 )
@@ -64,6 +65,14 @@ func TestEval(t *testing.T) {
 
 		err = e.Eval(v)
 		t.WriteErrors(err)
+		if b := validate.Validate(r, v, &validate.Config{
+			AllErrors: true,
+		}); b != nil {
+			fmt.Fprintln(t, "Errors:")
+			t.WriteErrors(b.Err)
+			fmt.Fprintln(t, "")
+			fmt.Fprintln(t, "Result:")
+		}
 
 		if v == nil {
 			return

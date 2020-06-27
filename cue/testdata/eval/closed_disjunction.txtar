@@ -14,6 +14,10 @@ b: #A & {
     d: 4
 }
 -- out/eval --
+Errors:
+field `d` not allowed
+
+Result:
 (_|_){
   // [eval]
   #A: (#struct){

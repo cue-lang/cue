@@ -117,6 +117,10 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
   ]
 }
 -- out/eval --
+Errors:
+incompatible list lengths (1 and 2)
+
+Result:
 (_|_){
   // [eval]
   l0: (#list){

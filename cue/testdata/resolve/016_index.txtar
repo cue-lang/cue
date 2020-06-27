@@ -77,6 +77,25 @@ e7: def["b"]
   e7: 〈0;def〉["b"]
 }
 -- out/eval --
+Errors:
+invalid list index "3" (type string):
+    ./in.cue:3:20
+undefined field 0:
+    ./in.cue:4:16
+invalid list index _ (type string):
+    ./in.cue:6:9
+invalid operand 2 (found int, want list or struct):
+    ./in.cue:7:5
+invalid label type bool:
+    ./in.cue:8:5
+undefined field 3:
+    ./in.cue:9:15
+invalid negative index *adt.Num:
+    ./in.cue:10:5
+invalid list index 1 (out of bounds):
+    ./in.cue:11:16
+
+Result:
 (_|_){
   // [eval]
   a: (int){ 2 }

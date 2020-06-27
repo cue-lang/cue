@@ -1,0 +1,21 @@
+TODO: add maching when bulk optional fields are allowed
+alongside other fields.
+-- in.cue --
+{[X=string]: baz: X}
+bar: {}
+-- out/eval --
+(struct){
+  bar: (struct){
+    baz: (string){ "bar" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    [string]: {
+      baz: 〈1;-〉
+    }
+  }
+  bar: {}
+}

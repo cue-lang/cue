@@ -90,12 +90,16 @@ func (x *Vertex) Concreteness() Concreteness {
 	return x.Value.Concreteness()
 }
 
+func (x *NodeLink) Concreteness() Concreteness     { return Concrete }
 func (x *ListMarker) Concreteness() Concreteness   { return Concrete }
 func (x *StructMarker) Concreteness() Concreteness { return Concrete }
 
-func (*Conjunction) Concreteness() Concreteness      { return Constraint }
-func (*Disjunction) Concreteness() Concreteness      { return Constraint }
-func (*BoundValue) Concreteness() Concreteness       { return Constraint }
+func (*Conjunction) Concreteness() Concreteness { return Constraint }
+func (*Disjunction) Concreteness() Concreteness { return Constraint }
+func (*BoundValue) Concreteness() Concreteness  { return Constraint }
+
+// Constraint only applies if Builtin is used as constraint.
+func (*Builtin) Concreteness() Concreteness          { return Constraint }
 func (*BuiltinValidator) Concreteness() Concreteness { return Constraint }
 
 // Value and Expr
@@ -132,9 +136,11 @@ func (*Conjunction) expr()      {}
 func (*Disjunction) expr()      {}
 func (*BoundValue) expr()       {}
 func (*BuiltinValidator) expr() {}
+func (*Builtin) expr()          {}
 
 // Expr and Resolver
 
+func (*NodeLink) expr()         {}
 func (*FieldReference) expr()   {}
 func (*LabelReference) expr()   {}
 func (*DynamicReference) expr() {}
@@ -207,6 +213,8 @@ func (*BoundValue) declNode()       {}
 func (*BoundValue) elemNode()       {}
 func (*BuiltinValidator) declNode() {}
 func (*BuiltinValidator) elemNode() {}
+func (*NodeLink) declNode()         {}
+func (*NodeLink) elemNode()         {}
 func (*FieldReference) declNode()   {}
 func (*FieldReference) elemNode()   {}
 func (*LabelReference) declNode()   {}
@@ -231,6 +239,8 @@ func (*BinaryExpr) declNode()       {}
 func (*BinaryExpr) elemNode()       {}
 func (*CallExpr) declNode()         {}
 func (*CallExpr) elemNode()         {}
+func (*Builtin) declNode()          {}
+func (*Builtin) elemNode()          {}
 func (*DisjunctionExpr) declNode()  {}
 func (*DisjunctionExpr) elemNode()  {}
 
@@ -249,6 +259,7 @@ func (*Vertex) node()            {}
 func (*Conjunction) node()       {}
 func (*Disjunction) node()       {}
 func (*BoundValue) node()        {}
+func (*Builtin) node()           {}
 func (*BuiltinValidator) node()  {}
 func (*Bottom) node()            {}
 func (*Null) node()              {}
@@ -261,6 +272,7 @@ func (*BasicType) node()         {}
 func (*StructLit) node()         {}
 func (*ListLit) node()           {}
 func (*BoundExpr) node()         {}
+func (*NodeLink) node()          {}
 func (*FieldReference) node()    {}
 func (*LabelReference) node()    {}
 func (*DynamicReference) node()  {}

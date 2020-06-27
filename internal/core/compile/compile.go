@@ -37,7 +37,7 @@ type Config struct {
 //
 // Files may return a completed parse even if it has errors.
 func Files(cfg *Config, r adt.Runtime, files ...*ast.File) (*adt.Vertex, errors.Error) {
-	c := &compiler{index: r}
+	c := newCompiler(cfg, r)
 
 	v := c.compileFiles(files)
 
@@ -47,7 +47,19 @@ func Files(cfg *Config, r adt.Runtime, files ...*ast.File) (*adt.Vertex, errors.
 	return v, nil
 }
 
+func newCompiler(cfg *Config, r adt.Runtime) *compiler {
+	c := &compiler{
+		index: r,
+	}
+	if cfg != nil {
+		c.Config = *cfg
+	}
+	return c
+}
+
 type compiler struct {
+	Config
+
 	index adt.StringIndexer
 
 	stack      []frame
@@ -190,6 +202,10 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	}
 
 	return res
+}
+
+func (c *compiler) compileExpr(x ast.Expr) adt.Expr {
+	return c.expr(x)
 }
 
 // resolve assumes that all existing resolutions are legal. Validation should

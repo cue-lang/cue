@@ -64,3 +64,31 @@ b:
 {"b":{"foo":"key","a":{"foo":{}}}}
 -- out/legacy-debug --
 <0>{#Foo: <1>C{connection: <2>C{[or ([ <3>for k, _ in <4>{} yield <3>.k ])]: <5>(_: string)->or ([ <3>for k, _ in <4>{} yield <3>.k ]), }}, #A: <6>C{foo: "key", a: <7>C{foo: <8>C{["key"]: <9>(_: string)-><10>.foo, }}}, #B: <11>C{foo: string, a: <12>C{foo: <13>C{[string]: <14>(_: string)-><15>.foo, }}}, b: <16>C{foo: "key", a: <17>C{foo: <18>C{["key"]: <19>(_: string)-><20>.foo, }}}}
+-- out/eval --
+(struct){
+  #Foo: (#struct){
+    connection: (#struct){
+    }
+  }
+  #A: (#struct){
+    foo: (string){ "key" }
+    a: (#struct){
+      foo: (#struct){
+      }
+    }
+  }
+  #B: (#struct){
+    foo: (string){ string }
+    a: (#struct){
+      foo: (#struct){
+      }
+    }
+  }
+  b: (#struct){
+    foo: (string){ "key" }
+    a: (#struct){
+      foo: (#struct){
+      }
+    }
+  }
+}

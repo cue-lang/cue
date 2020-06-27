@@ -60,6 +60,10 @@ type Runtime interface {
 	// StringIndexer allows for converting string labels to and from a
 	// canonical numeric representation.
 	StringIndexer
+
+	// LoadImport loads a unique Vertex associated with a given import path. It
+	// returns an error if no import for this package could be found.
+	LoadImport(importPath string) (*Vertex, errors.Error)
 }
 
 type Config struct {

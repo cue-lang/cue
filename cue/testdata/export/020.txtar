@@ -14,3 +14,8 @@ a: ""
 b: 0
 -- out/json --
 {"a":"","b":0}
+-- out/eval --
+(struct){
+  a: (string){ "" }
+  b: (int){ 0 }
+}

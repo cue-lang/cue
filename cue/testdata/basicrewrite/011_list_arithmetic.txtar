@@ -11,6 +11,7 @@ list1: [1]
 mul1_0: list1 * 0
 mul1_1: 1 * list1
 mul1_2: list1 * 2
+add1_2: list + list1
 e:      list * -1
 -- out/def --
 list: [1, 2, 3]
@@ -41,6 +42,7 @@ e: _|_ // negative number -1 multiplies list
   mul1_0: (〈0;list1〉 * 0)
   mul1_1: (1 * 〈0;list1〉)
   mul1_2: (〈0;list1〉 * 2)
+  add1_2: (〈0;list〉 + 〈0;list1〉)
   e: (〈0;list〉 * -1)
 }
 -- out/eval --
@@ -78,8 +80,14 @@ e: _|_ // negative number -1 multiplies list
     0: (int){ 1 }
     1: (int){ 1 }
   }
+  add1_2: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 1 }
+  }
   e: (_|_){
     // [eval] cannot convert negative number to uint64:
-    //     ./in.cue:9:9
+    //     ./in.cue:10:9
   }
 }

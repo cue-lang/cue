@@ -32,3 +32,27 @@ v9:  4
 v10: 0
 -- out/legacy-debug --
 <0>{args: [], v1: 0, v2: 0, v3: 0, v4: 1, v5: len ((<1>{a: 3} | <2>{a: 4})), v6: len (('sf' | 'dd')), v7: 2, v8: len (([2] | [1,2])), v9: 4, v10: 0}
+-- out/eval --
+(struct){
+  args: (#list){
+  }
+  v1: (int){ 0 }
+  v2: (int){ 0 }
+  v3: (int){ 0 }
+  v4: (int){ 1 }
+  v5: (_|_){
+    // [incomplete] unresolved disjunction *adt.Disjunction (type struct):
+    //     ./in.cue:6:7
+  }
+  v6: (_|_){
+    // [incomplete] unresolved disjunction *adt.Disjunction (type bytes):
+    //     ./in.cue:7:7
+  }
+  v7: (int){ 2 }
+  v8: (_|_){
+    // [incomplete] unresolved disjunction *adt.Disjunction (type list):
+    //     ./in.cue:9:7
+  }
+  v9: (int){ 4 }
+  v10: (int){ 0 }
+}

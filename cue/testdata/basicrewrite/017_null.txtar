@@ -45,7 +45,7 @@ call: _|_ // cannot call non-function null (type null)
   eq2: (bool){ false }
   ne1: (bool){ true }
   call: (_|_){
-    // [eval] cannot call non-function *adt.Null (type nil):
+    // [eval] cannot call non-function *adt.Null (type null):
     //     ./in.cue:9:7
   }
 }

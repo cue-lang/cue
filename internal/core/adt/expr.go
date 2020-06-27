@@ -17,6 +17,7 @@ package adt
 import (
 	"bytes"
 	"fmt"
+	"io"
 	"regexp"
 
 	"github.com/cockroachdb/apd/v2"
@@ -396,6 +397,20 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 	}
 }
 
+// A NodeLink is used during computation to refer to an existing Vertex.
+// It is used to signal a potential cycle or reference.
+// Note that a NodeLink may be used as a value. This should be taken into
+// account.
+type NodeLink struct {
+	Node *Vertex
+}
+
+func (x *NodeLink) Kind() Kind {
+	return x.Node.Kind()
+}
+func (x *NodeLink) Source() ast.Node             { return x.Node.Source() }
+func (x *NodeLink) resolve(c *OpContext) *Vertex { return x.Node }
+
 // A FieldReference represents a lexical reference to a field.
 //
 //    a
@@ -504,18 +519,11 @@ func (x *ImportReference) Source() ast.Node {
 	return x.Src
 }
 
-// TODO: imports
-// func (x *ImportReference) resolve(c *context, e *environment) (arc, *Bottom) {
-// 	return c.r.lookupImport(e, x.importPath)
-// }
-
-// func (x *ImportReference) eval(c *context, e *environment) envVal {
-// 	arc, err := lookup(e, e.node, x.label)
-// 	if err != nil {
-// 		return err
-// 	}
-// 	return envVal{e, arc.eval()}
-// }
+func (x *ImportReference) resolve(ctx *OpContext) *Vertex {
+	path := x.ImportPath.StringValue(ctx)
+	v, _ := ctx.Runtime.LoadImport(path)
+	return v
+}
 
 // A LetReference evaluates a let expression in its original environment.
 //
@@ -878,10 +886,112 @@ func (x *CallExpr) Source() ast.Node {
 }
 
 func (x *CallExpr) evaluate(c *OpContext) Value {
-	c.addErrf(0, pos(x), "cannot call non-function %s (type %s)",
-		x.Fun, "nil")
-	return nil
+	fun := c.value(x.Fun)
+	args := []Value{}
+	for _, a := range x.Args {
+		expr := c.value(a)
+		args = append(args, expr)
+	}
+	if c.HasErr() {
+		return nil
+	}
+	b, _ := fun.(*Builtin)
+	if b == nil {
+		c.addErrf(0, pos(x.Fun), "cannot call non-function %s (type %s)",
+			c.Str(x.Fun), kind(fun))
+		return nil
+	}
+	result := b.call(c, x.Src, args)
+	if result == nil {
+		return nil
+	}
+	return c.eval(result)
 }
+
+// A Builtin is a value representing a native function call.
+type Builtin struct {
+	// TODO:  make these values for better type checking.
+	Params []Kind
+	Result Kind
+	Func   func(c *OpContext, args []Value) Expr
+
+	Package Feature
+	Name    string
+	// REMOVE: for legacy
+	Const string
+}
+
+func (x *Builtin) WriteName(w io.Writer, c *OpContext) {
+	_, _ = fmt.Fprintf(w, "%s.%s", x.Package.StringValue(c), x.Name)
+}
+
+// Kind here represents the case where Builtin is used as a Validator.
+func (x *Builtin) Kind() Kind {
+	if len(x.Params) == 0 {
+		return BottomKind
+	}
+	return x.Params[0]
+}
+
+func (x *Builtin) validate(c *OpContext, v Value) *Bottom {
+	if x.Result != BoolKind {
+		return c.NewErrf(
+			"invalid validator %s: not a bool return", x.Name)
+	}
+	if len(x.Params) != 1 {
+		return c.NewErrf(
+			"invalid validator %s: may only have one validator to be used without call", x.Name)
+	}
+	return validateWithBuiltin(c, nil, x, []Value{v})
+}
+
+func bottom(v Value) *Bottom {
+	if x, ok := v.(*Vertex); ok {
+		v = x.Value
+	}
+	b, _ := v.(*Bottom)
+	return b
+}
+
+func (x *Builtin) call(c *OpContext, call *ast.CallExpr, args []Value) Expr {
+	if len(x.Params)-1 == len(args) && x.Result == BoolKind {
+		// We have a custom builtin
+		return &BuiltinValidator{call, x, args}
+	}
+	switch {
+	case len(x.Params) < len(args):
+		c.addErrf(0, call.Rparen,
+			"too many arguments in call to %s (have %d, want %d)",
+			call.Fun, len(args), len(x.Params))
+		return nil
+	case len(x.Params) > len(args):
+		c.addErrf(0, call.Rparen,
+			"not enough arguments in call to %s (have %d, want %d)",
+			call.Fun, len(args), len(x.Params))
+		return nil
+	}
+	for i, a := range args {
+		if x.Params[i] != BottomKind {
+			if b := bottom(a); b != nil {
+				return b
+			}
+			if k := kind(a); x.Params[i]&k == BottomKind {
+				code := EvalError
+				b, _ := args[i].(*Bottom)
+				if b != nil {
+					code = b.Code
+				}
+				c.addErrf(code, pos(a),
+					"cannot use %s (type %s) as %s in argument %d to %s",
+					a, k, x.Params[i], i+1, call.Fun)
+				return nil
+			}
+		}
+	}
+	return x.Func(c, args)
+}
+
+func (x *Builtin) Source() ast.Node { return nil }
 
 // A BuiltinValidator is a Value that results from evaluation a partial call
 // to a builtin (using CallExpr).
@@ -889,9 +999,9 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 //    strings.MinRunes(4)
 //
 type BuiltinValidator struct {
-	Src  *ast.CallExpr
-	Fun  Expr
-	Args []Value // any but the first value
+	Src     *ast.CallExpr
+	Builtin *Builtin
+	Args    []Value // any but the first value
 }
 
 func (x *BuiltinValidator) Source() ast.Node {
@@ -900,10 +1010,50 @@ func (x *BuiltinValidator) Source() ast.Node {
 	}
 	return x.Src
 }
-func (x *BuiltinValidator) Kind() Kind { return TopKind }
+
+func (x *BuiltinValidator) Kind() Kind {
+	return x.Builtin.Params[0]
+}
 
 func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
-	return nil
+	args := make([]Value, len(x.Args)+1)
+	args[0] = v
+	copy(args[1:], x.Args)
+	return validateWithBuiltin(c, x.Src, x.Builtin, args)
+}
+
+func validateWithBuiltin(c *OpContext, src *ast.CallExpr, b *Builtin, args []Value) *Bottom {
+	res := b.call(c, src, args)
+	switch v := res.(type) {
+	case nil:
+		return nil
+
+	case *Bottom:
+		return v
+
+	case *Bool:
+		if v.B {
+			return nil
+		}
+
+	default:
+		return c.NewErrf("invalid validator %s.%s", b.Package.StringValue(c), b.Name)
+	}
+
+	// failed:
+	var buf bytes.Buffer
+	b.WriteName(&buf, c)
+	if len(args) > 1 {
+		buf.WriteString("(")
+		for i, a := range args[1:] {
+			if i > 0 {
+				_, _ = buf.WriteString(", ")
+			}
+			buf.WriteString(c.Str(a))
+		}
+		buf.WriteString(")")
+	}
+	return c.NewErrf("invalid value %s (does not satisfy %s)", c.Str(args[0]), buf.String())
 }
 
 // A Disjunction represents a disjunction, where each disjunct may or may not

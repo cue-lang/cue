@@ -45,8 +45,7 @@ s3:  strings.ContainsAny(str, "dd")
 -- out/legacy-debug --
 <0>{n1: <1>{min: <<2>.max, max: ><2>.min}, n2: -<3>.num, num: <4, n3: +<3>.num, n4: (<3>.num + <3>.num), n5: (<3>.num - <3>.num), n6: (<3>.num * <3>.num), n7: (<3>.num / <3>.num), b1: !<3>.is, is: bool, s1: ""+<3>.str+"", str: string, s2: strings.ContainsAny ("dd"), s3: <4>.ContainsAny (<3>.str,"dd")}
 -- out/eval --
-(_|_){
-  // [eval]
+(struct){
   n1: (struct){
     min: (_|_){
       // [cycle] cycle error
@@ -88,11 +87,11 @@ s3:  strings.ContainsAny(str, "dd")
     //     ./in.cue:13:5
   }
   s2: (_|_){
-    // [eval] cannot call non-function *adt.SelectorExpr (type nil):
+    // [incomplete] incomplete value *adt.ImportReference:
     //     ./in.cue:14:5
   }
   s3: (_|_){
-    // [eval] cannot call non-function *adt.SelectorExpr (type nil):
+    // [incomplete] incomplete value *adt.ImportReference:
     //     ./in.cue:15:5
   }
   str: (string){ string }

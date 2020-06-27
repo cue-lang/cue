@@ -14,6 +14,11 @@
 
 package runtime
 
+import (
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal/core/adt"
+)
+
 // A Runtime maintains data structures for indexing and resuse for evaluation.
 type Runtime struct {
 	*index
@@ -24,4 +29,8 @@ func New() *Runtime {
 	return &Runtime{
 		index: newIndex(sharedIndex),
 	}
+}
+
+func (x *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {
+	return nil, nil
 }

@@ -42,14 +42,14 @@ func predeclared(n *ast.Ident) adt.Expr {
 	case "number", "__number":
 		return &adt.BasicType{Src: n, K: adt.NumKind}
 
-		// case "len", "__len":
-		// 	return lenBuiltin
-		// case "close", "__close":
-		// 	return closeBuiltin
-		// case "and", "__and":
-		// 	return andBuiltin
-		// case "or", "__or":
-		// 	return orBuiltin
+	case "len", "__len":
+		return lenBuiltin
+	case "close", "__close":
+		return closeBuiltin
+	case "and", "__and":
+		return andBuiltin
+	case "or", "__or":
+		return orBuiltin
 	}
 
 	if r, ok := predefinedRanges[n.Name]; ok {

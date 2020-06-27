@@ -169,6 +169,16 @@ func (w *compactPrinter) node(n adt.Node) {
 		fmt.Fprint(w, x.Op)
 		w.node(x.Value)
 
+	case *adt.NodeLink:
+		w.string(openTuple)
+		for i, f := range x.Node.Path() {
+			if i > 0 {
+				w.string(".")
+			}
+			w.label(f)
+		}
+		w.string(closeTuple)
+
 	case *adt.FieldReference:
 		w.label(x.Label)
 
@@ -253,8 +263,15 @@ func (w *compactPrinter) node(n adt.Node) {
 		}
 		w.string(")")
 
+	case *adt.Builtin:
+		if x.Package != 0 {
+			w.label(x.Package)
+			w.string(".")
+		}
+		w.string(x.Name)
+
 	case *adt.BuiltinValidator:
-		w.node(x.Fun)
+		w.node(x.Builtin)
 		w.string("(")
 		for i, a := range x.Args {
 			if i > 0 {

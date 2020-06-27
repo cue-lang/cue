@@ -32,14 +32,6 @@ type index struct {
 	typeCache sync.Map // map[reflect.Type]evaluated
 }
 
-// work around golang-ci linter bug: fields are used.
-func init() {
-	var i index
-	i.mutex.Lock()
-	i.mutex.Unlock()
-	i.typeCache.Load(1)
-}
-
 // sharedIndex is used for indexing builtins and any other labels common to
 // all instances.
 var sharedIndex = newSharedIndex()

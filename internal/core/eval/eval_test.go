@@ -92,16 +92,8 @@ var needFix = map[string]string{
 
 	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": "cycle",
 
-	"export/020":                  "builtin",
-	"resolve/034_closing_structs": "builtin",
-	"resolve/048_builtins":        "builtin",
-
-	"fulleval/027_len_of_incomplete_types": "builtin",
-
-	"fulleval/032_or_builtin_should_not_fail_on_non-concrete_empty_list": "builtin",
-
-	"fulleval/049_alias_reuse_in_nested_scope": "builtin",
-	"fulleval/053_issue312":                    "builtin",
+	"resolve/034_closing_structs": "close()",
+	"fulleval/053_issue312":       "close()",
 }
 
 // TestX is for debugging. Do not delete.

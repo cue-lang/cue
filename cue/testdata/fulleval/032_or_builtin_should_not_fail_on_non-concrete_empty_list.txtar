@@ -41,3 +41,21 @@ foo:
 {"foo":{"jobs":{"foo":{}}}}
 -- out/legacy-debug --
 <0>{#Workflow: <1>C{jobs: <2>{[]: <3>(jobID: string)-><4>C{}, }, #JobID: or ([ <5>for k, _ in <6>.jobs yield <5>.k ])}, foo: <7>C{jobs: <8>{[]: <9>(jobID: string)-><10>C{}, foo: <11>C{}}, #JobID: "foo"}}
+-- out/eval --
+(struct){
+  #Workflow: (#struct){
+    jobs: (#struct){
+    }
+    #JobID: (_|_){
+      // [incomplete] empty list in call to or:
+      //     ./in.cue:6:10
+    }
+  }
+  foo: (#struct){
+    jobs: (#struct){
+      foo: (#struct){
+      }
+    }
+    #JobID: (string){ "foo" }
+  }
+}

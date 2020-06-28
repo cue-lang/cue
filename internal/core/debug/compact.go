@@ -22,142 +22,54 @@ package debug
 
 import (
 	"fmt"
-	"io"
 	"strconv"
-	"strings"
 
-	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"golang.org/x/xerrors"
 )
 
-const (
-	openTuple  = "\u3008"
-	closeTuple = "\u3009"
-)
-
-type Config struct {
-	Cwd     string
-	Compact bool
-	Raw     bool
+type compactPrinter struct {
+	printer
 }
 
-func WriteNode(w io.Writer, i adt.StringIndexer, n adt.Node, config *Config) {
-	if config == nil {
-		config = &Config{}
-	}
-	p := printer{Writer: w, index: i, cfg: config}
-	if config.Compact {
-		p := compactPrinter{p}
-		p.node(n)
-	} else {
-		p.node(n)
-	}
-}
-
-func NodeString(i adt.StringIndexer, n adt.Node, config *Config) string {
-	b := &strings.Builder{}
-	WriteNode(b, i, n, config)
-	return b.String()
-}
-
-type printer struct {
-	io.Writer
-	index  adt.StringIndexer
-	indent string
-	cfg    *Config
-}
-
-func (w *printer) string(s string) {
-	s = strings.Replace(s, "\n", "\n"+w.indent, -1)
-	_, _ = io.WriteString(w, s)
-}
-
-func (w *printer) label(f adt.Feature) {
-	w.string(w.labelString(f))
-}
-
-// TODO: fold into label once :: is no longer supported.
-func (w *printer) labelString(f adt.Feature) string {
-	return f.SelectorString(w.index)
-}
-
-func (w *printer) shortError(errs errors.Error) {
-	for {
-		msg, args := errs.Msg()
-		fmt.Fprintf(w, msg, args...)
-
-		err := xerrors.Unwrap(errs)
-		if err == nil {
-			break
-		}
-
-		if errs, _ = err.(errors.Error); errs != nil {
-			w.string(err.Error())
-			break
-		}
-	}
-}
-
-func (w *printer) node(n adt.Node) {
+func (w *compactPrinter) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
-		var kind adt.Kind
-		if x.Value != nil {
-			kind = x.Value.Kind()
-		}
-
-		kindStr := kind.String()
-		kindStr = strings.ReplaceAll(kindStr, "{...}", "struct")
-		kindStr = strings.ReplaceAll(kindStr, "[...]", "list")
-
-		fmt.Fprintf(w, "(%s){", kindStr)
-
-		if x.Value != nil && kind&^(adt.StructKind|adt.ListKind) != 0 {
-			w.string(" ")
-			w.node(x.Value)
-			w.string(" }")
-			return
-		}
-
-		saved := w.indent
-		w.indent += "  "
-
-		if b, ok := x.Value.(*adt.Bottom); ok {
-			saved := w.indent
-			w.indent += "// "
-			w.string("\n")
-			w.string(strings.TrimSpace(errors.Details(b.Err, &errors.Config{
-				Cwd:     w.cfg.Cwd,
-				ToSlash: true,
-			})))
-			w.indent = saved
-		}
-
-		if len(x.Arcs) > 0 {
-			for _, a := range x.Arcs {
-				w.string("\n")
-				w.label(a.Label)
-				w.string(": ")
-				w.node(a)
-			}
-		}
-
-		if x.Value == nil {
-			w.indent += "// "
-			w.string("// ")
+		if x.Value == nil || (w.cfg.Raw && len(x.Conjuncts) > 0) {
 			for i, c := range x.Conjuncts {
 				if i > 0 {
 					w.string(" & ")
 				}
-				w.node(c.Expr()) // TODO: also include env?
+				w.node(c.Expr())
 			}
+			return
 		}
 
-		w.indent = saved
-		w.string("\n")
-		w.string("}")
+		switch x.Value.(type) {
+		case *adt.StructMarker:
+			w.string("{")
+			for i, a := range x.Arcs {
+				if i > 0 {
+					w.string(",")
+				}
+				w.label(a.Label)
+				w.string(":")
+				w.node(a)
+			}
+			w.string("}")
+
+		case *adt.ListMarker:
+			w.string("[")
+			for i, a := range x.Arcs {
+				if i > 0 {
+					w.string(",")
+				}
+				w.node(a)
+			}
+			w.string("]")
+
+		default:
+			w.node(x.Value)
+		}
 
 	case *adt.StructMarker:
 		w.string("struct")
@@ -166,58 +78,41 @@ func (w *printer) node(n adt.Node) {
 		w.string("list")
 
 	case *adt.StructLit:
-		if len(x.Decls) == 0 {
-			w.string("{}")
-			break
-		}
 		w.string("{")
-		w.indent += "  "
-		for _, d := range x.Decls {
-			w.string("\n")
+		for i, d := range x.Decls {
+			if i > 0 {
+				w.string(",")
+			}
 			w.node(d)
 		}
-		w.indent = w.indent[:len(w.indent)-2]
-		w.string("\n}")
+		w.string("}")
 
 	case *adt.ListLit:
-		if len(x.Elems) == 0 {
-			w.string("[]")
-			break
-		}
 		w.string("[")
-		w.indent += "  "
-		for _, d := range x.Elems {
-			w.string("\n")
+		for i, d := range x.Elems {
+			if i > 0 {
+				w.string(",")
+			}
 			w.node(d)
-			w.string(",")
 		}
-		w.indent = w.indent[:len(w.indent)-2]
-		w.string("\n]")
+		w.string("]")
 
 	case *adt.Field:
 		s := w.labelString(x.Label)
 		w.string(s)
 		w.string(":")
-		if x.Label.IsDef() && !internal.IsDef(s) {
-			w.string(":")
-		}
-		w.string(" ")
 		w.node(x.Value)
 
 	case *adt.OptionalField:
 		s := w.labelString(x.Label)
 		w.string(s)
 		w.string("?:")
-		if x.Label.IsDef() && !internal.IsDef(s) {
-			w.string(":")
-		}
-		w.string(" ")
 		w.node(x.Value)
 
 	case *adt.BulkOptionalField:
 		w.string("[")
 		w.node(x.Filter)
-		w.string("]: ")
+		w.string("]:")
 		w.node(x.Value)
 
 	case *adt.DynamicField:
@@ -225,7 +120,7 @@ func (w *printer) node(n adt.Node) {
 		if x.IsOptional() {
 			w.string("?")
 		}
-		w.string(": ")
+		w.string(":")
 		w.node(x.Value)
 
 	case *adt.Ellipsis:
@@ -238,7 +133,8 @@ func (w *printer) node(n adt.Node) {
 		w.string(`_|_`)
 		if x.Err != nil {
 			w.string("(")
-			w.shortError(x.Err)
+			msg, args := x.Err.Msg()
+			w.string(fmt.Sprintf(msg, args...))
 			w.string(")")
 		}
 
@@ -275,37 +171,23 @@ func (w *printer) node(n adt.Node) {
 		w.node(x.Value)
 
 	case *adt.FieldReference:
-		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
-		w.string(";")
 		w.label(x.Label)
-		w.string(closeTuple)
 
 	case *adt.LabelReference:
-		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
-		w.string(";-")
-		w.string(closeTuple)
+		if x.Src == nil {
+			w.string("LABEL")
+		} else {
+			w.string(x.Src.Name)
+		}
 
 	case *adt.DynamicReference:
-		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
-		w.string(";(")
 		w.node(x.Label)
-		w.string(")")
-		w.string(closeTuple)
 
 	case *adt.ImportReference:
-		w.string(openTuple + "import;")
 		w.label(x.ImportPath)
-		w.string(closeTuple)
 
 	case *adt.LetReference:
-		w.string(openTuple)
-		w.string(strconv.Itoa(int(x.UpCount)))
-		w.string(";let ")
 		w.label(x.Label)
-		w.string(closeTuple)
 
 	case *adt.SelectorExpr:
 		w.node(x.X)
@@ -398,27 +280,23 @@ func (w *printer) node(n adt.Node) {
 		w.string(")")
 
 	case *adt.Conjunction:
-		w.string("&(")
 		for i, c := range x.Values {
 			if i > 0 {
-				w.string(", ")
+				w.string(" & ")
 			}
 			w.node(c)
 		}
-		w.string(")")
 
 	case *adt.Disjunction:
-		w.string("|(")
 		for i, c := range x.Values {
 			if i > 0 {
-				w.string(", ")
+				w.string(" | ")
 			}
 			if i < x.NumDefaults {
 				w.string("*")
 			}
 			w.node(c)
 		}
-		w.string(")")
 
 	case *adt.ForClause:
 		w.string("for ")

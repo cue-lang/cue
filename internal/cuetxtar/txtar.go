@@ -148,16 +148,24 @@ func (t *Test) ValidInstances(args ...string) []*build.Instance {
 // RawInstances returns the intstances represented by this .txtar file. The
 // returned instances are not checked for errors.
 func (t *Test) RawInstances(args ...string) []*build.Instance {
-	if len(args) == 0 {
-		args = []string{"in.cue"}
-	}
+	return Load(t.Archive, t.Dir, args...)
+}
+
+// Load loads the intstances of a txtar file. By default, it only loads
+// files in the root directory. Relative files in the archive are given an
+// absolution location by prefixing it with dir.
+func Load(a *txtar.Archive, dir string, args ...string) []*build.Instance {
+	auto := len(args) == 0
 	overlay := map[string]load.Source{}
-	for _, f := range t.Archive.Files {
-		overlay[filepath.Join(t.Dir, f.Name)] = load.FromBytes(f.Data)
+	for _, f := range a.Files {
+		if auto && !strings.Contains(f.Name, "/") {
+			args = append(args, f.Name)
+		}
+		overlay[filepath.Join(dir, f.Name)] = load.FromBytes(f.Data)
 	}
 
 	cfg := &load.Config{
-		Dir:     t.Dir,
+		Dir:     dir,
 		Overlay: overlay,
 	}
 
@@ -183,15 +191,15 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 			return nil
 		}
 
-		a, err := txtar.ParseFile(fullpath)
-		if err != nil {
-			t.Fatalf("error parsing txtar file: %v", err)
-		}
-
 		p := strings.Index(fullpath, "/testdata/")
 		testName := fullpath[p+len("/testdata/") : len(fullpath)-len(".txtar")]
 
 		t.Run(testName, func(t *testing.T) {
+			a, err := txtar.ParseFile(fullpath)
+			if err != nil {
+				t.Fatalf("error parsing txtar file: %v", err)
+			}
+
 			outFile := path.Join("out", x.Name)
 
 			var gold *txtar.File
@@ -245,7 +253,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 			// Update and write file.
 
-			err := ioutil.WriteFile(fullpath, txtar.Format(a), 0644)
+			err = ioutil.WriteFile(fullpath, txtar.Format(a), 0644)
 			if err != nil {
 				t.Fatal(err)
 			}

@@ -7,6 +7,9 @@ cmp stdout expect-stdout
 bar: empty disjunction: conflicting values int and "str" (mismatched types int and string):
     ./errs.cue:5:10
     ./errs.cue:6:16
+bar: empty disjunction: conflicting values string and 2 (mismatched types string and int):
+    ./errs.cue:5:21
+    ./errs.cue:6:26
 x.q: conflicting values "hello" and "goodbye":
     ./errs.cue:1:4
     ./errs.cue:2:4

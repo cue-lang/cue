@@ -362,17 +362,24 @@ func (p *list) RemoveMultiples() {
 	var last Error
 	i := 0
 	for _, e := range *p {
-		pos := e.Position()
-		if last == nil ||
-			pos.Filename() != last.Position().Filename() ||
-			pos.Line() != last.Position().Line() ||
-			!equalPath(e.Path(), last.Path()) {
+		if last == nil || !approximateEqual(last, e) {
 			last = e
 			(*p)[i] = e
 			i++
 		}
 	}
 	(*p) = (*p)[0:i]
+}
+
+func approximateEqual(a, b Error) bool {
+	aPos := a.Position()
+	bPos := b.Position()
+	if aPos == token.NoPos || bPos == token.NoPos {
+		return a.Error() == b.Error()
+	}
+	return aPos.Filename() == bPos.Filename() &&
+		aPos.Line() == bPos.Line() &&
+		equalPath(a.Path(), b.Path())
 }
 
 // An List implements the error interface.

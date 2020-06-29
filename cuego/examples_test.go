@@ -42,7 +42,7 @@ func ExampleComplete_structTag() {
 	//Output:
 	// completed: cuego_test.Sum{A:1, B:5, C:6} (err: <nil>)
 	// completed: cuego_test.Sum{A:2, B:6, C:8} (err: <nil>)
-	// empty disjunction: conflicting values 5 and 2
+	// empty disjunction: conflicting values 5 and 2 (and 1 more errors)
 }
 
 func ExampleConstrain() {

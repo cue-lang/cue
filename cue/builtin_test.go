@@ -395,6 +395,9 @@ func TestBuiltins(t *testing.T) {
 		test("strings", `strings.ByteSlice("Hello", 2, 5)`),
 		`'llo'`,
 	}, {
+		test("strings", `strings.SliceRunes("✓ Hello", 0, 3)`),
+		`"✓ H"`,
+	}, {
 		test("strings", `strings.Runes("Café")`),
 		strings.Replace(fmt.Sprint([]rune{'C', 'a', 'f', 'é'}), " ", ",", -1),
 	}, {

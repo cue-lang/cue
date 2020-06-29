@@ -108,3 +108,13 @@ func ToCamel(s string) string {
 		},
 		s)
 }
+
+// SliceRunes returns a string of the underlying string data from the start index
+// up to but not including the end index.
+func SliceRunes(s string, start, end int) (string, error) {
+	runes := []rune(s)
+	if start < 0 || start > end || end > len(runes) {
+		return "", fmt.Errorf("index out of range")
+	}
+	return string(runes[start:end]), nil
+}

@@ -29,6 +29,9 @@ import (
 // A Runtime maintains data structures for indexing and resuse for evaluation.
 type Runtime struct {
 	index *Index
+
+	// Data holds the legacy index strut. It is for transitional purposes only.
+	Data interface{}
 }
 
 // New creates a new Runtime.

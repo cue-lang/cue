@@ -115,6 +115,11 @@ type OpContext struct {
 	tentative int // set during comprehension evaluation
 }
 
+// Impl is for internal use only. This will go.
+func (c *OpContext) Impl() Runtime {
+	return c.config.Runtime
+}
+
 // If IsTentative is set, evaluation of an arc should not finalize
 // to non-concrete values.
 func (c *OpContext) IsTentative() bool {

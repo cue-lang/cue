@@ -16,10 +16,14 @@ package runtime
 
 import (
 	"reflect"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 )
 
 // A Runtime maintains data structures for indexing and resuse for evaluation.
@@ -44,6 +48,66 @@ func (x *Runtime) IndexToString(i int64) string {
 
 func (x *Runtime) StringToIndex(s string) int64 {
 	return x.index.StringToIndex(s)
+}
+
+func (x *Runtime) Build(b *build.Instance) (v *adt.Vertex, errs errors.Error) {
+	if s := b.ImportPath; s != "" {
+		// Use cached result, if available.
+		if v, err := x.LoadImport(s); v != nil || err != nil {
+			return v, err
+		}
+		// Cache the result if any.
+		defer func() {
+			if errs == nil && v != nil {
+				x.index.AddInst(b.ImportPath, v, b)
+			}
+		}()
+	}
+
+	// Build transitive dependencies.
+	for _, file := range b.Files {
+		for _, d := range file.Decls {
+			switch g := d.(type) {
+			case *ast.Package:
+			case *ast.ImportDecl:
+				for _, s := range g.Specs {
+					errs = errors.Append(errs, x.buildSpec(b, s))
+				}
+			case *ast.CommentGroup:
+			default:
+				break
+			}
+		}
+	}
+
+	if errs != nil {
+		return nil, errs
+	}
+
+	return compile.Files(nil, x, b.Files...)
+}
+
+func (x *Runtime) buildSpec(b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {
+	info, err := astutil.ParseImportSpec(spec)
+	if err != nil {
+		return errors.Promote(err, "invalid import path")
+	}
+
+	pkg := b.LookupImport(info.ID)
+	if pkg == nil {
+		if strings.Contains(info.ID, ".") {
+			return errors.Newf(spec.Pos(),
+				"package %q imported but not defined in %s",
+				info.ID, b.ImportPath)
+		}
+		return nil // TODO: check the builtin package exists here.
+	}
+
+	if _, err := x.Build(pkg); err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (x *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {

@@ -66,3 +66,34 @@ Val:
 {"Val":{"data":{"baz":"var-string\n","foobar":"use: var-string\n"}}}
 -- out/legacy-debug --
 <0>{#Spec: <1>C{_vars: <2>C{something: string}, data: <3>C{#foo: <4>C{use: string}, baz: <5>.Marshal (<6>._vars.something), foobar: <5>.Marshal (<7>.#foo)}}, Val: <8>C{_vars: <9>C{something: "var-string"}, data: <10>C{#foo: <11>C{use: "var-string"}, baz: "var-string\n", foobar: "use: var-string\n"}}}
+-- out/eval --
+(struct){
+  #Spec: (#struct){
+    _vars: (#struct){
+      something: (string){ string }
+    }
+    data: (#struct){
+      #foo: (#struct){
+        use: (string){ string }
+      }
+      baz: (_|_){
+        // [incomplete] non-concrete argument 0
+      }
+      foobar: (_|_){
+        // [incomplete] incomplete value
+      }
+    }
+  }
+  Val: (#struct){
+    _vars: (#struct){
+      something: (string){ "var-string" }
+    }
+    data: (#struct){
+      #foo: (#struct){
+        use: (string){ "var-string" }
+      }
+      baz: (string){ "var-string\n" }
+      foobar: (string){ "use: var-string\n" }
+    }
+  }
+}

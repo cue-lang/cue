@@ -77,10 +77,10 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
 -- out/eval --
 Errors:
 conflicting types
-invalid value *adt.Num (out of bound *adt.BoundValue)
+invalid value 8 (out of bound <=5)
 invalid list index d (type string):
     ./in.cue:5:12
-invalid negative index *adt.Num:
+invalid negative index -1:
     ./in.cue:6:8
 
 Result:
@@ -105,7 +105,7 @@ Result:
     //     ./in.cue:5:12
   }
   e3: (_|_){
-    // [eval] invalid negative index *adt.Num:
+    // [eval] invalid negative index -1:
     //     ./in.cue:6:8
   }
   e4: (_|_){
@@ -114,7 +114,7 @@ Result:
     1: (int){ 2 }
     2: (int){ 4 }
     3: (_|_){
-      // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+      // [eval] invalid value 8 (out of bound <=5)
     }
   }
   e5: (_|_){
@@ -123,7 +123,7 @@ Result:
     1: (int){ 2 }
     2: (int){ 4 }
     3: (_|_){
-      // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+      // [eval] invalid value 8 (out of bound <=5)
     }
   }
 }

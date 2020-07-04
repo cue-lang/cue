@@ -138,11 +138,15 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
 }
 -- out/eval --
 Errors:
-bounds *adt.BoundValue *adt.BoundValue
-invalid value *adt.BoundValue (mismatched types (bool|string|bytes|list|struct|number) and null)
-invalid value *adt.BoundValue (mismatched types number and string)
-invalid value *adt.Null (mismatched types null and (bool|string|bytes|list|struct|number))
-invalid value *adt.Num (out of bound *adt.BoundValue)
+bounds >1 <0
+bounds >11 <11
+bounds >11 <=11
+bounds >=11 <11
+invalid value !=null (mismatched types (bool|string|bytes|list|struct|number) and null)
+invalid value 0 (out of bound <0)
+invalid value 1 (out of bound >1)
+invalid value <1 (mismatched types number and string)
+invalid value null (mismatched types null and (bool|string|bytes|list|struct|number))
 
 Result:
 (_|_){
@@ -178,30 +182,30 @@ Result:
   s23e: (number){ &(>0.0, <2.0) }
   s30: (int){ &(>0, int) }
   e1: (_|_){
-    // [eval] invalid value *adt.BoundValue (mismatched types (bool|string|bytes|list|struct|number) and null)
+    // [eval] invalid value !=null (mismatched types (bool|string|bytes|list|struct|number) and null)
   }
   e2: (_|_){
-    // [eval] invalid value *adt.Null (mismatched types null and (bool|string|bytes|list|struct|number))
+    // [eval] invalid value null (mismatched types null and (bool|string|bytes|list|struct|number))
   }
   e3: (_|_){
-    // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+    // [eval] invalid value 1 (out of bound >1)
   }
   e4: (_|_){
-    // [eval] invalid value *adt.Num (out of bound *adt.BoundValue)
+    // [eval] invalid value 0 (out of bound <0)
   }
   e5: (_|_){
-    // [eval] bounds *adt.BoundValue *adt.BoundValue
+    // [eval] bounds >1 <0
   }
   e6: (_|_){
-    // [eval] bounds *adt.BoundValue *adt.BoundValue
+    // [eval] bounds >11 <11
   }
   e7: (_|_){
-    // [eval] bounds *adt.BoundValue *adt.BoundValue
+    // [eval] bounds >=11 <11
   }
   e8: (_|_){
-    // [eval] bounds *adt.BoundValue *adt.BoundValue
+    // [eval] bounds >11 <=11
   }
   e9: (_|_){
-    // [eval] invalid value *adt.BoundValue (mismatched types number and string)
+    // [eval] invalid value <1 (mismatched types number and string)
   }
 }

@@ -16,7 +16,7 @@ b: "Count: \(a) times"
 }
 -- out/eval --
 Errors:
-invalid interpolation: cannot use *adt.Conjunction (type number) as type string:
+invalid interpolation: cannot use >=0 & <=10 (type number) as type string:
     ./in.cue:1:20
 
 Result:
@@ -24,7 +24,7 @@ Result:
   // [eval]
   a: (number){ &(>=0, <=10) }
   b: (_|_){
-    // [eval] invalid interpolation: cannot use *adt.Conjunction (type number) as type string:
+    // [eval] invalid interpolation: cannot use >=0 & <=10 (type number) as type string:
     //     ./in.cue:1:20
   }
 }

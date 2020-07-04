@@ -61,11 +61,11 @@ invalid slice index: 1 > 0:
     ./in.cue:5:5
 index 2 out of range:
     ./in.cue:6:5
-cannot slice *adt.Num (type int):
+cannot slice 4 (type int):
     ./in.cue:7:5
-cannot use *adt.String (type string) as type int in slice index:
+cannot use "" (type string) as type int in slice index:
     ./in.cue:8:5
-cannot use *adt.String (type string) as type int in slice index:
+cannot use "9" (type string) as type int in slice index:
     ./in.cue:9:5
 
 Result:
@@ -92,15 +92,15 @@ Result:
     //     ./in.cue:6:5
   }
   e5: (_|_){
-    // [eval] cannot slice *adt.Num (type int):
+    // [eval] cannot slice 4 (type int):
     //     ./in.cue:7:5
   }
   e6: (_|_){
-    // [eval] cannot use *adt.String (type string) as type int in slice index:
+    // [eval] cannot use "" (type string) as type int in slice index:
     //     ./in.cue:8:5
   }
   e7: (_|_){
-    // [eval] cannot use *adt.String (type string) as type int in slice index:
+    // [eval] cannot use "9" (type string) as type int in slice index:
     //     ./in.cue:9:5
   }
 }

@@ -26,16 +26,17 @@ b: _|_ // conflicting values 210 and 200
 }
 -- out/eval --
 Errors:
-incompatible values *adt.Num and *adt.Num
+incompatible values 101 and 100
+incompatible values 200 and 210
 
 Result:
 (_|_){
   // [eval]
   a: (int){ 100 }
   b: (_|_){
-    // [eval] incompatible values *adt.Num and *adt.Num
+    // [eval] incompatible values 200 and 210
   }
   x: (_|_){
-    // [eval] incompatible values *adt.Num and *adt.Num
+    // [eval] incompatible values 101 and 100
   }
 }

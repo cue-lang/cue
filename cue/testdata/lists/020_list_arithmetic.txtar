@@ -360,11 +360,11 @@ Result:
   l2: (#list){
   }
   l3: (_|_){
-    // [incomplete] non-concrete value *adt.BoundValue in operand to *:
+    // [incomplete] non-concrete value <=2 in operand to *:
     //     ./in.cue:4:5
   }
   l4: (_|_){
-    // [incomplete] non-concrete value *adt.BoundValue in operand to *:
+    // [incomplete] non-concrete value <=2 in operand to *:
     //     ./in.cue:5:5
   }
   l5: (_|_){

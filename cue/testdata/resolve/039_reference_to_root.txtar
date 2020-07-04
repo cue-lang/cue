@@ -85,14 +85,14 @@ wp: v & {
   c: (struct){
     b: (int){ 100 }
     d: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value int in operand to +:
       //     ./in.cue:4:5
     }
   }
   x: (struct){
     b: (int){ int }
     c: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value int in operand to +:
       //     ./in.cue:8:5
     }
   }
@@ -103,21 +103,21 @@ wp: v & {
   v: (struct){
     b: (int){ int }
     c: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value int in operand to +:
       //     ./in.cue:16:5
     }
   }
   w: (struct){
     b: (int){ 100 }
     c: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value int in operand to +:
       //     ./in.cue:16:5
     }
   }
   wp: (struct){
     b: (int){ 100 }
     c: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value int in operand to +:
       //     ./in.cue:16:5
     }
   }

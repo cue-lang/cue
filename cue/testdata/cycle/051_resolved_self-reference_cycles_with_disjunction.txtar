@@ -159,7 +159,7 @@ z3:  z1-3 & 8
 }
 -- out/eval --
 Errors:
-incompatible values *adt.Num and *adt.Num:
+incompatible values 7 and 6:
     ./in.cue:44:6
 
 Result:
@@ -187,19 +187,19 @@ Result:
     // [incomplete] empty disjunction
   }
   xe2: (_|_){
-    // [eval] incompatible values *adt.Num and *adt.Num:
+    // [eval] incompatible values 7 and 6:
     //     ./in.cue:44:6
   }
   xe3: (_|_){
-    // [eval] incompatible values *adt.Num and *adt.Num:
+    // [eval] incompatible values 7 and 6:
     //     ./in.cue:44:6
   }
   xe4: (_|_){
-    // [eval] incompatible values *adt.Num and *adt.Num:
+    // [eval] incompatible values 7 and 6:
     //     ./in.cue:44:6
   }
   xe5: (_|_){
-    // [eval] incompatible values *adt.Num and *adt.Num:
+    // [eval] incompatible values 7 and 6:
     //     ./in.cue:44:6
   }
   xf1: (int){ 8 }

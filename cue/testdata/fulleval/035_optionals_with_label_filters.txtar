@@ -105,7 +105,7 @@ Errors:
 field `cmd` not allowed
 field `foo1` not allowed
 field `fooTest1` not allowed
-invalid value *adt.Vertex (out of bound *adt.BoundValue)
+invalid value "badName" (out of bound =~"^test")
 
 Result:
 (_|_){
@@ -132,7 +132,7 @@ Result:
     fooTest: (_|_){
       // [eval]
       name: (_|_){
-        // [eval] invalid value *adt.Vertex (out of bound *adt.BoundValue)
+        // [eval] invalid value "badName" (out of bound =~"^test")
       }
       cmd: (string){ string }
     }

@@ -16,7 +16,7 @@
   d: (struct){
     x: (_){ _ }
     y: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value _ in operand to +:
       //     ./in.cue:5:6
     }
   }

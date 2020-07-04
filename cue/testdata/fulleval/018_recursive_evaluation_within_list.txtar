@@ -86,7 +86,7 @@ b1: {
   }
   b1: (struct){
     d: (_|_){
-      // [incomplete] non-concrete value *adt.BasicType in operand to +:
+      // [incomplete] non-concrete value string in operand to +:
       //     ./in.cue:10:5
     }
     c: (string){ string }

@@ -62,11 +62,11 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
 }
 -- out/eval --
 Errors:
-invalid value *adt.BoundValue (mismatched types number and string)
-invalid value *adt.Vertex (out of bound *adt.BoundValue)
-cannot use *adt.Num (type int) as type (string|bytes):
+invalid value "foo" (out of bound =~"[a-z]{4}")
+invalid value <5 (mismatched types number and string)
+cannot use 1 (type int) as type (string|bytes):
     ./in.cue:18:5
-cannot use *adt.Bool (type bool) as type (string|bytes):
+cannot use true (type bool) as type (string|bytes):
     ./in.cue:19:5
 
 Result:
@@ -79,20 +79,20 @@ Result:
   b1: (string){ "a" }
   b2: (string){ "foo" }
   b3: (_|_){
-    // [eval] invalid value *adt.Vertex (out of bound *adt.BoundValue)
+    // [eval] invalid value "foo" (out of bound =~"[a-z]{4}")
   }
   b4: (string){ "foo" }
   s1: (string){ &(!="b", =~"c") }
   s2: (string){ &(!="b", =~"[a-z]") }
   e1: (_|_){
-    // [eval] cannot use *adt.Num (type int) as type (string|bytes):
+    // [eval] cannot use 1 (type int) as type (string|bytes):
     //     ./in.cue:18:5
   }
   e2: (_|_){
-    // [eval] cannot use *adt.Bool (type bool) as type (string|bytes):
+    // [eval] cannot use true (type bool) as type (string|bytes):
     //     ./in.cue:19:5
   }
   e3: (_|_){
-    // [eval] invalid value *adt.BoundValue (mismatched types number and string)
+    // [eval] invalid value <5 (mismatched types number and string)
   }
 }

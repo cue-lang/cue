@@ -55,44 +55,40 @@ s3:  strings.ContainsAny(str, "dd")
     }
   }
   n2: (_|_){
-    // [incomplete] operand *adt.UnaryExpr of '-' not concrete (was number):
+    // [incomplete] operand -num of '-' not concrete (was number):
     //     ./in.cue:4:6
   }
   n3: (_|_){
-    // [incomplete] operand *adt.UnaryExpr of '+' not concrete (was number):
+    // [incomplete] operand +num of '+' not concrete (was number):
     //     ./in.cue:5:6
   }
   n4: (_|_){
-    // [incomplete] non-concrete value *adt.BoundValue in operand to +:
+    // [incomplete] non-concrete value <4 in operand to +:
     //     ./in.cue:6:5
   }
   n5: (_|_){
-    // [incomplete] non-concrete value *adt.BoundValue in operand to -:
+    // [incomplete] non-concrete value <4 in operand to -:
     //     ./in.cue:7:5
   }
   n6: (_|_){
-    // [incomplete] non-concrete value *adt.BoundValue in operand to *:
+    // [incomplete] non-concrete value <4 in operand to *:
     //     ./in.cue:8:5
   }
   n7: (_|_){
-    // [incomplete] non-concrete value *adt.BoundValue in operand to /:
+    // [incomplete] non-concrete value <4 in operand to /:
     //     ./in.cue:9:5
   }
   b1: (_|_){
-    // [incomplete] operand *adt.UnaryExpr of '!' not concrete (was bool):
+    // [incomplete] operand !is of '!' not concrete (was bool):
     //     ./in.cue:11:6
   }
   s1: (_|_){
-    // [incomplete] invalid interpolation: incomplete string value '*adt.BasicType':
+    // [incomplete] invalid interpolation: incomplete string value 'string':
     //     ./in.cue:13:5
   }
-  s2: (_|_){
-    // [incomplete] incomplete value *adt.ImportReference:
-    //     ./in.cue:14:5
-  }
+  s2: (string){ strings.ContainsAny("dd") }
   s3: (_|_){
-    // [incomplete] incomplete value *adt.ImportReference:
-    //     ./in.cue:15:5
+    // [incomplete] error in call to strings.ContainsAny: non-concrete value string
   }
   str: (string){ string }
   num: (number){ <4 }

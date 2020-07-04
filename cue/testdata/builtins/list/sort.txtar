@@ -1,0 +1,28 @@
+-- in.cue --
+import "list"
+
+a: list.Sort([2, 3, 1, 4], {x:_, y:_, less: x<y})
+
+-- out/eval --
+(struct){
+  a: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 4 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;list〉.Sort([
+    2,
+    3,
+    1,
+    4,
+  ], {
+    x: _
+    y: _
+    less: (〈0;x〉 < 〈0;y〉)
+  })
+}

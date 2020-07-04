@@ -90,7 +90,7 @@ invalid label type bool:
     ./in.cue:8:5
 undefined field 3:
     ./in.cue:9:15
-invalid negative index *adt.Num:
+invalid negative index -1:
     ./in.cue:10:5
 invalid list index 1 (out of bounds):
     ./in.cue:11:16
@@ -127,7 +127,7 @@ Result:
     //     ./in.cue:9:15
   }
   e5: (_|_){
-    // [eval] invalid negative index *adt.Num:
+    // [eval] invalid negative index -1:
     //     ./in.cue:10:5
   }
   e6: (_|_){

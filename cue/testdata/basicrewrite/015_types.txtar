@@ -39,12 +39,12 @@ m:  _|_ // invalid operation -false (- bool)
 }
 -- out/eval --
 Errors:
-invalid value *adt.BasicType (mismatched types string and int)
+invalid value string (mismatched types string and int)
 value can never become concrete:
     ./in.cue:7:5
-invalid operation +*adt.UnaryExpr (+ bool):
+invalid operation ++true (+ bool):
     ./in.cue:8:5
-invalid operation -*adt.UnaryExpr (- bool):
+invalid operation --false (- bool):
     ./in.cue:9:5
 
 Result:
@@ -55,21 +55,21 @@ Result:
   s: (string){ string }
   t: (string){ "s" }
   e: (_|_){
-    // [eval] invalid value *adt.BasicType (mismatched types string and int)
+    // [eval] invalid value string (mismatched types string and int)
   }
   e2: (_|_){
-    // [eval] invalid value *adt.BasicType (mismatched types string and int)
+    // [eval] invalid value string (mismatched types string and int)
   }
   b: (_|_){
     // [eval] value can never become concrete:
     //     ./in.cue:7:5
   }
   p: (_|_){
-    // [eval] invalid operation +*adt.UnaryExpr (+ bool):
+    // [eval] invalid operation ++true (+ bool):
     //     ./in.cue:8:5
   }
   m: (_|_){
-    // [eval] invalid operation -*adt.UnaryExpr (- bool):
+    // [eval] invalid operation --false (- bool):
     //     ./in.cue:9:5
   }
 }

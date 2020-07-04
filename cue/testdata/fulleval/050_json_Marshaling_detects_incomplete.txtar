@@ -22,3 +22,20 @@ foo: {
 b: json.Marshal(foo)
 -- out/legacy-debug --
 <0>{a: <1>.Marshal (<2>{a: string}), foo: <3>{a: 3, b: <4>.foo.c}, b: <1>.Marshal (<4>.foo)}
+-- out/eval --
+(struct){
+  a: (_|_){
+    // [incomplete] cannot convert incomplete value "string" to JSON
+  }
+  foo: (struct){
+    a: (int){ 3 }
+    b: (_|_){
+      // [incomplete] undefined field c:
+      //     ./in.cue:5:20
+    }
+  }
+  b: (_|_){
+    // [incomplete] undefined field c:
+    //     ./in.cue:5:20
+  }
+}

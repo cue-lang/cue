@@ -75,3 +75,28 @@ x:
 {"x":{"s":"myname","out":"myname"}}
 -- out/legacy-debug --
 <0>{x: <1>C{s: "myname", out: "myname"}, #T: <2>C{s: string, out: <3>.Execute ("{{.s}}",<4>C{s: <5>.s})}, #V: <6>C{s: string, out: <7>.Marshal (<8>C{s: <9>.s})}, #U: <10>C{s: string, out: <11>.Marshal (<12>C{s: <13>.s})}}
+-- out/eval --
+(struct){
+  x: (#struct){
+    s: (string){ "myname" }
+    out: (string){ "myname" }
+  }
+  #T: (#struct){
+    s: (string){ string }
+    out: (_|_){
+      // [incomplete] error in call to text/template.Execute: cannot convert incomplete value "string" to JSON
+    }
+  }
+  #V: (#struct){
+    s: (string){ string }
+    out: (_|_){
+      // [incomplete] cannot convert incomplete value "string" to JSON
+    }
+  }
+  #U: (#struct){
+    s: (string){ string }
+    out: (_|_){
+      // [incomplete] incomplete value
+    }
+  }
+}

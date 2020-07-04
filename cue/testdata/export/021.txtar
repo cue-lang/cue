@@ -46,7 +46,7 @@ a: {
 (struct){
   b: (struct){
     idx: (_|_){
-      // [incomplete] invalid non-ground value *adt.BasicType (must be concrete string)
+      // [incomplete] invalid non-ground value string (must be concrete string)
     }
     str: (string){ string }
     a: (struct){

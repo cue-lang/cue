@@ -30,7 +30,7 @@ f: _|_ // conflicting values true and false
 }
 -- out/eval --
 Errors:
-incompatible values *adt.Bool and *adt.Bool
+incompatible values false and true
 
 Result:
 (_|_){
@@ -41,6 +41,6 @@ Result:
   d: (bool){ true }
   e: (bool){ true }
   f: (_|_){
-    // [eval] incompatible values *adt.Bool and *adt.Bool
+    // [eval] incompatible values false and true
   }
 }

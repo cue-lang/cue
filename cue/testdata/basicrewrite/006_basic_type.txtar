@@ -34,7 +34,7 @@ f: true
 }
 -- out/eval --
 Errors:
-invalid value *adt.BasicType (mismatched types float and int)
+invalid value float (mismatched types float and int)
 
 Result:
 (_|_){
@@ -43,7 +43,7 @@ Result:
   b: (int){ 1 }
   c: (float){ 1.0 }
   d: (_|_){
-    // [eval] invalid value *adt.BasicType (mismatched types float and int)
+    // [eval] invalid value float (mismatched types float and int)
   }
   e: (string){ "4" }
   f: (bool){ true }

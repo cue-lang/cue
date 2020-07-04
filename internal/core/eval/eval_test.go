@@ -12,22 +12,21 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package eval
+package eval_test
 
 import (
 	"flag"
 	"fmt"
 	"testing"
 
-	"cuelang.org/go/cue/format"
-	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/pkg/strings"
+	"github.com/rogpeppe/go-internal/txtar"
 )
 
 var (
@@ -48,23 +47,19 @@ func TestEval(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	r := runtime.New()
+	r := cue.NewRuntime()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
 
-		v, err := compile.Files(nil, r, a[0].Files...)
+		v, err := r.Build(a[0])
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		e := Evaluator{
-			r:     r,
-			index: r,
-		}
+		ctx := eval.NewContext(r, v)
+		v.Finalize(ctx)
 
-		err = e.Eval(v)
-		t.WriteErrors(err)
 		if b := validate.Validate(r, v, &validate.Config{
 			AllErrors: true,
 		}); b != nil {
@@ -88,13 +83,6 @@ var alwaysSkip = map[string]string{
 }
 
 var needFix = map[string]string{
-	"fulleval/048_dont_pass_incomplete_values_to_builtins": "import",
-	"fulleval/050_json_Marshaling_detects_incomplete":      "import",
-	"fulleval/051_detectIncompleteYAML":                    "import",
-	"fulleval/052_detectIncompleteJSON":                    "import",
-	"fulleval/056_issue314":                                "import",
-	"resolve/013_custom_validators":                        "import",
-
 	"export/027": "cycle",
 	"export/028": "cycle",
 	"export/030": "cycle",
@@ -108,46 +96,32 @@ var needFix = map[string]string{
 
 // TestX is for debugging. Do not delete.
 func TestX(t *testing.T) {
-	t.Skip()
 	in := `
-	// max: >99 | *((5|*1) & 5)
-	// *( 5 | *_|_ )
-	// 1 | *((5|*1) & 5)
+-- cue.mod/module.cue --
+module: "example.com"
 
-
-	max: >= (num+0) | * (num+0)
-	res: !=4 | * 1
-	num:  *(1+(res+0)) | >(res+0)
-
-    // (1 | *2 | 3) & (1 | 2 | *3)
-
-	// m1: (*1 | (*2 | 3)) & (>=2 & <=3)
-	// m2: (*1 | (*2 | 3)) & (2 | 3)
-	// m3: (*1 | *(*2 | 3)) & (2 | 3)
-	// b: (*"a" | "b") | "c"
-	// {a: 1} | {b: 2}
+-- in.cue --
 	`
 
-	if strings.TrimSpace(in) == "" {
+	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
 		t.Skip()
 	}
 
-	file, err := parser.ParseFile("TestX", in)
+	a := txtar.Parse([]byte(in))
+	instance := cuetxtar.Load(a, "/tmp/test")[0]
+	if instance.Err != nil {
+		t.Fatal(instance.Err)
+	}
+
+	r := cue.NewRuntime()
+
+	v, err := r.Build(instance)
 	if err != nil {
 		t.Fatal(err)
 	}
-	r := runtime.New()
+	t.Error(debug.NodeString(r, v, nil))
 
-	b, err := format.Node(file)
-	_, _ = b, err
-	// fmt.Println(string(b), err)
-
-	v, err := compile.Files(nil, r, file)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	ctx := NewContext(r, v)
+	ctx := eval.NewContext(r, v)
 
 	ctx.Unify(ctx, v, adt.Finalized)
 	// if err != nil {

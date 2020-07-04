@@ -18,7 +18,7 @@ b: _|_ // cannot slice a (type string)
 (struct){
   a: ((int|string)){ |(*(string){ "foo" }, *(string){ "bar" }, *(string){ string }, (int){ int }) }
   b: (_|_){
-    // [incomplete] non-concrete slice subject *adt.FieldReference:
+    // [incomplete] non-concrete slice subject a:
     //     ./in.cue:1:41
   }
 }

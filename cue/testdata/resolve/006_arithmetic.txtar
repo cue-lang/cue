@@ -30,7 +30,7 @@ e2: _|_ // conflicting values int and (4.0 / 2.0) (mismatched types int and floa
 }
 -- out/eval --
 Errors:
-invalid value *adt.Num (mismatched types float and int)
+invalid value 2 (mismatched types float and int)
 
 Result:
 (_|_){
@@ -41,6 +41,6 @@ Result:
   v5: (float){ 2.0 }
   v6: (float){ 1 }
   e2: (_|_){
-    // [eval] invalid value *adt.Num (mismatched types float and int)
+    // [eval] invalid value 2 (mismatched types float and int)
   }
 }

@@ -12,7 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate go run gen.go
 //go:generate go run golang.org/x/tools/cmd/goimports -w -local cuelang.org/go builtins.go
 //go:generate gofmt -s -w builtins.go
 

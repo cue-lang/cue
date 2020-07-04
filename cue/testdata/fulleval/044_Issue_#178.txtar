@@ -27,13 +27,11 @@ bar:  hex.EncodedLen(len)
 -- out/eval --
 (struct){
   foo: (_|_){
-    // [incomplete] incomplete value *adt.ImportReference:
-    //     ./in.cue:5:7
+    // [incomplete] error in call to encoding/csv.Decode: non-concrete value bytes
   }
   data: (bytes){ bytes }
   len: (int){ int }
   bar: (_|_){
-    // [incomplete] incomplete value *adt.ImportReference:
-    //     ./in.cue:9:6
+    // [incomplete] error in call to encoding/hex.EncodedLen: non-concrete value int
   }
 }

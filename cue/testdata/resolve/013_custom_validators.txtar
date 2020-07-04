@@ -19,3 +19,16 @@ b: _|_ // invalid value "dog" (does not satisfy strings.ContainsAny("c"))
 c: "dog"
 -- out/legacy-debug --
 <0>{a: "after", b: _|_(strings.ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c"))), c: "dog"}
+-- out/eval --
+Errors:
+invalid value "dog" (does not satisfy strings.ContainsAny("c"))
+
+Result:
+(_|_){
+  // [eval]
+  a: (string){ "after" }
+  b: (_|_){
+    // [eval] invalid value "dog" (does not satisfy strings.ContainsAny("c"))
+  }
+  c: (string){ "dog" }
+}

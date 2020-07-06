@@ -1,0 +1,1073 @@
+-- in.cue --
+a1: {
+    f: [f]
+}
+
+a2: {
+    f: f
+}
+
+a3: {
+    f: { g: f }
+}
+
+a4: {
+    a: [a|int]
+}
+
+a5: {
+    a: b: a | int
+}
+
+a6: {
+    a: a | int
+}
+
+b1: {
+    b: a & [1]
+    a: [a|int]
+}
+
+b2: {
+    a: [a|int]
+    b: a & [1]
+}
+
+b3: {
+    x: a: [a|int]
+    b: x & {a: [1]}
+}
+
+b4: {
+    b: x.y & [1]
+    x: y: [y]
+}
+
+b5: {
+    b: x.y & {a: [1]}
+    x: y: a: [a|int]
+}
+
+b6: {
+    b: x & {a: [1]}
+    x: a: [a]
+}
+
+// TODO: erroneous: b should be an error. My suspicion is that `a` is detected
+// as a reference cycle, because list don't introduce a new scope, allowing
+// `1` to unify with the equivalent of `a: a` (which normally would be okay).
+b7: {
+    b: a & [[1]]
+    a: [a]
+}
+
+c1: {
+  a: {
+    b: {}
+    c: a & b
+  }
+}
+
+// indirection
+d1: {
+    a: b: c: d: { h: int, t: r }
+    r: a.b
+
+    x: a.b.c
+}
+
+d2: {
+    x: a.b.c
+
+    r: a.b
+    a: b: c: d: { h: int, t: r }
+}
+
+d3: {
+    config: {
+        a: b: c: indirect
+        indirect: [a.b, null][i]
+        i: int | *1
+    }
+    x: config & { i: 0 }
+}
+
+
+// combining structural with reference cycles
+e1: {
+    a: a
+    a: c: a
+
+    b: c: b
+    b: b
+}
+
+e2: {
+    a: {a}
+    a: c: a
+
+    b: c: b
+    b: {b}
+}
+
+e3: {
+    a: [a]
+    a: c: a
+
+    b: [b]
+    b: c: b
+}
+
+e4: {
+    a: [a | {}]
+    a: [[{c: 1}]]
+
+    b: [[{c: 1}]]
+    b: [b | {}]
+}
+
+
+e5: {
+    a: c: a | int
+    a: a | int
+
+    b: b | int
+    b: c: b | int
+}
+
+
+// validating values
+v1: {
+    x: [x | int, 1]
+    y: x & [[[2], 1], 1]
+}
+
+v2: {
+    y: x & [[[2], 1], 1]
+    x: [x | int, 1]
+}
+
+v3: {
+    list: {
+        head: int
+        tail: list | null
+    }
+
+    myList: list
+    myList: {
+        head: 2
+        tail: {
+            head: 3
+            tail: {
+                head: 4
+            }
+        }
+    }
+}
+
+v4: {
+    list: {
+        head: int
+        tail: list | 1
+    }
+
+    myList: list
+    myList: {
+        head: 2
+        tail: head: 3
+    }
+}
+
+v5: {
+    list: {
+        head: int
+        tail: list | {}
+    }
+
+    myList: list
+    myList: {
+        head: 2
+        tail: head: 3
+    }
+}
+
+
+
+// Example from "The Logic of Type Feature Structures" (Bob Carpenter)/
+z1: {
+    y: {
+        f: h: g
+        g: _
+    }
+    x: {
+        f: _
+        g: f
+    }
+    z: x & y
+}
+
+
+// Ensure these are NOT treated as structural errors.
+
+n1: a: b: int
+n2: n1 & { a: n1 }
+n3: n1 & { n1 }
+n4: n1 & { x: n1 & { y: n1 & { z: int }}}
+
+
+-- out/eval --
+Errors:
+conflicting types
+conflicting types list and struct
+structural cycle
+
+Result:
+(_|_){
+  // [eval]
+  a1: (_|_){
+    // [structural cycle]
+    f: (_|_){
+      // [structural cycle]
+      0: (_|_){
+        // [structural cycle] structural cycle
+        0: (_|_){// 〈0;f〉
+        }
+      }
+    }
+  }
+  a2: (struct){
+    f: (_){ _ }
+  }
+  a3: (_|_){
+    // [structural cycle]
+    f: (_|_){
+      // [structural cycle]
+      g: (_|_){
+        // [structural cycle] structural cycle
+        g: (_|_){// 〈1;f〉
+        }
+      }
+    }
+  }
+  a4: (struct){
+    a: (#list){
+      0: (int){ int }
+    }
+  }
+  a5: (struct){
+    a: (struct){
+      b: (int){ int }
+    }
+  }
+  a6: (struct){
+    a: (_){ |((_){ _ }, (int){ int }) }
+  }
+  b1: (struct){
+    b: (#list){
+      0: (int){ 1 }
+    }
+    a: (#list){
+      0: (int){ int }
+    }
+  }
+  b2: (struct){
+    a: (#list){
+      0: (int){ int }
+    }
+    b: (#list){
+      0: (int){ 1 }
+    }
+  }
+  b3: (struct){
+    x: (struct){
+      a: (#list){
+        0: (int){ int }
+      }
+    }
+    b: (struct){
+      a: (#list){
+        0: (int){ 1 }
+      }
+    }
+  }
+  b4: (_|_){
+    // [structural cycle]
+    b: (_|_){
+      // [structural cycle]
+      0: (int){ 1 }
+    }
+    x: (_|_){
+      // [structural cycle]
+      y: (_|_){
+        // [structural cycle]
+        0: (_|_){
+          // [structural cycle] structural cycle
+          0: (_|_){// 〈0;y〉
+          }
+        }
+      }
+    }
+  }
+  b5: (struct){
+    b: (struct){
+      a: (#list){
+        0: (int){ 1 }
+      }
+    }
+    x: (struct){
+      y: (struct){
+        a: (#list){
+          0: (int){ int }
+        }
+      }
+    }
+  }
+  b6: (_|_){
+    // [eval]
+    b: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval]
+        0: (_|_){
+          // [eval] conflicting types
+          0: (_|_){
+            // [structural cycle] structural cycle
+          }
+        }
+      }
+    }
+    x: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        0: (_|_){
+          // [structural cycle] structural cycle
+          0: (_|_){// 〈0;a〉
+          }
+        }
+      }
+    }
+  }
+  b7: (_|_){
+    // [structural cycle]
+    b: (#list){
+      0: (#list){
+        0: (int){ 1 }
+      }
+    }
+    a: (_|_){
+      // [structural cycle]
+      0: (_|_){
+        // [structural cycle] structural cycle
+        0: (_|_){// 〈0;a〉
+        }
+      }
+    }
+  }
+  c1: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (struct){
+      }
+      c: (_|_){
+        // [structural cycle]
+        b: (struct){
+        }
+        c: (_|_){
+          // [structural cycle] structural cycle
+          b: (_|_){// {}
+          }
+          c: (_|_){// (〈1;a〉 & 〈0;b〉)
+          }
+        }
+      }
+    }
+  }
+  d1: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          d: (_|_){
+            // [structural cycle]
+            h: (int){ int }
+            t: (_|_){
+              // [structural cycle] structural cycle
+              c: (_|_){// {
+                //   d: {
+                //     h: int
+                //     t: 〈4;r〉
+                //   }
+                // }
+              }
+            }
+          }
+        }
+      }
+    }
+    r: (_|_){
+      // [structural cycle] structural cycle
+      c: (_|_){// {
+        //   d: {
+        //     h: int
+        //     t: 〈4;r〉
+        //   }
+        // }
+      }
+    }
+    x: (_|_){
+      // [structural cycle]
+    }
+  }
+  d2: (_|_){
+    // [structural cycle]
+    x: (_|_){
+      // [structural cycle]
+    }
+    r: (_|_){
+      // [structural cycle] structural cycle
+      c: (_|_){// {
+        //   d: {
+        //     h: int
+        //     t: 〈4;r〉
+        //   }
+        // }
+      }
+    }
+    a: (_|_){
+      // [structural cycle]
+      b: (_|_){
+        // [structural cycle]
+        c: (_|_){
+          // [structural cycle]
+          d: (_|_){
+            // [structural cycle]
+            h: (int){ int }
+            t: (_|_){
+              // [structural cycle] structural cycle
+              c: (_|_){// {
+                //   d: {
+                //     h: int
+                //     t: 〈4;r〉
+                //   }
+                // }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  d3: (_|_){
+    // [structural cycle]
+    config: (struct){
+      a: (struct){
+        b: (struct){
+          c: (null){ null }
+        }
+      }
+      indirect: (null){ null }
+      i: (int){ 1 }
+    }
+    x: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          c: (_|_){
+            // [structural cycle] structural cycle
+            c: (_|_){// 〈2;indirect〉
+            }
+          }
+        }
+      }
+      indirect: (_|_){
+        // [structural cycle] structural cycle
+        c: (_|_){// 〈2;indirect〉
+        }
+      }
+      i: (int){ 0 }
+    }
+  }
+  e1: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      c: (_|_){
+        // [structural cycle] structural cycle
+        c: (_|_){// 〈1;a〉
+        }
+      }
+    }
+    b: (_|_){
+      // [structural cycle]
+      c: (_|_){
+        // [structural cycle] structural cycle
+        c: (_|_){// 〈1;b〉
+        }
+      }
+    }
+  }
+  e2: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle]
+      c: (_|_){
+        // [structural cycle] structural cycle
+        c: (_|_){// 〈1;a〉
+        }
+      }
+    }
+    b: (_|_){
+      // [structural cycle]
+      c: (_|_){
+        // [structural cycle] structural cycle
+        c: (_|_){// 〈1;b〉
+        }
+      }
+    }
+  }
+  e3: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] conflicting types list and struct
+      c: (_|_){
+        // [eval] conflicting types list and struct
+        // structural cycle
+        c: (_|_){// 〈1;a〉
+        }
+        0: (_|_){// 〈0;a〉
+        }
+      }
+      0: (_|_){
+        // [eval] conflicting types list and struct
+        // structural cycle
+        c: (_|_){// 〈1;a〉
+        }
+        0: (_|_){// 〈0;a〉
+        }
+      }
+    }
+    b: (_|_){
+      // [eval] conflicting types list and struct
+      c: (_|_){
+        // [eval] conflicting types list and struct
+        // structural cycle
+        c: (_|_){// 〈1;b〉
+        }
+        0: (_|_){// 〈0;b〉
+        }
+      }
+      0: (_|_){
+        // [eval] conflicting types list and struct
+        // structural cycle
+        c: (_|_){// 〈1;b〉
+        }
+        0: (_|_){// 〈0;b〉
+        }
+      }
+    }
+  }
+  e4: (struct){
+    a: (#list){
+      0: (#list){
+        0: (struct){
+          c: (int){ 1 }
+        }
+      }
+    }
+    b: (#list){
+      0: (#list){
+        0: (struct){
+          c: (int){ 1 }
+        }
+      }
+    }
+  }
+  e5: (struct){
+    a: (struct){
+      c: (int){ int }
+    }
+    b: (struct){
+      c: (int){ int }
+    }
+  }
+  v1: (struct){
+    x: (#list){
+      0: (int){ int }
+      1: (int){ 1 }
+    }
+    y: (#list){
+      0: (#list){
+        0: (#list){
+          0: (int){ 2 }
+        }
+        1: (int){ 1 }
+      }
+      1: (int){ 1 }
+    }
+  }
+  v2: (struct){
+    y: (#list){
+      0: (#list){
+        0: (#list){
+          0: (int){ 2 }
+        }
+        1: (int){ 1 }
+      }
+      1: (int){ 1 }
+    }
+    x: (#list){
+      0: (int){ int }
+      1: (int){ 1 }
+    }
+  }
+  v3: (struct){
+    list: (struct){
+      head: (int){ int }
+      tail: (null){ null }
+    }
+    myList: (struct){
+      head: (int){ 2 }
+      tail: (struct){
+        head: (int){ 3 }
+        tail: (struct){
+          head: (int){ 4 }
+          tail: (null){ null }
+        }
+      }
+    }
+  }
+  v4: (struct){
+    list: (struct){
+      head: (int){ int }
+      tail: (int){ 1 }
+    }
+    myList: (struct){
+      head: (int){ 2 }
+      tail: (struct){
+        head: (int){ 3 }
+        tail: (int){ 1 }
+      }
+    }
+  }
+  v5: (struct){
+    list: (struct){
+      head: (int){ int }
+      tail: (struct){
+      }
+    }
+    myList: (struct){
+      head: (int){ 2 }
+      tail: (struct){ |((struct){
+          head: (int){ 3 }
+          tail: (struct){
+          }
+        }, (struct){
+          head: (int){ 3 }
+        }) }
+    }
+  }
+  z1: (_|_){
+    // [structural cycle]
+    y: (struct){
+      f: (struct){
+        h: (_){ _ }
+      }
+      g: (_){ _ }
+    }
+    x: (struct){
+      f: (_){ _ }
+      g: (_){ _ }
+    }
+    z: (_|_){
+      // [structural cycle]
+      f: (_|_){
+        // [structural cycle]
+        h: (_|_){
+          // [structural cycle]
+          h: (_|_){
+            // [structural cycle] structural cycle
+            h: (_|_){// 〈1;g〉
+            }
+          }
+        }
+      }
+      g: (_|_){
+        // [structural cycle]
+        h: (_|_){
+          // [structural cycle] structural cycle
+          h: (_|_){// 〈1;g〉
+          }
+        }
+      }
+    }
+  }
+  n1: (struct){
+    a: (struct){
+      b: (int){ int }
+    }
+  }
+  n2: (struct){
+    a: (struct){
+      b: (int){ int }
+      a: (struct){
+        b: (int){ int }
+      }
+    }
+  }
+  n3: (struct){
+    a: (struct){
+      b: (int){ int }
+    }
+  }
+  n4: (struct){
+    a: (struct){
+      b: (int){ int }
+    }
+    x: (struct){
+      a: (struct){
+        b: (int){ int }
+      }
+      y: (struct){
+        a: (struct){
+          b: (int){ int }
+        }
+        z: (int){ int }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a1: {
+    f: [
+      〈0;f〉,
+    ]
+  }
+  a2: {
+    f: 〈0;f〉
+  }
+  a3: {
+    f: {
+      g: 〈1;f〉
+    }
+  }
+  a4: {
+    a: [
+      (〈0;a〉|int),
+    ]
+  }
+  a5: {
+    a: {
+      b: (〈1;a〉|int)
+    }
+  }
+  a6: {
+    a: (〈0;a〉|int)
+  }
+  b1: {
+    b: (〈0;a〉 & [
+      1,
+    ])
+    a: [
+      (〈0;a〉|int),
+    ]
+  }
+  b2: {
+    a: [
+      (〈0;a〉|int),
+    ]
+    b: (〈0;a〉 & [
+      1,
+    ])
+  }
+  b3: {
+    x: {
+      a: [
+        (〈0;a〉|int),
+      ]
+    }
+    b: (〈0;x〉 & {
+      a: [
+        1,
+      ]
+    })
+  }
+  b4: {
+    b: (〈0;x〉.y & [
+      1,
+    ])
+    x: {
+      y: [
+        〈0;y〉,
+      ]
+    }
+  }
+  b5: {
+    b: (〈0;x〉.y & {
+      a: [
+        1,
+      ]
+    })
+    x: {
+      y: {
+        a: [
+          (〈0;a〉|int),
+        ]
+      }
+    }
+  }
+  b6: {
+    b: (〈0;x〉 & {
+      a: [
+        1,
+      ]
+    })
+    x: {
+      a: [
+        〈0;a〉,
+      ]
+    }
+  }
+  b7: {
+    b: (〈0;a〉 & [
+      [
+        1,
+      ],
+    ])
+    a: [
+      〈0;a〉,
+    ]
+  }
+  c1: {
+    a: {
+      b: {}
+      c: (〈1;a〉 & 〈0;b〉)
+    }
+  }
+  d1: {
+    a: {
+      b: {
+        c: {
+          d: {
+            h: int
+            t: 〈4;r〉
+          }
+        }
+      }
+    }
+    r: 〈0;a〉.b
+    x: 〈0;a〉.b.c
+  }
+  d2: {
+    x: 〈0;a〉.b.c
+    r: 〈0;a〉.b
+    a: {
+      b: {
+        c: {
+          d: {
+            h: int
+            t: 〈4;r〉
+          }
+        }
+      }
+    }
+  }
+  d3: {
+    config: {
+      a: {
+        b: {
+          c: 〈2;indirect〉
+        }
+      }
+      indirect: [
+        〈0;a〉.b,
+        null,
+      ][〈0;i〉]
+      i: (int|*1)
+    }
+    x: (〈0;config〉 & {
+      i: 0
+    })
+  }
+  e1: {
+    a: 〈0;a〉
+    a: {
+      c: 〈1;a〉
+    }
+    b: {
+      c: 〈1;b〉
+    }
+    b: 〈0;b〉
+  }
+  e2: {
+    a: {
+      〈1;a〉
+    }
+    a: {
+      c: 〈1;a〉
+    }
+    b: {
+      c: 〈1;b〉
+    }
+    b: {
+      〈1;b〉
+    }
+  }
+  e3: {
+    a: [
+      〈0;a〉,
+    ]
+    a: {
+      c: 〈1;a〉
+    }
+    b: [
+      〈0;b〉,
+    ]
+    b: {
+      c: 〈1;b〉
+    }
+  }
+  e4: {
+    a: [
+      (〈0;a〉|{}),
+    ]
+    a: [
+      [
+        {
+          c: 1
+        },
+      ],
+    ]
+    b: [
+      [
+        {
+          c: 1
+        },
+      ],
+    ]
+    b: [
+      (〈0;b〉|{}),
+    ]
+  }
+  e5: {
+    a: {
+      c: (〈1;a〉|int)
+    }
+    a: (〈0;a〉|int)
+    b: (〈0;b〉|int)
+    b: {
+      c: (〈1;b〉|int)
+    }
+  }
+  v1: {
+    x: [
+      (〈0;x〉|int),
+      1,
+    ]
+    y: (〈0;x〉 & [
+      [
+        [
+          2,
+        ],
+        1,
+      ],
+      1,
+    ])
+  }
+  v2: {
+    y: (〈0;x〉 & [
+      [
+        [
+          2,
+        ],
+        1,
+      ],
+      1,
+    ])
+    x: [
+      (〈0;x〉|int),
+      1,
+    ]
+  }
+  v3: {
+    list: {
+      head: int
+      tail: (〈1;list〉|null)
+    }
+    myList: 〈0;list〉
+    myList: {
+      head: 2
+      tail: {
+        head: 3
+        tail: {
+          head: 4
+        }
+      }
+    }
+  }
+  v4: {
+    list: {
+      head: int
+      tail: (〈1;list〉|1)
+    }
+    myList: 〈0;list〉
+    myList: {
+      head: 2
+      tail: {
+        head: 3
+      }
+    }
+  }
+  v5: {
+    list: {
+      head: int
+      tail: (〈1;list〉|{})
+    }
+    myList: 〈0;list〉
+    myList: {
+      head: 2
+      tail: {
+        head: 3
+      }
+    }
+  }
+  z1: {
+    y: {
+      f: {
+        h: 〈1;g〉
+      }
+      g: _
+    }
+    x: {
+      f: _
+      g: 〈0;f〉
+    }
+    z: (〈0;x〉 & 〈0;y〉)
+  }
+  n1: {
+    a: {
+      b: int
+    }
+  }
+  n2: (〈0;n1〉 & {
+    a: 〈1;n1〉
+  })
+  n3: (〈0;n1〉 & {
+    〈1;n1〉
+  })
+  n4: (〈0;n1〉 & {
+    x: (〈1;n1〉 & {
+      y: (〈2;n1〉 & {
+        z: int
+      })
+    })
+  })
+}

@@ -51,6 +51,12 @@ const (
 	// Mostly used for legacy reasons.
 	NotExistError
 
+	// StructuralCycleError means a structural cycle was found. Structural
+	// cycles are permanent errors, but they are not passed up recursively,
+	// as a unification of a value with a structural cycle with one that
+	// doesn't may still give a useful result.
+	StructuralCycleError
+
 	// IncompleteError means an evaluation could not complete because of
 	// insufficient information that may still be added later.
 	IncompleteError
@@ -67,6 +73,8 @@ func (c ErrorCode) String() string {
 		return "eval"
 	case UserError:
 		return "user"
+	case StructuralCycleError:
+		return "structural cycle"
 	case IncompleteError:
 		return "incomplete"
 	case CycleError:

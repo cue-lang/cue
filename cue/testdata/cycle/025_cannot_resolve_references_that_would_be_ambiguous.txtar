@@ -56,22 +56,26 @@ c2: (*{
 -- out/eval --
 (struct){
   a1: (_|_){
-    // [incomplete]
+    // [incomplete] incomplete cause disjunction
   }
   a2: (_|_){
-    // [incomplete]
+    // [incomplete] incomplete cause disjunction
   }
   a3: (int){ 1 }
-  b1: (_|_){
-    // [incomplete] ambiguous disjunction
-  }
-  b2: (_|_){
-    // [incomplete] ambiguous disjunction
-  }
-  c1: (_|_){
-    // [incomplete] ambiguous disjunction
-  }
-  c2: (_|_){
-    // [incomplete] ambiguous disjunction
-  }
+  b1: (int){ |((int){ 0 }, (int){ 1 }) }
+  b2: (int){ |((int){ 1 }, (int){ 0 }) }
+  c1: (struct){ |((struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }, (struct){
+      b: (int){ 1 }
+      a: (int){ 2 }
+    }) }
+  c2: (struct){ |((struct){
+      a: (int){ 2 }
+      b: (int){ 1 }
+    }, (struct){
+      b: (int){ 2 }
+      a: (int){ 1 }
+    }) }
 }

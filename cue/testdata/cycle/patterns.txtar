@@ -1,0 +1,48 @@
+Lots of cycle-reference goodness.
+
+-- in.cue --
+{[!~"^[.]"]: c}
+a: b
+b: [string]: int
+c: a: int
+{[string]: c}
+a: b
+b: [string]: int
+c: a: int
+
+-- out/eval --
+(struct){
+  a: (struct){
+    a: (int){ int }
+  }
+  b: (struct){
+    a: (int){ int }
+  }
+  c: (struct){
+    a: (int){ int }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  {
+    [!~"^[.]"]: 〈1;c〉
+  }
+  a: 〈0;b〉
+  b: {
+    [string]: int
+  }
+  c: {
+    a: int
+  }
+  {
+    [string]: 〈1;c〉
+  }
+  a: 〈0;b〉
+  b: {
+    [string]: int
+  }
+  c: {
+    a: int
+  }
+}

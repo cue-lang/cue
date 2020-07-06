@@ -38,3 +38,15 @@ a: []
     ]
   }
 }
+-- out/eval --
+(struct){
+  #FindInMap: (#struct){
+    #: (#struct){
+      "Fn::FindInMap": (#list){
+        0: (string){ string }
+      }
+    }
+  }
+  a: (list){
+  }
+}

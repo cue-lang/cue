@@ -22,6 +22,61 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+// TODO: unanswered questions about structural cycles:
+//
+// 1. When detecting a structural cycle, should we consider this as:
+//    a) an unevaluated value,
+//    b) an incomplete error (which does not affect parent validity), or
+//    c) a special value.
+//
+// Making it an error is the simplest way to ensure reentrancy is disallowed:
+// without an error it would require an additional mechanism to stop reentrancy
+// from continuing to process. Even worse, in some cases it may only partially
+// evaluate, resulting in unexpected results. For this reason, we are taking
+// approach `b` for now.
+//
+// This has some consequences of how disjunctions are treated though. Consider
+//
+//     list: {
+//        head: _
+//        tail: list | null
+//     }
+//
+// When making it an error, evaluating the above will result in
+//
+//     list: {
+//        head: _
+//        tail: null
+//     }
+//
+// because list will result in a structural cycle, and thus an error, it will be
+// stripped from the disjunction. This may or may not be a desirable property. A
+// nice thing is that it is not required to write `list | *null`. A disadvantage
+// is that this is perhaps somewhat inexplicit.
+//
+// When not making it an error (and simply cease evaluating child arcs upon
+// cycle detection), the result would be:
+//
+//     list: {
+//        head: _
+//        tail: list | null
+//     }
+//
+// In other words, an evaluation would result in a cycle and thus an error.
+// Implementations can recognize such cases by having unevaluated arcs. An
+// explicit structure cycle marker would probably be less error prone.
+//
+// Note that in both cases, a reference to list will still use the original
+// conjuncts, so the result will be the same for either method in this case.
+//
+//
+// 2. Structural cycle allowance.
+//
+// Structural cycle detection disallows reentrancy as well. This means one
+// cannot use structs for recursive computation. This will probably preclude
+// evaluation of some configuration. Given that there is no real alternative
+// yet, we could allow structural cycle detection to be optionally disabled.
+
 // An Environment links the parent scopes for identifier lookup to a composite
 // node. Each conjunct that make up node in the tree can be associated with
 // a different environment (although some conjuncts may share an Environment).
@@ -33,9 +88,43 @@ type Environment struct {
 	// constraint. It is used to resolve label references.
 	DynamicLabel Feature
 
+	// TODO(perf): make the following public fields a shareable struct as it
+	// mostly is going to be the same for child nodes.
+
 	// CloseID is a unique number that tracks a group of conjuncts that need
 	// belong to a single originating definition.
 	CloseID uint32
+
+	// Cyclic indicates a structural cycle was detected for this conjunct or one
+	// of its ancestors.
+	Cyclic bool
+
+	// Deref keeps track of nodes that should dereference to Vertex. It is used
+	// for detecting structural cycle.
+	//
+	// The detection algorithm is based on Tomabechi's quasi-destructive graph
+	// unification. This detection requires dependencies to be resolved into
+	// fully dereferenced vertices. This is not the case in our algorithm:
+	// the result of evaluating conjuncts is placed into dereferenced vertices
+	// _after_ they are evaluated, but the Environment still points to the
+	// non-dereferenced context.
+	//
+	// In order to be able to detect structural cycles, we need to ensure that
+	// at least one node that is part of a cycle in the context in which
+	// conjunctions are evaluated dereferences correctly.
+	//
+	// The only field necessary to detect a structural cycle, however, is
+	// the Status field of the Vertex. So rather than dereferencing a node
+	// proper, it is sufficient to copy the Status of the dereferenced nodes
+	// to these nodes (will always be EvaluatingArcs).
+	Deref []*Vertex
+
+	// Cycles contains vertices for which cycles are detected. It is used
+	// for tracking self-references within structural cycles.
+	//
+	// Unlike Deref, Cycles is not incremented with child nodes.
+	// TODO: Cycles is always a tail end of Deref, so this can be optimized.
+	Cycles []*Vertex
 
 	cache map[Expr]Value
 }
@@ -71,6 +160,8 @@ type Vertex struct {
 	// Label is the feature leading to this vertex.
 	Label Feature
 
+	// TODO: move the following status fields to a separate struct.
+
 	// status indicates the evaluation progress of this vertex.
 	status VertexStatus
 
@@ -78,6 +169,13 @@ type Vertex struct {
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
 	isData bool
+
+	// EvalCount keeps track of temporary dereferencing during evaluation.
+	// If EvalCount > 0, status should be considered to be EvaluatingArcs.
+	EvalCount int
+
+	// SelfCount is used for tracking self-references.
+	SelfCount int
 
 	// Value is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
@@ -140,6 +238,9 @@ const (
 )
 
 func (v *Vertex) Status() VertexStatus {
+	if v.EvalCount > 0 {
+		return EvaluatingArcs
+	}
 	return v.status
 }
 

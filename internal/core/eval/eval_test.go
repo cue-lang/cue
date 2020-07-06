@@ -17,6 +17,7 @@ package eval_test
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/internal/core/debug"
@@ -24,7 +25,6 @@ import (
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/legacy/cue"
-	"cuelang.org/go/pkg/strings"
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
@@ -85,12 +85,7 @@ var alwaysSkip = map[string]string{
 }
 
 var needFix = map[string]string{
-	"export/027": "cycle",
-	"export/028": "cycle",
-	"export/030": "cycle",
-
-	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": "cycle",
-	"compile/scope": "cycle",
+	"DIR/NAME": "reason",
 }
 
 // TestX is for debugging. Do not delete.

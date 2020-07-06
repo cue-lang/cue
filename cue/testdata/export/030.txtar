@@ -53,3 +53,20 @@ eval: true
     #Bar: string
   }
 }
+-- out/eval --
+(struct){
+  #Foo: (#struct){
+    sgl: (string){ string }
+    ref: ((null|struct)){ |((null){ null }, (#struct){
+        sgl: (string){ string }
+        ref: (null){ null }
+        ext: ((null|string)){ |((string){ string }, (null){ null }) }
+        ref2: ((null|string)){ |((null){ null }, (string){ string }) }
+        "#Foo": (int){ 2 }
+      }) }
+    ext: ((null|string)){ |((string){ string }, (null){ null }) }
+    ref2: ((null|string)){ |((null){ null }, (string){ string }) }
+    "#Foo": (int){ 2 }
+  }
+  #Bar: (string){ string }
+}

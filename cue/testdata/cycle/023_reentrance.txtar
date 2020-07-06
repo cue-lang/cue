@@ -79,7 +79,8 @@ fib12: 144
   }).out
 }
 -- out/eval --
-(struct){
+(_|_){
+  // [structural cycle]
   fibRec: (struct){
     nn: (int){ int }
     out: (_|_){
@@ -93,6 +94,10 @@ fib12: 144
     n: (int){ int }
   }
   fib2: (int){ 1 }
-  fib7: (int){ 13 }
-  fib12: (int){ 144 }
+  fib7: (_|_){
+    // [structural cycle]
+  }
+  fib12: (_|_){
+    // [structural cycle]
+  }
 }

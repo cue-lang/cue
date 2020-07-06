@@ -1,0 +1,150 @@
+-- in.cue --
+
+// cycle is a structural cycle
+cycle: a: cycle
+
+// reference to outside structural cycle
+r1a: cycle | int
+r1b: int | cycle
+
+r2a: cycle | 1
+r2b: 1 | cycle
+
+r3a: cycle | null
+r3b: null | cycle
+
+r4a: cycle | {}
+r4b: {} | cycle
+
+r5a: cycle | []
+r5b: [] | cycle
+
+// reference to ancestor node
+s1a: x: s1a | int
+s1b: x: int | s1b
+
+s2a: x: s2a | 1
+s2b: x: 1 | s2b
+
+s3a: x: s3a | null
+s3b: x: null | s3b
+
+s4a: x: s4a | {}
+s4b: x: {} | s4b
+
+s5a: x: s5a | []
+s5b: x: [] | s5b
+
+
+
+-- out/eval --
+Errors:
+structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  cycle: (_|_){
+    // [structural cycle]
+    a: (_|_){
+      // [structural cycle] structural cycle
+      a: (_|_){// 〈1;cycle〉
+      }
+    }
+  }
+  r1a: (int){ int }
+  r1b: (int){ int }
+  r2a: (int){ 1 }
+  r2b: (int){ 1 }
+  r3a: (null){ null }
+  r3b: (null){ null }
+  r4a: (struct){
+  }
+  r4b: (struct){
+  }
+  r5a: (#list){
+  }
+  r5b: (#list){
+  }
+  s1a: (struct){
+    x: (int){ int }
+  }
+  s1b: (struct){
+    x: (int){ int }
+  }
+  s2a: (struct){
+    x: (int){ 1 }
+  }
+  s2b: (struct){
+    x: (int){ 1 }
+  }
+  s3a: (struct){
+    x: (null){ null }
+  }
+  s3b: (struct){
+    x: (null){ null }
+  }
+  s4a: (struct){
+    x: (struct){
+    }
+  }
+  s4b: (struct){
+    x: (struct){
+    }
+  }
+  s5a: (struct){
+    x: (#list){
+    }
+  }
+  s5b: (struct){
+    x: (#list){
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  cycle: {
+    a: 〈1;cycle〉
+  }
+  r1a: (〈0;cycle〉|int)
+  r1b: (int|〈0;cycle〉)
+  r2a: (〈0;cycle〉|1)
+  r2b: (1|〈0;cycle〉)
+  r3a: (〈0;cycle〉|null)
+  r3b: (null|〈0;cycle〉)
+  r4a: (〈0;cycle〉|{})
+  r4b: ({}|〈0;cycle〉)
+  r5a: (〈0;cycle〉|[])
+  r5b: ([]|〈0;cycle〉)
+  s1a: {
+    x: (〈1;s1a〉|int)
+  }
+  s1b: {
+    x: (int|〈1;s1b〉)
+  }
+  s2a: {
+    x: (〈1;s2a〉|1)
+  }
+  s2b: {
+    x: (1|〈1;s2b〉)
+  }
+  s3a: {
+    x: (〈1;s3a〉|null)
+  }
+  s3b: {
+    x: (null|〈1;s3b〉)
+  }
+  s4a: {
+    x: (〈1;s4a〉|{})
+  }
+  s4b: {
+    x: ({}|〈1;s4b〉)
+  }
+  s5a: {
+    x: (〈1;s5a〉|[])
+  }
+  s5b: {
+    x: ([]|〈1;s5b〉)
+  }
+}

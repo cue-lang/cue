@@ -545,6 +545,8 @@ func (n *nodeContext) postDisjunct() {
 		n.node.Closed = m
 	}
 
+	cyclic := n.hasCycle && !n.hasNonCycle
+
 	// Visit arcs recursively to validate and compute error.
 	for _, a := range n.node.Arcs {
 		if updated != nil {
@@ -560,11 +562,22 @@ func (n *nodeContext) postDisjunct() {
 		}
 		// Call UpdateStatus here to be absolutely sure the status is set
 		// correctly and that we are not regressing.
-		n.node.UpdateStatus(adt.EvaluatingArcs)
-		n.eval.Unify(ctx, a, adt.Finalized)
-		if err, _ := a.Value.(*adt.Bottom); err != nil {
-			n.node.AddChildError(err)
+		if !cyclic {
+			n.node.UpdateStatus(adt.EvaluatingArcs)
+			n.eval.Unify(ctx, a, adt.Finalized)
+			if err, _ := a.Value.(*adt.Bottom); err != nil {
+				n.node.AddChildError(err)
+			}
 		}
+	}
+
+	if cyclic {
+		n.node.Value = adt.CombineErrors(nil, n.node.Value, &adt.Bottom{
+			Code:  adt.StructuralCycleError,
+			Err:   errors.Newf(token.NoPos, "structural cycle"),
+			Value: n.node.Value,
+			// TODO: probably, this should have the referenced arc.
+		})
 	}
 
 	n.node.UpdateStatus(adt.Finalized)
@@ -681,6 +694,9 @@ type nodeContext struct {
 	lists  []envList
 	vLists []*adt.Vertex
 	exprs  []conjunct
+
+	hasCycle    bool // has conjunct with structural cycle
+	hasNonCycle bool // has conjunct without structural cycle
 
 	// Disjunction handling
 	disjunctions []envDisjunct
@@ -867,6 +883,23 @@ func (n *nodeContext) evalExpr(v adt.Conjunct, closeID uint32, top bool) {
 	// Require an Environment.
 	ctx := n.ctx
 
+	// TODO: see if we can do without these counters.
+	for _, d := range v.Env.Deref {
+		d.EvalCount++
+	}
+	for _, d := range v.Env.Cycles {
+		d.SelfCount++
+	}
+	defer func() {
+		for _, d := range v.Env.Deref {
+			d.EvalCount--
+		}
+		for _, d := range v.Env.Cycles {
+			d.SelfCount++
+		}
+	}()
+
+outer:
 	switch x := v.Expr().(type) {
 	case adt.Resolver:
 		arc, err := ctx.Resolve(v.Env, x)
@@ -883,30 +916,81 @@ func (n *nodeContext) evalExpr(v adt.Conjunct, closeID uint32, top bool) {
 			break
 		}
 
-		// If this is a cycle error, we have reached a fixed point and adding
-		// conjuncts at this point will not change the value. Also, continuing
-		// to pursue this value will result in an infinite loop.
-		//
-		// TODO: add a mechanism so that the computation will only have to be
-		// one once?
-		if isEvaluating(arc) {
-			break
+		// Pass detection of structural cycles from parent to children.
+		cyclic := false
+		if v.Env != nil {
+			// If a reference is in a tainted set, so is the value it refers to.
+			cyclic = v.Env.Cyclic
 		}
 
-		// TODO: detect structural cycles here. A structural cycle can occur
-		// if it is not a reference cycle, but refers to a parent. node.
-		// This should only be allowed if it is unified with a finite structure.
+		status := arc.Status()
+		for _, d := range v.Env.Deref {
+			if d == arc {
+				status = adt.EvaluatingArcs
+			}
+		}
+
+		switch status {
+		case adt.Evaluating:
+			// Reference cycle detected. We have reached a fixed point and
+			// adding conjuncts at this point will not change the value. Also,
+			// continuing to pursue this value will result in an infinite loop.
+
+			// TODO: add a mechanism so that the computation will only have to
+			// be done once?
+
+			if arc == n.node {
+				// TODO: we could use node sharing here. This may avoid an
+				// exponential blowup during evaluation, like is possible with
+				// YAML.
+				break outer
+			}
+
+		case adt.EvaluatingArcs:
+			// Structural cycle detected. Continue evaluation as usual, but
+			// keep track of whether any other conjuncts without structural
+			// cycles are added. If not, evaluation of child arcs will end
+			// with this node.
+
+			// For the purpose of determining whether at least one non-cyclic
+			// conjuncts exists, we consider all conjuncts of a cyclic conjuncts
+			// also cyclic.
+
+			cyclic = true
+			n.hasCycle = true
+
+			// As the adt.EvaluatingArcs mechanism bypasses the self-reference
+			// mechanism, we need to separately keep track of it here.
+			// If this (originally) is a self-reference node, adding them
+			// will result in recursively adding the same reference. For this
+			// we also mark the node as evaluating.
+			if arc.SelfCount > 0 {
+				break outer
+			}
+
+			// This count is added for values that are directly added below.
+			// The count is handled separately for delayed values.
+			arc.SelfCount++
+			defer func() { arc.SelfCount-- }()
+		}
+
+		// TODO: uncommenting the following almost works, but causes some
+		// faulty results in complex cycle handling between disjunctions.
+		// The reason is that disjunctions must be eliminated if checks in
+		// values on which they depend fail.
+		ctx.Unify(ctx, arc, adt.Finalized)
 
 		if arc.Label.IsDef() {
-			n.insertClosed(arc)
+			n.insertClosed(arc, cyclic, arc)
 		} else {
 			for _, a := range arc.Conjuncts {
-				n.addExprConjunct(a, closeID, top)
+				n.addExprConjunct(updateCyclic(a, cyclic, arc), closeID, top)
 			}
 		}
 
 	case adt.Evaluator:
 		// adt.Interpolation, adt.UnaryExpr, adt.BinaryExpr, adt.CallExpr
+		// Could be unify?
 		val, complete := ctx.Evaluate(v.Env, v.Expr())
 		if !complete {
 			n.exprs = append(n.exprs, conjunct{v, closeID, top})
@@ -933,7 +1017,40 @@ func (n *nodeContext) evalExpr(v adt.Conjunct, closeID uint32, top bool) {
 	}
 }
 
-func (n *nodeContext) insertClosed(arc *adt.Vertex) {
+// updateCyclicStatus looks for proof of non-cyclic conjuncts to override
+// a structural cycle.
+func (n *nodeContext) updateCyclicStatus(env *adt.Environment) {
+	if env == nil || !env.Cyclic {
+		// fmt.Printf("%p -- %d hasNonCycle\n", n.node, n.node.Label)
+		n.hasNonCycle = true
+	}
+}
+
+func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex) adt.Conjunct {
+	env := c.Env
+	switch {
+	case env == nil:
+		if !cyclic && deref == nil {
+			return c
+		}
+		env = &adt.Environment{Cyclic: cyclic}
+	case deref == nil && env.Cyclic == cyclic:
+		return c
+	default:
+		// The conjunct may still be in use in other fields, so we should
+		// make a new copy to mark Cyclic only for this case.
+		e := *env
+		e.Cyclic = e.Cyclic || cyclic
+		env = &e
+	}
+	if deref != nil {
+		env.Deref = append(env.Deref, deref)
+		env.Cycles = append(env.Cycles, deref)
+	}
+	return adt.MakeConjunct(env, c.Expr())
+}
+
+func (n *nodeContext) insertClosed(arc *adt.Vertex, cyclic bool, deref *adt.Vertex) {
 	id := n.eval.nextID()
 	n.needClose = true
 
@@ -941,7 +1058,7 @@ func (n *nodeContext) insertClosed(arc *adt.Vertex) {
 	n.newClose = nil
 
 	for _, a := range arc.Conjuncts {
-		n.addExprConjunct(a, id, false)
+		n.addExprConjunct(updateCyclic(a, cyclic, deref), id, false)
 	}
 
 	current, n.newClose = n.newClose, current
@@ -953,6 +1070,8 @@ func (n *nodeContext) insertClosed(arc *adt.Vertex) {
 }
 
 func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
+	n.updateCyclicStatus(env)
+
 	if x, ok := v.(*adt.Vertex); ok {
 		needClose := false
 		if isStruct(x) {
@@ -969,13 +1088,14 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 			n.node.AddStructs(x.Structs...)
 		}
 
-		if len(x.Conjuncts) > 0 {
+		if !x.IsData() && len(x.Conjuncts) > 0 {
+			cyclic := env != nil && env.Cyclic
 			if needClose {
-				n.insertClosed(x)
+				n.insertClosed(x, cyclic, nil)
 				return
 			}
 			for _, c := range x.Conjuncts {
-				n.addExprConjunct(c, 0, false) // Pass from eval
+				n.addExprConjunct(updateCyclic(c, cyclic, nil), 0, false) // TODO: Pass from eval
 			}
 			return
 		}
@@ -1112,6 +1232,8 @@ func (n *nodeContext) addStruct(
 	newDef uint32,
 	top bool) {
 
+	n.updateCyclicStatus(env) // to handle empty structs.
+
 	ctx := n.ctx
 	n.node.AddStructs(s)
 
@@ -1137,6 +1259,10 @@ func (n *nodeContext) addStruct(
 		Up:      env,
 		Vertex:  n.node,
 		CloseID: closeID,
+	}
+	if env != nil {
+		childEnv.Cyclic = env.Cyclic
+		childEnv.Deref = env.Deref
 	}
 
 	var hasOther, hasBulk adt.Node
@@ -1422,6 +1548,8 @@ func (n *nodeContext) addLists(c *adt.OpContext) {
 
 outer:
 	for i, l := range n.lists {
+		n.updateCyclicStatus(l.env)
+
 		index := int64(0)
 		hasComprehension := false
 		for j, elem := range l.list.Elems {

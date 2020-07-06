@@ -139,10 +139,14 @@ Result:
   xa2: (int){ 8 }
   xa3: (int){ 6 }
   xa4: (int){ 10 }
-  xb1: (int){ 8 }
-  xb2: (int){ 8 }
+  xb1: (int){ |(*(int){ 8 }, (int){ 9 }) }
+  xb2: (_|_){
+    // [incomplete]
+  }
   xb3: (int){ 6 }
-  xb4: (int){ 10 }
+  xb4: (_|_){
+    // [cycle] cycle error
+  }
   xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (int){ 6 }

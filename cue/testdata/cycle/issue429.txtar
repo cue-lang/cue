@@ -1,72 +1,168 @@
+TODO: a bound value resolving to a disjunction should probably
+be an error. In this case #Size.amx should resolve.
+
 -- in.cue --
-range1: {
-	min: *1 | int
-	range: >min
-	range: 8
-}
-range2: {
-	min: *1 | int
-	max: int & >min
-}
-rg: range2 & {
-//	min: 1
-	max: 8
-}
+// Range disjunction without cycle (checks only one-way).
 #Size : {
-  res: uint | * 0
-  num: > res | *(1 + res)
-  max: > num | *num
+    res: uint | * 0
+    min: >res | *(1 + res)
+    max: >min | *min
 }
 
-a: #Size & {
-  num: 5
+s0: #Size & { res: 1 }
+// This discards the default for max. This is correct, but unfortunate.
+// TODO: is there a tweak to the default mechanism possible that would fix that?
+//       Tread very carefully, though! Perhaps we could have a builtin that
+//       discards any default, so that we can at least manually override this
+//       behavior.
+s1: #Size & { min: 5 }
+s2: #Size & { max: 5 }
+s3: #Size & {
+    min: 5
+    max: 10
 }
+es3: #Size & {
+    min: 10
+    max: 5
+}
+
+// Disjunctions with cycles
+// TODO: improve error message here. Logic is correct, though.
+#nonEmptyRange: {
+    min: *1 | int
+    min: <max
+    max: >min
+}
+r1: #nonEmptyRange & {
+    min: 3
+}
+r2: #nonEmptyRange & {
+    max: 5
+}
+r3: #nonEmptyRange & {
+    min: 3
+    max: 6
+}
+
+er3: #nonEmptyRange & {
+    min: 5
+    max: 5
+}
+
+
 -- out/eval --
-(struct){
-  range1: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    range: (int){ 8 }
-  }
-  range2: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ &(>1, int) }
-  }
-  rg: (struct){
-    min: (int){ |(*(int){ 1 }, (int){ int }) }
-    max: (int){ 8 }
-  }
+Errors:
+invalid value 5 (out of bound <5)
+invalid value 5 (out of bound >10)
+
+Result:
+(_|_){
+  // [eval]
   #Size: (#struct){
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    num: (number){ |(*(int){ 1 }, (number){ >0 }) }
+    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
     max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
   }
-  a: (#struct){
+  s0: (#struct){
+    res: (int){ 1 }
+    min: (number){ |(*(int){ 2 }, (number){ >1 }) }
+    max: (number){ |(*(int){ 2 }, (number){ >1 }, (number){ >2 }) }
+  }
+  s1: (#struct){
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
-    num: (int){ 5 }
+    min: (int){ 5 }
     max: (number){ |((int){ 5 }, (number){ >5 }) }
+  }
+  s2: (#struct){
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+    max: (int){ 5 }
+  }
+  s3: (#struct){
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    min: (int){ 5 }
+    max: (int){ 10 }
+  }
+  es3: (_|_){
+    // [eval]
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
+    min: (int){ 10 }
+    max: (_|_){
+      // [eval] invalid value 5 (out of bound >10)
+    }
+  }
+  #nonEmptyRange: (#struct){
+    min: (_|_){
+      // [incomplete] incomplete cause disjunction
+    }
+    max: (_|_){
+      // [incomplete] incomplete cause disjunction
+    }
+  }
+  r1: (#struct){
+    min: (int){ 3 }
+    max: (number){ >3 }
+  }
+  r2: (#struct){
+    min: (int){ |(*(int){ 1 }, (int){ &(<5, int) }) }
+    max: (int){ 5 }
+  }
+  r3: (#struct){
+    min: (int){ 3 }
+    max: (int){ 6 }
+  }
+  er3: (_|_){
+    // [eval]
+    min: (_|_){
+      // [eval] invalid value 5 (out of bound <5)
+    }
+    max: (_|_){
+      // [eval] invalid value 5 (out of bound <5)
+    }
   }
 }
 -- out/compile --
 --- in.cue
 {
-  range1: {
-    min: (*1|int)
-    range: >〈0;min〉
-    range: 8
-  }
-  range2: {
-    min: (*1|int)
-    max: (int & >〈0;min〉)
-  }
-  rg: (〈0;range2〉 & {
-    max: 8
-  })
   #Size: {
     res: (&(int, >=0)|*0)
-    num: (>〈0;res〉|*(1 + 〈0;res〉))
-    max: (>〈0;num〉|*〈0;num〉)
+    min: (>〈0;res〉|*(1 + 〈0;res〉))
+    max: (>〈0;min〉|*〈0;min〉)
   }
-  a: (〈0;#Size〉 & {
-    num: 5
+  s0: (〈0;#Size〉 & {
+    res: 1
+  })
+  s1: (〈0;#Size〉 & {
+    min: 5
+  })
+  s2: (〈0;#Size〉 & {
+    max: 5
+  })
+  s3: (〈0;#Size〉 & {
+    min: 5
+    max: 10
+  })
+  es3: (〈0;#Size〉 & {
+    min: 10
+    max: 5
+  })
+  #nonEmptyRange: {
+    min: (*1|int)
+    min: <〈0;max〉
+    max: >〈0;min〉
+  }
+  r1: (〈0;#nonEmptyRange〉 & {
+    min: 3
+  })
+  r2: (〈0;#nonEmptyRange〉 & {
+    max: 5
+  })
+  r3: (〈0;#nonEmptyRange〉 & {
+    min: 3
+    max: 6
+  })
+  er3: (〈0;#nonEmptyRange〉 & {
+    min: 5
+    max: 5
   })
 }

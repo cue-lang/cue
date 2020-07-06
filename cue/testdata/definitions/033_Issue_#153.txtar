@@ -79,7 +79,7 @@ Result:
     listOfCloseds: (list){
     }
   }
-  #Closed: (#struct){
+  #Closed: (struct){
     a: (int){ |(*(int){ 0 }, (int){ int }) }
   }
   Junk: (struct){

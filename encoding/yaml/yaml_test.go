@@ -27,9 +27,19 @@ func TestYAML(t *testing.T) {
 	testCases := []struct {
 		name     string
 		yaml     string
+		yamlOut  string
 		want     string
 		isStream bool
 	}{{
+		name:    "empty",
+		yaml:    "",
+		yamlOut: "null",
+		want:    "null",
+	}, {
+		name:     "empty stream",
+		want:     "null",
+		isStream: true,
+	}, {
 		name: "string literal",
 		yaml: `foo`,
 		want: `"foo"`,
@@ -54,7 +64,37 @@ c: baz
 }]`,
 		isStream: true,
 	}, {
-		name:     "emtpy",
+		name: "stream with null",
+		yaml: `
+---
+a: foo
+---
+---
+b: bar
+c: baz
+---
+`,
+		// Not sure if a leading document separator should be gobbled, but the
+		// YAML parser seems to think so. This could have something to do with
+		// the fact that the document separator is really an "end of directives"
+		// marker, while ... means "end of document". YAML is hard!
+		yamlOut: `a: foo
+---
+null
+---
+b: bar
+c: baz
+---
+null
+`,
+		// TODO(bug): seems like bug in yaml parser. Try moving to yaml.v3,
+		// or validate that this is indeed a correct interpretation.
+		want: `[{
+	a: "foo"
+}, null, {
+	b: "bar"
+	c: "baz"
+}, null]`,
 		isStream: true,
 	}}
 	r := &cue.Runtime{}
@@ -66,7 +106,7 @@ c: baz
 			}
 			b, _ := format.Node(f)
 			if got := strings.TrimSpace(string(b)); got != tc.want {
-				t.Errorf("got %q; want %q", got, tc.want)
+				t.Errorf("Extract:\ngot  %q\nwant %q", got, tc.want)
 			}
 
 			inst, err := Decode(r, tc.name, tc.yaml)
@@ -79,7 +119,12 @@ c: baz
 			}
 			b, _ = format.Node(n)
 			if got := strings.TrimSpace(string(b)); got != tc.want {
-				t.Errorf("got %q; want %q", got, tc.want)
+				t.Errorf("Decode:\ngot  %q\nwant %q", got, tc.want)
+			}
+
+			yamlOut := tc.yaml
+			if tc.yamlOut != "" {
+				yamlOut = tc.yamlOut
 			}
 
 			inst, _ = r.Compile(tc.name, tc.want)
@@ -88,8 +133,8 @@ c: baz
 				if err != nil {
 					t.Error(err)
 				}
-				if got := strings.TrimSpace(string(b)); got != tc.yaml {
-					t.Errorf("got %q; want %q", got, tc.yaml)
+				if got := strings.TrimSpace(string(b)); got != yamlOut {
+					t.Errorf("Encode:\ngot  %q\nwant %q", got, yamlOut)
 				}
 			} else {
 				iter, _ := inst.Value().List()
@@ -97,8 +142,8 @@ c: baz
 				if err != nil {
 					t.Error(err)
 				}
-				if got := string(b); got != tc.yaml {
-					t.Errorf("got %q; want %q", got, tc.yaml)
+				if got := string(b); got != yamlOut {
+					t.Errorf("EncodeStream:\ngot  %q\nwant %q", got, yamlOut)
 				}
 			}
 		})

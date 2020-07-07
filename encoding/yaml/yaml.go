@@ -37,11 +37,14 @@ func Extract(filename string, src interface{}) (*ast.File, error) {
 	}
 	for {
 		expr, err := d.Decode()
-		if err == io.EOF {
-			break
-		}
 		if err != nil {
-			return nil, err
+			if err != io.EOF {
+				return nil, err
+			}
+			if expr != nil {
+				a = append(a, expr)
+			}
+			break
 		}
 		a = append(a, expr)
 	}

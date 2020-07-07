@@ -86,8 +86,9 @@ func Unmarshal(filename string, in []byte) (expr ast.Expr, err error) {
 
 // A Decorder reads and decodes YAML values from an input stream.
 type Decoder struct {
-	strict bool
-	parser *parser
+	strict    bool
+	firstDone bool
+	parser    *parser
 }
 
 // NewDecoder returns a new decoder that reads from r.
@@ -113,8 +114,12 @@ func (dec *Decoder) Decode() (expr ast.Expr, err error) {
 	defer handleErr(&err)
 	node := dec.parser.parse()
 	if node == nil {
-		return nil, io.EOF
+		if !dec.firstDone {
+			expr = ast.NewNull()
+		}
+		return expr, io.EOF
 	}
+	dec.firstDone = true
 	expr = d.unmarshal(node)
 	if len(d.terrors) > 0 {
 		return nil, &TypeError{d.terrors}

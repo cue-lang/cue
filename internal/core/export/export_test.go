@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package export
+package export_test
 
 import (
 	"flag"
@@ -23,8 +23,10 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/legacy/cue"
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
@@ -37,7 +39,7 @@ func TestDefinition(t *testing.T) {
 		Update: *update,
 	}
 
-	r := runtime.New()
+	r := cue.NewRuntime()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
@@ -51,7 +53,7 @@ func TestDefinition(t *testing.T) {
 		// TODO: do we need to evaluate v? In principle not necessary.
 		// v.Finalize(eval.NewContext(r, v))
 
-		file, errs := Def(r, v)
+		file, errs := export.Def(r, v)
 		errors.Print(t, errs, nil)
 		_, _ = t.Write(formatNode(t.T, file))
 	})
@@ -126,7 +128,7 @@ d2: C="foo\(bar)": {
 	}
 	v.Finalize(eval.NewContext(r, v))
 
-	file, errs := Def(r, v)
+	file, errs := export.Def(r, v)
 	if errs != nil {
 		t.Fatal(errs)
 	}

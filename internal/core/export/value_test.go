@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package export
+package export_test
 
 import (
 	"fmt"
@@ -23,8 +23,10 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/legacy/cue"
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
@@ -40,7 +42,7 @@ func TestValue(t *testing.T) {
 		Skip:   exclude,
 	}
 
-	r := runtime.New()
+	r := cue.NewRuntime()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
@@ -57,9 +59,9 @@ func TestValue(t *testing.T) {
 			name string
 			fn   func(r adt.Runtime, v adt.Value) (ast.Expr, errors.Error)
 		}{
-			{"Simplified", Simplified.Value},
-			{"Raw", Raw.Value},
-			{"All", All.Value},
+			{"Simplified", export.Simplified.Value},
+			{"Raw", export.Raw.Value},
+			{"All", export.All.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)
 			x, errs := tc.fn(r, v)
@@ -76,10 +78,10 @@ func TestValueX(t *testing.T) {
 
 	in := `
 -- in.cue --
-x: [string]: int64
-x: {
-    y: int
-}
+import "strings"
+
+strings.MinRunes(4) & strings.MaxRunes(7)
+
 	`
 
 	archive := txtar.Parse([]byte(in))
@@ -94,7 +96,7 @@ x: {
 	ctx := eval.NewContext(r, v)
 	v.Finalize(ctx)
 
-	x, errs := Value(r, v)
+	x, errs := export.Simplified.Value(r, v)
 	if errs != nil {
 		t.Fatal(errs)
 	}

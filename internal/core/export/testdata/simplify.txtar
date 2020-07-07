@@ -1,36 +1,45 @@
 -- in.cue --
+import "strings"
 
 x: [string]: int64
 x: {
     y: int
 }
+s: strings.MinRunes(4) & strings.MaxRunes(7)
 -- out/definition --
+import "strings"
+
 x: {
 	{
 		[string]: int64
 	}
 	y: int
 }
+s: strings.MinRunes(4) & strings.MaxRunes(7)
 -- out/doc --
 []
 [x]
 [x y]
+[s]
 -- out/value --
 == Simplified
 {
 	x: {
 		y: int64
 	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
 }
 == Raw
 {
 	x: {
 		y: >=-9223372036854775808 & <=9223372036854775807 & int
 	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
 }
 == All
 {
 	x: {
 		y: int64
 	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
 }

@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package export
+package export_test
 
 import (
 	"fmt"
@@ -21,8 +21,9 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 func TestExtract(t *testing.T) {
@@ -32,7 +33,7 @@ func TestExtract(t *testing.T) {
 		Update: *update,
 	}
 
-	r := runtime.New()
+	r := cue.NewRuntime()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
@@ -51,7 +52,7 @@ func TestExtract(t *testing.T) {
 
 func writeDocs(t *cuetxtar.Test, r adt.Runtime, v *adt.Vertex, path []string) {
 	fmt.Fprintln(t, path)
-	for _, c := range ExtractDoc(v) {
+	for _, c := range export.ExtractDoc(v) {
 		fmt.Fprintln(t, "-", c.Text())
 	}
 

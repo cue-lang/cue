@@ -612,7 +612,7 @@ var builtinPackages = map[string]*builtinPkg{
 						if !json.Valid(b) {
 							return false, fmt.Errorf("json: invalid JSON")
 						}
-						r := internal.GetRuntime(v).(*Runtime)
+						r := internal.GetRuntimeOld(v).(*Runtime)
 						inst, err := r.Compile("json.Validate", b)
 						if err != nil {
 							return false, err
@@ -709,7 +709,7 @@ var builtinPackages = map[string]*builtinPkg{
 						if err != nil {
 							return false, err
 						}
-						r := internal.GetRuntime(v).(*Runtime)
+						r := internal.GetRuntimeOld(v).(*Runtime)
 						for {
 							expr, err := d.Decode()
 							if err != nil {
@@ -748,7 +748,7 @@ var builtinPackages = map[string]*builtinPkg{
 						if err != nil {
 							return false, err
 						}
-						r := internal.GetRuntime(v).(*Runtime)
+						r := internal.GetRuntimeOld(v).(*Runtime)
 						for {
 							expr, err := d.Decode()
 							if err != nil {

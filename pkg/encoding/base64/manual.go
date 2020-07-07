@@ -19,7 +19,7 @@ import (
 	"encoding/base64"
 	"fmt"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // EncodedLen returns the length in bytes of the base64 encoding

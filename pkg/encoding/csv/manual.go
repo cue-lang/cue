@@ -19,7 +19,7 @@ import (
 	"encoding/csv"
 	"io"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // Encode encode the given list of lists to CSV.

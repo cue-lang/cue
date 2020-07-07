@@ -25,11 +25,11 @@ import (
 
 	"github.com/kylelemons/godebug/diff"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/openapi"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 var update *bool = flag.Bool("update", false, "update the test output")

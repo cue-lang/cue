@@ -20,11 +20,11 @@ import (
 	"path"
 	"regexp"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // TODO: skip invalid regexps containing ?! and foes.

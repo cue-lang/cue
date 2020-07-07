@@ -38,7 +38,7 @@ type Runtime struct {
 }
 
 func init() {
-	internal.GetRuntime = func(instance interface{}) interface{} {
+	internal.GetRuntimeOld = func(instance interface{}) interface{} {
 		switch x := instance.(type) {
 		case Value:
 			return &Runtime{idx: x.idx}
@@ -51,7 +51,7 @@ func init() {
 		}
 	}
 
-	internal.CheckAndForkRuntime = func(runtime, value interface{}) interface{} {
+	internal.CheckAndForkRuntimeOld = func(runtime, value interface{}) interface{} {
 		r := runtime.(*Runtime)
 		idx := value.(Value).ctx().index
 		if idx != r.idx {

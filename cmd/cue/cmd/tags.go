@@ -17,13 +17,13 @@ package cmd
 import (
 	"strings"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cli"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 func decorateInstances(cmd *Command, tags []string, a []*build.Instance) {

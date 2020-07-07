@@ -28,9 +28,9 @@ import (
 	"github.com/spf13/cobra"
 	"golang.org/x/sync/errgroup"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/legacy/cue"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/walk"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks

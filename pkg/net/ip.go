@@ -19,7 +19,7 @@ import (
 	"fmt"
 	"net"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // IP address lengths (bytes).

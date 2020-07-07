@@ -72,7 +72,7 @@ var FromGoType func(instance, x interface{}) interface{}
 var UnifyBuiltin func(v interface{}, kind string) interface{}
 
 // GetRuntime reports the runtime for an Instance or Value.
-var GetRuntime func(instance interface{}) interface{}
+var GetRuntimeOld func(instance interface{}) interface{}
 
 // GetRuntime reports the runtime for an Instance or Value.
 var GetRuntimeNew func(instance interface{}) interface{}
@@ -87,7 +87,7 @@ var MakeInstance func(value interface{}) (instance interface{})
 // CheckAndForkRuntime checks that value is created using runtime, panicking
 // if it does not, and returns a forked runtime that will discard additional
 // keys.
-var CheckAndForkRuntime func(runtime, value interface{}) interface{}
+var CheckAndForkRuntimeOld func(runtime, value interface{}) interface{}
 
 // CheckAndForkRuntime checks that value is created using runtime, panicking
 // if it does not, and returns a forked runtime that will discard additional

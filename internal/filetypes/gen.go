@@ -21,9 +21,9 @@ import (
 	"log"
 	"os"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/gocode"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 func main() {

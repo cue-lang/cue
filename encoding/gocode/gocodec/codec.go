@@ -23,8 +23,8 @@ package gocodec
 import (
 	"sync"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // Config has no options yet, but is defined for future extensibility.
@@ -177,5 +177,5 @@ func fromGoType(r *cue.Runtime, x interface{}) (cue.Value, error) {
 }
 
 func checkAndForkRuntime(r *cue.Runtime, v cue.Value) *cue.Runtime {
-	return internal.CheckAndForkRuntime(r, v).(*cue.Runtime)
+	return internal.CheckAndForkRuntimeNew(r, v).(*cue.Runtime)
 }

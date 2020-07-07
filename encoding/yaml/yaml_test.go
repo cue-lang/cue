@@ -18,9 +18,9 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 func TestYAML(t *testing.T) {

@@ -26,7 +26,6 @@ import (
 	"os"
 	"strings"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -39,6 +38,7 @@ import (
 	"cuelang.org/go/encoding/protobuf"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/internal/third_party/yaml"
 	"golang.org/x/text/encoding/unicode"
 	"golang.org/x/text/transform"

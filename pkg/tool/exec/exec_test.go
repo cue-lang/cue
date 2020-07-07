@@ -20,7 +20,7 @@ import (
 
 	"github.com/google/go-cmp/cmp"
 
-	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/internal/task"
 )
 

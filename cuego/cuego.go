@@ -19,9 +19,9 @@ import (
 	"reflect"
 	"sync"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // DefaultContext is the shared context used with top-level functions.

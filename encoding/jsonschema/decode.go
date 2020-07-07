@@ -24,12 +24,12 @@ import (
 	"sort"
 	"strings"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 // rootDefs defines the top-level name of the map of definitions that do not

@@ -18,11 +18,11 @@ import (
 	"strings"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/legacy/cue"
 	"github.com/google/go-cmp/cmp"
 )
 

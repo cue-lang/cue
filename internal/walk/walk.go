@@ -21,7 +21,7 @@
 // satisfactory API has been established, it can be made public.
 package walk
 
-import "cuelang.org/go/cue"
+import "cuelang.org/go/internal/legacy/cue"
 
 // TODO:
 // - allow overriding options for descendants.

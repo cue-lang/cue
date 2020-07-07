@@ -5,8 +5,8 @@ package filetypes
 import (
 	"fmt"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/encoding/gocode/gocodec"
+	"cuelang.org/go/internal/legacy/cue"
 )
 
 var cuegenCodec, cuegenInstance = func() (*gocodec.Codec, *cue.Instance) {

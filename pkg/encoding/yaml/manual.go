@@ -18,10 +18,10 @@ import (
 	"bytes"
 	"io"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 
@@ -79,7 +79,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := internal.GetRuntime(v).(*cue.Runtime)
+	r := internal.GetRuntimeNew(v).(*cue.Runtime)
 	for {
 		expr, err := d.Decode()
 		if err != nil {
@@ -123,7 +123,7 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := internal.GetRuntime(v).(*cue.Runtime)
+	r := internal.GetRuntimeNew(v).(*cue.Runtime)
 	for {
 		expr, err := d.Decode()
 		if err != nil {

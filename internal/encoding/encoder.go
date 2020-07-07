@@ -21,7 +21,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -30,6 +29,7 @@ import (
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/pkg/encoding/yaml"
 )
 

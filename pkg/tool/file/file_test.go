@@ -22,9 +22,9 @@ import (
 	"reflect"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/internal/task"
 )
 

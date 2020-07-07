@@ -26,8 +26,8 @@ import (
 
 	"github.com/kylelemons/godebug/diff"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/internal/str"
 )
 

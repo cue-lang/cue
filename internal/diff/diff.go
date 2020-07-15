@@ -15,9 +15,6 @@
 package diff
 
 import (
-	"strconv"
-
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/legacy/cue"
 )
@@ -103,10 +100,7 @@ func label(v cue.Value, i int) string {
 
 	// TODO: return formatted expression for optionals.
 	f := st.Field(i)
-	str := f.Name
-	if !ast.IsValidIdent(str) {
-		str = strconv.Quote(str)
-	}
+	str := f.Selector
 	if f.IsOptional {
 		str += "?"
 	}
@@ -208,10 +202,10 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 	xMap := make(map[string]int32, sx.Len())
 	yMap := make(map[string]int32, sy.Len())
 	for i := 0; i < sx.Len(); i++ {
-		xMap[sx.Field(i).Name] = int32(i + 1)
+		xMap[sx.Field(i).Selector] = int32(i + 1)
 	}
 	for i := 0; i < sy.Len(); i++ {
-		yMap[sy.Field(i).Name] = int32(i + 1)
+		yMap[sy.Field(i).Selector] = int32(i + 1)
 	}
 
 	edits := []Edit{}
@@ -223,7 +217,7 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 		// Process zero nodes
 		for ; xi < sx.Len(); xi++ {
 			xf = sx.Field(xi)
-			yp := yMap[xf.Name]
+			yp := yMap[xf.Selector]
 			if yp > 0 {
 				break
 			}
@@ -232,15 +226,15 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 		}
 		for ; yi < sy.Len(); yi++ {
 			yf = sy.Field(yi)
-			if yMap[yf.Name] == 0 {
+			if yMap[yf.Selector] == 0 {
 				// already done
 				continue
 			}
-			xp := xMap[yf.Name]
+			xp := xMap[yf.Selector]
 			if xp > 0 {
 				break
 			}
-			yMap[yf.Name] = 0
+			yMap[yf.Selector] = 0
 			edits = append(edits, Edit{UniqueY, 0, int32(yi + 1), nil})
 			differs = true
 		}
@@ -249,12 +243,12 @@ func (d *differ) diffStruct(x, y cue.Value) (Kind, *EditScript) {
 		for ; xi < sx.Len(); xi++ {
 			xf = sx.Field(xi)
 
-			yp := yMap[xf.Name]
+			yp := yMap[xf.Selector]
 			if yp == 0 {
 				break
 			}
 			// If yp != xi+1, the topological sort was not possible.
-			yMap[xf.Name] = 0
+			yMap[xf.Selector] = 0
 
 			yf := sy.Field(int(yp - 1))
 

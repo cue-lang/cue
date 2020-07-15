@@ -254,38 +254,38 @@ func TestDiff(t *testing.T) {
 	}, {
 		name: "optional and definitions",
 		x: `{
-	s :: {
-		a :: 1
+	#s: {
+		#a: 1
 		b: 2
 	}
 	o?: 3
-	od? :: 1
+	#od?: 1
 	oc?: 5
 }`,
 		y: `{
-	s :: {
+	#s: {
 		a: 2
-		b :: 2
+		#b: 2
 	}
 	o?: 4
-	od :: 1
-	oc? :: 5
+	#od: 1
+	#oc?: 5
 }
 `,
 		kind: Modified,
 		diff: `  {
-      s :: {
--         a :: 1
-+         a: 2
+      #s: {
+-         #a: 1
 -         b: 2
-+         b :: 2
++         a: 2
++         #b: 2
       }
 -     o?: 3
 +     o?: 4
--     od? :: 1
-+     od :: 1
+-     #od?: 1
++     #od: 1
 -     oc?: 5
-+     oc? :: 5
++     #oc?: 5
   }
 `,
 	}, {
@@ -306,10 +306,10 @@ a: x: "hello"
 `,
 	}, {
 		x: `
-		Directory :: {
+		#Directory: {
 			{
 					// Directory from another directory (e.g. subdirectory)
-					from: Directory
+					from: #Directory
 			} | {
 					// Reference to remote directory
 					ref: string
@@ -321,10 +321,10 @@ a: x: "hello"
 	}
 		`,
 		y: `
-	Directory :: {
+	#Directory: {
         {
                 // Directory from another directory (e.g. subdirectory)
-                from: Directory
+                from: #Directory
         } | {
                 // Reference to remote directory
                 ref: string
@@ -338,10 +338,10 @@ a: x: "hello"
 		profile: Final,
 	}, {
 		x: `
-		Directory :: {
+		#Directory: {
 			{
 					// Directory from another directory (e.g. subdirectory)
-					from: Directory
+					from: #Directory
 			} | {
 					// Reference to remote directory
 					ref: string
@@ -353,10 +353,10 @@ a: x: "hello"
 	}
 		`,
 		y: `
-	Directory :: {
+	#Directory: {
         {
                 // Directory from another directory (e.g. subdirectory)
-                from: Directory
+                from: #Directory
         } | {
                 // Reference to remote directory
                 ref: string

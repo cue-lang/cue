@@ -110,11 +110,7 @@ func label(v cue.Value, i int) string {
 	if f.IsOptional {
 		str += "?"
 	}
-	if f.IsDefinition {
-		str += " ::"
-	} else {
-		str += ":"
-	}
+	str += ":"
 	return str
 }
 

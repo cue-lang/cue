@@ -35,6 +35,13 @@ type Config struct {
 	//
 	// TODO
 	Scope *adt.Vertex
+
+	// Imports allows unresolved identifiers to resolve to imports.
+	//
+	// Under normal circumstances, identifiers bind to import specifications,
+	// which get resolved to an ImportReference. Use this option to automaically
+	// resolve identifiers to imports.
+	Imports func(x *ast.Ident) (pkgPath string)
 }
 
 // Files compiles the given files as a single instance. It disregards
@@ -195,7 +202,6 @@ func (c *compiler) popScope() {
 	c.stack = c.stack[:k]
 }
 
-// entry points // USE CONFIG
 func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	c.fileScope = map[adt.Feature]bool{}
 
@@ -209,6 +215,21 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 				}
 			}
 		}
+	}
+
+	// TODO: Assume that the other context is unified with the newly compiled
+	// files. This is not the same behavior as the old functionality, but we
+	// wanted to nix this anyway. For instance by allowing pkg_tool to be
+	// treated differently.
+	if v := c.Config.Scope; v != nil {
+		for _, arc := range v.Arcs {
+			if _, ok := c.fileScope[arc.Label]; !ok {
+				c.fileScope[arc.Label] = true
+			}
+		}
+
+		c.pushScope(nil, 0, v.Source()) // File scope
+		defer c.popScope()
 	}
 
 	// TODO: set doc.
@@ -228,9 +249,35 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 }
 
 func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
+	c.fileScope = map[adt.Feature]bool{}
+
+	if v := c.Config.Scope; v != nil {
+		for _, arc := range v.Arcs {
+			c.fileScope[arc.Label] = true
+		}
+
+		c.pushScope(nil, 0, v.Source()) // File scope
+		defer c.popScope()
+	}
+
 	expr := c.expr(x)
 
 	env := &adt.Environment{}
+	top := env
+
+	for p := c.Config.Scope; p != nil; p = p.Parent {
+		top.Vertex = p
+		top.Up = &adt.Environment{}
+		top = top.Up
+
+		// TODO: do something like this to allow multi-layered scopes.
+		// e := &adt.Environment{Vertex: p}
+		// if env != nil {
+		// 	env.Up = e
+		// }
+		// env = e
+	}
+
 	return adt.MakeConjunct(env, expr)
 }
 
@@ -263,6 +310,16 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 				Src:     n,
 				UpCount: upCount,
 				Label:   label,
+			}
+		}
+
+		if c.Config.Imports != nil {
+			if pkgPath := c.Config.Imports(n); pkgPath != "" {
+				return &adt.ImportReference{
+					Src:        n,
+					ImportPath: adt.MakeStringLabel(c.index, pkgPath),
+					Label:      c.label(n),
+				}
 			}
 		}
 

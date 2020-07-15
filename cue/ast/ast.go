@@ -520,6 +520,9 @@ func NewStruct(fields ...interface{}) *StructLit {
 		case *LetClause:
 			s.Elts = append(s.Elts, x)
 			continue
+		case *embedding:
+			s.Elts = append(s.Elts, (*EmbedDecl)(x))
+			continue
 		case Label:
 			label = x
 		case string:
@@ -560,6 +563,13 @@ func NewStruct(fields ...interface{}) *StructLit {
 	}
 	return s
 }
+
+// Embed can be used in conjunction with NewStruct to embed values.
+func Embed(x Expr) *embedding {
+	return (*embedding)(&EmbedDecl{Expr: x})
+}
+
+type embedding EmbedDecl
 
 // A ListLit node represents a literal list.
 type ListLit struct {

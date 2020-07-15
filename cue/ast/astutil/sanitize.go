@@ -136,7 +136,7 @@ func (z *sanitizer) unshadow(parent ast.Node, base string, link ast.Node) string
 		case *ast.StructLit:
 			decls = &x.Elts
 		default:
-			panic("impossible scope")
+			panic(fmt.Sprintf("impossible scope type %T", parent))
 		}
 
 		i := 0

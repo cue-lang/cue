@@ -149,7 +149,7 @@ func timeFormat(value, layout string) (bool, error) {
 
 var builtinPackages = map[string]*builtinPkg{
 	"": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 	},
 	"crypto/md5": {
 		native: []*builtin{{
@@ -3644,7 +3644,7 @@ var builtinPackages = map[string]*builtinPkg{
 		}},
 	},
 	"tool": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 		cue: `{
 	Command: {
 		$usage?: string
@@ -3664,7 +3664,7 @@ var builtinPackages = map[string]*builtinPkg{
 }`,
 	},
 	"tool/cli": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 		cue: `{
 	Print: {
 		$id:  *"tool/cli.Print" | "print"
@@ -3673,7 +3673,7 @@ var builtinPackages = map[string]*builtinPkg{
 }`,
 	},
 	"tool/exec": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 		cue: `{
 	Run: {
 		$id: *"tool/exec.Run" | "exec"
@@ -3689,7 +3689,7 @@ var builtinPackages = map[string]*builtinPkg{
 }`,
 	},
 	"tool/file": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 		cue: `{
 	Read: {
 		$id:      "tool/file.Read"
@@ -3716,7 +3716,7 @@ var builtinPackages = map[string]*builtinPkg{
 }`,
 	},
 	"tool/http": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 		cue: `{
 	Get: Do & {
 		method: "GET"
@@ -3758,7 +3758,7 @@ var builtinPackages = map[string]*builtinPkg{
 }`,
 	},
 	"tool/os": {
-		native: []*builtin{{}},
+		native: []*builtin{},
 		cue: `{
 	Name:  !="" & !~"^[$]"
 	Value: bool | number | *string | null

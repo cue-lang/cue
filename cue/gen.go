@@ -124,6 +124,7 @@ func main() {
 	// TODO: do this in a more principled way. The best is probably to
 	// put all builtins in a separate package.
 	b = bytes.Replace(b, []byte("cue."), []byte(""), -1)
+	b = bytes.Replace(b, []byte("{{}}"), []byte("{}"), -1)
 
 	if err := ioutil.WriteFile("builtins.go", b, 0644); err != nil {
 		log.Fatal(err)

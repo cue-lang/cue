@@ -91,34 +91,48 @@ baz: bar & {
 - comment from bar on field 2
 
 -- out/definition --
+// foobar defines at least foo.
+package foobar
+
+// A Foo fooses stuff.
 Foo: {
+	// field1 is an int.
 	field1: int
 	field2: int
-	dup3:   int
+
+	// duplicate field comment
+	dup3: int
 }
+
+// foos are instances of Foo.
 foos: {
 	{
-		[string]: Foo_1
+		[string]: Foo
 	}
 	MyFoo: {
+		// local field comment.
 		field1: 0
+
+		// other field comment.
 		field2: 1
-		dup3:   int
+
+		// duplicate field comment
+		dup3: int
 	}
 }
 bar: {
+	// comment from bar on field 1
 	field1: int
+	// comment from bar on field 2
 	field2: int
 }
 baz: {
-	bar_5
+	bar
+
+	// comment from baz on field 1
 	field1: int
 	field2: int
 }
-
-let Foo_1 = Foo
-
-let bar_5 = bar
 -- out/value --
 == Simplified
 {
@@ -164,6 +178,49 @@ let bar_5 = bar
 	}
 }
 == Raw
+{
+	// A Foo fooses stuff.
+	Foo: {
+		// field1 is an int.
+		field1: int
+		field2: int
+
+		// duplicate field comment
+		dup3: int
+	}
+
+	// foos are instances of Foo.
+	foos: {
+		// My first little foo.
+		MyFoo: {
+			// local field comment.
+
+			// field1 is an int.
+			field1: 0
+
+			// other field comment.
+			field2: 1
+
+			// duplicate field comment
+			dup3: int
+		}
+	}
+	bar: {
+		// comment from bar on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int
+	}
+	baz: {
+		// comment from bar on field 1
+
+		// comment from baz on field 1
+		field1: int
+		// comment from bar on field 2
+		field2: int
+	}
+}
+== All
 {
 	// A Foo fooses stuff.
 	Foo: {

@@ -16,7 +16,6 @@ package export
 
 import (
 	"strconv"
-	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
@@ -24,11 +23,25 @@ import (
 )
 
 func (e *exporter) stringLabel(f adt.Feature) ast.Label {
-	str := f.SelectorString(e.index)
-	if strings.HasPrefix(str, "#") && !f.IsDef() ||
-		strings.HasPrefix(str, "_") && !f.IsHidden() ||
-		!ast.IsValidIdent(str) {
-		return ast.NewLit(token.STRING, strconv.Quote(str))
+	if f == 0 {
+		return ast.NewIdent("_")
 	}
-	return &ast.Ident{Name: str}
+	x := f.Index()
+	switch f.Typ() {
+	case adt.IntLabel:
+		return ast.NewLit(token.INT, strconv.Itoa(int(x)))
+
+	case adt.DefinitionLabel, adt.HiddenLabel, adt.HiddenDefinitionLabel:
+		return ast.NewIdent(e.ctx.IndexToString(int64(x)))
+
+	case adt.StringLabel:
+		s := e.ctx.IndexToString(int64(x))
+		if !ast.IsValidIdent(s) {
+			return ast.NewLit(token.STRING, strconv.Quote(s))
+		}
+		fallthrough
+
+	default:
+		return ast.NewIdent(e.ctx.IndexToString(int64(x)))
+	}
 }

@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetxtar"
 	"github.com/rogpeppe/go-internal/txtar"
@@ -45,6 +46,10 @@ func TestDefinition(t *testing.T) {
 		if errs != nil {
 			t.Fatal(errs)
 		}
+		v.Finalize(eval.NewContext(r, v))
+
+		// TODO: do we need to evaluate v? In principle not necessary.
+		// v.Finalize(eval.NewContext(r, v))
 
 		file, errs := Def(r, v)
 		errors.Print(t, errs, nil)
@@ -70,20 +75,56 @@ func TestX(t *testing.T) {
 -- in.cue --
 package test
 
-import pkg2 "example.com/foo/pkg1"
-#pkg1: pkg2.Object
+// // Foo
+// a: [X=string]: [Y=string]: {
+// 	name: X+Y
+// }
 
-"Hello \(#pkg1)!"
+// [Y=string]: [X=string]: name: {Y+X}
+// {
+// 	name:  X.other + Y
+// 	other: string
+// }
+
+// c: [X=string]: X
+
+// #pkg1: Object
+
+// "Hello \(#pkg1)!"
+
+
+// Object: "World"
+
+// // A Foo fooses stuff.
+// foos are instances of Foo.
+// foos: [string]: {}
+
+// // // My first little foo.
+// foos: MyFoo: {}
+
+bar: 3
+d2: C="foo\(bar)": {
+    name: "xx"
+    foo: C.name
+}
+
 	`
 
 	archive := txtar.Parse([]byte(in))
 	a := cuetxtar.Load(archive, "/tmp/test")
+	if err := a[0].Err; err != nil {
+		t.Fatal(err)
+	}
+
+	// x := a[0].Files[0]
+	// astutil.Sanitize(x)
 
 	r := runtime.New()
 	v, errs := compile.Files(nil, r, a[0].Files...)
 	if errs != nil {
 		t.Fatal(errs)
 	}
+	v.Finalize(eval.NewContext(r, v))
 
 	file, errs := Def(r, v)
 	if errs != nil {

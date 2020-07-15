@@ -59,6 +59,7 @@ func TestValue(t *testing.T) {
 		}{
 			{"Simplified", Simplified.Value},
 			{"Raw", Raw.Value},
+			{"All", All.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)
 			x, errs := tc.fn(r, v)

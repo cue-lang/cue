@@ -29,10 +29,14 @@ import (
 //     foo: bar: 2
 //
 func ExtractDoc(v *adt.Vertex) (docs []*ast.CommentGroup) {
+	return extractDocs(v, v.Conjuncts)
+}
+
+func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 	fields := []*ast.Field{}
 
 	// Collect docs directly related to this Vertex.
-	for _, x := range v.Conjuncts {
+	for _, x := range a {
 		f, ok := x.Source().(*ast.Field)
 		if !ok || hasShorthandValue(f) {
 			continue
@@ -44,6 +48,10 @@ func ExtractDoc(v *adt.Vertex) (docs []*ast.CommentGroup) {
 				docs = append(docs, cg)
 			}
 		}
+	}
+
+	if v == nil {
+		return docs
 	}
 
 	// Collect docs from parent scopes in collapsed fields.

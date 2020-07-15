@@ -1,0 +1,198 @@
+-- in.cue --
+import mystrings "strings"
+
+p1: [X=string]: name: X
+
+d1: "foo\(bar)": int
+bar: "bar"
+
+// XXX: reference not resolving.
+d2: C="foo\(bar)": {
+    name: "xx"
+    foo: C.name
+}
+
+c1: mystrings.Contains("aa", "a")
+
+s1: """
+    multi
+    \(bar)
+    line
+    """
+
+l1: [3, ...int]
+l2: [...int]
+l3: []
+l4: [1, 2]
+
+n1: 1.0
+n10: 10
+
+// Ignored comment.
+
+// t is true
+t: true
+
+// Dangling comment.
+
+e1: <n1
+e2: >n1 & <n10
+e3: l4[2]
+e4: l4[2:3]
+e5: e1 + e2 - e3
+e6: !t
+e7: !t || !false
+e8?: !false
+
+m1: {
+    // this is a pattern constraint
+    {[string]: int}
+    // foo is an optional field
+    foo?: 3
+
+    // Dangling comment.
+
+    // bar is a field
+    bar: 4
+
+    // a comment too many.
+
+    ...
+}
+
+if true {
+    x: int
+}
+
+y1: {
+    src: [1, 2, 3]
+    for i, v in src for j, w in src if i < j {
+        "foo\(i)": v
+        "bar\(j)": w
+    }
+
+    for i, v in src {
+        "foo\(i)": v
+    }
+
+}
+
+-- out/definition --
+import mystrings "strings"
+
+p1: {
+	[X=string]: {
+		name: X
+	}
+}
+d1: {
+	"foo\(bar)": int
+}
+bar: "bar"
+d2: {
+	"foo\(bar)": {
+		name: "xx"
+		foo:  X.name
+	}
+}
+c1: mystrings.Contains("aa", "a")
+s1: """multi
+        
+        \(bar)
+        line
+        """
+l1: [3, ...int]
+l2: [...int]
+l3: []
+l4: [1, 2]
+n1:  1.0
+n10: 10
+t:   true
+e1:  <n1
+e2:  >n1 & <n10
+e3:  l4[2]
+e4:  l4[2:3]
+e5:  e1 + e2 - e3
+e6:  !t
+e7:  !t || !false
+e8?: !false
+m1: {
+	{
+		[string]: int
+	}
+
+	// foo is an optional field
+	foo?: 3
+
+	// bar is a field
+	bar: 4
+	...
+}
+if true {
+	x: int
+}
+y1: {
+	src: [1, 2, 3]
+	for i, v in src for j, w in src if i < j {
+		"foo\(i)": v
+		"bar\(j)": w
+	}
+	for i, v in src {
+		"foo\(i)": v
+	}
+}
+-- out/doc --
+[]
+[p1]
+[d1]
+[d1 foobar]
+[bar]
+[d2]
+- XXX: reference not resolving.
+
+[d2 foobar]
+[d2 foobar name]
+[d2 foobar foo]
+[c1]
+[s1]
+[l1]
+[l1 0]
+[l2]
+[l3]
+[l4]
+[l4 0]
+[l4 1]
+[n1]
+[n10]
+[t]
+- t is true
+
+[e1]
+[e2]
+[e3]
+[e4]
+[e5]
+[e6]
+[e7]
+[m1]
+[m1 bar]
+- bar is a field
+
+[y1]
+[y1 src]
+[y1 src 0]
+[y1 src 1]
+[y1 src 2]
+[y1 foo0]
+[y1 bar1]
+[y1 bar2]
+[y1 foo1]
+[y1 foo2]
+[x]
+-- out/value --
+== Simplified
+_|_ // undefined field 2
+== Raw
+_|_ // undefined field 2
+== All
+_|_ // undefined field 2

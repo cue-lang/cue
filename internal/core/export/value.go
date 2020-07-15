@@ -15,6 +15,8 @@
 package export
 
 import (
+	"fmt"
+
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/token"
@@ -22,16 +24,23 @@ import (
 )
 
 func (e *exporter) bareValue(v adt.Value) ast.Expr {
+	switch x := v.(type) {
+	case *adt.Vertex:
+		return e.vertex(x)
+	case adt.Value:
+		a := &adt.Vertex{Value: x}
+		return e.vertex(a)
+	default:
+		panic("unreachable")
+	}
 	// TODO: allow a Value context wrapper.
-	a := &adt.Vertex{Value: v}
-	return e.vertex(a)
 }
 
 // TODO: if the original value was a single reference, we could replace the
 // value with a reference in graph mode.
 
 func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
-	switch n.Value.(type) {
+	switch x := n.Value.(type) {
 	case nil:
 		// bare
 	case *adt.StructMarker:
@@ -40,10 +49,34 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	case *adt.ListMarker:
 		result = e.listComposite(n)
 
+	case *adt.Bottom:
+		if x.IsIncomplete() {
+			// fall back to expression mode
+			result = stripRefs(e.expr(n))
+			break
+		}
+		result = e.bottom(x)
+
 	default:
 		result = e.value(n.Value, n.Conjuncts...)
 	}
 	return result
+}
+
+// TODO: do something more principled. Best would be to have a similar
+// mechanism in ast.Ident as others do.
+func stripRefs(x ast.Expr) ast.Expr {
+	ast.Walk(x, nil, func(n ast.Node) {
+		switch x := n.(type) {
+		case *ast.Ident:
+			switch x.Node.(type) {
+			case *ast.ImportSpec:
+			default:
+				x.Node = nil
+			}
+		}
+	})
+	return x
 }
 
 func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
@@ -81,6 +114,9 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 	case *adt.BoundValue:
 		result = e.boundValue(x)
 
+	case *adt.Builtin:
+		result = e.builtin(x)
+
 	case *adt.BuiltinValidator:
 		result = e.builtinValidator(x)
 
@@ -88,27 +124,51 @@ func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
 		result = e.vertex(x)
 
 	case *adt.Conjunction:
-		if len(x.Values) == 0 {
-			result = ast.NewIdent("_")
-			break
+		switch len(x.Values) {
+		case 0:
+			return ast.NewIdent("_")
+		case 1:
+			if e.cfg.Simplify {
+				return e.expr(x.Values[0])
+			}
+			return e.bareValue(x.Values[0])
 		}
 
-		a := []ast.Expr{}
+		a := []adt.Value{}
 		b := boundSimplifier{e: e}
 		for _, v := range x.Values {
 			if !e.cfg.Simplify || !b.add(v) {
-				a = append(a, e.bareValue(v))
+				a = append(a, v)
 			}
 		}
 
-		if !e.cfg.Simplify {
-			return ast.NewBinExpr(token.AND, a...)
+		result = b.expr(e.ctx)
+		if result == nil {
+			a = x.Values
 		}
 
-		result = b.expr(e.ctx) // e.bareValue(x.Values[0])
-		for _, c := range a {
-			result = &ast.BinaryExpr{X: result, Op: token.AND, Y: c}
+		for _, x := range a {
+			result = wrapBin(result, e.bareValue(x), adt.AndOp)
 		}
+
+	case *adt.Disjunction:
+		a := []ast.Expr{}
+		for i, v := range x.Values {
+			var expr ast.Expr
+			if e.cfg.Simplify {
+				expr = e.bareValue(v)
+			} else {
+				expr = e.expr(v)
+			}
+			if i < x.NumDefaults {
+				expr = &ast.UnaryExpr{Op: token.MUL, X: expr}
+			}
+			a = append(a, expr)
+		}
+		result = ast.NewBinExpr(token.OR, a...)
+
+	default:
+		panic(fmt.Sprintf("unsupported type %T", x))
 	}
 
 	// TODO: Add comments from original.
@@ -120,16 +180,6 @@ func (e *exporter) bottom(n *adt.Bottom) *ast.BottomLit {
 	err := &ast.BottomLit{}
 	if x := n.Err; x != nil {
 		msg := x.Error()
-		// if len(x.sub) > 0 {
-		// 	buf := strings.Builder{}
-		// 	for i, b := range x.sub {
-		// 		if i > 0 {
-		// 			buf.WriteString("; ")
-		// 			buf.WriteString(b.msg())
-		// 		}
-		// 	}
-		// 	msg = buf.String()
-		// }
 		comment := &ast.Comment{Text: "// " + msg}
 		err.AddComment(&ast.CommentGroup{
 			Line:     true,
@@ -237,24 +287,64 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 }
 
 func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
-	s := &ast.StructLit{}
-	saved := e.stack
-	e.stack = append(e.stack, frame{scope: s})
-	defer func() { e.stack = saved }()
+	s, saved := e.pushFrame(v.Conjuncts)
+	e.top().upCount++
+	defer func() {
+		e.top().upCount--
+		e.popFrame(saved)
+	}()
 
-	for _, a := range e.sortedArcs(v) {
-		if a.Label.IsDef() || a.Label.IsHidden() {
+	p := e.cfg
+	for _, label := range VertexFeatures(v) {
+		if label.IsDef() && !p.ShowDefinitions {
+			continue
+		}
+		if label.IsHidden() && !p.ShowHidden {
 			continue
 		}
 
-		f := &ast.Field{
-			Label: e.stringLabel(a.Label),
-			Value: e.vertex(a),
-			Attrs: ExtractFieldAttrs(a.Conjuncts),
+		f := &ast.Field{Label: e.stringLabel(label)}
+
+		if label.IsDef() {
+			e.inDefinition++
 		}
 
-		docs := ExtractDoc(a)
-		ast.SetComments(f, docs)
+		arc := v.Lookup(label)
+		switch {
+		case arc == nil:
+			if !p.ShowOptional {
+				continue
+			}
+			f.Optional = token.NoSpace.Pos()
+
+			arc = &adt.Vertex{Label: label}
+			v.MatchAndInsert(e.ctx, arc)
+			if len(v.Conjuncts) == 0 {
+				continue
+			}
+
+			// fall back to expression mode.
+			f.Value = stripRefs(e.expr(arc))
+
+			// TODO: remove use of stripRefs.
+			// f.Value = e.expr(arc)
+
+		default:
+			f.Value = e.vertex(arc)
+		}
+
+		if label.IsDef() {
+			e.inDefinition--
+		}
+
+		if p.ShowAttributes {
+			f.Attrs = ExtractFieldAttrs(arc.Conjuncts)
+		}
+
+		if p.ShowDocs {
+			docs := ExtractDoc(arc)
+			ast.SetComments(f, docs)
+		}
 
 		s.Elts = append(s.Elts, f)
 	}

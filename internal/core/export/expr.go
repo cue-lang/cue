@@ -52,26 +52,28 @@ func (e *exporter) expr(v adt.Expr) (result ast.Expr) {
 		return nil
 
 	case *adt.Vertex:
-		if len(x.Conjuncts) == 0 {
+		if len(x.Conjuncts) == 0 || x.IsData() {
 			// Treat as literal value.
 			return e.value(x)
+		} // Should this be the arcs label?
+
+		a := []conjunct{}
+		for _, c := range x.Conjuncts {
+			a = append(a, conjunct{c, 0})
 		}
-		return e.mergeValues(x.Conjuncts...)
+
+		return e.mergeValues(adt.InvalidLabel, x, a, x.Conjuncts...)
 
 	case *adt.StructLit:
-		return e.mergeValues(adt.MakeConjunct(nil, x))
+		c := adt.MakeConjunct(nil, x)
+		return e.mergeValues(adt.InvalidLabel, nil, []conjunct{{c: c, up: 0}}, c)
 
 	case adt.Value:
-		e.value(x)
+		return e.value(x) // Use conjuncts.
 
 	default:
-		if f, ok := x.Source().(*ast.File); ok {
-			return &ast.StructLit{Elts: f.Decls}
-		}
-
-		return v.Source().(ast.Expr)
+		return e.adt(v, nil)
 	}
-	return nil
 }
 
 // Piece out values:
@@ -79,16 +81,24 @@ func (e *exporter) expr(v adt.Expr) (result ast.Expr) {
 // For a struct, piece out conjuncts that are already values. Those can be
 // unified. All other conjuncts are added verbatim.
 
-func (x *exporter) mergeValues(a ...adt.Conjunct) ast.Expr {
+func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct, orig ...adt.Conjunct) ast.Expr {
+
 	e := conjuncts{
 		exporter: x,
 		values:   &adt.Vertex{},
-		fields:   map[adt.Feature][]adt.Conjunct{},
+		fields:   map[adt.Feature]field{},
 	}
 
+	_, saved := e.pushFrame(orig)
+	defer e.popFrame(saved)
+
 	for _, c := range a {
-		e.addExpr(c.Env, c.Expr())
+		e.top().upCount = c.up
+		x := c.c.Expr()
+		e.addExpr(c.c.Env, x)
 	}
+
+	s := x.top().scope
 
 	// Unify values only for one level.
 	if len(e.values.Conjuncts) > 0 {
@@ -97,14 +107,23 @@ func (x *exporter) mergeValues(a ...adt.Conjunct) ast.Expr {
 	}
 
 	// Collect and order set of fields.
+
 	fields := []adt.Feature{}
 	for f := range e.fields {
 		fields = append(fields, f)
 	}
-	m := sortArcs(e.exporter.extractFeatures(e.structs))
+
+	// Sort fields in case features lists are missing to ensure
+	// predictability. Also sort in reverse order, so that bugs
+	// are more likely exposed.
+	sort.Slice(fields, func(i, j int) bool {
+		return fields[i] > fields[j]
+	})
+
+	m := sortArcs(extractFeatures(e.structs))
 	sort.SliceStable(fields, func(i, j int) bool {
-		if m[fields[i]] == 0 {
-			return m[fields[j]] != 0
+		if m[fields[j]] == 0 {
+			return m[fields[i]] != 0
 		}
 		return m[fields[i]] > m[fields[j]]
 	})
@@ -112,6 +131,9 @@ func (x *exporter) mergeValues(a ...adt.Conjunct) ast.Expr {
 	if len(e.fields) == 0 && !e.hasEllipsis {
 		switch len(e.exprs) {
 		case 0:
+			if len(e.structs) > 0 {
+				return ast.NewStruct()
+			}
 			return ast.NewIdent("_")
 		case 1:
 			return e.exprs[0]
@@ -121,52 +143,96 @@ func (x *exporter) mergeValues(a ...adt.Conjunct) ast.Expr {
 		}
 	}
 
-	s := &ast.StructLit{}
 	for _, x := range e.exprs {
 		s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: x})
 	}
 
 	for _, f := range fields {
-		c := e.fields[f]
-		merged := e.mergeValues(c...)
+		field := e.fields[f]
+		c := field.conjuncts
+
 		label := e.stringLabel(f)
+
+		if f.IsDef() {
+			x.inDefinition++
+		}
+
+		a := []adt.Conjunct{}
+		for _, cc := range c {
+			a = append(a, cc.c)
+		}
+
+		merged := e.mergeValues(f, nil, c, a...)
+
+		if f.IsDef() {
+			x.inDefinition--
+		}
+
 		d := &ast.Field{Label: label, Value: merged}
-		if isOptional(c) {
+		if isOptional(a) {
 			d.Optional = token.Blank.Pos()
+		}
+		if x.cfg.ShowDocs {
+			docs := extractDocs(src, a)
+			ast.SetComments(d, docs)
+		}
+		if x.cfg.ShowAttributes {
+			d.Attrs = ExtractFieldAttrs(a)
 		}
 		s.Elts = append(s.Elts, d)
 	}
 	if e.hasEllipsis {
 		s.Elts = append(s.Elts, &ast.Ellipsis{})
+	} else if src != nil && src.IsClosed(e.ctx) && e.inDefinition == 0 {
+		return ast.NewCall(ast.NewIdent("close"), s)
 	}
 
 	return s
 }
 
-// A conjuncts collects values of a single vertex.
+// Conjuncts if for collecting values of a single vertex.
 type conjuncts struct {
 	*exporter
 	// Values is used to collect non-struct values.
 	values      *adt.Vertex
 	exprs       []ast.Expr
 	structs     []*adt.StructLit
-	fields      map[adt.Feature][]adt.Conjunct
+	fields      map[adt.Feature]field
 	hasEllipsis bool
+}
+
+func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node) {
+
+	x := c.fields[f]
+	v := adt.MakeConjunct(env, n)
+	x.conjuncts = append(x.conjuncts, conjunct{
+		c:  v,
+		up: c.top().upCount,
+	})
+	// x.upCounts = append(x.upCounts, c.top().upCount)
+	c.fields[f] = x
+}
+
+type field struct {
+	docs      []*ast.CommentGroup
+	conjuncts []conjunct
+}
+
+type conjunct struct {
+	c  adt.Conjunct
+	up int32
 }
 
 func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 	switch x := x.(type) {
 	case *adt.StructLit:
+		e.top().upCount++
+
 		// Only add if it only has no bulk fields or elipsis.
 		if isComplexStruct(x) {
-			switch src := x.Src.(type) {
-			case nil:
-				panic("now allowed")
-			case *ast.StructLit:
-				e.exprs = append(e.exprs, src)
-			case *ast.File:
-				e.exprs = append(e.exprs, &ast.StructLit{Elts: src.Decls})
-			}
+			_, saved := e.pushFrame(nil)
+			e.exprs = append(e.exprs, e.adt(x, nil))
+			e.popFrame(saved)
 			return
 		}
 		// Used for sorting.
@@ -178,9 +244,11 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 			case *adt.Field:
 				label = f.Label
 			case *adt.OptionalField:
+				// TODO: mark optional here.
 				label = f.Label
 			case *adt.Ellipsis:
 				e.hasEllipsis = true
+				continue
 			case adt.Expr:
 				e.addExpr(env, f)
 				continue
@@ -189,21 +257,33 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 			default:
 				panic("unreachable")
 			}
-			c := adt.MakeConjunct(env, d)
-			e.fields[label] = append(e.fields[label], c)
+			e.addConjunct(label, env, d)
 		}
+		e.top().upCount--
 
 	case adt.Value: // other values.
 		if v, ok := x.(*adt.Vertex); ok {
 			// if !v.IsList() {
-			// 	panic("what to do?")
+			// 	panic("what to do?") // TO
 			// }
+			e.structs = append(e.structs, v.Structs...)
+
 			// generated, only consider arcs.
-			e.exprs = append(e.exprs, e.value(v, v.Conjuncts...))
-			return
+			for _, a := range v.Arcs {
+				a.Finalize(e.ctx) // TODO: should we do this?
+
+				e.addConjunct(a.Label, env, a)
+			}
+			x = v.Value
+			// e.exprs = append(e.exprs, e.value(v, v.Conjuncts...))
+			// return
 		}
 
-		e.values.AddConjunct(adt.MakeConjunct(env, x))
+		switch x.(type) {
+		case *adt.StructMarker, *adt.Top:
+		default:
+			e.values.AddConjunct(adt.MakeConjunct(env, x)) // GOBBLE TOP
+		}
 
 	case *adt.BinaryExpr:
 		switch {
@@ -225,9 +305,16 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 	}
 }
 
+// TODO: find a better way to annotate optionality. Maybe a special conjunct
+// or store it in the field information?
 func isOptional(a []adt.Conjunct) bool {
+	if len(a) == 0 {
+		return false
+	}
 	for _, c := range a {
 		switch f := c.Source().(type) {
+		case nil:
+			return false
 		case *ast.Field:
 			if f.Optional == token.NoPos {
 				return false

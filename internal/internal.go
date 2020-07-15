@@ -286,6 +286,24 @@ func ToFile(n ast.Node) *ast.File {
 	}
 }
 
+// ToStruct gets the non-preamble declarations of a file and puts them in a
+// struct.
+func ToStruct(f *ast.File) *ast.StructLit {
+	start := 0
+	for i, d := range f.Decls {
+		switch d.(type) {
+		case *ast.Package, *ast.ImportDecl:
+			start = i + 1
+		case *ast.Attribute, *ast.CommentGroup:
+		default:
+			break
+		}
+	}
+	s := ast.NewStruct()
+	s.Elts = f.Decls[start:]
+	return s
+}
+
 func IsBulkField(d ast.Decl) bool {
 	if f, ok := d.(*ast.Field); ok {
 		if _, ok := f.Label.(*ast.ListLit); ok {

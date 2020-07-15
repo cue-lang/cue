@@ -165,6 +165,11 @@ func TestValueType(t *testing.T) {
 		concrete:       true,
 		closed:         true,
 	}, {
+		value:          `v: [...int]`,
+		kind:           BottomKind,
+		incompleteKind: ListKind,
+		concrete:       false,
+	}, {
 		value:    `v: {a: int, b: [1][a]}.b`,
 		kind:     BottomKind,
 		concrete: false,
@@ -2386,6 +2391,22 @@ func TestPathCorrection(t *testing.T) {
 		want: "T",
 	}, {
 		input: `
+			#S: {
+				b?: [...#T]
+				b?: [...#T]
+			}
+			#T: int
+			`,
+		lookup: func(i *Instance) Value {
+			v := i.LookupDef("#S")
+			f, _ := v.LookupField("b")
+			v, _ = f.Value.Elem()
+			_, a := v.Expr()
+			return a[0]
+		},
+		want: "#T",
+	}, {
+		input: `
 			#a: {
 				#T: {b: 3}
 				close({}) | close({c: #T}) | close({d: string})
@@ -2724,6 +2745,15 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: "Hello, \(x)! Welcome to \(place)", place: string, x: string`,
 		want:  `\()("Hello, " .(<0> "x") "! Welcome to " .(<0> "place") "")`,
+	}, {
+		input: `v: { a, b: 1 }, a: 2`,
+		want:  `&(<0>{b: 1} .(<0> "a"))`,
+	}, {
+		input: `v: { {c: a}, b: a }, a: int`,
+		want:  `&(<0>{b: <1>.a} <0>{c: <1>.a})`,
+	}, {
+		input: `v: [...number] | *[1, 2, 3]`,
+		want:  `([, ...number] | *[1,2,3])`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

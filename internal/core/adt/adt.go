@@ -14,7 +14,50 @@
 
 package adt
 
-import "cuelang.org/go/cue/ast"
+import (
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/token"
+)
+
+func Resolve(ctx *OpContext, c Conjunct) *Vertex {
+	env := c.Env
+	// TODO: also allow resolution in parent scopes. The following will set up
+	// the environments. But the compiler also needs to resolve accordingly.
+	//
+	// // Set up environments for parent scopes, if any.
+	// root := env
+	// for p := scope; p != nil; p = p.Parent {
+	// 	root.Up = &Environment{Vertex: p.Parent}
+	// 	root = root.Up
+	// }
+
+	var v Value
+
+	expr := c.Expr()
+	switch x := expr.(type) {
+	case Value:
+		v = x
+
+	case Resolver:
+		r, err := ctx.Resolve(env, x)
+		if err != nil {
+			v = err
+			break
+		}
+		return r
+
+	case Evaluator:
+		// TODO: have a way to evaluate, but not strip down to the value.
+		v, _ = ctx.Evaluate(env, expr)
+
+	default:
+		// Unknown type.
+		v = ctx.NewErrf(
+			"could not evaluate expression %s of type %T", ctx.Str(c.Expr()), c)
+	}
+
+	return ToVertex(v)
+}
 
 // A Node is any abstract data type representing an value or expression.
 type Node interface {
@@ -78,6 +121,15 @@ type Yielder interface {
 type Validator interface {
 	Value
 	validate(c *OpContext, v Value) *Bottom
+}
+
+// Pos returns the file position of n, or token.NoPos if it is unknown.
+func Pos(n Node) token.Pos {
+	src := n.Source()
+	if src == nil {
+		return token.NoPos
+	}
+	return src.Pos()
 }
 
 // Value

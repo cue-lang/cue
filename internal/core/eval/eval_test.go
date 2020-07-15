@@ -19,7 +19,6 @@ import (
 	"fmt"
 	"testing"
 
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/validate"
@@ -57,8 +56,11 @@ func TestEval(t *testing.T) {
 			t.Fatal(err)
 		}
 
-		ctx := eval.NewContext(r, v)
+		e := eval.New(r)
+		ctx := e.NewContext(v)
 		v.Finalize(ctx)
+
+		t.Log(e.Stats())
 
 		if b := validate.Validate(r, v, &validate.Config{
 			AllErrors: true,
@@ -89,9 +91,6 @@ var needFix = map[string]string{
 
 	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": "cycle",
 	"compile/scope": "cycle",
-
-	"resolve/034_closing_structs": "close()",
-	"fulleval/053_issue312":       "close()",
 }
 
 // TestX is for debugging. Do not delete.
@@ -121,12 +120,11 @@ module: "example.com"
 	}
 	t.Error(debug.NodeString(r, v, nil))
 
-	ctx := eval.NewContext(r, v)
-
-	ctx.Unify(ctx, v, adt.Finalized)
-	// if err != nil {
-	// 	t.Fatal(err)
-	// }
+	e := eval.New(r)
+	ctx := e.NewContext(v)
+	v.Finalize(ctx)
 
 	t.Error(debug.NodeString(r, v, nil))
+
+	t.Log(e.Stats())
 }

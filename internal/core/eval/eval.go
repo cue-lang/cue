@@ -26,6 +26,8 @@ package eval
 
 import (
 	"fmt"
+	"html/template"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -33,6 +35,15 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 )
+
+// TODO TODO TODO TODO TODO TODO  TODO TODO TODO  TODO TODO TODO  TODO TODO TODO
+//
+// - Reuse work from previous cycles. For instance, if we can guarantee that a
+//   value is always correct for partial results, we can just process the arcs
+//   going from Partial to Finalized, without having to reevaluate the value.
+//
+// - Test closedness far more thoroughly.
+//
 
 func Evaluate(r adt.Runtime, v *adt.Vertex) {
 	format := func(n adt.Node) string {
@@ -49,6 +60,25 @@ func Evaluate(r adt.Runtime, v *adt.Vertex) {
 
 func New(r adt.Runtime) *Evaluator {
 	return &Evaluator{r: r, index: r}
+}
+
+type Stats struct {
+	DisjunctCount int
+	UnifyCount    int
+}
+
+var stats = template.Must(template.New("stats").Parse(`{{"" -}}
+Unifications: {{.UnifyCount}}
+Disjuncts:    {{.DisjunctCount}}`))
+
+func (s *Stats) String() string {
+	buf := strings.Builder{}
+	_ = stats.Execute(&buf, s)
+	return buf.String()
+}
+
+func (e *Evaluator) Stats() *Stats {
+	return &e.stats
 }
 
 // TODO: Note: NewContext takes essentially a cue.Value. By making this
@@ -83,6 +113,8 @@ type Evaluator struct {
 	r       adt.Runtime
 	index   adt.StringIndexer
 	closeID uint32
+
+	stats Stats
 }
 
 func (e *Evaluator) nextID() uint32 {
@@ -255,7 +287,9 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 	}
 	saved := *v
 
+	e.stats.UnifyCount++
 	for i := 0; ; i++ {
+		e.stats.DisjunctCount++
 
 		// Clear any remaining error.
 		if err := c.Err(); err != nil {

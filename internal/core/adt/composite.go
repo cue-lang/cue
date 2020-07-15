@@ -74,6 +74,11 @@ type Vertex struct {
 	// status indicates the evaluation progress of this vertex.
 	status VertexStatus
 
+	// isData indicates that this Vertex is to be interepreted as data: pattern
+	// and additional constraints, as well as optional fields, should be
+	// ignored.
+	isData bool
+
 	// Value is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
 	Value Value
@@ -147,6 +152,39 @@ func (v *Vertex) UpdateStatus(s VertexStatus) {
 	}
 	v.status = s
 }
+
+// IsData reports whether v should be interpreted in data mode. In other words,
+// it tells whether optional field matching and non-regular fields, like
+// definitions and hidden fields, should be ignored.
+func (v *Vertex) IsData() bool {
+	return v.isData || len(v.Conjuncts) == 0
+}
+
+// ToDataSingle creates a new Vertex that represents just the regular fields
+// of this vertex. Arcs are left untouched.
+// It is used by cue.Eval to convert nodes to data on per-node basis.
+func (v *Vertex) ToDataSingle() *Vertex {
+	w := *v
+	w.isData = true
+	return &w
+}
+
+// ToDataAll returns a new v where v and all its descendents contain only
+// the regular fields.
+func (v *Vertex) ToDataAll() *Vertex {
+	arcs := make([]*Vertex, len(v.Arcs))
+	for i, a := range v.Arcs {
+		arcs[i] = a.ToDataAll()
+	}
+	w := *v
+	w.Arcs = arcs
+	w.isData = true
+	return &w
+}
+
+// func (v *Vertex) IsEvaluating() bool {
+// 	return v.Value == cycle
+// }
 
 func (v *Vertex) IsErr() bool {
 	// if v.Status() > Evaluating {
@@ -228,7 +266,22 @@ type Acceptor interface {
 	// constraints, and additional constraints that match f and inserts them in
 	// arc. Use f is 0 to match all additional constraints only.
 	MatchAndInsert(c *OpContext, arc *Vertex)
+
+	// OptionalTypes returns a bit field with the type of optional constraints
+	// that are represented by this Acceptor.
+	OptionalTypes() OptionalType
 }
+
+// OptionalType is a bit field of the type of optional constraints in use by an
+// Acceptor.
+type OptionalType int
+
+const (
+	HasField OptionalType = 1 << iota
+	HasPattern
+	HasAdditional
+	IsOpen
+)
 
 func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
@@ -237,6 +290,17 @@ func (v *Vertex) Kind() Kind {
 		return TopKind
 	}
 	return v.Value.Kind()
+}
+
+func (v *Vertex) OptionalTypes() OptionalType {
+	switch {
+	case v.Closed != nil:
+		return v.Closed.OptionalTypes()
+	case v.IsList():
+		return 0
+	default:
+		return IsOpen
+	}
 }
 
 func (v *Vertex) IsClosed(ctx *OpContext) bool {

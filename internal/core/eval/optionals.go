@@ -37,6 +37,25 @@ type fieldSet struct {
 	isOpen     bool // has a ...
 }
 
+func (o *fieldSet) OptionalTypes() (mask adt.OptionalType) {
+	for _, f := range o.fields {
+		if len(f.optional) > 0 {
+			mask = adt.HasField
+			break
+		}
+	}
+	if o.bulk != nil {
+		mask |= adt.HasPattern
+	}
+	if o.additional != nil {
+		mask |= adt.HasAdditional
+	}
+	if o.isOpen {
+		mask |= adt.IsOpen
+	}
+	return mask
+}
+
 type field struct {
 	label    adt.Feature
 	optional []adt.Node

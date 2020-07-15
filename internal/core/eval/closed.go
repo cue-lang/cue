@@ -97,6 +97,13 @@ func (a *acceptor) MatchAndInsert(c *adt.OpContext, v *adt.Vertex) {
 	}
 }
 
+func (a *acceptor) OptionalTypes() (mask adt.OptionalType) {
+	for _, f := range a.fields {
+		mask |= f.OptionalTypes()
+	}
+	return mask
+}
+
 // CloseDef defines how individual FieldSets (corresponding to conjuncts)
 // combine to determine whether a field is contained in a closed set.
 //

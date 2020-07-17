@@ -3,9 +3,7 @@
 cmp stderr cmd_baddisplay.out
 
 -- cmd_baddisplay.out --
-command.baddisplay.display.text: conflicting values 42 and string (mismatched types int and string):
-    ./task_tool.cue:6:9
-    tool/cli:4:9
+command.baddisplay.display: conflicting values 42 and string (mismatched types int and string)
 -- task.cue --
 package home
 message: "Hello world!"

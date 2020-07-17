@@ -1,11 +1,13 @@
+skip 'wrong error message'
+
 ! cue notool
 ! stdout .
 cmp stderr cmd_baddisplay.out
 
 -- cmd_baddisplay.out --
-command "notool" is not defined
+cmd must be run as one of its subcommands: unknown subcommand "notool"
 Ensure commands are defined in a "_tool.cue" file.
-Run 'cue help' to show available commands.
+Run 'cue help cmd' for known subcommands.
 -- task.cue --
 package home
 message: "Hello world!"

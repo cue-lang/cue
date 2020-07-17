@@ -14,7 +14,7 @@ message: "Hello \(_who)!" // who declared in data.cue
 
 test: {
 	_foo: string // technically in error, but test anyway.
-	if len(_foo) > 0 {
+	if *(len(_foo) > 0) | false {
 		command: ["foo", "bar"]
 	}
 }

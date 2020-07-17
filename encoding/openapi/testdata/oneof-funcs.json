@@ -137,14 +137,11 @@
             "description": "Randomly picked description from a set of size one.",
             "type": "object",
             "required": [
-               "count",
                "include",
-               "exclude"
+               "exclude",
+               "count"
             ],
             "properties": {
-               "count": {
-                  "$ref": "#/components/schemas/MYINT"
-               },
                "include": {
                   "$ref": "#/components/schemas/T"
                },
@@ -154,6 +151,9 @@
                   "items": {
                      "$ref": "#/components/schemas/T"
                   }
+               },
+               "count": {
+                  "$ref": "#/components/schemas/MYINT"
                }
             }
          },

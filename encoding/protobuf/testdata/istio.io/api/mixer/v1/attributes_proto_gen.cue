@@ -55,35 +55,35 @@ import (
 	// Specifies one attribute value with different type.
 	#AttributeValue: {
 		// The attribute value.
-		close({}) | close({
+		{} | {
 			// Used for values of type STRING, DNS_NAME, EMAIL_ADDRESS, and URI
 			stringValue: string @protobuf(2,name=string_value)
-		}) | close({
+		} | {
 			// Used for values of type INT64
 			int64Value: int64 @protobuf(3,name=int64_value)
-		}) | close({
+		} | {
 			// Used for values of type DOUBLE
 			doubleValue: float64 @protobuf(4,type=double,name=double_value)
-		}) | close({
+		} | {
 			// Used for values of type BOOL
 			boolValue: bool @protobuf(5,name=bool_value)
-		}) | close({
+		} | {
 			// Used for values of type BYTES
 			bytesValue: bytes @protobuf(6,name=bytes_value)
-		}) | close({
+		} | {
 			// Used for values of type TIMESTAMP
 			timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
-		}) | close({
+		} | {
 			// Used for values of type DURATION
 			durationValue: time.Duration @protobuf(8,type=google.protobuf.Duration,name=duration_value)
-		}) | close({
+		} | {
 			// Used for values of type STRING_MAP
 			stringMapValue: #StringMap @protobuf(9,name=string_map_value)
-		}) | close({
+		} | {
 			testValue: test.#Test @protobuf(10,type=acme.test.Test,name=test_value)
-		}) | close({
+		} | {
 			testValue: test_test.#AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
-		})
+		}
 	}
 
 	// Defines a string map.

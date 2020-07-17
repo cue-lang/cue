@@ -1,9 +1,7 @@
 package kube
 
 service: valeter: spec: ports: [{
-	port:       8080
-	targetPort: 8080
-	name:       "http"
+	name: "http"
 }]
 deployment: valeter: spec: template: spec: containers: [{
 	image: "gcr.io/myproj/valeter:v0.0.4"

@@ -1,13 +1,9 @@
 ! cue vet -c
 cmp stderr expect-stderr
 -- expect-stderr --
-sum: incomplete value ((1 | 2)):
-    ./partial.cue:4:6
-b.idx: invalid non-ground value string (must be concrete int|string):
-    ./partial.cue:7:9
-    ./partial.cue:8:7
-b.str: incomplete value (string):
-    ./partial.cue:8:7
+b.idx: invalid non-ground value string (must be concrete string)
+b.str: incomplete value string
+sum: incomplete value 1 | 2
 -- partial.cue --
 package partial
 

@@ -83,10 +83,10 @@ func TestDiff(t *testing.T) {
 -     a: int
 +     a: string
 -     b: 2
++     c: 3
       s: 4
 -     d: 1
 +     d: int
-+     c: 3
   }
 `,
 	}, {

@@ -114,7 +114,7 @@ import "istio.io/api/mixer/v1"
 	// [rfc7231](https://tools.ietf.org/html/rfc7231#page-21). For
 	// example: GET, HEAD, POST, PUT, DELETE.
 	httpMethod?: string @protobuf(2,name=http_method)
-	close({}) | close({
+	{} | {
 		// URI template to match against as defined by
 		// [rfc6570](https://tools.ietf.org/html/rfc6570). For example, the
 		// following are valid URI templates:
@@ -125,7 +125,7 @@ import "istio.io/api/mixer/v1"
 		//     /search{?q*,lang}
 		//
 		uriTemplate: string @protobuf(3,name=uri_template)
-	}) | close({
+	} | {
 		// EXPERIMENTAL:
 		//
 		// ecmascript style regex-based match as defined by
@@ -135,7 +135,7 @@ import "istio.io/api/mixer/v1"
 		//     "^/pets/(.*?)?"
 		//
 		regex: string @protobuf(4)
-	})
+	}
 }
 
 // APIKey defines the explicit configuration for generating the
@@ -144,7 +144,7 @@ import "istio.io/api/mixer/v1"
 // See [API Keys](https://swagger.io/docs/specification/authentication/api-keys)
 // for a general overview of API keys as defined by OpenAPI.
 #APIKey: {
-	close({}) | close({
+	{} | {
 		// API Key is sent as a query parameter. `query` represents the
 		// query string parameter name.
 		//
@@ -154,7 +154,7 @@ import "istio.io/api/mixer/v1"
 		//     GET /something?api_key=abcdef12345
 		//
 		query: string @protobuf(1)
-	}) | close({
+	} | {
 		// API key is sent in a request header. `header` represents the
 		// header name.
 		//
@@ -165,7 +165,7 @@ import "istio.io/api/mixer/v1"
 		//     X-API-Key: abcdef12345
 		//
 		header: string @protobuf(2)
-	}) | close({
+	} | {
 		// API key is sent in a
 		// [cookie](https://swagger.io/docs/specification/authentication/cookie-authentication),
 		//
@@ -176,7 +176,7 @@ import "istio.io/api/mixer/v1"
 		//     Cookie: X-API-KEY=abcdef12345
 		//
 		cookie: string @protobuf(3)
-	})
+	}
 }
 
 // HTTPAPISpecReference defines a reference to an HTTPAPISpec. This is

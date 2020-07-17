@@ -1,0 +1,7 @@
+-- in.cue --
+foo: [string]: a: *1 | int
+foo: b: a: 1
+-- out/trim --
+== in.cue
+foo: [string]: a: *1 | int
+foo: b: {}

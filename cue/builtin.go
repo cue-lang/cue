@@ -12,10 +12,6 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-//go:generate go run gen.go
-//go:generate go run golang.org/x/tools/cmd/goimports -w -local cuelang.org/go builtins.go
-//go:generate gofmt -s -w builtins.go
-
 package cue
 
 import (
@@ -25,7 +21,6 @@ import (
 	"math/big"
 	"path"
 	"sort"
-	"strings"
 
 	"github.com/cockroachdb/apd/v2"
 
@@ -381,26 +376,6 @@ func getBuiltinPkg(ctx *context, path string) *structLit {
 		return nil
 	}
 	return p.rootStruct
-}
-
-func init() {
-	internal.UnifyBuiltin = func(val interface{}, kind string) interface{} {
-		v := val.(Value)
-		ctx := v.ctx()
-
-		p := strings.Split(kind, ".")
-		pkg, name := p[0], p[1]
-		s := getBuiltinPkg(ctx, pkg)
-		if s == nil {
-			return v
-		}
-		a := s.Lookup(ctx, ctx.Label(name, false))
-		if a.v == nil {
-			return v
-		}
-
-		return v.Unify(newValueRoot(ctx, a.v.evalPartial(ctx)))
-	}
 }
 
 // do returns whether the call should be done.

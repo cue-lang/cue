@@ -19,15 +19,18 @@ import (
 	"os"
 	pathpkg "path"
 	"path/filepath"
-	"runtime"
+	goruntime "runtime"
 	"strings"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 const (
@@ -453,19 +456,33 @@ func (c Config) complete() (cfg *Config, err error) {
 		if cerr != nil {
 			break
 		}
-		var r cue.Runtime
-		inst, err := r.Compile(mod, f)
+
+		// TODO: move to full build again
+		file, err := parser.ParseFile("load", f)
 		if err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 		}
-		prefix := inst.Lookup("module")
-		if prefix.Exists() {
-			name, err := prefix.String()
-			if err != nil {
-				return &c, err
+
+		r := runtime.New()
+		v, err := compile.Files(nil, r, file)
+		if err != nil {
+			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
+		}
+		ctx := eval.NewContext(r, v)
+		v.Finalize(ctx)
+		prefix := v.Lookup(ctx.StringLabel("module"))
+		if prefix != nil {
+			name := ctx.StringValue(prefix.Value)
+			if err := ctx.Err(); err != nil {
+				return &c, err.Err
+			}
+			pos := token.NoPos
+			src := prefix.Value.Source()
+			if src != nil {
+				pos = src.Pos()
 			}
 			if c.Module != "" && c.Module != name {
-				return &c, errors.Newf(prefix.Pos(), "inconsistent modules: got %q, want %q", name, c.Module)
+				return &c, errors.Newf(pos, "inconsistent modules: got %q, want %q", name, c.Module)
 			}
 			c.Module = name
 		}
@@ -532,9 +549,9 @@ func (c Config) findRoot(dir string) string {
 
 func home() string {
 	env := "HOME"
-	if runtime.GOOS == "windows" {
+	if goruntime.GOOS == "windows" {
 		env = "USERPROFILE"
-	} else if runtime.GOOS == "plan9" {
+	} else if goruntime.GOOS == "plan9" {
 		env = "home"
 	}
 	return os.Getenv(env)

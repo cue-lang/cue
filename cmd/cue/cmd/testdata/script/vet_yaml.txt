@@ -1,3 +1,5 @@
+skip 'error messages'
+
 ! cue vet ./yaml.cue
 cmp stderr expect-stderr
 

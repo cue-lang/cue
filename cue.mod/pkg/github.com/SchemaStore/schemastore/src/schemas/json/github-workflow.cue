@@ -10,14 +10,6 @@ import "strings"
 		// field, GitHub sets the name to the workflow's filename.
 		name?: string
 
-		// A map of environment variables that are available to all jobs
-		// and steps in the workflow.
-		env?: #env
-
-		// A map of default settings that will apply to all jobs in the
-		// workflow.
-		defaults?: #defaults
-
 		// The name of the GitHub event that triggers the workflow. You
 		// can provide a single event string, array of events, array of
 		// event types, or an event configuration map that schedules a
@@ -26,11 +18,6 @@ import "strings"
 		// events, see
 		// https://help.github.com/en/github/automating-your-workflow-with-github-actions/events-that-trigger-workflows.
 		on: #event | [...#event] & [_, ...] | {
-			// Runs your workflow anytime the status of a Git commit changes,
-			// which triggers the status event. For information about the
-			// REST API, see https://developer.github.com/v3/repos/statuses/.
-			status?: #eventObject
-
 			// Runs your workflow anytime the check_run event occurs. More
 			// than one activity type triggers this event. For information
 			// about the REST API, see
@@ -258,6 +245,11 @@ import "strings"
 				...
 			}
 
+			// Runs your workflow anytime the status of a Git commit changes,
+			// which triggers the status event. For information about the
+			// REST API, see https://developer.github.com/v3/repos/statuses/.
+			status?: #eventObject
+
 			// Runs your workflow anytime the watch event occurs. More than
 			// one activity type triggers this event. For information about
 			// the REST API, see
@@ -293,6 +285,14 @@ import "strings"
 			}] & [_, ...]
 		}
 
+		// A map of environment variables that are available to all jobs
+		// and steps in the workflow.
+		env?: #env
+
+		// A map of default settings that will apply to all jobs in the
+		// workflow.
+		defaults?: #defaults
+
 		// A workflow run is made up of one or more jobs. Jobs run in
 		// parallel by default. To run jobs sequentially, you can define
 		// dependencies on other jobs using the jobs.<job_id>.needs
@@ -306,26 +306,6 @@ import "strings"
 			{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: {
 				// The name of the job displayed on GitHub.
 				name?: string
-
-				// A map of environment variables that are available to all steps
-				// in the job.
-				env?: #env
-
-				// A container to run any steps in a job that don't already
-				// specify a container. If you have steps that use both script
-				// and container actions, the container actions will run as
-				// sibling containers on the same network with the same volume
-				// mounts.
-				// If you do not set a container, all steps will run directly on
-				// the host specified by runs-on unless a step refers to an
-				// action configured to run in a container.
-				container?: {
-					[string]: string | #container
-				}
-
-				// A map of default settings that will apply to all steps in the
-				// job.
-				defaults?: #defaults
 
 				// Identifies any jobs that must complete successfully before this
 				// job will run. It can be a string or array of strings. If a job
@@ -342,6 +322,14 @@ import "strings"
 				outputs?: {
 					[string]: string
 				}
+
+				// A map of environment variables that are available to all steps
+				// in the job.
+				env?: #env
+
+				// A map of default settings that will apply to all steps in the
+				// job.
+				defaults?: #defaults
 
 				// You can use the if conditional to prevent a job from running
 				// unless a condition is met. You can use any supported context
@@ -361,25 +349,10 @@ import "strings"
 				// environment variables are not preserved between steps. GitHub
 				// provides built-in steps to set up and complete a job.
 				steps?: [...{
-					// A name for your step to display on GitHub.
-					name?: string
-
-					// Sets environment variables for steps to use in the virtual
-					// environment. You can also set environment variables for the
-					// entire workflow or a job.
-					env?: #env
-
-					// Runs command-line programs using the operating system's shell.
-					// If you do not provide a name, the step name will default to
-					// the text specified in the run command.
-					// Commands run using non-login shells by default. You can choose
-					// a different shell and customize the shell used to run
-					// commands. For more information, see
-					// https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#using-a-specific-shell.
-					// Each run keyword represents a new process and shell in the
-					// virtual environment. When you provide multi-line commands,
-					// each line runs in the same shell.
-					run?: string, shell?: #shell, "working-directory"?: #["working-directory"]
+					// A unique identifier for the step. You can use the id to
+					// reference the step in contexts. For more information, see
+					// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
+					id?: string
 
 					// You can use the if conditional to prevent a step from running
 					// unless a condition is met. You can use any supported context
@@ -389,10 +362,8 @@ import "strings"
 					// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
 					if?: string
 
-					// A unique identifier for the step. You can use the id to
-					// reference the step in contexts. For more information, see
-					// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
-					id?: string
+					// A name for your step to display on GitHub.
+					name?: string
 
 					// Selects an action to run as part of a step in your job. An
 					// action is a reusable unit of code. You can use an action
@@ -422,6 +393,18 @@ import "strings"
 					// https://help.github.com/en/articles/virtual-environments-for-github-actions.
 					uses?: string
 
+					// Runs command-line programs using the operating system's shell.
+					// If you do not provide a name, the step name will default to
+					// the text specified in the run command.
+					// Commands run using non-login shells by default. You can choose
+					// a different shell and customize the shell used to run
+					// commands. For more information, see
+					// https://help.github.com/en/actions/automating-your-workflow-with-github-actions/workflow-syntax-for-github-actions#using-a-specific-shell.
+					// Each run keyword represents a new process and shell in the
+					// virtual environment. When you provide multi-line commands,
+					// each line runs in the same shell.
+					run?: string, "working-directory"?: #["working-directory"], shell?: #shell
+
 					// A map of the input parameters defined by the action. Each input
 					// parameter is a key/value pair. Input parameters are set as
 					// environment variables. The variable is prefixed with INPUT_
@@ -429,6 +412,11 @@ import "strings"
 					with?: #env & {
 						args?: string, entrypoint?: string, ...
 					}
+
+					// Sets environment variables for steps to use in the virtual
+					// environment. You can also set environment variables for the
+					// entire workflow or a job.
+					env?: #env
 
 					// Prevents a job from failing when a step fails. Set to true to
 					// allow a job to pass when this step fails.
@@ -438,10 +426,6 @@ import "strings"
 					// the process.
 					"timeout-minutes"?: number
 				}] & [_, ...]
-
-				// Prevents a workflow run from failing when a job fails. Set to
-				// true to allow a workflow run to pass when this job fails.
-				"continue-on-error"?: bool | string
 
 				// The maximum number of minutes to let a workflow run before
 				// GitHub automatically cancels it. Default: 360
@@ -484,6 +468,22 @@ import "strings"
 					"max-parallel"?: number
 				}
 
+				// Prevents a workflow run from failing when a job fails. Set to
+				// true to allow a workflow run to pass when this job fails.
+				"continue-on-error"?: bool | string
+
+				// A container to run any steps in a job that don't already
+				// specify a container. If you have steps that use both script
+				// and container actions, the container actions will run as
+				// sibling containers on the same network with the same volume
+				// mounts.
+				// If you do not set a container, all steps will run directly on
+				// the host specified by runs-on unless a step refers to an
+				// action configured to run in a container.
+				container?: {
+					[string]: string | #container
+				}
+
 				// Additional containers to host services for a job in a workflow.
 				// These are useful for creating databases or cache services like
 				// redis. The runner on the virtual machine will automatically
@@ -505,12 +505,6 @@ import "strings"
 		}
 	}
 
-	#path: #globs
-
-	#name: =~"^[_a-zA-Z][a-zA-Z0-9_-]*$"
-
-	#env: [string]: bool | number | string
-
 	#architecture: "ARM32" | "x64" | "x86"
 
 	#branch: #globs
@@ -520,13 +514,13 @@ import "strings"
 	} | [...#configuration]
 
 	#container: string | {
-		// Sets an array of environment variables in the container.
-		env?: #env
-
 		// The Docker image to use as the container to run the action. The
 		// value can be the Docker Hub image name or a public docker
 		// registry name.
 		image: string
+
+		// Sets an array of environment variables in the container.
+		env?: #env
 
 		// Sets an array of ports to expose on the container.
 		ports?: [...number | string] & [_, ...]
@@ -553,9 +547,7 @@ import "strings"
 		"working-directory"?: #["working-directory"]
 	}
 
-	#shell: (string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")) & string
-
-	#: "working-directory": string
+	#env: [string]: bool | number | string
 
 	#event: "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "member" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "push" | "registry_package" | "release" | "status" | "watch" | "repository_dispatch"
 
@@ -564,6 +556,10 @@ import "strings"
 	#globs: [...strings.MinRunes(1)] & [_, ...]
 
 	#machine: "linux" | "macos" | "windows"
+
+	#name: =~"^[_a-zA-Z][a-zA-Z0-9_-]*$"
+
+	#path: #globs
 
 	#ref: null | {
 		branches?:          #branch
@@ -575,5 +571,9 @@ import "strings"
 		...
 	}
 
+	#shell: (string | ("bash" | "pwsh" | "python" | "sh" | "cmd" | "powershell")) & string
+
 	#types: [_, ...]
+
+	#: "working-directory": string
 }

@@ -1,9 +1,6 @@
 package kube
 
-service: linecook: spec: ports: [{
-	port:       8080
-	targetPort: 8080
-}]
+service: {}
 deployment: linecook: spec: template: spec: {
 	volumes: [{
 	}, {

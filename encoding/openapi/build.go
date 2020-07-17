@@ -323,7 +323,9 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 	} else {
 		dedup := map[string]bool{}
 		hasNoRef := false
-		for _, v := range appendSplit(nil, cue.AndOp, v) {
+		accept := v
+		conjuncts := appendSplit(nil, cue.AndOp, v)
+		for _, v := range conjuncts {
 			// This may be a reference to an enum. So we need to check references before
 			// dissecting them.
 			switch p, r := v.Reference(); {
@@ -344,7 +346,7 @@ func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
 			}
 			hasNoRef = true
 			count++
-			values = values.Unify(v)
+			values = values.UnifyAccept(v, accept)
 		}
 		isRef = !hasNoRef && len(dedup) == 1
 	}

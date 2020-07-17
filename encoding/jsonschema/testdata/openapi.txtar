@@ -21,9 +21,10 @@ components:
 -- out.cue --
 // A User uses something.
 #User: {
-	name?:    string
-	id?:      int
-	address?: null | #PhoneNumber
+	id?:   int
+	name?: string
+	address?:
+		null | #PhoneNumber
 	...
 }
 

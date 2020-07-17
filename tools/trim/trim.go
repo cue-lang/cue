@@ -65,8 +65,12 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+
+	// "cuelang.org/go/cue"
 	"cuelang.org/go/internal/legacy/cue"
 )
+
+type Runtime = cue.Runtime
 
 // TODO:
 // - remove the limitations mentioned in the documentation
@@ -259,10 +263,13 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		// TODO: consider resolving incomplete values within the current
 		// scope, as we do for fields.
 		if v.Exists() {
-			in = in.Unify(v)
+			in = in.UnifyAccept(v, m)
 		}
 		gen = append(gen, v.Source())
 	}
+
+	accept := v
+	comp := in
 
 	// Identify generated components and unify them with the mixin value.
 	exists := false
@@ -270,9 +277,16 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		src := v.Source()
 		alwaysGen := t.alwaysGen[src]
 		inNodes := inNodes(gen, src)
+		fromComp := t.fromComp[src]
+		if fromComp {
+			gen = append(gen, src)
+			comp = comp.UnifyAccept(v, accept)
+			continue
+		}
 		if !(alwaysGen || inNodes) {
 			continue
 		}
+
 		if !v.IsConcrete() {
 			// The template has an expression that cannot be fully
 			// resolved. Attempt to complete the expression by
@@ -284,7 +298,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 			v = internal.EvalExpr(scope, expr).(cue.Value)
 		}
 
-		if w := in.Unify(v); w.Err() == nil {
+		if w := in.UnifyAccept(v, accept); w.Err() == nil {
 			in = w
 		}
 		// One of the sources of this struct is generated. That means
@@ -308,10 +322,13 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 		for iter, _ := v.Fields(cue.All()); iter.Next(); {
 			mSub := valueMap[iterKey(iter)]
 			if fn != nil {
-				mSub = mSub.Unify(fn(iter.Label()))
+				label := iter.Label()
+				w := fn(label)
+				mSub = mSub.Unify(w)
 			}
 
-			removed := t.trim(iter.Label(), iter.Value(), mSub, v)
+			label := iter.Label()
+			removed := t.trim(label, iter.Value(), mSub, v)
 			rm = append(rm, removed...)
 		}
 
@@ -459,6 +476,18 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 			t.traceMsg(w.String())
 		}
 	}
+
+	if comp.Exists() {
+		if v.Subsume(comp) == nil {
+			for _, v := range vSplit {
+				src := v.Source()
+				if !inNodes(gen, src) {
+					rmSet = append(rmSet, src)
+				}
+			}
+		}
+	}
+
 	return rmSet
 }
 
@@ -469,7 +498,9 @@ func (t *trimSet) trimDecls(decls []ast.Decl, rm []ast.Node, m cue.Value, allow 
 		if f, ok := d.(*ast.Field); ok {
 			label, _, err := ast.LabelName(f.Label)
 			v := m.Lookup(label)
-			if err == nil && inNodes(rm, f.Value) && (allow || v.Exists()) {
+			inNodes := inNodes(rm, f.Value)
+			ok := allow || v.Exists()
+			if err == nil && inNodes && ok {
 				continue
 			}
 		}

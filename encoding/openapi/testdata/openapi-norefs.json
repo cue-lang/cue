@@ -108,17 +108,11 @@
                   }
                },
                "foo": {
-                  "type": "number",
+                  "type": "integer",
                   "minimum": 10,
                   "exclusiveMinimum": true,
                   "maximum": 1000,
                   "exclusiveMaximum": true
-               },
-               "bar": {
-                  "type": "array",
-                  "items": {
-                     "type": "string"
-                  }
                },
                "a": {
                   "description": "Field a.",
@@ -126,6 +120,12 @@
                   "enum": [
                      1
                   ]
+               },
+               "bar": {
+                  "type": "array",
+                  "items": {
+                     "type": "string"
+                  }
                },
                "b": {
                   "type": "string"

@@ -1,12 +1,16 @@
 ! cue cmd cycle
-cmp stderr expect-stderr
+cmp stderr expect-stderr1
 ! cue cmd aftercycle
-cmp stderr expect-stderr
+cmp stderr expect-stderr2
 cue cmd interlockedTasks
 cmp stdout interlocked-stdout
+cmp stderr expect-stderr3
 
--- expect-stderr --
+-- expect-stderr1 --
 cyclic dependency in tasks
+-- expect-stderr2 --
+command.aftercycle: structural cycle
+-- expect-stderr3 --
 -- interlocked-stdout --
 v
 v
@@ -18,8 +22,8 @@ import (
 )
 
 command: interlockedTasks: {
-  t1: cli.Print & { text: ref.value, ref: t2, value: "v" }
-  t2: cli.Print & { text: ref.value, ref: t1, value: "v" }
+  t1: cli.Print & { text: t2.value, value: "v" }
+  t2: cli.Print & { text: t1.value, value: "v" }
 }
 
 command: aftercycle: {

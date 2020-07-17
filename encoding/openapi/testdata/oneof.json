@@ -128,14 +128,11 @@
          "Foo": {
             "type": "object",
             "required": [
-               "count",
                "include",
-               "exclude"
+               "exclude",
+               "count"
             ],
             "properties": {
-               "count": {
-                  "$ref": "#/components/schemas/MyInt"
-               },
                "include": {
                   "$ref": "#/components/schemas/T"
                },
@@ -144,6 +141,9 @@
                   "items": {
                      "$ref": "#/components/schemas/T"
                   }
+               },
+               "count": {
+                  "$ref": "#/components/schemas/MyInt"
                }
             }
          },

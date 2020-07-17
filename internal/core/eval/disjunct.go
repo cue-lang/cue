@@ -173,7 +173,7 @@ func (n *nodeContext) updateResult() (isFinal bool) {
 	case !n.nodeShared.isDefault() && n.defaultMode == isDefault:
 
 	default:
-		if Equal(n.ctx, n.node, n.result()) {
+		if x := n.result(); x == nil && Equal(n.ctx, n.node, x) {
 			return n.isFinal
 		}
 

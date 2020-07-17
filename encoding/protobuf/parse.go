@@ -659,9 +659,9 @@ func (p *protoConverter) enum(x *proto.Enum) {
 // disjunction allowing no fields. This makes it easier to constrain the
 // result to include at least one of the values.
 func (p *protoConverter) oneOf(x *proto.Oneof) {
-	embed := &ast.EmbedDecl{
-		Expr: ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
-	}
+	s := ast.NewStruct()
+	ast.SetRelPos(s, token.Newline)
+	embed := &ast.EmbedDecl{Expr: s}
 	embed.AddComment(comment(x.Comment, true))
 
 	p.addDecl(embed)
@@ -680,11 +680,7 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 			p.messageField(s, 1, v)
 		}
 
-		embed.Expr = &ast.BinaryExpr{
-			X:  embed.Expr,
-			Op: token.OR,
-			Y:  ast.NewCall(ast.NewIdent("close"), s),
-		}
+		embed.Expr = ast.NewBinExpr(token.OR, embed.Expr, s)
 	}
 }
 

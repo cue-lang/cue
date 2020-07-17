@@ -7,9 +7,7 @@ cmp stdout expect-stdout
 4
 -- expect-stderr --
 // b.idx
-invalid non-ground value string (must be concrete int|string):
-    ./partial.cue:7:9
-    ./partial.cue:8:7
+invalid non-ground value string (must be concrete string)
 -- partial.cue --
 package partial
 

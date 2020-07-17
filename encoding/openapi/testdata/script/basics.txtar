@@ -37,8 +37,8 @@ info: {
 }
 // A User uses something.
 #User: {
-	name?:    string
 	id?:      int
+	name?:    string
 	address?: #PhoneNumber
 	...
 }

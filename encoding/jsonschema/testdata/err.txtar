@@ -15,6 +15,6 @@
 
 -- out.err --
 constraint not allowed because type string is excluded:
-    type.json:9:22
+    type.json:9:9
 -- out.cue --
 multi?: int & >=2 & <=3

@@ -1,3 +1,5 @@
+skip 'error message'
+
 ! cue import test.yaml -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f
 cmp stderr expect-stderr
 

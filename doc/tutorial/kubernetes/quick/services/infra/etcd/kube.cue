@@ -3,12 +3,8 @@ package kube
 service: etcd: spec: {
 	clusterIP: "None"
 	ports: [{
-		port:       2379
-		targetPort: 2379
 	}, {
-		port:       2380
-		targetPort: 2380
-		name:       "peer"
+		name: "peer"
 	}]
 }
 statefulSet: etcd: spec: {

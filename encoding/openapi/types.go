@@ -21,7 +21,6 @@ import (
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/legacy/cue"
@@ -45,6 +44,11 @@ var cueToOpenAPI = map[string]string{
 	`time.Format ("2006-01-02T15:04:05.999999999Z07:00")`: "date-time",
 
 	// TODO:  password.
+
+	">=-2147483648 & <=2147483647 & int":                                                                   "int32",
+	">=-9223372036854775808 & <=9223372036854775807 & int":                                                 "int64",
+	">=-340282346638528859811704183484516925440 & <=340282346638528859811704183484516925440":               "float",
+	">=-1.797693134862315708145274237317043567981e+308 & <=1.797693134862315708145274237317043567981e+308": "double",
 }
 
 func extractFormat(v cue.Value) string {
@@ -65,12 +69,8 @@ func extractFormat(v cue.Value) string {
 		expr = inst.ImportPath + "." + strings.Join(ref, ".")
 		expr += arg
 	} else {
-		// TODO: have some function to extract normalized builtin types.
-		b, err := format.Node(v.Syntax(cue.Final()))
-		if err != nil {
-			return ""
-		}
-		expr = string(b)
+		expr = fmt.Sprint(v.Eval())
+		expr += arg
 	}
 	if s, ok := cueToOpenAPI[expr]; ok {
 		return s

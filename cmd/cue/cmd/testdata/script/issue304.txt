@@ -3,13 +3,14 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 
-close({
-	x:     int
-	body?: close({
+#_def
+#_def: {
+	x: int
+	body?: {
 		a:  int
 		b?: string
-	})
-})
+	}
+}
 -- x.cue --
 package example
 

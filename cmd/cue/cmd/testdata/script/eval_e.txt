@@ -4,8 +4,7 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 -- expect-stderr --
-reference "nonExist" not found:
-    --expression:1:1
+reference "nonExist" not found
 -- partial.cue --
 package exitcode
 

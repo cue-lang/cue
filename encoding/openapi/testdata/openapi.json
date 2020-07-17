@@ -2,8 +2,8 @@
    "openapi": "3.0.0",
    "info": {
       "contact": {
-         "name": "John Doe",
-         "url": "https://cuelang.org"
+         "url": "https://cuelang.org",
+         "name": "John Doe"
       },
       "title": "An OpenAPI testing package.",
       "version": "v1beta2"
@@ -96,7 +96,7 @@
                   "$ref": "#/components/schemas/Port"
                },
                "foo": {
-                  "type": "number",
+                  "type": "integer",
                   "allOf": [
                      {
                         "$ref": "#/components/schemas/Int32"

@@ -9,7 +9,6 @@ service: prometheus: {
 		type: "NodePort"
 		ports: [{
 			name:     "main"
-			port:     9090
 			nodePort: 30900
 		}]
 	}

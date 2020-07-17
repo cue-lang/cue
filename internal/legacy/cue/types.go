@@ -1334,9 +1334,7 @@ func (v Value) Struct() (*Struct, error) {
 func (v Value) getStruct() (*structLit, *bottom) {
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, structKind); err != nil {
-		if !err.HasRecursive ||
-			err.Value == nil ||
-			err.Value.Kind() != StructKind {
+		if !err.ChildError {
 			return nil, err
 		}
 	}

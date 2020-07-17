@@ -76,12 +76,12 @@ person?:           #person
 billing_address?:  #address
 shipping_address?: #address
 
-#int_1=#int: int
-
 #address: {
 	city?: string
 	...
 }
+
+#int_1=#int: int
 
 #: "string-int": int | string
 

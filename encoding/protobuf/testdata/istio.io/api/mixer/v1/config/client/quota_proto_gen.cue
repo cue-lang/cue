@@ -73,16 +73,16 @@ package client
 // Describes how to match a given string in HTTP headers. Match is
 // case-sensitive.
 #StringMatch: {
-	close({}) | close({
+	{} | {
 		// exact string match
 		exact: string @protobuf(1)
-	}) | close({
+	} | {
 		// prefix-based match
 		prefix: string @protobuf(2)
-	}) | close({
+	} | {
 		// ECMAscript style regex-based match
 		regex: string @protobuf(3)
-	})
+	}
 }
 
 // Specifies a match clause to match Istio attributes

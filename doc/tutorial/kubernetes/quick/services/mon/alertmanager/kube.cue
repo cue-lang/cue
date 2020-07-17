@@ -11,9 +11,7 @@ service: alertmanager: {
 	spec: {
 		// type: ClusterIP
 		ports: [{
-			name:       "main"
-			port:       9093
-			targetPort: 9093
+			name: "main"
 		}]
 	}
 }

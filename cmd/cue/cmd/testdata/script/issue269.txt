@@ -1,5 +1,6 @@
-! cue eval ./struct.cue
+cue eval ./struct.cue
 cmp stderr expect-stderr
+cmp stdout expect-stdout
 -- struct.cue --
 #type: {
     x: 0
@@ -17,9 +18,24 @@ data: {
     a: y: b.y
 }
 -- expect-stderr --
-data.a: conflicting values 0 and a.x (mismatched types int and struct):
-    ./struct.cue:2:8
-    ./struct.cue:13:11
-data.b: conflicting values 0 and a.x (mismatched types int and struct):
-    ./struct.cue:2:8
-    ./struct.cue:13:11
+-- expect-stdout --
+#type: {
+    x: 0
+    i: 0
+    j: 0
+    y: 0
+}
+data: {
+    a: {
+        x: 0
+        i: 0
+        j: 0
+        y: 0
+    }
+    b: {
+        x: 0
+        i: 0
+        j: 0
+        y: 0
+    }
+}

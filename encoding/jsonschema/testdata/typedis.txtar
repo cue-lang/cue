@@ -44,7 +44,7 @@
 }
 -- out.err --
 constraint not allowed because type string is excluded:
-    type.json:39:23
+    type.json:39:15
 -- out.cue --
 // Main schema
 intOrString1?: int | string

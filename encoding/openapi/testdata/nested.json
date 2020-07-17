@@ -10,6 +10,9 @@
          "Struct": {
             "type": "object",
             "properties": {
+               "b": {
+                  "$ref": "#/components/schemas/Struct.T"
+               },
                "a": {
                   "$ref": "#/components/schemas/Struct.T"
                },
@@ -18,9 +21,6 @@
                   "items": {
                      "$ref": "#/components/schemas/Struct.T"
                   }
-               },
-               "b": {
-                  "$ref": "#/components/schemas/Struct.T"
                }
             }
          },

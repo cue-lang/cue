@@ -283,3 +283,37 @@ func TestDecode(t *testing.T) {
 		})
 	}
 }
+
+// For debugging purposes, do not remove.
+func TestX(t *testing.T) {
+	t.Skip()
+
+	fail := "some error"
+	// Not a typical constraint, but it is possible.
+	var (
+		name        = "string list incompatible lengths"
+		value       = []string{"a", "b", "c"}
+		constraints = `4*[string]`
+		wantErr     = fail
+	)
+
+	r := &cue.Runtime{}
+	codec := New(r, nil)
+
+	v, err := codec.ExtractType(value)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if constraints != "" {
+		inst, err := r.Compile(name, constraints)
+		if err != nil {
+			t.Fatal(err)
+		}
+		w := inst.Value()
+		v = v.Unify(w)
+	}
+
+	err = codec.Validate(v, value)
+	checkErr(t, err, wantErr)
+}

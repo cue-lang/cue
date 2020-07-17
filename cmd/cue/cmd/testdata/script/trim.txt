@@ -30,7 +30,6 @@ foo: bar: {
 	_value: "here"
 	b:      "foo"
 	c:      45
-	f:      ">> here <<" // TODO: remove
 
 	sList: [{b: "foo"}, {}]
 }
@@ -57,6 +56,8 @@ group: {
 	comp: bar: {
 		aa: 8 // new value
 	}
+
+	comp: baz: {} // removed: fully implied by comprehension above
 }
 -- trim/trim.cue --
 package trim

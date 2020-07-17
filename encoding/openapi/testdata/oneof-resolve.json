@@ -110,14 +110,11 @@
          "Foo": {
             "type": "object",
             "required": [
-               "count",
                "include",
-               "exclude"
+               "exclude",
+               "count"
             ],
             "properties": {
-               "count": {
-                  "type": "integer"
-               },
                "include": {
                   "type": "object",
                   "properties": {
@@ -302,6 +299,9 @@
                         }
                      ]
                   }
+               },
+               "count": {
+                  "type": "integer"
                }
             }
          },

@@ -179,26 +179,26 @@ import (
 	// Specifies one attribute value with different type.
 	#AttributeValue: {
 		// The attribute value.
-		close({}) | close({
+		{} | {
 			stringValue: string @protobuf(2,name=string_value)
-		}) | close({
+		} | {
 			int64Value: int64 @protobuf(3,name=int64_value)
-		}) | close({
+		} | {
 			doubleValue: float64 @protobuf(4,type=double,name=double_value)
-		}) | close({
+		} | {
 			boolValue: bool @protobuf(5,name=bool_value)
-		}) | close({
+		} | {
 			bytesValue: bytes @protobuf(6,name=bytes_value)
-		}) | close({
+		} | {
 			timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
-		}) | close({
+		} | {
 			// Used for values of type STRING_MAP
 			stringMapValue: #StringMap @protobuf(9,name=string_map_value)
-		}) | close({
+		} | {
 			testValue: test.#Test @protobuf(10,type=acme.test.Test,name=test_value)
-		}) | close({
+		} | {
 			testValue: test_test.#AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
-		})
+		}
 	}
 
 	// Defines a string map.

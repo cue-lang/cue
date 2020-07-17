@@ -4,19 +4,19 @@ cmp stdout expect-stdout
 {
     "service": [
         {
-            "name": "booster",
-            "kind": "Service"
+            "kind": "Service",
+            "name": "booster"
         },
         {
-            "name": "supplement\nfoo",
             "kind": "Service",
+            "name": "supplement\nfoo",
             "json": "[1, 2]"
         }
     ],
     "deployment": [
         {
-            "name": "booster",
             "kind": "Deployment",
+            "name": "booster",
             "replicas": 1
         }
     ]

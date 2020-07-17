@@ -29,7 +29,7 @@ import "strings"
 	lastName?: strings.MinRunes(1)
 
 	// Age in years which must be equal to or greater than zero.
-	age?: >=0
+	age?: >=0 & int
 	...
 }
 -- schema.json --
@@ -63,18 +63,12 @@ import "strings"
 }
 -- expect-stderr --
 unsupported constraint "foo":
-    ./bad.json:3:10
+    ./bad.json:3:3
 -- data.yaml --
 age: twenty
 
 -- expect-stderr2 --
-age: conflicting values "twenty" and (int & >=0) (mismatched types string and int):
-    ./data.yaml:1:7
-    ./schema.json:18:15
-    ./schema.json:19:18
+age: conflicting values "twenty" and int (mismatched types string and int)
 -- expect-stderr3 --
-age: conflicting values "twenty" and (int & >=0) (mismatched types string and int):
-    ./data.yaml:1:7
-    ./schema.json:18:15
-    ./schema.json:19:18
+age: conflicting values "twenty" and int (mismatched types string and int)
 -- cue.mod --

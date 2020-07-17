@@ -1,115 +1,53 @@
-configMap: {}
 service: {}
 deployment: {}
-daemonSet: {}
-statefulSet: {}
 #Component: string
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: string
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: string
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
+daemonSet: {}
+statefulSet: {}
 configMap: {}
 service: {}
 deployment: {}
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     bartender: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *7080 | int32
+                targetPort: *7080 | int32 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "bartender"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "bartender"
             labels: {
-                component: "frontend"
                 app:       "bartender"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "bartender"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     bartender: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "bartender"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "bartender"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -122,93 +60,64 @@ deployment: {
                         image: "gcr.io/myproj/bartender:v0.1.34"
                         args: []
                         ports: [{
-                            containerPort: 7080
-                            _export:       true
+                            containerPort: *7080 | int32
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "bartender"
+        metadata: {
+            name: "bartender"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     breaddispatcher: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *7080 | int32
+                targetPort: *7080 | int32 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "breaddispatcher"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "breaddispatcher"
             labels: {
-                component: "frontend"
                 app:       "breaddispatcher"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "breaddispatcher"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     breaddispatcher: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "breaddispatcher"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "breaddispatcher"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -221,93 +130,64 @@ deployment: {
                         image: "gcr.io/myproj/breaddispatcher:v0.3.24"
                         args: ["-etcd=etcd:2379", "-event-server=events:7788"]
                         ports: [{
-                            containerPort: 7080
-                            _export:       true
+                            containerPort: *7080 | int32
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "breaddispatcher"
+        metadata: {
+            name: "breaddispatcher"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     host: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *7080 | int32
+                targetPort: *7080 | int32 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "host"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "host"
             labels: {
-                component: "frontend"
                 app:       "host"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "host"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     host: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "host"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: 2
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "host"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -320,93 +200,64 @@ deployment: {
                         image: "gcr.io/myproj/host:v0.1.10"
                         args: []
                         ports: [{
-                            containerPort: 7080
-                            _export:       true
+                            containerPort: *7080 | int32
                         }]
                     }]
                 }
             }
-            replicas: 2
         }
-        _name: "host"
+        metadata: {
+            name: "host"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     maitred: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *7080 | int32
+                targetPort: *7080 | int32 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "maitred"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "maitred"
             labels: {
-                component: "frontend"
                 app:       "maitred"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "maitred"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     maitred: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "maitred"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "maitred"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -419,93 +270,64 @@ deployment: {
                         image: "gcr.io/myproj/maitred:v0.0.4"
                         args: []
                         ports: [{
-                            containerPort: 7080
-                            _export:       true
+                            containerPort: *7080 | int32
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "maitred"
+        metadata: {
+            name: "maitred"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     valeter: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       *8080 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *8080 | int
+            }]
+            selector: {
+                app:       "valeter"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "valeter"
             labels: {
-                component: "frontend"
                 app:       "valeter"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "valeter"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "http"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     valeter: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "valeter"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "valeter"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -516,95 +338,66 @@ deployment: {
                     containers: [{
                         name:  "valeter"
                         image: "gcr.io/myproj/valeter:v0.0.4"
-                        args: ["-http=:8080", "-etcd=etcd:2379"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
                         }]
+                        args: ["-http=:8080", "-etcd=etcd:2379"]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "valeter"
+        metadata: {
+            name: "valeter"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     waiter: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *7080 | int32
+                targetPort: *7080 | int32 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "waiter"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "waiter"
             labels: {
-                component: "frontend"
                 app:       "waiter"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "waiter"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     waiter: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "waiter"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: 5
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "waiter"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -616,93 +409,64 @@ deployment: {
                         name:  "waiter"
                         image: "gcr.io/myproj/waiter:v0.3.0"
                         ports: [{
-                            containerPort: 7080
-                            _export:       true
+                            containerPort: *7080 | int32
                         }]
                     }]
                 }
             }
-            replicas: 5
         }
-        _name: "waiter"
+        metadata: {
+            name: "waiter"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     waterdispatcher: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                name:       "http"
+                port:       *7080 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *7080 | int32 | int
+            }]
+            selector: {
+                app:       "waterdispatcher"
+                domain:    "prod"
+                component: "frontend"
+            }
+        }
         metadata: {
             name: "waterdispatcher"
             labels: {
-                component: "frontend"
                 app:       "waterdispatcher"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "frontend"
-                app:       "waterdispatcher"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "http"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     waterdispatcher: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "waterdispatcher"
-            labels: {
-                component: "frontend"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "frontend"
                         app:       "waterdispatcher"
                         domain:    "prod"
+                        component: "frontend"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -715,126 +479,70 @@ deployment: {
                         image: "gcr.io/myproj/waterdispatcher:v0.0.48"
                         args: ["-http=:8080", "-etcd=etcd:2379"]
                         ports: [{
-                            containerPort: 7080
-                            _export:       true
+                            containerPort: *7080 | int32
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "waterdispatcher"
+        metadata: {
+            name: "waterdispatcher"
+            labels: {
+                component: "frontend"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "frontend"
 daemonSet: {}
 statefulSet: {}
-#Component: "frontend"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "frontend"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "frontend"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {}
 deployment: {}
+#Component: "infra"
 daemonSet: {}
 statefulSet: {}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     download: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *7080 | int32
+                targetPort: *7080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "download"
+                domain:    "prod"
+                component: "infra"
+            }
+        }
         metadata: {
             name: "download"
             labels: {
-                component: "infra"
                 app:       "download"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "infra"
-                app:       "download"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       7080
-                targetPort: 7080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     download: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "download"
-            labels: {
-                component: "infra"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "infra"
                         app:       "download"
                         domain:    "prod"
+                        component: "infra"
                     }
                 }
                 spec: {
@@ -843,99 +551,72 @@ deployment: {
                         image: "gcr.io/myproj/download:v0.0.2"
                         ports: [{
                             containerPort: 7080
-                            _export:       true
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "download"
+        metadata: {
+            name: "download"
+            labels: {
+                component: "infra"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "infra"
 daemonSet: {}
 statefulSet: {}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     etcd: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            clusterIP: "None"
+            ports: [{
+                port:       *2379 | int32
+                targetPort: *2379 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }, {
+                name:       "peer"
+                port:       *2380 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *2380 | int
+            }]
+            selector: {
+                app:       "etcd"
+                domain:    "prod"
+                component: "infra"
+            }
+        }
         metadata: {
             name: "etcd"
             labels: {
-                component: "infra"
                 app:       "etcd"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "infra"
-                app:       "etcd"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       2379
-                targetPort: 2379
-            }, {
-                name:       "peer"
-                protocol:   "TCP"
-                port:       2380
-                targetPort: 2380
-            }]
-            clusterIP: "None"
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {}
+#Component: "infra"
 daemonSet: {}
 statefulSet: {
     etcd: {
-        kind:       "StatefulSet"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "etcd"
-            labels: {
-                component: "infra"
-            }
-        }
         spec: {
+            serviceName: "etcd"
+            replicas:    3
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "infra"
                         app:       "etcd"
+                        component: "infra"
                         domain:    "prod"
                     }
                     annotations: {
@@ -944,8 +625,42 @@ statefulSet: {
                     }
                 }
                 spec: {
+                    affinity: {
+                        podAntiAffinity: {
+                            requiredDuringSchedulingIgnoredDuringExecution: [{
+                                labelSelector: {
+                                    matchExpressions: [{
+                                        key:      "app"
+                                        operator: "In"
+                                        values: ["etcd"]
+                                    }]
+                                }
+                                topologyKey: "kubernetes.io/hostname"
+                            }]
+                        }
+                    }
+                    terminationGracePeriodSeconds: 10
                     containers: [{
-                        name: "etcd"
+                        name:  "etcd"
+                        image: "quay.io/coreos/etcd:v3.3.10"
+                        ports: [{
+                            name:          "client"
+                            containerPort: 2379
+                        }, {
+                            name:          "peer"
+                            containerPort: 2380
+                        }]
+                        livenessProbe: {
+                            httpGet: {
+                                path: "/health"
+                                port: "client"
+                            }
+                            initialDelaySeconds: 30
+                        }
+                        volumeMounts: [{
+                            name:      "etcd3"
+                            mountPath: "/data"
+                        }]
                         env: [{
                             name:  "ETCDCTL_API"
                             value: "3"
@@ -967,48 +682,11 @@ statefulSet: {
                                 }
                             }
                         }]
-                        image: "quay.io/coreos/etcd:v3.3.10"
                         command: ["/usr/local/bin/etcd"]
                         args: ["-name", "$(NAME)", "-data-dir", "/data/etcd3", "-initial-advertise-peer-urls", "http://$(IP):2380", "-listen-peer-urls", "http://$(IP):2380", "-listen-client-urls", "http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls", "http://$(IP):2379", "-discovery", "https://discovery.etcd.io/xxxxxx"]
-                        ports: [{
-                            name:          "client"
-                            containerPort: 2379
-                            _export:       true
-                        }, {
-                            name:          "peer"
-                            containerPort: 2380
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "etcd3"
-                            mountPath: "/data"
-                        }]
-                        livenessProbe: {
-                            initialDelaySeconds: 30
-                            httpGet: {
-                                path: "/health"
-                                port: "client"
-                            }
-                        }
                     }]
-                    terminationGracePeriodSeconds: 10
-                    affinity: {
-                        podAntiAffinity: {
-                            requiredDuringSchedulingIgnoredDuringExecution: [{
-                                labelSelector: {
-                                    matchExpressions: [{
-                                        key:      "app"
-                                        operator: "In"
-                                        values: ["etcd"]
-                                    }]
-                                }
-                                topologyKey: "kubernetes.io/hostname"
-                            }]
-                        }
-                    }
                 }
             }
-            replicas: 3
             volumeClaimTemplates: [{
                 metadata: {
                     name: "etcd3"
@@ -1017,93 +695,64 @@ statefulSet: {
                     }
                 }
                 spec: {
+                    accessModes: ["ReadWriteOnce"]
                     resources: {
                         requests: {
                             storage: "10Gi"
                         }
                     }
-                    accessModes: ["ReadWriteOnce"]
                 }
             }]
-            serviceName: "etcd"
         }
-        _name: "etcd"
-    }
-}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
+        metadata: {
+            name: "etcd"
+            labels: {
+                component: "infra"
             }
         }
+        kind:       "StatefulSet"
+        apiVersion: "apps/v1"
     }
-    _name: string
 }
 configMap: {}
 service: {
     events: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                name:       "grpc"
+                port:       *7788 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *7788 | int
+            }]
+            selector: {
+                app:       "events"
+                domain:    "prod"
+                component: "infra"
+            }
+        }
         metadata: {
             name: "events"
             labels: {
-                component: "infra"
                 app:       "events"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "infra"
-                app:       "events"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "grpc"
-                protocol:   "TCP"
-                port:       7788
-                targetPort: 7788
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     events: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "events"
-            labels: {
-                component: "infra"
-            }
-        }
         spec: {
+            replicas: 2
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "infra"
                         app:       "events"
                         domain:    "prod"
+                        component: "infra"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1111,28 +760,6 @@ deployment: {
                     }
                 }
                 spec: {
-                    volumes: [{
-                        name: "secret-volume"
-                        secret: {
-                            secretName: "biz-secrets"
-                        }
-                    }]
-                    containers: [{
-                        name:  "events"
-                        image: "gcr.io/myproj/events:v0.1.31"
-                        args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
-                        ports: [{
-                            containerPort: 7080
-                            _export:       false
-                        }, {
-                            containerPort: 7788
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "secret-volume"
-                            mountPath: "/etc/ssl"
-                        }]
-                    }]
                     affinity: {
                         podAntiAffinity: {
                             requiredDuringSchedulingIgnoredDuringExecution: [{
@@ -1147,91 +774,83 @@ deployment: {
                             }]
                         }
                     }
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "biz-secrets"
+                        }
+                    }]
+                    containers: [{
+                        name:  "events"
+                        image: "gcr.io/myproj/events:v0.1.31"
+                        ports: [{
+                            containerPort: 7080
+                        }, {
+                            containerPort: 7788
+                        }]
+                        args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
+                        volumeMounts: [{
+                            mountPath: "/etc/ssl"
+                            name:      "secret-volume"
+                        }]
+                    }]
                 }
             }
-            replicas: 2
         }
-        _name: "events"
+        metadata: {
+            name: "events"
+            labels: {
+                component: "infra"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "infra"
 daemonSet: {}
 statefulSet: {}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     tasks: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            type:           "LoadBalancer"
+            loadBalancerIP: "1.2.3.4"
+            ports: [{
+                port:       443
+                name:       "http"
+                protocol:   *"TCP" | "UDP"
+                targetPort: *7443 | int
+            }]
+            selector: {
+                app:       "tasks"
+                domain:    "prod"
+                component: "infra"
+            }
+        }
         metadata: {
             name: "tasks"
             labels: {
-                component: "infra"
                 app:       "tasks"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            type: "LoadBalancer"
-            selector: {
                 component: "infra"
-                app:       "tasks"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "http"
-                protocol:   "TCP"
-                port:       443
-                targetPort: 7443
-            }]
-            loadBalancerIP: "1.2.3.4"
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     tasks: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "tasks"
-            labels: {
-                component: "infra"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "infra"
                         app:       "tasks"
                         domain:    "prod"
+                        component: "infra"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1250,99 +869,69 @@ deployment: {
                         image: "gcr.io/myproj/tasks:v0.2.6"
                         ports: [{
                             containerPort: 7080
-                            _export:       false
                         }, {
                             containerPort: 7443
-                            _export:       true
                         }]
                         volumeMounts: [{
-                            name:      "secret-volume"
                             mountPath: "/etc/ssl"
+                            name:      "secret-volume"
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "tasks"
+        metadata: {
+            name: "tasks"
+            labels: {
+                component: "infra"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "infra"
 daemonSet: {}
 statefulSet: {}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     updater: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "updater"
+                domain:    "prod"
+                component: "infra"
+            }
+        }
         metadata: {
             name: "updater"
             labels: {
-                component: "infra"
                 app:       "updater"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "infra"
-                app:       "updater"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     updater: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "updater"
-            labels: {
-                component: "infra"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "infra"
                         app:       "updater"
                         domain:    "prod"
+                        component: "infra"
                     }
                 }
                 spec: {
@@ -1355,101 +944,72 @@ deployment: {
                     containers: [{
                         name:  "updater"
                         image: "gcr.io/myproj/updater:v0.1.0"
-                        args: ["-key=/etc/certs/updater.pem"]
+                        volumeMounts: [{
+                            mountPath: "/etc/certs"
+                            name:      "secret-updater"
+                        }]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
                         }]
-                        volumeMounts: [{
-                            name:      "secret-updater"
-                            mountPath: "/etc/certs"
-                        }]
+                        args: ["-key=/etc/certs/updater.pem"]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "updater"
+        metadata: {
+            name: "updater"
+            labels: {
+                component: "infra"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "infra"
 daemonSet: {}
 statefulSet: {}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     watcher: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            type:           "LoadBalancer"
+            loadBalancerIP: "1.2.3.4."
+            ports: [{
+                name:       "http"
+                port:       *7788 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *7788 | int
+            }]
+            selector: {
+                app:       "watcher"
+                domain:    "prod"
+                component: "infra"
+            }
+        }
         metadata: {
             name: "watcher"
             labels: {
-                component: "infra"
                 app:       "watcher"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            type: "LoadBalancer"
-            selector: {
                 component: "infra"
-                app:       "watcher"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "http"
-                protocol:   "TCP"
-                port:       7788
-                targetPort: 7788
-            }]
-            loadBalancerIP: "1.2.3.4."
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     watcher: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "watcher"
-            labels: {
-                component: "infra"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "infra"
                         app:       "watcher"
                         domain:    "prod"
+                        component: "infra"
                     }
                 }
                 spec: {
@@ -1464,132 +1024,75 @@ deployment: {
                         image: "gcr.io/myproj/watcher:v0.1.0"
                         ports: [{
                             containerPort: 7080
-                            _export:       false
                         }, {
                             containerPort: 7788
-                            _export:       true
                         }]
                         volumeMounts: [{
-                            name:      "secret-volume"
                             mountPath: "/etc/ssl"
+                            name:      "secret-volume"
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "watcher"
+        metadata: {
+            name: "watcher"
+            labels: {
+                component: "infra"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "infra"
 daemonSet: {}
 statefulSet: {}
-#Component: "infra"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "infra"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "infra"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {}
 deployment: {}
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     caller: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "caller"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "caller"
             labels: {
-                component: "kitchen"
                 app:       "caller"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "caller"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     caller: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "caller"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: 3
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "caller"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1599,13 +1102,13 @@ deployment: {
                     volumes: [{
                         name: "ssd-caller"
                         gcePersistentDisk: {
-                            fsType: "ext4"
                             pdName: "ssd-caller"
+                            fsType: "ext4"
                         }
                     }, {
-                        name: "secret-caller"
+                        name: *"secret-caller" | string
                         secret: {
-                            secretName: "caller-secrets"
+                            secretName: *"caller-secrets" | string
                         }
                     }, {
                         name: "secret-ssh-key"
@@ -1616,116 +1119,86 @@ deployment: {
                     containers: [{
                         name:  "caller"
                         image: "gcr.io/myproj/caller:v0.20.14"
+                        volumeMounts: [{
+                            name:      "ssd-caller"
+                            mountPath: *"/logs" | string
+                        }, {
+                            mountPath: *"/etc/certs" | string
+                            name:      *"secret-caller" | string
+                            readOnly:  true
+                        }, {
+                            mountPath: "/sslcerts"
+                            name:      "secret-ssh-key"
+                            readOnly:  true
+                        }]
                         args: ["-env=prod", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "ssd-caller"
-                            mountPath: "/logs"
-                        }, {
-                            name:      "secret-caller"
-                            readOnly:  true
-                            mountPath: "/etc/certs"
-                        }, {
-                            name:      "secret-ssh-key"
-                            readOnly:  true
-                            mountPath: "/sslcerts"
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: true
                 }
             }
-            replicas: 3
         }
-        _name: "caller"
+        metadata: {
+            name: "caller"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     dishwasher: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "dishwasher"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "dishwasher"
             labels: {
-                component: "kitchen"
                 app:       "dishwasher"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "dishwasher"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     dishwasher: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "dishwasher"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: 5
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "dishwasher"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1733,15 +1206,15 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: "dishwasher-disk"
+                        name: *"dishwasher-disk" | string
                         gcePersistentDisk: {
+                            pdName: *"dishwasher-disk" | string
                             fsType: "ext4"
-                            pdName: "dishwasher-disk"
                         }
                     }, {
-                        name: "secret-dishwasher"
+                        name: *"secret-dishwasher" | string
                         secret: {
-                            secretName: "dishwasher-secrets"
+                            secretName: *"dishwasher-secrets" | string
                         }
                     }, {
                         name: "secret-ssh-key"
@@ -1752,116 +1225,86 @@ deployment: {
                     containers: [{
                         name:  "dishwasher"
                         image: "gcr.io/myproj/dishwasher:v0.2.13"
+                        volumeMounts: [{
+                            name:      *"dishwasher-disk" | string
+                            mountPath: *"/logs" | string
+                        }, {
+                            mountPath: "/sslcerts"
+                            name:      *"secret-dishwasher" | string
+                            readOnly:  true
+                        }, {
+                            mountPath: "/etc/certs"
+                            name:      "secret-ssh-key"
+                            readOnly:  true
+                        }]
                         args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "dishwasher-disk"
-                            mountPath: "/logs"
-                        }, {
-                            name:      "secret-dishwasher"
-                            readOnly:  true
-                            mountPath: "/sslcerts"
-                        }, {
-                            name:      "secret-ssh-key"
-                            readOnly:  true
-                            mountPath: "/etc/certs"
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: true
                 }
             }
-            replicas: 5
         }
-        _name: "dishwasher"
+        metadata: {
+            name: "dishwasher"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     expiditer: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "expiditer"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "expiditer"
             labels: {
-                component: "kitchen"
                 app:       "expiditer"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "expiditer"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     expiditer: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "expiditer"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "expiditer"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1869,15 +1312,15 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: "expiditer-disk"
+                        name: *"expiditer-disk" | string
                         gcePersistentDisk: {
+                            pdName: *"expiditer-disk" | string
                             fsType: "ext4"
-                            pdName: "expiditer-disk"
                         }
                     }, {
-                        name: "secret-expiditer"
+                        name: *"secret-expiditer" | string
                         secret: {
-                            secretName: "expiditer-secrets"
+                            secretName: *"expiditer-secrets" | string
                         }
                     }]
                     containers: [{
@@ -1886,109 +1329,79 @@ deployment: {
                         args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
                         }]
                         volumeMounts: [{
-                            name:      "expiditer-disk"
-                            mountPath: "/logs"
+                            name:      *"expiditer-disk" | string
+                            mountPath: *"/logs" | string
                         }, {
-                            name:      "secret-expiditer"
+                            mountPath: *"/etc/certs" | string
+                            name:      *"secret-expiditer" | string
                             readOnly:  true
-                            mountPath: "/etc/certs"
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: true
                 }
             }
-            replicas: 1
         }
-        _name: "expiditer"
+        metadata: {
+            name: "expiditer"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     headchef: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "headchef"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "headchef"
             labels: {
-                component: "kitchen"
                 app:       "headchef"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "headchef"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     headchef: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "headchef"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "headchef"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1996,126 +1409,96 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: "headchef-disk"
+                        name: *"headchef-disk" | string
                         gcePersistentDisk: {
+                            pdName: *"headchef-disk" | string
                             fsType: "ext4"
-                            pdName: "headchef-disk"
                         }
                     }, {
-                        name: "secret-headchef"
+                        name: *"secret-headchef" | string
                         secret: {
-                            secretName: "headchef-secrets"
+                            secretName: *"headchef-secrets" | string
                         }
                     }]
                     containers: [{
                         name:  "headchef"
                         image: "gcr.io/myproj/headchef:v0.2.16"
+                        volumeMounts: [{
+                            name:      *"headchef-disk" | string
+                            mountPath: *"/logs" | string
+                        }, {
+                            mountPath: "/sslcerts"
+                            name:      *"secret-headchef" | string
+                            readOnly:  true
+                        }]
                         args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "headchef-disk"
-                            mountPath: "/logs"
-                        }, {
-                            name:      "secret-headchef"
-                            readOnly:  true
-                            mountPath: "/sslcerts"
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: true
                 }
             }
-            replicas: 1
         }
-        _name: "headchef"
+        metadata: {
+            name: "headchef"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     linecook: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "linecook"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "linecook"
             labels: {
-                component: "kitchen"
                 app:       "linecook"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "linecook"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     linecook: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "linecook"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "linecook"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -2123,10 +1506,10 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: "linecook-disk"
+                        name: *"linecook-disk" | string
                         gcePersistentDisk: {
+                            pdName: *"linecook-disk" | string
                             fsType: "ext4"
-                            pdName: "linecook-disk"
                         }
                     }, {
                         name: "secret-kitchen"
@@ -2137,112 +1520,82 @@ deployment: {
                     containers: [{
                         name:  "linecook"
                         image: "gcr.io/myproj/linecook:v0.1.42"
+                        volumeMounts: [{
+                            name:      *"linecook-disk" | string
+                            mountPath: *"/logs" | string
+                        }, {
+                            name:      "secret-kitchen"
+                            mountPath: *"/etc/certs" | string
+                            readOnly:  true
+                        }]
                         args: ["-name=linecook", "-env=prod", "-logdir=/logs", "-event-server=events:7788", "-etcd", "etcd:2379", "-reconnect-delay", "1h", "-recovery-overlap", "100000"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "linecook-disk"
-                            mountPath: "/logs"
-                        }, {
-                            name:      "secret-kitchen"
-                            readOnly:  true
-                            mountPath: "/etc/certs"
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: true
                 }
             }
-            replicas: 1
         }
-        _name: "linecook"
+        metadata: {
+            name: "linecook"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     pastrychef: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "pastrychef"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "pastrychef"
             labels: {
-                component: "kitchen"
                 app:       "pastrychef"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "pastrychef"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     pastrychef: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "pastrychef"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "pastrychef"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -2250,10 +1603,10 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: "pastrychef-disk"
+                        name: *"pastrychef-disk" | string
                         gcePersistentDisk: {
+                            pdName: *"pastrychef-disk" | string
                             fsType: "ext4"
-                            pdName: "pastrychef-disk"
                         }
                     }, {
                         name: "secret-ssh-key"
@@ -2264,112 +1617,82 @@ deployment: {
                     containers: [{
                         name:  "pastrychef"
                         image: "gcr.io/myproj/pastrychef:v0.1.15"
+                        volumeMounts: [{
+                            name:      *"pastrychef-disk" | string
+                            mountPath: *"/logs" | string
+                        }, {
+                            name:      "secret-ssh-key"
+                            mountPath: *"/etc/certs" | string
+                            readOnly:  true
+                        }]
                         args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
                         ports: [{
                             containerPort: 8080
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "pastrychef-disk"
-                            mountPath: "/logs"
-                        }, {
-                            name:      "secret-ssh-key"
-                            readOnly:  true
-                            mountPath: "/etc/certs"
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: true
                 }
             }
-            replicas: 1
         }
-        _name: "pastrychef"
+        metadata: {
+            name: "pastrychef"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     souschef: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                port:       *8080 | int32
+                targetPort: *8080 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
+            }]
+            selector: {
+                app:       "souschef"
+                domain:    "prod"
+                component: "kitchen"
+            }
+        }
         metadata: {
             name: "souschef"
             labels: {
-                component: "kitchen"
                 app:       "souschef"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "kitchen"
-                app:       "souschef"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       8080
-                targetPort: 8080
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     souschef: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "souschef"
-            labels: {
-                component: "kitchen"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "kitchen"
                         app:       "souschef"
                         domain:    "prod"
+                        component: "kitchen"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -2381,162 +1704,76 @@ deployment: {
                         image: "gcr.io/myproj/souschef:v0.5.3"
                         ports: [{
                             containerPort: 8080
-                            _export:       true
                         }]
                         livenessProbe: {
-                            initialDelaySeconds: 40
-                            periodSeconds:       3
                             httpGet: {
                                 path: "/debug/health"
                                 port: 8080
                             }
+                            initialDelaySeconds: 40
+                            periodSeconds:       3
                         }
                     }]
-                    _hasDisks: false
                 }
             }
-            replicas: 1
         }
-        _name: "souschef"
+        metadata: {
+            name: "souschef"
+            labels: {
+                component: "kitchen"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "kitchen"
 daemonSet: {}
 statefulSet: {}
-#Component: "kitchen"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "kitchen"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "kitchen"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {}
 deployment: {}
+#Component: "mon"
 daemonSet: {}
 statefulSet: {}
-#Component: "mon"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "mon"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "mon"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
-configMap: {
-    alertmanager: {
-        kind:       "ConfigMap"
-        apiVersion: "v1"
-        metadata: {
-            name: "alertmanager"
-            labels: {
-                component: "mon"
-            }
-        }
-        data: {
-            "alerts.yaml": """
-        receivers:
-        - name: pager
-          slack_configs:
-          - text: |-
-              {{ range .Alerts }}{{ .Annotations.description }}
-              {{ end }}
-            channel: '#cloudmon'
-            send_resolved: true
-        route:
-          receiver: pager
-          group_by:
-          - alertname
-          - cluster
-        
-        """
-        }
-    }
-}
+configMap: {}
 service: {
     alertmanager: {
-        kind:       "Service"
-        apiVersion: "v1"
         metadata: {
             name: "alertmanager"
-            labels: {
-                name:      "alertmanager"
-                component: "mon"
-                app:       "alertmanager"
-                domain:    "prod"
-            }
             annotations: {
                 "prometheus.io/scrape": "true"
                 "prometheus.io/path":   "/metrics"
             }
-        }
-        spec: {
-            selector: {
+            labels: {
                 name:      "alertmanager"
-                component: "mon"
                 app:       "alertmanager"
                 domain:    "prod"
+                component: "mon"
             }
+        }
+        spec: {
             ports: [{
                 name:       "main"
-                protocol:   "TCP"
-                port:       9093
-                targetPort: 9093
+                port:       *9093 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *9093 | int
             }]
+            selector: {
+                name:      "alertmanager"
+                app:       "alertmanager"
+                domain:    "prod"
+                component: "mon"
+            }
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     alertmanager: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "alertmanager"
-            labels: {
-                component: "mon"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {
                 matchLabels: {
                     app: "alertmanager"
@@ -2546,21 +1783,12 @@ deployment: {
                 metadata: {
                     name: "alertmanager"
                     labels: {
-                        component: "mon"
                         app:       "alertmanager"
                         domain:    "prod"
+                        component: "mon"
                     }
                 }
                 spec: {
-                    volumes: [{
-                        name: "config-volume"
-                        configMap: {
-                            name: "alertmanager"
-                        }
-                    }, {
-                        name: "alertmanager"
-                        emptyDir: {}
-                    }]
                     containers: [{
                         name:  "alertmanager"
                         image: "prom/alertmanager:v0.15.2"
@@ -2568,7 +1796,6 @@ deployment: {
                         ports: [{
                             name:          "alertmanager"
                             containerPort: 9093
-                            _export:       true
                         }]
                         volumeMounts: [{
                             name:      "config-volume"
@@ -2578,111 +1805,121 @@ deployment: {
                             mountPath: "/alertmanager"
                         }]
                     }]
+                    volumes: [{
+                        name: "config-volume"
+                        configMap: {
+                            name: "alertmanager"
+                        }
+                    }, {
+                        name: "alertmanager"
+                        emptyDir: {}
+                    }]
                 }
             }
-            replicas: 1
         }
-        _name: "alertmanager"
+        metadata: {
+            name: "alertmanager"
+            labels: {
+                component: "mon"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "mon"
 daemonSet: {}
 statefulSet: {}
-#Component: "mon"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "mon"
+configMap: {
+    alertmanager: {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
+        data: {
+            "alerts.yaml": """
+        receivers:
+        - name: pager
+          slack_configs:
+          - channel: '#cloudmon'
+            text: |-
+              {{ range .Alerts }}{{ .Annotations.description }}
+              {{ end }}
+            send_resolved: true
+        route:
+          receiver: pager
+          group_by:
+          - alertname
+          - cluster
+        
+        """
+        }
+        metadata: {
+            name: "alertmanager"
+            labels: {
+                component: "mon"
+            }
         }
     }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "mon"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
 }
-configMap: {}
 service: {
     grafana: {
-        kind:       "Service"
-        apiVersion: "v1"
+        spec: {
+            ports: [{
+                name:       "grafana"
+                port:       3000
+                protocol:   *"TCP" | "UDP"
+                targetPort: 3000
+            }]
+            selector: {
+                app:       "grafana"
+                domain:    "prod"
+                component: "mon"
+            }
+        }
         metadata: {
             name: "grafana"
             labels: {
-                component: "mon"
                 app:       "grafana"
                 domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
                 component: "mon"
-                app:       "grafana"
-                domain:    "prod"
             }
-            ports: [{
-                name:       "grafana"
-                protocol:   "TCP"
-                port:       3000
-                targetPort: 3000
-            }]
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     grafana: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
         metadata: {
             name: "grafana"
             labels: {
-                component: "mon"
                 app:       "grafana"
+                component: "mon"
             }
         }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "mon"
                         app:       "grafana"
                         domain:    "prod"
+                        component: "mon"
                     }
                 }
                 spec: {
                     volumes: [{
                         name: "grafana-volume"
                         gcePersistentDisk: {
-                            fsType: "ext4"
                             pdName: "grafana-volume"
+                            fsType: "ext4"
                         }
                     }]
                     containers: [{
-                        name: "grafana"
-                        env: [{
-                            name:  "GF_AUTH_BASIC_ENABLED"
-                            value: "false"
-                        }, {
-                            name:  "GF_AUTH_ANONYMOUS_ENABLED"
-                            value: "true"
-                        }, {
-                            name:  "GF_AUTH_ANONYMOUS_ORG_ROLE"
-                            value: "admin"
+                        name:  "grafana"
+                        image: "grafana/grafana:4.5.2"
+                        ports: [{
+                            containerPort: 8080
                         }]
                         resources: {
                             limits: {
@@ -2694,10 +1931,15 @@ deployment: {
                                 memory: "100Mi"
                             }
                         }
-                        image: "grafana/grafana:4.5.2"
-                        ports: [{
-                            containerPort: 8080
-                            _export:       true
+                        env: [{
+                            name:  "GF_AUTH_BASIC_ENABLED"
+                            value: "false"
+                        }, {
+                            name:  "GF_AUTH_ANONYMOUS_ENABLED"
+                            value: "true"
+                        }, {
+                            name:  "GF_AUTH_ANONYMOUS_ORG_ROLE"
+                            value: "admin"
                         }]
                         volumeMounts: [{
                             name:      "grafana-volume"
@@ -2706,97 +1948,94 @@ deployment: {
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "grafana"
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "mon"
 daemonSet: {}
 statefulSet: {}
-#Component: "mon"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "mon"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "mon"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
 configMap: {}
 service: {
     "node-exporter": {
-        kind:       "Service"
-        apiVersion: "v1"
         metadata: {
             name: "node-exporter"
-            labels: {
-                component: "mon"
-                app:       "node-exporter"
-                domain:    "prod"
-            }
             annotations: {
                 "prometheus.io/scrape": "true"
             }
-        }
-        spec: {
-            type: "ClusterIP"
-            selector: {
-                component: "mon"
+            labels: {
                 app:       "node-exporter"
                 domain:    "prod"
+                component: "mon"
             }
+        }
+        spec: {
+            type:      "ClusterIP"
+            clusterIP: "None"
             ports: [{
                 name:       "metrics"
-                protocol:   "TCP"
-                port:       9100
-                targetPort: 9100
+                port:       *9100 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *9100 | int
             }]
-            clusterIP: "None"
+            selector: {
+                app:       "node-exporter"
+                domain:    "prod"
+                component: "mon"
+            }
         }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {}
+#Component: "mon"
 daemonSet: {
     "node-exporter": {
-        kind:       "DaemonSet"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "node-exporter"
-            labels: {
-                component: "mon"
-            }
-        }
         spec: {
             selector: {}
             template: {
                 metadata: {
                     name: "node-exporter"
                     labels: {
-                        component: "mon"
                         app:       "node-exporter"
+                        component: "mon"
                         domain:    "prod"
                     }
                 }
                 spec: {
+                    hostNetwork: true
+                    hostPID:     true
+                    containers: [{
+                        name:  "node-exporter"
+                        image: "quay.io/prometheus/node-exporter:v0.16.0"
+                        args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
+                        ports: [{
+                            containerPort: 9100
+                            hostPort:      9100
+                            name:          "scrape"
+                        }]
+                        resources: {
+                            requests: {
+                                memory: "30Mi"
+                                cpu:    "100m"
+                            }
+                            limits: {
+                                memory: "50Mi"
+                                cpu:    "200m"
+                            }
+                        }
+                        volumeMounts: [{
+                            name:      "proc"
+                            readOnly:  true
+                            mountPath: "/host/proc"
+                        }, {
+                            name:      "sys"
+                            readOnly:  true
+                            mountPath: "/host/sys"
+                        }]
+                    }]
                     volumes: [{
                         name: "proc"
                         hostPath: {
@@ -2808,122 +2047,162 @@ daemonSet: {
                             path: "/sys"
                         }
                     }]
-                    containers: [{
-                        name: "node-exporter"
-                        resources: {
-                            limits: {
-                                cpu:    "200m"
-                                memory: "50Mi"
-                            }
-                            requests: {
-                                cpu:    "100m"
-                                memory: "30Mi"
-                            }
-                        }
-                        image: "quay.io/prometheus/node-exporter:v0.16.0"
-                        args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
-                        ports: [{
-                            name:          "scrape"
-                            hostPort:      9100
-                            containerPort: 9100
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "proc"
-                            readOnly:  true
-                            mountPath: "/host/proc"
-                        }, {
-                            name:      "sys"
-                            readOnly:  true
-                            mountPath: "/host/sys"
-                        }]
-                    }]
-                    hostNetwork: true
-                    hostPID:     true
                 }
             }
         }
-        _name: "node-exporter"
+        metadata: {
+            name: "node-exporter"
+            labels: {
+                component: "mon"
+            }
+        }
+        kind:       "DaemonSet"
+        apiVersion: "apps/v1"
     }
 }
 statefulSet: {}
-#Component: "mon"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "mon"
+configMap: {}
+service: {
+    prometheus: {
+        metadata: {
+            name: "prometheus"
+            annotations: {
+                "prometheus.io/scrape": "true"
+            }
+            labels: {
+                name:      "prometheus"
+                app:       "prometheus"
+                domain:    "prod"
+                component: "mon"
+            }
         }
+        spec: {
+            type: "NodePort"
+            ports: [{
+                name:       "main"
+                nodePort:   30900
+                port:       *9090 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *9090 | int
+            }]
+            selector: {
+                name:      "prometheus"
+                app:       "prometheus"
+                domain:    "prod"
+                component: "mon"
+            }
+        }
+        kind:       "Service"
+        apiVersion: "v1"
     }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "mon"
-                    app:       string
-                    domain:    "prod"
+}
+deployment: {
+    prometheus: {
+        spec: {
+            replicas: *1 | int32
+            strategy: {
+                rollingUpdate: {
+                    maxSurge:       0
+                    maxUnavailable: 1
+                }
+                type: "RollingUpdate"
+            }
+            selector: {
+                matchLabels: {
+                    app: "prometheus"
                 }
             }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
+            template: {
+                metadata: {
+                    name: "prometheus"
+                    labels: {
+                        app:       "prometheus"
+                        domain:    "prod"
+                        component: "mon"
+                    }
+                    annotations: {
+                        "prometheus.io.scrape": "true"
+                    }
+                }
+                spec: {
+                    containers: [{
+                        name:  "prometheus"
+                        image: "prom/prometheus:v2.4.3"
+                        args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
+                        ports: [{
+                            name:          "web"
+                            containerPort: 9090
+                        }]
+                        volumeMounts: [{
+                            name:      "config-volume"
+                            mountPath: "/etc/prometheus"
+                        }]
+                    }]
+                    volumes: [{
+                        name: "config-volume"
+                        configMap: {
+                            name: "prometheus"
+                        }
+                    }]
+                }
             }
         }
-    }
-    _name: string
-}
-configMap: {
-    prometheus: {
-        kind:       "ConfigMap"
-        apiVersion: "v1"
         metadata: {
             name: "prometheus"
             labels: {
                 component: "mon"
             }
         }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
+    }
+}
+#Component: "mon"
+daemonSet: {}
+statefulSet: {}
+configMap: {
+    prometheus: {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
         data: {
             "alert.rules": """
         groups:
         - name: rules.yaml
           rules:
-          - labels:
+          - alert: InstanceDown
+            expr: up == 0
+            for: 30s
+            labels:
               severity: page
             annotations:
               description: '{{$labels.app}} of job {{ $labels.job }} has been down for more
                 than 30 seconds.'
               summary: Instance {{$labels.app}} down
-            alert: InstanceDown
-            expr: up == 0
-            for: 30s
-          - labels:
+          - alert: InsufficientPeers
+            expr: count(up{job=\"etcd\"} == 0) > (count(up{job=\"etcd\"}) / 2 - 1)
+            for: 3m
+            labels:
               severity: page
             annotations:
               description: If one more etcd peer goes down the cluster will be unavailable
               summary: etcd cluster small
-            alert: InsufficientPeers
-            expr: count(up{job=\"etcd\"} == 0) > (count(up{job=\"etcd\"}) / 2 - 1)
-            for: 3m
-          - labels:
+          - alert: EtcdNoMaster
+            expr: sum(etcd_server_has_leader{app=\"etcd\"}) == 0
+            for: 1s
+            labels:
               severity: page
             annotations:
               summary: No ETCD master elected.
-            alert: EtcdNoMaster
-            expr: sum(etcd_server_has_leader{app=\"etcd\"}) == 0
-            for: 1s
-          - labels:
+          - alert: PodRestart
+            expr: (max_over_time(pod_container_status_restarts_total[5m]) - min_over_time(pod_container_status_restarts_total[5m]))
+              > 2
+            for: 1m
+            labels:
               severity: page
             annotations:
               description: '{{$labels.app}} {{ $labels.container }} resturted {{ $value }}
                 times in 5m.'
               summary: Pod for {{$labels.container}} restarts too often
-            alert: PodRestart
-            expr: (max_over_time(pod_container_status_restarts_total[5m]) - min_over_time(pod_container_status_restarts_total[5m]))
-              > 2
-            for: 1m
         
         """
             "prometheus.yml": """
@@ -2938,27 +2217,27 @@ configMap: {
             - targets:
               - alertmanager:9093
         scrape_configs:
-        - scheme: https
-          job_name: kubernetes-apiservers
+        - job_name: kubernetes-apiservers
           kubernetes_sd_configs:
           - role: endpoints
+          scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
           relabel_configs:
-          - action: keep
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_namespace
             - __meta_kubernetes_service_name
             - __meta_kubernetes_endpoint_port_name
+            action: keep
             regex: default;kubernetes;https
-        - scheme: https
-          job_name: kubernetes-nodes
-          kubernetes_sd_configs:
-          - role: node
+        - job_name: kubernetes-nodes
+          scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          kubernetes_sd_configs:
+          - role: node
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
@@ -2969,13 +2248,13 @@ configMap: {
             regex: (.+)
             target_label: __metrics_path__
             replacement: /api/v1/nodes/${1}/proxy/metrics
-        - scheme: https
-          job_name: kubernetes-cadvisor
-          kubernetes_sd_configs:
-          - role: node
+        - job_name: kubernetes-cadvisor
+          scheme: https
           tls_config:
             ca_file: /var/run/secrets/kubernetes.io/serviceaccount/ca.crt
           bearer_token_file: /var/run/secrets/kubernetes.io/serviceaccount/token
+          kubernetes_sd_configs:
+          - role: node
           relabel_configs:
           - action: labelmap
             regex: __meta_kubernetes_node_label_(.+)
@@ -2990,44 +2269,48 @@ configMap: {
           kubernetes_sd_configs:
           - role: endpoints
           relabel_configs:
-          - action: keep
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_service_annotation_prometheus_io_scrape
+            action: keep
             regex: true
-          - action: replace
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_service_annotation_prometheus_io_scheme
-            regex: (https?)
+            action: replace
             target_label: __scheme__
-          - action: replace
-            source_labels:
+            regex: (https?)
+          - source_labels:
             - __meta_kubernetes_service_annotation_prometheus_io_path
-            regex: (.+)
+            action: replace
             target_label: __metrics_path__
-          - action: replace
-            source_labels:
+            regex: (.+)
+          - source_labels:
             - __address__
             - __meta_kubernetes_service_annotation_prometheus_io_port
-            regex: ([^:]+)(?::\\d+)?;(\\d+)
+            action: replace
             target_label: __address__
+            regex: ([^:]+)(?::\\d+)?;(\\d+)
             replacement: $1:$2
           - action: labelmap
             regex: __meta_kubernetes_service_label_(.+)
-          - action: replace
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_namespace
+            action: replace
             target_label: kubernetes_namespace
-          - action: replace
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_service_name
+            action: replace
             target_label: kubernetes_name
         - job_name: kubernetes-services
+          metrics_path: /probe
+          params:
+            module:
+            - http_2xx
           kubernetes_sd_configs:
           - role: service
           relabel_configs:
-          - action: keep
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_service_annotation_prometheus_io_probe
+            action: keep
             regex: true
           - source_labels:
             - __address__
@@ -3045,25 +2328,25 @@ configMap: {
           - source_labels:
             - __meta_kubernetes_service_name
             target_label: kubernetes_name
+        - job_name: kubernetes-ingresses
           metrics_path: /probe
           params:
             module:
             - http_2xx
-        - job_name: kubernetes-ingresses
           kubernetes_sd_configs:
           - role: ingress
           relabel_configs:
-          - action: keep
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_ingress_annotation_prometheus_io_probe
+            action: keep
             regex: true
           - source_labels:
             - __meta_kubernetes_ingress_scheme
             - __address__
             - __meta_kubernetes_ingress_path
             regex: (.+);(.+);(.+)
-            target_label: __param_target
             replacement: ${1}://${2}${3}
+            target_label: __param_target
           - target_label: __address__
             replacement: blackbox-exporter.example.com:9115
           - source_labels:
@@ -3077,215 +2360,132 @@ configMap: {
           - source_labels:
             - __meta_kubernetes_ingress_name
             target_label: kubernetes_name
-          metrics_path: /probe
-          params:
-            module:
-            - http_2xx
         - job_name: kubernetes-pods
           kubernetes_sd_configs:
           - role: pod
           relabel_configs:
-          - action: keep
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_pod_annotation_prometheus_io_scrape
+            action: keep
             regex: true
-          - action: replace
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_pod_annotation_prometheus_io_path
-            regex: (.+)
+            action: replace
             target_label: __metrics_path__
-          - action: replace
-            source_labels:
+            regex: (.+)
+          - source_labels:
             - __address__
             - __meta_kubernetes_pod_annotation_prometheus_io_port
+            action: replace
             regex: ([^:]+)(?::\\d+)?;(\\d+)
-            target_label: __address__
             replacement: $1:$2
+            target_label: __address__
           - action: labelmap
             regex: __meta_kubernetes_pod_label_(.+)
-          - action: replace
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_namespace
+            action: replace
             target_label: kubernetes_namespace
-          - action: replace
-            source_labels:
+          - source_labels:
             - __meta_kubernetes_pod_name
+            action: replace
             target_label: kubernetes_pod_name
         
         """
         }
-    }
-}
-service: {
-    prometheus: {
-        kind:       "Service"
-        apiVersion: "v1"
         metadata: {
             name: "prometheus"
             labels: {
-                name:      "prometheus"
                 component: "mon"
-                app:       "prometheus"
-                domain:    "prod"
-            }
-            annotations: {
-                "prometheus.io/scrape": "true"
             }
         }
+    }
+}
+service: {}
+deployment: {}
+#Component: "proxy"
+daemonSet: {}
+statefulSet: {}
+configMap: {}
+service: {
+    authproxy: {
         spec: {
-            type: "NodePort"
-            selector: {
-                name:      "prometheus"
-                component: "mon"
-                app:       "prometheus"
-                domain:    "prod"
-            }
             ports: [{
-                name:       "main"
-                protocol:   "TCP"
-                port:       9090
-                targetPort: 9090
-                nodePort:   30900
+                port:       *4180 | int32
+                targetPort: *4180 | int
+                name:       *"client" | string
+                protocol:   *"TCP" | "UDP"
             }]
+            selector: {
+                app:       "authproxy"
+                domain:    "prod"
+                component: "proxy"
+            }
         }
+        metadata: {
+            name: "authproxy"
+            labels: {
+                app:       "authproxy"
+                domain:    "prod"
+                component: "proxy"
+            }
+        }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
-    prometheus: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "prometheus"
-            labels: {
-                component: "mon"
-            }
-        }
+    authproxy: {
         spec: {
-            selector: {
-                matchLabels: {
-                    app: "prometheus"
-                }
-            }
+            replicas: *1 | int32
+            selector: {}
             template: {
                 metadata: {
-                    name: "prometheus"
                     labels: {
-                        component: "mon"
-                        app:       "prometheus"
+                        app:       "authproxy"
                         domain:    "prod"
-                    }
-                    annotations: {
-                        "prometheus.io.scrape": "true"
+                        component: "proxy"
                     }
                 }
                 spec: {
+                    containers: [{
+                        name:  "authproxy"
+                        image: "skippy/oauth2_proxy:2.0.1"
+                        ports: [{
+                            containerPort: 4180
+                        }]
+                        args: ["--config=/etc/authproxy/authproxy.cfg"]
+                        volumeMounts: [{
+                            name:      "config-volume"
+                            mountPath: "/etc/authproxy"
+                        }]
+                    }]
                     volumes: [{
                         name: "config-volume"
                         configMap: {
-                            name: "prometheus"
+                            name: "authproxy"
                         }
                     }]
-                    containers: [{
-                        name:  "prometheus"
-                        image: "prom/prometheus:v2.4.3"
-                        args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
-                        ports: [{
-                            name:          "web"
-                            containerPort: 9090
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "config-volume"
-                            mountPath: "/etc/prometheus"
-                        }]
-                    }]
-                }
-            }
-            replicas: 1
-            strategy: {
-                type: "RollingUpdate"
-                rollingUpdate: {
-                    maxUnavailable: 1
-                    maxSurge:       0
                 }
             }
         }
-        _name: "prometheus"
-    }
-}
-daemonSet: {}
-statefulSet: {}
-#Component: "mon"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "mon"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "mon"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
-configMap: {}
-service: {}
-deployment: {}
-daemonSet: {}
-statefulSet: {}
-#Component: "proxy"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "proxy"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "proxy"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
-configMap: {
-    authproxy: {
-        kind:       "ConfigMap"
-        apiVersion: "v1"
         metadata: {
             name: "authproxy"
             labels: {
                 component: "proxy"
             }
         }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
+    }
+}
+#Component: "proxy"
+daemonSet: {}
+statefulSet: {}
+configMap: {
+    authproxy: {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
         data: {
             "authproxy.cfg": """
         # Google Auth Proxy Config File
@@ -3341,160 +2541,54 @@ configMap: {
         cookie_https_only = true
         """
         }
-    }
-}
-service: {
-    authproxy: {
-        kind:       "Service"
-        apiVersion: "v1"
-        metadata: {
-            name: "authproxy"
-            labels: {
-                component: "proxy"
-                app:       "authproxy"
-                domain:    "prod"
-            }
-        }
-        spec: {
-            selector: {
-                component: "proxy"
-                app:       "authproxy"
-                domain:    "prod"
-            }
-            ports: [{
-                name:       "client"
-                protocol:   "TCP"
-                port:       4180
-                targetPort: 4180
-            }]
-        }
-    }
-}
-deployment: {
-    authproxy: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
         metadata: {
             name: "authproxy"
             labels: {
                 component: "proxy"
             }
         }
-        spec: {
-            selector: {}
-            template: {
-                metadata: {
-                    labels: {
-                        component: "proxy"
-                        app:       "authproxy"
-                        domain:    "prod"
-                    }
-                }
-                spec: {
-                    volumes: [{
-                        name: "config-volume"
-                        configMap: {
-                            name: "authproxy"
-                        }
-                    }]
-                    containers: [{
-                        name:  "authproxy"
-                        image: "skippy/oauth2_proxy:2.0.1"
-                        args: ["--config=/etc/authproxy/authproxy.cfg"]
-                        ports: [{
-                            containerPort: 4180
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "config-volume"
-                            mountPath: "/etc/authproxy"
-                        }]
-                    }]
-                }
-            }
-            replicas: 1
-        }
-        _name: "authproxy"
     }
 }
-daemonSet: {}
-statefulSet: {}
-#Component: "proxy"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "proxy"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "proxy"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
-}
-configMap: {}
 service: {
     goget: {
-        kind:       "Service"
-        apiVersion: "v1"
-        metadata: {
-            name: "goget"
-            labels: {
-                component: "proxy"
-                app:       "goget"
-                domain:    "prod"
-            }
-        }
         spec: {
-            type: "LoadBalancer"
-            selector: {
-                component: "proxy"
-                app:       "goget"
-                domain:    "prod"
-            }
-            ports: [{
-                name:       "https"
-                protocol:   "TCP"
-                port:       443
-                targetPort: 7443
-            }]
+            type:           "LoadBalancer"
             loadBalancerIP: "1.3.5.7"
+            ports: [{
+                port:       443
+                name:       "https"
+                protocol:   *"TCP" | "UDP"
+                targetPort: *7443 | int
+            }]
+            selector: {
+                app:       "goget"
+                domain:    "prod"
+                component: "proxy"
+            }
         }
+        metadata: {
+            name: "goget"
+            labels: {
+                app:       "goget"
+                domain:    "prod"
+                component: "proxy"
+            }
+        }
+        kind:       "Service"
+        apiVersion: "v1"
     }
 }
 deployment: {
     goget: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
-        metadata: {
-            name: "goget"
-            labels: {
-                component: "proxy"
-            }
-        }
         spec: {
+            replicas: *1 | int32
             selector: {}
             template: {
                 metadata: {
                     labels: {
-                        component: "proxy"
                         app:       "goget"
                         domain:    "prod"
+                        component: "proxy"
                     }
                 }
                 spec: {
@@ -3509,60 +2603,125 @@ deployment: {
                         image: "gcr.io/myproj/goget:v0.5.1"
                         ports: [{
                             containerPort: 7443
-                            _export:       true
                         }]
                         volumeMounts: [{
-                            name:      "secret-volume"
                             mountPath: "/etc/ssl"
+                            name:      "secret-volume"
                         }]
                     }]
                 }
             }
-            replicas: 1
         }
-        _name: "goget"
+        metadata: {
+            name: "goget"
+            labels: {
+                component: "proxy"
+            }
+        }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
     }
 }
+#Component: "proxy"
 daemonSet: {}
 statefulSet: {}
-#Component: "proxy"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "proxy"
+configMap: {}
+service: {
+    nginx: {
+        spec: {
+            type:           "LoadBalancer"
+            loadBalancerIP: "1.3.4.5"
+            ports: [{
+                name:       "http"
+                port:       *80 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *80 | int
+            }, {
+                name:       "https"
+                port:       *443 | int32
+                protocol:   *"TCP" | "UDP"
+                targetPort: *443 | int
+            }]
+            selector: {
+                app:       "nginx"
+                domain:    "prod"
+                component: "proxy"
+            }
         }
+        metadata: {
+            name: "nginx"
+            labels: {
+                app:       "nginx"
+                domain:    "prod"
+                component: "proxy"
+            }
+        }
+        kind:       "Service"
+        apiVersion: "v1"
     }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "proxy"
-                    app:       string
-                    domain:    "prod"
+}
+deployment: {
+    nginx: {
+        spec: {
+            replicas: *1 | int32
+            selector: {}
+            template: {
+                metadata: {
+                    labels: {
+                        app:       "nginx"
+                        domain:    "prod"
+                        component: "proxy"
+                    }
+                }
+                spec: {
+                    volumes: [{
+                        name: "secret-volume"
+                        secret: {
+                            secretName: "proxy-secrets"
+                        }
+                    }, {
+                        name: "config-volume"
+                        configMap: {
+                            name: "nginx"
+                        }
+                    }]
+                    containers: [{
+                        name:  "nginx"
+                        image: "nginx:1.11.10-alpine"
+                        ports: [{
+                            containerPort: 80
+                        }, {
+                            containerPort: 443
+                        }]
+                        volumeMounts: [{
+                            mountPath: "/etc/ssl"
+                            name:      "secret-volume"
+                        }, {
+                            name:      "config-volume"
+                            mountPath: "/etc/nginx/nginx.conf"
+                            subPath:   "nginx.conf"
+                        }]
+                    }]
                 }
             }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
         }
-    }
-    _name: string
-}
-configMap: {
-    nginx: {
-        kind:       "ConfigMap"
-        apiVersion: "v1"
         metadata: {
             name: "nginx"
             labels: {
                 component: "proxy"
             }
         }
+        kind:       "Deployment"
+        apiVersion: "apps/v1"
+    }
+}
+#Component: "proxy"
+daemonSet: {}
+statefulSet: {}
+configMap: {
+    nginx: {
+        apiVersion: "v1"
+        kind:       "ConfigMap"
         data: {
             "nginx.conf": """
         events {
@@ -3719,127 +2878,11 @@ configMap: {
         }
         """
         }
-    }
-}
-service: {
-    nginx: {
-        kind:       "Service"
-        apiVersion: "v1"
-        metadata: {
-            name: "nginx"
-            labels: {
-                component: "proxy"
-                app:       "nginx"
-                domain:    "prod"
-            }
-        }
-        spec: {
-            type: "LoadBalancer"
-            selector: {
-                component: "proxy"
-                app:       "nginx"
-                domain:    "prod"
-            }
-            ports: [{
-                name:       "http"
-                protocol:   "TCP"
-                port:       80
-                targetPort: 80
-            }, {
-                name:       "https"
-                protocol:   "TCP"
-                port:       443
-                targetPort: 443
-            }]
-            loadBalancerIP: "1.3.4.5"
-        }
-    }
-}
-deployment: {
-    nginx: {
-        kind:       "Deployment"
-        apiVersion: "apps/v1"
         metadata: {
             name: "nginx"
             labels: {
                 component: "proxy"
             }
         }
-        spec: {
-            selector: {}
-            template: {
-                metadata: {
-                    labels: {
-                        component: "proxy"
-                        app:       "nginx"
-                        domain:    "prod"
-                    }
-                }
-                spec: {
-                    volumes: [{
-                        name: "secret-volume"
-                        secret: {
-                            secretName: "proxy-secrets"
-                        }
-                    }, {
-                        name: "config-volume"
-                        configMap: {
-                            name: "nginx"
-                        }
-                    }]
-                    containers: [{
-                        name:  "nginx"
-                        image: "nginx:1.11.10-alpine"
-                        ports: [{
-                            containerPort: 80
-                            _export:       true
-                        }, {
-                            containerPort: 443
-                            _export:       true
-                        }]
-                        volumeMounts: [{
-                            name:      "secret-volume"
-                            mountPath: "/etc/ssl"
-                        }, {
-                            name:      "config-volume"
-                            mountPath: "/etc/nginx/nginx.conf"
-                            subPath:   "nginx.conf"
-                        }]
-                    }]
-                }
-            }
-            replicas: 1
-        }
-        _name: "nginx"
     }
-}
-daemonSet: {}
-statefulSet: {}
-#Component: "proxy"
-_spec: {
-    metadata: {
-        name: string
-        labels: {
-            component: "proxy"
-        }
-    }
-    spec: {
-        selector: {}
-        template: {
-            metadata: {
-                labels: {
-                    component: "proxy"
-                    app:       string
-                    domain:    "prod"
-                }
-            }
-            spec: {
-                containers: [{
-                    name: string
-                    ports: []
-                }]
-            }
-        }
-    }
-    _name: string
 }

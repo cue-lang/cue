@@ -3,9 +3,8 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-incomplete value '#X.y' in interpolation:
-    ./file.cue:16:3
-    ./file.cue:3:5
+invalid interpolation: incomplete string value 'string':
+    ./file.cue:12:1
 -- file.cue --
 #X: {
 	x: string

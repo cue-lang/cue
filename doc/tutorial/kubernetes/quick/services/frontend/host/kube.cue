@@ -1,9 +1,6 @@
 package kube
 
-service: host: spec: ports: [{
-	port:       7080
-	targetPort: 7080
-}]
+service: {}
 deployment: host: spec: {
 	replicas: 2
 	template: spec: containers: [{

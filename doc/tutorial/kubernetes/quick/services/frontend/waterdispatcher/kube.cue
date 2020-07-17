@@ -1,9 +1,7 @@
 package kube
 
 service: waterdispatcher: spec: ports: [{
-	port:       7080
-	targetPort: 7080
-	name:       "http"
+	name: "http"
 }]
 deployment: waterdispatcher: spec: template: spec: containers: [{
 	image: "gcr.io/myproj/waterdispatcher:v0.0.48"

@@ -3,14 +3,24 @@
 name: Test
 env:
   GERRIT_COOKIE: ${{ secrets.gerritCookie }}
+on:
+- repository_dispatch
 defaults:
   run:
     shell: bash
-on:
-- repository_dispatch
 jobs:
+  start:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Write the gitcookies file
+      run: echo "$GERRIT_COOKIE" > ~/.gitcookies
+    - name: Update Gerrit CL message with starting message
+      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Started
+        the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
+        github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{
+        github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit
+        }}/review'
   test:
-    needs: start
     runs-on: ${{ matrix.os }}
     steps:
     - name: Write the gitcookies file
@@ -32,26 +42,28 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum')
           }}
         restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
-    - name: Generate
-      if: matrix.go-version == '1.14.3' && matrix.os != 'windows-latest'
+    - if: matrix.go-version == '1.14.3' && matrix.os != 'windows-latest'
+      name: Generate
       run: go generate ./...
     - name: Test
       run: go test ./...
     - name: Test with -race
       run: go test -race ./...
-    - name: gorelease check
-      if: matrix.go-version == '1.14.3' || matrix.go-version == '1.13.x'
+    - if: matrix.go-version == '1.14.3' || matrix.go-version == '1.13.x'
+      name: gorelease check
       run: go run golang.org/x/exp/cmd/gorelease
     - name: Check that git is clean post generate and tests
       run: test -z "$(git status --porcelain)" || (git status; git diff; false)
-    - name: Post any failures for this matrix entry
-      if: ${{ failure() }}
+    - if: ${{ failure() }}
+      name: Post any failures for this matrix entry
       run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Build
         failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url
         }}/actions/runs/${{ github.run_id }} for more details","labels":{"Code-Review":-1}}''
         -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID
         }}/revisions/${{ github.event.client_payload.commit }}/review'
+    needs: start
     strategy:
+      fail-fast: false
       matrix:
         go-version:
         - 1.12.x
@@ -61,20 +73,7 @@ jobs:
         - ubuntu-latest
         - macos-latest
         - windows-latest
-      fail-fast: false
-  start:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Write the gitcookies file
-      run: echo "$GERRIT_COOKIE" > ~/.gitcookies
-    - name: Update Gerrit CL message with starting message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Started
-        the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
-        github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{
-        github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit
-        }}/review'
   end:
-    needs: test
     runs-on: ubuntu-latest
     steps:
     - name: Write the gitcookies file
@@ -85,3 +84,4 @@ jobs:
         }}","labels":{"Code-Review":1}}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{
         github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit
         }}/review'
+    needs: test

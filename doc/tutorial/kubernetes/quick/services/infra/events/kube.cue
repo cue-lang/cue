@@ -1,9 +1,7 @@
 package kube
 
 service: events: spec: ports: [{
-	port:       7788
-	targetPort: 7788
-	name:       "grpc"
+	name: "grpc"
 }]
 deployment: events: spec: {
 	replicas: 2

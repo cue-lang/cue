@@ -45,10 +45,10 @@ func TestToFile(t *testing.T) {
 			ast.NewIdent("a"), ast.NewString("foo"),
 			ast.NewIdent("b"), ast.NewIdent("a"),
 		),
-		want: `
-a: "foo"
-b: "foo"
-`,
+		want: `{
+	a: "foo"
+	b: "foo"
+}`,
 	}, {
 		desc: "unshadow",
 		expr: func() ast.Expr {
@@ -63,13 +63,13 @@ b: "foo"
 					ast.NewIdent("b"), ref, // refers to outer `a`.
 				))
 		}(),
-		want: `
-a: "bar"
-c: {
-	a: "foo"
-	b: "bar"
-}
-`,
+		want: `{
+	a: "bar"
+	c: {
+		a: "foo"
+		b: "bar"
+	}
+}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -85,7 +85,7 @@ c: {
 				t.Fatal(err)
 			}
 
-			b, err := format.Node(inst.Value().Syntax())
+			b, err := format.Node(inst.Value().Syntax(cue.Concrete(true)))
 			if err != nil {
 				t.Fatal(err)
 			}

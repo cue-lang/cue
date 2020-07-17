@@ -1628,7 +1628,7 @@ func (v Value) Template() func(label string) Value {
 		if val, _ := x.optionals.constraint(ctx, arg); val != nil {
 			return remakeValue(v, val)
 		}
-		return v
+		return Value{}
 	}
 }
 

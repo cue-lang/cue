@@ -55,17 +55,21 @@ func newCoreBuilder(c *buildContext) *builder {
 	return b
 }
 
-// coreSchema creates the core part of a structural OpenAPI.
-func (b *builder) coreSchema(name string) *ast.StructLit {
+func (b *builder) coreSchemaWithName(name string) *ast.StructLit {
 	oldPath := b.ctx.path
 	b.ctx.path = append(b.ctx.path, name)
-	defer func() { b.ctx.path = oldPath }()
+	s := b.coreSchema()
+	b.ctx.path = oldPath
+	return s
+}
 
+// coreSchema creates the core part of a structural OpenAPI.
+func (b *builder) coreSchema() *ast.StructLit {
 	switch b.kind {
 	case cue.ListKind:
 		if b.items != nil {
 			b.setType("array", "")
-			schema := b.items.coreSchema("*")
+			schema := b.items.coreSchemaWithName("*")
 			b.setSingle("items", schema, false)
 		}
 
@@ -73,7 +77,7 @@ func (b *builder) coreSchema(name string) *ast.StructLit {
 		p := &OrderedMap{}
 		for _, k := range b.keys {
 			sub := b.properties[k]
-			p.Set(k, sub.coreSchema(k))
+			p.Set(k, sub.coreSchemaWithName(k))
 		}
 		if p.len() > 0 || b.items != nil {
 			b.setType("object", "")
@@ -83,7 +87,7 @@ func (b *builder) coreSchema(name string) *ast.StructLit {
 		}
 		// TODO: in Structural schema only one of these is allowed.
 		if b.items != nil {
-			schema := b.items.coreSchema("*")
+			schema := b.items.coreSchemaWithName("*")
 			b.setSingle("additionalProperties", schema, false)
 		}
 	}

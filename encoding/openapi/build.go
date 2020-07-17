@@ -211,8 +211,8 @@ func (b *builder) schema(core *builder, name string, v cue.Value) *ast.StructLit
 	var c *builder
 	if core == nil && b.ctx.structural {
 		c = newCoreBuilder(b.ctx)
-		c.buildCore(v)     // initialize core structure
-		c.coreSchema(name) // build the
+		c.buildCore(v) // initialize core structure
+		c.coreSchema()
 	} else {
 		c = newRootBuilder(b.ctx)
 		c.core = core

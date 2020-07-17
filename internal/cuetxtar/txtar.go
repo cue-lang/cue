@@ -31,6 +31,8 @@ import (
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
+var envUpdate = os.Getenv("CUE_UPDATE")
+
 // A TxTarTest represents a test run that process all CUE tests in the txtar
 // format rooted in a given directory.
 type TxTarTest struct {
@@ -245,7 +247,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				return
 			}
 
-			if !x.Update {
+			if !x.Update && envUpdate == "" {
 				t.Fatal(cmp.Diff(string(gold.Data), string(result)))
 			}
 

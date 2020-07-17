@@ -441,6 +441,9 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 func (c *compiler) addDecls(st *adt.StructLit, a []ast.Decl) {
 	for _, d := range a {
+		c.addLetDecl(d)
+	}
+	for _, d := range a {
 		if x := c.decl(d); x != nil {
 			st.Decls = append(st.Decls, x)
 		}
@@ -535,32 +538,8 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 		}
 
-	// An alias reference will have an expression that is looked up in the
-	// environment cash.
-	case *ast.LetClause:
-		// Cache the parsed expression. Creating a unique expression for each
-		// reference allows the computation to be shared given that we don't
-		// have fields for expressions. This, in turn, prevents exponential
-		// blowup. in x2: x1+x1, x3: x2+x2, ... patterns.
-
-		expr := c.labeledExpr(nil, (*letScope)(x), x.Expr)
-
-		a := aliasEntry{source: x, expr: expr}
-
-		if err := c.insertAlias(x.Ident, a); err != nil {
-			return err
-		}
-
-	case *ast.Alias:
-
-		expr := c.labeledExpr(nil, (*deprecatedAliasScope)(x), x.Expr)
-
-		// TODO(legacy): deprecated, remove this use of Alias
-		a := aliasEntry{source: x, expr: expr}
-
-		if err := c.insertAlias(x.Ident, a); err != nil {
-			return err
-		}
+	// Handled in addLetDecl.
+	case *ast.LetClause, *ast.Alias:
 
 	case *ast.CommentGroup:
 		// Nothing to do for a free-floating comment group.
@@ -584,6 +563,33 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		return c.embed(x)
 	}
 	return nil
+}
+
+func (c *compiler) addLetDecl(d ast.Decl) {
+	switch x := d.(type) {
+	// An alias reference will have an expression that is looked up in the
+	// environment cash.
+	case *ast.LetClause:
+		// Cache the parsed expression. Creating a unique expression for each
+		// reference allows the computation to be shared given that we don't
+		// have fields for expressions. This, in turn, prevents exponential
+		// blowup in x2: x1+x1, x3: x2+x2, ... patterns.
+
+		expr := c.labeledExpr(nil, (*letScope)(x), x.Expr)
+
+		a := aliasEntry{source: x, expr: expr}
+
+		c.insertAlias(x.Ident, a)
+
+	case *ast.Alias:
+
+		expr := c.labeledExpr(nil, (*deprecatedAliasScope)(x), x.Expr)
+
+		// TODO(legacy): deprecated, remove this use of Alias
+		a := aliasEntry{source: x, expr: expr}
+
+		c.insertAlias(x.Ident, a)
+	}
 }
 
 func (c *compiler) elem(n ast.Expr) adt.Elem {

@@ -29,6 +29,12 @@ e & { // Is this allowed? Probably not as per comprehension rule (ref fixes.)
 B = {open: int}
 f: B
 
+schema: {
+		next:  _schema_1
+}
+
+let _schema_1 = schema
+
 -- out/compile --
 --- in.cue
 {
@@ -64,9 +70,17 @@ f: B
     }
   }
   f: 〈0;let B〉
+  schema: {
+    next: 〈1;let _schema_1〉
+  }
 }
 -- out/eval --
-(struct){
+Errors:
+structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
   e: (struct){
   }
   a: (struct){
@@ -85,5 +99,13 @@ f: B
   }
   f: (struct){
     open: (int){ int }
+  }
+  schema: (_|_){
+    // [structural cycle]
+    next: (_|_){
+      // [structural cycle] structural cycle
+      next: (_|_){// 〈1;let _schema_1〉
+      }
+    }
   }
 }

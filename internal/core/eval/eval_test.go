@@ -100,6 +100,7 @@ var needFix = map[string]string{
 	"export/030": "cycle",
 
 	"cycle/025_cannot_resolve_references_that_would_be_ambiguous": "cycle",
+	"compile/scope": "cycle",
 
 	"resolve/034_closing_structs": "close()",
 	"fulleval/053_issue312":       "close()",

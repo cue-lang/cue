@@ -43,11 +43,20 @@ import (
 // - space separator syntax
 const syntaxVersion = -1000 + 100*2 + 1
 
+var requestedVersion = os.Getenv("CUE_SYNTAX_OVERRIDE")
+
 var defaultConfig = config{
 	loadCfg: &load.Config{
 		ParseFile: func(name string, src interface{}) (*ast.File, error) {
+			version := syntaxVersion
+			if requestedVersion != "" {
+				switch {
+				case strings.HasPrefix(requestedVersion, "v0.1"):
+					version = -1000 + 100
+				}
+			}
 			return parser.ParseFile(name, src,
-				parser.FromVersion(syntaxVersion),
+				parser.FromVersion(version),
 				parser.ParseComments,
 			)
 		},

@@ -9,7 +9,12 @@ package runtime
 	Decoder: #Decoder
 }
 
+_#noopEncoderIdentifier: #Identifier & "noop"
+
 // NoopDecoder converts an Encoder to a Serializer or Codec for code that expects them but only uses encoding.
 #NoopDecoder: {
 	Encoder: #Encoder
 }
+
+_#internalGroupVersionerIdentifier: "internal"
+_#disabledGroupVersionerIdentifier: "disabled"

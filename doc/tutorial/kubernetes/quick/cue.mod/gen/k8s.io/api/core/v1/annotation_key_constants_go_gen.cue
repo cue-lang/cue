@@ -48,6 +48,7 @@ package v1
 
 // annotation key prefix used to identify non-convertible json paths.
 #NonConvertibleAnnotationPrefix: "non-convertible.kubernetes.io"
+_#kubectlPrefix:                 "kubectl.kubernetes.io/"
 
 // LastAppliedConfigAnnotation is the annotation used to store the previous
 // configuration of a resource for use in a three way diff by UpdateApplyAnnotation.

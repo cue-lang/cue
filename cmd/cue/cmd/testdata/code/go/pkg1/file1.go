@@ -67,6 +67,17 @@ type Foozer struct {
 	Unsupported map[int]string
 }
 
+type Identifier string
+
+const (
+	internalIdentifier Identifier = "internal"
+)
+
+const _ = true
+
+// appease linter
+var _ = internalIdentifier
+
 // Level gives an indication of the extent of stuff.
 type Level int
 

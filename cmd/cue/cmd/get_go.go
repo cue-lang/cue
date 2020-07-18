@@ -681,7 +681,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			}
 
 			for i, name := range v.Names {
-				if !ast.IsExported(name.Name) {
+				if name.Name == "_" {
 					continue
 				}
 				f := e.def(v.Doc, name.Name, nil, k == 0)

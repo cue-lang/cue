@@ -47,6 +47,13 @@ import (
 	} @go(,struct{CustomJSON})
 }
 
+#Identifier: string // #enumIdentifier
+
+#enumIdentifier:
+	_#internalIdentifier
+
+_#internalIdentifier: #Identifier & "internal"
+
 // Level gives an indication of the extent of stuff.
 #Level: int // #enumLevel
 

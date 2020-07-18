@@ -78,3 +78,9 @@ package resource
 #DecimalExponent: #Format & "DecimalExponent"
 #BinarySI:        #Format & "BinarySI"
 #DecimalSI:       #Format & "DecimalSI"
+
+// splitREString is used to separate a number from its suffix; as such,
+// this is overly permissive, but that's OK-- it will be checked later.
+_#splitREString: "^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
+
+_#int64QuantityExpectedBytes: 18

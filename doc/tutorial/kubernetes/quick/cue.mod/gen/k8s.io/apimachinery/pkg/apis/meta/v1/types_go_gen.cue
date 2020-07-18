@@ -858,7 +858,8 @@ import (
 	#CauseTypeFieldValueInvalid |
 	#CauseTypeFieldValueNotSupported |
 	#CauseTypeUnexpectedServerResponse |
-	#CauseTypeFieldManagerConflict
+	#CauseTypeFieldManagerConflict |
+	#CauseTypeResourceVersionTooLarge
 
 // CauseTypeFieldValueNotFound is used to report failure to find a requested value
 // (e.g. looking up an ID).
@@ -888,6 +889,10 @@ import (
 // FieldManagerConflict is used to report when another client claims to manage this field,
 // It should only be returned for a request using server-side apply.
 #CauseTypeFieldManagerConflict: #CauseType & "FieldManagerConflict"
+
+// CauseTypeResourceVersionTooLarge is used to report that the requested resource version
+// is newer than the data observed by the API server, so the request cannot be served.
+#CauseTypeResourceVersionTooLarge: #CauseType & "ResourceVersionTooLarge"
 
 // List holds a list of objects, which may not be known by the server.
 #List: {

@@ -153,6 +153,15 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 			// information than incorrect information.
 			for _, d := range d.Values {
 				d.Conjuncts = nil
+				for _, a := range d.Arcs {
+					for _, x := range a.Conjuncts {
+						// All the environments for embedded structs need to be
+						// dereferenced.
+						for env := x.Env; env != nil && env.Vertex == v; env = env.Up {
+							env.Vertex = d
+						}
+					}
+				}
 			}
 		}
 
@@ -251,13 +260,28 @@ func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatu
 
 	case d != nil && len(d.Values) > 0:
 		v.Value = d
-		v.Arcs = nil
-		v.Structs = nil
 		// The conjuncts will have too much information. Better have no
 		// information than incorrect information.
 		for _, d := range d.Values {
+			// We clear the conjuncts for now. As these disjuncts are for API
+			// use only, we will fill them out when necessary (using Defaults).
 			d.Conjuncts = nil
+
+			// TODO: use a more principled form of dereferencing. For instance,
+			// disjuncts could already be assumed to be the given Vertex, and
+			// the the main vertex could be dereferenced during evaluation.
+			for _, a := range d.Arcs {
+				for _, x := range a.Conjuncts {
+					// All the environments for embedded structs need to be
+					// dereferenced.
+					for env := x.Env; env != nil && env.Vertex == v; env = env.Up {
+						env.Vertex = d
+					}
+				}
+			}
 		}
+		v.Arcs = nil
+		// v.Structs = nil // TODO: should we keep or discard the Structs?
 
 	default:
 		if r := n.result(); r.Value != nil {

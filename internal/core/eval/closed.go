@@ -289,6 +289,8 @@ func (n *nodeContext) addOr(parentID uint32, c *CloseDef) { // used in eval.go
 // "and" semantics of conjunctions. It generates an error if a field is not
 // allowed.
 func (n *acceptor) verifyArcAllowed(ctx *adt.OpContext, f adt.Feature) *adt.Bottom {
+	// TODO(perf): this will also generate a message for f == 0. Do something
+	// more clever and only generate this when it is a user error.
 	filter := f.IsString() || f == adt.InvalidLabel
 	if filter && !n.verifyArcRecursive(ctx, n.tree, f) {
 		label := f.SelectorString(ctx)

@@ -143,7 +143,7 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 	if v.Value == nil {
 		save := *v
 		// Use node itself to allow for cycle detection.
-		s := e.evalVertex(c, v, adt.Partial)
+		s := e.evalVertex(c, v, adt.Partial, nil)
 
 		if d := s.disjunct; d != nil && len(d.Values) > 1 && d.NumDefaults != 1 {
 			v.Value = d
@@ -239,6 +239,19 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 // Phase two: record incomplete
 // Phase three: record cycle.
 func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus) {
+	e.UnifyAccept(c, v, state, nil) //v.Closed)
+}
+
+// UnifyAccept is like Unify, but takes an extra argument to override the
+// accepted set of fields.
+//
+// Instead of deriving the allowed set of fields, it verifies this set by
+// consulting the given Acceptor. This can be useful when splitting an existing
+// values into individual conjuncts and then unifying some of its components
+// back into a new value. Under normal circumstances, this may not always
+// succeed as the missing context may result in stricter closedness rules.
+func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus, accept adt.Acceptor) {
+
 	// defer c.PopVertex(c.PushVertex(v))
 
 	if state <= v.Status()+1 {
@@ -252,7 +265,7 @@ func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatu
 		return
 	}
 
-	n := e.evalVertex(c, v, state)
+	n := e.evalVertex(c, v, state, accept)
 
 	switch d := n.disjunct; {
 	case d != nil && len(d.Values) == 1:
@@ -282,6 +295,7 @@ func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatu
 		}
 		v.Arcs = nil
 		// v.Structs = nil // TODO: should we keep or discard the Structs?
+		v.Closed = newDisjunctionAcceptor(n.disjunct)
 
 	default:
 		if r := n.result(); r.Value != nil {
@@ -292,7 +306,7 @@ func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatu
 	// Else set it to something.
 
 	if v.Value == nil {
-		panic("errer")
+		panic("error")
 	}
 
 	// Check whether result is done.
@@ -301,13 +315,13 @@ func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatu
 // evalVertex computes the vertex results. The state indicates the minimum
 // status to which this vertex should be evaluated. It should be either
 // adt.Finalized or adt.Partial.
-func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus) *nodeShared {
-	// fmt.Println(debug.NodeString(c.StringIndexer, v, nil))
+func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus, accept adt.Acceptor) *nodeShared {
 	shared := &nodeShared{
-		ctx:   c,
-		eval:  e,
-		node:  v,
-		stack: nil, // silence linter
+		ctx:    c,
+		eval:   e,
+		node:   v,
+		stack:  nil, // silence linter
+		accept: accept,
 	}
 	saved := *v
 
@@ -577,7 +591,14 @@ func (n *nodeContext) postDisjunct() {
 			a.Closed = m
 		}
 		if updated != nil && m.isClosed {
-			if err := m.verifyArcAllowed(n.ctx, a.Label); err != nil {
+			if accept := n.nodeShared.accept; accept != nil {
+				if !accept.Accept(n.ctx, a.Label) {
+					label := a.Label.SelectorString(ctx)
+					n.node.Value = &adt.Bottom{
+						Err: errors.Newf(token.NoPos, "field `%s` not allowed by Acceptor", label),
+					}
+				}
+			} else if err := m.verifyArcAllowed(n.ctx, a.Label); err != nil {
 				n.node.Value = err
 			}
 			// TODO: use continue to not process already failed fields,
@@ -633,6 +654,9 @@ type nodeShared struct {
 	resultNode *nodeContext
 	result_    adt.Vertex
 	stack      []int
+
+	// Closedness override.
+	accept adt.Acceptor
 }
 
 func (n *nodeShared) result() *adt.Vertex {

@@ -104,6 +104,32 @@ func (a *acceptor) OptionalTypes() (mask adt.OptionalType) {
 	return mask
 }
 
+// A disjunction acceptor represents a disjunction of all possible fields. Note
+// that this is never used in evaluation as evaluation stops at incomplete nodes
+// and a disjunction is incomplete. When the node is referenced, the original
+// conjuncts are used instead.
+//
+// The value may be used in the API, though, where it may be an argument to
+// UnifyAccept.
+//
+// TODO(perf): it would be sufficient to only implement the Accept method of an
+// Acceptor. This could be implemented as an allocation-free wrapper type around
+// a Disjunction. This will require a bit more API cleaning, though.
+func newDisjunctionAcceptor(x *adt.Disjunction) adt.Acceptor {
+	tree := &CloseDef{}
+	sets := []fieldSet{}
+	for _, d := range x.Values {
+		if a, _ := d.Closed.(*acceptor); a != nil {
+			sets = append(sets, a.fields...)
+			tree.List = append(tree.List, a.tree)
+		}
+	}
+	if len(tree.List) == 0 && len(sets) == 0 {
+		return nil
+	}
+	return &acceptor{tree: tree, fields: sets}
+}
+
 // CloseDef defines how individual FieldSets (corresponding to conjuncts)
 // combine to determine whether a field is contained in a closed set.
 //

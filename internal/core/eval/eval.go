@@ -981,7 +981,8 @@ outer:
 		ctx.Unify(ctx, arc, adt.Finalized)
 
 		if arc.Label.IsDef() {
-			n.insertClosed(arc, cyclic, arc)
+			id := n.eval.nextID()
+			n.insertClosed(arc, id, cyclic, arc)
 		} else {
 			for _, a := range arc.Conjuncts {
 				n.addExprConjunct(updateCyclic(a, cyclic, arc), closeID, top)
@@ -1050,8 +1051,7 @@ func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex) adt.Conjunct {
 	return adt.MakeConjunct(env, c.Expr())
 }
 
-func (n *nodeContext) insertClosed(arc *adt.Vertex, cyclic bool, deref *adt.Vertex) {
-	id := n.eval.nextID()
+func (n *nodeContext) insertClosed(arc *adt.Vertex, id uint32, cyclic bool, deref *adt.Vertex) {
 	n.needClose = true
 
 	current := n.newClose
@@ -1091,7 +1091,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 		if !x.IsData() && len(x.Conjuncts) > 0 {
 			cyclic := env != nil && env.Cyclic
 			if needClose {
-				n.insertClosed(x, cyclic, nil)
+				n.insertClosed(x, env.CloseID, cyclic, nil)
 				return
 			}
 			for _, c := range x.Conjuncts {

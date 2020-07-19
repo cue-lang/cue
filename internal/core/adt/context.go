@@ -558,7 +558,8 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature) *Vertex {
 		}
 		// TODO: if the struct was a literal struct, we can also treat it as
 		// closed and make this a permanent error.
-		c.addErrf(code, pos, "undefined field %s", l.SelectorString(c.Runtime))
+		label := l.SelectorString(c.Runtime)
+		c.addErrf(code, pos, "undefined field %s", label)
 	}
 	return a
 }

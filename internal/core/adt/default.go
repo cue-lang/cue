@@ -43,35 +43,45 @@ func (d *Disjunction) Default() Value {
 
 // Default returns the default value or itself if there is no default.
 func (v *Vertex) Default() *Vertex {
-	d, ok := v.Value.(*Disjunction)
-	if !ok {
-		return v
-	}
-
-	var w *Vertex
-
-	switch d.NumDefaults {
-	case 0:
-		return v
-	case 1:
-		w = d.Values[0]
+	switch d := v.Value.(type) {
 	default:
-		x := *v
-		x.Value = &Disjunction{
-			Src:         d.Src,
-			Values:      d.Values[:d.NumDefaults],
-			NumDefaults: 0,
-		}
-		w = &x
-	}
+		return v
 
-	w.Conjuncts = nil
-	for _, c := range v.Conjuncts {
-		// TODO: preserve field information.
-		expr, _ := stripNonDefaults(c.Expr())
-		w.AddConjunct(MakeConjunct(c.Env, expr))
+	case *Disjunction:
+		var w *Vertex
+
+		switch d.NumDefaults {
+		case 0:
+			return v
+		case 1:
+			w = d.Values[0]
+		default:
+			x := *v
+			x.Value = &Disjunction{
+				Src:         d.Src,
+				Values:      d.Values[:d.NumDefaults],
+				NumDefaults: 0,
+			}
+			w = &x
+		}
+
+		w.Conjuncts = nil
+		for _, c := range v.Conjuncts {
+			// TODO: preserve field information.
+			expr, _ := stripNonDefaults(c.Expr())
+			w.Conjuncts = append(w.Conjuncts, MakeConjunct(c.Env, expr))
+		}
+		return w
+
+	case *ListMarker:
+		m := *d
+		m.IsOpen = false
+
+		w := *v
+		w.Closed = nil
+		w.Value = &m
+		return &w
 	}
-	return w
 }
 
 // TODO: this should go: record preexpanded disjunctions in Vertex.

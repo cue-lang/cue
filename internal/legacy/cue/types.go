@@ -618,6 +618,11 @@ func makeValue(idx *index, v *adt.Vertex) Value {
 }
 
 func remakeValue(base Value, env *adt.Environment, v value) Value {
+	// TODO: right now this is necessary because disjunctions do not have
+	// populated conjuncts.
+	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
+		return Value{base.idx, v}
+	}
 	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label}
 	n.AddConjunct(adt.MakeConjunct(env, v))
 	n = base.ctx().manifest(n)
@@ -1533,7 +1538,12 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 // given its name.
 func (v Value) Template() func(label string) Value {
 	// TODO: rename to optional.
-	if v.v == nil || v.v.Closed == nil {
+	if v.v == nil {
+		return nil
+	}
+
+	types := v.v.OptionalTypes()
+	if types&(adt.HasAdditional|adt.HasPattern) == 0 {
 		return nil
 	}
 
@@ -1543,6 +1553,9 @@ func (v Value) Template() func(label string) Value {
 		f := ctx.StringLabel(label)
 		arc := &adt.Vertex{Parent: parent, Label: f}
 		v.v.MatchAndInsert(ctx, arc)
+		if len(arc.Conjuncts) == 0 {
+			return Value{}
+		}
 		arc.Finalize(ctx)
 		return makeValue(v.idx, arc)
 	}
@@ -1610,6 +1623,33 @@ func (v Value) Unify(w Value) Value {
 
 	ctx := v.idx.newContext()
 	n.Finalize(ctx.opCtx)
+	return makeValue(v.idx, n)
+}
+
+// UnifyAccept is as v.Unify(w), but will disregard any field that is allowed
+// in the Value accept.
+func (v Value) UnifyAccept(w Value, accept Value) Value {
+	if v.v == nil {
+		return w
+	}
+	if w.v == nil {
+		return v
+	}
+	if accept.v == nil {
+		panic("accept must exist")
+	}
+
+	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
+	n.AddConjunct(adt.MakeConjunct(nil, v.v))
+	n.AddConjunct(adt.MakeConjunct(nil, w.v))
+
+	e := eval.New(v.idx.Runtime)
+	ctx := e.NewContext(n)
+	e.UnifyAccept(ctx, n, adt.Finalized, accept.v.Closed)
+
+	// ctx := v.idx.newContext()
+	n.Closed = accept.v.Closed
+	n.Finalize(ctx)
 	return makeValue(v.idx, n)
 }
 
@@ -2005,19 +2045,20 @@ func (v Value) Expr() (Op, []Value) {
 			if v.v.Value == nil {
 				return NoOp, []Value{makeValue(v.idx, v.v)}
 			}
-			expr = v.v.Value
+			switch x := v.v.Value.(type) {
+			case *adt.ListMarker, *adt.StructMarker:
+				expr = v.v
+			default:
+				expr = x
+			}
 
 		case 1:
 			// the default case, processed below.
 			c := v.v.Conjuncts[0]
 			env = c.Env
 			expr = c.Expr()
-			if v, ok := expr.(*adt.Vertex); ok {
-				switch x := v.Value.(type) {
-				case *adt.ListMarker, *adt.StructMarker:
-				default:
-					expr = x
-				}
+			if w, ok := expr.(*adt.Vertex); ok {
+				return Value{v.idx, w}.Expr()
 			}
 
 		default:
@@ -2060,30 +2101,55 @@ func (v Value) Expr() (Op, []Value) {
 		}
 		op = AndOp
 	case *adt.Disjunction:
-		for _, disjunct := range x.Values {
-			a = append(a, makeValue(v.idx, disjunct))
+		count := 0
+	outer:
+		for i, disjunct := range x.Values {
+			if i < x.NumDefaults {
+				for _, n := range x.Values[x.NumDefaults:] {
+					if subsume.Value(v.ctx().opCtx, n, disjunct) == nil {
+						continue outer
+					}
+				}
+			}
+			count++
+			a = append(a, remakeValue(v, env, disjunct))
 		}
-		op = OrOp
+		if count > 1 {
+			op = OrOp
+		}
 
 	case *adt.DisjunctionExpr:
 		// Filter defaults that are subsumed by another value.
 		count := 0
-		// outer:
+	outerExpr:
 		for _, disjunct := range x.Values {
-			// if disjunct.marked {
-			// 	for _, n := range x.Values {
-			// 		s := subsumer{ctx: v.ctx()}
-			// 		if !n.marked && s.subsumes(n.val, disjunct.val) {
-			// 			continue outer
-			// 		}
-			// 	}
-			// }
+			if disjunct.Default {
+				for _, n := range x.Values {
+					a := adt.Vertex{
+						Parent: v.v.Parent,
+						Label:  v.v.Label,
+						Closed: v.v.Closed,
+					}
+					b := a
+					a.AddConjunct(adt.MakeConjunct(env, n.Val))
+					b.AddConjunct(adt.MakeConjunct(env, disjunct.Val))
+
+					e := eval.New(v.idx.Runtime)
+					ctx := e.NewContext(nil)
+					e.UnifyAccept(ctx, &a, adt.Finalized, v.v.Closed)
+					e.UnifyAccept(ctx, &b, adt.Finalized, v.v.Closed)
+					if !n.Default && subsume.Value(ctx, &a, &b) == nil {
+						continue outerExpr
+					}
+				}
+			}
 			count++
 			a = append(a, remakeValue(v, env, disjunct.Val))
 		}
 		if count > 1 {
 			op = adt.OrOp
 		}
+
 	case *interpolation:
 		for _, p := range x.Parts {
 			a = append(a, remakeValue(v, env, p))

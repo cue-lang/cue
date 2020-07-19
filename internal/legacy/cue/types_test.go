@@ -2915,7 +2915,7 @@ func TestExpr(t *testing.T) {
 		want:  `&({c:a} {b:a})`,
 	}, {
 		input: `v: [...number] | *[1, 2, 3]`,
-		want:  `|([...number] [1,2,3])`,
+		want:  `([...number]|*[1,2,3])`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

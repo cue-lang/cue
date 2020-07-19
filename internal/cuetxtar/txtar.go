@@ -17,6 +17,7 @@ package cuetxtar
 import (
 	"bufio"
 	"bytes"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"path"
@@ -24,8 +25,10 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"github.com/google/go-cmp/cmp"
 	"github.com/rogpeppe/go-internal/txtar"
@@ -130,6 +133,22 @@ func (t *Test) WriteErrors(err errors.Error) {
 			ToSlash: true,
 		})
 	}
+}
+
+// Write file in a directory.
+func (t *Test) WriteFile(f *ast.File) {
+	fmt.Fprintln(t, "==", filepath.Base(f.Filename))
+	t.Write(formatNode(t.T, f))
+}
+
+func formatNode(t *testing.T, n ast.Node) []byte {
+	t.Helper()
+
+	b, err := format.Node(n)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return b
 }
 
 // ValidInstances returns the valid instances for this .txtar file or skips the

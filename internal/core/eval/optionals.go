@@ -44,8 +44,12 @@ func (o *fieldSet) OptionalTypes() (mask adt.OptionalType) {
 			break
 		}
 	}
-	if o.bulk != nil {
-		mask |= adt.HasPattern
+	for _, b := range o.bulk {
+		if b.expr == nil {
+			mask |= adt.HasDynamic
+		} else {
+			mask |= adt.HasPattern
+		}
 	}
 	if o.additional != nil {
 		mask |= adt.HasAdditional

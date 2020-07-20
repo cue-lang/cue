@@ -378,10 +378,11 @@ type Acceptor interface {
 type OptionalType int
 
 const (
-	HasField OptionalType = 1 << iota
-	HasPattern
-	HasAdditional
-	IsOpen
+	HasField      OptionalType = 1 << iota // X: T
+	HasDynamic                             // (X): T or "\(X)": T
+	HasPattern                             // [X]: T
+	HasAdditional                          // ...T
+	IsOpen                                 // Defined for all fields
 )
 
 func (v *Vertex) Kind() Kind {

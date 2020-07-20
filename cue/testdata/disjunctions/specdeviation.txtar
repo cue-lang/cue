@@ -1,0 +1,68 @@
+It turns out the semantics of the spec is somewhat awkward,
+though theoretically nicer. It seems like we do need to change
+the definition somewhat to make it less awkward, or at least
+come up with a good workaround before adopting the spec.
+
+We have introduce a small hack to mimic the old behavior for scalar
+values.
+
+Note that the value of p below is now 2 (default), but should
+be the non-concrete 2 | int.
+
+Proof:
+    p: *((*1 | int) & 2)  | int   // substitution of both P conjuncts in p
+    p: *(*_|_ | 2)  | int         // U1: distribute conjuncts
+    p: *_|_ | 2  | int            // M2: remove mark
+    p: 2  | int                   // value after removing default.
+
+-- in.cue --
+
+Q: *1 | int
+q: *Q | int // 1 as expected
+
+P: *1 | int
+P: 2
+p: *P | int // now 2, but should be (2 | int), according to the spec:
+
+
+s1: #Size & { min: 5 }
+
+#Size : {
+    max: >min | *min
+    res: uint | * 0
+    min: >res | *(1 + res)
+}
+-- out/eval --
+(struct){
+  Q: (int){ |(*(int){ 1 }, (int){ int }) }
+  q: (int){ |(*(int){ 1 }, (int){ int }) }
+  P: (int){ 2 }
+  p: (int){ |(*(int){ 2 }, (int){ int }) }
+  s1: (#struct){
+    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
+    res: (int){ 0 }
+    min: (int){ 5 }
+  }
+  #Size: (#struct){
+    max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
+    res: (int){ 0 }
+    min: (number){ |(*(int){ 1 }, (number){ >0 }) }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  Q: (*1|int)
+  q: (*〈0;Q〉|int)
+  P: (*1|int)
+  P: 2
+  p: (*〈0;P〉|int)
+  s1: (〈0;#Size〉 & {
+    min: 5
+  })
+  #Size: {
+    max: (>〈0;min〉|*〈0;min〉)
+    res: (&(int, >=0)|*0)
+    min: (>〈0;res〉|*(1 + 〈0;res〉))
+  }
+}

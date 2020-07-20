@@ -73,7 +73,7 @@ Result:
   s1: (#struct){
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
     min: (int){ 5 }
-    max: (number){ |((int){ 5 }, (number){ >5 }) }
+    max: (number){ |(*(int){ 5 }, (number){ >5 }) }
   }
   s2: (#struct){
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }

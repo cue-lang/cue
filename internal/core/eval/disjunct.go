@@ -240,9 +240,27 @@ func (n *nodeContext) insertDisjuncts() (inserted bool) {
 			break
 		}
 
-		subMode := []defaultMode{}
+		subMode := maybeDefault
 		for ; sub < len(n.disjunctions); sub++ {
 			d := n.disjunctions[sub]
+
+			// TODO: HACK ALERT: we ignore the default tags of the subexpression
+			// if we already have a scalar value and can no longer change the
+			// outcome.
+			// This is not conform the spec, but mimics the old implementation.
+			// It also results in nicer default semantics. Changing this will
+			// break existing CUE code in awkward ways.
+			// We probably should address this when we figure out how to change
+			// the spec to accommodate for this. For instance, we could say
+			// that if a disjunction only contributes a single disjunct to an
+			// end result, default information is ignored. Not the greatest
+			// definition, though.
+			// Another alternative might be to have a special builtin that
+			// mimics the good behavior.
+			// Note that the same result can be obtained in CUE by adding
+			// 0 to a referenced number (forces the default to be discarded).
+			wasScalar := n.scalar != nil // Hack line 1
+
 			disjunctions = append(disjunctions, d)
 			mode, ok := n.insertSingleDisjunct(p, d, true)
 			p++
@@ -250,13 +268,12 @@ func (n *nodeContext) insertDisjuncts() (inserted bool) {
 				inserted = false
 				break
 			}
-			subMode = append(subMode, mode)
-		}
-		for i := len(subMode) - 1; i >= 0; i-- {
-			defMode = combineSubDefault(defMode, subMode[i])
-		}
 
-		// fmt.Println("RESMODE", defMode, combineDefault(n.defaultMode, defMode))
+			if !wasScalar { // Hack line 2.
+				subMode = combineDefault(subMode, mode)
+			}
+		}
+		defMode = combineSubDefault(defMode, subMode)
 
 		n.defaultMode = combineDefault(n.defaultMode, defMode)
 	}
@@ -308,11 +325,14 @@ func (n *nodeContext) insertSingleDisjunct(p int, d envDisjunct, isSub bool) (mo
 //
 // M1: *v        => (v, v)
 // M2: *(v1, d1) => (v1, d1)
-// or
-// M2: *(v1, d1) => (v1, v1)
-// or
-// M2: *(v1, d1) => v1 if d1 == _|_
-// M2:              d1 otherwise
+//
+// NOTE: M2 cannot be *(v1, d1) => (v1, v1), as this has the weird property
+// of making a value less specific. This causes issues, for instance, when
+// trimming.
+//
+// The old implementation does something similar though. It will discard
+// default information after first determining if more than one conjunct
+// has survived.
 //
 // def + maybe -> def
 // not + maybe -> def
@@ -326,31 +346,49 @@ const (
 	isDefault
 )
 
+// combineSubDefault combines default modes where b is a subexpression in
+// a disjunctions.
+//
+// Default rules from spec:
+//
+// D1: (v1, d1) | v2       => (v1|v2, d1)
+// D2: (v1, d1) | (v2, d2) => (v1|v2, d1|d2)
+//
+// Spec:
+// M1: *v        => (v, v)
+// M2: *(v1, d1) => (v1, d1)
+//
 func combineSubDefault(a, b defaultMode) defaultMode {
 	switch {
-	case a == maybeDefault && b == maybeDefault:
+	case a == maybeDefault && b == maybeDefault: // D1
 		return maybeDefault
-	case a == maybeDefault && b == notDefault:
+	case a == maybeDefault && b == notDefault: // D1
 		return notDefault
-	case a == maybeDefault && b == isDefault:
+	case a == maybeDefault && b == isDefault: // D1
 		return isDefault
-	case a == notDefault && b == maybeDefault:
+	case a == notDefault && b == maybeDefault: // D1
 		return notDefault
-	case a == notDefault && b == notDefault:
+	case a == notDefault && b == notDefault: // D2
 		return notDefault
-	case a == notDefault && b == isDefault:
+	case a == notDefault && b == isDefault: // D2
 		return isDefault
-	case a == isDefault && b == maybeDefault:
+	case a == isDefault && b == maybeDefault: // D1
 		return isDefault
-	case a == isDefault && b == notDefault:
+	case a == isDefault && b == notDefault: // M2
 		return notDefault
-	case a == isDefault && b == isDefault:
+	case a == isDefault && b == isDefault: // D2
 		return isDefault
 	default:
 		panic("unreachable")
 	}
 }
 
+// combineDefaults combines default modes for unifying conjuncts.
+//
+// Default rules from spec:
+//
+// U1: (v1, d1) & v2       => (v1&v2, d1&v2)
+// U2: (v1, d1) & (v2, d2) => (v1&v2, d1&d2)
 func combineDefault(a, b defaultMode) defaultMode {
 	if a > b {
 		a, b = b, a

@@ -1,5 +1,9 @@
 package kube
 
+service: updater: spec: ports: [{
+	port:       8080
+	targetPort: 8080
+}]
 deployment: updater: spec: template: spec: {
 	volumes: [{
 		name: "secret-updater"

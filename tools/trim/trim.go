@@ -267,26 +267,30 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 	// Identify generated components and unify them with the mixin value.
 	exists := false
 	for _, v := range vSplit {
-		if src := v.Source(); t.alwaysGen[src] || inNodes(gen, src) {
-			if !v.IsConcrete() {
-				// The template has an expression that cannot be fully
-				// resolved. Attempt to complete the expression by
-				// evaluting it within the struct to which the template
-				// is applied.
-				expr := internal.ToExpr(v.Syntax())
-
-				// TODO: this only resolves references contained in scope.
-				v = internal.EvalExpr(scope, expr).(cue.Value)
-			}
-
-			if w := in.Unify(v); w.Err() == nil {
-				in = w
-			}
-			// One of the sources of this struct is generated. That means
-			// we can safely delete a non-generated version.
-			exists = true
-			gen = append(gen, src)
+		src := v.Source()
+		alwaysGen := t.alwaysGen[src]
+		inNodes := inNodes(gen, src)
+		if !(alwaysGen || inNodes) {
+			continue
 		}
+		if !v.IsConcrete() {
+			// The template has an expression that cannot be fully
+			// resolved. Attempt to complete the expression by
+			// evaluting it within the struct to which the template
+			// is applied.
+			expr := internal.ToExpr(v.Syntax())
+
+			// TODO: this only resolves references contained in scope.
+			v = internal.EvalExpr(scope, expr).(cue.Value)
+		}
+
+		if w := in.Unify(v); w.Err() == nil {
+			in = w
+		}
+		// One of the sources of this struct is generated. That means
+		// we can safely delete a non-generated version.
+		exists = true
+		gen = append(gen, src)
 	}
 
 	switch v.Kind() {
@@ -371,32 +375,45 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 
 	case cue.ListKind:
 		mIter, _ := m.List()
+		elem, hasElem := m.Elem()
 		i := 0
 		rmElem := []ast.Node{}
+		allowRemove := true
 		for iter, _ := v.List(); iter.Next(); i++ {
-			mIter.Next()
-			rm := t.trim(strconv.Itoa(i), iter.Value(), mIter.Value(), scope)
+			var m cue.Value
+			if mIter.Next() {
+				m = mIter.Value()
+			} else if hasElem {
+				m = elem
+				allowRemove = false
+			} else {
+				allowRemove = false
+				break
+			}
+			rm := t.trim(strconv.Itoa(i), iter.Value(), m, scope)
 			rmElem = append(rmElem, rm...)
 		}
 
 		// Signal the removal of lists of which all elements have been marked
 		// for removal.
-		for _, v := range vSplit {
-			if src := v.Source(); !t.alwaysGen[src] {
-				l, ok := src.(*ast.ListLit)
-				if !ok {
-					break
-				}
-				rmList := true
-				iter, _ := v.List()
-				for i := 0; i < len(l.Elts) && iter.Next(); i++ {
-					if !inNodes(rmElem, l.Elts[i]) {
-						rmList = false
+		if allowRemove {
+			for _, v := range vSplit {
+				if src := v.Source(); !t.alwaysGen[src] {
+					l, ok := src.(*ast.ListLit)
+					if !ok {
 						break
 					}
-				}
-				if rmList && m.Exists() && t.canRemove(src) && !inNodes(gen, src) {
-					rmSet = append(rmSet, src)
+					rmList := true
+					iter, _ := v.List()
+					for i := 0; i < len(l.Elts) && iter.Next(); i++ {
+						if !inNodes(rmElem, l.Elts[i]) {
+							rmList = false
+							break
+						}
+					}
+					if rmList && m.Exists() && t.canRemove(src) && !inNodes(gen, src) {
+						rmSet = append(rmSet, src)
+					}
 				}
 			}
 		}
@@ -404,6 +421,7 @@ func (t *trimSet) trim(label string, v, m, scope cue.Value) (rmSet []ast.Node) {
 
 	default:
 		// Mark any subsumed part that is covered by generated config.
+		in, _ := in.Default()
 		if in.Err() == nil && v.Subsume(in) == nil {
 			for _, v := range vSplit {
 				src := v.Source()

@@ -1,5 +1,9 @@
 package kube
 
+service: pastrychef: spec: ports: [{
+	port:       8080
+	targetPort: 8080
+}]
 deployment: pastrychef: spec: template: spec: {
 	volumes: [{
 	}, {

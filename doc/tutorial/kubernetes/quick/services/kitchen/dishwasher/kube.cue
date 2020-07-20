@@ -1,5 +1,9 @@
 package kube
 
+service: dishwasher: spec: ports: [{
+	port:       8080
+	targetPort: 8080
+}]
 deployment: dishwasher: spec: {
 	replicas: 5
 	template: spec: {

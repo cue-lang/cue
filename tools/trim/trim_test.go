@@ -24,7 +24,6 @@ import (
 )
 
 func TestFiles(t *testing.T) {
-	const trace = false
 	testCases := []struct {
 		name string
 		in   string
@@ -113,6 +112,23 @@ a: {}
 foo: M
 M :: c?: bool
 `,
+	}, {
+		name: "list removal",
+		in: `
+		service: [string]: {
+			ports: [{a: 1}, {a: 1}, ...{ extra: 3 }]
+		}
+		service: a: {
+			ports: [{a: 1}, {a: 1, extra: 3}, {}, { extra: 3 }]
+		}
+`,
+		out: `service: [string]: {
+	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
+}
+service: a: {
+	ports: [{}, {extra: 3}, {}, {}]
+}
+`,
 		// TODO: This used to work.
 		// 	name: "remove implied interpolations",
 		// 	in: `
@@ -138,7 +154,7 @@ M :: c?: bool
 			if err != nil {
 				t.Fatal(err)
 			}
-			err = Files([]*ast.File{f}, inst, &Config{Trace: trace})
+			err = Files([]*ast.File{f}, inst, &Config{Trace: false})
 			if err != nil {
 				t.Fatal(err)
 			}

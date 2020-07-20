@@ -1101,6 +1101,9 @@ func (v Value) Len() Value {
 
 // Elem returns the value of undefined element types of lists and structs.
 func (v Value) Elem() (Value, bool) {
+	if v.v == nil {
+		return Value{}, false
+	}
 	ctx := v.ctx()
 	switch x := v.v.Value.(type) {
 	case *structLit:

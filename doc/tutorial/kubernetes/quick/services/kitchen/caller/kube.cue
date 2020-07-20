@@ -1,5 +1,9 @@
 package kube
 
+service: caller: spec: ports: [{
+	port:       8080
+	targetPort: 8080
+}]
 deployment: caller: spec: {
 	replicas: 3
 	template: spec: {

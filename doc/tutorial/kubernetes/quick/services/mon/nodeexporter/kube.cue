@@ -7,6 +7,7 @@ service: "node-exporter": {
 		clusterIP: "None"
 		ports: [{
 			name: "metrics"
+			port: 9100
 		}]
 	}
 }

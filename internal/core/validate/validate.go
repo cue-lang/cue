@@ -82,12 +82,14 @@ func (v *validator) validate(x *adt.Vertex) {
 			return
 		}
 
-	} else if v.Concrete && v.inDefinition == 0 && !adt.IsConcrete(x) {
-		// TODO: use ValueError to get full path.
-		v.add(&adt.Bottom{
-			Code: adt.IncompleteError,
-			Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x.Value)),
-		})
+	} else if v.Concrete && v.inDefinition == 0 {
+		x := x.Default()
+		if !adt.IsConcrete(x) {
+			v.add(&adt.Bottom{
+				Code: adt.IncompleteError,
+				Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x.Value)),
+			})
+		}
 	}
 
 	for _, a := range x.Arcs {

@@ -143,6 +143,12 @@ y: incompatible values 4 and 2`,
 		x: 1 & 2
 		`,
 		out: "eval\nx: incompatible values 2 and 1",
+	}, {
+		desc: "consider defaults for concreteness",
+		cfg:  &Config{Concrete: true},
+		in: `
+		x: *1 | 2
+		`,
 	}}
 
 	r := runtime.New()

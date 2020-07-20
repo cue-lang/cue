@@ -19,7 +19,6 @@ import (
 	"io"
 
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/legacy/cue"
 )
 
@@ -195,8 +194,8 @@ func (p *printer) printSkipped(n int) {
 
 func (p *printer) printValue(v cue.Value) {
 	// TODO: have indent option.
-	b, _ := format.Node(v.Syntax())
-	p.write(b)
+	s := fmt.Sprintf("%-v", v)
+	io.WriteString(p, s)
 }
 
 func (p *printer) printFieldRun(es *EditScript, start, end int) {

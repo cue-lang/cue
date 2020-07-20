@@ -72,7 +72,7 @@ a: {
       c: (struct){
         d: (string){ string }
         s: (_|_){
-          // [incomplete] non-concrete value string in operand to +:
+          // [incomplete] a.b.c.s: non-concrete value string in operand to +:
           //     ./in.cue:4:34
         }
       }

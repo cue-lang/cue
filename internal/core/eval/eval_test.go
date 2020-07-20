@@ -62,7 +62,7 @@ func TestEval(t *testing.T) {
 
 		t.Log(e.Stats())
 
-		if b := validate.Validate(r, v, &validate.Config{
+		if b := validate.Validate(ctx, v, &validate.Config{
 			AllErrors: true,
 		}); b != nil {
 			fmt.Fprintln(t, "Errors:")

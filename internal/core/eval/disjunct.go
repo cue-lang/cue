@@ -17,8 +17,6 @@ package eval
 import (
 	"sort"
 
-	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -214,7 +212,7 @@ func (n *nodeContext) tryDisjuncts() (finished bool) {
 			// really we should keep track of the errors and return a more
 			// accurate result here.
 			Code: adt.IncompleteError,
-			Err:  errors.Newf(token.NoPos, "empty disjunction"),
+			Err:  n.ctx.Newf("empty disjunction"),
 		}
 		n.node.AddErr(n.ctx, b)
 	}

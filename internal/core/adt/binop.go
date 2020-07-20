@@ -19,7 +19,6 @@ import (
 	"math/big"
 	"strings"
 
-	"cuelang.org/go/cue/errors"
 	"github.com/cockroachdb/apd/v2"
 )
 
@@ -42,13 +41,13 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 	if left.Concreteness() > Concrete {
 		return &Bottom{
 			Code: IncompleteError,
-			Err:  errors.Newf(c.pos(), msg, c.Str(left), op),
+			Err:  c.Newf(msg, c.Str(left), op),
 		}
 	}
 	if right.Concreteness() > Concrete {
 		return &Bottom{
 			Code: IncompleteError,
-			Err:  errors.Newf(c.pos(), msg, c.Str(right), op),
+			Err:  c.Newf(msg, c.Str(right), op),
 		}
 	}
 

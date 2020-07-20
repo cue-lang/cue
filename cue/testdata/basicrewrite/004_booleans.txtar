@@ -27,7 +27,7 @@ e: _|_ // conflicting values true and false
 }
 -- out/eval --
 Errors:
-incompatible values false and true
+e: incompatible values false and true
 
 Result:
 (_|_){
@@ -35,6 +35,6 @@ Result:
   t: (bool){ true }
   f: (bool){ false }
   e: (_|_){
-    // [eval] incompatible values false and true
+    // [eval] e: incompatible values false and true
   }
 }

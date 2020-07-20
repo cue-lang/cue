@@ -62,11 +62,12 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
 }
 -- out/eval --
 Errors:
-invalid value "foo" (out of bound =~"[a-z]{4}")
-invalid value <5 (mismatched types number and string)
-cannot use 1 (type int) as type (string|bytes):
+e3: invalid value <5 (mismatched types number and string)
+b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
+    ./in.cue:10:5
+e1: cannot use 1 (type int) as type (string|bytes):
     ./in.cue:18:5
-cannot use true (type bool) as type (string|bytes):
+e2: cannot use true (type bool) as type (string|bytes):
     ./in.cue:19:5
 
 Result:
@@ -79,20 +80,21 @@ Result:
   b1: (string){ "a" }
   b2: (string){ "foo" }
   b3: (_|_){
-    // [eval] invalid value "foo" (out of bound =~"[a-z]{4}")
+    // [eval] b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
+    //     ./in.cue:10:5
   }
   b4: (string){ "foo" }
   s1: (string){ &(!="b", =~"c") }
   s2: (string){ &(!="b", =~"[a-z]") }
   e1: (_|_){
-    // [eval] cannot use 1 (type int) as type (string|bytes):
+    // [eval] e1: cannot use 1 (type int) as type (string|bytes):
     //     ./in.cue:18:5
   }
   e2: (_|_){
-    // [eval] cannot use true (type bool) as type (string|bytes):
+    // [eval] e2: cannot use true (type bool) as type (string|bytes):
     //     ./in.cue:19:5
   }
   e3: (_|_){
-    // [eval] invalid value <5 (mismatched types number and string)
+    // [eval] e3: invalid value <5 (mismatched types number and string)
   }
 }

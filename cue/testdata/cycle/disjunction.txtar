@@ -39,7 +39,7 @@ s5b: x: [] | s5b
 
 -- out/eval --
 Errors:
-structural cycle
+cycle.a: structural cycle
 
 Result:
 (_|_){
@@ -47,7 +47,7 @@ Result:
   cycle: (_|_){
     // [structural cycle]
     a: (_|_){
-      // [structural cycle] structural cycle
+      // [structural cycle] cycle.a: structural cycle
       a: (_|_){// 〈1;cycle〉
       }
     }

@@ -75,7 +75,7 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
 }
 -- out/eval --
 Errors:
-conflicting values struct and int
+e: conflicting values struct and int
 
 Result:
 (_|_){
@@ -97,7 +97,7 @@ Result:
     b: (int){ 2 }
   }
   e: (_|_){
-    // [eval] conflicting values struct and int
+    // [eval] e: conflicting values struct and int
     a: (int){ 3 }
   }
 }

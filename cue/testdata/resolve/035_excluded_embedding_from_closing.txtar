@@ -64,8 +64,8 @@ V: #S & {
 }
 -- out/eval --
 Errors:
-field `e` not allowed
-field `extra` not allowed
+V.b: field `extra` not allowed
+V.c: field `e` not allowed
 
 Result:
 (_|_){
@@ -84,7 +84,7 @@ Result:
   V: (_|_){
     // [eval]
     c: (_|_){
-      // [eval] field `e` not allowed
+      // [eval] V.c: field `e` not allowed
       d: (int){ int }
       e: (int){ int }
     }
@@ -92,7 +92,7 @@ Result:
       c: (int){ int }
     }
     b: (_|_){
-      // [eval] field `extra` not allowed
+      // [eval] V.b: field `extra` not allowed
       open: (int){ int }
       extra: (int){ int }
     }

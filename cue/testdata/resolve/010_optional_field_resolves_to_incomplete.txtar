@@ -29,11 +29,11 @@ r: {
 (struct){
   r: (struct){
     b: (_|_){
-      // [incomplete] undefined field a:
+      // [incomplete] r.b: undefined field a:
       //     ./in.cue:3:6
     }
     c: (_|_){
-      // [incomplete] undefined field a:
+      // [incomplete] r.c: undefined field a:
       //     ./in.cue:4:8
     }
   }

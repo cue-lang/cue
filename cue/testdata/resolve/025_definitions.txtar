@@ -119,7 +119,8 @@ mixedRec: {
 }
 -- out/eval --
 Errors:
-field `feild` not allowed
+foo: field `feild` not allowed
+foo1.recursive: field `feild` not allowed
 
 Result:
 (_|_){
@@ -135,7 +136,7 @@ Result:
     field2: (string){ string }
   }
   foo: (_|_){
-    // [eval] field `feild` not allowed
+    // [eval] foo: field `feild` not allowed
     field: (int){ int }
     recursive: (#struct){
       field: (string){ string }
@@ -146,7 +147,7 @@ Result:
     // [eval]
     field: (int){ 2 }
     recursive: (_|_){
-      // [eval] field `feild` not allowed
+      // [eval] foo1.recursive: field `feild` not allowed
       field: (string){ string }
       feild: (int){ 2 }
     }

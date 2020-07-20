@@ -28,10 +28,10 @@ b: cell.b
 (struct){
   #Value: (int){ |((int){ 0 }, (int){ 1 }) }
   foo: (_|_){
-    // [incomplete] incomplete cause disjunction
+    // [incomplete] foo: incomplete cause disjunction
   }
   bar: (_|_){
-    // [incomplete] incomplete cause disjunction
+    // [incomplete] bar: incomplete cause disjunction
   }
   Foo: (int){ 1 }
   Bar: (int){ 0 }

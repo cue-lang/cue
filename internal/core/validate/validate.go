@@ -12,13 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package validate collects errors from an evaluated Vertex.
 package validate
 
 import (
-	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/debug"
 )
 
 type Config struct {
@@ -36,20 +34,20 @@ type Config struct {
 
 // Validate checks that a value has certain properties. The value must have
 // been evaluated.
-func Validate(r adt.Runtime, v *adt.Vertex, cfg *Config) *adt.Bottom {
+func Validate(ctx *adt.OpContext, v *adt.Vertex, cfg *Config) *adt.Bottom {
 	if cfg == nil {
 		cfg = &Config{}
 	}
-	x := validator{Config: *cfg, runtime: r}
+	x := validator{Config: *cfg, ctx: ctx}
 	x.validate(v)
 	return x.err
 }
 
 type validator struct {
 	Config
+	ctx          *adt.OpContext
 	err          *adt.Bottom
 	inDefinition int
-	runtime      adt.Runtime
 }
 
 func (v *validator) add(b *adt.Bottom) {
@@ -63,6 +61,8 @@ func (v *validator) add(b *adt.Bottom) {
 }
 
 func (v *validator) validate(x *adt.Vertex) {
+	defer v.ctx.PopArc(v.ctx.PushArc(x))
+
 	if b, _ := x.Value.(*adt.Bottom); b != nil {
 		switch b.Code {
 		case adt.CycleError:
@@ -83,15 +83,10 @@ func (v *validator) validate(x *adt.Vertex) {
 		}
 
 	} else if v.Concrete && v.inDefinition == 0 && !adt.IsConcrete(x) {
-		p := token.NoPos
-		if src := x.Value.Source(); src != nil {
-			p = src.Pos()
-		}
 		// TODO: use ValueError to get full path.
 		v.add(&adt.Bottom{
 			Code: adt.IncompleteError,
-			Err: errors.Newf(p, "incomplete value %v",
-				debug.NodeString(v.runtime, x.Value, nil)),
+			Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x.Value)),
 		})
 	}
 

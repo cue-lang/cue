@@ -42,7 +42,7 @@ func TestValidate(t *testing.T) {
 		#foo: { use: string }
 		`,
 		lookup: "#foo",
-		out:    "incomplete\nincomplete value string",
+		out:    "incomplete\n#foo.use: incomplete value string",
 	}, {
 		desc: "definitions not considered for completeness",
 		cfg:  &Config{Concrete: true},
@@ -71,14 +71,14 @@ func TestValidate(t *testing.T) {
 		in: `
 		x: 1 & 2
 		`,
-		out: "eval\nincompatible values 2 and 1",
+		out: "eval\nx: incompatible values 2 and 1",
 	}, {
 		desc: "first error",
 		in: `
 		x: 1 & 2
 		y: 2 & 4
 		`,
-		out: "eval\nincompatible values 2 and 1",
+		out: "eval\nx: incompatible values 2 and 1",
 	}, {
 		desc: "all errors",
 		cfg:  &Config{AllErrors: true},
@@ -87,8 +87,8 @@ func TestValidate(t *testing.T) {
 		y: 2 & 4
 		`,
 		out: `eval
-incompatible values 2 and 1
-incompatible values 4 and 2`,
+x: incompatible values 2 and 1
+y: incompatible values 4 and 2`,
 	}, {
 		desc: "incomplete",
 		cfg:  &Config{Concrete: true},
@@ -96,7 +96,7 @@ incompatible values 4 and 2`,
 		y: 2 + x
 		x: string
 		`,
-		out: "incomplete\nnon-concrete value string in operand to +:\n    test:2:6",
+		out: "incomplete\ny: non-concrete value string in operand to +:\n    test:2:6",
 	}, {
 		desc: "allowed incomplete cycle",
 		in: `
@@ -142,7 +142,7 @@ incompatible values 4 and 2`,
 		y: string
 		x: 1 & 2
 		`,
-		out: "eval\nincompatible values 2 and 1",
+		out: "eval\nx: incompatible values 2 and 1",
 	}}
 
 	r := runtime.New()
@@ -163,7 +163,7 @@ incompatible values 4 and 2`,
 				v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup))
 			}
 
-			b := Validate(r, v, tc.cfg)
+			b := Validate(ctx, v, tc.cfg)
 
 			w := &strings.Builder{}
 			if b != nil {

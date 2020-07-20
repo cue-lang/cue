@@ -15,7 +15,7 @@ b: #A & {
 }
 -- out/eval --
 Errors:
-field `d` not allowed
+b: field `d` not allowed
 
 Result:
 (_|_){
@@ -27,7 +27,7 @@ Result:
     c: (int){ 3 }
   }
   b: (_|_){
-    // [eval] field `d` not allowed
+    // [eval] b: field `d` not allowed
     c: (int){ 3 }
     d: (int){ 4 }
   }

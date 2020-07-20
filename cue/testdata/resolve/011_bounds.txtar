@@ -138,15 +138,17 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
 }
 -- out/eval --
 Errors:
-bounds >1 <0
-bounds >11 <11
-bounds >11 <=11
-bounds >=11 <11
-invalid value !=null (mismatched types (bool|string|bytes|list|struct|number) and null)
-invalid value 0 (out of bound <0)
-invalid value 1 (out of bound >1)
-invalid value <1 (mismatched types number and string)
-invalid value null (mismatched types null and (bool|string|bytes|list|struct|number))
+e1: invalid value !=null (mismatched types (bool|string|bytes|list|struct|number) and null)
+e2: invalid value null (mismatched types null and (bool|string|bytes|list|struct|number))
+e5: incompatible bounds >1 and <0
+e6: incompatible bounds >11 and <11
+e7: incompatible bounds >=11 and <11
+e8: incompatible bounds >11 and <=11
+e9: invalid value <1 (mismatched types number and string)
+e3: invalid value 1 (out of bound >1):
+    ./in.cue:42:5
+e4: invalid value 0 (out of bound <0):
+    ./in.cue:43:5
 
 Result:
 (_|_){
@@ -182,30 +184,32 @@ Result:
   s23e: (number){ &(>0.0, <2.0) }
   s30: (int){ &(>0, int) }
   e1: (_|_){
-    // [eval] invalid value !=null (mismatched types (bool|string|bytes|list|struct|number) and null)
+    // [eval] e1: invalid value !=null (mismatched types (bool|string|bytes|list|struct|number) and null)
   }
   e2: (_|_){
-    // [eval] invalid value null (mismatched types null and (bool|string|bytes|list|struct|number))
+    // [eval] e2: invalid value null (mismatched types null and (bool|string|bytes|list|struct|number))
   }
   e3: (_|_){
-    // [eval] invalid value 1 (out of bound >1)
+    // [eval] e3: invalid value 1 (out of bound >1):
+    //     ./in.cue:42:5
   }
   e4: (_|_){
-    // [eval] invalid value 0 (out of bound <0)
+    // [eval] e4: invalid value 0 (out of bound <0):
+    //     ./in.cue:43:5
   }
   e5: (_|_){
-    // [eval] bounds >1 <0
+    // [eval] e5: incompatible bounds >1 and <0
   }
   e6: (_|_){
-    // [eval] bounds >11 <11
+    // [eval] e6: incompatible bounds >11 and <11
   }
   e7: (_|_){
-    // [eval] bounds >=11 <11
+    // [eval] e7: incompatible bounds >=11 and <11
   }
   e8: (_|_){
-    // [eval] bounds >11 <=11
+    // [eval] e8: incompatible bounds >11 and <=11
   }
   e9: (_|_){
-    // [eval] invalid value <1 (mismatched types number and string)
+    // [eval] e9: invalid value <1 (mismatched types number and string)
   }
 }

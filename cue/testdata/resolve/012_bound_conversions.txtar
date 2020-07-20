@@ -48,8 +48,11 @@ c4: _|_ // conflicting values 1.2 and ((>=1 & <2) & int) (mismatched types float
 }
 -- out/eval --
 Errors:
-invalid value 1.2 (out of bound >1.3)
-invalid value int (mismatched types int and float)
+c4: invalid value int (mismatched types int and float)
+c1: invalid value 1.2 (out of bound >1.3):
+    ./in.cue:10:12
+c2: invalid value 1.2 (out of bound >1.3):
+    ./in.cue:11:12
 
 Result:
 (_|_){
@@ -62,13 +65,15 @@ Result:
   r5: (number){ 1.1 }
   r6: (number){ 1.1 }
   c1: (_|_){
-    // [eval] invalid value 1.2 (out of bound >1.3)
+    // [eval] c1: invalid value 1.2 (out of bound >1.3):
+    //     ./in.cue:10:12
   }
   c2: (_|_){
-    // [eval] invalid value 1.2 (out of bound >1.3)
+    // [eval] c2: invalid value 1.2 (out of bound >1.3):
+    //     ./in.cue:11:12
   }
   c3: (float){ 1.2 }
   c4: (_|_){
-    // [eval] invalid value int (mismatched types int and float)
+    // [eval] c4: invalid value int (mismatched types int and float)
   }
 }

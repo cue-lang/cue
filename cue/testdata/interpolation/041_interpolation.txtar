@@ -33,7 +33,7 @@ e: _|_ // expression in interpolation must evaluate to a number kind or string (
 }
 -- out/eval --
 Errors:
-invalid interpolation: cannot use [] (type list) as type string:
+e: invalid interpolation: cannot use [] (type list) as type string:
     ./in.cue:7:4
 
 Result:
@@ -43,16 +43,16 @@ Result:
   b: (string){ "one 4 two 4one" }
   c: (string){ "one" }
   d: (_|_){
-    // [incomplete] invalid interpolation: incomplete string value '_':
+    // [incomplete] d: invalid interpolation: incomplete string value '_':
     //     ./in.cue:4:4
   }
   u: (_|_){
-    // [incomplete] invalid interpolation: incomplete string value '_':
+    // [incomplete] u: invalid interpolation: incomplete string value '_':
     //     ./in.cue:5:4
   }
   r: (_){ _ }
   e: (_|_){
-    // [eval] invalid interpolation: cannot use [] (type list) as type string:
+    // [eval] e: invalid interpolation: cannot use [] (type list) as type string:
     //     ./in.cue:7:4
   }
 }

@@ -118,7 +118,7 @@ e1: [..._|_ // conflicting values int and float (mismatched types int and float)
 }
 -- out/eval --
 Errors:
-incompatible list lengths (1 and 2)
+e0: incompatible list lengths (1 and 2)
 
 Result:
 (_|_){
@@ -153,7 +153,7 @@ Result:
   t1: (list){
   }
   e0: (_|_){
-    // [eval] incompatible list lengths (1 and 2)
+    // [eval] e0: incompatible list lengths (1 and 2)
     0: (struct){
     }
     1: (struct){

@@ -217,9 +217,37 @@ n4: n1 & { x: n1 & { y: n1 & { z: int }}}
 
 -- out/eval --
 Errors:
-conflicting types
-conflicting types list and struct
-structural cycle
+a1.f.0: structural cycle
+a3.f.g: structural cycle
+b4.x.y.0: structural cycle
+b6.b.a.0: conflicting types list and int
+b6.b.a.0.0: structural cycle
+b6.x.a.0: structural cycle
+b7.a.0: structural cycle
+c1.a.c.c: structural cycle
+d1.a.b.c.d.t: structural cycle
+d1.r: structural cycle
+d2.a.b.c.d.t: structural cycle
+d3.x.a.b.c: structural cycle
+d3.x.indirect: structural cycle
+e1.a.c: structural cycle
+e1.b.c: structural cycle
+e2.a.c: structural cycle
+e2.b.c: structural cycle
+e3.a: conflicting types list and struct
+e3.a.0: conflicting types list and struct
+e3.a.0: structural cycle
+e3.a.c: conflicting types list and struct
+e3.a.c: structural cycle
+e3.b: conflicting types list and struct
+e3.b.0: conflicting types list and struct
+e3.b.0: structural cycle
+e3.b.c: conflicting types list and struct
+e3.b.c: structural cycle
+z1.z.f.h.h: structural cycle
+z1.z.g.h: structural cycle
+d2.r: structural cycle:
+    ./in.cue:79:8
 
 Result:
 (_|_){
@@ -229,7 +257,7 @@ Result:
     f: (_|_){
       // [structural cycle]
       0: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] a1.f.0: structural cycle
         0: (_|_){// 〈0;f〉
         }
       }
@@ -243,7 +271,7 @@ Result:
     f: (_|_){
       // [structural cycle]
       g: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] a3.f.g: structural cycle
         g: (_|_){// 〈1;f〉
         }
       }
@@ -301,7 +329,7 @@ Result:
       y: (_|_){
         // [structural cycle]
         0: (_|_){
-          // [structural cycle] structural cycle
+          // [structural cycle] b4.x.y.0: structural cycle
           0: (_|_){// 〈0;y〉
           }
         }
@@ -329,9 +357,9 @@ Result:
       a: (_|_){
         // [eval]
         0: (_|_){
-          // [eval] conflicting types
+          // [eval] b6.b.a.0: conflicting types list and int
           0: (_|_){
-            // [structural cycle] structural cycle
+            // [structural cycle] b6.b.a.0.0: structural cycle
           }
         }
       }
@@ -341,7 +369,7 @@ Result:
       a: (_|_){
         // [structural cycle]
         0: (_|_){
-          // [structural cycle] structural cycle
+          // [structural cycle] b6.x.a.0: structural cycle
           0: (_|_){// 〈0;a〉
           }
         }
@@ -358,7 +386,7 @@ Result:
     a: (_|_){
       // [structural cycle]
       0: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] b7.a.0: structural cycle
         0: (_|_){// 〈0;a〉
         }
       }
@@ -375,7 +403,7 @@ Result:
         b: (struct){
         }
         c: (_|_){
-          // [structural cycle] structural cycle
+          // [structural cycle] c1.a.c.c: structural cycle
           b: (_|_){// {}
           }
           c: (_|_){// (〈1;a〉 & 〈0;b〉)
@@ -396,7 +424,7 @@ Result:
             // [structural cycle]
             h: (int){ int }
             t: (_|_){
-              // [structural cycle] structural cycle
+              // [structural cycle] d1.a.b.c.d.t: structural cycle
               c: (_|_){// {
                 //   d: {
                 //     h: int
@@ -410,7 +438,7 @@ Result:
       }
     }
     r: (_|_){
-      // [structural cycle] structural cycle
+      // [structural cycle] d1.r: structural cycle
       c: (_|_){// {
         //   d: {
         //     h: int
@@ -429,7 +457,8 @@ Result:
       // [structural cycle]
     }
     r: (_|_){
-      // [structural cycle] structural cycle
+      // [structural cycle] d2.r: structural cycle:
+      //     ./in.cue:79:8
       c: (_|_){// {
         //   d: {
         //     h: int
@@ -448,7 +477,7 @@ Result:
             // [structural cycle]
             h: (int){ int }
             t: (_|_){
-              // [structural cycle] structural cycle
+              // [structural cycle] d2.a.b.c.d.t: structural cycle
               c: (_|_){// {
                 //   d: {
                 //     h: int
@@ -480,14 +509,14 @@ Result:
         b: (_|_){
           // [structural cycle]
           c: (_|_){
-            // [structural cycle] structural cycle
+            // [structural cycle] d3.x.a.b.c: structural cycle
             c: (_|_){// 〈2;indirect〉
             }
           }
         }
       }
       indirect: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] d3.x.indirect: structural cycle
         c: (_|_){// 〈2;indirect〉
         }
       }
@@ -499,7 +528,7 @@ Result:
     a: (_|_){
       // [structural cycle]
       c: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] e1.a.c: structural cycle
         c: (_|_){// 〈1;a〉
         }
       }
@@ -507,7 +536,7 @@ Result:
     b: (_|_){
       // [structural cycle]
       c: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] e1.b.c: structural cycle
         c: (_|_){// 〈1;b〉
         }
       }
@@ -518,7 +547,7 @@ Result:
     a: (_|_){
       // [structural cycle]
       c: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] e2.a.c: structural cycle
         c: (_|_){// 〈1;a〉
         }
       }
@@ -526,7 +555,7 @@ Result:
     b: (_|_){
       // [structural cycle]
       c: (_|_){
-        // [structural cycle] structural cycle
+        // [structural cycle] e2.b.c: structural cycle
         c: (_|_){// 〈1;b〉
         }
       }
@@ -535,18 +564,18 @@ Result:
   e3: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] conflicting types list and struct
+      // [eval] e3.a: conflicting types list and struct
       c: (_|_){
-        // [eval] conflicting types list and struct
-        // structural cycle
+        // [eval] e3.a.c: conflicting types list and struct
+        // e3.a.c: structural cycle
         c: (_|_){// 〈1;a〉
         }
         0: (_|_){// 〈0;a〉
         }
       }
       0: (_|_){
-        // [eval] conflicting types list and struct
-        // structural cycle
+        // [eval] e3.a.0: conflicting types list and struct
+        // e3.a.0: structural cycle
         c: (_|_){// 〈1;a〉
         }
         0: (_|_){// 〈0;a〉
@@ -554,18 +583,18 @@ Result:
       }
     }
     b: (_|_){
-      // [eval] conflicting types list and struct
+      // [eval] e3.b: conflicting types list and struct
       c: (_|_){
-        // [eval] conflicting types list and struct
-        // structural cycle
+        // [eval] e3.b.c: conflicting types list and struct
+        // e3.b.c: structural cycle
         c: (_|_){// 〈1;b〉
         }
         0: (_|_){// 〈0;b〉
         }
       }
       0: (_|_){
-        // [eval] conflicting types list and struct
-        // structural cycle
+        // [eval] e3.b.0: conflicting types list and struct
+        // e3.b.0: structural cycle
         c: (_|_){// 〈1;b〉
         }
         0: (_|_){// 〈0;b〉
@@ -692,7 +721,7 @@ Result:
         h: (_|_){
           // [structural cycle]
           h: (_|_){
-            // [structural cycle] structural cycle
+            // [structural cycle] z1.z.f.h.h: structural cycle
             h: (_|_){// 〈1;g〉
             }
           }
@@ -701,7 +730,7 @@ Result:
       g: (_|_){
         // [structural cycle]
         h: (_|_){
-          // [structural cycle] structural cycle
+          // [structural cycle] z1.z.g.h: structural cycle
           h: (_|_){// 〈1;g〉
           }
         }

@@ -29,14 +29,14 @@ c2: _|_ // conflicting values {bar: 1} and 1 (mismatched types struct and int)
 -- out/eval --
 (struct){
   c1: (_|_){
-    // [incomplete] undefined field bar:
+    // [incomplete] c1: undefined field bar:
     //     ./in.cue:1:24
     bar: (struct){
       baz: (int){ 2 }
     }
   }
   c2: (_|_){
-    // [incomplete] undefined field bar:
+    // [incomplete] c2: undefined field bar:
     //     ./in.cue:2:24
     bar: (int){ 1 }
   }

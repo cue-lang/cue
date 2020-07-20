@@ -95,27 +95,27 @@ e8: _|_ // invalid operation 1.0 mod 1 (mismatched types float and int)
 }
 -- out/eval --
 Errors:
-failed arithmetic: division by zero:
+divZero: failed arithmetic: division by zero:
     ./in.cue:8:10
-failed arithmetic: division undefined:
+div00: failed arithmetic: division undefined:
     ./in.cue:9:10
-division by zero:
+idiv00: division by zero:
     ./in.cue:13:9
-division by zero:
+imod00: division by zero:
     ./in.cue:14:9
-division by zero:
+iquo00: division by zero:
     ./in.cue:15:9
-division by zero:
+irem00: division by zero:
     ./in.cue:16:9
-invalid operands 2 and "a" to '+' (type int and string):
+e0: invalid operands 2 and "a" to '+' (type int and string):
     ./in.cue:23:5
-invalid operands 1.0 and 2 to 'div' (type float and int):
+e5: invalid operands 1.0 and 2 to 'div' (type float and int):
     ./in.cue:29:5
-invalid operands 2 and 2.0 to 'rem' (type int and float):
+e6: invalid operands 2 and 2.0 to 'rem' (type int and float):
     ./in.cue:30:5
-invalid operands 2 and 2.0 to 'quo' (type int and float):
+e7: invalid operands 2 and 2.0 to 'quo' (type int and float):
     ./in.cue:31:5
-invalid operands 1.0 and 1 to 'mod' (type float and int):
+e8: invalid operands 1.0 and 1 to 'mod' (type float and int):
     ./in.cue:32:5
 
 Result:
@@ -128,29 +128,29 @@ Result:
   div2: (float){ 4.00000000000000000000000 }
   div3: (float){ 1 }
   divZero: (_|_){
-    // [eval] failed arithmetic: division by zero:
+    // [eval] divZero: failed arithmetic: division by zero:
     //     ./in.cue:8:10
   }
   div00: (_|_){
-    // [eval] failed arithmetic: division undefined:
+    // [eval] div00: failed arithmetic: division undefined:
     //     ./in.cue:9:10
   }
   b: (bool){ true }
   add: (float){ 5.00000000000000000000000 }
   idiv00: (_|_){
-    // [eval] division by zero:
+    // [eval] idiv00: division by zero:
     //     ./in.cue:13:9
   }
   imod00: (_|_){
-    // [eval] division by zero:
+    // [eval] imod00: division by zero:
     //     ./in.cue:14:9
   }
   iquo00: (_|_){
-    // [eval] division by zero:
+    // [eval] iquo00: division by zero:
     //     ./in.cue:15:9
   }
   irem00: (_|_){
-    // [eval] division by zero:
+    // [eval] irem00: division by zero:
     //     ./in.cue:16:9
   }
   v1: (float){ 5.0000000000E+11 }
@@ -158,23 +158,23 @@ Result:
   v3: (float){ 0.666666666666666666666667 }
   v5: (int){ 0 }
   e0: (_|_){
-    // [eval] invalid operands 2 and "a" to '+' (type int and string):
+    // [eval] e0: invalid operands 2 and "a" to '+' (type int and string):
     //     ./in.cue:23:5
   }
   e5: (_|_){
-    // [eval] invalid operands 1.0 and 2 to 'div' (type float and int):
+    // [eval] e5: invalid operands 1.0 and 2 to 'div' (type float and int):
     //     ./in.cue:29:5
   }
   e6: (_|_){
-    // [eval] invalid operands 2 and 2.0 to 'rem' (type int and float):
+    // [eval] e6: invalid operands 2 and 2.0 to 'rem' (type int and float):
     //     ./in.cue:30:5
   }
   e7: (_|_){
-    // [eval] invalid operands 2 and 2.0 to 'quo' (type int and float):
+    // [eval] e7: invalid operands 2 and 2.0 to 'quo' (type int and float):
     //     ./in.cue:31:5
   }
   e8: (_|_){
-    // [eval] invalid operands 1.0 and 1 to 'mod' (type float and int):
+    // [eval] e8: invalid operands 1.0 and 1 to 'mod' (type float and int):
     //     ./in.cue:32:5
   }
 }

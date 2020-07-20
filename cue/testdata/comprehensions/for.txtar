@@ -9,7 +9,7 @@ k: { for v in e { v } }
 e: int
 -- out/eval --
 Errors:
-invalid operand e (found int, want list or struct):
+k: invalid operand e (found int, want list or struct):
     ./in.cue:7:15
 
 Result:
@@ -28,7 +28,7 @@ Result:
   y: (struct){
   }
   k: (_|_){
-    // [eval] invalid operand e (found int, want list or struct):
+    // [eval] k: invalid operand e (found int, want list or struct):
     //     ./in.cue:7:15
   }
   e: (int){ int }

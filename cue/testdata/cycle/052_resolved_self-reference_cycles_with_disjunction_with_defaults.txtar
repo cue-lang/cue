@@ -129,7 +129,7 @@ z3:  8
 }
 -- out/eval --
 Errors:
-incompatible values 7 and 6:
+xe3: incompatible values 7 and 6:
     ./in.cue:37:6
 
 Result:
@@ -158,22 +158,22 @@ Result:
   xd4: (int){ 9 }
   xd5: (int){ 10 }
   xe1: (_|_){
-    // [incomplete] empty disjunction
+    // [incomplete] xe1: empty disjunction
   }
   xe2: (_|_){
-    // [eval] incompatible values 7 and 6:
+    // [eval] xe3: incompatible values 7 and 6:
     //     ./in.cue:37:6
   }
   xe3: (_|_){
-    // [eval] incompatible values 7 and 6:
+    // [eval] xe3: incompatible values 7 and 6:
     //     ./in.cue:37:6
   }
   xe4: (_|_){
-    // [eval] incompatible values 7 and 6:
+    // [eval] xe3: incompatible values 7 and 6:
     //     ./in.cue:37:6
   }
   xe5: (_|_){
-    // [eval] incompatible values 7 and 6:
+    // [eval] xe3: incompatible values 7 and 6:
     //     ./in.cue:37:6
   }
   z1: (int){ |(*(int){ 11 }, (int){ 13 }) }

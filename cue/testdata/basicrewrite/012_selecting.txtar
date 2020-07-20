@@ -60,9 +60,9 @@ h: _|_ // invalid operation: [3].b (type list does not support selection)
 }
 -- out/eval --
 Errors:
-invalid struct selector 4 (type int):
+e: invalid struct selector 4 (type int):
     ./in.cue:4:16
-invalid list index b (type string):
+h: invalid list index b (type string):
     ./in.cue:7:13
 
 Result:
@@ -75,19 +75,19 @@ Result:
   index: (int){ 2 }
   mulidx: (int){ 3 }
   e: (_|_){
-    // [eval] invalid struct selector 4 (type int):
+    // [eval] e: invalid struct selector 4 (type int):
     //     ./in.cue:4:16
   }
   f: (_|_){
-    // [incomplete] undefined field b:
+    // [incomplete] f: undefined field b:
     //     ./in.cue:5:16
   }
   g: (_|_){
-    // [incomplete] undefined field b:
+    // [incomplete] g: undefined field b:
     //     ./in.cue:6:16
   }
   h: (_|_){
-    // [eval] invalid list index b (type string):
+    // [eval] h: invalid list index b (type string):
     //     ./in.cue:7:13
   }
 }

@@ -1906,7 +1906,7 @@ func (v Value) Validate(opts ...Option) error {
 		AllErrors:      true,
 	}
 
-	b := validate.Validate(v.idx.Runtime, v.v, cfg)
+	b := validate.Validate(v.ctx().opCtx, v.v, cfg)
 	if b != nil {
 		return b.Err
 	}

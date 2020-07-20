@@ -28,7 +28,7 @@ a: {
 }
 -- out/eval --
 Errors:
-incompatible values "hey!?" and "hey"
+a.x: incompatible values "hey!?" and "hey"
 
 Result:
 (_|_){
@@ -36,10 +36,10 @@ Result:
   a: (_|_){
     // [eval]
     x: (_|_){
-      // [eval] incompatible values "hey!?" and "hey"
+      // [eval] a.x: incompatible values "hey!?" and "hey"
     }
     y: (_|_){
-      // [eval] incompatible values "hey!?" and "hey"
+      // [eval] a.x: incompatible values "hey!?" and "hey"
     }
   }
 }

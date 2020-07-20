@@ -52,8 +52,10 @@ er3: #nonEmptyRange & {
 
 -- out/eval --
 Errors:
-invalid value 5 (out of bound <5)
-invalid value 5 (out of bound >10)
+es3.max: invalid value 5 (out of bound >10):
+    ./in.cue:5:10
+er3.min: invalid value 5 (out of bound <5):
+    ./in.cue:29:10
 
 Result:
 (_|_){
@@ -88,15 +90,16 @@ Result:
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
     min: (int){ 10 }
     max: (_|_){
-      // [eval] invalid value 5 (out of bound >10)
+      // [eval] es3.max: invalid value 5 (out of bound >10):
+      //     ./in.cue:5:10
     }
   }
   #nonEmptyRange: (#struct){
     min: (_|_){
-      // [incomplete] incomplete cause disjunction
+      // [incomplete] #nonEmptyRange.min: incomplete cause disjunction
     }
     max: (_|_){
-      // [incomplete] incomplete cause disjunction
+      // [incomplete] #nonEmptyRange.min: incomplete cause disjunction
     }
   }
   r1: (#struct){
@@ -114,10 +117,12 @@ Result:
   er3: (_|_){
     // [eval]
     min: (_|_){
-      // [eval] invalid value 5 (out of bound <5)
+      // [eval] er3.min: invalid value 5 (out of bound <5):
+      //     ./in.cue:29:10
     }
     max: (_|_){
-      // [eval] invalid value 5 (out of bound <5)
+      // [eval] er3.min: invalid value 5 (out of bound <5):
+      //     ./in.cue:29:10
     }
   }
 }

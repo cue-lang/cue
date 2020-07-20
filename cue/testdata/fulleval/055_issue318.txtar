@@ -43,11 +43,11 @@
 }
 -- out/eval --
 Errors:
-invalid interpolation: undefined field y:
+#T.out1: invalid interpolation: undefined field y:
     ./in.cue:3:8
-invalid interpolation: undefined field y:
+#T.out2: invalid interpolation: undefined field y:
     ./in.cue:4:8
-undefined field y:
+#T.vy: undefined field y:
     ./in.cue:6:12
 
 Result:
@@ -59,16 +59,16 @@ Result:
       x: (string){ string }
     }
     out1: (_|_){
-      // [eval] invalid interpolation: undefined field y:
+      // [eval] #T.out1: invalid interpolation: undefined field y:
       //     ./in.cue:3:8
     }
     out2: (_|_){
-      // [eval] invalid interpolation: undefined field y:
+      // [eval] #T.out2: invalid interpolation: undefined field y:
       //     ./in.cue:4:8
     }
     vx: (string){ string }
     vy: (_|_){
-      // [eval] undefined field y:
+      // [eval] #T.vy: undefined field y:
       //     ./in.cue:6:12
     }
   }

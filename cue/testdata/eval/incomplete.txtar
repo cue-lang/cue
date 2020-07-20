@@ -19,13 +19,13 @@ E: {
 (struct){
   s: (string){ string }
   e1: (_|_){
-    // [incomplete] non-concrete value string in operand to +:
+    // [incomplete] e1: non-concrete value string in operand to +:
     //     ./in.cue:3:5
   }
   e2: (string){ >"bar" }
   e3: (string){ "foo" }
   e4: (_|_){
-    // [incomplete] non-concrete value string in operand to +:
+    // [incomplete] e1: non-concrete value string in operand to +:
     //     ./in.cue:3:5
   }
   e5: (_|_){

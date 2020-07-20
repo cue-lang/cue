@@ -210,8 +210,7 @@ var lenBuiltin = &builtin{
 			}
 			c.ret = len(s)
 		default:
-			c.ret = errors.Newf(token.NoPos,
-				"invalid argument type %v", k)
+			c.ret = c.ctx.opCtx.Newf("invalid argument type %v", k)
 		}
 	},
 }

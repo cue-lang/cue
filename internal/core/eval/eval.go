@@ -325,6 +325,8 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 	}
 	saved := *v
 
+	defer c.PopArc(c.PushArc(v))
+
 	e.stats.UnifyCount++
 	for i := 0; ; i++ {
 		e.stats.DisjunctCount++
@@ -474,10 +476,8 @@ func (n *nodeContext) postDisjunct() {
 		markStruct := false
 		if n.isStruct {
 			if kind != 0 && kind&adt.StructKind == 0 {
-				n.node.Value = &adt.Bottom{
-					Err: errors.Newf(token.NoPos,
-						"conflicting values struct and %s", n.kind),
-				}
+				n.node.Value = n.ctx.NewErrf(
+					"conflicting values struct and %s", n.kind)
 			}
 			markStruct = true
 		} else if len(n.node.Structs) > 0 {
@@ -497,9 +497,10 @@ func (n *nodeContext) postDisjunct() {
 				if src := v.Source(); src != nil {
 					p = src.Pos()
 				}
-				n.addErr(errors.Newf(p,
-					// TODO(err): position of all value types.
-					"conflicting types",
+				n.addErr(ctx.NewPosf(p,
+					// TODO(errors): position of all value types.
+					"conflicting types %v and %v",
+					v.Kind(), n.kind,
 				))
 			}
 			if n.lowerBound != nil {
@@ -533,9 +534,9 @@ func (n *nodeContext) postDisjunct() {
 		case v.Kind() == adt.ListKind:
 			for _, a := range n.node.Arcs {
 				if a.Label.Typ() == adt.StringLabel {
-					n.addErr(errors.Newf(token.NoPos,
-						// TODO(err): add positions for list and arc definitions.
-						"list may not have regular fields"))
+					n.addErr(ctx.Newf("list may not have regular fields"))
+					// TODO(errors): add positions for list and arc definitions.
+
 				}
 			}
 
@@ -543,7 +544,7 @@ func (n *nodeContext) postDisjunct() {
 			// 	for _, a := range n.node.Arcs {
 			// 		if a.Label.IsRegular() {
 			// 			n.addErr(errors.Newf(token.NoPos,
-			// 				// TODO(err): add positions of non-struct values and arcs.
+			// 				// TODO(errors): add positions of non-struct values and arcs.
 			// 				"cannot combine scalar values with arcs"))
 			// 		}
 			// 	}
@@ -594,9 +595,8 @@ func (n *nodeContext) postDisjunct() {
 			if accept := n.nodeShared.accept; accept != nil {
 				if !accept.Accept(n.ctx, a.Label) {
 					label := a.Label.SelectorString(ctx)
-					n.node.Value = &adt.Bottom{
-						Err: errors.Newf(token.NoPos, "field `%s` not allowed by Acceptor", label),
-					}
+					n.node.Value = ctx.NewErrf(
+						"field `%s` not allowed by Acceptor", label)
 				}
 			} else if err := m.verifyArcAllowed(n.ctx, a.Label); err != nil {
 				n.node.Value = err
@@ -619,7 +619,7 @@ func (n *nodeContext) postDisjunct() {
 	if cyclic {
 		n.node.Value = adt.CombineErrors(nil, n.node.Value, &adt.Bottom{
 			Code:  adt.StructuralCycleError,
-			Err:   errors.Newf(token.NoPos, "structural cycle"),
+			Err:   ctx.Newf("structural cycle"),
 			Value: n.node.Value,
 			// TODO: probably, this should have the referenced arc.
 		})
@@ -1190,7 +1190,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 	kind := n.kind & v.Kind()
 	if kind == adt.BottomKind {
 		// TODO: how to get other conflicting values?
-		n.addErr(errors.Newf(token.NoPos,
+		n.addErr(ctx.Newf(
 			"invalid value %s (mismatched types %s and %s)",
 			ctx.Str(v), v.Kind(), n.kind))
 		return
@@ -1245,7 +1245,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 	case adt.Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit
 		if y := n.scalar; y != nil {
 			if b, ok := adt.BinOp(ctx, adt.EqualOp, x, y).(*adt.Bool); !ok || !b.B {
-				n.addErr(errors.Newf(ctx.Pos(), "incompatible values %s and %s", ctx.Str(x), ctx.Str(y)))
+				n.addErr(ctx.Newf("incompatible values %s and %s", ctx.Str(x), ctx.Str(y)))
 			}
 			// TODO: do we need to explicitly add again?
 			// n.scalar = nil
@@ -1372,7 +1372,7 @@ func (n *nodeContext) addStruct(
 	}
 
 	if hasBulk != nil && hasOther != nil {
-		n.addErr(errors.Newf(token.NoPos, "cannot mix bulk optional fields with dynamic fields, embeddings, or comprehensions within the same struct"))
+		n.addErr(ctx.Newf("cannot mix bulk optional fields with dynamic fields, embeddings, or comprehensions within the same struct"))
 	}
 
 	// Apply existing fields
@@ -1421,7 +1421,7 @@ func (n *nodeContext) insertField(f adt.Feature, x adt.Conjunct) *adt.Vertex {
 // processed. We could instead detect such insertion and feed it to the
 // ForClause to generate another entry or have the for clause be recomputed.
 // This seems to be too complicated and lead to iffy edge cases.
-// TODO(error): detect when a field is added to a struct that is already used
+// TODO(errors): detect when a field is added to a struct that is already used
 // in a for clause.
 func (n *nodeContext) expandOne() (done bool) {
 	if n.done() {
@@ -1548,7 +1548,7 @@ func (n *nodeContext) addLists(c *adt.OpContext) {
 
 	for _, a := range n.node.Arcs {
 		if t := a.Label.Typ(); t == adt.StringLabel {
-			n.addErr(errors.Newf(token.NoPos, "conflicting types list and struct"))
+			n.addErr(c.Newf("conflicting types list and struct"))
 		}
 	}
 
@@ -1616,8 +1616,7 @@ outer:
 
 			case *adt.Ellipsis:
 				if j != len(l.list.Elems)-1 {
-					n.addErr(errors.Newf(token.NoPos,
-						"ellipsis must be last element in list"))
+					n.addErr(c.Newf("ellipsis must be last element in list"))
 				}
 
 				n.lists[i].elipsis = x
@@ -1709,6 +1708,5 @@ outer:
 }
 
 func (n *nodeContext) invalidListLength(na, nb int, a, b adt.Expr) {
-	n.addErr(errors.Newf(n.ctx.Pos(),
-		"incompatible list lengths (%d and %d)", na, nb))
+	n.addErr(n.ctx.Newf("incompatible list lengths (%d and %d)", na, nb))
 }

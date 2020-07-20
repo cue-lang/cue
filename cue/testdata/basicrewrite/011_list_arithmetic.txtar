@@ -47,7 +47,7 @@ e: _|_ // negative number -1 multiplies list
 }
 -- out/eval --
 Errors:
-cannot convert negative number to uint64:
+e: cannot convert negative number to uint64:
     ./in.cue:10:9
 
 Result:
@@ -92,7 +92,7 @@ Result:
     3: (int){ 1 }
   }
   e: (_|_){
-    // [eval] cannot convert negative number to uint64:
+    // [eval] e: cannot convert negative number to uint64:
     //     ./in.cue:10:9
   }
 }

@@ -305,7 +305,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		case errors.Error:
 			errs = x
 		default:
-			errs = errors.Newf(token.NoPos, "%s", x.Error())
+			errs = ctx.Newf("%s", x.Error())
 		}
 		return &adt.Bottom{Err: errs}
 	case bool:

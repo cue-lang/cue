@@ -83,9 +83,9 @@ a: {
     res: (struct){
       d: (string){ string }
       s: (_|_){
-        // [incomplete] non-concrete value string in operand to +:
+        // [incomplete] f1.res.s: non-concrete value string in operand to +:
         //     ./in.cue:5:25
-        // non-concrete value string in operand to +:
+        // f1.res.s: non-concrete value string in operand to +:
         //     ./in.cue:6:34
       }
     }
@@ -95,9 +95,9 @@ a: {
       c: (struct){
         d: (string){ string }
         s: (_|_){
-          // [incomplete] non-concrete value string in operand to +:
+          // [incomplete] a.b.c.s: non-concrete value string in operand to +:
           //     ./in.cue:5:25
-          // non-concrete value string in operand to +:
+          // a.b.c.s: non-concrete value string in operand to +:
           //     ./in.cue:6:34
         }
       }

@@ -50,7 +50,7 @@ B: A & {
 -- out/eval --
 (struct){
   A: (_|_){
-    // [incomplete] incomplete feed source value src (type _):
+    // [incomplete] A: incomplete feed source value src (type _):
     //     ./in.cue:2:11
     src: (_){ _ }
     baz: (string){ "baz" }

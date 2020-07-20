@@ -21,14 +21,16 @@ c: "dog"
 <0>{a: "after", b: _|_(strings.ContainsAny ("c"):invalid value "dog" (does not satisfy strings.ContainsAny("c"))), c: "dog"}
 -- out/eval --
 Errors:
-invalid value "dog" (does not satisfy strings.ContainsAny("c"))
+b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
+    ./in.cue:6:4
 
 Result:
 (_|_){
   // [eval]
   a: (string){ "after" }
   b: (_|_){
-    // [eval] invalid value "dog" (does not satisfy strings.ContainsAny("c"))
+    // [eval] b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
+    //     ./in.cue:6:4
   }
   c: (string){ "dog" }
 }

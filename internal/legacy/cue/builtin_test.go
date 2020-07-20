@@ -112,19 +112,19 @@ func TestBuiltins(t *testing.T) {
 		`true`,
 	}, {
 		test("encoding/json", `json.Validate("{\"a\":10}", {a:<3})`),
-		`_|_(error in call to encoding/json.Validate: invalid value 10 (out of bound <3) (and 1 more errors))`,
+		`_|_(error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3) (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3) (and 1 more errors))`,
+		`_|_(error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3) (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n", {a:<5, b:int})`),
-		`_|_(error in call to encoding/yaml.Validate: incomplete value int (and 1 more errors))`,
+		`_|_(error in call to encoding/yaml.Validate: b: incomplete value int (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3) (and 1 more errors))`,
+		`_|_(error in call to encoding/yaml.ValidatePartial: a: invalid value 4 (out of bound <3) (and 1 more errors))`,
 	}, {
 		test("encoding/yaml", `yaml.ValidatePartial("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
@@ -269,11 +269,12 @@ func TestBuiltins(t *testing.T) {
 		`[{a:1,v:2},{a:1,v:3},{a:2,v:1}]`,
 	}, {
 		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
-		`_|_(error in call to list.Sort: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
+		`_|_(error in call to list.Sort: less: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
 	}, {
 		test("list", `list.SortStrings(["b", "a"])`),
 		`["a","b"]`,
 	}, {
+		// TODO: path error. This should be done as part of builtin refactoring.
 		test("list", `list.SortStrings([1, 2])`),
 		`_|_(error in call to list.SortStrings: element 0 of list argument 0: 0: cannot use value 1 (type int) as string (and 1 more errors))`,
 	}, {
@@ -694,7 +695,7 @@ func TestSingleBuiltin(t *testing.T) {
 		emit      string
 	}{{
 		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
-		`_|_(error in call to list.Sort: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
+		`_|_(error in call to list.Sort: less: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {

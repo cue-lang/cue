@@ -93,6 +93,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	}
 	ctx := &OpContext{
 		config: *cfg,
+		vertex: v,
 	}
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
@@ -109,6 +110,11 @@ type OpContext struct {
 	e    *Environment
 	src  ast.Node
 	errs *Bottom
+
+	// vertex is used to determine the path location in case of error. Turning
+	// this into a stack could also allow determining the cyclic path for
+	// structural cycle errors.
+	vertex *Vertex
 
 	// TODO: remove use of tentative. Should be possible if incomplete
 	// handling is done better.
@@ -219,7 +225,7 @@ func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...i
 		}
 	}
 
-	err := errors.Newf(pos, msg, args...)
+	err := c.NewPosf(pos, msg, args...)
 	c.addErr(code, err)
 }
 
@@ -243,13 +249,15 @@ func (c *OpContext) AddErr(err errors.Error) *Bottom {
 // NewErrf creates a *Bottom value and returns it. The returned uses the
 // current source as the point of origin of the error.
 func (c *OpContext) NewErrf(format string, args ...interface{}) *Bottom {
-	err := errors.Newf(c.pos(), format, args...)
+	// TODO: consider renaming ot NewBottomf: this is now confusing as we also
+	// have Newf.
+	err := c.Newf(format, args...)
 	return &Bottom{Src: c.src, Err: err, Code: EvalError}
 }
 
 // AddErrf records an error in OpContext. It returns errors collected so far.
 func (c *OpContext) AddErrf(format string, args ...interface{}) *Bottom {
-	return c.AddErr(errors.Newf(c.pos(), format, args...))
+	return c.AddErr(c.Newf(format, args...))
 }
 
 func (c *OpContext) validate(v Value) *Bottom {
@@ -295,6 +303,19 @@ func (c *OpContext) PopState(s frame) *Bottom {
 	return err
 }
 
+// PushArc signals c that arc v is currently being processed for the purpose
+// of error reporting. PopArc should be called with the returned value once
+// processing of v is completed.
+func (c *OpContext) PushArc(v *Vertex) (saved *Vertex) {
+	c.vertex, saved = v, c.vertex
+	return saved
+}
+
+// PopArc signals completion of processing the current arc.
+func (c *OpContext) PopArc(saved *Vertex) {
+	c.vertex = saved
+}
+
 // Resolve finds a node in the tree.
 //
 // Should only be used to insert Conjuncts. TODO: perhaps only return Conjuncts
@@ -315,7 +336,15 @@ func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 
 // Validate calls validates value for the given validator.
 func (c *OpContext) Validate(check Validator, value Value) *Bottom {
-	return check.validate(c, value)
+	// TODO: use a position stack to push both values.
+	saved := c.src
+	c.src = check.Source()
+
+	err := check.validate(c, value)
+
+	c.src = saved
+
+	return err
 }
 
 // Yield evaluates a Yielder and calls f for each result.
@@ -404,7 +433,7 @@ func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete b
 		// TODO ENSURE THIS DOESN"T HAPPEN>
 		val = &Bottom{
 			Code: IncompleteError,
-			Err:  errors.Newf(token.NoPos, "UNANTICIPATED ERROR"),
+			Err:  c.Newf("UNANTICIPATED ERROR"),
 		}
 
 	}

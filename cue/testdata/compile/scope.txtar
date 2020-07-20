@@ -76,7 +76,7 @@ let _schema_1 = schema
 }
 -- out/eval --
 Errors:
-structural cycle
+schema.next: structural cycle
 
 Result:
 (_|_){
@@ -103,7 +103,7 @@ Result:
   schema: (_|_){
     // [structural cycle]
     next: (_|_){
-      // [structural cycle] structural cycle
+      // [structural cycle] schema.next: structural cycle
       next: (_|_){// 〈1;let _schema_1〉
       }
     }

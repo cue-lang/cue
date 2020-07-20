@@ -85,7 +85,7 @@ fib12: 144
     nn: (int){ int }
     out: (_|_){
       // [incomplete] incomplete
-      // undefined field out:
+      // fibRec.out: undefined field out:
       //     ./in.cue:3:40
     }
   }

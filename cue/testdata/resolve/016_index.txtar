@@ -78,21 +78,21 @@ e7: def["b"]
 }
 -- out/eval --
 Errors:
-invalid list index "3" (type string):
+c: invalid list index "3" (type string):
     ./in.cue:3:20
-undefined field 0:
+d: undefined field 0:
     ./in.cue:4:16
-invalid list index _ (type string):
+e1: invalid list index _ (type string):
     ./in.cue:6:9
-invalid operand 2 (found int, want list or struct):
+e2: invalid operand 2 (found int, want list or struct):
     ./in.cue:7:5
-invalid label type bool:
+e3: invalid label type bool:
     ./in.cue:8:5
-undefined field 3:
+e4: undefined field 3:
     ./in.cue:9:15
-invalid negative index -1:
+e5: invalid negative index -1:
     ./in.cue:10:5
-invalid list index 1 (out of bounds):
+e6: invalid list index 1 (out of bounds):
     ./in.cue:11:16
 
 Result:
@@ -101,37 +101,37 @@ Result:
   a: (int){ 2 }
   b: (string){ "bar" }
   c: (_|_){
-    // [eval] invalid list index "3" (type string):
+    // [eval] c: invalid list index "3" (type string):
     //     ./in.cue:3:20
   }
   d: (_|_){
-    // [eval] undefined field 0:
+    // [eval] d: undefined field 0:
     //     ./in.cue:4:16
   }
   l: (#list){
   }
   e1: (_|_){
-    // [eval] invalid list index _ (type string):
+    // [eval] e1: invalid list index _ (type string):
     //     ./in.cue:6:9
   }
   e2: (_|_){
-    // [eval] invalid operand 2 (found int, want list or struct):
+    // [eval] e2: invalid operand 2 (found int, want list or struct):
     //     ./in.cue:7:5
   }
   e3: (_|_){
-    // [eval] invalid label type bool:
+    // [eval] e3: invalid label type bool:
     //     ./in.cue:8:5
   }
   e4: (_|_){
-    // [eval] undefined field 3:
+    // [eval] e4: undefined field 3:
     //     ./in.cue:9:15
   }
   e5: (_|_){
-    // [eval] invalid negative index -1:
+    // [eval] e5: invalid negative index -1:
     //     ./in.cue:10:5
   }
   e6: (_|_){
-    // [eval] invalid list index 1 (out of bounds):
+    // [eval] e6: invalid list index 1 (out of bounds):
     //     ./in.cue:11:16
   }
   def: (struct){
@@ -139,7 +139,7 @@ Result:
     #b: (int){ 3 }
   }
   e7: (_|_){
-    // [incomplete] undefined field b:
+    // [incomplete] e7: undefined field b:
     //     ./in.cue:16:9
   }
 }

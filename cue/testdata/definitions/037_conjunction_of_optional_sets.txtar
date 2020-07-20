@@ -52,7 +52,8 @@ d: _|_ // field "aaa" not allowed in closed struct
 }
 -- out/eval --
 Errors:
-field `aaa` not allowed
+c: field `aaa` not allowed
+d: field `aaa` not allowed
 
 Result:
 (_|_){
@@ -64,13 +65,13 @@ Result:
   #C: (#struct){
   }
   c: (_|_){
-    // [eval] field `aaa` not allowed
+    // [eval] c: field `aaa` not allowed
     aaa: (int){ 3 }
   }
   #D: (#struct){
   }
   d: (_|_){
-    // [eval] field `aaa` not allowed
+    // [eval] d: field `aaa` not allowed
     aaa: (int){ 3 }
   }
 }

@@ -38,7 +38,7 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
 }
 -- out/eval --
 Errors:
-invalid operands 2 and "s" to '==' (type int and string):
+err: invalid operands 2 and "s" to '==' (type int and string):
     ./in.cue:9:6
 
 Result:
@@ -52,7 +52,7 @@ Result:
   geq: (bool){ true }
   seq: (bool){ true }
   err: (_|_){
-    // [eval] invalid operands 2 and "s" to '==' (type int and string):
+    // [eval] err: invalid operands 2 and "s" to '==' (type int and string):
     //     ./in.cue:9:6
   }
 }

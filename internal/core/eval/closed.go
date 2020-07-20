@@ -42,8 +42,6 @@ package eval
 // in eval.go.
 
 import (
-	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -320,9 +318,7 @@ func (n *acceptor) verifyArcAllowed(ctx *adt.OpContext, f adt.Feature) *adt.Bott
 	filter := f.IsString() || f == adt.InvalidLabel
 	if filter && !n.verifyArcRecursive(ctx, n.tree, f) {
 		label := f.SelectorString(ctx)
-		return &adt.Bottom{
-			Err: errors.Newf(token.NoPos, "field `%s` not allowed", label),
-		}
+		return ctx.NewErrf("field `%s` not allowed", label)
 	}
 	return nil
 }

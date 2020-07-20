@@ -39,12 +39,13 @@ m:  _|_ // invalid operation -false (- bool)
 }
 -- out/eval --
 Errors:
-invalid value string (mismatched types string and int)
-value can never become concrete:
+e: invalid value string (mismatched types string and int)
+e2: invalid value string (mismatched types string and int)
+b: value can never become concrete:
     ./in.cue:7:5
-invalid operation ++true (+ bool):
+p: invalid operation ++true (+ bool):
     ./in.cue:8:5
-invalid operation --false (- bool):
+m: invalid operation --false (- bool):
     ./in.cue:9:5
 
 Result:
@@ -55,21 +56,21 @@ Result:
   s: (string){ string }
   t: (string){ "s" }
   e: (_|_){
-    // [eval] invalid value string (mismatched types string and int)
+    // [eval] e: invalid value string (mismatched types string and int)
   }
   e2: (_|_){
-    // [eval] invalid value string (mismatched types string and int)
+    // [eval] e2: invalid value string (mismatched types string and int)
   }
   b: (_|_){
-    // [eval] value can never become concrete:
+    // [eval] b: value can never become concrete:
     //     ./in.cue:7:5
   }
   p: (_|_){
-    // [eval] invalid operation ++true (+ bool):
+    // [eval] p: invalid operation ++true (+ bool):
     //     ./in.cue:8:5
   }
   m: (_|_){
-    // [eval] invalid operation --false (- bool):
+    // [eval] m: invalid operation --false (- bool):
     //     ./in.cue:9:5
   }
 }

@@ -118,8 +118,8 @@ d1: #D1 & {
 }
 -- out/eval --
 Errors:
-field `b` not allowed
-field `c` not allowed
+#D4.env: field `b` not allowed
+d1.env: field `c` not allowed
 
 Result:
 (_|_){
@@ -137,7 +137,7 @@ Result:
   d1: (_|_){
     // [eval]
     env: (_|_){
-      // [eval] field `c` not allowed
+      // [eval] d1.env: field `c` not allowed
       a: (string){ "A" }
       b: (string){ "B" }
       c: (string){ "C" }
@@ -160,7 +160,7 @@ Result:
   #D4: (_|_){
     // [eval]
     env: (_|_){
-      // [eval] field `b` not allowed
+      // [eval] #D4.env: field `b` not allowed
       a: (int){ int }
       b: (int){ int }
     }

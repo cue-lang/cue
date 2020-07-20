@@ -56,10 +56,10 @@ c2: (*{
 -- out/eval --
 (struct){
   a1: (_|_){
-    // [incomplete] incomplete cause disjunction
+    // [incomplete] a1: incomplete cause disjunction
   }
   a2: (_|_){
-    // [incomplete] incomplete cause disjunction
+    // [incomplete] a2: incomplete cause disjunction
   }
   a3: (int){ 1 }
   b1: (int){ |((int){ 0 }, (int){ 1 }) }

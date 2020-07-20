@@ -61,7 +61,7 @@ i: false
 }
 -- out/eval --
 Errors:
-incompatible values 2 and 1:
+err: incompatible values 2 and 1:
     ./in.cue:2:4
 
 Result:
@@ -69,13 +69,13 @@ Result:
   // [eval]
   a: (bool){ true }
   b: (_|_){
-    // [eval] incompatible values 2 and 1:
+    // [eval] err: incompatible values 2 and 1:
     //     ./in.cue:2:4
   }
   c: (bool){ true }
   d: (bool){ false }
   e: (_|_){
-    // [eval] incompatible values 2 and 1:
+    // [eval] err: incompatible values 2 and 1:
     //     ./in.cue:2:4
   }
   f: (bool){ true }
@@ -83,7 +83,7 @@ Result:
   h: (bool){ true }
   i: (bool){ false }
   err: (_|_){
-    // [eval] incompatible values 2 and 1:
+    // [eval] err: incompatible values 2 and 1:
     //     ./in.cue:2:4
   }
 }

@@ -81,7 +81,7 @@
 }
 -- out/eval --
 Errors:
-field `d` not allowed
+#e1.a: field `d` not allowed
 
 Result:
 (_|_){
@@ -101,7 +101,7 @@ Result:
   #e1: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] field `d` not allowed
+      // [eval] #e1.a: field `d` not allowed
       b: (int){ int }
       c: (int){ int }
       d: (int){ 4 }

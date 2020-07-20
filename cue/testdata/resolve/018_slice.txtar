@@ -53,19 +53,19 @@ e7: _|_ // invalid slice index "9" (type string)
 }
 -- out/eval --
 Errors:
-index 1 out of range:
+e1: index 1 out of range:
     ./in.cue:3:5
-cannot convert negative number to uint64:
+e2: cannot convert negative number to uint64:
     ./in.cue:4:5
-invalid slice index: 1 > 0:
+e3: invalid slice index: 1 > 0:
     ./in.cue:5:5
-index 2 out of range:
+e4: index 2 out of range:
     ./in.cue:6:5
-cannot slice 4 (type int):
+e5: cannot slice 4 (type int):
     ./in.cue:7:5
-cannot use "" (type string) as type int in slice index:
+e6: cannot use "" (type string) as type int in slice index:
     ./in.cue:8:5
-cannot use "9" (type string) as type int in slice index:
+e7: cannot use "9" (type string) as type int in slice index:
     ./in.cue:9:5
 
 Result:
@@ -76,31 +76,31 @@ Result:
   b: (#list){
   }
   e1: (_|_){
-    // [eval] index 1 out of range:
+    // [eval] e1: index 1 out of range:
     //     ./in.cue:3:5
   }
   e2: (_|_){
-    // [eval] cannot convert negative number to uint64:
+    // [eval] e2: cannot convert negative number to uint64:
     //     ./in.cue:4:5
   }
   e3: (_|_){
-    // [eval] invalid slice index: 1 > 0:
+    // [eval] e3: invalid slice index: 1 > 0:
     //     ./in.cue:5:5
   }
   e4: (_|_){
-    // [eval] index 2 out of range:
+    // [eval] e4: index 2 out of range:
     //     ./in.cue:6:5
   }
   e5: (_|_){
-    // [eval] cannot slice 4 (type int):
+    // [eval] e5: cannot slice 4 (type int):
     //     ./in.cue:7:5
   }
   e6: (_|_){
-    // [eval] cannot use "" (type string) as type int in slice index:
+    // [eval] e6: cannot use "" (type string) as type int in slice index:
     //     ./in.cue:8:5
   }
   e7: (_|_){
-    // [eval] cannot use "9" (type string) as type int in slice index:
+    // [eval] e7: cannot use "9" (type string) as type int in slice index:
     //     ./in.cue:9:5
   }
 }

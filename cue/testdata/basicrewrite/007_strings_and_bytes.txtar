@@ -41,9 +41,9 @@ e1: _|_ // invalid operation 'b' + "c" (mismatched types bytes and string)
 }
 -- out/eval --
 Errors:
-invalid operands "a" and '' to '+' (type string and bytes):
+e0: invalid operands "a" and '' to '+' (type string and bytes):
     ./in.cue:10:5
-invalid operands 'b' and "c" to '+' (type bytes and string):
+e1: invalid operands 'b' and "c" to '+' (type bytes and string):
     ./in.cue:11:5
 
 Result:
@@ -56,11 +56,11 @@ Result:
   b1: (bytes){ 'abcabcabc' }
   b2: (bytes){ 'abcabc' }
   e0: (_|_){
-    // [eval] invalid operands "a" and '' to '+' (type string and bytes):
+    // [eval] e0: invalid operands "a" and '' to '+' (type string and bytes):
     //     ./in.cue:10:5
   }
   e1: (_|_){
-    // [eval] invalid operands 'b' and "c" to '+' (type bytes and string):
+    // [eval] e1: invalid operands 'b' and "c" to '+' (type bytes and string):
     //     ./in.cue:11:5
   }
 }

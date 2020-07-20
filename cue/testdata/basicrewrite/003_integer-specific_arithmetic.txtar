@@ -87,21 +87,21 @@ me2: _|_ // invalid operation 2 mod 1.0 (mismatched types int and float)
 }
 -- out/eval --
 Errors:
-invalid operands 2.0 and 1 to 'quo' (type float and int):
+qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):
     ./in.cue:5:6
-invalid operands 2 and 1.0 to 'quo' (type int and float):
+qe2: invalid operands 2 and 1.0 to 'quo' (type int and float):
     ./in.cue:6:6
-invalid operands 2.0 and 1 to 'rem' (type float and int):
+re1: invalid operands 2.0 and 1 to 'rem' (type float and int):
     ./in.cue:12:6
-invalid operands 2 and 1.0 to 'rem' (type int and float):
+re2: invalid operands 2 and 1.0 to 'rem' (type int and float):
     ./in.cue:13:6
-invalid operands 2.0 and 1 to 'div' (type float and int):
+de1: invalid operands 2.0 and 1 to 'div' (type float and int):
     ./in.cue:19:6
-invalid operands 2 and 1.0 to 'div' (type int and float):
+de2: invalid operands 2 and 1.0 to 'div' (type int and float):
     ./in.cue:20:6
-invalid operands 2.0 and 1 to 'mod' (type float and int):
+me1: invalid operands 2.0 and 1 to 'mod' (type float and int):
     ./in.cue:26:6
-invalid operands 2 and 1.0 to 'mod' (type int and float):
+me2: invalid operands 2 and 1.0 to 'mod' (type int and float):
     ./in.cue:27:6
 
 Result:
@@ -112,11 +112,11 @@ Result:
   q3: (int){ -2 }
   q4: (int){ 2 }
   qe1: (_|_){
-    // [eval] invalid operands 2.0 and 1 to 'quo' (type float and int):
+    // [eval] qe1: invalid operands 2.0 and 1 to 'quo' (type float and int):
     //     ./in.cue:5:6
   }
   qe2: (_|_){
-    // [eval] invalid operands 2 and 1.0 to 'quo' (type int and float):
+    // [eval] qe2: invalid operands 2 and 1.0 to 'quo' (type int and float):
     //     ./in.cue:6:6
   }
   r1: (int){ 1 }
@@ -124,11 +124,11 @@ Result:
   r3: (int){ -1 }
   r4: (int){ -1 }
   re1: (_|_){
-    // [eval] invalid operands 2.0 and 1 to 'rem' (type float and int):
+    // [eval] re1: invalid operands 2.0 and 1 to 'rem' (type float and int):
     //     ./in.cue:12:6
   }
   re2: (_|_){
-    // [eval] invalid operands 2 and 1.0 to 'rem' (type int and float):
+    // [eval] re2: invalid operands 2 and 1.0 to 'rem' (type int and float):
     //     ./in.cue:13:6
   }
   d1: (int){ 2 }
@@ -136,11 +136,11 @@ Result:
   d3: (int){ -3 }
   d4: (int){ 3 }
   de1: (_|_){
-    // [eval] invalid operands 2.0 and 1 to 'div' (type float and int):
+    // [eval] de1: invalid operands 2.0 and 1 to 'div' (type float and int):
     //     ./in.cue:19:6
   }
   de2: (_|_){
-    // [eval] invalid operands 2 and 1.0 to 'div' (type int and float):
+    // [eval] de2: invalid operands 2 and 1.0 to 'div' (type int and float):
     //     ./in.cue:20:6
   }
   m1: (int){ 1 }
@@ -148,11 +148,11 @@ Result:
   m3: (int){ 1 }
   m4: (int){ 1 }
   me1: (_|_){
-    // [eval] invalid operands 2.0 and 1 to 'mod' (type float and int):
+    // [eval] me1: invalid operands 2.0 and 1 to 'mod' (type float and int):
     //     ./in.cue:26:6
   }
   me2: (_|_){
-    // [eval] invalid operands 2 and 1.0 to 'mod' (type int and float):
+    // [eval] me2: invalid operands 2 and 1.0 to 'mod' (type int and float):
     //     ./in.cue:27:6
   }
 }

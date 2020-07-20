@@ -338,7 +338,7 @@ s35: [1, 2, 1, 2]
 }
 -- out/eval --
 Errors:
-value can never become concrete:
+l5: value can never become concrete:
     ./in.cue:6:12
 
 Result:
@@ -360,15 +360,15 @@ Result:
   l2: (#list){
   }
   l3: (_|_){
-    // [incomplete] non-concrete value <=2 in operand to *:
+    // [incomplete] l3: non-concrete value <=2 in operand to *:
     //     ./in.cue:4:5
   }
   l4: (_|_){
-    // [incomplete] non-concrete value <=2 in operand to *:
+    // [incomplete] l4: non-concrete value <=2 in operand to *:
     //     ./in.cue:5:5
   }
   l5: (_|_){
-    // [eval] value can never become concrete:
+    // [eval] l5: value can never become concrete:
     //     ./in.cue:6:12
   }
   l6: (#list){

@@ -61,7 +61,7 @@ baz: #Foo & {
 }
 -- out/eval --
 Errors:
-field `c` not allowed
+bar: field `c` not allowed
 
 Result:
 (_|_){
@@ -78,7 +78,7 @@ Result:
     a: (int){ 1 }
   }
   bar: (_|_){
-    // [eval] field `c` not allowed
+    // [eval] bar: field `c` not allowed
     field: (int){ int }
     c: (int){ 2 }
     b: (int){ 2 }

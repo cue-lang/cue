@@ -34,6 +34,7 @@ package adt
 import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 // ErrorCode indicates the type of error. The type of error may influence
@@ -198,4 +199,54 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 		Err:  errors.Append(a.Err, b.Err),
 		Code: a.Code,
 	}
+}
+
+// A valueError is returned as a result of evaluating a value.
+type valueError struct {
+	r   Runtime
+	v   *Vertex
+	pos []token.Pos
+	errors.Message
+}
+
+func (c *OpContext) errNode() *Vertex {
+	return c.vertex
+}
+
+func (c *OpContext) Newf(format string, args ...interface{}) *valueError {
+	return c.NewPosf(c.pos(), format, args...)
+}
+
+func (c *OpContext) NewPosf(pos token.Pos, format string, args ...interface{}) *valueError {
+	return &valueError{
+		r: c.Runtime,
+		v: c.errNode(),
+		// TODO: leave ni if it can be derived from the source and save an
+		// allocation.
+		pos:     []token.Pos{pos},
+		Message: errors.NewMessage(format, args),
+	}
+}
+
+func (e *valueError) Error() string {
+	return errors.String(e)
+}
+
+func (e *valueError) Position() token.Pos {
+	if len(e.pos) == 0 {
+		// TODO: retrieve from source
+		return token.NoPos
+	}
+	return e.pos[0]
+}
+
+func (e *valueError) InputPositions() []token.Pos {
+	return e.pos
+}
+
+func (e *valueError) Path() (a []string) {
+	for _, f := range appendPath(nil, e.v) {
+		a = append(a, f.SelectorString(e.r))
+	}
+	return a
 }

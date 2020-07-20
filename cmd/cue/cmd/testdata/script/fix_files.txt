@@ -1,3 +1,5 @@
+skip 'No longer supported, but keeping around until for sure.'
+
 cue fix ./foo/foo.cue ./bar/bar.cue
 
 cmp foo/foo.cue expect/foo/foo_cue

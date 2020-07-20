@@ -1154,13 +1154,18 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 			continue
 		}
 
-		n := &Vertex{Arcs: []*Vertex{
-			{Label: x.Value, Conjuncts: a.Conjuncts}, // TODO: only needed if value label != _
-		}}
+		n := &Vertex{status: Finalized}
+
+		// TODO: only needed if value label != _
+		b := *a
+		b.Label = x.Value
+		n.Arcs = append(n.Arcs, &b)
+
 		if x.Key != 0 {
 			v := &Vertex{Label: x.Key}
 			key := a.Label.ToValue(c)
 			v.AddConjunct(MakeConjunct(c.Env(0), key))
+			v.SetValue(c, Finalized, key)
 			n.Arcs = append(n.Arcs, v)
 		}
 

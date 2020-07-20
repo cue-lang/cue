@@ -1,0 +1,223 @@
+-- in.cue --
+package kube
+service: "node-exporter": {
+	spec: {
+		ports: [{
+			name:     "metrics"
+			port:     9100
+			protocol: "TCP"
+		}]
+	}
+}
+deployment: "node-exporter": {
+	spec: template: {
+		spec: {
+			containers: [{
+				ports: [{
+					containerPort: 9100
+					name:          "scrape"
+				}]
+			}]
+		}
+	}
+}
+service: [ID=string]: {
+	spec: {
+		ports: [...{
+			port:     int
+			protocol: *"TCP" | "UDP"
+			name:     string | *"client"
+		}]
+	}
+}
+deployment: [ID=string]: { }
+deployment: [ID=_]: _spec & {}
+_spec: {
+	_name: string
+	spec: template: {
+		spec: containers: [{name: _name}]
+	}
+}
+_spec: spec: template: spec: containers: [...{
+	ports: [...{
+		_export: *true | false // include the port in the service
+	}]
+}]
+for k, v in deployment {
+	service: "\(k)": {
+		spec: selector: v.spec.template.metadata.labels
+		spec: ports: [
+			for c in v.spec.template.spec.containers
+			for p in c.ports
+			if p._export {
+				let Port = p.containerPort // Port is an alias
+				port:       *Port | int
+				targetPort: *Port | int
+			},
+		]
+	}
+}
+-- out/eval --
+(struct){
+  service: (struct){
+    "node-exporter": (struct){
+      spec: (struct){
+        ports: (#list){
+          0: (struct){
+            name: (string){ "metrics" }
+            port: (int){ 9100 }
+            protocol: (string){ "TCP" }
+            targetPort: (int){ |(*(int){ 9100 }, (int){ int }) }
+          }
+        }
+        selector: (_|_){
+          // [incomplete] service."node-exporter".spec.selector: undefined field metadata:
+          //     ./in.cue:47:35
+        }
+      }
+    }
+  }
+  deployment: (struct){
+    "node-exporter": (struct){
+      spec: (struct){
+        template: (struct){
+          spec: (struct){
+            containers: (#list){
+              0: (struct){
+                ports: (#list){
+                  0: (struct){
+                    containerPort: (int){ 9100 }
+                    name: (string){ "scrape" }
+                    _export: (bool){ |(*(bool){ true }, (bool){ false }) }
+                  }
+                }
+                name: (string){ string }
+              }
+            }
+          }
+        }
+      }
+      _name: (string){ string }
+    }
+  }
+  _spec: (struct){
+    _name: (string){ string }
+    spec: (struct){
+      template: (struct){
+        spec: (struct){
+          containers: (#list){
+            0: (struct){
+              name: (string){ string }
+              ports: (list){
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  service: {
+    "node-exporter": {
+      spec: {
+        ports: [
+          {
+            name: "metrics"
+            port: 9100
+            protocol: "TCP"
+          },
+        ]
+      }
+    }
+  }
+  deployment: {
+    "node-exporter": {
+      spec: {
+        template: {
+          spec: {
+            containers: [
+              {
+                ports: [
+                  {
+                    containerPort: 9100
+                    name: "scrape"
+                  },
+                ]
+              },
+            ]
+          }
+        }
+      }
+    }
+  }
+  service: {
+    [string]: {
+      spec: {
+        ports: [
+          ...{
+            port: int
+            protocol: (*"TCP"|"UDP")
+            name: (string|*"client")
+          },
+        ]
+      }
+    }
+  }
+  deployment: {
+    [string]: {}
+  }
+  deployment: {
+    [_]: (〈1;_spec〉 & {})
+  }
+  _spec: {
+    _name: string
+    spec: {
+      template: {
+        spec: {
+          containers: [
+            {
+              name: 〈4;_name〉
+            },
+          ]
+        }
+      }
+    }
+  }
+  _spec: {
+    spec: {
+      template: {
+        spec: {
+          containers: [
+            ...{
+              ports: [
+                ...{
+                  _export: (*true|false)
+                },
+              ]
+            },
+          ]
+        }
+      }
+    }
+  }
+  for k, v in 〈0;deployment〉 {
+    service: {
+      "\(〈2;k〉)": {
+        spec: {
+          selector: 〈4;v〉.spec.template.metadata.labels
+        }
+        spec: {
+          ports: [
+            for _, c in 〈4;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export {
+              port: (*〈0;let Port〉|int)
+              targetPort: (*〈0;let Port〉|int)
+            },
+          ]
+        }
+      }
+    }
+  }
+}

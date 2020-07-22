@@ -188,6 +188,7 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 				Parent: v.Parent,
 				Value:  &adt.StructMarker{},
 				Arcs:   arcs,
+				Closed: result.Closed,
 			}
 		}
 		// *v = save // DO NOT ADD.
@@ -551,6 +552,34 @@ func (n *nodeContext) postDisjunct() {
 		}
 	}
 
+	n.updateClosedInfo()
+
+	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
+		n.node.Value = adt.CombineErrors(nil, n.node.Value, &adt.Bottom{
+			Code:  adt.StructuralCycleError,
+			Err:   ctx.Newf("structural cycle"),
+			Value: n.node.Value,
+			// TODO: probably, this should have the referenced arc.
+		})
+	} else {
+		// Visit arcs recursively to validate and compute error.
+		for _, a := range n.node.Arcs {
+			// Call UpdateStatus here to be absolutely sure the status is set
+			// correctly and that we are not regressing.
+			n.node.UpdateStatus(adt.EvaluatingArcs)
+			n.eval.Unify(ctx, a, adt.Finalized)
+			if err, _ := a.Value.(*adt.Bottom); err != nil {
+				n.node.AddChildError(err)
+			}
+		}
+	}
+
+	n.node.UpdateStatus(adt.Finalized)
+}
+
+func (n *nodeContext) updateClosedInfo() {
+	ctx := n.ctx
+
 	var c *CloseDef
 	if a, _ := n.node.Closed.(*acceptor); a != nil {
 		c = a.tree
@@ -559,7 +588,7 @@ func (n *nodeContext) postDisjunct() {
 
 	updated := updateClosed(c, n.replace)
 	if updated == nil && n.needClose {
-		updated = &CloseDef{}
+		updated = &CloseDef{Src: n.node}
 	}
 
 	// TODO retrieve from env.
@@ -584,8 +613,6 @@ func (n *nodeContext) postDisjunct() {
 		n.node.Closed = m
 	}
 
-	cyclic := n.hasCycle && !n.hasNonCycle
-
 	// Visit arcs recursively to validate and compute error.
 	for _, a := range n.node.Arcs {
 		if updated != nil {
@@ -605,27 +632,7 @@ func (n *nodeContext) postDisjunct() {
 			// or at least don't record recursive error.
 			// continue
 		}
-		// Call UpdateStatus here to be absolutely sure the status is set
-		// correctly and that we are not regressing.
-		if !cyclic {
-			n.node.UpdateStatus(adt.EvaluatingArcs)
-			n.eval.Unify(ctx, a, adt.Finalized)
-			if err, _ := a.Value.(*adt.Bottom); err != nil {
-				n.node.AddChildError(err)
-			}
-		}
 	}
-
-	if cyclic {
-		n.node.Value = adt.CombineErrors(nil, n.node.Value, &adt.Bottom{
-			Code:  adt.StructuralCycleError,
-			Err:   ctx.Newf("structural cycle"),
-			Value: n.node.Value,
-			// TODO: probably, this should have the referenced arc.
-		})
-	}
-
-	n.node.UpdateStatus(adt.Finalized)
 }
 
 // TODO: this is now a sentinel. Use a user-facing error that traces where
@@ -1112,7 +1119,7 @@ func (n *nodeContext) insertClosed(arc *adt.Vertex, id uint32, cyclic bool, dere
 	current, n.newClose = n.newClose, current
 
 	if current == nil {
-		current = &CloseDef{ID: id}
+		current = &CloseDef{ID: id, Src: arc}
 	}
 	n.addAnd(current)
 }
@@ -1315,7 +1322,7 @@ func (n *nodeContext) addStruct(
 
 	var hasOther, hasBulk adt.Node
 
-	opt := fieldSet{env: childEnv}
+	opt := fieldSet{pos: s, env: childEnv}
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
@@ -1352,7 +1359,7 @@ func (n *nodeContext) addStruct(
 			current, n.newClose = n.newClose, current
 
 			if current == nil {
-				current = &CloseDef{ID: id} // TODO: isClosed?
+				current = &CloseDef{Src: s, ID: id} // TODO: isClosed?
 			} else {
 				// n.needClose = true
 			}
@@ -1678,7 +1685,7 @@ outer:
 			continue
 		}
 
-		f := fieldSet{env: l.env}
+		f := fieldSet{pos: l.list, env: l.env}
 		f.AddEllipsis(c, l.elipsis)
 
 		n.optionals = append(n.optionals, f)

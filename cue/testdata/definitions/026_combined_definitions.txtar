@@ -118,8 +118,15 @@ d1: #D1 & {
 }
 -- out/eval --
 Errors:
-#D4.env: field `b` not allowed
-d1.env: field `c` not allowed
+#D4.env: field `b` not allowed:
+    ./in.cue:27:7
+    ./in.cue:30:1
+    ./in.cue:30:6
+d1.env: field `c` not allowed:
+    ./in.cue:2:1
+    ./in.cue:3:7
+    ./in.cue:4:7
+    ./in.cue:9:17
 
 Result:
 (_|_){
@@ -137,7 +144,11 @@ Result:
   d1: (_|_){
     // [eval]
     env: (_|_){
-      // [eval] d1.env: field `c` not allowed
+      // [eval] d1.env: field `c` not allowed:
+      //     ./in.cue:2:1
+      //     ./in.cue:3:7
+      //     ./in.cue:4:7
+      //     ./in.cue:9:17
       a: (string){ "A" }
       b: (string){ "B" }
       c: (string){ "C" }
@@ -160,7 +171,10 @@ Result:
   #D4: (_|_){
     // [eval]
     env: (_|_){
-      // [eval] #D4.env: field `b` not allowed
+      // [eval] #D4.env: field `b` not allowed:
+      //     ./in.cue:27:7
+      //     ./in.cue:30:1
+      //     ./in.cue:30:6
       a: (int){ int }
       b: (int){ int }
     }

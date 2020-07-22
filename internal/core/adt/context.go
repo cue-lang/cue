@@ -107,9 +107,10 @@ func New(v *Vertex, cfg *Config) *OpContext {
 type OpContext struct {
 	config
 
-	e    *Environment
-	src  ast.Node
-	errs *Bottom
+	e         *Environment
+	src       ast.Node
+	errs      *Bottom
+	positions []Node // keep track of error positions
 
 	// vertex is used to determine the path location in case of error. Turning
 	// this into a stack could also allow determining the cyclic path for

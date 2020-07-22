@@ -62,7 +62,11 @@ Junk: {
 }
 -- out/eval --
 Errors:
-listOfCloseds.0: field `b` not allowed
+listOfCloseds.0: field `b` not allowed:
+    ./in.cue:5:1
+    ./in.cue:5:10
+    ./in.cue:14:18
+    ./in.cue:15:20
 
 Result:
 (_|_){
@@ -70,7 +74,11 @@ Result:
   listOfCloseds: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] listOfCloseds.0: field `b` not allowed
+      // [eval] listOfCloseds.0: field `b` not allowed:
+      //     ./in.cue:5:1
+      //     ./in.cue:5:10
+      //     ./in.cue:14:18
+      //     ./in.cue:15:20
       a: (int){ |(*(int){ 0 }, (int){ int }) }
       b: (int){ 2 }
     }
@@ -79,7 +87,7 @@ Result:
     listOfCloseds: (list){
     }
   }
-  #Closed: (struct){
+  #Closed: (#struct){
     a: (int){ |(*(int){ 0 }, (int){ int }) }
   }
   Junk: (struct){

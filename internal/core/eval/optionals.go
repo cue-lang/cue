@@ -21,6 +21,8 @@ import "cuelang.org/go/internal/core/adt"
 // fieldSet represents the fields for a single struct literal, along
 // the constraints of fields that may be added.
 type fieldSet struct {
+	pos adt.Node
+
 	// TODO: look at consecutive identical environments to figure out
 	// what belongs to same definition?
 	env *adt.Environment

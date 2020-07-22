@@ -203,9 +203,10 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 
 // A valueError is returned as a result of evaluating a value.
 type valueError struct {
-	r   Runtime
-	v   *Vertex
-	pos []token.Pos
+	r      Runtime
+	v      *Vertex
+	pos    token.Pos
+	auxpos []token.Pos
 	errors.Message
 }
 
@@ -213,17 +214,45 @@ func (c *OpContext) errNode() *Vertex {
 	return c.vertex
 }
 
+// MarkPositions marks the current position stack.
+func (c *OpContext) MarkPositions() int {
+	return len(c.positions)
+}
+
+// ReleasePositions sets the position state to one from a call to MarkPositions.
+func (c *OpContext) ReleasePositions(p int) {
+	c.positions = c.positions[:p]
+}
+
+func (c *OpContext) AddPosition(n Node) {
+	c.positions = append(c.positions, n)
+}
+
 func (c *OpContext) Newf(format string, args ...interface{}) *valueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
 
-func (c *OpContext) NewPosf(pos token.Pos, format string, args ...interface{}) *valueError {
+func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *valueError {
+	var a []token.Pos
+	if len(c.positions) > 0 {
+		a = make([]token.Pos, 0, len(c.positions))
+		for _, n := range c.positions {
+			if p := pos(n); p != token.NoPos {
+				a = append(a, p)
+			} else if v, ok := n.(*Vertex); ok {
+				for _, c := range v.Conjuncts {
+					if p := pos(c.x); p != token.NoPos {
+						a = append(a, p)
+					}
+				}
+			}
+		}
+	}
 	return &valueError{
-		r: c.Runtime,
-		v: c.errNode(),
-		// TODO: leave ni if it can be derived from the source and save an
-		// allocation.
-		pos:     []token.Pos{pos},
+		r:       c.Runtime,
+		v:       c.errNode(),
+		pos:     p,
+		auxpos:  a,
 		Message: errors.NewMessage(format, args),
 	}
 }
@@ -233,15 +262,11 @@ func (e *valueError) Error() string {
 }
 
 func (e *valueError) Position() token.Pos {
-	if len(e.pos) == 0 {
-		// TODO: retrieve from source
-		return token.NoPos
-	}
-	return e.pos[0]
+	return e.pos
 }
 
-func (e *valueError) InputPositions() []token.Pos {
-	return e.pos
+func (e *valueError) InputPositions() (a []token.Pos) {
+	return e.auxpos
 }
 
 func (e *valueError) Path() (a []string) {

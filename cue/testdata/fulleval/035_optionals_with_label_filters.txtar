@@ -102,9 +102,21 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
 }
 -- out/eval --
 Errors:
-jobs1: field `foo1` not allowed
-jobs3: field `fooTest1` not allowed
-jobs3.fooTest1: field `cmd` not allowed
+jobs1: field `foo1` not allowed:
+    ./in.cue:6:8
+    ./in.cue:7:2
+    ./in.cue:9:2
+    ./in.cue:16:8
+jobs3: field `fooTest1` not allowed:
+    ./in.cue:6:8
+    ./in.cue:7:2
+    ./in.cue:9:2
+    ./in.cue:22:8
+    ./in.cue:23:8
+jobs3.fooTest1: field `cmd` not allowed:
+    ./in.cue:2:7
+    ./in.cue:6:8
+    ./in.cue:23:18
 jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
     ./in.cue:9:22
 
@@ -124,7 +136,11 @@ Result:
     }
   }
   jobs1: (_|_){
-    // [eval] jobs1: field `foo1` not allowed
+    // [eval] jobs1: field `foo1` not allowed:
+    //     ./in.cue:6:8
+    //     ./in.cue:7:2
+    //     ./in.cue:9:2
+    //     ./in.cue:16:8
     foo1: (#struct){
     }
   }
@@ -140,9 +156,17 @@ Result:
     }
   }
   jobs3: (_|_){
-    // [eval] jobs3: field `fooTest1` not allowed
+    // [eval] jobs3: field `fooTest1` not allowed:
+    //     ./in.cue:6:8
+    //     ./in.cue:7:2
+    //     ./in.cue:9:2
+    //     ./in.cue:22:8
+    //     ./in.cue:23:8
     fooTest1: (_|_){
-      // [eval] jobs3.fooTest1: field `cmd` not allowed
+      // [eval] jobs3.fooTest1: field `cmd` not allowed:
+      //     ./in.cue:2:7
+      //     ./in.cue:6:8
+      //     ./in.cue:23:18
       name: (string){ "badName" }
       cmd: (string){ string }
     }

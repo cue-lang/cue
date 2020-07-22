@@ -15,7 +15,10 @@ b: #A & {
 }
 -- out/eval --
 Errors:
-b: field `d` not allowed
+b: field `d` not allowed:
+    ./in.cue:1:5
+    ./in.cue:3:35
+    ./in.cue:11:9
 
 Result:
 (_|_){
@@ -27,7 +30,10 @@ Result:
     c: (int){ 3 }
   }
   b: (_|_){
-    // [eval] b: field `d` not allowed
+    // [eval] b: field `d` not allowed:
+    //     ./in.cue:1:5
+    //     ./in.cue:3:35
+    //     ./in.cue:11:9
     c: (int){ 3 }
     d: (int){ 4 }
   }

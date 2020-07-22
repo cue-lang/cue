@@ -114,7 +114,7 @@ func (a *acceptor) OptionalTypes() (mask adt.OptionalType) {
 // Acceptor. This could be implemented as an allocation-free wrapper type around
 // a Disjunction. This will require a bit more API cleaning, though.
 func newDisjunctionAcceptor(x *adt.Disjunction) adt.Acceptor {
-	tree := &CloseDef{}
+	tree := &CloseDef{Src: x}
 	sets := []fieldSet{}
 	for _, d := range x.Values {
 		if a, _ := d.Closed.(*acceptor); a != nil {
@@ -142,6 +142,7 @@ func newDisjunctionAcceptor(x *adt.Disjunction) adt.Acceptor {
 // of the set of allowed fields in that case and the embeddings will not add
 // any value.
 type CloseDef struct {
+	Src   adt.Node // for error reporting
 	ID    uint32
 	IsAnd bool
 	List  []*CloseDef
@@ -216,7 +217,7 @@ func updateClosedRec(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef {
 		return buf[0]
 	}
 
-	return &CloseDef{ID: c.ID, IsAnd: c.IsAnd, List: buf[:k]}
+	return &CloseDef{Src: c.Src, ID: c.ID, IsAnd: c.IsAnd, List: buf[:k]}
 }
 
 // UpdateReplace is called after evaluating a conjunct at the top of the arc
@@ -313,6 +314,8 @@ func (n *nodeContext) addOr(parentID uint32, c *CloseDef) { // used in eval.go
 // "and" semantics of conjunctions. It generates an error if a field is not
 // allowed.
 func (n *acceptor) verifyArcAllowed(ctx *adt.OpContext, f adt.Feature) *adt.Bottom {
+	defer ctx.ReleasePositions(ctx.MarkPositions())
+
 	// TODO(perf): this will also generate a message for f == 0. Do something
 	// more clever and only generate this when it is a user error.
 	filter := f.IsString() || f == adt.InvalidLabel
@@ -367,5 +370,20 @@ func (n *acceptor) verifyDefinition(ctx *adt.OpContext, closeID uint32, f adt.Fe
 			}
 		}
 	}
+	collectPositions(ctx, n.tree)
+	for _, o := range n.fields {
+		if o.pos != nil {
+			ctx.AddPosition(o.pos)
+		}
+	}
 	return false
+}
+
+func collectPositions(ctx *adt.OpContext, c *CloseDef) {
+	if c.Src != nil {
+		ctx.AddPosition(c.Src)
+	}
+	for _, x := range c.List {
+		collectPositions(ctx, x)
+	}
 }

@@ -45,7 +45,7 @@
 // it refers. If the copied value itself contains references we can distinguish
 // two different cases. References that refer to values within the copied
 // reference (not regarding selectors) will henceforth point to the copied node.
-// References that point to outside the referened value will keep refering to
+// References that point to outside the referened value will keep referring to
 // their original value.
 //
 //      a: b: {

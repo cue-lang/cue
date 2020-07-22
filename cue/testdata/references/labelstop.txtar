@@ -1,4 +1,4 @@
-TODO: add maching when bulk optional fields are allowed
+TODO: add matching when bulk optional fields are allowed
 alongside other fields.
 -- in.cue --
 {[X=string]: baz: X}

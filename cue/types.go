@@ -1453,7 +1453,7 @@ func (v Value) LookupDef(name string) Value {
 		}
 	}
 	return newErrValue(v, ctx.mkErr(v.v.v,
-		"defintion %q not found", name))
+		"definition %q not found", name))
 }
 
 var errNotFound = errors.Newf(token.NoPos, "field not found")
@@ -1989,7 +1989,7 @@ func (x *validator) before(v Value, o options) bool {
 func (x *validator) walk(v Value, opts options) {
 	// TODO(#42): we can get rid of the arbitrary evaluation depth once CUE has
 	// proper structural cycle detection. See Issue #42. Currently errors
-	// occuring at a depth > internal.MaxDepth will not be detected.
+	// occurring at a depth > internal.MaxDepth will not be detected.
 	if x.depth > internal.MaxDepth {
 		return
 	}

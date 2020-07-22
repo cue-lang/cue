@@ -549,7 +549,7 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 	}
 
 	for i, v := range disjuncts {
-		// In OpenAPI schema are open by default. To ensure forward compability,
+		// In OpenAPI schema are open by default. To ensure forward compatibility,
 		// we do not represent closed structs with additionalProperties: false
 		// (this is discouraged and often disallowed by implementions), but
 		// rather enforce this by ensuring uniqueness of the disjuncts.

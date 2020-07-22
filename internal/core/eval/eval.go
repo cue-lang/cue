@@ -1068,7 +1068,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 // addStruct collates the declarations of a struct.
 //
 // addStruct fulfills two additional pivotal functions:
-//   1) Implement vertex unification (this happends through De Bruijn indices
+//   1) Implement vertex unification (this happens through De Bruijn indices
 //      combined with proper set up of Environments).
 //   2) Implied closedness for definitions.
 //

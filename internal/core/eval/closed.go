@@ -63,7 +63,7 @@ import (
 //    }
 //
 // At the point of evaluating `a`, the struct is not yet closed. However,
-// descending into `d` will trigger the inclusion of defintions which in turn
+// descending into `d` will trigger the inclusion of definitions which in turn
 // causes the struct to be closed. At this point, it is important to know that
 // `b` originated from an embedding, as otherwise `e` may not be allowed.
 //
@@ -319,7 +319,7 @@ func (n *acceptor) verifyArcRecursive(ctx *adt.OpContext, c *CloseDef, f adt.Fea
 	return false
 }
 
-// verifyDefintion reports whether f is a valid member for any of the fieldSets
+// verifyDefinition reports whether f is a valid member for any of the fieldSets
 // with the same closeID.
 func (n *acceptor) verifyDefinition(ctx *adt.OpContext, closeID uint32, f adt.Feature) (ok bool) {
 	for _, o := range n.fields {

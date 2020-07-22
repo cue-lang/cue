@@ -105,7 +105,7 @@ func (t *Test) Value(key string) (value string, ok bool) {
 	return "", false
 }
 
-// Bool searchs for a line starting with #key: value in the comment and
+// Bool searches for a line starting with #key: value in the comment and
 // returns true if the key exists and the value is true.
 func (t *Test) Bool(key string) bool {
 	s, ok := t.Value(key)

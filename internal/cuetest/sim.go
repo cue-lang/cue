@@ -75,7 +75,7 @@ func Run(t *testing.T, dir, command string, cfg *Config) {
 	}
 	if err = cmd.Run(context.Background()); err != nil {
 		if cfg.Stdout == nil {
-			logf(t, "Ouput:\n%s", buf.String())
+			logf(t, "Output:\n%s", buf.String())
 		}
 		logf(t, "Execution failed: %v", err)
 	}

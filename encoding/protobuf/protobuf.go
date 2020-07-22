@@ -35,7 +35,7 @@
 //
 // Type Mappings
 //
-// The following type mappings of defintions apply:
+// The following type mappings of definitions apply:
 //
 //   Proto type     CUE type/def     Comments
 //   message        struct           Message fields become CUE fields, whereby

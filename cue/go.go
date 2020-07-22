@@ -103,7 +103,7 @@ func isOptional(f *reflect.StructField) bool {
 	switch f.Type.Kind() {
 	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
 		// Note: it may be confusing to distinguish between an empty slice and
-		// a nil slice. However, it is also surprizing to not be able to specify
+		// a nil slice. However, it is also surprising to not be able to specify
 		// a default value for a slice. So for now we will allow it.
 		isOptional = true
 	}
@@ -135,7 +135,7 @@ func isOmitEmpty(f *reflect.StructField) bool {
 	switch f.Type.Kind() {
 	case reflect.Ptr, reflect.Map, reflect.Chan, reflect.Interface, reflect.Slice:
 		// Note: it may be confusing to distinguish between an empty slice and
-		// a nil slice. However, it is also surprizing to not be able to specify
+		// a nil slice. However, it is also surprising to not be able to specify
 		// a default value for a slice. So for now we will allow it.
 		isOmitEmpty = true
 

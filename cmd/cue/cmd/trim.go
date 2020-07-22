@@ -40,7 +40,7 @@ func newTrimCmd(c *Command) *cobra.Command {
 		Long: `trim removes fields from structs that can be inferred from constraints
 
 A field, struct, or list is removed if it is implied by a constraint, such
-as from an optional field maching a required field, a list type value,
+as from an optional field matching a required field, a list type value,
 a comprehension or any other implied content. It will modify the files in place.
 
 

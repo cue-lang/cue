@@ -609,7 +609,7 @@ func (v *astVisitor) walk(astNode ast.Node) (ret value) {
 
 		// Allow different names to refer to the same field in unification. We
 		// do this by anonymizing the the reference. This then has to be
-		// resolved again when refering to lambdas.
+		// resolved again when referring to lambdas.
 		l, lambda := n2.(*lambdaExpr)
 		if lambda && len(l.params.arcs) == 1 {
 			f = 0

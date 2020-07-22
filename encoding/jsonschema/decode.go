@@ -564,7 +564,7 @@ func (s *state) schemaState(n cue.Value, types cue.Kind, idRef []label, isLogica
 			c := constraintMap[key]
 			if c == nil {
 				if pass == 0 && s.cfg.Strict {
-					// TODO: value is not the correct possition, albeit close. Fix this.
+					// TODO: value is not the correct position, albeit close. Fix this.
 					s.warnf(value.Pos(), "unsupported constraint %q", key)
 				}
 				return

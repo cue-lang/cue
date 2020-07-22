@@ -14,7 +14,7 @@
 
 // Package net provides net-related type definitions.
 //
-// The IP-related defintions can be represented as either a string or a list of
+// The IP-related definitions can be represented as either a string or a list of
 // byte values. To allow one format over an other these types can be further
 // constraint using string or [...]. For instance,
 //

@@ -178,6 +178,7 @@ func (c *OpContext) relNode(upCount int32) *Vertex {
 	for ; upCount > 0; upCount-- {
 		e = e.Up
 	}
+	c.Unify(c, e.Vertex, Partial)
 	return e.Vertex
 }
 
@@ -614,15 +615,17 @@ func (c *OpContext) node(x Expr, state VertexStatus) *Vertex {
 		if isError(v) {
 			if v == nil {
 				c.addErrf(IncompleteError, pos(x), "incomplete value %s", c.Str(x))
+				return emptyNode
 			}
-			return emptyNode
 		}
 		if v.Kind()&StructKind != 0 {
 			c.addErrf(IncompleteError, pos(x),
 				"incomplete feed source value %s (type %s)",
 				x.Source(), v.Kind())
+		} else if b, ok := v.(*Bottom); ok {
+			c.AddBottom(b)
 		} else {
-			c.addErrf(0, pos(x),
+			c.addErrf(0, pos(x), // TODO(error): better message.
 				"invalid operand %s (found %s, want list or struct)",
 				x.Source(), v.Kind())
 

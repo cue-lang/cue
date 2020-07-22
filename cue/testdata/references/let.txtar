@@ -1,0 +1,214 @@
+-- in.cue --
+
+a1list: [{1}]
+let A1 = a1list
+a1: 100*A1[0] + A1[0]
+
+a2list: [{2}]
+let A2 = a2list
+a2: b: 100*A2[0] + A2[0]
+
+a3list: [{3}]
+let A3 = a3list
+a3: b: c: 100*A3[0] + A3[0]
+
+a4list: [{4}]
+let A4 = a4list
+a4: [ for x in A4 { v: 404 } ]
+
+a5list: [{5}]
+let A5 = a5list
+a5: b: [ for x in A5 { v: 505 } ]
+
+a6list: [{6}]
+let A6 = a6list
+a6: b: c: [ for x in A6 { v: 606 } ]
+
+a7list: [{7}]
+let A7 = a7list
+a7: { for x in A7 { v: 707 } }
+
+a8list: [{8}]
+let A8 = a8list
+a8: b: { for x in A8 { v: 808 } }
+
+a9list: [{9}]
+let A9 = a9list
+a9: b: c: { for x in A9 { v: 909 } }
+
+
+-- out/compile --
+--- in.cue
+{
+  a1list: [
+    {
+      1
+    },
+  ]
+  a1: ((100 * 〈0;let A1〉[0]) + 〈0;let A1〉[0])
+  a2list: [
+    {
+      2
+    },
+  ]
+  a2: {
+    b: ((100 * 〈1;let A2〉[0]) + 〈1;let A2〉[0])
+  }
+  a3list: [
+    {
+      3
+    },
+  ]
+  a3: {
+    b: {
+      c: ((100 * 〈2;let A3〉[0]) + 〈2;let A3〉[0])
+    }
+  }
+  a4list: [
+    {
+      4
+    },
+  ]
+  a4: [
+    for _, x in 〈0;let A4〉 {
+      v: 404
+    },
+  ]
+  a5list: [
+    {
+      5
+    },
+  ]
+  a5: {
+    b: [
+      for _, x in 〈1;let A5〉 {
+        v: 505
+      },
+    ]
+  }
+  a6list: [
+    {
+      6
+    },
+  ]
+  a6: {
+    b: {
+      c: [
+        for _, x in 〈2;let A6〉 {
+          v: 606
+        },
+      ]
+    }
+  }
+  a7list: [
+    {
+      7
+    },
+  ]
+  a7: {
+    for _, x in 〈1;let A7〉 {
+      v: 707
+    }
+  }
+  a8list: [
+    {
+      8
+    },
+  ]
+  a8: {
+    b: {
+      for _, x in 〈2;let A8〉 {
+        v: 808
+      }
+    }
+  }
+  a9list: [
+    {
+      9
+    },
+  ]
+  a9: {
+    b: {
+      c: {
+        for _, x in 〈3;let A9〉 {
+          v: 909
+        }
+      }
+    }
+  }
+}
+-- out/eval --
+(struct){
+  a1list: (#list){
+    0: (int){ 1 }
+  }
+  a1: (int){ 101 }
+  a2list: (#list){
+    0: (int){ 2 }
+  }
+  a2: (struct){
+    b: (int){ 202 }
+  }
+  a3list: (#list){
+    0: (int){ 3 }
+  }
+  a3: (struct){
+    b: (struct){
+      c: (int){ 303 }
+    }
+  }
+  a4list: (#list){
+    0: (int){ 4 }
+  }
+  a4: (#list){
+    0: (struct){
+      v: (int){ 404 }
+    }
+  }
+  a5list: (#list){
+    0: (int){ 5 }
+  }
+  a5: (struct){
+    b: (#list){
+      0: (struct){
+        v: (int){ 505 }
+      }
+    }
+  }
+  a6list: (#list){
+    0: (int){ 6 }
+  }
+  a6: (struct){
+    b: (struct){
+      c: (#list){
+        0: (struct){
+          v: (int){ 606 }
+        }
+      }
+    }
+  }
+  a7list: (#list){
+    0: (int){ 7 }
+  }
+  a7: (struct){
+    v: (int){ 707 }
+  }
+  a8list: (#list){
+    0: (int){ 8 }
+  }
+  a8: (struct){
+    b: (struct){
+      v: (int){ 808 }
+    }
+  }
+  a9list: (#list){
+    0: (int){ 9 }
+  }
+  a9: (struct){
+    b: (struct){
+      c: (struct){
+        v: (int){ 909 }
+      }
+    }
+  }
+}

@@ -246,6 +246,10 @@ e3.b.c: conflicting types list and struct
 e3.b.c: structural cycle
 z1.z.f.h.h: structural cycle
 z1.z.g.h: structural cycle
+b4.x.y.0: structural cycle:
+    ./in.cue:41:8
+d2.a.b.c.d.t: structural cycle:
+    ./in.cue:79:8
 d2.r: structural cycle:
     ./in.cue:79:8
 
@@ -321,7 +325,8 @@ Result:
   b4: (_|_){
     // [structural cycle]
     b: (_|_){
-      // [structural cycle]
+      // [structural cycle] b4.x.y.0: structural cycle:
+      //     ./in.cue:41:8
       0: (int){ 1 }
     }
     x: (_|_){
@@ -448,13 +453,14 @@ Result:
       }
     }
     x: (_|_){
-      // [structural cycle]
+      // [structural cycle] d1.a.b.c.d.t: structural cycle
     }
   }
   d2: (_|_){
     // [structural cycle]
     x: (_|_){
-      // [structural cycle]
+      // [structural cycle] d2.a.b.c.d.t: structural cycle:
+      //     ./in.cue:79:8
     }
     r: (_|_){
       // [structural cycle] d2.r: structural cycle:

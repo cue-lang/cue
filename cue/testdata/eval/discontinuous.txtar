@@ -1,0 +1,76 @@
+This test tests a case where a child node needs to be evaluated
+before evaluating a parent has completed.
+
+-- in.cue --
+a: [ for c in foo.bar.baz {
+	c
+}]
+
+a: [{name: "http"}]
+
+foo: {
+	x.D
+
+	bar: baz: [{port: 8080}]
+}
+
+x: {
+	D: bar: DSpec
+	DSpec: {}
+}
+-- out/compile --
+--- in.cue
+{
+  a: [
+    for _, c in 〈0;foo〉.bar.baz {
+      〈1;c〉
+    },
+  ]
+  a: [
+    {
+      name: "http"
+    },
+  ]
+  foo: {
+    〈1;x〉.D
+    bar: {
+      baz: [
+        {
+          port: 8080
+        },
+      ]
+    }
+  }
+  x: {
+    D: {
+      bar: 〈1;DSpec〉
+    }
+    DSpec: {}
+  }
+}
+-- out/eval --
+(struct){
+  a: (#list){
+    0: (struct){
+      port: (int){ 8080 }
+      name: (string){ "http" }
+    }
+  }
+  foo: (struct){
+    bar: (struct){
+      baz: (#list){
+        0: (struct){
+          port: (int){ 8080 }
+        }
+      }
+    }
+  }
+  x: (struct){
+    D: (struct){
+      bar: (struct){
+      }
+    }
+    DSpec: (struct){
+    }
+  }
+}

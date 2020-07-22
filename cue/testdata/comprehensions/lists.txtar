@@ -1,0 +1,45 @@
+-- in.cue --
+
+a: [{a: 1}, {b: 2 & 3}]
+
+b: [ for x in a { x } ]
+-- out/eval --
+Errors:
+a.1.b: incompatible values 3 and 2
+
+Result:
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval]
+    0: (struct){
+      a: (int){ 1 }
+    }
+    1: (_|_){
+      // [eval]
+      b: (_|_){
+        // [eval] a.1.b: incompatible values 3 and 2
+      }
+    }
+  }
+  b: (_|_){
+    // [eval] a.1.b: incompatible values 3 and 2
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: [
+    {
+      a: 1
+    },
+    {
+      b: (2 & 3)
+    },
+  ]
+  b: [
+    for _, x in 〈0;a〉 {
+      〈1;x〉
+    },
+  ]
+}

@@ -137,7 +137,10 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		if e.cache == nil {
 			e.cache = map[Expr]Value{}
 		}
+		env, src := c.e, c.src
+		c.e, c.src = e, x.Source()
 		v = c.eval(x)
+		c.e, c.src = env, src
 		e.cache[x] = v
 	}
 	return v

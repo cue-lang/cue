@@ -1610,8 +1610,8 @@ outer:
 					n.insertField(label, adt.MakeConjunct(e, st))
 				})
 				hasComprehension = true
-				if err.IsIncomplete() {
-
+				if err != nil && !err.IsIncomplete() {
+					n.addBottom(err)
 				}
 
 			case *adt.Ellipsis:

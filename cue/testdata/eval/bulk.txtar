@@ -12,8 +12,36 @@ d: a & {
 	}
 }
 
+t1: {
+  #a: {
+    [>"e" & <"z"]: int
+  }
+  b: #a & { f: 4 }
+  c: #a & { z: 4 }
+}
+
+t2: {
+  #a: {
+    ["x" | "y"]: int
+  }
+  b: #a & { x: 4 }
+  c: #a & { z: 4 }
+}
+
 -- out/eval --
-(struct){
+Errors:
+t1.c: field `z` not allowed:
+    ./in.cue:15:3
+    ./in.cue:15:7
+    ./in.cue:19:11
+t2.c: field `z` not allowed:
+    ./in.cue:23:3
+    ./in.cue:23:7
+    ./in.cue:27:11
+
+Result:
+(_|_){
+  // [eval]
   a: (struct){
     foo: (struct){
       a: (int){ 1 }
@@ -27,6 +55,36 @@ d: a & {
       c: (int){ 2 }
       b: (int){ 1 }
       name: (string){ "foobar" }
+    }
+  }
+  t1: (_|_){
+    // [eval]
+    #a: (#struct){
+    }
+    b: (#struct){
+      f: (int){ 4 }
+    }
+    c: (_|_){
+      // [eval] t1.c: field `z` not allowed:
+      //     ./in.cue:15:3
+      //     ./in.cue:15:7
+      //     ./in.cue:19:11
+      z: (int){ 4 }
+    }
+  }
+  t2: (_|_){
+    // [eval]
+    #a: (#struct){
+    }
+    b: (#struct){
+      x: (int){ 4 }
+    }
+    c: (_|_){
+      // [eval] t2.c: field `z` not allowed:
+      //     ./in.cue:23:3
+      //     ./in.cue:23:7
+      //     ./in.cue:27:11
+      z: (int){ 4 }
     }
   }
 }
@@ -47,4 +105,26 @@ d: a & {
       c: 2
     }
   })
+  t1: {
+    #a: {
+      [(>"e" & <"z")]: int
+    }
+    b: (〈0;#a〉 & {
+      f: 4
+    })
+    c: (〈0;#a〉 & {
+      z: 4
+    })
+  }
+  t2: {
+    #a: {
+      [("x"|"y")]: int
+    }
+    b: (〈0;#a〉 & {
+      x: 4
+    })
+    c: (〈0;#a〉 & {
+      z: 4
+    })
+  }
 }

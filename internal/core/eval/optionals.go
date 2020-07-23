@@ -16,7 +16,9 @@ package eval
 
 // TODO: rename this file to fieldset.go
 
-import "cuelang.org/go/internal/core/adt"
+import (
+	"cuelang.org/go/internal/core/adt"
+)
 
 // fieldSet represents the fields for a single struct literal, along
 // the constraints of fields that may be added.
@@ -169,33 +171,22 @@ func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
 		// TODO: handle dynamically
 		return
 	}
-	switch f := v.(type) {
-	case *adt.Num:
-		// Just assert an error. Lists have not been expanded yet at
-		// this point, so there is no need to check for existing
-		//fields.
-		l, err := adt.MakeLabel(x.Src, c.Int64(f), adt.IntLabel)
-		if err != nil {
-			c.AddErr(err)
-			return
-		}
-		o.bulk = append(o.bulk, bulkField{labelMatcher(l), x})
 
+	if m := o.getMatcher(c, v); m != nil {
+		o.bulk = append(o.bulk, bulkField{m, x})
+	}
+}
+
+func (o *fieldSet) getMatcher(c *adt.OpContext, v adt.Value) fieldMatcher {
+	switch f := v.(type) {
 	case *adt.Top:
-		o.bulk = append(o.bulk, bulkField{typeMatcher(adt.TopKind), x})
+		return typeMatcher(adt.TopKind)
 
 	case *adt.BasicType:
-		o.bulk = append(o.bulk, bulkField{typeMatcher(f.K), x})
-
-	case *adt.String:
-		l := c.Label(f)
-		o.bulk = append(o.bulk, bulkField{labelMatcher(l), x})
-
-	case adt.Validator:
-		o.bulk = append(o.bulk, bulkField{validateMatcher{f}, x})
+		return typeMatcher(f.K)
 
 	default:
-		// TODO(err): not allowed type
+		return o.newPatternMatcher(c, v)
 	}
 }
 
@@ -212,12 +203,6 @@ type fieldMatcher interface {
 	Match(c *adt.OpContext, f adt.Feature) bool
 }
 
-type labelMatcher adt.Feature
-
-func (m labelMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
-	return adt.Feature(m) == f
-}
-
 type typeMatcher adt.Kind
 
 func (m typeMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
@@ -229,15 +214,6 @@ func (m typeMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 		return adt.Kind(m)&adt.IntKind != 0
 	}
 	return false
-}
-
-type validateMatcher struct {
-	adt.Validator
-}
-
-func (m validateMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
-	v := f.ToValue(c)
-	return c.Validate(m.Validator, v) == nil
 }
 
 type dynamicMatcher struct {
@@ -258,4 +234,21 @@ func (m dynamicMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 		return false
 	}
 	return f.SelectorString(c) == s.Str
+}
+
+type patternMatcher adt.Conjunct
+
+func (m patternMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
+	v := adt.Vertex{}
+	v.AddConjunct(adt.Conjunct(m))
+	label := f.ToValue(c)
+	v.AddConjunct(adt.MakeConjunct(m.Env, label))
+	v.Finalize(c)
+	b, _ := v.Value.(*adt.Bottom)
+	return b == nil
+}
+
+func (o *fieldSet) newPatternMatcher(ctx *adt.OpContext, x adt.Value) fieldMatcher {
+	c := adt.MakeConjunct(o.env, x)
+	return patternMatcher(c)
 }

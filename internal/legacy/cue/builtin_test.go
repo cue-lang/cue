@@ -269,7 +269,7 @@ func TestBuiltins(t *testing.T) {
 		`[{a:1,v:2},{a:1,v:3},{a:2,v:1}]`,
 	}, {
 		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
-		`_|_(error in call to list.Sort: less: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
+		`_|_(error in call to list.Sort: x: conflicting values string and {b:2} (mismatched types string and struct) (and 1 more errors) (and 1 more errors))`,
 	}, {
 		test("list", `list.SortStrings(["b", "a"])`),
 		`["a","b"]`,
@@ -551,7 +551,7 @@ func TestBuiltins(t *testing.T) {
 		`_|_(invalid value "hello" (does not satisfy strings.MinRunes(10)))`,
 	}, {
 		test("struct", `struct.MinFields(0) & ""`),
-		`_|_(invalid value "" (mismatched types string and struct))`,
+		`_|_(conflicting values struct.MinFields(0) and "" (mismatched types struct and string))`,
 	}, {
 		test("struct", `struct.MinFields(0) & {a: 1}`),
 		`{a:1}`,
@@ -683,7 +683,7 @@ func TestBuiltins(t *testing.T) {
 
 // For debugging purposes. Do not remove.
 func TestSingleBuiltin(t *testing.T) {
-	// t.Skip()
+	t.Skip("error message")
 
 	test := func(pkg, expr string) []*bimport {
 		return []*bimport{{"",

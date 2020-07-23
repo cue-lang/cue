@@ -790,10 +790,10 @@ func (x *UnaryExpr) evaluate(c *OpContext) Value {
 	}
 	if k&expectedKind != BottomKind {
 		c.addErrf(IncompleteError, pos(x.X),
-			"operand %s of '%s' not concrete (was %s)", c.Str(x), op, k)
+			"operand %s of '%s' not concrete (was %s)", c.Str(x.X), op, k)
 		return nil
 	}
-	return c.NewErrf("invalid operation %s%s (%s %s)", op, c.Str(x), op, k)
+	return c.NewErrf("invalid operation %s (%s %s)", c.Str(x), op, k)
 }
 
 // BinaryExpr is a binary expression.

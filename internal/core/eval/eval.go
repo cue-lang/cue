@@ -424,10 +424,12 @@ func (n *nodeContext) postDisjunct() {
 	for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
 	}
 
-	// TODO: preparation for association lists:
-	// We assume that association types may not be created dynamically for now.
-	// So we add lists
-	n.addLists(ctx)
+	if aList := n.addLists(ctx); aList != nil {
+		n.updateNodeType(adt.ListKind, aList)
+	}
+	if n.aStruct != nil {
+		n.updateNodeType(adt.StructKind, n.aStruct)
+	}
 
 	switch err := n.getErr(); {
 	case err != nil:
@@ -473,37 +475,19 @@ func (n *nodeContext) postDisjunct() {
 
 		// Either set to Conjunction or error.
 		var v adt.Value = n.node.Value
-		kind := n.kind
+		// TODO: verify and simplify the below code to determine whether
+		// something is a struct.
 		markStruct := false
-		if n.isStruct {
-			if kind != 0 && kind&adt.StructKind == 0 {
-				n.node.Value = n.ctx.NewErrf(
-					"conflicting values struct and %s", n.kind)
-			}
+		if n.aStruct != nil {
 			markStruct = true
 		} else if len(n.node.Structs) > 0 {
-			markStruct = kind&adt.StructKind != 0 && !n.hasTop
+			markStruct = n.kind&adt.StructKind != 0 && !n.hasTop
 		}
 		if v == nil && markStruct {
-			kind = adt.StructKind
 			n.node.Value = &adt.StructMarker{}
 			v = n.node
 		}
 		if v != nil && adt.IsConcrete(v) {
-			if n.scalar != nil {
-				kind = n.scalar.Kind()
-			}
-			if v.Kind()&^kind != 0 {
-				p := token.NoPos
-				if src := v.Source(); src != nil {
-					p = src.Pos()
-				}
-				n.addErr(ctx.NewPosf(p,
-					// TODO(errors): position of all value types.
-					"conflicting types %v and %v",
-					v.Kind(), n.kind,
-				))
-			}
 			if n.lowerBound != nil {
 				if b := ctx.Validate(n.lowerBound, v); b != nil {
 					n.addBottom(b)
@@ -722,6 +706,7 @@ type nodeContext struct {
 
 	// Concrete conjuncts
 	kind       adt.Kind
+	kindExpr   adt.Expr        // expr that adjust last value (for error reporting)
 	lowerBound *adt.BoundValue // > or >=
 	upperBound *adt.BoundValue // < or <=
 	checks     []adt.Validator // BuiltinValidator, other bound values.
@@ -739,7 +724,7 @@ type nodeContext struct {
 	// - parent node is closing
 	needClose bool
 	openList  bool
-	isStruct  bool
+	aStruct   adt.Expr
 	hasTop    bool
 	newClose  *CloseDef
 	// closeID   uint32 // from parent, or if not exist, new if introducing a def.
@@ -757,6 +742,32 @@ type nodeContext struct {
 	disjunctions []envDisjunct
 	defaultMode  defaultMode
 	isFinal      bool
+}
+
+func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr) bool {
+	ctx := n.ctx
+	kind := n.kind & k
+
+	switch {
+	case n.kind == adt.BottomKind,
+		k == adt.BottomKind:
+		return false
+
+	case kind == adt.BottomKind:
+		if n.kindExpr != nil {
+			n.addErr(ctx.Newf(
+				"conflicting values %s and %s (mismatched types %s and %s)",
+				ctx.Str(n.kindExpr), ctx.Str(v), n.kind, k))
+		} else {
+			n.addErr(ctx.Newf(
+				"conflicting value %s (mismatched types %s and %s)",
+				ctx.Str(v), n.kind, k))
+		}
+	}
+
+	n.kind = kind
+	n.kindExpr = v
+	return kind != adt.BottomKind
 }
 
 func (n *nodeContext) done() bool {
@@ -825,9 +836,7 @@ func (n *nodeContext) getValidators() adt.Value {
 		// Src is the combined input.
 		v = &adt.BasicType{K: n.kind}
 
-		// TODO: Change to isStruct?
 		if len(n.node.Structs) > 0 {
-			// n.isStruct = true
 			v = structSentinel
 
 		}
@@ -1130,7 +1139,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 	if x, ok := v.(*adt.Vertex); ok {
 		needClose := false
 		if isStruct(x) {
-			n.isStruct = true
+			n.aStruct = x
 			// TODO: find better way to mark as struct.
 			// For instance, we may want to add a faux
 			// Structlit for topological sort.
@@ -1167,6 +1176,9 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 
 		case *adt.StructMarker:
 			for _, a := range x.Arcs {
+				if a.Label.IsString() {
+					n.aStruct = x
+				}
 				// TODO, insert here as
 				n.insertField(a.Label, adt.MakeConjunct(nil, a))
 				// sub, _ := n.node.GetArc(a.Label)
@@ -1177,7 +1189,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 			n.addValueConjunct(env, v)
 
 			for _, a := range x.Arcs {
-				// TODO, insert here as
+				// TODO(errors): report error when this is a regular field.
 				n.insertField(a.Label, adt.MakeConjunct(nil, a))
 				// sub, _ := n.node.GetArc(a.Label)
 				// sub.Add(a)
@@ -1193,16 +1205,11 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 		return
 	}
 
-	ctx := n.ctx
-	kind := n.kind & v.Kind()
-	if kind == adt.BottomKind {
-		// TODO: how to get other conflicting values?
-		n.addErr(ctx.Newf(
-			"invalid value %s (mismatched types %s and %s)",
-			ctx.Str(v), v.Kind(), n.kind))
+	if !n.updateNodeType(v.Kind(), v) {
 		return
 	}
-	n.kind = kind
+
+	ctx := n.ctx
 
 	switch x := v.(type) {
 	case *adt.Disjunction:
@@ -1219,6 +1226,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value) {
 		n.optionals = append(n.optionals, fieldSet{env: env, isOpen: true})
 
 	case *adt.BasicType:
+		// handled above
 
 	case *adt.BoundValue:
 		switch x.Op {
@@ -1321,6 +1329,7 @@ func (n *nodeContext) addStruct(
 	}
 
 	var hasOther, hasBulk adt.Node
+	hasEmbed := false
 
 	opt := fieldSet{pos: s, env: childEnv}
 
@@ -1331,9 +1340,13 @@ func (n *nodeContext) addStruct(
 			// handle in next iteration.
 
 		case *adt.OptionalField:
+			if x.Label.IsString() {
+				n.aStruct = s
+			}
 			opt.AddOptional(ctx, x)
 
 		case *adt.DynamicField:
+			n.aStruct = s
 			hasOther = x
 			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x})
 			opt.AddDynamic(ctx, childEnv, x)
@@ -1347,6 +1360,8 @@ func (n *nodeContext) addStruct(
 			n.ifClauses = append(n.ifClauses, envYield{childEnv, x})
 
 		case adt.Expr:
+			hasEmbed = true
+
 			// push and opo embedding type.
 			id := n.eval.nextID()
 
@@ -1366,10 +1381,12 @@ func (n *nodeContext) addStruct(
 			n.addOr(closeID, current)
 
 		case *adt.BulkOptionalField:
+			n.aStruct = s
 			hasBulk = x
 			opt.AddBulk(ctx, x)
 
 		case *adt.Ellipsis:
+			n.aStruct = s
 			hasBulk = x
 			opt.AddEllipsis(ctx, x)
 
@@ -1380,6 +1397,10 @@ func (n *nodeContext) addStruct(
 
 	if hasBulk != nil && hasOther != nil {
 		n.addErr(ctx.Newf("cannot mix bulk optional fields with dynamic fields, embeddings, or comprehensions within the same struct"))
+	}
+
+	if !hasEmbed {
+		n.aStruct = s
 	}
 
 	// Apply existing fields
@@ -1393,6 +1414,9 @@ func (n *nodeContext) addStruct(
 	for _, d := range s.Decls {
 		switch x := d.(type) {
 		case *adt.Field:
+			if x.Label.IsString() {
+				n.aStruct = s
+			}
 			n.insertField(x.Label, adt.MakeConjunct(childEnv, x))
 		}
 	}
@@ -1401,10 +1425,6 @@ func (n *nodeContext) addStruct(
 func (n *nodeContext) insertField(f adt.Feature, x adt.Conjunct) *adt.Vertex {
 	ctx := n.ctx
 	arc, isNew := n.node.GetArc(f)
-
-	if f.IsString() {
-		n.isStruct = true
-	}
 
 	// TODO: disallow adding conjuncts when cache set?
 	arc.AddConjunct(x)
@@ -1548,24 +1568,18 @@ func (n *nodeContext) injectEmbedded(all []envYield) (a []envYield, progress boo
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists(c *adt.OpContext) {
+func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
-		return
+		return nil
 	}
-
-	for _, a := range n.node.Arcs {
-		if t := a.Label.Typ(); t == adt.StringLabel {
-			n.addErr(c.Newf("conflicting types list and struct"))
-		}
-	}
-
-	// fmt.Println(len(n.lists), "ELNE")
 
 	isOpen := true
 	max := 0
 	var maxNode adt.Expr
 
 	for _, l := range n.vLists {
+		oneOfTheLists = l
+
 		elems := l.Elems()
 		isClosed := l.IsClosed(c)
 
@@ -1603,6 +1617,8 @@ func (n *nodeContext) addLists(c *adt.OpContext) {
 
 outer:
 	for i, l := range n.lists {
+		oneOfTheLists = l.list
+
 		n.updateCyclicStatus(l.env)
 
 		index := int64(0)
@@ -1712,6 +1728,8 @@ outer:
 		Src:    ast.NewBinExpr(token.AND, sources...),
 		IsOpen: isOpen,
 	})
+
+	return oneOfTheLists
 }
 
 func (n *nodeContext) invalidListLength(na, nb int, a, b adt.Expr) {

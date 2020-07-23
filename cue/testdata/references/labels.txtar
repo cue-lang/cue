@@ -3,16 +3,16 @@
 
 // direct
 a: [X=string]: X
-a: bar: {}
+a: bar: _
 
 // in struct
 b: [X=string]: {X}
-b: bar: {}
+b: bar: _
 
 // in structs
 c: [X=string]: X
 c: [Y=string]: {{{Y}}}
-c: bar: {}
+c: bar: _
 
 // in sub field
 d: [X=string]: name: X
@@ -20,7 +20,7 @@ d: bar: {}
 
 // nested
 e: [X=string]: [Y=string]: X + Y
-e: foo: bar: {}
+e: foo: bar: _
 
 // Field aliases
 
@@ -44,7 +44,6 @@ c1: C="foo\(bar)": [D=string]: {
     foo: C.x.name
 }
 c1: foo3: x: _
-
 
 // TODO: support. Also not yet supported in old implementation.
 // c10: {
@@ -104,7 +103,7 @@ c1: foo3: x: _
     [string]: 〈0;-〉
   }
   a: {
-    bar: {}
+    bar: _
   }
   b: {
     [string]: {
@@ -112,7 +111,7 @@ c1: foo3: x: _
     }
   }
   b: {
-    bar: {}
+    bar: _
   }
   c: {
     [string]: 〈0;-〉
@@ -127,7 +126,7 @@ c1: foo3: x: _
     }
   }
   c: {
-    bar: {}
+    bar: _
   }
   d: {
     [string]: {
@@ -144,7 +143,7 @@ c1: foo3: x: _
   }
   e: {
     foo: {
-      bar: {}
+      bar: _
     }
   }
   bar: 3

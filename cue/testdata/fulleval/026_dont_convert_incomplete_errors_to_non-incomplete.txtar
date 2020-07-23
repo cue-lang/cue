@@ -55,11 +55,11 @@ s3:  strings.ContainsAny(str, "dd")
     }
   }
   n2: (_|_){
-    // [incomplete] n2: operand -num of '-' not concrete (was number):
+    // [incomplete] n2: operand num of '-' not concrete (was number):
     //     ./in.cue:4:6
   }
   n3: (_|_){
-    // [incomplete] n3: operand +num of '+' not concrete (was number):
+    // [incomplete] n3: operand num of '+' not concrete (was number):
     //     ./in.cue:5:6
   }
   n4: (_|_){
@@ -79,7 +79,7 @@ s3:  strings.ContainsAny(str, "dd")
     //     ./in.cue:9:5
   }
   b1: (_|_){
-    // [incomplete] b1: operand !is of '!' not concrete (was bool):
+    // [incomplete] b1: operand is of '!' not concrete (was bool):
     //     ./in.cue:11:6
   }
   s1: (_|_){

@@ -136,9 +136,8 @@ n5: 2.5
 Errors:
 b14: incompatible bounds >=6 and <=5
 b7: incompatible bounds >=6 and <=5
-c3: invalid value <=5 (mismatched types number and string)
-c3: invalid value >=1 (mismatched types number and string)
-c4: invalid value string (mismatched types string and number)
+c3: conflicting values string and >=1 (mismatched types string and number)
+c4: conflicting values <=5 and string (mismatched types number and string)
 n2: incompatible bounds >=1.1 and <=1.3
 a4: invalid value 6 (out of bound <=5):
     ./in.cue:5:11
@@ -195,11 +194,10 @@ Result:
   c1: (int){ &(>=1, <=5, int) }
   c2: (int){ &(>=1, <=5, int) }
   c3: (_|_){
-    // [eval] c3: invalid value <=5 (mismatched types number and string)
-    // c3: invalid value >=1 (mismatched types number and string)
+    // [eval] c3: conflicting values string and >=1 (mismatched types string and number)
   }
   c4: (_|_){
-    // [eval] c4: invalid value string (mismatched types string and number)
+    // [eval] c4: conflicting values <=5 and string (mismatched types number and string)
   }
   s1: (string){ "e" }
   s2: (string){ "ee" }

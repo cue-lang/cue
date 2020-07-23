@@ -76,7 +76,7 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
 }
 -- out/eval --
 Errors:
-e: conflicting types list and int
+e: conflicting values 4 and [] (mismatched types int and list)
 e2: invalid list index d (type string):
     ./in.cue:5:12
 e3: invalid negative index -1:
@@ -101,7 +101,7 @@ Result:
     2: (int){ 3 }
   }
   e: (_|_){
-    // [eval] e: conflicting types list and int
+    // [eval] e: conflicting values 4 and [] (mismatched types int and list)
   }
   e2: (_|_){
     // [eval] e2: invalid list index d (type string):

@@ -15,9 +15,54 @@ c: b & { name: "int", val: 3 }
 e: b & { val: "foo" }
 f: b & { name: "str", val: 3 }
 
+// Disjunct elimination based on type.
+e1: {
+  a: null | {bar: 2}
+  b: (a&{}).bar
+}
+
+d1: {
+  a: (null | {c: 1}) & {}
+  b: {} & (null | {c: 1})
+}
+
+d2: {
+  a: ([...] | {c: 1}) & {}
+  b: {} & ([...] | {c: 1})
+}
+
+d3: {
+  a: (string | {c: 1}) & {}
+  b: {} & (string | {c: 1})
+}
+
+d4: {
+  a: (string | {c: 1}) & {}
+  b: {} & (string | {c: 1})
+}
+
+d5: {
+  a: (number | {c: 1}) & {}
+  b: {} & (number | {c: 1})
+}
+
+d6: {
+  a: (int | {c: 1}) & {}
+  b: {} & (int | {c: 1})
+}
+
+
+d100: {
+  // Should we allow a selector to imply a struct or list? Would be convenient.
+  // This would be a spec change. Disallow for now.
+  // TODO(errors): better error message
+  i: null | {bar: 2}
+  j: i.bar
+}
+
 -- out/eval --
 Errors:
-f.val: invalid value string (mismatched types string and int)
+f.val: conflicting values 3 and string (mismatched types int and string)
 
 Result:
 (_|_){
@@ -47,7 +92,70 @@ Result:
     // [eval]
     name: (string){ "str" }
     val: (_|_){
-      // [eval] f.val: invalid value string (mismatched types string and int)
+      // [eval] f.val: conflicting values 3 and string (mismatched types int and string)
+    }
+  }
+  e1: (struct){
+    a: ((null|struct)){ |((null){ null }, (struct){
+        bar: (int){ 2 }
+      }) }
+    b: (int){ 2 }
+  }
+  d1: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d2: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d3: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d4: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d5: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d6: (struct){
+    a: (struct){
+      c: (int){ 1 }
+    }
+    b: (struct){
+      c: (int){ 1 }
+    }
+  }
+  d100: (struct){
+    i: ((null|struct)){ |((null){ null }, (struct){
+        bar: (int){ 2 }
+      }) }
+    j: (_|_){
+      // [incomplete] d100.j: incomplete feed source value i (type (null|struct)):
+      //     ./in.cue:59:6
     }
   }
 }
@@ -77,4 +185,68 @@ Result:
     name: "str"
     val: 3
   })
+  e1: {
+    a: (null|{
+      bar: 2
+    })
+    b: (〈0;a〉 & {}).bar
+  }
+  d1: {
+    a: ((null|{
+      c: 1
+    }) & {})
+    b: ({} & (null|{
+      c: 1
+    }))
+  }
+  d2: {
+    a: (([
+      ...,
+    ]|{
+      c: 1
+    }) & {})
+    b: ({} & ([
+      ...,
+    ]|{
+      c: 1
+    }))
+  }
+  d3: {
+    a: ((string|{
+      c: 1
+    }) & {})
+    b: ({} & (string|{
+      c: 1
+    }))
+  }
+  d4: {
+    a: ((string|{
+      c: 1
+    }) & {})
+    b: ({} & (string|{
+      c: 1
+    }))
+  }
+  d5: {
+    a: ((number|{
+      c: 1
+    }) & {})
+    b: ({} & (number|{
+      c: 1
+    }))
+  }
+  d6: {
+    a: ((int|{
+      c: 1
+    }) & {})
+    b: ({} & (int|{
+      c: 1
+    }))
+  }
+  d100: {
+    i: (null|{
+      bar: 2
+    })
+    j: 〈0;i〉.bar
+  }
 }

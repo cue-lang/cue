@@ -62,7 +62,7 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
 }
 -- out/eval --
 Errors:
-e3: invalid value <5 (mismatched types number and string)
+e3: conflicting values !="a" and <5 (mismatched types string and number)
 b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
     ./in.cue:10:5
 e1: cannot use 1 (type int) as type (string|bytes):
@@ -95,6 +95,6 @@ Result:
     //     ./in.cue:19:5
   }
   e3: (_|_){
-    // [eval] e3: invalid value <5 (mismatched types number and string)
+    // [eval] e3: conflicting values !="a" and <5 (mismatched types string and number)
   }
 }

@@ -34,7 +34,7 @@ f: true
 }
 -- out/eval --
 Errors:
-d: invalid value float (mismatched types float and int)
+d: conflicting values int and float (mismatched types int and float)
 
 Result:
 (_|_){
@@ -43,7 +43,7 @@ Result:
   b: (int){ 1 }
   c: (float){ 1.0 }
   d: (_|_){
-    // [eval] d: invalid value float (mismatched types float and int)
+    // [eval] d: conflicting values int and float (mismatched types int and float)
   }
   e: (string){ "4" }
   f: (bool){ true }

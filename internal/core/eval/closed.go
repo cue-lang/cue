@@ -162,11 +162,19 @@ func isOr(c *CloseDef) bool {
 // of this flat list.
 //
 func updateClosed(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef { // used in eval.go
+	// Insert an entry for CloseID 0 if we are about to replace it. By default
+	// 0, which is the majority case, is omitted.
+	if c != nil && replace[0] != nil && !containsClosed(c, 0) {
+		c = &CloseDef{IsAnd: true, List: []*CloseDef{c, {}}}
+	}
+
 	switch {
 	case c == nil:
 		and := []*CloseDef{}
 		for _, c := range replace {
-			and = append(and, c)
+			if c != nil {
+				and = append(and, c)
+			}
 		}
 		switch len(and) {
 		case 0:
@@ -190,11 +198,17 @@ func updateClosedRec(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef {
 	// If c is a leaf or AND node, replace it outright. If both are an OR node,
 	// merge the lists.
 	if len(c.List) == 0 || !c.IsAnd {
-		if sub := replace[c.ID]; sub != nil {
+		switch sub, ok := replace[c.ID]; {
+		case sub != nil:
 			if isOr(sub) && isOr(c) {
 				sub.List = append(sub.List, c.List...)
 			}
 			return sub
+
+		case !ok:
+			if len(c.List) == 0 {
+				return nil // drop from list
+			}
 		}
 	}
 
@@ -213,11 +227,14 @@ func updateClosedRec(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef {
 		return c
 	}
 
-	if k == 1 {
+	switch k {
+	case 0:
+		return nil
+	case 1:
 		return buf[0]
+	default:
+		return &CloseDef{Src: c.Src, ID: c.ID, IsAnd: c.IsAnd, List: buf[:k]}
 	}
-
-	return &CloseDef{Src: c.Src, ID: c.ID, IsAnd: c.IsAnd, List: buf[:k]}
 }
 
 // UpdateReplace is called after evaluating a conjunct at the top of the arc
@@ -386,4 +403,18 @@ func collectPositions(ctx *adt.OpContext, c *CloseDef) {
 	for _, x := range c.List {
 		collectPositions(ctx, x)
 	}
+}
+
+// containsClosed reports whether c contains any CloseDef with ID x,
+// recursively.
+func containsClosed(c *CloseDef, x uint32) bool {
+	if c.ID == x && !c.IsAnd {
+		return true
+	}
+	for _, e := range c.List {
+		if containsClosed(e, x) {
+			return true
+		}
+	}
+	return false
 }

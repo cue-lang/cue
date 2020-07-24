@@ -570,7 +570,28 @@ func (n *nodeContext) updateClosedInfo() {
 		n.needClose = n.needClose || a.isClosed
 	}
 
-	updated := updateClosed(c, n.replace)
+	replace := n.replace
+	if replace == nil {
+		replace = map[uint32]*CloseDef{}
+	}
+
+	// Mark any used CloseID to keep, if not already replaced.
+	for _, x := range n.optionals {
+		if _, ok := replace[x.env.CloseID]; !ok {
+			replace[x.env.CloseID] = nil
+		}
+	}
+	for _, a := range n.node.Arcs {
+		for _, c := range a.Conjuncts {
+			if c.Env != nil {
+				if _, ok := replace[c.Env.CloseID]; !ok {
+					replace[c.Env.CloseID] = nil
+				}
+			}
+		}
+	}
+
+	updated := updateClosed(c, replace)
 	if updated == nil && n.needClose {
 		updated = &CloseDef{Src: n.node}
 	}
@@ -1044,7 +1065,7 @@ outer:
 		// values on which they depend fail.
 		ctx.Unify(ctx, arc, adt.Finalized)
 
-		if arc.Label.IsDef() {
+		if arc.Label.IsDef() { // should test whether closed, not isDef?
 			id := n.eval.nextID()
 			n.insertClosed(arc, id, cyclic, arc)
 		} else {

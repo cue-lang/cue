@@ -113,10 +113,6 @@ jobs3: field `fooTest1` not allowed:
     ./in.cue:9:2
     ./in.cue:22:8
     ./in.cue:23:8
-jobs3.fooTest1: field `cmd` not allowed:
-    ./in.cue:2:7
-    ./in.cue:6:8
-    ./in.cue:23:18
 jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
     ./in.cue:9:22
 
@@ -162,11 +158,7 @@ Result:
     //     ./in.cue:9:2
     //     ./in.cue:22:8
     //     ./in.cue:23:8
-    fooTest1: (_|_){
-      // [eval] jobs3.fooTest1: field `cmd` not allowed:
-      //     ./in.cue:2:7
-      //     ./in.cue:6:8
-      //     ./in.cue:23:18
+    fooTest1: (#struct){
       name: (string){ "badName" }
       cmd: (string){ string }
     }

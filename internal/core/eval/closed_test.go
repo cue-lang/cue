@@ -27,6 +27,28 @@ func TestRewriteClosed(t *testing.T) {
 		replace map[uint32]*CloseDef
 		want    *CloseDef
 	}{{
+		desc:  "introduce new",
+		close: nil,
+		replace: map[uint32]*CloseDef{
+			0: {ID: 2, IsAnd: false, List: nil},
+		},
+		want: &CloseDef{
+			ID: 0x02,
+		},
+	}, {
+		desc: "auto insert missing 0",
+		close: &CloseDef{
+			ID: 1,
+		},
+		replace: map[uint32]*CloseDef{
+			0: {ID: 2, IsAnd: false, List: nil},
+			1: nil, // keep 1
+		},
+		want: &CloseDef{
+			IsAnd: true,
+			List:  []*CloseDef{{ID: 1}, {ID: 2}},
+		},
+	}, {
 		desc: "a: #A & #B",
 		close: &CloseDef{
 			ID: 1,
@@ -40,18 +62,38 @@ func TestRewriteClosed(t *testing.T) {
 			List:  []*CloseDef{{ID: 2}, {ID: 3}},
 		},
 	}, {
+		desc: "eliminateUnusedToEmpty",
+		close: &CloseDef{
+			ID: 1,
+		},
+		replace: map[uint32]*CloseDef{
+			0: nil,
+		},
+		want: nil,
+	}, {
 		// Eliminate an embedding for which there are no more entries.
-		// 	desc: "eliminateOneEmbedding",
-		// 	close: &CloseDef{
-		// 		ID: 0,
-		// 		List: []*CloseDef{
-		// 			{ID: 2},
-		// 			{ID: 3},
-		// 		},
-		// 	},
-		// 	replace: map[uint32]*CloseDef{2: nil},
-		// 	want:    &CloseDef{ID: 2},
-		// }, {
+		desc: "eliminateOneEmbedding",
+		close: &CloseDef{
+			ID: 0,
+			List: []*CloseDef{
+				{ID: 2},
+				{ID: 3},
+			},
+		},
+		replace: map[uint32]*CloseDef{2: nil},
+		want:    &CloseDef{ID: 2},
+	}, {
+		desc: "eliminateAllEmbeddings",
+		close: &CloseDef{
+			ID: 2,
+			List: []*CloseDef{
+				{ID: 2},
+				{ID: 3},
+			},
+		},
+		replace: map[uint32]*CloseDef{0: {ID: 4}, 4: nil},
+		want:    &CloseDef{ID: 4},
+	}, {
 		// Do not eliminate an embedding that has a replacement.
 		desc: "eliminateOneEmbeddingByMultiple",
 		close: &CloseDef{

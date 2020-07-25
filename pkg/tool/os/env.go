@@ -63,6 +63,10 @@ func (c *getenvCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		}
 		v := iter.Value()
 
+		if err := v.Err(); err != nil {
+			return nil, err
+		}
+
 		if err := validateEntry(name, v); err != nil {
 			return nil, err
 		}
@@ -117,7 +121,11 @@ func (c *environCmd) Run(ctx *task.Context) (res interface{}, err error) {
 		if strings.HasPrefix(name, "$") {
 			continue
 		}
-		if err := validateEntry(name, iter.Value()); err != nil {
+		v := iter.Value()
+		if err := v.Err(); err != nil {
+			return nil, err
+		}
+		if err := validateEntry(name, v); err != nil {
 			return nil, err
 		}
 		if _, ok := update[name]; !ok {

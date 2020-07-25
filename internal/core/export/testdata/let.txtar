@@ -1,0 +1,21 @@
+-- in.cue --
+let X = 1 + 1
+#Foo: X
+-- out/definition --
+
+let X = 1 + 1
+#Foo: X
+-- out/doc --
+[]
+[#Foo]
+-- out/value --
+== Simplified
+{}
+== Raw
+{
+	#Foo: 2
+}
+== All
+{
+	#Foo: 2
+}

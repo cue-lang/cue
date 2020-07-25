@@ -118,14 +118,31 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 		return ident
 
 	case *adt.LetReference:
-		f := e.frame(x.UpCount)
+		// TODO:
+		// - rename if necessary
+		// - look in to reusing the mechanism of the old evaluator
+		//
+		// Either way, we need a better mechanism. References may go out of
+		// scope. In case of aliases this means they may need to be reproduced
+		// locally. Most of these issues can be avoided by either fully
+		// expanding a configuration (export) or not at all (def).
+		//
+		i := len(e.stack) - 1 - int(x.UpCount) - 1
+		if i < 0 {
+			i = 0
+		}
+		f := &(e.stack[i])
 		let := f.let[x.X]
 		if let == nil {
 			if f.let == nil {
 				f.let = map[adt.Expr]*ast.LetClause{}
 			}
-			let = &ast.LetClause{Expr: e.expr(x.X)}
+			let = &ast.LetClause{
+				Ident: e.ident(x.Label),
+				Expr:  e.expr(x.X),
+			}
 			f.let[x.X] = let
+			f.scope.Elts = append(f.scope.Elts, let)
 		}
 		ident := e.ident(x.Label)
 		ident.Node = let

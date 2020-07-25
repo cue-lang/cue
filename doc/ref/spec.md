@@ -2705,7 +2705,8 @@ c: d
 d: b
 ```
 
-Implementations should report these as an error except in the following cases:
+Implementations should treat these as `_`.
+Two particular cases are discussed below.
 
 
 #### Expressions that unify an atom with an expression
@@ -2713,8 +2714,8 @@ Implementations should report these as an error except in the following cases:
 An expression of the form `a & e`, where `a` is an atom
 and `e` is an expression, always evaluates to `a` or bottom.
 As it does not matter how we fail, we can assume the result to be `a`
-and validate after the field in which the expression occurs has been evaluated
-that `a == e`.
+and postpone validating `a == e` until after all referenecs
+in `e` have been resolved.
 
 ```
 // Config            Evaluates to (requiring concrete values)
@@ -2733,7 +2734,7 @@ y: x & {              y: {
 #### Field values
 
 A field value of the form `r & v`,
-where `r` evaluates to a reference cycle and `v` is a value,
+where `r` evaluates to a reference cycle and `v` is a concrete value,
 evaluates to `v`.
 Unification is idempotent and unifying a value with itself ad infinitum,
 which is what the cycle represents, results in this value.
@@ -2786,16 +2787,48 @@ evaluate to this value.
 
 ### Structural cycles
 
-CUE disallows infinite structures.
-Implementations must report an error when encountering such declarations.
+A structural cycle is when a node references one of its ancestor nodes.
+It is possible to construct a structural cycle by unifying two acyclic values:
+```
+// acyclic
+y: {
+    f: h: g
+    g: _
+}
+// acyclic
+x: {
+    f: _
+    g: f
+}
+// introduces structural cycle
+z: x & y  
+```
+Implementations should be able to detect such structural cycles dynamically.
 
-<!-- for instance using an occurs check -->
+A structural cycle can result in infinite structure or evaluation loops.
+```
+// infinite structure
+a: b: a
+
+// infinite evaluation
+f: {
+    n:   int
+    out: n + (f & {n: 1}).out
+}
+```
+CUE must allow or disallow structural cycles under certain circumstances.
+
+If a node `a` references an ancestor node, we call it and any of its
+field values `a.f` _cyclic_.
+So if `a` is cyclic, all of its descendants are also regarded as cyclic.
+A given node `x`, whose value is composed of the conjuncts `c1 & ... & cn`,
+is valid if any of its conjuncts is not cyclic.
 
 ```
 // Disallowed: a list of infinite length with all elements being 1.
-list: {
+#List: {
     head: 1
-    tail: list
+    tail: #List
 }
 
 // Disallowed: another infinite structure (a:{b:{d:{b:{d:{...}}}}}, ...).
@@ -2805,36 +2838,21 @@ a: {
 c: {
     d: a
 }
-```
 
-It is allowed for a value to define an infinite set of possibilities
-without evaluating to an infinite structure itself.
-
-```
-// List defines a list of arbitrary length (default null).
-List: *null | {
+// #List defines a list of arbitrary length. Because the recursive reference
+// is part of a disjunction, this does not result in a structural cycle.
+#List: {
     head: _
-    tail: List
+    tail: null | #List
 }
+
+// Usage of #List. The value of tail in the most deeply nested element will
+// be `null`: as the value of the disjunct referring to list is the only
+// conjunct, all conjuncts are cyclic and the value is invalid and so
+// eliminated from the disjunction.
+MyList: #List & { head: 1, tail: { head: 2 }}
 ```
 
-<!--
-Consider banning any construct that makes CUE not having a linear
-running time expressed in the number of nodes in the output.
-
-This would require restricting constructs like:
-
-(fib&{n:2}).out
-
-fib: {
-        n: int
-
-        out: (fib&{n:n-2}).out + (fib&{n:n-1}).out if n >= 2
-        out: fib({n:n-2}).out + fib({n:n-1}).out if n >= 2
-        out: n if n < 2
-}
-
--->
 <!--
 ### Unused fields
 

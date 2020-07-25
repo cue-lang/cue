@@ -50,6 +50,10 @@ type validator struct {
 	inDefinition int
 }
 
+func (v *validator) checkConcrete() bool {
+	return v.Concrete && v.inDefinition == 0
+}
+
 func (v *validator) add(b *adt.Bottom) {
 	if !v.AllErrors {
 		v.err = adt.CombineErrors(nil, v.err, b)
@@ -66,12 +70,12 @@ func (v *validator) validate(x *adt.Vertex) {
 	if b, _ := x.Value.(*adt.Bottom); b != nil {
 		switch b.Code {
 		case adt.CycleError:
-			if v.Concrete || v.DisallowCycles {
+			if v.checkConcrete() || v.DisallowCycles {
 				v.add(b)
 			}
 
 		case adt.IncompleteError, adt.NotExistError:
-			if v.Concrete {
+			if v.checkConcrete() {
 				v.add(b)
 			}
 
@@ -82,7 +86,7 @@ func (v *validator) validate(x *adt.Vertex) {
 			return
 		}
 
-	} else if v.Concrete && v.inDefinition == 0 {
+	} else if v.checkConcrete() {
 		x := x.Default()
 		if !adt.IsConcrete(x) {
 			v.add(&adt.Bottom{

@@ -149,6 +149,16 @@ y: incompatible values 4 and 2`,
 		in: `
 		x: *1 | 2
 		`,
+	}, {
+		desc: "allow non-concrete in definitions in concrete mode",
+		cfg:  &Config{Concrete: true},
+		in: `
+		x: 2
+		#d: {
+			b: int
+			c: b + b
+		}
+		`,
 	}}
 
 	r := runtime.New()

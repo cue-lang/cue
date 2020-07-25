@@ -1234,9 +1234,10 @@ A1: A & {
 //    { field1: "foo", field2: string }
 ```
 
-A _closed struct_ `c` is a struct whose instances may not have regular fields
-with a name that does not match the name of a regular or optional field
+A _closed struct_ `c` is a struct whose instances may not declare any field
+with a name that does not match the name of a regular or optional field,
 or the pattern of a pattern constraint defined in `c`.
+Hidden fields are excluded from this limitation.
 A struct that is the result of unifying any struct with a [`...`](#Structs)
 declaration is defined for all fields.
 Recursively closing a struct is equivalent to adding `..._|_` to its its root

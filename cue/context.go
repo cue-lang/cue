@@ -15,48 +15,17 @@
 package cue
 
 import (
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/core/eval"
 	"github.com/cockroachdb/apd/v2"
 )
 
 // context manages evaluation state.
 type context struct {
+	opCtx *adt.OpContext
 	*apd.Context
-
 	*index
-
-	forwardMap []scope // pairs
-	oldSize    []int
-
-	// constraints are to be evaluated at the end values to be evaluated later.
-	constraints []*binaryExpr
-	evalStack   []bottom
-
-	inDefinition int
-	inSum        int
-	cycleErr     bool
-
-	// for debug strings
-	nodeRefs map[scope]string
-
-	// tracing
-	trace bool
-	level int
-
-	// TODO: replace with proper structural cycle detection/ occurs check.
-	// See Issue #29.
-	maxDepth int
-}
-
-func (c *context) incEvalDepth() {
-	if len(c.evalStack) > 0 {
-		c.evalStack[len(c.evalStack)-1].exprDepth++
-	}
-}
-
-func (c *context) decEvalDepth() {
-	if len(c.evalStack) > 0 {
-		c.evalStack[len(c.evalStack)-1].exprDepth--
-	}
 }
 
 var baseContext apd.Context
@@ -72,50 +41,56 @@ func (idx *index) newContext() *context {
 		Context: &baseContext,
 		index:   idx,
 	}
+	if idx != nil {
+		c.opCtx = eval.NewContext(idx.Runtime, nil)
+	}
 	return c
 }
 
-// delayConstraint schedules constraint to be evaluated and returns ret. If
-// delaying constraints is currently not allowed, it returns an error instead.
-func (c *context) delayConstraint(ret evaluated, constraint *binaryExpr) evaluated {
-	c.cycleErr = true
-	c.constraints = append(c.constraints, constraint)
-	return ret
+func debugStr(ctx *context, v adt.Node) string {
+	return debug.NodeString(ctx.opCtx, v, nil)
 }
 
-func (c *context) processDelayedConstraints() evaluated {
-	cons := c.constraints
-	c.constraints = c.constraints[:0]
-	for _, dc := range cons {
-		v := binOp(c, dc, dc.Op, dc.X.evalPartial(c), dc.Y.evalPartial(c))
-		if isBottom(v) {
-			return v
-		}
+func (c *context) str(v adt.Node) string {
+	return debugStr(c, v)
+}
+
+func (c *context) mkErr(src source, args ...interface{}) *bottom {
+	return c.index.mkErr(src, args...)
+}
+
+func (c *context) vertex(v *adt.Vertex) *adt.Vertex {
+	return v
+}
+
+// vertex returns the evaluated vertex of v.
+func (v Value) vertex(ctx *context) *adt.Vertex {
+	return ctx.vertex(v.v)
+}
+
+// eval returns the evaluated value. This may not be the vertex.
+//
+// Deprecated: use ctx.value
+func (v Value) eval(ctx *context) adt.Value {
+	if v.v == nil {
+		panic("undefined value")
 	}
-	return nil
-}
-
-func (c *context) deref(f scope) scope {
-outer:
-	for {
-		for i := 0; i < len(c.forwardMap); i += 2 {
-			if c.forwardMap[i] == f {
-				f = c.forwardMap[i+1]
-				continue outer
-			}
-		}
-		return f
+	x := ctx.manifest(v.v)
+	switch x.Kind() {
+	case adt.StructKind, adt.ListKind:
+		return x
+	default:
+		return x.Value
 	}
 }
 
-func (c *context) pushForwards(pairs ...scope) *context {
-	c.oldSize = append(c.oldSize, len(c.forwardMap))
-	c.forwardMap = append(c.forwardMap, pairs...)
-	return c
-}
+// func (v Value) evalFull(u value) (Value, adt.Value) {
+// 	ctx := v.ctx()
+// 	x := ctx.manifest(u)
+// }
 
-func (c *context) popForwards() {
-	last := len(c.oldSize) - 1
-	c.forwardMap = c.forwardMap[:c.oldSize[last]]
-	c.oldSize = c.oldSize[:last]
+// TODO: change from Vertex to Vertex.
+func (c *context) manifest(v *adt.Vertex) *adt.Vertex {
+	v.Finalize(c.opCtx)
+	return v
 }

@@ -23,8 +23,8 @@ package gocodec
 import (
 	"sync"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/legacy/cue"
 )
 
 // Config has no options yet, but is defined for future extensibility.

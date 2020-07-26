@@ -19,10 +19,10 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/legacy/cue"
 )
 
 // Compact generates the JSON-encoded src with insignificant space characters

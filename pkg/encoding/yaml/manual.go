@@ -18,10 +18,10 @@ import (
 	"bytes"
 	"io"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
-	"cuelang.org/go/internal/legacy/cue"
 	"cuelang.org/go/internal/third_party/yaml"
 )
 

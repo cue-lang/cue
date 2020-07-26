@@ -22,7 +22,7 @@ import (
 
 	"golang.org/x/net/idna"
 
-	"cuelang.org/go/internal/legacy/cue"
+	"cuelang.org/go/cue"
 )
 
 var idnaProfile = idna.New(

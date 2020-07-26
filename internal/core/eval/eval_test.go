@@ -20,11 +20,11 @@ import (
 	"strings"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
-	"cuelang.org/go/internal/legacy/cue"
 	"github.com/rogpeppe/go-internal/txtar"
 )
 

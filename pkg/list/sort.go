@@ -21,7 +21,7 @@ package list
 import (
 	"sort"
 
-	"cuelang.org/go/internal/legacy/cue"
+	"cuelang.org/go/cue"
 )
 
 // valueSorter defines a sort.Interface; implemented in cue/builtinutil.go.

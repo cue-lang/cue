@@ -18,8 +18,11 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -28,12 +31,7 @@ import (
 type Instance struct {
 	*index
 
-	rootStruct *structLit // the struct to insert root values into
-	rootValue  value      // the value to evaluate: may add comprehensions
-
-	// scope is used as an additional top-level scope between the package scope
-	// and the predeclared identifiers.
-	scope *structLit
+	root *adt.Vertex
 
 	ImportPath  string
 	Dir         string
@@ -49,12 +47,12 @@ type Instance struct {
 }
 
 func (x *index) addInst(p *Instance) *Instance {
-	x.Index.AddInst(p.ImportPath, p.rootStruct, p)
+	x.Index.AddInst(p.ImportPath, p.root, p)
 	p.index = x
 	return p
 }
 
-func (x *index) getImportFromNode(v value) *Instance {
+func (x *index) getImportFromNode(v *adt.Vertex) *Instance {
 	p := x.Index.GetImportFromNode(v)
 	if p == nil {
 		return nil
@@ -74,25 +72,23 @@ func init() {
 	internal.MakeInstance = func(value interface{}) interface{} {
 		v := value.(Value)
 		x := v.eval(v.ctx())
-		st, ok := x.(*structLit)
+		st, ok := x.(*adt.Vertex)
 		if !ok {
-			st = &structLit{baseValue: x.base(), emit: x}
+			st = &adt.Vertex{}
+			st.AddConjunct(adt.MakeConjunct(nil, x))
 		}
 		return v.ctx().index.addInst(&Instance{
-			rootStruct: st,
-			rootValue:  v.v.v,
+			root: st,
 		})
 	}
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.
-func newInstance(x *index, p *build.Instance) *Instance {
+func newInstance(x *index, p *build.Instance, v *adt.Vertex) *Instance {
 	// TODO: associate root source with structLit.
-	st := &structLit{baseValue: baseValue{nil}}
 	i := &Instance{
-		rootStruct: st,
-		rootValue:  st,
-		inst:       p,
+		root: v,
+		inst: p,
 	}
 	if p != nil {
 		i.ImportPath = p.ImportPath
@@ -118,28 +114,7 @@ func (inst *Instance) setError(err errors.Error) {
 
 func (inst *Instance) eval(ctx *context) evaluated {
 	// TODO: remove manifest here?
-	v := ctx.manifest(inst.rootValue)
-	if s, ok := v.(*structLit); ok && s.emit != nil {
-		e := s.emit.evalPartial(ctx)
-		src := binSrc(token.NoPos, opUnify, v, e)
-	outer:
-		switch e.(type) {
-		case *structLit, *top:
-			v = binOp(ctx, src, opUnifyUnchecked, v, e)
-			if s, ok := v.(*structLit); ok {
-				s.emit = nil
-			}
-
-		default:
-			for _, a := range s.Arcs {
-				if !a.definition {
-					v = binOp(ctx, src, opUnify, v, e)
-					break outer
-				}
-			}
-			return e
-		}
-	}
+	v := ctx.manifest(inst.root)
 	return v
 }
 
@@ -148,20 +123,63 @@ func init() {
 		v := value.(Value)
 		e := expr.(ast.Expr)
 		ctx := v.idx.newContext()
-		return newValueRoot(ctx, evalExpr(ctx, v.eval(ctx), e))
+		return newValueRoot(ctx, evalExpr(ctx, v.vertex(ctx), e))
 	}
 }
 
-func evalExpr(ctx *context, x value, expr ast.Expr) evaluated {
-	if isBottom(x) {
-		return ctx.mkErr(x, "error evaluating instance: %v", x)
+// evalExpr evaluates expr within scope.
+func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) evaluated {
+	cfg := &compile.Config{
+		Scope: scope,
+		Imports: func(x *ast.Ident) (pkgPath string) {
+			if _, ok := builtins[x.Name]; !ok {
+				return ""
+			}
+			return x.Name
+		},
 	}
-	obj, ok := x.(*structLit)
-	if !ok {
-		return ctx.mkErr(x, "instance is not a struct, found %s", x.Kind())
+
+	c, err := compile.Expr(cfg, ctx.opCtx, expr)
+	if err != nil {
+		return &adt.Bottom{Err: err}
 	}
-	v := newVisitor(ctx.index, nil, nil, obj, true)
-	return v.walk(expr).evalPartial(ctx)
+	return adt.Resolve(ctx.opCtx, c)
+
+	// scope.Finalize(ctx.opCtx) // TODO: not appropriate here.
+	// switch s := scope.Value.(type) {
+	// case *bottom:
+	// 	return s
+	// case *adt.StructMarker:
+	// default:
+	// 	return ctx.mkErr(scope, "instance is not a struct, found %s", scope.Kind())
+	// }
+
+	// c := ctx.opCtx
+
+	// x, err := compile.Expr(&compile.Config{Scope: scope}, c.Runtime, expr)
+	// if err != nil {
+	// 	return c.NewErrf("could not evaluate %s: %v", c.Str(x), err)
+	// }
+
+	// env := &adt.Environment{Vertex: scope}
+
+	// switch v := x.(type) {
+	// case adt.Value:
+	// 	return v
+	// case adt.Resolver:
+	// 	r, err := c.Resolve(env, v)
+	// 	if err != nil {
+	// 		return err
+	// 	}
+	// 	return r
+
+	// case adt.Evaluator:
+	// 	e, _ := c.Evaluate(env, x)
+	// 	return e
+
+	// }
+
+	// return c.NewErrf("could not evaluate %s", c.Str(x))
 }
 
 // Doc returns the package comments for this instance.
@@ -183,7 +201,8 @@ func (inst *Instance) Doc() []*ast.CommentGroup {
 // top-level values.
 func (inst *Instance) Value() Value {
 	ctx := inst.newContext()
-	return newValueRoot(ctx, inst.eval(ctx))
+	inst.root.Finalize(ctx.opCtx)
+	return newVertexRoot(ctx, inst.root)
 }
 
 // Eval evaluates an expression within an existing instance.
@@ -191,7 +210,9 @@ func (inst *Instance) Value() Value {
 // Expressions may refer to builtin packages if they can be uniquely identified.
 func (inst *Instance) Eval(expr ast.Expr) Value {
 	ctx := inst.newContext()
-	result := evalExpr(ctx, inst.eval(ctx), expr)
+	v := inst.root
+	v.Finalize(ctx.opCtx)
+	result := evalExpr(ctx, v, expr)
 	return newValueRoot(ctx, result)
 }
 
@@ -201,33 +222,22 @@ func (inst *Instance) Eval(expr ast.Expr) Value {
 // that these will only surface during manifestation. This allows
 // non-conflicting parts to be used.
 func Merge(inst ...*Instance) *Instance {
-	switch len(inst) {
-	case 0:
-		return nil
-	case 1:
-		return inst[0]
-	}
+	v := &adt.Vertex{}
 
-	values := []value{}
+	i := inst[0]
+	ctx := i.index.newContext().opCtx
+
+	// TODO: interesting test: use actual unification and then on K8s corpus.
+
 	for _, i := range inst {
-		if i.Err != nil {
-			return i
-		}
-		values = append(values, i.rootValue)
+		w := i.Value()
+		v.AddConjunct(adt.MakeConjunct(nil, w.v.ToDataAll()))
 	}
-	merged := &mergedValues{values: values}
+	v.Finalize(ctx)
 
-	ctx := inst[0].newContext()
-
-	st, ok := ctx.manifest(merged).(*structLit)
-	if !ok {
-		return nil
-	}
-
-	p := ctx.index.addInst(&Instance{
-		rootStruct: st,
-		rootValue:  merged,
-		complete:   true,
+	p := i.index.addInst(&Instance{
+		root:     v,
+		complete: true,
 	})
 	return p
 }
@@ -239,37 +249,33 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	p.Complete()
 
 	idx := inst.index
+	r := inst.index.Runtime
 
-	i := newInstance(idx, p)
+	rErr := runtime.ResolveFiles(idx.Index, p, isBuiltin)
+
+	v, err := compile.Files(&compile.Config{Scope: inst.root}, r, p.Files...)
+
+	v.AddConjunct(adt.MakeConjunct(nil, inst.root))
+
+	i := newInstance(idx, p, v)
+	if rErr != nil {
+		i.setListOrError(err)
+	}
 	if i.Err != nil {
-		return i
+		i.setListOrError(err)
 	}
 
-	ctx := inst.newContext()
-	val := newValueRoot(ctx, inst.rootValue)
-	v, err := val.structValFull(ctx)
 	if err != nil {
-		i.setError(val.toErr(err))
-		return i
+		i.setListOrError(err)
 	}
-	i.scope = v.obj
 
-	if err := runtime.ResolveFiles(idx.Index, p, isBuiltin); err != nil {
-		i.setError(err)
-		return i
-	}
-	for _, f := range p.Files {
-		if err := i.insertFile(f); err != nil {
-			i.setListOrError(err)
-		}
-	}
 	i.complete = true
 
 	return i
 }
 
 func (inst *Instance) value() Value {
-	return newValueRoot(inst.newContext(), inst.rootValue)
+	return newVertexRoot(inst.newContext(), inst.root)
 }
 
 // Lookup reports the value at a path starting from the top level struct. The
@@ -322,44 +328,36 @@ func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
 // a Value. In the latter case, it will panic if the Value is not from the same
 // Runtime.
 func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
-	ctx := inst.newContext()
-	root := ctx.manifest(inst.rootValue)
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convertVal(ctx, root, true, x)
-	eval := binOp(ctx, baseValue{}, opUnify, root, value)
-	// TODO: validate recursively?
-	err := inst.Err
-	var st *structLit
-	var stVal evaluated
-	switch x := eval.(type) {
-	case *structLit:
-		st = x
-		stVal = x
-	default:
-		// This should not happen.
-		b := ctx.mkErr(eval, "error filling struct")
-		err = inst.Value().toErr(b)
-		st = &structLit{emit: b}
-		stVal = b
-	case *bottom:
-		err = inst.Value().toErr(x)
-		st = &structLit{emit: x}
-		stVal = x
+	a := make([]adt.Conjunct, len(inst.root.Conjuncts))
+	copy(a, inst.root.Conjuncts)
+	u := &adt.Vertex{Conjuncts: a}
+
+	if v, ok := x.(Value); ok {
+		if inst.index != v.idx {
+			panic("value of type Value is not created with same Runtime as Instance")
+		}
+		for _, c := range v.v.Conjuncts {
+			u.AddConjunct(c)
+		}
+	} else {
+		ctx := eval.NewContext(inst.index.Runtime, nil)
+		expr := convert.GoValueToExpr(ctx, true, x)
+		u.AddConjunct(adt.MakeConjunct(nil, expr))
+		u.Finalize(ctx)
 	}
 	inst = inst.index.addInst(&Instance{
-		rootStruct: st,
-		rootValue:  stVal,
-		inst:       nil,
+		root: u,
+		inst: nil,
 
 		// Omit ImportPath to indicate this is not an importable package.
 		Dir:        inst.Dir,
 		PkgName:    inst.PkgName,
 		Incomplete: inst.Incomplete,
-		Err:        err,
 
-		complete: err != nil,
+		complete: true,
 	})
-	return inst, err
+	return inst, nil
 }

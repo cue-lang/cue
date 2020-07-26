@@ -16,7 +16,7 @@
 package structs
 
 import (
-	"cuelang.org/go/internal/legacy/cue"
+	"cuelang.org/go/cue"
 )
 
 // MinFields validates the minimum number of fields that are part of a struct.

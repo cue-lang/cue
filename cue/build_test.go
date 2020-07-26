@@ -16,12 +16,12 @@ package cue
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/debug"
 )
 
 func TestFromExpr(t *testing.T) {
@@ -36,7 +36,7 @@ func TestFromExpr(t *testing.T) {
 			ast.NewString("Hello"),
 			ast.NewString("World"),
 		),
-		out: `["Hello","World"]`,
+		out: `["Hello", "World"]`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -45,8 +45,7 @@ func TestFromExpr(t *testing.T) {
 			if err != nil {
 				t.Fatal(err)
 			}
-			ctx := inst.newContext()
-			if got := debugStr(ctx, inst.eval(ctx)); got != tc.out {
+			if got := fmt.Sprint(inst.Value()); got != tc.out {
 				t.Errorf("\n got: %v; want %v", got, tc.out)
 			}
 		})
@@ -86,7 +85,7 @@ func TestBuild(t *testing.T) {
 		emit      string
 	}{{
 		insts(&bimport{"", files(`test: "ok"`)}),
-		`{test: "ok"}`,
+		`{test:"ok"}`,
 	}, {
 		insts(&bimport{"",
 			files(
@@ -200,7 +199,8 @@ func TestBuild(t *testing.T) {
 			if err := insts[0].Err; err != nil {
 				got = err.Error()
 			} else {
-				got = strings.TrimSpace(fmt.Sprintf("%s\n", insts[0].Value()))
+				cfg := &debug.Config{Compact: true}
+				got = debug.NodeString(insts[0].Index, insts[0].Value().v, cfg)
 			}
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)

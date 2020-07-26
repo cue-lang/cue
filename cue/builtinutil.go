@@ -14,6 +14,11 @@
 
 package cue
 
+import (
+	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/convert"
+)
+
 // TODO: this code could be generated, but currently isn't.
 
 type valueSorter struct {
@@ -33,9 +38,12 @@ func (s *valueSorter) ret() ([]Value, error) {
 func (s *valueSorter) Len() int      { return len(s.a) }
 func (s *valueSorter) Swap(i, j int) { s.a[i], s.a[j] = s.a[j], s.a[i] }
 func (s *valueSorter) Less(i, j int) bool {
-	x := fill(s.cmp, s.a[i], "x")
-	x = fill(x, s.a[j], "y")
-	isLess, err := x.Lookup("less").Bool()
+	ctx := s.cmp.ctx()
+	x := fill(ctx, s.cmp.v, s.a[i], "x")
+	x = fill(ctx, x, s.a[j], "y")
+	ctx.opCtx.Unify(ctx.opCtx, x, adt.Finalized) // TODO: remove.
+	v := Value{s.cmp.idx, x}
+	isLess, err := v.Lookup("less").Bool()
 	if err != nil && s.err == nil {
 		s.err = err
 		return true
@@ -45,13 +53,22 @@ func (s *valueSorter) Less(i, j int) bool {
 
 // fill creates a new value with the old value unified with the given value.
 // TODO: consider making this a method on Value.
-func fill(v Value, x interface{}, path ...string) Value {
-	ctx := v.ctx()
-	root := v.v.val()
+func fill(ctx *context, v *adt.Vertex, x interface{}, path ...string) *adt.Vertex {
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	value := convertVal(ctx, root, false, x)
-	eval := binOp(ctx, baseValue{}, opUnify, root, value)
-	return newValueRoot(ctx, eval)
+	value := convertVal(ctx, v, false, x)
+
+	w := adt.ToVertex(value)
+	n := &adt.Vertex{Label: v.Label}
+	n.AddConjunct(adt.MakeConjunct(nil, v))
+	n.AddConjunct(adt.MakeConjunct(nil, w))
+
+	// n.Add(v)
+	// n.Add(w)
+	return n
+}
+
+func convertVal(ctx *context, src source, nullIsTop bool, x interface{}) adt.Value {
+	return convert.GoValueToValue(ctx.opCtx, x, nullIsTop)
 }

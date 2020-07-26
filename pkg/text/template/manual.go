@@ -18,7 +18,7 @@ import (
 	"bytes"
 	"text/template"
 
-	"cuelang.org/go/internal/legacy/cue"
+	"cuelang.org/go/cue"
 )
 
 // Execute executes a Go-style template.

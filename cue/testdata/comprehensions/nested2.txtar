@@ -1,0 +1,92 @@
+-- in.cue --
+given: {
+	INC: USD: 2.0
+	USD: GBP: 3.0
+}
+hydrated: {
+	for k,v in given {
+		for k1,r in v {
+			"\(k)": "\(k)":  1.0
+			"\(k1)": "\(k1)": 1.0
+			"\(k)": "\(k1)": r
+			"\(k1)": "\(k)": number
+		}
+	}
+}
+
+foo: {
+    a: 10
+    if a < 20 {
+        if a < 50 {
+            b: 20
+        }
+    }
+}
+-- out/eval --
+(struct){
+  given: (struct){
+    INC: (struct){
+      USD: (float){ 2.0 }
+    }
+    USD: (struct){
+      GBP: (float){ 3.0 }
+    }
+  }
+  hydrated: (struct){
+    INC: (struct){
+      INC: (float){ 1.0 }
+      USD: (float){ 2.0 }
+    }
+    USD: (struct){
+      USD: (float){ 1.0 }
+      INC: (number){ number }
+      GBP: (float){ 3.0 }
+    }
+    GBP: (struct){
+      GBP: (float){ 1.0 }
+      USD: (number){ number }
+    }
+  }
+  foo: (struct){
+    a: (int){ 10 }
+    b: (int){ 20 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  given: {
+    INC: {
+      USD: 2.0
+    }
+    USD: {
+      GBP: 3.0
+    }
+  }
+  hydrated: {
+    for k, v in 〈1;given〉 {
+      for k1, r in 〈1;v〉 {
+        "\(〈3;k〉)": {
+          "\(〈4;k〉)": 1.0
+        }
+        "\(〈1;k1〉)": {
+          "\(〈2;k1〉)": 1.0
+        }
+        "\(〈3;k〉)": {
+          "\(〈2;k1〉)": 〈2;r〉
+        }
+        "\(〈1;k1〉)": {
+          "\(〈4;k〉)": number
+        }
+      }
+    }
+  }
+  foo: {
+    a: 10
+    if (〈0;a〉 < 20) {
+      if (〈1;a〉 < 50) {
+        b: 20
+      }
+    }
+  }
+}

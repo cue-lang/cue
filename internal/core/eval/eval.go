@@ -1482,11 +1482,11 @@ func (n *nodeContext) expandOne() (done bool) {
 		return true
 	}
 
-	if n.ifClauses, progress = n.injectEmbedded(n.ifClauses); progress {
+	if progress = n.injectEmbedded(&(n.ifClauses)); progress {
 		return true
 	}
 
-	if n.forClauses, progress = n.injectEmbedded(n.forClauses); progress {
+	if progress = n.injectEmbedded(&(n.forClauses)); progress {
 		return true
 	}
 
@@ -1542,7 +1542,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 // injectEmbedded evaluates and inserts embeddings. It first evaluates all
 // embeddings before inserting the results to ensure that the order of
 // evaluation does not matter.
-func (n *nodeContext) injectEmbedded(all []envYield) (a []envYield, progress bool) {
+func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 	ctx := n.ctx
 	type envStruct struct {
 		env *adt.Environment
@@ -1554,12 +1554,13 @@ func (n *nodeContext) injectEmbedded(all []envYield) (a []envYield, progress boo
 	}
 
 	k := 0
-	for _, d := range all {
+	for i := 0; i < len(*all); i++ {
+		d := (*all)[i]
 		sa = sa[:0]
 
 		if err := ctx.Yield(d.env, d.yield, f); err != nil {
 			if err.IsIncomplete() {
-				all[k] = d
+				(*all)[k] = d
 				k++
 			} else {
 				// continue to collect other errors.
@@ -1573,7 +1574,8 @@ func (n *nodeContext) injectEmbedded(all []envYield) (a []envYield, progress boo
 		}
 	}
 
-	return all[:k], k < len(all)
+	*all = (*all)[:k]
+	return k < len(*all)
 }
 
 // addLists

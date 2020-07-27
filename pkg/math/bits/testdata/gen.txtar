@@ -1,0 +1,34 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "math/bits"
+
+t1: bits.Or(0x8, 0x1)
+t2: bits.Lsh(0x8, 4)
+t3: bits.Rsh(0x100, 4)
+t4: bits.At(0x100, 8)
+t5: bits.At(0x100, 9)
+t6: bits.Set(0x100, 7, 1)
+t7: bits.Set(0x100, 8, 0)
+t8: bits.And(0x10000000000000F0E, 0xF0F7)
+t9: bits.Or(0x100000000000000F0, 0x0F)
+t10: bits.Xor(0x10000000000000F0F, 0xFF0)
+t11: bits.Xor(0xFF0, 0x10000000000000F0F)
+t12: bits.Clear(0xF, 0x100000000000008)
+t13: bits.Clear(0x1000000000000000008, 0xF)
+-- out/bits --
+(struct){
+  t1: (int){ 9 }
+  t2: (int){ 128 }
+  t3: (int){ 16 }
+  t4: (int){ 1 }
+  t5: (int){ 0 }
+  t6: (int){ 384 }
+  t7: (int){ 0 }
+  t8: (int){ 6 }
+  t9: (int){ 18446744073709551871 }
+  t10: (int){ 18446744073709551871 }
+  t11: (int){ 18446744073709551871 }
+  t12: (int){ 7 }
+  t13: (int){ 4722366482869645213696 }
+}

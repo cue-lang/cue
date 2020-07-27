@@ -1,0 +1,16 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "crypto/sha512"
+
+t1: len(sha512.Sum512("hash me"))
+t2: len(sha512.Sum384("hash me"))
+t3: len(sha512.Sum512_224("hash me"))
+t4: len(sha512.Sum512_256("hash me"))
+-- out/sha512 --
+(struct){
+  t1: (int){ 64 }
+  t2: (int){ 48 }
+  t3: (int){ 28 }
+  t4: (int){ 32 }
+}

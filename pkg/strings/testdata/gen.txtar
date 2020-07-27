@@ -1,0 +1,74 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "strings"
+
+t1: strings.Join(["Hello", "World!"], " ")
+t2: strings.Join([1, 2], " ")
+t3: strings.ByteAt("a", 0)
+t4: strings.ByteSlice("Hello", 2, 5)
+t5: strings.SliceRunes("✓ Hello", 0, 3)
+t6: strings.Runes("Café")
+t7: strings.ToCamel("AlphaBeta")
+t8: strings.ToTitle("alpha")
+t9: strings.MaxRunes(3) & "foo"
+t10: strings.MaxRunes(3) & "quux"
+t11: strings.MinRunes(1) & "e"
+t12: strings.MaxRunes(0) & "e"
+t13: strings.MaxRunes(0) & ""
+t14: strings.MinRunes(3) & "hello"
+t15: strings.MaxRunes(10) & "hello"
+t16: strings.MaxRunes(3) & "hello"
+t17: strings.MinRunes(10) & "hello"
+-- out/strings --
+Errors:
+0: error in call to strings.Join: element 0 of list argument 0: cannot use value 1 (type int) as string
+t10: invalid value "quux" (does not satisfy strings.MaxRunes(3)):
+    ./in.cue:12:6
+t12: invalid value "e" (does not satisfy strings.MaxRunes(0)):
+    ./in.cue:14:6
+t16: invalid value "hello" (does not satisfy strings.MaxRunes(3)):
+    ./in.cue:18:6
+t17: invalid value "hello" (does not satisfy strings.MinRunes(10)):
+    ./in.cue:19:6
+
+Result:
+(_|_){
+  // [eval]
+  t1: (string){ "Hello World!" }
+  t2: (_|_){
+    // [eval] 0: error in call to strings.Join: element 0 of list argument 0: cannot use value 1 (type int) as string
+  }
+  t3: (int){ 97 }
+  t4: (bytes){ 'llo' }
+  t5: (string){ "✓ H" }
+  t6: (#list){
+    0: (int){ 67 }
+    1: (int){ 97 }
+    2: (int){ 102 }
+    3: (int){ 233 }
+  }
+  t7: (string){ "alphaBeta" }
+  t8: (string){ "Alpha" }
+  t9: (string){ "foo" }
+  t10: (_|_){
+    // [eval] t10: invalid value "quux" (does not satisfy strings.MaxRunes(3)):
+    //     ./in.cue:12:6
+  }
+  t11: (string){ "e" }
+  t12: (_|_){
+    // [eval] t12: invalid value "e" (does not satisfy strings.MaxRunes(0)):
+    //     ./in.cue:14:6
+  }
+  t13: (string){ "" }
+  t14: (string){ "hello" }
+  t15: (string){ "hello" }
+  t16: (_|_){
+    // [eval] t16: invalid value "hello" (does not satisfy strings.MaxRunes(3)):
+    //     ./in.cue:18:6
+  }
+  t17: (_|_){
+    // [eval] t17: invalid value "hello" (does not satisfy strings.MinRunes(10)):
+    //     ./in.cue:19:6
+  }
+}

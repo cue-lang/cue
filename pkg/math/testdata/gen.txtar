@@ -1,0 +1,116 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "math"
+
+t1: math.Pi
+t2: math.Floor(math.Pi)
+t3: math.Pi(3)
+t4: math.Floor(3, 5)
+t5: math.Floor("foo")
+t6: math.Jacobi(1000, 2000)
+t7: math.Jacobi(1000, 201)
+t8: math.Asin(2.0e400)
+t9: math.MultipleOf(4, 2)
+t10: math.MultipleOf(5, 2)
+t11: math.MultipleOf(5, 0)
+t12: math.MultipleOf(100, 1.00001)
+t13: math.MultipleOf(1, 1)
+t14: math.MultipleOf(5, 2.5)
+t15: math.MultipleOf(100e100, 10)
+t16: math.Pow(8, 4)
+t17: math.Pow10(4)
+t18: math.Signbit(-4)
+t19: math.Round(2.5)
+t20: math.Round(-2.5)
+t21: math.RoundToEven(2.5)
+t22: math.RoundToEven(-2.5)
+t23: math.Abs(2.5)
+t24: math.Abs(-2.2)
+t25: math.Cbrt(2)
+t26: math.Copysign(5, -2.2)
+t27: math.Exp(3)
+t28: math.Exp2(3.5)
+t29: math.Log(4)
+t30: math.Log10(4)
+t31: math.Log2(5)
+t32: math.Dim(3, 2.5)
+t33: math.Dim(5, 7.2)
+t34: math.Ceil(2.5)
+t35: math.Ceil(-2.2)
+t36: math.Floor(2.9)
+t37: math.Floor(-2.2)
+t38: math.Trunc(2.5)
+t39: math.Trunc(-2.9)
+-- out/math --
+Errors:
+error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000
+error in call to math.MultipleOf: division by zero
+t3: cannot call non-function math.Pi (type float):
+    ./in.cue:5:5
+t4: too many arguments in call to math.Floor (have 2, want 1):
+    ./in.cue:6:20
+t5: cannot use "foo" (type string) as number in argument 1 to math.Floor:
+    ./in.cue:7:16
+cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up:
+    ./in.cue:10:5
+
+Result:
+(_|_){
+  // [eval]
+  t1: (float){ 3.14159265358979323846264338327950288419716939937510582097494459 }
+  t2: (number){ 3 }
+  t3: (_|_){
+    // [eval] t3: cannot call non-function math.Pi (type float):
+    //     ./in.cue:5:5
+  }
+  t4: (_|_){
+    // [eval] t4: too many arguments in call to math.Floor (have 2, want 1):
+    //     ./in.cue:6:20
+  }
+  t5: (_|_){
+    // [eval] t5: cannot use "foo" (type string) as number in argument 1 to math.Floor:
+    //     ./in.cue:7:16
+  }
+  t6: (_|_){
+    // [eval] error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000
+  }
+  t7: (int){ 1 }
+  t8: (_|_){
+    // [eval] cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up:
+    //     ./in.cue:10:5
+  }
+  t9: (bool){ true }
+  t10: (bool){ false }
+  t11: (_|_){
+    // [eval] error in call to math.MultipleOf: division by zero
+  }
+  t12: (bool){ false }
+  t13: (bool){ true }
+  t14: (bool){ true }
+  t15: (bool){ true }
+  t16: (number){ 4096 }
+  t17: (number){ 1E+4 }
+  t18: (bool){ true }
+  t19: (number){ 3 }
+  t20: (number){ -3 }
+  t21: (number){ 2 }
+  t22: (number){ -2 }
+  t23: (number){ 2.5 }
+  t24: (number){ 2.2 }
+  t25: (number){ 1.25992104989487316476721 }
+  t26: (number){ -5 }
+  t27: (number){ 20.0855369231876677409285 }
+  t28: (number){ 11.3137084989847603904135 }
+  t29: (number){ 1.38629436111989061883446 }
+  t30: (number){ 0.602059991327962390427478 }
+  t31: (number){ 2.32192809488736234787032 }
+  t32: (number){ 0.5 }
+  t33: (number){ 0 }
+  t34: (number){ 3 }
+  t35: (number){ -2 }
+  t36: (number){ 2 }
+  t37: (number){ -3 }
+  t38: (number){ 2 }
+  t39: (number){ -2 }
+}

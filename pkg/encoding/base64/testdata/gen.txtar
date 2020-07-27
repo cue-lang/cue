@@ -1,0 +1,26 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "encoding/base64"
+
+t1: base64.Encode(null, "foo")
+t2: base64.Decode(null, base64.Encode(null, "foo"))
+t3: base64.Decode(null, "foo")
+t4: base64.Decode({}, "foo")
+-- out/base64 --
+Errors:
+error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null
+error in call to encoding/base64.Decode: illegal base64 data at input byte 0
+
+Result:
+(_|_){
+  // [eval]
+  t1: (string){ "Zm9v" }
+  t2: (bytes){ 'foo' }
+  t3: (_|_){
+    // [eval] error in call to encoding/base64.Decode: illegal base64 data at input byte 0
+  }
+  t4: (_|_){
+    // [eval] error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null
+  }
+}

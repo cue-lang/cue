@@ -1,0 +1,21 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "time"
+
+t1: time.Time & "1937-01-01T12:00:27.87+00:20"
+t2: time.Time & "no time"
+t3: time.Unix(1500000000, 123456)
+-- out/time --
+Errors:
+error in call to time.Time: invalid time "no time"
+
+Result:
+(_|_){
+  // [eval]
+  t1: (string){ "1937-01-01T12:00:27.87+00:20" }
+  t2: (_|_){
+    // [eval] error in call to time.Time: invalid time "no time"
+  }
+  t3: (string){ "2017-07-14T02:40:00.000123456Z" }
+}

@@ -1,0 +1,305 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "list"
+
+t1: list.Avg([1, 2, 3, 4])
+t2: list.Avg([])
+t3: list.Avg("foo")
+t4: list.Drop([1, 2, 3, 4], 0)
+t5: list.Drop([1, 2, 3, 4], 2)
+t6: list.Drop([1, 2, 3, 4], 10)
+t7: list.Drop([1, 2, 3, 4], -1)
+t8: list.FlattenN([1, [[2, 3], []], [4]], -1)
+t9: list.FlattenN([1, [[2, 3], []], [4]], 0)
+t10: list.FlattenN([1, [[2, 3], []], [4]], 1)
+t11: list.FlattenN([1, [[2, 3], []], [4]], 2)
+t12: list.FlattenN([[1, 2] | *[]], -1)
+t13: list.FlattenN("foo", 1)
+t14: list.FlattenN([], "foo")
+t15: list.Max([1, 2, 3, 4])
+t16: list.Max([])
+t17: list.Max("foo")
+t18: list.Min([1, 2, 3, 4])
+t19: list.Min([])
+t20: list.Min("foo")
+t21: list.Product([1, 2, 3, 4])
+t22: list.Product([])
+t23: list.Product("foo")
+t24: list.Range(0, 5, 0)
+t25: list.Range(5, 0, 1)
+t26: list.Range(0, 5, -1)
+t27: list.Range(0, 5, 1)
+t28: list.Range(0, 1, 1)
+t29: list.Range(0, 5, 2)
+t30: list.Range(5, 0, -1)
+t31: list.Range(0, 5, 0.5)
+t32: list.Slice([1, 2, 3, 4], 1, 3)
+t33: list.Slice([1, 2, 3, 4], -1, 3)
+t34: list.Slice([1, 2, 3, 4], 3, 1)
+t35: list.Slice([1, 2, 3, 4], 5, 5)
+t36: list.Slice([1, 2, 3, 4], 1, 5)
+t37: list.Sort([], list.Ascending)
+t38: list.Sort([2, 3, 1, 4], {x:_, y:_, less: x<y})
+t39: list.SortStable([{a:2,v:1}, {a:1,v:2}, {a:1,v:3}], {
+			x:_,
+			y:_,
+			less: (x.a < y.a)
+		})
+t40: list.Sort([{a:1}, {b:2}], list.Ascending)
+t41: list.SortStrings(["b", "a"])
+t42: list.SortStrings([1, 2])
+t43: list.Sum([1, 2, 3, 4])
+t44: list.Sum([])
+t45: list.Sum("foo")
+t46: list.Take([1, 2, 3, 4], 0)
+t47: list.Take([1, 2, 3, 4], 2)
+t48: list.Take([1, 2, 3, 4], 10)
+t49: list.Take([1, 2, 3, 4], -1)
+t50: list.MinItems([1, 2, 3, 4], 2)
+t51: list.MinItems([1, 2, 3, 4], 5)
+t52: list.MaxItems([1, 2, 3, 4], 5)
+t53: list.MaxItems([1, 2, 3, 4], 2)
+t54: list.Sort([{a:1}, {b:2}], list.Ascending)
+-- out/list --
+Errors:
+error in call to list.Avg: empty list
+error in call to list.Drop: negative index
+error in call to list.FlattenN: cannot use value "foo" (type string) as list
+error in call to list.Max: empty list
+error in call to list.Min: empty list
+error in call to list.Range: end must be greater than start when step is positive
+error in call to list.Range: end must be less than start when step is negative
+error in call to list.Range: step must be non zero
+error in call to list.Slice: invalid index: 3 > 1
+error in call to list.Slice: negative index
+error in call to list.Slice: slice bounds out of range
+error in call to list.Take: negative index
+0: error in call to list.SortStrings: element 0 of list argument 0: cannot use value 1 (type int) as string
+x: error in call to list.Sort: x: conflicting values string and {b:2} (mismatched types string and struct) (and 1 more errors)
+t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
+    ./in.cue:5:14
+t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN:
+    ./in.cue:16:24
+t17: cannot use "foo" (type string) as list in argument 1 to list.Max:
+    ./in.cue:19:15
+t20: cannot use "foo" (type string) as list in argument 1 to list.Min:
+    ./in.cue:22:15
+t23: cannot use "foo" (type string) as list in argument 1 to list.Product:
+    ./in.cue:25:19
+t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
+    ./in.cue:51:15
+
+Result:
+(_|_){
+  // [eval]
+  t1: (number){ 2.5 }
+  t2: (_|_){
+    // [eval] error in call to list.Avg: empty list
+  }
+  t3: (_|_){
+    // [eval] t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
+    //     ./in.cue:5:14
+  }
+  t4: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 4 }
+  }
+  t5: (#list){
+    0: (int){ 3 }
+    1: (int){ 4 }
+  }
+  t6: (#list){
+  }
+  t7: (_|_){
+    // [eval] error in call to list.Drop: negative index
+  }
+  t8: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 4 }
+  }
+  t9: (#list){
+    0: (int){ 1 }
+    1: (#list){
+      0: (#list){
+        0: (int){ 2 }
+        1: (int){ 3 }
+      }
+      1: (#list){
+      }
+    }
+    2: (#list){
+      0: (int){ 4 }
+    }
+  }
+  t10: (#list){
+    0: (int){ 1 }
+    1: (#list){
+      0: (int){ 2 }
+      1: (int){ 3 }
+    }
+    2: (#list){
+    }
+    3: (int){ 4 }
+  }
+  t11: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 4 }
+  }
+  t12: (#list){
+  }
+  t13: (_|_){
+    // [eval] error in call to list.FlattenN: cannot use value "foo" (type string) as list
+  }
+  t14: (_|_){
+    // [eval] t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN:
+    //     ./in.cue:16:24
+  }
+  t15: (number){ 4 }
+  t16: (_|_){
+    // [eval] error in call to list.Max: empty list
+  }
+  t17: (_|_){
+    // [eval] t17: cannot use "foo" (type string) as list in argument 1 to list.Max:
+    //     ./in.cue:19:15
+  }
+  t18: (number){ 1 }
+  t19: (_|_){
+    // [eval] error in call to list.Min: empty list
+  }
+  t20: (_|_){
+    // [eval] t20: cannot use "foo" (type string) as list in argument 1 to list.Min:
+    //     ./in.cue:22:15
+  }
+  t21: (number){ 24 }
+  t22: (number){ 1 }
+  t23: (_|_){
+    // [eval] t23: cannot use "foo" (type string) as list in argument 1 to list.Product:
+    //     ./in.cue:25:19
+  }
+  t24: (_|_){
+    // [eval] error in call to list.Range: step must be non zero
+  }
+  t25: (_|_){
+    // [eval] error in call to list.Range: end must be greater than start when step is positive
+  }
+  t26: (_|_){
+    // [eval] error in call to list.Range: end must be less than start when step is negative
+  }
+  t27: (#list){
+    0: (number){ 0 }
+    1: (number){ 1 }
+    2: (number){ 2 }
+    3: (number){ 3 }
+    4: (number){ 4 }
+  }
+  t28: (#list){
+    0: (number){ 0 }
+  }
+  t29: (#list){
+    0: (number){ 0 }
+    1: (number){ 2 }
+    2: (number){ 4 }
+  }
+  t30: (#list){
+    0: (number){ 5 }
+    1: (number){ 4 }
+    2: (number){ 3 }
+    3: (number){ 2 }
+    4: (number){ 1 }
+  }
+  t31: (#list){
+    0: (number){ 0 }
+    1: (number){ 0.5 }
+    2: (number){ 1.0 }
+    3: (number){ 1.5 }
+    4: (number){ 2.0 }
+    5: (number){ 2.5 }
+    6: (number){ 3.0 }
+    7: (number){ 3.5 }
+    8: (number){ 4.0 }
+    9: (number){ 4.5 }
+  }
+  t32: (#list){
+    0: (int){ 2 }
+    1: (int){ 3 }
+  }
+  t33: (_|_){
+    // [eval] error in call to list.Slice: negative index
+  }
+  t34: (_|_){
+    // [eval] error in call to list.Slice: invalid index: 3 > 1
+  }
+  t35: (_|_){
+    // [eval] error in call to list.Slice: slice bounds out of range
+  }
+  t36: (_|_){
+    // [eval] error in call to list.Slice: slice bounds out of range
+  }
+  t37: (#list){
+  }
+  t38: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 4 }
+  }
+  t39: (#list){
+    0: (struct){
+      a: (int){ 1 }
+      v: (int){ 2 }
+    }
+    1: (struct){
+      a: (int){ 1 }
+      v: (int){ 3 }
+    }
+    2: (struct){
+      a: (int){ 2 }
+      v: (int){ 1 }
+    }
+  }
+  t40: (_|_){
+    // [eval] x: error in call to list.Sort: x: conflicting values string and {b:2} (mismatched types string and struct) (and 1 more errors)
+  }
+  t41: (#list){
+    0: (string){ "a" }
+    1: (string){ "b" }
+  }
+  t42: (_|_){
+    // [eval] 0: error in call to list.SortStrings: element 0 of list argument 0: cannot use value 1 (type int) as string
+  }
+  t43: (number){ 10 }
+  t44: (number){ 0 }
+  t45: (_|_){
+    // [eval] t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
+    //     ./in.cue:51:15
+  }
+  t46: (#list){
+  }
+  t47: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  t48: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 4 }
+  }
+  t49: (_|_){
+    // [eval] error in call to list.Take: negative index
+  }
+  t50: (bool){ true }
+  t51: (bool){ false }
+  t52: (bool){ true }
+  t53: (bool){ false }
+  t54: (_|_){
+    // [eval] x: error in call to list.Sort: x: conflicting values string and {b:2} (mismatched types string and struct) (and 1 more errors)
+  }
+}

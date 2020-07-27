@@ -1,0 +1,39 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "encoding/json"
+
+t1: json.Validate("{\"a\":10}", {b:string})
+t2: json.Validate("{\"a\":10}", {a:<3})
+t3: json.Valid("1")
+t4: json.Compact("[1, 2]")
+t5: json.Indent(#"{"a": 1, "b": 2}"#, "", "  ")
+t6: json.Unmarshal("1")
+t7: json.MarshalStream([{a: 1}, {b: 2}])
+t8: {
+	x: int
+	y: json.Marshal({a: x})
+}
+-- out/json --
+Errors:
+a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3)
+
+Result:
+(_|_){
+  // [eval]
+  t1: (bool){ true }
+  t2: (_|_){
+    // [eval] a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3)
+  }
+  t3: (bool){ true }
+  t4: (string){ "[1,2]" }
+  t5: (string){ "{\n  \"a\": 1,\n  \"b\": 2\n}" }
+  t6: (int){ 1 }
+  t7: (string){ "{\"a\":1}\n{\"b\":2}\n" }
+  t8: (struct){
+    x: (int){ int }
+    y: (_|_){
+      // [incomplete] cannot convert incomplete value "int" to JSON
+    }
+  }
+}

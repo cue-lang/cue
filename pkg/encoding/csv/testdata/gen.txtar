@@ -1,0 +1,25 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "encoding/csv"
+
+t1: csv.Decode("1,2,3\n4,5,6")
+t2: csv.Encode([[1,2,3],[4,5],[7,8,9]])
+t3: csv.Encode([["a", "b"], ["c"]])
+-- out/csv --
+(struct){
+  t1: (#list){
+    0: (#list){
+      0: (string){ "1" }
+      1: (string){ "2" }
+      2: (string){ "3" }
+    }
+    1: (#list){
+      0: (string){ "4" }
+      1: (string){ "5" }
+      2: (string){ "6" }
+    }
+  }
+  t2: (string){ "1,2,3\n4,5\n7,8,9\n" }
+  t3: (string){ "a,b\nc\n" }
+}

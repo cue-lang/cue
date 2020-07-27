@@ -1,0 +1,14 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "crypto/sha256"
+
+t1: sha256.Sum256("hash me")
+t2: len(sha256.Sum256("hash me"))
+t3: len(sha256.Sum224("hash me"))
+-- out/sha256 --
+(struct){
+  t1: (bytes){ '\xeb \x1a\xf5\xaa\xf0\xd6\x06)\xd3Ҧ\x1eFl\xfc\x0f\xed\xb5\x17\xad\xd81\xec\xacR5\xe1کc\xd6' }
+  t2: (int){ 32 }
+  t3: (int){ 28 }
+}

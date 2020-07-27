@@ -1,0 +1,10 @@
+# generated from the original tests.
+# Henceforth it may be nicer to group tests into separate files.
+-- in.cue --
+import "crypto/sha1"
+
+t1: len(sha1.Sum("hash me"))
+-- out/sha1 --
+(struct){
+  t1: (int){ 20 }
+}

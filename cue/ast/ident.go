@@ -16,12 +16,12 @@ package ast
 
 import (
 	"strconv"
+	"strings"
 	"unicode"
 	"unicode/utf8"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/pkg/strings"
 )
 
 func isLetter(ch rune) bool {

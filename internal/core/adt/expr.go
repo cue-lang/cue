@@ -894,6 +894,8 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 			// Remove the path of the origin for arguments. This results in
 			// more sensible error messages: an error should refer to the call
 			// site, not the original location of the argument.
+			// TODO: alternative, explicitly mark the argument number and use
+			// that in error messages.
 			w := *v
 			w.Parent = nil
 			args = append(args, &w)

@@ -18,12 +18,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
-	"github.com/google/go-cmp/cmp"
+	_ "cuelang.org/go/pkg"
 )
 
 func TestToFile(t *testing.T) {
@@ -93,7 +95,7 @@ func TestToFile(t *testing.T) {
 			got := string(b)
 			want := strings.TrimLeft(tc.want, "\n")
 			if got != want {
-				t.Error(cmp.Diff(got, want))
+				t.Error(cmp.Diff(want, got))
 			}
 		})
 	}

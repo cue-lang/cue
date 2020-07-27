@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
+	_ "cuelang.org/go/pkg"
 )
 
 var update = flag.Bool("update", false, "update test files")

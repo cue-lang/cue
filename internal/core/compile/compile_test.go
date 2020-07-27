@@ -17,6 +17,7 @@ package compile_test
 import (
 	"flag"
 	"fmt"
+	"strings"
 	"testing"
 
 	"cuelang.org/go/cue/errors"
@@ -25,7 +26,6 @@ import (
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetxtar"
-	"cuelang.org/go/pkg/strings"
 )
 
 var (

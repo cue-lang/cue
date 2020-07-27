@@ -623,8 +623,9 @@ func Dereference(v Value) Value {
 
 // MakeValue converts an adt.Value and given OpContext to a Value. The context
 // must be directly or indirectly obtained from the NewRuntime defined in this
-// package and it will panic if this is not the case. This is for internal use
-// only.
+// package and it will panic if this is not the case.
+//
+// For internal use only.
 func MakeValue(ctx *adt.OpContext, v adt.Value) Value {
 	runtime := ctx.Impl().(*runtime.Runtime)
 	index := runtime.Data.(*index)
@@ -957,18 +958,25 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		}
 	}
 
-	if d := internal.Imports(f); len(d) == 0 {
-		if len(f.Decls) == 1 {
-			if e, ok := f.Decls[0].(*ast.EmbedDecl); ok {
-				return e.Expr
-			}
-		}
-		return &ast.StructLit{
-			Elts: f.Decls,
+outer:
+	for _, d := range f.Decls {
+		switch d.(type) {
+		case *ast.Package, *ast.ImportDecl:
+			return f
+		case *ast.CommentGroup, *ast.Attribute:
+		default:
+			break outer
 		}
 	}
 
-	return f
+	if len(f.Decls) == 1 {
+		if e, ok := f.Decls[0].(*ast.EmbedDecl); ok {
+			return e.Expr
+		}
+	}
+	return &ast.StructLit{
+		Elts: f.Decls,
+	}
 }
 
 // Decode initializes x with Value v. If x is a struct, it will validate the
@@ -1700,7 +1708,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 	case state.Flag('#'):
 		_, _ = io.WriteString(state, ctx.str(v.v))
 	case state.Flag('+'):
-		_, _ = io.WriteString(state, debugStr(ctx, v.v))
+		_, _ = io.WriteString(state, ctx.opCtx.Str(v.v))
 	default:
 		n, _ := export.Raw.Expr(v.idx.Runtime, v.v)
 		b, _ := format.Node(n)

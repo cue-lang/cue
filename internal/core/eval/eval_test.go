@@ -20,12 +20,14 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rogpeppe/go-internal/txtar"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
-	"github.com/rogpeppe/go-internal/txtar"
+	_ "cuelang.org/go/pkg"
 )
 
 var (

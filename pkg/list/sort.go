@@ -32,12 +32,25 @@ type valueSorter struct {
 }
 
 func (s *valueSorter) ret() ([]cue.Value, error) {
-	panic("implemented in cue/builtinutil.go")
+	if s.err != nil {
+		return nil, s.err
+	}
+	// The input slice is already a copy and that we can modify it safely.
+	return s.a, nil
 }
 
-func (s *valueSorter) Len() int           { panic("implemented in cue/builtinutil.go") }
-func (s *valueSorter) Swap(i, j int)      { panic("implemented in cue/builtinutil.go") }
-func (s *valueSorter) Less(i, j int) bool { panic("implemented in cue/builtinutil.go") }
+func (s *valueSorter) Len() int      { return len(s.a) }
+func (s *valueSorter) Swap(i, j int) { s.a[i], s.a[j] = s.a[j], s.a[i] }
+func (s *valueSorter) Less(i, j int) bool {
+	v := s.cmp.Fill(s.a[i], "x")
+	v = v.Fill(s.a[j], "y")
+	isLess, err := v.Lookup("less").Bool()
+	if err != nil && s.err == nil {
+		s.err = err
+		return true
+	}
+	return isLess
+}
 
 // Sort sorts data. It does O(n*log(n)) comparisons.
 // The sort is not guaranteed to be stable.

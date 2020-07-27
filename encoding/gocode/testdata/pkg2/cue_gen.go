@@ -7,6 +7,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/encoding/gocode/gocodec"
+	_ "cuelang.org/go/pkg"
 )
 
 var cuegenvalImportMe = cuegenMake("ImportMe", &ImportMe{})

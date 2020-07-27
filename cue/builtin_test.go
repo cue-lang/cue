@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"fmt"
@@ -20,6 +20,12 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/token"
+
+	_ "cuelang.org/go/pkg"
 )
 
 func TestBuiltins(t *testing.T) {
@@ -667,13 +673,12 @@ func TestBuiltins(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			insts := Build(makeInstances(tc.instances))
+			insts := cue.Build(makeInstances(tc.instances))
 			if err := insts[0].Err; err != nil {
 				t.Fatal(err)
 			}
 			v := insts[0].Value()
-			ctx := v.ctx()
-			got := ctx.opCtx.Str(v.v)
+			got := fmt.Sprintf("%+v", v)
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)
 			}
@@ -699,16 +704,64 @@ func TestSingleBuiltin(t *testing.T) {
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {
-			insts := Build(makeInstances(tc.instances))
+			insts := cue.Build(makeInstances(tc.instances))
 			if err := insts[0].Err; err != nil {
 				t.Fatal(err)
 			}
 			v := insts[0].Value()
-			ctx := v.ctx()
-			got := ctx.opCtx.Str(v.v)
+			got := fmt.Sprint(v)
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)
 			}
 		})
 	}
+}
+
+type builder struct {
+	ctxt    *build.Context
+	imports map[string]*bimport
+}
+
+func (b *builder) load(pos token.Pos, path string) *build.Instance {
+	bi := b.imports[path]
+	if bi == nil {
+		return nil
+	}
+	return b.build(bi)
+}
+
+type bimport struct {
+	path  string // "" means top-level
+	files []string
+}
+
+func makeInstances(insts []*bimport) (instances []*build.Instance) {
+	b := builder{
+		ctxt:    build.NewContext(),
+		imports: map[string]*bimport{},
+	}
+	for _, bi := range insts {
+		if bi.path != "" {
+			b.imports[bi.path] = bi
+		}
+	}
+	for _, bi := range insts {
+		if bi.path == "" {
+			instances = append(instances, b.build(bi))
+		}
+	}
+	return
+}
+
+func (b *builder) build(bi *bimport) *build.Instance {
+	path := bi.path
+	if path == "" {
+		path = "dir"
+	}
+	p := b.ctxt.NewInstance(path, b.load)
+	for i, f := range bi.files {
+		_ = p.AddFile(fmt.Sprintf("file%d.cue", i), f)
+	}
+	_ = p.Complete()
+	return p
 }

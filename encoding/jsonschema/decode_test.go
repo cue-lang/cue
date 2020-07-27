@@ -24,6 +24,10 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
+	"github.com/rogpeppe/go-internal/txtar"
+	"github.com/stretchr/testify/assert"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -31,9 +35,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
-	"github.com/google/go-cmp/cmp"
-	"github.com/stretchr/testify/assert"
-	"golang.org/x/tools/txtar"
+	_ "cuelang.org/go/pkg"
 )
 
 var update = flag.Bool("update", false, "update the test files")

@@ -69,7 +69,8 @@ Val:
         use: (string){ string }
       }
       baz: (_|_){
-        // [incomplete] non-concrete argument 0
+        // [incomplete] #Spec.data.baz: non-concrete argument 0:
+        //     ./in.cue:11:11
       }
       foobar: (_|_){
         // [incomplete] cannot convert incomplete value "string" to JSON

@@ -36,6 +36,7 @@ import (
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/core/validate"
 )
@@ -187,6 +188,7 @@ func (e *marshalError) Error() string {
 	return fmt.Sprintf("cue: marshal error: %v", e.err)
 }
 
+func (e *marshalError) Bottom() *adt.Bottom          { return e.b }
 func (e *marshalError) Path() []string               { return e.err.Path() }
 func (e *marshalError) Msg() (string, []interface{}) { return e.err.Msg() }
 func (e *marshalError) Position() token.Pos          { return e.err.Position() }
@@ -328,6 +330,16 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 		}
 	}
 	return int(n.X.Exponent), nil
+}
+
+// Decimal is for internal use only. The Decimal type that is returned is
+// subject to change.
+func (v Value) Decimal() (d *internal.Decimal, err error) {
+	n, err := v.getNum(numKind)
+	if err != nil {
+		return nil, err
+	}
+	return &n.X, nil
 }
 
 // AppendInt appends the string representation of x in the given base to buf and
@@ -607,6 +619,17 @@ func Dereference(v Value) Value {
 		return newErrValue(v, b)
 	}
 	return makeValue(v.idx, n)
+}
+
+// MakeValue converts an adt.Value and given OpContext to a Value. The context
+// must be directly or indirectly obtained from the NewRuntime defined in this
+// package and it will panic if this is not the case. This is for internal use
+// only.
+func MakeValue(ctx *adt.OpContext, v adt.Value) Value {
+	runtime := ctx.Impl().(*runtime.Runtime)
+	index := runtime.Data.(*index)
+
+	return newValueRoot(index.newContext(), v)
 }
 
 func makeValue(idx *index, v *adt.Vertex) Value {

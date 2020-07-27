@@ -35,7 +35,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
-	"cuelang.org/go/internal/core/runtime"
 )
 
 // A Builtin is a builtin function or constant.
@@ -122,13 +121,10 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 		Name:    b.Name,
 	}
 	x.Func = func(ctx *adt.OpContext, args []adt.Value) (ret adt.Expr) {
-		runtime := ctx.Impl().(*runtime.Runtime)
-		index := runtime.Data.(*index)
-
 		// call, _ := ctx.Source().(*ast.CallExpr)
 		c := &CallCtxt{
 			// src:  call,
-			ctx:     index.newContext(),
+			ctx:     ctx,
 			args:    args,
 			builtin: b,
 		}
@@ -143,8 +139,8 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 		switch v := c.Ret.(type) {
 		case adt.Value:
 			return v
-		case *valueError:
-			return v.err
+		case bottomer:
+			return v.Bottom()
 		}
 		if c.Err != nil {
 			return nil
@@ -180,11 +176,11 @@ func pos(n adt.Node) (p token.Pos) {
 	return src.Pos()
 }
 
-func (x *Builtin) name(ctx *context) string {
+func (x *Builtin) name(ctx *adt.OpContext) string {
 	if x.Pkg == 0 {
 		return x.Name
 	}
-	return fmt.Sprintf("%s.%s", ctx.LabelStr(x.Pkg), x.Name)
+	return fmt.Sprintf("%s.%s", x.Pkg.StringValue(ctx), x.Name)
 }
 
 func (x *Builtin) isValidator() bool {
@@ -193,24 +189,25 @@ func (x *Builtin) isValidator() bool {
 
 func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	ctx := call.ctx
-	src := call.src
 	switch err := errVal.(type) {
 	case nil:
 	case *callError:
 		ret = err.b
 	case *json.MarshalerError:
-		if err, ok := err.Err.(*marshalError); ok && err.b != nil {
-			ret = err.b
+		if err, ok := err.Err.(bottomer); ok {
+			if b := err.Bottom(); b != nil {
+				ret = b
+			}
 		}
-	case *marshalError:
-		ret = wrapCallErr(call, err.b)
-	case *valueError:
-		ret = wrapCallErr(call, err.err)
+	case bottomer:
+		ret = wrapCallErr(call, err.Bottom())
 	case errors.Error:
 		ret = wrapCallErr(call, &adt.Bottom{Err: err})
 	case error:
 		if call.Err == internal.ErrIncomplete {
-			ret = ctx.mkErr(src, codeIncomplete, "incomplete value")
+			err := ctx.NewErrf("incomplete value")
+			err.Code = adt.IncompleteError
+			ret = err
 		} else {
 			// TODO: store the underlying error explicitly
 			ret = wrapCallErr(call, &adt.Bottom{Err: errors.Promote(err, "")})
@@ -278,7 +275,7 @@ func (c *CallCtxt) convertError(x interface{}, name string) *adt.Bottom {
 // CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. It's interface may change.
 type CallCtxt struct {
 	src     adt.Expr // *adt.CallExpr
-	ctx     *context
+	ctx     *adt.OpContext
 	builtin *Builtin
 	Err     interface{}
 	Ret     interface{}
@@ -287,7 +284,7 @@ type CallCtxt struct {
 }
 
 func (c *CallCtxt) Pos() token.Pos {
-	return c.ctx.opCtx.Pos()
+	return c.ctx.Pos()
 }
 
 func (c *CallCtxt) Name() string {
@@ -351,6 +348,11 @@ func (c *CallCtxt) Do() bool {
 	return c.Err == nil
 }
 
+type bottomer interface {
+	error
+	Bottom() *adt.Bottom
+}
+
 type callError struct {
 	b *adt.Bottom
 }
@@ -360,27 +362,22 @@ func (e *callError) Error() string {
 }
 
 func (c *CallCtxt) errf(src adt.Node, underlying error, format string, args ...interface{}) {
-	a := make([]interface{}, 0, 2+len(args))
-	if err, ok := underlying.(*valueError); ok {
-		a = append(a, err.err)
+	var errs errors.Error
+	if err, ok := underlying.(bottomer); ok {
+		errs = err.Bottom().Err
 	}
-	a = append(a, format)
-	a = append(a, args...)
-	err := c.ctx.mkErr(src, a...)
-	c.Err = &callError{err}
+	errs = errors.Wrapf(errs, c.ctx.Pos(), format, args...)
+	c.Err = &callError{&adt.Bottom{Err: errs}}
 }
 
 func (c *CallCtxt) errcf(src adt.Node, code adt.ErrorCode, format string, args ...interface{}) {
-	a := make([]interface{}, 0, 2+len(args))
-	a = append(a, code)
-	a = append(a, format)
-	a = append(a, args...)
-	err := c.ctx.mkErr(src, a...)
+	err := c.ctx.NewErrf(format, args...)
+	err.Code = code
 	c.Err = &callError{err}
 }
 
 func (c *CallCtxt) Value(i int) Value {
-	v := newValueRoot(c.ctx, c.args[i])
+	v := MakeValue(c.ctx, c.args[i])
 	// TODO: remove default
 	// v, _ = v.Default()
 	if !v.IsConcrete() {
@@ -390,7 +387,7 @@ func (c *CallCtxt) Value(i int) Value {
 }
 
 func (c *CallCtxt) Struct(i int) *Struct {
-	v := newValueRoot(c.ctx, c.args[i])
+	v := MakeValue(c.ctx, c.args[i])
 	s, err := v.Struct()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "struct", err)
@@ -400,7 +397,7 @@ func (c *CallCtxt) Struct(i int) *Struct {
 }
 
 func (c *CallCtxt) invalidArgType(arg adt.Expr, i int, typ string, err error) {
-	if ve, ok := err.(*valueError); ok && ve.err.IsIncomplete() {
+	if ve, ok := err.(bottomer); ok && ve.Bottom().IsIncomplete() {
 		c.Err = ve
 		return
 	}
@@ -410,16 +407,16 @@ func (c *CallCtxt) invalidArgType(arg adt.Expr, i int, typ string, err error) {
 	if !ok {
 		c.errf(c.src, nil,
 			"cannot use incomplete value %s as %s in argument %d to %s: %v",
-			c.ctx.str(arg), typ, i, c.Name(), err)
+			c.ctx.Str(arg), typ, i, c.Name(), err)
 	}
 	if err != nil {
 		c.errf(c.src, err,
 			"cannot use %s (type %s) as %s in argument %d to %s: %v",
-			c.ctx.str(arg), v.Kind(), typ, i, c.Name(), err)
+			c.ctx.Str(arg), v.Kind(), typ, i, c.Name(), err)
 	} else {
 		c.errf(c.src, err,
 			"cannot use %s (type %s) as %s in argument %d to %s",
-			c.ctx.str(arg), v.Kind(), typ, i, c.Name())
+			c.ctx.Str(arg), v.Kind(), typ, i, c.Name())
 	}
 }
 
@@ -432,7 +429,7 @@ func (c *CallCtxt) Int64(i int) int64 { return int64(c.intValue(i, 64, "int64"))
 
 func (c *CallCtxt) intValue(i, bits int, typ string) int64 {
 	arg := c.args[i]
-	x := newValueRoot(c.ctx, arg)
+	x := MakeValue(c.ctx, arg)
 	n, err := x.Int(nil)
 	if err != nil {
 		c.invalidArgType(arg, i, typ, err)
@@ -454,7 +451,7 @@ func (c *CallCtxt) Uint32(i int) uint32 { return uint32(c.uintValue(i, 32, "uint
 func (c *CallCtxt) Uint64(i int) uint64 { return uint64(c.uintValue(i, 64, "uint64")) }
 
 func (c *CallCtxt) uintValue(i, bits int, typ string) uint64 {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil || n.Sign() < 0 {
 		c.invalidArgType(c.args[i], i, typ, err)
@@ -469,16 +466,16 @@ func (c *CallCtxt) uintValue(i, bits int, typ string) uint64 {
 }
 
 func (c *CallCtxt) Decimal(i int) *apd.Decimal {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	if _, err := x.MantExp(nil); err != nil {
 		c.invalidArgType(c.args[i], i, "Decimal", err)
 		return nil
 	}
-	return &c.args[i].(*numLit).X
+	return &c.args[i].(*adt.Num).X
 }
 
 func (c *CallCtxt) Float64(i int) float64 {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	res, err := x.Float64()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "float64", err)
@@ -488,7 +485,7 @@ func (c *CallCtxt) Float64(i int) float64 {
 }
 
 func (c *CallCtxt) BigInt(i int) *big.Int {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	n, err := x.Int(nil)
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "int", err)
@@ -500,7 +497,7 @@ func (c *CallCtxt) BigInt(i int) *big.Int {
 var ten = big.NewInt(10)
 
 func (c *CallCtxt) BigFloat(i int) *big.Float {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	var mant big.Int
 	exp, err := x.MantExp(&mant)
 	if err != nil {
@@ -518,7 +515,7 @@ func (c *CallCtxt) BigFloat(i int) *big.Float {
 }
 
 func (c *CallCtxt) String(i int) string {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	v, err := x.String()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "string", err)
@@ -528,7 +525,7 @@ func (c *CallCtxt) String(i int) string {
 }
 
 func (c *CallCtxt) Bytes(i int) []byte {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	v, err := x.Bytes()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "bytes", err)
@@ -538,7 +535,7 @@ func (c *CallCtxt) Bytes(i int) []byte {
 }
 
 func (c *CallCtxt) Reader(i int) io.Reader {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	// TODO: optimize for string and bytes cases
 	r, err := x.Reader()
 	if err != nil {
@@ -549,7 +546,7 @@ func (c *CallCtxt) Reader(i int) io.Reader {
 }
 
 func (c *CallCtxt) Bool(i int) bool {
-	x := newValueRoot(c.ctx, c.args[i])
+	x := MakeValue(c.ctx, c.args[i])
 	b, err := x.Bool()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "bool", err)
@@ -560,7 +557,7 @@ func (c *CallCtxt) Bool(i int) bool {
 
 func (c *CallCtxt) List(i int) (a []Value) {
 	arg := c.args[i]
-	x := newValueRoot(c.ctx, arg)
+	x := MakeValue(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "list", err)
@@ -574,38 +571,37 @@ func (c *CallCtxt) List(i int) (a []Value) {
 
 func (c *CallCtxt) Iter(i int) (a Iterator) {
 	arg := c.args[i]
-	x := newValueRoot(c.ctx, arg)
+	x := MakeValue(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "list", err)
-		return Iterator{ctx: c.ctx}
 	}
 	return v
 }
 
 func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 	arg := c.args[i]
-	x := newValueRoot(c.ctx, arg)
+	x := MakeValue(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "list", err)
 		return nil
 	}
 	for j := 0; v.Next(); j++ {
-		num, err := v.Value().getNum(numKind)
+		num, err := v.Value().Decimal()
 		if err != nil {
 			c.errf(c.src, err, "invalid list element %d in argument %d to %s: %v",
 				j, i, c.Name(), err)
 			break
 		}
-		a = append(a, &num.X)
+		a = append(a, num)
 	}
 	return a
 }
 
 func (c *CallCtxt) StringList(i int) (a []string) {
 	arg := c.args[i]
-	x := newValueRoot(c.ctx, arg)
+	x := MakeValue(c.ctx, arg)
 	v, err := x.List()
 	if err != nil {
 		c.invalidArgType(c.args[i], i, "list", err)

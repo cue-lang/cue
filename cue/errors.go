@@ -41,6 +41,8 @@ type valueError struct {
 	err *bottom
 }
 
+func (e *valueError) Bottom() *adt.Bottom { return e.err }
+
 func (e *valueError) Error() string {
 	return errors.String(e)
 }

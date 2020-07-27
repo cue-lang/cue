@@ -18,6 +18,7 @@ foo:   json.Marshal(input)
 (struct){
   input: (string){ string }
   foo: (_|_){
-    // [incomplete] non-concrete argument 0
+    // [incomplete] foo: non-concrete argument 0:
+    //     ./in.cue:4:8
   }
 }

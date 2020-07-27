@@ -96,7 +96,8 @@ x:
   #U: (#struct){
     s: (string){ string }
     out: (_|_){
-      // [incomplete] incomplete value
+      // [incomplete] #U.out: incomplete value:
+      //     ./in.cue:26:7
     }
   }
 }

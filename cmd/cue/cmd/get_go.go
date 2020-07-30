@@ -214,6 +214,8 @@ the more restrictive enum interpretation of Switch remains.
 	cmd.Flags().Bool(string(flagLocal), false,
 		"generates files in the main module locally")
 
+	cmd.Flags().StringP(string(flagPackage), "p", "", "package name for generated CUE files")
+
 	return cmd
 }
 
@@ -461,7 +463,12 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		}
 		sort.Strings(pkgs)
 
-		pkg := &cueast.Package{Name: e.ident(p.Name, false)}
+		pName := flagPackage.String(e.cmd)
+		if pName == "" {
+			pName = p.Name
+		}
+
+		pkg := &cueast.Package{Name: e.ident(pName, false)}
 		addDoc(f.Doc, pkg)
 
 		f := &cueast.File{Decls: []cueast.Decl{

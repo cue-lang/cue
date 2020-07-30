@@ -22,6 +22,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/copy"
+	"github.com/google/go-cmp/cmp"
 )
 
 func TestGetGo(t *testing.T) {
@@ -81,7 +82,7 @@ func TestGetGo(t *testing.T) {
 			got := loadFile(t, filepath.Join(root, path[len(dst):]))
 
 			if want != got {
-				t.Errorf("contexts for file %s differ", path[len(prefix):])
+				t.Errorf("contexts for file %s differ: \n%s", path[len(prefix):], cmp.Diff(got, want))
 			}
 		})
 		return nil

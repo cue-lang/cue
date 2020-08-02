@@ -19,6 +19,7 @@ package cli
 
 import (
 	"fmt"
+	"strings"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/task"
@@ -26,6 +27,7 @@ import (
 
 func init() {
 	task.Register("tool/cli.Print", newPrintCmd)
+	task.Register("tool/cli.Ask", newAskCmd)
 
 	// For backwards compatibility.
 	task.Register("print", newPrintCmd)
@@ -44,4 +46,40 @@ func (c *printCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 	fmt.Fprintln(ctx.Stdout, str)
 	return nil, nil
+}
+
+type askCmd struct{}
+
+func newAskCmd(v cue.Value) (task.Runner, error) {
+	return &askCmd{}, nil
+}
+
+func (c *askCmd) Run(ctx *task.Context) (res interface{}, err error) {
+	str := ctx.String("prompt")
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+	if str != "" {
+		fmt.Fprint(ctx.Stdout, str+" ")
+	}
+
+	var response string
+	if _, err := fmt.Scan(&response); err != nil {
+		return nil, err
+	}
+
+	update := map[string]interface{}{"response": response}
+
+	switch v := ctx.Lookup("response"); v.IncompleteKind() {
+	case cue.BoolKind:
+		switch strings.ToLower(response) {
+		case "yes":
+			update["response"] = true
+		default:
+			update["response"] = false
+		}
+	case cue.StringKind:
+		// already set above
+	}
+	return update, nil
 }

@@ -23,5 +23,10 @@ var pkg = &internal.Package{
 		$id:  *"tool/cli.Print" | "print"
 		text: string
 	}
+	Ask: {
+		kind:     "tool/cli.Ask"
+		prompt:   string
+		response: string | bool
+	}
 }`,
 }

@@ -12,7 +12,6 @@
 //     	text: string
 //     }
 //
-//     // TODO:
 //     // Ask prompts the current console with a message and waits for input.
 //     //
 //     // Example:
@@ -20,15 +19,15 @@
 //     //         prompt:   "Are you okay?"
 //     //         repsonse: bool
 //     //     })
-//     // Ask: {
-//     //  kind: "tool/cli.Ask"
+//     Ask: {
+//     	kind: "tool/cli.Ask"
 //
-//     //  // prompt sends this message to the output.
-//     //  prompt: string
+//     	// prompt sends this message to the output.
+//     	prompt: string
 //
-//     //  // response holds the user's response. If it is a boolean expression it
-//     //  // will interpret the answer using textual yes/ no.
-//     //  response: string | bool
-//     // }
+//     	// response holds the user's response. If it is a boolean expression it
+//     	// will interpret the answer using textual yes/ no.
+//     	response: string | bool
+//     }
 //
 package cli

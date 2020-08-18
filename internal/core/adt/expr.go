@@ -890,7 +890,16 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 	args := []Value{}
 	for _, a := range x.Args {
 		expr := c.value(a)
-		args = append(args, expr)
+		if v, ok := expr.(*Vertex); ok {
+			// Remove the path of the origin for arguments. This results in
+			// more sensible error messages: an error should refer to the call
+			// site, not the original location of the argument.
+			w := *v
+			w.Parent = nil
+			args = append(args, &w)
+		} else {
+			args = append(args, expr)
+		}
 	}
 	if c.HasErr() {
 		return nil

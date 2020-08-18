@@ -1520,9 +1520,14 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 	for i := len(path) - 1; i >= 0; i-- {
 		x = map[string]interface{}{path[i]: x}
 	}
-	var value = convert.GoValueToExpr(ctx.opCtx, true, x)
-	n := &adt.Vertex{Parent: v.v.Parent}
-	n.AddConjunct(adt.MakeConjunct(nil, value))
+	var value = convert.GoValueToValue(ctx.opCtx, x, true)
+	n, _ := value.(*adt.Vertex)
+	if n == nil {
+		n = &adt.Vertex{Label: v.v.Label, Parent: v.v.Parent}
+		n.AddConjunct(adt.MakeConjunct(nil, value))
+	} else {
+		n.Label = v.v.Label
+	}
 	n.Finalize(ctx.opCtx)
 	w := makeValue(v.idx, n)
 	return v.Unify(w)

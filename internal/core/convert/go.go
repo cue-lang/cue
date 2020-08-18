@@ -391,8 +391,9 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 		case reflect.Struct:
 			obj := &adt.StructLit{Src: src}
-			v := &adt.Vertex{Value: &adt.StructMarker{}}
+			v := &adt.Vertex{}
 			v.AddConjunct(adt.MakeConjunct(nil, obj))
+			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
 			for i := 0; i < value.NumField(); i++ {
@@ -443,6 +444,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 			obj := &adt.StructLit{Src: src}
 			v := &adt.Vertex{Value: &adt.StructMarker{}}
 			v.AddConjunct(adt.MakeConjunct(nil, obj))
+			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
 			switch key := t.Key(); key.Kind() {

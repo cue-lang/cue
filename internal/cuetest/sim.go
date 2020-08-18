@@ -65,6 +65,9 @@ func Run(t *testing.T, dir, command string, cfg *Config) {
 		cfg.Stdout = buf
 	}
 	cmd, err := cmd.New(args)
+	if err != nil {
+		t.Fatal(err)
+	}
 	if cfg.Stdout != nil {
 		cmd.SetOutput(cfg.Stdout)
 	} else {

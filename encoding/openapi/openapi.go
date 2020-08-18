@@ -133,27 +133,29 @@ func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit) (x *ast.Str
 	var info *ast.StructLit
 
 	for i, _ := inst.Value().Fields(cue.Definitions(true)); i.Next(); {
-		if !i.IsDefinition() {
-			label := i.Label()
-			attr := i.Value().Attribute("openapi")
-			if s, _ := attr.String(0); s != "" {
-				label = s
-			}
-			switch label {
-			case "-":
-			case "info":
-				info, _ = i.Value().Syntax().(*ast.StructLit)
-				if info == nil {
-					errs = errors.Append(errs, errors.Newf(i.Value().Pos(),
-						"info must be a struct"))
-				}
-				title, _ = i.Value().Lookup("title").String()
-				version, _ = i.Value().Lookup("version").String()
-
-			default:
+		if i.IsDefinition() {
+			continue
+		}
+		label := i.Label()
+		attr := i.Value().Attribute("openapi")
+		if s, _ := attr.String(0); s != "" {
+			label = s
+		}
+		switch label {
+		case "$version":
+		case "-":
+		case "info":
+			info, _ = i.Value().Syntax().(*ast.StructLit)
+			if info == nil {
 				errs = errors.Append(errs, errors.Newf(i.Value().Pos(),
-					"openapi: unsupported top-level field %q", x))
+					"info must be a struct"))
 			}
+			title, _ = i.Value().Lookup("title").String()
+			version, _ = i.Value().Lookup("version").String()
+
+		default:
+			errs = errors.Append(errs, errors.Newf(i.Value().Pos(),
+				"openapi: unsupported top-level field %q", label))
 		}
 	}
 
@@ -210,7 +212,7 @@ func (c *Config) compose(inst *cue.Instance, schemas *ast.StructLit) (x *ast.Str
 		"info", info,
 		"paths", ast.NewStruct(),
 		"components", ast.NewStruct("schemas", schemas),
-	), nil
+	), errs
 }
 
 // Schemas extracts component/schemas from the CUE top-level types.

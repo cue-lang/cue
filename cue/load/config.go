@@ -395,7 +395,7 @@ func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 		absDir = filepath.Join(GenPath(c.ModuleRoot), sub)
 	}
 
-	return absDir, name, nil
+	return absDir, name, err
 }
 
 // Complete updates the configuration information. After calling complete,

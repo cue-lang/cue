@@ -386,7 +386,7 @@ func Log2(x *internal.Decimal) (*internal.Decimal, error) {
 		return &d, err
 	}
 	_, err = apdContext.Quo(&d, &d, &ln2)
-	return &d, nil
+	return &d, err
 }
 
 // Log1p returns the natural logarithm of 1 plus its argument x.

@@ -61,43 +61,6 @@ const (
 	InterpolationOp = adt.InterpolationOp
 )
 
-var opToOp = map[op]Op{
-	opUnify: AndOp,
-	// TODO(eval): opUnifyUnchecked is not the same as opUnify and should have its own
-	// category, if needed. More likely opUnifyUnchecked, should be
-	// represented as a separate embedding method.
-	opUnifyUnchecked: AndOp,
-	opDisjunction:    OrOp,
-	opLand:           BooleanAndOp,
-	opLor:            BooleanOrOp,
-	opEql:            EqualOp,
-	opNot:            NotOp,
-	opNeq:            NotEqualOp,
-	opLss:            LessThanOp,
-	opLeq:            LessThanEqualOp,
-	opGtr:            GreaterThanOp,
-	opGeq:            GreaterThanEqualOp,
-	opMat:            RegexMatchOp,
-	opNMat:           NotRegexMatchOp,
-	opAdd:            AddOp,
-	opSub:            SubtractOp,
-	opMul:            MultiplyOp,
-	opQuo:            FloatQuotientOp,
-	opIQuo:           IntQuotientOp,
-	opIRem:           IntRemainderOp,
-	opIDiv:           IntDivideOp,
-	opIMod:           IntModuloOp,
-}
-
-func opIn(op op, anyOf ...op) bool {
-	for _, o := range anyOf {
-		if o == op {
-			return true
-		}
-	}
-	return false
-}
-
 // isCmp reports whether an op is a comparator.
 func (op op) isCmp() bool {
 	return opEql <= op && op <= opGeq

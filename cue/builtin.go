@@ -171,50 +171,6 @@ func mustParseConstBuiltin(ctx *context, name, val string) adt.Expr {
 
 }
 
-var lenBuiltin = &builtin{
-	Name:   "len",
-	Params: []kind{stringKind | bytesKind | listKind | structKind},
-	Result: intKind,
-	Func: func(c *callCtxt) {
-		v := c.value(0)
-		switch k := v.IncompleteKind(); k {
-		case StructKind:
-			s, err := v.structValData(c.ctx)
-			if err != nil {
-				c.ret = err
-				break
-			}
-			c.ret = s.Len()
-		case ListKind:
-			i := 0
-			iter, err := v.List()
-			if err != nil {
-				c.ret = err
-				break
-			}
-			for ; iter.Next(); i++ {
-			}
-			c.ret = i
-		case BytesKind:
-			b, err := v.Bytes()
-			if err != nil {
-				c.ret = err
-				break
-			}
-			c.ret = len(b)
-		case StringKind:
-			s, err := v.String()
-			if err != nil {
-				c.ret = err
-				break
-			}
-			c.ret = len(s)
-		default:
-			c.ret = c.ctx.opCtx.Newf("invalid argument type %v", k)
-		}
-	},
-}
-
 func pos(n adt.Node) (p token.Pos) {
 	if n == nil {
 		return
@@ -224,71 +180,6 @@ func pos(n adt.Node) (p token.Pos) {
 		return
 	}
 	return src.Pos()
-}
-
-var closeBuiltin = &builtin{
-	Name:   "close",
-	Params: []kind{structKind},
-	Result: structKind,
-	Func: func(c *callCtxt) {
-		s, ok := c.args[0].(*adt.Vertex)
-		if !ok {
-			c.ret = errors.Newf(pos(c.args[0]), "struct argument must be concrete")
-			return
-		}
-		if s.IsClosed(c.ctx.opCtx) {
-			c.ret = s
-		} else {
-			v := *s
-			v.Closed = nil // TODO: set dedicated Closer.
-			c.ret = &v
-		}
-	},
-}
-
-var andBuiltin = &builtin{
-	Name:   "and",
-	Params: []kind{listKind},
-	Result: intKind,
-	Func: func(c *callCtxt) {
-		iter := c.iter(0)
-		if !iter.Next() {
-			c.ret = &top{}
-			return
-		}
-		var u adt.Expr = iter.Value().v
-		for iter.Next() {
-			u = &adt.BinaryExpr{Op: adt.AndOp, X: u, Y: iter.Value().v}
-		}
-		c.ret = u
-	},
-}
-
-var orBuiltin = &builtin{
-	Name:   "or",
-	Params: []kind{listKind},
-	Result: intKind,
-	Func: func(c *callCtxt) {
-		iter := c.iter(0)
-		d := []adt.Disjunct{}
-		for iter.Next() {
-			d = append(d, adt.Disjunct{iter.Value().v, false})
-		}
-		c.ret = &adt.DisjunctionExpr{nil, d, false}
-		if len(d) == 0 {
-			// TODO(manifest): This should not be unconditionally incomplete,
-			// but it requires results from comprehensions and all to have
-			// some special status. Maybe this can be solved by having results
-			// of list comprehensions be open if they result from iterating over
-			// an open list or struct. This would actually be exactly what
-			// that means. The error here could then only add an incomplete
-			// status if the source is open.
-			c.ret = &adt.Bottom{
-				Code: adt.IncompleteError,
-				Err:  errors.Newf(c.Pos(), "empty list in call to or"),
-			}
-		}
-	},
 }
 
 func (x *builtin) name(ctx *context) string {
@@ -428,10 +319,6 @@ func initBuiltins(pkgs map[string]*builtinPkg) {
 		builtins[k] = i
 		builtins["-/"+path.Base(k)] = i
 	}
-}
-
-func getBuiltinShorthandPkg(ctx *context, shorthand string) *structLit {
-	return getBuiltinPkg(ctx, "-/"+shorthand)
 }
 
 func getBuiltinPkg(ctx *context, path string) *structLit {

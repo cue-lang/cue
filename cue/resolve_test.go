@@ -17,8 +17,6 @@ package cue
 import (
 	"strings"
 	"testing"
-
-	"cuelang.org/go/internal/core/adt"
 )
 
 func TestX(t *testing.T) {
@@ -29,34 +27,4 @@ func TestX(t *testing.T) {
 	if strings.TrimSpace(in) == "" {
 		t.Skip()
 	}
-}
-
-// var traceOn = flag.Bool("debug", false, "enable tracing")
-
-// func compileFileWithErrors(t *testing.T, body string) (*context, *structLit, error) {
-// 	t.Helper()
-// 	ctx, inst, err := compileInstance(t, body)
-// 	return ctx, inst.root, err
-// }
-
-// func compileFile(t *testing.T, body string) (*context, *structLit) {
-// 	t.Helper()
-// 	ctx, inst, errs := compileInstance(t, body)
-// 	if errs != nil {
-// 		t.Fatal(errs)
-// 	}
-// 	return ctx, inst.root
-// }
-
-func compileInstance(t *testing.T, body string) (*context, *Instance, error) {
-	var r Runtime
-	inst, err := r.Compile("test", body)
-
-	if err != nil {
-		x := newInstance(newIndex(sharedIndex), nil, &adt.Vertex{})
-		ctx := x.newContext()
-		return ctx, x, err
-	}
-
-	return r.index().newContext(), inst, nil
 }

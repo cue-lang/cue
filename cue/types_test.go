@@ -2950,9 +2950,3 @@ func compactRawStr(v Value) string {
 	cfg := &debug.Config{Compact: true, Raw: true}
 	return debug.NodeString(ctx.opCtx, v.v, cfg)
 }
-
-func compactValueStr(v Value) string {
-	ctx := v.ctx()
-	cfg := &debug.Config{Compact: true}
-	return debug.NodeString(ctx.opCtx, v.v, cfg)
-}

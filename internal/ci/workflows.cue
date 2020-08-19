@@ -7,7 +7,7 @@ import (
 
 workflowsDir: *"./" | string @tag(workflowsDir)
 
-workflows: [...{file: string, schema: (json.#Workflow&{})}]
+workflows: [...{file: string, schema: (json.#Workflow & {})}]
 workflows: [
 	{
 		file:   "test.yml"
@@ -30,7 +30,7 @@ workflows: [
 // TODO: drop when cuelang.org/issue/390 is fixed.
 // Declare definitions for sub-schemas
 #job:  ((json.#Workflow & {}).jobs & {x: _}).x
-#step: ((#job & {steps:           _}).steps & [_])[0]
+#step: ((#job & {steps:                  _}).steps & [_])[0]
 
 #latestGo: "1.14.3"
 
@@ -161,7 +161,7 @@ test_dispatch: json.#Workflow & {
 		}
 	}
 
-	name: "Test"
+	name: "Test Dispatch"
 	env: GERRIT_COOKIE: "${{ secrets.gerritCookie }}"
 	on: ["repository_dispatch"]
 	defaults: run: shell: "bash"

@@ -14,6 +14,7 @@ t8: {
 	x: int
 	y: json.Marshal({a: x})
 }
+t9: json.MarshalStream([{a: 1}, {b: int | *2}])
 -- out/json --
 Errors:
 a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3)
@@ -36,4 +37,5 @@ Result:
       // [incomplete] cannot convert incomplete value "int" to JSON
     }
   }
+  t9: (string){ "{\"a\":1}\n{\"b\":2}\n" }
 }

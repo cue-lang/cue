@@ -28,6 +28,9 @@ const debug = false
 type Profile struct {
 	Simplify bool
 
+	// TakeDefaults is used in Value mode to drop non-default values.
+	TakeDefaults bool
+
 	// TODO:
 	// IncludeDocs
 	ShowOptional    bool
@@ -48,6 +51,11 @@ type Profile struct {
 var Simplified = &Profile{
 	Simplify: true,
 	ShowDocs: true,
+}
+
+var Final = &Profile{
+	Simplify:     true,
+	TakeDefaults: true,
 }
 
 var Raw = &Profile{

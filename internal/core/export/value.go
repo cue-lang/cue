@@ -80,6 +80,9 @@ func stripRefs(x ast.Expr) ast.Expr {
 }
 
 func (e *exporter) value(n adt.Value, a ...adt.Conjunct) (result ast.Expr) {
+	if e.cfg.TakeDefaults {
+		n = adt.Default(n)
+	}
 	// Evaluate arc if needed?
 
 	// if e.concrete && !adt.IsConcrete(n.Value) {

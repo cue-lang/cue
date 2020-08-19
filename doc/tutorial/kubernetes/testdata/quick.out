@@ -14,10 +14,10 @@ service: {
     bartender: {
         spec: {
             ports: [{
-                port:       *7080 | int32
-                targetPort: *7080 | int32 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       7080
+                targetPort: 7080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "bartender"
@@ -40,7 +40,7 @@ service: {
 deployment: {
     bartender: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -60,7 +60,7 @@ deployment: {
                         image: "gcr.io/myproj/bartender:v0.1.34"
                         args: []
                         ports: [{
-                            containerPort: *7080 | int32
+                            containerPort: 7080
                         }]
                     }]
                 }
@@ -84,10 +84,10 @@ service: {
     breaddispatcher: {
         spec: {
             ports: [{
-                port:       *7080 | int32
-                targetPort: *7080 | int32 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       7080
+                targetPort: 7080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "breaddispatcher"
@@ -110,7 +110,7 @@ service: {
 deployment: {
     breaddispatcher: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -130,7 +130,7 @@ deployment: {
                         image: "gcr.io/myproj/breaddispatcher:v0.3.24"
                         args: ["-etcd=etcd:2379", "-event-server=events:7788"]
                         ports: [{
-                            containerPort: *7080 | int32
+                            containerPort: 7080
                         }]
                     }]
                 }
@@ -154,10 +154,10 @@ service: {
     host: {
         spec: {
             ports: [{
-                port:       *7080 | int32
-                targetPort: *7080 | int32 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       7080
+                targetPort: 7080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "host"
@@ -200,7 +200,7 @@ deployment: {
                         image: "gcr.io/myproj/host:v0.1.10"
                         args: []
                         ports: [{
-                            containerPort: *7080 | int32
+                            containerPort: 7080
                         }]
                     }]
                 }
@@ -224,10 +224,10 @@ service: {
     maitred: {
         spec: {
             ports: [{
-                port:       *7080 | int32
-                targetPort: *7080 | int32 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       7080
+                targetPort: 7080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "maitred"
@@ -250,7 +250,7 @@ service: {
 deployment: {
     maitred: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -270,7 +270,7 @@ deployment: {
                         image: "gcr.io/myproj/maitred:v0.0.4"
                         args: []
                         ports: [{
-                            containerPort: *7080 | int32
+                            containerPort: 7080
                         }]
                     }]
                 }
@@ -295,9 +295,9 @@ service: {
         spec: {
             ports: [{
                 name:       "http"
-                port:       *8080 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *8080 | int
+                port:       8080
+                protocol:   "TCP"
+                targetPort: 8080
             }]
             selector: {
                 app:       "valeter"
@@ -320,7 +320,7 @@ service: {
 deployment: {
     valeter: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -364,10 +364,10 @@ service: {
     waiter: {
         spec: {
             ports: [{
-                port:       *7080 | int32
-                targetPort: *7080 | int32 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       7080
+                targetPort: 7080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "waiter"
@@ -409,7 +409,7 @@ deployment: {
                         name:  "waiter"
                         image: "gcr.io/myproj/waiter:v0.3.0"
                         ports: [{
-                            containerPort: *7080 | int32
+                            containerPort: 7080
                         }]
                     }]
                 }
@@ -434,9 +434,9 @@ service: {
         spec: {
             ports: [{
                 name:       "http"
-                port:       *7080 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *7080 | int32 | int
+                port:       7080
+                protocol:   "TCP"
+                targetPort: 7080
             }]
             selector: {
                 app:       "waterdispatcher"
@@ -459,7 +459,7 @@ service: {
 deployment: {
     waterdispatcher: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -479,7 +479,7 @@ deployment: {
                         image: "gcr.io/myproj/waterdispatcher:v0.0.48"
                         args: ["-http=:8080", "-etcd=etcd:2379"]
                         ports: [{
-                            containerPort: *7080 | int32
+                            containerPort: 7080
                         }]
                     }]
                 }
@@ -509,10 +509,10 @@ service: {
     download: {
         spec: {
             ports: [{
-                port:       *7080 | int32
-                targetPort: *7080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       7080
+                targetPort: 7080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "download"
@@ -535,7 +535,7 @@ service: {
 deployment: {
     download: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -575,15 +575,15 @@ service: {
         spec: {
             clusterIP: "None"
             ports: [{
-                port:       *2379 | int32
-                targetPort: *2379 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       2379
+                targetPort: 2379
+                name:       "client"
+                protocol:   "TCP"
             }, {
                 name:       "peer"
-                port:       *2380 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *2380 | int
+                port:       2380
+                protocol:   "TCP"
+                targetPort: 2380
             }]
             selector: {
                 app:       "etcd"
@@ -720,9 +720,9 @@ service: {
         spec: {
             ports: [{
                 name:       "grpc"
-                port:       *7788 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *7788 | int
+                port:       7788
+                protocol:   "TCP"
+                targetPort: 7788
             }]
             selector: {
                 app:       "events"
@@ -819,8 +819,8 @@ service: {
             ports: [{
                 port:       443
                 name:       "http"
-                protocol:   *"TCP" | "UDP"
-                targetPort: *7443 | int
+                protocol:   "TCP"
+                targetPort: 7443
             }]
             selector: {
                 app:       "tasks"
@@ -843,7 +843,7 @@ service: {
 deployment: {
     tasks: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -898,10 +898,10 @@ service: {
     updater: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "updater"
@@ -924,7 +924,7 @@ service: {
 deployment: {
     updater: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -977,9 +977,9 @@ service: {
             loadBalancerIP: "1.2.3.4."
             ports: [{
                 name:       "http"
-                port:       *7788 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *7788 | int
+                port:       7788
+                protocol:   "TCP"
+                targetPort: 7788
             }]
             selector: {
                 app:       "watcher"
@@ -1002,7 +1002,7 @@ service: {
 deployment: {
     watcher: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1059,10 +1059,10 @@ service: {
     caller: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "caller"
@@ -1106,9 +1106,9 @@ deployment: {
                             fsType: "ext4"
                         }
                     }, {
-                        name: *"secret-caller" | string
+                        name: "secret-caller"
                         secret: {
-                            secretName: *"caller-secrets" | string
+                            secretName: "caller-secrets"
                         }
                     }, {
                         name: "secret-ssh-key"
@@ -1121,10 +1121,10 @@ deployment: {
                         image: "gcr.io/myproj/caller:v0.20.14"
                         volumeMounts: [{
                             name:      "ssd-caller"
-                            mountPath: *"/logs" | string
+                            mountPath: "/logs"
                         }, {
-                            mountPath: *"/etc/certs" | string
-                            name:      *"secret-caller" | string
+                            mountPath: "/etc/certs"
+                            name:      "secret-caller"
                             readOnly:  true
                         }, {
                             mountPath: "/sslcerts"
@@ -1165,10 +1165,10 @@ service: {
     dishwasher: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "dishwasher"
@@ -1206,15 +1206,15 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: *"dishwasher-disk" | string
+                        name: "dishwasher-disk"
                         gcePersistentDisk: {
-                            pdName: *"dishwasher-disk" | string
+                            pdName: "dishwasher-disk"
                             fsType: "ext4"
                         }
                     }, {
-                        name: *"secret-dishwasher" | string
+                        name: "secret-dishwasher"
                         secret: {
-                            secretName: *"dishwasher-secrets" | string
+                            secretName: "dishwasher-secrets"
                         }
                     }, {
                         name: "secret-ssh-key"
@@ -1226,11 +1226,11 @@ deployment: {
                         name:  "dishwasher"
                         image: "gcr.io/myproj/dishwasher:v0.2.13"
                         volumeMounts: [{
-                            name:      *"dishwasher-disk" | string
-                            mountPath: *"/logs" | string
+                            name:      "dishwasher-disk"
+                            mountPath: "/logs"
                         }, {
                             mountPath: "/sslcerts"
-                            name:      *"secret-dishwasher" | string
+                            name:      "secret-dishwasher"
                             readOnly:  true
                         }, {
                             mountPath: "/etc/certs"
@@ -1271,10 +1271,10 @@ service: {
     expiditer: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "expiditer"
@@ -1297,7 +1297,7 @@ service: {
 deployment: {
     expiditer: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1312,15 +1312,15 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: *"expiditer-disk" | string
+                        name: "expiditer-disk"
                         gcePersistentDisk: {
-                            pdName: *"expiditer-disk" | string
+                            pdName: "expiditer-disk"
                             fsType: "ext4"
                         }
                     }, {
-                        name: *"secret-expiditer" | string
+                        name: "secret-expiditer"
                         secret: {
-                            secretName: *"expiditer-secrets" | string
+                            secretName: "expiditer-secrets"
                         }
                     }]
                     containers: [{
@@ -1331,11 +1331,11 @@ deployment: {
                             containerPort: 8080
                         }]
                         volumeMounts: [{
-                            name:      *"expiditer-disk" | string
-                            mountPath: *"/logs" | string
+                            name:      "expiditer-disk"
+                            mountPath: "/logs"
                         }, {
-                            mountPath: *"/etc/certs" | string
-                            name:      *"secret-expiditer" | string
+                            mountPath: "/etc/certs"
+                            name:      "secret-expiditer"
                             readOnly:  true
                         }]
                         livenessProbe: {
@@ -1368,10 +1368,10 @@ service: {
     headchef: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "headchef"
@@ -1394,7 +1394,7 @@ service: {
 deployment: {
     headchef: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1409,26 +1409,26 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: *"headchef-disk" | string
+                        name: "headchef-disk"
                         gcePersistentDisk: {
-                            pdName: *"headchef-disk" | string
+                            pdName: "headchef-disk"
                             fsType: "ext4"
                         }
                     }, {
-                        name: *"secret-headchef" | string
+                        name: "secret-headchef"
                         secret: {
-                            secretName: *"headchef-secrets" | string
+                            secretName: "headchef-secrets"
                         }
                     }]
                     containers: [{
                         name:  "headchef"
                         image: "gcr.io/myproj/headchef:v0.2.16"
                         volumeMounts: [{
-                            name:      *"headchef-disk" | string
-                            mountPath: *"/logs" | string
+                            name:      "headchef-disk"
+                            mountPath: "/logs"
                         }, {
                             mountPath: "/sslcerts"
-                            name:      *"secret-headchef" | string
+                            name:      "secret-headchef"
                             readOnly:  true
                         }]
                         args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
@@ -1465,10 +1465,10 @@ service: {
     linecook: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "linecook"
@@ -1491,7 +1491,7 @@ service: {
 deployment: {
     linecook: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1506,9 +1506,9 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: *"linecook-disk" | string
+                        name: "linecook-disk"
                         gcePersistentDisk: {
-                            pdName: *"linecook-disk" | string
+                            pdName: "linecook-disk"
                             fsType: "ext4"
                         }
                     }, {
@@ -1521,11 +1521,11 @@ deployment: {
                         name:  "linecook"
                         image: "gcr.io/myproj/linecook:v0.1.42"
                         volumeMounts: [{
-                            name:      *"linecook-disk" | string
-                            mountPath: *"/logs" | string
+                            name:      "linecook-disk"
+                            mountPath: "/logs"
                         }, {
                             name:      "secret-kitchen"
-                            mountPath: *"/etc/certs" | string
+                            mountPath: "/etc/certs"
                             readOnly:  true
                         }]
                         args: ["-name=linecook", "-env=prod", "-logdir=/logs", "-event-server=events:7788", "-etcd", "etcd:2379", "-reconnect-delay", "1h", "-recovery-overlap", "100000"]
@@ -1562,10 +1562,10 @@ service: {
     pastrychef: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "pastrychef"
@@ -1588,7 +1588,7 @@ service: {
 deployment: {
     pastrychef: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1603,9 +1603,9 @@ deployment: {
                 }
                 spec: {
                     volumes: [{
-                        name: *"pastrychef-disk" | string
+                        name: "pastrychef-disk"
                         gcePersistentDisk: {
-                            pdName: *"pastrychef-disk" | string
+                            pdName: "pastrychef-disk"
                             fsType: "ext4"
                         }
                     }, {
@@ -1618,11 +1618,11 @@ deployment: {
                         name:  "pastrychef"
                         image: "gcr.io/myproj/pastrychef:v0.1.15"
                         volumeMounts: [{
-                            name:      *"pastrychef-disk" | string
-                            mountPath: *"/logs" | string
+                            name:      "pastrychef-disk"
+                            mountPath: "/logs"
                         }, {
                             name:      "secret-ssh-key"
-                            mountPath: *"/etc/certs" | string
+                            mountPath: "/etc/certs"
                             readOnly:  true
                         }]
                         args: ["-env=prod", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-logdir=/logs", "-event-server=events:7788", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
@@ -1659,10 +1659,10 @@ service: {
     souschef: {
         spec: {
             ports: [{
-                port:       *8080 | int32
-                targetPort: *8080 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       8080
+                targetPort: 8080
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "souschef"
@@ -1685,7 +1685,7 @@ service: {
 deployment: {
     souschef: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1755,9 +1755,9 @@ service: {
         spec: {
             ports: [{
                 name:       "main"
-                port:       *9093 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *9093 | int
+                port:       9093
+                protocol:   "TCP"
+                targetPort: 9093
             }]
             selector: {
                 name:      "alertmanager"
@@ -1773,7 +1773,7 @@ service: {
 deployment: {
     alertmanager: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {
                 matchLabels: {
                     app: "alertmanager"
@@ -1866,7 +1866,7 @@ service: {
             ports: [{
                 name:       "grafana"
                 port:       3000
-                protocol:   *"TCP" | "UDP"
+                protocol:   "TCP"
                 targetPort: 3000
             }]
             selector: {
@@ -1897,7 +1897,7 @@ deployment: {
             }
         }
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -1975,9 +1975,9 @@ service: {
             clusterIP: "None"
             ports: [{
                 name:       "metrics"
-                port:       *9100 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *9100 | int
+                port:       9100
+                protocol:   "TCP"
+                targetPort: 9100
             }]
             selector: {
                 app:       "node-exporter"
@@ -2081,9 +2081,9 @@ service: {
             ports: [{
                 name:       "main"
                 nodePort:   30900
-                port:       *9090 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *9090 | int
+                port:       9090
+                protocol:   "TCP"
+                targetPort: 9090
             }]
             selector: {
                 name:      "prometheus"
@@ -2099,7 +2099,7 @@ service: {
 deployment: {
     prometheus: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             strategy: {
                 rollingUpdate: {
                     maxSurge:       0
@@ -2411,10 +2411,10 @@ service: {
     authproxy: {
         spec: {
             ports: [{
-                port:       *4180 | int32
-                targetPort: *4180 | int
-                name:       *"client" | string
-                protocol:   *"TCP" | "UDP"
+                port:       4180
+                targetPort: 4180
+                name:       "client"
+                protocol:   "TCP"
             }]
             selector: {
                 app:       "authproxy"
@@ -2437,7 +2437,7 @@ service: {
 deployment: {
     authproxy: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -2557,8 +2557,8 @@ service: {
             ports: [{
                 port:       443
                 name:       "https"
-                protocol:   *"TCP" | "UDP"
-                targetPort: *7443 | int
+                protocol:   "TCP"
+                targetPort: 7443
             }]
             selector: {
                 app:       "goget"
@@ -2581,7 +2581,7 @@ service: {
 deployment: {
     goget: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {
@@ -2633,14 +2633,14 @@ service: {
             loadBalancerIP: "1.3.4.5"
             ports: [{
                 name:       "http"
-                port:       *80 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *80 | int
+                port:       80
+                protocol:   "TCP"
+                targetPort: 80
             }, {
                 name:       "https"
-                port:       *443 | int32
-                protocol:   *"TCP" | "UDP"
-                targetPort: *443 | int
+                port:       443
+                protocol:   "TCP"
+                targetPort: 443
             }]
             selector: {
                 app:       "nginx"
@@ -2663,7 +2663,7 @@ service: {
 deployment: {
     nginx: {
         spec: {
-            replicas: *1 | int32
+            replicas: 1
             selector: {}
             template: {
                 metadata: {

@@ -36,6 +36,13 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 }
+== Final
+{
+	x: {
+		y: int64
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+}
 == All
 {
 	x: {

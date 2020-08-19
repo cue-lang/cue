@@ -1,23 +1,24 @@
 -- in.cue --
-let X = 1 + 1
-#Foo: X
+a: int | *2
 -- out/definition --
-
-let X = 1 + 1
-#Foo: X
+a: int | *2
 -- out/doc --
 []
-[#Foo]
+[a]
 -- out/value --
 == Simplified
-{}
+{
+	a: *2 | int
+}
 == Raw
 {
-	#Foo: 2
+	a: *2 | int
 }
 == Final
-{}
+{
+	a: 2
+}
 == All
 {
-	#Foo: 2
+	a: *2 | int
 }

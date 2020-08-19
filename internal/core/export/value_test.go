@@ -61,6 +61,7 @@ func TestValue(t *testing.T) {
 		}{
 			{"Simplified", export.Simplified.Value},
 			{"Raw", export.Raw.Value},
+			{"Final", export.Final.Value},
 			{"All", export.All.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)

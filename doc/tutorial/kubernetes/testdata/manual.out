@@ -20,13 +20,13 @@ kubernetes: {
 }
 deployment: {
     bartender: {
-        name:     *"bartender" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "bartender"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/bartender:v0.1.34"
         expose: {
             port: {
-                http: *7080 | int
+                http: 7080
             }
         }
         port: {}
@@ -34,7 +34,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"bartender" | string
+            app:       "bartender"
             domain:    "prod"
             component: "frontend"
         }
@@ -56,16 +56,16 @@ deployment: {
 }
 service: {
     bartender: {
-        name: *"bartender" | string
+        name: "bartender"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"bartender" | string
+            app:       "bartender"
             domain:    "prod"
             component: "frontend"
         }
@@ -79,23 +79,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"bartender" | string
+                name: "bartender"
                 labels: {
-                    app:       *"bartender" | string
+                    app:       "bartender"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"bartender" | string
+                    app:       "bartender"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -105,7 +105,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"bartender" | string
+                name: "bartender"
                 labels: {
                     component: "frontend"
                 }
@@ -114,7 +114,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"bartender" | string
+                            app:       "bartender"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -125,17 +125,17 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"bartender" | string
+                            name:  "bartender"
                             image: "gcr.io/myproj/bartender:v0.1.34"
                             args: []
                             ports: [{
                                 name:          "http"
-                                containerPort: *7080 | int
+                                containerPort: 7080
                             }]
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -145,13 +145,13 @@ kubernetes: {
 }
 deployment: {
     breaddispatcher: {
-        name:     *"breaddispatcher" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "breaddispatcher"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/breaddispatcher:v0.3.24"
         expose: {
             port: {
-                http: *7080 | int
+                http: 7080
             }
         }
         port: {}
@@ -162,7 +162,7 @@ deployment: {
         args: ["-etcd=etcd:2379", "-event-server=events:7788"] | []
         env: {}
         label: {
-            app:       *"breaddispatcher" | string
+            app:       "breaddispatcher"
             domain:    "prod"
             component: "frontend"
         }
@@ -184,16 +184,16 @@ deployment: {
 }
 service: {
     breaddispatcher: {
-        name: *"breaddispatcher" | string
+        name: "breaddispatcher"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"breaddispatcher" | string
+            app:       "breaddispatcher"
             domain:    "prod"
             component: "frontend"
         }
@@ -207,23 +207,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"breaddispatcher" | string
+                name: "breaddispatcher"
                 labels: {
-                    app:       *"breaddispatcher" | string
+                    app:       "breaddispatcher"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"breaddispatcher" | string
+                    app:       "breaddispatcher"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -233,7 +233,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"breaddispatcher" | string
+                name: "breaddispatcher"
                 labels: {
                     component: "frontend"
                 }
@@ -242,7 +242,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"breaddispatcher" | string
+                            app:       "breaddispatcher"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -253,17 +253,17 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"breaddispatcher" | string
+                            name:  "breaddispatcher"
                             image: "gcr.io/myproj/breaddispatcher:v0.3.24"
                             args:  ["-etcd=etcd:2379", "-event-server=events:7788"] | []
                             ports: [{
                                 name:          "http"
-                                containerPort: *7080 | int
+                                containerPort: 7080
                             }]
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -273,13 +273,13 @@ kubernetes: {
 }
 deployment: {
     host: {
-        name:     *"host" | string
-        kind:     *"deployment" | "stateful" | "daemon"
+        name:     "host"
+        kind:     "deployment"
         replicas: 2
         image:    "gcr.io/myproj/host:v0.1.10"
         expose: {
             port: {
-                http: *7080 | int
+                http: 7080
             }
         }
         port: {}
@@ -287,7 +287,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"host" | string
+            app:       "host"
             domain:    "prod"
             component: "frontend"
         }
@@ -309,16 +309,16 @@ deployment: {
 }
 service: {
     host: {
-        name: *"host" | string
+        name: "host"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"host" | string
+            app:       "host"
             domain:    "prod"
             component: "frontend"
         }
@@ -332,23 +332,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"host" | string
+                name: "host"
                 labels: {
-                    app:       *"host" | string
+                    app:       "host"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"host" | string
+                    app:       "host"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -358,7 +358,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"host" | string
+                name: "host"
                 labels: {
                     component: "frontend"
                 }
@@ -367,7 +367,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"host" | string
+                            app:       "host"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -378,12 +378,12 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"host" | string
+                            name:  "host"
                             image: "gcr.io/myproj/host:v0.1.10"
                             args: []
                             ports: [{
                                 name:          "http"
-                                containerPort: *7080 | int
+                                containerPort: 7080
                             }]
                         }]
                     }
@@ -398,13 +398,13 @@ kubernetes: {
 }
 deployment: {
     maitred: {
-        name:     *"maitred" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "maitred"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/maitred:v0.0.4"
         expose: {
             port: {
-                http: *7080 | int
+                http: 7080
             }
         }
         port: {}
@@ -412,7 +412,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"maitred" | string
+            app:       "maitred"
             domain:    "prod"
             component: "frontend"
         }
@@ -434,16 +434,16 @@ deployment: {
 }
 service: {
     maitred: {
-        name: *"maitred" | string
+        name: "maitred"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"maitred" | string
+            app:       "maitred"
             domain:    "prod"
             component: "frontend"
         }
@@ -457,23 +457,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"maitred" | string
+                name: "maitred"
                 labels: {
-                    app:       *"maitred" | string
+                    app:       "maitred"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"maitred" | string
+                    app:       "maitred"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -483,7 +483,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"maitred" | string
+                name: "maitred"
                 labels: {
                     component: "frontend"
                 }
@@ -492,7 +492,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"maitred" | string
+                            app:       "maitred"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -503,17 +503,17 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"maitred" | string
+                            name:  "maitred"
                             image: "gcr.io/myproj/maitred:v0.0.4"
                             args: []
                             ports: [{
                                 name:          "http"
-                                containerPort: *7080 | int
+                                containerPort: 7080
                             }]
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -523,9 +523,9 @@ kubernetes: {
 }
 deployment: {
     valeter: {
-        name:     *"valeter" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "valeter"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/valeter:v0.0.4"
         arg: {
             http: ":8080"
@@ -540,7 +540,7 @@ deployment: {
         args: ["-http=:8080", "-etcd=etcd:2379"] | []
         env: {}
         label: {
-            app:       *"valeter" | string
+            app:       "valeter"
             domain:    "prod"
             component: "frontend"
         }
@@ -562,16 +562,16 @@ deployment: {
 }
 service: {
     valeter: {
-        name: *"valeter" | string
+        name: "valeter"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"valeter" | string
+            app:       "valeter"
             domain:    "prod"
             component: "frontend"
         }
@@ -585,23 +585,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"valeter" | string
+                name: "valeter"
                 labels: {
-                    app:       *"valeter" | string
+                    app:       "valeter"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"valeter" | string
+                    app:       "valeter"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -611,7 +611,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"valeter" | string
+                name: "valeter"
                 labels: {
                     component: "frontend"
                 }
@@ -620,7 +620,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"valeter" | string
+                            app:       "valeter"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -631,7 +631,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"valeter" | string
+                            name:  "valeter"
                             image: "gcr.io/myproj/valeter:v0.0.4"
                             args:  ["-http=:8080", "-etcd=etcd:2379"] | []
                             ports: [{
@@ -641,7 +641,7 @@ kubernetes: {
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -651,13 +651,13 @@ kubernetes: {
 }
 deployment: {
     waiter: {
-        name:     *"waiter" | string
-        kind:     *"deployment" | "stateful" | "daemon"
+        name:     "waiter"
+        kind:     "deployment"
         image:    "gcr.io/myproj/waiter:v0.3.0"
         replicas: 5
         expose: {
             port: {
-                http: *7080 | int
+                http: 7080
             }
         }
         port: {}
@@ -665,7 +665,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"waiter" | string
+            app:       "waiter"
             domain:    "prod"
             component: "frontend"
         }
@@ -687,16 +687,16 @@ deployment: {
 }
 service: {
     waiter: {
-        name: *"waiter" | string
+        name: "waiter"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"waiter" | string
+            app:       "waiter"
             domain:    "prod"
             component: "frontend"
         }
@@ -710,23 +710,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"waiter" | string
+                name: "waiter"
                 labels: {
-                    app:       *"waiter" | string
+                    app:       "waiter"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"waiter" | string
+                    app:       "waiter"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -736,7 +736,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"waiter" | string
+                name: "waiter"
                 labels: {
                     component: "frontend"
                 }
@@ -745,7 +745,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"waiter" | string
+                            app:       "waiter"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -756,12 +756,12 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"waiter" | string
+                            name:  "waiter"
                             image: "gcr.io/myproj/waiter:v0.3.0"
                             args: []
                             ports: [{
                                 name:          "http"
-                                containerPort: *7080 | int
+                                containerPort: 7080
                             }]
                         }]
                     }
@@ -776,13 +776,13 @@ kubernetes: {
 }
 deployment: {
     waterdispatcher: {
-        name:     *"waterdispatcher" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "waterdispatcher"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/waterdispatcher:v0.0.48"
         expose: {
             port: {
-                http: *7080 | int
+                http: 7080
             }
         }
         port: {}
@@ -793,7 +793,7 @@ deployment: {
         args: ["-http=:8080", "-etcd=etcd:2379"] | []
         env: {}
         label: {
-            app:       *"waterdispatcher" | string
+            app:       "waterdispatcher"
             domain:    "prod"
             component: "frontend"
         }
@@ -815,16 +815,16 @@ deployment: {
 }
 service: {
     waterdispatcher: {
-        name: *"waterdispatcher" | string
+        name: "waterdispatcher"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"waterdispatcher" | string
+            app:       "waterdispatcher"
             domain:    "prod"
             component: "frontend"
         }
@@ -838,23 +838,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"waterdispatcher" | string
+                name: "waterdispatcher"
                 labels: {
-                    app:       *"waterdispatcher" | string
+                    app:       "waterdispatcher"
                     domain:    "prod"
                     component: "frontend"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"waterdispatcher" | string
+                    app:       "waterdispatcher"
                     domain:    "prod"
                     component: "frontend"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -864,7 +864,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"waterdispatcher" | string
+                name: "waterdispatcher"
                 labels: {
                     component: "frontend"
                 }
@@ -873,7 +873,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"waterdispatcher" | string
+                            app:       "waterdispatcher"
                             domain:    "prod"
                             component: "frontend"
                         }
@@ -884,17 +884,17 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"waterdispatcher" | string
+                            name:  "waterdispatcher"
                             image: "gcr.io/myproj/waterdispatcher:v0.0.48"
                             args:  ["-http=:8080", "-etcd=etcd:2379"] | []
                             ports: [{
                                 name:          "http"
-                                containerPort: *7080 | int
+                                containerPort: 7080
                             }]
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -914,9 +914,9 @@ kubernetes: {
 }
 deployment: {
     download: {
-        name:     *"download" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "download"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/download:v0.0.2"
         expose: {
             port: {
@@ -928,7 +928,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"download" | string
+            app:       "download"
             domain:    "prod"
             component: "infra"
         }
@@ -939,16 +939,16 @@ deployment: {
 }
 service: {
     download: {
-        name: *"download" | string
+        name: "download"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     7080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"download" | string
+            app:       "download"
             domain:    "prod"
             component: "infra"
         }
@@ -962,23 +962,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"download" | string
+                name: "download"
                 labels: {
-                    app:       *"download" | string
+                    app:       "download"
                     domain:    "prod"
                     component: "infra"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"download" | string
+                    app:       "download"
                     domain:    "prod"
                     component: "infra"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     7080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -988,7 +988,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"download" | string
+                name: "download"
                 labels: {
                     component: "infra"
                 }
@@ -997,14 +997,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"download" | string
+                            app:       "download"
                             domain:    "prod"
                             component: "infra"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"download" | string
+                            name:  "download"
                             image: "gcr.io/myproj/download:v0.0.2"
                             args: []
                             ports: [{
@@ -1014,7 +1014,7 @@ kubernetes: {
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -1024,7 +1024,7 @@ kubernetes: {
 }
 deployment: {
     etcd: {
-        name:     *"etcd" | string
+        name:     "etcd"
         kind:     "stateful"
         replicas: 3
         image:    "quay.io/coreos/etcd:v3.3.10"
@@ -1132,7 +1132,7 @@ deployment: {
         port: {}
         args: ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"] | []
         label: {
-            app:       *"etcd" | string
+            app:       "etcd"
             domain:    "prod"
             component: "infra"
         }
@@ -1141,17 +1141,17 @@ deployment: {
 }
 service: {
     etcd: {
-        name: *"etcd" | string
+        name: "etcd"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     2379
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
             peer: {
-                name:     *"peer" | string
+                name:     "peer"
                 port:     2380
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -1160,7 +1160,7 @@ service: {
             }
         }
         label: {
-            app:       *"etcd" | string
+            app:       "etcd"
             domain:    "prod"
             component: "infra"
         }
@@ -1175,24 +1175,24 @@ kubernetes: {
             spec: {
                 clusterIP: "None"
                 selector: {
-                    app:       *"etcd" | string
+                    app:       "etcd"
                     domain:    "prod"
                     component: "infra"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     2379
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }, {
-                    name:     *"peer" | string
+                    name:     "peer"
                     port:     2380
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
             metadata: {
-                name: *"etcd" | string
+                name: "etcd"
                 labels: {
-                    app:       *"etcd" | string
+                    app:       "etcd"
                     domain:    "prod"
                     component: "infra"
                 }
@@ -1205,7 +1205,7 @@ kubernetes: {
             apiVersion: "apps/v1beta1"
             kind:       "StatefulSet"
             metadata: {
-                name: *"etcd" | string
+                name: "etcd"
                 labels: {
                     component: "infra"
                 }
@@ -1232,7 +1232,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"etcd" | string
+                            app:       "etcd"
                             domain:    "prod"
                             component: "infra"
                         }
@@ -1243,7 +1243,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"etcd" | string
+                            name:  "etcd"
                             image: "quay.io/coreos/etcd:v3.3.10"
                             args:  ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"] | []
                             command: ["/usr/local/bin/etcd"]
@@ -1312,8 +1312,8 @@ kubernetes: {
 }
 deployment: {
     events: {
-        name:     *"events" | string
-        kind:     *"deployment" | "stateful" | "daemon"
+        name:     "events"
+        kind:     "deployment"
         replicas: 2
         image:    "gcr.io/myproj/events:v0.1.31"
         arg: {
@@ -1333,10 +1333,10 @@ deployment: {
         env: {}
         volume: {
             "secret-volume": {
-                name:      *"secret-volume" | string
+                name:      "secret-volume"
                 mountPath: "/etc/ssl"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     secret: {
                         secretName: "biz-secrets"
@@ -1374,7 +1374,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"events" | string
+            app:       "events"
             domain:    "prod"
             component: "infra"
         }
@@ -1383,16 +1383,16 @@ deployment: {
 }
 service: {
     events: {
-        name: *"events" | string
+        name: "events"
         port: {
             grpc: {
-                name:     *"grpc" | string
+                name:     "grpc"
                 port:     7788
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"events" | string
+            app:       "events"
             domain:    "prod"
             component: "infra"
         }
@@ -1406,23 +1406,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"events" | string
+                name: "events"
                 labels: {
-                    app:       *"events" | string
+                    app:       "events"
                     domain:    "prod"
                     component: "infra"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"events" | string
+                    app:       "events"
                     domain:    "prod"
                     component: "infra"
                 }
                 ports: [{
-                    name:     *"grpc" | string
+                    name:     "grpc"
                     port:     7788
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -1432,7 +1432,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"events" | string
+                name: "events"
                 labels: {
                     component: "infra"
                 }
@@ -1441,7 +1441,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"events" | string
+                            app:       "events"
                             domain:    "prod"
                             component: "infra"
                         }
@@ -1452,7 +1452,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"events" | string
+                            name:  "events"
                             image: "gcr.io/myproj/events:v0.1.31"
                             args:  ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"] | []
                             volumeMounts: [{
@@ -1488,7 +1488,7 @@ kubernetes: {
                             }
                         }
                         volumes: [{
-                            name: *"secret-volume" | string
+                            name: "secret-volume"
                         }]
                     }
                 }
@@ -1502,9 +1502,9 @@ kubernetes: {
 }
 deployment: {
     tasks: {
-        name:     *"tasks" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "tasks"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/tasks:v0.2.6"
         port: {
             http: 7080
@@ -1519,10 +1519,10 @@ deployment: {
         env: {}
         volume: {
             "secret-volume": {
-                name:      *"secret-volume" | string
+                name:      "secret-volume"
                 mountPath: "/etc/ssl"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     secret: {
                         secretName: "star-example-com-secrets"
@@ -1544,7 +1544,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"tasks" | string
+            app:       "tasks"
             domain:    "prod"
             component: "infra"
         }
@@ -1553,10 +1553,10 @@ deployment: {
 }
 service: {
     tasks: {
-        name: *"tasks" | string
+        name: "tasks"
         port: {
             https: {
-                name:       *"https" | string
+                name:       "https"
                 port:       443
                 targetPort: 7443
                 protocol:   "TCP"
@@ -1569,7 +1569,7 @@ service: {
             }
         }
         label: {
-            app:       *"tasks" | string
+            app:       "tasks"
             domain:    "prod"
             component: "infra"
         }
@@ -1584,12 +1584,12 @@ kubernetes: {
             spec: {
                 type: "LoadBalancer"
                 selector: {
-                    app:       *"tasks" | string
+                    app:       "tasks"
                     domain:    "prod"
                     component: "infra"
                 }
                 ports: [{
-                    name:       *"https" | string
+                    name:       "https"
                     port:       443
                     targetPort: 7443
                     protocol:   "TCP"
@@ -1597,9 +1597,9 @@ kubernetes: {
                 loadBalancerIP: "1.2.3.4"
             }
             metadata: {
-                name: *"tasks" | string
+                name: "tasks"
                 labels: {
-                    app:       *"tasks" | string
+                    app:       "tasks"
                     domain:    "prod"
                     component: "infra"
                 }
@@ -1611,7 +1611,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"tasks" | string
+                name: "tasks"
                 labels: {
                     component: "infra"
                 }
@@ -1620,7 +1620,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"tasks" | string
+                            app:       "tasks"
                             domain:    "prod"
                             component: "infra"
                         }
@@ -1631,7 +1631,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"tasks" | string
+                            name:  "tasks"
                             image: "gcr.io/myproj/tasks:v0.2.6"
                             args: []
                             volumeMounts: [{
@@ -1653,11 +1653,11 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-volume" | string
+                            name: "secret-volume"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -1667,9 +1667,9 @@ kubernetes: {
 }
 deployment: {
     updater: {
-        name:     *"updater" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "updater"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/updater:v0.1.0"
         args: ["-key=/etc/certs/updater.pem"]
         expose: {
@@ -1682,10 +1682,10 @@ deployment: {
         env: {}
         volume: {
             "secret-updater": {
-                name:      *"secret-updater" | string
+                name:      "secret-updater"
                 mountPath: "/etc/certs"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     secret: {
                         secretName: "updater-secrets"
@@ -1695,7 +1695,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"updater" | string
+            app:       "updater"
             domain:    "prod"
             component: "infra"
         }
@@ -1705,16 +1705,16 @@ deployment: {
 }
 service: {
     updater: {
-        name: *"updater" | string
+        name: "updater"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"updater" | string
+            app:       "updater"
             domain:    "prod"
             component: "infra"
         }
@@ -1728,23 +1728,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"updater" | string
+                name: "updater"
                 labels: {
-                    app:       *"updater" | string
+                    app:       "updater"
                     domain:    "prod"
                     component: "infra"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"updater" | string
+                    app:       "updater"
                     domain:    "prod"
                     component: "infra"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -1754,7 +1754,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"updater" | string
+                name: "updater"
                 labels: {
                     component: "infra"
                 }
@@ -1763,14 +1763,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"updater" | string
+                            app:       "updater"
                             domain:    "prod"
                             component: "infra"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"updater" | string
+                            name:  "updater"
                             image: "gcr.io/myproj/updater:v0.1.0"
                             args: ["-key=/etc/certs/updater.pem"]
                             volumeMounts: [{
@@ -1789,11 +1789,11 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-updater" | string
+                            name: "secret-updater"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -1803,16 +1803,16 @@ kubernetes: {
 }
 deployment: {
     watcher: {
-        name:     *"watcher" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "watcher"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/watcher:v0.1.0"
         volume: {
             "secret-volume": {
-                name:      *"secret-volume" | string
+                name:      "secret-volume"
                 mountPath: "/etc/ssl"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     secret: {
                         secretName: "star-example-com-secrets"
@@ -1833,7 +1833,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"watcher" | string
+            app:       "watcher"
             domain:    "prod"
             component: "infra"
         }
@@ -1843,12 +1843,12 @@ deployment: {
 }
 service: {
     watcher: {
-        name: *"watcher" | string
+        name: "watcher"
         port: {
             https: {
-                name:     *"https" | string
+                name:     "https"
                 port:     7788
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -1864,7 +1864,7 @@ service: {
             }
         }
         label: {
-            app:       *"watcher" | string
+            app:       "watcher"
             domain:    "prod"
             component: "infra"
         }
@@ -1879,21 +1879,21 @@ kubernetes: {
             spec: {
                 type: "LoadBalancer"
                 selector: {
-                    app:       *"watcher" | string
+                    app:       "watcher"
                     domain:    "prod"
                     component: "infra"
                 }
                 ports: [{
-                    name:     *"https" | string
+                    name:     "https"
                     port:     7788
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
                 loadBalancerIP: "1.2.3.4"
             }
             metadata: {
-                name: *"watcher" | string
+                name: "watcher"
                 labels: {
-                    app:       *"watcher" | string
+                    app:       "watcher"
                     domain:    "prod"
                     component: "infra"
                 }
@@ -1905,7 +1905,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"watcher" | string
+                name: "watcher"
                 labels: {
                     component: "infra"
                 }
@@ -1914,14 +1914,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"watcher" | string
+                            app:       "watcher"
                             domain:    "prod"
                             component: "infra"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"watcher" | string
+                            name:  "watcher"
                             image: "gcr.io/myproj/watcher:v0.1.0"
                             args: []
                             volumeMounts: [{
@@ -1943,11 +1943,11 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-volume" | string
+                            name: "secret-volume"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -1967,8 +1967,8 @@ kubernetes: {
 }
 deployment: {
     caller: {
-        name:     *"caller" | string
-        kind:     *"deployment" | "stateful" | "daemon"
+        name:     "caller"
+        kind:     "deployment"
         replicas: 3
         image:    "gcr.io/myproj/caller:v0.20.14"
         expose: {
@@ -1991,21 +1991,21 @@ deployment: {
         volume: {
             "caller-disk": {
                 name:      "ssd-caller"
-                mountPath: *"/logs" | string
-                subPath:   *null | string
-                readOnly:  *false | true
+                mountPath: "/logs"
+                subPath:   null
+                readOnly:  false
                 kubernetes: {}
                 spec: {
                     gcePersistentDisk: {
-                        pdName: *"ssd-caller" | string
+                        pdName: "ssd-caller"
                         fsType: "ext4"
                     }
                 }
             }
             "secret-ssh-key": {
-                name:      *"secret-ssh-key" | string
+                name:      "secret-ssh-key"
                 mountPath: "/sslcerts"
-                subPath:   *null | string
+                subPath:   null
                 readOnly:  true
                 spec: {
                     secret: {
@@ -2015,20 +2015,20 @@ deployment: {
                 kubernetes: {}
             }
             "secret-caller": {
-                name:      *"secret-caller" | string
-                mountPath: *"/etc/certs" | string
-                subPath:   *null | string
+                name:      "secret-caller"
+                mountPath: "/etc/certs"
+                subPath:   null
                 readOnly:  true
                 spec: {
                     secret: {
-                        secretName: *"caller-secrets" | string
+                        secretName: "caller-secrets"
                     }
                 }
                 kubernetes: {}
             }
         }
         label: {
-            app:       *"caller" | string
+            app:       "caller"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2060,16 +2060,16 @@ deployment: {
 }
 service: {
     caller: {
-        name: *"caller" | string
+        name: "caller"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"caller" | string
+            app:       "caller"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2083,23 +2083,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"caller" | string
+                name: "caller"
                 labels: {
-                    app:       *"caller" | string
+                    app:       "caller"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"caller" | string
+                    app:       "caller"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -2109,7 +2109,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"caller" | string
+                name: "caller"
                 labels: {
                     component: "kitchen"
                 }
@@ -2118,7 +2118,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"caller" | string
+                            app:       "caller"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -2128,7 +2128,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"caller" | string
+                            name:  "caller"
                             image: "gcr.io/myproj/caller:v0.20.14"
                             args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem"] | []
                             livenessProbe: {
@@ -2175,9 +2175,9 @@ kubernetes: {
                         volumes: [{
                             name: "ssd-caller"
                         }, {
-                            name: *"secret-ssh-key" | string
+                            name: "secret-ssh-key"
                         }, {
-                            name: *"secret-caller" | string
+                            name: "secret-caller"
                         }]
                     }
                 }
@@ -2191,8 +2191,8 @@ kubernetes: {
 }
 deployment: {
     dishwasher: {
-        name:     *"dishwasher" | string
-        kind:     *"deployment" | "stateful" | "daemon"
+        name:     "dishwasher"
+        kind:     "deployment"
         replicas: 5
         image:    "gcr.io/myproj/dishwasher:v0.2.13"
         expose: {
@@ -2211,9 +2211,9 @@ deployment: {
         env: {}
         volume: {
             "secret-ssh-key": {
-                name:      *"secret-ssh-key" | string
+                name:      "secret-ssh-key"
                 mountPath: "/sslcerts"
-                subPath:   *null | string
+                subPath:   null
                 readOnly:  true
                 spec: {
                     secret: {
@@ -2223,33 +2223,33 @@ deployment: {
                 kubernetes: {}
             }
             "dishwasher-disk": {
-                name:      *"dishwasher-disk" | string
-                mountPath: *"/logs" | string
-                subPath:   *null | string
-                readOnly:  *false | true
+                name:      "dishwasher-disk"
+                mountPath: "/logs"
+                subPath:   null
+                readOnly:  false
                 spec: {
                     gcePersistentDisk: {
-                        pdName: *"dishwasher-disk" | string
+                        pdName: "dishwasher-disk"
                         fsType: "ext4"
                     }
                 }
                 kubernetes: {}
             }
             "secret-dishwasher": {
-                name:      *"secret-dishwasher" | string
-                mountPath: *"/etc/certs" | string
-                subPath:   *null | string
+                name:      "secret-dishwasher"
+                mountPath: "/etc/certs"
+                subPath:   null
                 readOnly:  true
                 spec: {
                     secret: {
-                        secretName: *"dishwasher-secrets" | string
+                        secretName: "dishwasher-secrets"
                     }
                 }
                 kubernetes: {}
             }
         }
         label: {
-            app:       *"dishwasher" | string
+            app:       "dishwasher"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2281,16 +2281,16 @@ deployment: {
 }
 service: {
     dishwasher: {
-        name: *"dishwasher" | string
+        name: "dishwasher"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"dishwasher" | string
+            app:       "dishwasher"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2304,23 +2304,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"dishwasher" | string
+                name: "dishwasher"
                 labels: {
-                    app:       *"dishwasher" | string
+                    app:       "dishwasher"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"dishwasher" | string
+                    app:       "dishwasher"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -2330,7 +2330,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"dishwasher" | string
+                name: "dishwasher"
                 labels: {
                     component: "kitchen"
                 }
@@ -2339,7 +2339,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"dishwasher" | string
+                            app:       "dishwasher"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -2349,7 +2349,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"dishwasher" | string
+                            name:  "dishwasher"
                             image: "gcr.io/myproj/dishwasher:v0.2.13"
                             args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"] | []
                             livenessProbe: {
@@ -2394,11 +2394,11 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-ssh-key" | string
+                            name: "secret-ssh-key"
                         }, {
-                            name: *"dishwasher-disk" | string
+                            name: "dishwasher-disk"
                         }, {
-                            name: *"secret-dishwasher" | string
+                            name: "secret-dishwasher"
                         }]
                     }
                 }
@@ -2412,9 +2412,9 @@ kubernetes: {
 }
 deployment: {
     expiditer: {
-        name:     *"expiditer" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "expiditer"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/expiditer:v0.5.34"
         expose: {
             port: {
@@ -2432,33 +2432,33 @@ deployment: {
         env: {}
         volume: {
             "expiditer-disk": {
-                name:      *"expiditer-disk" | string
-                mountPath: *"/logs" | string
-                subPath:   *null | string
-                readOnly:  *false | true
+                name:      "expiditer-disk"
+                mountPath: "/logs"
+                subPath:   null
+                readOnly:  false
                 spec: {
                     gcePersistentDisk: {
-                        pdName: *"expiditer-disk" | string
+                        pdName: "expiditer-disk"
                         fsType: "ext4"
                     }
                 }
                 kubernetes: {}
             }
             "secret-expiditer": {
-                name:      *"secret-expiditer" | string
-                mountPath: *"/etc/certs" | string
-                subPath:   *null | string
+                name:      "secret-expiditer"
+                mountPath: "/etc/certs"
+                subPath:   null
                 readOnly:  true
                 spec: {
                     secret: {
-                        secretName: *"expiditer-secrets" | string
+                        secretName: "expiditer-secrets"
                     }
                 }
                 kubernetes: {}
             }
         }
         label: {
-            app:       *"expiditer" | string
+            app:       "expiditer"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2490,16 +2490,16 @@ deployment: {
 }
 service: {
     expiditer: {
-        name: *"expiditer" | string
+        name: "expiditer"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"expiditer" | string
+            app:       "expiditer"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2513,23 +2513,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"expiditer" | string
+                name: "expiditer"
                 labels: {
-                    app:       *"expiditer" | string
+                    app:       "expiditer"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"expiditer" | string
+                    app:       "expiditer"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -2539,7 +2539,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"expiditer" | string
+                name: "expiditer"
                 labels: {
                     component: "kitchen"
                 }
@@ -2548,7 +2548,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"expiditer" | string
+                            app:       "expiditer"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -2558,7 +2558,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"expiditer" | string
+                            name:  "expiditer"
                             image: "gcr.io/myproj/expiditer:v0.5.34"
                             args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"] | []
                             livenessProbe: {
@@ -2594,13 +2594,13 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"expiditer-disk" | string
+                            name: "expiditer-disk"
                         }, {
-                            name: *"secret-expiditer" | string
+                            name: "secret-expiditer"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -2610,9 +2610,9 @@ kubernetes: {
 }
 deployment: {
     headchef: {
-        name:     *"headchef" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "headchef"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/headchef:v0.2.16"
         expose: {
             port: {
@@ -2629,25 +2629,25 @@ deployment: {
         env: {}
         volume: {
             "secret-headchef": {
-                name:      *"secret-headchef" | string
+                name:      "secret-headchef"
                 mountPath: "/sslcerts"
-                subPath:   *null | string
+                subPath:   null
                 readOnly:  true
                 kubernetes: {}
                 spec: {
                     secret: {
-                        secretName: *"headchef-secrets" | string
+                        secretName: "headchef-secrets"
                     }
                 }
             }
             "headchef-disk": {
-                name:      *"headchef-disk" | string
-                mountPath: *"/logs" | string
-                subPath:   *null | string
-                readOnly:  *false | true
+                name:      "headchef-disk"
+                mountPath: "/logs"
+                subPath:   null
+                readOnly:  false
                 spec: {
                     gcePersistentDisk: {
-                        pdName: *"headchef-disk" | string
+                        pdName: "headchef-disk"
                         fsType: "ext4"
                     }
                 }
@@ -2655,7 +2655,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"headchef" | string
+            app:       "headchef"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2687,16 +2687,16 @@ deployment: {
 }
 service: {
     headchef: {
-        name: *"headchef" | string
+        name: "headchef"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"headchef" | string
+            app:       "headchef"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2710,23 +2710,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"headchef" | string
+                name: "headchef"
                 labels: {
-                    app:       *"headchef" | string
+                    app:       "headchef"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"headchef" | string
+                    app:       "headchef"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -2736,7 +2736,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"headchef" | string
+                name: "headchef"
                 labels: {
                     component: "kitchen"
                 }
@@ -2745,7 +2745,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"headchef" | string
+                            app:       "headchef"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -2755,7 +2755,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"headchef" | string
+                            name:  "headchef"
                             image: "gcr.io/myproj/headchef:v0.2.16"
                             args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788"] | []
                             livenessProbe: {
@@ -2791,13 +2791,13 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-headchef" | string
+                            name: "secret-headchef"
                         }, {
-                            name: *"headchef-disk" | string
+                            name: "headchef-disk"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -2807,9 +2807,9 @@ kubernetes: {
 }
 deployment: {
     linecook: {
-        name:     *"linecook" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "linecook"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/linecook:v0.1.42"
         expose: {
             port: {
@@ -2831,24 +2831,24 @@ deployment: {
         volume: {
             "secret-linecook": {
                 name:      "secret-kitchen"
-                mountPath: *"/etc/certs" | string
-                subPath:   *null | string
+                mountPath: "/etc/certs"
+                subPath:   null
                 readOnly:  true
                 kubernetes: {}
                 spec: {
                     secret: {
-                        secretName: *"linecook-secrets" | string
+                        secretName: "linecook-secrets"
                     }
                 }
             }
             "linecook-disk": {
-                name:      *"linecook-disk" | string
-                mountPath: *"/logs" | string
-                subPath:   *null | string
-                readOnly:  *false | true
+                name:      "linecook-disk"
+                mountPath: "/logs"
+                subPath:   null
+                readOnly:  false
                 spec: {
                     gcePersistentDisk: {
-                        pdName: *"linecook-disk" | string
+                        pdName: "linecook-disk"
                         fsType: "ext4"
                     }
                 }
@@ -2856,7 +2856,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"linecook" | string
+            app:       "linecook"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2888,16 +2888,16 @@ deployment: {
 }
 service: {
     linecook: {
-        name: *"linecook" | string
+        name: "linecook"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"linecook" | string
+            app:       "linecook"
             domain:    "prod"
             component: "kitchen"
         }
@@ -2911,23 +2911,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"linecook" | string
+                name: "linecook"
                 labels: {
-                    app:       *"linecook" | string
+                    app:       "linecook"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"linecook" | string
+                    app:       "linecook"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -2937,7 +2937,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"linecook" | string
+                name: "linecook"
                 labels: {
                     component: "kitchen"
                 }
@@ -2946,7 +2946,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"linecook" | string
+                            app:       "linecook"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -2956,7 +2956,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"linecook" | string
+                            name:  "linecook"
                             image: "gcr.io/myproj/linecook:v0.1.42"
                             args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-name=linecook", "-etcd=etcd:2379", "-reconnect-delay=1h", "--recovery-overlap=100000"] | []
                             livenessProbe: {
@@ -2994,11 +2994,11 @@ kubernetes: {
                         volumes: [{
                             name: "secret-kitchen"
                         }, {
-                            name: *"linecook-disk" | string
+                            name: "linecook-disk"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -3008,9 +3008,9 @@ kubernetes: {
 }
 deployment: {
     pastrychef: {
-        name:     *"pastrychef" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "pastrychef"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/pastrychef:v0.1.15"
         expose: {
             port: {
@@ -3032,8 +3032,8 @@ deployment: {
         volume: {
             "secret-pastrychef": {
                 name:      "secret-ssh-key"
-                mountPath: *"/etc/certs" | string
-                subPath:   *null | string
+                mountPath: "/etc/certs"
+                subPath:   null
                 readOnly:  true
                 spec: {
                     secret: {
@@ -3043,13 +3043,13 @@ deployment: {
                 kubernetes: {}
             }
             "pastrychef-disk": {
-                name:      *"pastrychef-disk" | string
-                mountPath: *"/logs" | string
-                subPath:   *null | string
-                readOnly:  *false | true
+                name:      "pastrychef-disk"
+                mountPath: "/logs"
+                subPath:   null
+                readOnly:  false
                 spec: {
                     gcePersistentDisk: {
-                        pdName: *"pastrychef-disk" | string
+                        pdName: "pastrychef-disk"
                         fsType: "ext4"
                     }
                 }
@@ -3057,7 +3057,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"pastrychef" | string
+            app:       "pastrychef"
             domain:    "prod"
             component: "kitchen"
         }
@@ -3089,16 +3089,16 @@ deployment: {
 }
 service: {
     pastrychef: {
-        name: *"pastrychef" | string
+        name: "pastrychef"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"pastrychef" | string
+            app:       "pastrychef"
             domain:    "prod"
             component: "kitchen"
         }
@@ -3112,23 +3112,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"pastrychef" | string
+                name: "pastrychef"
                 labels: {
-                    app:       *"pastrychef" | string
+                    app:       "pastrychef"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"pastrychef" | string
+                    app:       "pastrychef"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -3138,7 +3138,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"pastrychef" | string
+                name: "pastrychef"
                 labels: {
                     component: "kitchen"
                 }
@@ -3147,7 +3147,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"pastrychef" | string
+                            app:       "pastrychef"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -3157,7 +3157,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"pastrychef" | string
+                            name:  "pastrychef"
                             image: "gcr.io/myproj/pastrychef:v0.1.15"
                             args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"] | []
                             livenessProbe: {
@@ -3195,11 +3195,11 @@ kubernetes: {
                         volumes: [{
                             name: "secret-ssh-key"
                         }, {
-                            name: *"pastrychef-disk" | string
+                            name: "pastrychef-disk"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -3209,9 +3209,9 @@ kubernetes: {
 }
 deployment: {
     souschef: {
-        name:     *"souschef" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "souschef"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/souschef:v0.5.3"
         expose: {
             port: {
@@ -3223,7 +3223,7 @@ deployment: {
         args: []
         env: {}
         label: {
-            app:       *"souschef" | string
+            app:       "souschef"
             domain:    "prod"
             component: "kitchen"
         }
@@ -3256,16 +3256,16 @@ deployment: {
 }
 service: {
     souschef: {
-        name: *"souschef" | string
+        name: "souschef"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     8080
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"souschef" | string
+            app:       "souschef"
             domain:    "prod"
             component: "kitchen"
         }
@@ -3279,23 +3279,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"souschef" | string
+                name: "souschef"
                 labels: {
-                    app:       *"souschef" | string
+                    app:       "souschef"
                     domain:    "prod"
                     component: "kitchen"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"souschef" | string
+                    app:       "souschef"
                     domain:    "prod"
                     component: "kitchen"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     8080
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -3305,7 +3305,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"souschef" | string
+                name: "souschef"
                 labels: {
                     component: "kitchen"
                 }
@@ -3314,7 +3314,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"souschef" | string
+                            app:       "souschef"
                             domain:    "prod"
                             component: "kitchen"
                         }
@@ -3324,7 +3324,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"souschef" | string
+                            name:  "souschef"
                             image: "gcr.io/myproj/souschef:v0.5.3"
                             args: []
                             livenessProbe: {
@@ -3342,7 +3342,7 @@ kubernetes: {
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -3362,9 +3362,9 @@ kubernetes: {
 }
 deployment: {
     alertmanager: {
-        name:     *"alertmanager" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "alertmanager"
+        kind:     "deployment"
+        replicas: 1
         kubernetes: {
             spec: {
                 selector: {
@@ -3386,10 +3386,10 @@ deployment: {
         env: {}
         volume: {
             "config-volume": {
-                name:      *"config-volume" | string
+                name:      "config-volume"
                 mountPath: "/etc/alertmanager"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     configMap: {
                         name: "alertmanager"
@@ -3398,10 +3398,10 @@ deployment: {
                 kubernetes: {}
             }
             alertmanager: {
-                name:      *"alertmanager" | string
+                name:      "alertmanager"
                 mountPath: "/alertmanager"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     emptyDir: {}
                 }
@@ -3409,7 +3409,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"alertmanager" | string
+            app:       "alertmanager"
             domain:    "prod"
             component: "mon"
         }
@@ -3418,10 +3418,10 @@ deployment: {
 }
 service: {
     alertmanager: {
-        name: *"alertmanager" | string
+        name: "alertmanager"
         label: {
             name:      "alertmanager"
-            app:       *"alertmanager" | string
+            app:       "alertmanager"
             domain:    "prod"
             component: "mon"
         }
@@ -3429,7 +3429,7 @@ service: {
             alertmanager: {
                 name:     "main"
                 port:     9093
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -3468,10 +3468,10 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"alertmanager" | string
+                name: "alertmanager"
                 labels: {
                     name:      "alertmanager"
-                    app:       *"alertmanager" | string
+                    app:       "alertmanager"
                     domain:    "prod"
                     component: "mon"
                 }
@@ -3483,14 +3483,14 @@ kubernetes: {
             spec: {
                 selector: {
                     name:      "alertmanager"
-                    app:       *"alertmanager" | string
+                    app:       "alertmanager"
                     domain:    "prod"
                     component: "mon"
                 }
                 ports: [{
                     name:     "main"
                     port:     9093
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -3500,7 +3500,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"alertmanager" | string
+                name: "alertmanager"
                 labels: {
                     component: "mon"
                 }
@@ -3509,14 +3509,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"alertmanager" | string
+                            app:       "alertmanager"
                             domain:    "prod"
                             component: "mon"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"alertmanager" | string
+                            name:  "alertmanager"
                             image: "prom/alertmanager:v0.15.2"
                             args: ["--config.file=/etc/alertmanager/alerts.yaml", "--storage.path=/alertmanager", "--web.external-url=https://alertmanager.example.com"]
                             volumeMounts: [{
@@ -3544,9 +3544,9 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"config-volume" | string
+                            name: "config-volume"
                         }, {
-                            name: *"alertmanager" | string
+                            name: "alertmanager"
                         }]
                     }
                 }
@@ -3555,7 +3555,7 @@ kubernetes: {
                         app: "alertmanager"
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -3594,9 +3594,9 @@ kubernetes: {
 }
 deployment: {
     grafana: {
-        name:     *"grafana" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "grafana"
+        kind:     "deployment"
+        replicas: 1
         image:    "grafana/grafana:4.5.2"
         expose: {
             port: {
@@ -3610,10 +3610,10 @@ deployment: {
         args: []
         volume: {
             "grafana-volume": {
-                name:      *"grafana-volume" | string
+                name:      "grafana-volume"
                 mountPath: "/var/lib/grafana"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     gcePersistentDisk: {
                         pdName: "grafana-volume"
@@ -3649,7 +3649,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"grafana" | string
+            app:       "grafana"
             domain:    "prod"
             component: "mon"
         }
@@ -3668,16 +3668,16 @@ deployment: {
 }
 service: {
     grafana: {
-        name: *"grafana" | string
+        name: "grafana"
         port: {
             grafana: {
-                name:     *"grafana" | string
+                name:     "grafana"
                 port:     3000
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"grafana" | string
+            app:       "grafana"
             domain:    "prod"
             component: "mon"
         }
@@ -3691,23 +3691,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"grafana" | string
+                name: "grafana"
                 labels: {
-                    app:       *"grafana" | string
+                    app:       "grafana"
                     domain:    "prod"
                     component: "mon"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"grafana" | string
+                    app:       "grafana"
                     domain:    "prod"
                     component: "mon"
                 }
                 ports: [{
-                    name:     *"grafana" | string
+                    name:     "grafana"
                     port:     3000
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -3717,7 +3717,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"grafana" | string
+                name: "grafana"
                 labels: {
                     component: "mon"
                 }
@@ -3726,14 +3726,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"grafana" | string
+                            app:       "grafana"
                             domain:    "prod"
                             component: "mon"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"grafana" | string
+                            name:  "grafana"
                             image: "grafana/grafana:4.5.2"
                             args: []
                             env: [{
@@ -3775,11 +3775,11 @@ kubernetes: {
                             }
                         }]
                         volumes: [{
-                            name: *"grafana-volume" | string
+                            name: "grafana-volume"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -3789,9 +3789,9 @@ kubernetes: {
 }
 deployment: {
     "node-exporter": {
-        name:     *"node-exporter" | string
+        name:     "node-exporter"
         kind:     "daemon"
-        replicas: *1 | int
+        replicas: 1
         image:    "quay.io/prometheus/node-exporter:v0.16.0"
         expose: {
             port: {
@@ -3804,9 +3804,9 @@ deployment: {
         env: {}
         volume: {
             proc: {
-                name:      *"proc" | string
+                name:      "proc"
                 mountPath: "/host/proc"
-                subPath:   *null | string
+                subPath:   null
                 readOnly:  true
                 spec: {
                     hostPath: {
@@ -3816,9 +3816,9 @@ deployment: {
                 kubernetes: {}
             }
             sys: {
-                name:      *"sys" | string
+                name:      "sys"
                 mountPath: "/host/sys"
-                subPath:   *null | string
+                subPath:   null
                 readOnly:  true
                 spec: {
                     hostPath: {
@@ -3854,7 +3854,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"node-exporter" | string
+            app:       "node-exporter"
             domain:    "prod"
             component: "mon"
         }
@@ -3863,12 +3863,12 @@ deployment: {
 }
 service: {
     "node-exporter": {
-        name: *"node-exporter" | string
+        name: "node-exporter"
         port: {
             scrape: {
                 name:     "metrics"
                 port:     9100
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -3883,7 +3883,7 @@ service: {
             }
         }
         label: {
-            app:       *"node-exporter" | string
+            app:       "node-exporter"
             domain:    "prod"
             component: "mon"
         }
@@ -3899,9 +3899,9 @@ kubernetes: {
                 annotations: {
                     "prometheus.io/scrape": "true"
                 }
-                name: *"node-exporter" | string
+                name: "node-exporter"
                 labels: {
-                    app:       *"node-exporter" | string
+                    app:       "node-exporter"
                     domain:    "prod"
                     component: "mon"
                 }
@@ -3910,14 +3910,14 @@ kubernetes: {
                 type:      "ClusterIP"
                 clusterIP: "None"
                 selector: {
-                    app:       *"node-exporter" | string
+                    app:       "node-exporter"
                     domain:    "prod"
                     component: "mon"
                 }
                 ports: [{
                     name:     "metrics"
                     port:     9100
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -3928,7 +3928,7 @@ kubernetes: {
         "node-exporter": {
             apiVersion: "extensions/v1beta1"
             metadata: {
-                name: *"node-exporter" | string
+                name: "node-exporter"
                 labels: {
                     component: "mon"
                 }
@@ -3937,7 +3937,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"node-exporter" | string
+                            app:       "node-exporter"
                             domain:    "prod"
                             component: "mon"
                         }
@@ -3946,12 +3946,12 @@ kubernetes: {
                         hostNetwork: true
                         hostPID:     true
                         volumes: [{
-                            name: *"proc" | string
+                            name: "proc"
                         }, {
-                            name: *"sys" | string
+                            name: "sys"
                         }]
                         containers: [{
-                            name:  *"node-exporter" | string
+                            name:  "node-exporter"
                             image: "quay.io/prometheus/node-exporter:v0.16.0"
                             args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
                             volumeMounts: [{
@@ -3999,9 +3999,9 @@ kubernetes: {
 }
 deployment: {
     prometheus: {
-        name:     *"prometheus" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "prometheus"
+        kind:     "deployment"
+        replicas: 1
         image:    "prom/prometheus:v2.4.3"
         args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
         expose: {
@@ -4014,10 +4014,10 @@ deployment: {
         env: {}
         volume: {
             "config-volume": {
-                name:      *"config-volume" | string
+                name:      "config-volume"
                 mountPath: "/etc/prometheus"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     configMap: {
                         name: "prometheus"
@@ -4050,7 +4050,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"prometheus" | string
+            app:       "prometheus"
             domain:    "prod"
             component: "mon"
         }
@@ -4059,10 +4059,10 @@ deployment: {
 }
 service: {
     prometheus: {
-        name: *"prometheus" | string
+        name: "prometheus"
         label: {
             name:      "prometheus"
-            app:       *"prometheus" | string
+            app:       "prometheus"
             domain:    "prod"
             component: "mon"
         }
@@ -4071,7 +4071,7 @@ service: {
                 name:     "main"
                 port:     9090
                 nodePort: 30900
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -4326,10 +4326,10 @@ kubernetes: {
                 annotations: {
                     "prometheus.io/scrape": "true"
                 }
-                name: *"prometheus" | string
+                name: "prometheus"
                 labels: {
                     name:      "prometheus"
-                    app:       *"prometheus" | string
+                    app:       "prometheus"
                     domain:    "prod"
                     component: "mon"
                 }
@@ -4338,7 +4338,7 @@ kubernetes: {
                 type: "NodePort"
                 selector: {
                     name:      "prometheus"
-                    app:       *"prometheus" | string
+                    app:       "prometheus"
                     domain:    "prod"
                     component: "mon"
                 }
@@ -4346,7 +4346,7 @@ kubernetes: {
                     name:     "main"
                     port:     9090
                     nodePort: 30900
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -4356,7 +4356,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"prometheus" | string
+                name: "prometheus"
                 labels: {
                     component: "mon"
                 }
@@ -4365,7 +4365,7 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"prometheus" | string
+                            app:       "prometheus"
                             domain:    "prod"
                             component: "mon"
                         }
@@ -4375,7 +4375,7 @@ kubernetes: {
                     }
                     spec: {
                         containers: [{
-                            name:  *"prometheus" | string
+                            name:  "prometheus"
                             image: "prom/prometheus:v2.4.3"
                             args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
                             volumeMounts: [{
@@ -4394,7 +4394,7 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"config-volume" | string
+                            name: "config-volume"
                         }]
                     }
                 }
@@ -4410,7 +4410,7 @@ kubernetes: {
                         maxUnavailable: 1
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -4670,9 +4670,9 @@ kubernetes: {
 }
 deployment: {
     authproxy: {
-        name:     *"authproxy" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "authproxy"
+        kind:     "deployment"
+        replicas: 1
         image:    "skippy/oauth2_proxy:2.0.1"
         args: ["--config=/etc/authproxy/authproxy.cfg"]
         expose: {
@@ -4685,10 +4685,10 @@ deployment: {
         env: {}
         volume: {
             "config-volume": {
-                name:      *"config-volume" | string
+                name:      "config-volume"
                 mountPath: "/etc/authproxy"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     configMap: {
                         name: "authproxy"
@@ -4698,7 +4698,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"authproxy" | string
+            app:       "authproxy"
             domain:    "prod"
             component: "proxy"
         }
@@ -4708,16 +4708,16 @@ deployment: {
 }
 service: {
     authproxy: {
-        name: *"authproxy" | string
+        name: "authproxy"
         port: {
             client: {
-                name:     *"client" | string
+                name:     "client"
                 port:     4180
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         label: {
-            app:       *"authproxy" | string
+            app:       "authproxy"
             domain:    "prod"
             component: "proxy"
         }
@@ -4787,23 +4787,23 @@ kubernetes: {
             apiVersion: "v1"
             kind:       "Service"
             metadata: {
-                name: *"authproxy" | string
+                name: "authproxy"
                 labels: {
-                    app:       *"authproxy" | string
+                    app:       "authproxy"
                     domain:    "prod"
                     component: "proxy"
                 }
             }
             spec: {
                 selector: {
-                    app:       *"authproxy" | string
+                    app:       "authproxy"
                     domain:    "prod"
                     component: "proxy"
                 }
                 ports: [{
-                    name:     *"client" | string
+                    name:     "client"
                     port:     4180
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
             }
         }
@@ -4813,7 +4813,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"authproxy" | string
+                name: "authproxy"
                 labels: {
                     component: "proxy"
                 }
@@ -4822,14 +4822,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"authproxy" | string
+                            app:       "authproxy"
                             domain:    "prod"
                             component: "proxy"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"authproxy" | string
+                            name:  "authproxy"
                             image: "skippy/oauth2_proxy:2.0.1"
                             args: ["--config=/etc/authproxy/authproxy.cfg"]
                             volumeMounts: [{
@@ -4848,11 +4848,11 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"config-volume" | string
+                            name: "config-volume"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -4928,9 +4928,9 @@ kubernetes: {
 }
 deployment: {
     goget: {
-        name:     *"goget" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "goget"
+        kind:     "deployment"
+        replicas: 1
         image:    "gcr.io/myproj/goget:v0.5.1"
         expose: {
             port: {
@@ -4943,10 +4943,10 @@ deployment: {
         env: {}
         volume: {
             "secret-volume": {
-                name:      *"secret-volume" | string
+                name:      "secret-volume"
                 mountPath: "/etc/ssl"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     secret: {
                         secretName: "goget-secrets"
@@ -4956,7 +4956,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"goget" | string
+            app:       "goget"
             domain:    "prod"
             component: "proxy"
         }
@@ -4966,17 +4966,17 @@ deployment: {
 }
 service: {
     goget: {
-        name: *"goget" | string
+        name: "goget"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     443
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
             https: {
-                name:     *"https" | string
+                name:     "https"
                 port:     7443
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -4986,7 +4986,7 @@ service: {
             }
         }
         label: {
-            app:       *"goget" | string
+            app:       "goget"
             domain:    "prod"
             component: "proxy"
         }
@@ -5001,25 +5001,25 @@ kubernetes: {
             spec: {
                 type: "LoadBalancer"
                 selector: {
-                    app:       *"goget" | string
+                    app:       "goget"
                     domain:    "prod"
                     component: "proxy"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     443
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }, {
-                    name:     *"https" | string
+                    name:     "https"
                     port:     7443
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
                 loadBalancerIP: "1.3.5.7"
             }
             metadata: {
-                name: *"goget" | string
+                name: "goget"
                 labels: {
-                    app:       *"goget" | string
+                    app:       "goget"
                     domain:    "prod"
                     component: "proxy"
                 }
@@ -5031,7 +5031,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"goget" | string
+                name: "goget"
                 labels: {
                     component: "proxy"
                 }
@@ -5040,14 +5040,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"goget" | string
+                            app:       "goget"
                             domain:    "prod"
                             component: "proxy"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"goget" | string
+                            name:  "goget"
                             image: "gcr.io/myproj/goget:v0.5.1"
                             args: []
                             volumeMounts: [{
@@ -5066,11 +5066,11 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-volume" | string
+                            name: "secret-volume"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }
@@ -5080,9 +5080,9 @@ kubernetes: {
 }
 deployment: {
     nginx: {
-        name:     *"nginx" | string
-        kind:     *"deployment" | "stateful" | "daemon"
-        replicas: *1 | int
+        name:     "nginx"
+        kind:     "deployment"
+        replicas: 1
         image:    "nginx:1.11.10-alpine"
         expose: {
             port: {
@@ -5096,10 +5096,10 @@ deployment: {
         env: {}
         volume: {
             "secret-volume": {
-                name:      *"secret-volume" | string
+                name:      "secret-volume"
                 mountPath: "/etc/ssl"
-                subPath:   *null | string
-                readOnly:  *false | true
+                subPath:   null
+                readOnly:  false
                 spec: {
                     secret: {
                         secretName: "proxy-secrets"
@@ -5108,10 +5108,10 @@ deployment: {
                 kubernetes: {}
             }
             "config-volume": {
-                name:      *"config-volume" | string
+                name:      "config-volume"
                 mountPath: "/etc/nginx/nginx.conf"
                 subPath:   "nginx.conf"
-                readOnly:  *false | true
+                readOnly:  false
                 spec: {
                     configMap: {
                         name: "nginx"
@@ -5121,7 +5121,7 @@ deployment: {
             }
         }
         label: {
-            app:       *"nginx" | string
+            app:       "nginx"
             domain:    "prod"
             component: "proxy"
         }
@@ -5131,17 +5131,17 @@ deployment: {
 }
 service: {
     nginx: {
-        name: *"nginx" | string
+        name: "nginx"
         port: {
             http: {
-                name:     *"http" | string
+                name:     "http"
                 port:     80
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
             https: {
-                name:     *"https" | string
+                name:     "https"
                 port:     443
-                protocol: *"TCP" | "UDP"
+                protocol: "TCP"
             }
         }
         kubernetes: {
@@ -5151,7 +5151,7 @@ service: {
             }
         }
         label: {
-            app:       *"nginx" | string
+            app:       "nginx"
             domain:    "prod"
             component: "proxy"
         }
@@ -5365,25 +5365,25 @@ kubernetes: {
             spec: {
                 type: "LoadBalancer"
                 selector: {
-                    app:       *"nginx" | string
+                    app:       "nginx"
                     domain:    "prod"
                     component: "proxy"
                 }
                 ports: [{
-                    name:     *"http" | string
+                    name:     "http"
                     port:     80
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }, {
-                    name:     *"https" | string
+                    name:     "https"
                     port:     443
-                    protocol: *"TCP" | "UDP"
+                    protocol: "TCP"
                 }]
                 loadBalancerIP: "1.3.4.5"
             }
             metadata: {
-                name: *"nginx" | string
+                name: "nginx"
                 labels: {
-                    app:       *"nginx" | string
+                    app:       "nginx"
                     domain:    "prod"
                     component: "proxy"
                 }
@@ -5395,7 +5395,7 @@ kubernetes: {
             apiVersion: "extensions/v1beta1"
             kind:       "Deployment"
             metadata: {
-                name: *"nginx" | string
+                name: "nginx"
                 labels: {
                     component: "proxy"
                 }
@@ -5404,14 +5404,14 @@ kubernetes: {
                 template: {
                     metadata: {
                         labels: {
-                            app:       *"nginx" | string
+                            app:       "nginx"
                             domain:    "prod"
                             component: "proxy"
                         }
                     }
                     spec: {
                         containers: [{
-                            name:  *"nginx" | string
+                            name:  "nginx"
                             image: "nginx:1.11.10-alpine"
                             args: []
                             volumeMounts: [{
@@ -5424,7 +5424,7 @@ kubernetes: {
                                     readOnly: v.readOnly
                                 }
                             }, {
-                                name:      *"config-volume" | string
+                                name:      "config-volume"
                                 subPath:   "nginx.conf"
                                 mountPath: "/etc/nginx/nginx.conf"
                             }]
@@ -5437,13 +5437,13 @@ kubernetes: {
                             }]
                         }]
                         volumes: [{
-                            name: *"secret-volume" | string
+                            name: "secret-volume"
                         }, {
-                            name: *"config-volume" | string
+                            name: "config-volume"
                         }]
                     }
                 }
-                replicas: *1 | int
+                replicas: 1
             }
         }
     }

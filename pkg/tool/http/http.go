@@ -99,7 +99,7 @@ func parseHeaders(obj cue.Value, label string) (http.Header, error) {
 	if err != nil {
 		return nil, err
 	}
-	var h http.Header
+	h := http.Header{}
 	for iter.Next() {
 		str, err := iter.Value().String()
 		if err != nil {

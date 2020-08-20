@@ -69,7 +69,7 @@ var pkg = &internal.Package{
 	}, {
 		Name:   "Floor",
 		Params: []adt.Kind{adt.NumKind},
-		Result: adt.NumKind,
+		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -79,7 +79,7 @@ var pkg = &internal.Package{
 	}, {
 		Name:   "Ceil",
 		Params: []adt.Kind{adt.NumKind},
-		Result: adt.NumKind,
+		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -89,7 +89,7 @@ var pkg = &internal.Package{
 	}, {
 		Name:   "Trunc",
 		Params: []adt.Kind{adt.NumKind},
-		Result: adt.NumKind,
+		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -99,7 +99,7 @@ var pkg = &internal.Package{
 	}, {
 		Name:   "Round",
 		Params: []adt.Kind{adt.NumKind},
-		Result: adt.NumKind,
+		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {
@@ -109,7 +109,7 @@ var pkg = &internal.Package{
 	}, {
 		Name:   "RoundToEven",
 		Params: []adt.Kind{adt.NumKind},
-		Result: adt.NumKind,
+		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
 			if c.Do() {

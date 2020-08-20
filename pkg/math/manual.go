@@ -15,10 +15,30 @@
 package math
 
 import (
+	"math/big"
+
 	"github.com/cockroachdb/apd/v2"
 
 	"cuelang.org/go/internal"
 )
+
+func roundContext(rounder string) *apd.Context {
+	c := *apdContext
+	c.Rounding = rounder
+	return &c
+}
+
+// TODO: for now we convert Decimals to int. This allows the desired type to be
+// conveyed. This has the disadvantage tht a number like 1E10000 will need to be
+// expanded. Eventually it would be better to to unify number types and allow
+// anything that results in an integer to pose as an integer type.
+func toInt(d *internal.Decimal) *big.Int {
+	i := &d.Coeff
+	if d.Negative {
+		i.Neg(i)
+	}
+	return i
+}
 
 // Floor returns the greatest integer value less than or equal to x.
 //
@@ -26,10 +46,11 @@ import (
 //	Floor(±0) = ±0
 //	Floor(±Inf) = ±Inf
 //	Floor(NaN) = NaN
-func Floor(x *internal.Decimal) (*internal.Decimal, error) {
+func Floor(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
 	_, err := apdContext.Floor(&d, x)
-	return &d, err
+	_, _ = apdContext.Quantize(&d, &d, 0)
+	return toInt(&d), err
 }
 
 // Ceil returns the least integer value greater than or equal to x.
@@ -38,13 +59,14 @@ func Floor(x *internal.Decimal) (*internal.Decimal, error) {
 //	Ceil(±0) = ±0
 //	Ceil(±Inf) = ±Inf
 //	Ceil(NaN) = NaN
-func Ceil(x *internal.Decimal) (*internal.Decimal, error) {
+func Ceil(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
 	_, err := apdContext.Ceil(&d, x)
-	return &d, err
+	_, _ = apdContext.Quantize(&d, &d, 0)
+	return toInt(&d), err
 }
 
-var roundTruncContext = apd.Context{Rounding: apd.RoundDown}
+var roundTruncContext = roundContext(apd.RoundDown)
 
 // Trunc returns the integer value of x.
 //
@@ -52,13 +74,13 @@ var roundTruncContext = apd.Context{Rounding: apd.RoundDown}
 //	Trunc(±0) = ±0
 //	Trunc(±Inf) = ±Inf
 //	Trunc(NaN) = NaN
-func Trunc(x *internal.Decimal) (*internal.Decimal, error) {
+func Trunc(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
 	_, err := roundTruncContext.RoundToIntegralExact(&d, x)
-	return &d, err
+	return toInt(&d), err
 }
 
-var roundUpContext = apd.Context{Rounding: apd.RoundHalfUp}
+var roundUpContext = roundContext(apd.RoundHalfUp)
 
 // Round returns the nearest integer, rounding half away from zero.
 //
@@ -66,13 +88,13 @@ var roundUpContext = apd.Context{Rounding: apd.RoundHalfUp}
 //	Round(±0) = ±0
 //	Round(±Inf) = ±Inf
 //	Round(NaN) = NaN
-func Round(x *internal.Decimal) (*internal.Decimal, error) {
+func Round(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
 	_, err := roundUpContext.RoundToIntegralExact(&d, x)
-	return &d, err
+	return toInt(&d), err
 }
 
-var roundEvenContext = apd.Context{Rounding: apd.RoundHalfEven}
+var roundEvenContext = roundContext(apd.RoundHalfEven)
 
 // RoundToEven returns the nearest integer, rounding ties to even.
 //
@@ -80,10 +102,10 @@ var roundEvenContext = apd.Context{Rounding: apd.RoundHalfEven}
 //	RoundToEven(±0) = ±0
 //	RoundToEven(±Inf) = ±Inf
 //	RoundToEven(NaN) = NaN
-func RoundToEven(x *internal.Decimal) (*internal.Decimal, error) {
+func RoundToEven(x *internal.Decimal) (*big.Int, error) {
 	var d internal.Decimal
 	_, err := roundEvenContext.RoundToIntegralExact(&d, x)
-	return &d, err
+	return toInt(&d), err
 }
 
 var mulContext = apd.BaseContext.WithPrecision(1)

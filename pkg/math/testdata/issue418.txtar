@@ -1,0 +1,33 @@
+-- in.cue --
+import "math"
+
+a: {
+    x: 32.45
+    y: int
+    y: math.Round(x)
+}
+
+b: {
+    x: 32.45
+    y: int
+    y: math.Log(x)
+}
+-- out/math --
+Errors:
+b.y: conflicting values int and 3.47970044315009900124277 (mismatched types int and float)
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    x: (float){ 32.45 }
+    y: (int){ 32 }
+  }
+  b: (_|_){
+    // [eval]
+    x: (float){ 32.45 }
+    y: (_|_){
+      // [eval] b.y: conflicting values int and 3.47970044315009900124277 (mismatched types int and float)
+    }
+  }
+}

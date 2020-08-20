@@ -275,8 +275,16 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		return n
 
 	case *apd.Decimal:
-		// TODO: set num or float based on value of number.
-		n := &adt.Num{Src: ctx.Source(), K: adt.NumKind}
+		// TODO: should we allow an "int" bit to be set here? It is a bit
+		// tricky, as we would also need to pass down the result of rounding.
+		// So more likely an API must return explicitly whether a value is
+		// a float or an int after all.
+		// The code to autodetect whether something is an integer can be done
+		// with this:
+		// var d apd.Decimal
+		// res, _ := apd.BaseContext.RoundToIntegralExact(&d, v)
+		// integer := !res.Inexact()
+		n := &adt.Num{Src: ctx.Source(), K: adt.FloatKind}
 		n.X = *v
 		return n
 

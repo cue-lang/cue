@@ -398,7 +398,11 @@ func (e *exporter) comprehension(y adt.Yielder) ast.Expr {
 			y = x.Dst
 
 		case *adt.ValueClause:
-			c.Value = e.expr(x.StructLit)
+			v := e.expr(x.StructLit)
+			if _, ok := v.(*ast.StructLit); !ok {
+				v = ast.NewStruct(ast.Embed(v))
+			}
+			c.Value = v
 			return c
 
 		default:

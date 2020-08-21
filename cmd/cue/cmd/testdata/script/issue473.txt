@@ -1,0 +1,36 @@
+cue eval --out json x.cue
+
+-- cue.mod/module.cue --
+module: "mod.com"
+-- x.cue --
+package x
+
+#Guide: {
+        Terminals: [string]: #Terminal
+
+        Steps: [string]: #Step
+
+        #TerminalName: or([ for k, _ in Terminals {k}])
+
+        #Step: {
+                Terminal: #TerminalName
+                Cmd:      string
+        }
+
+        #Terminal: {
+                Image: string
+        }
+}
+
+g: #Guide & {
+        Terminals: client: {
+                Image: "golang"
+        }
+
+        Steps: {
+                list: {
+                        Terminal: "client"
+                        Cmd:      "ls"
+                }
+        }
+}

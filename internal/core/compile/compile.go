@@ -663,6 +663,7 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 		prev = next
 	}
 
+	// TODO: make x.Value an *ast.StructLit and this is redundant.
 	if y, ok := x.Value.(*ast.StructLit); !ok {
 		return c.errf(x.Value,
 			"comprehension value must be struct, found %T", y)

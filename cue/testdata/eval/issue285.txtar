@@ -1,0 +1,48 @@
+-- in.cue --
+#TopLevel: [name=string]: {
+	path:    string
+	content: string
+}
+
+#Mid: #TopLevel & {
+	myoutput: path: "/output"
+}
+
+val: #Mid & {} & {myoutput: {content: "foo"}} // Should work.
+-- out/eval --
+(struct){
+  #TopLevel: (#struct){
+  }
+  #Mid: (#struct){
+    myoutput: (#struct){
+      path: (string){ "/output" }
+      content: (string){ string }
+    }
+  }
+  val: (#struct){
+    myoutput: (#struct){
+      path: (string){ "/output" }
+      content: (string){ "foo" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #TopLevel: {
+    [string]: {
+      path: string
+      content: string
+    }
+  }
+  #Mid: (〈0;#TopLevel〉 & {
+    myoutput: {
+      path: "/output"
+    }
+  })
+  val: ((〈0;#Mid〉 & {}) & {
+    myoutput: {
+      content: "foo"
+    }
+  })
+}

@@ -1,0 +1,66 @@
+-- in.cue --
+t1: {
+	#R: {
+		pos:  uint
+		name: "hello_\(pos)"
+	}
+	a: #R & {pos: 67}
+}
+t2: {
+	#R: {
+		pos:  string
+		name: "hello_\(pos)"
+	}
+	a: #R & {pos: "a"}
+}
+-- out/eval --
+(struct){
+  t1: (struct){
+    #R: (#struct){
+      pos: (int){ &(>=0, int) }
+      name: (_|_){
+        // [incomplete] t1.#R.name: invalid interpolation: non-concrete value >=0 & int (type int):
+        //     ./in.cue:4:9
+      }
+    }
+    a: (#struct){
+      pos: (int){ 67 }
+      name: (string){ "hello_67" }
+    }
+  }
+  t2: (struct){
+    #R: (#struct){
+      pos: (string){ string }
+      name: (_|_){
+        // [incomplete] t2.#R.name: invalid interpolation: non-concrete value string (type string):
+        //     ./in.cue:11:9
+      }
+    }
+    a: (#struct){
+      pos: (string){ "a" }
+      name: (string){ "hello_a" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    #R: {
+      pos: &(int, >=0)
+      name: "hello_\(〈0;pos〉)"
+    }
+    a: (〈0;#R〉 & {
+      pos: 67
+    })
+  }
+  t2: {
+    #R: {
+      pos: string
+      name: "hello_\(〈0;pos〉)"
+    }
+    a: (〈0;#R〉 & {
+      pos: "a"
+    })
+  }
+}

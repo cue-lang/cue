@@ -83,7 +83,7 @@ s3:  strings.ContainsAny(str, "dd")
     //     ./in.cue:11:6
   }
   s1: (_|_){
-    // [incomplete] s1: invalid interpolation: incomplete string value 'string':
+    // [incomplete] s1: invalid interpolation: non-concrete value string (type string):
     //     ./in.cue:13:5
   }
   s2: (string){ strings.ContainsAny("dd") }

@@ -738,9 +738,27 @@ func (c *OpContext) StringValue(v Value) string {
 	return c.stringValue(v, nil)
 }
 
+// ToString returns the string value of a numeric or string value.
+func (c *OpContext) ToString(v Value) string {
+	return c.toStringValue(v, StringKind|NumKind, nil)
+
+}
+
 func (c *OpContext) stringValue(v Value, as interface{}) string {
+	return c.toStringValue(v, StringKind, as)
+}
+
+func (c *OpContext) toStringValue(v Value, k Kind, as interface{}) string {
 	v = Unwrap(v)
 	if isError(v) {
+		return ""
+	}
+	if v.Kind()&k == 0 {
+		if as == nil {
+			c.typeError(v, k)
+		} else {
+			c.typeErrorAs(v, k, as)
+		}
 		return ""
 	}
 	switch x := v.(type) {
@@ -754,11 +772,8 @@ func (c *OpContext) stringValue(v Value, as interface{}) string {
 		return x.X.String()
 
 	default:
-		if as == nil {
-			c.typeError(v, StringKind)
-		} else {
-			c.typeErrorAs(v, StringKind, as)
-		}
+		c.addErrf(IncompleteError, c.pos(),
+			"non-concrete value %s (type %s)", c.Str(v), v.Kind())
 	}
 	return ""
 }

@@ -717,7 +717,7 @@ func (x *Interpolation) evaluate(c *OpContext) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
 		v := c.value(e)
-		s := c.StringValue(v)
+		s := c.ToString(v)
 		buf.WriteString(s)
 	}
 	if err := c.Err(); err != nil {

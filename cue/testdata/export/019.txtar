@@ -15,16 +15,10 @@ b: "Count: \(a) times"
   }
 }
 -- out/eval --
-Errors:
-b: invalid interpolation: cannot use >=0 & <=10 (type number) as type string:
-    ./in.cue:1:20
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   a: (number){ &(>=0, <=10) }
   b: (_|_){
-    // [eval] b: invalid interpolation: cannot use >=0 & <=10 (type number) as type string:
+    // [incomplete] b: invalid interpolation: non-concrete value >=0 & <=10 (type number):
     //     ./in.cue:1:20
   }
 }

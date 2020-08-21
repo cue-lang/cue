@@ -1,0 +1,38 @@
+-- in.cue --
+a: 12
+#Controller: settings: {
+    controller: #Controller
+}
+
+-- out/eval --
+Errors:
+#Controller.settings.controller: structural cycle
+
+Result:
+(_|_){
+  // [structural cycle]
+  a: (int){ 12 }
+  #Controller: (_|_){
+    // [structural cycle]
+    settings: (_|_){
+      // [structural cycle]
+      controller: (_|_){
+        // [structural cycle] #Controller.settings.controller: structural cycle
+        settings: (_|_){// {
+          //   controller: 〈2;#Controller〉
+          // }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: 12
+  #Controller: {
+    settings: {
+      controller: 〈2;#Controller〉
+    }
+  }
+}

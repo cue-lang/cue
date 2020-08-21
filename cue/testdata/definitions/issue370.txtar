@@ -1,0 +1,55 @@
+
+-- x.cue --
+package x
+
+#C1: {
+  name: string
+}
+
+#C2: {
+  #C1
+  age: int
+}
+
+c1: #C1 & {
+  name: "cueckoo"
+}
+
+c2: #C2 & {
+  c1
+  //age: 5
+}
+-- out/eval --
+(struct){
+  #C1: (#struct){
+    name: (string){ string }
+  }
+  #C2: (#struct){
+    name: (string){ string }
+    age: (int){ int }
+  }
+  c1: (#struct){
+    name: (string){ "cueckoo" }
+  }
+  c2: (#struct){
+    name: (string){ "cueckoo" }
+    age: (int){ int }
+  }
+}
+-- out/compile --
+--- x.cue
+{
+  #C1: {
+    name: string
+  }
+  #C2: {
+    〈1;#C1〉
+    age: int
+  }
+  c1: (〈0;#C1〉 & {
+    name: "cueckoo"
+  })
+  c2: (〈0;#C2〉 & {
+    〈1;c1〉
+  })
+}

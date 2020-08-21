@@ -1,0 +1,79 @@
+-- in.cue --
+X: {
+	#Simple: {
+		ref: string
+	}
+
+	#Complex: {
+		{
+			ref: string
+		} | {
+			local: string
+		}
+	}
+
+	var: "XXX"
+
+	// Validate(concrete) after Fill() on Complex.ref from a "static" key will succeed
+	"test_1": #Complex
+
+	// Validate(concrete) after Fill() on "#Simple.ref" from a "dynamic" key will succeed
+	"test_2_\(var)": #Simple
+	
+	// Validate(concrete) after Fill() on Complex.ref from a "dynamic" key will fail
+	"test_3_\(var)": #Complex
+
+	test_3_XXX: ref: "FOO"
+}
+
+Z: X.test_3_XXX.ref
+-- out/eval --
+(struct){
+  X: (struct){
+    #Simple: (#struct){
+      ref: (string){ string }
+    }
+    #Complex: (struct){ |((#struct){
+        ref: (string){ string }
+      }, (#struct){
+        local: (string){ string }
+      }) }
+    var: (string){ "XXX" }
+    test_1: (struct){ |((#struct){
+        ref: (string){ string }
+      }, (#struct){
+        local: (string){ string }
+      }) }
+    test_3_XXX: (#struct){
+      ref: (string){ "FOO" }
+    }
+    test_2_XXX: (#struct){
+      ref: (string){ string }
+    }
+  }
+  Z: (string){ "FOO" }
+}
+-- out/compile --
+--- in.cue
+{
+  X: {
+    #Simple: {
+      ref: string
+    }
+    #Complex: {
+      ({
+        ref: string
+      }|{
+        local: string
+      })
+    }
+    var: "XXX"
+    test_1: 〈0;#Complex〉
+    "test_2_\(〈0;var〉)": 〈0;#Simple〉
+    "test_3_\(〈0;var〉)": 〈0;#Complex〉
+    test_3_XXX: {
+      ref: "FOO"
+    }
+  }
+  Z: 〈0;X〉.test_3_XXX.ref
+}

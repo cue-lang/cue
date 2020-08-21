@@ -1,0 +1,53 @@
+-- in.cue --
+import "list"
+#d: {
+	#x: string
+	result: [#x]
+}
+#foo: {
+	X=#x: _
+	y: list.FlattenN((#d & {#x: X}).result, 1)
+}
+r: #foo & {
+	#x: "hello"
+}
+-- out/eval --
+(struct){
+  #d: (#struct){
+    #x: (string){ string }
+    result: (#list){
+      0: (string){ string }
+    }
+  }
+  #foo: (#struct){
+    #x: (_){ _ }
+    y: (#list){
+      0: (string){ string }
+    }
+  }
+  r: (#struct){
+    #x: (string){ "hello" }
+    y: (#list){
+      0: (string){ "hello" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #d: {
+    #x: string
+    result: [
+      〈0;#x〉,
+    ]
+  }
+  #foo: {
+    #x: _
+    y: 〈import;list〉.FlattenN((〈1;#d〉 & {
+      #x: 〈1;#x〉
+    }).result, 1)
+  }
+  r: (〈0;#foo〉 & {
+    #x: "hello"
+  })
+}

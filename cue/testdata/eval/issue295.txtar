@@ -1,0 +1,21 @@
+-- in.cue --
+p: close({
+	"\("f")": _
+})
+p: f: 9
+-- out/compile --
+--- in.cue
+{
+  p: close({
+    "\("f")": _
+  })
+  p: {
+    f: 9
+  }
+}
+-- out/eval --
+(struct){
+  p: (#struct){
+    f: (int){ 9 }
+  }
+}

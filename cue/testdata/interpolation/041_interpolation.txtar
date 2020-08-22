@@ -33,7 +33,7 @@ e: _|_ // expression in interpolation must evaluate to a number kind or string (
 }
 -- out/eval --
 Errors:
-e: invalid interpolation: cannot use [] (type list) as type (string|number):
+e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
     ./in.cue:7:4
 
 Result:
@@ -52,7 +52,7 @@ Result:
   }
   r: (_){ _ }
   e: (_|_){
-    // [eval] e: invalid interpolation: cannot use [] (type list) as type (string|number):
+    // [eval] e: invalid interpolation: cannot use [] (type list) as type (bool|string|bytes|number):
     //     ./in.cue:7:4
   }
 }

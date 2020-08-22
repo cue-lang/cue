@@ -226,20 +226,7 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.string("]")
 
 	case *adt.Interpolation:
-		w.string(`"`)
-		for i := 0; i < len(x.Parts); i += 2 {
-			if s, ok := x.Parts[i].(*adt.String); ok {
-				w.string(s.Str)
-			} else {
-				w.string("<bad string>")
-			}
-			if i+1 < len(x.Parts) {
-				w.string(`\(`)
-				w.node(x.Parts[i+1])
-				w.string(`)`)
-			}
-		}
-		w.string(`"`)
+		w.interpolation(x)
 
 	case *adt.UnaryExpr:
 		fmt.Fprint(w, x.Op)

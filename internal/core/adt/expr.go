@@ -717,8 +717,11 @@ func (x *Interpolation) evaluate(c *OpContext) Value {
 	buf := bytes.Buffer{}
 	for _, e := range x.Parts {
 		v := c.value(e)
-		s := c.ToString(v)
-		buf.WriteString(s)
+		if x.K == BytesKind {
+			buf.Write(c.ToBytes(v))
+		} else {
+			buf.WriteString(c.ToString(v))
+		}
 	}
 	if err := c.Err(); err != nil {
 		err = &Bottom{
@@ -729,9 +732,9 @@ func (x *Interpolation) evaluate(c *OpContext) Value {
 		// return nil
 		return err
 	}
-	// if k == bytesKind {
-	// 	return &BytesLit{x.source, buf.String(), nil}
-	// }
+	if x.K == BytesKind {
+		return &Bytes{x.Src, buf.Bytes(), nil}
+	}
 	return &String{x.Src, buf.String(), nil}
 }
 

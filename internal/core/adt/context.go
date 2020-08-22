@@ -20,7 +20,7 @@ import (
 	"regexp"
 
 	"github.com/cockroachdb/apd/v2"
-	"golang.org/x/text/runes"
+	"golang.org/x/text/encoding/unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
@@ -738,9 +738,17 @@ func (c *OpContext) StringValue(v Value) string {
 	return c.stringValue(v, nil)
 }
 
-// ToString returns the string value of a numeric or string value.
+// ToBytes returns the bytes value of a scalar value.
+func (c *OpContext) ToBytes(v Value) []byte {
+	if x, ok := v.(*Bytes); ok {
+		return x.B
+	}
+	return []byte(c.ToString(v))
+}
+
+// ToString returns the string value of a scalar value.
 func (c *OpContext) ToString(v Value) string {
-	return c.toStringValue(v, StringKind|NumKind, nil)
+	return c.toStringValue(v, StringKind|NumKind|BytesKind|BoolKind, nil)
 
 }
 
@@ -766,16 +774,27 @@ func (c *OpContext) toStringValue(v Value, k Kind, as interface{}) string {
 		return x.Str
 
 	case *Bytes:
-		return string(runes.ReplaceIllFormed().Bytes(x.B))
+		return bytesToString(x.B)
 
 	case *Num:
 		return x.X.String()
+
+	case *Bool:
+		if x.B {
+			return "true"
+		}
+		return "false"
 
 	default:
 		c.addErrf(IncompleteError, c.pos(),
 			"non-concrete value %s (type %s)", c.Str(v), v.Kind())
 	}
 	return ""
+}
+
+func bytesToString(b []byte) string {
+	b, _ = unicode.UTF8.NewDecoder().Bytes(b)
+	return string(b)
 }
 
 func (c *OpContext) bytesValue(v Value, as interface{}) []byte {

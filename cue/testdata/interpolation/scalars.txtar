@@ -1,0 +1,48 @@
+-- in.cue --
+bool1: "1+1=2:  \(true)"
+bool1: "1+1=2:  \(true)"
+bool2: "1+1=1:  \(false)"
+
+// one replacement character
+b1: 'a\xED\x95a'
+bytes1s: "\(b1)"
+bytes1b: '\(b1)'
+
+// two replacement characters
+b2: 'a\x80\x95a'
+bytes2s: "\(b2)"
+bytes2b: '\(b2)'
+
+// preserve precision
+n1: "\(1) \(2.00)"
+
+// but normalize representation
+n2: "\(1e2)"
+-- out/eval --
+(struct){
+  bool1: (string){ "1+1=2:  true" }
+  bool2: (string){ "1+1=1:  false" }
+  b1: (bytes){ 'a\xed\x95a' }
+  bytes1s: (string){ "a�a" }
+  bytes1b: (bytes){ 'a\xed\x95a' }
+  b2: (bytes){ 'a\x80\x95a' }
+  bytes2s: (string){ "a��a" }
+  bytes2b: (bytes){ 'a\x80\x95a' }
+  n1: (string){ "1 2.00" }
+  n2: (string){ "1E+2" }
+}
+-- out/compile --
+--- in.cue
+{
+  bool1: "1+1=2:  \(true)"
+  bool1: "1+1=2:  \(true)"
+  bool2: "1+1=1:  \(false)"
+  b1: 'a\xed\x95a'
+  bytes1s: "\(〈0;b1〉)"
+  bytes1b: '\(〈0;b1〉)'
+  b2: 'a\x80\x95a'
+  bytes2s: "\(〈0;b2〉)"
+  bytes2b: '\(〈0;b2〉)'
+  n1: "\(1) \(2.00)"
+  n2: "\(1E+2)"
+}

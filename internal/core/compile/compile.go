@@ -799,10 +799,15 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		if len(n.Elts) == 1 {
 			return c.expr(n.Elts[0])
 		}
-		lit := &adt.Interpolation{Src: n, K: adt.StringKind}
+		lit := &adt.Interpolation{Src: n}
 		info, prefixLen, _, err := literal.ParseQuotes(first.Value, last.Value)
 		if err != nil {
 			return c.errf(n, "invalid interpolation: %v", err)
+		}
+		if info.IsDouble() {
+			lit.K = adt.StringKind
+		} else {
+			lit.K = adt.BytesKind
 		}
 		prefix := ""
 		for i := 0; i < len(n.Elts); i += 2 {

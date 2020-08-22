@@ -2609,8 +2609,21 @@ expressions with their string representation.
 String interpolation may be used in single- and double-quoted strings, as well
 as their multiline equivalent.
 
-A placeholder consists of "\(" followed by an expression and a ")". The
-expression is evaluated within the scope within which the string is defined.
+A placeholder consists of "\(" followed by an expression and a ")".
+The expression is evaluated in the scope within which the string is defined.
+
+The result of the expression is substituted as follows:
+- string: as is
+- bool: the JSON representation of the bool
+- number: a JSON representation of the number that preserves the
+precision of the underlying binary coded decimal
+- bytes: as if substituted within single quotes or
+converted to valid UTF-8 replacing the
+maximal subpart of ill-formed subsequences with a single
+replacement character (W3C encoding standard) otherwise
+- list: illegal
+- struct: illegal
+
 
 ```
 a: "World"

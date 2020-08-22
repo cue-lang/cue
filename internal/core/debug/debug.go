@@ -106,6 +106,36 @@ func (w *printer) shortError(errs errors.Error) {
 	}
 }
 
+func (w *printer) interpolation(x *adt.Interpolation) {
+	quote := `"`
+	if x.K == adt.BytesKind {
+		quote = `'`
+	}
+	w.string(quote)
+	for i := 0; i < len(x.Parts); i += 2 {
+		switch x.K {
+		case adt.StringKind:
+			if s, ok := x.Parts[i].(*adt.String); ok {
+				w.string(s.Str)
+			} else {
+				w.string("<bad string>")
+			}
+		case adt.BytesKind:
+			if s, ok := x.Parts[i].(*adt.Bytes); ok {
+				_, _ = w.Write(s.B)
+			} else {
+				w.string("<bad bytes>")
+			}
+		}
+		if i+1 < len(x.Parts) {
+			w.string(`\(`)
+			w.node(x.Parts[i+1])
+			w.string(`)`)
+		}
+	}
+	w.string(quote)
+}
+
 func (w *printer) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
@@ -375,20 +405,7 @@ func (w *printer) node(n adt.Node) {
 		w.string("]")
 
 	case *adt.Interpolation:
-		w.string(`"`)
-		for i := 0; i < len(x.Parts); i += 2 {
-			if s, ok := x.Parts[i].(*adt.String); ok {
-				w.string(s.Str)
-			} else {
-				w.string("<bad string>")
-			}
-			if i+1 < len(x.Parts) {
-				w.string(`\(`)
-				w.node(x.Parts[i+1])
-				w.string(`)`)
-			}
-		}
-		w.string(`"`)
+		w.interpolation(x)
 
 	case *adt.UnaryExpr:
 		fmt.Fprint(w, x.Op)

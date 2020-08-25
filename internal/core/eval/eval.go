@@ -420,13 +420,18 @@ func isStruct(v *adt.Vertex) bool {
 func (n *nodeContext) postDisjunct() {
 	ctx := n.ctx
 
-	// Use maybeSetCache for cycle breaking
-	for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
+	for {
+		// Use maybeSetCache for cycle breaking
+		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
+		}
+
+		if aList := n.addLists(ctx); aList != nil {
+			n.updateNodeType(adt.ListKind, aList)
+		} else {
+			break
+		}
 	}
 
-	if aList := n.addLists(ctx); aList != nil {
-		n.updateNodeType(adt.ListKind, aList)
-	}
 	if n.aStruct != nil {
 		n.updateNodeType(adt.StructKind, n.aStruct)
 	}
@@ -1600,6 +1605,11 @@ func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr) {
 	max := 0
 	var maxNode adt.Expr
 
+	if m, ok := n.node.Value.(*adt.ListMarker); ok {
+		isOpen = m.IsOpen
+		max = len(n.node.Arcs)
+	}
+
 	for _, l := range n.vLists {
 		oneOfTheLists = l
 
@@ -1747,10 +1757,21 @@ outer:
 
 	n.openList = isOpen
 
-	n.node.SetValue(c, adt.Partial, &adt.ListMarker{
-		Src:    ast.NewBinExpr(token.AND, sources...),
-		IsOpen: isOpen,
-	})
+	if m, ok := n.node.Value.(*adt.ListMarker); !ok {
+		n.node.SetValue(c, adt.Partial, &adt.ListMarker{
+			Src:    ast.NewBinExpr(token.AND, sources...),
+			IsOpen: isOpen,
+		})
+	} else {
+		if expr, _ := m.Src.(ast.Expr); expr != nil {
+			sources = append(sources, expr)
+		}
+		m.Src = ast.NewBinExpr(token.AND, sources...)
+		m.IsOpen = m.IsOpen && isOpen
+	}
+
+	n.lists = n.lists[:0]
+	n.vLists = n.vLists[:0]
 
 	return oneOfTheLists
 }

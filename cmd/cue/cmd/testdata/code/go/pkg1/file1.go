@@ -47,6 +47,8 @@ type Foozer struct {
 
 	Barzer p2.Barzer
 
+	Alias1 *MyBarzer
+
 	Map    map[string]*CustomJSON
 	Slice1 []int
 	Slice2 []interface{}

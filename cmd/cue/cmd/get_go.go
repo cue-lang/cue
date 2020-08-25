@@ -27,7 +27,6 @@ import (
 	"path/filepath"
 	"reflect"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 	"unicode"
@@ -36,6 +35,7 @@ import (
 	"golang.org/x/tools/go/packages"
 
 	cueast "cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
@@ -259,11 +259,10 @@ type extractor struct {
 	usedPkgs map[string]bool
 
 	// per file
-	cmap       ast.CommentMap
-	pkg        *packages.Package
-	consts     map[string][]string
-	pkgNames   map[string]pkgInfo
-	usedInFile map[string]bool
+	cmap     ast.CommentMap
+	pkg      *packages.Package
+	consts   map[string][]string
+	pkgNames map[string]pkgInfo
 
 	exclusions []*regexp.Regexp
 	exclude    string
@@ -282,7 +281,6 @@ func (e *extractor) logf(format string, args ...interface{}) {
 
 func (e *extractor) usedPkg(pkg string) {
 	e.usedPkgs[pkg] = true
-	e.usedInFile[pkg] = true
 }
 
 func initInterfaces() error {
@@ -427,7 +425,6 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 		e.cmap = ast.NewCommentMap(p.Fset, f, f.Comments)
 
 		e.pkgNames = map[string]pkgInfo{}
-		e.usedInFile = map[string]bool{}
 
 		for _, spec := range f.Imports {
 			pkgPath, _ := strconv.Unquote(spec.Path.Value)
@@ -457,12 +454,6 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			continue
 		}
 
-		pkgs := []string{}
-		for k := range e.usedInFile {
-			pkgs = append(pkgs, k)
-		}
-		sort.Strings(pkgs)
-
 		pName := flagPackage.String(e.cmd)
 		if pName == "" {
 			pName = p.Name
@@ -478,21 +469,11 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			}},
 			pkg,
 		}}
-
-		if len(pkgs) > 0 {
-			imports := &cueast.ImportDecl{}
-			f.Decls = append(f.Decls, imports)
-			for _, s := range pkgs {
-				info := e.pkgNames[s]
-				spec := cueast.NewImport(nil, info.id)
-				if p.Imports[s].Name != info.name {
-					spec.Name = e.ident(info.name, false)
-				}
-				imports.Specs = append(imports.Specs, spec)
-			}
-		}
-
 		f.Decls = append(f.Decls, decls...)
+
+		if err := astutil.Sanitize(f); err != nil {
+			return err
+		}
 
 		file := filepath.Base(p.CompiledGoFiles[i])
 
@@ -936,9 +917,12 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		// builtin type.
 		switch obj.Type().String() {
 		case "time.Time":
-			e.usedInFile["time"] = true
 			ref := e.ident(e.pkgNames[obj.Pkg().Path()].name, false)
-			ref.Node = cueast.NewImport(nil, "time")
+			var name *cueast.Ident
+			if ref.Name != "time" {
+				name = e.ident(ref.Name, false)
+			}
+			ref.Node = cueast.NewImport(name, "time")
 			return cueast.NewSel(ref, obj.Name())
 
 		case "math/big.Int":
@@ -956,16 +940,26 @@ func (e *extractor) makeType(expr types.Type) (result cueast.Expr) {
 		}
 
 		result = e.ident(obj.Name(), true)
-		if pkg := obj.Pkg(); pkg != nil {
-			if info := e.pkgNames[pkg.Path()]; info.name != "" {
-				p := e.ident(info.name, false)
-				// TODO: set package name et. at.
-				p.Node = cueast.NewImport(nil, pkg.Path())
-				// makeType is always called to describe a type, so whatever
-				// this is referring to, it must be a definition.
-				result = cueast.NewSel(p, "#"+obj.Name())
-				e.usedPkg(pkg.Path())
+		if pkg := obj.Pkg(); pkg != nil && pkg != e.pkg.Types {
+			info := e.pkgNames[pkg.Path()]
+			if info.name == "" {
+				info.name = pkg.Name()
 			}
+			p := e.ident(info.name, false)
+			var name *cueast.Ident
+			if info.name != pkg.Name() {
+				name = e.ident(info.name, false)
+			}
+			if info.id == "" {
+				// This may happen if an alias is defined in a different file
+				// within this package referring to yet another package.
+				info.id = pkg.Path()
+			}
+			p.Node = cueast.NewImport(name, info.id)
+			// makeType is always called to describe a type, so whatever
+			// this is referring to, it must be a definition.
+			result = cueast.NewSel(p, "#"+obj.Name())
+			e.usedPkg(pkg.Path())
 		}
 		return
 	}

@@ -1,0 +1,31 @@
+Incomplete errors should not unify with values.
+
+-- in.cue --
+a: or([])
+a: "t"
+
+b: _|_
+b: "t"
+
+-- out/eval --
+Errors:
+from source:
+    ./in.cue:4:4
+
+Result:
+(_|_){
+  // [user]
+  a: (string){ "t" }
+  b: (_|_){
+    // [user] from source:
+    //     ./in.cue:4:4
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: or([])
+  a: "t"
+  b: _|_(from source)
+  b: "t"
+}

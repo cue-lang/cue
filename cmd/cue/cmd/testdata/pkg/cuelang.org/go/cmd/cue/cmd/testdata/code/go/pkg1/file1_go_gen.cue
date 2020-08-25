@@ -6,8 +6,8 @@
 package pkg1
 
 import (
-	p2 "cuelang.org/go/cmd/cue/cmd/testdata/code/go/pkg2:pkgtwo"
 	"time"
+	p2 "cuelang.org/go/cmd/cue/cmd/testdata/code/go/pkg2:pkgtwo"
 )
 
 // Foozer foozes a jaman.
@@ -24,8 +24,9 @@ import (
 	bar?:        int & >10          @go(Bar)
 
 	// Time is mapped to CUE's internal type.
-	Time:   time.Time
-	Barzer: p2.#Barzer
+	Time:    time.Time
+	Barzer:  p2.#Barzer
+	Alias1?: null | p2.#Barzer @go(,*p2.Barzer)
 	Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON)
 	Slice1: [...int] @go(,[]int)
 	Slice2: [...] @go(,[]interface{})

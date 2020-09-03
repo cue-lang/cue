@@ -17,6 +17,7 @@ package eval
 import (
 	"testing"
 
+	"cuelang.org/go/internal/core/adt"
 	"github.com/google/go-cmp/cmp"
 )
 
@@ -24,12 +25,12 @@ func TestRewriteClosed(t *testing.T) {
 	testCases := []struct {
 		desc    string
 		close   *CloseDef
-		replace map[uint32]*CloseDef
+		replace map[adt.ID]*CloseDef
 		want    *CloseDef
 	}{{
 		desc:  "introduce new",
 		close: nil,
-		replace: map[uint32]*CloseDef{
+		replace: map[adt.ID]*CloseDef{
 			0: {ID: 2, IsAnd: false, List: nil},
 		},
 		want: &CloseDef{
@@ -40,7 +41,7 @@ func TestRewriteClosed(t *testing.T) {
 		close: &CloseDef{
 			ID: 1,
 		},
-		replace: map[uint32]*CloseDef{
+		replace: map[adt.ID]*CloseDef{
 			0: {ID: 2, IsAnd: false, List: nil},
 			1: nil, // keep 1
 		},
@@ -53,7 +54,7 @@ func TestRewriteClosed(t *testing.T) {
 		close: &CloseDef{
 			ID: 1,
 		},
-		replace: map[uint32]*CloseDef{
+		replace: map[adt.ID]*CloseDef{
 			1: {ID: 1, IsAnd: true, List: []*CloseDef{{ID: 2}, {ID: 3}}},
 		},
 		want: &CloseDef{
@@ -66,7 +67,7 @@ func TestRewriteClosed(t *testing.T) {
 		close: &CloseDef{
 			ID: 1,
 		},
-		replace: map[uint32]*CloseDef{
+		replace: map[adt.ID]*CloseDef{
 			0: nil,
 		},
 		want: nil,
@@ -80,7 +81,7 @@ func TestRewriteClosed(t *testing.T) {
 				{ID: 3},
 			},
 		},
-		replace: map[uint32]*CloseDef{2: nil},
+		replace: map[adt.ID]*CloseDef{2: nil},
 		want:    &CloseDef{ID: 2},
 	}, {
 		desc: "eliminateAllEmbeddings",
@@ -91,7 +92,7 @@ func TestRewriteClosed(t *testing.T) {
 				{ID: 3},
 			},
 		},
-		replace: map[uint32]*CloseDef{0: {ID: 4}, 4: nil},
+		replace: map[adt.ID]*CloseDef{0: {ID: 4}, 4: nil},
 		want:    &CloseDef{ID: 4},
 	}, {
 		// Do not eliminate an embedding that has a replacement.
@@ -103,7 +104,7 @@ func TestRewriteClosed(t *testing.T) {
 				{ID: 3},
 			},
 		},
-		replace: map[uint32]*CloseDef{
+		replace: map[adt.ID]*CloseDef{
 			2: nil,
 			3: {ID: 3, IsAnd: true, List: []*CloseDef{{ID: 4}, {ID: 5}}},
 		},
@@ -134,7 +135,7 @@ func TestRewriteClosed(t *testing.T) {
 				{ID: 0},
 			},
 		},
-		replace: map[uint32]*CloseDef{0: {ID: 3}},
+		replace: map[adt.ID]*CloseDef{0: {ID: 3}},
 		want:    &CloseDef{ID: 3},
 	}, {
 		// Select b within a
@@ -156,7 +157,7 @@ func TestRewriteClosed(t *testing.T) {
 				{ID: 0},
 			},
 		},
-		replace: map[uint32]*CloseDef{
+		replace: map[adt.ID]*CloseDef{
 			0: {IsAnd: true, List: []*CloseDef{{ID: 3}, {ID: 4}}},
 		},
 		want: &CloseDef{

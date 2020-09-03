@@ -143,7 +143,7 @@ func newDisjunctionAcceptor(x *adt.Disjunction) adt.Acceptor {
 // any value.
 type CloseDef struct {
 	Src   adt.Node // for error reporting
-	ID    uint32
+	ID    adt.ID
 	IsAnd bool
 	List  []*CloseDef
 }
@@ -161,7 +161,7 @@ func isOr(c *CloseDef) bool {
 // a CloseDef tree based on replacement information gathered during evaluation
 // of this flat list.
 //
-func updateClosed(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef { // used in eval.go
+func updateClosed(c *CloseDef, replace map[adt.ID]*CloseDef) *CloseDef { // used in eval.go
 	// Insert an entry for CloseID 0 if we are about to replace it. By default
 	// 0, which is the majority case, is omitted.
 	if c != nil && replace[0] != nil && !containsClosed(c, 0) {
@@ -190,7 +190,7 @@ func updateClosed(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef { // used
 	return c
 }
 
-func updateClosedRec(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef {
+func updateClosedRec(c *CloseDef, replace map[adt.ID]*CloseDef) *CloseDef {
 	if c == nil {
 		return nil
 	}
@@ -239,18 +239,13 @@ func updateClosedRec(c *CloseDef, replace map[uint32]*CloseDef) *CloseDef {
 
 // UpdateReplace is called after evaluating a conjunct at the top of the arc
 // to update the replacement information with the gathered CloseDef info.
-func (n *nodeContext) updateReplace(env *adt.Environment) { // used in eval.go
+func (n *nodeContext) updateReplace(id adt.ID) { // used in eval.go
 	if n.newClose == nil {
 		return
 	}
 
 	if n.replace == nil {
-		n.replace = make(map[uint32]*CloseDef)
-	}
-
-	id := uint32(0)
-	if env != nil {
-		id = env.CloseID
+		n.replace = make(map[adt.ID]*CloseDef)
 	}
 
 	n.replace[id] = updateClose(n.replace[id], n.newClose)
@@ -310,7 +305,7 @@ func (n *nodeContext) addAnd(c *CloseDef) { // used in eval.go
 	}
 }
 
-func (n *nodeContext) addOr(parentID uint32, c *CloseDef) { // used in eval.go
+func (n *nodeContext) addOr(parentID adt.ID, c *CloseDef) { // used in eval.go
 	switch {
 	case n.newClose == nil:
 		d := &CloseDef{ID: parentID, List: []*CloseDef{{ID: parentID}}}
@@ -337,6 +332,7 @@ func (n *acceptor) verifyArcAllowed(ctx *adt.OpContext, f adt.Feature) *adt.Bott
 	// more clever and only generate this when it is a user error.
 	filter := f.IsString() || f == adt.InvalidLabel
 	if filter && !n.verifyArcRecursive(ctx, n.tree, f) {
+		collectPositions(ctx, n.tree)
 		label := f.SelectorString(ctx)
 		return ctx.NewErrf("field `%s` not allowed", label)
 	}
@@ -365,9 +361,9 @@ func (n *acceptor) verifyArcRecursive(ctx *adt.OpContext, c *CloseDef, f adt.Fea
 
 // verifyDefinition reports whether f is a valid member for any of the fieldSets
 // with the same closeID.
-func (n *acceptor) verifyDefinition(ctx *adt.OpContext, closeID uint32, f adt.Feature) (ok bool) {
+func (n *acceptor) verifyDefinition(ctx *adt.OpContext, closeID adt.ID, f adt.Feature) (ok bool) {
 	for _, o := range n.fields {
-		if o.env.CloseID != closeID {
+		if o.id != closeID {
 			continue
 		}
 
@@ -387,7 +383,6 @@ func (n *acceptor) verifyDefinition(ctx *adt.OpContext, closeID uint32, f adt.Fe
 			}
 		}
 	}
-	collectPositions(ctx, n.tree)
 	for _, o := range n.fields {
 		if o.pos != nil {
 			ctx.AddPosition(o.pos)
@@ -407,7 +402,7 @@ func collectPositions(ctx *adt.OpContext, c *CloseDef) {
 
 // containsClosed reports whether c contains any CloseDef with ID x,
 // recursively.
-func containsClosed(c *CloseDef, x uint32) bool {
+func containsClosed(c *CloseDef, x adt.ID) bool {
 	if c.ID == x && !c.IsAnd {
 		return true
 	}

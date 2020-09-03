@@ -42,7 +42,7 @@ func (s *subsumer) conjunct(gt, lt adt.Conjunct) bool {
 }
 
 func (s *subsumer) c(env *adt.Environment, x adt.Expr) adt.Conjunct {
-	return adt.MakeConjunct(env, x)
+	return adt.MakeRootConjunct(env, x)
 }
 
 func isBottomConjunct(c adt.Conjunct) bool {
@@ -247,12 +247,12 @@ func (c *collatedDecls) collate(env *adt.Environment, s *adt.StructLit) {
 		case *adt.Field:
 			e := c.fields[x.Label]
 			e.required = true
-			e.conjuncts = append(e.conjuncts, adt.MakeConjunct(env, x))
+			e.conjuncts = append(e.conjuncts, adt.MakeRootConjunct(env, x))
 			c.fields[x.Label] = e
 
 		case *adt.OptionalField:
 			e := c.fields[x.Label]
-			e.conjuncts = append(e.conjuncts, adt.MakeConjunct(env, x))
+			e.conjuncts = append(e.conjuncts, adt.MakeRootConjunct(env, x))
 			c.fields[x.Label] = e
 			c.hasOptional = true
 

@@ -75,7 +75,7 @@ func init() {
 		st, ok := x.(*adt.Vertex)
 		if !ok {
 			st = &adt.Vertex{}
-			st.AddConjunct(adt.MakeConjunct(nil, x))
+			st.AddConjunct(adt.MakeRootConjunct(nil, x))
 		}
 		return v.ctx().index.addInst(&Instance{
 			root: st,
@@ -231,7 +231,7 @@ func Merge(inst ...*Instance) *Instance {
 
 	for _, i := range inst {
 		w := i.Value()
-		v.AddConjunct(adt.MakeConjunct(nil, w.v.ToDataAll()))
+		v.AddConjunct(adt.MakeRootConjunct(nil, w.v.ToDataAll()))
 	}
 	v.Finalize(ctx)
 
@@ -255,7 +255,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 
 	v, err := compile.Files(&compile.Config{Scope: inst.root}, r, p.Files...)
 
-	v.AddConjunct(adt.MakeConjunct(nil, inst.root))
+	v.AddConjunct(adt.MakeRootConjunct(nil, inst.root))
 
 	i := newInstance(idx, p, v)
 	if rErr != nil {
@@ -345,7 +345,7 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	} else {
 		ctx := eval.NewContext(inst.index.Runtime, nil)
 		expr := convert.GoValueToExpr(ctx, true, x)
-		u.AddConjunct(adt.MakeConjunct(nil, expr))
+		u.AddConjunct(adt.MakeRootConjunct(nil, expr))
 		u.Finalize(ctx)
 	}
 	inst = inst.index.addInst(&Instance{

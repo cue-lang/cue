@@ -91,10 +91,6 @@ type Environment struct {
 	// TODO(perf): make the following public fields a shareable struct as it
 	// mostly is going to be the same for child nodes.
 
-	// CloseID is a unique number that tracks a group of conjuncts that need
-	// belong to a single originating definition.
-	CloseID uint32
-
 	// Cyclic indicates a structural cycle was detected for this conjunct or one
 	// of its ancestors.
 	Cyclic bool
@@ -128,6 +124,8 @@ type Environment struct {
 
 	cache map[Expr]Value
 }
+
+type ID int32
 
 // evalCached is used to look up let expressions. Caching let expressions
 // prevents a possible combinatorial explosion.
@@ -337,7 +335,7 @@ func ToVertex(v Value) *Vertex {
 			status: Finalized,
 			Value:  x,
 		}
-		n.AddConjunct(MakeConjunct(nil, v))
+		n.AddConjunct(MakeRootConjunct(nil, v))
 		return n
 	}
 }
@@ -557,13 +555,25 @@ func (v *Vertex) appendListArcs(arcs []*Vertex) (err *Bottom) {
 type Conjunct struct {
 	Env *Environment
 	x   Node
+
+	// CloseID is a unique number that tracks a group of conjuncts that need
+	// belong to a single originating definition.
+	CloseID ID
+}
+
+func (c *Conjunct) ID() ID {
+	return c.CloseID
 }
 
 // TODO(perf): replace with composite literal if this helps performance.
 
-// MakeConjunct creates a conjunct from the given environment and node.
+// MakeRootConjunct creates a conjunct from the given environment and node.
 // It panics if x cannot be used as an expression.
-func MakeConjunct(env *Environment, x Node) Conjunct {
+func MakeRootConjunct(env *Environment, x Node) Conjunct {
+	return MakeConjunct(env, x, 0)
+}
+
+func MakeConjunct(env *Environment, x Node, id ID) Conjunct {
 	if env == nil {
 		// TODO: better is to pass one.
 		env = &Environment{}
@@ -573,7 +583,7 @@ func MakeConjunct(env *Environment, x Node) Conjunct {
 	default:
 		panic(fmt.Sprintf("invalid Node type %T", x))
 	}
-	return Conjunct{env, x}
+	return Conjunct{env, x, id}
 }
 
 func (c *Conjunct) Source() ast.Node {

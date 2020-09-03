@@ -64,7 +64,7 @@ func (p *Package) MustCompile(ctx *adt.OpContext, pkgName string) *adt.Vertex {
 	pkgLabel := ctx.StringLabel(pkgName)
 	st := &adt.StructLit{}
 	if len(p.Native) > 0 {
-		obj.AddConjunct(adt.MakeConjunct(nil, st))
+		obj.AddConjunct(adt.MakeRootConjunct(nil, st))
 	}
 	for _, b := range p.Native {
 		b.Pkg = pkgLabel

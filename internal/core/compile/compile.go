@@ -241,7 +241,7 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 		c.pushScope(nil, 0, file) // File scope
 		v := &adt.StructLit{Src: file}
 		c.addDecls(v, file.Decls)
-		res.Conjuncts = append(res.Conjuncts, adt.MakeConjunct(nil, v))
+		res.Conjuncts = append(res.Conjuncts, adt.MakeRootConjunct(nil, v))
 		c.popScope()
 	}
 
@@ -278,7 +278,7 @@ func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
 		// env = e
 	}
 
-	return adt.MakeConjunct(env, expr)
+	return adt.MakeRootConjunct(env, expr)
 }
 
 // resolve assumes that all existing resolutions are legal. Validation should

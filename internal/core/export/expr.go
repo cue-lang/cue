@@ -65,7 +65,7 @@ func (e *exporter) expr(v adt.Expr) (result ast.Expr) {
 		return e.mergeValues(adt.InvalidLabel, x, a, x.Conjuncts...)
 
 	case *adt.StructLit:
-		c := adt.MakeConjunct(nil, x)
+		c := adt.MakeRootConjunct(nil, x)
 		return e.mergeValues(adt.InvalidLabel, nil, []conjunct{{c: c, up: 0}}, c)
 
 	case adt.Value:
@@ -204,7 +204,7 @@ type conjuncts struct {
 func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node) {
 
 	x := c.fields[f]
-	v := adt.MakeConjunct(env, n)
+	v := adt.MakeRootConjunct(env, n)
 	x.conjuncts = append(x.conjuncts, conjunct{
 		c:  v,
 		up: c.top().upCount,
@@ -282,7 +282,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 		switch x.(type) {
 		case *adt.StructMarker, *adt.Top:
 		default:
-			e.values.AddConjunct(adt.MakeConjunct(env, x)) // GOBBLE TOP
+			e.values.AddConjunct(adt.MakeRootConjunct(env, x)) // GOBBLE TOP
 		}
 
 	case *adt.BinaryExpr:
@@ -291,14 +291,14 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 			e.addExpr(env, x.X)
 			e.addExpr(env, x.Y)
 		case isSelfContained(x):
-			e.values.AddConjunct(adt.MakeConjunct(env, x))
+			e.values.AddConjunct(adt.MakeRootConjunct(env, x))
 		default:
 			e.exprs = append(e.exprs, e.expr(x))
 		}
 
 	default:
 		if isSelfContained(x) {
-			e.values.AddConjunct(adt.MakeConjunct(env, x))
+			e.values.AddConjunct(adt.MakeRootConjunct(env, x))
 		} else {
 			e.exprs = append(e.exprs, e.expr(x))
 		}

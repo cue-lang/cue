@@ -570,7 +570,7 @@ func newErrValue(v Value, b *bottom) Value {
 		node.Parent = v.v.Parent
 	}
 	node.UpdateStatus(adt.Finalized)
-	node.AddConjunct(adt.MakeConjunct(nil, b))
+	node.AddConjunct(adt.MakeRootConjunct(nil, b))
 	return makeValue(v.idx, node)
 }
 
@@ -590,7 +590,7 @@ func newValueRoot(ctx *context, x value) Value {
 		return newVertexRoot(ctx, n)
 	}
 	node := &adt.Vertex{}
-	node.AddConjunct(adt.MakeConjunct(nil, x))
+	node.AddConjunct(adt.MakeRootConjunct(nil, x))
 	return newVertexRoot(ctx, node)
 }
 
@@ -648,7 +648,7 @@ func remakeValue(base Value, env *adt.Environment, v value) Value {
 		return Value{base.idx, v}
 	}
 	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label}
-	n.AddConjunct(adt.MakeConjunct(env, v))
+	n.AddConjunct(adt.MakeRootConjunct(env, v))
 	n = base.ctx().manifest(n)
 	return makeValue(base.idx, n)
 }
@@ -1556,7 +1556,7 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 	n, _ := value.(*adt.Vertex)
 	if n == nil {
 		n = &adt.Vertex{Label: v.v.Label, Parent: v.v.Parent}
-		n.AddConjunct(adt.MakeConjunct(nil, value))
+		n.AddConjunct(adt.MakeRootConjunct(nil, value))
 	} else {
 		n.Label = v.v.Label
 	}
@@ -1653,8 +1653,8 @@ func (v Value) Unify(w Value) Value {
 		return v
 	}
 	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
-	n.AddConjunct(adt.MakeConjunct(nil, v.v))
-	n.AddConjunct(adt.MakeConjunct(nil, w.v))
+	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
+	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
 
 	ctx := v.idx.newContext()
 	n.Finalize(ctx.opCtx)
@@ -1675,8 +1675,8 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	}
 
 	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
-	n.AddConjunct(adt.MakeConjunct(nil, v.v))
-	n.AddConjunct(adt.MakeConjunct(nil, w.v))
+	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
+	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
 
 	e := eval.New(v.idx.Runtime)
 	ctx := e.NewContext(n)
@@ -2166,8 +2166,8 @@ func (v Value) Expr() (Op, []Value) {
 						Closed: v.v.Closed,
 					}
 					b := a
-					a.AddConjunct(adt.MakeConjunct(env, n.Val))
-					b.AddConjunct(adt.MakeConjunct(env, disjunct.Val))
+					a.AddConjunct(adt.MakeRootConjunct(env, n.Val))
+					b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
 
 					e := eval.New(v.idx.Runtime)
 					ctx := e.NewContext(nil)
@@ -2246,7 +2246,7 @@ func (v Value) Expr() (Op, []Value) {
 				n := &adt.Vertex{
 					Parent: v.v.Parent,
 					Label:  v.v.Label}
-				c := adt.MakeConjunct(envEmbed, x)
+				c := adt.MakeRootConjunct(envEmbed, x)
 				n.AddConjunct(c)
 				n.Finalize(ctx)
 				a = append(a, makeValue(v.idx, n))
@@ -2265,7 +2265,7 @@ func (v Value) Expr() (Op, []Value) {
 				Parent: v.v.Parent,
 				Label:  v.v.Label,
 			}
-			c := adt.MakeConjunct(env, &adt.StructLit{
+			c := adt.MakeRootConjunct(env, &adt.StructLit{
 				Decls: fields,
 			})
 			n.AddConjunct(c)

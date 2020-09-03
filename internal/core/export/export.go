@@ -291,7 +291,7 @@ func (e *exporter) frame(upCount int32) *frame {
 
 func (e *exporter) setDocs(x adt.Node) {
 	f := e.stack[len(e.stack)-1]
-	f.docSources = []adt.Conjunct{adt.MakeConjunct(nil, x)}
+	f.docSources = []adt.Conjunct{adt.MakeRootConjunct(nil, x)}
 	e.stack[len(e.stack)-1] = f
 }
 

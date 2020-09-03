@@ -128,7 +128,7 @@ var orBuiltin = &adt.Builtin{
 		}
 		v := &adt.Vertex{}
 		// TODO: make a Disjunction.
-		v.AddConjunct(adt.MakeConjunct(nil,
+		v.AddConjunct(adt.MakeRootConjunct(nil,
 			&adt.DisjunctionExpr{Values: d, HasDefaults: false},
 		))
 		c.Unify(c, v, adt.Finalized)

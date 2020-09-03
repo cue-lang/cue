@@ -40,7 +40,7 @@ func (x *StructLit) Source() ast.Node { return x.Src }
 
 func (x *StructLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, 0}}}
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	return v
 }
@@ -168,7 +168,7 @@ func (x *ListLit) Source() ast.Node {
 
 func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, 0}}}
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	return v
 }
@@ -547,7 +547,7 @@ func (x *LetReference) resolve(c *OpContext) *Vertex {
 	e := c.Env(x.UpCount)
 	label := e.Vertex.Label
 	// Anonymous arc.
-	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X}}}
+	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X, 0}}}
 }
 
 func (x *LetReference) evaluate(c *OpContext) Value {
@@ -822,7 +822,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		// Anonymous Arc
-		v := Vertex{Conjuncts: []Conjunct{{env, x}}}
+		v := Vertex{Conjuncts: []Conjunct{{env, x, 0}}}
 		return c.Unifier.Evaluate(c, &v)
 	}
 
@@ -1094,7 +1094,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 
 func (x *DisjunctionExpr) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, 0}}}
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	// TODO: if the disjunction result originated from a literal value, we may
 	// consider the result closed to create more permanent errors.
@@ -1178,7 +1178,7 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 		if x.Key != 0 {
 			v := &Vertex{Label: x.Key}
 			key := a.Label.ToValue(c)
-			v.AddConjunct(MakeConjunct(c.Env(0), key))
+			v.AddConjunct(MakeRootConjunct(c.Env(0), key))
 			v.SetValue(c, Finalized, key)
 			n.Arcs = append(n.Arcs, v)
 		}
@@ -1234,7 +1234,7 @@ func (x *LetClause) Source() ast.Node {
 
 func (x *LetClause) yield(c *OpContext, f YieldFunc) {
 	n := &Vertex{Arcs: []*Vertex{
-		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr}}},
+		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, 0}}},
 	}}
 	x.Dst.yield(c.spawn(n), f)
 }

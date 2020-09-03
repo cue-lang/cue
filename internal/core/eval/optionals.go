@@ -23,11 +23,13 @@ import (
 // fieldSet represents the fields for a single struct literal, along
 // the constraints of fields that may be added.
 type fieldSet struct {
-	pos adt.Node
+	next *fieldSet
+	pos  adt.Node
 
 	// TODO: look at consecutive identical environments to figure out
 	// what belongs to same definition?
 	env *adt.Environment
+	id  adt.ID
 
 	// field marks the optional conjuncts of all explicit fields.
 	// Required fields are marked as empty
@@ -104,7 +106,7 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 	}
 	if p < len(o.fields) {
 		for _, e := range o.fields[p].optional {
-			arc.AddConjunct(adt.MakeConjunct(env, e))
+			arc.AddConjunct(adt.MakeConjunct(env, e, o.id))
 		}
 		return
 	}
@@ -122,7 +124,7 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 		if f.check.Match(c, arc.Label) {
 			matched = true
 			if f.expr != nil {
-				arc.AddConjunct(adt.MakeConjunct(&bulkEnv, f.expr))
+				arc.AddConjunct(adt.MakeConjunct(&bulkEnv, f.expr, o.id))
 			}
 		}
 	}
@@ -132,7 +134,7 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 
 	// match others
 	for _, x := range o.additional {
-		arc.AddConjunct(adt.MakeConjunct(env, x))
+		arc.AddConjunct(adt.MakeConjunct(env, x, o.id))
 	}
 }
 
@@ -242,13 +244,13 @@ func (m patternMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 	v := adt.Vertex{}
 	v.AddConjunct(adt.Conjunct(m))
 	label := f.ToValue(c)
-	v.AddConjunct(adt.MakeConjunct(m.Env, label))
+	v.AddConjunct(adt.MakeRootConjunct(m.Env, label))
 	v.Finalize(c)
 	b, _ := v.Value.(*adt.Bottom)
 	return b == nil
 }
 
 func (o *fieldSet) newPatternMatcher(ctx *adt.OpContext, x adt.Value) fieldMatcher {
-	c := adt.MakeConjunct(o.env, x)
+	c := adt.MakeRootConjunct(o.env, x)
 	return patternMatcher(c)
 }

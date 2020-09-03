@@ -38,7 +38,7 @@ func init() {
 			expr = &adt.Bottom{Err: err}
 		}
 		n := &adt.Vertex{}
-		n.AddConjunct(adt.MakeConjunct(nil, expr))
+		n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 		return Value{r.idx, n}
 
 		// return convertType(runtime.(*Runtime), x)

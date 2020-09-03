@@ -160,9 +160,6 @@ func (c *OpContext) spawn(node *Vertex) *OpContext {
 	sub := *c
 	node.Parent = c.e.Vertex
 	sub.e = &Environment{Up: c.e, Vertex: node}
-	if c.e != nil {
-		sub.e.CloseID = c.e.CloseID
-	}
 	return &sub
 }
 
@@ -290,9 +287,7 @@ func (c *OpContext) PushState(env *Environment, src ast.Node) (saved frame) {
 	if src != nil {
 		c.src = src
 	}
-	if env != nil {
-		c.e = env
-	}
+	c.e = env
 
 	return saved
 }

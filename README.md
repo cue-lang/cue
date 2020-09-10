@@ -17,7 +17,7 @@
 [![Github](https://github.com/cuelang/cue/workflows/Test/badge.svg)](https://github.com/cuelang/cue/actions)
 [![Go Report Card](https://goreportcard.com/badge/github.com/cuelang/cue)](https://goreportcard.com/report/github.com/cuelang/cue)
 [![GolangCI](https://golangci.com/badges/github.com/cuelang/cue.svg)](https://golangci.com/r/github.com/cuelang/cue)
-[![Go 1.12+](https://img.shields.io/badge/go-1.12-9cf.svg)](https://golang.org/dl/)
+[![Go 1.13+](https://img.shields.io/badge/go-1.13-9cf.svg)](https://golang.org/dl/)
 [![platforms](https://img.shields.io/badge/platforms-linux|windows|macos-inactive.svg)]()
 
 

@@ -1,0 +1,75 @@
+-- in.cue --
+package x
+
+somelist: [...string] | * []
+// Works just fine
+foo: [
+  for e in somelist {
+    "hello foo: \(e)"
+  }
+]
+
+otherlist: ["something"]
+// Works fine as well
+z: [
+  for e in otherlist {
+    "hello z: \(e)"
+  }
+]
+
+extlist: [...string] | * ["something"]
+bar: [
+  for e in extlist {
+    "hello bar: \(e)"
+  }
+]
+-- out/eval --
+(struct){
+  somelist: (#list){
+  }
+  foo: (#list){
+  }
+  otherlist: (#list){
+    0: (string){ "something" }
+  }
+  z: (#list){
+    0: (string){ "hello z: something" }
+  }
+  extlist: (list){ |(*(#list){
+      0: (string){ "something" }
+    }, (list){
+    }) }
+  bar: (#list){
+    0: (string){ "hello bar: something" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  somelist: ([
+    ...string,
+  ]|*[])
+  foo: [
+    for _, e in 〈0;somelist〉 {
+      "hello foo: \(〈1;e〉)"
+    },
+  ]
+  otherlist: [
+    "something",
+  ]
+  z: [
+    for _, e in 〈0;otherlist〉 {
+      "hello z: \(〈1;e〉)"
+    },
+  ]
+  extlist: ([
+    ...string,
+  ]|*[
+    "something",
+  ])
+  bar: [
+    for _, e in 〈0;extlist〉 {
+      "hello bar: \(〈1;e〉)"
+    },
+  ]
+}

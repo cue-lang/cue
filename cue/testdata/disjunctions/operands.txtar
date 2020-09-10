@@ -1,0 +1,115 @@
+# This file tests disjunctions used as operands.
+
+-- in.cue --
+
+list: *[1] | [2]
+condition: *true | false
+num: *1 | 2
+object: *{ a: 1 } | { a: 2 }
+
+forLoop: [
+  for e in list {
+    "count: \(e)"
+  }
+]
+
+conditional: {
+    if condition {
+        a: 3
+    }
+    if num < 5 {
+        b: 3
+    }
+}
+
+selector: {
+    a: object.a
+}
+
+index: {
+    a: list[0]
+}
+
+binOp: {
+    a: num + 4
+}
+
+unaryOp: {
+    a: -num
+}
+
+-- out/eval --
+(struct){
+  list: (list){ |(*(#list){
+      0: (int){ 1 }
+    }, (#list){
+      0: (int){ 2 }
+    }) }
+  condition: (bool){ |(*(bool){ true }, (bool){ false }) }
+  num: (int){ |(*(int){ 1 }, (int){ 2 }) }
+  object: (struct){ |(*(struct){
+      a: (int){ 1 }
+    }, (struct){
+      a: (int){ 2 }
+    }) }
+  forLoop: (#list){
+    0: (string){ "count: 1" }
+  }
+  conditional: (struct){
+    a: (int){ 3 }
+    b: (int){ 3 }
+  }
+  selector: (struct){
+    a: (int){ 1 }
+  }
+  index: (struct){
+    a: (int){ 1 }
+  }
+  binOp: (struct){
+    a: (int){ 5 }
+  }
+  unaryOp: (struct){
+    a: (int){ -1 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  list: (*[
+    1,
+  ]|[
+    2,
+  ])
+  condition: (*true|false)
+  num: (*1|2)
+  object: (*{
+    a: 1
+  }|{
+    a: 2
+  })
+  forLoop: [
+    for _, e in 〈0;list〉 {
+      "count: \(〈1;e〉)"
+    },
+  ]
+  conditional: {
+    if 〈1;condition〉 {
+      a: 3
+    }
+    if (〈1;num〉 < 5) {
+      b: 3
+    }
+  }
+  selector: {
+    a: 〈1;object〉.a
+  }
+  index: {
+    a: 〈1;list〉[0]
+  }
+  binOp: {
+    a: (〈1;num〉 + 4)
+  }
+  unaryOp: {
+    a: -〈1;num〉
+  }
+}

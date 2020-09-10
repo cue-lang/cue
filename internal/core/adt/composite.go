@@ -281,6 +281,12 @@ func (v *Vertex) ToDataAll() *Vertex {
 	w := *v
 	w.Arcs = arcs
 	w.isData = true
+	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
+	copy(w.Conjuncts, v.Conjuncts)
+	for i := range w.Conjuncts {
+		w.Conjuncts[i].CloseID = 0
+	}
+	w.Closed = nil
 	return &w
 }
 
@@ -588,6 +594,10 @@ func MakeConjunct(env *Environment, x Node, id ID) Conjunct {
 
 func (c *Conjunct) Source() ast.Node {
 	return c.x.Source()
+}
+
+func (c *Conjunct) Field() Node {
+	return c.x
 }
 
 func (c *Conjunct) Expr() Expr {

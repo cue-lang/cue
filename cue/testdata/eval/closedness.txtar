@@ -19,10 +19,11 @@ a: #A & {
 -- out/eval --
 Errors:
 a.q: field `e` not allowed:
-    ./in.cue:1:1
     ./in.cue:1:5
     ./in.cue:6:8
-    ./in.cue:13:8
+    ./in.cue:7:9
+    ./in.cue:11:4
+    ./in.cue:15:9
 
 Result:
 (_|_){
@@ -41,14 +42,17 @@ Result:
     // [eval]
     b: (int){ 3 }
     q: (_|_){
-      // [eval] a.q: field `e` not allowed:
-      //     ./in.cue:1:1
-      //     ./in.cue:1:5
-      //     ./in.cue:6:8
-      //     ./in.cue:13:8
+      // [eval]
       c: (int){ 2 }
       d: (int){ int }
-      e: (int){ 43 }
+      e: (_|_){
+        // [eval] a.q: field `e` not allowed:
+        //     ./in.cue:1:5
+        //     ./in.cue:6:8
+        //     ./in.cue:7:9
+        //     ./in.cue:11:4
+        //     ./in.cue:15:9
+      }
     }
   }
 }

@@ -1,0 +1,56 @@
+-- in.cue --
+#Artifact: {
+  body: _
+  other: [string]: int
+}
+
+#App:  #Artifact
+#Atom: #Artifact
+
+#Both: #App | #Atom
+
+t1: #Both  & {body: 3}
+-- out/eval --
+(struct){
+  #Artifact: (#struct){
+    body: (_){ _ }
+    other: (#struct){
+    }
+  }
+  #App: (#struct){
+    body: (_){ _ }
+    other: (#struct){
+    }
+  }
+  #Atom: (#struct){
+    body: (_){ _ }
+    other: (#struct){
+    }
+  }
+  #Both: (#struct){
+    body: (_){ _ }
+    other: (#struct){
+    }
+  }
+  t1: (#struct){
+    body: (int){ 3 }
+    other: (#struct){
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Artifact: {
+    body: _
+    other: {
+      [string]: int
+    }
+  }
+  #App: 〈0;#Artifact〉
+  #Atom: 〈0;#Artifact〉
+  #Both: (〈0;#App〉|〈0;#Atom〉)
+  t1: (〈0;#Both〉 & {
+    body: 3
+  })
+}

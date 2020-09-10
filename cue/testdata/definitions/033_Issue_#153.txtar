@@ -63,10 +63,10 @@ Junk: {
 -- out/eval --
 Errors:
 listOfCloseds.0: field `b` not allowed:
-    ./in.cue:5:1
+    ./in.cue:2:21
     ./in.cue:5:10
-    ./in.cue:14:18
-    ./in.cue:15:20
+    ./in.cue:13:1
+    ./in.cue:16:4
 
 Result:
 (_|_){
@@ -74,13 +74,15 @@ Result:
   listOfCloseds: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] listOfCloseds.0: field `b` not allowed:
-      //     ./in.cue:5:1
-      //     ./in.cue:5:10
-      //     ./in.cue:14:18
-      //     ./in.cue:15:20
+      // [eval]
       a: (int){ |(*(int){ 0 }, (int){ int }) }
-      b: (int){ 2 }
+      b: (_|_){
+        // [eval] listOfCloseds.0: field `b` not allowed:
+        //     ./in.cue:2:21
+        //     ./in.cue:5:10
+        //     ./in.cue:13:1
+        //     ./in.cue:16:4
+      }
     }
   }
   Foo: (struct){

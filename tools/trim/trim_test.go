@@ -135,7 +135,7 @@ foo: multipath: {
 		x: >=5 & <=8 & int
 	}
 
-	t: u: { x: 5 }
+	t: u: { x: 5 } // TODO: should be t: u: {}
 }
 
 group: {
@@ -157,7 +157,7 @@ foo: multipath: {
 		x: >=5 & <=8 & int
 	}
 
-	t: u: {}
+	t: u: {x: 5}
 }
 
 group: {

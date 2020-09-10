@@ -88,7 +88,6 @@ type envDisjunct struct {
 	values      []disjunct
 	numDefaults int
 	cloneID     adt.ID
-	isEmbed     bool
 }
 
 type disjunct struct {
@@ -96,7 +95,7 @@ type disjunct struct {
 	isDefault bool
 }
 
-func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExpr, cloneID adt.ID, isEmbed bool) {
+func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExpr, cloneID adt.ID) {
 	a := []disjunct{}
 
 	numDefaults := 0
@@ -113,10 +112,10 @@ func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExp
 	})
 
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, a, numDefaults, cloneID, isEmbed})
+		envDisjunct{env, a, numDefaults, cloneID})
 }
 
-func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjunction, cloneID adt.ID, isEmbed bool) {
+func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjunction, cloneID adt.ID) {
 	a := []disjunct{}
 
 	for i, v := range x.Values {
@@ -124,7 +123,7 @@ func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjuncti
 	}
 
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, a, x.NumDefaults, cloneID, isEmbed})
+		envDisjunct{env, a, x.NumDefaults, cloneID})
 }
 
 func (n *nodeContext) updateResult() (isFinal bool) {
@@ -298,7 +297,7 @@ func (n *nodeContext) insertSingleDisjunct(p int, d envDisjunct, isSub bool) (mo
 	v := d.values[k]
 	n.isFinal = n.isFinal && k == len(d.values)-1
 	c := adt.MakeConjunct(d.env, v.expr, d.cloneID)
-	n.addExprConjunct(c, d.isEmbed)
+	n.addExprConjunct(c)
 
 	for n.expandOne() {
 	}

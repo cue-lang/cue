@@ -119,13 +119,13 @@ d1: #D1 & {
 -- out/eval --
 Errors:
 #D4.env: field `b` not allowed:
+    ./in.cue:26:7
     ./in.cue:27:7
-    ./in.cue:30:1
     ./in.cue:30:6
 d1.env: field `c` not allowed:
-    ./in.cue:2:1
     ./in.cue:3:7
     ./in.cue:4:7
+    ./in.cue:9:5
     ./in.cue:9:17
 
 Result:
@@ -144,14 +144,16 @@ Result:
   d1: (_|_){
     // [eval]
     env: (_|_){
-      // [eval] d1.env: field `c` not allowed:
-      //     ./in.cue:2:1
-      //     ./in.cue:3:7
-      //     ./in.cue:4:7
-      //     ./in.cue:9:17
+      // [eval]
       a: (string){ "A" }
       b: (string){ "B" }
-      c: (string){ "C" }
+      c: (_|_){
+        // [eval] d1.env: field `c` not allowed:
+        //     ./in.cue:3:7
+        //     ./in.cue:4:7
+        //     ./in.cue:9:5
+        //     ./in.cue:9:17
+      }
     }
     #def: (#struct){
       a: (string){ "A" }
@@ -171,12 +173,14 @@ Result:
   #D4: (_|_){
     // [eval]
     env: (_|_){
-      // [eval] #D4.env: field `b` not allowed:
-      //     ./in.cue:27:7
-      //     ./in.cue:30:1
-      //     ./in.cue:30:6
+      // [eval]
       a: (int){ int }
-      b: (int){ int }
+      b: (_|_){
+        // [eval] #D4.env: field `b` not allowed:
+        //     ./in.cue:26:7
+        //     ./in.cue:27:7
+        //     ./in.cue:30:6
+      }
     }
   }
   #DC: (#struct){

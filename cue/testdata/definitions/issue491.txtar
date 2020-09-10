@@ -1,0 +1,115 @@
+-- in.cue --
+package x
+
+#Prestep: {
+	Args: *null | _
+}
+
+#PrestepNewUser: #Prestep & {
+	Args: #NewUser
+}
+
+#NewUser: {
+	Repos: [...#Repo]
+}
+
+#Repo: {
+	Var:     string
+	Pattern: *"*" | string
+}
+
+x: [...#Repo]
+x: [{
+	Var: "REPO1"
+}]
+
+y: #Repo & {
+	Var: "REPO1"
+}
+
+z: #PrestepNewUser & {
+	Args: {
+		Repos: [ {
+			Var: "REPO1"
+		}]
+	}
+}
+-- out/eval --
+(struct){
+  #Prestep: (#struct){
+    Args: (_){ |(*(null){ null }, (_){ _ }) }
+  }
+  #PrestepNewUser: (#struct){
+    Args: (#struct){
+      Repos: (list){
+      }
+    }
+  }
+  #NewUser: (#struct){
+    Repos: (list){
+    }
+  }
+  #Repo: (#struct){
+    Var: (string){ string }
+    Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
+  }
+  x: (#list){
+    0: (#struct){
+      Var: (string){ "REPO1" }
+      Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
+    }
+  }
+  y: (#struct){
+    Var: (string){ "REPO1" }
+    Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
+  }
+  z: (#struct){
+    Args: (#struct){
+      Repos: (#list){
+        0: (#struct){
+          Var: (string){ "REPO1" }
+          Pattern: (string){ |(*(string){ "*" }, (string){ string }) }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Prestep: {
+    Args: (*null|_)
+  }
+  #PrestepNewUser: (〈0;#Prestep〉 & {
+    Args: 〈1;#NewUser〉
+  })
+  #NewUser: {
+    Repos: [
+      ...〈1;#Repo〉,
+    ]
+  }
+  #Repo: {
+    Var: string
+    Pattern: (*"*"|string)
+  }
+  x: [
+    ...〈0;#Repo〉,
+  ]
+  x: [
+    {
+      Var: "REPO1"
+    },
+  ]
+  y: (〈0;#Repo〉 & {
+    Var: "REPO1"
+  })
+  z: (〈0;#PrestepNewUser〉 & {
+    Args: {
+      Repos: [
+        {
+          Var: "REPO1"
+        },
+      ]
+    }
+  })
+}

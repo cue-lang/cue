@@ -1,0 +1,42 @@
+-- in.cue --
+#A : _
+
+#N: #A & {
+  f: j: {
+    n: "hi"
+  }
+}
+
+l: #N
+
+-- out/eval --
+(struct){
+  #A: (_){ _ }
+  #N: (#struct){
+    f: (#struct){
+      j: (#struct){
+        n: (string){ "hi" }
+      }
+    }
+  }
+  l: (#struct){
+    f: (#struct){
+      j: (#struct){
+        n: (string){ "hi" }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #A: _
+  #N: (〈0;#A〉 & {
+    f: {
+      j: {
+        n: "hi"
+      }
+    }
+  })
+  l: 〈0;#N〉
+}

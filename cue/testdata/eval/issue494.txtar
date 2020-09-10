@@ -1,0 +1,115 @@
+-- in.cue --
+_Q : [{pos: 0},{pos: 1}]
+
+a: [rn=string]:  _Q[0:len(a[rn])]
+a: ben: [{}]
+
+b: [rn=string]: _Q[0:1]
+b: ben: [{}]
+
+c: [rn=string]: [...{l: len(a[rn])}]
+c: ben: [{}]
+
+#d: [rn=string]:  [...{pos:uint}] & _Q[0:len(#d[rn])]
+#d: ben: [{}]
+
+d: #d
+-- out/eval --
+(struct){
+  _Q: (#list){
+    0: (struct){
+      pos: (int){ 0 }
+    }
+    1: (struct){
+      pos: (int){ 1 }
+    }
+  }
+  a: (struct){
+    ben: (#list){
+      0: (struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+  b: (struct){
+    ben: (#list){
+      0: (struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+  c: (struct){
+    ben: (#list){
+      0: (struct){
+        l: (int){ 1 }
+      }
+    }
+  }
+  #d: (#struct){
+    ben: (#list){
+      0: (#struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+  d: (#struct){
+    ben: (#list){
+      0: (#struct){
+        pos: (int){ 0 }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  _Q: [
+    {
+      pos: 0
+    },
+    {
+      pos: 1
+    },
+  ]
+  a: {
+    [string]: 〈1;_Q〉[0:len(〈1;a〉[〈0;-〉])]
+  }
+  a: {
+    ben: [
+      {},
+    ]
+  }
+  b: {
+    [string]: 〈1;_Q〉[0:1]
+  }
+  b: {
+    ben: [
+      {},
+    ]
+  }
+  c: {
+    [string]: [
+      ...{
+        l: len(〈2;a〉[〈1;-〉])
+      },
+    ]
+  }
+  c: {
+    ben: [
+      {},
+    ]
+  }
+  #d: {
+    [string]: ([
+      ...{
+        pos: &(int, >=0)
+      },
+    ] & 〈1;_Q〉[0:len(〈1;#d〉[〈0;-〉])])
+  }
+  #d: {
+    ben: [
+      {},
+    ]
+  }
+  d: 〈0;#d〉
+}

@@ -120,13 +120,13 @@ mixedRec: {
 -- out/eval --
 Errors:
 foo: field `feild` not allowed:
-    ./in.cue:1:1
     ./in.cue:1:7
-    ./in.cue:13:6
+    ./in.cue:12:6
+    ./in.cue:13:7
 foo1.recursive: field `feild` not allowed:
-    ./in.cue:1:1
     ./in.cue:3:13
-    ./in.cue:18:13
+    ./in.cue:15:7
+    ./in.cue:19:3
 
 Result:
 (_|_){
@@ -142,26 +142,30 @@ Result:
     field2: (string){ string }
   }
   foo: (_|_){
-    // [eval] foo: field `feild` not allowed:
-    //     ./in.cue:1:1
-    //     ./in.cue:1:7
-    //     ./in.cue:13:6
+    // [eval]
     field: (int){ int }
     recursive: (#struct){
       field: (string){ string }
     }
-    feild: (int){ 2 }
+    feild: (_|_){
+      // [eval] foo: field `feild` not allowed:
+      //     ./in.cue:1:7
+      //     ./in.cue:12:6
+      //     ./in.cue:13:7
+    }
   }
   foo1: (_|_){
     // [eval]
     field: (int){ 2 }
     recursive: (_|_){
-      // [eval] foo1.recursive: field `feild` not allowed:
-      //     ./in.cue:1:1
-      //     ./in.cue:3:13
-      //     ./in.cue:18:13
+      // [eval]
       field: (string){ string }
-      feild: (int){ 2 }
+      feild: (_|_){
+        // [eval] foo1.recursive: field `feild` not allowed:
+        //     ./in.cue:3:13
+        //     ./in.cue:15:7
+        //     ./in.cue:19:3
+      }
     }
   }
   #Bar: (#struct){

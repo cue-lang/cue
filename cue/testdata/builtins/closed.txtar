@@ -1,0 +1,57 @@
+-- in.cue --
+a: close({
+    a: b: int
+})
+
+b: a & { x: int } // err
+c: a & { a: c: int } // okay (non-recursive close)
+
+-- out/eval --
+Errors:
+b: field `x` not allowed:
+    ./in.cue:1:10
+    ./in.cue:5:10
+
+Result:
+(_|_){
+  // [eval]
+  a: (#struct){
+    a: (#struct){
+      b: (int){ int }
+    }
+  }
+  b: (_|_){
+    // [eval]
+    a: (#struct){
+      b: (int){ int }
+    }
+    x: (_|_){
+      // [eval] b: field `x` not allowed:
+      //     ./in.cue:1:10
+      //     ./in.cue:5:10
+    }
+  }
+  c: (#struct){
+    a: (#struct){
+      b: (int){ int }
+      c: (int){ int }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: close({
+    a: {
+      b: int
+    }
+  })
+  b: (〈0;a〉 & {
+    x: int
+  })
+  c: (〈0;a〉 & {
+    a: {
+      c: int
+    }
+  })
+}

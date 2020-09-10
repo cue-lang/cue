@@ -1,0 +1,38 @@
+cue cmd dostuffloop
+cmp stdout expect-stdout
+
+-- x_tool.cue --
+package x
+
+import (
+        "tool/cli"
+        "encoding/yaml"
+)
+
+command: dostuff: {
+        write: cli.Print & {
+                text: "yaml is " + yaml.Marshal(w)
+        }
+}
+
+command: dostuffloop: {
+        for w in l {
+                write: cli.Print & {
+                        text: "yaml is " + yaml.Marshal(w)
+                }
+        }
+}
+-- y.cue --
+package x
+
+#Workflow: {
+  #: "working-directory": string
+}
+
+l: [w]
+w: #Workflow & {
+}
+
+-- expect-stdout --
+yaml is {}
+

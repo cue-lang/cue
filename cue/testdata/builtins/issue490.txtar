@@ -1,0 +1,44 @@
+-- test.cue --
+A: close({
+	a: 1
+	b: 2
+})
+
+B: A & {
+	c: 3
+}
+-- out/eval --
+Errors:
+B: field `c` not allowed:
+    ./test.cue:1:10
+    ./test.cue:7:2
+
+Result:
+(_|_){
+  // [eval]
+  A: (#struct){
+    a: (int){ 1 }
+    b: (int){ 2 }
+  }
+  B: (_|_){
+    // [eval]
+    a: (int){ 1 }
+    b: (int){ 2 }
+    c: (_|_){
+      // [eval] B: field `c` not allowed:
+      //     ./test.cue:1:10
+      //     ./test.cue:7:2
+    }
+  }
+}
+-- out/compile --
+--- test.cue
+{
+  A: close({
+    a: 1
+    b: 2
+  })
+  B: (〈0;A〉 & {
+    c: 3
+  })
+}

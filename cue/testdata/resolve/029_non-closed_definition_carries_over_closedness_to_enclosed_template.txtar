@@ -105,17 +105,17 @@ c: #R & {
 -- out/eval --
 Errors:
 a.v: field `b` not allowed:
-    ./in.cue:1:1
     ./in.cue:2:12
-    ./in.cue:5:5
+    ./in.cue:4:4
+    ./in.cue:5:6
 b.w: field `c` not allowed:
-    ./in.cue:7:1
     ./in.cue:8:23
-    ./in.cue:11:5
+    ./in.cue:10:4
+    ./in.cue:11:6
 c.w.0: field `d` not allowed:
-    ./in.cue:13:1
     ./in.cue:14:13
-    ./in.cue:17:6
+    ./in.cue:16:4
+    ./in.cue:17:7
 
 Result:
 (_|_){
@@ -125,11 +125,13 @@ Result:
   a: (_|_){
     // [eval]
     v: (_|_){
-      // [eval] a.v: field `b` not allowed:
-      //     ./in.cue:1:1
-      //     ./in.cue:2:12
-      //     ./in.cue:5:5
-      b: (int){ int }
+      // [eval]
+      b: (_|_){
+        // [eval] a.v: field `b` not allowed:
+        //     ./in.cue:2:12
+        //     ./in.cue:4:4
+        //     ./in.cue:5:6
+      }
       a: (int){ int }
     }
   }
@@ -138,11 +140,13 @@ Result:
   b: (_|_){
     // [eval]
     w: (_|_){
-      // [eval] b.w: field `c` not allowed:
-      //     ./in.cue:7:1
-      //     ./in.cue:8:23
-      //     ./in.cue:11:5
-      c: (int){ int }
+      // [eval]
+      c: (_|_){
+        // [eval] b.w: field `c` not allowed:
+        //     ./in.cue:8:23
+        //     ./in.cue:10:4
+        //     ./in.cue:11:6
+      }
       b: (int){ int }
     }
   }
@@ -153,11 +157,13 @@ Result:
     w: (_|_){
       // [eval]
       0: (_|_){
-        // [eval] c.w.0: field `d` not allowed:
-        //     ./in.cue:13:1
-        //     ./in.cue:14:13
-        //     ./in.cue:17:6
-        d: (int){ int }
+        // [eval]
+        d: (_|_){
+          // [eval] c.w.0: field `d` not allowed:
+          //     ./in.cue:14:13
+          //     ./in.cue:16:4
+          //     ./in.cue:17:7
+        }
         a: (int){ int }
       }
       1: (#struct){

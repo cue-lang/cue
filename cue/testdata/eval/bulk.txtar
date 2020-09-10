@@ -31,13 +31,13 @@ t2: {
 -- out/eval --
 Errors:
 t1.c: field `z` not allowed:
-    ./in.cue:15:3
     ./in.cue:15:7
-    ./in.cue:19:11
+    ./in.cue:19:6
+    ./in.cue:19:13
 t2.c: field `z` not allowed:
-    ./in.cue:23:3
     ./in.cue:23:7
-    ./in.cue:27:11
+    ./in.cue:27:6
+    ./in.cue:27:13
 
 Result:
 (_|_){
@@ -65,11 +65,13 @@ Result:
       f: (int){ 4 }
     }
     c: (_|_){
-      // [eval] t1.c: field `z` not allowed:
-      //     ./in.cue:15:3
-      //     ./in.cue:15:7
-      //     ./in.cue:19:11
-      z: (int){ 4 }
+      // [eval]
+      z: (_|_){
+        // [eval] t1.c: field `z` not allowed:
+        //     ./in.cue:15:7
+        //     ./in.cue:19:6
+        //     ./in.cue:19:13
+      }
     }
   }
   t2: (_|_){
@@ -80,11 +82,13 @@ Result:
       x: (int){ 4 }
     }
     c: (_|_){
-      // [eval] t2.c: field `z` not allowed:
-      //     ./in.cue:23:3
-      //     ./in.cue:23:7
-      //     ./in.cue:27:11
-      z: (int){ 4 }
+      // [eval]
+      z: (_|_){
+        // [eval] t2.c: field `z` not allowed:
+        //     ./in.cue:23:7
+        //     ./in.cue:27:6
+        //     ./in.cue:27:13
+      }
     }
   }
 }

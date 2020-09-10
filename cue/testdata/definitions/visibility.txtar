@@ -1,0 +1,35 @@
+-- in.cue --
+#foo: {
+	name: string
+}
+foo: #foo & {
+    // These should all be allowed.
+    _name: "foo"
+    _#name: "bar"
+
+    #name: "baz" // TODO: this should not be allowed.
+}
+-- out/eval --
+(struct){
+  #foo: (#struct){
+    name: (string){ string }
+  }
+  foo: (#struct){
+    name: (string){ string }
+    _name: (string){ "foo" }
+    _#name: (string){ "bar" }
+    #name: (string){ "baz" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #foo: {
+    name: string
+  }
+  foo: (〈0;#foo〉 & {
+    _name: "foo"
+    _#name: "bar"
+    #name: "baz"
+  })
+}

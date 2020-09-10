@@ -17,7 +17,7 @@ c1: #C1 & {
 
 c2: #C2 & {
   c1
-  //age: 5
+  age: 5
 }
 -- out/eval --
 (struct){
@@ -33,7 +33,7 @@ c2: #C2 & {
   }
   c2: (#struct){
     name: (string){ "cueckoo" }
-    age: (int){ int }
+    age: (int){ 5 }
   }
 }
 -- out/compile --
@@ -51,5 +51,6 @@ c2: #C2 & {
   })
   c2: (〈0;#C2〉 & {
     〈1;c1〉
+    age: 5
   })
 }

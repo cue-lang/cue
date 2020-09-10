@@ -14,34 +14,35 @@
 
 package eval
 
-// The file implements the majority of the closed struct semantics.
-// The data is recorded in the Closed field of a Vertex.
+// The file implements the majority of the closed struct semantics. The data is
+// recorded in the Closed field of a Vertex.
 //
 // Each vertex has a set of conjuncts that make up the values of the vertex.
 // Each Conjunct may originate from various sources, like an embedding, field
 // definition or regular value. For the purpose of computing the value, the
-// source of the conjunct is irrelevant. The origin does matter, however, if
-// for determining whether a field is allowed in a closed struct. The Closed
-// field keeps track of the kind of origin for this purpose.
+// source of the conjunct is irrelevant. The origin does matter, however, for
+// determining whether a field is allowed in a closed struct. The Closed field
+// keeps track of the kind of origin for this purpose.
 //
-// More precisely, the CloseDef struct explains how the conjuncts of an arc
-// were combined and define a logical expression on the field sets
-// computed for each conjunct.
+// More precisely, the CloseDef struct explains how the conjuncts of an arc were
+// combined for instance due to a conjunction with closed struct or through an
+// embedding. Each Vertex may be associated with a slice of CloseDefs. The
+// position of a CloseDef in a file corresponds to an adt.ID.
 //
-// While evaluating each conjunct, nodeContext keeps track what changes need to
-// be made to ClosedDef based on the evaluation of the current conjuncts.
-// For instance, if a field references a definition, all other previous
-// checks are useless, as the newly referred to definitions define an upper
-// bound and will contain all the information that is necessary to determine
-// whether a field may be included.
+// While evaluating each conjunct, new CloseDefs are added to indicate how a
+// conjunct relates to its parent as needed. For instance, if a field references
+// a definition, all other previous checks are useless, as the newly referred to
+// definitions define an upper bound and will contain all the information that
+// is necessary to determine whether a field may be included.
 //
 // Most of the logic in this file concerns itself with the combination of
 // multiple CloseDef values as well as traversing the structure to validate
-// whether an arc is allowed. The actual fieldSet logic is in optional.go
-// The overal control and use of the functionality in this file is used
-// in eval.go.
+// whether an arc is allowed. The actual fieldSet logic is in optional.go The
+// overall control and use of the functionality in this file is used in eval.go.
 
 import (
+	"fmt"
+
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -66,17 +67,34 @@ import (
 // `b` originated from an embedding, as otherwise `e` may not be allowed.
 //
 type acceptor struct {
-	tree     *CloseDef
-	fields   []fieldSet
+	Canopy []CloseDef
+	Fields []*fieldSet
+
+	// TODO: remove (unused as not fine-grained enough)
+	// isClosed is now used as an approximate filter.
 	isClosed bool
 	isList   bool
 	openList bool
+}
+
+func (a *acceptor) clone() *acceptor {
+	canopy := make([]CloseDef, len(a.Canopy))
+	copy(canopy, a.Canopy)
+	for i := range canopy {
+		canopy[i].IsClosed = false
+	}
+	return &acceptor{
+		Canopy:   canopy,
+		isClosed: a.isClosed,
+	}
 }
 
 func (a *acceptor) Accept(c *adt.OpContext, f adt.Feature) bool {
 	if a.isList {
 		return a.openList
 	}
+
+	// TODO: remove these two checks and always pass InvalidLabel.
 	if !a.isClosed {
 		return true
 	}
@@ -86,19 +104,19 @@ func (a *acceptor) Accept(c *adt.OpContext, f adt.Feature) bool {
 	if f.IsInt() {
 		return a.openList
 	}
-	return a.verifyArcAllowed(c, f) == nil
+	return a.verifyArcAllowed(c, f, nil)
 }
 
 func (a *acceptor) MatchAndInsert(c *adt.OpContext, v *adt.Vertex) {
-	for _, fs := range a.fields {
+	a.visitAllFieldSets(func(fs *fieldSet) {
 		fs.MatchAndInsert(c, v)
-	}
+	})
 }
 
 func (a *acceptor) OptionalTypes() (mask adt.OptionalType) {
-	for _, f := range a.fields {
+	a.visitAllFieldSets(func(f *fieldSet) {
 		mask |= f.OptionalTypes()
-	}
+	})
 	return mask
 }
 
@@ -114,302 +132,474 @@ func (a *acceptor) OptionalTypes() (mask adt.OptionalType) {
 // Acceptor. This could be implemented as an allocation-free wrapper type around
 // a Disjunction. This will require a bit more API cleaning, though.
 func newDisjunctionAcceptor(x *adt.Disjunction) adt.Acceptor {
-	tree := &CloseDef{Src: x}
-	sets := []fieldSet{}
+	n := &acceptor{}
+
 	for _, d := range x.Values {
 		if a, _ := d.Closed.(*acceptor); a != nil {
-			sets = append(sets, a.fields...)
-			tree.List = append(tree.List, a.tree)
+			offset := n.InsertSubtree(0, nil, d, false)
+			a.visitAllFieldSets(func(f *fieldSet) {
+				g := *f
+				g.id += offset
+				n.insertFieldSet(g.id, &g)
+			})
 		}
 	}
-	if len(tree.List) == 0 && len(sets) == 0 {
-		return nil
-	}
-	return &acceptor{tree: tree, fields: sets}
+
+	return n
 }
 
-// CloseDef defines how individual FieldSets (corresponding to conjuncts)
+// CloseDef defines how individual fieldSets (corresponding to conjuncts)
 // combine to determine whether a field is contained in a closed set.
 //
-// Nodes with a non-empty List and IsAnd is false represent embeddings.
-// The ID is the node that contained the embedding in that case.
-//
-// Nodes with a non-empty List and IsAnd is true represent conjunctions of
-// definitions. In this case, a field must be contained in each definition.
-//
-// If a node has both conjunctions of definitions and embeddings, only the
-// former are maintained. Conjunctions of definitions define an upper bound
-// of the set of allowed fields in that case and the embeddings will not add
-// any value.
+// A CloseDef combines multiple conjuncts and embeddings. All CloseDefs are
+// stored in slice. References to other CloseDefs are indices within this slice.
+// Together they define the top of the tree of the expression tree of how
+// conjuncts combine together (a canopy).
 type CloseDef struct {
-	Src   adt.Node // for error reporting
-	ID    adt.ID
-	IsAnd bool
-	List  []*CloseDef
+	Src adt.Node
+
+	// And is used to track the IDs of a set of conjuncts. If IsDef or IsClosed
+	// is true, a field is only allowed if at least one of the corresponding
+	// fieldsets associated with this node or its embeddings allows it.
+	//
+	// And nodes are linked in a ring, meaning that the last node points back
+	// to the first node. This allows a traversal of all and nodes to commence
+	// at any point in the ring.
+	And adt.ID
+
+	// NextEmbed indicates the first ID for a linked list of embedded
+	// expressions. The node corresponding to the actual embedding is at
+	// position NextEmbed+1. The linked-list nodes all have a value of -1 for
+	// And. NextEmbed is 0 for the last element in the list.
+	NextEmbed adt.ID
+
+	// IsDef indicates this node is associated with a definition and that all
+	// expressions are recursively closed. This value is "sticky" when a child
+	// node copies the closedness data from a parent node.
+	IsDef bool
+
+	// IsClosed indicates this node is associated with the result of close().
+	// A child vertex should not "inherit" this value.
+	IsClosed bool
 }
 
-// isOr reports whether this is a node representing embeddings.
-func isOr(c *CloseDef) bool {
-	return len(c.List) > 0 && !c.IsAnd
+func (n *CloseDef) isRequired() bool {
+	return n.IsDef || n.IsClosed
 }
 
-// updateClosed transforms c into a new node with all non-AND nodes with an
-// ID matching one in replace substituted with the replace value.
-//
-// Vertex only keeps track of a flat list of conjuncts and does not keep track
-// of the hierarchy of how these were derived. This function allows rewriting
-// a CloseDef tree based on replacement information gathered during evaluation
-// of this flat list.
-//
-func updateClosed(c *CloseDef, replace map[adt.ID]*CloseDef) *CloseDef { // used in eval.go
-	// Insert an entry for CloseID 0 if we are about to replace it. By default
-	// 0, which is the majority case, is omitted.
-	if c != nil && replace[0] != nil && !containsClosed(c, 0) {
-		c = &CloseDef{IsAnd: true, List: []*CloseDef{c, {}}}
-	}
+const embedRoot adt.ID = -1
 
-	switch {
-	case c == nil:
-		and := []*CloseDef{}
-		for _, c := range replace {
-			if c != nil {
-				and = append(and, c)
-			}
+type Entry = fieldSet
+
+func (c *acceptor) visitAllFieldSets(f func(f *fieldSet)) {
+	for _, set := range c.Fields {
+		for ; set != nil; set = set.next {
+			f(set)
 		}
-		switch len(and) {
-		case 0:
-		case 1:
-			c = and[0]
-		default:
-			c = &CloseDef{IsAnd: true, List: and}
-		}
-		// needClose
-	case len(replace) > 0:
-		c = updateClosedRec(c, replace)
 	}
-	return c
 }
 
-func updateClosedRec(c *CloseDef, replace map[adt.ID]*CloseDef) *CloseDef {
-	if c == nil {
+func (c *acceptor) visitAnd(id adt.ID, f func(id adt.ID, n CloseDef) bool) bool {
+	for i := id; ; {
+		x := c.Canopy[i]
+
+		if !f(i, x) {
+			return false
+		}
+
+		if i = x.And; i == id {
+			break
+		}
+	}
+	return true
+}
+
+func (c *acceptor) visitOr(id adt.ID, f func(id adt.ID, n CloseDef) bool) bool {
+	if !f(id, c.Canopy[id]) {
+		return false
+	}
+	return c.visitEmbed(id, f)
+}
+
+func (c *acceptor) visitEmbed(id adt.ID, f func(id adt.ID, n CloseDef) bool) bool {
+	for i := c.Canopy[id].NextEmbed; i != 0; i = c.Canopy[i].NextEmbed {
+		if id := i + 1; !f(id, c.Canopy[id]) {
+			return false
+		}
+	}
+	return true
+}
+
+func (c *acceptor) node(id adt.ID) *CloseDef {
+	if len(c.Canopy) == 0 {
+		c.Canopy = append(c.Canopy, CloseDef{})
+	}
+	return &c.Canopy[id]
+}
+
+func (c *acceptor) fieldSet(at adt.ID) *fieldSet {
+	if int(at) >= len(c.Fields) {
 		return nil
 	}
-
-	// If c is a leaf or AND node, replace it outright. If both are an OR node,
-	// merge the lists.
-	if len(c.List) == 0 || !c.IsAnd {
-		switch sub, ok := replace[c.ID]; {
-		case sub != nil:
-			if isOr(sub) && isOr(c) {
-				sub.List = append(sub.List, c.List...)
-			}
-			return sub
-
-		case !ok:
-			if len(c.List) == 0 {
-				return nil // drop from list
-			}
-		}
-	}
-
-	changed := false
-	buf := make([]*CloseDef, len(c.List))
-	k := 0
-	for _, c := range c.List {
-		n := updateClosedRec(c, replace)
-		changed = changed || n != c
-		if n != nil {
-			buf[k] = n
-			k++
-		}
-	}
-	if !changed {
-		return c
-	}
-
-	switch k {
-	case 0:
-		return nil
-	case 1:
-		return buf[0]
-	default:
-		return &CloseDef{Src: c.Src, ID: c.ID, IsAnd: c.IsAnd, List: buf[:k]}
-	}
+	return c.Fields[at]
 }
 
-// UpdateReplace is called after evaluating a conjunct at the top of the arc
-// to update the replacement information with the gathered CloseDef info.
-func (n *nodeContext) updateReplace(id adt.ID) { // used in eval.go
-	if n.newClose == nil {
-		return
+func (c *acceptor) insertFieldSet(at adt.ID, e *fieldSet) {
+	c.node(0) // Ensure the canopy is at least length 1.
+	if len(c.Fields) < len(c.Canopy) {
+		a := make([]*fieldSet, len(c.Canopy))
+		copy(a, c.Fields)
+		c.Fields = a
 	}
-
-	if n.replace == nil {
-		n.replace = make(map[adt.ID]*CloseDef)
-	}
-
-	n.replace[id] = updateClose(n.replace[id], n.newClose)
-	n.newClose = nil
+	e.next = c.Fields[at]
+	c.Fields[at] = e
 }
 
-// appendList creates a new CloseDef with the elements of the list of orig
-// and updated appended. It will take the ID of orig. It does not alter
-// either orig or update.
-func appendLists(orig, update *CloseDef) *CloseDef {
-	list := make([]*CloseDef, len(orig.List)+len(update.List))
-	copy(list[copy(list, orig.List):], update.List)
-	c := *orig
-	c.List = list
-	return &c
+// InsertDefinition appends a new CloseDef to Canopy representing a reference to
+// a definition at the given position. It returns the position of the new
+// CloseDef.
+func (c *acceptor) InsertDefinition(at adt.ID, src adt.Node) (id adt.ID) {
+	if len(c.Canopy) == 0 {
+		c.Canopy = append(c.Canopy, CloseDef{})
+	}
+	if int(at) >= len(c.Canopy) {
+		panic(fmt.Sprintf("at >= len(canopy) (%d >= %d)", at, len(c.Canopy)))
+	}
+	// New there is a new definition, the parent location (invariant) is no
+	// longer a required entry and could be dropped if there were no more
+	// fields.
+	//    #orig: #d     // only fields in #d are sufficient to check.
+	//    #orig: {a: b}
+	c.Canopy[at].IsDef = false
+
+	id = adt.ID(len(c.Canopy))
+	y := CloseDef{
+		Src:       src,
+		And:       c.Canopy[at].And,
+		NextEmbed: 0,
+		IsDef:     true,
+	}
+	c.Canopy[at].And = id
+	c.Canopy = append(c.Canopy, y)
+
+	return id
 }
 
-// updateClose merges update into orig without altering either.
-//
-// The merge takes into account whether it is an embedding node or not.
-// Most notably, if an "And" node is combined with an embedding, the
-// embedding information may be discarded.
-func updateClose(orig, update *CloseDef) *CloseDef {
-	switch {
-	case orig == nil:
-		return update
-	case isOr(orig):
-		if !isOr(update) {
-			return update
-		}
-		return appendLists(orig, update)
-	case isOr(update):
-		return orig
-	case len(orig.List) == 0 && len(update.List) == 0:
-		return &CloseDef{IsAnd: true, List: []*CloseDef{orig, update}}
-	case len(orig.List) == 0:
-		update.List = append(update.List, orig)
-		return update
-	default: // isAnd(orig)
-		return appendLists(orig, update)
+// InsertEmbed appends a new CloseDef to Canopy representing the use of an
+// embedding at the given position. It returns the position of the new CloseDef.
+func (c *acceptor) InsertEmbed(at adt.ID, src adt.Node) (id adt.ID) {
+	if len(c.Canopy) == 0 {
+		c.Canopy = append(c.Canopy, CloseDef{})
 	}
+	if int(at) >= len(c.Canopy) {
+		panic(fmt.Sprintf("at >= len(canopy) (%d >= %d)", at, len(c.Canopy)))
+	}
+
+	id = adt.ID(len(c.Canopy))
+	y := CloseDef{
+		And:       -1,
+		NextEmbed: c.Canopy[at].NextEmbed,
+	}
+	z := CloseDef{Src: src, And: id + 1}
+	c.Canopy[at].NextEmbed = id
+	c.Canopy = append(c.Canopy, y, z)
+
+	return id + 1
 }
 
-func (n *nodeContext) addAnd(c *CloseDef) { // used in eval.go
-	switch {
-	case n.newClose == nil:
-		n.newClose = c
-	case isOr(n.newClose):
-		n.newClose = c
-	case len(n.newClose.List) == 0:
-		n.newClose = &CloseDef{
-			IsAnd: true,
-			List:  []*CloseDef{n.newClose, c},
-		}
-	default:
-		n.newClose.List = append(n.newClose.List, c)
-	}
-}
-
-func (n *nodeContext) addOr(parentID adt.ID, c *CloseDef) { // used in eval.go
-	switch {
-	case n.newClose == nil:
-		d := &CloseDef{ID: parentID, List: []*CloseDef{{ID: parentID}}}
-		if c != nil {
-			d.List = append(d.List, c)
-		}
-		n.newClose = d
-	case isOr(n.newClose):
-		d := n.newClose
-		if c != nil {
-			d.List = append(d.List, c)
-		}
-	}
-}
-
-// verifyArcAllowed checks whether f is an allowed label within the current
-// node. It traverses c considering the "or" semantics of embeddings and the
-// "and" semantics of conjunctions. It generates an error if a field is not
-// allowed.
-func (n *acceptor) verifyArcAllowed(ctx *adt.OpContext, f adt.Feature) *adt.Bottom {
-	defer ctx.ReleasePositions(ctx.MarkPositions())
-
-	// TODO(perf): this will also generate a message for f == 0. Do something
-	// more clever and only generate this when it is a user error.
-	filter := f.IsString() || f == adt.InvalidLabel
-	if filter && !n.verifyArcRecursive(ctx, n.tree, f) {
-		collectPositions(ctx, n.tree)
-		label := f.SelectorString(ctx)
-		return ctx.NewErrf("field `%s` not allowed", label)
-	}
-	return nil
-}
-
-func (n *acceptor) verifyArcRecursive(ctx *adt.OpContext, c *CloseDef, f adt.Feature) bool {
-	if len(c.List) == 0 {
-		return n.verifyDefinition(ctx, c.ID, f)
-	}
-	if c.IsAnd {
-		for _, c := range c.List {
-			if !n.verifyArcRecursive(ctx, c, f) {
-				return false
-			}
-		}
+// isComplexStruct reports whether the Closed information should be copied as a
+// subtree into the parent node using InsertSubtree. If not, the conjuncts can
+// just be inserted at the current ID.
+func isComplexStruct(v *adt.Vertex) bool {
+	m, _ := v.Value.(*adt.StructMarker)
+	if m == nil {
 		return true
 	}
-	for _, c := range c.List {
-		if n.verifyArcRecursive(ctx, c, f) {
-			return true
-		}
+	a, _ := v.Closed.(*acceptor)
+	if a == nil {
+		return false
 	}
-	return false
+	if a.isClosed {
+		return true
+	}
+	switch len(a.Canopy) {
+	case 0:
+		return false
+	case 1:
+		// TODO: should we check for closedness?
+		x := a.Canopy[0]
+		return x.isRequired()
+	}
+	return true
 }
 
-// verifyDefinition reports whether f is a valid member for any of the fieldSets
-// with the same closeID.
-func (n *acceptor) verifyDefinition(ctx *adt.OpContext, closeID adt.ID, f adt.Feature) (ok bool) {
-	for _, o := range n.fields {
-		if o.id != closeID {
-			continue
+// InsertSubtree inserts the closedness information of v into c as an embedding
+// at the current position and inserts conjuncts of v into n (if not nil).
+// It inserts it as an embedding and not and to cover either case. The idea is
+// that one of the values were supposed to be closed, a separate node entry
+// would already have been created.
+func (c *acceptor) InsertSubtree(at adt.ID, n *nodeContext, v *adt.Vertex, cyclic bool) adt.ID {
+	if len(c.Canopy) == 0 {
+		c.Canopy = append(c.Canopy, CloseDef{})
+	}
+	if int(at) >= len(c.Canopy) {
+		panic(fmt.Sprintf("at >= len(canopy) (%d >= %d)", at, len(c.Canopy)))
+	}
+
+	a := closedInfo(v)
+	a.node(0)
+
+	id := adt.ID(len(c.Canopy))
+	y := CloseDef{
+		And:       embedRoot,
+		NextEmbed: c.Canopy[at].NextEmbed,
+	}
+	c.Canopy[at].NextEmbed = id
+
+	c.Canopy = append(c.Canopy, y)
+	id = adt.ID(len(c.Canopy))
+
+	// First entry is at the embedded node location.
+	c.Canopy = append(c.Canopy, a.Canopy...)
+
+	// Shift all IDs for the new offset.
+	for i, x := range c.Canopy[id:] {
+		if x.And != -1 {
+			c.Canopy[int(id)+i].And += id
+		}
+		if x.NextEmbed != 0 {
+			c.Canopy[int(id)+i].NextEmbed += id
+		}
+	}
+
+	if n != nil {
+		for _, c := range v.Conjuncts {
+			c = updateCyclic(c, cyclic, nil)
+			c.CloseID += id
+			n.addExprConjunct(c)
+		}
+	}
+
+	return id
+}
+
+func (c *acceptor) verifyArc(ctx *adt.OpContext, f adt.Feature, v *adt.Vertex) (found bool, err *adt.Bottom) {
+
+	defer ctx.ReleasePositions(ctx.MarkPositions())
+
+	c.node(0) // ensure at least a size of 1.
+	if c.verify(ctx, f) {
+		return true, nil
+	}
+
+	// TODO: also disallow non-hidden definitions.
+	if !f.IsString() && f != adt.InvalidLabel {
+		return false, nil
+	}
+
+	if v != nil {
+		for _, c := range v.Conjuncts {
+			if pos := c.Field(); pos != nil {
+				ctx.AddPosition(pos)
+			}
+		}
+	}
+
+	// collect positions from tree.
+	for _, c := range c.Canopy {
+		if c.Src != nil {
+			ctx.AddPosition(c.Src)
+		}
+	}
+
+	label := f.SelectorString(ctx)
+	return false, ctx.NewErrf("field `%s` not allowed", label)
+}
+
+func (c *acceptor) verifyArcAllowed(ctx *adt.OpContext, f adt.Feature, v *adt.Vertex) bool {
+
+	// TODO: also disallow non-hidden definitions.
+	if !f.IsString() && f != adt.InvalidLabel {
+		return true
+	}
+
+	defer ctx.ReleasePositions(ctx.MarkPositions())
+
+	c.node(0) // ensure at least a size of 1.
+	return c.verify(ctx, f)
+}
+
+func (c *acceptor) verify(ctx *adt.OpContext, f adt.Feature) bool {
+	ok, required := c.verifyAnd(ctx, 0, f)
+	return ok || (!required && !c.isClosed)
+}
+
+// verifyAnd reports whether f is contained in all closed conjuncts at id and,
+// if not, whether the precense of at least one entry is required.
+func (c *acceptor) verifyAnd(ctx *adt.OpContext, id adt.ID, f adt.Feature) (found, required bool) {
+	for i := id; ; {
+		x := c.Canopy[i]
+
+		if ok, req := c.verifySets(ctx, i, f); ok {
+			found = true
+		} else if ok, isClosed := c.verifyEmbed(ctx, i, f); ok {
+			found = true
+		} else if req || x.isRequired() {
+			// Not found for a closed entry so this indicates a failure.
+			return false, true
+		} else if isClosed {
+			// The node itself isn't closed, but an embedding indicates it
+			// should. See cue/testdata/definitions/embed.txtar.
+			required = true
 		}
 
+		if i = x.And; i == id {
+			break
+		}
+	}
+
+	return found, required
+}
+
+// verifyEmbed reports whether any of the embeddings for the node at id allows f
+// and, if not, whether the embeddings imply that the enclosing node should be
+// closed. The latter is the case when embedded struct itself is closed.
+func (c *acceptor) verifyEmbed(ctx *adt.OpContext, id adt.ID, f adt.Feature) (found, isClosed bool) {
+
+	for i := c.Canopy[id].NextEmbed; i != 0; i = c.Canopy[i].NextEmbed {
+		ok, req := c.verifyAnd(ctx, i+1, f)
+		if ok {
+			return true, false
+		}
+		if req {
+			isClosed = true
+		}
+	}
+	return false, isClosed
+}
+
+func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (found, required bool) {
+	o := c.fieldSet(id)
+	if o == nil {
+		return false, false
+	}
+	for ; o != nil; o = o.next {
 		if len(o.additional) > 0 || o.isOpen {
-			return true
+			return true, false
 		}
 
 		for _, g := range o.fields {
 			if f == g.label {
-				return true
+				return true, false
 			}
 		}
 
 		for _, b := range o.bulk {
 			if b.check.Match(ctx, f) {
-				return true
+				return true, false
 			}
 		}
 	}
-	for _, o := range n.fields {
+
+	// TODO: this is the same location where code is registered as the old code,
+	// but
+	for o := c.Fields[id]; o != nil; o = o.next {
 		if o.pos != nil {
 			ctx.AddPosition(o.pos)
 		}
 	}
-	return false
+	return false, false
 }
 
-func collectPositions(ctx *adt.OpContext, c *CloseDef) {
-	if c.Src != nil {
-		ctx.AddPosition(c.Src)
-	}
-	for _, x := range c.List {
-		collectPositions(ctx, x)
-	}
+type info struct {
+	referred bool
+	up       adt.ID
+	replace  adt.ID
+	reverse  adt.ID
 }
 
-// containsClosed reports whether c contains any CloseDef with ID x,
-// recursively.
-func containsClosed(c *CloseDef, x adt.ID) bool {
-	if c.ID == x && !c.IsAnd {
-		return true
+func (c *acceptor) Compact(all []adt.Conjunct) (compacted []CloseDef) {
+	a := c.Canopy
+	if len(a) == 0 {
+		return nil
 	}
-	for _, e := range c.List {
-		if containsClosed(e, x) {
-			return true
+
+	marked := make([]info, len(a))
+
+	c.markParents(0, marked)
+
+	// Mark all entries that cannot be dropped.
+	for _, x := range all {
+		c.markUsed(x.CloseID, marked)
+	}
+
+	// Compute compact numbers and reverse.
+	k := adt.ID(0)
+	for i, x := range marked {
+		if x.referred {
+			marked[i].replace = k
+			marked[k].reverse = adt.ID(i)
+			k++
 		}
 	}
-	return false
+
+	compacted = make([]CloseDef, k)
+
+	for i := range compacted {
+		orig := c.Canopy[marked[i].reverse]
+
+		and := orig.And
+		if and != embedRoot {
+			and = marked[orig.And].replace
+		}
+		compacted[i] = CloseDef{
+			Src:   orig.Src,
+			And:   and,
+			IsDef: orig.IsDef,
+		}
+
+		last := adt.ID(i)
+		for or := orig.NextEmbed; or != 0; or = c.Canopy[or].NextEmbed {
+			if marked[or].referred {
+				compacted[last].NextEmbed = marked[or].replace
+				last = marked[or].replace
+			}
+		}
+	}
+
+	// Update conjuncts
+	for i, x := range all {
+		all[i].CloseID = marked[x.ID()].replace
+	}
+
+	return compacted
+}
+
+func (c *acceptor) markParents(parent adt.ID, info []info) {
+	// Ands are arranged in a ring, so check for parent, not 0.
+	c.visitAnd(parent, func(i adt.ID, x CloseDef) bool {
+		c.visitEmbed(i, func(j adt.ID, x CloseDef) bool {
+			info[j-1].up = i
+			info[j].up = i
+			c.markParents(j, info)
+			return true
+		})
+		return true
+	})
+}
+
+func (c *acceptor) markUsed(id adt.ID, marked []info) {
+	if marked[id].referred {
+		return
+	}
+
+	if id > 0 && c.Canopy[id-1].And == embedRoot {
+		marked[id-1].referred = true
+	}
+
+	for i := id; !marked[i].referred; i = c.Canopy[i].And {
+		marked[i].referred = true
+	}
+
+	c.markUsed(marked[id].up, marked)
 }

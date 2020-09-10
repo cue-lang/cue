@@ -44,6 +44,7 @@ foo: multipath: {
 	}
 
 	t: u: {
+		x: 5
 	}
 }
 

@@ -65,11 +65,14 @@ V: #S & {
 -- out/eval --
 Errors:
 V.b: field `extra` not allowed:
+    ./in.cue:3:2
     ./in.cue:6:10
+    ./in.cue:9:4
     ./in.cue:11:5
 V.c: field `e` not allowed:
-    ./in.cue:1:5
+    ./in.cue:3:2
     ./in.cue:4:6
+    ./in.cue:9:4
     ./in.cue:10:5
 
 Result:
@@ -89,22 +92,29 @@ Result:
   V: (_|_){
     // [eval]
     c: (_|_){
-      // [eval] V.c: field `e` not allowed:
-      //     ./in.cue:1:5
-      //     ./in.cue:4:6
-      //     ./in.cue:10:5
+      // [eval]
       d: (int){ int }
-      e: (int){ int }
+      e: (_|_){
+        // [eval] V.c: field `e` not allowed:
+        //     ./in.cue:3:2
+        //     ./in.cue:4:6
+        //     ./in.cue:9:4
+        //     ./in.cue:10:5
+      }
     }
     a: (#struct){
       c: (int){ int }
     }
     b: (_|_){
-      // [eval] V.b: field `extra` not allowed:
-      //     ./in.cue:6:10
-      //     ./in.cue:11:5
+      // [eval]
       open: (int){ int }
-      extra: (int){ int }
+      extra: (_|_){
+        // [eval] V.b: field `extra` not allowed:
+        //     ./in.cue:3:2
+        //     ./in.cue:6:10
+        //     ./in.cue:9:4
+        //     ./in.cue:11:5
+      }
     }
   }
 }

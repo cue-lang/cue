@@ -63,8 +63,10 @@ baz: #Foo & {
 Errors:
 bar: field `c` not allowed:
     ./in.cue:1:7
+    ./in.cue:4:2
     ./in.cue:5:2
-    ./in.cue:12:6
+    ./in.cue:11:6
+    ./in.cue:12:7
 
 Result:
 (_|_){
@@ -81,12 +83,16 @@ Result:
     a: (int){ 1 }
   }
   bar: (_|_){
-    // [eval] bar: field `c` not allowed:
-    //     ./in.cue:1:7
-    //     ./in.cue:5:2
-    //     ./in.cue:12:6
+    // [eval]
     field: (int){ int }
-    c: (int){ 2 }
+    c: (_|_){
+      // [eval] bar: field `c` not allowed:
+      //     ./in.cue:1:7
+      //     ./in.cue:4:2
+      //     ./in.cue:5:2
+      //     ./in.cue:11:6
+      //     ./in.cue:12:7
+    }
     b: (int){ 2 }
   }
   baz: (#struct){

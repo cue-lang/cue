@@ -4,7 +4,7 @@
 }
 
 #B: {
-	_b: string
+	b: string
 }
 
 #X: #A | #B
@@ -12,7 +12,7 @@
 l: [...#X]
 
 l: [
-	{_b: "bar"}
+	{b: "bar"}
 ]
 -- out/eval --
 (struct){
@@ -20,16 +20,16 @@ l: [
     a: (string){ string }
   }
   #B: (#struct){
-    _b: (string){ string }
+    b: (string){ string }
   }
   #X: (struct){ |((#struct){
       a: (string){ string }
     }, (#struct){
-      _b: (string){ string }
+      b: (string){ string }
     }) }
   l: (#list){
     0: (#struct){
-      _b: (string){ "bar" }
+      b: (string){ "bar" }
     }
   }
 }
@@ -40,7 +40,7 @@ l: [
     a: string
   }
   #B: {
-    _b: string
+    b: string
   }
   #X: (〈0;#A〉|〈0;#B〉)
   l: [
@@ -48,7 +48,7 @@ l: [
   ]
   l: [
     {
-      _b: "bar"
+      b: "bar"
     },
   ]
 }

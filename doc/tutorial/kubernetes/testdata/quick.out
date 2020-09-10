@@ -16,15 +16,17 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "bartender"
-                domain:    "prod"
                 component: "frontend"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "bartender"
             labels: {
@@ -33,8 +35,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -46,8 +46,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "bartender"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -72,8 +72,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -86,15 +86,17 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "breaddispatcher"
-                domain:    "prod"
                 component: "frontend"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "breaddispatcher"
             labels: {
@@ -103,8 +105,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -116,8 +116,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "breaddispatcher"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -142,8 +142,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -156,15 +156,17 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "host"
-                domain:    "prod"
                 component: "frontend"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "host"
             labels: {
@@ -173,8 +175,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -186,8 +186,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "host"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -212,8 +212,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -226,15 +226,17 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "maitred"
-                domain:    "prod"
                 component: "frontend"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "maitred"
             labels: {
@@ -243,8 +245,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -256,8 +256,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "maitred"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -282,8 +282,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -305,6 +305,8 @@ service: {
                 component: "frontend"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "valeter"
             labels: {
@@ -313,8 +315,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -326,8 +326,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "valeter"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -352,8 +352,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -366,15 +366,17 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "waiter"
-                domain:    "prod"
                 component: "frontend"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "waiter"
             labels: {
@@ -383,8 +385,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -396,8 +396,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "waiter"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -421,8 +421,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -444,6 +444,8 @@ service: {
                 component: "frontend"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "waterdispatcher"
             labels: {
@@ -452,8 +454,6 @@ service: {
                 component: "frontend"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -465,8 +465,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "waterdispatcher"
-                        domain:    "prod"
                         component: "frontend"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -491,8 +491,8 @@ deployment: {
                 component: "frontend"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "frontend"
@@ -511,15 +511,17 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "download"
-                domain:    "prod"
                 component: "infra"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "download"
             labels: {
@@ -528,8 +530,6 @@ service: {
                 component: "infra"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -541,8 +541,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "download"
-                        domain:    "prod"
                         component: "infra"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -562,8 +562,8 @@ deployment: {
                 component: "infra"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "infra"
@@ -577,8 +577,8 @@ service: {
             ports: [{
                 port:       2379
                 targetPort: 2379
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }, {
                 name:       "peer"
                 port:       2380
@@ -591,6 +591,8 @@ service: {
                 component: "infra"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "etcd"
             labels: {
@@ -599,8 +601,6 @@ service: {
                 component: "infra"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {}
@@ -710,8 +710,8 @@ statefulSet: {
                 component: "infra"
             }
         }
-        kind:       "StatefulSet"
         apiVersion: "apps/v1"
+        kind:       "StatefulSet"
     }
 }
 configMap: {}
@@ -730,6 +730,8 @@ service: {
                 component: "infra"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "events"
             labels: {
@@ -738,8 +740,6 @@ service: {
                 component: "infra"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -751,8 +751,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "events"
-                        domain:    "prod"
                         component: "infra"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -803,8 +803,8 @@ deployment: {
                 component: "infra"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "infra"
@@ -828,6 +828,8 @@ service: {
                 component: "infra"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "tasks"
             labels: {
@@ -836,8 +838,6 @@ service: {
                 component: "infra"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -849,8 +849,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "tasks"
-                        domain:    "prod"
                         component: "infra"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -886,8 +886,8 @@ deployment: {
                 component: "infra"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "infra"
@@ -900,15 +900,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "updater"
-                domain:    "prod"
                 component: "infra"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "updater"
             labels: {
@@ -917,8 +919,6 @@ service: {
                 component: "infra"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -930,8 +930,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "updater"
-                        domain:    "prod"
                         component: "infra"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -962,8 +962,8 @@ deployment: {
                 component: "infra"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "infra"
@@ -987,6 +987,8 @@ service: {
                 component: "infra"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "watcher"
             labels: {
@@ -995,8 +997,6 @@ service: {
                 component: "infra"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1008,8 +1008,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "watcher"
-                        domain:    "prod"
                         component: "infra"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -1041,8 +1041,8 @@ deployment: {
                 component: "infra"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "infra"
@@ -1061,15 +1061,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "caller"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "caller"
             labels: {
@@ -1078,8 +1080,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1091,8 +1091,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "caller"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1153,8 +1153,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1167,15 +1167,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "dishwasher"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "dishwasher"
             labels: {
@@ -1184,8 +1186,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1197,8 +1197,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "dishwasher"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1259,8 +1259,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1273,15 +1273,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "expiditer"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "expiditer"
             labels: {
@@ -1290,8 +1292,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1303,8 +1303,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "expiditer"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1356,8 +1356,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1370,15 +1370,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "headchef"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "headchef"
             labels: {
@@ -1387,8 +1389,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1400,8 +1400,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "headchef"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1453,8 +1453,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1467,15 +1467,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "linecook"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "linecook"
             labels: {
@@ -1484,8 +1486,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1497,8 +1497,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "linecook"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1550,8 +1550,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1564,15 +1564,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "pastrychef"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "pastrychef"
             labels: {
@@ -1581,8 +1583,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1594,8 +1594,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "pastrychef"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1647,8 +1647,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1661,15 +1661,17 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "souschef"
-                domain:    "prod"
                 component: "kitchen"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "souschef"
             labels: {
@@ -1678,8 +1680,6 @@ service: {
                 component: "kitchen"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1691,8 +1691,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "souschef"
-                        domain:    "prod"
                         component: "kitchen"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -1723,8 +1723,8 @@ deployment: {
                 component: "kitchen"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "kitchen"
@@ -1766,8 +1766,8 @@ service: {
                 component: "mon"
             }
         }
-        kind:       "Service"
         apiVersion: "v1"
+        kind:       "Service"
     }
 }
 deployment: {
@@ -1784,8 +1784,8 @@ deployment: {
                     name: "alertmanager"
                     labels: {
                         app:       "alertmanager"
-                        domain:    "prod"
                         component: "mon"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -1823,8 +1823,8 @@ deployment: {
                 component: "mon"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "mon"
@@ -1875,6 +1875,8 @@ service: {
                 component: "mon"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "grafana"
             labels: {
@@ -1883,8 +1885,6 @@ service: {
                 component: "mon"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -1903,8 +1903,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "grafana"
-                        domain:    "prod"
                         component: "mon"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -1949,8 +1949,8 @@ deployment: {
                 }
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "mon"
@@ -1985,8 +1985,8 @@ service: {
                 component: "mon"
             }
         }
-        kind:       "Service"
         apiVersion: "v1"
+        kind:       "Service"
     }
 }
 deployment: {}
@@ -2056,8 +2056,8 @@ daemonSet: {
                 component: "mon"
             }
         }
-        kind:       "DaemonSet"
         apiVersion: "apps/v1"
+        kind:       "DaemonSet"
     }
 }
 statefulSet: {}
@@ -2092,8 +2092,8 @@ service: {
                 component: "mon"
             }
         }
-        kind:       "Service"
         apiVersion: "v1"
+        kind:       "Service"
     }
 }
 deployment: {
@@ -2117,8 +2117,8 @@ deployment: {
                     name: "prometheus"
                     labels: {
                         app:       "prometheus"
-                        domain:    "prod"
                         component: "mon"
+                        domain:    "prod"
                     }
                     annotations: {
                         "prometheus.io.scrape": "true"
@@ -2153,8 +2153,8 @@ deployment: {
                 component: "mon"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "mon"
@@ -2413,15 +2413,17 @@ service: {
             ports: [{
                 port:       4180
                 targetPort: 4180
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "authproxy"
-                domain:    "prod"
                 component: "proxy"
+                domain:    "prod"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "authproxy"
             labels: {
@@ -2430,8 +2432,6 @@ service: {
                 component: "proxy"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -2443,8 +2443,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "authproxy"
-                        domain:    "prod"
                         component: "proxy"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -2475,8 +2475,8 @@ deployment: {
                 component: "proxy"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "proxy"
@@ -2566,6 +2566,8 @@ service: {
                 component: "proxy"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "goget"
             labels: {
@@ -2574,8 +2576,6 @@ service: {
                 component: "proxy"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -2587,8 +2587,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "goget"
-                        domain:    "prod"
                         component: "proxy"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -2618,8 +2618,8 @@ deployment: {
                 component: "proxy"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "proxy"
@@ -2648,6 +2648,8 @@ service: {
                 component: "proxy"
             }
         }
+        apiVersion: "v1"
+        kind:       "Service"
         metadata: {
             name: "nginx"
             labels: {
@@ -2656,8 +2658,6 @@ service: {
                 component: "proxy"
             }
         }
-        kind:       "Service"
-        apiVersion: "v1"
     }
 }
 deployment: {
@@ -2669,8 +2669,8 @@ deployment: {
                 metadata: {
                     labels: {
                         app:       "nginx"
-                        domain:    "prod"
                         component: "proxy"
+                        domain:    "prod"
                     }
                 }
                 spec: {
@@ -2711,8 +2711,8 @@ deployment: {
                 component: "proxy"
             }
         }
-        kind:       "Deployment"
         apiVersion: "apps/v1"
+        kind:       "Deployment"
     }
 }
 #Component: "proxy"

@@ -1,0 +1,71 @@
+-- in.cue --
+package x
+
+#a: (#c | #d) & {
+	name: string
+}
+
+#a1: #c & {
+	name: string
+}
+
+#a2: #d & {
+	name: string
+}
+
+#c: {
+	name: string
+	age:  int
+}
+
+#d: {
+	name:    string
+	address: string
+}
+-- out/eval --
+(struct){
+  #a: (struct){ |((#struct){
+      name: (string){ string }
+      age: (int){ int }
+    }, (#struct){
+      name: (string){ string }
+      address: (string){ string }
+    }) }
+  #a1: (#struct){
+    name: (string){ string }
+    age: (int){ int }
+  }
+  #a2: (#struct){
+    name: (string){ string }
+    address: (string){ string }
+  }
+  #c: (#struct){
+    name: (string){ string }
+    age: (int){ int }
+  }
+  #d: (#struct){
+    name: (string){ string }
+    address: (string){ string }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #a: ((〈0;#c〉|〈0;#d〉) & {
+    name: string
+  })
+  #a1: (〈0;#c〉 & {
+    name: string
+  })
+  #a2: (〈0;#d〉 & {
+    name: string
+  })
+  #c: {
+    name: string
+    age: int
+  }
+  #d: {
+    name: string
+    address: string
+  }
+}

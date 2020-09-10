@@ -115,7 +115,9 @@ module: "example.com"
 	if err != nil {
 		t.Fatal(err)
 	}
-	t.Error(debug.NodeString(r, v, nil))
+
+	// t.Error(debug.NodeString(r, v, nil))
+	// eval.Debug = true
 
 	e := eval.New(r)
 	ctx := e.NewContext(v)

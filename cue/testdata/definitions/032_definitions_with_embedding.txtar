@@ -82,9 +82,10 @@
 -- out/eval --
 Errors:
 #e1.a: field `d` not allowed:
-    ./in.cue:1:1
     ./in.cue:2:5
+    ./in.cue:6:2
     ./in.cue:7:5
+    ./in.cue:12:6
     ./in.cue:12:15
 
 Result:
@@ -105,14 +106,17 @@ Result:
   #e1: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] #e1.a: field `d` not allowed:
-      //     ./in.cue:1:1
-      //     ./in.cue:2:5
-      //     ./in.cue:7:5
-      //     ./in.cue:12:15
+      // [eval]
       b: (int){ int }
       c: (int){ int }
-      d: (int){ 4 }
+      d: (_|_){
+        // [eval] #e1.a: field `d` not allowed:
+        //     ./in.cue:2:5
+        //     ./in.cue:6:2
+        //     ./in.cue:7:5
+        //     ./in.cue:12:6
+        //     ./in.cue:12:15
+      }
     }
     b: (int){ 3 }
   }

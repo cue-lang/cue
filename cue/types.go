@@ -647,9 +647,10 @@ func remakeValue(base Value, env *adt.Environment, v value) Value {
 	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
 		return Value{base.idx, v}
 	}
-	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label}
+	n := &adt.Vertex{Label: base.v.Label}
 	n.AddConjunct(adt.MakeRootConjunct(env, v))
 	n = base.ctx().manifest(n)
+	n.Parent = base.v.Parent
 	return makeValue(base.idx, n)
 }
 
@@ -1555,12 +1556,13 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 	var value = convert.GoValueToValue(ctx.opCtx, x, true)
 	n, _ := value.(*adt.Vertex)
 	if n == nil {
-		n = &adt.Vertex{Label: v.v.Label, Parent: v.v.Parent}
+		n = &adt.Vertex{Label: v.v.Label}
 		n.AddConjunct(adt.MakeRootConjunct(nil, value))
 	} else {
 		n.Label = v.v.Label
 	}
 	n.Finalize(ctx.opCtx)
+	n.Parent = v.v.Parent
 	w := makeValue(v.idx, n)
 	return v.Unify(w)
 }
@@ -1652,12 +1654,16 @@ func (v Value) Unify(w Value) Value {
 	if w.v == nil {
 		return v
 	}
-	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
+	n := &adt.Vertex{Label: v.v.Label}
 	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
 	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
 
 	ctx := v.idx.newContext()
 	n.Finalize(ctx.opCtx)
+
+	// We do not set the parent until here as we don't want to "inherit" the
+	// closedness setting from v.
+	n.Parent = v.v.Parent
 	return makeValue(v.idx, n)
 }
 
@@ -1680,7 +1686,7 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 
 	e := eval.New(v.idx.Runtime)
 	ctx := e.NewContext(n)
-	e.UnifyAccept(ctx, n, adt.Finalized, accept.v.Closed)
+	e.UnifyAccept(ctx, n, adt.Finalized, accept.v.Closed) // check for nil.
 
 	// ctx := v.idx.newContext()
 	n.Closed = accept.v.Closed
@@ -2100,6 +2106,8 @@ func (v Value) Expr() (Op, []Value) {
 			a := []Value{}
 			ctx := v.ctx().opCtx
 			for _, c := range v.v.Conjuncts {
+				// Keep parent here. TODO: do we need remove the requirement
+				// from other conjuncts?
 				n := &adt.Vertex{
 					Parent: v.v.Parent,
 					Label:  v.v.Label,
@@ -2161,7 +2169,6 @@ func (v Value) Expr() (Op, []Value) {
 			if disjunct.Default {
 				for _, n := range x.Values {
 					a := adt.Vertex{
-						Parent: v.v.Parent,
 						Label:  v.v.Label,
 						Closed: v.v.Closed,
 					}
@@ -2173,6 +2180,7 @@ func (v Value) Expr() (Op, []Value) {
 					ctx := e.NewContext(nil)
 					e.UnifyAccept(ctx, &a, adt.Finalized, v.v.Closed)
 					e.UnifyAccept(ctx, &b, adt.Finalized, v.v.Closed)
+					a.Parent = v.v.Parent
 					if !n.Default && subsume.Value(ctx, &a, &b) == nil {
 						continue outerExpr
 					}
@@ -2243,12 +2251,11 @@ func (v Value) Expr() (Op, []Value) {
 			switch x := d.(type) {
 			case adt.Expr:
 				// embedding
-				n := &adt.Vertex{
-					Parent: v.v.Parent,
-					Label:  v.v.Label}
+				n := &adt.Vertex{Label: v.v.Label}
 				c := adt.MakeRootConjunct(envEmbed, x)
 				n.AddConjunct(c)
 				n.Finalize(ctx)
+				n.Parent = v.v.Parent
 				a = append(a, makeValue(v.idx, n))
 
 			default:
@@ -2262,14 +2269,14 @@ func (v Value) Expr() (Op, []Value) {
 
 		if len(fields) > 0 {
 			n := &adt.Vertex{
-				Parent: v.v.Parent,
-				Label:  v.v.Label,
+				Label: v.v.Label,
 			}
 			c := adt.MakeRootConjunct(env, &adt.StructLit{
 				Decls: fields,
 			})
 			n.AddConjunct(c)
 			n.Finalize(ctx)
+			n.Parent = v.v.Parent
 			a = append(a, makeValue(v.idx, n))
 		}
 

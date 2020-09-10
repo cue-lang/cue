@@ -1,0 +1,20 @@
+cue cmd run
+
+-- task.cue --
+package ci
+
+// Must have
+// - indirection through definition
+// - unification of two list elements
+// - one of those elements must be _
+// - Must use merge and unify tool file
+
+workflows: #Workflow
+
+#Workflow: ["a"] & [_]
+
+-- task_tool.cue --
+package ci
+
+command: run: {
+}

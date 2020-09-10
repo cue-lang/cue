@@ -1,0 +1,56 @@
+-- in.cue --
+deployment: [string]: #Deployment
+
+deployment: foo: spec: replicas: 1
+
+#Deployment: {
+	#TypeMeta
+
+	spec: #Spec
+}
+
+#Spec: replicas: int
+
+#TypeMeta: {}
+-- out/eval --
+(struct){
+  deployment: (struct){
+    foo: (#struct){
+      spec: (#struct){
+        replicas: (int){ 1 }
+      }
+    }
+  }
+  #Deployment: (#struct){
+    spec: (#struct){
+      replicas: (int){ int }
+    }
+  }
+  #Spec: (#struct){
+    replicas: (int){ int }
+  }
+  #TypeMeta: (#struct){
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  deployment: {
+    [string]: 〈1;#Deployment〉
+  }
+  deployment: {
+    foo: {
+      spec: {
+        replicas: 1
+      }
+    }
+  }
+  #Deployment: {
+    〈1;#TypeMeta〉
+    spec: 〈1;#Spec〉
+  }
+  #Spec: {
+    replicas: int
+  }
+  #TypeMeta: {}
+}

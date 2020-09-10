@@ -1,0 +1,52 @@
+cue eval ./pkg:foo
+
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- in.cue --
+package foo
+
+import "example.com/pkg"
+
+#def: {
+  _name: d: int
+}
+
+d: pkg.#D & { _name: d: int }
+
+// TODO: this should fail, as the _name restricting it is in this
+// package.
+// e: pkg.#D & #def & { _name: e: int }
+
+-- pkg/bar.cue --
+package pkg
+
+#D: {}
+
+-- out/eval --
+(struct){
+  #def: (#struct){
+    _name: (#struct){
+      d: (int){ int }
+    }
+  }
+  d: (#struct){
+    _name: (#struct){
+      d: (int){ int }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #def: {
+    _name: {
+      d: int
+    }
+  }
+  d: (〈import;"example.com/pkg"〉.#D & {
+    _name: {
+      d: int
+    }
+  })
+}

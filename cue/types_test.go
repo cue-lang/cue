@@ -1075,7 +1075,7 @@ func TestTemplate(t *testing.T) {
 		a: foo: b: [Bar=string]: { d: Bar }
 		`,
 		path: []string{"a", "foo", "b", ""},
-		want: `{"d":"label","c":"foolabel"}`,
+		want: `{"c":"foolabel","d":"label"}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -1133,7 +1133,7 @@ func TestElem(t *testing.T) {
 		a: foo: b: [Bar=string]: { d: Bar }
 		`,
 		path: []string{"a", "foo", "b", ""},
-		want: "{\n\td: string\n\tc: string + string\n}",
+		want: "{\n\tc: string + string\n\td: string\n}",
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

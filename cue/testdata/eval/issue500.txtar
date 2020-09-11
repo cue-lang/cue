@@ -1,0 +1,82 @@
+-- in.cue --
+package x
+
+import "strings"
+
+a: strings.Join(strings.Split("test", "")[1:], "")
+
+b: strings.Join(["t", "e", "s", "t"][1:], "")
+
+c: ["t", "e", "s", "t"][1:]
+d: strings.Join(c, "")
+
+e: strings.Join(["a"] + ["b"], "")
+
+f: ["a"] + ["b"]
+g: strings.Join(f, "")
+
+h: strings.Join(3*["a"], "")
+
+i: 3 * ["b"]
+j: strings.Join(i, "")
+
+-- out/eval --
+(struct){
+  a: (string){ "est" }
+  b: (string){ "est" }
+  c: (#list){
+    0: (string){ "e" }
+    1: (string){ "s" }
+    2: (string){ "t" }
+  }
+  d: (string){ "est" }
+  e: (string){ "ab" }
+  f: (#list){
+    0: (string){ "a" }
+    1: (string){ "b" }
+  }
+  g: (string){ "ab" }
+  h: (string){ "aaa" }
+  i: (#list){
+    0: (string){ "b" }
+    1: (string){ "b" }
+    2: (string){ "b" }
+  }
+  j: (string){ "bbb" }
+}
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;strings〉.Join(〈import;strings〉.Split("test", "")[1:], "")
+  b: 〈import;strings〉.Join([
+    "t",
+    "e",
+    "s",
+    "t",
+  ][1:], "")
+  c: [
+    "t",
+    "e",
+    "s",
+    "t",
+  ][1:]
+  d: 〈import;strings〉.Join(〈0;c〉, "")
+  e: 〈import;strings〉.Join(([
+    "a",
+  ] + [
+    "b",
+  ]), "")
+  f: ([
+    "a",
+  ] + [
+    "b",
+  ])
+  g: 〈import;strings〉.Join(〈0;f〉, "")
+  h: 〈import;strings〉.Join((3 * [
+    "a",
+  ]), "")
+  i: (3 * [
+    "b",
+  ])
+  j: 〈import;strings〉.Join(〈0;i〉, "")
+}

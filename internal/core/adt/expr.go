@@ -668,6 +668,7 @@ func (x *SliceExpr) evaluate(c *OpContext) Value {
 				Conjuncts: a.Conjuncts,
 			})
 		}
+		n.status = Finalized
 		return n
 
 	case *Bytes:

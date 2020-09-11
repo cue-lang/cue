@@ -1,0 +1,11 @@
+cue vet list.cue list.json
+
+cmp stdout expect-stdout
+
+-- list.cue --
+[]
+
+-- list.json --
+[]
+
+-- expect-stdout --

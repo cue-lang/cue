@@ -1,0 +1,31 @@
+-- in.cue --
+import "list"
+x: list.UniqueItems
+x: [string, ...string]
+x: ["x","x"]
+-- out/eval --
+Errors:
+x: invalid value ["x","x"] (does not satisfy list.UniqueItems)
+
+Result:
+(_|_){
+  // [eval]
+  x: (_|_){
+    // [eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems)
+    0: (string){ "x" }
+    1: (string){ "x" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  x: 〈import;list〉.UniqueItems
+  x: [
+    string,
+    ...string,
+  ]
+  x: [
+    "x",
+    "x",
+  ]
+}

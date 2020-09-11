@@ -1,4 +1,22 @@
+
 -- in.cue --
+#T: {
+	if true {
+		// We'd like to restrict the possible members of x in this case,
+		// but this doesn't work.
+		x: close({
+			f1: int
+		})
+	}
+	x: _
+}
+z: #T & {
+	x: {
+		f1: 99
+		f2: "i want to disallow this"
+	}
+}
+
 t: #C
 #C: {
 	if true {
@@ -7,7 +25,33 @@ t: #C
 }
 t: p: "foo"
 -- out/eval --
-(struct){
+Errors:
+z.x: field `f2` not allowed:
+    ./in.cue:5:12
+    ./in.cue:11:4
+    ./in.cue:14:3
+
+Result:
+(_|_){
+  // [eval]
+  #T: (#struct){
+    x: (#struct){
+      f1: (int){ int }
+    }
+  }
+  z: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
+      f1: (int){ 99 }
+      f2: (_|_){
+        // [eval] z.x: field `f2` not allowed:
+        //     ./in.cue:5:12
+        //     ./in.cue:11:4
+        //     ./in.cue:14:3
+      }
+    }
+  }
   t: (#struct){
     p: (string){ "foo" }
   }
@@ -18,6 +62,20 @@ t: p: "foo"
 -- out/compile --
 --- in.cue
 {
+  #T: {
+    if true {
+      x: close({
+        f1: int
+      })
+    }
+    x: _
+  }
+  z: (〈0;#T〉 & {
+    x: {
+      f1: 99
+      f2: "i want to disallow this"
+    }
+  })
   t: 〈0;#C〉
   #C: {
     if true {

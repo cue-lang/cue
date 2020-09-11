@@ -1,0 +1,21 @@
+cue eval ./pkg:foo
+cmp stdout expect-stdout
+-- cue.mod/module.cue --
+module: "example.com"
+-- pkg/foo.cue --
+package foo
+import "example.com/pkg:bar"
+bar
+z: 3
+-- pkg/bar.cue --
+package bar
+import "example.com/pkg:baz"
+baz
+y: 2
+-- pkg/baz.cue --
+package baz
+x: 1
+-- expect-stdout --
+z: 3
+y: 2
+x: 1

@@ -290,7 +290,9 @@ if the user includes the flag "-t prod" on the command line.
 Injecting values
 
 The injection mechanism allows values to be injected into fields
-that are marked with a "tag" attribute. For any field of the form
+that are not defined within the scope of a comprehension, list, or
+optional field and that are marked with a "tag" attribute. For any
+field of the form
 
    field: x @tag(key)
 

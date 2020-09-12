@@ -1,0 +1,13 @@
+cue eval test.cue -t env=prod
+
+cmp stdout expect-stdout
+
+# TODO: report errors for invalid tags?
+
+-- test.cue --
+{
+    environment: "prod" | "staging" @tag(env,short=prod|staging)
+}
+
+-- expect-stdout --
+environment: "prod"

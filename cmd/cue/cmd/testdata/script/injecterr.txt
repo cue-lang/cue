@@ -1,0 +1,36 @@
+! cue eval test.cue -t env=prod
+
+cmp stderr expect-stderr
+
+# TODO: report errors for invalid tags?
+
+-- test.cue --
+{
+    environment: "prod" | "staging" @tag(env,short=prod|staging)
+
+    // Don't replace in optional
+    opt?: string @tag(env)
+    bulk: [string]: foo: string @tag(env)
+    bulk: x: {}
+
+    // Don't replace in lists.
+    a: [
+        { no_replace: string @tag(env) }
+    ]
+
+    // Don't allow in comprehensions
+    src: [1, 2]
+    for _ in src {
+        b: string @tag(prod)
+    }
+}
+
+-- expect-stderr --
+@tag not allowed within optional fields:
+    ./test.cue:5:18
+@tag not allowed within optional fields:
+    ./test.cue:6:33
+@tag not allowed within lists:
+    ./test.cue:11:30
+@tag not allowed within comprehension:
+    ./test.cue:17:19

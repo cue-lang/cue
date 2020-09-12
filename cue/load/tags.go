@@ -101,20 +101,34 @@ func (t *tag) inject(value string) errors.Error {
 //
 // TODO: should we limit the depth at which tags may occur?
 func findTags(b *build.Instance) (tags []tag, errs errors.Error) {
+	findInvalidTags := func(x ast.Node, msg string) {
+		ast.Walk(x, nil, func(n ast.Node) {
+			if f, ok := n.(*ast.Field); ok {
+				for _, a := range f.Attrs {
+					if key, _ := a.Split(); key == "tag" {
+						errs = errors.Append(errs, errors.Newf(a.Pos(), msg))
+						// TODO: add position of x.
+					}
+				}
+			}
+		})
+	}
 	for _, f := range b.Files {
 		ast.Walk(f, func(n ast.Node) bool {
-			if b.Err != nil {
-				return false
-			}
-
 			switch x := n.(type) {
-			case *ast.StructLit, *ast.File:
-				return true
+			case *ast.ListLit:
+				findInvalidTags(n, "@tag not allowed within lists")
+				return false
+
+			case *ast.Comprehension:
+				findInvalidTags(n, "@tag not allowed within comprehension")
+				return false
 
 			case *ast.Field:
 				// TODO: allow optional fields?
 				_, _, err := ast.LabelName(x.Label)
 				if err != nil || x.Optional != token.NoPos {
+					findInvalidTags(n, "@tag not allowed within optional fields")
 					return false
 				}
 
@@ -131,9 +145,8 @@ func findTags(b *build.Instance) (tags []tag, errs errors.Error) {
 					t.field = x
 					tags = append(tags, t)
 				}
-				return true
 			}
-			return false
+			return true
 		}, nil)
 	}
 	return tags, errs

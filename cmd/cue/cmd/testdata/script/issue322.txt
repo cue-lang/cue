@@ -1,0 +1,16 @@
+! cue vet
+cmp stderr expect-stderr
+
+-- expect-stderr --
+imported and not used: "strings":
+    ./x.cue:2:8
+-- x.cue --
+package x
+import "strings"
+
+foo: "hello"
+
+-- y.cue --
+package x
+
+bar: foo

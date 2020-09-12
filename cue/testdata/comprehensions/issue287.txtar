@@ -18,12 +18,12 @@ if #E["y"] != _|_ {
 -- out/compile --
 --- in.cue
 {
-  if (〈0;#E〉["x"] != _|_(from source)) {
+  if (〈0;#E〉["x"] != _|_(explicit error (_|_ literal) in source)) {
     #E: {
       y: true
     }
   }
-  if (〈0;#E〉["y"] != _|_(from source)) {
+  if (〈0;#E〉["y"] != _|_(explicit error (_|_ literal) in source)) {
     z: true
   }
   #E: {

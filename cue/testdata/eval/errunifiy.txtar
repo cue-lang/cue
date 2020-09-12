@@ -9,7 +9,7 @@ b: "t"
 
 -- out/eval --
 Errors:
-from source:
+explicit error (_|_ literal) in source:
     ./in.cue:4:4
 
 Result:
@@ -17,7 +17,7 @@ Result:
   // [user]
   a: (string){ "t" }
   b: (_|_){
-    // [user] from source:
+    // [user] explicit error (_|_ literal) in source:
     //     ./in.cue:4:4
   }
 }
@@ -26,6 +26,6 @@ Result:
 {
   a: or([])
   a: "t"
-  b: _|_(from source)
+  b: _|_(explicit error (_|_ literal) in source)
   b: "t"
 }

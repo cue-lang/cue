@@ -32,27 +32,27 @@ i: false
 -- out/compile --
 --- in.cue
 {
-  a: (_|_(from source) == _|_(from source))
+  a: (_|_(explicit error (_|_ literal) in source) == _|_(explicit error (_|_ literal) in source))
   b: ((〈0;err〉 == 1) & 2)
-  c: (〈0;err〉 == _|_(from source))
-  d: (〈0;err〉 != _|_(from source))
+  c: (〈0;err〉 == _|_(explicit error (_|_ literal) in source))
+  d: (〈0;err〉 != _|_(explicit error (_|_ literal) in source))
   e: ((〈0;err〉 != 1) & 3)
   f: (({
     a: 1
   } & {
     a: 2
-  }) == _|_(from source))
+  }) == _|_(explicit error (_|_ literal) in source))
   g: (({
     a: 1
   } & {
     b: 2
-  }) == _|_(from source))
-  h: (_|_(from source) == ({
+  }) == _|_(explicit error (_|_ literal) in source))
+  h: (_|_(explicit error (_|_ literal) in source) == ({
     a: 1
   } & {
     a: 2
   }))
-  i: (_|_(from source) == ({
+  i: (_|_(explicit error (_|_ literal) in source) == ({
     a: 1
   } & {
     b: 2

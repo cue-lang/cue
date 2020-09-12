@@ -9,38 +9,38 @@ c: b.a == _|_
 d: _|_ != b.a
 e: _|_ == _|_
 -- out/def --
-a: _|_ // from source
-b: _|_ // from source
+a: _|_ // explicit error (_|_ literal) in source
+b: _|_ // explicit error (_|_ literal) in source
 c: true
 d: false
 e: true
 -- out/legacy-debug --
-<0>{a: _|_(from source), b: _|_(from source), c: true, d: false, e: true}
+<0>{a: _|_(explicit error (_|_ literal) in source), b: _|_(explicit error (_|_ literal) in source), c: true, d: false, e: true}
 -- out/compile --
 --- in.cue
 {
-  a: (_|_(from source) & _|_(from source))
-  b: (null & _|_(from source))
-  c: (〈0;b〉.a == _|_(from source))
-  d: (_|_(from source) != 〈0;b〉.a)
-  e: (_|_(from source) == _|_(from source))
+  a: (_|_(explicit error (_|_ literal) in source) & _|_(explicit error (_|_ literal) in source))
+  b: (null & _|_(explicit error (_|_ literal) in source))
+  c: (〈0;b〉.a == _|_(explicit error (_|_ literal) in source))
+  d: (_|_(explicit error (_|_ literal) in source) != 〈0;b〉.a)
+  e: (_|_(explicit error (_|_ literal) in source) == _|_(explicit error (_|_ literal) in source))
 }
 -- out/eval --
 Errors:
-from source:
+explicit error (_|_ literal) in source:
     ./in.cue:1:4
-from source:
+explicit error (_|_ literal) in source:
     ./in.cue:2:11
 
 Result:
 (_|_){
   // [user]
   a: (_|_){
-    // [user] from source:
+    // [user] explicit error (_|_ literal) in source:
     //     ./in.cue:1:4
   }
   b: (_|_){
-    // [user] from source:
+    // [user] explicit error (_|_ literal) in source:
     //     ./in.cue:2:11
   }
   c: (bool){ true }

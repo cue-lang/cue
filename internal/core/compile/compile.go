@@ -778,7 +778,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		return &adt.Bottom{
 			Src:  n,
 			Code: adt.UserError,
-			Err:  errors.Newf(n.Pos(), "from source"),
+			Err:  errors.Newf(n.Pos(), "explicit error (_|_ literal) in source"),
 		}
 
 	case *ast.BadExpr:

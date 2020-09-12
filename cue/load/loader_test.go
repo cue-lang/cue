@@ -253,6 +253,47 @@ module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata/toolonly
 display:./toolonly`,
+	}, {
+		cfg: &Config{
+			Dir:  testdataDir,
+			Tags: []string{"prod"},
+		},
+		args: args("./tags"),
+		want: `
+path:   example.org/test/tags
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/tags
+display:./tags
+files:
+	$CWD/testdata/tags/prod.cue`,
+	}, {
+		cfg: &Config{
+			Dir:  testdataDir,
+			Tags: []string{"prod", "foo=bar"},
+		},
+		args: args("./tags"),
+		want: `
+path:   example.org/test/tags
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/tags
+display:./tags
+files:
+	$CWD/testdata/tags/prod.cue`,
+	}, {
+		cfg: &Config{
+			Dir:  testdataDir,
+			Tags: []string{"prod"},
+		},
+		args: args("./tagsbad"),
+		want: `
+err:    multiple @if attributes (and 2 more errors)
+path:   example.org/test/tagsbad
+module: example.org/test
+root:   $CWD/testdata
+dir:    $CWD/testdata/tagsbad
+display:./tagsbad`,
 	}}
 	for i, tc := range testCases {
 		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {

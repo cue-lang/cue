@@ -21,6 +21,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cli"
@@ -138,13 +139,13 @@ func findTags(b *build.Instance) (tags []tag, errs errors.Error) {
 	return tags, errs
 }
 
-func injectTags(tags []string, a []tag) errors.Error {
+func injectTags(tags []string, l *loader) errors.Error {
 	// Parses command line args
 	for _, s := range tags {
 		p := strings.Index(s, "=")
-		found := false
+		found := l.buildTags[s]
 		if p > 0 { // key-value
-			for _, t := range a {
+			for _, t := range l.tags {
 				if t.key == s[:p] {
 					found = true
 					if err := t.inject(s[p+1:]); err != nil {
@@ -156,7 +157,7 @@ func injectTags(tags []string, a []tag) errors.Error {
 				return errors.Newf(token.NoPos, "no tag for %q", s[:p])
 			}
 		} else { // shorthand
-			for _, t := range a {
+			for _, t := range l.tags {
 				for _, sh := range t.shorthands {
 					if sh == s {
 						found = true
@@ -167,9 +168,104 @@ func injectTags(tags []string, a []tag) errors.Error {
 				}
 			}
 			if !found {
-				return errors.Newf(token.NoPos, "no shorthand for %q", s)
+				return errors.Newf(token.NoPos, "tag %q not used in any file", s)
 			}
 		}
 	}
 	return nil
+}
+
+func shouldBuildFile(f *ast.File, fp *fileProcessor) (bool, errors.Error) {
+	tags := fp.c.Tags
+
+	a, errs := getBuildAttr(f)
+	if errs != nil {
+		return false, errs
+	}
+	if a == nil {
+		return true, nil
+	}
+
+	_, body := a.Split()
+
+	expr, err := parser.ParseExpr("", body)
+	if err != nil {
+		return false, errors.Promote(err, "")
+	}
+
+	tagMap := map[string]bool{}
+	for _, t := range tags {
+		tagMap[t] = !strings.ContainsRune(t, '=')
+	}
+
+	c := checker{tags: tagMap, loader: fp.c.loader}
+	include := c.shouldInclude(expr)
+	if c.err != nil {
+		return false, c.err
+	}
+	return include, nil
+}
+
+func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {
+	var a *ast.Attribute
+	for _, d := range f.Decls {
+		switch x := d.(type) {
+		case *ast.Attribute:
+			key, _ := x.Split()
+			if key != "if" {
+				continue
+			}
+			if a != nil {
+				err := errors.Newf(d.Pos(), "multiple @if attributes")
+				err = errors.Append(err,
+					errors.Newf(a.Pos(), "previous declaration here"))
+				return nil, err
+			}
+			a = x
+
+		case *ast.Package:
+			break
+		}
+	}
+	return a, nil
+}
+
+type checker struct {
+	loader *loader
+	tags   map[string]bool
+	err    errors.Error
+}
+
+func (c *checker) shouldInclude(expr ast.Expr) bool {
+	switch x := expr.(type) {
+	case *ast.Ident:
+		c.loader.buildTags[x.Name] = true
+		return c.tags[x.Name]
+
+	case *ast.BinaryExpr:
+		switch x.Op {
+		case token.LAND:
+			return c.shouldInclude(x.X) && c.shouldInclude(x.Y)
+
+		case token.LOR:
+			return c.shouldInclude(x.X) || c.shouldInclude(x.Y)
+
+		default:
+			c.err = errors.Append(c.err, errors.Newf(token.NoPos,
+				"invalid operator %v", x.Op))
+			return false
+		}
+
+	case *ast.UnaryExpr:
+		if x.Op != token.NOT {
+			c.err = errors.Append(c.err, errors.Newf(token.NoPos,
+				"invalid operator %v", x.Op))
+		}
+		return !c.shouldInclude(x.X)
+
+	default:
+		c.err = errors.Append(c.err, errors.Newf(token.NoPos,
+			"invalid type %T in build attribute", expr))
+		return false
+	}
 }

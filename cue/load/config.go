@@ -163,6 +163,16 @@ type Config struct {
 	// build and to inject values into the AST.
 	//
 	//
+	// File selection
+	//
+	// Files with an attribute of the form @if(expr) before a package clause
+	// are conditionally included if expr resolves to true, where expr refers to
+	// boolean values in Tags.
+	//
+	// It is an error for a file to have more than one @if attribute or to
+	// have a @if attribute without or after a package clause.
+	//
+	//
 	// Value injection
 	//
 	// The Tags values are also used to inject values into fields with a
@@ -490,7 +500,10 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	}
 
-	c.loader = &loader{cfg: &c}
+	c.loader = &loader{
+		cfg:       &c,
+		buildTags: make(map[string]bool),
+	}
 
 	// TODO: also make this work if run from outside the module?
 	switch {

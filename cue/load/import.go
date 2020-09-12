@@ -375,6 +375,15 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return false // don't mark as added
 	}
 
+	if include, err := shouldBuildFile(pf, fp); !include {
+		if err != nil {
+			fp.err = errors.Append(fp.err, err)
+		}
+		p.IgnoredCUEFiles = append(p.InvalidCUEFiles, fullPath)
+		p.IgnoredFiles = append(p.InvalidFiles, file)
+		return false
+	}
+
 	if pkg != "" && pkg != "_" {
 		if p.PkgName == "" {
 			p.PkgName = pkg

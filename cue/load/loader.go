@@ -86,7 +86,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 
 	// TODO(api): have API call that returns an error which is the aggregate
 	// of all build errors. Certain errors, like these, hold across builds.
-	if err := injectTags(c.Tags, l.tags); err != nil {
+	if err := injectTags(c.Tags, l); err != nil {
 		for _, p := range a {
 			p.ReportError(err)
 		}
@@ -110,9 +110,10 @@ const (
 )
 
 type loader struct {
-	cfg  *Config
-	stk  importStack
-	tags []tag // tags found in files
+	cfg       *Config
+	stk       importStack
+	tags      []tag // tags found in files
+	buildTags map[string]bool
 }
 
 func (l *loader) abs(filename string) string {

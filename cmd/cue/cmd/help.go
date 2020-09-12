@@ -262,9 +262,32 @@ $ cue export -e name -o=text:foo
 
 var injectHelp = &cobra.Command{
 	Use:   "injection",
-	Short: "inject values from the command line",
-	Long: `Many of the cue commands allow injecting values
-from the command line using the --inject/-t flag.
+	Short: "inject files or values into specific fields for a build",
+	Long: `Many of the cue commands allow injecting values or
+selecting files from the command line using the --inject/-t flag.
+
+
+Injecting files
+
+A "build" attribute defines a boolean expression that causes a file
+to only be included in a build if its expression evaluates to true.
+There may only be a single @if attribute per file and it must
+appear before a package clause.
+
+The expression is a subset of CUE consisting only of identifiers
+and the operators &&, ||, !, where identifiers refer to tags
+defined by the user on the command line.
+
+For example, the following file will only be included in a build
+if the user includes the flag "-t prod" on the command line.
+
+   // File prod.cue
+   @if(prod)
+
+   package foo
+
+
+Injecting values
 
 The injection mechanism allows values to be injected into fields
 that are marked with a "tag" attribute. For any field of the form

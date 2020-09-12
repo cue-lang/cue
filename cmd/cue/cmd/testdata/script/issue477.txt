@@ -1,0 +1,19 @@
+! cue cmd print
+
+cmp stderr expect-stderr
+
+-- x_tool.cue --
+package x
+
+import (
+    "strings"
+    "tool/cli"
+)
+
+command: print: cli.Print & {
+    text: "this is a test"
+}
+
+-- expect-stderr --
+imported and not used: "strings":
+    ./x_tool.cue:4:5

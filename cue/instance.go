@@ -259,10 +259,10 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 
 	i := newInstance(idx, p, v)
 	if rErr != nil {
-		i.setListOrError(err)
+		i.setListOrError(rErr)
 	}
 	if i.Err != nil {
-		i.setListOrError(err)
+		i.setListOrError(i.Err)
 	}
 
 	if err != nil {

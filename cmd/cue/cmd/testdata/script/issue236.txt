@@ -1,0 +1,12 @@
+cue trim
+
+-- in.cue --
+package x
+
+#Schema: {
+    optional: string
+}
+d: #Schema
+d: {
+    optional: "some"
+}

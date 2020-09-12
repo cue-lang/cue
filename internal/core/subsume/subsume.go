@@ -103,6 +103,13 @@ func (s *subsumer) errf(msg string, args ...interface{}) {
 	s.errs = errors.Append(s.errs, b.Err)
 }
 
+func unifyValue(c *adt.OpContext, a, b adt.Value) adt.Value {
+	v := &adt.Vertex{}
+	v.AddConjunct(adt.MakeRootConjunct(c.Env(0), a))
+	v.AddConjunct(adt.MakeRootConjunct(c.Env(0), b))
+	return c.Unifier.Evaluate(c, v)
+}
+
 func (s *subsumer) getError() (err errors.Error) {
 	c := s.ctx
 	// src := binSrc(token.NoPos, opUnify, gt, lt)
@@ -110,7 +117,7 @@ func (s *subsumer) getError() (err errors.Error) {
 		// src := binSrc(token.NoPos, opUnify, s.gt, s.lt)
 		if s.missing != 0 {
 			s.errf("missing field %q", s.missing.SelectorString(c))
-		} else if b, ok := adt.BinOp(c, adt.AndOp, s.gt, s.lt).(*adt.Bottom); !ok {
+		} else if b, ok := unifyValue(c, s.gt, s.lt).(*adt.Bottom); !ok {
 			s.errf("value not an instance")
 		} else {
 			s.errs = errors.Append(s.errs, b.Err)

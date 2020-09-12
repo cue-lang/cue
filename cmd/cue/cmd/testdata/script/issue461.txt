@@ -1,0 +1,26 @@
+cue cmd writefile
+
+-- cue.mod/module.cue --
+module: "mod.com"
+-- expect-hello --
+Hello, world!
+-- x_tool.cue --
+package x
+
+import (
+	"strings"
+	"tool/exec"
+	"tool/file"
+)
+
+command: writefile: {
+	echo: exec.Run & {
+		cmd:    "echo hello.txt"
+		stdout: string
+	}
+
+	write: file.Create & {
+		filename:  strings.TrimSpace(echo.stdout)
+		contents: "Hello, world!"
+	}
+}

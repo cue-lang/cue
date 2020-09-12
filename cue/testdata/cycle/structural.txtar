@@ -84,7 +84,7 @@ d2: {
 }
 
 d3: {
-    // TODO(errors): position reporting in structural cycle.
+    // TODO(errors): correct position reporting in structural cycle.
     config: {
         a: b: c: indirect
         indirect: [a.b, null][i]
@@ -253,6 +253,8 @@ d2.a.b.c.d.t: structural cycle:
     ./in.cue:79:8
 d2.r: structural cycle:
     ./in.cue:79:8
+0: structural cycle:
+    ./in.cue:89:19
 
 Result:
 (_|_){
@@ -507,12 +509,14 @@ Result:
         b: (_|_){
           // [structural cycle]
           c: (_|_){
-            // [structural cycle]
+            // [structural cycle] 0: structural cycle:
+            //     ./in.cue:89:19
           }
         }
       }
       indirect: (_|_){
-        // [structural cycle]
+        // [structural cycle] 0: structural cycle:
+        //     ./in.cue:89:19
       }
       i: (int){ 1 }
     }
@@ -523,12 +527,14 @@ Result:
         b: (_|_){
           // [structural cycle]
           c: (_|_){
-            // [structural cycle]
+            // [structural cycle] 0: structural cycle:
+            //     ./in.cue:89:19
           }
         }
       }
       indirect: (_|_){
-        // [structural cycle]
+        // [structural cycle] 0: structural cycle:
+        //     ./in.cue:89:19
       }
       i: (int){ 0 }
     }

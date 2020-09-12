@@ -51,11 +51,8 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 		}
 	}
 
-	if a, ok := left.(*Bottom); ok {
-		return CombineErrors(nil, a, right)
-	}
-	if b, ok := left.(*Bottom); ok {
-		return b
+	if err := CombineErrors(c.src, left, right); err != nil {
+		return err
 	}
 
 	switch op {

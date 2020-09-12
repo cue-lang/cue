@@ -171,8 +171,8 @@ func (v *Vertex) AddChildError(recursive *Bottom) {
 
 // CombineErrors combines two errors that originate at the same Vertex.
 func CombineErrors(src ast.Node, x, y Value) *Bottom {
-	a, _ := x.(*Bottom)
-	b, _ := y.(*Bottom)
+	a, _ := Unwrap(x).(*Bottom)
+	b, _ := Unwrap(y).(*Bottom)
 
 	switch {
 	case a != nil && b != nil:

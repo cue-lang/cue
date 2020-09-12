@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+package load
 
 import (
 	"strings"
@@ -25,13 +25,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cli"
 )
-
-func decorateInstances(cmd *Command, tags []string, a []*build.Instance) {
-	if len(tags) == 0 {
-		return
-	}
-	exitOnErr(cmd, injectTags(tags, a), true)
-}
 
 // A tag binds an identifier to a field to allow passing command-line values.
 //
@@ -145,16 +138,7 @@ func findTags(b *build.Instance) (tags []tag, errs errors.Error) {
 	return tags, errs
 }
 
-func injectTags(tags []string, b []*build.Instance) errors.Error {
-	var a []tag
-	for _, p := range b {
-		x, err := findTags(p)
-		if err != nil {
-			return err
-		}
-		a = append(a, x...)
-	}
-
+func injectTags(tags []string, a []tag) errors.Error {
 	// Parses command line args
 	for _, s := range tags {
 		p := strings.Index(s, "=")

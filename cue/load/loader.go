@@ -84,6 +84,14 @@ func Instances(args []string, c *Config) []*build.Instance {
 		a = append(a, l.cueFilesPackage(files))
 	}
 
+	// TODO(api): have API call that returns an error which is the aggregate
+	// of all build errors. Certain errors, like these, hold across builds.
+	if err := injectTags(c.Tags, l.tags); err != nil {
+		for _, p := range a {
+			p.ReportError(err)
+		}
+	}
+
 	return a
 }
 
@@ -102,8 +110,9 @@ const (
 )
 
 type loader struct {
-	cfg *Config
-	stk importStack
+	cfg  *Config
+	stk  importStack
+	tags []tag // tags found in files
 }
 
 func (l *loader) abs(filename string) string {
@@ -195,6 +204,11 @@ func (l *loader) addFiles(dir string, p *build.Instance) {
 		}
 		d.Close()
 	}
+	tags, err := findTags(p)
+	if err != nil {
+		p.ReportError(err)
+	}
+	l.tags = append(l.tags, tags...)
 }
 
 func cleanImport(path string) string {

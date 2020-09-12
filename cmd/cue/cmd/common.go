@@ -376,11 +376,12 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		return nil, err
 	}
 
+	cfg.loadCfg.Tags = flagInject.StringArray(cmd)
+
 	builds := loadFromArgs(cmd, args, cfg.loadCfg)
 	if builds == nil {
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
-	decorateInstances(cmd, flagInject.StringArray(cmd), builds)
 
 	for _, b := range builds {
 		if b.Err != nil {
@@ -571,7 +572,12 @@ func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance,
 }
 
 func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
-	binst := loadFromArgs(cmd, args, &load.Config{Tools: true})
+
+	cfg := &load.Config{
+		Tags:  tags,
+		Tools: true,
+	}
+	binst := loadFromArgs(cmd, args, cfg)
 	if len(binst) == 0 {
 		return nil, nil
 	}
@@ -593,7 +599,6 @@ func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 		}
 		inst.Files = inst.Files[:k]
 	}
-	decorateInstances(cmd, tags, append(binst, ti))
 
 	insts, err := buildToolInstances(cmd, binst)
 	if err != nil {

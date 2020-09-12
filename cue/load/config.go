@@ -150,11 +150,62 @@ type Config struct {
 	// If Dir is empty, the tool is run in the current directory.
 	Dir string
 
-	// The build and release tags specify build constraints that should be
-	// considered satisfied when processing +build lines. Clients creating a new
-	// context may customize BuildTags, which defaults to empty, but it is
-	// usually an error to customize ReleaseTags, which defaults to the list of
-	// CUE releases the current release is compatible with.
+	// Tags defines boolean tags or key-value pairs to select files to build
+	// or be injected as values in fields.
+	//
+	// Each string is of the form
+	//
+	//     key [ "=" value ]
+	//
+	// where key is a valid CUE identifier and value valid CUE scalar.
+	//
+	// The Tags values are used to both select which files get included in a
+	// build and to inject values into the AST.
+	//
+	//
+	// Value injection
+	//
+	// The Tags values are also used to inject values into fields with a
+	// @tag attribute.
+	//
+	// For any field of the form
+	//
+	//    field: x @tag(key)
+	//
+	// and Tags value for which the name matches key, the field will be
+	// modified to
+	//
+	//   field: x & "value"
+	//
+	// By default, the injected value is treated as a string. Alternatively, a
+	// "type" option of the @tag attribute allows a value to be interpreted as
+	// an int, number, or bool. For instance, for a field
+	//
+	//    field: x @tag(key,type=int)
+	//
+	// an entry "key=2" modifies the field to
+	//
+	//    field: x & 2
+	//
+	// Valid values for type are "int", "number", "bool", and "string".
+	//
+	// A @tag attribute can also define shorthand values, which can be injected
+	// into the fields without having to specify the key. For instance, for
+	//
+	//    environment: string @tag(env,short=prod|staging)
+	//
+	// the Tags entry "prod" sets the environment field to the value "prod".
+	// This is equivalent to a Tags entry of "env=prod".
+	//
+	// The use of @tag does not preclude using any of the usual CUE constraints
+	// to limit the possible values of a field. For instance
+	//
+	//    environment: "prod" | "staging" @tag(env,short=prod|staging)
+	//
+	// ensures the user may only specify "prod" or "staging".
+	Tags []string
+
+	// Deprecated: use Tags
 	BuildTags   []string
 	releaseTags []string
 

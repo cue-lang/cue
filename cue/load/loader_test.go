@@ -238,7 +238,9 @@ path:   example.org/test/toolonly:foo
 module: example.org/test
 root:   $CWD/testdata
 dir:    $CWD/testdata/toolonly
-display:./toolonly`,
+display:./toolonly
+files:
+	$CWD/testdata/toolonly/foo_tool.cue`,
 	}, {
 		cfg: &Config{
 			Dir: testdataDir,

@@ -52,15 +52,7 @@ func newFmtCmd(c *Command) *cobra.Command {
 					exitOnErr(cmd, inst.Err, false)
 					continue
 				}
-				all := []*build.File{}
-				all = append(all, inst.BuildFiles...)
-				for _, name := range append(inst.ToolCUEFiles, inst.TestCUEFiles...) {
-					all = append(all, &build.File{
-						Filename: name,
-						Encoding: build.CUE,
-					})
-				}
-				for _, file := range all {
+				for _, file := range inst.BuildFiles {
 					files := []*ast.File{}
 					d := encoding.NewDecoder(file, &cfg)
 					defer d.Close()

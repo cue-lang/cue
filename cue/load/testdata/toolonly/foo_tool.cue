@@ -2,7 +2,7 @@ package foo
 
 import "tool/cli"
 
-command foo task: {
+command: foo: task: {
 	foo: cli.Print & {
 		text: "foo"
 	}

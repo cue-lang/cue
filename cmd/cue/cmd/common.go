@@ -579,12 +579,19 @@ func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 
 	ti := binst[0].Context().NewInstance(binst[0].Root, nil)
 	for _, inst := range binst {
-		for _, f := range inst.ToolCUEFiles {
-			if file := inst.Abs(f); !included[file] {
-				_ = ti.AddFile(file, nil)
-				included[file] = true
+		k := 0
+		for _, f := range inst.Files {
+			if strings.HasSuffix(f.Filename, "_tool.cue") {
+				if !included[f.Filename] {
+					_ = ti.AddSyntax(f)
+					included[f.Filename] = true
+				}
+				continue
 			}
+			inst.Files[k] = f
+			k++
 		}
+		inst.Files = inst.Files[:k]
 	}
 	decorateInstances(cmd, tags, append(binst, ti))
 

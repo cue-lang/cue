@@ -81,17 +81,6 @@ func runFixAll(cmd *Command, args []string) error {
 		Tools: true,
 	})
 
-	for _, i := range instances {
-		a := append(i.ToolCUEFiles, i.TestCUEFiles...)
-		for _, f := range a {
-			file := i.Abs(f)
-			_ = i.AddFile(file, nil)
-		}
-		if i.Err != nil {
-			return i.Err
-		}
-	}
-
 	errs := fix.Instances(instances)
 
 	if errs != nil && flagForce.Bool(cmd) {

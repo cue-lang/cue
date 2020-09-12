@@ -433,10 +433,18 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	switch {
 	case isTest:
 		p.TestCUEFiles = append(p.TestCUEFiles, fullPath)
-		// TODO: what is the BuildFiles equivalent?
+		if fp.c.loader.cfg.Tests {
+			p.BuildFiles = append(p.BuildFiles, file)
+		} else {
+			p.IgnoredFiles = append(p.IgnoredFiles, file)
+		}
 	case isTool:
 		p.ToolCUEFiles = append(p.ToolCUEFiles, fullPath)
-		// TODO: what is the BuildFiles equivalent?
+		if fp.c.loader.cfg.Tools {
+			p.BuildFiles = append(p.BuildFiles, file)
+		} else {
+			p.IgnoredFiles = append(p.IgnoredFiles, file)
+		}
 	default:
 		p.CUEFiles = append(p.CUEFiles, fullPath)
 		p.BuildFiles = append(p.BuildFiles, file)

@@ -131,6 +131,7 @@ func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
 	for _, d := range f.Decls {
 		switch x := d.(type) {
 		case *ast.CommentGroup:
+		case *ast.Attribute:
 		case *ast.Package:
 			if x.Name == nil {
 				break

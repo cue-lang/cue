@@ -1606,6 +1606,11 @@ func (p *parser) parseFile() *ast.File {
 
 	var decls []ast.Decl
 
+	for p.tok == token.ATTRIBUTE {
+		decls = append(decls, p.parseAttribute())
+		p.consumeDeclComma()
+	}
+
 	// The package clause is not a declaration: it does not appear in any
 	// scope.
 	if p.tok == token.IDENT && p.lit == "package" {
@@ -1626,6 +1631,11 @@ func (p *parser) parseFile() *ast.File {
 		decls = append(decls, pkg)
 		p.expectComma()
 		c.closeNode(p, pkg)
+	}
+
+	for p.tok == token.ATTRIBUTE {
+		decls = append(decls, p.parseAttribute())
+		p.consumeDeclComma()
 	}
 
 	if p.mode&packageClauseOnlyMode == 0 {

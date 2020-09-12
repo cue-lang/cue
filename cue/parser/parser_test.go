@@ -410,6 +410,20 @@ func TestParse(t *testing.T) {
 		`,
 		`<[l5// d] a: 1 @a() @b()>`,
 	}, {
+		"attribute declarations",
+		`
+		@foo()
+
+		package bar
+
+		@bar()
+
+		import "strings"
+
+		@baz()
+			`,
+		`@foo(), package bar, @bar(), import "strings", @baz()`,
+	}, {
 		"comprehension comments",
 		`
 		if X {

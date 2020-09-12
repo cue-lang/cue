@@ -2647,7 +2647,7 @@ Argument type    Result
 string            string length in bytes
 bytes             length of byte sequence
 list              list length, smallest length for an open list
-struct            number of distinct data fields, including optional
+struct            number of distinct data fields, excluding optional
 ```
 <!-- TODO: consider not supporting len, but instead rely on more
 precisely named builtin functions:

@@ -31,7 +31,7 @@ func ResolveFiles(
 	idx *Index,
 	p *build.Instance,
 	isBuiltin func(s string) bool,
-) errors.Error {
+) (errs errors.Error) {
 	// Link top-level declarations. As top-level entries get unified, an entry
 	// may be linked to any top-level entry of any of the files.
 	allFields := map[string]ast.Node{}
@@ -45,11 +45,10 @@ func ResolveFiles(
 		}
 	}
 	for _, f := range p.Files {
-		if err := ResolveFile(idx, f, p, allFields, isBuiltin); err != nil {
-			return err
-		}
+		err := ResolveFile(idx, f, p, allFields, isBuiltin)
+		errs = errors.Append(errs, err)
 	}
-	return nil
+	return errs
 }
 
 func ResolveFile(

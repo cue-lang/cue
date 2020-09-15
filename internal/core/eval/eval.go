@@ -1135,17 +1135,20 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 	ctx := n.ctx
 
 	if x, ok := v.(*adt.Vertex); ok {
-		if m, ok := x.Value.(*adt.StructMarker); ok && m.NeedClose {
-			ci := closedInfo(n.node)
-			ci.isClosed = true // TODO: remove
-			id = ci.InsertDefinition(id, x)
-			ci.Canopy[id].IsClosed = true
-			ci.Canopy[id].IsDef = false
+		if m, ok := x.Value.(*adt.StructMarker); ok {
+			n.aStruct = x
+			if m.NeedClose {
+				ci := closedInfo(n.node)
+				ci.isClosed = true // TODO: remove
+				id = ci.InsertDefinition(id, x)
+				ci.Canopy[id].IsClosed = true
+				ci.Canopy[id].IsDef = false
+			}
 		}
 
-		if !x.IsData() && len(x.Conjuncts) > 0 {
-			cyclic := env != nil && env.Cyclic
+		cyclic := env != nil && env.Cyclic
 
+		if !x.IsData() && len(x.Conjuncts) > 0 {
 			if isComplexStruct(x) {
 				closedInfo(n.node).InsertSubtree(id, n, x, cyclic)
 				return
@@ -1167,13 +1170,9 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 		case *adt.StructMarker:
 			for _, a := range x.Arcs {
-				if a.Label.IsString() {
-					n.aStruct = x
-				}
-				// TODO, insert here as
-				n.insertField(a.Label, adt.MakeConjunct(nil, a, id))
-				// sub, _ := n.node.GetArc(a.Label)
-				// sub.Add(a)
+				c := adt.MakeConjunct(nil, a, id)
+				c = updateCyclic(c, cyclic, nil)
+				n.insertField(a.Label, c)
 			}
 
 		default:

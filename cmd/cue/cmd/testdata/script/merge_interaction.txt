@@ -1,0 +1,30 @@
+cue cmd dump
+
+cmp stdout expect-stdout
+
+-- combine.cue --
+package kube
+
+map: [string]: spec: {}
+map: bartender: {}
+
+-- combine_tool.cue --
+package kube
+
+import (
+	"encoding/yaml"
+	"tool/cli"
+)
+
+objects: [ for x in map {x}]
+
+command: dump: {
+	cli.Print & {
+		text: yaml.MarshalStream(objects)
+	}
+}
+-- cue.mod --
+
+-- expect-stdout --
+spec: {}
+

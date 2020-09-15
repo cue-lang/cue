@@ -9,7 +9,7 @@ cmp stderr expect-stderr3
 -- expect-stderr1 --
 cyclic dependency in tasks
 -- expect-stderr2 --
-command.aftercycle: structural cycle
+command.aftercycle.t1.$after.$after: structural cycle
 -- expect-stderr3 --
 -- interlocked-stdout --
 v

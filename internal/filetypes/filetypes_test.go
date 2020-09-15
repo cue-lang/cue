@@ -19,6 +19,7 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"github.com/google/go-cmp/cmp"
 	"github.com/google/go-cmp/cmp/cmpopts"
 )
@@ -26,7 +27,7 @@ import (
 func check(t *testing.T, want, x interface{}, err error) {
 	t.Helper()
 	if err != nil {
-		x = err.Error()
+		x = errors.String(err.(errors.Error))
 	}
 	if !cmp.Equal(x, want, cmpopts.EquateEmpty()) {
 		t.Error(cmp.Diff(want, x))

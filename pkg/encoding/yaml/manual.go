@@ -31,6 +31,8 @@ func Marshal(v cue.Value) (string, error) {
 		if err := v.Validate(); err != nil {
 			return "", err
 		}
+		// TODO: allow adt.Bottom to implement errors.Error so that code and
+		// messages can be passed.
 		return "", internal.ErrIncomplete
 	}
 	n := v.Syntax(cue.Final(), cue.Concrete(true))
@@ -55,6 +57,8 @@ func MarshalStream(v cue.Value) (string, error) {
 			if err := v.Validate(); err != nil {
 				return "", err
 			}
+			// TODO: allow adt.Bottom to implement errors.Error so that code and
+			// messages can be passed.
 			return "", internal.ErrIncomplete
 		}
 		n := v.Syntax(cue.Final(), cue.Concrete(true))

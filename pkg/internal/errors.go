@@ -39,11 +39,14 @@ func (e *callError) Error() string {
 
 func (c *CallCtxt) errf(src adt.Node, underlying error, format string, args ...interface{}) {
 	var errs errors.Error
+	var code adt.ErrorCode
 	if err, ok := underlying.(bottomer); ok {
-		errs = err.Bottom().Err
+		b := err.Bottom()
+		errs = b.Err
+		code = b.Code
 	}
 	errs = errors.Wrapf(errs, c.ctx.Pos(), format, args...)
-	c.Err = &callError{&adt.Bottom{Err: errs}}
+	c.Err = &callError{&adt.Bottom{Code: code, Err: errs}}
 }
 
 func (c *CallCtxt) errcf(src adt.Node, code adt.ErrorCode, format string, args ...interface{}) {
@@ -59,11 +62,13 @@ func wrapCallErr(c *CallCtxt, b *adt.Bottom) *adt.Bottom {
 			pos = src.Pos()
 		}
 	}
-	const msg = "error in call to %s"
-	return &adt.Bottom{
-		Code: b.Code,
-		Err:  errors.Wrapf(b.Err, pos, msg, c.builtin.name(c.ctx)),
+	var err errors.Error
+	for _, e := range errors.Errors(b.Err) {
+		const msg = "error in call to %s"
+		err = errors.Append(err,
+			errors.Wrapf(e, pos, msg, c.builtin.name(c.ctx)))
 	}
+	return &adt.Bottom{Code: b.Code, Err: err}
 }
 
 func (c *CallCtxt) convertError(x interface{}, name string) *adt.Bottom {

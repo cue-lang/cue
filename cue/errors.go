@@ -20,16 +20,16 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-func (v Value) appendErr(err errors.Error, b *bottom) errors.Error {
-	return &valueError{
-		v: v,
-		err: &adt.Bottom{
-			Err: errors.Append(err, b.Err),
-		},
-	}
-}
-
 func (v Value) toErr(b *bottom) (err errors.Error) {
+	errs := errors.Errors(b.Err)
+	if len(errs) > 1 {
+		for _, e := range errs {
+			bb := *b
+			bb.Err = e
+			err = errors.Append(err, &valueError{v: v, err: &bb})
+		}
+		return err
+	}
 	return &valueError{v: v, err: b}
 }
 
@@ -48,6 +48,9 @@ func (e *valueError) Error() string {
 }
 
 func (e *valueError) Position() token.Pos {
+	if e.err.Err != nil {
+		return e.err.Err.Position()
+	}
 	src := e.err.Source()
 	if src == nil {
 		return token.NoPos
@@ -70,6 +73,12 @@ func (e *valueError) Msg() (string, []interface{}) {
 }
 
 func (e *valueError) Path() (a []string) {
+	if e.err.Err != nil {
+		a = e.err.Err.Path()
+		if a != nil {
+			return a
+		}
+	}
 	return e.v.appendPath(nil)
 }
 

@@ -151,19 +151,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 }
 
 func toExpr(f *ast.File) (expr ast.Expr, pkg *ast.Package) {
-	var p int
-outer:
-	for i, d := range f.Decls {
-		switch x := d.(type) {
-		case *ast.Package:
-			pkg = x
-		case *ast.ImportDecl:
-			p = i + 1
-		case *ast.CommentGroup:
-		default:
-			break outer
-		}
-	}
+	p := len(f.Preamble())
 	return &ast.StructLit{Elts: f.Decls[p:]}, pkg
 }
 

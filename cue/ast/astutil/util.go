@@ -109,17 +109,23 @@ func insertImport(decls *[]ast.Decl, spec *ast.ImportSpec) *ast.ImportSpec {
 
 	var imports *ast.ImportDecl
 	var orig *ast.ImportSpec
-	i := 0
+
+	p := 0
 outer:
-	for ; i < len(a); i++ {
+	for i := 0; i < len(a); i++ {
 		d := a[i]
 		switch t := d.(type) {
 		default:
 			break outer
 
 		case *ast.Package:
+			p = i + 1
 		case *ast.CommentGroup:
+			p = i + 1
+		case *ast.Attribute:
+			continue
 		case *ast.ImportDecl:
+			p = i + 1
 			imports = t
 			for _, s := range t.Specs {
 				y, _ := ParseImportSpec(s)
@@ -137,8 +143,8 @@ outer:
 	// Import not found, add one.
 	if imports == nil {
 		imports = &ast.ImportDecl{}
-		preamble := append(a[:i:i], imports)
-		a = append(preamble, a[i:]...)
+		preamble := append(a[:p:p], imports)
+		a = append(preamble, a[p:]...)
 		*decls = a
 	}
 

@@ -112,21 +112,6 @@ func ListEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
 	return elts, e
 }
 
-func Imports(f *ast.File) (a []ast.Decl) {
-	for _, d := range f.Decls {
-		switch x := d.(type) {
-		case *ast.CommentGroup:
-		case *ast.Package:
-		case *ast.Attribute:
-		case *ast.ImportDecl:
-			a = append(a, x)
-		default:
-			return a
-		}
-	}
-	return a
-}
-
 func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
 	for _, d := range f.Decls {
 		switch x := d.(type) {
@@ -225,6 +210,7 @@ func FileComment(f *ast.File) *ast.CommentGroup {
 			if cgs = ast.Comments(d); cgs != nil {
 				break
 			}
+			// TODO: what to do here?
 			if _, ok := d.(*ast.Attribute); !ok {
 				break
 			}

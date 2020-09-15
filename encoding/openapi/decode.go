@@ -65,17 +65,16 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 		add(cg)
 	}
 
-	i := 0
-	for ; i < len(js.Decls); i++ {
-		switch x := js.Decls[i].(type) {
+	preamble := js.Preamble()
+	body := js.Decls[len(preamble):]
+	for _, d := range preamble {
+		switch x := d.(type) {
 		case *ast.Package:
 			return nil, errors.Newf(x.Pos(), "unexpected package %q", x.Name.Name)
 
-		case *ast.ImportDecl, *ast.CommentGroup:
+		default:
 			add(x)
-			continue
 		}
-		break
 	}
 
 	// TODO: allow attributes before imports? Would be easier.
@@ -112,9 +111,9 @@ func Extract(data *cue.Instance, c *Config) (*ast.File, error) {
 		}
 	}
 
-	if i < len(js.Decls) {
-		ast.SetRelPos(js.Decls[i], token.NewSection)
-		f.Decls = append(f.Decls, js.Decls[i:]...)
+	if len(body) > 0 {
+		ast.SetRelPos(body[0], token.NewSection)
+		f.Decls = append(f.Decls, body...)
 	}
 
 	return f, nil

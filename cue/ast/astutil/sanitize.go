@@ -169,23 +169,16 @@ func (z *sanitizer) markUsed(s *scope, n *ast.Ident) bool {
 }
 
 func (z *sanitizer) cleanImports() {
-	for _, d := range z.file.Decls {
-		switch id := d.(type) {
-		case *ast.Package, *ast.CommentGroup:
-		case *ast.ImportDecl:
-			k := 0
-			for _, s := range id.Specs {
-				if _, ok := z.referenced[s]; ok {
-					id.Specs[k] = s
-					k++
-				}
+	z.file.VisitImports(func(d *ast.ImportDecl) {
+		k := 0
+		for _, s := range d.Specs {
+			if _, ok := z.referenced[s]; ok {
+				d.Specs[k] = s
+				k++
 			}
-			id.Specs = id.Specs[:k]
-
-		default:
-			return
 		}
-	}
+		d.Specs = d.Specs[:k]
+	})
 }
 
 func (z *sanitizer) handleIdent(s *scope, n *ast.Ident) bool {

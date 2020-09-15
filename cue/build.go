@@ -306,18 +306,11 @@ func (v *visitor) addErr(e errors.Error) {
 }
 
 func (v *visitor) file(file *ast.File) {
-	for _, d := range file.Decls {
-		switch x := d.(type) {
-		case *ast.Package:
-		case *ast.ImportDecl:
-			for _, s := range x.Specs {
-				v.spec(s)
-			}
-		case *ast.CommentGroup:
-		default:
-			return
+	file.VisitImports(func(x *ast.ImportDecl) {
+		for _, s := range x.Specs {
+			v.spec(s)
 		}
-	}
+	})
 }
 
 func (v *visitor) spec(spec *ast.ImportSpec) {

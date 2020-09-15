@@ -967,6 +967,40 @@ type File struct {
 	comments
 }
 
+// Preamble returns the declarations of the preamble.
+func (f *File) Preamble() []Decl {
+	p := 0
+outer:
+	for i, d := range f.Decls {
+		switch d.(type) {
+		default:
+			break outer
+
+		case *Package:
+			p = i + 1
+		case *CommentGroup:
+		case *Attribute:
+		case *ImportDecl:
+			p = i + 1
+		}
+	}
+	return f.Decls[:p]
+}
+
+func (f *File) VisitImports(fn func(d *ImportDecl)) {
+	for _, d := range f.Decls {
+		switch x := d.(type) {
+		case *CommentGroup:
+		case *Package:
+		case *Attribute:
+		case *ImportDecl:
+			fn(x)
+		default:
+			return
+		}
+	}
+}
+
 // PackageName returns the package name associated with this file or "" if no
 // package is associated.
 func (f *File) PackageName() string {
@@ -974,7 +1008,7 @@ func (f *File) PackageName() string {
 		switch x := d.(type) {
 		case *Package:
 			return x.Name.Name
-		case *CommentGroup:
+		case *CommentGroup, *Attribute:
 		default:
 			return ""
 		}

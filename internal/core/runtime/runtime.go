@@ -69,18 +69,11 @@ func (x *Runtime) Build(b *build.Instance) (v *adt.Vertex, errs errors.Error) {
 
 	// Build transitive dependencies.
 	for _, file := range b.Files {
-		for _, d := range file.Decls {
-			switch g := d.(type) {
-			case *ast.Package:
-			case *ast.ImportDecl:
-				for _, s := range g.Specs {
-					errs = errors.Append(errs, x.buildSpec(b, s))
-				}
-			case *ast.CommentGroup:
-			default:
-				break
+		file.VisitImports(func(d *ast.ImportDecl) {
+			for _, s := range d.Specs {
+				errs = errors.Append(errs, x.buildSpec(b, s))
 			}
-		}
+		})
 	}
 
 	if errs != nil {

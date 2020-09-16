@@ -273,8 +273,13 @@ func (x *StructMarker) node()            {}
 // Top represents all possible values. It can be used as a Value and Expr.
 type Top struct{ Src *ast.Ident }
 
-func (x *Top) Source() ast.Node { return x.Src }
-func (x *Top) Kind() Kind       { return TopKind }
+func (x *Top) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+func (x *Top) Kind() Kind { return TopKind }
 
 // BasicType represents all values of a certain Kind. It can be used as a Value
 // and Expr.
@@ -1246,6 +1251,9 @@ type ValueClause struct {
 }
 
 func (x *ValueClause) Source() ast.Node {
+	if x.StructLit == nil {
+		return nil
+	}
 	if x.Src == nil {
 		return nil
 	}

@@ -27,6 +27,7 @@ import (
 
 	"golang.org/x/xerrors"
 
+	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
@@ -84,11 +85,35 @@ func Instances(args []string, c *Config) []*build.Instance {
 		a = append(a, l.cueFilesPackage(files))
 	}
 
+	for _, p := range a {
+		tags, err := findTags(p)
+		if err != nil {
+			p.ReportError(err)
+		}
+		l.tags = append(l.tags, tags...)
+	}
+
 	// TODO(api): have API call that returns an error which is the aggregate
 	// of all build errors. Certain errors, like these, hold across builds.
 	if err := injectTags(c.Tags, l); err != nil {
 		for _, p := range a {
 			p.ReportError(err)
+		}
+	}
+
+	if l.replacements == nil {
+		return a
+	}
+
+	for _, p := range a {
+		for _, f := range p.Files {
+			ast.Walk(f, nil, func(n ast.Node) {
+				if ident, ok := n.(*ast.Ident); ok {
+					if v, ok := l.replacements[ident.Node]; ok {
+						ident.Node = v
+					}
+				}
+			})
 		}
 	}
 
@@ -110,10 +135,11 @@ const (
 )
 
 type loader struct {
-	cfg       *Config
-	stk       importStack
-	tags      []tag // tags found in files
-	buildTags map[string]bool
+	cfg          *Config
+	stk          importStack
+	tags         []tag // tags found in files
+	buildTags    map[string]bool
+	replacements map[ast.Node]ast.Node
 }
 
 func (l *loader) abs(filename string) string {
@@ -205,11 +231,6 @@ func (l *loader) addFiles(dir string, p *build.Instance) {
 		}
 		d.Close()
 	}
-	tags, err := findTags(p)
-	if err != nil {
-		p.ReportError(err)
-	}
-	l.tags = append(l.tags, tags...)
 }
 
 func cleanImport(path string) string {

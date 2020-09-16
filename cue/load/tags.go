@@ -88,12 +88,17 @@ func parseTag(pos token.Pos, body string) (t tag, err errors.Error) {
 	return t, nil
 }
 
-func (t *tag) inject(value string) errors.Error {
+func (t *tag) inject(value string, l *loader) errors.Error {
 	e, err := cli.ParseValue(token.NoPos, t.key, value, t.kind)
 	if err != nil {
 		return err
 	}
-	t.field.Value = ast.NewBinExpr(token.AND, t.field.Value, e)
+	injected := ast.NewBinExpr(token.AND, t.field.Value, e)
+	if l.replacements == nil {
+		l.replacements = map[ast.Node]ast.Node{}
+	}
+	l.replacements[t.field.Value] = injected
+	t.field.Value = injected
 	return nil
 }
 
@@ -161,7 +166,7 @@ func injectTags(tags []string, l *loader) errors.Error {
 			for _, t := range l.tags {
 				if t.key == s[:p] {
 					found = true
-					if err := t.inject(s[p+1:]); err != nil {
+					if err := t.inject(s[p+1:], l); err != nil {
 						return err
 					}
 				}
@@ -174,7 +179,7 @@ func injectTags(tags []string, l *loader) errors.Error {
 				for _, sh := range t.shorthands {
 					if sh == s {
 						found = true
-						if err := t.inject(s); err != nil {
+						if err := t.inject(s, l); err != nil {
 							return err
 						}
 					}

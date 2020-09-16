@@ -1,0 +1,30 @@
+cue cmd -t greeting=hello prefix
+
+-- cue.mod/module.cue --
+module: "mod.com"
+-- my.cue --
+package tools
+
+msg: string @tag(greeting)
+
+-- my_tool.cue --
+package tools
+
+import (
+	"tool/cli"
+)
+
+greeting: string @tag(greeting)
+
+command: prefix: {
+	p1: cli.Print & {
+		text: greeting
+	}
+    salutation: string @tag(greeting)
+	p2: cli.Print & {
+		text: salutation
+	}
+	p3: cli.Print & {
+		text: msg @tag(greeting)
+	}
+}

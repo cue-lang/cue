@@ -22,7 +22,10 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/runtime"
@@ -67,6 +70,75 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 		t.Fatal(err)
 	}
 	return b
+}
+
+// TestGenerated tests conversions of generated Go structs, which may be
+// different from parsed or evaluated CUE, such as having Vertex values.
+func TestGenerated(t *testing.T) {
+	testCases := []struct {
+		in    interface{}
+		value string
+		typ   string
+	}{{
+		in: &C{
+			Terminals: []*A{
+				{Name: "Name", Description: "Desc"},
+			},
+		},
+		value: `{Terminals: [{Description: "Desc", Name: "Name"}]}`,
+		typ:   `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
+	}, {
+		in: []*A{
+			{Name: "Name", Description: "Desc"},
+		},
+		value: `[{Name: "Name", Description: "Desc"}]`,
+		typ:   `*null|[...*null|{Name: string, Description: string}]`,
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			r := runtime.New()
+			e := eval.New(r)
+			ctx := adt.NewContext(r, e, &adt.Vertex{})
+
+			v := convert.GoValueToValue(ctx, tc.in, false)
+
+			expr, err := export.Expr(ctx, v)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got := internal.DebugStr(expr)
+			if got != tc.value {
+				t.Errorf("value: got:  %s\nwant: %s", got, tc.value)
+			}
+
+			x, err := convert.GoTypeToExpr(ctx, tc.in)
+			if err != nil {
+				t.Fatal(err)
+			}
+			expr, err = export.Expr(ctx, x)
+			if err != nil {
+				t.Fatal(err)
+			}
+			got = internal.DebugStr(expr)
+			if got != tc.typ {
+				t.Errorf("type: got:  %s\nwant: %s", got, tc.typ)
+			}
+
+		})
+	}
+}
+
+type A struct {
+	Name        string
+	Description string
+}
+
+type B struct {
+	Image string
+}
+
+type C struct {
+	Terminals []*A
 }
 
 // For debugging purposes. Do not delete.

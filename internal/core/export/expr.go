@@ -263,9 +263,20 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 
 	case adt.Value: // other values.
 		if v, ok := x.(*adt.Vertex); ok {
-			// if !v.IsList() {
-			// 	panic("what to do?") // TO
-			// }
+			if v.IsList() {
+				a := []ast.Expr{}
+				for _, x := range v.Elems() {
+					a = append(a, e.expr(x))
+				}
+				if !v.IsClosed(e.ctx) {
+					v := &adt.Vertex{}
+					v.MatchAndInsert(e.ctx, v)
+					a = append(a, &ast.Ellipsis{Type: e.expr(v)})
+				}
+				e.exprs = append(e.exprs, ast.NewList(a...))
+				return
+			}
+
 			e.structs = append(e.structs, v.Structs...)
 
 			// generated, only consider arcs.

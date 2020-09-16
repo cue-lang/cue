@@ -74,7 +74,7 @@ func (c *cmdAppend) Run(ctx *task.Context) (res interface{}, err error) {
 		return nil, ctx.Err
 	}
 
-	f, err := os.OpenFile(filename, os.O_APPEND|os.O_WRONLY, os.FileMode(mode))
+	f, err := os.OpenFile(filename, os.O_CREATE|os.O_APPEND|os.O_WRONLY, os.FileMode(mode))
 	if err != nil {
 		return nil, err
 	}

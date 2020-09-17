@@ -50,12 +50,17 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		result = e.listComposite(n)
 
 	case *adt.Bottom:
-		if x.IsIncomplete() {
-			// fall back to expression mode
-			result = stripRefs(e.expr(n))
+		if !x.IsIncomplete() || len(n.Conjuncts) == 0 {
+			result = e.bottom(x)
 			break
 		}
-		result = e.bottom(x)
+
+		// fall back to expression mode
+		a := []ast.Expr{}
+		for _, c := range n.Conjuncts {
+			a = append(a, e.expr(c.Expr()))
+		}
+		result = ast.NewBinExpr(token.AND, a...)
 
 	default:
 		result = e.value(n.Value, n.Conjuncts...)

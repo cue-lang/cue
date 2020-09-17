@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
@@ -76,23 +77,62 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // different from parsed or evaluated CUE, such as having Vertex values.
 func TestGenerated(t *testing.T) {
 	testCases := []struct {
-		in    interface{}
-		value string
-		typ   string
+		in  func(ctx *adt.OpContext) (adt.Expr, error)
+		out string
 	}{{
-		in: &C{
-			Terminals: []*A{
-				{Name: "Name", Description: "Desc"},
-			},
+		in: func(ctx *adt.OpContext) (adt.Expr, error) {
+			in := &C{
+				Terminals: []*A{{Name: "Name", Description: "Desc"}},
+			}
+			return convert.GoValueToValue(ctx, in, false), nil
 		},
-		value: `{Terminals: [{Description: "Desc", Name: "Name"}]}`,
-		typ:   `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
+		out: `{Terminals: [{Description: "Desc", Name: "Name"}]}`,
 	}, {
-		in: []*A{
-			{Name: "Name", Description: "Desc"},
+		in: func(ctx *adt.OpContext) (adt.Expr, error) {
+			in := &C{
+				Terminals: []*A{{Name: "Name", Description: "Desc"}},
+			}
+			return convert.GoTypeToExpr(ctx, in)
 		},
-		value: `[{Name: "Name", Description: "Desc"}]`,
-		typ:   `*null|[...*null|{Name: string, Description: string}]`,
+		out: `*null|{Terminals?: *null|[...*null|{Name: string, Description: string}]}`,
+	}, {
+		in: func(ctx *adt.OpContext) (adt.Expr, error) {
+			in := []*A{{Name: "Name", Description: "Desc"}}
+			return convert.GoValueToValue(ctx, in, false), nil
+		},
+		out: `[{Name: "Name", Description: "Desc"}]`,
+	}, {
+		in: func(ctx *adt.OpContext) (adt.Expr, error) {
+			in := []*A{{Name: "Name", Description: "Desc"}}
+			return convert.GoTypeToExpr(ctx, in)
+		},
+		out: `*null|[...*null|{Name: string, Description: string}]`,
+	}, {
+		in: func(ctx *adt.OpContext) (adt.Expr, error) {
+			expr, err := parser.ParseExpr("test", `{
+				x: Guide.#Terminal
+				Guide: {}
+			}`)
+			if err != nil {
+				return nil, err
+			}
+			c, err := compile.Expr(nil, ctx, expr)
+			if err != nil {
+				return nil, err
+			}
+			root := &adt.Vertex{}
+			root.AddConjunct(c)
+			root.Finalize(ctx)
+
+			// Simulate Value.Unify of Lookup("x") and Lookup("Guide").
+			n := &adt.Vertex{}
+			n.AddConjunct(adt.MakeRootConjunct(nil, root.Arcs[0]))
+			n.AddConjunct(adt.MakeRootConjunct(nil, root.Arcs[1]))
+			n.Finalize(ctx)
+
+			return n, nil
+		},
+		out: `<[l2// x: undefined field #Terminal] _|_>`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -100,30 +140,18 @@ func TestGenerated(t *testing.T) {
 			e := eval.New(r)
 			ctx := adt.NewContext(r, e, &adt.Vertex{})
 
-			v := convert.GoValueToValue(ctx, tc.in, false)
-
+			v, err := tc.in(ctx)
+			if err != nil {
+				t.Fatal("failed test case: ", err)
+			}
 			expr, err := export.Expr(ctx, v)
 			if err != nil {
-				t.Fatal(err)
+				t.Fatal("failed export: ", err)
 			}
 			got := internal.DebugStr(expr)
-			if got != tc.value {
-				t.Errorf("value: got:  %s\nwant: %s", got, tc.value)
+			if got != tc.out {
+				t.Errorf("got:  %s\nwant: %s", got, tc.out)
 			}
-
-			x, err := convert.GoTypeToExpr(ctx, tc.in)
-			if err != nil {
-				t.Fatal(err)
-			}
-			expr, err = export.Expr(ctx, x)
-			if err != nil {
-				t.Fatal(err)
-			}
-			got = internal.DebugStr(expr)
-			if got != tc.typ {
-				t.Errorf("type: got:  %s\nwant: %s", got, tc.typ)
-			}
-
 		})
 	}
 }

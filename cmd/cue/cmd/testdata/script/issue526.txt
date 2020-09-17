@@ -1,0 +1,12 @@
+cue cmd gengithub
+
+-- x.cue --
+package x
+
+test:      #Workflow
+#Workflow: 1 | [_]
+
+-- x_tool.cue --
+package x
+
+command: gengithub: {}

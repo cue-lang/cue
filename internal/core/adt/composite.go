@@ -279,15 +279,48 @@ func (v *Vertex) ToDataAll() *Vertex {
 		arcs[i] = a.ToDataAll()
 	}
 	w := *v
+
+	w.Value = toDataAll(w.Value)
 	w.Arcs = arcs
 	w.isData = true
 	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
 	copy(w.Conjuncts, v.Conjuncts)
-	for i := range w.Conjuncts {
+	for i, c := range w.Conjuncts {
 		w.Conjuncts[i].CloseID = 0
+		if v, _ := c.x.(Value); v != nil {
+			w.Conjuncts[i].x = toDataAll(v)
+		}
 	}
 	w.Closed = nil
 	return &w
+}
+
+func toDataAll(v Value) Value {
+	switch x := v.(type) {
+	default:
+		return x
+
+	case *Vertex:
+		return x.ToDataAll()
+
+	// The following cases are always erroneous, but we handle them anyway
+	// to avoid issues with the closedness algorithm down the line.
+	case *Disjunction:
+		d := *x
+		d.Values = make([]*Vertex, len(x.Values))
+		for i, v := range x.Values {
+			d.Values[i] = v.ToDataAll()
+		}
+		return &d
+
+	case *Conjunction:
+		c := *x
+		c.Values = make([]Value, len(x.Values))
+		for i, v := range x.Values {
+			c.Values[i] = toDataAll(v)
+		}
+		return &c
+	}
 }
 
 // func (v *Vertex) IsEvaluating() bool {
@@ -314,9 +347,6 @@ func (v *Vertex) Err(c *OpContext, state VertexStatus) *Bottom {
 // func (v *Vertex) Evaluate()
 
 func (v *Vertex) Finalize(c *OpContext) {
-	if c == nil {
-		fmt.Println("WOT?")
-	}
 	c.Unify(c, v, Finalized)
 }
 

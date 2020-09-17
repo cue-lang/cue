@@ -274,9 +274,11 @@ func (v *Vertex) ToDataSingle() *Vertex {
 // ToDataAll returns a new v where v and all its descendents contain only
 // the regular fields.
 func (v *Vertex) ToDataAll() *Vertex {
-	arcs := make([]*Vertex, len(v.Arcs))
-	for i, a := range v.Arcs {
-		arcs[i] = a.ToDataAll()
+	arcs := make([]*Vertex, 0, len(v.Arcs))
+	for _, a := range v.Arcs {
+		if a.Label.IsRegular() {
+			arcs = append(arcs, a.ToDataAll())
+		}
 	}
 	w := *v
 

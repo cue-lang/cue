@@ -605,7 +605,12 @@ func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 		return nil, err
 	}
 
-	inst := cue.Merge(insts...).Build(ti)
+	inst := insts[0]
+	if len(insts) > 1 {
+		inst = cue.Merge(insts...)
+	}
+
+	inst = inst.Build(ti)
 	return inst, inst.Err
 }
 

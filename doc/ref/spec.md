@@ -1243,8 +1243,8 @@ declaration is defined for all fields.
 Recursively closing a struct is equivalent to adding `..._|_` to its its root
 and any of its substructures that are not defined for all fields.
 
-Syntactically, structs are recursively closed explicitly with
-the `close` builtin or implicitly by [definitions](#Definitions).
+Syntactically, structs are closed explicitly with the `close` builtin or
+implicitly and recursively by [definitions](#definitions-and-hidden-fields).
 
 
 ```

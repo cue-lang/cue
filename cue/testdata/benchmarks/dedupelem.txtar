@@ -1,0 +1,120 @@
+-- in.cue --
+package lpcorpus
+
+#Value: {type: "int"} | {type: "float"} | {type: "string"}
+
+foo: [{type: "float"}] & [...#Value]
+foo: [{type: "float"}] & [...#Value]
+foo: [{type: "float"}] & [...#Value]
+foo: [{type: "float"}] & [...#Value]
+foo: [{type: "float"}] & [...#Value]
+foo: [{type: "string"}] & [...#Value]
+foo: [{type: "string"}] & [...#Value]
+foo: [{type: "string"}] & [...#Value]
+foo: [{type: "float"}] & [...#Value]
+foo: [{type: "float"}] & [...#Value]
+-- out/eval --
+Errors:
+foo.0.type: incompatible values "string" and "float"
+
+Result:
+(_|_){
+  // [eval]
+  #Value: (struct){ |((#struct){
+      type: (string){ "int" }
+    }, (#struct){
+      type: (string){ "float" }
+    }, (#struct){
+      type: (string){ "string" }
+    }) }
+  foo: (_|_){
+    // [eval]
+    0: (_|_){
+      // [eval]
+      type: (_|_){
+        // [eval] foo.0.type: incompatible values "string" and "float"
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Value: ({
+    type: "int"
+  }|{
+    type: "float"
+  }|{
+    type: "string"
+  })
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "string"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "string"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "string"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+  foo: ([
+    {
+      type: "float"
+    },
+  ] & [
+    ...〈0;#Value〉,
+  ])
+}

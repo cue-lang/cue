@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/encoding/gocode/gocodec"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
@@ -234,4 +235,33 @@ d2: C="foo\(bar)": {
 	}
 
 	t.Error(string(formatNode(t, file)))
+}
+
+func TestFromGo(t *testing.T) {
+	type Struct struct {
+		A string
+		B string
+	}
+
+	m := make(map[string]Struct)
+	m["hello"] = Struct{
+		A: "a",
+		B: "b",
+	}
+	var r cue.Runtime
+	codec := gocodec.New(&r, nil)
+	v, err := codec.Decode(m)
+	if err != nil {
+		panic(err)
+	}
+
+	syn, _ := format.Node(v.Syntax())
+	if got := string(syn); got != `{
+	hello: {
+		A: "a"
+		B: "b"
+	}
+}` {
+		t.Errorf("incorrect ordering: %s\n", got)
+	}
 }

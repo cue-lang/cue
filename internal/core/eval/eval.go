@@ -388,6 +388,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 		// }
 
 		n := &nodeContext{
+			arcMap:     map[arcKey]bool{},
 			kind:       adt.TopKind,
 			nodeShared: shared,
 			needClose:  needClose,
@@ -704,6 +705,11 @@ func (n *nodeShared) isDefault() bool {
 	return n.resultNode.defaultMode == isDefault
 }
 
+type arcKey struct {
+	arc *adt.Vertex
+	id  adt.ID
+}
+
 // A nodeContext is used to collate all conjuncts of a value to facilitate
 // unification. Conceptually order of unification does not matter. However,
 // order has relevance when performing checks of non-monotic properities. Such
@@ -717,6 +723,8 @@ type nodeContext struct {
 	// whether some breath-first search gives sufficient performance, as this
 	// should already ensure a quick-fail for struct disjunctions with
 	// discriminators.
+
+	arcMap map[arcKey]bool
 
 	// Current value (may be under construction)
 	scalar adt.Value // TODO: use Value in node.
@@ -989,6 +997,29 @@ outer:
 			n.exprs = append(n.exprs, v)
 			break
 		}
+
+		// We need to ensure that each arc is only unified once (or at least) a
+		// bounded time, witch each conjunct. Comprehensions, for instance, may
+		// distribute a value across many values that get unified back into the
+		// same value. If such a value is a disjunction, than a disjunction of N
+		// disjuncts will result in a factor N more unifications for each
+		// occurrence of such value, resulting in exponential running time. This
+		// is especially common values that are used as a type.
+		//
+		// However, unification is idempotent, so each such conjunct only needs
+		// to be unified once. This cache checks for this and prevents an
+		// exponential blowup in such case.
+		//
+		// TODO(perf): this cache ensures the conjuncts of an arc at most once
+		// per ID. However, we really need to add the conjuncts of an arc only
+		// once total, and then add the close information once per close ID
+		// (pointer can probably be shared). Aside from being more performant,
+		// this is probably the best way to guarantee that conjunctions are
+		// linear in this case.
+		if n.arcMap[arcKey{arc, v.CloseID}] {
+			return
+		}
+		n.arcMap[arcKey{arc, v.CloseID}] = true
 
 		// Pass detection of structural cycles from parent to children.
 		cyclic := false

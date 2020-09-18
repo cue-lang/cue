@@ -46,7 +46,27 @@ reclose2: {
   z: d: 3 // allow this
 }
 
-
+reclose3: {
+  #Step: (#A | #B) & {
+    #Common
+  }
+  #Common: {
+    Name: string
+  }
+  #A: {
+    #Common
+    Something: int
+  }
+  #B: {
+    #Common
+    Else: int
+  }
+  x: #Step
+  x: #A & {
+    Name:      "a"
+    Something: 4
+  }
+}
 
 -- out/eval --
 Errors:
@@ -116,6 +136,30 @@ Result:
       d: (int){ 3 }
     }
   }
+  reclose3: (struct){
+    #Step: (struct){ |((#struct){
+        Name: (string){ string }
+        Something: (int){ int }
+      }, (#struct){
+        Name: (string){ string }
+        Else: (int){ int }
+      }) }
+    #Common: (#struct){
+      Name: (string){ string }
+    }
+    #A: (#struct){
+      Name: (string){ string }
+      Something: (int){ int }
+    }
+    #B: (#struct){
+      Name: (string){ string }
+      Else: (int){ int }
+    }
+    x: (#struct){
+      Name: (string){ "a" }
+      Something: (int){ 4 }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -169,5 +213,26 @@ Result:
     z: {
       d: 3
     }
+  }
+  reclose3: {
+    #Step: ((〈0;#A〉|〈0;#B〉) & {
+      〈1;#Common〉
+    })
+    #Common: {
+      Name: string
+    }
+    #A: {
+      〈1;#Common〉
+      Something: int
+    }
+    #B: {
+      〈1;#Common〉
+      Else: int
+    }
+    x: 〈0;#Step〉
+    x: (〈0;#A〉 & {
+      Name: "a"
+      Something: 4
+    })
   }
 }

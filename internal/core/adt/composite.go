@@ -532,15 +532,12 @@ func (v *Vertex) Source() ast.Node { return nil }
 // AddConjunct adds the given Conjuncts to v if it doesn't already exist.
 func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 	if v.Value != nil {
+		// TODO: investigate why this happens at all. Removing it seems to
+		// change the order of fields in some cases.
+		//
 		// This is likely a bug in the evaluator and should not happen.
 		return &Bottom{Err: errors.Newf(token.NoPos, "cannot add conjunct")}
 	}
-	for _, x := range v.Conjuncts {
-		if x == c {
-			return nil
-		}
-	}
-
 	v.Conjuncts = append(v.Conjuncts, c)
 	return nil
 }

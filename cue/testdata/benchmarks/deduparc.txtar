@@ -1,0 +1,59 @@
+-- in.cue --
+package bench1
+
+#Value: {type: "float"} | {type: "string"}
+
+foo: {type: "string"}
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+foo: #Value
+-- out/eval --
+(struct){
+  #Value: (struct){ |((#struct){
+      type: (string){ "float" }
+    }, (#struct){
+      type: (string){ "string" }
+    }) }
+  foo: (#struct){
+    type: (string){ "string" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Value: ({
+    type: "float"
+  }|{
+    type: "string"
+  })
+  foo: {
+    type: "string"
+  }
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+  foo: 〈0;#Value〉
+}

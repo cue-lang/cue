@@ -31,7 +31,7 @@ translations:
 ---
 translations:
   hello:
-    lang: no
+    lang: false
     text: Hallo
 ---
 translations:

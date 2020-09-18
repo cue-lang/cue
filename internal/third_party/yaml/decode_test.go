@@ -100,16 +100,22 @@ var unmarshalTests = []struct {
 	// Bools from spec
 	{
 		"canonical: y",
-		"canonical: true",
+		`canonical: "y"`,
+	}, {
+		"answer: n",
+		`answer: "n"`,
 	}, {
 		"answer: NO",
-		"answer: false",
+		`answer: "NO"`,
 	}, {
 		"logical: True",
 		"logical: true",
 	}, {
 		"option: on",
-		"option: true",
+		`option: "on"`,
+	}, {
+		"answer: off",
+		`answer: "off"`,
 	},
 	// Ints from spec
 	{
@@ -243,7 +249,7 @@ apple: "newline"`,
 		"a: [1, 2]",
 	}, {
 		"a: y",
-		"a: true",
+		`a: "y"`,
 	}, {
 		"{ a: 1, b: {c: 1} }",
 		`a: 1, b: {c: 1}`,

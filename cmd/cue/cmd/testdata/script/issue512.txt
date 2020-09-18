@@ -1,0 +1,23 @@
+cue export -o bools.yaml bools.cue
+cue import -o bools2.cue bools.yaml
+cmp bools.cue bools2.cue
+
+-- bools.cue --
+x: [
+	"n",
+	"N",
+	"no",
+	"No",
+	"NO",
+	"y",
+	"Y",
+	"yes",
+	"Yes",
+	"YES",
+	"off",
+	"Off",
+	"OFF",
+	"on",
+	"On",
+	"ON",
+]

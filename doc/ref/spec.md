@@ -1240,8 +1240,7 @@ or the pattern of a pattern constraint defined in `c`.
 Hidden fields are excluded from this limitation.
 A struct that is the result of unifying any struct with a [`...`](#Structs)
 declaration is defined for all fields.
-Recursively closing a struct is equivalent to adding `..._|_` to its its root
-and any of its substructures that are not defined for all fields.
+Closing a struct is equivalent to adding `..._|_` to it.
 
 Syntactically, structs are closed explicitly with the `close` builtin or
 implicitly and recursively by [definitions](#definitions-and-hidden-fields).
@@ -1288,17 +1287,17 @@ D: close({
 
 #### Embedding
 
-A struct may contain an _embedded value_, an operand used
-as a declaration, which must evaluate to a struct.
+A struct may contain an _embedded value_, an operand used as a declaration.
 An embedded value of type struct is unified with the struct in which it is
 embedded, but disregarding the restrictions imposed by closed structs.
-A struct resulting from such a unification is closed if either of the involved
-structs were closed.
+So if an embedding contains a closed struct, the corresponding resulting struct
+will also be closed, but may have fields that are not allowed if
+normal rules for closed structs were observed.
 
-At the top level, an embedded value may be any type.
-In this case, a CUE program will evaluate to the embedded value
-and the CUE program may not have top-level regular or optional
-fields (definitions and aliases are allowed).
+If an embedded value is not of type struct, the struct may only have
+definitions or hidden fields. Regular fields are not allowed in such case.
+
+The result of `{ A }` is `A` for any `A` (including definitions).
 
 Syntactically, embeddings may be any expression.
 
@@ -1339,10 +1338,11 @@ A field is _hidden_ if its starts with a `_`.
 Definitions and hidden fields are not emitted when converting a CUE program
 to data and are never required to be concrete.
 
-Referencing a definition will implicitely [close](#ClosedStructs) it.
-A struct that embeds a referenced definition will itself be closed
-after first allowing any other fields or embedded structs to unify.
-The result of `{ #A }` is `#A` for any `#A`.
+Referencing a definition will recursively [close](#ClosedStructs) it.
+That is, a referenced definition will not unify with a struct
+that would add a field anywhere within the definition that it does not
+already define or explicitly allow with a pattern constraint or `...`.
+[Embeddings](#Embedding) allow bypassing this check.
 
 If referencing a definition would always result in an error, implementations
 may report this inconsistency at the point of its declaration.
@@ -1372,6 +1372,30 @@ myValue: #MyStruct & {
 
 D1: #D & { a: 12, c: 22 }  // { a: 12, c: 22 }
 D2: #D & { a: 12, b: 33 }  // _|_ // cannot define both `a` and `b`
+```
+
+
+```
+#A: {a: int}
+
+B: {
+    #A
+    b: c: int
+}
+
+x: B
+x: d: 3  // not allowed, as closed by embedded #A
+
+y: B.b
+y: d: 3  // allowed as nothing closes b
+
+#B: {
+    #A
+    b: c: int
+}
+
+z: #B.b
+z: d: 3  // not allowed, as referencing #B closes b
 ```
 
 

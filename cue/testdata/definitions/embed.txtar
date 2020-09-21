@@ -12,8 +12,52 @@ deployment: foo: spec: replicas: 1
 #Spec: replicas: int
 
 #TypeMeta: {}
+
+// Reclosing
+reclose1: {
+  #D: {
+    x: int
+    y: int
+  }
+  #a: {
+    #D
+    b: {
+      c: int
+    }
+  }
+
+  z: #a.b
+  z: d: 3 // don't allow this
+}
+
+reclose2: {
+  #D: {
+    x: int
+    y: int
+  }
+  a: {
+    #D
+    b: { // keep open
+      c: int
+    }
+  }
+
+  z: a.b
+  z: d: 3 // allow this
+}
+
+
+
 -- out/eval --
-(struct){
+Errors:
+reclose1.z: field `d` not allowed:
+    ./in.cue:23:8
+    ./in.cue:28:6
+    ./in.cue:29:6
+
+Result:
+(_|_){
+  // [eval]
   deployment: (struct){
     foo: (#struct){
       spec: (#struct){
@@ -30,6 +74,47 @@ deployment: foo: spec: replicas: 1
     replicas: (int){ int }
   }
   #TypeMeta: (#struct){
+  }
+  reclose1: (_|_){
+    // [eval]
+    #D: (#struct){
+      x: (int){ int }
+      y: (int){ int }
+    }
+    #a: (#struct){
+      x: (int){ int }
+      y: (int){ int }
+      b: (#struct){
+        c: (int){ int }
+      }
+    }
+    z: (_|_){
+      // [eval]
+      c: (int){ int }
+      d: (_|_){
+        // [eval] reclose1.z: field `d` not allowed:
+        //     ./in.cue:23:8
+        //     ./in.cue:28:6
+        //     ./in.cue:29:6
+      }
+    }
+  }
+  reclose2: (struct){
+    #D: (#struct){
+      x: (int){ int }
+      y: (int){ int }
+    }
+    a: (#struct){
+      x: (int){ int }
+      y: (int){ int }
+      b: (#struct){
+        c: (int){ int }
+      }
+    }
+    z: (struct){
+      c: (int){ int }
+      d: (int){ 3 }
+    }
   }
 }
 -- out/compile --
@@ -53,4 +138,36 @@ deployment: foo: spec: replicas: 1
     replicas: int
   }
   #TypeMeta: {}
+  reclose1: {
+    #D: {
+      x: int
+      y: int
+    }
+    #a: {
+      〈1;#D〉
+      b: {
+        c: int
+      }
+    }
+    z: 〈0;#a〉.b
+    z: {
+      d: 3
+    }
+  }
+  reclose2: {
+    #D: {
+      x: int
+      y: int
+    }
+    a: {
+      〈1;#D〉
+      b: {
+        c: int
+      }
+    }
+    z: 〈0;a〉.b
+    z: {
+      d: 3
+    }
+  }
 }

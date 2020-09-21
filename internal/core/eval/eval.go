@@ -1048,7 +1048,7 @@ outer:
 			defer func() { arc.SelfCount-- }()
 		}
 
-		if arc.Label.IsDef() { // should test whether closed, not isDef?
+		if isDef(v.Expr()) { // should test whether closed, not isDef?
 			c := closedInfo(n.node)
 			closeID = c.InsertDefinition(v.CloseID, x)
 			n.needClose = true // TODO: is this still necessary?
@@ -1094,6 +1094,28 @@ outer:
 	default:
 		panic(fmt.Sprintf("unknown expression of type %T", x))
 	}
+}
+
+// isDef reports whether an expressions is a reference that references a
+// definition anywhere in its selection path.
+//
+// TODO(performance): this should be merged with resolve(). But for now keeping
+// this code isolated makes it easier to see what it is for.
+func isDef(x adt.Expr) bool {
+	switch r := x.(type) {
+	case *adt.FieldReference:
+		return r.Label.IsDef()
+
+	case *adt.SelectorExpr:
+		if r.Sel.IsDef() {
+			return true
+		}
+		return isDef(r.X)
+
+	case *adt.IndexExpr:
+		return isDef(r.X)
+	}
+	return false
 }
 
 // updateCyclicStatus looks for proof of non-cyclic conjuncts to override

@@ -1,0 +1,45 @@
+-- in.cue --
+#Schema: {
+	...
+}
+
+Component: {
+	hostname: string | *"localhost"
+
+	#foo: {
+		hello: "world"
+	}
+}
+
+hello: #Schema & Component
+-- out/eval --
+(struct){
+  #Schema: (#struct){
+  }
+  Component: (struct){
+    hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
+    #foo: (#struct){
+      hello: (string){ "world" }
+    }
+  }
+  hello: (#struct){
+    hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
+    #foo: (#struct){
+      hello: (string){ "world" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #Schema: {
+    ...
+  }
+  Component: {
+    hostname: (string|*"localhost")
+    #foo: {
+      hello: "world"
+    }
+  }
+  hello: (〈0;#Schema〉 & 〈0;Component〉)
+}

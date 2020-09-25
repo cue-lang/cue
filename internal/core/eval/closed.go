@@ -483,8 +483,8 @@ func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (fou
 	if o == nil {
 		return false, false
 	}
-	for ; o != nil; o = o.next {
-		if len(o.additional) > 0 || o.isOpen {
+	for isRegular := f.IsRegular(); o != nil; o = o.next {
+		if isRegular && (len(o.additional) > 0 || o.isOpen) {
 			return true, false
 		}
 
@@ -492,6 +492,10 @@ func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (fou
 			if f == g.label {
 				return true, false
 			}
+		}
+
+		if !isRegular {
+			continue
 		}
 
 		for _, b := range o.bulk {

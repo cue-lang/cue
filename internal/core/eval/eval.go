@@ -1294,11 +1294,36 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 			n.lowerBound = x
 
 		case adt.EqualOp, adt.NotEqualOp, adt.MatchOp, adt.NotMatchOp:
-			n.checks = append(n.checks, x)
+			// This check serves as simplifier, but also to remove duplicates.
+			k := 0
+			match := false
+			for _, c := range n.checks {
+				if y, ok := c.(*adt.BoundValue); ok {
+					switch z := adt.SimplifyBounds(ctx, n.kind, x, y); {
+					case z == y:
+						match = true
+					case z == x:
+						continue
+					}
+				}
+				n.checks[k] = c
+				k++
+			}
+			n.checks = n.checks[:k]
+			if !match {
+				n.checks = append(n.checks, x)
+			}
 			return
 		}
 
 	case adt.Validator:
+		// This check serves as simplifier, but also to remove duplicates.
+		for i, y := range n.checks {
+			if b := adt.SimplifyValidator(ctx, x, y); b != nil {
+				n.checks[i] = b
+				return
+			}
+		}
 		n.checks = append(n.checks, x)
 
 	case *adt.Vertex:

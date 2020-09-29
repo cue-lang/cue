@@ -18,7 +18,9 @@ b4: !~"[a-z]{4}"
 b4: "foo"
 
 s1: !="b" & =~"c"     // =~"c"
-s2: !="b" & =~"[a-z]" // != "b" & =~"[a-z]"
+s2: =~"c" & !="b"     // =~"c"
+s3: !="b" & =~"[a-z]" // != "b" & =~"[a-z]"
+s4: =~"[a-z]" & !="b" // != "b" & =~"[a-z]"
 
 e1: "foo" =~ 1
 e2: "foo" !~ true
@@ -55,7 +57,9 @@ e3: _|_ // conflicting values !="a" and <5 (mismatched types string and number)
   b4: !~"[a-z]{4}"
   b4: "foo"
   s1: (!="b" & =~"c")
-  s2: (!="b" & =~"[a-z]")
+  s2: (=~"c" & !="b")
+  s3: (!="b" & =~"[a-z]")
+  s4: (=~"[a-z]" & !="b")
   e1: ("foo" =~ 1)
   e2: ("foo" !~ true)
   e3: (!="a" & <5)
@@ -66,9 +70,9 @@ e3: conflicting values !="a" and <5 (mismatched types string and number)
 b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
     ./in.cue:10:5
 e1: cannot use 1 (type int) as type (string|bytes):
-    ./in.cue:18:5
+    ./in.cue:20:5
 e2: cannot use true (type bool) as type (string|bytes):
-    ./in.cue:19:5
+    ./in.cue:21:5
 
 Result:
 (_|_){
@@ -84,15 +88,17 @@ Result:
     //     ./in.cue:10:5
   }
   b4: (string){ "foo" }
-  s1: (string){ &(!="b", =~"c") }
-  s2: (string){ &(!="b", =~"[a-z]") }
+  s1: (string){ =~"c" }
+  s2: (string){ =~"c" }
+  s3: (string){ &(!="b", =~"[a-z]") }
+  s4: (string){ &(=~"[a-z]", !="b") }
   e1: (_|_){
     // [eval] e1: cannot use 1 (type int) as type (string|bytes):
-    //     ./in.cue:18:5
+    //     ./in.cue:20:5
   }
   e2: (_|_){
     // [eval] e2: cannot use true (type bool) as type (string|bytes):
-    //     ./in.cue:19:5
+    //     ./in.cue:21:5
   }
   e3: (_|_){
     // [eval] e3: conflicting values !="a" and <5 (mismatched types string and number)

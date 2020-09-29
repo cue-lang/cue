@@ -33,11 +33,14 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 
 	switch {
 	case xCat == yCat:
-		if x.Op == NotEqualOp || x.Op == MatchOp || x.Op == NotMatchOp {
+		switch x.Op {
+		// NOTE: EqualOp should not happen, but include it defensively.
+		// Maybe an API would use it, for instance.
+		case EqualOp, NotEqualOp, MatchOp, NotMatchOp:
 			if test(ctx, EqualOp, xv, yv) {
 				return x
 			}
-			break // unify the two bounds
+			return nil // keep both bounds
 		}
 
 		// xCat == yCat && x.Op != NotEqualOp
@@ -192,4 +195,47 @@ func test(ctx *OpContext, op Op, a, b Value) bool {
 		return b.B
 	}
 	return false
+}
+
+// SimplifyValidator simplifies non-bound validators.
+//
+// Currently this only checks for pure equality. In the future this can be used
+// to simplify certain builtin validators analogously to how we simplify bounds
+// now.
+func SimplifyValidator(ctx *OpContext, v, w Validator) Validator {
+	switch x := v.(type) {
+	case *Builtin:
+		switch y := w.(type) {
+		case *Builtin:
+			if x == y {
+				return x
+			}
+
+		case *BuiltinValidator:
+			if y.Builtin == x && len(y.Args) == 0 {
+				return x
+			}
+		}
+
+	case *BuiltinValidator:
+		switch y := w.(type) {
+		case *Builtin:
+			return SimplifyValidator(ctx, y, x)
+
+		case *BuiltinValidator:
+			if x == y {
+				return x
+			}
+			if x.Builtin != y.Builtin || len(x.Args) != len(y.Args) {
+				return nil
+			}
+			for i, a := range x.Args {
+				if !test(ctx, EqualOp, a, y.Args[i]) {
+					return nil
+				}
+			}
+			return x
+		}
+	}
+	return nil
 }

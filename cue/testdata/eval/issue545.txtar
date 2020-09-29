@@ -1,0 +1,103 @@
+title: Simplification of validators.
+
+-- in.cue --
+package main
+
+import (
+    "strings"
+    "time"
+)
+
+t1: {
+    #Test: {
+        #HTTP:  =~"^http://"
+        #SSH:   !~"^ssh://"
+        #USER:  strings.MinRunes(3)
+        source: #HTTP | #SSH | #USER | #Test
+    }
+
+    foo: #Test & {
+        source: "http://blablabla"
+    }
+
+    bar: #Test & {
+        source: foo
+    }
+}
+
+t2: {
+    str: "foo"
+    a: =~str
+    b: =~"foo"
+    c: a & b & a & b
+
+    d: time.Time
+    e: time.Time()
+    f: d & e & d & e
+}
+
+
+-- out/eval --
+(struct){
+  t1: (struct){
+    #Test: (#struct){
+      #HTTP: (string){ =~"^http://" }
+      #SSH: (string){ !~"^ssh://" }
+      #USER: (string){ strings.MinRunes(3) }
+      source: (string){ |((string){ =~"^http://" }, (string){ !~"^ssh://" }, (string){ strings.MinRunes(3) }) }
+    }
+    foo: (#struct){
+      #HTTP: (string){ =~"^http://" }
+      #SSH: (string){ !~"^ssh://" }
+      #USER: (string){ strings.MinRunes(3) }
+      source: (string){ "http://blablabla" }
+    }
+    bar: (#struct){
+      #HTTP: (string){ =~"^http://" }
+      #SSH: (string){ !~"^ssh://" }
+      #USER: (string){ strings.MinRunes(3) }
+      source: (#struct){
+        #HTTP: (string){ =~"^http://" }
+        #SSH: (string){ !~"^ssh://" }
+        #USER: (string){ strings.MinRunes(3) }
+        source: (string){ "http://blablabla" }
+      }
+    }
+  }
+  t2: (struct){
+    str: (string){ "foo" }
+    a: (string){ =~"foo" }
+    b: (string){ =~"foo" }
+    c: (string){ =~"foo" }
+    d: (string){ time.Time }
+    e: (string){ time.Time() }
+    f: (string){ time.Time }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  t1: {
+    #Test: {
+      #HTTP: =~"^http://"
+      #SSH: !~"^ssh://"
+      #USER: 〈import;strings〉.MinRunes(3)
+      source: (〈0;#HTTP〉|〈0;#SSH〉|〈0;#USER〉|〈1;#Test〉)
+    }
+    foo: (〈0;#Test〉 & {
+      source: "http://blablabla"
+    })
+    bar: (〈0;#Test〉 & {
+      source: 〈1;foo〉
+    })
+  }
+  t2: {
+    str: "foo"
+    a: =~〈0;str〉
+    b: =~"foo"
+    c: (((〈0;a〉 & 〈0;b〉) & 〈0;a〉) & 〈0;b〉)
+    d: 〈import;time〉.Time
+    e: 〈import;time〉.Time()
+    f: (((〈0;d〉 & 〈0;e〉) & 〈0;d〉) & 〈0;e〉)
+  }
+}

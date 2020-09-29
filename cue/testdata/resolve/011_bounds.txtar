@@ -162,7 +162,7 @@ Result:
   s2: (number){ &(>=0, <=10) }
   s3: (number){ >5 }
   s4: (number){ <10 }
-  s5: (number){ &(!=2, !=2) }
+  s5: (number){ !=2 }
   s6: (number){ &(>=2, !=2) }
   s7: (number){ &(>=2, !=2) }
   s8: (number){ >5 }

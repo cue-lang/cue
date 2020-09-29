@@ -709,11 +709,18 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 	p.openList()
 	defer p.closeList()
 
-	for p.tok != token.RBRACE && p.tok != token.ELLIPSIS && p.tok != token.EOF {
+	for p.tok != token.RBRACE && p.tok != token.EOF {
 		switch p.tok {
 		case token.ATTRIBUTE:
 			list = append(list, p.parseAttribute())
 			p.consumeDeclComma()
+
+		case token.ELLIPSIS:
+			c := p.openComments()
+			ellipsis := &ast.Ellipsis{Ellipsis: p.pos}
+			p.next()
+			c.closeNode(p, ellipsis)
+			list = append(list, ellipsis)
 
 		default:
 			list = append(list, p.parseField())
@@ -732,13 +739,6 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 		}
 	}
 
-	if p.tok == token.ELLIPSIS {
-		c := p.openComments()
-		ellipsis := &ast.Ellipsis{Ellipsis: p.pos}
-		p.next()
-		c.closeNode(p, ellipsis)
-		list = append(list, ellipsis)
-	}
 	return
 }
 

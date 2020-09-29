@@ -118,22 +118,27 @@ func TestParse(t *testing.T) {
 		`{V1, V2}`,
 	}, {
 		"expression embedding",
-		`Def :: {
+		`#Def: {
 			a.b.c
 			a > b < c
 			-1<2
 
 			foo: 2
 		}`,
-		`Def :: {a.b.c, a>b<c, -1<2, foo: 2}`,
+		`#Def: {a.b.c, a>b<c, -1<2, foo: 2}`,
 	}, {
 		"ellipsis in structs",
-		`Def :: {
+		`#Def: {
 			b: "2"
 			...
 		}
+
+		#Def2: {
+			...
+			b: "2"
+		}
 		`,
-		`Def :: {b: "2", ...}`,
+		`#Def: {b: "2", ...}, #Def2: {..., b: "2"}`,
 	}, {
 		"emitted referencing non-emitted",
 		`a: 1

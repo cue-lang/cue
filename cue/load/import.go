@@ -150,6 +150,11 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 				if f.IsDir() {
 					continue
 				}
+				if f.Name() == "-" {
+					if _, err := cfg.fileSystem.stat("-"); !os.IsNotExist(err) {
+						continue
+					}
+				}
 				file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
 				if err != nil {
 					p.UnknownFiles = append(p.UnknownFiles, &build.File{

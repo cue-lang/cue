@@ -1,0 +1,9 @@
+# try to trick cue reading from a perpetually open stdin by placing a file
+# named '-' in the current directory.
+
+! cue eval
+stdin -
+cmp stderr expect-stderr
+-- - --
+-- expect-stderr --
+no CUE files in .

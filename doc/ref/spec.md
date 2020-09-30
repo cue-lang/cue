@@ -1694,7 +1694,7 @@ of the predefined identifier, prefixed with `__`.
 
 ```
 Functions
-len       required  close     open
+len       close and or
 
 Types
 null      The null type and value

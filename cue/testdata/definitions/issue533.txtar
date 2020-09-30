@@ -1,0 +1,79 @@
+-- in.cue --
+package x
+
+#x: {
+	Name: string
+}
+
+_#x: {
+	Name: string
+}
+
+x1: #x & {
+	Name: "hello"
+	Age:  50
+}
+
+x2: _#x & {
+	Name: "hello"
+	Age:  50
+}
+-- out/eval --
+Errors:
+x1: field `Age` not allowed:
+    ./in.cue:3:5
+    ./in.cue:11:5
+    ./in.cue:13:2
+x2: field `Age` not allowed:
+    ./in.cue:7:6
+    ./in.cue:16:5
+    ./in.cue:18:2
+
+Result:
+(_|_){
+  // [eval]
+  #x: (#struct){
+    Name: (string){ string }
+  }
+  _#x: (#struct){
+    Name: (string){ string }
+  }
+  x1: (_|_){
+    // [eval]
+    Name: (string){ "hello" }
+    Age: (_|_){
+      // [eval] x1: field `Age` not allowed:
+      //     ./in.cue:3:5
+      //     ./in.cue:11:5
+      //     ./in.cue:13:2
+    }
+  }
+  x2: (_|_){
+    // [eval]
+    Name: (string){ "hello" }
+    Age: (_|_){
+      // [eval] x2: field `Age` not allowed:
+      //     ./in.cue:7:6
+      //     ./in.cue:16:5
+      //     ./in.cue:18:2
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #x: {
+    Name: string
+  }
+  _#x: {
+    Name: string
+  }
+  x1: (〈0;#x〉 & {
+    Name: "hello"
+    Age: 50
+  })
+  x2: (〈0;_#x〉 & {
+    Name: "hello"
+    Age: 50
+  })
+}

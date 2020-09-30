@@ -116,7 +116,7 @@ func MakeIdentLabel(r StringIndexer, s string) Feature {
 	i := r.StringToIndex(s)
 	t := StringLabel
 	switch {
-	case strings.HasPrefix(s, "#_"):
+	case strings.HasPrefix(s, "_#"):
 		t = HiddenDefinitionLabel
 	case strings.HasPrefix(s, "#"):
 		t = DefinitionLabel

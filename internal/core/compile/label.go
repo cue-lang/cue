@@ -15,8 +15,6 @@
 package compile
 
 import (
-	"strings"
-
 	"github.com/cockroachdb/apd/v2"
 	"golang.org/x/text/unicode/norm"
 
@@ -31,23 +29,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 	index := c.index
 	switch x := n.(type) {
 	case *ast.Ident:
-		s := x.Name
-		i := index.StringToIndex(x.Name)
-		t := adt.StringLabel
-		switch {
-		case strings.HasPrefix(s, "#_"):
-			t = adt.HiddenDefinitionLabel
-		case strings.HasPrefix(s, "#"):
-			t = adt.DefinitionLabel
-		case strings.HasPrefix(s, "_"):
-			t = adt.HiddenLabel
-		}
-		f, err := adt.MakeLabel(n, i, t)
-		if err != nil {
-			c.errf(n, "invalid identifier label: %v", err)
-			return adt.InvalidLabel
-		}
-		return f
+		return adt.MakeIdentLabel(c.index, x.Name)
 
 	case *ast.BasicLit:
 		switch x.Kind {

@@ -1,0 +1,34 @@
+-- in.cue --
+t0: {
+	a=_a: _
+	let _b = a
+	_out: _b
+}
+t1: {
+    _a: b
+    let b = c
+    c=d: 3
+}
+-- out/compile --
+--- in.cue
+{
+  t0: {
+    _a: _
+    _out: 〈0;let _b〉
+  }
+  t1: {
+    _a: 〈0;let b〉
+    d: 3
+  }
+}
+-- out/eval --
+(struct){
+  t0: (struct){
+    _a: (_){ _ }
+    _out: (_){ _ }
+  }
+  t1: (struct){
+    _a: (int){ 3 }
+    d: (int){ 3 }
+  }
+}

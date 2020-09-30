@@ -166,6 +166,15 @@ func (c *compiler) insertAlias(id *ast.Ident, a aliasEntry) *adt.Bottom {
 	return nil
 }
 
+func (c *compiler) updateAlias(id *ast.Ident, expr adt.Expr) {
+	k := len(c.stack) - 1
+	m := c.stack[k].aliases
+
+	x := m[id.Name]
+	x.expr = expr
+	m[id.Name] = x
+}
+
 // lookupAlias looks up an alias with the given name at the k'th stack position.
 func (c compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	m := c.stack[k].aliases
@@ -441,12 +450,39 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 func (c *compiler) addDecls(st *adt.StructLit, a []ast.Decl) {
 	for _, d := range a {
+		c.markAlias(d)
+	}
+	for _, d := range a {
 		c.addLetDecl(d)
 	}
 	for _, d := range a {
 		if x := c.decl(d); x != nil {
 			st.Decls = append(st.Decls, x)
 		}
+	}
+}
+
+func (c *compiler) markAlias(d ast.Decl) {
+	switch x := d.(type) {
+	case *ast.Field:
+		lab := x.Label
+		if a, ok := lab.(*ast.Alias); ok {
+			if _, ok = a.Expr.(ast.Label); !ok {
+				c.errf(a, "alias expression is not a valid label")
+			}
+
+			e := aliasEntry{source: a}
+
+			c.insertAlias(a.Ident, e)
+		}
+
+	case *ast.LetClause:
+		a := aliasEntry{source: x}
+		c.insertAlias(x.Ident, a)
+
+	case *ast.Alias:
+		a := aliasEntry{source: x}
+		c.insertAlias(x.Ident, a)
 	}
 }
 
@@ -462,18 +498,12 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				return c.errf(a, "alias expression is not a valid label")
 			}
 
-			e := aliasEntry{source: a}
-
 			switch lab.(type) {
 			case *ast.Ident, *ast.BasicLit, *ast.ListLit:
 				// Even though we won't need the alias, we still register it
 				// for duplicate and failed reference detection.
 			default:
-				e.expr = c.expr(a.Expr)
-			}
-
-			if err := c.insertAlias(a.Ident, e); err != nil {
-				return err
+				c.updateAlias(a.Ident, c.expr(a.Expr))
 			}
 		}
 
@@ -576,19 +606,13 @@ func (c *compiler) addLetDecl(d ast.Decl) {
 		// blowup in x2: x1+x1, x3: x2+x2, ... patterns.
 
 		expr := c.labeledExpr(nil, (*letScope)(x), x.Expr)
-
-		a := aliasEntry{source: x, expr: expr}
-
-		c.insertAlias(x.Ident, a)
+		c.updateAlias(x.Ident, expr)
 
 	case *ast.Alias:
+		// TODO(legacy): deprecated, remove this use of Alias
 
 		expr := c.labeledExpr(nil, (*deprecatedAliasScope)(x), x.Expr)
-
-		// TODO(legacy): deprecated, remove this use of Alias
-		a := aliasEntry{source: x, expr: expr}
-
-		c.insertAlias(x.Ident, a)
+		c.updateAlias(x.Ident, expr)
 	}
 }
 

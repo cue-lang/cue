@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -545,7 +546,7 @@ func (v Value) appendPath(a []string) []string {
 			label := v.idx.LabelStr(f)
 			if !f.IsDef() && !f.IsHidden() {
 				if !ast.IsValidIdent(label) {
-					label = strconv.Quote(label)
+					label = literal.String.Quote(label)
 				}
 			}
 			a = append(a, label)

@@ -22,8 +22,8 @@ package debug
 
 import (
 	"fmt"
-	"strconv"
 
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -147,13 +147,10 @@ func (w *compactPrinter) node(n adt.Node) {
 		fmt.Fprint(w, &x.X)
 
 	case *adt.String:
-		w.string(strconv.Quote(x.Str))
+		w.string(literal.String.Quote(x.Str))
 
 	case *adt.Bytes:
-		b := []byte(strconv.Quote(string(x.B)))
-		b[0] = '\''
-		b[len(b)-1] = '\''
-		w.string(string(b))
+		w.string(literal.Bytes.Quote(string(x.B)))
 
 	case *adt.Top:
 		w.string("_")

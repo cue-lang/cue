@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/source"
@@ -381,7 +382,7 @@ func (p *protoConverter) stringLit(pos scanner.Position, s string) *ast.BasicLit
 	return &ast.BasicLit{
 		ValuePos: p.toCUEPos(pos),
 		Kind:     token.STRING,
-		Value:    strconv.Quote(s)}
+		Value:    literal.String.Quote(s)}
 }
 
 func (p *protoConverter) ident(pos scanner.Position, name string) *ast.Ident {
@@ -787,7 +788,7 @@ func quoteOption(s string) string {
 		return s
 	}
 	if !strings.ContainsAny(s, `"\`) {
-		return strconv.Quote(s)
+		return literal.String.Quote(s)
 	}
 	esc := `\#`
 	for strings.Contains(s, esc) {

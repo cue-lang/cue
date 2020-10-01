@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
@@ -65,7 +66,7 @@ func (f Feature) SelectorString(index StringIndexer) string {
 		if ast.IsValidIdent(s) && !internal.IsDefOrHidden(s) {
 			return s
 		}
-		return strconv.Quote(s)
+		return literal.String.Quote(s)
 	default:
 		return index.IndexToString(int64(x))
 	}

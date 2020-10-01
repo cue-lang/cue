@@ -15,6 +15,7 @@ import (
 	"unicode"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 )
 
@@ -458,24 +459,21 @@ func (d *decoder) scalar(n *node) ast.Expr {
 		return &ast.BasicLit{
 			ValuePos: d.start(n),
 			Kind:     token.STRING,
-			Value:    strconv.Quote(n.value),
+			Value:    literal.String.Quote(n.value),
 		}
 
 	case yaml_STR_TAG:
 		return &ast.BasicLit{
 			ValuePos: d.start(n),
 			Kind:     token.STRING,
-			Value:    d.quoteString(n.value),
+			Value:    quoteString(n.value),
 		}
 
 	case yaml_BINARY_TAG:
-		buf := strconv.AppendQuote(nil, resolved.(string))
-		buf[0] = '\''
-		buf[len(buf)-1] = '\''
 		return &ast.BasicLit{
 			ValuePos: d.start(n),
 			Kind:     token.STRING,
-			Value:    string(buf),
+			Value:    literal.Bytes.Quote(resolved.(string)),
 		}
 
 	case yaml_BOOL_TAG:
@@ -562,7 +560,7 @@ stringLabel:
 	return &ast.BasicLit{
 		ValuePos: d.start(n),
 		Kind:     token.STRING,
-		Value:    strconv.Quote(n.value),
+		Value:    literal.Label.Quote(n.value),
 	}
 }
 
@@ -587,7 +585,7 @@ func (d *decoder) makeNum(n *node, val string, kind token.Token) (expr ast.Expr)
 }
 
 // quoteString converts a string to a CUE multiline string if needed.
-func (d *decoder) quoteString(s string) string {
+func quoteString(s string) string {
 	lines := []string{}
 	last := 0
 	for i, c := range s {
@@ -620,7 +618,7 @@ func (d *decoder) quoteString(s string) string {
 		return string(buf)
 	}
 quoted:
-	return strconv.Quote(s)
+	return literal.String.Quote(s)
 }
 
 func (d *decoder) sequence(n *node) ast.Expr {

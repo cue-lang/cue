@@ -15,12 +15,14 @@
 package export
 
 import (
+	"bytes"
 	"fmt"
 	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -56,6 +58,7 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 		for _, d := range x.Decls {
 			s.Elts = append(s.Elts, e.decl(d))
 		}
+
 		return s
 
 	case *adt.FieldReference:
@@ -177,36 +180,43 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 
 	case *adt.Interpolation:
 		t := &ast.Interpolation{}
-		multiline := false
+		f := literal.String.WithGraphicOnly() // TODO: also support bytes
+		openQuote := `"`
+		closeQuote := `"`
+		indent := ""
 		// TODO: mark formatting in interpolation itself.
 		for i := 0; i < len(x.Parts); i += 2 {
 			str := x.Parts[i].(*adt.String).Str
 			if strings.IndexByte(str, '\n') >= 0 {
-				multiline = true
+				f = f.WithTabIndent(len(e.stack))
+				indent = strings.Repeat("\t", len(e.stack))
+				openQuote = `"""` + "\n" + indent
+				closeQuote = `"""`
 				break
 			}
 		}
-		quote := `"`
-		if multiline {
-			quote = `"""`
-		}
-		prefix := quote
+		prefix := openQuote
 		suffix := `\(`
 		for i, elem := range x.Parts {
 			if i%2 == 1 {
 				t.Elts = append(t.Elts, e.expr(elem))
 			} else {
+				// b := strings.Builder{}
 				buf := []byte(prefix)
-				if i == len(x.Parts)-1 {
-					suffix = quote
-				}
 				str := elem.(*adt.String).Str
-				if multiline {
-					buf = appendEscapeMulti(buf, str, '"')
+				buf = f.AppendEscaped(buf, str)
+				if i == len(x.Parts)-1 {
+					if len(closeQuote) > 1 {
+						buf = append(buf, '\n')
+						buf = append(buf, indent...)
+					}
+					buf = append(buf, closeQuote...)
 				} else {
-					buf = appendEscaped(buf, str, '"', true)
+					if bytes.HasSuffix(buf, []byte("\n")) {
+						buf = append(buf, indent...)
+					}
+					buf = append(buf, suffix...)
 				}
-				buf = append(buf, suffix...)
 				t.Elts = append(t.Elts, &ast.BasicLit{
 					Kind:  token.STRING,
 					Value: string(buf),

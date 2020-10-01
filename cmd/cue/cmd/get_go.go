@@ -37,6 +37,7 @@ import (
 	cueast "cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	cuetoken "cuelang.org/go/cue/token"
@@ -1128,7 +1129,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 
 			if typeName != cueStr {
 				if strings.ContainsAny(typeName, `#"',()=`) {
-					typeName = strconv.Quote(typeName)
+					typeName = literal.String.Quote(typeName)
 				}
 				fmt.Fprint(buf, ",", typeName)
 			}

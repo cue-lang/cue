@@ -18,6 +18,7 @@ import (
 	"strconv"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -37,7 +38,7 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 	case adt.StringLabel:
 		s := e.ctx.IndexToString(int64(x))
 		if !ast.IsValidIdent(s) {
-			return ast.NewLit(token.STRING, strconv.Quote(s))
+			return ast.NewLit(token.STRING, literal.Label.Quote(s))
 		}
 		fallthrough
 

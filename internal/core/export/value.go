@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
@@ -233,9 +234,10 @@ func (e *exporter) string(n *adt.String, orig []adt.Conjunct) *ast.BasicLit {
 	if b := extractBasic(orig); b != nil {
 		return b
 	}
+	s := literal.String.WithOptionalTabIndent(len(e.stack)).Quote(n.Str)
 	return &ast.BasicLit{
 		Kind:  token.STRING,
-		Value: quote(n.Str, '"'),
+		Value: s,
 	}
 }
 
@@ -244,9 +246,10 @@ func (e *exporter) bytes(n *adt.Bytes, orig []adt.Conjunct) *ast.BasicLit {
 	if b := extractBasic(orig); b != nil {
 		return b
 	}
+	s := literal.String.WithOptionalTabIndent(len(e.stack)).Quote(string(n.B))
 	return &ast.BasicLit{
 		Kind:  token.STRING,
-		Value: quote(string(n.B), '\''),
+		Value: s,
 	}
 }
 

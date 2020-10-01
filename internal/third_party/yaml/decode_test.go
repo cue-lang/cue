@@ -384,6 +384,9 @@ apple: "newline"`,
 		C
 		""",
 ]`,
+	}, {
+		`"\0"`,
+		`"\u0000"`,
 	},
 
 	// Explicit tags.

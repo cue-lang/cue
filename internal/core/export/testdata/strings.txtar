@@ -1,0 +1,94 @@
+-- in.cue --
+a: """
+    multi
+    line
+    """
+
+b: "message: \(a)!"
+
+c: d: a
+
+-- out/definition --
+a: """
+    multi
+    line
+    """
+b: "message: \(a)!"
+c: {
+	d: a
+}
+-- out/doc --
+[]
+[a]
+[b]
+[c]
+[c d]
+-- out/value --
+== Simplified
+{
+	a: """
+	multi
+	line
+	"""
+	b: """
+	message: multi
+	line!
+	"""
+	c: {
+		d: """
+		multi
+		line
+		"""
+	}
+}
+== Raw
+{
+	a: """
+	multi
+	line
+	"""
+	b: """
+	message: multi
+	line!
+	"""
+	c: {
+		d: """
+		multi
+		line
+		"""
+	}
+}
+== Final
+{
+	a: """
+	multi
+	line
+	"""
+	b: """
+	message: multi
+	line!
+	"""
+	c: {
+		d: """
+		multi
+		line
+		"""
+	}
+}
+== All
+{
+	a: """
+	multi
+	line
+	"""
+	b: """
+	message: multi
+	line!
+	"""
+	c: {
+		d: """
+		multi
+		line
+		"""
+	}
+}

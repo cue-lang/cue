@@ -18,7 +18,6 @@ package json
 import (
 	gojson "encoding/json"
 	"io"
-	"strconv"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -229,11 +228,7 @@ func patchExpr(n ast.Node) {
 					break // should not happen: implies invalid JSON
 				}
 
-				lines := strings.Split(s, "\n")
-				if len(lines) == 1 {
-					break
-				}
-				x.Value = quoteMulti(lines, len(stack))
+				x.Value = literal.String.WithOptionalTabIndent(len(stack)).Quote(s)
 			}
 		}
 
@@ -248,18 +243,4 @@ func patchExpr(n ast.Node) {
 
 func hasSpaces(n ast.Node) bool {
 	return n.Pos().RelPos() > token.NoSpace
-}
-
-func quoteMulti(a []string, indent int) string {
-	b := strings.Builder{}
-	prefix := "\n" + strings.Repeat("\t", indent)
-	b.WriteString(`"""`)
-	for _, s := range a {
-		b.WriteString(prefix)
-		q := strconv.Quote(s)
-		b.WriteString(q[1 : len(q)-1])
-	}
-	b.WriteString(prefix)
-	b.WriteString(`"""`)
-	return b.String()
 }

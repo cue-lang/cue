@@ -96,11 +96,11 @@ d2: {
 	}
 }
 c1: mystrings.Contains("aa", "a")
-s1: """multi
-        
-        \(bar)
-        line
-        """
+s1: """
+		multi
+		\(bar)
+		line
+		"""
 l1: [3, ...int]
 l2: [...int]
 l3: []

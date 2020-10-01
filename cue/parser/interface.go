@@ -94,7 +94,7 @@ type DeprecationError struct {
 }
 
 func (e *DeprecationError) Error() string {
-	return "try running `cue fix` on the file or module to upgrade"
+	return "try running `cue fix` using CUE v0.2.2 on the file or module to upgrade"
 }
 
 // Latest specifies the latest version of the parser, effectively setting

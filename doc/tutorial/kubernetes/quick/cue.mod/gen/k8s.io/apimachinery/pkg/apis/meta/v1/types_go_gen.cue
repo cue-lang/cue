@@ -14,8 +14,8 @@
 package v1
 
 import (
-	"k8s.io/apimachinery/pkg/runtime"
 	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/runtime"
 )
 
 // TypeMeta describes an individual object in an API response or request
@@ -117,7 +117,7 @@ import (
 	// +optional
 	generateName?: string @go(GenerateName) @protobuf(2,bytes,opt)
 
-	// Namespace defines the space within each name must be unique. An empty namespace is
+	// Namespace defines the space within which each name must be unique. An empty namespace is
 	// equivalent to the "default" namespace, but "default" is the canonical representation.
 	// Not all objects are required to be scoped to a namespace - the value of this field for
 	// those objects will be empty.
@@ -341,14 +341,23 @@ import (
 	// +optional
 	allowWatchBookmarks?: bool @go(AllowWatchBookmarks) @protobuf(9,varint,opt)
 
-	// When specified with a watch call, shows changes that occur after that particular version of a resource.
-	// Defaults to changes from the beginning of history.
-	// When specified for list:
-	// - if unset, then the result is returned from remote storage based on quorum-read flag;
-	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
-	// - if set to non zero, then the result is at least as fresh as given rv.
+	// resourceVersion sets a constraint on what resource versions a request may be served from.
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
+	// details.
+	//
+	// Defaults to unset
 	// +optional
 	resourceVersion?: string @go(ResourceVersion) @protobuf(4,bytes,opt)
+
+	// resourceVersionMatch determines how resourceVersion is applied to list calls.
+	// It is highly recommended that resourceVersionMatch be set for list calls where
+	// resourceVersion is set
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
+	// details.
+	//
+	// Defaults to unset
+	// +optional
+	resourceVersionMatch?: #ResourceVersionMatch @go(ResourceVersionMatch) @protobuf(10,bytes,opt,casttype=ResourceVersionMatch)
 
 	// Timeout for the list/watch call.
 	// This limits the duration of the call, regardless of any activity or inactivity.
@@ -390,6 +399,28 @@ import (
 	continue?: string @go(Continue) @protobuf(8,bytes,opt)
 }
 
+// resourceVersionMatch specifies how the resourceVersion parameter is applied. resourceVersionMatch
+// may only be set if resourceVersion is also set.
+//
+// "NotOlderThan" matches data at least as new as the provided resourceVersion.
+// "Exact" matches data at the exact resourceVersion provided.
+//
+// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
+// details.
+#ResourceVersionMatch: string // #enumResourceVersionMatch
+
+#enumResourceVersionMatch:
+	#ResourceVersionMatchNotOlderThan |
+	#ResourceVersionMatchExact
+
+// ResourceVersionMatchNotOlderThan matches data at least as new as the provided
+// resourceVersion.
+#ResourceVersionMatchNotOlderThan: #ResourceVersionMatch & "NotOlderThan"
+
+// ResourceVersionMatchExact matches data at the exact resourceVersion
+// provided.
+#ResourceVersionMatchExact: #ResourceVersionMatch & "Exact"
+
 // ExportOptions is the query options to the standard REST get call.
 // Deprecated. Planned for removal in 1.18.
 #ExportOptions: {
@@ -408,10 +439,12 @@ import (
 #GetOptions: {
 	#TypeMeta
 
-	// When specified:
-	// - if unset, then the result is returned from remote storage based on quorum-read flag;
-	// - if it's 0, then we simply return what we currently have in cache, no guarantee;
-	// - if set to non zero, then the result is at least as fresh as given rv.
+	// resourceVersion sets a constraint on what resource versions a request may be served from.
+	// See https://kubernetes.io/docs/reference/using-api/api-concepts/#resource-versions for
+	// details.
+	//
+	// Defaults to unset
+	// +optional
 	resourceVersion?: string @go(ResourceVersion) @protobuf(1,bytes,opt)
 }
 
@@ -1159,6 +1192,7 @@ import (
 // If a key maps to an empty Fields value, the field that key represents is part of the set.
 //
 // The exact format is defined in sigs.k8s.io/structured-merge-diff
+// +protobuf.options.(gogoproto.goproto_stringer)=false
 #FieldsV1: _
 
 // Table is a tabular representation of a set of API resources. The server transforms the
@@ -1328,4 +1362,71 @@ import (
 
 	// items contains each of the included items.
 	items: [...#PartialObjectMetadata] @go(Items,[]PartialObjectMetadata) @protobuf(2,bytes,rep)
+}
+
+// Condition contains details for one aspect of the current state of this API Resource.
+// ---
+// This struct is intended for direct use as an array at the field path .status.conditions.  For example,
+// type FooStatus struct{
+//     // Represents the observations of a foo's current state.
+//     // Known .status.conditions.type are: "Available", "Progressing", and "Degraded"
+//     // +patchMergeKey=type
+//     // +patchStrategy=merge
+//     // +listType=map
+//     // +listMapKey=type
+//     Conditions []metav1.Condition `json:"conditions,omitempty" patchStrategy:"merge" patchMergeKey:"type" protobuf:"bytes,1,rep,name=conditions"`
+//
+//     // other fields
+// }
+#Condition: {
+	// type of condition in CamelCase or in foo.example.com/CamelCase.
+	// ---
+	// Many .condition.type values are consistent across resources like Available, but because arbitrary conditions can be
+	// useful (see .node.status.conditions), the ability to deconflict is important.
+	// The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+	// +required
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$`
+	// +kubebuilder:validation:MaxLength=316
+	type: string @go(Type) @protobuf(1,bytes,opt)
+
+	// status of the condition, one of True, False, Unknown.
+	// +required
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Enum=True;False;Unknown
+	status: #ConditionStatus @go(Status) @protobuf(2,bytes,opt)
+
+	// observedGeneration represents the .metadata.generation that the condition was set based upon.
+	// For instance, if .metadata.generation is currently 12, but the .status.conditions[x].observedGeneration is 9, the condition is out of date
+	// with respect to the current state of the instance.
+	// +optional
+	// +kubebuilder:validation:Minimum=0
+	observedGeneration?: int64 @go(ObservedGeneration) @protobuf(3,varint,opt)
+
+	// lastTransitionTime is the last time the condition transitioned from one status to another.
+	// This should be when the underlying condition changed.  If that is not known, then using the time when the API field changed is acceptable.
+	// +required
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Type=string
+	// +kubebuilder:validation:Format=date-time
+	lastTransitionTime: #Time @go(LastTransitionTime) @protobuf(4,bytes,opt)
+
+	// reason contains a programmatic identifier indicating the reason for the condition's last transition.
+	// Producers of specific condition types may define expected values and meanings for this field,
+	// and whether the values are considered a guaranteed API.
+	// The value should be a CamelCase string.
+	// This field may not be empty.
+	// +required
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=1024
+	// +kubebuilder:validation:MinLength=1
+	// +kubebuilder:validation:Pattern=`^[A-Za-z]([A-Za-z0-9_,:]*[A-Za-z0-9_])?$`
+	reason: string @go(Reason) @protobuf(5,bytes,opt)
+
+	// message is a human readable message indicating details about the transition.
+	// This may be an empty string.
+	// +required
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:MaxLength=32768
+	message: string @go(Message) @protobuf(6,bytes,opt)
 }

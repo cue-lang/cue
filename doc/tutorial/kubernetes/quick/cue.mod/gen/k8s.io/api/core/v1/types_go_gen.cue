@@ -5,10 +5,10 @@
 package v1
 
 import (
-	"k8s.io/apimachinery/pkg/api/resource"
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
-	"k8s.io/apimachinery/pkg/types"
+	"k8s.io/apimachinery/pkg/api/resource"
 	"k8s.io/apimachinery/pkg/util/intstr"
+	"k8s.io/apimachinery/pkg/types"
 )
 
 // NamespaceDefault means the object is in the default namespace which is applied when not specified by clients
@@ -167,9 +167,37 @@ import (
 	// +optional
 	storageos?: null | #StorageOSVolumeSource @go(StorageOS,*StorageOSVolumeSource) @protobuf(27,bytes,opt)
 
-	// CSI (Container Storage Interface) represents storage that is handled by an external CSI driver (Alpha feature).
+	// CSI (Container Storage Interface) represents ephemeral storage that is handled by certain external CSI drivers (Beta feature).
 	// +optional
 	csi?: null | #CSIVolumeSource @go(CSI,*CSIVolumeSource) @protobuf(28,bytes,opt)
+
+	// Ephemeral represents a volume that is handled by a cluster storage driver (Alpha feature).
+	// The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
+	// and deleted when the pod is removed.
+	//
+	// Use this if:
+	// a) the volume is only needed while the pod runs,
+	// b) features of normal volumes like restoring from snapshot or capacity
+	//    tracking are needed,
+	// c) the storage driver is specified through a storage class, and
+	// d) the storage driver supports dynamic volume provisioning through
+	//    a PersistentVolumeClaim (see EphemeralVolumeSource for more
+	//    information on the connection between this volume type
+	//    and PersistentVolumeClaim).
+	//
+	// Use PersistentVolumeClaim or one of the vendor-specific
+	// APIs for volumes that persist for longer than the lifecycle
+	// of an individual pod.
+	//
+	// Use CSI for light-weight local ephemeral volumes if the CSI driver is meant to
+	// be used that way - see the documentation of the driver for
+	// more information.
+	//
+	// A pod can use both types of ephemeral volumes and
+	// persistent volumes at the same time.
+	//
+	// +optional
+	ephemeral?: null | #EphemeralVolumeSource @go(Ephemeral,*EphemeralVolumeSource) @protobuf(29,bytes,opt)
 }
 
 // PersistentVolumeClaimVolumeSource references the user's PVC in the same namespace.
@@ -1249,8 +1277,10 @@ import (
 	// +optional
 	items?: [...#KeyToPath] @go(Items,[]KeyToPath) @protobuf(2,bytes,rep)
 
-	// Optional: mode bits to use on created files by default. Must be a
-	// value between 0 and 0777. Defaults to 0644.
+	// Optional: mode bits used to set permissions on created files by default.
+	// Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+	// YAML accepts both octal and decimal values, JSON requires decimal values
+	// for mode bits. Defaults to 0644.
 	// Directories within the path are not affected by this setting.
 	// This might be in conflict with other options that affect the file
 	// mode, like fsGroup, and the result can be other mode bits set.
@@ -1752,8 +1782,10 @@ import (
 	// +optional
 	items?: [...#KeyToPath] @go(Items,[]KeyToPath) @protobuf(2,bytes,rep)
 
-	// Optional: mode bits to use on created files by default. Must be a
-	// value between 0 and 0777. Defaults to 0644.
+	// Optional: mode bits used to set permissions on created files by default.
+	// Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+	// YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+	// Defaults to 0644.
 	// Directories within the path are not affected by this setting.
 	// This might be in conflict with other options that affect the file
 	// mode, like fsGroup, and the result can be other mode bits set.
@@ -1823,8 +1855,9 @@ import (
 	// list of volume projections
 	sources: [...#VolumeProjection] @go(Sources,[]VolumeProjection) @protobuf(1,bytes,rep)
 
-	// Mode bits to use on created files by default. Must be a value between
-	// 0 and 0777.
+	// Mode bits used to set permissions on created files by default.
+	// Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+	// YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
 	// Directories within the path are not affected by this setting.
 	// This might be in conflict with other options that affect the file
 	// mode, like fsGroup, and the result can be other mode bits set.
@@ -1864,8 +1897,10 @@ import (
 	// May not start with the string '..'.
 	path: string @go(Path) @protobuf(2,bytes,opt)
 
-	// Optional: mode bits to use on this file, must be a value between 0
-	// and 0777. If not specified, the volume defaultMode will be used.
+	// Optional: mode bits used to set permissions on this file.
+	// Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+	// YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+	// If not specified, the volume defaultMode will be used.
 	// This might be in conflict with other options that affect the file
 	// mode, like fsGroup, and the result can be other mode bits set.
 	// +optional
@@ -1975,6 +2010,54 @@ import (
 	// secret object contains more than one secret, all secret references are passed.
 	// +optional
 	nodePublishSecretRef?: null | #LocalObjectReference @go(NodePublishSecretRef,*LocalObjectReference) @protobuf(5,bytes,opt)
+}
+
+// Represents an ephemeral volume that is handled by a normal storage driver.
+#EphemeralVolumeSource: {
+	// Will be used to create a stand-alone PVC to provision the volume.
+	// The pod in which this EphemeralVolumeSource is embedded will be the
+	// owner of the PVC, i.e. the PVC will be deleted together with the
+	// pod.  The name of the PVC will be `<pod name>-<volume name>` where
+	// `<volume name>` is the name from the `PodSpec.Volumes` array
+	// entry. Pod validation will reject the pod if the concatenated name
+	// is not valid for a PVC (for example, too long).
+	//
+	// An existing PVC with that name that is not owned by the pod
+	// will *not* be used for the pod to avoid using an unrelated
+	// volume by mistake. Starting the pod is then blocked until
+	// the unrelated PVC is removed. If such a pre-created PVC is
+	// meant to be used by the pod, the PVC has to updated with an
+	// owner reference to the pod once the pod exists. Normally
+	// this should not be necessary, but it may be useful when
+	// manually reconstructing a broken cluster.
+	//
+	// This field is read-only and no changes will be made by Kubernetes
+	// to the PVC after it has been created.
+	//
+	// Required, must not be nil.
+	volumeClaimTemplate?: null | #PersistentVolumeClaimTemplate @go(VolumeClaimTemplate,*PersistentVolumeClaimTemplate) @protobuf(1,bytes,opt)
+
+	// Specifies a read-only configuration for the volume.
+	// Defaults to false (read/write).
+	// +optional
+	readOnly?: bool @go(ReadOnly) @protobuf(2,varint,opt)
+}
+
+// PersistentVolumeClaimTemplate is used to produce
+// PersistentVolumeClaim objects as part of an EphemeralVolumeSource.
+#PersistentVolumeClaimTemplate: {
+	// May contain labels and annotations that will be copied into the PVC
+	// when creating it. No other fields are allowed and will be rejected during
+	// validation.
+	//
+	// +optional
+	metadata?: metav1.#ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
+
+	// The specification for the PersistentVolumeClaim. The entire content is
+	// copied unchanged into the PVC that gets created from this
+	// template. The same fields as in a PersistentVolumeClaim
+	// are also valid here.
+	spec: #PersistentVolumeClaimSpec @go(Spec) @protobuf(2,bytes)
 }
 
 // ContainerPort represents a network port in a single container.
@@ -2102,7 +2185,7 @@ import (
 
 // EnvVarSource represents a source for the value of an EnvVar.
 #EnvVarSource: {
-	// Selects a field of the pod: supports metadata.name, metadata.namespace, metadata.labels, metadata.annotations,
+	// Selects a field of the pod: supports metadata.name, metadata.namespace, `metadata.labels['<KEY>']`, `metadata.annotations['<KEY>']`,
 	// spec.nodeName, spec.serviceAccountName, status.hostIP, status.podIP, status.podIPs.
 	// +optional
 	fieldRef?: null | #ObjectFieldSelector @go(FieldRef,*ObjectFieldSelector) @protobuf(1,bytes,opt)
@@ -3393,7 +3476,7 @@ import (
 	// PreemptionPolicy is the Policy for preempting pods with lower priority.
 	// One of Never, PreemptLowerPriority.
 	// Defaults to PreemptLowerPriority if unset.
-	// This field is alpha-level and is only honored by servers that enable the NonPreemptingPriority feature.
+	// This field is beta-level, gated by the NonPreemptingPriority feature-gate.
 	// +optional
 	preemptionPolicy?: null | #PreemptionPolicy @go(PreemptionPolicy,*PreemptionPolicy) @protobuf(31,bytes,opt)
 
@@ -3410,7 +3493,6 @@ import (
 
 	// TopologySpreadConstraints describes how a group of pods ought to spread across topology
 	// domains. Scheduler will schedule pods in a way which abides by the constraints.
-	// This field is only honored by clusters that enable the EvenPodsSpread feature.
 	// All topologySpreadConstraints are ANDed.
 	// +optional
 	// +patchMergeKey=topologyKey
@@ -3419,6 +3501,14 @@ import (
 	// +listMapKey=topologyKey
 	// +listMapKey=whenUnsatisfiable
 	topologySpreadConstraints?: [...#TopologySpreadConstraint] @go(TopologySpreadConstraints,[]TopologySpreadConstraint) @protobuf(33,bytes,opt)
+
+	// If true the pod's hostname will be configured as the pod's FQDN, rather than the leaf name (the default).
+	// In Linux containers, this means setting the FQDN in the hostname field of the kernel (the nodename field of struct utsname).
+	// In Windows containers, this means setting the registry value of hostname for the registry key HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Services\\Tcpip\\Parameters to FQDN.
+	// If a pod does not have FQDN, this has no effect.
+	// Default to false.
+	// +optional
+	setHostnameAsFQDN?: null | bool @go(SetHostnameAsFQDN,*bool) @protobuf(35,varint,opt)
 }
 
 #UnsatisfiableConstraintAction: string // #enumUnsatisfiableConstraintAction
@@ -3438,8 +3528,8 @@ import (
 // TopologySpreadConstraint specifies how to spread matching pods among the given topology.
 #TopologySpreadConstraint: {
 	// MaxSkew describes the degree to which pods may be unevenly distributed.
-	// It's the maximum permitted difference between the number of matching pods in
-	// any two topology domains of a given topology type.
+	// When `whenUnsatisfiable=DoNotSchedule`, it is the maximum permitted difference
+	// between the number of matching pods in the target topology and the global minimum.
 	// For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
 	// labelSelector spread as 1/1/0:
 	// +-------+-------+-------+
@@ -3451,6 +3541,8 @@ import (
 	// scheduling it onto zone1(zone2) would make the ActualSkew(2-0) on zone1(zone2)
 	// violate MaxSkew(1).
 	// - if MaxSkew is 2, incoming pod can be scheduled onto any zone.
+	// When `whenUnsatisfiable=ScheduleAnyway`, it is used to give higher precedence
+	// to topologies that satisfy it.
 	// It's a required field. Default value is 1 and 0 is not allowed.
 	maxSkew: int32 @go(MaxSkew) @protobuf(1,varint,opt)
 
@@ -3463,10 +3555,13 @@ import (
 
 	// WhenUnsatisfiable indicates how to deal with a pod if it doesn't satisfy
 	// the spread constraint.
-	// - DoNotSchedule (default) tells the scheduler not to schedule it
-	// - ScheduleAnyway tells the scheduler to still schedule it
-	// It's considered as "Unsatisfiable" if and only if placing incoming pod on any
-	// topology violates "MaxSkew".
+	// - DoNotSchedule (default) tells the scheduler not to schedule it.
+	// - ScheduleAnyway tells the scheduler to schedule the pod in any location,
+	//   but giving higher precedence to topologies that would help reduce the
+	//   skew.
+	// A constraint is considered "Unsatisfiable" for an incoming pod
+	// if and only if every possible node assigment for that pod would violate
+	// "MaxSkew" on some topology.
 	// For example, in a 3-zone cluster, MaxSkew is set to 1, and pods with the same
 	// labelSelector spread as 3/1/1:
 	// +-------+-------+-------+
@@ -3594,7 +3689,51 @@ import (
 	// Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".
 	// +optional
 	fsGroupChangePolicy?: null | #PodFSGroupChangePolicy @go(FSGroupChangePolicy,*PodFSGroupChangePolicy) @protobuf(9,bytes,opt)
+
+	// The seccomp options to use by the containers in this pod.
+	// +optional
+	seccompProfile?: null | #SeccompProfile @go(SeccompProfile,*SeccompProfile) @protobuf(10,bytes,opt)
 }
+
+// SeccompProfile defines a pod/container's seccomp profile settings.
+// Only one profile source may be set.
+// +union
+#SeccompProfile: {
+	// type indicates which kind of seccomp profile will be applied.
+	// Valid options are:
+	//
+	// Localhost - a profile defined in a file on the node should be used.
+	// RuntimeDefault - the container runtime default profile should be used.
+	// Unconfined - no profile should be applied.
+	// +unionDiscriminator
+	type: #SeccompProfileType @go(Type) @protobuf(1,bytes,opt,casttype=SeccompProfileType)
+
+	// localhostProfile indicates a profile defined in a file on the node should be used.
+	// The profile must be preconfigured on the node to work.
+	// Must be a descending path, relative to the kubelet's configured seccomp profile location.
+	// Must only be set if type is "Localhost".
+	// +optional
+	localhostProfile?: null | string @go(LocalhostProfile,*string) @protobuf(2,bytes,opt)
+}
+
+// SeccompProfileType defines the supported seccomp profile types.
+#SeccompProfileType: string // #enumSeccompProfileType
+
+#enumSeccompProfileType:
+	#SeccompProfileTypeUnconfined |
+	#SeccompProfileTypeRuntimeDefault |
+	#SeccompProfileTypeLocalhost
+
+// SeccompProfileTypeUnconfined indicates no seccomp profile is applied (A.K.A. unconfined).
+#SeccompProfileTypeUnconfined: #SeccompProfileType & "Unconfined"
+
+// SeccompProfileTypeRuntimeDefault represents the default container runtime seccomp profile.
+#SeccompProfileTypeRuntimeDefault: #SeccompProfileType & "RuntimeDefault"
+
+// SeccompProfileTypeLocalhost indicates a profile defined in a file on the node should be used.
+// The file's location is based off the kubelet's deprecated flag --seccomp-profile-root.
+// Once the flag support is removed the location will be <kubelet-root-dir>/seccomp.
+#SeccompProfileTypeLocalhost: #SeccompProfileType & "Localhost"
 
 // PodQOSClass defines the supported qos classes of Pods.
 #PodQOSClass: string // #enumPodQOSClass
@@ -4367,12 +4506,14 @@ import (
 	// +optional
 	healthCheckNodePort?: int32 @go(HealthCheckNodePort) @protobuf(12,bytes,opt)
 
-	// publishNotReadyAddresses, when set to true, indicates that DNS implementations
-	// must publish the notReadyAddresses of subsets for the Endpoints associated with
-	// the Service. The default value is false.
-	// The primary use case for setting this field is to use a StatefulSet's Headless Service
-	// to propagate SRV records for its Pods without respect to their readiness for purpose
-	// of peer discovery.
+	// publishNotReadyAddresses indicates that any agent which deals with endpoints for this
+	// Service should disregard any indications of ready/not-ready.
+	// The primary use case for setting this field is for a StatefulSet's Headless Service to
+	// propagate SRV DNS records for its Pods for the purpose of peer discovery.
+	// The Kubernetes controllers that generate Endpoints and EndpointSlice resources for
+	// Services interpret this to mean that all endpoints are considered "ready" even if the
+	// Pods themselves are not. Agents which consume only Kubernetes generated endpoints
+	// through the Endpoints or EndpointSlice resources can safely assume this behavior.
 	// +optional
 	publishNotReadyAddresses?: bool @go(PublishNotReadyAddresses) @protobuf(13,varint,opt)
 
@@ -4380,13 +4521,21 @@ import (
 	// +optional
 	sessionAffinityConfig?: null | #SessionAffinityConfig @go(SessionAffinityConfig,*SessionAffinityConfig) @protobuf(14,bytes,opt)
 
-	// ipFamily specifies whether this Service has a preference for a particular IP family (e.g. IPv4 vs.
-	// IPv6).  If a specific IP family is requested, the clusterIP field will be allocated from that family, if it is
-	// available in the cluster.  If no IP family is requested, the cluster's primary IP family will be used.
-	// Other IP fields (loadBalancerIP, loadBalancerSourceRanges, externalIPs) and controllers which
-	// allocate external load-balancers should use the same IP family.  Endpoints for this Service will be of
-	// this family.  This field is immutable after creation. Assigning a ServiceIPFamily not available in the
-	// cluster (e.g. IPv6 in IPv4 only cluster) is an error condition and will fail during clusterIP assignment.
+	// ipFamily specifies whether this Service has a preference for a particular IP family (e.g.
+	// IPv4 vs. IPv6) when the IPv6DualStack feature gate is enabled. In a dual-stack cluster,
+	// you can specify ipFamily when creating a ClusterIP Service to determine whether the
+	// controller will allocate an IPv4 or IPv6 IP for it, and you can specify ipFamily when
+	// creating a headless Service to determine whether it will have IPv4 or IPv6 Endpoints. In
+	// either case, if you do not specify an ipFamily explicitly, it will default to the
+	// cluster's primary IP family.
+	// This field is part of an alpha feature, and you should not make any assumptions about its
+	// semantics other than those described above. In particular, you should not assume that it
+	// can (or cannot) be changed after creation time; that it can only have the values "IPv4"
+	// and "IPv6"; or that its current value on a given Service correctly reflects the current
+	// state of that Service. (For ClusterIP Services, look at clusterIP to see if the Service
+	// is IPv4 or IPv6. For headless Services, look at the endpoints, which may be dual-stack in
+	// the future. For ExternalName Services, ipFamily has no meaning, but it may be set to an
+	// irrelevant value anyway.)
 	// +optional
 	ipFamily?: null | #IPFamily @go(IPFamily,*IPFamily) @protobuf(15,bytes,opt,Configcasttype=IPFamily)
 
@@ -4427,7 +4576,8 @@ import (
 	// RFC-6335 and http://www.iana.org/assignments/service-names).
 	// Non-standard protocols should use prefixed names such as
 	// mycompany.com/my-custom-protocol.
-	// Field can be enabled with ServiceAppProtocol feature gate.
+	// This is a beta field that is guarded by the ServiceAppProtocol feature
+	// gate and enabled by default.
 	// +optional
 	appProtocol?: null | string @go(AppProtocol,*string) @protobuf(6,bytes,opt)
 
@@ -4646,7 +4796,8 @@ import (
 	// RFC-6335 and http://www.iana.org/assignments/service-names).
 	// Non-standard protocols should use prefixed names such as
 	// mycompany.com/my-custom-protocol.
-	// Field can be enabled with ServiceAppProtocol feature gate.
+	// This is a beta field that is guarded by the ServiceAppProtocol feature
+	// gate and enabled by default.
 	// +optional
 	appProtocol?: null | string @go(AppProtocol,*string) @protobuf(4,bytes,opt)
 }
@@ -4754,7 +4905,7 @@ import (
 
 	// SystemUUID reported by the node. For unique machine identification
 	// MachineID is preferred. This field is specific to Red Hat hosts
-	// https://access.redhat.com/documentation/en-US/Red_Hat_Subscription_Management/1/html/RHSM/getting-system-uuid.html
+	// https://access.redhat.com/documentation/en-us/red_hat_subscription_management/1/html/rhsm/uuid
 	systemUUID: string @go(SystemUUID) @protobuf(2,bytes,opt)
 
 	// Boot ID reported by the node.
@@ -5645,22 +5796,7 @@ import (
 
 	// Time of the last occurrence observed
 	lastObservedTime?: metav1.#MicroTime @go(LastObservedTime) @protobuf(2,bytes)
-
-	// State of this Series: Ongoing or Finished
-	// Deprecated. Planned removal for 1.18
-	state?: #EventSeriesState @go(State) @protobuf(3,bytes)
 }
-
-#EventSeriesState: string // #enumEventSeriesState
-
-#enumEventSeriesState:
-	#EventSeriesStateOngoing |
-	#EventSeriesStateFinished |
-	#EventSeriesStateUnknown
-
-#EventSeriesStateOngoing:  #EventSeriesState & "Ongoing"
-#EventSeriesStateFinished: #EventSeriesState & "Finished"
-#EventSeriesStateUnknown:  #EventSeriesState & "Unknown"
 
 // EventList is a list of events.
 #EventList: {
@@ -5956,7 +6092,7 @@ import (
 	// be updated (only object metadata can be modified).
 	// If not set to true, the field can be modified at any time.
 	// Defaulted to nil.
-	// This is an alpha field enabled by ImmutableEphemeralVolumes feature gate.
+	// This is a beta field enabled by ImmutableEphemeralVolumes feature gate.
 	// +optional
 	immutable?: null | bool @go(Immutable,*bool) @protobuf(5,varint,opt)
 
@@ -6111,7 +6247,7 @@ import (
 	// be updated (only object metadata can be modified).
 	// If not set to true, the field can be modified at any time.
 	// Defaulted to nil.
-	// This is an alpha field enabled by ImmutableEphemeralVolumes feature gate.
+	// This is a beta field enabled by ImmutableEphemeralVolumes feature gate.
 	// +optional
 	immutable?: null | bool @go(Immutable,*bool) @protobuf(4,varint,opt)
 
@@ -6176,6 +6312,7 @@ import (
 }
 
 // ComponentStatus (and ComponentStatusList) holds the cluster validation info.
+// Deprecated: This API is deprecated in v1.19+
 #ComponentStatus: {
 	metav1.#TypeMeta
 
@@ -6192,6 +6329,7 @@ import (
 }
 
 // Status of all the conditions for the component as a list of ComponentStatus objects.
+// Deprecated: This API is deprecated in v1.19+
 #ComponentStatusList: {
 	metav1.#TypeMeta
 
@@ -6212,7 +6350,10 @@ import (
 	items?: [...#DownwardAPIVolumeFile] @go(Items,[]DownwardAPIVolumeFile) @protobuf(1,bytes,rep)
 
 	// Optional: mode bits to use on created files by default. Must be a
-	// value between 0 and 0777. Defaults to 0644.
+	// Optional: mode bits used to set permissions on created files by default.
+	// Must be an octal value between 0000 and 0777 or a decimal value between 0 and 511.
+	// YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+	// Defaults to 0644.
 	// Directories within the path are not affected by this setting.
 	// This might be in conflict with other options that affect the file
 	// mode, like fsGroup, and the result can be other mode bits set.
@@ -6236,8 +6377,10 @@ import (
 	// +optional
 	resourceFieldRef?: null | #ResourceFieldSelector @go(ResourceFieldRef,*ResourceFieldSelector) @protobuf(3,bytes,opt)
 
-	// Optional: mode bits to use on this file, must be a value between 0
-	// and 0777. If not specified, the volume defaultMode will be used.
+	// Optional: mode bits used to set permissions on this file, must be an octal value
+	// between 0000 and 0777 or a decimal value between 0 and 511.
+	// YAML accepts both octal and decimal values, JSON requires decimal values for mode bits.
+	// If not specified, the volume defaultMode will be used.
 	// This might be in conflict with other options that affect the file
 	// mode, like fsGroup, and the result can be other mode bits set.
 	// +optional
@@ -6324,6 +6467,12 @@ import (
 	// This requires the ProcMountType feature flag to be enabled.
 	// +optional
 	procMount?: null | #ProcMountType @go(ProcMount,*ProcMountType) @protobuf(9,bytes,opt)
+
+	// The seccomp options to use by this container. If seccomp options are
+	// provided at both the pod & container level, the container options
+	// override the pod options.
+	// +optional
+	seccompProfile?: null | #SeccompProfile @go(SeccompProfile,*SeccompProfile) @protobuf(11,bytes,opt)
 }
 
 #ProcMountType: string // #enumProcMountType
@@ -6416,7 +6565,7 @@ import (
 }
 
 // NodeResources is an object for conveying resource information about a node.
-// see http://releases.k8s.io/HEAD/docs/design/resources.md for more details.
+// see https://kubernetes.io/docs/concepts/architecture/nodes/#capacity for more details.
 #NodeResources: {
 	// Capacity represents the available resources of a node
 	Capacity: #ResourceList @protobuf(1,bytes,rep,name=capacity,casttype=ResourceList,castkey=ResourceName)

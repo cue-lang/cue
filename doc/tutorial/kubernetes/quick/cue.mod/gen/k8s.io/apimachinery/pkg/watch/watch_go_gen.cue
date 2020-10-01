@@ -19,12 +19,11 @@ import "k8s.io/apimachinery/pkg/runtime"
 	#Bookmark |
 	#Error
 
-#Added:           #EventType & "ADDED"
-#Modified:        #EventType & "MODIFIED"
-#Deleted:         #EventType & "DELETED"
-#Bookmark:        #EventType & "BOOKMARK"
-#Error:           #EventType & "ERROR"
-#DefaultChanSize: int32 & 100
+#Added:    #EventType & "ADDED"
+#Modified: #EventType & "MODIFIED"
+#Deleted:  #EventType & "DELETED"
+#Bookmark: #EventType & "BOOKMARK"
+#Error:    #EventType & "ERROR"
 
 // Event represents a single event to a watched resource.
 // +k8s:deepcopy-gen=true

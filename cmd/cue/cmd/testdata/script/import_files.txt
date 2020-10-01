@@ -8,9 +8,9 @@ name:     "booster"
 replicas: 1
 kind: "Service"
 name: """
-		supplement
-		foo
-		"""
+	supplement
+	foo
+	"""
 json: "[1, 2]"
 -- import/services.jsonl --
 {

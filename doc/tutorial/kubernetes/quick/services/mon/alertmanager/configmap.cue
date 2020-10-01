@@ -15,9 +15,9 @@ configMap: alertmanager: {
 				slack_configs: [{
 					channel: "#cloudmon"
 					text: """
-		{{ range .Alerts }}{{ .Annotations.description }}
-		{{ end }}
-		"""
+						{{ range .Alerts }}{{ .Annotations.description }}
+						{{ end }}
+						"""
 					send_resolved: true
 				}]
 			}]

@@ -205,11 +205,11 @@ apple: "newline"`,
 		"scalar: | # Comment\n\n literal\n\n \ttext\n\n",
 		`scalar: """
 
-		literal
+	literal
 
-		\ttext
+	\ttext
 
-		"""`,
+	"""`,
 	},
 
 	// Folded block scalar
@@ -217,14 +217,14 @@ apple: "newline"`,
 		"scalar: > # Comment\n\n folded\n line\n \n next\n line\n  * one\n  * two\n\n last\n line\n\n",
 		`scalar: """
 
-		folded line
-		next line
-		 * one
-		 * two
+	folded line
+	next line
+	 * one
+	 * two
 
-		last line
+	last line
 
-		"""`,
+	"""`,
 	},
 
 	// Structs
@@ -456,10 +456,10 @@ b: {
 			` Line separator\u2028\` + "\n" +
 			` Paragraph separator\u2029"` + "\n",
 		`"""
-		Generic line break (no glyph)
-		Generic line break (glyphed)
-		Line separator\u2028Paragraph separator\u2029
-		"""`,
+	Generic line break (no glyph)
+	Generic line break (glyphed)
+	Line separator\u2028Paragraph separator\u2029
+	"""`,
 	},
 
 	// bug 1243827

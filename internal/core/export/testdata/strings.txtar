@@ -10,9 +10,9 @@ c: d: a
 
 -- out/definition --
 a: """
-    multi
-    line
-    """
+	multi
+	line
+	"""
 b: "message: \(a)!"
 c: {
 	d: a
@@ -27,68 +27,68 @@ c: {
 == Simplified
 {
 	a: """
-	multi
-	line
-	"""
-	b: """
-	message: multi
-	line!
-	"""
-	c: {
-		d: """
 		multi
 		line
 		"""
+	b: """
+		message: multi
+		line!
+		"""
+	c: {
+		d: """
+			multi
+			line
+			"""
 	}
 }
 == Raw
 {
 	a: """
-	multi
-	line
-	"""
-	b: """
-	message: multi
-	line!
-	"""
-	c: {
-		d: """
 		multi
 		line
 		"""
+	b: """
+		message: multi
+		line!
+		"""
+	c: {
+		d: """
+			multi
+			line
+			"""
 	}
 }
 == Final
 {
 	a: """
-	multi
-	line
-	"""
-	b: """
-	message: multi
-	line!
-	"""
-	c: {
-		d: """
 		multi
 		line
 		"""
+	b: """
+		message: multi
+		line!
+		"""
+	c: {
+		d: """
+			multi
+			line
+			"""
 	}
 }
 == All
 {
 	a: """
-	multi
-	line
-	"""
-	b: """
-	message: multi
-	line!
-	"""
-	c: {
-		d: """
 		multi
 		line
 		"""
+	b: """
+		message: multi
+		line!
+		"""
+	c: {
+		d: """
+			multi
+			line
+			"""
 	}
 }

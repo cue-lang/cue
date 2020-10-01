@@ -543,6 +543,15 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 	case *proto.Extensions, *proto.Reserved:
 		// no need to handle
 
+	case *proto.Option:
+		opt := fmt.Sprintf("@protobuf(option %s=%s)", x.Name, x.Constant.Source)
+		attr := &ast.Attribute{
+			At:   p.toCUEPos(x.Position),
+			Text: opt,
+		}
+		addComments(attr, i, x.Doc(), x.InlineComment)
+		s.Elts = append(s.Elts, attr)
+
 	default:
 		failf(scanner.Position{}, "unsupported field type %T", v)
 	}

@@ -3,5 +3,9 @@ syntax = "proto3";
 package acme.test;
 
 message Test {
+  // doc comment
+  option (yoyo.foo) = true; // line comment
+
+  option (yoyo.bar) = false;
   int32 test = 1;
 }

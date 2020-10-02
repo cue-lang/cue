@@ -26,17 +26,25 @@ b: _|_ // conflicting values 210 and 200
 }
 -- out/eval --
 Errors:
-b: incompatible values 200 and 210
-x: incompatible values 101 and 100
+b: conflicting values 200 and 210:
+    ./in.cue:2:4
+    ./in.cue:3:4
+x: conflicting values 101 and 100:
+    ./in.cue:5:4
+    ./in.cue:6:4
 
 Result:
 (_|_){
   // [eval]
   a: (int){ 100 }
   b: (_|_){
-    // [eval] b: incompatible values 200 and 210
+    // [eval] b: conflicting values 200 and 210:
+    //     ./in.cue:2:4
+    //     ./in.cue:3:4
   }
   x: (_|_){
-    // [eval] x: incompatible values 101 and 100
+    // [eval] x: conflicting values 101 and 100:
+    //     ./in.cue:5:4
+    //     ./in.cue:6:4
   }
 }

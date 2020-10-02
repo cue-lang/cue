@@ -454,15 +454,15 @@ func (n *nodeContext) postDisjunct() {
 		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
 		}
 
-		if aList := n.addLists(ctx); aList != nil {
-			n.updateNodeType(adt.ListKind, aList)
+		if aList, id := n.addLists(ctx); aList != nil {
+			n.updateNodeType(adt.ListKind, aList, id)
 		} else {
 			break
 		}
 	}
 
 	if n.aStruct != nil {
-		n.updateNodeType(adt.StructKind, n.aStruct)
+		n.updateNodeType(adt.StructKind, n.aStruct, n.aStructID)
 	}
 
 	switch err := n.getErr(); {
@@ -524,15 +524,32 @@ func (n *nodeContext) postDisjunct() {
 		if v != nil && adt.IsConcrete(v) {
 			if n.lowerBound != nil {
 				if b := ctx.Validate(n.lowerBound, v); b != nil {
+					// TODO(errors): make Validate return boolean and generate
+					// optimized conflict message. Also track and inject IDs
+					// to determine origin location.s
+					if e, _ := b.Err.(*adt.ValueError); e != nil {
+						e.AddPosition(n.lowerBound)
+						e.AddPosition(v)
+					}
 					n.addBottom(b)
 				}
 			}
 			if n.upperBound != nil {
 				if b := ctx.Validate(n.upperBound, v); b != nil {
+					// TODO(errors): make Validate return boolean and generate
+					// optimized conflict message. Also track and inject IDs
+					// to determine origin location.s
+					if e, _ := b.Err.(*adt.ValueError); e != nil {
+						e.AddPosition(n.upperBound)
+						e.AddPosition(v)
+					}
 					n.addBottom(b)
 				}
 			}
 			for _, v := range n.checks {
+				// TODO(errors): make Validate return boolean and generate
+				// optimized conflict message. Also track and inject IDs
+				// to determine origin location.s
 				if b := ctx.Validate(v, n.node); b != nil {
 					n.addBottom(b)
 				}
@@ -727,11 +744,13 @@ type nodeContext struct {
 	arcMap map[arcKey]bool
 
 	// Current value (may be under construction)
-	scalar adt.Value // TODO: use Value in node.
+	scalar   adt.Value // TODO: use Value in node.
+	scalarID adt.ID
 
 	// Concrete conjuncts
 	kind       adt.Kind
 	kindExpr   adt.Expr        // expr that adjust last value (for error reporting)
+	kindID     adt.ID          // for error tracing
 	lowerBound *adt.BoundValue // > or >=
 	upperBound *adt.BoundValue // < or <=
 	checks     []adt.Validator // BuiltinValidator, other bound values.
@@ -745,6 +764,7 @@ type nodeContext struct {
 	// TODO: remove this and annotate directly in acceptor.
 	needClose bool
 	aStruct   adt.Expr
+	aStructID adt.ID
 	hasTop    bool
 
 	// Expression conjuncts
@@ -770,7 +790,50 @@ func closedInfo(n *adt.Vertex) *acceptor {
 	return a
 }
 
-func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr) bool {
+// TODO(errors): return a dedicated ConflictError that can track original
+// positions on demand.
+//
+// Fully detailed origin tracking could be created on the back of CloseIDs
+// tracked in acceptor.Canopy. To make this fully functional, the following
+// still needs to be implemented:
+//
+//  - We need to know the ID for every value involved in the conflict.
+//    (There may be multiple if the result comes from a simplification).
+//  - CloseIDs should be forked not only for definitions, but all references.
+//  - Upon forking a CloseID, it should keep track of its enclosing CloseID
+//    as well (probably as a pointer to the origin so that the reference
+//    persists after compaction).
+//
+// The modifications to the CloseID algorithm may also benefit the computation
+// of `{ #A } == #A`, which currently is not done.
+//
+func (n *nodeContext) addConflict(
+	v1, v2 adt.Node,
+	k1, k2 adt.Kind,
+	id1, id2 adt.ID) {
+
+	ctx := n.ctx
+
+	var err *adt.ValueError
+	if k1 == k2 {
+		err = ctx.NewPosf(token.NoPos,
+			"conflicting values %s and %s", ctx.Str(v1), ctx.Str(v2))
+	} else {
+		err = ctx.NewPosf(token.NoPos,
+			"conflicting values %s and %s (mismatched types %s and %s)",
+			ctx.Str(v1), ctx.Str(v2), k1, k2)
+	}
+
+	ci := closedInfo(n.node)
+	err.AddPosition(v1)
+	err.AddPosition(v2)
+	err.AddPosition(ci.node(id1).Src)
+	err.AddPosition(ci.node(id2).Src)
+
+	n.addErr(err)
+}
+
+func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr, id adt.ID) bool {
 	ctx := n.ctx
 	kind := n.kind & k
 
@@ -781,9 +844,7 @@ func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr) bool {
 
 	case kind == adt.BottomKind:
 		if n.kindExpr != nil {
-			n.addErr(ctx.Newf(
-				"conflicting values %s and %s (mismatched types %s and %s)",
-				ctx.Str(n.kindExpr), ctx.Str(v), n.kind, k))
+			n.addConflict(n.kindExpr, v, n.kind, k, n.kindID, id)
 		} else {
 			n.addErr(ctx.Newf(
 				"conflicting value %s (mismatched types %s and %s)",
@@ -1190,6 +1251,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 	if x, ok := v.(*adt.Vertex); ok {
 		if m, ok := x.Value.(*adt.StructMarker); ok {
 			n.aStruct = x
+			n.aStructID = id
 			if m.NeedClose {
 				ci := closedInfo(n.node)
 				ci.isClosed = true // TODO: remove
@@ -1248,7 +1310,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 		return
 	}
 
-	if !n.updateNodeType(v.Kind(), v) {
+	if !n.updateNodeType(v.Kind(), v, id) {
 		return
 	}
 
@@ -1280,7 +1342,13 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 		case adt.LessThanOp, adt.LessEqualOp:
 			if y := n.upperBound; y != nil {
 				n.upperBound = nil
-				n.addValueConjunct(env, adt.SimplifyBounds(ctx, n.kind, x, y), id)
+				v := adt.SimplifyBounds(ctx, n.kind, x, y)
+				if err := valueError(v); err != nil {
+					err.AddPosition(v)
+					err.AddPosition(n.upperBound)
+					err.AddPosition(closedInfo(n.node).node(id).Src)
+				}
+				n.addValueConjunct(env, v, id)
 				return
 			}
 			n.upperBound = x
@@ -1288,7 +1356,13 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 		case adt.GreaterThanOp, adt.GreaterEqualOp:
 			if y := n.lowerBound; y != nil {
 				n.lowerBound = nil
-				n.addValueConjunct(env, adt.SimplifyBounds(ctx, n.kind, x, y), id)
+				v := adt.SimplifyBounds(ctx, n.kind, x, y)
+				if err := valueError(v); err != nil {
+					err.AddPosition(v)
+					err.AddPosition(n.lowerBound)
+					err.AddPosition(closedInfo(n.node).node(id).Src)
+				}
+				n.addValueConjunct(env, v, id)
 				return
 			}
 			n.lowerBound = x
@@ -1332,7 +1406,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 	case adt.Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit
 		if y := n.scalar; y != nil {
 			if b, ok := adt.BinOp(ctx, adt.EqualOp, x, y).(*adt.Bool); !ok || !b.B {
-				n.addErr(ctx.Newf("incompatible values %s and %s", ctx.Str(x), ctx.Str(y)))
+				n.addConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)
 			}
 			// TODO: do we need to explicitly add again?
 			// n.scalar = nil
@@ -1340,6 +1414,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 			break
 		}
 		n.scalar = x
+		n.scalarID = id
 
 	default:
 		panic(fmt.Sprintf("unknown value type %T", x))
@@ -1347,11 +1422,31 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 	if n.lowerBound != nil && n.upperBound != nil {
 		if u := adt.SimplifyBounds(ctx, n.kind, n.lowerBound, n.upperBound); u != nil {
+			if err := valueError(u); err != nil {
+				err.AddPosition(n.lowerBound)
+				err.AddPosition(n.upperBound)
+				err.AddPosition(closedInfo(n.node).node(id).Src)
+			}
 			n.lowerBound = nil
 			n.upperBound = nil
 			n.addValueConjunct(env, u, id)
 		}
 	}
+}
+
+func valueError(v adt.Value) *adt.ValueError {
+	if v == nil {
+		return nil
+	}
+	b, _ := v.(*adt.Bottom)
+	if b == nil {
+		return nil
+	}
+	err, _ := b.Err.(*adt.ValueError)
+	if err == nil {
+		return nil
+	}
+	return err
 }
 
 // addStruct collates the declarations of a struct.
@@ -1406,11 +1501,13 @@ func (n *nodeContext) addStruct(
 		case *adt.OptionalField:
 			if x.Label.IsString() {
 				n.aStruct = s
+				n.aStructID = closeID
 			}
 			opt.AddOptional(ctx, x)
 
 		case *adt.DynamicField:
 			n.aStruct = s
+			n.aStructID = closeID
 			hasOther = x
 			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeID})
 			opt.AddDynamic(ctx, childEnv, x)
@@ -1438,11 +1535,13 @@ func (n *nodeContext) addStruct(
 
 		case *adt.BulkOptionalField:
 			n.aStruct = s
+			n.aStructID = closeID
 			hasBulk = x
 			opt.AddBulk(ctx, x)
 
 		case *adt.Ellipsis:
 			n.aStruct = s
+			n.aStructID = closeID
 			hasBulk = x
 			opt.AddEllipsis(ctx, x)
 
@@ -1457,6 +1556,7 @@ func (n *nodeContext) addStruct(
 
 	if !hasEmbed {
 		n.aStruct = s
+		n.aStructID = closeID
 	}
 
 	// Apply existing fields
@@ -1472,6 +1572,7 @@ func (n *nodeContext) addStruct(
 		case *adt.Field:
 			if x.Label.IsString() {
 				n.aStruct = s
+				n.aStructID = closeID
 			}
 			n.insertField(x.Label, adt.MakeConjunct(childEnv, x, closeID))
 		}
@@ -1626,9 +1727,9 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr) {
+func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr, anID adt.ID) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
-		return nil
+		return nil, 0
 	}
 
 	isOpen := true
@@ -1681,6 +1782,7 @@ func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr) {
 outer:
 	for i, l := range n.lists {
 		oneOfTheLists = l.list
+		anID = l.id
 
 		n.updateCyclicStatus(l.env)
 
@@ -1806,7 +1908,7 @@ outer:
 	n.lists = n.lists[:0]
 	n.vLists = n.vLists[:0]
 
-	return oneOfTheLists
+	return oneOfTheLists, anID
 }
 
 func (n *nodeContext) invalidListLength(na, nb int, a, b adt.Expr) {

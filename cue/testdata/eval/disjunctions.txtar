@@ -61,7 +61,9 @@ d100: {
 
 -- out/eval --
 Errors:
-f.val: conflicting values 3 and string (mismatched types int and string)
+f.val: conflicting values 3 and string (mismatched types int and string):
+    ./in.cue:9:7
+    ./in.cue:15:28
 
 Result:
 (_|_){
@@ -91,7 +93,9 @@ Result:
     // [eval]
     name: (string){ "str" }
     val: (_|_){
-      // [eval] f.val: conflicting values 3 and string (mismatched types int and string)
+      // [eval] f.val: conflicting values 3 and string (mismatched types int and string):
+      //     ./in.cue:9:7
+      //     ./in.cue:15:28
     }
   }
   e1: (struct){

@@ -29,7 +29,8 @@ e1: _|_ // invalid value 100000 (out of bound int & <=32767)
 }
 -- out/eval --
 Errors:
-e1: invalid value 100000 (out of bound <=32767)
+e1: invalid value 100000 (out of bound <=32767):
+    ./in.cue:8:5
 
 Result:
 (_|_){
@@ -37,6 +38,7 @@ Result:
   k1: (int){ 44 }
   k2: (int){ -8000000000 }
   e1: (_|_){
-    // [eval] e1: invalid value 100000 (out of bound <=32767)
+    // [eval] e1: invalid value 100000 (out of bound <=32767):
+    //     ./in.cue:8:5
   }
 }

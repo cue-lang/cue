@@ -27,7 +27,9 @@ e: _|_ // conflicting values true and false
 }
 -- out/eval --
 Errors:
-e: incompatible values false and true
+e: conflicting values false and true:
+    ./in.cue:5:4
+    ./in.cue:6:4
 
 Result:
 (_|_){
@@ -35,6 +37,8 @@ Result:
   t: (bool){ true }
   f: (bool){ false }
   e: (_|_){
-    // [eval] e: incompatible values false and true
+    // [eval] e: conflicting values false and true:
+    //     ./in.cue:5:4
+    //     ./in.cue:6:4
   }
 }

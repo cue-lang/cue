@@ -76,15 +76,19 @@ e5: [1, 2, 4, _|_, // invalid value 8 (out of bound <=5)
 }
 -- out/eval --
 Errors:
-e: conflicting values 4 and [] (mismatched types int and list)
+e: conflicting values 4 and [] (mismatched types int and list):
+    ./in.cue:4:8
+    ./in.cue:4:13
 e2: invalid list index d (type string):
     ./in.cue:5:12
 e3: invalid negative index -1:
     ./in.cue:6:8
 e4.3: invalid value 8 (out of bound <=5):
     ./in.cue:7:24
+    ./in.cue:7:41
 e5.3: invalid value 8 (out of bound <=5):
     ./in.cue:8:39
+    ./in.cue:8:18
 
 Result:
 (_|_){
@@ -101,7 +105,9 @@ Result:
     2: (int){ 3 }
   }
   e: (_|_){
-    // [eval] e: conflicting values 4 and [] (mismatched types int and list)
+    // [eval] e: conflicting values 4 and [] (mismatched types int and list):
+    //     ./in.cue:4:8
+    //     ./in.cue:4:13
   }
   e2: (_|_){
     // [eval] e2: invalid list index d (type string):
@@ -119,6 +125,7 @@ Result:
     3: (_|_){
       // [eval] e4.3: invalid value 8 (out of bound <=5):
       //     ./in.cue:7:24
+      //     ./in.cue:7:41
     }
   }
   e5: (_|_){
@@ -129,6 +136,7 @@ Result:
     3: (_|_){
       // [eval] e5.3: invalid value 8 (out of bound <=5):
       //     ./in.cue:8:39
+      //     ./in.cue:8:18
     }
   }
 }

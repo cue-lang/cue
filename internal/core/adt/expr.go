@@ -394,6 +394,8 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 		if v.B {
 			return nil
 		}
+		// TODO(errors): use "invalid value %v (not an %s)" if x is a
+		// predeclared identifier such as `int`.
 		return c.NewErrf("invalid value %v (out of bound %s)",
 			c.Str(y), c.Str(x))
 

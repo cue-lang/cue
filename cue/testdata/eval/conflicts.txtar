@@ -1,0 +1,93 @@
+-- in.cue --
+i: int
+s: string
+
+t0: {
+    v: i & s
+}
+
+t1: {
+    #d1: {
+        a: b: 3
+    }
+
+    #d2: {
+        a: b: 4
+    }
+
+    x: #d1 & #d2
+}
+
+-- out/eval --
+Errors:
+t0.v: conflicting values int and string (mismatched types int and string):
+    ./in.cue:1:4
+    ./in.cue:2:4
+t1.x.a.b: conflicting values 4 and 3:
+    ./in.cue:10:15
+    ./in.cue:14:15
+    ./in.cue:17:8
+    ./in.cue:17:14
+
+Result:
+(_|_){
+  // [eval]
+  i: (int){ int }
+  s: (string){ string }
+  t0: (_|_){
+    // [eval]
+    v: (_|_){
+      // [eval] t0.v: conflicting values int and string (mismatched types int and string):
+      //     ./in.cue:1:4
+      //     ./in.cue:2:4
+    }
+  }
+  t1: (_|_){
+    // [eval]
+    #d1: (#struct){
+      a: (#struct){
+        b: (int){ 3 }
+      }
+    }
+    #d2: (#struct){
+      a: (#struct){
+        b: (int){ 4 }
+      }
+    }
+    x: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval]
+        b: (_|_){
+          // [eval] t1.x.a.b: conflicting values 4 and 3:
+          //     ./in.cue:10:15
+          //     ./in.cue:14:15
+          //     ./in.cue:17:8
+          //     ./in.cue:17:14
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  i: int
+  s: string
+  t0: {
+    v: (〈1;i〉 & 〈1;s〉)
+  }
+  t1: {
+    #d1: {
+      a: {
+        b: 3
+      }
+    }
+    #d2: {
+      a: {
+        b: 4
+      }
+    }
+    x: (〈0;#d1〉 & 〈0;#d2〉)
+  }
+}

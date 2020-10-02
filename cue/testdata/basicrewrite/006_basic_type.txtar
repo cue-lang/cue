@@ -34,7 +34,9 @@ f: true
 }
 -- out/eval --
 Errors:
-d: conflicting values int and float (mismatched types int and float)
+d: conflicting values int and float (mismatched types int and float):
+    ./in.cue:5:4
+    ./in.cue:5:10
 
 Result:
 (_|_){
@@ -43,7 +45,9 @@ Result:
   b: (int){ 1 }
   c: (float){ 1.0 }
   d: (_|_){
-    // [eval] d: conflicting values int and float (mismatched types int and float)
+    // [eval] d: conflicting values int and float (mismatched types int and float):
+    //     ./in.cue:5:4
+    //     ./in.cue:5:10
   }
   e: (string){ "4" }
   f: (bool){ true }

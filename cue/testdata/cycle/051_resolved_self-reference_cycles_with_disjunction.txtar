@@ -159,8 +159,9 @@ z3:  z1-3 & 8
 }
 -- out/eval --
 Errors:
-xe3: incompatible values 7 and 6:
-    ./in.cue:44:6
+xe3: conflicting values 7 and 6:
+    ./in.cue:45:6
+    ./in.cue:45:10
 
 Result:
 (_|_){
@@ -191,20 +192,24 @@ Result:
     // [incomplete] xe1: empty disjunction
   }
   xe2: (_|_){
-    // [eval] xe3: incompatible values 7 and 6:
-    //     ./in.cue:44:6
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:45:6
+    //     ./in.cue:45:10
   }
   xe3: (_|_){
-    // [eval] xe3: incompatible values 7 and 6:
-    //     ./in.cue:44:6
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:45:6
+    //     ./in.cue:45:10
   }
   xe4: (_|_){
-    // [eval] xe3: incompatible values 7 and 6:
-    //     ./in.cue:44:6
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:45:6
+    //     ./in.cue:45:10
   }
   xe5: (_|_){
-    // [eval] xe3: incompatible values 7 and 6:
-    //     ./in.cue:44:6
+    // [eval] xe3: conflicting values 7 and 6:
+    //     ./in.cue:45:6
+    //     ./in.cue:45:10
   }
   xf1: (int){ |((int){ 8 }, (int){ 9 }) }
   xf2: (_|_){

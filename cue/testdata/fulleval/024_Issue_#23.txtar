@@ -28,7 +28,9 @@ y: _|_ // ; empty disjunction: conflicting values 2 and 3
 }
 -- out/eval --
 Errors:
-y.a: incompatible values 2 and 3
+y.a: conflicting values 2 and 3:
+    ./in.cue:1:21
+    ./in.cue:2:12
 
 Result:
 (_|_){
@@ -41,7 +43,9 @@ Result:
   y: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] y.a: incompatible values 2 and 3
+      // [eval] y.a: conflicting values 2 and 3:
+      //     ./in.cue:1:21
+      //     ./in.cue:2:12
     }
   }
 }

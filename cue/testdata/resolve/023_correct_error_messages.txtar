@@ -15,12 +15,16 @@ a: _|_ // conflicting values "a" and 1 (mismatched types string and int)
 }
 -- out/eval --
 Errors:
-a: conflicting values "a" and 1 (mismatched types string and int)
+a: conflicting values "a" and 1 (mismatched types string and int):
+    ./in.cue:1:4
+    ./in.cue:1:10
 
 Result:
 (_|_){
   // [eval]
   a: (_|_){
-    // [eval] a: conflicting values "a" and 1 (mismatched types string and int)
+    // [eval] a: conflicting values "a" and 1 (mismatched types string and int):
+    //     ./in.cue:1:4
+    //     ./in.cue:1:10
   }
 }

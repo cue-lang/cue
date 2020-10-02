@@ -65,20 +65,20 @@ func TestValidate(t *testing.T) {
 		in: `
 		1 & 2
 		`,
-		out: "eval\nincompatible values 2 and 1",
+		out: "eval\nconflicting values 2 and 1:\n    test:2:3\n    test:2:7",
 	}, {
 		desc: "evaluation error in field",
 		in: `
 		x: 1 & 2
 		`,
-		out: "eval\nx: incompatible values 2 and 1",
+		out: "eval\nx: conflicting values 2 and 1:\n    test:2:6\n    test:2:10",
 	}, {
 		desc: "first error",
 		in: `
 		x: 1 & 2
 		y: 2 & 4
 		`,
-		out: "eval\nx: incompatible values 2 and 1",
+		out: "eval\nx: conflicting values 2 and 1:\n    test:2:6\n    test:2:10",
 	}, {
 		desc: "all errors",
 		cfg:  &Config{AllErrors: true},
@@ -87,8 +87,12 @@ func TestValidate(t *testing.T) {
 		y: 2 & 4
 		`,
 		out: `eval
-x: incompatible values 2 and 1
-y: incompatible values 4 and 2`,
+x: conflicting values 2 and 1:
+    test:2:6
+    test:2:10
+y: conflicting values 4 and 2:
+    test:3:6
+    test:3:10`,
 	}, {
 		desc: "incomplete",
 		cfg:  &Config{Concrete: true},
@@ -142,7 +146,7 @@ y: incompatible values 4 and 2`,
 		y: string
 		x: 1 & 2
 		`,
-		out: "eval\nx: incompatible values 2 and 1",
+		out: "eval\nx: conflicting values 2 and 1:\n    test:3:6\n    test:3:10",
 	}, {
 		desc: "consider defaults for concreteness",
 		cfg:  &Config{Concrete: true},

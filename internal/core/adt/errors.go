@@ -201,13 +201,27 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 	}
 }
 
-// A valueError is returned as a result of evaluating a value.
-type valueError struct {
+// A ValueError is returned as a result of evaluating a value.
+type ValueError struct {
 	r      Runtime
 	v      *Vertex
 	pos    token.Pos
 	auxpos []token.Pos
 	errors.Message
+}
+
+func (v *ValueError) AddPosition(n Node) {
+	if n == nil {
+		return
+	}
+	if p := pos(n); p != token.NoPos {
+		for _, q := range v.auxpos {
+			if p == q {
+				return
+			}
+		}
+		v.auxpos = append(v.auxpos, p)
+	}
 }
 
 func (c *OpContext) errNode() *Vertex {
@@ -225,14 +239,16 @@ func (c *OpContext) ReleasePositions(p int) {
 }
 
 func (c *OpContext) AddPosition(n Node) {
-	c.positions = append(c.positions, n)
+	if n != nil {
+		c.positions = append(c.positions, n)
+	}
 }
 
-func (c *OpContext) Newf(format string, args ...interface{}) *valueError {
+func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
 
-func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *valueError {
+func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
 	var a []token.Pos
 	if len(c.positions) > 0 {
 		a = make([]token.Pos, 0, len(c.positions))
@@ -248,7 +264,7 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *va
 			}
 		}
 	}
-	return &valueError{
+	return &ValueError{
 		r:       c.Runtime,
 		v:       c.errNode(),
 		pos:     p,
@@ -257,19 +273,19 @@ func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *va
 	}
 }
 
-func (e *valueError) Error() string {
+func (e *ValueError) Error() string {
 	return errors.String(e)
 }
 
-func (e *valueError) Position() token.Pos {
+func (e *ValueError) Position() token.Pos {
 	return e.pos
 }
 
-func (e *valueError) InputPositions() (a []token.Pos) {
+func (e *ValueError) InputPositions() (a []token.Pos) {
 	return e.auxpos
 }
 
-func (e *valueError) Path() (a []string) {
+func (e *ValueError) Path() (a []string) {
 	for _, f := range appendPath(nil, e.v) {
 		a = append(a, f.SelectorString(e.r))
 	}

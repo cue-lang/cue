@@ -15,7 +15,9 @@ foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
 -- out/eval --
 Errors:
-foo.0.type: incompatible values "string" and "float"
+foo.0.type: conflicting values "string" and "float":
+    ./in.cue:5:14
+    ./in.cue:10:14
 
 Result:
 (_|_){
@@ -32,7 +34,9 @@ Result:
     0: (_|_){
       // [eval]
       type: (_|_){
-        // [eval] foo.0.type: incompatible values "string" and "float"
+        // [eval] foo.0.type: conflicting values "string" and "float":
+        //     ./in.cue:5:14
+        //     ./in.cue:10:14
       }
     }
   }

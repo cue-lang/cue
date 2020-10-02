@@ -28,7 +28,9 @@ a: {
 }
 -- out/eval --
 Errors:
-a.x: incompatible values "hey!?" and "hey"
+a.x: conflicting values "hey!?" and "hey":
+    ./in.cue:2:5
+    ./in.cue:5:7
 
 Result:
 (_|_){
@@ -36,10 +38,14 @@ Result:
   a: (_|_){
     // [eval]
     x: (_|_){
-      // [eval] a.x: incompatible values "hey!?" and "hey"
+      // [eval] a.x: conflicting values "hey!?" and "hey":
+      //     ./in.cue:2:5
+      //     ./in.cue:5:7
     }
     y: (_|_){
-      // [eval] a.x: incompatible values "hey!?" and "hey"
+      // [eval] a.x: conflicting values "hey!?" and "hey":
+      //     ./in.cue:2:5
+      //     ./in.cue:5:7
     }
   }
 }

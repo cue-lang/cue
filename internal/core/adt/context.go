@@ -332,6 +332,9 @@ func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 }
 
 // Validate calls validates value for the given validator.
+//
+// TODO(errors): return boolean instead: only the caller has enough information
+// to generate a proper error message.
 func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 	// TODO: use a position stack to push both values.
 	saved := c.src

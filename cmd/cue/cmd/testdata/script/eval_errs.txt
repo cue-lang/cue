@@ -4,8 +4,12 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 -- expect-stderr --
-bar.b: conflicting values 2 and string (mismatched types int and string)
-x.q: incompatible values "goodbye" and "hello"
+bar.b: conflicting values 2 and string (mismatched types int and string):
+    ./errs.cue:5:21
+    ./errs.cue:6:26
+x.q: conflicting values "goodbye" and "hello":
+    ./errs.cue:1:4
+    ./errs.cue:2:4
 -- errs.cue --
 a: "hello"
 b: "goodbye"

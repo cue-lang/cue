@@ -75,7 +75,9 @@ e: _|_ // conflicting values 1 and {a: 3} (mismatched types int and struct)
 }
 -- out/eval --
 Errors:
-e: conflicting values 1 and {a:3} (mismatched types int and struct)
+e: conflicting values 1 and {a:3} (mismatched types int and struct):
+    ./in.cue:7:5
+    ./in.cue:8:4
 
 Result:
 (_|_){
@@ -97,7 +99,9 @@ Result:
     b: (int){ 2 }
   }
   e: (_|_){
-    // [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct)
+    // [eval] e: conflicting values 1 and {a:3} (mismatched types int and struct):
+    //     ./in.cue:7:5
+    //     ./in.cue:8:4
     a: (int){ 3 }
   }
 }

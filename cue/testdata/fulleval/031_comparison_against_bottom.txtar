@@ -61,29 +61,33 @@ i: false
 }
 -- out/eval --
 Errors:
-err: incompatible values 2 and 1:
-    ./in.cue:2:4
+err: conflicting values 2 and 1:
+    ./in.cue:12:6
+    ./in.cue:12:10
 
 Result:
 (_|_){
   // [eval]
   a: (bool){ true }
   b: (_|_){
-    // [eval] err: incompatible values 2 and 1:
-    //     ./in.cue:2:4
+    // [eval] err: conflicting values 2 and 1:
+    //     ./in.cue:12:6
+    //     ./in.cue:12:10
   }
   c: (bool){ true }
   d: (bool){ false }
   e: (_|_){
-    // [eval] err: incompatible values 2 and 1:
-    //     ./in.cue:2:4
+    // [eval] err: conflicting values 2 and 1:
+    //     ./in.cue:12:6
+    //     ./in.cue:12:10
   }
   f: (bool){ true }
   g: (bool){ false }
   h: (bool){ true }
   i: (bool){ false }
   err: (_|_){
-    // [eval] err: incompatible values 2 and 1:
-    //     ./in.cue:2:4
+    // [eval] err: conflicting values 2 and 1:
+    //     ./in.cue:12:6
+    //     ./in.cue:12:10
   }
 }

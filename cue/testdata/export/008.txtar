@@ -16,7 +16,10 @@ a: [_|_, // conflicting values 3 and 4
 }
 -- out/eval --
 Errors:
-a.0: incompatible values 4 and 3
+a.0: conflicting values 4 and 3:
+    ./in.cue:1:1
+    ./in.cue:1:7
+    ./in.cue:1:11
 
 Result:
 (_|_){
@@ -24,7 +27,10 @@ Result:
   a: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] a.0: incompatible values 4 and 3
+      // [eval] a.0: conflicting values 4 and 3:
+      //     ./in.cue:1:1
+      //     ./in.cue:1:7
+      //     ./in.cue:1:11
     }
   }
 }

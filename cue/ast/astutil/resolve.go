@@ -413,20 +413,30 @@ func resolveIdent(s *scope, x *ast.Ident) bool {
 
 func scopeClauses(s *scope, clauses []ast.Clause) *scope {
 	for _, c := range clauses {
-		if f, ok := c.(*ast.ForClause); ok { // TODO(let): support let clause
-			walk(s, f.Source)
-			s = newScope(s.file, s, f, nil)
-			if f.Key != nil {
-				name, err := ast.ParseIdent(f.Key)
+		switch x := c.(type) {
+		case *ast.ForClause:
+			walk(s, x.Source)
+			s = newScope(s.file, s, x, nil)
+			if x.Key != nil {
+				name, err := ast.ParseIdent(x.Key)
 				if err == nil {
-					s.insert(name, f.Key, f)
+					s.insert(name, x.Key, x)
 				}
 			}
-			name, err := ast.ParseIdent(f.Value)
+			name, err := ast.ParseIdent(x.Value)
 			if err == nil {
-				s.insert(name, f.Value, f)
+				s.insert(name, x.Value, x)
 			}
-		} else {
+
+		case *ast.LetClause:
+			walk(s, x.Expr)
+			s = newScope(s.file, s, x, nil)
+			name, err := ast.ParseIdent(x.Ident)
+			if err == nil {
+				s.insert(name, x.Ident, x)
+			}
+
+		default:
 			walk(s, c)
 		}
 	}

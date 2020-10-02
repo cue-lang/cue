@@ -275,6 +275,8 @@ func (c *collatedDecls) collate(env *adt.Environment, s *adt.StructLit) {
 			c.yielders = append(c.yielders, x)
 
 		case *adt.LetClause:
+			c.yielders = append(c.yielders, x)
+
 		case *adt.ValueClause:
 		}
 	}

@@ -13,6 +13,12 @@ b: {
 		l: 40
 	}
 }
+
+c: {
+  for k, v in a let y = v+10 if y > 50 {
+    "\(k)": y
+  }
+}
 -- out/eval --
 (struct){
   a: (struct){
@@ -25,6 +31,10 @@ b: {
     k: (int){ 20 }
     z: (int){ 50 }
     l: (int){ 40 }
+  }
+  c: (struct){
+    y: (int){ 110 }
+    z: (int){ 60 }
   }
 }
 -- out/compile --
@@ -46,6 +56,11 @@ b: {
     k: int
     if (〈0;k〉 > 0) {
       l: 40
+    }
+  }
+  c: {
+    for k, v in 〈1;a〉 let y = (〈0;v〉 + 10) if (〈0;y〉 > 50) {
+      "\(〈2;k〉)": 〈1;y〉
     }
   }
 }

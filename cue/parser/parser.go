@@ -1123,11 +1123,20 @@ func (p *parser) parseComprehensionClauses(first bool) (clauses []ast.Clause, c 
 				Condition: p.parseRHS(),
 			}))
 
-		// TODO:
-		// case token.LET:
-		// 	c := p.openComments()
-		// 	p.expect(token.LET)
-		// 	return nil, c
+		case token.LET:
+			c := p.openComments()
+			letPos := p.expect(token.LET)
+
+			ident := p.parseIdent()
+			assign := p.expect(token.BIND)
+			expr := p.parseRHS()
+
+			clauses = append(clauses, c.closeClause(p, &ast.LetClause{
+				Let:   letPos,
+				Ident: ident,
+				Equal: assign,
+				Expr:  expr,
+			}))
 
 		default:
 			return clauses, nil

@@ -280,6 +280,17 @@ func TestParse(t *testing.T) {
 			 }`,
 		`{y: {a: 1, b: 2}, a: {for k: v in y if v>2 {"\(k)": v}}}`,
 	}, {
+		"nested comprehensions",
+		`{
+			y: { a: 1, b: 2}
+			a: {
+				for k, v in y let x = v+2 if x > 2 {
+					"\(k)": v
+				}
+			}
+		}`,
+		`{y: {a: 1, b: 2}, a: {for k: v in y let x=v+2 if x>2 {"\(k)": v}}}`,
+	}, {
 		"let declaration",
 		`{
 			let X = 42

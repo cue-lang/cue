@@ -909,11 +909,13 @@ func (f *formatter) selectorExpr(x *ast.SelectorExpr, depth int) bool {
 	f.expr1(x.X, token.HighestPrec, depth)
 	f.print(token.PERIOD)
 	if x.Sel.Pos().IsNewline() {
-		f.print(indent, formfeed, x.Sel.Pos(), x.Sel)
+		f.print(indent, formfeed)
+		f.expr(x.Sel.(ast.Expr))
 		f.print(unindent)
 		return true
 	}
-	f.print(x.Sel.Pos(), x.Sel)
+	f.print(noblank)
+	f.expr(x.Sel.(ast.Expr))
 	return false
 }
 

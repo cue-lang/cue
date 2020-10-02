@@ -1361,6 +1361,21 @@ L:
 					X:   p.checkExpr(x),
 					Sel: p.parseIdent(),
 				}
+			case token.STRING:
+				if strings.HasPrefix(p.lit, `"`) && !strings.HasPrefix(p.lit, `""`) {
+					str := &ast.BasicLit{
+						ValuePos: p.pos,
+						Kind:     token.STRING,
+						Value:    p.lit,
+					}
+					p.next()
+					x = &ast.SelectorExpr{
+						X:   p.checkExpr(x),
+						Sel: str,
+					}
+					break
+				}
+				fallthrough
 			default:
 				pos := p.pos
 				p.errorExpected(pos, "selector")

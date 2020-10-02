@@ -583,7 +583,7 @@ func (x *SelectorExpr) Source() ast.Node {
 
 func (x *SelectorExpr) resolve(c *OpContext) *Vertex {
 	n := c.node(x.X, Partial)
-	return c.lookup(n, x.Src.Sel.NamePos, x.Sel)
+	return c.lookup(n, x.Src.Sel.Pos(), x.Sel)
 }
 
 // IndexExpr is like a selector, but selects an index.

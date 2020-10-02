@@ -1,14 +1,21 @@
 -- in.cue --
-	a: 1
-	b: a + 1
-	d: {
-		x: _
-		y: b + x
-	}
-	e: d & {
-		x: 5
-	}
-
+a: 1
+b: a + 1
+d: {
+  x: _
+  y: b + x
+}
+e: d & {
+  x: 5
+}
+f: {
+  a: "foo-bar": 3
+  b: a."foo-bar"
+}
+g: {
+  a: "foo-bar": c: 3
+  b: a."foo-bar".c
+}
 -- out/eval --
 (struct){
   a: (int){ 1 }
@@ -24,6 +31,20 @@
     x: (int){ 5 }
     y: (int){ 7 }
   }
+  f: (struct){
+    a: (struct){
+      "foo-bar": (int){ 3 }
+    }
+    b: (int){ 3 }
+  }
+  g: (struct){
+    a: (struct){
+      "foo-bar": (struct){
+        c: (int){ 3 }
+      }
+    }
+    b: (int){ 3 }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -37,4 +58,18 @@
   e: (〈0;d〉 & {
     x: 5
   })
+  f: {
+    a: {
+      "foo-bar": 3
+    }
+    b: 〈0;a〉."foo-bar"
+  }
+  g: {
+    a: {
+      "foo-bar": {
+        c: 3
+      }
+    }
+    b: 〈0;a〉."foo-bar".c
+  }
 }

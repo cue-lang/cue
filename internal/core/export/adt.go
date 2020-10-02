@@ -155,7 +155,7 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 	case *adt.SelectorExpr:
 		return &ast.SelectorExpr{
 			X:   e.expr(x.X),
-			Sel: e.ident(x.Sel),
+			Sel: e.stringLabel(x.Sel),
 		}
 
 	case *adt.IndexExpr:

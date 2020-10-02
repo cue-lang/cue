@@ -117,6 +117,23 @@ func TestParse(t *testing.T) {
 		`{ V1, V2 }`,
 		`{V1, V2}`,
 	}, {
+		"selectors",
+		`a.b. "str"`,
+		`a.b."str"`,
+	}, {
+		"selectors",
+		`a.b. "str"`,
+		`a.b."str"`,
+	}, {
+		"faulty bytes selector",
+		`a.b.'str'`,
+		"a.b._\nexpected selector, found 'STRING' 'str'",
+	}, {
+		"faulty multiline string selector",
+		`a.b."""
+			"""`,
+		"a.b._\nexpected selector, found 'STRING' \"\"\"\n\t\t\t\"\"\"",
+	}, {
 		"expression embedding",
 		`#Def: {
 			a.b.c
@@ -697,8 +714,8 @@ func TestImports(t *testing.T) {
 // *BadExpr.
 func TestIncompleteSelection(t *testing.T) {
 	for _, src := range []string{
-		"{ a: fmt. }",           // at end of object
-		"{ a: fmt.\n\"a\": x }", // not at end of struct
+		"{ a: fmt. }",         // at end of object
+		"{ a: fmt.\n0.0: x }", // not at end of struct
 	} {
 		t.Run("", func(t *testing.T) {
 			f, err := ParseFile("", src)

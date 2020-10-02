@@ -830,8 +830,9 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		// Anonymous Arc
-		v := Vertex{Conjuncts: []Conjunct{{env, x, 0}}}
-		return c.Unifier.Evaluate(c, &v)
+		v := &Vertex{Conjuncts: []Conjunct{{env, x, 0}}}
+		c.Unifier.Unify(c, v, Finalized)
+		return v
 	}
 
 	if !c.concreteIsPossible(x.X) || !c.concreteIsPossible(x.Y) {

@@ -8,6 +8,8 @@ b: null & _|_
 c: b.a == _|_
 d: _|_ != b.a
 e: _|_ == _|_
+f: ({} & false) == _|_
+g: _|_ != ({} & false)
 -- out/def --
 a: _|_ // explicit error (_|_ literal) in source
 b: _|_ // explicit error (_|_ literal) in source
@@ -24,6 +26,8 @@ e: true
   c: (〈0;b〉.a == _|_(explicit error (_|_ literal) in source))
   d: (_|_(explicit error (_|_ literal) in source) != 〈0;b〉.a)
   e: (_|_(explicit error (_|_ literal) in source) == _|_(explicit error (_|_ literal) in source))
+  f: (({} & false) == _|_(explicit error (_|_ literal) in source))
+  g: (_|_(explicit error (_|_ literal) in source) != ({} & false))
 }
 -- out/eval --
 Errors:
@@ -46,4 +50,6 @@ Result:
   c: (bool){ true }
   d: (bool){ false }
   e: (bool){ true }
+  f: (bool){ true }
+  g: (bool){ false }
 }

@@ -147,8 +147,7 @@ func (x *Index) Label(s string, isIdent bool) adt.Feature {
 }
 
 func (idx *Index) LabelStr(l adt.Feature) string {
-	index := int64(l.Index())
-	return idx.IndexToString(index)
+	return l.IdentString(idx)
 }
 
 func (x *Index) AddInst(path string, key, p interface{}) {

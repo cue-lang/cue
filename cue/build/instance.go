@@ -15,6 +15,7 @@
 package build
 
 import (
+	"fmt"
 	pathpkg "path"
 	"path/filepath"
 	"strings"
@@ -125,6 +126,15 @@ type Instance struct {
 	Deps       []string
 	DepsErrors []error
 	Match      []string
+}
+
+// ID returns the package ID unique for this module.
+func (inst *Instance) ID() string {
+	if inst.PkgName == "" {
+		return ""
+	}
+	s := fmt.Sprintf("%s:%s", inst.Module, inst.PkgName)
+	return s
 }
 
 // Dependencies reports all Instances on which this instance depends.

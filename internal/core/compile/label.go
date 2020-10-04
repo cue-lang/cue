@@ -29,7 +29,7 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 	index := c.index
 	switch x := n.(type) {
 	case *ast.Ident:
-		return adt.MakeIdentLabel(c.index, x.Name)
+		return adt.MakeIdentLabel(c.index, x.Name, c.pkgPath)
 
 	case *ast.BasicLit:
 		switch x.Kind {

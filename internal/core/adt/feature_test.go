@@ -77,18 +77,18 @@ func TestFeatureBool(t *testing.T) {
 		isRegular: true,
 		isInt:     true,
 	}, {
-		in:        adt.MakeIdentLabel(r, "foo"),
+		in:        adt.MakeIdentLabel(r, "foo", "main"),
 		isRegular: true,
 		isString:  true,
 	}, {
-		in:           adt.MakeIdentLabel(r, "#foo"),
+		in:           adt.MakeIdentLabel(r, "#foo", "main"),
 		isDefinition: true,
 	}, {
-		in:           adt.MakeIdentLabel(r, "_#foo"),
+		in:           adt.MakeIdentLabel(r, "_#foo", "main"),
 		isDefinition: true,
 		isHidden:     true,
 	}, {
-		in:       adt.MakeIdentLabel(r, "_foo"),
+		in:       adt.MakeIdentLabel(r, "_foo", "main"),
 		isHidden: true,
 	}}
 	for i, tc := range testCases {

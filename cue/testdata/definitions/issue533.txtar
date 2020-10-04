@@ -35,7 +35,7 @@ Result:
   #x: (#struct){
     Name: (string){ string }
   }
-  _#x: (#struct){
+  _#x(:x): (#struct){
     Name: (string){ string }
   }
   x1: (_|_){

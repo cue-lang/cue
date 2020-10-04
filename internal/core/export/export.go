@@ -35,9 +35,13 @@ type Profile struct {
 	// IncludeDocs
 	ShowOptional    bool
 	ShowDefinitions bool
-	ShowHidden      bool
-	ShowDocs        bool
-	ShowAttributes  bool
+
+	// ShowHidden forces the inclusion of hidden fields when these would
+	// otherwise be omitted. Only hidden fields from the current package are
+	// included.
+	ShowHidden     bool
+	ShowDocs       bool
+	ShowAttributes bool
 
 	// AllowErrorType
 	// Use unevaluated conjuncts for these error types
@@ -77,13 +81,13 @@ var All = &Profile{
 // Concrete
 
 // Def exports v as a definition.
-func Def(r adt.Runtime, v *adt.Vertex) (*ast.File, errors.Error) {
-	return All.Def(r, v)
+func Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
+	return All.Def(r, pkgID, v)
 }
 
 // Def exports v as a definition.
-func (p *Profile) Def(r adt.Runtime, v *adt.Vertex) (*ast.File, errors.Error) {
-	e := newExporter(p, r, v)
+func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, errors.Error) {
+	e := newExporter(p, r, pkgID, v)
 	if v.Label.IsDef() {
 		e.inDefinition++
 	}
@@ -100,12 +104,12 @@ func (p *Profile) Def(r adt.Runtime, v *adt.Vertex) (*ast.File, errors.Error) {
 	return e.toFile(v, expr)
 }
 
-func Expr(r adt.Runtime, n adt.Expr) (ast.Expr, errors.Error) {
-	return Simplified.Expr(r, n)
+func Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
+	return Simplified.Expr(r, pkgID, n)
 }
 
-func (p *Profile) Expr(r adt.Runtime, n adt.Expr) (ast.Expr, errors.Error) {
-	e := newExporter(p, r, nil)
+func (p *Profile) Expr(r adt.Runtime, pkgID string, n adt.Expr) (ast.Expr, errors.Error) {
+	e := newExporter(p, r, pkgID, nil)
 	return e.expr(n), nil
 }
 
@@ -156,30 +160,32 @@ func (e *exporter) toFile(v *adt.Vertex, x ast.Expr) (*ast.File, errors.Error) {
 
 // File
 
-func Vertex(r adt.Runtime, n *adt.Vertex) (*ast.File, errors.Error) {
-	return Simplified.Vertex(r, n)
+func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
+	return Simplified.Vertex(r, pkgID, n)
 }
 
-func (p *Profile) Vertex(r adt.Runtime, n *adt.Vertex) (*ast.File, errors.Error) {
+func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
 	e := exporter{
 		cfg:   p,
 		index: r,
+		pkgID: pkgID,
 	}
 	v := e.value(n, n.Conjuncts...)
 
 	return e.toFile(n, v)
 }
 
-func Value(r adt.Runtime, n adt.Value) (ast.Expr, errors.Error) {
-	return Simplified.Value(r, n)
+func Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
+	return Simplified.Value(r, pkgID, n)
 }
 
 // Should take context.
-func (p *Profile) Value(r adt.Runtime, n adt.Value) (ast.Expr, errors.Error) {
+func (p *Profile) Value(r adt.Runtime, pkgID string, n adt.Value) (ast.Expr, errors.Error) {
 	e := exporter{
 		ctx:   eval.NewContext(r, nil),
 		cfg:   p,
 		index: r,
+		pkgID: pkgID,
 	}
 	v := e.value(n)
 	return v, e.errs
@@ -199,13 +205,20 @@ type exporter struct {
 	inDefinition int // for close() wrapping.
 
 	unique int
+
+	// hidden label handling
+	pkgID       string
+	hidden      map[string]adt.Feature // adt.InvalidFeatures means more than one.
+	usedFeature map[adt.Feature]string
+	usedHidden  map[string]bool
 }
 
-func newExporter(p *Profile, r adt.Runtime, v *adt.Vertex) *exporter {
+func newExporter(p *Profile, r adt.Runtime, pkgID string, v *adt.Vertex) *exporter {
 	return &exporter{
 		cfg:   p,
 		ctx:   eval.NewContext(r, v),
 		index: r,
+		pkgID: pkgID,
 	}
 }
 

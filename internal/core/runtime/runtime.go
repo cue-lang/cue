@@ -80,7 +80,7 @@ func (x *Runtime) Build(b *build.Instance) (v *adt.Vertex, errs errors.Error) {
 		return nil, errs
 	}
 
-	return compile.Files(nil, x, b.Files...)
+	return compile.Files(nil, x, b.ID(), b.Files...)
 }
 
 func (x *Runtime) buildSpec(b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {

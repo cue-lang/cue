@@ -174,13 +174,13 @@ y: conflicting values 4 and 2:
 			if err != nil {
 				t.Fatal(err)
 			}
-			v, err := compile.Files(nil, r, f)
+			v, err := compile.Files(nil, r, "", f)
 			if err != nil {
 				t.Fatal(err)
 			}
 			ctx.Unify(ctx, v, adt.Finalized)
 			if tc.lookup != "" {
-				v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup))
+				v = v.Lookup(adt.MakeIdentLabel(r, tc.lookup, "main"))
 			}
 
 			b := Validate(ctx, v, tc.cfg)

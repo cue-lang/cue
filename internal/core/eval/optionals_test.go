@@ -60,7 +60,7 @@ func TestOptionalTypes(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			v, errs := compile.Files(nil, ctx, f)
+			v, errs := compile.Files(nil, ctx, "", f)
 			if errs != nil {
 				t.Fatal(errs)
 			}

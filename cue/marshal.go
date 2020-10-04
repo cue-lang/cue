@@ -142,7 +142,7 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 			return p
 		}
 		// TODO: support exporting instance
-		file, _ := export.Def(r.idx.Runtime, i.root)
+		file, _ := export.Def(r.idx.Runtime, i.inst.ID(), i.root)
 		imports := []string{}
 		file.VisitImports(func(i *ast.ImportDecl) {
 			for _, spec := range i.Specs {

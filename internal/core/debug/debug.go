@@ -87,6 +87,13 @@ func (w *printer) label(f adt.Feature) {
 
 // TODO: fold into label once :: is no longer supported.
 func (w *printer) labelString(f adt.Feature) string {
+	if f.IsHidden() {
+		ident := f.IdentString(w.index)
+		if pkgName := f.PkgID(w.index); pkgName != "main" {
+			ident = fmt.Sprintf("%s(%s)", ident, pkgName)
+		}
+		return ident
+	}
 	return f.SelectorString(w.index)
 }
 

@@ -528,7 +528,7 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 
 		r := runtime.New()
-		v, err := compile.Files(nil, r, file)
+		v, err := compile.Files(nil, r, "_", file)
 		if err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 		}

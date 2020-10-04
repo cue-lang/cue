@@ -262,7 +262,7 @@ func (idx *index) loadInstance(p *build.Instance) *Instance {
 		err := runtime.ResolveFiles(idx.Index, p, isBuiltin)
 		errs = errors.Append(errs, err)
 
-		v, err := compile.Files(nil, idx.Runtime, p.Files...)
+		v, err := compile.Files(nil, idx.Runtime, p.ID(), p.Files...)
 		errs = errors.Append(errs, err)
 
 		inst := newInstance(idx, p, v)

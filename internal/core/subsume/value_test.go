@@ -387,7 +387,7 @@ func TestValues(t *testing.T) {
 				t.Fatal(err)
 			}
 
-			root, errs := compile.Files(nil, r, file)
+			root, errs := compile.Files(nil, r, "", file)
 			if errs != nil {
 				t.Fatal(errs)
 			}

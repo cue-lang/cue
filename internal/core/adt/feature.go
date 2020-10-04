@@ -15,6 +15,7 @@
 package adt
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -68,8 +69,34 @@ func (f Feature) SelectorString(index StringIndexer) string {
 		}
 		return literal.String.Quote(s)
 	default:
-		return index.IndexToString(int64(x))
+		return f.IdentString(index)
 	}
+}
+
+// IdentString reports the identifier of f. The result is undefined if f
+// is not an identifier label.
+func (f Feature) IdentString(index StringIndexer) string {
+	s := index.IndexToString(int64(f.Index()))
+	if f.IsHidden() {
+		if p := strings.IndexByte(s, '\x00'); p >= 0 {
+			s = s[:p]
+		}
+	}
+	return s
+}
+
+// PkgID returns the package identifier, composed of the module and package
+// name, associated with this identifier. It will return "" if this is not
+// a hidden label.
+func (f Feature) PkgID(index StringIndexer) string {
+	if !f.IsHidden() {
+		return ""
+	}
+	s := index.IndexToString(int64(f.Index()))
+	if p := strings.IndexByte(s, '\x00'); p >= 0 {
+		return s[p+1:]
+	}
+	return s
 }
 
 // StringValue reports the string value of f, which must be a string label.
@@ -113,17 +140,19 @@ func MakeStringLabel(r StringIndexer, s string) Feature {
 }
 
 // MakeIdentLabel creates a label for the given identifier.
-func MakeIdentLabel(r StringIndexer, s string) Feature {
-	i := r.StringToIndex(s)
+func MakeIdentLabel(r StringIndexer, s, pkgpath string) Feature {
 	t := StringLabel
 	switch {
 	case strings.HasPrefix(s, "_#"):
 		t = HiddenDefinitionLabel
+		s = fmt.Sprintf("%s\x00%s", s, pkgpath)
 	case strings.HasPrefix(s, "#"):
 		t = DefinitionLabel
 	case strings.HasPrefix(s, "_"):
+		s = fmt.Sprintf("%s\x00%s", s, pkgpath)
 		t = HiddenLabel
 	}
+	i := r.StringToIndex(s)
 	f, err := MakeLabel(nil, i, t)
 	if err != nil {
 		panic("out of free string slots")

@@ -12,29 +12,41 @@ import "example.com/pkg"
   _name: d: int
 }
 
-d: pkg.#D & { _name: d: int }
+d: pkg.#D & { _name: d: int, _val: 4 }
 
 // TODO: this should fail, as the _name restricting it is in this
 // package.
-// e: pkg.#D & #def & { _name: e: int }
+e: pkg.#D & #def & { _name: e: int, _val: int }
+f: e._val
 
 -- pkg/bar.cue --
 package pkg
 
-#D: {}
+#D: { _val: 3 }
 
 -- out/eval --
 (struct){
   #def: (#struct){
-    _name: (#struct){
+    _name(:foo): (#struct){
       d: (int){ int }
     }
   }
   d: (#struct){
-    _name: (#struct){
+    _val(example.com:pkg): (int){ 3 }
+    _name(:foo): (#struct){
       d: (int){ int }
     }
+    _val(:foo): (int){ 4 }
   }
+  e: (#struct){
+    _val(example.com:pkg): (int){ 3 }
+    _name(:foo): (#struct){
+      d: (int){ int }
+      e: (int){ int }
+    }
+    _val(:foo): (int){ int }
+  }
+  f: (int){ int }
 }
 -- out/compile --
 --- in.cue
@@ -48,5 +60,13 @@ package pkg
     _name: {
       d: int
     }
+    _val: 4
   })
+  e: ((〈import;"example.com/pkg"〉.#D & 〈0;#def〉) & {
+    _name: {
+      e: int
+    }
+    _val: int
+  })
+  f: 〈0;e〉._val
 }

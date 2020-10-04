@@ -49,7 +49,7 @@ func TestDefinition(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
 
-		v, errs := compile.Files(nil, r, a[0].Files...)
+		v, errs := compile.Files(nil, r, "", a[0].Files...)
 		if errs != nil {
 			t.Fatal(errs)
 		}
@@ -58,7 +58,7 @@ func TestDefinition(t *testing.T) {
 		// TODO: do we need to evaluate v? In principle not necessary.
 		// v.Finalize(eval.NewContext(r, v))
 
-		file, errs := export.Def(r, v)
+		file, errs := export.Def(r, "", v)
 		errors.Print(t, errs, nil)
 		_, _ = t.Write(formatNode(t.T, file))
 	})
@@ -117,7 +117,7 @@ func TestGenerated(t *testing.T) {
 			if err != nil {
 				return nil, err
 			}
-			c, err := compile.Expr(nil, ctx, expr)
+			c, err := compile.Expr(nil, ctx, "_", expr)
 			if err != nil {
 				return nil, err
 			}
@@ -145,7 +145,7 @@ func TestGenerated(t *testing.T) {
 			if err != nil {
 				t.Fatal("failed test case: ", err)
 			}
-			expr, err := export.Expr(ctx, v)
+			expr, err := export.Expr(ctx, "", v)
 			if err != nil {
 				t.Fatal("failed export: ", err)
 			}
@@ -223,13 +223,13 @@ d2: C="foo\(bar)": {
 	// astutil.Sanitize(x)
 
 	r := runtime.New()
-	v, errs := compile.Files(nil, r, a[0].Files...)
+	v, errs := compile.Files(nil, r, "", a[0].Files...)
 	if errs != nil {
 		t.Fatal(errs)
 	}
 	v.Finalize(eval.NewContext(r, v))
 
-	file, errs := export.Def(r, v)
+	file, errs := export.Def(r, "main", v)
 	if errs != nil {
 		t.Fatal(errs)
 	}

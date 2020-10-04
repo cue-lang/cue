@@ -937,13 +937,15 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		ShowDocs:        o.docs,
 	}
 
+	pkgID := v.instance().ID()
+
 	// var expr ast.Expr
 	var err error
 	var f *ast.File
 	if o.concrete || o.final {
 		// inst = v.instance()
 		var expr ast.Expr
-		expr, err = p.Value(v.idx.Runtime, v.v)
+		expr, err = p.Value(v.idx.Runtime, pkgID, v.v)
 		if err != nil {
 			return nil
 		}
@@ -955,7 +957,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		}
 		// return expr
 	} else {
-		f, err = p.Def(v.idx.Runtime, v.v)
+		f, err = p.Def(v.idx.Runtime, pkgID, v.v)
 		if err != nil {
 			panic(err)
 		}
@@ -1718,7 +1720,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 	case state.Flag('+'):
 		_, _ = io.WriteString(state, ctx.opCtx.Str(v.v))
 	default:
-		n, _ := export.Raw.Expr(v.idx.Runtime, v.v)
+		n, _ := export.Raw.Expr(v.idx.Runtime, v.instance().ID(), v.v)
 		b, _ := format.Node(n)
 		_, _ = state.Write(b)
 	}

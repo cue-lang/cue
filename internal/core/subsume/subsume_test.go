@@ -50,7 +50,7 @@ func parse(t *testing.T, ctx *adt.OpContext, str string) *adt.Vertex {
 		t.Fatal(err)
 	}
 
-	root, errs := compile.Files(nil, ctx, file)
+	root, errs := compile.Files(nil, ctx, "", file)
 	if errs != nil {
 		t.Fatal(errs)
 	}

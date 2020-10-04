@@ -88,7 +88,7 @@ for k, v in deployment {
                   0: (struct){
                     containerPort: (int){ 9100 }
                     name: (string){ "scrape" }
-                    _export: (bool){ |(*(bool){ true }, (bool){ false }) }
+                    _export(:kube): (bool){ |(*(bool){ true }, (bool){ false }) }
                   }
                 }
                 name: (string){ string }
@@ -97,11 +97,11 @@ for k, v in deployment {
           }
         }
       }
-      _name: (string){ string }
+      _name(:kube): (string){ string }
     }
   }
-  _spec: (struct){
-    _name: (string){ string }
+  _spec(:kube): (struct){
+    _name(:kube): (string){ string }
     spec: (struct){
       template: (struct){
         spec: (struct){

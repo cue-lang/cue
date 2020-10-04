@@ -47,9 +47,11 @@ func TestValue(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
 
-		v, errs := compile.Files(nil, r, a[0].Files...)
-		if errs != nil {
-			t.Fatal(errs)
+		pkgID := a[0].ID()
+
+		v, err := r.Build(a[0])
+		if err != nil {
+			t.Fatal(err)
 		}
 
 		ctx := eval.NewContext(r, v)
@@ -57,7 +59,7 @@ func TestValue(t *testing.T) {
 
 		for _, tc := range []struct {
 			name string
-			fn   func(r adt.Runtime, v adt.Value) (ast.Expr, errors.Error)
+			fn   func(r adt.Runtime, id string, v adt.Value) (ast.Expr, errors.Error)
 		}{
 			{"Simplified", export.Simplified.Value},
 			{"Raw", export.Raw.Value},
@@ -65,7 +67,7 @@ func TestValue(t *testing.T) {
 			{"All", export.All.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)
-			x, errs := tc.fn(r, v)
+			x, errs := tc.fn(r, pkgID, v)
 			errors.Print(t, errs, nil)
 			_, _ = t.Write(formatNode(t.T, x))
 			fmt.Fprintln(t)
@@ -89,7 +91,7 @@ strings.MinRunes(4) & strings.MaxRunes(7)
 	a := cuetxtar.Load(archive, "/tmp/test")
 
 	r := runtime.New()
-	v, errs := compile.Files(nil, r, a[0].Files...)
+	v, errs := compile.Files(nil, r, "", a[0].Files...)
 	if errs != nil {
 		t.Fatal(errs)
 	}
@@ -97,7 +99,7 @@ strings.MinRunes(4) & strings.MaxRunes(7)
 	ctx := eval.NewContext(r, v)
 	v.Finalize(ctx)
 
-	x, errs := export.Simplified.Value(r, v)
+	x, errs := export.Simplified.Value(r, "main", v)
 	if errs != nil {
 		t.Fatal(errs)
 	}

@@ -310,8 +310,13 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 		if label.IsDef() && !p.ShowDefinitions {
 			continue
 		}
-		if label.IsHidden() && !p.ShowHidden {
-			continue
+		if label.IsHidden() {
+			if !p.ShowHidden {
+				continue
+			}
+			if label.PkgID(e.ctx) != e.pkgID {
+				continue
+			}
 		}
 
 		f := &ast.Field{Label: e.stringLabel(label)}

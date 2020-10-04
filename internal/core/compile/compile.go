@@ -39,18 +39,23 @@ type Config struct {
 	// Imports allows unresolved identifiers to resolve to imports.
 	//
 	// Under normal circumstances, identifiers bind to import specifications,
-	// which get resolved to an ImportReference. Use this option to automaically
-	// resolve identifiers to imports.
+	// which get resolved to an ImportReference. Use this option to
+	// automatically resolve identifiers to imports.
 	Imports func(x *ast.Ident) (pkgPath string)
+
+	// pkgPath is used to qualify the scope of hidden fields. The default
+	// scope is "main".
+	pkgPath string
 }
 
 // Files compiles the given files as a single instance. It disregards
 // the package names and it is the responsibility of the user to verify that
-// the packages names are consistent.
+// the packages names are consistent. The pkgID must be a unique identifier
+// for a package in a module, for instance as obtained from build.Instance.ID.
 //
 // Files may return a completed parse even if it has errors.
-func Files(cfg *Config, r adt.Runtime, files ...*ast.File) (*adt.Vertex, errors.Error) {
-	c := newCompiler(cfg, r)
+func Files(cfg *Config, r adt.Runtime, pkgID string, files ...*ast.File) (*adt.Vertex, errors.Error) {
+	c := newCompiler(cfg, pkgID, r)
 
 	v := c.compileFiles(files)
 
@@ -60,14 +65,11 @@ func Files(cfg *Config, r adt.Runtime, files ...*ast.File) (*adt.Vertex, errors.
 	return v, nil
 }
 
-func Expr(cfg *Config, r adt.Runtime, x ast.Expr) (adt.Conjunct, errors.Error) {
-	if cfg == nil {
-		cfg = &Config{}
-	}
-	c := &compiler{
-		Config: *cfg,
-		index:  r,
-	}
+// Expr compiles the given expression into a conjunct. The pkgID must be a
+// unique identifier for a package in a module, for instance as obtained from
+// build.Instance.ID.
+func Expr(cfg *Config, r adt.Runtime, pkgPath string, x ast.Expr) (adt.Conjunct, errors.Error) {
+	c := newCompiler(cfg, pkgPath, r)
 
 	v := c.compileExpr(x)
 
@@ -77,13 +79,17 @@ func Expr(cfg *Config, r adt.Runtime, x ast.Expr) (adt.Conjunct, errors.Error) {
 	return v, nil
 }
 
-func newCompiler(cfg *Config, r adt.Runtime) *compiler {
+func newCompiler(cfg *Config, pkgPath string, r adt.Runtime) *compiler {
 	c := &compiler{
 		index: r,
 	}
 	if cfg != nil {
 		c.Config = *cfg
 	}
+	if pkgPath == "" {
+		pkgPath = "main"
+	}
+	c.Config.pkgPath = pkgPath
 	return c
 }
 

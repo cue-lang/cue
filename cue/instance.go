@@ -127,6 +127,11 @@ func init() {
 	}
 }
 
+// pkgID reports a package path that can never resolve to a valid package.
+func pkgID() string {
+	return "_"
+}
+
 // evalExpr evaluates expr within scope.
 func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) evaluated {
 	cfg := &compile.Config{
@@ -139,7 +144,7 @@ func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) evaluated {
 		},
 	}
 
-	c, err := compile.Expr(cfg, ctx.opCtx, expr)
+	c, err := compile.Expr(cfg, ctx.opCtx, pkgID(), expr)
 	if err != nil {
 		return &adt.Bottom{Err: err}
 	}
@@ -180,6 +185,15 @@ func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) evaluated {
 	// }
 
 	// return c.NewErrf("could not evaluate %s", c.Str(x))
+}
+
+// ID returns the package identifier that uniquely qualifies module and
+// package name.
+func (inst *Instance) ID() string {
+	if inst == nil || inst.inst == nil {
+		return ""
+	}
+	return inst.inst.ID()
 }
 
 // Doc returns the package comments for this instance.
@@ -253,7 +267,8 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 
 	rErr := runtime.ResolveFiles(idx.Index, p, isBuiltin)
 
-	v, err := compile.Files(&compile.Config{Scope: inst.root}, r, p.Files...)
+	cfg := &compile.Config{Scope: inst.root}
+	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
 
 	v.AddConjunct(adt.MakeRootConjunct(nil, inst.root))
 

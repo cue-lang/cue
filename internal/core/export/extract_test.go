@@ -38,7 +38,7 @@ func TestExtract(t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
 
-		v, err := compile.Files(nil, r, a[0].Files...)
+		v, err := compile.Files(nil, r, "", a[0].Files...)
 		if err != nil {
 			t.Fatal(err)
 		}

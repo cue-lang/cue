@@ -68,7 +68,7 @@ func toValue(e adt.Expr) adt.Value {
 }
 
 func compileExpr(ctx *adt.OpContext, expr ast.Expr) adt.Value {
-	c, err := compile.Expr(nil, ctx, expr)
+	c, err := compile.Expr(nil, ctx, pkgID(), expr)
 	if err != nil {
 		return &adt.Bottom{Err: errors.Promote(err, "compile")}
 	}
@@ -241,7 +241,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		return &adt.Null{Src: ctx.Source()}
 
 	case *ast.File:
-		x, err := compile.Files(nil, ctx, v)
+		x, err := compile.Files(nil, ctx, pkgID(), v)
 		if err != nil {
 			return &adt.Bottom{Err: errors.Promote(err, "compile")}
 		}
@@ -737,7 +737,7 @@ store:
 			ctx.AddErrf(msg, args...)
 		})
 		var x adt.Expr
-		c, err := compile.Expr(nil, ctx, e)
+		c, err := compile.Expr(nil, ctx, pkgID(), e)
 		if err != nil {
 			b := &adt.Bottom{Err: err}
 			ctx.AddBottom(b)
@@ -787,4 +787,9 @@ func makeNullable(e ast.Expr, nullIsDefault bool) ast.Expr {
 		null = &ast.UnaryExpr{Op: token.MUL, X: null}
 	}
 	return ast.NewBinExpr(token.OR, null, e)
+}
+
+// pkgID returns a package path that can never resolve to an existing package.
+func pkgID() string {
+	return "_"
 }

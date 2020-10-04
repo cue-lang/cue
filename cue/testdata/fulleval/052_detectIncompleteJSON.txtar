@@ -61,7 +61,7 @@ Val:
 -- out/eval --
 (struct){
   #Spec: (#struct){
-    _vars: (#struct){
+    _vars(:foobar): (#struct){
       something: (string){ string }
     }
     data: (#struct){
@@ -78,7 +78,7 @@ Val:
     }
   }
   Val: (#struct){
-    _vars: (#struct){
+    _vars(:foobar): (#struct){
       something: (string){ "var-string" }
     }
     data: (#struct){

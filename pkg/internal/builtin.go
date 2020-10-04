@@ -59,9 +59,9 @@ type Package struct {
 	CUE    string
 }
 
-func (p *Package) MustCompile(ctx *adt.OpContext, pkgName string) *adt.Vertex {
+func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex {
 	obj := &adt.Vertex{}
-	pkgLabel := ctx.StringLabel(pkgName)
+	pkgLabel := ctx.StringLabel(importPath)
 	st := &adt.StructLit{}
 	if len(p.Native) > 0 {
 		obj.AddConjunct(adt.MakeRootConjunct(nil, st))
@@ -83,11 +83,11 @@ func (p *Package) MustCompile(ctx *adt.OpContext, pkgName string) *adt.Vertex {
 
 	// Parse builtin CUE
 	if p.CUE != "" {
-		expr, err := parser.ParseExpr(pkgName, p.CUE)
+		expr, err := parser.ParseExpr(importPath, p.CUE)
 		if err != nil {
 			panic(fmt.Errorf("could not parse %v: %v", p.CUE, err))
 		}
-		c, err := compile.Expr(nil, ctx.Runtime, expr)
+		c, err := compile.Expr(nil, ctx.Runtime, importPath, expr)
 		if err != nil {
 			panic(fmt.Errorf("could compile parse %v: %v", p.CUE, err))
 		}
@@ -147,7 +147,7 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 	if err != nil {
 		panic(err)
 	}
-	c, err := compile.Expr(nil, ctx, expr)
+	c, err := compile.Expr(nil, ctx, "_", expr)
 	if err != nil {
 		panic(err)
 	}

@@ -52,8 +52,8 @@ func (s *valueSorter) Less(i, j int) bool {
 	return isLess
 }
 
-// Sort sorts data. It does O(n*log(n)) comparisons.
-// The sort is not guaranteed to be stable.
+// Sort sorts data while keeping the original order of equal elements.
+// It does O(n*log(n)) comparisons.
 //
 // cmp is a struct of the form {T: _, x: T, y: T, less: bool}, where
 // less should reflect x < y.
@@ -67,15 +67,11 @@ func (s *valueSorter) Less(i, j int) bool {
 func Sort(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 	s := valueSorter{list, cmp, nil}
 	// The input slice is already a copy and that we can modify it safely.
-	sort.Sort(&s)
+	sort.Stable(&s)
 	return s.ret()
 }
 
-// SortStable sorts data while keeping the original order of equal elements.
-// It does O(n*log(n)) comparisons.
-//
-// See Sort for an example usage.
-//
+// Deprecated: use Sort, which is always stable
 func SortStable(list []cue.Value, cmp cue.Value) (sorted []cue.Value, err error) {
 	s := valueSorter{list, cmp, nil}
 	sort.Stable(&s)

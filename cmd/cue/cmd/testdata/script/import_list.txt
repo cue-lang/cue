@@ -1,6 +1,14 @@
-cue import -o - -f -l "\(strings.ToLower(kind))" --list ./import
-cmp stdout expect-stdout
--- expect-stdout --
+cue import -o - -f -l "\(strings.ToLower(kind))" --list ./import1
+cmp stdout expect-stdout1
+
+# Issue #368
+cue import -o - -f --list ./import2
+cmp stdout expect-stdout2
+
+# Issue #369
+cue import --with-context -l '"\(path.Ext(filename))": data' ./import3/data.json
+cmpenv import3/data.cue expect3
+-- expect-stdout1 --
 service: [{
 	kind: "Service"
 	name: "booster"
@@ -17,7 +25,11 @@ deployment: [{
 	name:     "booster"
 	replicas: 1
 }]
--- import/services.jsonl --
+-- expect-stdout2 --
+[[{a: 1}], [{b: 2}]]
+-- expect3 --
+".json": [1]
+-- import1/services.jsonl --
 {
     "kind": "Service",
     "name": "booster"
@@ -32,4 +44,9 @@ deployment: [{
     "name": "supplement\nfoo",
     "json": "[1, 2]"
 }
+-- import2/data.jsonl --
+[{"a": 1}]
+[{"b": 2}]
+-- import3/data.json --
+[1]
 -- cue.mod --

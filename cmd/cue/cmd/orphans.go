@@ -150,11 +150,6 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 	return true, nil
 }
 
-func toExpr(f *ast.File) (expr ast.Expr, pkg *ast.Package) {
-	p := len(f.Preamble())
-	return &ast.StructLit{Elts: f.Decls[p:]}, pkg
-}
-
 func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.File, error) {
 	f := &ast.File{}
 
@@ -163,7 +158,8 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 		if i == 0 {
 			astutil.CopyMeta(f, file)
 		}
-		expr, p := toExpr(file)
+		expr := internal.ToExpr(file)
+		p, _, _ := internal.PackageInfo(file)
 
 		var pathElems []ast.Label
 		var pathTokens []token.Token

@@ -259,7 +259,13 @@ func ToExpr(n ast.Node) ast.Expr {
 				break outer
 			}
 		}
-		return &ast.StructLit{Elts: x.Decls[start:]}
+		decls := x.Decls[start:]
+		if len(decls) == 1 {
+			if e, ok := decls[0].(*ast.EmbedDecl); ok {
+				return e.Expr
+			}
+		}
+		return &ast.StructLit{Elts: decls}
 
 	default:
 		panic(fmt.Sprintf("Unsupported node type %T", x))

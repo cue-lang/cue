@@ -172,7 +172,8 @@ Result:
   xa4: (int){ 10 }
   xb1: (int){ |((int){ 8 }, (int){ 9 }) }
   xb2: (_|_){
-    // [incomplete]
+    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:18:6
   }
   xb3: (int){ |((int){ 6 }, (int){ 9 }) }
   xb4: (_|_){
@@ -213,7 +214,8 @@ Result:
   }
   xf1: (int){ |((int){ 8 }, (int){ 9 }) }
   xf2: (_|_){
-    // [incomplete]
+    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
+    //     ./in.cue:52:6
   }
   xf3: (int){ |((int){ 6 }, (int){ 9 }) }
   xf4: (_|_){

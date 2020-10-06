@@ -67,15 +67,23 @@ func New(r adt.Runtime) *Evaluator {
 type Stats struct {
 	DisjunctCount int
 	UnifyCount    int
+
+	Freed  int
+	Reused int
+	Allocs int
 }
 
 var stats = template.Must(template.New("stats").Parse(`{{"" -}}
+Freed:  {{.Freed}}
+Reused: {{.Reused}}
+Allocs: {{.Allocs}}
+
 Unifications: {{.UnifyCount}}
 Disjuncts:    {{.DisjunctCount}}`))
 
 func (s *Stats) String() string {
-	buf := strings.Builder{}
-	_ = stats.Execute(&buf, s)
+	buf := &strings.Builder{}
+	_ = stats.Execute(buf, s)
 	return buf.String()
 }
 
@@ -116,6 +124,9 @@ type Evaluator struct {
 	index adt.StringIndexer
 
 	stats Stats
+
+	freeListNode   *nodeContext
+	freeListShared *nodeShared
 }
 
 func (e *Evaluator) Eval(v *adt.Vertex) errors.Error {
@@ -136,12 +147,52 @@ func (e *Evaluator) Eval(v *adt.Vertex) errors.Error {
 //
 func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 	var resultValue adt.Value
+
+	if b, _ := v.Value.(*adt.Bottom); b != nil {
+		return b
+	}
+
 	if v.Value == nil {
 		save := *v
 		// Use node itself to allow for cycle detection.
 		s := e.evalVertex(c, v, adt.Partial, nil)
+		defer e.freeSharedNode(s)
 
-		if d := s.disjunct; d != nil && len(d.Values) > 1 && d.NumDefaults != 1 {
+		resultValue = v.Value
+		if s.result_.Value != nil {
+			*v = s.result_
+			resultValue = v.Value
+		} else {
+			*v = save
+		}
+
+		switch {
+		case !s.touched:
+
+		case len(s.disjunct.Values) == 1 || s.disjunct.NumDefaults == 1:
+			// TODO: this seems unnecessary as long as we have a better way
+			// to handle incomplete, and perhaps referenced. nodes.
+			if c.IsTentative() && isStruct(v) {
+				// TODO(perf): do something more efficient perhaps? This discards
+				// the computed arcs so far. Instead, we could have a separate
+				// marker to accumulate results. As this only happens within
+				// comprehensions, the effect is likely minimal, though.
+				arcs := v.Arcs
+				*v = save
+				return &adt.Vertex{
+					Parent: v.Parent,
+					Value:  &adt.StructMarker{},
+					Arcs:   arcs,
+					Closed: s.result_.Closed,
+				}
+			}
+
+		default:
+			d := s.createDisjunct()
+			last := len(d.Values) - 1
+			clone := *(d.Values[last])
+			d.Values[last] = &clone
+
 			v.Value = d
 			v.Arcs = nil
 			v.Structs = nil // TODO: maybe not do this.
@@ -159,35 +210,10 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 					}
 				}
 			}
+
+			return d
 		}
 
-		resultValue = v.Value
-
-		result := s.result()
-		*v = save
-
-		if result.Value != nil {
-			*v = *result
-			resultValue = result.Value
-		}
-
-		// TODO: this seems unnecessary as long as we have a better way
-		// to handle incomplete, and perhaps referenced. nodes.
-		if c.IsTentative() && isStruct(v) {
-			// TODO(perf): do something more efficient perhaps? This discards
-			// the computed arcs so far. Instead, we could have a separate
-			// marker to accumulate results. As this only happens within
-			// comprehensions, the effect is likely minimal, though.
-			arcs := v.Arcs
-			*v = save
-			return &adt.Vertex{
-				Parent: v.Parent,
-				Value:  &adt.StructMarker{},
-				Arcs:   arcs,
-				Closed: result.Closed,
-			}
-		}
-		// *v = save // DO NOT ADD.
 		err, _ := resultValue.(*adt.Bottom)
 		// BEFORE RESTORING, copy the value to return one
 		// with the temporary arcs.
@@ -195,24 +221,15 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 			// Clear values afterwards
 			*v = save
 		}
-		if !s.done() && s.hasDisjunction() {
-			return &adt.Bottom{Code: adt.IncompleteError}
-		}
 		if s.hasResult() {
 			if b, _ := v.Value.(*adt.Bottom); b != nil {
 				*v = save
 				return b
 			}
 			// TODO: Only use result when not a cycle.
-			v = result
+			v = s.result()
 		}
 		// TODO: Store if concrete and fully resolved.
-
-	} else {
-		b, _ := v.Value.(*adt.Bottom)
-		if b != nil {
-			return b
-		}
 	}
 
 	switch v.Value.(type) {
@@ -263,12 +280,14 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 	}
 
 	n := e.evalVertex(c, v, state, accept)
+	defer e.freeSharedNode(n)
 
-	switch d := n.disjunct; {
-	case d != nil && len(d.Values) == 1:
-		*v = *(d.Values[0])
+	switch {
+	case len(n.disjunct.Values) == 1:
+		*v = *(n.disjunct.Values[0])
 
-	case d != nil && len(d.Values) > 0:
+	case len(n.disjunct.Values) > 0:
+		d := n.createDisjunct()
 		v.Value = d
 		// The conjuncts will have too much information. Better have no
 		// information than incorrect information.
@@ -292,7 +311,7 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 		}
 		v.Arcs = nil
 		// v.Structs = nil // TODO: should we keep or discard the Structs?
-		v.Closed = newDisjunctionAcceptor(n.disjunct)
+		v.Closed = newDisjunctionAcceptor(d)
 
 	default:
 		if r := n.result(); r.Value != nil {
@@ -313,13 +332,7 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 // status to which this vertex should be evaluated. It should be either
 // adt.Finalized or adt.Partial.
 func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus, accept adt.Acceptor) *nodeShared {
-	shared := &nodeShared{
-		ctx:    c,
-		eval:   e,
-		node:   v,
-		stack:  nil, // silence linter
-		accept: accept,
-	}
+	shared := e.newSharedNode(c, v, accept)
 	saved := *v
 
 	var closedInfo *acceptor
@@ -372,7 +385,9 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 		v.Value = cycle
 
 		if closedInfo != nil {
-			v.Closed = closedInfo.clone()
+			ci := closedInfo.clone()
+			v.Closed = ci
+			// TODO(performance): use closedInfo.Compact.
 		}
 
 		v.UpdateStatus(adt.Evaluating)
@@ -382,21 +397,8 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 		//   2) this node is a child of a node that introduces a definition,
 		//      recursively.
 		//   3) this node embeds a closed struct.
-		needClose := v.Label.IsDef()
-		// if needClose {
-		// 	closedInfo.isClosed = true
-		// }
-
-		n := &nodeContext{
-			arcMap:     map[arcKey]bool{},
-			kind:       adt.TopKind,
-			nodeShared: shared,
-			needClose:  needClose,
-
-			// These get cleared upon proof to the contrary.
-			// isDefault: true,
-			isFinal: true,
-		}
+		n := e.newNodeContext(shared)
+		n.needClose = v.Label.IsDef()
 
 		for _, x := range v.Conjuncts {
 			// TODO: needed for reentrancy. Investigate usefulness for cycle
@@ -414,6 +416,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 				// field, but that will be caught when evaluating this field
 				// for real.
 				shared.setResult(v)
+				e.freeNodeContext(n)
 				return shared
 			}
 			if !n.done() && len(n.disjunctions) > 0 && isEvaluating(v) {
@@ -423,6 +426,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 				b.Code = adt.IncompleteError
 				v.SetValue(n.ctx, adt.Finalized, b)
 				shared.setResult(v)
+				e.freeNodeContext(n)
 				return shared
 			}
 		}
@@ -434,6 +438,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 				v.Value = n.getValidators()
 			}
 
+			e.freeNodeContext(n)
 			break
 		}
 	}
@@ -669,20 +674,66 @@ func isEvaluating(v *adt.Vertex) bool {
 	return isCycle
 }
 
+// TODO(perf): merge this type with nodeContext once we're certain we can
+// remove the distinction (after other optimizations).
 type nodeShared struct {
+	nextFree *nodeShared
+
 	eval *Evaluator
 	ctx  *adt.OpContext
-	sub  []*adt.Environment // Environment cache
 	node *adt.Vertex
 
 	// Disjunction handling
-	disjunct   *adt.Disjunction
-	resultNode *nodeContext
-	result_    adt.Vertex
-	stack      []int
+	touched  bool
+	disjunct adt.Disjunction
+	result_  adt.Vertex
+	isDone   bool
+	stack    []int
 
 	// Closedness override.
 	accept adt.Acceptor
+}
+
+func (e *Evaluator) newSharedNode(ctx *adt.OpContext, node *adt.Vertex, accept adt.Acceptor) *nodeShared {
+	if n := e.freeListShared; n != nil {
+		e.stats.Reused++
+		e.freeListShared = n.nextFree
+
+		*n = nodeShared{
+			eval:   e,
+			ctx:    ctx,
+			node:   node,
+			accept: accept,
+
+			stack:    n.stack[:0],
+			disjunct: adt.Disjunction{Values: n.disjunct.Values[:0]},
+		}
+
+		return n
+	}
+	e.stats.Allocs++
+
+	return &nodeShared{
+		ctx:    ctx,
+		eval:   e,
+		node:   node,
+		accept: accept,
+	}
+}
+
+func (e *Evaluator) freeSharedNode(n *nodeShared) {
+	e.stats.Freed++
+	n.nextFree = e.freeListShared
+	e.freeListShared = n
+}
+
+func (n *nodeShared) createDisjunct() *adt.Disjunction {
+	a := make([]*adt.Vertex, len(n.disjunct.Values))
+	copy(a, n.disjunct.Values)
+	return &adt.Disjunction{
+		Values:      a,
+		NumDefaults: n.disjunct.NumDefaults,
+	}
 }
 
 func (n *nodeShared) result() *adt.Vertex {
@@ -694,32 +745,15 @@ func (n *nodeShared) setResult(v *adt.Vertex) {
 }
 
 func (n *nodeShared) hasResult() bool {
-	return n.resultNode != nil //|| n.hasResult_
-	// return n.resultNode != nil || n.hasResult_
+	return len(n.disjunct.Values) > 1
 }
 
 func (n *nodeShared) done() bool {
-	// if d := n.disjunct; d == nil || len(n.disjunct.Values) == 0 {
-	// 	return false
-	// }
-	if n.resultNode == nil {
-		return false
-	}
-	return n.resultNode.done()
-}
-
-func (n *nodeShared) hasDisjunction() bool {
-	if n.resultNode == nil {
-		return false
-	}
-	return len(n.resultNode.disjunctions) > 0
+	return n.isDone
 }
 
 func (n *nodeShared) isDefault() bool {
-	if n.resultNode == nil {
-		return false
-	}
-	return n.resultNode.defaultMode == isDefault
+	return n.disjunct.NumDefaults > 0
 }
 
 type arcKey struct {
@@ -732,6 +766,8 @@ type arcKey struct {
 // order has relevance when performing checks of non-monotic properities. Such
 // checks should only be performed once the full value is known.
 type nodeContext struct {
+	nextFree *nodeContext
+
 	*nodeShared
 
 	// TODO:
@@ -776,9 +812,54 @@ type nodeContext struct {
 	hasNonCycle bool // has conjunct without structural cycle
 
 	// Disjunction handling
-	disjunctions []envDisjunct
-	defaultMode  defaultMode
-	isFinal      bool
+	disjunctions    []envDisjunct
+	subDisjunctions []envDisjunct
+	defaultMode     defaultMode
+	isFinal         bool
+}
+
+func (e *Evaluator) newNodeContext(shared *nodeShared) *nodeContext {
+	if n := e.freeListNode; n != nil {
+		e.stats.Reused++
+		e.freeListNode = n.nextFree
+
+		*n = nodeContext{
+			// TODO(perf): use another technique that doesn't require allocation.
+			// arcMap: map[arcKey]bool{},
+
+			kind:       adt.TopKind,
+			nodeShared: shared,
+			isFinal:    true,
+
+			checks:          n.checks[:0],
+			dynamicFields:   n.dynamicFields[:0],
+			ifClauses:       n.ifClauses[:0],
+			forClauses:      n.forClauses[:0],
+			lists:           n.lists[:0],
+			vLists:          n.vLists[:0],
+			exprs:           n.exprs[:0],
+			disjunctions:    n.disjunctions[:0],
+			subDisjunctions: n.subDisjunctions[:0],
+		}
+
+		return n
+	}
+	e.stats.Allocs++
+
+	return &nodeContext{
+		// arcMap:     map[arcKey]bool{},
+		kind:       adt.TopKind,
+		nodeShared: shared,
+
+		// These get cleared upon proof to the contrary.
+		isFinal: true,
+	}
+}
+
+func (e *Evaluator) freeNodeContext(n *nodeContext) {
+	e.stats.Freed++
+	n.nextFree = e.freeListNode
+	e.freeListNode = n
 }
 
 func closedInfo(n *adt.Vertex) *acceptor {
@@ -1077,6 +1158,9 @@ outer:
 		// (pointer can probably be shared). Aside from being more performant,
 		// this is probably the best way to guarantee that conjunctions are
 		// linear in this case.
+		if n.arcMap == nil {
+			n.arcMap = map[arcKey]bool{}
+		}
 		if n.arcMap[arcKey{arc, v.CloseID}] {
 			return
 		}

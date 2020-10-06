@@ -133,11 +133,8 @@ func (n *nodeContext) updateResult() (isFinal bool) {
 		return n.isFinal
 	}
 
-	d := n.nodeShared.disjunct
-	if d == nil {
-		d = &adt.Disjunction{}
-		n.nodeShared.disjunct = d
-	}
+	n.touched = true
+	d := &n.nodeShared.disjunct
 
 	result := *n.node
 	if result.Value == nil {
@@ -152,6 +149,11 @@ func (n *nodeContext) updateResult() (isFinal bool) {
 
 	p := &result
 	d.Values = append(d.Values, p)
+
+	if n.done() && (!n.isDefault() || n.isDefault()) {
+		n.nodeShared.isDone = true
+	}
+
 	if n.defaultMode == isDefault {
 		// Keep defaults sorted first.
 		i := d.NumDefaults
@@ -172,22 +174,9 @@ func (n *nodeContext) updateResult() (isFinal bool) {
 	case !n.nodeShared.isDefault() && n.defaultMode == isDefault:
 
 	default:
-		if x := n.result(); x == nil && Equal(n.ctx, n.node, x) {
-			return n.isFinal
-		}
-
-		// TODO: Compute fancy error message.
-		n.nodeShared.resultNode = n
-		// n.nodeShared.result.AddErr(n.ctx, &adt.Bottom{
-		// 	Code: adt.IncompleteError,
-		// 	Err:  errors.Newf(n.ctx.Pos(), "ambiguous disjunction"),
-		// })
-		n.nodeShared.result_.Arcs = nil
-		n.nodeShared.result_.Structs = nil
 		return n.isFinal // n.defaultMode == isDefault
 	}
 
-	n.nodeShared.resultNode = n
 	n.nodeShared.setResult(n.node)
 
 	return n.isFinal
@@ -225,11 +214,11 @@ func (n *nodeContext) insertDisjuncts() (inserted bool) {
 	p := 0
 	inserted = true
 
-	disjunctions := []envDisjunct{}
+	n.subDisjunctions = n.subDisjunctions[:0]
 
 	// fmt.Println("----", debug.NodeString(n.ctx, n.node, nil))
 	for _, d := range n.disjunctions {
-		disjunctions = append(disjunctions, d)
+		n.subDisjunctions = append(n.subDisjunctions, d)
 
 		sub := len(n.disjunctions)
 		defMode, ok := n.insertSingleDisjunct(p, d, false)
@@ -260,7 +249,7 @@ func (n *nodeContext) insertDisjuncts() (inserted bool) {
 			// 0 to a referenced number (forces the default to be discarded).
 			wasScalar := n.scalar != nil // Hack line 1
 
-			disjunctions = append(disjunctions, d)
+			n.subDisjunctions = append(n.subDisjunctions, d)
 			mode, ok := n.insertSingleDisjunct(p, d, true)
 			p++
 			if !ok {
@@ -278,7 +267,7 @@ func (n *nodeContext) insertDisjuncts() (inserted bool) {
 	}
 
 	// Find last disjunction at which there is no overflow.
-	for ; p > 0 && n.stack[p-1]+1 >= len(disjunctions[p-1].values); p-- {
+	for ; p > 0 && n.stack[p-1]+1 >= len(n.subDisjunctions[p-1].values); p-- {
 	}
 	if p > 0 {
 		// Increment a valid position and set all subsequent entries to 0.

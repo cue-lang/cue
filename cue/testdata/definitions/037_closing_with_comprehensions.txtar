@@ -104,7 +104,6 @@ a: _|_ // field "f3" not allowed in closed struct
 }
 -- out/eval --
 Errors:
-#D: cannot mix bulk optional fields with dynamic fields, embeddings, or comprehensions within the same struct
 #E: field `f3` not allowed:
     ./in.cue:1:5
     ./in.cue:27:5
@@ -127,8 +126,7 @@ Result:
   #C: (#struct){
     f1: (int){ int }
   }
-  #D: (_|_){
-    // [eval] #D: cannot mix bulk optional fields with dynamic fields, embeddings, or comprehensions within the same struct
+  #D: (#struct){
     f1: (int){ int }
   }
   #E: (_|_){

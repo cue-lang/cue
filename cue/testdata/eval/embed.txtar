@@ -1,0 +1,77 @@
+-- in.cue --
+#A: {
+    Common
+    ...
+}
+
+Common: {
+    a: int
+    b: int
+}
+
+x: #A
+x: {
+    c: int
+}
+
+#B: {
+    if true {
+        a: int
+    }
+    ...
+}
+
+y: #B
+y: {
+    c: int
+}
+
+-- out/eval --
+(struct){
+  #A: (#struct){
+    a: (int){ int }
+    b: (int){ int }
+  }
+  Common: (struct){
+    a: (int){ int }
+    b: (int){ int }
+  }
+  x: (#struct){
+    a: (int){ int }
+    b: (int){ int }
+    c: (int){ int }
+  }
+  #B: (#struct){
+    a: (int){ int }
+  }
+  y: (#struct){
+    c: (int){ int }
+    a: (int){ int }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #A: {
+    〈1;Common〉
+    ...
+  }
+  Common: {
+    a: int
+    b: int
+  }
+  x: 〈0;#A〉
+  x: {
+    c: int
+  }
+  #B: {
+    if true {
+      a: int
+    }
+    ...
+  }
+  y: 〈0;#B〉
+  y: {
+    c: int
+  }
+}

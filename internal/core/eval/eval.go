@@ -1542,7 +1542,6 @@ func (n *nodeContext) addStruct(
 		case *adt.Ellipsis:
 			n.aStruct = s
 			n.aStructID = closeID
-			hasBulk = x
 			opt.AddEllipsis(ctx, x)
 
 		default:

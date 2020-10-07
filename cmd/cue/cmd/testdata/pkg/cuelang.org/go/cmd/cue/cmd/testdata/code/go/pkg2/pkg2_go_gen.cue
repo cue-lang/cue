@@ -18,6 +18,8 @@ import t "time"
 	S:     string
 	"x-y": bool @go(XY)
 	Err:   _    @go(,error)
+
+	#Inline
 }
 
 #Perm: 0o755
@@ -25,3 +27,5 @@ import t "time"
 #Few: 3
 
 #Couple: int & 2
+
+#Inline: A: int

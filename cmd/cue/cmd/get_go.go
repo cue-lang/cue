@@ -1069,6 +1069,13 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		}
 		if f.Anonymous() && e.isInline(x.Tag(i)) {
 			typ := f.Type()
+			for {
+				p, ok := typ.(*types.Pointer)
+				if !ok {
+					break
+				}
+				typ = p.Elem()
+			}
 			if _, ok := typ.(*types.Named); ok {
 				embed := &cueast.EmbedDecl{Expr: e.makeType(typ)}
 				if i > 0 {

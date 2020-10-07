@@ -35,6 +35,8 @@ type Barzer struct {
 	XY bool `json:"x-y"`
 
 	Err error
+
+	*Inline `json:",inline"`
 }
 
 const Perm = 0755
@@ -42,3 +44,5 @@ const Perm = 0755
 const Few = 3
 
 const Couple int = 2
+
+type Inline struct{ A int }

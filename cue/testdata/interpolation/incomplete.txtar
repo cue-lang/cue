@@ -1,0 +1,47 @@
+Issue #553
+
+-- in.cue --
+a: "foo"
+b: "boo"
+commands: {
+    #c: {
+        help: "help!"
+    }
+}
+out: """
+    a is \(a)
+    b is \(b)
+
+    c is \(commands.#c.help)
+    d is \(commands.#d.help)
+    """
+-- out/eval --
+(struct){
+  a: (string){ "foo" }
+  b: (string){ "boo" }
+  commands: (struct){
+    #c: (#struct){
+      help: (string){ "help!" }
+    }
+  }
+  out: (_|_){
+    // [incomplete] out: invalid interpolation: undefined field #d:
+    //     ./in.cue:8:6
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: "foo"
+  b: "boo"
+  commands: {
+    #c: {
+      help: "help!"
+    }
+  }
+  out: "a is \(〈0;a〉)
+  b is \(〈0;b〉)
+  
+  c is \(〈0;commands〉.#c.help)
+  d is \(〈0;commands〉.#d.help)"
+}

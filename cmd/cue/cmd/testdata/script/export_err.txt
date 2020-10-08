@@ -1,13 +1,25 @@
+! cue eval ./exporterr --out json
+cmp stdout expect-stdout
+cmp stderr expect-stderr
+
+! cue eval ./exporterr -c
+cmp stdout expect-stdout
+cmp stderr expect-stderr
+
 ! cue export ./exporterr
 cmp stdout expect-stdout
 cmp stderr expect-stderr
 -- expect-stderr --
-a.b.2.c: cannot convert incomplete value "int" to JSON
+a.b.2.c: incomplete value int
+out: invalid interpolation: undefined field d:
+    ./exporterr/export_err.cue:7:6
 -- expect-stdout --
 -- exporterr/export_err.cue --
 package exporterr
 
-a: {
-	b: [0, 1, {c: int}, 3]
-}
+a: b: [0, 1, {c: int}, 3]
+
+// Issue #553
+b: c: "hello"
+out: "d is \(b.d)"
 -- exporterr/cue.mod --

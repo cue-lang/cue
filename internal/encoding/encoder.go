@@ -42,6 +42,16 @@ type Encoder struct {
 	encFile      func(*ast.File) error
 	encValue     func(cue.Value) error
 	autoSimplify bool
+	concrete     bool
+}
+
+// IsConcrete reports whether the output is required to be concrete.
+//
+// INTERNAL ONLY: this is just to work around a problem related to issue #553
+// of catching errors ony after syntax generation, dropping line number
+// information.
+func (e *Encoder) IsConcrete() bool {
+	return e.concrete
 }
 
 func (e Encoder) Close() error {
@@ -86,6 +96,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		if err != nil {
 			return nil, err
 		}
+		e.concrete = !fi.Incomplete
 
 		synOpts := []cue.Option{}
 		if !fi.KeepDefaults || !fi.Incomplete {
@@ -135,6 +146,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		e.encFile = func(f *ast.File) error { return format(f.Filename, f) }
 
 	case build.JSON, build.JSONL:
+		e.concrete = true
 		d := json.NewEncoder(w)
 		d.SetIndent("", "    ")
 		d.SetEscapeHTML(cfg.EscapeHTML)
@@ -147,6 +159,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		}
 
 	case build.YAML:
+		e.concrete = true
 		streamed := false
 		e.encValue = func(v cue.Value) error {
 			if streamed {
@@ -163,6 +176,7 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		}
 
 	case build.Text:
+		e.concrete = true
 		e.encValue = func(v cue.Value) error {
 			s, err := v.String()
 			if err != nil {
@@ -197,6 +211,10 @@ func (e *Encoder) Encode(inst *cue.Instance) error {
 		}
 		return e.encodeFile(f, nil)
 	}
+	v := inst.Value()
+	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
+		return err
+	}
 	if e.encValue != nil {
 		return e.encValue(inst.Value())
 	}
@@ -215,6 +233,10 @@ func (e *Encoder) encodeFile(f *ast.File, interpret func(*cue.Instance) (*ast.Fi
 	}
 	if interpret != nil {
 		return e.Encode(inst)
+	}
+	v := inst.Value()
+	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
+		return err
 	}
 	return e.encValue(inst.Value())
 }

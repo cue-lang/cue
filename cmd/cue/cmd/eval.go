@@ -20,7 +20,6 @@ import (
 	"github.com/spf13/cobra"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding"
@@ -141,7 +140,10 @@ func runEval(cmd *Command, args []string) error {
 			errHeader()
 			return err
 		}
-		if flagConcrete.Bool(cmd) && !flagIgnore.Bool(cmd) {
+
+		// TODO(#553): this can be removed once v.Syntax() below retains line
+		// information.
+		if (e.IsConcrete() || flagConcrete.Bool(cmd)) && !flagIgnore.Bool(cmd) {
 			if err := v.Validate(cue.Concrete(true)); err != nil {
 				errHeader()
 				exitOnErr(cmd, err, false)
@@ -149,7 +151,7 @@ func runEval(cmd *Command, args []string) error {
 			}
 		}
 
-		f := getSyntax(v, syn)
+		f := internal.ToFile(v.Syntax(syn...))
 		f.Filename = id
 		err := e.EncodeFile(f)
 		if err != nil {
@@ -159,8 +161,4 @@ func runEval(cmd *Command, args []string) error {
 	}
 	exitOnErr(cmd, iter.err(), true)
 	return nil
-}
-
-func getSyntax(v cue.Value, opts []cue.Option) *ast.File {
-	return internal.ToFile(v.Syntax(opts...))
 }

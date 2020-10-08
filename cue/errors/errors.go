@@ -143,11 +143,23 @@ func Newf(p token.Pos, format string, args ...interface{}) Error {
 // Wrapf creates an Error with the associated position and message. The provided
 // error is added for inspection context.
 func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
-	return &posError{
-		pos:     p,
-		Message: NewMessage(format, args),
-		err:     err,
+	a, ok := err.(list)
+	if !ok {
+		return &posError{
+			pos:     p,
+			Message: NewMessage(format, args),
+			err:     err,
+		}
 	}
+	b := make([]Error, len(a))
+	for i, err := range a {
+		b[i] = &posError{
+			pos:     p,
+			Message: NewMessage(format, args),
+			err:     err,
+		}
+	}
+	return list(b)
 }
 
 // Promote converts a regular Go error to an Error if it isn't already one.

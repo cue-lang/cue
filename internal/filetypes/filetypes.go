@@ -72,6 +72,30 @@ type FileInfo struct {
 // Encoding must be specified.
 // TODO: mode should probably not be necessary here.
 func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
+	// Handle common case. This allows certain test cases to be analyzed in
+	// isolation without interference from evaluating these files.
+	if mode == Input &&
+		b.Encoding == build.CUE &&
+		b.Form == build.Schema &&
+		b.Interpretation == "" {
+		return &FileInfo{
+			File: b,
+
+			Definitions:  true,
+			Data:         true,
+			Optional:     true,
+			Constraints:  true,
+			References:   true,
+			Cycles:       true,
+			KeepDefaults: true,
+			Incomplete:   true,
+			Imports:      true,
+			Stream:       true,
+			Docs:         true,
+			Attributes:   true,
+		}, nil
+	}
+
 	i := cuegenInstance.Value()
 	i = i.Unify(i.Lookup("modes", mode.String()))
 	v := i.LookupDef("FileInfo")
@@ -125,7 +149,7 @@ func FromFile(b *build.File, mode Mode) (*FileInfo, error) {
 //     json: foo.data bar.data json+schema: bar.schema
 //
 func ParseArgs(args []string) (files []*build.File, err error) {
-	inst, v := parseType("", Input)
+	var inst, v cue.Value
 
 	qualifier := ""
 	hasFiles := false
@@ -134,6 +158,19 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 		a := strings.Split(s, ":")
 		switch {
 		case len(a) == 1 || len(a[0]) == 1: // filename
+			if !v.Exists() {
+				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
+					// Handle majority case.
+					files = append(files, &build.File{
+						Filename: a[0],
+						Encoding: build.CUE,
+						Form:     build.Schema,
+					})
+					hasFiles = true
+					continue
+				}
+				inst, v = parseType("", Input)
+			}
 			f, err := toFile(inst, v, s)
 			if err != nil {
 				return nil, err

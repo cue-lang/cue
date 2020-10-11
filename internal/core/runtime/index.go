@@ -15,122 +15,30 @@
 package runtime
 
 import (
-	"reflect"
 	"sync"
 
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 )
 
-// Index maps conversions from label names to internal codes.
-//
-// All instances belonging to the same package should share this Index.
-//
-// INDEX IS A TRANSITIONAL TYPE TO BRIDGE THE OLD AND NEW
-// IMPLEMENTATIONS. USE RUNTIME.
-type Index struct {
-	labelMap map[string]int64
-	labels   []string
-
-	// Change this to Instance at some point.
-	// From *structLit/*Vertex -> Instance
-	imports       map[interface{}]interface{}
-	importsByPath map[string]interface{}
-	// imports map[string]*adt.Vertex
-
-	offset int64
-	parent *Index
-
-	// mutex     sync.Mutex
-	typeCache sync.Map // map[reflect.Type]evaluated
+func (r *Runtime) IndexToString(i int64) string {
+	return r.index.IndexToString(i)
 }
 
-// SharedIndex is used for indexing builtins and any other labels common to
-// all instances.
-var SharedIndex = newSharedIndex()
-
-var SharedIndexNew = newSharedIndex()
-
-var SharedRuntimeNew = &Runtime{index: SharedIndexNew}
-
-func newSharedIndex() *Index {
-	i := &Index{
-		labelMap:      map[string]int64{"": 0},
-		labels:        []string{""},
-		imports:       map[interface{}]interface{}{},
-		importsByPath: map[string]interface{}{},
-	}
-	return i
+func (r *Runtime) StringToIndex(s string) int64 {
+	return getKey(s)
 }
 
-// NewIndex creates a new index.
-func NewIndex(parent *Index) *Index {
-	i := &Index{
-		labelMap:      map[string]int64{},
-		imports:       map[interface{}]interface{}{},
-		importsByPath: map[string]interface{}{},
-		offset:        int64(len(parent.labels)) + parent.offset,
-		parent:        parent,
-	}
-	return i
+func (r *Runtime) LabelStr(l adt.Feature) string {
+	return l.IdentString(r)
 }
 
-func (x *Index) IndexToString(i int64) string {
-	for ; i < x.offset; x = x.parent {
-	}
-	return x.labels[i-x.offset]
+func (r *Runtime) StrLabel(str string) adt.Feature {
+	return r.Label(str, false)
 }
 
-func (x *Index) StringToIndex(s string) int64 {
-	for p := x; p != nil; p = p.parent {
-		if f, ok := p.labelMap[s]; ok {
-			return int64(f)
-		}
-	}
-	index := int64(len(x.labelMap)) + x.offset
-	x.labelMap[s] = index
-	x.labels = append(x.labels, s)
-	return int64(index)
-}
-
-func (x *Index) HasLabel(s string) (ok bool) {
-	for c := x; c != nil; c = c.parent {
-		_, ok = c.labelMap[s]
-		if ok {
-			break
-		}
-	}
-	return ok
-}
-
-func (x *Index) StoreType(t reflect.Type, v interface{}) {
-	x.typeCache.Store(t, v)
-}
-
-func (x *Index) LoadType(t reflect.Type) (v interface{}, ok bool) {
-	v, ok = x.typeCache.Load(t)
-	return v, ok
-}
-
-func (x *Index) StrLabel(str string) adt.Feature {
-	return x.Label(str, false)
-}
-
-func (x *Index) NodeLabel(n ast.Node) (f adt.Feature, ok bool) {
-	switch label := n.(type) {
-	case *ast.BasicLit:
-		name, _, err := ast.LabelName(label)
-		return x.Label(name, false), err == nil
-	case *ast.Ident:
-		name, err := ast.ParseIdent(label)
-		return x.Label(name, true), err == nil
-	}
-	return 0, false
-}
-
-func (x *Index) Label(s string, isIdent bool) adt.Feature {
-	index := x.StringToIndex(s)
+func (r *Runtime) Label(s string, isIdent bool) adt.Feature {
+	index := r.StringToIndex(s)
 	typ := adt.StringLabel
 	if isIdent {
 		switch {
@@ -146,32 +54,39 @@ func (x *Index) Label(s string, isIdent bool) adt.Feature {
 	return f
 }
 
-func (idx *Index) LabelStr(l adt.Feature) string {
-	return l.IdentString(idx)
+// TODO: move to Runtime as fields.
+var (
+	labelMap = map[string]int{}
+	labels   = make([]string, 0, 1000)
+	mutex    sync.RWMutex
+)
+
+func init() {
+	getKey("")
 }
 
-func (x *Index) AddInst(path string, key, p interface{}) {
-	if key == nil {
-		panic("key must not be nil")
+func getKey(s string) int64 {
+	mutex.RLock()
+	p, ok := labelMap[s]
+	mutex.RUnlock()
+	if ok {
+		return int64(p)
 	}
-	x.imports[key] = p
-	if path != "" {
-		x.importsByPath[path] = key
+	mutex.Lock()
+	defer mutex.Unlock()
+	p, ok = labelMap[s]
+	if ok {
+		return int64(p)
 	}
+	p = len(labels)
+	labels = append(labels, s)
+	labelMap[s] = p
+	return int64(p)
 }
 
-func (x *Index) GetImportFromNode(key interface{}) interface{} {
-	imp := x.imports[key]
-	if imp == nil && x.parent != nil {
-		return x.parent.GetImportFromNode(key)
-	}
-	return imp
-}
-
-func (x *Index) GetImportFromPath(id string) interface{} {
-	key := x.importsByPath[id]
-	if key == nil && x.parent != nil {
-		return x.parent.GetImportFromPath(id)
-	}
-	return key
+func (x *index) IndexToString(i int64) string {
+	mutex.RLock()
+	s := labels[i]
+	mutex.RUnlock()
+	return s
 }

@@ -15,13 +15,17 @@
 package internal
 
 import (
-	"cuelang.org/go/internal/builtin"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 func Register(importPath string, p *Package) {
-	f := func(ctx *adt.OpContext) (*adt.Vertex, error) {
+	f := func(r adt.Runtime) (*adt.Vertex, errors.Error) {
+		ctx := eval.NewContext(r, nil)
+
 		return p.MustCompile(ctx, importPath), nil
 	}
-	builtin.Register(importPath, f)
+	runtime.RegisterBuiltin(importPath, f)
 }

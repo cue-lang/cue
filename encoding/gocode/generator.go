@@ -159,7 +159,7 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 		g.decl(iter.Label(), iter.Value())
 	}
 
-	r := internal.GetRuntimeNew(inst).(*cue.Runtime)
+	r := internal.GetRuntime(inst).(*cue.Runtime)
 	b, err = r.Marshal(inst)
 	g.addErr(err)
 

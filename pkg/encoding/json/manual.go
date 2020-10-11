@@ -109,7 +109,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 	if !json.Valid(b) {
 		return false, fmt.Errorf("json: invalid JSON")
 	}
-	r := internal.GetRuntimeNew(v).(*cue.Runtime)
+	r := internal.GetRuntime(v).(*cue.Runtime)
 	inst, err := r.Compile("json.Validate", b)
 	if err != nil {
 		return false, err

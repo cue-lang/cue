@@ -177,5 +177,5 @@ func fromGoType(r *cue.Runtime, x interface{}) (cue.Value, error) {
 }
 
 func checkAndForkRuntime(r *cue.Runtime, v cue.Value) *cue.Runtime {
-	return internal.CheckAndForkRuntimeNew(r, v).(*cue.Runtime)
+	return internal.CheckAndForkRuntime(r, v).(*cue.Runtime)
 }

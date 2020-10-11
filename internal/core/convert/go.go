@@ -224,7 +224,7 @@ func isNil(x reflect.Value) bool {
 func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 	if internal.CoreValue != nil {
 		if ii, iv := internal.CoreValue(x); ii != nil {
-			i := ii.(*runtime.Index)
+			i := ii.(*runtime.Runtime)
 			v := iv.(*adt.Vertex)
 			// TODO: panic if nto the same runtime.
 			_ = i

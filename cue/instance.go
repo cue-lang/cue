@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
 )
 
 // An Instance defines a single configuration based on a collection of
@@ -43,29 +42,79 @@ type Instance struct {
 
 	inst *build.Instance
 
-	complete bool // for cycle detection
+	// complete bool // for cycle detection
 }
 
 func (x *index) addInst(p *Instance) *Instance {
-	x.Index.AddInst(p.ImportPath, p.root, p)
+	if p.inst == nil {
+		p.inst = &build.Instance{
+			ImportPath: p.ImportPath,
+			PkgName:    p.PkgName,
+		}
+	}
+	// fmt.Println(p.ImportPath, "XXX")
+	x.AddInst(p.ImportPath, p.root, p.inst)
+	x.loaded[p.inst] = p
 	p.index = x
 	return p
 }
 
+func (x *index) getImportFromBuild(p *build.Instance) *Instance {
+	inst := x.loaded[p]
+
+	if inst != nil {
+		return inst
+	}
+
+	v := x.GetNodeFromInstance(p)
+	if v == nil {
+		return nil
+	}
+
+	inst = &Instance{
+		ImportPath:  p.ImportPath,
+		Dir:         p.Dir,
+		PkgName:     p.PkgName,
+		DisplayName: p.ImportPath,
+		root:        v,
+		inst:        p,
+		index:       x,
+	}
+	if p.Err != nil {
+		inst.setListOrError(p.Err)
+	}
+
+	x.loaded[p] = inst
+
+	return inst
+}
+
 func (x *index) getImportFromNode(v *adt.Vertex) *Instance {
-	p := x.Index.GetImportFromNode(v)
+	p := x.GetInstanceFromNode(v)
 	if p == nil {
 		return nil
 	}
-	return p.(*Instance)
+
+	return x.getImportFromBuild(p)
 }
 
 func (x *index) getImportFromPath(id string) *Instance {
-	node := x.Index.GetImportFromPath(id)
+	node, _ := x.LoadImport(id)
 	if node == nil {
 		return nil
 	}
-	return x.Index.GetImportFromNode(node).(*Instance)
+	b := x.GetInstanceFromNode(node)
+	inst := x.loaded[b]
+	if inst == nil {
+		inst = &Instance{
+			ImportPath: b.ImportPath,
+			PkgName:    b.PkgName,
+			root:       node,
+			inst:       b,
+			index:      x,
+		}
+	}
+	return inst
 }
 
 func init() {
@@ -86,20 +135,24 @@ func init() {
 // newInstance creates a new instance. Use Insert to populate the instance.
 func newInstance(x *index, p *build.Instance, v *adt.Vertex) *Instance {
 	// TODO: associate root source with structLit.
-	i := &Instance{
+	inst := &Instance{
 		root: v,
 		inst: p,
 	}
 	if p != nil {
-		i.ImportPath = p.ImportPath
-		i.Dir = p.Dir
-		i.PkgName = p.PkgName
-		i.DisplayName = p.ImportPath
+		inst.ImportPath = p.ImportPath
+		inst.Dir = p.Dir
+		inst.PkgName = p.PkgName
+		inst.DisplayName = p.ImportPath
 		if p.Err != nil {
-			i.setListOrError(p.Err)
+			inst.setListOrError(p.Err)
 		}
 	}
-	return x.addInst(i)
+
+	x.AddInst(p.ImportPath, v, p)
+	x.loaded[p] = inst
+	inst.index = x
+	return inst
 }
 
 func (inst *Instance) setListOrError(err errors.Error) {
@@ -137,7 +190,7 @@ func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) evaluated {
 	cfg := &compile.Config{
 		Scope: scope,
 		Imports: func(x *ast.Ident) (pkgPath string) {
-			if _, ok := builtins[x.Name]; !ok {
+			if !isBuiltin(x.Name) {
 				return ""
 			}
 			return x.Name
@@ -250,8 +303,8 @@ func Merge(inst ...*Instance) *Instance {
 	v.Finalize(ctx)
 
 	p := i.index.addInst(&Instance{
-		root:     v,
-		complete: true,
+		root: v,
+		// complete: true,
 	})
 	return p
 }
@@ -265,7 +318,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	idx := inst.index
 	r := inst.index.Runtime
 
-	rErr := runtime.ResolveFiles(idx.Index, p, isBuiltin)
+	rErr := r.ResolveFiles(p)
 
 	cfg := &compile.Config{Scope: inst.root}
 	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
@@ -284,7 +337,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 		i.setListOrError(err)
 	}
 
-	i.complete = true
+	// i.complete = true
 
 	return i
 }
@@ -372,7 +425,7 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 		PkgName:    inst.PkgName,
 		Incomplete: inst.Incomplete,
 
-		complete: true,
+		// complete: true,
 	})
 	return inst, nil
 }

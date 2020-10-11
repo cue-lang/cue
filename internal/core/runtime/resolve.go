@@ -23,15 +23,9 @@ import (
 	"cuelang.org/go/cue/errors"
 )
 
-func lineStr(idx *Index, n ast.Node) string {
-	return n.Pos().String()
-}
+func (r *Runtime) ResolveFiles(p *build.Instance) (errs errors.Error) {
+	idx := r.index
 
-func ResolveFiles(
-	idx *Index,
-	p *build.Instance,
-	isBuiltin func(s string) bool,
-) (errs errors.Error) {
 	// Link top-level declarations. As top-level entries get unified, an entry
 	// may be linked to any top-level entry of any of the files.
 	allFields := map[string]ast.Node{}
@@ -45,18 +39,17 @@ func ResolveFiles(
 		}
 	}
 	for _, f := range p.Files {
-		err := ResolveFile(idx, f, p, allFields, isBuiltin)
+		err := resolveFile(idx, f, p, allFields)
 		errs = errors.Append(errs, err)
 	}
 	return errs
 }
 
-func ResolveFile(
-	idx *Index,
+func resolveFile(
+	idx *index,
 	f *ast.File,
 	p *build.Instance,
 	allFields map[string]ast.Node,
-	isBuiltin func(s string) bool,
 ) errors.Error {
 	unresolved := map[string][]*ast.Ident{}
 	for _, u := range f.Unresolved {
@@ -82,7 +75,7 @@ func ResolveFile(
 		name := path.Base(id)
 		if imp := p.LookupImport(id); imp != nil {
 			name = imp.PkgName
-		} else if !isBuiltin(id) {
+		} else if _, ok := idx.builtins[id]; !ok {
 			errs = errors.Append(errs,
 				nodeErrorf(spec, "package %q not found", id))
 			continue
@@ -161,4 +154,8 @@ func ResolveFile(
 	// 	return ctx.mkErr(newBase(n), "unresolved reference %s", n.Name)
 	// }
 	return errs
+}
+
+func lineStr(idx *index, n ast.Node) string {
+	return n.Pos().String()
 }

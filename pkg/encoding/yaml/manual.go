@@ -83,7 +83,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := internal.GetRuntimeNew(v).(*cue.Runtime)
+	r := internal.GetRuntime(v).(*cue.Runtime)
 	for {
 		expr, err := d.Decode()
 		if err != nil {
@@ -127,7 +127,7 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := internal.GetRuntimeNew(v).(*cue.Runtime)
+	r := internal.GetRuntime(v).(*cue.Runtime)
 	for {
 		expr, err := d.Decode()
 		if err != nil {

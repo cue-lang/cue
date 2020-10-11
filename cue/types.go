@@ -551,7 +551,7 @@ func (v Value) appendPath(a []string) []string {
 			}
 			a = append(a, label)
 		default:
-			a = append(a, f.SelectorString(v.idx.Index))
+			a = append(a, f.SelectorString(v.idx.Runtime))
 		}
 	}
 	return a
@@ -1756,7 +1756,7 @@ func reference(c *context, env *adt.Environment, r adt.Expr) (inst *Instance, pa
 	case *adt.FieldReference:
 		env := ctx.Env(x.UpCount)
 		inst, path = mkPath(c, nil, env.Vertex)
-		path = append(path, x.Label.SelectorString(c.Index))
+		path = append(path, x.Label.SelectorString(c.Runtime))
 
 	case *adt.LabelReference:
 		env := ctx.Env(x.UpCount)
@@ -2216,7 +2216,7 @@ func (v Value) Expr() (Op, []Value) {
 		a = append(a, remakeValue(v, env, x.X))
 		// A string selector is quoted.
 		a = append(a, remakeValue(v, env, &adt.String{
-			Str: x.Sel.SelectorString(v.idx.Index),
+			Str: x.Sel.SelectorString(v.idx.Runtime),
 		}))
 		op = SelectorOp
 

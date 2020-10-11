@@ -33,8 +33,6 @@ func TestPartiallyResolved(t *testing.T) {
 		Path: ast.NewString(importPath),
 	}
 
-	isBuiltin := func(s string) bool { return false }
-
 	f := &ast.File{
 		Decls: []ast.Decl{
 			&ast.ImportDecl{Specs: []*ast.ImportSpec{spec1, spec2}},
@@ -50,12 +48,12 @@ func TestPartiallyResolved(t *testing.T) {
 		Imports: []*ast.ImportSpec{spec1, spec2},
 	}
 
-	err := ResolveFile(nil, f, &build.Instance{
+	err := resolveFile(nil, f, &build.Instance{
 		Imports: []*build.Instance{{
 			ImportPath: importPath,
 			PkgName:    "foo",
 		}},
-	}, map[string]ast.Node{}, isBuiltin)
+	}, map[string]ast.Node{})
 
 	if err != nil {
 		t.Errorf("exected no error, found %v", err)

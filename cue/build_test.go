@@ -200,7 +200,7 @@ func TestBuild(t *testing.T) {
 				got = err.Error()
 			} else {
 				cfg := &debug.Config{Compact: true}
-				got = debug.NodeString(insts[0].Index, insts[0].Value().v, cfg)
+				got = debug.NodeString(insts[0].Runtime, insts[0].Value().v, cfg)
 			}
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)

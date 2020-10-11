@@ -223,7 +223,7 @@ func newStreamingIterator(b *buildPlan) *streamingIterator {
 		if inst.Err != nil {
 			return &streamingIterator{e: inst.Err}
 		}
-		i.r = internal.GetRuntimeNew(inst).(*cue.Runtime)
+		i.r = internal.GetRuntime(inst).(*cue.Runtime)
 		if b.schema == nil {
 			i.base = inst.Value()
 		} else {

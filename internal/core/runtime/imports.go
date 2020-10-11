@@ -66,9 +66,7 @@ type index struct {
 	builtinPaths   map[string]PackageFunc // Full path
 	builtinShort   map[string]string      // Commandline shorthand
 
-	// mutex     sync.Mutex
 	typeCache sync.Map // map[reflect.Type]evaluated
-
 }
 
 func newIndex() *index {

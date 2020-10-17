@@ -1452,6 +1452,9 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 //
 // The Exists() method can be used to verify if the returned value existed.
 // Lookup cannot be used to look up hidden or optional fields or definitions.
+//
+// Deprecated: use LookupPath. At some point before v1.0.0, this method will
+// be removed to be reused eventually for looking up a selector.
 func (v Value) Lookup(path ...string) Value {
 	ctx := v.ctx()
 	for _, k := range path {
@@ -1465,6 +1468,54 @@ func (v Value) Lookup(path ...string) Value {
 		v = obj.Lookup(k)
 	}
 	return v
+}
+
+// Path returns the path to this value from the root of an Instance.
+//
+// This is currently only defined for values that have a fixed path within
+// a configuration, and thus not those that are derived from Elem, Template,
+// or programmatically generated values such as those returned by Unify.
+func (v Value) Path() Path {
+	p := v.v.Path()
+	a := make([]Selector, len(p))
+	for i, f := range p {
+		switch f.Typ() {
+		case adt.IntLabel:
+			a[i] = Selector{indexSelector(f)}
+
+		case adt.DefinitionLabel, adt.HiddenDefinitionLabel, adt.HiddenLabel:
+			a[i] = Selector{definitionSelector(f.SelectorString(v.idx.Runtime))}
+
+		case adt.StringLabel:
+			a[i] = Selector{stringSelector(f.StringValue(v.idx.Runtime))}
+		}
+	}
+	return Path{path: a}
+}
+
+// LookupPath reports the value for path p relative to v.
+func (v Value) LookupPath(p Path) Value {
+	n := v.v
+outer:
+	for _, sel := range p.path {
+		f := sel.sel.feature(v.idx.Runtime)
+		for _, a := range n.Arcs {
+			if a.Label == f {
+				n = a
+				continue outer
+			}
+		}
+		var x *adt.Bottom
+		if err, ok := sel.sel.(pathError); ok {
+			x = &adt.Bottom{Err: err.Error}
+		} else {
+			// TODO: better message.
+			x = v.idx.mkErr(n, codeNotExist, "value %q not found", sel.sel)
+		}
+		v := makeValue(v.idx, n)
+		return newErrValue(v, x)
+	}
+	return makeValue(v.idx, n)
 }
 
 // LookupDef reports the definition with the given name within struct v. The

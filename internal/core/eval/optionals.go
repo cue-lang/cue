@@ -235,7 +235,8 @@ func (m dynamicMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 	if !ok {
 		return false
 	}
-	return f.SelectorString(c) == s.Str
+	label := f.StringValue(c)
+	return label == s.Str
 }
 
 type patternMatcher adt.Conjunct

@@ -1,0 +1,77 @@
+Issue #556
+
+-- in.cue --
+import "list"
+
+DeleteThis: ["this", "that"]
+useful_infra: {
+	gcp:  cluters:   10
+	aws:  clusters:  20
+	this: clusters: 1
+	that: clusters: 2
+}
+New_infra: {
+    for k,v in useful_infra {
+        if !list.Contains(DeleteThis, k) {
+            "\(k)": v
+        }
+    }
+}
+-- out/eval --
+(struct){
+  DeleteThis: (#list){
+    0: (string){ "this" }
+    1: (string){ "that" }
+  }
+  useful_infra: (struct){
+    gcp: (struct){
+      cluters: (int){ 10 }
+    }
+    aws: (struct){
+      clusters: (int){ 20 }
+    }
+    this: (struct){
+      clusters: (int){ 1 }
+    }
+    that: (struct){
+      clusters: (int){ 2 }
+    }
+  }
+  New_infra: (struct){
+    gcp: (struct){
+      cluters: (int){ 10 }
+    }
+    aws: (struct){
+      clusters: (int){ 20 }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  DeleteThis: [
+    "this",
+    "that",
+  ]
+  useful_infra: {
+    gcp: {
+      cluters: 10
+    }
+    aws: {
+      clusters: 20
+    }
+    this: {
+      clusters: 1
+    }
+    that: {
+      clusters: 2
+    }
+  }
+  New_infra: {
+    for k, v in 〈1;useful_infra〉 {
+      if !〈import;list〉.Contains(〈3;DeleteThis〉, 〈1;k〉) {
+        "\(〈2;k〉)": 〈2;v〉
+      }
+    }
+  }
+}

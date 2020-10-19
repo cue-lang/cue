@@ -1793,8 +1793,11 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 		}
 	}
 
+	progress = k < len(*all)
+
 	*all = (*all)[:k]
-	return k < len(*all)
+
+	return progress
 }
 
 // addLists

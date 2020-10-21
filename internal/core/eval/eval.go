@@ -1701,7 +1701,8 @@ func (n *nodeContext) insertField(f adt.Feature, x adt.Conjunct) *adt.Vertex {
 // TODO(errors): detect when a field is added to a struct that is already used
 // in a for clause.
 func (n *nodeContext) expandOne() (done bool) {
-	if n.done() {
+	// Don't expand incomplete expressions if we detected a cycle.
+	if n.done() || (n.hasCycle && !n.hasNonCycle) {
 		return false
 	}
 

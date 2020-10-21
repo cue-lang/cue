@@ -374,7 +374,7 @@ func (c *acceptor) InsertSubtree(at adt.ID, n *nodeContext, v *adt.Vertex, cycli
 
 	if n != nil {
 		for _, c := range v.Conjuncts {
-			c = updateCyclic(c, cyclic, nil)
+			c = updateCyclic(c, cyclic, nil, nil)
 			c.CloseID += id
 			n.addExprConjunct(c)
 		}

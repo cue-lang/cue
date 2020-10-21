@@ -1237,7 +1237,11 @@ outer:
 		ctx.Unify(ctx, arc, adt.Finalized)
 
 		for _, c := range arc.Conjuncts {
-			c = updateCyclic(c, cyclic, arc)
+			var a []*adt.Vertex
+			if v.Env != nil {
+				a = v.Env.Deref
+			}
+			c = updateCyclic(c, cyclic, arc, a)
 			c.CloseID = closeID
 			n.addExprConjunct(c)
 		}
@@ -1298,12 +1302,11 @@ func isDef(x adt.Expr) bool {
 // a structural cycle.
 func (n *nodeContext) updateCyclicStatus(env *adt.Environment) {
 	if env == nil || !env.Cyclic {
-		// fmt.Printf("%p -- %d hasNonCycle\n", n.node, n.node.Label)
 		n.hasNonCycle = true
 	}
 }
 
-func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex) adt.Conjunct {
+func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex, a []*adt.Vertex) adt.Conjunct {
 	env := c.Env
 	switch {
 	case env == nil:
@@ -1311,7 +1314,7 @@ func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex) adt.Conjunct {
 			return c
 		}
 		env = &adt.Environment{Cyclic: cyclic}
-	case deref == nil && env.Cyclic == cyclic:
+	case deref == nil && env.Cyclic == cyclic && len(a) == 0:
 		return c
 	default:
 		// The conjunct may still be in use in other fields, so we should
@@ -1320,8 +1323,15 @@ func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex) adt.Conjunct {
 		e.Cyclic = e.Cyclic || cyclic
 		env = &e
 	}
+	if deref != nil || len(a) > 0 {
+		cp := make([]*adt.Vertex, 0, len(a)+1)
+		cp = append(cp, a...)
+		if deref != nil {
+			cp = append(cp, deref)
+		}
+		env.Deref = cp
+	}
 	if deref != nil {
-		env.Deref = append(env.Deref, deref)
 		env.Cycles = append(env.Cycles, deref)
 	}
 	return adt.MakeConjunct(env, c.Expr(), c.CloseID)
@@ -1354,7 +1364,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 			}
 
 			for _, c := range x.Conjuncts {
-				c = updateCyclic(c, cyclic, nil)
+				c = updateCyclic(c, cyclic, nil, nil)
 				c.CloseID = id
 				n.addExprConjunct(c) // TODO: Pass from eval
 			}
@@ -1370,7 +1380,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 		case *adt.StructMarker:
 			for _, a := range x.Arcs {
 				c := adt.MakeConjunct(nil, a, id)
-				c = updateCyclic(c, cyclic, nil)
+				c = updateCyclic(c, cyclic, nil, nil)
 				n.insertField(a.Label, c)
 			}
 

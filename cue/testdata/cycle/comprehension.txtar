@@ -1,0 +1,155 @@
+-- in.cue --
+// Allow lookup in partially evaluated struct as long as the end result is
+// concrete.
+A: {
+    a: {
+        parent: ""
+        children: [ for k, v in A if v.parent == k { k } ]
+    }
+    b: {
+        parent: "a"
+        children: [ for k, v in A if v.parent == k { k } ]
+    }
+}
+
+// TODO(errors): this should result in an incomplete error.
+// A simplified control flow should help here.
+B: {
+    a: {
+        parent: ""
+        children: [ for k, v in B for _, w in v.children { k } ]
+    }
+}
+
+// Issue #486
+Issue486: {
+    A: {
+        a: {
+            parent: ""
+            children: [...string]
+        }
+        b: {
+            parent: "a"
+            children: [...string]
+        }
+        c: {
+            parent: "b"
+            children: [...string]
+        }
+    }
+
+    A: [Name=string]: {
+        children: [
+            for k, v in A
+            if v.parent == Name {
+                k
+            }
+        ]
+    }
+}
+-- out/eval --
+(struct){
+  A: (struct){
+    a: (struct){
+      parent: (string){ "" }
+      children: (#list){
+      }
+    }
+    b: (struct){
+      parent: (string){ "a" }
+      children: (#list){
+      }
+    }
+  }
+  B: (struct){
+    a: (struct){
+      parent: (string){ "" }
+      children: (#list){
+      }
+    }
+  }
+  Issue486: (struct){
+    A: (struct){
+      a: (struct){
+        parent: (string){ "" }
+        children: (#list){
+          0: (string){ "b" }
+        }
+      }
+      b: (struct){
+        parent: (string){ "a" }
+        children: (#list){
+          0: (string){ "c" }
+        }
+      }
+      c: (struct){
+        parent: (string){ "b" }
+        children: (#list){
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  A: {
+    a: {
+      parent: ""
+      children: [
+        for k, v in 〈2;A〉 if (〈0;v〉.parent == 〈0;k〉) {
+          〈1;k〉
+        },
+      ]
+    }
+    b: {
+      parent: "a"
+      children: [
+        for k, v in 〈2;A〉 if (〈0;v〉.parent == 〈0;k〉) {
+          〈1;k〉
+        },
+      ]
+    }
+  }
+  B: {
+    a: {
+      parent: ""
+      children: [
+        for k, v in 〈2;B〉 for _, w in 〈0;v〉.children {
+          〈2;k〉
+        },
+      ]
+    }
+  }
+  Issue486: {
+    A: {
+      a: {
+        parent: ""
+        children: [
+          ...string,
+        ]
+      }
+      b: {
+        parent: "a"
+        children: [
+          ...string,
+        ]
+      }
+      c: {
+        parent: "b"
+        children: [
+          ...string,
+        ]
+      }
+    }
+    A: {
+      [string]: {
+        children: [
+          for k, v in 〈2;A〉 if (〈0;v〉.parent == 〈2;-〉) {
+            〈1;k〉
+          },
+        ]
+      }
+    }
+  }
+}

@@ -117,6 +117,8 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 
 	bulkEnv := *env
 	bulkEnv.DynamicLabel = arc.Label
+	bulkEnv.Deref = nil
+	bulkEnv.Cycles = nil
 
 	// match bulk optional fields / pattern properties
 	matched := false
@@ -132,9 +134,13 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 		return
 	}
 
+	addEnv := *env
+	addEnv.Deref = nil
+	addEnv.Cycles = nil
+
 	// match others
 	for _, x := range o.additional {
-		arc.AddConjunct(adt.MakeConjunct(env, x, o.id))
+		arc.AddConjunct(adt.MakeConjunct(&addEnv, x, o.id))
 	}
 }
 

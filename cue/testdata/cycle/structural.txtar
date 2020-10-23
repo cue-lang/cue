@@ -125,6 +125,85 @@ b12: {
     }
 }
 
+// Issue #502 -- unused bulk constraints are not cyclic
+p1: {
+  #T: {
+    a: [string]: link: #T
+  }
+
+  a: #T & {
+    a: one: link: a: two: {}
+  }
+}
+
+// Issue #502 -- but they are if it is invoked within the struct.
+p2: {
+  #T: {
+    a: [string]: link: #T
+    a: b: {}
+  }
+
+  a: #T & {
+    a: one: link: a: two: {}
+  }
+}
+
+// Issue #502 -- or added later.
+p3: {
+  #S: #T: {
+    a: [string]: link: #T
+  }
+
+  #U: {
+    #S
+    #T: a: b: {}
+  }
+
+  a: #U.#T & {
+    a: one: link: a: two: {}
+  }
+}
+
+// Issue #502 -- unused bulk constraints are not cyclic
+p4: {
+  #T: {
+    a: [...{link: #T}]
+  }
+
+  a: #T & {
+    a: [{link: a: [{}]}]
+  }
+}
+
+// Issue #502 -- but they are if it is invoked within the struct.
+p5: {
+  #T: {
+    a: [...{link: #T}]
+    a: [{}]
+  }
+
+  a: #T & {
+    a: [{link: a: [{}]}]
+  }
+}
+
+// Issue #502 -- or added later.
+p6: {
+  #S: #T: {
+    a: [...{link: #T}]
+  }
+
+  #U: {
+    #S
+    #T: a: [{}]
+  }
+
+  a: #U.#T & {
+    a: [{link: a: [{}]}]
+  }
+}
+
+
 c1: {
   a: {
     b: {}
@@ -300,43 +379,46 @@ e1.b.c: structural cycle
 e2.a.c: structural cycle
 e2.b.c: structural cycle
 e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-    ./in.cue:178:8
-    ./in.cue:179:8
+    ./in.cue:257:8
+    ./in.cue:258:8
 e3.a.0: conflicting values [a] and {c:a} (mismatched types list and struct):
-    ./in.cue:178:8
-    ./in.cue:179:8
+    ./in.cue:257:8
+    ./in.cue:258:8
 e3.a.0: structural cycle
 e3.a.c: conflicting values [a] and {c:a} (mismatched types list and struct):
-    ./in.cue:178:8
-    ./in.cue:179:8
+    ./in.cue:257:8
+    ./in.cue:258:8
 e3.a.c: structural cycle
 e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-    ./in.cue:181:8
-    ./in.cue:182:8
+    ./in.cue:260:8
+    ./in.cue:261:8
 e3.b.0: conflicting values [b] and {c:b} (mismatched types list and struct):
-    ./in.cue:181:8
-    ./in.cue:182:8
+    ./in.cue:260:8
+    ./in.cue:261:8
 e3.b.0: structural cycle
 e3.b.c: conflicting values [b] and {c:b} (mismatched types list and struct):
-    ./in.cue:181:8
-    ./in.cue:182:8
+    ./in.cue:260:8
+    ./in.cue:261:8
 e3.b.c: structural cycle
 e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:186:13
-    ./in.cue:187:9
+    ./in.cue:265:13
+    ./in.cue:266:9
 e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-    ./in.cue:189:9
-    ./in.cue:190:13
-z1.z.f.h.h: structural cycle
+    ./in.cue:268:9
+    ./in.cue:269:13
+p2.#T.a.b.link: structural cycle
+p3.#U.#T.a.b.link: structural cycle
+p5.#T.a.0.link: structural cycle
+p6.#U.#T.a.0.link: structural cycle
 z1.z.g.h: structural cycle
 b4.x.y.0: structural cycle:
     ./in.cue:41:8
 d2.a.b.c.d.t: structural cycle:
-    ./in.cue:143:8
+    ./in.cue:222:8
 d2.r: structural cycle:
-    ./in.cue:143:8
+    ./in.cue:222:8
 0: structural cycle:
-    ./in.cue:153:19
+    ./in.cue:232:19
 
 Result:
 (_|_){
@@ -470,8 +552,10 @@ Result:
   }
   b7: (_|_){
     // [structural cycle]
-    b: (#list){
-      0: (#list){
+    b: (_|_){
+      // [structural cycle]
+      0: (_|_){
+        // [structural cycle] b7.a.0: structural cycle
         0: (int){ 1 }
       }
     }
@@ -568,6 +652,212 @@ Result:
       sum: (int){ 10 }
     }
   }
+  p1: (struct){
+    #T: (#struct){
+      a: (#struct){
+      }
+    }
+    a: (#struct){
+      a: (#struct){
+        one: (#struct){
+          link: (#struct){
+            a: (#struct){
+              two: (#struct){
+                link: (#struct){
+                  a: (#struct){
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  p2: (_|_){
+    // [structural cycle]
+    #T: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        b: (_|_){
+          // [structural cycle]
+          link: (_|_){
+            // [structural cycle] p2.#T.a.b.link: structural cycle
+            a: (_|_){// {
+              //   [string]: {
+              //     link: 〈3;#T〉
+              //   }
+              // } & {
+              //   b: {}
+              // }
+            }
+          }
+        }
+      }
+    }
+    a: (_|_){
+      // [structural cycle]
+      a: (struct){
+        one: (struct){
+          link: (struct){
+            a: (struct){
+              two: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  p3: (_|_){
+    // [structural cycle]
+    #S: (#struct){
+      #T: (#struct){
+        a: (#struct){
+        }
+      }
+    }
+    #U: (_|_){
+      // [structural cycle]
+      #T: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          b: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle] p3.#U.#T.a.b.link: structural cycle
+              a: (_|_){// {
+                //   [string]: {
+                //     link: 〈3;#T〉
+                //   }
+                // } & {
+                //   b: {}
+                // }
+              }
+            }
+          }
+        }
+      }
+    }
+    a: (_|_){
+      // [structural cycle] p3.#U.#T.a.b.link: structural cycle
+      a: (struct){
+        one: (struct){
+          link: (struct){
+            a: (struct){
+              two: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  p4: (struct){
+    #T: (#struct){
+      a: (list){
+      }
+    }
+    a: (#struct){
+      a: (#list){
+        0: (#struct){
+          link: (#struct){
+            a: (#list){
+              0: (#struct){
+                link: (#struct){
+                  a: (list){
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  p5: (_|_){
+    // [structural cycle]
+    #T: (_|_){
+      // [structural cycle]
+      a: (_|_){
+        // [structural cycle]
+        0: (_|_){
+          // [structural cycle]
+          link: (_|_){
+            // [structural cycle] p5.#T.a.0.link: structural cycle
+            a: (_|_){// [
+              //   ...{
+              //     link: 〈2;#T〉
+              //   },
+              // ] & [
+              //   {},
+              // ]
+            }
+          }
+        }
+      }
+    }
+    a: (_|_){
+      // [structural cycle]
+      a: (#list){
+        0: (struct){
+          link: (struct){
+            a: (#list){
+              0: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  p6: (_|_){
+    // [structural cycle]
+    #S: (#struct){
+      #T: (#struct){
+        a: (list){
+        }
+      }
+    }
+    #U: (_|_){
+      // [structural cycle]
+      #T: (_|_){
+        // [structural cycle]
+        a: (_|_){
+          // [structural cycle]
+          0: (_|_){
+            // [structural cycle]
+            link: (_|_){
+              // [structural cycle] p6.#U.#T.a.0.link: structural cycle
+              a: (_|_){// [
+                //   ...{
+                //     link: 〈2;#T〉
+                //   },
+                // ] & [
+                //   {},
+                // ]
+              }
+            }
+          }
+        }
+      }
+    }
+    a: (_|_){
+      // [structural cycle] p6.#U.#T.a.0.link: structural cycle
+      a: (#list){
+        0: (struct){
+          link: (struct){
+            a: (#list){
+              0: (struct){
+              }
+            }
+          }
+        }
+      }
+    }
+  }
   c1: (_|_){
     // [structural cycle]
     a: (_|_){
@@ -631,11 +921,11 @@ Result:
     // [structural cycle]
     x: (_|_){
       // [structural cycle] d2.a.b.c.d.t: structural cycle:
-      //     ./in.cue:143:8
+      //     ./in.cue:222:8
     }
     r: (_|_){
       // [structural cycle] d2.r: structural cycle:
-      //     ./in.cue:143:8
+      //     ./in.cue:222:8
       c: (_|_){// {
         //   d: {
         //     h: int
@@ -678,32 +968,19 @@ Result:
           // [structural cycle]
           c: (_|_){
             // [structural cycle] 0: structural cycle:
-            //     ./in.cue:153:19
+            //     ./in.cue:232:19
           }
         }
       }
       indirect: (_|_){
         // [structural cycle] 0: structural cycle:
-        //     ./in.cue:153:19
+        //     ./in.cue:232:19
       }
       i: (int){ 1 }
     }
     x: (_|_){
-      // [structural cycle]
-      a: (_|_){
-        // [structural cycle]
-        b: (_|_){
-          // [structural cycle]
-          c: (_|_){
-            // [structural cycle] 0: structural cycle:
-            //     ./in.cue:153:19
-          }
-        }
-      }
-      indirect: (_|_){
-        // [structural cycle] 0: structural cycle:
-        //     ./in.cue:153:19
-      }
+      // [structural cycle] 0: structural cycle:
+      //     ./in.cue:232:19
       i: (int){ 0 }
     }
   }
@@ -749,12 +1026,12 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
-      //     ./in.cue:178:8
-      //     ./in.cue:179:8
+      //     ./in.cue:257:8
+      //     ./in.cue:258:8
       c: (_|_){
         // [eval] e3.a.c: conflicting values [a] and {c:a} (mismatched types list and struct):
-        //     ./in.cue:178:8
-        //     ./in.cue:179:8
+        //     ./in.cue:257:8
+        //     ./in.cue:258:8
         // e3.a.c: structural cycle
         c: (_|_){// 〈1;a〉
         }
@@ -763,8 +1040,8 @@ Result:
       }
       0: (_|_){
         // [eval] e3.a.0: conflicting values [a] and {c:a} (mismatched types list and struct):
-        //     ./in.cue:178:8
-        //     ./in.cue:179:8
+        //     ./in.cue:257:8
+        //     ./in.cue:258:8
         // e3.a.0: structural cycle
         c: (_|_){// 〈1;a〉
         }
@@ -774,12 +1051,12 @@ Result:
     }
     b: (_|_){
       // [eval] e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
-      //     ./in.cue:181:8
-      //     ./in.cue:182:8
+      //     ./in.cue:260:8
+      //     ./in.cue:261:8
       c: (_|_){
         // [eval] e3.b.c: conflicting values [b] and {c:b} (mismatched types list and struct):
-        //     ./in.cue:181:8
-        //     ./in.cue:182:8
+        //     ./in.cue:260:8
+        //     ./in.cue:261:8
         // e3.b.c: structural cycle
         c: (_|_){// 〈1;b〉
         }
@@ -788,8 +1065,8 @@ Result:
       }
       0: (_|_){
         // [eval] e3.b.0: conflicting values [b] and {c:b} (mismatched types list and struct):
-        //     ./in.cue:181:8
-        //     ./in.cue:182:8
+        //     ./in.cue:260:8
+        //     ./in.cue:261:8
         // e3.b.0: structural cycle
         c: (_|_){// 〈1;b〉
         }
@@ -804,8 +1081,8 @@ Result:
       // [eval]
       0: (_|_){
         // [eval] e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:186:13
-        //     ./in.cue:187:9
+        //     ./in.cue:265:13
+        //     ./in.cue:266:9
         0: (struct){
           c: (int){ 1 }
         }
@@ -815,8 +1092,8 @@ Result:
       // [eval]
       0: (_|_){
         // [eval] e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
-        //     ./in.cue:189:9
-        //     ./in.cue:190:13
+        //     ./in.cue:268:9
+        //     ./in.cue:269:13
         0: (struct){
           c: (int){ 1 }
         }
@@ -926,7 +1203,7 @@ Result:
         h: (_|_){
           // [structural cycle]
           h: (_|_){
-            // [structural cycle] z1.z.f.h.h: structural cycle
+            // [structural cycle] z1.z.g.h: structural cycle
           }
         }
       }
@@ -1137,6 +1414,152 @@ Result:
         }
       }
     }
+  }
+  p1: {
+    #T: {
+      a: {
+        [string]: {
+          link: 〈3;#T〉
+        }
+      }
+    }
+    a: (〈0;#T〉 & {
+      a: {
+        one: {
+          link: {
+            a: {
+              two: {}
+            }
+          }
+        }
+      }
+    })
+  }
+  p2: {
+    #T: {
+      a: {
+        [string]: {
+          link: 〈3;#T〉
+        }
+      }
+      a: {
+        b: {}
+      }
+    }
+    a: (〈0;#T〉 & {
+      a: {
+        one: {
+          link: {
+            a: {
+              two: {}
+            }
+          }
+        }
+      }
+    })
+  }
+  p3: {
+    #S: {
+      #T: {
+        a: {
+          [string]: {
+            link: 〈3;#T〉
+          }
+        }
+      }
+    }
+    #U: {
+      〈1;#S〉
+      #T: {
+        a: {
+          b: {}
+        }
+      }
+    }
+    a: (〈0;#U〉.#T & {
+      a: {
+        one: {
+          link: {
+            a: {
+              two: {}
+            }
+          }
+        }
+      }
+    })
+  }
+  p4: {
+    #T: {
+      a: [
+        ...{
+          link: 〈2;#T〉
+        },
+      ]
+    }
+    a: (〈0;#T〉 & {
+      a: [
+        {
+          link: {
+            a: [
+              {},
+            ]
+          }
+        },
+      ]
+    })
+  }
+  p5: {
+    #T: {
+      a: [
+        ...{
+          link: 〈2;#T〉
+        },
+      ]
+      a: [
+        {},
+      ]
+    }
+    a: (〈0;#T〉 & {
+      a: [
+        {
+          link: {
+            a: [
+              {},
+            ]
+          }
+        },
+      ]
+    })
+  }
+  p6: {
+    #S: {
+      #T: {
+        a: [
+          ...{
+            link: 〈2;#T〉
+          },
+        ]
+      }
+    }
+    #U: {
+      〈1;#S〉
+      #T: {
+        a: [
+          {},
+        ]
+      }
+    }
+    a: (〈0;#U〉.#T & {
+      a: [
+        {
+          link: {
+            a: [
+              {},
+            ]
+          }
+        },
+      ]
+    })
   }
   c1: {
     a: {

@@ -328,6 +328,10 @@ func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 		return nil, err
 	}
 
+	if arc.ChildErrors != nil && arc.ChildErrors.Code == StructuralCycleError {
+		return nil, arc.ChildErrors
+	}
+
 	return arc, err
 }
 

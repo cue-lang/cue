@@ -388,6 +388,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 			ci := closedInfo.clone()
 			v.Closed = ci
 			// TODO(performance): use closedInfo.Compact.
+			// TODO: should be clear the list flag here?
 		}
 
 		v.UpdateStatus(adt.Evaluating)
@@ -1174,11 +1175,6 @@ outer:
 		}
 
 		status := arc.Status()
-		for _, d := range v.Env.Deref {
-			if d == arc {
-				status = adt.EvaluatingArcs
-			}
-		}
 
 		switch status {
 		case adt.Evaluating:

@@ -1,0 +1,236 @@
+-- in.cue --
+#T : {
+  config: _ 
+  body: _
+  mas: [string]: {
+    cfg: _
+    _link: #T
+    link: _link & {config: cfg}
+  }
+}
+
+#a: #T & {
+  config: a: int
+  body: config.a
+  mas: one: {
+    cfg: b: config.a
+    _link: {
+      config: b: int
+      body: config.b 
+      mas: two : {
+        cfg: c: config.b 
+        _link: {
+          config: c: int 
+          body: config.c
+        }
+      }
+    }
+  }
+}
+
+a: #a & {config: a: 34}
+-- out/eval --
+(struct){
+  #T: (#struct){
+    config: (_){ _ }
+    body: (_){ _ }
+    mas: (#struct){
+    }
+  }
+  #a: (#struct){
+    config: (#struct){
+      a: (int){ int }
+    }
+    body: (int){ int }
+    mas: (#struct){
+      one: (#struct){
+        cfg: (#struct){
+          b: (int){ int }
+        }
+        _link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+        link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  a: (#struct){
+    config: (#struct){
+      a: (int){ 34 }
+    }
+    body: (int){ 34 }
+    mas: (#struct){
+      one: (#struct){
+        cfg: (#struct){
+          b: (int){ 34 }
+        }
+        _link: (#struct){
+          config: (#struct){
+            b: (int){ int }
+          }
+          body: (int){ int }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ int }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+        link: (#struct){
+          config: (#struct){
+            b: (int){ 34 }
+          }
+          body: (int){ 34 }
+          mas: (#struct){
+            two: (#struct){
+              cfg: (#struct){
+                c: (int){ 34 }
+              }
+              _link: (#struct){
+                config: (#struct){
+                  c: (int){ int }
+                }
+                body: (int){ int }
+                mas: (#struct){
+                }
+              }
+              link: (#struct){
+                config: (#struct){
+                  c: (int){ 34 }
+                }
+                body: (int){ 34 }
+                mas: (#struct){
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #T: {
+    config: _
+    body: _
+    mas: {
+      [string]: {
+        cfg: _
+        _link: 〈3;#T〉
+        link: (〈0;_link〉 & {
+          config: 〈1;cfg〉
+        })
+      }
+    }
+  }
+  #a: (〈0;#T〉 & {
+    config: {
+      a: int
+    }
+    body: 〈0;config〉.a
+    mas: {
+      one: {
+        cfg: {
+          b: 〈3;config〉.a
+        }
+        _link: {
+          config: {
+            b: int
+          }
+          body: 〈0;config〉.b
+          mas: {
+            two: {
+              cfg: {
+                c: 〈3;config〉.b
+              }
+              _link: {
+                config: {
+                  c: int
+                }
+                body: 〈0;config〉.c
+              }
+            }
+          }
+        }
+      }
+    }
+  })
+  a: (〈0;#a〉 & {
+    config: {
+      a: 34
+    }
+  })
+}

@@ -15,6 +15,7 @@
 package literal
 
 import (
+	"fmt"
 	"strings"
 	"testing"
 
@@ -34,6 +35,7 @@ func TestQuote(t *testing.T) {
 		{form: String.WithASCIIOnly(),
 			in: "abc\xffdef", out: `"abc\ufffddef"`, lossy: true},
 		{form: String, in: "\a\b\f\r\n\t\v", out: `"\a\b\f\r\n\t\v"`},
+		{form: String, in: "\"", out: `"\""`},
 		{form: String, in: "\\", out: `"\\"`},
 		{form: String, in: "\u263a", out: `"☺"`},
 		{form: String, in: "\U0010ffff", out: `"\U0010ffff"`},
@@ -80,9 +82,29 @@ func TestQuote(t *testing.T) {
 			foo
 			"bar"
 			"""`},
+		{form: String.WithTabIndent(3), in: "foo\n\"\"\"bar\"", out: `#"""
+			foo
+			"""bar"
+			"""#`},
+		{form: String.WithTabIndent(3), in: "foo\n\"\"\"\"\"###bar\"", out: `####"""
+			foo
+			"""""###bar"
+			"""####`},
+		{form: String.WithTabIndent(3), in: "foo\n\"\"\"\r\f\\", out: `#"""
+			foo
+			"""\#r\#f\#\
+			"""#`},
+		{form: Bytes.WithTabIndent(3), in: "foo'''\nhello", out: `#'''
+			foo'''
+			hello
+			'''#`},
+		{form: Bytes.WithTabIndent(3), in: "foo\n'''\r\f\\", out: `#'''
+			foo
+			'''\#r\#f\#\
+			'''#`},
 	}
 	for _, tc := range testCases {
-		t.Run(tc.in, func(t *testing.T) {
+		t.Run(fmt.Sprintf("%q", tc.in), func(t *testing.T) {
 			got := tc.form.Quote(tc.in)
 			if got != tc.out {
 				t.Errorf("Quote: %s", cmp.Diff(tc.out, got))

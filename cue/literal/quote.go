@@ -22,6 +22,7 @@ import (
 
 // Form defines how to quote a string or bytes literal.
 type Form struct {
+	hashCount   int
 	quote       byte
 	multiline   bool
 	auto        bool
@@ -29,6 +30,7 @@ type Form struct {
 	asciiOnly   bool
 	graphicOnly bool
 	indent      string
+	tripleQuote string
 }
 
 // TODO:
@@ -99,8 +101,15 @@ var (
 	// Bytes defines the format of bytes literal.
 	Bytes Form = bytesForm
 
-	stringForm = Form{quote: '"'}
-	bytesForm  = Form{quote: '\'', exact: true}
+	stringForm = Form{
+		quote:       '"',
+		tripleQuote: `"""`,
+	}
+	bytesForm = Form{
+		quote:       '\'',
+		tripleQuote: `'''`,
+		exact:       true,
+	}
 )
 
 // Quote returns CUE string literal representing s. The returned string uses CUE
@@ -122,6 +131,9 @@ func (f Form) Append(buf []byte, s string) []byte {
 	if f.auto && strings.ContainsRune(s, '\n') {
 		f.multiline = true
 	}
+	if f.multiline {
+		f.hashCount = f.requiredHashCount(s)
+	}
 
 	// Often called with big strings, so preallocate. If there's quoting,
 	// this is conservative but still helps a lot.
@@ -130,9 +142,11 @@ func (f Form) Append(buf []byte, s string) []byte {
 		copy(nBuf, buf)
 		buf = nBuf
 	}
-	buf = append(buf, f.quote)
+	for i := 0; i < f.hashCount; i++ {
+		buf = append(buf, '#')
+	}
 	if f.multiline {
-		buf = append(buf, f.quote, f.quote, '\n')
+		buf = append(buf, f.quote, f.quote, f.quote, '\n')
 		if s == "" {
 			buf = append(buf, f.indent...)
 			buf = append(buf, f.quote, f.quote, f.quote)
@@ -141,6 +155,8 @@ func (f Form) Append(buf []byte, s string) []byte {
 		if len(s) > 0 && s[0] != '\n' {
 			buf = append(buf, f.indent...)
 		}
+	} else {
+		buf = append(buf, f.quote)
 	}
 
 	buf = f.appendEscaped(buf, s)
@@ -151,6 +167,9 @@ func (f Form) Append(buf []byte, s string) []byte {
 		buf = append(buf, f.quote, f.quote, f.quote)
 	} else {
 		buf = append(buf, f.quote)
+	}
+	for i := 0; i < f.hashCount; i++ {
+		buf = append(buf, '#')
 	}
 
 	return buf
@@ -206,7 +225,7 @@ func (f Form) appendEscaped(buf []byte, s string) []byte {
 func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 	var runeTmp [utf8.UTFMax]byte
 	if (!f.multiline && r == rune(f.quote)) || r == '\\' { // always backslashed
-		buf = append(buf, '\\')
+		buf = f.appendEscape(buf)
 		buf = append(buf, byte(r))
 		return buf
 	}
@@ -220,43 +239,86 @@ func (f *Form) appendEscapedRune(buf []byte, r rune) []byte {
 		buf = append(buf, runeTmp[:n]...)
 		return buf
 	}
+	buf = f.appendEscape(buf)
 	switch r {
 	case '\a':
-		buf = append(buf, `\a`...)
+		buf = append(buf, 'a')
 	case '\b':
-		buf = append(buf, `\b`...)
+		buf = append(buf, 'b')
 	case '\f':
-		buf = append(buf, `\f`...)
+		buf = append(buf, 'f')
 	case '\n':
-		buf = append(buf, `\n`...)
+		buf = append(buf, 'n')
 	case '\r':
-		buf = append(buf, `\r`...)
+		buf = append(buf, 'r')
 	case '\t':
-		buf = append(buf, `\t`...)
+		buf = append(buf, 't')
 	case '\v':
-		buf = append(buf, `\v`...)
+		buf = append(buf, 'v')
 	default:
 		switch {
 		case r < ' ' && f.exact:
-			buf = append(buf, `\x`...)
+			buf = append(buf, 'x')
 			buf = append(buf, lowerhex[byte(r)>>4])
 			buf = append(buf, lowerhex[byte(r)&0xF])
 		case r > utf8.MaxRune:
 			r = 0xFFFD
 			fallthrough
 		case r < 0x10000:
-			buf = append(buf, `\u`...)
+			buf = append(buf, 'u')
 			for s := 12; s >= 0; s -= 4 {
 				buf = append(buf, lowerhex[r>>uint(s)&0xF])
 			}
 		default:
-			buf = append(buf, `\U`...)
+			buf = append(buf, 'U')
 			for s := 28; s >= 0; s -= 4 {
 				buf = append(buf, lowerhex[r>>uint(s)&0xF])
 			}
 		}
 	}
 	return buf
+}
+
+func (f *Form) appendEscape(buf []byte) []byte {
+	buf = append(buf, '\\')
+	for i := 0; i < f.hashCount; i++ {
+		buf = append(buf, '#')
+	}
+	return buf
+}
+
+// requiredHashCount returns the number of # characters
+// that are required to quote the multiline string s.
+func (f *Form) requiredHashCount(s string) int {
+	hashCount := 0
+	i := 0
+	// Find all occurrences of the triple-quote and count
+	// the maximum number of succeeding # characters.
+	for {
+		j := strings.Index(s[i:], f.tripleQuote)
+		if j == -1 {
+			break
+		}
+		i += j + 3
+		// Absorb all extra quotes, so we
+		// get to the end of the sequence.
+		for ; i < len(s); i++ {
+			if s[i] != f.quote {
+				break
+			}
+		}
+		e := i - 1
+		// Count succeeding # characters.
+		for ; i < len(s); i++ {
+			if s[i] != '#' {
+				break
+			}
+		}
+		if nhash := i - e; nhash > hashCount {
+			hashCount = nhash
+		}
+	}
+	return hashCount
 }
 
 // isInGraphicList reports whether the rune is in the isGraphic list. This separation

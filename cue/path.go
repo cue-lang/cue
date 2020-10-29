@@ -28,7 +28,7 @@ import (
 	"github.com/cockroachdb/apd/v2"
 )
 
-// A Selector is path component in a path.
+// A Selector is a component of a path.
 type Selector struct {
 	sel selector
 }
@@ -188,7 +188,7 @@ func isHiddenOrDefinition(s string) bool {
 }
 
 // A Def marks a string as a definition label. An # will be added if a string is
-// not prefixed with an # or _ already. Hidden labels are qualified by the
+// not prefixed with an # or _# already. Hidden labels are qualified by the
 // package in which they are looked up.
 func Def(s string) Selector {
 	if !isHiddenOrDefinition(s) {
@@ -213,7 +213,7 @@ func (d definitionSelector) kind() adt.FeatureType {
 	case strings.HasPrefix(string(d), "_"):
 		return adt.HiddenLabel
 	default:
-		return adt.StringLabel
+		panic("invalid definition")
 	}
 }
 

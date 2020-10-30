@@ -1,0 +1,106 @@
+-- in.cue --
+root: {
+    a: {
+        $id: "list"
+        out: [...int]
+    }
+    middle: {
+        for x in a.out if x > 1 {
+            "la\(x)": {
+                $id: "sequenced"
+                seq: x
+                val: "foo\(x)"
+            }
+        }
+    }
+    // Run this after all generated tasks (so far)
+    b: {
+        $id: "list"
+        $after: [ for x in middle { x } ]
+        out: [...int]
+    }
+    after: {
+        for x in b.out if x > 1 {
+            "lb\(x)": {
+                $id: "valToOut"
+                val: "foo\(x)"
+            }
+        }
+    }
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.b [Waiting]")
+  t1-->t0
+
+-- out/run/t1 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Waiting]")
+  t1-->t0
+  t1-->t2
+  t2("root.middle.la2 [Ready]")
+  t2-->t0
+
+-- out/run/t1/value --
+{
+	$id: "list"
+	out: [1, 2]
+}
+-- out/run/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Ready]")
+  t1-->t0
+  t1-->t2
+  t2("root.middle.la2 [Terminated]")
+  t2-->t0
+
+-- out/run/t2/value --
+{
+	$id: "sequenced"
+	seq: 2
+	out: "foo2"
+	val: "foo2"
+}
+-- out/run/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Terminated]")
+  t1-->t0
+  t1-->t2
+  t2("root.middle.la2 [Terminated]")
+  t2-->t0
+  t3("root.after.lb2 [Ready]")
+  t3-->t1
+
+-- out/run/t3/value --
+{
+	$id: "list"
+	$after: [{
+		$id: "sequenced"
+		seq: 2
+		out: "foo2"
+		val: "foo2"
+	}]
+	out: [1, 2]
+}
+-- out/run/t4 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Terminated]")
+  t1-->t0
+  t1-->t2
+  t2("root.middle.la2 [Terminated]")
+  t2-->t0
+  t3("root.after.lb2 [Terminated]")
+  t3-->t1
+
+-- out/run/t4/value --
+{
+	$id: "valToOut"
+	out: "foo2"
+	val: "foo2"
+}

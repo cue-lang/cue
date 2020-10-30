@@ -1,0 +1,319 @@
+// complex dependencies
+
+-- in.cue --
+// Each task depends on the previous one in a different manner.
+
+root: [string]: $id: "valToOut"
+
+indirectValue: root.taskRootReference.x
+
+// This is not just a reference, but a copy of a new task.
+indirectTaskRoot: root.indirectTaskValueReference
+
+root: {
+	a: {
+        b: 3
+    }
+
+	concreteValueInGeneratedSubfield: {
+		x: {
+			// reference in value of comprehension.
+            // Even though the referenced value is concrete, we still consider
+            // this to be a dependency.
+			for x in [1] { foo: a.b }
+		}
+		index: int
+	}
+
+	indexReference: {
+		x: [0, 1][concreteValueInGeneratedSubfield.index]
+	}
+
+	taskRootReference: {
+		$after: indexReference
+		x: 3
+	}
+
+	indirectTaskValueReference: {
+		x: indirectValue
+	}
+
+	indirectTaskRootReference: {
+		x: indirectTaskRoot
+
+		incomplete: _
+	}
+
+	incompleteComprehensionSource: {
+		x: { for x in indirectTaskRootReference.incomplete {} }
+	}
+
+	incompleteList: {
+		x: [ for x in [1] { incompleteComprehensionSource.x } ]
+	}
+
+	incompleteGeneratedStruct: {
+		x: { for x in [1] { foo: incompleteList.x } }
+	}
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.concreteValueInGeneratedSubfield [Waiting]")
+  t1-->t0
+  t2("root.indexReference [Waiting]")
+  t2-->t1
+  t3("root.taskRootReference [Waiting]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t1 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Ready]")
+  t1-->t0
+  t2("root.indexReference [Waiting]")
+  t2-->t1
+  t3("root.taskRootReference [Waiting]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t1/value --
+{
+	b:   3
+	$id: "valToOut"
+}
+-- out/run/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Ready]")
+  t2-->t1
+  t3("root.taskRootReference [Waiting]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t2/value --
+{
+	x: {
+		foo: 3
+	}
+	$id:   "valToOut"
+	index: int
+}
+-- out/run/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Ready]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Waiting]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t3/value --
+{
+	x:   [0, 1][concreteValueInGeneratedSubfield.index]
+	$id: "valToOut"
+}
+-- out/run/t4 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Ready]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Waiting]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t4/value --
+{
+	$after: {
+		x:   [0, 1][concreteValueInGeneratedSubfield.index]
+		$id: "valToOut"
+	}
+	$id: "valToOut"
+	x:   3
+}
+-- out/run/t5 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Ready]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Waiting]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t5/value --
+{
+	x:   3
+	$id: "valToOut"
+}
+-- out/run/t6 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Ready]")
+  t6-->t5
+  t7("root.incompleteList [Waiting]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t6/value --
+{
+	x: {
+		x:   3
+		$id: "valToOut"
+	}
+	$id:        "valToOut"
+	incomplete: _
+}
+-- out/run/t7 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Terminated]")
+  t6-->t5
+  t7("root.incompleteList [Ready]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Waiting]")
+  t8-->t7
+
+-- out/run/t7/value --
+{
+	x: {
+		for x in indirectTaskRootReference.incomplete {}
+	}
+	$id: "valToOut"
+}
+-- out/run/t8 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Terminated]")
+  t6-->t5
+  t7("root.incompleteList [Terminated]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Ready]")
+  t8-->t7
+
+-- out/run/t8/value --
+{
+	x: [incompleteComprehensionSource.x]
+	$id: "valToOut"
+}
+-- out/run/t9 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.concreteValueInGeneratedSubfield [Terminated]")
+  t1-->t0
+  t2("root.indexReference [Terminated]")
+  t2-->t1
+  t3("root.taskRootReference [Terminated]")
+  t3-->t2
+  t4("root.indirectTaskValueReference [Terminated]")
+  t4-->t3
+  t5("root.indirectTaskRootReference [Terminated]")
+  t5-->t4
+  t6("root.incompleteComprehensionSource [Terminated]")
+  t6-->t5
+  t7("root.incompleteList [Terminated]")
+  t7-->t6
+  t8("root.incompleteGeneratedStruct [Terminated]")
+  t8-->t7
+
+-- out/run/t9/value --
+{
+	x: {
+		foo: [incompleteComprehensionSource.x]
+	}
+	$id: "valToOut"
+}

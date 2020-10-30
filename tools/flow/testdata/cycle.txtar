@@ -1,0 +1,34 @@
+-- in.cue --
+root: {
+    a: {
+        $id: "valToOut"
+        $after: c.$id
+    }
+    b: {
+        $id: "valToOut"
+        $after: a.$id
+        out: "foo"
+    }
+    c: {
+        $id: "valToOut"
+        in: b.out
+    }
+}
+-- out/run/errors --
+error: cyclic task dependency:
+	task root.a refers to
+	task root.c refers to
+	task root.b refers to
+	task root.a:
+    ./testdata/in.cue:2:5
+    ./testdata/in.cue:6:5
+    ./testdata/in.cue:11:5
+-- out/run/t0 --
+graph TD
+  t0("root.a [Waiting]")
+  t0-->t2
+  t1("root.b [Waiting]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t1
+

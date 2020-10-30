@@ -1,0 +1,22 @@
+-- in.cue --
+root: {
+    a: {
+        $id: "failure"
+        val: "foo"
+        out: string
+    }
+    b: {
+        $id: "valToOut"
+        $after: a
+        val: "bar"
+        out: string
+    }
+}
+-- out/run/errors --
+error: task failed: failure
+-- out/run/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.b [Waiting]")
+  t1-->t0
+

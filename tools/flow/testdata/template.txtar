@@ -1,0 +1,82 @@
+#InferTasks: true
+-- in.cue --
+import "tool/exec"
+
+foo: {
+	$id: "tool/http.Do"
+
+    method: "GET"
+	url:    string
+
+	request: body: *bytes | string
+}
+
+// vendorgithubschema is expected to be run within the cuelang.org/go
+// cue.mod directory
+root: {
+	get: foo & {
+		request: body: ""
+		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	}
+	convert: exec.Run & {
+		stdin: get.response.body
+		cmd:   "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	}
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.get [Ready]")
+  t1("root.convert [Waiting]")
+  t1-->t0
+
+-- out/run/t1 --
+graph TD
+  t0("root.get [Terminated]")
+  t1("root.convert [Ready]")
+  t1-->t0
+
+-- out/run/t1/value --
+{
+	$id:    "tool/http.Do"
+	method: "GET"
+	stdout: "foo"
+	url:    "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+	request: {
+		body: ""
+	}
+}
+-- out/run/t2 --
+graph TD
+  t0("root.get [Terminated]")
+  t1("root.convert [Terminated]")
+  t1-->t0
+
+-- out/run/t2/value --
+{
+	$id: "tool/exec.Run"
+	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	env: {}
+	stdout:  "foo"
+	stderr:  null
+	stdin:   (*null | string | bytes) & get.response.body
+	success: bool
+}
+-- out/run/t3 --
+graph TD
+  t0("root.get [Terminated]")
+  t0-->t2
+  t1("root.convert [Terminated]")
+  t1-->t0
+  t2("foo [Terminated]")
+
+-- out/run/t3/value --
+{
+	$id: "tool/exec.Run"
+	cmd: "go run cuelang.org/go/cmd/cue import -f -p json -l #Workflow: jsonschema: - --outfile pkg/github.com/SchemaStore/schemastore/src/schemas/json/github-workflow.cue"
+	env: {}
+	stdout:  "foo"
+	stderr:  null
+	stdin:   (*null | string | bytes) & get.response.body
+	success: bool
+}

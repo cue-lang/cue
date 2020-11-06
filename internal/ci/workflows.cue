@@ -62,8 +62,8 @@ workflows: [
 		path: "~/go/pkg/mod"
 		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"
 		"restore-keys": """
-					${{ runner.os }}-${{ matrix.go-version }}-go-
-					"""
+			${{ runner.os }}-${{ matrix.go-version }}-go-
+			"""
 	}
 
 }
@@ -99,11 +99,11 @@ workflows: [
 #pullThroughProxy: #step & {
 	name: "Pull this commit through the proxy on master"
 	run: """
-				v=$(git rev-parse HEAD)
-				cd $(mktemp -d)
-				go mod init mod.com
-				GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
-				"""
+		v=$(git rev-parse HEAD)
+		cd $(mktemp -d)
+		go mod init mod.com
+		GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
+		"""
 	if: "github.ref == 'refs/heads/master'"
 }
 
@@ -137,9 +137,9 @@ test_dispatch: json.#Workflow & {
 	#checkoutRef: #step & {
 		name: "Checkout ref"
 		run: """
-		  git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-		  git checkout FETCH_HEAD
-		  """
+			git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
+			git checkout FETCH_HEAD
+			"""
 	}
 	#writeCookiesFile: #step & {
 		name: "Write the gitcookies file"
@@ -255,7 +255,7 @@ release: {
 				run: """
 					CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
 					echo \"CUE_VERSION=$CUE_VERSION\"
-					echo \"::set-env name=CUE_VERSION::$(echo $CUE_VERSION)\"
+					echo \"CUE_VERSION=$(echo $CUE_VERSION)\" >> $GITHUB_ENV
 					"""
 			}, {
 				name: "Push to Docker Hub"

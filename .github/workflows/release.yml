@@ -29,7 +29,7 @@ jobs:
       run: |-
         CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
         echo "CUE_VERSION=$CUE_VERSION"
-        echo "::set-env name=CUE_VERSION::$(echo $CUE_VERSION)"
+        echo "CUE_VERSION=$(echo $CUE_VERSION)" >> $GITHUB_ENV
     - name: Push to Docker Hub
       env:
         DOCKER_BUILDKIT: 1

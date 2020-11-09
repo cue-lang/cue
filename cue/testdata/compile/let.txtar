@@ -1,0 +1,49 @@
+-- in.cue --
+a: {
+    let X = Y
+    let Y = c
+
+    b: X
+    c: 5
+}
+
+b: {
+    let X = Y
+    let Y = X
+
+    b: X
+    c: 5
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    b: 〈0;let X〉
+    c: 5
+  }
+  b: {
+    b: 〈0;let X〉
+    c: 5
+  }
+}
+-- out/eval --
+Errors:
+b.let[]: cyclic references in let clause or alias:
+    ./in.cue:10:13
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    b: (int){ 5 }
+    c: (int){ 5 }
+  }
+  b: (_|_){
+    // [eval]
+    b: (_|_){
+      // [eval] b.let[]: cyclic references in let clause or alias:
+      //     ./in.cue:10:13
+    }
+    c: (int){ 5 }
+  }
+}

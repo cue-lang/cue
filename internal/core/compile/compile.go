@@ -145,9 +145,11 @@ type frame struct {
 }
 
 type aliasEntry struct {
-	expr   adt.Expr
-	source ast.Node
-	used   bool
+	label   labeler
+	srcExpr ast.Expr
+	expr    adt.Expr
+	source  ast.Node
+	used    bool
 }
 
 func (c *compiler) insertAlias(id *ast.Ident, a aliasEntry) *adt.Bottom {
@@ -178,6 +180,8 @@ func (c *compiler) updateAlias(id *ast.Ident, expr adt.Expr) {
 
 	x := m[id.Name]
 	x.expr = expr
+	x.label = nil
+	x.srcExpr = nil
 	m[id.Name] = x
 }
 
@@ -190,6 +194,21 @@ func (c compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	if !ok {
 		err := c.errf(id, "could not find LetClause associated with identifier %q", name)
 		return aliasEntry{expr: err}
+	}
+
+	switch {
+	case entry.label != nil:
+		if entry.srcExpr == nil {
+			entry.expr = c.errf(id, "cyclic references in let clause or alias")
+			break
+		}
+
+		src := entry.srcExpr
+		entry.srcExpr = nil // mark to allow detecting cycles
+		m[name] = entry
+
+		entry.expr = c.labeledExpr(nil, entry.label, src)
+		entry.label = nil
 	}
 
 	entry.used = true
@@ -483,11 +502,19 @@ func (c *compiler) markAlias(d ast.Decl) {
 		}
 
 	case *ast.LetClause:
-		a := aliasEntry{source: x}
+		a := aliasEntry{
+			label:   (*letScope)(x),
+			srcExpr: x.Expr,
+			source:  x,
+		}
 		c.insertAlias(x.Ident, a)
 
 	case *ast.Alias:
-		a := aliasEntry{source: x}
+		a := aliasEntry{
+			label:   (*deprecatedAliasScope)(x),
+			srcExpr: x.Expr,
+			source:  x,
+		}
 		c.insertAlias(x.Ident, a)
 	}
 }
@@ -609,14 +636,12 @@ func (c *compiler) addLetDecl(d ast.Decl) {
 		// Cache the parsed expression. Creating a unique expression for each
 		// reference allows the computation to be shared given that we don't
 		// have fields for expressions. This, in turn, prevents exponential
-		// blowup in x2: x1+x1, x3: x2+x2, ... patterns.
-
+		// blowup in x2: x1+x1, x3: x2+x2,  ... patterns.
 		expr := c.labeledExpr(nil, (*letScope)(x), x.Expr)
 		c.updateAlias(x.Ident, expr)
 
 	case *ast.Alias:
 		// TODO(legacy): deprecated, remove this use of Alias
-
 		expr := c.labeledExpr(nil, (*deprecatedAliasScope)(x), x.Expr)
 		c.updateAlias(x.Ident, expr)
 	}
@@ -733,11 +758,14 @@ func (c *compiler) labeledExpr(f *ast.Field, lab labeler, expr ast.Expr) adt.Exp
 	if c.stack[k].field != nil {
 		panic("expected nil field")
 	}
+	saved := c.stack[k]
+
 	c.stack[k].label = lab
 	c.stack[k].field = f
+
 	value := c.expr(expr)
-	c.stack[k].label = nil
-	c.stack[k].field = nil
+
+	c.stack[k] = saved
 	return value
 }
 

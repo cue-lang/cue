@@ -553,6 +553,9 @@ func (x *LetReference) Source() ast.Node {
 func (x *LetReference) resolve(c *OpContext) *Vertex {
 	e := c.Env(x.UpCount)
 	label := e.Vertex.Label
+	if x.X == nil {
+		panic("nil expression")
+	}
 	// Anonymous arc.
 	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X, 0}}}
 }

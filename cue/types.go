@@ -1476,6 +1476,9 @@ func (v Value) Lookup(path ...string) Value {
 // a configuration, and thus not those that are derived from Elem, Template,
 // or programmatically generated values such as those returned by Unify.
 func (v Value) Path() Path {
+	if v.v == nil {
+		return Path{}
+	}
 	p := v.v.Path()
 	a := make([]Selector, len(p))
 	for i, f := range p {

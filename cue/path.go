@@ -66,6 +66,11 @@ func ParsePath(s string) Path {
 	return Path{path: toSelectors(expr)}
 }
 
+// Selectors reports the individual selectors of a path.
+func (p Path) Selectors() []Selector {
+	return p.path
+}
+
 // String reports the CUE representation of p.
 func (p Path) String() string {
 	if err := p.Err(); err != nil {

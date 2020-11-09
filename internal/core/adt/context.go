@@ -340,6 +340,14 @@ func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 		return nil, arc.ChildErrors
 	}
 
+	for {
+		x, ok := arc.Value.(*Vertex)
+		if !ok {
+			break
+		}
+		arc = x
+	}
+
 	return arc, err
 }
 

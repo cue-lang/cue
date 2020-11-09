@@ -1148,13 +1148,6 @@ outer:
 			n.exprs = append(n.exprs, v)
 			break
 		}
-		for {
-			x, ok := arc.Value.(*adt.Vertex)
-			if !ok {
-				break
-			}
-			arc = x
-		}
 
 		// We need to ensure that each arc is only unified once (or at least) a
 		// bounded time, witch each conjunct. Comprehensions, for instance, may

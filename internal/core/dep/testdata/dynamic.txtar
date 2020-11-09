@@ -1,0 +1,32 @@
+-- in.cue --
+first: {
+    out: [1, 2]
+}
+ignore: {
+    x: 1
+    y: a.c
+}
+middle: {
+    for x in first.out {
+        ignore.y
+
+        "la\(x)": ignore & {
+            seq: x+1
+            val: "foo\(x)"
+            out: ignore.x
+        }
+    }
+}
+
+a: {
+    b: [ for x in middle { x } ]
+    c: {}
+}
+-- out/dependencies/field --
+middle
+-- out/dependencies/all --
+middle
+-- out/dependencies/dynamic --
+middle
+middle.la1
+middle.la2

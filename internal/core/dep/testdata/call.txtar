@@ -1,0 +1,13 @@
+-- in.cue --
+import "encoding/json"
+
+// The reference to string needs to be included even for Visit.
+a: b: json.Marshal({ #a: str })
+
+str: "x:y:z"
+-- out/dependencies/field --
+"encoding/json".Marshal
+str
+-- out/dependencies/all --
+"encoding/json".Marshal
+str

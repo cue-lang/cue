@@ -1,0 +1,23 @@
+-- in.cue --
+a: b: {
+    { [pattern]:  c }
+    { "\(name)": c }
+    regular:    c
+    optional?:  c
+    ...
+}
+
+pattern: =~"^Foo"
+value:   c
+name:    "name"
+c:       "descendants"
+-- out/dependencies/field --
+pattern
+name
+-- out/dependencies/all --
+pattern
+c
+name
+c
+c
+c

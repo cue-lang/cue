@@ -1,0 +1,18 @@
+-- in.cue --
+a: b: {
+    for x in b {}
+
+    x: {
+        c: m
+        d: y
+        e: f
+        f: 1
+        g: b.x
+    }
+    y: 3
+}
+
+m: 3
+-- out/dependencies/field --
+-- out/dependencies/all --
+m

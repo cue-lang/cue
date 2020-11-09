@@ -1,0 +1,14 @@
+-- in.cue --
+let X = Y
+let Y = c + d
+
+a: b: X
+
+c: 5
+d: 6
+-- out/dependencies/field --
+c
+d
+-- out/dependencies/all --
+c
+d

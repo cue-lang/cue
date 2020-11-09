@@ -1,0 +1,22 @@
+-- in.cue --
+// Note: in dynamic mode, [d] does not get picked up
+// because the disjunction is not resolved.
+a: b: "\(d)" | -d | c[:1] | c[0] | <e | [d, ...] | [...e]
+
+c: [1, 2]
+d: 2
+e: 3
+-- out/dependencies/field --
+d
+d
+c
+c[0]
+e
+-- out/dependencies/all --
+d
+d
+c
+c[0]
+e
+d
+e

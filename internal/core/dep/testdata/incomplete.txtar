@@ -1,0 +1,20 @@
+-- in.cue --
+a: b: c.d | c.e | c[e] | c["d"] | c[d]
+
+c: d: 3
+d: "d"
+e: "e"
+-- out/dependencies/field --
+c.d
+c
+c
+e
+c.d
+c.d
+-- out/dependencies/all --
+c.d
+c
+c
+e
+c.d
+c.d

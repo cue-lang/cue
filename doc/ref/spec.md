@@ -1335,6 +1335,8 @@ S3: {
 
 A field is a _definition_ if its identifier starts with `#` or `_#`.
 A field is _hidden_ if its starts with a `_`.
+All other fields are _regular_.
+
 Definitions and hidden fields are not emitted when converting a CUE program
 to data and are never required to be concrete.
 
@@ -1647,7 +1649,7 @@ others as well:
 - Each `for` and `let` clause in a [comprehension](#comprehensions)
   is considered to be its own implicit block.
 
-Blocks nest and influence [scoping].
+Blocks nest and influence scoping.
 
 
 ### Declarations and scope
@@ -1962,7 +1964,8 @@ x.f
 ```
 
 denotes the element of a <!--list or -->struct `x` identified by `f`.
-<!--For structs, -->`f` must be an identifier or a string literal identifying
+<!--For structs, -->
+`f` must be an identifier or a string literal identifying
 any definition or regular non-optional field.
 The identifier `f` is called the field selector.
 

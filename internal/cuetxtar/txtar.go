@@ -18,6 +18,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"os"
 	"path"
@@ -72,9 +73,9 @@ type Test struct {
 	// Allow Test to be used as a T.
 	*testing.T
 
-	// Buffer is used to write the test results that will be compared to the
-	// golden file.
-	*bytes.Buffer
+	prefix   string
+	buf      *bytes.Buffer // the default buffer
+	outFiles []file
 
 	Archive *txtar.Archive
 
@@ -82,6 +83,19 @@ type Test struct {
 	Dir string
 
 	hasGold bool
+}
+
+func (t *Test) Write(b []byte) (n int, err error) {
+	if t.buf == nil {
+		t.buf = &bytes.Buffer{}
+		t.outFiles = append(t.outFiles, file{t.prefix, t.buf})
+	}
+	return t.buf.Write(b)
+}
+
+type file struct {
+	name string
+	buf  *bytes.Buffer
 }
 
 func (t *Test) HasTag(key string) bool {
@@ -137,8 +151,34 @@ func (t *Test) WriteErrors(err errors.Error) {
 
 // Write file in a directory.
 func (t *Test) WriteFile(f *ast.File) {
+	// TODO: use FileWriter instead in separate CL.
 	fmt.Fprintln(t, "==", filepath.Base(f.Filename))
-	t.Write(formatNode(t.T, f))
+	_, _ = t.Write(formatNode(t.T, f))
+}
+
+// Writer returns a Writer with the given name.
+func (t *Test) Writer(name string) io.Writer {
+	switch name {
+	case "":
+		name = t.prefix
+	default:
+		name = path.Join(t.prefix, name)
+	}
+
+	for _, f := range t.outFiles {
+		if f.name == name {
+			return f.buf
+		}
+	}
+
+	w := &bytes.Buffer{}
+	t.outFiles = append(t.outFiles, file{name, w})
+
+	if name == t.prefix {
+		t.buf = w
+	}
+
+	return w
 }
 
 func formatNode(t *testing.T, n ast.Node) []byte {
@@ -222,22 +262,19 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 				t.Fatalf("error parsing txtar file: %v", err)
 			}
 
-			outFile := path.Join("out", x.Name)
-
-			var gold *txtar.File
-			for i, f := range a.Files {
-				if f.Name == outFile {
-					gold = &a.Files[i]
-				}
-			}
-
 			tc := &Test{
 				T:       t,
-				Buffer:  &bytes.Buffer{},
 				Archive: a,
 				Dir:     filepath.Dir(filepath.Join(dir, fullpath)),
 
-				hasGold: gold != nil,
+				prefix: path.Join("out", x.Name),
+			}
+
+			for _, f := range a.Files {
+				// TODO: not entirely correct.
+				if strings.HasPrefix(f.Name, tc.prefix) {
+					tc.hasGold = true
+				}
 			}
 
 			if tc.HasTag("skip") {
@@ -253,31 +290,42 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 
 			f(tc)
 
-			result := tc.Bytes()
-			if len(result) == 0 {
-				return
+			update := false
+			for _, sub := range tc.outFiles {
+				var gold *txtar.File
+				for i, f := range a.Files {
+					if f.Name == sub.name {
+						gold = &a.Files[i]
+					}
+				}
+
+				result := sub.buf.Bytes()
+
+				switch {
+				case gold == nil:
+					a.Files = append(a.Files, txtar.File{Name: sub.name})
+					gold = &a.Files[len(a.Files)-1]
+
+				case bytes.Equal(gold.Data, result):
+					continue
+				}
+
+				if x.Update || envUpdate != "" {
+					update = true
+					gold.Data = result
+					continue
+				}
+
+				t.Errorf("result for %s differs:\n%s",
+					sub.name,
+					cmp.Diff(string(gold.Data), string(result)))
 			}
 
-			if gold == nil {
-				a.Files = append(a.Files, txtar.File{Name: outFile})
-				gold = &a.Files[len(a.Files)-1]
-			}
-
-			if bytes.Equal(gold.Data, result) {
-				return
-			}
-
-			if !x.Update && envUpdate == "" {
-				t.Fatal(cmp.Diff(string(gold.Data), string(result)))
-			}
-
-			gold.Data = result
-
-			// Update and write file.
-
-			err = ioutil.WriteFile(fullpath, txtar.Format(a), 0644)
-			if err != nil {
-				t.Fatal(err)
+			if update {
+				err = ioutil.WriteFile(fullpath, txtar.Format(a), 0644)
+				if err != nil {
+					t.Fatal(err)
+				}
 			}
 		})
 

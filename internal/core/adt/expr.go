@@ -585,7 +585,7 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext) *Vertex {
-	n := c.node(x.X, EvaluatingArcs)
+	n := c.node(x.X, FieldSetDefined)
 	return c.lookup(n, x.Src.Sel.Pos(), x.Sel)
 }
 

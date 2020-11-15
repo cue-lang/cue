@@ -126,8 +126,8 @@ func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjuncti
 		envDisjunct{env, a, x.NumDefaults, cloneID})
 }
 
-func (n *nodeContext) updateResult() (isFinal bool) {
-	n.postDisjunct()
+func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
+	n.postDisjunct(state)
 
 	if n.hasErr() {
 		return n.isFinal
@@ -182,8 +182,8 @@ func (n *nodeContext) updateResult() (isFinal bool) {
 	return n.isFinal
 }
 
-func (n *nodeContext) tryDisjuncts() (finished bool) {
-	if !n.insertDisjuncts() || !n.updateResult() {
+func (n *nodeContext) tryDisjuncts(state adt.VertexStatus) (finished bool) {
+	if !n.insertDisjuncts() || !n.updateResult(state) {
 		if !n.isFinal {
 			return false // More iterations to do.
 		}

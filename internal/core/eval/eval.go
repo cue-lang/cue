@@ -132,7 +132,7 @@ type Evaluator struct {
 func (e *Evaluator) Eval(v *adt.Vertex) errors.Error {
 	if v.Value == nil {
 		ctx := adt.NewContext(e.r, e, v)
-		e.Unify(ctx, v, adt.Finalized)
+		e.Unify(ctx, v, adt.Partial)
 	}
 
 	// extract error if needed.
@@ -268,7 +268,7 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 
 	// defer c.PopVertex(c.PushVertex(v))
 
-	if state <= v.Status()+1 {
+	if state <= v.Status() {
 		return
 	}
 
@@ -434,7 +434,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 
 		// Handle disjunctions. If there are no disjunctions, this call is
 		// equivalent to calling n.postDisjunct.
-		if n.tryDisjuncts() {
+		if n.tryDisjuncts(state) {
 			if v.Value == nil {
 				v.Value = n.getValidators()
 			}
@@ -452,7 +452,7 @@ func isStruct(v *adt.Vertex) bool {
 	return ok
 }
 
-func (n *nodeContext) postDisjunct() {
+func (n *nodeContext) postDisjunct(state adt.VertexStatus) {
 	ctx := n.ctx
 
 	for {
@@ -595,6 +595,12 @@ func (n *nodeContext) postDisjunct() {
 
 	n.updateClosedInfo()
 
+	n.completeArcs(state)
+}
+
+func (n *nodeContext) completeArcs(state adt.VertexStatus) {
+	ctx := n.ctx
+
 	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
 		n.node.Value = adt.CombineErrors(nil, n.node.Value, &adt.Bottom{
 			Code:  adt.StructuralCycleError,
@@ -607,7 +613,9 @@ func (n *nodeContext) postDisjunct() {
 		for _, a := range n.node.Arcs {
 			// Call UpdateStatus here to be absolutely sure the status is set
 			// correctly and that we are not regressing.
-			n.node.UpdateStatus(adt.EvaluatingArcs)
+			if state == adt.Finalized {
+				n.node.UpdateStatus(adt.EvaluatingArcs)
+			}
 			n.eval.Unify(ctx, a, adt.Finalized)
 			if err, _ := a.Value.(*adt.Bottom); err != nil {
 				n.node.AddChildError(err)

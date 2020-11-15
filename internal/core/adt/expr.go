@@ -1185,9 +1185,12 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 		n := &Vertex{status: Finalized}
 
 		// TODO: only needed if value label != _
-		b := *a
-		b.Label = x.Value
-		n.Arcs = append(n.Arcs, &b)
+
+		b := &Vertex{
+			Label: x.Value,
+			Value: a,
+		}
+		n.Arcs = append(n.Arcs, b)
 
 		if x.Key != 0 {
 			v := &Vertex{Label: x.Key}

@@ -1140,6 +1140,13 @@ outer:
 			n.exprs = append(n.exprs, v)
 			break
 		}
+		for {
+			x, ok := arc.Value.(*adt.Vertex)
+			if !ok {
+				break
+			}
+			arc = x
+		}
 
 		// We need to ensure that each arc is only unified once (or at least) a
 		// bounded time, witch each conjunct. Comprehensions, for instance, may
@@ -1888,7 +1895,8 @@ outer:
 					label, err := adt.MakeLabel(x.Source(), index, adt.IntLabel)
 					n.addErr(err)
 					index++
-					n.insertField(label, adt.MakeConjunct(e, st, l.id))
+					c := adt.MakeConjunct(e, st, l.id)
+					n.insertField(label, c)
 				})
 				hasComprehension = true
 				if err != nil && !err.IsIncomplete() {

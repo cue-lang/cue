@@ -159,7 +159,15 @@ func (c *OpContext) pos() token.Pos {
 func (c *OpContext) spawn(node *Vertex) *OpContext {
 	sub := *c
 	node.Parent = c.e.Vertex
-	sub.e = &Environment{Up: c.e, Vertex: node}
+	sub.e = &Environment{
+		Up:     c.e,
+		Vertex: node,
+
+		// Copy cycle data.
+		Cyclic: c.e.Cyclic,
+		Deref:  c.e.Deref,
+		Cycles: c.e.Cycles,
+	}
 	return &sub
 }
 

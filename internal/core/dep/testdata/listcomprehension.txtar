@@ -9,3 +9,10 @@ d
 -- out/dependencies/all --
 c
 d
+-- out/dependencies/dynamic --
+c
+d
+c[0].a
+d
+c[1].a
+d

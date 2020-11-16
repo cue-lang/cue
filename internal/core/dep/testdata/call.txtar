@@ -11,3 +11,6 @@ str
 -- out/dependencies/all --
 "encoding/json".Marshal
 str
+-- out/dependencies/dynamic --
+"encoding/json".Marshal
+str

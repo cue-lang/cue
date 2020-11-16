@@ -9,3 +9,6 @@ e: int
 -- out/dependencies/all --
 d
 e
+-- out/dependencies/dynamic --
+d
+e

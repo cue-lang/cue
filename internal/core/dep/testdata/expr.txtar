@@ -20,3 +20,9 @@ c[0]
 e
 d
 e
+-- out/dependencies/dynamic --
+d
+d
+c
+c[0]
+e

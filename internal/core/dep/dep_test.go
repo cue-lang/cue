@@ -62,6 +62,10 @@ func TestVisit(t *testing.T) {
 			name: "all",
 			root: "a",
 			fn:   dep.VisitAll,
+		}, {
+			name: "dynamic",
+			root: "a",
+			fn:   dep.VisitFields,
 		}}
 
 		for _, tc := range testCases {
@@ -88,7 +92,6 @@ func TestVisit(t *testing.T) {
 
 // DO NOT REMOVE: for Testing purposes.
 func TestX(t *testing.T) {
-	// a and a.b are the fields for which to determine the references.
 	in := `
 	`
 
@@ -117,7 +120,7 @@ func TestX(t *testing.T) {
 
 	deps := []string{}
 
-	_ = dep.VisitAll(ctxt, n, func(d dep.Dependency) error {
+	_ = dep.VisitFields(ctxt, n, func(d dep.Dependency) error {
 		str := cue.MakeValue(ctxt, d.Node).Path().String()
 		if i := d.Import(); i != nil {
 			path := i.ImportPath.StringValue(ctxt)

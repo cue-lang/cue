@@ -16,3 +16,8 @@ m: 3
 -- out/dependencies/field --
 -- out/dependencies/all --
 m
+-- out/dependencies/dynamic --
+m
+a.b.y
+a.b.x.f
+a.b

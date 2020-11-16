@@ -1,0 +1,46 @@
+#IgnoreConcrete: true
+-- in.cue --
+root: {
+    t1: {
+        $id:   "sequenced"
+        seq:   1
+        text:  t2.value
+        value: "v"
+    }
+    t2: {
+        $id:   "sequenced"
+        seq:   2
+        text:  t1.value
+        value: "v"
+    }
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.t1 [Ready]")
+  t1("root.t2 [Ready]")
+
+-- out/run/t1 --
+graph TD
+  t0("root.t1 [Terminated]")
+  t1("root.t2 [Running]")
+
+-- out/run/t1/value --
+{
+	$id:   "sequenced"
+	seq:   1
+	text:  "v"
+	value: "v"
+}
+-- out/run/t2 --
+graph TD
+  t0("root.t1 [Terminated]")
+  t1("root.t2 [Terminated]")
+
+-- out/run/t2/value --
+{
+	$id:   "sequenced"
+	seq:   2
+	text:  "v"
+	value: "v"
+}

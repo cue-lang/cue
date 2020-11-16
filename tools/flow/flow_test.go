@@ -72,9 +72,10 @@ func TestFlow(t *testing.T) {
 		}
 
 		cfg := &flow.Config{
-			Root:       cue.ParsePath("root"),
-			InferTasks: t.Bool("InferTasks"),
-			UpdateFunc: updateFunc,
+			Root:           cue.ParsePath("root"),
+			InferTasks:     t.Bool("InferTasks"),
+			IgnoreConcrete: t.Bool("IgnoreConcrete"),
+			UpdateFunc:     updateFunc,
 		}
 
 		c := flow.New(cfg, inst, taskFunc)

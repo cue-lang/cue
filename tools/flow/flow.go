@@ -136,6 +136,10 @@ type Config struct {
 	// by any of the tasks defined within Root.
 	InferTasks bool
 
+	// IgnoreConcrete ignores references for which the values are already
+	// concrete and cannot change.
+	IgnoreConcrete bool
+
 	// UpdateFunc is called whenever the information in the controller is
 	// updated. This includes directly after initialization. The task may be
 	// nil if this call is not the result of a task completing.

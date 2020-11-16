@@ -161,6 +161,12 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 
 	n := d.Node
 	for ; n != nil; n = n.Parent {
+		if c.cfg.IgnoreConcrete && n.Value.Concreteness() <= adt.Concrete {
+			if k := n.Value.Kind(); k != adt.StructKind && k != adt.ListKind {
+				return nil
+			}
+		}
+
 		t, ok := c.nodes[n]
 		if ok || !c.cfg.InferTasks {
 			return t

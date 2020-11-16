@@ -7,7 +7,12 @@ cmp stdout interlocked-stdout
 cmp stderr expect-stderr3
 
 -- expect-stderr1 --
-cyclic dependency in tasks
+cyclic task dependency:
+	task command.cycle.t1 refers to
+	task command.cycle.t2 refers to
+	task command.cycle.t1:
+    ./after_tool.cue:18:2
+    ./after_tool.cue:19:2
 -- expect-stderr2 --
 command.aftercycle.t1.$after.$after: structural cycle
 -- expect-stderr3 --

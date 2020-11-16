@@ -1,0 +1,72 @@
+# Issue #281
+# Verify that we get the expected exported output.
+cue export
+cmp stdout expect/concrete.json
+
+# Using the explicitly written command works OK.
+cue hello1
+stdout 'hello, world'
+
+# Using the command that's defined externally fails.
+cue hello
+stdout 'hello, world'
+
+
+-- expect/concrete.json --
+{
+    "command": {
+        "hello": {
+            "task": {
+                "hello": {
+                    "$id": "tool/cli.Print",
+                    "text": "hello, world"
+                }
+            }
+        },
+        "hello1": {
+            "task": {
+                "hello": {
+                    "$id": "tool/cli.Print",
+                    "text": "hello, world"
+                }
+            }
+        }
+    }
+}
+-- cue.mod/module.cue --
+module: ""
+-- cue.mod/pkg/example.com/hello/cue.mod/module.cue --
+module: "example.com/hello"
+-- cue.mod/pkg/example.com/hello/hello.cue --
+package hello
+
+import "tool/cli"
+
+command: hello: task: hello: cli.Print & {
+	text: "hello, world"
+}
+-- m.cue --
+package x
+import (
+	"tool/cli"
+	"example.com/hello"
+)
+
+hello
+
+command: hello1: task: hello: cli.Print & {
+	text: "hello, world"
+}
+-- x_tool.cue --
+package x
+import (
+	"tool/cli"
+	"example.com/hello"
+)
+
+// This should pull in the hello task.
+hello
+
+command: hello1: task: hello: cli.Print & {
+	text: "hello, world"
+}

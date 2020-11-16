@@ -1,6 +1,6 @@
 ! cue cmd errcode
 ! stdout .
-stderr '^command "ls --badflags" failed: exit status [12]$'
+stderr '^task failed: command "ls --badflags" failed: exit status [12]$'
 
 -- task.cue --
 package home

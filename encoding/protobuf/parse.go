@@ -676,21 +676,30 @@ func (p *protoConverter) oneOf(x *proto.Oneof) {
 
 	p.addDecl(embed)
 
-	for _, v := range x.Elements {
-		s := &ast.StructLit{
+	newStruct := func() {
+		s = &ast.StructLit{
 			// TODO: make this the default in the formatter.
 			Rbrace: token.Newline.Pos(),
 		}
+		embed.Expr = ast.NewBinExpr(token.OR, embed.Expr, s)
+	}
+	for _, v := range x.Elements {
 		switch x := v.(type) {
 		case *proto.OneOfField:
+			newStruct()
 			oneOf := p.parseField(s, 0, x.Field)
 			oneOf.Optional = token.NoPos
 
+		case *proto.Comment:
+			cg := comment(x, false)
+			ast.SetRelPos(cg, token.NewSection)
+			s.Elts = append(s.Elts, cg)
+
 		default:
+			newStruct()
 			p.messageField(s, 1, v)
 		}
 
-		embed.Expr = ast.NewBinExpr(token.OR, embed.Expr, s)
 	}
 }
 

@@ -1,0 +1,15 @@
+// Issue #586
+package foo
+
+message Bar {
+    oneof Foo {
+        string a = 1;
+        // hello world
+
+        string b = 2;
+        // hello world
+    }
+
+    int32 c = 3;
+    // hello world
+}

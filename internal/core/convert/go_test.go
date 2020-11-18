@@ -183,6 +183,21 @@ func TestConvert(t *testing.T) {
 		reflect.ValueOf(3), "3",
 	}, {
 		time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `(string){ "2019-04-01T00:00:00Z" }`,
+	}, {
+		func() interface{} {
+			type T struct {
+				B int
+			}
+			type S struct {
+				A string
+				T
+			}
+			return S{}
+		}(),
+		`(struct){
+  A: (string){ "" }
+  B: (int){ 0 }
+}`,
 	}}
 	r := runtime.New()
 	for _, tc := range testCases {

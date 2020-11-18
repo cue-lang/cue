@@ -99,6 +99,9 @@ var tagsWithNames = []string{"json", "yaml", "protobuf"}
 
 func getName(f *reflect.StructField) string {
 	name := f.Name
+	if f.Anonymous {
+		name = ""
+	}
 	for _, s := range tagsWithNames {
 		if tag, ok := f.Tag.Lookup(s); ok {
 			if p := strings.Index(tag, ","); p >= 0 {
@@ -405,18 +408,18 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 			t := value.Type()
 			for i := 0; i < value.NumField(); i++ {
-				t := t.Field(i)
-				if t.PkgPath != "" {
+				sf := t.Field(i)
+				if sf.PkgPath != "" {
 					continue
 				}
 				val := value.Field(i)
 				if !nilIsTop && isNil(val) {
 					continue
 				}
-				if tag, _ := t.Tag.Lookup("json"); tag == "-" {
+				if tag, _ := sf.Tag.Lookup("json"); tag == "-" {
 					continue
 				}
-				if isOmitEmpty(&t) && isZero(val) {
+				if isOmitEmpty(&sf) && isZero(val) {
 					continue
 				}
 				sub := convertRec(ctx, nilIsTop, val.Interface())
@@ -430,10 +433,21 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 				// leave errors like we do during normal evaluation or do we
 				// want to return the error?
-				name := getName(&t)
+				name := getName(&sf)
 				if name == "-" {
 					continue
 				}
+				if sf.Anonymous && name == "" {
+					arc, ok := sub.(*adt.Vertex)
+					if ok {
+						for _, a := range arc.Arcs {
+							obj.Decls = append(obj.Decls, &adt.Field{Label: a.Label, Value: a.Value})
+							v.Arcs = append(v.Arcs, a)
+						}
+					}
+					continue
+				}
+
 				f := ctx.StringLabel(name)
 				obj.Decls = append(obj.Decls, &adt.Field{Label: f, Value: sub})
 				arc, ok := sub.(*adt.Vertex)

@@ -27,7 +27,6 @@ import (
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
-	"golang.org/x/xerrors"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -429,7 +428,7 @@ type decorated struct {
 }
 
 func (e *decorated) Is(err error) bool {
-	return xerrors.Is(e.info, err) || xerrors.Is(e.cueError, err)
+	return errors.Is(e.info, err) || errors.Is(e.cueError, err)
 }
 
 // MaxDepth indicates the maximum evaluation depth. This is there to break

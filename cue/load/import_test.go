@@ -19,9 +19,8 @@ import (
 	"reflect"
 	"testing"
 
-	"golang.org/x/xerrors"
-
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -58,7 +57,7 @@ func TestEmptyFolderImport(t *testing.T) {
 func TestIgnoredCUEFilesImport(t *testing.T) {
 	_, err := getInst(".", testdata+"ignored")
 	var e *NoFilesError
-	ok := xerrors.As(err, &e)
+	ok := errors.As(err, &e)
 	if !ok {
 		t.Fatal(`Import("testdata/ignored") did not return NoFilesError.`)
 	}

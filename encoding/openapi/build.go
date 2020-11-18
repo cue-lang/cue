@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"golang.org/x/xerrors"
 )
 
 type buildContext struct {
@@ -564,7 +563,7 @@ func (b *builder) disjunction(a []cue.Value, f typeFunc) {
 				continue
 			}
 			err := v.Subsume(w, cue.Schema())
-			if err == nil || xerrors.Is(err, internal.ErrInexact) {
+			if err == nil || errors.Is(err, internal.ErrInexact) {
 				subsumed = append(subsumed, schemas[j])
 			}
 		}

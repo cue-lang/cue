@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"golang.org/x/xerrors"
 )
 
 // Config configures a compilation.
@@ -445,7 +444,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 		}
 		name, _, err := ast.LabelName(lab)
 		switch {
-		case xerrors.Is(err, ast.ErrIsExpression):
+		case errors.Is(err, ast.ErrIsExpression):
 			if aliasInfo.expr == nil {
 				panic("unreachable")
 			}

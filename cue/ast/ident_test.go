@@ -19,9 +19,9 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/xerrors"
 
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 )
@@ -138,7 +138,7 @@ func TestLabelName(t *testing.T) {
 			assert.Equal(t, tc.out, str, "value")
 			assert.Equal(t, tc.isIdent, isIdent, "isIdent")
 			assert.Equal(t, tc.err, err != nil, "err")
-			assert.Equal(t, tc.expr, xerrors.Is(err, ast.ErrIsExpression), "expr")
+			assert.Equal(t, tc.expr, errors.Is(err, ast.ErrIsExpression), "expr")
 		})
 	}
 }

@@ -25,8 +25,6 @@ import (
 	"strings"
 	"unicode"
 
-	"golang.org/x/xerrors"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -193,7 +191,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	rewriteFiles(pkg, pkg.Dir, true)
 	for _, err := range errors.Errors(fp.finalize()) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError
-		if len(pkg.OrphanedFiles) == 0 || !xerrors.As(err, &x) {
+		if len(pkg.OrphanedFiles) == 0 || !errors.As(err, &x) {
 			pkg.ReportError(err)
 		}
 	}

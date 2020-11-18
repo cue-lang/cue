@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"golang.org/x/xerrors"
 )
 
 const (
@@ -102,7 +101,7 @@ func (w *printer) shortError(errs errors.Error) {
 		msg, args := errs.Msg()
 		fmt.Fprintf(w, msg, args...)
 
-		err := xerrors.Unwrap(errs)
+		err := errors.Unwrap(errs)
 		if err == nil {
 			break
 		}

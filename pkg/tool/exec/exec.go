@@ -22,8 +22,6 @@ import (
 	"os/exec"
 	"strings"
 
-	"golang.org/x/xerrors"
-
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
@@ -86,7 +84,7 @@ func (c *execCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 	update["success"] = err == nil
 	if err != nil {
-		if exit := (*exec.ExitError)(nil); xerrors.As(err, &exit) && captureErr {
+		if exit := (*exec.ExitError)(nil); errors.As(err, &exit) && captureErr {
 			update["stderr"] = string(exit.Stderr)
 		} else {
 			update = nil

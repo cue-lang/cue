@@ -1,0 +1,27 @@
+# Issue #578
+cue dump ./...
+cmp stdout stdout-expect
+-- k1.cue --
+package kube
+
+import "encoding/json"
+
+x: y: 2
+
+objects: [ for v in [ json.Marshal(x) ] {v} ]
+
+-- k_tool.cue --
+package kube
+
+import (
+	"tool/cli"
+	"encoding/json"
+)
+
+command: dump: cli.Print & {
+	text: json.MarshalStream(objects)
+}
+
+-- stdout-expect --
+"{\"y\":2}"
+

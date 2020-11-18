@@ -178,13 +178,16 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 				// marker to accumulate results. As this only happens within
 				// comprehensions, the effect is likely minimal, though.
 				arcs := v.Arcs
-				*v = save
-				return &adt.Vertex{
-					Parent: v.Parent,
-					Value:  &adt.StructMarker{},
-					Arcs:   arcs,
-					Closed: s.result_.Closed,
+				w := &adt.Vertex{
+					Parent:    v.Parent,
+					Value:     &adt.StructMarker{},
+					Arcs:      arcs,
+					Conjuncts: v.Conjuncts,
+					Closed:    s.result_.Closed,
 				}
+				w.UpdateStatus(v.Status())
+				*v = save
+				return w
 			}
 
 		default:

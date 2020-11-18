@@ -41,6 +41,13 @@ type valueError struct {
 	err *bottom
 }
 
+func (e *valueError) Unwrap() error {
+	if e.err.Err == nil {
+		return nil
+	}
+	return errors.Unwrap(e.err.Err)
+}
+
 func (e *valueError) Bottom() *adt.Bottom { return e.err }
 
 func (e *valueError) Error() string {

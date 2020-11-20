@@ -15,6 +15,7 @@
 package export
 
 import (
+	"fmt"
 	"sort"
 
 	"cuelang.org/go/cue/ast"
@@ -162,13 +163,21 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			a = append(a, cc.c)
 		}
 
-		merged := e.mergeValues(f, nil, c, a...)
+		d := &ast.Field{Label: label}
+
+		top := e.frame(0)
+		if fr, ok := top.fields[f]; ok && fr.alias != "" {
+			setFieldAlias(d, fr.alias)
+			fr.node = d
+			top.fields[f] = fr
+		}
+
+		d.Value = e.mergeValues(f, nil, c, a...)
 
 		if f.IsDef() {
 			x.inDefinition--
 		}
 
-		d := &ast.Field{Label: label, Value: merged}
 		if isOptional(a) {
 			d.Optional = token.Blank.Pos()
 		}
@@ -255,7 +264,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 
 				// TODO: also handle dynamic fields
 			default:
-				panic("unreachable")
+				panic(fmt.Sprintf("Unexpected type %T", d))
 			}
 			e.addConjunct(label, env, d)
 		}
@@ -336,9 +345,25 @@ func isOptional(a []adt.Conjunct) bool {
 }
 
 func isComplexStruct(s *adt.StructLit) bool {
-	for _, e := range s.Decls {
-		switch x := e.(type) {
-		case *adt.Field, *adt.OptionalField, adt.Expr:
+	for _, d := range s.Decls {
+		switch x := d.(type) {
+		case *adt.Field:
+			// TODO: remove this and also handle field annotation in expr().
+			// This allows structs to be merged. Ditto below.
+			if x.Src != nil {
+				if _, ok := x.Src.Label.(*ast.Alias); ok {
+					return ok
+				}
+			}
+
+		case *adt.OptionalField:
+			if x.Src != nil {
+				if _, ok := x.Src.Label.(*ast.Alias); ok {
+					return ok
+				}
+			}
+
+		case adt.Expr:
 
 		case *adt.Ellipsis:
 			if x.Value != nil {

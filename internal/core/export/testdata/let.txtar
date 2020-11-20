@@ -1,23 +1,54 @@
+# Issue #590
+
 -- in.cue --
 let X = 1 + 1
 #Foo: X
+-- x.cue --
+x: string
+
+let Y = x
+y: Y
+-- y.cue --
+x: "foo"
+
+// Note: although syntactically the same, this is a different let clause than
+// the one from before and thus will be renamed.
+// Issue #590
+let Y = x
+y: Y
 -- out/definition --
 
 let X = 1 + 1
 #Foo: X
+x:    "foo"
+let Y = x
+let Y_1 = x
+y: Y & Y_1
 -- out/doc --
 []
 [#Foo]
+[x]
+[y]
 -- out/value --
 == Simplified
-{}
+{
+	x: "foo"
+	y: "foo"
+}
 == Raw
 {
 	#Foo: 2
+	x:    "foo"
+	y:    "foo"
 }
 == Final
-{}
+{
+	x: "foo"
+	y: "foo"
+}
 == All
 {
 	#Foo: 2
+	x:    "foo"
+	y:    "foo"
 }

@@ -321,6 +321,8 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 
 		f := &ast.Field{Label: e.stringLabel(label)}
 
+		e.addField(label, f, f.Value)
+
 		if label.IsDef() {
 			e.inDefinition++
 		}

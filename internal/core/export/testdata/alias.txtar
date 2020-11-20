@@ -1,0 +1,85 @@
+// TODO: merge the resulting files. This can only be done if off-by-one handling
+// is moved to expr handling too.
+//
+// For now this is better than panicking.
+
+-- x.cue --
+X="a-b": 4
+
+foo: X
+bar?: Y
+
+Y="a-c": 5
+
+-- y.cue --
+baz: 3
+X="d-2": E=[D="cue"]: C="foo\(baz)": {
+    name: "xx"
+	foo: C.name
+	bar: X
+	baz: D
+	qux: E
+}
+-- out/definition --
+
+{
+	X="a-b": 4
+	foo:     X
+	bar?:    Y
+	Y="a-c": 5
+} & {
+	baz: 3
+	X_1="d-2": {
+		E=[D="cue"]: {
+			C="foo\(baz)": {
+				name: "xx"
+				foo:  C.name
+				bar:  X_1
+				baz:  D
+				qux:  E
+			}
+		}
+	}
+}
+-- out/doc --
+[]
+["a-b"]
+[foo]
+["a-c"]
+[baz]
+["d-2"]
+-- out/value --
+== Simplified
+{
+	"a-b": 4
+	foo:   4
+	baz:   3
+	"a-c": 5
+	"d-2": {}
+}
+== Raw
+{
+	"a-b":   4
+	foo:     4
+	bar?:    Y
+	baz:     3
+	Y="a-c": 5
+	"d-2": {}
+}
+== Final
+{
+	"a-b": 4
+	foo:   4
+	baz:   3
+	"a-c": 5
+	"d-2": {}
+}
+== All
+{
+	"a-b":   4
+	foo:     4
+	bar?:    Y
+	baz:     3
+	Y="a-c": 5
+	"d-2": {}
+}

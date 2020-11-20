@@ -204,13 +204,6 @@ package test
 
 // // // My first little foo.
 // foos: MyFoo: {}
-
-bar: 3
-d2: C="foo\(bar)": {
-    name: "xx"
-    foo: C.name
-}
-
 	`
 
 	archive := txtar.Parse([]byte(in))

@@ -16,8 +16,38 @@ x: "foo"
 // Issue #590
 let Y = x
 y: Y
+-- issue593.cue --
+cfgs: [ for crd in ["one", "two"] {
+        metadata: {
+                name: crd
+        }
+}]
+for cfg in cfgs {
+        let filepath = "kind-\(cfg.name)"
+        files: {
+                "\(filepath)": {
+                        patches: cfg
+                }
+        }
+}
+
 -- out/definition --
 
+{
+	cfgs: [ for crd in ["one", "two"] {
+		metadata: {
+			name: crd
+		}
+	}]
+	for cfg in cfgs {
+		let filepath = "kind-\(cfg.name)"
+		files: {
+			"\(filepath)": {
+				patches: cfg
+			}
+		}
+	}
+}
 let X = 1 + 1
 #Foo: X
 x:    "foo"
@@ -29,26 +59,110 @@ y: Y & Y_1
 [#Foo]
 [x]
 [y]
+[cfgs]
+[cfgs 0]
+[cfgs 0 metadata]
+[cfgs 0 metadata name]
+[cfgs 1]
+[cfgs 1 metadata]
+[cfgs 1 metadata name]
+[files]
 -- out/value --
 == Simplified
 {
 	x: "foo"
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	let filepath = "kind-\(cfg.name)"
+	files: {
+		"\(filepath)": {
+			patches: cfg
+		}
+	} & {
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
 	y: "foo"
 }
 == Raw
 {
 	#Foo: 2
 	x:    "foo"
-	y:    "foo"
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	let filepath = "kind-\(cfg.name)"
+	files: {
+		"\(filepath)": {
+			patches: cfg
+		}
+	} & {
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
+	y: "foo"
 }
 == Final
 {
 	x: "foo"
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	let filepath = "kind-\(cfg.name)"
+	files: {
+		"\(filepath)": {
+			patches: cfg
+		}
+	} & {
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
 	y: "foo"
 }
 == All
 {
 	#Foo: 2
 	x:    "foo"
-	y:    "foo"
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	let filepath = "kind-\(cfg.name)"
+	files: {
+		"\(filepath)": {
+			patches: cfg
+		}
+	} & {
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
+	y: "foo"
 }

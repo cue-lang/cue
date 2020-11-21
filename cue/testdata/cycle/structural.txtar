@@ -437,9 +437,25 @@ e3.b.c: structural cycle
 e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:297:13
     ./in.cue:298:9
+e4.a.0: empty disjunction: 4 related errors:
+e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
+    ./in.cue:298:9
+    ./in.cue:298:10
+e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+    ./in.cue:297:13
+    ./in.cue:298:9
+e4.a.0.0: empty disjunction: 2 related errors:
 e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:300:9
     ./in.cue:301:13
+e4.b.0: empty disjunction: 4 related errors:
+e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
+    ./in.cue:300:9
+    ./in.cue:300:10
+e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+    ./in.cue:300:9
+    ./in.cue:301:13
+e4.b.0.0: empty disjunction: 2 related errors:
 p2.#T.a.b.link: structural cycle
 p3.#U.#T.a.b.link: structural cycle
 p5.#T.a.0.link: structural cycle
@@ -1185,6 +1201,14 @@ Result:
         // [eval] e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
         //     ./in.cue:297:13
         //     ./in.cue:298:9
+        // e4.a.0: empty disjunction: 4 related errors:
+        // e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
+        //     ./in.cue:298:9
+        //     ./in.cue:298:10
+        // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+        //     ./in.cue:297:13
+        //     ./in.cue:298:9
+        // e4.a.0.0: empty disjunction: 2 related errors:
         0: (struct){
           c: (int){ 1 }
         }
@@ -1196,6 +1220,14 @@ Result:
         // [eval] e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
         //     ./in.cue:300:9
         //     ./in.cue:301:13
+        // e4.b.0: empty disjunction: 4 related errors:
+        // e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
+        //     ./in.cue:300:9
+        //     ./in.cue:300:10
+        // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+        //     ./in.cue:300:9
+        //     ./in.cue:301:13
+        // e4.b.0.0: empty disjunction: 2 related errors:
         0: (struct){
           c: (int){ 1 }
         }

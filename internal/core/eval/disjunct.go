@@ -17,6 +17,8 @@ package eval
 import (
 	"sort"
 
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -129,7 +131,22 @@ func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjuncti
 func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 	n.postDisjunct(state)
 
+	x := n.node
 	if n.hasErr() {
+		err, ok := x.Value.(*adt.Bottom)
+		if !ok {
+			err = n.getErr()
+		}
+		_ = ok
+		if err == nil {
+			err = x.ChildErrors
+		}
+		if err != nil {
+			if Debug {
+				// fmt.Println(err)
+			}
+			n.disjunctErrs = append(n.disjunctErrs, err)
+		}
 		return n.isFinal
 	}
 
@@ -194,15 +211,22 @@ func (n *nodeContext) tryDisjuncts(state adt.VertexStatus) (finished bool) {
 	}
 
 	if len(n.disjunctions) > 0 {
-		b := &adt.Bottom{
-			// TODO(errors): we should not make this error worse by discarding
-			// the type or error. Using IncompleteError is a compromise. But
-			// really we should keep track of the errors and return a more
-			// accurate result here.
-			Code: adt.IncompleteError,
-			Err:  n.ctx.Newf("empty disjunction"),
+		code := adt.IncompleteError
+
+		if len(n.disjunctErrs) > 0 {
+			code = adt.EvalError
+			for _, c := range n.disjunctErrs {
+				if c.Code > code {
+					code = c.Code
+				}
+			}
 		}
-		n.node.AddErr(n.ctx, b)
+
+		b := &adt.Bottom{
+			Code: code,
+			Err:  n.disjunctError(),
+		}
+		n.node.SetValue(n.ctx, adt.Finalized, b)
 	}
 	return true
 }
@@ -397,4 +421,76 @@ func combineDefault(a, b defaultMode) defaultMode {
 	default:
 		panic("unreachable")
 	}
+}
+
+// disjunctError returns a compound error for a failed disjunction.
+//
+// TODO(perf): the set of errors is now computed during evaluation. Eventually,
+// this could be done lazily.
+func (n *nodeContext) disjunctError() (errs errors.Error) {
+	ctx := n.ctx
+
+	disjuncts := selectErrors(n.disjunctErrs)
+
+	if disjuncts == nil {
+		errs = ctx.Newf("empty disjunction")
+	} else {
+		disjuncts = errors.Sanitize(disjuncts)
+		k := len(errors.Errors(disjuncts))
+		errs = ctx.Newf("empty disjunction: %d related errors:", k)
+	}
+
+	errs = errors.Append(errs, disjuncts)
+
+	return errs
+}
+
+func selectErrors(a []*adt.Bottom) (errs errors.Error) {
+	// return all errors if less than a certain number.
+	if len(a) <= 2 {
+		for _, b := range a {
+			errs = errors.Append(errs, b.Err)
+
+		}
+		return errs
+	}
+
+	// First select only relevant errors.
+	isIncomplete := false
+	k := 0
+	for _, b := range a {
+		if !isIncomplete && b.Code >= adt.IncompleteError {
+			k = 0
+			isIncomplete = true
+		}
+		a[k] = b
+		k++
+	}
+	a = a[:k]
+
+	// filter errors
+	positions := map[token.Pos]bool{}
+
+	add := func(b *adt.Bottom, p token.Pos) bool {
+		if positions[p] {
+			return false
+		}
+		positions[p] = true
+		errs = errors.Append(errs, b.Err)
+		return true
+	}
+
+	for _, b := range a {
+		// TODO: Should we also distinguish by message type?
+		if add(b, b.Err.Position()) {
+			continue
+		}
+		for _, p := range b.Err.InputPositions() {
+			if add(b, p) {
+				break
+			}
+		}
+	}
+
+	return errs
 }

@@ -4,6 +4,10 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 -- expect-stderr --
+bar: empty disjunction: 2 related errors:
+bar.a: conflicting values "str" and int (mismatched types string and int):
+    ./errs.cue:5:10
+    ./errs.cue:6:16
 bar.b: conflicting values 2 and string (mismatched types int and string):
     ./errs.cue:5:21
     ./errs.cue:6:26

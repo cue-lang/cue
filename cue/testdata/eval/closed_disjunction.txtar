@@ -15,16 +15,17 @@ b: #A & {
 }
 -- out/eval --
 Errors:
+b: empty disjunction: 2 related errors:
 b: field `c` not allowed:
     ./in.cue:1:5
     ./in.cue:3:5
-    ./in.cue:3:35
+    ./in.cue:3:6
     ./in.cue:11:4
     ./in.cue:12:5
 b: field `d` not allowed:
     ./in.cue:1:5
     ./in.cue:3:5
-    ./in.cue:3:35
+    ./in.cue:3:11
     ./in.cue:11:4
     ./in.cue:13:5
 
@@ -38,7 +39,19 @@ Result:
     c: (int){ 3 }
   }
   b: (_|_){
-    // [eval]
+    // [eval] b: empty disjunction: 2 related errors:
+    // b: field `c` not allowed:
+    //     ./in.cue:1:5
+    //     ./in.cue:3:5
+    //     ./in.cue:3:6
+    //     ./in.cue:11:4
+    //     ./in.cue:12:5
+    // b: field `d` not allowed:
+    //     ./in.cue:1:5
+    //     ./in.cue:3:5
+    //     ./in.cue:3:11
+    //     ./in.cue:11:4
+    //     ./in.cue:13:5
     c: (_|_){
       // [eval] b: field `c` not allowed:
       //     ./in.cue:1:5

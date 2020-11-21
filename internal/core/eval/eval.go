@@ -696,11 +696,13 @@ type nodeShared struct {
 	node *adt.Vertex
 
 	// Disjunction handling
-	touched  bool
-	disjunct adt.Disjunction
-	result_  adt.Vertex
-	isDone   bool
-	stack    []int
+	touched      bool
+	disjunct     adt.Disjunction
+	disjunctErrs []*adt.Bottom
+
+	result_ adt.Vertex
+	isDone  bool
+	stack   []int
 
 	// Closedness override.
 	accept adt.Acceptor
@@ -717,8 +719,9 @@ func (e *Evaluator) newSharedNode(ctx *adt.OpContext, node *adt.Vertex, accept a
 			node:   node,
 			accept: accept,
 
-			stack:    n.stack[:0],
-			disjunct: adt.Disjunction{Values: n.disjunct.Values[:0]},
+			stack:        n.stack[:0],
+			disjunct:     adt.Disjunction{Values: n.disjunct.Values[:0]},
+			disjunctErrs: n.disjunctErrs[:0],
 		}
 
 		return n
@@ -945,8 +948,10 @@ func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr, id adt.ID) bool {
 		}
 	}
 
+	if n.kind != kind || n.kindExpr == nil {
+		n.kindExpr = v
+	}
 	n.kind = kind
-	n.kindExpr = v
 	return kind != adt.BottomKind
 }
 

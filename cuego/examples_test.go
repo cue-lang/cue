@@ -16,7 +16,9 @@ package cuego_test
 
 import (
 	"fmt"
+	"strings"
 
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cuego"
 )
 
@@ -37,12 +39,14 @@ func ExampleComplete_structTag() {
 
 	a = Sum{A: 2, B: 3, C: 8}
 	err = cuego.Complete(&a)
-	fmt.Println(err)
+	fmt.Println(errMsg(err))
 
 	//Output:
 	// completed: cuego_test.Sum{A:1, B:5, C:6} (err: <nil>)
 	// completed: cuego_test.Sum{A:2, B:6, C:8} (err: <nil>)
-	// A: conflicting values 5 and 2 (and 3 more errors)
+	// empty disjunction: 2 related errors:
+	// conflicting values null and {A:2,B:3,C:8} (mismatched types null and struct)
+	// A: conflicting values 5 and 2
 }
 
 func ExampleConstrain() {
@@ -68,31 +72,47 @@ func ExampleConstrain() {
 		MaxCount: <=10_000
 	}`)
 
-	fmt.Println("error:", err)
+	fmt.Println("error:", errMsg(err))
 
-	fmt.Println("validate:", cuego.Validate(&Config{
+	fmt.Println("validate:", errMsg(cuego.Validate(&Config{
 		Filename: "foo.json",
 		MaxCount: 1200,
 		MinCount: 39,
-	}))
+	})))
 
-	fmt.Println("validate:", cuego.Validate(&Config{
+	fmt.Println("validate:", errMsg(cuego.Validate(&Config{
 		Filename: "foo.json",
 		MaxCount: 12,
 		MinCount: 39,
-	}))
+	})))
 
-	fmt.Println("validate:", cuego.Validate(&Config{
+	fmt.Println("validate:", errMsg(cuego.Validate(&Config{
 		Filename: "foo.jso",
 		MaxCount: 120,
 		MinCount: 39,
-	}))
+	})))
 
 	// TODO(errors): fix bound message (should be "does not match")
 
 	//Output:
-	// error: <nil>
-	// validate: <nil>
-	// validate: MinCount: invalid value 39 (out of bound <=12)
-	// validate: Filename: invalid value "foo.jso" (out of bound =~".json$")
+	// error: nil
+	// validate: nil
+	// validate: empty disjunction: 2 related errors:
+	// conflicting values null and {Filename:"foo.json",MaxCount:12,MinCount:39} (mismatched types null and struct)
+	// MinCount: invalid value 39 (out of bound <=12)
+	// validate: empty disjunction: 2 related errors:
+	// conflicting values null and {Filename:"foo.jso",MaxCount:120,MinCount:39} (mismatched types null and struct)
+	// Filename: invalid value "foo.jso" (out of bound =~".json$")
+}
+
+func errMsg(err error) string {
+	a := []string{}
+	for _, err := range errors.Errors(err) {
+		a = append(a, err.Error())
+	}
+	s := strings.Join(a, "\n")
+	if s == "" {
+		return "nil"
+	}
+	return s
 }

@@ -143,8 +143,8 @@ b7: incompatible bounds >=6 and <=5:
 c3: conflicting values string and >=1 (mismatched types string and number):
     ./in.cue:34:5
     ./in.cue:34:14
-c4: conflicting values <=5 and string (mismatched types number and string):
-    ./in.cue:35:11
+c4: conflicting values >=1 and string (mismatched types number and string):
+    ./in.cue:35:5
     ./in.cue:35:17
 n2: incompatible bounds >=1.1 and <=1.3:
     ./in.cue:42:11
@@ -221,8 +221,8 @@ Result:
     //     ./in.cue:34:14
   }
   c4: (_|_){
-    // [eval] c4: conflicting values <=5 and string (mismatched types number and string):
-    //     ./in.cue:35:11
+    // [eval] c4: conflicting values >=1 and string (mismatched types number and string):
+    //     ./in.cue:35:5
     //     ./in.cue:35:17
   }
   s1: (string){ "e" }

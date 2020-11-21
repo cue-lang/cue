@@ -162,9 +162,9 @@ CUE programs may omit most of these commas using the following two rules:
 When the input is broken into tokens, a comma is automatically inserted into
 the token stream immediately after a line's final token if that token is
 
-- an identifier
-- null, true, false, bottom, or an integer, floating-point, or string literal
-- one of the characters ), ], or }
+- an identifier, keyword, or bottom
+- a number or string literal, including an interpolation
+- one of the characters `)`, `]`, `}`, or `?`
 
 
 Although commas are automatically inserted, the parser will require
@@ -257,23 +257,15 @@ TODO:
 -->
 
 
-#### Arithmetic
-
-The following pseudo keywords can be used as operators in expressions.
-
-```
-div          mod          quo          rem
-```
-
 ### Operators and punctuation
 
 The following character sequences represent operators and punctuation:
 
 ```
-+     div   &&    ==    <     =     (     )
--     mod   ||    !=    >     :     {     }
-*     quo   &     =~    <=    ?     [     ]     ,
-/     rem   |     !~    >=    !     _|_   ...   .
++     &&    ==    <     =     (     )
+-     ||    !=    >     :     {     }
+*     &     =~    <=    ?     [     ]     ,
+/     |     !~    >=    !     _|_   ...   .
 ```
 <!--
 Free tokens:  ; ~ ^
@@ -286,19 +278,9 @@ Free tokens:  ; ~ ^
  -->
 
 
-### Integer literals
+### Numeric literals
 
-An integer literal is a sequence of digits representing an integer value.
-An optional prefix sets a non-decimal base: 0o for octal,
-0x or 0X for hexadecimal, and 0b for binary.
-In hexadecimal literals, letters a-f and A-F represent values 10 through 15.
-All integers allow interstitial underscores "_";
-these have no meaning and are solely for readability.
-
-Decimal integers may have a SI or IEC multiplier.
-Multipliers can be used with fractional numbers.
-When multiplying a fraction by a multiplier, the result is truncated
-towards zero if it is not an integer.
+There are several kinds of numeric literals.
 
 ```
 int_lit     = decimal_lit | si_lit | octal_lit | binary_lit | hex_lit .
@@ -316,23 +298,30 @@ float_lit   = decimals "." [ decimals ] [ exponent ] |
               "." decimals [ exponent ].
 exponent    = ( "e" | "E" ) [ "+" | "-" ] decimals .
 ```
-<!--
-TODO: consider allowing Exo (and up), if not followed by a sign
-or number. Alternatively one could only allow Ei, Yi, and Zi.
--->
+
+An _integer literal_ is a sequence of digits representing an integer value.
+An optional prefix sets a non-decimal base: 0o for octal,
+0x or 0X for hexadecimal, and 0b for binary.
+In hexadecimal literals, letters a-f and A-F represent values 10 through 15.
+All integers allow interstitial underscores "_";
+these have no meaning and are solely for readability.
+
+Integer literals may have an SI or IEC multiplier.
+Multipliers can be used with fractional numbers.
+When multiplying a fraction by a multiplier, the result is truncated
+towards zero if it is not an integer.
 
 ```
 42
-1.5Gi
+1.5G    // 1_000_000_000
+1.3Ki   // 1.3 * 1024 = trunc(1331.2) = 1331
 170_141_183_460_469_231_731_687_303_715_884_105_727
 0xBad_Face
 0o755
 0b0101_0001
 ```
 
-### Decimal floating-point literals
-
-A decimal floating-point literal is a representation of
+A _decimal floating-point literal_ is a representation of
 a decimal floating-point value (a _float_).
 It has an integer part, a decimal point, a fractional part, and an
 exponent part.
@@ -340,13 +329,6 @@ The integer and fractional part comprise decimal digits; the
 exponent part is an `e` or `E` followed by an optionally signed decimal exponent.
 One of the integer part or the fractional part may be elided; one of the decimal
 point or the exponent may be elided.
-
-```
-decimal_lit = decimals "." [ decimals ] [ exponent ] |
-            decimals exponent |
-            "." decimals [ exponent ] .
-exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
-```
 
 ```
 0.
@@ -359,6 +341,25 @@ exponent  = ( "e" | "E" ) [ "+" | "-" ] decimals .
 .25
 .12345E+5
 ```
+
+<!--
+TODO: consider allowing Exo (and up), if not followed by a sign
+or number. Alternatively one could only allow Ei, Yi, and Zi.
+-->
+
+Neither a `float_lit` nor an `si_lit` may not appear after a token that is:
+
+- an identifier, keyword, or bottom
+- a number or string literal, including an interpolation
+- one of the characters `)`, `]`, `}`, `?`, or `.`.
+
+<!--
+So
+`a + 3.2Ti`  -> `a`, `+`, `3.2Ti`
+`a 3.2Ti`    -> `a`, `3`, `.`, `2`, `Ti`
+`a + .5e3`   -> `a`, `+`, `.5e3`
+`a .5e3`     -> `a`, `.`, `5`, `e3`.
+-->
 
 
 ### String and byte sequence literals
@@ -2103,7 +2104,7 @@ UnaryExpr  = PrimaryExpr | unary_op UnaryExpr .
 binary_op  = "|" | "&" | "||" | "&&" | "==" | rel_op | add_op | mul_op  .
 rel_op     = "!=" | "<" | "<=" | ">" | ">=" | "=~" | "!~" .
 add_op     = "+" | "-" .
-mul_op     = "*" | "/" | "div" | "mod" | "quo" | "rem" .
+mul_op     = "*" | "/" .
 unary_op   = "+" | "-" | "!" | "*" | rel_op .
 ```
 
@@ -2153,7 +2154,7 @@ and finally `|` (disjunction):
 
 ```
 Precedence    Operator
-    7             *  / div mod quo rem
+    7             *  /
     6             +  -
     5             ==  !=  <  <=  >  >= =~ !~
     4             &&
@@ -2178,90 +2179,34 @@ x == y+1 && y == z-1
 #### Arithmetic operators
 
 Arithmetic operators apply to numeric values and yield a result of the same type
-as the first operand. The three of the four standard arithmetic operators
-`(+, -, *)` apply to integer and decimal floating-point types;
+as the first operand. The four standard arithmetic operators
+`(+, -, *, /)` apply to integer and decimal floating-point types;
 `+` and `*` also apply to lists and strings.
-`/` only applies to decimal floating-point types and
-`div`, `mod`, `quo`, and `rem` only apply to integer types.
 
 ```
 +    sum                    integers, floats, lists, strings, bytes
 -    difference             integers, floats
 *    product                integers, floats, lists, strings, bytes
-/    quotient               floats
-div  division               integers
-mod  modulo                 integers
-quo  quotient               integers
-rem  remainder              integers
+/    quotient               integers, floats
 ```
 
 For any operator that accepts operands of type `float`, any operand may be
-of type `int` or `float`, in which case the result will be `float` if any
-of the operands is `float` or `int` otherwise.
-For `/` the result is always `float`.
+of type `int` or `float`, in which case the result will be `float`
+if it cannot be represented as an `int` or if any of the operands are `float`,
+or `int` otherwise.
+So the result of `1 / 2` is `0.5` and is of type `float`.
 
+The result of division by zero is bottom (an error).
+<!-- TODO: consider making it +/- Inf -->
+Integer division is implemented through the builtin functions
+`quo`, `rem`, `div`, and `mod`.
 
-#### Integer operators
-
-For two integer values `x` and `y`,
-the integer quotient `q = x div y` and remainder `r = x mod y `
-implement Euclidean division and
-satisfy the following relationship:
-
-```
-r = x - y*q  with 0 <= r < |y|
-```
-where `|y|` denotes the absolute value of `y`.
-
-```
- x     y    x div y   x mod y
- 5     3       1         2
--5     3      -2         1
- 5    -3      -1         2
--5    -3       2         1
-```
-
-For two integer values `x` and `y`,
-the integer quotient `q = x quo y` and remainder `r = x rem y `
-implement truncated division and
-satisfy the following relationship:
-
-```
-x = q*y + r  and  |r| < |y|
-```
-
-with `x quo y` truncated towards zero.
-
-```
- x     y    x quo y   x rem y
- 5     3       1         2
--5     3      -1        -2
- 5    -3      -1         2
--5    -3       1        -2
-```
-
-A zero divisor in either case results in bottom (an error).
-
-For integer operands, the unary operators `+` and `-` are defined as follows:
+The unary operators `+` and `-` are defined for numeric values as follows:
 
 ```
 +x                          is 0 + x
 -x    negation              is 0 - x
 ```
-
-
-#### Decimal floating-point operators
-
-For decimal floating-point numbers, `+x` is the same as `x`,
-while -x is the negation of x.
-The result of a floating-point division by zero is bottom (an error).
-
-<!-- TODO: consider making it +/- Inf -->
-
-An implementation may combine multiple floating-point operations into a single
-fused operation, possibly across statements, and produce a result that differs
-from the value obtained by executing and rounding the instructions individually.
-
 
 #### List operators
 
@@ -2723,6 +2668,47 @@ or([a, b])           a | b
 or([a])              a
 or([])               _|_
 ```
+
+#### `div`, `mod`, `quo` and `rem`
+
+For two integer values `x` and `y`,
+the integer quotient `q = div(x, y)` and remainder `r = mod(x, y)`
+implement Euclidean division and
+satisfy the following relationship:
+
+```
+r = x - y*q  with 0 <= r < |y|
+```
+where `|y|` denotes the absolute value of `y`.
+
+```
+ x     y   div(x, y)  mod(x, y)
+ 5     3        1          2
+-5     3       -2          1
+ 5    -3       -1          2
+-5    -3        2          1
+```
+
+For two integer values `x` and `y`,
+the integer quotient `q = quo(x, y)` and remainder `r = rem(x, y)`
+implement truncated division and
+satisfy the following relationship:
+
+```
+x = q*y + r  and  |r| < |y|
+```
+
+with `quo(x, y)` truncated towards zero.
+
+```
+ x     y   quo(x, y)  rem(x, y)
+ 5     3        1          2
+-5     3       -1         -2
+ 5    -3       -1          2
+-5    -3        1         -2
+```
+
+A zero divisor in either case results in bottom (an error).
 
 
 ## Cycles

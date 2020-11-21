@@ -939,6 +939,29 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 
 	pkgID := v.instance().ID()
 
+	bad := func(name string, err error) ast.Node {
+		const format = `"%s: internal error
+Error: %s
+
+Profile:
+%#v
+
+Value:
+%v
+
+You could file a bug with the above information at:
+    https://github.com/cuelang/cue/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=.
+`
+		cg := &ast.CommentGroup{Doc: true}
+		msg := fmt.Sprintf(format, name, err, p, v)
+		for _, line := range strings.Split(msg, "\n") {
+			cg.List = append(cg.List, &ast.Comment{Text: "// " + line})
+		}
+		x := &ast.BadExpr{}
+		ast.AddComment(x, cg)
+		return x
+	}
+
 	// var expr ast.Expr
 	var err error
 	var f *ast.File
@@ -947,19 +970,19 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		var expr ast.Expr
 		expr, err = p.Value(v.idx.Runtime, pkgID, v.v)
 		if err != nil {
-			return nil
+			return bad(`"cuelang.org/go/internal/core/export".Value`, err)
 		}
 
 		// This introduces gratuitous unshadowing!
 		f, err = astutil.ToFile(expr)
 		if err != nil {
-			return nil
+			return bad(`"cuelang.org/go/ast/astutil".ToFile`, err)
 		}
 		// return expr
 	} else {
 		f, err = p.Def(v.idx.Runtime, pkgID, v.v)
 		if err != nil {
-			panic(err)
+			return bad(`"cuelang.org/go/internal/core/export".Def`, err)
 		}
 	}
 

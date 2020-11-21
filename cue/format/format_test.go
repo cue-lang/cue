@@ -286,7 +286,7 @@ func TestNodes(t *testing.T) {
 // Verify that the printer doesn't crash if the AST contains BadXXX nodes.
 func TestBadNodes(t *testing.T) {
 	const src = "package p\n("
-	const res = "package p\n\n(BadExpr)\n"
+	const res = "package p\n\n(_|_)\n"
 	f, err := parser.ParseFile("", src, parser.ParseComments)
 	if err == nil {
 		t.Error("expected illegal program") // error in test

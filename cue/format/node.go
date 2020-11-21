@@ -532,7 +532,7 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	switch x := expr.(type) {
 	case *ast.BadExpr:
-		f.print(x.From, "BadExpr")
+		f.print(x.From, "_|_")
 
 	case *ast.BottomLit:
 		f.print(x.Bottom, token.BOTTOM)

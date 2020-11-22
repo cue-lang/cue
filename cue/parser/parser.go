@@ -1213,12 +1213,6 @@ func (p *parser) parseListElements() (list []ast.Expr) {
 		}
 	}
 
-	for _, v := range list {
-		if _, ok := v.(*ast.Comprehension); ok && len(list) != 1 {
-			p.errf(v.Pos(), "multiple comprehensions per list not yet supported")
-		}
-	}
-
 	return
 }
 

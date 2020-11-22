@@ -145,10 +145,17 @@ package expressions
     e: [ x
     for x in someObject
     if x > 9 ]
-   e: [ x
+   e: [ x // TODO(deprecated): remove!
     for x in someObject
     if x > 9
     ]
+
+    e: [
+        if x > 1 {},
+        if x > 1 {},
+        for x in src {},
+    ]
+
     for k, v in someObject {
         "\(k)": v
     }

@@ -1,0 +1,30 @@
+-- in.cue --
+cond: bool
+src: {}
+a: [ if cond {} ]
+b: [ for x in src.foo {} ]
+-- out/eval --
+(struct){
+  cond: (bool){ bool }
+  src: (struct){
+  }
+  a: (_|_){
+    // [incomplete] a: incomplete bool value 'bool'
+  }
+  b: (_|_){
+    // [incomplete] b: undefined field foo:
+    //     ./in.cue:4:19
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  cond: bool
+  src: {}
+  a: [
+    if 〈0;cond〉 {},
+  ]
+  b: [
+    for _, x in 〈0;src〉.foo {},
+  ]
+}

@@ -1,0 +1,101 @@
+-- in.cue --
+list: [2, 3]
+a: [ 3, for x in list { x }, for x in list { x } ]
+b: [ 3, if true { 3 }, for x in list if x > 2 { x } ]
+
+issue574: {
+    greet: true
+    bye:   true
+
+    message1: [
+     if greet { "hello" },
+     "how are you doing?",
+     "bye",
+    ]
+
+    message2: [
+        if !greet { "hello" },
+        "how are you doing?",
+        if bye {
+            "bye"
+        },
+    ]
+}
+-- out/eval --
+(struct){
+  list: (#list){
+    0: (int){ 2 }
+    1: (int){ 3 }
+  }
+  a: (#list){
+    0: (int){ 3 }
+    1: (int){ 2 }
+    2: (int){ 3 }
+    3: (int){ 2 }
+    4: (int){ 3 }
+  }
+  b: (#list){
+    0: (int){ 3 }
+    1: (int){ 3 }
+    2: (int){ 3 }
+  }
+  issue574: (struct){
+    greet: (bool){ true }
+    bye: (bool){ true }
+    message1: (#list){
+      0: (string){ "hello" }
+      1: (string){ "how are you doing?" }
+      2: (string){ "bye" }
+    }
+    message2: (#list){
+      0: (string){ "how are you doing?" }
+      1: (string){ "bye" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  list: [
+    2,
+    3,
+  ]
+  a: [
+    3,
+    for _, x in 〈0;list〉 {
+      〈1;x〉
+    },
+    for _, x in 〈0;list〉 {
+      〈1;x〉
+    },
+  ]
+  b: [
+    3,
+    if true {
+      3
+    },
+    for _, x in 〈0;list〉 if (〈0;x〉 > 2) {
+      〈1;x〉
+    },
+  ]
+  issue574: {
+    greet: true
+    bye: true
+    message1: [
+      if 〈0;greet〉 {
+        "hello"
+      },
+      "how are you doing?",
+      "bye",
+    ]
+    message2: [
+      if !〈0;greet〉 {
+        "hello"
+      },
+      "how are you doing?",
+      if 〈0;bye〉 {
+        "bye"
+      },
+    ]
+  }
+}

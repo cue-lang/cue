@@ -1908,7 +1908,7 @@ outer:
 					n.insertField(label, c)
 				})
 				hasComprehension = true
-				if err != nil && !err.IsIncomplete() {
+				if err != nil {
 					n.addBottom(err)
 				}
 

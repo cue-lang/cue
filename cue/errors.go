@@ -20,7 +20,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
-func (v Value) toErr(b *bottom) (err errors.Error) {
+func (v Value) toErr(b *adt.Bottom) (err errors.Error) {
 	errs := errors.Errors(b.Err)
 	if len(errs) > 1 {
 		for _, e := range errs {
@@ -38,7 +38,7 @@ var _ errors.Error = &valueError{}
 // A valueError is returned as a result of evaluating a value.
 type valueError struct {
 	v   Value
-	err *bottom
+	err *adt.Bottom
 }
 
 func (e *valueError) Unwrap() error {
@@ -101,14 +101,14 @@ var errNotExists = &adt.Bottom{
 	Err:  errors.Newf(token.NoPos, "undefined value"),
 }
 
-func exists(v value) bool {
-	if err, ok := v.(*bottom); ok {
+func exists(v adt.Expr) bool {
+	if err, ok := v.(*adt.Bottom); ok {
 		return err.Code != codeNotExist
 	}
 	return true
 }
 
-func (idx *index) mkErr(src source, args ...interface{}) *bottom {
+func (idx *index) mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
 	var e *adt.Bottom
 	var code errCode = -1
 outer:
@@ -116,15 +116,15 @@ outer:
 		switch x := a.(type) {
 		case errCode:
 			code = x
-		case *bottom:
+		case *adt.Bottom:
 			e = adt.CombineErrors(nil, e, x)
-		case []*bottom:
+		case []*adt.Bottom:
 			for _, b := range x {
 				e = adt.CombineErrors(nil, e, b)
 			}
 		case errors.Error:
 			e = adt.CombineErrors(nil, e, &adt.Bottom{Err: x})
-		case value:
+		case adt.Expr:
 		case string:
 			args := args[i+1:]
 			// Do not expand message so that errors can be localized.

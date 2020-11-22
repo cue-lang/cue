@@ -55,7 +55,7 @@ func (c *context) str(v adt.Node) string {
 	return debugStr(c, v)
 }
 
-func (c *context) mkErr(src source, args ...interface{}) *bottom {
+func (c *context) mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
 	return c.index.mkErr(src, args...)
 }
 

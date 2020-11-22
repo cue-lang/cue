@@ -172,14 +172,14 @@ var _ errors.Error = &marshalError{}
 
 type marshalError struct {
 	err errors.Error
-	b   *bottom
+	b   *adt.Bottom
 }
 
-func toMarshalErr(v Value, b *bottom) error {
+func toMarshalErr(v Value, b *adt.Bottom) error {
 	return &marshalError{v.toErr(b), b}
 }
 
-func marshalErrf(v Value, src source, code errCode, msg string, args ...interface{}) error {
+func marshalErrf(v Value, src adt.Node, code errCode, msg string, args ...interface{}) error {
 	arguments := append([]interface{}{code, msg}, args...)
 	b := v.idx.mkErr(src, arguments...)
 	return toMarshalErr(v, b)
@@ -218,7 +218,7 @@ type Iterator struct {
 	arcs  []field
 	p     int
 	cur   Value
-	f     label
+	f     adt.Feature
 	isOpt bool
 }
 
@@ -298,13 +298,13 @@ func marshalList(l *Iterator) (b []byte, err errors.Error) {
 	return b, nil
 }
 
-func (v Value) getNum(k kind) (*numLit, errors.Error) {
+func (v Value) getNum(k adt.Kind) (*adt.Num, errors.Error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	if err := v.checkKind(ctx, k); err != nil {
 		return nil, v.toErr(err)
 	}
-	n, _ := v.eval(ctx).(*numLit)
+	n, _ := v.eval(ctx).(*adt.Num)
 	return n, nil
 }
 
@@ -317,7 +317,7 @@ func (v Value) getNum(k kind) (*numLit, errors.Error) {
 // 200 and exp == -2. Calling MantExp with a nil argument is an efficient way to
 // get the exponent of the receiver.
 func (v Value) MantExp(mant *big.Int) (exp int, err error) {
-	n, err := v.getNum(numKind)
+	n, err := v.getNum(adt.NumKind)
 	if err != nil {
 		return 0, err
 	}
@@ -336,7 +336,7 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 // Decimal is for internal use only. The Decimal type that is returned is
 // subject to change.
 func (v Value) Decimal() (d *internal.Decimal, err error) {
-	n, err := v.getNum(numKind)
+	n, err := v.getNum(adt.NumKind)
 	if err != nil {
 		return nil, err
 	}
@@ -357,7 +357,7 @@ func (v Value) AppendInt(buf []byte, base int) ([]byte, error) {
 // AppendFloat appends to buf the string form of the floating-point number x.
 // It returns an error if v is not a number.
 func (v Value) AppendFloat(buf []byte, fmt byte, prec int) ([]byte, error) {
-	n, err := v.getNum(numKind)
+	n, err := v.getNum(adt.NumKind)
 	if err != nil {
 		return nil, err
 	}
@@ -395,7 +395,7 @@ var (
 // argument z is provided, Int stores the result in z instead of allocating a
 // new Int.
 func (v Value) Int(z *big.Int) (*big.Int, error) {
-	n, err := v.getNum(intKind)
+	n, err := v.getNum(adt.IntKind)
 	if err != nil {
 		return nil, err
 	}
@@ -417,7 +417,7 @@ func (v Value) Int(z *big.Int) (*big.Int, error) {
 // as an int64. The result is (math.MinInt64, ErrAbove) for x < math.MinInt64,
 // and (math.MaxInt64, ErrBelow) for x > math.MaxInt64.
 func (v Value) Int64() (int64, error) {
-	n, err := v.getNum(intKind)
+	n, err := v.getNum(adt.IntKind)
 	if err != nil {
 		return 0, err
 	}
@@ -439,7 +439,7 @@ func (v Value) Int64() (int64, error) {
 // as a uint64. The result is (0, ErrAbove) for x < 0, and
 // (math.MaxUint64, ErrBelow) for x > math.MaxUint64.
 func (v Value) Uint64() (uint64, error) {
-	n, err := v.getNum(intKind)
+	n, err := v.getNum(adt.IntKind)
 	if err != nil {
 		return 0, err
 	}
@@ -513,7 +513,7 @@ func init() {
 // by a float64 (|x| > math.MaxFloat64), the result is (+Inf, ErrAbove) or
 // (-Inf, ErrBelow), depending on the sign of x.
 func (v Value) Float64() (float64, error) {
-	n, err := v.getNum(numKind)
+	n, err := v.getNum(adt.NumKind)
 	if err != nil {
 		return 0, err
 	}
@@ -564,7 +564,7 @@ type Value struct {
 	v   *adt.Vertex
 }
 
-func newErrValue(v Value, b *bottom) Value {
+func newErrValue(v Value, b *adt.Bottom) Value {
 	node := &adt.Vertex{Value: b}
 	if v.v != nil {
 		node.Label = v.v.Label
@@ -586,7 +586,7 @@ func newVertexRoot(ctx *context, x *adt.Vertex) Value {
 	return makeValue(ctx.index, x)
 }
 
-func newValueRoot(ctx *context, x value) Value {
+func newValueRoot(ctx *context, x adt.Expr) Value {
 	if n, ok := x.(*adt.Vertex); ok {
 		return newVertexRoot(ctx, n)
 	}
@@ -642,7 +642,7 @@ func makeValue(idx *index, v *adt.Vertex) Value {
 	return Value{idx, v}
 }
 
-func remakeValue(base Value, env *adt.Environment, v value) Value {
+func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 	// TODO: right now this is necessary because disjunctions do not have
 	// populated conjuncts.
 	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
@@ -665,7 +665,7 @@ func (v Value) ctx() *context {
 	return v.idx.newContext()
 }
 
-func (v Value) makeChild(ctx *context, i uint32, a arc) Value {
+func (v Value) makeChild(ctx *context, i uint32, a *adt.Vertex) Value {
 	a.Parent = v.v
 	return makeValue(v.idx, a)
 }
@@ -887,29 +887,29 @@ func (v Value) marshalJSON() (b []byte, err error) {
 
 	// TODO: implement marshalles in value.
 	switch k := x.Kind(); k {
-	case nullKind:
+	case adt.NullKind:
 		return json.Marshal(nil)
-	case boolKind:
-		return json.Marshal(x.(*boolLit).B)
-	case intKind, floatKind, numKind:
-		b, err := x.(*numLit).X.MarshalText()
+	case adt.BoolKind:
+		return json.Marshal(x.(*adt.Bool).B)
+	case adt.IntKind, adt.FloatKind, adt.NumKind:
+		b, err := x.(*adt.Num).X.MarshalText()
 		b = bytes.TrimLeft(b, "+")
 		return b, err
-	case stringKind:
-		return json.Marshal(x.(*stringLit).Str)
-	case bytesKind:
-		return json.Marshal(x.(*bytesLit).B)
-	case listKind:
+	case adt.StringKind:
+		return json.Marshal(x.(*adt.String).Str)
+	case adt.BytesKind:
+		return json.Marshal(x.(*adt.Bytes).B)
+	case adt.ListKind:
 		i, _ := v.List()
 		return marshalList(&i)
-	case structKind:
+	case adt.StructKind:
 		obj, err := v.structValData(ctx)
 		if err != nil {
 			return nil, toMarshalErr(v, err)
 		}
 		return obj.marshalJSON()
-	case bottomKind:
-		return nil, toMarshalErr(v, x.(*bottom))
+	case adt.BottomKind:
+		return nil, toMarshalErr(v, x.(*adt.Bottom))
 	default:
 		return nil, marshalErrf(v, x, 0, "cannot convert value %q of type %T to JSON", ctx.str(x), x)
 	}
@@ -1066,7 +1066,7 @@ func (v Value) Source() ast.Node {
 
 // Err returns the error represented by v or nil v is not an error.
 func (v Value) Err() error {
-	if err := v.checkKind(v.ctx(), bottomKind); err != nil {
+	if err := v.checkKind(v.ctx(), adt.BottomKind); err != nil {
 		return v.toErr(err)
 	}
 	return nil
@@ -1128,18 +1128,18 @@ func (v Value) Exists() bool {
 	return exists(v.v.Value)
 }
 
-func (v Value) checkKind(ctx *context, want kind) *bottom {
+func (v Value) checkKind(ctx *context, want adt.Kind) *adt.Bottom {
 	if v.v == nil {
 		return errNotExists
 	}
 	// TODO: use checkKind
 	x := v.eval(ctx)
-	if b, ok := x.(*bottom); ok {
+	if b, ok := x.(*adt.Bottom); ok {
 		return b
 	}
 	k := x.Kind()
-	if want != bottomKind {
-		if k&want == bottomKind {
+	if want != adt.BottomKind {
+		if k&want == adt.BottomKind {
 			return ctx.mkErr(x, "cannot use value %v (type %s) as %s",
 				ctx.opCtx.Str(x), k, want)
 		}
@@ -1151,7 +1151,7 @@ func (v Value) checkKind(ctx *context, want kind) *bottom {
 }
 
 func makeInt(v Value, x int64) Value {
-	n := &adt.Num{K: intKind}
+	n := &adt.Num{K: adt.IntKind}
 	n.X.SetInt64(int64(x))
 	return remakeFinal(v, nil, n)
 }
@@ -1165,7 +1165,7 @@ func (v Value) Len() Value {
 		case *adt.Vertex:
 			if x.IsList() {
 				ctx := v.ctx()
-				n := &adt.Num{K: intKind}
+				n := &adt.Num{K: adt.IntKind}
 				n.X.SetInt64(int64(len(x.Elems())))
 				if x.IsClosed(ctx.opCtx) {
 					return remakeFinal(v, nil, n)
@@ -1181,9 +1181,9 @@ func (v Value) Len() Value {
 				return remakeFinal(v, nil, c)
 
 			}
-		case *bytesLit:
+		case *adt.Bytes:
 			return makeInt(v, int64(len(x.B)))
-		case *stringLit:
+		case *adt.String:
 			return makeInt(v, int64(len([]rune(x.Str))))
 		}
 	}
@@ -1248,7 +1248,7 @@ func (v Value) Elem() (Value, bool) {
 func (v Value) List() (Iterator, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
-	if err := v.checkKind(ctx, listKind); err != nil {
+	if err := v.checkKind(ctx, adt.ListKind); err != nil {
 		return Iterator{ctx: ctx}, v.toErr(err)
 	}
 	arcs := []field{}
@@ -1263,7 +1263,7 @@ func (v Value) List() (Iterator, error) {
 // Null reports an error if v is not null.
 func (v Value) Null() error {
 	v, _ = v.Default()
-	if err := v.checkKind(v.ctx(), nullKind); err != nil {
+	if err := v.checkKind(v.ctx(), adt.NullKind); err != nil {
 		return v.toErr(err)
 	}
 	return nil
@@ -1278,20 +1278,20 @@ func (v Value) Null() error {
 func (v Value) Bool() (bool, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
-	if err := v.checkKind(ctx, boolKind); err != nil {
+	if err := v.checkKind(ctx, adt.BoolKind); err != nil {
 		return false, v.toErr(err)
 	}
-	return v.eval(ctx).(*boolLit).B, nil
+	return v.eval(ctx).(*adt.Bool).B, nil
 }
 
 // String returns the string value if v is a string or an error otherwise.
 func (v Value) String() (string, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
-	if err := v.checkKind(ctx, stringKind); err != nil {
+	if err := v.checkKind(ctx, adt.StringKind); err != nil {
 		return "", v.toErr(err)
 	}
-	return v.eval(ctx).(*stringLit).Str, nil
+	return v.eval(ctx).(*adt.String).Str, nil
 }
 
 // Bytes returns a byte slice if v represents a list of bytes or an error
@@ -1300,12 +1300,12 @@ func (v Value) Bytes() ([]byte, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
-	case *bytesLit:
+	case *adt.Bytes:
 		return append([]byte(nil), x.B...), nil
-	case *stringLit:
+	case *adt.String:
 		return []byte(x.Str), nil
 	}
-	return nil, v.toErr(v.checkKind(ctx, bytesKind|stringKind))
+	return nil, v.toErr(v.checkKind(ctx, adt.BytesKind|adt.StringKind))
 }
 
 // Reader returns a new Reader if v is a string or bytes type and an error
@@ -1314,12 +1314,12 @@ func (v Value) Reader() (io.Reader, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
-	case *bytesLit:
+	case *adt.Bytes:
 		return bytes.NewReader(x.B), nil
-	case *stringLit:
+	case *adt.String:
 		return strings.NewReader(x.Str), nil
 	}
-	return nil, v.toErr(v.checkKind(ctx, stringKind|bytesKind))
+	return nil, v.toErr(v.checkKind(ctx, adt.StringKind|adt.BytesKind))
 }
 
 // TODO: distinguish between optional, hidden, etc. Probably the best approach
@@ -1327,7 +1327,7 @@ func (v Value) Reader() (io.Reader, error) {
 // a structVal.
 
 // structVal returns an structVal or an error if v is not a struct.
-func (v Value) structValData(ctx *context) (structValue, *bottom) {
+func (v Value) structValData(ctx *context) (structValue, *adt.Bottom) {
 	return v.structValOpts(ctx, options{
 		omitHidden:      true,
 		omitDefinitions: true,
@@ -1335,12 +1335,12 @@ func (v Value) structValData(ctx *context) (structValue, *bottom) {
 	})
 }
 
-func (v Value) structValFull(ctx *context) (structValue, *bottom) {
+func (v Value) structValFull(ctx *context) (structValue, *adt.Bottom) {
 	return v.structValOpts(ctx, options{})
 }
 
 // structVal returns an structVal or an error if v is not a struct.
-func (v Value) structValOpts(ctx *context, o options) (structValue, *bottom) {
+func (v Value) structValOpts(ctx *context, o options) (structValue, *adt.Bottom) {
 	v, _ = v.Default()
 
 	obj, err := v.getStruct()
@@ -1390,9 +1390,9 @@ func (v Value) Struct() (*Struct, error) {
 	return &Struct{obj}, nil
 }
 
-func (v Value) getStruct() (*structLit, *bottom) {
+func (v Value) getStruct() (*adt.Vertex, *adt.Bottom) {
 	ctx := v.ctx()
-	if err := v.checkKind(ctx, structKind); err != nil {
+	if err := v.checkKind(ctx, adt.StructKind); err != nil {
 		if !err.ChildError {
 			return nil, err
 		}
@@ -2204,17 +2204,17 @@ func (v Value) Expr() (Op, []Value) {
 	a := []Value{}
 	op := NoOp
 	switch x := expr.(type) {
-	case *binaryExpr:
+	case *adt.BinaryExpr:
 		a = append(a, remakeValue(v, env, x.X))
 		a = append(a, remakeValue(v, env, x.Y))
 		op = x.Op
-	case *unaryExpr:
+	case *adt.UnaryExpr:
 		a = append(a, remakeValue(v, env, x.X))
 		op = x.Op
-	case *boundExpr:
+	case *adt.BoundExpr:
 		a = append(a, remakeValue(v, env, x.Expr))
 		op = x.Op
-	case *boundValue:
+	case *adt.BoundValue:
 		a = append(a, remakeValue(v, env, x.Value))
 		op = x.Op
 	case *adt.Conjunction:
@@ -2273,7 +2273,7 @@ func (v Value) Expr() (Op, []Value) {
 			op = adt.OrOp
 		}
 
-	case *interpolation:
+	case *adt.Interpolation:
 		for _, p := range x.Parts {
 			a = append(a, remakeValue(v, env, p))
 		}
@@ -2289,7 +2289,7 @@ func (v Value) Expr() (Op, []Value) {
 		_ = ctx.PopState(f)
 		op = SelectorOp
 
-	case *selectorExpr:
+	case *adt.SelectorExpr:
 		a = append(a, remakeValue(v, env, x.X))
 		// A string selector is quoted.
 		a = append(a, remakeValue(v, env, &adt.String{
@@ -2297,22 +2297,22 @@ func (v Value) Expr() (Op, []Value) {
 		}))
 		op = SelectorOp
 
-	case *indexExpr:
+	case *adt.IndexExpr:
 		a = append(a, remakeValue(v, env, x.X))
 		a = append(a, remakeValue(v, env, x.Index))
 		op = IndexOp
-	case *sliceExpr:
+	case *adt.SliceExpr:
 		a = append(a, remakeValue(v, env, x.X))
 		a = append(a, remakeValue(v, env, x.Lo))
 		a = append(a, remakeValue(v, env, x.Hi))
 		op = SliceOp
-	case *callExpr:
+	case *adt.CallExpr:
 		a = append(a, remakeValue(v, env, x.Fun))
 		for _, arg := range x.Args {
 			a = append(a, remakeValue(v, env, arg))
 		}
 		op = CallOp
-	case *customValidator:
+	case *adt.BuiltinValidator:
 		a = append(a, remakeValue(v, env, x.Builtin))
 		for _, arg := range x.Args {
 			a = append(a, remakeValue(v, env, arg))

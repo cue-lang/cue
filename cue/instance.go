@@ -165,7 +165,7 @@ func (inst *Instance) setError(err errors.Error) {
 	inst.Err = errors.Append(inst.Err, err)
 }
 
-func (inst *Instance) eval(ctx *context) evaluated {
+func (inst *Instance) eval(ctx *context) adt.Value {
 	// TODO: remove manifest here?
 	v := ctx.manifest(inst.root)
 	return v
@@ -186,7 +186,7 @@ func pkgID() string {
 }
 
 // evalExpr evaluates expr within scope.
-func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) evaluated {
+func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) adt.Value {
 	cfg := &compile.Config{
 		Scope: scope,
 		Imports: func(x *ast.Ident) (pkgPath string) {

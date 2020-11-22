@@ -585,7 +585,7 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext) *Vertex {
-	n := c.node(x.X, FieldSetDefined)
+	n := c.node(x.X, x.Sel.IsRegular())
 	return c.lookup(n, x.Src.Sel.Pos(), x.Sel)
 }
 
@@ -608,7 +608,7 @@ func (x *IndexExpr) Source() ast.Node {
 
 func (x *IndexExpr) resolve(ctx *OpContext) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x.X, EvaluatingArcs)
+	n := ctx.node(x.X, true)
 	i := ctx.value(x.Index)
 	f := ctx.Label(i)
 	return ctx.lookup(n, x.Src.Index.Pos(), f)
@@ -1174,7 +1174,7 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
-	n := c.node(x.Src, EvaluatingArcs)
+	n := c.node(x.Src, true)
 	for _, a := range n.Arcs {
 		c.Unify(c, a, Partial)
 

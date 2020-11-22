@@ -48,7 +48,11 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		result = e.structComposite(n)
 
 	case *adt.ListMarker:
-		result = e.listComposite(n)
+		if e.showArcs(n) {
+			result = e.structComposite(n)
+		} else {
+			result = e.listComposite(n)
+		}
 
 	case *adt.Bottom:
 		if !x.IsIncomplete() || len(n.Conjuncts) == 0 {
@@ -64,7 +68,11 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		result = ast.NewBinExpr(token.AND, a...)
 
 	default:
-		result = e.value(n.Value, n.Conjuncts...)
+		if e.showArcs(n) {
+			result = e.structComposite(n)
+		} else {
+			result = e.value(n.Value, n.Conjuncts...)
+		}
 	}
 	return result
 }
@@ -297,6 +305,22 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 	return l
 }
 
+func (e exporter) showArcs(v *adt.Vertex) bool {
+	p := e.cfg
+	if !p.ShowHidden && !p.ShowDefinitions {
+		return false
+	}
+	for _, a := range v.Arcs {
+		switch {
+		case a.Label.IsDef() && p.ShowDefinitions:
+			return true
+		case a.Label.IsHidden() && p.ShowHidden:
+			return true
+		}
+	}
+	return false
+}
+
 func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 	s, saved := e.pushFrame(v.Conjuncts)
 	e.top().upCount++
@@ -305,18 +329,32 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 		e.popFrame(saved)
 	}()
 
+	showRegular := false
+	switch x := v.Value.(type) {
+	case *adt.StructMarker:
+		showRegular = true
+	case *adt.ListMarker:
+		// As lists may be long, put them at the end.
+		defer e.addEmbed(e.listComposite(v))
+	default:
+		e.addEmbed(e.value(x))
+	}
+
 	p := e.cfg
 	for _, label := range VertexFeatures(v) {
-		if label.IsDef() && !p.ShowDefinitions {
+		show := false
+		switch label.Typ() {
+		case adt.StringLabel:
+			show = showRegular
+		case adt.IntLabel:
 			continue
+		case adt.DefinitionLabel:
+			show = p.ShowDefinitions
+		case adt.HiddenLabel, adt.HiddenDefinitionLabel:
+			show = p.ShowHidden && label.PkgID(e.ctx) == e.pkgID
 		}
-		if label.IsHidden() {
-			if !p.ShowHidden {
-				continue
-			}
-			if label.PkgID(e.ctx) != e.pkgID {
-				continue
-			}
+		if !show {
+			continue
 		}
 
 		f := &ast.Field{Label: e.stringLabel(label)}

@@ -1,19 +1,26 @@
 -- in.cue --
 cond: bool
-src: {}
+src:  {}
+top:  _
 a: [ if cond {} ]
 b: [ for x in src.foo {} ]
+c: { for x in top {} }
 -- out/eval --
 (struct){
   cond: (bool){ bool }
   src: (struct){
   }
+  top: (_){ _ }
   a: (_|_){
     // [incomplete] a: incomplete bool value 'bool'
   }
   b: (_|_){
     // [incomplete] b: undefined field foo:
-    //     ./in.cue:4:19
+    //     ./in.cue:5:19
+  }
+  c: (_|_){
+    // [incomplete] c: incomplete feed source value top (type _):
+    //     ./in.cue:6:15
   }
 }
 -- out/compile --
@@ -21,10 +28,14 @@ b: [ for x in src.foo {} ]
 {
   cond: bool
   src: {}
+  top: _
   a: [
     if 〈0;cond〉 {},
   ]
   b: [
     for _, x in 〈0;src〉.foo {},
   ]
+  c: {
+    for _, x in 〈1;top〉 {}
+  }
 }

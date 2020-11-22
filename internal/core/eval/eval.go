@@ -145,6 +145,7 @@ func (e *Evaluator) Eval(v *adt.Vertex) errors.Error {
 // can be the only value in a valid configuration. This means that an error
 // may go undetected at this point, as long as it is caught later.
 //
+// TODO: return *adt.Vertex
 func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 	var resultValue adt.Value
 
@@ -235,17 +236,14 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 		// TODO: Store if concrete and fully resolved.
 	}
 
-	switch v.Value.(type) {
-	case nil:
-		// Error saved in result.
-		return resultValue // incomplete
-
-	case *adt.ListMarker, *adt.StructMarker:
-		return v
-
-	default:
-		return v.Value
+	// TODO: Use this and ensure that each use of Evaluate handles
+	// struct numbers correctly. E.g. by using a function that
+	// gets the concrete value.
+	//
+	if v.Value == nil {
+		return resultValue
 	}
+	return v
 }
 
 // Unify implements adt.Unifier.

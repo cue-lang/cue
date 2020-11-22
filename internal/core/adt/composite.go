@@ -228,10 +228,6 @@ const (
 	// nodeContext to allow reusing the computations done so far.
 	Partial
 
-	// FieldSetDefined indicates that the value and conjuncts of all fields have
-	// been completed, but that the individual arcs are not yet evaluated.
-	FieldSetDefined
-
 	// EvaluatingArcs indicates that the arcs of the Vertex are currently being
 	// evaluated. If this is encountered it indicates a structural cycle.
 	// Value does not have to be nil

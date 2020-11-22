@@ -385,6 +385,11 @@ func (e *exporter) addField(label adt.Feature, f *ast.Field, n ast.Node) {
 	frame.fields[label] = entry
 }
 
+func (e *exporter) addEmbed(x ast.Expr) {
+	frame := e.top()
+	frame.scope.Elts = append(frame.scope.Elts, x)
+}
+
 func (e *exporter) pushFrame(conjuncts []adt.Conjunct) (s *ast.StructLit, saved []frame) {
 	saved = e.stack
 	s = &ast.StructLit{}

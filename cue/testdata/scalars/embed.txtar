@@ -1,0 +1,125 @@
+-- in.cue --
+import "strings"
+
+a1: {
+    2
+}
+a2: {
+    v: {
+        3
+        #foo: a2.v + 1
+    }
+    w: v
+    x: v.#foo
+}
+a3: a1 + a2.v
+
+b3: {
+    [1, 2]
+    #foo: 1
+}
+b4: b3 + b3
+b5: b3[1]
+b6: b3[5]
+b7: b4[a1] // 1
+
+s1: {
+    "foo"
+    #bar: "bar"
+}
+s2: [ s1, { s1.#bar, #baz: 4 } ]
+s3: strings.Join(s2, "--")
+
+-- out/eval --
+Errors:
+b6: invalid list index 5 (out of bounds):
+    ./in.cue:22:8
+
+Result:
+(_|_){
+  // [eval]
+  a1: (int){ 2 }
+  a2: (struct){
+    v: (int){
+      3
+      #foo: (int){ 4 }
+    }
+    w: (int){
+      3
+      #foo: (int){ 4 }
+    }
+    x: (int){ 4 }
+  }
+  a3: (int){ 5 }
+  b3: (#list){
+    #foo: (int){ 1 }
+    0: (int){ 1 }
+    1: (int){ 2 }
+  }
+  b4: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 1 }
+    3: (int){ 2 }
+  }
+  b5: (int){ 2 }
+  b6: (_|_){
+    // [eval] b6: invalid list index 5 (out of bounds):
+    //     ./in.cue:22:8
+  }
+  b7: (int){ 1 }
+  s1: (string){
+    "foo"
+    #bar: (string){ "bar" }
+  }
+  s2: (#list){
+    0: (string){
+      "foo"
+      #bar: (string){ "bar" }
+    }
+    1: (string){
+      "bar"
+      #baz: (int){ 4 }
+    }
+  }
+  s3: (string){ "foo--bar" }
+}
+-- out/compile --
+--- in.cue
+{
+  a1: {
+    2
+  }
+  a2: {
+    v: {
+      3
+      #foo: (〈2;a2〉.v + 1)
+    }
+    w: 〈0;v〉
+    x: 〈0;v〉.#foo
+  }
+  a3: (〈0;a1〉 + 〈0;a2〉.v)
+  b3: {
+    [
+      1,
+      2,
+    ]
+    #foo: 1
+  }
+  b4: (〈0;b3〉 + 〈0;b3〉)
+  b5: 〈0;b3〉[1]
+  b6: 〈0;b3〉[5]
+  b7: 〈0;b4〉[〈0;a1〉]
+  s1: {
+    "foo"
+    #bar: "bar"
+  }
+  s2: [
+    〈0;s1〉,
+    {
+      〈1;s1〉.#bar
+      #baz: 4
+    },
+  ]
+  s3: 〈import;strings〉.Join(〈0;s2〉, "--")
+}

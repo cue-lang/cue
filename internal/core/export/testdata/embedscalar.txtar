@@ -1,0 +1,87 @@
+-- in.cue --
+#top: 4
+sub: {
+    #sub: 5
+    a: {
+        3
+        #foo: 4
+    }
+    b: {
+        [1, 2]
+        #bar: 5
+        #baz: "foo"
+    }
+}
+-- out/definition --
+#top: 4
+sub: {
+	#sub: 5
+	a: {
+		3
+		#foo: 4
+	}
+	b: {
+		[1, 2]
+		#bar: 5
+		#baz: "foo"
+	}
+}
+-- out/doc --
+[]
+[#top]
+[sub]
+[sub #sub]
+[sub a]
+[sub a #foo]
+[sub b]
+[sub b #bar]
+[sub b #baz]
+[sub b 0]
+[sub b 1]
+-- out/value --
+== Simplified
+{
+	sub: {
+		a: 3
+		b: [1, 2]
+	}
+}
+== Raw
+{
+	#top: 4
+	sub: {
+		#sub: 5
+		a: {
+			3
+			#foo: 4
+		}
+		b: {
+			#bar: 5
+			#baz: "foo"
+			[1, 2]
+		}
+	}
+}
+== Final
+{
+	sub: {
+		a: 3
+		b: [1, 2]
+	}
+}
+== All
+{
+	#top: 4
+	sub: {
+		#sub: 5
+		a: {
+			3
+			#foo: 4
+		}
+		b: {
+			#bar: 5
+			#baz: "foo"
+			[1, 2]
+		}
+	}
+}

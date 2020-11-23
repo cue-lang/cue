@@ -133,7 +133,22 @@ func (p *printer) Print(v interface{}) {
 				data[1] >= '0' && data[1] <= '9' {
 				data = "0o" + data[1:]
 			}
+			// Pad trailing dot before multiplier.
+			if p := strings.IndexByte(data, '.'); p >= 0 && data[p+1] > '9' {
+				data = data[:p+1] + "0" + data[p+1:]
+			}
+
 		case token.FLOAT:
+			// Pad leading or trailing dots.
+			switch p := strings.IndexByte(data, '.'); {
+			case p < 0:
+			case p == 0:
+				data = "0" + data
+			case p == len(data)-1:
+				data += "0"
+			case data[p+1] > '9':
+				data = data[:p+1] + "0" + data[p+1:]
+			}
 			if strings.IndexByte(data, 'E') != -1 {
 				data = strings.ToLower(data)
 			}

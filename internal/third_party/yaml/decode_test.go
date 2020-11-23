@@ -56,7 +56,7 @@ var unmarshalTests = []struct {
 		"v: 0.1",
 	}, {
 		"v: .1",
-		"v: .1",
+		"v: 0.1",
 	}, {
 		"v: .Inf",
 		"v: +Inf",
@@ -68,7 +68,7 @@ var unmarshalTests = []struct {
 		"v: -10",
 	}, {
 		"v: -.1",
-		"v: -.1",
+		"v: -0.1",
 	},
 
 	// Simple values.

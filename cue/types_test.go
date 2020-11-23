@@ -2482,32 +2482,33 @@ func TestPathCorrection(t *testing.T) {
 		want   string
 		skip   bool
 	}{{
-		// // TODO: structural cycle.
-		// input: `
-		// a: b: {
-		// 	c: d: b
-		// }
-		// `,
-		// lookup: func(i *Instance) Value {
-		// 	_, a := i.Lookup("a", "b", "c", "d").Expr()
-		// 	return a[0].Lookup("b", "c", "d")
-		// },
-		// want: "a.b",
-		// }, {
+		input: `
+			a: b: {
+				c: d: b
+			}
+			`,
+		lookup: func(i *Instance) Value {
+			op, a := i.Lookup("a", "b", "c", "d").Expr()
+			_ = op
+			return a[0] // structural cycle errors.
+		},
+		want: "a",
+	}, {
 
 		// TODO: embedding: have field operators.
-		// input: `
-		// 	a: {
-		// 		c: 3
-		// 		{x: c}
-		// 	}
-		// 	`,
-		// lookup: func(i *Instance) Value {
-		// 	_, a := i.Lookup("a").Expr()
-		// 	return a[1].Lookup("x")
-		// },
-		// want: "a.c",
-		// }, {
+		input: `
+			a: {
+				{x: c}
+				c: 3
+			}
+			`,
+		lookup: func(i *Instance) Value {
+			op, a := i.Lookup("a").Expr()
+			_ = op
+			return a[0].Lookup("x")
+		},
+		want: "a.c",
+	}, {
 
 		// TODO: implement proper Elem()
 		input: `
@@ -2557,46 +2558,45 @@ func TestPathCorrection(t *testing.T) {
 			return a[0]
 		},
 		want: "#T",
-		// }, {
-		// 	input: `
-		// 		#a: {
-		// 			#T: {b: 3}
-		// 			close({}) | close({c: #T}) | close({d: string})
-		// 		}
-		// 		`,
-		// 	lookup: func(i *Instance) Value {
-		// 		f, _ := i.LookupField("#a")
-		// 		_, a := f.Value.Expr() // &
-		// 		_, a = a[1].Expr()     // |
-		// 		return a[1].Lookup("c")
-		// 	},
-		// 	want: "#a.#T",
 	}, {
-		// TODO: iterate over Definitions
-		// input: `
-		// 	package foo
+		input: `
+		#a: {
+			close({}) | close({c: #T}) | close({d: string})
+			#T: {b: 3}
+		}
+		`,
+		lookup: func(i *Instance) Value {
+			f, _ := i.LookupField("#a")
+			_, a := f.Value.Expr() // &
+			_, a = a[0].Expr()     // |
+			return a[1].Lookup("c")
+		},
+		want: "#a.#T",
+	}, {
+		input: `
+		package foo
 
-		// 	#Struct: {
-		// 		#T: int
+		#Struct: {
+			#T: int
 
-		// 		{b?: #T}
-		// 	}`,
-		// want: "#Struct.#T",
-		// lookup: func(inst *Instance) Value {
-		// 	// Locate Struct
-		// 	i, _ := inst.Value().Fields(Definitions(true))
-		// 	if !i.Next() {
-		// 		t.Fatal("no fields")
-		// 	}
-		// 	// Locate b
-		// 	i, _ = i.Value().Fields(Definitions(true), Optional(true))
-		// 	if !(i.Next() && i.Next()) {
-		// 		t.Fatal("no fields")
-		// 	}
-		// 	v := i.Value()
-		// 	return v
-		// },
-		// }, {
+			{b?: #T}
+		}`,
+		want: "#Struct.#T",
+		lookup: func(inst *Instance) Value {
+			// Locate Struct
+			i, _ := inst.Value().Fields(Definitions(true))
+			if !i.Next() {
+				t.Fatal("no fields")
+			}
+			// Locate b
+			i, _ = i.Value().Fields(Definitions(true), Optional(true))
+			if !(i.Next() && i.Next()) {
+				t.Fatal("no fields")
+			}
+			v := i.Value()
+			return v
+		},
+	}, {
 
 		input: `
 		package foo
@@ -2617,80 +2617,71 @@ func TestPathCorrection(t *testing.T) {
 			v = v.Lookup("a")
 			return v
 		},
-		// }, {
+	}, {
 
 		// TODO: record additionalItems in list
-		// input: `
-		// 	package foo
+		input: `
+			package foo
 
-		// 	#A: #B: #T
+			#A: #B: #T
 
-		// 	#T: {
-		// 		a: [...#S]
-		// 		#S: {}
-		// 	}
-		// 	`,
-		// want: "#T.#S",
-		// lookup: func(inst *Instance) Value {
-		// 	f, _ := inst.Value().LookupField("#A")
-		// 	f, _ = f.Value.LookupField("#B")
-		// 	v := f.Value
-		// 	v = Dereference(v)
-		// 	v, _ = v.Lookup("a").Elem()
-		// 	return v
-		// },
-		// }, {
+			#T: {
+				a: [...#S]
+				#S: {}
+			}
+			`,
+		want: "#T.#S",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("#A")
+			f, _ = f.Value.LookupField("#B")
+			v := f.Value
+			v = Dereference(v)
+			v, _ = v.Lookup("a").Elem()
+			return v
+		},
+	}, {
+		input: `
+		#A: {
+			b: #T
+		}
 
-		// YAY: works.
-		// input: `
-		// 	#A: {
-		// 		b: #T
-		// 	}
+		#T: {
+			a: #S
+			#S: {}
+		}
+		`,
+		want: "#T.#S",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("#A")
+			v := f.Value.Lookup("b")
+			v = Dereference(v)
+			v = v.Lookup("a")
+			return v
+		},
+	}, {
+		input: `
+			#Tracing: {
+				#T: { address?: string }
+				#S: { ip?: string }
 
-		// 	#T: {
-		// 		a: #S
-		// 		#S: {}
-		// 	}
-		// 	`,
-		// want: "#T.#S",
-		// lookup: func(inst *Instance) Value {
-		// 	f, _ := inst.Value().LookupField("#A")
-		// 	v := f.Value.Lookup("b")
-		// 	v = Dereference(v)
-		// 	v = v.Lookup("a")
-		// 	return v
-		// },
-		// }, {
-
-		// 	// TODO(eval): embedded structs are currently represented at the same
-		// 	// level as the enclosing struct. This means that the parent of an
-		// 	// embedded struct skips the struct in which it is embedded. Treat
-		// 	// embedded structs as "anonymous" fields.
-		// 	// This could perhaps be made fixed with dereferencing as well.
-		// 	skip: true,
-		// input: `
-		// 	#Tracing: {
-		// 		#T: { address?: string }
-		// 		#S: { ip?: string }
-
-		// 		close({}) | close({
-		// 			t: #T
-		// 		}) | close({
-		// 			s: #S
-		// 		})
-		// 	}
-		// 	#X: {}
-		// 	#X // Disconnect top-level struct from the one visible by close.
-		// 	`,
-		// want: "",
-		// lookup: func(inst *Instance) Value {
-		// 	f, _ := inst.Value().LookupField("#Tracing")
-		// 	v := f.Value.Eval()
-		// 	_, args := v.Expr()
-		// 	v = args[1].Lookup("t")
-		// 	v = Dereference(v)
-		// 	return v
-		// },
+				close({}) | close({
+					t: #T
+				}) | close({
+					s: #S
+				})
+			}
+			#X: {}
+			#X // Disconnect top-level struct from the one visible by close.
+			`,
+		want: "#Tracing.#T",
+		lookup: func(inst *Instance) Value {
+			f, _ := inst.Value().LookupField("#Tracing")
+			v := f.Value.Eval()
+			_, args := v.Expr()
+			v = args[1]
+			v = v.Lookup("t")
+			return v
+		},
 	}}
 	for _, tc := range testCases {
 		if tc.skip {

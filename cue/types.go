@@ -1830,6 +1830,13 @@ func reference(c *context, env *adt.Environment, r adt.Expr) (inst *Instance, pa
 	defer ctx.PopState(ctx.PushState(env, r.Source()))
 
 	switch x := r.(type) {
+	// TODO: do we need to handle Vertex as well, in case this is hard-wired?
+	// Probably not, as this results from dynamic content.
+
+	case *adt.NodeLink:
+		// TODO: consider getting rid of NodeLink.
+		inst, path = mkPath(c, nil, x.Node)
+
 	case *adt.FieldReference:
 		env := ctx.Env(x.UpCount)
 		inst, path = mkPath(c, nil, env.Vertex)

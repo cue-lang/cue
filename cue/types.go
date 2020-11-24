@@ -1718,8 +1718,9 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
 func (v Value) Subsumes(w Value) bool {
+	ctx := v.ctx().opCtx
 	p := subsume.Profile{Defaults: true}
-	return p.Check(v.ctx().opCtx, v.v, w.v)
+	return p.Check(ctx, v.v, w.v)
 }
 
 // Unify reports the greatest lower bound of v and w.

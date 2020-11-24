@@ -1159,6 +1159,88 @@ func TestElem(t *testing.T) {
 	}
 }
 
+func TestSubsume(t *testing.T) {
+	a := ParsePath("a")
+	b := ParsePath("b")
+	testCases := []struct {
+		value   string
+		pathA   Path
+		pathB   Path
+		options []Option
+		want    bool
+	}{{
+		value: `4`,
+		want:  true,
+	}, {
+		value: `a: string, b: "foo"`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		value: `a: string, b: "foo"`,
+		pathA: b,
+		pathB: a,
+		want:  false,
+	}, {
+		value: `a: {a: string, b: 4}, b: {a: "foo", b: 4}`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		value: `a: [string,  4], b: ["foo", 4]`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		value: `a: [...string], b: ["foo"]`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		value: `a: [...int], b: ["foo"]`,
+		pathA: a,
+		pathB: b,
+		want:  false,
+	}, {
+		// Issue #566
+		// Closed struct subsuming open struct.
+		value: `
+		#Run: { action: "run", command: [...string] }
+		b: { action: "run", command: ["echo", "hello"] }
+		`,
+		pathA: ParsePath("#Run"),
+		pathB: b,
+
+		// NOTE: this is for v0.2 compatibility. Logically a closed struct
+		// does not subsume an open struct. One could argue that the default
+		// of an open struct is the closed struct with the minimal number
+		// of fields that is an instance of it, though.
+		want: true, // open struct is not subsumed by closed if not final.
+	}, {
+		// Issue #566
+		// Closed struct subsuming open struct.
+		value: `
+			#Run: { action: "run", command: [...string] }
+			b: { action: "run", command: ["echo", "hello"] }
+			`,
+		pathA:   ParsePath("#Run"),
+		pathB:   b,
+		options: []Option{Final()},
+		want:    true,
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.value, func(t *testing.T) {
+			v := getInstance(t, tc.value)
+			a := v.Value().LookupPath(tc.pathA)
+			b := v.Value().LookupPath(tc.pathB)
+			got := a.Subsume(b, tc.options...) == nil
+			if got != tc.want {
+				t.Errorf("got %v (%v); want %v (%v)", got, a, tc.want, b)
+			}
+		})
+	}
+}
+
 func TestSubsumes(t *testing.T) {
 	a := []string{"a"}
 	b := []string{"b"}
@@ -1187,6 +1269,24 @@ func TestSubsumes(t *testing.T) {
 		want:  true,
 	}, {
 		value: `a: [string,  4], b: ["foo", 4]`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		value: `a: [...string], b: ["foo"]`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		value: `a: [...int], b: ["foo"]`,
+		pathA: a,
+		pathB: b,
+		want:  false,
+	}, {
+		value: `
+		a: { action: "run", command: [...string] }
+		b: { action: "run", command: ["echo", "hello"] }
+		`,
 		pathA: a,
 		pathB: b,
 		want:  true,

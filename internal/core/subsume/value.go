@@ -34,7 +34,6 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 	}
 
 	if s.Defaults {
-		a = adt.Default(a)
 		b = adt.Default(b)
 	}
 

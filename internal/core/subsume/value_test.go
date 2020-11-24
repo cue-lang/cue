@@ -32,6 +32,7 @@ const (
 	subFinal
 	subNoOptional
 	subSchema
+	subDefaults
 )
 
 func TestValues(t *testing.T) {
@@ -367,6 +368,41 @@ func TestValues(t *testing.T) {
 		807: {subsumes: true, in: `a: {}, b: close({})`, mode: subSchema},
 		808: {subsumes: false, in: `a: {[string]: 1}, b: {foo: 2}`, mode: subSchema},
 		809: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subSchema},
+
+		// Lists
+		950: {subsumes: true, in: `a: [], b: []`},
+		951: {subsumes: true, in: `a: [...], b: []`},
+		952: {subsumes: true, in: `a: [...], b: [...]`},
+		953: {subsumes: false, in: `a: [], b: [...]`},
+
+		954: {subsumes: true, in: `a: [2], b: [2]`},
+		955: {subsumes: true, in: `a: [int], b: [2]`},
+		956: {subsumes: false, in: `a: [2], b: [int]`},
+		957: {subsumes: true, in: `a: [int], b: [int]`},
+
+		958: {subsumes: true, in: `a: [...2], b: [2]`},
+		959: {subsumes: true, in: `a: [...int], b: [2]`},
+		960: {subsumes: false, in: `a: [...2], b: [int]`},
+		961: {subsumes: true, in: `a: [...int], b: [int]`},
+
+		962: {subsumes: false, in: `a: [2], b: [...2]`},
+		963: {subsumes: false, in: `a: [int], b: [...2]`},
+		964: {subsumes: false, in: `a: [2], b: [...int]`},
+		965: {subsumes: false, in: `a: [int], b: [...int]`},
+
+		966: {subsumes: false, in: `a: [...int], b: ["foo"]`},
+		967: {subsumes: false, in: `a: ["foo"], b: [...int]`},
+
+		// Defaults:
+		// TODO: for the purpose of v0.2 compatibility these
+		// evaluate to true. Reconsider before making this package
+		// public.
+		970: {subsumes: true, in: `a: [], b: [...int]`, mode: subDefaults},
+		971: {subsumes: true, in: `a: [2], b: [2, ...int]`, mode: subDefaults},
+
+		// Final
+		980: {subsumes: true, in: `a: [], b: [...int]`, mode: subFinal},
+		981: {subsumes: true, in: `a: [2], b: [2, ...int]`, mode: subFinal},
 	}
 
 	re := regexp.MustCompile(`a: (.*).*b: ([^\n]*)`)
@@ -414,6 +450,9 @@ func TestValues(t *testing.T) {
 			// TODO: see comments above.
 			// case subNoOptional:
 			// 	err = IgnoreOptional.Value(ctx, a, b)
+			case subDefaults:
+				p := Profile{Defaults: true}
+				err = p.Value(ctx, a, b)
 			case subFinal:
 				err = Final.Value(ctx, a, b)
 			}

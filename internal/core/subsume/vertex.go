@@ -31,7 +31,6 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	}
 
 	if s.Defaults {
-		x = x.Default()
 		y = y.Default()
 	}
 
@@ -78,7 +77,10 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	}
 
 	xClosed := x.IsClosed(ctx) && !s.IgnoreClosedness
-	yClosed := y.IsClosed(ctx) && !s.IgnoreClosedness
+	// TODO: this should not close for taking defaults. Do a more principled
+	// makeover of this package before making it public, though.
+	yClosed := s.Final || s.Defaults ||
+		(y.IsClosed(ctx) && !s.IgnoreClosedness)
 
 	if xClosed && !yClosed && !final {
 		return false
@@ -228,7 +230,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 	case x.IsClosed(ctx):
 		return false
 	default:
-		a := &adt.Vertex{Label: adt.InvalidLabel}
+		a := &adt.Vertex{Label: 0}
 		x.MatchAndInsert(ctx, a)
 		a.Finalize(ctx)
 

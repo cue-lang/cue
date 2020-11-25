@@ -70,11 +70,17 @@ type acceptor struct {
 	Canopy []CloseDef
 	Fields []*fieldSet
 
-	// TODO: remove (unused as not fine-grained enough)
-	// isClosed is now used as an approximate filter.
+	// TODO: isClosed could be removed if we can include closedness fully
+	// in the ClosedDefs representing conjuncts. This, in turn, will allow
+	// various optimizations, like having to record field sets for data
+	// vertices.
 	isClosed bool
 	isList   bool
 	openList bool
+
+	// ignore tells to the closedness check for one level. This allows
+	// constructed parent nodes that do not have field sets defined.
+	ignore bool
 }
 
 func (a *acceptor) clone() *acceptor {
@@ -190,6 +196,30 @@ func (n *CloseDef) isRequired() bool {
 const embedRoot adt.ID = -1
 
 type Entry = fieldSet
+
+// TODO: this may be an idea to get rid of acceptor.isClosed. There
+// are various more things to consider, though.
+//
+// func (c *acceptor) isRequired(id adt.ID) bool {
+// 	req := false
+// 	c.visitAnd(id, func(id adt.ID, n CloseDef) bool {
+// 		if n.isRequired() {
+// 			req = true
+// 			return false
+// 		}
+// 		c.visitEmbed(id, func(id adt.ID, n CloseDef) bool {
+// 			if n.isRequired() {
+// 				req = true
+// 				return false
+// 			}
+// 			req = req || c.isRequired(id)
+// 			return true
+// 		})
+
+// 		return true
+// 	})
+// 	return req
+// }
 
 func (c *acceptor) visitAllFieldSets(f func(f *fieldSet)) {
 	for _, set := range c.Fields {
@@ -313,7 +343,7 @@ func (c *acceptor) InsertEmbed(at adt.ID, src adt.Node) (id adt.ID) {
 func isComplexStruct(v *adt.Vertex) bool {
 	m, _ := v.Value.(*adt.StructMarker)
 	if m == nil {
-		return true
+		return false
 	}
 	a, _ := v.Closed.(*acceptor)
 	if a == nil {
@@ -334,10 +364,15 @@ func isComplexStruct(v *adt.Vertex) bool {
 }
 
 // InsertSubtree inserts the closedness information of v into c as an embedding
-// at the current position and inserts conjuncts of v into n (if not nil).
-// It inserts it as an embedding and not and to cover either case. The idea is
-// that one of the values were supposed to be closed, a separate node entry
-// would already have been created.
+// at the current position and inserts conjuncts of v into n (if not nil). It
+// inserts it as an embedding and not and to cover either case. The idea is that
+// one of the values were supposed to be closed, a separate node entry would
+// already have been created.
+//
+// TODO: get rid of this. This is now only used in newDisjunctionAcceptor,
+// which, in turn, is rarely used for analyzing disjunction values in the API.
+// This code is not ideal and buggy (see comment below), but it doesn't seem
+// worth improving it and we can probably do without.
 func (c *acceptor) InsertSubtree(at adt.ID, n *nodeContext, v *adt.Vertex, cyclic bool) adt.ID {
 	if len(c.Canopy) == 0 {
 		c.Canopy = append(c.Canopy, CloseDef{})
@@ -346,6 +381,15 @@ func (c *acceptor) InsertSubtree(at adt.ID, n *nodeContext, v *adt.Vertex, cycli
 		panic(fmt.Sprintf("at >= len(canopy) (%d >= %d)", at, len(c.Canopy)))
 	}
 
+	// TODO: like with AddVertex, this really should use the acceptor of the
+	// parent. This seems not to work, though.
+	//
+	// var a *acceptor
+	// if v.Parent != nil && v.Parent.Closed != nil {
+	// 	a = closedInfo(v.Parent)
+	// } else {
+	// 	a = &acceptor{}
+	// }
 	a := closedInfo(v)
 	a.node(0)
 
@@ -363,12 +407,13 @@ func (c *acceptor) InsertSubtree(at adt.ID, n *nodeContext, v *adt.Vertex, cycli
 	c.Canopy = append(c.Canopy, a.Canopy...)
 
 	// Shift all IDs for the new offset.
-	for i, x := range c.Canopy[id:] {
+	for i := int(id); i < len(c.Canopy); i++ {
+		x := c.Canopy[i]
 		if x.And != -1 {
-			c.Canopy[int(id)+i].And += id
+			c.Canopy[i].And += id
 		}
 		if x.NextEmbed != 0 {
-			c.Canopy[int(id)+i].NextEmbed += id
+			c.Canopy[i].NextEmbed += id
 		}
 	}
 
@@ -382,6 +427,187 @@ func (c *acceptor) InsertSubtree(at adt.ID, n *nodeContext, v *adt.Vertex, cycli
 
 	return id
 }
+
+func appendConjuncts(v *adt.Vertex, a []adt.Conjunct) {
+	for _, c := range a {
+		v.AddConjunct(c)
+	}
+}
+
+// AddVertex add a Vertex to a new destination node. The caller may
+// call AddVertex multiple times on dst. None of the fields of dst
+// should be set by the caller. AddVertex takes care of setting the
+// Label and Parent.
+func AddVertex(dst, src *adt.Vertex) {
+	if dst.Parent == nil {
+		// Create "fake" parent that holds the combined closed data.
+		// We do not set the parent until here as we don't want to "inherit" the
+		// closedness setting from v.
+		dst.Parent = &adt.Vertex{Parent: src.Parent}
+		dst.Label = src.Label
+	}
+
+	if src.IsData() {
+		dst.AddConjunct(adt.MakeConjunct(nil, src, 0))
+		return
+	}
+
+	var srcC *acceptor
+	if src.Parent != nil && src.Parent.Closed != nil {
+		srcC = closedInfo(src.Parent)
+	} else {
+		srcC = &acceptor{}
+	}
+	dstC := closedInfo(dst.Parent)
+	dstC.ignore = true
+
+	isDef := src.Label.IsDef()
+	addClose := isDef || srcC.isClosed
+
+	if addClose {
+		dstC.node(0)
+	} else if len(dstC.Canopy) == 0 {
+		// we can copy it as is (assuming 0 is )
+		appendConjuncts(dst, src.Conjuncts)
+		dstC.Canopy = append(dstC.Canopy, srcC.Canopy...)
+		return
+	}
+
+	offset := adt.ID(len(dstC.Canopy))
+	top := offset
+
+	switch {
+	case len(srcC.Canopy) == 0 && !addClose:
+		appendConjuncts(dst, src.Conjuncts)
+		return
+
+	case len(srcC.Canopy) == 1:
+		c := srcC.Canopy[0]
+		if !addClose && !c.IsDef && !c.IsClosed {
+			appendConjuncts(dst, src.Conjuncts)
+			return
+		}
+		c.IsDef = addClose
+		dstC.Canopy = append(dstC.Canopy, c)
+
+	case addClose:
+		srcC.node(0)
+		isClosed := false
+		srcC.visitAnd(0, func(id adt.ID, c CloseDef) bool {
+			if c.IsClosed || c.IsDef {
+				isClosed = true
+				return false
+			}
+			return true
+		})
+
+		if !isClosed {
+			// need to embed and close.
+			dstC.Canopy = append(dstC.Canopy,
+				CloseDef{
+					And:       offset,
+					IsDef:     true,
+					NextEmbed: offset + 1,
+				},
+				CloseDef{
+					And: embedRoot,
+				})
+
+			offset += 2
+		}
+		fallthrough
+
+	default:
+		dstC.Canopy = append(dstC.Canopy, srcC.Canopy...)
+	}
+
+	// Shift all IDs for the new offset.
+	for i := int(offset); i < len(dstC.Canopy); i++ {
+		x := dstC.Canopy[i]
+		if x.And != -1 {
+			dstC.Canopy[i].And += offset
+		}
+		if x.NextEmbed != 0 {
+			dstC.Canopy[i].NextEmbed += offset
+		}
+	}
+
+	topAnd := dstC.Canopy[top].And
+	atAnd := dstC.Canopy[0].And
+	dstC.Canopy[top].And = atAnd
+	dstC.Canopy[0].And = topAnd
+
+	for _, c := range src.Conjuncts {
+		c.CloseID += offset
+		if err := dst.AddConjunct(c); err != nil {
+			panic(err)
+		}
+	}
+}
+
+// TODO: This is roughly the equivalent of AddVertex for use with
+// UnifyAccept. It is based on the old InsertSubTree. We should use
+// this at some point, but ideally we should have a better way to
+// represent closedness in the first place that is more flexible in
+// handling API usage.
+//
+// func EmbedVertex(dst, src *adt.Vertex) {
+// 	if dst.Parent == nil {
+// 		// Create "fake" parent that holds the combined closed data.
+// 		// We do not set the parent until here as we don't want to "inherit" the
+// 		// closedness setting from v.
+// 		dst.Parent = &adt.Vertex{Parent: src.Parent}
+// 		dst.Label = src.Label
+// 	}
+//
+// 	if src.IsData() {
+// 		dst.AddConjunct(adt.MakeConjunct(nil, src, 0))
+// 		return
+// 	}
+//
+// 	var a *acceptor
+// 	if src.Parent != nil && src.Parent.Closed != nil {
+// 		a = closedInfo(src.Parent)
+// 	} else {
+// 		a = &acceptor{}
+// 	}
+// 	a.node(0)
+//
+// 	c := closedInfo(dst.Parent)
+// 	c.ignore = true
+// 	c.node(0)
+//
+// 	id := adt.ID(len(c.Canopy))
+// 	y := CloseDef{
+// 		And:       embedRoot,
+// 		NextEmbed: c.Canopy[0].NextEmbed,
+// 	}
+// 	c.Canopy[0].NextEmbed = id
+//
+// 	c.Canopy = append(c.Canopy, y)
+// 	id = adt.ID(len(c.Canopy))
+//
+// 	// First entry is at the embedded node location.
+// 	c.Canopy = append(c.Canopy, a.Canopy...)
+//
+// 	// Shift all IDs for the new offset.
+// 	for i := int(id); i < len(c.Canopy); i++ {
+// 		x := c.Canopy[i]
+// 		if x.And != -1 {
+// 			c.Canopy[i].And += id
+// 		}
+// 		if x.NextEmbed != 0 {
+// 			c.Canopy[i].NextEmbed += id
+// 		}
+// 	}
+//
+// 	for _, c := range src.Conjuncts {
+// 		c.CloseID += id
+// 		if err := dst.AddConjunct(c); err != nil {
+// 			panic(err)
+// 		}
+// 	}
+// }
 
 func (c *acceptor) verifyArc(ctx *adt.OpContext, f adt.Feature, v *adt.Vertex) (found bool, err *adt.Bottom) {
 

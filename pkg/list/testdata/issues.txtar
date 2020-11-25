@@ -1,0 +1,102 @@
+-- in.cue --
+import "list"
+
+issue563: {
+    #MyDef: {
+        name: string
+        ...
+    }
+
+    _all: [
+        _a,
+        _b,
+    ]
+
+    _a: [...#MyDef] & [
+        { name: "a" },
+        { name: "b" },
+        { name: "c" },
+    ]
+
+    _b: [...#MyDef] & [
+        { name: "1" },
+        { name: "2" },
+        { name: "3" },
+    ]
+
+    output: [...#MyDef] & list.FlattenN(_all, 1)
+}
+-- out/list --
+(struct){
+  issue563: (struct){
+    #MyDef: (#struct){
+      name: (string){ string }
+    }
+    _all: (#list){
+      0: (#list){
+        0: (#struct){
+          name: (string){ "a" }
+        }
+        1: (#struct){
+          name: (string){ "b" }
+        }
+        2: (#struct){
+          name: (string){ "c" }
+        }
+      }
+      1: (#list){
+        0: (#struct){
+          name: (string){ "1" }
+        }
+        1: (#struct){
+          name: (string){ "2" }
+        }
+        2: (#struct){
+          name: (string){ "3" }
+        }
+      }
+    }
+    _a: (#list){
+      0: (#struct){
+        name: (string){ "a" }
+      }
+      1: (#struct){
+        name: (string){ "b" }
+      }
+      2: (#struct){
+        name: (string){ "c" }
+      }
+    }
+    _b: (#list){
+      0: (#struct){
+        name: (string){ "1" }
+      }
+      1: (#struct){
+        name: (string){ "2" }
+      }
+      2: (#struct){
+        name: (string){ "3" }
+      }
+    }
+    output: (#list){
+      0: (#struct){
+        name: (string){ "a" }
+      }
+      1: (#struct){
+        name: (string){ "b" }
+      }
+      2: (#struct){
+        name: (string){ "c" }
+      }
+      3: (#struct){
+        name: (string){ "1" }
+      }
+      4: (#struct){
+        name: (string){ "2" }
+      }
+      5: (#struct){
+        name: (string){ "3" }
+      }
+    }
+  }
+}

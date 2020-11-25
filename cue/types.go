@@ -1636,13 +1636,10 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 	var value = convert.GoValueToValue(ctx.opCtx, x, true)
 	n, _ := value.(*adt.Vertex)
 	if n == nil {
-		n = &adt.Vertex{Label: v.v.Label}
+		n = &adt.Vertex{}
 		n.AddConjunct(adt.MakeRootConjunct(nil, value))
-	} else {
-		n.Label = v.v.Label
 	}
 	n.Finalize(ctx.opCtx)
-	n.Parent = v.v.Parent
 	w := makeValue(v.idx, n)
 	return v.Unify(w)
 }
@@ -1728,23 +1725,21 @@ func (v Value) Subsumes(w Value) bool {
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
 func (v Value) Unify(w Value) Value {
-	// ctx := v.ctx()
 	if v.v == nil {
 		return w
 	}
 	if w.v == nil {
 		return v
 	}
-	n := &adt.Vertex{Label: v.v.Label}
-	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
-	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
+
+	n := &adt.Vertex{}
+
+	eval.AddVertex(n, v.v)
+	eval.AddVertex(n, w.v)
 
 	ctx := v.idx.newContext()
 	n.Finalize(ctx.opCtx)
 
-	// We do not set the parent until here as we don't want to "inherit" the
-	// closedness setting from v.
-	n.Parent = v.v.Parent
 	return makeValue(v.idx, n)
 }
 
@@ -1761,6 +1756,12 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 		panic("accept must exist")
 	}
 
+	// TODO: take a similar approach for UnifyAccept as for Unify. In this
+	// case though, the fields should be added as an embeding.
+	//
+	// n := &adt.Vertex{}
+	// eval.EmbedVertex(n, v.v)
+	// eval.EmbedVertex(n, w.v)
 	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
 	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
 	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
@@ -1782,7 +1783,6 @@ func (v Value) Equals(other Value) bool {
 		return false
 	}
 	return eval.Equal(v.ctx().opCtx, v.v, other.v)
-
 }
 
 // Format prints a debug version of a value.

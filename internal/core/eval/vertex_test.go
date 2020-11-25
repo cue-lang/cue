@@ -113,8 +113,8 @@ func TestVertex(t *testing.T) {
 		t.Run("", func(t *testing.T) {
 
 			n := &adt.Vertex{}
-			n.AddConjunct(adt.MakeRootConjunct(nil, tc.a))
-			n.AddConjunct(adt.MakeRootConjunct(nil, tc.b))
+			eval.AddVertex(n, tc.a)
+			eval.AddVertex(n, tc.b)
 			n.Finalize(ctx)
 
 			got := debug.NodeString(r, n, &debug.Config{Compact: !tc.verbose})

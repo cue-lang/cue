@@ -44,6 +44,60 @@ func getInstance(t *testing.T, body ...string) *Instance {
 	return insts[0]
 }
 
+func TestAPI(t *testing.T) {
+	testCases := []struct {
+		input string
+		fun   func(i *Instance) Value
+		want  string
+		skip  bool
+	}{{
+		// Issue #567
+		input: `
+		#runSpec: {action: foo: int}
+
+		v: {ction: foo: 1}
+				`,
+		fun: func(i *Instance) Value {
+			runSpec := i.LookupDef("#runSpec")
+			v := i.Lookup("v")
+			res := runSpec.Unify(v)
+			return res
+		},
+		want: "_|_(#runSpec: field `ction` not allowed)",
+	}, {
+		// Issue #567
+		input: `
+		#runSpec: {action: foo: int}
+
+		v: {action: Foo: 1}
+				`,
+		fun: func(i *Instance) Value {
+			runSpec := i.LookupDef("#runSpec")
+			v := i.Lookup("v")
+			res := runSpec.Unify(v)
+			return res
+		},
+		want: "_|_(#runSpec.action: field `Foo` not allowed)",
+	}}
+	for _, tc := range testCases {
+		if tc.skip {
+			continue
+		}
+		t.Run("", func(t *testing.T) {
+			var r Runtime
+			inst, err := r.Compile("in", tc.input)
+			if err != nil {
+				t.Fatal(err)
+			}
+			v := tc.fun(inst)
+			got := fmt.Sprintf("%+v", v)
+			if got != tc.want {
+				t.Errorf("got:\n%s\nwant:\n%s", got, tc.want)
+			}
+		})
+	}
+}
+
 func TestValueType(t *testing.T) {
 	testCases := []struct {
 		value          string
@@ -2574,7 +2628,6 @@ func TestReference(t *testing.T) {
 	}
 }
 
-// TODO: stack overflow
 func TestPathCorrection(t *testing.T) {
 	testCases := []struct {
 		input  string

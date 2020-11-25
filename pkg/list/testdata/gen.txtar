@@ -76,12 +76,12 @@ error in call to list.Slice: negative index
 error in call to list.Slice: slice bounds out of range
 error in call to list.Take: negative index
 0: error in call to list.SortStrings: element 0 of list argument 0: cannot use value 1 (type int) as string
-x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
-x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
-x: error in call to list.Sort: empty disjunction: 2 related errors:
-y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
-y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
-y: error in call to list.Sort: empty disjunction: 2 related errors:
+Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
+Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
+Ascending.x: error in call to list.Sort: empty disjunction: 2 related errors:
+Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
+Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
+Ascending.y: error in call to list.Sort: empty disjunction: 2 related errors:
 t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
     ./in.cue:5:14
 t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN:
@@ -270,12 +270,12 @@ Result:
     }
   }
   t40: (_|_){
-    // [eval] x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
-    // x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
-    // x: error in call to list.Sort: empty disjunction: 2 related errors:
-    // y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
-    // y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
-    // y: error in call to list.Sort: empty disjunction: 2 related errors:
+    // [eval] Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
+    // Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
+    // Ascending.x: error in call to list.Sort: empty disjunction: 2 related errors:
+    // Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
+    // Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
+    // Ascending.y: error in call to list.Sort: empty disjunction: 2 related errors:
   }
   t41: (#list){
     0: (string){ "a" }
@@ -310,11 +310,11 @@ Result:
   t52: (bool){ true }
   t53: (bool){ false }
   t54: (_|_){
-    // [eval] x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
-    // x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
-    // x: error in call to list.Sort: empty disjunction: 2 related errors:
-    // y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
-    // y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
-    // y: error in call to list.Sort: empty disjunction: 2 related errors:
+    // [eval] Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
+    // Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
+    // Ascending.x: error in call to list.Sort: empty disjunction: 2 related errors:
+    // Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
+    // Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
+    // Ascending.y: error in call to list.Sort: empty disjunction: 2 related errors:
   }
 }

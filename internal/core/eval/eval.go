@@ -312,7 +312,7 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 		}
 		v.Arcs = nil
 		// v.Structs = nil // TODO: should we keep or discard the Structs?
-		v.Closed = newDisjunctionAcceptor(d)
+		v.Closed = newDisjunctionAcceptor(d) // TODO: remove?
 
 	default:
 		if r := n.result(); r.Value != nil {
@@ -341,7 +341,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 		closedInfo, _ = v.Parent.Closed.(*acceptor)
 	}
 
-	if !v.Label.IsInt() && closedInfo != nil {
+	if !v.Label.IsInt() && closedInfo != nil && !closedInfo.ignore {
 		ci := closedInfo
 		// Visit arcs recursively to validate and compute error.
 		switch ok, err := ci.verifyArc(c, v.Label, v); {
@@ -355,7 +355,7 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 			return shared
 
 		case !ok: // hidden field
-			// A hidden field is except from checking. Ensure that the
+			// A hidden field is exempt from checking. Ensure that the
 			// closedness doesn't carry over into children.
 			// TODO: make this more fine-grained per package, allowing
 			// checked restrictions to be defined within the package.
@@ -1086,6 +1086,13 @@ func (n *nodeContext) addExprConjunct(v adt.Conjunct) {
 	id := v.CloseID
 
 	switch x := v.Expr().(type) {
+	case *adt.Vertex:
+		if x.IsData() {
+			n.addValueConjunct(env, x, id)
+		} else {
+			n.addVertexConjuncts(env, id, x, x)
+		}
+
 	case adt.Value:
 		n.addValueConjunct(env, x, id)
 
@@ -1177,6 +1184,17 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 				break
 			}
 		}
+
+		// TODO: also to through normal Vertex handling here. At the moment
+		// addValueConjunct handles StructMarker.NeedsClose, as this is always
+		// only needed when evaluation an Evaluator, and not a Resolver.
+		// The two code paths should ideally be merged once this separate
+		// mechanism is eliminated.
+		//
+		// if arc, ok := val.(*adt.Vertex); ok && !arc.IsData() {
+		// 	n.addVertexConjuncts(v.Env, closeID, v.Expr(), arc)
+		// 	break
+		// }
 
 		// TODO: insert in vertex as well
 		n.addValueConjunct(v.Env, val, closeID)
@@ -1372,9 +1390,11 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 		cyclic := env != nil && env.Cyclic
 
-		if !x.IsData() && len(x.Conjuncts) > 0 {
+		if !x.IsData() {
+			// TODO: this really shouldn't happen anymore.
 			if isComplexStruct(x) {
-				closedInfo(n.node).InsertSubtree(id, n, x, cyclic)
+				// This really shouldn't happen, but just in case.
+				n.addVertexConjuncts(env, id, x, x)
 				return
 			}
 

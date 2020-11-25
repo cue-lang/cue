@@ -1,0 +1,10 @@
+cue import -p uni --with-context -l 'path.Ext(filename)' -n '.*uni.yml' ./...
+cmp uni.cue out/expect-uni.cue
+-- uni.yml --
+hello: world
+-- service.yaml --
+x: foobie
+-- out/expect-uni.cue --
+package uni
+
+".yml": hello: "world"

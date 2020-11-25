@@ -73,7 +73,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 
 	for _, f := range i.OrphanedFiles {
 		if !i.User && !re.MatchString(filepath.Base(f.Filename)) {
-			return false, nil
+			continue
 		}
 
 		// We add the module root to the path if there is a module defined.

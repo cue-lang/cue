@@ -141,6 +141,11 @@ func doTasks(cmd *Command, typ, command string, root *cue.Instance) error {
 // }
 
 func isTask(v cue.Value) bool {
+	// This mimics the v0.2 behavior. The cutoff is really quite arbitrary. A
+	// sane implementation should not use InferTasks, really.
+	if len(v.Path().Selectors()) == 0 {
+		return false
+	}
 	return v.Kind() == cue.StructKind &&
 		(v.Lookup("$id").Exists() || v.Lookup("kind").Exists())
 }

@@ -134,6 +134,11 @@ type Config struct {
 	// InferTasks allows tasks to be defined outside of the Root. Such tasks
 	// will only be included in the workflow if any of its fields is referenced
 	// by any of the tasks defined within Root.
+	//
+	// CAVEAT EMPTOR: this features is mostly provided for backwards
+	// compatibility with v0.2. A problem with this approach is that it will
+	// look for task structs within arbitrary data. So if not careful, there may
+	// be spurious matches.
 	InferTasks bool
 
 	// IgnoreConcrete ignores references for which the values are already

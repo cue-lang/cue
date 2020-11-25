@@ -1,0 +1,29 @@
+cue cmd dump
+cmp stdout expect-stdout
+-- f1.cue --
+package kube
+
+test: {
+    a: 1
+}
+
+// A kind at the top-level should not be allowed.
+
+kind: "foo"
+$id: "bar"
+
+-- dump_tool.cue --
+package kube
+
+import (
+	"tool/cli"
+	"encoding/yaml"
+)
+
+command: dump: {
+	task: print: cli.Print & { text: yaml.Marshal(test) }
+}
+
+-- expect-stdout --
+a: 1
+

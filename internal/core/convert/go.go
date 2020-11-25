@@ -402,8 +402,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 		case reflect.Struct:
 			obj := &adt.StructLit{Src: src}
-			v := &adt.Vertex{}
-			v.AddConjunct(adt.MakeRootConjunct(nil, obj))
+			v := &adt.Vertex{Structs: []*adt.StructLit{obj}}
 			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
@@ -440,10 +439,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 				if sf.Anonymous && name == "" {
 					arc, ok := sub.(*adt.Vertex)
 					if ok {
-						for _, a := range arc.Arcs {
-							obj.Decls = append(obj.Decls, &adt.Field{Label: a.Label, Value: a.Value})
-							v.Arcs = append(v.Arcs, a)
-						}
+						v.Arcs = append(v.Arcs, arc.Arcs...)
 					}
 					continue
 				}
@@ -455,6 +451,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					arc.Label = f
 				} else {
 					arc = &adt.Vertex{Label: f, Value: sub}
+					arc.UpdateStatus(adt.Finalized)
 					arc.AddConjunct(adt.MakeRootConjunct(nil, sub))
 				}
 				v.Arcs = append(v.Arcs, arc)
@@ -463,9 +460,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 			return v
 
 		case reflect.Map:
-			obj := &adt.StructLit{Src: src}
 			v := &adt.Vertex{Value: &adt.StructMarker{}}
-			v.AddConjunct(adt.MakeRootConjunct(nil, obj))
 			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
@@ -497,15 +492,12 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 					s := fmt.Sprint(k)
 					f := ctx.StringLabel(s)
-					obj.Decls = append(obj.Decls, &adt.Field{
-						Label: f,
-						Value: sub,
-					})
 					arc, ok := sub.(*adt.Vertex)
 					if ok {
 						arc.Label = f
 					} else {
 						arc = &adt.Vertex{Label: f, Value: sub}
+						arc.UpdateStatus(adt.Finalized)
 						arc.AddConjunct(adt.MakeRootConjunct(nil, sub))
 					}
 					v.Arcs = append(v.Arcs, arc)

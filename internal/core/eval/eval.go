@@ -1393,21 +1393,37 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 			return
 
 		case *adt.StructMarker:
+			// TODO: this would not be necessary if acceptor.isClose were
+			// not used. See comment at acceptor.
+			opt := fieldSet{env: env, id: id}
+
+			// Keep ordering of Go struct for topological sort.
+			n.node.Structs = append(n.node.Structs, x.Structs...)
 			for _, a := range x.Arcs {
 				c := adt.MakeConjunct(nil, a, id)
 				c = updateCyclic(c, cyclic, nil, nil)
 				n.insertField(a.Label, c)
+				opt.MarkField(ctx, a.Label)
 			}
+
+			closedInfo(n.node).insertFieldSet(id, &opt)
 
 		default:
 			n.addValueConjunct(env, v, id)
 
+			// TODO: this would not be necessary if acceptor.isClose were
+			// not used. See comment at acceptor.
+			opt := fieldSet{env: env, id: id}
+
 			for _, a := range x.Arcs {
 				// TODO(errors): report error when this is a regular field.
-				n.insertField(a.Label, adt.MakeConjunct(nil, a, id))
-				// sub, _ := n.node.GetArc(a.Label)
-				// sub.Add(a)
+				c := adt.MakeConjunct(nil, a, id)
+				c = updateCyclic(c, cyclic, nil, nil)
+				n.insertField(a.Label, c)
+				opt.MarkField(ctx, a.Label)
 			}
+
+			closedInfo(n.node).insertFieldSet(id, &opt)
 		}
 
 		return
@@ -1434,7 +1450,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 	case *adt.Top:
 		n.hasTop = true
-		// TODO: Is this correct. Needed for elipsis, but not sure for others.
+		// TODO: Is this correct? Needed for elipsis, but not sure for others.
 		// n.optionals = append(n.optionals, fieldSet{env: env, id: id, isOpen: true})
 		if a, _ := n.node.Closed.(*acceptor); a != nil {
 			// Embedding top indicates that now all possible values are allowed
@@ -1604,7 +1620,7 @@ func (n *nodeContext) addStruct(
 	for _, d := range s.Decls {
 		switch x := d.(type) {
 		case *adt.Field:
-			opt.MarkField(ctx, x)
+			opt.MarkField(ctx, x.Label)
 			// handle in next iteration.
 
 		case *adt.OptionalField:

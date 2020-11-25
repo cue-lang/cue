@@ -153,9 +153,9 @@ func (o *fieldSet) fieldIndex(f adt.Feature) int {
 	return -1
 }
 
-func (o *fieldSet) MarkField(c *adt.OpContext, x *adt.Field) {
-	if o.fieldIndex(x.Label) < 0 {
-		o.fields = append(o.fields, field{label: x.Label})
+func (o *fieldSet) MarkField(c *adt.OpContext, f adt.Feature) {
+	if o.fieldIndex(f) < 0 {
+		o.fields = append(o.fields, field{label: f})
 	}
 }
 

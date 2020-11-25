@@ -1138,7 +1138,6 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 		}
 	}()
 
-outer:
 	switch x := v.Expr().(type) {
 	case adt.Resolver:
 		arc, err := ctx.Resolve(v.Env, x)
@@ -1155,106 +1154,7 @@ outer:
 			break
 		}
 
-		// We need to ensure that each arc is only unified once (or at least) a
-		// bounded time, witch each conjunct. Comprehensions, for instance, may
-		// distribute a value across many values that get unified back into the
-		// same value. If such a value is a disjunction, than a disjunction of N
-		// disjuncts will result in a factor N more unifications for each
-		// occurrence of such value, resulting in exponential running time. This
-		// is especially common values that are used as a type.
-		//
-		// However, unification is idempotent, so each such conjunct only needs
-		// to be unified once. This cache checks for this and prevents an
-		// exponential blowup in such case.
-		//
-		// TODO(perf): this cache ensures the conjuncts of an arc at most once
-		// per ID. However, we really need to add the conjuncts of an arc only
-		// once total, and then add the close information once per close ID
-		// (pointer can probably be shared). Aside from being more performant,
-		// this is probably the best way to guarantee that conjunctions are
-		// linear in this case.
-		if n.arcMap == nil {
-			n.arcMap = map[arcKey]bool{}
-		}
-		if n.arcMap[arcKey{arc, v.CloseID}] {
-			return
-		}
-		n.arcMap[arcKey{arc, v.CloseID}] = true
-
-		// Pass detection of structural cycles from parent to children.
-		cyclic := false
-		if v.Env != nil {
-			// If a reference is in a tainted set, so is the value it refers to.
-			cyclic = v.Env.Cyclic
-		}
-
-		status := arc.Status()
-
-		switch status {
-		case adt.Evaluating:
-			// Reference cycle detected. We have reached a fixed point and
-			// adding conjuncts at this point will not change the value. Also,
-			// continuing to pursue this value will result in an infinite loop.
-
-			// TODO: add a mechanism so that the computation will only have to
-			// be done once?
-
-			if arc == n.node {
-				// TODO: we could use node sharing here. This may avoid an
-				// exponential blowup during evaluation, like is possible with
-				// YAML.
-				break outer
-			}
-
-		case adt.EvaluatingArcs:
-			// Structural cycle detected. Continue evaluation as usual, but
-			// keep track of whether any other conjuncts without structural
-			// cycles are added. If not, evaluation of child arcs will end
-			// with this node.
-
-			// For the purpose of determining whether at least one non-cyclic
-			// conjuncts exists, we consider all conjuncts of a cyclic conjuncts
-			// also cyclic.
-
-			cyclic = true
-			n.hasCycle = true
-
-			// As the adt.EvaluatingArcs mechanism bypasses the self-reference
-			// mechanism, we need to separately keep track of it here.
-			// If this (originally) is a self-reference node, adding them
-			// will result in recursively adding the same reference. For this
-			// we also mark the node as evaluating.
-			if arc.SelfCount > 0 {
-				break outer
-			}
-
-			// This count is added for values that are directly added below.
-			// The count is handled separately for delayed values.
-			arc.SelfCount++
-			defer func() { arc.SelfCount-- }()
-		}
-
-		if isDef(v.Expr()) { // should test whether closed, not isDef?
-			c := closedInfo(n.node)
-			closeID = c.InsertDefinition(v.CloseID, x)
-			n.needClose = true // TODO: is this still necessary?
-		}
-
-		// TODO: uncommenting the following almost works, but causes some
-		// faulty results in complex cycle handling between disjunctions.
-		// The reason is that disjunctions must be eliminated if checks in
-		// values on which they depend fail.
-		ctx.Unify(ctx, arc, adt.Finalized)
-
-		for _, c := range arc.Conjuncts {
-			var a []*adt.Vertex
-			if v.Env != nil {
-				a = v.Env.Deref
-			}
-			c = updateCyclic(c, cyclic, arc, a)
-			c.CloseID = closeID
-			n.addExprConjunct(c)
-		}
+		n.addVertexConjuncts(v.Env, v.CloseID, v.Expr(), arc)
 
 	case adt.Evaluator:
 		// adt.Interpolation, adt.UnaryExpr, adt.BinaryExpr, adt.CallExpr
@@ -1283,6 +1183,111 @@ outer:
 
 	default:
 		panic(fmt.Sprintf("unknown expression of type %T", x))
+	}
+}
+
+func (n *nodeContext) addVertexConjuncts(env *adt.Environment, closeID adt.ID, x adt.Expr, arc *adt.Vertex) {
+
+	// We need to ensure that each arc is only unified once (or at least) a
+	// bounded time, witch each conjunct. Comprehensions, for instance, may
+	// distribute a value across many values that get unified back into the
+	// same value. If such a value is a disjunction, than a disjunction of N
+	// disjuncts will result in a factor N more unifications for each
+	// occurrence of such value, resulting in exponential running time. This
+	// is especially common values that are used as a type.
+	//
+	// However, unification is idempotent, so each such conjunct only needs
+	// to be unified once. This cache checks for this and prevents an
+	// exponential blowup in such case.
+	//
+	// TODO(perf): this cache ensures the conjuncts of an arc at most once
+	// per ID. However, we really need to add the conjuncts of an arc only
+	// once total, and then add the close information once per close ID
+	// (pointer can probably be shared). Aside from being more performant,
+	// this is probably the best way to guarantee that conjunctions are
+	// linear in this case.
+	if n.arcMap == nil {
+		n.arcMap = map[arcKey]bool{}
+	}
+	if n.arcMap[arcKey{arc, closeID}] {
+		return
+	}
+	n.arcMap[arcKey{arc, closeID}] = true
+
+	// Pass detection of structural cycles from parent to children.
+	cyclic := false
+	if env != nil {
+		// If a reference is in a tainted set, so is the value it refers to.
+		cyclic = env.Cyclic
+	}
+
+	status := arc.Status()
+
+	switch status {
+	case adt.Evaluating:
+		// Reference cycle detected. We have reached a fixed point and
+		// adding conjuncts at this point will not change the value. Also,
+		// continuing to pursue this value will result in an infinite loop.
+
+		// TODO: add a mechanism so that the computation will only have to
+		// be done once?
+
+		if arc == n.node {
+			// TODO: we could use node sharing here. This may avoid an
+			// exponential blowup during evaluation, like is possible with
+			// YAML.
+			return
+		}
+
+	case adt.EvaluatingArcs:
+		// Structural cycle detected. Continue evaluation as usual, but
+		// keep track of whether any other conjuncts without structural
+		// cycles are added. If not, evaluation of child arcs will end
+		// with this node.
+
+		// For the purpose of determining whether at least one non-cyclic
+		// conjuncts exists, we consider all conjuncts of a cyclic conjuncts
+		// also cyclic.
+
+		cyclic = true
+		n.hasCycle = true
+
+		// As the adt.EvaluatingArcs mechanism bypasses the self-reference
+		// mechanism, we need to separately keep track of it here.
+		// If this (originally) is a self-reference node, adding them
+		// will result in recursively adding the same reference. For this
+		// we also mark the node as evaluating.
+		if arc.SelfCount > 0 {
+			return
+		}
+
+		// This count is added for values that are directly added below.
+		// The count is handled separately for delayed values.
+		arc.SelfCount++
+		defer func() { arc.SelfCount-- }()
+	}
+
+	if isDef(x) { // should test whether closed, not isDef?
+		c := closedInfo(n.node)
+		closeID = c.InsertDefinition(closeID, x)
+		n.needClose = true // TODO: is this still necessary?
+	}
+
+	// TODO: uncommenting the following almost works, but causes some
+	// faulty results in complex cycle handling between disjunctions.
+	// The reason is that disjunctions must be eliminated if checks in
+	// values on which they depend fail.
+	ctx := n.ctx
+	ctx.Unify(ctx, arc, adt.Finalized)
+
+	for _, c := range arc.Conjuncts {
+		var a []*adt.Vertex
+		if env != nil {
+			a = env.Deref
+		}
+		c = updateCyclic(c, cyclic, arc, a)
+		c.CloseID = closeID
+		n.addExprConjunct(c)
 	}
 }
 

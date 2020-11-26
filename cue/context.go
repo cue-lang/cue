@@ -76,12 +76,7 @@ func (v Value) eval(ctx *context) adt.Value {
 		panic("undefined value")
 	}
 	x := ctx.manifest(v.v)
-	switch x.Kind() {
-	case adt.StructKind, adt.ListKind:
-		return x
-	default:
-		return x.Value
-	}
+	return x.ActualValue()
 }
 
 // func (v Value) evalFull(u value) (Value, adt.Value) {

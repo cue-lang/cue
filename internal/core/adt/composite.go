@@ -255,6 +255,25 @@ func (v *Vertex) UpdateStatus(s VertexStatus) {
 	v.status = s
 }
 
+// ActualValue returns the Value of v without definitions if it is a scalar
+// or itself otherwise.
+func (v *Vertex) ActualValue() Value {
+	// TODO: rename to Value.
+	switch x := v.Value.(type) {
+	// XXX: remove
+	case *StructMarker, *ListMarker:
+		return v
+	case Value:
+		return x
+	default:
+		return v
+	}
+}
+
+func (x *Vertex) IsConcrete() bool {
+	return x.Concreteness() <= Concrete
+}
+
 // IsData reports whether v should be interpreted in data mode. In other words,
 // it tells whether optional field matching and non-regular fields, like
 // definitions and hidden fields, should be ignored.
@@ -385,12 +404,7 @@ func Unwrap(v Value) Value {
 	if !ok {
 		return v
 	}
-	switch x.Value.(type) {
-	case *StructMarker, *ListMarker:
-		return v
-	default:
-		return x.Value
-	}
+	return x.ActualValue()
 }
 
 // Acceptor is a single interface that reports whether feature f is a valid

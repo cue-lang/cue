@@ -136,10 +136,16 @@ func Pos(n Node) token.Pos {
 
 func (x *Vertex) Concreteness() Concreteness {
 	// Depends on concreteness of value.
-	if x.Value == nil {
+	switch v := x.Value.(type) {
+	case nil:
 		return Concrete // Should be indetermined.
+
+	case Value:
+		return v.Concreteness()
+
+	default: //  *StructMarker, *ListMarker:
+		return Concrete
 	}
-	return x.Value.Concreteness()
 }
 
 func (x *NodeLink) Concreteness() Concreteness     { return Concrete }

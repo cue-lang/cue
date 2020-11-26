@@ -844,7 +844,7 @@ func (v Value) Kind() Kind {
 		return BottomKind
 	}
 	c := v.v.Value
-	if !adt.IsConcrete(c) {
+	if !v.v.IsConcrete() {
 		return BottomKind
 	}
 	if v.IncompleteKind() == adt.ListKind && !v.IsClosed() {
@@ -2161,12 +2161,7 @@ func (v Value) Expr() (Op, []Value) {
 	var env *adt.Environment
 
 	if v.v.IsData() {
-		switch x := v.v.Value.(type) {
-		case *adt.ListMarker, *adt.StructMarker:
-			expr = v.v
-		default:
-			expr = x
-		}
+		expr = v.v.ActualValue()
 
 	} else {
 		switch len(v.v.Conjuncts) {
@@ -2174,12 +2169,7 @@ func (v Value) Expr() (Op, []Value) {
 			if v.v.Value == nil {
 				return NoOp, []Value{makeValue(v.idx, v.v)}
 			}
-			switch x := v.v.Value.(type) {
-			case *adt.ListMarker, *adt.StructMarker:
-				expr = v.v
-			default:
-				expr = x
-			}
+			expr = v.v.ActualValue()
 
 		case 1:
 			// the default case, processed below.

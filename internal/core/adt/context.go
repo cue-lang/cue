@@ -449,17 +449,14 @@ func (c *OpContext) getDefault(v Value, scalar bool) (result Value, ok bool) {
 		case *Disjunction:
 			d = t
 
-		case *StructMarker, *ListMarker:
-			return v, true
-
 		case *Vertex:
 			return c.getDefault(t, scalar)
 
 		default:
 			if !scalar {
-				return v, true
+				return x, true
 			}
-			return t, true
+			return x.ActualValue(), true
 		}
 
 	case *Disjunction:
@@ -551,7 +548,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		}
 		if isIncomplete(arc) {
 			if arc != nil {
-				return arc.Value
+				return arc.ActualValue() // *Bottom
 			}
 			return nil
 		}

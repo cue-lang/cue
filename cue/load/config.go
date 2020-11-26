@@ -536,12 +536,12 @@ func (c Config) complete() (cfg *Config, err error) {
 		v.Finalize(ctx)
 		prefix := v.Lookup(ctx.StringLabel("module"))
 		if prefix != nil {
-			name := ctx.StringValue(prefix.Value)
+			name := ctx.StringValue(prefix.ActualValue())
 			if err := ctx.Err(); err != nil {
 				return &c, err.Err
 			}
 			pos := token.NoPos
-			src := prefix.Value.Source()
+			src := prefix.ActualValue().Source()
 			if src != nil {
 				pos = src.Pos()
 			}

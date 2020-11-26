@@ -67,12 +67,15 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		}
 		result = ast.NewBinExpr(token.AND, a...)
 
-	default:
+	case adt.Value:
 		if e.showArcs(n) {
 			result = e.structComposite(n)
 		} else {
-			result = e.value(n.Value, n.Conjuncts...)
+			result = e.value(x, n.Conjuncts...)
 		}
+
+	default:
+		panic("unknow value")
 	}
 	return result
 }
@@ -336,7 +339,7 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 	case *adt.ListMarker:
 		// As lists may be long, put them at the end.
 		defer e.addEmbed(e.listComposite(v))
-	default:
+	case adt.Value:
 		e.addEmbed(e.value(x))
 	}
 

@@ -271,8 +271,17 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 		e.top().upCount--
 
 	case adt.Value: // other values.
-		if v, ok := x.(*adt.Vertex); ok {
-			if v.IsList() {
+		switch v := x.(type) {
+		case nil:
+		case *adt.Top:
+		default:
+			e.values.AddConjunct(adt.MakeRootConjunct(env, x)) // GOBBLE TOP
+
+		case *adt.Vertex:
+			e.structs = append(e.structs, v.Structs...)
+
+			switch y := v.Value.(type) {
+			case *adt.ListMarker:
 				a := []ast.Expr{}
 				for _, x := range v.Elems() {
 					a = append(a, e.expr(x))
@@ -284,9 +293,13 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 				}
 				e.exprs = append(e.exprs, ast.NewList(a...))
 				return
-			}
 
-			e.structs = append(e.structs, v.Structs...)
+			case *adt.StructMarker:
+				x = nil
+
+			case adt.Value:
+				e.values.AddConjunct(adt.MakeRootConjunct(env, y)) // GOBBLE TOP
+			}
 
 			// generated, only consider arcs.
 			for _, a := range v.Arcs {
@@ -294,15 +307,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 
 				e.addConjunct(a.Label, env, a)
 			}
-			x = v.Value
 			// e.exprs = append(e.exprs, e.value(v, v.Conjuncts...))
-			// return
-		}
-
-		switch x.(type) {
-		case *adt.StructMarker, *adt.Top:
-		default:
-			e.values.AddConjunct(adt.MakeRootConjunct(env, x)) // GOBBLE TOP
 		}
 
 	case *adt.BinaryExpr:

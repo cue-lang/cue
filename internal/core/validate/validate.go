@@ -89,9 +89,10 @@ func (v *validator) validate(x *adt.Vertex) {
 	} else if v.checkConcrete() {
 		x := x.Default()
 		if !adt.IsConcrete(x) {
+			x := x.ActualValue()
 			v.add(&adt.Bottom{
 				Code: adt.IncompleteError,
-				Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x.Value)),
+				Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x)),
 			})
 		}
 	}

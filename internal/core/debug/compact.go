@@ -44,7 +44,7 @@ func (w *compactPrinter) node(n adt.Node) {
 			return
 		}
 
-		switch x.Value.(type) {
+		switch v := x.Value.(type) {
 		case *adt.StructMarker:
 			w.string("{")
 			for i, a := range x.Arcs {
@@ -67,8 +67,8 @@ func (w *compactPrinter) node(n adt.Node) {
 			}
 			w.string("]")
 
-		default:
-			w.node(x.Value)
+		case adt.Value:
+			w.node(v)
 		}
 
 	case *adt.StructMarker:

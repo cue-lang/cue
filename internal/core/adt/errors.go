@@ -153,7 +153,7 @@ func (v *Vertex) AddChildError(recursive *Bottom) {
 	if err == nil {
 		v.Value = &Bottom{
 			Code:         recursive.Code,
-			Value:        x,
+			Value:        v,
 			HasRecursive: true,
 			ChildError:   true,
 			Err:          recursive.Err,

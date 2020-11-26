@@ -48,7 +48,7 @@ var lenBuiltin = &adt.Builtin{
 				return c.NewInt64(int64(n), v)
 
 			default:
-				v = x.Value
+				v = x.ActualValue()
 			}
 		}
 
@@ -98,7 +98,7 @@ var andBuiltin = &adt.Builtin{
 		}
 		a := []adt.Value{}
 		for _, c := range list {
-			a = append(a, c.Value)
+			a = append(a, c.ActualValue())
 		}
 		return &adt.Conjunction{Values: a}
 	},

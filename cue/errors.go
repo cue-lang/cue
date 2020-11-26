@@ -101,13 +101,6 @@ var errNotExists = &adt.Bottom{
 	Err:  errors.Newf(token.NoPos, "undefined value"),
 }
 
-func exists(v adt.Expr) bool {
-	if err, ok := v.(*adt.Bottom); ok {
-		return err.Code != codeNotExist
-	}
-	return true
-}
-
 func (idx *index) mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
 	var e *adt.Bottom
 	var code errCode = -1

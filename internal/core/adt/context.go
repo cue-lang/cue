@@ -437,6 +437,10 @@ func (c *OpContext) Concrete(env *Environment, x Expr, msg interface{}) (result 
 	return v, true
 }
 
+// getDefault resolves a disjunction to a single value. If there is no default
+// value, or if there is more than one default value, it reports an "incomplete"
+// error and return false. In all other cases it will return true, even if
+// v is already an error. v may be nil, in which case it will also return nil.
 func (c *OpContext) getDefault(v Value, scalar bool) (result Value, ok bool) {
 	var d *Disjunction
 	switch x := v.(type) {
@@ -515,7 +519,6 @@ func (c *OpContext) value(x Expr) (result Value) {
 func (c *OpContext) eval(x Expr) (result Value) {
 	v := c.evalState(x, Partial)
 	return v
-
 }
 
 func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
@@ -557,10 +560,9 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		return v
 
 	default:
-		// return nil
-		c.AddErrf("unexpected Expr type %T", v)
+		// This can only happen, really, if v == nil, which is not allowed.
+		panic(fmt.Sprintf("unexpected Expr type %T", v))
 	}
-	return nil
 }
 
 func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature) *Vertex {
@@ -674,7 +676,7 @@ func (c *OpContext) node(x Expr, scalar bool) *Vertex {
 
 	node, ok := v.(*Vertex)
 	if ok {
-		v = node.Value
+		v = node.ActualValue()
 	}
 	switch nv := v.(type) {
 	case nil:
@@ -682,13 +684,15 @@ func (c *OpContext) node(x Expr, scalar bool) *Vertex {
 		return emptyNode
 
 	case *Bottom:
+		// TODO: this is a bit messy. In some cases errors are already added
+		// and in some cases not. Not a huge deal, as errors will be uniqued
+		// down the line, but could be better.
 		c.AddBottom(nv)
 		return emptyNode
 
-	case *StructMarker, *ListMarker:
+	case *Vertex:
 		if node == nil {
-			Assert("unexpected markers with nil node", false)
-			return emptyNode
+			panic("unexpected markers with nil node")
 		}
 
 	default:

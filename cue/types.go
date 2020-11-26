@@ -1061,7 +1061,7 @@ func (v Value) Source() ast.Node {
 	if len(v.v.Conjuncts) == 1 {
 		return v.v.Conjuncts[0].Source()
 	}
-	return v.v.Value.Source()
+	return v.v.ActualValue().Source()
 }
 
 // Err returns the error represented by v or nil v is not an error.
@@ -1125,7 +1125,10 @@ func (v Value) Exists() bool {
 	if v.v == nil {
 		return false
 	}
-	return exists(v.v.Value)
+	if err, ok := v.v.Value.(*adt.Bottom); ok {
+		return err.Code != codeNotExist
+	}
+	return true
 }
 
 func (v Value) checkKind(ctx *context, want adt.Kind) *adt.Bottom {

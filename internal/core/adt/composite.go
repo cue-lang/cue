@@ -180,7 +180,7 @@ type Vertex struct {
 
 	// Value is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
-	Value Value
+	Value BaseValue
 
 	// ChildErrors is the collection of all errors of children.
 	ChildErrors *Bottom
@@ -260,13 +260,14 @@ func (v *Vertex) UpdateStatus(s VertexStatus) {
 func (v *Vertex) ActualValue() Value {
 	// TODO: rename to Value.
 	switch x := v.Value.(type) {
-	// XXX: remove
+	case nil:
+		return nil
 	case *StructMarker, *ListMarker:
 		return v
 	case Value:
 		return x
 	default:
-		return v
+		panic(fmt.Sprintf("unexpected type %T", v.Value))
 	}
 }
 
@@ -309,14 +310,14 @@ func (v *Vertex) ToDataAll() *Vertex {
 	for i, c := range w.Conjuncts {
 		w.Conjuncts[i].CloseID = 0
 		if v, _ := c.x.(Value); v != nil {
-			w.Conjuncts[i].x = toDataAll(v)
+			w.Conjuncts[i].x = toDataAll(v).(Value)
 		}
 	}
 	w.Closed = nil
 	return &w
 }
 
-func toDataAll(v Value) Value {
+func toDataAll(v BaseValue) BaseValue {
 	switch x := v.(type) {
 	default:
 		return x
@@ -338,7 +339,8 @@ func toDataAll(v Value) Value {
 		c := *x
 		c.Values = make([]Value, len(x.Values))
 		for i, v := range x.Values {
-			c.Values[i] = toDataAll(v)
+			// This case is okay because the source is of type Value.
+			c.Values[i] = toDataAll(v).(Value)
 		}
 		return &c
 	}
@@ -372,11 +374,11 @@ func (v *Vertex) Finalize(c *OpContext) {
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
-	v.Value = CombineErrors(nil, v.Value, b)
+	v.Value = CombineErrors(nil, v.ActualValue(), b)
 	v.UpdateStatus(Finalized)
 }
 
-func (v *Vertex) SetValue(ctx *OpContext, state VertexStatus, value Value) *Bottom {
+func (v *Vertex) SetValue(ctx *OpContext, state VertexStatus, value BaseValue) *Bottom {
 	v.Value = value
 	v.UpdateStatus(state)
 	return nil

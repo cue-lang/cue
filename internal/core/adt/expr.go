@@ -899,9 +899,16 @@ func (x *CallExpr) Source() ast.Node {
 func (x *CallExpr) evaluate(c *OpContext) Value {
 	fun := c.value(x.Fun)
 	args := []Value{}
-	for _, a := range x.Args {
+	for i, a := range x.Args {
 		expr := c.value(a)
-		if v, ok := expr.(*Vertex); ok {
+		switch v := expr.(type) {
+		case nil:
+			// There SHOULD be an error in the context. If not, we generate
+			// one.
+			c.Assertf(pos(x.Fun), c.HasErr(),
+				"argument %d to function %s is incomplete", i, c.Str(x.Fun))
+
+		case *Vertex:
 			// Remove the path of the origin for arguments. This results in
 			// more sensible error messages: an error should refer to the call
 			// site, not the original location of the argument.
@@ -910,7 +917,8 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 			w := *v
 			w.Parent = nil
 			args = append(args, &w)
-		} else {
+
+		default:
 			args = append(args, expr)
 		}
 	}
@@ -969,7 +977,7 @@ func (x *Builtin) validate(c *OpContext, v Value) *Bottom {
 
 func bottom(v Value) *Bottom {
 	if x, ok := v.(*Vertex); ok {
-		v = x.Value
+		v = x.ActualValue()
 	}
 	b, _ := v.(*Bottom)
 	return b

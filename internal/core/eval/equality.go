@@ -34,11 +34,15 @@ func equalVertex(ctx *adt.OpContext, x *adt.Vertex, v adt.Value) bool {
 	if x == y {
 		return true
 	}
-	if len(x.Arcs) != len(y.Arcs) {
+	xk := x.Kind()
+	yk := y.Kind()
+
+	if xk != yk {
 		return false
 	}
-	if len(x.Arcs) == 0 && len(y.Arcs) == 0 {
-		return equalTerminal(ctx, x.Value, y.Value)
+
+	if len(x.Arcs) != len(y.Arcs) {
+		return false
 	}
 
 loop1:
@@ -65,13 +69,20 @@ loop1:
 	// 		return false
 	// 	}
 
-	return equalTerminal(ctx, x.Value, y.Value)
+	v, ok1 := x.Value.(adt.Value)
+	w, ok2 := y.Value.(adt.Value)
+	if !ok1 && !ok2 {
+		return true // both are struct or list.
+	}
+
+	return equalTerminal(ctx, v, w)
 }
 
 func equalTerminal(ctx *adt.OpContext, v, w adt.Value) bool {
 	if v == w {
 		return true
 	}
+
 	switch x := v.(type) {
 	case *adt.Num, *adt.String, *adt.Bool, *adt.Bytes:
 		if b, ok := adt.BinOp(ctx, adt.EqualOp, v, w).(*adt.Bool); ok {
@@ -118,14 +129,6 @@ func equalTerminal(ctx *adt.OpContext, v, w adt.Value) bool {
 			}
 		}
 		return true
-
-	case *adt.ListMarker:
-		_, ok := w.(*adt.ListMarker)
-		return ok
-
-	case *adt.StructMarker:
-		_, ok := w.(*adt.StructMarker)
-		return ok
 
 	case *adt.BuiltinValidator:
 	}

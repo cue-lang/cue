@@ -1,0 +1,151 @@
+-- in.cue --
+import "list"
+
+
+list1: {
+    // Note that Top is not incomplete, only its first element is.
+    // We allow FlattenN to proceed and pass on the incomplete values.
+    Out1: list.FlattenN(Top , 1)
+    Out2: [...] & list.FlattenN(Top , 1)
+    Out3: list.FlattenN(Top , 1) & [...]
+
+    // This evaluates to a list with an incomplete element.
+    Top: [
+        [ for _, F in _Sub { F } ],
+    ]
+
+    _Sub: a.b
+    a: {} // b does not
+}
+
+list2: {
+    Out1: list.FlattenN(_Top , 1)
+    Out2: [...] & list.FlattenN(_Top , 1)
+    Out3: list.FlattenN(_Top , 1) & [...]
+
+    // This evaluates to a list with an incomplete element.
+    _Top: [
+        for _, F in #Sub { F }
+    ]
+
+    #Sub: a.b
+    a: {} // b does not
+}
+
+value1: {
+    a: len('sf' | 'dd')
+}
+
+value2: {
+    len('sf' | 'dd')
+}
+
+-- out/eval --
+(struct){
+  list1: (struct){
+    Out1: (#list){
+      0: (_|_){
+        // [incomplete] list1._Sub: undefined field b:
+        //     ./in.cue:16:13
+      }
+    }
+    Out2: (#list){
+      0: (_|_){
+        // [incomplete] list1._Sub: undefined field b:
+        //     ./in.cue:16:13
+      }
+    }
+    Out3: (#list){
+      0: (_|_){
+        // [incomplete] list1._Sub: undefined field b:
+        //     ./in.cue:16:13
+      }
+    }
+    Top: (#list){
+      0: (_|_){
+        // [incomplete] list1._Sub: undefined field b:
+        //     ./in.cue:16:13
+      }
+    }
+    _Sub: (_|_){
+      // [incomplete] list1._Sub: undefined field b:
+      //     ./in.cue:16:13
+    }
+    a: (struct){
+    }
+  }
+  list2: (struct){
+    Out1: (_|_){
+      // [incomplete] list2.#Sub: undefined field b:
+      //     ./in.cue:30:13
+    }
+    Out2: (list){
+    }
+    Out3: (list){
+    }
+    _Top: (_|_){
+      // [incomplete] list2.#Sub: undefined field b:
+      //     ./in.cue:30:13
+    }
+    #Sub: (_|_){
+      // [incomplete] list2.#Sub: undefined field b:
+      //     ./in.cue:30:13
+    }
+    a: (struct){
+    }
+  }
+  value1: (struct){
+    a: (_|_){
+      // [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
+      //     ./in.cue:35:8
+    }
+  }
+  value2: (_|_){
+    // [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
+    //     ./in.cue:39:5
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  list1: {
+    Out1: 〈import;list〉.FlattenN(〈0;Top〉, 1)
+    Out2: ([
+      ...,
+    ] & 〈import;list〉.FlattenN(〈0;Top〉, 1))
+    Out3: (〈import;list〉.FlattenN(〈0;Top〉, 1) & [
+      ...,
+    ])
+    Top: [
+      [
+        for _, F in 〈0;_Sub〉 {
+          〈1;F〉
+        },
+      ],
+    ]
+    _Sub: 〈0;a〉.b
+    a: {}
+  }
+  list2: {
+    Out1: 〈import;list〉.FlattenN(〈0;_Top〉, 1)
+    Out2: ([
+      ...,
+    ] & 〈import;list〉.FlattenN(〈0;_Top〉, 1))
+    Out3: (〈import;list〉.FlattenN(〈0;_Top〉, 1) & [
+      ...,
+    ])
+    _Top: [
+      for _, F in 〈0;#Sub〉 {
+        〈1;F〉
+      },
+    ]
+    #Sub: 〈0;a〉.b
+    a: {}
+  }
+  value1: {
+    a: len(('sf'|'dd'))
+  }
+  value2: {
+    len(('sf'|'dd'))
+  }
+}

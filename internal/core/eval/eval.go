@@ -147,7 +147,7 @@ func (e *Evaluator) Eval(v *adt.Vertex) errors.Error {
 //
 // TODO: return *adt.Vertex
 func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
-	var resultValue adt.Value
+	var result adt.Vertex
 
 	if b, _ := v.Value.(*adt.Bottom); b != nil {
 		return b
@@ -159,10 +159,14 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 		s := e.evalVertex(c, v, adt.Partial, nil)
 		defer e.freeSharedNode(s)
 
-		resultValue = v.Value
-		if s.result_.Value != nil {
+		result = *v
+
+		if s.result_.Value != nil { // There is a complete result.
 			*v = s.result_
-			resultValue = v.Value
+			result = *v
+		} else if b, ok := v.Value.(*adt.Bottom); ok {
+			*v = save
+			return b
 		} else {
 			*v = save
 		}
@@ -218,7 +222,7 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 			return d
 		}
 
-		err, _ := resultValue.(*adt.Bottom)
+		err, _ := result.Value.(*adt.Bottom)
 		// BEFORE RESTORING, copy the value to return one
 		// with the temporary arcs.
 		if !s.done() && (err == nil || err.IsIncomplete()) {
@@ -241,7 +245,7 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 	// gets the concrete value.
 	//
 	if v.Value == nil {
-		return resultValue
+		return &result
 	}
 	return v
 }
@@ -515,7 +519,6 @@ func (n *nodeContext) postDisjunct(state adt.VertexStatus) {
 		n.node.UpdateStatus(adt.Partial)
 
 		// Either set to Conjunction or error.
-		var v adt.Value = n.node.Value
 		// TODO: verify and simplify the below code to determine whether
 		// something is a struct.
 		markStruct := false
@@ -524,11 +527,15 @@ func (n *nodeContext) postDisjunct(state adt.VertexStatus) {
 		} else if len(n.node.Structs) > 0 {
 			markStruct = n.kind&adt.StructKind != 0 && !n.hasTop
 		}
-		if v == nil && markStruct {
+		v := n.node.ActualValue()
+		if n.node.Value == nil && markStruct {
 			n.node.Value = &adt.StructMarker{}
 			v = n.node
 		}
 		if v != nil && adt.IsConcrete(v) {
+			// Also check when we already have errors as we may find more
+			// serious errors and would like to know about all errors anyway.
+
 			if n.lowerBound != nil {
 				if b := ctx.Validate(n.lowerBound, v); b != nil {
 					// TODO(errors): make Validate return boolean and generate
@@ -603,12 +610,14 @@ func (n *nodeContext) completeArcs(state adt.VertexStatus) {
 	ctx := n.ctx
 
 	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
-		n.node.Value = adt.CombineErrors(nil, n.node.Value, &adt.Bottom{
-			Code:  adt.StructuralCycleError,
-			Err:   ctx.Newf("structural cycle"),
-			Value: n.node.Value,
-			// TODO: probably, this should have the referenced arc.
-		})
+		n.node.Value = adt.CombineErrors(nil,
+			n.node.ActualValue(),
+			&adt.Bottom{
+				Code:  adt.StructuralCycleError,
+				Err:   ctx.Newf("structural cycle"),
+				Value: n.node.ActualValue(),
+				// TODO: probably, this should have the referenced arc.
+			})
 	} else {
 		// Visit arcs recursively to validate and compute error.
 		for _, a := range n.node.Arcs {
@@ -978,7 +987,7 @@ func (n *nodeContext) getErr() *adt.Bottom {
 }
 
 // getValidators sets the vertex' Value in case there was no concrete value.
-func (n *nodeContext) getValidators() adt.Value {
+func (n *nodeContext) getValidators() adt.BaseValue {
 	ctx := n.ctx
 
 	a := []adt.Value{}
@@ -1013,7 +1022,7 @@ func (n *nodeContext) getValidators() adt.Value {
 		a = append(a, &adt.BasicType{K: n.kind})
 	}
 
-	var v adt.Value
+	var v adt.BaseValue
 	switch len(a) {
 	case 0:
 		// Src is the combined input.
@@ -1123,7 +1132,8 @@ func (n *nodeContext) addExprConjunct(v adt.Conjunct) {
 	}
 }
 
-// evalExpr is only called by addExprConjunct.
+// evalExpr is only called by addExprConjunct. If an error occurs, it records
+// the error in n and returns nil.
 func (n *nodeContext) evalExpr(v adt.Conjunct) {
 	// Require an Environment.
 	ctx := n.ctx
@@ -1409,6 +1419,9 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 		// TODO: evaluate value?
 		switch v := x.Value.(type) {
+		default:
+			panic("invalid value")
+
 		case *adt.ListMarker:
 			n.vLists = append(n.vLists, x)
 			return
@@ -1429,7 +1442,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 			closedInfo(n.node).insertFieldSet(id, &opt)
 
-		default:
+		case adt.Value:
 			n.addValueConjunct(env, v, id)
 
 			// TODO: this would not be necessary if acceptor.isClose were
@@ -1922,7 +1935,8 @@ func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr, anID a
 
 		for _, a := range elems {
 			if a.Conjuncts == nil {
-				n.insertField(a.Label, adt.MakeConjunct(nil, a.Value, 0))
+				x := a.Value.(adt.Value)
+				n.insertField(a.Label, adt.MakeConjunct(nil, x, 0))
 				continue
 			}
 			for _, c := range a.Conjuncts {
@@ -1933,9 +1947,6 @@ func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr, anID a
 
 outer:
 	for i, l := range n.lists {
-		oneOfTheLists = l.list
-		anID = l.id
-
 		n.updateCyclicStatus(l.env)
 
 		index := int64(0)
@@ -1953,6 +1964,7 @@ outer:
 				hasComprehension = true
 				if err != nil {
 					n.addBottom(err)
+					continue outer
 				}
 
 			case *adt.Ellipsis:
@@ -1975,6 +1987,9 @@ outer:
 				continue outer
 			}
 		}
+
+		oneOfTheLists = l.list
+		anID = l.id
 
 		switch closed := n.lists[i].elipsis == nil; {
 		case int(index) < max:

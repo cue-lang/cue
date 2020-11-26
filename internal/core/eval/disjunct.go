@@ -137,14 +137,13 @@ func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 		if !ok {
 			err = n.getErr()
 		}
-		_ = ok
 		if err == nil {
+			// TODO(disjuncts): Is this always correct? Especially for partial
+			// evaluation it is okay for child errors to have incomplete errors.
+			// Perhaps introduce an Err() method.
 			err = x.ChildErrors
 		}
 		if err != nil {
-			if Debug {
-				// fmt.Println(err)
-			}
 			n.disjunctErrs = append(n.disjunctErrs, err)
 		}
 		return n.isFinal

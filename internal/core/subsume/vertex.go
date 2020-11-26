@@ -15,6 +15,8 @@
 package subsume
 
 import (
+	"fmt"
+
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/export"
 )
@@ -65,8 +67,8 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 			return false
 		}
 
-	default:
-		if !s.values(v, y.Value) {
+	case adt.Value:
+		if !s.values(v, y.ActualValue()) {
 			return false
 		}
 
@@ -74,6 +76,9 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		if final {
 			return true
 		}
+
+	default:
+		panic(fmt.Sprintf("unexpected type %T", v))
 	}
 
 	xClosed := x.IsClosed(ctx) && !s.IgnoreClosedness

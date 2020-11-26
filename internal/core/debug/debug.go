@@ -193,15 +193,15 @@ func (w *printer) node(n adt.Node) {
 			// 	// return
 			// }
 
-		default:
+		case adt.Value:
 			if len(x.Arcs) == 0 {
 				w.string(" ")
-				w.node(x.Value)
+				w.node(v)
 				w.string(" }")
 				return
 			}
 			w.string("\n")
-			w.node(x.Value)
+			w.node(v)
 		}
 
 		for _, a := range x.Arcs {

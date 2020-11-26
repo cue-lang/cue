@@ -45,7 +45,7 @@ const (
 // IsConcrete returns whether a value is concrete.
 func IsConcrete(v Value) bool {
 	if x, ok := v.(*Vertex); ok {
-		v = x.Value
+		return x.IsConcrete()
 	}
 	if v == nil {
 		return false

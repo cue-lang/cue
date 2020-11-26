@@ -69,8 +69,8 @@ loop1:
 	// 		return false
 	// 	}
 
-	v, ok1 := x.Value.(adt.Value)
-	w, ok2 := y.Value.(adt.Value)
+	v, ok1 := x.BaseValue.(adt.Value)
+	w, ok2 := y.BaseValue.(adt.Value)
 	if !ok1 && !ok2 {
 		return true // both are struct or list.
 	}

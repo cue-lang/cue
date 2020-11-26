@@ -977,7 +977,7 @@ func (x *Builtin) validate(c *OpContext, v Value) *Bottom {
 
 func bottom(v Value) *Bottom {
 	if x, ok := v.(*Vertex); ok {
-		v = x.ActualValue()
+		v = x.Value()
 	}
 	b, _ := v.(*Bottom)
 	return b
@@ -1191,8 +1191,8 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 		// TODO: only needed if value label != _
 
 		b := &Vertex{
-			Label: x.Value,
-			Value: a,
+			Label:     x.Value,
+			BaseValue: a,
 		}
 		n.Arcs = append(n.Arcs, b)
 

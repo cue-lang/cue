@@ -30,7 +30,7 @@ var lenBuiltin = &adt.Builtin{
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		v := args[0]
 		if x, ok := v.(*adt.Vertex); ok {
-			switch x.Value.(type) {
+			switch x.BaseValue.(type) {
 			case nil:
 				// This should not happen, but be defensive.
 				return c.NewErrf("unevaluated vertex")
@@ -48,7 +48,7 @@ var lenBuiltin = &adt.Builtin{
 				return c.NewInt64(int64(n), v)
 
 			default:
-				v = x.ActualValue()
+				v = x.Value()
 			}
 		}
 
@@ -82,7 +82,7 @@ var closeBuiltin = &adt.Builtin{
 			return s
 		}
 		v := *s
-		v.Value = &adt.StructMarker{NeedClose: true}
+		v.BaseValue = &adt.StructMarker{NeedClose: true}
 		return &v
 	},
 }
@@ -98,7 +98,7 @@ var andBuiltin = &adt.Builtin{
 		}
 		a := []adt.Value{}
 		for _, c := range list {
-			a = append(a, c.ActualValue())
+			a = append(a, c.Value())
 		}
 		return &adt.Conjunction{Values: a}
 	},

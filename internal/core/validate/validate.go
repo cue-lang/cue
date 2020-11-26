@@ -67,7 +67,7 @@ func (v *validator) add(b *adt.Bottom) {
 func (v *validator) validate(x *adt.Vertex) {
 	defer v.ctx.PopArc(v.ctx.PushArc(x))
 
-	if b, _ := x.Value.(*adt.Bottom); b != nil {
+	if b, _ := x.BaseValue.(*adt.Bottom); b != nil {
 		switch b.Code {
 		case adt.CycleError:
 			if v.checkConcrete() || v.DisallowCycles {
@@ -89,7 +89,7 @@ func (v *validator) validate(x *adt.Vertex) {
 	} else if v.checkConcrete() {
 		x := x.Default()
 		if !adt.IsConcrete(x) {
-			x := x.ActualValue()
+			x := x.Value()
 			v.add(&adt.Bottom{
 				Code: adt.IncompleteError,
 				Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x)),

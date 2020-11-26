@@ -34,7 +34,7 @@ type compactPrinter struct {
 func (w *compactPrinter) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
-		if x.Value == nil || (w.cfg.Raw && !x.IsData()) {
+		if x.BaseValue == nil || (w.cfg.Raw && !x.IsData()) {
 			for i, c := range x.Conjuncts {
 				if i > 0 {
 					w.string(" & ")
@@ -44,7 +44,7 @@ func (w *compactPrinter) node(n adt.Node) {
 			return
 		}
 
-		switch v := x.Value.(type) {
+		switch v := x.BaseValue.(type) {
 		case *adt.StructMarker:
 			w.string("{")
 			for i, a := range x.Arcs {

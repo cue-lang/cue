@@ -47,7 +47,7 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 		if a, ok := a.(*adt.Vertex); ok {
 			return s.vertices(a, b)
 		}
-		if v, ok := b.Value.(adt.Value); ok {
+		if v, ok := b.BaseValue.(adt.Value); ok {
 			// Safe to ignore arcs of w.
 			return s.values(a, v)
 		}
@@ -134,7 +134,7 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 		}
 
 		// TODO: Under what conditions can we cast to the value?
-		if v, _ := x.Value.(adt.Value); v != nil {
+		if v, _ := x.BaseValue.(adt.Value); v != nil {
 			return s.values(v, b)
 		}
 		return false

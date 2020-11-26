@@ -29,7 +29,7 @@ func (e *exporter) bareValue(v adt.Value) ast.Expr {
 	case *adt.Vertex:
 		return e.vertex(x)
 	case adt.Value:
-		a := &adt.Vertex{Value: x}
+		a := &adt.Vertex{BaseValue: x}
 		return e.vertex(a)
 	default:
 		panic("unreachable")
@@ -41,7 +41,7 @@ func (e *exporter) bareValue(v adt.Value) ast.Expr {
 // value with a reference in graph mode.
 
 func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
-	switch x := n.Value.(type) {
+	switch x := n.BaseValue.(type) {
 	case nil:
 		// bare
 	case *adt.StructMarker:
@@ -333,7 +333,7 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 	}()
 
 	showRegular := false
-	switch x := v.Value.(type) {
+	switch x := v.BaseValue.(type) {
 	case *adt.StructMarker:
 		showRegular = true
 	case *adt.ListMarker:

@@ -253,7 +253,7 @@ func (m patternMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 	label := f.ToValue(c)
 	v.AddConjunct(adt.MakeRootConjunct(m.Env, label))
 	v.Finalize(c)
-	b, _ := v.Value.(*adt.Bottom)
+	b, _ := v.BaseValue.(*adt.Bottom)
 	return b == nil
 }
 

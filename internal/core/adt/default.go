@@ -43,7 +43,7 @@ func (d *Disjunction) Default() Value {
 
 // Default returns the default value or itself if there is no default.
 func (v *Vertex) Default() *Vertex {
-	switch d := v.Value.(type) {
+	switch d := v.BaseValue.(type) {
 	default:
 		return v
 
@@ -57,7 +57,7 @@ func (v *Vertex) Default() *Vertex {
 			w = d.Values[0]
 		default:
 			x := *v
-			x.Value = &Disjunction{
+			x.BaseValue = &Disjunction{
 				Src:         d.Src,
 				Values:      d.Values[:d.NumDefaults],
 				NumDefaults: 0,
@@ -79,7 +79,7 @@ func (v *Vertex) Default() *Vertex {
 
 		w := *v
 		w.Closed = nil
-		w.Value = &m
+		w.BaseValue = &m
 		return &w
 	}
 }

@@ -341,7 +341,7 @@ func (c *acceptor) InsertEmbed(at adt.ID, src adt.Node) (id adt.ID) {
 // subtree into the parent node using InsertSubtree. If not, the conjuncts can
 // just be inserted at the current ID.
 func isComplexStruct(v *adt.Vertex) bool {
-	m, _ := v.Value.(*adt.StructMarker)
+	m, _ := v.BaseValue.(*adt.StructMarker)
 	if m == nil {
 		return false
 	}

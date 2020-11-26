@@ -144,7 +144,7 @@ func Pos(n Node) token.Pos {
 
 func (x *Vertex) Concreteness() Concreteness {
 	// Depends on concreteness of value.
-	switch v := x.Value.(type) {
+	switch v := x.BaseValue.(type) {
 	case nil:
 		return Concrete // Should be indetermined.
 

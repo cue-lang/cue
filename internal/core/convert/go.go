@@ -450,7 +450,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 				if ok {
 					arc.Label = f
 				} else {
-					arc = &adt.Vertex{Label: f, Value: sub}
+					arc = &adt.Vertex{Label: f, BaseValue: sub}
 					arc.UpdateStatus(adt.Finalized)
 					arc.AddConjunct(adt.MakeRootConjunct(nil, sub))
 				}
@@ -460,7 +460,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 			return v
 
 		case reflect.Map:
-			v := &adt.Vertex{Value: &adt.StructMarker{}}
+			v := &adt.Vertex{BaseValue: &adt.StructMarker{}}
 			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()
@@ -496,7 +496,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					if ok {
 						arc.Label = f
 					} else {
-						arc = &adt.Vertex{Label: f, Value: sub}
+						arc = &adt.Vertex{Label: f, BaseValue: sub}
 						arc.UpdateStatus(adt.Finalized)
 						arc.AddConjunct(adt.MakeRootConjunct(nil, sub))
 					}

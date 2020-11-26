@@ -36,7 +36,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		y = y.Default()
 	}
 
-	if b, _ := y.Value.(*adt.Bottom); b != nil {
+	if b, _ := y.BaseValue.(*adt.Bottom); b != nil {
 		// If the value is incomplete, the error is not final. So either check
 		// structural equivalence or return an error.
 		return !b.IsIncomplete()
@@ -46,7 +46,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 
 	final := y.IsData() || s.Final
 
-	switch v := x.Value.(type) {
+	switch v := x.BaseValue.(type) {
 	case *adt.Bottom:
 		return false
 
@@ -62,13 +62,13 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		return true
 
 	case *adt.StructMarker:
-		_, ok := y.Value.(*adt.StructMarker)
+		_, ok := y.BaseValue.(*adt.StructMarker)
 		if !ok {
 			return false
 		}
 
 	case adt.Value:
-		if !s.values(v, y.ActualValue()) {
+		if !s.values(v, y.Value()) {
 			return false
 		}
 

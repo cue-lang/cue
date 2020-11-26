@@ -76,7 +76,7 @@ func (v Value) eval(ctx *context) adt.Value {
 		panic("undefined value")
 	}
 	x := ctx.manifest(v.v)
-	return x.ActualValue()
+	return x.Value()
 }
 
 // func (v Value) evalFull(u value) (Value, adt.Value) {

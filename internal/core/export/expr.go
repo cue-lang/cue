@@ -280,7 +280,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 		case *adt.Vertex:
 			e.structs = append(e.structs, v.Structs...)
 
-			switch y := v.Value.(type) {
+			switch y := v.BaseValue.(type) {
 			case *adt.ListMarker:
 				a := []ast.Expr{}
 				for _, x := range v.Elems() {

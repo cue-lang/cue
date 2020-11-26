@@ -147,8 +147,8 @@ func (w *printer) node(n adt.Node) {
 	switch x := n.(type) {
 	case *adt.Vertex:
 		var kind adt.Kind
-		if x.Value != nil {
-			kind = x.Value.Kind()
+		if x.BaseValue != nil {
+			kind = x.BaseValue.Kind()
 		}
 
 		kindStr := kind.String()
@@ -166,7 +166,7 @@ func (w *printer) node(n adt.Node) {
 		w.indent += "  "
 		defer func() { w.indent = saved }()
 
-		switch v := x.Value.(type) {
+		switch v := x.BaseValue.(type) {
 		case nil:
 		case *adt.Bottom:
 			// TODO: reuse bottom.
@@ -211,7 +211,7 @@ func (w *printer) node(n adt.Node) {
 			w.node(a)
 		}
 
-		if x.Value == nil {
+		if x.BaseValue == nil {
 			w.indent += "// "
 			w.string("// ")
 			for i, c := range x.Conjuncts {

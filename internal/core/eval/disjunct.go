@@ -133,7 +133,7 @@ func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 
 	x := n.node
 	if n.hasErr() {
-		err, ok := x.Value.(*adt.Bottom)
+		err, ok := x.BaseValue.(*adt.Bottom)
 		if !ok {
 			err = n.getErr()
 		}
@@ -153,8 +153,8 @@ func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 	d := &n.nodeShared.disjunct
 
 	result := *n.node
-	if result.Value == nil {
-		result.Value = n.getValidators()
+	if result.BaseValue == nil {
+		result.BaseValue = n.getValidators()
 	}
 
 	for _, v := range d.Values {

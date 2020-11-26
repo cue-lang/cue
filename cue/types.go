@@ -565,7 +565,7 @@ type Value struct {
 }
 
 func newErrValue(v Value, b *adt.Bottom) Value {
-	node := &adt.Vertex{Value: b}
+	node := &adt.Vertex{BaseValue: b}
 	if v.v != nil {
 		node.Label = v.v.Label
 		node.Parent = v.v.Parent
@@ -635,9 +635,9 @@ func MakeValue(ctx *adt.OpContext, v adt.Value) Value {
 }
 
 func makeValue(idx *index, v *adt.Vertex) Value {
-	if v.Status() == 0 || v.Value == nil {
+	if v.Status() == 0 || v.BaseValue == nil {
 		panic(fmt.Sprintf("not properly initialized (state: %v, value: %T)",
-			v.Status(), v.Value))
+			v.Status(), v.BaseValue))
 	}
 	return Value{idx, v}
 }
@@ -656,7 +656,7 @@ func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 }
 
 func remakeFinal(base Value, env *adt.Environment, v adt.Value) Value {
-	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label, Value: v}
+	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label, BaseValue: v}
 	n.UpdateStatus(adt.Finalized)
 	return makeValue(base.idx, n)
 }
@@ -843,7 +843,7 @@ func (v Value) Kind() Kind {
 	if v.v == nil {
 		return BottomKind
 	}
-	c := v.v.Value
+	c := v.v.BaseValue
 	if !v.v.IsConcrete() {
 		return BottomKind
 	}
@@ -1061,7 +1061,7 @@ func (v Value) Source() ast.Node {
 	if len(v.v.Conjuncts) == 1 {
 		return v.v.Conjuncts[0].Source()
 	}
-	return v.v.ActualValue().Source()
+	return v.v.Value().Source()
 }
 
 // Err returns the error represented by v or nil v is not an error.
@@ -1100,7 +1100,7 @@ func (v Value) IsConcrete() bool {
 	if v.v == nil {
 		return false // any is neither concrete, not a list or struct.
 	}
-	if b, ok := v.v.Value.(*adt.Bottom); ok {
+	if b, ok := v.v.BaseValue.(*adt.Bottom); ok {
 		return !b.IsIncomplete()
 	}
 	if !adt.IsConcrete(v.v) {
@@ -1125,7 +1125,7 @@ func (v Value) Exists() bool {
 	if v.v == nil {
 		return false
 	}
-	if err, ok := v.v.Value.(*adt.Bottom); ok {
+	if err, ok := v.v.BaseValue.(*adt.Bottom); ok {
 		return err.Code != codeNotExist
 	}
 	return true
@@ -2164,15 +2164,15 @@ func (v Value) Expr() (Op, []Value) {
 	var env *adt.Environment
 
 	if v.v.IsData() {
-		expr = v.v.ActualValue()
+		expr = v.v.Value()
 
 	} else {
 		switch len(v.v.Conjuncts) {
 		case 0:
-			if v.v.Value == nil {
+			if v.v.BaseValue == nil {
 				return NoOp, []Value{makeValue(v.idx, v.v)}
 			}
-			expr = v.v.ActualValue()
+			expr = v.v.Value()
 
 		case 1:
 			// the default case, processed below.

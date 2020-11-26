@@ -178,9 +178,9 @@ type Vertex struct {
 	// SelfCount is used for tracking self-references.
 	SelfCount int
 
-	// Value is the value associated with this vertex. For lists and structs
+	// BaseValue is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
-	Value BaseValue
+	BaseValue BaseValue
 
 	// ChildErrors is the collection of all errors of children.
 	ChildErrors *Bottom
@@ -249,17 +249,17 @@ func (v *Vertex) UpdateStatus(s VertexStatus) {
 	if v.status > s+1 {
 		panic(fmt.Sprintf("attempt to regress status from %d to %d", v.Status(), s))
 	}
-	if s == Finalized && v.Value == nil {
+	if s == Finalized && v.BaseValue == nil {
 		// panic("not finalized")
 	}
 	v.status = s
 }
 
-// ActualValue returns the Value of v without definitions if it is a scalar
+// Value returns the Value of v without definitions if it is a scalar
 // or itself otherwise.
-func (v *Vertex) ActualValue() Value {
+func (v *Vertex) Value() Value {
 	// TODO: rename to Value.
-	switch x := v.Value.(type) {
+	switch x := v.BaseValue.(type) {
 	case nil:
 		return nil
 	case *StructMarker, *ListMarker:
@@ -267,7 +267,7 @@ func (v *Vertex) ActualValue() Value {
 	case Value:
 		return x
 	default:
-		panic(fmt.Sprintf("unexpected type %T", v.Value))
+		panic(fmt.Sprintf("unexpected type %T", v.BaseValue))
 	}
 }
 
@@ -302,7 +302,7 @@ func (v *Vertex) ToDataAll() *Vertex {
 	}
 	w := *v
 
-	w.Value = toDataAll(w.Value)
+	w.BaseValue = toDataAll(w.BaseValue)
 	w.Arcs = arcs
 	w.isData = true
 	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
@@ -352,7 +352,7 @@ func toDataAll(v BaseValue) BaseValue {
 
 func (v *Vertex) IsErr() bool {
 	// if v.Status() > Evaluating {
-	if _, ok := v.Value.(*Bottom); ok {
+	if _, ok := v.BaseValue.(*Bottom); ok {
 		return true
 	}
 	// }
@@ -361,7 +361,7 @@ func (v *Vertex) IsErr() bool {
 
 func (v *Vertex) Err(c *OpContext, state VertexStatus) *Bottom {
 	c.Unify(c, v, state)
-	if b, ok := v.Value.(*Bottom); ok {
+	if b, ok := v.BaseValue.(*Bottom); ok {
 		return b
 	}
 	return nil
@@ -374,12 +374,12 @@ func (v *Vertex) Finalize(c *OpContext) {
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
-	v.Value = CombineErrors(nil, v.ActualValue(), b)
+	v.BaseValue = CombineErrors(nil, v.Value(), b)
 	v.UpdateStatus(Finalized)
 }
 
 func (v *Vertex) SetValue(ctx *OpContext, state VertexStatus, value BaseValue) *Bottom {
-	v.Value = value
+	v.BaseValue = value
 	v.UpdateStatus(state)
 	return nil
 }
@@ -391,8 +391,8 @@ func ToVertex(v Value) *Vertex {
 		return x
 	default:
 		n := &Vertex{
-			status: Finalized,
-			Value:  x,
+			status:    Finalized,
+			BaseValue: x,
 		}
 		n.AddConjunct(MakeRootConjunct(nil, v))
 		return n
@@ -406,7 +406,7 @@ func Unwrap(v Value) Value {
 	if !ok {
 		return v
 	}
-	return x.ActualValue()
+	return x.Value()
 }
 
 // Acceptor is a single interface that reports whether feature f is a valid
@@ -443,10 +443,10 @@ const (
 func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
 	// not known at this time what the type is.
-	if v.Value == nil {
+	if v.BaseValue == nil {
 		return TopKind
 	}
-	return v.Value.Kind()
+	return v.BaseValue.Kind()
 }
 
 func (v *Vertex) OptionalTypes() OptionalType {
@@ -461,7 +461,7 @@ func (v *Vertex) OptionalTypes() OptionalType {
 }
 
 func (v *Vertex) IsClosed(ctx *OpContext) bool {
-	switch x := v.Value.(type) {
+	switch x := v.BaseValue.(type) {
 	case *ListMarker:
 		// TODO: use one mechanism.
 		if x.IsOpen {
@@ -505,7 +505,7 @@ func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
 }
 
 func (v *Vertex) IsList() bool {
-	_, ok := v.Value.(*ListMarker)
+	_, ok := v.BaseValue.(*ListMarker)
 	return ok
 }
 
@@ -547,7 +547,7 @@ func (v *Vertex) Source() ast.Node { return nil }
 
 // AddConjunct adds the given Conjuncts to v if it doesn't already exist.
 func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
-	if v.Value != nil {
+	if v.BaseValue != nil {
 		// TODO: investigate why this happens at all. Removing it seems to
 		// change the order of fields in some cases.
 		//

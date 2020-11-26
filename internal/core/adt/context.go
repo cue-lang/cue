@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"os"
 	"reflect"
 	"regexp"
 
@@ -27,6 +28,36 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 )
+
+// Debug sets whether extra aggressive checking should be done.
+// This should typically default to true for pre-releases and default to
+// false otherwise.
+var Debug bool = os.Getenv("CUE_DEBUG") != "0"
+
+// Assert panics if the condition is false. Assert can be used to check for
+// conditions that are considers to break an internal variant or unexpected
+// condition, but that nonetheless probably will be handled correctly down the
+// line. For instance, a faulty condition could lead to to error being caught
+// down the road, but resulting in an inaccurate error message. In production
+// code it is better to deal with the bad error message than to panic.
+//
+// It is advisable for each use of Assert to document how the error is expected
+// to be handled down the line.
+func Assert(name string, b bool) {
+	if Debug && !b {
+		panic("assertion failed: " + name)
+	}
+}
+
+// Assertf either panics or reports an error to c if the condition is not met.
+func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interface{}) {
+	if !b {
+		if Debug {
+			panic(fmt.Sprintf("assertion failed: "+format, args...))
+		}
+		c.addErrf(0, pos, format, args...)
+	}
+}
 
 // A Unifier implements a strategy for CUE's unification operation. It must
 // handle the following aspects of CUE evaluation:
@@ -658,6 +689,10 @@ func (c *OpContext) node(x Expr, scalar bool) *Vertex {
 		return emptyNode
 
 	case *StructMarker, *ListMarker:
+		if node == nil {
+			Assert("unexpected markers with nil node", false)
+			return emptyNode
+		}
 
 	default:
 		if v.Kind()&StructKind != 0 {

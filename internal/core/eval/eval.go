@@ -1068,13 +1068,14 @@ type envList struct {
 
 func (n *nodeContext) addBottom(b *adt.Bottom) {
 	n.errs = adt.CombineErrors(nil, n.errs, b)
+	// TODO(errors): consider doing this
+	// n.kindExpr = n.errs
+	// n.kind = 0
 }
 
 func (n *nodeContext) addErr(err errors.Error) {
 	if err != nil {
-		n.errs = adt.CombineErrors(nil, n.errs, &adt.Bottom{
-			Err: err,
-		})
+		n.addBottom(&adt.Bottom{Err: err})
 	}
 }
 

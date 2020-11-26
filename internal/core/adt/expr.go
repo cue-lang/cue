@@ -875,11 +875,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 		return err
 	}
 
-	value := BinOp(c, x.Op, left, right)
-	if n, ok := value.(*Vertex); ok && n.IsList() {
-		n.UpdateStatus(Partial)
-	}
-	return value
+	return BinOp(c, x.Op, left, right)
 }
 
 // A CallExpr represents a call to a builtin.

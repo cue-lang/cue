@@ -572,23 +572,6 @@ func appendPath(a []Feature, v *Vertex) []Feature {
 	return a
 }
 
-func (v *Vertex) appendListArcs(arcs []*Vertex) (err *Bottom) {
-	for _, a := range arcs {
-		// TODO(list): BUG this only works if lists do not have definitions
-		// fields.
-		label, err := MakeLabel(a.Source(), int64(len(v.Arcs)), IntLabel)
-		if err != nil {
-			return &Bottom{Src: a.Source(), Err: err}
-		}
-		v.Arcs = append(v.Arcs, &Vertex{
-			Parent:    v,
-			Label:     label,
-			Conjuncts: a.Conjuncts,
-		})
-	}
-	return nil
-}
-
 // An Conjunct is an Environment-Expr pair. The Environment is the starting
 // point for reference lookup for any reference contained in X.
 type Conjunct struct {

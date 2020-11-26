@@ -183,20 +183,36 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			return c.newBytes(b)
 
 		case leftKind == ListKind && rightKind == ListKind:
-			a := c.Elems(left)
-			b := c.Elems(right)
+			// TODO: get rid of list addition. Semantically it is somewhat
+			// unclear and, as it turns out, it is also hard to get right.
+			// Simulate addition with comprehensions now.
 			if err := c.Err(); err != nil {
 				return err
 			}
-			n := c.newList(c.src, nil)
-			if err := n.appendListArcs(a); err != nil {
-				return err
+
+			x := MakeIdentLabel(c, "x", "")
+
+			forClause := func(src Expr) *ForClause {
+				return &ForClause{
+					Value: x,
+					Src:   src,
+					Dst: &ValueClause{&StructLit{Decls: []Decl{
+						&FieldReference{UpCount: 1, Label: x},
+					}}},
+				}
 			}
-			if err := n.appendListArcs(b); err != nil {
-				return err
+
+			list := &ListLit{
+				Elems: []Elem{
+					forClause(left),
+					forClause(right),
+				},
 			}
-			// n.isList = true
-			// n.IsClosed = true
+
+			n := &Vertex{}
+			n.AddConjunct(MakeRootConjunct(c.Env(0), list))
+			n.Finalize(c)
+
 			return n
 		}
 
@@ -230,21 +246,30 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			fallthrough
 
 		case leftKind == IntKind && rightKind == ListKind:
-			a := c.Elems(right)
-			n := c.newList(c.src, nil)
-			// n.IsClosed = true
-			index := int64(0)
+			// TODO: get rid of list multiplication.
+
+			list := &ListLit{}
+			x := MakeIdentLabel(c, "x", "")
+
 			for i := c.uint64(left, "list multiplier"); i > 0; i-- {
-				for _, a := range a {
-					f, _ := MakeLabel(a.Source(), index, IntLabel)
-					n.Arcs = append(n.Arcs, &Vertex{
-						Parent:    n,
-						Label:     f,
-						Conjuncts: a.Conjuncts,
-					})
-					index++
-				}
+				list.Elems = append(list.Elems,
+					&ForClause{
+						Value: x,
+						Src:   right,
+						Dst: &ValueClause{&StructLit{Decls: []Decl{
+							&FieldReference{UpCount: 1, Label: x},
+						}}},
+					},
+				)
 			}
+			if err := c.Err(); err != nil {
+				return err
+			}
+
+			n := &Vertex{}
+			n.AddConjunct(MakeRootConjunct(c.Env(0), list))
+			n.Finalize(c)
+
 			return n
 		}
 

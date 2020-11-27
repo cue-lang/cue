@@ -709,7 +709,8 @@ func (c *OpContext) node(x Expr, scalar bool) *Vertex {
 			return emptyNode
 		}
 	}
-	return node.Default()
+
+	return node
 }
 
 // Elems returns the elements of a list.

@@ -312,6 +312,17 @@ func TestValues(t *testing.T) {
 		// 447: {subsumes: true, in: `a: {}, b: close({})`, mode: subNoOptional},
 		// 448: {subsumes: true, in: `a: {}, b: close({foo?: 1})`, mode: subNoOptional},
 
+		// embedded scalars
+		460: {subsumes: true, in: `a: {1, #foo: number}, b: {1, #foo: 1}`},
+		461: {subsumes: true, in: `a: {1, #foo?: number}, b: {1, #foo: 1}`},
+		462: {subsumes: true, in: `a: {1, #foo?: number}, b: {1, #foo?: 1}`},
+		463: {subsumes: false, in: `a: {1, #foo: number}, b: {1, #foo?: 1}`},
+
+		464: {subsumes: true, in: `a: {int, #foo: number}, b: {1, #foo: 1}`},
+		465: {subsumes: false, in: `a: {int, #foo: 1}, b: {1, #foo: number}`},
+		466: {subsumes: false, in: `a: {1, #foo: number}, b: {int, #foo: 1}`},
+		467: {subsumes: false, in: `a: {1, #foo: 1}, b: {int, #foo: number}`},
+
 		// Lists
 		506: {subsumes: true, in: `a: [], b: [] `},
 		507: {subsumes: true, in: `a: [1], b: [1] `},

@@ -76,7 +76,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
 			// n := c.newNum()
-			return cmpTonode(c, op, c.num(left, op).X.Cmp(&c.num(right, op).X))
+			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
 		case leftKind == ListKind && rightKind == ListKind:
 			x := c.Elems(left)
@@ -114,7 +114,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
 			// n := c.newNum()
-			return cmpTonode(c, op, c.num(left, op).X.Cmp(&c.num(right, op).X))
+			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 
 		case leftKind == ListKind && rightKind == ListKind:
 			x := c.Elems(left)
@@ -143,7 +143,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 		case leftKind&NumKind != 0 && rightKind&NumKind != 0:
 			// n := c.newNum(left, right)
-			return cmpTonode(c, op, c.num(left, op).X.Cmp(&c.num(right, op).X))
+			return cmpTonode(c, op, c.Num(left, op).X.Cmp(&c.Num(right, op).X))
 		}
 
 	case BoolAndOp:
@@ -284,38 +284,38 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 	case IntDivideOp:
 		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			y := c.num(right, op)
+			y := c.Num(right, op)
 			if y.X.IsZero() {
 				return c.NewErrf("division by zero")
 			}
-			return intOp(c, (*big.Int).Div, c.num(left, op), y)
+			return intOp(c, (*big.Int).Div, c.Num(left, op), y)
 		}
 
 	case IntModuloOp:
 		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			y := c.num(right, op)
+			y := c.Num(right, op)
 			if y.X.IsZero() {
 				return c.NewErrf("division by zero")
 			}
-			return intOp(c, (*big.Int).Mod, c.num(left, op), y)
+			return intOp(c, (*big.Int).Mod, c.Num(left, op), y)
 		}
 
 	case IntQuotientOp:
 		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			y := c.num(right, op)
+			y := c.Num(right, op)
 			if y.X.IsZero() {
 				return c.NewErrf("division by zero")
 			}
-			return intOp(c, (*big.Int).Quo, c.num(left, op), y)
+			return intOp(c, (*big.Int).Quo, c.Num(left, op), y)
 		}
 
 	case IntRemainderOp:
 		if leftKind&IntKind != 0 && rightKind&IntKind != 0 {
-			y := c.num(right, op)
+			y := c.Num(right, op)
 			if y.X.IsZero() {
 				return c.NewErrf("division by zero")
 			}
-			return intOp(c, (*big.Int).Rem, c.num(left, op), y)
+			return intOp(c, (*big.Int).Rem, c.Num(left, op), y)
 		}
 	}
 
@@ -346,8 +346,8 @@ type numFunc func(z, x, y *apd.Decimal) (apd.Condition, error)
 
 func numOp(c *OpContext, fn numFunc, a, b Value, op Op) Value {
 	var d apd.Decimal
-	x := c.num(a, op)
-	y := c.num(b, op)
+	x := c.Num(a, op)
+	y := c.Num(b, op)
 	cond, err := fn(&d, &x.X, &y.X)
 	if err != nil {
 		return c.NewErrf("failed arithmetic: %v", err)
@@ -359,7 +359,7 @@ func numOp(c *OpContext, fn numFunc, a, b Value, op Op) Value {
 	if k == 0 {
 		k = FloatKind
 	}
-	return c.newNum(&d, k)
+	return c.NewNum(&d, k)
 }
 
 type intFunc func(z, x, y *big.Int) *big.Int
@@ -381,5 +381,5 @@ func intOp(c *OpContext, fn intFunc, a, b *Num) Value {
 		d.Coeff.Neg(&d.Coeff)
 		d.Negative = true
 	}
-	return c.newNum(&d, IntKind)
+	return c.NewNum(&d, IntKind)
 }

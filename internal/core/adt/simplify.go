@@ -133,23 +133,23 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case diff == 1:
 			if k&FloatKind == 0 {
 				if x.Op == GreaterEqualOp && y.Op == LessThanOp {
-					return ctx.newNum(&lo, k&NumKind, x, y)
+					return ctx.NewNum(&lo, k&NumKind, x, y)
 				}
 				if x.Op == GreaterThanOp && y.Op == LessEqualOp {
-					return ctx.newNum(&hi, k&NumKind, x, y)
+					return ctx.NewNum(&hi, k&NumKind, x, y)
 				}
 			}
 
 		case diff == 2:
 			if k&FloatKind == 0 && x.Op == GreaterThanOp && y.Op == LessThanOp {
 				_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &lo)
-				return ctx.newNum(&d, k&NumKind, x, y)
+				return ctx.NewNum(&d, k&NumKind, x, y)
 
 			}
 
 		case diff == 0:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
-				return ctx.newNum(&lo, k&NumKind, x, y)
+				return ctx.NewNum(&lo, k&NumKind, x, y)
 			}
 			fallthrough
 

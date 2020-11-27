@@ -740,7 +740,7 @@ func (c *OpContext) scalar(v Value) Value {
 
 var zero = &Num{K: NumKind}
 
-func (c *OpContext) num(v Value, as interface{}) *Num {
+func (c *OpContext) Num(v Value, as interface{}) *Num {
 	v = Unwrap(v)
 	if isError(v) {
 		return zero
@@ -930,7 +930,9 @@ func (c *OpContext) regexp(v Value) *regexp.Regexp {
 	}
 }
 
-func (c *OpContext) newNum(d *apd.Decimal, k Kind, sources ...Node) Value {
+// NewNum creates a new number of the given kind. It reports an error value
+// instead if any error occurred.
+func (c *OpContext) NewNum(d *apd.Decimal, k Kind, sources ...Node) Value {
 	if c.HasErr() {
 		return c.Err()
 	}

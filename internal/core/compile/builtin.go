@@ -15,8 +15,11 @@
 package compile
 
 import (
+	"math/big"
+
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"github.com/cockroachdb/apd/v2"
 )
 
 // This file contains predeclared builtins.
@@ -134,4 +137,91 @@ var orBuiltin = &adt.Builtin{
 		c.Unify(c, v, adt.Finalized)
 		return v
 	},
+}
+
+var divBuiltin = &adt.Builtin{
+	Name:   "div",
+	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Result: adt.IntKind,
+	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+		const name = "argument to div builtin"
+
+		return intDivOp(c, (*big.Int).Div, name, args)
+	},
+}
+
+var modBuiltin = &adt.Builtin{
+	Name:   "mod",
+	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Result: adt.IntKind,
+	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+		const name = "argument to mod builtin"
+
+		return intDivOp(c, (*big.Int).Mod, name, args)
+	},
+}
+
+var quoBuiltin = &adt.Builtin{
+	Name:   "quo",
+	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Result: adt.IntKind,
+	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+		const name = "argument to quo builtin"
+
+		return intDivOp(c, (*big.Int).Quo, name, args)
+	},
+}
+
+var remBuiltin = &adt.Builtin{
+	Name:   "rem",
+	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Result: adt.IntKind,
+	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
+		const name = "argument to rem builtin"
+
+		return intDivOp(c, (*big.Int).Rem, name, args)
+	},
+}
+
+var apdCtx apd.Context
+
+func init() {
+	apdCtx = apd.BaseContext
+	apdCtx.Precision = 24
+}
+
+type intFunc func(z, x, y *big.Int) *big.Int
+
+func intDivOp(c *adt.OpContext, fn intFunc, name string, args []adt.Value) adt.Value {
+	a := c.Num(args[0], name)
+	b := c.Num(args[1], name)
+
+	if c.HasErr() {
+		return nil
+	}
+
+	if b.X.IsZero() {
+		return c.NewErrf("division by zero")
+	}
+
+	var x, y apd.Decimal
+	_, _ = apdCtx.RoundToIntegralValue(&x, &a.X)
+	if x.Negative {
+		x.Coeff.Neg(&x.Coeff)
+	}
+	_, _ = apdCtx.RoundToIntegralValue(&y, &b.X)
+	if y.Negative {
+		y.Coeff.Neg(&y.Coeff)
+	}
+
+	var d apd.Decimal
+
+	fn(&d.Coeff, &x.Coeff, &y.Coeff)
+
+	if d.Coeff.Sign() < 0 {
+		d.Coeff.Neg(&d.Coeff)
+		d.Negative = true
+	}
+
+	return c.NewNum(&d, adt.IntKind)
 }

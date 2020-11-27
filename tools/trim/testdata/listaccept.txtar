@@ -1,0 +1,21 @@
+-- in.cue --
+deployment: [ID=_]: {
+	containers: [{}]
+}
+
+deployment: bartender: {
+	containers: [{
+		image: "gcr.io/myproj/bartender:v0.1.34"
+	}]
+}
+-- out/trim --
+== in.cue
+deployment: [ID=_]: {
+	containers: [{}]
+}
+
+deployment: bartender: {
+	containers: [{
+		image: "gcr.io/myproj/bartender:v0.1.34"
+	}]
+}

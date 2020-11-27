@@ -639,10 +639,6 @@ func (n *nodeContext) updateClosedInfo() {
 		// later. Logically we're done.
 	}
 
-	if n.node.IsList() {
-		return
-	}
-
 	a, _ := n.node.Closed.(*acceptor)
 	if a == nil {
 		if !n.node.IsList() && !n.needClose {
@@ -660,7 +656,9 @@ func (n *nodeContext) updateClosedInfo() {
 	// for Value.Unify (API).
 	ctx := n.ctx
 
-	if accept := n.nodeShared.accept; accept != nil {
+	// TODO: record the list length for the acceptor, possibly. But the
+	// length matching should already have been done.
+	if accept := n.nodeShared.accept; accept != nil && !n.node.IsList() {
 		for _, a := range n.node.Arcs {
 			if !accept.Accept(n.ctx, a.Label) {
 				label := a.Label.SelectorString(ctx)

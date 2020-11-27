@@ -1,0 +1,46 @@
+-- in.cue --
+issue595: {
+    // NOTE: this should eval with an EVAL error, not
+    // an incomplete error. See Issue #595.
+    #cfgs: [{
+        name: "foo"
+    }]
+    for cfg in #cfgs {
+        files: cfg.nam
+    }
+}
+-- out/eval --
+Errors:
+issue595.files: undefined field nam:
+    ./in.cue:8:20
+
+Result:
+(_|_){
+  // [eval]
+  issue595: (_|_){
+    // [eval]
+    #cfgs: (#list){
+      0: (#struct){
+        name: (string){ "foo" }
+      }
+    }
+    files: (_|_){
+      // [eval] issue595.files: undefined field nam:
+      //     ./in.cue:8:20
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue595: {
+    #cfgs: [
+      {
+        name: "foo"
+      },
+    ]
+    for _, cfg in 〈0;#cfgs〉 {
+      files: 〈1;cfg〉.nam
+    }
+  }
+}

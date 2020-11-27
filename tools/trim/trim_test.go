@@ -326,7 +326,9 @@ func TestX(t *testing.T) {
 
 	files := instances[0].Files
 
-	err := Files(files, inst, &Config{Trace: false})
+	err := Files(files, inst, &Config{
+		Trace: true,
+	})
 	if err != nil {
 		t.Fatal(err)
 	}

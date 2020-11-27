@@ -1,0 +1,84 @@
+-- in.cue --
+
+fatalArg: {
+    x: len("eee" + 'eee')
+}
+
+// don't call builtin for a permanent error of a child node
+fatalChild: {
+    #b: {}
+    x: and([{a: #b.c}])
+}
+
+// allow incomplete child values. The error will persist after `and` is
+// evaluated down the line. This allows the and-ing of templates that may
+// complete later.
+okIncompleteChild: {
+    b: {}
+    x: and([{a: b.c}, {b: 1}])
+}
+
+-- out/eval --
+Errors:
+fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
+    ./in.cue:3:12
+0.a: undefined field c:
+    ./in.cue:9:20
+
+Result:
+(_|_){
+  // [eval]
+  fatalArg: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
+      //     ./in.cue:3:12
+    }
+  }
+  fatalChild: (_|_){
+    // [eval]
+    #b: (#struct){
+    }
+    x: (_|_){
+      // [eval] 0.a: undefined field c:
+      //     ./in.cue:9:20
+    }
+  }
+  okIncompleteChild: (struct){
+    b: (struct){
+    }
+    x: (struct){
+      a: (_|_){
+        // [incomplete] okIncompleteChild.x.a: undefined field c:
+        //     ./in.cue:17:19
+      }
+      b: (int){ 1 }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  fatalArg: {
+    x: len(("eee" + 'eee'))
+  }
+  fatalChild: {
+    #b: {}
+    x: and([
+      {
+        a: 〈1;#b〉.c
+      },
+    ])
+  }
+  okIncompleteChild: {
+    b: {}
+    x: and([
+      {
+        a: 〈1;b〉.c
+      },
+      {
+        b: 1
+      },
+    ])
+  }
+}

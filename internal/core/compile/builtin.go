@@ -98,7 +98,7 @@ var andBuiltin = &adt.Builtin{
 		}
 		a := []adt.Value{}
 		for _, c := range list {
-			a = append(a, c.Value())
+			a = append(a, c)
 		}
 		return &adt.Conjunction{Values: a}
 	},

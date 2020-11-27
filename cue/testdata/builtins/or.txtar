@@ -1,0 +1,10 @@
+// unwrap into single value
+unwrap: or([1, 1, 1])
+
+// unique duplicate values
+unique1: or([2, 1, 1, 2])
+
+unique2: or([{a: 1}, {a: 1}, {a: 2}])
+
+// do not unique embedded scalars with differing values for child definitions.
+embed1: or([{2, #x: 1}, {2, #x: 2}])

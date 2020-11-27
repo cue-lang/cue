@@ -1,0 +1,42 @@
+-- in.cue --
+merge: and([1, 1])
+
+// ensure definitions along embedded scalars are preserved.
+embed: and([{2, #x: 1}, {2, #x: 2}])
+-- out/eval --
+Errors:
+embed.#x: conflicting values 2 and 1:
+    ./in.cue:4:21
+    ./in.cue:4:33
+
+Result:
+(_|_){
+  // [eval]
+  merge: (int){ 1 }
+  embed: (_|_){
+    // [eval]
+    #x: (_|_){
+      // [eval] embed.#x: conflicting values 2 and 1:
+      //     ./in.cue:4:21
+      //     ./in.cue:4:33
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  merge: and([
+    1,
+    1,
+  ])
+  embed: and([
+    {
+      2
+      #x: 1
+    },
+    {
+      2
+      #x: 2
+    },
+  ])
+}

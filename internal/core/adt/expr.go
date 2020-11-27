@@ -908,15 +908,11 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 			c.Assertf(pos(x.Fun), c.HasErr(),
 				"argument %d to function %s is incomplete", i, c.Str(x.Fun))
 
-		case *Vertex:
-			// Remove the path of the origin for arguments. This results in
-			// more sensible error messages: an error should refer to the call
-			// site, not the original location of the argument.
-			// TODO: alternative, explicitly mark the argument number and use
-			// that in error messages.
-			w := *v
-			w.Parent = nil
-			args = append(args, &w)
+		case *Bottom:
+			// TODO(errors): consider adding an argument index for this errors.
+			// On the other hand, this error is really not related to the
+			// argument itself, so maybe it is good as it is.
+			c.AddBottom(v)
 
 		default:
 			args = append(args, expr)

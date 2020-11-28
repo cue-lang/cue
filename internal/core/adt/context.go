@@ -637,7 +637,12 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature) *Vertex {
 			c.addErrf(code, pos, "index out of range [%d] with length %d",
 				l.Index(), len(x.Elems()))
 		} else {
-			c.addErrf(code, pos, "undefined field %s", label)
+			if code != 0 && x.Closed != nil && x.Closed.IsOptional(l) {
+				c.addErrf(code, pos,
+					"cannot reference optional field %s", label)
+			} else {
+				c.addErrf(code, pos, "undefined field %s", label)
+			}
 		}
 	}
 	return a

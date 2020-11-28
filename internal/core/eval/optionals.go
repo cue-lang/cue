@@ -66,6 +66,15 @@ func (o *fieldSet) OptionalTypes() (mask adt.OptionalType) {
 	return mask
 }
 
+func (o *fieldSet) IsOptional(label adt.Feature) bool {
+	for _, f := range o.fields {
+		if f.label == label && len(f.optional) > 0 {
+			return true
+		}
+	}
+	return false
+}
+
 type field struct {
 	label    adt.Feature
 	optional []adt.Node

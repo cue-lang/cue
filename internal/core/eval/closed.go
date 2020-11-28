@@ -126,6 +126,14 @@ func (a *acceptor) OptionalTypes() (mask adt.OptionalType) {
 	return mask
 }
 
+func (a *acceptor) IsOptional(label adt.Feature) bool {
+	optional := false
+	a.visitAllFieldSets(func(f *fieldSet) {
+		optional = optional || f.IsOptional(label)
+	})
+	return optional
+}
+
 // A disjunction acceptor represents a disjunction of all possible fields. Note
 // that this is never used in evaluation as evaluation stops at incomplete nodes
 // and a disjunction is incomplete. When the node is referenced, the original

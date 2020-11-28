@@ -426,6 +426,10 @@ type Acceptor interface {
 	// OptionalTypes returns a bit field with the type of optional constraints
 	// that are represented by this Acceptor.
 	OptionalTypes() OptionalType
+
+	// IsOptional reports whether a field is explicitly defined as optional,
+	// as opposed to whether it is allowed by a pattern constraint.
+	IsOptional(f Feature) bool
 }
 
 // OptionalType is a bit field of the type of optional constraints in use by an

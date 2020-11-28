@@ -97,7 +97,7 @@ index: {
   }
   select: (struct){
     opt: (_|_){
-      // [incomplete] select.opt: undefined field opt:
+      // [incomplete] select.opt: cannot reference optional field opt:
       //     ./in.cue:10:15
     }
     txt: (int){ 2 }
@@ -107,7 +107,7 @@ index: {
   }
   index: (struct){
     opt: (_|_){
-      // [incomplete] index.opt: undefined field opt:
+      // [incomplete] index.opt: cannot reference optional field opt:
       //     ./in.cue:17:15
     }
     txt: (int){ 2 }

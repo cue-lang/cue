@@ -1180,25 +1180,6 @@ func (p *parser) parseList() (expr ast.Expr) {
 
 	elts := p.parseListElements()
 
-	if clauses, _ := p.parseComprehensionClauses(false); clauses != nil {
-		var expr ast.Expr
-		p.assertV0(p.pos, 1, 3, "old-style list comprehensions")
-		if len(elts) != 1 {
-			p.errf(lbrack.Add(1), "list comprehension must have exactly one element")
-		}
-		if len(elts) > 0 {
-			expr = elts[0]
-		}
-		rbrack := p.expectClosing(token.RBRACK, "list comprehension")
-
-		return &ast.ListComprehension{
-			Lbrack:  lbrack,
-			Expr:    expr,
-			Clauses: clauses,
-			Rbrack:  rbrack,
-		}
-	}
-
 	if p.tok == token.ELLIPSIS {
 		ellipsis := &ast.Ellipsis{
 			Ellipsis: p.pos,
@@ -1326,7 +1307,6 @@ func (p *parser) checkExpr(x ast.Expr) ast.Expr {
 	case *ast.Interpolation:
 	case *ast.StructLit:
 	case *ast.ListLit:
-	case *ast.ListComprehension:
 	case *ast.ParenExpr:
 		panic("unreachable")
 	case *ast.SelectorExpr:

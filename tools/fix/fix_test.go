@@ -73,14 +73,6 @@ a: {
 `,
 	}, {
 		in: `
-		y: [1, 2, 3, 4]
-		a: [ x for x in y ]
-		`,
-		out: `y: [1, 2, 3, 4]
-a: [ for x in y { x } ]
-`,
-	}, {
-		in: `
 		y = foo
 		`,
 		out: `

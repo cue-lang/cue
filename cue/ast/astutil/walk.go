@@ -174,12 +174,6 @@ func walk(v visitor, node ast.Node) {
 	case *ast.Package:
 		// The package identifier isn't really an identifier. Skip it.
 
-	case *ast.ListComprehension:
-		walk(v, n.Expr)
-		for _, c := range n.Clauses {
-			walk(v, c)
-		}
-
 	case *ast.LetClause:
 		walk(v, n.Ident)
 		walk(v, n.Expr)

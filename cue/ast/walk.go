@@ -183,12 +183,6 @@ func walk(v visitor, node Node) {
 	case *Package:
 		walk(v, n.Name)
 
-	case *ListComprehension:
-		walk(v, n.Expr)
-		for _, c := range n.Clauses {
-			walk(v, c)
-		}
-
 	case *ForClause:
 		if n.Key != nil {
 			walk(v, n.Key)

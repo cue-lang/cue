@@ -143,15 +143,13 @@ package expressions
 	e: [ for x in someObject if x > 9 {
 		x
 	}]
-	e: [ for x in someObject if x > 9 { x } ]
+	e: [ for x in someObject if x > 9 {x}]
 	e: [
 		for x in someObject
-		if x > 9 { x } ]
+		if x > 9 {x}]
 	e: [
 		for x in someObject
-		if x > 9 { x // TODO(deprecated): remove!
-		}
-	]
+		if x > 9 {x}]
 
 	e: [
 		if x > 1 {},

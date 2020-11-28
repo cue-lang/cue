@@ -312,7 +312,7 @@ func (f *formatter) decl(decl ast.Decl) {
 
 		if n.Value != nil {
 			switch n.Value.(type) {
-			case *ast.ListComprehension, *ast.ListLit, *ast.StructLit:
+			case *ast.ListLit, *ast.StructLit:
 				f.expr(n.Value)
 			default:
 				f.print(indent)
@@ -669,20 +669,6 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 
 	case *ast.Ellipsis:
 		f.ellipsis(x)
-
-	case *ast.ListComprehension:
-		f.print(x.Lbrack, token.LBRACK, blank, indent)
-		f.print(blank)
-		f.walkClauseList(x.Clauses, blank)
-		f.print(blank, nooverride)
-		if _, ok := x.Expr.(*ast.StructLit); ok {
-			f.expr(x.Expr)
-		} else {
-			f.print(token.LBRACE, blank)
-			f.expr(x.Expr)
-			f.print(blank, token.RBRACE)
-		}
-		f.print(unindent, f.wsOverride(blank), x.Rbrack, token.RBRACK)
 
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))

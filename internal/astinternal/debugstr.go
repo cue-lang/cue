@@ -108,14 +108,6 @@ func DebugStr(x interface{}) (out string) {
 		}
 		return out
 
-	case *ast.ListComprehension:
-		out := "["
-		out += DebugStr(v.Expr)
-		out += " "
-		out += DebugStr(v.Clauses)
-		out += "]"
-		return out
-
 	case *ast.ForClause:
 		out := "for "
 		if v.Key != nil {

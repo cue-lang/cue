@@ -444,8 +444,7 @@ func (v *validator) validate(n ast.Node) bool {
 		}
 
 	case *ast.BinaryExpr, *ast.ParenExpr, *ast.IndexExpr, *ast.SliceExpr,
-		*ast.CallExpr, *ast.Comprehension, *ast.ListComprehension,
-		*ast.Interpolation:
+		*ast.CallExpr, *ast.Comprehension, *ast.Interpolation:
 		check(n, constraints, "expressions", true)
 
 	case *ast.Ellipsis:

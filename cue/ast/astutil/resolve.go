@@ -278,9 +278,6 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 	case *ast.Comprehension:
 		s = scopeClauses(s, x.Clauses)
 
-	case *ast.ListComprehension:
-		s = scopeClauses(s, x.Clauses)
-
 	case *ast.Field:
 		var n ast.Node = x.Label
 		alias, ok := x.Label.(*ast.Alias)

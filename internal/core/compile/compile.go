@@ -519,7 +519,7 @@ func (c *compiler) markAlias(d ast.Decl) {
 		c.insertAlias(x.Ident, a)
 
 	case *ast.Alias:
-		c.errf(x, "old-style alias no longer supported: use let clause.\nuse cue fix to update.")
+		c.errf(x, "old-style alias no longer supported: use let clause; use cue fix to update.")
 	}
 }
 
@@ -626,7 +626,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 
 	// Handled in addLetDecl.
 	case *ast.LetClause:
-	// case: *ast.Alias: // TODO(value aliases)
+	// case: *ast.Alias: // TODO(value alias)
 
 	case *ast.CommentGroup:
 		// Nothing to do for a free-floating comment group.
@@ -665,7 +665,7 @@ func (c *compiler) addLetDecl(d ast.Decl) {
 		c.updateAlias(x.Ident, expr)
 
 	case *ast.Alias:
-		c.errf(x, "old-style alias no longer supported: use let clause.\nuse cue fix to update.")
+		c.errf(x, "old-style alias no longer supported: use let clause; use cue fix to update.")
 	}
 }
 

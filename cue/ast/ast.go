@@ -601,17 +601,6 @@ type Ellipsis struct {
 	expr
 }
 
-// A ListComprehension node represents as list comprehension.
-type ListComprehension struct {
-	Lbrack  token.Pos // position of "["
-	Expr    Expr
-	Clauses []Clause  // Feed or Guard (TODO let)
-	Rbrack  token.Pos // position of "]"
-
-	comments
-	expr
-}
-
 // A ForClause node represents a for clause in a comprehension.
 type ForClause struct {
 	For token.Pos
@@ -770,34 +759,32 @@ func (x *StructLit) pos() *token.Pos {
 	return &x.Lbrace
 }
 
-func (x *ListLit) Pos() token.Pos            { return x.Lbrack }
-func (x *ListLit) pos() *token.Pos           { return &x.Lbrack }
-func (x *Ellipsis) Pos() token.Pos           { return x.Ellipsis }
-func (x *Ellipsis) pos() *token.Pos          { return &x.Ellipsis }
-func (x *ListComprehension) Pos() token.Pos  { return x.Lbrack }
-func (x *ListComprehension) pos() *token.Pos { return &x.Lbrack }
-func (x *LetClause) Pos() token.Pos          { return x.Let }
-func (x *LetClause) pos() *token.Pos         { return &x.Let }
-func (x *ForClause) Pos() token.Pos          { return x.For }
-func (x *ForClause) pos() *token.Pos         { return &x.For }
-func (x *IfClause) Pos() token.Pos           { return x.If }
-func (x *IfClause) pos() *token.Pos          { return &x.If }
-func (x *ParenExpr) Pos() token.Pos          { return x.Lparen }
-func (x *ParenExpr) pos() *token.Pos         { return &x.Lparen }
-func (x *SelectorExpr) Pos() token.Pos       { return x.X.Pos() }
-func (x *SelectorExpr) pos() *token.Pos      { return x.X.pos() }
-func (x *IndexExpr) Pos() token.Pos          { return x.X.Pos() }
-func (x *IndexExpr) pos() *token.Pos         { return x.X.pos() }
-func (x *SliceExpr) Pos() token.Pos          { return x.X.Pos() }
-func (x *SliceExpr) pos() *token.Pos         { return x.X.pos() }
-func (x *CallExpr) Pos() token.Pos           { return x.Fun.Pos() }
-func (x *CallExpr) pos() *token.Pos          { return x.Fun.pos() }
-func (x *UnaryExpr) Pos() token.Pos          { return x.OpPos }
-func (x *UnaryExpr) pos() *token.Pos         { return &x.OpPos }
-func (x *BinaryExpr) Pos() token.Pos         { return x.X.Pos() }
-func (x *BinaryExpr) pos() *token.Pos        { return x.X.pos() }
-func (x *BottomLit) Pos() token.Pos          { return x.Bottom }
-func (x *BottomLit) pos() *token.Pos         { return &x.Bottom }
+func (x *ListLit) Pos() token.Pos       { return x.Lbrack }
+func (x *ListLit) pos() *token.Pos      { return &x.Lbrack }
+func (x *Ellipsis) Pos() token.Pos      { return x.Ellipsis }
+func (x *Ellipsis) pos() *token.Pos     { return &x.Ellipsis }
+func (x *LetClause) Pos() token.Pos     { return x.Let }
+func (x *LetClause) pos() *token.Pos    { return &x.Let }
+func (x *ForClause) Pos() token.Pos     { return x.For }
+func (x *ForClause) pos() *token.Pos    { return &x.For }
+func (x *IfClause) Pos() token.Pos      { return x.If }
+func (x *IfClause) pos() *token.Pos     { return &x.If }
+func (x *ParenExpr) Pos() token.Pos     { return x.Lparen }
+func (x *ParenExpr) pos() *token.Pos    { return &x.Lparen }
+func (x *SelectorExpr) Pos() token.Pos  { return x.X.Pos() }
+func (x *SelectorExpr) pos() *token.Pos { return x.X.pos() }
+func (x *IndexExpr) Pos() token.Pos     { return x.X.Pos() }
+func (x *IndexExpr) pos() *token.Pos    { return x.X.pos() }
+func (x *SliceExpr) Pos() token.Pos     { return x.X.Pos() }
+func (x *SliceExpr) pos() *token.Pos    { return x.X.pos() }
+func (x *CallExpr) Pos() token.Pos      { return x.Fun.Pos() }
+func (x *CallExpr) pos() *token.Pos     { return x.Fun.pos() }
+func (x *UnaryExpr) Pos() token.Pos     { return x.OpPos }
+func (x *UnaryExpr) pos() *token.Pos    { return &x.OpPos }
+func (x *BinaryExpr) Pos() token.Pos    { return x.X.Pos() }
+func (x *BinaryExpr) pos() *token.Pos   { return x.X.pos() }
+func (x *BottomLit) Pos() token.Pos     { return x.Bottom }
+func (x *BottomLit) pos() *token.Pos    { return &x.Bottom }
 
 func (x *BadExpr) End() token.Pos { return x.To }
 func (x *Ident) End() token.Pos {
@@ -819,18 +806,17 @@ func (x *Ellipsis) End() token.Pos {
 	}
 	return x.Ellipsis.Add(3) // len("...")
 }
-func (x *ListComprehension) End() token.Pos { return x.Rbrack }
-func (x *LetClause) End() token.Pos         { return x.Expr.End() }
-func (x *ForClause) End() token.Pos         { return x.Source.End() }
-func (x *IfClause) End() token.Pos          { return x.Condition.End() }
-func (x *ParenExpr) End() token.Pos         { return x.Rparen.Add(1) }
-func (x *SelectorExpr) End() token.Pos      { return x.Sel.End() }
-func (x *IndexExpr) End() token.Pos         { return x.Rbrack.Add(1) }
-func (x *SliceExpr) End() token.Pos         { return x.Rbrack.Add(1) }
-func (x *CallExpr) End() token.Pos          { return x.Rparen.Add(1) }
-func (x *UnaryExpr) End() token.Pos         { return x.X.End() }
-func (x *BinaryExpr) End() token.Pos        { return x.Y.End() }
-func (x *BottomLit) End() token.Pos         { return x.Bottom.Add(1) }
+func (x *LetClause) End() token.Pos    { return x.Expr.End() }
+func (x *ForClause) End() token.Pos    { return x.Source.End() }
+func (x *IfClause) End() token.Pos     { return x.Condition.End() }
+func (x *ParenExpr) End() token.Pos    { return x.Rparen.Add(1) }
+func (x *SelectorExpr) End() token.Pos { return x.Sel.End() }
+func (x *IndexExpr) End() token.Pos    { return x.Rbrack.Add(1) }
+func (x *SliceExpr) End() token.Pos    { return x.Rbrack.Add(1) }
+func (x *CallExpr) End() token.Pos     { return x.Rparen.Add(1) }
+func (x *UnaryExpr) End() token.Pos    { return x.X.End() }
+func (x *BinaryExpr) End() token.Pos   { return x.Y.End() }
+func (x *BottomLit) End() token.Pos    { return x.Bottom.Add(1) }
 
 // ----------------------------------------------------------------------------
 // Convenience functions for Idents

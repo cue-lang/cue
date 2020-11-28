@@ -15,8 +15,21 @@ E: {
   b: c-a
   c: a+b & >=5
 }
+
+// Issue #129
+permanentlyIncompleteOperands: {
+    a: string + ":" + string
+    a: "golang/go:1.13.5"
+}
+
 -- out/eval --
-(struct){
+Errors:
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:18:8
+
+Result:
+(_|_){
+  // [eval]
   s: (string){ string }
   e1: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
@@ -42,6 +55,13 @@ E: {
       // [cycle] cycle error
     }
   }
+  permanentlyIncompleteOperands: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+      //     ./in.cue:18:8
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -56,5 +76,9 @@ E: {
     a: (〈0;c〉 - 〈0;b〉)
     b: (〈0;c〉 - 〈0;a〉)
     c: ((〈0;a〉 + 〈0;b〉) & >=5)
+  }
+  permanentlyIncompleteOperands: {
+    a: ((string + ":") + string)
+    a: "golang/go:1.13.5"
   }
 }

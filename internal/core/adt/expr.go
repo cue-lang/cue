@@ -768,7 +768,7 @@ func (x *UnaryExpr) Source() ast.Node {
 }
 
 func (x *UnaryExpr) evaluate(c *OpContext) Value {
-	if !c.concreteIsPossible(x.X) {
+	if !c.concreteIsPossible(x.Op, x.X) {
 		return nil
 	}
 	v := c.value(x.X)
@@ -838,7 +838,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 		return v
 	}
 
-	if !c.concreteIsPossible(x.X) || !c.concreteIsPossible(x.Y) {
+	if !c.concreteIsPossible(x.Op, x.X) || !c.concreteIsPossible(x.Op, x.Y) {
 		return nil
 	}
 

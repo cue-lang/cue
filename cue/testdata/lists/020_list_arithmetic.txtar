@@ -338,7 +338,7 @@ s35: [1, 2, 1, 2]
 }
 -- out/eval --
 Errors:
-l5: value can never become concrete:
+l5: invalid operand int ('*' requires concrete value):
     ./in.cue:6:12
 
 Result:
@@ -368,7 +368,7 @@ Result:
     //     ./in.cue:5:5
   }
   l5: (_|_){
-    // [eval] l5: value can never become concrete:
+    // [eval] l5: invalid operand int ('*' requires concrete value):
     //     ./in.cue:6:12
   }
   l6: (#list){

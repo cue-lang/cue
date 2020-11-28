@@ -228,10 +228,11 @@ func (c *OpContext) relLabel(upCount int32) Feature {
 	return e.DynamicLabel
 }
 
-func (c *OpContext) concreteIsPossible(x Expr) bool {
+func (c *OpContext) concreteIsPossible(op Op, x Expr) bool {
 	if v, ok := x.(Value); ok {
 		if v.Concreteness() > Concrete {
-			c.AddErrf("value can never become concrete")
+			c.AddErrf("invalid operand %s ('%s' requires concrete value)",
+				c.Str(x), op)
 			return false
 		}
 	}

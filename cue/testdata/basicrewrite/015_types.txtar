@@ -45,7 +45,7 @@ e: conflicting values int and string (mismatched types int and string):
 e2: conflicting values 1 and string (mismatched types int and string):
     ./in.cue:6:5
     ./in.cue:6:9
-b: value can never become concrete:
+b: invalid operand int ('!' requires concrete value):
     ./in.cue:7:5
 p: invalid operation +true (+ bool):
     ./in.cue:8:5
@@ -70,7 +70,7 @@ Result:
     //     ./in.cue:6:9
   }
   b: (_|_){
-    // [eval] b: value can never become concrete:
+    // [eval] b: invalid operand int ('!' requires concrete value):
     //     ./in.cue:7:5
   }
   p: (_|_){

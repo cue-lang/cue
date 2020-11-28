@@ -7,6 +7,9 @@ cue eval -e incomplete
 cmp stderr expect/incomplete/stderr
 cmp stdout expect/incomplete/stdout
 
+# Issue #384
+! cue eval foo.bar
+cmp stderr expect/foobar/stderr
 
 -- expect/nonExist/stdout --
 -- expect/nonExist/stderr --
@@ -15,6 +18,11 @@ reference "nonExist" not found:
 -- expect/incomplete/stdout --
 
 -- expect/incomplete/stderr --
+-- expect/foobar/stdout --
+
+-- expect/foobar/stderr --
+unknown file extension .bar
+-- input/ --
 -- partial.cue --
 package exitcode
 
@@ -25,6 +33,8 @@ import (
 a: 1
 
 incomplete: pkg.Settings
+
+foo: bar: "hello"
 
 -- cue.mod/pkg/foo.com/example/example.cue --
 package example

@@ -84,7 +84,7 @@ func TestScript(t *testing.T) {
 // Usage Comment out t.Skip() and set file to test.
 func TestX(t *testing.T) {
 	t.Skip()
-	const path = "./testdata/script/eval_context.txt"
+	const path = "./testdata/script/eval_e.txt"
 
 	check := func(err error) {
 		t.Helper()

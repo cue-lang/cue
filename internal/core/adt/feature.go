@@ -124,7 +124,7 @@ func (f Feature) ToValue(ctx *OpContext) Value {
 
 // StringLabel converts s to a string label.
 func (c *OpContext) StringLabel(s string) Feature {
-	return labelFromValue(c, &String{Str: s})
+	return labelFromValue(c, nil, &String{Str: s})
 }
 
 // MakeStringLabel creates a label for the given string.
@@ -162,7 +162,7 @@ func MakeIdentLabel(r StringIndexer, s, pkgpath string) Feature {
 
 const msgGround = "invalid non-ground value %s (must be concrete %s)"
 
-func labelFromValue(ctx *OpContext, v Value) Feature {
+func labelFromValue(c *OpContext, src Expr, v Value) Feature {
 	var i int64
 	var t FeatureType
 	if isError(v) {
@@ -172,39 +172,56 @@ func labelFromValue(ctx *OpContext, v Value) Feature {
 	case IntKind, NumKind:
 		x, _ := v.(*Num)
 		if x == nil {
-			ctx.addErrf(IncompleteError, pos(v), msgGround, v, "int")
+			c.addErrf(IncompleteError, pos(v), msgGround, v, "int")
 			return InvalidLabel
 		}
 		t = IntLabel
 		var err error
 		i, err = x.X.Int64()
 		if err != nil || x.K != IntKind {
-			ctx.AddErrf("invalid label %v: %v", v, err)
+			if src == nil {
+				src = v
+			}
+			c.AddErrf("invalid index %v: %v", src, err)
 			return InvalidLabel
 		}
 		if i < 0 {
-			ctx.AddErrf("invalid negative index %s", ctx.Str(x))
+			switch src.(type) {
+			case nil, *Num, *UnaryExpr:
+				// If the value is a constant, we know it is always an error.
+				// UnaryExpr is an approximation for a constant value here.
+				c.AddErrf("invalid index %s (index must be non-negative)",
+					c.Str(x))
+			default:
+				// Use a different message is it is the result of evaluation.
+				c.AddErrf("index %s out of range [%s]", c.Str(src), c.Str(x))
+			}
 			return InvalidLabel
 		}
 
 	case StringKind:
 		x, _ := v.(*String)
 		if x == nil {
-			ctx.addErrf(IncompleteError, pos(v), msgGround, v, "string")
+			c.addErrf(IncompleteError, pos(v), msgGround, v, "string")
 			return InvalidLabel
 		}
 		t = StringLabel
-		i = ctx.StringToIndex(x.Str)
+		i = c.StringToIndex(x.Str)
 
 	default:
-		ctx.AddErrf("invalid label type %v", v.Kind())
+		if src != nil {
+			c.AddErrf("invalid index %s (invalid type %v)",
+				c.Str(src), v.Kind())
+		} else {
+			c.AddErrf("invalid index type %v", v.Kind())
+		}
 		return InvalidLabel
 	}
 
 	// TODO: set position if it exists.
 	f, err := MakeLabel(nil, i, t)
 	if err != nil {
-		ctx.AddErr(err)
+		c.AddErr(err)
 	}
 	return f
 }

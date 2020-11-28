@@ -1,0 +1,23 @@
+-- in.cue --
+a: {
+    foo?: int
+
+    b: foo
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    foo?: int
+    b: 〈0;foo〉
+  }
+}
+-- out/eval --
+(struct){
+  a: (struct){
+    b: (_|_){
+      // [incomplete] a.b: undefined field foo:
+      //     ./in.cue:4:8
+    }
+  }
+}

@@ -1,0 +1,38 @@
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- in.cue --
+package exitcode
+
+import (
+	pkg "foo.com/example"
+)
+
+a: 1
+
+incomplete: pkg.Settings
+
+-- cue.mod/pkg/foo.com/example/example.cue --
+package example
+
+// An incomplete error in a package is not transferred to a
+// package that is using it.
+//
+// Issue #550
+blah: Settings.anyKey
+Settings: {}
+
+-- out/ --
+
+-- out/eval --
+(struct){
+  a: (int){ 1 }
+  incomplete: (struct){
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: 1
+  incomplete: 〈import;"foo.com/example"〉.Settings
+}

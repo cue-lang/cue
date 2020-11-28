@@ -483,27 +483,20 @@ func (n *nodeContext) postDisjunct(state adt.VertexStatus) {
 
 	default:
 		if isEvaluating(n.node) {
-			// TODO: this does not yet validate all values.
-
 			if !n.done() { // && !ctx.IsTentative() {
 				// collect incomplete errors.
-				// 	len(n.ifClauses) == 0 &&
-				// 	len(n.forClauses) == 0 &&
 				var err *adt.Bottom // n.incomplete
-				// err = n.incomplete
 				for _, d := range n.dynamicFields {
-					x, _ := ctx.Concrete(d.env, d.field.Key, "dynamic field")
-					b, _ := x.(*adt.Bottom)
-					err = adt.CombineErrors(nil, err, b)
+					err = adt.CombineErrors(nil, err, d.err)
 				}
 				for _, c := range n.forClauses {
-					f := func(env *adt.Environment, st *adt.StructLit) {}
-					err = adt.CombineErrors(nil, err, ctx.Yield(c.env, c.yield, f))
+					err = adt.CombineErrors(nil, err, c.err)
+				}
+				for _, c := range n.ifClauses {
+					err = adt.CombineErrors(nil, err, c.err)
 				}
 				for _, x := range n.exprs {
-					x, _ := ctx.Evaluate(x.Env, x.Expr())
-					b, _ := x.(*adt.Bottom)
-					err = adt.CombineErrors(nil, err, b)
+					err = adt.CombineErrors(nil, err, x.err)
 				}
 				if err == nil {
 					// safeguard.
@@ -828,7 +821,7 @@ type nodeContext struct {
 	// Expression conjuncts
 	lists  []envList
 	vLists []*adt.Vertex
-	exprs  []adt.Conjunct
+	exprs  []envExpr
 
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
@@ -1034,7 +1027,7 @@ func (n *nodeContext) getValidators() adt.BaseValue {
 		}
 
 	case 1:
-		v = a[0].(adt.Value)
+		v = a[0].(adt.Value) // remove cast
 
 	default:
 		v = &adt.Conjunction{Values: a}
@@ -1055,16 +1048,23 @@ func (n *nodeContext) maybeSetCache() {
 	}
 }
 
+type envExpr struct {
+	c   adt.Conjunct
+	err *adt.Bottom
+}
+
 type envDynamic struct {
 	env   *adt.Environment
 	field *adt.DynamicField
 	id    adt.ID
+	err   *adt.Bottom
 }
 
 type envYield struct {
 	env   *adt.Environment
 	yield adt.Yielder
 	id    adt.ID
+	err   *adt.Bottom
 }
 
 type envList struct {
@@ -1159,16 +1159,12 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 	switch x := v.Expr().(type) {
 	case adt.Resolver:
 		arc, err := ctx.Resolve(v.Env, x)
-		if err != nil {
-			if err.IsIncomplete() {
-				n.incomplete = adt.CombineErrors(nil, n.incomplete, err)
-			} else {
-				n.addBottom(err)
-				break
-			}
+		if err != nil && !err.IsIncomplete() {
+			n.addBottom(err)
+			break
 		}
 		if arc == nil {
-			n.exprs = append(n.exprs, v)
+			n.exprs = append(n.exprs, envExpr{v, err})
 			break
 		}
 
@@ -1179,7 +1175,8 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 		// Could be unify?
 		val, complete := ctx.Evaluate(v.Env, v.Expr())
 		if !complete {
-			n.exprs = append(n.exprs, v)
+			b, _ := val.(*adt.Bottom)
+			n.exprs = append(n.exprs, envExpr{v, b})
 			break
 		}
 
@@ -1668,16 +1665,16 @@ func (n *nodeContext) addStruct(
 			n.aStruct = s
 			n.aStructID = closeID
 			hasOther = x
-			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeID})
+			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeID, nil})
 			opt.AddDynamic(ctx, childEnv, x)
 
 		case *adt.ForClause:
 			hasOther = x
-			n.forClauses = append(n.forClauses, envYield{childEnv, x, closeID})
+			n.forClauses = append(n.forClauses, envYield{childEnv, x, closeID, nil})
 
 		case adt.Yielder:
 			hasOther = x
-			n.ifClauses = append(n.ifClauses, envYield{childEnv, x, closeID})
+			n.ifClauses = append(n.ifClauses, envYield{childEnv, x, closeID, nil})
 
 		case adt.Expr:
 			hasEmbed = true
@@ -1795,7 +1792,7 @@ func (n *nodeContext) expandOne() (done bool) {
 	exprs := n.exprs
 	n.exprs = n.exprs[:0]
 	for _, x := range exprs {
-		n.addExprConjunct(x)
+		n.addExprConjunct(x.c)
 
 		// collect and and or
 	}
@@ -1818,6 +1815,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 		var f adt.Feature
 		v, complete := ctx.Evaluate(d.env, d.field.Key)
 		if !complete {
+			d.err, _ = v.(*adt.Bottom)
 			a[k] = d
 			k++
 			continue
@@ -1826,7 +1824,7 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 			n.addValueConjunct(nil, b, d.id)
 			continue
 		}
-		f = ctx.Label(v)
+		f = ctx.Label(d.field.Key, v)
 		n.insertField(f, adt.MakeConjunct(d.env, d.field, d.id))
 	}
 
@@ -1858,6 +1856,7 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 
 		if err := ctx.Yield(d.env, d.yield, f); err != nil {
 			if err.IsIncomplete() {
+				d.err = err
 				(*all)[k] = d
 				k++
 			} else {

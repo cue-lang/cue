@@ -19,7 +19,7 @@ c: { for x in top {} }
     //     ./in.cue:5:19
   }
   c: (_|_){
-    // [incomplete] c: incomplete feed source value top (type _):
+    // [incomplete] c: cannot range over top (incomplete type _):
     //     ./in.cue:6:15
   }
 }

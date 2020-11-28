@@ -14,6 +14,10 @@ e3: [][true]
 e4: [1, 2, 3][3]
 e5: [1, 2, 3][-1]
 e6: (*[] | {})[1]
+e7: [1, 2, 3][3]
+e8: [1, 2, 3][-1]
+e9: (*[] | {})[1]
+
 def: {
 	a:  1
 	#b: 3
@@ -70,6 +74,17 @@ e7: def["b"]
     3,
   ][-1]
   e6: (*[]|{})[1]
+  e7: [
+    1,
+    2,
+    3,
+  ][3]
+  e8: [
+    1,
+    2,
+    3,
+  ][-1]
+  e9: (*[]|{})[1]
   def: {
     a: 1
     #b: 3
@@ -80,20 +95,26 @@ e7: def["b"]
 Errors:
 c: invalid list index "3" (type string):
     ./in.cue:3:20
-d: undefined field 0:
+d: index out of range [0] with length 0:
     ./in.cue:4:16
 e1: invalid list index _ (type string):
     ./in.cue:6:9
 e2: invalid operand 2 (found int, want list or struct):
     ./in.cue:7:5
-e3: invalid label type bool:
+e3: invalid index true (invalid type bool):
     ./in.cue:8:5
-e4: undefined field 3:
+e4: index out of range [3] with length 3:
     ./in.cue:9:15
-e5: invalid negative index -1:
+e5: invalid index -1 (index must be non-negative):
     ./in.cue:10:5
 e6: invalid list index 1 (out of bounds):
     ./in.cue:11:16
+e7: index out of range [3] with length 3:
+    ./in.cue:12:15
+e8: invalid index -1 (index must be non-negative):
+    ./in.cue:13:5
+e9: invalid list index 1 (out of bounds):
+    ./in.cue:14:16
 
 Result:
 (_|_){
@@ -105,7 +126,7 @@ Result:
     //     ./in.cue:3:20
   }
   d: (_|_){
-    // [eval] d: undefined field 0:
+    // [eval] d: index out of range [0] with length 0:
     //     ./in.cue:4:16
   }
   l: (#list){
@@ -119,27 +140,35 @@ Result:
     //     ./in.cue:7:5
   }
   e3: (_|_){
-    // [eval] e3: invalid label type bool:
+    // [eval] e3: invalid index true (invalid type bool):
     //     ./in.cue:8:5
   }
   e4: (_|_){
-    // [eval] e4: undefined field 3:
+    // [eval] e4: index out of range [3] with length 3:
     //     ./in.cue:9:15
   }
   e5: (_|_){
-    // [eval] e5: invalid negative index -1:
+    // [eval] e5: invalid index -1 (index must be non-negative):
     //     ./in.cue:10:5
   }
   e6: (_|_){
     // [eval] e6: invalid list index 1 (out of bounds):
     //     ./in.cue:11:16
   }
+  e7: (_|_){
+    // [eval] e7: index out of range [3] with length 3:
+    //     ./in.cue:12:15
+  }
+  e8: (_|_){
+    // [eval] e8: invalid index -1 (index must be non-negative):
+    //     ./in.cue:13:5
+  }
+  e9: (_|_){
+    // [eval] e9: invalid list index 1 (out of bounds):
+    //     ./in.cue:14:16
+  }
   def: (struct){
     a: (int){ 1 }
     #b: (int){ 3 }
-  }
-  e7: (_|_){
-    // [incomplete] e7: undefined field b:
-    //     ./in.cue:16:9
   }
 }

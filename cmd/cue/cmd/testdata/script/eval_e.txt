@@ -1,12 +1,34 @@
 ! cue eval -e nonExist
-cmp stderr expect-stderr
-cmp stdout expect-stdout
+cmp stderr expect/nonExist/stderr
+cmp stdout expect/nonExist/stdout
 
--- expect-stdout --
--- expect-stderr --
+# Issue #550: ignore incomplete error in different package
+cue eval -e incomplete
+cmp stderr expect/incomplete/stderr
+cmp stdout expect/incomplete/stdout
+
+
+-- expect/nonExist/stdout --
+-- expect/nonExist/stderr --
 reference "nonExist" not found:
     --expression:1:1
+-- expect/incomplete/stdout --
+
+-- expect/incomplete/stderr --
 -- partial.cue --
 package exitcode
 
+import (
+	pkg "foo.com/example"
+)
+
 a: 1
+
+incomplete: pkg.Settings
+
+-- cue.mod/pkg/foo.com/example/example.cue --
+package example
+
+Settings: {}
+blah: Settings.anyKey
+

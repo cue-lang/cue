@@ -2399,7 +2399,7 @@ func TestMarshalJSON(t *testing.T) {
 		}
 		y: _
 		`,
-		err: `x: incomplete feed source`,
+		err: `x: cannot range over y (incomplete type _)`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

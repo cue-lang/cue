@@ -503,7 +503,7 @@ func (x *DynamicReference) resolve(ctx *OpContext) *Vertex {
 	frame := ctx.PushState(e, x.Src)
 	v := ctx.value(x.Label)
 	ctx.PopState(frame)
-	f := ctx.Label(v)
+	f := ctx.Label(x.Label, v)
 	return ctx.lookup(e.Vertex, pos(x), f)
 }
 
@@ -585,7 +585,7 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext) *Vertex {
-	n := c.node(x.X, x.Sel.IsRegular())
+	n := c.node(x, x.X, x.Sel.IsRegular())
 	return c.lookup(n, x.Src.Sel.Pos(), x.Sel)
 }
 
@@ -608,9 +608,9 @@ func (x *IndexExpr) Source() ast.Node {
 
 func (x *IndexExpr) resolve(ctx *OpContext) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x.X, true)
+	n := ctx.node(x, x.X, true)
 	i := ctx.value(x.Index)
-	f := ctx.Label(i)
+	f := ctx.Label(x.Index, i)
 	return ctx.lookup(n, x.Src.Index.Pos(), f)
 }
 
@@ -1174,7 +1174,7 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
-	n := c.node(x.Src, true)
+	n := c.node(x, x.Src, true)
 	for _, a := range n.Arcs {
 		c.Unify(c, a, Partial)
 

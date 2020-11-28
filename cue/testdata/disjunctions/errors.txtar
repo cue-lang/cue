@@ -24,6 +24,14 @@ issue516: {
     x: match: metrics: "foo": {}
 }
 
+// issue #465
+explicitDefaultError: {
+    a: string | *_|_
+
+    if a != "" {
+    }
+}
+
 -- out/eval --
 Errors:
 issue516.x: empty disjunction: 2 related errors:
@@ -115,6 +123,11 @@ Result:
       }
     }
   }
+  explicitDefaultError: (_|_){
+    // [incomplete] explicitDefaultError.a: empty disjunction:
+    //     ./in.cue:30:8
+    a: (string){ string }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -152,5 +165,9 @@ Result:
         }
       }
     }
+  }
+  explicitDefaultError: {
+    a: (string|*_|_(explicit error (_|_ literal) in source))
+    if (〈0;a〉 != "") {}
   }
 }

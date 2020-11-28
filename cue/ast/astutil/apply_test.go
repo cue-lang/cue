@@ -47,6 +47,7 @@ func TestApply(t *testing.T) {
 		`,
 		out: `
 iam: new
+
 // foo is a
 foo: {
 	iam: new

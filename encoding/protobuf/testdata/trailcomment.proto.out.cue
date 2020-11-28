@@ -14,7 +14,6 @@ package foo
 
 	}
 	c?: int32 @protobuf(3)
-
 	// hello world
 
 }

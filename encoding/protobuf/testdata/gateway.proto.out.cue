@@ -360,7 +360,6 @@ package v1alpha3
 		// secured using TLS. The value of this field determines how TLS is
 		// enforced.
 		mode?: #TLSmode @protobuf(2)
-
 		// Extra comment.
 
 		// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file

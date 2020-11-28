@@ -558,6 +558,50 @@ bar: 2
 		a: int=>2
 		`,
 		out: "a: int=>2\nalias \"int\" not allowed as value",
+	}, {
+		desc: "struct comments",
+		in: `
+		struct: {
+			// This is a comment
+		
+			// This is a comment
+		
+			// Another comment
+			something: {
+			}
+		
+			// extra comment
+		}`,
+		out: `struct: {<[0// This is a comment] [0// This is a comment] [d0// Another comment] [d5// extra comment] something: {}>}`,
+	}, {
+		desc: "list comments",
+		in: `
+		list: [
+			// Comment1
+
+			// Comment2
+
+			// Another comment
+			{
+			},
+
+			// Comment 3
+		]`,
+		out: "list: [<[0// Comment1] [0// Comment2] [d0// Another comment] [d3// Comment 3] {}>]",
+	}, {
+		desc: "call comments",
+		in: `
+		funcArg1: foo(
+			{},
+	
+			// Comment1
+
+			// Comment2
+			{}
+	
+			// Comment3
+		)`,
+		out: "funcArg1: foo(<[1// Comment1] {}>, <[d0// Comment2] [d1// Comment3] {}>)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
@@ -751,7 +795,7 @@ func TestX(t *testing.T) {
 	t.Skip()
 
 	f, err := ParseFile("input", `
-	`)
+	`, ParseComments)
 	if err != nil {
 		t.Errorf("unexpected error: %v", err)
 	}

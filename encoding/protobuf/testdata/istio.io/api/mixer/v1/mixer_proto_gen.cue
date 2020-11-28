@@ -195,7 +195,6 @@ import (
 
 // Used to report telemetry after performing one or more actions.
 #ReportRequest: {
-
 	// next value: 5
 
 	// Used to signal how the sets of compressed attributes should be reconstitued server-side.

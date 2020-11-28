@@ -102,6 +102,9 @@ type commentState struct {
 
 // openComments reserves the next doc comment for the caller and flushes
 func (p *parser) openComments() *commentState {
+	child := &commentState{
+		parent: p.comments,
+	}
 	if c := p.comments; c != nil && c.isList > 0 {
 		if c.lastChild != nil {
 			var groups []*ast.CommentGroup
@@ -125,15 +128,16 @@ func (p *parser) openComments() *commentState {
 			for _, cg := range c.groups {
 				cg.Position = 0
 			}
+			child.groups = c.groups
+			c.groups = nil
 		}
 	}
-	c := &commentState{
-		parent: p.comments,
-		groups: []*ast.CommentGroup{p.leadComment},
+	if p.leadComment != nil {
+		child.groups = append(child.groups, p.leadComment)
+		p.leadComment = nil
 	}
-	p.comments = c
-	p.leadComment = nil
-	return c
+	p.comments = child
+	return child
 }
 
 // openList is used to treat a list of comments as a single comment
@@ -296,9 +300,18 @@ func (p *parser) consumeComment() (comment *ast.Comment, endline int) {
 // comments list, and return it together with the line at which
 // the last comment in the group ends. A non-comment token or n
 // empty lines terminate a comment group.
-func (p *parser) consumeCommentGroup(n int) (comments *ast.CommentGroup, endline int) {
+func (p *parser) consumeCommentGroup(prevLine, n int) (comments *ast.CommentGroup, endline int) {
 	var list []*ast.Comment
+	var rel token.RelPos
 	endline = p.file.Line(p.pos)
+	switch endline - prevLine {
+	case 0:
+		rel = token.Blank
+	case 1:
+		rel = token.Newline
+	default:
+		rel = token.NewSection
+	}
 	for p.tok == token.COMMENT && p.file.Line(p.pos) <= endline+n {
 		var comment *ast.Comment
 		comment, endline = p.consumeComment()
@@ -306,6 +319,7 @@ func (p *parser) consumeCommentGroup(n int) (comments *ast.CommentGroup, endline
 	}
 
 	cg := &ast.CommentGroup{List: list}
+	ast.SetRelPos(cg, rel)
 	comments = cg
 	return
 }
@@ -338,10 +352,12 @@ func (p *parser) next() {
 		var comment *ast.CommentGroup
 		var endline int
 
-		if p.file.Line(p.pos) == p.file.Line(prev) {
+		currentLine := p.file.Line(p.pos)
+		prevLine := p.file.Line(prev)
+		if prevLine == currentLine {
 			// The comment is on same line as the previous token; it
 			// cannot be a lead comment but may be a line comment.
-			comment, endline = p.consumeCommentGroup(0)
+			comment, endline = p.consumeCommentGroup(prevLine, 0)
 			if p.file.Line(p.pos) != endline {
 				// The next token is on a different line, thus
 				// the last comment group is a line comment.
@@ -355,7 +371,10 @@ func (p *parser) next() {
 			if comment != nil {
 				p.comments.add(comment)
 			}
-			comment, endline = p.consumeCommentGroup(1)
+			comment, endline = p.consumeCommentGroup(prevLine, 1)
+			prevLine = currentLine
+			currentLine = p.file.Line(p.pos)
+
 		}
 
 		if endline+1 == p.file.Line(p.pos) && p.tok != token.EOF {
@@ -674,7 +693,11 @@ func (p *parser) parseCallOrConversion(fun ast.Expr) (expr *ast.CallExpr) {
 	c := p.openComments()
 	defer func() { c.closeNode(p, expr) }()
 
+	p.openList()
+	defer p.closeList()
+
 	lparen := p.expect(token.LPAREN)
+
 	p.exprLev++
 	var list []ast.Expr
 	for p.tok != token.RPAREN && p.tok != token.EOF {
@@ -1059,6 +1082,15 @@ func (p *parser) parseStructBody() []ast.Decl {
 
 	p.exprLev++
 	var elts []ast.Decl
+
+	// TODO: consider "stealing" non-lead comments.
+	// for _, cg := range p.comments.groups {
+	// 	if cg != nil {
+	// 		elts = append(elts, cg)
+	// 	}
+	// }
+	// p.comments.groups = p.comments.groups[:0]
+
 	if p.tok != token.RBRACE {
 		elts = p.parseFieldList()
 	}

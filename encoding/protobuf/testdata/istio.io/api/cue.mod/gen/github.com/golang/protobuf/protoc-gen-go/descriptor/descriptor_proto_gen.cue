@@ -621,7 +621,6 @@ package descriptor
 }
 
 #ServiceOptions: {
-
 	// Note:  Field numbers 1 through 32 are reserved for Google's internal RPC
 	//   framework.  We apologize for hoarding these numbers to ourselves, but
 	//   we were already using them long before we decided to release Protocol
@@ -638,7 +637,6 @@ package descriptor
 }
 
 #MethodOptions: {
-
 	// Note:  Field numbers 1 through 32 are reserved for Google's internal RPC
 	//   framework.  We apologize for hoarding these numbers to ourselves, but
 	//   we were already using them long before we decided to release Protocol

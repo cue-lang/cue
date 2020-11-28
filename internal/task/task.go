@@ -22,6 +22,9 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 )
 
 // A Context provides context for running a task.
@@ -37,8 +40,7 @@ type Context struct {
 func (c *Context) Lookup(field string) cue.Value {
 	f := c.Obj.Lookup(field)
 	if !f.Exists() {
-		c.Err = errors.Append(c.Err, errors.Newf(c.Obj.Pos(),
-			"could not find field %q", field))
+		c.addErr(f, nil, "could not find field %q", field)
 		return cue.Value{}
 	}
 	if err := f.Err(); err != nil {
@@ -53,8 +55,7 @@ func (c *Context) Int64(field string) int64 {
 	if err != nil {
 		// TODO: use v for position for now, as f has not yet a
 		// position associated with it.
-		c.Err = errors.Append(c.Err, errors.Wrapf(err, c.Obj.Pos(),
-			"invalid integer argument for field %q", field))
+		c.addErr(f, err, "invalid integer argument")
 		return 0
 	}
 	return value
@@ -66,9 +67,7 @@ func (c *Context) String(field string) string {
 	if err != nil {
 		// TODO: use v for position for now, as f has not yet a
 		// position associated with it.
-		c.Err = errors.Append(c.Err, errors.Wrapf(err, c.Obj.Pos(),
-			"invalid string argument for field %q", field))
-		c.Err = errors.Promote(err, "ddd")
+		c.addErr(f, err, "invalid string argument")
 		return ""
 	}
 	return value
@@ -78,14 +77,57 @@ func (c *Context) Bytes(field string) []byte {
 	f := c.Obj.Lookup(field)
 	value, err := f.Bytes()
 	if err != nil {
-		// TODO: use v for position for now, as f has not yet a
-		// position associated with it.
-		c.Err = errors.Append(c.Err, errors.Wrapf(err, c.Obj.Pos(),
-			"invalid bytes argument for field %q", field))
+		c.addErr(f, err, "invalid bytes argument")
 		return nil
 	}
 	return value
 }
+
+func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interface{}) {
+
+	err := &taskError{
+		task:    c.Obj,
+		v:       v,
+		Message: errors.NewMessage(format, args),
+		err:     wrap,
+	}
+	c.Err = errors.Append(c.Err, err)
+}
+
+// taskError wraps some error values to retain position information about the
+// error.
+type taskError struct {
+	task cue.Value
+	v    cue.Value
+	errors.Message
+	err error
+}
+
+var _ errors.Error = &taskError{}
+
+func (t *taskError) Path() (a []string) {
+	for _, x := range t.v.Path().Selectors() {
+		a = append(a, x.String())
+	}
+	return a
+}
+
+func (t *taskError) Position() token.Pos {
+	return t.task.Pos()
+}
+
+func (t *taskError) InputPositions() (a []token.Pos) {
+	_, nx := internal.CoreValue(t.v)
+
+	for _, x := range nx.(*adt.Vertex).Conjuncts {
+		if src := x.Source(); src != nil {
+			a = append(a, src.Pos())
+		}
+	}
+	return a
+}
+
+func (t *taskError) Unwrap() error { return t.err }
 
 // A RunnerFunc creates a Runner.
 type RunnerFunc func(v cue.Value) (Runner, error)

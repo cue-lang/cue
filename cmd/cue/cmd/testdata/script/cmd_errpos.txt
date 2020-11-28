@@ -1,0 +1,34 @@
+! cue cmd prompter
+cmp stderr expect-stderr
+
+# Issue #479
+
+-- expect-stdout --
+-- expect-stderr --
+command.prompter.contents: invalid bytes argument: non-concrete value string:
+    ./task_tool.cue:9:10
+    ./task_tool.cue:17:3
+    tool/file:11:3
+command.prompter.filename: invalid string argument: non-concrete value string:
+    ./task_tool.cue:9:10
+    tool/file:9:3
+-- task_tool.cue --
+package foo
+
+import (
+	"tool/cli"
+    "tool/file"
+)
+
+
+command: prompter: {
+	ask: cli.Ask & {
+		prompt:   "What is your name?"
+		response: string
+	}
+
+	// inadvertently defined at top level, masking other tasks.
+	file.Append & {
+		contents: ask.response
+	}
+}

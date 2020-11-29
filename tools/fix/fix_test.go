@@ -27,6 +27,22 @@ func TestFile(t *testing.T) {
 		in   string
 		out  string
 	}{{
+		name: "rewrite integer division",
+		in: `package foo
+
+a: 1 div 2
+b: 3 mod 5
+c: 2 quo 9
+d: 1.0 rem 1.0 // pass on illegal values.
+`,
+		out: `package foo
+
+a: __div(1, 2)
+b: __mod(3, 5)
+c: __quo(2, 9)
+d: __rem(1.0, 1.0) // pass on illegal values.
+`,
+	}, {
 		name: "referenced quoted fields",
 		in: `package foo
 

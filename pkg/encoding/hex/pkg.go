@@ -18,8 +18,10 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "EncodedLen",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "EncodedLen",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			n := c.Int(0)
@@ -28,8 +30,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "DecodedLen",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "DecodedLen",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Int(0)
@@ -38,8 +42,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Decode",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Decode",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BytesKind | adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -48,8 +54,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Dump",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind},
+		Name: "Dump",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			data := c.Bytes(0)
@@ -58,8 +66,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Encode",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind},
+		Name: "Encode",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			src := c.Bytes(0)

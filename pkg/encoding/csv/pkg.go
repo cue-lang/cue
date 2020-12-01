@@ -18,8 +18,10 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Encode",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "Encode",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Value(0)
@@ -28,8 +30,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Decode",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind},
+		Name: "Decode",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			r := c.Reader(0)

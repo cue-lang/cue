@@ -36,8 +36,10 @@ var pkg = &internal.Package{
 		Name:  "Hour",
 		Const: "3600000000000",
 	}, {
-		Name:   "Duration",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Duration",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -46,8 +48,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ParseDuration",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ParseDuration",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -152,8 +156,10 @@ var pkg = &internal.Package{
 		Name:  "Saturday",
 		Const: "6",
 	}, {
-		Name:   "Time",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Time",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -162,8 +168,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Format",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Format",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			value, layout := c.String(0), c.String(1)
@@ -172,8 +181,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Parse",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Parse",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			layout, value := c.String(0), c.String(1)
@@ -182,8 +194,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Unix",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Unix",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			sec, nsec := c.Int64(0), c.Int64(1)

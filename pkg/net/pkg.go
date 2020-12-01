@@ -18,8 +18,10 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "SplitHostPort",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "SplitHostPort",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -28,8 +30,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "JoinHostPort",
-		Params: []adt.Kind{adt.TopKind, adt.TopKind},
+		Name: "JoinHostPort",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.TopKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			host, port := c.Value(0), c.Value(1)
@@ -38,8 +43,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "FQDN",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "FQDN",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -54,8 +61,10 @@ var pkg = &internal.Package{
 		Name:  "IPv6len",
 		Const: "16",
 	}, {
-		Name:   "ParseIP",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ParseIP",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -64,8 +73,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IPv4",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "IPv4",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -74,8 +85,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "IP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -84,8 +97,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "LoopbackIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "LoopbackIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -94,8 +109,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "MulticastIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "MulticastIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -104,8 +121,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "InterfaceLocalMulticastIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "InterfaceLocalMulticastIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -114,8 +133,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "LinkLocalMulticastIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "LinkLocalMulticastIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -124,8 +145,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "LinkLocalUnicastIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "LinkLocalUnicastIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -134,8 +157,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "GlobalUnicastIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "GlobalUnicastIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -144,8 +169,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "UnspecifiedIP",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "UnspecifiedIP",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -154,8 +181,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ToIP4",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "ToIP4",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -164,8 +193,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ToIP16",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "ToIP16",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)
@@ -174,8 +205,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IPString",
-		Params: []adt.Kind{adt.TopKind},
+		Name: "IPString",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			ip := c.Value(0)

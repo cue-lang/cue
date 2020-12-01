@@ -18,8 +18,10 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Escape",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Escape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -28,8 +30,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Unescape",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Unescape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)

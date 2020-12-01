@@ -27,8 +27,10 @@ var pkg = &internal.Package{
 		Name:  "BlockSize",
 		Const: "64",
 	}, {
-		Name:   "Sum256",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind},
+		Name: "Sum256",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
 		Result: adt.BytesKind | adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			data := c.Bytes(0)
@@ -37,8 +39,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Sum224",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind},
+		Name: "Sum224",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
 		Result: adt.BytesKind | adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			data := c.Bytes(0)

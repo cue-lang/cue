@@ -937,7 +937,7 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 // A Builtin is a value representing a native function call.
 type Builtin struct {
 	// TODO:  make these values for better type checking.
-	Params []Kind
+	Params []Param
 	Result Kind
 	Func   func(c *OpContext, args []Value) Expr
 
@@ -945,6 +945,23 @@ type Builtin struct {
 	Name    string
 	// REMOVE: for legacy
 	Const string
+}
+
+type Param struct {
+	Name  Feature // name of the argument; mostly for documentation
+	Value Value   // Could become Value later, using disjunctions for defaults.
+}
+
+func (p Param) Kind() Kind {
+	return p.Value.Kind()
+}
+
+func (p Param) Default() Value {
+	d, ok := p.Value.(*Disjunction)
+	if !ok || d.NumDefaults != 1 {
+		return nil
+	}
+	return d.Values[0]
 }
 
 func (x *Builtin) WriteName(w io.Writer, c *OpContext) {
@@ -956,7 +973,7 @@ func (x *Builtin) Kind() Kind {
 	if len(x.Params) == 0 {
 		return BottomKind
 	}
-	return x.Params[0]
+	return x.Params[0].Kind()
 }
 
 func (x *Builtin) validate(c *OpContext, v Value) *Bottom {
@@ -984,24 +1001,28 @@ func (x *Builtin) call(c *OpContext, call *ast.CallExpr, args []Value) Expr {
 		// We have a custom builtin
 		return &BuiltinValidator{call, x, args}
 	}
-	switch {
-	case len(x.Params) < len(args):
+	if len(args) > len(x.Params) {
 		c.addErrf(0, call.Rparen,
 			"too many arguments in call to %s (have %d, want %d)",
 			call.Fun, len(args), len(x.Params))
 		return nil
-	case len(x.Params) > len(args):
-		c.addErrf(0, call.Rparen,
-			"not enough arguments in call to %s (have %d, want %d)",
-			call.Fun, len(args), len(x.Params))
-		return nil
+	}
+	for i := len(args); i < len(x.Params); i++ {
+		v := x.Params[i].Default()
+		if v == nil {
+			c.addErrf(0, call.Rparen,
+				"not enough arguments in call to %s (have %d, want %d)",
+				call.Fun, len(args), len(x.Params))
+			return nil
+		}
+		args = append(args, v)
 	}
 	for i, a := range args {
-		if x.Params[i] != BottomKind {
+		if x.Params[i].Kind() != BottomKind {
 			if b := bottom(a); b != nil {
 				return b
 			}
-			if k := kind(a); x.Params[i]&k == BottomKind {
+			if k := kind(a); x.Params[i].Kind()&k == BottomKind {
 				code := EvalError
 				b, _ := args[i].(*Bottom)
 				if b != nil {
@@ -1009,7 +1030,7 @@ func (x *Builtin) call(c *OpContext, call *ast.CallExpr, args []Value) Expr {
 				}
 				c.addErrf(code, pos(a),
 					"cannot use %s (type %s) as %s in argument %d to %s",
-					a, k, x.Params[i], i+1, call.Fun)
+					a, k, x.Params[i].Kind(), i+1, call.Fun)
 				return nil
 			}
 		}
@@ -1038,7 +1059,7 @@ func (x *BuiltinValidator) Source() ast.Node {
 }
 
 func (x *BuiltinValidator) Kind() Kind {
-	return x.Builtin.Params[0]
+	return x.Builtin.Params[0].Kind()
 }
 
 func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {

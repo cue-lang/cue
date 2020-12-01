@@ -24,8 +24,10 @@ var pkg = &internal.Package{
 		Name:  "BlockSize",
 		Const: "64",
 	}, {
-		Name:   "Sum",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind},
+		Name: "Sum",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
 		Result: adt.BytesKind | adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			data := c.Bytes(0)

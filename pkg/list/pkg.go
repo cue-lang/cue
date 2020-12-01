@@ -18,8 +18,11 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Drop",
-		Params: []adt.Kind{adt.ListKind, adt.IntKind},
+		Name: "Drop",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			x, n := c.List(0), c.Int(1)
@@ -28,8 +31,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "FlattenN",
-		Params: []adt.Kind{adt.TopKind, adt.IntKind},
+		Name: "FlattenN",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			xs, depth := c.Value(0), c.Int(1)
@@ -38,8 +44,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Take",
-		Params: []adt.Kind{adt.ListKind, adt.IntKind},
+		Name: "Take",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			x, n := c.List(0), c.Int(1)
@@ -48,8 +57,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Slice",
-		Params: []adt.Kind{adt.ListKind, adt.IntKind, adt.IntKind},
+		Name: "Slice",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			x, i, j := c.List(0), c.Int(1), c.Int(2)
@@ -58,8 +71,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "MinItems",
-		Params: []adt.Kind{adt.ListKind, adt.IntKind},
+		Name: "MinItems",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			a, n := c.List(0), c.Int(1)
@@ -68,8 +84,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "MaxItems",
-		Params: []adt.Kind{adt.ListKind, adt.IntKind},
+		Name: "MaxItems",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			a, n := c.List(0), c.Int(1)
@@ -78,8 +97,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "UniqueItems",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "UniqueItems",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			a := c.List(0)
@@ -88,8 +109,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Contains",
-		Params: []adt.Kind{adt.ListKind, adt.TopKind},
+		Name: "Contains",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			a, v := c.List(0), c.Value(1)
@@ -98,8 +122,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Avg",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "Avg",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			xs := c.DecimalList(0)
@@ -108,8 +134,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Max",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "Max",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			xs := c.DecimalList(0)
@@ -118,8 +146,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Min",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "Min",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			xs := c.DecimalList(0)
@@ -128,8 +158,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Product",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "Product",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			xs := c.DecimalList(0)
@@ -138,8 +170,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Range",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind, adt.NumKind},
+		Name: "Range",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			start, limit, step := c.Decimal(0), c.Decimal(1), c.Decimal(2)
@@ -148,8 +184,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Sum",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "Sum",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			xs := c.DecimalList(0)
@@ -158,8 +196,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Sort",
-		Params: []adt.Kind{adt.ListKind, adt.TopKind},
+		Name: "Sort",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.TopKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			list, cmp := c.List(0), c.Value(1)
@@ -168,8 +209,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "SortStable",
-		Params: []adt.Kind{adt.ListKind, adt.TopKind},
+		Name: "SortStable",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.TopKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			list, cmp := c.List(0), c.Value(1)
@@ -178,8 +222,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "SortStrings",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "SortStrings",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			a := c.StringList(0)
@@ -188,8 +234,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IsSorted",
-		Params: []adt.Kind{adt.ListKind, adt.TopKind},
+		Name: "IsSorted",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.TopKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			list, cmp := c.List(0), c.Value(1)
@@ -198,8 +247,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IsSortedStrings",
-		Params: []adt.Kind{adt.ListKind},
+		Name: "IsSortedStrings",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			a := c.StringList(0)

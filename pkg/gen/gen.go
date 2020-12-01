@@ -309,7 +309,11 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 		}
 	}
 
-	fmt.Fprintf(g.w, "Params: []adt.Kind{%s},\n", strings.Join(kind, ", "))
+	fmt.Fprintf(g.w, "Params: []internal.Param{\n")
+	for _, k := range kind {
+		fmt.Fprintf(g.w, "{Kind: %s},\n", k)
+	}
+	fmt.Fprintf(g.w, "\n},\n")
 	result := g.goToCUE(x.Type.Results.List[0].Type)
 	fmt.Fprintf(g.w, "Result: %s,\n", result)
 	argList := strings.Join(args, ", ")

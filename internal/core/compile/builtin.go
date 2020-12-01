@@ -26,9 +26,16 @@ import (
 
 const supportedByLen = adt.StructKind | adt.BytesKind | adt.StringKind | adt.ListKind
 
+var (
+	stringParam = adt.Param{Value: &adt.BasicType{K: adt.StringKind}}
+	structParam = adt.Param{Value: &adt.BasicType{K: adt.StructKind}}
+	listParam   = adt.Param{Value: &adt.BasicType{K: adt.ListKind}}
+	intParam    = adt.Param{Value: &adt.BasicType{K: adt.IntKind}}
+)
+
 var lenBuiltin = &adt.Builtin{
 	Name:   "len",
-	Params: []adt.Kind{supportedByLen},
+	Params: []adt.Param{{Value: &adt.BasicType{K: supportedByLen}}},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		v := args[0]
@@ -74,7 +81,7 @@ var lenBuiltin = &adt.Builtin{
 
 var closeBuiltin = &adt.Builtin{
 	Name:   "close",
-	Params: []adt.Kind{adt.StructKind},
+	Params: []adt.Param{structParam},
 	Result: adt.StructKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		s, ok := args[0].(*adt.Vertex)
@@ -92,7 +99,7 @@ var closeBuiltin = &adt.Builtin{
 
 var andBuiltin = &adt.Builtin{
 	Name:   "and",
-	Params: []adt.Kind{adt.ListKind},
+	Params: []adt.Param{listParam},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		list := c.Elems(args[0])
@@ -109,7 +116,7 @@ var andBuiltin = &adt.Builtin{
 
 var orBuiltin = &adt.Builtin{
 	Name:   "or",
-	Params: []adt.Kind{adt.ListKind},
+	Params: []adt.Param{listParam},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		d := []adt.Disjunct{}
@@ -141,7 +148,7 @@ var orBuiltin = &adt.Builtin{
 
 var divBuiltin = &adt.Builtin{
 	Name:   "div",
-	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		const name = "argument to div builtin"
@@ -152,7 +159,7 @@ var divBuiltin = &adt.Builtin{
 
 var modBuiltin = &adt.Builtin{
 	Name:   "mod",
-	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		const name = "argument to mod builtin"
@@ -163,7 +170,7 @@ var modBuiltin = &adt.Builtin{
 
 var quoBuiltin = &adt.Builtin{
 	Name:   "quo",
-	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		const name = "argument to quo builtin"
@@ -174,7 +181,7 @@ var quoBuiltin = &adt.Builtin{
 
 var remBuiltin = &adt.Builtin{
 	Name:   "rem",
-	Params: []adt.Kind{adt.IntKind, adt.IntKind},
+	Params: []adt.Param{intParam, intParam},
 	Result: adt.IntKind,
 	Func: func(c *adt.OpContext, args []adt.Value) adt.Expr {
 		const name = "argument to rem builtin"

@@ -18,8 +18,11 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Execute",
-		Params: []adt.Kind{adt.StringKind, adt.TopKind},
+		Name: "Execute",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.TopKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			templ, data := c.String(0), c.Value(1)
@@ -28,8 +31,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "HTMLEscape",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "HTMLEscape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -38,8 +43,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "JSEscape",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "JSEscape",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)

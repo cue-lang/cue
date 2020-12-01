@@ -18,8 +18,10 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Unquote",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Unquote",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -28,8 +30,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ParseBool",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ParseBool",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			str := c.String(0)
@@ -38,8 +42,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "FormatBool",
-		Params: []adt.Kind{adt.BoolKind},
+		Name: "FormatBool",
+		Params: []internal.Param{
+			{Kind: adt.BoolKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			b := c.Bool(0)
@@ -48,8 +54,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ParseFloat",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind},
+		Name: "ParseFloat",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			s, bitSize := c.String(0), c.Int(1)
@@ -61,8 +70,12 @@ var pkg = &internal.Package{
 		Name:  "IntSize",
 		Const: "64",
 	}, {
-		Name:   "ParseUint",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind, adt.IntKind},
+		Name: "ParseUint",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, base, bitSize := c.String(0), c.Int(1), c.Int(2)
@@ -71,8 +84,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ParseInt",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind, adt.IntKind},
+		Name: "ParseInt",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, base, bitSize := c.String(0), c.Int(1), c.Int(2)
@@ -81,8 +98,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Atoi",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Atoi",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -91,8 +110,13 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "FormatFloat",
-		Params: []adt.Kind{adt.NumKind, adt.IntKind, adt.IntKind, adt.IntKind},
+		Name: "FormatFloat",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			f, fmt, prec, bitSize := c.Float64(0), c.Byte(1), c.Int(2), c.Int(3)
@@ -101,8 +125,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "FormatUint",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "FormatUint",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			i, base := c.Uint64(0), c.Int(1)
@@ -111,8 +138,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "FormatInt",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "FormatInt",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			i, base := c.Int64(0), c.Int(1)
@@ -121,8 +151,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Quote",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Quote",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -131,8 +163,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "QuoteToASCII",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "QuoteToASCII",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -141,8 +175,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "QuoteToGraphic",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "QuoteToGraphic",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -151,8 +187,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "QuoteRune",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "QuoteRune",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			r := c.Rune(0)
@@ -161,8 +199,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "QuoteRuneToASCII",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "QuoteRuneToASCII",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			r := c.Rune(0)
@@ -171,8 +211,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "QuoteRuneToGraphic",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "QuoteRuneToGraphic",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			r := c.Rune(0)
@@ -181,8 +223,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IsPrint",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "IsPrint",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			r := c.Rune(0)
@@ -191,8 +235,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IsGraphic",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "IsGraphic",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			r := c.Rune(0)

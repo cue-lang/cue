@@ -54,8 +54,11 @@ var pkg = &internal.Package{
 		Name:  "Above",
 		Const: "1",
 	}, {
-		Name:   "Jacobi",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Jacobi",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.BigInt(0), c.BigInt(1)
@@ -67,8 +70,10 @@ var pkg = &internal.Package{
 		Name:  "MaxBase",
 		Const: "62",
 	}, {
-		Name:   "Floor",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Floor",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -77,8 +82,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Ceil",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Ceil",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -87,8 +94,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Trunc",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Trunc",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -97,8 +106,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Round",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Round",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -107,8 +118,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "RoundToEven",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "RoundToEven",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -117,8 +130,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "MultipleOf",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "MultipleOf",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
@@ -127,8 +143,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Abs",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Abs",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -137,8 +155,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Acosh",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Acosh",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -147,8 +167,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Asin",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Asin",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -157,8 +179,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Acos",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Acos",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -167,8 +191,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Asinh",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Asinh",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -177,8 +203,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Atan",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Atan",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -187,8 +215,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Atan2",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Atan2",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			y, x := c.Float64(0), c.Float64(1)
@@ -197,8 +228,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Atanh",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Atanh",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -207,8 +240,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Cbrt",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Cbrt",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -250,8 +285,11 @@ var pkg = &internal.Package{
 		Name:  "Log10E",
 		Const: "0.43429448190325182765112891891660508229439700580366656611445378",
 	}, {
-		Name:   "Copysign",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Copysign",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
@@ -260,8 +298,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Dim",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Dim",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
@@ -270,8 +311,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Erf",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Erf",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -280,8 +323,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Erfc",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Erfc",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -290,8 +335,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Erfinv",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Erfinv",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -300,8 +347,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Erfcinv",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Erfcinv",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -310,8 +359,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Exp",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Exp",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -320,8 +371,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Exp2",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Exp2",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -330,8 +383,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Expm1",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Expm1",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -340,8 +395,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Gamma",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Gamma",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -350,8 +407,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Hypot",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Hypot",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			p, q := c.Float64(0), c.Float64(1)
@@ -360,8 +420,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "J0",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "J0",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -370,8 +432,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Y0",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Y0",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -380,8 +444,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "J1",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "J1",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -390,8 +456,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Y1",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Y1",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -400,8 +468,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Jn",
-		Params: []adt.Kind{adt.IntKind, adt.NumKind},
+		Name: "Jn",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			n, x := c.Int(0), c.Float64(1)
@@ -410,8 +481,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Yn",
-		Params: []adt.Kind{adt.IntKind, adt.NumKind},
+		Name: "Yn",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			n, x := c.Int(0), c.Float64(1)
@@ -420,8 +494,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Ldexp",
-		Params: []adt.Kind{adt.NumKind, adt.IntKind},
+		Name: "Ldexp",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			frac, exp := c.Float64(0), c.Int(1)
@@ -430,8 +507,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Log",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Log",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -440,8 +519,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Log10",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Log10",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -450,8 +531,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Log2",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Log2",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -460,8 +543,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Log1p",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Log1p",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -470,8 +555,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Logb",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Logb",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -480,8 +567,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Ilogb",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Ilogb",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -490,8 +579,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Mod",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Mod",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.Float64(0), c.Float64(1)
@@ -500,8 +592,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Pow",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Pow",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.Decimal(0), c.Decimal(1)
@@ -510,8 +605,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Pow10",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "Pow10",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			n := c.Int32(0)
@@ -520,8 +617,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Remainder",
-		Params: []adt.Kind{adt.NumKind, adt.NumKind},
+		Name: "Remainder",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x, y := c.Float64(0), c.Float64(1)
@@ -530,8 +630,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Signbit",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Signbit",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Decimal(0)
@@ -540,8 +642,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Cos",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Cos",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -550,8 +654,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Sin",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Sin",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -560,8 +666,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Sinh",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Sinh",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -570,8 +678,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Cosh",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Cosh",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -580,8 +690,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Sqrt",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Sqrt",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -590,8 +702,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Tan",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Tan",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)
@@ -600,8 +714,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Tanh",
-		Params: []adt.Kind{adt.NumKind},
+		Name: "Tanh",
+		Params: []internal.Param{
+			{Kind: adt.NumKind},
+		},
 		Result: adt.NumKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.Float64(0)

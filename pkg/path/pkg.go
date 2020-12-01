@@ -18,8 +18,10 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Split",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Split",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			path := c.String(0)
@@ -28,8 +30,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Match",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Match",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			pattern, name := c.String(0), c.String(1)
@@ -38,8 +43,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Clean",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Clean",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			path := c.String(0)
@@ -48,8 +55,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Ext",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Ext",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			path := c.String(0)
@@ -58,8 +67,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Base",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Base",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			path := c.String(0)
@@ -68,8 +79,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IsAbs",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "IsAbs",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			path := c.String(0)
@@ -78,8 +91,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Dir",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Dir",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			path := c.String(0)

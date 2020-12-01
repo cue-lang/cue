@@ -18,8 +18,11 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "Lsh",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Lsh",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x, n := c.BigInt(0), c.Uint(1)
@@ -28,8 +31,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Rsh",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Rsh",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x, n := c.BigInt(0), c.Uint(1)
@@ -38,8 +44,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "At",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "At",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x, i := c.BigInt(0), c.Uint(1)
@@ -48,8 +57,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Set",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind, adt.IntKind},
+		Name: "Set",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x, i, bit := c.BigInt(0), c.Int(1), c.Uint(2)
@@ -58,8 +71,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "And",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "And",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
@@ -68,8 +84,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Or",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Or",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
@@ -78,8 +97,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Xor",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Xor",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
@@ -88,8 +110,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Clear",
-		Params: []adt.Kind{adt.IntKind, adt.IntKind},
+		Name: "Clear",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			a, b := c.BigInt(0), c.BigInt(1)
@@ -98,8 +123,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "OnesCount",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "OnesCount",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.BigInt(0)
@@ -108,8 +135,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Len",
-		Params: []adt.Kind{adt.IntKind},
+		Name: "Len",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			x := c.BigInt(0)

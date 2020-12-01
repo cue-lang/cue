@@ -18,8 +18,11 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name:   "ByteAt",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind, adt.IntKind},
+		Name: "ByteAt",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			b, i := c.Bytes(0), c.Int(1)
@@ -28,8 +31,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ByteSlice",
-		Params: []adt.Kind{adt.BytesKind | adt.StringKind, adt.IntKind, adt.IntKind},
+		Name: "ByteSlice",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BytesKind | adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			b, start, end := c.Bytes(0), c.Int(1), c.Int(2)
@@ -38,8 +45,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Runes",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Runes",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -48,8 +57,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "MinRunes",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind},
+		Name: "MinRunes",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s, min := c.String(0), c.Int(1)
@@ -58,8 +70,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "MaxRunes",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind},
+		Name: "MaxRunes",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s, max := c.String(0), c.Int(1)
@@ -68,8 +83,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ToTitle",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ToTitle",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -78,8 +95,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ToCamel",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ToCamel",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -88,8 +107,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "SliceRunes",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind, adt.IntKind},
+		Name: "SliceRunes",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, start, end := c.String(0), c.Int(1), c.Int(2)
@@ -98,8 +121,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Compare",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Compare",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			a, b := c.String(0), c.String(1)
@@ -108,8 +134,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Count",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Count",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
@@ -118,8 +147,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Contains",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Contains",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
@@ -128,8 +160,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ContainsAny",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "ContainsAny",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s, chars := c.String(0), c.String(1)
@@ -138,8 +173,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "LastIndex",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "LastIndex",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, substr := c.String(0), c.String(1)
@@ -148,8 +186,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "IndexAny",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "IndexAny",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, chars := c.String(0), c.String(1)
@@ -158,8 +199,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "LastIndexAny",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "LastIndexAny",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, chars := c.String(0), c.String(1)
@@ -168,8 +212,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "SplitN",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind, adt.IntKind},
+		Name: "SplitN",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s, sep, n := c.String(0), c.String(1), c.Int(2)
@@ -178,8 +226,12 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "SplitAfterN",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind, adt.IntKind},
+		Name: "SplitAfterN",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s, sep, n := c.String(0), c.String(1), c.Int(2)
@@ -188,8 +240,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Split",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Split",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s, sep := c.String(0), c.String(1)
@@ -198,8 +253,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "SplitAfter",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "SplitAfter",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s, sep := c.String(0), c.String(1)
@@ -208,8 +266,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Fields",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "Fields",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -218,8 +278,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Join",
-		Params: []adt.Kind{adt.ListKind, adt.StringKind},
+		Name: "Join",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			elems, sep := c.StringList(0), c.String(1)
@@ -228,8 +291,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "HasPrefix",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "HasPrefix",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s, prefix := c.String(0), c.String(1)
@@ -238,8 +304,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "HasSuffix",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "HasSuffix",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.BoolKind,
 		Func: func(c *internal.CallCtxt) {
 			s, suffix := c.String(0), c.String(1)
@@ -248,8 +317,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Repeat",
-		Params: []adt.Kind{adt.StringKind, adt.IntKind},
+		Name: "Repeat",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, count := c.String(0), c.Int(1)
@@ -258,8 +330,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ToUpper",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ToUpper",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -268,8 +342,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "ToLower",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "ToLower",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -278,8 +354,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Trim",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Trim",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, cutset := c.String(0), c.String(1)
@@ -288,8 +367,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "TrimLeft",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "TrimLeft",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, cutset := c.String(0), c.String(1)
@@ -298,8 +380,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "TrimRight",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "TrimRight",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, cutset := c.String(0), c.String(1)
@@ -308,8 +393,10 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "TrimSpace",
-		Params: []adt.Kind{adt.StringKind},
+		Name: "TrimSpace",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s := c.String(0)
@@ -318,8 +405,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "TrimPrefix",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "TrimPrefix",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, prefix := c.String(0), c.String(1)
@@ -328,8 +418,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "TrimSuffix",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "TrimSuffix",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, suffix := c.String(0), c.String(1)
@@ -338,8 +431,13 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Replace",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind, adt.StringKind, adt.IntKind},
+		Name: "Replace",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
 		Result: adt.StringKind,
 		Func: func(c *internal.CallCtxt) {
 			s, old, new, n := c.String(0), c.String(1), c.String(2), c.Int(3)
@@ -348,8 +446,11 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name:   "Index",
-		Params: []adt.Kind{adt.StringKind, adt.StringKind},
+		Name: "Index",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
 		Result: adt.IntKind,
 		Func: func(c *internal.CallCtxt) {
 			s, substr := c.String(0), c.String(1)

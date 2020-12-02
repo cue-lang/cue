@@ -1,16 +1,42 @@
+// Copyright 2020 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Copyright 2010 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package filepath
+package path
 
 import (
 	"strings"
-	"syscall"
+)
+
+type windowsInfo struct{}
+
+var _ osInfo = windowsInfo{}
+
+const (
+	windowsSeparator     = '\\'
+	windowsListSeparator = ';'
 )
 
 func isSlash(c uint8) bool {
 	return c == '\\' || c == '/'
+}
+
+func (os windowsInfo) IsPathSeparator(b byte) bool {
+	return isSlash(b)
 }
 
 // reservedNames lists reserved Windows names. Search for PRN in
@@ -24,7 +50,7 @@ var reservedNames = []string{
 
 // isReservedName returns true, if path is Windows reserved name.
 // See reservedNames for the full list.
-func isReservedName(path string) bool {
+func (os windowsInfo) isReservedName(path string) bool {
 	if len(path) == 0 {
 		return false
 	}
@@ -37,11 +63,11 @@ func isReservedName(path string) bool {
 }
 
 // IsAbs reports whether the path is absolute.
-func IsAbs(path string) (b bool) {
-	if isReservedName(path) {
+func (os windowsInfo) IsAbs(path string) (b bool) {
+	if os.isReservedName(path) {
 		return true
 	}
-	l := volumeNameLen(path)
+	l := os.volumeNameLen(path)
 	if l == 0 {
 		return false
 	}
@@ -54,7 +80,7 @@ func IsAbs(path string) (b bool) {
 
 // volumeNameLen returns length of the leading volume name on Windows.
 // It returns 0 elsewhere.
-func volumeNameLen(path string) int {
+func (os windowsInfo) volumeNameLen(path string) int {
 	if len(path) < 2 {
 		return 0
 	}
@@ -94,14 +120,14 @@ func volumeNameLen(path string) int {
 //
 // Deprecated: HasPrefix does not respect path boundaries and
 // does not ignore case when required.
-func HasPrefix(p, prefix string) bool {
+func (os windowsInfo) HasPrefix(p, prefix string) bool {
 	if strings.HasPrefix(p, prefix) {
 		return true
 	}
 	return strings.HasPrefix(strings.ToLower(p), strings.ToLower(prefix))
 }
 
-func splitList(path string) []string {
+func (os windowsInfo) splitList(path string) []string {
 	// The same implementation is used in LookPath in os/exec;
 	// consider changing os/exec when changing this.
 
@@ -117,7 +143,7 @@ func splitList(path string) []string {
 		switch c := path[i]; {
 		case c == '"':
 			quo = !quo
-		case c == ListSeparator && !quo:
+		case c == windowsListSeparator && !quo:
 			list = append(list, path[start:i])
 			start = i + 1
 		}
@@ -132,31 +158,17 @@ func splitList(path string) []string {
 	return list
 }
 
-func abs(path string) (string, error) {
-	if path == "" {
-		// syscall.FullPath returns an error on empty path, because it's not a valid path.
-		// To implement Abs behavior of returning working directory on empty string input,
-		// special-case empty path by changing it to "." path. See golang.org/issue/24441.
-		path = "."
-	}
-	fullPath, err := syscall.FullPath(path)
-	if err != nil {
-		return "", err
-	}
-	return Clean(fullPath), nil
-}
-
-func join(elem []string) string {
+func (os windowsInfo) join(elem []string) string {
 	for i, e := range elem {
 		if e != "" {
-			return joinNonEmpty(elem[i:])
+			return os.joinNonEmpty(elem[i:])
 		}
 	}
 	return ""
 }
 
 // joinNonEmpty is like join, but it assumes that the first element is non-empty.
-func joinNonEmpty(elem []string) string {
+func (o windowsInfo) joinNonEmpty(elem []string) string {
 	if len(elem[0]) == 2 && elem[0][1] == ':' {
 		// First element is drive letter without terminating slash.
 		// Keep path relative to current directory on that drive.
@@ -167,34 +179,34 @@ func joinNonEmpty(elem []string) string {
 				break
 			}
 		}
-		return Clean(elem[0] + strings.Join(elem[i:], string(Separator)))
+		return clean(elem[0]+strings.Join(elem[i:], string(windowsSeparator)), windows)
 	}
 	// The following logic prevents Join from inadvertently creating a
 	// UNC path on Windows. Unless the first element is a UNC path, Join
 	// shouldn't create a UNC path. See golang.org/issue/9167.
-	p := Clean(strings.Join(elem, string(Separator)))
+	p := clean(strings.Join(elem, string(windowsSeparator)), windows)
 	if !isUNC(p) {
 		return p
 	}
 	// p == UNC only allowed when the first element is a UNC path.
-	head := Clean(elem[0])
+	head := clean(elem[0], windows)
 	if isUNC(head) {
 		return p
 	}
 	// head + tail == UNC, but joining two non-UNC paths should not result
 	// in a UNC path. Undo creation of UNC path.
-	tail := Clean(strings.Join(elem[1:], string(Separator)))
-	if head[len(head)-1] == Separator {
+	tail := clean(strings.Join(elem[1:], string(windowsSeparator)), windows)
+	if head[len(head)-1] == windowsSeparator {
 		return head + tail
 	}
-	return head + string(Separator) + tail
+	return head + string(windowsSeparator) + tail
 }
 
 // isUNC reports whether path is a UNC path.
 func isUNC(path string) bool {
-	return volumeNameLen(path) > 2
+	return windows.volumeNameLen(path) > 2
 }
 
-func sameWord(a, b string) bool {
+func (o windowsInfo) sameWord(a, b string) bool {
 	return strings.EqualFold(a, b)
 }

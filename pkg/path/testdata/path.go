@@ -1,3 +1,17 @@
+// Copyright 2020 CUE Authors
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//     http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
 // Copyright 2009 The Go Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
@@ -9,13 +23,10 @@
 // depending on the operating system. To process paths such as URLs
 // that always use forward slashes regardless of the operating
 // system, see the path package.
-package filepath
+package path
 
 import (
 	"errors"
-	"io/fs"
-	"os"
-	"sort"
 	"strings"
 )
 
@@ -58,13 +69,14 @@ func (b *lazybuf) string() string {
 	return b.volAndPath[:b.volLen] + string(b.buf[:b.w])
 }
 
-const (
-	Separator     = os.PathSeparator
-	ListSeparator = os.PathListSeparator
-)
+// const (
+// 	Separator     = os.PathSeparator
+// 	ListSeparator = os.PathListSeparator
+// )
 
 // Clean returns the shortest path name equivalent to path
-// by purely lexical processing. It applies the following rules
+// by purely lexical processing. The default value for os is Unix.
+// It applies the following rules
 // iteratively until no further processing can be done:
 //
 //	1. Replace multiple Separator elements with a single one.
@@ -86,14 +98,18 @@ const (
 // See also Rob Pike, ``Lexical File Names in Plan 9 or
 // Getting Dot-Dot Right,''
 // https://9p.io/sys/doc/lexnames.html
-func Clean(path string) string {
+func Clean(path string, os OS) string {
+	return clean(path, getOS(os))
+}
+
+func clean(path string, os os) string {
 	originalPath := path
-	volLen := volumeNameLen(path)
+	volLen := os.volumeNameLen(path)
 	path = path[volLen:]
 	if path == "" {
 		if volLen > 1 && originalPath[1] != ':' {
 			// should be UNC
-			return FromSlash(originalPath)
+			return fromSlash(originalPath, os)
 		}
 		return originalPath + "."
 	}
@@ -108,7 +124,7 @@ func Clean(path string) string {
 	out := lazybuf{path: path, volAndPath: originalPath, volLen: volLen}
 	r, dotdot := 0, 0
 	if rooted {
-		out.append(Separator)
+		out.append(os.Separator)
 		r, dotdot = 1, 1
 	}
 
@@ -133,7 +149,7 @@ func Clean(path string) string {
 			case !rooted:
 				// cannot backtrack, but not rooted, so append .. element.
 				if out.w > 0 {
-					out.append(Separator)
+					out.append(os.Separator)
 				}
 				out.append('.')
 				out.append('.')
@@ -143,7 +159,7 @@ func Clean(path string) string {
 			// real path element.
 			// add slash if needed
 			if rooted && out.w != 1 || !rooted && out.w != 0 {
-				out.append(Separator)
+				out.append(os.Separator)
 			}
 			// copy element
 			for ; r < n && !os.IsPathSeparator(path[r]); r++ {
@@ -157,49 +173,58 @@ func Clean(path string) string {
 		out.append('.')
 	}
 
-	return FromSlash(out.string())
+	return fromSlash(out.string(), os)
 }
 
 // ToSlash returns the result of replacing each separator character
 // in path with a slash ('/') character. Multiple separators are
 // replaced by multiple slashes.
-func ToSlash(path string) string {
-	if Separator == '/' {
+func ToSlash(path string, os OS) string {
+	return toSlash(path, getOS(os))
+}
+
+func toSlash(path string, os os) string {
+	if os.Separator == '/' {
 		return path
 	}
-	return strings.ReplaceAll(path, string(Separator), "/")
+	return strings.ReplaceAll(path, string(os.Separator), "/")
 }
 
 // FromSlash returns the result of replacing each slash ('/') character
 // in path with a separator character. Multiple slashes are replaced
 // by multiple separators.
-func FromSlash(path string) string {
-	if Separator == '/' {
+func FromSlash(path string, os OS) string {
+	return fromSlash(path, getOS(os))
+}
+
+func fromSlash(path string, os os) string {
+	if os.Separator == '/' {
 		return path
 	}
-	return strings.ReplaceAll(path, "/", string(Separator))
+	return strings.ReplaceAll(path, "/", string(os.Separator))
 }
 
 // SplitList splits a list of paths joined by the OS-specific ListSeparator,
 // usually found in PATH or GOPATH environment variables.
 // Unlike strings.Split, SplitList returns an empty slice when passed an empty
 // string.
-func SplitList(path string) []string {
-	return splitList(path)
+func SplitList(path string, os OS) []string {
+	return getOS(os).splitList(path)
 }
 
-// Split splits path immediately following the final Separator,
-// separating it into a directory and file name component.
-// If there is no Separator in path, Split returns an empty dir
-// and file set to path.
-// The returned values have the property that path = dir+file.
-func Split(path string) (dir, file string) {
-	vol := VolumeName(path)
+// Split splits path immediately following the final slash and returns them as
+// the list [dir, file], separating it into a directory and file name component.
+// If there is no slash in path, Split returns an empty dir and file set to
+// path. The returned values have the property that path = dir+file.
+// The default value for os is Unix.
+func Split(path string, os OS) []string {
+	x := getOS(os)
+	vol := volumeName(path, x)
 	i := len(path) - 1
-	for i >= len(vol) && !os.IsPathSeparator(path[i]) {
+	for i >= len(vol) && !x.IsPathSeparator(path[i]) {
 		i--
 	}
-	return path[:i+1], path[i+1:]
+	return []string{path[:i+1], path[i+1:]}
 }
 
 // Join joins any number of path elements into a single path,
@@ -209,16 +234,18 @@ func Split(path string) (dir, file string) {
 // an empty string.
 // On Windows, the result will only be a UNC path if the first
 // non-empty element is a UNC path.
-func Join(elem ...string) string {
-	return join(elem)
+// The default value for os is Unix.
+func Join(elem []string, os OS) string {
+	return getOS(os).join(elem)
 }
 
 // Ext returns the file name extension used by path.
 // The extension is the suffix beginning at the final dot
 // in the final element of path; it is empty if there is
-// no dot.
-func Ext(path string) string {
-	for i := len(path) - 1; i >= 0 && !os.IsPathSeparator(path[i]); i-- {
+// no dot. The default value for os is Unix.
+func Ext(path string, os OS) string {
+	x := getOS(os)
+	for i := len(path) - 1; i >= 0 && !x.IsPathSeparator(path[i]); i-- {
 		if path[i] == '.' {
 			return path[i:]
 		}
@@ -226,33 +253,16 @@ func Ext(path string) string {
 	return ""
 }
 
-// EvalSymlinks returns the path name after the evaluation of any symbolic
-// links.
-// If path is relative the result will be relative to the current directory,
-// unless one of the components is an absolute symbolic link.
-// EvalSymlinks calls Clean on the result.
-func EvalSymlinks(path string) (string, error) {
-	return evalSymlinks(path)
-}
-
-// Abs returns an absolute representation of path.
-// If the path is not absolute it will be joined with the current
-// working directory to turn it into an absolute path. The absolute
-// path name for a given file is not guaranteed to be unique.
-// Abs calls Clean on the result.
-func Abs(path string) (string, error) {
-	return abs(path)
-}
-
-func unixAbs(path string) (string, error) {
-	if IsAbs(path) {
-		return Clean(path), nil
+// Resolve reports the path of sub relative to dir. If sub is an absolute path,
+// or if dir is empty, it will return sub. If sub is empty, it will return dir.
+// Resolve calls Clean on the result. The default value for os is Unix.
+func Resolve(dir, sub string, os OS) string {
+	x := getOS(os)
+	if x.IsAbs(sub) {
+		return clean(sub, x)
 	}
-	wd, err := os.Getwd()
-	if err != nil {
-		return "", err
-	}
-	return Join(wd, path), nil
+	dir = clean(dir, x)
+	return x.join([]string{dir, sub})
 }
 
 // Rel returns a relative path that is lexically equivalent to targpath when
@@ -262,13 +272,14 @@ func unixAbs(path string) (string, error) {
 // even if basepath and targpath share no elements.
 // An error is returned if targpath can't be made relative to basepath or if
 // knowing the current working directory would be necessary to compute it.
-// Rel calls Clean on the result.
-func Rel(basepath, targpath string) (string, error) {
-	baseVol := VolumeName(basepath)
-	targVol := VolumeName(targpath)
-	base := Clean(basepath)
-	targ := Clean(targpath)
-	if sameWord(targ, base) {
+// Rel calls Clean on the result. The default value for os is Unix.
+func Rel(basepath, targpath string, os OS) (string, error) {
+	x := getOS(os)
+	baseVol := volumeName(basepath, x)
+	targVol := volumeName(targpath, x)
+	base := clean(basepath, x)
+	targ := clean(targpath, x)
+	if x.sameWord(targ, base) {
 		return ".", nil
 	}
 	base = base[len(baseVol):]
@@ -277,9 +288,9 @@ func Rel(basepath, targpath string) (string, error) {
 		base = ""
 	}
 	// Can't use IsAbs - `\a` and `a` are both relative in Windows.
-	baseSlashed := len(base) > 0 && base[0] == Separator
-	targSlashed := len(targ) > 0 && targ[0] == Separator
-	if baseSlashed != targSlashed || !sameWord(baseVol, targVol) {
+	baseSlashed := len(base) > 0 && base[0] == x.Separator
+	targSlashed := len(targ) > 0 && targ[0] == x.Separator
+	if baseSlashed != targSlashed || !x.sameWord(baseVol, targVol) {
 		return "", errors.New("Rel: can't make " + targpath + " relative to " + basepath)
 	}
 	// Position base[b0:bi] and targ[t0:ti] at the first differing elements.
@@ -287,13 +298,13 @@ func Rel(basepath, targpath string) (string, error) {
 	tl := len(targ)
 	var b0, bi, t0, ti int
 	for {
-		for bi < bl && base[bi] != Separator {
+		for bi < bl && base[bi] != x.Separator {
 			bi++
 		}
-		for ti < tl && targ[ti] != Separator {
+		for ti < tl && targ[ti] != x.Separator {
 			ti++
 		}
-		if !sameWord(targ[t0:ti], base[b0:bi]) {
+		if !x.sameWord(targ[t0:ti], base[b0:bi]) {
 			break
 		}
 		if bi < bl {
@@ -310,7 +321,7 @@ func Rel(basepath, targpath string) (string, error) {
 	}
 	if b0 != bl {
 		// Base elements left. Must go up before going down.
-		seps := strings.Count(base[b0:bl], string(Separator))
+		seps := strings.Count(base[b0:bl], string(x.Separator))
 		size := 2 + seps*3
 		if tl != t0 {
 			size += 1 + tl - t0
@@ -318,12 +329,12 @@ func Rel(basepath, targpath string) (string, error) {
 		buf := make([]byte, size)
 		n := copy(buf, "..")
 		for i := 0; i < seps; i++ {
-			buf[n] = Separator
+			buf[n] = x.Separator
 			copy(buf[n+1:], "..")
 			n += 3
 		}
 		if t0 != tl {
-			buf[n] = Separator
+			buf[n] = x.Separator
 			copy(buf[n+1:], targ[t0:])
 		}
 		return string(buf), nil
@@ -331,230 +342,25 @@ func Rel(basepath, targpath string) (string, error) {
 	return targ[t0:], nil
 }
 
-// SkipDir is used as a return value from WalkFuncs to indicate that
-// the directory named in the call is to be skipped. It is not returned
-// as an error by any function.
-var SkipDir error = fs.SkipDir
-
-// WalkFunc is the type of the function called by Walk to visit each each
-// file or directory.
-//
-// The path argument contains the argument to Walk as a prefix.
-// That is, if Walk is called with root argument "dir" and finds a file
-// named "a" in that directory, the walk function will be called with
-// argument "dir/a".
-//
-// The directory and file are joined with Join, which may clean the
-// directory name: if Walk is called with the root argument "x/../dir"
-// and finds a file named "a" in that directory, the walk function will
-// be called with argument "dir/a", not "x/../dir/a".
-//
-// The info argument is the fs.FileInfo for the named path.
-//
-// The error result returned by the function controls how Walk continues.
-// If the function returns the special value SkipDir, Walk skips the
-// current directory (path if info.IsDir() is true, otherwise path's
-// parent directory). Otherwise, if the function returns a non-nil error,
-// Walk stops entirely and returns that error.
-//
-// The err argument reports an error related to path, signaling that Walk
-// will not walk into that directory. The function can decide how to
-// handle that error; as described earlier, returning the error will
-// cause Walk to stop walking the entire tree.
-//
-// Walk calls the function with a non-nil err argument in two cases.
-//
-// First, if an os.Lstat on the root directory or any directory or file
-// in the tree fails, Walk calls the function with path set to that
-// directory or file's path, info set to nil, and err set to the error
-// from os.Lstat.
-//
-// Second, if a directory's Readdirnames method fails, Walk calls the
-// function with path set to the directory's path, info, set to an
-// fs.FileInfo describing the directory, and err set to the error from
-// Readdirnames.
-type WalkFunc func(path string, info fs.FileInfo, err error) error
-
-var lstat = os.Lstat // for testing
-
-// walkDir recursively descends path, calling walkDirFn.
-func walkDir(path string, d fs.DirEntry, walkDirFn fs.WalkDirFunc) error {
-	if err := walkDirFn(path, d, nil); err != nil || !d.IsDir() {
-		if err == SkipDir && d.IsDir() {
-			// Successfully skipped directory.
-			err = nil
-		}
-		return err
-	}
-
-	dirs, err := readDir(path)
-	if err != nil {
-		// Second call, to report ReadDir error.
-		err = walkDirFn(path, d, err)
-		if err != nil {
-			return err
-		}
-	}
-
-	for _, d1 := range dirs {
-		path1 := Join(path, d1.Name())
-		if err := walkDir(path1, d1, walkDirFn); err != nil {
-			if err == SkipDir {
-				break
-			}
-			return err
-		}
-	}
-	return nil
-}
-
-// walk recursively descends path, calling walkFn.
-func walk(path string, info fs.FileInfo, walkFn WalkFunc) error {
-	if !info.IsDir() {
-		return walkFn(path, info, nil)
-	}
-
-	names, err := readDirNames(path)
-	err1 := walkFn(path, info, err)
-	// If err != nil, walk can't walk into this directory.
-	// err1 != nil means walkFn want walk to skip this directory or stop walking.
-	// Therefore, if one of err and err1 isn't nil, walk will return.
-	if err != nil || err1 != nil {
-		// The caller's behavior is controlled by the return value, which is decided
-		// by walkFn. walkFn may ignore err and return nil.
-		// If walkFn returns SkipDir, it will be handled by the caller.
-		// So walk should return whatever walkFn returns.
-		return err1
-	}
-
-	for _, name := range names {
-		filename := Join(path, name)
-		fileInfo, err := lstat(filename)
-		if err != nil {
-			if err := walkFn(filename, fileInfo, err); err != nil && err != SkipDir {
-				return err
-			}
-		} else {
-			err = walk(filename, fileInfo, walkFn)
-			if err != nil {
-				if !fileInfo.IsDir() || err != SkipDir {
-					return err
-				}
-			}
-		}
-	}
-	return nil
-}
-
-// WalkDir walks the file tree rooted at root, calling fn for each file or
-// directory in the tree, including root.
-//
-// All errors that arise visiting files and directories are filtered by fn:
-// see the fs.WalkDirFunc documentation for details.
-//
-// The files are walked in lexical order, which makes the output deterministic
-// but requires WalkDir to read an entire directory into memory before proceeding
-// to walk that directory.
-//
-// WalkDir does not follow symbolic links.
-func WalkDir(root string, fn fs.WalkDirFunc) error {
-	info, err := os.Lstat(root)
-	if err != nil {
-		err = fn(root, nil, err)
-	} else {
-		err = walkDir(root, &statDirEntry{info}, fn)
-	}
-	if err == SkipDir {
-		return nil
-	}
-	return err
-}
-
-type statDirEntry struct {
-	info fs.FileInfo
-}
-
-func (d *statDirEntry) Name() string               { return d.info.Name() }
-func (d *statDirEntry) IsDir() bool                { return d.info.IsDir() }
-func (d *statDirEntry) Type() fs.FileMode          { return d.info.Mode().Type() }
-func (d *statDirEntry) Info() (fs.FileInfo, error) { return d.info, nil }
-
-// Walk walks the file tree rooted at root, calling fn for each file or
-// directory in the tree, including root.
-//
-// All errors that arise visiting files and directories are filtered by fn:
-// see the WalkFunc documentation for details.
-//
-// The files are walked in lexical order, which makes the output deterministic
-// but requires Walk to read an entire directory into memory before proceeding
-// to walk that directory.
-//
-// Walk does not follow symbolic links.
-//
-// Walk is less efficient than WalkDir, introduced in Go 1.16,
-// which avoids calling os.Lstat on every visited file or directory.
-func Walk(root string, fn WalkFunc) error {
-	info, err := os.Lstat(root)
-	if err != nil {
-		err = fn(root, nil, err)
-	} else {
-		err = walk(root, info, fn)
-	}
-	if err == SkipDir {
-		return nil
-	}
-	return err
-}
-
-// readDir reads the directory named by dirname and returns
-// a sorted list of directory entries.
-func readDir(dirname string) ([]fs.DirEntry, error) {
-	f, err := os.Open(dirname)
-	if err != nil {
-		return nil, err
-	}
-	dirs, err := f.ReadDir(-1)
-	f.Close()
-	if err != nil {
-		return nil, err
-	}
-	sort.Slice(dirs, func(i, j int) bool { return dirs[i].Name() < dirs[j].Name() })
-	return dirs, nil
-}
-
-// readDirNames reads the directory named by dirname and returns
-// a sorted list of directory entry names.
-func readDirNames(dirname string) ([]string, error) {
-	f, err := os.Open(dirname)
-	if err != nil {
-		return nil, err
-	}
-	names, err := f.Readdirnames(-1)
-	f.Close()
-	if err != nil {
-		return nil, err
-	}
-	sort.Strings(names)
-	return names, nil
-}
-
 // Base returns the last element of path.
 // Trailing path separators are removed before extracting the last element.
 // If the path is empty, Base returns ".".
 // If the path consists entirely of separators, Base returns a single separator.
-func Base(path string) string {
+// The default value for os is Unix.
+func Base(path string, os OS) string {
+	x := getOS(os)
 	if path == "" {
 		return "."
 	}
 	// Strip trailing slashes.
-	for len(path) > 0 && os.IsPathSeparator(path[len(path)-1]) {
+	for len(path) > 0 && x.IsPathSeparator(path[len(path)-1]) {
 		path = path[0 : len(path)-1]
 	}
 	// Throw away volume name
-	path = path[len(VolumeName(path)):]
+	path = path[x.volumeNameLen(path):]
 	// Find the last element
 	i := len(path) - 1
-	for i >= 0 && !os.IsPathSeparator(path[i]) {
+	for i >= 0 && !x.IsPathSeparator(path[i]) {
 		i--
 	}
 	if i >= 0 {
@@ -562,7 +368,7 @@ func Base(path string) string {
 	}
 	// If empty now, it had only slashes.
 	if path == "" {
-		return string(Separator)
+		return string(x.Separator)
 	}
 	return path
 }
@@ -573,13 +379,15 @@ func Base(path string) string {
 // If the path is empty, Dir returns ".".
 // If the path consists entirely of separators, Dir returns a single separator.
 // The returned path does not end in a separator unless it is the root directory.
-func Dir(path string) string {
-	vol := VolumeName(path)
+// The default value for os is Unix.
+func Dir(path string, os OS) string {
+	x := getOS(os)
+	vol := volumeName(path, x)
 	i := len(path) - 1
-	for i >= len(vol) && !os.IsPathSeparator(path[i]) {
+	for i >= len(vol) && !x.IsPathSeparator(path[i]) {
 		i--
 	}
-	dir := Clean(path[len(vol) : i+1])
+	dir := clean(path[len(vol):i+1], x)
 	if dir == "." && len(vol) > 2 {
 		// must be UNC
 		return vol
@@ -587,10 +395,20 @@ func Dir(path string) string {
 	return vol + dir
 }
 
+// IsAbs reports whether the path is absolute. The default value for os is Unix.
+func IsAbs(path string, os OS) bool {
+	return getOS(os).IsAbs(path)
+}
+
 // VolumeName returns leading volume name.
 // Given "C:\foo\bar" it returns "C:" on Windows.
 // Given "\\host\share\foo" it returns "\\host\share".
 // On other platforms it returns "".
-func VolumeName(path string) string {
-	return path[:volumeNameLen(path)]
+// The default value for os is Windows.
+func VolumeName(path string, os OS) string {
+	return volumeName(path, getOS(os))
+}
+
+func volumeName(path string, os os) string {
+	return path[:os.volumeNameLen(path)]
 }

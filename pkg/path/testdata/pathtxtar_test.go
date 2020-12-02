@@ -12,24 +12,14 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Copyright 2017 The Go Authors. All rights reserved.
-// Use of this source code is governed by a BSD-style
-// license that can be found in the LICENSE file.
-
 package path_test
 
 import (
-	"fmt"
+	"testing"
 
-	"cuelang.org/go/pkg/path"
+	"cuelang.org/go/pkg/internal/builtintest"
 )
 
-func ExampleExt() {
-	fmt.Printf("No dots: %q\n", path.Ext("index", "unix"))
-	fmt.Printf("One dot: %q\n", path.Ext("index.js", "unix"))
-	fmt.Printf("Two dots: %q\n", path.Ext("main.test.js", "unix"))
-	// Output:
-	// No dots: ""
-	// One dot: ".js"
-	// Two dots: ".js"
+func TestBuiltin(t *testing.T) {
+	builtintest.Run("path", t)
 }

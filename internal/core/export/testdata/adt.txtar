@@ -12,6 +12,8 @@ d2: C="foo\(bar)": {
     foo: C.name
 }
 
+bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
+
 c1: mystrings.Contains("aa", "a")
 
 s1: """
@@ -95,8 +97,9 @@ d2: {
 		foo:  C.name
 	}
 }
-c1: mystrings.Contains("aa", "a")
-s1: """
+bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
+c1:    mystrings.Contains("aa", "a")
+s1:    """
 		multi
 		\(bar)
 		line
@@ -153,6 +156,7 @@ y1: {
 [d2 foobar]
 [d2 foobar name]
 [d2 foobar foo]
+[bytes]
 [c1]
 [s1]
 [l1]

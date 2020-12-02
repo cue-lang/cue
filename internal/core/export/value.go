@@ -257,7 +257,7 @@ func (e *exporter) bytes(n *adt.Bytes, orig []adt.Conjunct) *ast.BasicLit {
 	if b := extractBasic(orig); b != nil {
 		return b
 	}
-	s := literal.String.WithOptionalTabIndent(len(e.stack)).Quote(string(n.B))
+	s := literal.Bytes.WithOptionalTabIndent(len(e.stack)).Quote(string(n.B))
 	return &ast.BasicLit{
 		Kind:  token.STRING,
 		Value: s,

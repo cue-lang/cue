@@ -84,6 +84,10 @@ func (w *printer) label(f adt.Feature) {
 	w.string(w.labelString(f))
 }
 
+func (w *printer) ident(f adt.Feature) {
+	w.string(f.IdentString(w.index))
+}
+
 // TODO: fold into label once :: is no longer supported.
 func (w *printer) labelString(f adt.Feature) string {
 	if f.IsHidden() {
@@ -378,7 +382,7 @@ func (w *printer) node(n adt.Node) {
 		w.string(openTuple)
 		w.string(strconv.Itoa(int(x.UpCount)))
 		w.string(";let ")
-		w.label(x.Label)
+		w.ident(x.Label)
 		w.string(closeTuple)
 
 	case *adt.SelectorExpr:
@@ -490,9 +494,9 @@ func (w *printer) node(n adt.Node) {
 
 	case *adt.ForClause:
 		w.string("for ")
-		w.label(x.Key)
+		w.ident(x.Key)
 		w.string(", ")
-		w.label(x.Value)
+		w.ident(x.Value)
 		w.string(" in ")
 		w.node(x.Src)
 		w.string(" ")
@@ -506,7 +510,7 @@ func (w *printer) node(n adt.Node) {
 
 	case *adt.LetClause:
 		w.string("let ")
-		w.label(x.Label)
+		w.ident(x.Label)
 		w.string(" = ")
 		w.node(x.Expr)
 		w.string(" ")

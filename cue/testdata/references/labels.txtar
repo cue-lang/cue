@@ -45,6 +45,11 @@ c1: C="foo\(bar)": [D=string]: {
 }
 c1: foo3: x: _
 
+emptyLabel: {
+    "": 1
+    a: emptyLabel[""]
+}
+
 // TODO: support. Also not yet supported in old implementation.
 // c10: {
 // 	C=[string]: {
@@ -94,6 +99,10 @@ c1: foo3: x: _
         foo: (string){ "x" }
       }
     }
+  }
+  emptyLabel: (struct){
+    "": (int){ 1 }
+    a: (int){ 1 }
   }
 }
 -- out/compile --
@@ -174,5 +183,9 @@ c1: foo3: x: _
     foo3: {
       x: _
     }
+  }
+  emptyLabel: {
+    "": 1
+    a: 〈1;emptyLabel〉[""]
   }
 }

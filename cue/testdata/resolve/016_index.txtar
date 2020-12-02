@@ -97,7 +97,7 @@ c: invalid list index "3" (type string):
     ./in.cue:3:20
 d: index out of range [0] with length 0:
     ./in.cue:4:16
-e1: invalid list index _ (type string):
+e1: invalid list index "" (type string):
     ./in.cue:6:9
 e2: invalid operand 2 (found int, want list or struct):
     ./in.cue:7:5
@@ -132,7 +132,7 @@ Result:
   l: (#list){
   }
   e1: (_|_){
-    // [eval] e1: invalid list index _ (type string):
+    // [eval] e1: invalid list index "" (type string):
     //     ./in.cue:6:9
   }
   e2: (_|_){

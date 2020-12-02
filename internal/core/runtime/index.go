@@ -62,7 +62,8 @@ var (
 )
 
 func init() {
-	getKey("")
+	// Ensure label 0 is assigned to _.
+	getKey("_")
 }
 
 func getKey(s string) int64 {

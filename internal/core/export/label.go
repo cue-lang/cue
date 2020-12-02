@@ -24,9 +24,6 @@ import (
 )
 
 func (e *exporter) stringLabel(f adt.Feature) ast.Label {
-	if f == 0 {
-		return ast.NewIdent("_")
-	}
 	x := f.Index()
 	switch f.Typ() {
 	case adt.IntLabel:
@@ -38,7 +35,7 @@ func (e *exporter) stringLabel(f adt.Feature) ast.Label {
 
 	case adt.StringLabel:
 		s := e.ctx.IndexToString(int64(x))
-		if !ast.IsValidIdent(s) {
+		if f == 0 || !ast.IsValidIdent(s) {
 			return ast.NewLit(token.STRING, literal.Label.Quote(s))
 		}
 		fallthrough

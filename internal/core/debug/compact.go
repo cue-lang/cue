@@ -193,7 +193,7 @@ func (w *compactPrinter) node(n adt.Node) {
 		w.label(x.ImportPath)
 
 	case *adt.LetReference:
-		w.label(x.Label)
+		w.ident(x.Label)
 
 	case *adt.SelectorExpr:
 		w.node(x.X)
@@ -300,9 +300,9 @@ func (w *compactPrinter) node(n adt.Node) {
 
 	case *adt.ForClause:
 		w.string("for ")
-		w.label(x.Key)
+		w.ident(x.Key)
 		w.string(", ")
-		w.label(x.Value)
+		w.ident(x.Value)
 		w.string(" in ")
 		w.node(x.Src)
 		w.string(" ")
@@ -316,7 +316,7 @@ func (w *compactPrinter) node(n adt.Node) {
 
 	case *adt.LetClause:
 		w.string("let ")
-		w.label(x.Label)
+		w.ident(x.Label)
 		w.string(" = ")
 		w.node(x.Expr)
 		w.string(" ")

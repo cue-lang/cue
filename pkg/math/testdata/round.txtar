@@ -41,36 +41,27 @@ floorE2: cannot use "foo" (type string) as number in argument 1 to math.Floor:
     ./in.cue:18:21
 
 Result:
-(_|_){
-  // [eval]
-  mul0: (bool){ true }
-  mul1: (bool){ false }
-  mul2: (_|_){
-    // [eval] error in call to math.MultipleOf: division by zero
-  }
-  mul3: (bool){ false }
-  mul4: (bool){ true }
-  mul5: (bool){ true }
-  mul6: (bool){ true }
-  r0: (int){ 3 }
-  r1: (int){ -3 }
-  r2: (int){ 2 }
-  r3: (int){ -2 }
-  floorE1: (_|_){
-    // [eval] floorE1: too many arguments in call to math.Floor (have 2, want 1):
-    //     ./in.cue:17:25
-  }
-  floorE2: (_|_){
-    // [eval] floorE2: cannot use "foo" (type string) as number in argument 1 to math.Floor:
-    //     ./in.cue:18:21
-  }
-  floor0: (int){ 3 }
-  floor1: (int){ 2 }
-  floor2: (int){ -3 }
-  floor3: (int){ 2900 }
-  floor4: (int){ 2900 }
-  ceil0: (int){ 3 }
-  ceil1: (int){ -2 }
-  trunc0: (int){ 2 }
-  trunc1: (int){ -2 }
-}
+mul0: true
+mul1: false
+// TODO(errors): ensure path is included for the following error.
+mul2:    _|_ // error in call to math.MultipleOf: division by zero (and 1 more errors)
+mul3:    false
+mul4:    true
+mul5:    true
+mul6:    true
+r0:      3
+r1:      -3
+r2:      2
+r3:      -2
+floorE1: _|_ // floorE1: too many arguments in call to math.Floor (have 2, want 1)
+floorE2: _|_ // floorE2: cannot use "foo" (type string) as number in argument 1 to math.Floor
+floor0:  3
+floor1:  2
+floor2:  -3
+floor3:  2900
+floor4:  2900
+ceil0:   3
+ceil1:   -2
+trunc0:  2
+trunc1:  -2
+

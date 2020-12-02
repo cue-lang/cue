@@ -5,6 +5,5 @@ import "text/template"
 
 t1: template.Execute("{{.}}-{{.}}", "foo")
 -- out/template --
-(struct){
-  t1: (string){ "foo-foo" }
-}
+t1: "foo-foo"
+

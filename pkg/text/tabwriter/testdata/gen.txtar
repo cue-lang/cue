@@ -11,7 +11,13 @@ t2: tabwriter.Write([
 				"a\tb\tc",
 				"aaa\tbb\tvv"])
 -- out/tabwriter --
-(struct){
-  t1: (string){ "a   b  c\naaa bb vv" }
-  t2: (string){ "a   b  c\naaa bb vv\n" }
-}
+t1: """
+	a   b  c
+	aaa bb vv
+	"""
+t2: """
+	a   b  c
+	aaa bb vv
+
+	"""
+

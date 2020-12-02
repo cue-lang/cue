@@ -20,22 +20,33 @@ Errors:
 a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3)
 
 Result:
-(_|_){
-  // [eval]
-  t1: (bool){ true }
-  t2: (_|_){
-    // [eval] a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3)
-  }
-  t3: (bool){ true }
-  t4: (string){ "[1,2]" }
-  t5: (string){ "{\n  \"a\": 1,\n  \"b\": 2\n}" }
-  t6: (int){ 1 }
-  t7: (string){ "{\"a\":1}\n{\"b\":2}\n" }
-  t8: (struct){
-    x: (int){ int }
-    y: (_|_){
-      // [incomplete] cannot convert incomplete value "int" to JSON
-    }
-  }
-  t9: (string){ "{\"a\":1}\n{\"b\":2}\n" }
+import "encoding/json"
+
+t1: true
+t2: _|_ // error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3) (and 1 more errors)
+t3: true
+t4: "[1,2]"
+t5: """
+	{
+	  "a": 1,
+	  "b": 2
+	}
+	"""
+t6: 1
+t7: """
+	{"a":1}
+	{"b":2}
+
+	"""
+t8: {
+	x: int
+	y: json.Marshal({
+		a: x
+	})
 }
+t9: """
+	{"a":1}
+	{"b":2}
+
+	"""
+

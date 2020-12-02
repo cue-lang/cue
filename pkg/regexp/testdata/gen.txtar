@@ -26,76 +26,32 @@ error in call to regexp.FindAllSubmatch: no match
 error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
 
 Result:
-(_|_){
-  // [eval]
-  t1: (string){ "foo" }
-  t2: (_|_){
-    // [eval] error in call to regexp.Find: no match
-  }
-  t3: (#list){
-    0: (string){ "foo" }
-    1: (string){ "flo" }
-  }
-  t4: (#list){
-    0: (string){ "foo" }
-    1: (string){ "flo" }
-  }
-  t5: (_|_){
-    // [eval] error in call to regexp.FindAll: no match
-  }
-  t6: (#list){
-    0: (string){ "flo" }
-    1: (string){ "l" }
-    2: (string){ "o" }
-  }
-  t7: (#list){
-    0: (#list){
-      0: (string){ "flo" }
-      1: (string){ "l" }
-      2: (string){ "o" }
-    }
-    1: (#list){
-      0: (string){ "foo" }
-      1: (string){ "o" }
-      2: (string){ "o" }
-    }
-    2: (#list){
-      0: (string){ "fro" }
-      1: (string){ "r" }
-      2: (string){ "o" }
-    }
-  }
-  t8: (_|_){
-    // [eval] error in call to regexp.FindAllSubmatch: no match
-  }
-  t9: (struct){
-    A: (string){ "l" }
-    B: (string){ "o" }
-  }
-  t10: (#list){
-    0: (struct){
-      A: (string){ "l" }
-      B: (string){ "o" }
-    }
-    1: (struct){
-      A: (string){ "o" }
-      B: (string){ "o" }
-    }
-    2: (struct){
-      A: (string){ "r" }
-      B: (string){ "o" }
-    }
-  }
-  t11: (#list){
-    0: (struct){
-      A: (string){ "" }
-    }
-  }
-  t12: (_|_){
-    // [eval] error in call to regexp.FindAllNamedSubmatch: no match
-  }
-  t13: (string){ "valid" }
-  t14: (_|_){
-    // [eval] error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
-  }
+t1: "foo"
+t2: _|_ // error in call to regexp.Find: no match (and 1 more errors)
+t3: ["foo", "flo"]
+t4: ["foo", "flo"]
+t5: _|_ // error in call to regexp.FindAll: no match (and 1 more errors)
+t6: ["flo", "l", "o"]
+t7: [["flo", "l", "o"], ["foo", "o", "o"], ["fro", "r", "o"]]
+t8: _|_ // error in call to regexp.FindAllSubmatch: no match (and 1 more errors)
+t9: {
+	A: "l"
+	B: "o"
 }
+t10: [{
+	A: "l"
+	B: "o"
+}, {
+	A: "o"
+	B: "o"
+}, {
+	A: "r"
+	B: "o"
+}]
+t11: [{
+	A: ""
+}]
+t12: _|_ // error in call to regexp.FindAllNamedSubmatch: no match (and 1 more errors)
+t13: "valid"
+t14: _|_ // error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
+

@@ -32,34 +32,24 @@ cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value wa
     ./in.cue:8:5
 
 Result:
-(_|_){
-  // [eval]
-  t1: (float){ 3.14159265358979323846264338327950288419716939937510582097494459 }
-  t2: (int){ 3 }
-  t3: (_|_){
-    // [eval] t3: cannot call non-function math.Pi (type float):
-    //     ./in.cue:5:5
-  }
-  t6: (_|_){
-    // [eval] error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000
-  }
-  t7: (int){ 1 }
-  t8: (_|_){
-    // [eval] cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up:
-    //     ./in.cue:8:5
-  }
-  t16: (float){ 4096 }
-  t17: (float){ 1E+4 }
-  t18: (bool){ true }
-  t23: (float){ 2.5 }
-  t24: (float){ 2.2 }
-  t25: (float){ 1.25992104989487316476721 }
-  t26: (float){ -5 }
-  t27: (float){ 20.0855369231876677409285 }
-  t28: (float){ 11.3137084989847603904135 }
-  t29: (float){ 1.38629436111989061883446 }
-  t30: (float){ 0.602059991327962390427478 }
-  t31: (float){ 2.32192809488736234787032 }
-  t32: (float){ 0.5 }
-  t33: (float){ 0 }
-}
+t1:  3.14159265358979323846264338327950288419716939937510582097494459
+t2:  3
+t3:  _|_ // t3: cannot call non-function math.Pi (type float)
+t6:  _|_ // error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000 (and 1 more errors)
+t7:  1
+t8:  _|_ // cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up (and 1 more errors)
+t16: 4096
+t17: 1e+4
+t18: true
+t23: 2.5
+t24: 2.2
+t25: 1.25992104989487316476721
+t26: -5
+t27: 20.0855369231876677409285
+t28: 11.3137084989847603904135
+t29: 1.38629436111989061883446
+t30: 0.602059991327962390427478
+t31: 2.32192809488736234787032
+t32: 0.5
+t33: 0
+

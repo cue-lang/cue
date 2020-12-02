@@ -19,8 +19,9 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/export"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -36,9 +37,9 @@ func Run(name string, t *testing.T) {
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
 
-		v, err := r.Build(a[0])
-		if err != nil {
-			t.Fatal(err)
+		v, errs := r.Build(a[0])
+		if errs != nil {
+			t.Fatal(errs)
 		}
 
 		e := eval.New(r)
@@ -54,7 +55,19 @@ func Run(name string, t *testing.T) {
 			fmt.Fprintln(t, "Result:")
 		}
 
-		debug.WriteNode(t, r, v, &debug.Config{Cwd: t.Dir})
-		fmt.Fprintln(t)
+		p := export.All
+		p.ShowErrors = true
+
+		files, errs := p.Vertex(r, test.Name, v)
+		if errs != nil {
+			t.Fatal(errs)
+		}
+
+		b, err := format.Node(files)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		fmt.Fprintln(t, string(b))
 	})
 }

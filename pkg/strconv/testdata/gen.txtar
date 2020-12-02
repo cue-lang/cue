@@ -18,20 +18,9 @@ t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
     ./in.cue:6:31
 
 Result:
-(_|_){
-  // [eval]
-  t1: (string){ "40" }
-  t2: (_|_){
-    // [eval] int 300 overflows byte in argument 1 in call to strconv.FormatFloat:
-    //     ./in.cue:4:5
-  }
-  t3: (_|_){
-    // [eval] cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat:
-    //     ./in.cue:5:5
-  }
-  t4: (_|_){
-    // [eval] t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
-    //     ./in.cue:6:31
-  }
-  t5: (string){ "true" }
-}
+t1: "40"
+t2: _|_ // int 300 overflows byte in argument 1 in call to strconv.FormatFloat (and 1 more errors)
+t3: _|_ // cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat (and 1 more errors)
+t4: _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
+t5: "true"
+

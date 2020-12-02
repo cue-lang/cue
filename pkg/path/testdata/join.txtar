@@ -1,0 +1,205 @@
+// Copyright 2020 CUE Authors
+// 
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+// 
+//     http://www.apache.org/licenses/LICENSE-2.0
+// 
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+-- in.cue --
+import "path"
+
+joinSingle: path.Join(["a", "b"])
+joinSingle: "a/b"
+
+Join: unix:    _
+Join: windows: _
+
+Join: [OS=string]: [...{
+    arg: [...string]
+
+    out: path.Join(arg, OS)
+}]
+
+Join: [_]: [
+    {arg: ["a", "b"]},
+    {arg: ["a/b", "c/d"]},
+
+    {arg: ["/"]},
+    {arg: ["a"]},
+
+    {arg: ["a", "b"]},
+    {arg: ["a", ""]},
+    {arg: ["", "b"]},
+    {arg: ["/", "a"]},
+    {arg: ["/", "a/b"]},
+    {arg: ["/", ""]},
+    {arg: ["//", "a"]},
+
+    {arg: ["directory", "file"]},
+
+    {arg: [#"C:\Windows\"#, #"System32"#]},
+    {arg: [#"C:\Windows\"#, #""#]},
+    {arg: [#"C:\"#, #"Windows"#]},
+    {arg: [#"C:"#, #"a\b"#]},
+    {arg: [#"C:"#, #"a"#, #"b"#]},
+    {arg: [#"C:"#, #""#, #""#, #"b"#]},
+    {arg: [#"C:"#, #""#]},
+    {arg: [#"C:"#, #""#, #""#]},
+    {arg: [#"C:."#, #"a"#]},
+    {arg: [#"C:a"#, #"b"#]},
+    {arg: [#"\\host\share"#, #"foo"#]},
+]
+
+-- out/path --
+joinSingle: "a/b"
+Join: {
+	unix: [{
+		arg: ["a", "b"]
+		out: "a/b"
+	}, {
+		arg: ["a/b", "c/d"]
+		out: "a/b/c/d"
+	}, {
+		arg: ["/"]
+		out: "/"
+	}, {
+		arg: ["a"]
+		out: "a"
+	}, {
+		arg: ["a", "b"]
+		out: "a/b"
+	}, {
+		arg: ["a", ""]
+		out: "a"
+	}, {
+		arg: ["", "b"]
+		out: "b"
+	}, {
+		arg: ["/", "a"]
+		out: "/a"
+	}, {
+		arg: ["/", "a/b"]
+		out: "/a/b"
+	}, {
+		arg: ["/", ""]
+		out: "/"
+	}, {
+		arg: ["//", "a"]
+		out: "/a"
+	}, {
+		arg: ["directory", "file"]
+		out: "directory/file"
+	}, {
+		arg: [#"C:\Windows\"#, #"System32"#]
+		out: "C:\\Windows\\/System32"
+	}, {
+		arg: [#"C:\Windows\"#, #""#]
+		out: "C:\\Windows\\"
+	}, {
+		arg: [#"C:\"#, #"Windows"#]
+		out: "C:\\/Windows"
+	}, {
+		arg: [#"C:"#, #"a\b"#]
+		out: "C:/a\\b"
+	}, {
+		arg: [#"C:"#, #"a"#, #"b"#]
+		out: "C:/a/b"
+	}, {
+		arg: [#"C:"#, #""#, #""#, #"b"#]
+		out: "C:/b"
+	}, {
+		arg: [#"C:"#, #""#]
+		out: "C:"
+	}, {
+		arg: [#"C:"#, #""#, #""#]
+		out: "C:"
+	}, {
+		arg: [#"C:."#, #"a"#]
+		out: "C:./a"
+	}, {
+		arg: [#"C:a"#, #"b"#]
+		out: "C:a/b"
+	}, {
+		arg: [#"\\host\share"#, #"foo"#]
+		out: "\\\\host\\share/foo"
+	}]
+	windows: [{
+		arg: ["a", "b"]
+		out: "a\\b"
+	}, {
+		arg: ["a/b", "c/d"]
+		out: "a\\b\\c\\d"
+	}, {
+		arg: ["/"]
+		out: "\\"
+	}, {
+		arg: ["a"]
+		out: "a"
+	}, {
+		arg: ["a", "b"]
+		out: "a\\b"
+	}, {
+		arg: ["a", ""]
+		out: "a"
+	}, {
+		arg: ["", "b"]
+		out: "b"
+	}, {
+		arg: ["/", "a"]
+		out: "\\a"
+	}, {
+		arg: ["/", "a/b"]
+		out: "\\a\\b"
+	}, {
+		arg: ["/", ""]
+		out: "\\"
+	}, {
+		arg: ["//", "a"]
+		out: "\\a"
+	}, {
+		arg: ["directory", "file"]
+		out: "directory\\file"
+	}, {
+		arg: [#"C:\Windows\"#, #"System32"#]
+		out: "C:\\Windows\\System32"
+	}, {
+		arg: [#"C:\Windows\"#, #""#]
+		out: "C:\\Windows"
+	}, {
+		arg: [#"C:\"#, #"Windows"#]
+		out: "C:\\Windows"
+	}, {
+		arg: [#"C:"#, #"a\b"#]
+		out: "C:a\\b"
+	}, {
+		arg: [#"C:"#, #"a"#, #"b"#]
+		out: "C:a\\b"
+	}, {
+		arg: [#"C:"#, #""#, #""#, #"b"#]
+		out: "C:b"
+	}, {
+		arg: [#"C:"#, #""#]
+		out: "C:."
+	}, {
+		arg: [#"C:"#, #""#, #""#]
+		out: "C:."
+	}, {
+		arg: [#"C:."#, #"a"#]
+		out: "C:a"
+	}, {
+		arg: [#"C:a"#, #"b"#]
+		out: "C:a\\b"
+	}, {
+		arg: [#"\\host\share"#, #"foo"#]
+		out: "\\\\host\\share\\foo"
+	}]
+}
+

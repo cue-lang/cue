@@ -980,10 +980,12 @@ type Param struct {
 	Value Value   // Could become Value later, using disjunctions for defaults.
 }
 
+// Kind returns the kind mask of this parameter.
 func (p Param) Kind() Kind {
 	return p.Value.Kind()
 }
 
+// Default reports the default value for this Param or nil if there is none.
 func (p Param) Default() Value {
 	d, ok := p.Value.(*Disjunction)
 	if !ok || d.NumDefaults != 1 {
@@ -1009,8 +1011,12 @@ func (x *Builtin) BareValidator() *BuiltinValidator {
 	return &BuiltinValidator{Builtin: x}
 }
 
-func (x *Builtin) IsValidator(numArgs int) bool {
-	return len(x.Params)-1 == numArgs && x.Result&^BoolKind == 0
+// IsValidator reports whether b should be interpreted as a Validator for the
+// given number of arguments.
+func (b *Builtin) IsValidator(numArgs int) bool {
+	return numArgs == len(b.Params)-1 &&
+		b.Result&^BoolKind == 0 &&
+		b.Params[numArgs].Default() == nil
 }
 
 func bottom(v Value) *Bottom {
@@ -1040,21 +1046,35 @@ func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
 		args = append(args, v)
 	}
 	for i, a := range args {
-		if x.Params[i].Kind() != BottomKind {
-			if b := bottom(a); b != nil {
-				return b
+		if x.Params[i].Kind() == BottomKind {
+			continue
+		}
+		if b := bottom(a); b != nil {
+			return b
+		}
+		if k := kind(a); x.Params[i].Kind()&k == BottomKind {
+			code := EvalError
+			b, _ := args[i].(*Bottom)
+			if b != nil {
+				code = b.Code
 			}
-			if k := kind(a); x.Params[i].Kind()&k == BottomKind {
-				code := EvalError
-				b, _ := args[i].(*Bottom)
-				if b != nil {
-					code = b.Code
-				}
-				c.addErrf(code, pos(a),
-					"cannot use %s (type %s) as %s in argument %d to %s",
-					a, k, x.Params[i].Kind(), i+1, fun)
-				return nil
+			c.addErrf(code, pos(a),
+				"cannot use %s (type %s) as %s in argument %d to %s",
+				a, k, x.Params[i].Kind(), i+1, fun)
+			return nil
+		}
+		v := x.Params[i].Value
+		if _, ok := v.(*BasicType); !ok {
+			env := c.Env(0)
+			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
+			n := &Vertex{Conjuncts: []Conjunct{{env, x, 0}}}
+			c.Unifier.Unify(c, n, Finalized)
+			if _, ok := n.BaseValue.(*Bottom); ok {
+				c.addErrf(0, pos(a),
+					"cannot use %s as %s in argument %d to %s",
+					a, v, i+1, fun)
 			}
+			args[i] = n
 		}
 	}
 	return x.Func(c, args)

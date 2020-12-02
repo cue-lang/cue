@@ -55,9 +55,8 @@ type Builtin struct {
 }
 
 type Param struct {
-	Kind    adt.Kind
-	Value   adt.Value // input constraint
-	Default adt.Value // may be nil
+	Kind  adt.Kind
+	Value adt.Value // input constraint (may be nil)
 }
 
 type Package struct {
@@ -112,16 +111,9 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 	params := make([]adt.Param, len(b.Params))
 	for i, p := range b.Params {
-		// TODO: use Value.
-		params[i].Value = &adt.BasicType{K: p.Kind}
-		if p.Default != nil {
-			params[i].Value = &adt.Disjunction{
-				NumDefaults: 1,
-				Values: []*adt.Vertex{
-					adt.ToVertex(p.Default),
-					adt.ToVertex(params[i].Value),
-				},
-			}
+		params[i].Value = p.Value
+		if params[i].Value == nil {
+			params[i].Value = &adt.BasicType{K: p.Kind}
 		}
 	}
 

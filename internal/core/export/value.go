@@ -55,17 +55,26 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		}
 
 	case *adt.Bottom:
-		if !x.IsIncomplete() || len(n.Conjuncts) == 0 {
-			result = e.bottom(x)
-			break
-		}
+		switch {
+		case e.cfg.ShowErrors && x.ChildError:
+			// TODO(perf): use precompiled arc statistics
+			if len(n.Arcs) > 0 && n.Arcs[0].Label.IsInt() && !e.showArcs(n) {
+				result = e.listComposite(n)
+			} else {
+				result = e.structComposite(n)
+			}
 
-		// fall back to expression mode
-		a := []ast.Expr{}
-		for _, c := range n.Conjuncts {
-			a = append(a, e.expr(c.Expr()))
+		case !x.IsIncomplete() || len(n.Conjuncts) == 0:
+			result = e.bottom(x)
+
+		default:
+			// fall back to expression mode
+			a := []ast.Expr{}
+			for _, c := range n.Conjuncts {
+				a = append(a, e.expr(c.Expr()))
+			}
+			result = ast.NewBinExpr(token.AND, a...)
 		}
-		result = ast.NewBinExpr(token.AND, a...)
 
 	case adt.Value:
 		if e.showArcs(n) {
@@ -339,6 +348,24 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 	case *adt.ListMarker:
 		// As lists may be long, put them at the end.
 		defer e.addEmbed(e.listComposite(v))
+	case *adt.Bottom:
+		if !e.cfg.ShowErrors || !x.ChildError {
+			// Should not be reachable, but just in case. The output will be
+			// correct.
+			e.addEmbed(e.value(x))
+			return s
+		}
+		// Always also show regular fields, even when list, as we are in
+		// debugging mode.
+		showRegular = true
+		// TODO(perf): do something better
+		for _, a := range v.Arcs {
+			if a.Label.IsInt() {
+				defer e.addEmbed(e.listComposite(v))
+				break
+			}
+		}
+
 	case adt.Value:
 		e.addEmbed(e.value(x))
 	}

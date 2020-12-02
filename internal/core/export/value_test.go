@@ -57,6 +57,9 @@ func TestValue(t *testing.T) {
 		ctx := eval.NewContext(r, v)
 		v.Finalize(ctx)
 
+		all := export.All
+		all.ShowErrors = true
+
 		for _, tc := range []struct {
 			name string
 			fn   func(r adt.Runtime, id string, v adt.Value) (ast.Expr, errors.Error)
@@ -64,7 +67,7 @@ func TestValue(t *testing.T) {
 			{"Simplified", export.Simplified.Value},
 			{"Raw", export.Raw.Value},
 			{"Final", export.Final.Value},
-			{"All", export.All.Value},
+			{"All", all.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)
 			x, errs := tc.fn(r, pkgID, v)
@@ -99,7 +102,10 @@ strings.MinRunes(4) & strings.MaxRunes(7)
 	ctx := eval.NewContext(r, v)
 	v.Finalize(ctx)
 
-	x, errs := export.Simplified.Value(r, "main", v)
+	p := export.All
+	p.ShowErrors = true
+
+	x, errs := p.Value(r, "main", v)
 	if errs != nil {
 		t.Fatal(errs)
 	}

@@ -47,7 +47,8 @@ type Profile struct {
 	ShowDocs       bool
 	ShowAttributes bool
 
-	// AllowErrorType
+	// ShowErrors treats errors as values and will not percolate errors up.
+	ShowErrors bool
 	// Use unevaluated conjuncts for these error types
 	// IgnoreRecursive
 
@@ -176,6 +177,7 @@ func Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error
 
 func (p *Profile) Vertex(r adt.Runtime, pkgID string, n *adt.Vertex) (*ast.File, errors.Error) {
 	e := exporter{
+		ctx:   eval.NewContext(r, nil),
 		cfg:   p,
 		index: r,
 		pkgID: pkgID,

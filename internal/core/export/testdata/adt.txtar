@@ -79,6 +79,24 @@ y1: {
 
 }
 
+errorStructDef: {
+	a: 1
+	b: 1 & 2
+
+	#Def: 1
+}
+
+errorList: [
+	1,
+	1 & 2,
+]
+
+errorListDef: {
+	errorList
+
+	#Def: 1
+}
+
 -- out/definition --
 import mystrings "strings"
 
@@ -144,6 +162,16 @@ y1: {
 		"foo\(i)": v
 	}
 }
+errorStructDef: {
+	a:    1
+	b:    _|_ // conflicting values 2 and 1
+	#Def: 1
+}
+errorList: [1, 1 & 2]
+errorListDef: {
+	errorList
+	#Def: 1
+}
 -- out/doc --
 []
 [p1]
@@ -192,6 +220,17 @@ y1: {
 [y1 bar2]
 [y1 foo1]
 [y1 foo2]
+[errorStructDef]
+[errorStructDef a]
+[errorStructDef b]
+[errorStructDef #Def]
+[errorList]
+[errorList 0]
+[errorList 1]
+[errorListDef]
+[errorListDef #Def]
+[errorListDef 0]
+[errorListDef 1]
 [x]
 -- out/value --
 == Simplified
@@ -201,4 +240,68 @@ _|_ // e3: index out of range [2] with length 2
 == Final
 _|_ // e3: index out of range [2] with length 2
 == All
-_|_ // e3: index out of range [2] with length 2
+{
+	p1: {}
+	d1: {
+		foobar: int
+	}
+	bar: "bar"
+
+	// XXX: reference not resolving.
+	d2: {
+		foobar: {
+			name: "xx"
+			foo:  "xx"
+		}
+	}
+	bytes: '\xeb \x1a\xf5\xaa\xf0\xd6\x06)'
+	c1:    true
+	s1: """
+		multi
+		bar
+		line
+		"""
+	l1: [3]
+	l2: []
+	l3: []
+	l4: [1, 2]
+	n1:  1.0
+	n10: 10
+
+	// t is true
+	t:   true
+	e1:  <1.0
+	e2:  >1.0 & <10
+	e3:  _|_ // e3: index out of range [2] with length 2
+	e4:  _|_ // e4: index 3 out of range
+	e5:  _|_ // e3: index out of range [2] with length 2
+	e6:  false
+	e7:  true
+	e8?: true
+	m1: {
+		// foo is an optional field
+		foo?: 3
+
+		// bar is a field
+		bar: 4
+	}
+	y1: {
+		src: [1, 2, 3]
+		foo0: 1
+		bar1: 2
+		bar2: 3
+		foo1: 2
+		foo2: 3
+	}
+	errorStructDef: {
+		a:    1
+		b:    _|_ // errorStructDef.b: conflicting values 2 and 1
+		#Def: 1
+	}
+	errorList: [1, _|_]
+	x: int
+	errorListDef: {
+		#Def: 1
+		[1, _|_]
+	}
+}

@@ -15,9 +15,11 @@
 package encoding
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"io"
+	"io/ioutil"
 	"os"
 	"path/filepath"
 
@@ -37,7 +39,7 @@ import (
 // An Encoder allows
 type Encoder struct {
 	cfg          *Config
-	closer       io.Closer
+	close        func() error
 	interpret    func(*cue.Instance) (*ast.File, error)
 	encFile      func(*ast.File) error
 	encValue     func(cue.Value) error
@@ -55,21 +57,21 @@ func (e *Encoder) IsConcrete() bool {
 }
 
 func (e Encoder) Close() error {
-	if e.closer == nil {
+	if e.close == nil {
 		return nil
 	}
-	return e.closer.Close()
+	return e.close()
 }
 
 // NewEncoder writes content to the file with the given specification.
 func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
-	w, closer, err := writer(f, cfg)
+	w, close, err := writer(f, cfg)
 	if err != nil {
 		return nil, err
 	}
 	e := &Encoder{
-		cfg:    cfg,
-		closer: closer,
+		cfg:   cfg,
+		close: close,
 	}
 
 	switch f.Interpretation {
@@ -241,7 +243,7 @@ func (e *Encoder) encodeFile(f *ast.File, interpret func(*cue.Instance) (*ast.Fi
 	return e.encValue(inst.Value())
 }
 
-func writer(f *build.File, cfg *Config) (io.Writer, io.Closer, error) {
+func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err error) {
 	if cfg.Out != nil {
 		return cfg.Out, nil, nil
 	}
@@ -258,6 +260,11 @@ func writer(f *build.File, cfg *Config) (io.Writer, io.Closer, error) {
 				"error writing %q", path)
 		}
 	}
-	w, err := os.Create(path)
-	return w, w, err
+	// Delay opening the file until we can write it to completion. This will
+	// prevent clobbering the file in case of a crash.
+	b := &bytes.Buffer{}
+	fn := func() error {
+		return ioutil.WriteFile(path, b.Bytes(), 0644)
+	}
+	return b, fn, nil
 }

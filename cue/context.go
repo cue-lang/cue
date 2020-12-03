@@ -18,28 +18,18 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
-	"github.com/cockroachdb/apd/v2"
 )
 
 // context manages evaluation state.
 type context struct {
 	opCtx *adt.OpContext
-	*apd.Context
 	*index
-}
-
-var baseContext apd.Context
-
-func init() {
-	baseContext = apd.BaseContext
-	baseContext.Precision = 24
 }
 
 // newContext returns a new evaluation context.
 func (idx *index) newContext() *context {
 	c := &context{
-		Context: &baseContext,
-		index:   idx,
+		index: idx,
 	}
 	if idx != nil {
 		c.opCtx = eval.NewContext(idx.Runtime, nil)

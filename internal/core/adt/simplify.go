@@ -82,17 +82,17 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			// Readjust bounds for integers.
 			if x.Op == GreaterEqualOp {
 				// >=3.4  ==>  >=4
-				_, _ = apd.BaseContext.Ceil(&lo, &a.X)
+				_, _ = apdCtx.Ceil(&lo, &a.X)
 			} else {
 				// >3.4  ==>  >3
-				_, _ = apd.BaseContext.Floor(&lo, &a.X)
+				_, _ = apdCtx.Floor(&lo, &a.X)
 			}
 			if y.Op == LessEqualOp {
 				// <=2.3  ==>  <= 2
-				_, _ = apd.BaseContext.Floor(&hi, &b.X)
+				_, _ = apdCtx.Floor(&hi, &b.X)
 			} else {
 				// <2.3   ==>  < 3
-				_, _ = apd.BaseContext.Ceil(&hi, &b.X)
+				_, _ = apdCtx.Ceil(&hi, &b.X)
 			}
 		}
 
@@ -133,23 +133,23 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		case diff == 1:
 			if k&FloatKind == 0 {
 				if x.Op == GreaterEqualOp && y.Op == LessThanOp {
-					return ctx.NewNum(&lo, k&NumKind, x, y)
+					return ctx.newNum(&lo, k&NumKind, x, y)
 				}
 				if x.Op == GreaterThanOp && y.Op == LessEqualOp {
-					return ctx.NewNum(&hi, k&NumKind, x, y)
+					return ctx.newNum(&hi, k&NumKind, x, y)
 				}
 			}
 
 		case diff == 2:
 			if k&FloatKind == 0 && x.Op == GreaterThanOp && y.Op == LessThanOp {
 				_, _ = apd.BaseContext.Add(&d, d.SetInt64(1), &lo)
-				return ctx.NewNum(&d, k&NumKind, x, y)
+				return ctx.newNum(&d, k&NumKind, x, y)
 
 			}
 
 		case diff == 0:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
-				return ctx.NewNum(&lo, k&NumKind, x, y)
+				return ctx.newNum(&lo, k&NumKind, x, y)
 			}
 			fallthrough
 

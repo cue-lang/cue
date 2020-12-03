@@ -976,9 +976,9 @@ func (c *OpContext) regexp(v Value) *regexp.Regexp {
 	}
 }
 
-// NewNum creates a new number of the given kind. It reports an error value
+// newNum creates a new number of the given kind. It reports an error value
 // instead if any error occurred.
-func (c *OpContext) NewNum(d *apd.Decimal, k Kind, sources ...Node) Value {
+func (c *OpContext) newNum(d *apd.Decimal, k Kind, sources ...Node) Value {
 	if c.HasErr() {
 		return c.Err()
 	}

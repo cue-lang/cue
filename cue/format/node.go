@@ -714,6 +714,14 @@ func (f *formatter) clause(clause ast.Clause) {
 		f.expr(n.Condition)
 		f.markUnindentLine()
 
+	case *ast.LetClause:
+		f.print(n.Let, token.LET, blank, nooverride)
+		f.print(indent)
+		f.expr(n.Ident)
+		f.print(blank, nooverride, n.Equal, token.BIND, blank)
+		f.expr(n.Expr)
+		f.markUnindentLine()
+
 	default:
 		panic("unknown clause type")
 	}

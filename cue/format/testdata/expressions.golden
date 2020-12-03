@@ -180,8 +180,9 @@ package expressions
 
 	e: {
 		for k, v in someObject
+		let x = v
 		if k > "a" {
-			"\(k)": v
+			"\(k)": x
 		}}
 
 	if a |

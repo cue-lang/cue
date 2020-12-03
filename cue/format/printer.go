@@ -137,6 +137,11 @@ func (p *printer) Print(v interface{}) {
 			if p := strings.IndexByte(data, '.'); p >= 0 && data[p+1] > '9' {
 				data = data[:p+1] + "0" + data[p+1:]
 			}
+			// Lowercase E, but only if it is not the last character: in the
+			// future we may use E for Exa.
+			if p := strings.IndexByte(data, 'E'); p != -1 && p < len(data)-1 {
+				data = strings.ToLower(data)
+			}
 
 		case token.FLOAT:
 			// Pad leading or trailing dots.

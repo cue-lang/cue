@@ -284,10 +284,13 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		// a float or an int after all.
 		// The code to autodetect whether something is an integer can be done
 		// with this:
-		// var d apd.Decimal
-		// res, _ := apd.BaseContext.RoundToIntegralExact(&d, v)
-		// integer := !res.Inexact()
-		n := &adt.Num{Src: ctx.Source(), K: adt.FloatKind}
+		kind := adt.FloatKind
+		var d apd.Decimal
+		res, _ := apd.BaseContext.RoundToIntegralExact(&d, v)
+		if !res.Inexact() {
+			kind = adt.IntKind
+		}
+		n := &adt.Num{Src: ctx.Source(), K: kind}
 		n.X = *v
 		return n
 

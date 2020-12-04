@@ -121,7 +121,7 @@ y: conflicting values 4 and 2:
 		y: x + 1
 		x: y - 1
 		`,
-		out: "cycle\ncycle error",
+		out: "cycle\ncycle error:\n    test:3:6",
 	}, {
 		desc: "disallow cycle",
 		cfg:  &Config{DisallowCycles: true},
@@ -129,7 +129,7 @@ y: conflicting values 4 and 2:
 		a: b - 100
 		b: a + 100
 		c: [c[1], c[0]]		`,
-		out: "cycle\ncycle error",
+		out: "cycle\ncycle error:\n    test:3:6",
 	}, {
 		desc: "treat cycles as incomplete when not disallowing",
 		cfg:  &Config{},

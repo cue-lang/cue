@@ -42,17 +42,27 @@ Result:
     //     ./in.cue:3:5
   }
   e5: (_|_){
-    // [cycle] cycle error
+    // [cycle] cycle error:
+    //     ./in.cue:8:6
   }
   E: (struct){
     a: (_|_){
-      // [cycle] cycle error
+      // [cycle] cycle error:
+      //     ./in.cue:12:6
+      // cycle error:
+      //     ./in.cue:13:6
     }
     b: (_|_){
-      // [cycle] cycle error
+      // [cycle] cycle error:
+      //     ./in.cue:12:6
+      // cycle error:
+      //     ./in.cue:13:6
     }
     c: (_|_){
-      // [cycle] cycle error
+      // [cycle] cycle error:
+      //     ./in.cue:12:6
+      // cycle error:
+      //     ./in.cue:13:6
     }
   }
   permanentlyIncompleteOperands: (_|_){

@@ -177,7 +177,8 @@ Result:
   }
   xb3: (int){ |((int){ 6 }, (int){ 9 }) }
   xb4: (_|_){
-    // [cycle] cycle error
+    // [cycle] cycle error:
+    //     ./in.cue:20:6
   }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
@@ -219,7 +220,8 @@ Result:
   }
   xf3: (int){ |((int){ 6 }, (int){ 9 }) }
   xf4: (_|_){
-    // [cycle] cycle error
+    // [cycle] cycle error:
+    //     ./in.cue:54:6
   }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }

@@ -1,0 +1,114 @@
+-- references.cue --
+
+missingField: {
+    a: {}
+    r: a.b
+}
+
+missingFieldClosed: {
+    #a: {}
+    r: #a.b
+}
+
+missingFieldNested: {
+    a: {}
+    // Must refer to `b` in error
+    r: a.b.c
+}
+
+missingFieldNestedClosed: {
+    #a: {}
+    // Must refer to `d` in error
+    r: #a.d.c
+}
+
+missingFieldNestedInInterpolation: {
+    a: {}
+    // Must refer to `b` in error
+    r1: "\(a.b.c)"
+    // Must refer to `d` in error: in case only one error is shown for a
+    // a location, ensure it doesn't alphabetically sort and pick `c` instead.
+    r2: "\(a.d.c)"
+}
+-- out/eval --
+Errors:
+missingFieldClosed.r: undefined field b:
+    ./references.cue:9:11
+missingFieldNestedClosed.r: undefined field d:
+    ./references.cue:21:11
+
+Result:
+(_|_){
+  // [eval]
+  missingField: (struct){
+    a: (struct){
+    }
+    r: (_|_){
+      // [incomplete] missingField.r: undefined field b:
+      //     ./references.cue:4:10
+    }
+  }
+  missingFieldClosed: (_|_){
+    // [eval]
+    #a: (#struct){
+    }
+    r: (_|_){
+      // [eval] missingFieldClosed.r: undefined field b:
+      //     ./references.cue:9:11
+    }
+  }
+  missingFieldNested: (struct){
+    a: (struct){
+    }
+    r: (_|_){
+      // [incomplete] missingFieldNested.r: undefined field b:
+      //     ./references.cue:15:10
+    }
+  }
+  missingFieldNestedClosed: (_|_){
+    // [eval]
+    #a: (#struct){
+    }
+    r: (_|_){
+      // [eval] missingFieldNestedClosed.r: undefined field d:
+      //     ./references.cue:21:11
+    }
+  }
+  missingFieldNestedInInterpolation: (struct){
+    a: (struct){
+    }
+    r1: (_|_){
+      // [incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field b:
+      //     ./references.cue:27:9
+    }
+    r2: (_|_){
+      // [incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field d:
+      //     ./references.cue:30:9
+    }
+  }
+}
+-- out/compile --
+--- references.cue
+{
+  missingField: {
+    a: {}
+    r: 〈0;a〉.b
+  }
+  missingFieldClosed: {
+    #a: {}
+    r: 〈0;#a〉.b
+  }
+  missingFieldNested: {
+    a: {}
+    r: 〈0;a〉.b.c
+  }
+  missingFieldNestedClosed: {
+    #a: {}
+    r: 〈0;#a〉.d.c
+  }
+  missingFieldNestedInInterpolation: {
+    a: {}
+    r1: "\(〈0;a〉.b.c)"
+    r2: "\(〈0;a〉.d.c)"
+  }
+}

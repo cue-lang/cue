@@ -269,7 +269,7 @@ func (c *OpContext) addErrf(code ErrorCode, pos token.Pos, msg string, args ...i
 }
 
 func (c *OpContext) addErr(code ErrorCode, err errors.Error) {
-	c.errs = CombineErrors(c.src, c.errs, &Bottom{Code: code, Err: err})
+	c.AddBottom(&Bottom{Code: code, Err: err})
 }
 
 // AddBottom records an error in OpContext.
@@ -280,7 +280,7 @@ func (c *OpContext) AddBottom(b *Bottom) {
 // AddErr records an error in OpContext. It returns errors collected so far.
 func (c *OpContext) AddErr(err errors.Error) *Bottom {
 	if err != nil {
-		c.errs = CombineErrors(c.src, c.errs, &Bottom{Err: err})
+		c.AddBottom(&Bottom{Err: err})
 	}
 	return c.errs
 }
@@ -529,6 +529,15 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 
 	defer func() {
 		c.errs = CombineErrors(c.src, c.errs, err)
+		// TODO: remove this when we handle errors more principally.
+		if b, ok := result.(*Bottom); ok && c.src != nil &&
+			b.Code == CycleError &&
+			b.Err.Position() == token.NoPos &&
+			len(b.Err.InputPositions()) == 0 {
+			bb := *b
+			bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
+			result = &bb
+		}
 		c.errs = CombineErrors(c.src, c.errs, result)
 		if c.errs != nil {
 			result = c.errs

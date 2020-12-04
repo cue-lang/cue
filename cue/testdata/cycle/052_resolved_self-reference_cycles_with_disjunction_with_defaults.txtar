@@ -144,7 +144,8 @@ Result:
   xb2: (int){ 8 }
   xb3: (int){ 6 }
   xb4: (_|_){
-    // [cycle] cycle error
+    // [cycle] cycle error:
+    //     ./in.cue:14:6
   }
   xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }

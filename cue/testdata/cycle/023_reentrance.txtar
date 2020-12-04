@@ -89,9 +89,7 @@ Result:
   fibRec: (struct){
     nn: (int){ int }
     out: (_|_){
-      // [incomplete] fibRec.out: undefined field out:
-      //     ./in.cue:3:40
-      // non-concrete value int in operand to >=:
+      // [incomplete] non-concrete value int in operand to >=:
       //     ./in.cue:7:5
       // non-concrete value int in operand to <:
       //     ./in.cue:10:5

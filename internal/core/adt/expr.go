@@ -586,6 +586,9 @@ func (x *SelectorExpr) Source() ast.Node {
 
 func (x *SelectorExpr) resolve(c *OpContext) *Vertex {
 	n := c.node(x, x.X, x.Sel.IsRegular())
+	if n == emptyNode {
+		return n
+	}
 	return c.lookup(n, x.Src.Sel.Pos(), x.Sel)
 }
 
@@ -610,6 +613,9 @@ func (x *IndexExpr) resolve(ctx *OpContext) *Vertex {
 	// TODO: support byte index.
 	n := ctx.node(x, x.X, true)
 	i := ctx.value(x.Index)
+	if n == emptyNode {
+		return n
+	}
 	f := ctx.Label(x.Index, i)
 	return ctx.lookup(n, x.Src.Index.Pos(), f)
 }

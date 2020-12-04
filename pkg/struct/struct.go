@@ -17,22 +17,33 @@ package structs
 
 import (
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal/core/adt"
 )
 
 // MinFields validates the minimum number of fields that are part of a struct.
+// It can only be used as a validator, for instance `MinFields(3)`.
 //
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
-func MinFields(object *cue.Struct, n int) (bool, error) {
+func MinFields(object *cue.Struct, n int) *adt.Bottom {
 	iter := object.Fields(cue.Hidden(false), cue.Optional(false))
 	count := 0
 	for iter.Next() {
 		count++
 	}
-	return count >= n, nil
+	if count < n {
+		return &adt.Bottom{
+			Code: adt.IncompleteError, // could still be resolved
+			Err:  errors.Newf(token.NoPos, "struct has %d fields < MinFields(%d)", count, n),
+		}
+	}
+	return nil
 }
 
 // MaxFields validates the maximum number of fields that are part of a struct.
+// It can only be used as a validator, for instance `MaxFields(3)`.
 //
 // Only fields that are part of the data model count. This excludes hidden
 // fields, optional fields, and definitions.
@@ -42,5 +53,6 @@ func MaxFields(object *cue.Struct, n int) (bool, error) {
 	for iter.Next() {
 		count++
 	}
+	// permanent error is okay here.
 	return count <= n, nil
 }

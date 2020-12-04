@@ -36,6 +36,7 @@ var cueToOpenAPI = map[string]string{
 
 	"bytes": "binary",
 
+	"time.Time()":                "date-time",
 	"time.Time":                  "date-time",
 	`time.Format ("2006-01-02")`: "date",
 

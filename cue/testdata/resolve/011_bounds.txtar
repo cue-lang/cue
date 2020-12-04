@@ -138,10 +138,10 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
 }
 -- out/eval --
 Errors:
-e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|list|struct|number)):
+e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
     ./in.cue:40:5
     ./in.cue:40:12
-e2: conflicting values !=null and null (mismatched types (bool|string|bytes|list|struct|number) and null):
+e2: conflicting values !=null and null (mismatched types (bool|string|bytes|func|list|struct|number) and null):
     ./in.cue:41:5
     ./in.cue:41:14
 e5: incompatible bounds >1 and <0:
@@ -200,12 +200,12 @@ Result:
   s23e: (number){ &(>0.0, <2.0) }
   s30: (int){ &(>0, int) }
   e1: (_|_){
-    // [eval] e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|list|struct|number)):
+    // [eval] e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
     //     ./in.cue:40:5
     //     ./in.cue:40:12
   }
   e2: (_|_){
-    // [eval] e2: conflicting values !=null and null (mismatched types (bool|string|bytes|list|struct|number) and null):
+    // [eval] e2: conflicting values !=null and null (mismatched types (bool|string|bytes|func|list|struct|number) and null):
     //     ./in.cue:41:5
     //     ./in.cue:41:14
   }

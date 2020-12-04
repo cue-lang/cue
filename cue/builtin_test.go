@@ -104,7 +104,9 @@ func TestBuiltins(t *testing.T) {
 		`{a:1}`,
 	}, {
 		test("struct", `struct.MinFields(2) & {a: 1}`),
-		`_|_(invalid value {a:1} (does not satisfy struct.MinFields(2)))`,
+		// TODO: original value may be better.
+		// `_|_(invalid value {a:1} (does not satisfy struct.MinFields(2)))`,
+		`_|_(struct has 1 fields < MinFields(2))`,
 	}, {
 		test("time", `time.Time & "1937-01-01T12:00:27.87+00:20"`),
 		`"1937-01-01T12:00:27.87+00:20"`,

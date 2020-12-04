@@ -204,24 +204,8 @@ func test(ctx *OpContext, op Op, a, b Value) bool {
 // now.
 func SimplifyValidator(ctx *OpContext, v, w Validator) Validator {
 	switch x := v.(type) {
-	case *Builtin:
-		switch y := w.(type) {
-		case *Builtin:
-			if x == y {
-				return x
-			}
-
-		case *BuiltinValidator:
-			if y.Builtin == x && len(y.Args) == 0 {
-				return x
-			}
-		}
-
 	case *BuiltinValidator:
 		switch y := w.(type) {
-		case *Builtin:
-			return SimplifyValidator(ctx, y, x)
-
 		case *BuiltinValidator:
 			if x == y {
 				return x

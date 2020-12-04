@@ -162,8 +162,7 @@ func (*Conjunction) Concreteness() Concreteness { return Constraint }
 func (*Disjunction) Concreteness() Concreteness { return Constraint }
 func (*BoundValue) Concreteness() Concreteness  { return Constraint }
 
-// Constraint only applies if Builtin is used as constraint.
-func (*Builtin) Concreteness() Concreteness          { return Constraint }
+func (*Builtin) Concreteness() Concreteness          { return Concrete }
 func (*BuiltinValidator) Concreteness() Concreteness { return Constraint }
 
 // Value and Expr

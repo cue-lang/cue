@@ -314,8 +314,10 @@ func (g *generator) genFun(x *ast.FuncDecl) {
 		fmt.Fprintf(g.w, "{Kind: %s},\n", k)
 	}
 	fmt.Fprintf(g.w, "\n},\n")
-	result := g.goToCUE(x.Type.Results.List[0].Type)
-	fmt.Fprintf(g.w, "Result: %s,\n", result)
+
+	expr := x.Type.Results.List[0].Type
+	fmt.Fprintf(g.w, "Result: %s,\n", g.goToCUE(expr))
+
 	argList := strings.Join(args, ", ")
 	valList := strings.Join(vals, ", ")
 	init := ""
@@ -351,6 +353,8 @@ func (g *generator) goKind(expr ast.Expr) string {
 		return "bigFloat"
 	case "big.Rat":
 		return "bigRat"
+	case "adt.Bottom":
+		return "error"
 	case "internal.Decimal":
 		return "decimal"
 	case "[]*internal.Decimal":

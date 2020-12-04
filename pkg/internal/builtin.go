@@ -148,6 +148,9 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 		}()
 		b.Func(c)
 		switch v := c.Ret.(type) {
+		case nil:
+			// Validators may return a nil in case validation passes.
+			return nil
 		case adt.Value:
 			return v
 		case bottomer:

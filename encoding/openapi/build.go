@@ -792,7 +792,7 @@ func (b *builder) array(v cue.Value) {
 	case cue.CallOp:
 		name := fmt.Sprint(a[0])
 		switch name {
-		case "list.UniqueItems":
+		case "list.UniqueItems", "list.UniqueItems()":
 			b.checkArgs(a, 0)
 			b.setFilter("Schema", "uniqueItems", ast.NewBool(true))
 			return

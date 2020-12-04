@@ -23,11 +23,11 @@ var pkg = &internal.Package{
 			{Kind: adt.StructKind},
 			{Kind: adt.IntKind},
 		},
-		Result: adt.BoolKind,
+		Result: adt.BottomKind,
 		Func: func(c *internal.CallCtxt) {
 			object, n := c.Struct(0), c.Int(1)
 			if c.Do() {
-				c.Ret, c.Err = MinFields(object, n)
+				c.Ret = MinFields(object, n)
 			}
 		},
 	}, {

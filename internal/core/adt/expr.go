@@ -898,6 +898,33 @@ func (x *CallExpr) Source() ast.Node {
 
 func (x *CallExpr) evaluate(c *OpContext) Value {
 	fun := c.value(x.Fun)
+	var b *Builtin
+	switch f := fun.(type) {
+	case *Builtin:
+		b = f
+
+	case *BuiltinValidator:
+		// We allow a validator that takes no arguments accept the validated
+		// value to be called with zero arguments.
+		switch {
+		case f.Src != nil:
+			c.addErrf(0, pos(x.Fun),
+				"cannot call previously called validator %s", c.Str(x.Fun))
+
+		case f.Builtin.IsValidator(len(x.Args)):
+			v := *f
+			v.Src = x
+			return &v
+
+		default:
+			b = f.Builtin
+		}
+
+	default:
+		c.addErrf(0, pos(x.Fun), "cannot call non-function %s (type %s)",
+			c.Str(x.Fun), kind(fun))
+		return nil
+	}
 	args := []Value{}
 	for i, a := range x.Args {
 		expr := c.value(a)
@@ -921,13 +948,10 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 	if c.HasErr() {
 		return nil
 	}
-	b, _ := fun.(*Builtin)
-	if b == nil {
-		c.addErrf(0, pos(x.Fun), "cannot call non-function %s (type %s)",
-			c.Str(x.Fun), kind(fun))
-		return nil
+	if b.IsValidator(len(args)) {
+		return &BuiltinValidator{x, b, args}
 	}
-	result := b.call(c, x.Src, args)
+	result := b.call(c, pos(x), args)
 	if result == nil {
 		return nil
 	}
@@ -943,8 +967,6 @@ type Builtin struct {
 
 	Package Feature
 	Name    string
-	// REMOVE: for legacy
-	Const string
 }
 
 type Param struct {
@@ -970,22 +992,19 @@ func (x *Builtin) WriteName(w io.Writer, c *OpContext) {
 
 // Kind here represents the case where Builtin is used as a Validator.
 func (x *Builtin) Kind() Kind {
-	if len(x.Params) == 0 {
-		return BottomKind
-	}
-	return x.Params[0].Kind()
+	return FuncKind
 }
 
-func (x *Builtin) validate(c *OpContext, v Value) *Bottom {
-	if x.Result != BoolKind {
-		return c.NewErrf(
-			"invalid validator %s: not a bool return", x.Name)
+func (x *Builtin) BareValidator() *BuiltinValidator {
+	if len(x.Params) != 1 ||
+		(x.Result != BoolKind && x.Result != BottomKind) {
+		return nil
 	}
-	if len(x.Params) != 1 {
-		return c.NewErrf(
-			"invalid validator %s: may only have one validator to be used without call", x.Name)
-	}
-	return validateWithBuiltin(c, nil, x, []Value{v})
+	return &BuiltinValidator{Builtin: x}
+}
+
+func (x *Builtin) IsValidator(numArgs int) bool {
+	return len(x.Params)-1 == numArgs && x.Result&^BoolKind == 0
 }
 
 func bottom(v Value) *Bottom {
@@ -996,23 +1015,20 @@ func bottom(v Value) *Bottom {
 	return b
 }
 
-func (x *Builtin) call(c *OpContext, call *ast.CallExpr, args []Value) Expr {
-	if len(x.Params)-1 == len(args) && x.Result == BoolKind {
-		// We have a custom builtin
-		return &BuiltinValidator{call, x, args}
-	}
+func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
+	fun := x // right now always x.
 	if len(args) > len(x.Params) {
-		c.addErrf(0, call.Rparen,
+		c.addErrf(0, p,
 			"too many arguments in call to %s (have %d, want %d)",
-			call.Fun, len(args), len(x.Params))
+			fun, len(args), len(x.Params))
 		return nil
 	}
 	for i := len(args); i < len(x.Params); i++ {
 		v := x.Params[i].Default()
 		if v == nil {
-			c.addErrf(0, call.Rparen,
+			c.addErrf(0, p,
 				"not enough arguments in call to %s (have %d, want %d)",
-				call.Fun, len(args), len(x.Params))
+				fun, len(args), len(x.Params))
 			return nil
 		}
 		args = append(args, v)
@@ -1030,7 +1046,7 @@ func (x *Builtin) call(c *OpContext, call *ast.CallExpr, args []Value) Expr {
 				}
 				c.addErrf(code, pos(a),
 					"cannot use %s (type %s) as %s in argument %d to %s",
-					a, k, x.Params[i].Kind(), i+1, call.Fun)
+					a, k, x.Params[i].Kind(), i+1, fun)
 				return nil
 			}
 		}
@@ -1046,16 +1062,23 @@ func (x *Builtin) Source() ast.Node { return nil }
 //    strings.MinRunes(4)
 //
 type BuiltinValidator struct {
-	Src     *ast.CallExpr
+	Src     *CallExpr
 	Builtin *Builtin
 	Args    []Value // any but the first value
 }
 
 func (x *BuiltinValidator) Source() ast.Node {
 	if x.Src == nil {
-		return nil
+		return x.Builtin.Source()
 	}
-	return x.Src
+	return x.Src.Source()
+}
+
+func (x *BuiltinValidator) Pos() token.Pos {
+	if src := x.Source(); src != nil {
+		return src.Pos()
+	}
+	return token.NoPos
 }
 
 func (x *BuiltinValidator) Kind() Kind {
@@ -1066,10 +1089,11 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 	args := make([]Value, len(x.Args)+1)
 	args[0] = v
 	copy(args[1:], x.Args)
-	return validateWithBuiltin(c, x.Src, x.Builtin, args)
+
+	return validateWithBuiltin(c, x.Pos(), x.Builtin, args)
 }
 
-func validateWithBuiltin(c *OpContext, src *ast.CallExpr, b *Builtin, args []Value) *Bottom {
+func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) *Bottom {
 	res := b.call(c, src, args)
 	switch v := res.(type) {
 	case nil:

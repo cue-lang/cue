@@ -554,7 +554,7 @@ func (n *nodeContext) postDisjunct(state adt.VertexStatus) {
 				}
 			}
 			for _, v := range n.checks {
-				// TODO(errors): make Validate return boolean and generate
+				// TODO(errors): make Validate return bottom and generate
 				// optimized conflict message. Also track and inject IDs
 				// to determine origin location.s
 				if b := ctx.Validate(v, n.node); b != nil {
@@ -1459,9 +1459,15 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 		// TODO: Use the Closer to close other fields as well?
 	}
 
-	if b, ok := v.(*adt.Bottom); ok {
+	switch b := v.(type) {
+	case *adt.Bottom:
 		n.addBottom(b)
 		return
+	case *adt.Builtin:
+		if v := b.BareValidator(); v != nil {
+			n.addValueConjunct(env, v, id)
+			return
+		}
 	}
 
 	if !n.updateNodeType(v.Kind(), v, id) {
@@ -1552,12 +1558,13 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 				return
 			}
 		}
+		n.updateNodeType(x.Kind(), x, id)
 		n.checks = append(n.checks, x)
 
 	case *adt.Vertex:
 	// handled above.
 
-	case adt.Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit
+	case adt.Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit, *Builtin
 		if y := n.scalar; y != nil {
 			if b, ok := adt.BinOp(ctx, adt.EqualOp, x, y).(*adt.Bool); !ok || !b.B {
 				n.addConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)

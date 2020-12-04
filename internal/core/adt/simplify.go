@@ -230,7 +230,7 @@ func SimplifyValidator(ctx *OpContext, v, w Validator) Validator {
 				return nil
 			}
 			for i, a := range x.Args {
-				if !test(ctx, EqualOp, a, y.Args[i]) {
+				if !Equal(ctx, a, y.Args[i]) {
 					return nil
 				}
 			}

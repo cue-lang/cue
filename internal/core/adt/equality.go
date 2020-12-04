@@ -12,22 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package eval
+package adt
 
-import "cuelang.org/go/internal/core/adt"
-
-func Equal(ctx *adt.OpContext, v, w adt.Value) bool {
-	if x, ok := v.(*adt.Vertex); ok {
+func Equal(ctx *OpContext, v, w Value) bool {
+	if x, ok := v.(*Vertex); ok {
 		return equalVertex(ctx, x, w)
 	}
-	if y, ok := w.(*adt.Vertex); ok {
+	if y, ok := w.(*Vertex); ok {
 		return equalVertex(ctx, y, v)
 	}
 	return equalTerminal(ctx, v, w)
 }
 
-func equalVertex(ctx *adt.OpContext, x *adt.Vertex, v adt.Value) bool {
-	y, ok := v.(*adt.Vertex)
+func equalVertex(ctx *OpContext, x *Vertex, v Value) bool {
+	y, ok := v.(*Vertex)
 	if !ok {
 		return false
 	}
@@ -69,8 +67,8 @@ loop1:
 	// 		return false
 	// 	}
 
-	v, ok1 := x.BaseValue.(adt.Value)
-	w, ok2 := y.BaseValue.(adt.Value)
+	v, ok1 := x.BaseValue.(Value)
+	w, ok2 := y.BaseValue.(Value)
 	if !ok1 && !ok2 {
 		return true // both are struct or list.
 	}
@@ -78,14 +76,14 @@ loop1:
 	return equalTerminal(ctx, v, w)
 }
 
-func equalTerminal(ctx *adt.OpContext, v, w adt.Value) bool {
+func equalTerminal(ctx *OpContext, v, w Value) bool {
 	if v == w {
 		return true
 	}
 
 	switch x := v.(type) {
-	case *adt.Num, *adt.String, *adt.Bool, *adt.Bytes:
-		if b, ok := adt.BinOp(ctx, adt.EqualOp, v, w).(*adt.Bool); ok {
+	case *Num, *String, *Bool, *Bytes:
+		if b, ok := BinOp(ctx, EqualOp, v, w).(*Bool); ok {
 			return b.B
 		}
 		return false
@@ -93,18 +91,18 @@ func equalTerminal(ctx *adt.OpContext, v, w adt.Value) bool {
 	// TODO: for the remainder we are dealing with non-concrete values, so we
 	// could also just not bother.
 
-	case *adt.BoundValue:
-		if y, ok := w.(*adt.BoundValue); ok {
+	case *BoundValue:
+		if y, ok := w.(*BoundValue); ok {
 			return x.Op == y.Op && Equal(ctx, x.Value, y.Value)
 		}
 
-	case *adt.BasicType:
-		if y, ok := w.(*adt.BasicType); ok {
+	case *BasicType:
+		if y, ok := w.(*BasicType); ok {
 			return x.K == y.K
 		}
 
-	case *adt.Conjunction:
-		y, ok := w.(*adt.Conjunction)
+	case *Conjunction:
+		y, ok := w.(*Conjunction)
 		if !ok || len(x.Values) != len(y.Values) {
 			return false
 		}
@@ -116,10 +114,10 @@ func equalTerminal(ctx *adt.OpContext, v, w adt.Value) bool {
 		}
 		return true
 
-	case *adt.Disjunction:
+	case *Disjunction:
 		// The best way to compute this is with subsumption, but even that won't
 		// be too accurate. Assume structural equivalence for now.
-		y, ok := w.(*adt.Disjunction)
+		y, ok := w.(*Disjunction)
 		if !ok || len(x.Values) != len(y.Values) {
 			return false
 		}
@@ -130,7 +128,7 @@ func equalTerminal(ctx *adt.OpContext, v, w adt.Value) bool {
 		}
 		return true
 
-	case *adt.BuiltinValidator:
+	case *BuiltinValidator:
 	}
 
 	return false

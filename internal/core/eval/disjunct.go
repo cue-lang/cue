@@ -158,7 +158,7 @@ func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 	}
 
 	for _, v := range d.Values {
-		if Equal(n.ctx, v, &result) {
+		if adt.Equal(n.ctx, v, &result) {
 			return isFinal
 		}
 	}

@@ -1785,7 +1785,7 @@ func (v Value) Equals(other Value) bool {
 	if v.v == nil || other.v == nil {
 		return false
 	}
-	return eval.Equal(v.ctx().opCtx, v.v, other.v)
+	return adt.Equal(v.ctx().opCtx, v.v, other.v)
 }
 
 // Format prints a debug version of a value.

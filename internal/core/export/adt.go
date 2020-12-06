@@ -223,19 +223,38 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 		return &ast.SliceExpr{X: e.expr(x.X), Low: lo, High: hi}
 
 	case *adt.Interpolation:
+		var (
+			tripple    = `"""`
+			openQuote  = `"`
+			closeQuote = `"`
+			f          = literal.String
+		)
+		if x.K&adt.BytesKind != 0 {
+			tripple = `'''`
+			openQuote = `'`
+			closeQuote = `'`
+			f = literal.Bytes
+		}
+		toString := func(v adt.Expr) string {
+			str := ""
+			switch x := v.(type) {
+			case *adt.String:
+				str = x.Str
+			case *adt.Bytes:
+				str = string(x.B)
+			}
+			return str
+		}
 		t := &ast.Interpolation{}
-		f := literal.String.WithGraphicOnly() // TODO: also support bytes
-		openQuote := `"`
-		closeQuote := `"`
+		f = f.WithGraphicOnly()
 		indent := ""
 		// TODO: mark formatting in interpolation itself.
 		for i := 0; i < len(x.Parts); i += 2 {
-			str := x.Parts[i].(*adt.String).Str
-			if strings.IndexByte(str, '\n') >= 0 {
+			if strings.IndexByte(toString(x.Parts[i]), '\n') >= 0 {
 				f = f.WithTabIndent(len(e.stack))
 				indent = strings.Repeat("\t", len(e.stack))
-				openQuote = `"""` + "\n" + indent
-				closeQuote = `"""`
+				openQuote = tripple + "\n" + indent
+				closeQuote = tripple
 				break
 			}
 		}
@@ -247,7 +266,7 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 			} else {
 				// b := strings.Builder{}
 				buf := []byte(prefix)
-				str := elem.(*adt.String).Str
+				str := toString(elem)
 				buf = f.AppendEscaped(buf, str)
 				if i == len(x.Parts)-1 {
 					if len(closeQuote) > 1 {

@@ -8,6 +8,13 @@ b: "message: \(a)!"
 
 c: d: a
 
+bin1: '\(a)'
+
+bin2: '''
+	multi
+	\(b)
+	'''
+
 -- out/definition --
 a: """
 	multi
@@ -17,12 +24,19 @@ b: "message: \(a)!"
 c: {
 	d: a
 }
+bin1: '\(a)'
+bin2: '''
+		multi
+		\(b)
+		'''
 -- out/doc --
 []
 [a]
 [b]
 [c]
 [c d]
+[bin1]
+[bin2]
 -- out/value --
 == Simplified
 {
@@ -40,6 +54,15 @@ c: {
 			line
 			"""
 	}
+	bin1: '''
+		multi
+		line
+		'''
+	bin2: '''
+		multi
+		message: multi
+		line!
+		'''
 }
 == Raw
 {
@@ -57,6 +80,15 @@ c: {
 			line
 			"""
 	}
+	bin1: '''
+		multi
+		line
+		'''
+	bin2: '''
+		multi
+		message: multi
+		line!
+		'''
 }
 == Final
 {
@@ -74,6 +106,15 @@ c: {
 			line
 			"""
 	}
+	bin1: '''
+		multi
+		line
+		'''
+	bin2: '''
+		multi
+		message: multi
+		line!
+		'''
 }
 == All
 {
@@ -91,4 +132,13 @@ c: {
 			line
 			"""
 	}
+	bin1: '''
+		multi
+		line
+		'''
+	bin2: '''
+		multi
+		message: multi
+		line!
+		'''
 }

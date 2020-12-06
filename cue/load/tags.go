@@ -193,6 +193,8 @@ func injectTags(tags []string, l *loader) errors.Error {
 	return nil
 }
 
+// shouldBuildFile determines whether a File should be included based on its
+// attributes.
 func shouldBuildFile(f *ast.File, fp *fileProcessor) (bool, errors.Error) {
 	tags := fp.c.Tags
 

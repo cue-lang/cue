@@ -1,0 +1,69 @@
+cue fmt .
+cmp x.cue out/x.cue
+cmp x.cue out/star-cue
+cmp y.cue out/y-cue
+cmp yb.cue out/yb-cue
+-- x.cue --
+// header
+
+package x
+
+// file comment
+
+a:    1
+bb:  2
+
+-- star.cue --
+package _
+
+a:    1
+bb:  2
+
+-- y.cue --
+package y
+
+// a comment
+a:    1
+bb:  2 @test(foo)
+
+-- yb.cue --
+// only for prod
+@if(prod)
+
+package y
+
+a:    1 @test(foo)
+bb:  2
+
+-- out/x.cue --
+// header
+
+package x
+
+// file comment
+
+a:  1
+bb: 2
+-- out/star-cue --
+// header
+
+package x
+
+// file comment
+
+a:  1
+bb: 2
+-- out/y-cue --
+package y
+
+// a comment
+a:  1
+bb: 2 @test(foo)
+-- out/yb-cue --
+// only for prod
+@if(prod)
+
+package y
+
+a:  1 @test(foo)
+bb: 2

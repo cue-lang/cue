@@ -33,7 +33,7 @@ type match struct {
 	Pattern string // the pattern itself
 	Literal bool   // whether it is a literal (no wildcards)
 	Pkgs    []*build.Instance
-	Err     error
+	Err     errors.Error
 }
 
 // TODO: should be matched from module file only.
@@ -205,22 +205,24 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		}
 		// TODO: consider not doing these checks here.
 		inst := c.newRelInstance(token.NoPos, dir, pkgName)
-		p := l.importPkg(token.NoPos, inst)
-		if err := p.Err; err != nil && (p == nil || len(p.InvalidCUEFiles) == 0) {
-			switch err.(type) {
-			case nil:
-				break
-			case *NoFilesError:
-				if c.DataFiles && len(p.OrphanedFiles) > 0 {
+		pkgs := l.importPkg(token.NoPos, inst)
+		for _, p := range pkgs {
+			if err := p.Err; err != nil && (p == nil || len(p.InvalidCUEFiles) == 0) {
+				switch err.(type) {
+				case nil:
 					break
+				case *NoFilesError:
+					if c.DataFiles && len(p.OrphanedFiles) > 0 {
+						break
+					}
+					return nil
+				default:
+					m.Err = errors.Append(m.Err, err)
 				}
-				return nil
-			default:
-				m.Err = err
 			}
 		}
 
-		m.Pkgs = append(m.Pkgs, p)
+		m.Pkgs = append(m.Pkgs, pkgs...)
 		return nil
 	})
 	return m
@@ -348,6 +350,9 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 			pkgName = a[p+1:]
 			a = a[:p]
 		}
+		if pkgName == "*" {
+			pkgName = ""
+		}
 
 		if strings.Contains(a, "...") {
 			if isLocalImport(a) {
@@ -365,8 +370,8 @@ func (l *loader) importPathsQuiet(patterns []string) []*match {
 			p = l.cfg.newInstance(token.NoPos, importPath(orig))
 		}
 
-		pkg := l.importPkg(token.NoPos, p)
-		out = append(out, &match{Pattern: a, Literal: true, Pkgs: []*build.Instance{pkg}})
+		pkgs := l.importPkg(token.NoPos, p)
+		out = append(out, &match{Pattern: a, Literal: true, Pkgs: pkgs})
 	}
 	return out
 }

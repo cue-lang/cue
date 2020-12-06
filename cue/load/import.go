@@ -66,7 +66,14 @@ const (
 // If an error occurs, importPkg sets the error in the returned instance,
 // which then may contain partial information.
 //
-func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
+// pkgName indicates which packages to load. It supports the following
+// values:
+//     ""      the default package for the directory, if only one
+//             is present.
+//     _       anonymous files (which may be marked with _)
+//     *       all packages
+//
+func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	l.stk.Push(p.ImportPath)
 	defer l.stk.Pop()
 
@@ -74,18 +81,35 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 	ctxt := &cfg.fileSystem
 
 	if p.Err != nil {
-		return p
+		return []*build.Instance{p}
+	}
+
+	retErr := func(errs errors.Error) []*build.Instance {
+		// XXX: move this loop to ReportError
+		for _, err := range errors.Errors(errs) {
+			p.ReportError(err)
+		}
+		return []*build.Instance{p}
 	}
 
 	if !strings.HasPrefix(p.Dir, cfg.ModuleRoot) {
-		p.Err = errors.Newf(token.NoPos, "module root not defined", p.DisplayPath)
-		return p
+		err := errors.Newf(token.NoPos, "module root not defined", p.DisplayPath)
+		return retErr(err)
 	}
 
 	fp := newFileProcessor(cfg, p)
 
-	// If we have an explicit package name, we can ignore other packages.
+	if p.PkgName == "" {
+		if l.cfg.Package == "*" {
+			fp.ignoreOther = true
+			fp.allPackages = true
+			p.PkgName = "_"
+		} else {
+			p.PkgName = l.cfg.Package
+		}
+	}
 	if p.PkgName != "" {
+		// If we have an explicit package name, we can ignore other packages.
 		fp.ignoreOther = true
 	}
 
@@ -98,13 +122,14 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 	if strings.HasPrefix(p.Dir, genDir) {
 		dirs = append(dirs, [2]string{genDir, p.Dir})
 		// TODO(legacy): don't support "pkg"
+		// && p.PkgName != "_"
 		if filepath.Base(genDir) != "pkg" {
 			for _, sub := range []string{"pkg", "usr"} {
 				rel, err := filepath.Rel(genDir, p.Dir)
 				if err != nil {
 					// should not happen
-					p.Err = errors.Wrapf(err, token.NoPos, "invalid path")
-					return p
+					return retErr(
+						errors.Wrapf(err, token.NoPos, "invalid path"))
 				}
 				base := filepath.Join(cfg.ModuleRoot, modDir, sub)
 				dir := filepath.Join(base, rel)
@@ -125,13 +150,13 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 	}
 
 	if !found {
-		p.Err = errors.Newf(token.NoPos, "cannot find package %q", p.DisplayPath)
-		return p
+		return retErr(
+			errors.Newf(token.NoPos, "cannot find package %q", p.DisplayPath))
 	}
 
 	// This algorithm assumes that multiple directories within cue.mod/*/
 	// have the same module scope and that there are no invalid modules.
-	inModule := false
+	inModule := false // if pkg == "_"
 	for _, d := range dirs {
 		if l.cfg.findRoot(d[1]) != "" {
 			inModule = true
@@ -143,8 +168,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
 			files, err := ctxt.readDir(dir)
 			if err != nil && !os.IsNotExist(err) {
-				p.ReportError(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
-				return p
+				return retErr(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
 			}
 			for _, f := range files {
 				if f.IsDir() {
@@ -165,7 +189,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 				fp.add(pos, dir, file, importComment)
 			}
 
-			if fp.pkg.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
+			if p.PkgName == "" || !inModule || l.cfg.isRoot(dir) || dir == d[0] {
 				break
 			}
 
@@ -183,23 +207,29 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) *build.Instance {
 		}
 	}
 
-	impPath, err := addImportQualifier(importPath(p.ImportPath), p.PkgName)
-	p.ImportPath = string(impPath)
-	if err != nil {
-		p.ReportError(err)
-	}
+	all := []*build.Instance{}
 
-	rewriteFiles(p, cfg.ModuleRoot, false)
-	if errs := fp.finalize(); errs != nil {
-		for _, e := range errors.Errors(errs) {
-			p.ReportError(e)
+	for _, p := range fp.pkgs {
+		impPath, err := addImportQualifier(importPath(p.ImportPath), p.PkgName)
+		p.ImportPath = string(impPath)
+		if err != nil {
+			p.ReportError(err)
 		}
-		return p
-	}
 
-	l.addFiles(cfg.ModuleRoot, p)
-	p.Complete()
-	return p
+		all = append(all, p)
+		rewriteFiles(p, cfg.ModuleRoot, false)
+		if errs := fp.finalize(p); errs != nil {
+			p.ReportError(errs)
+			return all
+		}
+
+		l.addFiles(cfg.ModuleRoot, p)
+		_ = p.Complete()
+	}
+	sort.Slice(all, func(i, j int) bool {
+		return all[i].Dir < all[j].Dir
+	})
+	return all
 }
 
 // loadFunc creates a LoadFunc that can be used to create new build.Instances.
@@ -218,13 +248,15 @@ func (l *loader) loadFunc() build.LoadFunc {
 		if strings.IndexByte(strings.Split(path, "/")[0], '.') == -1 {
 			if l.cfg.StdRoot != "" {
 				p := cfg.newInstance(pos, impPath)
-				return l.importPkg(pos, p)
+				_ = l.importPkg(pos, p)
+				return p
 			}
 			return nil
 		}
 
 		p := cfg.newInstance(pos, impPath)
-		return l.importPkg(pos, p)
+		_ = l.importPkg(pos, p)
+		return p
 	}
 }
 
@@ -285,9 +317,11 @@ type fileProcessor struct {
 	allTags          map[string]bool
 	allFiles         bool
 	ignoreOther      bool // ignore files from other packages
+	allPackages      bool
 
-	c   *Config
-	pkg *build.Instance
+	c    *Config
+	pkgs map[string]*build.Instance
+	pkg  *build.Instance
 
 	err errors.Error
 }
@@ -297,6 +331,7 @@ func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
 		imported: make(map[string][]token.Pos),
 		allTags:  make(map[string]bool),
 		c:        c,
+		pkgs:     map[string]*build.Instance{"_": p},
 		pkg:      p,
 	}
 }
@@ -312,12 +347,13 @@ func countCUEFiles(c *Config, p *build.Instance) int {
 	return count
 }
 
-func (fp *fileProcessor) finalize() errors.Error {
-	p := fp.pkg
+func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	if fp.err != nil {
 		return fp.err
 	}
-	if countCUEFiles(fp.c, p) == 0 && !fp.c.DataFiles {
+	if countCUEFiles(fp.c, p) == 0 &&
+		!fp.c.DataFiles &&
+		(p.PkgName != "_" || !fp.allPackages) {
 		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredCUEFiles) > 0})
 		return fp.err
 	}
@@ -343,8 +379,10 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 
 	base := filepath.Base(fullPath)
 
-	p := fp.pkg
+	// special * and _
+	p := fp.pkg // default package
 
+	// badFile := func(p *build.Instance, err errors.Error) bool {
 	badFile := func(err errors.Error) bool {
 		fp.err = errors.Append(fp.err, err)
 		p.InvalidCUEFiles = append(p.InvalidCUEFiles, fullPath)
@@ -374,19 +412,45 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	}
 
 	_, pkg, _ := internal.PackageInfo(pf)
-	if pkg == "" && mode&allowAnonymous == 0 {
+	if pkg == "" {
+		pkg = "_"
+	}
+
+	switch {
+	case pkg == p.PkgName, mode&allowAnonymous != 0:
+	case fp.allPackages && pkg != "_":
+		q := fp.pkgs[pkg]
+		if q == nil {
+			q = &build.Instance{
+				PkgName: pkg,
+
+				Dir:         p.Dir,
+				DisplayPath: p.DisplayPath,
+				ImportPath:  p.ImportPath + ":" + pkg,
+				Root:        p.Root,
+				Module:      p.Module,
+			}
+			fp.pkgs[pkg] = q
+		}
+		p = q
+
+	case pkg != "_":
+
+	default:
 		p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
 		p.IgnoredFiles = append(p.IgnoredFiles, file)
 		return false // don't mark as added
 	}
 
-	if include, err := shouldBuildFile(pf, fp); !include {
-		if err != nil {
-			fp.err = errors.Append(fp.err, err)
+	if !fp.c.AllCUEFiles {
+		if include, err := shouldBuildFile(pf, fp); !include {
+			if err != nil {
+				fp.err = errors.Append(fp.err, err)
+			}
+			p.IgnoredCUEFiles = append(p.InvalidCUEFiles, fullPath)
+			p.IgnoredFiles = append(p.InvalidFiles, file)
+			return false
 		}
-		p.IgnoredCUEFiles = append(p.InvalidCUEFiles, fullPath)
-		p.IgnoredFiles = append(p.InvalidFiles, file)
-		return false
 	}
 
 	if pkg != "" && pkg != "_" {

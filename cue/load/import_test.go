@@ -20,7 +20,6 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue/build"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
 
@@ -30,7 +29,7 @@ func getInst(pkg, cwd string) (*build.Instance, error) {
 	c, _ := (&Config{Dir: cwd}).complete()
 	l := loader{cfg: c}
 	inst := c.newRelInstance(token.NoPos, pkg, c.Package)
-	p := l.importPkg(token.NoPos, inst)
+	p := l.importPkg(token.NoPos, inst)[0]
 	return p, p.Err
 }
 
@@ -51,18 +50,6 @@ func TestEmptyFolderImport(t *testing.T) {
 	_, err := getInst(".", testdata+"empty")
 	if _, ok := err.(*NoFilesError); !ok {
 		t.Fatal(`Import("testdata/empty") did not return NoCUEError.`)
-	}
-}
-
-func TestIgnoredCUEFilesImport(t *testing.T) {
-	_, err := getInst(".", testdata+"ignored")
-	var e *NoFilesError
-	ok := errors.As(err, &e)
-	if !ok {
-		t.Fatal(`Import("testdata/ignored") did not return NoFilesError.`)
-	}
-	if !e.ignored {
-		t.Fatal(`Import("testdata/ignored") should have ignored CUE files.`)
 	}
 }
 

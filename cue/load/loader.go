@@ -189,7 +189,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// TODO: ModImportFromFiles(files)
 	pkg.Dir = cfg.Dir
 	rewriteFiles(pkg, pkg.Dir, true)
-	for _, err := range errors.Errors(fp.finalize()) { // ImportDir(&ctxt, dir, 0)
+	for _, err := range errors.Errors(fp.finalize(pkg)) { // ImportDir(&ctxt, dir, 0)
 		var x *NoFilesError
 		if len(pkg.OrphanedFiles) == 0 || !errors.As(err, &x) {
 			pkg.ReportError(err)

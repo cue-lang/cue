@@ -15,8 +15,6 @@
 package load
 
 import (
-	"os"
-	"path/filepath"
 	"reflect"
 	"testing"
 )
@@ -49,86 +47,4 @@ func TestMatch(t *testing.T) {
 	noMatch("!foo", map[string]bool{"foo": true})
 	matchFn("foo,!bar", map[string]bool{"foo": true, "bar": true})
 	noMatch("!", map[string]bool{})
-}
-
-func TestShouldBuild(t *testing.T) {
-	const file1 = "// +build tag1\n\n" +
-		"package main\n"
-	want1 := map[string]bool{"tag1": true}
-
-	const file2 = "// +build cgo\n\n" +
-		"// This package implements parsing of tags like\n" +
-		"// +build tag1\n" +
-		"package load"
-	want2 := map[string]bool{"cgo": true}
-
-	const file3 = "// Copyright The CUE Authors.\n\n" +
-		"package load\n\n" +
-		"// shouldBuild checks tags given by lines of the form\n" +
-		"// +build tag\n" +
-		"func shouldBuild(content []byte)\n"
-	want3 := map[string]bool{}
-
-	c := &Config{BuildTags: []string{"tag1"}}
-	m := map[string]bool{}
-	if !shouldBuild(c, []byte(file1), m) {
-		t.Errorf("shouldBuild(file1) = false, want true")
-	}
-	if !reflect.DeepEqual(m, want1) {
-		t.Errorf("shouldBuild(file1) tags = %v, want %v", m, want1)
-	}
-
-	m = map[string]bool{}
-	if shouldBuild(c, []byte(file2), m) {
-		t.Errorf("shouldBuild(file2) = true, want false")
-	}
-	if !reflect.DeepEqual(m, want2) {
-		t.Errorf("shouldBuild(file2) tags = %v, want %v", m, want2)
-	}
-
-	m = map[string]bool{}
-	c = &Config{BuildTags: nil}
-	if !shouldBuild(c, []byte(file3), m) {
-		t.Errorf("shouldBuild(file3) = false, want true")
-	}
-	if !reflect.DeepEqual(m, want3) {
-		t.Errorf("shouldBuild(file3) tags = %v, want %v", m, want3)
-	}
-}
-
-var (
-	cfg    = &Config{BuildTags: []string{"enable"}}
-	defCfg = &Config{}
-)
-
-var matchFileTests = []struct {
-	cfg   *Config
-	name  string
-	data  string
-	match bool
-}{
-	{defCfg, "foo.cue", "", true},
-	{defCfg, "a/b/c/foo.cue", "// +build enable\n\npackage foo\n", false},
-	{defCfg, "foo.cue", "// +build !enable\n\npackage foo\n", true},
-	{defCfg, "foo1.cue", "// +build linux\n\npackage foo\n", false},
-	{defCfg, "foo.badsuffix", "", false},
-	{cfg, "a/b/c/d/foo.cue", "// +build enable\n\npackage foo\n", true},
-	{cfg, "foo.cue", "// +build !enable\n\npackage foo\n", false},
-}
-
-func TestMatchFile(t *testing.T) {
-	cwd, _ := os.Getwd()
-	abs := func(path string) string {
-		return filepath.Join(cwd, path)
-	}
-	for _, tt := range matchFileTests {
-		cfg := tt.cfg
-		cfg.Overlay = map[string]Source{abs(tt.name): FromString(tt.data)}
-		cfg, _ = cfg.complete()
-
-		match, err := matchFileTest(cfg, "", tt.name)
-		if match != tt.match || err != nil {
-			t.Fatalf("MatchFile(%q) = %v, %v, want %v, nil", tt.name, match, err, tt.match)
-		}
-	}
 }

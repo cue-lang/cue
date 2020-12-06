@@ -15,7 +15,6 @@
 package load
 
 import (
-	"bytes"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -24,23 +23,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/filetypes"
 )
-
-// matchFileTest reports whether the file with the given name in the given directory
-// matches the context and would be included in a Package created by ImportDir
-// of that directory.
-//
-// matchFileTest considers the name of the file and may use cfg.Build.OpenFile to
-// read some or all of the file's content.
-func matchFileTest(cfg *Config, dir, name string) (match bool, err error) {
-	file, err := filetypes.ParseFile(filepath.Join(dir, name), filetypes.Input)
-	if err != nil {
-		return false, nil
-	}
-	match, _, err = matchFile(cfg, file, false, false, nil)
-	return
-}
 
 // matchFile determines whether the file with the given name in the given directory
 // should be included in the package being constructed.
@@ -96,86 +79,8 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 		return
 	}
 
-	// Look for +build comments to accept or reject the file.
-	if !shouldBuild(cfg, data, allTags) && !allFiles {
-		return
-	}
-
 	match = true
 	return
-}
-
-// shouldBuild reports whether it is okay to use this file,
-// The rule is that in the file's leading run of // comments
-// and blank lines, which must be followed by a blank line
-// (to avoid including a Go package clause doc comment),
-// lines beginning with '// +build' are taken as build directives.
-//
-// The file is accepted only if each such line lists something
-// matching the file. For example:
-//
-//	// +build windows linux
-//
-// marks the file as applicable only on Windows and Linux.
-//
-// If shouldBuild finds a //go:binary-only-package comment in the file,
-// it sets *binaryOnly to true. Otherwise it does not change *binaryOnly.
-//
-func shouldBuild(cfg *Config, content []byte, allTags map[string]bool) bool {
-	// Pass 1. Identify leading run of // comments and blank lines,
-	// which must be followed by a blank line.
-	end := 0
-	p := content
-	for len(p) > 0 {
-		line := p
-		if i := bytes.IndexByte(line, '\n'); i >= 0 {
-			line, p = line[:i], p[i+1:]
-		} else {
-			p = p[len(p):]
-		}
-		line = bytes.TrimSpace(line)
-		if len(line) == 0 { // Blank line
-			end = len(content) - len(p)
-			continue
-		}
-		if !bytes.HasPrefix(line, slashslash) { // Not comment line
-			break
-		}
-	}
-	content = content[:end]
-
-	// Pass 2.  Process each line in the run.
-	p = content
-	allok := true
-	for len(p) > 0 {
-		line := p
-		if i := bytes.IndexByte(line, '\n'); i >= 0 {
-			line, p = line[:i], p[i+1:]
-		} else {
-			p = p[len(p):]
-		}
-		line = bytes.TrimSpace(line)
-		if bytes.HasPrefix(line, slashslash) {
-			line = bytes.TrimSpace(line[len(slashslash):])
-			if len(line) > 0 && line[0] == '+' {
-				// Looks like a comment +line.
-				f := strings.Fields(string(line))
-				if f[0] == "+build" {
-					ok := false
-					for _, tok := range f[1:] {
-						if doMatch(cfg, tok, allTags) {
-							ok = true
-						}
-					}
-					if !ok {
-						allok = false
-					}
-				}
-			}
-		}
-	}
-
-	return allok
 }
 
 // doMatch reports whether the name is one of:

@@ -77,6 +77,12 @@ y1: {
         "foo\(i)": v
     }
 
+	x: [
+		for x in src
+		let y = x {
+			y
+		}
+	]
 }
 
 errorStructDef: {
@@ -161,6 +167,9 @@ y1: {
 	for i, v in src {
 		"foo\(i)": v
 	}
+	x: [ for x in src let y = x {
+		y
+	}]
 }
 errorStructDef: {
 	a:    1
@@ -215,6 +224,10 @@ errorListDef: {
 [y1 src 0]
 [y1 src 1]
 [y1 src 2]
+[y1 x]
+[y1 x 0]
+[y1 x 1]
+[y1 x 2]
 [y1 foo0]
 [y1 bar1]
 [y1 bar2]
@@ -291,6 +304,7 @@ _|_ // e3: index out of range [2] with length 2
 		bar1: 2
 		bar2: 3
 		foo1: 2
+		x: [1, 2, 3]
 		foo2: 3
 	}
 	errorStructDef: {

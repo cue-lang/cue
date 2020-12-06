@@ -455,7 +455,10 @@ func (e *exporter) comprehension(y adt.Yielder) ast.Expr {
 			y = x.Dst
 
 		case *adt.LetClause:
-			clause := &ast.LetClause{Expr: e.expr(x.Expr)}
+			clause := &ast.LetClause{
+				Ident: e.ident(x.Label),
+				Expr:  e.expr(x.Expr),
+			}
 			c.Clauses = append(c.Clauses, clause)
 
 			_, saved := e.pushFrame(nil)

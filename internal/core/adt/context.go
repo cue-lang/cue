@@ -43,9 +43,9 @@ var Debug bool = os.Getenv("CUE_DEBUG") != "0"
 //
 // It is advisable for each use of Assert to document how the error is expected
 // to be handled down the line.
-func Assert(name string, b bool) {
+func Assertf(b bool, format string, args ...interface{}) {
 	if Debug && !b {
-		panic("assertion failed: " + name)
+		panic(fmt.Sprintf("assertion failed: "+format, args...))
 	}
 }
 

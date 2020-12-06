@@ -246,9 +246,8 @@ func (v *Vertex) Status() VertexStatus {
 }
 
 func (v *Vertex) UpdateStatus(s VertexStatus) {
-	if v.status > s+1 {
-		panic(fmt.Sprintf("attempt to regress status from %d to %d", v.Status(), s))
-	}
+	Assertf(v.status <= s+1, "attempt to regress status from %d to %d", v.Status(), s)
+
 	if s == Finalized && v.BaseValue == nil {
 		// panic("not finalized")
 	}

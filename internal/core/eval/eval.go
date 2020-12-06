@@ -1746,8 +1746,7 @@ func (n *nodeContext) insertField(f adt.Feature, x adt.Conjunct) *adt.Vertex {
 	// TODO: disallow adding conjuncts when cache set?
 	arc.AddConjunct(x)
 
-	adt.Assert("invalid adt.ID",
-		x.CloseID == 0 || int(x.CloseID) < len(closedInfo(n.node).Canopy))
+	adt.Assertf(x.CloseID == 0 || int(x.CloseID) < len(closedInfo(n.node).Canopy), "invalid adt.ID")
 
 	if isNew {
 		closedInfo(n.node).visitAllFieldSets(func(o *fieldSet) {

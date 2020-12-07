@@ -35,10 +35,9 @@ type fieldSet struct {
 	// Required fields are marked as empty
 	fields []field
 
-	// literal map[adt.Feature][]adt.Node
-
 	// excluded are all literal fields that already exist.
-	bulk       []bulkField
+	bulk []bulkField
+
 	additional []adt.Expr
 	isOpen     bool // has a ...
 }
@@ -81,8 +80,9 @@ type field struct {
 }
 
 type bulkField struct {
-	check fieldMatcher
-	expr  adt.Node // *adt.BulkOptionalField // Conjunct
+	check      fieldMatcher
+	expr       adt.Node // *adt.BulkOptionalField // Conjunct
+	additional bool     // used with ...
 }
 
 func (o *fieldSet) Accept(c *adt.OpContext, f adt.Feature) bool {
@@ -107,17 +107,16 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 	env := o.env
 
 	// Match normal fields
-	p := 0
-	for ; p < len(o.fields); p++ {
-		if o.fields[p].label == arc.Label {
-			break
+	matched := false
+outer:
+	for _, f := range o.fields {
+		if f.label == arc.Label {
+			for _, e := range f.optional {
+				arc.AddConjunct(adt.MakeConjunct(env, e, o.id))
+			}
+			matched = true
+			break outer
 		}
-	}
-	if p < len(o.fields) {
-		for _, e := range o.fields[p].optional {
-			arc.AddConjunct(adt.MakeConjunct(env, e, o.id))
-		}
-		return
 	}
 
 	if !arc.Label.IsRegular() {
@@ -130,8 +129,10 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 	bulkEnv.Cycles = nil
 
 	// match bulk optional fields / pattern properties
-	matched := false
 	for _, f := range o.bulk {
+		if matched && f.additional {
+			continue
+		}
 		if f.check.Match(c, arc.Label) {
 			matched = true
 			if f.expr != nil {
@@ -179,7 +180,7 @@ func (o *fieldSet) AddOptional(c *adt.OpContext, x *adt.OptionalField) {
 
 func (o *fieldSet) AddDynamic(c *adt.OpContext, env *adt.Environment, x *adt.DynamicField) {
 	// not in bulk: count as regular field?
-	o.bulk = append(o.bulk, bulkField{dynamicMatcher{env, x.Key}, nil})
+	o.bulk = append(o.bulk, bulkField{dynamicMatcher{env, x.Key}, nil, false})
 }
 
 func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
@@ -190,7 +191,7 @@ func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
 	}
 
 	if m := o.getMatcher(c, v); m != nil {
-		o.bulk = append(o.bulk, bulkField{m, x})
+		o.bulk = append(o.bulk, bulkField{m, x, false})
 	}
 }
 

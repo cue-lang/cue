@@ -45,11 +45,15 @@ Result:
   a: (struct){
     foo: (struct){
       a: (int){ 1 }
+      b: (int){ 1 }
+      name: (string){ "foo" }
     }
   }
   d: (struct){
     foo: (struct){
       a: (int){ 1 }
+      b: (int){ 1 }
+      name: (string){ "foo" }
     }
     foobar: (struct){
       c: (int){ 2 }

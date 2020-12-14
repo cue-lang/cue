@@ -55,7 +55,8 @@ func TestEval(t *testing.T) {
 
 		v, err := r.Build(a[0])
 		if err != nil {
-			t.Fatal(err)
+			t.WriteErrors(err)
+			return
 		}
 
 		e := eval.New(r)

@@ -1,0 +1,81 @@
+-- in.cue --
+package compile
+
+import "list"
+
+dis1: "dev"|"prd"
+dis2: *"dev"|"prd"
+
+con1: string
+let con2 = string
+
+ok1: [string]: string
+ok2: [name=string]: string
+ok3: [con1]: string
+ok3: [con2]: string
+
+bad1: ["foo"]: string
+bad2: [1]: string
+bad3: [name=1]: string
+bad4: [dis1]: string
+bad5: [dis2]: string
+bad6: [name=dis2]: string
+bad7: [{foo: "bar"}]: string
+bad8: [list.FlattenN([string], 1)]: string
+bad9: [for x in [1,2,3] {x}]: string
+
+-- out/compile --
+bad9: comprehension values not allowed in this position:
+    ./in.cue:24:8
+--- in.cue
+{
+  dis1: ("dev"|"prd")
+  dis2: (*"dev"|"prd")
+  con1: string
+  ok1: {
+    [string]: string
+  }
+  ok2: {
+    [string]: string
+  }
+  ok3: {
+    [〈1;con1〉]: string
+  }
+  ok3: {
+    [〈1;let con2〉]: string
+  }
+  bad1: {
+    ["foo"]: string
+  }
+  bad2: {
+    [1]: string
+  }
+  bad3: {
+    [1]: string
+  }
+  bad4: {
+    [〈1;dis1〉]: string
+  }
+  bad5: {
+    [〈1;dis2〉]: string
+  }
+  bad6: {
+    [〈1;dis2〉]: string
+  }
+  bad7: {
+    [{
+      foo: "bar"
+    }]: string
+  }
+  bad8: {
+    [〈import;list〉.FlattenN([
+      string,
+    ], 1)]: string
+  }
+  bad9: {
+    [_|_(comprehension values not allowed in this position)]: string
+  }
+}
+-- out/eval --
+bad9: comprehension values not allowed in this position:
+    ./in.cue:24:8

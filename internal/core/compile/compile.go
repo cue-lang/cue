@@ -15,7 +15,6 @@
 package compile
 
 import (
-	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -938,8 +937,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		}
 
 	default:
-		panic(fmt.Sprintf("unknown expression type %T", n))
-		// return c.errf(n, "unknown expression type %T", n)
+		return c.errf(n, "%s values not allowed in this position", ast.Name(n))
 	}
 }
 

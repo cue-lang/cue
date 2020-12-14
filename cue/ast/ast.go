@@ -56,6 +56,12 @@ type Node interface {
 	commentInfo() *comments
 }
 
+// Name describes the type of n.
+func Name(n Node) string {
+	s := fmt.Sprintf("%T", n)
+	return strings.ToLower(s[strings.Index(s, "ast.")+4:])
+}
+
 func getPos(n Node) token.Pos {
 	p := n.pos()
 	if p == nil {

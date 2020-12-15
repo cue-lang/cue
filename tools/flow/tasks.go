@@ -99,8 +99,13 @@ func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 
 		var errs errors.Error
 		if err != nil {
-			c.addErr(err, "invalid task")
-			errs = errors.Promote(err, "create task")
+			if !c.inRoot(w) {
+				// Must be in InferTask mode. In this case we ignore the error.
+				r = nil
+			} else {
+				c.addErr(err, "invalid task")
+				errs = errors.Promote(err, "create task")
+			}
 		}
 
 		if r != nil {
@@ -222,6 +227,20 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 		}
 		return nil
 	})
+}
+
+func (c *Controller) inRoot(n *adt.Vertex) bool {
+	path := cue.MakeValue(c.opCtx, n).Path().Selectors()
+	root := c.cfg.Root.Selectors()
+	if len(path) < len(root) {
+		return false
+	}
+	for i, sel := range root {
+		if path[i] != sel {
+			return false
+		}
+	}
+	return true
 }
 
 var cycleMarker = &Task{}

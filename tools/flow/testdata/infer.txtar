@@ -8,10 +8,14 @@ top1: {
     $after: top0
 }
 
+top3: {
+    $id: string // not a task
+}
+
 root: {
     t1: {
         $id: "valToOut"
-        $after: top1
+        $after: [top1, top3]
     }
 }
 -- out/run/errors --
@@ -61,10 +65,12 @@ graph TD
 -- out/run/t3/value --
 {
 	$id: "valToOut"
-	$after: {
+	$after: [{
 		$id: "valToOut"
 		$after: {
 			$id: "valToOut"
 		}
-	}
+	}, {
+		$id: string
+	}]
 }

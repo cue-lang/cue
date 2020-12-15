@@ -3,8 +3,25 @@ cmp stdout expect-stdout
 -- f1.cue --
 package kube
 
+pkg: {
+	#Def: {
+		a: int
+		b: #Role
+	}
+	#Role: {
+		kind: string
+		name: string
+	}
+
+}
+
+test: pkg.#Def
 test: {
     a: 1
+	b: {
+		kind: "foo"
+		name: "bar"
+	}
 }
 
 // A kind at the top-level should not be allowed.
@@ -26,4 +43,7 @@ command: dump: {
 
 -- expect-stdout --
 a: 1
+b:
+  kind: foo
+  name: bar
 

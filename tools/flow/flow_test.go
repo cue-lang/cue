@@ -101,6 +101,9 @@ func taskFunc(v cue.Value) (flow.Runner, error) {
 				return nil
 			}), nil
 		}
+		if err != nil && v.Lookup("$id").Exists() {
+			return nil, err
+		}
 
 	case "valToOut":
 		return flow.RunnerFunc(func(t *flow.Task) error {

@@ -12,8 +12,8 @@ A: {
     }
 }
 
-// TODO(errors): this should result in an incomplete error.
-// A simplified control flow should help here.
+// This should result in an incomplete error (a reference cycle error classifies
+// as incomplete).
 B: {
     a: {
         parent: ""
@@ -64,7 +64,9 @@ Issue486: {
   B: (struct){
     a: (struct){
       parent: (string){ "" }
-      children: (#list){
+      children: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:19:47
       }
     }
   }

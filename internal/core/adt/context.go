@@ -187,10 +187,9 @@ func (c *OpContext) pos() token.Pos {
 	return c.src.Pos()
 }
 
-func (c *OpContext) spawn(node *Vertex) *OpContext {
-	sub := *c
-	node.Parent = c.e.Vertex
-	sub.e = &Environment{
+func (c *OpContext) spawn(node *Vertex) *Environment {
+	node.Parent = c.e.Vertex // TODO: Is this necessary?
+	return &Environment{
 		Up:     c.e,
 		Vertex: node,
 
@@ -199,7 +198,6 @@ func (c *OpContext) spawn(node *Vertex) *OpContext {
 		Deref:  c.e.Deref,
 		Cycles: c.e.Cycles,
 	}
-	return &sub
 }
 
 func (c *OpContext) Env(upCount int32) *Environment {

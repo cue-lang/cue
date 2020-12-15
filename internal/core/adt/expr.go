@@ -1251,7 +1251,13 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 			n.Arcs = append(n.Arcs, v)
 		}
 
-		x.Dst.yield(c.spawn(n), f)
+		sub := c.spawn(n)
+		saved := c.PushState(sub, x.Dst.Source())
+		x.Dst.yield(c, f)
+		if b := c.PopState(saved); b != nil {
+			c.AddBottom(b)
+			break
+		}
 		if c.HasErr() {
 			break
 		}
@@ -1304,7 +1310,13 @@ func (x *LetClause) yield(c *OpContext, f YieldFunc) {
 	n := &Vertex{Arcs: []*Vertex{
 		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, 0}}},
 	}}
-	x.Dst.yield(c.spawn(n), f)
+
+	sub := c.spawn(n)
+	saved := c.PushState(sub, x.Dst.Source())
+	x.Dst.yield(c, f)
+	if b := c.PopState(saved); b != nil {
+		c.AddBottom(b)
+	}
 }
 
 // A ValueClause represents the value part of a comprehension.

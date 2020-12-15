@@ -1,0 +1,94 @@
+-- in.cue --
+a: { b: 2, c: int }
+
+wrongConcreteType:  {
+	if a.b {
+		2
+	}
+}
+
+wrongType:  {
+	if a.c {
+		2
+	}
+}
+
+incomplete:  {
+	if a.d {
+		2
+	}
+}
+
+incomplete:  {
+    list: [1, 2, 3]
+	for x in list if a.d {
+		x
+	}
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    b: 2
+    c: int
+  }
+  wrongConcreteType: {
+    if 〈1;a〉.b {
+      2
+    }
+  }
+  wrongType: {
+    if 〈1;a〉.c {
+      2
+    }
+  }
+  incomplete: {
+    if 〈1;a〉.d {
+      2
+    }
+  }
+  incomplete: {
+    list: [
+      1,
+      2,
+      3,
+    ]
+    for _, x in 〈0;list〉 if 〈2;a〉.d {
+      〈1;x〉
+    }
+  }
+}
+-- out/eval --
+Errors:
+wrongConcreteType: cannot use 2 (type int) as type bool:
+    ./in.cue:4:2
+wrongType: cannot use int (type int) as type bool:
+    ./in.cue:10:2
+
+Result:
+(_|_){
+  // [eval]
+  a: (struct){
+    b: (int){ 2 }
+    c: (int){ int }
+  }
+  wrongConcreteType: (_|_){
+    // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
+    //     ./in.cue:4:2
+  }
+  wrongType: (_|_){
+    // [eval] wrongType: cannot use int (type int) as type bool:
+    //     ./in.cue:10:2
+  }
+  incomplete: (_|_){
+    // [incomplete] incomplete: undefined field d:
+    //     ./in.cue:16:7
+    // incomplete: undefined field d:
+    //     ./in.cue:23:21
+    list: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+    }
+  }
+}

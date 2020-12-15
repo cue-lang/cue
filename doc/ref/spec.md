@@ -1050,8 +1050,13 @@ match that pattern.
 When unifying structs `a` and `b`,
 a pattern constraint `[p]: v` declared in `a`
 defines that the value `v` should unify with any field in the resulting struct `c`
-whose label unifies with pattern `p` and for which there exists no
-field in `a` with the same label.
+whose label unifies with pattern `p`.
+
+<!-- TODO: Update grammar and support this.
+A pattern constraints with a pattern preceded by `...` indicates
+the pattern can only matches fields in `b` for which there
+exists no field in `a` with the same label.
+-->
 
 Additionally, a _default constraint_, denoted `...value`, defines a value
 to unify with any field for which there is no other declaration in a struct.

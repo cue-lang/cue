@@ -211,7 +211,8 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 		depTask := c.findImpliedTask(d)
 		if depTask != nil {
 			if depTask != cycleMarker {
-				t.addDep(depTask)
+				v := cue.MakeValue(c.opCtx, d.Node)
+				t.addDep(v.Path().String(), depTask)
 			}
 			return nil
 		}

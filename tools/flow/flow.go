@@ -300,8 +300,9 @@ type Task struct {
 	labels []adt.Feature
 
 	// Dynamic
-	update adt.Expr
-	deps   map[*Task]bool
+	update   adt.Expr
+	deps     map[*Task]bool
+	pathDeps map[string][]*Task
 
 	conjunctSeq int64
 	valueSeq    int64
@@ -345,13 +346,30 @@ func (t *Task) vertex() *adt.Vertex {
 	return x.(*adt.Vertex)
 }
 
-func (t *Task) addDep(dep *Task) {
+func (t *Task) addDep(path string, dep *Task) {
 	if dep == nil || dep == t {
 		return
 	}
 	if t.deps == nil {
 		t.deps = map[*Task]bool{}
+		t.pathDeps = map[string][]*Task{}
 	}
+
+	// Add the dependencies for a given path to the controller. We could compute
+	// this again later, but this ensures there will be no discrepancies.
+	a := t.pathDeps[path]
+	found := false
+	for _, t := range a {
+		if t == dep {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.pathDeps[path] = append(a, dep)
+
+	}
+
 	if !t.deps[dep] {
 		t.deps[dep] = true
 		t.depTasks = append(t.depTasks, dep)
@@ -392,6 +410,15 @@ func (t *Task) Value() cue.Value {
 func (t *Task) Dependencies() []*Task {
 	// TODO: add synchronization.
 	return t.depTasks
+}
+
+// PathDependencies reports the dependencies found for a value at the given
+// path.
+//
+// This may currently only be called before Run is called or from within
+// a call to UpdateFunc.
+func (t *Task) PathDependencies(p cue.Path) []*Task {
+	return t.pathDeps[p.String()]
 }
 
 // Err returns the error of a completed Task.

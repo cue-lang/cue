@@ -93,7 +93,7 @@ func (o *fieldSet) Accept(c *adt.OpContext, f adt.Feature) bool {
 		return true
 	}
 	for _, b := range o.bulk {
-		if b.check.Match(c, f) {
+		if b.check.Match(c, o.env, f) {
 			return true
 		}
 	}
@@ -133,7 +133,7 @@ outer:
 		if matched && f.additional {
 			continue
 		}
-		if f.check.Match(c, arc.Label) {
+		if f.check.Match(c, o.env, arc.Label) {
 			matched = true
 			if f.expr != nil {
 				arc.AddConjunct(adt.MakeConjunct(&bulkEnv, f.expr, o.id))
@@ -178,9 +178,9 @@ func (o *fieldSet) AddOptional(c *adt.OpContext, x *adt.OptionalField) {
 	o.fields[p].optional = append(o.fields[p].optional, x)
 }
 
-func (o *fieldSet) AddDynamic(c *adt.OpContext, env *adt.Environment, x *adt.DynamicField) {
+func (o *fieldSet) AddDynamic(c *adt.OpContext, x *adt.DynamicField) {
 	// not in bulk: count as regular field?
-	o.bulk = append(o.bulk, bulkField{dynamicMatcher{env, x.Key}, nil, false})
+	o.bulk = append(o.bulk, bulkField{dynamicMatcher{x.Key}, nil, false})
 }
 
 func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
@@ -218,12 +218,12 @@ func (o *fieldSet) AddEllipsis(c *adt.OpContext, x *adt.Ellipsis) {
 }
 
 type fieldMatcher interface {
-	Match(c *adt.OpContext, f adt.Feature) bool
+	Match(c *adt.OpContext, env *adt.Environment, f adt.Feature) bool
 }
 
 type typeMatcher adt.Kind
 
-func (m typeMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
+func (m typeMatcher) Match(c *adt.OpContext, env *adt.Environment, f adt.Feature) bool {
 	switch f.Typ() {
 	case adt.StringLabel:
 		return adt.Kind(m)&adt.StringKind != 0
@@ -235,15 +235,14 @@ func (m typeMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 }
 
 type dynamicMatcher struct {
-	env  *adt.Environment
 	expr adt.Expr
 }
 
-func (m dynamicMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
+func (m dynamicMatcher) Match(c *adt.OpContext, env *adt.Environment, f adt.Feature) bool {
 	if !f.IsRegular() || !f.IsString() {
 		return false
 	}
-	v, ok := c.Evaluate(m.env, m.expr)
+	v, ok := c.Evaluate(env, m.expr)
 	if !ok {
 		return false
 	}
@@ -257,7 +256,7 @@ func (m dynamicMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
 
 type patternMatcher adt.Conjunct
 
-func (m patternMatcher) Match(c *adt.OpContext, f adt.Feature) bool {
+func (m patternMatcher) Match(c *adt.OpContext, env *adt.Environment, f adt.Feature) bool {
 	v := adt.Vertex{}
 	v.AddConjunct(adt.Conjunct(m))
 	label := f.ToValue(c)

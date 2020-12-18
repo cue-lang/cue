@@ -733,7 +733,7 @@ func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (fou
 		}
 
 		for _, b := range o.bulk {
-			if b.check.Match(ctx, f) {
+			if b.check.Match(ctx, o.env, f) {
 				return true, false
 			}
 		}

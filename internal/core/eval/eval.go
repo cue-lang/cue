@@ -1669,7 +1669,7 @@ func (n *nodeContext) addStruct(
 			n.aStruct = s
 			n.aStructID = closeID
 			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeID, nil})
-			opt.AddDynamic(ctx, childEnv, x)
+			opt.AddDynamic(ctx, x)
 
 		case *adt.ForClause:
 			n.forClauses = append(n.forClauses, envYield{childEnv, x, closeID, nil})

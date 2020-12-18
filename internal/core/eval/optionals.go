@@ -38,7 +38,7 @@ type fieldSet struct {
 	Dynamic []*adt.DynamicField
 
 	// excluded are all literal fields that already exist.
-	Bulk []bulkField
+	Bulk []*adt.BulkOptionalField
 
 	Additional []adt.Expr
 	IsOpen     bool // has a ...
@@ -80,12 +80,6 @@ type FieldInfo struct {
 	Optional []adt.Node
 }
 
-type bulkField struct {
-	check      fieldMatcher
-	expr       adt.Node // *adt.BulkOptionalField // Conjunct
-	additional bool     // used with ...
-}
-
 func (o *fieldSet) Accept(c *adt.OpContext, f adt.Feature) bool {
 	if len(o.Additional) > 0 {
 		return true
@@ -100,7 +94,7 @@ func (o *fieldSet) Accept(c *adt.OpContext, f adt.Feature) bool {
 		}
 	}
 	for _, b := range o.Bulk {
-		if b.check.Match(c, o.env, f) {
+		if matchBulk(c, o.env, b, f) {
 			return true
 		}
 	}
@@ -136,15 +130,13 @@ outer:
 	bulkEnv.Cycles = nil
 
 	// match bulk optional fields / pattern properties
-	for _, f := range o.Bulk {
-		if matched && f.additional {
-			continue
-		}
-		if f.check.Match(c, o.env, arc.Label) {
+	for _, b := range o.Bulk {
+		// if matched && f.additional {
+		// 	continue
+		// }
+		if matchBulk(c, o.env, b, arc.Label) {
 			matched = true
-			if f.expr != nil {
-				arc.AddConjunct(adt.MakeConjunct(&bulkEnv, f.expr, o.id))
-			}
+			arc.AddConjunct(adt.MakeConjunct(&bulkEnv, b, o.id))
 		}
 	}
 	if matched {
@@ -190,18 +182,10 @@ func (o *fieldSet) AddDynamic(c *adt.OpContext, x *adt.DynamicField) {
 }
 
 func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
-	v, ok := c.Evaluate(o.env, x.Filter)
-	if !ok {
-		// TODO: handle dynamically
-		return
-	}
-
-	if m := o.getMatcher(c, v); m != nil {
-		o.Bulk = append(o.Bulk, bulkField{m, x, false})
-	}
+	o.Bulk = append(o.Bulk, x)
 }
 
-func (o *fieldSet) getMatcher(c *adt.OpContext, v adt.Value) fieldMatcher {
+func getMatcher(c *adt.OpContext, env *adt.Environment, v adt.Value) fieldMatcher {
 	switch f := v.(type) {
 	case *adt.Top:
 		return typeMatcher(adt.TopKind)
@@ -210,8 +194,22 @@ func (o *fieldSet) getMatcher(c *adt.OpContext, v adt.Value) fieldMatcher {
 		return typeMatcher(f.K)
 
 	default:
-		return o.newPatternMatcher(c, v)
+		return newPatternMatcher(c, env, v)
 	}
+}
+
+func matchBulk(c *adt.OpContext, env *adt.Environment, x *adt.BulkOptionalField, f adt.Feature) bool {
+	v, ok := c.Evaluate(env, x.Filter)
+	if !ok {
+		// TODO: handle dynamically
+		return false
+	}
+
+	m := getMatcher(c, env, v)
+	if m == nil {
+		return false
+	}
+	return m.Match(c, env, f)
 }
 
 func (o *fieldSet) AddEllipsis(c *adt.OpContext, x *adt.Ellipsis) {
@@ -272,7 +270,7 @@ func (m patternMatcher) Match(c *adt.OpContext, env *adt.Environment, f adt.Feat
 	return b == nil
 }
 
-func (o *fieldSet) newPatternMatcher(ctx *adt.OpContext, x adt.Value) fieldMatcher {
-	c := adt.MakeRootConjunct(o.env, x)
+func newPatternMatcher(ctx *adt.OpContext, env *adt.Environment, x adt.Value) fieldMatcher {
+	c := adt.MakeRootConjunct(env, x)
 	return patternMatcher(c)
 }

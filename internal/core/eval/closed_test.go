@@ -361,7 +361,7 @@ func TestVerifyArcAllowed(t *testing.T) {
 				fs := &fieldSet{}
 				c.Fields = append(c.Fields, fs)
 				for _, id := range f {
-					fs.fields = append(fs.fields, field{label: id})
+					fs.Fields = append(fs.Fields, FieldInfo{Label: id})
 				}
 			}
 

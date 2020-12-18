@@ -31,52 +31,52 @@ type fieldSet struct {
 	env *adt.Environment
 	id  adt.ID
 
-	// field marks the optional conjuncts of all explicit fields.
-	// Required fields are marked as empty
-	fields []field
+	// field marks the optional conjuncts of all explicit Fields.
+	// Required Fields are marked as empty
+	Fields []FieldInfo
 
 	// excluded are all literal fields that already exist.
-	bulk []bulkField
+	Bulk []bulkField
 
-	additional []adt.Expr
-	isOpen     bool // has a ...
+	Additional []adt.Expr
+	IsOpen     bool // has a ...
 }
 
 func (o *fieldSet) OptionalTypes() (mask adt.OptionalType) {
-	for _, f := range o.fields {
-		if len(f.optional) > 0 {
+	for _, f := range o.Fields {
+		if len(f.Optional) > 0 {
 			mask = adt.HasField
 			break
 		}
 	}
-	for _, b := range o.bulk {
+	for _, b := range o.Bulk {
 		if b.expr == nil {
 			mask |= adt.HasDynamic
 		} else {
 			mask |= adt.HasPattern
 		}
 	}
-	if o.additional != nil {
+	if o.Additional != nil {
 		mask |= adt.HasAdditional
 	}
-	if o.isOpen {
+	if o.IsOpen {
 		mask |= adt.IsOpen
 	}
 	return mask
 }
 
 func (o *fieldSet) IsOptional(label adt.Feature) bool {
-	for _, f := range o.fields {
-		if f.label == label && len(f.optional) > 0 {
+	for _, f := range o.Fields {
+		if f.Label == label && len(f.Optional) > 0 {
 			return true
 		}
 	}
 	return false
 }
 
-type field struct {
-	label    adt.Feature
-	optional []adt.Node
+type FieldInfo struct {
+	Label    adt.Feature
+	Optional []adt.Node
 }
 
 type bulkField struct {
@@ -86,13 +86,13 @@ type bulkField struct {
 }
 
 func (o *fieldSet) Accept(c *adt.OpContext, f adt.Feature) bool {
-	if len(o.additional) > 0 {
+	if len(o.Additional) > 0 {
 		return true
 	}
 	if o.fieldIndex(f) >= 0 {
 		return true
 	}
-	for _, b := range o.bulk {
+	for _, b := range o.Bulk {
 		if b.check.Match(c, o.env, f) {
 			return true
 		}
@@ -109,9 +109,9 @@ func (o *fieldSet) MatchAndInsert(c *adt.OpContext, arc *adt.Vertex) {
 	// Match normal fields
 	matched := false
 outer:
-	for _, f := range o.fields {
-		if f.label == arc.Label {
-			for _, e := range f.optional {
+	for _, f := range o.Fields {
+		if f.Label == arc.Label {
+			for _, e := range f.Optional {
 				arc.AddConjunct(adt.MakeConjunct(env, e, o.id))
 			}
 			matched = true
@@ -129,7 +129,7 @@ outer:
 	bulkEnv.Cycles = nil
 
 	// match bulk optional fields / pattern properties
-	for _, f := range o.bulk {
+	for _, f := range o.Bulk {
 		if matched && f.additional {
 			continue
 		}
@@ -149,14 +149,14 @@ outer:
 	addEnv.Cycles = nil
 
 	// match others
-	for _, x := range o.additional {
+	for _, x := range o.Additional {
 		arc.AddConjunct(adt.MakeConjunct(&addEnv, x, o.id))
 	}
 }
 
 func (o *fieldSet) fieldIndex(f adt.Feature) int {
-	for i := range o.fields {
-		if o.fields[i].label == f {
+	for i := range o.Fields {
+		if o.Fields[i].Label == f {
 			return i
 		}
 	}
@@ -165,22 +165,22 @@ func (o *fieldSet) fieldIndex(f adt.Feature) int {
 
 func (o *fieldSet) MarkField(c *adt.OpContext, f adt.Feature) {
 	if o.fieldIndex(f) < 0 {
-		o.fields = append(o.fields, field{label: f})
+		o.Fields = append(o.Fields, FieldInfo{Label: f})
 	}
 }
 
 func (o *fieldSet) AddOptional(c *adt.OpContext, x *adt.OptionalField) {
 	p := o.fieldIndex(x.Label)
 	if p < 0 {
-		p = len(o.fields)
-		o.fields = append(o.fields, field{label: x.Label})
+		p = len(o.Fields)
+		o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
 	}
-	o.fields[p].optional = append(o.fields[p].optional, x)
+	o.Fields[p].Optional = append(o.Fields[p].Optional, x)
 }
 
 func (o *fieldSet) AddDynamic(c *adt.OpContext, x *adt.DynamicField) {
 	// not in bulk: count as regular field?
-	o.bulk = append(o.bulk, bulkField{dynamicMatcher{x.Key}, nil, false})
+	o.Bulk = append(o.Bulk, bulkField{dynamicMatcher{x.Key}, nil, false})
 }
 
 func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
@@ -191,7 +191,7 @@ func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {
 	}
 
 	if m := o.getMatcher(c, v); m != nil {
-		o.bulk = append(o.bulk, bulkField{m, x, false})
+		o.Bulk = append(o.Bulk, bulkField{m, x, false})
 	}
 }
 
@@ -211,10 +211,10 @@ func (o *fieldSet) getMatcher(c *adt.OpContext, v adt.Value) fieldMatcher {
 func (o *fieldSet) AddEllipsis(c *adt.OpContext, x *adt.Ellipsis) {
 	expr := x.Value
 	if x.Value == nil {
-		o.isOpen = true
+		o.IsOpen = true
 		expr = &adt.Top{}
 	}
-	o.additional = append(o.additional, expr)
+	o.Additional = append(o.Additional, expr)
 }
 
 type fieldMatcher interface {

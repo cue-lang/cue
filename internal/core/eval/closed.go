@@ -718,12 +718,12 @@ func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (fou
 		return false, false
 	}
 	for isRegular := f.IsRegular(); o != nil; o = o.next {
-		if isRegular && (len(o.additional) > 0 || o.isOpen) {
+		if isRegular && (len(o.Additional) > 0 || o.IsOpen) {
 			return true, false
 		}
 
-		for _, g := range o.fields {
-			if f == g.label {
+		for _, g := range o.Fields {
+			if f == g.Label {
 				return true, false
 			}
 		}
@@ -732,7 +732,7 @@ func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (fou
 			continue
 		}
 
-		for _, b := range o.bulk {
+		for _, b := range o.Bulk {
 			if b.check.Match(ctx, o.env, f) {
 				return true, false
 			}

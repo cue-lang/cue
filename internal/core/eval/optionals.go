@@ -35,6 +35,8 @@ type fieldSet struct {
 	// Required Fields are marked as empty
 	Fields []FieldInfo
 
+	Dynamic []*adt.DynamicField
+
 	// excluded are all literal fields that already exist.
 	Bulk []bulkField
 
@@ -49,12 +51,11 @@ func (o *fieldSet) OptionalTypes() (mask adt.OptionalType) {
 			break
 		}
 	}
-	for _, b := range o.Bulk {
-		if b.expr == nil {
-			mask |= adt.HasDynamic
-		} else {
-			mask |= adt.HasPattern
-		}
+	if len(o.Dynamic) > 0 {
+		mask |= adt.HasDynamic
+	}
+	if len(o.Bulk) > 0 {
+		mask |= adt.HasPattern
 	}
 	if o.Additional != nil {
 		mask |= adt.HasAdditional
@@ -91,6 +92,12 @@ func (o *fieldSet) Accept(c *adt.OpContext, f adt.Feature) bool {
 	}
 	if o.fieldIndex(f) >= 0 {
 		return true
+	}
+	for _, d := range o.Dynamic {
+		m := dynamicMatcher{d.Key}
+		if m.Match(c, o.env, f) {
+			return true
+		}
 	}
 	for _, b := range o.Bulk {
 		if b.check.Match(c, o.env, f) {
@@ -179,8 +186,7 @@ func (o *fieldSet) AddOptional(c *adt.OpContext, x *adt.OptionalField) {
 }
 
 func (o *fieldSet) AddDynamic(c *adt.OpContext, x *adt.DynamicField) {
-	// not in bulk: count as regular field?
-	o.Bulk = append(o.Bulk, bulkField{dynamicMatcher{x.Key}, nil, false})
+	o.Dynamic = append(o.Dynamic, x)
 }
 
 func (o *fieldSet) AddBulk(c *adt.OpContext, x *adt.BulkOptionalField) {

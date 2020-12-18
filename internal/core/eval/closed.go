@@ -732,6 +732,13 @@ func (c *acceptor) verifySets(ctx *adt.OpContext, id adt.ID, f adt.Feature) (fou
 			continue
 		}
 
+		for _, b := range o.Dynamic {
+			m := dynamicMatcher{b.Key}
+			if m.Match(ctx, o.env, f) {
+				return true, false
+			}
+		}
+
 		for _, b := range o.Bulk {
 			if b.check.Match(ctx, o.env, f) {
 				return true, false

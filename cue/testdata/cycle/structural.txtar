@@ -399,8 +399,10 @@ b13.root.a.0.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.x.y.0: structural cycle
 b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
+    ./in.cue:63:8
     ./in.cue:63:16
     ./in.cue:63:17
+    ./in.cue:64:12
 b6.b.a.0.0: structural cycle
 b6.x.a.0: structural cycle
 b7.a.0: structural cycle
@@ -417,22 +419,26 @@ e3.a: conflicting values [a] and {c:a} (mismatched types list and struct):
     ./in.cue:290:8
 e3.a.0: conflicting values [a] and {c:a} (mismatched types list and struct):
     ./in.cue:289:8
+    ./in.cue:289:9
     ./in.cue:290:8
 e3.a.0: structural cycle
 e3.a.c: conflicting values [a] and {c:a} (mismatched types list and struct):
     ./in.cue:289:8
     ./in.cue:290:8
+    ./in.cue:290:11
 e3.a.c: structural cycle
 e3.b: conflicting values [b] and {c:b} (mismatched types list and struct):
     ./in.cue:292:8
     ./in.cue:293:8
 e3.b.0: conflicting values [b] and {c:b} (mismatched types list and struct):
     ./in.cue:292:8
+    ./in.cue:292:9
     ./in.cue:293:8
 e3.b.0: structural cycle
 e3.b.c: conflicting values [b] and {c:b} (mismatched types list and struct):
     ./in.cue:292:8
     ./in.cue:293:8
+    ./in.cue:293:11
 e3.b.c: structural cycle
 e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:297:13
@@ -442,6 +448,7 @@ e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct
     ./in.cue:298:9
     ./in.cue:298:10
 e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+    ./in.cue:297:9
     ./in.cue:297:13
     ./in.cue:298:9
 e4.a.0.0: empty disjunction: 2 related errors:
@@ -454,6 +461,7 @@ e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct
     ./in.cue:300:10
 e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:300:9
+    ./in.cue:301:9
     ./in.cue:301:13
 e4.b.0.0: empty disjunction: 2 related errors:
 p2.#T.a.b.link: structural cycle
@@ -594,8 +602,10 @@ Result:
         // [eval]
         0: (_|_){
           // [eval] b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
+          //     ./in.cue:63:8
           //     ./in.cue:63:16
           //     ./in.cue:63:17
+          //     ./in.cue:64:12
           0: (_|_){
             // [structural cycle] b6.b.a.0.0: structural cycle
           }
@@ -1150,6 +1160,7 @@ Result:
         // [eval] e3.a.c: conflicting values [a] and {c:a} (mismatched types list and struct):
         //     ./in.cue:289:8
         //     ./in.cue:290:8
+        //     ./in.cue:290:11
         // e3.a.c: structural cycle
         c: (_|_){// 〈1;a〉
         }
@@ -1159,6 +1170,7 @@ Result:
       0: (_|_){
         // [eval] e3.a.0: conflicting values [a] and {c:a} (mismatched types list and struct):
         //     ./in.cue:289:8
+        //     ./in.cue:289:9
         //     ./in.cue:290:8
         // e3.a.0: structural cycle
         c: (_|_){// 〈1;a〉
@@ -1175,6 +1187,7 @@ Result:
         // [eval] e3.b.c: conflicting values [b] and {c:b} (mismatched types list and struct):
         //     ./in.cue:292:8
         //     ./in.cue:293:8
+        //     ./in.cue:293:11
         // e3.b.c: structural cycle
         c: (_|_){// 〈1;b〉
         }
@@ -1184,6 +1197,7 @@ Result:
       0: (_|_){
         // [eval] e3.b.0: conflicting values [b] and {c:b} (mismatched types list and struct):
         //     ./in.cue:292:8
+        //     ./in.cue:292:9
         //     ./in.cue:293:8
         // e3.b.0: structural cycle
         c: (_|_){// 〈1;b〉
@@ -1206,6 +1220,7 @@ Result:
         //     ./in.cue:298:9
         //     ./in.cue:298:10
         // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
+        //     ./in.cue:297:9
         //     ./in.cue:297:13
         //     ./in.cue:298:9
         // e4.a.0.0: empty disjunction: 2 related errors:
@@ -1226,6 +1241,7 @@ Result:
         //     ./in.cue:300:10
         // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
         //     ./in.cue:300:9
+        //     ./in.cue:301:9
         //     ./in.cue:301:13
         // e4.b.0.0: empty disjunction: 2 related errors:
         0: (struct){

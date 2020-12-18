@@ -151,6 +151,18 @@ type OpContext struct {
 	// TODO: remove use of tentative. Should be possible if incomplete
 	// handling is done better.
 	tentative int // set during comprehension evaluation
+
+	// These fields are used associate scratch fields for computing closedness
+	// of a Vertex. These fields could have been included in StructInfo (like
+	// Tomabechi's unification algorithm), but we opted for an indirection to
+	// allow concurrent unification.
+	//
+	// TODO(perf): have two generations: one for each pass of the closedness
+	// algorithm, so that the results of the first pass can be reused for all
+	// features of a node.
+	generation int
+	closed     map[*closeInfo]*closeStats
+	todo       *closeStats
 }
 
 // Impl is for internal use only. This will go.
@@ -645,7 +657,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature) *Vertex {
 			c.addErrf(code, pos, "index out of range [%d] with length %d",
 				l.Index(), len(x.Elems()))
 		} else {
-			if code != 0 && x.Closed != nil && x.Closed.IsOptional(l) {
+			if code != 0 && x.IsOptional(l) {
 				c.addErrf(code, pos,
 					"cannot reference optional field %s", label)
 			} else {

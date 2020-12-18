@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package eval_test
+package adt_test
 
 import (
 	"testing"

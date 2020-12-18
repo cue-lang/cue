@@ -224,6 +224,14 @@ func (v *ValueError) AddPosition(n Node) {
 	}
 }
 
+func (v *ValueError) AddClosedPositions(c CloseInfo) {
+	for s := c.closeInfo; s != nil; s = s.parent {
+		if loc := s.location; loc != nil {
+			v.AddPosition(loc)
+		}
+	}
+}
+
 func (c *OpContext) errNode() *Vertex {
 	return c.vertex
 }

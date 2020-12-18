@@ -31,9 +31,11 @@ Errors:
 y: empty disjunction: 2 related errors:
 y.a: conflicting values 1 and 3:
     ./in.cue:1:12
+    ./in.cue:2:4
     ./in.cue:2:12
 y.a: conflicting values 2 and 3:
     ./in.cue:1:21
+    ./in.cue:2:4
     ./in.cue:2:12
 
 Result:
@@ -48,13 +50,16 @@ Result:
     // [eval] y: empty disjunction: 2 related errors:
     // y.a: conflicting values 1 and 3:
     //     ./in.cue:1:12
+    //     ./in.cue:2:4
     //     ./in.cue:2:12
     // y.a: conflicting values 2 and 3:
     //     ./in.cue:1:21
+    //     ./in.cue:2:4
     //     ./in.cue:2:12
     a: (_|_){
       // [eval] y.a: conflicting values 2 and 3:
       //     ./in.cue:1:21
+      //     ./in.cue:2:4
       //     ./in.cue:2:12
     }
   }

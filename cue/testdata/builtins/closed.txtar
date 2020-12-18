@@ -10,6 +10,7 @@ c: a & { a: c: int } // okay (non-recursive close)
 Errors:
 b: field `x` not allowed:
     ./in.cue:1:10
+    ./in.cue:5:4
     ./in.cue:5:10
 
 Result:
@@ -28,6 +29,7 @@ Result:
     x: (_|_){
       // [eval] b: field `x` not allowed:
       //     ./in.cue:1:10
+      //     ./in.cue:5:4
       //     ./in.cue:5:10
     }
   }

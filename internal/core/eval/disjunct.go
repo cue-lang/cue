@@ -89,7 +89,7 @@ type envDisjunct struct {
 	env         *adt.Environment
 	values      []disjunct
 	numDefaults int
-	cloneID     adt.ID
+	cloneID     adt.CloseInfo
 }
 
 type disjunct struct {
@@ -97,7 +97,7 @@ type disjunct struct {
 	isDefault bool
 }
 
-func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExpr, cloneID adt.ID) {
+func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExpr, cloneID adt.CloseInfo) {
 	a := []disjunct{}
 
 	numDefaults := 0
@@ -117,7 +117,7 @@ func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExp
 		envDisjunct{env, a, numDefaults, cloneID})
 }
 
-func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjunction, cloneID adt.ID) {
+func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjunction, cloneID adt.CloseInfo) {
 	a := []disjunct{}
 
 	for i, v := range x.Values {

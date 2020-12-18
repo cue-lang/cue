@@ -73,14 +73,14 @@ func (e *exporter) sortedArcs(v *adt.Vertex) (sorted []*adt.Vertex) {
 }
 
 // TODO: remove
-func (e *exporter) extractFeatures(in []*adt.StructLit) (a [][]adt.Feature) {
+func (e *exporter) extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
 	return extractFeatures(in)
 }
 
-func extractFeatures(in []*adt.StructLit) (a [][]adt.Feature) {
+func extractFeatures(in []*adt.StructInfo) (a [][]adt.Feature) {
 	for _, s := range in {
 		sorted := []adt.Feature{}
-		for _, e := range s.Decls {
+		for _, e := range s.StructLit.Decls {
 			switch x := e.(type) {
 			case *adt.Field:
 				sorted = append(sorted, x.Label)

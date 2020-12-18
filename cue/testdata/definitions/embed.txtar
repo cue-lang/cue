@@ -127,7 +127,7 @@ Result:
     a: (#struct){
       x: (int){ int }
       y: (int){ int }
-      b: (#struct){
+      b: (struct){
         c: (int){ int }
       }
     }

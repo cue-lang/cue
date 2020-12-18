@@ -1,0 +1,218 @@
+-- in.cue --
+package deps
+
+a: {
+    #A: {
+        n: string
+        depends_on: [...#AnyA]
+    }
+
+    #AnyA: {
+        n: string
+        depends_on: [...#AnyA]
+        ...
+    }
+
+    #A1: {
+        #A
+        x: int
+        y: z: string // Comment to avoid error
+    }
+
+    #A2: {
+        #A
+        i: string
+    }
+
+    s: [Name=string]: #AnyA & { n: Name }
+
+    s: foo: #A1 & {
+        x: 10
+        y: z: "z" // Comment to avoid error
+    }
+
+    s: bar: #A2 & {
+        i: "hello bar"
+        depends_on: [s.foo]
+    }
+}
+
+b: {
+    #A: {
+        f: {...}
+    }
+
+    #A1: {
+        #A
+        // f: {...} // Uncomment to fix
+    }
+
+    #C: {
+        d: {...}
+    }
+
+    s: [string]: #A1
+
+    s: foo: {
+        f: #C & {
+            d: foo: "bar"
+        }
+    }
+}
+-- out/eval --
+(struct){
+  a: (struct){
+    #A: (#struct){
+      n: (string){ string }
+      depends_on: (list){
+      }
+    }
+    #AnyA: (#struct){
+      n: (string){ string }
+      depends_on: (list){
+      }
+    }
+    #A1: (#struct){
+      n: (string){ string }
+      depends_on: (list){
+      }
+      x: (int){ int }
+      y: (#struct){
+        z: (string){ string }
+      }
+    }
+    #A2: (#struct){
+      n: (string){ string }
+      depends_on: (list){
+      }
+      i: (string){ string }
+    }
+    s: (struct){
+      foo: (#struct){
+        n: (string){ "foo" }
+        depends_on: (list){
+        }
+        x: (int){ 10 }
+        y: (#struct){
+          z: (string){ "z" }
+        }
+      }
+      bar: (#struct){
+        n: (string){ "bar" }
+        depends_on: (#list){
+          0: (#struct){
+            n: (string){ "foo" }
+            depends_on: (list){
+            }
+            x: (int){ 10 }
+            y: (#struct){
+              z: (string){ "z" }
+            }
+          }
+        }
+        i: (string){ "hello bar" }
+      }
+    }
+  }
+  b: (struct){
+    #A: (#struct){
+      f: (#struct){
+      }
+    }
+    #A1: (#struct){
+      f: (#struct){
+      }
+    }
+    #C: (#struct){
+      d: (#struct){
+      }
+    }
+    s: (struct){
+      foo: (#struct){
+        f: (#struct){
+          d: (#struct){
+            foo: (string){ "bar" }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    #A: {
+      n: string
+      depends_on: [
+        ...〈1;#AnyA〉,
+      ]
+    }
+    #AnyA: {
+      n: string
+      depends_on: [
+        ...〈1;#AnyA〉,
+      ]
+      ...
+    }
+    #A1: {
+      〈1;#A〉
+      x: int
+      y: {
+        z: string
+      }
+    }
+    #A2: {
+      〈1;#A〉
+      i: string
+    }
+    s: {
+      [string]: (〈1;#AnyA〉 & {
+        n: 〈1;-〉
+      })
+    }
+    s: {
+      foo: (〈1;#A1〉 & {
+        x: 10
+        y: {
+          z: "z"
+        }
+      })
+    }
+    s: {
+      bar: (〈1;#A2〉 & {
+        i: "hello bar"
+        depends_on: [
+          〈2;s〉.foo,
+        ]
+      })
+    }
+  }
+  b: {
+    #A: {
+      f: {
+        ...
+      }
+    }
+    #A1: {
+      〈1;#A〉
+    }
+    #C: {
+      d: {
+        ...
+      }
+    }
+    s: {
+      [string]: 〈1;#A1〉
+    }
+    s: {
+      foo: {
+        f: (〈2;#C〉 & {
+          d: {
+            foo: "bar"
+          }
+        })
+      }
+    }
+  }
+}

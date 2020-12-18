@@ -78,6 +78,20 @@ func TestAPI(t *testing.T) {
 			return res
 		},
 		want: "_|_(#runSpec.action: field `Foo` not allowed)",
+	}, {
+		input: `
+		#runSpec: v: {action: foo: int}
+
+		w: {ction: foo: 1}
+					`,
+		fun: func(i *Instance) Value {
+			runSpec := i.LookupDef("#runSpec")
+			v := runSpec.Lookup("v")
+			w := i.Lookup("w")
+			res := w.Unify(v)
+			return res
+		},
+		want: "_|_(#runSpec.v: field `ction` not allowed)",
 	}}
 	for _, tc := range testCases {
 		if tc.skip {

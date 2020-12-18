@@ -170,6 +170,7 @@ type Vertex struct {
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
 	isData bool
+	Closed bool
 
 	// EvalCount keeps track of temporary dereferencing during evaluation.
 	// If EvalCount > 0, status should be considered to be EvaluatingArcs.
@@ -199,14 +200,30 @@ type Vertex struct {
 
 	// Structs is a slice of struct literals that contributed to this value.
 	// This information is used to compute the topological sort of arcs.
-	Structs []*StructLit
+	Structs []*StructInfo
+}
 
-	// Closed contains information about how to interpret field labels for the
-	// various conjuncts with respect to which fields are allowed in this
-	// Vertex. If allows all fields if it is nil.
-	// The evaluator will first check existing fields before using this. So for
-	// simple cases, an Acceptor can always return false to close the Vertex.
-	Closed Acceptor
+type StructInfo struct {
+	*StructLit
+
+	Env *Environment
+
+	CloseInfo
+
+	// Embed indicates the struct in which this struct is embedded (originally),
+	// or nil if this is a root structure.
+	// Embed   *StructInfo
+	// Context *RefInfo // the location from which this struct originates.
+	Disable bool
+
+	Embedding bool
+}
+
+func (s *StructInfo) useForAccept() bool {
+	if c := s.closeInfo; c != nil {
+		return !c.noCheck
+	}
+	return true
 }
 
 // VertexStatus indicates the evaluation progress of a Vertex.
@@ -305,14 +322,17 @@ func (v *Vertex) ToDataAll() *Vertex {
 	w.Arcs = arcs
 	w.isData = true
 	w.Conjuncts = make([]Conjunct, len(v.Conjuncts))
+	// TODO(perf): this is not strictly necessary for evaluation, but it can
+	// hurt performance greatly. Drawback is that it may disable ordering.
+	for _, s := range w.Structs {
+		s.Disable = true
+	}
 	copy(w.Conjuncts, v.Conjuncts)
 	for i, c := range w.Conjuncts {
-		w.Conjuncts[i].CloseID = 0
 		if v, _ := c.x.(Value); v != nil {
 			w.Conjuncts[i].x = toDataAll(v).(Value)
 		}
 	}
-	w.Closed = nil
 	return &w
 }
 
@@ -408,29 +428,6 @@ func Unwrap(v Value) Value {
 	return x.Value()
 }
 
-// Acceptor is a single interface that reports whether feature f is a valid
-// field label for this vertex.
-//
-// TODO: combine this with the StructMarker functionality?
-type Acceptor interface {
-	// Accept reports whether a given field is accepted as output.
-	// Pass an InvalidLabel to determine whether this is always open.
-	Accept(ctx *OpContext, f Feature) bool
-
-	// MatchAndInsert finds the conjuncts for optional fields, pattern
-	// constraints, and additional constraints that match f and inserts them in
-	// arc. Use f is 0 to match all additional constraints only.
-	MatchAndInsert(c *OpContext, arc *Vertex)
-
-	// OptionalTypes returns a bit field with the type of optional constraints
-	// that are represented by this Acceptor.
-	OptionalTypes() OptionalType
-
-	// IsOptional reports whether a field is explicitly defined as optional,
-	// as opposed to whether it is allowed by a pattern constraint.
-	IsOptional(f Feature) bool
-}
-
 // OptionalType is a bit field of the type of optional constraints in use by an
 // Acceptor.
 type OptionalType int
@@ -453,58 +450,79 @@ func (v *Vertex) Kind() Kind {
 }
 
 func (v *Vertex) OptionalTypes() OptionalType {
-	switch {
-	case v.Closed != nil:
-		return v.Closed.OptionalTypes()
-	case v.IsList():
-		return 0
-	default:
-		return IsOpen
+	var mask OptionalType
+	for _, s := range v.Structs {
+		mask |= s.OptionalTypes()
 	}
+	return mask
+}
+
+// IsOptional reports whether a field is explicitly defined as optional,
+// as opposed to whether it is allowed by a pattern constraint.
+func (v *Vertex) IsOptional(label Feature) bool {
+	for _, s := range v.Structs {
+		if s.IsOptional(label) {
+			return true
+		}
+	}
+	return false
+}
+
+func (v *Vertex) accepts(ok, required bool) bool {
+	return ok || (!required && !v.Closed)
 }
 
 func (v *Vertex) IsClosed(ctx *OpContext) bool {
 	switch x := v.BaseValue.(type) {
 	case *ListMarker:
-		// TODO: use one mechanism.
-		if x.IsOpen {
-			return false
-		}
-		if v.Closed == nil {
-			return true
-		}
-		return !v.Closed.Accept(ctx, InvalidLabel)
+		return !x.IsOpen
 
 	case *StructMarker:
 		if x.NeedClose {
 			return true
 		}
-		if v.Closed == nil {
-			return false
-		}
-		return !v.Closed.Accept(ctx, InvalidLabel)
+		return v.Closed || isClosed(v)
 	}
 	return false
 }
 
+// TODO: return error instead of boolean? (or at least have version that does.)
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
+	if v.IsList() {
+		if f.IsInt() {
+			// TODO(perf): use precomputed length.
+			if f.Index() < len(v.Elems()) {
+				return true
+			}
+		}
+		return !v.IsClosed(ctx)
+	}
+
 	if !v.IsClosed(ctx) || v.Lookup(f) != nil {
 		return true
 	}
-	if v.Closed != nil {
-		return v.Closed.Accept(ctx, f)
-	}
-	return false
+	// TODO(perf): collect positions in error.
+	defer ctx.ReleasePositions(ctx.MarkPositions())
+
+	return v.accepts(Accept(ctx, v, f))
 }
 
+// MatchAndInsert finds the conjuncts for optional fields, pattern
+// constraints, and additional constraints that match f and inserts them in
+// arc. Use f is 0 to match all additional constraints only.
 func (v *Vertex) MatchAndInsert(ctx *OpContext, arc *Vertex) {
-	if v.Closed == nil {
-		return
-	}
 	if !v.Accept(ctx, arc.Label) {
 		return
 	}
-	v.Closed.MatchAndInsert(ctx, arc)
+
+	// Go backwards to simulate old implementation.
+	for i := len(v.Structs) - 1; i >= 0; i-- {
+		s := v.Structs[i]
+		if s.Disable {
+			continue
+		}
+		s.MatchAndInsert(ctx, arc)
+	}
 }
 
 func (v *Vertex) IsList() bool {
@@ -557,20 +575,29 @@ func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 		// This is likely a bug in the evaluator and should not happen.
 		return &Bottom{Err: errors.Newf(token.NoPos, "cannot add conjunct")}
 	}
+	for _, x := range v.Conjuncts {
+		if x == c {
+			return nil
+		}
+	}
 	v.Conjuncts = append(v.Conjuncts, c)
 	return nil
 }
 
-func (v *Vertex) AddStructs(a ...*StructLit) {
-outer:
-	for _, s := range a {
-		for _, t := range v.Structs {
-			if t == s {
-				continue outer
-			}
-		}
-		v.Structs = append(v.Structs, s)
+func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *StructInfo {
+	info := StructInfo{
+		StructLit: s,
+		Env:       env,
+		CloseInfo: ci,
 	}
+	for _, t := range v.Structs {
+		if *t == info {
+			return t
+		}
+	}
+	t := &info
+	v.Structs = append(v.Structs, t)
+	return t
 }
 
 // Path computes the sequence of Features leading from the root to of the
@@ -597,13 +624,9 @@ type Conjunct struct {
 	Env *Environment
 	x   Node
 
-	// CloseID is a unique number that tracks a group of conjuncts that need
+	// CloseInfo is a unique number that tracks a group of conjuncts that need
 	// belong to a single originating definition.
-	CloseID ID
-}
-
-func (c *Conjunct) ID() ID {
-	return c.CloseID
+	CloseInfo CloseInfo
 }
 
 // TODO(perf): replace with composite literal if this helps performance.
@@ -611,10 +634,10 @@ func (c *Conjunct) ID() ID {
 // MakeRootConjunct creates a conjunct from the given environment and node.
 // It panics if x cannot be used as an expression.
 func MakeRootConjunct(env *Environment, x Node) Conjunct {
-	return MakeConjunct(env, x, 0)
+	return MakeConjunct(env, x, CloseInfo{})
 }
 
-func MakeConjunct(env *Environment, x Node, id ID) Conjunct {
+func MakeConjunct(env *Environment, x Node, id CloseInfo) Conjunct {
 	if env == nil {
 		// TODO: better is to pass one.
 		env = &Environment{}

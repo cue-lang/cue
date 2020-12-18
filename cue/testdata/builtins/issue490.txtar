@@ -11,6 +11,7 @@ B: A & {
 Errors:
 B: field `c` not allowed:
     ./test.cue:1:10
+    ./test.cue:6:4
     ./test.cue:7:2
 
 Result:
@@ -27,6 +28,7 @@ Result:
     c: (_|_){
       // [eval] B: field `c` not allowed:
       //     ./test.cue:1:10
+      //     ./test.cue:6:4
       //     ./test.cue:7:2
     }
   }

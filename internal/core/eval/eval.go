@@ -156,7 +156,7 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 	if v.BaseValue == nil {
 		save := *v
 		// Use node itself to allow for cycle detection.
-		s := e.evalVertex(c, v, adt.Partial, nil)
+		s := e.evalVertex(c, v, adt.Partial)
 		defer e.freeSharedNode(s)
 
 		result = *v
@@ -188,7 +188,6 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 					BaseValue: &adt.StructMarker{},
 					Arcs:      arcs,
 					Conjuncts: v.Conjuncts,
-					Closed:    s.result_.Closed,
 				}
 				w.UpdateStatus(v.Status())
 				*v = save
@@ -258,19 +257,6 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 // Phase two: record incomplete
 // Phase three: record cycle.
 func (e *Evaluator) Unify(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus) {
-	e.UnifyAccept(c, v, state, nil) //v.Closed)
-}
-
-// UnifyAccept is like Unify, but takes an extra argument to override the
-// accepted set of fields.
-//
-// Instead of deriving the allowed set of fields, it verifies this set by
-// consulting the given Acceptor. This can be useful when splitting an existing
-// values into individual conjuncts and then unifying some of its components
-// back into a new value. Under normal circumstances, this may not always
-// succeed as the missing context may result in stricter closedness rules.
-func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus, accept adt.Acceptor) {
-
 	// defer c.PopVertex(c.PushVertex(v))
 
 	if state <= v.Status() {
@@ -284,7 +270,7 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 		return
 	}
 
-	n := e.evalVertex(c, v, state, accept)
+	n := e.evalVertex(c, v, state)
 	defer e.freeSharedNode(n)
 
 	switch {
@@ -316,7 +302,7 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 		}
 		v.Arcs = nil
 		// v.Structs = nil // TODO: should we keep or discard the Structs?
-		v.Closed = newDisjunctionAcceptor(d) // TODO: remove?
+		// TODO: how to represent closedness information? Do we need it?
 
 	default:
 		if r := n.result(); r.BaseValue != nil {
@@ -336,20 +322,24 @@ func (e *Evaluator) UnifyAccept(c *adt.OpContext, v *adt.Vertex, state adt.Verte
 // evalVertex computes the vertex results. The state indicates the minimum
 // status to which this vertex should be evaluated. It should be either
 // adt.Finalized or adt.Partial.
-func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus, accept adt.Acceptor) *nodeShared {
-	shared := e.newSharedNode(c, v, accept)
-	saved := *v
+func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.VertexStatus) *nodeShared {
+	shared := e.newSharedNode(c, v)
 
-	var closedInfo *acceptor
-	if v.Parent != nil {
-		closedInfo, _ = v.Parent.Closed.(*acceptor)
+	if v.Label.IsDef() {
+		v.Closed = true
 	}
 
-	if !v.Label.IsInt() && closedInfo != nil && !closedInfo.ignore {
-		ci := closedInfo
+	ignore := false
+	if v.Parent != nil {
+		if v.Parent.Closed {
+			v.Closed = true
+		}
+	}
+	saved := *v
+
+	if !v.Label.IsInt() && v.Parent != nil && !ignore {
 		// Visit arcs recursively to validate and compute error.
-		switch ok, err := ci.verifyArc(c, v.Label, v); {
-		case err != nil:
+		if _, err := verifyArc(c, v.Label, v, v.Closed); err != nil {
 			// Record error in child node to allow recording multiple
 			// conflicts at the appropriate place, to allow valid fields to
 			// be represented normally and, most importantly, to avoid
@@ -357,16 +347,6 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 			v.BaseValue = err
 			v.SetValue(c, adt.Finalized, err)
 			return shared
-
-		case !ok: // hidden field
-			// A hidden field is exempt from checking. Ensure that the
-			// closedness doesn't carry over into children.
-			// TODO: make this more fine-grained per package, allowing
-			// checked restrictions to be defined within the package.
-			closedInfo = closedInfo.clone()
-			for i := range closedInfo.Canopy {
-				closedInfo.Canopy[i].IsDef = false
-			}
 		}
 	}
 
@@ -389,13 +369,6 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 		*v = saved
 		v.BaseValue = cycle
 
-		if closedInfo != nil {
-			ci := closedInfo.clone()
-			v.Closed = ci
-			// TODO(performance): use closedInfo.Compact.
-			// TODO: should be clear the list flag here?
-		}
-
 		v.UpdateStatus(adt.Evaluating)
 
 		// If the result is a struct, it needs to be closed if:
@@ -404,7 +377,6 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 		//      recursively.
 		//   3) this node embeds a closed struct.
 		n := e.newNodeContext(shared)
-		n.needClose = v.Label.IsDef()
 
 		for _, x := range v.Conjuncts {
 			// TODO: needed for reentrancy. Investigate usefulness for cycle
@@ -594,7 +566,14 @@ func (n *nodeContext) postDisjunct(state adt.VertexStatus) {
 		}
 	}
 
-	n.updateClosedInfo()
+	if err := n.getErr(); err != nil {
+		if b, _ := n.node.BaseValue.(*adt.Bottom); b != nil {
+			err = adt.CombineErrors(nil, b, err)
+		}
+		n.node.BaseValue = err
+		// TODO: add return: if evaluation of arcs is important it can be done
+		// later. Logically we're done.
+	}
 
 	n.completeArcs(state)
 }
@@ -629,46 +608,6 @@ func (n *nodeContext) completeArcs(state adt.VertexStatus) {
 	n.node.UpdateStatus(adt.Finalized)
 }
 
-func (n *nodeContext) updateClosedInfo() {
-	if err := n.getErr(); err != nil {
-		if b, _ := n.node.BaseValue.(*adt.Bottom); b != nil {
-			err = adt.CombineErrors(nil, b, err)
-		}
-		n.node.BaseValue = err
-		// TODO: add return: if evaluation of arcs is important it can be done
-		// later. Logically we're done.
-	}
-
-	a, _ := n.node.Closed.(*acceptor)
-	if a == nil {
-		if !n.node.IsList() && !n.needClose {
-			return
-		}
-		a = closedInfo(n.node)
-	}
-
-	// TODO: set this earlier.
-	n.needClose = n.needClose || a.isClosed
-	a.isClosed = n.needClose
-
-	// TODO: consider removing this. Now checking is done at the top of
-	// evalVertex, skipping one level of checks happens naturally again
-	// for Value.Unify (API).
-	ctx := n.ctx
-
-	// TODO: record the list length for the acceptor, possibly. But the
-	// length matching should already have been done.
-	if accept := n.nodeShared.accept; accept != nil && !n.node.IsList() {
-		for _, a := range n.node.Arcs {
-			if !accept.Accept(n.ctx, a.Label) {
-				label := a.Label.SelectorString(ctx)
-				n.node.BaseValue = ctx.NewErrf(
-					"field `%s` not allowed by Acceptor", label)
-			}
-		}
-	}
-}
-
 // TODO: this is now a sentinel. Use a user-facing error that traces where
 // the cycle originates.
 var cycle = &adt.Bottom{
@@ -701,21 +640,17 @@ type nodeShared struct {
 	result_ adt.Vertex
 	isDone  bool
 	stack   []int
-
-	// Closedness override.
-	accept adt.Acceptor
 }
 
-func (e *Evaluator) newSharedNode(ctx *adt.OpContext, node *adt.Vertex, accept adt.Acceptor) *nodeShared {
+func (e *Evaluator) newSharedNode(ctx *adt.OpContext, node *adt.Vertex) *nodeShared {
 	if n := e.freeListShared; n != nil {
 		e.stats.Reused++
 		e.freeListShared = n.nextFree
 
 		*n = nodeShared{
-			eval:   e,
-			ctx:    ctx,
-			node:   node,
-			accept: accept,
+			eval: e,
+			ctx:  ctx,
+			node: node,
 
 			stack:        n.stack[:0],
 			disjunct:     adt.Disjunction{Values: n.disjunct.Values[:0]},
@@ -727,10 +662,9 @@ func (e *Evaluator) newSharedNode(ctx *adt.OpContext, node *adt.Vertex, accept a
 	e.stats.Allocs++
 
 	return &nodeShared{
-		ctx:    ctx,
-		eval:   e,
-		node:   node,
-		accept: accept,
+		ctx:  ctx,
+		eval: e,
+		node: node,
 	}
 }
 
@@ -771,7 +705,7 @@ func (n *nodeShared) isDefault() bool {
 
 type arcKey struct {
 	arc *adt.Vertex
-	id  adt.ID
+	id  adt.CloseInfo
 }
 
 // A nodeContext is used to collate all conjuncts of a value to facilitate
@@ -794,12 +728,12 @@ type nodeContext struct {
 
 	// Current value (may be under construction)
 	scalar   adt.Value // TODO: use Value in node.
-	scalarID adt.ID
+	scalarID adt.CloseInfo
 
 	// Concrete conjuncts
 	kind       adt.Kind
 	kindExpr   adt.Expr        // expr that adjust last value (for error reporting)
-	kindID     adt.ID          // for error tracing
+	kindID     adt.CloseInfo   // for error tracing
 	lowerBound *adt.BoundValue // > or >=
 	upperBound *adt.BoundValue // < or <=
 	checks     []adt.Validator // BuiltinValidator, other bound values.
@@ -810,11 +744,9 @@ type nodeContext struct {
 	dynamicFields []envDynamic
 	ifClauses     []envYield
 	forClauses    []envYield
-	// TODO: remove this and annotate directly in acceptor.
-	needClose bool
-	aStruct   adt.Expr
-	aStructID adt.ID
-	hasTop    bool
+	aStruct       adt.Expr
+	aStructID     adt.CloseInfo
+	hasTop        bool
 
 	// Expression conjuncts
 	lists  []envList
@@ -875,36 +807,12 @@ func (e *Evaluator) freeNodeContext(n *nodeContext) {
 	e.freeListNode = n
 }
 
-func closedInfo(n *adt.Vertex) *acceptor {
-	a, _ := n.Closed.(*acceptor)
-	if a == nil {
-		a = &acceptor{}
-		n.Closed = a
-	}
-	return a
-}
-
-// TODO(errors): return a dedicated ConflictError that can track original
+// TODO(perf): return a dedicated ConflictError that can track original
 // positions on demand.
-//
-// Fully detailed origin tracking could be created on the back of CloseIDs
-// tracked in acceptor.Canopy. To make this fully functional, the following
-// still needs to be implemented:
-//
-//  - We need to know the ID for every value involved in the conflict.
-//    (There may be multiple if the result comes from a simplification).
-//  - CloseIDs should be forked not only for definitions, but all references.
-//  - Upon forking a CloseID, it should keep track of its enclosing CloseID
-//    as well (probably as a pointer to the origin so that the reference
-//    persists after compaction).
-//
-// The modifications to the CloseID algorithm may also benefit the computation
-// of `{ #A } == #A`, which currently is not done.
-//
 func (n *nodeContext) addConflict(
 	v1, v2 adt.Node,
 	k1, k2 adt.Kind,
-	id1, id2 adt.ID) {
+	id1, id2 adt.CloseInfo) {
 
 	ctx := n.ctx
 
@@ -918,16 +826,15 @@ func (n *nodeContext) addConflict(
 			ctx.Str(v1), ctx.Str(v2), k1, k2)
 	}
 
-	ci := closedInfo(n.node)
 	err.AddPosition(v1)
 	err.AddPosition(v2)
-	err.AddPosition(ci.node(id1).Src)
-	err.AddPosition(ci.node(id2).Src)
+	err.AddClosedPositions(id1)
+	err.AddClosedPositions(id2)
 
 	n.addErr(err)
 }
 
-func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr, id adt.ID) bool {
+func (n *nodeContext) updateNodeType(k adt.Kind, v adt.Expr, id adt.CloseInfo) bool {
 	ctx := n.ctx
 	kind := n.kind & k
 
@@ -1054,14 +961,14 @@ type envExpr struct {
 type envDynamic struct {
 	env   *adt.Environment
 	field *adt.DynamicField
-	id    adt.ID
+	id    adt.CloseInfo
 	err   *adt.Bottom
 }
 
 type envYield struct {
 	env   *adt.Environment
 	yield adt.Yielder
-	id    adt.ID
+	id    adt.CloseInfo
 	err   *adt.Bottom
 }
 
@@ -1070,7 +977,7 @@ type envList struct {
 	list    *adt.ListLit
 	n       int64 // recorded length after evaluator
 	elipsis *adt.Ellipsis
-	id      adt.ID
+	id      adt.CloseInfo
 }
 
 func (n *nodeContext) addBottom(b *adt.Bottom) {
@@ -1091,7 +998,7 @@ func (n *nodeContext) addErr(err errors.Error) {
 // incomplete or is not value.
 func (n *nodeContext) addExprConjunct(v adt.Conjunct) {
 	env := v.Env
-	id := v.CloseID
+	id := v.CloseInfo
 
 	switch x := v.Expr().(type) {
 	case *adt.Vertex:
@@ -1136,7 +1043,7 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 	// Require an Environment.
 	ctx := n.ctx
 
-	closeID := v.CloseID
+	closeID := v.CloseInfo
 
 	// TODO: see if we can do without these counters.
 	for _, d := range v.Env.Deref {
@@ -1166,7 +1073,7 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 			break
 		}
 
-		n.addVertexConjuncts(v.Env, v.CloseID, v.Expr(), arc)
+		n.addVertexConjuncts(v.Env, v.CloseInfo, v.Expr(), arc)
 
 	case adt.Evaluator:
 		// adt.Interpolation, adt.UnaryExpr, adt.BinaryExpr, adt.CallExpr
@@ -1184,7 +1091,7 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 			b, ok := v.BaseValue.(*adt.Bottom)
 			if ok && b.IsIncomplete() && len(v.Conjuncts) > 0 {
 				for _, c := range v.Conjuncts {
-					c.CloseID = closeID
+					c.CloseInfo = closeID
 					n.addExprConjunct(c)
 				}
 				break
@@ -1210,7 +1117,7 @@ func (n *nodeContext) evalExpr(v adt.Conjunct) {
 	}
 }
 
-func (n *nodeContext) addVertexConjuncts(env *adt.Environment, closeID adt.ID, x adt.Expr, arc *adt.Vertex) {
+func (n *nodeContext) addVertexConjuncts(env *adt.Environment, closeInfo adt.CloseInfo, x adt.Expr, arc *adt.Vertex) {
 
 	// We need to ensure that each arc is only unified once (or at least) a
 	// bounded time, witch each conjunct. Comprehensions, for instance, may
@@ -1233,10 +1140,12 @@ func (n *nodeContext) addVertexConjuncts(env *adt.Environment, closeID adt.ID, x
 	if n.arcMap == nil {
 		n.arcMap = map[arcKey]bool{}
 	}
-	if n.arcMap[arcKey{arc, closeID}] {
+
+	id := closeInfo
+	if n.arcMap[arcKey{arc, id}] {
 		return
 	}
-	n.arcMap[arcKey{arc, closeID}] = true
+	n.arcMap[arcKey{arc, id}] = true
 
 	// Pass detection of structural cycles from parent to children.
 	cyclic := false
@@ -1291,11 +1200,7 @@ func (n *nodeContext) addVertexConjuncts(env *adt.Environment, closeID adt.ID, x
 		defer func() { arc.SelfCount-- }()
 	}
 
-	if isDef(x) { // should test whether closed, not isDef?
-		c := closedInfo(n.node)
-		closeID = c.InsertDefinition(closeID, x)
-		n.needClose = true // TODO: is this still necessary?
-	}
+	closeInfo = closeInfo.SpawnRef(arc, adt.IsDef(x), x)
 
 	// TODO: uncommenting the following almost works, but causes some
 	// faulty results in complex cycle handling between disjunctions.
@@ -1310,7 +1215,11 @@ func (n *nodeContext) addVertexConjuncts(env *adt.Environment, closeID adt.ID, x
 			a = env.Deref
 		}
 		c = updateCyclic(c, cyclic, arc, a)
-		c.CloseID = closeID
+
+		// Note that we are resetting the tree here. We hereby assume that
+		// closedness conflicts resulting from unifying the referenced arc were
+		// already caught there and that we can ignore further errors here.
+		c.CloseInfo = closeInfo
 		n.addExprConjunct(c)
 	}
 }
@@ -1373,10 +1282,10 @@ func updateCyclic(c adt.Conjunct, cyclic bool, deref *adt.Vertex, a []*adt.Verte
 	if deref != nil {
 		env.Cycles = append(env.Cycles, deref)
 	}
-	return adt.MakeConjunct(env, c.Expr(), c.CloseID)
+	return adt.MakeConjunct(env, c.Expr(), c.CloseInfo)
 }
 
-func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt.ID) {
+func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt.CloseInfo) {
 	n.updateCyclicStatus(env)
 
 	ctx := n.ctx
@@ -1386,11 +1295,9 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 			n.aStruct = x
 			n.aStructID = id
 			if m.NeedClose {
-				ci := closedInfo(n.node)
-				ci.isClosed = true // TODO: remove
-				id = ci.InsertDefinition(id, x)
-				ci.Canopy[id].IsClosed = true
-				ci.Canopy[id].IsDef = false
+				n.node.Closed = true // TODO: remove.
+				id = id.SpawnRef(x, adt.IsDef(x), x)
+				id.IsClosed = true
 			}
 		}
 
@@ -1398,7 +1305,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 		if !x.IsData() {
 			// TODO: this really shouldn't happen anymore.
-			if isComplexStruct(x) {
+			if isComplexStruct(ctx, x) {
 				// This really shouldn't happen, but just in case.
 				n.addVertexConjuncts(env, id, x, x)
 				return
@@ -1406,7 +1313,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 			for _, c := range x.Conjuncts {
 				c = updateCyclic(c, cyclic, nil, nil)
-				c.CloseID = id
+				c.CloseInfo = id
 				n.addExprConjunct(c) // TODO: Pass from eval
 			}
 			return
@@ -1424,35 +1331,34 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 		case *adt.StructMarker:
 			// TODO: this would not be necessary if acceptor.isClose were
 			// not used. See comment at acceptor.
-			opt := fieldSet{env: env, id: id}
+			s := &adt.StructLit{}
 
 			// Keep ordering of Go struct for topological sort.
+			n.node.AddStruct(s, env, id)
 			n.node.Structs = append(n.node.Structs, x.Structs...)
+
 			for _, a := range x.Arcs {
 				c := adt.MakeConjunct(nil, a, id)
 				c = updateCyclic(c, cyclic, nil, nil)
 				n.insertField(a.Label, c)
-				opt.MarkField(ctx, a.Label)
+				s.MarkField(a.Label)
 			}
-
-			closedInfo(n.node).insertFieldSet(id, &opt)
 
 		case adt.Value:
 			n.addValueConjunct(env, v, id)
 
 			// TODO: this would not be necessary if acceptor.isClose were
 			// not used. See comment at acceptor.
-			opt := fieldSet{env: env, id: id}
+			s := &adt.StructLit{}
+			n.node.AddStruct(s, env, id)
 
 			for _, a := range x.Arcs {
 				// TODO(errors): report error when this is a regular field.
 				c := adt.MakeConjunct(nil, a, id)
 				c = updateCyclic(c, cyclic, nil, nil)
 				n.insertField(a.Label, c)
-				opt.MarkField(ctx, a.Label)
+				s.MarkField(a.Label)
 			}
-
-			closedInfo(n.node).insertFieldSet(id, &opt)
 		}
 
 		return
@@ -1485,14 +1391,6 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 
 	case *adt.Top:
 		n.hasTop = true
-		// TODO: Is this correct? Needed for elipsis, but not sure for others.
-		// n.optionals = append(n.optionals, fieldSet{env: env, id: id, isOpen: true})
-		if a, _ := n.node.Closed.(*acceptor); a != nil {
-			// Embedding top indicates that now all possible values are allowed
-			// and that we should no longer enforce closedness within this
-			// conjunct.
-			a.node(id).IsDef = false
-		}
 
 	case *adt.BasicType:
 		// handled above
@@ -1506,7 +1404,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
 					err.AddPosition(n.upperBound)
-					err.AddPosition(closedInfo(n.node).node(id).Src)
+					err.AddClosedPositions(id)
 				}
 				n.addValueConjunct(env, v, id)
 				return
@@ -1520,7 +1418,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 				if err := valueError(v); err != nil {
 					err.AddPosition(v)
 					err.AddPosition(n.lowerBound)
-					err.AddPosition(closedInfo(n.node).node(id).Src)
+					err.AddClosedPositions(id)
 				}
 				n.addValueConjunct(env, v, id)
 				return
@@ -1586,7 +1484,7 @@ func (n *nodeContext) addValueConjunct(env *adt.Environment, v adt.Value, id adt
 			if err := valueError(u); err != nil {
 				err.AddPosition(n.lowerBound)
 				err.AddPosition(n.upperBound)
-				err.AddPosition(closedInfo(n.node).node(id).Src)
+				err.AddClosedPositions(id)
 			}
 			n.lowerBound = nil
 			n.upperBound = nil
@@ -1620,12 +1518,11 @@ func valueError(v adt.Value) *adt.ValueError {
 func (n *nodeContext) addStruct(
 	env *adt.Environment,
 	s *adt.StructLit,
-	closeID adt.ID) {
+	closeInfo adt.CloseInfo) {
 
 	n.updateCyclicStatus(env) // to handle empty structs.
 
 	ctx := n.ctx
-	n.node.AddStructs(s)
 
 	// NOTE: This is a crucial point in the code:
 	// Unification derferencing happens here. The child nodes are set to
@@ -1648,34 +1545,37 @@ func (n *nodeContext) addStruct(
 		childEnv.Deref = env.Deref
 	}
 
+	parent := n.node.AddStruct(s, childEnv, closeInfo)
+	closeInfo.IsClosed = false
+	parent.Disable = true // disable until processing is done.
+
 	hasEmbed := false
 
-	opt := fieldSet{pos: s, env: childEnv, id: closeID}
+	s.Init()
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
 		case *adt.Field:
-			opt.MarkField(ctx, x.Label)
 			// handle in next iteration.
 
 		case *adt.OptionalField:
 			if x.Label.IsString() {
 				n.aStruct = s
-				n.aStructID = closeID
+				n.aStructID = closeInfo
 			}
-			opt.AddOptional(ctx, x)
 
 		case *adt.DynamicField:
 			n.aStruct = s
-			n.aStructID = closeID
-			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeID, nil})
-			opt.AddDynamic(ctx, x)
+			n.aStructID = closeInfo
+			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeInfo, nil})
 
 		case *adt.ForClause:
-			n.forClauses = append(n.forClauses, envYield{childEnv, x, closeID, nil})
+			// Why is this not an embedding?
+			n.forClauses = append(n.forClauses, envYield{childEnv, x, closeInfo, nil})
 
 		case adt.Yielder:
-			n.ifClauses = append(n.ifClauses, envYield{childEnv, x, closeID, nil})
+			// Why is this not an embedding?
+			n.ifClauses = append(n.ifClauses, envYield{childEnv, x, closeInfo, nil})
 
 		case adt.Expr:
 			hasEmbed = true
@@ -1684,20 +1584,18 @@ func (n *nodeContext) addStruct(
 
 			// TODO(perf): only do this if addExprConjunct below will result in
 			// a fieldSet. Otherwise the entry will just be removed next.
-			id := closedInfo(n.node).InsertEmbed(closeID, x)
+			id := closeInfo.SpawnEmbed(x)
 
 			// push and opo embedding type.
 			n.addExprConjunct(adt.MakeConjunct(childEnv, x, id))
 
 		case *adt.BulkOptionalField:
 			n.aStruct = s
-			n.aStructID = closeID
-			opt.AddBulk(ctx, x)
+			n.aStructID = closeInfo
 
 		case *adt.Ellipsis:
 			n.aStruct = s
-			n.aStructID = closeID
-			opt.AddEllipsis(ctx, x)
+			n.aStructID = closeInfo
 
 		default:
 			panic("unreachable")
@@ -1706,25 +1604,25 @@ func (n *nodeContext) addStruct(
 
 	if !hasEmbed {
 		n.aStruct = s
-		n.aStructID = closeID
+		n.aStructID = closeInfo
 	}
 
 	// Apply existing fields
 	for _, arc := range n.node.Arcs {
 		// Reuse adt.Acceptor interface.
-		opt.MatchAndInsert(ctx, arc)
+		parent.MatchAndInsert(ctx, arc)
 	}
 
-	closedInfo(n.node).insertFieldSet(closeID, &opt)
+	parent.Disable = false
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
 		case *adt.Field:
 			if x.Label.IsString() {
 				n.aStruct = s
-				n.aStructID = closeID
+				n.aStructID = closeInfo
 			}
-			n.insertField(x.Label, adt.MakeConjunct(childEnv, x, closeID))
+			n.insertField(x.Label, adt.MakeConjunct(childEnv, x, closeInfo))
 		}
 	}
 }
@@ -1736,12 +1634,13 @@ func (n *nodeContext) insertField(f adt.Feature, x adt.Conjunct) *adt.Vertex {
 	// TODO: disallow adding conjuncts when cache set?
 	arc.AddConjunct(x)
 
-	adt.Assertf(x.CloseID == 0 || int(x.CloseID) < len(closedInfo(n.node).Canopy), "invalid adt.ID")
-
 	if isNew {
-		closedInfo(n.node).visitAllFieldSets(func(o *fieldSet) {
-			o.MatchAndInsert(ctx, arc)
-		})
+		for _, s := range n.node.Structs {
+			if s.Disable {
+				continue
+			}
+			s.MatchAndInsert(ctx, arc)
+		}
 	}
 	return arc
 }
@@ -1885,9 +1784,9 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr, anID adt.ID) {
+func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr, anID adt.CloseInfo) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
-		return nil, 0
+		return nil, adt.CloseInfo{}
 	}
 
 	isOpen := true
@@ -1929,7 +1828,7 @@ func (n *nodeContext) addLists(c *adt.OpContext) (oneOfTheLists adt.Expr, anID a
 		for _, a := range elems {
 			if a.Conjuncts == nil {
 				x := a.BaseValue.(adt.Value)
-				n.insertField(a.Label, adt.MakeConjunct(nil, x, 0))
+				n.insertField(a.Label, adt.MakeConjunct(nil, x, adt.CloseInfo{}))
 				continue
 			}
 			for _, c := range a.Conjuncts {
@@ -2005,8 +1904,7 @@ outer:
 	// add additionalItem values to list and construct optionals.
 	elems := n.node.Elems()
 	for _, l := range n.vLists {
-		a, _ := l.Closed.(*acceptor)
-		if a == nil {
+		if !l.IsClosed(c) {
 			continue
 		}
 
@@ -2014,9 +1912,6 @@ outer:
 		if len(newElems) >= len(elems) {
 			continue // error generated earlier, if applicable.
 		}
-
-		// TODO: why not necessary?
-		// n.optionals = append(n.optionals, a.fields...)
 
 		for _, arc := range elems[len(newElems):] {
 			l.MatchAndInsert(c, arc)
@@ -2028,13 +1923,12 @@ outer:
 			continue
 		}
 
-		f := &fieldSet{pos: l.list, env: l.env, id: l.id}
-		f.AddEllipsis(c, l.elipsis)
-
-		closedInfo(n.node).insertFieldSet(l.id, f)
+		s := &adt.StructLit{Decls: []adt.Decl{l.elipsis}}
+		s.Init()
+		info := n.node.AddStruct(s, l.env, l.id)
 
 		for _, arc := range elems[l.n:] {
-			f.MatchAndInsert(c, arc)
+			info.MatchAndInsert(c, arc)
 		}
 	}
 
@@ -2048,10 +1942,6 @@ outer:
 			sources = append(sources, src)
 		}
 	}
-
-	ci := closedInfo(n.node)
-	ci.isList = true
-	ci.openList = isOpen
 
 	if m, ok := n.node.BaseValue.(*adt.ListMarker); !ok {
 		n.node.SetValue(c, adt.Partial, &adt.ListMarker{

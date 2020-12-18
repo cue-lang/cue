@@ -80,7 +80,6 @@ func (v *Vertex) Default() *Vertex {
 		m.IsOpen = false
 
 		w := *v
-		w.Closed = nil
 		w.BaseValue = &m
 		return &w
 	}

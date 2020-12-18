@@ -405,7 +405,12 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 		case reflect.Struct:
 			obj := &adt.StructLit{Src: src}
-			v := &adt.Vertex{Structs: []*adt.StructLit{obj}}
+			v := &adt.Vertex{}
+			env := ctx.Env(0)
+			if env == nil {
+				env = &adt.Environment{}
+			}
+			v.AddStruct(obj, env, adt.CloseInfo{})
 			v.SetValue(ctx, adt.Finalized, &adt.StructMarker{})
 
 			t := value.Type()

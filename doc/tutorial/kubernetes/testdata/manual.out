@@ -33,6 +33,11 @@ deployment: {
         arg: {}
         args: []
         env: {}
+        label: {
+            app:       "bartender"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -44,11 +49,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "bartender"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -161,6 +161,11 @@ deployment: {
         }
         args: ["-etcd=etcd:2379", "-event-server=events:7788"] | []
         env: {}
+        label: {
+            app:       "breaddispatcher"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -172,11 +177,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "breaddispatcher"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -286,6 +286,11 @@ deployment: {
         arg: {}
         args: []
         env: {}
+        label: {
+            app:       "host"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -297,11 +302,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "host"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -411,6 +411,11 @@ deployment: {
         arg: {}
         args: []
         env: {}
+        label: {
+            app:       "maitred"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -422,11 +427,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "maitred"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -539,6 +539,11 @@ deployment: {
         port: {}
         args: ["-http=:8080", "-etcd=etcd:2379"] | []
         env: {}
+        label: {
+            app:       "valeter"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -550,11 +555,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "valeter"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -664,6 +664,11 @@ deployment: {
         arg: {}
         args: []
         env: {}
+        label: {
+            app:       "waiter"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -675,11 +680,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "waiter"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -792,6 +792,11 @@ deployment: {
         }
         args: ["-http=:8080", "-etcd=etcd:2379"] | []
         env: {}
+        label: {
+            app:       "waterdispatcher"
+            domain:    "prod"
+            component: "frontend"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -803,11 +808,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "waterdispatcher"
-            domain:    "prod"
-            component: "frontend"
         }
         envSpec: {}
         volume: {}
@@ -2027,6 +2027,11 @@ deployment: {
                 kubernetes: {}
             }
         }
+        label: {
+            app:       "caller"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -2049,11 +2054,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "caller"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
     }
@@ -2248,6 +2248,11 @@ deployment: {
                 kubernetes: {}
             }
         }
+        label: {
+            app:       "dishwasher"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -2270,11 +2275,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "dishwasher"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
     }
@@ -2457,6 +2457,11 @@ deployment: {
                 kubernetes: {}
             }
         }
+        label: {
+            app:       "expiditer"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -2479,11 +2484,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "expiditer"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
     }
@@ -2654,6 +2654,11 @@ deployment: {
                 kubernetes: {}
             }
         }
+        label: {
+            app:       "headchef"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -2676,11 +2681,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "headchef"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
     }
@@ -2855,6 +2855,11 @@ deployment: {
                 kubernetes: {}
             }
         }
+        label: {
+            app:       "linecook"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -2877,11 +2882,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "linecook"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
     }
@@ -3056,6 +3056,11 @@ deployment: {
                 kubernetes: {}
             }
         }
+        label: {
+            app:       "pastrychef"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -3078,11 +3083,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "pastrychef"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
     }
@@ -3222,6 +3222,11 @@ deployment: {
         arg: {}
         args: []
         env: {}
+        label: {
+            app:       "souschef"
+            domain:    "prod"
+            component: "kitchen"
+        }
         kubernetes: {
             spec: {
                 template: {
@@ -3244,11 +3249,6 @@ deployment: {
                     }
                 }
             }
-        }
-        label: {
-            app:       "souschef"
-            domain:    "prod"
-            component: "kitchen"
         }
         envSpec: {}
         volume: {}

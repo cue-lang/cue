@@ -1723,6 +1723,40 @@ func (v Value) Subsumes(w Value) bool {
 	return p.Check(ctx, v.v, w.v)
 }
 
+func isDef(v *adt.Vertex) bool {
+	for ; v != nil; v = v.Parent {
+		if v.Label.IsDef() {
+			return true
+		}
+	}
+	return false
+}
+
+func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
+	if !parent.IsClosed(ctx) && !isDef(parent) {
+		return nil
+	}
+
+	for _, a := range n.Arcs {
+		if !parent.Accept(ctx, a.Label) {
+			defer ctx.PopArc(ctx.PushArc(parent))
+			label := a.Label.SelectorString(ctx)
+			parent.Accept(ctx, a.Label)
+			return ctx.NewErrf("field `%s` not allowed", label)
+		}
+	}
+	return nil
+}
+
+func addConjuncts(dst, src *adt.Vertex) {
+	c := adt.MakeRootConjunct(nil, src)
+	if src.Closed {
+		var root adt.CloseInfo
+		c.CloseInfo = root.SpawnRef(src, src.Closed, nil)
+	}
+	dst.AddConjunct(c)
+}
+
 // Unify reports the greatest lower bound of v and w.
 //
 // Value v and w must be obtained from the same build.
@@ -1736,12 +1770,22 @@ func (v Value) Unify(w Value) Value {
 	}
 
 	n := &adt.Vertex{}
+	addConjuncts(n, v.v)
+	addConjuncts(n, w.v)
 
-	eval.AddVertex(n, v.v)
-	eval.AddVertex(n, w.v)
+	ctx := v.idx.newContext().opCtx
+	n.Finalize(ctx)
 
-	ctx := v.idx.newContext()
-	n.Finalize(ctx.opCtx)
+	n.Parent = v.v.Parent
+	n.Label = v.v.Label
+	n.Closed = v.v.Closed || w.v.Closed
+
+	if err := allowed(ctx, v.v, n); err != nil {
+		return newErrValue(w, err)
+	}
+	if err := allowed(ctx, w.v, n); err != nil {
+		return newErrValue(v, err)
+	}
 
 	return makeValue(v.idx, n)
 }
@@ -1759,23 +1803,20 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 		panic("accept must exist")
 	}
 
-	// TODO: take a similar approach for UnifyAccept as for Unify. In this
-	// case though, the fields should be added as an embeding.
-	//
-	// n := &adt.Vertex{}
-	// eval.EmbedVertex(n, v.v)
-	// eval.EmbedVertex(n, w.v)
-	n := &adt.Vertex{Parent: v.v.Parent, Label: v.v.Label}
+	n := &adt.Vertex{}
 	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
 	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
 
-	e := eval.New(v.idx.Runtime)
-	ctx := e.NewContext(n)
-	e.UnifyAccept(ctx, n, adt.Finalized, accept.v.Closed) // check for nil.
-
-	// ctx := v.idx.newContext()
-	n.Closed = accept.v.Closed
+	ctx := v.idx.newContext().opCtx
 	n.Finalize(ctx)
+
+	n.Parent = v.v.Parent
+	n.Label = v.v.Label
+
+	if err := allowed(ctx, accept.v, n); err != nil {
+		return newErrValue(accept, err)
+	}
+
 	return makeValue(v.idx, n)
 }
 
@@ -2250,8 +2291,7 @@ func (v Value) Expr() (Op, []Value) {
 			if disjunct.Default {
 				for _, n := range x.Values {
 					a := adt.Vertex{
-						Label:  v.v.Label,
-						Closed: v.v.Closed,
+						Label: v.v.Label,
 					}
 					b := a
 					a.AddConjunct(adt.MakeRootConjunct(env, n.Val))
@@ -2259,8 +2299,16 @@ func (v Value) Expr() (Op, []Value) {
 
 					e := eval.New(v.idx.Runtime)
 					ctx := e.NewContext(nil)
-					e.UnifyAccept(ctx, &a, adt.Finalized, v.v.Closed)
-					e.UnifyAccept(ctx, &b, adt.Finalized, v.v.Closed)
+					e.Unify(ctx, &a, adt.Finalized)
+					e.Unify(ctx, &b, adt.Finalized)
+					if allowed(ctx, v.v, &b) != nil {
+						// Everything subsumed bottom
+						continue outerExpr
+					}
+					if allowed(ctx, v.v, &a) != nil {
+						// An error doesn't subsume anything except another error.
+						continue
+					}
 					a.Parent = v.v.Parent
 					if !n.Default && subsume.Value(ctx, &a, &b) == nil {
 						continue outerExpr

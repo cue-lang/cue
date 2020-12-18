@@ -23,6 +23,7 @@ Errors:
 t0.v: conflicting values int and string (mismatched types int and string):
     ./in.cue:1:4
     ./in.cue:2:4
+    ./in.cue:5:12
 t1.x.a.b: conflicting values 4 and 3:
     ./in.cue:10:15
     ./in.cue:14:15
@@ -40,6 +41,7 @@ Result:
       // [eval] t0.v: conflicting values int and string (mismatched types int and string):
       //     ./in.cue:1:4
       //     ./in.cue:2:4
+      //     ./in.cue:5:12
     }
   }
   t1: (_|_){

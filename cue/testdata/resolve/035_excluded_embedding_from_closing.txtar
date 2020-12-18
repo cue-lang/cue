@@ -65,8 +65,8 @@ V: #S & {
 -- out/eval --
 Errors:
 V.b: field `extra` not allowed:
-    ./in.cue:3:2
     ./in.cue:6:10
+    ./in.cue:7:5
     ./in.cue:9:4
     ./in.cue:11:5
 V.c: field `e` not allowed:
@@ -110,8 +110,8 @@ Result:
       open: (int){ int }
       extra: (_|_){
         // [eval] V.b: field `extra` not allowed:
-        //     ./in.cue:3:2
         //     ./in.cue:6:10
+        //     ./in.cue:7:5
         //     ./in.cue:9:4
         //     ./in.cue:11:5
       }

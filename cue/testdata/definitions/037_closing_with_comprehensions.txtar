@@ -107,6 +107,7 @@ Errors:
 #E: field `f3` not allowed:
     ./in.cue:1:5
     ./in.cue:27:5
+    ./in.cue:27:10
     ./in.cue:29:3
 a: field `f3` not allowed:
     ./in.cue:1:5
@@ -137,6 +138,7 @@ Result:
       // [eval] #E: field `f3` not allowed:
       //     ./in.cue:1:5
       //     ./in.cue:27:5
+      //     ./in.cue:27:10
       //     ./in.cue:29:3
     }
   }

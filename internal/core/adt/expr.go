@@ -32,17 +32,127 @@ type StructLit struct {
 	Src   ast.Node // ast.File or ast.StructLit
 	Decls []Decl
 
+	// TODO: record the merge order somewhere.
+
+	// The below fields are redundant to Decls and are computed with Init.
+
+	// field marks the optional conjuncts of all explicit Fields.
+	// Required Fields are marked as empty
+	Fields []FieldInfo
+
+	Dynamic []*DynamicField
+
+	// excluded are all literal fields that already exist.
+	Bulk []*BulkOptionalField
+
+	Additional  []Expr
+	IsOpen      bool // has a ...
+	initialized bool
+
 	// administrative fields like hasreferences.
 	// hasReferences bool
+}
+
+type FieldInfo struct {
+	Label    Feature
+	Optional []Node
 }
 
 func (x *StructLit) Source() ast.Node { return x.Src }
 
 func (x *StructLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x, 0}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	return v
+}
+
+// TODO: remove this method
+func (o *StructLit) MarkField(f Feature) {
+	o.Fields = append(o.Fields, FieldInfo{Label: f})
+}
+
+func (o *StructLit) Init() {
+	if o.initialized {
+		return
+	}
+	o.initialized = true
+	for _, d := range o.Decls {
+		switch x := d.(type) {
+		case *Field:
+			if o.fieldIndex(x.Label) < 0 {
+				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
+			}
+
+		case *OptionalField:
+			p := o.fieldIndex(x.Label)
+			if p < 0 {
+				p = len(o.Fields)
+				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
+			}
+			o.Fields[p].Optional = append(o.Fields[p].Optional, x)
+
+		case *DynamicField:
+			o.Dynamic = append(o.Dynamic, x)
+
+		case *ForClause, Yielder, Expr:
+			// Set hasEmbed, or maybe add embeddings.
+
+		case *BulkOptionalField:
+			o.Bulk = append(o.Bulk, x)
+
+		case *Ellipsis:
+			expr := x.Value
+			if x.Value == nil {
+				o.IsOpen = true
+				expr = &Top{}
+			}
+			o.Additional = append(o.Additional, expr)
+
+		default:
+			panic("unreachable")
+		}
+	}
+}
+
+func (o *StructLit) fieldIndex(f Feature) int {
+	for i := range o.Fields {
+		if o.Fields[i].Label == f {
+			return i
+		}
+	}
+	return -1
+}
+
+func (o *StructLit) OptionalTypes() (mask OptionalType) {
+	for _, f := range o.Fields {
+		if len(f.Optional) > 0 {
+			mask = HasField
+			break
+		}
+	}
+	if len(o.Dynamic) > 0 {
+		mask |= HasDynamic
+	}
+	if len(o.Bulk) > 0 {
+		mask |= HasPattern
+	}
+	if o.Additional != nil {
+		mask |= HasAdditional
+	}
+	if o.IsOpen {
+		mask |= IsOpen
+	}
+	return mask
+}
+
+func (o *StructLit) IsOptional(label Feature) bool {
+	for _, f := range o.Fields {
+		if f.Label == label && len(f.Optional) > 0 {
+			return true
+		}
+	}
+	return false
 }
 
 // FIELDS
@@ -168,7 +278,7 @@ func (x *ListLit) Source() ast.Node {
 
 func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x, 0}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	return v
 }
@@ -557,7 +667,7 @@ func (x *LetReference) resolve(c *OpContext) *Vertex {
 		panic("nil expression")
 	}
 	// Anonymous arc.
-	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X, 0}}}
+	return &Vertex{Parent: nil, Label: label, Conjuncts: []Conjunct{{e, x.X, CloseInfo{}}}}
 }
 
 func (x *LetReference) evaluate(c *OpContext) Value {
@@ -839,7 +949,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	env := c.Env(0)
 	if x.Op == AndOp {
 		// Anonymous Arc
-		v := &Vertex{Conjuncts: []Conjunct{{env, x, 0}}}
+		v := &Vertex{Conjuncts: []Conjunct{{env, x, CloseInfo{}}}}
 		c.Unifier.Unify(c, v, Finalized)
 		return v
 	}
@@ -1067,7 +1177,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
 		if _, ok := v.(*BasicType); !ok {
 			env := c.Env(0)
 			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
-			n := &Vertex{Conjuncts: []Conjunct{{env, x, 0}}}
+			n := &Vertex{Conjuncts: []Conjunct{{env, x, CloseInfo{}}}}
 			c.Unifier.Unify(c, n, Finalized)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
@@ -1177,7 +1287,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 
 func (x *DisjunctionExpr) evaluate(c *OpContext) Value {
 	e := c.Env(0)
-	v := &Vertex{Conjuncts: []Conjunct{{e, x, 0}}}
+	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	// TODO: if the disjunction result originated from a literal value, we may
 	// consider the result closed to create more permanent errors.
@@ -1328,7 +1438,7 @@ func (x *LetClause) Source() ast.Node {
 
 func (x *LetClause) yield(c *OpContext, f YieldFunc) {
 	n := &Vertex{Arcs: []*Vertex{
-		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, 0}}},
+		{Label: x.Label, Conjuncts: []Conjunct{{c.Env(0), x.Expr, CloseInfo{}}}},
 	}}
 
 	sub := c.spawn(n)

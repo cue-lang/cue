@@ -205,7 +205,7 @@ type conjuncts struct {
 	// Values is used to collect non-struct values.
 	values      *adt.Vertex
 	exprs       []ast.Expr
-	structs     []*adt.StructLit
+	structs     []*adt.StructInfo
 	fields      map[adt.Feature]field
 	hasEllipsis bool
 }
@@ -245,7 +245,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 			return
 		}
 		// Used for sorting.
-		e.structs = append(e.structs, x)
+		e.structs = append(e.structs, &adt.StructInfo{StructLit: x, Env: env})
 
 		for _, d := range x.Decls {
 			var label adt.Feature

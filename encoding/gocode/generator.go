@@ -115,7 +115,7 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 
 	if pkgPath != "" {
 		loadCfg := &packages.Config{
-			Mode: packages.LoadAllSyntax,
+			Mode: packages.NeedName | packages.NeedFiles | packages.NeedCompiledGoFiles | packages.NeedImports | packages.NeedTypes | packages.NeedTypesSizes | packages.NeedSyntax | packages.NeedTypesInfo | packages.NeedDeps,
 		}
 		pkgs, err := packages.Load(loadCfg, pkgPath)
 		if err != nil {

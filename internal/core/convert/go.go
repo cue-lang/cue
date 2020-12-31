@@ -451,6 +451,8 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 				obj.Decls = append(obj.Decls, &adt.Field{Label: f, Value: sub})
 				arc, ok := sub.(*adt.Vertex)
 				if ok {
+					a := *arc
+					arc = &a
 					arc.Label = f
 				} else {
 					arc = &adt.Vertex{Label: f, BaseValue: sub}
@@ -497,6 +499,8 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					f := ctx.StringLabel(s)
 					arc, ok := sub.(*adt.Vertex)
 					if ok {
+						a := *arc
+						arc = &a
 						arc.Label = f
 					} else {
 						arc = &adt.Vertex{Label: f, BaseValue: sub}

@@ -1,0 +1,54 @@
+// Issue #616
+-- in.cue --
+import "list"
+
+t1: {
+    l: ["c","b","a"]
+    ls: list.Sort(l, list.Ascending)
+    il: list.IsSorted(l, list.Ascending)
+    ils: list.IsSorted(ls, list.Ascending)
+}
+
+t2: {
+    l: ["c","b","a"]
+    il: list.IsSorted(l, list.Ascending)
+
+    ls: list.Sort(l, list.Ascending)
+    ils: list.IsSorted(ls, list.Ascending)
+}
+
+t3: {
+    L: ["c","b","a", "e", "d"]
+    l: list.Take(L, 4)
+    il: list.IsSorted(l, list.Ascending)
+
+    ls: list.Sort(l, list.Ascending)
+    ils: list.IsSorted(ls, list.Ascending)
+
+    l2: l
+    l3: ls
+}
+
+-- out/list --
+t1: {
+	l: ["c", "b", "a"]
+	ls: ["a", "b", "c"]
+	il:  false
+	ils: true
+}
+t2: {
+	l: ["c", "b", "a"]
+	il: false
+	ls: ["a", "b", "c"]
+	ils: true
+}
+t3: {
+	L: ["c", "b", "a", "e", "d"]
+	l: ["c", "b", "a", "e"]
+	il: false
+	ls: ["a", "b", "c", "e"]
+	ils: true
+	l2: ["c", "b", "a", "e"]
+	l3: ["a", "b", "c", "e"]
+}
+

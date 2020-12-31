@@ -399,7 +399,8 @@ func (n *nodeContext) disjunctError() (errs errors.Error) {
 	} else {
 		disjuncts = errors.Sanitize(disjuncts)
 		k := len(errors.Errors(disjuncts))
-		errs = ctx.Newf("empty disjunction: %d related errors:", k)
+		// prefix '-' to sort to top
+		errs = ctx.Newf("%d errors in empty disjunction:", k)
 	}
 
 	errs = errors.Append(errs, disjuncts)

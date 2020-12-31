@@ -15,7 +15,7 @@ foo: [{type: "float"}] & [...#Value]
 foo: [{type: "float"}] & [...#Value]
 -- out/eval --
 Errors:
-foo.0: empty disjunction: 2 related errors:
+foo.0: 2 errors in empty disjunction:
 foo.0.type: conflicting values "int" and "float":
     ./in.cue:3:16
     ./in.cue:5:14
@@ -37,7 +37,7 @@ Result:
   foo: (_|_){
     // [eval]
     0: (_|_){
-      // [eval] foo.0: empty disjunction: 2 related errors:
+      // [eval] foo.0: 2 errors in empty disjunction:
       // foo.0.type: conflicting values "int" and "float":
       //     ./in.cue:3:16
       //     ./in.cue:5:14

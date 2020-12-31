@@ -61,7 +61,7 @@ d100: {
 
 -- out/eval --
 Errors:
-f: empty disjunction: 2 related errors:
+f: 2 errors in empty disjunction:
 f.name: conflicting values "int" and "str":
     ./in.cue:5:8
     ./in.cue:15:4
@@ -96,7 +96,7 @@ Result:
     name: (string){ "str" }
   }
   f: (_|_){
-    // [eval] f: empty disjunction: 2 related errors:
+    // [eval] f: 2 errors in empty disjunction:
     // f.name: conflicting values "int" and "str":
     //     ./in.cue:5:8
     //     ./in.cue:15:4

@@ -28,7 +28,7 @@ y: _|_ // ; empty disjunction: conflicting values 2 and 3
 }
 -- out/eval --
 Errors:
-y: empty disjunction: 2 related errors:
+y: 2 errors in empty disjunction:
 y.a: conflicting values 1 and 3:
     ./in.cue:1:12
     ./in.cue:2:4
@@ -47,7 +47,7 @@ Result:
       a: (int){ 2 }
     }) }
   y: (_|_){
-    // [eval] y: empty disjunction: 2 related errors:
+    // [eval] y: 2 errors in empty disjunction:
     // y.a: conflicting values 1 and 3:
     //     ./in.cue:1:12
     //     ./in.cue:2:4

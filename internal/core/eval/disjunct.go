@@ -131,8 +131,8 @@ func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjuncti
 func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 	n.postDisjunct(state)
 
-	x := n.node
 	if n.hasErr() {
+		x := n.node
 		err, ok := x.BaseValue.(*adt.Bottom)
 		if !ok {
 			err = n.getErr()
@@ -166,7 +166,7 @@ func (n *nodeContext) updateResult(state adt.VertexStatus) (isFinal bool) {
 	p := &result
 	d.Values = append(d.Values, p)
 
-	if n.done() && (!n.isDefault() || n.isDefault()) {
+	if n.done() {
 		n.nodeShared.isDone = true
 	}
 

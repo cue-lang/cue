@@ -200,6 +200,7 @@ func (e *Evaluator) Evaluate(c *adt.OpContext, v *adt.Vertex) adt.Value {
 			clone := *(d.Values[last])
 			d.Values[last] = &clone
 
+			v.UpdateStatus(adt.Finalized)
 			v.BaseValue = d
 			v.Arcs = nil
 			v.Structs = nil // TODO: maybe not do this.
@@ -344,7 +345,6 @@ func (e *Evaluator) evalVertex(c *adt.OpContext, v *adt.Vertex, state adt.Vertex
 			// conflicts at the appropriate place, to allow valid fields to
 			// be represented normally and, most importantly, to avoid
 			// recursive processing of a disallowed field.
-			v.BaseValue = err
 			v.SetValue(c, adt.Finalized, err)
 			return shared
 		}
@@ -684,7 +684,8 @@ func (n *nodeShared) createDisjunct() *adt.Disjunction {
 }
 
 func (n *nodeShared) result() *adt.Vertex {
-	return &n.result_
+	x := n.result_
+	return &x
 }
 
 func (n *nodeShared) setResult(v *adt.Vertex) {

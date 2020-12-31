@@ -51,6 +51,50 @@ d6: {
   b: {} & (int | {c: 1})
 }
 
+t10: {
+    schema: test
+    schema: string | {name: string}
+    #A: {string | {name: string}}
+
+    test: name: "Test"
+    test: #A
+}
+
+t10: {
+    schema: string | {name: string}
+    schema: test
+    #A: {string | {name: string}}
+
+    test: name: "Test"
+    test: #A
+}
+
+t10: {
+    #A: {string | {name: string}}
+
+    test: name: "Test"
+    test: #A
+
+    schema: string | {name: string}
+    schema: test
+}
+
+t11: {
+    a: #A
+    a: b
+
+    b: #A & ["b"]
+    #A: ["a" | "b"] | {}
+}
+
+t11: {
+    b: #A & ["b"]
+    #A: ["a" | "b"] | {}
+
+    a: b
+    a: #A
+}
+
 
 d100: {
   // Should we allow a selector to imply a struct or list? Would be convenient.
@@ -167,13 +211,36 @@ Result:
       c: (int){ 1 }
     }
   }
+  t10: (struct){
+    schema: (#struct){
+      name: (string){ "Test" }
+    }
+    #A: ((string|struct)){ |((string){ string }, (#struct){
+        name: (string){ string }
+      }) }
+    test: (#struct){
+      name: (string){ "Test" }
+    }
+  }
+  t11: (struct){
+    a: (#list){
+      0: (string){ "b" }
+    }
+    b: (#list){
+      0: (string){ "b" }
+    }
+    #A: ((list|struct)){ |((#list){
+        0: (string){ |((string){ "a" }, (string){ "b" }) }
+      }, (#struct){
+      }) }
+  }
   d100: (struct){
     i: ((null|struct)){ |((null){ null }, (struct){
         bar: (int){ 2 }
       }) }
     j: (_|_){
       // [incomplete] d100.j: unresolved disjunction null | {bar:2} (type (null|struct)):
-      //     ./in.cue:58:6
+      //     ./in.cue:102:6
     }
   }
 }
@@ -260,6 +327,71 @@ Result:
     b: ({} & (int|{
       c: 1
     }))
+  }
+  t10: {
+    schema: 〈0;test〉
+    schema: (string|{
+      name: string
+    })
+    #A: {
+      (string|{
+        name: string
+      })
+    }
+    test: {
+      name: "Test"
+    }
+    test: 〈0;#A〉
+  }
+  t10: {
+    schema: (string|{
+      name: string
+    })
+    schema: 〈0;test〉
+    #A: {
+      (string|{
+        name: string
+      })
+    }
+    test: {
+      name: "Test"
+    }
+    test: 〈0;#A〉
+  }
+  t10: {
+    #A: {
+      (string|{
+        name: string
+      })
+    }
+    test: {
+      name: "Test"
+    }
+    test: 〈0;#A〉
+    schema: (string|{
+      name: string
+    })
+    schema: 〈0;test〉
+  }
+  t11: {
+    a: 〈0;#A〉
+    a: 〈0;b〉
+    b: (〈0;#A〉 & [
+      "b",
+    ])
+    #A: ([
+      ("a"|"b"),
+    ]|{})
+  }
+  t11: {
+    b: (〈0;#A〉 & [
+      "b",
+    ])
+    #A: ([
+      ("a"|"b"),
+    ]|{})
+    a: 〈0;b〉
+    a: 〈0;#A〉
   }
   d100: {
     i: (null|{

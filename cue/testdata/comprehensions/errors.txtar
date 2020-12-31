@@ -32,7 +32,9 @@ Result:
   // [eval]
   circularIf: (struct){
     #list: (#struct){
-      tail: (null){ null }
+      tail: ((null|struct)){ |(*(null){ null }, (#struct){
+          tail: (null){ null }
+        }) }
     }
   }
   circularFor: (_|_){
@@ -44,7 +46,7 @@ Result:
     }
   }
   userError: (_|_){
-    // [incomplete] userError.a: empty disjunction:
+    // [incomplete] userError: non-concrete value string in operand to !=:
     //     ./in.cue:21:8
     a: (string){ string }
   }

@@ -409,7 +409,6 @@ b7.a.0: structural cycle
 c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
 d1.r: structural cycle
-d2.a.b.c.d.t: structural cycle
 e1.a.c: structural cycle
 e1.b.c: structural cycle
 e2.a.c: structural cycle
@@ -469,11 +468,9 @@ p3.#U.#T.a.b.link: structural cycle
 p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 z1.z.g.h: structural cycle
-b4.x.y.0: structural cycle:
+b4.x.y.0.0: structural cycle:
     ./in.cue:53:8
-d2.a.b.c.d.t: structural cycle:
-    ./in.cue:254:8
-d2.r: structural cycle:
+d2.r.c.d.t: structural cycle:
     ./in.cue:254:8
 0: structural cycle:
     ./in.cue:264:19
@@ -564,7 +561,7 @@ Result:
   b4: (_|_){
     // [structural cycle]
     b: (_|_){
-      // [structural cycle] b4.x.y.0: structural cycle:
+      // [structural cycle] b4.x.y.0.0: structural cycle:
       //     ./in.cue:53:8
       0: (int){ 1 }
     }
@@ -589,7 +586,9 @@ Result:
     x: (struct){
       y: (struct){
         a: (#list){
-          0: (int){ int }
+          0: ((int|list)){ |((#list){
+              0: (int){ int }
+            }, (int){ int }) }
         }
       }
     }
@@ -699,13 +698,19 @@ Result:
   }
   b11: (struct){
     #list: (#struct){
-      tail: (null){ null }
+      tail: ((null|struct)){ |(*(null){ null }, (#struct){
+          tail: (null){ null }
+        }) }
     }
   }
   b12: (struct){
     #list: (#struct){
       value: (int){ int }
-      tail: (null){ null }
+      tail: ((null|struct)){ |(*(null){ null }, (#struct){
+          value: (int){ int }
+          tail: (null){ null }
+          sum: (int){ int }
+        }) }
       sum: (int){ int }
     }
     list1: (#struct){
@@ -1048,18 +1053,28 @@ Result:
   d2: (_|_){
     // [structural cycle]
     x: (_|_){
-      // [structural cycle] d2.a.b.c.d.t: structural cycle:
+      // [structural cycle] d2.r.c.d.t: structural cycle:
       //     ./in.cue:254:8
     }
     r: (_|_){
-      // [structural cycle] d2.r: structural cycle:
-      //     ./in.cue:254:8
-      c: (_|_){// {
-        //   d: {
-        //     h: int
-        //     t: 〈4;r〉
-        //   }
-        // }
+      // [structural cycle]
+      c: (_|_){
+        // [structural cycle]
+        d: (_|_){
+          // [structural cycle]
+          h: (int){ int }
+          t: (_|_){
+            // [structural cycle] d2.r.c.d.t: structural cycle:
+            //     ./in.cue:254:8
+            c: (_|_){// {
+              //   d: {
+              //     h: int
+              //     t: 〈4;r〉
+              //   }
+              // }
+            }
+          }
+        }
       }
     }
     a: (_|_){
@@ -1072,14 +1087,7 @@ Result:
             // [structural cycle]
             h: (int){ int }
             t: (_|_){
-              // [structural cycle] d2.a.b.c.d.t: structural cycle
-              c: (_|_){// {
-                //   d: {
-                //     h: int
-                //     t: 〈4;r〉
-                //   }
-                // }
-              }
+              // [structural cycle]
             }
           }
         }
@@ -1104,7 +1112,7 @@ Result:
         // [structural cycle] 0: structural cycle:
         //     ./in.cue:264:19
       }
-      i: (int){ 1 }
+      i: (int){ |(*(int){ 1 }, (int){ int }) }
     }
     x: (_|_){
       // [structural cycle] 0: structural cycle:

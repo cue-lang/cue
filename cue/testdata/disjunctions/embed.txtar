@@ -1,0 +1,131 @@
+-- in.cue --
+// Given the existence of this field, embedDefault is a struct. This
+// means that embedding this conjunction into `embedDefault` itself should
+// make it resolve to `{a: 2}`.
+
+default: {
+    y: *1 | {a: 2}
+    y
+}
+
+unambiguous: {
+    y: 1 | {a: 2}
+    y
+}
+
+forDefault: {
+    y: *1 | {a: 2}
+    for x in [1] {y}
+}
+
+// Carry over default to first disjunct.
+openDefault: {
+    #y: *1 | {a: 2}
+    #y
+}
+
+openAmbiguous: {
+    #y: 1 | {a: 2}
+    #y
+}
+
+forceStruct: {
+    #y: 1 | {a: 2}
+    #y
+    {}
+}
+
+-- out/eval --
+(struct){
+  default: (struct){
+    y: ((int|struct)){ |(*(int){ 1 }, (struct){
+        a: (int){ 2 }
+      }) }
+    a: (int){ 2 }
+  }
+  unambiguous: (struct){
+    y: ((int|struct)){ |((int){ 1 }, (struct){
+        a: (int){ 2 }
+      }) }
+    a: (int){ 2 }
+  }
+  forDefault: (struct){
+    y: ((int|struct)){ |(*(int){ 1 }, (struct){
+        a: (int){ 2 }
+      }) }
+    a: (int){ 2 }
+  }
+  openDefault: ((int|struct)){ |(*(int){
+      1
+      #y: ((int|struct)){ |(*(int){ 1 }, (#struct){
+          a: (int){ 2 }
+        }) }
+    }, (#struct){
+      #y: ((int|struct)){ |(*(int){ 1 }, (#struct){
+          a: (int){ 2 }
+        }) }
+      a: (int){ 2 }
+    }) }
+  openAmbiguous: ((int|struct)){ |((int){
+      1
+      #y: ((int|struct)){ |((int){ 1 }, (#struct){
+          a: (int){ 2 }
+        }) }
+    }, (#struct){
+      #y: ((int|struct)){ |((int){ 1 }, (#struct){
+          a: (int){ 2 }
+        }) }
+      a: (int){ 2 }
+    }) }
+  forceStruct: (#struct){
+    #y: ((int|struct)){ |((int){ 1 }, (#struct){
+        a: (int){ 2 }
+      }) }
+    a: (int){ 2 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  default: {
+    y: (*1|{
+      a: 2
+    })
+    〈0;y〉
+  }
+  unambiguous: {
+    y: (1|{
+      a: 2
+    })
+    〈0;y〉
+  }
+  forDefault: {
+    y: (*1|{
+      a: 2
+    })
+    for _, x in [
+      1,
+    ] {
+      〈2;y〉
+    }
+  }
+  openDefault: {
+    #y: (*1|{
+      a: 2
+    })
+    〈0;#y〉
+  }
+  openAmbiguous: {
+    #y: (1|{
+      a: 2
+    })
+    〈0;#y〉
+  }
+  forceStruct: {
+    #y: (1|{
+      a: 2
+    })
+    〈0;#y〉
+    {}
+  }
+}

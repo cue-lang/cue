@@ -37,7 +37,7 @@ s: t & {
 -- out/eval --
 (struct){
   t: (struct){
-    #ok: (bool){ true }
+    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
     x: (int){ int }
   }
   s: (struct){

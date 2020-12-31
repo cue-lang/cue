@@ -129,6 +129,10 @@ z3:  8
 }
 -- out/eval --
 Errors:
+xe1: 2 errors in empty disjunction:
+xe1: conflicting values 8 and 9:
+    ./in.cue:36:14
+    ./in.cue:41:6
 xe3: conflicting values 7 and 6:
     ./in.cue:38:6
     ./in.cue:38:10
@@ -142,7 +146,7 @@ Result:
   xa4: (int){ 10 }
   xb1: (int){ 8 }
   xb2: (int){ 8 }
-  xb3: (int){ 6 }
+  xb3: (int){ |(*(int){ 6 }, (int){ 9 }) }
   xb4: (_|_){
     // [cycle] cycle error:
     //     ./in.cue:14:6
@@ -158,7 +162,13 @@ Result:
   xd4: (int){ 9 }
   xd5: (int){ 10 }
   xe1: (_|_){
-    // [incomplete] xe1: empty disjunction
+    // [eval] xe1: 2 errors in empty disjunction:
+    // xe1: conflicting values 8 and 9:
+    //     ./in.cue:36:14
+    //     ./in.cue:41:6
+    // xe3: conflicting values 7 and 6:
+    //     ./in.cue:38:6
+    //     ./in.cue:38:10
   }
   xe2: (_|_){
     // [eval] xe3: conflicting values 7 and 6:

@@ -19,10 +19,12 @@ joinOK: path.Join(["a", "b"], "aix")
 joinErr: path.Join(["a", "b"], "foo")
 -- out/path --
 Errors:
+cannot use _|_(2 errors in empty disjunction: (and 2 more errors)) (type _|_) as string in argument 1 to path.Join: 2 errors in empty disjunction: (and 2 more errors):
+    ./in.cue:4:10
 joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos" in argument 2 to path.Join:
     ./in.cue:4:32
 
 Result:
 joinOK:  "a/b"
-joinErr: _|_ // joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos" in argument 2 to path.Join (and 1 more errors)
+joinErr: _|_ // joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos" in argument 2 to path.Join (and 3 more errors)
 

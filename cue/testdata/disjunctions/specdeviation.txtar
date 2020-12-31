@@ -40,12 +40,12 @@ s1: #Size & { min: 5 }
   p: (int){ |(*(int){ 2 }, (int){ int }) }
   s1: (#struct){
     max: (number){ |(*(int){ 5 }, (number){ >5 }) }
-    res: (int){ 0 }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
     min: (int){ 5 }
   }
   #Size: (#struct){
     max: (number){ |(*(int){ 1 }, (number){ >0 }, (number){ >1 }) }
-    res: (int){ 0 }
+    res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
     min: (number){ |(*(int){ 1 }, (number){ >0 }) }
   }
 }

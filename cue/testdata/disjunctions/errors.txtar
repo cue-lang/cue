@@ -124,7 +124,7 @@ Result:
     }
   }
   explicitDefaultError: (_|_){
-    // [incomplete] explicitDefaultError.a: empty disjunction:
+    // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
     //     ./in.cue:30:8
     a: (string){ string }
   }

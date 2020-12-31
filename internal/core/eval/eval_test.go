@@ -23,6 +23,7 @@ import (
 	"github.com/rogpeppe/go-internal/txtar"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/validate"
@@ -120,9 +121,11 @@ module: "example.com"
 	// t.Error(debug.NodeString(r, v, nil))
 	// eval.Debug = true
 
+	adt.Verbosity = 1
 	e := eval.New(r)
 	ctx := e.NewContext(v)
 	v.Finalize(ctx)
+	adt.Verbosity = 0
 
 	t.Error(debug.NodeString(r, v, nil))
 

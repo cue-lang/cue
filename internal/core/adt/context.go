@@ -16,6 +16,7 @@ package adt
 
 import (
 	"fmt"
+	"log"
 	"os"
 	"reflect"
 	"regexp"
@@ -33,6 +34,11 @@ import (
 // This should typically default to true for pre-releases and default to
 // false otherwise.
 var Debug bool = os.Getenv("CUE_DEBUG") != "0"
+
+// Verbosity sets the log level. There are currently only two levels:
+//   0: no logging
+//   1: logging
+var Verbosity int
 
 // Assert panics if the condition is false. Assert can be used to check for
 // conditions that are considers to break an internal variant or unexpected
@@ -57,6 +63,43 @@ func (c *OpContext) Assertf(pos token.Pos, b bool, format string, args ...interf
 		}
 		c.addErrf(0, pos, format, args...)
 	}
+}
+
+func init() {
+	log.SetFlags(log.Lshortfile)
+}
+
+func Logf(format string, args ...interface{}) {
+	if Verbosity == 0 {
+		return
+	}
+	s := fmt.Sprintf(format, args...)
+	_ = log.Output(2, s)
+}
+
+var pMap = map[*Vertex]int{}
+
+func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
+	if Verbosity == 0 {
+		return
+	}
+	p := pMap[v]
+	if p == 0 {
+		p = len(pMap) + 1
+		pMap[v] = p
+	}
+	a := append([]interface{}{
+		p,
+		v.Label.SelectorString(c),
+		v.Path(),
+	}, args...)
+	for i := 2; i < len(a); i++ {
+		if n, ok := a[i].(Node); ok {
+			a[i] = c.Str(n)
+		}
+	}
+	s := fmt.Sprintf(" [%d] %s/%v"+format, a...)
+	_ = log.Output(2, s)
 }
 
 // A Unifier implements a strategy for CUE's unification operation. It must

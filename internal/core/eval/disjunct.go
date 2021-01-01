@@ -284,7 +284,7 @@ func (n *nodeContext) insertDisjuncts() (inserted bool) {
 				subMode = combineDefault(subMode, mode)
 			}
 		}
-		defMode = combineSubDefault(defMode, subMode)
+		defMode = combineDefault(defMode, subMode)
 
 		n.defaultMode = combineDefault(n.defaultMode, defMode)
 	}
@@ -356,43 +356,6 @@ const (
 	notDefault
 	isDefault
 )
-
-// combineSubDefault combines default modes where b is a subexpression in
-// a disjunctions.
-//
-// Default rules from spec:
-//
-// D1: (v1, d1) | v2       => (v1|v2, d1)
-// D2: (v1, d1) | (v2, d2) => (v1|v2, d1|d2)
-//
-// Spec:
-// M1: *v        => (v, v)
-// M2: *(v1, d1) => (v1, d1)
-//
-func combineSubDefault(a, b defaultMode) defaultMode {
-	switch {
-	case a == maybeDefault && b == maybeDefault: // D1
-		return maybeDefault
-	case a == maybeDefault && b == notDefault: // D1
-		return notDefault
-	case a == maybeDefault && b == isDefault: // D1
-		return isDefault
-	case a == notDefault && b == maybeDefault: // D1
-		return notDefault
-	case a == notDefault && b == notDefault: // D2
-		return notDefault
-	case a == notDefault && b == isDefault: // D2
-		return isDefault
-	case a == isDefault && b == maybeDefault: // D1
-		return isDefault
-	case a == isDefault && b == notDefault: // M2
-		return notDefault
-	case a == isDefault && b == isDefault: // D2
-		return isDefault
-	default:
-		panic("unreachable")
-	}
-}
 
 // combineDefaults combines default modes for unifying conjuncts.
 //

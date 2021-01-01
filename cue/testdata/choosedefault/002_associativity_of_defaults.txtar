@@ -41,11 +41,11 @@ c: *"a" | *"b" | "c"
 (struct){
   a: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
   b: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-  c: (string){ |(*(string){ "a" }, *(string){ "b" }, (string){ "c" }) }
+  c: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
   x: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
   y: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
-  s1: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ 3 }) }
-  s2: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ 3 }) }
+  s1: (int){ |(*(int){ 1 }, (int){ 2 }, (int){ 3 }) }
+  s2: (int){ |(*(int){ 1 }, (int){ 2 }, (int){ 3 }) }
   s3: (int){ |(*(int){ 1 }, (int){ 3 }) }
   s4: (int){ |(*(int){ 1 }, (int){ 2 }) }
   s5: (int){ |(*(int){ 1 }, *(int){ 2 }, (int){ 3 }) }

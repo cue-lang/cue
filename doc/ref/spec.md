@@ -697,69 +697,79 @@ even though `a` resolves to 1 in all cases.
 
 #### Default values
 
-Any element of a disjunction can be marked as a default
-by prefixing it with an asterisk `*`.
+Any value `v` _may_ be associated with a default value `d`,
+where `d` must be in instance of `v` (`d ⊑ v`).
+
+Default values are introduced by means of disjunctions.
+Any element of a disjunction can be _marked_ as a default
+by prefixing it with an asterisk `*` ([a unary expression](#Operators)).
+Syntactically consecutive disjunctions are considered to be
+part of a single disjunction,
+whereby multiple disjuncts can be marked as default.
+A _marked disjunction_ is one where any of its terms are marked.
+So `a | b | *c | d` is a single marked disjunction of four terms,
+whereas `a | (b | *c | d)` is an unmarked disjunction of two terms,
+one of which is a marked disjunction of three terms.
+As explained below, distinguishing the nesting of disjunctions like this
+is only relevant when both an outer and nested disjunction are marked.
+
 Intuitively, when an expression needs to be resolved for an operation other
-than unification or disjunctions,
+than unification or disjunction,
 non-starred elements are dropped in favor of starred ones if the starred ones
 do not resolve to bottom.
 
-More precisely, any value `v` may be associated with a default value `d`,
-denoted `(v, d)` (not CUE syntax),
-where `d` must be in instance of `v` (`d ⊑ v`).
-The rules for unifying and disjoining such values are as follows:
+To define the the unification and disjunction operation we use the notation
+`⟨v⟩` to denote a CUE value `v` that is not associated with a default
+and the notation `⟨v, d⟩` to denote a value `v` associated with a default
+value `d`.
 
+The rewrite rules for unifying such values are as follows:
 ```
-U1: (v1, d1) & v2       => (v1&v2, d1&v2)
-U2: (v1, d1) & (v2, d2) => (v1&v2, d1&d2)
-
-D1: (v1, d1) | v2       => (v1|v2, d1)
-D2: (v1, d1) | (v2, d2) => (v1|v2, d1|d2)
-```
-
-Default values may be introduced within disjunctions
-by _marking_ terms of a disjunction with an asterisk `*`
-([a unary expression](#Operators)).
-The default value of a disjunction with marked terms is the disjunction
-of those marked terms, applying the following rules for marks:
-
-```
-M1: *v        => (v, v)
-M2: *(v1, d1) => (v1, d1)
+U0: ⟨v1⟩ & ⟨v2⟩         => ⟨v1&v2⟩
+U1: ⟨v1, d1⟩ & ⟨v2⟩     => ⟨v1&v2, d1&v2⟩
+U2: ⟨v1, d1⟩ & ⟨v2, d2⟩ => ⟨v1&v2, d1&d2⟩
 ```
 
-In general, any operation `f` in CUE involving default values proceeds along the
-following lines
+The rewrite rules for disjoining terms of unmarked disjunctions are
 ```
-O1: f((v1, d1), ..., (vn, dn))  => (f(v1, ..., vn), f(d1, ..., dn))
+D0: ⟨v1⟩ | ⟨v2⟩         => ⟨v1|v2⟩
+D1: ⟨v1, d1⟩ | ⟨v2⟩     => ⟨v1|v2, d1⟩
+D2: ⟨v1, d1⟩ | ⟨v2, d2⟩ => ⟨v1|v2, d1|d2⟩
 ```
-where, with the exception of disjunction, a value `v` without a default
-value is promoted to `(v, v)`.
 
+Terms of marked disjunctions are first rewritten according to the following
+rules:
+```
+M0:  ⟨v⟩    => ⟨v⟩        don't introduce defaults for unmarked term
+M1: *⟨v⟩    => ⟨v, v⟩     introduce identical default for marked term
+M2: *⟨v, d⟩ => ⟨v, d⟩     keep existing defaults for marked term
+M3:  ⟨v, d⟩ => ⟨v⟩        strip existing defaults from unmarked term
+```
+
+Note that for any marked disjunction `a`,
+the expressions `a|a`, `*a|a` and `*a|*a` all resolve to `a`.
 
 ```
 Expression               Value-default pair      Rules applied
-*"tcp" | "udp"           ("tcp"|"udp", "tcp")    M1, D1
-string | *"foo"          (string, "foo")         M1, D1
+*"tcp" | "udp"           ⟨"tcp"|"udp", "tcp"⟩    M1, D1
+string | *"foo"          ⟨string, "foo"⟩         M1, D1
 
-*1 | 2 | 3               (1|2|3, 1)              M1, D1
+*1 | 2 | 3               ⟨1|2|3, 1⟩              M1, D1
 
-(*1|2|3) | (1|*2|3)      (1|2|3, 1|2)            M1, D1, D2
-(*1|2|3) | *(1|*2|3)     (1|2|3, 1|2)            M1, D1, M2, D2
-(*1|2|3) | (1|*2|3)&2    (1|2|3, 1|2)            M1, D1, U1, D2
+(*1|2|3) | (1|*2|3)      ⟨1|2|3, 1|2⟩            M1, D1, D2
+(*1|2|3) | *(1|*2|3)     ⟨1|2|3, 2⟩              M1, M2, M3, D1, D2
+(*1|2|3) | (1|*2|3)&2    ⟨1|2|3, 1|2⟩            M1, D1, U1, D2
 
-(*1|2) & (1|*2)          (1|2, _|_)              M1, D1, U2
-
-(*1|2) + (1|*2)          ((1|2)+(1|2), 3)        M1, D1, O1
+(*1|2) & (1|*2)          ⟨1|2, _|_⟩              M1, D1, U2
 ```
 
 The rules of subsumption for defaults can be derived from the above definitions
 and are as follows.
 
 ```
-(v2, d2) ⊑ (v1, d1)  if v2 ⊑ v1 and d2 ⊑ d1
-(v1, d1) ⊑ v         if v1 ⊑ v
-v ⊑ (v1, d1)         if v ⊑ d1
+⟨v2, d2⟩ ⊑ ⟨v1, d1⟩  if v2 ⊑ v1 and d2 ⊑ d1
+⟨v1, d1⟩ ⊑ ⟨v⟩       if v1 ⊑ v
+⟨v⟩      ⊑ ⟨v1, d1⟩  if v ⊑ d1
 ```
 
 <!--
@@ -783,13 +793,13 @@ compatible way later if really desirable, as long as we require that
 disjunction literals be normalized).
 -->
 
-
 ```
 Expression                       Resolves to
 "tcp" | "udp"                    "tcp" | "udp"
 *"tcp" | "udp"                   "tcp"
 float | *1                       1
 *string | 1.0                    string
+(*1|2) + (2|*3)                  4
 
 (*1|2|3) | (1|*2|3)              1|2
 (*1|2|3) & (1|*2|3)              1|2|3 // default is _|_
@@ -807,8 +817,8 @@ float | *1                       1
 {a: 1} | {b: 1}                  {a: 1} | {b: 1}
 {a: 1} | *{b: 1}                 {b:1}
 *{a: 1} | *{b: 1}                {a: 1} | {b: 1}
-({a: 1} | {b: 1}) & {a:1}        {a:1} // after eliminating {a:1,b:1} by normalization
-({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1} // after eliminating {a:1,b:1} by normalization
+({a: 1} | {b: 1}) & {a:1}        {a:1}  | {a: 1, b: 1}
+({a:1}|*{b:1}) & ({a:1}|*{b:1})  {b:1}
 ```
 
 

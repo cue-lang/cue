@@ -2196,12 +2196,12 @@ x == y+1 && y == z-1
 Arithmetic operators apply to numeric values and yield a result of the same type
 as the first operand. The four standard arithmetic operators
 `(+, -, *, /)` apply to integer and decimal floating-point types;
-`+` and `*` also apply to lists and strings.
+`+` and `*` also apply to strings and bytes.
 
 ```
-+    sum                    integers, floats, lists, strings, bytes
++    sum                    integers, floats, strings, bytes
 -    difference             integers, floats
-*    product                integers, floats, lists, strings, bytes
+*    product                integers, floats, strings, bytes
 /    quotient               integers, floats
 ```
 
@@ -2222,39 +2222,6 @@ The unary operators `+` and `-` are defined for numeric values as follows:
 +x                          is 0 + x
 -x    negation              is 0 - x
 ```
-
-#### List operators
-
-Lists can be concatenated using the `+` operator.
-Opens list are closed to their default value beforehand.
-
-```
-[ 1, 2 ]      + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
-[ 1, 2, ... ] + [ 3, 4 ]       // [ 1, 2, 3, 4 ]
-[ 1, 2 ]      + [ 3, 4, ... ]  // [ 1, 2, 3, 4 ]
-```
-
-Lists can be multiplied with a non-negative`int` using the `*` operator
-to create a repeated the list by the indicated number.
-```
-3*[1,2]         // [1, 2, 1, 2, 1, 2]
-3*[1, 2, ...]   // [1, 2, 1, 2, 1 ,2]
-[byte]*4        // [byte, byte, byte, byte]
-0*[1,2]         // []
-```
-
-<!-- TODO(mpvl): should we allow multiplication with a range?
-If so, how does one specify a list with a range of possible lengths?
-
-Suggestion from jba:
-Multiplication should distribute over disjunction,
-so int(1)..int(3) * [x] = [x] | [x, x] | [x, x, x].
-The hard part is figuring out what (>=1 & <=3) * [x] means,
-since  >=1 & <=3 includes many floats.
-(mpvl: could constrain arguments to parameter types, but needs to be
-done consistently.)
--->
-
 
 #### String operators
 

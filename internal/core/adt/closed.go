@@ -118,6 +118,24 @@ func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
 	return c
 }
 
+// SpawnGroup is used for structs that contain embeddings that may end up
+// closing the struct. This is to force that `b` is not allowed in
+//
+//      a: {#foo} & {b: int}
+//
+func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
+	embedded := false
+	if c.closeInfo != nil {
+		embedded = c.embedded
+	}
+	c.closeInfo = &closeInfo{
+		parent:   c.closeInfo,
+		location: x,
+		embedded: embedded,
+	}
+	return c
+}
+
 func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	embedded := false
 	if c.closeInfo != nil {

@@ -301,6 +301,46 @@ func TestClosedness(t *testing.T) {
 		},
 		required: true,
 	}, {
+		desc: "local closing of def",
+		// #test: {
+		//     #def
+		//     a: 1
+		//     b: 1
+		// }
+		// #test: {
+		//     c: 1
+		//     d: 1
+		// }
+		// #def: {
+		//     c: 1
+		//     e: 1
+		// }
+		n: func() *adt.Vertex {
+			var (
+				root adt.CloseInfo
+				test = root.SpawnRef(nil, true, mkRef("#test"))
+				// isolate local struct.
+				spawned = test.SpawnRef(nil, false, mkRef("dummy"))
+				embed   = spawned.SpawnEmbed(mkRef("dummy"))
+				def     = embed.SpawnRef(nil, true, mkRef("#def"))
+			)
+			return &adt.Vertex{
+				Structs: []*adt.StructInfo{
+					mkStruct(spawned, "{a: 1, b: 1}"),
+					mkStruct(test, "{c: 1, d: 1}"),
+					mkStruct(def, "{c: 1, e: 1}"),
+				},
+			}
+		},
+		tests: []test{
+			{"a", true},
+			{"d", false},
+			{"c", true},
+			{"e", true},
+			{"f", false},
+		},
+		required: true,
+	}, {
 		desc: "branching",
 		// test: #foo
 		// #foo: {
@@ -372,11 +412,11 @@ func TestClosedness(t *testing.T) {
 	// -----
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {
+			n := tc.n()
 			for _, sub := range tc.tests {
 				t.Run(sub.f, func(t *testing.T) {
 					f := adt.MakeIdentLabel(r, sub.f, "")
 
-					n := tc.n()
 					ok, required := adt.Accept(ctx, n, f)
 					if ok != sub.found || required != tc.required {
 						t.Errorf("got (%v, %v); want (%v, %v)",

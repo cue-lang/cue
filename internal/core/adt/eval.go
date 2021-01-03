@@ -1569,13 +1569,15 @@ func (n *nodeContext) addStruct(
 		childEnv.Deref = env.Deref
 	}
 
+	s.Init()
+
+	if s.HasEmbed {
+		closeInfo = closeInfo.SpawnGroup(nil)
+	}
+
 	parent := n.node.AddStruct(s, childEnv, closeInfo)
 	closeInfo.IsClosed = false
 	parent.Disable = true // disable until processing is done.
-
-	hasEmbed := false
-
-	s.Init()
 
 	for _, d := range s.Decls {
 		switch x := d.(type) {
@@ -1602,8 +1604,6 @@ func (n *nodeContext) addStruct(
 			n.ifClauses = append(n.ifClauses, envYield{childEnv, x, closeInfo, nil})
 
 		case Expr:
-			hasEmbed = true
-
 			// add embedding to optional
 
 			// TODO(perf): only do this if addExprConjunct below will result in
@@ -1626,7 +1626,7 @@ func (n *nodeContext) addStruct(
 		}
 	}
 
-	if !hasEmbed {
+	if !s.HasEmbed {
 		n.aStruct = s
 		n.aStructID = closeInfo
 	}

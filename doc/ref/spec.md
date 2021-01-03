@@ -1306,8 +1306,8 @@ D: close({
 A struct may contain an _embedded value_, an operand used as a declaration.
 An embedded value of type struct is unified with the struct in which it is
 embedded, but disregarding the restrictions imposed by closed structs.
-So if an embedding contains a closed struct, the corresponding resulting struct
-will also be closed, but may have fields that are not allowed if
+So if an embedding resolves to a closed struct, the corresponding enclosing
+struct will also be closed, but may have fields that are not allowed if
 normal rules for closed structs were observed.
 
 If an embedded value is not of type struct, the struct may only have

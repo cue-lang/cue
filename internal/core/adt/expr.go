@@ -46,6 +46,7 @@ type StructLit struct {
 	Bulk []*BulkOptionalField
 
 	Additional  []Expr
+	HasEmbed    bool
 	IsOpen      bool // has a ...
 	initialized bool
 
@@ -95,8 +96,10 @@ func (o *StructLit) Init() {
 		case *DynamicField:
 			o.Dynamic = append(o.Dynamic, x)
 
-		case *ForClause, Yielder, Expr:
-			// Set hasEmbed, or maybe add embeddings.
+		case Expr:
+			o.HasEmbed = true
+
+		case *ForClause, Yielder:
 
 		case *BulkOptionalField:
 			o.Bulk = append(o.Bulk, x)

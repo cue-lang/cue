@@ -13,6 +13,11 @@ deployment: foo: spec: replicas: 1
 
 #TypeMeta: {}
 
+recloseSimple: {
+  #foo: {}
+  a: {#foo} & {b: int}
+}
+
 // Reclosing
 reclose1: {
   #D: {
@@ -47,7 +52,8 @@ reclose2: {
 }
 
 reclose3: {
-  #Step: (#A | #B) & {
+  #Step: {
+    (#A | #B)
     #Common
   }
   #Common: {
@@ -71,9 +77,14 @@ reclose3: {
 -- out/eval --
 Errors:
 reclose1.z: field `d` not allowed:
-    ./in.cue:23:8
-    ./in.cue:28:6
-    ./in.cue:29:6
+    ./in.cue:28:8
+    ./in.cue:33:6
+    ./in.cue:34:6
+recloseSimple.a: field `b` not allowed:
+    ./in.cue:16:9
+    ./in.cue:17:6
+    ./in.cue:17:7
+    ./in.cue:17:16
 
 Result:
 (_|_){
@@ -95,6 +106,21 @@ Result:
   }
   #TypeMeta: (#struct){
   }
+  recloseSimple: (_|_){
+    // [eval]
+    #foo: (#struct){
+    }
+    a: (_|_){
+      // [eval]
+      b: (_|_){
+        // [eval] recloseSimple.a: field `b` not allowed:
+        //     ./in.cue:16:9
+        //     ./in.cue:17:6
+        //     ./in.cue:17:7
+        //     ./in.cue:17:16
+      }
+    }
+  }
   reclose1: (_|_){
     // [eval]
     #D: (#struct){
@@ -113,9 +139,9 @@ Result:
       c: (int){ int }
       d: (_|_){
         // [eval] reclose1.z: field `d` not allowed:
-        //     ./in.cue:23:8
-        //     ./in.cue:28:6
-        //     ./in.cue:29:6
+        //     ./in.cue:28:8
+        //     ./in.cue:33:6
+        //     ./in.cue:34:6
       }
     }
   }
@@ -182,6 +208,14 @@ Result:
     replicas: int
   }
   #TypeMeta: {}
+  recloseSimple: {
+    #foo: {}
+    a: ({
+      〈1;#foo〉
+    } & {
+      b: int
+    })
+  }
   reclose1: {
     #D: {
       x: int
@@ -215,9 +249,10 @@ Result:
     }
   }
   reclose3: {
-    #Step: ((〈0;#A〉|〈0;#B〉) & {
+    #Step: {
+      (〈1;#A〉|〈1;#B〉)
       〈1;#Common〉
-    })
+    }
     #Common: {
       Name: string
     }

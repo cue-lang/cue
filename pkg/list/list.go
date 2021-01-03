@@ -123,6 +123,47 @@ func FlattenN(xs cue.Value, depth int) ([]cue.Value, error) {
 	return flattenN(xs, depth)
 }
 
+// Repeat returns a new list consisting of count copies of list x.
+//
+// For instance:
+//
+//    Repeat([1, 2], 2)
+//
+// results in
+//
+//    [1, 2, 1, 2]
+//
+func Repeat(x []cue.Value, count int) ([]cue.Value, error) {
+	if count < 0 {
+		return nil, fmt.Errorf("negative count")
+	}
+	var a []cue.Value
+	for i := 0; i < count; i++ {
+		a = append(a, x...)
+	}
+	return a, nil
+}
+
+// Concat takes a list of lists and concatenates them.
+//
+// Concat([a, b, c]) is equivalent to
+//
+//     [ for x in a {x}, for x in b {x}, for x in c {x} ]
+//
+func Concat(a []cue.Value) ([]cue.Value, error) {
+	var res []cue.Value
+	for _, e := range a {
+		iter, err := e.List()
+		if err != nil {
+			return nil, err
+		}
+		for iter.Next() {
+			res = append(res, iter.Value())
+		}
+	}
+	return res, nil
+}
+
 // Take reports the prefix of length n of list x, or x itself if n > len(x).
 //
 // For instance:

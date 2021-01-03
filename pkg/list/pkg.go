@@ -44,6 +44,31 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "Repeat",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.ListKind,
+		Func: func(c *internal.CallCtxt) {
+			x, count := c.List(0), c.Int(1)
+			if c.Do() {
+				c.Ret, c.Err = Repeat(x, count)
+			}
+		},
+	}, {
+		Name: "Concat",
+		Params: []internal.Param{
+			{Kind: adt.ListKind},
+		},
+		Result: adt.ListKind,
+		Func: func(c *internal.CallCtxt) {
+			a := c.List(0)
+			if c.Do() {
+				c.Ret, c.Err = Concat(a)
+			}
+		},
+	}, {
 		Name: "Take",
 		Params: []internal.Param{
 			{Kind: adt.ListKind},

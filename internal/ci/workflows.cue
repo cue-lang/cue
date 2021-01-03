@@ -107,7 +107,9 @@ workflows: [
 	if: "github.ref == 'refs/heads/master'"
 }
 
-test: json.#Workflow & {
+test: {
+	json.#Workflow
+
 	name: "Test"
 	on: {
 		push: {
@@ -133,7 +135,9 @@ test: json.#Workflow & {
 	}
 }
 
-test_dispatch: json.#Workflow & {
+test_dispatch: {
+	json.#Workflow
+	
 	#checkoutRef: #step & {
 		name: "Checkout ref"
 		run: """
@@ -282,7 +286,9 @@ release: {
 	}
 }
 
-rebuild_tip_cuelang_org: json.#Workflow & {
+rebuild_tip_cuelang_org: {
+	json.#Workflow
+	
 	name: "Push to tip"
 	on: push: branches: ["master"]
 	jobs: push: {

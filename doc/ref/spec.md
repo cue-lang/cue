@@ -1251,11 +1251,11 @@ A1: A & {
 ```
 
 A _closed struct_ `c` is a struct whose instances may not declare any field
-with a name that does not match the name of a regular or optional field,
+with a name that does not match the name of field
 or the pattern of a pattern constraint defined in `c`.
 Hidden fields are excluded from this limitation.
 A struct that is the result of unifying any struct with a [`...`](#Structs)
-declaration is defined for all fields.
+declaration is defined for all regular fields.
 Closing a struct is equivalent to adding `..._|_` to it.
 
 Syntactically, structs are closed explicitly with the `close` builtin or

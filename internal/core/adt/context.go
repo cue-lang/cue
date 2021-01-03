@@ -94,8 +94,11 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 		v.Path(),
 	}, args...)
 	for i := 2; i < len(a); i++ {
-		if n, ok := a[i].(Node); ok {
-			a[i] = c.Str(n)
+		switch x := a[i].(type) {
+		case Node:
+			a[i] = c.Str(x)
+		case Feature:
+			a[i] = x.SelectorString(c)
 		}
 	}
 	s := fmt.Sprintf(" [%d] %s/%v"+format, a...)

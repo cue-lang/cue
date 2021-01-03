@@ -7,18 +7,30 @@ foo: #foo & {
     _name: "foo"
     _#name: "bar"
 
-    #name: "baz" // TODO: this should not be allowed.
+    #name: "baz"
 }
 -- out/eval --
-(struct){
+Errors:
+foo: field `#name` not allowed:
+    ./in.cue:4:6
+    ./in.cue:9:5
+
+Result:
+(_|_){
+  // [eval]
   #foo: (#struct){
     name: (string){ string }
   }
-  foo: (#struct){
+  foo: (_|_){
+    // [eval]
     name: (string){ string }
     _name: (string){ "foo" }
     _#name: (string){ "bar" }
-    #name: (string){ "baz" }
+    #name: (_|_){
+      // [eval] foo: field `#name` not allowed:
+      //     ./in.cue:4:6
+      //     ./in.cue:9:5
+    }
   }
 }
 -- out/compile --

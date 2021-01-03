@@ -6,7 +6,7 @@
 Component: {
 	hostname: string | *"localhost"
 
-	#foo: {
+	_#foo: {
 		hello: "world"
 	}
 }
@@ -18,13 +18,13 @@ hello: #Schema & Component
   }
   Component: (struct){
     hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
-    #foo: (#struct){
+    _#foo: (#struct){
       hello: (string){ "world" }
     }
   }
   hello: (#struct){
     hostname: (string){ |(*(string){ "localhost" }, (string){ string }) }
-    #foo: (#struct){
+    _#foo: (#struct){
       hello: (string){ "world" }
     }
   }
@@ -37,7 +37,7 @@ hello: #Schema & Component
   }
   Component: {
     hostname: (string|*"localhost")
-    #foo: {
+    _#foo: {
       hello: "world"
     }
   }

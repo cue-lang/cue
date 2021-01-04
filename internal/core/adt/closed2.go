@@ -12,11 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package eval
-
-import (
-	"cuelang.org/go/internal/core/adt"
-)
+package adt
 
 // CloseDef defines how individual fieldSets (corresponding to conjuncts)
 // combine to determine whether a field is contained in a closed set.
@@ -29,20 +25,20 @@ import (
 // isComplexStruct reports whether the Closed information should be copied as a
 // subtree into the parent node using InsertSubtree. If not, the conjuncts can
 // just be inserted at the current ID.
-func isComplexStruct(ctx *adt.OpContext, v *adt.Vertex) bool {
+func isComplexStruct(ctx *OpContext, v *Vertex) bool {
 	return v.IsClosed(ctx)
 }
 
-func verifyArc(ctx *adt.OpContext, f adt.Feature, v *adt.Vertex, isClosed bool) (found bool, err *adt.Bottom) {
+func verifyArc2(ctx *OpContext, f Feature, v *Vertex, isClosed bool) (found bool, err *Bottom) {
 
 	defer ctx.ReleasePositions(ctx.MarkPositions())
 
-	if ok, required := adt.Accept(ctx, v.Parent, f); ok || (!required && !isClosed) {
+	if ok, required := Accept(ctx, v.Parent, f); ok || (!required && !isClosed) {
 		return true, nil
 	}
 
-	if !f.IsString() && f != adt.InvalidLabel {
-		// if f.IsHidden() && f != adt.InvalidLabel {
+	if !f.IsString() && f != InvalidLabel {
+		// if f.IsHidden() && f != InvalidLabel {
 		return false, nil
 	}
 

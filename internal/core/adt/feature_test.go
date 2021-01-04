@@ -19,14 +19,12 @@ import (
 	"testing"
 
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
 func TestFeatureBool(t *testing.T) {
 	r := runtime.New()
-	u := eval.New(r)
-	ctx := adt.NewContext(r, u, &adt.Vertex{})
+	ctx := adt.NewContext(r, &adt.Vertex{})
 
 	makeInt := func(x int64) adt.Feature {
 		f, _ := adt.MakeLabel(nil, 2, adt.IntLabel)

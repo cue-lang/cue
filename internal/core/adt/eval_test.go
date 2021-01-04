@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package eval_test
+package adt_test
 
 import (
 	"flag"
@@ -129,5 +129,5 @@ module: "example.com"
 
 	t.Error(debug.NodeString(r, v, nil))
 
-	t.Log(e.Stats())
+	t.Log(ctx.Stats())
 }

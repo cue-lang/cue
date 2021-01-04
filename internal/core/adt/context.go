@@ -102,33 +102,6 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 	_ = log.Output(2, s)
 }
 
-// A Unifier implements a strategy for CUE's unification operation. It must
-// handle the following aspects of CUE evaluation:
-//
-//    - Structural and reference cycles
-//    - Non-monotic validation
-//    - Fixed-point computation of comprehension
-//
-type Unifier interface {
-	// Unify fully unifies all values of a Vertex to completion and stores
-	// the result in the Vertex. If Unify was called on v before it returns
-	// the cached results.
-	Unify(c *OpContext, v *Vertex, state VertexStatus) // error or bool?
-
-	// Evaluate returns the evaluated value associated with v. It may return a
-	// partial result. That is, if v was not yet unified, it may return a
-	// concrete value that must be the result assuming the configuration has no
-	// errors.
-	//
-	// This semantics allows CUE to break reference cycles in a straightforward
-	// manner.
-	//
-	// Vertex v must still be evaluated at some point to catch the underlying
-	// error.
-	//
-	Evaluate(c *OpContext, v *Vertex) Value
-}
-
 // Runtime defines an interface for low-level representation conversion and
 // lookup.
 type Runtime interface {
@@ -150,23 +123,20 @@ type Runtime interface {
 
 type Config struct {
 	Runtime
-	Unifier
-
 	Format func(Node) string
 }
-
-type config = Config
 
 // New creates an operation context.
 func New(v *Vertex, cfg *Config) *OpContext {
 	if cfg.Runtime == nil {
 		panic("nil Runtime")
 	}
-	if cfg.Unifier == nil {
-		panic("nil Unifier")
-	}
 	ctx := &OpContext{
-		config: *cfg,
+		Runtime: cfg.Runtime,
+		Format:  cfg.Format,
+		Unifier: Unifier{
+			r: cfg.Runtime,
+		},
 		vertex: v,
 	}
 	if v != nil {
@@ -179,7 +149,9 @@ func New(v *Vertex, cfg *Config) *OpContext {
 // defined in this package. It tracks errors provides convenience methods for
 // evaluating values.
 type OpContext struct {
-	config
+	Runtime
+	Format func(Node) string
+	Unifier
 
 	e         *Environment
 	src       ast.Node
@@ -210,7 +182,7 @@ type OpContext struct {
 
 // Impl is for internal use only. This will go.
 func (c *OpContext) Impl() Runtime {
-	return c.config.Runtime
+	return c.Runtime
 }
 
 // If IsTentative is set, evaluation of an arc should not finalize
@@ -231,8 +203,8 @@ func (c *OpContext) Source() ast.Node {
 }
 
 // NewContext creates an operation context.
-func NewContext(r Runtime, u Unifier, v *Vertex) *OpContext {
-	return New(v, &Config{Runtime: r, Unifier: u})
+func NewContext(r Runtime, v *Vertex) *OpContext {
+	return New(v, &Config{Runtime: r})
 }
 
 func (c *OpContext) pos() token.Pos {

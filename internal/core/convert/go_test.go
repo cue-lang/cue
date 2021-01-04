@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -201,8 +200,7 @@ func TestConvert(t *testing.T) {
 	}}
 	r := runtime.New()
 	for _, tc := range testCases {
-		e := eval.New(r)
-		ctx := adt.NewContext(r, e, &adt.Vertex{})
+		ctx := adt.NewContext(r, &adt.Vertex{})
 		t.Run("", func(t *testing.T) {
 			v := convert.GoValueToValue(ctx, tc.goVal, true)
 			got := debug.NodeString(ctx, v, nil)
@@ -219,8 +217,7 @@ func TestX(t *testing.T) {
 	x := []string{}
 
 	r := runtime.New()
-	e := eval.New(r)
-	ctx := adt.NewContext(r, e, &adt.Vertex{})
+	ctx := adt.NewContext(r, &adt.Vertex{})
 
 	v := convert.GoValueToValue(ctx, x, false)
 	// if err != nil {
@@ -342,8 +339,7 @@ func TestConvertType(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			e := eval.New(r)
-			ctx := adt.NewContext(r, e, &adt.Vertex{})
+			ctx := adt.NewContext(r, &adt.Vertex{})
 			v, _ := convert.GoTypeToExpr(ctx, tc.goTyp)
 			got := debug.NodeString(ctx, v, nil)
 			if got != tc.want {

@@ -12,14 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package eval
+package adt
 
 import (
 	"sort"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal/core/adt"
 )
 
 // Nodes man not reenter a disjunction.
@@ -86,18 +85,18 @@ import (
 //     - So only need to check exact labels for vertices.
 
 type envDisjunct struct {
-	env         *adt.Environment
+	env         *Environment
 	values      []disjunct
 	numDefaults int
-	cloneID     adt.CloseInfo
+	cloneID     CloseInfo
 }
 
 type disjunct struct {
-	expr      adt.Expr
+	expr      Expr
 	isDefault bool
 }
 
-func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExpr, cloneID adt.CloseInfo) {
+func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, cloneID CloseInfo) {
 	a := make([]disjunct, 0, len(x.Values))
 
 	numDefaults := 0
@@ -117,7 +116,7 @@ func (n *nodeContext) addDisjunction(env *adt.Environment, x *adt.DisjunctionExp
 		envDisjunct{env, a, numDefaults, cloneID})
 }
 
-func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjunction, cloneID adt.CloseInfo) {
+func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
 	a := make([]disjunct, 0, len(x.Values))
 
 	for i, v := range x.Values {
@@ -129,7 +128,7 @@ func (n *nodeContext) addDisjunctionValue(env *adt.Environment, x *adt.Disjuncti
 }
 
 func (n *nodeContext) expandDisjuncts(
-	state adt.VertexStatus,
+	state VertexStatus,
 	parent *nodeContext,
 	m defaultMode,
 	recursive bool) {
@@ -155,7 +154,7 @@ func (n *nodeContext) expandDisjuncts(
 
 		if n.hasErr() {
 			x := n.node
-			err, ok := x.BaseValue.(*adt.Bottom)
+			err, ok := x.BaseValue.(*Bottom)
 			if !ok {
 				err = n.getErr()
 			}
@@ -185,7 +184,7 @@ func (n *nodeContext) expandDisjuncts(
 		if n.node.BaseValue == nil {
 			n.node.BaseValue = result.BaseValue
 		}
-		if state < adt.Finalized {
+		if state < Finalized {
 			*n = m
 		}
 		n.result = result
@@ -206,7 +205,7 @@ func (n *nodeContext) expandDisjuncts(
 				// partial evaluation. This will disable the closedness
 				// check and any other non-monotonic check that should
 				// not be done unless there is complete information.
-				state = adt.Partial
+				state = Partial
 			}
 
 			for _, dn := range a {
@@ -214,7 +213,7 @@ func (n *nodeContext) expandDisjuncts(
 					cn := dn.clone()
 					*cn.node = snapshotVertex(dn.snapshot)
 
-					c := adt.MakeConjunct(d.env, v.expr, d.cloneID)
+					c := MakeConjunct(d.env, v.expr, d.cloneID)
 					cn.addExprConjunct(c)
 
 					newMode := mode(d, v)
@@ -256,7 +255,7 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for _, v := range p.disjuncts {
-				if adt.Equal(n.ctx, &v.result, &d.result) {
+				if Equal(n.ctx, &v.result, &d.result) {
 					n.eval.freeNodeContext(n)
 					continue outer
 				}
@@ -276,10 +275,10 @@ func (n *nodeContext) expandDisjuncts(
 }
 
 func (n *nodeShared) makeError() {
-	code := adt.IncompleteError
+	code := IncompleteError
 
 	if len(n.disjunctErrs) > 0 {
-		code = adt.EvalError
+		code = EvalError
 		for _, c := range n.disjunctErrs {
 			if c.Code > code {
 				code = c.Code
@@ -287,11 +286,11 @@ func (n *nodeShared) makeError() {
 		}
 	}
 
-	b := &adt.Bottom{
+	b := &Bottom{
 		Code: code,
 		Err:  n.disjunctError(),
 	}
-	n.node.SetValue(n.ctx, adt.Finalized, b)
+	n.node.SetValue(n.ctx, Finalized, b)
 }
 
 func mode(d envDisjunct, v disjunct) defaultMode {
@@ -317,22 +316,22 @@ func mode(d envDisjunct, v disjunct) defaultMode {
 // longer needed and can become nil. All other fields can be copied shallowly.
 //
 // USE TO SAVE NODE BRANCH FOR DISJUNCTION, BUT BEFORE POSTDIJSUNCT.
-func snapshotVertex(v adt.Vertex) adt.Vertex {
+func snapshotVertex(v Vertex) Vertex {
 	if a := v.Arcs; len(a) > 0 {
-		v.Arcs = make([]*adt.Vertex, len(a))
+		v.Arcs = make([]*Vertex, len(a))
 		for i, arc := range a {
 			// For child arcs, only Conjuncts are set and Arcs and
 			// Structs will be nil.
 			a := *arc
 			v.Arcs[i] = &a
 
-			a.Conjuncts = make([]adt.Conjunct, len(arc.Conjuncts))
+			a.Conjuncts = make([]Conjunct, len(arc.Conjuncts))
 			copy(a.Conjuncts, arc.Conjuncts)
 		}
 	}
 
 	if a := v.Structs; len(a) > 0 {
-		v.Structs = make([]*adt.StructInfo, len(a))
+		v.Structs = make([]*StructInfo, len(a))
 		copy(v.Structs, a)
 	}
 
@@ -421,7 +420,7 @@ func (n *nodeShared) disjunctError() (errs errors.Error) {
 	return errs
 }
 
-func selectErrors(a []*adt.Bottom) (errs errors.Error) {
+func selectErrors(a []*Bottom) (errs errors.Error) {
 	// return all errors if less than a certain number.
 	if len(a) <= 2 {
 		for _, b := range a {
@@ -435,7 +434,7 @@ func selectErrors(a []*adt.Bottom) (errs errors.Error) {
 	isIncomplete := false
 	k := 0
 	for _, b := range a {
-		if !isIncomplete && b.Code >= adt.IncompleteError {
+		if !isIncomplete && b.Code >= IncompleteError {
 			k = 0
 			isIncomplete = true
 		}
@@ -447,7 +446,7 @@ func selectErrors(a []*adt.Bottom) (errs errors.Error) {
 	// filter errors
 	positions := map[token.Pos]bool{}
 
-	add := func(b *adt.Bottom, p token.Pos) bool {
+	add := func(b *Bottom, p token.Pos) bool {
 		if positions[p] {
 			return false
 		}

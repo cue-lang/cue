@@ -26,7 +26,7 @@ b: _|_ // conflicting values 210 and 200
 }
 -- out/eval --
 Errors:
-b: conflicting values 200 and 210:
+b: conflicting values 210 and 200:
     ./in.cue:2:4
     ./in.cue:3:4
 x: conflicting values 101 and 100:
@@ -38,7 +38,7 @@ Result:
   // [eval]
   a: (int){ 100 }
   b: (_|_){
-    // [eval] b: conflicting values 200 and 210:
+    // [eval] b: conflicting values 210 and 200:
     //     ./in.cue:2:4
     //     ./in.cue:3:4
   }

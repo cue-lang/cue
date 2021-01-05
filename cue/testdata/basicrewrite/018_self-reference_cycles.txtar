@@ -27,11 +27,11 @@ c: [c[1], c[0]]
 (struct){
   a: (_|_){
     // [cycle] cycle error:
-    //     ./in.cue:2:4
+    //     ./in.cue:1:4
   }
   b: (_|_){
     // [cycle] cycle error:
-    //     ./in.cue:2:4
+    //     ./in.cue:1:4
   }
   c: (#list){
     0: (_){ _ }

@@ -1071,7 +1071,7 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 	if result == nil {
 		return nil
 	}
-	return c.eval(result)
+	return c.evalState(result, Partial)
 }
 
 // A Builtin is a value representing a native function call.

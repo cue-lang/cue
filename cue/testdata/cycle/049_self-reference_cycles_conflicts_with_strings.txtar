@@ -42,10 +42,6 @@ Result:
       //     ./in.cue:2:5
       //     ./in.cue:5:7
     }
-    y: (_|_){
-      // [eval] a.x: conflicting values "hey!?" and "hey":
-      //     ./in.cue:2:5
-      //     ./in.cue:5:7
-    }
+    y: (string){ "hey!" }
   }
 }

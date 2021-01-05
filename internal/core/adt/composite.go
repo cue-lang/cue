@@ -137,7 +137,7 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		}
 		env, src := c.e, c.src
 		c.e, c.src = e, x.Source()
-		v = c.eval(x)
+		v = c.evalState(x, Partial)
 		c.e, c.src = env, src
 		e.cache[x] = v
 	}
@@ -161,7 +161,13 @@ type Vertex struct {
 	// Label is the feature leading to this vertex.
 	Label Feature
 
-	// TODO: move the following status fields to a separate struct.
+	// State:
+	//   eval: nil, BaseValue: nil -- unevaluated
+	//   eval: *,   BaseValue: nil -- evaluating
+	//   eval: *,   BaseValue: *   -- finalized
+	//
+	state *nodeContext
+	// TODO: move the following status fields to nodeContext.
 
 	// status indicates the evaluation progress of this vertex.
 	status VertexStatus
@@ -245,6 +251,10 @@ const (
 	// nodeContext to allow reusing the computations done so far.
 	Partial
 
+	// AllArcs is request only. It must be past Partial, but
+	// before recursively resolving arcs.
+	AllArcs
+
 	// EvaluatingArcs indicates that the arcs of the Vertex are currently being
 	// evaluated. If this is encountered it indicates a structural cycle.
 	// Value does not have to be nil
@@ -274,7 +284,6 @@ func (v *Vertex) UpdateStatus(s VertexStatus) {
 // Value returns the Value of v without definitions if it is a scalar
 // or itself otherwise.
 func (v *Vertex) Value() Value {
-	// TODO: rename to Value.
 	switch x := v.BaseValue.(type) {
 	case nil:
 		return nil
@@ -424,6 +433,15 @@ func Unwrap(v Value) Value {
 	x, ok := v.(*Vertex)
 	if !ok {
 		return v
+	}
+	// b, _ := x.BaseValue.(*Bottom)
+	if n := x.state; n != nil && x.BaseValue == cycle {
+		if n.errs != nil && !n.errs.IsIncomplete() {
+			return n.errs
+		}
+		if n.scalar != nil {
+			return n.scalar
+		}
 	}
 	return x.Value()
 }
@@ -575,13 +593,17 @@ func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 		// This is likely a bug in the evaluator and should not happen.
 		return &Bottom{Err: errors.Newf(token.NoPos, "cannot add conjunct")}
 	}
+	v.addConjunct(c)
+	return nil
+}
+
+func (v *Vertex) addConjunct(c Conjunct) {
 	for _, x := range v.Conjuncts {
 		if x == c {
-			return nil
+			return
 		}
 	}
 	v.Conjuncts = append(v.Conjuncts, c)
-	return nil
 }
 
 func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *StructInfo {

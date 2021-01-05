@@ -51,9 +51,10 @@ type Stats struct {
 	DisjunctCount int
 	UnifyCount    int
 
-	Freed  int
-	Reused int
-	Allocs int
+	Freed    int
+	Retained int
+	Reused   int
+	Allocs   int
 }
 
 var stats = template.Must(template.New("stats").Parse(`{{"" -}}
@@ -102,8 +103,7 @@ type Unifier struct {
 
 	stats Stats
 
-	freeListNode   *nodeContext
-	freeListShared *nodeShared
+	freeListNode *nodeContext
 }
 
 func (e *Unifier) Eval(v *Vertex) errors.Error {
@@ -129,36 +129,30 @@ func (e *Unifier) Eval(v *Vertex) errors.Error {
 //
 // TODO: return *Vertex
 func (e *Unifier) Evaluate(c *OpContext, v *Vertex) Value {
-	var result Vertex
+	return e.evaluate(c, v, Partial)
+}
 
-	if b, _ := v.BaseValue.(*Bottom); b != nil {
-		return b
+func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
+	if v.BaseValue == nil || v.BaseValue == cycle {
+		// Use node itself to allow for cycle detection.
+		e.Unify(c, v, state)
 	}
 
-	if v.BaseValue == nil {
-		save := *v
-		// Use node itself to allow for cycle detection.
-		s := e.evalVertex(c, v, Partial)
-		defer e.freeSharedNode(s)
-
-		result = *v
-
-		if s.result_.BaseValue != nil { // There is a complete result.
-			*v = s.result_
-			// result = *v
-		} else if b, ok := v.BaseValue.(*Bottom); ok {
-			*v = save
-			return b
-		} else {
-			*v = save
+	if n := v.state; n != nil {
+		if n.errs != nil && !n.errs.IsIncomplete() {
+			return n.errs
 		}
+		// TODO: consider enabling this
+		// if n.scalar != nil {
+		// 	return n.scalar
+		// }
+	}
 
-		switch {
-		case !s.touched:
-
-		case len(s.disjuncts) == 1 || s.numDefaults == 1:
-			// TODO: this seems unnecessary as long as we have a better way
-			// to handle incomplete, and perhaps referenced. nodes.
+	switch x := v.BaseValue.(type) {
+	case *Bottom:
+		return x
+	case *Disjunction:
+		if x.NumDefaults == 1 {
 			if c.IsTentative() && isStruct(v) {
 				// TODO(perf): do something more efficient perhaps? This discards
 				// the computed arcs so far. Instead, we could have a separate
@@ -172,67 +166,25 @@ func (e *Unifier) Evaluate(c *OpContext, v *Vertex) Value {
 					Conjuncts: v.Conjuncts,
 				}
 				w.UpdateStatus(v.Status())
-				*v = save
 				return w
 			}
+		}
+		return x
 
-		default:
-			d := s.createDisjunct()
-			last := len(d.Values) - 1
-			clone := *(d.Values[last])
-			d.Values[last] = &clone
-
-			v.UpdateStatus(Finalized)
-			v.BaseValue = d
-			v.Arcs = nil
-			v.Structs = nil // TODO: maybe not do this.
-			// The conjuncts will have too much information. Better have no
-			// information than incorrect information.
-			for _, d := range d.Values {
-				d.Conjuncts = nil
-				for _, a := range d.Arcs {
-					for _, x := range a.Conjuncts {
-						// All the environments for embedded structs need to be
-						// dereferenced.
-						for env := x.Env; env != nil && env.Vertex == v; env = env.Up {
-							env.Vertex = d
-						}
-					}
-				}
+	case nil:
+		if v.state != nil {
+			switch x := v.state.getValidators().(type) {
+			case Value:
+				return x
+			default:
+				w := *v
+				w.BaseValue = x
+				return &w
 			}
-
-			return d
 		}
-
-		err, _ := result.BaseValue.(*Bottom)
-		// BEFORE RESTORING, copy the value to return one
-		// with the temporary arcs.
-		if !s.done() && (err == nil || err.IsIncomplete()) {
-			// Clear values afterwards
-			*v = save
-		}
-		if s.hasResult() {
-			if b, _ := v.BaseValue.(*Bottom); b != nil {
-				*v = save
-				return b
-			}
-			// TODO: Only use result when not a cycle.
-			w := s.result()
-			v = &w
-		}
-		// TODO: Store if concrete and fully resolved.
+		panic("nil value")
 	}
 
-	// TODO: Use this and ensure that each use of Evaluate handles
-	// struct numbers correctly. E.g. by using a function that
-	// gets the concrete value.
-	//
-	if v.BaseValue == nil {
-		if result.BaseValue == nil {
-			panic("nil basevalue")
-		}
-		return &result
-	}
 	return v
 }
 
@@ -243,157 +195,174 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 	// defer c.PopVertex(c.PushVertex(v))
 
 	if state <= v.Status() {
-		return
+		if v.Status() != Partial && state != Partial {
+			return
+		}
 	}
 
-	if x := v.BaseValue; x != nil {
-		// if state == Partial || x == cycle {
-		// 	return
-		// }
+	n := v.state
+
+	switch v.Status() {
+	case Evaluating:
 		return
-	}
 
-	n := e.evalVertex(c, v, state)
-	defer e.freeSharedNode(n)
+	case EvaluatingArcs:
+		return
 
-	switch {
-	case len(n.disjuncts) == 1:
-		*v = n.disjuncts[0].result
+	case 0:
+		// from state 0
+		n = e.newNodeContext(c, v)
 
-	case len(n.disjuncts) > 0:
-		d := n.createDisjunct()
-		v.BaseValue = d
-		// The conjuncts will have too much information. Better have no
-		// information than incorrect information.
-		for _, d := range d.Values {
-			// We clear the conjuncts for now. As these disjuncts are for API
-			// use only, we will fill them out when necessary (using Defaults).
-			d.Conjuncts = nil
+		v.state = n
 
-			// TODO: use a more principled form of dereferencing. For instance,
-			// disjuncts could already be assumed to be the given Vertex, and
-			// the the main vertex could be dereferenced during evaluation.
-			for _, a := range d.Arcs {
-				for _, x := range a.Conjuncts {
-					// All the environments for embedded structs need to be
-					// dereferenced.
-					for env := x.Env; env != nil && env.Vertex == v; env = env.Up {
-						env.Vertex = d
+		if v.Label.IsDef() {
+			v.Closed = true
+		}
+
+		ignore := false
+		if v.Parent != nil {
+			if v.Parent.Closed {
+				v.Closed = true
+			}
+		}
+
+		if !v.Label.IsInt() && v.Parent != nil && !ignore && state == Finalized {
+			// Visit arcs recursively to validate and compute error.
+			if _, err := verifyArc2(c, v.Label, v, v.Closed); err != nil {
+				// Record error in child node to allow recording multiple
+				// conflicts at the appropriate place, to allow valid fields to
+				// be represented normally and, most importantly, to avoid
+				// recursive processing of a disallowed field.
+				v.SetValue(c, Finalized, err)
+				return
+			}
+		}
+
+		defer c.PopArc(c.PushArc(v))
+
+		e.stats.UnifyCount++
+
+		// Clear any remaining error.
+		if err := c.Err(); err != nil {
+			panic("uncaught error")
+		}
+
+		// Set the cache to a cycle error to ensure a cyclic reference will result
+		// in an error if applicable. A cyclic error may be ignored for
+		// non-expression references. The cycle error may also be removed as soon
+		// as there is evidence what a correct value must be, but before all
+		// validation has taken place.
+		v.BaseValue = cycle
+
+		v.UpdateStatus(Evaluating)
+
+		// If the result is a struct, it needs to be closed if:
+		//   1) this node introduces a definition
+		//   2) this node is a child of a node that introduces a definition,
+		//      recursively.
+		//   3) this node embeds a closed struct.
+
+		for _, x := range v.Conjuncts {
+			// TODO: needed for reentrancy. Investigate usefulness for cycle
+			// detection.
+			n.addExprConjunct(x)
+		}
+
+		fallthrough
+
+	case Partial:
+		defer c.PopArc(c.PushArc(v))
+
+		// Use maybeSetCache for cycle breaking
+		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
+		}
+
+		if !n.done() {
+			if len(n.disjunctions) > 0 && v.BaseValue == cycle {
+				// We disallow entering computations of disjunctions with
+				// incomplete data.
+				if state == Finalized {
+					b := c.NewErrf("incomplete cause disjunction")
+					b.Code = IncompleteError
+					n.errs = CombineErrors(nil, n.errs, b)
+					v.SetValue(n.ctx, Finalized, b)
+				} else {
+					n.node.UpdateStatus(Partial)
+				}
+				return
+			}
+		}
+
+		if !n.done() && state <= Partial {
+			n.node.UpdateStatus(Partial)
+			return
+		}
+
+		if s := v.Status(); state <= s {
+			// We have found a partial result. There may still be errors
+			// down the line which may result from further evaluating this
+			// field, but that will be caught when evaluating this field
+			// for real.
+
+			// This also covers the case where a recursive evaluation triggered
+			// this field to become finalized in the mean time. In that case
+			// we can avoid running another expandDisjuncts.
+			return
+		}
+
+		n.expandDisjuncts(state, nil, maybeDefault, false)
+
+		switch len(n.disjuncts) {
+		case 0:
+		case 1:
+			*v = n.disjuncts[0].result
+
+		default:
+			d := n.createDisjunct()
+			v.BaseValue = d
+			// The conjuncts will have too much information. Better have no
+			// information than incorrect information.
+			for _, d := range d.Values {
+				// We clear the conjuncts for now. As these disjuncts are for API
+				// use only, we will fill them out when necessary (using Defaults).
+				d.Conjuncts = nil
+
+				// TODO: use a more principled form of dereferencing. For instance,
+				// disjuncts could already be assumed to be the given Vertex, and
+				// the the main vertex could be dereferenced during evaluation.
+				for _, a := range d.Arcs {
+					for _, x := range a.Conjuncts {
+						// All the environments for embedded structs need to be
+						// dereferenced.
+						for env := x.Env; env != nil && env.Vertex == v; env = env.Up {
+							env.Vertex = d
+						}
 					}
 				}
 			}
+			v.Arcs = nil
+			// v.Structs = nil // TODO: should we keep or discard the Structs?
+			// TODO: how to represent closedness information? Do we need it?
 		}
-		v.Arcs = nil
-		// v.Structs = nil // TODO: should we keep or discard the Structs?
-		// TODO: how to represent closedness information? Do we need it?
 
-	default:
-		if r := n.result(); r.BaseValue != nil {
-			*v = r
+		if state != Finalized {
+			return
 		}
-	}
 
-	// Else set it to something.
-
-	if v.BaseValue == nil {
-		panic("error")
-	}
-
-	// Check whether result is done.
-}
-
-// evalVertex computes the vertex results. The state indicates the minimum
-// status to which this vertex should be evaluated. It should be either
-// Finalized or Partial.
-func (e *Unifier) evalVertex(c *OpContext, v *Vertex, state VertexStatus) *nodeShared {
-	shared := e.newSharedNode(c, v)
-
-	if v.Label.IsDef() {
-		v.Closed = true
-	}
-
-	ignore := false
-	if v.Parent != nil {
-		if v.Parent.Closed {
-			v.Closed = true
+		if v.BaseValue == nil {
+			v.BaseValue = n.getValidators()
 		}
+
+		// Free memory here?
+		v.UpdateStatus(Finalized)
+
+	case AllArcs:
+		defer c.PopArc(c.PushArc(v))
+
+		n.completeArcs(state)
+
+	case Finalized:
 	}
-
-	if !v.Label.IsInt() && v.Parent != nil && !ignore && state == Finalized {
-		// Visit arcs recursively to validate and compute error.
-		if _, err := verifyArc2(c, v.Label, v, v.Closed); err != nil {
-			// Record error in child node to allow recording multiple
-			// conflicts at the appropriate place, to allow valid fields to
-			// be represented normally and, most importantly, to avoid
-			// recursive processing of a disallowed field.
-			v.SetValue(c, Finalized, err)
-			return shared
-		}
-	}
-
-	defer c.PopArc(c.PushArc(v))
-
-	e.stats.UnifyCount++
-
-	// Clear any remaining error.
-	if err := c.Err(); err != nil {
-		panic("uncaught error")
-	}
-
-	// Set the cache to a cycle error to ensure a cyclic reference will result
-	// in an error if applicable. A cyclic error may be ignored for
-	// non-expression references. The cycle error may also be removed as soon
-	// as there is evidence what a correct value must be, but before all
-	// validation has taken place.
-	v.BaseValue = cycle
-
-	v.UpdateStatus(Evaluating)
-
-	// If the result is a struct, it needs to be closed if:
-	//   1) this node introduces a definition
-	//   2) this node is a child of a node that introduces a definition,
-	//      recursively.
-	//   3) this node embeds a closed struct.
-	n := e.newNodeContext(shared)
-
-	for _, x := range v.Conjuncts {
-		// TODO: needed for reentrancy. Investigate usefulness for cycle
-		// detection.
-		n.addExprConjunct(x)
-	}
-
-	// Use maybeSetCache for cycle breaking
-	for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
-	}
-	if v.Status() > Evaluating && state <= Partial {
-		// We have found a partial result. There may still be errors
-		// down the line which may result from further evaluating this
-		// field, but that will be caught when evaluating this field
-		// for real.
-		shared.setResult(v)
-		e.freeNodeContext(n)
-		return shared
-	}
-
-	if !n.done() && len(n.disjunctions) > 0 && isEvaluating(v) {
-		// We disallow entering computations of disjunctions with
-		// incomplete data.
-		b := c.NewErrf("incomplete cause disjunction")
-		b.Code = IncompleteError
-		v.SetValue(n.ctx, Finalized, b)
-		shared.setResult(v)
-		e.freeNodeContext(n)
-		return shared
-	}
-
-	n.expandDisjuncts(state, nil, maybeDefault, false)
-	// TODO: reorganize nodeShared and nodeContext
-	n.nodeShared.disjuncts = append(n.nodeShared.disjuncts, n.disjuncts...)
-	if v.BaseValue == nil {
-		v.BaseValue = n.getValidators()
-	}
-	// e.freeNodeContext(n) freed in freeSharedNode
-	return shared
 }
 
 func isStruct(v *Vertex) bool {
@@ -426,7 +395,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		n.errs = nil
 
 	default:
-		if isEvaluating(n.node) {
+		if n.node.BaseValue == cycle {
 			if !n.done() { // && !ctx.IsTentative() {
 				// collect incomplete errors.
 				var err *Bottom // n.incomplete
@@ -453,7 +422,8 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		}
 
 		// We are no longer evaluating.
-		n.node.UpdateStatus(Partial)
+		// n.node.UpdateStatus(Partial)
+		n.node.UpdateStatus(Evaluating)
 
 		// Either set to Conjunction or error.
 		// TODO: verify and simplify the below code to determine whether
@@ -497,21 +467,20 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 					n.addBottom(b)
 				}
 			}
-			for _, v := range n.checks {
-				// TODO(errors): make Validate return bottom and generate
-				// optimized conflict message. Also track and inject IDs
-				// to determine origin location.s
-				if b := ctx.Validate(v, n.node); b != nil {
-					n.addBottom(b)
+			// MOVE BELOW
+			if v := n.node.Value(); v != nil && IsConcrete(v) {
+				for _, v := range n.checks {
+					// TODO(errors): make Validate return bottom and generate
+					// optimized conflict message. Also track and inject IDs
+					// to determine origin location.s
+					if b := ctx.Validate(v, n.node); b != nil {
+						n.addBottom(b)
+					}
 				}
 			}
-
-		} else if !ctx.IsTentative() {
+		} else if state == Finalized {
 			n.node.BaseValue = n.getValidators()
 		}
-		// else if v == nil {
-		// 	n.node.Value = incompleteSentinel
-		// }
 
 		if v == nil {
 			break
@@ -551,6 +520,14 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 }
 
 func (n *nodeContext) completeArcs(state VertexStatus) {
+
+	if state <= AllArcs {
+		n.node.UpdateStatus(AllArcs)
+		return
+	}
+
+	n.node.UpdateStatus(EvaluatingArcs)
+
 	ctx := n.ctx
 
 	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
@@ -567,17 +544,19 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 		for _, a := range n.node.Arcs {
 			// Call UpdateStatus here to be absolutely sure the status is set
 			// correctly and that we are not regressing.
-			if state == Finalized {
-				n.node.UpdateStatus(EvaluatingArcs)
+			n.node.UpdateStatus(EvaluatingArcs)
+			n.ctx.Unifier.Unify(ctx, a, state)
+			// Don't set the state to Finalized if the child arcs are not done.
+			if state == Finalized && a.status < Finalized {
+				state = AllArcs
 			}
-			n.eval.Unify(ctx, a, state)
 			if err, _ := a.BaseValue.(*Bottom); err != nil {
 				n.node.AddChildError(err)
 			}
 		}
 	}
 
-	n.node.UpdateStatus(Finalized)
+	n.node.UpdateStatus(state)
 }
 
 // TODO: this is now a sentinel. Use a user-facing error that traces where
@@ -587,101 +566,24 @@ var cycle = &Bottom{
 	Code: CycleError,
 }
 
-func isEvaluating(v *Vertex) bool {
-	isCycle := v.Status() == Evaluating
-	if isCycle != (v.BaseValue == cycle) {
-		panic(fmt.Sprintf("cycle data of sync %d vs %#v", v.Status(), v.BaseValue))
-	}
-	return isCycle
-}
-
-// TODO(perf): merge this type with nodeContext once we're certain we can
-// remove the distinction (after other optimizations).
-type nodeShared struct {
-	nextFree *nodeShared
-
-	eval *Unifier
-	ctx  *OpContext
-	node *Vertex
-
-	// Disjunction handling
-	touched      bool
-	disjuncts    []*nodeContext
-	disjunctErrs []*Bottom
-	numDefaults  int
-
-	result_ Vertex
-	isDone  bool
-}
-
-func (e *Unifier) newSharedNode(ctx *OpContext, node *Vertex) *nodeShared {
-	if n := e.freeListShared; n != nil {
-		e.stats.Reused++
-		e.freeListShared = n.nextFree
-
-		*n = nodeShared{
-			eval: e,
-			ctx:  ctx,
-			node: node,
-
-			disjuncts:    n.disjuncts[:0],
-			disjunctErrs: n.disjunctErrs[:0],
-		}
-
-		return n
-	}
-	e.stats.Allocs++
-
-	return &nodeShared{
-		ctx:  ctx,
-		eval: e,
-		node: node,
-	}
-}
-
-func (e *Unifier) freeSharedNode(n *nodeShared) {
-	e.stats.Freed++
-	n.nextFree = e.freeListShared
-	e.freeListShared = n
-
-	for _, d := range n.disjuncts {
-		e.freeNodeContext(d)
-	}
-}
-
-func (n *nodeShared) createDisjunct() *Disjunction {
+func (n *nodeContext) createDisjunct() *Disjunction {
 	a := make([]*Vertex, len(n.disjuncts))
 	p := 0
 	for i, x := range n.disjuncts {
-		v := x.result
+		v := new(Vertex)
+		*v = x.result
 		if x.defaultMode == isDefault {
 			a[i] = a[p]
-			a[p] = &v
+			a[p] = v
 			p++
 		} else {
-			a[i] = &v
+			a[i] = v
 		}
 	}
 	return &Disjunction{
 		Values:      a,
 		NumDefaults: p,
 	}
-}
-
-func (n *nodeShared) result() Vertex {
-	return n.result_
-}
-
-func (n *nodeShared) setResult(v *Vertex) {
-	n.result_ = *v
-}
-
-func (n *nodeShared) hasResult() bool {
-	return len(n.disjuncts) > 0
-}
-
-func (n *nodeShared) done() bool {
-	return n.isDone
 }
 
 type arcKey struct {
@@ -696,7 +598,8 @@ type arcKey struct {
 type nodeContext struct {
 	nextFree *nodeContext
 
-	*nodeShared
+	ctx  *OpContext
+	node *Vertex
 
 	// TODO: (this is CL is first step)
 	// filter *Vertex a subset of composite with concrete fields for
@@ -742,16 +645,21 @@ type nodeContext struct {
 	hasTop      bool
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
+	isDone      bool
 
 	// Disjunction handling
 	disjunctions []envDisjunct
 	defaultMode  defaultMode
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
+	disjunctErrs []*Bottom
 }
 
 func (n *nodeContext) clone() *nodeContext {
-	d := n.eval.newNodeContext(n.nodeShared)
+	d := n.ctx.Unifier.newNodeContext(n.ctx, n.node)
+
+	d.ctx = n.ctx
+	d.node = n.node
 
 	d.scalar = n.scalar
 	d.scalarID = n.scalarID
@@ -782,14 +690,15 @@ func (n *nodeContext) clone() *nodeContext {
 	return d
 }
 
-func (e *Unifier) newNodeContext(shared *nodeShared) *nodeContext {
+func (e *Unifier) newNodeContext(ctx *OpContext, node *Vertex) *nodeContext {
 	if n := e.freeListNode; n != nil {
 		e.stats.Reused++
 		e.freeListNode = n.nextFree
 
 		*n = nodeContext{
+			ctx:           ctx,
+			node:          node,
 			kind:          TopKind,
-			nodeShared:    shared,
 			arcMap:        n.arcMap[:0],
 			checks:        n.checks[:0],
 			dynamicFields: n.dynamicFields[:0],
@@ -799,6 +708,7 @@ func (e *Unifier) newNodeContext(shared *nodeShared) *nodeContext {
 			vLists:        n.vLists[:0],
 			exprs:         n.exprs[:0],
 			disjunctions:  n.disjunctions[:0],
+			disjunctErrs:  n.disjunctErrs[:0],
 			disjuncts:     n.disjuncts[:0],
 			buffer:        n.buffer[:0],
 		}
@@ -808,15 +718,28 @@ func (e *Unifier) newNodeContext(shared *nodeShared) *nodeContext {
 	e.stats.Allocs++
 
 	return &nodeContext{
-		kind:       TopKind,
-		nodeShared: shared,
+		ctx:  ctx,
+		node: node,
+		kind: TopKind,
 	}
 }
 
+func (v *Vertex) getNodeContext(c *OpContext) *nodeContext {
+	if v.state != nil {
+		if v.status == Finalized {
+			panic("dangling node")
+		}
+		return v.state
+	}
+	v.state = c.Unifier.newNodeContext(c, v)
+	return v.state
+}
+
 func (e *Unifier) freeNodeContext(n *nodeContext) {
-	e.stats.Freed++
-	n.nextFree = e.freeListNode
-	e.freeListNode = n
+	// TODO: re-enable memory management.
+	// e.stats.Freed++
+	// n.nextFree = e.freeListNode
+	// e.freeListNode = n
 }
 
 // TODO(perf): return a dedicated ConflictError that can track original
@@ -953,16 +876,18 @@ func (n *nodeContext) getValidators() BaseValue {
 	return v
 }
 
+// TODO: this function can probably go as this is now handled in the nodeContext.
 func (n *nodeContext) maybeSetCache() {
-	if n.node.Status() > Evaluating { // n.node.BaseValue != nil
+	if n.node.Status() > Partial { // n.node.BaseValue != nil
 		return
 	}
 	if n.scalar != nil {
 		n.node.SetValue(n.ctx, Partial, n.scalar)
 	}
-	if n.errs != nil {
-		n.node.SetValue(n.ctx, Partial, n.errs)
-	}
+	// NOTE: this is now handled by associating the nodeContext
+	// if n.errs != nil {
+	// 	n.node.SetValue(n.ctx, Partial, n.errs)
+	// }
 }
 
 type envExpr struct {
@@ -1641,16 +1566,41 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	ctx := n.ctx
 	arc, isNew := n.node.GetArc(f)
 
-	// TODO: disallow adding conjuncts when cache set?
-	arc.AddConjunct(x)
+	arc.addConjunct(x)
 
-	if isNew {
+	switch {
+	case isNew:
 		for _, s := range n.node.Structs {
 			if s.Disable {
 				continue
 			}
 			s.MatchAndInsert(ctx, arc)
 		}
+
+	case arc.state != nil:
+		s := arc.state
+		switch {
+		case arc.Status() <= AllArcs:
+			// This may happen when a struct has multiple comprehensions, where
+			// the insertion of one of which depends on the outcome of another.
+
+			// TODO: to something more principled by allowing values to
+			// monotonically increase.
+			arc.status = Partial
+			arc.BaseValue = nil
+			s.disjuncts = s.disjuncts[:0]
+			s.disjunctErrs = s.disjunctErrs[:0]
+
+			fallthrough
+
+		default:
+			arc.state.addExprConjunct(x)
+		}
+
+	case arc.Status() == 0:
+	default:
+		// TODO: handle adding to finalized conjunct
+		panic("unhandled")
 	}
 	return arc
 }

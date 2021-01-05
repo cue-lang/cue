@@ -504,7 +504,7 @@ func (c *OpContext) getDefault(v Value) (result Value, ok bool) {
 func (c *OpContext) Evaluate(env *Environment, x Expr) (result Value, complete bool) {
 	s := c.PushState(env, x.Source())
 
-	val := c.eval(x)
+	val := c.evalState(x, Partial)
 
 	complete = true
 
@@ -538,11 +538,6 @@ func (c *OpContext) value(x Expr) (result Value) {
 
 	v, _ = c.getDefault(v)
 	v = Unwrap(v)
-	return v
-}
-
-func (c *OpContext) eval(x Expr) (result Value) {
-	v := c.evalState(x, Partial)
 	return v
 }
 
@@ -583,14 +578,11 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		if c.HasErr() {
 			return nil
 		}
-		if isIncomplete(arc) {
-			if arc != nil {
-				return arc.Value() // *Bottom
-			}
+		if arc == nil {
 			return nil
 		}
 
-		v := c.Unifier.Evaluate(c, arc)
+		v := c.Unifier.evaluate(c, arc, state)
 		return v
 
 	default:
@@ -728,7 +720,9 @@ func pos(x Node) token.Pos {
 func (c *OpContext) node(orig Node, x Expr, scalar bool) *Vertex {
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
-	v := c.evalState(x, EvaluatingArcs)
+	// This must be partial, because
+	// TODO: this should always be "AllArcs"
+	v := c.evalState(x, AllArcs)
 
 	v, ok := c.getDefault(v)
 	if !ok {

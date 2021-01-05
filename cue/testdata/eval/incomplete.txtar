@@ -48,21 +48,19 @@ Result:
   E: (struct){
     a: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:12:6
-      // cycle error:
-      //     ./in.cue:13:6
+      //     ./in.cue:11:6
     }
     b: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:12:6
+      //     ./in.cue:11:6
       // cycle error:
-      //     ./in.cue:13:6
+      //     ./in.cue:12:6
     }
     c: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:12:6
+      //     ./in.cue:11:6
       // cycle error:
-      //     ./in.cue:13:6
+      //     ./in.cue:12:6
     }
   }
   permanentlyIncompleteOperands: (_|_){

@@ -409,6 +409,7 @@ b7.a.0: structural cycle
 c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
 d1.r: structural cycle
+d2.r.c.d.t: structural cycle
 e1.a.c: structural cycle
 e1.b.c: structural cycle
 e2.a.c: structural cycle
@@ -468,10 +469,6 @@ p3.#U.#T.a.b.link: structural cycle
 p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 z1.z.g.h: structural cycle
-b4.x.y.0.0: structural cycle:
-    ./in.cue:53:8
-d2.r.c.d.t: structural cycle:
-    ./in.cue:254:8
 0: structural cycle:
     ./in.cue:264:19
 
@@ -561,9 +558,10 @@ Result:
   b4: (_|_){
     // [structural cycle]
     b: (_|_){
-      // [structural cycle] b4.x.y.0.0: structural cycle:
-      //     ./in.cue:53:8
-      0: (int){ 1 }
+      // [structural cycle]
+      0: (_|_){
+        // [structural cycle] b4.x.y.0: structural cycle
+      }
     }
     x: (_|_){
       // [structural cycle]
@@ -586,9 +584,7 @@ Result:
     x: (struct){
       y: (struct){
         a: (#list){
-          0: ((int|list)){ |((#list){
-              0: (int){ int }
-            }, (int){ int }) }
+          0: (int){ int }
         }
       }
     }
@@ -1053,8 +1049,14 @@ Result:
   d2: (_|_){
     // [structural cycle]
     x: (_|_){
-      // [structural cycle] d2.r.c.d.t: structural cycle:
-      //     ./in.cue:254:8
+      // [structural cycle]
+      d: (_|_){
+        // [structural cycle]
+        h: (int){ int }
+        t: (_|_){
+          // [structural cycle]
+        }
+      }
     }
     r: (_|_){
       // [structural cycle]
@@ -1064,8 +1066,7 @@ Result:
           // [structural cycle]
           h: (int){ int }
           t: (_|_){
-            // [structural cycle] d2.r.c.d.t: structural cycle:
-            //     ./in.cue:254:8
+            // [structural cycle] d2.r.c.d.t: structural cycle
             c: (_|_){// {
               //   d: {
               //     h: int
@@ -1088,6 +1089,16 @@ Result:
             h: (int){ int }
             t: (_|_){
               // [structural cycle]
+              c: (_|_){
+                // [structural cycle]
+                d: (_|_){
+                  // [structural cycle]
+                  h: (int){ int }
+                  t: (_|_){
+                    // [structural cycle]
+                  }
+                }
+              }
             }
           }
         }

@@ -49,11 +49,11 @@ s3:  strings.ContainsAny(str, "dd")
   n1: (struct){
     min: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:3:23
+      //     ./in.cue:3:12
     }
     max: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:3:23
+      //     ./in.cue:3:12
     }
   }
   n2: (_|_){

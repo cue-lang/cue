@@ -25,8 +25,9 @@ bar: [
 ]
 -- out/eval --
 (struct){
-  somelist: (#list){
-  }
+  somelist: (list){ |(*(#list){
+    }, (list){
+    }) }
   foo: (#list){
   }
   otherlist: (#list){

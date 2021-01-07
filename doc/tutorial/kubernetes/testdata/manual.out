@@ -159,7 +159,7 @@ deployment: {
             etcd:           "etcd:2379"
             "event-server": "events:7788"
         }
-        args: ["-etcd=etcd:2379", "-event-server=events:7788"] | []
+        args: ["-etcd=etcd:2379", "-event-server=events:7788"]
         env: {}
         label: {
             app:       "breaddispatcher"
@@ -255,7 +255,7 @@ kubernetes: {
                         containers: [{
                             name:  "breaddispatcher"
                             image: "gcr.io/myproj/breaddispatcher:v0.3.24"
-                            args:  ["-etcd=etcd:2379", "-event-server=events:7788"] | []
+                            args: ["-etcd=etcd:2379", "-event-server=events:7788"]
                             ports: [{
                                 name:          "http"
                                 containerPort: 7080
@@ -537,7 +537,7 @@ deployment: {
             }
         }
         port: {}
-        args: ["-http=:8080", "-etcd=etcd:2379"] | []
+        args: ["-http=:8080", "-etcd=etcd:2379"]
         env: {}
         label: {
             app:       "valeter"
@@ -633,7 +633,7 @@ kubernetes: {
                         containers: [{
                             name:  "valeter"
                             image: "gcr.io/myproj/valeter:v0.0.4"
-                            args:  ["-http=:8080", "-etcd=etcd:2379"] | []
+                            args: ["-http=:8080", "-etcd=etcd:2379"]
                             ports: [{
                                 name:          "http"
                                 containerPort: 8080
@@ -790,7 +790,7 @@ deployment: {
             http: ":8080"
             etcd: "etcd:2379"
         }
-        args: ["-http=:8080", "-etcd=etcd:2379"] | []
+        args: ["-http=:8080", "-etcd=etcd:2379"]
         env: {}
         label: {
             app:       "waterdispatcher"
@@ -886,7 +886,7 @@ kubernetes: {
                         containers: [{
                             name:  "waterdispatcher"
                             image: "gcr.io/myproj/waterdispatcher:v0.0.48"
-                            args:  ["-http=:8080", "-etcd=etcd:2379"] | []
+                            args: ["-http=:8080", "-etcd=etcd:2379"]
                             ports: [{
                                 name:          "http"
                                 containerPort: 7080
@@ -1130,7 +1130,7 @@ deployment: {
             }
         }
         port: {}
-        args: ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"] | []
+        args: ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"]
         label: {
             app:       "etcd"
             domain:    "prod"
@@ -1245,7 +1245,7 @@ kubernetes: {
                         containers: [{
                             name:  "etcd"
                             image: "quay.io/coreos/etcd:v3.3.10"
-                            args:  ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"] | []
+                            args: ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"]
                             command: ["/usr/local/bin/etcd"]
                             volumeMounts: [{
                                 name:      "etcd3"
@@ -1329,7 +1329,7 @@ deployment: {
                 grpc: 7788
             }
         }
-        args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"] | []
+        args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
         env: {}
         volume: {
             "secret-volume": {
@@ -1454,7 +1454,7 @@ kubernetes: {
                         containers: [{
                             name:  "events"
                             image: "gcr.io/myproj/events:v0.1.31"
-                            args:  ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"] | []
+                            args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
                             volumeMounts: [{
                                 name:      v.name
                                 mountPath: v.mountPath
@@ -1986,7 +1986,7 @@ deployment: {
             ca:               "/etc/certs/servfx.ca"
             "ssh-tunnel-key": "/sslcerts/tunnel-private.pem"
         }
-        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem"] | []
+        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem"]
         env: {}
         volume: {
             "caller-disk": {
@@ -2130,7 +2130,7 @@ kubernetes: {
                         containers: [{
                             name:  "caller"
                             image: "gcr.io/myproj/caller:v0.20.14"
-                            args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem"] | []
+                            args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -2207,7 +2207,7 @@ deployment: {
             "event-server":   "events:7788"
             "ssh-tunnel-key": "/etc/certs/tunnel-private.pem"
         }
-        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"] | []
+        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"]
         env: {}
         volume: {
             "secret-ssh-key": {
@@ -2351,7 +2351,7 @@ kubernetes: {
                         containers: [{
                             name:  "dishwasher"
                             image: "gcr.io/myproj/dishwasher:v0.2.13"
-                            args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"] | []
+                            args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -2428,7 +2428,7 @@ deployment: {
             "event-server":   "events:7788"
             "ssh-tunnel-key": "/etc/certs/tunnel-private.pem"
         }
-        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"] | []
+        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"]
         env: {}
         volume: {
             "expiditer-disk": {
@@ -2560,7 +2560,7 @@ kubernetes: {
                         containers: [{
                             name:  "expiditer"
                             image: "gcr.io/myproj/expiditer:v0.5.34"
-                            args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"] | []
+                            args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -2625,7 +2625,7 @@ deployment: {
             logdir:         "/logs"
             "event-server": "events:7788"
         }
-        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"] | []
+        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
         env: {}
         volume: {
             "secret-headchef": {
@@ -2757,7 +2757,7 @@ kubernetes: {
                         containers: [{
                             name:  "headchef"
                             image: "gcr.io/myproj/headchef:v0.2.16"
-                            args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788"] | []
+                            args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -2826,7 +2826,7 @@ deployment: {
             "reconnect-delay":   "1h"
             "-recovery-overlap": "100000"
         }
-        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-name=linecook", "-etcd=etcd:2379", "-reconnect-delay=1h", "--recovery-overlap=100000"] | []
+        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-name=linecook", "-etcd=etcd:2379", "-reconnect-delay=1h", "--recovery-overlap=100000"]
         env: {}
         volume: {
             "secret-linecook": {
@@ -2958,7 +2958,7 @@ kubernetes: {
                         containers: [{
                             name:  "linecook"
                             image: "gcr.io/myproj/linecook:v0.1.42"
-                            args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-name=linecook", "-etcd=etcd:2379", "-reconnect-delay=1h", "--recovery-overlap=100000"] | []
+                            args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-name=linecook", "-etcd=etcd:2379", "-reconnect-delay=1h", "--recovery-overlap=100000"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"
@@ -3027,7 +3027,7 @@ deployment: {
             etcd:               "etcd:2379"
             "recovery-overlap": "10000"
         }
-        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"] | []
+        args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
         env: {}
         volume: {
             "secret-pastrychef": {
@@ -3159,7 +3159,7 @@ kubernetes: {
                         containers: [{
                             name:  "pastrychef"
                             image: "gcr.io/myproj/pastrychef:v0.1.15"
-                            args:  ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"] | []
+                            args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
                             livenessProbe: {
                                 httpGet: {
                                     path: "/debug/health"

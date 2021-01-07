@@ -43,6 +43,10 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value) bool {
 		return false
 	}
 
+	if x.IsClosed(ctx) != y.IsClosed(ctx) {
+		return false
+	}
+
 loop1:
 	for _, a := range x.Arcs {
 		for _, b := range y.Arcs {

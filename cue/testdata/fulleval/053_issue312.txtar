@@ -21,5 +21,6 @@ for x in [1] *close({}) | {
 -- out/legacy-debug --
 <0>{ <1>for _, x in [1] yield <2>{}, (*close (<3>{}) | <4>{[]: <5>(_: string)->null, })}
 -- out/eval --
-(#struct){
-}
+(struct){ |(*(#struct){
+  }, (struct){
+  }) }

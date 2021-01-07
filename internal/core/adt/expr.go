@@ -1323,6 +1323,7 @@ type Disjunction struct {
 
 	// NumDefaults indicates the number of default values.
 	NumDefaults int
+	HasDefaults bool
 }
 
 func (x *Disjunction) Source() ast.Node { return x.Src }

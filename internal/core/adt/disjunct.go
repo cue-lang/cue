@@ -88,10 +88,12 @@ type envDisjunct struct {
 	env         *Environment
 	values      []disjunct
 	numDefaults int
+	hasDefaults bool
 	cloneID     CloseInfo
 }
 
 type disjunct struct {
+	v         *Vertex
 	expr      Expr
 	isDefault bool
 }
@@ -105,7 +107,7 @@ func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, clone
 		if isDef {
 			numDefaults++
 		}
-		a = append(a, disjunct{v.Val, isDef})
+		a = append(a, disjunct{nil, v.Val, isDef})
 	}
 
 	sort.SliceStable(a, func(i, j int) bool {
@@ -113,18 +115,20 @@ func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, clone
 	})
 
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, a, numDefaults, cloneID})
+		envDisjunct{env, a, numDefaults, numDefaults > 0, cloneID})
+
 }
 
 func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
 	a := make([]disjunct, 0, len(x.Values))
 
 	for i, v := range x.Values {
-		a = append(a, disjunct{v, i < x.NumDefaults})
+		a = append(a, disjunct{v, nil, i < x.NumDefaults})
 	}
 
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, a, x.NumDefaults, cloneID})
+		envDisjunct{env, a, x.NumDefaults, x.HasDefaults, cloneID})
+
 }
 
 func (n *nodeContext) expandDisjuncts(
@@ -216,8 +220,12 @@ func (n *nodeContext) expandDisjuncts(
 					cn := dn.clone()
 					*cn.node = snapshotVertex(dn.snapshot)
 
-					c := MakeConjunct(d.env, v.expr, d.cloneID)
-					cn.addExprConjunct(c)
+					if v.v != nil {
+						cn.addValueConjunct(d.env, v.v, d.cloneID)
+					} else {
+						c := MakeConjunct(d.env, v.expr, d.cloneID)
+						cn.addExprConjunct(c)
+					}
 
 					newMode := mode(d, v)
 
@@ -302,7 +310,7 @@ func (n *nodeContext) makeError() {
 func mode(d envDisjunct, v disjunct) defaultMode {
 	var mode defaultMode
 	switch {
-	case d.numDefaults == 0:
+	case !d.hasDefaults:
 		mode = maybeDefault
 	case v.isDefault:
 		mode = isDefault

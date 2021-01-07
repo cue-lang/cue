@@ -569,20 +569,28 @@ var cycle = &Bottom{
 func (n *nodeContext) createDisjunct() *Disjunction {
 	a := make([]*Vertex, len(n.disjuncts))
 	p := 0
+	hasDefaults := false
 	for i, x := range n.disjuncts {
 		v := new(Vertex)
 		*v = x.result
-		if x.defaultMode == isDefault {
+		switch x.defaultMode {
+		case isDefault:
 			a[i] = a[p]
 			a[p] = v
 			p++
-		} else {
+			hasDefaults = true
+
+		case notDefault:
+			hasDefaults = true
+			fallthrough
+		case maybeDefault:
 			a[i] = v
 		}
 	}
 	return &Disjunction{
 		Values:      a,
 		NumDefaults: p,
+		HasDefaults: hasDefaults,
 	}
 }
 

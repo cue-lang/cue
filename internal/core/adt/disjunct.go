@@ -15,8 +15,6 @@
 package adt
 
 import (
-	"sort"
-
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 )
@@ -86,48 +84,30 @@ import (
 
 type envDisjunct struct {
 	env         *Environment
-	values      []disjunct
-	numDefaults int
-	hasDefaults bool
 	cloneID     CloseInfo
-}
-
-type disjunct struct {
-	v         *Vertex
-	expr      Expr
-	isDefault bool
+	expr        *DisjunctionExpr
+	value       *Disjunction
+	hasDefaults bool
 }
 
 func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, cloneID CloseInfo) {
-	a := make([]disjunct, 0, len(x.Values))
 
+	// TODO: precompute
 	numDefaults := 0
 	for _, v := range x.Values {
 		isDef := v.Default // || n.hasDefaults(env, v.Val)
 		if isDef {
 			numDefaults++
 		}
-		a = append(a, disjunct{nil, v.Val, isDef})
 	}
 
-	sort.SliceStable(a, func(i, j int) bool {
-		return !a[j].isDefault && a[i].isDefault != a[j].isDefault
-	})
-
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, a, numDefaults, numDefaults > 0, cloneID})
-
+		envDisjunct{env, cloneID, x, nil, numDefaults > 0})
 }
 
 func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
-	a := make([]disjunct, 0, len(x.Values))
-
-	for i, v := range x.Values {
-		a = append(a, disjunct{v, nil, i < x.NumDefaults})
-	}
-
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, a, x.NumDefaults, x.HasDefaults, cloneID})
+		envDisjunct{env, cloneID, nil, x, x.HasDefaults})
 
 }
 
@@ -216,22 +196,33 @@ func (n *nodeContext) expandDisjuncts(
 			}
 
 			for _, dn := range a {
-				for _, v := range d.values {
-					cn := dn.clone()
-					*cn.node = snapshotVertex(dn.snapshot)
+				switch {
+				case d.expr != nil:
+					for _, v := range d.expr.Values {
+						cn := dn.clone()
+						*cn.node = snapshotVertex(dn.snapshot)
 
-					if v.v != nil {
-						cn.addValueConjunct(d.env, v.v, d.cloneID)
-					} else {
-						c := MakeConjunct(d.env, v.expr, d.cloneID)
+						c := MakeConjunct(d.env, v.Val, d.cloneID)
 						cn.addExprConjunct(c)
+
+						newMode := mode(d.hasDefaults, v.Default)
+						cn.defaultMode = combineDefault(dn.defaultMode, newMode)
+
+						cn.expandDisjuncts(state, n, newMode, true)
 					}
 
-					newMode := mode(d, v)
+				case d.value != nil:
+					for i, v := range d.value.Values {
+						cn := dn.clone()
+						*cn.node = snapshotVertex(dn.snapshot)
 
-					cn.expandDisjuncts(state, n, newMode, true)
+						cn.addValueConjunct(d.env, v, d.cloneID)
 
-					cn.defaultMode = combineDefault(dn.defaultMode, newMode)
+						newMode := mode(d.hasDefaults, i < d.value.NumDefaults)
+						cn.defaultMode = combineDefault(dn.defaultMode, newMode)
+
+						cn.expandDisjuncts(state, n, newMode, true)
+					}
 				}
 			}
 
@@ -243,6 +234,7 @@ func (n *nodeContext) expandDisjuncts(
 
 			if len(n.disjuncts) == 0 {
 				n.makeError()
+				break
 			}
 		}
 
@@ -271,6 +263,9 @@ func (n *nodeContext) expandDisjuncts(
 			for _, v := range p.disjuncts {
 				if Equal(n.ctx, &v.result, &d.result) {
 					n.ctx.Unifier.freeNodeContext(n)
+					if d.defaultMode == isDefault {
+						v.defaultMode = isDefault
+					}
 					continue outer
 				}
 			}
@@ -307,12 +302,12 @@ func (n *nodeContext) makeError() {
 	n.node.SetValue(n.ctx, Finalized, b)
 }
 
-func mode(d envDisjunct, v disjunct) defaultMode {
+func mode(hasDefault, marked bool) defaultMode {
 	var mode defaultMode
 	switch {
-	case !d.hasDefaults:
+	case !hasDefault:
 		mode = maybeDefault
-	case v.isDefault:
+	case marked:
 		mode = isDefault
 	default:
 		mode = notDefault
@@ -379,8 +374,8 @@ type defaultMode int
 
 const (
 	maybeDefault defaultMode = iota
-	notDefault
 	isDefault
+	notDefault
 )
 
 // combineDefaults combines default modes for unifying conjuncts.
@@ -391,24 +386,9 @@ const (
 // U2: (v1, d1) & (v2, d2) => (v1&v2, d1&d2)
 func combineDefault(a, b defaultMode) defaultMode {
 	if a > b {
-		a, b = b, a
+		return a
 	}
-	switch {
-	case a == maybeDefault && b == maybeDefault:
-		return maybeDefault
-	case a == maybeDefault && b == notDefault:
-		return notDefault
-	case a == maybeDefault && b == isDefault:
-		return isDefault
-	case a == notDefault && b == notDefault:
-		return notDefault
-	case a == notDefault && b == isDefault:
-		return notDefault
-	case a == isDefault && b == isDefault:
-		return isDefault
-	default:
-		panic("unreachable")
-	}
+	return b
 }
 
 // disjunctError returns a compound error for a failed disjunction.

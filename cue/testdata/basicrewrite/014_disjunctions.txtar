@@ -84,7 +84,7 @@ i1: "c"
   o1: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
   o2: (int){ 1 }
   o3: (int){ 2 }
-  o4: (int){ |((int){ 2 }, (int){ 1 }, (int){ 3 }) }
+  o4: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
   o5: (int){ |(*(int){ 2 }, (int){ 1 }, (int){ 3 }) }
   o6: (int){ |((int){ 1 }, (int){ 2 }, (int){ 3 }) }
   o7: (int){ |((int){ 2 }, (int){ 3 }) }

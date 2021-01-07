@@ -63,7 +63,7 @@ c2: (*{
   }
   a3: (int){ 1 }
   b1: (int){ |((int){ 0 }, (int){ 1 }) }
-  b2: (int){ |((int){ 1 }, (int){ 0 }) }
+  b2: (int){ |((int){ 0 }, (int){ 1 }) }
   c1: (struct){ |((struct){
       a: (int){ 1 }
       b: (int){ 2 }

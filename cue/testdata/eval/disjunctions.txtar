@@ -95,6 +95,11 @@ t11: {
     a: #A
 }
 
+cross: {
+    a: *"word" | string
+    a:  string | *"word"
+}
+
 
 d100: {
   // Should we allow a selector to imply a struct or list? Would be convenient.
@@ -234,13 +239,16 @@ Result:
       }, (#struct){
       }) }
   }
+  cross: (struct){
+    a: (string){ |(*(string){ "word" }, (string){ string }) }
+  }
   d100: (struct){
     i: ((null|struct)){ |((null){ null }, (struct){
         bar: (int){ 2 }
       }) }
     j: (_|_){
       // [incomplete] d100.j: unresolved disjunction null | {bar:2} (type (null|struct)):
-      //     ./in.cue:102:6
+      //     ./in.cue:107:6
     }
   }
 }
@@ -392,6 +400,10 @@ Result:
     ]|{})
     a: 〈0;b〉
     a: 〈0;#A〉
+  }
+  cross: {
+    a: (*"word"|string)
+    a: (string|*"word")
   }
   d100: {
     i: (null|{

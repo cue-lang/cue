@@ -24,7 +24,7 @@ command: echo: {
 }
 
 -- expect-stdout --
-cmd executes defined the named command for each of the named instances.
+cmd executes the named command for each of the named instances.
 
 Commands define actions on instances. For example, they may
 specify how to upload a configuration to Kubernetes. Commands are

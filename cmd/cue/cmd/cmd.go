@@ -27,7 +27,7 @@ func newCmdCmd(c *Command) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "cmd <name> [inputs]",
 		Short: "run a user-defined shell command",
-		Long: `cmd executes defined the named command for each of the named instances.
+		Long: `cmd executes the named command for each of the named instances.
 
 Commands define actions on instances. For example, they may
 specify how to upload a configuration to Kubernetes. Commands are

@@ -38,7 +38,7 @@ import (
 	_ "cuelang.org/go/pkg"
 )
 
-var update = flag.Bool("update", false, "update the test files")
+var update = flag.Bool("update", os.Getenv("CUE_UPDATE") != "", "update the test files")
 
 // TestDecode reads the testdata/*.txtar files, converts the contained
 // JSON schema to CUE and compares it against the output.

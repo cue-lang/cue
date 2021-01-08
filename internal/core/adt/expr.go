@@ -1357,11 +1357,11 @@ func (x *ForClause) Source() ast.Node {
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 	n := c.node(x, x.Src, true)
 	for _, a := range n.Arcs {
-		c.Unify(c, a, Partial)
-
 		if !a.Label.IsRegular() {
 			continue
 		}
+
+		c.Unify(c, a, Partial)
 
 		n := &Vertex{status: Finalized}
 

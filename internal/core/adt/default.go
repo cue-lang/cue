@@ -70,6 +70,7 @@ func (v *Vertex) Default() *Vertex {
 			w = d.Values[0]
 		default:
 			x := *v
+			x.state = nil
 			x.BaseValue = &Disjunction{
 				Src:         d.Src,
 				Values:      d.Values[:d.NumDefaults],
@@ -92,6 +93,7 @@ func (v *Vertex) Default() *Vertex {
 
 		w := *v
 		w.BaseValue = &m
+		w.state = nil
 		return &w
 	}
 }

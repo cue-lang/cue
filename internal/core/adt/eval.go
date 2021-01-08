@@ -61,6 +61,7 @@ var stats = template.Must(template.New("stats").Parse(`{{"" -}}
 Freed:  {{.Freed}}
 Reused: {{.Reused}}
 Allocs: {{.Allocs}}
+Retain: {{.Retained}}
 
 Unifications: {{.UnifyCount}}
 Disjuncts:    {{.DisjunctCount}}`))
@@ -200,7 +201,8 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 		}
 	}
 
-	n := v.state
+	n := v.getNodeContext(c)
+	defer v.freeNode(n)
 
 	switch v.Status() {
 	case Evaluating:
@@ -210,11 +212,6 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 		return
 
 	case 0:
-		// from state 0
-		n = e.newNodeContext(c, v)
-
-		v.state = n
-
 		if v.Label.IsDef() {
 			v.Closed = true
 		}
@@ -310,12 +307,22 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 			return
 		}
 
-		n.expandDisjuncts(state, nil, maybeDefault, false)
+		n.expandDisjuncts(state, n, maybeDefault, false)
+
+		// If the state has changed, it is because a disjunct has been run. In this case, our node will have completed, and it will
+		// set a value soon.
+		v.state = n // alternatively, set to nil
+
+		for _, d := range n.disjuncts {
+			d.free()
+		}
 
 		switch len(n.disjuncts) {
 		case 0:
 		case 1:
-			*v = n.disjuncts[0].result
+			x := n.disjuncts[0].result
+			x.state = nil
+			*v = x
 
 		default:
 			d := n.createDisjunct()
@@ -573,6 +580,7 @@ func (n *nodeContext) createDisjunct() *Disjunction {
 	for i, x := range n.disjuncts {
 		v := new(Vertex)
 		*v = x.result
+		v.state = nil
 		switch x.defaultMode {
 		case isDefault:
 			a[i] = a[p]
@@ -605,6 +613,7 @@ type arcKey struct {
 // checks should only be performed once the full value is known.
 type nodeContext struct {
 	nextFree *nodeContext
+	refCount int
 
 	ctx  *OpContext
 	node *Vertex
@@ -653,7 +662,6 @@ type nodeContext struct {
 	hasTop      bool
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
-	isDone      bool
 
 	// Disjunction handling
 	disjunctions []envDisjunct
@@ -665,6 +673,8 @@ type nodeContext struct {
 
 func (n *nodeContext) clone() *nodeContext {
 	d := n.ctx.Unifier.newNodeContext(n.ctx, n.node)
+
+	d.refCount++
 
 	d.ctx = n.ctx
 	d.node = n.node
@@ -733,21 +743,59 @@ func (e *Unifier) newNodeContext(ctx *OpContext, node *Vertex) *nodeContext {
 }
 
 func (v *Vertex) getNodeContext(c *OpContext) *nodeContext {
-	if v.state != nil {
+	if v.state == nil {
 		if v.status == Finalized {
-			panic("dangling node")
+			return nil
 		}
-		return v.state
+		v.state = c.Unifier.newNodeContext(c, v)
+	} else if v.state.node != v {
+		panic("getNodeContext: nodeContext out of sync")
 	}
-	v.state = c.Unifier.newNodeContext(c, v)
+	v.state.refCount++
 	return v.state
 }
 
+func (v *Vertex) freeNode(n *nodeContext) {
+	if n == nil {
+		return
+	}
+	if n.node != v {
+		panic("freeNode: unpaired free")
+	}
+	if v.state != nil && v.state != n {
+		panic("freeNode: nodeContext out of sync")
+	}
+	if n.refCount--; n.refCount == 0 {
+		if v.status == Finalized {
+			v.freeNodeState()
+		} else {
+			n.ctx.Unifier.stats.Retained++
+		}
+	}
+}
+
+func (v *Vertex) freeNodeState() {
+	if v.state == nil {
+		return
+	}
+	state := v.state
+	v.state = nil
+
+	state.ctx.Unifier.freeNodeContext(state)
+}
+
+func (n *nodeContext) free() {
+	if n.refCount--; n.refCount == 0 {
+		n.ctx.Unifier.freeNodeContext(n)
+	}
+}
+
 func (e *Unifier) freeNodeContext(n *nodeContext) {
-	// TODO: re-enable memory management.
-	// e.stats.Freed++
-	// n.nextFree = e.freeListNode
-	// e.freeListNode = n
+	e.stats.Freed++
+	n.nextFree = e.freeListNode
+	e.freeListNode = n
+	n.node = nil
+	n.refCount = 0
 }
 
 // TODO(perf): return a dedicated ConflictError that can track original

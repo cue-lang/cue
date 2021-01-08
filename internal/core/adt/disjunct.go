@@ -122,11 +122,6 @@ func (n *nodeContext) expandDisjuncts(
 	for n.expandOne() {
 	}
 
-	errNode := n
-	if parent != nil {
-		errNode = parent
-	}
-
 	// save node to snapShot in nodeContex
 	// save nodeContext.
 
@@ -142,6 +137,10 @@ func (n *nodeContext) expandDisjuncts(
 		n.postDisjunct(state)
 
 		if n.hasErr() {
+			// TODO: consider finalizing the node thusly:
+			// if recursive {
+			// 	n.node.Finalize(n.ctx)
+			// }
 			x := n.node
 			err, ok := x.BaseValue.(*Bottom)
 			if !ok {
@@ -154,25 +153,27 @@ func (n *nodeContext) expandDisjuncts(
 				err = x.ChildErrors
 			}
 			if err != nil {
-				errNode.disjunctErrs = append(errNode.disjunctErrs, err)
+				parent.disjunctErrs = append(parent.disjunctErrs, err)
 			}
-			if recursive || len(n.disjunctions) > 0 {
-				n.ctx.Unifier.freeNodeContext(n)
+			if recursive {
+				n.free()
 			}
 			return
 		}
+		if n.node.BaseValue == nil {
+			n.node.BaseValue = n.getValidators()
+		}
+
 		// TODO: clean up this mess:
 		result := *n.node // XXX: n.result = snapshotVertex(n.node)?
 
-		if result.BaseValue == nil {
-			result.BaseValue = n.getValidators()
-		}
-
-		if state < Finalized {
+		if recursive && state < Finalized {
 			*n = m
 		}
 		n.result = result
-		n.disjuncts = append(n.disjuncts, n)
+		if recursive {
+			n.disjuncts = append(n.disjuncts, n)
+		}
 
 	case len(n.disjunctions) > 0:
 		// Process full disjuncts to ensure that erroneous disjuncts are
@@ -201,6 +202,7 @@ func (n *nodeContext) expandDisjuncts(
 					for _, v := range d.expr.Values {
 						cn := dn.clone()
 						*cn.node = snapshotVertex(dn.snapshot)
+						cn.node.state = cn
 
 						c := MakeConjunct(d.env, v.Val, d.cloneID)
 						cn.addExprConjunct(c)
@@ -215,6 +217,7 @@ func (n *nodeContext) expandDisjuncts(
 					for i, v := range d.value.Values {
 						cn := dn.clone()
 						*cn.node = snapshotVertex(dn.snapshot)
+						cn.node.state = cn
 
 						cn.addValueConjunct(d.env, v, d.cloneID)
 
@@ -226,14 +229,17 @@ func (n *nodeContext) expandDisjuncts(
 				}
 			}
 
-			if i > 0 {
-				for _, d := range a {
-					n.ctx.freeNodeContext(d)
+			if len(n.disjuncts) == 0 {
+				n.makeError()
+			}
+
+			if recursive || i > 0 {
+				for _, x := range a {
+					x.free()
 				}
 			}
 
 			if len(n.disjuncts) == 0 {
-				n.makeError()
 				break
 			}
 		}
@@ -253,33 +259,27 @@ func (n *nodeContext) expandDisjuncts(
 	// Compare to root, but add to this one.
 	// TODO: if only one value is left, set to maybeDefault.
 	switch p := parent; {
-	case p != nil:
+	case p != n:
 		p.disjunctErrs = append(p.disjunctErrs, n.disjunctErrs...)
 		n.disjunctErrs = n.disjunctErrs[:0]
 
-		k := 0
 	outer:
 		for _, d := range n.disjuncts {
 			for _, v := range p.disjuncts {
 				if Equal(n.ctx, &v.result, &d.result) {
-					n.ctx.Unifier.freeNodeContext(n)
 					if d.defaultMode == isDefault {
 						v.defaultMode = isDefault
 					}
+					d.free()
 					continue outer
 				}
 			}
-			n.disjuncts[k] = d
-			k++
 
 			d.defaultMode = combineDefault(m, d.defaultMode)
+			p.disjuncts = append(p.disjuncts, d)
 		}
 
-		p.disjuncts = append(p.disjuncts, n.disjuncts[:k]...)
 		n.disjuncts = n.disjuncts[:0]
-
-	case n.done():
-		n.isDone = true
 	}
 }
 

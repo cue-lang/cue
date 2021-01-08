@@ -36,7 +36,11 @@ x: conflicting values 101 and 100:
 Result:
 (_|_){
   // [eval]
-  a: (int){ 100 }
+  a: (_|_){
+    // [eval] b: conflicting values 210 and 200:
+    //     ./in.cue:2:4
+    //     ./in.cue:3:4
+  }
   b: (_|_){
     // [eval] b: conflicting values 210 and 200:
     //     ./in.cue:2:4

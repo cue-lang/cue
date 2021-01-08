@@ -167,10 +167,9 @@ func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
 					Conjuncts: v.Conjuncts,
 				}
 				w.UpdateStatus(v.Status())
-				return w
+				v = w
 			}
 		}
-		return x
 
 	case nil:
 		if v.state != nil {
@@ -184,6 +183,10 @@ func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
 			}
 		}
 		panic("nil value")
+	}
+
+	if v.status < Finalized && v.state != nil {
+		v.state.addNotify(c.vertex)
 	}
 
 	return v
@@ -273,6 +276,8 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 		// Use maybeSetCache for cycle breaking
 		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
 		}
+
+		n.doNotify()
 
 		if !n.done() {
 			if len(n.disjunctions) > 0 && v.BaseValue == cycle {
@@ -369,6 +374,23 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 		n.completeArcs(state)
 
 	case Finalized:
+	}
+}
+
+func (n *nodeContext) doNotify() {
+	if n.errs != nil && len(n.notify) > 0 {
+		for _, v := range n.notify {
+			if v.state == nil {
+				if b, ok := v.BaseValue.(*Bottom); ok {
+					v.BaseValue = CombineErrors(nil, b, n.errs)
+				} else {
+					v.BaseValue = n.errs
+				}
+			} else {
+				v.state.addBottom(n.errs)
+			}
+		}
+		n.notify = n.notify[:0]
 	}
 }
 
@@ -647,6 +669,10 @@ type nodeContext struct {
 	checks     []Validator // BuiltinValidator, other bound values.
 	errs       *Bottom
 
+	// notify is used to communicate errors in cyclic dependencies.
+	// TODO: also use this to communicate increasingly more concrete values.
+	notify []*Vertex
+
 	// Struct information
 	dynamicFields []envDynamic
 	ifClauses     []envYield
@@ -669,6 +695,12 @@ type nodeContext struct {
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
+}
+
+func (n *nodeContext) addNotify(v *Vertex) {
+	if v != nil {
+		n.notify = append(n.notify, v)
+	}
 }
 
 func (n *nodeContext) clone() *nodeContext {
@@ -696,6 +728,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.hasNonCycle = n.hasNonCycle
 
 	// d.arcMap = append(d.arcMap, n.arcMap...) // XXX add?
+	d.notify = append(d.notify, n.notify...)
 	d.checks = append(d.checks, n.checks...)
 	d.dynamicFields = append(d.dynamicFields, n.dynamicFields...)
 	d.ifClauses = append(d.ifClauses, n.ifClauses...)

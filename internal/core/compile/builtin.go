@@ -89,6 +89,8 @@ var closeBuiltin = &adt.Builtin{
 			return s
 		}
 		v := *s
+		// TODO(perf): do not copy the arc, but rather find a way to mark the
+		// calling nodeContext.
 		v.BaseValue = &adt.StructMarker{NeedClose: true}
 		return &v
 	},

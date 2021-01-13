@@ -273,6 +273,8 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 	case Partial:
 		defer c.PopArc(c.PushArc(v))
 
+		v.status = Evaluating
+
 		// Use maybeSetCache for cycle breaking
 		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
 		}
@@ -312,7 +314,13 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 			return
 		}
 
-		n.expandDisjuncts(state, n, maybeDefault, false)
+		// Disjunctions should always be finalized. If there are nested
+		// disjunctions the last one should be finalized.
+		disState := state
+		if len(n.disjunctions) > 0 && disState != Finalized {
+			disState = Finalized
+		}
+		n.expandDisjuncts(disState, n, maybeDefault, false)
 
 		// If the state has changed, it is because a disjunct has been run. In this case, our node will have completed, and it will
 		// set a value soon.
@@ -1231,7 +1239,7 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 	// The reason is that disjunctions must be eliminated if checks in
 	// values on which they depend fail.
 	ctx := n.ctx
-	ctx.Unify(ctx, arc, Finalized)
+	ctx.Unify(ctx, arc, AllArcs)
 
 	for _, c := range arc.Conjuncts {
 		var a []*Vertex
@@ -1689,7 +1697,7 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	case arc.Status() == 0:
 	default:
 		// TODO: handle adding to finalized conjunct
-		panic("unhandled")
+		panic(fmt.Sprintf("unhandled %d", arc.status))
 	}
 	return arc
 }

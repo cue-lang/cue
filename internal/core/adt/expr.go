@@ -64,7 +64,11 @@ func (x *StructLit) Source() ast.Node { return x.Src }
 func (x *StructLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
-	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
+	// evaluate may not finalize a field, as the resulting value may be
+	// used in a context where more conjuncts are added. It may also lead
+	// to disjuncts being in a partially expanded state, leading to
+	// misaligned nodeContexts.
+	c.Unifier.Unify(c, v, AllArcs)
 	return v
 }
 
@@ -282,6 +286,7 @@ func (x *ListLit) Source() ast.Node {
 func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
+	// TODO: should be AllArcs and then use Finalize for builtins?
 	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
 	return v
 }

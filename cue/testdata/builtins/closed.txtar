@@ -6,6 +6,18 @@ a: close({
 b: a & { x: int } // err
 c: a & { a: c: int } // okay (non-recursive close)
 
+inDisjunctions: {
+    x: [string]: #Def
+    #Def: [string]: {
+        a: b: true
+        let X = a
+        close({uint: a: b: X.b}) | close({string: a: b: true})
+    }
+    x: socket: string: {}
+    x: syslog: x.socket
+    x: syslog: xxx: {}
+}
+
 -- out/eval --
 Errors:
 b: field `x` not allowed:
@@ -39,6 +51,73 @@ Result:
       c: (int){ int }
     }
   }
+  inDisjunctions: (struct){
+    x: (struct){
+      socket: (#struct){
+        string: (struct){ |((#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            uint: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }, (#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            string: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }) }
+      }
+      syslog: (#struct){
+        string: (struct){ |((#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            uint: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }, (#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            string: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }) }
+        xxx: (struct){ |((#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            uint: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }, (#struct){
+            a: (#struct){
+              b: (bool){ true }
+            }
+            string: (#struct){
+              a: (#struct){
+                b: (bool){ true }
+              }
+            }
+          }) }
+      }
+    }
+    #Def: (#struct){
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -56,4 +135,42 @@ Result:
       c: int
     }
   })
+  inDisjunctions: {
+    x: {
+      [string]: 〈1;#Def〉
+    }
+    #Def: {
+      [string]: {
+        a: {
+          b: true
+        }
+        (close({
+          uint: {
+            a: {
+              b: 〈3;let X〉.b
+            }
+          }
+        })|close({
+          string: {
+            a: {
+              b: true
+            }
+          }
+        }))
+      }
+    }
+    x: {
+      socket: {
+        string: {}
+      }
+    }
+    x: {
+      syslog: 〈1;x〉.socket
+    }
+    x: {
+      syslog: {
+        xxx: {}
+      }
+    }
+  }
 }

@@ -619,6 +619,7 @@ func Dereference(v Value) Value {
 	if b != nil {
 		return newErrValue(v, b)
 	}
+	n.Finalize(ctx.opCtx)
 	return makeValue(v.idx, n)
 }
 

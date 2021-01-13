@@ -313,6 +313,8 @@ func (v *Vertex) IsData() bool {
 func (v *Vertex) ToDataSingle() *Vertex {
 	w := *v
 	w.isData = true
+	w.state = nil
+	w.status = Finalized
 	return &w
 }
 
@@ -326,6 +328,8 @@ func (v *Vertex) ToDataAll() *Vertex {
 		}
 	}
 	w := *v
+	w.state = nil
+	w.status = Finalized
 
 	w.BaseValue = toDataAll(w.BaseValue)
 	w.Arcs = arcs

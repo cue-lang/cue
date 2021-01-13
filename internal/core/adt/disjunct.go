@@ -119,6 +119,11 @@ func (n *nodeContext) expandDisjuncts(
 
 	n.ctx.stats.DisjunctCount++
 
+	node := n.node
+	defer func() {
+		n.node = node
+	}()
+
 	for n.expandOne() {
 	}
 
@@ -126,7 +131,7 @@ func (n *nodeContext) expandDisjuncts(
 	// save nodeContext.
 
 	if recursive || len(n.disjunctions) > 0 {
-		n.snapshot = snapshotVertex(*n.node)
+		n.snapshot = clone(*n.node)
 	} else {
 		n.snapshot = *n.node
 	}
@@ -171,6 +176,8 @@ func (n *nodeContext) expandDisjuncts(
 			*n = m
 		}
 		n.result = result
+		n.node = &n.result
+
 		if recursive {
 			n.disjuncts = append(n.disjuncts, n)
 		}
@@ -178,7 +185,6 @@ func (n *nodeContext) expandDisjuncts(
 	case len(n.disjunctions) > 0:
 		// Process full disjuncts to ensure that erroneous disjuncts are
 		// eliminated.
-		state = Finalized
 
 		n.disjuncts = append(n.disjuncts, n)
 
@@ -201,7 +207,7 @@ func (n *nodeContext) expandDisjuncts(
 				case d.expr != nil:
 					for _, v := range d.expr.Values {
 						cn := dn.clone()
-						*cn.node = snapshotVertex(dn.snapshot)
+						*cn.node = clone(dn.snapshot)
 						cn.node.state = cn
 
 						c := MakeConjunct(d.env, v.Val, d.cloneID)
@@ -216,7 +222,7 @@ func (n *nodeContext) expandDisjuncts(
 				case d.value != nil:
 					for i, v := range d.value.Values {
 						cn := dn.clone()
-						*cn.node = snapshotVertex(dn.snapshot)
+						*cn.node = clone(dn.snapshot)
 						cn.node.state = cn
 
 						cn.addValueConjunct(d.env, v, d.cloneID)
@@ -315,27 +321,42 @@ func mode(hasDefault, marked bool) defaultMode {
 	return mode
 }
 
-// Clone makes a shallow copy of a Vertex. The purpose is to create different
+// clone makes a shallow copy of a Vertex. The purpose is to create different
 // disjuncts from the same Vertex under computation. This allows the conjuncts
 // of an arc to be reset to a previous position and the reuse of earlier
 // computations.
 //
-// Notes: only Arcs need to be cloned recursively. Structs is assumed to not yet
-// be computed at the time that a Clone is needed and must be nil. Conjuncts no
-// longer needed and can become nil. All other fields can be copied shallowly.
-//
-// USE TO SAVE NODE BRANCH FOR DISJUNCTION, BUT BEFORE POSTDIJSUNCT.
-func snapshotVertex(v Vertex) Vertex {
+// Notes: only Arcs need to be copied recursively. Either the arc is finalized
+// and can be used as is, or Structs is assumed to not yet be computed at the
+// time that a clone is needed and must be nil. Conjuncts no longer needed and
+// can become nil. All other fields can be copied shallowly.
+func clone(v Vertex) Vertex {
 	if a := v.Arcs; len(a) > 0 {
 		v.Arcs = make([]*Vertex, len(a))
 		for i, arc := range a {
-			// For child arcs, only Conjuncts are set and Arcs and
-			// Structs will be nil.
-			a := *arc
-			v.Arcs[i] = &a
+			switch arc.status {
+			case Finalized:
+				v.Arcs[i] = arc
 
-			a.Conjuncts = make([]Conjunct, len(arc.Conjuncts))
-			copy(a.Conjuncts, arc.Conjuncts)
+			case 0:
+				a := *arc
+				v.Arcs[i] = &a
+
+				a.Conjuncts = make([]Conjunct, len(arc.Conjuncts))
+				copy(a.Conjuncts, arc.Conjuncts)
+
+			default:
+				// This should never happen and would be a performance issue.
+				// But try to mend the situation by doing something sensible in
+				// case the user is not running with strict mode enabled.
+				Assertf(false, "invalid state for disjunct")
+
+				a := *arc
+				a.state = arc.state.clone()
+				a.state.node = &a
+				a.state.snapshot = clone(a)
+				v.Arcs[i] = &a
+			}
 		}
 	}
 

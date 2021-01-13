@@ -166,10 +166,6 @@ type OpContext struct {
 	// structural cycle errors.
 	vertex *Vertex
 
-	// TODO: remove use of tentative. Should be possible if incomplete
-	// handling is done better.
-	tentative int // set during comprehension evaluation
-
 	// These fields are used associate scratch fields for computing closedness
 	// of a Vertex. These fields could have been included in StructInfo (like
 	// Tomabechi's unification algorithm), but we opted for an indirection to
@@ -186,12 +182,6 @@ type OpContext struct {
 // Impl is for internal use only. This will go.
 func (c *OpContext) Impl() Runtime {
 	return c.Runtime
-}
-
-// If IsTentative is set, evaluation of an arc should not finalize
-// to non-concrete values.
-func (c *OpContext) IsTentative() bool {
-	return c.tentative > 0
 }
 
 func (c *OpContext) Pos() token.Pos {
@@ -431,11 +421,7 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 func (c *OpContext) Yield(env *Environment, y Yielder, f YieldFunc) *Bottom {
 	s := c.PushState(env, y.Source())
 
-	c.tentative++
-
 	y.yield(c, f)
-
-	c.tentative--
 
 	return c.PopState(s)
 

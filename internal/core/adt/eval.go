@@ -152,24 +152,6 @@ func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
 	switch x := v.BaseValue.(type) {
 	case *Bottom:
 		return x
-	case *Disjunction:
-		if x.NumDefaults == 1 {
-			if c.IsTentative() && isStruct(v) {
-				// TODO(perf): do something more efficient perhaps? This discards
-				// the computed arcs so far. Instead, we could have a separate
-				// marker to accumulate results. As this only happens within
-				// comprehensions, the effect is likely minimal, though.
-				arcs := v.Arcs
-				w := &Vertex{
-					Parent:    v.Parent,
-					BaseValue: &StructMarker{},
-					Arcs:      arcs,
-					Conjuncts: v.Conjuncts,
-				}
-				w.UpdateStatus(v.Status())
-				v = w
-			}
-		}
 
 	case nil:
 		if v.state != nil {
@@ -433,7 +415,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 
 	default:
 		if n.node.BaseValue == cycle {
-			if !n.done() { // && !ctx.IsTentative() {
+			if !n.done() {
 				// collect incomplete errors.
 				var err *Bottom // n.incomplete
 				for _, d := range n.dynamicFields {

@@ -147,10 +147,7 @@ Result:
   xb1: (int){ 8 }
   xb2: (int){ 8 }
   xb3: (int){ |(*(int){ 6 }, (int){ 9 }) }
-  xb4: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:14:6
-  }
+  xb4: (int){ 10 }
   xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (int){ 6 }

@@ -1213,13 +1213,6 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 
 	closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
 
-	// TODO: uncommenting the following almost works, but causes some
-	// faulty results in complex cycle handling between disjunctions.
-	// The reason is that disjunctions must be eliminated if checks in
-	// values on which they depend fail.
-	ctx := n.ctx
-	ctx.Unify(ctx, arc, AllArcs)
-
 	for _, c := range arc.Conjuncts {
 		var a []*Vertex
 		if env != nil {

@@ -1,4 +1,5 @@
 -- in.cue --
+import "list"
 
 a1list: [{1}]
 let A1 = a1list
@@ -36,6 +37,32 @@ a9list: [{9}]
 let A9 = a9list
 a9: b: c: { for x in A9 { v: 909 } }
 
+// Issue #609:
+// When a let value resolved to an incomplete value, it should pass this
+// incomplete status to the expression in which it used. But 609 reported
+// a gobbling of this incomplete status. The problem seemed to be not
+// exclusive to the use of let, though.
+incompleteLet: {
+    input: [1,2,3,4,5]
+
+    last: {
+        min: list.Min(input)
+        max: list.Max(input)
+    }
+
+    bar: {
+        let mn = last.min
+        let mx = list.max
+
+        min: mn
+        max: mx
+    }
+
+    x: {
+        if list.max < 0 {
+        }
+    }
+}
 
 -- out/compile --
 --- in.cue
@@ -136,6 +163,26 @@ a9: b: c: { for x in A9 { v: 909 } }
       }
     }
   }
+  incompleteLet: {
+    input: [
+      1,
+      2,
+      3,
+      4,
+      5,
+    ]
+    last: {
+      min: 〈import;list〉.Min(〈1;input〉)
+      max: 〈import;list〉.Max(〈1;input〉)
+    }
+    bar: {
+      min: 〈0;let mn〉
+      max: 〈0;let mx〉
+    }
+    x: {
+      if (〈import;list〉.max < 0) {}
+    }
+  }
 }
 -- out/eval --
 (struct){
@@ -209,6 +256,30 @@ a9: b: c: { for x in A9 { v: 909 } }
       c: (struct){
         v: (int){ 909 }
       }
+    }
+  }
+  incompleteLet: (struct){
+    input: (#list){
+      0: (int){ 1 }
+      1: (int){ 2 }
+      2: (int){ 3 }
+      3: (int){ 4 }
+      4: (int){ 5 }
+    }
+    last: (struct){
+      min: (int){ 1 }
+      max: (int){ 5 }
+    }
+    bar: (struct){
+      min: (int){ 1 }
+      max: (_|_){
+        // [incomplete] incompleteLet.bar.max: undefined field max:
+        //     ./in.cue:54:23
+      }
+    }
+    x: (_|_){
+      // [incomplete] incompleteLet.x: undefined field max:
+      //     ./in.cue:61:17
     }
   }
 }

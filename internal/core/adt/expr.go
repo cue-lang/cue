@@ -50,6 +50,8 @@ type StructLit struct {
 	IsOpen      bool // has a ...
 	initialized bool
 
+	types OptionalType
+
 	// administrative fields like hasreferences.
 	// hasReferences bool
 }
@@ -57,6 +59,10 @@ type StructLit struct {
 type FieldInfo struct {
 	Label    Feature
 	Optional []Node
+}
+
+func (x *StructLit) HasOptional() bool {
+	return x.types&(HasField|HasPattern|HasAdditional) != 0
 }
 
 func (x *StructLit) Source() ast.Node { return x.Src }
@@ -96,9 +102,11 @@ func (o *StructLit) Init() {
 				o.Fields = append(o.Fields, FieldInfo{Label: x.Label})
 			}
 			o.Fields[p].Optional = append(o.Fields[p].Optional, x)
+			o.types |= HasField
 
 		case *DynamicField:
 			o.Dynamic = append(o.Dynamic, x)
+			o.types |= HasDynamic
 
 		case Expr:
 			o.HasEmbed = true
@@ -107,12 +115,16 @@ func (o *StructLit) Init() {
 
 		case *BulkOptionalField:
 			o.Bulk = append(o.Bulk, x)
+			o.types |= HasPattern
 
 		case *Ellipsis:
 			expr := x.Value
 			if x.Value == nil {
 				o.IsOpen = true
+				o.types |= IsOpen
 				expr = &Top{}
+			} else {
+				o.types |= HasAdditional
 			}
 			o.Additional = append(o.Additional, expr)
 
@@ -131,26 +143,8 @@ func (o *StructLit) fieldIndex(f Feature) int {
 	return -1
 }
 
-func (o *StructLit) OptionalTypes() (mask OptionalType) {
-	for _, f := range o.Fields {
-		if len(f.Optional) > 0 {
-			mask = HasField
-			break
-		}
-	}
-	if len(o.Dynamic) > 0 {
-		mask |= HasDynamic
-	}
-	if len(o.Bulk) > 0 {
-		mask |= HasPattern
-	}
-	if o.Additional != nil {
-		mask |= HasAdditional
-	}
-	if o.IsOpen {
-		mask |= IsOpen
-	}
-	return mask
+func (o *StructLit) OptionalTypes() OptionalType {
+	return o.types
 }
 
 func (o *StructLit) IsOptional(label Feature) bool {

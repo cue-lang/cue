@@ -32,7 +32,7 @@ func TestOptionalTypes(t *testing.T) {
 		in: `
 		...
 		`,
-		out: adt.HasAdditional | adt.IsOpen,
+		out: adt.IsOpen,
 	}, {
 		in: `
 		[string]: int

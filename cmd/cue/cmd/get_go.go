@@ -237,9 +237,6 @@ func (e *extractor) initExclusions(str string) {
 }
 
 func (e *extractor) filter(name string) bool {
-	if !ast.IsExported(name) {
-		return true
-	}
 	for _, ex := range e.exclusions {
 		if ex.MatchString(name) {
 			return true
@@ -637,7 +634,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 
 			}
 
-			if len(enums) > 0 {
+			if len(enums) > 0 && ast.IsExported(name) {
 				enumName := "#enum" + name
 				cueast.AddComment(a[len(a)-1], internal.NewComment(false, enumName))
 

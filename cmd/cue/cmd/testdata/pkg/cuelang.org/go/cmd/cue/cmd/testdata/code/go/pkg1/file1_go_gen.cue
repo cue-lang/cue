@@ -80,6 +80,10 @@ _#internalIdentifier: #Identifier & "internal"
 #CustomYAML: {
 }
 
+_#localType: int
+
+_#localConst: _#localType & 1
+
 #Inline: Kind: string
 
 #NoInline: Kind: string

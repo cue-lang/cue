@@ -111,7 +111,13 @@ func (c CustomYAML) MarshalYAML() ([]byte, error) {
 	return nil, nil
 }
 
-type excludeType int
+type localType int
+
+const (
+	localConst localType = 1
+
+	_ = localConst // silence linter
+)
 
 type Inline struct {
 	Kind string

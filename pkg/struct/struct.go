@@ -36,7 +36,7 @@ func MinFields(object *cue.Struct, n int) *adt.Bottom {
 	if count < n {
 		return &adt.Bottom{
 			Code: adt.IncompleteError, // could still be resolved
-			Err:  errors.Newf(token.NoPos, "struct has %d fields < MinFields(%d)", count, n),
+			Err:  errors.Newf(token.NoPos, "len(fields) < MinFields(%[2]d) (%[1]d < %[2]d)", count, n),
 		}
 	}
 	return nil

@@ -1232,13 +1232,20 @@ func (x *BuiltinValidator) validate(c *OpContext, v Value) *Bottom {
 }
 
 func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) *Bottom {
+	var severeness ErrorCode
+	var err errors.Error
+
 	res := b.call(c, src, args)
 	switch v := res.(type) {
 	case nil:
 		return nil
 
 	case *Bottom:
-		return v
+		if v == nil {
+			return nil // caught elsewhere, but be defensive.
+		}
+		severeness = v.Code
+		err = v.Err
 
 	case *Bool:
 		if v.B {
@@ -1262,7 +1269,15 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 		}
 		buf.WriteString(")")
 	}
-	return c.NewErrf("invalid value %s (does not satisfy %s)", c.Str(args[0]), buf.String())
+
+	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", c.Str(args[0]), buf.String())
+	vErr.err = err
+
+	for _, v := range args {
+		vErr.AddPosition(v)
+	}
+
+	return &Bottom{Code: severeness, Err: vErr}
 }
 
 // A Disjunction represents a disjunction, where each disjunct may or may not

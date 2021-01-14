@@ -8,10 +8,10 @@ t2: time.Time & "no time"
 t3: time.Unix(1500000000, 123456)
 -- out/time --
 Errors:
-error in call to time.Time: invalid time "no time"
+t2: invalid value "no time" (does not satisfy time.Time): error in call to time.Time: invalid time "no time"
 
 Result:
 t1: "1937-01-01T12:00:27.87+00:20"
-t2: _|_ // error in call to time.Time: invalid time "no time"
+t2: _|_ // t2: invalid value "no time" (does not satisfy time.Time): error in call to time.Time: invalid time "no time"
 t3: "2017-07-14T02:40:00.000123456Z"
 

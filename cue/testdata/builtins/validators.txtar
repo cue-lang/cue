@@ -123,7 +123,9 @@ Result:
   incompleteError2: (struct){
     MyType: (struct){
       kv: (_|_){
-        // [incomplete] struct has 0 fields < MinFields(1)
+        // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+        //     ./in.cue:22:17
+        //     ./in.cue:22:34
       }
     }
     foo: (struct){
@@ -144,7 +146,9 @@ Result:
   violation: (struct){
     #MyType: (#struct){
       kv: (_|_){
-        // [incomplete] struct has 0 fields < MinFields(1)
+        // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
+        //     ./in.cue:49:17
+        //     ./in.cue:49:34
       }
     }
     foo: (#struct){

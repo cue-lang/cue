@@ -47,6 +47,9 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value) bool {
 	if x.IsClosed(ctx) != y.IsClosed(ctx) {
 		return false
 	}
+	if !equalOptional(ctx, x, y) {
+		return false
+	}
 
 loop1:
 	for _, a := range x.Arcs {
@@ -79,6 +82,37 @@ loop1:
 	}
 
 	return equalTerminal(ctx, v, w)
+}
+
+// equalOptional tests if x and y have the same set of close information.
+// Right now this just checks if it has the same source structs that
+// define optional fields.
+// TODO: the following refinements are possible:
+// - unify optional fields and equate the optional fields
+// - do the same for pattern constraints, where the pattern constraints
+//   are collated by pattern equality.
+// - a further refinement would collate patterns by ranges.
+//
+// For all these refinements it would be necessary to have well-working
+// structure sharing so as to not repeatedly recompute optional arcs.
+func equalOptional(ctx *OpContext, x, y *Vertex) bool {
+	return verifyStructs(x, y) && verifyStructs(y, x)
+}
+
+func verifyStructs(x, y *Vertex) bool {
+outer:
+	for _, s := range x.Structs {
+		if !s.StructLit.HasOptional() {
+			continue
+		}
+		for _, t := range y.Structs {
+			if s.StructLit == t.StructLit {
+				continue outer
+			}
+		}
+		return false
+	}
+	return true
 }
 
 func equalTerminal(ctx *OpContext, v, w Value) bool {

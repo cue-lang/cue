@@ -32,8 +32,11 @@ b: field `d` not allowed:
 Result:
 (_|_){
   // [eval]
-  #A: (#struct){
-  }
+  #A: (struct){ |(*(#struct){
+    }, (#struct){
+    }, (#struct){
+    }, (#struct){
+    }) }
   a: (#struct){
     b: (int){ 3 }
     c: (int){ 3 }

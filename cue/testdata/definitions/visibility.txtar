@@ -10,27 +10,15 @@ foo: #foo & {
     #name: "baz"
 }
 -- out/eval --
-Errors:
-foo: field `#name` not allowed:
-    ./in.cue:4:6
-    ./in.cue:9:5
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   #foo: (#struct){
     name: (string){ string }
   }
-  foo: (_|_){
-    // [eval]
+  foo: (#struct){
     name: (string){ string }
     _name: (string){ "foo" }
     _#name: (string){ "bar" }
-    #name: (_|_){
-      // [eval] foo: field `#name` not allowed:
-      //     ./in.cue:4:6
-      //     ./in.cue:9:5
-    }
+    #name: (string){ "baz" }
   }
 }
 -- out/compile --

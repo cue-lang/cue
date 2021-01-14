@@ -3,6 +3,11 @@
 #name: builtins
 #evalPartial
 -- in.cue --
+import (
+  "list"
+  "strings"
+)
+
 a1: {
 	a: and([b, c])
 	b: =~"oo"
@@ -18,6 +23,37 @@ o1: {
 }
 o2: o1 & {a: "foo"}
 o3: o1 & {a: "foo", b: "baz"}
+
+// Issue #585
+stringListErrors: {
+    a: {
+        x: [string, ...string]
+        result: strings.Join(x, " ")
+    }
+
+    b: {
+        x: [int, ...string]
+        result: strings.Join(x, " ")
+    }
+
+    c: {
+        x: []
+        result: strings.Join(x, int)
+    }
+}
+
+decimalListErrors: {
+    a: {
+        x: [string]
+        result: list.Avg(x)
+    }
+
+    b: {
+        x: [int, ...string]
+        result: list.Avg(x)
+    }
+}
+
 -- out/def --
 a1: {
 	a: =~"oo" & =~"fo"
@@ -48,19 +84,25 @@ o3: o1 & {
 Errors:
 o3.a: 2 errors in empty disjunction:
 o3.a: conflicting values "bar" and "foo":
-    ./in.cue:10:12
-    ./in.cue:12:5
-    ./in.cue:15:5
-    ./in.cue:15:14
+    ./in.cue:15:12
+    ./in.cue:17:5
+    ./in.cue:20:5
+    ./in.cue:20:14
 o3.a: conflicting values "baz" and "foo":
-    ./in.cue:10:9
-    ./in.cue:15:5
-    ./in.cue:15:14
-    ./in.cue:15:24
+    ./in.cue:15:9
+    ./in.cue:20:5
+    ./in.cue:20:14
+    ./in.cue:20:24
 a3.a: invalid value "bar" (out of bound =~"oo"):
-    ./in.cue:3:5
+    ./in.cue:8:5
 a3.a: invalid value "bar" (out of bound =~"fo"):
-    ./in.cue:4:5
+    ./in.cue:9:5
+stringListErrors.b.result: invalid type element 0 (int) of string list argument 0:
+    ./in.cue:31:17
+stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
+    ./in.cue:36:33
+decimalListErrors.a.result: invalid type element 0 (string) of number list argument 0:
+    ./in.cue:43:17
 
 Result:
 (_|_){
@@ -79,9 +121,9 @@ Result:
     // [eval]
     a: (_|_){
       // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
-      //     ./in.cue:3:5
+      //     ./in.cue:8:5
       // a3.a: invalid value "bar" (out of bound =~"fo"):
-      //     ./in.cue:4:5
+      //     ./in.cue:9:5
     }
     b: (string){ =~"oo" }
     c: (string){ =~"fo" }
@@ -101,17 +143,70 @@ Result:
     a: (_|_){
       // [eval] o3.a: 2 errors in empty disjunction:
       // o3.a: conflicting values "bar" and "foo":
-      //     ./in.cue:10:12
-      //     ./in.cue:12:5
-      //     ./in.cue:15:5
-      //     ./in.cue:15:14
+      //     ./in.cue:15:12
+      //     ./in.cue:17:5
+      //     ./in.cue:20:5
+      //     ./in.cue:20:14
       // o3.a: conflicting values "baz" and "foo":
-      //     ./in.cue:10:9
-      //     ./in.cue:15:5
-      //     ./in.cue:15:14
-      //     ./in.cue:15:24
+      //     ./in.cue:15:9
+      //     ./in.cue:20:5
+      //     ./in.cue:20:14
+      //     ./in.cue:20:24
     }
     b: (string){ "baz" }
     c: (string){ "bar" }
+  }
+  stringListErrors: (_|_){
+    // [eval]
+    a: (struct){
+      x: (list){
+        0: (string){ string }
+      }
+      result: (_|_){
+        // [incomplete] stringListErrors.a.result: non-concrete string value for element 0 of string list argument 0:
+        //     ./in.cue:26:17
+      }
+    }
+    b: (_|_){
+      // [eval]
+      x: (list){
+        0: (int){ int }
+      }
+      result: (_|_){
+        // [eval] stringListErrors.b.result: invalid type element 0 (int) of string list argument 0:
+        //     ./in.cue:31:17
+      }
+    }
+    c: (_|_){
+      // [eval]
+      x: (#list){
+      }
+      result: (_|_){
+        // [eval] stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
+        //     ./in.cue:36:33
+      }
+    }
+  }
+  decimalListErrors: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval]
+      x: (#list){
+        0: (string){ string }
+      }
+      result: (_|_){
+        // [eval] decimalListErrors.a.result: invalid type element 0 (string) of number list argument 0:
+        //     ./in.cue:43:17
+      }
+    }
+    b: (struct){
+      x: (list){
+        0: (int){ int }
+      }
+      result: (_|_){
+        // [incomplete] decimalListErrors.b.result: non-concrete number value for element 0 of number list argument 0:
+        //     ./in.cue:48:17
+      }
+    }
   }
 }

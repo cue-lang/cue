@@ -207,6 +207,8 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 	ctx := call.ctx
 	switch err := errVal.(type) {
 	case nil:
+	case *adt.Bottom:
+		ret = err
 	case *callError:
 		ret = err.b
 	case *json.MarshalerError:

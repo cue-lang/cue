@@ -75,7 +75,6 @@ error in call to list.Slice: invalid index: 3 > 1
 error in call to list.Slice: negative index
 error in call to list.Slice: slice bounds out of range
 error in call to list.Take: negative index
-0: error in call to list.SortStrings: element 0 of list argument 0: cannot use value 1 (type int) as string
 Ascending.x: error in call to list.Sort: 2 errors in empty disjunction:
 Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
 Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
@@ -92,6 +91,8 @@ t20: cannot use "foo" (type string) as list in argument 1 to list.Min:
     ./in.cue:22:15
 t23: cannot use "foo" (type string) as list in argument 1 to list.Product:
     ./in.cue:25:19
+t42: invalid type element 0 (int) of string list argument 0:
+    ./in.cue:48:6
 t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
     ./in.cue:51:15
 
@@ -146,7 +147,7 @@ t39: [{
 }]
 t40: _|_ // error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 11 more errors)
 t41: ["a", "b"]
-t42: _|_ // error in call to list.SortStrings: element 0 of list argument 0: 0: cannot use value 1 (type int) as string (and 1 more errors)
+t42: _|_ // t42: invalid type element 0 (int) of string list argument 0 (and 1 more errors)
 t43: 10
 t44: 0
 t45: _|_ // t45: cannot use "foo" (type string) as list in argument 1 to list.Sum

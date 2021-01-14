@@ -19,7 +19,6 @@ import (
 	"math/big"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
 	"github.com/cockroachdb/apd/v2"
@@ -237,7 +236,21 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 		return nil
 	}
 	for j := 0; v.Next(); j++ {
-		num, err := v.Value().Decimal()
+		w := v.Value()
+		if k := w.IncompleteKind(); k&adt.NumKind == 0 {
+			err := c.ctx.NewErrf(
+				"invalid type element %d (%s) of number list argument %d", j, k, i)
+			c.Err = &callError{err}
+			break
+		}
+		if !w.IsConcrete() {
+			err := c.ctx.NewErrf(
+				"non-concrete number value for element %d of number list argument %d", j, i)
+			err.Code = adt.IncompleteError
+			c.Err = &callError{err}
+			break
+		}
+		num, err := w.Decimal()
 		if err != nil {
 			c.errf(c.src, err, "invalid list element %d in argument %d to %s: %v",
 				j, i, c.Name(), err)
@@ -257,10 +270,24 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 		return nil
 	}
 	for j := 0; v.Next(); j++ {
-		str, err := v.Value().String()
+		w := v.Value()
+		if k := w.IncompleteKind(); k&adt.StringKind == 0 {
+			err := c.ctx.NewErrf(
+				"invalid type element %d (%s) of string list argument %d", j, k, i)
+			c.Err = &callError{err}
+			break
+		}
+		if !w.IsConcrete() {
+			err := c.ctx.NewErrf(
+				"non-concrete string value for element %d of string list argument %d", j, i)
+			err.Code = adt.IncompleteError
+			c.Err = &callError{err}
+			break
+		}
+		str, err := w.String()
 		if err != nil {
-			c.Err = errors.Wrapf(err, c.Pos(),
-				"element %d of list argument %d", j, i)
+			// TODO: expose wrapping
+			c.Err = &callError{c.ctx.NewErrf("element %d of list argument %d: %v", j, i, err)}
 			break
 		}
 		a = append(a, str)

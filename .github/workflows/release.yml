@@ -7,7 +7,10 @@ on:
     - v*
 jobs:
   goreleaser:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -21,7 +24,10 @@ jobs:
         args: release --rm-dist
   docker:
     name: docker
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Check out the repo
       uses: actions/checkout@v2

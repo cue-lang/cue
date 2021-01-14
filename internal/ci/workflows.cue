@@ -27,130 +27,149 @@ workflows: [
 	},
 ]
 
-// TODO: drop when cuelang.org/issue/390 is fixed.
-// Declare definitions for sub-schemas
-#job:  ((json.#Workflow & {}).jobs & {x: _}).x
-#step: ((#job & {steps:                  _}).steps & [_])[0]
-
-// We need at least go1.14 for code generation
-#codeGenGo: "1.14.9"
-
-#testStrategy: {
-	"fail-fast": false
-	matrix: {
-		// Use a stable version of 1.14.x for go generate
-		"go-version": ["1.13.x", #codeGenGo, "1.15.x"]
-		os: ["ubuntu-latest", "macos-latest", "windows-latest"]
-	}
-}
-
-#installGo: #step & {
-	name: "Install Go"
-	uses: "actions/setup-go@v2"
-	with: "go-version": "${{ matrix.go-version }}"
-}
-
-#checkoutCode: #step & {
-	name: "Checkout code"
-	uses: "actions/checkout@v2"
-}
-
-#cacheGoModules: #step & {
-	name: "Cache Go modules"
-	uses: "actions/cache@v1"
-	with: {
-		path: "~/go/pkg/mod"
-		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"
-		"restore-keys": """
-			${{ runner.os }}-${{ matrix.go-version }}-go-
-			"""
-	}
-
-}
-
-#goGenerate: #step & {
-	name: "Generate"
-	run:  "go generate ./..."
-	// The Go version corresponds to the precise version specified in
-	// the matrix. Skip windows for now until we work out why re-gen is flaky
-	if: "matrix.go-version == '\(#codeGenGo)' && matrix.os != 'windows-latest'"
-}
-
-#goTest: #step & {
-	name: "Test"
-	run:  "go test ./..."
-}
-
-#goTestRace: #step & {
-	name: "Test with -race"
-	run:  "go test -race ./..."
-}
-
-#goReleaseCheck: #step & {
-	name: "gorelease check"
-	run:  "go run golang.org/x/exp/cmd/gorelease"
-}
-
-#checkGitClean: #step & {
-	name: "Check that git is clean post generate and tests"
-	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
-}
-
-#pullThroughProxy: #step & {
-	name: "Pull this commit through the proxy on master"
-	run: """
-		v=$(git rev-parse HEAD)
-		cd $(mktemp -d)
-		go mod init mod.com
-		GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
-		"""
-	if: "github.ref == 'refs/heads/master'"
-}
-
-test: {
-	json.#Workflow
+test: _#bashWorkflow & {
 
 	name: "Test"
 	on: {
 		push: {
-			branches: ["*"]
+			branches: ["**"] // any branch (including '/' namespaced branches)
 			"tags-ignore": ["v*"]
 		}
 	}
-	defaults: run: shell: "bash"
-	jobs: test: {
-		strategy:  #testStrategy
-		"runs-on": "${{ matrix.os }}"
-		steps: [
-			#installGo,
-			#checkoutCode,
-			#cacheGoModules,
-			#goGenerate,
-			#goTest,
-			#goTestRace,
-			#goReleaseCheck,
-			#checkGitClean,
-			#pullThroughProxy,
-		]
+
+	jobs: {
+		test: {
+			strategy:  _#testStrategy
+			"runs-on": "${{ matrix.os }}"
+			steps: [
+				_#writeCookiesFile,
+				_#installGo,
+				_#checkoutCode,
+				_#cacheGoModules,
+				_#goGenerate,
+				_#goTest,
+				_#goTestRace,
+				_#goReleaseCheck,
+				_#checkGitClean,
+				_#pullThroughProxy,
+				_#failCLBuild,
+			]
+		}
+		mark_ci_success: {
+			"runs-on": _#linuxMachine
+			if:        "${{ \(_#isCLCITestBranch) }}"
+			needs:     "test"
+			steps: [
+				_#writeCookiesFile,
+				_#passCLBuild,
+			]
+		}
+		delete_build_branch: {
+			"runs-on": _#linuxMachine
+			if:        "${{ \(_#isCLCITestBranch) && always() }}"
+			needs:     "test"
+			steps: [
+				_#step & {
+					run: "echo git push origin :${GITHUB_REF#\(_#branchRefPrefix)}"
+				},
+			]
+		}
+	}
+
+	// _#isCLCITestBranch is an expression that evaluates to true
+	// if the job is running as a result of a CL triggered CI build
+	_#isCLCITestBranch: "startsWith(github.ref, '\(_#branchRefPrefix)ci/')"
+
+	// _#isMaster is an expression that evaluates to true if the
+	// job is running as a result of a master commit push
+	_#isMaster: "github.ref == '\(_#branchRefPrefix)master'"
+
+	_#pullThroughProxy: _#step & {
+		name: "Pull this commit through the proxy on master"
+		run: """
+			v=$(git rev-parse HEAD)
+			cd $(mktemp -d)
+			go mod init mod.com
+			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
+			"""
+		if: "${{ \(_#isMaster) }}"
+	}
+
+	_#failCLBuild: _#step & {
+		if:   "${{ \(_#isCLCITestBranch) && failure() }}"
+		name: "Post any failures for this matrix entry"
+		run:  (_#gerrit._#setCodeReview & {
+			#args: {
+				message: "Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details"
+				labels: {
+					"Code-Review": -1
+				}
+			}
+		}).res
+	}
+
+	_#passCLBuild: _#step & {
+		name: "Update Gerrit CL message with success message"
+		run:  (_#gerrit._#setCodeReview & {
+			#args: {
+				message: "Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+				labels: {
+					"Code-Review": 1
+				}
+			}
+		}).res
+	}
+
+	_#gerrit: {
+		// _#setCodeReview assumes that it is invoked from a job where
+		// _#isCLCITestBranch is true
+		_#setCodeReview: {
+			#args: {
+				message: string
+				labels?: {
+					"Code-Review": int
+				}
+			}
+			res: #"""
+			curl -f -s -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review
+			"""#
+		}
 	}
 }
 
-test_dispatch: {
-	json.#Workflow
+test_dispatch: _#bashWorkflow & {
 
-	#checkoutRef: #step & {
-		name: "Checkout ref"
-		run: """
-			git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-			git checkout FETCH_HEAD
-			"""
+	name: "Test Dispatch"
+	on: ["repository_dispatch"]
+	jobs: {
+		start: {
+			if:        "${{ startsWith(github.event.action, 'Build for refs/changes/') }}"
+			"runs-on": _#linuxMachine
+			steps: [
+				_#writeCookiesFile,
+				_#step & {
+					name: "Update Gerrit CL message with starting message"
+					run:  (_#gerrit._#setCodeReview & {
+						#args: message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+					}).res
+				},
+				_#step & {
+					name: "Checkout ref"
+					run: """
+						git config --global user.name cueckoo
+						git config --global user.email cueckoo@gmail.com
+						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+						git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
+						git checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD
+						git push origin ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}
+						"""
+				},
+			]
+		}
 	}
-	#writeCookiesFile: #step & {
-		name: "Write the gitcookies file"
-		run:  "echo \"$GERRIT_COOKIE\" > ~/.gitcookies"
-	}
-	#gerrit: {
-		#setCodeReview: {
+
+	_#gerrit: {
+		_#setCodeReview: {
 			#args: {
 				message: string
 				labels?: {
@@ -162,79 +181,15 @@ test_dispatch: {
 			"""#
 		}
 	}
-
-	name: "Test Dispatch"
-	env: GERRIT_COOKIE: "${{ secrets.gerritCookie }}"
-	on: ["repository_dispatch"]
-	defaults: run: shell: "bash"
-	jobs: {
-		start: {
-			"runs-on": "ubuntu-latest"
-			steps: [
-				#writeCookiesFile,
-				#step & {
-					name: "Update Gerrit CL message with starting message"
-					run:  (#gerrit.#setCodeReview & {
-						#args: message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-					}).res
-				},
-			]
-		}
-		test: {
-			"runs-on": "${{ matrix.os }}"
-			steps: [
-				#writeCookiesFile,
-				#installGo,
-				#checkoutCode,
-				#checkoutRef,
-				#cacheGoModules,
-				#goGenerate,
-				#goTest,
-				#goTestRace,
-				#goReleaseCheck,
-				#checkGitClean,
-				#step & {
-					if:   "${{ failure() }}"
-					name: "Post any failures for this matrix entry"
-					run:  (#gerrit.#setCodeReview & {
-						#args: {
-							message: "Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details"
-							labels: {
-								"Code-Review": -1
-							}
-						}
-					}).res
-				},
-			]
-			needs:    "start"
-			strategy: #testStrategy
-		}
-		end: {
-			"runs-on": "ubuntu-latest"
-			steps: [
-				#writeCookiesFile,
-				#step & {
-					name: "Update Gerrit CL message with success message"
-					run:  (#gerrit.#setCodeReview & {
-						#args: {
-							message: "Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-							labels: {
-								"Code-Review": 1
-							}
-						}
-					}).res
-				},
-			]
-			needs: "test"
-		}
-	}
 }
-release: {
+
+release: _#bashWorkflow & {
+
 	name: "Release"
 	on: push: tags: ["v*"]
 	jobs: {
 		goreleaser: {
-			"runs-on": "ubuntu-latest"
+			"runs-on": _#linuxMachine
 			steps: [{
 				name: "Checkout code"
 				uses: "actions/checkout@v2"
@@ -250,7 +205,7 @@ release: {
 		}
 		docker: {
 			name:      "docker"
-			"runs-on": "ubuntu-latest"
+			"runs-on": _#linuxMachine
 			steps: [{
 				name: "Check out the repo"
 				uses: "actions/checkout@v2"
@@ -286,16 +241,98 @@ release: {
 	}
 }
 
-rebuild_tip_cuelang_org: {
-	json.#Workflow
+rebuild_tip_cuelang_org: _#bashWorkflow & {
 
 	name: "Push to tip"
 	on: push: branches: ["master"]
 	jobs: push: {
-		"runs-on": "ubuntu-latest"
+		"runs-on": _#linuxMachine
 		steps: [{
 			name: "Rebuild tip.cuelang.org"
 			run:  "curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
 		}]
 	}
 }
+
+_#bashWorkflow: json.#Workflow & {
+	jobs: [string]: defaults: run: shell: "bash"
+}
+
+// TODO: drop when cuelang.org/issue/390 is fixed.
+// Declare definitions for sub-schemas
+_#job:  ((json.#Workflow & {}).jobs & {x: _}).x
+_#step: ((_#job & {steps:                 _}).steps & [_])[0]
+
+// We need at least go1.14 for code generation
+_#codeGenGo: "1.14.9"
+
+_#linuxMachine:   "ubuntu-18.04"
+_#macosMachine:   "macos-10.15"
+_#windowsMachine: "windows-2019"
+
+_#testStrategy: {
+	"fail-fast": false
+	matrix: {
+		// Use a stable version of 1.14.x for go generate
+		"go-version": ["1.13.x", _#codeGenGo, "1.15.x"]
+		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
+	}
+}
+
+_#installGo: _#step & {
+	name: "Install Go"
+	uses: "actions/setup-go@v2"
+	with: "go-version": "${{ matrix.go-version }}"
+}
+
+_#checkoutCode: _#step & {
+	name: "Checkout code"
+	uses: "actions/checkout@v2"
+}
+
+_#cacheGoModules: _#step & {
+	name: "Cache Go modules"
+	uses: "actions/cache@v1"
+	with: {
+		path: "~/go/pkg/mod"
+		key:  "${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum') }}"
+		"restore-keys": """
+			${{ runner.os }}-${{ matrix.go-version }}-go-
+			"""
+	}
+}
+
+_#goGenerate: _#step & {
+	name: "Generate"
+	run:  "go generate ./..."
+	// The Go version corresponds to the precise version specified in
+	// the matrix. Skip windows for now until we work out why re-gen is flaky
+	if: "matrix.go-version == '\(_#codeGenGo)' && matrix.os != '\(_#windowsMachine)'"
+}
+
+_#goTest: _#step & {
+	name: "Test"
+	run:  "go test ./..."
+}
+
+_#goTestRace: _#step & {
+	name: "Test with -race"
+	run:  "go test -race ./..."
+}
+
+_#goReleaseCheck: _#step & {
+	name: "gorelease check"
+	run:  "go run golang.org/x/exp/cmd/gorelease"
+}
+
+_#checkGitClean: _#step & {
+	name: "Check that git is clean post generate and tests"
+	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
+}
+
+_#writeCookiesFile: _#step & {
+	name: "Write the gitcookies file"
+	run:  "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies"
+}
+
+_#branchRefPrefix: "refs/heads/"

@@ -7,7 +7,10 @@ on:
     - master
 jobs:
   push:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
     steps:
     - name: Rebuild tip.cuelang.org
       run: curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook

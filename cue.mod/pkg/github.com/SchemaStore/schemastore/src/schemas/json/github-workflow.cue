@@ -217,6 +217,20 @@ import "strings"
 				...
 			}
 
+			// This event is similar to pull_request, except that it runs in
+			// the context of the base repository of the pull request, rather
+			// than in the merge commit. This means that you can more safely
+			// make your secrets available to the workflows triggered by the
+			// pull request, because only workflows defined in the commit on
+			// the base repository are run. For example, this event allows
+			// you to create workflows that label and comment on pull
+			// requests, based on the contents of the event payload.
+			pull_request_target?: #ref & {
+				types?: #types & [..."assigned" | "unassigned" | "labeled" | "unlabeled" | "opened" | "edited" | "closed" | "reopened" | "synchronize" | "ready_for_review" | "locked" | "unlocked" | "review_requested" | "review_request_removed"] | *["opened", "synchronize", "reopened"]
+
+				{[=~"^(branche|tag|path)s(-ignore)?$" & !~"^(types)$"]: _}
+			}
+
 			// Runs your workflow when someone pushes to a repository branch,
 			// which triggers the push event.
 			// Note: The webhook payload available to GitHub Actions does not
@@ -239,9 +253,10 @@ import "strings"
 			// Runs your workflow anytime the release event occurs. More than
 			// one activity type triggers this event. For information about
 			// the REST API, see
-			// https://developer.github.com/v3/repos/releases/.
+			// https://developer.github.com/v3/repos/releases/ in the GitHub
+			// Developer documentation.
 			release?: #eventObject & {
-				types?: #types & [..."published" | "unpublished" | "created" | "edited" | "deleted" | "prereleased"] | *["published", "unpublished", "created", "edited", "deleted", "prereleased"]
+				types?: #types & [..."published" | "unpublished" | "created" | "edited" | "deleted" | "prereleased" | "released"] | *["published", "unpublished", "created", "edited", "deleted", "prereleased", "released"]
 				...
 			}
 
@@ -255,6 +270,51 @@ import "strings"
 			// the REST API, see
 			// https://developer.github.com/v3/activity/starring/.
 			watch?: #eventObject
+
+			// You can now create workflows that are manually triggered with
+			// the new workflow_dispatch event. You will then see a 'Run
+			// workflow' button on the Actions tab, enabling you to easily
+			// trigger a run.
+			workflow_dispatch?: null | bool | number | string | [...] | {
+				// Input parameters allow you to specify data that the action
+				// expects to use during runtime. GitHub stores input parameters
+				// as environment variables. Input ids with uppercase letters are
+				// converted to lowercase during runtime. We recommended using
+				// lowercase input ids.
+				inputs?: {
+					{[=~"^[_a-zA-Z][a-zA-Z0-9_-]*$" & !~"^()$"]: {
+						// A string description of the input parameter.
+						description: string
+
+						// A string shown to users using the deprecated input.
+						deprecationMessage?: string
+
+						// A boolean to indicate whether the action requires the input
+						// parameter. Set to true when the parameter is required.
+						required: bool
+
+						// A string representing the default value. The default value is
+						// used when an input parameter isn't specified in a workflow
+						// file.
+						default?: string
+					}}
+				}
+				...
+			}
+
+			// This event occurs when a workflow run is requested or
+			// completed, and allows you to execute a workflow based on the
+			// finished result of another workflow. For example, if your
+			// pull_request workflow generates build artifacts, you can
+			// create a new workflow that uses workflow_run to analyze the
+			// results and add a comment to the original pull request.
+			workflow_run?: #eventObject & {
+				types?:     #types & [..."requested" | "completed"] | *["requested", "completed"]
+				workflows?: [...string] & [_, ...]
+
+				{[=~"^branches(-ignore)?$" & !~"^(types|workflows)$"]: _}
+				...
+			}
 
 			// You can use the GitHub API to trigger a webhook event called
 			// repository_dispatch when you want to trigger a workflow for
@@ -281,7 +341,7 @@ import "strings"
 			// To help you get started, there is also a list of crontab guru
 			// examples (https://crontab.guru/examples.html).
 			schedule?: [...null | bool | number | string | [...] | {
-				cron?: =~"^(((\\d+,)+\\d+|((\\d+|\\*)\\/\\d+)|(\\d+-\\d+)|\\d+|\\*) ?){5,7}$"
+				cron?: =~"^(((\\d+,)+\\d+|((\\d+|\\*)\\/\\d+|JAN|FEB|MAR|APR|MAY|JUN|JUL|AUG|SEP|OCT|NOV|DEC)|(\\d+-\\d+)|\\d+|\\*|MON|TUE|WED|THU|FRI|SAT|SUN) ?){5,7}$"
 			}] & [_, ...]
 		}
 
@@ -315,7 +375,10 @@ import "strings"
 
 				// The type of machine to run the job on. The machine can be
 				// either a GitHub-hosted runner, or a self-hosted runner.
-				"runs-on": "${{ matrix.os }}" | "macos-latest" | "macos-10.15" | "self-hosted" | "ubuntu-16.04" | "ubuntu-18.04" | "ubuntu-latest" | "windows-latest" | "windows-2019" | (["self-hosted"] | ["self-hosted", #machine] | ["self-hosted", #architecture] | ["self-hosted", #machine, #architecture] | ["self-hosted", #architecture, #machine])
+				"runs-on": "macos-10.15" | "macos-11.0" | "macos-latest" | "self-hosted" | "ubuntu-16.04" | "ubuntu-18.04" | "ubuntu-20.04" | "ubuntu-latest" | "windows-2016" | "windows-2019" | "windows-latest" | (["self-hosted"] | ["self-hosted", #machine] | ["self-hosted", #architecture] | ["self-hosted", #machine, #architecture] | ["self-hosted", #architecture, #machine]) & [...] | #expressionSyntax
+
+				// The environment that the job references.
+				environment?: string | #environment
 
 				// A map of outputs for a job. Job outputs are available to all
 				// downstream jobs that depend on this job.
@@ -420,7 +483,7 @@ import "strings"
 
 					// Prevents a job from failing when a step fails. Set to true to
 					// allow a job to pass when this step fails.
-					"continue-on-error"?: bool | *false
+					"continue-on-error"?: bool | #expressionSyntax | *false
 
 					// The maximum number of minutes to run the step before killing
 					// the process.
@@ -450,7 +513,9 @@ import "strings"
 					// matrix.os context parameter to set runs-on. For more
 					// information, see
 					// https://help.github.com/en/articles/contexts-and-expression-syntax-for-github-actions.
-					matrix: {
+					matrix: ({
+						...
+					} | #expressionSyntax) & {
 						{[=~"^(in|ex)clude$" & !~"^()$"]: [...{
 											[string]: #configuration
 						}] & [_, ...]}
@@ -470,7 +535,7 @@ import "strings"
 
 				// Prevents a workflow run from failing when a job fails. Set to
 				// true to allow a workflow run to pass when this job fails.
-				"continue-on-error"?: bool | string
+				"continue-on-error"?: bool | #expressionSyntax
 
 				// A container to run any steps in a job that don't already
 				// specify a container. If you have steps that use both script
@@ -480,9 +545,7 @@ import "strings"
 				// If you do not set a container, all steps will run directly on
 				// the host specified by runs-on unless a step refers to an
 				// action configured to run in a container.
-				container?: {
-					[string]: string | #container
-				}
+				container?: string | #container
 
 				// Additional containers to host services for a job in a workflow.
 				// These are useful for creating databases or cache services like
@@ -509,15 +572,24 @@ import "strings"
 
 	#branch: #globs
 
-	#configuration: string | number | {
+	#configuration: string | number | bool | {
 		[string]: #configuration
 	} | [...#configuration]
 
-	#container: string | {
+	#container: {
 		// The Docker image to use as the container to run the action. The
-		// value can be the Docker Hub image name or a public docker
-		// registry name.
+		// value can be the Docker Hub image name or a registry name.
 		image: string
+
+		// If the image's container registry requires authentication to
+		// pull the image, you can use credentials to set a map of the
+		// username and password. The credentials are the same values
+		// that you would provide to the `docker login` command.
+		credentials?: {
+			username?: string
+			password?: string
+			...
+		}
 
 		// Sets an array of environment variables in the container.
 		env?: #env
@@ -549,9 +621,19 @@ import "strings"
 
 	#env: [string]: bool | number | string
 
-	#event: "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "member" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "push" | "registry_package" | "release" | "status" | "watch" | "repository_dispatch"
+	#environment: {
+		// The name of the environment configured in the repo.
+		name: string
+
+		// A deployment URL
+		url?: string
+	}
+
+	#event: "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "member" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "pull_request_target" | "push" | "registry_package" | "release" | "status" | "watch" | "workflow_dispatch" | "workflow_run" | "repository_dispatch"
 
 	#eventObject: null
+
+	#expressionSyntax: =~"^\\$\\{\\{.*\\}\\}$"
 
 	#globs: [...strings.MinRunes(1)] & [_, ...]
 

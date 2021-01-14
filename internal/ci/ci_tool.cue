@@ -25,7 +25,9 @@ command: genworkflows: task: {
 command: vendorgithubschema: {
 	get: http.Get & {
 		request: body: ""
-		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/f7a0789ccb3bd74a720ddbd6691d60fd9e2d8b7a/src/schemas/json/github-workflow.json"
+
+		// Tip link: https://github.com/SchemaStore/schemastore/blob/master/src/schemas/json/github-workflow.json
+		url: "https://raw.githubusercontent.com/SchemaStore/schemastore/6fe4707b9d1c5d45cfc8d5b6d56968e65d2bdc38/src/schemas/json/github-workflow.json"
 	}
 	convert: exec.Run & {
 		stdin: get.response.body

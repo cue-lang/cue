@@ -1042,9 +1042,6 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 		n.lists = append(n.lists, envList{env: env, list: x, id: id})
 
 	case *DisjunctionExpr:
-		if n.disjunctions != nil {
-			_ = n.disjunctions
-		}
 		n.addDisjunction(env, x, id)
 
 	default:
@@ -1343,40 +1340,29 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 			return
 
 		case *StructMarker:
-			// TODO: this would not be necessary if acceptor.isClose were
-			// not used. See comment at acceptor.
-			s := &StructLit{}
-
-			// Keep ordering of Go struct for topological sort.
-			n.node.AddStruct(s, env, id)
-			n.node.Structs = append(n.node.Structs, x.Structs...)
-
-			for _, a := range x.Arcs {
-				c := MakeConjunct(nil, a, id)
-				c = updateCyclic(c, cyclic, nil, nil)
-				n.insertField(a.Label, c)
-				s.MarkField(a.Label)
-			}
 
 		case Value:
 			n.addValueConjunct(env, v, id)
-
-			// TODO: this would not be necessary if acceptor.isClose were
-			// not used. See comment at acceptor.
-			s := &StructLit{}
-			n.node.AddStruct(s, env, id)
-
-			for _, a := range x.Arcs {
-				// TODO(errors): report error when this is a regular field.
-				c := MakeConjunct(nil, a, id)
-				c = updateCyclic(c, cyclic, nil, nil)
-				n.insertField(a.Label, c)
-				s.MarkField(a.Label)
-			}
 		}
 
+		if len(x.Arcs) == 0 {
+			return
+		}
+
+		s := &StructLit{}
+
+		// Keep ordering of Go struct for topological sort.
+		n.node.AddStruct(s, env, id)
+		n.node.Structs = append(n.node.Structs, x.Structs...)
+
+		for _, a := range x.Arcs {
+			// TODO(errors): report error when this is a regular field.
+			c := MakeConjunct(nil, a, id)
+			c = updateCyclic(c, cyclic, nil, nil)
+			n.insertField(a.Label, c)
+			s.MarkField(a.Label)
+		}
 		return
-		// TODO: Use the Closer to close other fields as well?
 	}
 
 	switch b := v.(type) {
@@ -1641,6 +1627,17 @@ func (n *nodeContext) addStruct(
 	}
 }
 
+// TODO(perf): if an arc is the only arc with that label added to a Vertex, and
+// if there are no conjuncts of optional fields to be added, then the arc could
+// be added as is until any of these conditions change. This would allow
+// structure sharing in many cases. One should be careful, however, to
+// recursively track arcs of previously unified evaluated vertices ot make this
+// optimization meaningful.
+//
+// An alternative approach to avoid evaluating optional arcs (if we take that
+// route) is to not recursively evaluate those arcs, even for Finalize. This is
+// possible as it is not necessary to evaluate optional arcs to evaluate
+// disjunctions.
 func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	ctx := n.ctx
 	arc, isNew := n.node.GetArc(f)

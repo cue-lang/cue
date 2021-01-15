@@ -156,12 +156,15 @@ test_dispatch: _#bashWorkflow & {
 				_#step & {
 					name: "Checkout ref"
 					run: """
-						git config --global user.name cueckoo
-						git config --global user.email cueckoo@gmail.com
+						mkdir tmpgit
+						cd tmpgit
+						git init
+						git config user.name cueckoo
+						git config user.email cueckoo@gmail.com
 						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
 						git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
 						git checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD
-						git push origin ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}
+						git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}
 						"""
 				},
 			]

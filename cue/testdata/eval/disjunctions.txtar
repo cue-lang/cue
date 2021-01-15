@@ -108,6 +108,31 @@ d100: {
   j: i.bar
 }
 
+issue641: {
+    #A: {
+      type: "a"
+      x:    ""
+    }
+
+    #B: {
+      type: "b"
+      x:    string
+    }
+
+    #C: {
+      b: #A | #B
+    }
+
+    e: [string]: #C & {
+      b: #A | #B
+    }
+
+    e: foobar: #C & {
+      b: #B & {
+        x: "foobar"
+      }
+    }
+}
 -- out/eval --
 Errors:
 f: 2 errors in empty disjunction:
@@ -249,6 +274,33 @@ Result:
     j: (_|_){
       // [incomplete] d100.j: unresolved disjunction null | {bar:2} (type (null|struct)):
       //     ./in.cue:107:6
+    }
+  }
+  issue641: (struct){
+    #A: (#struct){
+      type: (string){ "a" }
+      x: (string){ "" }
+    }
+    #B: (#struct){
+      type: (string){ "b" }
+      x: (string){ string }
+    }
+    #C: (#struct){
+      b: (struct){ |((#struct){
+          type: (string){ "a" }
+          x: (string){ "" }
+        }, (#struct){
+          type: (string){ "b" }
+          x: (string){ string }
+        }) }
+    }
+    e: (struct){
+      foobar: (#struct){
+        b: (#struct){
+          type: (string){ "b" }
+          x: (string){ "foobar" }
+        }
+      }
     }
   }
 }
@@ -410,5 +462,30 @@ Result:
       bar: 2
     })
     j: 〈0;i〉.bar
+  }
+  issue641: {
+    #A: {
+      type: "a"
+      x: ""
+    }
+    #B: {
+      type: "b"
+      x: string
+    }
+    #C: {
+      b: (〈1;#A〉|〈1;#B〉)
+    }
+    e: {
+      [string]: (〈1;#C〉 & {
+        b: (〈2;#A〉|〈2;#B〉)
+      })
+    }
+    e: {
+      foobar: (〈1;#C〉 & {
+        b: (〈2;#B〉 & {
+          x: "foobar"
+        })
+      })
+    }
   }
 }

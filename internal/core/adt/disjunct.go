@@ -165,21 +165,15 @@ func (n *nodeContext) expandDisjuncts(
 			}
 			return
 		}
-		if n.node.BaseValue == nil {
-			n.node.BaseValue = n.getValidators()
-		}
-
-		// TODO: clean up this mess:
-		result := *n.node // XXX: n.result = snapshotVertex(n.node)?
-
-		if recursive && state < Finalized {
-			*n = m
-		}
-		n.result = result
-		n.node = &n.result
 
 		if recursive {
+			*n = m
+			n.result = *n.node // XXX: n.result = snapshotVertex(n.node)?
+			n.node = &n.result
 			n.disjuncts = append(n.disjuncts, n)
+		}
+		if n.node.BaseValue == nil {
+			n.node.BaseValue = n.getValidators()
 		}
 
 	case len(n.disjunctions) > 0:
@@ -201,6 +195,8 @@ func (n *nodeContext) expandDisjuncts(
 				// not be done unless there is complete information.
 				state = Partial
 			}
+			//  TODO(perf): ideally always finalize. See comment below
+			// state = Finalized
 
 			for _, dn := range a {
 				switch {
@@ -272,6 +268,12 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for _, v := range p.disjuncts {
+				// TODO(perf): not checking equality here may lead to polynomial
+				// blowup. Doesn't seem to affect large configurations, though,
+				// where this could matter at the moment.
+				if state != Finalized {
+					break
+				}
 				if Equal(n.ctx, &v.result, &d.result) {
 					if d.defaultMode == isDefault {
 						v.defaultMode = isDefault

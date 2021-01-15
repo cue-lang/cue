@@ -1857,7 +1857,7 @@ func (v Value) instance() *Instance {
 	if v.v == nil {
 		return nil
 	}
-	return v.ctx().getImportFromNode(v.v)
+	return v.idx.getImportFromNode(v.v)
 }
 
 // Reference returns the instance and path referred to by this value such that

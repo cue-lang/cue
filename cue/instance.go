@@ -59,16 +59,11 @@ func (x *index) addInst(p *Instance) *Instance {
 	return p
 }
 
-func (x *index) getImportFromBuild(p *build.Instance) *Instance {
+func (x *index) getImportFromBuild(p *build.Instance, v *adt.Vertex) *Instance {
 	inst := x.loaded[p]
 
 	if inst != nil {
 		return inst
-	}
-
-	v := x.GetNodeFromInstance(p)
-	if v == nil {
-		return nil
 	}
 
 	inst = &Instance{
@@ -95,7 +90,7 @@ func (x *index) getImportFromNode(v *adt.Vertex) *Instance {
 		return nil
 	}
 
-	return x.getImportFromBuild(p)
+	return x.getImportFromBuild(p, v)
 }
 
 func (x *index) getImportFromPath(id string) *Instance {

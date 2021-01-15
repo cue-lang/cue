@@ -95,7 +95,7 @@ func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
 	return r.index.imports[key]
 }
 
-func (r *Runtime) GetNodeFromInstance(key *build.Instance) *adt.Vertex {
+func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
 	return r.index.importsByBuild[key]
 }
 

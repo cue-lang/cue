@@ -28,7 +28,7 @@ import (
 // Build builds b and all its transitive dependencies, insofar they have not
 // been build yet.
 func (x *Runtime) Build(b *build.Instance) (v *adt.Vertex, errs errors.Error) {
-	if v := x.GetNodeFromInstance(b); v != nil {
+	if v := x.getNodeFromInstance(b); v != nil {
 		return v, b.Err
 	}
 	// TODO: clear cache of old implementation.

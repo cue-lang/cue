@@ -193,25 +193,19 @@ func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 	})
 }
 
-type importIndex map[*build.Instance]*Instance
-
 // index maps conversions from label names to internal codes.
 //
 // All instances belonging to the same package should share this index.
 type index struct {
 	*runtime.Runtime
-	loaded importIndex
+	loaded map[*build.Instance]*Instance
 }
 
 // NewRuntime creates a *runtime.Runtime with builtins preloaded.
 func NewRuntime() *runtime.Runtime {
-	r := runtime.New()
-	i := &index{
-		Runtime: r,
-		loaded:  importIndex{},
-	}
-	r.Data = i
-	return r
+	i := newIndex()
+	i.Runtime.Data = i
+	return i.Runtime
 }
 
 // newIndex creates a new index.
@@ -219,7 +213,7 @@ func newIndex() *index {
 	r := runtime.New()
 	i := &index{
 		Runtime: r,
-		loaded:  importIndex{},
+		loaded:  map[*build.Instance]*Instance{},
 	}
 	r.Data = i
 	return i
@@ -230,6 +224,6 @@ func isBuiltin(s string) bool {
 }
 
 func (idx *index) loadInstance(p *build.Instance) *Instance {
-	idx.Runtime.Build(p)
-	return idx.getImportFromBuild(p)
+	v, _ := idx.Runtime.Build(p)
+	return idx.getImportFromBuild(p, v)
 }

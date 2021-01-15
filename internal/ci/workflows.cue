@@ -70,7 +70,10 @@ test: _#bashWorkflow & {
 			needs:     "test"
 			steps: [
 				_#step & {
-					run: "echo git push origin :${GITHUB_REF#\(_#branchRefPrefix)}"
+					run: """
+						\(_#tempCueckooGitDir)
+						git push https://github.com/cuelang/cue :${GITHUB_REF#\(_#branchRefPrefix)}
+						"""
 				},
 			]
 		}
@@ -155,13 +158,8 @@ test_dispatch: _#bashWorkflow & {
 				},
 				_#step & {
 					name: "Checkout ref"
-					run: """
-						mkdir tmpgit
-						cd tmpgit
-						git init
-						git config user.name cueckoo
-						git config user.email cueckoo@gmail.com
-						git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+					run:  """
+						\(_#tempCueckooGitDir)
 						git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
 						git checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD
 						git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}
@@ -339,3 +337,12 @@ _#writeCookiesFile: _#step & {
 }
 
 _#branchRefPrefix: "refs/heads/"
+
+_#tempCueckooGitDir: """
+	mkdir tmpgit
+	cd tmpgit
+	git init
+	git config user.name cueckoo
+	git config user.email cueckoo@gmail.com
+	git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+	"""

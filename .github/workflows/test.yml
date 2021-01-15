@@ -88,4 +88,11 @@ jobs:
       run:
         shell: bash
     steps:
-    - run: echo git push origin :${GITHUB_REF#refs/heads/}
+    - run: |-
+        mkdir tmpgit
+        cd tmpgit
+        git init
+        git config user.name cueckoo
+        git config user.email cueckoo@gmail.com
+        git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
+        git push https://github.com/cuelang/cue :${GITHUB_REF#refs/heads/}

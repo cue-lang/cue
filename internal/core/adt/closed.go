@@ -227,6 +227,9 @@ func (c *closeInfo) isClosed() bool {
 
 func isClosed(v *Vertex) bool {
 	for _, s := range v.Structs {
+		if s.IsClosed {
+			return true
+		}
 		for c := s.closeInfo; c != nil; c = c.parent {
 			if c.isClosed() {
 				return true

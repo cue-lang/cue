@@ -20,13 +20,16 @@ package adt
 func (o *StructInfo) MatchAndInsert(c *OpContext, arc *Vertex) {
 	env := o.Env
 
+	closeInfo := o.CloseInfo
+	closeInfo.IsClosed = false
+
 	// Match normal fields
 	matched := false
 outer:
 	for _, f := range o.Fields {
 		if f.Label == arc.Label {
 			for _, e := range f.Optional {
-				arc.AddConjunct(MakeConjunct(env, e, o.CloseInfo))
+				arc.AddConjunct(MakeConjunct(env, e, closeInfo))
 			}
 			matched = true
 			break outer
@@ -49,7 +52,7 @@ outer:
 		// }
 		if matchBulk(c, env, b, arc.Label) {
 			matched = true
-			arc.AddConjunct(MakeConjunct(&bulkEnv, b, o.CloseInfo))
+			arc.AddConjunct(MakeConjunct(&bulkEnv, b, closeInfo))
 		}
 	}
 	if matched {
@@ -62,7 +65,7 @@ outer:
 
 	// match others
 	for _, x := range o.Additional {
-		arc.AddConjunct(MakeConjunct(&addEnv, x, o.CloseInfo))
+		arc.AddConjunct(MakeConjunct(&addEnv, x, closeInfo))
 	}
 }
 

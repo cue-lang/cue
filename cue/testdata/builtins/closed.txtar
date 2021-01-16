@@ -18,6 +18,30 @@ inDisjunctions: {
     x: syslog: xxx: {}
 }
 
+issue642: {
+    test: close({
+        a: _
+        b: x: _
+    } & {
+        [string]: y: _
+    })
+
+    test: a: x: _
+    test: b: x: _
+}
+
+// Issue 642
+withSubfields: {
+    test: close({
+        a: _
+        b: x: _
+        [string]: y: _
+    })
+
+    test: a: x: _
+    test: b: x: _
+}
+
 -- out/eval --
 Errors:
 b: field `x` not allowed:
@@ -29,13 +53,13 @@ Result:
 (_|_){
   // [eval]
   a: (#struct){
-    a: (#struct){
+    a: (struct){
       b: (int){ int }
     }
   }
   b: (_|_){
     // [eval]
-    a: (#struct){
+    a: (struct){
       b: (int){ int }
     }
     x: (_|_){
@@ -46,7 +70,7 @@ Result:
     }
   }
   c: (#struct){
-    a: (#struct){
+    a: (struct){
       b: (int){ int }
       c: (int){ int }
     }
@@ -118,6 +142,30 @@ Result:
     #Def: (#struct){
     }
   }
+  issue642: (struct){
+    test: (#struct){
+      a: (struct){
+        y: (_){ _ }
+        x: (_){ _ }
+      }
+      b: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+    }
+  }
+  withSubfields: (struct){
+    test: (#struct){
+      a: (struct){
+        y: (_){ _ }
+        x: (_){ _ }
+      }
+      b: (struct){
+        x: (_){ _ }
+        y: (_){ _ }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -170,6 +218,49 @@ Result:
     x: {
       syslog: {
         xxx: {}
+      }
+    }
+  }
+  issue642: {
+    test: close(({
+      a: _
+      b: {
+        x: _
+      }
+    } & {
+      [string]: {
+        y: _
+      }
+    }))
+    test: {
+      a: {
+        x: _
+      }
+    }
+    test: {
+      b: {
+        x: _
+      }
+    }
+  }
+  withSubfields: {
+    test: close({
+      a: _
+      b: {
+        x: _
+      }
+      [string]: {
+        y: _
+      }
+    })
+    test: {
+      a: {
+        x: _
+      }
+    }
+    test: {
+      b: {
+        x: _
       }
     }
   }

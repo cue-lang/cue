@@ -1299,7 +1299,6 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 			n.aStruct = x
 			n.aStructID = id
 			if m.NeedClose {
-				n.node.Closed = true // TODO: remove.
 				id = id.SpawnRef(x, IsDef(x), x)
 				id.IsClosed = true
 			}

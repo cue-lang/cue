@@ -100,6 +100,15 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+
+	// Generated protobuf CUE may use builtins. Ensure that these can always be
+	// found, even if the user does not use cue/load or another package that
+	// triggers its loading.
+	//
+	// TODO: consider whether just linking in the necessary packages suffices.
+	// It probably does, but this may reorder some of the imports, which may,
+	// in turn, change the numbering, which can be confusing while debugging.
+	_ "cuelang.org/go/pkg"
 )
 
 // Config specifies the environment into which to parse a proto definition file.

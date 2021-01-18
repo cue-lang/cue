@@ -54,6 +54,11 @@ func runFixAll(cmd *Command, args []string) error {
 		return err
 	}
 
+	var opts []fix.Option
+	if flagSimplify.Bool(cmd) {
+		opts = append(opts, fix.Simplify())
+	}
+
 	if len(args) == 0 {
 		args = []string{"./..."}
 
@@ -81,7 +86,7 @@ func runFixAll(cmd *Command, args []string) error {
 		Tools: true,
 	})
 
-	errs := fix.Instances(instances)
+	errs := fix.Instances(instances, opts...)
 
 	if errs != nil && flagForce.Bool(cmd) {
 		return errs

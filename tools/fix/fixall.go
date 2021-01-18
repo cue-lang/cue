@@ -25,7 +25,7 @@ import (
 // Instances modifies all files contained in the given build instances at once.
 //
 // It also applies fix.File.
-func Instances(a []*build.Instance) errors.Error {
+func Instances(a []*build.Instance, o ...Option) errors.Error {
 	cwd, _ := os.Getwd()
 
 	// Collect all
@@ -34,7 +34,7 @@ func Instances(a []*build.Instance) errors.Error {
 		cwd:       cwd,
 	}
 
-	p.visitAll(func(f *ast.File) { File(f) })
+	p.visitAll(func(f *ast.File) { File(f, o...) })
 
 	return p.err
 }

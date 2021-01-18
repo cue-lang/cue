@@ -28,8 +28,25 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+type Option func(*options)
+
+type options struct {
+	simplify bool
+}
+
+// Simplify enables fixes that simplify the code, but are not strictly
+// necessary.
+func Simplify() Option {
+	return func(o *options) { o.simplify = true }
+}
+
 // File applies fixes to f and returns it. It alters the original f.
-func File(f *ast.File) *ast.File {
+func File(f *ast.File, o ...Option) *ast.File {
+	var options options
+	for _, f := range o {
+		f(&options)
+	}
+
 	// Rewrite integer division operations to use builtins.
 	f = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()
@@ -248,5 +265,38 @@ func File(f *ast.File) *ast.File {
 	// 	return true
 	// }, nil).(*ast.File)
 
+	if !options.simplify {
+		return f
+	}
+
+	// Rewrite disjunctions with _ to _.
+	f = astutil.Apply(f, func(c astutil.Cursor) bool {
+		if x := findTop(c.Node()); x != nil {
+			c.Replace(x)
+		}
+		return true
+	}, nil).(*ast.File)
+
 	return f
+}
+
+func findTop(x ast.Node) ast.Expr {
+	switch x := x.(type) {
+	case *ast.BinaryExpr:
+		if x.Op != token.OR {
+			break
+		}
+		if v := findTop(x.X); v != nil {
+			return v
+		}
+		if v := findTop(x.Y); v != nil {
+			return v
+		}
+
+	case *ast.Ident:
+		if x.Name == "_" {
+			return x
+		}
+	}
+	return nil
 }

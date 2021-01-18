@@ -56,6 +56,11 @@ type StructLit struct {
 	// hasReferences bool
 }
 
+func (o *StructLit) IsFile() bool {
+	_, ok := o.Src.(*ast.File)
+	return ok
+}
+
 type FieldInfo struct {
 	Label    Feature
 	Optional []Node

@@ -1,0 +1,79 @@
+// Treat fields of different files as belonging to the same struct.
+// This means that a closed embedding in one file should not restrict the
+// fields of another.
+
+-- in.cue --
+#theme: {
+	color:   string
+	ctermbg: string
+}
+dark: #theme & {
+	color:   "dark"
+	ctermbg: "239"
+}
+light: #theme & {
+	color:   "light"
+	ctermbg: "254"
+}
+#Config: {
+	console: dark | *light
+}
+
+-- box.cue --
+#Config & {
+	console: dark
+}
+
+-- out/eval --
+(#struct){
+  #theme: (#struct){
+    color: (string){ string }
+    ctermbg: (string){ string }
+  }
+  dark: (#struct){
+    color: (string){ "dark" }
+    ctermbg: (string){ "239" }
+  }
+  light: (#struct){
+    color: (string){ "light" }
+    ctermbg: (string){ "254" }
+  }
+  #Config: (#struct){
+    console: (struct){ |(*(#struct){
+        color: (string){ "light" }
+        ctermbg: (string){ "254" }
+      }, (#struct){
+        color: (string){ "dark" }
+        ctermbg: (string){ "239" }
+      }) }
+  }
+  console: (#struct){
+    color: (string){ "dark" }
+    ctermbg: (string){ "239" }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #theme: {
+    color: string
+    ctermbg: string
+  }
+  dark: (〈0;#theme〉 & {
+    color: "dark"
+    ctermbg: "239"
+  })
+  light: (〈0;#theme〉 & {
+    color: "light"
+    ctermbg: "254"
+  })
+  #Config: {
+    console: (〈1;dark〉|*〈1;light〉)
+  }
+}
+--- box.cue
+{
+  (〈0;#Config〉 & {
+    console: 〈1;dark〉
+  })
+}

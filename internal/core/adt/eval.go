@@ -1539,7 +1539,7 @@ func (n *nodeContext) addStruct(
 
 	s.Init()
 
-	if s.HasEmbed {
+	if s.HasEmbed && !s.IsFile() {
 		closeInfo = closeInfo.SpawnGroup(nil)
 	}
 

@@ -1,0 +1,47 @@
+-- in.cue --
+a: {
+    #A
+}
+
+a: c: 1
+
+#A: b: 1
+-- out/eval --
+Errors:
+a: field `c` not allowed:
+    ./in.cue:1:4
+    ./in.cue:2:5
+    ./in.cue:5:4
+    ./in.cue:7:5
+
+Result:
+(_|_){
+  // [eval]
+  a: (_|_){
+    // [eval]
+    b: (int){ 1 }
+    c: (_|_){
+      // [eval] a: field `c` not allowed:
+      //     ./in.cue:1:4
+      //     ./in.cue:2:5
+      //     ./in.cue:5:4
+      //     ./in.cue:7:5
+    }
+  }
+  #A: (#struct){
+    b: (int){ 1 }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  a: {
+    〈1;#A〉
+  }
+  a: {
+    c: 1
+  }
+  #A: {
+    b: 1
+  }
+}

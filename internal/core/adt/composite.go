@@ -520,9 +520,10 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		return !v.IsClosed(ctx)
 	}
 
-	if !v.IsClosed(ctx) || v.Lookup(f) != nil {
+	if !f.IsString() || !v.IsClosed(ctx) || v.Lookup(f) != nil {
 		return true
 	}
+
 	// TODO(perf): collect positions in error.
 	defer ctx.ReleasePositions(ctx.MarkPositions())
 

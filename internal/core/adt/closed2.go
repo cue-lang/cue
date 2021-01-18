@@ -29,8 +29,10 @@ func isComplexStruct(ctx *OpContext, v *Vertex) bool {
 	return v.IsClosed(ctx)
 }
 
+// TODO: cleanup code and error messages. Reduce duplication in some related
+// code.
 func verifyArc2(ctx *OpContext, f Feature, v *Vertex, isClosed bool) (found bool, err *Bottom) {
-
+	// TODO(perf): collect positions in error.
 	defer ctx.ReleasePositions(ctx.MarkPositions())
 
 	if ok, required := Accept(ctx, v.Parent, f); ok || (!required && !isClosed) {
@@ -38,7 +40,7 @@ func verifyArc2(ctx *OpContext, f Feature, v *Vertex, isClosed bool) (found bool
 	}
 
 	if !f.IsString() && f != InvalidLabel {
-		// if f.IsHidden() && f != InvalidLabel {
+		// if f.IsHidden() && f != InvalidLabel { Also change Accept in composite.go
 		return false, nil
 	}
 

@@ -1403,6 +1403,11 @@ func TestUnify(t *testing.T) {
 		pathA: a,
 		pathB: b,
 		want:  `["foo",4]`,
+	}, {
+		value: `a: {a: string, _hidden: int, _#hidden: int}, b: close({a: "foo"})`,
+		pathA: a,
+		pathB: b,
+		want:  `{"a":"foo"}`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

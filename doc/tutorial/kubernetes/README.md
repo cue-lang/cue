@@ -505,7 +505,7 @@ for x in [deployment, daemonSet, statefulSet] for k, v in x {
                 let Port = p.containerPort // Port is an alias
                 port:       *Port | int
                 targetPort: *Port | int
-            }  
+            }
         ]
     }
 }
@@ -1063,7 +1063,6 @@ $ go get k8s.io/api/apps/v1
 ```
 
 ```
-$ cue get go k8s.io/api/core/v1
 $ cue get go k8s.io/api/apps/v1
 
 ```

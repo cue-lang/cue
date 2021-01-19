@@ -109,11 +109,16 @@ func (c *CloseInfo) AddPositions(ctx *OpContext) {
 // TODO(perf): use on StructInfo. Then if parent and expression are the same
 // it is possible to use cached value.
 func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
+	var span SpanType
+	if c.closeInfo != nil {
+		span = c.span
+	}
+
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
 		mode:     closeEmbed,
-		embedded: true,
+		span:     span | EmbeddingSpan,
 	}
 	return c
 }
@@ -124,27 +129,27 @@ func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
 //      a: {#foo} & {b: int}
 //
 func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
-	embedded := false
+	var span SpanType
 	if c.closeInfo != nil {
-		embedded = c.embedded
+		span = c.span
 	}
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
-		embedded: embedded,
+		span:     span,
 	}
 	return c
 }
 
 func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
-	embedded := false
+	var span SpanType
 	if c.closeInfo != nil {
-		embedded = c.embedded
+		span = c.span
 	}
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
-		embedded: embedded,
+		span:     span,
 	}
 	if isDef {
 		c.mode = closeDef
@@ -174,6 +179,22 @@ func IsDef(x Expr) bool {
 	return false
 }
 
+// A SpanType is used to indicate whether a CUE value is within the scope of
+// a certain CUE language construct, the span type.
+type SpanType uint8
+
+const (
+	// EmbeddingSpan means that this value was embedded at some point and should
+	// not be included as a possible root node in the todo field of OpContext.
+	EmbeddingSpan SpanType = 1 << iota
+
+	// TODO:
+	// from comprehension
+	// from template.
+	// from definition
+
+)
+
 type closeInfo struct {
 	// location records the expression that led to this node's introduction.
 	location Node
@@ -193,9 +214,7 @@ type closeInfo struct {
 	//  - it is a sibling of a new definition.
 	noCheck bool // don't process for inclusion info
 
-	// embedded means that this value was embedded at some point and should
-	// not be included as a possible root node in the todo field of OpContext.
-	embedded bool
+	span SpanType
 }
 
 // closeStats holds the administrative fields for a closeInfo value. Each
@@ -303,7 +322,7 @@ func markRequired(ctx *OpContext, info *closeInfo) {
 			return
 		}
 
-		if !s.embedded {
+		if s.span&EmbeddingSpan == 0 {
 			x.next = ctx.todo
 			ctx.todo = x
 		}

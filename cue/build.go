@@ -31,7 +31,6 @@ import (
 //
 // The zero value of a Runtime is ready to use.
 type Runtime struct {
-	ctx *build.Context // TODO: remove
 	idx *index
 }
 
@@ -75,14 +74,6 @@ func (r *Runtime) index() *index {
 	return r.idx
 }
 
-func (r *Runtime) buildContext() *build.Context {
-	ctx := r.ctx
-	if r.ctx == nil {
-		ctx = build.NewContext()
-	}
-	return ctx
-}
-
 func (r *Runtime) complete(p *build.Instance) (*Instance, error) {
 	idx := r.index()
 	if err := p.Complete(); err != nil {
@@ -101,7 +92,7 @@ func (r *Runtime) complete(p *build.Instance) (*Instance, error) {
 // name in position information. The source may import builtin packages. Use
 // Build to allow importing non-builtin packages.
 func (r *Runtime) Compile(filename string, source interface{}) (*Instance, error) {
-	ctx := r.buildContext()
+	ctx := build.NewContext()
 	p := ctx.NewInstance(filename, dummyLoad)
 	if err := p.AddFile(filename, source); err != nil {
 		return nil, p.Err
@@ -112,7 +103,7 @@ func (r *Runtime) Compile(filename string, source interface{}) (*Instance, error
 // CompileFile compiles the given source file into an Instance. The source may
 // import builtin packages. Use Build to allow importing non-builtin packages.
 func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
-	ctx := r.buildContext()
+	ctx := build.NewContext()
 	p := ctx.NewInstance(file.Filename, dummyLoad)
 	err := p.AddSyntax(file)
 	if err != nil {

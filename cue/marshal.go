@@ -70,7 +70,7 @@ func (b *unmarshaller) build(bi *instanceData) *build.Instance {
 
 func compileInstances(r *Runtime, data []*instanceData) (instances []*Instance, err error) {
 	b := unmarshaller{
-		ctxt:    r.buildContext(),
+		ctxt:    build.NewContext(),
 		imports: map[string]*instanceData{},
 	}
 	for _, i := range data {

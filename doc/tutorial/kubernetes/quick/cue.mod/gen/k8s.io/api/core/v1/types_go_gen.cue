@@ -542,17 +542,13 @@ import (
 	volumeMode?: null | #PersistentVolumeMode @go(VolumeMode,*PersistentVolumeMode) @protobuf(6,bytes,opt,casttype=PersistentVolumeMode)
 
 	// This field can be used to specify either:
-	// * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot - Beta)
+	// * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
 	// * An existing PVC (PersistentVolumeClaim)
-	// * An existing custom resource/object that implements data population (Alpha)
-	// In order to use VolumeSnapshot object types, the appropriate feature gate
-	// must be enabled (VolumeSnapshotDataSource or AnyVolumeDataSource)
+	// * An existing custom resource that implements data population (Alpha)
+	// In order to use custom resource types that implement data population,
+	// the AnyVolumeDataSource feature gate must be enabled.
 	// If the provisioner or an external controller can support the specified data source,
 	// it will create a new volume based on the contents of the specified data source.
-	// If the specified data source is not supported, the volume will
-	// not be created and the failure will be reported as an event.
-	// In the future, we plan to support more data source types and the behavior
-	// of the provisioner may change.
 	// +optional
 	dataSource?: null | #TypedLocalObjectReference @go(DataSource,*TypedLocalObjectReference) @protobuf(7,bytes,opt)
 }
@@ -1853,6 +1849,7 @@ import (
 // Represents a projected volume source
 #ProjectedVolumeSource: {
 	// list of volume projections
+	// +optional
 	sources: [...#VolumeProjection] @go(Sources,[]VolumeProjection) @protobuf(1,bytes,rep)
 
 	// Mode bits used to set permissions on created files by default.
@@ -2082,6 +2079,7 @@ import (
 	// Protocol for port. Must be UDP, TCP, or SCTP.
 	// Defaults to "TCP".
 	// +optional
+	// +default="TCP"
 	protocol?: #Protocol @go(Protocol) @protobuf(4,bytes,opt,casttype=Protocol)
 
 	// What host IP to bind the external port to.
@@ -2587,7 +2585,6 @@ import (
 	// This can be used to provide different probe parameters at the beginning of a Pod's lifecycle,
 	// when it might take a long time to load data or warm a cache, than during steady-state operation.
 	// This cannot be updated.
-	// This is a beta feature enabled by the StartupProbe feature flag.
 	// More info: https://kubernetes.io/docs/concepts/workloads/pods/pod-lifecycle#container-probes
 	// +optional
 	startupProbe?: null | #Probe @go(StartupProbe,*Probe) @protobuf(22,bytes,opt)
@@ -3686,7 +3683,7 @@ import (
 	// volume types which support fsGroup based ownership(and permissions).
 	// It will have no effect on ephemeral volume types such as: secret, configmaps
 	// and emptydir.
-	// Valid values are "OnRootMismatch" and "Always". If not specified defaults to "Always".
+	// Valid values are "OnRootMismatch" and "Always". If not specified, "Always" is used.
 	// +optional
 	fsGroupChangePolicy?: null | #PodFSGroupChangePolicy @go(FSGroupChangePolicy,*PodFSGroupChangePolicy) @protobuf(9,bytes,opt)
 
@@ -4355,12 +4352,24 @@ import (
 // ServiceExternalTrafficPolicyTypeCluster specifies node-global (legacy) behavior.
 #ServiceExternalTrafficPolicyTypeCluster: #ServiceExternalTrafficPolicyType & "Cluster"
 
+// LoadBalancerPortsError represents the condition of the requested ports
+// on the cloud load balancer instance.
+#LoadBalancerPortsError: "LoadBalancerPortsError"
+
 // ServiceStatus represents the current status of a service.
 #ServiceStatus: {
 	// LoadBalancer contains the current status of the load-balancer,
 	// if one is present.
 	// +optional
 	loadBalancer?: #LoadBalancerStatus @go(LoadBalancer) @protobuf(1,bytes,opt)
+
+	// Current service state
+	// +optional
+	// +patchMergeKey=type
+	// +patchStrategy=merge
+	// +listType=map
+	// +listMapKey=type
+	conditions?: [...metav1.#Condition] @go(Conditions,[]metav1.Condition) @protobuf(2,bytes,rep)
 }
 
 // LoadBalancerStatus represents the status of a load-balancer.
@@ -4383,10 +4392,19 @@ import (
 	// (typically AWS load-balancers)
 	// +optional
 	hostname?: string @go(Hostname) @protobuf(2,bytes,opt)
+
+	// Ports is a list of records of service ports
+	// If used, every port defined in the service should have an entry in it
+	// +listType=atomic
+	// +optional
+	ports?: [...#PortStatus] @go(Ports,[]PortStatus) @protobuf(4,bytes,rep)
 }
 
+// MaxServiceTopologyKeys is the largest number of topology keys allowed on a service
+#MaxServiceTopologyKeys: 16
+
 // IPFamily represents the IP Family (IPv4 or IPv6). This type is used
-// to express the family of an IP expressed by a type (i.e. service.Spec.IPFamily)
+// to express the family of an IP expressed by a type (e.g. service.spec.ipFamilies).
 #IPFamily: string // #enumIPFamily
 
 #enumIPFamily:
@@ -4399,8 +4417,33 @@ import (
 // IPv6Protocol indicates that this IP is IPv6 protocol
 #IPv6Protocol: #IPFamily & "IPv6"
 
-// MaxServiceTopologyKeys is the largest number of topology keys allowed on a service
-#MaxServiceTopologyKeys: 16
+// IPFamilyPolicyType represents the dual-stack-ness requested or required by a Service
+#IPFamilyPolicyType: string // #enumIPFamilyPolicyType
+
+#enumIPFamilyPolicyType:
+	#IPFamilyPolicySingleStack |
+	#IPFamilyPolicyPreferDualStack |
+	#IPFamilyPolicyRequireDualStack
+
+// IPFamilyPolicySingleStack indicates that this service is required to have a single IPFamily.
+// The IPFamily assigned is based on the default IPFamily used by the cluster
+// or as identified by service.spec.ipFamilies field
+#IPFamilyPolicySingleStack: #IPFamilyPolicyType & "SingleStack"
+
+// IPFamilyPolicyPreferDualStack indicates that this service prefers dual-stack when
+// the cluster is configured for dual-stack. If the cluster is not configured
+// for dual-stack the service will be assigned a single IPFamily. If the IPFamily is not
+// set in service.spec.ipFamilies then the service will be assigned the default IPFamily
+// configured on the cluster
+#IPFamilyPolicyPreferDualStack: #IPFamilyPolicyType & "PreferDualStack"
+
+// IPFamilyPolicyRequireDualStack indicates that this service requires dual-stack. Using
+// IPFamilyPolicyRequireDualStack on a single stack cluster will result in validation errors. The
+// IPFamilies (and their order) assigned  to this service is based on service.spec.ipFamilies. If
+// service.spec.ipFamilies was not provided then it will be assigned according to how they are
+// configured on the cluster. If service.spec.ipFamilies has only one entry then the alternative
+// IPFamily will be added by apiserver
+#IPFamilyPolicyRequireDualStack: #IPFamilyPolicyType & "RequireDualStack"
 
 // ServiceSpec describes the attributes that a user creates on a service.
 #ServiceSpec: {
@@ -4423,30 +4466,68 @@ import (
 	selector?: {[string]: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
 
 	// clusterIP is the IP address of the service and is usually assigned
-	// randomly by the master. If an address is specified manually and is not in
-	// use by others, it will be allocated to the service; otherwise, creation
-	// of the service will fail. This field can not be changed through updates.
-	// Valid values are "None", empty string (""), or a valid IP address. "None"
-	// can be specified for headless services when proxying is not required.
-	// Only applies to types ClusterIP, NodePort, and LoadBalancer. Ignored if
-	// type is ExternalName.
+	// randomly. If an address is specified manually, is in-range (as per
+	// system configuration), and is not in use, it will be allocated to the
+	// service; otherwise creation of the service will fail. This field may not
+	// be changed through updates unless the type field is also being changed
+	// to ExternalName (which requires this field to be blank) or the type
+	// field is being changed from ExternalName (in which case this field may
+	// optionally be specified, as describe above).  Valid values are "None",
+	// empty string (""), or a valid IP address. Setting this to "None" makes a
+	// "headless service" (no virtual IP), which is useful when direct endpoint
+	// connections are preferred and proxying is not required.  Only applies to
+	// types ClusterIP, NodePort, and LoadBalancer. If this field is specified
+	// when creating a Service of type ExternalName, creation will fail. This
+	// field will be wiped when updating a Service to type ExternalName.
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
 	// +optional
 	clusterIP?: string @go(ClusterIP) @protobuf(3,bytes,opt)
 
+	// ClusterIPs is a list of IP addresses assigned to this service, and are
+	// usually assigned randomly.  If an address is specified manually, is
+	// in-range (as per system configuration), and is not in use, it will be
+	// allocated to the service; otherwise creation of the service will fail.
+	// This field may not be changed through updates unless the type field is
+	// also being changed to ExternalName (which requires this field to be
+	// empty) or the type field is being changed from ExternalName (in which
+	// case this field may optionally be specified, as describe above).  Valid
+	// values are "None", empty string (""), or a valid IP address.  Setting
+	// this to "None" makes a "headless service" (no virtual IP), which is
+	// useful when direct endpoint connections are preferred and proxying is
+	// not required.  Only applies to types ClusterIP, NodePort, and
+	// LoadBalancer. If this field is specified when creating a Service of type
+	// ExternalName, creation will fail. This field will be wiped when updating
+	// a Service to type ExternalName.  If this field is not specified, it will
+	// be initialized from the clusterIP field.  If this field is specified,
+	// clients must ensure that clusterIPs[0] and clusterIP have the same
+	// value.
+	//
+	// Unless the "IPv6DualStack" feature gate is enabled, this field is
+	// limited to one value, which must be the same as the clusterIP field.  If
+	// the feature gate is enabled, this field may hold a maximum of two
+	// entries (dual-stack IPs, in either order).  These IPs must correspond to
+	// the values of the ipFamilies field. Both clusterIPs and ipFamilies are
+	// governed by the ipFamilyPolicy field.
+	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#virtual-ips-and-service-proxies
+	// +listType=atomic
+	// +optional
+	clusterIPs?: [...string] @go(ClusterIPs,[]string) @protobuf(18,bytes,opt)
+
 	// type determines how the Service is exposed. Defaults to ClusterIP. Valid
 	// options are ExternalName, ClusterIP, NodePort, and LoadBalancer.
-	// "ExternalName" maps to the specified externalName.
-	// "ClusterIP" allocates a cluster-internal IP address for load-balancing to
-	// endpoints. Endpoints are determined by the selector or if that is not
-	// specified, by manual construction of an Endpoints object. If clusterIP is
-	// "None", no virtual IP is allocated and the endpoints are published as a
-	// set of endpoints rather than a stable IP.
+	// "ClusterIP" allocates a cluster-internal IP address for load-balancing
+	// to endpoints. Endpoints are determined by the selector or if that is not
+	// specified, by manual construction of an Endpoints object or
+	// EndpointSlice objects. If clusterIP is "None", no virtual IP is
+	// allocated and the endpoints are published as a set of endpoints rather
+	// than a virtual IP.
 	// "NodePort" builds on ClusterIP and allocates a port on every node which
-	// routes to the clusterIP.
-	// "LoadBalancer" builds on NodePort and creates an
-	// external load-balancer (if supported in the current cloud) which routes
-	// to the clusterIP.
+	// routes to the same endpoints as the clusterIP.
+	// "LoadBalancer" builds on NodePort and creates an external load-balancer
+	// (if supported in the current cloud) which routes to the same endpoints
+	// as the clusterIP.
+	// "ExternalName" aliases this service to the specified externalName.
+	// Several other fields do not apply to ExternalName services.
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#publishing-services-service-types
 	// +optional
 	type?: #ServiceType @go(Type) @protobuf(4,bytes,opt,casttype=ServiceType)
@@ -4482,10 +4563,10 @@ import (
 	// +optional
 	loadBalancerSourceRanges?: [...string] @go(LoadBalancerSourceRanges,[]string) @protobuf(9,bytes,opt)
 
-	// externalName is the external reference that kubedns or equivalent will
-	// return as a CNAME record for this service. No proxying will be involved.
-	// Must be a valid RFC-1123 hostname (https://tools.ietf.org/html/rfc1123)
-	// and requires Type to be ExternalName.
+	// externalName is the external reference that discovery mechanisms will
+	// return as an alias for this service (e.g. a DNS CNAME record). No
+	// proxying will be involved.  Must be a lowercase RFC-1123 hostname
+	// (https://tools.ietf.org/html/rfc1123) and requires Type to be
 	// +optional
 	externalName?: string @go(ExternalName) @protobuf(10,bytes,opt)
 
@@ -4499,10 +4580,14 @@ import (
 	externalTrafficPolicy?: #ServiceExternalTrafficPolicyType @go(ExternalTrafficPolicy) @protobuf(11,bytes,opt)
 
 	// healthCheckNodePort specifies the healthcheck nodePort for the service.
-	// If not specified, HealthCheckNodePort is created by the service api
-	// backend with the allocated nodePort. Will use user-specified nodePort value
-	// if specified by the client. Only effects when Type is set to LoadBalancer
-	// and ExternalTrafficPolicy is set to Local.
+	// This only applies when type is set to LoadBalancer and
+	// externalTrafficPolicy is set to Local. If a value is specified, is
+	// in-range, and is not in use, it will be used.  If not specified, a value
+	// will be automatically allocated.  External systems (e.g. load-balancers)
+	// can use this port to determine if a given node holds endpoints for this
+	// service or not.  If this field is specified when creating a Service
+	// which does not need it, creation will fail. This field will be wiped
+	// when updating a Service to no longer need it (e.g. changing type).
 	// +optional
 	healthCheckNodePort?: int32 @go(HealthCheckNodePort) @protobuf(12,bytes,opt)
 
@@ -4521,24 +4606,6 @@ import (
 	// +optional
 	sessionAffinityConfig?: null | #SessionAffinityConfig @go(SessionAffinityConfig,*SessionAffinityConfig) @protobuf(14,bytes,opt)
 
-	// ipFamily specifies whether this Service has a preference for a particular IP family (e.g.
-	// IPv4 vs. IPv6) when the IPv6DualStack feature gate is enabled. In a dual-stack cluster,
-	// you can specify ipFamily when creating a ClusterIP Service to determine whether the
-	// controller will allocate an IPv4 or IPv6 IP for it, and you can specify ipFamily when
-	// creating a headless Service to determine whether it will have IPv4 or IPv6 Endpoints. In
-	// either case, if you do not specify an ipFamily explicitly, it will default to the
-	// cluster's primary IP family.
-	// This field is part of an alpha feature, and you should not make any assumptions about its
-	// semantics other than those described above. In particular, you should not assume that it
-	// can (or cannot) be changed after creation time; that it can only have the values "IPv4"
-	// and "IPv6"; or that its current value on a given Service correctly reflects the current
-	// state of that Service. (For ClusterIP Services, look at clusterIP to see if the Service
-	// is IPv4 or IPv6. For headless Services, look at the endpoints, which may be dual-stack in
-	// the future. For ExternalName Services, ipFamily has no meaning, but it may be set to an
-	// irrelevant value anyway.)
-	// +optional
-	ipFamily?: null | #IPFamily @go(IPFamily,*IPFamily) @protobuf(15,bytes,opt,Configcasttype=IPFamily)
-
 	// topologyKeys is a preference-order list of topology keys which
 	// implementations of services should use to preferentially sort endpoints
 	// when accessing this Service, it can not be used at the same time as
@@ -4551,8 +4618,51 @@ import (
 	// The special value "*" may be used to mean "any topology". This catch-all
 	// value, if used, only makes sense as the last value in the list.
 	// If this is not specified or empty, no topology constraints will be applied.
+	// This field is alpha-level and is only honored by servers that enable the ServiceTopology feature.
 	// +optional
 	topologyKeys?: [...string] @go(TopologyKeys,[]string) @protobuf(16,bytes,opt)
+
+	// IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
+	// service, and is gated by the "IPv6DualStack" feature gate.  This field
+	// is usually assigned automatically based on cluster configuration and the
+	// ipFamilyPolicy field. If this field is specified manually, the requested
+	// family is available in the cluster, and ipFamilyPolicy allows it, it
+	// will be used; otherwise creation of the service will fail.  This field
+	// is conditionally mutable: it allows for adding or removing a secondary
+	// IP family, but it does not allow changing the primary IP family of the
+	// Service.  Valid values are "IPv4" and "IPv6".  This field only applies
+	// to Services of types ClusterIP, NodePort, and LoadBalancer, and does
+	// apply to "headless" services.  This field will be wiped when updating a
+	// Service to type ExternalName.
+	//
+	// This field may hold a maximum of two entries (dual-stack families, in
+	// either order).  These families must correspond to the values of the
+	// clusterIPs field, if specified. Both clusterIPs and ipFamilies are
+	// governed by the ipFamilyPolicy field.
+	// +listType=atomic
+	// +optional
+	ipFamilies?: [...#IPFamily] @go(IPFamilies,[]IPFamily) @protobuf(19,bytes,opt,casttype=IPFamily)
+
+	// IPFamilyPolicy represents the dual-stack-ness requested or required by
+	// this Service, and is gated by the "IPv6DualStack" feature gate.  If
+	// there is no value provided, then this field will be set to SingleStack.
+	// Services can be "SingleStack" (a single IP family), "PreferDualStack"
+	// (two IP families on dual-stack configured clusters or a single IP family
+	// on single-stack clusters), or "RequireDualStack" (two IP families on
+	// dual-stack configured clusters, otherwise fail). The ipFamilies and
+	// clusterIPs fields depend on the value of this field.  This field will be
+	// wiped when updating a service to type ExternalName.
+	// +optional
+	ipFamilyPolicy?: null | #IPFamilyPolicyType @go(IPFamilyPolicy,*IPFamilyPolicyType) @protobuf(17,bytes,opt,casttype=IPFamilyPolicyType)
+
+	// allocateLoadBalancerNodePorts defines if NodePorts will be automatically
+	// allocated for services with type LoadBalancer.  Default is "true". It may be
+	// set to "false" if the cluster load-balancer does not rely on NodePorts.
+	// allocateLoadBalancerNodePorts may only be set for services with type LoadBalancer
+	// and will be cleared if the type is changed to any other type.
+	// This field is alpha-level and is only honored by servers that enable the ServiceLBNodePortControl feature.
+	// +optional
+	allocateLoadBalancerNodePorts?: null | bool @go(AllocateLoadBalancerNodePorts,*bool) @protobuf(20,bytes,opt)
 }
 
 // ServicePort contains information on service's port.
@@ -4595,10 +4705,14 @@ import (
 	// +optional
 	targetPort?: intstr.#IntOrString @go(TargetPort) @protobuf(4,bytes,opt)
 
-	// The port on each node on which this service is exposed when type=NodePort or LoadBalancer.
-	// Usually assigned by the system. If specified, it will be allocated to the service
-	// if unused or else creation of the service will fail.
-	// Default is to auto-allocate a port if the ServiceType of this Service requires one.
+	// The port on each node on which this service is exposed when type is
+	// NodePort or LoadBalancer.  Usually assigned by the system. If a value is
+	// specified, in-range, and not in use it will be used, otherwise the
+	// operation will fail.  If not specified, a port will be allocated if this
+	// Service requires one.  If this field is specified when creating a
+	// Service which does not need it, creation will fail. This field will be
+	// wiped when updating a Service to no longer need it (e.g. changing type
+	// from NodePort to ClusterIP).
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/#type-nodeport
 	// +optional
 	nodePort?: int32 @go(NodePort) @protobuf(5,varint,opt)
@@ -5721,7 +5835,12 @@ import (
 // These events are to warn that something might go wrong
 #EventTypeWarning: "Warning"
 
-// Event is a report of an event somewhere in the cluster.
+// Event is a report of an event somewhere in the cluster.  Events
+// have a limited retention time and triggers and messages may evolve
+// with time.  Event consumers should not rely on the timing of an event
+// with a given Reason reflecting a consistent underlying trigger, or the
+// continued existence of events with that Reason.  Events should be
+// treated as informative, best-effort, supplemental data.
 #Event: {
 	metav1.#TypeMeta
 
@@ -6613,3 +6732,26 @@ import (
 // Name of header that specifies a request ID used to associate the error
 // and data streams for a single forwarded connection
 #PortForwardRequestIDHeader: "requestID"
+
+#PortStatus: {
+	// Port is the port number of the service port of which status is recorded here
+	port: int32 @go(Port) @protobuf(1,varint,opt)
+
+	// Protocol is the protocol of the service port of which status is recorded here
+	// The supported values are: "TCP", "UDP", "SCTP"
+	protocol: #Protocol @go(Protocol) @protobuf(2,bytes,opt,casttype=Protocol)
+
+	// Error is to record the problem with the service port
+	// The format of the error shall comply with the following rules:
+	// - built-in error values shall be specified in this file and those shall use
+	//   CamelCase names
+	// - cloud provider specific error values must have names that comply with the
+	//   format foo.example.com/CamelCase.
+	// ---
+	// The regex it matches is (dns1123SubdomainFmt/)?(qualifiedNameFmt)
+	// +optional
+	// +kubebuilder:validation:Required
+	// +kubebuilder:validation:Pattern=`^([a-z0-9]([-a-z0-9]*[a-z0-9])?(\.[a-z0-9]([-a-z0-9]*[a-z0-9])?)*/)?(([A-Za-z0-9][-A-Za-z0-9_.]*)?[A-Za-z0-9])$`
+	// +kubebuilder:validation:MaxLength=316
+	error?: null | string @go(Error,*string) @protobuf(3,bytes,opt)
+}

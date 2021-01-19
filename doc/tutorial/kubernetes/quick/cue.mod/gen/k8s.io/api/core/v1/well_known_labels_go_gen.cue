@@ -5,6 +5,12 @@
 package v1
 
 #LabelHostname:                "kubernetes.io/hostname"
+#LabelFailureDomainBetaZone:   "failure-domain.beta.kubernetes.io/zone"
+#LabelFailureDomainBetaRegion: "failure-domain.beta.kubernetes.io/region"
+#LabelTopologyZone:            "topology.kubernetes.io/zone"
+#LabelTopologyRegion:          "topology.kubernetes.io/region"
+
+// Legacy names for compat.
 #LabelZoneFailureDomain:       "failure-domain.beta.kubernetes.io/zone"
 #LabelZoneRegion:              "failure-domain.beta.kubernetes.io/region"
 #LabelZoneFailureDomainStable: "topology.kubernetes.io/zone"

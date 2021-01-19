@@ -29,3 +29,7 @@ package resource
 #Tera:  #Scale & 12
 #Peta:  #Scale & 15
 #Exa:   #Scale & 18
+
+// infDecAmount implements common operations over an inf.Dec that are specific to the quantity
+// representation.
+_#infDecAmount: string

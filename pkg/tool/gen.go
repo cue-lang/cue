@@ -17,7 +17,7 @@
 package main
 
 // TODO: remove when we have a cuedoc server. Until then,
-// piggyback on godoc.org.
+// piggyback on pkg.go.dev.
 
 import (
 	"bytes"

@@ -13,7 +13,7 @@
  See the License for the specific language governing permissions and
  limitations under the License.
 -->
-[![GoDoc](https://godoc.org/cuelang.org/go?status.svg)](https://godoc.org/cuelang.org/go)
+[![Go Reference](https://pkg.go.dev/badge/cuelang.org/go.svg)](https://pkg.go.dev/cuelang.org/go)
 [![Github](https://github.com/cuelang/cue/workflows/Test/badge.svg)](https://github.com/cuelang/cue/actions)
 [![GolangCI](https://golangci.com/badges/github.com/cuelang/cue.svg)](https://golangci.com/r/github.com/cuelang/cue)
 [![Go 1.13+](https://img.shields.io/badge/go-1.13-9cf.svg)](https://golang.org/dl/)
@@ -125,9 +125,9 @@ an existing set of Kubernetes configurations is available in
 
 - [Language Specification](./doc/ref/spec.md): official CUE Language specification.
 
-- [API](https://godoc.org/cuelang.org/go/cue): the API on godoc.org
+- [API](https://pkg.go.dev/cuelang.org/go/cue): the API on pkg.go.dev
 
-- [Builtin packages](https://godoc.org/cuelang.org/go/pkg): builtins available from CUE programs
+- [Builtin packages](https://pkg.go.dev/cuelang.org/go/pkg): builtins available from CUE programs
 
 - [`cue` Command line reference](./doc/cmd/cue.md): the `cue` command
 

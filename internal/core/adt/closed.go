@@ -96,6 +96,34 @@ type CloseInfo struct {
 	IsClosed bool
 }
 
+func (c CloseInfo) Location() Node {
+	if c.closeInfo == nil {
+		return nil
+	}
+	return c.closeInfo.location
+}
+
+func (c CloseInfo) SpanMask() SpanType {
+	if c.closeInfo == nil {
+		return 0
+	}
+	return c.span
+}
+
+func (c CloseInfo) RootSpanType() SpanType {
+	if c.closeInfo == nil {
+		return 0
+	}
+	return c.root
+}
+
+func (c CloseInfo) IsInOneOf(t SpanType) bool {
+	if c.closeInfo == nil {
+		return false
+	}
+	return c.span&t != 0
+}
+
 // TODO(perf): remove: error positions should always be computed on demand
 // in dedicated error types.
 func (c *CloseInfo) AddPositions(ctx *OpContext) {
@@ -118,6 +146,7 @@ func (c CloseInfo) SpawnEmbed(x Expr) CloseInfo {
 		parent:   c.closeInfo,
 		location: x,
 		mode:     closeEmbed,
+		root:     EmbeddingSpan,
 		span:     span | EmbeddingSpan,
 	}
 	return c
@@ -152,6 +181,7 @@ func (c CloseInfo) SpawnSpan(x Node, t SpanType) CloseInfo {
 	c.closeInfo = &closeInfo{
 		parent:   c.closeInfo,
 		location: x,
+		root:     t,
 		span:     span | t,
 	}
 	return c
@@ -169,6 +199,7 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	}
 	if isDef {
 		c.mode = closeDef
+		c.closeInfo.root = DefinitionSpan
 		c.closeInfo.span |= DefinitionSpan
 	}
 	return c
@@ -228,6 +259,7 @@ type closeInfo struct {
 	//  - it is a sibling of a new definition.
 	noCheck bool // don't process for inclusion info
 
+	root SpanType
 	span SpanType
 }
 

@@ -44,11 +44,9 @@ foo: multipath: {
 	}
 
 	t: u: {
-		x: 5
 	}
 }
 
-// TODO: top-level fields are currently not removed.
 group: {
 	for k, v in foo {
 		comp: "\(k)": v
@@ -58,7 +56,7 @@ group: {
 		aa: 8 // new value
 	}
 
-	comp: baz: {} // removed: fully implied by comprehension above
+	comp: {} // TODO: remove: implied by comprehension above
 }
 -- trim/trim.cue --
 package trim
@@ -93,7 +91,7 @@ foo: bar: {
 	b: "foo"
 	c: 45
 	e: string
-	f: ">> here <<"  // TODO: remove
+	f: ">> here <<"
 
 	// 5 is an integer, so this can be removed.
 	n: int
@@ -121,7 +119,6 @@ foo: multipath: {
 	}
 }
 
-// TODO: top-level fields are currently not removed.
 group: {
 	for k, v in foo {
 		comp: "\(k)": v
@@ -132,6 +129,6 @@ group: {
 		aa: 8 // new value
 	}
 
-	comp: baz: {} // removed: fully implied by comprehension above
+	comp: baz: {} // TODO: remove: implied by comprehension above
 }
 -- cue.mod --

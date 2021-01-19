@@ -1,3 +1,1 @@
 package kube
-
-service: {}

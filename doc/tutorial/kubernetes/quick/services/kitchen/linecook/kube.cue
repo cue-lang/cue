@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: linecook: spec: template: spec: {
 	volumes: [{
 	}, {

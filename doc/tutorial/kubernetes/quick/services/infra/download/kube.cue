@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: download: spec: template: spec: containers: [{
 	image: "gcr.io/myproj/download:v0.0.2"
 	ports: [{

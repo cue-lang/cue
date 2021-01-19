@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: caller: spec: {
 	replicas: 3
 	template: spec: {

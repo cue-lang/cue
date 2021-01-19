@@ -79,6 +79,7 @@ foo: b: {}
 		c: b: 3
 
 		z: {
+
 			a: b: 3
 			for k, v in a {
 				c: "\(k)": v
@@ -92,6 +93,7 @@ for k, v in a {
 }
 
 z: {
+
 	a: b: 3
 	for k, v in a {
 		c: "\(k)": v
@@ -135,7 +137,7 @@ foo: multipath: {
 		x: >=5 & <=8 & int
 	}
 
-	t: u: { x: 5 } // TODO: should be t: u: {}
+	t: u: { x: 5 }
 }
 
 group: {
@@ -157,7 +159,7 @@ foo: multipath: {
 		x: >=5 & <=8 & int
 	}
 
-	t: u: {x: 5}
+	t: u: {}
 }
 
 group: {
@@ -181,6 +183,22 @@ group: {
 }
 service: a: {
 	ports: [{}, {extra: 3}, {}, {}]
+}
+`,
+	}, {
+		name: "list removal",
+		in: `
+		service: [string]: {
+			ports: [{a: 1}, {a: 1}, ...{ extra: 3 }]
+		}
+		service: a: {
+			ports: [{a: 1}, {a: 1,}]
+		}
+		`,
+		out: `service: [string]: {
+	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
+}
+service: a: {
 }
 `,
 	}, {
@@ -213,36 +231,25 @@ group: {
 }
 `,
 	}, {
-		name: "list removal",
+		name: "remove implied interpolations",
 		in: `
-	service: [string]: {
-		ports: [{a: 1}, {a: 1}, ...{ extra: 3 }]
-	}
-	service: a: {
-		ports: [{a: 1}, {a: 1, extra: 3}, {}, { extra: 3 }]
-	}
-`,
-		out: `service: [string]: {
-	ports: [{a: 1}, {a: 1}, ...{extra: 3}]
+				foo: [string]: {
+					a: string
+					b: "--\(a)--"
+				}
+				foo: entry: {
+					a: "insert"
+					b: "--insert--"
+				}
+				`,
+		out: `foo: [string]: {
+	a: string
+	b: "--\(a)--"
 }
-service: a: {
-	ports: [{}, {extra: 3}, {}, {}]
+foo: entry: {
+	a: "insert"
 }
 `,
-		// }, {
-		// TODO: This used to work.
-		// 	name: "remove implied interpolations",
-		// 	in: `
-		// 		foo: [string]: {
-		// 			a: string
-		// 			b: "--\(a)--"
-		// 		}
-		// 		foo: entry: {
-		// 			a: "insert"
-		// 			b: "--insert--"
-		// 		}
-		// 		`,
-		// 	out: ``,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
@@ -250,7 +257,7 @@ service: a: {
 			if err != nil {
 				t.Fatal(err)
 			}
-			r := Runtime{}
+			r := cue.Runtime{}
 			inst, err := r.CompileFile(f)
 			if err != nil {
 				t.Fatal(err)

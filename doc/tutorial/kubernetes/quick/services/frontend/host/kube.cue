@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: host: spec: {
 	replicas: 2
 	template: spec: containers: [{

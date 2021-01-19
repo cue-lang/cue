@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: waiter: spec: {
 	replicas: 5
 	template: spec: containers: [{

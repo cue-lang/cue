@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: pastrychef: spec: template: spec: {
 	volumes: [{
 	}, {

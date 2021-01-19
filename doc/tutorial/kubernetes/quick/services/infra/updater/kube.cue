@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: updater: spec: template: spec: {
 	volumes: [{
 		name: "secret-updater"

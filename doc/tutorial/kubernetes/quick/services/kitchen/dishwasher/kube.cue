@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: dishwasher: spec: {
 	replicas: 5
 	template: spec: {

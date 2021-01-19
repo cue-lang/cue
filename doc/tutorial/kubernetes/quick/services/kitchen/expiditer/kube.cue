@@ -1,6 +1,5 @@
 package kube
 
-service: {}
 deployment: expiditer: spec: template: spec: containers: [{
 	image: "gcr.io/myproj/expiditer:v0.5.34"
 	args: [

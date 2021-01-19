@@ -1,0 +1,20 @@
+#Issue #558
+
+-- in.cue --
+#Foo: {
+	bar: int
+	baz: 2
+}
+foo: #Foo & {
+	bar: 1
+	baz: 2
+}
+-- out/trim --
+== in.cue
+#Foo: {
+	bar: int
+	baz: 2
+}
+foo: #Foo & {
+	bar: 1
+}

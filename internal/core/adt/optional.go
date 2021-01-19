@@ -40,22 +40,26 @@ outer:
 		return
 	}
 
-	bulkEnv := *env
-	bulkEnv.DynamicLabel = arc.Label
-	bulkEnv.Deref = nil
-	bulkEnv.Cycles = nil
+	if len(o.Bulk) > 0 {
+		bulkEnv := *env
+		bulkEnv.DynamicLabel = arc.Label
+		bulkEnv.Deref = nil
+		bulkEnv.Cycles = nil
 
-	// match bulk optional fields / pattern properties
-	for _, b := range o.Bulk {
-		// if matched && f.additional {
-		// 	continue
-		// }
-		if matchBulk(c, env, b, arc.Label) {
-			matched = true
-			arc.AddConjunct(MakeConjunct(&bulkEnv, b, closeInfo))
+		// match bulk optional fields / pattern properties
+		for _, b := range o.Bulk {
+			// if matched && f.additional {
+			// 	continue
+			// }
+			if matchBulk(c, env, b, arc.Label) {
+				matched = true
+				info := closeInfo.SpawnSpan(b.Value, ConstraintSpan)
+				arc.AddConjunct(MakeConjunct(&bulkEnv, b, info))
+			}
 		}
 	}
-	if matched {
+
+	if matched || len(o.Additional) == 0 {
 		return
 	}
 
@@ -65,7 +69,11 @@ outer:
 
 	// match others
 	for _, x := range o.Additional {
-		arc.AddConjunct(MakeConjunct(&addEnv, x, closeInfo))
+		info := closeInfo
+		if _, ok := x.(*Top); !ok {
+			info = info.SpawnSpan(x, ConstraintSpan)
+		}
+		arc.AddConjunct(MakeConjunct(&addEnv, x, info))
 	}
 }
 

@@ -27,6 +27,7 @@ t: p: "foo"
 -- out/eval --
 Errors:
 z.x: field `f2` not allowed:
+    ./in.cue:2:2
     ./in.cue:5:12
     ./in.cue:11:4
     ./in.cue:14:3
@@ -46,6 +47,7 @@ Result:
       f1: (int){ 99 }
       f2: (_|_){
         // [eval] z.x: field `f2` not allowed:
+        //     ./in.cue:2:2
         //     ./in.cue:5:12
         //     ./in.cue:11:4
         //     ./in.cue:14:3

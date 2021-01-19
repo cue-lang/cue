@@ -67,6 +67,7 @@ listOfCloseds.0: field `b` not allowed:
     ./in.cue:5:10
     ./in.cue:13:1
     ./in.cue:14:18
+    ./in.cue:15:3
     ./in.cue:16:4
 
 Result:
@@ -83,6 +84,7 @@ Result:
         //     ./in.cue:5:10
         //     ./in.cue:13:1
         //     ./in.cue:14:18
+        //     ./in.cue:15:3
         //     ./in.cue:16:4
       }
     }

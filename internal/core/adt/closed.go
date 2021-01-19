@@ -91,9 +91,9 @@ const (
 
 // TODO: merge with closeInfo: this is a leftover of the refactoring.
 type CloseInfo struct {
-	IsClosed bool
-
 	*closeInfo
+
+	IsClosed bool
 }
 
 // TODO(perf): remove: error positions should always be computed on demand
@@ -141,6 +141,22 @@ func (c CloseInfo) SpawnGroup(x Expr) CloseInfo {
 	return c
 }
 
+// SpawnSpan is used to track that a value is introduced by a comprehension
+// or constraint. Definition and embedding spans are introduced with SpawnRef
+// and SpawnEmbed, respectively.
+func (c CloseInfo) SpawnSpan(x Node, t SpanType) CloseInfo {
+	var span SpanType
+	if c.closeInfo != nil {
+		span = c.span
+	}
+	c.closeInfo = &closeInfo{
+		parent:   c.closeInfo,
+		location: x,
+		span:     span | t,
+	}
+	return c
+}
+
 func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	var span SpanType
 	if c.closeInfo != nil {
@@ -153,6 +169,7 @@ func (c CloseInfo) SpawnRef(arc *Vertex, isDef bool, x Expr) CloseInfo {
 	}
 	if isDef {
 		c.mode = closeDef
+		c.closeInfo.span |= DefinitionSpan
 	}
 	return c
 }
@@ -187,12 +204,9 @@ const (
 	// EmbeddingSpan means that this value was embedded at some point and should
 	// not be included as a possible root node in the todo field of OpContext.
 	EmbeddingSpan SpanType = 1 << iota
-
-	// TODO:
-	// from comprehension
-	// from template.
-	// from definition
-
+	ConstraintSpan
+	ComprehensionSpan
+	DefinitionSpan
 )
 
 type closeInfo struct {

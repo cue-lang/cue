@@ -127,6 +127,7 @@ func (o *StructLit) Init() {
 			if x.Value == nil {
 				o.IsOpen = true
 				o.types |= IsOpen
+				// TODO(perf): encode more efficiently.
 				expr = &Top{}
 			} else {
 				o.types |= HasAdditional

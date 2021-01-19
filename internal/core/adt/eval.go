@@ -1787,8 +1787,12 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 			continue
 		}
 
+		if len(sa) == 0 {
+			continue
+		}
+		id := d.id.SpawnSpan(d.yield, ComprehensionSpan)
 		for _, st := range sa {
-			n.addStruct(st.env, st.s, d.id)
+			n.addStruct(st.env, st.s, id)
 		}
 	}
 

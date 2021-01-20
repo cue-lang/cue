@@ -18,10 +18,6 @@ Result:
       // [structural cycle]
       controller: (_|_){
         // [structural cycle] #Controller.settings.controller: structural cycle
-        settings: (_|_){// {
-          //   controller: 〈2;#Controller〉
-          // }
-        }
       }
     }
   }

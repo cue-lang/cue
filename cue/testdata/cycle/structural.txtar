@@ -503,8 +503,6 @@ Result:
       // [structural cycle]
       0: (_|_){
         // [structural cycle] a1.f.0: structural cycle
-        0: (_|_){// 〈0;f〉
-        }
       }
     }
   }
@@ -517,8 +515,6 @@ Result:
       // [structural cycle]
       g: (_|_){
         // [structural cycle] a3.f.g: structural cycle
-        g: (_|_){// 〈1;f〉
-        }
       }
     }
   }
@@ -630,8 +626,6 @@ Result:
         // [structural cycle]
         0: (_|_){
           // [structural cycle] b6.x.a.0: structural cycle
-          0: (_|_){// 〈0;a〉
-          }
         }
       }
     }
@@ -752,8 +746,6 @@ Result:
         //     ./in.cue:144:10
         tail: (_|_){
           // [structural cycle] b12b.#list.tail.tail: structural cycle
-          tail: (_|_){// 〈1;#list〉
-          }
         }
       }
     }
@@ -776,10 +768,6 @@ Result:
           // [structural cycle]
           0: (_|_){
             // [structural cycle] b13.root.a.0.0: structural cycle
-            0: (_|_){// {
-              //   〈1;x〉
-              // }
-            }
           }
         }
       }
@@ -801,14 +789,6 @@ Result:
           }
           1: (_|_){
             // [structural cycle] b14.root.b.1.1: structural cycle
-            0: (_|_){// {
-              //   〈1;x〉
-              // }
-            }
-            1: (_|_){// {
-              //   〈1;x〉
-              // }
-            }
           }
         }
       }
@@ -852,14 +832,6 @@ Result:
           // [structural cycle]
           link: (_|_){
             // [structural cycle] p2.#T.a.b.link: structural cycle
-            a: (_|_){// {
-              //   [string]: {
-              //     link: 〈3;#T〉
-              //   }
-              // } & {
-              //   b: {}
-              // }
-            }
           }
         }
       }
@@ -896,14 +868,6 @@ Result:
             // [structural cycle]
             link: (_|_){
               // [structural cycle] p3.#U.#T.a.b.link: structural cycle
-              a: (_|_){// {
-                //   [string]: {
-                //     link: 〈3;#T〉
-                //   }
-                // } & {
-                //   b: {}
-                // }
-              }
             }
           }
         }
@@ -955,14 +919,6 @@ Result:
           // [structural cycle]
           link: (_|_){
             // [structural cycle] p5.#T.a.0.link: structural cycle
-            a: (_|_){// [
-              //   ...{
-              //     link: 〈2;#T〉
-              //   },
-              // ] & [
-              //   {},
-              // ]
-            }
           }
         }
       }
@@ -999,14 +955,6 @@ Result:
             // [structural cycle]
             link: (_|_){
               // [structural cycle] p6.#U.#T.a.0.link: structural cycle
-              a: (_|_){// [
-                //   ...{
-                //     link: 〈2;#T〉
-                //   },
-                // ] & [
-                //   {},
-                // ]
-              }
             }
           }
         }
@@ -1038,10 +986,6 @@ Result:
         }
         c: (_|_){
           // [structural cycle] c1.a.c.c: structural cycle
-          b: (_|_){// {}
-          }
-          c: (_|_){// (〈1;a〉 & 〈0;b〉)
-          }
         }
       }
     }
@@ -1059,13 +1003,6 @@ Result:
             h: (int){ int }
             t: (_|_){
               // [structural cycle] d1.a.b.c.d.t: structural cycle
-              c: (_|_){// {
-                //   d: {
-                //     h: int
-                //     t: 〈4;r〉
-                //   }
-                // }
-              }
             }
           }
         }
@@ -1162,16 +1099,12 @@ Result:
       // [structural cycle]
       c: (_|_){
         // [structural cycle] e1.a.c: structural cycle
-        c: (_|_){// 〈1;a〉
-        }
       }
     }
     b: (_|_){
       // [structural cycle]
       c: (_|_){
         // [structural cycle] e1.b.c: structural cycle
-        c: (_|_){// 〈1;b〉
-        }
       }
     }
   }
@@ -1181,16 +1114,12 @@ Result:
       // [structural cycle]
       c: (_|_){
         // [structural cycle] e2.a.c: structural cycle
-        c: (_|_){// 〈1;a〉
-        }
       }
     }
     b: (_|_){
       // [structural cycle]
       c: (_|_){
         // [structural cycle] e2.b.c: structural cycle
-        c: (_|_){// 〈1;b〉
-        }
       }
     }
   }
@@ -1206,10 +1135,6 @@ Result:
         //     ./in.cue:309:8
         //     ./in.cue:309:11
         // e3.a.c: structural cycle
-        c: (_|_){// 〈1;a〉
-        }
-        0: (_|_){// 〈0;a〉
-        }
       }
       0: (_|_){
         // [eval] e3.a.0: conflicting values [a] and {c:a} (mismatched types list and struct):
@@ -1217,10 +1142,6 @@ Result:
         //     ./in.cue:308:9
         //     ./in.cue:309:8
         // e3.a.0: structural cycle
-        c: (_|_){// 〈1;a〉
-        }
-        0: (_|_){// 〈0;a〉
-        }
       }
     }
     b: (_|_){
@@ -1233,10 +1154,6 @@ Result:
         //     ./in.cue:312:8
         //     ./in.cue:312:11
         // e3.b.c: structural cycle
-        c: (_|_){// 〈1;b〉
-        }
-        0: (_|_){// 〈0;b〉
-        }
       }
       0: (_|_){
         // [eval] e3.b.0: conflicting values [b] and {c:b} (mismatched types list and struct):
@@ -1244,10 +1161,6 @@ Result:
         //     ./in.cue:311:9
         //     ./in.cue:312:8
         // e3.b.0: structural cycle
-        c: (_|_){// 〈1;b〉
-        }
-        0: (_|_){// 〈0;b〉
-        }
       }
     }
   }

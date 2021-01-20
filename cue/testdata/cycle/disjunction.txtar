@@ -48,8 +48,6 @@ Result:
     // [structural cycle]
     a: (_|_){
       // [structural cycle] cycle.a: structural cycle
-      a: (_|_){// 〈1;cycle〉
-      }
     }
   }
   r1a: (int){ int }

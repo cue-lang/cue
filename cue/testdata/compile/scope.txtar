@@ -104,8 +104,6 @@ Result:
     // [structural cycle]
     next: (_|_){
       // [structural cycle] schema.next: structural cycle
-      next: (_|_){// 〈1;let _schema_1〉
-      }
     }
   }
 }

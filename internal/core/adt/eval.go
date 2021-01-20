@@ -558,6 +558,9 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 				Value: n.node.Value(),
 				// TODO: probably, this should have the referenced arc.
 			})
+		// Don't process Arcs. This is mostly to ensure that no Arcs with
+		// an Unprocessed status remain in the output.
+		n.node.Arcs = nil
 	} else {
 		// Visit arcs recursively to validate and compute error.
 		for _, a := range n.node.Arcs {

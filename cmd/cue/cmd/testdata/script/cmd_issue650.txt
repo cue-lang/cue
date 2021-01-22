@@ -1,0 +1,32 @@
+cue cmd test
+
+-- blah/blah.cue --
+package blah
+
+#Pod: {
+ spec?: #PodSpec
+}
+
+#PodSpec: {
+}
+-- cue.mod/module.cue --
+module: "mod.com"
+-- x.cue --
+package kube
+
+import (
+ "tool/cli"
+ "mod.com/blah"
+)
+
+root: blah.#Pod
+
+root: spec: _
+
+command: test: task: test: cli.Print & {
+ for _ in root {
+  text: "success"
+ }
+}
+-- y_tool.cue --
+package kube

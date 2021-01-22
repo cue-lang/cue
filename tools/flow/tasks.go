@@ -165,6 +165,21 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 	}
 
 	n := d.Node
+
+	// This Finalize should not be necessary, as the input to dep is already
+	// finalized. However, cue cmd uses some legacy instance stitching code
+	// where some of the backlink Environments are not properly initialized.
+	// Finalizing should patch those up at the expense of doing some duplicate
+	// work. The plan is to replace `cue cmd` with a much more clean
+	// implementation (probably a separate tool called `cuerun`) where this
+	// issue is fixed. For now we leave this patch.
+	//
+	// Note that this issue predates package flow, but that it just surfaced in
+	// flow and having a different evaluation order.
+	//
+	// Note: this call is cheap if n is already Finalized.
+	n.Finalize(c.opCtx)
+
 	for ; n != nil; n = n.Parent {
 		if c.cfg.IgnoreConcrete && n.IsConcrete() {
 			if k := n.BaseValue.Kind(); k != adt.StructKind && k != adt.ListKind {

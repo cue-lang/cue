@@ -201,14 +201,33 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 			v.Closed = true
 		}
 
-		ignore := false
 		if v.Parent != nil {
 			if v.Parent.Closed {
 				v.Closed = true
 			}
 		}
 
-		if !v.Label.IsInt() && v.Parent != nil && !ignore && state == Finalized {
+		// TODO(perf): ideally we should always perform a closedness check if
+		// state is Finalized. This is currently not possible when computing a
+		// partial disjunction as the closedness information is not yet
+		// complete, possibly leading to a disjunct to be rejected prematurely.
+		// It is probably possible to fix this if we could add StructInfo
+		// structures demarked per conjunct.
+		//
+		// In practice this should not be a problem: when disjuncts originate
+		// from the same disjunct, they will have the same StructInfos, and thus
+		// Equal is able to equate them even in the precense of optional field.
+		// In general, combining any limited set of disjuncts will soon reach
+		// a fixed point where duplicate elements can be eliminated this way.
+		//
+		// Note that not checking closedness is irrelevant for disjunctions of
+		// scalars. This means it also doesn't hurt performance where structs
+		// have a discriminator field (e.g. Kubernetes). We should take care,
+		// though, that any potential performance issues are eliminated for
+		// Protobuf-like oneOf fields.
+		ignore := state != Finalized || n.skipNonMonotonicChecks()
+
+		if !v.Label.IsInt() && v.Parent != nil && !ignore {
 			// Visit arcs recursively to validate and compute error.
 			if _, err := verifyArc2(c, v.Label, v, v.Closed); err != nil {
 				// Record error in child node to allow recording multiple
@@ -474,7 +493,9 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 				}
 			}
 			// MOVE BELOW
-			if v := n.node.Value(); v != nil && IsConcrete(v) {
+			// TODO(perf): only delay processing of actual non-monotonic checks.
+			skip := n.skipNonMonotonicChecks()
+			if v := n.node.Value(); v != nil && IsConcrete(v) && !skip {
 				for _, v := range n.checks {
 					// TODO(errors): make Validate return bottom and generate
 					// optimized conflict message. Also track and inject IDs

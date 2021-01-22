@@ -141,7 +141,8 @@ func (n *nodeContext) expandDisjuncts(
 		m := *n
 		n.postDisjunct(state)
 
-		if n.hasErr() {
+		switch {
+		case n.hasErr():
 			// TODO: consider finalizing the node thusly:
 			// if recursive {
 			// 	n.node.Finalize(n.ctx)
@@ -156,6 +157,9 @@ func (n *nodeContext) expandDisjuncts(
 				// evaluation it is okay for child errors to have incomplete errors.
 				// Perhaps introduce an Err() method.
 				err = x.ChildErrors
+			}
+			if err.IsIncomplete() {
+				break
 			}
 			if err != nil {
 				parent.disjunctErrs = append(parent.disjunctErrs, err)
@@ -178,7 +182,8 @@ func (n *nodeContext) expandDisjuncts(
 
 	case len(n.disjunctions) > 0:
 		// Process full disjuncts to ensure that erroneous disjuncts are
-		// eliminated.
+		// eliminated as early as possible.
+		state = Finalized
 
 		n.disjuncts = append(n.disjuncts, n)
 
@@ -187,16 +192,10 @@ func (n *nodeContext) expandDisjuncts(
 			n.disjuncts = n.buffer[:0]
 			n.buffer = a[:0]
 
-			state := state
-			if i+1 < len(n.disjunctions) {
-				// If this is not the last disjunction, set it to
-				// partial evaluation. This will disable the closedness
-				// check and any other non-monotonic check that should
-				// not be done unless there is complete information.
-				state = Partial
+			skipNonMonotonicChecks := i+1 < len(n.disjunctions)
+			if skipNonMonotonicChecks {
+				n.ctx.inDisjunct++
 			}
-			//  TODO(perf): ideally always finalize. See comment below
-			// state = Finalized
 
 			for _, dn := range a {
 				switch {
@@ -229,6 +228,10 @@ func (n *nodeContext) expandDisjuncts(
 						cn.expandDisjuncts(state, n, newMode, true)
 					}
 				}
+			}
+
+			if skipNonMonotonicChecks {
+				n.ctx.inDisjunct--
 			}
 
 			if len(n.disjuncts) == 0 {
@@ -268,12 +271,6 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for _, v := range p.disjuncts {
-				// TODO(perf): not checking equality here may lead to polynomial
-				// blowup. Doesn't seem to affect large configurations, though,
-				// where this could matter at the moment.
-				if state != Finalized {
-					break
-				}
 				if Equal(n.ctx, &v.result, &d.result) {
 					if d.defaultMode == isDefault {
 						v.defaultMode = isDefault

@@ -88,7 +88,11 @@ func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature) 
 	if m == nil {
 		return false
 	}
-	return m.Match(c, env, f)
+
+	c.inConstraint++
+	ret := m.Match(c, env, f)
+	c.inConstraint--
+	return ret
 }
 
 func getMatcher(c *OpContext, env *Environment, v Value) fieldMatcher {

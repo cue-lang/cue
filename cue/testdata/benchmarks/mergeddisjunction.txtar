@@ -1,0 +1,223 @@
+// Here one comprehension creates a number of distinct values, each of which
+// with a disjunction, then another comprehension maps them back to the
+// same value, creating a large number of disjunctions.
+//
+// The disjunctions cannot be identified as equal in the general case. If no
+// care is taken, disjunction elimination will be exponential, causing over
+// a billion disjuncts to process in the below example. With the proper
+// optimizations, there is a small, constant number of disjunction ops per
+// disjunct.
+//
+// Issue #651
+-- in.cue --
+list: [
+	0, 1, 2, 3, 4, 5, 6, 7, 8,
+	9, 10, 11, 12, 13, 14, 15, 16,
+	17, 18, 19, 20, 21, 22, 23, 24,
+	25, 26, 27, 28, 29, 30,
+]
+a: [X=string]: text: *"default" | string
+
+a: {
+	for i in list {
+		"\(i)": text: string
+	}
+}
+
+b: {
+	for x in a {
+		"\(x.text)":  { text: x.text }
+	}
+}
+-- out/eval --
+(struct){
+  list: (#list){
+    0: (int){ 0 }
+    1: (int){ 1 }
+    2: (int){ 2 }
+    3: (int){ 3 }
+    4: (int){ 4 }
+    5: (int){ 5 }
+    6: (int){ 6 }
+    7: (int){ 7 }
+    8: (int){ 8 }
+    9: (int){ 9 }
+    10: (int){ 10 }
+    11: (int){ 11 }
+    12: (int){ 12 }
+    13: (int){ 13 }
+    14: (int){ 14 }
+    15: (int){ 15 }
+    16: (int){ 16 }
+    17: (int){ 17 }
+    18: (int){ 18 }
+    19: (int){ 19 }
+    20: (int){ 20 }
+    21: (int){ 21 }
+    22: (int){ 22 }
+    23: (int){ 23 }
+    24: (int){ 24 }
+    25: (int){ 25 }
+    26: (int){ 26 }
+    27: (int){ 27 }
+    28: (int){ 28 }
+    29: (int){ 29 }
+    30: (int){ 30 }
+  }
+  a: (struct){
+    "0": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "1": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "2": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "3": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "4": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "5": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "6": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "7": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "8": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "9": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "10": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "11": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "12": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "13": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "14": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "15": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "16": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "17": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "18": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "19": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "20": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "21": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "22": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "23": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "24": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "25": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "26": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "27": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "28": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "29": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+    "30": (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+  }
+  b: (struct){
+    default: (struct){
+      text: (string){ |(*(string){ "default" }, (string){ string }) }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  list: [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16,
+    17,
+    18,
+    19,
+    20,
+    21,
+    22,
+    23,
+    24,
+    25,
+    26,
+    27,
+    28,
+    29,
+    30,
+  ]
+  a: {
+    [string]: {
+      text: (*"default"|string)
+    }
+  }
+  a: {
+    for _, i in 〈1;list〉 {
+      "\(〈1;i〉)": {
+        text: string
+      }
+    }
+  }
+  b: {
+    for _, x in 〈1;a〉 {
+      "\(〈1;x〉.text)": {
+        text: 〈2;x〉.text
+      }
+    }
+  }
+}

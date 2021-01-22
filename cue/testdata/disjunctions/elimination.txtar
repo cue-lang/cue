@@ -1,0 +1,788 @@
+// Ensure that disjunction elimination is not done prematurely.
+
+// Issue #651
+
+-- in.cue --
+import "struct"
+
+// Closedness checks should not be triggered too early, or with an improper
+// subset of StructInfos. Blindly finalizing partial disjuncts will end up
+// doing a closedness check with not all embeddings present, which can lead to
+// a field being rejected prematurely.
+//
+// It should be recursively disabled.
+disambiguateClosed: {
+    b: #Def & a
+    a: #Def
+    #Def: { {x: true} | {y: true} }
+}
+
+// Checks should never be disabled for field matching.
+alwaysCheckMatchers1: {
+    b: {[=~"^xxxx$"]: int} | null
+    b: {c:            string} | null
+    b: c: "yyyyy"
+}
+
+alwaysCheckPatterns2: {
+    a: #X
+    a: b
+
+    b: #X
+    b: c: "yyyyy"
+
+    #X: string | {
+        c: string
+        {[=~"^xxxx$"]: int}
+    }
+}
+
+nestedNonMonotonic: resolved: n1: {
+    x: { a: struct.MinFields(2) } | null
+    x: { a: c: 1 } | null
+    x: { a: d: 1 } | null
+}
+
+nestedNonMonotonic: resolved: n2: {
+    x: { a: b: struct.MinFields(2) } | null
+    x: { a: b: c: 1 } | null
+    x: { a: b: d: 1 } | null
+}
+
+nestedNonMonotonic: eliminated: n1: p1: {
+    x: { a: struct.MaxFields(1) } | null
+    x: { a: c: 1 } | null
+    x: { a: d: 1 } | null
+}
+
+nestedNonMonotonic: eliminated: n1: p2: {
+    x: { a: c: 1 } | null
+    x: { a: struct.MaxFields(1) } | null
+    x: { a: d: 1 } | null
+}
+
+nestedNonMonotonic: eliminated: n1: p2: {
+    x: { a: c: 1 } | null
+    x: { a: d: 1 } | null
+    x: { a: struct.MaxFields(1) } | null
+}
+
+nestedNonMonotonic: eliminated: n2: p1: {
+    x: { a: b: struct.MaxFields(1) } | null
+    x: { a: b: c: 1 } | null
+    x: { a: b: d: 1 } | null
+}
+
+nestedNonMonotonic: eliminated: n2: p2: {
+    x: { a: b: c: 1 } | null
+    x: { a: b: struct.MaxFields(1) } | null
+    x: { a: b: d: 1 } | null
+}
+
+nestedNonMonotonic: eliminated: n2: p2: {
+    x: { a: b: c: 1 } | null
+    x: { a: b: d: 1 } | null
+    x: { a: b: struct.MaxFields(1) } | null
+}
+
+nestedNonMonotonic: incomplete: a: n1: p1:  {
+    x: { a: struct.MinFields(2) } | null
+    x: { a: c: 1 } | null
+}
+
+nestedNonMonotonic: incomplete: a: n1: p2:  {
+    x: { a: c: 1 } | null
+    x: { a: struct.MinFields(2) } | null
+}
+
+nestedNonMonotonic: incomplete: a: n2: p1:  {
+    x: { a: b: struct.MinFields(2) } | null
+    x: { a: b: c: 1 } | null
+}
+
+nestedNonMonotonic: incomplete: a: n2: p2:  {
+    x: { a: b: c: 1 } | null
+    x: { a: b: struct.MinFields(2) } | null
+}
+
+
+nestedNonMonotonic: incomplete: b: n1: p1: {
+    x: { a: struct.MinFields(3) } | null
+    x: { a: c: 1 } | null
+    x: { a: d: 1 } | null
+}
+
+nestedNonMonotonic: incomplete: b: n1: p2: {
+    x: { a: c: 1 } | null
+    x: { a: struct.MinFields(3) } | null
+    x: { a: d: 1 } | null
+}
+
+nestedNonMonotonic: incomplete: b: n1: p3: {
+    x: { a: c: 1 } | null
+    x: { a: d: 1 } | null
+    x: { a: struct.MinFields(3) } | null
+}
+
+nestedNonMonotonic: incomplete: b: n2: p1: {
+    x: { a: b: struct.MinFields(3) } | null
+    x: { a: b: c: 1 } | null
+    x: { a: b: d: 1 } | null
+}
+
+nestedNonMonotonic: incomplete: b: n2: p1: {
+    x: { a: b: c: 1 } | null
+    x: { a: b: struct.MinFields(3) } | null
+    x: { a: b: d: 1 } | null
+}
+
+nestedNonMonotonic: incomplete: b: n2: p1: {
+    x: { a: b: c: 1 } | null
+    x: { a: b: d: 1 } | null
+    x: { a: b: struct.MinFields(3) } | null
+}
+
+-- out/eval --
+(struct){
+  disambiguateClosed: (struct){
+    b: (struct){ |((#struct){
+        x: (bool){ true }
+      }, (#struct){
+        y: (bool){ true }
+      }) }
+    a: (struct){ |((#struct){
+        x: (bool){ true }
+      }, (#struct){
+        y: (bool){ true }
+      }) }
+    #Def: (struct){ |((#struct){
+        x: (bool){ true }
+      }, (#struct){
+        y: (bool){ true }
+      }) }
+  }
+  alwaysCheckMatchers1: (struct){
+    b: (struct){
+      c: (string){ "yyyyy" }
+    }
+  }
+  alwaysCheckPatterns2: (struct){
+    a: (#struct){
+      c: (string){ "yyyyy" }
+    }
+    b: (#struct){
+      c: (string){ "yyyyy" }
+    }
+    #X: ((string|struct)){ |((string){ string }, (#struct){
+        c: (string){ string }
+      }) }
+  }
+  nestedNonMonotonic: (struct){
+    resolved: (struct){
+      n1: (struct){
+        x: ((null|struct)){ |((struct){
+            a: (struct){
+              c: (int){ 1 }
+              d: (int){ 1 }
+            }
+          }, (null){ null }) }
+      }
+      n2: (struct){
+        x: ((null|struct)){ |((struct){
+            a: (struct){
+              b: (struct){
+                c: (int){ 1 }
+                d: (int){ 1 }
+              }
+            }
+          }, (null){ null }) }
+      }
+    }
+    eliminated: (struct){
+      n1: (struct){
+        p1: (struct){
+          x: (null){ null }
+        }
+        p2: (struct){
+          x: (null){ null }
+        }
+      }
+      n2: (struct){
+        p1: (struct){
+          x: (null){ null }
+        }
+        p2: (struct){
+          x: (null){ null }
+        }
+      }
+    }
+    incomplete: (struct){
+      a: (struct){
+        n1: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (_|_){
+                  // [incomplete] nestedNonMonotonic.incomplete.a.n1.p1.x.a: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                  //     ./in.cue:84:13
+                  //     ./in.cue:84:30
+                  c: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+          p2: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (_|_){
+                  // [incomplete] nestedNonMonotonic.incomplete.a.n1.p2.x.a: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                  //     ./in.cue:90:13
+                  //     ./in.cue:90:30
+                  c: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+        }
+        n2: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  b: (_|_){
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    //     ./in.cue:94:16
+                    //     ./in.cue:94:33
+                    c: (int){ 1 }
+                  }
+                }
+              }, (null){ null }) }
+          }
+          p2: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  b: (_|_){
+                    // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
+                    //     ./in.cue:100:16
+                    //     ./in.cue:100:33
+                    c: (int){ 1 }
+                  }
+                }
+              }, (null){ null }) }
+          }
+        }
+      }
+      b: (struct){
+        n1: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (_|_){
+                  // [incomplete] nestedNonMonotonic.incomplete.b.n1.p1.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                  //     ./in.cue:105:13
+                  //     ./in.cue:105:30
+                  c: (int){ 1 }
+                  d: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+          p2: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (_|_){
+                  // [incomplete] nestedNonMonotonic.incomplete.b.n1.p2.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                  //     ./in.cue:112:13
+                  //     ./in.cue:112:30
+                  c: (int){ 1 }
+                  d: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+          p3: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (_|_){
+                  // [incomplete] nestedNonMonotonic.incomplete.b.n1.p3.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                  //     ./in.cue:119:13
+                  //     ./in.cue:119:30
+                  c: (int){ 1 }
+                  d: (int){ 1 }
+                }
+              }, (null){ null }) }
+          }
+        }
+        n2: (struct){
+          p1: (struct){
+            x: ((null|struct)){ |((struct){
+                a: (struct){
+                  b: (_|_){
+                    // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
+                    //     ./in.cue:137:16
+                    //     ./in.cue:137:33
+                    c: (int){ 1 }
+                    d: (int){ 1 }
+                  }
+                }
+              }, (null){ null }) }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  disambiguateClosed: {
+    b: (〈0;#Def〉 & 〈0;a〉)
+    a: 〈0;#Def〉
+    #Def: {
+      ({
+        x: true
+      }|{
+        y: true
+      })
+    }
+  }
+  alwaysCheckMatchers1: {
+    b: ({
+      [=~"^xxxx$"]: int
+    }|null)
+    b: ({
+      c: string
+    }|null)
+    b: {
+      c: "yyyyy"
+    }
+  }
+  alwaysCheckPatterns2: {
+    a: 〈0;#X〉
+    a: 〈0;b〉
+    b: 〈0;#X〉
+    b: {
+      c: "yyyyy"
+    }
+    #X: (string|{
+      c: string
+      {
+        [=~"^xxxx$"]: int
+      }
+    })
+  }
+  nestedNonMonotonic: {
+    resolved: {
+      n1: {
+        x: ({
+          a: 〈import;struct〉.MinFields(2)
+        }|null)
+        x: ({
+          a: {
+            c: 1
+          }
+        }|null)
+        x: ({
+          a: {
+            d: 1
+          }
+        }|null)
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    resolved: {
+      n2: {
+        x: ({
+          a: {
+            b: 〈import;struct〉.MinFields(2)
+          }
+        }|null)
+        x: ({
+          a: {
+            b: {
+              c: 1
+            }
+          }
+        }|null)
+        x: ({
+          a: {
+            b: {
+              d: 1
+            }
+          }
+        }|null)
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n1: {
+        p1: {
+          x: ({
+            a: 〈import;struct〉.MaxFields(1)
+          }|null)
+          x: ({
+            a: {
+              c: 1
+            }
+          }|null)
+          x: ({
+            a: {
+              d: 1
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n1: {
+        p2: {
+          x: ({
+            a: {
+              c: 1
+            }
+          }|null)
+          x: ({
+            a: 〈import;struct〉.MaxFields(1)
+          }|null)
+          x: ({
+            a: {
+              d: 1
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n1: {
+        p2: {
+          x: ({
+            a: {
+              c: 1
+            }
+          }|null)
+          x: ({
+            a: {
+              d: 1
+            }
+          }|null)
+          x: ({
+            a: 〈import;struct〉.MaxFields(1)
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n2: {
+        p1: {
+          x: ({
+            a: {
+              b: 〈import;struct〉.MaxFields(1)
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                d: 1
+              }
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n2: {
+        p2: {
+          x: ({
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: 〈import;struct〉.MaxFields(1)
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                d: 1
+              }
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    eliminated: {
+      n2: {
+        p2: {
+          x: ({
+            a: {
+              b: {
+                c: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: {
+                d: 1
+              }
+            }
+          }|null)
+          x: ({
+            a: {
+              b: 〈import;struct〉.MaxFields(1)
+            }
+          }|null)
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n1: {
+          p1: {
+            x: ({
+              a: 〈import;struct〉.MinFields(2)
+            }|null)
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n1: {
+          p2: {
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: 〈import;struct〉.MinFields(2)
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(2)
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      a: {
+        n2: {
+          p2: {
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(2)
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n1: {
+          p1: {
+            x: ({
+              a: 〈import;struct〉.MinFields(3)
+            }|null)
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: {
+                d: 1
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n1: {
+          p2: {
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: 〈import;struct〉.MinFields(3)
+            }|null)
+            x: ({
+              a: {
+                d: 1
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n1: {
+          p3: {
+            x: ({
+              a: {
+                c: 1
+              }
+            }|null)
+            x: ({
+              a: {
+                d: 1
+              }
+            }|null)
+            x: ({
+              a: 〈import;struct〉.MinFields(3)
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(3)
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  d: 1
+                }
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(3)
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  d: 1
+                }
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+  nestedNonMonotonic: {
+    incomplete: {
+      b: {
+        n2: {
+          p1: {
+            x: ({
+              a: {
+                b: {
+                  c: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: {
+                  d: 1
+                }
+              }
+            }|null)
+            x: ({
+              a: {
+                b: 〈import;struct〉.MinFields(3)
+              }
+            }|null)
+          }
+        }
+      }
+    }
+  }
+}

@@ -264,7 +264,8 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 		n.doNotify()
 
 		if !n.done() {
-			if len(n.disjunctions) > 0 && v.BaseValue == cycle {
+			switch {
+			case len(n.disjunctions) > 0 && v.BaseValue == cycle:
 				// We disallow entering computations of disjunctions with
 				// incomplete data.
 				if state == Finalized {
@@ -276,12 +277,16 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 					n.node.UpdateStatus(Partial)
 				}
 				return
-			}
-		}
 
-		if !n.done() && state <= Partial {
-			n.node.UpdateStatus(Partial)
-			return
+			case state <= Partial:
+				n.node.UpdateStatus(Partial)
+				return
+
+			case state <= AllArcs:
+				c.AddBottom(n.incompleteErrors())
+				n.node.UpdateStatus(Partial)
+				return
+			}
 		}
 
 		if s := v.Status(); state <= s {
@@ -416,25 +421,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 	default:
 		if n.node.BaseValue == cycle {
 			if !n.done() {
-				// collect incomplete errors.
-				var err *Bottom // n.incomplete
-				for _, d := range n.dynamicFields {
-					err = CombineErrors(nil, err, d.err)
-				}
-				for _, c := range n.forClauses {
-					err = CombineErrors(nil, err, c.err)
-				}
-				for _, c := range n.ifClauses {
-					err = CombineErrors(nil, err, c.err)
-				}
-				for _, x := range n.exprs {
-					err = CombineErrors(nil, err, x.err)
-				}
-				if err == nil {
-					// safeguard.
-					err = incompleteSentinel
-				}
-				n.node.BaseValue = err
+				n.node.BaseValue = n.incompleteErrors()
 			} else {
 				n.node.BaseValue = nil
 			}
@@ -536,6 +523,28 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 	}
 
 	n.completeArcs(state)
+}
+
+func (n *nodeContext) incompleteErrors() *Bottom {
+	// collect incomplete errors.
+	var err *Bottom // n.incomplete
+	for _, d := range n.dynamicFields {
+		err = CombineErrors(nil, err, d.err)
+	}
+	for _, c := range n.forClauses {
+		err = CombineErrors(nil, err, c.err)
+	}
+	for _, c := range n.ifClauses {
+		err = CombineErrors(nil, err, c.err)
+	}
+	for _, x := range n.exprs {
+		err = CombineErrors(nil, err, x.err)
+	}
+	if err == nil {
+		// safeguard.
+		err = incompleteSentinel
+	}
+	return err
 }
 
 func (n *nodeContext) completeArcs(state VertexStatus) {

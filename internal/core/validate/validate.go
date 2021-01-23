@@ -87,7 +87,7 @@ func (v *validator) validate(x *adt.Vertex) {
 		}
 
 	} else if v.checkConcrete() {
-		x := x.Default()
+		x = x.Default()
 		if !adt.IsConcrete(x) {
 			x := x.Value()
 			v.add(&adt.Bottom{

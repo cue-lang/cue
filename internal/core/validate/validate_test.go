@@ -163,6 +163,24 @@ y: conflicting values 4 and 2:
 			c: b + b
 		}
 		`,
+	}, {
+		desc: "pick up non-concrete value in default",
+		cfg:  &Config{Concrete: true},
+		in: `
+		x: null | *{
+			a: int
+		}
+		`,
+		out: "incomplete\nx.a: incomplete value int",
+	}, {
+		desc: "pick up non-concrete value in default",
+		cfg:  &Config{Concrete: true},
+		in: `
+			x: null | *{
+				a: 1 | 2
+			}
+			`,
+		out: "incomplete\nx.a: incomplete value 1 | 2",
 	}}
 
 	r := runtime.New()

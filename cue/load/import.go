@@ -151,7 +151,10 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 
 	if !found {
 		return retErr(
-			errors.Newf(token.NoPos, "cannot find package %q", p.DisplayPath))
+			&PackageError{
+				Message: errors.NewMessage("cannot find package %q",
+					[]interface{}{p.DisplayPath}),
+			})
 	}
 
 	// This algorithm assumes that multiple directories within cue.mod/*/

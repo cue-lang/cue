@@ -361,7 +361,7 @@ type config struct {
 	loadCfg *load.Config
 }
 
-func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
+func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
 	if cfg == nil {
 		cfg = &defaultConfig
 	}
@@ -377,6 +377,15 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 	}
 
 	cfg.loadCfg.Tags = flagInject.StringArray(cmd)
+
+	return p, nil
+}
+
+func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
+	p, err = newBuildPlan(cmd, args, cfg)
+	if err != nil {
+		return nil, err
+	}
 
 	builds := loadFromArgs(cmd, args, cfg.loadCfg)
 	if builds == nil {

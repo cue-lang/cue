@@ -19,8 +19,10 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/tools/fix"
 )
@@ -32,13 +34,18 @@ func newFmtCmd(c *Command) *cobra.Command {
 		Long: `Fmt formats the given files or the files for the given packages in place
 `,
 		RunE: mkRunE(c, func(cmd *Command, args []string) error {
-			plan, err := parseArgs(cmd, args, &config{loadCfg: &load.Config{
+			plan, err := newBuildPlan(cmd, args, &config{loadCfg: &load.Config{
 				Tests:       true,
 				Tools:       true,
 				AllCUEFiles: true,
 				Package:     "*",
 			}})
 			exitOnErr(cmd, err, true)
+
+			builds := loadFromArgs(cmd, args, plan.cfg.loadCfg)
+			if builds == nil {
+				exitOnErr(cmd, errors.Newf(token.NoPos, "invalid args"), true)
+			}
 
 			opts := []format.Option{}
 			if flagSimplify.Bool(cmd) {
@@ -49,10 +56,15 @@ func newFmtCmd(c *Command) *cobra.Command {
 			cfg.Format = opts
 			cfg.Force = true
 
-			for _, inst := range plan.insts {
+			for _, inst := range builds {
 				if inst.Err != nil {
-					exitOnErr(cmd, inst.Err, false)
-					continue
+					var p *load.PackageError
+					switch {
+					case errors.As(inst.Err, &p):
+					default:
+						exitOnErr(cmd, inst.Err, false)
+						continue
+					}
 				}
 				for _, file := range inst.BuildFiles {
 					files := []*ast.File{}

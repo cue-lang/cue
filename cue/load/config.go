@@ -324,7 +324,7 @@ func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 			"non-canonical import path: %q should be %q", path, pathpkg.Clean(path)))
 	}
 
-	if importPath, e := c.importPathFromAbsDir(fsPath(dir), path, c.Package); e != nil {
+	if importPath, e := c.importPathFromAbsDir(fsPath(dir), path); e != nil {
 		// Detect later to keep error messages consistent.
 	} else {
 		p.ImportPath = string(importPath)
@@ -358,7 +358,7 @@ type importPath string
 
 type fsPath string
 
-func (c *Config) importPathFromAbsDir(absDir fsPath, key, name string) (importPath, errors.Error) {
+func (c *Config) importPathFromAbsDir(absDir fsPath, key string) (importPath, errors.Error) {
 	if c.ModuleRoot == "" {
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (root undefined)", key)
@@ -392,6 +392,12 @@ func (c *Config) importPathFromAbsDir(absDir fsPath, key, name string) (importPa
 			"cannot determine import path for %q (no module)", key)
 	default:
 		pkg = c.Module + pkg
+	}
+
+	name := c.Package
+	switch name {
+	case "_", "*":
+		name = ""
 	}
 
 	return addImportQualifier(importPath(pkg), name)

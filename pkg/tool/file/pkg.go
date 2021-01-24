@@ -27,13 +27,13 @@ var pkg = &internal.Package{
 	Append: {
 		$id:         "tool/file.Append"
 		filename:    !=""
-		permissions: int | *420
+		permissions: int | *438
 		contents:    bytes | string
 	}
 	Create: {
 		$id:         "tool/file.Create"
 		filename:    !=""
-		permissions: int | *420
+		permissions: int | *438
 		contents:    bytes | string
 	}
 	Glob: {

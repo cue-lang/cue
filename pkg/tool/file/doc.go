@@ -31,7 +31,7 @@
 //     	filename: !=""
 //
 //     	// permissions defines the permissions to use if the file does not yet exist.
-//     	permissions: int | *0o644
+//     	permissions: int | *0o666
 //
 //     	// contents specifies the bytes to be written.
 //     	contents: bytes | string
@@ -48,7 +48,7 @@
 //     	filename: !=""
 //
 //     	// permissions defines the permissions to use if the file does not yet exist.
-//     	permissions: int | *0o644
+//     	permissions: int | *0o666
 //
 //     	// contents specifies the bytes to be written.
 //     	contents: bytes | string

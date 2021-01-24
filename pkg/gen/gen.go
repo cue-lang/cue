@@ -107,7 +107,7 @@ func main() {
 
 	filename := filepath.Join(genFile)
 
-	if err := ioutil.WriteFile(filename, b, 0644); err != nil {
+	if err := ioutil.WriteFile(filename, b, 0666); err != nil {
 		log.Fatal(err)
 	}
 }

@@ -89,9 +89,19 @@ let y = foo
 	}, {
 		simplify: true,
 		in: `
-		y: _ | {[string]: int}
+		x1: 3 & _
+		x2: _ | {[string]: int}
+		x3: 4 & (9 | _)
+		x4: (_ | 9) & 4
+		x5: (_ & 9) & 4
+		x6: 4 & (_ & 9)
 		`,
-		out: `y: _
+		out: `x1: 3
+x2: _
+x3: 4
+x4: 4
+x5: 9 & 4
+x6: 4 & 9
 `,
 
 		// 	}, {

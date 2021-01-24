@@ -31,7 +31,8 @@ import (
 type Option func(*options)
 
 type options struct {
-	simplify bool
+	simplify   bool
+	deprecated bool
 }
 
 // Simplify enables fixes that simplify the code, but are not strictly
@@ -265,38 +266,9 @@ func File(f *ast.File, o ...Option) *ast.File {
 	// 	return true
 	// }, nil).(*ast.File)
 
-	if !options.simplify {
-		return f
+	if options.simplify {
+		f = simplify(f)
 	}
-
-	// Rewrite disjunctions with _ to _.
-	f = astutil.Apply(f, func(c astutil.Cursor) bool {
-		if x := findTop(c.Node()); x != nil {
-			c.Replace(x)
-		}
-		return true
-	}, nil).(*ast.File)
 
 	return f
-}
-
-func findTop(x ast.Node) ast.Expr {
-	switch x := x.(type) {
-	case *ast.BinaryExpr:
-		if x.Op != token.OR {
-			break
-		}
-		if v := findTop(x.X); v != nil {
-			return v
-		}
-		if v := findTop(x.Y); v != nil {
-			return v
-		}
-
-	case *ast.Ident:
-		if x.Name == "_" {
-			return x
-		}
-	}
-	return nil
 }

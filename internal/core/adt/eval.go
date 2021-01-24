@@ -392,20 +392,21 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 }
 
 func (n *nodeContext) doNotify() {
-	if n.errs != nil && len(n.notify) > 0 {
-		for _, v := range n.notify {
-			if v.state == nil {
-				if b, ok := v.BaseValue.(*Bottom); ok {
-					v.BaseValue = CombineErrors(nil, b, n.errs)
-				} else {
-					v.BaseValue = n.errs
-				}
-			} else {
-				v.state.addBottom(n.errs)
-			}
-		}
-		n.notify = n.notify[:0]
+	if n.errs == nil || len(n.notify) == 0 {
+		return
 	}
+	for _, v := range n.notify {
+		if v.state == nil {
+			if b, ok := v.BaseValue.(*Bottom); ok {
+				v.BaseValue = CombineErrors(nil, b, n.errs)
+			} else {
+				v.BaseValue = n.errs
+			}
+		} else {
+			v.state.addBottom(n.errs)
+		}
+	}
+	n.notify = n.notify[:0]
 }
 
 func isStruct(v *Vertex) bool {
@@ -774,6 +775,7 @@ func (e *Unifier) newNodeContext(ctx *OpContext, node *Vertex) *nodeContext {
 			node:          node,
 			kind:          TopKind,
 			arcMap:        n.arcMap[:0],
+			notify:        n.notify[:0],
 			checks:        n.checks[:0],
 			dynamicFields: n.dynamicFields[:0],
 			ifClauses:     n.ifClauses[:0],

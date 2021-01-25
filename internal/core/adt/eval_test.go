@@ -64,7 +64,11 @@ func TestEval(t *testing.T) {
 		ctx := e.NewContext(v)
 		v.Finalize(ctx)
 
-		t.Log(e.Stats())
+		stats := ctx.Stats()
+		t.Log(stats)
+		if n := stats.Leaks(); n > 0 {
+			t.Skipf("%d leaks reported", n)
+		}
 
 		if b := validate.Validate(ctx, v, &validate.Config{
 			AllErrors: true,

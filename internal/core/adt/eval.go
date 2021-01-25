@@ -57,7 +57,18 @@ type Stats struct {
 	Allocs   int
 }
 
+// Leaks reports the number of nodeContext structs leaked. These are typically
+// benign, as they will just be garbage collected, as long as the pointer from
+// the original nodes has been eliminated or the original nodes are also not
+// referred to. But Leaks may have notable impact on performance, and thus
+// should be avoided.
+func (s *Stats) Leaks() int {
+	return s.Allocs + s.Reused - s.Freed
+}
+
 var stats = template.Must(template.New("stats").Parse(`{{"" -}}
+
+Leaks:  {{.Leaks}}
 Freed:  {{.Freed}}
 Reused: {{.Reused}}
 Allocs: {{.Allocs}}
@@ -330,10 +341,6 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 		}
 		n.expandDisjuncts(disState, n, maybeDefault, false)
 
-		// If the state has changed, it is because a disjunct has been run. In this case, our node will have completed, and it will
-		// set a value soon.
-		v.state = n // alternatively, set to nil
-
 		for _, d := range n.disjuncts {
 			d.free()
 		}
@@ -372,6 +379,11 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 			// v.Structs = nil // TODO: should we keep or discard the Structs?
 			// TODO: how to represent closedness information? Do we need it?
 		}
+
+		// If the state has changed, it is because a disjunct has been run, or
+		// because a single disjunct has replaced it. Restore the old state as
+		// to not confuse memory management.
+		v.state = n
 
 		if state != Finalized {
 			return

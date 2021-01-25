@@ -330,6 +330,7 @@ func mode(hasDefault, marked bool) defaultMode {
 // time that a clone is needed and must be nil. Conjuncts no longer needed and
 // can become nil. All other fields can be copied shallowly.
 func clone(v Vertex) Vertex {
+	v.state = nil
 	if a := v.Arcs; len(a) > 0 {
 		v.Arcs = make([]*Vertex, len(a))
 		for i, arc := range a {

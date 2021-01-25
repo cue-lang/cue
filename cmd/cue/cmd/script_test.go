@@ -26,6 +26,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
 	"github.com/rogpeppe/go-internal/txtar"
@@ -37,7 +38,8 @@ import (
 // TestLatest checks that the examples match the latest language standard,
 // even if still valid in backwards compatibility mode.
 func TestLatest(t *testing.T) {
-	filepath.Walk("testdata/script", func(fullpath string, info os.FileInfo, err error) error {
+	root := filepath.Join("testdata", "script")
+	filepath.Walk(root, func(fullpath string, info os.FileInfo, err error) error {
 		if !strings.HasSuffix(fullpath, ".txt") ||
 			strings.HasPrefix(filepath.Base(fullpath), "fix") {
 			return nil
@@ -72,9 +74,20 @@ func TestLatest(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
+	srv, err := goproxytest.NewServer(filepath.Join("testdata", "mod"), "")
+	if err != nil {
+		t.Fatalf("cannot start proxy: %v", err)
+	}
 	p := testscript.Params{
-		Dir:           "testdata/script",
+		Dir:           filepath.Join("testdata", "script"),
 		UpdateScripts: *update,
+		Setup: func(e *testscript.Env) error {
+			e.Vars = append(e.Vars,
+				"GOPROXY="+srv.URL,
+				"GONOSUMDB=*", // GOPROXY is a private proxy
+			)
+			return nil
+		},
 	}
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)

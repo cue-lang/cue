@@ -1,10 +1,5 @@
 # Test that a basic get go works using golden files to verify output
 
-# Set HOME for go-build cache to be valid
-env HOME=$WORK${/}home
-env USERPROFILE=$HOME
-env LOCALAPPDATA=$WORK${/}appdata
-
 # All the things
 cue get go --local
 cmp blah_go_gen.cue all.cue.golden

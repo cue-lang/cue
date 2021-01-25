@@ -26,6 +26,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
 	"github.com/rogpeppe/go-internal/txtar"
 
@@ -71,10 +72,14 @@ func TestLatest(t *testing.T) {
 }
 
 func TestScript(t *testing.T) {
-	testscript.Run(t, testscript.Params{
+	p := testscript.Params{
 		Dir:           "testdata/script",
 		UpdateScripts: *update,
-	})
+	}
+	if err := gotooltest.Setup(&p); err != nil {
+		t.Fatal(err)
+	}
+	testscript.Run(t, p)
 }
 
 // TestScriptDebug takes a single testscript file and then runs it within the

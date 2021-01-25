@@ -1,0 +1,6 @@
+# Basic sanity check that go command works as expected
+# within testscript tests
+
+go version
+stdout '^go version'
+

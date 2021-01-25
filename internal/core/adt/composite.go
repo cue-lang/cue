@@ -265,6 +265,25 @@ const (
 	Finalized
 )
 
+func (s VertexStatus) String() string {
+	switch s {
+	case Unprocessed:
+		return "unprocessed"
+	case Evaluating:
+		return "evaluating"
+	case Partial:
+		return "partial"
+	case AllArcs:
+		return "allarcs"
+	case EvaluatingArcs:
+		return "evaluatingArcs"
+	case Finalized:
+		return "finalized"
+	default:
+		return "unknown"
+	}
+}
+
 func (v *Vertex) Status() VertexStatus {
 	if v.EvalCount > 0 {
 		return EvaluatingArcs

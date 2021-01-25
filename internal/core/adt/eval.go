@@ -164,7 +164,7 @@ func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
 				return &w
 			}
 		}
-		panic("nil value")
+		Assertf(false, "no BaseValue: state: %v; requested: %v", v.status, state)
 	}
 
 	if v.status < Finalized && v.state != nil {
@@ -180,14 +180,16 @@ func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
 func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 	// defer c.PopVertex(c.PushVertex(v))
 
+	// Ensure a node will always have a nodeContext after calling Unify if it is
+	// not yet Finalized.
+	n := v.getNodeContext(c)
+	defer v.freeNode(n)
+
 	if state <= v.Status() {
 		if v.Status() != Partial && state != Partial {
 			return
 		}
 	}
-
-	n := v.getNodeContext(c)
-	defer v.freeNode(n)
 
 	switch v.Status() {
 	case Evaluating:

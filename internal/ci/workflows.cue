@@ -265,7 +265,7 @@ _#job:  ((json.#Workflow & {}).jobs & {x: _}).x
 _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 
 // We need at least go1.14 for code generation
-_#codeGenGo:      "1.14.9"
+_#codeGenGo:      "1.14.14"
 _#latestStableGo: "1.15.x"
 
 _#linuxMachine:   "ubuntu-18.04"

@@ -28,7 +28,7 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
-        - 1.14.9
+        - 1.14.14
         - 1.15.x
         - 1.16.0-rc1
         os:
@@ -56,7 +56,7 @@ jobs:
         key: ${{ runner.os }}-${{ matrix.go-version }}-go-${{ hashFiles('**/go.sum')
           }}
         restore-keys: ${{ runner.os }}-${{ matrix.go-version }}-go-
-    - if: matrix.go-version == '1.14.9' && matrix.os != 'windows-2019'
+    - if: matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'
       name: Generate
       run: go generate ./...
     - name: Test

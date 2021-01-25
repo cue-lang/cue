@@ -38,6 +38,14 @@ test: _#bashWorkflow & {
 	}
 
 	jobs: {
+		start: {
+			"runs-on": _#linuxMachine
+			if:        "${{ \(_#isCLCITestBranch) }}"
+			steps: [
+				_#writeCookiesFile,
+				_#startCLBuild,
+			]
+		}
 		test: {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
@@ -98,6 +106,13 @@ test: _#bashWorkflow & {
 		if: "${{ \(_#isMaster) }}"
 	}
 
+	_#startCLBuild: _#step & {
+		name: "Update Gerrit CL message with starting message"
+		run:  (_#gerrit._#setCodeReview & {
+			#args: message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+		}).res
+	}
+
 	_#failCLBuild: _#step & {
 		if:   "${{ \(_#isCLCITestBranch) && failure() }}"
 		name: "Post any failures for this matrix entry"
@@ -149,13 +164,6 @@ test_dispatch: _#bashWorkflow & {
 			if:        "${{ startsWith(github.event.action, 'Build for refs/changes/') }}"
 			"runs-on": _#linuxMachine
 			steps: [
-				_#writeCookiesFile,
-				_#step & {
-					name: "Update Gerrit CL message with starting message"
-					run:  (_#gerrit._#setCodeReview & {
-						#args: message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-					}).res
-				},
 				_#step & {
 					name: "Checkout ref"
 					run:  """
@@ -166,20 +174,6 @@ test_dispatch: _#bashWorkflow & {
 						"""
 				},
 			]
-		}
-	}
-
-	_#gerrit: {
-		_#setCodeReview: {
-			#args: {
-				message: string
-				labels?: {
-					"Code-Review": int
-				}
-			}
-			res: #"""
-			curl -f -s -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review
-			"""#
 		}
 	}
 }

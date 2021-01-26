@@ -107,7 +107,8 @@ func unifyValue(c *adt.OpContext, a, b adt.Value) adt.Value {
 	v := &adt.Vertex{}
 	v.AddConjunct(adt.MakeRootConjunct(c.Env(0), a))
 	v.AddConjunct(adt.MakeRootConjunct(c.Env(0), b))
-	return c.Unifier.Evaluate(c, v)
+	x, _ := c.Evaluate(c.Env(0), v)
+	return x
 }
 
 func (s *subsumer) getError() (err errors.Error) {

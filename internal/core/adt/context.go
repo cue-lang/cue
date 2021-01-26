@@ -137,10 +137,7 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	ctx := &OpContext{
 		Runtime: cfg.Runtime,
 		Format:  cfg.Format,
-		Unifier: Unifier{
-			r: cfg.Runtime,
-		},
-		vertex: v,
+		vertex:  v,
 	}
 	if v != nil {
 		ctx.e = &Environment{Up: nil, Vertex: v}
@@ -148,13 +145,17 @@ func New(v *Vertex, cfg *Config) *OpContext {
 	return ctx
 }
 
-// An OpContext associates a Runtime and Unifier to allow evaluating the types
-// defined in this package. It tracks errors provides convenience methods for
-// evaluating values.
+// An OpContext implements CUE's unification operation. It's operations only
+// operation on values that are created with the Runtime with which an OpContext
+// is associated. An OpContext is not goroutine save and only one goroutine may
+// use an OpContext at a time.
+//
 type OpContext struct {
 	Runtime
 	Format func(Node) string
-	Unifier
+
+	stats        Stats
+	freeListNode *nodeContext
 
 	e         *Environment
 	src       ast.Node
@@ -253,7 +254,7 @@ func (c *OpContext) relNode(upCount int32) *Vertex {
 	for ; upCount > 0; upCount-- {
 		e = e.Up
 	}
-	c.Unify(c, e.Vertex, Partial)
+	c.Unify(e.Vertex, Partial)
 	return e.Vertex
 }
 
@@ -342,7 +343,7 @@ func (c *OpContext) validate(v Value) *Bottom {
 	case *Bottom:
 		return x
 	case *Vertex:
-		v := c.Unifier.Evaluate(c, x)
+		v := c.evaluate(x, Partial)
 		if b, ok := v.(*Bottom); ok {
 			return b
 		}
@@ -591,7 +592,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 			return nil
 		}
 
-		v := c.Unifier.evaluate(c, arc, state)
+		v := c.evaluate(arc, state)
 		return v
 
 	default:
@@ -646,7 +647,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 
 		if v.BaseValue == nil || v.BaseValue == cycle {
 			// Use node itself to allow for cycle detection.
-			c.Unifier.Unify(c, v, state)
+			c.Unify(v, state)
 		}
 
 		if b, _ := v.BaseValue.(*Bottom); b != nil && b.Code != IncompleteError {
@@ -1134,6 +1135,6 @@ func (c *OpContext) NewList(values ...Value) *Vertex {
 	for _, x := range values {
 		list.Elems = append(list.Elems, x)
 	}
-	c.Unify(c, v, Finalized)
+	c.Unify(v, Finalized)
 	return v
 }

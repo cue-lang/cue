@@ -27,20 +27,20 @@ func Evaluate(r adt.Runtime, v *adt.Vertex) {
 		Runtime: r,
 		Format:  format,
 	})
-	c.Unify(c, v, adt.Finalized)
+	c.Unify(v, adt.Finalized)
 }
 
 func New(r adt.Runtime) *Unifier {
-	return &Unifier{r: r, e: adt.NewUnifier(r)}
+	return &Unifier{r: r, e: NewContext(r, nil)}
 }
 
 type Unifier struct {
 	r adt.Runtime
-	e *adt.Unifier
+	e *adt.OpContext
 }
 
 func (e *Unifier) Unify(ctx *adt.OpContext, v *adt.Vertex, state adt.VertexStatus) {
-	e.e.Unify(ctx, v, state)
+	e.e.Unify(v, state)
 }
 
 func (e *Unifier) Stats() *adt.Stats {
@@ -50,18 +50,17 @@ func (e *Unifier) Stats() *adt.Stats {
 // TODO: Note: NewContext takes essentially a cue.Value. By making this
 // type more central, we can perhaps avoid context creation.
 func NewContext(r adt.Runtime, v *adt.Vertex) *adt.OpContext {
-	e := New(r)
-	return e.NewContext(v)
+	format := func(n adt.Node) string {
+		return debug.NodeString(r, n, printConfig)
+	}
+	return adt.New(v, &adt.Config{
+		Runtime: r,
+		Format:  format,
+	})
 }
 
 func (e *Unifier) NewContext(v *adt.Vertex) *adt.OpContext {
-	format := func(n adt.Node) string {
-		return debug.NodeString(e.r, n, printConfig)
-	}
-	return adt.New(v, &adt.Config{
-		Runtime: e.r,
-		Format:  format,
-	})
+	return NewContext(e.r, v)
 }
 
 var printConfig = &debug.Config{Compact: true}

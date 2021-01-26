@@ -411,7 +411,7 @@ func (v *Vertex) IsErr() bool {
 }
 
 func (v *Vertex) Err(c *OpContext, state VertexStatus) *Bottom {
-	c.Unify(c, v, state)
+	c.Unify(v, state)
 	if b, ok := v.BaseValue.(*Bottom); ok {
 		return b
 	}
@@ -421,7 +421,7 @@ func (v *Vertex) Err(c *OpContext, state VertexStatus) *Bottom {
 // func (v *Vertex) Evaluate()
 
 func (v *Vertex) Finalize(c *OpContext) {
-	c.Unify(c, v, Finalized)
+	c.Unify(v, Finalized)
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {

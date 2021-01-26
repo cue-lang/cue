@@ -140,7 +140,7 @@ var orBuiltin = &adt.Builtin{
 		v.AddConjunct(adt.MakeRootConjunct(nil,
 			&adt.DisjunctionExpr{Values: d, HasDefaults: false},
 		))
-		c.Unify(c, v, adt.Finalized)
+		c.Unify(v, adt.Finalized)
 		return v
 	},
 }

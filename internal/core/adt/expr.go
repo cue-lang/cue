@@ -79,7 +79,7 @@ func (x *StructLit) evaluate(c *OpContext) Value {
 	// used in a context where more conjuncts are added. It may also lead
 	// to disjuncts being in a partially expanded state, leading to
 	// misaligned nodeContexts.
-	c.Unifier.Unify(c, v, AllArcs)
+	c.Unify(v, AllArcs)
 	return v
 }
 
@@ -287,7 +287,7 @@ func (x *ListLit) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
 	// TODO: should be AllArcs and then use Finalize for builtins?
-	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
+	c.Unify(v, Finalized) // TODO: also partial okay?
 	return v
 }
 
@@ -961,7 +961,7 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	if x.Op == AndOp {
 		// Anonymous Arc
 		v := &Vertex{Conjuncts: []Conjunct{{env, x, CloseInfo{}}}}
-		c.Unifier.Unify(c, v, Finalized)
+		c.Unify(v, Finalized)
 		return v
 	}
 
@@ -1189,7 +1189,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
 			env := c.Env(0)
 			x := &BinaryExpr{Op: AndOp, X: v, Y: a}
 			n := &Vertex{Conjuncts: []Conjunct{{env, x, CloseInfo{}}}}
-			c.Unifier.Unify(c, n, Finalized)
+			c.Unify(n, Finalized)
 			if _, ok := n.BaseValue.(*Bottom); ok {
 				c.addErrf(0, pos(a),
 					"cannot use %s as %s in argument %d to %s",
@@ -1314,7 +1314,7 @@ func (x *DisjunctionExpr) Source() ast.Node {
 func (x *DisjunctionExpr) evaluate(c *OpContext) Value {
 	e := c.Env(0)
 	v := &Vertex{Conjuncts: []Conjunct{{e, x, CloseInfo{}}}}
-	c.Unifier.Unify(c, v, Finalized) // TODO: also partial okay?
+	c.Unify(v, Finalized) // TODO: also partial okay?
 	// TODO: if the disjunction result originated from a literal value, we may
 	// consider the result closed to create more permanent errors.
 	return v
@@ -1388,7 +1388,7 @@ func (x *ForClause) yield(c *OpContext, f YieldFunc) {
 			continue
 		}
 
-		c.Unify(c, a, Partial)
+		c.Unify(a, Partial)
 
 		n := &Vertex{status: Finalized}
 

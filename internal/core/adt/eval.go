@@ -43,10 +43,6 @@ import (
 // - Test closedness far more thoroughly.
 //
 
-func NewUnifier(r Runtime) *Unifier {
-	return &Unifier{r: r, index: r}
-}
-
 type Stats struct {
 	DisjunctCount int
 	UnifyCount    int
@@ -83,8 +79,8 @@ func (s *Stats) String() string {
 	return buf.String()
 }
 
-func (e *Unifier) Stats() *Stats {
-	return &e.stats
+func (c *OpContext) Stats() *Stats {
+	return &c.stats
 }
 
 // TODO: Note: NewContext takes essentially a cue.Value. By making this
@@ -102,33 +98,7 @@ var incompleteSentinel = &Bottom{
 	Err:  errors.Newf(token.NoPos, "incomplete"),
 }
 
-// A Unifier implements a strategy for CUE's unification operation. It must
-// handle the following aspects of CUE evaluation:
-//
-//    - Structural and reference cycles
-//    - Non-monotic validation
-//    - Fixed-point computation of comprehension
-//
-type Unifier struct {
-	r     Runtime
-	index StringIndexer
-
-	stats Stats
-
-	freeListNode *nodeContext
-}
-
-func (e *Unifier) Eval(v *Vertex) errors.Error {
-	if v.BaseValue == nil {
-		ctx := NewContext(e.r, v)
-		e.Unify(ctx, v, Partial)
-	}
-
-	// extract error if needed.
-	return nil
-}
-
-// Evaluate returns the evaluated value associated with v. It may return a
+// evaluate returns the evaluated value associated with v. It may return a
 // partial result. That is, if v was not yet unified, it may return a
 // concrete value that must be the result assuming the configuration has no
 // errors.
@@ -140,14 +110,10 @@ func (e *Unifier) Eval(v *Vertex) errors.Error {
 // error.
 //
 // TODO: return *Vertex
-func (e *Unifier) Evaluate(c *OpContext, v *Vertex) Value {
-	return e.evaluate(c, v, Partial)
-}
-
-func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
+func (c *OpContext) evaluate(v *Vertex, state VertexStatus) Value {
 	if v.BaseValue == nil || v.BaseValue == cycle {
 		// Use node itself to allow for cycle detection.
-		e.Unify(c, v, state)
+		c.Unify(v, state)
 	}
 
 	if n := v.state; n != nil {
@@ -186,9 +152,9 @@ func (e *Unifier) evaluate(c *OpContext, v *Vertex, state VertexStatus) Value {
 }
 
 // Unify fully unifies all values of a Vertex to completion and stores
-// the result in the Vertex. If Unify was called on v before it returns
+// the result in the Vertex. If unify was called on v before it returns
 // the cached results.
-func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
+func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 	// defer c.PopVertex(c.PushVertex(v))
 
 	// Ensure a node will always have a nodeContext after calling Unify if it is
@@ -254,7 +220,7 @@ func (e *Unifier) Unify(c *OpContext, v *Vertex, state VertexStatus) {
 
 		defer c.PopArc(c.PushArc(v))
 
-		e.stats.UnifyCount++
+		c.stats.UnifyCount++
 
 		// Clear any remaining error.
 		if err := c.Err(); err != nil {
@@ -436,7 +402,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
 		}
 
-		if aList, id := n.addLists(ctx); aList != nil {
+		if aList, id := n.addLists(); aList != nil {
 			n.updateNodeType(ListKind, aList, id)
 		} else {
 			break
@@ -612,7 +578,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 			// Call UpdateStatus here to be absolutely sure the status is set
 			// correctly and that we are not regressing.
 			n.node.UpdateStatus(EvaluatingArcs)
-			n.ctx.Unifier.Unify(ctx, a, state)
+			ctx.Unify(a, state)
 			// Don't set the state to Finalized if the child arcs are not done.
 			if state == Finalized && a.status < Finalized {
 				state = AllArcs
@@ -742,7 +708,7 @@ func (n *nodeContext) addNotify(v *Vertex) {
 }
 
 func (n *nodeContext) clone() *nodeContext {
-	d := n.ctx.Unifier.newNodeContext(n.ctx, n.node)
+	d := n.ctx.newNodeContext(n.node)
 
 	d.refCount++
 
@@ -779,13 +745,13 @@ func (n *nodeContext) clone() *nodeContext {
 	return d
 }
 
-func (e *Unifier) newNodeContext(ctx *OpContext, node *Vertex) *nodeContext {
-	if n := e.freeListNode; n != nil {
-		e.stats.Reused++
-		e.freeListNode = n.nextFree
+func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
+	if n := c.freeListNode; n != nil {
+		c.stats.Reused++
+		c.freeListNode = n.nextFree
 
 		*n = nodeContext{
-			ctx:           ctx,
+			ctx:           c,
 			node:          node,
 			kind:          TopKind,
 			arcMap:        n.arcMap[:0],
@@ -805,10 +771,10 @@ func (e *Unifier) newNodeContext(ctx *OpContext, node *Vertex) *nodeContext {
 
 		return n
 	}
-	e.stats.Allocs++
+	c.stats.Allocs++
 
 	return &nodeContext{
-		ctx:  ctx,
+		ctx:  c,
 		node: node,
 		kind: TopKind,
 	}
@@ -819,7 +785,7 @@ func (v *Vertex) getNodeContext(c *OpContext) *nodeContext {
 		if v.status == Finalized {
 			return nil
 		}
-		v.state = c.Unifier.newNodeContext(c, v)
+		v.state = c.newNodeContext(v)
 	} else if v.state.node != v {
 		panic("getNodeContext: nodeContext out of sync")
 	}
@@ -841,7 +807,7 @@ func (v *Vertex) freeNode(n *nodeContext) {
 		if v.status == Finalized {
 			v.freeNodeState()
 		} else {
-			n.ctx.Unifier.stats.Retained++
+			n.ctx.stats.Retained++
 		}
 	}
 }
@@ -853,19 +819,19 @@ func (v *Vertex) freeNodeState() {
 	state := v.state
 	v.state = nil
 
-	state.ctx.Unifier.freeNodeContext(state)
+	state.ctx.freeNodeContext(state)
 }
 
 func (n *nodeContext) free() {
 	if n.refCount--; n.refCount == 0 {
-		n.ctx.Unifier.freeNodeContext(n)
+		n.ctx.freeNodeContext(n)
 	}
 }
 
-func (e *Unifier) freeNodeContext(n *nodeContext) {
-	e.stats.Freed++
-	n.nextFree = e.freeListNode
-	e.freeListNode = n
+func (c *OpContext) freeNodeContext(n *nodeContext) {
+	c.stats.Freed++
+	n.nextFree = c.freeListNode
+	c.freeListNode = n
 	n.node = nil
 	n.refCount = 0
 }
@@ -1869,7 +1835,7 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 //
 // TODO(embeddedScalars): for embedded scalars, there should be another pass
 // of evaluation expressions after expanding lists.
-func (n *nodeContext) addLists(c *OpContext) (oneOfTheLists Expr, anID CloseInfo) {
+func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 	if len(n.lists) == 0 && len(n.vLists) == 0 {
 		return nil, CloseInfo{}
 	}
@@ -1882,6 +1848,8 @@ func (n *nodeContext) addLists(c *OpContext) (oneOfTheLists Expr, anID CloseInfo
 		isOpen = m.IsOpen
 		max = len(n.node.Arcs)
 	}
+
+	c := n.ctx
 
 	for _, l := range n.vLists {
 		oneOfTheLists = l

@@ -533,8 +533,11 @@ type NodeLink struct {
 func (x *NodeLink) Kind() Kind {
 	return x.Node.Kind()
 }
-func (x *NodeLink) Source() ast.Node             { return x.Node.Source() }
-func (x *NodeLink) resolve(c *OpContext) *Vertex { return x.Node }
+func (x *NodeLink) Source() ast.Node { return x.Node.Source() }
+
+func (x *NodeLink) resolve(c *OpContext, state VertexStatus) *Vertex {
+	return x.Node
+}
 
 // A FieldReference represents a lexical reference to a field.
 //
@@ -553,7 +556,7 @@ func (x *FieldReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *FieldReference) resolve(c *OpContext) *Vertex {
+func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	n := c.relNode(x.UpCount)
 	pos := pos(x)
 	return c.lookup(n, pos, x.Label)
@@ -616,7 +619,7 @@ func (x *DynamicReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *DynamicReference) resolve(ctx *OpContext) *Vertex {
+func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	e := ctx.Env(x.UpCount)
 	frame := ctx.PushState(e, x.Src)
 	v := ctx.value(x.Label)
@@ -644,7 +647,7 @@ func (x *ImportReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *ImportReference) resolve(ctx *OpContext) *Vertex {
+func (x *ImportReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	path := x.ImportPath.StringValue(ctx)
 	v, _ := ctx.Runtime.LoadImport(path)
 	return v
@@ -668,7 +671,7 @@ func (x *LetReference) Source() ast.Node {
 	return x.Src
 }
 
-func (x *LetReference) resolve(c *OpContext) *Vertex {
+func (x *LetReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	e := c.Env(x.UpCount)
 	label := e.Vertex.Label
 	if x.X == nil {
@@ -702,8 +705,8 @@ func (x *SelectorExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *SelectorExpr) resolve(c *OpContext) *Vertex {
-	n := c.node(x, x.X, x.Sel.IsRegular())
+func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
+	n := c.node(x, x.X, x.Sel.IsRegular(), state)
 	if n == emptyNode {
 		return n
 	}
@@ -727,9 +730,9 @@ func (x *IndexExpr) Source() ast.Node {
 	return x.Src
 }
 
-func (x *IndexExpr) resolve(ctx *OpContext) *Vertex {
+func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x, x.X, true)
+	n := ctx.node(x, x.X, true, state)
 	i := ctx.value(x.Index)
 	if n == emptyNode {
 		return n
@@ -1379,7 +1382,7 @@ func (x *ForClause) Source() ast.Node {
 }
 
 func (x *ForClause) yield(c *OpContext, f YieldFunc) {
-	n := c.node(x, x.Src, true)
+	n := c.node(x, x.Src, true, AllArcs)
 	for _, a := range n.Arcs {
 		if !a.Label.IsRegular() {
 			continue

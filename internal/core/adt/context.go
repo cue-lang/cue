@@ -398,7 +398,7 @@ func (c *OpContext) PopArc(saved *Vertex) {
 func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	s := c.PushState(env, r.Source())
 
-	arc := r.resolve(c)
+	arc := r.resolve(c, AllArcs)
 	// TODO: check for cycle errors?
 
 	err := c.PopState(s)
@@ -583,7 +583,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		return v
 
 	case Resolver:
-		arc := x.resolve(c)
+		arc := x.resolve(c, state)
 		if c.HasErr() {
 			return nil
 		}
@@ -592,6 +592,67 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		}
 
 		v := c.Unifier.evaluate(c, arc, state)
+		return v
+
+	default:
+		// This can only happen, really, if v == nil, which is not allowed.
+		panic(fmt.Sprintf("unexpected Expr type %T", v))
+	}
+}
+
+// unifyNode returns a possibly partially evaluated node value.
+//
+// TODO: maybe return *Vertex, *Bottom
+func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
+	savedSrc := c.src
+	c.src = v.Source()
+	err := c.errs
+	c.errs = nil
+
+	defer func() {
+		c.errs = CombineErrors(c.src, c.errs, err)
+		// TODO: remove this when we handle errors more principally.
+		if b, ok := result.(*Bottom); ok && c.src != nil &&
+			b.Code == CycleError &&
+			b.Err.Position() == token.NoPos &&
+			len(b.Err.InputPositions()) == 0 {
+			bb := *b
+			bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
+			result = &bb
+		}
+		c.errs = CombineErrors(c.src, c.errs, result)
+		if c.errs != nil {
+			result = c.errs
+		}
+		c.src = savedSrc
+	}()
+
+	switch x := v.(type) {
+	case Value:
+		return x
+
+	case Evaluator:
+		v := x.evaluate(c)
+		return v
+
+	case Resolver:
+		v := x.resolve(c, state)
+		if c.HasErr() {
+			return nil
+		}
+		if v == nil {
+			return nil
+		}
+
+		if v.BaseValue == nil || v.BaseValue == cycle {
+			// Use node itself to allow for cycle detection.
+			c.Unifier.Unify(c, v, state)
+		}
+
+		if b, _ := v.BaseValue.(*Bottom); b != nil && b.Code != IncompleteError {
+			return b
+		}
+
 		return v
 
 	default:
@@ -726,12 +787,11 @@ func pos(x Node) token.Pos {
 	return x.Source().Pos()
 }
 
-func (c *OpContext) node(orig Node, x Expr, scalar bool) *Vertex {
+func (c *OpContext) node(orig Node, x Expr, scalar bool, state VertexStatus) *Vertex {
 	// TODO: always get the vertex. This allows a whole bunch of trickery
 	// down the line.
-	// This must be partial, because
-	// TODO: this should always be "AllArcs"
-	v := c.evalState(x, AllArcs)
+
+	v := c.unifyNode(x, AllArcs)
 
 	v, ok := c.getDefault(v)
 	if !ok {

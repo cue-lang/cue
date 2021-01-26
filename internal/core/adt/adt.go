@@ -114,7 +114,7 @@ type Evaluator interface {
 // a value.
 type Resolver interface {
 	Node
-	resolve(ctx *OpContext) *Vertex
+	resolve(ctx *OpContext, state VertexStatus) *Vertex
 }
 
 type YieldFunc func(env *Environment, s *StructLit)

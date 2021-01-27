@@ -88,6 +88,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		exporter: x,
 		values:   &adt.Vertex{},
 		fields:   map[adt.Feature]field{},
+		attrs:    []*ast.Attribute{},
 	}
 
 	_, saved := e.pushFrame(orig)
@@ -100,6 +101,10 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	}
 
 	s := x.top().scope
+
+	for _, a := range e.attrs {
+		s.Elts = append(s.Elts, a)
+	}
 
 	// Unify values only for one level.
 	if len(e.values.Conjuncts) > 0 {
@@ -133,7 +138,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		switch len(e.exprs) {
 		case 0:
 			if len(e.structs) > 0 {
-				return ast.NewStruct()
+				return s
 			}
 			return ast.NewIdent("_")
 		case 1:
@@ -207,6 +212,7 @@ type conjuncts struct {
 	exprs       []ast.Expr
 	structs     []*adt.StructInfo
 	fields      map[adt.Feature]field
+	attrs       []*ast.Attribute
 	hasEllipsis bool
 }
 
@@ -236,6 +242,10 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 	switch x := x.(type) {
 	case *adt.StructLit:
 		e.top().upCount++
+
+		if e.cfg.ShowAttributes {
+			e.attrs = extractDeclAttrs(e.attrs, x.Src)
+		}
 
 		// Only add if it only has no bulk fields or elipsis.
 		if isComplexStruct(x) {

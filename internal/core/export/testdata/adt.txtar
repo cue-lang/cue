@@ -1,6 +1,8 @@
 -- in.cue --
 import mystrings "strings"
 
+@foo(bar)
+
 p1: [X=string]: name: X
 
 d1: "foo\(bar)": int
@@ -254,6 +256,7 @@ _|_ // e3: index out of range [2] with length 2
 _|_ // e3: index out of range [2] with length 2
 == All
 {
+	@foo(bar)
 	p1: {}
 	d1: {
 		foobar: int

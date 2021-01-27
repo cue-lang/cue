@@ -370,6 +370,12 @@ func (e *exporter) structComposite(v *adt.Vertex) ast.Expr {
 		e.addEmbed(e.value(x))
 	}
 
+	if e.cfg.ShowAttributes {
+		for _, a := range ExtractDeclAttrs(v.Conjuncts) {
+			s.Elts = append(s.Elts, a)
+		}
+	}
+
 	p := e.cfg
 	for _, label := range VertexFeatures(v) {
 		show := false

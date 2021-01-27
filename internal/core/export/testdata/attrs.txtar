@@ -1,0 +1,84 @@
+-- a.cue --
+@package("foo")
+
+package bar
+
+@file("foo")
+
+a: {
+    @decl(1)
+    @decl(2)
+} @field(2)
+
+a: {
+    @decl(1)
+    @decl(3)
+
+} @field(1) @field(4)
+
+a: {} @field(1) @field(3)
+
+-- b.cue --
+@package("b")
+
+package bar
+
+@file("bar")
+
+a: {
+    @decl(5)
+} @field(5)
+
+
+-- out/definition --
+package bar
+
+@file("foo")
+
+@file("bar")
+a: {
+	@decl(1)
+	@decl(2)
+	@decl(3)
+	@decl(5)
+} @field(2) @field(1) @field(4) @field(3) @field(5)
+-- out/doc --
+[]
+[a]
+-- out/value --
+== Simplified
+{
+	a: {}
+}
+== Raw
+{
+	a: {}
+}
+== Final
+{
+	a: {}
+}
+== All
+{
+	@file("foo")
+
+	@file("bar")
+	a: {
+		@decl(1)
+		@decl(2)
+		@decl(3)
+		@decl(5)
+	} @field(2) @field(1) @field(4) @field(3) @field(5)
+}
+== Eval
+{
+	@file("foo")
+
+	@file("bar")
+	a: {
+		@decl(1)
+		@decl(2)
+		@decl(3)
+		@decl(5)
+	} @field(2) @field(1) @field(4) @field(3) @field(5)
+}

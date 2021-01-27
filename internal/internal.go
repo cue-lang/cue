@@ -103,8 +103,14 @@ func ListEllipsis(n *ast.ListLit) (elts []ast.Expr, e *ast.Ellipsis) {
 	return elts, e
 }
 
-func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
-	for _, d := range f.Decls {
+type PkgInfo struct {
+	Package *ast.Package
+	Index   int // position in File.Decls
+	Name    string
+}
+
+func GetPackageInfo(f *ast.File) PkgInfo {
+	for i, d := range f.Decls {
 		switch x := d.(type) {
 		case *ast.CommentGroup:
 		case *ast.Attribute:
@@ -112,8 +118,17 @@ func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
 			if x.Name == nil {
 				break
 			}
-			return x, x.Name.Name, x.Name.Pos()
+			return PkgInfo{x, i, x.Name.Name}
 		}
+	}
+	return PkgInfo{}
+}
+
+// Deprecated: use GetPackageInfo
+func PackageInfo(f *ast.File) (p *ast.Package, name string, tok token.Pos) {
+	x := GetPackageInfo(f)
+	if p := x.Package; p != nil {
+		return p, x.Name, p.Name.Pos()
 	}
 	return nil, "", f.Pos()
 }

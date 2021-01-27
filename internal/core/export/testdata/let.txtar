@@ -166,3 +166,28 @@ y: Y & Y_1
 	}
 	y: "foo"
 }
+== Eval
+{
+	#Foo: 2
+	x:    "foo"
+	cfgs: [{
+		metadata: {
+			name: "one"
+		}
+	}, {
+		metadata: {
+			name: "two"
+		}
+	}]
+	let filepath = "kind-\(cfg.name)"
+	files: {
+		"\(filepath)": {
+			patches: cfg
+		}
+	} & {
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
+	y: "foo"
+}

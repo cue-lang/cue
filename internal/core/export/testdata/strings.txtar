@@ -142,3 +142,29 @@ bin2: '''
 		line!
 		'''
 }
+== Eval
+{
+	a: """
+		multi
+		line
+		"""
+	b: """
+		message: multi
+		line!
+		"""
+	c: {
+		d: """
+			multi
+			line
+			"""
+	}
+	bin1: '''
+		multi
+		line
+		'''
+	bin2: '''
+		multi
+		message: multi
+		line!
+		'''
+}

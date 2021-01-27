@@ -1,0 +1,53 @@
+
+-- uplot.cue --
+#LineConfig: {
+  lineColor?: string
+}
+
+#GraphFieldConfig: #LineConfig & {
+  drawStyle?: int
+}
+-- out/definition --
+#LineConfig: {
+	lineColor?: string
+}
+#GraphFieldConfig: {
+	#LineConfig
+	drawStyle?: int
+}
+-- out/doc --
+[]
+[#LineConfig]
+[#GraphFieldConfig]
+-- out/value --
+== Simplified
+{}
+== Raw
+{
+	#LineConfig: {
+		lineColor?: string
+	}
+	#GraphFieldConfig: {
+		lineColor?: string
+	}
+}
+== Final
+{}
+== All
+{
+	#LineConfig: {
+		lineColor?: string
+	}
+	#GraphFieldConfig: {
+		lineColor?: string
+	}
+}
+== Eval
+{
+	#LineConfig: {
+		lineColor?: string
+	}
+	#GraphFieldConfig: {
+		lineColor?: string
+	}
+}

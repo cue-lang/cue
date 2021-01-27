@@ -286,3 +286,26 @@ baz: {
 		field2: int
 	}
 }
+== Eval
+{
+	Foo: {
+		field1: int
+		field2: int
+		dup3:   int
+	}
+	foos: {
+		MyFoo: {
+			field1: 0
+			field2: 1
+			dup3:   int
+		}
+	}
+	bar: {
+		field1: int
+		field2: int
+	}
+	baz: {
+		field1: int
+		field2: int
+	}
+}

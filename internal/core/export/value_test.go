@@ -60,6 +60,13 @@ func TestValue(t *testing.T) {
 		all := export.All
 		all.ShowErrors = true
 
+		evalWithOptions := export.Profile{
+			TakeDefaults:    true,
+			ShowOptional:    true,
+			ShowDefinitions: true,
+			ShowAttributes:  true,
+		}
+
 		for _, tc := range []struct {
 			name string
 			fn   func(r adt.Runtime, id string, v adt.Value) (ast.Expr, errors.Error)
@@ -68,6 +75,7 @@ func TestValue(t *testing.T) {
 			{"Raw", export.Raw.Value},
 			{"Final", export.Final.Value},
 			{"All", all.Value},
+			{"Eval", evalWithOptions.Value},
 		} {
 			fmt.Fprintln(t, "==", tc.name)
 			x, errs := tc.fn(r, pkgID, v)
@@ -104,6 +112,13 @@ strings.MinRunes(4) & strings.MaxRunes(7)
 
 	p := export.All
 	p.ShowErrors = true
+
+	p = &export.Profile{
+		TakeDefaults:    true,
+		ShowOptional:    true,
+		ShowDefinitions: true,
+		ShowAttributes:  true,
+	}
 
 	x, errs := p.Value(r, "main", v)
 	if errs != nil {

@@ -50,3 +50,10 @@ s: strings.MinRunes(4) & strings.MaxRunes(7)
 	}
 	s: strings.MinRunes(4) & strings.MaxRunes(7)
 }
+== Eval
+{
+	x: {
+		y: >=-9223372036854775808 & <=9223372036854775807 & int
+	}
+	s: strings.MinRunes(4) & strings.MaxRunes(7)
+}

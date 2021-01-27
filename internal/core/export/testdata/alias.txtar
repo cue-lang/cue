@@ -83,3 +83,12 @@ X="d-2": E=[D="cue"]: C="foo\(baz)": {
 	Y="a-c": 5
 	"d-2": {}
 }
+== Eval
+{
+	"a-b":   4
+	foo:     4
+	bar?:    Y
+	baz:     3
+	Y="a-c": 5
+	"d-2": {}
+}

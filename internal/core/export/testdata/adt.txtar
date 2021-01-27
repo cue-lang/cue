@@ -319,3 +319,5 @@ _|_ // e3: index out of range [2] with length 2
 		[1, _|_]
 	}
 }
+== Eval
+_|_ // e3: index out of range [2] with length 2

@@ -186,7 +186,10 @@ Result:
   }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
-  xc3: (int){ 6 }
+  xc3: (_|_){
+    // [incomplete] xc3: unresolved disjunction 8 | 9 (type int):
+    //     ./in.cue:29:10
+  }
   xc4: (int){ 9 }
   xc5: (int){ 10 }
   xd1: (int){ 8 }
@@ -235,5 +238,8 @@ Result:
   }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
-  z3: (int){ 8 }
+  z3: (_|_){
+    // [incomplete] z3: unresolved disjunction 11 | 13 (type int):
+    //     ./in.cue:58:5
+  }
 }

@@ -79,9 +79,13 @@ value2: {
       // [incomplete] list2.#Sub: undefined field b:
       //     ./in.cue:30:13
     }
-    Out2: (list){
+    Out2: (_|_){
+      // [incomplete] list2.#Sub: undefined field b:
+      //     ./in.cue:30:13
     }
-    Out3: (list){
+    Out3: (_|_){
+      // [incomplete] list2.#Sub: undefined field b:
+      //     ./in.cue:30:13
     }
     _Top: (_|_){
       // [incomplete] list2.#Sub: undefined field b:

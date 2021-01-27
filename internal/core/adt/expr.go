@@ -452,15 +452,110 @@ func (x *BoundExpr) Source() ast.Node {
 }
 
 func (x *BoundExpr) evaluate(ctx *OpContext) Value {
+	v := ctx.value(x.Expr)
+	if isError(v) {
+		return v
+	}
+
+	switch k := v.Kind(); k {
+	case IntKind, FloatKind, NumKind, StringKind, BytesKind:
+	case NullKind:
+		if x.Op != NotEqualOp {
+			err := ctx.NewPosf(pos(x.Expr),
+				"cannot use null for bound %s", x.Op)
+			return &Bottom{Err: err}
+		}
+	default:
+		mask := IntKind | FloatKind | NumKind | StringKind | BytesKind
+		if x.Op == NotEqualOp {
+			mask |= NullKind
+		}
+		if k&mask != 0 {
+			ctx.addErrf(IncompleteError, ctx.pos(),
+				"non-concrete value %s for bound %s", ctx.Str(x.Expr), x.Op)
+			return nil
+		}
+		err := ctx.NewPosf(pos(x.Expr),
+			"invalid value %s (type %s) for bound %s",
+			ctx.Str(v), k, x.Op)
+		return &Bottom{Err: err}
+	}
+
 	if v, ok := x.Expr.(Value); ok {
 		if v == nil || v.Concreteness() > Concrete {
 			return ctx.NewErrf("bound has fixed non-concrete value")
 		}
 		return &BoundValue{x.Src, x.Op, v}
 	}
-	v := ctx.value(x.Expr)
-	if isError(v) {
-		return v
+
+	// This simplifies boundary expressions. It is an alternative to an
+	// evaluation strategy that makes nodes increasingly more specific.
+	//
+	// For instance, a completely different implementation would be to allow
+	// the precense of a concrete value to ignore incomplete errors.
+	//
+	// TODO: consider an alternative approach.
+	switch y := v.(type) {
+	case *BoundValue:
+		switch {
+		case y.Op == NotEqualOp:
+			switch x.Op {
+			case LessEqualOp, LessThanOp, GreaterEqualOp, GreaterThanOp:
+				// <(!=3)  =>  number
+				// Smaller than an arbitrarily large number is any number.
+				return &BasicType{K: y.Kind()}
+			case NotEqualOp:
+				// !=(!=3) ==> 3
+				// Not a value that is anything but a given value is that
+				// given value.
+				return y.Value
+			}
+
+		case x.Op == NotEqualOp:
+			// Invert if applicable.
+			switch y.Op {
+			case LessEqualOp:
+				return &BoundValue{x.Src, GreaterThanOp, y.Value}
+			case LessThanOp:
+				return &BoundValue{x.Src, GreaterEqualOp, y.Value}
+			case GreaterEqualOp:
+				return &BoundValue{x.Src, LessThanOp, y.Value}
+			case GreaterThanOp:
+				return &BoundValue{x.Src, LessEqualOp, y.Value}
+			}
+
+		case (x.Op == LessThanOp || x.Op == LessEqualOp) &&
+			(y.Op == GreaterThanOp || y.Op == GreaterEqualOp),
+			(x.Op == GreaterThanOp || x.Op == GreaterEqualOp) &&
+				(y.Op == LessThanOp || y.Op == LessEqualOp):
+			// <(>=3)
+			// Something smaller than an arbitrarily large number is any number.
+			return &BasicType{K: y.Kind()}
+
+		case x.Op == LessThanOp &&
+			(y.Op == LessEqualOp || y.Op == LessThanOp),
+			x.Op == GreaterThanOp &&
+				(y.Op == GreaterEqualOp || y.Op == GreaterThanOp):
+			// <(<=x)  => <x
+			// <(<x)   => <x
+			// Less than something that is less or equal to x is less than x.
+			return &BoundValue{x.Src, x.Op, y.Value}
+
+		case x.Op == LessEqualOp &&
+			(y.Op == LessEqualOp || y.Op == LessThanOp),
+			x.Op == GreaterEqualOp &&
+				(y.Op == GreaterEqualOp || y.Op == GreaterThanOp):
+			// <=(<x)   => <x
+			// <=(<=x)  => <=x
+			// Less or equal than something that is less than x is less than x.
+			return y
+		}
+
+	case *BasicType:
+		switch x.Op {
+		case LessEqualOp, LessThanOp, GreaterEqualOp, GreaterThanOp:
+			return y
+		}
 	}
 	if v.Concreteness() > Concrete {
 		ctx.addErrf(IncompleteError, ctx.pos(),

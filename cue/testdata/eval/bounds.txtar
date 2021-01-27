@@ -10,8 +10,67 @@ b4: >=20 & >20
 b5: >=21 & >20
 b6: int & >5 & <= 6
 
+simplifyExpr: {
+    less1: <(<3)
+    less2: <(<=3)
+    less3: <=(<3)
+    less4: <=(<=3)
+    less5: <(!=3)
+    less6: <=(!=3)
+
+    gtr1: >(>3)
+    gtr2: >(>=3)
+    gtr3: >=(>3)
+    gtr4: >=(>=3)
+    gtr5: >(!=3)
+    gtr6: >=(!=3)
+
+    lg1: <(>3)
+    lg2: <(>=3)
+    lg3: <=(>3)
+    lg4: <=(>=3)
+
+    gl1: >(<3)
+    gl2: >(<=3)
+    gl3: >=(<3)
+    gl4: >=(<=3)
+
+    ne1: !=(!=3)
+    ne2: !=(<3)
+    ne3: !=(<=3)
+    ne4: !=(>3)
+    ne5: !=(>=3)
+
+    s: string
+    n: number
+    i: int
+    f: float
+    b: bytes
+    basic1: <(i)
+    basic2: >(n)
+    basic3: >=(s)
+    basic4: <=(f)
+    basic5: <=(b)
+
+    // Do NOT interpret this the same as `!= type`.
+    bne1: !=(s)
+    bne2: !=(n)
+    bne3: !=(n)
+    bne4: !=(i)
+    bne5: !=(b)
+
+    e1: <(=~"foo")
+    e2: >(null)
+}
+
 -- out/eval --
-(struct){
+Errors:
+simplifyExpr.e2: cannot use null for bound >:
+    ./in.cue:62:11
+
+Result:
+(_|_){
+  // [eval]
   x0: (int){ 5 }
   x1: (int){ 30 }
   b0: (number){ &(>0, <5) }
@@ -21,6 +80,72 @@ b6: int & >5 & <= 6
   b4: (number){ >20 }
   b5: (number){ >=21 }
   b6: (int){ 6 }
+  simplifyExpr: (_|_){
+    // [eval]
+    less1: (number){ <3 }
+    less2: (number){ <3 }
+    less3: (number){ <3 }
+    less4: (number){ <=3 }
+    less5: (number){ number }
+    less6: (number){ number }
+    gtr1: (number){ >3 }
+    gtr2: (number){ >3 }
+    gtr3: (number){ >3 }
+    gtr4: (number){ >=3 }
+    gtr5: (number){ number }
+    gtr6: (number){ number }
+    lg1: (number){ number }
+    lg2: (number){ number }
+    lg3: (number){ number }
+    lg4: (number){ number }
+    gl1: (number){ number }
+    gl2: (number){ number }
+    gl3: (number){ number }
+    gl4: (number){ number }
+    ne1: (int){ 3 }
+    ne2: (number){ >=3 }
+    ne3: (number){ >3 }
+    ne4: (number){ <=3 }
+    ne5: (number){ <3 }
+    s: (string){ string }
+    n: (number){ number }
+    i: (int){ int }
+    f: (float){ float }
+    b: (bytes){ bytes }
+    basic1: (int){ int }
+    basic2: (number){ number }
+    basic3: (string){ string }
+    basic4: (float){ float }
+    basic5: (bytes){ bytes }
+    bne1: (_|_){
+      // [incomplete] simplifyExpr.bne1: non-concrete value s for bound !=:
+      //     ./in.cue:55:11
+    }
+    bne2: (_|_){
+      // [incomplete] simplifyExpr.bne2: non-concrete value n for bound !=:
+      //     ./in.cue:56:11
+    }
+    bne3: (_|_){
+      // [incomplete] simplifyExpr.bne3: non-concrete value n for bound !=:
+      //     ./in.cue:57:11
+    }
+    bne4: (_|_){
+      // [incomplete] simplifyExpr.bne4: non-concrete value i for bound !=:
+      //     ./in.cue:58:11
+    }
+    bne5: (_|_){
+      // [incomplete] simplifyExpr.bne5: non-concrete value b for bound !=:
+      //     ./in.cue:59:11
+    }
+    e1: (_|_){
+      // [incomplete] simplifyExpr.e1: non-concrete value =~"foo" for bound <:
+      //     ./in.cue:61:9
+    }
+    e2: (_|_){
+      // [eval] simplifyExpr.e2: cannot use null for bound >:
+      //     ./in.cue:62:11
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -34,4 +159,48 @@ b6: int & >5 & <= 6
   b4: (>=20 & >20)
   b5: (>=21 & >20)
   b6: ((int & >5) & <=6)
+  simplifyExpr: {
+    less1: <<3
+    less2: <<=3
+    less3: <=<3
+    less4: <=<=3
+    less5: <!=3
+    less6: <=!=3
+    gtr1: >>3
+    gtr2: >>=3
+    gtr3: >=>3
+    gtr4: >=>=3
+    gtr5: >!=3
+    gtr6: >=!=3
+    lg1: <>3
+    lg2: <>=3
+    lg3: <=>3
+    lg4: <=>=3
+    gl1: ><3
+    gl2: ><=3
+    gl3: >=<3
+    gl4: >=<=3
+    ne1: !=!=3
+    ne2: !=<3
+    ne3: !=<=3
+    ne4: !=>3
+    ne5: !=>=3
+    s: string
+    n: number
+    i: int
+    f: float
+    b: bytes
+    basic1: <〈0;i〉
+    basic2: >〈0;n〉
+    basic3: >=〈0;s〉
+    basic4: <=〈0;f〉
+    basic5: <=〈0;b〉
+    bne1: !=〈0;s〉
+    bne2: !=〈0;n〉
+    bne3: !=〈0;n〉
+    bne4: !=〈0;i〉
+    bne5: !=〈0;b〉
+    e1: <=~"foo"
+    e2: >null
+  }
 }

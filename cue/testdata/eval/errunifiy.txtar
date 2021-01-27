@@ -15,7 +15,10 @@ explicit error (_|_ literal) in source:
 Result:
 (_|_){
   // [user]
-  a: (string){ "t" }
+  a: (_|_){
+    // [incomplete] empty list in call to or:
+    //     ./in.cue:1:4
+  }
   b: (_|_){
     // [user] explicit error (_|_ literal) in source:
     //     ./in.cue:4:4

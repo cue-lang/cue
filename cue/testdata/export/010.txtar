@@ -82,15 +82,21 @@ f: [1, 2, ...]
     3: (int){ int }
     4: (int){ int }
   }
-  b: (list){
+  b: (_|_){
+    // [incomplete] b: non-concrete value <=5 in operand to *:
+    //     ./in.cue:4:5
     0: (int){ 1 }
     1: (int){ 2 }
   }
-  c: (list){
+  c: (_|_){
+    // [incomplete] c: non-concrete value >=3 & <=5 in operand to *:
+    //     ./in.cue:6:5
     0: (int){ 1 }
     1: (int){ 2 }
   }
-  d: (list){
+  d: (_|_){
+    // [incomplete] d: non-concrete value >=2 in operand to *:
+    //     ./in.cue:8:5
     0: (int){ 1 }
     1: (int){ 2 }
   }

@@ -308,6 +308,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		n.expandDisjuncts(disState, n, maybeDefault, false)
 
 		for _, d := range n.disjuncts {
+			d.finalizeIncomplete()
 			d.free()
 		}
 
@@ -351,6 +352,10 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		// to not confuse memory management.
 		v.state = n
 
+		// We don't do this in postDisjuncts, as it should only be done after
+		// completing all disjunctions.
+		n.finalizeIncomplete()
+
 		if state != Finalized {
 			return
 		}
@@ -371,6 +376,17 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 	}
 }
 
+// finalizeIncomplete collects all uncompleted expressions and adds them as
+// errors. As disjuncts are always evaluated with Finalized, care should be
+// taken to only call this after all disjunctions in a path have been completed.
+func (n *nodeContext) finalizeIncomplete() {
+	if !n.done() {
+		if err := n.incompleteErrors(); err != nil {
+			n.node.BaseValue = err
+		}
+	}
+}
+
 func (n *nodeContext) doNotify() {
 	if n.errs == nil || len(n.notify) == 0 {
 		return
@@ -387,11 +403,6 @@ func (n *nodeContext) doNotify() {
 		}
 	}
 	n.notify = n.notify[:0]
-}
-
-func isStruct(v *Vertex) bool {
-	_, ok := v.BaseValue.(*StructMarker)
-	return ok
 }
 
 func (n *nodeContext) postDisjunct(state VertexStatus) {
@@ -426,6 +437,16 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 				n.node.BaseValue = nil
 			}
 		}
+		// TODO: this ideally should be done here. However, doing so causes
+		// a somewhat more aggressive cutoff in disjunction cycles, which cause
+		// some incompatibilities. Fix in another CL.
+		//
+		// else if !n.done() {
+		// 	n.expandOne()
+		// 	if err := n.incompleteErrors(); err != nil {
+		// 		n.node.BaseValue = err
+		// 	}
+		// }
 
 		// We are no longer evaluating.
 		// n.node.UpdateStatus(Partial)

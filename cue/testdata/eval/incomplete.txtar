@@ -1,11 +1,12 @@
-These should all be an incomplete errors.
+These should all be incomplete errors.
 
 -- in.cue --
 s: string
 
 e1: s + s
-e2: >"bar" & s // TODO
-e3: >s & "foo" // TODO
+e2: >"bar" & s // okay
+e3: >s & "foo" // okay
+e3b: >s
 
 e4: >e1 & s
 e5: <e5 & s
@@ -22,10 +23,13 @@ permanentlyIncompleteOperands: {
     a: "golang/go:1.13.5"
 }
 
+issue680: (>10 * 2) & 0
+
+
 -- out/eval --
 Errors:
 permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
-    ./in.cue:18:8
+    ./in.cue:19:8
 
 Result:
 (_|_){
@@ -37,38 +41,43 @@ Result:
   }
   e2: (string){ >"bar" }
   e3: (string){ "foo" }
+  e3b: (string){ string }
   e4: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
     //     ./in.cue:3:5
   }
   e5: (_|_){
     // [cycle] cycle error:
-    //     ./in.cue:8:6
+    //     ./in.cue:9:6
   }
   E: (struct){
     a: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:11:6
+      //     ./in.cue:12:6
     }
     b: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:11:6
-      // cycle error:
       //     ./in.cue:12:6
+      // cycle error:
+      //     ./in.cue:13:6
     }
     c: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:11:6
-      // cycle error:
       //     ./in.cue:12:6
+      // cycle error:
+      //     ./in.cue:13:6
     }
   }
   permanentlyIncompleteOperands: (_|_){
     // [eval]
     a: (_|_){
       // [eval] permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
-      //     ./in.cue:18:8
+      //     ./in.cue:19:8
     }
+  }
+  issue680: (_|_){
+    // [incomplete] issue680: non-concrete value >10 in operand to *:
+    //     ./in.cue:23:12
   }
 }
 -- out/compile --
@@ -78,6 +87,7 @@ Result:
   e1: (〈0;s〉 + 〈0;s〉)
   e2: (>"bar" & 〈0;s〉)
   e3: (>〈0;s〉 & "foo")
+  e3b: >〈0;s〉
   e4: (>〈0;e1〉 & 〈0;s〉)
   e5: (<〈0;e5〉 & 〈0;s〉)
   E: {
@@ -89,4 +99,5 @@ Result:
     a: ((string + ":") + string)
     a: "golang/go:1.13.5"
   }
+  issue680: ((>10 * 2) & 0)
 }

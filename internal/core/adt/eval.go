@@ -120,10 +120,9 @@ func (c *OpContext) evaluate(v *Vertex, state VertexStatus) Value {
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
 		}
-		// TODO: consider enabling this
-		// if n.scalar != nil {
-		// 	return n.scalar
-		// }
+		if n.scalar != nil && v.BaseValue == cycle {
+			return n.scalar
+		}
 	}
 
 	switch x := v.BaseValue.(type) {
@@ -1127,9 +1126,8 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 	case Evaluator:
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
 		// Could be unify?
-		val, complete := ctx.Evaluate(v.Env, v.Expr())
-		if !complete {
-			b, _ := val.(*Bottom)
+		val := ctx.evaluateRec(v.Env, v.Expr(), Partial)
+		if b, ok := val.(*Bottom); ok && b.IsIncomplete() {
 			n.exprs = append(n.exprs, envExpr{v, b})
 			break
 		}
@@ -1707,8 +1705,9 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 
 	case arc.Status() == 0:
 	default:
-		// TODO: handle adding to finalized conjunct
-		panic(fmt.Sprintf("unhandled %d", arc.status))
+		n.addErr(ctx.NewPosf(pos(x.Field()),
+			"cannot add field %s: was already used",
+			f.SelectorString(ctx)))
 	}
 	return arc
 }

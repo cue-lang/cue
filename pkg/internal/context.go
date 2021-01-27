@@ -163,6 +163,7 @@ func (c *CallCtxt) BigFloat(i int) *big.Float {
 }
 
 func (c *CallCtxt) String(i int) string {
+	// TODO: use Evaluate instead.
 	x := cue.MakeValue(c.ctx, c.args[i])
 	v, err := x.String()
 	if err != nil {

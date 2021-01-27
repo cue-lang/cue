@@ -1,0 +1,813 @@
+// Comparing against bottom is not officially supported by the spec.
+// In practice it is used for a variety of purposes.
+//
+// TODO: It should really be replaced with two builtins:
+//
+//    - exists(reference): check if a certain field exists.
+//    - isvalid(value):    check if a certain value is valid (recursively).
+//
+// For now it implements something in between these two: it fails if a value
+// resolves to an error, but not necessarily if it does so recursively.
+// Although adding a recursive check is easy, it will break existing
+// configurations, as a recursive evaluation will trigger cycles where these
+// are perhaps not expected.
+
+// To verify these tests, each result should have a field
+//
+//     X: "user@example.com"
+//
+// for the large and medium examples and
+//
+//     X: "message: hello"
+//
+// for the simple example.
+//
+// These are not automatically tested using CUE to avoid interfering with the
+// evaluation.
+
+-- in.cue --
+import (
+	"strconv"
+	"regexp"
+)
+
+simple: {
+    #message: #"^(message: (?P<message>.*))?$"#
+
+
+    p1: {
+        X: "message: hello"
+        #aux: {
+            if Y.message == _|_ {
+                message: ""
+            }
+            if Y.message != _|_ {
+                message: "message: " + Y.message
+            }
+        }
+
+        Y: regexp.FindNamedSubmatch(#message, X)
+        X: #aux.message
+    }
+
+    p2: {
+        #aux: {
+            if Y.message == _|_ {
+                message: ""
+            }
+            if Y.message != _|_ {
+                message: "message: " + Y.message
+            }
+        }
+
+        X: "message: hello"
+        Y: regexp.FindNamedSubmatch(#message, X)
+        X: #aux.message
+    }
+
+    p3: {
+        #aux: {
+            if Y.message == _|_ {
+                message: ""
+            }
+            if Y.message != _|_ {
+                message: "message: " + Y.message
+            }
+        }
+
+        Y: regexp.FindNamedSubmatch(#message, X)
+        X: #aux.message
+        X: "message: hello"
+    }
+}
+
+medium: {
+    #userHostPort: #"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"#
+
+    p1: {
+        Y: {
+            userinfo: "user"
+            host: "example.com"
+        }
+
+        X: #X.userinfo + #X.host
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo + "v"
+            }
+
+            host: #Y.host
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p2: {
+        X: #X.userinfo + #X.host
+
+        Y: {
+            userinfo: "user"
+            host: "example.com"
+        }
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo + "v"
+            }
+
+            host: #Y.host
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p3: {
+        X: #X.userinfo + #X.host
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+        }
+
+        Y: {
+            userinfo: "user"
+            host: "example.com"
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo + "v"
+            }
+
+            host: #Y.host
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p4: {
+        X: #X.userinfo + #X.host
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo + "v"
+            }
+
+            host: #Y.host
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+
+        Y: {
+            userinfo: "user"
+            host: "example.com"
+        }
+    }
+}
+
+large: {
+    #userHostPort: 	#"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
+
+    p1: {
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        X: #X.userinfo + #X.host + #X.port
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+            
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p2: {
+        X: #X.userinfo + #X.host + #X.port
+
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+            
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p3: {
+        X: #X.userinfo + #X.host + #X.port
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+            
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p4: {
+        X: #X.userinfo + #X.host + #X.port
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+    }
+}
+-- out/eval --
+(struct){
+  simple: (struct){
+    #message: (string){ "^(message: (?P<message>.*))?$" }
+    p1: (struct){
+      X: (string){ "message: hello" }
+      #aux: (#struct){
+        message: (string){ "message: hello" }
+      }
+      Y: (struct){
+        message: (string){ "hello" }
+      }
+    }
+    p2: (struct){
+      #aux: (#struct){
+        message: (string){ "message: hello" }
+      }
+      X: (string){ "message: hello" }
+      Y: (struct){
+        message: (string){ "hello" }
+      }
+    }
+    p3: (struct){
+      #aux: (#struct){
+        message: (string){ "message: hello" }
+      }
+      Y: (struct){
+        message: (string){ "hello" }
+      }
+      X: (string){ "message: hello" }
+    }
+  }
+  medium: (struct){
+    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$" }
+    p1: (struct){
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p2: (struct){
+      X: (string){ "user@example.com" }
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p3: (struct){
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+      }
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p4: (struct){
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+      }
+      Y: (struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user" }
+      }
+    }
+  }
+  large: (struct){
+    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
+    p1: (struct){
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p2: (struct){
+      X: (string){ "user@example.com" }
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p3: (struct){
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p4: (struct){
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  simple: {
+    #message: "^(message: (?P<message>.*))?$"
+    p1: {
+      X: "message: hello"
+      #aux: {
+        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
+          message: ""
+        }
+        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
+          message: ("message: " + 〈2;Y〉.message)
+        }
+      }
+      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
+      X: 〈0;#aux〉.message
+    }
+    p2: {
+      #aux: {
+        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
+          message: ""
+        }
+        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
+          message: ("message: " + 〈2;Y〉.message)
+        }
+      }
+      X: "message: hello"
+      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
+      X: 〈0;#aux〉.message
+    }
+    p3: {
+      #aux: {
+        if (〈1;Y〉.message == _|_(explicit error (_|_ literal) in source)) {
+          message: ""
+        }
+        if (〈1;Y〉.message != _|_(explicit error (_|_ literal) in source)) {
+          message: ("message: " + 〈2;Y〉.message)
+        }
+      }
+      Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#message〉, 〈0;X〉)
+      X: 〈0;#aux〉.message
+      X: "message: hello"
+    }
+  }
+  medium: {
+    #userHostPort: "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)$"
+    p1: {
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;#Y〉.userinfo + "v")
+        }
+        host: 〈1;#Y〉.host
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p2: {
+      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;#Y〉.userinfo + "v")
+        }
+        host: 〈1;#Y〉.host
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p3: {
+      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+      }
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;#Y〉.userinfo + "v")
+        }
+        host: 〈1;#Y〉.host
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p4: {
+      X: (〈0;#X〉.userinfo + 〈0;#X〉.host)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;#Y〉.userinfo + "v")
+        }
+        host: 〈1;#Y〉.host
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+    }
+  }
+  large: {
+    #userHostPort: "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$"
+    p1: {
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p2: {
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p3: {
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p4: {
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+    }
+  }
+}

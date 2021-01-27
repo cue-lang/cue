@@ -1064,30 +1064,21 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 		return nil
 	}
 
-	left, _ := c.Concrete(env, x.X, x.Op)
-	right, _ := c.Concrete(env, x.Y, x.Op)
-
-	leftKind := kind(left)
-	rightKind := kind(right)
-
 	// TODO: allow comparing to a literal Bottom only. Find something more
 	// principled perhaps. One should especially take care that two values
 	// evaluating to Bottom don't evaluate to true. For now we check for
 	// Bottom here and require that one of the values be a Bottom literal.
-	if isLiteralBottom(x.X) || isLiteralBottom(x.Y) {
-		if b := c.validate(left); b != nil {
-			left = b
+	if x.Op == EqualOp || x.Op == NotEqualOp {
+		if isLiteralBottom(x.X) {
+			return c.validate(env, x.Src, x.Y, x.Op)
 		}
-		if b := c.validate(right); b != nil {
-			right = b
-		}
-		switch x.Op {
-		case EqualOp:
-			return &Bool{x.Src, leftKind == rightKind}
-		case NotEqualOp:
-			return &Bool{x.Src, leftKind != rightKind}
+		if isLiteralBottom(x.Y) {
+			return c.validate(env, x.Src, x.X, x.Op)
 		}
 	}
+
+	left, _ := c.Concrete(env, x.X, x.Op)
+	right, _ := c.Concrete(env, x.Y, x.Op)
 
 	if err := CombineErrors(x.Src, left, right); err != nil {
 		return err
@@ -1098,6 +1089,24 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	}
 
 	return BinOp(c, x.Op, left, right)
+}
+
+func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) Value {
+	s := c.PushState(env, src)
+	defer c.PopState(s)
+
+	for v := c.evalState(x, Partial); ; {
+		switch x := v.(type) {
+		case *Vertex:
+			v, _ = x.BaseValue.(Value)
+
+		case *Bottom:
+			return &Bool{src, op == EqualOp}
+
+		default:
+			return &Bool{src, op != EqualOp}
+		}
+	}
 }
 
 // A CallExpr represents a call to a builtin.

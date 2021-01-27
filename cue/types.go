@@ -1340,16 +1340,20 @@ func (v Value) structValData(ctx *context) (structValue, *adt.Bottom) {
 }
 
 func (v Value) structValFull(ctx *context) (structValue, *adt.Bottom) {
-	return v.structValOpts(ctx, options{})
+	return v.structValOpts(ctx, options{allowScalar: true})
 }
 
 // structVal returns an structVal or an error if v is not a struct.
-func (v Value) structValOpts(ctx *context, o options) (structValue, *adt.Bottom) {
+func (v Value) structValOpts(ctx *context, o options) (s structValue, err *adt.Bottom) {
 	v, _ = v.Default()
 
-	obj, err := v.getStruct()
-	if err != nil {
-		return structValue{}, err
+	obj := v.v
+
+	if !o.allowScalar {
+		obj, err = v.getStruct()
+		if err != nil {
+			return structValue{}, err
+		}
 	}
 
 	features := export.VertexFeatures(obj)
@@ -1949,6 +1953,7 @@ type options struct {
 	ignoreClosedness  bool // used for comparing APIs
 	docs              bool
 	disallowCycles    bool // implied by concrete
+	allowScalar       bool
 }
 
 // An Option defines modes of evaluation.

@@ -1001,6 +1001,10 @@ func TestValue_LookupDef(t *testing.T) {
 		in:  `_#foo: 3`,
 		def: "_#foo",
 		out: `_|_ // definition "_#foo" not found`,
+	}, {
+		in:  `"foo", #foo: 3`,
+		def: "#foo",
+		out: `3`,
 	}}
 
 	for _, tc := range testCases {

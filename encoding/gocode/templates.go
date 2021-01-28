@@ -81,7 +81,7 @@ var {{.prefix}}Codec, {{.prefix}}Instance = func() (*gocodec.Codec, *cue.Instanc
 // {{.prefix}}Make is called in the init phase to initialize CUE values for
 // validation functions.
 func {{.prefix}}Make(name string, x interface{}) cue.Value {
-	f, err := {{.prefix}}Instance.LookupField(name)
+	f, err := {{.prefix}}Instance.Value().FieldByName(name, true)
 	if err != nil {
 		panic(fmt.Errorf("could not find type %q in instance", name))
 	}

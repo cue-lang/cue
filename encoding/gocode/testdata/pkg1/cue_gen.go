@@ -66,7 +66,7 @@ var cuegenCodec, cuegenInstance = func() (*gocodec.Codec, *cue.Instance) {
 // cuegenMake is called in the init phase to initialize CUE values for
 // validation functions.
 func cuegenMake(name string, x interface{}) cue.Value {
-	f, err := cuegenInstance.LookupField(name)
+	f, err := cuegenInstance.Value().FieldByName(name, true)
 	if err != nil {
 		panic(fmt.Errorf("could not find type %q in instance", name))
 	}

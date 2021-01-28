@@ -7,6 +7,9 @@ import (
 
 workflowsDir: *"./" | string @tag(workflowsDir)
 
+_#masterBranch:      "master"
+_#releaseTagPattern: "v*"
+
 workflows: [...{file: string, schema: (json.#Workflow & {})}]
 workflows: [
 	{
@@ -33,7 +36,7 @@ test: _#bashWorkflow & {
 	on: {
 		push: {
 			branches: ["**"] // any branch (including '/' namespaced branches)
-			"tags-ignore": ["v*"]
+			"tags-ignore": [_#releaseTagPattern]
 		}
 	}
 
@@ -56,7 +59,9 @@ test: _#bashWorkflow & {
 				_#cacheGoModules,
 				_#goGenerate,
 				_#goTest,
-				_#goTestRace,
+				_#goTestRace & {
+					if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				},
 				_#goReleaseCheck,
 				_#checkGitClean,
 				_#pullThroughProxy,
@@ -93,10 +98,10 @@ test: _#bashWorkflow & {
 
 	// _#isMaster is an expression that evaluates to true if the
 	// job is running as a result of a master commit push
-	_#isMaster: "github.ref == '\(_#branchRefPrefix)master'"
+	_#isMaster: "github.ref == '\(_#branchRefPrefix+_#masterBranch)'"
 
 	_#pullThroughProxy: _#step & {
-		name: "Pull this commit through the proxy on master"
+		name: "Pull this commit through the proxy on \(_#masterBranch)"
 		run: """
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
@@ -181,7 +186,7 @@ test_dispatch: _#bashWorkflow & {
 release: _#bashWorkflow & {
 
 	name: "Release"
-	on: push: tags: ["v*"]
+	on: push: tags: [_#releaseTagPattern]
 	jobs: {
 		goreleaser: {
 			"runs-on": _#linuxMachine
@@ -239,7 +244,7 @@ release: _#bashWorkflow & {
 rebuild_tip_cuelang_org: _#bashWorkflow & {
 
 	name: "Push to tip"
-	on: push: branches: ["master"]
+	on: push: branches: [_#masterBranch]
 	jobs: push: {
 		"runs-on": _#linuxMachine
 		steps: [{
@@ -259,7 +264,8 @@ _#job:  ((json.#Workflow & {}).jobs & {x: _}).x
 _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 
 // We need at least go1.14 for code generation
-_#codeGenGo: "1.14.9"
+_#codeGenGo:      "1.14.9"
+_#latestStableGo: "1.15.x"
 
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
@@ -269,7 +275,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": ["1.13.x", _#codeGenGo, "1.15.x"]
+		"go-version": ["1.13.x", _#codeGenGo, _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }

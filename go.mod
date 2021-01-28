@@ -14,9 +14,8 @@ require (
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.3
 	github.com/stretchr/testify v1.2.2
-	golang.org/x/exp v0.0.0-20200513190911-00229845015e
+	golang.org/x/exp v0.0.0-20210126221216-84987778548c
 	golang.org/x/net v0.0.0-20200226121028-0de0cce0169b
-	golang.org/x/sync v0.0.0-20190911185100-cd5d95a43a6e
 	golang.org/x/text v0.3.2
 	golang.org/x/tools v0.0.0-20200612220849-54c614fe050c
 	golang.org/x/xerrors v0.0.0-20191204190536-9bdfabe68543

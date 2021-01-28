@@ -276,7 +276,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": ["1.13.x", _#codeGenGo, _#latestStableGo]
+		"go-version": [_#codeGenGo, _#latestStableGo, "1.16.0-rc1"]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -284,7 +284,10 @@ _#testStrategy: {
 _#installGo: _#step & {
 	name: "Install Go"
 	uses: "actions/setup-go@v2"
-	with: "go-version": "${{ matrix.go-version }}"
+	with: {
+		"go-version": "${{ matrix.go-version }}"
+		stable:       false
+	}
 }
 
 _#checkoutCode: _#step & {

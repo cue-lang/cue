@@ -8,7 +8,7 @@ description = ""
 -- text.md --
 In CUE, schemas are typically written as Definitions.
 A definition is a field which identifier starts with
-a `#` or `_#`.
+`#` or `_#`.
 This tells CUE that they are to be used for validation and should
 not be output as data; it is okay for them to remain unspecified.
 

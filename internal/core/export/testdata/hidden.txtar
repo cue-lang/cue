@@ -22,8 +22,7 @@ package foo
 
 import "acme.com/pkg"
 
-a: {
-	pkg.#A
+a: pkg.#A & {
 	_val:  3
 	_#val: 6
 }

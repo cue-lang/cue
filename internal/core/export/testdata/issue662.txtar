@@ -11,8 +11,7 @@
 #LineConfig: {
 	lineColor?: string
 }
-#GraphFieldConfig: {
-	#LineConfig
+#GraphFieldConfig: #LineConfig & {
 	drawStyle?: int
 }
 -- out/doc --

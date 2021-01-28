@@ -126,9 +126,7 @@ bar: {
 	// comment from bar on field 2
 	field2: int
 }
-baz: {
-	bar
-
+baz: bar & {
 	// comment from baz on field 1
 	field1: int
 	field2: int

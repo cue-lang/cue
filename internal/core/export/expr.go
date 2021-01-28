@@ -97,7 +97,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	for _, c := range a {
 		e.top().upCount = c.up
 		x := c.c.Expr()
-		e.addExpr(c.c.Env, x)
+		e.addExpr(c.c.Env, x, false)
 	}
 
 	s := x.top().scope
@@ -109,7 +109,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	// Unify values only for one level.
 	if len(e.values.Conjuncts) > 0 {
 		e.values.Finalize(e.ctx)
-		e.exprs = append(e.exprs, e.value(e.values, e.values.Conjuncts...))
+		e.embed = append(e.embed, e.value(e.values, e.values.Conjuncts...))
 	}
 
 	// Collect and order set of fields.
@@ -135,21 +135,25 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	})
 
 	if len(e.fields) == 0 && !e.hasEllipsis {
-		switch len(e.exprs) {
+		switch len(e.embed) + len(e.conjuncts) {
 		case 0:
 			if len(e.structs) > 0 {
 				return s
 			}
 			return ast.NewIdent("_")
 		case 1:
-			return e.exprs[0]
+			if len(e.conjuncts) == 1 {
+				return e.conjuncts[0]
+			}
+			return e.embed[0]
 		case 2:
 			// Simplify.
-			return ast.NewBinExpr(token.AND, e.exprs...)
+			e.conjuncts = append(e.conjuncts, e.embed...)
+			return ast.NewBinExpr(token.AND, e.conjuncts...)
 		}
 	}
 
-	for _, x := range e.exprs {
+	for _, x := range e.embed {
 		s.Elts = append(s.Elts, &ast.EmbedDecl{Expr: x})
 	}
 
@@ -201,7 +205,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		return ast.NewCall(ast.NewIdent("close"), s)
 	}
 
-	return s
+	e.conjuncts = append(e.conjuncts, s)
+
+	return ast.NewBinExpr(token.AND, e.conjuncts...)
 }
 
 // Conjuncts if for collecting values of a single vertex.
@@ -209,7 +215,8 @@ type conjuncts struct {
 	*exporter
 	// Values is used to collect non-struct values.
 	values      *adt.Vertex
-	exprs       []ast.Expr
+	embed       []ast.Expr
+	conjuncts   []ast.Expr
 	structs     []*adt.StructInfo
 	fields      map[adt.Feature]field
 	attrs       []*ast.Attribute
@@ -238,7 +245,7 @@ type conjunct struct {
 	up int32
 }
 
-func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
+func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 	switch x := x.(type) {
 	case *adt.StructLit:
 		e.top().upCount++
@@ -250,7 +257,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 		// Only add if it only has no bulk fields or elipsis.
 		if isComplexStruct(x) {
 			_, saved := e.pushFrame(nil)
-			e.exprs = append(e.exprs, e.adt(x, nil))
+			e.embed = append(e.embed, e.adt(x, nil))
 			e.popFrame(saved)
 			return
 		}
@@ -269,7 +276,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 				e.hasEllipsis = true
 				continue
 			case adt.Expr:
-				e.addExpr(env, f)
+				e.addExpr(env, f, true)
 				continue
 
 				// TODO: also handle dynamic fields
@@ -301,7 +308,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 					v.MatchAndInsert(e.ctx, v)
 					a = append(a, &ast.Ellipsis{Type: e.expr(v)})
 				}
-				e.exprs = append(e.exprs, ast.NewList(a...))
+				e.embed = append(e.embed, ast.NewList(a...))
 				return
 
 			case *adt.StructMarker:
@@ -322,20 +329,27 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr) {
 
 	case *adt.BinaryExpr:
 		switch {
-		case x.Op == adt.AndOp:
-			e.addExpr(env, x.X)
-			e.addExpr(env, x.Y)
+		case x.Op == adt.AndOp && !isEmbed:
+			e.addExpr(env, x.X, false)
+			e.addExpr(env, x.Y, false)
 		case isSelfContained(x):
 			e.values.AddConjunct(adt.MakeRootConjunct(env, x))
 		default:
-			e.exprs = append(e.exprs, e.expr(x))
+			if isEmbed {
+				e.embed = append(e.embed, e.expr(x))
+			} else {
+				e.conjuncts = append(e.conjuncts, e.expr(x))
+			}
 		}
 
 	default:
-		if isSelfContained(x) {
+		switch {
+		case isSelfContained(x):
 			e.values.AddConjunct(adt.MakeRootConjunct(env, x))
-		} else {
-			e.exprs = append(e.exprs, e.expr(x))
+		case isEmbed:
+			e.embed = append(e.embed, e.expr(x))
+		default:
+			e.conjuncts = append(e.conjuncts, e.expr(x))
 		}
 	}
 }

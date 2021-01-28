@@ -1,0 +1,102 @@
+-- in.cue --
+#A: {
+    _
+	#a: string
+}
+
+#E: {_}
+#F: {_}
+#G: {_}
+
+#B: #A & {
+	{ 2, #def: 3 }
+	2
+	#E & #F
+	#f: int
+    {
+        _
+        #bar: int
+        #G
+    }
+
+}
+-- out/definition --
+#A: {
+	#a: string
+}
+#E: {}
+#F: {}
+#G: {}
+#B: #A & {
+	#E & #F
+	#G
+	2
+	#f:   int
+	#def: 3
+	#bar: int
+}
+-- out/doc --
+[]
+[#A]
+[#A #a]
+[#E]
+[#F]
+[#G]
+[#B]
+[#B #a]
+[#B #def]
+[#B #bar]
+[#B #f]
+-- out/value --
+== Simplified
+{}
+== Raw
+{
+	#A: {
+		#a: string
+	}
+	#E: {}
+	#F: {}
+	#G: {}
+	#B: {
+		2
+		#a:   string
+		#f:   int
+		#def: 3
+		#bar: int
+	}
+}
+== Final
+{}
+== All
+{
+	#A: {
+		#a: string
+	}
+	#E: {}
+	#F: {}
+	#G: {}
+	#B: {
+		2
+		#a:   string
+		#f:   int
+		#def: 3
+		#bar: int
+	}
+}
+== Eval
+{
+	#A: {
+		#a: string
+	}
+	#E: {}
+	#F: {}
+	#G: {}
+	#B: {
+		2
+		#a:   string
+		#f:   int
+		#def: 3
+		#bar: int
+	}
+}

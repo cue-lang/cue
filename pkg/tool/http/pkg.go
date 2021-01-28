@@ -19,20 +19,16 @@ var _ = adt.TopKind // in case the adt package isn't used
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{},
 	CUE: `{
-	Get: {
-		Do
+	Get: Do & {
 		method: "GET"
 	}
-	Post: {
-		Do
+	Post: Do & {
 		method: "POST"
 	}
-	Put: {
-		Do
+	Put: Do & {
 		method: "PUT"
 	}
-	Delete: {
-		Do
+	Delete: Do & {
 		method: "DELETE"
 	}
 	Do: {

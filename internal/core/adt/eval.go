@@ -144,7 +144,14 @@ func (c *OpContext) evaluate(v *Vertex, state VertexStatus) Value {
 	}
 
 	if v.status < Finalized && v.state != nil {
-		v.state.addNotify(c.vertex)
+		// TODO: errors are slightly better if we always add addNotify, but
+		// in this case it is less likely to cause a performance penalty.
+		// See https://github.com/cuelang/cue/issues/661. It may be possible to
+		// relax this again once we have proper tests to prevent regressions of
+		// that issue.
+		if !v.state.done() || v.state.errs != nil {
+			v.state.addNotify(c.vertex)
+		}
 	}
 
 	return v

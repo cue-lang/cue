@@ -19,7 +19,7 @@ jobs:
     - name: Run GoReleaser
       env:
         GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
-      uses: docker://goreleaser/goreleaser:latest
+      uses: docker://goreleaser/goreleaser:v0.110.0
       with:
         args: release --rm-dist
   docker:

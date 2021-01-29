@@ -43,7 +43,7 @@ test: _#bashWorkflow & {
 	jobs: {
 		start: {
 			"runs-on": _#linuxMachine
-			if:        "${{ \(_#isCLCITestBranch) }}"
+			steps: [...(_ & {if: "${{ \(_#isCLCITestBranch) }}"})]
 			steps: [
 				_#writeCookiesFile,
 				_#startCLBuild,
@@ -200,7 +200,7 @@ release: _#bashWorkflow & {
 			}, {
 				name: "Run GoReleaser"
 				env: GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
-				uses: "docker://goreleaser/goreleaser:latest"
+				uses: "docker://goreleaser/goreleaser:v0.110.0"
 				with: args: "release --rm-dist"
 			}]
 		}

@@ -13,11 +13,12 @@ jobs:
     defaults:
       run:
         shell: bash
-    if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
     steps:
-    - name: Write the gitcookies file
+    - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
+      name: Write the gitcookies file
       run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
-    - name: Update Gerrit CL message with starting message
+    - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
+      name: Update Gerrit CL message with starting message
       run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Started
         the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
         github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename

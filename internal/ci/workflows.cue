@@ -50,6 +50,7 @@ test: _#bashWorkflow & {
 			]
 		}
 		test: {
+			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [

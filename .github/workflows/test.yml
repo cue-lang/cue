@@ -23,6 +23,7 @@ jobs:
         github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   test:
+    needs: start
     strategy:
       fail-fast: false
       matrix:

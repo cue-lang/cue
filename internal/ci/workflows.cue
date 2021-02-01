@@ -31,8 +31,8 @@ workflows: [
 		schema: test
 	},
 	{
-		file:   "test_dispatch.yml"
-		schema: test_dispatch
+		file:   "repository_dispatch.yml"
+		schema: repository_dispatch
 	},
 	{
 		file:   "release.yml"
@@ -175,9 +175,9 @@ test: _#bashWorkflow & {
 	}
 }
 
-test_dispatch: _#bashWorkflow & {
+repository_dispatch: _#bashWorkflow & {
 
-	name: "Test Dispatch"
+	name: "Repository Dispatch"
 	on: ["repository_dispatch"]
 	jobs: {
 		start: {

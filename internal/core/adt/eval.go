@@ -111,7 +111,7 @@ var incompleteSentinel = &Bottom{
 //
 // TODO: return *Vertex
 func (c *OpContext) evaluate(v *Vertex, state VertexStatus) Value {
-	if v.BaseValue == nil || v.BaseValue == cycle {
+	if v.isUndefined() {
 		// Use node itself to allow for cycle detection.
 		c.Unify(v, state)
 	}
@@ -120,13 +120,17 @@ func (c *OpContext) evaluate(v *Vertex, state VertexStatus) Value {
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
 		}
-		if n.scalar != nil && v.BaseValue == cycle {
+		if n.scalar != nil && isCyclePlaceholder(v.BaseValue) {
 			return n.scalar
 		}
 	}
 
 	switch x := v.BaseValue.(type) {
 	case *Bottom:
+		if x.IsIncomplete() {
+			c.AddBottom(x)
+			return nil
+		}
 		return x
 
 	case nil:
@@ -176,6 +180,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 	switch v.Status() {
 	case Evaluating:
+		n.insertConjuncts()
 		return
 
 	case EvaluatingArcs:
@@ -238,21 +243,15 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		// non-expression references. The cycle error may also be removed as soon
 		// as there is evidence what a correct value must be, but before all
 		// validation has taken place.
+		//
+		// TODO(cycle): having a more recursive algorithm would make this
+		// special cycle handling unnecessary.
 		v.BaseValue = cycle
 
 		v.UpdateStatus(Evaluating)
 
-		// If the result is a struct, it needs to be closed if:
-		//   1) this node introduces a definition
-		//   2) this node is a child of a node that introduces a definition,
-		//      recursively.
-		//   3) this node embeds a closed struct.
-
-		for _, x := range v.Conjuncts {
-			// TODO: needed for reentrancy. Investigate usefulness for cycle
-			// detection.
-			n.addExprConjunct(x)
-		}
+		n.conjuncts = v.Conjuncts
+		n.insertConjuncts()
 
 		fallthrough
 
@@ -269,7 +268,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		if !n.done() {
 			switch {
-			case len(n.disjunctions) > 0 && v.BaseValue == cycle:
+			case len(n.disjunctions) > 0 && isCyclePlaceholder(v.BaseValue):
 				// We disallow entering computations of disjunctions with
 				// incomplete data.
 				if state == Finalized {
@@ -282,12 +281,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 				}
 				return
 
-			case state <= Partial:
-				n.node.UpdateStatus(Partial)
-				return
-
 			case state <= AllArcs:
-				c.AddBottom(n.incompleteErrors())
 				n.node.UpdateStatus(Partial)
 				return
 			}
@@ -382,6 +376,15 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 	}
 }
 
+// insertConjuncts inserts conjuncts previously uninserted.
+func (n *nodeContext) insertConjuncts() {
+	for len(n.conjuncts) > 0 {
+		x := n.conjuncts[0]
+		n.conjuncts = n.conjuncts[1:]
+		n.addExprConjunct(x)
+	}
+}
+
 // finalizeIncomplete collects all uncompleted expressions and adds them as
 // errors. As disjuncts are always evaluated with Finalized, care should be
 // taken to only call this after all disjunctions in a path have been completed.
@@ -436,7 +439,7 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 		n.errs = nil
 
 	default:
-		if n.node.BaseValue == cycle {
+		if isCyclePlaceholder(n.node.BaseValue) {
 			if !n.done() {
 				n.node.BaseValue = n.incompleteErrors()
 			} else {
@@ -602,6 +605,19 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	} else {
 		// Visit arcs recursively to validate and compute error.
 		for _, a := range n.node.Arcs {
+			if a.nonMonotonicInsertGen >= a.nonMonotonicLookupGen && a.nonMonotonicLookupGen > 0 {
+				err := ctx.Newf(
+					"cycle: new field %s inserted by if clause that was previously evaluated by another if clause", a.Label.SelectorString(ctx))
+				err.AddPosition(n.node)
+				n.node.BaseValue = &Bottom{Err: err}
+			} else if a.nonMonotonicReject {
+				err := ctx.Newf(
+					"cycle: field %s was added after an if clause evaluated it",
+					a.Label.SelectorString(ctx))
+				err.AddPosition(n.node)
+				n.node.BaseValue = &Bottom{Err: err}
+			}
+
 			// Call UpdateStatus here to be absolutely sure the status is set
 			// correctly and that we are not regressing.
 			n.node.UpdateStatus(EvaluatingArcs)
@@ -624,6 +640,10 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 var cycle = &Bottom{
 	Err:  errors.Newf(token.NoPos, "cycle error"),
 	Code: CycleError,
+}
+
+func isCyclePlaceholder(v BaseValue) bool {
+	return v == cycle
 }
 
 func (n *nodeContext) createDisjunct() *Disjunction {
@@ -671,6 +691,9 @@ type nodeContext struct {
 	ctx  *OpContext
 	node *Vertex
 
+	// usedArcs is a list of arcs that were looked up during non-monotonic operations, but do not exist yet.
+	usedArcs []*Vertex
+
 	// TODO: (this is CL is first step)
 	// filter *Vertex a subset of composite with concrete fields for
 	// bloom-like filtering of disjuncts. We should first verify, however,
@@ -699,6 +722,10 @@ type nodeContext struct {
 	upperBound *BoundValue // < or <=
 	checks     []Validator // BuiltinValidator, other bound values.
 	errs       *Bottom
+
+	// Conjuncts holds a reference to the Vertex Arcs that still need
+	// processing. It does NOT need to be copied.
+	conjuncts []Conjunct
 
 	// notify is used to communicate errors in cyclic dependencies.
 	// TODO: also use this to communicate increasingly more concrete values.
@@ -759,6 +786,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.hasNonCycle = n.hasNonCycle
 
 	// d.arcMap = append(d.arcMap, n.arcMap...) // XXX add?
+	// d.usedArcs = append(d.usedArcs, n.usedArcs...) // XXX: add?
 	d.notify = append(d.notify, n.notify...)
 	d.checks = append(d.checks, n.checks...)
 	d.dynamicFields = append(d.dynamicFields, n.dynamicFields...)
@@ -781,6 +809,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			ctx:           c,
 			node:          node,
 			kind:          TopKind,
+			usedArcs:      n.usedArcs[:0],
 			arcMap:        n.arcMap[:0],
 			notify:        n.notify[:0],
 			checks:        n.checks[:0],
@@ -1677,7 +1706,7 @@ func (n *nodeContext) addStruct(
 // disjunctions.
 func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	ctx := n.ctx
-	arc, isNew := n.node.GetArc(f)
+	arc, isNew := n.node.GetArc(ctx, f)
 
 	arc.addConjunct(x)
 
@@ -1837,9 +1866,12 @@ func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
 			continue
 		}
 		id := d.id.SpawnSpan(d.yield, ComprehensionSpan)
+
+		n.ctx.nonMonotonicInsertNest++
 		for _, st := range sa {
 			n.addStruct(st.env, st.s, id)
 		}
+		n.ctx.nonMonotonicInsertNest--
 	}
 
 	progress = k < len(*all)

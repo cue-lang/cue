@@ -47,8 +47,7 @@ Result:
     //     ./in.cue:3:5
   }
   e5: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:9:6
+    // [cycle] cycle error
   }
   E: (struct){
     a: (_|_){
@@ -57,8 +56,6 @@ Result:
     }
     b: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:12:6
-      // cycle error:
       //     ./in.cue:13:6
     }
     c: (_|_){

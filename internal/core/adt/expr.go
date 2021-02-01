@@ -654,7 +654,7 @@ func (x *FieldReference) Source() ast.Node {
 func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	n := c.relNode(x.UpCount)
 	pos := pos(x)
-	return c.lookup(n, pos, x.Label)
+	return c.lookup(n, pos, x.Label, state)
 }
 
 // A LabelReference refers to the string or integer value of a label.
@@ -720,7 +720,7 @@ func (x *DynamicReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	v := ctx.value(x.Label)
 	ctx.PopState(frame)
 	f := ctx.Label(x.Label, v)
-	return ctx.lookup(e.Vertex, pos(x), f)
+	return ctx.lookup(e.Vertex, pos(x), f, state)
 }
 
 // An ImportReference refers to an imported package.
@@ -805,7 +805,7 @@ func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
 	if n == emptyNode {
 		return n
 	}
-	return c.lookup(n, x.Src.Sel.Pos(), x.Sel)
+	return c.lookup(n, x.Src.Sel.Pos(), x.Sel, state)
 }
 
 // IndexExpr is like a selector, but selects an index.
@@ -833,7 +833,7 @@ func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 		return n
 	}
 	f := ctx.Label(x.Index, i)
-	return ctx.lookup(n, x.Src.Index.Pos(), f)
+	return ctx.lookup(n, x.Src.Index.Pos(), f, state)
 }
 
 // A SliceExpr represents a slice operation. (Not currently in spec.)
@@ -1091,22 +1091,57 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 	return BinOp(c, x.Op, left, right)
 }
 
-func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) Value {
+func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r Value) {
 	s := c.PushState(env, src)
-	defer c.PopState(s)
-
-	for v := c.evalState(x, Partial); ; {
-		switch x := v.(type) {
-		case *Vertex:
-			v, _ = x.BaseValue.(Value)
-
-		case *Bottom:
-			return &Bool{src, op == EqualOp}
-
-		default:
-			return &Bool{src, op != EqualOp}
-		}
+	if c.nonMonotonicLookupNest == 0 {
+		c.nonMonotonicGeneration++
 	}
+
+	var match bool
+	v := c.evalState(x, Partial)
+	// NOTE: using Unwrap is maybe note entirely accurate, as it may discard
+	// a future error. However, if it does so, the error will at least be
+	// reported elsewhere.
+	switch b := Unwrap(v).(type) {
+	case nil:
+	case *Bottom:
+		if b.Code == CycleError {
+			c.PopState(s)
+			c.AddBottom(b)
+			return nil
+		}
+		match = op == EqualOp
+		// We have a nonmonotonic use of a failure. Referenced fields should
+		// not be added anymore.
+		c.nonMonotonicRejectNest++
+		c.evalState(x, Partial)
+		c.nonMonotonicRejectNest--
+
+	default:
+		// TODO(cycle): if EqualOp:
+		// - ensure to pass special status to if clause or keep a track of "hot"
+		//   paths.
+		// - evaluate hypothetical struct
+		// - walk over all fields and verify that fields are not contradicting
+		//   previously marked fields.
+		//
+		switch {
+		case b.Concreteness() > Concrete:
+			// TODO: mimic comparison to bottom semantics. If it is a valid
+			// value, check for concreteness that this level only. This
+			// should ultimately be replaced with an exists and valid
+			// builtin.
+			match = op == EqualOp
+		default:
+			match = op != EqualOp
+		}
+		c.nonMonotonicLookupNest++
+		c.evalState(x, Partial)
+		c.nonMonotonicLookupNest--
+	}
+
+	c.PopState(s)
+	return &Bool{src, match}
 }
 
 // A CallExpr represents a call to a builtin.

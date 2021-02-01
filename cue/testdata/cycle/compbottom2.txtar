@@ -1,0 +1,511 @@
+-- in.cue --
+
+self: {
+    fail: {
+        a: {
+            if a.b == _|_ {
+                b: 1
+            }
+        }
+    }
+    isConcreteFail: {
+        a: {
+            if a.b == _|_ {
+                b: 1
+            }
+            b: int
+        }
+    }
+    isNotConcrete: {
+        a: {
+            if a.b != _|_ {
+                b: 1
+            }
+            b: int
+        }
+    }
+}
+
+mutual: {
+	noConflicts: {
+		a: { if b.foo == _|_ { new: "" } }
+		b: { if a.bar == _|_ { new: "" } }
+	}
+
+	mutualCycleFail: {
+		b: { if a.bar == _|_ { foo: "" } }
+		a: { if b.foo == _|_ { bar: "" } }
+	}
+
+    brokenCycleSuccess: {
+		a: { if b.foo == _|_ { foo: "" } }
+		b: { if a.bar == _|_ { bar: "" } }
+        a: bar: ""
+	}
+
+	oneDirectionalConflictFail: {
+        p1: {
+            a: { if b.foo == _|_ { bar: "" } }
+            b: { if a.bar == _|_ { new: "" } }
+        }
+        p2: {
+            a: { if b.foo == _|_ { new: "" } }
+            b: { if a.bar == _|_ { foo: "" } }
+        }
+	}
+
+	oneDirectionalBrokenConflictSuccess: {
+		a: { if b.foo == _|_ { bar: "" } }
+		b: { if a.bar == _|_ { new: "" } }
+        b: foo: ""
+	}
+}
+
+sameStruct: {
+	chainSuccess: {
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret?: {}
+		if ret != _|_ {
+			foo: a: 1
+		}
+	}
+
+	cycleFail: {
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
+		}
+		ret?: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+	}
+
+	defCloseSuccess: {
+		#Example: {
+			raises?: {
+				runtime?:     string
+			}
+		
+			if raises == _|_ {
+				ret?: _
+			}
+		}
+
+		expr: #Example & {
+		   ret: 2
+		}
+	}
+}
+
+// Issue
+nestedChain: {
+	cycleFail: {
+		if #E.x != _|_ {
+			#E: y: true
+		}
+		if #E.y == _|_ {
+			#E: x: true
+		}
+		#E: [_]: bool
+	}
+
+	brokenCycleSuccess: {
+		if #E.x != _|_ {
+			#E: y: true
+		}
+		if #E.y == _|_ {
+			#E: x: true
+		}
+		#E: [_]: bool
+		#E: x: true
+	}
+
+  // TODO: the current algorithm does _not_ handle checking fields that were
+  // not added in certain situations.
+	doubleAddfail: {
+		if #E.x == _|_ {
+			#E: y: true
+		}
+		if #E.y == _|_ {
+			#E: x: true
+		}
+		#E: [_]: bool
+	}
+
+	trippleSuccess: {
+		if #E.x != _|_ {
+			#E: y: true
+		}
+		if #E.y != _|_ {
+			z: true
+		}
+		#E: x: true
+	}
+}
+-- out/eval --
+Errors:
+mutual.mutualCycleFail.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
+mutual.oneDirectionalConflictFail.p1.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
+mutual.oneDirectionalConflictFail.p2.b: cycle: new field foo inserted by if clause that was previously evaluated by another if clause
+nestedChain.cycleFail.#E: cycle: new field x inserted by if clause that was previously evaluated by another if clause
+sameStruct.cycleFail: cycle: new field raises inserted by if clause that was previously evaluated by another if clause
+self.fail.a: cycle: new field b inserted by if clause that was previously evaluated by another if clause
+
+Result:
+(_|_){
+  // [eval]
+  self: (_|_){
+    // [eval]
+    fail: (_|_){
+      // [eval]
+      a: (_|_){
+        // [eval] self.fail.a: cycle: new field b inserted by if clause that was previously evaluated by another if clause
+        b: (int){ 1 }
+      }
+    }
+    isConcreteFail: (struct){
+      a: (struct){
+        b: (int){ 1 }
+      }
+    }
+    isNotConcrete: (struct){
+      a: (struct){
+        b: (int){ int }
+      }
+    }
+  }
+  mutual: (_|_){
+    // [eval]
+    noConflicts: (struct){
+      a: (struct){
+        new: (string){ "" }
+      }
+      b: (struct){
+        new: (string){ "" }
+      }
+    }
+    mutualCycleFail: (_|_){
+      // [eval]
+      b: (struct){
+      }
+      a: (_|_){
+        // [eval] mutual.mutualCycleFail.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
+        bar: (string){ "" }
+      }
+    }
+    brokenCycleSuccess: (struct){
+      a: (struct){
+        bar: (string){ "" }
+        foo: (string){ "" }
+      }
+      b: (struct){
+      }
+    }
+    oneDirectionalConflictFail: (_|_){
+      // [eval]
+      p1: (_|_){
+        // [eval]
+        a: (_|_){
+          // [eval] mutual.oneDirectionalConflictFail.p1.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
+          bar: (string){ "" }
+        }
+        b: (struct){
+          new: (string){ "" }
+        }
+      }
+      p2: (_|_){
+        // [eval]
+        a: (struct){
+        }
+        b: (_|_){
+          // [eval] mutual.oneDirectionalConflictFail.p2.b: cycle: new field foo inserted by if clause that was previously evaluated by another if clause
+          foo: (string){ "" }
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: (struct){
+      a: (struct){
+      }
+      b: (struct){
+        foo: (string){ "" }
+        new: (string){ "" }
+      }
+    }
+  }
+  sameStruct: (_|_){
+    // [eval]
+    chainSuccess: (struct){
+      ret: (struct){
+        a: (int){ 1 }
+      }
+      foo: (struct){
+        a: (int){ 1 }
+      }
+    }
+    cycleFail: (_|_){
+      // [eval] sameStruct.cycleFail: cycle: new field raises inserted by if clause that was previously evaluated by another if clause
+      ret: (struct){
+        a: (int){ 1 }
+      }
+      raises: (struct){
+        a: (int){ 1 }
+      }
+    }
+    defCloseSuccess: (struct){
+      #Example: (#struct){
+      }
+      expr: (#struct){
+        ret: (int){ 2 }
+      }
+    }
+  }
+  nestedChain: (_|_){
+    // [eval]
+    cycleFail: (_|_){
+      // [eval]
+      #E: (_|_){
+        // [eval] nestedChain.cycleFail.#E: cycle: new field x inserted by if clause that was previously evaluated by another if clause
+        x: (bool){ true }
+      }
+    }
+    brokenCycleSuccess: (struct){
+      #E: (#struct){
+        x: (bool){ true }
+        y: (bool){ true }
+      }
+    }
+    doubleAddfail: (struct){
+      #E: (#struct){
+        y: (bool){ true }
+      }
+    }
+    trippleSuccess: (struct){
+      #E: (#struct){
+        x: (bool){ true }
+        y: (bool){ true }
+      }
+      z: (bool){ true }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  self: {
+    fail: {
+      a: {
+        if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+          b: 1
+        }
+      }
+    }
+    isConcreteFail: {
+      a: {
+        if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+          b: 1
+        }
+        b: int
+      }
+    }
+    isNotConcrete: {
+      a: {
+        if (〈1;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+          b: 1
+        }
+        b: int
+      }
+    }
+  }
+  mutual: {
+    noConflicts: {
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          new: ""
+        }
+      }
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          new: ""
+        }
+      }
+    }
+    mutualCycleFail: {
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          foo: ""
+        }
+      }
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          bar: ""
+        }
+      }
+    }
+    brokenCycleSuccess: {
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          foo: ""
+        }
+      }
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          bar: ""
+        }
+      }
+      a: {
+        bar: ""
+      }
+    }
+    oneDirectionalConflictFail: {
+      p1: {
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+      }
+      p2: {
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            foo: ""
+          }
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      a: {
+        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+          bar: ""
+        }
+      }
+      b: {
+        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+          new: ""
+        }
+      }
+      b: {
+        foo: ""
+      }
+    }
+  }
+  sameStruct: {
+    chainSuccess: {
+      raises?: {}
+      if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+        ret: {
+          a: 1
+        }
+      }
+      ret?: {}
+      if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+        foo: {
+          a: 1
+        }
+      }
+    }
+    cycleFail: {
+      raises?: {}
+      if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+        ret: {
+          a: 1
+        }
+      }
+      ret?: {}
+      if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+        raises: {
+          a: 1
+        }
+      }
+    }
+    defCloseSuccess: {
+      #Example: {
+        raises?: {
+          runtime?: string
+        }
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret?: _
+        }
+      }
+      expr: (〈0;#Example〉 & {
+        ret: 2
+      })
+    }
+  }
+  nestedChain: {
+    cycleFail: {
+      if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          x: true
+        }
+      }
+      #E: {
+        [_]: bool
+      }
+    }
+    brokenCycleSuccess: {
+      if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          x: true
+        }
+      }
+      #E: {
+        [_]: bool
+      }
+      #E: {
+        x: true
+      }
+    }
+    doubleAddfail: {
+      if (〈0;#E〉.x == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y == _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          x: true
+        }
+      }
+      #E: {
+        [_]: bool
+      }
+    }
+    trippleSuccess: {
+      if (〈0;#E〉.x != _|_(explicit error (_|_ literal) in source)) {
+        #E: {
+          y: true
+        }
+      }
+      if (〈0;#E〉.y != _|_(explicit error (_|_ literal) in source)) {
+        z: true
+      }
+      #E: {
+        x: true
+      }
+    }
+  }
+}

@@ -175,15 +175,18 @@ type Vertex struct {
 	// isData indicates that this Vertex is to be interepreted as data: pattern
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
-	isData bool
-	Closed bool
+	isData                bool
+	Closed                bool
+	nonMonotonicReject    bool
+	nonMonotonicInsertGen int32
+	nonMonotonicLookupGen int32
 
 	// EvalCount keeps track of temporary dereferencing during evaluation.
 	// If EvalCount > 0, status should be considered to be EvaluatingArcs.
-	EvalCount int
+	EvalCount int32
 
 	// SelfCount is used for tracking self-references.
-	SelfCount int
+	SelfCount int32
 
 	// BaseValue is the value associated with this vertex. For lists and structs
 	// this is a sentinel value indicating its kind.
@@ -313,6 +316,15 @@ func (v *Vertex) Value() Value {
 	default:
 		panic(fmt.Sprintf("unexpected type %T", v.BaseValue))
 	}
+}
+
+// isUndefined reports whether a vertex does not have a useable BaseValue yet.
+func (v *Vertex) isUndefined() bool {
+	switch v.BaseValue {
+	case nil, cycle:
+		return true
+	}
+	return false
 }
 
 func (x *Vertex) IsConcrete() bool {
@@ -458,7 +470,7 @@ func Unwrap(v Value) Value {
 		return v
 	}
 	// b, _ := x.BaseValue.(*Bottom)
-	if n := x.state; n != nil && x.BaseValue == cycle {
+	if n := x.state; n != nil && isCyclePlaceholder(x.BaseValue) {
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
 		}
@@ -596,12 +608,31 @@ func (v *Vertex) Elems() []*Vertex {
 
 // GetArc returns a Vertex for the outgoing arc with label f. It creates and
 // ads one if it doesn't yet exist.
-func (v *Vertex) GetArc(f Feature) (arc *Vertex, isNew bool) {
+func (v *Vertex) GetArc(c *OpContext, f Feature) (arc *Vertex, isNew bool) {
 	arc = v.Lookup(f)
+	if arc == nil {
+		for _, a := range v.state.usedArcs {
+			if a.Label == f {
+				arc = a
+				v.Arcs = append(v.Arcs, arc)
+				isNew = true
+				if c.nonMonotonicInsertNest > 0 {
+					a.nonMonotonicInsertGen = c.nonMonotonicGeneration
+				}
+				break
+			}
+		}
+	}
 	if arc == nil {
 		arc = &Vertex{Parent: v, Label: f}
 		v.Arcs = append(v.Arcs, arc)
 		isNew = true
+		if c.nonMonotonicInsertNest > 0 {
+			arc.nonMonotonicInsertGen = c.nonMonotonicGeneration
+		}
+	}
+	if c.nonMonotonicInsertNest == 0 {
+		arc.nonMonotonicInsertGen = 0
 	}
 	return arc, isNew
 }

@@ -167,6 +167,11 @@ type OpContext struct {
 	// structural cycle errors.
 	vertex *Vertex
 
+	nonMonotonicLookupNest int32
+	nonMonotonicRejectNest int32
+	nonMonotonicInsertNest int32
+	nonMonotonicGeneration int32
+
 	// These fields are used associate scratch fields for computing closedness
 	// of a Vertex. These fields could have been included in StructInfo (like
 	// Tomabechi's unification algorithm), but we opted for an indirection to
@@ -386,8 +391,7 @@ func (c *OpContext) PopArc(saved *Vertex) {
 func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 	s := c.PushState(env, r.Source())
 
-	arc := r.resolve(c, AllArcs)
-	// TODO: check for cycle errors?
+	arc := r.resolve(c, Partial)
 
 	err := c.PopState(s)
 	if err != nil {
@@ -563,16 +567,34 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 
 	defer func() {
 		c.errs = CombineErrors(c.src, c.errs, err)
-		// TODO: remove this when we handle errors more principally.
-		if b, ok := result.(*Bottom); ok && c.src != nil &&
-			b.Code == CycleError &&
-			b.Err.Position() == token.NoPos &&
-			len(b.Err.InputPositions()) == 0 {
-			bb := *b
-			bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
-			result = &bb
+
+		if v, ok := result.(*Vertex); ok {
+			if b, _ := v.BaseValue.(*Bottom); b != nil {
+				switch b.Code {
+				case IncompleteError:
+				case CycleError:
+					if state == Partial {
+						break
+					}
+					fallthrough
+				default:
+					result = b
+				}
+			}
 		}
-		c.errs = CombineErrors(c.src, c.errs, result)
+
+		// TODO: remove this when we handle errors more principally.
+		if b, ok := result.(*Bottom); ok {
+			if c.src != nil &&
+				b.Code == CycleError &&
+				b.Err.Position() == token.NoPos &&
+				len(b.Err.InputPositions()) == 0 {
+				bb := *b
+				bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
+				result = &bb
+			}
+			c.errs = CombineErrors(c.src, c.errs, result)
+		}
 		if c.errs != nil {
 			result = c.errs
 		}
@@ -668,7 +690,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 			return nil
 		}
 
-		if v.BaseValue == nil || v.BaseValue == cycle {
+		if v.isUndefined() {
 			// Use node itself to allow for cycle detection.
 			c.Unify(v, AllArcs)
 		}
@@ -681,7 +703,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 	}
 }
 
-func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature) *Vertex {
+func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStatus) *Vertex {
 	if l == InvalidLabel || x == nil {
 		// TODO: is it possible to have an invalid label here? Maybe through the
 		// API?
@@ -739,10 +761,50 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature) *Vertex {
 	}
 
 	a := x.Lookup(l)
+
+	var hasCycle bool
+outer:
+	switch {
+	case c.nonMonotonicLookupNest == 0 && c.nonMonotonicRejectNest == 0:
+	case a != nil:
+		if state == Partial {
+			a.nonMonotonicLookupGen = c.nonMonotonicGeneration
+		}
+
+	case x.state != nil && state == Partial:
+		for _, e := range x.state.exprs {
+			if isCyclePlaceholder(e.err) {
+				hasCycle = true
+			}
+		}
+		for _, a := range x.state.usedArcs {
+			if a.Label == l {
+				a.nonMonotonicLookupGen = c.nonMonotonicGeneration
+				if c.nonMonotonicRejectNest > 0 {
+					a.nonMonotonicReject = true
+				}
+				break outer
+			}
+		}
+		a := &Vertex{Label: l, nonMonotonicLookupGen: c.nonMonotonicGeneration}
+		if c.nonMonotonicRejectNest > 0 {
+			a.nonMonotonicReject = true
+		}
+		x.state.usedArcs = append(x.state.usedArcs, a)
+	}
 	if a == nil {
+		if x.state != nil {
+			for _, e := range x.state.exprs {
+				if isCyclePlaceholder(e.err) {
+					hasCycle = true
+				}
+			}
+		}
 		code := IncompleteError
 		if !x.Accept(c, l) {
 			code = 0
+		} else if hasCycle {
+			code = CycleError
 		}
 		// TODO: if the struct was a literal struct, we can also treat it as
 		// closed and make this a permanent error.
@@ -824,13 +886,13 @@ func (c *OpContext) node(orig Node, x Expr, scalar bool, state VertexStatus) *Ve
 	// annotated cycle error that could be taken as is.
 	// TODO: do something simpler.
 	if scalar {
-		if w := Unwrap(v); w != cycle {
+		if w := Unwrap(v); !isCyclePlaceholder(w) {
 			v = w
 		}
 	}
 
 	node, ok := v.(*Vertex)
-	if ok && node.BaseValue != cycle {
+	if ok && !isCyclePlaceholder(node.BaseValue) {
 		v = node.Value()
 	}
 

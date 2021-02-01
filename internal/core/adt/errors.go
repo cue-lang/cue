@@ -174,6 +174,9 @@ func CombineErrors(src ast.Node, x, y Value) *Bottom {
 	a, _ := Unwrap(x).(*Bottom)
 	b, _ := Unwrap(y).(*Bottom)
 
+	if a == b && isCyclePlaceholder(a) {
+		return a
+	}
 	switch {
 	case a != nil && b != nil:
 	case a != nil:

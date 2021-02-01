@@ -44,6 +44,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 			v = err
 			break
 		}
+		// r.Finalize(ctx) // TODO: Finalize here?
 		return r
 
 	case Evaluator:

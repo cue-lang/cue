@@ -1,0 +1,869 @@
+// Issues: #667, #695, #622
+-- in.cue --
+import (
+	"strconv"
+	"regexp"
+)
+
+// In these test, it is impossible to determine the existence of some arcs due
+// to mutual dependence on becoming concrete.
+//
+// This tests shows the essences of when an existence check cannot be resolved.
+minimal: {
+    a: {
+        if b.port == _|_ {
+            port: ""
+        }
+    }
+
+    b: {
+        if a.port == _|_ {
+            port: ""
+        }
+    }
+}
+
+small: {
+    #userHostPort: 	#"^(:(?P<port>\d+))?$"#
+
+    p1: {
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+        #X: {
+            if #Y.port == _|_ {
+                port: ""
+            }
+            if #Y.port != _|_ {
+                port: ":" + strconv.FormatInt(#Y.port, 10)
+            }
+        }
+	}
+
+    p2: {
+        #X: {
+            if #Y.port == _|_ {
+                port: ""
+            }
+            if #Y.port != _|_ {
+                port: ":" + strconv.FormatInt(#Y.port, 10)
+            }
+        }
+
+		#Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+	}
+}
+
+medium: {
+    #userHostPort: 	#"^(:(?P<port>\d+))?$"#
+
+    p1: {
+        #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+        Y: {
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #X: {
+            // Can never determine whether Y.port exists as it's resolution
+            // depends on #Y becoming finalized, which, in turn, depends on #X
+            // becoming finalized.
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+    }
+
+    p2: {
+        #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+        #X: {
+            // Can never determine whether Y.port exists as it's resolution
+            // depends on #Y becoming finalized, which, in turn, depends on #X
+            // becoming finalized.
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            if #Y.port != _|_ {
+              port: strconv.Atoi(#Y.port)
+            }
+        }
+	}
+
+    p3: {
+         Y: {
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+        #X: {
+            // Can never determine whether Y.port exists as it's resolution
+            // depends on #Y becoming finalized, which, in turn, depends on #X
+            // becoming finalized.
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+    }
+
+    p4: {
+        Y: {
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #X: {
+            // Can never determine whether Y.port exists as it's resolution
+            // depends on #Y becoming finalized, which, in turn, depends on #X
+            // becoming finalized.
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+    }
+
+    p5: {
+        #X: {
+            // Can never determine whether Y.port exists as it's resolution
+            // depends on #Y becoming finalized, which, in turn, depends on #X
+            // becoming finalized.
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+
+        Y: {
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+    }
+
+    p6: {
+        #X: {
+            // Can never determine whether Y.port exists as it's resolution
+            // depends on #Y becoming finalized, which, in turn, depends on #X
+            // becoming finalized.
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
+    }
+}
+
+
+large: {
+    #userHostPort: 	#"^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\d+))?$"#
+
+    p1: {
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        X: #X.userinfo + #X.host + #X.port
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+            
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p2: {
+        X: #X.userinfo + #X.host + #X.port
+
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+            
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p3: {
+        X: #X.userinfo + #X.host + #X.port
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+            
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+    }
+
+    p4: {
+        X: #X.userinfo + #X.host + #X.port
+
+        #X: {
+            if Y.userinfo == _|_ {
+                userinfo: ""
+            }
+            if Y.userinfo != _|_ {
+                userinfo: Y.userinfo + "@"
+            }
+
+            host: Y.host
+
+            if Y.port == _|_ {
+                port: ""
+            }
+            if Y.port != _|_ {
+                port: ":" + strconv.FormatInt(Y.port, 10)
+            }
+        }
+
+        #Y: regexp.FindNamedSubmatch(#userHostPort, X)
+
+        Y: {
+            userinfo: "user"
+            host:     "example.com"
+        }
+
+        Y: {
+            if #Y.userinfo != _|_ {
+                userinfo: #Y.userinfo
+            }
+
+            host: #Y.host
+
+            if #Y.port != _|_ {
+                port: strconv.Atoi(#Y.port)
+            }
+        }
+    }
+}
+-- out/eval --
+Errors:
+error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+large.p1.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+large.p2.#Y: cycle: field userinfo was added after an if clause evaluated it
+large.p2.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+large.p3.#Y: cycle: field userinfo was added after an if clause evaluated it
+large.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+large.p4.#Y: cycle: field userinfo was added after an if clause evaluated it
+medium.p1.#Y: cycle: field port was added after an if clause evaluated it
+medium.p2.#Y: cycle: field port was added after an if clause evaluated it
+medium.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+medium.p5.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+medium.p6.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+minimal.b: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+small.p1.#Y: cycle: field port was added after an if clause evaluated it
+small.p2.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+small.p2.#Y: cycle: field port was added after an if clause evaluated it
+small.p2.#X: cannot use "" (type string) as int in argument 1 to strconv.FormatInt:
+    ./in.cue:50:7
+
+Result:
+(_|_){
+  // [eval]
+  minimal: (_|_){
+    // [eval]
+    a: (struct){
+    }
+    b: (_|_){
+      // [eval] minimal.b: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+      port: (string){ "" }
+    }
+  }
+  small: (_|_){
+    // [eval]
+    #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
+    p1: (_|_){
+      // [eval]
+      #Y: (_|_){
+        // [eval] small.p1.#Y: cycle: field port was added after an if clause evaluated it
+        port: (string){ "" }
+      }
+      #X: (#struct){
+        port: (string){ "" }
+      }
+    }
+    p2: (_|_){
+      // [eval]
+      #X: (_|_){
+        // [eval] small.p2.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        port: (_|_){
+          // [eval] small.p2.#X: cannot use "" (type string) as int in argument 1 to strconv.FormatInt:
+          //     ./in.cue:50:7
+        }
+      }
+      #Y: (_|_){
+        // [eval] small.p2.#Y: cycle: field port was added after an if clause evaluated it
+        port: (string){ "" }
+      }
+    }
+  }
+  medium: (_|_){
+    // [eval]
+    #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
+    p1: (_|_){
+      // [eval]
+      #Y: (_|_){
+        // [eval] medium.p1.#Y: cycle: field port was added after an if clause evaluated it
+        port: (string){ "" }
+      }
+      Y: (struct){
+      }
+      #X: (#struct){
+        port: (string){ "" }
+      }
+    }
+    p2: (_|_){
+      // [eval]
+      #Y: (_|_){
+        // [eval] medium.p2.#Y: cycle: field port was added after an if clause evaluated it
+        port: (string){ "" }
+      }
+      #X: (#struct){
+        port: (string){ "" }
+      }
+      Y: (struct){
+      }
+    }
+    p3: (_|_){
+      // [eval]
+      Y: (_|_){
+        // [eval] medium.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        port: (_|_){
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+        }
+      }
+      #Y: (#struct){
+        port: (string){ "" }
+      }
+      #X: (#struct){
+        port: (string){ "" }
+      }
+    }
+    p4: (_|_){
+      // [eval]
+      Y: (_|_){
+        // [eval] medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        port: (_|_){
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+        }
+      }
+      #X: (#struct){
+        port: (string){ "" }
+      }
+      #Y: (#struct){
+        port: (string){ "" }
+      }
+    }
+    p5: (_|_){
+      // [eval]
+      #X: (_|_){
+        // [eval] medium.p5.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        port: (string){ "" }
+      }
+      #Y: (_|_){
+        // [eval] medium.p5.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+      }
+      Y: (struct){
+      }
+    }
+    p6: (_|_){
+      // [eval]
+      #X: (_|_){
+        // [eval] medium.p6.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        port: (string){ "" }
+      }
+      Y: (struct){
+      }
+      #Y: (_|_){
+        // [eval] medium.p6.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+      }
+    }
+  }
+  large: (_|_){
+    // [eval]
+    #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
+    p1: (_|_){
+      // [eval]
+      Y: (_|_){
+        // [eval] large.p1.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+        port: (_|_){
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+        }
+      }
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      #Y: (#struct){
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p2: (_|_){
+      // [eval]
+      X: (string){ "user@example.com" }
+      Y: (_|_){
+        // [eval] large.p2.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+        port: (_|_){
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+        }
+      }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      #Y: (_|_){
+        // [eval] large.p2.#Y: cycle: field userinfo was added after an if clause evaluated it
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p3: (_|_){
+      // [eval]
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      Y: (_|_){
+        // [eval] large.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        userinfo: (string){ "user" }
+        host: (string){ "example.com" }
+        port: (_|_){
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+        }
+      }
+      #Y: (_|_){
+        // [eval] large.p3.#Y: cycle: field userinfo was added after an if clause evaluated it
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+    }
+    p4: (_|_){
+      // [eval]
+      X: (string){ "user@example.com" }
+      #X: (#struct){
+        host: (string){ "example.com" }
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+      }
+      #Y: (_|_){
+        // [eval] large.p4.#Y: cycle: field userinfo was added after an if clause evaluated it
+        host: (string){ "example.com" }
+        port: (string){ "" }
+        userinfo: (string){ "user" }
+      }
+      Y: (_|_){
+        // [eval]
+        userinfo: (string){ "user" }
+        host: (_|_){
+          // [eval] large.p4.#Y: cycle: field userinfo was added after an if clause evaluated it
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  minimal: {
+    a: {
+      if (〈1;b〉.port == _|_(explicit error (_|_ literal) in source)) {
+        port: ""
+      }
+    }
+    b: {
+      if (〈1;a〉.port == _|_(explicit error (_|_ literal) in source)) {
+        port: ""
+      }
+    }
+  }
+  small: {
+    #userHostPort: "^(:(?P<port>\\d+))?$"
+    p1: {
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      #X: {
+        if (〈1;#Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;#Y〉.port, 10))
+        }
+      }
+    }
+    p2: {
+      #X: {
+        if (〈1;#Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;#Y〉.port, 10))
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+    }
+  }
+  medium: {
+    #userHostPort: "^(:(?P<port>\\d+))?$"
+    p1: {
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      Y: {
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #X: {
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+    }
+    p2: {
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+    }
+    p3: {
+      Y: {
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+    }
+    p4: {
+      Y: {
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #X: {
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+    }
+    p5: {
+      #X: {
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+      Y: {
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+    }
+    p6: {
+      #X: {
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;#X〉.port)
+    }
+  }
+  large: {
+    #userHostPort: "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$"
+    p1: {
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p2: {
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p3: {
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+    }
+    p4: {
+      X: ((〈0;#X〉.userinfo + 〈0;#X〉.host) + 〈0;#X〉.port)
+      #X: {
+        if (〈1;Y〉.userinfo == _|_(explicit error (_|_ literal) in source)) {
+          userinfo: ""
+        }
+        if (〈1;Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: (〈2;Y〉.userinfo + "@")
+        }
+        host: 〈1;Y〉.host
+        if (〈1;Y〉.port == _|_(explicit error (_|_ literal) in source)) {
+          port: ""
+        }
+        if (〈1;Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: (":" + 〈import;strconv〉.FormatInt(〈2;Y〉.port, 10))
+        }
+      }
+      #Y: 〈import;regexp〉.FindNamedSubmatch(〈1;#userHostPort〉, 〈0;X〉)
+      Y: {
+        userinfo: "user"
+        host: "example.com"
+      }
+      Y: {
+        if (〈1;#Y〉.userinfo != _|_(explicit error (_|_ literal) in source)) {
+          userinfo: 〈2;#Y〉.userinfo
+        }
+        host: 〈1;#Y〉.host
+        if (〈1;#Y〉.port != _|_(explicit error (_|_ literal) in source)) {
+          port: 〈import;strconv〉.Atoi(〈2;#Y〉.port)
+        }
+      }
+    }
+  }
+}

@@ -74,6 +74,9 @@ es3.max: invalid value 5 (out of bound >10):
 er3.min: invalid value 5 (out of bound <5):
     ./in.cue:29:10
     ./in.cue:44:10
+er3.max: invalid value 5 (out of bound >5):
+    ./in.cue:30:10
+    ./in.cue:45:10
 
 Result:
 (_|_){
@@ -157,14 +160,9 @@ Result:
       //     ./in.cue:44:10
     }
     max: (_|_){
-      // [eval] er3.min: 2 errors in empty disjunction:
-      // er3.min: conflicting values 1 and 5:
-      //     ./in.cue:28:11
-      //     ./in.cue:43:6
-      //     ./in.cue:44:10
-      // er3.min: invalid value 5 (out of bound <5):
-      //     ./in.cue:29:10
-      //     ./in.cue:44:10
+      // [eval] er3.max: invalid value 5 (out of bound >5):
+      //     ./in.cue:30:10
+      //     ./in.cue:45:10
     }
   }
 }

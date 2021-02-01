@@ -27,17 +27,24 @@ c2: _|_ // conflicting values {bar: 1} and 1 (mismatched types struct and int)
   } & 〈0;c2〉.bar)
 }
 -- out/eval --
-(struct){
-  c1: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:1:21
+Errors:
+c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+    ./in.cue:2:5
+    ./in.cue:2:16
+
+Result:
+(_|_){
+  // [eval]
+  c1: (struct){
     bar: (struct){
       baz: (int){ 2 }
     }
+    baz: (int){ 2 }
   }
   c2: (_|_){
-    // [cycle] cycle error:
-    //     ./in.cue:2:21
+    // [eval] c2: conflicting values 1 and {bar:1} (mismatched types int and struct):
+    //     ./in.cue:2:5
+    //     ./in.cue:2:16
     bar: (int){ 1 }
   }
 }

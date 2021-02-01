@@ -22,18 +22,6 @@
 // Tasks may depend on other tasks. Cyclic dependencies are thereby not allowed.
 // A Task A depends on another Task B if A, directly or indirectly, has a
 // reference to any field of Task B, including its root.
-//
-// Example:
-//   var inst cue.Instance
-//
-//   // taskFunc takes a Value v and returns a Runner if v is a Task.
-//   w := flow.New(inst, taskFunc, nil)
-//
-//   err := w.Run(context.Background())
-//   if err != nil {
-//       ...
-//   }
-//
 package flow
 
 // TODO: Add hooks. This would allow UIs, for instance, to report on progress.

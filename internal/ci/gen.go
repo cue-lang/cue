@@ -1,4 +1,4 @@
-// Copyright 2020 The CUE Authors
+// Copyright 2021 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,6 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package ci
 
-//go:generate go generate ./.github/workflows
+//go:generate go run cuelang.org/go/cmd/cue cmd vendorgithubschema ./vendor
+//go:generate go run cuelang.org/go/cmd/cue cmd genworkflows

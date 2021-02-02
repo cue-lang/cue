@@ -307,10 +307,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		}
 		n.expandDisjuncts(disState, n, maybeDefault, false)
 
-		for _, d := range n.disjuncts {
-			d.finalizeIncomplete()
-			d.free()
-		}
+		n.finalizeDisjuncts()
 
 		switch len(n.disjuncts) {
 		case 0:
@@ -354,7 +351,11 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		// We don't do this in postDisjuncts, as it should only be done after
 		// completing all disjunctions.
-		n.finalizeIncomplete()
+		if !n.done() {
+			if err := n.incompleteErrors(); err != nil {
+				n.node.BaseValue = err
+			}
+		}
 
 		if state != Finalized {
 			return
@@ -385,15 +386,34 @@ func (n *nodeContext) insertConjuncts() {
 	}
 }
 
-// finalizeIncomplete collects all uncompleted expressions and adds them as
-// errors. As disjuncts are always evaluated with Finalized, care should be
-// taken to only call this after all disjunctions in a path have been completed.
-func (n *nodeContext) finalizeIncomplete() {
-	if !n.done() {
-		if err := n.incompleteErrors(); err != nil {
-			n.node.BaseValue = err
-		}
+// finalizeDisjuncts: incomplete errors are kept around and not removed early.
+// This call filters the incomplete errors and removes them
+//
+// This also collects all errors of empty disjunctions. These cannot be
+// collected during the finalization state of individual disjuncts. Care should
+// be taken to only call this after all disjuncts have been finalized.
+func (n *nodeContext) finalizeDisjuncts() {
+	a := n.disjuncts
+	if len(a) == 0 {
+		return
 	}
+	k := 0
+	for i, d := range a {
+		switch d.finalDone() {
+		case true:
+			a[k], a[i] = d, a[k]
+			k++
+		default:
+			if err := d.incompleteErrors(); err != nil {
+				n.disjunctErrs = append(n.disjunctErrs, err)
+			}
+		}
+		d.free()
+	}
+	if k == 0 {
+		n.makeError()
+	}
+	n.disjuncts = a[:k]
 }
 
 func (n *nodeContext) doNotify() {
@@ -668,6 +688,11 @@ func (n *nodeContext) createDisjunct() *Disjunction {
 			a[i] = v
 		}
 	}
+	// TODO: disambiguate based on concrete values.
+	// TODO: consider not storing defaults.
+	// if p > 0 {
+	// 	a = a[:p]
+	// }
 	return &Disjunction{
 		Values:      a,
 		NumDefaults: p,
@@ -950,6 +975,19 @@ func (n *nodeContext) done() bool {
 		len(n.ifClauses) == 0 &&
 		len(n.forClauses) == 0 &&
 		len(n.exprs) == 0
+}
+
+// finalDone is like done, but allows for cycle errors, which can be ignored
+// as they essentially indicate a = a & _.
+func (n *nodeContext) finalDone() bool {
+	for _, x := range n.exprs {
+		if x.err.Code != CycleError {
+			return false
+		}
+	}
+	return len(n.dynamicFields) == 0 &&
+		len(n.ifClauses) == 0 &&
+		len(n.forClauses) == 0
 }
 
 // hasErr is used to determine if an evaluation path, for instance a single

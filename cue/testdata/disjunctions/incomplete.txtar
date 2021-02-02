@@ -1,0 +1,110 @@
+-- in.cue --
+import "encoding/yaml"
+
+issue700: {
+    a:y: "y"
+    test1: *a.x | 1
+    test2: *a.y | 1
+}
+
+lookup: {
+    x: {
+        name: "Hello"
+    }
+    y: x.a
+    ok1:      *x.a  |  x
+    ok2:       x    | *x.a
+    ok3:       x.a  | *x
+    ok4:      *x    |  x.a
+    ok5:       x    |  x.a
+    ok5:       x.a  |  x
+    allFail1:  x.a  |  x.b
+    allFail2:  x.a  |  x.b
+}
+
+func: {
+    s: string
+    ok1: yaml.MarshalStream(s) | yaml.Marshal(s)
+}
+
+-- out/eval --
+(struct){
+  issue700: (struct){
+    a: (struct){
+      y: (string){ "y" }
+    }
+    test1: (int){ 1 }
+    test2: ((int|string)){ |(*(string){ "y" }, (int){ 1 }) }
+  }
+  lookup: (struct){
+    x: (struct){
+      name: (string){ "Hello" }
+    }
+    y: (_|_){
+      // [incomplete] lookup.y: undefined field a:
+      //     ./in.cue:13:10
+    }
+    ok1: (struct){
+      name: (string){ "Hello" }
+    }
+    ok2: (struct){
+      name: (string){ "Hello" }
+    }
+    ok3: (struct){
+      name: (string){ "Hello" }
+    }
+    ok4: (struct){
+      name: (string){ "Hello" }
+    }
+    ok5: (struct){
+      name: (string){ "Hello" }
+    }
+    allFail1: (_|_){
+      // [incomplete] lookup.allFail1: 1 errors in empty disjunction:
+      // lookup.allFail1: undefined field a:
+      //     ./in.cue:20:18
+    }
+    allFail2: (_|_){
+      // [incomplete] lookup.allFail2: 1 errors in empty disjunction:
+      // lookup.allFail2: undefined field a:
+      //     ./in.cue:21:18
+    }
+  }
+  func: (struct){
+    s: (string){ string }
+    ok1: (_|_){
+      // [incomplete] func.ok1: 1 errors in empty disjunction:
+      // func.ok1: non-concrete argument 0:
+      //     ./in.cue:26:10
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  issue700: {
+    a: {
+      y: "y"
+    }
+    test1: (*〈0;a〉.x|1)
+    test2: (*〈0;a〉.y|1)
+  }
+  lookup: {
+    x: {
+      name: "Hello"
+    }
+    y: 〈0;x〉.a
+    ok1: (*〈0;x〉.a|〈0;x〉)
+    ok2: (〈0;x〉|*〈0;x〉.a)
+    ok3: (〈0;x〉.a|*〈0;x〉)
+    ok4: (*〈0;x〉|〈0;x〉.a)
+    ok5: (〈0;x〉|〈0;x〉.a)
+    ok5: (〈0;x〉.a|〈0;x〉)
+    allFail1: (〈0;x〉.a|〈0;x〉.b)
+    allFail2: (〈0;x〉.a|〈0;x〉.b)
+  }
+  func: {
+    s: string
+    ok1: (〈import;"encoding/yaml"〉.MarshalStream(〈0;s〉)|〈import;"encoding/yaml"〉.Marshal(〈0;s〉))
+  }
+}

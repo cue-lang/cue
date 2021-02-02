@@ -17,7 +17,7 @@ xa2: xa3 + 2
 xa3: 6 & xa1-2
 xa4: xa2 + 2
 
-// The second disjunct in xb4 can be eliminated as both disjuncts
+// The second disjunct of xb1 can be eliminated as both disjuncts
 // of xb3 result in an incompatible sum when substituted.
 xb1: (xb2 & 8) | (xb4 & 9)
 xb2: xb3 + 2
@@ -174,16 +174,10 @@ Result:
   xa2: (int){ 8 }
   xa3: (int){ 6 }
   xa4: (int){ 10 }
-  xb1: (int){ |((int){ 8 }, (int){ 9 }) }
-  xb2: (_|_){
-    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:18:6
-  }
-  xb3: (int){ |((int){ 6 }, (int){ 9 }) }
-  xb4: (_|_){
-    // [incomplete] xb2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:18:6
-  }
+  xb1: (int){ 8 }
+  xb2: (int){ 8 }
+  xb3: (int){ 6 }
+  xb4: (int){ 10 }
   xc1: (int){ |((int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
   xc3: (_|_){
@@ -226,16 +220,10 @@ Result:
     //     ./in.cue:45:6
     //     ./in.cue:45:10
   }
-  xf1: (int){ |((int){ 8 }, (int){ 9 }) }
-  xf2: (_|_){
-    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:52:6
-  }
-  xf3: (int){ |((int){ 6 }, (int){ 9 }) }
-  xf4: (_|_){
-    // [incomplete] xf2: unresolved disjunction 6 | 9 (type int):
-    //     ./in.cue:52:6
-  }
+  xf1: (int){ 8 }
+  xf2: (int){ 8 }
+  xf3: (int){ 6 }
+  xf4: (int){ 10 }
   z1: (int){ |((int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }
   z3: (_|_){

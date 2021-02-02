@@ -10,9 +10,6 @@ xa2: xa3 + 2
 xa3: 6 & xa1-2
 xa4: xa2 + 2
 
-// As xb3 is a disjunction, xb2 cannot be resolved and evaluating
-// the cycle completely is broken. However, it is not an error
-// as the user might still resolve the disjunction.
 xb1: *(xb2 & 8) | (xb4 & 9)
 xb2: xb3 + 2
 xb3: *(6 & (xb1 - 2)) | (xb4 & 9)
@@ -131,11 +128,11 @@ z3:  8
 Errors:
 xe1: 2 errors in empty disjunction:
 xe1: conflicting values 8 and 9:
-    ./in.cue:36:14
-    ./in.cue:41:6
-xe3: conflicting values 7 and 6:
+    ./in.cue:33:14
     ./in.cue:38:6
-    ./in.cue:38:10
+xe3: conflicting values 7 and 6:
+    ./in.cue:35:6
+    ./in.cue:35:10
 
 Result:
 (_|_){
@@ -146,7 +143,7 @@ Result:
   xa4: (int){ 10 }
   xb1: (int){ 8 }
   xb2: (int){ 8 }
-  xb3: (int){ |(*(int){ 6 }, (int){ 9 }) }
+  xb3: (int){ 6 }
   xb4: (int){ 10 }
   xc1: (int){ |(*(int){ 8 }, (int){ 9 }) }
   xc2: (int){ 8 }
@@ -161,31 +158,31 @@ Result:
   xe1: (_|_){
     // [eval] xe1: 2 errors in empty disjunction:
     // xe1: conflicting values 8 and 9:
-    //     ./in.cue:36:14
-    //     ./in.cue:41:6
-    // xe3: conflicting values 7 and 6:
+    //     ./in.cue:33:14
     //     ./in.cue:38:6
-    //     ./in.cue:38:10
+    // xe3: conflicting values 7 and 6:
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
   }
   xe2: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:38:6
-    //     ./in.cue:38:10
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
   }
   xe3: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:38:6
-    //     ./in.cue:38:10
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
   }
   xe4: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:38:6
-    //     ./in.cue:38:10
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
   }
   xe5: (_|_){
     // [eval] xe3: conflicting values 7 and 6:
-    //     ./in.cue:38:6
-    //     ./in.cue:38:10
+    //     ./in.cue:35:6
+    //     ./in.cue:35:10
   }
   z1: (int){ |(*(int){ 11 }, (int){ 13 }) }
   z2: (int){ 10 }

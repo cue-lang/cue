@@ -285,9 +285,7 @@ func (inst *Instance) Eval(expr ast.Expr) Value {
 
 // Merge unifies the given instances into a single one.
 //
-// Errors regarding conflicts are included in the result, but not reported, so
-// that these will only surface during manifestation. This allows
-// non-conflicting parts to be used.
+// Deprecated: do not use.
 func Merge(inst ...*Instance) *Instance {
 	v := &adt.Vertex{}
 

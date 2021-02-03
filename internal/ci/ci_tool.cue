@@ -96,7 +96,8 @@ command: updateTxtarTests: {
 		}
 	}
 	// When we have a solution for cuelang.org/issue/709 we can make this a
-	// file.Glob
+	// file.Glob. Ultimately it would be better to be able to do a cue def
+	// on the tool "package"
 	readToolsFile: file.Read & {
 		filename: "ci_tool.cue"
 		contents: string

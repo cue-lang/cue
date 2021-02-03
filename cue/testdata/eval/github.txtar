@@ -31,6 +31,9 @@ workflows:           [...{
 }, {
 	file:   "rebuild_tip_cuelang_org.yml"
 	schema: rebuild_tip_cuelang_org
+}, {
+	file:   "mirror.yml"
+	schema: mirror
 }]
 test: _#bashWorkflow & {
 	name: "Test"
@@ -129,20 +132,60 @@ test: _#bashWorkflow & {
 	}
 }
 repository_dispatch: _#bashWorkflow & {
+	// These constants are defined by github.com/cue-sh/tools/cmd/cueckoo
+	_#runtrybot:   "runtrybot"
+	_#mirror:      "mirror"
+	_#importpr:    "importpr"
+	_#dispatchJob: _#job & {
+		_#type:    string
+		"runs-on": _#linuxMachine
+		if:        "${{ github.event.client_payload.type == '\(_#type)' }}"
+	}
 	name: "Repository Dispatch"
 	on: ["repository_dispatch"]
-	jobs: start: {
-		if:        "${{ startsWith(github.event.action, 'Build for refs/changes/') }}"
+	jobs: {
+		"\(_#runtrybot)": _#dispatchJob & {
+			_#type: _#runtrybot
+			steps: [_#step & {
+				name: "Trigger trybot"
+				run:  """
+								\(_#tempCueckooGitDir)
+								git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}
+								git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
+								git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
+								"""
+			}]
+		}
+		"\(_#mirror)": _#dispatchJob & {
+			_#type: _#mirror
+			steps:  _#copybaraSteps & {
+				_
+				_#name: "Mirror Gerrit to GitHub"
+				_#cmd:  "github"
+			}
+		}
+		"\(_#importpr)": _#dispatchJob & {
+			_#type: _#importpr
+			steps:  _#copybaraSteps & {
+				_
+				_#name: "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit"
+				_#cmd:  "github-pr ${{ github.event.client_payload.payload.pr }}"
+			}
+		}
+	}
+}
+mirror: _#bashWorkflow & {
+	name: "Scheduled repo mirror"
+	on: schedule: [{
+		cron: "*/30 * * * *"
+	}]
+	jobs: mirror: {
 		"runs-on": _#linuxMachine
-		steps: [_#step & {
-			name: "Checkout ref"
-			run:  """
-							\(_#tempCueckooGitDir)
-							git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-							git checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD
-							git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}
-							"""
-		}]
+		steps:     _#copybaraSteps & {
+			_
+			_#name: "Mirror Gerrit to GitHub"
+			_#cmd:  "github"
+		}
 	}
 }
 release: _#bashWorkflow & {
@@ -298,6 +341,40 @@ _#tempCueckooGitDir: """
 	git config user.email cueckoo@gmail.com
 	git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
 	"""
+
+// The cueckoo/copybara Docker image to use
+_#cueckooCopybaraImage: "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c"
+
+// Define the base command for copybara
+_#copybaraCmd: {
+	"""
+		cd _scripts
+		docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" \(_#cueckooCopybaraImage) bash -c " \\
+		\tset -eu; \\
+		\techo \\"${{ secrets.gerritCookie }}\\" > ~/.gitcookies; \\
+		\tchmod 600 ~/.gitcookies; \\
+		\tgit config --global user.name cueckoo; \\
+		\tgit config --global user.email cueckoo@gmail.com; \\
+		\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\
+		  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\
+		\tchmod 600 ~/.git-credentials; \\
+		\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky \(_#cmd); \\
+		\t"
+		"""
+	_#cmd: string
+}
+_#copybaraSteps: {
+	let cmdCmd = _#cmd
+	[_#checkoutCode, _#step & {
+		name: _#name
+		run:  _#copybaraCmd & {
+			_
+			_#cmd: cmdCmd
+		}
+	}]
+	_#name: string
+	_#cmd:  string
+}
 -- cue.mod/module.cue --
 module: "mod.com"
 
@@ -2047,6 +2124,10 @@ import "strings"
       file: "rebuild_tip_cuelang_org.yml"
       schema: 〈1;rebuild_tip_cuelang_org〉
     },
+    {
+      file: "mirror.yml"
+      schema: 〈1;mirror〉
+    },
   ])
   test: (〈0;_#bashWorkflow〉 & {
     name: "Test"
@@ -2164,23 +2245,66 @@ import "strings"
     }
   })
   repository_dispatch: (〈0;_#bashWorkflow〉 & {
+    _#runtrybot: "runtrybot"
+    _#mirror: "mirror"
+    _#importpr: "importpr"
+    _#dispatchJob: (〈1;_#job〉 & {
+      _#type: string
+      "runs-on": 〈2;_#linuxMachine〉
+      if: "${{ github.event.client_payload.type == '\(〈0;_#type〉)' }}"
+    })
     name: "Repository Dispatch"
     on: [
       "repository_dispatch",
     ]
     jobs: {
-      start: {
-        if: "${{ startsWith(github.event.action, 'Build for refs/changes/') }}"
-        "runs-on": 〈3;_#linuxMachine〉
+      "\(〈1;_#runtrybot〉)": (〈1;_#dispatchJob〉 & {
+        _#type: 〈2;_#runtrybot〉
         steps: [
           (〈3;_#step〉 & {
-            name: "Checkout ref"
+            name: "Trigger trybot"
             run: "\(〈4;_#tempCueckooGitDir〉)
-            git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-            git checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD
-            git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}"
+            git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}
+            git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
+            git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}"
           }),
         ]
+      })
+      "\(〈1;_#mirror〉)": (〈1;_#dispatchJob〉 & {
+        _#type: 〈2;_#mirror〉
+        steps: (〈3;_#copybaraSteps〉 & {
+          _
+          _#name: "Mirror Gerrit to GitHub"
+          _#cmd: "github"
+        })
+      })
+      "\(〈1;_#importpr〉)": (〈1;_#dispatchJob〉 & {
+        _#type: 〈2;_#importpr〉
+        steps: (〈3;_#copybaraSteps〉 & {
+          _
+          _#name: "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit"
+          _#cmd: "github-pr ${{ github.event.client_payload.payload.pr }}"
+        })
+      })
+    }
+  })
+  mirror: (〈0;_#bashWorkflow〉 & {
+    name: "Scheduled repo mirror"
+    on: {
+      schedule: [
+        {
+          cron: "*/30 * * * *"
+        },
+      ]
+    }
+    jobs: {
+      mirror: {
+        "runs-on": 〈3;_#linuxMachine〉
+        steps: (〈3;_#copybaraSteps〉 & {
+          _
+          _#name: "Mirror Gerrit to GitHub"
+          _#cmd: "github"
+        })
       }
     }
   })
@@ -2362,4 +2486,34 @@ import "strings"
   })
   _#branchRefPrefix: "refs/heads/"
   _#tempCueckooGitDir: "mkdir tmpgit\ncd tmpgit\ngit init\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\""
+  _#cueckooCopybaraImage: "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c"
+  _#copybaraCmd: {
+    "cd _scripts
+    docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" \(〈1;_#cueckooCopybaraImage〉) bash -c " \
+    	set -eu; \
+    	echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
+    	chmod 600 ~/.gitcookies; \
+    	git config --global user.name cueckoo; \
+    	git config --global user.email cueckoo@gmail.com; \
+    	git config --global http.cookiefile \$HOME/.gitcookies; \
+      	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
+    	chmod 600 ~/.git-credentials; \
+    	java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky \(〈0;_#cmd〉); \
+    	""
+    _#cmd: string
+  }
+  _#copybaraSteps: {
+    [
+      〈1;_#checkoutCode〉,
+      (〈1;_#step〉 & {
+        name: 〈1;_#name〉
+        run: (〈2;_#copybaraCmd〉 & {
+          _
+          _#cmd: 〈2;let cmdCmd〉
+        })
+      }),
+    ]
+    _#name: string
+    _#cmd: string
+  }
 }

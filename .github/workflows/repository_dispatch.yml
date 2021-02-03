@@ -4,14 +4,14 @@ name: Repository Dispatch
 on:
 - repository_dispatch
 jobs:
-  start:
-    if: ${{ startsWith(github.event.action, 'Build for refs/changes/') }}
+  runtrybot:
     runs-on: ubuntu-18.04
     defaults:
       run:
         shell: bash
+    if: ${{ github.event.client_payload.type == 'runtrybot' }}
     steps:
-    - name: Checkout ref
+    - name: Trigger trybot
       run: |-
         mkdir tmpgit
         cd tmpgit
@@ -19,6 +19,52 @@ jobs:
         git config user.name cueckoo
         git config user.email cueckoo@gmail.com
         git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-        git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}
-        git checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD
-        git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}
+        git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}
+        git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
+        git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
+  mirror:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
+    if: ${{ github.event.client_payload.type == 'mirror' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: Mirror Gerrit to GitHub
+      run: |-
+        cd _scripts
+        docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c " \
+        	set -eu; \
+        	echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
+        	chmod 600 ~/.gitcookies; \
+        	git config --global user.name cueckoo; \
+        	git config --global user.email cueckoo@gmail.com; \
+        	git config --global http.cookiefile \$HOME/.gitcookies; \
+          	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
+        	chmod 600 ~/.git-credentials; \
+        	java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \
+        	"
+  importpr:
+    runs-on: ubuntu-18.04
+    defaults:
+      run:
+        shell: bash
+    if: ${{ github.event.client_payload.type == 'importpr' }}
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+    - name: 'Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit'
+      run: |-
+        cd _scripts
+        docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c " \
+        	set -eu; \
+        	echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
+        	chmod 600 ~/.gitcookies; \
+        	git config --global user.name cueckoo; \
+        	git config --global user.email cueckoo@gmail.com; \
+        	git config --global http.cookiefile \$HOME/.gitcookies; \
+          	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
+        	chmod 600 ~/.git-credentials; \
+        	java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github-pr ${{ github.event.client_payload.payload.pr }}; \
+        	"

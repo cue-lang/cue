@@ -1,0 +1,74 @@
+# Copyright 2021 The CUE Authors
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# The copybara configuration for the cuelang/cue repository
+#
+# When used in conjunction with the cueckoo/copybara Docker image this
+# configuration can be run in two modes:
+#
+#     github
+#     github-pr N
+#
+# The first mode mirrors Gerrit to GitHub. The second mode imports PR #N from
+# GitHub to Gerrit.
+#
+# See the CUE-defined copybara workflow defined in internal/ci for an example
+# of how to pass in Gerrit and GitHub credentials when running an instance of
+# the cueckoo/copybara image.
+
+github_url = "https://github.com/cuelang/cue.git"
+gerrit_url = "https://cue-review.googlesource.com/cue"
+
+origin_github_pr = git.github_pr_origin(
+        baseline_from_branch = True,
+        use_merge = True,
+        url = github_url,
+        )
+
+origin_gerrit = git.origin(
+        url = gerrit_url,
+        ref = "master",
+        )
+
+destination_gerrit = git.gerrit_destination(
+        url = gerrit_url,
+        fetch = "master",
+        push_to_refs_for = "master%hashtag=github-pr",
+        )
+
+# Mirror from Gerrit -> GitHub
+git.mirror(
+        name = "github",
+        origin = gerrit_url,
+        destination = github_url,
+        refspecs = ["refs/*"],
+        prune = False,
+        )
+
+# Import a PR from GitHub to Gerrit
+core.workflow(
+        name = "github-pr",
+        origin = origin_github_pr,
+        destination = destination_gerrit,
+        authoring = authoring.pass_thru("CUE team <no-reply@google.com>"),
+        transformations = [
+            metadata.replace_message(
+                "${GITHUB_PR_TITLE}\n\n" +
+                "${GITHUB_PR_BODY}\n\n" +
+                "Closes #${GITHUB_PR_NUMBER}\n" +
+                "https://github.com/cuelang/cue/pull/${GITHUB_PR_NUMBER}",
+                ),
+            ],
+        mode = "CHANGE_REQUEST",
+        )

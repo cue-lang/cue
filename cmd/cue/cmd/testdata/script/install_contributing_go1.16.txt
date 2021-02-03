@@ -1,0 +1,20 @@
+# Test that we can install tools required to contribute to the CUE
+# project via the new Go 1.16 method
+#
+# Keep this test in sync with all places that describe install
+# instructions for contributing
+
+[!go1.16] skip 'Test only applies to Go 1.16'
+[!long] skip 'Install tests use the network and take some time'
+
+# For this test we want to use the real proxy
+env GOPROXY=https://proxy.golang.org
+
+# Sanity check pre install
+! exists $WORK/gopath/bin/git-codereview
+
+# Install
+env GO111MODULE=on
+go install golang.org/x/review/git-codereview@latest
+exec $WORK/gopath/bin/git-codereview help
+stdout 'Git-codereview is a git helper'

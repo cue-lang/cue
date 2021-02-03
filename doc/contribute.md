@@ -29,8 +29,12 @@ on "Generate Password" (top right), and follow the instructions.
 - **Step 3**: Register for Gerrit, the code review tool used by the CUE team,
 by [visiting this page](https://cue-review.googlesource.com/login/).
 The CLA and the registration need to be done only once for your account.
-- **Step 4**: Install `git-codereview` by running
-`go get -u golang.org/x/review/git-codereview`
+- **Step 4**: Install `git-codereview` by running: `GO111MODULE=on go get
+  golang.org/x/review/git-codereview` (or just `go install
+  golang.org/x/review/git-codereview@latest` if you are using Go 1.16)
+
+<!-- Keep the above steps in sync with cmd/cue/cmd/testdata/script/contributing_install*.txt -->
+
 
 <!-- TODO
 If you prefer, there is an automated tool that walks through these steps.
@@ -169,12 +173,18 @@ Changes to CUE must be reviewed before they are accepted, no matter who makes th
 A custom `git` command called `git-codereview`
 simplifies sending changes to Gerrit.
 
+<!-- Keep the following in sync with cmd/cue/cmd/testdata/script/contributing_install*.txt -->
 
 Install the `git-codereview` command by running,
 
+```
+$ GO111MODULE=on go get golang.org/x/review/git-codereview
+```
+
+or with Go 1.16:
 
 ```
-$ go get -u golang.org/x/review/git-codereview
+$ go install golang.org/x/review/git-codereview@latest
 ```
 
 Make sure `git-codereview` is installed in your shell path, so that the

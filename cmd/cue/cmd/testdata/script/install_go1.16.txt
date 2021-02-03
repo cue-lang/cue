@@ -1,0 +1,19 @@
+# Test that we can install CUE via the new Go 1.16 go install
+# method described in the project README
+#
+# Keep this test in sync with all places that describe install
+# instructions
+
+[!go1.16] skip 'Test only applies to Go 1.16'
+[!long] skip 'Install tests use the network and take some time'
+
+# For this test we want to use the real proxy
+env GOPROXY=https://proxy.golang.org
+
+# Sanity check pre install
+! exists $WORK/gopath/bin/cue
+
+# Install
+go install cuelang.org/go/cmd/cue@latest
+exec $WORK/gopath/bin/cue help
+stdout 'cue evaluates CUE files'

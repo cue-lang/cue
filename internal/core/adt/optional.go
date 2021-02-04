@@ -125,26 +125,6 @@ func (m typeMatcher) Match(c *OpContext, env *Environment, f Feature) bool {
 	return false
 }
 
-type dynamicMatcher struct {
-	expr Expr
-}
-
-func (m dynamicMatcher) Match(c *OpContext, env *Environment, f Feature) bool {
-	if !f.IsRegular() || !f.IsString() {
-		return false
-	}
-	v, ok := c.Evaluate(env, m.expr)
-	if !ok {
-		return false
-	}
-	s, ok := v.(*String)
-	if !ok {
-		return false
-	}
-	label := f.StringValue(c)
-	return label == s.Str
-}
-
 type patternMatcher Conjunct
 
 func (m patternMatcher) Match(c *OpContext, env *Environment, f Feature) bool {

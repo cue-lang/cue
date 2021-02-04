@@ -310,6 +310,10 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 	ctx.generation++
 	ctx.todo = nil
 
+	// TODO(perf): more aggressively determine whether a struct is open or
+	// closed: open structs do not have to be checked, yet they can particularly
+	// be the ones with performance isssues, for instanced as a result of
+	// embedded for comprehensions.
 	for _, s := range n.Structs {
 		if !s.useForAccept() {
 			continue
@@ -317,11 +321,16 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 		markCounts(ctx, s.CloseInfo)
 	}
 
+	str := ""
+	if f.IsString() {
+		str = f.StringValue(ctx)
+	}
+
 	for _, s := range n.Structs {
 		if !s.useForAccept() {
 			continue
 		}
-		if verifyArc(ctx, s, f) {
+		if verifyArc(ctx, s, f, str) {
 			// Beware: don't add to below expression: this relies on the
 			// side effects of markUp.
 			ok := markUp(ctx, s.closeInfo, 0)
@@ -435,7 +444,7 @@ func getScratch(ctx *OpContext, s *closeInfo) *closeStats {
 	return x
 }
 
-func verifyArc(ctx *OpContext, s *StructInfo, f Feature) bool {
+func verifyArc(ctx *OpContext, s *StructInfo, f Feature, label string) bool {
 	isRegular := f.IsRegular()
 
 	o := s.StructLit
@@ -455,10 +464,16 @@ func verifyArc(ctx *OpContext, s *StructInfo, f Feature) bool {
 		return false
 	}
 
-	for _, b := range o.Dynamic {
-		m := dynamicMatcher{b.Key}
-		if m.Match(ctx, env, f) {
-			return true
+	if f.IsString() {
+		for _, b := range o.Dynamic {
+			v := env.evalCached(ctx, b.Key)
+			s, ok := v.(*String)
+			if !ok {
+				continue
+			}
+			if label == s.Str {
+				return true
+			}
 		}
 	}
 

@@ -228,6 +228,8 @@ type StructInfo struct {
 	Embedding bool
 }
 
+// TODO(perf): this could be much more aggressive for eliminating structs that
+// are immaterial for closing.
 func (s *StructInfo) useForAccept() bool {
 	if c := s.closeInfo; c != nil {
 		return !c.noCheck

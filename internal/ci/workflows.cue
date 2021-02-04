@@ -76,6 +76,10 @@ test: _#bashWorkflow & {
 				_#installGo,
 				_#checkoutCode,
 				_#cacheGoModules,
+				_#setGoBuildTags & {
+					_#tags: "long"
+					if:     "${{ \(_#isMaster) }}"
+				},
 				_#goGenerate,
 				_#goTest,
 				_#goTestRace & {
@@ -346,6 +350,14 @@ _#testStrategy: {
 		"go-version": [_#codeGenGo, _#latestStableGo, "1.16.0-rc1"]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
+}
+
+_#setGoBuildTags: _#step & {
+	_#tags: string
+	name:   "Set go build tags"
+	run:    """
+		go env -w GOFLAGS=-tags=\(_#tags)
+		"""
 }
 
 _#installGo: _#step & {

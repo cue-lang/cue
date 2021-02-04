@@ -33,12 +33,13 @@ import (
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/yaml"
+	"cuelang.org/go/internal/cuetest"
 )
 
 // TestDecode reads the testdata/*.txtar files, converts the contained
 // JSON schema to CUE and compares it against the output.
 //
-// Use the --update flag to update test files with the corresponding output.
+// Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
 	err := filepath.Walk("testdata/script", func(fullpath string, info os.FileInfo, err error) error {
 		_ = err
@@ -103,7 +104,7 @@ func TestDecode(t *testing.T) {
 				out = bytes.TrimSpace(out)
 
 				if !cmp.Equal(b, out) {
-					if *update {
+					if cuetest.UpdateGoldenFiles {
 						a.Files[outIndex].Data = b
 						b = txtar.Format(a)
 						err = ioutil.WriteFile(fullpath, b, 0644)

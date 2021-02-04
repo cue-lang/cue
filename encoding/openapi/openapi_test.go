@@ -17,7 +17,6 @@ package openapi_test
 import (
 	"bytes"
 	"encoding/json"
-	"flag"
 	"io/ioutil"
 	"path/filepath"
 	"strings"
@@ -30,9 +29,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/encoding/openapi"
+	"cuelang.org/go/internal/cuetest"
 )
-
-var update *bool = flag.Bool("update", false, "update the test output")
 
 func TestParseDefinitions(t *testing.T) {
 	info := *(*openapi.OrderedMap)(ast.NewStruct(
@@ -150,7 +148,7 @@ func TestParseDefinitions(t *testing.T) {
 			_ = json.Indent(out, b, "", "   ")
 
 			wantFile := filepath.Join("testdata", tc.out)
-			if *update {
+			if cuetest.UpdateGoldenFiles {
 				_ = ioutil.WriteFile(wantFile, out.Bytes(), 0644)
 				return
 			}

@@ -1,4 +1,4 @@
-// Copyright 2018 The CUE Authors
+// Copyright 2021 The CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,29 +12,10 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cmd
+// +build long
 
-import (
-	"os"
-	"testing"
+package cuetest
 
-	"cuelang.org/go/cue/errors"
-)
-
-var _ = errors.Print
-
-func printConfig(t *testing.T) *errors.Config {
-	t.Helper()
-
-	inTest = true
-
-	cwd, err := os.Getwd()
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	return &errors.Config{
-		Cwd:     cwd,
-		ToSlash: true,
-	}
-}
+// LongTest is a build tag used to indicate that long tests should be run
+// Note this is not the equivalent of not supplying -short.
+const Long = true

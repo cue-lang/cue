@@ -2,7 +2,6 @@ package yaml_test
 
 import (
 	"errors"
-	"flag"
 	"fmt"
 	"io"
 	"io/ioutil"
@@ -12,10 +11,9 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/third_party/yaml"
 )
-
-var update = flag.Bool("update", false, "update test data")
 
 var unmarshalIntTest = 123
 
@@ -876,7 +874,7 @@ func TestFiles(t *testing.T) {
 				t.Fatal(err)
 			}
 			got := cueStr(expr)
-			if *update {
+			if cuetest.UpdateGoldenFiles {
 				ioutil.WriteFile(filename, []byte(got), 0644)
 				return
 			}

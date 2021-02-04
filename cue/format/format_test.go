@@ -18,7 +18,6 @@ package format
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"path/filepath"
@@ -30,6 +29,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/cuetest"
 )
 
 var (
@@ -40,8 +40,6 @@ var (
 const (
 	dataDir = "testdata"
 )
-
-var update = flag.Bool("update", false, "update golden files")
 
 type checkMode uint
 
@@ -136,7 +134,7 @@ func runcheck(t *testing.T, source, golden string, mode checkMode) {
 	}
 
 	// update golden files if necessary
-	if *update {
+	if cuetest.UpdateGoldenFiles {
 		if err := ioutil.WriteFile(golden, res, 0644); err != nil {
 			t.Error(err)
 		}
@@ -193,7 +191,7 @@ type entry struct {
 	mode           checkMode
 }
 
-// Use go test -update to create/update the respective golden files.
+// Set CUE_UPDATE=1 to create/update the respective golden files.
 var data = []entry{
 	{"comments.input", "comments.golden", simplify},
 	{"simplify.input", "simplify.golden", simplify},

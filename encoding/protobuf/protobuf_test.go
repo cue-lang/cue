@@ -16,7 +16,6 @@ package protobuf
 
 import (
 	"bytes"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -29,9 +28,8 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/internal/cuetest"
 )
-
-var update = flag.Bool("update", false, "update the test output")
 
 func TestExtractDefinitions(t *testing.T) {
 	testCases := []string{
@@ -58,7 +56,7 @@ func TestExtractDefinitions(t *testing.T) {
 			}
 
 			wantFile := filepath.Join("testdata", filepath.Base(file)+".out.cue")
-			if *update {
+			if cuetest.UpdateGoldenFiles {
 				_ = ioutil.WriteFile(wantFile, out.Bytes(), 0644)
 				return
 			}
@@ -98,7 +96,7 @@ func TestBuild(t *testing.T) {
 		t.Fatal(errors.Details(err, nil))
 	}
 
-	if *update {
+	if cuetest.UpdateGoldenFiles {
 		for _, f := range files {
 			b, err := format.Node(f)
 			if err != nil {

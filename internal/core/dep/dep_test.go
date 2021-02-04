@@ -15,7 +15,6 @@
 package dep_test
 
 import (
-	"flag"
 	"fmt"
 	"strings"
 	"testing"
@@ -27,16 +26,15 @@ import (
 	"cuelang.org/go/internal/core/dep"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
-
-var update = flag.Bool("update", false, "update the test files")
 
 func TestVisit(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata",
 		Name:   "dependencies",
-		Update: *update,
+		Update: cuetest.UpdateGoldenFiles,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

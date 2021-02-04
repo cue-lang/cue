@@ -38,7 +38,6 @@ import (
 )
 
 var (
-	update  = flag.Bool("update", false, "update test data")
 	cleanup = flag.Bool("cleanup", true, "clean up generated files")
 )
 
@@ -78,7 +77,7 @@ func TestTutorial(t *testing.T) {
 		// Stdin: strings.NewReader(input),
 	})
 
-	if *update {
+	if cuetest.UpdateGoldenFiles {
 		// The test environment won't work in all environments. We create
 		// a fake go.mod so that Go will find the module root. By default
 		// we won't set it.
@@ -164,7 +163,7 @@ func TestTutorial(t *testing.T) {
 					break
 				}
 
-				if !*update && strings.HasPrefix(cmd, "cue get") {
+				if !cuetest.UpdateGoldenFiles && strings.HasPrefix(cmd, "cue get") {
 					// Don't fetch stuff in normal mode.
 					break
 				}
@@ -207,7 +206,7 @@ func TestTutorial(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	if *update {
+	if cuetest.UpdateGoldenFiles {
 		// Remove all old cue files.
 		err := filepath.Walk(".", func(path string, info os.FileInfo, err error) error {
 			if isCUE(path) {
@@ -286,7 +285,7 @@ func TestEval(t *testing.T) {
 
 			testfile := filepath.Join("testdata", dir+".out")
 
-			if *update {
+			if cuetest.UpdateGoldenFiles {
 				err := ioutil.WriteFile(testfile, got, 0644)
 				if err != nil {
 					t.Fatal(err)

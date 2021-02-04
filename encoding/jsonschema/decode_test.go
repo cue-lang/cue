@@ -16,7 +16,6 @@ package jsonschema
 
 import (
 	"bytes"
-	"flag"
 	"io/ioutil"
 	"os"
 	"path"
@@ -35,15 +34,14 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
+	"cuelang.org/go/internal/cuetest"
 	_ "cuelang.org/go/pkg"
 )
-
-var update = flag.Bool("update", os.Getenv("CUE_UPDATE") != "", "update the test files")
 
 // TestDecode reads the testdata/*.txtar files, converts the contained
 // JSON schema to CUE and compares it against the output.
 //
-// Use the --update flag to update test files with the corresponding output.
+// Set CUE_UPDATE=1 to update test files with the corresponding output.
 func TestDecode(t *testing.T) {
 	err := filepath.Walk("testdata", func(fullpath string, info os.FileInfo, err error) error {
 		_ = err
@@ -102,7 +100,7 @@ func TestDecode(t *testing.T) {
 
 				switch {
 				case !cmp.Equal(errout, got):
-					if *update {
+					if cuetest.UpdateGoldenFiles {
 						a.Files[errIndex].Data = got
 						updated = true
 						break
@@ -129,7 +127,7 @@ func TestDecode(t *testing.T) {
 
 				switch {
 				case !cmp.Equal(b, out):
-					if *update {
+					if cuetest.UpdateGoldenFiles {
 						updated = true
 						a.Files[outIndex].Data = b
 						break

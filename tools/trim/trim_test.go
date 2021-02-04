@@ -15,7 +15,6 @@
 package trim
 
 import (
-	"flag"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -23,11 +22,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 	"github.com/rogpeppe/go-internal/txtar"
 )
-
-var update = flag.Bool("update", false, "update the test files")
 
 func TestFiles(t *testing.T) {
 	testCases := []struct {
@@ -281,7 +279,7 @@ func TestData(t *testing.T) {
 	test := cuetxtar.TxTarTest{
 		Root:   "./testdata",
 		Name:   "trim",
-		Update: *update,
+		Update: cuetest.UpdateGoldenFiles,
 	}
 
 	test.Run(t, func(t *cuetxtar.Test) {

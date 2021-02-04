@@ -31,11 +31,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/internal/cuetest"
 	"github.com/google/go-cmp/cmp"
 	"github.com/rogpeppe/go-internal/txtar"
 )
-
-var envUpdate = os.Getenv("CUE_UPDATE")
 
 // A TxTarTest represents a test run that process all CUE tests in the txtar
 // format rooted in a given directory.
@@ -310,7 +309,7 @@ func (x *TxTarTest) Run(t *testing.T, f func(tc *Test)) {
 					continue
 				}
 
-				if x.Update || envUpdate != "" {
+				if x.Update || cuetest.UpdateGoldenFiles {
 					update = true
 					gold.Data = result
 					continue

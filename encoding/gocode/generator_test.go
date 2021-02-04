@@ -16,7 +16,6 @@ package gocode
 
 import (
 	"bytes"
-	"flag"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -28,10 +27,9 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/load"
+	"cuelang.org/go/internal/cuetest"
 	_ "cuelang.org/go/pkg"
 )
-
-var update = flag.Bool("update", false, "update test files")
 
 func TestGenerate(t *testing.T) {
 	dirs, err := ioutil.ReadDir("testdata")
@@ -67,7 +65,7 @@ func TestGenerate(t *testing.T) {
 			}
 
 			goFile := filepath.Join("testdata", d.Name(), "cue_gen.go")
-			if *update {
+			if cuetest.UpdateGoldenFiles {
 				_ = ioutil.WriteFile(goFile, b, 0644)
 				return
 			}

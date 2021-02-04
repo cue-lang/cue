@@ -1,7 +1,6 @@
 package basics
 
 import (
-	"flag"
 	"os"
 	"path"
 	"path/filepath"
@@ -13,9 +12,8 @@ import (
 
 	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/cuetest"
 )
-
-var update = flag.Bool("update", false, "update the test files")
 
 // TestLatest checks that the examples match the latest language standard,
 // even if still valid in backwards compatibility mode.
@@ -54,7 +52,7 @@ func TestScript(t *testing.T) {
 		}
 		testscript.Run(t, testscript.Params{
 			Dir:           path,
-			UpdateScripts: *update,
+			UpdateScripts: cuetest.UpdateGoldenFiles,
 		})
 		return nil
 	})

@@ -33,6 +33,7 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/internal/cuetest"
 )
 
 // TestLatest checks that the examples match the latest language standard,
@@ -80,7 +81,7 @@ func TestScript(t *testing.T) {
 	}
 	p := testscript.Params{
 		Dir:           filepath.Join("testdata", "script"),
-		UpdateScripts: *update,
+		UpdateScripts: cuetest.UpdateGoldenFiles,
 		Setup: func(e *testscript.Env) error {
 			e.Vars = append(e.Vars,
 				"GOPROXY="+srv.URL,
@@ -88,6 +89,7 @@ func TestScript(t *testing.T) {
 			)
 			return nil
 		},
+		Condition: cuetest.Condition,
 	}
 	if err := gotooltest.Setup(&p); err != nil {
 		t.Fatal(err)

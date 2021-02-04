@@ -184,6 +184,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		return
 
 	case EvaluatingArcs:
+		Assertf(v.status > 0, "unexpected status %d", v.status)
 		return
 
 	case 0:
@@ -1320,6 +1321,16 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 	}
 
 	closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
+
+	if arc.status == 0 && !inline {
+		// This is a rare condition, but can happen in certain
+		// evaluation orders. Unfortunately, adding this breaks
+		// resolution of cyclic mutually referring disjunctions. But it
+		// is necessary to prevent lookups in unevaluated structs.
+		// TODO(cycles): this can probably most easily be fixed with a
+		// having a more recursive implementation.
+		n.ctx.Unify(arc, AllArcs)
+	}
 
 	for _, c := range arc.Conjuncts {
 		var a []*Vertex

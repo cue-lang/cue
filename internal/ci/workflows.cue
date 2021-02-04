@@ -121,7 +121,7 @@ test: _#bashWorkflow & {
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
 			go mod init mod.com
-			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
+			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
 			"""
 		if: "${{ \(_#isMaster) }}"
 	}

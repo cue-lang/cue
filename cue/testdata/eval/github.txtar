@@ -85,7 +85,7 @@ test: _#bashWorkflow & {
 			v=$(git rev-parse HEAD)
 			cd $(mktemp -d)
 			go mod init mod.com
-			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
+			GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
 			"""
 		if: "${{ \(_#isMaster) }}"
 	}
@@ -2117,7 +2117,7 @@ import "strings"
     _#isMaster: "github.ref == '\((〈1;_#branchRefPrefix〉 + 〈1;_#masterBranch〉))'"
     _#pullThroughProxy: (〈1;_#step〉 & {
       name: "Pull this commit through the proxy on \(〈2;_#masterBranch〉)"
-      run: "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v"
+      run: "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v"
       if: "${{ \(〈1;_#isMaster〉) }}"
     })
     _#startCLBuild: (〈1;_#step〉 & {

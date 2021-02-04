@@ -76,7 +76,7 @@ jobs:
         v=$(git rev-parse HEAD)
         cd $(mktemp -d)
         go mod init mod.com
-        GOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v
+        GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
       name: Post any failures for this matrix entry
       run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Build

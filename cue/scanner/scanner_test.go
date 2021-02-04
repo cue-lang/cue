@@ -461,7 +461,9 @@ func TestRelative(t *testing.T) {
 	b :    5
 	// line one
 	// line two
-	c: "dfs"
+	c
+	: "dfs"
+	, d: "foo"
 	`
 	want := []string{
 		`newline IDENT    package`,
@@ -480,8 +482,12 @@ func TestRelative(t *testing.T) {
 		"newline COMMENT  // line one",
 		"newline COMMENT  // line two",
 		`newline IDENT    c`,
-		`nospace :        `,
+		`newline :        `,
 		`blank   STRING   "dfs"`,
+		"newline ,        ,",
+		"blank   IDENT    d",
+		"nospace :        ",
+		`blank   STRING   "foo"`,
 		"elided  ,        \n",
 	}
 	var S Scanner

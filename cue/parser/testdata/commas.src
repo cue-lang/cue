@@ -30,3 +30,6 @@ bar: [
 	3
 ]
 
+frontStyle: { "key": "value"
+	, "key2": "value2"
+}

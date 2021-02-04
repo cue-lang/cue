@@ -831,7 +831,15 @@ scanAgain:
 			// set in the first place and exited early
 			// from s.skipWhitespace()
 			s.insertEOL = false // newline consumed
-			return s.file.Pos(offset, token.Elided), token.COMMA, "\n"
+			p := s.file.Pos(offset, token.Elided)
+			s.skipWhitespace(1)
+			// Don't elide comma before a ',' or ':' to ensure JSON
+			// conformance. Note that cue fmt should immediately undo those.
+			if s.ch == ',' || s.ch == ':' {
+				return s.Scan()
+			}
+			return p, token.COMMA, "\n"
+
 		case '#':
 			for quote.numHash++; s.ch == '#'; quote.numHash++ {
 				s.next()

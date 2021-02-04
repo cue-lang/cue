@@ -602,6 +602,15 @@ bar: 2
 			// Comment3
 		)`,
 		out: "funcArg1: foo(<[1// Comment1] {}>, <[d0// Comment2] [d1// Comment3] {}>)",
+	}, {
+		desc: "front-style commas",
+		in: `
+			frontStyle: { "key": "value"
+				, "key2": "value2"
+				, "foo" : bar
+			}
+			`,
+		out: "frontStyle: {\"key\": \"value\", \"key2\": \"value2\", \"foo\": bar}",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

@@ -1,0 +1,50 @@
+Issue #721
+
+-- in.cue --
+// allow front-style commas
+a
+: { "key": "value"
+, "key2"
+: "value2"
+}
+
+, b: [
+    0
+,   1
+,       2
+        ,3,
+    4
+
+    , 5
+]
+-- out/compile --
+--- in.cue
+{
+  a: {
+    key: "value"
+    key2: "value2"
+  }
+  b: [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+  ]
+}
+-- out/eval --
+(struct){
+  a: (struct){
+    key: (string){ "value" }
+    key2: (string){ "value2" }
+  }
+  b: (#list){
+    0: (int){ 0 }
+    1: (int){ 1 }
+    2: (int){ 2 }
+    3: (int){ 3 }
+    4: (int){ 4 }
+    5: (int){ 5 }
+  }
+}

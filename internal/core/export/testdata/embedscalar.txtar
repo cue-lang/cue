@@ -12,6 +12,15 @@ sub: {
         #baz: "foo"
     }
 }
+
+issue718: {
+	#fn: {
+		#a + #b
+		#a: int
+		#b: int
+	}
+	#fn & {_, #a: 1, #b: 2}
+}
 -- out/definition --
 #top: 4
 sub: {
@@ -26,6 +35,18 @@ sub: {
 		#baz: "foo"
 	}
 }
+issue718: {
+	#fn & {
+		_
+		#a: 1
+		#b: 2
+	}
+	#fn: {
+		#a + #b
+		#a: int
+		#b: int
+	}
+}
 -- out/doc --
 []
 [#top]
@@ -38,6 +59,12 @@ sub: {
 [sub b #baz]
 [sub b 0]
 [sub b 1]
+[issue718]
+[issue718 #a]
+[issue718 #b]
+[issue718 #fn]
+[issue718 #fn #a]
+[issue718 #fn #b]
 -- out/value --
 == Simplified
 {
@@ -45,6 +72,7 @@ sub: {
 		a: 3
 		b: [1, 2]
 	}
+	issue718: 3
 }
 == Raw
 {
@@ -61,6 +89,16 @@ sub: {
 			[1, 2]
 		}
 	}
+	issue718: {
+		3
+		#fn: {
+			#a + #b
+			#a: int
+			#b: int
+		}
+		#a: 1
+		#b: 2
+	}
 }
 == Final
 {
@@ -68,6 +106,7 @@ sub: {
 		a: 3
 		b: [1, 2]
 	}
+	issue718: 3
 }
 == All
 {
@@ -84,6 +123,16 @@ sub: {
 			[1, 2]
 		}
 	}
+	issue718: {
+		3
+		#fn: {
+			#a + #b
+			#a: int
+			#b: int
+		}
+		#a: 1
+		#b: 2
+	}
 }
 == Eval
 {
@@ -99,5 +148,15 @@ sub: {
 			#baz: "foo"
 			[1, 2]
 		}
+	}
+	issue718: {
+		3
+		#fn: {
+			#a + #b
+			#a: int
+			#b: int
+		}
+		#a: 1
+		#b: 2
 	}
 }

@@ -290,7 +290,6 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 	case adt.Value: // other values.
 		switch v := x.(type) {
 		case nil:
-		case *adt.Top:
 		default:
 			e.values.AddConjunct(adt.MakeRootConjunct(env, x)) // GOBBLE TOP
 

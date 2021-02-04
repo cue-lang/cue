@@ -22,11 +22,12 @@
 }
 -- out/definition --
 #A: {
+	_
 	#a: string
 }
-#E: {}
-#F: {}
-#G: {}
+#E: _
+#F: _
+#G: _
 #B: #A & {
 	#E & #F
 	#G

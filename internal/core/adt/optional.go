@@ -40,6 +40,11 @@ outer:
 		return
 	}
 
+	var label Value
+	if o.types&HasComplexPattern != 0 && arc.Label.IsString() {
+		label = arc.Label.ToValue(c)
+	}
+
 	if len(o.Bulk) > 0 {
 		bulkEnv := *env
 		bulkEnv.DynamicLabel = arc.Label
@@ -51,7 +56,7 @@ outer:
 			// if matched && f.additional {
 			// 	continue
 			// }
-			if matchBulk(c, env, b, arc.Label) {
+			if matchBulk(c, env, b, arc.Label, label) {
 				matched = true
 				info := closeInfo.SpawnSpan(b.Value, ConstraintSpan)
 				arc.AddConjunct(MakeConjunct(&bulkEnv, b, info))
@@ -77,67 +82,43 @@ outer:
 	}
 }
 
-func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature) bool {
-	v, ok := c.Evaluate(env, x.Filter)
-	if !ok {
-		// TODO: handle dynamically
-		return false
-	}
+func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, label Value) bool {
+	v := env.evalCached(c, x.Filter)
 
-	m := getMatcher(c, env, v)
-	if m == nil {
-		return false
-	}
-
-	c.inConstraint++
-	ret := m.Match(c, env, f)
-	c.inConstraint--
-	return ret
-}
-
-func getMatcher(c *OpContext, env *Environment, v Value) fieldMatcher {
-	switch f := v.(type) {
+	// Fast-track certain cases.
+	switch x := v.(type) {
 	case *Top:
-		return typeMatcher(TopKind)
+		return true
 
 	case *BasicType:
-		return typeMatcher(f.K)
+		return x.K&StringKind != 0
 
-	default:
-		return newPatternMatcher(c, env, v)
+	case *BoundValue:
+		switch x.Kind() {
+		case StringKind:
+			if label == nil {
+				label = f.ToValue(c)
+			}
+			str := label.(*String).Str
+			return x.validateStr(c, str)
+
+		case IntKind:
+			return x.validateInt(c, int64(f.Index()))
+		}
 	}
-}
 
-type fieldMatcher interface {
-	Match(c *OpContext, env *Environment, f Feature) bool
-}
-
-type typeMatcher Kind
-
-func (m typeMatcher) Match(c *OpContext, env *Environment, f Feature) bool {
-	switch f.Typ() {
-	case StringLabel:
-		return Kind(m)&StringKind != 0
-
-	case IntLabel:
-		return Kind(m)&IntKind != 0
+	n := Vertex{}
+	m := MakeRootConjunct(env, v)
+	n.AddConjunct(m)
+	if label == nil {
+		label = f.ToValue(c)
 	}
-	return false
-}
+	n.AddConjunct(MakeRootConjunct(m.Env, label))
 
-type patternMatcher Conjunct
+	c.inConstraint++
+	n.Finalize(c)
+	c.inConstraint--
 
-func (m patternMatcher) Match(c *OpContext, env *Environment, f Feature) bool {
-	v := Vertex{}
-	v.AddConjunct(Conjunct(m))
-	label := f.ToValue(c)
-	v.AddConjunct(MakeRootConjunct(m.Env, label))
-	v.Finalize(c)
-	b, _ := v.BaseValue.(*Bottom)
+	b, _ := n.BaseValue.(*Bottom)
 	return b == nil
-}
-
-func newPatternMatcher(ctx *OpContext, env *Environment, x Value) fieldMatcher {
-	c := MakeRootConjunct(env, x)
-	return patternMatcher(c)
 }

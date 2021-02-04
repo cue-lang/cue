@@ -121,6 +121,11 @@ func (o *StructLit) Init() {
 		case *BulkOptionalField:
 			o.Bulk = append(o.Bulk, x)
 			o.types |= HasPattern
+			switch x.Filter.(type) {
+			case *BasicType, *Top:
+			default:
+				o.types |= HasComplexPattern
+			}
 
 		case *Ellipsis:
 			expr := x.Value
@@ -615,6 +620,56 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 	default:
 		panic(fmt.Sprintf("unsupported type %T", v))
 	}
+}
+
+func (x *BoundValue) validateStr(c *OpContext, a string) bool {
+	if str, ok := x.Value.(*String); ok {
+		b := str.Str
+		switch x.Op {
+		case LessEqualOp:
+			return a <= b
+		case LessThanOp:
+			return a < b
+		case GreaterEqualOp:
+			return a >= b
+		case GreaterThanOp:
+			return a > b
+		case EqualOp:
+			return a == b
+		case NotEqualOp:
+			return a != b
+		case MatchOp:
+			return c.regexp(x.Value).MatchString(a)
+		case NotMatchOp:
+			return !c.regexp(x.Value).MatchString(a)
+		}
+	}
+	return x.validate(c, &String{Str: a}) == nil
+}
+
+func (x *BoundValue) validateInt(c *OpContext, a int64) bool {
+	switch n := x.Value.(type) {
+	case *Num:
+		b, err := n.X.Int64()
+		if err != nil {
+			break
+		}
+		switch x.Op {
+		case LessEqualOp:
+			return a <= b
+		case LessThanOp:
+			return a < b
+		case GreaterEqualOp:
+			return a >= b
+		case GreaterThanOp:
+			return a > b
+		case EqualOp:
+			return a == b
+		case NotEqualOp:
+			return a != b
+		}
+	}
+	return x.validate(c, c.NewInt64(a)) == nil
 }
 
 // A NodeLink is used during computation to refer to an existing Vertex.

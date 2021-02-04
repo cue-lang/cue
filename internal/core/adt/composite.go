@@ -130,6 +130,9 @@ type ID int32
 // evalCached is used to look up let expressions. Caching let expressions
 // prevents a possible combinatorial explosion.
 func (e *Environment) evalCached(c *OpContext, x Expr) Value {
+	if v, ok := x.(Value); ok {
+		return v
+	}
 	v, ok := e.cache[x]
 	if !ok {
 		if e.cache == nil {
@@ -488,11 +491,12 @@ func Unwrap(v Value) Value {
 type OptionalType int
 
 const (
-	HasField      OptionalType = 1 << iota // X: T
-	HasDynamic                             // (X): T or "\(X)": T
-	HasPattern                             // [X]: T
-	HasAdditional                          // ...T
-	IsOpen                                 // Defined for all fields
+	HasField          OptionalType = 1 << iota // X: T
+	HasDynamic                                 // (X): T or "\(X)": T
+	HasPattern                                 // [X]: T
+	HasComplexPattern                          // anything but a basic type
+	HasAdditional                              // ...T
+	IsOpen                                     // Defined for all fields
 )
 
 func (v *Vertex) Kind() Kind {

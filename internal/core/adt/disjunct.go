@@ -187,6 +187,34 @@ func (n *nodeContext) expandDisjuncts(
 
 		n.disjuncts = append(n.disjuncts, n)
 
+		// HACK: this is an AWFUL, AWFUL HACK to work around a limitation of
+		// using defaults for marking oneOfs in protobuffers. Previously this
+		// was worked around by another hack that (deliberately erroneously)
+		// would move the default status of a disjunct of which only one
+		// disjunct remained from "not default" to "maybe default". For
+		// protobuf oneOfs this would mean that only the "intended" struct would
+		// get the default value. It also worked around various other
+		// limitations.
+		//
+		// With the latest performance enhancements this old hack still worked,
+		// but only because it introduced a bug that this hack relied on. Fixing
+		// this bug now causes this hack to no longer work.
+		//
+		// Ultimately, the correct way to address the issue for the protobuf
+		// representation is not to use defaults at all. Instead we should use
+		// the required annotator (which fixes a whole load of other issues):
+		//
+		//    {} | {a!: int} | {b!: int}
+		//
+		// This would force that only one of these can be true independent of
+		// default magic. Aside from fixing this issue, it also moves to a model
+		// that is consistent with the recommendation to not use defaults in
+		// a top-level API specification.
+		//
+		// The hack we use now recognizes the oneOf patterns and then sets the
+		// default for the "smallest" element.
+		protoForm := true
+
 		for i, d := range n.disjunctions {
 			a := n.disjuncts
 			n.disjuncts = n.buffer[:0]
@@ -195,6 +223,23 @@ func (n *nodeContext) expandDisjuncts(
 			skipNonMonotonicChecks := i+1 < len(n.disjunctions)
 			if skipNonMonotonicChecks {
 				n.ctx.inDisjunct++
+			}
+
+			// HACK: see above
+			defaultCount := 0
+			override := true
+			if d.expr == nil {
+				override = false
+			} else {
+				for _, v := range d.expr.Values {
+					if !d.hasDefaults || v.Default {
+						defaultCount++
+						if s, ok := v.Val.(*StructLit); !ok || len(s.Decls) > 0 {
+							protoForm = false
+							override = false
+						}
+					}
+				}
 			}
 
 			for _, dn := range a {
@@ -207,6 +252,12 @@ func (n *nodeContext) expandDisjuncts(
 
 						c := MakeConjunct(d.env, v.Val, d.cloneID)
 						cn.addExprConjunct(c)
+
+						if override {
+							if s, ok := v.Val.(*StructLit); ok && len(s.Decls) == 0 {
+								cn.protoCount++
+							}
+						}
 
 						newMode := mode(d.hasDefaults, v.Default)
 						cn.defaultMode = combineDefault(dn.defaultMode, newMode)
@@ -249,6 +300,25 @@ func (n *nodeContext) expandDisjuncts(
 			}
 		}
 
+		// HACK: see above
+		if protoForm {
+			min := int32(0)
+			minPos := 0
+			for i, d := range n.disjuncts {
+				if d.defaultMode == isDefault {
+					min = 0
+					break
+				}
+				if d.protoCount > min {
+					min = d.protoCount
+					minPos = i
+				}
+			}
+			if min > 0 {
+				n.disjuncts[minPos].defaultMode = isDefault
+			}
+		}
+
 		// HACK alert: this replaces the hack of the previous algorithm with a
 		// slightly less worse hack: instead of dropping the default info when
 		// the value was scalar before, we drop this information when there
@@ -271,7 +341,7 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for _, v := range p.disjuncts {
-				if Equal(n.ctx, &v.result, &d.result) {
+				if Equal(n.ctx, &v.result, &d.result, true) {
 					if d.defaultMode == isDefault {
 						v.defaultMode = isDefault
 					}

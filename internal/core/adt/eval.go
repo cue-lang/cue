@@ -772,6 +772,7 @@ type nodeContext struct {
 	hasTop      bool
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
+	protoCount  int32
 
 	// Disjunction handling
 	disjunctions []envDisjunct

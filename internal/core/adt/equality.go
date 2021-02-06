@@ -14,17 +14,17 @@
 
 package adt
 
-func Equal(ctx *OpContext, v, w Value) bool {
+func Equal(ctx *OpContext, v, w Value, optional bool) bool {
 	if x, ok := v.(*Vertex); ok {
-		return equalVertex(ctx, x, w)
+		return equalVertex(ctx, x, w, optional)
 	}
 	if y, ok := w.(*Vertex); ok {
-		return equalVertex(ctx, y, v)
+		return equalVertex(ctx, y, v, optional)
 	}
-	return equalTerminal(ctx, v, w)
+	return equalTerminal(ctx, v, w, optional)
 }
 
-func equalVertex(ctx *OpContext, x *Vertex, v Value) bool {
+func equalVertex(ctx *OpContext, x *Vertex, v Value, opt bool) bool {
 	y, ok := v.(*Vertex)
 	if !ok {
 		return false
@@ -47,7 +47,7 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value) bool {
 	if x.IsClosed(ctx) != y.IsClosed(ctx) {
 		return false
 	}
-	if !equalOptional(ctx, x, y) {
+	if opt && !equalClosed(ctx, x, y) {
 		return false
 	}
 
@@ -55,7 +55,7 @@ loop1:
 	for _, a := range x.Arcs {
 		for _, b := range y.Arcs {
 			if a.Label == b.Label {
-				if !Equal(ctx, a, b) {
+				if !Equal(ctx, a, b, opt) {
 					return false
 				}
 				continue loop1
@@ -81,12 +81,10 @@ loop1:
 		return true // both are struct or list.
 	}
 
-	return equalTerminal(ctx, v, w)
+	return equalTerminal(ctx, v, w, opt)
 }
 
-// equalOptional tests if x and y have the same set of close information.
-// Right now this just checks if it has the same source structs that
-// define optional fields.
+// equalClosed tests if x and y have the same set of close information.
 // TODO: the following refinements are possible:
 // - unify optional fields and equate the optional fields
 // - do the same for pattern constraints, where the pattern constraints
@@ -95,14 +93,14 @@ loop1:
 //
 // For all these refinements it would be necessary to have well-working
 // structure sharing so as to not repeatedly recompute optional arcs.
-func equalOptional(ctx *OpContext, x, y *Vertex) bool {
+func equalClosed(ctx *OpContext, x, y *Vertex) bool {
 	return verifyStructs(x, y) && verifyStructs(y, x)
 }
 
 func verifyStructs(x, y *Vertex) bool {
 outer:
 	for _, s := range x.Structs {
-		if !s.StructLit.HasOptional() {
+		if s.closeInfo == nil || s.closeInfo.span|DefinitionSpan == 0 {
 			continue
 		}
 		for _, t := range y.Structs {
@@ -115,7 +113,7 @@ outer:
 	return true
 }
 
-func equalTerminal(ctx *OpContext, v, w Value) bool {
+func equalTerminal(ctx *OpContext, v, w Value, opt bool) bool {
 	if v == w {
 		return true
 	}
@@ -132,7 +130,7 @@ func equalTerminal(ctx *OpContext, v, w Value) bool {
 
 	case *BoundValue:
 		if y, ok := w.(*BoundValue); ok {
-			return x.Op == y.Op && Equal(ctx, x.Value, y.Value)
+			return x.Op == y.Op && Equal(ctx, x.Value, y.Value, opt)
 		}
 
 	case *BasicType:
@@ -147,7 +145,7 @@ func equalTerminal(ctx *OpContext, v, w Value) bool {
 		}
 		// always ordered the same
 		for i, xe := range x.Values {
-			if !Equal(ctx, xe, y.Values[i]) {
+			if !Equal(ctx, xe, y.Values[i], opt) {
 				return false
 			}
 		}
@@ -161,7 +159,7 @@ func equalTerminal(ctx *OpContext, v, w Value) bool {
 			return false
 		}
 		for i, xe := range x.Values {
-			if !Equal(ctx, xe, y.Values[i]) {
+			if !Equal(ctx, xe, y.Values[i], opt) {
 				return false
 			}
 		}

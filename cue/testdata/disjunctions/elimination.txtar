@@ -142,6 +142,46 @@ nestedNonMonotonic: incomplete: b: n2: p1: {
     x: { a: b: struct.MinFields(3) } | null
 }
 
+preserveClosedness: small: p1: {
+    #A: #B & {a: string}
+    #B: {
+      *{} | {a: string}
+      *{} | {b: int}
+    }
+}
+
+preserveClosedness: small: p2: {
+    #A: #B & {a: string}
+    #B: {
+      {a: string} | *{}
+      *{} | {b: int}
+    }
+}
+
+preserveClosedness: medium: p1: {
+    #A: #B & {a: string}
+    #B: {
+      *{} | {a: string} | {b: string}
+      *{} | {c: int} | {d: string}
+    }
+}
+
+preserveClosedness: medium: p2: {
+    #A: #B & {a: string}
+    #B: {
+      {a: string} | *{} | {b: string}
+      *{} | {c: int} | {d: string}
+    }
+}
+
+preserveClosedness: medium: p3: {
+    #A: #B & {a: string}
+    #B: {
+      {a: string} | {b: string} | *{}
+      *{} | {c: int} | {d: string}
+    }
+}
+
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){
@@ -318,6 +358,145 @@ nestedNonMonotonic: incomplete: b: n2: p1: {
               }, (null){ null }) }
           }
         }
+      }
+    }
+  }
+  preserveClosedness: (struct){
+    small: (struct){
+      p1: (struct){
+        #A: (struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (int){ int }
+          }) }
+        #B: (struct){ |(*(#struct){
+          }, (#struct){
+            b: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (int){ int }
+          }) }
+      }
+      p2: (struct){
+        #A: (struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            b: (int){ int }
+          }) }
+        #B: (struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+            b: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            b: (int){ int }
+          }) }
+      }
+    }
+    medium: (struct){
+      p1: (struct){
+        #A: (struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }) }
+        #B: (struct){ |(*(#struct){
+          }, (#struct){
+            c: (int){ int }
+          }, (#struct){
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            b: (string){ string }
+            d: (string){ string }
+          }) }
+      }
+      p2: (struct){
+        #A: (struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }) }
+        #B: (struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            c: (int){ int }
+          }, (#struct){
+            d: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            b: (string){ string }
+            d: (string){ string }
+          }) }
+      }
+      p3: (struct){
+        #A: (struct){ |(*(#struct){
+            a: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }) }
+        #B: (struct){ |(*(#struct){
+          }, (#struct){
+            a: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            a: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+          }, (#struct){
+            b: (string){ string }
+            c: (int){ int }
+          }, (#struct){
+            b: (string){ string }
+            d: (string){ string }
+          }, (#struct){
+            a: (string){ string }
+          }, (#struct){
+            c: (int){ int }
+          }, (#struct){
+            d: (string){ string }
+          }) }
       }
     }
   }
@@ -781,6 +960,103 @@ nestedNonMonotonic: incomplete: b: n2: p1: {
               }
             }|null)
           }
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    small: {
+      p1: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          (*{}|{
+            a: string
+          })
+          (*{}|{
+            b: int
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    small: {
+      p2: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          ({
+            a: string
+          }|*{})
+          (*{}|{
+            b: int
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    medium: {
+      p1: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          (*{}|{
+            a: string
+          }|{
+            b: string
+          })
+          (*{}|{
+            c: int
+          }|{
+            d: string
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    medium: {
+      p2: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          ({
+            a: string
+          }|*{}|{
+            b: string
+          })
+          (*{}|{
+            c: int
+          }|{
+            d: string
+          })
+        }
+      }
+    }
+  }
+  preserveClosedness: {
+    medium: {
+      p3: {
+        #A: (〈0;#B〉 & {
+          a: string
+        })
+        #B: {
+          ({
+            a: string
+          }|{
+            b: string
+          }|*{})
+          (*{}|{
+            c: int
+          }|{
+            d: string
+          })
         }
       }
     }

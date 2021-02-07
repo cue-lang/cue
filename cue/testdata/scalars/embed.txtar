@@ -1,3 +1,5 @@
+// Issue ##739
+
 -- in.cue --
 import "strings"
 
@@ -67,6 +69,30 @@ defCheck: {
     b: a.#def
 }
 
+optionalExists: {
+    string | {
+        value?: string
+
+        if value != _|_ {
+            other: int
+        }
+    }
+}
+
+optionalCheck: {
+    thing: string | {
+        value?: string
+
+        if value != _|_ {
+            other: int
+        }
+    }
+
+    thing: {
+        value: "some string"
+        other: 3
+    }
+}
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
@@ -160,6 +186,14 @@ Result:
     }
     b: (int){ 1 }
   }
+  optionalExists: ((string|struct)){ |((string){ string }, (struct){
+    }) }
+  optionalCheck: (struct){
+    thing: (struct){
+      value: (string){ "some string" }
+      other: (int){ 3 }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -246,5 +280,25 @@ Result:
       #def: 1
     }
     b: 〈0;a〉.#def
+  }
+  optionalExists: {
+    (string|{
+      value?: string
+      if (〈0;value〉 != _|_(explicit error (_|_ literal) in source)) {
+        other: int
+      }
+    })
+  }
+  optionalCheck: {
+    thing: (string|{
+      value?: string
+      if (〈0;value〉 != _|_(explicit error (_|_ literal) in source)) {
+        other: int
+      }
+    })
+    thing: {
+      value: "some string"
+      other: 3
+    }
   }
 }

@@ -117,6 +117,7 @@ func (o *StructLit) Init() {
 			o.HasEmbed = true
 
 		case *ForClause, Yielder:
+			o.HasEmbed = true
 
 		case *BulkOptionalField:
 			o.Bulk = append(o.Bulk, x)

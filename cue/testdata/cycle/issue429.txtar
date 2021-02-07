@@ -71,9 +71,6 @@ es3.max: conflicting values 10 and 5:
 es3.max: invalid value 5 (out of bound >10):
     ./in.cue:5:10
     ./in.cue:22:10
-er3.min: invalid value 5 (out of bound <5):
-    ./in.cue:29:10
-    ./in.cue:44:10
 er3.max: invalid value 5 (out of bound >5):
     ./in.cue:30:10
     ./in.cue:45:10
@@ -155,9 +152,9 @@ Result:
       //     ./in.cue:28:11
       //     ./in.cue:43:6
       //     ./in.cue:44:10
-      // er3.min: invalid value 5 (out of bound <5):
-      //     ./in.cue:29:10
-      //     ./in.cue:44:10
+      // er3.max: invalid value 5 (out of bound >5):
+      //     ./in.cue:30:10
+      //     ./in.cue:45:10
     }
     max: (_|_){
       // [eval] er3.max: invalid value 5 (out of bound >5):

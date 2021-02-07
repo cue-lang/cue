@@ -1076,7 +1076,7 @@ func (n *nodeContext) maybeSetCache() {
 		return
 	}
 	if n.scalar != nil {
-		n.node.SetValue(n.ctx, Partial, n.scalar)
+		n.node.BaseValue = n.scalar
 	}
 	// NOTE: this is now handled by associating the nodeContext
 	// if n.errs != nil {

@@ -416,11 +416,6 @@ func clone(v Vertex) Vertex {
 				copy(a.Conjuncts, arc.Conjuncts)
 
 			default:
-				// This should never happen and would be a performance issue.
-				// But try to mend the situation by doing something sensible in
-				// case the user is not running with strict mode enabled.
-				Assertf(false, "invalid state for disjunct")
-
 				a := *arc
 				a.state = arc.state.clone()
 				a.state.node = &a

@@ -428,6 +428,7 @@ b6.x.a.0: structural cycle
 b7.a.0: structural cycle
 c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
+d1.r: structural cycle
 d2.r.c.d.t: structural cycle
 d2.x.d.t.c.d.t: structural cycle
 e1.a.c: structural cycle
@@ -489,6 +490,7 @@ p3.#U.#T.a.b.link: structural cycle
 p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 z1.z.f.h.h: structural cycle
+z1.z.g.h: structural cycle
 cycle error:
     ./in.cue:144:10
 0: structural cycle:
@@ -1009,7 +1011,7 @@ Result:
       }
     }
     r: (_|_){
-      // [structural cycle] d1.a.b.c.d.t: structural cycle
+      // [structural cycle] d1.r: structural cycle
     }
     x: (_|_){
       // [structural cycle] d1.a.b.c.d.t: structural cycle
@@ -1316,6 +1318,9 @@ Result:
       }
       g: (_|_){
         // [structural cycle]
+        h: (_|_){
+          // [structural cycle] z1.z.g.h: structural cycle
+        }
       }
     }
   }

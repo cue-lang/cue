@@ -354,6 +354,10 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		// completing all disjunctions.
 		if !n.done() {
 			if err := n.incompleteErrors(); err != nil {
+				b, _ := n.node.BaseValue.(*Bottom)
+				if b != err {
+					err = CombineErrors(n.ctx.src, b, err)
+				}
 				n.node.BaseValue = err
 			}
 		}

@@ -1043,6 +1043,8 @@ import "strings"
 -- out/eval --
 (struct){
   workflowsDir: (string){ |(*(string){ "./" }, (string){ string }) }
+  _#masterBranch(:ci): (string){ "master" }
+  _#releaseTagPattern(:ci): (string){ "v*" }
   workflows: (#list){
     0: (struct){
       file: (string){ "test.yml" }
@@ -1085,14 +1087,35 @@ import "strings"
           "working-directory": (string){ string }
         }
         jobs: (#struct){
+          start: (#struct){
+            "runs-on": (string){ "ubuntu-18.04" }
+            steps: (#list){
+              0: (#struct){
+                name: (string){ "Write the gitcookies file" }
+                run: (string){ "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies" }
+                if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
+              }
+              1: (#struct){
+                name: (string){ "Update Gerrit CL message with starting message" }
+                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+                if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
+              }
+            }
+            defaults: (#struct){
+              run: (#struct){
+                shell: (string){ "bash" }
+              }
+            }
+          }
           test: (#struct){
+            needs: (string){ "start" }
             strategy: (#struct){
               "fail-fast": (bool){ false }
               matrix: (#struct){
                 "go-version": (#list){
-                  0: (string){ "1.13.x" }
-                  1: (string){ "1.14.9" }
-                  2: (string){ "1.15.x" }
+                  0: (string){ "1.14.14" }
+                  1: (string){ "1.15.x" }
+                  2: (string){ "1.16.0-rc1" }
                 }
                 os: (#list){
                   0: (string){ "ubuntu-18.04" }
@@ -1112,6 +1135,7 @@ import "strings"
                 uses: (string){ "actions/setup-go@v2" }
                 with: (#struct){
                   "go-version": (string){ "${{ matrix.go-version }}" }
+                  stable: (bool){ false }
                 }
               }
               2: (#struct){
@@ -1130,7 +1154,7 @@ import "strings"
               4: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
-                if: (string){ "matrix.go-version == '1.14.9' && matrix.os != 'windows-2019'" }
+                if: (string){ "matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'" }
               }
               5: (#struct){
                 name: (string){ "Test" }
@@ -1139,6 +1163,7 @@ import "strings"
               6: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
+                if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.15.x' && matrix.os == 'ubuntu-18.04' }}" }
               }
               7: (#struct){
                 name: (string){ "gorelease check" }
@@ -1150,7 +1175,7 @@ import "strings"
               }
               9: (#struct){
                 name: (string){ "Pull this commit through the proxy on master" }
-                run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v" }
+                run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
                 if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
               }
               10: (#struct){
@@ -1216,8 +1241,12 @@ import "strings"
         _#isMaster(:ci): (string){ "github.ref == 'refs/heads/master'" }
         _#pullThroughProxy(:ci): (#struct){
           name: (string){ "Pull this commit through the proxy on master" }
-          run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v" }
+          run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
           if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
+        }
+        _#startCLBuild(:ci): (#struct){
+          name: (string){ "Update Gerrit CL message with starting message" }
+          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
         }
         _#failCLBuild(:ci): (#struct){
           if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
@@ -1235,14 +1264,14 @@ import "strings"
             }
             res: (_|_){
               // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-              //     ./workflows.cue:136:9
+              //     ./workflows.cue:122:9
             }
           }
         }
       }
     }
     1: (struct){
-      file: (string){ "test_dispatch.yml" }
+      file: (string){ "repository_dispatch.yml" }
       schema: (#struct){
         #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
         #branch: (list){
@@ -1282,21 +1311,64 @@ import "strings"
           "working-directory": (string){ string }
         }
         jobs: (#struct){
-          start: (#struct){
-            if: (string){ "${{ startsWith(github.event.action, 'Build for refs/changes/') }}" }
+          runtrybot: (#struct){
             "runs-on": (string){ "ubuntu-18.04" }
+            _#type(:ci): (string){ "runtrybot" }
+            if: (string){ "${{ github.event.client_payload.type == 'runtrybot' }}" }
             steps: (#list){
               0: (#struct){
-                name: (string){ "Write the gitcookies file" }
-                run: (string){ "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies" }
+                name: (string){ "Trigger trybot" }
+                run: (string){ "mkdir tmpgit\ncd tmpgit\ngit init\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\"\ngit fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}\ngit checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD\ngit push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}" }
+              }
+            }
+            defaults: (#struct){
+              run: (#struct){
+                shell: (string){ "bash" }
+              }
+            }
+          }
+          mirror: (#struct){
+            "runs-on": (string){ "ubuntu-18.04" }
+            _#type(:ci): (string){ "mirror" }
+            if: (string){ "${{ github.event.client_payload.type == 'mirror' }}" }
+            steps: (#list){
+              _#name(:ci): (string){ "Mirror Gerrit to GitHub" }
+              _#cmd(:ci): (string){ "github" }
+              0: (#struct){
+                name: (string){ "Checkout code" }
+                uses: (string){ "actions/checkout@v2" }
               }
               1: (#struct){
-                name: (string){ "Update Gerrit CL message with starting message" }
-                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review" }
+                name: (string){ "Mirror Gerrit to GitHub" }
+                run: (string){
+                  "cd _scripts\ndocker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint=\"\" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c \" \\\n\tset -eu; \\\n\techo \\\"${{ secrets.gerritCookie }}\\\" > ~/.gitcookies; \\\n\tchmod 600 ~/.gitcookies; \\\n\tgit config --global user.name cueckoo; \\\n\tgit config --global user.email cueckoo@gmail.com; \\\n\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\\n  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\\n\tchmod 600 ~/.git-credentials; \\\n\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \\\n\t\""
+                  _#cmd(:ci): (string){ "github" }
+                }
               }
-              2: (#struct){
-                name: (string){ "Checkout ref" }
-                run: (string){ "mkdir tmpgit\ncd tmpgit\ngit init\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\"\ngit fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}\ngit checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD\ngit push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}" }
+            }
+            defaults: (#struct){
+              run: (#struct){
+                shell: (string){ "bash" }
+              }
+            }
+          }
+          importpr: (#struct){
+            "runs-on": (string){ "ubuntu-18.04" }
+            _#type(:ci): (string){ "importpr" }
+            if: (string){ "${{ github.event.client_payload.type == 'importpr' }}" }
+            steps: (#list){
+              _#name(:ci): (string){ "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit" }
+              _#cmd(:ci): (string){ "github-pr ${{ github.event.client_payload.payload.pr }}" }
+              0: (#struct){
+                name: (string){ "Checkout code" }
+                uses: (string){ "actions/checkout@v2" }
+              }
+              1: (#struct){
+                name: (string){ "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit" }
+                run: (string){
+                  "cd _scripts\ndocker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint=\"\" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c \" \\\n\tset -eu; \\\n\techo \\\"${{ secrets.gerritCookie }}\\\" > ~/.gitcookies; \\\n\tchmod 600 ~/.gitcookies; \\\n\tgit config --global user.name cueckoo; \\\n\tgit config --global user.email cueckoo@gmail.com; \\\n\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\\n  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\\n\tchmod 600 ~/.git-credentials; \\\n\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github-pr ${{ github.event.client_payload.payload.pr }}; \\\n\t\""
+                  _#cmd(:ci): (string){ "github-pr ${{ github.event.client_payload.payload.pr }}" }
+                }
               }
             }
             defaults: (#struct){
@@ -1306,20 +1378,20 @@ import "strings"
             }
           }
         }
-        name: (string){ "Test Dispatch" }
+        _#runtrybot(:ci): (string){ "runtrybot" }
+        _#mirror(:ci): (string){ "mirror" }
+        _#importpr(:ci): (string){ "importpr" }
+        _#dispatchJob(:ci): (#struct){
+          "runs-on": (string){ "ubuntu-18.04" }
+          _#type(:ci): (string){ string }
+          if: (_|_){
+            // [incomplete] workflows.1.schema._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
+            //     ./workflows.cue:134:14
+          }
+        }
+        name: (string){ "Repository Dispatch" }
         on: (#list){
           0: (string){ "repository_dispatch" }
-        }
-        _#gerrit(:ci): (#struct){
-          _#setCodeReview(:ci): (#struct){
-            #args: (#struct){
-              message: (string){ string }
-            }
-            res: (_|_){
-              // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-              //     ./workflows.cue:180:9
-            }
-          }
         }
       }
     }
@@ -1380,7 +1452,7 @@ import "strings"
                 env: (#struct){
                   GITHUB_TOKEN: (string){ "${{ secrets.ACTIONS_GITHUB_TOKEN }}" }
                 }
-                uses: (string){ "docker://goreleaser/goreleaser:latest" }
+                uses: (string){ "docker://goreleaser/goreleaser:v0.110.0" }
                 with: (#struct){
                   args: (string){ "release --rm-dist" }
                 }
@@ -1509,6 +1581,81 @@ import "strings"
         }
       }
     }
+    4: (struct){
+      file: (string){ "mirror.yml" }
+      schema: (#struct){
+        #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
+        #branch: (list){
+          0: (string){ strings.MinRunes(1) }
+        }
+        #configuration: ((bool|string|list|struct|number)){ |((string){ string }, (number){ number }, (bool){ bool }, (#struct){
+          }, (list){
+          }) }
+        #container: (#struct){
+          image: (string){ string }
+        }
+        #defaults: (#struct){
+        }
+        #env: (#struct){
+        }
+        #environment: (#struct){
+          name: (string){ string }
+        }
+        #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
+        #eventObject: (null){ null }
+        #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
+        #globs: (list){
+          0: (string){ strings.MinRunes(1) }
+        }
+        #machine: (string){ |((string){ "linux" }, (string){ "macos" }, (string){ "windows" }) }
+        #name: (string){ =~"^[_a-zA-Z][a-zA-Z0-9_-]*$" }
+        #path: (list){
+          0: (string){ strings.MinRunes(1) }
+        }
+        #ref: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
+        #shell: (string){ |((string){ string }, (string){ "bash" }, (string){ "pwsh" }, (string){ "python" }, (string){ "sh" }, (string){ "cmd" }, (string){ "powershell" }) }
+        #types: (list){
+          0: (_){ _ }
+        }
+        #: (#struct){
+          "working-directory": (string){ string }
+        }
+        jobs: (#struct){
+          mirror: (#struct){
+            "runs-on": (string){ "ubuntu-18.04" }
+            steps: (#list){
+              _#name(:ci): (string){ "Mirror Gerrit to GitHub" }
+              _#cmd(:ci): (string){ "github" }
+              0: (#struct){
+                name: (string){ "Checkout code" }
+                uses: (string){ "actions/checkout@v2" }
+              }
+              1: (#struct){
+                name: (string){ "Mirror Gerrit to GitHub" }
+                run: (string){
+                  "cd _scripts\ndocker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint=\"\" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c \" \\\n\tset -eu; \\\n\techo \\\"${{ secrets.gerritCookie }}\\\" > ~/.gitcookies; \\\n\tchmod 600 ~/.gitcookies; \\\n\tgit config --global user.name cueckoo; \\\n\tgit config --global user.email cueckoo@gmail.com; \\\n\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\\n  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\\n\tchmod 600 ~/.git-credentials; \\\n\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \\\n\t\""
+                  _#cmd(:ci): (string){ "github" }
+                }
+              }
+            }
+            defaults: (#struct){
+              run: (#struct){
+                shell: (string){ "bash" }
+              }
+            }
+          }
+        }
+        name: (string){ "Scheduled repo mirror" }
+        on: (#struct){
+          schedule: (#list){
+            0: (#struct){
+              cron: (string){ "*/30 * * * *" }
+            }
+          }
+        }
+      }
+    }
   }
   test: (#struct){
     #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
@@ -1549,14 +1696,35 @@ import "strings"
       "working-directory": (string){ string }
     }
     jobs: (#struct){
+      start: (#struct){
+        "runs-on": (string){ "ubuntu-18.04" }
+        steps: (#list){
+          0: (#struct){
+            name: (string){ "Write the gitcookies file" }
+            run: (string){ "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies" }
+            if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
+          }
+          1: (#struct){
+            name: (string){ "Update Gerrit CL message with starting message" }
+            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+            if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
+          }
+        }
+        defaults: (#struct){
+          run: (#struct){
+            shell: (string){ "bash" }
+          }
+        }
+      }
       test: (#struct){
+        needs: (string){ "start" }
         strategy: (#struct){
           "fail-fast": (bool){ false }
           matrix: (#struct){
             "go-version": (#list){
-              0: (string){ "1.13.x" }
-              1: (string){ "1.14.9" }
-              2: (string){ "1.15.x" }
+              0: (string){ "1.14.14" }
+              1: (string){ "1.15.x" }
+              2: (string){ "1.16.0-rc1" }
             }
             os: (#list){
               0: (string){ "ubuntu-18.04" }
@@ -1576,6 +1744,7 @@ import "strings"
             uses: (string){ "actions/setup-go@v2" }
             with: (#struct){
               "go-version": (string){ "${{ matrix.go-version }}" }
+              stable: (bool){ false }
             }
           }
           2: (#struct){
@@ -1594,7 +1763,7 @@ import "strings"
           4: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
-            if: (string){ "matrix.go-version == '1.14.9' && matrix.os != 'windows-2019'" }
+            if: (string){ "matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'" }
           }
           5: (#struct){
             name: (string){ "Test" }
@@ -1603,6 +1772,7 @@ import "strings"
           6: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
+            if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.15.x' && matrix.os == 'ubuntu-18.04' }}" }
           }
           7: (#struct){
             name: (string){ "gorelease check" }
@@ -1614,7 +1784,7 @@ import "strings"
           }
           9: (#struct){
             name: (string){ "Pull this commit through the proxy on master" }
-            run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v" }
+            run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
             if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
           }
           10: (#struct){
@@ -1680,8 +1850,12 @@ import "strings"
     _#isMaster(:ci): (string){ "github.ref == 'refs/heads/master'" }
     _#pullThroughProxy(:ci): (#struct){
       name: (string){ "Pull this commit through the proxy on master" }
-      run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go@$v" }
+      run: (string){ "v=$(git rev-parse HEAD)\ncd $(mktemp -d)\ngo mod init mod.com\nGOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v" }
       if: (string){ "${{ github.ref == 'refs/heads/master' }}" }
+    }
+    _#startCLBuild(:ci): (#struct){
+      name: (string){ "Update Gerrit CL message with starting message" }
+      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
     }
     _#failCLBuild(:ci): (#struct){
       if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
@@ -1699,12 +1873,12 @@ import "strings"
         }
         res: (_|_){
           // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-          //     ./workflows.cue:136:9
+          //     ./workflows.cue:122:9
         }
       }
     }
   }
-  test_dispatch: (#struct){
+  repository_dispatch: (#struct){
     #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
     #branch: (list){
       0: (string){ strings.MinRunes(1) }
@@ -1743,21 +1917,64 @@ import "strings"
       "working-directory": (string){ string }
     }
     jobs: (#struct){
-      start: (#struct){
-        if: (string){ "${{ startsWith(github.event.action, 'Build for refs/changes/') }}" }
+      runtrybot: (#struct){
         "runs-on": (string){ "ubuntu-18.04" }
+        _#type(:ci): (string){ "runtrybot" }
+        if: (string){ "${{ github.event.client_payload.type == 'runtrybot' }}" }
         steps: (#list){
           0: (#struct){
-            name: (string){ "Write the gitcookies file" }
-            run: (string){ "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies" }
+            name: (string){ "Trigger trybot" }
+            run: (string){ "mkdir tmpgit\ncd tmpgit\ngit init\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\"\ngit fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}\ngit checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD\ngit push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}" }
+          }
+        }
+        defaults: (#struct){
+          run: (#struct){
+            shell: (string){ "bash" }
+          }
+        }
+      }
+      mirror: (#struct){
+        "runs-on": (string){ "ubuntu-18.04" }
+        _#type(:ci): (string){ "mirror" }
+        if: (string){ "${{ github.event.client_payload.type == 'mirror' }}" }
+        steps: (#list){
+          _#name(:ci): (string){ "Mirror Gerrit to GitHub" }
+          _#cmd(:ci): (string){ "github" }
+          0: (#struct){
+            name: (string){ "Checkout code" }
+            uses: (string){ "actions/checkout@v2" }
           }
           1: (#struct){
-            name: (string){ "Update Gerrit CL message with starting message" }
-            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/${{ github.event.client_payload.changeID }}/revisions/${{ github.event.client_payload.commit }}/review" }
+            name: (string){ "Mirror Gerrit to GitHub" }
+            run: (string){
+              "cd _scripts\ndocker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint=\"\" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c \" \\\n\tset -eu; \\\n\techo \\\"${{ secrets.gerritCookie }}\\\" > ~/.gitcookies; \\\n\tchmod 600 ~/.gitcookies; \\\n\tgit config --global user.name cueckoo; \\\n\tgit config --global user.email cueckoo@gmail.com; \\\n\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\\n  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\\n\tchmod 600 ~/.git-credentials; \\\n\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \\\n\t\""
+              _#cmd(:ci): (string){ "github" }
+            }
           }
-          2: (#struct){
-            name: (string){ "Checkout ref" }
-            run: (string){ "mkdir tmpgit\ncd tmpgit\ngit init\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\"\ngit fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.ref }}\ngit checkout -b ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }} FETCH_HEAD\ngit push https://github.com/cuelang/cue ci/${{ github.event.client_payload.changeID }}/${{ github.event.client_payload.commit }}" }
+        }
+        defaults: (#struct){
+          run: (#struct){
+            shell: (string){ "bash" }
+          }
+        }
+      }
+      importpr: (#struct){
+        "runs-on": (string){ "ubuntu-18.04" }
+        _#type(:ci): (string){ "importpr" }
+        if: (string){ "${{ github.event.client_payload.type == 'importpr' }}" }
+        steps: (#list){
+          _#name(:ci): (string){ "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit" }
+          _#cmd(:ci): (string){ "github-pr ${{ github.event.client_payload.payload.pr }}" }
+          0: (#struct){
+            name: (string){ "Checkout code" }
+            uses: (string){ "actions/checkout@v2" }
+          }
+          1: (#struct){
+            name: (string){ "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit" }
+            run: (string){
+              "cd _scripts\ndocker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint=\"\" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c \" \\\n\tset -eu; \\\n\techo \\\"${{ secrets.gerritCookie }}\\\" > ~/.gitcookies; \\\n\tchmod 600 ~/.gitcookies; \\\n\tgit config --global user.name cueckoo; \\\n\tgit config --global user.email cueckoo@gmail.com; \\\n\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\\n  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\\n\tchmod 600 ~/.git-credentials; \\\n\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github-pr ${{ github.event.client_payload.payload.pr }}; \\\n\t\""
+              _#cmd(:ci): (string){ "github-pr ${{ github.event.client_payload.payload.pr }}" }
+            }
           }
         }
         defaults: (#struct){
@@ -1767,18 +1984,90 @@ import "strings"
         }
       }
     }
-    name: (string){ "Test Dispatch" }
+    _#runtrybot(:ci): (string){ "runtrybot" }
+    _#mirror(:ci): (string){ "mirror" }
+    _#importpr(:ci): (string){ "importpr" }
+    _#dispatchJob(:ci): (#struct){
+      "runs-on": (string){ "ubuntu-18.04" }
+      _#type(:ci): (string){ string }
+      if: (_|_){
+        // [incomplete] repository_dispatch._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
+        //     ./workflows.cue:134:14
+      }
+    }
+    name: (string){ "Repository Dispatch" }
     on: (#list){
       0: (string){ "repository_dispatch" }
     }
-    _#gerrit(:ci): (#struct){
-      _#setCodeReview(:ci): (#struct){
-        #args: (#struct){
-          message: (string){ string }
+  }
+  mirror: (#struct){
+    #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
+    #branch: (list){
+      0: (string){ strings.MinRunes(1) }
+    }
+    #configuration: ((bool|string|list|struct|number)){ |((string){ string }, (number){ number }, (bool){ bool }, (#struct){
+      }, (list){
+      }) }
+    #container: (#struct){
+      image: (string){ string }
+    }
+    #defaults: (#struct){
+    }
+    #env: (#struct){
+    }
+    #environment: (#struct){
+      name: (string){ string }
+    }
+    #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
+    #eventObject: (null){ null }
+    #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
+    #globs: (list){
+      0: (string){ strings.MinRunes(1) }
+    }
+    #machine: (string){ |((string){ "linux" }, (string){ "macos" }, (string){ "windows" }) }
+    #name: (string){ =~"^[_a-zA-Z][a-zA-Z0-9_-]*$" }
+    #path: (list){
+      0: (string){ strings.MinRunes(1) }
+    }
+    #ref: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
+    #shell: (string){ |((string){ string }, (string){ "bash" }, (string){ "pwsh" }, (string){ "python" }, (string){ "sh" }, (string){ "cmd" }, (string){ "powershell" }) }
+    #types: (list){
+      0: (_){ _ }
+    }
+    #: (#struct){
+      "working-directory": (string){ string }
+    }
+    jobs: (#struct){
+      mirror: (#struct){
+        "runs-on": (string){ "ubuntu-18.04" }
+        steps: (#list){
+          _#name(:ci): (string){ "Mirror Gerrit to GitHub" }
+          _#cmd(:ci): (string){ "github" }
+          0: (#struct){
+            name: (string){ "Checkout code" }
+            uses: (string){ "actions/checkout@v2" }
+          }
+          1: (#struct){
+            name: (string){ "Mirror Gerrit to GitHub" }
+            run: (string){
+              "cd _scripts\ndocker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint=\"\" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c \" \\\n\tset -eu; \\\n\techo \\\"${{ secrets.gerritCookie }}\\\" > ~/.gitcookies; \\\n\tchmod 600 ~/.gitcookies; \\\n\tgit config --global user.name cueckoo; \\\n\tgit config --global user.email cueckoo@gmail.com; \\\n\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\\n  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\\n\tchmod 600 ~/.git-credentials; \\\n\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \\\n\t\""
+              _#cmd(:ci): (string){ "github" }
+            }
+          }
         }
-        res: (_|_){
-          // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-          //     ./workflows.cue:180:9
+        defaults: (#struct){
+          run: (#struct){
+            shell: (string){ "bash" }
+          }
+        }
+      }
+    }
+    name: (string){ "Scheduled repo mirror" }
+    on: (#struct){
+      schedule: (#list){
+        0: (#struct){
+          cron: (string){ "*/30 * * * *" }
         }
       }
     }
@@ -1838,7 +2127,7 @@ import "strings"
             env: (#struct){
               GITHUB_TOKEN: (string){ "${{ secrets.ACTIONS_GITHUB_TOKEN }}" }
             }
-            uses: (string){ "docker://goreleaser/goreleaser:latest" }
+            uses: (string){ "docker://goreleaser/goreleaser:v0.110.0" }
             with: (#struct){
               args: (string){ "release --rm-dist" }
             }
@@ -2029,7 +2318,8 @@ import "strings"
   }
   _#step(:ci): (#struct){
   }
-  _#codeGenGo(:ci): (string){ "1.14.9" }
+  _#codeGenGo(:ci): (string){ "1.14.14" }
+  _#latestStableGo(:ci): (string){ "1.15.x" }
   _#linuxMachine(:ci): (string){ "ubuntu-18.04" }
   _#macosMachine(:ci): (string){ "macos-10.15" }
   _#windowsMachine(:ci): (string){ "windows-2019" }
@@ -2037,9 +2327,9 @@ import "strings"
     "fail-fast": (bool){ false }
     matrix: (#struct){
       "go-version": (#list){
-        0: (string){ "1.13.x" }
-        1: (string){ "1.14.9" }
-        2: (string){ "1.15.x" }
+        0: (string){ "1.14.14" }
+        1: (string){ "1.15.x" }
+        2: (string){ "1.16.0-rc1" }
       }
       os: (#list){
         0: (string){ "ubuntu-18.04" }
@@ -2053,6 +2343,7 @@ import "strings"
     uses: (string){ "actions/setup-go@v2" }
     with: (#struct){
       "go-version": (string){ "${{ matrix.go-version }}" }
+      stable: (bool){ false }
     }
   }
   _#checkoutCode(:ci): (#struct){
@@ -2071,7 +2362,7 @@ import "strings"
   _#goGenerate(:ci): (#struct){
     name: (string){ "Generate" }
     run: (string){ "go generate ./..." }
-    if: (string){ "matrix.go-version == '1.14.9' && matrix.os != 'windows-2019'" }
+    if: (string){ "matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'" }
   }
   _#goTest(:ci): (#struct){
     name: (string){ "Test" }
@@ -2095,6 +2386,28 @@ import "strings"
   }
   _#branchRefPrefix(:ci): (string){ "refs/heads/" }
   _#tempCueckooGitDir(:ci): (string){ "mkdir tmpgit\ncd tmpgit\ngit init\ngit config user.name cueckoo\ngit config user.email cueckoo@gmail.com\ngit config http.https://github.com/.extraheader \"AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)\"" }
+  _#cueckooCopybaraImage(:ci): (string){ "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c" }
+  _#copybaraCmd(:ci): (_|_){
+    // [incomplete] _#copybaraCmd: invalid interpolation: non-concrete value string (type string):
+    //     ./workflows.cue:342:2
+    _#cmd(:ci): (string){ string }
+  }
+  _#copybaraSteps(:ci): (#list){
+    _#name(:ci): (string){ string }
+    _#cmd(:ci): (string){ string }
+    0: (#struct){
+      name: (string){ "Checkout code" }
+      uses: (string){ "actions/checkout@v2" }
+    }
+    1: (#struct){
+      name: (string){ string }
+      run: (_|_){
+        // [incomplete] _#copybaraSteps.1.run: invalid interpolation: non-concrete value string (type string):
+        //     ./workflows.cue:342:2
+        _#cmd(:ci): (string){ string }
+      }
+    }
+  }
 }
 -- out/compile --
 --- workflows.cue

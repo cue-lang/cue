@@ -89,6 +89,9 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 			}
 			return true
 		}, nil)
+		if err := astutil.Sanitize(f); err != nil {
+			return err
+		}
 	}
 
 	return nil
@@ -109,8 +112,16 @@ func (t *trimmer) markRemove(c adt.Conjunct) {
 
 const dominatorNode = adt.ComprehensionSpan | adt.DefinitionSpan | adt.ConstraintSpan
 
+// isDominator reports whether a node can remove other nodes.
 func isDominator(c adt.Conjunct) bool {
 	return c.CloseInfo.IsInOneOf(dominatorNode)
+}
+
+// Removable reports whether a non-dominator conjunct can be removed. This is
+// not the case if it has pattern constraints that could turn into dominator
+// nodes.
+func removable(c adt.Conjunct) bool {
+	return c.CloseInfo.FieldTypes&(adt.HasAdditional|adt.HasPattern) == 0
 }
 
 // Roots of constraints are not allowed to strip conjuncts by
@@ -200,7 +211,7 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) int {
 	}
 
 	for _, c := range v.Conjuncts {
-		if !isDominator(c) {
+		if !isDominator(c) && removable(c) {
 			t.markRemove(c)
 		}
 	}

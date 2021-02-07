@@ -488,7 +488,7 @@ func Unwrap(v Value) Value {
 
 // OptionalType is a bit field of the type of optional constraints in use by an
 // Acceptor.
-type OptionalType int
+type OptionalType int8
 
 const (
 	HasField          OptionalType = 1 << iota // X: T

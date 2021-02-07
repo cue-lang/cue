@@ -1,0 +1,104 @@
+// Issue #716
+-- in.cue --
+keepPatternConstraintRoot: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	deployment: name: spec: []
+
+	deployment: [string]: spec: []
+}
+
+// TODO(additional): add once implemented
+// keepAdditionalRoots: {
+// 	if true {
+//		deployment: "name": {spec: [1]}
+//	}
+//
+//	deployment: name: spec: [1]
+//
+//	deployment: [string]: spec: [1]
+// }
+
+keepPatternConstraintRootSolo: {
+	if true {
+		deployment: "name": {spec: [1]}
+	}
+
+	deployment: [string]: spec: [1]
+}
+
+keepPatternConstraintRootIndirect: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	deployment: name: spec: []
+
+	deployment: indirect
+
+	indirect: {{[string]: spec: []}}
+}
+
+keepPatternConstraintRootDef: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	#Deployment: spec: []
+
+	deployment: name: #Deployment
+
+	deployment: [string]: spec: []
+}
+
+
+-- out/trim --
+== in.cue
+keepPatternConstraintRoot: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	deployment: [string]: spec: []
+}
+
+// TODO(additional): add once implemented
+// keepAdditionalRoots: {
+//  if true {
+//   deployment: "name": {spec: [1]}
+//  }
+//
+// deployment: name: spec: [1]
+//
+// deployment: [string]: spec: [1]
+// }
+
+keepPatternConstraintRootSolo: {
+	if true {
+		deployment: "name": {spec: [1]}
+	}
+
+	deployment: [string]: spec: [1]
+}
+
+keepPatternConstraintRootIndirect: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	deployment: indirect
+
+	indirect: {{[string]: spec: []}}
+}
+
+keepPatternConstraintRootDef: {
+	if true {
+		deployment: "name": {spec: []}
+	}
+
+	#Deployment: spec: []
+
+	deployment: [string]: spec: []
+}

@@ -385,9 +385,16 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 // insertConjuncts inserts conjuncts previously uninserted.
 func (n *nodeContext) insertConjuncts() {
 	for len(n.conjuncts) > 0 {
-		x := n.conjuncts[0]
+		nInfos := len(n.node.Structs)
+		p := &n.conjuncts[0]
 		n.conjuncts = n.conjuncts[1:]
-		n.addExprConjunct(x)
+		n.addExprConjunct(*p)
+
+		// Record the OptionalTypes for all structs that were inferred by this
+		// Conjunct. This information can be used by algorithms such as trim.
+		for i := nInfos; i < len(n.node.Structs); i++ {
+			p.CloseInfo.FieldTypes |= n.node.Structs[i].types
+		}
 	}
 }
 

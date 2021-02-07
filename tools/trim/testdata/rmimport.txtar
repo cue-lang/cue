@@ -1,0 +1,38 @@
+// Issue #716
+//
+// NOTE removing the empty import decl is more a job for
+// cue/format or astutil.Sanitize.
+
+-- a/a.cue --
+package a
+
+A: 5
+-- b.cue --
+package b
+
+import (
+	"example.com/blah/a"
+)
+
+#Def: {
+    y: 5
+}
+
+x: #Def
+x: y: a.A
+-- cue.mod/module.cue --
+module: "example.com/blah"
+
+-- out/trim --
+== b.cue
+package b
+
+import (
+)
+
+#Def: {
+	y: 5
+}
+
+x: #Def
+x: {}

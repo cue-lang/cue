@@ -93,7 +93,8 @@ const (
 type CloseInfo struct {
 	*closeInfo
 
-	IsClosed bool
+	IsClosed   bool
+	FieldTypes OptionalType
 }
 
 func (c CloseInfo) Location() Node {

@@ -5,12 +5,6 @@ raw: true
 {
 	a: 5 * [int]
 	a: [1, 2, ...]
-	b: <=5 * [int]
-	b: [1, 2, ...]
-	c: (>=3 & <=5) * [int]
-	c: [1, 2, ...]
-	d: >=2 * [int]
-	d: [1, 2, ...]
 	e: [...int]
 	e: [1, 2, ...]
 	f: [1, 2, ...]
@@ -30,30 +24,6 @@ f: [1, 2, ...]
       int,
     ])
     a: [
-      1,
-      2,
-      ...,
-    ]
-    b: (<=5 * [
-      int,
-    ])
-    b: [
-      1,
-      2,
-      ...,
-    ]
-    c: ((>=3 & <=5) * [
-      int,
-    ])
-    c: [
-      1,
-      2,
-      ...,
-    ]
-    d: (>=2 * [
-      int,
-    ])
-    d: [
       1,
       2,
       ...,
@@ -81,24 +51,6 @@ f: [1, 2, ...]
     2: (int){ int }
     3: (int){ int }
     4: (int){ int }
-  }
-  b: (_|_){
-    // [incomplete] b: non-concrete value <=5 in operand to *:
-    //     ./in.cue:4:5
-    0: (int){ 1 }
-    1: (int){ 2 }
-  }
-  c: (_|_){
-    // [incomplete] c: non-concrete value >=3 & <=5 in operand to *:
-    //     ./in.cue:6:5
-    0: (int){ 1 }
-    1: (int){ 2 }
-  }
-  d: (_|_){
-    // [incomplete] d: non-concrete value >=2 in operand to *:
-    //     ./in.cue:8:5
-    0: (int){ 1 }
-    1: (int){ 2 }
   }
   e: (list){
     0: (int){ 1 }

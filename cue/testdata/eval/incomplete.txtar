@@ -1,5 +1,3 @@
-These should all be incomplete errors.
-
 -- in.cue --
 s: string
 
@@ -17,23 +15,11 @@ E: {
   c: a+b & >=5
 }
 
-// Issue #129
-permanentlyIncompleteOperands: {
-    a: string + ":" + string
-    a: "golang/go:1.13.5"
-}
-
-issue680: (>10 * 2) & 0
-
+a: int
+okay: (>10 & <a) + 3
 
 -- out/eval --
-Errors:
-permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
-    ./in.cue:19:8
-
-Result:
-(_|_){
-  // [eval]
+(struct){
   s: (string){ string }
   e1: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
@@ -65,16 +51,10 @@ Result:
       //     ./in.cue:13:6
     }
   }
-  permanentlyIncompleteOperands: (_|_){
-    // [eval]
-    a: (_|_){
-      // [eval] permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
-      //     ./in.cue:19:8
-    }
-  }
-  issue680: (_|_){
-    // [incomplete] issue680: non-concrete value >10 in operand to *:
-    //     ./in.cue:23:12
+  a: (int){ int }
+  okay: (_|_){
+    // [incomplete] okay: non-concrete value >10 & int in operand to +:
+    //     ./in.cue:18:7
   }
 }
 -- out/compile --
@@ -92,9 +72,6 @@ Result:
     b: (〈0;c〉 - 〈0;a〉)
     c: ((〈0;a〉 + 〈0;b〉) & >=5)
   }
-  permanentlyIncompleteOperands: {
-    a: ((string + ":") + string)
-    a: "golang/go:1.13.5"
-  }
-  issue680: ((>10 * 2) & 0)
+  a: int
+  okay: ((>10 & <〈0;a〉) + 3)
 }

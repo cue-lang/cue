@@ -1,0 +1,60 @@
+// Issue #742
+// Issue #405
+
+-- in.cue --
+// Issue #129
+permanentlyIncompleteOperands: {
+    a: string + ":" + string
+    a: "golang/go:1.13.5"
+}
+
+permanentlyIncompleteOperandsNested: {
+    a: (int + 1) + (int + 1)
+}
+
+permanentlyIncompleteOperandsDisjunct: {
+    a: (int + 1) | (int + 1)
+}
+
+
+issue680: (>10 * 2) & 0
+
+issue405: >=100 <=200
+
+-- out/eval --
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:3:8
+permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:8:9
+permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:12:9
+issue680: invalid operand >10 ('*' requires concrete value):
+    ./in.cue:16:12
+issue405: invalid operand >=100 ('<=' requires concrete value):
+    ./in.cue:18:11
+-- out/compile --
+permanentlyIncompleteOperands.a: invalid operand string ('+' requires concrete value):
+    ./in.cue:3:8
+permanentlyIncompleteOperandsNested.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:8:9
+permanentlyIncompleteOperandsDisjunct.a: invalid operand int ('+' requires concrete value):
+    ./in.cue:12:9
+issue680: invalid operand >10 ('*' requires concrete value):
+    ./in.cue:16:12
+issue405: invalid operand >=100 ('<=' requires concrete value):
+    ./in.cue:18:11
+--- in.cue
+{
+  permanentlyIncompleteOperands: {
+    a: ((string + ":") + string)
+    a: "golang/go:1.13.5"
+  }
+  permanentlyIncompleteOperandsNested: {
+    a: ((int + 1) + (int + 1))
+  }
+  permanentlyIncompleteOperandsDisjunct: {
+    a: ((int + 1)|(int + 1))
+  }
+  issue680: ((>10 * 2) & 0)
+  issue405: (>=100 <= 200)
+}

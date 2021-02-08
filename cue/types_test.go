@@ -642,9 +642,6 @@ func TestList(t *testing.T) {
 		value: `[1,2,3]`,
 		res:   "[1,2,3,]",
 	}, {
-		value: `>=5*[1,2,3, ...int]`,
-		err:   "non-concrete value >=5 in operand to *",
-	}, {
 		value: `[for x in #y if x > 1 { x }]
 		#y: [1,2,3]`,
 		res: "[2,3,]",
@@ -2325,9 +2322,6 @@ func TestMarshalJSON(t *testing.T) {
 	}, {
 		value: `[int]`,
 		err:   `0: cannot convert incomplete value`,
-	}, {
-		value: `(>=3 * [1, 2])`,
-		err:   "cue: marshal error: non-concrete value >=3 in operand to *",
 	}, {
 		value: `{}`,
 		json:  `{}`,

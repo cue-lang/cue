@@ -273,12 +273,22 @@ func (c *OpContext) relLabel(upCount int32) Feature {
 }
 
 func (c *OpContext) concreteIsPossible(op Op, x Expr) bool {
-	if v, ok := x.(Value); ok {
-		if v.Concreteness() > Concrete {
-			c.AddErrf("invalid operand %s ('%s' requires concrete value)",
-				c.Str(x), op)
-			return false
-		}
+	if !AssertConcreteIsPossible(op, x) {
+		c.AddErrf("invalid operand %s ('%s' requires concrete value)",
+			c.Str(x), op)
+		return false
+	}
+	return true
+}
+
+// Assert that the given expression can evaluate to a concrete value.
+func AssertConcreteIsPossible(op Op, x Expr) bool {
+	switch v := x.(type) {
+	case *Bottom:
+	case *BoundExpr:
+		return false
+	case Value:
+		return v.Concreteness() == Concrete
 	}
 	return true
 }

@@ -57,7 +57,7 @@ changelog:
     - '^test:'
 
 brews:
-- github:
+- tap:
     owner: cuelang
     name: homebrew-tap
   commit_author:

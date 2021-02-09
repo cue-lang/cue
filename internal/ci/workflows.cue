@@ -250,53 +250,59 @@ release: _#bashWorkflow & {
 	jobs: {
 		goreleaser: {
 			"runs-on": _#linuxMachine
-			steps: [{
-				name: "Checkout code"
-				uses: "actions/checkout@v2"
-			}, {
-				name: "Unshallow" // required for the changelog to work correctly.
-				run:  "git fetch --prune --unshallow"
-			}, {
-				name: "Run GoReleaser"
-				env: GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
-				uses: "docker://goreleaser/goreleaser:v0.110.0"
-				with: args: "release --rm-dist"
-			}]
+			steps: [
+				_#checkoutCode & {
+					with: "fetch-depth": 0
+				},
+				_#installGo & {
+					with: version: _#latestStableGo
+				},
+				_#step & {
+					name: "Run GoReleaser"
+					env: GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
+					uses: "goreleaser/goreleaser-action@v2"
+					with: {
+						args:    "release --rm-dist"
+						version: "v0.155.1"
+					}
+				},
+			]
 		}
 		docker: {
 			name:      "docker"
 			"runs-on": _#linuxMachine
-			steps: [{
-				name: "Check out the repo"
-				uses: "actions/checkout@v2"
-			}, {
-				name: "Set version environment"
-				run: """
-					CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
-					echo \"CUE_VERSION=$CUE_VERSION\"
-					echo \"CUE_VERSION=$(echo $CUE_VERSION)\" >> $GITHUB_ENV
-					"""
-			}, {
-				name: "Push to Docker Hub"
-				env: {
-					DOCKER_BUILDKIT: 1
-					GOLANG_VERSION:  1.14
-					CUE_VERSION:     "${{ env.CUE_VERSION }}"
-				}
-				uses: "docker/build-push-action@v1"
-				with: {
-					tags:           "${{ env.CUE_VERSION }},latest"
-					repository:     "cuelang/cue"
-					username:       "${{ secrets.DOCKER_USERNAME }}"
-					password:       "${{ secrets.DOCKER_PASSWORD }}"
-					tag_with_ref:   false
-					tag_with_sha:   false
-					target:         "cue"
-					always_pull:    true
-					build_args:     "GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=v${{ env.CUE_VERSION }}"
-					add_git_labels: true
-				}
-			}]
+			steps: [
+				_#checkoutCode,
+				_#step & {
+					name: "Set version environment"
+					run: """
+						CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
+						echo \"CUE_VERSION=$CUE_VERSION\"
+						echo \"CUE_VERSION=$(echo $CUE_VERSION)\" >> $GITHUB_ENV
+						"""
+				},
+				_#step & {
+					name: "Push to Docker Hub"
+					env: {
+						DOCKER_BUILDKIT: 1
+						GOLANG_VERSION:  1.14
+						CUE_VERSION:     "${{ env.CUE_VERSION }}"
+					}
+					uses: "docker/build-push-action@v1"
+					with: {
+						tags:           "${{ env.CUE_VERSION }},latest"
+						repository:     "cuelang/cue"
+						username:       "${{ secrets.DOCKER_USERNAME }}"
+						password:       "${{ secrets.DOCKER_PASSWORD }}"
+						tag_with_ref:   false
+						tag_with_sha:   false
+						target:         "cue"
+						always_pull:    true
+						build_args:     "GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=v${{ env.CUE_VERSION }}"
+						add_git_labels: true
+					}
+				},
+			]
 		}
 	}
 }
@@ -324,8 +330,10 @@ _#job:  ((json.#Workflow & {}).jobs & {x: _}).x
 _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 
 // We need at least go1.14 for code generation
-_#codeGenGo:      "1.14.14"
-_#latestStableGo: "1.15.x"
+_#codeGenGo: "1.14.14"
+
+// Use a specific latest version for release builds
+_#latestStableGo: "1.15.8"
 
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
@@ -344,7 +352,7 @@ _#installGo: _#step & {
 	name: "Install Go"
 	uses: "actions/setup-go@v2"
 	with: {
-		"go-version": "${{ matrix.go-version }}"
+		"go-version": *"${{ matrix.go-version }}" | string
 		stable:       false
 	}
 }

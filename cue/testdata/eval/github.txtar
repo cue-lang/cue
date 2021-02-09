@@ -194,33 +194,31 @@ release: _#bashWorkflow & {
 	jobs: {
 		goreleaser: {
 			"runs-on": _#linuxMachine
-			steps: [{
-				name: "Checkout code"
-				uses: "actions/checkout@v2"
-			}, {
-				name: "Unshallow"
-				run:  "git fetch --prune --unshallow"
-			}, {
+			steps: [_#checkoutCode & {
+				with: "fetch-depth": 0
+			}, _#installGo & {
+				with: version: _#latestStableGo
+			}, _#step & {
 				name: "Run GoReleaser"
 				env: GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
-				uses: "docker://goreleaser/goreleaser:v0.110.0"
-				with: args: "release --rm-dist"
+				uses: "goreleaser/goreleaser-action@v2"
+				with: {
+					args:    "release --rm-dist"
+					version: "v0.155.1"
+				}
 			}]
 		}
 		docker: {
 			name:      "docker"
 			"runs-on": _#linuxMachine
-			steps: [{
-				name: "Check out the repo"
-				uses: "actions/checkout@v2"
-			}, {
+			steps: [_#checkoutCode, _#step & {
 				name: "Set version environment"
 				run: """
 					CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
 					echo \"CUE_VERSION=$CUE_VERSION\"
 					echo \"CUE_VERSION=$(echo $CUE_VERSION)\" >> $GITHUB_ENV
 					"""
-			}, {
+			}, _#step & {
 				name: "Push to Docker Hub"
 				env: {
 					DOCKER_BUILDKIT: 1
@@ -269,8 +267,10 @@ _#step: ((_#job & {
 }).steps & [_])[0]
 
 // We need at least go1.14 for code generation
-_#codeGenGo:      "1.14.14"
-_#latestStableGo: "1.15.x"
+_#codeGenGo: "1.14.14"
+
+// Use a specific latest version for release builds
+_#latestStableGo: "1.15.8"
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
 _#windowsMachine: "windows-2019"
@@ -286,7 +286,7 @@ _#installGo: _#step & {
 	name: "Install Go"
 	uses: "actions/setup-go@v2"
 	with: {
-		"go-version": "${{ matrix.go-version }}"
+		"go-version": *"${{ matrix.go-version }}" | string
 		stable:       false
 	}
 }
@@ -1114,7 +1114,7 @@ import "strings"
               matrix: (#struct){
                 "go-version": (#list){
                   0: (string){ "1.14.14" }
-                  1: (string){ "1.15.x" }
+                  1: (string){ "1.15.8" }
                   2: (string){ "1.16.0-rc1" }
                 }
                 os: (#list){
@@ -1134,7 +1134,7 @@ import "strings"
                 name: (string){ "Install Go" }
                 uses: (string){ "actions/setup-go@v2" }
                 with: (#struct){
-                  "go-version": (string){ "${{ matrix.go-version }}" }
+                  "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
                   stable: (bool){ false }
                 }
               }
@@ -1163,7 +1163,7 @@ import "strings"
               6: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
-                if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.15.x' && matrix.os == 'ubuntu-18.04' }}" }
+                if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.15.8' && matrix.os == 'ubuntu-18.04' }}" }
               }
               7: (#struct){
                 name: (string){ "gorelease check" }
@@ -1442,19 +1442,28 @@ import "strings"
               0: (#struct){
                 name: (string){ "Checkout code" }
                 uses: (string){ "actions/checkout@v2" }
+                with: (#struct){
+                  "fetch-depth": (int){ 0 }
+                }
               }
               1: (#struct){
-                name: (string){ "Unshallow" }
-                run: (string){ "git fetch --prune --unshallow" }
+                name: (string){ "Install Go" }
+                uses: (string){ "actions/setup-go@v2" }
+                with: (#struct){
+                  "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
+                  stable: (bool){ false }
+                  version: (string){ "1.15.8" }
+                }
               }
               2: (#struct){
                 name: (string){ "Run GoReleaser" }
                 env: (#struct){
                   GITHUB_TOKEN: (string){ "${{ secrets.ACTIONS_GITHUB_TOKEN }}" }
                 }
-                uses: (string){ "docker://goreleaser/goreleaser:v0.110.0" }
+                uses: (string){ "goreleaser/goreleaser-action@v2" }
                 with: (#struct){
                   args: (string){ "release --rm-dist" }
+                  version: (string){ "v0.155.1" }
                 }
               }
             }
@@ -1469,7 +1478,7 @@ import "strings"
             "runs-on": (string){ "ubuntu-18.04" }
             steps: (#list){
               0: (#struct){
-                name: (string){ "Check out the repo" }
+                name: (string){ "Checkout code" }
                 uses: (string){ "actions/checkout@v2" }
               }
               1: (#struct){
@@ -1723,7 +1732,7 @@ import "strings"
           matrix: (#struct){
             "go-version": (#list){
               0: (string){ "1.14.14" }
-              1: (string){ "1.15.x" }
+              1: (string){ "1.15.8" }
               2: (string){ "1.16.0-rc1" }
             }
             os: (#list){
@@ -1743,7 +1752,7 @@ import "strings"
             name: (string){ "Install Go" }
             uses: (string){ "actions/setup-go@v2" }
             with: (#struct){
-              "go-version": (string){ "${{ matrix.go-version }}" }
+              "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
               stable: (bool){ false }
             }
           }
@@ -1772,7 +1781,7 @@ import "strings"
           6: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
-            if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.15.x' && matrix.os == 'ubuntu-18.04' }}" }
+            if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.15.8' && matrix.os == 'ubuntu-18.04' }}" }
           }
           7: (#struct){
             name: (string){ "gorelease check" }
@@ -2117,19 +2126,28 @@ import "strings"
           0: (#struct){
             name: (string){ "Checkout code" }
             uses: (string){ "actions/checkout@v2" }
+            with: (#struct){
+              "fetch-depth": (int){ 0 }
+            }
           }
           1: (#struct){
-            name: (string){ "Unshallow" }
-            run: (string){ "git fetch --prune --unshallow" }
+            name: (string){ "Install Go" }
+            uses: (string){ "actions/setup-go@v2" }
+            with: (#struct){
+              "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
+              stable: (bool){ false }
+              version: (string){ "1.15.8" }
+            }
           }
           2: (#struct){
             name: (string){ "Run GoReleaser" }
             env: (#struct){
               GITHUB_TOKEN: (string){ "${{ secrets.ACTIONS_GITHUB_TOKEN }}" }
             }
-            uses: (string){ "docker://goreleaser/goreleaser:v0.110.0" }
+            uses: (string){ "goreleaser/goreleaser-action@v2" }
             with: (#struct){
               args: (string){ "release --rm-dist" }
+              version: (string){ "v0.155.1" }
             }
           }
         }
@@ -2144,7 +2162,7 @@ import "strings"
         "runs-on": (string){ "ubuntu-18.04" }
         steps: (#list){
           0: (#struct){
-            name: (string){ "Check out the repo" }
+            name: (string){ "Checkout code" }
             uses: (string){ "actions/checkout@v2" }
           }
           1: (#struct){
@@ -2319,7 +2337,7 @@ import "strings"
   _#step(:ci): (#struct){
   }
   _#codeGenGo(:ci): (string){ "1.14.14" }
-  _#latestStableGo(:ci): (string){ "1.15.x" }
+  _#latestStableGo(:ci): (string){ "1.15.8" }
   _#linuxMachine(:ci): (string){ "ubuntu-18.04" }
   _#macosMachine(:ci): (string){ "macos-10.15" }
   _#windowsMachine(:ci): (string){ "windows-2019" }
@@ -2328,7 +2346,7 @@ import "strings"
     matrix: (#struct){
       "go-version": (#list){
         0: (string){ "1.14.14" }
-        1: (string){ "1.15.x" }
+        1: (string){ "1.15.8" }
         2: (string){ "1.16.0-rc1" }
       }
       os: (#list){
@@ -2342,7 +2360,7 @@ import "strings"
     name: (string){ "Install Go" }
     uses: (string){ "actions/setup-go@v2" }
     with: (#struct){
-      "go-version": (string){ "${{ matrix.go-version }}" }
+      "go-version": (string){ |(*(string){ "${{ matrix.go-version }}" }, (string){ string }) }
       stable: (bool){ false }
     }
   }
@@ -2634,39 +2652,39 @@ import "strings"
       goreleaser: {
         "runs-on": 〈3;_#linuxMachine〉
         steps: [
-          {
-            name: "Checkout code"
-            uses: "actions/checkout@v2"
-          },
-          {
-            name: "Unshallow"
-            run: "git fetch --prune --unshallow"
-          },
-          {
+          (〈3;_#checkoutCode〉 & {
+            with: {
+              "fetch-depth": 0
+            }
+          }),
+          (〈3;_#installGo〉 & {
+            with: {
+              version: 〈5;_#latestStableGo〉
+            }
+          }),
+          (〈3;_#step〉 & {
             name: "Run GoReleaser"
             env: {
               GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
             }
-            uses: "docker://goreleaser/goreleaser:v0.110.0"
+            uses: "goreleaser/goreleaser-action@v2"
             with: {
               args: "release --rm-dist"
+              version: "v0.155.1"
             }
-          },
+          }),
         ]
       }
       docker: {
         name: "docker"
         "runs-on": 〈3;_#linuxMachine〉
         steps: [
-          {
-            name: "Check out the repo"
-            uses: "actions/checkout@v2"
-          },
-          {
+          〈3;_#checkoutCode〉,
+          (〈3;_#step〉 & {
             name: "Set version environment"
             run: "CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})\necho \"CUE_VERSION=$CUE_VERSION\"\necho \"CUE_VERSION=$(echo $CUE_VERSION)\" >> $GITHUB_ENV"
-          },
-          {
+          }),
+          (〈3;_#step〉 & {
             name: "Push to Docker Hub"
             env: {
               DOCKER_BUILDKIT: 1
@@ -2686,7 +2704,7 @@ import "strings"
               build_args: "GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=v${{ env.CUE_VERSION }}"
               add_git_labels: true
             }
-          },
+          }),
         ]
       }
     }
@@ -2732,7 +2750,7 @@ import "strings"
     _,
   ])[0]
   _#codeGenGo: "1.14.14"
-  _#latestStableGo: "1.15.x"
+  _#latestStableGo: "1.15.8"
   _#linuxMachine: "ubuntu-18.04"
   _#macosMachine: "macos-10.15"
   _#windowsMachine: "windows-2019"
@@ -2755,7 +2773,7 @@ import "strings"
     name: "Install Go"
     uses: "actions/setup-go@v2"
     with: {
-      "go-version": "${{ matrix.go-version }}"
+      "go-version": (*"${{ matrix.go-version }}"|string)
       stable: false
     }
   })

@@ -14,14 +14,21 @@ jobs:
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
-    - name: Unshallow
-      run: git fetch --prune --unshallow
+      with:
+        fetch-depth: 0
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: ${{ matrix.go-version }}
+        version: 1.15.8
+        stable: false
     - name: Run GoReleaser
-      env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
-      uses: docker://goreleaser/goreleaser:v0.110.0
+      uses: goreleaser/goreleaser-action@v2
       with:
         args: release --rm-dist
+        version: v0.155.1
+      env:
+        GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
   docker:
     name: docker
     runs-on: ubuntu-18.04
@@ -29,7 +36,7 @@ jobs:
       run:
         shell: bash
     steps:
-    - name: Check out the repo
+    - name: Checkout code
       uses: actions/checkout@v2
     - name: Set version environment
       run: |-
@@ -37,10 +44,6 @@ jobs:
         echo "CUE_VERSION=$CUE_VERSION"
         echo "CUE_VERSION=$(echo $CUE_VERSION)" >> $GITHUB_ENV
     - name: Push to Docker Hub
-      env:
-        DOCKER_BUILDKIT: 1
-        GOLANG_VERSION: 1.14
-        CUE_VERSION: ${{ env.CUE_VERSION }}
       uses: docker/build-push-action@v1
       with:
         tags: ${{ env.CUE_VERSION }},latest
@@ -54,3 +57,7 @@ jobs:
         build_args: GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=v${{ env.CUE_VERSION
           }}
         add_git_labels: true
+      env:
+        DOCKER_BUILDKIT: 1
+        GOLANG_VERSION: 1.14
+        CUE_VERSION: ${{ env.CUE_VERSION }}

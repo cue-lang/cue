@@ -16,6 +16,7 @@ package kubernetes
 
 import (
 	"bytes"
+	"context"
 	"flag"
 	"fmt"
 	"io"
@@ -30,6 +31,7 @@ import (
 
 	"github.com/kylelemons/godebug/diff"
 
+	"cuelang.org/go/cmd/cue/cmd"
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/internal/copy"
 	"cuelang.org/go/internal/cuetest"
@@ -72,7 +74,7 @@ func TestTutorial(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	cuetest.Run(t, dir, "cue mod init", &cuetest.Config{
+	run(t, dir, "cue mod init", &config{
 		// Stdin: strings.NewReader(input),
 	})
 
@@ -167,7 +169,7 @@ func TestTutorial(t *testing.T) {
 					break
 				}
 
-				cuetest.Run(t, wd, cmd, &cuetest.Config{
+				run(t, wd, cmd, &config{
 					Stdin:  strings.NewReader(input),
 					Stdout: os.Stdout,
 				})
@@ -265,16 +267,11 @@ func isCUE(filename string) bool {
 	return filepath.Ext(filename) == ".cue" && !strings.Contains(filename, "_tool")
 }
 
-func logf(t *testing.T, format string, args ...interface{}) {
-	t.Logf(format, args...)
-	log.Printf(format, args...)
-}
-
 func TestEval(t *testing.T) {
 	for _, dir := range []string{"quick", "manual"} {
 		t.Run(dir, func(t *testing.T) {
 			buf := &bytes.Buffer{}
-			cuetest.Run(t, dir, "cue eval ./...", &cuetest.Config{
+			run(t, dir, "cue eval ./...", &config{
 				Stdout: buf,
 			})
 
@@ -308,4 +305,95 @@ func TestEval(t *testing.T) {
 			}
 		})
 	}
+}
+
+type config struct {
+	Stdin  io.Reader
+	Stdout io.Writer
+	Golden string
+}
+
+// run executes the given command in the given directory and reports any
+// errors comparing it to the gold standard.
+func run(t *testing.T, dir, command string, cfg *config) {
+	if cfg == nil {
+		cfg = &config{}
+	}
+
+	old, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	defer func() { os.Chdir(old) }()
+
+	logf(t, "Executing command: %s", command)
+
+	command = strings.TrimSpace(command[4:])
+	args := splitArgs(t, command)
+	logf(t, "Args: %q", args)
+
+	buf := &bytes.Buffer{}
+	if cfg.Golden != "" {
+		if cfg.Stdout != nil {
+			t.Fatal("cannot set Golden and Stdout")
+		}
+		cfg.Stdout = buf
+	}
+	cmd, err := cmd.New(args)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if cfg.Stdout != nil {
+		cmd.SetOutput(cfg.Stdout)
+	} else {
+		cmd.SetOutput(buf)
+	}
+	if cfg.Stdin != nil {
+		cmd.SetInput(cfg.Stdin)
+	}
+	if err = cmd.Run(context.Background()); err != nil {
+		if cfg.Stdout == nil {
+			logf(t, "Output:\n%s", buf.String())
+		}
+		logf(t, "Execution failed: %v", err)
+	}
+
+	if cfg.Golden == "" {
+		return
+	}
+
+	pattern := fmt.Sprintf("//.*%s.*", regexp.QuoteMeta(dir))
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		t.Fatal(err)
+	}
+	got := re.ReplaceAllString(buf.String(), "")
+	got = strings.TrimSpace(got)
+
+	want := strings.TrimSpace(cfg.Golden)
+	if got != want {
+		t.Errorf("files differ:\n%s", diff.Diff(got, want))
+	}
+}
+
+func logf(t *testing.T, format string, args ...interface{}) {
+	t.Helper()
+	t.Logf(format, args...)
+}
+
+func splitArgs(t *testing.T, s string) (args []string) {
+	c := cuetest.NewChunker(t, []byte(s))
+	for {
+		found := c.Find(" '")
+		args = append(args, strings.Split(c.Text(), " ")...)
+		if !found {
+			break
+		}
+		c.Next("", "' ")
+		args = append(args, c.Text())
+	}
+	return args
 }

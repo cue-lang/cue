@@ -1,0 +1,13 @@
+cue eval ./float.cue
+cmp stderr expect-stderr
+cmp stdout expect-stdout
+-- float.cue --
+import "strconv"
+
+x : strconv.ParseFloat("3.14", 32)
+y : strconv.ParseFloat("3.14", 64)
+
+-- expect-stderr --
+-- expect-stdout --
+x: 3.140000104904175
+y: 3.14

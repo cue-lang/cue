@@ -274,7 +274,9 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 	case *big.Float:
 		n := &adt.Num{Src: src, K: adt.FloatKind}
 		_, _, err := n.X.SetString(v.String())
-		ctx.AddErr(errors.Promote(err, "invalid float"))
+		if err != nil {
+			return ctx.AddErr(errors.Promote(err, "invalid float"))
+		}
 		return n
 
 	case *apd.Decimal:
@@ -355,13 +357,17 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 		return toUint(ctx, uint64(v))
 	case float64:
 		n := &adt.Num{Src: src, K: adt.FloatKind}
-		_, _, err := n.X.SetString(fmt.Sprintf("%g", v))
-		ctx.AddErr(errors.Promote(err, "invalid float"))
+		_, _, err := n.X.SetString(fmt.Sprint(v))
+		if err != nil {
+			return ctx.AddErr(errors.Promote(err, "invalid float"))
+		}
 		return n
 	case float32:
 		n := &adt.Num{Src: src, K: adt.FloatKind}
-		_, _, err := n.X.SetString(fmt.Sprintf("%g", v))
-		ctx.AddErr(errors.Promote(err, "invalid float"))
+		_, _, err := n.X.SetString(fmt.Sprint(v))
+		if err != nil {
+			return ctx.AddErr(errors.Promote(err, "invalid float"))
+		}
 		return n
 
 	case reflect.Value:

@@ -978,6 +978,38 @@ func TestFill2(t *testing.T) {
 	}
 }
 
+func TestFillFloat(t *testing.T) {
+	// This tests panics for issue #749
+
+	want := `{
+	x: 3.14
+}`
+
+	filltest := func(x interface{}) {
+		r := &Runtime{}
+		i, err := r.Compile("test", `
+	x: number
+	`)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		i, err = i.Fill(x, "x")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		got := fmt.Sprint(i.Value())
+		if got != want {
+			t.Errorf("got:  %s\nwant: %s", got, want)
+		}
+	}
+
+	filltest(float32(3.14))
+	filltest(float64(3.14))
+	filltest(big.NewFloat(3.14))
+}
+
 func TestValue_LookupDef(t *testing.T) {
 	r := &Runtime{}
 

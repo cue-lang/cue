@@ -1,0 +1,20 @@
+-- in.cue --
+#dev:   int
+"#dev": int
+_dev:   int
+_#dev:  int
+-- out/compile --
+--- in.cue
+{
+  #dev: int
+  "#dev": int
+  _dev: int
+  _#dev: int
+}
+-- out/eval --
+(struct){
+  #dev: (int){ int }
+  "#dev": (int){ int }
+  _dev: (int){ int }
+  _#dev: (int){ int }
+}

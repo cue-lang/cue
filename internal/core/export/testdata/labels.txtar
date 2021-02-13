@@ -1,0 +1,89 @@
+-- in.cue --
+package foo
+
+#def:   int
+"#def": int
+_def:   int
+_#def:  int
+
+a: {
+    #def:   int
+    "#def": int
+    _def:   int
+    _#def:  int
+}
+
+-- out/definition --
+package foo
+
+#def:   int
+"#def": int
+_def:   int
+_#def:  int
+a: {
+	#def:   int
+	"#def": int
+	_def:   int
+	_#def:  int
+}
+-- out/doc --
+[]
+[#def]
+["#def"]
+[_def]
+[_#def]
+[a]
+[a #def]
+[a "#def"]
+[a _def]
+[a _#def]
+-- out/value --
+== Simplified
+{
+	"#def": int
+	a: {
+		"#def": int
+	}
+}
+== Raw
+{
+	#def:   int
+	"#def": int
+	_def:   int
+	_#def:  int
+	a: {
+		#def:   int
+		"#def": int
+		_def:   int
+		_#def:  int
+	}
+}
+== Final
+{
+	"#def": int
+	a: {
+		"#def": int
+	}
+}
+== All
+{
+	#def:   int
+	"#def": int
+	_def:   int
+	_#def:  int
+	a: {
+		#def:   int
+		"#def": int
+		_def:   int
+		_#def:  int
+	}
+}
+== Eval
+{
+	#def:   int
+	"#def": int
+	a: {
+		#def:   int
+		"#def": int
+	}
+}

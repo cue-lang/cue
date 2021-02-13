@@ -333,6 +333,8 @@ func TestX(t *testing.T) {
 
 	files := instances[0].Files
 
+	Debug = true
+
 	err := Files(files, inst, &Config{
 		Trace: true,
 	})

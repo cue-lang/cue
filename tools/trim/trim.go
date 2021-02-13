@@ -50,11 +50,15 @@
 package trim
 
 import (
+	"io"
+	"os"
+
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
 )
@@ -77,6 +81,8 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 		Config: *cfg,
 		ctx:    adt.NewContext(r, v),
 		remove: map[ast.Node]bool{},
+		debug:  Debug,
+		w:      os.Stderr,
 	}
 
 	t.findSubordinates(v)
@@ -102,11 +108,20 @@ type trimmer struct {
 
 	ctx    *adt.OpContext
 	remove map[ast.Node]bool
+
+	debug  bool
+	indent int
+	w      io.Writer
 }
+
+var Debug bool = false
 
 func (t *trimmer) markRemove(c adt.Conjunct) {
 	if src := c.Expr().Source(); src != nil {
 		t.remove[src] = true
+		if t.debug {
+			t.logf("removing %s", debug.NodeString(t.ctx, c.Expr(), nil))
+		}
 	}
 }
 
@@ -148,6 +163,8 @@ const (
 )
 
 func (t *trimmer) findSubordinates(v *adt.Vertex) int {
+	defer un(t.trace(v))
+
 	// TODO(structure sharing): do not descend into vertices whose parent is not
 	// equal to the parent. This is not relevant at this time, but may be so in
 	// the future.

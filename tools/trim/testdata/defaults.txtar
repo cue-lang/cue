@@ -1,7 +1,25 @@
 -- in.cue --
-foo: [string]: a: *1 | int
-foo: b: a: 1
+domToSub: {
+    foo: [string]: a: *1 | int
+    foo: b: a: 1
+}
+
+// Issue #759
+subToDom: {
+    #maybeString: {ip?: string}
+    something: ip: *"default" | string
+    something: #maybeString
+}
 -- out/trim --
 == in.cue
-foo: [string]: a: *1 | int
-foo: b: {}
+domToSub: {
+	foo: [string]: a: *1 | int
+	foo: b: {}
+}
+
+// Issue #759
+subToDom: {
+	#maybeString: {ip?: string}
+	something: ip: *"default" | string
+	something: #maybeString
+}

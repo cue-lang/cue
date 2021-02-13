@@ -235,6 +235,11 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
 		doms.Finalize(t.ctx)
 		doms = doms.Default()
 
+		// This should normally not be necessary, as subsume should catch this.
+		// But as we already take the default value for doms, it doesn't hurt to
+		// do it.
+		v = v.Default()
+
 		// This is not necessary, but seems like it may result in more
 		// user-friendly semantics.
 		if doms.IsErr() || v.IsErr() {

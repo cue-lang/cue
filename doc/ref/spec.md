@@ -127,6 +127,7 @@ The underscore character _ (U+005F) is considered a letter.
 ```
 letter        = unicode_letter | "_" .
 decimal_digit = "0" … "9" .
+binary_digit  = "0" … "1" .
 octal_digit   = "0" … "7" .
 hex_digit     = "0" … "9" | "A" … "F" | "a" … "f" .
 ```

@@ -78,11 +78,12 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 	v := vx.(*adt.Vertex)
 
 	t := &trimmer{
-		Config: *cfg,
-		ctx:    adt.NewContext(r, v),
-		remove: map[ast.Node]bool{},
-		debug:  Debug,
-		w:      os.Stderr,
+		Config:  *cfg,
+		ctx:     adt.NewContext(r, v),
+		remove:  map[ast.Node]bool{},
+		exclude: map[ast.Node]bool{},
+		debug:   Debug,
+		w:       os.Stderr,
 	}
 
 	t.findSubordinates(v)
@@ -90,7 +91,7 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 	// Remove subordinate values from files.
 	for _, f := range files {
 		astutil.Apply(f, func(c astutil.Cursor) bool {
-			if f, ok := c.Node().(*ast.Field); ok && t.remove[f.Value] {
+			if f, ok := c.Node().(*ast.Field); ok && t.remove[f.Value] && !t.exclude[f.Value] {
 				c.Delete()
 			}
 			return true
@@ -106,8 +107,9 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 type trimmer struct {
 	Config
 
-	ctx    *adt.OpContext
-	remove map[ast.Node]bool
+	ctx     *adt.OpContext
+	remove  map[ast.Node]bool
+	exclude map[ast.Node]bool
 
 	debug  bool
 	indent int
@@ -125,6 +127,18 @@ func (t *trimmer) markRemove(c adt.Conjunct) {
 	}
 }
 
+func (t *trimmer) markKeep(c adt.Conjunct) {
+	if isDominator(c) {
+		return
+	}
+	if src := c.Expr().Source(); src != nil {
+		t.exclude[src] = true
+		if t.debug {
+			t.logf("keeping")
+		}
+	}
+}
+
 const dominatorNode = adt.ComprehensionSpan | adt.DefinitionSpan | adt.ConstraintSpan
 
 // isDominator reports whether a node can remove other nodes.
@@ -135,17 +149,18 @@ func isDominator(c adt.Conjunct) bool {
 // Removable reports whether a non-dominator conjunct can be removed. This is
 // not the case if it has pattern constraints that could turn into dominator
 // nodes.
-func removable(c adt.Conjunct) bool {
+func removable(c adt.Conjunct, v *adt.Vertex) bool {
 	return c.CloseInfo.FieldTypes&(adt.HasAdditional|adt.HasPattern) == 0
 }
 
 // Roots of constraints are not allowed to strip conjuncts by
 // themselves as it will eliminate the reason for the trigger.
-func allowRemove(v *adt.Vertex) bool {
+func (t *trimmer) allowRemove(v *adt.Vertex) bool {
 	for _, c := range v.Conjuncts {
-		if isDominator(c) &&
-			(c.CloseInfo.Location() != c.Expr() ||
-				c.CloseInfo.RootSpanType() != adt.ConstraintSpan) {
+		isDom := isDominator(c)
+		loc := c.CloseInfo.Location() != c.Expr()
+		isSpan := c.CloseInfo.RootSpanType() != adt.ConstraintSpan
+		if isDom && (loc || isSpan) {
 			return true
 		}
 	}
@@ -162,8 +177,15 @@ const (
 	yes
 )
 
-func (t *trimmer) findSubordinates(v *adt.Vertex) int {
+func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
 	defer un(t.trace(v))
+	defer func() {
+		if result == no {
+			for _, c := range v.Conjuncts {
+				t.markKeep(c)
+			}
+		}
+	}()
 
 	// TODO(structure sharing): do not descend into vertices whose parent is not
 	// equal to the parent. This is not relevant at this time, but may be so in
@@ -184,7 +206,7 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) int {
 		}
 	}
 
-	if !allowRemove(v) {
+	if !t.allowRemove(v) {
 		return no
 	}
 
@@ -228,7 +250,7 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) int {
 	}
 
 	for _, c := range v.Conjuncts {
-		if !isDominator(c) && removable(c) {
+		if !isDominator(c) && removable(c, v) {
 			t.markRemove(c)
 		}
 	}

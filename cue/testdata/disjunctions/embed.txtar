@@ -35,6 +35,32 @@ forceStruct: {
     {}
 }
 
+defaultsMulti: {
+    a: {
+        #def: {
+            *{} | {a: string} | {b: string}
+            *{} | {c: string} | {d: string}
+        }
+
+        a: #def & {a: "foo"}
+    }
+
+    b: {
+        #def: {
+            *{} | {a: string} | {b: string}
+            *{} | {c: string} | {d: string}
+            *{} | {d: string} | {e: string}
+        }
+
+        a: #def & {a: "foo", e: "bar"}
+    }
+}
+
+nested: {
+	a: 1 | 2 | *(
+		(3 | 4 | *( 5 | 6 | *7)) & ( 3 | 4 | ( *7 | 8 )))
+}
+
 -- out/eval --
 (struct){
   default: (struct){
@@ -83,6 +109,137 @@ forceStruct: {
       }) }
     a: (int){ 2 }
   }
+  defaultsMulti: (struct){
+    a: (struct){
+      #def: (struct){ |(*(#struct){
+        }, (#struct){
+          c: (string){ string }
+        }, (#struct){
+          d: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          c: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          c: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          d: (string){ string }
+        }) }
+      a: (struct){ |(*(#struct){
+          a: (string){ "foo" }
+        }, (#struct){
+          a: (string){ "foo" }
+          c: (string){ string }
+        }, (#struct){
+          a: (string){ "foo" }
+          d: (string){ string }
+        }) }
+    }
+    b: (struct){
+      #def: (struct){ |(*(#struct){
+        }, (#struct){
+          d: (string){ string }
+        }, (#struct){
+          e: (string){ string }
+        }, (#struct){
+          c: (string){ string }
+        }, (#struct){
+          c: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          c: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          d: (string){ string }
+        }, (#struct){
+          d: (string){ string }
+        }, (#struct){
+          d: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          c: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          c: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          c: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          a: (string){ string }
+          d: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          c: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          c: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          c: (string){ string }
+          e: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          d: (string){ string }
+        }, (#struct){
+          b: (string){ string }
+          d: (string){ string }
+          e: (string){ string }
+        }) }
+      a: (struct){ |(*(#struct){
+          a: (string){ "foo" }
+          e: (string){ "bar" }
+        }, (#struct){
+          a: (string){ "foo" }
+          e: (string){ "bar" }
+          c: (string){ string }
+        }, (#struct){
+          a: (string){ "foo" }
+          e: (string){ "bar" }
+          d: (string){ string }
+        }) }
+    }
+  }
+  nested: (struct){
+    a: (int){ |(*(int){ 7 }, (int){ 2 }, (int){ 3 }, (int){ 4 }, (int){ 1 }) }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -127,5 +284,50 @@ forceStruct: {
     })
     〈0;#y〉
     {}
+  }
+  defaultsMulti: {
+    a: {
+      #def: {
+        (*{}|{
+          a: string
+        }|{
+          b: string
+        })
+        (*{}|{
+          c: string
+        }|{
+          d: string
+        })
+      }
+      a: (〈0;#def〉 & {
+        a: "foo"
+      })
+    }
+    b: {
+      #def: {
+        (*{}|{
+          a: string
+        }|{
+          b: string
+        })
+        (*{}|{
+          c: string
+        }|{
+          d: string
+        })
+        (*{}|{
+          d: string
+        }|{
+          e: string
+        })
+      }
+      a: (〈0;#def〉 & {
+        a: "foo"
+        e: "bar"
+      })
+    }
+  }
+  nested: {
+    a: (1|2|*((3|4|*(5|6|*7)) & (3|4|(*7|8))))
   }
 }

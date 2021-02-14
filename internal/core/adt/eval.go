@@ -783,14 +783,31 @@ type nodeContext struct {
 	hasTop      bool
 	hasCycle    bool // has conjunct with structural cycle
 	hasNonCycle bool // has conjunct without structural cycle
-	protoCount  int32
 
 	// Disjunction handling
 	disjunctions []envDisjunct
+
+	// usedDefault indicates the for each of possibly multiple parent
+	// disjunctions whether it is unified with a default disjunct or not.
+	// This is then later used to determine whether a disjunction should
+	// be treated as a marked disjunction.
+	usedDefault []defaultInfo
+
 	defaultMode  defaultMode
 	disjuncts    []*nodeContext
 	buffer       []*nodeContext
 	disjunctErrs []*Bottom
+}
+
+type defaultInfo struct {
+	// parentMode indicates whether this values was used as a default value,
+	// based on the parent mode.
+	parentMode defaultMode
+
+	// The result of default evaluation for a nested disjunction.
+	nestedMode defaultMode
+
+	origMode defaultMode
 }
 
 func (n *nodeContext) addNotify(v *Vertex) {
@@ -833,6 +850,8 @@ func (n *nodeContext) clone() *nodeContext {
 	d.lists = append(d.lists, n.lists...)
 	d.vLists = append(d.vLists, n.vLists...)
 	d.exprs = append(d.exprs, n.exprs...)
+	d.usedDefault = append(d.usedDefault, n.usedDefault...)
+
 	// No need to clone d.disjunctions
 
 	return d
@@ -858,6 +877,7 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 			vLists:        n.vLists[:0],
 			exprs:         n.exprs[:0],
 			disjunctions:  n.disjunctions[:0],
+			usedDefault:   n.usedDefault[:0],
 			disjunctErrs:  n.disjunctErrs[:0],
 			disjuncts:     n.disjuncts[:0],
 			buffer:        n.buffer[:0],

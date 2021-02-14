@@ -88,6 +88,13 @@ type envDisjunct struct {
 	expr        *DisjunctionExpr
 	value       *Disjunction
 	hasDefaults bool
+
+	// These are used for book keeping, tracking whether any of the
+	// disjuncts marked with a default marker remains after unification.
+	// If no default is used, all other elements are treated as "maybeDefault".
+	// Otherwise, elements are treated as is.
+	parentDefaultUsed bool
+	childDefaultUsed  bool
 }
 
 func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, cloneID CloseInfo) {
@@ -102,19 +109,19 @@ func (n *nodeContext) addDisjunction(env *Environment, x *DisjunctionExpr, clone
 	}
 
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, cloneID, x, nil, numDefaults > 0})
+		envDisjunct{env, cloneID, x, nil, numDefaults > 0, false, false})
 }
 
 func (n *nodeContext) addDisjunctionValue(env *Environment, x *Disjunction, cloneID CloseInfo) {
 	n.disjunctions = append(n.disjunctions,
-		envDisjunct{env, cloneID, nil, x, x.HasDefaults})
+		envDisjunct{env, cloneID, nil, x, x.HasDefaults, false, false})
 
 }
 
 func (n *nodeContext) expandDisjuncts(
 	state VertexStatus,
 	parent *nodeContext,
-	m defaultMode,
+	parentMode defaultMode, // default mode of this disjunct
 	recursive bool) {
 
 	n.ctx.stats.DisjunctCount++
@@ -135,6 +142,8 @@ func (n *nodeContext) expandDisjuncts(
 	} else {
 		n.snapshot = *n.node
 	}
+
+	defaultOffset := len(n.usedDefault)
 
 	switch {
 	default: // len(n.disjunctions) == 0
@@ -180,6 +189,12 @@ func (n *nodeContext) expandDisjuncts(
 			n.node.BaseValue = n.getValidators()
 		}
 
+		n.usedDefault = append(n.usedDefault, defaultInfo{
+			parentMode: parentMode,
+			nestedMode: parentMode,
+			origMode:   parentMode,
+		})
+
 	case len(n.disjunctions) > 0:
 		// Process full disjuncts to ensure that erroneous disjuncts are
 		// eliminated as early as possible.
@@ -187,33 +202,8 @@ func (n *nodeContext) expandDisjuncts(
 
 		n.disjuncts = append(n.disjuncts, n)
 
-		// HACK: this is an AWFUL, AWFUL HACK to work around a limitation of
-		// using defaults for marking oneOfs in protobuffers. Previously this
-		// was worked around by another hack that (deliberately erroneously)
-		// would move the default status of a disjunct of which only one
-		// disjunct remained from "not default" to "maybe default". For
-		// protobuf oneOfs this would mean that only the "intended" struct would
-		// get the default value. It also worked around various other
-		// limitations.
-		//
-		// With the latest performance enhancements this old hack still worked,
-		// but only because it introduced a bug that this hack relied on. Fixing
-		// this bug now causes this hack to no longer work.
-		//
-		// Ultimately, the correct way to address the issue for the protobuf
-		// representation is not to use defaults at all. Instead we should use
-		// the required annotator (which fixes a whole load of other issues):
-		//
-		//    {} | {a!: int} | {b!: int}
-		//
-		// This would force that only one of these can be true independent of
-		// default magic. Aside from fixing this issue, it also moves to a model
-		// that is consistent with the recommendation to not use defaults in
-		// a top-level API specification.
-		//
-		// The hack we use now recognizes the oneOf patterns and then sets the
-		// default for the "smallest" element.
-		protoForm := true
+		n.refCount++
+		defer n.free()
 
 		for i, d := range n.disjunctions {
 			a := n.disjuncts
@@ -223,23 +213,6 @@ func (n *nodeContext) expandDisjuncts(
 			skipNonMonotonicChecks := i+1 < len(n.disjunctions)
 			if skipNonMonotonicChecks {
 				n.ctx.inDisjunct++
-			}
-
-			// HACK: see above
-			defaultCount := 0
-			override := true
-			if d.expr == nil {
-				override = false
-			} else {
-				for _, v := range d.expr.Values {
-					if !d.hasDefaults || v.Default {
-						defaultCount++
-						if s, ok := v.Val.(*StructLit); !ok || len(s.Decls) > 0 {
-							protoForm = false
-							override = false
-						}
-					}
-				}
 			}
 
 			for _, dn := range a {
@@ -253,14 +226,7 @@ func (n *nodeContext) expandDisjuncts(
 						c := MakeConjunct(d.env, v.Val, d.cloneID)
 						cn.addExprConjunct(c)
 
-						if override {
-							if s, ok := v.Val.(*StructLit); ok && len(s.Decls) == 0 {
-								cn.protoCount++
-							}
-						}
-
 						newMode := mode(d.hasDefaults, v.Default)
-						cn.defaultMode = combineDefault(dn.defaultMode, newMode)
 
 						cn.expandDisjuncts(state, n, newMode, true)
 					}
@@ -274,7 +240,6 @@ func (n *nodeContext) expandDisjuncts(
 						cn.addValueConjunct(d.env, v, d.cloneID)
 
 						newMode := mode(d.hasDefaults, i < d.value.NumDefaults)
-						cn.defaultMode = combineDefault(dn.defaultMode, newMode)
 
 						cn.expandDisjuncts(state, n, newMode, true)
 					}
@@ -300,39 +265,98 @@ func (n *nodeContext) expandDisjuncts(
 			}
 		}
 
-		// HACK: see above
-		if protoForm {
-			min := int32(0)
-			minPos := 0
-			for i, d := range n.disjuncts {
-				if d.defaultMode == isDefault {
-					min = 0
-					break
+		// Annotate disjunctions with whether any of the default disjunctions
+		// was used.
+		for _, d := range n.disjuncts {
+			for i, info := range d.usedDefault[defaultOffset:] {
+				if info.parentMode == isDefault {
+					n.disjunctions[i].parentDefaultUsed = true
 				}
-				if d.protoCount > min {
-					min = d.protoCount
-					minPos = i
+				if info.origMode == isDefault {
+					n.disjunctions[i].childDefaultUsed = true
 				}
-			}
-			if min > 0 {
-				n.disjuncts[minPos].defaultMode = isDefault
 			}
 		}
 
+		// Combine parent and child default markers, considering that a parent
+		// "notDefault" is treated as "maybeDefault" if none of the disjuncts
+		// marked as default remain.
+		//
+		// NOTE for a parent marked as "notDefault", a child is *never*
+		// considered as default. It may either be "not" or "maybe" default.
+		//
+		// The result for each disjunction is conjoined into a single value.
+		for _, d := range n.disjuncts {
+			m := maybeDefault
+			orig := maybeDefault
+			for i, info := range d.usedDefault[defaultOffset:] {
+				parent := info.parentMode
+
+				used := n.disjunctions[i].parentDefaultUsed
+				childUsed := n.disjunctions[i].childDefaultUsed
+				hasDefaults := n.disjunctions[i].hasDefaults
+
+				orig = combineDefault(orig, info.parentMode)
+				orig = combineDefault(orig, info.nestedMode)
+
+				switch {
+				case childUsed:
+					// One of the children used a default. This is "normal"
+					// mode. This may also happen when we are in
+					// hasDefaults/notUsed mode. Consider
+					//
+					//      ("a" | "b") & (*(*"a" | string) | string)
+					//
+					// Here the doubly nested default is called twice, once
+					// for "a" and then for "b", where the second resolves to
+					// not using a default. The first does, however, and on that
+					// basis the "ot default marker cannot be overridden.
+					m = combineDefault(m, info.parentMode)
+					m = combineDefault(m, info.origMode)
+
+				case !hasDefaults, used:
+					m = combineDefault(m, info.parentMode)
+					m = combineDefault(m, info.nestedMode)
+
+				case hasDefaults && !used:
+					Assertf(parent == notDefault, "unexpected default mode")
+				}
+			}
+			d.defaultMode = m
+
+			d.usedDefault = d.usedDefault[:defaultOffset]
+			d.usedDefault = append(d.usedDefault, defaultInfo{
+				parentMode: parentMode,
+				nestedMode: m,
+				origMode:   orig,
+			})
+
+		}
+
+		// TODO: this is an old trick that seems no longer necessary for the new
+		// implementation. Keep around until we finalize the semantics for
+		// defaults, though. The recursion of nested defaults is not entirely
+		// proper yet.
+		//
+		// A better approach, that avoids the need for recursion (semantically),
+		// would be to only consider default usage for one level, but then to
+		// also allow a default to be passed if only one value is remaining.
+		// This means that a nested subsumption would first have to be evaluated
+		// in isolation, however, to determine that it is not previous
+		// disjunctions that cause the disambiguation.
+		//
 		// HACK alert: this replaces the hack of the previous algorithm with a
 		// slightly less worse hack: instead of dropping the default info when
-		// the value was scalar before, we drop this information when there
-		// is only one disjunct, while not discarding hard defaults.
-		// TODO: a more principled approach would be to recognize that there
-		// is only one default at a point where this does not break
-		// commutativity.
-		if len(n.disjuncts) == 1 && n.disjuncts[0].defaultMode != isDefault {
-			n.disjuncts[0].defaultMode = maybeDefault
-		}
+		// the value was scalar before, we drop this information when there is
+		// only one disjunct, while not discarding hard defaults. TODO: a more
+		// principled approach would be to recognize that there is only one
+		// default at a point where this does not break commutativity. if
+		// if len(n.disjuncts) == 1 && n.disjuncts[0].defaultMode != isDefault {
+		// 	n.disjuncts[0].defaultMode = maybeDefault
+		// }
 	}
 
 	// Compare to root, but add to this one.
-	// TODO: if only one value is left, set to maybeDefault.
 	switch p := parent; {
 	case p != n:
 		p.disjunctErrs = append(p.disjunctErrs, n.disjunctErrs...)
@@ -340,17 +364,22 @@ func (n *nodeContext) expandDisjuncts(
 
 	outer:
 		for _, d := range n.disjuncts {
-			for _, v := range p.disjuncts {
+			for k, v := range p.disjuncts {
 				if Equal(n.ctx, &v.result, &d.result, true) {
-					if d.defaultMode == isDefault {
-						v.defaultMode = isDefault
+					m := maybeDefault
+					for _, u := range d.usedDefault {
+						m = combineDefault(m, u.nestedMode)
 					}
-					d.free()
+					if m == isDefault {
+						p.disjuncts[k] = d
+						v.free()
+					} else {
+						d.free()
+					}
 					continue outer
 				}
 			}
 
-			d.defaultMode = combineDefault(m, d.defaultMode)
 			p.disjuncts = append(p.disjuncts, d)
 		}
 

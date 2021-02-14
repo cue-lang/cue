@@ -24,6 +24,12 @@ P: *1 | int
 P: 2
 p: *P | int // now 2, but should be (2 | int), according to the spec:
 
+// Here the inner default may not be used as it is masked by the outer default.
+r: (*3 | (*1 | 2)) & (1 | 2)
+
+// Here the inner default is used, as there are no defaults marked in the
+// outer disjunction.
+s: (3 | (*1 | 2)) & (1 | 2)
 
 s1: #Size & { min: 5 }
 
@@ -32,12 +38,39 @@ s1: #Size & { min: 5 }
     res: uint | * 0
     min: >res | *(1 + res)
 }
+
+staged: {
+    c: ("a" | "b") & (*(*"a" | string) | string)
+    d: (*(*"a" | string) | string) & ("a" | "b")
+}
+
+issue763a: {
+  #A: {
+    v: "a" | "b" | "c" // change to string to fix
+  }
+
+  h: [string]: #A
+
+  h: [=~"^b"]: #A & {
+    v: *h.a.v | string
+  }
+
+  h: a: {
+    v: *"a" | string
+  }
+
+  h: baa: _
+  h: boo: _
+}
+
 -- out/eval --
 (struct){
   Q: (int){ |(*(int){ 1 }, (int){ int }) }
   q: (int){ |(*(int){ 1 }, (int){ int }) }
   P: (int){ 2 }
   p: (int){ |(*(int){ 2 }, (int){ int }) }
+  r: (int){ |((int){ 1 }, (int){ 2 }) }
+  s: (int){ |(*(int){ 1 }, (int){ 2 }) }
   s1: (#struct){
     max: (number){ |(*(int){ 5 }, (number){ >5 }) }
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
@@ -48,6 +81,26 @@ s1: #Size & { min: 5 }
     res: (int){ |(*(int){ 0 }, (int){ &(>=0, int) }) }
     min: (number){ |(*(int){ 1 }, (number){ >0 }) }
   }
+  staged: (struct){
+    c: (string){ |(*(string){ "a" }, (string){ "b" }) }
+    d: (string){ |(*(string){ "a" }, (string){ "b" }) }
+  }
+  issue763a: (struct){
+    #A: (#struct){
+      v: (string){ |((string){ "a" }, (string){ "b" }, (string){ "c" }) }
+    }
+    h: (struct){
+      a: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      baa: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+      boo: (#struct){
+        v: (string){ |(*(string){ "a" }, (string){ "b" }, (string){ "c" }) }
+      }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -57,6 +110,8 @@ s1: #Size & { min: 5 }
   P: (*1|int)
   P: 2
   p: (*〈0;P〉|int)
+  r: ((*3|(*1|2)) & (1|2))
+  s: ((3|(*1|2)) & (1|2))
   s1: (〈0;#Size〉 & {
     min: 5
   })
@@ -64,5 +119,33 @@ s1: #Size & { min: 5 }
     max: (>〈0;min〉|*〈0;min〉)
     res: (&(int, >=0)|*0)
     min: (>〈0;res〉|*(1 + 〈0;res〉))
+  }
+  staged: {
+    c: (("a"|"b") & (*(*"a"|string)|string))
+    d: ((*(*"a"|string)|string) & ("a"|"b"))
+  }
+  issue763a: {
+    #A: {
+      v: ("a"|"b"|"c")
+    }
+    h: {
+      [string]: 〈1;#A〉
+    }
+    h: {
+      [=~"^b"]: (〈1;#A〉 & {
+        v: (*〈2;h〉.a.v|string)
+      })
+    }
+    h: {
+      a: {
+        v: (*"a"|string)
+      }
+    }
+    h: {
+      baa: _
+    }
+    h: {
+      boo: _
+    }
   }
 }

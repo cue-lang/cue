@@ -205,7 +205,7 @@ func (c compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 		entry.srcExpr = nil // mark to allow detecting cycles
 		m[name] = entry
 
-		entry.expr = c.labeledExpr(nil, entry.label, src)
+		entry.expr = c.labeledExprAt(k, nil, entry.label, src)
 		entry.label = nil
 	}
 
@@ -753,6 +753,10 @@ func (c *compiler) embed(expr ast.Expr) adt.Expr {
 
 func (c *compiler) labeledExpr(f *ast.Field, lab labeler, expr ast.Expr) adt.Expr {
 	k := len(c.stack) - 1
+	return c.labeledExprAt(k, f, lab, expr)
+}
+
+func (c *compiler) labeledExprAt(k int, f *ast.Field, lab labeler, expr ast.Expr) adt.Expr {
 	if c.stack[k].field != nil {
 		panic("expected nil field")
 	}

@@ -14,6 +14,48 @@ b: {
     b: X
     c: 5
 }
+
+fieldOffset: {
+    a: {
+        p1: {
+            let X = { value: Y }
+            let Y = 2
+            x: X
+        }
+        p2: {
+            x: X
+            let Y = 2
+            let X = { value: Y }
+        }
+    }
+    b:  {
+        p1: {
+            let X = { x: y: Y }
+            let Y = 2
+            x: X
+        }
+        p2: {
+            x: X
+            let Y = 2
+            let X = { x: y: Y }
+        }
+    }
+}
+
+issue767: {
+    #Foo: {
+      let _#bar = {
+            value: ""
+      }
+      let _#volmnts = {
+            x: _#baz.value
+      }
+      let _#baz = {
+        _#bar
+      }
+      out: _#volmnts
+    }
+}
 -- out/compile --
 --- in.cue
 {
@@ -24,6 +66,29 @@ b: {
   b: {
     b: 〈0;let X〉
     c: 5
+  }
+  fieldOffset: {
+    a: {
+      p1: {
+        x: 〈0;let X〉
+      }
+      p2: {
+        x: 〈0;let X〉
+      }
+    }
+    b: {
+      p1: {
+        x: 〈0;let X〉
+      }
+      p2: {
+        x: 〈0;let X〉
+      }
+    }
+  }
+  issue767: {
+    #Foo: {
+      out: 〈0;let _#volmnts〉
+    }
   }
 }
 -- out/eval --
@@ -45,5 +110,42 @@ Result:
       //     ./in.cue:10:13
     }
     c: (int){ 5 }
+  }
+  fieldOffset: (struct){
+    a: (struct){
+      p1: (struct){
+        x: (struct){
+          value: (int){ 2 }
+        }
+      }
+      p2: (struct){
+        x: (struct){
+          value: (int){ 2 }
+        }
+      }
+    }
+    b: (struct){
+      p1: (struct){
+        x: (struct){
+          x: (struct){
+            y: (int){ 2 }
+          }
+        }
+      }
+      p2: (struct){
+        x: (struct){
+          x: (struct){
+            y: (int){ 2 }
+          }
+        }
+      }
+    }
+  }
+  issue767: (struct){
+    #Foo: (#struct){
+      out: (#struct){
+        x: (string){ "" }
+      }
+    }
   }
 }

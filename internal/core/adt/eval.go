@@ -1082,11 +1082,6 @@ func (n *nodeContext) getValidators() BaseValue {
 		// Src is the combined input.
 		v = &BasicType{K: n.kind}
 
-		if len(n.node.Structs) > 0 {
-			v = structSentinel
-
-		}
-
 	case 1:
 		v = a[0].(Value) // remove cast
 

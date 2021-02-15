@@ -1,0 +1,49 @@
+-- in.cue --
+top: {
+    a: {_}
+    b: _
+}
+
+scalar: {
+    a: {string}
+    b: string
+    c: {{{number}}}
+    d: number
+}
+-- out/eval --
+(struct){
+  top: (struct){
+    a: (_){ _ }
+    b: (_){ _ }
+  }
+  scalar: (struct){
+    a: (string){ string }
+    b: (string){ string }
+    c: (number){ number }
+    d: (number){ number }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  top: {
+    a: {
+      _
+    }
+    b: _
+  }
+  scalar: {
+    a: {
+      string
+    }
+    b: string
+    c: {
+      {
+        {
+          number
+        }
+      }
+    }
+    d: number
+  }
+}

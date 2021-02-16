@@ -837,6 +837,10 @@ Any evaluation error is represented as bottom.
 Implementations may associate error strings with different instances of bottom;
 logically they all remain the same value.
 
+```
+bottom_lit = "_|_" .
+```
+
 
 ### Top
 
@@ -859,7 +863,7 @@ It has only one parent, top, and one child, bottom.
 It is unordered with respect to any other value.
 
 ```
-null_lit   = "null"
+null_lit   = "null" .
 ```
 
 ```
@@ -877,7 +881,7 @@ The predeclared boolean type is `bool`; it is a defined type and a separate
 element in the lattice.
 
 ```
-boolean_lit = "true" | "false"
+bool_lit = "true" | "false" .
 ```
 
 ```
@@ -1623,7 +1627,7 @@ The length of an open list is the its number of elements as a lower bound
 and an unlimited number of elements as its upper bound.
 
 ```
-ListLit       = "[" [ ElementList [ "," [ Ellipsis ] ] [ "," ] "]" .
+ListLit       = "[" [ ElementList [ "," [ Ellipsis ] ] [ "," ] ] "]" .
 ElementList   = Embedding { "," Embedding } .
 ```
 
@@ -1853,7 +1857,7 @@ field, alias, or let declaration, or a parenthesized expression.
 Operand     = Literal | OperandName | "(" Expression ")" .
 Literal     = BasicLit | ListLit | StructLit .
 BasicLit    = int_lit | float_lit | string_lit |
-              null_lit | bool_lit | bottom_lit | top_lit .
+              null_lit | bool_lit | bottom_lit .
 OperandName = identifier | QualifiedIdent .
 ```
 

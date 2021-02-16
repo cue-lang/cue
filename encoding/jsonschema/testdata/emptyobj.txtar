@@ -1,0 +1,36 @@
+// Objects without properties should convert correctly.
+//
+// Issue #734
+-- github-workflow.json --
+{
+  "$schema": "http://json-schema.org/draft-07/schema",
+  "definitions": {
+    "obj1": {
+      "oneOf": [
+        {
+          "type": "object"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "additionalProperties": true
+    },
+    "obj2": {
+      "type": [ "object", "null" ],
+      "additionalProperties": true
+    }
+  }
+}
+-- out.err --
+-- out.cue --
+@jsonschema(schema="http://json-schema.org/draft-07/schema")
+_
+
+#obj1: null | {
+	...
+}
+
+#obj2: null | {
+	...
+}

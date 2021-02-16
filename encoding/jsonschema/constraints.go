@@ -596,9 +596,6 @@ var constraints = []*constraint{
 		switch n.Kind() {
 		case cue.BoolKind:
 			s.closeStruct = !s.boolValue(n)
-			if !s.closeStruct {
-				s.usedTypes |= cue.StructKind
-			}
 
 		case cue.StructKind:
 			s.usedTypes |= cue.StructKind

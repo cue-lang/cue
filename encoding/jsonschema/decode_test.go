@@ -34,6 +34,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
+	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/cuetest"
 	_ "cuelang.org/go/pkg"
 )
@@ -147,4 +148,39 @@ func TestDecode(t *testing.T) {
 		return nil
 	})
 	assert.NoError(t, err)
+}
+
+func TestX(t *testing.T) {
+	t.Skip()
+	data := `
+-- schema.json --
+`
+
+	a := txtar.Parse([]byte(data))
+
+	r := &cue.Runtime{}
+	var in *cue.Instance
+	var err error
+	for _, f := range a.Files {
+		switch path.Ext(f.Name) {
+		case ".json":
+			in, err = json.Decode(r, f.Name, f.Data)
+			if err != nil {
+				t.Fatal(err)
+			}
+		case ".yaml":
+			in, err = yaml.Decode(r, f.Name, f.Data)
+			if err != nil {
+				t.Fatal(err)
+			}
+		}
+	}
+
+	cfg := &Config{ID: "test"}
+	expr, err := Extract(in, cfg)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	t.Fatal(internal.DebugStr(expr))
 }

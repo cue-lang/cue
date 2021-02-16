@@ -1020,7 +1020,9 @@ import "strings"
 
 	#event: "check_run" | "check_suite" | "create" | "delete" | "deployment" | "deployment_status" | "fork" | "gollum" | "issue_comment" | "issues" | "label" | "member" | "milestone" | "page_build" | "project" | "project_card" | "project_column" | "public" | "pull_request" | "pull_request_review" | "pull_request_review_comment" | "pull_request_target" | "push" | "registry_package" | "release" | "status" | "watch" | "workflow_dispatch" | "workflow_run" | "repository_dispatch"
 
-	#eventObject: null
+	#eventObject: null | {
+		...
+	}
 
 	#expressionSyntax: =~"^\\$\\{\\{.*\\}\\}$"
 
@@ -1075,7 +1077,8 @@ import "strings"
           name: (string){ string }
         }
         #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-        #eventObject: (null){ null }
+        #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
         #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
         #globs: (list){
           0: (string){ strings.MinRunes(1) }
@@ -1305,7 +1308,8 @@ import "strings"
           name: (string){ string }
         }
         #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-        #eventObject: (null){ null }
+        #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
         #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
         #globs: (list){
           0: (string){ strings.MinRunes(1) }
@@ -1430,7 +1434,8 @@ import "strings"
           name: (string){ string }
         }
         #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-        #eventObject: (null){ null }
+        #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
         #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
         #globs: (list){
           0: (string){ strings.MinRunes(1) }
@@ -1559,7 +1564,8 @@ import "strings"
           name: (string){ string }
         }
         #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-        #eventObject: (null){ null }
+        #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
         #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
         #globs: (list){
           0: (string){ strings.MinRunes(1) }
@@ -1625,7 +1631,8 @@ import "strings"
           name: (string){ string }
         }
         #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-        #eventObject: (null){ null }
+        #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
         #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
         #globs: (list){
           0: (string){ strings.MinRunes(1) }
@@ -1699,7 +1706,8 @@ import "strings"
       name: (string){ string }
     }
     #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-    #eventObject: (null){ null }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
     #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
     #globs: (list){
       0: (string){ strings.MinRunes(1) }
@@ -1926,7 +1934,8 @@ import "strings"
       name: (string){ string }
     }
     #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-    #eventObject: (null){ null }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
     #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
     #globs: (list){
       0: (string){ strings.MinRunes(1) }
@@ -2048,7 +2057,8 @@ import "strings"
       name: (string){ string }
     }
     #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-    #eventObject: (null){ null }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
     #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
     #globs: (list){
       0: (string){ strings.MinRunes(1) }
@@ -2120,7 +2130,8 @@ import "strings"
       name: (string){ string }
     }
     #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-    #eventObject: (null){ null }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
     #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
     #globs: (list){
       0: (string){ strings.MinRunes(1) }
@@ -2246,7 +2257,8 @@ import "strings"
       name: (string){ string }
     }
     #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-    #eventObject: (null){ null }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
     #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
     #globs: (list){
       0: (string){ strings.MinRunes(1) }
@@ -2309,7 +2321,8 @@ import "strings"
       name: (string){ string }
     }
     #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
-    #eventObject: (null){ null }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
     #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
     #globs: (list){
       0: (string){ strings.MinRunes(1) }

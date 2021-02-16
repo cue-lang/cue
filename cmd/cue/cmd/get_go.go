@@ -399,15 +399,6 @@ func extract(cmd *Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	var errs []string
-	for _, P := range pkgs {
-		if len(P.Errors) > 0 {
-			errs = append(errs, fmt.Sprintf("\t%s: %v", P.PkgPath, P.Errors))
-		}
-	}
-	if len(errs) > 0 {
-		return fmt.Errorf("could not load Go packages:\n%s", strings.Join(errs, "\n"))
-	}
 
 	e := extractor{
 		cmd:    cmd,

@@ -46,7 +46,7 @@ contain multiple objects (such as using --- in YAML), they will all be verified
 individually.
 
 By default, each file is checked against the root of the loaded CUE files.
-The -e can be used to only verify files against the result of an expression
+The -d can be used to only verify files against the result of an expression
 evaluated within the CUE files. This can be useful if the CUE files contain
 a set of definitions to pick from.
 
@@ -56,7 +56,7 @@ Examples:
   cue vet foo.yaml foo.cue
 
   # Check files against a particular expression
-  cue vet translations/*.yaml foo.cue -e Translation
+  cue vet translations/*.yaml foo.cue -d '#Translation'
 
 If more than one expression is given, all must match all values.
 `

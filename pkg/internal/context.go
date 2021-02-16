@@ -228,70 +228,98 @@ func (c *CallCtxt) Iter(i int) (a cue.Iterator) {
 	return v
 }
 
-func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
-	arg := c.args[i]
-	x := cue.MakeValue(c.ctx, arg)
-	v, err := x.List()
-	if err != nil {
+func (c *CallCtxt) getList(i int) *adt.Vertex {
+	x := c.args[i]
+	switch v, ok := x.(*adt.Vertex); {
+	case ok && v.IsList():
+		v.Finalize(c.ctx)
+		return v
+
+	case v != nil:
+		x = v.Value()
+	}
+	if x.Kind()&adt.ListKind == 0 {
+		var err error
+		if b, ok := x.(*adt.Bottom); ok {
+			err = &callError{b}
+		}
 		c.invalidArgType(c.args[i], i, "list", err)
+	} else {
+		err := c.ctx.NewErrf("non-concrete list for argument %d", i)
+		err.Code = adt.IncompleteError
+		c.Err = &callError{err}
+	}
+	return nil
+}
+
+func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
+	v := c.getList(i)
+	if v == nil {
 		return nil
 	}
-	for j := 0; v.Next(); j++ {
-		w := v.Value()
-		if k := w.IncompleteKind(); k&adt.NumKind == 0 {
-			err := c.ctx.NewErrf(
-				"invalid type element %d (%s) of number list argument %d", j, k, i)
-			c.Err = &callError{err}
-			break
-		}
-		if !w.IsConcrete() {
+
+	for j, w := range v.Elems() {
+		w.Finalize(c.ctx) // defensive
+		switch x := w.Value().(type) {
+		case *adt.Num:
+			a = append(a, &x.X)
+
+		case *adt.Bottom:
+			if x.IsIncomplete() {
+				c.Err = x
+				return nil
+			}
+
+		default:
+			if k := w.Kind(); k&adt.NumKind == 0 {
+				err := c.ctx.NewErrf(
+					"invalid type element %d (%s) of number list argument %d", j, k, i)
+				c.Err = &callError{err}
+				return a
+			}
+
 			err := c.ctx.NewErrf(
 				"non-concrete number value for element %d of number list argument %d", j, i)
 			err.Code = adt.IncompleteError
 			c.Err = &callError{err}
-			break
+			return nil
 		}
-		num, err := w.Decimal()
-		if err != nil {
-			c.errf(c.src, err, "invalid list element %d in argument %d to %s: %v",
-				j, i, c.Name(), err)
-			break
-		}
-		a = append(a, num)
 	}
 	return a
 }
 
 func (c *CallCtxt) StringList(i int) (a []string) {
-	arg := c.args[i]
-	x := cue.MakeValue(c.ctx, arg)
-	v, err := x.List()
-	if err != nil {
-		c.invalidArgType(c.args[i], i, "list", err)
+	v := c.getList(i)
+	if v == nil {
 		return nil
 	}
-	for j := 0; v.Next(); j++ {
-		w := v.Value()
-		if k := w.IncompleteKind(); k&adt.StringKind == 0 {
-			err := c.ctx.NewErrf(
-				"invalid type element %d (%s) of string list argument %d", j, k, i)
-			c.Err = &callError{err}
-			break
-		}
-		if !w.IsConcrete() {
+
+	for j, w := range v.Elems() {
+		w.Finalize(c.ctx) // defensive
+		switch x := w.Value().(type) {
+		case *adt.String:
+			a = append(a, x.Str)
+
+		case *adt.Bottom:
+			if x.IsIncomplete() {
+				c.Err = x
+				return nil
+			}
+
+		default:
+			if k := w.Kind(); k&adt.StringKind == 0 {
+				err := c.ctx.NewErrf(
+					"invalid type element %d (%s) of string list argument %d", j, k, i)
+				c.Err = &callError{err}
+				return a
+			}
+
 			err := c.ctx.NewErrf(
 				"non-concrete string value for element %d of string list argument %d", j, i)
 			err.Code = adt.IncompleteError
 			c.Err = &callError{err}
-			break
+			return nil
 		}
-		str, err := w.String()
-		if err != nil {
-			// TODO: expose wrapping
-			c.Err = &callError{c.ctx.NewErrf("element %d of list argument %d: %v", j, i, err)}
-			break
-		}
-		a = append(a, str)
 	}
 	return a
 }

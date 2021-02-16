@@ -1,5 +1,8 @@
 -- in.cue --
-import "list"
+import (
+  "list"
+  "strings"
+)
 
 
 list1: {
@@ -40,36 +43,90 @@ value2: {
     len('sf' | 'dd')
 }
 
+incompleteArgDecimalList: {
+    a: #a & {param: 123}
+    #a: {
+        param: int
+        transformed: +param
+        max: list.Max([transformed])
+    }
+}
+
+incompleteArgStringList: {
+    a: #a & {param: "123"}
+    #a: {
+        param: string
+        transformed: param+""
+        joined: strings.Join([transformed], "-")
+    }
+}
+
+incompleteList: {
+    x: _
+    decimal: list.Max(x)
+    str:     strings.Join(x, "")
+}
+
+incompleteListError: {
+    x: y + []
+    y: _
+    decimal: list.Max(x)
+    str:     strings.Join(x, "")
+}
+
+badListType: {
+    x: 2
+    decimal: list.Max(x)
+    str:     strings.Join(x, "")
+}
+
+badListError: {
+    x: 2 + y
+    y: "foo"
+    decimal: list.Max(x)
+    str:     strings.Join(x, "")
+}
+
 -- out/eval --
-(struct){
+Errors:
+badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
+    ./in.cue:77:8
+badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
+    ./in.cue:77:8
+badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+    ./in.cue:83:8
+
+Result:
+(_|_){
+  // [eval]
   list1: (struct){
     Out1: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:13:23
+        //     ./in.cue:16:23
       }
     }
     Out2: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:13:23
+        //     ./in.cue:16:23
       }
     }
     Out3: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:13:23
+        //     ./in.cue:16:23
       }
     }
     Top: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:13:23
+        //     ./in.cue:16:23
       }
     }
     _Sub: (_|_){
       // [incomplete] list1._Sub: undefined field b:
-      //     ./in.cue:16:13
+      //     ./in.cue:19:13
     }
     a: (struct){
     }
@@ -77,23 +134,23 @@ value2: {
   list2: (struct){
     Out1: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:27:21
+      //     ./in.cue:30:21
     }
     Out2: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:27:21
+      //     ./in.cue:30:21
     }
     Out3: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:27:21
+      //     ./in.cue:30:21
     }
     _Top: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:27:21
+      //     ./in.cue:30:21
     }
     #Sub: (_|_){
       // [incomplete] list2.#Sub: undefined field b:
-      //     ./in.cue:30:13
+      //     ./in.cue:33:13
     }
     a: (struct){
     }
@@ -101,12 +158,102 @@ value2: {
   value1: (struct){
     a: (_|_){
       // [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
-      //     ./in.cue:35:8
+      //     ./in.cue:38:8
     }
   }
   value2: (_|_){
     // [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
-    //     ./in.cue:39:5
+    //     ./in.cue:42:5
+  }
+  incompleteArgDecimalList: (struct){
+    a: (#struct){
+      param: (int){ 123 }
+      transformed: (int){ 123 }
+      max: (int){ 123 }
+    }
+    #a: (#struct){
+      param: (int){ int }
+      transformed: (_|_){
+        // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
+        //     ./in.cue:49:23
+      }
+      max: (_|_){
+        // [incomplete] 0: operand param of '+' not concrete (was int):
+        //     ./in.cue:49:23
+      }
+    }
+  }
+  incompleteArgStringList: (struct){
+    a: (#struct){
+      param: (string){ "123" }
+      transformed: (string){ "123" }
+      joined: (string){ "123" }
+    }
+    #a: (#struct){
+      param: (string){ string }
+      transformed: (_|_){
+        // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
+        //     ./in.cue:58:22
+      }
+      joined: (_|_){
+        // [incomplete] 0: non-concrete value string in operand to +:
+        //     ./in.cue:58:22
+      }
+    }
+  }
+  incompleteList: (struct){
+    x: (_){ _ }
+    decimal: (_|_){
+      // [incomplete] incompleteList.decimal: non-concrete list for argument 0:
+      //     ./in.cue:65:14
+    }
+    str: (_|_){
+      // [incomplete] incompleteList.str: non-concrete list for argument 0:
+      //     ./in.cue:66:14
+    }
+  }
+  incompleteListError: (struct){
+    x: (_|_){
+      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+      //     ./in.cue:70:8
+    }
+    y: (_){ _ }
+    decimal: (_|_){
+      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+      //     ./in.cue:70:8
+    }
+    str: (_|_){
+      // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
+      //     ./in.cue:70:8
+    }
+  }
+  badListType: (_|_){
+    // [eval]
+    x: (int){ 2 }
+    decimal: (_|_){
+      // [eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
+      //     ./in.cue:77:8
+    }
+    str: (_|_){
+      // [eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
+      //     ./in.cue:77:8
+    }
+  }
+  badListError: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+      //     ./in.cue:83:8
+    }
+    y: (string){ "foo" }
+    decimal: (_|_){
+      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+      //     ./in.cue:83:8
+    }
+    str: (_|_){
+      // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
+      //     ./in.cue:83:8
+    }
   }
 }
 -- out/compile --
@@ -151,5 +298,51 @@ value2: {
   }
   value2: {
     len(('sf'|'dd'))
+  }
+  incompleteArgDecimalList: {
+    a: (〈0;#a〉 & {
+      param: 123
+    })
+    #a: {
+      param: int
+      transformed: +〈0;param〉
+      max: 〈import;list〉.Max([
+        〈0;transformed〉,
+      ])
+    }
+  }
+  incompleteArgStringList: {
+    a: (〈0;#a〉 & {
+      param: "123"
+    })
+    #a: {
+      param: string
+      transformed: (〈0;param〉 + "")
+      joined: 〈import;strings〉.Join([
+        〈0;transformed〉,
+      ], "-")
+    }
+  }
+  incompleteList: {
+    x: _
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  incompleteListError: {
+    x: (〈0;y〉 + [])
+    y: _
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  badListType: {
+    x: 2
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  badListError: {
+    x: (2 + 〈0;y〉)
+    y: "foo"
+    decimal: 〈import;list〉.Max(〈0;x〉)
+    str: 〈import;strings〉.Join(〈0;x〉, "")
   }
 }

@@ -951,10 +951,10 @@ func (x *SliceExpr) evaluate(c *OpContext) Value {
 				c.AddBottom(&Bottom{Src: a.Source(), Err: err})
 				return nil
 			}
-			n.Arcs = append(n.Arcs, &Vertex{
-				Label:     label,
-				Conjuncts: a.Conjuncts,
-			})
+			arc := *a
+			arc.Parent = n
+			arc.Label = label
+			n.Arcs = append(n.Arcs, &arc)
 		}
 		n.status = Finalized
 		return n

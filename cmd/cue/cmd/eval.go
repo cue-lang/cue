@@ -117,7 +117,7 @@ func runEval(cmd *Command, args []string) error {
 		if len(b.insts) > 1 {
 			id = iter.id()
 		}
-		v := iter.instance().Value()
+		v := iter.value()
 
 		if flagConcrete.Bool(cmd) {
 			syn = append(syn, cue.Concrete(true))

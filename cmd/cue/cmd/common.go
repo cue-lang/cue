@@ -16,7 +16,6 @@ package cmd
 
 import (
 	"bytes"
-	"fmt"
 	"io"
 	"os"
 	"path/filepath"
@@ -169,7 +168,7 @@ func (b *buildPlan) instances() iterator {
 
 type iterator interface {
 	scan() bool
-	instance() *cue.Instance
+	value() cue.Value
 	file() *ast.File // may return nil
 	err() error
 	close()
@@ -187,11 +186,11 @@ func (i *instanceIterator) scan() bool {
 	return i.i < len(i.a) && i.e == nil
 }
 
-func (i *instanceIterator) close()                  {}
-func (i *instanceIterator) err() error              { return i.e }
-func (i *instanceIterator) instance() *cue.Instance { return i.a[i.i] }
-func (i *instanceIterator) file() *ast.File         { return nil }
-func (i *instanceIterator) id() string              { return i.a[i.i].Dir }
+func (i *instanceIterator) close()           {}
+func (i *instanceIterator) err() error       { return i.e }
+func (i *instanceIterator) value() cue.Value { return i.a[i.i].Value() }
+func (i *instanceIterator) file() *ast.File  { return nil }
+func (i *instanceIterator) id() string       { return i.a[i.i].Dir }
 
 type streamingIterator struct {
 	r    *cue.Runtime
@@ -201,7 +200,7 @@ type streamingIterator struct {
 	cfg  *encoding.Config
 	a    []*build.File
 	dec  *encoding.Decoder
-	i    *cue.Instance
+	v    cue.Value
 	f    *ast.File
 	e    error
 }
@@ -240,8 +239,8 @@ func newStreamingIterator(b *buildPlan) *streamingIterator {
 	return i
 }
 
-func (i *streamingIterator) file() *ast.File         { return i.f }
-func (i *streamingIterator) instance() *cue.Instance { return i.i }
+func (i *streamingIterator) file() *ast.File  { return i.f }
+func (i *streamingIterator) value() cue.Value { return i.v }
 
 func (i *streamingIterator) id() string {
 	if i.inst != nil {
@@ -284,15 +283,12 @@ func (i *streamingIterator) scan() bool {
 		i.e = err
 		return false
 	}
-	i.i = inst
+	i.v = inst.Value()
 	if i.base.Exists() {
 		i.e = i.base.Err()
 		if i.e == nil {
-			i.i, i.e = i.i.Fill(i.base)
-			i.i.DisplayName = internal.DebugStr(i.b.schema)
-			if inst.DisplayName != "" {
-				i.i.DisplayName = fmt.Sprintf("%s|%s", inst.DisplayName, i.i.DisplayName)
-			}
+			i.v = i.v.Unify(i.base)
+			i.e = i.v.Err()
 		}
 		i.f = nil
 	}
@@ -339,15 +335,11 @@ func (i *expressionIter) scan() bool {
 
 func (i *expressionIter) file() *ast.File { return nil }
 
-func (i *expressionIter) instance() *cue.Instance {
+func (i *expressionIter) value() cue.Value {
 	if len(i.expr) == 0 {
-		return i.iter.instance()
+		return i.iter.value()
 	}
-	inst := i.iter.instance()
-	v := i.iter.instance().Eval(i.expr[i.i])
-	ni := internal.MakeInstance(v).(*cue.Instance)
-	ni.DisplayName = fmt.Sprintf("%s|%s", inst.DisplayName, i.expr[i.i])
-	return ni
+	return internal.EvalExpr(i.iter.value(), i.expr[i.i]).(cue.Value)
 }
 
 type config struct {

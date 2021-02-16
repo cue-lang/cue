@@ -40,7 +40,7 @@ import (
 type Encoder struct {
 	cfg          *Config
 	close        func() error
-	interpret    func(*cue.Instance) (*ast.File, error)
+	interpret    func(cue.Value) (*ast.File, error)
 	encFile      func(*ast.File) error
 	encValue     func(cue.Value) error
 	autoSimplify bool
@@ -79,7 +79,8 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 	case build.OpenAPI:
 		// TODO: get encoding options
 		cfg := &openapi.Config{}
-		e.interpret = func(i *cue.Instance) (*ast.File, error) {
+		e.interpret = func(v cue.Value) (*ast.File, error) {
+			i := internal.MakeInstance(v).(*cue.Instance)
 			return openapi.Generate(i, cfg)
 		}
 	// case build.JSONSchema:
@@ -204,26 +205,25 @@ func (e *Encoder) EncodeFile(f *ast.File) error {
 	return e.encodeFile(f, e.interpret)
 }
 
-func (e *Encoder) Encode(inst *cue.Instance) error {
+func (e *Encoder) Encode(v cue.Value) error {
 	e.autoSimplify = true
 	if e.interpret != nil {
-		f, err := e.interpret(inst)
+		f, err := e.interpret(v)
 		if err != nil {
 			return err
 		}
 		return e.encodeFile(f, nil)
 	}
-	v := inst.Value()
 	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
 		return err
 	}
 	if e.encValue != nil {
-		return e.encValue(inst.Value())
+		return e.encValue(v)
 	}
-	return e.encFile(valueToFile(inst.Value()))
+	return e.encFile(valueToFile(v))
 }
 
-func (e *Encoder) encodeFile(f *ast.File, interpret func(*cue.Instance) (*ast.File, error)) error {
+func (e *Encoder) encodeFile(f *ast.File, interpret func(cue.Value) (*ast.File, error)) error {
 	if interpret == nil && e.encFile != nil {
 		return e.encFile(f)
 	}
@@ -234,13 +234,13 @@ func (e *Encoder) encodeFile(f *ast.File, interpret func(*cue.Instance) (*ast.Fi
 		return err
 	}
 	if interpret != nil {
-		return e.Encode(inst)
+		return e.Encode(inst.Value())
 	}
 	v := inst.Value()
 	if err := v.Validate(cue.Concrete(e.concrete)); err != nil {
 		return err
 	}
-	return e.encValue(inst.Value())
+	return e.encValue(v)
 }
 
 func writer(f *build.File, cfg *Config) (_ io.Writer, close func() error, err error) {

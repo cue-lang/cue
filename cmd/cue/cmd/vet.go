@@ -107,7 +107,7 @@ func doVet(cmd *Command, args []string) error {
 	iter := b.instances()
 	defer iter.close()
 	for iter.scan() {
-		inst := iter.instance()
+		v := iter.value()
 		// TODO: use ImportPath or some other sanitized path.
 
 		concrete := true
@@ -124,9 +124,9 @@ func doVet(cmd *Command, args []string) error {
 			cue.Hidden(true),
 		}
 		w := cmd.Stderr()
-		err := inst.Value().Validate(append(opt, cue.Concrete(concrete))...)
+		err := v.Validate(append(opt, cue.Concrete(concrete))...)
 		if err != nil && !hasFlag {
-			err = inst.Value().Validate(append(opt, cue.Concrete(false))...)
+			err = v.Validate(append(opt, cue.Concrete(false))...)
 			if !shown && err == nil {
 				shown = true
 				p := message.NewPrinter(getLang())
@@ -150,7 +150,7 @@ func vetFiles(cmd *Command, b *buildPlan) {
 	iter := b.instances()
 	defer iter.close()
 	for iter.scan() {
-		v := iter.instance().Value()
+		v := iter.value()
 
 		// Always concrete when checking against concrete files.
 		err := v.Validate(cue.Concrete(true))

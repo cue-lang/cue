@@ -114,8 +114,8 @@ func runExport(cmd *Command, args []string) error {
 	iter := b.instances()
 	defer iter.close()
 	for iter.scan() {
-		inst := iter.instance()
-		err = enc.Encode(inst)
+		v := iter.value()
+		err = enc.Encode(v)
 		exitOnErr(cmd, err, true)
 	}
 	exitOnErr(cmd, iter.err(), true)

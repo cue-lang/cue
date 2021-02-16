@@ -64,7 +64,7 @@ func runDef(cmd *Command, args []string) error {
 			err := e.EncodeFile(f)
 			exitOnErr(cmd, err, true)
 		} else {
-			err := e.Encode(iter.instance())
+			err := e.Encode(iter.value())
 			exitOnErr(cmd, err, true)
 		}
 	}

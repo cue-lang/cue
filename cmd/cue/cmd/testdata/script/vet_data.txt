@@ -1,5 +1,3 @@
-skip 'error messages'
-
 ! cue vet schema.cue data.yaml
 cmp stderr vet-stderr
 
@@ -23,10 +21,8 @@ languages:
     name: Norwegian
 
 -- vet-stderr --
-languages.2.tag: conflicting values false and string (mismatched types bool and string)
 languages.1.name: invalid value "dutch" (out of bound =~"^\\p{Lu}"):
     ./schema.cue:3:8
 -- export-stderr --
-languages.2.tag: conflicting values false and string (mismatched types bool and string)
 languages.1.name: invalid value "dutch" (out of bound =~"^\\p{Lu}"):
     ./schema.cue:3:8

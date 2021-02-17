@@ -159,10 +159,6 @@ nested: {
           e: (string){ string }
         }, (#struct){
           d: (string){ string }
-        }, (#struct){
-          d: (string){ string }
-        }, (#struct){
-          d: (string){ string }
           e: (string){ string }
         }, (#struct){
           a: (string){ string }
@@ -186,12 +182,6 @@ nested: {
         }, (#struct){
           a: (string){ string }
           d: (string){ string }
-        }, (#struct){
-          a: (string){ string }
-          d: (string){ string }
-        }, (#struct){
-          a: (string){ string }
-          d: (string){ string }
           e: (string){ string }
         }, (#struct){
           b: (string){ string }
@@ -212,12 +202,6 @@ nested: {
           b: (string){ string }
           c: (string){ string }
           e: (string){ string }
-        }, (#struct){
-          b: (string){ string }
-          d: (string){ string }
-        }, (#struct){
-          b: (string){ string }
-          d: (string){ string }
         }, (#struct){
           b: (string){ string }
           d: (string){ string }

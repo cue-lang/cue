@@ -122,7 +122,7 @@ func (n *nodeContext) expandDisjuncts(
 	state VertexStatus,
 	parent *nodeContext,
 	parentMode defaultMode, // default mode of this disjunct
-	recursive bool) {
+	recursive, last bool) {
 
 	n.ctx.stats.DisjunctCount++
 
@@ -210,6 +210,7 @@ func (n *nodeContext) expandDisjuncts(
 			n.disjuncts = n.buffer[:0]
 			n.buffer = a[:0]
 
+			last := i+1 == len(n.disjunctions)
 			skipNonMonotonicChecks := i+1 < len(n.disjunctions)
 			if skipNonMonotonicChecks {
 				n.ctx.inDisjunct++
@@ -228,7 +229,7 @@ func (n *nodeContext) expandDisjuncts(
 
 						newMode := mode(d.hasDefaults, v.Default)
 
-						cn.expandDisjuncts(state, n, newMode, true)
+						cn.expandDisjuncts(state, n, newMode, true, last)
 					}
 
 				case d.value != nil:
@@ -241,7 +242,7 @@ func (n *nodeContext) expandDisjuncts(
 
 						newMode := mode(d.hasDefaults, i < d.value.NumDefaults)
 
-						cn.expandDisjuncts(state, n, newMode, true)
+						cn.expandDisjuncts(state, n, newMode, true, last)
 					}
 				}
 			}
@@ -365,7 +366,11 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for k, v := range p.disjuncts {
-				if Equal(n.ctx, &v.result, &d.result, true) {
+				flags := CheckStructural
+				if last {
+					flags |= IgnoreOptional
+				}
+				if Equal(n.ctx, &v.result, &d.result, flags) {
 					m := maybeDefault
 					for _, u := range d.usedDefault {
 						m = combineDefault(m, u.nestedMode)

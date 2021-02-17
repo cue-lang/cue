@@ -306,7 +306,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		if len(n.disjunctions) > 0 && disState != Finalized {
 			disState = Finalized
 		}
-		n.expandDisjuncts(disState, n, maybeDefault, false)
+		n.expandDisjuncts(disState, n, maybeDefault, false, true)
 
 		n.finalizeDisjuncts()
 

@@ -59,3 +59,22 @@ foo:
     #JobID: (string){ "foo" }
   }
 }
+-- out/compile --
+--- in.cue
+{
+  #Workflow: {
+    jobs: {
+      [string]: {}
+    }
+    #JobID: or([
+      for k, _ in 〈0;jobs〉 {
+        〈1;k〉
+      },
+    ])
+  }
+  foo: (〈0;#Workflow〉 & {
+    jobs: {
+      foo: {}
+    }
+  })
+}

@@ -94,3 +94,24 @@ s3:  strings.ContainsAny(str, "dd")
   num: (number){ <4 }
   is: (bool){ bool }
 }
+-- out/compile --
+--- in.cue
+{
+  n1: {
+    min: <〈0;max〉
+    max: >〈0;min〉
+  }
+  n2: -〈0;num〉
+  n3: +〈0;num〉
+  n4: (〈0;num〉 + 〈0;num〉)
+  n5: (〈0;num〉 - 〈0;num〉)
+  n6: (〈0;num〉 * 〈0;num〉)
+  n7: (〈0;num〉 / 〈0;num〉)
+  b1: !〈0;is〉
+  s1: "\(〈0;str〉)"
+  s2: 〈import;strings〉.ContainsAny("dd")
+  s3: 〈import;strings〉.ContainsAny(〈0;str〉, "dd")
+  str: string
+  num: <4
+  is: bool
+}

@@ -101,3 +101,29 @@ x:
     }
   }
 }
+-- out/compile --
+--- in.cue
+{
+  x: {
+    s: "myname"
+    〈1;#T〉
+  }
+  #T: {
+    s: string
+    out: 〈import;"text/template"〉.Execute("{{.s}}", {
+      s: 〈1;s〉
+    })
+  }
+  #V: {
+    s: string
+    out: 〈import;"encoding/json"〉.Marshal({
+      s: 〈1;s〉
+    })
+  }
+  #U: {
+    s: string
+    out: 〈import;"encoding/yaml"〉.Marshal({
+      s: 〈1;s〉
+    })
+  }
+}

@@ -22,3 +22,9 @@ foo:   json.Marshal(input)
     //     ./in.cue:4:8
   }
 }
+-- out/compile --
+--- in.cue
+{
+  input: string
+  foo: 〈import;"encoding/json"〉.Marshal(〈0;input〉)
+}

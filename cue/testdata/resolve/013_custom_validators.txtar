@@ -38,3 +38,13 @@ Result:
   }
   c: (string){ "dog" }
 }
+-- out/compile --
+--- in.cue
+{
+  a: 〈import;strings〉.ContainsAny("ab")
+  a: "after"
+  b: 〈import;strings〉.ContainsAny("c")
+  b: "dog"
+  c: (〈import;strings〉.ContainsAny("d") & 〈import;strings〉.ContainsAny("g"))
+  c: "dog"
+}

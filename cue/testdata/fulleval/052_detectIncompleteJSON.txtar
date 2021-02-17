@@ -90,3 +90,24 @@ Val:
     }
   }
 }
+-- out/compile --
+--- in.cue
+{
+  #Spec: {
+    _vars: {
+      something: string
+    }
+    data: {
+      #foo: {
+        use: 〈2;_vars〉.something
+      }
+      baz: 〈import;"encoding/json"〉.Marshal(〈1;_vars〉.something)
+      foobar: 〈import;"encoding/json"〉.Marshal(〈0;#foo〉)
+    }
+  }
+  Val: (〈0;#Spec〉 & {
+    _vars: {
+      something: "var-string"
+    }
+  })
+}

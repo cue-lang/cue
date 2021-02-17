@@ -80,22 +80,7 @@ var alwaysSkip = map[string]string{
 }
 
 var needFix = map[string]string{
-	"export/020":                           "builtin",
-	"fulleval/027_len_of_incomplete_types": "builtin",
-	"fulleval/032_or_builtin_should_not_fail_on_non-concrete_empty_list": "builtin",
-	"fulleval/053_issue312":       "builtin",
-	"resolve/034_closing_structs": "builtin",
-	"resolve/048_builtins":        "builtin",
-
-	"fulleval/026_dont_convert_incomplete_errors_to_non-incomplete": "import",
-	"fulleval/044_Issue_#178":                              "import",
-	"fulleval/048_dont_pass_incomplete_values_to_builtins": "import",
-	"fulleval/049_alias_reuse_in_nested_scope":             "import",
-	"fulleval/050_json_Marshaling_detects_incomplete":      "import",
-	"fulleval/051_detectIncompleteYAML":                    "import",
-	"fulleval/052_detectIncompleteJSON":                    "import",
-	"fulleval/056_issue314":                                "import",
-	"resolve/013_custom_validators":                        "import",
+	"DIR/NAME": "explanation",
 }
 
 // TestX is for debugging. Do not delete.

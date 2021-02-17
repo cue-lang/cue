@@ -214,3 +214,71 @@ Result:
     }
   }
 }
+-- out/compile --
+--- in.cue
+{
+  a1: {
+    a: and([
+      〈0;b〉,
+      〈0;c〉,
+    ])
+    b: =~"oo"
+    c: =~"fo"
+  }
+  a2: (〈0;a1〉 & {
+    a: "foo"
+  })
+  a3: (〈0;a1〉 & {
+    a: "bar"
+  })
+  o1: {
+    a: or([
+      〈0;b〉,
+      〈0;c〉,
+    ])
+    b: string
+    c: "bar"
+  }
+  o2: (〈0;o1〉 & {
+    a: "foo"
+  })
+  o3: (〈0;o1〉 & {
+    a: "foo"
+    b: "baz"
+  })
+  stringListErrors: {
+    a: {
+      x: [
+        string,
+        ...string,
+      ]
+      result: 〈import;strings〉.Join(〈0;x〉, " ")
+    }
+    b: {
+      x: [
+        int,
+        ...string,
+      ]
+      result: 〈import;strings〉.Join(〈0;x〉, " ")
+    }
+    c: {
+      x: []
+      result: 〈import;strings〉.Join(〈0;x〉, int)
+    }
+  }
+  decimalListErrors: {
+    a: {
+      x: [
+        string,
+      ]
+      result: 〈import;list〉.Avg(〈0;x〉)
+    }
+    b: {
+      x: [
+        int,
+        ...string,
+      ]
+      result: 〈import;list〉.Avg(〈0;x〉)
+    }
+  }
+}

@@ -92,3 +92,31 @@ b:
     }
   }
 }
+-- out/compile --
+--- in.cue
+{
+  #Foo: {
+    connection: {
+      [〈1;let X〉]: 〈1;let X〉
+    }
+  }
+  #A: {
+    foo: "key"
+    a: {
+      foo: {
+        [〈2;let X〉]: 〈2;let X〉
+      }
+    }
+  }
+  #B: {
+    foo: string
+    a: {
+      foo: {
+        [〈2;let X〉]: 〈2;let X〉
+      }
+    }
+  }
+  b: (〈0;#B〉 & {
+    foo: "key"
+  })
+}

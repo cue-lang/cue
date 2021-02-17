@@ -105,3 +105,34 @@ ctct: ct & ct
     x: (int){ int }
   }
 }
+-- out/compile --
+--- in.cue
+{
+  op: {
+    x: int
+  }
+  ot: {
+    x: int
+    ...
+  }
+  cp: close({
+    x: int
+  })
+  ct: close({
+    x: int
+    ...
+  })
+  opot: (〈0;op〉 & 〈0;ot〉)
+  otop: (〈0;ot〉 & 〈0;op〉)
+  opcp: (〈0;op〉 & 〈0;cp〉)
+  cpop: (〈0;cp〉 & 〈0;op〉)
+  opct: (〈0;op〉 & 〈0;ct〉)
+  ctop: (〈0;ct〉 & 〈0;op〉)
+  otcp: (〈0;ot〉 & 〈0;cp〉)
+  cpot: (〈0;cp〉 & 〈0;ot〉)
+  otct: (〈0;ot〉 & 〈0;ct〉)
+  ctot: (〈0;ct〉 & 〈0;ot〉)
+  cpct: (〈0;cp〉 & 〈0;ct〉)
+  ctcp: (〈0;ct〉 & 〈0;cp〉)
+  ctct: (〈0;ct〉 & 〈0;ct〉)
+}

@@ -35,3 +35,11 @@ bar:  hex.EncodedLen(len)
     // [incomplete] error in call to encoding/hex.EncodedLen: non-concrete value int
   }
 }
+-- out/compile --
+--- in.cue
+{
+  foo: 〈import;"encoding/csv"〉.Decode(〈0;data〉)
+  data: bytes
+  len: int
+  bar: 〈import;"encoding/hex"〉.EncodedLen(〈0;len〉)
+}

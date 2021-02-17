@@ -24,3 +24,14 @@ for x in [1] *close({}) | {
 (struct){ |(*(#struct){
   }, (struct){
   }) }
+-- out/compile --
+--- in.cue
+{
+  for _, x in [
+    1,
+  ] {
+    (*close({})|{
+      [_]: null
+    })
+  }
+}

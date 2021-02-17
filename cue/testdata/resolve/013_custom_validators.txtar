@@ -24,6 +24,7 @@ Errors:
 b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
     ./in.cue:6:4
     ./in.cue:6:24
+    ./in.cue:7:4
 
 Result:
 (_|_){
@@ -33,6 +34,7 @@ Result:
     // [eval] b: invalid value "dog" (does not satisfy strings.ContainsAny("c")):
     //     ./in.cue:6:4
     //     ./in.cue:6:24
+    //     ./in.cue:7:4
   }
   c: (string){ "dog" }
 }

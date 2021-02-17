@@ -71,6 +71,7 @@ e3: conflicting values !="a" and <5 (mismatched types string and number):
     ./in.cue:22:13
 b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
     ./in.cue:10:5
+    ./in.cue:11:5
 e1: cannot use 1 (type int) as type (string|bytes):
     ./in.cue:20:5
 e2: cannot use true (type bool) as type (string|bytes):
@@ -88,6 +89,7 @@ Result:
   b3: (_|_){
     // [eval] b3: invalid value "foo" (out of bound =~"[a-z]{4}"):
     //     ./in.cue:10:5
+    //     ./in.cue:11:5
   }
   b4: (string){ "foo" }
   s1: (string){ =~"c" }

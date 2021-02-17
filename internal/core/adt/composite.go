@@ -643,7 +643,14 @@ func (v *Vertex) GetArc(c *OpContext, f Feature) (arc *Vertex, isNew bool) {
 	return arc, isNew
 }
 
-func (v *Vertex) Source() ast.Node { return nil }
+func (v *Vertex) Source() ast.Node {
+	if v != nil {
+		if b, ok := v.BaseValue.(Value); ok {
+			return b.Source()
+		}
+	}
+	return nil
+}
 
 // AddConjunct adds the given Conjuncts to v if it doesn't already exist.
 func (v *Vertex) AddConjunct(c Conjunct) *Bottom {

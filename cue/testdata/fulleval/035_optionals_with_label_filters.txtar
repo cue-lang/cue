@@ -117,6 +117,7 @@ jobs3: field `fooTest1` not allowed:
     ./in.cue:23:8
 jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
     ./in.cue:9:22
+    ./in.cue:19:23
 
 Result:
 (_|_){
@@ -151,6 +152,7 @@ Result:
       name: (_|_){
         // [eval] jobs2.fooTest.name: invalid value "badName" (out of bound =~"^test"):
         //     ./in.cue:9:22
+        //     ./in.cue:19:23
       }
       cmd: (string){ string }
     }

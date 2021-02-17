@@ -23,7 +23,8 @@ error in call to regexp.Find: no match
 error in call to regexp.FindAll: no match
 error in call to regexp.FindAllNamedSubmatch: no match
 error in call to regexp.FindAllSubmatch: no match
-t14: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
+t14: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`:
+    ./in.cue:16:21
 
 Result:
 t1: "foo"

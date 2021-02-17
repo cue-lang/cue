@@ -95,8 +95,10 @@ o3.a: conflicting values "baz" and "foo":
     ./in.cue:20:24
 a3.a: invalid value "bar" (out of bound =~"oo"):
     ./in.cue:8:5
+    ./in.cue:12:14
 a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
+    ./in.cue:12:14
 stringListErrors.b.result: invalid type element 0 (int) of string list argument 0:
     ./in.cue:31:17
 stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
@@ -122,8 +124,10 @@ Result:
     a: (_|_){
       // [eval] a3.a: invalid value "bar" (out of bound =~"oo"):
       //     ./in.cue:8:5
+      //     ./in.cue:12:14
       // a3.a: invalid value "bar" (out of bound =~"fo"):
       //     ./in.cue:9:5
+      //     ./in.cue:12:14
     }
     b: (string){ =~"oo" }
     c: (string){ =~"fo" }

@@ -564,6 +564,7 @@ func (x *BoundExpr) evaluate(ctx *OpContext) Value {
 		}
 	}
 	if v.Concreteness() > Concrete {
+		// TODO(errors): analyze dependencies of x.Expr to get positions.
 		ctx.addErrf(IncompleteError, ctx.pos(),
 			"non-concrete value %s for bound %s", ctx.Str(x.Expr), x.Op)
 		return nil
@@ -615,8 +616,10 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 		}
 		// TODO(errors): use "invalid value %v (not an %s)" if x is a
 		// predeclared identifier such as `int`.
-		return c.NewErrf("invalid value %v (out of bound %s)",
+		err := c.Newf("invalid value %v (out of bound %s)",
 			c.Str(y), c.Str(x))
+		err.AddPosition(y)
+		return &Bottom{Src: c.src, Err: err, Code: EvalError}
 
 	default:
 		panic(fmt.Sprintf("unsupported type %T", v))

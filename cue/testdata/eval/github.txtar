@@ -281,7 +281,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.16.0-rc1"]
+		"go-version": [_#codeGenGo, _#latestStableGo, "1.16"]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -1123,7 +1123,7 @@ import "strings"
                 "go-version": (#list){
                   0: (string){ "1.14.14" }
                   1: (string){ "1.15.8" }
-                  2: (string){ "1.16.0-rc1" }
+                  2: (string){ "1.16" }
                 }
                 os: (#list){
                   0: (string){ "ubuntu-18.04" }
@@ -1747,7 +1747,7 @@ import "strings"
             "go-version": (#list){
               0: (string){ "1.14.14" }
               1: (string){ "1.15.8" }
-              2: (string){ "1.16.0-rc1" }
+              2: (string){ "1.16" }
             }
             os: (#list){
               0: (string){ "ubuntu-18.04" }
@@ -2367,7 +2367,7 @@ import "strings"
       "go-version": (#list){
         0: (string){ "1.14.14" }
         1: (string){ "1.15.8" }
-        2: (string){ "1.16.0-rc1" }
+        2: (string){ "1.16" }
       }
       os: (#list){
         0: (string){ "ubuntu-18.04" }
@@ -2792,7 +2792,7 @@ import "strings"
       "go-version": [
         〈2;_#codeGenGo〉,
         〈2;_#latestStableGo〉,
-        "1.16.0-rc1",
+        "1.16",
       ]
       os: [
         〈2;_#linuxMachine〉,

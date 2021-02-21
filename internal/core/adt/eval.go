@@ -1702,12 +1702,6 @@ func (n *nodeContext) addStruct(
 		case *Field:
 			// handle in next iteration.
 
-		case *OptionalField:
-			if x.Label.IsString() {
-				n.aStruct = s
-				n.aStructID = closeInfo
-			}
-
 		case *DynamicField:
 			n.aStruct = s
 			n.aStructID = closeInfo
@@ -1731,13 +1725,10 @@ func (n *nodeContext) addStruct(
 			// push and opo embedding type.
 			n.addExprConjunct(MakeConjunct(childEnv, x, id))
 
-		case *BulkOptionalField:
-			n.aStruct = s
-			n.aStructID = closeInfo
-
-		case *Ellipsis:
-			n.aStruct = s
-			n.aStructID = closeInfo
+		case *OptionalField, *BulkOptionalField, *Ellipsis:
+			// Nothing to do here. Note that the precense of these fields do not
+			// excluded embedded scalars: only when they match actual fields
+			// does it exclude those.
 
 		default:
 			panic("unreachable")

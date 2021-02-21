@@ -1,0 +1,222 @@
+// Issue #783
+
+-- in.cue --
+elipsis: {
+    test1: {
+        string
+        #foo: "bar"
+    }
+
+    #Def: {
+        ...
+        #foo: string
+        _
+    }
+    check: test1 & #Def
+}
+
+bulk: {
+    test1: {
+        string
+        #foo: "bar"
+    }
+
+    #Def: {
+        [string]: int
+        #foo: string
+        _
+    }
+    check: test1 & #Def
+}
+
+optional: {
+    test1: {
+        string
+        #foo: "bar"
+    }
+
+    #Def: {
+        bar?: int
+        #foo: string
+        _
+    }
+    check: test1 & #Def
+}
+
+issue783: {
+    test1: {
+        string
+        #foo: "bar"
+    }
+
+    test2: {
+        hello: "world"
+        #foo: "bar"
+    }
+
+
+    #Def1: {
+        ...
+        #foo: string
+    } | {
+        string
+        #foo: string
+    }
+    check1a: test1 & #Def1
+    check1b: test2 & #Def1
+
+    #Def2: {
+        ...
+        #foo: string
+        _
+    }
+    check2a: test1 & #Def2
+    check2b: test2 & #Def2
+}
+-- out/eval --
+(struct){
+  elipsis: (struct){
+    test1: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+    #Def: (_){
+      _
+      #foo: (string){ string }
+    }
+    check: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+  }
+  bulk: (struct){
+    test1: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+    #Def: (_){
+      _
+      #foo: (string){ string }
+    }
+    check: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+  }
+  optional: (struct){
+    test1: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+    #Def: (_){
+      _
+      #foo: (string){ string }
+    }
+    check: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+  }
+  issue783: (struct){
+    test1: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+    test2: (struct){
+      hello: (string){ "world" }
+      #foo: (string){ "bar" }
+    }
+    #Def1: ((string|struct)){ |((#struct){
+        #foo: (string){ string }
+      }, (string){
+        string
+        #foo: (string){ string }
+      }) }
+    check1a: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+    check1b: (#struct){
+      hello: (string){ "world" }
+      #foo: (string){ "bar" }
+    }
+    #Def2: (_){
+      _
+      #foo: (string){ string }
+    }
+    check2a: (string){
+      string
+      #foo: (string){ "bar" }
+    }
+    check2b: (#struct){
+      hello: (string){ "world" }
+      #foo: (string){ "bar" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  elipsis: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    #Def: {
+      ...
+      #foo: string
+      _
+    }
+    check: (〈0;test1〉 & 〈0;#Def〉)
+  }
+  bulk: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    #Def: {
+      [string]: int
+      #foo: string
+      _
+    }
+    check: (〈0;test1〉 & 〈0;#Def〉)
+  }
+  optional: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    #Def: {
+      bar?: int
+      #foo: string
+      _
+    }
+    check: (〈0;test1〉 & 〈0;#Def〉)
+  }
+  issue783: {
+    test1: {
+      string
+      #foo: "bar"
+    }
+    test2: {
+      hello: "world"
+      #foo: "bar"
+    }
+    #Def1: ({
+      ...
+      #foo: string
+    }|{
+      string
+      #foo: string
+    })
+    check1a: (〈0;test1〉 & 〈0;#Def1〉)
+    check1b: (〈0;test2〉 & 〈0;#Def1〉)
+    #Def2: {
+      ...
+      #foo: string
+      _
+    }
+    check2a: (〈0;test1〉 & 〈0;#Def2〉)
+    check2b: (〈0;test2〉 & 〈0;#Def2〉)
+  }
+}

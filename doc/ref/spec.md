@@ -285,7 +285,7 @@ There are several kinds of numeric literals.
 
 ```
 int_lit     = decimal_lit | si_lit | octal_lit | binary_lit | hex_lit .
-decimal_lit = ( "1" … "9" ) { [ "_" ] decimal_digit } .
+decimal_lit = "0" | ( "1" … "9" ) { [ "_" ] decimal_digit } .
 decimals    = decimal_digit { [ "_" ] decimal_digit } .
 si_it       = decimals [ "." decimals ] multiplier |
               "." decimals  multiplier .

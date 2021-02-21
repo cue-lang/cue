@@ -1,0 +1,16 @@
+-- in.cue --
+import "crypto/hmac"
+import "encoding/hex"
+
+t1: hex.Encode(hmac.Sign(hmac.SHA1, hex.Decode("303132333435363738393a3b3c3d3e3f40414243"), "Sample #2"))
+t2: hex.Encode(hmac.Sign(hmac.MD5, "Jefe", "what do ya want for nothing?"))
+t3: hex.Encode(hmac.Sign(hmac.SHA256, hex.Decode("0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b0b"), "Hi There"))
+t4: hex.Encode(hmac.Sign(hmac.SHA224, hex.Decode("000102030405060708090a0b0c0d0e0f101112131415161718191a1b"), "Sample message for keylen<blocklen"))
+t5: hex.Encode(hmac.Sign(hmac.SHA384, hex.Decode("000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f202122232425262728292a2b2c2d2e2f"), "Sample message for keylen<blocklen"))
+-- out/hmac --
+t1: "0922d3405faa3d194f82a45830737d5cc6c75d24"
+t2: "750c783e6ab0b503eaa86e310a5db738"
+t3: "b0344c61d8db38535ca8afceaf0bf12b881dc200c9833da726e9376c2e32cff7"
+t4: "e3d249a8cfb67ef8b7a169e9a0a599714a2cecba65999a51beb8fbbe"
+t5: "6eb242bdbb582ca17bebfa481b1e23211464d2b7f8c20b9ff2201637b93646af5ae9ac316e98db45d9cae773675eeed0"
+

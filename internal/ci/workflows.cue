@@ -188,6 +188,7 @@ repository_dispatch: _#bashWorkflow & {
 	_#runtrybot: "runtrybot"
 	_#mirror:    "mirror"
 	_#importpr:  "importpr"
+	_#unity:     "unity"
 
 	_#dispatchJob: _#job & {
 		_#type:    string

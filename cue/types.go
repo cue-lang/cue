@@ -1831,7 +1831,7 @@ func (v Value) Equals(other Value) bool {
 	if v.v == nil || other.v == nil {
 		return false
 	}
-	return adt.Equal(v.ctx().opCtx, v.v, other.v, adt.CheckStructural)
+	return adt.Equal(v.ctx().opCtx, v.v, other.v, 0)
 }
 
 // Format prints a debug version of a value.

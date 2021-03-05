@@ -1493,6 +1493,21 @@ func TestEquals(t *testing.T) {
 			a: "foo",
 		}`,
 		false,
+	}, {
+		// Ignore closedness
+		`{ #Foo: { k: 1 }, a: #Foo }`,
+		`{ #Foo: { k: 1 }, a: { k: 1 } }`,
+		true,
+	}, {
+		// Ignore optional fields
+		`{ #Foo: { k: 1 }, a: #Foo }`,
+		`{ #Foo: { k: 1 }, a: { #Foo, i?: 1 } }`,
+		true,
+	}, {
+		// Treat embedding as equal
+		`{ a: 2, b: { 3 } }`,
+		`{ a: { 2 }, b: 3 }`,
+		true,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

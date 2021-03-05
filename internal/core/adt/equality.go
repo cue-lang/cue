@@ -57,11 +57,13 @@ func equalVertex(ctx *OpContext, x *Vertex, v Value, flags Flag) bool {
 	}
 
 	// TODO: this really should be subsumption.
-	if x.IsClosed(ctx) != y.IsClosed(ctx) {
-		return false
-	}
-	if flags != 0 && !equalClosed(ctx, x, y, flags) {
-		return false
+	if flags != 0 {
+		if x.IsClosed(ctx) != y.IsClosed(ctx) {
+			return false
+		}
+		if !equalClosed(ctx, x, y, flags) {
+			return false
+		}
 	}
 
 loop1:

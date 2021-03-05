@@ -1157,11 +1157,10 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 	}
 
 	var match bool
-	v := c.evalState(x, Partial)
 	// NOTE: using Unwrap is maybe note entirely accurate, as it may discard
 	// a future error. However, if it does so, the error will at least be
 	// reported elsewhere.
-	switch b := Unwrap(v).(type) {
+	switch b := c.value(x).(type) {
 	case nil:
 	case *Bottom:
 		if b.Code == CycleError {

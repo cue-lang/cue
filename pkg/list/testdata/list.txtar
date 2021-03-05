@@ -31,6 +31,16 @@ concat: {
     t7: x: 1
     t8: x: [1, [2]]
 }
+unique: {
+	issue797: {
+		mylst: [
+			{ foo: "bar" },
+			{ foo: "baz" }
+		]
+
+		_testmylst: list.UniqueItems & [for x in mylst { x.foo } ]
+	}
+}
 -- out/list --
 Errors:
 error in call to list.Concat: cannot use value 1 (type int) as list
@@ -113,6 +123,15 @@ concat: {
 	t8: {
 		x: [1, [2]]
 		v: _|_ // error in call to list.Concat: cannot use value 1 (type int) as list (and 1 more errors)
+	}
+}
+unique: {
+	issue797: {
+		mylst: [{
+			foo: "bar"
+		}, {
+			foo: "baz"
+		}]
 	}
 }
 

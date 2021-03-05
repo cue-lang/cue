@@ -231,7 +231,7 @@ func MaxItems(a []cue.Value, n int) bool {
 func UniqueItems(a []cue.Value) bool {
 	b := []string{}
 	for _, v := range a {
-		b = append(b, fmt.Sprint(v))
+		b = append(b, fmt.Sprintf("%+v", v))
 	}
 	sort.Strings(b)
 	for i := 1; i < len(b); i++ {

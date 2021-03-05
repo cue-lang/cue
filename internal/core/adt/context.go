@@ -743,7 +743,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 				return nil
 			}
 
-		case l.IsDef():
+		case l.IsDef(), l.IsHidden():
 
 		default:
 			c.addErrf(0, pos, "invalid list index %s (type string)", l)

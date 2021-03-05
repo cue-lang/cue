@@ -93,6 +93,13 @@ optionalCheck: {
         other: 3
     }
 }
+
+hidden: {
+    issue794: {
+        _foo: "foo"
+        [_foo]
+    }
+}
 -- out/eval --
 Errors:
 listEmbed.b6: invalid list index 5 (out of bounds):
@@ -192,6 +199,12 @@ Result:
     thing: (struct){
       value: (string){ "some string" }
       other: (int){ 3 }
+    }
+  }
+  hidden: (struct){
+    issue794: (#list){
+      _foo: (string){ "foo" }
+      0: (string){ "foo" }
     }
   }
 }
@@ -299,6 +312,14 @@ Result:
     thing: {
       value: "some string"
       other: 3
+    }
+  }
+  hidden: {
+    issue794: {
+      _foo: "foo"
+      [
+        〈0;_foo〉,
+      ]
     }
   }
 }

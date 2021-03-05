@@ -8,13 +8,31 @@ X="\(b)": {
 	a: 1
 }
 c: X
+
+withError: {
+    issue799: {key: int32} & {"\(1&2)": 123}
+}
 -- out/eval --
-(struct){
+Errors:
+invalid interpolation: conflicting values 2 and 1:
+    ./in.cue:12:31
+
+Result:
+(_|_){
+  // [eval]
   a: (string){ "foo" }
   e: (int){ 2 }
   b: (string){ "bar" }
   c: (struct){
     a: (int){ 1 }
+  }
+  withError: (_|_){
+    // [eval]
+    issue799: (_|_){
+      // [eval] invalid interpolation: conflicting values 2 and 1:
+      //     ./in.cue:12:31
+      key: (int){ &(>=-2147483648, <=2147483647, int) }
+    }
   }
   foo: (struct){
     b: (struct){
@@ -44,4 +62,11 @@ c: X
     a: 1
   }
   c: 〈0;("\(〈0;b〉)")〉
+  withError: {
+    issue799: ({
+      key: &(int, >=-2147483648, <=2147483647)
+    } & {
+      "\((1 & 2))": 123
+    })
+  }
 }

@@ -468,6 +468,10 @@ func verifyArc(ctx *OpContext, s *StructInfo, f Feature, label Value) bool {
 		return false
 	}
 
+	// Do not record errors during this validation.
+	errs := ctx.errs
+	defer func() { ctx.errs = errs }()
+
 	if len(o.Dynamic) > 0 && f.IsString() {
 		if label == nil && f.IsString() {
 			label = f.ToValue(ctx)

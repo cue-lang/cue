@@ -56,7 +56,7 @@ group: {
 		aa: 8 // new value
 	}
 
-	comp: {} // TODO: remove: implied by comprehension above
+	comp: baz: {} // TODO: remove: implied by comprehension above
 }
 -- trim/trim.cue --
 package trim

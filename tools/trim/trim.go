@@ -86,7 +86,8 @@ func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
 		w:       os.Stderr,
 	}
 
-	t.findSubordinates(v)
+	d, _, _, pickedDefault := t.addDominators(nil, v, false)
+	t.findSubordinates(d, v, pickedDefault)
 
 	// Remove subordinate values from files.
 	for _, f := range files {
@@ -177,7 +178,68 @@ const (
 	yes
 )
 
-func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
+// addDominators injects dominator values from v into d. If no default has
+// been selected from dominators so far, the values are erased. Otherwise,
+// both default and new values are merged.
+//
+// Erasing the previous values when there has been no default so far allows
+// interpolations, for instance, to be evaluated in the new context and
+// eliminated.
+//
+// Values are kept when there has been a default (current or ancestor) because
+// the current value may contain information that caused that default to be
+// selected and thus erasing it would cause that information to be lost.
+//
+// TODO:
+// In principle, information only needs to be kept for discriminator values, or
+// any value that was instrumental in selecting the default. This is currently
+// hard to do, however, so we just fall back to a stricter mode in the presence
+// of defaults.
+func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *adt.Vertex, ambiguous, hasSubs, strict bool) {
+	strict = hasDisjunction
+	doms = &adt.Vertex{}
+	if d != nil && hasDisjunction {
+		doms.Conjuncts = append(doms.Conjuncts, d.Conjuncts...)
+	}
+
+	for _, c := range v.Conjuncts {
+		switch {
+		case isDominator(c):
+			doms.AddConjunct(c)
+		default:
+			if r, ok := c.Expr().(adt.Resolver); ok {
+				x, _ := t.ctx.Resolve(c.Env, r)
+				// Even if this is not a dominator now, descendants will be.
+				if x.Label.IsDef() {
+					for _, c := range x.Conjuncts {
+						doms.AddConjunct(c)
+					}
+					break
+				}
+			}
+			hasSubs = true
+		}
+	}
+	doms.Finalize(t.ctx)
+
+	switch x := doms.Value().(type) {
+	case *adt.Disjunction:
+		switch x.NumDefaults {
+		case 1:
+			strict = true
+		default:
+			ambiguous = true
+		}
+	}
+
+	if doms = doms.Default(); doms.IsErr() {
+		ambiguous = true
+	}
+
+	return doms, hasSubs, ambiguous, strict || ambiguous
+}
+
+func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (result int) {
 	defer un(t.trace(v))
 	defer func() {
 		if result == no {
@@ -187,6 +249,12 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
 		}
 	}()
 
+	doms, hasSubs, ambiguous, pickedDefault := t.addDominators(doms, v, hasDisjunction)
+
+	if ambiguous {
+		return no
+	}
+
 	// TODO(structure sharing): do not descend into vertices whose parent is not
 	// equal to the parent. This is not relevant at this time, but may be so in
 	// the future.
@@ -194,7 +262,8 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
 	if len(v.Arcs) > 0 {
 		var match int
 		for _, a := range v.Arcs {
-			match |= t.findSubordinates(a)
+			d := doms.Lookup(a.Label)
+			match |= t.findSubordinates(d, a, pickedDefault)
 		}
 
 		// This also skips embedded scalars if not all fields are removed. In
@@ -217,23 +286,9 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
 		// have to check additional optional constraints to pass subsumption.
 
 	default:
-		doms := &adt.Vertex{}
-		hasSubs := false
-
-		for _, c := range v.Conjuncts {
-			if isDominator(c) {
-				doms.AddConjunct(c)
-			} else {
-				hasSubs = true
-			}
-		}
-
 		if !hasSubs {
-			return maybe // only if there are siblings to be removed.
+			return maybe
 		}
-
-		doms.Finalize(t.ctx)
-		doms = doms.Default()
 
 		// This should normally not be necessary, as subsume should catch this.
 		// But as we already take the default value for doms, it doesn't hurt to
@@ -242,7 +297,7 @@ func (t *trimmer) findSubordinates(v *adt.Vertex) (result int) {
 
 		// This is not necessary, but seems like it may result in more
 		// user-friendly semantics.
-		if doms.IsErr() || v.IsErr() {
+		if v.IsErr() {
 			return no
 		}
 

@@ -27,6 +27,29 @@ func: {
     ok1: yaml.MarshalStream(s) | yaml.Marshal(s)
 }
 
+issue782: {
+    a: {
+        inner:         string
+        interpolation: *"\(inner)" | string
+        interpolation: "override"
+    }
+    b: {
+        inner:         string
+        interpolation: string | *"\(inner)"
+        interpolation: "override"
+    }
+    c: {
+        inner:         string
+        interpolation: "\(inner)" | string
+        interpolation: "override"
+    }
+    d: {
+        inner:         string
+        interpolation: string | "\(inner)"
+        interpolation: "override"
+    }
+}
+
 -- out/eval --
 (struct){
   issue700: (struct){
@@ -78,6 +101,24 @@ func: {
       //     ./in.cue:26:10
     }
   }
+  issue782: (struct){
+    a: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+    b: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+    c: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+    d: (struct){
+      inner: (string){ string }
+      interpolation: (string){ "override" }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -106,5 +147,27 @@ func: {
   func: {
     s: string
     ok1: (〈import;"encoding/yaml"〉.MarshalStream(〈0;s〉)|〈import;"encoding/yaml"〉.Marshal(〈0;s〉))
+  }
+  issue782: {
+    a: {
+      inner: string
+      interpolation: (*"\(〈0;inner〉)"|string)
+      interpolation: "override"
+    }
+    b: {
+      inner: string
+      interpolation: (string|*"\(〈0;inner〉)")
+      interpolation: "override"
+    }
+    c: {
+      inner: string
+      interpolation: ("\(〈0;inner〉)"|string)
+      interpolation: "override"
+    }
+    d: {
+      inner: string
+      interpolation: (string|"\(〈0;inner〉)")
+      interpolation: "override"
+    }
   }
 }

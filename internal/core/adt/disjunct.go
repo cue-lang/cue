@@ -366,6 +366,9 @@ func (n *nodeContext) expandDisjuncts(
 	outer:
 		for _, d := range n.disjuncts {
 			for k, v := range p.disjuncts {
+				if !d.done() || !v.done() {
+					break
+				}
 				flags := CheckStructural
 				if last {
 					flags |= IgnoreOptional

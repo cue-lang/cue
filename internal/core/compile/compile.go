@@ -235,9 +235,18 @@ func (c *compiler) popScope() {
 func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	c.fileScope = map[adt.Feature]bool{}
 
-	// Populate file scope to handle unresolved references. Note that we do
-	// not allow aliases to be resolved across file boundaries.
+	// TODO(resolve): this is also done in the runtime package, do we need both?
+
+	// Populate file scope to handle unresolved references.
+	// Excluded from cross-file resolution are:
+	// - import specs
+	// - aliases
+	// - anything in an anonymous file
+	//
 	for _, f := range a {
+		if p := internal.GetPackageInfo(f); p.IsAnonymous() {
+			continue
+		}
 		for _, d := range f.Decls {
 			if f, ok := d.(*ast.Field); ok {
 				if id, ok := f.Label.(*ast.Ident); ok {

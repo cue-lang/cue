@@ -3,6 +3,8 @@
 // fields of another.
 
 -- in.cue --
+package foo
+
 #theme: {
 	color:   string
 	ctermbg: string
@@ -20,6 +22,8 @@ light: #theme & {
 }
 
 -- box.cue --
+package foo
+
 #Config & {
 	console: dark
 }

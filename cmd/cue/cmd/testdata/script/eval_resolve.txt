@@ -1,0 +1,80 @@
+# Issue #736
+#
+# references should never resolve to files of an
+# anonymous package (no package or package _).
+
+! cue eval data.yaml check.cue
+cmp stderr out-stderr
+
+! cue eval none.cue check.cue
+cmp stderr out-stderr
+
+! cue eval anon.cue check.cue
+cmp stderr out-stderr
+
+# TODO: allow this for now. Files without a package clause should not resolve
+# across other files.
+cue eval package.cue check.cue
+
+-- data.yaml --
+nodes:
+- name: foo
+  childs:
+  - bar
+  - baz
+
+- name: bar
+  parent: foo
+
+- name: baz
+  parent: foo
+
+-- none.cue --
+nodes: [{
+    name: "foo"
+    childs: ["bar", "baz"]
+}, {
+    name:   "bar"
+    parent: "foo"
+}, {
+    name:   "baz"
+    parent: "foo"
+}]
+
+-- anon.cue --
+// This is an explicitly declared anonymous package.
+package _
+
+nodes: [{
+    name: "foo"
+    childs: ["bar", "baz"]
+}, {
+    name:   "bar"
+    parent: "foo"
+}, {
+    name:   "baz"
+    parent: "foo"
+}]
+
+-- package.cue --
+package list
+
+nodes: [{
+    name: "foo"
+    childs: ["bar", "baz"]
+}, {
+    name:   "bar"
+    parent: "foo"
+}, {
+    name:   "baz"
+    parent: "foo"
+}]
+
+-- check.cue --
+import "list"
+
+#map: {for n in nodes {"\(n.name)": n}}
+
+-- out-stderr --
+#map: reference "nodes" not found:
+    ./check.cue:3:17

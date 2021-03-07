@@ -21,16 +21,21 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/internal"
 )
 
+// TODO(resolve): this is also done in compile, do we need both?
 func (r *Runtime) ResolveFiles(p *build.Instance) (errs errors.Error) {
 	idx := r.index
 
 	// Link top-level declarations. As top-level entries get unified, an entry
 	// may be linked to any top-level entry of any of the files.
 	allFields := map[string]ast.Node{}
-	for _, file := range p.Files {
-		for _, d := range file.Decls {
+	for _, f := range p.Files {
+		if p := internal.GetPackageInfo(f); p.IsAnonymous() {
+			continue
+		}
+		for _, d := range f.Decls {
 			if f, ok := d.(*ast.Field); ok && f.Value != nil {
 				if ident, ok := f.Label.(*ast.Ident); ok {
 					allFields[ident.Name] = f.Value
@@ -39,6 +44,9 @@ func (r *Runtime) ResolveFiles(p *build.Instance) (errs errors.Error) {
 		}
 	}
 	for _, f := range p.Files {
+		if p := internal.GetPackageInfo(f); p.IsAnonymous() {
+			continue
+		}
 		err := resolveFile(idx, f, p, allFields)
 		errs = errors.Append(errs, err)
 	}

@@ -89,6 +89,9 @@ var (
 
 // A TaskFunc creates a Runner for v if v defines a task or reports nil
 // otherwise. It reports an error for illformed tasks.
+//
+// If TaskFunc returns a non-nil Runner the search for task within v stops.
+// That is, subtasks are not supported.
 type TaskFunc func(v cue.Value) (Runner, error)
 
 // A Runner executes a Task.
@@ -276,6 +279,7 @@ func (s State) String() string {
 }
 
 // A Task contains the context for a single task execution.
+// Tasks may be run concurrently.
 type Task struct {
 	// Static
 	c    *Controller
@@ -306,6 +310,7 @@ func (t *Task) Context() context.Context {
 }
 
 // Path reports the path of Task within the Instance in which it is defined.
+// The Path is always valid.
 func (t *Task) Path() cue.Path {
 	return t.path
 }

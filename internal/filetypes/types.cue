@@ -28,7 +28,7 @@ package build
 	encoding:        #Encoding
 	interpretation?: #Interpretation
 	form?:           #Form
-	tags?: {[string]: string}
+	tags?: [string]: string
 }
 
 // Default is the file used for stdin and stdout. The settings depend

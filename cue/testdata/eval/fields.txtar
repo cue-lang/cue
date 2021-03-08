@@ -1,0 +1,45 @@
+-- in.cue --
+bulkToSelf: {
+    a: {
+        foo: [string]: int
+        foo: bar: "3" // error
+    }
+}
+-- out/compile --
+--- in.cue
+{
+  bulkToSelf: {
+    a: {
+      foo: {
+        [string]: int
+      }
+      foo: {
+        bar: "3"
+      }
+    }
+  }
+}
+-- out/eval --
+Errors:
+bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
+    ./in.cue:3:24
+    ./in.cue:4:19
+
+Result:
+(_|_){
+  // [eval]
+  bulkToSelf: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval]
+      foo: (_|_){
+        // [eval]
+        bar: (_|_){
+          // [eval] bulkToSelf.a.foo.bar: conflicting values "3" and int (mismatched types string and int):
+          //     ./in.cue:3:24
+          //     ./in.cue:4:19
+        }
+      }
+    }
+  }
+}

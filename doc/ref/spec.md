@@ -1103,21 +1103,6 @@ b: a & {
 }
 ```
 
-<!-- NOTE: pattern and default constraints can be made to apply to all
-fields by embedding them as a struct:
-    x: {
-        a: 2
-        b: 3
-        {[string]: int}
-    }
-or by writing
-    x: [string]: int
-    x: {
-        a: 2
-        b: 3
-    }
--->
-
 Concrete field labels may be an identifier or string, the latter of which may be
 interpolated.
 Fields with identifier labels can be referred to within the scope they are

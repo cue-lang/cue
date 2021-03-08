@@ -1,11 +1,11 @@
 Lots of cycle-reference goodness.
 
 -- in.cue --
-{[!~"^[.]"]: c}
+[!~"^[.]"]: c
 a: b
 b: [string]: int
 c: a: int
-{[string]: c}
+[string]: c
 a: b
 b: [string]: int
 c: a: int
@@ -25,9 +25,7 @@ c: a: int
 -- out/compile --
 --- in.cue
 {
-  {
-    [!~"^[.]"]: 〈1;c〉
-  }
+  [!~"^[.]"]: 〈0;c〉
   a: 〈0;b〉
   b: {
     [string]: int
@@ -35,9 +33,7 @@ c: a: int
   c: {
     a: int
   }
-  {
-    [string]: 〈1;c〉
-  }
+  [string]: 〈0;c〉
   a: 〈0;b〉
   b: {
     [string]: int

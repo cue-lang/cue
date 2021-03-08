@@ -357,8 +357,8 @@ func TestValues(t *testing.T) {
 		631: {subsumes: false, in: `a: {a: 1}, b: {#a: 1}`},
 
 		// Subsuming final values.
-		700: {subsumes: true, in: `a: {[string]: 1}, b: {foo: 1}`, mode: subFinal},
-		701: {subsumes: true, in: `a: {[string]: int}, b: {foo: 1}`, mode: subFinal},
+		700: {subsumes: true, in: `a: [string]: 1, b: {foo: 1}`, mode: subFinal},
+		701: {subsumes: true, in: `a: [string]: int, b: {foo: 1}`, mode: subFinal},
 		702: {subsumes: true, in: `a: {["foo"]: int}, b: {foo: 1}`, mode: subFinal},
 		703: {subsumes: false, in: `a: close({["foo"]: 1}), b: {bar: 1}`, mode: subFinal},
 		704: {subsumes: false, in: `a: {foo: 1}, b: {foo?: 1}`, mode: subFinal},

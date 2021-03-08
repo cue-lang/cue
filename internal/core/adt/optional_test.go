@@ -41,8 +41,8 @@ func TestOptionalTypes(t *testing.T) {
 		out: adt.HasPattern,
 	}, {
 		in: `
-		bar: 3          // Not counted, as it is not optional.
-		{[string]: int} // embedded into end result.
+		bar: 3        // Not counted, as it is not optional.
+		[string]: int // embedded into end result.
 		"\(bar)": int
 		`,
 		out: adt.HasPattern | adt.HasDynamic,

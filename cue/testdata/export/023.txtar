@@ -41,8 +41,8 @@ raw: true
 #e: {
 	b: int
 	#f
-	{[string]: <100}
-	{[string]: <300}
+	[string]: <100
+	[string]: <300
 }
 -- out/export --
 

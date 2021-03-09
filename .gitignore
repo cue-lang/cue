@@ -2,3 +2,4 @@
 cmd/cue/cue
 **/*.test
 /dist
+/.unity-bin

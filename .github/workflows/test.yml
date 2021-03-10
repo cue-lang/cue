@@ -19,9 +19,9 @@ jobs:
       run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
       name: Update Gerrit CL message with starting message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Started
+      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Started
         the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
-        github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
+        github.run_id }}","labels":{"Code-Review":0}}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   test:
     needs: start
@@ -82,7 +82,7 @@ jobs:
         GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
       name: Post any failures for this matrix entry
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Build
+      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
         failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url
         }}/actions/runs/${{ github.run_id }} for more details","labels":{"Code-Review":-1}}''
         -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
@@ -98,7 +98,7 @@ jobs:
     - name: Write the gitcookies file
       run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
     - name: Update Gerrit CL message with success message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"message":"Build
+      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
         succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id
         }}","labels":{"Code-Review":1}}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'

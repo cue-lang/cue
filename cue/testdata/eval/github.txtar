@@ -100,6 +100,7 @@ test: _#bashWorkflow & {
 		run:  (_#gerrit._#setCodeReview & {
 			#args: {
 				message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+				labels: "Code-Review": 0
 			}
 		}).res
 	}
@@ -127,8 +128,9 @@ test: _#bashWorkflow & {
 		// _#isCLCITestBranch is true
 		_#setCodeReview: {
 			#args: {
+				tag:     "trybot"
 				message: string
-				labels?: "Code-Review": int
+				labels: "Code-Review": int
 			}
 			res: "curl -f -s -H \"Content-Type: application/json\" --request POST --data '\(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review"
 		}
@@ -1109,7 +1111,7 @@ import "strings"
               }
               1: (#struct){
                 name: (string){ "Update Gerrit CL message with starting message" }
-                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":0}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
                 if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
               }
             }
@@ -1199,7 +1201,7 @@ import "strings"
               11: (#struct){
                 if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
                 name: (string){ "Post any failures for this matrix entry" }
-                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
               }
             }
             defaults: (#struct){
@@ -1219,7 +1221,7 @@ import "strings"
               }
               1: (#struct){
                 name: (string){ "Update Gerrit CL message with success message" }
-                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+                run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
               }
             }
             defaults: (#struct){
@@ -1264,25 +1266,29 @@ import "strings"
         }
         _#startCLBuild(:ci): (#struct){
           name: (string){ "Update Gerrit CL message with starting message" }
-          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":0}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
         }
         _#failCLBuild(:ci): (#struct){
           if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
           name: (string){ "Post any failures for this matrix entry" }
-          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
         }
         _#passCLBuild(:ci): (#struct){
           name: (string){ "Update Gerrit CL message with success message" }
-          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+          run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
         }
         _#gerrit(:ci): (#struct){
           _#setCodeReview(:ci): (#struct){
             #args: (#struct){
+              tag: (string){ "trybot" }
               message: (string){ string }
+              labels: (#struct){
+                "Code-Review": (int){ int }
+              }
             }
             res: (_|_){
               // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-              //     ./workflows.cue:125:9
+              //     ./workflows.cue:127:9
             }
           }
         }
@@ -1406,7 +1412,7 @@ import "strings"
           _#type(:ci): (string){ string }
           if: (_|_){
             // [incomplete] workflows.1.schema._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
-            //     ./workflows.cue:138:14
+            //     ./workflows.cue:140:14
           }
         }
         name: (string){ "Repository Dispatch" }
@@ -1739,7 +1745,7 @@ import "strings"
           }
           1: (#struct){
             name: (string){ "Update Gerrit CL message with starting message" }
-            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":0}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
             if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') }}" }
           }
         }
@@ -1829,7 +1835,7 @@ import "strings"
           11: (#struct){
             if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
             name: (string){ "Post any failures for this matrix entry" }
-            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
           }
         }
         defaults: (#struct){
@@ -1849,7 +1855,7 @@ import "strings"
           }
           1: (#struct){
             name: (string){ "Update Gerrit CL message with success message" }
-            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+            run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
           }
         }
         defaults: (#struct){
@@ -1894,25 +1900,29 @@ import "strings"
     }
     _#startCLBuild(:ci): (#struct){
       name: (string){ "Update Gerrit CL message with starting message" }
-      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":0}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
     }
     _#failCLBuild(:ci): (#struct){
       if: (string){ "${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}" }
       name: (string){ "Post any failures for this matrix entry" }
-      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details\",\"labels\":{\"Code-Review\":-1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
     }
     _#passCLBuild(:ci): (#struct){
       name: (string){ "Update Gerrit CL message with success message" }
-      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
+      run: (string){ "curl -f -s -H \"Content-Type: application/json\" --request POST --data '{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"Code-Review\":1}}' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review" }
     }
     _#gerrit(:ci): (#struct){
       _#setCodeReview(:ci): (#struct){
         #args: (#struct){
+          tag: (string){ "trybot" }
           message: (string){ string }
+          labels: (#struct){
+            "Code-Review": (int){ int }
+          }
         }
         res: (_|_){
           // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-          //     ./workflows.cue:125:9
+          //     ./workflows.cue:127:9
         }
       }
     }
@@ -2033,7 +2043,7 @@ import "strings"
       _#type(:ci): (string){ string }
       if: (_|_){
         // [incomplete] repository_dispatch._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
-        //     ./workflows.cue:138:14
+        //     ./workflows.cue:140:14
       }
     }
     name: (string){ "Repository Dispatch" }
@@ -2397,7 +2407,7 @@ import "strings"
     name: (string){ "Set go build tags" }
     run: (_|_){
       // [incomplete] _#setGoBuildTags.run: invalid interpolation: non-concrete value string (type string):
-      //     ./workflows.cue:284:10
+      //     ./workflows.cue:286:10
     }
   }
   _#installGo(:ci): (#struct){
@@ -2451,7 +2461,7 @@ import "strings"
   _#cueckooCopybaraImage(:ci): (string){ "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c" }
   _#copybaraCmd(:ci): (_|_){
     // [incomplete] _#copybaraCmd: invalid interpolation: non-concrete value string (type string):
-    //     ./workflows.cue:351:2
+    //     ./workflows.cue:353:2
     _#cmd(:ci): (string){ string }
   }
   _#copybaraSteps(:ci): (#list){
@@ -2465,7 +2475,7 @@ import "strings"
       name: (string){ string }
       run: (_|_){
         // [incomplete] _#copybaraSteps.1.run: invalid interpolation: non-concrete value string (type string):
-        //     ./workflows.cue:351:2
+        //     ./workflows.cue:353:2
         _#cmd(:ci): (string){ string }
       }
     }
@@ -2585,6 +2595,9 @@ import "strings"
       run: (〈1;_#gerrit〉._#setCodeReview & {
         #args: {
           message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
+          labels: {
+            "Code-Review": 0
+          }
         }
       }).res
     })
@@ -2614,8 +2627,9 @@ import "strings"
     _#gerrit: {
       _#setCodeReview: {
         #args: {
+          tag: "trybot"
           message: string
-          labels?: {
+          labels: {
             "Code-Review": int
           }
         }

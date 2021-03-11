@@ -1,0 +1,14 @@
+# Test that we get expected error when we ask cue get go to get
+# a Go package that cannot be resolved.
+
+# Ensure that we don't automatically add the missing dependency pre Go 1.16
+[!go1.16] env GOFLAGS=-mod=readonly
+
+! cue get go k8s.io/api/apps/v1
+[go1.16] stderr '\Qno required module provides package k8s.io/api/apps/v1'
+[go1.14] [!go1.16] stderr '\Qcannot find module providing package k8s.io/api/apps/v1: import lookup disabled by -mod=readonly'
+
+-- go.mod --
+module mod.com/blah
+
+go 1.14

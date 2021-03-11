@@ -63,8 +63,10 @@ single expression, the emit value. For example, the file
 yields the following JSON:
 
 	{
+		"arg1": 1,
 		"a": 1,
-		"b", "my string"
+		"arg2": "my string",
+		"b": "my string"
 	}
 
 In absence of arguments, the current directory is loaded as a package instance.

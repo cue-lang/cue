@@ -1612,8 +1612,8 @@ The length of an open list is the its number of elements as a lower bound
 and an unlimited number of elements as its upper bound.
 
 ```
-ListLit       = "[" [ ElementList [ "," [ Ellipsis ] ] [ "," ] ] "]" .
-ElementList   = Embedding { "," Embedding } .
+ListLit       = "[" [ ElementList [ "," ] ] "]" .
+ElementList   = Ellipsis | Embedding { "," Embedding } [ "," Ellipsis ] .
 ```
 
 Lists can be thought of as structs:

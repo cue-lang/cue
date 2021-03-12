@@ -6,8 +6,6 @@
 # that is left for other tests, so that this test can focus
 # on the various rules of get go.
 
-[go1.15] [windows] skip 'flakey per golang.org/issue/44137'
-
 # cue get go
 cue get go --local ./...
 cmp ./pkg3/pkg3_go_gen.cue ./pkg3/pkg3_go_gen.cue.golden

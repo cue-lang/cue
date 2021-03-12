@@ -23,6 +23,7 @@ import (
 	"os"
 	"path"
 	"path/filepath"
+	goruntime "runtime"
 	"strings"
 	"testing"
 
@@ -34,6 +35,10 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/internal/cuetest"
+)
+
+const (
+	homeDirName = ".user-home"
 )
 
 // TestLatest checks that the examples match the latest language standard,
@@ -83,9 +88,17 @@ func TestScript(t *testing.T) {
 		Dir:           filepath.Join("testdata", "script"),
 		UpdateScripts: cuetest.UpdateGoldenFiles,
 		Setup: func(e *testscript.Env) error {
+			// Set up a home dir within work dir with a . prefix so that the
+			// Go/CUE pattern ./... does not descend into it.
+			home := filepath.Join(e.WorkDir, homeDirName)
+			if err := os.Mkdir(home, 0777); err != nil {
+				return err
+			}
+
 			e.Vars = append(e.Vars,
 				"GOPROXY="+srv.URL,
 				"GONOSUMDB=*", // GOPROXY is a private proxy
+				homeEnvName()+"="+home,
 			)
 			return nil
 		},
@@ -163,4 +176,18 @@ func TestMain(m *testing.M) {
 	os.Exit(testscript.RunMain(m, map[string]func() int{
 		"cue": MainTest,
 	}))
+}
+
+// homeEnvName extracts the logic from os.UserHomeDir to get the
+// name of the environment variable that should be used when
+// seting the user's home directory
+func homeEnvName() string {
+	switch goruntime.GOOS {
+	case "windows":
+		return "USERPROFILE"
+	case "plan9":
+		return "home"
+	default:
+		return "HOME"
+	}
 }

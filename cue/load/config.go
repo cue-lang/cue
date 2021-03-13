@@ -259,11 +259,9 @@ type Config struct {
 	// the syntax tree.
 	ParseFile func(name string, src interface{}) (*ast.File, error)
 
-	// Overlay provides a mapping of absolute file paths to file contents.
-	// If the file  with the given path already exists, the parser will use the
+	// Overlay provides a mapping of absolute file paths to file contents.  If
+	// the file with the given path already exists, the parser will use the
 	// alternative file contents provided by the map.
-	//
-	// If the value must be of type string, []byte, io.Reader, or *ast.File.
 	Overlay map[string]Source
 
 	// Stdin defines an alternative for os.Stdin for the file "-". When used,

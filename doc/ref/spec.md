@@ -1354,7 +1354,7 @@ Referencing a definition will recursively [close](#ClosedStructs) it.
 That is, a referenced definition will not unify with a struct
 that would add a field anywhere within the definition that it does not
 already define or explicitly allow with a pattern constraint or `...`.
-[Embeddings](#Embedding) allow bypassing this check.
+[Embeddings](#embedding) allow bypassing this check.
 
 If referencing a definition would always result in an error, implementations
 may report this inconsistency at the point of its declaration.

@@ -1,0 +1,155 @@
+-- in.cue --
+package main
+
+#d1: {
+	as: [...string]
+
+	#c: [
+		#f1 & {
+			"as": ["go"] + as
+		},
+	]
+}
+
+#d2: {
+	p: *"." | string
+
+	#c: [
+		#f2 & {
+			from: #d1 & {
+				as: [p]
+			}
+		},
+	]
+}
+
+#c1: {
+	#c: [...#o]
+	_
+	...
+}
+
+#o: #f1 | #f2
+
+#f1: {
+	do: "f1"
+	as: [...string]
+}
+
+#f2: {
+	do:   "f2"
+	from: #c1
+}
+-- out/eval --
+(struct){
+  #d1: (#struct){
+    as: (list){
+    }
+    #c: (#list){
+      0: (#struct){
+        do: (string){ "f1" }
+        as: (#list){
+          0: (string){ "go" }
+        }
+      }
+    }
+  }
+  #d2: (#struct){
+    p: (string){ |(*(string){ "." }, (string){ string }) }
+    #c: (#list){
+      0: (#struct){
+        do: (string){ "f2" }
+        from: (#struct){
+          #c: (#list){
+            0: (#struct){
+              do: (string){ "f1" }
+              as: (#list){
+                0: (string){ "go" }
+                1: (string){ |(*(string){ "." }, (string){ string }) }
+              }
+            }
+          }
+          as: (#list){
+            0: (string){ |(*(string){ "." }, (string){ string }) }
+          }
+        }
+      }
+    }
+  }
+  #c1: (_){
+    _
+    #c: (list){
+    }
+  }
+  #o: (struct){ |((#struct){
+      do: (string){ "f1" }
+      as: (list){
+      }
+    }, (#struct){
+      do: (string){ "f2" }
+      from: (_){
+        _
+        #c: (list){
+        }
+      }
+    }) }
+  #f1: (#struct){
+    do: (string){ "f1" }
+    as: (list){
+    }
+  }
+  #f2: (#struct){
+    do: (string){ "f2" }
+    from: (_){
+      _
+      #c: (list){
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #d1: {
+    as: [
+      ...string,
+    ]
+    #c: [
+      (〈1;#f1〉 & {
+        as: ([
+          "go",
+        ] + 〈1;as〉)
+      }),
+    ]
+  }
+  #d2: {
+    p: (*"."|string)
+    #c: [
+      (〈1;#f2〉 & {
+        from: (〈2;#d1〉 & {
+          as: [
+            〈2;p〉,
+          ]
+        })
+      }),
+    ]
+  }
+  #c1: {
+    #c: [
+      ...〈1;#o〉,
+    ]
+    _
+    ...
+  }
+  #o: (〈0;#f1〉|〈0;#f2〉)
+  #f1: {
+    do: "f1"
+    as: [
+      ...string,
+    ]
+  }
+  #f2: {
+    do: "f2"
+    from: 〈1;#c1〉
+  }
+}

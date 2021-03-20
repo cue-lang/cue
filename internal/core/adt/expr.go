@@ -1572,7 +1572,7 @@ type ForClause struct {
 }
 
 func (x *ForClause) Source() ast.Node {
-	if x.Src == nil {
+	if x.Syntax == nil {
 		return nil
 	}
 	return x.Syntax

@@ -82,11 +82,18 @@ outer:
 	}
 }
 
+// matchBulk reports whether feature f matches the filter of x. It evaluation of
+// the filter is erroneous, it returns false and the error will  be set in c.
 func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, label Value) bool {
 	v := env.evalCached(c, x.Filter)
 
 	// Fast-track certain cases.
 	switch x := v.(type) {
+	case *Bottom:
+		if c.errs == nil {
+			c.AddBottom(x)
+		}
+		return false
 	case *Top:
 		return true
 

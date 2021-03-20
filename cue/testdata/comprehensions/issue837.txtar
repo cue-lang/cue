@@ -1,0 +1,306 @@
+-- in.cue --
+#DeploymentManifest: #Manifest & {ref: kind: "deployment"}
+
+#Manifest: {
+	ref:         #ManifestRef
+	description: #KumoriKinds[ref.kind]
+}
+
+#ManifestRef: kind: #KindsNames
+
+#KindsNames: "service" | "deployment"
+
+#KumoriKinds: deployment: #Deployment
+#KumoriKinds: [string]: {...}
+
+#DoDeploy: {
+	_params: manifest: #DeploymentManifest
+	deployment: {
+		description: {
+			let dep = _params.manifest.description
+			service: (#Configure & {
+				_params: hsize: dep.hsize
+			}).service
+		}
+	}
+}
+
+#Configure: {
+	$p=_params: {
+		hsize: [string]: #RoleSize
+	}
+	service: {
+		description: {
+			let configed = (#RelabelService & {
+				_params: {
+					hsize: $p.hsize
+				}
+			}).out
+
+			role: configed.role
+		}
+	}
+}
+
+#RelabelService: {
+	$p=_params: {
+		hsize: #RoleSize
+	}
+
+	out: {
+		labstr: $p.label
+	}
+}
+
+#RoleSize: {
+	$_instances: >=0 | *1
+}
+
+#Deployment: {
+	service: #ServiceManifest
+	hsize: [service.description.#roles]: #RoleSize
+}
+
+#ServiceManifest: #Manifest & {ref: kind: "service"}
+-- out/eval --
+Errors:
+_params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+    ./in.cue:29:20
+    ./in.cue:35:13
+    ./in.cue:54:12
+    ./in.cue:55:22
+_params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+    ./in.cue:29:20
+    ./in.cue:35:13
+    ./in.cue:54:12
+    ./in.cue:55:15
+#DoDeploy._params.manifest.description.service.description: undefined field service:
+    ./in.cue:5:28
+_params.hsize.$_instances: 2 errors in empty disjunction::
+    ./in.cue:33:20
+#RelabelService.out.labstr: undefined field label:
+    ./in.cue:50:14
+
+Result:
+(_|_){
+  // [eval]
+  #DeploymentManifest: (#struct){
+    ref: (#struct){
+      kind: (string){ "deployment" }
+    }
+    description: (#struct){
+      service: (#struct){
+        ref: (#struct){
+          kind: (string){ "service" }
+        }
+        description: (_|_){
+          // [incomplete] #DeploymentManifest.description.service.description: undefined field service:
+          //     ./in.cue:5:28
+        }
+      }
+      hsize: (#struct){
+      }
+    }
+  }
+  #Manifest: (#struct){
+    ref: (#struct){
+      kind: (string){ |((string){ "service" }, (string){ "deployment" }) }
+    }
+    description: (_|_){
+      // [incomplete] #Manifest.description: unresolved disjunction "service" | "deployment" (type string):
+      //     ./in.cue:5:15
+    }
+  }
+  #ManifestRef: (#struct){
+    kind: (string){ |((string){ "service" }, (string){ "deployment" }) }
+  }
+  #KindsNames: (string){ |((string){ "service" }, (string){ "deployment" }) }
+  #KumoriKinds: (#struct){
+    deployment: (#struct){
+      service: (#struct){
+        ref: (#struct){
+          kind: (string){ "service" }
+        }
+        description: (_|_){
+          // [incomplete] #KumoriKinds.deployment.service.description: undefined field service:
+          //     ./in.cue:5:28
+        }
+      }
+      hsize: (#struct){
+      }
+    }
+  }
+  #DoDeploy: (_|_){
+    // [eval]
+    _params: (#struct){
+      manifest: (#struct){
+        ref: (#struct){
+          kind: (string){ "deployment" }
+        }
+        description: (#struct){
+          service: (#struct){
+            ref: (#struct){
+              kind: (string){ "service" }
+            }
+            description: (_|_){
+              // [eval] #DoDeploy._params.manifest.description.service.description: undefined field service:
+              //     ./in.cue:5:28
+            }
+          }
+          hsize: (#struct){
+          }
+        }
+      }
+    }
+    deployment: (_|_){
+      // [eval]
+      description: (_|_){
+        // [eval]
+        service: (_|_){
+          // [eval] #DoDeploy._params.manifest.description.service.description: undefined field service:
+          //     ./in.cue:5:28
+        }
+      }
+    }
+  }
+  #Configure: (_|_){
+    // [eval]
+    _params: (#struct){
+      hsize: (#struct){
+      }
+    }
+    service: (_|_){
+      // [eval]
+      description: (_|_){
+        // [eval]
+        role: (_|_){
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          //     ./in.cue:29:20
+          //     ./in.cue:35:13
+          //     ./in.cue:54:12
+          //     ./in.cue:55:22
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          //     ./in.cue:29:20
+          //     ./in.cue:35:13
+          //     ./in.cue:54:12
+          //     ./in.cue:55:15
+          // _params.hsize.$_instances: 2 errors in empty disjunction::
+          //     ./in.cue:33:20
+        }
+      }
+    }
+  }
+  #RelabelService: (_|_){
+    // [eval]
+    _params: (#struct){
+      hsize: (#struct){
+        $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
+      }
+    }
+    out: (_|_){
+      // [eval]
+      labstr: (_|_){
+        // [eval] #RelabelService.out.labstr: undefined field label:
+        //     ./in.cue:50:14
+      }
+    }
+  }
+  #RoleSize: (#struct){
+    $_instances: (number){ |(*(int){ 1 }, (number){ >=0 }) }
+  }
+  #Deployment: (#struct){
+    service: (#struct){
+      ref: (#struct){
+        kind: (string){ "service" }
+      }
+      description: (_|_){
+        // [incomplete] #Deployment.service.description: undefined field service:
+        //     ./in.cue:5:28
+      }
+    }
+    hsize: (#struct){
+    }
+  }
+  #ServiceManifest: (#struct){
+    ref: (#struct){
+      kind: (string){ "service" }
+    }
+    description: (_|_){
+      // [incomplete] #ServiceManifest.description: undefined field service:
+      //     ./in.cue:5:28
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  #DeploymentManifest: (〈0;#Manifest〉 & {
+    ref: {
+      kind: "deployment"
+    }
+  })
+  #Manifest: {
+    ref: 〈1;#ManifestRef〉
+    description: 〈1;#KumoriKinds〉[〈0;ref〉.kind]
+  }
+  #ManifestRef: {
+    kind: 〈1;#KindsNames〉
+  }
+  #KindsNames: ("service"|"deployment")
+  #KumoriKinds: {
+    deployment: 〈1;#Deployment〉
+  }
+  #KumoriKinds: {
+    [string]: {
+      ...
+    }
+  }
+  #DoDeploy: {
+    _params: {
+      manifest: 〈2;#DeploymentManifest〉
+    }
+    deployment: {
+      description: {
+        service: (〈3;#Configure〉 & {
+          _params: {
+            hsize: 〈2;let dep〉.hsize
+          }
+        }).service
+      }
+    }
+  }
+  #Configure: {
+    _params: {
+      hsize: {
+        [string]: 〈3;#RoleSize〉
+      }
+    }
+    service: {
+      description: {
+        role: 〈0;let configed〉.role
+      }
+    }
+  }
+  #RelabelService: {
+    _params: {
+      hsize: 〈2;#RoleSize〉
+    }
+    out: {
+      labstr: 〈1;_params〉.label
+    }
+  }
+  #RoleSize: {
+    $_instances: (>=0|*1)
+  }
+  #Deployment: {
+    service: 〈1;#ServiceManifest〉
+    hsize: {
+      [〈1;service〉.description.#roles]: 〈2;#RoleSize〉
+    }
+  }
+  #ServiceManifest: (〈0;#Manifest〉 & {
+    ref: {
+      kind: "service"
+    }
+  })
+}

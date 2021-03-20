@@ -30,6 +30,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 	itask "cuelang.org/go/internal/task"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
 	_ "cuelang.org/go/pkg/tool/exec"
@@ -70,6 +71,25 @@ func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.I
 	if !o.Exists() {
 		return nil, o.Err()
 	}
+
+	// Ensure there is at least one tool file.
+	// TODO: remove this block to allow commands to be defined in any file.
+outer:
+	for _, v := range []cue.Value{tools.Lookup(typ), o} {
+		_, vv := internal.CoreValue(v)
+		w := vv.(*adt.Vertex)
+		for _, c := range w.Conjuncts {
+			src := c.Source()
+			if src == nil {
+				continue
+			}
+			if strings.HasSuffix(src.Pos().Filename(), "_tool.cue") {
+				break outer
+			}
+		}
+		return nil, errors.New("no command %q defined in a *_tool.cue file")
+	}
+
 	docs := o.Doc()
 	var usage, short, long string
 	if len(docs) > 0 {

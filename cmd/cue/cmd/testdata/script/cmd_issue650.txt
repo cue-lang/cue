@@ -11,7 +11,7 @@ package blah
 }
 -- cue.mod/module.cue --
 module: "mod.com"
--- x.cue --
+-- x_tool.cue --
 package kube
 
 import (

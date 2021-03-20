@@ -1,5 +1,3 @@
-skip 'error messages'
-
 ! cue cmd notool
 ! stdout .
 cmp stderr cmd_baddisplay.out

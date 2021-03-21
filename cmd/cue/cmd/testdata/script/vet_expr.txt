@@ -1,13 +1,13 @@
-skip 'error messages/ missed disallowed field'
-
 ! cue vet -d '#File' vet.cue data.yaml
 cmp stderr expect-stderr
 
 -- expect-stderr --
 translations.hello.lang: incomplete value string
-translations.hello.lang: conflicting values false and string (mismatched types bool and string)
-field "skip" not allowed in closed struct:
-    ./data.yaml:20:7
+field skip not allowed:
+    ./data.yaml:16:1
+    ./data.yaml:20:1
+    ./vet.cue:1:1
+    ./vet.cue:1:8
 -- vet.cue --
 #File: {
 	translations: [string]: {

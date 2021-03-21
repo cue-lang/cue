@@ -1785,6 +1785,9 @@ func (v Value) Unify(w Value) Value {
 	n.Label = v.v.Label
 	n.Closed = v.v.Closed || w.v.Closed
 
+	if err := n.Err(ctx, adt.Finalized); err != nil {
+		return makeValue(v.idx, n)
+	}
 	if err := allowed(ctx, v.v, n); err != nil {
 		return newErrValue(w, err)
 	}
@@ -1818,6 +1821,9 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n.Parent = v.v.Parent
 	n.Label = v.v.Label
 
+	if err := n.Err(ctx, adt.Finalized); err != nil {
+		return makeValue(v.idx, n)
+	}
 	if err := allowed(ctx, accept.v, n); err != nil {
 		return newErrValue(accept, err)
 	}

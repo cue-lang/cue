@@ -91,7 +91,7 @@ func TestAPI(t *testing.T) {
 			res := w.Unify(v)
 			return res
 		},
-		want: "_|_(#runSpec.v: field ction not allowed)",
+		want: "_|_(w: field ction not allowed)",
 	}}
 	for _, tc := range testCases {
 		if tc.skip {

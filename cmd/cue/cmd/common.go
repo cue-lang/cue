@@ -169,7 +169,8 @@ func (b *buildPlan) instances() iterator {
 type iterator interface {
 	scan() bool
 	value() cue.Value
-	file() *ast.File // may return nil
+	instance() *cue.Instance // may return nil
+	file() *ast.File         // may return nil
 	err() error
 	close()
 	id() string
@@ -186,11 +187,12 @@ func (i *instanceIterator) scan() bool {
 	return i.i < len(i.a) && i.e == nil
 }
 
-func (i *instanceIterator) close()           {}
-func (i *instanceIterator) err() error       { return i.e }
-func (i *instanceIterator) value() cue.Value { return i.a[i.i].Value() }
-func (i *instanceIterator) file() *ast.File  { return nil }
-func (i *instanceIterator) id() string       { return i.a[i.i].Dir }
+func (i *instanceIterator) close()                  {}
+func (i *instanceIterator) err() error              { return i.e }
+func (i *instanceIterator) value() cue.Value        { return i.a[i.i].Value() }
+func (i *instanceIterator) instance() *cue.Instance { return i.a[i.i] }
+func (i *instanceIterator) file() *ast.File         { return nil }
+func (i *instanceIterator) id() string              { return i.a[i.i].Dir }
 
 type streamingIterator struct {
 	r    *cue.Runtime
@@ -239,8 +241,9 @@ func newStreamingIterator(b *buildPlan) *streamingIterator {
 	return i
 }
 
-func (i *streamingIterator) file() *ast.File  { return i.f }
-func (i *streamingIterator) value() cue.Value { return i.v }
+func (i *streamingIterator) file() *ast.File         { return i.f }
+func (i *streamingIterator) value() cue.Value        { return i.v }
+func (i *streamingIterator) instance() *cue.Instance { return nil }
 
 func (i *streamingIterator) id() string {
 	if i.inst != nil {
@@ -333,7 +336,8 @@ func (i *expressionIter) scan() bool {
 	return true
 }
 
-func (i *expressionIter) file() *ast.File { return nil }
+func (i *expressionIter) file() *ast.File         { return nil }
+func (i *expressionIter) instance() *cue.Instance { return nil }
 
 func (i *expressionIter) value() cue.Value {
 	if len(i.expr) == 0 {

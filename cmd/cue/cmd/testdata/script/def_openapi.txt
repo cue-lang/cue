@@ -1,5 +1,3 @@
-skip 'fix comments and value printing'
-
 cue def openapi+cue: expect-cue-out -o -
 
 cue def foo.cue -o openapi:-
@@ -255,11 +253,14 @@ info: {
 }
 -- expect-cue3 --
 // My OpenAPI
+
+// My OpenAPI2
 package foo
 
 info: {
-	title:   string | *_|_
-	version: *"v1alpha1" | string}
+	title:   (*"My OpenAPI" | string) & (*"My OpenAPI2" | string)
+	version: (*"v1alpha1" | string) & (*"v1alpha1" | string)
+}
 #Bar: {
 	foo: #Foo
 	...

@@ -45,6 +45,7 @@ type Encoder struct {
 	encValue     func(cue.Value) error
 	autoSimplify bool
 	concrete     bool
+	instance     *cue.Instance
 }
 
 // IsConcrete reports whether the output is required to be concrete.
@@ -80,7 +81,10 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 		// TODO: get encoding options
 		cfg := &openapi.Config{}
 		e.interpret = func(v cue.Value) (*ast.File, error) {
-			i := internal.MakeInstance(v).(*cue.Instance)
+			i := e.instance
+			if i == nil {
+				i = internal.MakeInstance(v).(*cue.Instance)
+			}
 			return openapi.Generate(i, cfg)
 		}
 	// case build.JSONSchema:
@@ -203,6 +207,15 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 func (e *Encoder) EncodeFile(f *ast.File) error {
 	e.autoSimplify = false
 	return e.encodeFile(f, e.interpret)
+}
+
+// EncodeInstance is as Encode, but stores instance information. This should
+// all be retrievable from the value itself.
+func (e *Encoder) EncodeInstance(v *cue.Instance) error {
+	e.instance = v
+	err := e.Encode(v.Value())
+	e.instance = nil
+	return err
 }
 
 func (e *Encoder) Encode(v cue.Value) error {

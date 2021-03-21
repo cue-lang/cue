@@ -60,13 +60,15 @@ func runDef(cmd *Command, args []string) error {
 	iter := b.instances()
 	defer iter.close()
 	for i := 0; iter.scan(); i++ {
+		var err error
 		if f := iter.file(); f != nil {
-			err := e.EncodeFile(f)
-			exitOnErr(cmd, err, true)
+			err = e.EncodeFile(f)
+		} else if i := iter.instance(); i != nil {
+			err = e.EncodeInstance(iter.instance())
 		} else {
-			err := e.Encode(iter.value())
-			exitOnErr(cmd, err, true)
+			err = e.Encode(iter.value())
 		}
+		exitOnErr(cmd, err, true)
 	}
 	exitOnErr(cmd, iter.err(), true)
 	return nil

@@ -63,7 +63,7 @@ func TestAPI(t *testing.T) {
 			res := runSpec.Unify(v)
 			return res
 		},
-		want: "_|_(#runSpec: field `ction` not allowed)",
+		want: "_|_(#runSpec: field ction not allowed)",
 	}, {
 		// Issue #567
 		input: `
@@ -77,7 +77,7 @@ func TestAPI(t *testing.T) {
 			res := runSpec.Unify(v)
 			return res
 		},
-		want: "_|_(#runSpec.action: field `Foo` not allowed)",
+		want: "_|_(#runSpec.action: field Foo not allowed)",
 	}, {
 		input: `
 		#runSpec: v: {action: foo: int}
@@ -91,7 +91,7 @@ func TestAPI(t *testing.T) {
 			res := w.Unify(v)
 			return res
 		},
-		want: "_|_(#runSpec.v: field `ction` not allowed)",
+		want: "_|_(#runSpec.v: field ction not allowed)",
 	}}
 	for _, tc := range testCases {
 		if tc.skip {

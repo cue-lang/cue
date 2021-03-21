@@ -16,13 +16,13 @@ b: #A & {
 -- out/eval --
 Errors:
 b: 2 errors in empty disjunction:
-b: field `c` not allowed:
+b: field c not allowed:
     ./in.cue:1:5
     ./in.cue:3:5
     ./in.cue:3:6
     ./in.cue:11:4
     ./in.cue:12:5
-b: field `d` not allowed:
+b: field d not allowed:
     ./in.cue:1:5
     ./in.cue:3:5
     ./in.cue:3:11
@@ -43,20 +43,20 @@ Result:
   }
   b: (_|_){
     // [eval] b: 2 errors in empty disjunction:
-    // b: field `c` not allowed:
+    // b: field c not allowed:
     //     ./in.cue:1:5
     //     ./in.cue:3:5
     //     ./in.cue:3:6
     //     ./in.cue:11:4
     //     ./in.cue:12:5
-    // b: field `d` not allowed:
+    // b: field d not allowed:
     //     ./in.cue:1:5
     //     ./in.cue:3:5
     //     ./in.cue:3:11
     //     ./in.cue:11:4
     //     ./in.cue:13:5
     c: (_|_){
-      // [eval] b: field `c` not allowed:
+      // [eval] b: field c not allowed:
       //     ./in.cue:1:5
       //     ./in.cue:3:5
       //     ./in.cue:3:35
@@ -64,7 +64,7 @@ Result:
       //     ./in.cue:12:5
     }
     d: (_|_){
-      // [eval] b: field `d` not allowed:
+      // [eval] b: field d not allowed:
       //     ./in.cue:1:5
       //     ./in.cue:3:5
       //     ./in.cue:3:35

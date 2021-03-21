@@ -76,11 +76,11 @@ reclose3: {
 
 -- out/eval --
 Errors:
-reclose1.z: field `d` not allowed:
+reclose1.z: field d not allowed:
     ./in.cue:28:8
     ./in.cue:33:6
     ./in.cue:34:6
-recloseSimple.a: field `b` not allowed:
+recloseSimple.a: field b not allowed:
     ./in.cue:16:9
     ./in.cue:17:6
     ./in.cue:17:7
@@ -113,7 +113,7 @@ Result:
     a: (_|_){
       // [eval]
       b: (_|_){
-        // [eval] recloseSimple.a: field `b` not allowed:
+        // [eval] recloseSimple.a: field b not allowed:
         //     ./in.cue:16:9
         //     ./in.cue:17:6
         //     ./in.cue:17:7
@@ -138,7 +138,7 @@ Result:
       // [eval]
       c: (int){ int }
       d: (_|_){
-        // [eval] reclose1.z: field `d` not allowed:
+        // [eval] reclose1.z: field d not allowed:
         //     ./in.cue:28:8
         //     ./in.cue:33:6
         //     ./in.cue:34:6

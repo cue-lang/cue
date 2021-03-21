@@ -38,7 +38,7 @@ a: #S & {
 }
 -- out/eval --
 Errors:
-a.v: field `b` not allowed:
+a.v: field b not allowed:
     ./in.cue:2:12
     ./in.cue:4:4
     ./in.cue:5:6
@@ -53,7 +53,7 @@ Result:
     v: (_|_){
       // [eval]
       b: (_|_){
-        // [eval] a.v: field `b` not allowed:
+        // [eval] a.v: field b not allowed:
         //     ./in.cue:2:12
         //     ./in.cue:4:4
         //     ./in.cue:5:6

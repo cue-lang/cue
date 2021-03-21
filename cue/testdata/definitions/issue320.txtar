@@ -12,7 +12,7 @@ foo: #Foo & {
 }
 -- out/eval --
 Errors:
-foo: field `y` not allowed:
+foo: field y not allowed:
     ./in.cue:1:7
     ./in.cue:3:2
     ./in.cue:6:8
@@ -31,7 +31,7 @@ Result:
     // [eval]
     x: (string){ "hello" }
     y: (_|_){
-      // [eval] foo: field `y` not allowed:
+      // [eval] foo: field y not allowed:
       //     ./in.cue:1:7
       //     ./in.cue:3:2
       //     ./in.cue:6:8

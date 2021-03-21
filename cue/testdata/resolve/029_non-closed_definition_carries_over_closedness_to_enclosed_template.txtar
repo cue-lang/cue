@@ -104,16 +104,16 @@ c: #R & {
 }
 -- out/eval --
 Errors:
-a.v: field `b` not allowed:
+a.v: field b not allowed:
     ./in.cue:2:12
     ./in.cue:4:4
     ./in.cue:5:6
 b.w: 1 errors in empty disjunction:
-b.w: field `c` not allowed:
+b.w: field c not allowed:
     ./in.cue:8:12
     ./in.cue:10:4
     ./in.cue:11:6
-c.w.0: field `d` not allowed:
+c.w.0: field d not allowed:
     ./in.cue:14:12
     ./in.cue:14:13
     ./in.cue:16:4
@@ -129,7 +129,7 @@ Result:
     v: (_|_){
       // [eval]
       b: (_|_){
-        // [eval] a.v: field `b` not allowed:
+        // [eval] a.v: field b not allowed:
         //     ./in.cue:2:12
         //     ./in.cue:4:4
         //     ./in.cue:5:6
@@ -143,12 +143,12 @@ Result:
     // [eval]
     w: (_|_){
       // [eval] b.w: 1 errors in empty disjunction:
-      // b.w: field `c` not allowed:
+      // b.w: field c not allowed:
       //     ./in.cue:8:12
       //     ./in.cue:10:4
       //     ./in.cue:11:6
       c: (_|_){
-        // [eval] b.w: field `c` not allowed:
+        // [eval] b.w: field c not allowed:
         //     ./in.cue:8:12
         //     ./in.cue:8:23
         //     ./in.cue:10:4
@@ -166,7 +166,7 @@ Result:
       0: (_|_){
         // [eval]
         d: (_|_){
-          // [eval] c.w.0: field `d` not allowed:
+          // [eval] c.w.0: field d not allowed:
           //     ./in.cue:14:12
           //     ./in.cue:14:13
           //     ./in.cue:16:4

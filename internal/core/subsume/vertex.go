@@ -157,7 +157,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		s.gt = a
 		s.lt = y
 
-		s.errf("field %s not not present in %s",
+		s.errf("field %s not present in %s",
 			f.SelectorString(ctx), ctx.Str(y))
 		return false
 	}

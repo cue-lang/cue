@@ -160,5 +160,9 @@ func runEval(cmd *Command, args []string) error {
 		}
 	}
 	exitOnErr(cmd, iter.err(), true)
+
+	err = e.Close()
+	exitOnErr(cmd, err, true)
+
 	return nil
 }

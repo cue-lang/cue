@@ -1,3 +1,6 @@
+cue def foo.cue -o openapi+cue:out.cue
+cmp out.cue expect-out.cue
+
 cue def openapi+cue: expect-cue-out -o -
 
 cue def foo.cue -o openapi:-
@@ -274,4 +277,31 @@ info: {
 	a: int
 	b: uint & <10
 	...
+}
+-- expect-out.cue --
+openapi: "3.0.0"
+info: {
+	title:   "Some clever title."
+	version: "v1"
+}
+paths: {}
+components: schemas: {
+	Bar: {
+		type: "object"
+		required: ["foo"]
+		properties: foo: $ref: "#/components/schemas/Foo"
+	}
+	Foo: {
+		type: "object"
+		required: ["a", "b"]
+		properties: {
+			a: type: "integer"
+			b: {
+				type:             "integer"
+				minimum:          0
+				maximum:          10
+				exclusiveMaximum: true
+			}
+		}
+	}
 }

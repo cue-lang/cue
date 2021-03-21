@@ -71,5 +71,9 @@ func runDef(cmd *Command, args []string) error {
 		exitOnErr(cmd, err, true)
 	}
 	exitOnErr(cmd, iter.err(), true)
+
+	err = e.Close()
+	exitOnErr(cmd, err, true)
+
 	return nil
 }

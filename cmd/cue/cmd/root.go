@@ -239,8 +239,8 @@ func New(args []string) (cmd *Command, err error) {
 		// "fix":   {"fix", nil},
 	}
 
-	// handle help and --help on root 'cue' command
-	if args[0] == "help" || args[0] == "--help" {
+	// handle help, --help and -h on root 'cue' command
+	if args[0] == "help" || args[0] == "--help" || args[0] == "-h" {
 		// Allow errors.
 		_ = addSubcommands(cmd, sub, args[1:], true)
 		return cmd, nil
@@ -301,10 +301,10 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string, isHelp
 			oldargs := []string{args[0]}
 			args = args[1:]
 
-			// Check for 'cue cmd --help'
+			// Check for 'cue cmd --help|-h'
 			// it is behaving differently for this one command, cobra does not seem to pick it up
 			// See issue #340
-			if len(args) == 1 && args[0] == "--help" {
+			if len(args) == 1 && (args[0] == "--help" || args[0] == "-h") {
 				return cmd.Usage()
 			}
 

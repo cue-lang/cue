@@ -27,12 +27,22 @@ func TestHelp(t *testing.T) {
 		t.Error("help command failed unexpectedly")
 	}
 
+	cmd, err = New([]string{"-h"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
 	cmd, err = New([]string{"help", "cmd"})
 	if err != nil || cmd == nil {
 		t.Error("help command failed unexpectedly")
 	}
 
 	cmd, err = New([]string{"cmd", "--help"})
+	if err != nil || cmd == nil {
+		t.Error("help command failed unexpectedly")
+	}
+
+	cmd, err = New([]string{"cmd", "-h"})
 	if err != nil || cmd == nil {
 		t.Error("help command failed unexpectedly")
 	}

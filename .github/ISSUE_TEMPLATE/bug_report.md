@@ -31,6 +31,10 @@ If you built from source, specify what git tag or commit was used.
 
 <!--
 If possible, provide a recipe for reproducing the error.
+
+For advice on how to create a good reproducer, please see:
+
+https://github.com/cuelang/cue/wiki/Creating-test-or-performance-reproducers
 -->
 
 

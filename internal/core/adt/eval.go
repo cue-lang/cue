@@ -198,36 +198,8 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 			}
 		}
 
-		// TODO(perf): ideally we should always perform a closedness check if
-		// state is Finalized. This is currently not possible when computing a
-		// partial disjunction as the closedness information is not yet
-		// complete, possibly leading to a disjunct to be rejected prematurely.
-		// It is probably possible to fix this if we could add StructInfo
-		// structures demarked per conjunct.
-		//
-		// In practice this should not be a problem: when disjuncts originate
-		// from the same disjunct, they will have the same StructInfos, and thus
-		// Equal is able to equate them even in the precense of optional field.
-		// In general, combining any limited set of disjuncts will soon reach
-		// a fixed point where duplicate elements can be eliminated this way.
-		//
-		// Note that not checking closedness is irrelevant for disjunctions of
-		// scalars. This means it also doesn't hurt performance where structs
-		// have a discriminator field (e.g. Kubernetes). We should take care,
-		// though, that any potential performance issues are eliminated for
-		// Protobuf-like oneOf fields.
-		ignore := state != Finalized || n.skipNonMonotonicChecks()
-
-		if !v.Label.IsInt() && v.Parent != nil && !ignore {
-			// Visit arcs recursively to validate and compute error.
-			if _, err := verifyArc2(c, v.Label, v, v.Closed); err != nil {
-				// Record error in child node to allow recording multiple
-				// conflicts at the appropriate place, to allow valid fields to
-				// be represented normally and, most importantly, to avoid
-				// recursive processing of a disallowed field.
-				v.SetValue(c, Finalized, err)
-				return
-			}
+		if !n.checkClosed(state) {
+			return
 		}
 
 		defer c.PopArc(c.PushArc(v))
@@ -374,6 +346,10 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 		v.UpdateStatus(Finalized)
 
 	case AllArcs:
+		if !n.checkClosed(state) {
+			break
+		}
+
 		defer c.PopArc(c.PushArc(v))
 
 		n.completeArcs(state)
@@ -609,6 +585,43 @@ func (n *nodeContext) incompleteErrors() *Bottom {
 		err = incompleteSentinel
 	}
 	return err
+}
+
+// TODO(perf): ideally we should always perform a closedness check if
+// state is Finalized. This is currently not possible when computing a
+// partial disjunction as the closedness information is not yet
+// complete, possibly leading to a disjunct to be rejected prematurely.
+// It is probably possible to fix this if we could add StructInfo
+// structures demarked per conjunct.
+//
+// In practice this should not be a problem: when disjuncts originate
+// from the same disjunct, they will have the same StructInfos, and thus
+// Equal is able to equate them even in the precense of optional field.
+// In general, combining any limited set of disjuncts will soon reach
+// a fixed point where duplicate elements can be eliminated this way.
+//
+// Note that not checking closedness is irrelevant for disjunctions of
+// scalars. This means it also doesn't hurt performance where structs
+// have a discriminator field (e.g. Kubernetes). We should take care,
+// though, that any potential performance issues are eliminated for
+// Protobuf-like oneOf fields.
+func (n *nodeContext) checkClosed(state VertexStatus) bool {
+	ignore := state != Finalized || n.skipNonMonotonicChecks()
+
+	v := n.node
+	if !v.Label.IsInt() && v.Parent != nil && !ignore {
+		ctx := n.ctx
+		// Visit arcs recursively to validate and compute error.
+		if _, err := verifyArc2(ctx, v.Label, v, v.Closed); err != nil {
+			// Record error in child node to allow recording multiple
+			// conflicts at the appropriate place, to allow valid fields to
+			// be represented normally and, most importantly, to avoid
+			// recursive processing of a disallowed field.
+			v.SetValue(ctx, Finalized, err)
+			return false
+		}
+	}
+	return true
 }
 
 func (n *nodeContext) completeArcs(state VertexStatus) {

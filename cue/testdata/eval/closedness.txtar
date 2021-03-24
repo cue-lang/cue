@@ -1,3 +1,5 @@
+// Issue #852
+
 -- in.cue --
 #E: {
     c: int
@@ -16,6 +18,23 @@ a: #A & {
         e: 43
     }
 }
+
+// `a` is evaluated through the comprehension first. Ensure that
+// this does not bypass closedness checks.
+issue852: {
+  #A: {
+    [=~"^a-z$"]: string
+  }
+
+  a: #A
+
+  a: Foo: "foo"
+
+  for k, v in a {
+    b: "\(k)": v
+  }
+}
+
 -- out/eval --
 Errors:
 a.q: field e not allowed:
@@ -24,6 +43,10 @@ a.q: field e not allowed:
     ./in.cue:7:9
     ./in.cue:11:4
     ./in.cue:15:9
+issue852.a: field Foo not allowed:
+    ./in.cue:22:7
+    ./in.cue:26:6
+    ./in.cue:28:6
 
 Result:
 (_|_){
@@ -55,6 +78,23 @@ Result:
       }
     }
   }
+  issue852: (_|_){
+    // [eval]
+    #A: (#struct){
+    }
+    a: (_|_){
+      // [eval]
+      Foo: (_|_){
+        // [eval] issue852.a: field Foo not allowed:
+        //     ./in.cue:22:7
+        //     ./in.cue:26:6
+        //     ./in.cue:28:6
+      }
+    }
+    b: (struct){
+      Foo: (string){ "foo" }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -76,4 +116,18 @@ Result:
       e: 43
     }
   })
+  issue852: {
+    #A: {
+      [=~"^a-z$"]: string
+    }
+    a: 〈0;#A〉
+    a: {
+      Foo: "foo"
+    }
+    for k, v in 〈0;a〉 {
+      b: {
+        "\(〈2;k〉)": 〈2;v〉
+      }
+    }
+  }
 }

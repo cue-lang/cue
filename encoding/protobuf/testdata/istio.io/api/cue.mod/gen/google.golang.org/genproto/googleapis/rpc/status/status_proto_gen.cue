@@ -69,13 +69,13 @@ package status
 #Status: {
 	// The status code, which should be an enum value of
 	// [google.rpc.Code][google.rpc.Code].
-	code?: int32 @protobuf(1)
+	code?: int32 @protobuf(1,int32)
 
 	// A developer-facing error message, which should be in English. Any
 	// user-facing error message should be localized and sent in the
 	// [google.rpc.Status.details][google.rpc.Status.details] field, or localized
 	// by the client.
-	message?: string @protobuf(2)
+	message?: string @protobuf(2,string)
 
 	// A list of messages that carry the error details.  There is a common set of
 	// message types for APIs to use.
@@ -83,5 +83,5 @@ package status
 		// A URL/resource name that uniquely identifies the type of the serialized protocol buffer message. This string must contain at least one "/" character. The last segment of the URL's path must represent the fully qualified name of the type (as in `type.googleapis.com/google.protobuf.Duration`). The name should be in a canonical form (e.g., leading "." is not accepted).
 		// The remaining fields of this object correspond to fields of the proto messsage. If the embedded message is well-known and has a custom JSON representation, that representation is assigned to the 'value' field.
 		"@type": string
-	}] @protobuf(3,type=google.protobuf.Any)
+	}] @protobuf(3,google.protobuf.Any)
 }

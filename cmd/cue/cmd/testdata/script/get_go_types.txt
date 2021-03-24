@@ -70,7 +70,9 @@ type Foozer struct {
 
 	Alias1 *MyBarzer
 
-	Map    map[string]*CustomJSON
+	// Note: Go encodings of protobuf tags are lossy. So this is a best-effort
+	// thing.
+	Map    map[string]*CustomJSON `protobuf:"bytes,1,name=intf" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	Slice1 []int
 	Slice2 []interface{}
 	Slice3 *[]json.Unmarshaler
@@ -222,52 +224,52 @@ import "example.com/pkg2"
 package pkg1
 
 import (
- "time"
- p2 "example.com/pkg2:pkgtwo"
+	"time"
+	p2 "example.com/pkg2:pkgtwo"
 )
 
 // Foozer foozes a jaman.
 #Foozer: {
- Int:    int
- String: string
+	Int:    int
+	String: string
 
- #Inline
- NoInline:    #NoInline
- CustomJSON:  #CustomJSON
- CustomYAML?: null | #CustomYAML @go(,*CustomYAML)
- AnyJSON:     _                  @go(,json.Marshaler)
- AnyText:     string             @go(,encoding.TextMarshaler)
- bar?:        int & >10          @go(Bar)
+	#Inline
+	NoInline:    #NoInline
+	CustomJSON:  #CustomJSON
+	CustomYAML?: null | #CustomYAML @go(,*CustomYAML)
+	AnyJSON:     _                  @go(,json.Marshaler)
+	AnyText:     string             @go(,encoding.TextMarshaler)
+	bar?:        int & >10          @go(Bar)
 
- // Time is mapped to CUE's internal type.
- Time:    time.Time
- Barzer:  p2.#Barzer
- Alias1?: null | p2.#Barzer @go(,*p2.Barzer)
- Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON)
- Slice1: [...int] @go(,[]int)
- Slice2: [...] @go(,[]interface{})
- Slice3?: null | [...] @go(,*[]json.Unmarshaler)
- Array1:  5 * [int]    @go(,[5]int)
- Array2:  5 * [_]      @go(,[5]interface{})
- Array3?: null | 5*[_] @go(,*[5]json.Marshaler)
- Intf:    #Interface   @protobuf(2,varint,name=intf)
- Intf2:   _            @go(,interface{})
- Intf3: {
-  Interface: #Interface
- } @go(,struct{Interface})
- Intf4: _ @go(,"interface{Foo()}")
+	// Time is mapped to CUE's internal type.
+	Time:    time.Time
+	Barzer:  p2.#Barzer
+	Alias1?: null | p2.#Barzer @go(,*p2.Barzer)
+	Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON)
+	Slice1: [...int] @go(,[]int)
+	Slice2: [...] @go(,[]interface{})
+	Slice3?: null | [...] @go(,*[]json.Unmarshaler)
+	Array1:  5 * [int]    @go(,[5]int)
+	Array2:  5 * [_]      @go(,[5]interface{})
+	Array3?: null | 5*[_] @go(,*[5]json.Marshaler)
+	Intf:    #Interface   @protobuf(2,varint,name=intf)
+	Intf2:   _            @go(,interface{})
+	Intf3: {
+		Interface: #Interface
+	} @go(,struct{Interface})
+	Intf4: _ @go(,"interface{Foo()}")
 
- // Even though this struct as a type implements MarshalJSON, it is known
- // that it is really only implemented by the embedded field.
- Embed: {
-  CustomJSON: #CustomJSON
- } @go(,struct{CustomJSON})
+	// Even though this struct as a type implements MarshalJSON, it is known
+	// that it is really only implemented by the embedded field.
+	Embed: {
+		CustomJSON: #CustomJSON
+	} @go(,struct{CustomJSON})
 }
 
 #Identifier: string // #enumIdentifier
 
 #enumIdentifier:
- _#internalIdentifier
+	_#internalIdentifier
 
 _#internalIdentifier: #Identifier & "internal"
 
@@ -275,10 +277,10 @@ _#internalIdentifier: #Identifier & "internal"
 #Level: int // #enumLevel
 
 #enumLevel:
- #Unknown |
- #Low |
- #Medium |
- #High
+	#Unknown |
+	#Low |
+	#Medium |
+	#High
 
 // Block comment.
 //  Indented.
@@ -317,17 +319,17 @@ import t "time"
 
 // A Barzer barzes.
 #Barzer: {
- a:     int @go(A) @protobuf(2,varint,)
- T:     t.Time
- B?:    null | int    @go(,*big.Int)
- C:     int           @go(,big.Int)
- F:     string        @go(,big.Float) @xml(,attr)
- G?:    null | string @go(,*big.Float)
- S:     string
- "x-y": bool @go(XY)
- Err:   _    @go(,error)
+	a:     int @go(A) @protobuf(2,varint,)
+	T:     t.Time
+	B?:    null | int    @go(,*big.Int)
+	C:     int           @go(,big.Int)
+	F:     string        @go(,big.Float) @xml(,attr)
+	G?:    null | string @go(,*big.Float)
+	S:     string
+	"x-y": bool @go(XY)
+	Err:   _    @go(,error)
 
- #Inline
+	#Inline
 }
 
 #Perm: 0o755
@@ -335,6 +337,8 @@ import t "time"
 #Few: 3
 
 #Couple: int & 2
+
+#LongStringConst: "This is a really long string. Why are we using a long string? Because that way it ensures we are using go/constant.Value.ExactString() instead of go/constant.Value.String()"
 
 #Inline: A: int
 -- pkg3/pkg3_go_gen.cue --
@@ -388,7 +392,10 @@ import (
 	Time:    time.Time
 	Barzer:  p2.#Barzer
 	Alias1?: null | p2.#Barzer @go(,*p2.Barzer)
-	Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON)
+
+	// Note: Go encodings of protobuf tags are lossy. So this is a best-effort
+	// thing.
+	Map: {[string]: null | #CustomJSON} @go(,map[string]*CustomJSON) @protobuf(1,map[bytes]bytes,name=intf)
 	Slice1: [...int] @go(,[]int)
 	Slice2: [...] @go(,[]interface{})
 	Slice3?: null | [...] @go(,*[]json.Unmarshaler)

@@ -4,5 +4,5 @@ package test
 	// doc comment
 	@protobuf(option (yoyo.foo)=true) // line comment
 	@protobuf(option (yoyo.bar)=false)
-	test?: int32 @protobuf(1)
+	test?: int32 @protobuf(1,int32)
 }

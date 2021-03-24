@@ -1210,7 +1210,10 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		}
 
 		// Carry over protobuf field tags with modifications.
-		if t := reflect.StructTag(tag).Get("protobuf"); t != "" {
+		// TODO: consider trashing the protobuf tag, as the Go versions are
+		// lossy and will not allow for an accurate translation in some cases.
+		tags := reflect.StructTag(tag)
+		if t := tags.Get("protobuf"); t != "" {
 			split := strings.Split(t, ",")
 			k := 0
 			for _, s := range split {
@@ -1227,6 +1230,18 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 			if len(split) >= 2 {
 				split[0], split[1] = split[1], split[0]
 			}
+
+			// Interpret as map?
+			if len(split) > 2 && split[1] == "bytes" {
+				tk := tags.Get("protobuf_key")
+				tv := tags.Get("protobuf_val")
+				if tk != "" && tv != "" {
+					tk = strings.SplitN(tk, ",", 2)[0]
+					tv = strings.SplitN(tv, ",", 2)[0]
+					split[1] = fmt.Sprintf("map[%s]%s", tk, tv)
+				}
+			}
+
 			e.addAttr(field, "protobuf", strings.Join(split, ","))
 		}
 

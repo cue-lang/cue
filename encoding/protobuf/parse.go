@@ -30,7 +30,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
@@ -520,7 +519,7 @@ func (p *protoConverter) messageField(s *ast.StructLit, i int, v proto.Visitee) 
 		addComments(f, i, x.Comment, x.InlineComment)
 
 		o := optionParser{message: s, field: f}
-		o.tags = fmt.Sprintf("%d,type=map<%s,%s>", x.Sequence, x.KeyType, x.Type)
+		o.tags = fmt.Sprintf(`%d,map[%s]%s`, x.Sequence, x.KeyType, x.Type)
 		if x.Name != name.Name {
 			o.tags += "," + x.Name
 		}
@@ -718,13 +717,8 @@ func (p *protoConverter) parseField(s *ast.StructLit, i int, x *proto.Field) *as
 
 	o := optionParser{message: s, field: f}
 
-	// body of @protobuf tag: sequence[,type][,name=<name>][,...]
-	o.tags += fmt.Sprint(x.Sequence)
-	b, _ := format.Node(typ)
-	str := string(b)
-	if x.Type != strings.TrimLeft(str, "#") {
-		o.tags += ",type=" + x.Type
-	}
+	// body of @protobuf tag: sequence,type[,name=<name>][,...]
+	o.tags += fmt.Sprintf("%v,%s", x.Sequence, x.Type)
 	if x.Name != name.Name {
 		o.tags += ",name=" + x.Name
 	}

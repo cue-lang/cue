@@ -35,44 +35,44 @@ import (
 	#FailPolicy_value: FAIL_OPEN: 0
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
-	policy?: #FailPolicy @protobuf(1)
+	policy?: #FailPolicy @protobuf(1,FailPolicy)
 
 	// Max retries on transport error.
-	maxRetry?: uint32 @protobuf(2,name=max_retry)
+	maxRetry?: uint32 @protobuf(2,uint32,name=max_retry)
 
 	// Base time to wait between retries.  Will be adjusted by exponential
 	// backoff and jitter.
-	baseRetryWait?: time.Duration @protobuf(3,type=google.protobuf.Duration,name=base_retry_wait)
+	baseRetryWait?: time.Duration @protobuf(3,google.protobuf.Duration,name=base_retry_wait)
 
 	// Max time to wait between retries.
-	maxRetryWait?: time.Duration @protobuf(4,type=google.protobuf.Duration,name=max_retry_wait)
+	maxRetryWait?: time.Duration @protobuf(4,google.protobuf.Duration,name=max_retry_wait)
 }
 
 // Defines the per-service client configuration.
 #ServiceConfig: {
 	// If true, do not call Mixer Check.
-	disableCheckCalls?: bool @protobuf(1,name=disable_check_calls)
+	disableCheckCalls?: bool @protobuf(1,bool,name=disable_check_calls)
 
 	// If true, do not call Mixer Report.
-	disableReportCalls?: bool @protobuf(2,name=disable_report_calls)
+	disableReportCalls?: bool @protobuf(2,bool,name=disable_report_calls)
 
 	// Send these attributes to Mixer in both Check and Report. This
 	// typically includes the "destination.service" attribute.
 	// In case of a per-route override, per-route attributes take precedence
 	// over the attributes supplied in the client configuration.
-	mixerAttributes?: v1.#Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
+	mixerAttributes?: v1.#Attributes @protobuf(3,Attributes,name=mixer_attributes)
 
 	// HTTP API specifications to generate API attributes.
-	httpApiSpec?: [...#HTTPAPISpec] @protobuf(4,name=http_api_spec)
+	httpApiSpec?: [...#HTTPAPISpec] @protobuf(4,HTTPAPISpec,name=http_api_spec)
 
 	// Quota specifications to generate quota requirements.
-	quotaSpec?: [...#QuotaSpec] @protobuf(5,name=quota_spec)
+	quotaSpec?: [...#QuotaSpec] @protobuf(5,QuotaSpec,name=quota_spec)
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	// This is the service-level policy. It overrides
 	// [mesh-level
 	// policy][istio.mixer.v1.config.client.TransportConfig.network_fail_policy].
-	networkFailPolicy?: #NetworkFailPolicy @protobuf(7,name=network_fail_policy)
+	networkFailPolicy?: #NetworkFailPolicy @protobuf(7,NetworkFailPolicy,name=network_fail_policy)
 
 	// Default attributes to forward to upstream. This typically
 	// includes the "source.ip" and "source.uid" attributes.
@@ -86,27 +86,27 @@ import (
 	// 3. forwarded attributes from the source filter config (if any);
 	// 4. forwarded attributes from the source route config (if any);
 	// 5. derived attributes from the request metadata.
-	forwardAttributes?: v1.#Attributes @protobuf(8,type=Attributes,name=forward_attributes)
+	forwardAttributes?: v1.#Attributes @protobuf(8,Attributes,name=forward_attributes)
 }
 
 // Defines the transport config on how to call Mixer.
 #TransportConfig: {
 	// The flag to disable check cache.
-	disableCheckCache?: bool @protobuf(1,name=disable_check_cache)
+	disableCheckCache?: bool @protobuf(1,bool,name=disable_check_cache)
 
 	// The flag to disable quota cache.
-	disableQuotaCache?: bool @protobuf(2,name=disable_quota_cache)
+	disableQuotaCache?: bool @protobuf(2,bool,name=disable_quota_cache)
 
 	// The flag to disable report batch.
-	disableReportBatch?: bool @protobuf(3,name=disable_report_batch)
+	disableReportBatch?: bool @protobuf(3,bool,name=disable_report_batch)
 
 	// Specifies the behavior when the client is unable to connect to Mixer.
 	// This is the mesh level policy. The default value for policy is FAIL_OPEN.
-	networkFailPolicy?: #NetworkFailPolicy @protobuf(4,name=network_fail_policy)
+	networkFailPolicy?: #NetworkFailPolicy @protobuf(4,NetworkFailPolicy,name=network_fail_policy)
 
 	// Specify refresh interval to write Mixer client statistics to Envoy share
 	// memory. If not specified, the interval is 10 seconds.
-	statsUpdateInterval?: time.Duration @protobuf(5,type=google.protobuf.Duration,name=stats_update_interval)
+	statsUpdateInterval?: time.Duration @protobuf(5,google.protobuf.Duration,name=stats_update_interval)
 
 	// Name of the cluster that will forward check calls to a pool of mixer
 	// servers. Defaults to "mixer_server". By using different names for
@@ -116,7 +116,7 @@ import (
 	//
 	// NOTE: Any value other than the default "mixer_server" will require the
 	// Istio Grafana dashboards to be reconfigured to use the new name.
-	checkCluster?: string @protobuf(6,name=check_cluster)
+	checkCluster?: string @protobuf(6,string,name=check_cluster)
 
 	// Name of the cluster that will forward report calls to a pool of mixer
 	// servers. Defaults to "mixer_server". By using different names for
@@ -126,62 +126,62 @@ import (
 	//
 	// NOTE: Any value other than the default "mixer_server" will require the
 	// Istio Grafana dashboards to be reconfigured to use the new name.
-	reportCluster?: string @protobuf(7,name=report_cluster)
+	reportCluster?: string @protobuf(7,string,name=report_cluster)
 
 	// Default attributes to forward to Mixer upstream. This typically
 	// includes the "source.ip" and "source.uid" attributes. These
 	// attributes are consumed by the proxy in front of mixer.
-	attributesForMixerProxy?: v1.#Attributes @protobuf(8,type=Attributes,name=attributes_for_mixer_proxy)
+	attributesForMixerProxy?: v1.#Attributes @protobuf(8,Attributes,name=attributes_for_mixer_proxy)
 }
 
 // Defines the client config for HTTP.
 #HttpClientConfig: {
 	// The transport config.
-	transport?: #TransportConfig @protobuf(1)
+	transport?: #TransportConfig @protobuf(1,TransportConfig)
 
 	// Map of control configuration indexed by destination.service. This
 	// is used to support per-service configuration for cases where a
 	// mixerclient serves multiple services.
 	serviceConfigs?: {
 		[string]: #ServiceConfig
-	} @protobuf(2,type=map<string,ServiceConfig>,service_configs)
+	} @protobuf(2,map[string]ServiceConfig,service_configs)
 
 	// Default destination service name if none was specified in the
 	// client request.
-	defaultDestinationService?: string @protobuf(3,name=default_destination_service)
+	defaultDestinationService?: string @protobuf(3,string,name=default_destination_service)
 
 	// Default attributes to send to Mixer in both Check and
 	// Report. This typically includes "destination.ip" and
 	// "destination.uid" attributes.
-	mixerAttributes?: v1.#Attributes @protobuf(4,type=Attributes,name=mixer_attributes)
+	mixerAttributes?: v1.#Attributes @protobuf(4,Attributes,name=mixer_attributes)
 
 	// Default attributes to forward to upstream. This typically
 	// includes the "source.ip" and "source.uid" attributes.
-	forwardAttributes?: v1.#Attributes @protobuf(5,type=Attributes,name=forward_attributes)
+	forwardAttributes?: v1.#Attributes @protobuf(5,Attributes,name=forward_attributes)
 }
 
 // Defines the client config for TCP.
 #TcpClientConfig: {
 	// The transport config.
-	transport?: #TransportConfig @protobuf(1)
+	transport?: #TransportConfig @protobuf(1,TransportConfig)
 
 	// Default attributes to send to Mixer in both Check and
 	// Report. This typically includes "destination.ip" and
 	// "destination.uid" attributes.
-	mixerAttributes?: v1.#Attributes @protobuf(2,type=Attributes,name=mixer_attributes)
+	mixerAttributes?: v1.#Attributes @protobuf(2,Attributes,name=mixer_attributes)
 
 	// If set to true, disables Mixer check calls.
-	disableCheckCalls?: bool @protobuf(3,name=disable_check_calls)
+	disableCheckCalls?: bool @protobuf(3,bool,name=disable_check_calls)
 
 	// If set to true, disables Mixer check calls.
-	disableReportCalls?: bool @protobuf(4,name=disable_report_calls)
+	disableReportCalls?: bool @protobuf(4,bool,name=disable_report_calls)
 
 	// Quota specifications to generate quota requirements.
 	// It applies on the new TCP connections.
-	connectionQuotaSpec?: #QuotaSpec @protobuf(5,name=connection_quota_spec)
+	connectionQuotaSpec?: #QuotaSpec @protobuf(5,QuotaSpec,name=connection_quota_spec)
 
 	// Specify report interval to send periodical reports for long TCP
 	// connections. If not specified, the interval is 10 seconds. This interval
 	// should not be less than 1 second, otherwise it will be reset to 1 second.
-	reportInterval?: time.Duration @protobuf(6,type=google.protobuf.Duration,name=report_interval)
+	reportInterval?: time.Duration @protobuf(6,google.protobuf.Duration,name=report_interval)
 }

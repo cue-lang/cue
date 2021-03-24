@@ -74,10 +74,10 @@ import "istio.io/api/mixer/v1"
 	// List of attributes that are generated when *any* of the HTTP
 	// patterns match. This list typically includes the "api.service"
 	// and "api.version" attributes.
-	attributes?: v1.#Attributes @protobuf(1,type=Attributes)
+	attributes?: v1.#Attributes @protobuf(1,Attributes)
 
 	// List of HTTP patterns to match.
-	patterns?: [...#HTTPAPISpecPattern] @protobuf(2)
+	patterns?: [...#HTTPAPISpecPattern] @protobuf(2,HTTPAPISpecPattern)
 
 	// List of APIKey that describes how to extract an API-KEY from an
 	// HTTP request. The first API-Key match found in the list is used,
@@ -88,7 +88,7 @@ import "istio.io/api/mixer/v1"
 	//
 	//     `query: key, `query: api_key`, and then `header: x-api-key`
 	//
-	apiKeys?: [...#APIKey] @protobuf(3,name=api_keys)
+	apiKeys?: [...#APIKey] @protobuf(3,APIKey,name=api_keys)
 }
 
 // HTTPAPISpecPattern defines a single pattern to match against
@@ -108,12 +108,12 @@ import "istio.io/api/mixer/v1"
 	// List of attributes that are generated if the HTTP request matches
 	// the specified http_method and uri_template. This typically
 	// includes the "api.operation" attribute.
-	attributes?: v1.#Attributes @protobuf(1,type=Attributes)
+	attributes?: v1.#Attributes @protobuf(1,Attributes)
 
 	// HTTP request method to match against as defined by
 	// [rfc7231](https://tools.ietf.org/html/rfc7231#page-21). For
 	// example: GET, HEAD, POST, PUT, DELETE.
-	httpMethod?: string @protobuf(2,name=http_method)
+	httpMethod?: string @protobuf(2,string,name=http_method)
 	{} | {
 		// URI template to match against as defined by
 		// [rfc6570](https://tools.ietf.org/html/rfc6570). For example, the
@@ -124,7 +124,7 @@ import "istio.io/api/mixer/v1"
 		//     /dictionary/{term:1}/{term}
 		//     /search{?q*,lang}
 		//
-		uriTemplate: string @protobuf(3,name=uri_template)
+		uriTemplate: string @protobuf(3,string,name=uri_template)
 	} | {
 		// EXPERIMENTAL:
 		//
@@ -134,7 +134,7 @@ import "istio.io/api/mixer/v1"
 		//
 		//     "^/pets/(.*?)?"
 		//
-		regex: string @protobuf(4)
+		regex: string @protobuf(4,string)
 	}
 }
 
@@ -153,7 +153,7 @@ import "istio.io/api/mixer/v1"
 		//
 		//     GET /something?api_key=abcdef12345
 		//
-		query: string @protobuf(1)
+		query: string @protobuf(1,string)
 	} | {
 		// API key is sent in a request header. `header` represents the
 		// header name.
@@ -164,7 +164,7 @@ import "istio.io/api/mixer/v1"
 		//     GET /something HTTP/1.1
 		//     X-API-Key: abcdef12345
 		//
-		header: string @protobuf(2)
+		header: string @protobuf(2,string)
 	} | {
 		// API key is sent in a
 		// [cookie](https://swagger.io/docs/specification/authentication/cookie-authentication),
@@ -175,7 +175,7 @@ import "istio.io/api/mixer/v1"
 		//     GET /something HTTP/1.1
 		//     Cookie: X-API-KEY=abcdef12345
 		//
-		cookie: string @protobuf(3)
+		cookie: string @protobuf(3,string)
 	}
 }
 
@@ -191,11 +191,11 @@ import "istio.io/api/mixer/v1"
 #HTTPAPISpecReference: {
 	// REQUIRED. The short name of the HTTPAPISpec. This is the resource
 	// name defined by the metadata name field.
-	name?: string @protobuf(1)
+	name?: string @protobuf(1,string)
 
 	// Optional namespace of the HTTPAPISpec. Defaults to the encompassing
 	// HTTPAPISpecBinding's metadata namespace field.
-	namespace?: string @protobuf(2)
+	namespace?: string @protobuf(2,string)
 }
 
 // HTTPAPISpecBinding defines the binding between HTTPAPISpecs and one or more
@@ -218,10 +218,10 @@ import "istio.io/api/mixer/v1"
 // ```
 #HTTPAPISpecBinding: {
 	// REQUIRED. One or more services to map the listed HTTPAPISpec onto.
-	services?: [...#IstioService] @protobuf(1)
+	services?: [...#IstioService] @protobuf(1,IstioService)
 
 	// REQUIRED. One or more HTTPAPISpec references that should be mapped to
 	// the specified service(s). The aggregate collection of match
 	// conditions defined in the HTTPAPISpecs should not overlap.
-	apiSpecs?: [...#HTTPAPISpecReference] @protobuf(2,name=api_specs)
+	apiSpecs?: [...#HTTPAPISpecReference] @protobuf(2,HTTPAPISpecReference,name=api_specs)
 }

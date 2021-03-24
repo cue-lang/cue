@@ -4,9 +4,9 @@ cd ..
 
 cmp stderr expect-stderr
 cmp stdout expect-stdout
-cmp expect-attributes_proto_gen.cue root/mixer/v1/attributes_proto_gen.cue
-cmp expect-client_config_proto_gen.cue root/mixer/v1/config/client/client_config_proto_gen.cue
-cmp expect-test_proto_gen.cue root/cue.mod/gen/googleapis.com/acme/test/test_proto_gen.cue
+cmp root/mixer/v1/attributes_proto_gen.cue expect-attributes_proto_gen.cue
+cmp root/mixer/v1/config/client/client_config_proto_gen.cue expect-client_config_proto_gen.cue
+cmp root/cue.mod/gen/googleapis.com/acme/test/test_proto_gen.cue expect-test_proto_gen.cue
 
 -- expect-stdout --
 -- expect-stderr --
@@ -174,30 +174,30 @@ import (
 	// A map of attribute name to its value.
 	attributes?: {
 		[string]: #AttributeValue
-	} @protobuf(1,type=map<string,AttributeValue>)
+	} @protobuf(1,map[string]AttributeValue)
 
 	// Specifies one attribute value with different type.
 	#AttributeValue: {
 		// The attribute value.
 		{} | {
-			stringValue: string @protobuf(2,name=string_value)
+			stringValue: string @protobuf(2,string,name=string_value)
 		} | {
-			int64Value: int64 @protobuf(3,name=int64_value)
+			int64Value: int64 @protobuf(3,int64,name=int64_value)
 		} | {
-			doubleValue: float64 @protobuf(4,type=double,name=double_value)
+			doubleValue: float64 @protobuf(4,double,name=double_value)
 		} | {
-			boolValue: bool @protobuf(5,name=bool_value)
+			boolValue: bool @protobuf(5,bool,name=bool_value)
 		} | {
-			bytesValue: bytes @protobuf(6,name=bytes_value)
+			bytesValue: bytes @protobuf(6,bytes,name=bytes_value)
 		} | {
-			timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
+			timestampValue: time.Time @protobuf(7,google.protobuf.Timestamp,name=timestamp_value)
 		} | {
 			// Used for values of type STRING_MAP
-			stringMapValue: #StringMap @protobuf(9,name=string_map_value)
+			stringMapValue: #StringMap @protobuf(9,StringMap,name=string_map_value)
 		} | {
-			testValue: test.#Test @protobuf(10,type=acme.test.Test,name=test_value)
+			testValue: test.#Test @protobuf(10,acme.test.Test,name=test_value)
 		} | {
-			testValue: test_test.#AnotherTest @protobuf(11,type=acme.test.test.AnotherTest,name=test_value)
+			testValue: test_test.#AnotherTest @protobuf(11,acme.test.test.AnotherTest,name=test_value)
 		}
 	}
 
@@ -206,7 +206,7 @@ import (
 		// Holds a set of name/value pairs.
 		entries?: {
 			[string]: string
-		} @protobuf(1,type=map<string,string>)
+		} @protobuf(1,map[string]string)
 	}
 }
 -- expect-client_config_proto_gen.cue --
@@ -217,13 +217,13 @@ import "acme.com/api/mixer/v1"
 
 // Defines the per-service client configuration.
 #ServiceConfig: {
-	disableCheckCalls?:  bool           @protobuf(1,name=disable_check_calls)
-	disableReportCalls?: bool           @protobuf(2,name=disable_report_calls)
-	mixerAttributes?:    v1.#Attributes @protobuf(3,type=Attributes,name=mixer_attributes)
+	disableCheckCalls?:  bool           @protobuf(1,bool,name=disable_check_calls)
+	disableReportCalls?: bool           @protobuf(2,bool,name=disable_report_calls)
+	mixerAttributes?:    v1.#Attributes @protobuf(3,Attributes,name=mixer_attributes)
 }
 -- expect-test_proto_gen.cue --
 package test
 
 #Test: {
-	test?: int32 @protobuf(1)
+	test?: int32 @protobuf(1,int32)
 }

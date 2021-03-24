@@ -205,7 +205,7 @@ package v1alpha3
 
 #Gateway: {
 	// REQUIRED: A list of server specifications.
-	servers?: [...#Server] @protobuf(1)
+	servers?: [...#Server] @protobuf(1,Server)
 
 	// REQUIRED: One or more labels that indicate a specific set of pods/VMs
 	// on which this gateway configuration should be applied. The scope of
@@ -214,7 +214,7 @@ package v1alpha3
 	// reside in the same namespace as the gateway workload instance.
 	selector?: {
 		[string]: string
-	} @protobuf(2,type=map<string,string>)
+	} @protobuf(2,map[string]string)
 	selector?: {[name=_]: name}
 }
 
@@ -282,7 +282,7 @@ package v1alpha3
 #Server: {
 	// REQUIRED: The Port on which the proxy should listen for incoming
 	// connections.
-	port?: #Port @protobuf(1)
+	port?: #Port @protobuf(1,Port)
 	port?: >10 & <100
 
 	// $hide_from_docs
@@ -290,7 +290,7 @@ package v1alpha3
 	// to. Format: `x.x.x.x` or `unix:///path/to/uds` or `unix://@foobar`
 	// (Linux abstract namespace). When using Unix domain sockets, the port
 	// number should be 0.
-	bind?: string @protobuf(4)
+	bind?: string @protobuf(4,string)
 
 	// REQUIRED. One or more hosts exposed by this gateway.
 	// While typically applicable to
@@ -316,12 +316,12 @@ package v1alpha3
 	// Private configurations (e.g., `exportTo` set to `.`) will not be
 	// available. Refer to the `exportTo` setting in `VirtualService`,
 	// `DestinationRule`, and `ServiceEntry` configurations for details.
-	hosts?: [...string] @protobuf(2)
+	hosts?: [...string] @protobuf(2,string)
 
 	#TLSOptions: {
 		// If set to true, the load balancer will send a 301 redirect for all
 		// http connections, asking the clients to use HTTPS.
-		httpsRedirect?: bool @protobuf(1,name=https_redirect)
+		httpsRedirect?: bool @protobuf(1,bool,name=https_redirect)
 
 		// TLS modes enforced by the proxy
 		#TLSmode:
@@ -359,21 +359,21 @@ package v1alpha3
 		// Optional: Indicates whether connections to this port should be
 		// secured using TLS. The value of this field determines how TLS is
 		// enforced.
-		mode?: #TLSmode @protobuf(2)
+		mode?: #TLSmode @protobuf(2,TLSmode)
 		// Extra comment.
 
 		// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file
 		// holding the server-side TLS certificate to use.
-		serverCertificate?: string @protobuf(3,name=server_certificate)
+		serverCertificate?: string @protobuf(3,string,name=server_certificate)
 
 		// REQUIRED if mode is `SIMPLE` or `MUTUAL`. The path to the file
 		// holding the server's private key.
-		privateKey?: string @protobuf(4,name=private_key)
+		privateKey?: string @protobuf(4,string,name=private_key)
 
 		// REQUIRED if mode is `MUTUAL`. The path to a file containing
 		// certificate authority certificates to use in verifying a presented
 		// client side certificate.
-		caCertificates?: string @protobuf(5,name=ca_certificates)
+		caCertificates?: string @protobuf(5,string,name=ca_certificates)
 
 		// The credentialName stands for a unique identifier that can be used
 		// to identify the serverCertificate and the privateKey. The
@@ -391,11 +391,11 @@ package v1alpha3
 		// key, and the CA certificate (if using mutual TLS). Set the
 		// `ISTIO_META_USER_SDS` metadata variable in the gateway's proxy to
 		// enable the dynamic credential fetching feature.
-		credentialName?: string @protobuf(10,name=credential_name)
+		credentialName?: string @protobuf(10,string,name=credential_name)
 
 		// A list of alternate names to verify the subject identity in the
 		// certificate presented by the client.
-		subjectAltNames?: [...string] @protobuf(6,name=subject_alt_names)
+		subjectAltNames?: [...string] @protobuf(6,string,name=subject_alt_names)
 
 		// TLS protocol versions.
 		#TLSProtocol: "TLS_AUTO" | // Automatically choose the optimal TLS version.
@@ -413,38 +413,38 @@ package v1alpha3
 		}
 
 		// Optional: Minimum TLS protocol version.
-		minProtocolVersion?: #TLSProtocol @protobuf(7,name=min_protocol_version)
+		minProtocolVersion?: #TLSProtocol @protobuf(7,TLSProtocol,name=min_protocol_version)
 
 		// Optional: Maximum TLS protocol version.
-		maxProtocolVersion?: #TLSProtocol @protobuf(8,name=max_protocol_version)
+		maxProtocolVersion?: #TLSProtocol @protobuf(8,TLSProtocol,name=max_protocol_version)
 
 		// Optional: If specified, only support the specified cipher list.
 		// Otherwise default to the default cipher list supported by Envoy.
-		cipherSuites?: [...string] @protobuf(9,name=cipher_suites)
+		cipherSuites?: [...string] @protobuf(9,string,name=cipher_suites)
 	}
 
 	// Set of TLS related options that govern the server's behavior. Use
 	// these options to control if all http requests should be redirected to
 	// https, and the TLS modes to use.
-	tls?: #TLSOptions @protobuf(3)
+	tls?: #TLSOptions @protobuf(3,TLSOptions)
 
 	// The loopback IP endpoint or Unix domain socket to which traffic should
 	// be forwarded to by default. Format should be `127.0.0.1:PORT` or
 	// `unix:///path/to/socket` or `unix://@foobar` (Linux abstract namespace).
-	defaultEndpoint?: string @protobuf(5,name=default_endpoint)
+	defaultEndpoint?: string @protobuf(5,string,name=default_endpoint)
 }
 
 // Port describes the properties of a specific port of a service.
 #Port: {
 	// REQUIRED: A valid non-negative integer port number.
-	number?: uint32 @protobuf(1)
+	number?: uint32 @protobuf(1,uint32)
 
 	// REQUIRED: The protocol exposed on the port.
 	// MUST BE one of HTTP|HTTPS|GRPC|HTTP2|MONGO|TCP|TLS.
 	// TLS implies the connection will be routed based on the SNI header to
 	// the destination without terminating the TLS connection.
-	protocol?: string @protobuf(2)
+	protocol?: string @protobuf(2,string)
 
 	// Label assigned to the port.
-	name?: string @protobuf(3)
+	name?: string @protobuf(3,string)
 }

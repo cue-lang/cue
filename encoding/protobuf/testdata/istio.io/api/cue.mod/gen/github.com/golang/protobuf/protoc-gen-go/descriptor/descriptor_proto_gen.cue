@@ -75,76 +75,76 @@ package descriptor
 // The protocol compiler can output a FileDescriptorSet containing the .proto
 // files it parses.
 #FileDescriptorSet: {
-	file?: [...#FileDescriptorProto] @protobuf(1)
+	file?: [...#FileDescriptorProto] @protobuf(1,FileDescriptorProto)
 }
 
 // Describes a complete .proto file.
 #FileDescriptorProto: {
-	name?:    string @protobuf(1) // file name, relative to root of source tree
-	package?: string @protobuf(2) // e.g. "foo", "foo.bar", etc.
+	name?:    string @protobuf(1,string) // file name, relative to root of source tree
+	package?: string @protobuf(2,string) // e.g. "foo", "foo.bar", etc.
 
 	// Names of files imported by this file.
-	dependency?: [...string] @protobuf(3)
+	dependency?: [...string] @protobuf(3,string)
 
 	// Indexes of the public imported files in the dependency list above.
-	publicDependency?: [...int32] @protobuf(10,name=public_dependency)
+	publicDependency?: [...int32] @protobuf(10,int32,name=public_dependency)
 
 	// Indexes of the weak imported files in the dependency list.
 	// For Google-internal migration only. Do not use.
-	weakDependency?: [...int32] @protobuf(11,name=weak_dependency)
+	weakDependency?: [...int32] @protobuf(11,int32,name=weak_dependency)
 
 	// All top-level definitions in this file.
-	messageType?: [...#DescriptorProto] @protobuf(4,name=message_type)
-	enumType?: [...#EnumDescriptorProto] @protobuf(5,name=enum_type)
-	service?: [...#ServiceDescriptorProto] @protobuf(6)
-	extension?: [...#FieldDescriptorProto] @protobuf(7)
-	options?: #FileOptions @protobuf(8)
+	messageType?: [...#DescriptorProto] @protobuf(4,DescriptorProto,name=message_type)
+	enumType?: [...#EnumDescriptorProto] @protobuf(5,EnumDescriptorProto,name=enum_type)
+	service?: [...#ServiceDescriptorProto] @protobuf(6,ServiceDescriptorProto)
+	extension?: [...#FieldDescriptorProto] @protobuf(7,FieldDescriptorProto)
+	options?: #FileOptions @protobuf(8,FileOptions)
 
 	// This field contains optional information about the original source code.
 	// You may safely remove this entire field without harming runtime
 	// functionality of the descriptors -- the information is needed only by
 	// development tools.
-	sourceCodeInfo?: #SourceCodeInfo @protobuf(9,name=source_code_info)
+	sourceCodeInfo?: #SourceCodeInfo @protobuf(9,SourceCodeInfo,name=source_code_info)
 
 	// The syntax of the proto file.
 	// The supported values are "proto2" and "proto3".
-	syntax?: string @protobuf(12)
+	syntax?: string @protobuf(12,string)
 }
 
 // Describes a message type.
 #DescriptorProto: {
-	name?: string @protobuf(1)
-	field?: [...#FieldDescriptorProto] @protobuf(2)
-	extension?: [...#FieldDescriptorProto] @protobuf(6)
-	nestedType?: [...#DescriptorProto] @protobuf(3,name=nested_type)
-	enumType?: [...#EnumDescriptorProto] @protobuf(4,name=enum_type)
+	name?: string @protobuf(1,string)
+	field?: [...#FieldDescriptorProto] @protobuf(2,FieldDescriptorProto)
+	extension?: [...#FieldDescriptorProto] @protobuf(6,FieldDescriptorProto)
+	nestedType?: [...#DescriptorProto] @protobuf(3,DescriptorProto,name=nested_type)
+	enumType?: [...#EnumDescriptorProto] @protobuf(4,EnumDescriptorProto,name=enum_type)
 
 	#ExtensionRange: {
-		start?:   int32                  @protobuf(1) // Inclusive.
-		end?:     int32                  @protobuf(2) // Exclusive.
-		options?: #ExtensionRangeOptions @protobuf(3)
+		start?:   int32                  @protobuf(1,int32) // Inclusive.
+		end?:     int32                  @protobuf(2,int32) // Exclusive.
+		options?: #ExtensionRangeOptions @protobuf(3,ExtensionRangeOptions)
 	}
-	extensionRange?: [...#ExtensionRange] @protobuf(5,name=extension_range)
-	oneofDecl?: [...#OneofDescriptorProto] @protobuf(8,name=oneof_decl)
-	options?: #MessageOptions @protobuf(7)
+	extensionRange?: [...#ExtensionRange] @protobuf(5,ExtensionRange,name=extension_range)
+	oneofDecl?: [...#OneofDescriptorProto] @protobuf(8,OneofDescriptorProto,name=oneof_decl)
+	options?: #MessageOptions @protobuf(7,MessageOptions)
 
 	// Range of reserved tag numbers. Reserved tag numbers may not be used by
 	// fields or extension ranges in the same message. Reserved ranges may
 	// not overlap.
 	#ReservedRange: {
-		start?: int32 @protobuf(1) // Inclusive.
-		end?:   int32 @protobuf(2) // Exclusive.
+		start?: int32 @protobuf(1,int32) // Inclusive.
+		end?:   int32 @protobuf(2,int32) // Exclusive.
 	}
-	reservedRange?: [...#ReservedRange] @protobuf(9,name=reserved_range)
+	reservedRange?: [...#ReservedRange] @protobuf(9,ReservedRange,name=reserved_range)
 
 	// Reserved field names, which may not be used by fields in the same message.
 	// A given name may only be reserved once.
-	reservedName?: [...string] @protobuf(10,name=reserved_name)
+	reservedName?: [...string] @protobuf(10,string,name=reserved_name)
 }
 
 #ExtensionRangeOptions: {
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 // Describes a field within a message.
@@ -215,55 +215,55 @@ package descriptor
 		"LABEL_REQUIRED": 2
 		"LABEL_REPEATED": 3
 	}
-	name?:   string @protobuf(1)
-	number?: int32  @protobuf(3)
-	label?:  #Label @protobuf(4)
+	name?:   string @protobuf(1,string)
+	number?: int32  @protobuf(3,int32)
+	label?:  #Label @protobuf(4,Label)
 
 	// If type_name is set, this need not be set.  If both this and type_name
 	// are set, this must be one of TYPE_ENUM, TYPE_MESSAGE or TYPE_GROUP.
-	type?: #Type @protobuf(5)
+	type?: #Type @protobuf(5,Type)
 
 	// For message and enum types, this is the name of the type.  If the name
 	// starts with a '.', it is fully-qualified.  Otherwise, C++-like scoping
 	// rules are used to find the type (i.e. first the nested types within this
 	// message are searched, then within the parent, on up to the root
 	// namespace).
-	typeName?: string @protobuf(6,name=type_name)
+	typeName?: string @protobuf(6,string,name=type_name)
 
 	// For extensions, this is the name of the type being extended.  It is
 	// resolved in the same manner as type_name.
-	extendee?: string @protobuf(2)
+	extendee?: string @protobuf(2,string)
 
 	// For numeric types, contains the original text representation of the value.
 	// For booleans, "true" or "false".
 	// For strings, contains the default text contents (not escaped in any way).
 	// For bytes, contains the C escaped value.  All bytes >= 128 are escaped.
 	// TODO(kenton):  Base-64 encode?
-	defaultValue?: string @protobuf(7,name=default_value)
+	defaultValue?: string @protobuf(7,string,name=default_value)
 
 	// If set, gives the index of a oneof in the containing type's oneof_decl
 	// list.  This field is a member of that oneof.
-	oneofIndex?: int32 @protobuf(9,name=oneof_index)
+	oneofIndex?: int32 @protobuf(9,int32,name=oneof_index)
 
 	// JSON name of this field. The value is set by protocol compiler. If the
 	// user has set a "json_name" option on this field, that option's value
 	// will be used. Otherwise, it's deduced from the field's name by converting
 	// it to camelCase.
-	jsonName?: string        @protobuf(10,name=json_name)
-	options?:  #FieldOptions @protobuf(8)
+	jsonName?: string        @protobuf(10,string,name=json_name)
+	options?:  #FieldOptions @protobuf(8,FieldOptions)
 }
 
 // Describes a oneof.
 #OneofDescriptorProto: {
-	name?:    string        @protobuf(1)
-	options?: #OneofOptions @protobuf(2)
+	name?:    string        @protobuf(1,string)
+	options?: #OneofOptions @protobuf(2,OneofOptions)
 }
 
 // Describes an enum type.
 #EnumDescriptorProto: {
-	name?: string @protobuf(1)
-	value?: [...#EnumValueDescriptorProto] @protobuf(2)
-	options?: #EnumOptions @protobuf(3)
+	name?: string @protobuf(1,string)
+	value?: [...#EnumValueDescriptorProto] @protobuf(2,EnumValueDescriptorProto)
+	options?: #EnumOptions @protobuf(3,EnumOptions)
 
 	// Range of reserved numeric values. Reserved values may not be used by
 	// entries in the same enum. Reserved ranges may not overlap.
@@ -272,49 +272,49 @@ package descriptor
 	// is inclusive such that it can appropriately represent the entire int32
 	// domain.
 	#EnumReservedRange: {
-		start?: int32 @protobuf(1) // Inclusive.
-		end?:   int32 @protobuf(2) // Inclusive.
+		start?: int32 @protobuf(1,int32) // Inclusive.
+		end?:   int32 @protobuf(2,int32) // Inclusive.
 	}
 
 	// Range of reserved numeric values. Reserved numeric values may not be used
 	// by enum values in the same enum declaration. Reserved ranges may not
 	// overlap.
-	reservedRange?: [...#EnumReservedRange] @protobuf(4,name=reserved_range)
+	reservedRange?: [...#EnumReservedRange] @protobuf(4,EnumReservedRange,name=reserved_range)
 
 	// Reserved enum value names, which may not be reused. A given name may only
 	// be reserved once.
-	reservedName?: [...string] @protobuf(5,name=reserved_name)
+	reservedName?: [...string] @protobuf(5,string,name=reserved_name)
 }
 
 // Describes a value within an enum.
 #EnumValueDescriptorProto: {
-	name?:    string            @protobuf(1)
-	number?:  int32             @protobuf(2)
-	options?: #EnumValueOptions @protobuf(3)
+	name?:    string            @protobuf(1,string)
+	number?:  int32             @protobuf(2,int32)
+	options?: #EnumValueOptions @protobuf(3,EnumValueOptions)
 }
 
 // Describes a service.
 #ServiceDescriptorProto: {
-	name?: string @protobuf(1)
-	method?: [...#MethodDescriptorProto] @protobuf(2)
-	options?: #ServiceOptions @protobuf(3)
+	name?: string @protobuf(1,string)
+	method?: [...#MethodDescriptorProto] @protobuf(2,MethodDescriptorProto)
+	options?: #ServiceOptions @protobuf(3,ServiceOptions)
 }
 
 // Describes a method of a service.
 #MethodDescriptorProto: {
-	name?: string @protobuf(1)
+	name?: string @protobuf(1,string)
 
 	// Input and output type names.  These are resolved in the same way as
 	// FieldDescriptorProto.type_name, but must refer to a message type.
-	inputType?:  string         @protobuf(2,name=input_type)
-	outputType?: string         @protobuf(3,name=output_type)
-	options?:    #MethodOptions @protobuf(4)
+	inputType?:  string         @protobuf(2,string,name=input_type)
+	outputType?: string         @protobuf(3,string,name=output_type)
+	options?:    #MethodOptions @protobuf(4,MethodOptions)
 
 	// Identifies if client streams multiple client messages
-	clientStreaming?: bool @protobuf(5,name=client_streaming,"default=false")
+	clientStreaming?: bool @protobuf(5,bool,name=client_streaming,"default=false")
 
 	// Identifies if server streams multiple server messages
-	serverStreaming?: bool @protobuf(6,name=server_streaming,"default=false")
+	serverStreaming?: bool @protobuf(6,bool,name=server_streaming,"default=false")
 }
 
 #FileOptions: {
@@ -322,14 +322,14 @@ package descriptor
 	// placed.  By default, the proto package is used, but this is often
 	// inappropriate because proto packages do not normally start with backwards
 	// domain names.
-	javaPackage?: string @protobuf(1,name=java_package)
+	javaPackage?: string @protobuf(1,string,name=java_package)
 
 	// If set, all the classes from the .proto file are wrapped in a single
 	// outer class with the given name.  This applies to both Proto1
 	// (equivalent to the old "--one_java_file" option) and Proto2 (where
 	// a .proto always translates to a single class, but you may want to
 	// explicitly choose the class name).
-	javaOuterClassname?: string @protobuf(8,name=java_outer_classname)
+	javaOuterClassname?: string @protobuf(8,string,name=java_outer_classname)
 
 	// If set true, then the Java code generator will generate a separate .java
 	// file for each top-level message, enum, and service defined in the .proto
@@ -337,10 +337,10 @@ package descriptor
 	// named by java_outer_classname.  However, the outer class will still be
 	// generated to contain the file's getDescriptor() method as well as any
 	// top-level extensions defined in the file.
-	javaMultipleFiles?: bool @protobuf(10,name=java_multiple_files,"default=false")
+	javaMultipleFiles?: bool @protobuf(10,bool,name=java_multiple_files,"default=false")
 
 	// This option does nothing.
-	javaGenerateEqualsAndHash?: bool @protobuf(20,name=java_generate_equals_and_hash,deprecated)
+	javaGenerateEqualsAndHash?: bool @protobuf(20,bool,name=java_generate_equals_and_hash,deprecated)
 
 	// If set true, then the Java2 code generator will generate code that
 	// throws an exception whenever an attempt is made to assign a non-UTF-8
@@ -348,7 +348,7 @@ package descriptor
 	// Message reflection will do the same.
 	// However, an extension field still accepts non-UTF-8 byte sequences.
 	// This option has no effect on when used with the lite runtime.
-	javaStringCheckUtf8?: bool @protobuf(27,name=java_string_check_utf8,"default=false")
+	javaStringCheckUtf8?: bool @protobuf(27,bool,name=java_string_check_utf8,"default=false")
 
 	// Generated classes can be optimized for speed or code size.
 	#OptimizeMode: "SPEED" | // Generate complete code for parsing, serialization,
@@ -362,14 +362,14 @@ package descriptor
 		"CODE_SIZE":    2 // Use ReflectionOps to implement these methods.
 		"LITE_RUNTIME": 3
 	}
-	optimizeFor?: #OptimizeMode @protobuf(9,name=optimize_for,"default=SPEED")
+	optimizeFor?: #OptimizeMode @protobuf(9,OptimizeMode,name=optimize_for,"default=SPEED")
 
 	// Sets the Go package where structs generated from this .proto will be
 	// placed. If omitted, the Go package will be derived from the following:
 	//   - The basename of the package import path, if provided.
 	//   - Otherwise, the package statement in the .proto file, if present.
 	//   - Otherwise, the basename of the .proto file, without extension.
-	goPackage?: string @protobuf(11,name=go_package)
+	goPackage?: string @protobuf(11,string,name=go_package)
 
 	// Should generic services be generated in each language?  "Generic" services
 	// are not specific to any particular RPC system.  They are generated by the
@@ -381,56 +381,56 @@ package descriptor
 	// that generate code specific to your particular RPC system.  Therefore,
 	// these default to false.  Old code which depends on generic services should
 	// explicitly set them to true.
-	ccGenericServices?:   bool @protobuf(16,name=cc_generic_services,"default=false")
-	javaGenericServices?: bool @protobuf(17,name=java_generic_services,"default=false")
-	pyGenericServices?:   bool @protobuf(18,name=py_generic_services,"default=false")
-	phpGenericServices?:  bool @protobuf(42,name=php_generic_services,"default=false")
+	ccGenericServices?:   bool @protobuf(16,bool,name=cc_generic_services,"default=false")
+	javaGenericServices?: bool @protobuf(17,bool,name=java_generic_services,"default=false")
+	pyGenericServices?:   bool @protobuf(18,bool,name=py_generic_services,"default=false")
+	phpGenericServices?:  bool @protobuf(42,bool,name=php_generic_services,"default=false")
 
 	// Is this file deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for everything in the file, or it will be completely ignored; in the very
 	// least, this is a formalization for deprecating files.
-	deprecated?: bool @protobuf(23,"default=false")
+	deprecated?: bool @protobuf(23,bool,"default=false")
 
 	// Enables the use of arenas for the proto messages in this file. This applies
 	// only to generated classes for C++.
-	ccEnableArenas?: bool @protobuf(31,name=cc_enable_arenas,"default=false")
+	ccEnableArenas?: bool @protobuf(31,bool,name=cc_enable_arenas,"default=false")
 
 	// Sets the objective c class prefix which is prepended to all objective c
 	// generated classes from this .proto. There is no default.
-	objcClassPrefix?: string @protobuf(36,name=objc_class_prefix)
+	objcClassPrefix?: string @protobuf(36,string,name=objc_class_prefix)
 
 	// Namespace for generated classes; defaults to the package.
-	csharpNamespace?: string @protobuf(37,name=csharp_namespace)
+	csharpNamespace?: string @protobuf(37,string,name=csharp_namespace)
 
 	// By default Swift generators will take the proto package and CamelCase it
 	// replacing '.' with underscore and use that to prefix the types/symbols
 	// defined. When this options is provided, they will use this value instead
 	// to prefix the types/symbols defined.
-	swiftPrefix?: string @protobuf(39,name=swift_prefix)
+	swiftPrefix?: string @protobuf(39,string,name=swift_prefix)
 
 	// Sets the php class prefix which is prepended to all php generated classes
 	// from this .proto. Default is empty.
-	phpClassPrefix?: string @protobuf(40,name=php_class_prefix)
+	phpClassPrefix?: string @protobuf(40,string,name=php_class_prefix)
 
 	// Use this option to change the namespace of php generated classes. Default
 	// is empty. When this option is empty, the package name will be used for
 	// determining the namespace.
-	phpNamespace?: string @protobuf(41,name=php_namespace)
+	phpNamespace?: string @protobuf(41,string,name=php_namespace)
 
 	// Use this option to change the namespace of php generated metadata classes.
 	// Default is empty. When this option is empty, the proto file name will be
 	// used for determining the namespace.
-	phpMetadataNamespace?: string @protobuf(44,name=php_metadata_namespace)
+	phpMetadataNamespace?: string @protobuf(44,string,name=php_metadata_namespace)
 
 	// Use this option to change the package of ruby generated classes. Default
 	// is empty. When this option is not set, the package name will be used for
 	// determining the ruby package.
-	rubyPackage?: string @protobuf(45,name=ruby_package)
+	rubyPackage?: string @protobuf(45,string,name=ruby_package)
 
 	// The parser stores options it doesn't recognize here.
 	// See the documentation for the "Options" section above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #MessageOptions: {
@@ -452,18 +452,18 @@ package descriptor
 	//
 	// Because this is an option, the above two restrictions are not enforced by
 	// the protocol compiler.
-	messageSetWireFormat?: bool @protobuf(1,name=message_set_wire_format,"default=false")
+	messageSetWireFormat?: bool @protobuf(1,bool,name=message_set_wire_format,"default=false")
 
 	// Disables the generation of the standard "descriptor()" accessor, which can
 	// conflict with a field of the same name.  This is meant to make migration
 	// from proto1 easier; new code should avoid fields named "descriptor".
-	noStandardDescriptorAccessor?: bool @protobuf(2,name=no_standard_descriptor_accessor,"default=false")
+	noStandardDescriptorAccessor?: bool @protobuf(2,bool,name=no_standard_descriptor_accessor,"default=false")
 
 	// Is this message deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the message, or it will be completely ignored; in the very least,
 	// this is a formalization for deprecating messages.
-	deprecated?: bool @protobuf(3,"default=false")
+	deprecated?: bool @protobuf(3,bool,"default=false")
 
 	// Whether the message is an automatically generated map entry type for the
 	// maps field.
@@ -486,10 +486,10 @@ package descriptor
 	// NOTE: Do not set the option in .proto files. Always use the maps syntax
 	// instead. The option should only be implicitly set by the proto compiler
 	// parser.
-	mapEntry?: bool @protobuf(7,name=map_entry)
+	mapEntry?: bool @protobuf(7,bool,name=map_entry)
 
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #FieldOptions: {
@@ -497,7 +497,7 @@ package descriptor
 	// representation of the field than it normally would.  See the specific
 	// options below.  This option is not yet implemented in the open source
 	// release -- sorry, we'll try to include it in a future version!
-	ctype?: #CType @protobuf(1,"default=STRING")
+	ctype?: #CType @protobuf(1,CType,"default=STRING")
 	#CType:
 		// Default mode.
 		"STRING" |
@@ -515,7 +515,7 @@ package descriptor
 	// writing the tag and type for each element, the entire array is encoded as
 	// a single length-delimited blob. In proto3, only explicit setting it to
 	// false will avoid using packed encoding.
-	packed?: bool @protobuf(2)
+	packed?: bool @protobuf(2,bool)
 
 	// The jstype option determines the JavaScript type used for values of the
 	// field.  The option is permitted only for 64 bit integral and fixed types
@@ -528,7 +528,7 @@ package descriptor
 	//
 	// This option is an enum to permit additional types to be added, e.g.
 	// goog.math.Integer.
-	jstype?: #JSType @protobuf(6,"default=JS_NORMAL")
+	jstype?: #JSType @protobuf(6,JSType,"default=JS_NORMAL")
 	#JSType:
 		// Use the default type.
 		"JS_NORMAL" |
@@ -573,39 +573,39 @@ package descriptor
 	// implementation must either *always* check its required fields, or *never*
 	// check its required fields, regardless of whether or not the message has
 	// been parsed.
-	lazy?: bool @protobuf(5,"default=false")
+	lazy?: bool @protobuf(5,bool,"default=false")
 
 	// Is this field deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for accessors, or it will be completely ignored; in the very least, this
 	// is a formalization for deprecating fields.
-	deprecated?: bool @protobuf(3,"default=false")
+	deprecated?: bool @protobuf(3,bool,"default=false")
 
 	// For Google-internal migration only. Do not use.
-	weak?: bool @protobuf(10,"default=false")
+	weak?: bool @protobuf(10,bool,"default=false")
 
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #OneofOptions: {
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #EnumOptions: {
 	// Set this option to true to allow mapping different tag names to the same
 	// value.
-	allowAlias?: bool @protobuf(2,name=allow_alias)
+	allowAlias?: bool @protobuf(2,bool,name=allow_alias)
 
 	// Is this enum deprecated?
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the enum, or it will be completely ignored; in the very least, this
 	// is a formalization for deprecating enums.
-	deprecated?: bool @protobuf(3,"default=false")
+	deprecated?: bool @protobuf(3,bool,"default=false")
 
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #EnumValueOptions: {
@@ -613,10 +613,10 @@ package descriptor
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the enum value, or it will be completely ignored; in the very least,
 	// this is a formalization for deprecating enum values.
-	deprecated?: bool @protobuf(1,"default=false")
+	deprecated?: bool @protobuf(1,bool,"default=false")
 
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #ServiceOptions: {
@@ -629,10 +629,10 @@ package descriptor
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the service, or it will be completely ignored; in the very least,
 	// this is a formalization for deprecating services.
-	deprecated?: bool @protobuf(33,"default=false")
+	deprecated?: bool @protobuf(33,bool,"default=false")
 
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 #MethodOptions: {
@@ -645,7 +645,7 @@ package descriptor
 	// Depending on the target platform, this can emit Deprecated annotations
 	// for the method, or it will be completely ignored; in the very least,
 	// this is a formalization for deprecating methods.
-	deprecated?: bool @protobuf(33,"default=false")
+	deprecated?: bool @protobuf(33,bool,"default=false")
 
 	// Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 	// or neither? HTTP based RPC implementation may choose GET verb for safe
@@ -659,10 +659,10 @@ package descriptor
 		"NO_SIDE_EFFECTS":     1
 		"IDEMPOTENT":          2
 	}
-	idempotencyLevel?: #IdempotencyLevel @protobuf(34,name=idempotency_level,"default=IDEMPOTENCY_UNKNOWN")
+	idempotencyLevel?: #IdempotencyLevel @protobuf(34,IdempotencyLevel,name=idempotency_level,"default=IDEMPOTENCY_UNKNOWN")
 
 	// The parser stores options it doesn't recognize here. See above.
-	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,name=uninterpreted_option)
+	uninterpretedOption?: [...#UninterpretedOption] @protobuf(999,UninterpretedOption,name=uninterpreted_option)
 }
 
 // A message representing a option the parser does not recognize. This only
@@ -678,19 +678,19 @@ package descriptor
 	// E.g.,{ ["foo", false], ["bar.baz", true], ["qux", false] } represents
 	// "foo.(bar.baz).qux".
 	#NamePart: {
-		namePart?:    string @protobuf(1,name=name_part)
-		isExtension?: bool   @protobuf(2,name=is_extension)
+		namePart?:    string @protobuf(1,string,name=name_part)
+		isExtension?: bool   @protobuf(2,bool,name=is_extension)
 	}
-	name?: [...#NamePart] @protobuf(2)
+	name?: [...#NamePart] @protobuf(2,NamePart)
 
 	// The value of the uninterpreted option, in whatever type the tokenizer
 	// identified it as during parsing. Exactly one of these should be set.
-	identifierValue?:  string  @protobuf(3,name=identifier_value)
-	positiveIntValue?: uint64  @protobuf(4,name=positive_int_value)
-	negativeIntValue?: int64   @protobuf(5,name=negative_int_value)
-	doubleValue?:      float64 @protobuf(6,type=double,name=double_value)
-	stringValue?:      bytes   @protobuf(7,name=string_value)
-	aggregateValue?:   string  @protobuf(8,name=aggregate_value)
+	identifierValue?:  string  @protobuf(3,string,name=identifier_value)
+	positiveIntValue?: uint64  @protobuf(4,uint64,name=positive_int_value)
+	negativeIntValue?: int64   @protobuf(5,int64,name=negative_int_value)
+	doubleValue?:      float64 @protobuf(6,double,name=double_value)
+	stringValue?:      bytes   @protobuf(7,bytes,name=string_value)
+	aggregateValue?:   string  @protobuf(8,string,name=aggregate_value)
 }
 
 // Encapsulates information about the original source file from which a
@@ -739,7 +739,7 @@ package descriptor
 	// - Code which tries to interpret locations should probably be designed to
 	//   ignore those that it doesn't understand, as more types of locations could
 	//   be recorded in the future.
-	location?: [...#Location] @protobuf(1)
+	location?: [...#Location] @protobuf(1,Location)
 
 	#Location: {
 		// Identifies which part of the FileDescriptorProto was defined at this
@@ -765,14 +765,14 @@ package descriptor
 		//   [ 4, 3, 2, 7 ]
 		// this path refers to the whole field declaration (from the beginning
 		// of the label to the terminating semicolon).
-		path?: [...int32] @protobuf(1,packed)
+		path?: [...int32] @protobuf(1,int32,packed)
 
 		// Always has exactly three or four elements: start line, start column,
 		// end line (optional, otherwise assumed same as start line), end column.
 		// These are packed into a single field for efficiency.  Note that line
 		// and column numbers are zero-based -- typically you will want to add
 		// 1 to each before displaying to a user.
-		span?: [...int32] @protobuf(2,packed)
+		span?: [...int32] @protobuf(2,int32,packed)
 
 		// If this SourceCodeInfo represents a complete declaration, these are any
 		// comments appearing before and after the declaration which appear to be
@@ -821,9 +821,9 @@ package descriptor
 		//   optional int32 grault = 6;
 		//
 		//   // ignored detached comments.
-		leadingComments?:  string @protobuf(3,name=leading_comments)
-		trailingComments?: string @protobuf(4,name=trailing_comments)
-		leadingDetachedComments?: [...string] @protobuf(6,name=leading_detached_comments)
+		leadingComments?:  string @protobuf(3,string,name=leading_comments)
+		trailingComments?: string @protobuf(4,string,name=trailing_comments)
+		leadingDetachedComments?: [...string] @protobuf(6,string,name=leading_detached_comments)
 	}
 }
 
@@ -833,23 +833,23 @@ package descriptor
 #GeneratedCodeInfo: {
 	// An Annotation connects some span of text in generated code to an element
 	// of its generating .proto file.
-	annotation?: [...#Annotation] @protobuf(1)
+	annotation?: [...#Annotation] @protobuf(1,Annotation)
 
 	#Annotation: {
 		// Identifies the element in the original source .proto file. This field
 		// is formatted the same as SourceCodeInfo.Location.path.
-		path?: [...int32] @protobuf(1,packed)
+		path?: [...int32] @protobuf(1,int32,packed)
 
 		// Identifies the filesystem path to the original source .proto.
-		sourceFile?: string @protobuf(2,name=source_file)
+		sourceFile?: string @protobuf(2,string,name=source_file)
 
 		// Identifies the starting offset in bytes in the generated code
 		// that relates to the identified object.
-		begin?: int32 @protobuf(3)
+		begin?: int32 @protobuf(3,int32)
 
 		// Identifies the ending offset in bytes in the generated code that
 		// relates to the identified offset. The end offset should be one past
 		// the last relevant byte (so the length of the text = end - begin).
-		end?: int32 @protobuf(4)
+		end?: int32 @protobuf(4,int32)
 	}
 }

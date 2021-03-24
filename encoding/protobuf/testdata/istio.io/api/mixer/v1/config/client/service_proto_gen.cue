@@ -27,16 +27,16 @@ package client
 // (e.g. on Kubernetes, "reviews" + "default" + "svc.cluster.local" -> "reviews.default.svc.cluster.local").
 #IstioService: {
 	// The short name of the service such as "foo".
-	name?: string @protobuf(1)
+	name?: string @protobuf(1,string)
 
 	// Optional namespace of the service. Defaults to value of metadata namespace field.
-	namespace?: string @protobuf(2)
+	namespace?: string @protobuf(2,string)
 
 	// Domain suffix used to construct the service FQDN in implementations that support such specification.
-	domain?: string @protobuf(3)
+	domain?: string @protobuf(3,string)
 
 	// The service FQDN.
-	service?: string @protobuf(4)
+	service?: string @protobuf(4,string)
 
 	// Optional one or more labels that uniquely identify the service version.
 	//
@@ -44,5 +44,5 @@ package client
 	//
 	labels?: {
 		[string]: string
-	} @protobuf(5,type=map<string,string>)
+	} @protobuf(5,map[string]string)
 }

@@ -11,24 +11,24 @@ import "time"
 	// A map of attribute name to its value.
 	attributes?: {
 		[string]: #AttributeValue
-	} @protobuf(1,type=map<string,AttributeValue>)
+	} @protobuf(1,map[string]AttributeValue)
 
 	// Specifies one attribute value with different type.
 	#AttributeValue: {} | {
-		stringValue: string @protobuf(2,name=string_value)
+		stringValue: string @protobuf(2,string,name=string_value)
 	} | {
-		int64Value: int64 @protobuf(3,name=int64_value)
+		int64Value: int64 @protobuf(3,int64,name=int64_value)
 	} | {
-		doubleValue: float64 @protobuf(4,type=double,name=double_value)
+		doubleValue: float64 @protobuf(4,double,name=double_value)
 	} | {
-		boolValue: bool @protobuf(5,name=bool_value)
+		boolValue: bool @protobuf(5,bool,name=bool_value)
 	} | {
-		bytesValue: bytes @protobuf(6,name=bytes_value)
+		bytesValue: bytes @protobuf(6,bytes,name=bytes_value)
 	} | {
-		timestampValue: time.Time @protobuf(7,type=google.protobuf.Timestamp,name=timestamp_value)
+		timestampValue: time.Time @protobuf(7,google.protobuf.Timestamp,name=timestamp_value)
 	} | {
 		// Used for values of type STRING_MAP
-		stringMapValue: #StringMap @protobuf(9,name=string_map_value)
+		stringMapValue: #StringMap @protobuf(9,StringMap,name=string_map_value)
 	}
 
 	// Defines a string map.
@@ -36,7 +36,7 @@ import "time"
 		// Holds a set of name/value pairs.
 		entries?: {
 			[string]: string
-		} @protobuf(1,type=map<string,string>)
+		} @protobuf(1,map[string]string)
 	}
 }
 -- policy.proto --

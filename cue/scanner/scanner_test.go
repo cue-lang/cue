@@ -70,6 +70,7 @@ var testTokens = [...]elt{
 	{token.ATTRIBUTE, `@foo("",a="")`, special},
 	{token.ATTRIBUTE, `@foo(2,bytes,a.b=c)`, special},
 	{token.ATTRIBUTE, `@foo([{()}]())`, special},
+	{token.ATTRIBUTE, `@foo("{")`, special},
 
 	// Identifiers and basic type literals
 	{token.BOTTOM, "_|_", literal},

@@ -18,6 +18,7 @@ import (
 	"fmt"
 	"strconv"
 	"strings"
+	"unicode"
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
@@ -111,6 +112,7 @@ func (a *Attr) Lookup(pos int, key string) (val string, found bool, err error) {
 func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 	i := 0
 	for {
+		i += skipSpace(s[i:])
 		// always scan at least one, possibly empty element.
 		n, err := scanAttributeElem(pos, s[i:], &a)
 		if err != nil {
@@ -119,12 +121,22 @@ func ParseAttrBody(pos token.Pos, s string) (a Attr) {
 		if i += n; i >= len(s) {
 			break
 		}
+		i += skipSpace(s[i:])
 		if s[i] != ',' {
 			return Attr{Err: errors.Newf(pos, "invalid attribute: expected comma")}
 		}
 		i++
 	}
 	return a
+}
+
+func skipSpace(s string) int {
+	for n, r := range s {
+		if !unicode.IsSpace(r) {
+			return n
+		}
+	}
+	return 0
 }
 
 func scanAttributeElem(pos token.Pos, s string, a *Attr) (n int, err errors.Error) {
@@ -135,16 +147,17 @@ func scanAttributeElem(pos token.Pos, s string, a *Attr) (n int, err errors.Erro
 		p := strings.IndexAny(s, ",=") // ) is assumed to be stripped.
 		switch {
 		case p < 0:
-			kv.data = s
+			kv.data = strings.TrimSpace(s)
 			n = len(s)
 
 		default: // ','
 			n = p
-			kv.data = s[:n]
+			kv.data = strings.TrimSpace(s[:n])
 
 		case s[p] == '=':
 			kv.equal = p
 			offset := p + 1
+			offset += skipSpace(s[offset:])
 			var str string
 			if p, str, err = scanAttributeString(pos, s[offset:]); p > 0 {
 				n = offset + p
@@ -154,7 +167,7 @@ func scanAttributeElem(pos token.Pos, s string, a *Attr) (n int, err errors.Erro
 				if p = strings.IndexByte(s[offset:], ','); p >= 0 {
 					n = offset + p
 				}
-				kv.data = s[:n]
+				kv.data = strings.TrimSpace(s[:n])
 			}
 		}
 	}

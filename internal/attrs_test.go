@@ -45,6 +45,15 @@ func TestAttributeBody(t *testing.T) {
 		in:  `foo,"bar",#"baz"#`,
 		out: "[{foo 0} {bar 0} {baz 0}]",
 	}, {
+		in:  `foo,bar,baz`,
+		out: "[{foo 0} {bar 0} {baz 0}]",
+	}, {
+		in:  `1,"map<int,string>"`,
+		out: "[{1 0} {map<int,string> 0}]",
+	}, {
+		in:  `1, "map<int,string>"`,
+		out: "[{1 0} {map<int,string> 0}]",
+	}, {
 		in:  `bar=str`,
 		out: "[{bar=str 3}]",
 	}, {
@@ -60,6 +69,12 @@ func TestAttributeBody(t *testing.T) {
 		in:  `foo=1,bar="str",baz=free form`,
 		out: "[{foo=1 3} {bar=str 3} {baz=free form 3}]",
 	}, {
+		in:  `foo=1,bar="str",baz=free form  `,
+		out: "[{foo=1 3} {bar=str 3} {baz=free form 3}]",
+	}, {
+		in:  `foo=1,bar="str"  ,baz="free form  "`,
+		out: "[{foo=1 3} {bar=str 3} {baz=free form   3}]",
+	}, {
 		in: `"""
 		"""`,
 		out: "[{ 0}]",
@@ -70,7 +85,7 @@ func TestAttributeBody(t *testing.T) {
 		out: "[{  0}]",
 	}, {
 		in:  "'' ,b",
-		err: "invalid attribute",
+		out: "[{ 0} {b 0}]",
 	}, {
 		in:  "' ,b",
 		err: "not terminated",

@@ -1,0 +1,23 @@
+-- value.cue --
+a: 1
+b: 2
+c: 3.4
+
+d: "foo\u1234"
+e: '\000'
+
+f: false
+// Doc comment
+t: true
+
+notConcrete: string
+
+-- out/encode --
+a: 1
+b: 2
+c: 3.4
+d: "fooሴ"
+e: "\x00"
+f: false
+# Doc comment
+t: true

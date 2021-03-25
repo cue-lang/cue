@@ -16,6 +16,8 @@ package pbinternal
 
 import (
 	"strings"
+	"unicode"
+	"unicode/utf8"
 
 	"cuelang.org/go/cue"
 )
@@ -49,6 +51,8 @@ type Info struct {
 	CompositeType CompositeType
 	ValueType     ValueType
 	Type          string
+
+	IsEnum bool
 
 	// For maps only
 	KeyType       ValueType // only for maps
@@ -97,7 +101,7 @@ func FromValue(name string, v cue.Value) (info Info, err error) {
 
 	case cue.StructKind:
 		if strings.HasPrefix(info.Type, "map[") {
-			a := strings.SplitN(info.Type[len("map["):], ",", 2)
+			a := strings.SplitN(info.Type[len("map["):], "]", 2)
 			info.KeyTypeString = strings.TrimSpace(a[0])
 			switch info.KeyTypeString {
 			case "string":
@@ -133,6 +137,8 @@ func FromValue(name string, v cue.Value) (info Info, err error) {
 
 	case cue.IntKind:
 		info.ValueType = Int
+		r, _ := utf8.DecodeRuneInString(info.Type)
+		info.IsEnum = unicode.In(r, unicode.Upper)
 
 	case cue.FloatKind, cue.NumberKind:
 		info.ValueType = Float

@@ -64,3 +64,47 @@ func matchBySymbol(v cue.Value, name string, x *ast.BasicLit) bool {
 
 	return false
 }
+
+// MatchByInt finds a symbol for a given enum value and sets it in x.
+func MatchByInt(v cue.Value, val int64) string {
+	if op, a := v.Expr(); op == cue.AndOp {
+		for _, v := range a {
+			if s := MatchByInt(v, val); s != "" {
+				return s
+			}
+		}
+	}
+	v = cue.Dereference(v)
+	return matchByInt(v, val)
+}
+
+func matchByInt(v cue.Value, val int64) string {
+	switch op, a := v.Expr(); op {
+	case cue.OrOp, cue.AndOp:
+		for _, v := range a {
+			if s := matchByInt(v, val); s != "" {
+				return s
+			}
+		}
+
+	default:
+		if i, err := v.Int64(); err != nil || i != val {
+			break
+		}
+
+		_, path := v.ReferencePath()
+		a := path.Selectors()
+		if len(a) == 0 {
+			break
+		}
+
+		sel := a[len(a)-1]
+		if !sel.IsDefinition() {
+			break
+		}
+
+		return sel.String()[1:]
+	}
+
+	return ""
+}

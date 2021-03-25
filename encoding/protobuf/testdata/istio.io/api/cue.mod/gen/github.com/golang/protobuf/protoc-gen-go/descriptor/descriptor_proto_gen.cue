@@ -150,6 +150,8 @@ package descriptor
 // Describes a field within a message.
 #FieldDescriptorProto: {
 	#Type:
+		// 0 is reserved for errors.
+		// Order is weird for historical reasons.
 		"TYPE_DOUBLE" |
 		"TYPE_FLOAT" |
 
@@ -180,9 +182,6 @@ package descriptor
 		"TYPE_SFIXED32" |
 		"TYPE_SFIXED64" |
 		"TYPE_SINT32" | // Uses ZigZag encoding.
-
-		// 0 is reserved for errors.
-		// Order is weird for historical reasons.
 		"TYPE_SINT64" // Uses ZigZag encoding.
 
 	#Type_value: {

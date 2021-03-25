@@ -163,7 +163,12 @@ func (c *comments) AddComment(cg *CommentGroup) {
 		c.groups = &a
 		return
 	}
+
 	*c.groups = append(*c.groups, cg)
+	a := *c.groups
+	for i := len(a) - 2; i >= 0 && a[i].Position > cg.Position; i-- {
+		a[i], a[i+1] = a[i+1], a[i]
+	}
 }
 
 func (c *comments) SetComments(cgs []*CommentGroup) {

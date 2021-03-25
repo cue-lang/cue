@@ -1,0 +1,47 @@
+// test of non-standard list
+
+// TODO: there are many missing comments, but these really are consequences
+// of the buggy textpbfmt library.
+
+-- list.cue --
+empty1: [...int]
+empty2: [...int]
+
+int1: [...int]
+int2: [...int]
+int3: [...int]
+
+string1: [...string]
+
+float1: [...number]
+
+
+-- input.textproto --
+empty1: []
+empty2: [ # foo
+]
+
+int1: [1, 2]
+int2: [1 2]  # omitting commas okay
+int3: [
+    1 # omitting comma okay
+    2
+]
+
+string1: [
+    "a",  # omitting comma NOT supported
+    "b"
+]
+
+float1: [ 1e+2 1. 0]
+-- out/decode --
+empty1: []
+empty2: [ // foo
+]
+int1: [1, 2]
+int2: [1, 2] // omitting commas okay
+int3: [1, // omitting comma okay
+		2]
+string1: ["a", // omitting comma NOT supported
+		"b"]
+float1: [1e+2, 1.0, 0]

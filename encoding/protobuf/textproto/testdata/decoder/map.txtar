@@ -1,0 +1,51 @@
+-- map.cue --
+map: {[string]: int} @protobuf(1,map[string]int)
+
+
+implicit: [string]: string
+
+intMap: {[string]: int} @protobuf(1,map[int]int)
+
+-- input.textproto --
+map: {
+    key: "foo"
+    value: 2
+}
+map: {
+    key: "bar"
+    value: 3
+}
+
+implicit: {
+    key: "foo"
+    value: 2
+}
+implicit: {
+    key: "bar"
+    value: 3
+}
+
+intMap: {
+    key:   100
+    value: 2
+}
+intMap: {
+    key:   102
+    value: 3
+}
+
+-- out/decode --
+map: {
+	"foo": 2
+}
+map: {
+	"bar": 3
+}
+implicit: {}
+implicit: {}
+intMap: {
+	"100": 2
+}
+intMap: {
+	"102": 3
+}

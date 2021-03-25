@@ -48,11 +48,11 @@ func TestAttributeBody(t *testing.T) {
 		in:  `foo,bar,baz`,
 		out: "[{foo 0} {bar 0} {baz 0}]",
 	}, {
-		in:  `1,"map<int,string>"`,
-		out: "[{1 0} {map<int,string> 0}]",
+		in:  `1,map[int]string`,
+		out: "[{1 0} {map[int]string 0}]",
 	}, {
-		in:  `1, "map<int,string>"`,
-		out: "[{1 0} {map<int,string> 0}]",
+		in:  `1,map[int]string`,
+		out: "[{1 0} {map[int]string 0}]",
 	}, {
 		in:  `bar=str`,
 		out: "[{bar=str 3}]",

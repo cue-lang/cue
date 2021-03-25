@@ -1,0 +1,19 @@
+-- map.cue --
+inf: number
+nan: number
+
+t: bool
+f: bool
+
+
+-- input.textproto --
+inf: inf
+nan: nan
+t: true
+f: false
+
+-- out/decode --
+inf: _|_
+nan: _|_
+t:   true
+f:   false

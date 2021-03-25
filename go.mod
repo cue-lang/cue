@@ -10,6 +10,7 @@ require (
 	github.com/lib/pq v1.0.0 // indirect
 	github.com/mpvl/unique v0.0.0-20150818121801-cbe035fff7de
 	github.com/pkg/errors v0.8.1 // indirect
+	github.com/protocolbuffers/txtpbfmt v0.0.0-20201118171849-f6a6b3f636fc
 	github.com/rogpeppe/go-internal v1.8.0
 	github.com/spf13/cobra v1.0.0
 	github.com/spf13/pflag v1.0.3

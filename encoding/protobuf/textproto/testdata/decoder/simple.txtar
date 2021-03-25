@@ -1,0 +1,63 @@
+// From: https://stackoverflow.com/questions/18873924/what-does-the-protobuf-text-format-look-like
+-- foo.cue --
+#MyEnum: "Default" | "Variant1" | "Variant100"
+
+f1:       string
+f2:       int64
+fa:       [...uint64]
+fb:       [...int32]
+fc:       [...number]
+pairs:    [...#Pair]
+bbbb:     bytes // optional
+
+//    extensions 100 to max;
+
+#Pair: {
+    key:   string
+    value: string
+}
+
+-- input.textproto --
+f1: "dsfadsafsaf"
+f2: 234 # value comment
+
+fa: 2342134
+fa: 2342135
+fa: 2342136
+# Mix of list and single elements.
+fb: [ -2342134, -2342135, -2342136 ]
+fb: -1000
+
+fc: 4
+fc: 7
+fc: -12
+fc: 4
+fc: 7
+fc: -3
+fc: 4
+fc: 7
+fc: 0
+pairs {
+    key: "sdfff"
+    value: "q\"qq\\q\n"
+}
+pairs {
+    key: "   sdfff2  \321\202\320\265\321\201\321\202 "
+    value: "q\tqq<>q2&\001\377"
+}
+bbbb: "\000\001\002\377\376\375"
+-- out/decode --
+f1: "dsfadsafsaf"
+f2: 234 // value comment
+fa: [2342134, 2342135, 2342136]
+// Mix of list and single elements.
+fb: [-2342134, -2342135, -2342136, -1000]
+fc: [4, 7, -12, 4, 7, -3, 4, 7, 0]
+pairs: [{
+	key:   "sdfff"
+	value: "q\"qq\\q\n"
+}, {
+	key:   "   sdfff2  тест "
+	value: "q\tqq<>q2&\u0001�"
+}]
+bbbb: '\x00\x01\x02\xff\xfe\xfd'

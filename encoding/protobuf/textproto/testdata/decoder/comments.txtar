@@ -1,0 +1,116 @@
+// TODO: there are many missing comments, but these really are consequences
+// of the buggy textpbfmt library.
+
+-- foo.cue --
+a: string
+b: [...int]
+c: [...int32]
+m: [...#Msg]
+#Msg: {
+    x: string
+    y: string
+}
+
+-- input.textproto --
+# file comment
+
+# doc comment a
+a: "dsfadsafsaf" # line comment
+
+# floating comment a-b
+
+# doc comment b
+b: [
+  # pre-elem comment
+
+  # doc elem 0
+  123, # elem 0 line comment
+  # trailing elem 0
+
+  # inbetween comment 1
+
+  # inbetween comment 2
+
+  # doc elem 1
+  456 # elem 1 line comment
+  # trailing elem 1
+
+  # final floating 1
+
+  # final floating 2
+]
+# floating end
+
+c: 2342134 # line elem 0
+c: 2342135 # line elem 1
+# inbetween elems
+c: 2342136 # line elem 2
+# after list c
+
+# floating
+
+m {
+    x: "sdfff" # inner line comment
+    y: "q\"qq\\q\n"
+    # after last value
+} # after elem line
+ # after elem separate
+m {
+    x: "   sdfff2  \321\202\320\265\321\201\321\202 "
+    y: "q\tqq<>q2&\001\377"
+} # after list line
+# after list
+
+# floating end
+
+-- out/decode --
+// file comment
+
+// doc comment a
+a: "dsfadsafsaf" // line comment
+
+// floating comment a-b
+
+// doc comment b
+b: [
+	// pre-elem comment
+	123, // elem 0 line comment
+
+	// trailing elem 0
+	// inbetween comment 2
+	456, // elem 1 line comment
+
+	// trailing elem 1
+
+	// final floating 2
+]
+
+// floating end
+
+c: [2342134, // line elem 0
+		2342135, // line elem 1
+		// inbetween elems
+		2342136, // line elem 2
+]
+
+// after list c
+
+// floating
+
+m: [{
+	x: "sdfff" // inner line comment
+	y: "q\"qq\\q\n"
+
+	// after last value
+
+}, // after elem line
+	// after elem separate
+	{
+		x: "   sdfff2  тест "
+		y: "q\tqq<>q2&\u0001�"
+	}, // after list line
+]
+
+// after list
+
+// floating end

@@ -27,6 +27,7 @@ import (
 
 // Attr holds positional information for a single Attr.
 type Attr struct {
+	Body   string
 	Fields []keyValue
 	Err    error
 }
@@ -110,6 +111,7 @@ func (a *Attr) Lookup(pos int, key string) (val string, found bool, err error) {
 }
 
 func ParseAttrBody(pos token.Pos, s string) (a Attr) {
+	a.Body = s
 	i := 0
 	for {
 		i += skipSpace(s[i:])

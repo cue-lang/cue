@@ -60,6 +60,9 @@ func MakePath(selectors ...Selector) Path {
 //
 // Unlike with normal CUE expressions, the first element of the path may be
 // a string literal.
+//
+// A path may not contain hidden fields. To create a path with hidden fields,
+// use MakePath and Ident.
 func ParsePath(s string) Path {
 	if s == "" {
 		return Path{}
@@ -69,7 +72,14 @@ func ParsePath(s string) Path {
 		return MakePath(Selector{pathError{errors.Promote(err, "invalid path")}})
 	}
 
-	return Path{path: toSelectors(expr)}
+	p := Path{path: toSelectors(expr)}
+	for _, sel := range p.path {
+		if sel.sel.kind().IsHidden() {
+			return MakePath(Selector{pathError{errors.Newf(token.NoPos,
+				"invalid path: hidden fields not allowed in path %s", s)}})
+		}
+	}
+	return p
 }
 
 // Selectors reports the individual selectors of a path.

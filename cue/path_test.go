@@ -79,6 +79,11 @@ func Test(t *testing.T) {
 		str:  `c."#Foo"`,
 		out:  "7",
 	}, {
+		path: ParsePath("foo._foo"),
+		str:  "_|_",
+		err:  true,
+		out:  `_|_ // invalid path: hidden fields not allowed in path foo._foo`,
+	}, {
 		path: ParsePath(`c."#Foo`),
 		str:  "_|_",
 		err:  true,

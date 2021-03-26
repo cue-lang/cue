@@ -978,6 +978,100 @@ func TestFill2(t *testing.T) {
 	}
 }
 
+func TestFillPath(t *testing.T) {
+	r := &Runtime{}
+
+	inst, err := r.CompileExpr(ast.NewStruct("bar", ast.NewString("baz")))
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	testCases := []struct {
+		in   string
+		x    interface{}
+		path Path
+		out  string
+	}{{
+		in: `
+		foo: int
+		bar: foo
+		`,
+		x:    3,
+		path: ParsePath("foo"),
+		out: `
+		foo: 3
+		bar: 3
+		`,
+	}, {
+		in: `
+		X="#foo": int
+		bar: X
+		`,
+		x:    3,
+		path: ParsePath(`"#foo"`),
+		out: `
+		"#foo": 3
+		bar: 3
+		`,
+	}, {
+		in: `
+		X="#foo": foo: int
+		bar: X.foo
+		`,
+		x:    3,
+		path: ParsePath(`"#foo".foo`),
+		out: `
+		"#foo": foo: 3
+		bar: 3
+		`,
+	}, {
+		in: `
+		foo: #foo: int
+		bar: foo.#foo
+		`,
+		x:    3,
+		path: ParsePath("foo.#foo"),
+		out: `
+		foo: {
+			#foo: 3
+		}
+		bar: 3
+		`,
+	}, {
+		in: `
+		string
+		`,
+		x:    "foo",
+		path: ParsePath(""),
+		out: `
+		"foo"
+		`,
+	}, {
+		in: `
+		foo: _
+		`,
+		x:    inst.Value(),
+		path: ParsePath("foo"),
+		out: `
+		{foo: {bar: "baz"}}
+		`,
+	}}
+
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			v := compileT(t, r, tc.in).Value()
+			v = v.FillPath(tc.path, tc.x)
+
+			w := compileT(t, r, tc.out).Value()
+
+			if !cmp.Equal(goValue(v), goValue(w)) {
+				t.Error(cmp.Diff(goValue(v), goValue(w)))
+				t.Errorf("\ngot:  %s\nwant: %s", v, w)
+			}
+		})
+	}
+}
+
 func TestFillFloat(t *testing.T) {
 	// This tests panics for issue #749
 

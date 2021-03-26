@@ -257,6 +257,14 @@ const (
 	indexShift = 3
 )
 
+func (f FeatureType) IsDef() bool {
+	return f&DefinitionLabel == DefinitionLabel
+}
+
+func (f FeatureType) IsHidden() bool {
+	return f&HiddenLabel == HiddenLabel
+}
+
 // IsValid reports whether f is a valid label.
 func (f Feature) IsValid() bool { return f != InvalidLabel }
 
@@ -276,7 +284,7 @@ func (f Feature) IsDef() bool {
 		// TODO(perf): do more mask trickery to avoid this branch.
 		return false
 	}
-	return f.Typ()&DefinitionLabel == DefinitionLabel
+	return f.Typ().IsDef()
 }
 
 // IsInt reports whether this is an integer index.
@@ -289,7 +297,7 @@ func (f Feature) IsHidden() bool {
 		// TODO(perf): do more mask trickery to avoid this branch.
 		return false
 	}
-	return f.Typ()&HiddenLabel == HiddenLabel
+	return f.Typ().IsHidden()
 }
 
 // Index reports the abstract index associated with f.

@@ -57,7 +57,13 @@ func MakePath(selectors ...Selector) Path {
 
 // ParsePath parses a CUE expression into a Path. Any error resulting from
 // this conversion can be obtained by calling Err on the result.
+//
+// Unlike with normal CUE expressions, the first element of the path may be
+// a string literal.
 func ParsePath(s string) Path {
+	if s == "" {
+		return Path{}
+	}
 	expr, err := parser.ParseExpr("", s)
 	if err != nil {
 		return MakePath(Selector{pathError{errors.Promote(err, "invalid path")}})
@@ -100,6 +106,9 @@ func toSelectors(expr ast.Expr) []Selector {
 	switch x := expr.(type) {
 	case *ast.Ident:
 		return []Selector{identSelector(x)}
+
+	case *ast.BasicLit:
+		return []Selector{basicLitSelector(x)}
 
 	case *ast.IndexExpr:
 		a := toSelectors(x.X)

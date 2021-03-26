@@ -42,6 +42,14 @@ func Test(t *testing.T) {
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
+		path: ParsePath(`#Foo.a.b`),
+		out:  "1",
+		str:  "#Foo.a.b",
+	}, {
+		path: ParsePath(`"#Foo".c.d`),
+		out:  "2",
+		str:  `"#Foo".c.d`,
+	}, {
 		// fallback Def(Foo) -> Def(#Foo)
 		path: p(Def("Foo"), Str("a"), Str("b")),
 		out:  "1",

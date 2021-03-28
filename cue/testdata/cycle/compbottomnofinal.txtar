@@ -370,14 +370,8 @@ medium.p1.#Y: cycle: field port was added after an if clause evaluated it
 medium.p2.#Y: cycle: field port was added after an if clause evaluated it
 medium.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
 medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-medium.p5.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-medium.p6.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
 minimal.b: cycle: new field port inserted by if clause that was previously evaluated by another if clause
 small.p1.#Y: cycle: field port was added after an if clause evaluated it
-small.p2.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-small.p2.#Y: cycle: field port was added after an if clause evaluated it
-small.p2.#X: cannot use "" (type string) as int in argument 1 to strconv.FormatInt:
-    ./in.cue:50:7
 
 Result:
 (_|_){
@@ -404,17 +398,13 @@ Result:
         port: (string){ "" }
       }
     }
-    p2: (_|_){
-      // [eval]
-      #X: (_|_){
-        // [eval] small.p2.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-        port: (_|_){
-          // [eval] small.p2.#X: cannot use "" (type string) as int in argument 1 to strconv.FormatInt:
-          //     ./in.cue:50:7
-        }
+    p2: (struct){
+      #X: (#struct){
+        port: (string){ "" }
       }
       #Y: (_|_){
-        // [eval] small.p2.#Y: cycle: field port was added after an if clause evaluated it
+        // [incomplete] small.p2.#Y: undefined field port:
+        //     ./in.cue:50:50
         port: (string){ "" }
       }
     }
@@ -476,28 +466,28 @@ Result:
         port: (string){ "" }
       }
     }
-    p5: (_|_){
-      // [eval]
-      #X: (_|_){
-        // [eval] medium.p5.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+    p5: (struct){
+      #X: (#struct){
         port: (string){ "" }
       }
       #Y: (_|_){
-        // [eval] medium.p5.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [incomplete] medium.p5.#Y: undefined field port:
+        //     ./in.cue:158:56
+        port: (string){ "" }
       }
       Y: (struct){
       }
     }
-    p6: (_|_){
-      // [eval]
-      #X: (_|_){
-        // [eval] medium.p6.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+    p6: (struct){
+      #X: (#struct){
         port: (string){ "" }
       }
       Y: (struct){
       }
       #Y: (_|_){
-        // [eval] medium.p6.#X: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [incomplete] medium.p6.#Y: undefined field port:
+        //     ./in.cue:186:56
+        port: (string){ "" }
       }
     }
   }

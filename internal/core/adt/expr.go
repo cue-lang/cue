@@ -864,6 +864,12 @@ func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
 	if n == emptyNode {
 		return n
 	}
+	if n.status == Partial {
+		if b := n.state.incompleteErrors(); b != nil && b.Code < CycleError {
+			n.BaseValue = b
+			return n
+		}
+	}
 	return c.lookup(n, x.Src.Sel.Pos(), x.Sel, state)
 }
 
@@ -890,6 +896,12 @@ func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	i := ctx.value(x.Index)
 	if n == emptyNode {
 		return n
+	}
+	if n.status == Partial {
+		if b := n.state.incompleteErrors(); b != nil && b.Code < CycleError {
+			n.BaseValue = b
+			return n
+		}
 	}
 	f := ctx.Label(x.Index, i)
 	return ctx.lookup(n, x.Src.Index.Pos(), f, state)

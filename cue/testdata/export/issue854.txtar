@@ -1,0 +1,32 @@
+-- cue.mod/module.cue --
+module: "mod.com"
+-- a.cue --
+package a
+
+import "mod.com/b"
+
+theb: b.name
+-- b/b.cue --
+package b
+
+import "mod.com/c"
+
+b: c.c & {
+	other: "name"
+}
+
+name: b.other
+-- c/c.cue --
+package c
+-- out/compile --
+--- a.cue
+{
+  theb: 〈import;"mod.com/b"〉.name
+}
+-- out/eval --
+(struct){
+  theb: (_|_){
+    // [incomplete] b: undefined field c:
+    //     ./b/b.cue:5:6
+  }
+}

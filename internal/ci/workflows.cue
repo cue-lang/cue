@@ -139,9 +139,6 @@ test: _#bashWorkflow & {
 		run:  (_#gerrit._#setCodeReview & {
 			#args: {
 				message: "Started the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-				labels: {
-					"Code-Review": 0
-				}
 			}
 		}).res
 	}
@@ -178,7 +175,7 @@ test: _#bashWorkflow & {
 			#args: {
 				tag:     "trybot"
 				message: string
-				labels: {
+				labels?: {
 					"Code-Review": int
 				}
 			}

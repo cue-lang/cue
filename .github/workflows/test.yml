@@ -21,7 +21,7 @@ jobs:
       name: Update Gerrit CL message with starting message
       run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Started
         the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
-        github.run_id }}","labels":{"Code-Review":0}}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
+        github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   test:
     needs: start

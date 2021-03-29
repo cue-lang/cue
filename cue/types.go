@@ -1716,12 +1716,9 @@ func (v Value) Template() func(label string) Value {
 //
 // Without options, the entire value is considered for assumption, which means
 // Subsume tests whether  v is a backwards compatible (newer) API version of w.
-// Use the Final() to indicate that the subsumed value is data, and that
 //
 // Use the Final option to check subsumption if a w is known to be final,
 // and should assumed to be closed.
-//
-// Options are currently ignored and the function will panic if any are passed.
 //
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.

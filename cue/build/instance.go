@@ -131,7 +131,10 @@ type Instance struct {
 // ID returns the package ID unique for this module.
 func (inst *Instance) ID() string {
 	if inst.PkgName == "" {
-		return ""
+		return "_"
+	}
+	if s := inst.ImportPath; s != "" {
+		return s
 	}
 	s := fmt.Sprintf("%s:%s", inst.Module, inst.PkgName)
 	return s

@@ -49,7 +49,7 @@ Result:
     }
   }
   d: (#struct){
-    _val(example.com:pkg): (#struct){
+    _val(example.com/pkg): (#struct){
       f: (int){ 3 }
     }
     _name(:foo): (struct){
@@ -61,7 +61,7 @@ Result:
   }
   e: (_|_){
     // [eval]
-    _val(example.com:pkg): (#struct){
+    _val(example.com/pkg): (#struct){
       f: (int){ 3 }
     }
     _name(:foo): (_|_){
@@ -79,7 +79,7 @@ Result:
     }
   }
   f: (#struct){
-    _val(example.com:pkg): (#struct){
+    _val(example.com/pkg): (#struct){
       f: (int){ 3 }
     }
     _val(:foo): (struct){

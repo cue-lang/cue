@@ -53,7 +53,7 @@ func TestCompile(t *testing.T) {
 
 		a := t.ValidInstances()
 
-		v, err := compile.Files(nil, r, "main", a[0].Files...)
+		v, err := compile.Files(nil, r, "", a[0].Files...)
 
 		// Write the results.
 		t.WriteErrors(err)
@@ -98,7 +98,7 @@ func TestX(t *testing.T) {
 	}
 	r := runtime.New()
 
-	arc, err := compile.Files(nil, r, "main", file)
+	arc, err := compile.Files(nil, r, "", file)
 	if err != nil {
 		t.Error(errors.Details(err, nil))
 	}

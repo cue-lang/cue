@@ -42,7 +42,7 @@ type Config struct {
 	Imports func(x *ast.Ident) (pkgPath string)
 
 	// pkgPath is used to qualify the scope of hidden fields. The default
-	// scope is "main".
+	// scope is "_".
 	pkgPath string
 }
 
@@ -85,7 +85,7 @@ func newCompiler(cfg *Config, pkgPath string, r adt.Runtime) *compiler {
 		c.Config = *cfg
 	}
 	if pkgPath == "" {
-		pkgPath = "main"
+		pkgPath = "_"
 	}
 	c.Config.pkgPath = pkgPath
 	return c

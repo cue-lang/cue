@@ -1039,6 +1039,19 @@ func TestFillPath(t *testing.T) {
 		`,
 	}, {
 		in: `
+		foo: _foo: int
+		bar: foo._foo
+		`,
+		x:    3,
+		path: MakePath(Str("foo"), Hid("_foo", "_")),
+		out: `
+		foo: {
+			_foo: 3
+		}
+		bar: 3
+		`,
+	}, {
+		in: `
 		string
 		`,
 		x:    "foo",

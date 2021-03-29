@@ -15,6 +15,7 @@
 package cue
 
 import (
+	"fmt"
 	"strconv"
 	"strings"
 
@@ -130,17 +131,35 @@ func toSelectors(expr ast.Expr) []Selector {
 		} else {
 			sel = basicLitSelector(b)
 		}
-		return append(a, sel)
+		return appendSelector(a, sel)
 
 	case *ast.SelectorExpr:
 		a := toSelectors(x.X)
-		return append(a, identSelector(x.Sel))
+		return appendSelector(a, identSelector(x.Sel))
 
 	default:
-		return []Selector{Selector{pathError{
+		return []Selector{{pathError{
 			errors.Newf(token.NoPos, "invalid label %s ", internal.DebugStr(x)),
 		}}}
 	}
+}
+
+// appendSelector is like append(a, sel), except that it collects errors
+// in a one-element slice.
+func appendSelector(a []Selector, sel Selector) []Selector {
+	err, isErr := sel.sel.(pathError)
+	if len(a) == 1 {
+		if p, ok := a[0].sel.(pathError); ok {
+			if isErr {
+				p.Error = errors.Append(p.Error, err.Error)
+			}
+			return a
+		}
+	}
+	if isErr {
+		return []Selector{sel}
+	}
+	return append(a, sel)
 }
 
 func basicLitSelector(b *ast.BasicLit) Selector {
@@ -181,10 +200,17 @@ func basicLitSelector(b *ast.BasicLit) Selector {
 func identSelector(label ast.Label) Selector {
 	switch x := label.(type) {
 	case *ast.Ident:
-		if isHiddenOrDefinition(x.Name) {
+		switch s := x.Name; {
+		case strings.HasPrefix(s, "_"):
+			// TODO: extract package from a bound identifier.
+			return Selector{pathError{errors.Newf(token.NoPos,
+				"invalid path: hidden label %s not allowed", s),
+			}}
+		case strings.HasPrefix(s, "#"):
 			return Selector{definitionSelector(x.Name)}
+		default:
+			return Selector{stringSelector(x.Name)}
 		}
-		return Selector{stringSelector(x.Name)}
 
 	case *ast.BasicLit:
 		return basicLitSelector(x)
@@ -211,12 +237,57 @@ func isHiddenOrDefinition(s string) bool {
 	return strings.HasPrefix(s, "#") || strings.HasPrefix(s, "_")
 }
 
+// Hid returns a selector for a hidden field. It panics is pkg is empty.
+// Hidden fields are scoped by package, and pkg indicates for which package
+// the hidden field must apply.For anonymous packages, it must be set to "_".
+func Hid(name, pkg string) Selector {
+	if !ast.IsValidIdent(name) {
+		panic(fmt.Sprintf("invalid identifier %s", name))
+	}
+	if !strings.HasPrefix(name, "_") {
+		panic(fmt.Sprintf("%s is not a hidden field identifier", name))
+	}
+	if pkg == "" {
+		panic(fmt.Sprintf("missing package for hidden identifier %s", name))
+	}
+	return Selector{scopedSelector{name, pkg}}
+}
+
+type scopedSelector struct {
+	name, pkg string
+}
+
+// String returns the CUE representation of the definition.
+func (s scopedSelector) String() string {
+	return s.name
+}
+
+func (s scopedSelector) kind() adt.FeatureType {
+	switch {
+	case strings.HasPrefix(s.name, "#"):
+		return adt.DefinitionLabel
+	case strings.HasPrefix(s.name, "_#"):
+		return adt.HiddenDefinitionLabel
+	case strings.HasPrefix(s.name, "_"):
+		return adt.HiddenLabel
+	default:
+		return adt.StringLabel
+	}
+}
+
+func (s scopedSelector) feature(r adt.Runtime) adt.Feature {
+	return adt.MakeIdentLabel(r, s.name, s.pkg)
+}
+
 // A Def marks a string as a definition label. An # will be added if a string is
-// not prefixed with an # or _# already. Hidden labels are qualified by the
-// package in which they are looked up.
+// not prefixed with a #. It will panic if s cannot be written as a valid
+// identifier.
 func Def(s string) Selector {
-	if !isHiddenOrDefinition(s) {
+	if !strings.HasPrefix(s, "#") {
 		s = "#" + s
+	}
+	if !ast.IsValidIdent(s) {
+		panic(fmt.Sprintf("invalid definition %s", s))
 	}
 	return Selector{definitionSelector(s)}
 }
@@ -229,16 +300,7 @@ func (d definitionSelector) String() string {
 }
 
 func (d definitionSelector) kind() adt.FeatureType {
-	switch {
-	case strings.HasPrefix(string(d), "#"):
-		return adt.DefinitionLabel
-	case strings.HasPrefix(string(d), "_#"):
-		return adt.HiddenDefinitionLabel
-	case strings.HasPrefix(string(d), "_"):
-		return adt.HiddenLabel
-	default:
-		panic("invalid definition")
-	}
+	return adt.DefinitionLabel
 }
 
 func (d definitionSelector) feature(r adt.Runtime) adt.Feature {

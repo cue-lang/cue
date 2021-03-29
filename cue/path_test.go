@@ -20,14 +20,11 @@ import (
 )
 
 func Test(t *testing.T) {
-	p := func(a ...Selector) Path {
-		return Path{path: a}
-	}
-	_ = p
 	var r Runtime
 	inst, _ := r.Compile("", `
 		#Foo:   a: b: 1
 		"#Foo": c: d: 2
+		_foo: b: 5
 		a: 3
 		b: [4, 5, 6]
 		c: "#Foo": 7
@@ -38,7 +35,7 @@ func Test(t *testing.T) {
 		str  string
 		err  bool
 	}{{
-		path: p(Def("#Foo"), Str("a"), Str("b")),
+		path: MakePath(Def("#Foo"), Str("a"), Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
@@ -51,17 +48,21 @@ func Test(t *testing.T) {
 		str:  `"#Foo".c.d`,
 	}, {
 		// fallback Def(Foo) -> Def(#Foo)
-		path: p(Def("Foo"), Str("a"), Str("b")),
+		path: MakePath(Def("Foo"), Str("a"), Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
 	}, {
-		path: p(Str("b"), Index(2)),
+		path: MakePath(Str("b"), Index(2)),
 		out:  "6",
 		str:  "b[2]", // #Foo.b.2
 	}, {
-		path: p(Str("c"), Str("#Foo")),
+		path: MakePath(Str("c"), Str("#Foo")),
 		out:  "7",
 		str:  `c."#Foo"`,
+	}, {
+		path: MakePath(Hid("_foo", "_"), Str("b")),
+		out:  "5",
+		str:  `_foo.b`,
 	}, {
 		path: ParsePath("#Foo.a.b"),
 		str:  "#Foo.a.b",
@@ -82,7 +83,7 @@ func Test(t *testing.T) {
 		path: ParsePath("foo._foo"),
 		str:  "_|_",
 		err:  true,
-		out:  `_|_ // invalid path: hidden fields not allowed in path foo._foo`,
+		out:  `_|_ // invalid path: hidden label _foo not allowed`,
 	}, {
 		path: ParsePath(`c."#Foo`),
 		str:  "_|_",

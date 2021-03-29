@@ -92,7 +92,7 @@ func (w *printer) ident(f adt.Feature) {
 func (w *printer) labelString(f adt.Feature) string {
 	if f.IsHidden() {
 		ident := f.IdentString(w.index)
-		if pkgName := f.PkgID(w.index); pkgName != "main" {
+		if pkgName := f.PkgID(w.index); pkgName != "_" {
 			ident = fmt.Sprintf("%s(%s)", ident, pkgName)
 		}
 		return ident

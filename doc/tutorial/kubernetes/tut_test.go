@@ -81,15 +81,8 @@ func TestTutorial(t *testing.T) {
 		// The test environment won't work in all environments. We create
 		// a fake go.mod so that Go will find the module root. By default
 		// we won't set it.
-		if err := os.Chdir(dir); err != nil {
-			t.Fatal(err)
-		}
-		cmd := exec.Command("go", "mod", "init", "cuelang.org/dummy")
-		b, err := cmd.CombinedOutput()
-		logf(t, string(b))
-		if err != nil {
-			t.Fatal(err)
-		}
+		out := execute(t, dir, "go", "mod", "init", "cuelang.org/dummy")
+		logf(t, "%s", out)
 	} else {
 		// We only fetch new kubernetes files with when updating.
 		err := copy.Dir(load.GenPath("quick"), load.GenPath(dir))
@@ -198,6 +191,14 @@ func TestTutorial(t *testing.T) {
 				if err != nil {
 					t.Fatal(err)
 				}
+			case strings.HasPrefix(cmd, "go "):
+				if !cuetest.UpdateGoldenFiles && strings.HasPrefix(cmd, "go get") {
+					// Don't fetch stuff in normal mode.
+					break
+				}
+
+				out := execute(t, wd, splitArgs(t, cmd)...)
+				logf(t, "%s", out)
 			}
 		}
 	}
@@ -310,6 +311,27 @@ type config struct {
 	Stdin  io.Reader
 	Stdout io.Writer
 	Golden string
+}
+
+// execute executes the given command in the given directory
+func execute(t *testing.T, dir string, args ...string) string {
+	old, err := os.Getwd()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err = os.Chdir(dir); err != nil {
+		t.Fatal(err)
+	}
+	defer func() { os.Chdir(old) }()
+
+	logf(t, "Executing command: %s", strings.Join(args, " "))
+
+	cmd := exec.Command(args[0], args[1:]...)
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		t.Fatalf("failed to run [%v] in %s: %v\n%s", cmd, dir, err, out)
+	}
+	return string(out)
 }
 
 // run executes the given command in the given directory and reports any

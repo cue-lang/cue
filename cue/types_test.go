@@ -1994,6 +1994,57 @@ func cmpError(a, b error) bool {
 	return a.Error() == b.Error()
 }
 
+func TestAttributes(t *testing.T) {
+	const config = `
+	a: {
+		a: 0 @foo(a,b,c=1)
+		b: 1 @bar(a,b,c,d=1) @foo(a,,d=1)
+	}
+	b: {
+		@embed(foo)
+		3
+	} @field(foo)
+
+	`
+
+	testCases := []struct {
+		flags AttrKind
+		path  string
+		out   string
+	}{{
+		flags: FieldAttr,
+		path:  "a.a",
+		out:   "[@foo(a,b,c=1)]",
+	}, {
+		flags: FieldAttr,
+		path:  "a.b",
+		out:   "[@bar(a,b,c,d=1) @foo(a,,d=1)]",
+	}, {
+		flags: DeclAttr,
+		path:  "b",
+		out:   "[@embed(foo)]",
+	}, {
+		flags: FieldAttr,
+		path:  "b",
+		out:   "[@field(foo)]",
+	}, {
+		flags: ValueAttr,
+		path:  "b",
+		out:   "[@field(foo) @embed(foo)]",
+	}}
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			v := getInstance(t, config).Value().LookupPath(ParsePath(tc.path))
+			a := v.Attributes(tc.flags)
+			got := fmt.Sprint(a)
+			if got != tc.out {
+				t.Errorf("got %v; want %v", got, tc.out)
+			}
+
+		})
+	}
+}
+
 func TestAttributeErr(t *testing.T) {
 	const config = `
 	a: {
@@ -2201,7 +2252,7 @@ func TestAttributeLookup(t *testing.T) {
 	const config = `
 	a: {
 		a: 0 @foo(a,b,c=1)
-		b: 1 @bar(a,b,e=-5,d=1) @foo(a,,d=1)
+		b: 1 @bar(a,b,e =-5,d=1) @foo(a,,d=1)
 	}
 	`
 	testCases := []struct {

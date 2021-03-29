@@ -25,10 +25,32 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+// AttrKind indicates the location of an attribute within CUE source.
+type AttrKind uint8
+
+const (
+	// FieldAttr indicates an attribute is a field attribute.
+	// foo: bar @attr()
+	FieldAttr AttrKind = 1 << iota
+
+	// DeclAttr indicates an attribute was specified at a declaration position.
+	// foo: {
+	//     @attr()
+	// }
+	DeclAttr
+
+	// TODO: Possible future attr kinds
+	// ElemAttr
+	// FileAttr
+	// ValueAttr = FieldAttr|DeclAttr|ElemAttr
+)
+
 // Attr holds positional information for a single Attr.
 type Attr struct {
+	Name   string // e.g. "json" or "protobuf"
 	Body   string
-	Fields []keyValue
+	Kind   AttrKind
+	Fields []KeyValue
 	Err    error
 }
 
@@ -38,14 +60,24 @@ func NewNonExisting(key string) Attr {
 	return Attr{Err: errors.Newf(token.NoPos, msgNotExist, key)}
 }
 
-type keyValue struct {
+type KeyValue struct {
 	data  string
 	equal int // index of equal sign or 0 if non-existing
 }
 
-func (kv *keyValue) Text() string { return kv.data }
-func (kv *keyValue) Key() string  { return kv.data[:kv.equal] }
-func (kv *keyValue) Value() string {
+func (kv *KeyValue) Text() string { return kv.data }
+func (kv *KeyValue) Key() string {
+	if kv.equal == 0 {
+		return kv.data
+	}
+	s := kv.data[:kv.equal]
+	s = strings.TrimSpace(s)
+	return s
+}
+func (kv *KeyValue) Value() string {
+	if kv.equal == 0 {
+		return ""
+	}
 	return strings.TrimSpace(kv.data[kv.equal+1:])
 }
 
@@ -143,7 +175,7 @@ func skipSpace(s string) int {
 
 func scanAttributeElem(pos token.Pos, s string, a *Attr) (n int, err errors.Error) {
 	// try CUE string
-	kv := keyValue{}
+	kv := KeyValue{}
 	if n, kv.data, err = scanAttributeString(pos, s); n == 0 {
 		// try key-value pair
 		p := strings.IndexAny(s, ",=") // ) is assumed to be stripped.

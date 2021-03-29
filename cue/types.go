@@ -2163,23 +2163,133 @@ func (v Value) Walk(before func(Value) bool, after func(Value)) {
 func (v Value) Attribute(key string) Attribute {
 	// look up the attributes
 	if v.v == nil {
-		return Attribute{internal.NewNonExisting(key)}
+		return nonExistAttr(key)
 	}
 	// look up the attributes
 	for _, a := range export.ExtractFieldAttrs(v.v.Conjuncts) {
-		k, body := a.Split()
+		k, _ := a.Split()
 		if key != k {
 			continue
 		}
-		return Attribute{internal.ParseAttrBody(token.NoPos, body)}
+		return newAttr(internal.FieldAttr, a)
 	}
 
-	return Attribute{internal.NewNonExisting(key)}
+	return nonExistAttr(key)
 }
+
+func newAttr(k internal.AttrKind, a *ast.Attribute) Attribute {
+	key, body := a.Split()
+	x := internal.ParseAttrBody(token.NoPos, body)
+	x.Name = key
+	x.Kind = k
+	return Attribute{x}
+}
+
+func nonExistAttr(key string) Attribute {
+	a := internal.NewNonExisting(key)
+	a.Name = key
+	a.Kind = internal.FieldAttr
+	return Attribute{a}
+}
+
+// Attributes reports all field attributes for the Value.
+//
+// To retrieve attributes of multiple kinds, you can bitwise-or kinds together.
+// Use ValueKind to query attributes associated with a value.
+func (v Value) Attributes(mask AttrKind) []Attribute {
+	if v.v == nil {
+		return nil
+	}
+
+	attrs := []Attribute{}
+
+	if mask&FieldAttr != 0 {
+		for _, a := range export.ExtractFieldAttrs(v.v.Conjuncts) {
+			attrs = append(attrs, newAttr(internal.FieldAttr, a))
+		}
+	}
+
+	if mask&DeclAttr != 0 {
+		for _, a := range export.ExtractDeclAttrs(v.v.Conjuncts) {
+			attrs = append(attrs, newAttr(internal.DeclAttr, a))
+		}
+	}
+
+	return attrs
+}
+
+// AttrKind indicates the location of an attribute within CUE source.
+type AttrKind int
+
+const (
+	// FieldAttr indicates a field attribute.
+	// foo: bar @attr()
+	FieldAttr AttrKind = AttrKind(internal.FieldAttr)
+
+	// DeclAttr indicates a declaration attribute.
+	// foo: {
+	//     @attr()
+	// }
+	DeclAttr AttrKind = AttrKind(internal.DeclAttr)
+
+	// A ValueAttr is a bit mask to request any attribute that is locally
+	// associated with a field, instead of, for instance, an entire file.
+	ValueAttr AttrKind = FieldAttr | DeclAttr
+
+	// TODO: Possible future attr kinds
+	// ElemAttr (is a ValueAttr)
+	// FileAttr (not a ValueAttr)
+
+	// TODO: Merge: merge namesake attributes.
+)
 
 // An Attribute contains meta data about a field.
 type Attribute struct {
 	attr internal.Attr
+}
+
+// Format implements fmt.Formatter.
+func (a Attribute) Format(w fmt.State, verb rune) {
+	fmt.Fprintf(w, "@%s(%s)", a.attr.Name, a.attr.Body)
+}
+
+var _ fmt.Formatter = &Attribute{}
+
+// Name returns the name of the attribute, for instance, "json" for @json(...).
+func (a *Attribute) Name() string {
+	return a.attr.Name
+}
+
+// Contents reports the full contents of an attribute within parentheses, so
+// contents in @attr(contents).
+func (a *Attribute) Contents() string {
+	return a.attr.Body
+}
+
+// NumArgs reports the number of arguments parsed for this attribute.
+func (a *Attribute) NumArgs() int {
+	return len(a.attr.Fields)
+}
+
+// Arg reports the contents of the ith comma-separated argument of a.
+//
+// If the argument contains an unescaped equals sign, it returns a key-value
+// pair. Otherwise it returns the contents in value.
+func (a *Attribute) Arg(i int) (key, value string) {
+	f := a.attr.Fields[i]
+	return f.Key(), f.Value()
+}
+
+// RawArg reports the raw contents of the ith comma-separated argument of a,
+// including surrounding spaces.
+func (a *Attribute) RawArg(i int) string {
+	return a.attr.Fields[i].Text()
+}
+
+// Kind reports the type of location within CUE source where the attribute
+// was specified.
+func (a *Attribute) Kind() AttrKind {
+	return AttrKind(a.attr.Kind)
 }
 
 // Err returns the error associated with this Attribute or nil if this

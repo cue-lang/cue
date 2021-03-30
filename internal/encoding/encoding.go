@@ -143,6 +143,8 @@ type Config struct {
 	Stream    bool // will potentially write more than one document per file
 	AllErrors bool
 
+	Schema cue.Value // used for schema-based decoding
+
 	EscapeHTML bool
 	ProtoPath  []string
 	Format     []format.Option

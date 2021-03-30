@@ -203,7 +203,6 @@ func (i *instanceIterator) id() string              { return i.a[i.i].Dir }
 type streamingIterator struct {
 	r    *cue.Runtime
 	inst *cue.Instance
-	base cue.Value
 	b    *buildPlan
 	cfg  *encoding.Config
 	a    []*decoderInfo
@@ -232,12 +231,13 @@ func newStreamingIterator(b *buildPlan) *streamingIterator {
 		}
 		i.r = internal.GetRuntime(inst).(*cue.Runtime)
 		if b.schema == nil {
-			i.base = inst.Value()
+			b.encConfig.Schema = inst.Value()
 		} else {
-			i.base = inst.Eval(b.schema)
-			if err := i.base.Err(); err != nil {
+			schema := inst.Eval(b.schema)
+			if err := schema.Err(); err != nil {
 				return &streamingIterator{e: err}
 			}
+			b.encConfig.Schema = schema
 		}
 	default:
 		return &streamingIterator{e: errors.Newf(token.NoPos,
@@ -293,10 +293,10 @@ func (i *streamingIterator) scan() bool {
 		return false
 	}
 	i.v = inst.Value()
-	if i.base.Exists() {
-		i.e = i.base.Err()
+	if schema := i.b.encConfig.Schema; schema.Exists() {
+		i.e = schema.Err()
 		if i.e == nil {
-			i.v = i.v.Unify(i.base)
+			i.v = i.v.Unify(schema)
 			i.e = i.v.Err()
 		}
 		i.f = nil

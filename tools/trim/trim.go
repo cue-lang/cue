@@ -129,7 +129,7 @@ func (t *trimmer) markRemove(c adt.Conjunct) {
 }
 
 func (t *trimmer) markKeep(c adt.Conjunct) {
-	if isDominator(c) {
+	if isDom, _ := isDominator(c); isDom {
 		return
 	}
 	if src := c.Expr().Source(); src != nil {
@@ -143,8 +143,15 @@ func (t *trimmer) markKeep(c adt.Conjunct) {
 const dominatorNode = adt.ComprehensionSpan | adt.DefinitionSpan | adt.ConstraintSpan
 
 // isDominator reports whether a node can remove other nodes.
-func isDominator(c adt.Conjunct) bool {
-	return c.CloseInfo.IsInOneOf(dominatorNode)
+func isDominator(c adt.Conjunct) (ok, mayRemove bool) {
+	if !c.CloseInfo.IsInOneOf(dominatorNode) {
+		return false, false
+	}
+	switch c.Field().(type) {
+	case *adt.OptionalField: // bulk constraints handled elsewhere.
+		return true, false
+	}
+	return true, true
 }
 
 // Removable reports whether a non-dominator conjunct can be removed. This is
@@ -158,10 +165,10 @@ func removable(c adt.Conjunct, v *adt.Vertex) bool {
 // themselves as it will eliminate the reason for the trigger.
 func (t *trimmer) allowRemove(v *adt.Vertex) bool {
 	for _, c := range v.Conjuncts {
-		isDom := isDominator(c)
+		_, allowRemove := isDominator(c)
 		loc := c.CloseInfo.Location() != c.Expr()
 		isSpan := c.CloseInfo.RootSpanType() != adt.ConstraintSpan
-		if isDom && (loc || isSpan) {
+		if allowRemove && (loc || isSpan) {
 			return true
 		}
 	}
@@ -202,9 +209,11 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 		doms.Conjuncts = append(doms.Conjuncts, d.Conjuncts...)
 	}
 
+	hasDoms := false
 	for _, c := range v.Conjuncts {
+		isDom, _ := isDominator(c)
 		switch {
-		case isDominator(c):
+		case isDom:
 			doms.AddConjunct(c)
 		default:
 			if r, ok := c.Expr().(adt.Resolver); ok {
@@ -236,6 +245,7 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 		ambiguous = true
 	}
 
+	_ = hasDoms
 	return doms, hasSubs, ambiguous, strict || ambiguous
 }
 
@@ -310,7 +320,8 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 	}
 
 	for _, c := range v.Conjuncts {
-		if !isDominator(c) && removable(c, v) {
+		_, allowRemove := isDominator(c)
+		if !allowRemove && removable(c, v) {
 			t.markRemove(c)
 		}
 	}

@@ -139,6 +139,12 @@ type buildPlan struct {
 	expressions []ast.Expr // only evaluate these expressions within results
 	schema      ast.Expr   // selects schema in instance for orphaned values
 
+	// orphan placement flags.
+	perFile    bool
+	useList    bool
+	path       []string
+	useContext bool
+
 	// outFile defines the file to output to. Default is CUE stdout.
 	outFile *build.File
 
@@ -388,41 +394,41 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		return nil, errors.Newf(token.NoPos, "invalid args")
 	}
 
+	if err := p.parsePlacementFlags(); err != nil {
+		return nil, err
+	}
+
 	for _, b := range builds {
 		if b.Err != nil {
 			return nil, b.Err
 		}
-		var ok bool
-		if b.User || p.importing {
-			ok, err = p.placeOrphans(b)
-			if err != nil {
-				return nil, err
+		switch {
+		case !b.User:
+			if p.importing {
+				if err = p.placeOrphans(b); err != nil {
+					return nil, err
+				}
 			}
-		}
-		if !b.User {
 			p.insts = append(p.insts, b)
-			continue
-		}
-		addedUser := false
-		if len(b.BuildFiles) > 0 {
-			addedUser = true
-			p.insts = append(p.insts, b)
-		}
-		if ok {
-			continue
-		}
 
-		if len(b.OrphanedFiles) == 0 {
-			continue
-		}
-
-		if p.orphanInstance != nil {
+		case p.orphanInstance != nil:
 			return nil, errors.Newf(token.NoPos,
 				"builds contain two file packages")
-		}
-		p.orphanInstance = b
-		p.encConfig.Stream = true
 
+		default:
+			p.orphanInstance = b
+		}
+	}
+
+	switch b := p.orphanInstance; {
+	case b == nil:
+	case p.usePlacement() || p.importing:
+		p.insts = append(p.insts, b)
+		if err = p.placeOrphans(b); err != nil {
+			return nil, err
+		}
+
+	default:
 		for _, f := range b.OrphanedFiles {
 			switch f.Encoding {
 			case build.Protobuf, build.YAML, build.JSON, build.Text:
@@ -466,7 +472,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			}
 		}
 
-		if !addedUser && len(b.Files) > 0 {
+		if len(b.Files) > 0 {
 			p.insts = append(p.insts, b)
 		} else if len(p.orphaned) == 0 {
 			// Instance with only a single build: just print the file.

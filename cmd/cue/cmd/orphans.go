@@ -33,32 +33,40 @@ import (
 
 // This file contains logic for placing orphan files within a CUE namespace.
 
-func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
-	var (
-		perFile    = flagFiles.Bool(b.cmd)
-		useList    = flagList.Bool(b.cmd)
-		path       = flagPath.StringArray(b.cmd)
-		useContext = flagWithContext.Bool(b.cmd)
-	)
-	if !b.importing && !perFile && !useList && len(path) == 0 {
-		if useContext {
-			return false, fmt.Errorf(
+func (b *buildPlan) usePlacement() bool {
+	return b.perFile || b.useList || len(b.path) > 0
+}
+
+func (b *buildPlan) parsePlacementFlags() error {
+	cmd := b.cmd
+	b.perFile = flagFiles.Bool(cmd)
+	b.useList = flagList.Bool(cmd)
+	b.path = flagPath.StringArray(cmd)
+	b.useContext = flagWithContext.Bool(cmd)
+
+	if !b.importing && !b.perFile && !b.useList && len(b.path) == 0 {
+		if b.useContext {
+			return fmt.Errorf(
 				"flag %q must be used with at least one of flag %q, %q, or %q",
 				flagWithContext, flagPath, flagList, flagFiles,
 			)
 		}
-		// TODO: should we remove this optimization? This is really added as a
-		// conversion safety.
-		if len(i.OrphanedFiles)+len(i.BuildFiles) <= 1 || b.cfg.noMerge {
-			return false, err
-		}
+	} else if b.schema != nil {
+		return fmt.Errorf(
+			"cannot combine --%s flag with flag %q, %q, or %q",
+			flagSchema, flagPath, flagList, flagFiles,
+		)
 	}
+	return nil
+}
+
+func (b *buildPlan) placeOrphans(i *build.Instance) error {
 
 	pkg := b.encConfig.PkgName
 	if pkg == "" {
 		pkg = i.PkgName
 	} else if pkg != "" && i.PkgName != "" && i.PkgName != pkg && !flagForce.Bool(b.cmd) {
-		return false, fmt.Errorf(
+		return fmt.Errorf(
 			"%q flag clashes with existing package name (%s vs %s)",
 			flagPackage, pkg, i.PkgName,
 		)
@@ -68,7 +76,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 
 	re, err := regexp.Compile(b.cfg.fileFilter)
 	if err != nil {
-		return false, err
+		return err
 	}
 
 	for _, f := range i.OrphanedFiles {
@@ -95,14 +103,14 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 			}
 		}
 		if err := d.Err(); err != nil {
-			return false, err
+			return err
 		}
 
-		if perFile {
+		if b.perFile {
 			for i, obj := range objs {
 				f, err := placeOrphans(b.cmd, d.Filename(), pkg, obj)
 				if err != nil {
-					return false, err
+					return err
 				}
 				f.Filename = newName(d.Filename(), i)
 				files = append(files, f)
@@ -112,13 +120,13 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 		// TODO: consider getting rid of this requirement. It is important that
 		// import will catch conflicts ahead of time then, though, and report
 		// this messages as a possible solution if there are conflicts.
-		if b.importing && len(objs) > 1 && len(path) == 0 && !useList {
-			return false, fmt.Errorf(
+		if b.importing && len(objs) > 1 && len(b.path) == 0 && !b.useList {
+			return fmt.Errorf(
 				"%s, %s, or %s flag needed to handle multiple objects in file %s",
 				flagPath, flagList, flagFiles, shortFile(i.Root, f))
 		}
 
-		if !useList && len(path) == 0 && !useContext {
+		if !b.useList && len(b.path) == 0 && !b.useContext {
 			for _, f := range objs {
 				if pkg := c.PkgName; pkg != "" {
 					internal.SetPackage(f, pkg, false)
@@ -129,7 +137,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 			// TODO: handle imports correctly, i.e. for proto.
 			f, err := placeOrphans(b.cmd, d.Filename(), pkg, objs...)
 			if err != nil {
-				return false, err
+				return err
 			}
 			f.Filename = newName(d.Filename(), 0)
 			files = append(files, f)
@@ -139,7 +147,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 	b.imported = append(b.imported, files...)
 	for _, f := range files {
 		if err := i.AddSyntax(f); err != nil {
-			return false, err
+			return err
 		}
 		i.BuildFiles = append(i.BuildFiles, &build.File{
 			Filename: f.Filename,
@@ -147,7 +155,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance) (ok bool, err error) {
 			Source:   f,
 		})
 	}
-	return true, nil
+	return nil
 }
 
 func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.File, error) {

@@ -40,7 +40,7 @@ type Form struct {
 // - QuoteExact that fails with an error if a string cannot be represented
 //   without loss.
 // - Handle auto-breaking for long lines (Swift-style, \-terminated lines).
-//   This is not supported yet in CUE, but may, and should be considred as
+//   This is not supported yet in CUE, but may, and should be considered as
 //   a possibility in API design.
 // - Other possible convenience forms: Blob (auto-break bytes), String (bytes
 //   or string), Label.

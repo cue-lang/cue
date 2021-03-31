@@ -59,6 +59,16 @@ func (q QuoteInfo) IsDouble() bool {
 	return q.char == '"'
 }
 
+// IsMulti reports whether a multi-line string was parsed.
+func (q QuoteInfo) IsMulti() bool {
+	return q.multiline
+}
+
+// Whitespace returns prefix whitespace for multiline strings.
+func (q QuoteInfo) Whitespace() string {
+	return q.whitespace
+}
+
 // ParseQuotes checks if the opening quotes in start matches the ending quotes
 // in end and reports its type as q or an error if they do not matching or are
 // invalid. nStart indicates the number of bytes used for the opening quote.

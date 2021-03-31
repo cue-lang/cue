@@ -1,0 +1,97 @@
+-- schema.cue --
+a: int
+
+strings: {
+    c: string
+    d: "foo" | "bar"
+}
+
+lists: {
+    e: [...int]
+    f: [int, int]
+    g: [int, int, ...int]
+    h: [int, int]
+}
+
+structs: [string]: {
+    a: int
+}
+
+-- data.json --
+{
+    "a": "44",
+    "strings": {
+        "c": "cc",
+        "d": "foo"
+    },
+    "lists": {
+        "e": ["1"],
+        "f": ["2"],
+        "g": ["3", "4", "5"],
+        "h": ["3", "4", "5"]
+    },
+    "structs": {
+        "field": {
+            "a": "1",
+            "b": "2"
+        }
+    },
+    "tail": {}
+}
+-- data.cue --
+a: "44"
+strings: {
+	c: "cc"
+	d: "foo"
+}
+lists: {
+	e: ["1"]
+	f: ["2"]
+	g: ["3", "4", "5"]
+	h: ["3", "4", "5"] // Last element should not be rewritten!
+},
+structs: {
+	field: {
+		a: "1"
+		b: "2"
+	}
+}
+tail: {}
+-- out/jsonpb/data.json --
+a: 44
+strings: {
+	c: "cc"
+	d: "foo"
+}
+lists: {
+	e: [1]
+	f: [2]
+	g: [3, 4, 5]
+	h: [3, 4, "5"]
+}
+structs: {
+	field: {
+		a: 1
+		b: "2"
+	}
+}
+tail: {}
+-- out/jsonpb/data.cue --
+a: 44
+strings: {
+	c: "cc"
+	d: "foo"
+}
+lists: {
+	e: [1]
+	f: [2]
+	g: [3, 4, 5]
+	h: [3, 4, "5"] // Last element should not be rewritten!
+}
+structs: {
+	field: {
+		a: 1
+		b: "2"
+	}
+}
+tail: {}

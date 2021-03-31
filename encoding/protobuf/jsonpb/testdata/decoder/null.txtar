@@ -1,0 +1,155 @@
+-- schema.cue --
+a0: int
+a1: 1 | *2
+
+a2: string
+a3: "a" | *"b"
+
+a4: bytes
+a5: *'a' | 'b'
+
+a6: [...int]
+a7: *[0] | [...int]
+
+a8: bool
+a9: *true | false
+
+a10: null
+
+a11: null
+a12: null
+
+-- data.yaml --
+# comment a0
+a0: null
+
+# comment a1
+a1: null
+
+# comment a2
+a2: null
+
+# comment a3
+a3: null
+
+# comment a4
+a4: null
+
+# comment a5
+a5: null
+
+# comment a6
+a6: null
+
+# comment a7
+a7: null
+
+# comment a8
+a8: null
+
+# comment a9
+a9: null
+
+# comment a10
+a10: null
+
+-- data.cue --
+// comment a0
+a0: null
+
+// comment a1
+a1: null
+
+// comment a2
+a2: null
+
+// comment a3
+a3: null
+
+// comment a4
+a4: null
+
+// comment a5
+a5: null
+
+// comment a6
+a6: null
+
+// comment a7
+a7: null
+
+// comment a8
+a8: null
+
+// comment a9
+a9: null
+
+// comment a10
+a10: null
+
+-- out/jsonpb/data.yaml --
+	// comment a0
+a0: 0
+
+// comment a1
+a1: 2
+
+// comment a2
+a2: ""
+
+// comment a3
+a3: "b"
+
+// comment a4
+a4: ''
+
+// comment a5
+a5: 'a'
+
+// comment a6
+a6: []
+
+// comment a7
+a7: [0]
+
+// comment a8
+a8: false
+
+// comment a9
+a9: true
+
+// comment a10
+a10: null
+-- out/jsonpb/data.cue --
+	// comment a0
+a0: 0
+
+// comment a1
+a1: 2
+
+// comment a2
+a2: ""
+
+// comment a3
+a3: "b"
+
+// comment a4
+a4: ''
+
+// comment a5
+a5: 'a'
+
+// comment a6
+a6: []
+
+// comment a7
+a7: [0]
+
+// comment a8
+a8: false
+
+// comment a9
+a9: true
+
+// comment a10
+a10: null

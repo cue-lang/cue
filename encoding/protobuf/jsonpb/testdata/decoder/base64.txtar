@@ -1,0 +1,31 @@
+-- schema.cue --
+b: [string]: bytes
+
+-- std.cue --
+b: hello: "SGVsbG8sIOS4lueVjA=="
+b: noPad: "SGVsbG8sIOS4lueVjA"
+b: bar:   "c29tZSBkYXRhIHdpdGggACBhbmQg77u/"
+
+// A large one-line text.
+b: multi: """
+    TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz
+    IHNpbmd1bGFyIHBhc3Npb24gZnJvbSBvdGhlciBhbmltYWxzLCB3aGljaCBpcyBhIGx1c3Qgb2Yg
+    dGhlIG1pbmQsIHRoYXQgYnkgYSBwZXJzZXZlcmFuY2Ugb2YgZGVsaWdodCBpbiB0aGUgY29udGlu
+    dWVkIGFuZCBpbmRlZmF0aWdhYmxlIGdlbmVyYXRpb24gb2Yga25vd2xlZGdlLCBleGNlZWRzIHRo
+    ZSBzaG9ydCB2ZWhlbWVuY2Ugb2YgYW55IGNhcm5hbCBwbGVhc3VyZS4=
+    """
+
+-- url.cue --
+b: bar:   "c29tZSBkYXRhIHdpdGggACBhbmQg77u_"
+
+-- out/jsonpb/std.cue --
+b: hello: 'Hello, 世界'
+b: noPad: 'Hello, 世界'
+b: bar:   'some data with \x00 and \ufeff'
+
+// A large one-line text.
+b: multi: '''
+	Man is distinguished, not only by his reason, but by this singular passion from other animals, which is a lust of the mind, that by a perseverance of delight in the continued and indefatigable generation of knowledge, exceeds the short vehemence of any carnal pleasure.
+	'''
+-- out/jsonpb/url.cue --
+b: bar: 'some data with \x00 and \ufeff'

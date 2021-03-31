@@ -1,0 +1,48 @@
+-- schema.cue --
+enum: [string]: {
+    "foo"
+    #intValue: 1
+} | {
+    "bar"
+    #intValue: 2
+}
+
+singleEnum: { "single", #intValue: 1 }
+
+badEnum: { string, #intValue: 1 } | { "two", #intValue: 2 }
+
+-- data.cue --
+enum: asIs: "foo"
+enum: asIsUnknown: "foobar"
+
+enum: numExistFoo: 1
+enum: numExistBar: 2
+
+singleEnum: 1
+
+-- errors.cue --
+enum: numNotExists: 3
+
+enum: numNotExists: 4
+
+enum: tooLarge: 4_111_222_333_444_555_666_777_888_999
+
+badEnum: 1
+
+-- out/jsonpb/data.cue --
+enum: asIs:        "foo"
+enum: asIsUnknown: "foobar"
+
+enum: numExistFoo: "foo"
+enum: numExistBar: "bar"
+
+singleEnum: "single"
+-- out/jsonpb/errors.cue --
+enum.numNotExists: could not locate integer enum value 3:
+    errors.cue:1:21
+enum.numNotExists: could not locate integer enum value 4:
+    errors.cue:3:21
+enum.tooLarge: invalid enum index: 4111222333444555666777888999: greater than max int64:
+    errors.cue:5:17
+badEnum: invalid string enum: non-concrete value string:
+    schema.cue:11:10

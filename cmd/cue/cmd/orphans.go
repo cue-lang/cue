@@ -28,7 +28,6 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/encoding"
 )
 
 // This file contains logic for placing orphan files within a CUE namespace.
@@ -60,8 +59,7 @@ func (b *buildPlan) parsePlacementFlags() error {
 	return nil
 }
 
-func (b *buildPlan) placeOrphans(i *build.Instance) error {
-
+func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 	pkg := b.encConfig.PkgName
 	if pkg == "" {
 		pkg = i.PkgName
@@ -79,19 +77,12 @@ func (b *buildPlan) placeOrphans(i *build.Instance) error {
 		return err
 	}
 
-	for _, f := range i.OrphanedFiles {
-		if !i.User && !re.MatchString(filepath.Base(f.Filename)) {
+	for _, di := range a {
+		if !i.User && !re.MatchString(filepath.Base(di.file.Filename)) {
 			continue
 		}
 
-		// We add the module root to the path if there is a module defined.
-		c := *b.encConfig
-		if i.Module != "" {
-			c.ProtoPath = append(c.ProtoPath, i.Root)
-		}
-
-		d := encoding.NewDecoder(f, &c)
-		defer d.Close()
+		d := di.dec(b)
 
 		var objs []*ast.File
 
@@ -123,12 +114,12 @@ func (b *buildPlan) placeOrphans(i *build.Instance) error {
 		if b.importing && len(objs) > 1 && len(b.path) == 0 && !b.useList {
 			return fmt.Errorf(
 				"%s, %s, or %s flag needed to handle multiple objects in file %s",
-				flagPath, flagList, flagFiles, shortFile(i.Root, f))
+				flagPath, flagList, flagFiles, shortFile(i.Root, di.file))
 		}
 
 		if !b.useList && len(b.path) == 0 && !b.useContext {
 			for _, f := range objs {
-				if pkg := c.PkgName; pkg != "" {
+				if pkg := b.encConfig.PkgName; pkg != "" {
 					internal.SetPackage(f, pkg, false)
 				}
 				files = append(files, f)
@@ -149,11 +140,6 @@ func (b *buildPlan) placeOrphans(i *build.Instance) error {
 		if err := i.AddSyntax(f); err != nil {
 			return err
 		}
-		i.BuildFiles = append(i.BuildFiles, &build.File{
-			Filename: f.Filename,
-			Encoding: build.CUE,
-			Source:   f,
-		})
 	}
 	return nil
 }

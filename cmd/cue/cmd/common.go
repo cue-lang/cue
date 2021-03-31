@@ -129,7 +129,7 @@ type buildPlan struct {
 	// the instance is also included in insts.
 	importing      bool
 	mergeData      bool // do not merge individual data files.
-	orphaned       []*build.File
+	orphaned       []*decoderInfo
 	orphanInstance *build.Instance
 	// imported files are files that were orphaned in the build instance, but
 	// were placed in the instance by using one the --files, --list or --path
@@ -206,7 +206,7 @@ type streamingIterator struct {
 	base cue.Value
 	b    *buildPlan
 	cfg  *encoding.Config
-	a    []*build.File
+	a    []*decoderInfo
 	dec  *encoding.Decoder
 	v    cue.Value
 	f    *ast.File
@@ -278,7 +278,7 @@ func (i *streamingIterator) scan() bool {
 			return false
 		}
 
-		i.dec = encoding.NewDecoder(i.a[0], i.cfg)
+		i.dec = i.a[0].dec(i.b)
 		if i.e = i.dec.Err(); i.e != nil {
 			return false
 		}
@@ -383,6 +383,87 @@ func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err e
 	return p, nil
 }
 
+type decoderInfo struct {
+	file *build.File
+	d    *encoding.Decoder // may be nil if delayed
+}
+
+func (d *decoderInfo) dec(b *buildPlan) *encoding.Decoder {
+	if d.d == nil {
+		d.d = encoding.NewDecoder(d.file, b.encConfig)
+	}
+	return d.d
+}
+
+func (d *decoderInfo) close() {
+	if d.d != nil {
+		d.d.Close()
+	}
+}
+
+// getDecoders takes the orphaned files of the given instance and splits them in
+// schemas and values, saving the build.File and encoding.Decoder in the
+// returned slices. It is up to the caller to Close any of the decoders that are
+// returned.
+func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderInfo, err error) {
+	for _, f := range b.OrphanedFiles {
+		switch f.Encoding {
+		case build.Protobuf, build.YAML, build.JSON, build.JSONL, build.Text:
+		default:
+			return schemas, values, errors.Newf(token.NoPos,
+				"unsupported encoding %q", f.Encoding)
+		}
+
+		// We add the module root to the path if there is a module defined.
+		c := *p.encConfig
+		if b.Module != "" {
+			c.ProtoPath = append(c.ProtoPath, b.Root)
+		}
+		d := encoding.NewDecoder(f, &c)
+
+		fi, err := filetypes.FromFile(f, p.cfg.outMode)
+		if err != nil {
+			return schemas, values, err
+		}
+		switch {
+		// case !fi.Schema: // TODO: value/schema/auto
+		// 	values = append(values, d)
+		case fi.Form != build.Schema && fi.Form != build.Final:
+			values = append(values, &decoderInfo{f, d})
+
+		case f.Interpretation != build.Auto:
+			schemas = append(schemas, &decoderInfo{f, d})
+
+		case d.Interpretation() == "":
+			values = append(values, &decoderInfo{f, d})
+
+		default:
+			schemas = append(schemas, &decoderInfo{f, d})
+		}
+	}
+	return schemas, values, nil
+}
+
+// importFiles imports orphan files for existing instances. Note that during
+// import, both schemas and non-schemas are placed (TODO: should we allow schema
+// mode here as well? It seems that the existing package should have enough
+// typing to allow for schemas).
+//
+// It is a separate call to allow closing decoders between processing each
+// package.
+func (p *buildPlan) importFiles(b *build.Instance) error {
+	// TODO: assume textproto is imported at top-level or just ignore them.
+
+	schemas, values, err := p.getDecoders(b)
+	for _, d := range append(schemas, values...) {
+		defer d.close()
+	}
+	if err != nil {
+		return err
+	}
+	return p.placeOrphans(b, append(schemas, values...))
+}
+
 func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
 	p, err = newBuildPlan(cmd, args, cfg)
 	if err != nil {
@@ -405,7 +486,7 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		switch {
 		case !b.User:
 			if p.importing {
-				if err = p.placeOrphans(b); err != nil {
+				if err := p.importFiles(b); err != nil {
 					return nil, err
 				}
 			}
@@ -420,50 +501,27 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		}
 	}
 
-	switch b := p.orphanInstance; {
-	case b == nil:
-	case p.usePlacement() || p.importing:
-		p.insts = append(p.insts, b)
-		if err = p.placeOrphans(b); err != nil {
+	if b := p.orphanInstance; b != nil {
+		schemas, values, err := p.getDecoders(b)
+		for _, d := range append(schemas, values...) {
+			defer d.close()
+		}
+		if err != nil {
 			return nil, err
 		}
 
-	default:
-		for _, f := range b.OrphanedFiles {
-			switch f.Encoding {
-			case build.Protobuf, build.YAML, build.JSON, build.Text:
-			default:
-				return nil, errors.Newf(token.NoPos,
-					"unsupported encoding %q", f.Encoding)
-			}
+		// TODO(v0.4.0): what to do:
+		// - when there is already a single instance
+		// - when we are importing and there are schemas and values.
+
+		if values == nil {
+			values, schemas = schemas, values
 		}
 
-		// TODO: this processing could probably be delayed, or at least
-		// simplified. The main reason to do this here is to allow interpreting
-		// the --schema/-d flag, while allowing to use this for OpenAPI and
-		// JSON Schema in auto-detect mode.
-		buildFiles := []*build.File{}
-		for _, f := range b.OrphanedFiles {
-			d := encoding.NewDecoder(f, p.encConfig)
+		for _, di := range schemas {
+			d := di.dec(p)
 			for ; !d.Done(); d.Next() {
-				file := d.File()
-				sub := &build.File{
-					Filename:       d.Filename(),
-					Encoding:       f.Encoding,
-					Interpretation: d.Interpretation(),
-					Form:           f.Form,
-					Tags:           f.Tags,
-					Source:         file,
-				}
-				if (!p.mergeData || p.schema != nil) && d.Interpretation() == "" {
-					switch sub.Encoding {
-					case build.YAML, build.JSON, build.Text:
-						p.orphaned = append(p.orphaned, sub)
-						continue
-					}
-				}
-				buildFiles = append(buildFiles, sub)
-				if err := b.AddSyntax(file); err != nil {
+				if err := b.AddSyntax(d.File()); err != nil {
 					return nil, err
 				}
 			}
@@ -472,11 +530,34 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			}
 		}
 
+		// TODO(v0.4.0): if schema is specified and data format is JSON, YAML or
+		// Protobuf, reinterpret with schema.
+
+		switch {
+		case p.usePlacement() || p.importing:
+			if err = p.placeOrphans(b, values); err != nil {
+				return nil, err
+			}
+
+		case !p.mergeData || p.schema != nil:
+			p.orphaned = values
+
+		default:
+			for _, di := range values {
+				d := di.dec(p)
+				for ; !d.Done(); d.Next() {
+					if err := b.AddSyntax(d.File()); err != nil {
+						return nil, err
+					}
+				}
+				if err := d.Err(); err != nil {
+					return nil, err
+				}
+			}
+		}
+
 		if len(b.Files) > 0 {
 			p.insts = append(p.insts, b)
-		} else if len(p.orphaned) == 0 {
-			// Instance with only a single build: just print the file.
-			p.orphaned = append(p.orphaned, buildFiles...)
 		}
 	}
 

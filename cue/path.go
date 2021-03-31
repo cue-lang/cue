@@ -39,6 +39,11 @@ func (sel Selector) String() string {
 	return sel.sel.String()
 }
 
+// IsString reports whether sel is a regular label type.
+func (sel Selector) IsString() bool {
+	return sel.sel.kind() == adt.StringLabel
+}
+
 type selector interface {
 	String() string
 
@@ -116,7 +121,7 @@ func (p Path) String() string {
 func toSelectors(expr ast.Expr) []Selector {
 	switch x := expr.(type) {
 	case *ast.Ident:
-		return []Selector{identSelector(x)}
+		return []Selector{Label(x)}
 
 	case *ast.BasicLit:
 		return []Selector{basicLitSelector(x)}
@@ -135,7 +140,7 @@ func toSelectors(expr ast.Expr) []Selector {
 
 	case *ast.SelectorExpr:
 		a := toSelectors(x.X)
-		return appendSelector(a, identSelector(x.Sel))
+		return appendSelector(a, Label(x.Sel))
 
 	default:
 		return []Selector{{pathError{
@@ -197,7 +202,8 @@ func basicLitSelector(b *ast.BasicLit) Selector {
 	}
 }
 
-func identSelector(label ast.Label) Selector {
+// Label converts an AST label to a Selector.
+func Label(label ast.Label) Selector {
 	switch x := label.(type) {
 	case *ast.Ident:
 		switch s := x.Name; {

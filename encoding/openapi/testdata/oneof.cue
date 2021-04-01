@@ -19,6 +19,13 @@ $version: "v1alpha1"
 	shared2: int
 }
 
+// This should be dedupped.
+#T: {} | {
+	count: int
+} | {
+	amount: int
+}
+
 #MyInt: int
 
 #Foo: {

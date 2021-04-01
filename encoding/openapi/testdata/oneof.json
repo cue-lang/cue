@@ -232,6 +232,7 @@
             "type": "integer"
          },
          "T": {
+            "description": "This should be dedupped.",
             "type": "object",
             "properties": {
                "shared": {

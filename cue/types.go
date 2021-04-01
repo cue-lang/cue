@@ -1717,11 +1717,14 @@ func (v Value) Template() func(label string) Value {
 // Without options, the entire value is considered for assumption, which means
 // Subsume tests whether  v is a backwards compatible (newer) API version of w.
 //
-// Use the Final option to check subsumption if a w is known to be final,
-// and should assumed to be closed.
+// Use the Final option to check subsumption if a w is known to be final, and
+// should assumed to be closed.
 //
-// Value v and w must be obtained from the same build.
-// TODO: remove this requirement.
+// Use the Raw option to do a low-level subsumption, taking defaults into
+// account.
+//
+// Value v and w must be obtained from the same build. TODO: remove this
+// requirement.
 func (v Value) Subsume(w Value, opts ...Option) error {
 	o := getOptions(opts)
 	p := subsume.CUE
@@ -1733,7 +1736,9 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 	case o.ignoreClosedness:
 		p = subsume.API
 	}
-	p.Defaults = true
+	if !o.raw {
+		p.Defaults = true
+	}
 	ctx := v.ctx().opCtx
 	return p.Value(ctx, v.v, w.v)
 }

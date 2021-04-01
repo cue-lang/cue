@@ -72,7 +72,7 @@ func (p *Profile) Value(ctx *adt.OpContext, a, b adt.Value) errors.Error {
 	if !s.values(a, b) {
 		return s.getError()
 	}
-	return s.errs
+	return nil // ignore errors here even if there are some.
 }
 
 // Check reports whether b is an instance of a.

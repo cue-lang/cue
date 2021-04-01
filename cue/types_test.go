@@ -1435,6 +1435,42 @@ func TestSubsume(t *testing.T) {
 		pathB:   b,
 		options: []Option{Final()},
 		want:    true,
+	}, {
+		// default
+		value: `
+		a: <5
+		b: *3 | int
+		`,
+		pathA: a,
+		pathB: b,
+		want:  true,
+	}, {
+		// Disable default elimination.
+		value: `
+			a: <5
+			b: *3 | int
+			`,
+		pathA:   a,
+		pathB:   b,
+		options: []Option{Raw()},
+		want:    false,
+	}, {
+		value: `
+			#A: {
+				exact: string
+			} | {
+				regex: string
+			}
+			#B: {
+				exact: string
+			} | {
+				regex: string
+			}
+			`,
+		pathA:   ParsePath("#A"),
+		pathB:   ParsePath("#B"),
+		options: []Option{},
+		want:    true,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

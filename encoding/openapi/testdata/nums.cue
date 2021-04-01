@@ -6,3 +6,6 @@ import "math"
 
 #exMin: >5
 #exMax: <6
+
+#int:     int64
+#intNull: int64 | null

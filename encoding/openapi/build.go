@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/core/adt"
 )
 
 type buildContext struct {
@@ -591,7 +592,8 @@ func (b *builder) setValueType(v cue.Value) {
 		return
 	}
 
-	switch v.IncompleteKind() {
+	k := v.IncompleteKind() &^ adt.NullKind
+	switch k {
 	case cue.BoolKind:
 		b.typ = "boolean"
 	case cue.FloatKind, cue.NumberKind:

@@ -615,6 +615,15 @@ func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 		inst = cue.Merge(insts...)
 	}
 
+	r := internal.GetRuntime(inst).(*cue.Runtime)
+	for _, b := range binst {
+		for _, i := range b.Imports {
+			if _, err := r.Build(i); err != nil {
+				return nil, err
+			}
+		}
+	}
+
 	inst = inst.Build(ti)
 	return inst, inst.Err
 }

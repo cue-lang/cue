@@ -1,0 +1,25 @@
+cue cmd foo
+cmp stdout cue_cmd_foo_both.golden
+
+-- cue.mod/module.cue --
+module: "example.org/test"
+-- sub/sub.cue --
+package sub
+
+User: "sub"
+-- x_tool.cue --
+package x
+
+import (
+ "tool/cli"
+
+ "example.org/test/sub"
+)
+
+command: foo: cli.Print & {
+ text: "test \(sub.User)"
+}
+-- cue_eval.golden --
+x: "sub"
+-- cue_cmd_foo_both.golden --
+test sub

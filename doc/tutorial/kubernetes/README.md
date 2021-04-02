@@ -100,7 +100,7 @@ which they should belong.
 
 ```
 $ cue import ./... -p kube
-list, flag, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
+path, list, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
 ```
 
 Many of the files contain more than one Kubernetes object.

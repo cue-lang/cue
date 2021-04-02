@@ -210,6 +210,7 @@ Examples:
   kind: Deployment
   name: booster
   replicas: 1
+  EOF
 
   # base the path values on th input
   $ cue import -f -p "x -> strings.ToLower(x.kind) x.name" foo.yaml

@@ -1,0 +1,85 @@
+-- cue.mod/module.cue --
+module: "example.org/test"
+-- sub/sub.cue --
+package sub
+
+User: "sub"
+-- in.cue --
+import "example.org/test/sub"
+
+root: {
+    a: {
+        $id: "valToOut"
+        val: "foo \(sub.User)"
+        out: string
+    }
+    b: {
+        $id: "valToOut"
+        $after: a
+        val: "bar"
+        out: string
+    }
+    c: {
+        $id: "valToOut"
+        out: a.out + b.out
+    }
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root.b [Waiting]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t1 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Ready]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t1/value --
+{
+	$id: "valToOut"
+	val: "foo sub"
+	out: "foo sub"
+}
+-- out/run/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Terminated]")
+  t1-->t0
+  t2("root.c [Ready]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t2/value --
+{
+	$id: "valToOut"
+	$after: {
+		$id: "valToOut"
+		val: "foo sub"
+		out: "foo sub"
+	}
+	val: "bar"
+	out: "bar"
+}
+-- out/run/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root.b [Terminated]")
+  t1-->t0
+  t2("root.c [Terminated]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t3/value --
+{
+	$id: "valToOut"
+	out: "foo subbar"
+}

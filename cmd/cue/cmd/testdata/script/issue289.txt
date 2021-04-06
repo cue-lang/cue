@@ -13,4 +13,4 @@ spec:
 ---
 # EMPTY FILE
 -- expect-stderr --
-unsupported label path type: reference "kind" not found
+error evaluating label strings.ToCamel(kind): reference "kind" not found

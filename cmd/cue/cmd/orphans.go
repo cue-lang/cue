@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/encoding"
 )
 
 // This file contains logic for placing orphan files within a CUE namespace.
@@ -40,8 +41,22 @@ func (b *buildPlan) parsePlacementFlags() error {
 	cmd := b.cmd
 	b.perFile = flagFiles.Bool(cmd)
 	b.useList = flagList.Bool(cmd)
-	b.path = flagPath.StringArray(cmd)
 	b.useContext = flagWithContext.Bool(cmd)
+
+	for _, str := range flagPath.StringArray(cmd) {
+		l, err := parser.ParseExpr("--path", str)
+		if err != nil {
+			labels, err := parseFullPath(str)
+			if err != nil {
+				return fmt.Errorf(
+					`labels must be expressions (-l foo -l 'strings.ToLower(bar)') or full paths (-l '"foo": "\(strings.ToLower(bar))":) : %v`, err)
+			}
+			b.path = append(b.path, labels...)
+			continue
+		}
+
+		b.path = append(b.path, &ast.ParenExpr{X: l})
+	}
 
 	if !b.importing && !b.perFile && !b.useList && len(b.path) == 0 {
 		if b.useContext {
@@ -99,7 +114,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 
 		if b.perFile {
 			for i, obj := range objs {
-				f, err := placeOrphans(b.cmd, d.Filename(), pkg, obj)
+				f, err := placeOrphans(b, d, pkg, obj)
 				if err != nil {
 					return err
 				}
@@ -126,7 +141,7 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 			}
 		} else {
 			// TODO: handle imports correctly, i.e. for proto.
-			f, err := placeOrphans(b.cmd, d.Filename(), pkg, objs...)
+			f, err := placeOrphans(b, d, pkg, objs...)
 			if err != nil {
 				return err
 			}
@@ -144,8 +159,9 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 	return nil
 }
 
-func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.File, error) {
+func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.File) (*ast.File, error) {
 	f := &ast.File{}
+	filename := d.Filename()
 
 	index := newIndex()
 	for i, file := range objs {
@@ -155,13 +171,12 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 		expr := internal.ToExpr(file)
 		p, _, _ := internal.PackageInfo(file)
 
-		var pathElems []ast.Label
-		var pathTokens []token.Token
+		var labels []ast.Label
 
 		switch {
-		case len(flagPath.StringArray(cmd)) > 0:
+		case len(b.path) > 0:
 			expr := expr
-			if flagWithContext.Bool(cmd) {
+			if b.useContext {
 				expr = ast.NewStruct(
 					"data", expr,
 					"filename", ast.NewString(filename),
@@ -185,31 +200,37 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 				return nil, err
 			}
 
-			for _, str := range flagPath.StringArray(cmd) {
-				l, err := parser.ParseExpr("--path", str)
-				if err != nil {
-					labels, tokens, err := parseFullPath(inst, str)
-					if err != nil {
-						return nil, fmt.Errorf(
-							`labels must be expressions (-l foo -l 'strings.ToLower(bar)') or full paths (-l '"foo": "\(strings.ToLower(bar))":) : %v`, err)
-					}
-					pathElems = append(pathElems, labels...)
-					pathTokens = append(pathTokens, tokens...)
-					continue
-				}
+			var a []cue.Selector
 
-				str, err := inst.Eval(l).String()
-				if err != nil {
-					return nil, fmt.Errorf("unsupported label path type: %v", err)
+			for _, label := range b.path {
+				switch x := label.(type) {
+				case *ast.Ident, *ast.BasicLit:
+				case ast.Expr:
+					if p, ok := x.(*ast.ParenExpr); ok {
+						x = p.X // unwrap for better error messages
+					}
+					switch l := inst.Eval(x); l.Kind() {
+					case cue.StringKind, cue.IntKind:
+						label = l.Syntax().(ast.Label)
+
+					default:
+						var arg interface{} = l
+						if err := l.Err(); err != nil {
+							arg = err
+						}
+						return nil, fmt.Errorf(
+							`error evaluating label %v: %v`,
+							internal.DebugStr(x), arg)
+					}
 				}
-				pathElems = append(pathElems, ast.NewString(str))
-				pathTokens = append(pathTokens, 0)
+				a = append(a, cue.Label(label))
+				labels = append(labels, label)
 			}
 		}
 
-		if flagList.Bool(cmd) {
+		if b.useList {
 			idx := index
-			for _, e := range pathElems {
+			for _, e := range labels {
 				idx = idx.label(e)
 			}
 			if idx.field.Value == nil {
@@ -220,7 +241,7 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 			}
 			list := idx.field.Value.(*ast.ListLit)
 			list.Elts = append(list.Elts, expr)
-		} else if len(pathElems) == 0 {
+		} else if len(labels) == 0 {
 			obj, ok := expr.(*ast.StructLit)
 			if !ok {
 				if _, ok := expr.(*ast.ListLit); ok {
@@ -230,16 +251,14 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 			}
 			f.Decls = append(f.Decls, obj.Elts...)
 		} else {
-			field := &ast.Field{Label: pathElems[0]}
-			field.Token = pathTokens[0]
+			field := &ast.Field{Label: labels[0]}
 			f.Decls = append(f.Decls, field)
 			if p != nil {
 				astutil.CopyComments(field, p)
 			}
-			for i, e := range pathElems[1:] {
+			for _, e := range labels[1:] {
 				newField := &ast.Field{Label: e}
 				newVal := ast.NewStruct(newField)
-				newField.Token = pathTokens[i+1]
 				field.Value = newVal
 				field = newField
 			}
@@ -251,7 +270,7 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 		internal.SetPackage(f, pkg, false)
 	}
 
-	if flagList.Bool(cmd) {
+	if b.useList {
 		switch x := index.field.Value.(type) {
 		case *ast.StructLit:
 			f.Decls = append(f.Decls, x.Elts...)
@@ -265,39 +284,32 @@ func placeOrphans(cmd *Command, filename, pkg string, objs ...*ast.File) (*ast.F
 	return f, astutil.Sanitize(f)
 }
 
-func parseFullPath(inst *cue.Instance, exprs string) (p []ast.Label, t []token.Token, err error) {
+func parseFullPath(exprs string) (p []ast.Label, err error) {
 	f, err := parser.ParseFile("--path", exprs+"_")
 	if err != nil {
-		return nil, nil, fmt.Errorf("parser error in path %q: %v", exprs, err)
+		return p, fmt.Errorf("parser error in path %q: %v", exprs, err)
 	}
 
 	if len(f.Decls) != 1 {
-		return nil, nil, errors.New("path flag must be a space-separated sequence of labels")
+		return p, errors.New("path flag must be a space-separated sequence of labels")
 	}
 
 	for d := f.Decls[0]; ; {
 		field, ok := d.(*ast.Field)
 		if !ok {
 			// This should never happen
-			return nil, nil, errors.New("%q not a sequence of labels")
+			return p, errors.New("%q not a sequence of labels")
 		}
-
-		t = append(t, field.Token)
 
 		switch x := field.Label.(type) {
 		case *ast.Ident, *ast.BasicLit:
 			p = append(p, x)
 
-		case *ast.TemplateLabel:
-			return nil, nil, fmt.Errorf("template labels not supported in path flag")
-
 		case ast.Expr:
-			v := inst.Eval(x)
-			if v.Kind() == cue.BottomKind {
-				return nil, nil, v.Err()
-			}
-			p = append(p, v.Syntax().(ast.Label))
+			p = append(p, &ast.ParenExpr{X: x})
 
+		default:
+			return p, fmt.Errorf("unsupported label type %T", x)
 		}
 
 		v, ok := field.Value.(*ast.StructLit)
@@ -306,12 +318,12 @@ func parseFullPath(inst *cue.Instance, exprs string) (p []ast.Label, t []token.T
 		}
 
 		if len(v.Elts) != 1 {
-			return nil, nil, errors.New("path value may not contain a struct")
+			return p, errors.New("path value may not contain a struct")
 		}
 
 		d = v.Elts[0]
 	}
-	return p, t, nil
+	return p, nil
 }
 
 type listIndex struct {

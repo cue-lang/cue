@@ -146,7 +146,7 @@ type buildPlan struct {
 	// orphan placement flags.
 	perFile    bool
 	useList    bool
-	path       []string
+	path       []ast.Label
 	useContext bool
 
 	// outFile defines the file to output to. Default is CUE stdout.

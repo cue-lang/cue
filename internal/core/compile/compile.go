@@ -574,7 +574,17 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 				Label:  label,
 			}
 
-		case *ast.Interpolation: // *ast.ParenExpr,
+		case *ast.ParenExpr:
+			if x.Token == token.ISA {
+				c.errf(x, "definitions not supported for dynamic fields")
+			}
+			return &adt.DynamicField{
+				Src:   x,
+				Key:   c.expr(l),
+				Value: value,
+			}
+
+		case *ast.Interpolation:
 			if x.Token == token.ISA {
 				c.errf(x, "definitions not supported for interpolations")
 			}

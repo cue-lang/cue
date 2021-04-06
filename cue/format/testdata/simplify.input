@@ -32,6 +32,8 @@ a:
 // Issue #294
 "\("x")": "x"
 
+(x): "foo"
+
 a :: {
     [string]: _
     foo: 2

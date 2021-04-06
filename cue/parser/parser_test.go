@@ -330,6 +330,16 @@ func TestParse(t *testing.T) {
 		}`,
 		"{[foo=_]: {a: int}, a: {a: 1}}",
 	}, {
+		"dynamic labels",
+		`{
+			(x): a: int
+			x:   "foo"
+			a: {
+				(a.b)
+			}
+		}`,
+		`{(x): {a: int}, x: "foo", a: {(a.b)}}`,
+	}, {
 		"foo",
 		`[
 			[1],

@@ -897,7 +897,8 @@ func (p *parser) parseField() (decl ast.Decl) {
 					return a
 				}
 				switch tok {
-				case token.IDENT, token.LBRACK, token.STRING, token.INTERPOLATION,
+				case token.IDENT, token.LBRACK, token.LPAREN,
+					token.STRING, token.INTERPOLATION,
 					token.NULL, token.TRUE, token.FALSE,
 					token.FOR, token.IF, token.LET, token.IN:
 					return &ast.EmbedDecl{Expr: expr}
@@ -1011,7 +1012,7 @@ func (p *parser) parseLabel(rhs bool) (label ast.Label, expr ast.Expr, decl ast.
 		}
 		expr = ident
 
-	case token.IDENT, token.STRING, token.INTERPOLATION,
+	case token.IDENT, token.STRING, token.INTERPOLATION, token.LPAREN,
 		token.NULL, token.TRUE, token.FALSE, token.IN:
 		expr = p.parseExpr()
 

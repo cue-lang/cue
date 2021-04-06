@@ -493,6 +493,9 @@ func (f *formatter) label(l ast.Label, optional bool) {
 	case *ast.ListLit:
 		f.expr(n)
 
+	case *ast.ParenExpr:
+		f.expr(n)
+
 	case *ast.Interpolation:
 		f.expr(n)
 

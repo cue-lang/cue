@@ -281,6 +281,9 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 		}
 
 		switch label := n.(type) {
+		case *ast.ParenExpr:
+			walk(s, label)
+
 		case *ast.Interpolation:
 			walk(s, label)
 

@@ -667,6 +667,7 @@ type ParenExpr struct {
 
 	comments
 	expr
+	label
 }
 
 // A SelectorExpr node represents an expression followed by a selector.

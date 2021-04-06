@@ -12,6 +12,15 @@ c: X
 withError: {
     issue799: {key: int32} & {"\(1&2)": 123}
 }
+
+parenExprRefParent: {
+  a: (x): {}
+  x: "foo"
+}
+parenExprRefEqual: {
+  (x): {}
+  x: "foo"
+}
 -- out/eval --
 Errors:
 invalid interpolation: conflicting values 2 and 1:
@@ -32,6 +41,18 @@ Result:
       // [eval] invalid interpolation: conflicting values 2 and 1:
       //     ./in.cue:12:31
       key: (int){ &(>=-2147483648, <=2147483647, int) }
+    }
+  }
+  parenExprRefParent: (struct){
+    a: (struct){
+      foo: (struct){
+      }
+    }
+    x: (string){ "foo" }
+  }
+  parenExprRefEqual: (struct){
+    x: (string){ "foo" }
+    foo: (struct){
     }
   }
   foo: (struct){
@@ -68,5 +89,15 @@ Result:
     } & {
       "\((1 & 2))": 123
     })
+  }
+  parenExprRefParent: {
+    a: {
+      〈1;x〉: {}
+    }
+    x: "foo"
+  }
+  parenExprRefEqual: {
+    〈0;x〉: {}
+    x: "foo"
   }
 }

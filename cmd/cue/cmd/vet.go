@@ -143,7 +143,7 @@ func doVet(cmd *Command, args []string) error {
 func vetFiles(cmd *Command, b *buildPlan) {
 	// Use -r type root, instead of -e
 
-	if len(b.insts) == 0 {
+	if !b.encConfig.Schema.Exists() {
 		exitOnErr(cmd, errors.New("data files specified without a schema"), true)
 	}
 

@@ -123,6 +123,10 @@ type buildPlan struct {
 	cmd   *Command
 	insts []*build.Instance
 
+	// instance is a pre-compiled instance, which exists if value files are
+	// being processed, which may require a schema to decode.
+	instance *cue.Instance
+
 	cfg *config
 
 	// If orphanFiles are mixed with CUE files and/or if placement flags are used,
@@ -149,7 +153,6 @@ type buildPlan struct {
 	outFile *build.File
 
 	encConfig *encoding.Config
-	merge     []*build.Instance
 }
 
 // instances iterates either over a list of instances, or a list of
@@ -157,10 +160,18 @@ type buildPlan struct {
 // instance, with which the data instance may be merged.
 func (b *buildPlan) instances() iterator {
 	var i iterator
-	if len(b.orphaned) == 0 {
-		i = &instanceIterator{a: buildInstances(b.cmd, b.insts), i: -1}
-	} else {
+	switch {
+	case len(b.orphaned) > 0:
 		i = newStreamingIterator(b)
+	case len(b.insts) > 0:
+		i = &instanceIterator{
+			inst: b.instance,
+			a:    buildInstances(b.cmd, b.insts),
+			i:    -1,
+		}
+	default:
+		i = &instanceIterator{a: []*cue.Instance{b.instance}, i: -1}
+		b.instance = nil
 	}
 	if len(b.expressions) > 0 {
 		return &expressionIter{
@@ -183,9 +194,10 @@ type iterator interface {
 }
 
 type instanceIterator struct {
-	a []*cue.Instance
-	i int
-	e error
+	inst *cue.Instance
+	a    []*cue.Instance
+	i    int
+	e    error
 }
 
 func (i *instanceIterator) scan() bool {
@@ -193,23 +205,33 @@ func (i *instanceIterator) scan() bool {
 	return i.i < len(i.a) && i.e == nil
 }
 
-func (i *instanceIterator) close()                  {}
-func (i *instanceIterator) err() error              { return i.e }
-func (i *instanceIterator) value() cue.Value        { return i.a[i.i].Value() }
-func (i *instanceIterator) instance() *cue.Instance { return i.a[i.i] }
-func (i *instanceIterator) file() *ast.File         { return nil }
-func (i *instanceIterator) id() string              { return i.a[i.i].Dir }
+func (i *instanceIterator) close()     {}
+func (i *instanceIterator) err() error { return i.e }
+func (i *instanceIterator) value() cue.Value {
+	v := i.a[i.i].Value()
+	if i.inst != nil {
+		v = v.Unify(i.inst.Value())
+	}
+	return v
+}
+func (i *instanceIterator) instance() *cue.Instance {
+	if i.inst != nil {
+		return nil
+	}
+	return i.a[i.i]
+}
+func (i *instanceIterator) file() *ast.File { return nil }
+func (i *instanceIterator) id() string      { return i.a[i.i].Dir }
 
 type streamingIterator struct {
-	r    *cue.Runtime
-	inst *cue.Instance
-	b    *buildPlan
-	cfg  *encoding.Config
-	a    []*decoderInfo
-	dec  *encoding.Decoder
-	v    cue.Value
-	f    *ast.File
-	e    error
+	r   *cue.Runtime
+	b   *buildPlan
+	cfg *encoding.Config
+	a   []*decoderInfo
+	dec *encoding.Decoder
+	v   cue.Value
+	f   *ast.File
+	e   error
 }
 
 func newStreamingIterator(b *buildPlan) *streamingIterator {
@@ -220,28 +242,9 @@ func newStreamingIterator(b *buildPlan) *streamingIterator {
 	}
 
 	// TODO: use orphanedSchema
-	switch len(b.insts) {
-	case 0:
-		i.r = &cue.Runtime{}
-	case 1:
-		p := b.insts[0]
-		inst := buildInstances(b.cmd, []*build.Instance{p})[0]
-		if inst.Err != nil {
-			return &streamingIterator{e: inst.Err}
-		}
-		i.r = internal.GetRuntime(inst).(*cue.Runtime)
-		if b.schema == nil {
-			b.encConfig.Schema = inst.Value()
-		} else {
-			schema := inst.Eval(b.schema)
-			if err := schema.Err(); err != nil {
-				return &streamingIterator{e: err}
-			}
-			b.encConfig.Schema = schema
-		}
-	default:
-		return &streamingIterator{e: errors.Newf(token.NoPos,
-			"cannot combine data streaming with multiple instances")}
+	i.r = &cue.Runtime{}
+	if v := b.encConfig.Schema; v.Exists() {
+		i.r = internal.GetRuntime(v).(*cue.Runtime)
 	}
 
 	return i
@@ -252,9 +255,6 @@ func (i *streamingIterator) value() cue.Value        { return i.v }
 func (i *streamingIterator) instance() *cue.Instance { return nil }
 
 func (i *streamingIterator) id() string {
-	if i.inst != nil {
-		return i.inst.Dir
-	}
 	return ""
 }
 
@@ -510,10 +510,6 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			return nil, err
 		}
 
-		// TODO(v0.4.0): what to do:
-		// - when there is already a single instance
-		// - when we are importing and there are schemas and values.
-
 		if values == nil {
 			values, schemas = schemas, values
 		}
@@ -530,40 +526,61 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 			}
 		}
 
-		// TODO(v0.4.0): if schema is specified and data format is JSON, YAML or
-		// Protobuf, reinterpret with schema.
+		if len(p.insts) > 1 && p.schema != nil {
+			return nil, errors.Newf(token.NoPos,
+				"cannot use --schema/-d with flag more than one schema")
+		}
+
+		var schema *build.Instance
+		switch n := len(p.insts); n {
+		default:
+			return nil, errors.Newf(token.NoPos,
+				"too many packages defined (%d) in combination with files", n)
+		case 1:
+			if len(schemas) > 0 {
+				return nil, errors.Newf(token.NoPos,
+					"cannot combine packages with individual schema files")
+			}
+			schema = p.insts[0]
+			p.insts = nil
+
+		case 0:
+			bb := *b
+			schema = &bb
+			b.BuildFiles = nil
+			b.Files = nil
+		}
+
+		if schema != nil && len(schema.Files) > 0 {
+			inst := buildInstances(p.cmd, []*build.Instance{schema})[0]
+
+			if inst.Err != nil {
+				return nil, err
+			}
+			p.instance = inst
+			p.encConfig.Schema = inst.Value()
+			if p.schema != nil {
+				v := inst.Eval(p.schema)
+				if err := v.Err(); err != nil {
+					return nil, err
+				}
+				p.encConfig.Schema = v
+			}
+		}
 
 		switch {
-		case p.usePlacement() || p.importing:
+		case p.mergeData, p.usePlacement(), p.importing:
 			if err = p.placeOrphans(b, values); err != nil {
 				return nil, err
 			}
 
-		case !p.mergeData || p.schema != nil:
-			p.orphaned = values
-
 		default:
-			for _, di := range values {
-				d := di.dec(p)
-				for ; !d.Done(); d.Next() {
-					if err := b.AddSyntax(d.File()); err != nil {
-						return nil, err
-					}
-				}
-				if err := d.Err(); err != nil {
-					return nil, err
-				}
-			}
+			p.orphaned = values
 		}
 
 		if len(b.Files) > 0 {
 			p.insts = append(p.insts, b)
 		}
-	}
-
-	if len(p.insts) > 1 && p.schema != nil {
-		return nil, errors.Newf(token.NoPos,
-			"cannot use --schema/-d flag more than one schema")
 	}
 
 	if len(p.expressions) > 1 {

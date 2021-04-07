@@ -1994,7 +1994,7 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 		oneOfTheLists = l
 
 		elems := l.Elems()
-		isClosed := l.IsClosed(c)
+		isClosed := l.IsClosedList()
 
 		switch {
 		case len(elems) < max:
@@ -2096,7 +2096,7 @@ outer:
 	// add additionalItem values to list and construct optionals.
 	elems := n.node.Elems()
 	for _, l := range n.vLists {
-		if !l.IsClosed(c) {
+		if !l.IsClosedList() {
 			continue
 		}
 

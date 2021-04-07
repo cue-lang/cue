@@ -848,7 +848,7 @@ func (v Value) Kind() Kind {
 	if !v.v.IsConcrete() {
 		return BottomKind
 	}
-	if v.IncompleteKind() == adt.ListKind && !v.IsClosed() {
+	if v.IncompleteKind() == adt.ListKind && !v.v.IsClosedList() {
 		return BottomKind
 	}
 	return c.Kind()
@@ -1086,11 +1086,23 @@ func (v Value) Pos() token.Pos {
 
 // IsClosed reports whether a list of struct is closed. It reports false when
 // when the value is not a list or struct.
+//
+// Deprecated: use Allows and Kind/IncompleteKind.
 func (v Value) IsClosed() bool {
 	if v.v == nil {
 		return false
 	}
-	return v.v.IsClosed(v.ctx().opCtx)
+	return v.v.IsClosedList() || v.v.IsClosedStruct()
+}
+
+// Allows reports whether a field with the given selector could be added to v.
+//
+// Allows does not take into account validators like list.MaxItems(4). This may
+// change in the future.
+func (v Value) Allows(sel Selector) bool {
+	c := v.ctx().opCtx
+	f := sel.sel.feature(c)
+	return v.v.Accept(c, f)
 }
 
 // IsConcrete reports whether the current value is a concrete scalar value
@@ -1107,7 +1119,7 @@ func (v Value) IsConcrete() bool {
 	if !adt.IsConcrete(v.v) {
 		return false
 	}
-	if v.IncompleteKind() == adt.ListKind && !v.IsClosed() {
+	if v.IncompleteKind() == adt.ListKind && !v.v.IsClosedList() {
 		return false
 	}
 	return true
@@ -1168,10 +1180,9 @@ func (v Value) Len() Value {
 		switch x := v.eval(v.ctx()).(type) {
 		case *adt.Vertex:
 			if x.IsList() {
-				ctx := v.ctx()
 				n := &adt.Num{K: adt.IntKind}
 				n.X.SetInt64(int64(len(x.Elems())))
-				if x.IsClosed(ctx.opCtx) {
+				if x.IsClosedList() {
 					return remakeFinal(v, nil, n)
 				}
 				// Note: this HAS to be a Conjunction value and cannot be
@@ -1214,38 +1225,6 @@ func (v Value) Elem() (Value, bool) {
 	x.Finalize(ctx)
 	return makeValue(v.idx, x), true
 }
-
-// // BulkOptionals returns all bulk optional fields as key-value pairs.
-// // See also Elem and Template.
-// func (v Value) BulkOptionals() [][2]Value {
-// 	x, ok := v.path.cache.(*structLit)
-// 	if !ok {
-// 		return nil
-// 	}
-// 	return v.appendBulk(nil, x.optionals)
-// }
-
-// func (v Value) appendBulk(a [][2]Value, x *optionals) [][2]Value {
-// 	if x == nil {
-// 		return a
-// 	}
-// 	a = v.appendBulk(a, x.left)
-// 	a = v.appendBulk(a, x.right)
-// 	for _, set := range x.fields {
-// 		if set.key != nil {
-// 			ctx := v.ctx()
-// 			fn, ok := ctx.manifest(set.value).(*lambdaExpr)
-// 			if !ok {
-// 				// create error
-// 				continue
-// 			}
-// 			x := fn.call(ctx, set.value, &basicType{K: stringKind})
-
-// 			a = append(a, [2]Value{v.makeElem(set.key), v.makeElem(x)})
-// 		}
-// 	}
-// 	return a
-// }
 
 // List creates an iterator over the values of a list or reports an error if
 // v is not a list.
@@ -1793,7 +1772,7 @@ func isDef(v *adt.Vertex) bool {
 }
 
 func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
-	if !parent.IsClosed(ctx) && !isDef(parent) {
+	if !parent.IsClosedList() && !parent.IsClosedStruct() && !isDef(parent) {
 		return nil
 	}
 

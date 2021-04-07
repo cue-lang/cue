@@ -104,7 +104,7 @@ func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, 
 		switch x.Kind() {
 		case StringKind:
 			if label == nil {
-				label = f.ToValue(c)
+				return false
 			}
 			str := label.(*String).Str
 			return x.validateStr(c, str)
@@ -114,12 +114,13 @@ func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, 
 		}
 	}
 
+	if label == nil {
+		return false
+	}
+
 	n := Vertex{}
 	m := MakeRootConjunct(env, v)
 	n.AddConjunct(m)
-	if label == nil {
-		label = f.ToValue(c)
-	}
 	n.AddConjunct(MakeRootConjunct(m.Env, label))
 
 	c.inConstraint++

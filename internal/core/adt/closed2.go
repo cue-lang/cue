@@ -26,7 +26,7 @@ package adt
 // subtree into the parent node using InsertSubtree. If not, the conjuncts can
 // just be inserted at the current ID.
 func isComplexStruct(ctx *OpContext, v *Vertex) bool {
-	return v.IsClosed(ctx)
+	return v.IsClosedStruct()
 }
 
 // TODO: cleanup code and error messages. Reduce duplication in some related

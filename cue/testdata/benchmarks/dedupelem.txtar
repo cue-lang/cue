@@ -27,7 +27,7 @@ foo.0.type: conflicting values "string" and "float":
 Result:
 (_|_){
   // [eval]
-  #Value: (struct){ |((#struct){
+  #Value: (#struct){ |((#struct){
       type: (string){ "int" }
     }, (#struct){
       type: (string){ "float" }

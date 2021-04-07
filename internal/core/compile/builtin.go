@@ -85,7 +85,7 @@ var closeBuiltin = &adt.Builtin{
 		if !ok {
 			return c.NewErrf("struct argument must be concrete")
 		}
-		if s.IsClosed(c) {
+		if s.IsClosedStruct() {
 			return s
 		}
 		v := *s

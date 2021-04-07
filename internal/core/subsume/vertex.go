@@ -81,11 +81,11 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		panic(fmt.Sprintf("unexpected type %T", v))
 	}
 
-	xClosed := x.IsClosed(ctx) && !s.IgnoreClosedness
+	xClosed := x.IsClosedStruct() && !s.IgnoreClosedness
 	// TODO: this should not close for taking defaults. Do a more principled
 	// makeover of this package before making it public, though.
 	yClosed := s.Final || s.Defaults ||
-		(y.IsClosed(ctx) && !s.IgnoreClosedness)
+		(y.IsClosedStruct() && !s.IgnoreClosedness)
 
 	if xClosed && !yClosed && !final {
 		return false
@@ -221,7 +221,7 @@ outer:
 func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 	ctx := s.ctx
 
-	if !y.IsData() && x.IsClosed(ctx) && !y.IsClosed(ctx) {
+	if !y.IsData() && x.IsClosedList() && !y.IsClosedList() {
 		return false
 	}
 
@@ -232,7 +232,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 	case len(xElems) == len(yElems):
 	case len(xElems) > len(yElems):
 		return false
-	case x.IsClosed(ctx):
+	case x.IsClosedList():
 		return false
 	default:
 		a := &adt.Vertex{Label: 0}
@@ -246,7 +246,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 			}
 		}
 
-		if !y.IsClosed(ctx) {
+		if !y.IsClosedList() {
 			b := &adt.Vertex{Label: adt.InvalidLabel}
 			y.MatchAndInsert(ctx, b)
 			b.Finalize(ctx)

@@ -82,12 +82,12 @@ Result:
       }
       error: (string){ string }
     }
-    #Output: (struct){ |((#struct){
+    #Output: (#struct){ |((#struct){
         result: (_){ _ }
       }, (#struct){
         error: (string){ string }
       }) }
-    #DecodeOutput: (struct){ |((#struct){
+    #DecodeOutput: (#struct){ |((#struct){
         result: (list){
         }
       }, (#struct){
@@ -96,7 +96,7 @@ Result:
   }
   issue516: (_|_){
     // [eval]
-    #Def: (struct){ |((#struct){
+    #Def: (#struct){ |((#struct){
         match: (#struct){
           metrics: (#struct){
             string: (#struct){

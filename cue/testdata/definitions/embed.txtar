@@ -163,7 +163,7 @@ Result:
     }
   }
   reclose3: (struct){
-    #Step: (struct){ |((#struct){
+    #Step: (#struct){ |((#struct){
         Name: (string){ string }
         Something: (int){ int }
       }, (#struct){

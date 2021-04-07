@@ -185,17 +185,17 @@ preserveClosedness: medium: p3: {
 -- out/eval --
 (struct){
   disambiguateClosed: (struct){
-    b: (struct){ |((#struct){
+    b: (#struct){ |((#struct){
         x: (bool){ true }
       }, (#struct){
         y: (bool){ true }
       }) }
-    a: (struct){ |((#struct){
+    a: (#struct){ |((#struct){
         x: (bool){ true }
       }, (#struct){
         y: (bool){ true }
       }) }
-    #Def: (struct){ |((#struct){
+    #Def: (#struct){ |((#struct){
         x: (bool){ true }
       }, (#struct){
         y: (bool){ true }
@@ -364,13 +364,13 @@ preserveClosedness: medium: p3: {
   preserveClosedness: (struct){
     small: (struct){
       p1: (struct){
-        #A: (struct){ |(*(#struct){
+        #A: (#struct){ |(*(#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
             b: (int){ int }
           }) }
-        #B: (struct){ |(*(#struct){
+        #B: (#struct){ |(*(#struct){
           }, (#struct){
             b: (int){ int }
           }, (#struct){
@@ -381,13 +381,13 @@ preserveClosedness: medium: p3: {
           }) }
       }
       p2: (struct){
-        #A: (struct){ |(*(#struct){
+        #A: (#struct){ |(*(#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
             b: (int){ int }
           }) }
-        #B: (struct){ |(*(#struct){
+        #B: (#struct){ |(*(#struct){
           }, (#struct){
             a: (string){ string }
             b: (int){ int }
@@ -400,7 +400,7 @@ preserveClosedness: medium: p3: {
     }
     medium: (struct){
       p1: (struct){
-        #A: (struct){ |(*(#struct){
+        #A: (#struct){ |(*(#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
@@ -409,7 +409,7 @@ preserveClosedness: medium: p3: {
             a: (string){ string }
             d: (string){ string }
           }) }
-        #B: (struct){ |(*(#struct){
+        #B: (#struct){ |(*(#struct){
           }, (#struct){
             c: (int){ int }
           }, (#struct){
@@ -433,7 +433,7 @@ preserveClosedness: medium: p3: {
           }) }
       }
       p2: (struct){
-        #A: (struct){ |(*(#struct){
+        #A: (#struct){ |(*(#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
@@ -442,7 +442,7 @@ preserveClosedness: medium: p3: {
             a: (string){ string }
             d: (string){ string }
           }) }
-        #B: (struct){ |(*(#struct){
+        #B: (#struct){ |(*(#struct){
           }, (#struct){
             a: (string){ string }
             c: (int){ int }
@@ -466,7 +466,7 @@ preserveClosedness: medium: p3: {
           }) }
       }
       p3: (struct){
-        #A: (struct){ |(*(#struct){
+        #A: (#struct){ |(*(#struct){
             a: (string){ string }
           }, (#struct){
             a: (string){ string }
@@ -475,7 +475,7 @@ preserveClosedness: medium: p3: {
             a: (string){ string }
             d: (string){ string }
           }) }
-        #B: (struct){ |(*(#struct){
+        #B: (#struct){ |(*(#struct){
           }, (#struct){
             a: (string){ string }
             c: (int){ int }

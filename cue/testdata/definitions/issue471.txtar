@@ -24,7 +24,7 @@ package x
 }
 -- out/eval --
 (struct){
-  #a: (struct){ |((#struct){
+  #a: (#struct){ |((#struct){
       name: (string){ string }
       age: (int){ int }
     }, (#struct){

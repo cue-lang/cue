@@ -201,7 +201,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	}
 	if e.hasEllipsis {
 		s.Elts = append(s.Elts, &ast.Ellipsis{})
-	} else if src != nil && src.IsClosed(e.ctx) && e.inDefinition == 0 {
+	} else if src != nil && src.IsClosedStruct() && e.inDefinition == 0 {
 		return ast.NewCall(ast.NewIdent("close"), s)
 	}
 
@@ -302,7 +302,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 				for _, x := range v.Elems() {
 					a = append(a, e.expr(x))
 				}
-				if !v.IsClosed(e.ctx) {
+				if !v.IsClosedList() {
 					v := &adt.Vertex{}
 					v.MatchAndInsert(e.ctx, v)
 					a = append(a, &ast.Ellipsis{Type: e.expr(v)})

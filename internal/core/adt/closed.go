@@ -325,8 +325,12 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 		optionalTypes |= s.types
 	}
 
+	if f.Index() == MaxIndex {
+		f = 0
+	}
+
 	var str Value
-	if optionalTypes&(HasComplexPattern|HasDynamic) != 0 && f.IsString() {
+	if optionalTypes&(HasComplexPattern|HasDynamic) != 0 && f.IsString() && f > 0 {
 		str = f.ToValue(ctx)
 	}
 
@@ -472,10 +476,7 @@ func verifyArc(ctx *OpContext, s *StructInfo, f Feature, label Value) bool {
 	errs := ctx.errs
 	defer func() { ctx.errs = errs }()
 
-	if len(o.Dynamic) > 0 && f.IsString() {
-		if label == nil && f.IsString() {
-			label = f.ToValue(ctx)
-		}
+	if len(o.Dynamic) > 0 && f.IsString() && label != nil {
 		for _, b := range o.Dynamic {
 			v := env.evalCached(ctx, b.Key)
 			s, ok := v.(*String)

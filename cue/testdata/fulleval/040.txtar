@@ -67,7 +67,7 @@ foo:
 }
 -- out/eval --
 (struct){
-  #Task: (struct){ |((#struct){
+  #Task: (#struct){ |((#struct){
       op: (string){ "pull" }
       tag: (string){ |(*(string){ "latest" }, (string){ string }) }
       refToTag: (string){ |(*(string){ "latest" }, (string){ string }) }

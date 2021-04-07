@@ -33,11 +33,24 @@ type Feature uint32
 // TODO: create labels such that list are sorted first (or last with index.)
 
 // InvalidLabel is an encoding of an erroneous label.
-const InvalidLabel Feature = 0x7 // 0xb111
+const (
+	InvalidLabel Feature = 0x7 // 0xb111
 
-// MaxIndex indicates the maximum number of unique strings that are used for
-// labeles within this CUE implementation.
-const MaxIndex int64 = 1<<28 - 1
+	// MaxIndex indicates the maximum number of unique strings that are used for
+	// labeles within this CUE implementation.
+	MaxIndex = 1<<28 - 1
+)
+
+// These labels can be used for wildcard queries.
+var (
+	// AnyLabel represents any label or index.
+	AnyLabel Feature = 0
+
+	AnyDefinition Feature = makeLabel(MaxIndex, DefinitionLabel)
+	AnyHidden     Feature = makeLabel(MaxIndex, HiddenLabel)
+	AnyRegular    Feature = makeLabel(MaxIndex, StringLabel)
+	AnyIndex      Feature = makeLabel(MaxIndex, IntLabel)
+)
 
 // A StringIndexer coverts strings to and from an index that is unique for a
 // given string.
@@ -58,12 +71,12 @@ func (f Feature) SelectorString(index StringIndexer) string {
 	if f == 0 {
 		return "_"
 	}
-	x := f.Index()
+	x := f.safeIndex()
 	switch f.Typ() {
 	case IntLabel:
 		return strconv.Itoa(int(x))
 	case StringLabel:
-		s := index.IndexToString(int64(x))
+		s := index.IndexToString(x)
 		if ast.IsValidIdent(s) && !internal.IsDefOrHidden(s) {
 			return s
 		}
@@ -76,7 +89,7 @@ func (f Feature) SelectorString(index StringIndexer) string {
 // IdentString reports the identifier of f. The result is undefined if f
 // is not an identifier label.
 func (f Feature) IdentString(index StringIndexer) string {
-	s := index.IndexToString(int64(f.Index()))
+	s := index.IndexToString(f.safeIndex())
 	if f.IsHidden() {
 		if p := strings.IndexByte(s, '\x00'); p >= 0 {
 			s = s[:p]
@@ -92,7 +105,7 @@ func (f Feature) PkgID(index StringIndexer) string {
 	if !f.IsHidden() {
 		return ""
 	}
-	s := index.IndexToString(int64(f.Index()))
+	s := index.IndexToString(f.safeIndex())
 	if p := strings.IndexByte(s, '\x00'); p >= 0 {
 		return s[p+1:]
 	}
@@ -104,8 +117,8 @@ func (f Feature) StringValue(index StringIndexer) string {
 	if !f.IsString() {
 		panic("not a string label")
 	}
-	x := f.Index()
-	return index.IndexToString(int64(x))
+	x := f.safeIndex()
+	return index.IndexToString(x)
 }
 
 // ToValue converts a label to a value, which will be a Num for integer labels
@@ -117,8 +130,8 @@ func (f Feature) ToValue(ctx *OpContext) Value {
 	if f.IsInt() {
 		return ctx.NewInt64(int64(f.Index()))
 	}
-	x := f.Index()
-	str := ctx.IndexToString(int64(x))
+	x := f.safeIndex()
+	str := ctx.IndexToString(x)
 	return ctx.NewString(str)
 }
 
@@ -228,16 +241,20 @@ func labelFromValue(c *OpContext, src Expr, v Value) Feature {
 
 // MakeLabel creates a label. It reports an error if the index is out of range.
 func MakeLabel(src ast.Node, index int64, f FeatureType) (Feature, errors.Error) {
-	if 0 > index || index > MaxIndex {
+	if 0 > index || index > MaxIndex-1 {
 		p := token.NoPos
 		if src != nil {
 			p = src.Pos()
 		}
 		return InvalidLabel,
 			errors.Newf(p, "int label out of range (%d not >=0 and <= %d)",
-				index, MaxIndex)
+				index, MaxIndex-1)
 	}
 	return Feature(index)<<indexShift | Feature(f), nil
+}
+
+func makeLabel(index int64, f FeatureType) Feature {
+	return Feature(index)<<indexShift | Feature(f)
 }
 
 // A FeatureType indicates the type of label.
@@ -301,7 +318,18 @@ func (f Feature) IsHidden() bool {
 }
 
 // Index reports the abstract index associated with f.
-func (f Feature) Index() int { return int(f >> indexShift) }
+func (f Feature) Index() int {
+	return int(f >> indexShift)
+}
+
+// SafeIndex reports the abstract index associated with f, setting MaxIndex to 0.
+func (f Feature) safeIndex() int64 {
+	x := int(f >> indexShift)
+	if x == MaxIndex {
+		x = 0 // Safety, MaxIndex means any
+	}
+	return int64(x)
+}
 
 // TODO: should let declarations be implemented as fields?
 // func (f Feature) isLet() bool  { return f.typ() == letLabel }

@@ -52,7 +52,7 @@
 }
 -- out/eval --
 (struct){
-  #def: (struct){ |((#struct){
+  #def: (#struct){ |((#struct){
       Type: (string){ "B" }
       Text: (string){ string }
       Size: (int){ 0 }

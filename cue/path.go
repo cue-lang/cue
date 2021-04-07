@@ -44,6 +44,32 @@ func (sel Selector) IsString() bool {
 	return sel.sel.kind() == adt.StringLabel
 }
 
+var (
+	// AnyField can be used to ask for any single label.
+	//
+	// In paths it is used to select constraints that apply to all elements.
+	// AnyField = anyField
+	anyField = Selector{sel: anySelector(adt.AnyLabel)}
+
+	// AnyDefinition can be used to ask for any definition.
+	//
+	// In paths it is used to select constraints that apply to all elements.
+	// AnyDefinition = anyDefinition
+	anyDefinition = Selector{sel: anySelector(adt.AnyDefinition)}
+
+	// AnyIndex can be used to ask for any index.
+	//
+	// In paths it is used to select constraints that apply to all elements.
+	AnyIndex = anyIndex
+	anyIndex = Selector{sel: anySelector(adt.AnyIndex)}
+
+	// AnyString can be used to ask for any regular string field.
+	//
+	// In paths it is used to select constraints that apply to all elements.
+	AnyString = anyLabel
+	anyLabel  = Selector{sel: anySelector(adt.AnyRegular)}
+)
+
 type selector interface {
 	String() string
 
@@ -352,6 +378,16 @@ func (s indexSelector) String() string {
 func (s indexSelector) kind() adt.FeatureType { return adt.IntLabel }
 
 func (s indexSelector) feature(r adt.Runtime) adt.Feature {
+	return adt.Feature(s)
+}
+
+// an anySelector represents a wildcard option of a particular type.
+type anySelector adt.Feature
+
+func (s anySelector) String() string        { return "_" }
+func (s anySelector) kind() adt.FeatureType { return adt.Feature(s).Typ() }
+
+func (s anySelector) feature(r adt.Runtime) adt.Feature {
 	return adt.Feature(s)
 }
 

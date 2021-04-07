@@ -286,7 +286,7 @@ Result:
       x: (string){ string }
     }
     #C: (#struct){
-      b: (struct){ |((#struct){
+      b: (#struct){ |((#struct){
           type: (string){ "a" }
           x: (string){ "" }
         }, (#struct){

@@ -158,7 +158,7 @@ func (w *printer) node(n adt.Node) {
 		kindStr := kind.String()
 
 		// TODO: replace with showing full closedness data.
-		if x.IsClosed(nil) {
+		if x.IsClosedList() || x.IsClosedStruct() {
 			if kind == adt.ListKind || kind == adt.StructKind {
 				kindStr = "#" + kindStr
 			}

@@ -33,13 +33,13 @@ Z: X.test_3_XXX.ref
     #Simple: (#struct){
       ref: (string){ string }
     }
-    #Complex: (struct){ |((#struct){
+    #Complex: (#struct){ |((#struct){
         ref: (string){ string }
       }, (#struct){
         local: (string){ string }
       }) }
     var: (string){ "XXX" }
-    test_1: (struct){ |((#struct){
+    test_1: (#struct){ |((#struct){
         ref: (string){ string }
       }, (#struct){
         local: (string){ string }

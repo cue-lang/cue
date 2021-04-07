@@ -22,7 +22,7 @@ l: [
   #B: (#struct){
     b: (string){ string }
   }
-  #X: (struct){ |((#struct){
+  #X: (#struct){ |((#struct){
       a: (string){ string }
     }, (#struct){
       b: (string){ string }

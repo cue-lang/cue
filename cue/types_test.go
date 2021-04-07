@@ -1146,6 +1146,245 @@ func TestFillPath(t *testing.T) {
 	}
 }
 
+func TestAllows(t *testing.T) {
+	r := &Runtime{}
+
+	testCases := []struct {
+		desc  string
+		in    string
+		sel   Selector
+		allow bool
+	}{{
+		desc: "allow new field in open struct",
+		in: `
+		x: {
+			a: int
+		}
+		`,
+		sel:   Str("b"),
+		allow: true,
+	}, {
+		desc: "disallow new field in definition",
+		in: `
+		x: #Def
+		#Def: {
+			a: int
+		}
+		`,
+		sel: Str("b"),
+	}, {
+		desc: "disallow new field in explicitly closed struct",
+		in: `
+		x: close({
+			a: int
+		})
+		`,
+		sel: Str("b"),
+	}, {
+		desc: "allow index in open list",
+		in: `
+		x: [...int]
+		`,
+		sel:   Index(100),
+		allow: true,
+	}, {
+		desc: "disallow index in closed list",
+		in: `
+		x: []
+		`,
+		sel: Index(0),
+	}, {
+		desc: "allow existing index in closed list",
+		in: `
+		x: [1]
+		`,
+		sel:   Index(0),
+		allow: true,
+	}, {
+		desc: "definition in non-def closed list",
+		in: `
+		x: [1]
+		`,
+		sel:   Def("#foo"),
+		allow: true,
+	}, {
+		// TODO(disallow)
+		desc: "definition in def open list",
+		in: `
+		x: #Def
+		x: [1]
+		#Def: [...int]
+		`,
+		sel:   Def("#foo"),
+		allow: true,
+	}, {
+		desc: "field in def open list",
+		in: `
+		x: #Def
+		x: [1]
+		#Def: [...int]
+		`,
+		sel: Str("foo"),
+	}, {
+		desc: "definition in open scalar",
+		in: `
+		x: 1
+		`,
+		sel:   Def("#foo"),
+		allow: true,
+	}, {
+		desc: "field in scalar",
+		in: `
+		x: #Def
+		x: 1
+		#Def: int
+		`,
+		sel: Str("foo"),
+	}, {
+		desc: "any index in closed list",
+		in: `
+		x: [1]
+		`,
+		sel: AnyIndex,
+	}, {
+		desc: "any index in open list",
+		in: `
+		x: [...int]
+			`,
+		sel:   AnyIndex,
+		allow: true,
+	}, {
+		desc: "definition in open scalar",
+		in: `
+		x: 1
+		`,
+		sel:   anyDefinition,
+		allow: true,
+	}, {
+		desc: "field in open scalar",
+		in: `
+			x: 1
+			`,
+		sel: AnyString,
+
+		// TODO(v0.6.0)
+		// }, {
+		// 	desc: "definition in closed scalar",
+		// 	in: `
+		// 	x: #Def
+		// 	x: 1
+		// 	#Def: int
+		// 	`,
+		// 	sel:   AnyDefinition,
+		// 	allow: true,
+	}, {
+		desc: "allow field in any",
+		in: `
+			x: _
+			`,
+		sel:   AnyString,
+		allow: true,
+	}, {
+		desc: "allow index in any",
+		in: `
+		x: _
+		`,
+		sel:   AnyIndex,
+		allow: true,
+	}, {
+		desc: "allow index in disjunction",
+		in: `
+		x: [...int] | 1
+		`,
+		sel:   AnyIndex,
+		allow: true,
+	}, {
+		desc: "allow index in disjunction",
+		in: `
+		x: [] | [...int]
+			`,
+		sel:   AnyIndex,
+		allow: true,
+	}, {
+		desc: "disallow index in disjunction",
+		in: `
+		x: [1, 2] | [3, 2]
+		`,
+		sel: AnyIndex,
+	}, {
+		desc: "disallow index in non-list disjunction",
+		in: `
+		x: "foo" | 1
+		`,
+		sel: AnyIndex,
+	}, {
+		desc: "allow label in disjunction",
+		in: `
+		x: {} | 1
+		`,
+		sel:   AnyString,
+		allow: true,
+	}, {
+		desc: "allow label in disjunction",
+		in: `
+		x: #Def
+		#Def: { a: 1 } | { b: 1, ... }
+		`,
+		sel:   AnyString,
+		allow: true,
+	}, {
+		desc: "disallow label in disjunction",
+		in: `
+		x: #Def
+		#Def: { a: 1 } | { b: 1 }
+		`,
+		sel: AnyString,
+	}, {
+		desc: "pattern constraint",
+		in: `
+		x: #PC
+		#PC: [>"m"]: int
+		`,
+		sel: Str(""),
+	}, {
+		desc: "pattern constraint",
+		in: `
+		x: #PC
+		#PC: [>"m"]: int
+		`,
+		sel:   Str("z"),
+		allow: true,
+	}, {
+		desc: "any in pattern constraint",
+		in: `
+		x: #PC
+		#PC: [>"m"]: int
+		`,
+		sel: AnyString,
+	}, {
+		desc: "any in pattern constraint",
+		in: `
+		x: #PC
+		#PC: [>" "]: int
+		`,
+		sel: AnyString,
+	}}
+
+	path := ParsePath("x")
+
+	for _, tc := range testCases {
+		t.Run(tc.desc, func(t *testing.T) {
+			v := compileT(t, r, tc.in).Value()
+			v = v.LookupPath(path)
+
+			got := v.Allows(tc.sel)
+			if got != tc.allow {
+				t.Errorf("got %v; want %v", got, tc.allow)
+			}
+		})
+	}
+}
+
 func TestFillFloat(t *testing.T) {
 	// This tests panics for issue #749
 

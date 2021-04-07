@@ -32,7 +32,7 @@ b: field d not allowed:
 Result:
 (_|_){
   // [eval]
-  #A: (struct){ |(*(#struct){
+  #A: (#struct){ |(*(#struct){
     }, (#struct){
     }, (#struct){
     }, (#struct){

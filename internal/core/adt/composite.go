@@ -502,10 +502,14 @@ const (
 func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
 	// not known at this time what the type is.
-	if v.BaseValue == nil {
+	switch {
+	case v.state != nil:
+		return v.state.kind
+	case v.BaseValue == nil:
 		return TopKind
+	default:
+		return v.BaseValue.Kind()
 	}
-	return v.BaseValue.Kind()
 }
 
 func (v *Vertex) OptionalTypes() OptionalType {
@@ -531,33 +535,61 @@ func (v *Vertex) accepts(ok, required bool) bool {
 	return ok || (!required && !v.Closed)
 }
 
-func (v *Vertex) IsClosed(ctx *OpContext) bool {
+func (v *Vertex) IsClosedStruct() bool {
 	switch x := v.BaseValue.(type) {
-	case *ListMarker:
-		return !x.IsOpen
+	default:
+		return false
 
 	case *StructMarker:
 		if x.NeedClose {
 			return true
 		}
-		return v.Closed || isClosed(v)
+
+	case *Disjunction:
+	}
+	return v.Closed || isClosed(v)
+}
+
+func (v *Vertex) IsClosedList() bool {
+	if x, ok := v.BaseValue.(*ListMarker); ok {
+		return !x.IsOpen
 	}
 	return false
 }
 
 // TODO: return error instead of boolean? (or at least have version that does.)
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
-	if v.IsList() {
-		if f.IsInt() {
+	if f.IsInt() {
+		switch x := v.BaseValue.(type) {
+		case *ListMarker:
 			// TODO(perf): use precomputed length.
 			if f.Index() < len(v.Elems()) {
 				return true
 			}
+			return !v.IsClosedList()
+
+		case *Disjunction:
+			for _, v := range x.Values {
+				if v.Accept(ctx, f) {
+					return true
+				}
+			}
+			return false
+
+		default:
+			return v.Kind()&ListKind != 0
 		}
-		return !v.IsClosed(ctx)
 	}
 
-	if !f.IsString() || !v.IsClosed(ctx) || v.Lookup(f) != nil {
+	if k := v.Kind(); k&StructKind == 0 && f.IsString() && f != AnyLabel {
+		// If the value is bottom, we may not really know if this used to
+		// be a struct.
+		if k != BottomKind || len(v.Structs) == 0 {
+			return false
+		}
+	}
+
+	if f.IsHidden() || !v.IsClosedStruct() || v.Lookup(f) != nil {
 		return true
 	}
 

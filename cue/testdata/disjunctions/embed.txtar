@@ -111,7 +111,7 @@ nested: {
   }
   defaultsMulti: (struct){
     a: (struct){
-      #def: (struct){ |(*(#struct){
+      #def: (#struct){ |(*(#struct){
         }, (#struct){
           c: (string){ string }
         }, (#struct){
@@ -133,7 +133,7 @@ nested: {
           b: (string){ string }
           d: (string){ string }
         }) }
-      a: (struct){ |(*(#struct){
+      a: (#struct){ |(*(#struct){
           a: (string){ "foo" }
         }, (#struct){
           a: (string){ "foo" }
@@ -144,7 +144,7 @@ nested: {
         }) }
     }
     b: (struct){
-      #def: (struct){ |(*(#struct){
+      #def: (#struct){ |(*(#struct){
         }, (#struct){
           d: (string){ string }
         }, (#struct){
@@ -207,7 +207,7 @@ nested: {
           d: (string){ string }
           e: (string){ string }
         }) }
-      a: (struct){ |(*(#struct){
+      a: (#struct){ |(*(#struct){
           a: (string){ "foo" }
           e: (string){ "bar" }
         }, (#struct){

@@ -729,6 +729,7 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 	case *StructMarker:
 		if l.Typ() == IntLabel {
 			c.addErrf(0, pos, "invalid struct selector %s (type int)", l)
+			return nil
 		}
 
 	case *ListMarker:

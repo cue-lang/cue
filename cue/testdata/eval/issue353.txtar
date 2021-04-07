@@ -13,12 +13,12 @@ e: a: "hello"
 }
 -- out/eval --
 (struct){
-  e: (struct){ |((#struct){
+  e: (#struct){ |((#struct){
       a: (string){ "hello" }
     }, (#struct){
       a: (string){ "hello" }
     }) }
-  #Example: (struct){ |((#struct){
+  #Example: (#struct){ |((#struct){
       a: (string){ string }
     }, (#struct){
       a: (string){ string }

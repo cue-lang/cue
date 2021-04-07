@@ -39,7 +39,7 @@ light: #theme & {
     ctermbg: (string){ "254" }
   }
   #Config: (#struct){
-    console: (struct){ |(*(#struct){
+    console: (#struct){ |(*(#struct){
         color: (string){ "light" }
         ctermbg: (string){ "254" }
       }, (#struct){

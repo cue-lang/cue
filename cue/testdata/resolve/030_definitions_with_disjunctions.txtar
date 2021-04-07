@@ -71,7 +71,7 @@ bar: field c not allowed:
 Result:
 (_|_){
   // [eval]
-  #Foo: (struct){ |((#struct){
+  #Foo: (#struct){ |((#struct){
       field: (int){ int }
       a: (int){ 1 }
     }, (#struct){

@@ -675,7 +675,7 @@ Result:
     #ref: (#struct){
       ref: (string){ string }
     }
-    x: (struct){ |((#struct){
+    x: (#struct){ |((#struct){
         c: (#list){
           0: ((string|struct)){ |((string){ string }, (#struct){
               ref: (string){ string }

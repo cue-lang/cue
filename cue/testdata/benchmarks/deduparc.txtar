@@ -21,7 +21,7 @@ foo: #Value
 foo: #Value
 -- out/eval --
 (struct){
-  #Value: (struct){ |((#struct){
+  #Value: (#struct){ |((#struct){
       type: (string){ "float" }
     }, (#struct){
       type: (string){ "string" }

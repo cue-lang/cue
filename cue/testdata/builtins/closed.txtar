@@ -78,7 +78,7 @@ Result:
   inDisjunctions: (struct){
     x: (struct){
       socket: (#struct){
-        string: (struct){ |((#struct){
+        string: (#struct){ |((#struct){
             a: (#struct){
               b: (bool){ true }
             }
@@ -99,7 +99,7 @@ Result:
           }) }
       }
       syslog: (#struct){
-        string: (struct){ |((#struct){
+        string: (#struct){ |((#struct){
             a: (#struct){
               b: (bool){ true }
             }
@@ -118,7 +118,7 @@ Result:
               }
             }
           }) }
-        xxx: (struct){ |((#struct){
+        xxx: (#struct){ |((#struct){
             a: (#struct){
               b: (bool){ true }
             }

@@ -81,7 +81,7 @@ package main
     #c: (list){
     }
   }
-  #o: (struct){ |((#struct){
+  #o: (#struct){ |((#struct){
       do: (string){ "f1" }
       as: (list){
       }

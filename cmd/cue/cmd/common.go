@@ -296,7 +296,7 @@ func (i *streamingIterator) scan() bool {
 	if schema := i.b.encConfig.Schema; schema.Exists() {
 		i.e = schema.Err()
 		if i.e == nil {
-			i.v = i.v.Unify(schema)
+			i.v = i.v.Unify(schema) // TODO(required fields): don't merge in schema
 			i.e = i.v.Err()
 		}
 		i.f = nil
@@ -409,6 +409,19 @@ func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderIn
 	for _, f := range b.OrphanedFiles {
 		switch f.Encoding {
 		case build.Protobuf, build.YAML, build.JSON, build.JSONL, build.Text:
+			if f.Interpretation == build.ProtobufJSON {
+				// Need a schema.
+				values = append(values, &decoderInfo{f, nil})
+				continue
+			}
+		case build.TextProto:
+			if p.importing {
+				return schemas, values, errors.Newf(token.NoPos,
+					"cannot import textproto files")
+			}
+			// Needs to be decoded after any schema.
+			values = append(values, &decoderInfo{f, nil})
+			continue
 		default:
 			return schemas, values, errors.Newf(token.NoPos,
 				"unsupported encoding %q", f.Encoding)
@@ -569,13 +582,17 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		}
 
 		switch {
+		default:
+			fallthrough
+
+		case p.schema != nil:
+			p.orphaned = values
+
 		case p.mergeData, p.usePlacement(), p.importing:
 			if err = p.placeOrphans(b, values); err != nil {
 				return nil, err
 			}
 
-		default:
-			p.orphaned = values
 		}
 
 		if len(b.Files) > 0 {

@@ -30,17 +30,17 @@ type File struct {
 type Encoding string
 
 const (
-	CUE      Encoding = "cue"
-	JSON     Encoding = "json"
-	YAML     Encoding = "yaml"
-	JSONL    Encoding = "jsonl"
-	Text     Encoding = "text"
-	Protobuf Encoding = "proto"
+	CUE         Encoding = "cue"
+	JSON        Encoding = "json"
+	YAML        Encoding = "yaml"
+	JSONL       Encoding = "jsonl"
+	Text        Encoding = "text"
+	Protobuf    Encoding = "proto"
+	TextProto   Encoding = "textproto"
+	BinaryProto Encoding = "pb"
 
 	// TODO:
 	// TOML
-	// TextProto
-	// BinProto
 
 	Code Encoding = "code" // Programming languages
 )
@@ -62,9 +62,10 @@ const (
 	// the info.title and info.version fields.
 	//
 	// In all other cases, the underlying data is interpreted as is.
-	Auto       Interpretation = "auto"
-	JSONSchema Interpretation = "jsonschema"
-	OpenAPI    Interpretation = "openapi"
+	Auto         Interpretation = "auto"
+	JSONSchema   Interpretation = "jsonschema"
+	OpenAPI      Interpretation = "openapi"
+	ProtobufJSON Interpretation = "pb"
 )
 
 // A Form specifies the form in which a program should be represented.

@@ -185,9 +185,11 @@ var filetypeHelp = &cobra.Command{
     jsonl       .jsonl/.ldjson  Line-separated JSON values.
     jsonschema                  JSON Schema.
     openapi                     OpenAPI schema.
+	pb                          Use Protobuf mappings (e.g. json+pb)
+    textproto    .textproto     Text-based protocol buffers.
     proto        .proto         Protocol Buffer definitions.
-    go          .go             Go source files.
-    text        .txt            Raw text file; the evaluated
+    go           .go            Go source files.
+    text         .txt           Raw text file; the evaluated
                                 value must be of type string.
 
 OpenAPI, JSON Schema and Protocol Buffer definitions are
@@ -495,7 +497,6 @@ cuelang.org/go/pkg/tool/tool.cue.
 // - id=<url>
 
 // TODO: filetypes:
-// - textpb
 // - binpb
 
 // TODO: cue.mod help topic

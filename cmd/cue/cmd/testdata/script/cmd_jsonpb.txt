@@ -1,0 +1,81 @@
+cue eval schema.cue json+pb: data.json
+cmp stdout out/data1
+
+cue eval schemaflag.cue -d '#X' json+pb: data.json
+cmp stdout out/data1
+
+! cue eval schema.cue json+pb: data-err.json
+cmp stderr out/data-err
+
+cue eval .:nested yaml+pb: stream.yaml -l kind
+cmp stdout out/stream
+
+-- schema.cue --
+a: int @protobuf(1,int64) // to string
+b: int @protobuf(2,int32) // also allow string
+c: int // also allow
+d: float
+s: string
+t: bytes
+
+-- nested.cue --
+package nested
+
+A: {
+    a: int @protobuf(1,int64) // to string
+    b: bytes
+}
+
+B: {
+    a: int @protobuf(1,int64) // to string
+    s: string
+}
+
+-- schemaflag.cue --
+#X: {
+    a: int @protobuf(1,int64) // to string
+    b: int @protobuf(2,int32) // also allow string
+    c: int // also allow
+    d: float
+    s: string
+    t: bytes
+}
+
+-- data.json --
+{"a": "10", "b": "20", "c": 30, "d": "1.2",
+"s":"SGVsbG8sIOS4lueVjA==",
+"t": "SGVsbG8sIOS4lueVjA=="}
+
+-- data-err.json --
+{"a": "10", "b": "20", "c": "30", "t": "SGVsbG8sIOS4lue???VjA==" }
+
+-- stream.yaml --
+kind: "A"
+a: "10"
+b: "SGVsbG8sIOS4lueVjA=="
+---
+kind: "B"
+a: "10"
+s: "SGVsbG8sIOS4lueVjA=="
+
+-- out/data1 --
+a: 10
+b: 20
+c: 30
+d: 1.2
+s: "SGVsbG8sIOS4lueVjA=="
+t: 'Hello, 世界'
+-- out/stream --
+A: {
+    kind: "A"
+    a:    10
+    b:    'Hello, 世界'
+}
+B: {
+    kind: "B"
+    a:    10
+    s:    "SGVsbG8sIOS4lueVjA=="
+}
+-- out/data-err --
+t: failed to decode base64: illegal base64 data at input byte 15:
+    ./data-err.json:1:40

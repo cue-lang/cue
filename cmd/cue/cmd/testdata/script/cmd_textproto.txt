@@ -1,0 +1,37 @@
+cue eval topschema.cue foo.textproto
+cmp stdout out/topfoo.textproto
+
+cue eval -d '#X' schema.cue foo.textproto
+cmp stdout out/foo.textproto
+
+! cue eval -d '#X' schema.cue foo.textproto -l c
+cmp stderr out/stderr3
+
+-- topschema.cue --
+a: int
+b: [...int]
+c: string
+-- schema.cue --
+#X: {
+        a: int
+        b: [...int]
+        c: string
+}
+-- foo.textproto --
+a: 4
+b: 1
+b: 2
+b: 3
+b: 4
+b: 5
+c: "foo"
+-- out/topfoo.textproto --
+a: 4
+b: [1, 2, 3, 4, 5]
+c: "foo"
+-- out/foo.textproto --
+a: 4
+b: [1, 2, 3, 4, 5]
+c: "foo"
+-- out/stderr3 --
+cannot combine --schema flag with flag "path", "list", or "files"

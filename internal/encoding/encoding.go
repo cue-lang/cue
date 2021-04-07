@@ -37,6 +37,8 @@ import (
 	"cuelang.org/go/encoding/jsonschema"
 	"cuelang.org/go/encoding/openapi"
 	"cuelang.org/go/encoding/protobuf"
+	"cuelang.org/go/encoding/protobuf/jsonpb"
+	"cuelang.org/go/encoding/protobuf/textproto"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/third_party/yaml"
@@ -48,6 +50,7 @@ type Decoder struct {
 	cfg            *Config
 	closer         io.Closer
 	next           func() (ast.Expr, error)
+	rewriteFunc    rewriteFunc
 	interpretFunc  interpretFunc
 	interpretation build.Interpretation
 	expr           ast.Expr
@@ -59,6 +62,7 @@ type Decoder struct {
 }
 
 type interpretFunc func(*cue.Instance) (file *ast.File, id string, err error)
+type rewriteFunc func(*ast.File) (file *ast.File, err error)
 
 // ID returns a canonical identifier for the decoded object or "" if no such
 // identifier could be found.
@@ -89,7 +93,15 @@ func (i *Decoder) Next() {
 }
 
 func (i *Decoder) doInterpret() {
-	// Interpretations
+	if i.rewriteFunc != nil {
+		i.file = i.File()
+		var err error
+		i.file, err = i.rewriteFunc(i.file)
+		if err != nil {
+			i.err = err
+			return
+		}
+	}
 	if i.interpretFunc != nil {
 		var r cue.Runtime
 		i.file = i.File()
@@ -208,6 +220,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 	case build.JSONSchema:
 		i.interpretation = build.JSONSchema
 		i.interpretFunc = jsonSchemaFunc(cfg, f)
+	case build.ProtobufJSON:
+		i.interpretation = build.ProtobufJSON
+		i.rewriteFunc = protobufJSONFunc(cfg, f)
 	default:
 		i.err = fmt.Errorf("unsupported interpretation %q", f.Interpretation)
 	}
@@ -242,6 +257,13 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 			PkgName: cfg.PkgName,
 		}
 		i.file, i.err = protobuf.Extract(path, r, paths)
+	case build.TextProto:
+		b, err := ioutil.ReadAll(r)
+		i.err = err
+		if err == nil {
+			d := textproto.NewDecoder()
+			i.expr, i.err = d.Parse(cfg.Schema, path, b)
+		}
 	default:
 		i.err = fmt.Errorf("unsupported encoding %q", f.Encoding)
 	}
@@ -283,6 +305,16 @@ func openAPIFunc(c *Config, f *build.File) interpretFunc {
 		// TODO: simplify currently erases file line info. Reintroduce after fix.
 		// file, err = simplify(file, err)
 		return file, "", err
+	}
+}
+
+func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
+	return func(f *ast.File) (*ast.File, error) {
+		if !cfg.Schema.Exists() {
+			return f, errors.Newf(token.NoPos,
+				"no schema specified for protobuf interpretation.")
+		}
+		return f, jsonpb.NewDecoder(cfg.Schema).RewriteFile(f)
 	}
 }
 

@@ -27,6 +27,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/encoding/protobuf/jsonpb"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/encoding"
@@ -172,6 +173,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 		expr := internal.ToExpr(file)
 		p, _, _ := internal.PackageInfo(file)
 
+		var path cue.Path
 		var labels []ast.Label
 
 		switch {
@@ -226,6 +228,22 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 				}
 				a = append(a, cue.Label(label))
 				labels = append(labels, label)
+			}
+
+			path = cue.MakePath(a...)
+		}
+
+		switch d.Interpretation() {
+		case build.ProtobufJSON:
+			v := b.instance.Value().LookupPath(path)
+			if b.useList {
+				v, _ = v.Elem()
+			}
+			if !v.Exists() {
+				break
+			}
+			if err := jsonpb.NewDecoder(v).RewriteFile(file); err != nil {
+				return nil, err
 			}
 		}
 

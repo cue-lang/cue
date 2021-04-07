@@ -1539,6 +1539,8 @@ outer:
 				continue outer
 			}
 		}
+		// TODO: if optional, look up template for name.
+
 		var x *adt.Bottom
 		if err, ok := sel.sel.(pathError); ok {
 			x = &adt.Bottom{Err: err.Error}
@@ -1555,6 +1557,8 @@ outer:
 // LookupDef reports the definition with the given name within struct v. The
 // Exists method of the returned value will report false if the definition did
 // not exist. The Err method reports if any error occurred during evaluation.
+//
+// Deprecated: use lookupPath.
 func (v Value) LookupDef(name string) Value {
 	ctx := v.ctx()
 	o, err := v.structValFull(ctx)
@@ -1649,9 +1653,14 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 // FillPath creates a new value by unifying v with the value of x at the given
 // path.
 //
-// Values may be any Go value that can be converted to CUE, an ast.Expr or a
-// Value. In the latter case, it will panic if the Value is not from the same
-// Runtime.
+// If x is an cue/ast.Expr, it will be evaluated within the context of the
+// given path: identifiers that are not resolved within the expression are
+// resolved as if they were defined at the path position.
+//
+// If x is a Value, it will be used as is. It panics if x is not created
+// from the same Runtime as v.
+//
+// Otherwise, the given Go value will be converted to CUE.
 //
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.
@@ -1659,13 +1668,28 @@ func (v Value) Fill(x interface{}, path ...string) Value {
 // List paths are not supported at this time.
 func (v Value) FillPath(p Path, x interface{}) Value {
 	if v.v == nil {
+		// TODO: panic here?
 		return v
 	}
 	ctx := v.ctx()
 	if err := p.Err(); err != nil {
 		return newErrValue(v, ctx.mkErr(nil, 0, "invalid path: %v", err))
 	}
-	var expr adt.Expr = convert.GoValueToValue(ctx.opCtx, x, true)
+	var expr adt.Expr
+	switch x := x.(type) {
+	case Value:
+		if v.idx != x.idx {
+			panic("values are not from the same runtime")
+		}
+		expr = x.v
+	case adt.Node, adt.Feature:
+		panic("cannot set internal Value or Feature type")
+	case ast.Expr:
+		n := getScopePrefix(v, p)
+		expr = resolveExpr(ctx, n, x)
+	default:
+		expr = convert.GoValueToValue(ctx.opCtx, x, true)
+	}
 	for i := len(p.path) - 1; i >= 0; i-- {
 		expr = &adt.StructLit{Decls: []adt.Decl{
 			&adt.Field{

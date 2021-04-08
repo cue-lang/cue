@@ -36,18 +36,22 @@ outer:
 		}
 	}
 
-	if !arc.Label.IsRegular() {
+	f := arc.Label
+	if !f.IsRegular() {
 		return
+	}
+	if int64(f.Index()) == MaxIndex {
+		f = 0
 	}
 
 	var label Value
-	if o.types&HasComplexPattern != 0 && arc.Label.IsString() {
-		label = arc.Label.ToValue(c)
+	if o.types&HasComplexPattern != 0 && f.IsString() {
+		label = f.ToValue(c)
 	}
 
 	if len(o.Bulk) > 0 {
 		bulkEnv := *env
-		bulkEnv.DynamicLabel = arc.Label
+		bulkEnv.DynamicLabel = f
 		bulkEnv.Deref = nil
 		bulkEnv.Cycles = nil
 
@@ -56,7 +60,7 @@ outer:
 			// if matched && f.additional {
 			// 	continue
 			// }
-			if matchBulk(c, env, b, arc.Label, label) {
+			if matchBulk(c, env, b, f, label) {
 				matched = true
 				info := closeInfo.SpawnSpan(b.Value, ConstraintSpan)
 				arc.AddConjunct(MakeConjunct(&bulkEnv, b, info))

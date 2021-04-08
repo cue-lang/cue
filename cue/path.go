@@ -70,11 +70,18 @@ var (
 	anyLabel  = Selector{sel: anySelector(adt.AnyRegular)}
 )
 
+// Optional converts sel into an optional equivalent.
+//     foo -> foo?
+func (sel Selector) Optional() Selector {
+	return wrapOptional(sel)
+}
+
 type selector interface {
 	String() string
 
 	feature(ctx adt.Runtime) adt.Feature
 	kind() adt.FeatureType
+	optional() bool
 }
 
 // A Path is series of selectors to query a CUE value.
@@ -142,6 +149,17 @@ func (p Path) String() string {
 		b.WriteString(x.String())
 	}
 	return b.String()
+}
+
+// Optional returns the optional form of a Path. For instance,
+//    foo.bar  --> foo?.bar?
+//
+func (p Path) Optional() Path {
+	q := make([]Selector, 0, len(p.path))
+	for _, s := range p.path {
+		q = appendSelector(q, wrapOptional(s))
+	}
+	return Path{path: q}
 }
 
 func toSelectors(expr ast.Expr) []Selector {
@@ -293,6 +311,7 @@ type scopedSelector struct {
 func (s scopedSelector) String() string {
 	return s.name
 }
+func (scopedSelector) optional() bool { return false }
 
 func (s scopedSelector) kind() adt.FeatureType {
 	switch {
@@ -331,6 +350,8 @@ func (d definitionSelector) String() string {
 	return string(d)
 }
 
+func (d definitionSelector) optional() bool { return false }
+
 func (d definitionSelector) kind() adt.FeatureType {
 	return adt.DefinitionLabel
 }
@@ -354,6 +375,7 @@ func (s stringSelector) String() string {
 	return str
 }
 
+func (s stringSelector) optional() bool        { return false }
 func (s stringSelector) kind() adt.FeatureType { return adt.StringLabel }
 
 func (s stringSelector) feature(r adt.Runtime) adt.Feature {
@@ -376,6 +398,7 @@ func (s indexSelector) String() string {
 }
 
 func (s indexSelector) kind() adt.FeatureType { return adt.IntLabel }
+func (s indexSelector) optional() bool        { return false }
 
 func (s indexSelector) feature(r adt.Runtime) adt.Feature {
 	return adt.Feature(s)
@@ -385,6 +408,7 @@ func (s indexSelector) feature(r adt.Runtime) adt.Feature {
 type anySelector adt.Feature
 
 func (s anySelector) String() string        { return "_" }
+func (s anySelector) optional() bool        { return true }
 func (s anySelector) kind() adt.FeatureType { return adt.Feature(s).Typ() }
 
 func (s anySelector) feature(r adt.Runtime) adt.Feature {
@@ -398,16 +422,27 @@ func (s anySelector) feature(r adt.Runtime) adt.Feature {
 // func ImportPath(s string) Selector {
 // 	return importSelector(s)
 // }
+type optionalSelector struct {
+	selector
+}
 
-// type importSelector string
+func wrapOptional(sel Selector) Selector {
+	if !sel.sel.optional() {
+		sel = Selector{optionalSelector{sel.sel}}
+	}
+	return sel
+}
 
-// func (s importSelector) String() string {
-// 	return literal.String.Quote(string(s))
+// func isOptional(sel selector) bool {
+// 	_, ok := sel.(optionalSelector)
+// 	return ok
 // }
 
-// func (s importSelector) feature(r adt.Runtime) adt.Feature {
-// 	return adt.InvalidLabel
-// }
+func (s optionalSelector) optional() bool { return true }
+
+func (s optionalSelector) String() string {
+	return s.selector.String() + "?"
+}
 
 // TODO: allow looking up in parent scopes?
 
@@ -429,6 +464,7 @@ type pathError struct {
 }
 
 func (p pathError) String() string        { return p.Error.Error() }
+func (p pathError) optional() bool        { return false }
 func (p pathError) kind() adt.FeatureType { return 0 }
 func (p pathError) feature(r adt.Runtime) adt.Feature {
 	return adt.InvalidLabel

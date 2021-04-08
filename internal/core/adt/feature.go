@@ -127,6 +127,7 @@ func (f Feature) ToValue(ctx *OpContext) Value {
 	if !f.IsRegular() {
 		panic("not a regular label")
 	}
+	// TODO: Handle special regular values: invalid and AnyRegular.
 	if f.IsInt() {
 		return ctx.NewInt64(int64(f.Index()))
 	}

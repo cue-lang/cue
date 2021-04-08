@@ -334,7 +334,7 @@ func (s scopedSelector) feature(r adt.Runtime) adt.Feature {
 // not prefixed with a #. It will panic if s cannot be written as a valid
 // identifier.
 func Def(s string) Selector {
-	if !strings.HasPrefix(s, "#") {
+	if !strings.HasPrefix(s, "#") && !strings.HasPrefix(s, "_#") {
 		s = "#" + s
 	}
 	if !ast.IsValidIdent(s) {

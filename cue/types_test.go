@@ -1432,11 +1432,11 @@ func TestValue_LookupDef(t *testing.T) {
 	}, {
 		in:  `_foo: 3`,
 		def: "_foo",
-		out: `_|_ // definition "_foo" not found`,
+		out: `_|_ // field "#_foo" not found`,
 	}, {
 		in:  `_#foo: 3`,
 		def: "_#foo",
-		out: `_|_ // definition "_#foo" not found`,
+		out: `_|_ // field "_#foo" not found`,
 	}, {
 		in:  `"foo", #foo: 3`,
 		def: "#foo",

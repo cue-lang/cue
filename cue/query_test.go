@@ -26,17 +26,11 @@ func TestLookupPath(t *testing.T) {
 	r := &cue.Runtime{}
 
 	testCases := []struct {
-		in       string
-		path     cue.Path
-		out      string `test:"update"` // :nerdSnipe:
-		notExist bool   `test:"update"` // :nerdSnipe:
+		in   string
+		path cue.Path
+		out  string `test:"update"` // :nerdSnipe:
+		err  string `test:"update"` // :nerdSnipe:
 	}{{
-		in: `
-		[Name=string]: { a: Name }
-		`,
-		path:     cue.MakePath(cue.Str("a")),
-		notExist: true,
-	}, {
 		in: `
 		#V: {
 			x: int
@@ -48,6 +42,22 @@ func TestLookupPath(t *testing.T) {
 		`,
 		path: cue.ParsePath("v.x"),
 		out:  `int64`,
+	}, {
+		in:   `#foo: 3`,
+		path: cue.ParsePath("#foo"),
+		out:  `3`,
+	}, {
+		in:   `_foo: 3`,
+		path: cue.MakePath(cue.Def("_foo")),
+		err:  `field "#_foo" not found`,
+	}, {
+		in:   `_#foo: 3`,
+		path: cue.MakePath(cue.Def("_#foo")),
+		err:  `field "_#foo" not found`,
+	}, {
+		in:   `"foo", #foo: 3`,
+		path: cue.ParsePath("#foo"),
+		out:  `3`,
 	}, {
 		in: `
 		a: [...int]
@@ -89,8 +99,8 @@ func TestLookupPath(t *testing.T) {
 		in: `
 		[Name=string]: { a: Name }
 		`,
-		path:     cue.MakePath(cue.Str("a")),
-		notExist: true,
+		path: cue.MakePath(cue.Str("a")),
+		err:  `field "a" not found`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.path.String(), func(t *testing.T) {
@@ -98,8 +108,14 @@ func TestLookupPath(t *testing.T) {
 
 			v = v.LookupPath(tc.path)
 
-			if exists := v.Exists(); exists != !tc.notExist {
-				t.Fatalf("exists: got %v; want: %v", exists, !tc.notExist)
+			if err := v.Err(); err != nil || tc.err != "" {
+				if got := err.Error(); got != tc.err {
+					t.Errorf("error: got %v; want %v", got, tc.err)
+				}
+			}
+
+			if exists := v.Exists(); exists != (tc.err == "") {
+				t.Fatalf("exists: got %v; want: %v", exists, tc.err == "")
 			} else if !exists {
 				return
 			}

@@ -1362,6 +1362,7 @@ func (v Value) structValOpts(ctx *context, o options) (s structValue, err *adt.B
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
 func (v Value) Struct() (*Struct, error) {
+	// TODO: deprecate
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, options{})
 	if err != nil {
@@ -1451,7 +1452,7 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 }
 
 // Lookup reports the value at a path starting from v. The empty path returns v
-// itself. Use LookupDef for definitions or LookupField for any kind of field.
+// itself.
 //
 // The Exists() method can be used to verify if the returned value existed.
 // Lookup cannot be used to look up hidden or optional fields or definitions.
@@ -1499,35 +1500,11 @@ func (v Value) Path() Path {
 	return Path{path: a}
 }
 
-// LookupDef reports the definition with the given name within struct v. The
-// Exists method of the returned value will report false if the definition did
-// not exist. The Err method reports if any error occurred during evaluation.
+// LookupDef is equal to LookupPath(MakePath(Def(name))).
 //
 // Deprecated: use LookupPath.
 func (v Value) LookupDef(name string) Value {
-	ctx := v.ctx()
-	o, err := v.structValFull(ctx)
-	if err != nil {
-		return newErrValue(v, err)
-	}
-
-	f := v.ctx().Label(name, true)
-	for i, a := range o.features {
-		if a == f {
-			if f.IsHidden() || !f.IsDef() { // optional not possible for now
-				break
-			}
-			return newChildValue(&o, i)
-		}
-	}
-	if !strings.HasPrefix(name, "#") {
-		alt := v.LookupDef("#" + name)
-		// Use the original error message if this resulted in an error as well.
-		if alt.Err() == nil {
-			return alt
-		}
-	}
-	return newErrValue(v, ctx.mkErr(v.v, "definition %q not found", name))
+	return v.LookupPath(MakePath(Def(name)))
 }
 
 var errNotFound = errors.Newf(token.NoPos, "field not found")
@@ -1535,6 +1512,8 @@ var errNotFound = errors.Newf(token.NoPos, "field not found")
 // FieldByName looks up a field for the given name. If isIdent is true, it will
 // look up a definition or hidden field (starting with `_` or `_#`). Otherwise
 // it interprets name as an arbitrary string for a regular field.
+//
+// Deprecated: use LookupPath.
 func (v Value) FieldByName(name string, isIdent bool) (f FieldInfo, err error) {
 	s, err := v.Struct()
 	if err != nil {
@@ -1545,7 +1524,7 @@ func (v Value) FieldByName(name string, isIdent bool) (f FieldInfo, err error) {
 
 // LookupField reports information about a field of v.
 //
-// Deprecated: this API does not work with new-style definitions. Use FieldByName.
+// Deprecated: use LookupPath
 func (v Value) LookupField(name string) (FieldInfo, error) {
 	s, err := v.Struct()
 	if err != nil {

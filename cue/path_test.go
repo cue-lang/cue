@@ -70,7 +70,7 @@ func Test(t *testing.T) {
 	}, {
 		path: ParsePath("#Foo.a.c"),
 		str:  "#Foo.a.c",
-		out:  `_|_ // value "c" not found`,
+		out:  `_|_ // field "c" not found`,
 	}, {
 		path: ParsePath(`b[2]`),
 		str:  `b[2]`,

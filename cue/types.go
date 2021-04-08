@@ -1208,22 +1208,15 @@ func (v Value) Len() Value {
 }
 
 // Elem returns the value of undefined element types of lists and structs.
+//
+// Deprecated: use LookupPath in combination with "AnyString" or "AnyIndex".
 func (v Value) Elem() (Value, bool) {
-	if v.v == nil {
-		return Value{}, false
+	sel := AnyString
+	if v.v.IsList() {
+		sel = AnyIndex
 	}
-	ctx := v.ctx().opCtx
-	x := &adt.Vertex{
-		Parent: v.v,
-		Label:  0,
-	}
-	v.v.Finalize(ctx)
-	v.v.MatchAndInsert(ctx, x)
-	if len(x.Conjuncts) == 0 {
-		return Value{}, false
-	}
-	x.Finalize(ctx)
-	return makeValue(v.idx, x), true
+	x := v.LookupPath(MakePath(sel))
+	return x, x.Exists()
 }
 
 // List creates an iterator over the values of a list or reports an error if
@@ -1663,8 +1656,9 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 //
 // The returned function returns the value that would be unified with field
 // given its name.
+//
+// Deprecated: use LookupPath in combination with using optional selectors.
 func (v Value) Template() func(label string) Value {
-	// TODO: rename to optional.
 	if v.v == nil {
 		return nil
 	}
@@ -1674,17 +1668,8 @@ func (v Value) Template() func(label string) Value {
 		return nil
 	}
 
-	parent := v.v
-	ctx := v.ctx().opCtx
 	return func(label string) Value {
-		f := ctx.StringLabel(label)
-		arc := &adt.Vertex{Parent: parent, Label: f}
-		v.v.MatchAndInsert(ctx, arc)
-		if len(arc.Conjuncts) == 0 {
-			return Value{}
-		}
-		arc.Finalize(ctx)
-		return makeValue(v.idx, arc)
+		return v.LookupPath(MakePath(Str(label).Optional()))
 	}
 }
 

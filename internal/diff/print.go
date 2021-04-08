@@ -98,7 +98,8 @@ func (p *printer) script(e *EditScript) {
 	case cue.ListKind:
 		p.printList(e)
 	default:
-		p.printf("BadExpr")
+		p.printElem("-", e.x)
+		p.printElem("+", e.y)
 	}
 }
 
@@ -194,7 +195,7 @@ func (p *printer) printSkipped(n int) {
 
 func (p *printer) printValue(v cue.Value) {
 	// TODO: have indent option.
-	s := fmt.Sprintf("%-v", v)
+	s := fmt.Sprintf("%+v", v)
 	io.WriteString(p, s)
 }
 

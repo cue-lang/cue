@@ -34,6 +34,8 @@ var (
 	}
 )
 
+// TODO: don't return Kind, which is always Modified or not.
+
 // Diff is a shorthand for Schema.Diff.
 func Diff(x, y cue.Value) (Kind, *EditScript) {
 	return Schema.Diff(x, y)
@@ -42,7 +44,11 @@ func Diff(x, y cue.Value) (Kind, *EditScript) {
 // Diff returns an edit script representing the difference between x and y.
 func (p *Profile) Diff(x, y cue.Value) (Kind, *EditScript) {
 	d := differ{cfg: *p}
-	return d.diffValue(x, y)
+	k, es := d.diffValue(x, y)
+	if k == Modified && es == nil {
+		es = &EditScript{x: x, y: y}
+	}
+	return k, es
 }
 
 // Kind identifies the kind of operation of an edit script.

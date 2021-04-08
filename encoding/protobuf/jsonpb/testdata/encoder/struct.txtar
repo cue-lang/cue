@@ -1,0 +1,28 @@
+-- schema.cue --
+a: {
+    {b: int @protobuf(1,int64)}
+
+    c: int @protobuf(1,int64)
+
+    {d: int @protobuf(1,int32)}
+
+    e: int @protobuf(1,int32)
+
+}
+-- value.cue --
+// Hello
+a: {
+    b: 1
+    c: 2
+    d: 3
+    e: 4
+}
+
+-- out/jsonpb --
+// Hello
+a: {
+	b: "1"
+	c: "2"
+	d: 3
+	e: 4
+}

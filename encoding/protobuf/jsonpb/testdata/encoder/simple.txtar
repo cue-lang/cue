@@ -1,0 +1,27 @@
+-- value.cue --
+a: 1 @protobuf(1, int64)
+b: 2 @protobuf(1, int32)
+c: 3.4 @protobuf(1, int64)
+
+d: "foo\u1234"
+e: '\000'
+
+f: false
+// Doc comment
+t: true
+
+notConcrete: string
+
+-- out/jsonpb --
+a: "1" @protobuf(1, int64)
+b: 2   @protobuf(1, int32)
+c: 3.4 @protobuf(1, int64)
+
+d: "foo\u1234"
+e: '\000'
+
+f: false
+// Doc comment
+t: true
+
+notConcrete: string

@@ -14,4 +14,6 @@
 
 // Package jsonpb rewrites a CUE expression based upon the Protobuf
 // interpretation of JSON.
+//
+// API Status: DRAFT: API may change without notice.
 package jsonpb

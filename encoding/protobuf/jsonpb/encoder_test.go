@@ -15,25 +15,21 @@
 package jsonpb_test
 
 import (
-	"strings"
 	"testing"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/protobuf/jsonpb"
-	"cuelang.org/go/encoding/yaml"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
 
-func TestParse(t *testing.T) {
+func TestEncoder(t *testing.T) {
 	test := cuetxtar.TxTarTest{
-		Root:   "./testdata/decoder",
+		Root:   "./testdata/encoder",
 		Name:   "jsonpb",
 		Update: cuetest.UpdateGoldenFiles,
 	}
@@ -55,80 +51,34 @@ func TestParse(t *testing.T) {
 					return
 				}
 				schema = inst.Value()
-				continue
 
-			case strings.HasPrefix(f.Name, "out/"):
-				continue
-
-			case strings.HasSuffix(f.Name, ".cue"):
+			case f.Name == "value.cue":
 				f, err := parser.ParseFile(f.Name, f.Data, parser.ParseComments)
 				if err != nil {
-					t.Fatal(err)
-				}
-				file = f
-
-			case strings.HasSuffix(f.Name, ".json"):
-				x, err := json.Extract(f.Name, f.Data)
-				if err != nil {
-					t.Fatal(err)
-				}
-				file, err = astutil.ToFile(x)
-				if err != nil {
-					t.Fatal(err)
-				}
-
-			case strings.HasSuffix(f.Name, ".yaml"):
-				f, err := yaml.Extract(f.Name, f.Data)
-				if err != nil {
-					t.Fatal(err)
+					t.WriteErrors(errors.Promote(err, "test"))
+					return
 				}
 				file = f
 			}
-
-			w := t.Writer(f.Name)
-			err := jsonpb.NewDecoder(schema).RewriteFile(file)
-			if err != nil {
-				errors.Print(w, err, nil)
-				continue
-			}
-
-			b, err := format.Node(file)
-			if err != nil {
-				t.Fatal(err)
-			}
-			_, _ = w.Write(b)
 		}
+
+		if !schema.Exists() {
+			inst, err := r.CompileFile(file)
+			if err != nil {
+				t.WriteErrors(errors.Promote(err, "test"))
+			}
+			schema = inst.Value()
+		}
+
+		err := jsonpb.NewEncoder(schema).RewriteFile(file)
+		if err != nil {
+			errors.Print(t, err, nil)
+		}
+
+		b, err := format.Node(file)
+		if err != nil {
+			t.Fatal(err)
+		}
+		_, _ = t.Write(b)
 	})
-}
-
-// For debugging purposes: DO NOT REMOVE.
-func TestX(t *testing.T) {
-	const schema = `
-
-		`
-	const data = `
-`
-	if strings.TrimSpace(data) == "" {
-		t.Skip()
-	}
-	var r cue.Runtime
-	inst, err := r.Compile("schema", schema)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	file, err := parser.ParseFile("data", data)
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	if err := jsonpb.NewDecoder(inst.Value()).RewriteFile(file); err != nil {
-		t.Fatal(err)
-	}
-
-	b, err := format.Node(file)
-	if err != nil {
-		t.Fatal(err)
-	}
-	t.Error(string(b))
 }

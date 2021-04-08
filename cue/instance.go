@@ -278,7 +278,7 @@ func (inst *Instance) Eval(expr ast.Expr) Value {
 	return newValueRoot(ctx, result)
 }
 
-// Merge unifies the given instances into a single one.
+// DO NOT USE.
 //
 // Deprecated: do not use.
 func Merge(inst ...*Instance) *Instance {

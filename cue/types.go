@@ -1506,38 +1506,11 @@ func (v Value) Path() Path {
 	return Path{path: a}
 }
 
-// LookupPath reports the value for path p relative to v.
-func (v Value) LookupPath(p Path) Value {
-	n := v.v
-outer:
-	for _, sel := range p.path {
-		f := sel.sel.feature(v.idx.Runtime)
-		for _, a := range n.Arcs {
-			if a.Label == f {
-				n = a
-				continue outer
-			}
-		}
-		// TODO: if optional, look up template for name.
-
-		var x *adt.Bottom
-		if err, ok := sel.sel.(pathError); ok {
-			x = &adt.Bottom{Err: err.Error}
-		} else {
-			// TODO: better message.
-			x = v.idx.mkErr(n, codeNotExist, "value %q not found", sel.sel)
-		}
-		v := makeValue(v.idx, n)
-		return newErrValue(v, x)
-	}
-	return makeValue(v.idx, n)
-}
-
 // LookupDef reports the definition with the given name within struct v. The
 // Exists method of the returned value will report false if the definition did
 // not exist. The Err method reports if any error occurred during evaluation.
 //
-// Deprecated: use lookupPath.
+// Deprecated: use LookupPath.
 func (v Value) LookupDef(name string) Value {
 	ctx := v.ctx()
 	o, err := v.structValFull(ctx)

@@ -147,6 +147,9 @@ func TestX(t *testing.T) {
 	for s := bufio.NewScanner(bytes.NewReader(a.Comment)); s.Scan(); {
 		cmd := s.Text()
 		cmd = strings.TrimLeft(cmd, "! ")
+		if strings.HasPrefix(cmd, "exec ") {
+			cmd = cmd[len("exec "):]
+		}
 		if !strings.HasPrefix(cmd, "cue ") {
 			continue
 		}

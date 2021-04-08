@@ -49,11 +49,6 @@ type Instance struct {
 	loadFunc LoadFunc
 	done     bool
 
-	// Scope is another instance that may be used to resolve any unresolved
-	// reference of this instance. For instance, tool and test instances
-	// may refer to top-level fields in their package scope.
-	Scope *Instance
-
 	// PkgName is the name specified in the package clause.
 	PkgName string
 	hasName bool

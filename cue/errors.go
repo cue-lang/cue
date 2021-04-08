@@ -89,25 +89,18 @@ func (e *valueError) Path() (a []string) {
 	return e.v.appendPath(nil)
 }
 
-type errCode = adt.ErrorCode
-
-const (
-	codeNotExist   = adt.NotExistError
-	codeIncomplete = adt.IncompleteError
-)
-
 var errNotExists = &adt.Bottom{
-	Code: codeNotExist,
+	Code: adt.NotExistError,
 	Err:  errors.Newf(token.NoPos, "undefined value"),
 }
 
 func (idx *index) mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
 	var e *adt.Bottom
-	var code errCode = -1
+	var code adt.ErrorCode = -1
 outer:
 	for i, a := range args {
 		switch x := a.(type) {
-		case errCode:
+		case adt.ErrorCode:
 			code = x
 		case *adt.Bottom:
 			e = adt.CombineErrors(nil, e, x)

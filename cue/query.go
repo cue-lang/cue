@@ -72,7 +72,7 @@ outer:
 			x = &adt.Bottom{Err: err.Error}
 		} else {
 			// TODO: better message.
-			x = v.idx.mkErr(n, codeNotExist, "value %q not found", sel.sel)
+			x = v.idx.mkErr(n, adt.NotExistError, "value %q not found", sel.sel)
 		}
 		v := makeValue(v.idx, n)
 		return newErrValue(v, x)

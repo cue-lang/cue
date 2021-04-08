@@ -136,7 +136,7 @@ func (o *structValue) Lookup(key string) Value {
 	if i == len {
 		// TODO: better message.
 		ctx := o.ctx
-		x := ctx.mkErr(o.obj, codeNotExist, "value %q not found", key)
+		x := ctx.mkErr(o.obj, adt.NotExistError, "value %q not found", key)
 		return newErrValue(o.v, x)
 	}
 	return newChildValue(o, i)
@@ -179,7 +179,7 @@ func toMarshalErr(v Value, b *adt.Bottom) error {
 	return &marshalError{v.toErr(b), b}
 }
 
-func marshalErrf(v Value, src adt.Node, code errCode, msg string, args ...interface{}) error {
+func marshalErrf(v Value, src adt.Node, code adt.ErrorCode, msg string, args ...interface{}) error {
 	arguments := append([]interface{}{code, msg}, args...)
 	b := v.idx.mkErr(src, arguments...)
 	return toMarshalErr(v, b)
@@ -880,10 +880,10 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	x := v.eval(ctx)
 
 	if _, ok := x.(adt.Resolver); ok {
-		return nil, marshalErrf(v, x, codeIncomplete, "value %q contains unresolved references", ctx.str(x))
+		return nil, marshalErrf(v, x, adt.IncompleteError, "value %q contains unresolved references", ctx.str(x))
 	}
 	if !adt.IsConcrete(x) {
-		return nil, marshalErrf(v, x, codeIncomplete, "cannot convert incomplete value %q to JSON", ctx.str(x))
+		return nil, marshalErrf(v, x, adt.IncompleteError, "cannot convert incomplete value %q to JSON", ctx.str(x))
 	}
 
 	// TODO: implement marshalles in value.
@@ -1139,7 +1139,7 @@ func (v Value) Exists() bool {
 		return false
 	}
 	if err, ok := v.v.BaseValue.(*adt.Bottom); ok {
-		return err.Code != codeNotExist
+		return err.Code != adt.NotExistError
 	}
 	return true
 }
@@ -1160,7 +1160,7 @@ func (v Value) checkKind(ctx *context, want adt.Kind) *adt.Bottom {
 				ctx.opCtx.Str(x), k, want)
 		}
 		if !adt.IsConcrete(x) {
-			return ctx.mkErr(x, codeIncomplete, "non-concrete value %v", k)
+			return ctx.mkErr(x, adt.IncompleteError, "non-concrete value %v", k)
 		}
 	}
 	return nil

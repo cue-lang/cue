@@ -63,7 +63,7 @@ func (v Value) LookupPath(p Path) Value {
 
 outer:
 	for _, sel := range p.path {
-		f := sel.sel.feature(v.idx.Runtime)
+		f := sel.sel.feature(v.idx)
 		for _, a := range n.Arcs {
 			if a.Label == f {
 				n = a

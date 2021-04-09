@@ -23,12 +23,13 @@ import (
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // An Instance defines a single configuration based on a collection of
 // underlying CUE files.
 type Instance struct {
-	index *index
+	index *runtime.Runtime
 
 	root *adt.Vertex
 
@@ -45,28 +46,27 @@ type Instance struct {
 	// complete bool // for cycle detection
 }
 
-func addInst(x *index, p *Instance) *Instance {
+func addInst(x *runtime.Runtime, p *Instance) *Instance {
 	if p.inst == nil {
 		p.inst = &build.Instance{
 			ImportPath: p.ImportPath,
 			PkgName:    p.PkgName,
 		}
 	}
-	// fmt.Println(p.ImportPath, "XXX")
 	x.AddInst(p.ImportPath, p.root, p.inst)
 	x.SetBuildData(p.inst, p)
 	p.index = x
 	return p
 }
 
-func lookupInstance(x *index, p *build.Instance) *Instance {
+func lookupInstance(x *runtime.Runtime, p *build.Instance) *Instance {
 	if x, ok := x.BuildData(p); ok {
 		return x.(*Instance)
 	}
 	return nil
 }
 
-func getImportFromBuild(x *index, p *build.Instance, v *adt.Vertex) *Instance {
+func getImportFromBuild(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance {
 	inst := lookupInstance(x, p)
 
 	if inst != nil {
@@ -91,7 +91,7 @@ func getImportFromBuild(x *index, p *build.Instance, v *adt.Vertex) *Instance {
 	return inst
 }
 
-func getImportFromNode(x *index, v *adt.Vertex) *Instance {
+func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
 	p := x.GetInstanceFromNode(v)
 	if p == nil {
 		return nil
@@ -100,7 +100,7 @@ func getImportFromNode(x *index, v *adt.Vertex) *Instance {
 	return getImportFromBuild(x, p, v)
 }
 
-func getImportFromPath(x *index, id string) *Instance {
+func getImportFromPath(x *runtime.Runtime, id string) *Instance {
 	node, _ := x.LoadImport(id)
 	if node == nil {
 		return nil
@@ -135,7 +135,7 @@ func init() {
 }
 
 // newInstance creates a new instance. Use Insert to populate the instance.
-func newInstance(x *index, p *build.Instance, v *adt.Vertex) *Instance {
+func newInstance(x *runtime.Runtime, p *build.Instance, v *adt.Vertex) *Instance {
 	// TODO: associate root source with structLit.
 	inst := &Instance{
 		root: v,
@@ -316,7 +316,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 	p.Complete()
 
 	idx := inst.index
-	r := inst.index.Runtime
+	r := inst.index
 
 	rErr := r.ResolveFiles(p)
 
@@ -411,7 +411,7 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 			u.AddConjunct(c)
 		}
 	} else {
-		ctx := eval.NewContext(inst.index.Runtime, nil)
+		ctx := eval.NewContext(inst.index, nil)
 		expr := convert.GoValueToExpr(ctx, true, x)
 		u.AddConjunct(adt.MakeRootConjunct(nil, expr))
 		u.Finalize(ctx)

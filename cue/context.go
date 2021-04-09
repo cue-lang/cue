@@ -18,14 +18,15 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
 )
 
 // newContext returns a new evaluation context.
-func newContext(idx *index) *adt.OpContext {
+func newContext(idx *runtime.Runtime) *adt.OpContext {
 	if idx == nil {
 		return nil
 	}
-	return eval.NewContext(idx.Runtime, nil)
+	return eval.NewContext(idx, nil)
 }
 
 func debugStr(ctx *adt.OpContext, v adt.Node) string {

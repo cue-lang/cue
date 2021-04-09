@@ -213,7 +213,7 @@ func unwrapJSONError(err error) errors.Error {
 //
 type Iterator struct {
 	val   Value
-	idx   *index
+	idx   *runtime.Runtime
 	ctx   *adt.OpContext
 	arcs  []field
 	p     int
@@ -551,7 +551,7 @@ func (v Value) appendPath(a []string) []string {
 			}
 			a = append(a, label)
 		default:
-			a = append(a, f.SelectorString(v.idx.Runtime))
+			a = append(a, f.SelectorString(v.idx))
 		}
 	}
 	return a
@@ -560,7 +560,7 @@ func (v Value) appendPath(a []string) []string {
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,
 // Struct, or String.
 type Value struct {
-	idx *index
+	idx *runtime.Runtime
 	v   *adt.Vertex
 }
 
@@ -575,7 +575,7 @@ func newErrValue(v Value, b *adt.Bottom) Value {
 	return makeValue(v.idx, node)
 }
 
-func newVertexRoot(idx *index, ctx *adt.OpContext, x *adt.Vertex) Value {
+func newVertexRoot(idx *runtime.Runtime, ctx *adt.OpContext, x *adt.Vertex) Value {
 	if ctx != nil {
 		// This is indicative of an zero Value. In some cases this is called
 		// with an error value.
@@ -586,7 +586,7 @@ func newVertexRoot(idx *index, ctx *adt.OpContext, x *adt.Vertex) Value {
 	return makeValue(idx, x)
 }
 
-func newValueRoot(idx *index, ctx *adt.OpContext, x adt.Expr) Value {
+func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
 	if n, ok := x.(*adt.Vertex); ok {
 		return newVertexRoot(idx, ctx, n)
 	}
@@ -629,13 +629,12 @@ func Dereference(v Value) Value {
 //
 // For internal use only.
 func MakeValue(ctx *adt.OpContext, v adt.Value) Value {
-	runtime := ctx.Impl().(*runtime.Runtime)
-	index := runtime.Data.(*index)
+	index := ctx.Impl().(*runtime.Runtime)
 
 	return newValueRoot(index, newContext(index), v)
 }
 
-func makeValue(idx *index, v *adt.Vertex) Value {
+func makeValue(idx *runtime.Runtime, v *adt.Vertex) Value {
 	if v.Status() == 0 || v.BaseValue == nil {
 		panic(fmt.Sprintf("not properly initialized (state: %v, value: %T)",
 			v.Status(), v.BaseValue))
@@ -969,7 +968,7 @@ You could file a bug with the above information at:
 	if o.concrete || o.final {
 		// inst = v.instance()
 		var expr ast.Expr
-		expr, err = p.Value(v.idx.Runtime, pkgID, v.v)
+		expr, err = p.Value(v.idx, pkgID, v.v)
 		if err != nil {
 			return bad(`"cuelang.org/go/internal/core/export".Value`, err)
 		}
@@ -981,7 +980,7 @@ You could file a bug with the above information at:
 		}
 		// return expr
 	} else {
-		f, err = p.Def(v.idx.Runtime, pkgID, v.v)
+		f, err = p.Def(v.idx, pkgID, v.v)
 		if err != nil {
 			return bad(`"cuelang.org/go/internal/core/export".Def`, err)
 		}
@@ -1491,10 +1490,10 @@ func (v Value) Path() Path {
 			a[i] = Selector{indexSelector(f)}
 
 		case adt.DefinitionLabel, adt.HiddenDefinitionLabel, adt.HiddenLabel:
-			a[i] = Selector{definitionSelector(f.SelectorString(v.idx.Runtime))}
+			a[i] = Selector{definitionSelector(f.SelectorString(v.idx))}
 
 		case adt.StringLabel:
-			a[i] = Selector{stringSelector(f.StringValue(v.idx.Runtime))}
+			a[i] = Selector{stringSelector(f.StringValue(v.idx))}
 		}
 	}
 	return Path{path: a}
@@ -1824,7 +1823,7 @@ func (v Value) Format(state fmt.State, verb rune) {
 	case state.Flag('+'):
 		_, _ = io.WriteString(state, ctx.Str(v.v))
 	default:
-		n, _ := export.Raw.Expr(v.idx.Runtime, v.instance().ID(), v.v)
+		n, _ := export.Raw.Expr(v.idx, v.instance().ID(), v.v)
 		b, _ := format.Node(n)
 		_, _ = state.Write(b)
 	}
@@ -1852,7 +1851,7 @@ func (v Value) Reference() (inst *Instance, path []string) {
 	return reference(v.idx, ctx, c.Env, c.Expr())
 }
 
-func reference(rt *index, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *Instance, path []string) {
+func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *Instance, path []string) {
 	ctx := c
 	defer ctx.PopState(ctx.PushState(env, r.Source()))
 
@@ -1900,7 +1899,7 @@ func reference(rt *index, c *adt.OpContext, env *adt.Environment, r adt.Expr) (i
 	return inst, path
 }
 
-func mkPath(ctx *index, a []string, v *adt.Vertex) (inst *Instance, path []string) {
+func mkPath(ctx *runtime.Runtime, a []string, v *adt.Vertex) (inst *Instance, path []string) {
 	if v.Parent == nil {
 		return getImportFromNode(ctx, v), a
 	}
@@ -2390,7 +2389,7 @@ func (v Value) Expr() (Op, []Value) {
 					a.AddConjunct(adt.MakeRootConjunct(env, n.Val))
 					b.AddConjunct(adt.MakeRootConjunct(env, disjunct.Val))
 
-					ctx := eval.NewContext(v.idx.Runtime, nil)
+					ctx := eval.NewContext(v.idx, nil)
 					ctx.Unify(&a, adt.Finalized)
 					ctx.Unify(&b, adt.Finalized)
 					if allowed(ctx, v.v, &b) != nil {
@@ -2434,7 +2433,7 @@ func (v Value) Expr() (Op, []Value) {
 		a = append(a, remakeValue(v, env, x.X))
 		// A string selector is quoted.
 		a = append(a, remakeValue(v, env, &adt.String{
-			Str: x.Sel.SelectorString(v.idx.Runtime),
+			Str: x.Sel.SelectorString(v.idx),
 		}))
 		op = SelectorOp
 

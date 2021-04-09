@@ -22,9 +22,6 @@ import (
 type Runtime struct {
 	index *index
 
-	// Data holds the legacy index strut. It is for transitional purposes only.
-	Data interface{}
-
 	loaded map[*build.Instance]interface{}
 }
 

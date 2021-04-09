@@ -24,7 +24,7 @@ import (
 func init() {
 	internal.FromGoValue = func(runtime, x interface{}, nilIsTop bool) interface{} {
 		r := runtime.(*Runtime)
-		ctx := eval.NewContext(r.index().Runtime, nil)
+		ctx := eval.NewContext(r.index(), nil)
 		v := convert.GoValueToValue(ctx, x, nilIsTop)
 		n := adt.ToVertex(v)
 		return Value{r.idx, n}
@@ -32,7 +32,7 @@ func init() {
 
 	internal.FromGoType = func(runtime, x interface{}) interface{} {
 		r := runtime.(*Runtime)
-		ctx := eval.NewContext(r.index().Runtime, nil)
+		ctx := eval.NewContext(r.index(), nil)
 		expr, err := convert.GoTypeToExpr(ctx, x)
 		if err != nil {
 			expr = &adt.Bottom{Err: err}

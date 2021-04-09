@@ -31,7 +31,7 @@ import (
 //
 // The zero value of a Runtime is ready to use.
 type Runtime struct {
-	idx *index
+	idx *runtime.Runtime
 }
 
 func init() {
@@ -59,7 +59,7 @@ func init() {
 
 	internal.CoreValue = func(value interface{}) (runtime, vertex interface{}) {
 		if v, ok := value.(Value); ok && v.v != nil {
-			return v.idx.Runtime, v.v
+			return v.idx, v.v
 		}
 		return nil, nil
 	}
@@ -67,7 +67,7 @@ func init() {
 
 func dummyLoad(token.Pos, string) *build.Instance { return nil }
 
-func (r *Runtime) index() *index {
+func (r *Runtime) index() *runtime.Runtime {
 	if r.idx == nil {
 		r.idx = newIndex()
 	}
@@ -184,35 +184,22 @@ func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 	})
 }
 
-// index maps conversions from label names to internal codes.
-//
-// All instances belonging to the same package should share this index.
-type index struct {
-	*runtime.Runtime
-}
-
 // NewRuntime creates a *runtime.Runtime with builtins preloaded.
 func NewRuntime() *runtime.Runtime {
 	i := newIndex()
-	i.Runtime.Data = i
-	return i.Runtime
+	return i
 }
 
 // newIndex creates a new index.
-func newIndex() *index {
-	r := runtime.New()
-	i := &index{
-		Runtime: r,
-	}
-	r.Data = i
-	return i
+func newIndex() *runtime.Runtime {
+	return runtime.New()
 }
 
 func isBuiltin(s string) bool {
 	return runtime.SharedRuntime.IsBuiltinPackage(s)
 }
 
-func loadInstance(idx *index, p *build.Instance) *Instance {
-	v, _ := idx.Runtime.Build(p)
+func loadInstance(idx *runtime.Runtime, p *build.Instance) *Instance {
+	v, _ := idx.Build(p)
 	return getImportFromBuild(idx, p, v)
 }

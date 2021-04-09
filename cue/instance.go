@@ -45,7 +45,7 @@ type Instance struct {
 	// complete bool // for cycle detection
 }
 
-func (x *index) addInst(p *Instance) *Instance {
+func addInst(x *index, p *Instance) *Instance {
 	if p.inst == nil {
 		p.inst = &build.Instance{
 			ImportPath: p.ImportPath,
@@ -128,7 +128,7 @@ func init() {
 			st = &adt.Vertex{}
 			st.AddConjunct(adt.MakeRootConjunct(nil, x))
 		}
-		return v.ctx().index.addInst(&Instance{
+		return addInst(v.idx, &Instance{
 			root: st,
 		})
 	}
@@ -167,9 +167,9 @@ func (inst *Instance) setError(err errors.Error) {
 	inst.Err = errors.Append(inst.Err, err)
 }
 
-func (inst *Instance) eval(ctx *context) adt.Value {
+func (inst *Instance) eval(ctx *adt.OpContext) adt.Value {
 	// TODO: remove manifest here?
-	v := ctx.manifest(inst.root)
+	v := manifest(ctx, inst.root)
 	return v
 }
 
@@ -178,7 +178,7 @@ func init() {
 		v := value.(Value)
 		e := expr.(ast.Expr)
 		ctx := newContext(v.idx)
-		return newValueRoot(ctx, evalExpr(ctx, v.vertex(ctx), e))
+		return newValueRoot(v.idx, ctx, evalExpr(ctx, v.v, e))
 	}
 }
 
@@ -188,7 +188,7 @@ func pkgID() string {
 }
 
 // evalExpr evaluates expr within scope.
-func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) adt.Value {
+func evalExpr(ctx *adt.OpContext, scope *adt.Vertex, expr ast.Expr) adt.Value {
 	cfg := &compile.Config{
 		Scope: scope,
 		Imports: func(x *ast.Ident) (pkgPath string) {
@@ -199,13 +199,13 @@ func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) adt.Value {
 		},
 	}
 
-	c, err := compile.Expr(cfg, ctx.opCtx, pkgID(), expr)
+	c, err := compile.Expr(cfg, ctx, pkgID(), expr)
 	if err != nil {
 		return &adt.Bottom{Err: err}
 	}
-	return adt.Resolve(ctx.opCtx, c)
+	return adt.Resolve(ctx, c)
 
-	// scope.Finalize(ctx.opCtx) // TODO: not appropriate here.
+	// scope.Finalize(ctx) // TODO: not appropriate here.
 	// switch s := scope.Value.(type) {
 	// case *bottom:
 	// 	return s
@@ -214,7 +214,7 @@ func evalExpr(ctx *context, scope *adt.Vertex, expr ast.Expr) adt.Value {
 	// 	return ctx.mkErr(scope, "instance is not a struct, found %s", scope.Kind())
 	// }
 
-	// c := ctx.opCtx
+	// c := ctx
 
 	// x, err := compile.Expr(&compile.Config{Scope: scope}, c.Runtime, expr)
 	// if err != nil {
@@ -270,8 +270,8 @@ func (inst *Instance) Doc() []*ast.CommentGroup {
 // top-level values.
 func (inst *Instance) Value() Value {
 	ctx := newContext(inst.index)
-	inst.root.Finalize(ctx.opCtx)
-	return newVertexRoot(ctx, inst.root)
+	inst.root.Finalize(ctx)
+	return newVertexRoot(inst.index, ctx, inst.root)
 }
 
 // Eval evaluates an expression within an existing instance.
@@ -280,9 +280,9 @@ func (inst *Instance) Value() Value {
 func (inst *Instance) Eval(expr ast.Expr) Value {
 	ctx := newContext(inst.index)
 	v := inst.root
-	v.Finalize(ctx.opCtx)
+	v.Finalize(ctx)
 	result := evalExpr(ctx, v, expr)
-	return newValueRoot(ctx, result)
+	return newValueRoot(inst.index, ctx, result)
 }
 
 // DO NOT USE.
@@ -292,7 +292,7 @@ func Merge(inst ...*Instance) *Instance {
 	v := &adt.Vertex{}
 
 	i := inst[0]
-	ctx := newContext(i.index).opCtx
+	ctx := newContext(i.index)
 
 	// TODO: interesting test: use actual unification and then on K8s corpus.
 
@@ -302,7 +302,7 @@ func Merge(inst ...*Instance) *Instance {
 	}
 	v.Finalize(ctx)
 
-	p := i.index.addInst(&Instance{
+	p := addInst(i.index, &Instance{
 		root: v,
 		// complete: true,
 	})
@@ -343,7 +343,7 @@ func (inst *Instance) Build(p *build.Instance) *Instance {
 }
 
 func (inst *Instance) value() Value {
-	return newVertexRoot(newContext(inst.index), inst.root)
+	return newVertexRoot(inst.index, newContext(inst.index), inst.root)
 }
 
 // Lookup reports the value at a path starting from the top level struct. The
@@ -416,7 +416,7 @@ func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 		u.AddConjunct(adt.MakeRootConjunct(nil, expr))
 		u.Finalize(ctx)
 	}
-	inst = inst.index.addInst(&Instance{
+	inst = addInst(inst.index, &Instance{
 		root: u,
 		inst: nil,
 

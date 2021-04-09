@@ -38,7 +38,6 @@ func init() {
 	// TODO: unroll this function. Should no longer be necessary to be internal.
 	internal.UnifyBuiltin = func(val interface{}, kind string) interface{} {
 		v := val.(Value)
-		ctx := v.ctx()
 
 		p := strings.Split(kind, ".")
 		pkg, name := p[0], p[1]
@@ -46,7 +45,7 @@ func init() {
 		if s == nil {
 			return v
 		}
-		a := s.Lookup(ctx.Label(name, false))
+		a := s.Lookup(v.idx.Label(name, false))
 		if a == nil {
 			return v
 		}

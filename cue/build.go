@@ -50,7 +50,7 @@ func init() {
 
 	internal.CheckAndForkRuntime = func(runtime, value interface{}) interface{} {
 		r := runtime.(*Runtime)
-		idx := value.(Value).ctx().index
+		idx := value.(Value).idx
 		if idx != r.idx {
 			panic("value not from same runtime")
 		}

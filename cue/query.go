@@ -41,16 +41,16 @@ func getScopePrefix(v Value, p Path) *adt.Vertex {
 func errFn(pos token.Pos, msg string, args ...interface{}) {}
 
 // resolveExpr binds unresolved expressions to values in the expression or v.
-func resolveExpr(ctx *context, v *adt.Vertex, x ast.Expr) adt.Value {
+func resolveExpr(ctx *adt.OpContext, v *adt.Vertex, x ast.Expr) adt.Value {
 	cfg := &compile.Config{Scope: v}
 
 	astutil.ResolveExpr(x, errFn)
 
-	c, err := compile.Expr(cfg, ctx.opCtx, pkgID(), x)
+	c, err := compile.Expr(cfg, ctx, pkgID(), x)
 	if err != nil {
 		return &adt.Bottom{Err: err}
 	}
-	return adt.Resolve(ctx.opCtx, c)
+	return adt.Resolve(ctx, c)
 }
 
 // LookupPath reports the value for path p relative to v.
@@ -59,7 +59,7 @@ func (v Value) LookupPath(p Path) Value {
 		return Value{}
 	}
 	n := v.v
-	ctx := v.ctx().opCtx
+	ctx := v.ctx()
 
 outer:
 	for _, sel := range p.path {
@@ -88,7 +88,7 @@ outer:
 			x = &adt.Bottom{Err: err.Error}
 		} else {
 			// TODO: better message.
-			x = v.idx.mkErr(n, adt.NotExistError, "field %q not found", sel.sel)
+			x = mkErr(v.idx, n, adt.NotExistError, "field %q not found", sel.sel)
 		}
 		v := makeValue(v.idx, n)
 		return newErrValue(v, x)

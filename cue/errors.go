@@ -94,7 +94,7 @@ var errNotExists = &adt.Bottom{
 	Err:  errors.Newf(token.NoPos, "undefined value"),
 }
 
-func (idx *index) mkErr(src adt.Node, args ...interface{}) *adt.Bottom {
+func mkErr(idx *index, src adt.Node, args ...interface{}) *adt.Bottom {
 	var e *adt.Bottom
 	var code adt.ErrorCode = -1
 outer:

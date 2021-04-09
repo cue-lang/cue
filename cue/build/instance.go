@@ -42,6 +42,8 @@ type Instance struct {
 	InvalidFiles  []*File // could not parse these files
 	UnknownFiles  []*File // unknown file types
 
+	User bool // True if package was created from individual files.
+
 	// Files contains the AST for all files part of this instance.
 	// TODO: the intent is to deprecate this in favor of BuildFiles.
 	Files []*ast.File
@@ -66,23 +68,13 @@ type Instance struct {
 	// were any errors in dependencies.
 	Err errors.Error
 
-	// Incomplete reports whether any dependencies had an error.
-	Incomplete bool
-
 	parent *Instance // TODO: for cycle detection
 
 	// The following fields are for informative purposes and are not used by
 	// the cue package to create an instance.
 
-	// ImportComment is the path in the import comment on the package statement.
-	ImportComment string
-
 	// DisplayPath is a user-friendly version of the package or import path.
 	DisplayPath string
-
-	// Dir is the package directory. Note that a package may also include files
-	// from ancestor directories, up to the module file.
-	Dir string
 
 	// Module defines the module name of a package. It must be defined if
 	// the packages within the directory structure of the module are to be
@@ -95,20 +87,30 @@ type Instance struct {
 	// Root/pkg is the directory that holds third-party packages.
 	Root string // root directory of hierarchy ("" if unknown)
 
+	// Dir is the package directory. A package may also include files from
+	// ancestor directories, up to the module file.
+	Dir string
+
+	// NOTICE: the below tags may change in the future.
+
+	// ImportComment is the path in the import comment on the package statement.
+	ImportComment string `api:"alpha"`
+
 	// AllTags are the build tags that can influence file selection in this
 	// directory.
-	AllTags []string
+	AllTags []string `api:"alpha"`
 
-	Standard bool // Is a builtin package
-	User     bool // True if package was created from individual files.
+	// Incomplete reports whether any dependencies had an error.
+	Incomplete bool `api:"alpha"`
 
 	// Dependencies
-	ImportPaths []string
-	ImportPos   map[string][]token.Pos // line information for Imports
+	// ImportPaths gives the transitive dependencies of all imports.
+	ImportPaths []string               `api:"alpha"`
+	ImportPos   map[string][]token.Pos `api:"alpha"` // line information for Imports
 
-	Deps       []string
-	DepsErrors []error
-	Match      []string
+	Deps       []string `api:"alpha"`
+	DepsErrors []error  `api:"alpha"`
+	Match      []string `api:"alpha"`
 }
 
 // RelPath reports the path of f relative to the root of the instance's module
@@ -216,6 +218,9 @@ func (inst *Instance) addImport(imp *Instance) {
 // instance. The file may be loaded from the cache of the instance's context.
 // It does not process the file's imports. The package name of the file must
 // match the package name of the instance.
+//
+// Deprecated: use AddSyntax or wait for this to be renamed using a new
+// signature.
 func (inst *Instance) AddFile(filename string, src interface{}) error {
 	file, err := inst.parse(filename, src)
 	if err != nil {

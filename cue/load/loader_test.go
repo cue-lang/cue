@@ -247,7 +247,7 @@ files:
 		},
 		args: args("./toolonly"),
 		want: `
-err:    build constraints exclude all CUE files in ./toolonly (ignored: anon.cue, test.cue)
+err:    build constraints exclude all CUE files in ./toolonly (ignored: anon.cue, test.cue, toolonly/foo_tool.cue)
 path:   example.org/test/toolonly:foo
 module: example.org/test
 root:   $CWD/testdata

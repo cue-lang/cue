@@ -102,18 +102,6 @@ type Instance struct {
 	Standard bool // Is a builtin package
 	User     bool // True if package was created from individual files.
 
-	// Deprecated: use BuildFiles
-	CUEFiles []string // .cue source files
-	// Deprecated: use BuildFiles and OrphanedFiles
-	DataFiles []string // recognized data files (.json, .yaml, etc.)
-
-	// The intent is to also deprecate the following fields in favor of
-	// IgnoredFiles and UnknownFiles.
-	TestCUEFiles    []string // .cue test files (_test.cue)
-	ToolCUEFiles    []string // .cue tool files (_tool.cue)
-	IgnoredCUEFiles []string // .cue source files ignored for this build
-	InvalidCUEFiles []string // .cue source files with detected problems (parse error, wrong package name, and so on)
-
 	// Dependencies
 	ImportPaths []string
 	ImportPos   map[string][]token.Pos // line information for Imports
@@ -121,6 +109,16 @@ type Instance struct {
 	Deps       []string
 	DepsErrors []error
 	Match      []string
+}
+
+// RelPath reports the path of f relative to the root of the instance's module
+// directory. The full path is returned if a relative path could not be found.
+func (inst *Instance) RelPath(f *File) string {
+	p, err := filepath.Rel(inst.Root, f.Filename)
+	if err != nil {
+		return f.Filename
+	}
+	return p
 }
 
 // ID returns the package ID unique for this module.

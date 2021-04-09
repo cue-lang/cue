@@ -263,48 +263,14 @@ func (l *loader) loadFunc() build.LoadFunc {
 	}
 }
 
-func normPrefix(root, path string, isLocal bool) string {
-	root = filepath.Clean(root)
-	prefix := ""
-	if isLocal {
-		prefix = "." + string(filepath.Separator)
-	}
-	if !strings.HasSuffix(root, string(filepath.Separator)) &&
-		strings.HasPrefix(path, root) {
-		path = prefix + path[len(root)+1:]
-	}
-	return path
-}
-
 func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 	p.Root = root
-
-	normalizeFilenames(root, p.CUEFiles, isLocal)
-	normalizeFilenames(root, p.TestCUEFiles, isLocal)
-	normalizeFilenames(root, p.ToolCUEFiles, isLocal)
-	normalizeFilenames(root, p.IgnoredCUEFiles, isLocal)
-	normalizeFilenames(root, p.InvalidCUEFiles, isLocal)
 
 	normalizeFiles(p.BuildFiles)
 	normalizeFiles(p.IgnoredFiles)
 	normalizeFiles(p.OrphanedFiles)
 	normalizeFiles(p.InvalidFiles)
 	normalizeFiles(p.UnknownFiles)
-}
-
-func normalizeFilenames(root string, a []string, isLocal bool) {
-	for i, path := range a {
-		if strings.HasPrefix(path, root) {
-			a[i] = normPrefix(root, path, isLocal)
-		}
-	}
-	sortParentsFirst(a)
-}
-
-func sortParentsFirst(s []string) {
-	sort.Slice(s, func(i, j int) bool {
-		return len(filepath.Dir(s[i])) < len(filepath.Dir(s[j]))
-	})
 }
 
 func normalizeFiles(a []*build.File) {
@@ -340,12 +306,14 @@ func newFileProcessor(c *Config, p *build.Instance) *fileProcessor {
 }
 
 func countCUEFiles(c *Config, p *build.Instance) int {
-	count := len(p.CUEFiles)
-	if c.Tools {
-		count += len(p.ToolCUEFiles)
-	}
-	if c.Tests {
-		count += len(p.TestCUEFiles)
+	count := len(p.BuildFiles)
+	for _, f := range p.IgnoredFiles {
+		if c.Tools && strings.HasSuffix(f.Filename, "_tool.cue") {
+			count++
+		}
+		if c.Tests && strings.HasSuffix(f.Filename, "_test.cue") {
+			count++
+		}
 	}
 	return count
 }
@@ -357,7 +325,7 @@ func (fp *fileProcessor) finalize(p *build.Instance) errors.Error {
 	if countCUEFiles(fp.c, p) == 0 &&
 		!fp.c.DataFiles &&
 		(p.PkgName != "_" || !fp.allPackages) {
-		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredCUEFiles) > 0})
+		fp.err = errors.Append(fp.err, &NoFilesError{Package: p, ignored: len(p.IgnoredFiles) > 0})
 		return fp.err
 	}
 
@@ -388,7 +356,6 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	// badFile := func(p *build.Instance, err errors.Error) bool {
 	badFile := func(err errors.Error) bool {
 		fp.err = errors.Append(fp.err, err)
-		p.InvalidCUEFiles = append(p.InvalidCUEFiles, fullPath)
 		p.InvalidFiles = append(p.InvalidFiles, file)
 		return true
 	}
@@ -399,11 +366,9 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	}
 	if !match {
 		if file.Encoding == build.CUE && file.Interpretation == "" {
-			p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		} else {
 			p.OrphanedFiles = append(p.OrphanedFiles, file)
-			p.DataFiles = append(p.DataFiles, fullPath)
 		}
 		return false // don't mark as added
 	}
@@ -440,7 +405,6 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	case pkg != "_":
 
 	default:
-		p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
 		p.IgnoredFiles = append(p.IgnoredFiles, file)
 		return false // don't mark as added
 	}
@@ -450,8 +414,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 			if err != nil {
 				fp.err = errors.Append(fp.err, err)
 			}
-			p.IgnoredCUEFiles = append(p.InvalidCUEFiles, fullPath)
-			p.IgnoredFiles = append(p.InvalidFiles, file)
+			p.IgnoredFiles = append(p.IgnoredFiles, file)
 			return false
 		}
 	}
@@ -462,7 +425,6 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 			fp.firstFile = base
 		} else if pkg != p.PkgName {
 			if fp.ignoreOther {
-				p.IgnoredCUEFiles = append(p.IgnoredCUEFiles, fullPath)
 				p.IgnoredFiles = append(p.IgnoredFiles, file)
 				return false
 			}
@@ -513,46 +475,21 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	}
 	switch {
 	case isTest:
-		p.TestCUEFiles = append(p.TestCUEFiles, fullPath)
 		if fp.c.loader.cfg.Tests {
 			p.BuildFiles = append(p.BuildFiles, file)
 		} else {
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		}
 	case isTool:
-		p.ToolCUEFiles = append(p.ToolCUEFiles, fullPath)
 		if fp.c.loader.cfg.Tools {
 			p.BuildFiles = append(p.BuildFiles, file)
 		} else {
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		}
 	default:
-		p.CUEFiles = append(p.CUEFiles, fullPath)
 		p.BuildFiles = append(p.BuildFiles, file)
 	}
 	return true
-}
-
-func nameExt(name string) string {
-	i := strings.LastIndex(name, ".")
-	if i < 0 {
-		return ""
-	}
-	return name[i:]
-}
-
-// hasCUEFiles reports whether dir contains any files with names ending in .go.
-// For a vendor check we must exclude directories that contain no .go files.
-// Otherwise it is not possible to vendor just a/b/c and still import the
-// non-vendored a/b. See golang.org/issue/13832.
-func hasCUEFiles(ctxt *fileSystem, dir string) bool {
-	ents, _ := ctxt.readDir(dir)
-	for _, ent := range ents {
-		if !ent.IsDir() && strings.HasSuffix(ent.Name(), cueSuffix) {
-			return true
-		}
-	}
-	return false
 }
 
 func findimportComment(data []byte) (s string, line int) {
@@ -652,18 +589,6 @@ func cleanImports(m map[string][]token.Pos) ([]string, map[string][]token.Pos) {
 	sort.Strings(all)
 	return all, m
 }
-
-// // Import is shorthand for Default.Import.
-// func Import(path, srcDir string, mode ImportMode) (*Package, error) {
-// 	return Default.Import(path, srcDir, mode)
-// }
-
-// // ImportDir is shorthand for Default.ImportDir.
-// func ImportDir(dir string, mode ImportMode) (*Package, error) {
-// 	return Default.ImportDir(dir, mode)
-// }
-
-var slashslash = []byte("//")
 
 // isLocalImport reports whether the import path is
 // a local import path, like ".", "..", "./foo", or "../foo".

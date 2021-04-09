@@ -207,7 +207,7 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		inst := c.newRelInstance(token.NoPos, dir, pkgName)
 		pkgs := l.importPkg(token.NoPos, inst)
 		for _, p := range pkgs {
-			if err := p.Err; err != nil && (p == nil || len(p.InvalidCUEFiles) == 0) {
+			if err := p.Err; err != nil && (p == nil || len(p.InvalidFiles) == 0) {
 				switch err.(type) {
 				case nil:
 					break

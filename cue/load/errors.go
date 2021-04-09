@@ -105,8 +105,8 @@ func (e *NoFilesError) Msg() (string, []interface{}) { return e.Error(), nil }
 func (e *NoFilesError) Error() string {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
-	for _, name := range e.Package.IgnoredCUEFiles {
-		if strings.HasPrefix(name, "_") {
+	for _, f := range e.Package.IgnoredFiles {
+		if strings.HasPrefix(filepath.Base(f.Filename), "_") {
 			dummy++
 		}
 	}
@@ -114,15 +114,16 @@ func (e *NoFilesError) Error() string {
 	// path := shortPath(e.Package.Root, e.Package.Dir)
 	path := e.Package.DisplayPath
 
-	if len(e.Package.IgnoredCUEFiles) > dummy {
+	if len(e.Package.IgnoredFiles) > dummy {
 		// CUE files exist, but they were ignored due to build constraints.
 		msg := "build constraints exclude all CUE files in " + path + " (ignored: "
-		files := e.Package.IgnoredCUEFiles
-		if len(files) > 4 {
-			files = append(files[:4], "...")
-		}
-		for i, f := range files {
-			files[i] = filepath.ToSlash(f)
+		var files []string
+		for i, f := range e.Package.IgnoredFiles {
+			if i == 4 {
+				files = append(files[:4], "...")
+				break
+			}
+			files = append(files, filepath.ToSlash(e.Package.RelPath(f)))
 		}
 		msg += strings.Join(files, ", ")
 		msg += ")"

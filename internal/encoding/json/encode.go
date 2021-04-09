@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 )
 
 // Encode converts a CUE AST to JSON.
@@ -158,7 +158,7 @@ func (e *encoder) encode(n ast.Node) error {
 			return e.encodeScalar(l, false)
 		}
 	}
-	return errors.Newf(n.Pos(), "json: unsupported node %s (%T)", internal.DebugStr(n), n)
+	return errors.Newf(n.Pos(), "json: unsupported node %s (%T)", astinternal.DebugStr(n), n)
 }
 
 func (e *encoder) encodeScalar(l *ast.BasicLit, allowMinus bool) error {
@@ -220,7 +220,7 @@ func (e *encoder) encodeDecls(decls []ast.Decl, endPos token.Pos) error {
 	for _, d := range decls {
 		switch x := d.(type) {
 		default:
-			return errors.Newf(x.Pos(), "json: unsupported node %s (%T)", internal.DebugStr(x), x)
+			return errors.Newf(x.Pos(), "json: unsupported node %s (%T)", astinternal.DebugStr(x), x)
 
 		case *ast.Package:
 			if embed != nil || fields != nil {

@@ -1,4 +1,4 @@
-// Copyright 2018 The CUE Authors
+// Copyright 2021 CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package parser
+package astinternal
 
 import (
 	"fmt"
@@ -21,18 +21,13 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 )
 
-func init() {
-	internal.DebugStr = debugStr
-}
-
-func debugStr(x interface{}) (out string) {
+func DebugStr(x interface{}) (out string) {
 	if n, ok := x.(ast.Node); ok {
 		comments := ""
 		for _, g := range n.Comments() {
-			comments += debugStr(g)
+			comments += DebugStr(g)
 		}
 		if comments != "" {
 			defer func() { out = "<" + comments + out + ">" }()
@@ -41,25 +36,25 @@ func debugStr(x interface{}) (out string) {
 	switch v := x.(type) {
 	case *ast.File:
 		out := ""
-		out += debugStr(v.Decls)
+		out += DebugStr(v.Decls)
 		return out
 
 	case *ast.Package:
 		out := "package "
-		out += debugStr(v.Name)
+		out += DebugStr(v.Name)
 		return out
 
 	case *ast.LetClause:
 		out := "let "
-		out += debugStr(v.Ident)
+		out += DebugStr(v.Ident)
 		out += "="
-		out += debugStr(v.Expr)
+		out += DebugStr(v.Expr)
 		return out
 
 	case *ast.Alias:
-		out := debugStr(v.Ident)
+		out := DebugStr(v.Ident)
 		out += "="
-		out += debugStr(v.Expr)
+		out += DebugStr(v.Expr)
 		return out
 
 	case *ast.BottomLit:
@@ -70,75 +65,75 @@ func debugStr(x interface{}) (out string) {
 
 	case *ast.Interpolation:
 		for _, e := range v.Elts {
-			out += debugStr(e)
+			out += DebugStr(e)
 		}
 		return out
 
 	case *ast.EmbedDecl:
-		out += debugStr(v.Expr)
+		out += DebugStr(v.Expr)
 		return out
 
 	case *ast.ImportDecl:
 		out := "import "
 		if v.Lparen != token.NoPos {
 			out += "( "
-			out += debugStr(v.Specs)
+			out += DebugStr(v.Specs)
 			out += " )"
 		} else {
-			out += debugStr(v.Specs)
+			out += DebugStr(v.Specs)
 		}
 		return out
 
 	case *ast.Comprehension:
-		out := debugStr(v.Clauses)
-		out += debugStr(v.Value)
+		out := DebugStr(v.Clauses)
+		out += DebugStr(v.Value)
 		return out
 
 	case *ast.StructLit:
 		out := "{"
-		out += debugStr(v.Elts)
+		out += DebugStr(v.Elts)
 		out += "}"
 		return out
 
 	case *ast.ListLit:
 		out := "["
-		out += debugStr(v.Elts)
+		out += DebugStr(v.Elts)
 		out += "]"
 		return out
 
 	case *ast.Ellipsis:
 		out := "..."
 		if v.Type != nil {
-			out += debugStr(v.Type)
+			out += DebugStr(v.Type)
 		}
 		return out
 
 	case *ast.ListComprehension:
 		out := "["
-		out += debugStr(v.Expr)
+		out += DebugStr(v.Expr)
 		out += " "
-		out += debugStr(v.Clauses)
+		out += DebugStr(v.Clauses)
 		out += "]"
 		return out
 
 	case *ast.ForClause:
 		out := "for "
 		if v.Key != nil {
-			out += debugStr(v.Key)
+			out += DebugStr(v.Key)
 			out += ": "
 		}
-		out += debugStr(v.Value)
+		out += DebugStr(v.Value)
 		out += " in "
-		out += debugStr(v.Source)
+		out += DebugStr(v.Source)
 		return out
 
 	case *ast.IfClause:
 		out := "if "
-		out += debugStr(v.Condition)
+		out += DebugStr(v.Condition)
 		return out
 
 	case *ast.Field:
-		out := debugStr(v.Label)
+		out := DebugStr(v.Label)
 		if v.Optional != token.NoPos {
 			out += "?"
 		}
@@ -149,10 +144,10 @@ func debugStr(x interface{}) (out string) {
 			default:
 				out += fmt.Sprintf(" %s ", v.Token)
 			}
-			out += debugStr(v.Value)
+			out += DebugStr(v.Value)
 			for _, a := range v.Attrs {
 				out += " "
-				out += debugStr(a)
+				out += DebugStr(a)
 			}
 		}
 		return out
@@ -165,43 +160,43 @@ func debugStr(x interface{}) (out string) {
 
 	case *ast.TemplateLabel:
 		out := "<"
-		out += debugStr(v.Ident)
+		out += DebugStr(v.Ident)
 		out += ">"
 		return out
 
 	case *ast.SelectorExpr:
-		return debugStr(v.X) + "." + debugStr(v.Sel)
+		return DebugStr(v.X) + "." + DebugStr(v.Sel)
 
 	case *ast.CallExpr:
-		out := debugStr(v.Fun)
+		out := DebugStr(v.Fun)
 		out += "("
-		out += debugStr(v.Args)
+		out += DebugStr(v.Args)
 		out += ")"
 		return out
 
 	case *ast.ParenExpr:
 		out := "("
-		out += debugStr(v.X)
+		out += DebugStr(v.X)
 		out += ")"
 		return out
 
 	case *ast.UnaryExpr:
-		return v.Op.String() + debugStr(v.X)
+		return v.Op.String() + DebugStr(v.X)
 
 	case *ast.BinaryExpr:
-		out := debugStr(v.X)
+		out := DebugStr(v.X)
 		op := v.Op.String()
 		if 'a' <= op[0] && op[0] <= 'z' {
 			op = fmt.Sprintf(" %s ", op)
 		}
 		out += op
-		out += debugStr(v.Y)
+		out += DebugStr(v.Y)
 		return out
 
 	case []*ast.CommentGroup:
 		var a []string
 		for _, c := range v {
-			a = append(a, debugStr(c))
+			a = append(a, DebugStr(c))
 		}
 		return strings.Join(a, "\n")
 
@@ -221,28 +216,28 @@ func debugStr(x interface{}) (out string) {
 		return str + strings.Join(a, " ") + "] "
 
 	case *ast.IndexExpr:
-		out := debugStr(v.X)
+		out := DebugStr(v.X)
 		out += "["
-		out += debugStr(v.Index)
+		out += DebugStr(v.Index)
 		out += "]"
 		return out
 
 	case *ast.SliceExpr:
-		out := debugStr(v.X)
+		out := DebugStr(v.X)
 		out += "["
-		out += debugStr(v.Low)
+		out += DebugStr(v.Low)
 		out += ":"
-		out += debugStr(v.High)
+		out += DebugStr(v.High)
 		out += "]"
 		return out
 
 	case *ast.ImportSpec:
 		out := ""
 		if v.Name != nil {
-			out += debugStr(v.Name)
+			out += DebugStr(v.Name)
 			out += " "
 		}
-		out += debugStr(v.Path)
+		out += DebugStr(v.Path)
 		return out
 
 	case []ast.Decl:
@@ -251,7 +246,7 @@ func debugStr(x interface{}) (out string) {
 		}
 		out := ""
 		for _, d := range v {
-			out += debugStr(d)
+			out += DebugStr(d)
 			out += sep
 		}
 		return out[:len(out)-len(sep)]
@@ -262,7 +257,7 @@ func debugStr(x interface{}) (out string) {
 		}
 		out := ""
 		for _, c := range v {
-			out += debugStr(c)
+			out += DebugStr(c)
 			out += " "
 		}
 		return out
@@ -273,7 +268,7 @@ func debugStr(x interface{}) (out string) {
 		}
 		out := ""
 		for _, d := range v {
-			out += debugStr(d)
+			out += DebugStr(d)
 			out += sep
 		}
 		return out[:len(out)-len(sep)]
@@ -284,7 +279,7 @@ func debugStr(x interface{}) (out string) {
 		}
 		out := ""
 		for _, d := range v {
-			out += debugStr(d)
+			out += DebugStr(d)
 			out += sep
 		}
 		return out[:len(out)-len(sep)]

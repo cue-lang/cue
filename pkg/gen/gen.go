@@ -176,7 +176,7 @@ func (g *generator) processCUE(pkg string) {
 
 	v := instances[0].Value().Syntax(cue.Raw())
 	// fmt.Printf("%T\n", v)
-	// fmt.Println(internal.DebugStr(v))
+	// fmt.Println(astinternal.DebugStr(v))
 	n := internal.ToExpr(v)
 	b, err := cueformat.Node(n)
 	if err != nil {

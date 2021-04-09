@@ -23,7 +23,7 @@ import (
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/encoding/gocode/gocodec"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
@@ -146,7 +146,7 @@ func TestGenerated(t *testing.T) {
 			if err != nil {
 				t.Fatal("failed export: ", err)
 			}
-			got := internal.DebugStr(expr)
+			got := astinternal.DebugStr(expr)
 			if got != tc.out {
 				t.Errorf("got:  %s\nwant: %s", got, tc.out)
 			}

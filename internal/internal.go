@@ -39,9 +39,6 @@ import (
 // Right now Decimal is aliased to apd.Decimal. This may change in the future.
 type Decimal = apd.Decimal
 
-// DebugStr prints a syntax node.
-var DebugStr func(x interface{}) string
-
 // ErrIncomplete can be used by builtins to signal the evaluation was
 // incomplete.
 var ErrIncomplete = errors.New("incomplete value")

@@ -25,7 +25,10 @@ import (
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 )
+
+var debugStr = astinternal.DebugStr
 
 // The parser structure holds the parser's internal state.
 type parser struct {

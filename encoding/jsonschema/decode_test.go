@@ -34,7 +34,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
 	"cuelang.org/go/encoding/yaml"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/cuetest"
 	_ "cuelang.org/go/pkg"
 )
@@ -182,5 +182,5 @@ func TestX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	t.Fatal(internal.DebugStr(expr))
+	t.Fatal(astinternal.DebugStr(expr))
 }

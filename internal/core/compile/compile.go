@@ -22,6 +22,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 )
 
@@ -945,7 +946,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 
 func (c *compiler) assertConcreteIsPossible(src ast.Node, op adt.Op, x adt.Expr) bool {
 	if !adt.AssertConcreteIsPossible(op, x) {
-		str := internal.DebugStr(src)
+		str := astinternal.DebugStr(src)
 		c.errf(src, "invalid operand %s ('%s' requires concrete value)", str, op)
 	}
 	return false

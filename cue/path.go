@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"github.com/cockroachdb/apd/v2"
 )
@@ -176,7 +176,7 @@ func toSelectors(expr ast.Expr) []Selector {
 		if b, ok := x.Index.(*ast.BasicLit); !ok {
 			sel = Selector{pathError{
 				errors.Newf(token.NoPos, "non-constant expression %s",
-					internal.DebugStr(x.Index))}}
+					astinternal.DebugStr(x.Index))}}
 		} else {
 			sel = basicLitSelector(b)
 		}
@@ -188,7 +188,7 @@ func toSelectors(expr ast.Expr) []Selector {
 
 	default:
 		return []Selector{{pathError{
-			errors.Newf(token.NoPos, "invalid label %s ", internal.DebugStr(x)),
+			errors.Newf(token.NoPos, "invalid label %s ", astinternal.DebugStr(x)),
 		}}}
 	}
 }
@@ -267,7 +267,7 @@ func Label(label ast.Label) Selector {
 
 	default:
 		return Selector{pathError{
-			errors.Newf(token.NoPos, "invalid label %s ", internal.DebugStr(x)),
+			errors.Newf(token.NoPos, "invalid label %s ", astinternal.DebugStr(x)),
 		}}
 	}
 }

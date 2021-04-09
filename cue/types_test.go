@@ -29,7 +29,7 @@ import (
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 )
@@ -823,7 +823,7 @@ v: #X
 			t.Errorf("got %v; want %v", got, tc.raw)
 		}
 
-		got := fmt.Sprint(internal.DebugStr(v.Eval().Syntax()))
+		got := fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
 		if got != tc.eval {
 			t.Errorf("got %v; want %v", got, tc.eval)
 		}
@@ -845,7 +845,7 @@ v: #X
 			t.Errorf("got %v; want %v", got, tc.raw)
 		}
 
-		got = fmt.Sprint(internal.DebugStr(v.Eval().Syntax()))
+		got = fmt.Sprint(astinternal.DebugStr(v.Eval().Syntax()))
 		if got != tc.eval {
 			t.Errorf("got %v; want %v", got, tc.eval)
 		}

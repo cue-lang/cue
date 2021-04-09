@@ -25,7 +25,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 )
 
 // Encode converts a CUE AST to YAML.
@@ -87,9 +87,9 @@ func encode(n ast.Node) (y *yaml.Node, err error) {
 				break
 			}
 		}
-		return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", internal.DebugStr(x), x)
+		return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
 	default:
-		return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", internal.DebugStr(x), x)
+		return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
 	}
 	if err != nil {
 		return nil, err
@@ -170,7 +170,7 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 	for _, d := range decls {
 		switch x := d.(type) {
 		default:
-			return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", internal.DebugStr(x), x)
+			return nil, errors.Newf(x.Pos(), "yaml: unsupported node %s (%T)", astinternal.DebugStr(x), x)
 
 		case *ast.Package:
 			if len(n.Content) > 0 {

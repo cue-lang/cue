@@ -28,6 +28,7 @@ import (
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/astinternal"
 	"cuelang.org/go/internal/encoding"
 )
 
@@ -220,7 +221,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 						}
 						return nil, fmt.Errorf(
 							`error evaluating label %v: %v`,
-							internal.DebugStr(x), arg)
+							astinternal.DebugStr(x), arg)
 					}
 				}
 				a = append(a, cue.Label(label))
@@ -339,7 +340,7 @@ func newIndex() *listIndex {
 }
 
 func (x *listIndex) label(label ast.Label) *listIndex {
-	key := internal.DebugStr(label)
+	key := astinternal.DebugStr(label)
 	idx := x.index[key]
 	if idx == nil {
 		if x.field.Value == nil {

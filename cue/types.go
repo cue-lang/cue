@@ -40,6 +40,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
 	"cuelang.org/go/internal/core/validate"
+	"cuelang.org/go/internal/types"
 )
 
 // Kind determines the underlying type of a Value.
@@ -562,6 +563,14 @@ func (v Value) appendPath(a []string) []string {
 type Value struct {
 	idx *runtime.Runtime
 	v   *adt.Vertex
+}
+
+type hiddenValue = Value
+
+// Core is for internal use only.
+func (v hiddenValue) Core(x *types.Value) {
+	x.V = v.v
+	x.R = v.idx
 }
 
 func newErrValue(v Value, b *adt.Bottom) Value {

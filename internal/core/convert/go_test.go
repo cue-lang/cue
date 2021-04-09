@@ -23,7 +23,6 @@ import (
 	"github.com/cockroachdb/apd/v2"
 	"github.com/google/go-cmp/cmp"
 
-	_ "cuelang.org/go/cue" // set internal.CoreValue
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"

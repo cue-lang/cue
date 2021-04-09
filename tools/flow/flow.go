@@ -71,11 +71,10 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/value"
 )
 
 var (
@@ -197,8 +196,7 @@ func (c *Controller) addErr(err error, msg string) {
 // New creates a Controller for a given Instance and TaskFunc.
 func New(cfg *Config, inst *cue.Instance, f TaskFunc) *Controller {
 	v := inst.Value()
-	rx, nx := internal.CoreValue(v)
-	ctx := eval.NewContext(rx.(*runtime.Runtime), nx.(*adt.Vertex))
+	ctx := eval.NewContext(value.ToInternal(v))
 
 	c := &Controller{
 		isTask: f,
@@ -335,8 +333,8 @@ func (t *Task) isReady() bool {
 }
 
 func (t *Task) vertex() *adt.Vertex {
-	_, x := internal.CoreValue(t.v)
-	return x.(*adt.Vertex)
+	_, x := value.ToInternal(t.v)
+	return x
 }
 
 func (t *Task) addDep(path string, dep *Task) {

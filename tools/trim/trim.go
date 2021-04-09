@@ -56,11 +56,10 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/subsume"
+	"cuelang.org/go/internal/value"
 )
 
 // Config configures trim options.
@@ -73,9 +72,7 @@ type Config struct {
 // Trimming is done on a best-effort basis and only when the removed field
 // is clearly implied by another field, rather than equal sibling fields.
 func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
-	rx, vx := internal.CoreValue(inst.Value())
-	r := rx.(*runtime.Runtime)
-	v := vx.(*adt.Vertex)
+	r, v := value.ToInternal(inst.Value())
 
 	t := &trimmer{
 		Config:  *cfg,

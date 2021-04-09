@@ -28,15 +28,13 @@ package flow
 import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
+	"cuelang.org/go/internal/value"
 )
 
 func (c *Controller) runLoop() {
-	_, x := internal.CoreValue(c.inst)
-	root := x.(*adt.Vertex)
+	_, root := value.ToInternal(c.inst)
 
 	// Copy the initial conjuncts.
 	n := len(root.Conjuncts)
@@ -64,8 +62,7 @@ func (c *Controller) runLoop() {
 				t.state = Running
 				c.updateTaskValue(t)
 
-				rx, nx := internal.CoreValue(t.v)
-				t.ctxt = eval.NewContext(rx.(*runtime.Runtime), nx.(*adt.Vertex))
+				t.ctxt = eval.NewContext(value.ToInternal(t.v))
 
 				go func(t *Task) {
 					if err := t.r.Run(t, nil); err != nil {

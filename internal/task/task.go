@@ -23,8 +23,7 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/value"
 )
 
 // A Context provides context for running a task.
@@ -117,9 +116,9 @@ func (t *taskError) Position() token.Pos {
 }
 
 func (t *taskError) InputPositions() (a []token.Pos) {
-	_, nx := internal.CoreValue(t.v)
+	_, nx := value.ToInternal(t.v)
 
-	for _, x := range nx.(*adt.Vertex).Conjuncts {
+	for _, x := range nx.Conjuncts {
 		if src := x.Source(); src != nil {
 			a = append(a, src.Pos())
 		}

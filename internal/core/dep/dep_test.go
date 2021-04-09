@@ -20,14 +20,13 @@ import (
 	"testing"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/dep"
 	"cuelang.org/go/internal/core/eval"
-	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/value"
 )
 
 func TestVisit(t *testing.T) {
@@ -45,8 +44,7 @@ func TestVisit(t *testing.T) {
 			t.Fatal(inst.Err())
 		}
 
-		rx, nx := internal.CoreValue(inst)
-		ctxt := eval.NewContext(rx.(*runtime.Runtime), nx.(*adt.Vertex))
+		ctxt := eval.NewContext(value.ToInternal(inst))
 
 		testCases := []struct {
 			name string
@@ -69,8 +67,7 @@ func TestVisit(t *testing.T) {
 		for _, tc := range testCases {
 			v := inst.LookupPath(cue.ParsePath(tc.root))
 
-			_, nx = internal.CoreValue(v)
-			n := nx.(*adt.Vertex)
+			_, n := value.ToInternal(v)
 			w := t.Writer(tc.name)
 
 			t.Run(tc.name, func(sub *testing.T) {
@@ -105,9 +102,7 @@ func TestX(t *testing.T) {
 
 	v := inst.Lookup("a")
 
-	rx, nx := internal.CoreValue(v)
-	r := rx.(*runtime.Runtime)
-	n := nx.(*adt.Vertex)
+	r, n := value.ToInternal(v)
 
 	ctxt := eval.NewContext(r, n)
 

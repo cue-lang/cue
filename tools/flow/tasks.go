@@ -20,9 +20,9 @@ package flow
 import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/dep"
+	"cuelang.org/go/internal/value"
 )
 
 // initTasks takes the current configuration and adds tasks to the list of
@@ -82,8 +82,7 @@ func (c *Controller) findRootTasks(v cue.Value) {
 // getTask finds and marks tasks that are descendents of v.
 func (c *Controller) getTask(scope *Task, v cue.Value) *Task {
 	// Look up cached node.
-	_, n := internal.CoreValue(v)
-	w := n.(*adt.Vertex)
+	_, w := value.ToInternal(v)
 	if t, ok := c.nodes[w]; ok {
 		return t
 	}

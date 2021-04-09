@@ -56,13 +56,6 @@ func init() {
 		}
 		return &Runtime{idx: newIndex()}
 	}
-
-	internal.CoreValue = func(value interface{}) (runtime, vertex interface{}) {
-		if v, ok := value.(Value); ok && v.v != nil {
-			return v.idx, v.v
-		}
-		return nil, nil
-	}
 }
 
 func dummyLoad(token.Pos, string) *build.Instance { return nil }

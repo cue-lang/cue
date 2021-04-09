@@ -30,8 +30,8 @@ import (
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal"
-	"cuelang.org/go/internal/core/adt"
 	itask "cuelang.org/go/internal/task"
+	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
 	_ "cuelang.org/go/pkg/tool/exec"
 	_ "cuelang.org/go/pkg/tool/file"
@@ -76,8 +76,7 @@ func addCustom(c *Command, parent *cobra.Command, typ, name string, tools *cue.I
 	// TODO: remove this block to allow commands to be defined in any file.
 outer:
 	for _, v := range []cue.Value{tools.Lookup(typ), o} {
-		_, vv := internal.CoreValue(v)
-		w := vv.(*adt.Vertex)
+		_, w := value.ToInternal(v)
 		for _, c := range w.Conjuncts {
 			src := c.Source()
 			if src == nil {

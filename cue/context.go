@@ -27,7 +27,7 @@ type context struct {
 }
 
 // newContext returns a new evaluation context.
-func (idx *index) newContext() *context {
+func newContext(idx *index) *context {
 	c := &context{
 		index: idx,
 	}

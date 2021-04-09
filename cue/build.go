@@ -79,7 +79,7 @@ func (r *Runtime) complete(p *build.Instance) (*Instance, error) {
 	if err := p.Complete(); err != nil {
 		return nil, err
 	}
-	inst := idx.loadInstance(p)
+	inst := loadInstance(idx, p)
 	inst.ImportPath = p.ImportPath
 	if inst.Err != nil {
 		return nil, inst.Err
@@ -165,7 +165,7 @@ func (r *Runtime) build(instances []*build.Instance) ([]*Instance, error) {
 		_ = p.Complete()
 		errs = errors.Append(errs, p.Err)
 
-		i := index.loadInstance(p)
+		i := loadInstance(index, p)
 		errs = errors.Append(errs, i.Err)
 		loaded = append(loaded, i)
 	}
@@ -189,7 +189,6 @@ func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 // All instances belonging to the same package should share this index.
 type index struct {
 	*runtime.Runtime
-	loaded map[*build.Instance]*Instance
 }
 
 // NewRuntime creates a *runtime.Runtime with builtins preloaded.
@@ -204,7 +203,6 @@ func newIndex() *index {
 	r := runtime.New()
 	i := &index{
 		Runtime: r,
-		loaded:  map[*build.Instance]*Instance{},
 	}
 	r.Data = i
 	return i
@@ -214,7 +212,7 @@ func isBuiltin(s string) bool {
 	return runtime.SharedRuntime.IsBuiltinPackage(s)
 }
 
-func (idx *index) loadInstance(p *build.Instance) *Instance {
+func loadInstance(idx *index, p *build.Instance) *Instance {
 	v, _ := idx.Runtime.Build(p)
-	return idx.getImportFromBuild(p, v)
+	return getImportFromBuild(idx, p, v)
 }

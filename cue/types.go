@@ -632,7 +632,7 @@ func MakeValue(ctx *adt.OpContext, v adt.Value) Value {
 	runtime := ctx.Impl().(*runtime.Runtime)
 	index := runtime.Data.(*index)
 
-	return newValueRoot(index.newContext(), v)
+	return newValueRoot(newContext(index), v)
 }
 
 func makeValue(idx *index, v *adt.Vertex) Value {
@@ -663,7 +663,7 @@ func remakeFinal(base Value, env *adt.Environment, v adt.Value) Value {
 }
 
 func (v Value) ctx() *context {
-	return v.idx.newContext()
+	return newContext(v.idx)
 }
 
 func (v Value) makeChild(ctx *context, i uint32, a *adt.Vertex) Value {
@@ -876,7 +876,7 @@ func (v Value) marshalJSON() (b []byte, err error) {
 	if v.v == nil {
 		return json.Marshal(nil)
 	}
-	ctx := v.idx.newContext()
+	ctx := newContext(v.idx)
 	x := v.eval(ctx)
 
 	if _, ok := x.(adt.Resolver); ok {
@@ -1749,7 +1749,7 @@ func (v Value) Unify(w Value) Value {
 	addConjuncts(n, v.v)
 	addConjuncts(n, w.v)
 
-	ctx := v.idx.newContext().opCtx
+	ctx := newContext(v.idx).opCtx
 	n.Finalize(ctx)
 
 	n.Parent = v.v.Parent
@@ -1786,7 +1786,7 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n.AddConjunct(adt.MakeRootConjunct(nil, v.v))
 	n.AddConjunct(adt.MakeRootConjunct(nil, w.v))
 
-	ctx := v.idx.newContext().opCtx
+	ctx := newContext(v.idx).opCtx
 	n.Finalize(ctx)
 
 	n.Parent = v.v.Parent
@@ -1834,7 +1834,7 @@ func (v Value) instance() *Instance {
 	if v.v == nil {
 		return nil
 	}
-	return v.idx.getImportFromNode(v.v)
+	return getImportFromNode(v.idx, v.v)
 }
 
 // Reference returns the instance and path referred to by this value such that
@@ -1882,7 +1882,7 @@ func reference(c *context, env *adt.Environment, r adt.Expr) (inst *Instance, pa
 
 	case *adt.ImportReference:
 		imp := x.ImportPath.StringValue(ctx)
-		inst = c.index.getImportFromPath(imp)
+		inst = getImportFromPath(c.index, imp)
 
 	case *adt.SelectorExpr:
 		inst, path = reference(c, env, x.X)
@@ -1902,7 +1902,7 @@ func reference(c *context, env *adt.Environment, r adt.Expr) (inst *Instance, pa
 
 func mkPath(ctx *context, a []string, v *adt.Vertex) (inst *Instance, path []string) {
 	if v.Parent == nil {
-		return ctx.index.getImportFromNode(v), a
+		return getImportFromNode(ctx.index, v), a
 	}
 	inst, path = mkPath(ctx, a, v.Parent)
 	path = append(path, v.Label.SelectorString(ctx.opCtx))

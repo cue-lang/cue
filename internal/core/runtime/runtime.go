@@ -14,18 +14,41 @@
 
 package runtime
 
+import (
+	"cuelang.org/go/cue/build"
+)
+
 // A Runtime maintains data structures for indexing and resuse for evaluation.
 type Runtime struct {
 	index *index
 
 	// Data holds the legacy index strut. It is for transitional purposes only.
 	Data interface{}
+
+	loaded map[*build.Instance]interface{}
+}
+
+func (r *Runtime) SetBuildData(b *build.Instance, x interface{}) {
+	r.loaded[b] = x
+}
+
+func (r *Runtime) BuildData(b *build.Instance) (x interface{}, ok bool) {
+	x, ok = r.loaded[b]
+	return x, ok
 }
 
 // New creates a new Runtime. The builtins registered with RegisterBuiltin
 // are available for
 func New() *Runtime {
-	return &Runtime{
-		index: sharedIndex,
+	r := &Runtime{}
+	r.Init()
+	return r
+}
+
+func (r *Runtime) Init() {
+	if r.index != nil {
+		return
 	}
+	r.index = sharedIndex
+	r.loaded = map[*build.Instance]interface{}{}
 }

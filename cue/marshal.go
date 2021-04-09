@@ -129,7 +129,7 @@ func (r *Runtime) Unmarshal(b []byte) ([]*Instance, error) {
 // The stored instances are functionally the same, but preserving of file
 // information is only done on a best-effort basis.
 func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
-	ctx := r.index().newContext()
+	ctx := newContext(r.index())
 
 	staged := []instanceData{}
 	done := map[string]int{}
@@ -192,7 +192,7 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 		p := len(staged) - 1
 
 		for _, imp := range imports {
-			i := ctx.getImportFromPath(imp)
+			i := getImportFromPath(ctx.index, imp)
 			if i == nil || !strings.Contains(imp, ".") {
 				continue // a builtin package.
 			}

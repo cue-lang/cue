@@ -120,6 +120,7 @@ errorListDef: {
 -- out/definition --
 import mystrings "strings"
 
+@foo(bar)
 p1: {
 	[X=string]: {
 		name: X

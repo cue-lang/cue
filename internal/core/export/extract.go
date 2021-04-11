@@ -137,12 +137,15 @@ func containsDoc(a []*ast.CommentGroup, cg *ast.CommentGroup) bool {
 	return false
 }
 
-func ExtractFieldAttrs(a []adt.Conjunct) (attrs []*ast.Attribute) {
-	for _, x := range a {
-		f, ok := x.Source().(*ast.Field)
-		if !ok {
-			continue
-		}
+func ExtractFieldAttrs(v *adt.Vertex) (attrs []*ast.Attribute) {
+	for _, x := range v.Conjuncts {
+		attrs = extractFieldAttrs(attrs, x)
+	}
+	return attrs
+}
+
+func extractFieldAttrs(attrs []*ast.Attribute, c adt.Conjunct) []*ast.Attribute {
+	if f, ok := c.Source().(*ast.Field); ok {
 		for _, a := range f.Attrs {
 			if !containsAttr(attrs, a) {
 				attrs = append(attrs, a)
@@ -152,9 +155,11 @@ func ExtractFieldAttrs(a []adt.Conjunct) (attrs []*ast.Attribute) {
 	return attrs
 }
 
-func ExtractDeclAttrs(a []adt.Conjunct) (attrs []*ast.Attribute) {
-	for _, c := range a {
-		attrs = extractDeclAttrs(attrs, c.Expr().Source())
+func ExtractDeclAttrs(v *adt.Vertex) (attrs []*ast.Attribute) {
+	for _, st := range v.Structs {
+		if src := st.StructLit; src != nil {
+			attrs = extractDeclAttrs(attrs, src.Src)
+		}
 	}
 	return attrs
 }

@@ -137,16 +137,31 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	if len(e.fields) == 0 && !e.hasEllipsis {
 		switch len(e.embed) + len(e.conjuncts) {
 		case 0:
+			if len(e.attrs) > 0 {
+				break
+			}
 			if len(e.structs) > 0 {
 				return s
 			}
 			return ast.NewIdent("_")
 		case 1:
+			var x ast.Expr
 			if len(e.conjuncts) == 1 {
-				return e.conjuncts[0]
+				x = e.conjuncts[0]
+			} else {
+				x = e.embed[0]
 			}
-			return e.embed[0]
+			if len(e.attrs) == 0 {
+				return x
+			}
+			if st, ok := x.(*ast.StructLit); ok {
+				s.Elts = append(s.Elts, st.Elts...)
+				return s
+			}
 		case 2:
+			if len(e.attrs) > 0 {
+				break
+			}
 			// Simplify.
 			e.conjuncts = append(e.conjuncts, e.embed...)
 			return ast.NewBinExpr(token.AND, e.conjuncts...)
@@ -195,7 +210,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			ast.SetComments(d, docs)
 		}
 		if x.cfg.ShowAttributes {
-			d.Attrs = ExtractFieldAttrs(a)
+			for _, c := range a {
+				d.Attrs = extractFieldAttrs(d.Attrs, c)
+			}
 		}
 		s.Elts = append(s.Elts, d)
 	}

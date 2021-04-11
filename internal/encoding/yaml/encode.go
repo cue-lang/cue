@@ -183,6 +183,9 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			docForNext.WriteString("\n\n")
 			continue
 
+		case *ast.Attribute:
+			continue
+
 		case *ast.Field:
 			if x.Token == token.ISA {
 				return nil, errors.Newf(x.TokenPos, "yaml: definition not allowed")

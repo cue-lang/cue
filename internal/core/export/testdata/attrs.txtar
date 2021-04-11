@@ -18,6 +18,33 @@ a: {
 
 a: {} @field(1) @field(3)
 
+doNotPropagate: {
+	#A: {  } @attr1()
+	a: #A
+
+	// Do not accumulated field attributes in embedding.
+	#B: {  } @attr1()
+	b: { #B }
+}
+
+embedScalarField: {
+	a: { 2 } @attr1()
+	a: { _ } @attr2()
+}
+
+embedScalarDecl: {
+	b0: { 2, @attr1() }
+	b1: b0
+	b2: { 2, b0, @attr2() }
+}
+
+dontMergeForDef: {
+	a: { @decl1() }
+	b: a & { x: 1, @decl2() }
+	c: a & { @decl2() }
+	d: { a, @decl2() }
+}
+
 -- b.cue --
 @package("b")
 
@@ -42,21 +69,143 @@ a: {
 	@decl(3)
 	@decl(5)
 } @field(2) @field(1) @field(4) @field(3) @field(5)
+doNotPropagate: {
+	#A: {} @attr1()
+	a: #A
+
+	// Do not accumulated field attributes in embedding.
+	#B: {} @attr1()
+	b: #B
+}
+embedScalarField: {
+	a: 2 @attr1() @attr2()
+}
+embedScalarDecl: {
+	b0: {
+		@attr1()
+		2
+	}
+	b1: b0
+	b2: {
+		@attr2()
+		b0
+		2
+	}
+}
+dontMergeForDef: {
+	a: {
+		@decl1()
+	}
+	b: a & {
+		@decl2()
+		x: 1
+	}
+	c: a & {
+		@decl2()
+	}
+	d: {
+		@decl2()
+		a
+	}
+}
 -- out/doc --
 []
 [a]
+[doNotPropagate]
+[doNotPropagate #A]
+[doNotPropagate a]
+[doNotPropagate #B]
+- Do not accumulated field attributes in embedding.
+
+[doNotPropagate b]
+[embedScalarField]
+[embedScalarField a]
+[embedScalarDecl]
+[embedScalarDecl b0]
+[embedScalarDecl b1]
+[embedScalarDecl b2]
+[dontMergeForDef]
+[dontMergeForDef a]
+[dontMergeForDef b]
+[dontMergeForDef b x]
+[dontMergeForDef c]
+[dontMergeForDef d]
 -- out/value --
 == Simplified
 {
 	a: {}
+	doNotPropagate: {
+		a: {}
+		b: {}
+	}
+	embedScalarField: {
+		a: 2
+	}
+	embedScalarDecl: {
+		b0: 2
+		b1: 2
+		b2: 2
+	}
+	dontMergeForDef: {
+		a: {}
+		b: {
+			x: 1
+		}
+		c: {}
+		d: {}
+	}
 }
 == Raw
 {
 	a: {}
+	doNotPropagate: {
+		#A: {}
+		a: {}
+
+		// Do not accumulated field attributes in embedding.
+		#B: {}
+		b: {}
+	}
+	embedScalarField: {
+		a: 2
+	}
+	embedScalarDecl: {
+		b0: 2
+		b1: 2
+		b2: 2
+	}
+	dontMergeForDef: {
+		a: {}
+		b: {
+			x: 1
+		}
+		c: {}
+		d: {}
+	}
 }
 == Final
 {
 	a: {}
+	doNotPropagate: {
+		a: {}
+		b: {}
+	}
+	embedScalarField: {
+		a: 2
+	}
+	embedScalarDecl: {
+		b0: 2
+		b1: 2
+		b2: 2
+	}
+	dontMergeForDef: {
+		a: {}
+		b: {
+			x: 1
+		}
+		c: {}
+		d: {}
+	}
 }
 == All
 {
@@ -69,6 +218,43 @@ a: {
 		@decl(3)
 		@decl(5)
 	} @field(2) @field(1) @field(4) @field(3) @field(5)
+	doNotPropagate: {
+		#A: {} @attr1()
+		a: {}
+
+		// Do not accumulated field attributes in embedding.
+		#B: {} @attr1()
+		b: {}
+	}
+	embedScalarField: {
+		a: 2 @attr1() @attr2()
+	}
+	embedScalarDecl: {
+		b0: {
+			2, @attr1()
+		}
+		b1: {
+			2, @attr1()
+		}
+		b2: {
+			2, @attr2(), @attr1()
+		}
+	}
+	dontMergeForDef: {
+		a: {
+			@decl1()
+		}
+		b: {
+			@decl1(), @decl2()
+			x: 1
+		}
+		c: {
+			@decl1(), @decl2()
+		}
+		d: {
+			@decl2(), @decl1()
+		}
+	}
 }
 == Eval
 {
@@ -81,4 +267,39 @@ a: {
 		@decl(3)
 		@decl(5)
 	} @field(2) @field(1) @field(4) @field(3) @field(5)
+	doNotPropagate: {
+		#A: {} @attr1()
+		a: {}
+		#B: {} @attr1()
+		b: {}
+	}
+	embedScalarField: {
+		a: 2 @attr1() @attr2()
+	}
+	embedScalarDecl: {
+		b0: {
+			2, @attr1()
+		}
+		b1: {
+			2, @attr1()
+		}
+		b2: {
+			2, @attr2(), @attr1()
+		}
+	}
+	dontMergeForDef: {
+		a: {
+			@decl1()
+		}
+		b: {
+			@decl1(), @decl2()
+			x: 1
+		}
+		c: {
+			@decl1(), @decl2()
+		}
+		d: {
+			@decl2(), @decl1()
+		}
+	}
 }

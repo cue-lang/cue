@@ -2111,7 +2111,7 @@ func (v Value) Attribute(key string) Attribute {
 		return nonExistAttr(key)
 	}
 	// look up the attributes
-	for _, a := range export.ExtractFieldAttrs(v.v.Conjuncts) {
+	for _, a := range export.ExtractFieldAttrs(v.v) {
 		k, _ := a.Split()
 		if key != k {
 			continue
@@ -2149,13 +2149,13 @@ func (v Value) Attributes(mask AttrKind) []Attribute {
 	attrs := []Attribute{}
 
 	if mask&FieldAttr != 0 {
-		for _, a := range export.ExtractFieldAttrs(v.v.Conjuncts) {
+		for _, a := range export.ExtractFieldAttrs(v.v) {
 			attrs = append(attrs, newAttr(internal.FieldAttr, a))
 		}
 	}
 
 	if mask&DeclAttr != 0 {
-		for _, a := range export.ExtractDeclAttrs(v.v.Conjuncts) {
+		for _, a := range export.ExtractDeclAttrs(v.v) {
 			attrs = append(attrs, newAttr(internal.DeclAttr, a))
 		}
 	}

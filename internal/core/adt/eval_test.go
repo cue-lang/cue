@@ -22,10 +22,10 @@ import (
 
 	"github.com/rogpeppe/go-internal/txtar"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
@@ -49,7 +49,7 @@ func TestEval(t *testing.T) {
 		test.ToDo = nil
 	}
 
-	r := cue.NewRuntime()
+	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()
@@ -115,7 +115,7 @@ module: "example.com"
 		t.Fatal(instance.Err)
 	}
 
-	r := cue.NewRuntime()
+	r := runtime.New()
 
 	v, err := r.Build(instance)
 	if err != nil {

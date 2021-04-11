@@ -177,12 +177,6 @@ func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 	})
 }
 
-// NewRuntime creates a *runtime.Runtime with builtins preloaded.
-func NewRuntime() *runtime.Runtime {
-	i := newIndex()
-	return i
-}
-
 // newIndex creates a new index.
 func newIndex() *runtime.Runtime {
 	return runtime.New()

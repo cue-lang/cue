@@ -18,10 +18,10 @@ import (
 	"fmt"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/core/validate"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -32,7 +32,7 @@ func Run(name string, t *testing.T) {
 		Name: name,
 	}
 
-	r := cue.NewRuntime()
+	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()

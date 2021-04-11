@@ -18,11 +18,11 @@ import (
 	"fmt"
 	"testing"
 
-	"cuelang.org/go/cue"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
+	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
 )
@@ -34,7 +34,7 @@ func TestExtract(t *testing.T) {
 		Update: cuetest.UpdateGoldenFiles,
 	}
 
-	r := cue.NewRuntime()
+	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()

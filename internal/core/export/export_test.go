@@ -42,7 +42,7 @@ func TestDefinition(t *testing.T) {
 		Update: cuetest.UpdateGoldenFiles,
 	}
 
-	r := cue.NewRuntime()
+	r := runtime.New()
 
 	test.Run(t, func(t *cuetxtar.Test) {
 		a := t.ValidInstances()

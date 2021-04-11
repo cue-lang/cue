@@ -196,7 +196,7 @@ func labelFromValue(c *OpContext, src Expr, v Value) Feature {
 			if src == nil {
 				src = v
 			}
-			c.AddErrf("invalid index %v: %v", src, err)
+			c.AddErrf("invalid index %v: %v", c.Str(src), err)
 			return InvalidLabel
 		}
 		if i < 0 {

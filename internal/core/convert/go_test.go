@@ -42,51 +42,53 @@ func TestConvert(t *testing.T) {
 		goVal interface{}
 		want  string
 	}{{
-		nil, "_",
+		nil, "(_){ _ }",
 	}, {
-		true, "true",
+		true, "(bool){ true }",
 	}, {
-		false, "false",
+		false, "(bool){ false }",
 	}, {
-		errors.New("oh noes"), "_|_(oh noes)",
+		errors.New("oh noes"), "(_|_){\n  // [eval] oh noes\n}",
 	}, {
-		"foo", `"foo"`,
+		"foo", `(string){ "foo" }`,
 	}, {
-		"\x80", `_|_(cannot convert result to string: invalid UTF-8)`,
+		"\x80", "(_|_){\n  // [eval] cannot convert result to string: invalid UTF-8\n}",
 	}, {
-		3, "3",
+		3, "(int){ 3 }",
 	}, {
-		uint(3), "3",
+		uint(3), "(int){ 3 }",
 	}, {
-		uint8(3), "3",
+		uint8(3), "(int){ 3 }",
 	}, {
-		uint16(3), "3",
+		uint16(3), "(int){ 3 }",
 	}, {
-		uint32(3), "3",
+		uint32(3), "(int){ 3 }",
 	}, {
-		uint64(3), "3",
+		uint64(3), "(int){ 3 }",
 	}, {
-		int8(-3), "-3",
+		int8(-3), "(int){ -3 }",
 	}, {
-		int16(-3), "-3",
+		int16(-3), "(int){ -3 }",
 	}, {
-		int32(-3), "-3",
+		int32(-3), "(int){ -3 }",
 	}, {
-		int64(-3), "-3",
+		int64(-3), "(int){ -3 }",
 	}, {
-		float64(3.1), "3.1",
+		float64(3), "(float){ 3 }",
 	}, {
-		float32(3.1), "3.1",
+		float64(3.1), "(float){ 3.1 }",
 	}, {
-		uintptr(3), "3",
+		float32(3.1), "(float){ 3.1 }",
 	}, {
-		&i34, "34",
+		uintptr(3), "(int){ 3 }",
 	}, {
-		&f37, "37",
+		&i34, "(int){ 34 }",
 	}, {
-		&d35, "35",
+		&f37, "(float){ 37 }",
 	}, {
-		&n36, "-36",
+		&d35, "(int){ 35 }",
+	}, {
+		&n36, "(int){ -36 }",
 	}, {
 		[]int{1, 2, 3, 4}, `(#list){
   0: (int){ 1 }
@@ -123,9 +125,9 @@ func TestConvert(t *testing.T) {
   }
 }`,
 	}, {
-		map[bool]int{}, "_|_(unsupported Go type for map key (bool))",
+		map[bool]int{}, "(_|_){\n  // [eval] unsupported Go type for map key (bool)\n}",
 	}, {
-		map[struct{}]int{{}: 2}, "_|_(unsupported Go type for map key (struct {}))",
+		map[struct{}]int{{}: 2}, "(_|_){\n  // [eval] unsupported Go type for map key (struct {})\n}",
 	}, {
 		map[int]int{1: 2}, `(struct){
   "1": (int){ 2 }
@@ -177,9 +179,9 @@ func TestConvert(t *testing.T) {
   A: (int){ 3 }
 }`,
 	}, {
-		(*struct{ A int })(nil), "_",
+		(*struct{ A int })(nil), "(_){ _ }",
 	}, {
-		reflect.ValueOf(3), "3",
+		reflect.ValueOf(3), "(int){ 3 }",
 	}, {
 		time.Date(2019, 4, 1, 0, 0, 0, 0, time.UTC), `(string){ "2019-04-01T00:00:00Z" }`,
 	}, {
@@ -203,7 +205,11 @@ func TestConvert(t *testing.T) {
 		ctx := adt.NewContext(r, &adt.Vertex{})
 		t.Run("", func(t *testing.T) {
 			v := convert.GoValueToValue(ctx, tc.goVal, true)
-			got := debug.NodeString(ctx, v, nil)
+			n, ok := v.(*adt.Vertex)
+			if !ok {
+				n = &adt.Vertex{BaseValue: v}
+			}
+			got := debug.NodeString(ctx, n, nil)
 			if got != tc.want {
 				t.Error(cmp.Diff(got, tc.want))
 			}

@@ -16,6 +16,7 @@ package export
 
 import (
 	"fmt"
+	"strings"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -245,8 +246,11 @@ func (e *exporter) num(n *adt.Num, orig []adt.Conjunct) *ast.BasicLit {
 	if n.K&adt.IntKind != 0 {
 		kind = token.INT
 	}
-	return &ast.BasicLit{Kind: kind, Value: n.X.String()}
-
+	s := n.X.String()
+	if kind == token.FLOAT && !strings.ContainsAny(s, "eE.") {
+		s += "."
+	}
+	return &ast.BasicLit{Kind: kind, Value: s}
 }
 
 func (e *exporter) string(n *adt.String, orig []adt.Conjunct) *ast.BasicLit {

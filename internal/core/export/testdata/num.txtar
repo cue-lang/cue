@@ -1,0 +1,86 @@
+-- in.cue --
+import "strings"
+
+floats: {
+    a: 3.
+    b: float & 3.
+}
+numbers: {
+    a: number
+    a: 3
+    b: number
+    b: 3.
+}
+-- out/definition --
+floats: {
+	a: 3.0
+	b: 3.0
+}
+numbers: {
+	a: 3
+	b: 3.0
+}
+-- out/doc --
+[]
+[floats]
+[floats a]
+[floats b]
+[numbers]
+[numbers a]
+[numbers b]
+-- out/value --
+== Simplified
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== Raw
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== Final
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== All
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}
+== Eval
+{
+	floats: {
+		a: 3.0
+		b: 3.0
+	}
+	numbers: {
+		a: 3
+		b: 3.0
+	}
+}

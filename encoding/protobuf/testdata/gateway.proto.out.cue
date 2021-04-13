@@ -324,19 +324,22 @@ package v1alpha3
 		httpsRedirect?: bool @protobuf(1,bool,name=https_redirect)
 
 		// TLS modes enforced by the proxy
-		#TLSmode:
+		#TLSmode: {
 			// The SNI string presented by the client will be used as the match
 			// criterion in a VirtualService TLS route to determine the
 			// destination service from the service registry.
-			"PASSTHROUGH" |
-
+			"PASSTHROUGH"
+			#enumValue: 0
+		} | {
 			// Secure connections with standard TLS semantics.
-			"SIMPLE" |
-
+			"SIMPLE"
+			#enumValue: 1
+		} | {
 			// Secure connections to the upstream using mutual TLS by presenting
 			// client certificates for authentication.
-			"MUTUAL" |
-
+			"MUTUAL"
+			#enumValue: 2
+		} | {
 			// Similar to the passthrough mode, except servers with this TLS mode
 			// do not require an associated VirtualService to map from the SNI
 			// value to service in the registry. The destination details such as
@@ -348,6 +351,8 @@ package v1alpha3
 			// their respective endpoints. Use of this mode assumes that both the
 			// source and the destination are using Istio mTLS to secure traffic.
 			"AUTO_PASSTHROUGH"
+			#enumValue: 3
+		}
 
 		#TLSmode_value: {
 			PASSTHROUGH:      0
@@ -398,11 +403,22 @@ package v1alpha3
 		subjectAltNames?: [...string] @protobuf(6,string,name=subject_alt_names)
 
 		// TLS protocol versions.
-		#TLSProtocol: "TLS_AUTO" | // Automatically choose the optimal TLS version.
-			"TLSV1_0" | // TLS version 1.0
-			"TLSV1_1" | // TLS version 1.1
-			"TLSV1_2" | // TLS version 1.2
-			"TLSV1_3" // TLS version 1.3
+		#TLSProtocol: {
+			"TLS_AUTO"// Automatically choose the optimal TLS version.
+			#enumValue: 0
+		} | {
+			"TLSV1_0"// TLS version 1.0
+			#enumValue: 1
+		} | {
+			"TLSV1_1"// TLS version 1.1
+			#enumValue: 2
+		} | {
+			"TLSV1_2"// TLS version 1.2
+			#enumValue: 3
+		} | {
+			"TLSV1_3"// TLS version 1.3
+			#enumValue: 4
+		}
 
 		#TLSProtocol_value: {
 			TLS_AUTO: 0

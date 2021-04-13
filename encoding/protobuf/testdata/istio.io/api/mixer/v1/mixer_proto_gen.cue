@@ -103,10 +103,19 @@ import (
 // This can be used to construct a response cache.
 #ReferencedAttributes: {
 	// How an attribute's value was matched
-	#Condition: "CONDITION_UNSPECIFIED" | // should not occur
-		"ABSENCE" | // match when attribute doesn't exist
-		"EXACT" | // match when attribute value is an exact byte-for-byte match
-		"REGEX" // match when attribute value matches the included regex
+	#Condition: {
+		"CONDITION_UNSPECIFIED"// should not occur
+		#enumValue: 0
+	} | {
+		"ABSENCE"// match when attribute doesn't exist
+		#enumValue: 1
+	} | {
+		"EXACT"// match when attribute value is an exact byte-for-byte match
+		#enumValue: 2
+	} | {
+		"REGEX"// match when attribute value matches the included regex
+		#enumValue: 3
+	}
 
 	#Condition_value: {
 		"CONDITION_UNSPECIFIED": 0
@@ -155,9 +164,16 @@ import (
 // the request headers.
 #HeaderOperation: {
 	// Operation type.
-	#Operation: "REPLACE" | // replaces the header with the given name
-		"REMOVE" | // removes the header with the given name (the value is ignored)
-		"APPEND" // appends the value to the header value, or sets it if not present
+	#Operation: {
+		"REPLACE"// replaces the header with the given name
+		#enumValue: 0
+	} | {
+		"REMOVE"// removes the header with the given name (the value is ignored)
+		#enumValue: 1
+	} | {
+		"APPEND"// appends the value to the header value, or sets it if not present
+		#enumValue: 2
+	}
 
 	#Operation_value: {
 		"REPLACE": 0
@@ -198,17 +214,20 @@ import (
 	// next value: 5
 
 	// Used to signal how the sets of compressed attributes should be reconstitued server-side.
-	#RepeatedAttributesSemantics:
+	#RepeatedAttributesSemantics: {
 		// Use delta encoding between sets of compressed attributes to reduce the overall on-wire
 		// request size. Each individual set of attributes is used to modify the previous set.
 		// NOTE: There is no way with this encoding to specify attribute value deletion. This
 		// option should be used with extreme caution.
-		"DELTA_ENCODING" |
-
+		"DELTA_ENCODING"
+		#enumValue: 0
+	} | {
 		// Treat each set of compressed attributes as complete - independent from other sets
 		// in this request. This will result in on-wire duplication of attributes and values, but
 		// will allow for proper accounting of absent values in overall encoding.
 		"INDEPENDENT_ENCODING"
+		#enumValue: 1
+	}
 
 	#RepeatedAttributesSemantics_value: {
 		"DELTA_ENCODING":       0

@@ -43,6 +43,7 @@ const (
 	flagPath        flagName = "path"
 	flagFiles       flagName = "files"
 	flagProtoPath   flagName = "proto_path"
+	flagProtoEnum   flagName = "proto_enum"
 	flagWithContext flagName = "with-context"
 	flagOut         flagName = "out"
 	flagOutFile     flagName = "outfile"
@@ -79,6 +80,7 @@ func addOrphanFlags(f *pflag.FlagSet) {
 	f.Bool(string(flagList), false, "concatenate multiple objects into a list")
 	f.Bool(string(flagWithContext), false, "import as object with contextual data")
 	f.StringArrayP(string(flagProtoPath), "I", nil, "paths in which to search for imports")
+	f.String(string(flagProtoEnum), "int", "mode for rendering enums (int|json)")
 	f.StringP(string(flagGlob), "n", "", "glob filter for file names")
 	f.Bool(string(flagMerge), true, "merge non-CUE files")
 }

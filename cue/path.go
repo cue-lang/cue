@@ -44,6 +44,11 @@ func (sel Selector) IsString() bool {
 	return sel.sel.kind() == adt.StringLabel
 }
 
+// IsDefinition reports whether sel is a non-hidden definition label type.
+func (sel Selector) IsDefinition() bool {
+	return sel.sel.kind() == adt.DefinitionLabel
+}
+
 var (
 	// AnyField can be used to ask for any single label.
 	//
@@ -463,7 +468,7 @@ type pathError struct {
 	errors.Error
 }
 
-func (p pathError) String() string        { return p.Error.Error() }
+func (p pathError) String() string        { return "" }
 func (p pathError) optional() bool        { return false }
 func (p pathError) kind() adt.FeatureType { return 0 }
 func (p pathError) feature(r adt.Runtime) adt.Feature {

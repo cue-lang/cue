@@ -120,6 +120,13 @@ const (
 	High
 )
 
+type Level2 Level
+
+const (
+	AnotherLevel1 Level2 = iota + 4
+	AnotherLevel2
+)
+
 type CustomJSON struct {
 }
 
@@ -432,6 +439,13 @@ _#internalIdentifier: #Identifier & "internal"
 	#Medium |
 	#High
 
+#values_Level: {
+	Unknown: #Unknown
+	Low:     #Low
+	Medium:  #Medium
+	High:    #High
+}
+
 // Block comment.
 //  Indented.
 //
@@ -442,6 +456,20 @@ _#internalIdentifier: #Identifier & "internal"
 // Medium is neither High nor Low
 #Medium: #Level & 2
 #High:   #Level & 3
+
+#Level2: #Level // #enumLevel2
+
+#enumLevel2:
+	#AnotherLevel1 |
+	#AnotherLevel2
+
+#values_Level2: {
+	AnotherLevel1: #AnotherLevel1
+	AnotherLevel2: #AnotherLevel2
+}
+
+#AnotherLevel1: #Level2 & 4
+#AnotherLevel2: #Level2 & 5
 
 #CustomJSON: _
 

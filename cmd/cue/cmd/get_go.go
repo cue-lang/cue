@@ -676,6 +676,12 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 			typ := e.pkg.TypesInfo.TypeOf(v.Name)
 			enums := e.consts[typ.String()]
 			name := v.Name.Name
+			mapNamed := false
+			underlying := e.pkg.TypesInfo.TypeOf(v.Type)
+			if b, ok := underlying.Underlying().(*types.Basic); ok && b.Kind() != types.String {
+				mapNamed = true
+			}
+
 			switch tn, ok := e.pkg.TypesInfo.Defs[v.Name].(*types.TypeName); {
 			case ok:
 				if altType := e.altType(tn.Type()); altType != nil {
@@ -695,8 +701,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 					a = append(a, e.def(x.Doc, name, s, true))
 					break
 				}
-				// TODO: only print original type if value is not marked as enum.
-				underlying := e.pkg.TypesInfo.TypeOf(v.Type)
+
 				f, _ := e.makeField(name, cuetoken.ISA, underlying, x.Doc, true)
 				a = append(a, f)
 				cueast.SetRelPos(f, cuetoken.NewSection)
@@ -708,20 +713,44 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 				cueast.AddComment(a[len(a)-1], internal.NewComment(false, enumName))
 
 				// Constants are mapped as definitions.
-				var x cueast.Expr = e.ident(enums[0], true)
-				cueast.SetRelPos(x, cuetoken.Newline)
-				for _, v := range enums[1:] {
-					y := e.ident(v, true)
-					cueast.SetRelPos(y, cuetoken.Newline)
-					x = cueast.NewBinExpr(cuetoken.OR, x, y)
+				var exprs []cueast.Expr
+				var named []cueast.Decl
+				for _, v := range enums {
+					label := cueast.NewString(v)
+					cueast.SetRelPos(label, cuetoken.Blank)
+
+					var x cueast.Expr = e.ident(v, true)
+					cueast.SetRelPos(x, cuetoken.Newline)
+					exprs = append(exprs, x)
+
+					if !mapNamed {
+						continue
+					}
+
+					named = append(named, &cueast.Field{
+						Label: label,
+						Value: e.ident(v, true),
+					})
 				}
-				// a = append(a, e.def(nil, enumName, x, true))
-				f := &cueast.Field{
-					Label: cueast.NewIdent(enumName),
-					Value: x,
+
+				addField := func(label string, exprs []cueast.Expr) {
+					f := &cueast.Field{
+						Label: cueast.NewIdent(label),
+						Value: cueast.NewBinExpr(cuetoken.OR, exprs...),
+					}
+					cueast.SetRelPos(f, cuetoken.NewSection)
+					a = append(a, f)
 				}
-				a = append(a, f)
-				cueast.SetRelPos(f, cuetoken.NewSection)
+
+				addField(enumName, exprs)
+				if len(named) > 0 {
+					f := &cueast.Field{
+						Label: cueast.NewIdent("#values_" + name),
+						Value: &cueast.StructLit{Elts: named},
+					}
+					cueast.SetRelPos(f, cuetoken.NewSection)
+					a = append(a, f)
+				}
 			}
 		}
 

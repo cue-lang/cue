@@ -27,10 +27,12 @@ import (
 // Specifies the behavior when the client is unable to connect to Mixer.
 #NetworkFailPolicy: {
 	// Example of single-value enum.
-	#FailPolicy:
+	#FailPolicy: {
 		// If network connection fails, request is allowed and delivered to the
 		// service.
 		"FAIL_OPEN"
+		#enumValue: 0
+	}
 
 	#FailPolicy_value: "FAIL_OPEN": 0
 

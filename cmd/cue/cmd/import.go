@@ -334,10 +334,11 @@ func protoMode(b *buildPlan) error {
 	}
 
 	c := &protobuf.Config{
-		Root:    root,
-		Module:  module,
-		Paths:   b.encConfig.ProtoPath,
-		PkgName: b.encConfig.PkgName,
+		Root:     root,
+		Module:   module,
+		Paths:    b.encConfig.ProtoPath,
+		PkgName:  b.encConfig.PkgName,
+		EnumMode: flagProtoEnum.String(b.cmd),
 	}
 	if module != "" {
 		// We only allow imports from packages within the module if an actual

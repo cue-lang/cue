@@ -1,22 +1,49 @@
 -- schema.cue --
-enum: [string]: {
-    "foo"
-    #intValue: 1
-} | {
-    "bar"
-    #intValue: 2
-}
+enum: [string]:
+    { "foo", #enumValue: 1 } |
+    { "bar", #enumValue: 2 }
 
-singleEnum: { "single", #intValue: 1 }
+defEnum: [string]: #foo | #bar
 
-badEnum: { string, #intValue: 1 } | { "two", #intValue: 2 }
+#foo: 1
+#bar: 2
+
+typeEnum: [string]: #Enum
+
+#Enum: #foo | #bar
+
+
+// TODO: consider supporting @symbol(foo) or @json(,symbol=foo)
+// symbolEnum: [string]:
+//     { 1, @symbol(foo) } |
+//     { 2, @symbol(bar) }
+
+
+singleEnum: { "single", #enumValue: 1 }
+
+badEnum: { string, #enumValue: 1 } | { "two", #enumValue: 2 }
 
 -- data.cue --
 enum: asIs: "foo"
 enum: asIsUnknown: "foobar"
 
+// Convert integers to string
 enum: numExistFoo: 1
 enum: numExistBar: 2
+
+// Convert strings to integer
+defEnum: foo: "foo"
+defEnum: bar: "bar"
+defEnum: baz: "baz" // unavailable
+
+typeEnum: foo: "foo"
+typeEnum: bar: "bar"
+typeEnum: baz: "baz" // unavailable
+
+// TODO: consider supporting @symbol(foo) or @json(,symbol=foo)
+// symbolEnum: foo: "foo"
+// symbolEnum: bar: "bar"
+// symbolEnum: baz: "baz"
 
 singleEnum: 1
 
@@ -33,8 +60,23 @@ badEnum: 1
 enum: asIs:        "foo"
 enum: asIsUnknown: "foobar"
 
+// Convert integers to string
 enum: numExistFoo: "foo"
 enum: numExistBar: "bar"
+
+// Convert strings to integer
+defEnum: foo: 1
+defEnum: bar: 2
+defEnum: baz: "baz" // unavailable
+
+typeEnum: foo: 1
+typeEnum: bar: 2
+typeEnum: baz: "baz" // unavailable
+
+// TODO: consider supporting @symbol(foo) or @json(,symbol=foo)
+// symbolEnum: foo: "foo"
+// symbolEnum: bar: "bar"
+// symbolEnum: baz: "baz"
 
 singleEnum: "single"
 -- out/jsonpb/errors.cue --
@@ -45,4 +87,4 @@ enum.numNotExists: could not locate integer enum value 4:
 enum.tooLarge: invalid enum index: 4111222333444555666777888999: greater than max int64:
     errors.cue:5:17
 badEnum: invalid string enum: non-concrete value string:
-    schema.cue:11:10
+    schema.cue:23:10

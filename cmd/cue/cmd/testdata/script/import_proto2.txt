@@ -1,5 +1,5 @@
 cd root
-cue import proto -I ../include ./...
+cue import proto -I ../include ./... --proto_enum=json
 cd ..
 
 cmp stderr expect-stderr
@@ -176,12 +176,8 @@ import (
 
 // Attributes defines attributes.
 #Attributes: {
-	#Type:
-		#TYPE_A |
-		#TYPE_B
-
-	#TYPE_A: 1
-	#TYPE_B: 2
+	#Type: {"TYPE_A", #enumValue: 1} |
+		{"TYPE_B", #enumValue: 2}
 
 	#Type_value: {
 		TYPE_A: 1

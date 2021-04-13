@@ -149,40 +149,48 @@ package descriptor
 
 // Describes a field within a message.
 #FieldDescriptorProto: {
-	#Type:
+	#Type: {
 		// 0 is reserved for errors.
 		// Order is weird for historical reasons.
-		"TYPE_DOUBLE" |
-		"TYPE_FLOAT" |
-
+		"TYPE_DOUBLE"
+					#enumValue: 1
+	} | {"TYPE_FLOAT", #enumValue: 2} | {
 		// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT64 if
 		// negative values are likely.
-		"TYPE_INT64" |
-		"TYPE_UINT64" |
-
+		"TYPE_INT64"
+					#enumValue: 3
+	} | {"TYPE_UINT64", #enumValue: 4} | {
 		// Not ZigZag encoded.  Negative numbers take 10 bytes.  Use TYPE_SINT32 if
 		// negative values are likely.
-		"TYPE_INT32" |
-		"TYPE_FIXED64" |
-		"TYPE_FIXED32" |
-		"TYPE_BOOL" |
-		"TYPE_STRING" |
-
-		// Tag-delimited aggregate.
-		// Group type is deprecated and not supported in proto3. However, Proto3
-		// implementations should still be able to parse the group wire format and
-		// treat group fields as unknown fields.
-		"TYPE_GROUP" |
-		"TYPE_MESSAGE" | // Length-delimited aggregate.
-
-		// New in version 2.
-		"TYPE_BYTES" |
-		"TYPE_UINT32" |
-		"TYPE_ENUM" |
-		"TYPE_SFIXED32" |
-		"TYPE_SFIXED64" |
-		"TYPE_SINT32" | // Uses ZigZag encoding.
-		"TYPE_SINT64" // Uses ZigZag encoding.
+		"TYPE_INT32"
+						#enumValue: 5
+	} | {"TYPE_FIXED64", #enumValue: 6} |
+		{"TYPE_FIXED32", #enumValue: 7} |
+		{"TYPE_BOOL", #enumValue: 8} |
+		{"TYPE_STRING", #enumValue: 9} | {
+			// Tag-delimited aggregate.
+			// Group type is deprecated and not supported in proto3. However, Proto3
+			// implementations should still be able to parse the group wire format and
+			// treat group fields as unknown fields.
+			"TYPE_GROUP"
+			#enumValue: 10
+		} | {
+			"TYPE_MESSAGE"// Length-delimited aggregate.
+			#enumValue: 11
+		} | {
+			// New in version 2.
+			"TYPE_BYTES"
+						#enumValue: 12
+		} | {"TYPE_UINT32", #enumValue: 13} |
+		{"TYPE_ENUM", #enumValue: 14} |
+		{"TYPE_SFIXED32", #enumValue: 15} |
+		{"TYPE_SFIXED64", #enumValue: 16} | {
+			"TYPE_SINT32"// Uses ZigZag encoding.
+			#enumValue: 17
+		} | {
+			"TYPE_SINT64"// Uses ZigZag encoding.
+			#enumValue: 18
+		}
 
 	#Type_value: {
 		"TYPE_DOUBLE":   1
@@ -204,11 +212,13 @@ package descriptor
 		"TYPE_SINT32":   17
 		"TYPE_SINT64":   18
 	}
-	#Label:
+
+	#Label: {
 		// 0 is reserved for errors
-		"LABEL_OPTIONAL" |
-		"LABEL_REQUIRED" |
-		"LABEL_REPEATED"
+		"LABEL_OPTIONAL"
+						#enumValue: 1
+	} | {"LABEL_REQUIRED", #enumValue: 2} |
+		{"LABEL_REPEATED", #enumValue: 3}
 
 	#Label_value: {
 		"LABEL_OPTIONAL": 1
@@ -351,15 +361,21 @@ package descriptor
 	javaStringCheckUtf8?: bool @protobuf(27,bool,name=java_string_check_utf8,"default=false")
 
 	// Generated classes can be optimized for speed or code size.
-	#OptimizeMode: "SPEED" | // Generate complete code for parsing, serialization,
-
+	#OptimizeMode: {
+		"SPEED"// Generate complete code for parsing, serialization,
+		#enumValue: 1
+	} | {
 		// etc.
-		"CODE_SIZE" |
-		"LITE_RUNTIME" // Generate code using MessageLite and the lite runtime.
+		"CODE_SIZE"// Use ReflectionOps to implement these methods.
+		#enumValue: 2
+	} | {
+		"LITE_RUNTIME"// Generate code using MessageLite and the lite runtime.
+		#enumValue: 3
+	}
 
 	#OptimizeMode_value: {
 		"SPEED":        1
-		"CODE_SIZE":    2 // Use ReflectionOps to implement these methods.
+		"CODE_SIZE":    2
 		"LITE_RUNTIME": 3
 	}
 	optimizeFor?: #OptimizeMode @protobuf(9,OptimizeMode,name=optimize_for,"default=SPEED")
@@ -498,11 +514,13 @@ package descriptor
 	// options below.  This option is not yet implemented in the open source
 	// release -- sorry, we'll try to include it in a future version!
 	ctype?: #CType @protobuf(1,CType,"default=STRING")
-	#CType:
+
+	#CType: {
 		// Default mode.
-		"STRING" |
-		"CORD" |
-		"STRING_PIECE"
+		"STRING"
+					#enumValue: 0
+	} | {"CORD", #enumValue: 1} |
+		{"STRING_PIECE", #enumValue: 2}
 
 	#CType_value: {
 		"STRING":       0
@@ -529,15 +547,20 @@ package descriptor
 	// This option is an enum to permit additional types to be added, e.g.
 	// goog.math.Integer.
 	jstype?: #JSType @protobuf(6,JSType,"default=JS_NORMAL")
-	#JSType:
+
+	#JSType: {
 		// Use the default type.
-		"JS_NORMAL" |
-
+		"JS_NORMAL"
+		#enumValue: 0
+	} | {
 		// Use JavaScript strings.
-		"JS_STRING" |
-
+		"JS_STRING"
+		#enumValue: 1
+	} | {
 		// Use JavaScript numbers.
 		"JS_NUMBER"
+		#enumValue: 2
+	}
 
 	#JSType_value: {
 		"JS_NORMAL": 0
@@ -650,9 +673,13 @@ package descriptor
 	// Is this method side-effect-free (or safe in HTTP parlance), or idempotent,
 	// or neither? HTTP based RPC implementation may choose GET verb for safe
 	// methods, and PUT verb for idempotent methods instead of the default POST.
-	#IdempotencyLevel: "IDEMPOTENCY_UNKNOWN" |
-		"NO_SIDE_EFFECTS" | // implies idempotent
-		"IDEMPOTENT" // idempotent, but may have side effects
+	#IdempotencyLevel: {"IDEMPOTENCY_UNKNOWN", #enumValue: 0} | {
+		"NO_SIDE_EFFECTS"// implies idempotent
+		#enumValue: 1
+	} | {
+		"IDEMPOTENT"// idempotent, but may have side effects
+		#enumValue: 2
+	}
 
 	#IdempotencyLevel_value: {
 		"IDEMPOTENCY_UNKNOWN": 0

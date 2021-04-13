@@ -133,6 +133,20 @@ type Config struct {
 	// PkgName specifies the package name for a generated CUE file. A value
 	// will be derived from the Go package name if undefined.
 	PkgName string
+
+	// EnumMode defines whether enums should be set as integer values, instead
+	// of strings.
+	//
+	//    json    value is a string, corresponding to the standard JSON mapping
+	//            of Protobuf. The value is associated with a #enumValue
+	//            to allow the json+pb interpretation to interpret integers
+	//            as well.
+	//
+	//    int     value is an integer associated with an #enumValue definition
+	//            The json+pb interpreter uses the definition names in the
+	//            disjunction of the enum to interpret strings.
+	//
+	EnumMode string
 }
 
 // An Extractor converts a collection of proto files, typically belonging to one
@@ -146,11 +160,12 @@ type Config struct {
 // according to their Go package import path.
 //
 type Extractor struct {
-	root    string
-	cwd     string
-	module  string
-	paths   []string
-	pkgName string
+	root     string
+	cwd      string
+	module   string
+	paths    []string
+	pkgName  string
+	enumMode string
 
 	fileCache map[string]result
 	imports   map[string]*build.Instance
@@ -175,6 +190,7 @@ func NewExtractor(c *Config) *Extractor {
 		paths:     c.Paths,
 		pkgName:   c.PkgName,
 		module:    c.Module,
+		enumMode:  c.EnumMode,
 		fileCache: map[string]result{},
 		imports:   map[string]*build.Instance{},
 	}

@@ -71,6 +71,7 @@ func TestDiff(t *testing.T) {
 			b: 2
 			s: 4
 			d: 1
+			e: null
 		}
 		`,
 		y: `
@@ -79,6 +80,7 @@ func TestDiff(t *testing.T) {
 			c: 3
 			s: 4
 			d: int
+			e: null
 		}
 		`,
 		kind: Modified,
@@ -90,6 +92,7 @@ func TestDiff(t *testing.T) {
       s: 4
 -     d: 1
 +     d: int
+      e: null
   }
 `,
 	}, {

@@ -3104,7 +3104,7 @@ func TestTrimZeros(t *testing.T) {
 	}
 }
 
-func TestReference(t *testing.T) {
+func TestReferencePath(t *testing.T) {
 	testCases := []struct {
 		input string
 		want  string
@@ -3120,16 +3120,31 @@ func TestReference(t *testing.T) {
 		want:  "a",
 	}, {
 		input: "v: w: x: a.b.c, a: b: c: 1",
-		want:  "a b c",
+		want:  "a.b.c",
 	}, {
 		input: "v: w: x: w.a.b.c, v: w: a: b: c: 1",
-		want:  "v w a b c",
+		want:  "v.w.a.b.c",
 	}, {
 		input: `v: w: x: w.a.b.c, v: w: a: b: c: 1, #D: 3, opt?: 3, "v\(#D)": 3, X: {a: 3}, X`,
-		want:  "v w a b c",
+		want:  "v.w.a.b.c",
 	}, {
-		input: `v: w: x: w.a[bb]["c"], v: w: a: b: c: 1, bb: "b"`,
-		want:  "v w a b c",
+		input: `
+		v: w: x: w.a[bb]["c"]
+		v: w: a: b: c: 1
+		bb: "b"`,
+		want: "v.w.a.b.c",
+	}, {
+		input: `
+		X="\(y)": 1
+		v: w: x: X // TODO: Move up for crash
+		y: "foo"`,
+		want: "foo",
+	}, {
+		input: `
+		v: w: _
+		v: [X=string]: x: a[X]
+		a: w: 1`,
+		want: "a.w",
 	}, {
 		input: `v: {
 			for t in src {
@@ -3138,7 +3153,7 @@ func TestReference(t *testing.T) {
 			}
 		},
 		src: ["x", "y"]`,
-		want: "v w tx",
+		want: "v.w.tx",
 	}, {
 		input: `
 		v: w: x: a
@@ -3167,8 +3182,25 @@ func TestReference(t *testing.T) {
 			var r Runtime
 			inst, _ := r.Compile("in", tc.input) // getInstance(t, tc.input)
 			v := inst.Lookup("v", "w", "x")
+
+			root, path := v.ReferencePath()
+			if got := path.String(); got != tc.want {
+				t.Errorf("\n got %v;\nwant %v", got, tc.want)
+			}
+
+			if tc.want != "" {
+				want := "1"
+				if tc.alt != "" {
+					want = tc.alt
+				}
+				v := fmt.Sprint(root.LookupPath(path))
+				if v != want {
+					t.Errorf("path resolved to %s; want %s", v, want)
+				}
+			}
+
 			inst, a := v.Reference()
-			if got := strings.Join(a, " "); got != tc.want {
+			if got := strings.Join(a, "."); got != tc.want {
 				t.Errorf("\n got %v;\nwant %v", got, tc.want)
 			}
 

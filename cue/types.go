@@ -1849,18 +1849,46 @@ func (v Value) instance() *Instance {
 // inst.Lookup(path) resolves to the same value, or no path if this value is not
 // a reference. If a reference contains index selection (foo[bar]), it will
 // only return a reference if the index resolves to a concrete value.
+//
+// Deprecated: use ReferencePath
 func (v Value) Reference() (inst *Instance, path []string) {
+	root, p := v.ReferencePath()
+	if !root.Exists() {
+		return nil, nil
+	}
+
+	inst = getImportFromNode(v.idx, root.v)
+	for _, sel := range p.Selectors() {
+		switch x := sel.sel.(type) {
+		case stringSelector:
+			path = append(path, string(x))
+		default:
+			path = append(path, sel.String())
+		}
+	}
+
+	return inst, path
+}
+
+// ReferencePath returns the value and path referred to by this value such that
+// value.LookupPath(path) resolves to the same value, or no path if this value
+// is not a reference.
+func (v Value) ReferencePath() (root Value, p Path) {
 	// TODO: don't include references to hidden fields.
 	if v.v == nil || len(v.v.Conjuncts) != 1 {
-		return nil, nil
+		return Value{}, Path{}
 	}
 	ctx := v.ctx()
 	c := v.v.Conjuncts[0]
 
-	return reference(v.idx, ctx, c.Env, c.Expr())
+	x, path := reference(v.idx, ctx, c.Env, c.Expr())
+	if x == nil {
+		return Value{}, Path{}
+	}
+	return makeValue(v.idx, x), Path{path: path}
 }
 
-func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *Instance, path []string) {
+func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *adt.Vertex, path []Selector) {
 	ctx := c
 	defer ctx.PopState(ctx.PushState(env, r.Source()))
 
@@ -1875,7 +1903,7 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 	case *adt.FieldReference:
 		env := ctx.Env(x.UpCount)
 		inst, path = mkPath(rt, nil, env.Vertex)
-		path = append(path, x.Label.SelectorString(c))
+		path = appendSelector(path, featureToSel(x.Label, rt))
 
 	case *adt.LabelReference:
 		env := ctx.Env(x.UpCount)
@@ -1885,22 +1913,19 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 		env := ctx.Env(x.UpCount)
 		inst, path = mkPath(rt, nil, env.Vertex)
 		v, _ := ctx.Evaluate(env, x.Label)
-		str := ctx.StringValue(v)
-		path = append(path, str)
+		path = appendSelector(path, valueToSel(v))
 
 	case *adt.ImportReference:
-		imp := x.ImportPath.StringValue(ctx)
-		inst = getImportFromPath(rt, imp)
+		inst, _ = rt.LoadImport(rt.LabelStr(x.ImportPath))
 
 	case *adt.SelectorExpr:
 		inst, path = reference(rt, c, env, x.X)
-		path = append(path, x.Sel.SelectorString(ctx))
+		path = appendSelector(path, featureToSel(x.Sel, rt))
 
 	case *adt.IndexExpr:
 		inst, path = reference(rt, c, env, x.X)
 		v, _ := ctx.Evaluate(env, x.Index)
-		str := ctx.StringValue(v)
-		path = append(path, str)
+		path = appendSelector(path, valueToSel(v))
 	}
 	if inst == nil {
 		return nil, nil
@@ -1908,22 +1933,14 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 	return inst, path
 }
 
-func mkPath(ctx *runtime.Runtime, a []string, v *adt.Vertex) (inst *Instance, path []string) {
+func mkPath(r *runtime.Runtime, a []Selector, v *adt.Vertex) (root *adt.Vertex, path []Selector) {
 	if v.Parent == nil {
-		return getImportFromNode(ctx, v), a
+		return v, a
 	}
-	inst, path = mkPath(ctx, a, v.Parent)
-	path = append(path, v.Label.SelectorString(ctx))
-	return inst, path
+	root, path = mkPath(r, a, v.Parent)
+	path = appendSelector(path, featureToSel(v.Label, r))
+	return root, path
 }
-
-// // References reports all references used to evaluate this value. It does not
-// // report references for sub fields if v is a struct.
-// //
-// // Deprecated: can be implemented in terms of Reference and Expr.
-// func (v Value) References() [][]string {
-// 	panic("deprecated")
-// }
 
 type options struct {
 	concrete          bool // enforce that values are concrete

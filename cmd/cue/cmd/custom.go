@@ -29,7 +29,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -201,7 +200,7 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		}
 
 		// Verify entry against template.
-		v = internal.UnifyBuiltin(v, kind).(cue.Value)
+		v = value.UnifyBuiltin(v, kind)
 		if err := v.Err(); err != nil {
 			return nil, errors.Promote(err, "newTask")
 		}

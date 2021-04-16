@@ -20,8 +20,9 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/value"
 )
 
 // DefaultContext is the shared context used with top-level functions.
@@ -159,12 +160,12 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 var (
 	mutex    sync.Mutex
 	instance *cue.Instance
-	runtime  = &cue.Runtime{}
+	runtime  = cuecontext.New()
 )
 
 func init() {
 	var err error
-	instance, err = runtime.Compile("<cuego>", "{}")
+	instance, err = value.ConvertToRuntime(runtime).Compile("<cuego>", "{}")
 	if err != nil {
 		panic(err)
 	}
@@ -176,7 +177,7 @@ func fromGoValue(x interface{}, nilIsNull bool) (v cue.Value, err error) {
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v = internal.FromGoValue(runtime, x, nilIsNull).(cue.Value)
+	v = value.FromGoValue(runtime, x, nilIsNull)
 	mutex.Unlock()
 	if err := v.Err(); err != nil {
 		return v, err
@@ -204,7 +205,7 @@ func fromGoType(x interface{}) cue.Value {
 	// Instance) here as any previously unrecognized field can never match an
 	// existing one and can only be merged.
 	mutex.Lock()
-	v := internal.FromGoType(runtime, x).(cue.Value)
+	v := value.FromGoType(runtime, x)
 	mutex.Unlock()
 	return v
 }

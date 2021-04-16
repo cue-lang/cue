@@ -43,30 +43,6 @@ type Decimal = apd.Decimal
 // incomplete.
 var ErrIncomplete = errors.New("incomplete value")
 
-// EvalExpr evaluates an expression within an existing struct value.
-// Identifiers only resolve to values defined within the struct.
-//
-// Expressions may refer to builtin packages if they can be uniquely identified
-//
-// Both value and result are of type cue.Value, but are an interface to prevent
-// cyclic dependencies.
-//
-// TODO: extract interface
-var EvalExpr func(value, expr interface{}) (result interface{})
-
-// FromGoValue converts an arbitrary Go value to the corresponding CUE value.
-// instance must be of type *cue.Instance.
-// The returned value is a cue.Value, which the caller must cast to.
-var FromGoValue func(instance, x interface{}, allowDefault bool) interface{}
-
-// FromGoType converts an arbitrary Go type to the corresponding CUE value.
-// instance must be of type *cue.Instance.
-// The returned value is a cue.Value, which the caller must cast to.
-var FromGoType func(instance, x interface{}) interface{}
-
-// UnifyBuiltin returns the given Value unified with the given builtin template.
-var UnifyBuiltin func(v interface{}, kind string) interface{}
-
 // MakeInstance makes a new instance from a value.
 var MakeInstance func(value interface{}) (instance interface{})
 

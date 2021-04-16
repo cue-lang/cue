@@ -15,12 +15,8 @@
 package cue
 
 import (
-	"strings"
-
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/runtime"
 )
 
 func pos(n adt.Node) (p token.Pos) {
@@ -32,24 +28,4 @@ func pos(n adt.Node) (p token.Pos) {
 		return
 	}
 	return src.Pos()
-}
-
-func init() {
-	// TODO: unroll this function. Should no longer be necessary to be internal.
-	internal.UnifyBuiltin = func(val interface{}, kind string) interface{} {
-		v := val.(Value)
-
-		p := strings.Split(kind, ".")
-		pkg, name := p[0], p[1]
-		s, _ := runtime.SharedRuntime.LoadImport(pkg)
-		if s == nil {
-			return v
-		}
-		a := s.Lookup(v.idx.Label(name, false))
-		if a == nil {
-			return v
-		}
-
-		return v.Unify(makeValue(v.idx, a))
-	}
 }

@@ -25,7 +25,6 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/cuecontext"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/value"
 )
 
@@ -36,7 +35,7 @@ type Config struct {
 // A Codec decodes and encodes CUE from and to Go values and validates and
 // completes Go values based on CUE templates.
 type Codec struct {
-	runtime *cue.Runtime
+	runtime *cue.Context
 	mutex   sync.RWMutex
 }
 
@@ -46,7 +45,7 @@ type Codec struct {
 // Runtime is not used elsewhere while using Codec. However, only the concurrent
 // use of Decode, Validate, and Complete is efficient.
 func New(r *cue.Runtime, c *Config) *Codec {
-	return &Codec{runtime: r}
+	return &Codec{runtime: value.ConvertToContext(r)}
 }
 
 // ExtractType extracts a CUE value from a Go type.
@@ -162,24 +161,24 @@ func (c *Codec) Complete(v cue.Value, x interface{}) error {
 	return w.Unify(v).Decode(x)
 }
 
-func fromGoValue(r *cue.Runtime, x interface{}, allowDefault bool) (cue.Value, error) {
-	v := internal.FromGoValue(r, x, allowDefault).(cue.Value)
+func fromGoValue(r *cue.Context, x interface{}, allowDefault bool) (cue.Value, error) {
+	v := value.FromGoValue(r, x, allowDefault)
 	if err := v.Err(); err != nil {
 		return v, err
 	}
 	return v, nil
 }
 
-func fromGoType(r *cue.Runtime, x interface{}) (cue.Value, error) {
-	v := internal.FromGoType(r, x).(cue.Value)
+func fromGoType(r *cue.Context, x interface{}) (cue.Value, error) {
+	v := value.FromGoType(r, x)
 	if err := v.Err(); err != nil {
 		return v, err
 	}
 	return v, nil
 }
 
-func checkAndForkContext(r *cue.Runtime, v cue.Value) *cue.Runtime {
-	rr := value.ConvertToRuntime(v.Context())
+func checkAndForkContext(r *cue.Context, v cue.Value) *cue.Context {
+	rr := v.Context()
 	if r != rr {
 		panic("value not from same runtime")
 	}

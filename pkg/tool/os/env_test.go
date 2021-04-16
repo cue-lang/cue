@@ -26,8 +26,8 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/task"
+	"cuelang.org/go/internal/value"
 )
 
 func TestGetenv(t *testing.T) {
@@ -140,5 +140,5 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return internal.UnifyBuiltin(i.Value(), kind).(cue.Value)
+	return value.UnifyBuiltin(i.Value(), kind)
 }

@@ -17,8 +17,15 @@
 package value
 
 import (
+	"strings"
+
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
+	"cuelang.org/go/internal/core/convert"
+	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/types"
 )
@@ -38,17 +45,91 @@ func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
 	return t.R, t.V
 }
 
-// TODO:
 // Make wraps cue.MakeValue.
 func Make(ctx *adt.OpContext, v adt.Value) cue.Value {
 	return (*cue.Context)(ctx.Impl().(*runtime.Runtime)).Encode(v)
 }
 
-//
-// func Make(r *runtime.Runtime, v *adt.Vertex) cue.Value {
-// 	return cue.Value{}
-// }
+func MakeError(r *runtime.Runtime, err errors.Error) cue.Value {
+	b := &adt.Bottom{Err: err}
+	node := &adt.Vertex{BaseValue: b}
+	node.UpdateStatus(adt.Finalized)
+	node.AddConjunct(adt.MakeRootConjunct(nil, b))
+	return (*cue.Context)(r).Encode(node)
+}
 
-// func MakeError(r *runtime.Runtime, err error) cue.Value {
-// 	return cue.Value{}
-// }
+// UnifyBuiltin returns the given Value unified with the given builtin template.
+func UnifyBuiltin(v cue.Value, kind string) cue.Value {
+	p := strings.Split(kind, ".")
+	pkg, name := p[0], p[1]
+	s, _ := runtime.SharedRuntime.LoadImport(pkg)
+	if s == nil {
+		return v
+	}
+
+	ctx := v.Context()
+	a := s.Lookup((*runtime.Runtime)(ctx).Label(name, false))
+	if a == nil {
+		return v
+	}
+
+	return v.Unify(ctx.Encode(a))
+}
+
+func FromGoValue(r *cue.Context, x interface{}, nilIsTop bool) cue.Value {
+	rt := (*runtime.Runtime)(r)
+	rt.Init()
+	ctx := eval.NewContext(rt, nil)
+	v := convert.GoValueToValue(ctx, x, nilIsTop)
+	n := adt.ToVertex(v)
+	return r.Encode(n)
+}
+
+func FromGoType(r *cue.Context, x interface{}) cue.Value {
+	rt := (*runtime.Runtime)(r)
+	rt.Init()
+	ctx := eval.NewContext(rt, nil)
+	expr, err := convert.GoTypeToExpr(ctx, x)
+	if err != nil {
+		expr = &adt.Bottom{Err: err}
+	}
+	n := &adt.Vertex{}
+	n.AddConjunct(adt.MakeRootConjunct(nil, expr))
+	return r.Encode(n)
+}
+
+// EvalExpr evaluates an expression within an existing struct value.
+// Identifiers only resolve to values defined within the struct.
+//
+// Expressions may refer to builtin packages if they can be uniquely identified
+func EvalExpr(value cue.Value, expr ast.Expr) cue.Value {
+	r, scope := ToInternal(value)
+	ctx := eval.NewContext(r, nil)
+
+	cfg := &compile.Config{
+		Scope: scope,
+		Imports: func(x *ast.Ident) (pkgPath string) {
+			if !isBuiltin(x.Name) {
+				return ""
+			}
+			return x.Name
+		},
+	}
+
+	c, err := compile.Expr(cfg, ctx, pkgID(), expr)
+	if err != nil {
+		return MakeError(r, err)
+	}
+	v := adt.Resolve(ctx, c)
+
+	return (*cue.Context)(r).Encode(v)
+}
+
+func isBuiltin(s string) bool {
+	return runtime.SharedRuntime.IsBuiltinPackage(s)
+}
+
+// pkgID reports a package path that can never resolve to a valid package.
+func pkgID() string {
+	return "_"
+}

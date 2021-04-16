@@ -31,7 +31,6 @@ import (
 	"cuelang.org/go/cue/load"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
 	"cuelang.org/go/internal/value"
@@ -350,7 +349,8 @@ func (i *expressionIter) value() cue.Value {
 	if len(i.expr) == 0 {
 		return i.iter.value()
 	}
-	return internal.EvalExpr(i.iter.value(), i.expr[i.i]).(cue.Value)
+	// TODO: replace with FillPath.
+	return value.EvalExpr(i.iter.value(), i.expr[i.i])
 }
 
 type config struct {

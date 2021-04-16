@@ -173,15 +173,6 @@ func (inst *Instance) eval(ctx *adt.OpContext) adt.Value {
 	return v
 }
 
-func init() {
-	internal.EvalExpr = func(value, expr interface{}) interface{} {
-		v := value.(Value)
-		e := expr.(ast.Expr)
-		ctx := newContext(v.idx)
-		return newValueRoot(v.idx, ctx, evalExpr(ctx, v.v, e))
-	}
-}
-
 // pkgID reports a package path that can never resolve to a valid package.
 func pkgID() string {
 	return "_"

@@ -24,8 +24,8 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/task"
+	"cuelang.org/go/internal/value"
 )
 
 func parse(t *testing.T, kind, expr string) cue.Value {
@@ -40,7 +40,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	if err != nil {
 		t.Fatal(err)
 	}
-	return internal.UnifyBuiltin(i.Value(), kind).(cue.Value)
+	return value.UnifyBuiltin(i.Value(), kind)
 }
 func TestRead(t *testing.T) {
 	v := parse(t, "tool/file.Read", `{filename: "testdata/input.foo"}`)

@@ -334,13 +334,6 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 				}
 			})
 			walk(s, expr)
-
-		case *ast.TemplateLabel:
-			s = newScope(s.file, s, x, nil)
-			name, err := ast.ParseIdent(label.Ident)
-			if err == nil {
-				s.insert(name, x.Label, x) // Field used for entire lambda.
-			}
 		}
 
 		if n := x.Value; n != nil {

@@ -95,9 +95,6 @@ func walk(v visitor, node ast.Node) {
 	case *ast.BottomLit, *ast.BadExpr, *ast.Ident, *ast.BasicLit:
 		// nothing to do
 
-	case *ast.TemplateLabel:
-		walk(v, n.Ident)
-
 	case *ast.Interpolation:
 		for _, e := range n.Elts {
 			walk(v, e)

@@ -485,11 +485,6 @@ func (f *formatter) label(l ast.Label, optional bool) {
 		}
 		f.print(n.ValuePos, str)
 
-	case *ast.TemplateLabel:
-		f.print(n.Langle, token.LSS, indent)
-		f.label(n.Ident, false)
-		f.print(unindent, n.Rangle, token.GTR)
-
 	case *ast.ListLit:
 		f.expr(n)
 

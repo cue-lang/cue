@@ -414,18 +414,6 @@ type Ident struct {
 	expr
 }
 
-// A TemplateLabel represents a field template declaration in a struct.
-//
-// Deprecated: use square bracket notation through ListLit.
-type TemplateLabel struct {
-	Langle token.Pos
-	Ident  *Ident
-	Rangle token.Pos
-
-	comments
-	label
-}
-
 // A BasicLit node represents a literal of basic type.
 type BasicLit struct {
 	ValuePos token.Pos   // literal position
@@ -770,8 +758,6 @@ func (x *BadExpr) Pos() token.Pos        { return x.From }
 func (x *BadExpr) pos() *token.Pos       { return &x.From }
 func (x *Ident) Pos() token.Pos          { return x.NamePos }
 func (x *Ident) pos() *token.Pos         { return &x.NamePos }
-func (x *TemplateLabel) Pos() token.Pos  { return x.Langle }
-func (x *TemplateLabel) pos() *token.Pos { return &x.Langle }
 func (x *BasicLit) Pos() token.Pos       { return x.ValuePos }
 func (x *BasicLit) pos() *token.Pos      { return &x.ValuePos }
 func (x *Interpolation) Pos() token.Pos  { return x.Elts[0].Pos() }
@@ -817,8 +803,7 @@ func (x *BadExpr) End() token.Pos { return x.To }
 func (x *Ident) End() token.Pos {
 	return x.NamePos.Add(len(x.Name))
 }
-func (x *TemplateLabel) End() token.Pos { return x.Rangle }
-func (x *BasicLit) End() token.Pos      { return x.ValuePos.Add(len(x.Value)) }
+func (x *BasicLit) End() token.Pos { return x.ValuePos.Add(len(x.Value)) }
 
 func (x *Interpolation) End() token.Pos { return x.Elts[len(x.Elts)-1].Pos() }
 func (x *StructLit) End() token.Pos {

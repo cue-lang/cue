@@ -350,9 +350,6 @@ func applyCursor(v applyVisitor, c Cursor) {
 	case *ast.BottomLit, *ast.BadExpr, *ast.Ident, *ast.BasicLit:
 		// nothing to do
 
-	case *ast.TemplateLabel:
-		apply(v, c, &n.Ident)
-
 	case *ast.Interpolation:
 		applyExprList(v, c, &n, n.Elts)
 

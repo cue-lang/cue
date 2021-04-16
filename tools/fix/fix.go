@@ -150,26 +150,6 @@ func File(f *ast.File, o ...Option) *ast.File {
 		}
 	}
 
-	// Rewrite TemplateLabel to ListLit.
-	// Note: there is a chance that the name will clash with the
-	// scope in which it is defined. We drop the alias if it is not
-	// used to mitigate this issue.
-	f = astutil.Apply(f, func(c astutil.Cursor) bool {
-		n := c.Node()
-		switch x := n.(type) {
-		case *ast.TemplateLabel:
-			var expr ast.Expr = ast.NewIdent("string")
-			if _, ok := referred[x]; ok {
-				expr = &ast.Alias{
-					Ident: x.Ident,
-					Expr:  ast.NewIdent("_"),
-				}
-			}
-			c.Replace(ast.NewList(expr))
-		}
-		return true
-	}, nil).(*ast.File)
-
 	// Rewrite quoted identifier fields that are referenced.
 	f = astutil.Apply(f, func(c astutil.Cursor) bool {
 		n := c.Node()

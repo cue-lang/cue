@@ -100,9 +100,6 @@ func walk(v visitor, node Node) {
 	case *BottomLit, *BadExpr, *Ident, *BasicLit:
 		// nothing to do
 
-	case *TemplateLabel:
-		walk(v, n.Ident)
-
 	case *Interpolation:
 		for _, e := range n.Elts {
 			walk(v, e)

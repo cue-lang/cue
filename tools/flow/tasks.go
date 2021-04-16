@@ -192,7 +192,7 @@ func (c *Controller) findImpliedTask(d dep.Dependency) *Task {
 		}
 
 		if !d.IsRoot() {
-			v := cue.MakeValue(c.opCtx, n)
+			v := value.Make(c.opCtx, n)
 
 			if t := c.getTask(nil, v); t != nil {
 				return t
@@ -225,7 +225,7 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 		depTask := c.findImpliedTask(d)
 		if depTask != nil {
 			if depTask != cycleMarker {
-				v := cue.MakeValue(c.opCtx, d.Node)
+				v := value.Make(c.opCtx, d.Node)
 				t.addDep(v.Path().String(), depTask)
 			}
 			return nil
@@ -245,7 +245,7 @@ func (c *Controller) markTaskDependencies(t *Task, n *adt.Vertex) {
 }
 
 func (c *Controller) inRoot(n *adt.Vertex) bool {
-	path := cue.MakeValue(c.opCtx, n).Path().Selectors()
+	path := value.Make(c.opCtx, n).Path().Selectors()
 	root := c.cfg.Root.Selectors()
 	if len(path) < len(root) {
 		return false

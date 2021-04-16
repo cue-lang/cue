@@ -72,7 +72,7 @@ func TestVisit(t *testing.T) {
 
 			t.Run(tc.name, func(sub *testing.T) {
 				tc.fn(ctxt, n, func(d dep.Dependency) error {
-					str := cue.MakeValue(ctxt, d.Node).Path().String()
+					str := value.Make(ctxt, d.Node).Path().String()
 					if i := d.Import(); i != nil {
 						path := i.ImportPath.StringValue(ctxt)
 						str = fmt.Sprintf("%q.%s", path, str)
@@ -114,7 +114,7 @@ func TestX(t *testing.T) {
 	deps := []string{}
 
 	_ = dep.VisitFields(ctxt, n, func(d dep.Dependency) error {
-		str := cue.MakeValue(ctxt, d.Node).Path().String()
+		str := value.Make(ctxt, d.Node).Path().String()
 		if i := d.Import(); i != nil {
 			path := i.ImportPath.StringValue(ctxt)
 			str = fmt.Sprintf("%q.%s", path, str)

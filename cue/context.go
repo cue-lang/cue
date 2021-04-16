@@ -212,6 +212,10 @@ func NilIsAny(isAny bool) EncodeOption {
 // The returned Value will represent an error, accessible through Err, if any
 // error occurred.
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
+	switch v := x.(type) {
+	case adt.Value:
+		return newValueRoot(c.index(), c.ctx(), v)
+	}
 	var options encodeOptions
 	options.process(option)
 

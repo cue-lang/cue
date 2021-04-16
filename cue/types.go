@@ -632,17 +632,6 @@ func Dereference(v Value) Value {
 	return makeValue(v.idx, n)
 }
 
-// MakeValue converts an adt.Value and given OpContext to a Value. The context
-// must be directly or indirectly obtained from the NewRuntime defined in this
-// package and it will panic if this is not the case.
-//
-// For internal use only.
-func MakeValue(ctx *adt.OpContext, v adt.Value) Value {
-	index := ctx.Impl().(*runtime.Runtime)
-
-	return newValueRoot(index, newContext(index), v)
-}
-
 func makeValue(idx *runtime.Runtime, v *adt.Vertex) Value {
 	if v.Status() == 0 || v.BaseValue == nil {
 		panic(fmt.Sprintf("not properly initialized (state: %v, value: %T)",

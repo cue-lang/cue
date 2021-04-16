@@ -26,7 +26,6 @@ package flow
 // future tasks may be long running, as discussed above.
 
 import (
-	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/eval"
@@ -153,7 +152,7 @@ func (c *Controller) updateValue() bool {
 	v := &adt.Vertex{Conjuncts: c.conjuncts}
 	v.Finalize(c.opCtx)
 
-	c.inst = cue.MakeValue(c.opCtx, v)
+	c.inst = value.Make(c.opCtx, v)
 	c.valueSeqNum = c.conjunctSeq
 	return true
 }

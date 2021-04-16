@@ -27,7 +27,7 @@ func init() {
 		ctx := eval.NewContext(r.index(), nil)
 		v := convert.GoValueToValue(ctx, x, nilIsTop)
 		n := adt.ToVertex(v)
-		return Value{r.idx, n}
+		return Value{r.index(), n}
 	}
 
 	internal.FromGoType = func(runtime, x interface{}) interface{} {
@@ -39,7 +39,7 @@ func init() {
 		}
 		n := &adt.Vertex{}
 		n.AddConjunct(adt.MakeRootConjunct(nil, expr))
-		return Value{r.idx, n}
+		return Value{r.index(), n}
 
 		// return convertType(runtime.(*Runtime), x)
 	}

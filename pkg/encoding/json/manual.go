@@ -24,7 +24,7 @@ import (
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/value"
 )
 
 // Compact generates the JSON-encoded src with insignificant space characters
@@ -111,7 +111,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 	if !json.Valid(b) {
 		return false, fmt.Errorf("json: invalid JSON")
 	}
-	r := internal.GetRuntime(v).(*cue.Runtime)
+	r := value.ConvertToRuntime(v.Context())
 	inst, err := r.Compile("json.Validate", b)
 	if err != nil {
 		return false, err

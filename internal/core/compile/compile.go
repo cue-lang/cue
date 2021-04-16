@@ -92,6 +92,7 @@ func newCompiler(cfg *Config, pkgPath string, r adt.Runtime) *compiler {
 
 type compiler struct {
 	Config
+	upCountOffset int32 // 1 for files; 0 for expressions
 
 	index adt.StringIndexer
 
@@ -235,6 +236,7 @@ func (c *compiler) popScope() {
 
 func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	c.fileScope = map[adt.Feature]bool{}
+	c.upCountOffset = 1
 
 	// TODO(resolve): this is also done in the runtime package, do we need both?
 
@@ -262,11 +264,20 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 
 	// env := &adt.Environment{Vertex: nil} // runtime: c.runtime
 
+	env := &adt.Environment{}
+	top := env
+
+	for p := c.Config.Scope; p != nil; p = p.Parent {
+		top.Vertex = p
+		top.Up = &adt.Environment{}
+		top = top.Up
+	}
+
 	for _, file := range a {
 		c.pushScope(nil, 0, file) // File scope
 		v := &adt.StructLit{Src: file}
 		c.addDecls(v, file.Decls)
-		res.Conjuncts = append(res.Conjuncts, adt.MakeRootConjunct(nil, v))
+		res.Conjuncts = append(res.Conjuncts, adt.MakeRootConjunct(env, v))
 		c.popScope()
 	}
 
@@ -319,6 +330,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 				Label:   label,
 			}
 		}
+		upCount += c.upCountOffset
 		for p := c.Scope; p != nil; p = p.Parent {
 			for _, a := range p.Arcs {
 				if a.Label == label {

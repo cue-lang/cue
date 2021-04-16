@@ -140,7 +140,7 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 			return p
 		}
 		// TODO: support exporting instance
-		file, _ := export.Def(r.idx, i.inst.ID(), i.root)
+		file, _ := export.Def(r.index(), i.inst.ID(), i.root)
 		imports := []string{}
 		file.VisitImports(func(i *ast.ImportDecl) {
 			for _, spec := range i.Specs {
@@ -190,7 +190,7 @@ func (r *Runtime) Marshal(instances ...*Instance) (b []byte, err error) {
 		p := len(staged) - 1
 
 		for _, imp := range imports {
-			i := getImportFromPath(r.idx, imp)
+			i := getImportFromPath(r.index(), imp)
 			if i == nil || !strings.Contains(imp, ".") {
 				continue // a builtin package.
 			}

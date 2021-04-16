@@ -24,7 +24,9 @@ import (
 	"sync"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/value"
 )
 
 // Config has no options yet, but is defined for future extensibility.
@@ -93,7 +95,7 @@ func (c *Codec) Encode(v cue.Value, x interface{}) error {
 	return v.Decode(x)
 }
 
-var defaultCodec = New(&cue.Runtime{}, nil)
+var defaultCodec = New(value.ConvertToRuntime(cuecontext.New()), nil)
 
 // Validate calls Validate on a default Codec for the type of x.
 func Validate(x interface{}) error {
@@ -125,7 +127,7 @@ func (c *Codec) Validate(v cue.Value, x interface{}) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	r := checkAndForkRuntime(c.runtime, v)
+	r := checkAndForkContext(c.runtime, v)
 	w, err := fromGoValue(r, x, false)
 	if err != nil {
 		return err
@@ -151,7 +153,7 @@ func (c *Codec) Complete(v cue.Value, x interface{}) error {
 	c.mutex.RLock()
 	defer c.mutex.RUnlock()
 
-	r := checkAndForkRuntime(c.runtime, v)
+	r := checkAndForkContext(c.runtime, v)
 	w, err := fromGoValue(r, x, true)
 	if err != nil {
 		return err
@@ -176,6 +178,10 @@ func fromGoType(r *cue.Runtime, x interface{}) (cue.Value, error) {
 	return v, nil
 }
 
-func checkAndForkRuntime(r *cue.Runtime, v cue.Value) *cue.Runtime {
-	return internal.CheckAndForkRuntime(r, v).(*cue.Runtime)
+func checkAndForkContext(r *cue.Runtime, v cue.Value) *cue.Runtime {
+	rr := value.ConvertToRuntime(v.Context())
+	if r != rr {
+		panic("value not from same runtime")
+	}
+	return rr
 }

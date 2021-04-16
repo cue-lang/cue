@@ -12,38 +12,20 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-// Package value contains functions for converting values to internal types
-// and various other Value-related utilities.
-package value
+package cuecontext
 
 import (
 	"cuelang.org/go/cue"
-	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/runtime"
-	"cuelang.org/go/internal/types"
+
+	_ "cuelang.org/go/pkg"
 )
 
-func ConvertToRuntime(c *cue.Context) *cue.Runtime {
-	return (*cue.Runtime)(c)
-}
+// Option controls a build context.
+type Option interface{ buildOption() }
 
-func ConvertToContext(r *cue.Runtime) *cue.Context {
-	(*runtime.Runtime)(r).Init()
+// New creates a new Context.
+func New(options ...Option) *cue.Context {
+	r := runtime.New()
 	return (*cue.Context)(r)
 }
-
-func ToInternal(v cue.Value) (*runtime.Runtime, *adt.Vertex) {
-	var t types.Value
-	v.Core(&t)
-	return t.R, t.V
-}
-
-// TODO:
-//
-// func Make(r *runtime.Runtime, v *adt.Vertex) cue.Value {
-// 	return cue.Value{}
-// }
-
-// func MakeError(r *runtime.Runtime, err error) cue.Value {
-// 	return cue.Value{}
-// }

@@ -49,7 +49,7 @@ func TestValue(t *testing.T) {
 
 		pkgID := a[0].ID()
 
-		v, err := r.Build(a[0])
+		v, err := r.Build(nil, a[0])
 		if err != nil {
 			t.Fatal(err)
 		}

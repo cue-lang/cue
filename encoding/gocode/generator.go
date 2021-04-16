@@ -26,7 +26,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/internal"
+	"cuelang.org/go/internal/value"
 )
 
 // Config defines options for generation Go code.
@@ -159,7 +159,7 @@ func Generate(pkgPath string, inst *cue.Instance, c *Config) (b []byte, err erro
 		g.decl(iter.Label(), iter.Value())
 	}
 
-	r := internal.GetRuntime(inst).(*cue.Runtime)
+	r := value.ConvertToRuntime(inst.Value().Context())
 	b, err = r.Marshal(inst)
 	g.addErr(err)
 

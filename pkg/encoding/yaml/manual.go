@@ -23,6 +23,7 @@ import (
 	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/third_party/yaml"
+	"cuelang.org/go/internal/value"
 )
 
 // Marshal returns the YAML encoding of v.
@@ -83,7 +84,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := internal.GetRuntime(v).(*cue.Runtime)
+	r := value.ConvertToRuntime(v.Context())
 	for {
 		expr, err := d.Decode()
 		if err != nil {
@@ -127,7 +128,7 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := internal.GetRuntime(v).(*cue.Runtime)
+	r := value.ConvertToRuntime(v.Context())
 	for {
 		expr, err := d.Decode()
 		if err != nil {

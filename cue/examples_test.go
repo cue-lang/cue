@@ -20,6 +20,7 @@ import (
 	"os"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/cuetxtar"
 	"github.com/rogpeppe/go-internal/txtar"
 )
@@ -67,8 +68,9 @@ bar: _foo
 }
 
 func ExampleValue_Allows() {
+	ctx := cuecontext.New()
+
 	const file = `
--- main.cue --
 a: [1, 2, ...int]
 
 b: #Point
@@ -84,7 +86,7 @@ d: #C
 #C: [>"m"]: int
 `
 
-	v := load(file).Value()
+	v := ctx.CompileString(file)
 
 	a := v.LookupPath(cue.ParsePath("a"))
 	fmt.Println("a allows:")

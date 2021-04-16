@@ -38,13 +38,13 @@ import (
 // to create a new Context.
 type Context runtime.Runtime
 
-func (c *Context) index() *runtime.Runtime {
+func (c *Context) runtime() *runtime.Runtime {
 	rt := (*runtime.Runtime)(c)
 	return rt
 }
 
 func (c *Context) ctx() *adt.OpContext {
-	return newContext(c.index())
+	return newContext(c.runtime())
 }
 
 // Context reports the Context with which this value was created.
@@ -92,7 +92,7 @@ func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
 // error occurred.
 func (c *Context) BuildInstance(i *build.Instance, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	v, err := c.index().Build(&cfg, i)
+	v, err := c.runtime().Build(&cfg, i)
 	if err != nil {
 		return c.makeError(err)
 	}
@@ -113,7 +113,7 @@ func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 	var errs errors.Error
 	var a []Value
 	for _, b := range instances {
-		v, err := c.index().Build(nil, b)
+		v, err := c.runtime().Build(nil, b)
 		if err != nil {
 			errs = errors.Append(errs, err)
 		}
@@ -128,7 +128,7 @@ func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 // error occurred.
 func (c *Context) BuildFile(f *ast.File, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.index().CompileFile(&cfg, f))
+	return c.compile(c.runtime().CompileFile(&cfg, f))
 }
 
 func (c *Context) compile(v *adt.Vertex, p *build.Instance) Value {
@@ -144,7 +144,7 @@ func (c *Context) compile(v *adt.Vertex, p *build.Instance) Value {
 // error occurred.
 func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	v, p, err := c.index().CompileExpr(&cfg, x)
+	v, p, err := c.runtime().CompileExpr(&cfg, x)
 	if err != nil {
 		return c.makeError(p.Err)
 	}
@@ -157,7 +157,7 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 // error occurred.
 func (c *Context) CompileString(src string, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.index().Compile(&cfg, src))
+	return c.compile(c.runtime().Compile(&cfg, src))
 }
 
 // ParseString parses and build a Value from the given source bytes.
@@ -166,7 +166,7 @@ func (c *Context) CompileString(src string, options ...BuildOption) Value {
 // error occurred.
 func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 	cfg := c.parseOptions(options)
-	return c.compile(c.index().Compile(&cfg, b))
+	return c.compile(c.runtime().Compile(&cfg, b))
 }
 
 // TODO: fs.FS or custom wrapper?
@@ -183,7 +183,7 @@ func (c *Context) CompileBytes(b []byte, options ...BuildOption) Value {
 // }
 
 func (c *Context) make(v *adt.Vertex) Value {
-	return newValueRoot(c.index(), newContext(c.index()), v)
+	return newValueRoot(c.runtime(), newContext(c.runtime()), v)
 }
 
 // An EncodeOption defines options for the various encoding-related methods of
@@ -214,7 +214,7 @@ func NilIsAny(isAny bool) EncodeOption {
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	switch v := x.(type) {
 	case adt.Value:
-		return newValueRoot(c.index(), c.ctx(), v)
+		return newValueRoot(c.runtime(), c.ctx(), v)
 	}
 	var options encodeOptions
 	options.process(option)

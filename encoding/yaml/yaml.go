@@ -66,6 +66,8 @@ func Extract(filename string, src interface{}) (*ast.File, error) {
 
 // Decode converts a YAML file to a CUE value. Streams are returned as a list
 // of the streamed values.
+//
+// Deprecate: use Extract and build the File with cue.Context.BuildFile.
 func Decode(r *cue.Runtime, filename string, src interface{}) (*cue.Instance, error) {
 	file, err := Extract(filename, src)
 	if err != nil {

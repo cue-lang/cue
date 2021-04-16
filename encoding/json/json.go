@@ -55,6 +55,8 @@ func Extract(path string, data []byte) (ast.Expr, error) {
 
 // Decode parses JSON-encoded data to a CUE value, using path for position
 // information.
+//
+// Deprecated: use Extract and build using cue.Context.BuildExpr.
 func Decode(r *cue.Runtime, path string, data []byte) (*cue.Instance, error) {
 	expr, err := extract(path, data)
 	if err != nil {
@@ -80,6 +82,8 @@ func extract(path string, b []byte) (ast.Expr, error) {
 // NewDecoder configures a JSON decoder. The path is used to associate position
 // information with each node. The runtime may be nil if the decoder
 // is only used to extract to CUE ast objects.
+//
+// The runtime may be nil if Decode isn't used.
 func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 	return &Decoder{
 		r:      r,
@@ -129,6 +133,8 @@ func (d *Decoder) extract() (ast.Expr, error) {
 
 // Decode converts the current JSON value to a CUE instance. It returns io.EOF
 // if the input has been exhausted.
+//
+// Deprecated: use Extract and build with cue.Context.BuildExpr.
 func (d *Decoder) Decode() (*cue.Instance, error) {
 	expr, err := d.Extract()
 	if err != nil {

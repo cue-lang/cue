@@ -225,6 +225,8 @@ type Iterator struct {
 	isOpt bool
 }
 
+type hiddenIterator = Iterator
+
 type field struct {
 	arc        *adt.Vertex
 	isOptional bool
@@ -252,13 +254,17 @@ func (i *Iterator) Value() Value {
 	return i.cur
 }
 
-func (i *Iterator) Feature() adt.Feature {
-	return i.f
+// Selector reports the field label of this iteration.
+func (i *Iterator) Selector() Selector {
+	return featureToSel(i.f, i.idx)
 }
 
 // Label reports the label of the value if i iterates over struct fields and
 // "" otherwise.
-func (i *Iterator) Label() string {
+//
+// Deprecated: use i.Selector().String(). Note that this will give more accurate
+// string representations.
+func (i *hiddenIterator) Label() string {
 	if i.f == 0 {
 		return ""
 	}
@@ -266,7 +272,9 @@ func (i *Iterator) Label() string {
 }
 
 // IsHidden reports if a field is hidden from the data model.
-func (i *Iterator) IsHidden() bool {
+//
+// Deprecated: use i.Selector().PkgPath() != ""
+func (i *hiddenIterator) IsHidden() bool {
 	return i.f.IsHidden()
 }
 
@@ -276,7 +284,9 @@ func (i *Iterator) IsOptional() bool {
 }
 
 // IsDefinition reports if a field is a definition.
-func (i *Iterator) IsDefinition() bool {
+//
+// Deprecated: use i.Selector().IsDefinition()
+func (i *hiddenIterator) IsDefinition() bool {
 	return i.f.IsDef()
 }
 

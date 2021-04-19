@@ -691,7 +691,7 @@ func TestFields(t *testing.T) {
 		res:   "{a:1,b:2,c:3,}",
 	}, {
 		value: `{a:1,"_b":2,c:3,_d:4}`,
-		res:   "{a:1,_b:2,c:3,}",
+		res:   `{a:1,"_b":2,c:3,}`,
 	}, {
 		value: `{_a:"a"}`,
 		res:   "{}",
@@ -715,7 +715,7 @@ func TestFields(t *testing.T) {
 
 			buf := []byte{'{'}
 			for iter.Next() {
-				buf = append(buf, iter.Label()...)
+				buf = append(buf, iter.Selector().String()...)
 				buf = append(buf, ':')
 				b, err := iter.Value().MarshalJSON()
 				checkFatal(t, err, tc.err, "Obj.At")

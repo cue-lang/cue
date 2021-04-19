@@ -145,11 +145,3 @@ func (l *letScope) labelString() string {
 	// TODO: include more info in square brackets.
 	return "let[]"
 }
-
-// TODO(legacy): remove
-type deprecatedAliasScope ast.Alias
-
-func (l *deprecatedAliasScope) labelString() string {
-	// TODO: include more info in square brackets.
-	return "let[]"
-}

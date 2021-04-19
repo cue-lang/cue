@@ -60,7 +60,7 @@ func ExampleConstrain() {
 	}
 
 	err := cuego.Constrain(&Config{}, `{
-		jsonFile = =~".json$"
+		let jsonFile = =~".json$"
 
 		// Filename must be defined and have a .json extension
 		Filename: jsonFile

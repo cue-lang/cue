@@ -26,7 +26,7 @@ e & { // Is this allowed? Probably not as per comprehension rule (ref fixes.)
 {X=["foo"]: b: X | null}
 {[Y="bar"]: b: Y}
 
-B = {open: int}
+let B = {open: int}
 f: B
 
 schema: {

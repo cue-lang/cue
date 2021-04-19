@@ -4,7 +4,7 @@ import "encoding/yaml"
 
 configMap: prometheus: {
 	"alert.rules": yaml.Marshal(alert_rules)
-	alert_rules = {
+	let alert_rules = {
 		groups: [{
 			name: "rules.yaml"
 			rules: [{
@@ -44,7 +44,7 @@ configMap: prometheus: {
 		}]
 	}
 	"prometheus.yml": yaml.Marshal(prometheus_yml)
-	prometheus_yml = {
+	let prometheus_yml = {
 		global: scrape_interval: "15s"
 		rule_files: ["/etc/prometheus/alert.rules"]
 		alerting: alertmanagers: [{

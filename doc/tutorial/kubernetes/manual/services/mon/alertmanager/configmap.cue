@@ -4,7 +4,7 @@ import "encoding/yaml"
 
 configMap: alertmanager: {
 	"alerts.yaml": yaml.Marshal(alerts_yaml)
-	alerts_yaml = {
+	let alerts_yaml = {
 		receivers: [{
 			name: "pager"
 			// email_configs:
@@ -12,9 +12,9 @@ configMap: alertmanager: {
 			slack_configs: [{
 				channel: "#cloudmon"
 				text: """
-		{{ range .Alerts }}{{ .Annotations.description }}
-		{{ end }}
-		"""
+					{{ range .Alerts }}{{ .Annotations.description }}
+					{{ end }}
+					"""
 				send_resolved: true
 			}]
 		}]

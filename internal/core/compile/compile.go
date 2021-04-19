@@ -410,7 +410,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 	switch n.Node.(type) {
 	// Local expressions
-	case *ast.LetClause, *ast.Alias:
+	case *ast.LetClause:
 		entry := c.lookupAlias(k, n)
 
 		return &adt.LetReference{
@@ -419,6 +419,8 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			Label:   label,
 			X:       entry.expr,
 		}
+
+		// TODO: handle new-style aliases
 	}
 
 	if n.Scope == nil {
@@ -507,12 +509,7 @@ func (c *compiler) markAlias(d ast.Decl) {
 		c.insertAlias(x.Ident, a)
 
 	case *ast.Alias:
-		a := aliasEntry{
-			label:   (*deprecatedAliasScope)(x),
-			srcExpr: x.Expr,
-			source:  x,
-		}
-		c.insertAlias(x.Ident, a)
+		c.errf(x, "old-style alias no longer supported: use let clause.\nuse cue fix to update.")
 	}
 }
 
@@ -609,7 +606,8 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		}
 
 	// Handled in addLetDecl.
-	case *ast.LetClause, *ast.Alias:
+	case *ast.LetClause:
+	// case: *ast.Alias:
 
 	case *ast.CommentGroup:
 		// Nothing to do for a free-floating comment group.
@@ -648,9 +646,7 @@ func (c *compiler) addLetDecl(d ast.Decl) {
 		c.updateAlias(x.Ident, expr)
 
 	case *ast.Alias:
-		// TODO(legacy): deprecated, remove this use of Alias
-		expr := c.labeledExpr(nil, (*deprecatedAliasScope)(x), x.Expr)
-		c.updateAlias(x.Ident, expr)
+		c.errf(x, "old-style alias no longer supported: use let clause.\nuse cue fix to update.")
 	}
 }
 

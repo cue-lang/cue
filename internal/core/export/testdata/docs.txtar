@@ -47,6 +47,8 @@ baz: bar & {
 -- out.txt --
 -- out/doc --
 []
+- foobar defines at least foo.
+
 [Foo]
 - A Foo fooses stuff.
 

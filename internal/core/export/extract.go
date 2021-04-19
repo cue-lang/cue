@@ -42,15 +42,22 @@ func extractDocs(v *adt.Vertex, a []adt.Conjunct) (docs []*ast.CommentGroup) {
 			docs = append(docs, extractDocs(v, v.Conjuncts)...)
 			continue
 		}
-		f, ok := x.Source().(*ast.Field)
-		if !ok || hasShorthandValue(f) {
-			continue
-		}
 
-		fields = append(fields, f)
-		for _, cg := range f.Comments() {
-			if !containsDoc(docs, cg) && cg.Doc {
-				docs = append(docs, cg)
+		switch f := x.Source().(type) {
+		case *ast.Field:
+			if hasShorthandValue(f) {
+				continue
+			}
+			fields = append(fields, f)
+			for _, cg := range f.Comments() {
+				if !containsDoc(docs, cg) && cg.Doc {
+					docs = append(docs, cg)
+				}
+			}
+
+		case *ast.File:
+			if c := internal.FileComment(f); c != nil {
+				docs = append(docs, c)
 			}
 		}
 	}

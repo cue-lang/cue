@@ -194,7 +194,9 @@ func (c *Controller) addErr(err error, msg string) {
 }
 
 // New creates a Controller for a given Instance and TaskFunc.
-func New(cfg *Config, inst *cue.Instance, f TaskFunc) *Controller {
+//
+// The instance value can either be a *cue.Instance or a cue.Value.
+func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 	v := inst.Value()
 	ctx := eval.NewContext(value.ToInternal(v))
 

@@ -40,7 +40,7 @@ import (
 //
 // The generated CUE schema is guaranteed to deem valid any value that is
 // a valid instance of the source JSON schema.
-func Extract(data *cue.Instance, cfg *Config) (f *ast.File, err error) {
+func Extract(data cue.InstanceOrValue, cfg *Config) (f *ast.File, err error) {
 	d := &decoder{cfg: cfg}
 
 	f = d.decode(data.Value())

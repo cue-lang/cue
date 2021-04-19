@@ -71,7 +71,7 @@ type Config struct {
 // as can be derived from the evaluated values in inst.
 // Trimming is done on a best-effort basis and only when the removed field
 // is clearly implied by another field, rather than equal sibling fields.
-func Files(files []*ast.File, inst *cue.Instance, cfg *Config) error {
+func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 	r, v := value.ToInternal(inst.Value())
 
 	t := &trimmer{

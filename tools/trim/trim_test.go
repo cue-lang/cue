@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
@@ -255,12 +256,12 @@ foo: entry: {
 			if err != nil {
 				t.Fatal(err)
 			}
-			r := cue.Runtime{}
-			inst, err := r.CompileFile(f)
-			if err != nil {
+			r := cuecontext.New()
+			v := r.BuildFile(f)
+			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
-			err = Files([]*ast.File{f}, inst, &Config{Trace: false})
+			err = Files([]*ast.File{f}, v, &Config{Trace: false})
 			if err != nil {
 				t.Fatal(err)
 			}

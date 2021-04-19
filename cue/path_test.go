@@ -19,7 +19,7 @@ import (
 	"testing"
 )
 
-func Test(t *testing.T) {
+func TestPaths(t *testing.T) {
 	var r Runtime
 	inst, _ := r.Compile("", `
 		#Foo:   a: b: 1

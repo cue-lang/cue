@@ -1491,8 +1491,14 @@ func (v Value) Path() Path {
 		case adt.IntLabel:
 			a[i] = Selector{indexSelector(f)}
 
-		case adt.DefinitionLabel, adt.HiddenDefinitionLabel, adt.HiddenLabel:
+		case adt.DefinitionLabel:
 			a[i] = Selector{definitionSelector(f.SelectorString(v.idx))}
+
+		case adt.HiddenDefinitionLabel, adt.HiddenLabel:
+			a[i] = Selector{scopedSelector{
+				name: f.IdentString(v.idx),
+				pkg:  f.PkgID(v.idx),
+			}}
 
 		case adt.StringLabel:
 			a[i] = Selector{stringSelector(f.StringValue(v.idx))}

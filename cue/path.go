@@ -49,6 +49,13 @@ func (sel Selector) IsDefinition() bool {
 	return sel.sel.kind() == adt.DefinitionLabel
 }
 
+// PkgPath reports the package path associated with a hidden label or "" if
+// this is not a hidden label.
+func (sel Selector) PkgPath() string {
+	h, _ := sel.sel.(scopedSelector)
+	return h.pkg
+}
+
 var (
 	// AnyField can be used to ask for any single label.
 	//

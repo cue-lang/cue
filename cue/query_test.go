@@ -16,10 +16,14 @@ package cue_test
 
 import (
 	"bytes"
+	"io/ioutil"
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/cuetxtar"
 	"cuelang.org/go/internal/diff"
+	"github.com/rogpeppe/go-internal/txtar"
 )
 
 func TestLookupPath(t *testing.T) {
@@ -138,4 +142,52 @@ func compileT(t *testing.T, r *cue.Runtime, s string) cue.Value {
 		t.Fatal(err)
 	}
 	return inst.Value()
+}
+
+func TestHidden(t *testing.T) {
+	in := `
+-- cue.mod/module.cue --
+module: "example.com"
+
+-- in.cue --
+import "example.com/foo"
+
+a: foo.C
+b: _c
+_c: 2
+-- foo/foo.cue --
+package foo
+
+C: _d
+_d: 3
+		`
+
+	a := txtar.Parse([]byte(in))
+	dir, _ := ioutil.TempDir("", "*")
+	instance := cuetxtar.Load(a, dir)[0]
+	if instance.Err != nil {
+		t.Fatal(instance.Err)
+	}
+
+	v := cuecontext.New().BuildInstance(instance)
+
+	testCases := []struct {
+		path cue.Path
+		pkg  string
+	}{{
+		path: cue.ParsePath("a"),
+		pkg:  "example.com/foo",
+	}, {
+		path: cue.ParsePath("b"),
+		pkg:  "_",
+	}}
+	for _, tc := range testCases {
+		t.Run(tc.path.String(), func(t *testing.T) {
+			v := v.LookupPath(tc.path)
+			p := cue.Dereference(cue.Dereference(v)).Path().Selectors()
+			if got := p[len(p)-1].PkgPath(); got != tc.pkg {
+				t.Errorf("got %v; want %v", got, tc.pkg)
+			}
+		})
+	}
 }

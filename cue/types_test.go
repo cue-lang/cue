@@ -2799,7 +2799,7 @@ Another Foo.
 		})
 	}
 	want := "foobar defines at least foo.\n"
-	if got := docStr(inst.Doc()); got != want {
+	if got := docStr(inst.Value().Doc()); got != want {
 		t.Errorf("pkg: got:\n%vwant:\n%v", got, want)
 	}
 }

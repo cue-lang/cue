@@ -21,8 +21,6 @@ import (
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
-	"cuelang.org/go/internal/core/convert"
-	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
 )
 
@@ -260,17 +258,10 @@ func (inst *Instance) ID() string {
 }
 
 // Doc returns the package comments for this instance.
+//
+// Deprecated: use inst.Value().Doc()
 func (inst *Instance) Doc() []*ast.CommentGroup {
-	var docs []*ast.CommentGroup
-	if inst.inst == nil {
-		return nil
-	}
-	for _, f := range inst.inst.Files {
-		if c := internal.FileComment(f); c != nil {
-			docs = append(docs, c)
-		}
-	}
-	return docs
+	return inst.Value().Doc()
 }
 
 // Value returns the root value of the configuration. If the configuration
@@ -403,37 +394,19 @@ func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
 // Values may be any Go value that can be converted to CUE, an ast.Expr or
 // a Value. In the latter case, it will panic if the Value is not from the same
 // Runtime.
+//
+// Deprecated: use Value.FillPath()
 func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
-	for i := len(path) - 1; i >= 0; i-- {
-		x = map[string]interface{}{path[i]: x}
-	}
-	a := make([]adt.Conjunct, len(inst.root.Conjuncts))
-	copy(a, inst.root.Conjuncts)
-	u := &adt.Vertex{Conjuncts: a}
+	v := inst.Value().Fill(x, path...)
 
-	if v, ok := x.(Value); ok {
-		if inst.index != v.idx {
-			panic("value of type Value is not created with same Runtime as Instance")
-		}
-		for _, c := range v.v.Conjuncts {
-			u.AddConjunct(c)
-		}
-	} else {
-		ctx := eval.NewContext(inst.index, nil)
-		expr := convert.GoValueToExpr(ctx, true, x)
-		u.AddConjunct(adt.MakeRootConjunct(nil, expr))
-		u.Finalize(ctx)
-	}
 	inst = addInst(inst.index, &Instance{
-		root: u,
+		root: v.v,
 		inst: nil,
 
 		// Omit ImportPath to indicate this is not an importable package.
 		Dir:        inst.Dir,
 		PkgName:    inst.PkgName,
 		Incomplete: inst.Incomplete,
-
-		// complete: true,
 	})
 	return inst, nil
 }

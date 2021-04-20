@@ -170,24 +170,76 @@ func Newf(p token.Pos, format string, args ...interface{}) Error {
 // Wrapf creates an Error with the associated position and message. The provided
 // error is added for inspection context.
 func Wrapf(err error, p token.Pos, format string, args ...interface{}) Error {
-	a, ok := err.(list)
-	if !ok {
-		return &posError{
-			pos:     p,
-			Message: NewMessage(format, args),
-			err:     err,
-		}
+	pErr := &posError{
+		pos:     p,
+		Message: NewMessage(format, args),
 	}
-	b := make([]Error, len(a))
-	for i, err := range a {
-		b[i] = &posError{
-			pos:     p,
-			Message: NewMessage(format, args),
-			err:     err,
-		}
-	}
-	return list(b)
+	return Wrap(pErr, err)
 }
+
+// Wrap creates a new error where child is a subordinate error of parent.
+// If child is list of Errors, the result will itself be a list of errors
+// where child is a subordinate error of each parent.
+func Wrap(parent Error, child error) Error {
+	if child == nil {
+		return parent
+	}
+	a, ok := child.(list)
+	if !ok {
+		return &wrapped{parent, child}
+	}
+	b := make(list, len(a))
+	for i, err := range a {
+		b[i] = &wrapped{parent, err}
+	}
+	return b
+}
+
+type wrapped struct {
+	main Error
+	wrap error
+}
+
+// Error implements the error interface.
+func (e *wrapped) Error() string {
+	switch msg := e.main.Error(); {
+	case e.wrap == nil:
+		return msg
+	case msg == "":
+		return e.wrap.Error()
+	default:
+		return fmt.Sprintf("%s: %s", msg, e.wrap)
+	}
+}
+
+func (e *wrapped) Msg() (format string, args []interface{}) {
+	return e.main.Msg()
+}
+
+func (e *wrapped) Path() []string {
+	if p := Path(e.main); p != nil {
+		return p
+	}
+	return Path(e.wrap)
+}
+
+func (e *wrapped) InputPositions() []token.Pos {
+	return append(e.main.InputPositions(), Positions(e.wrap)...)
+}
+
+func (e *wrapped) Position() token.Pos {
+	if p := e.main.Position(); p != token.NoPos {
+		return p
+	}
+	if wrap, ok := e.wrap.(Error); ok {
+		return wrap.Position()
+	}
+	return token.NoPos
+}
+
+func (e *wrapped) Unwrap() error { return e.wrap }
+
+func (e *wrapped) Cause() error { return e.wrap }
 
 // Promote converts a regular Go error to an Error if it isn't already one.
 func Promote(err error, msg string) Error {
@@ -209,27 +261,11 @@ type posError struct {
 	pos    token.Pos
 	inputs []token.Pos
 	Message
-
-	// The underlying error that triggered this one, if any.
-	err error
 }
 
-func (e *posError) Path() []string              { return Path(e.err) }
+func (e *posError) Path() []string              { return nil }
 func (e *posError) InputPositions() []token.Pos { return e.inputs }
 func (e *posError) Position() token.Pos         { return e.pos }
-func (e *posError) Unwrap() error               { return e.err }
-func (e *posError) Cause() error                { return e.err }
-
-// Error implements the error interface.
-func (e *posError) Error() string {
-	if e.err == nil {
-		return e.Message.Error()
-	}
-	if e.Message.format == "" {
-		return e.err.Error()
-	}
-	return fmt.Sprintf("%s: %s", e.Message.Error(), e.err)
-}
 
 // Append combines two errors, flattening Lists as necessary.
 func Append(a, b Error) Error {

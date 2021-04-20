@@ -43,10 +43,11 @@ unique: {
 }
 -- out/list --
 Errors:
-error in call to list.Concat: cannot use value 1 (type int) as list
 error in call to list.Repeat: negative count
 concat.t7.v: cannot use 1 (type int) as list in argument 1 to list.Concat:
     ./in.cue:30:12
+error in call to list.Concat: cannot use value 1 (type int) as list:
+    ./in.cue:31:13
 
 Result:
 repeat: {

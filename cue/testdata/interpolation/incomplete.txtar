@@ -27,6 +27,7 @@ out: """
   out: (_|_){
     // [incomplete] out: invalid interpolation: undefined field #d:
     //     ./in.cue:8:6
+    //     ./in.cue:13:21
   }
 }
 -- out/compile --

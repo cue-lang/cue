@@ -25,6 +25,8 @@ parenExprRefEqual: {
 Errors:
 invalid interpolation: conflicting values 2 and 1:
     ./in.cue:12:31
+    ./in.cue:12:34
+    ./in.cue:12:36
 
 Result:
 (_|_){
@@ -40,6 +42,8 @@ Result:
     issue799: (_|_){
       // [eval] invalid interpolation: conflicting values 2 and 1:
       //     ./in.cue:12:31
+      //     ./in.cue:12:34
+      //     ./in.cue:12:36
       key: (int){ &(>=-2147483648, <=2147483647, int) }
     }
   }

@@ -10,6 +10,7 @@ command.ref.task.display.filename: invalid string argument: non-concrete value s
     ./task_tool.cue:6:8
     ./task_tool.cue:7:9
     tool/file:15:3
+    tool/file:15:16
 -- task_tool.cue --
 package home
 

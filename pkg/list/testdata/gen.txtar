@@ -65,7 +65,6 @@ t54: list.Sort([{a:1}, {b:2}], list.Ascending)
 Errors:
 error in call to list.Avg: empty list
 error in call to list.Drop: negative index
-error in call to list.FlattenN: cannot use value "foo" (type string) as list
 error in call to list.Max: empty list
 error in call to list.Min: empty list
 error in call to list.Range: end must be greater than start when step is positive
@@ -76,13 +75,23 @@ error in call to list.Slice: negative index
 error in call to list.Slice: slice bounds out of range
 error in call to list.Take: negative index
 Ascending.x: error in call to list.Sort: 2 errors in empty disjunction:
-Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct)
-Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct)
+Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct):
+    ./in.cue:46:24
+    list:10:9
+Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct):
+    ./in.cue:46:24
+    list:10:18
 Ascending.y: error in call to list.Sort: 2 errors in empty disjunction:
-Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct)
-Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct)
+Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct):
+    ./in.cue:46:17
+    list:10:9
+Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct):
+    ./in.cue:60:17
+    list:10:18
 t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
     ./in.cue:5:14
+error in call to list.FlattenN: cannot use value "foo" (type string) as list:
+    ./in.cue:15:20
 t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN:
     ./in.cue:16:24
 t17: cannot use "foo" (type string) as list in argument 1 to list.Max:

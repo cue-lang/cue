@@ -1484,13 +1484,12 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 	}
 
 	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", args[0], buf.String())
-	vErr.err = err
 
 	for _, v := range args {
 		vErr.AddPosition(v)
 	}
 
-	return &Bottom{Code: severeness, Err: vErr}
+	return &Bottom{Code: severeness, Err: errors.Wrap(vErr, err)}
 }
 
 // A Disjunction represents a disjunction, where each disjunct may or may not

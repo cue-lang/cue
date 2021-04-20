@@ -211,7 +211,6 @@ type ValueError struct {
 	v      *Vertex
 	pos    token.Pos
 	auxpos []token.Pos
-	err    errors.Error
 	errors.Message
 }
 
@@ -324,8 +323,4 @@ func (e *ValueError) Path() (a []string) {
 		a = append(a, f.SelectorString(e.r))
 	}
 	return a
-}
-
-func (e ValueError) Unwrap() error {
-	return e.err
 }

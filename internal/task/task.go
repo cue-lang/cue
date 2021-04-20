@@ -88,9 +88,8 @@ func (c *Context) addErr(v cue.Value, wrap error, format string, args ...interfa
 		task:    c.Obj,
 		v:       v,
 		Message: errors.NewMessage(format, args),
-		err:     wrap,
 	}
-	c.Err = errors.Append(c.Err, err)
+	c.Err = errors.Append(c.Err, errors.Wrap(err, wrap))
 }
 
 // taskError wraps some error values to retain position information about the
@@ -99,7 +98,6 @@ type taskError struct {
 	task cue.Value
 	v    cue.Value
 	errors.Message
-	err error
 }
 
 var _ errors.Error = &taskError{}
@@ -125,8 +123,6 @@ func (t *taskError) InputPositions() (a []token.Pos) {
 	}
 	return a
 }
-
-func (t *taskError) Unwrap() error { return t.err }
 
 // A RunnerFunc creates a Runner.
 type RunnerFunc func(v cue.Value) (Runner, error)

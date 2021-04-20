@@ -14,9 +14,13 @@ t8: yaml.Marshal({b: int | *2})
 t9: yaml.MarshalStream([{a: 1}, {b: int | *2}])
 -- out/yaml --
 Errors:
-a: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3)
-a: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3)
 b: error in call to encoding/yaml.Validate: incomplete value int
+a: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
+    ./in.cue:3:41
+    yaml.Validate:3:5
+a: error in call to encoding/yaml.ValidatePartial: invalid value 4 (out of bound <3):
+    ./in.cue:6:48
+    yaml.ValidatePartial:3:5
 
 Result:
 t1: _|_ // error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3) (and 1 more errors)

@@ -80,10 +80,12 @@ Result:
     r1: (_|_){
       // [incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field b:
       //     ./references.cue:27:9
+      //     ./references.cue:27:14
     }
     r2: (_|_){
       // [incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field d:
       //     ./references.cue:30:9
+      //     ./references.cue:30:14
     }
   }
 }

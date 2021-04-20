@@ -84,7 +84,8 @@ x:
   #T: (#struct){
     s: (string){ string }
     out: (_|_){
-      // [incomplete] error in call to text/template.Execute: cannot convert incomplete value "string" to JSON
+      // [incomplete] error in call to text/template.Execute: cannot convert incomplete value "string" to JSON:
+      //     ./in.cue:14:7
     }
   }
   #V: (#struct){

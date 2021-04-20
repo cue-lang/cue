@@ -17,9 +17,10 @@ package base64
 
 import (
 	"encoding/base64"
-	"fmt"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 )
 
 // EncodedLen returns the length in bytes of the base64 encoding
@@ -27,7 +28,7 @@ import (
 // as only StdEncoding is supported for now.
 func EncodedLen(encoding cue.Value, n int) (int, error) {
 	if err := encoding.Null(); err != nil {
-		return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
+		return 0, errors.Wrapf(err, token.NoPos, "base64: unsupported encoding")
 	}
 	return base64.StdEncoding.EncodedLen(n), nil
 }
@@ -37,7 +38,7 @@ func EncodedLen(encoding cue.Value, n int) (int, error) {
 // null as only StdEncoding is supported for now.
 func DecodedLen(encoding cue.Value, x int) (int, error) {
 	if err := encoding.Null(); err != nil {
-		return 0, fmt.Errorf("base64: unsupported encoding: %v", err)
+		return 0, errors.Wrapf(err, token.NoPos, "base64: unsupported encoding")
 	}
 	return base64.StdEncoding.DecodedLen(x), nil
 }
@@ -46,7 +47,7 @@ func DecodedLen(encoding cue.Value, x int) (int, error) {
 // as only StdEncoding is supported for now.
 func Encode(encoding cue.Value, src []byte) (string, error) {
 	if err := encoding.Null(); err != nil {
-		return "", fmt.Errorf("base64: unsupported encoding: %v", err)
+		return "", errors.Wrapf(err, token.NoPos, "base64: unsupported encoding")
 	}
 	return base64.StdEncoding.EncodeToString(src), nil
 }
@@ -55,7 +56,7 @@ func Encode(encoding cue.Value, src []byte) (string, error) {
 // to be set to null as only StdEncoding is supported for now.
 func Decode(encoding cue.Value, s string) ([]byte, error) {
 	if err := encoding.Null(); err != nil {
-		return nil, fmt.Errorf("base64: unsupported encoding: %v", err)
+		return nil, errors.Wrapf(err, token.NoPos, "base64: unsupported encoding")
 	}
 	return base64.StdEncoding.DecodeString(s)
 }

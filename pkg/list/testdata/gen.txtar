@@ -63,47 +63,56 @@ t53: list.MaxItems([1, 2, 3, 4], 2)
 t54: list.Sort([{a:1}, {b:2}], list.Ascending)
 -- out/list --
 Errors:
-error in call to list.Avg: empty list
-error in call to list.Drop: negative index
-error in call to list.Max: empty list
-error in call to list.Min: empty list
-error in call to list.Range: end must be greater than start when step is positive
-error in call to list.Range: end must be less than start when step is negative
-error in call to list.Range: step must be non zero
-error in call to list.Slice: invalid index: 3 > 1
-error in call to list.Slice: negative index
-error in call to list.Slice: slice bounds out of range
-error in call to list.Take: negative index
-Ascending.x: error in call to list.Sort: 2 errors in empty disjunction:
-Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mismatched types number and struct):
-    ./in.cue:46:24
-    list:10:9
-Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct):
-    ./in.cue:60:24
-    list:10:18
-Ascending.y: error in call to list.Sort: 2 errors in empty disjunction:
-Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct):
-    ./in.cue:60:17
-    list:10:9
-Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct):
-    ./in.cue:46:17
-    list:10:18
+error in call to list.Avg: empty list:
+    ./in.cue:4:5
 t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
     ./in.cue:5:14
+error in call to list.Drop: negative index:
+    ./in.cue:9:5
 error in call to list.FlattenN: cannot use value "foo" (type string) as list:
+    ./in.cue:15:6
     ./in.cue:15:20
 t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN:
     ./in.cue:16:24
+error in call to list.Max: empty list:
+    ./in.cue:18:6
 t17: cannot use "foo" (type string) as list in argument 1 to list.Max:
     ./in.cue:19:15
+error in call to list.Min: empty list:
+    ./in.cue:21:6
 t20: cannot use "foo" (type string) as list in argument 1 to list.Min:
     ./in.cue:22:15
 t23: cannot use "foo" (type string) as list in argument 1 to list.Product:
     ./in.cue:25:19
-t42: invalid type element 0 (int) of string list argument 0:
+error in call to list.Range: step must be non zero:
+    ./in.cue:26:6
+error in call to list.Range: end must be greater than start when step is positive:
+    ./in.cue:27:6
+error in call to list.Range: end must be less than start when step is negative:
+    ./in.cue:28:6
+error in call to list.Slice: negative index:
+    ./in.cue:35:6
+error in call to list.Slice: invalid index: 3 > 1:
+    ./in.cue:36:6
+error in call to list.Slice: slice bounds out of range:
+    ./in.cue:37:6
+error in call to list.Slice: slice bounds out of range:
+    ./in.cue:38:6
+Ascending.x: error in call to list.Sort: 2 errors in empty disjunction::
+    ./in.cue:46:6
+Ascending.y: error in call to list.Sort: 2 errors in empty disjunction::
+    ./in.cue:46:6
+t42: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string:
     ./in.cue:48:6
+    ./in.cue:48:24
 t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
     ./in.cue:51:15
+error in call to list.Take: negative index:
+    ./in.cue:55:6
+Ascending.x: error in call to list.Sort: 2 errors in empty disjunction::
+    ./in.cue:60:6
+Ascending.y: error in call to list.Sort: 2 errors in empty disjunction::
+    ./in.cue:60:6
 
 Result:
 t1: 2.5
@@ -156,7 +165,7 @@ t39: [{
 }]
 t40: _|_ // error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 5 more errors)
 t41: ["a", "b"]
-t42: _|_ // t42: invalid type element 0 (int) of string list argument 0
+t42: _|_ // t42: invalid list element 0 in argument 0 to call: cannot use value 1 (int) as string
 t43: 10
 t44: 0
 t45: _|_ // t45: cannot use "foo" (type string) as list in argument 1 to list.Sum

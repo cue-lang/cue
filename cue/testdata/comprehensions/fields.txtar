@@ -25,7 +25,8 @@ user: {
   #User: (#struct){
     tags_str: (string){ string }
     tags_map: (_|_){
-      // [incomplete] error in call to strings.Split: non-concrete value string
+      // [incomplete] error in call to strings.Split: non-concrete value string:
+      //     ./in.cue:6:22
       "{a}": (string){ string }
     }
   }

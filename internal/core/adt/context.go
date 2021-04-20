@@ -585,8 +585,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		if b, ok := result.(*Bottom); ok {
 			if c.src != nil &&
 				b.Code == CycleError &&
-				b.Err.Position() == token.NoPos &&
-				len(b.Err.InputPositions()) == 0 {
+				len(errors.Positions(b.Err)) == 0 {
 				bb := *b
 				bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
 				result = &bb

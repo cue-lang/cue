@@ -18,6 +18,7 @@ t9: json.MarshalStream([{a: 1}, {b: int | *2}])
 -- out/json --
 Errors:
 a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
+    ./in.cue:4:5
     ./in.cue:4:36
     json.Validate:1:6
 

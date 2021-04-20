@@ -359,7 +359,6 @@ large: {
 }
 -- out/eval --
 Errors:
-error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
 large.p1.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
 large.p2.#Y: cycle: field userinfo was added after an if clause evaluated it
 large.p2.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
@@ -372,6 +371,16 @@ medium.p3.Y: cycle: new field port inserted by if clause that was previously eva
 medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
 minimal.b: cycle: new field port inserted by if clause that was previously evaluated by another if clause
 small.p1.#Y: cycle: field port was added after an if clause evaluated it
+error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+    ./in.cue:104:23
+error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+    ./in.cue:126:23
+error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+    ./in.cue:228:23
+error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+    ./in.cue:269:23
+error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+    ./in.cue:310:23
 
 Result:
 (_|_){
@@ -441,7 +450,8 @@ Result:
       Y: (_|_){
         // [eval] medium.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
         port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+          //     ./in.cue:104:23
         }
       }
       #Y: (#struct){
@@ -456,7 +466,8 @@ Result:
       Y: (_|_){
         // [eval] medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
         port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+          //     ./in.cue:126:23
         }
       }
       #X: (#struct){
@@ -501,7 +512,8 @@ Result:
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
         port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+          //     ./in.cue:228:23
         }
       }
       X: (string){ "user@example.com" }
@@ -524,7 +536,8 @@ Result:
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
         port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+          //     ./in.cue:269:23
         }
       }
       #X: (#struct){
@@ -552,7 +565,8 @@ Result:
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
         port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax
+          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
+          //     ./in.cue:310:23
         }
       }
       #Y: (_|_){

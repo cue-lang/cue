@@ -21,7 +21,9 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 )
 
@@ -98,7 +100,7 @@ func Unmarshal(b []byte) (ast.Expr, error) {
 	expr, err := parser.ParseExpr("json", b)
 	if err != nil {
 		// NOTE: should never happen.
-		return nil, fmt.Errorf("json: could not parse JSON: %v", err)
+		return nil, errors.Wrapf(err, token.NoPos, "json: could not parse JSON")
 	}
 	return expr, nil
 }

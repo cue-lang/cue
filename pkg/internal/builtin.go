@@ -20,7 +20,6 @@ import (
 
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/parser"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/compile"
@@ -126,7 +125,6 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 	x.Func = func(ctx *adt.OpContext, args []adt.Value) (ret adt.Expr) {
 		// call, _ := ctx.Source().(*ast.CallExpr)
 		c := &CallCtxt{
-			// src:  call,
 			ctx:     ctx,
 			args:    args,
 			builtin: b,
@@ -179,17 +177,6 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 	}
 	return c.Expr()
 
-}
-
-func pos(n adt.Node) (p token.Pos) {
-	if n == nil {
-		return
-	}
-	src := n.Source()
-	if src == nil {
-		return
-	}
-	return src.Pos()
 }
 
 func (x *Builtin) name(ctx *adt.OpContext) string {

@@ -92,7 +92,8 @@ s3:  strings.ContainsAny(str, "dd")
   }
   s2: (string){ strings.ContainsAny("dd") }
   s3: (_|_){
-    // [incomplete] error in call to strings.ContainsAny: non-concrete value string
+    // [incomplete] error in call to strings.ContainsAny: non-concrete value string:
+    //     ./in.cue:15:5
   }
   str: (string){ string }
   num: (number){ <4 }

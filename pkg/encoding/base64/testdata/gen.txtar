@@ -9,8 +9,10 @@ t3: base64.Decode(null, "foo")
 t4: base64.Decode({}, "foo")
 -- out/base64 --
 Errors:
-error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null
-error in call to encoding/base64.Decode: illegal base64 data at input byte 0
+error in call to encoding/base64.Decode: illegal base64 data at input byte 0:
+    ./in.cue:5:5
+error in call to encoding/base64.Decode: base64: unsupported encoding: cannot use value {} (type struct) as null:
+    ./in.cue:6:5
 
 Result:
 t1: "Zm9v"

@@ -1398,6 +1398,7 @@ func (x *Builtin) call(c *OpContext, p token.Pos, args []Value) Expr {
 				c.addErrf(0, pos(a),
 					"cannot use %s as %s in argument %d to %s",
 					a, v, i+1, fun)
+				return nil
 			}
 			args[i] = n
 		}

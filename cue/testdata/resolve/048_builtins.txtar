@@ -99,12 +99,14 @@ a3.a: invalid value "bar" (out of bound =~"oo"):
 a3.a: invalid value "bar" (out of bound =~"fo"):
     ./in.cue:9:5
     ./in.cue:12:14
-stringListErrors.b.result: invalid type element 0 (int) of string list argument 0:
+stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
     ./in.cue:31:17
+    ./in.cue:30:13
 stringListErrors.c.result: cannot use int (type int) as string in argument 2 to strings.Join:
     ./in.cue:36:33
-decimalListErrors.a.result: invalid type element 0 (string) of number list argument 0:
+decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
     ./in.cue:43:17
+    ./in.cue:42:13
 
 Result:
 (_|_){
@@ -167,8 +169,9 @@ Result:
         0: (string){ string }
       }
       result: (_|_){
-        // [incomplete] stringListErrors.a.result: non-concrete string value for element 0 of string list argument 0:
+        // [incomplete] stringListErrors.a.result: non-concrete value string for element 0 of string list argument 0:
         //     ./in.cue:26:17
+        //     ./in.cue:25:13
       }
     }
     b: (_|_){
@@ -177,8 +180,9 @@ Result:
         0: (int){ int }
       }
       result: (_|_){
-        // [eval] stringListErrors.b.result: invalid type element 0 (int) of string list argument 0:
+        // [eval] stringListErrors.b.result: invalid list element 0 in argument 0 to call: cannot use value int (int) as string:
         //     ./in.cue:31:17
+        //     ./in.cue:30:13
       }
     }
     c: (_|_){
@@ -199,8 +203,9 @@ Result:
         0: (string){ string }
       }
       result: (_|_){
-        // [eval] decimalListErrors.a.result: invalid type element 0 (string) of number list argument 0:
+        // [eval] decimalListErrors.a.result: invalid list element 0 in argument 0 to call: cannot use value string (string) as number:
         //     ./in.cue:43:17
+        //     ./in.cue:42:13
       }
     }
     b: (struct){
@@ -208,8 +213,9 @@ Result:
         0: (int){ int }
       }
       result: (_|_){
-        // [incomplete] decimalListErrors.b.result: non-concrete number value for element 0 of number list argument 0:
+        // [incomplete] decimalListErrors.b.result: non-concrete value int for element 0 of number list argument 0:
         //     ./in.cue:48:17
+        //     ./in.cue:47:13
       }
     }
   }

@@ -26,7 +26,6 @@ import (
 
 // CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. It's interface may change.
 type CallCtxt struct {
-	src     adt.Expr
 	ctx     *adt.OpContext
 	builtin *Builtin
 	Err     interface{}
@@ -53,7 +52,7 @@ func (c *CallCtxt) Value(i int) cue.Value {
 	// TODO: remove default
 	// v, _ = v.Default()
 	if !v.IsConcrete() {
-		c.errcf(c.src, adt.IncompleteError, "non-concrete argument %d", i)
+		c.errcf(adt.IncompleteError, "non-concrete argument %d", i)
 	}
 	return v
 }
@@ -84,7 +83,7 @@ func (c *CallCtxt) intValue(i, bits int, typ string) int64 {
 		return 0
 	}
 	if n.BitLen() > bits {
-		c.errf(c.src, err, "int %s overflows %s in argument %d in call to %s",
+		c.errf(err, "int %s overflows %s in argument %d in call to %s",
 			n, typ, i, c.Name())
 	}
 	res, _ := x.Int64()
@@ -106,7 +105,7 @@ func (c *CallCtxt) uintValue(i, bits int, typ string) uint64 {
 		return 0
 	}
 	if n.BitLen() > bits {
-		c.errf(c.src, err, "int %s overflows %s in argument %d in call to %s",
+		c.errf(err, "int %s overflows %s in argument %d in call to %s",
 			n, typ, i, c.Name())
 	}
 	res, _ := x.Uint64()
@@ -273,13 +272,15 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 		default:
 			if k := w.Kind(); k&adt.NumKind == 0 {
 				err := c.ctx.NewErrf(
-					"invalid type element %d (%s) of number list argument %d", j, k, i)
+					"invalid list element %d in argument %d to call: cannot use value %s (%s) as number",
+					j, i, w, k)
 				c.Err = &callError{err}
 				return a
 			}
 
 			err := c.ctx.NewErrf(
-				"non-concrete number value for element %d of number list argument %d", j, i)
+				"non-concrete value %s for element %d of number list argument %d",
+				w, j, i)
 			err.Code = adt.IncompleteError
 			c.Err = &callError{err}
 			return nil
@@ -309,13 +310,15 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 		default:
 			if k := w.Kind(); k&adt.StringKind == 0 {
 				err := c.ctx.NewErrf(
-					"invalid type element %d (%s) of string list argument %d", j, k, i)
+					"invalid list element %d in argument %d to call: cannot use value %s (%s) as string",
+					j, i, w, k)
 				c.Err = &callError{err}
 				return a
 			}
 
 			err := c.ctx.NewErrf(
-				"non-concrete string value for element %d of string list argument %d", j, i)
+				"non-concrete value %s for element %d of string list argument %d",
+				w, j, i)
 			err.Code = adt.IncompleteError
 			c.Err = &callError{err}
 			return nil

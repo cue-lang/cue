@@ -9,7 +9,8 @@ t3: hex.Decode("foo")
 t4: hex.Dump('foo')
 -- out/hex --
 Errors:
-error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o'
+error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o':
+    ./in.cue:5:5
 
 Result:
 t1: "666f6f"

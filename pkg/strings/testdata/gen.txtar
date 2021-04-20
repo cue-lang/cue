@@ -43,7 +43,7 @@ t17: invalid value "hello" (does not satisfy strings.MinRunes(10)):
 
 Result:
 t1: "Hello World!"
-t2: _|_ // t2: invalid type element 0 (int) of string list argument 0 (and 1 more errors)
+t2: _|_ // t2: invalid type element 0 (int) of string list argument 0
 t3: 97
 t4: 'llo'
 t5: "✓ H"

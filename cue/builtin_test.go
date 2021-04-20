@@ -62,13 +62,13 @@ func TestBuiltins(t *testing.T) {
 		`16`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<3})`),
-		`_|_(error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3) (and 1 more errors))`,
+		`_|_(error in call to encoding/yaml.Validate: a: invalid value 4 (out of bound <3))`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n---\na: 4", {a:<5})`),
 		`true`,
 	}, {
 		test("encoding/yaml", `yaml.Validate("a: 2\n", {a:<5, b:int})`),
-		`_|_(error in call to encoding/yaml.Validate: b: incomplete value int (and 1 more errors))`,
+		`_|_(error in call to encoding/yaml.Validate: b: incomplete value int)`,
 	}, {
 		test("strconv", `strconv.FormatUint(64, 16)`),
 		`"40"`,
@@ -77,7 +77,7 @@ func TestBuiltins(t *testing.T) {
 		`"foo"`,
 	}, {
 		test("regexp", `regexp.Find(#"f\w\w"#, "bar")`),
-		`_|_(error in call to regexp.Find: no match (and 1 more errors))`,
+		`_|_(error in call to regexp.Find: no match)`,
 	}, {
 		testExpr(`len([1, 2, 3])`),
 		`3`,
@@ -92,7 +92,7 @@ func TestBuiltins(t *testing.T) {
 			x: int
 			y: json.Marshal({a: x})
 		}`),
-		`{x:int,y:_|_(cannot convert incomplete value "int" to JSON (and 1 more errors))}`,
+		`{x:int,y:_|_(cannot convert incomplete value "int" to JSON)}`,
 	}, {
 		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),
 		`"a: 1\n---\nb: 2\n"`,
@@ -146,7 +146,7 @@ func TestSingleBuiltin(t *testing.T) {
 		emit      string
 	}{{
 		test("list", `list.Sort([{a:1}, {b:2}], list.Ascending)`),
-		`_|_(error in call to list.Sort: less: invalid operands {b:2} and {a:1} to '<' (type struct and struct) (and 1 more errors))`,
+		`_|_(error in call to list.Sort: less: invalid operands {b:2} and {a:1} to '<' (type struct and struct))`,
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprint(i), func(t *testing.T) {

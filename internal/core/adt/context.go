@@ -591,7 +591,9 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 				bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
 				result = &bb
 			}
-			c.errs = CombineErrors(c.src, c.errs, result)
+			if c.errs != result {
+				c.errs = CombineErrors(c.src, c.errs, result)
+			}
 		}
 		if c.errs != nil {
 			result = c.errs

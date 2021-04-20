@@ -25,7 +25,7 @@ Result:
 import "encoding/json"
 
 t1: true
-t2: _|_ // error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3) (and 1 more errors)
+t2: _|_ // error in call to encoding/json.Validate: a: invalid value 10 (out of bound <3)
 t3: true
 t4: "[1,2]"
 t5: """

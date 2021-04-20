@@ -26,5 +26,5 @@ joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" |
 
 Result:
 joinOK:  "a/b"
-joinErr: _|_ // joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos" in argument 2 to path.Join (and 3 more errors)
+joinErr: _|_ // joinErr: cannot use "foo" as *"unix" | "windows" | "plan9" | "aix" | "android" | "darwin" | "dragonfly" | "freebsd" | "hurd" | "illumos" | "ios" | "js" | "linux" | "nacl" | "netbsd" | "openbsd" | "solaris" | "zos" in argument 2 to path.Join (and 1 more errors)
 

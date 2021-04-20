@@ -14,7 +14,7 @@ error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o'
 Result:
 t1: "666f6f"
 t2: 'foo'
-t3: _|_ // error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o' (and 1 more errors)
+t3: _|_ // error in call to encoding/hex.Decode: encoding/hex: invalid byte: U+006F 'o'
 t4: """
 	00000000  66 6f 6f                                          |foo|
 

@@ -36,7 +36,7 @@ t3: ["::%lo0", "80"]
 t4:  "example.com:80"
 t5:  "[2001:db8::1]:80"
 t6:  "192.30.4.2:80"
-t7:  _|_ // error in call to net.JoinHostPort: invalid host [192, 30, 4] (and 1 more errors)
+t7:  _|_ // error in call to net.JoinHostPort: invalid host [192, 30, 4]
 t8:  true
 t9:  _|_ // t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4)
 t10: true

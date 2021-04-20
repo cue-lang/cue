@@ -19,8 +19,8 @@ t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat:
 
 Result:
 t1: "40"
-t2: _|_ // int 300 overflows byte in argument 1 in call to strconv.FormatFloat (and 1 more errors)
-t3: _|_ // cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat (and 1 more errors)
+t2: _|_ // int 300 overflows byte in argument 1 in call to strconv.FormatFloat
+t3: _|_ // cannot use -1 (type int) as byte in argument 1 to strconv.FormatFloat
 t4: _|_ // t4: cannot use 1.0 (type float) as int in argument 2 to strconv.FormatFloat
 t5: "true"
 

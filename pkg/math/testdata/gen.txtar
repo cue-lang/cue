@@ -36,9 +36,9 @@ Result:
 t1:  3.14159265358979323846264338327950288419716939937510582097494459
 t2:  3
 t3:  _|_ // t3: cannot call non-function math.Pi (type float)
-t6:  _|_ // error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000 (and 1 more errors)
+t6:  _|_ // error in call to math.Jacobi: big: invalid 2nd argument to Int.Jacobi: need odd integer but got 2000
 t7:  1
-t8:  _|_ // cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up (and 1 more errors)
+t8:  _|_ // cannot use 2.0E+400 (type float) as float64 in argument 0 to math.Asin: value was rounded up
 t16: 4096
 t17: 1e+4
 t18: true

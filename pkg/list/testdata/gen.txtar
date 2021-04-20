@@ -79,14 +79,14 @@ Ascending.x: error in call to list.Sort: conflicting values number and {b:2} (mi
     ./in.cue:46:24
     list:10:9
 Ascending.x: error in call to list.Sort: conflicting values string and {b:2} (mismatched types string and struct):
-    ./in.cue:46:24
+    ./in.cue:60:24
     list:10:18
 Ascending.y: error in call to list.Sort: 2 errors in empty disjunction:
 Ascending.y: error in call to list.Sort: conflicting values number and {a:1} (mismatched types number and struct):
-    ./in.cue:46:17
+    ./in.cue:60:17
     list:10:9
 Ascending.y: error in call to list.Sort: conflicting values string and {a:1} (mismatched types string and struct):
-    ./in.cue:60:17
+    ./in.cue:46:17
     list:10:18
 t3: cannot use "foo" (type string) as list in argument 1 to list.Avg:
     ./in.cue:5:14
@@ -107,41 +107,41 @@ t45: cannot use "foo" (type string) as list in argument 1 to list.Sum:
 
 Result:
 t1: 2.5
-t2: _|_ // error in call to list.Avg: empty list (and 1 more errors)
+t2: _|_ // error in call to list.Avg: empty list
 t3: _|_ // t3: cannot use "foo" (type string) as list in argument 1 to list.Avg
 t4: [1, 2, 3, 4]
 t5: [3, 4]
 t6: []
-t7: _|_ // error in call to list.Drop: negative index (and 1 more errors)
+t7: _|_ // error in call to list.Drop: negative index
 t8: [1, 2, 3, 4]
 t9: [1, [[2, 3], []], [4]]
 t10: [1, [2, 3], [], 4]
 t11: [1, 2, 3, 4]
 t12: []
-t13: _|_ // error in call to list.FlattenN: cannot use value "foo" (type string) as list (and 1 more errors)
+t13: _|_ // error in call to list.FlattenN: cannot use value "foo" (type string) as list
 t14: _|_ // t14: cannot use "foo" (type string) as int in argument 2 to list.FlattenN
 t15: 4
-t16: _|_ // error in call to list.Max: empty list (and 1 more errors)
+t16: _|_ // error in call to list.Max: empty list
 t17: _|_ // t17: cannot use "foo" (type string) as list in argument 1 to list.Max
 t18: 1
-t19: _|_ // error in call to list.Min: empty list (and 1 more errors)
+t19: _|_ // error in call to list.Min: empty list
 t20: _|_ // t20: cannot use "foo" (type string) as list in argument 1 to list.Min
 t21: 24
 t22: 1
 t23: _|_ // t23: cannot use "foo" (type string) as list in argument 1 to list.Product
-t24: _|_ // error in call to list.Range: step must be non zero (and 1 more errors)
-t25: _|_ // error in call to list.Range: end must be greater than start when step is positive (and 1 more errors)
-t26: _|_ // error in call to list.Range: end must be less than start when step is negative (and 1 more errors)
+t24: _|_ // error in call to list.Range: step must be non zero
+t25: _|_ // error in call to list.Range: end must be greater than start when step is positive
+t26: _|_ // error in call to list.Range: end must be less than start when step is negative
 t27: [0, 1, 2, 3, 4]
 t28: [0]
 t29: [0, 2, 4]
 t30: [5, 4, 3, 2, 1]
 t31: [0, 0.5, 1.0, 1.5, 2.0, 2.5, 3.0, 3.5, 4.0, 4.5]
 t32: [2, 3]
-t33: _|_ // error in call to list.Slice: negative index (and 1 more errors)
-t34: _|_ // error in call to list.Slice: invalid index: 3 > 1 (and 1 more errors)
-t35: _|_ // error in call to list.Slice: slice bounds out of range (and 1 more errors)
-t36: _|_ // error in call to list.Slice: slice bounds out of range (and 1 more errors)
+t33: _|_ // error in call to list.Slice: negative index
+t34: _|_ // error in call to list.Slice: invalid index: 3 > 1
+t35: _|_ // error in call to list.Slice: slice bounds out of range
+t36: _|_ // error in call to list.Slice: slice bounds out of range
 t37: []
 t38: [1, 2, 3, 4]
 t39: [{
@@ -154,19 +154,19 @@ t39: [{
 	a: 2
 	v: 1
 }]
-t40: _|_ // error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 11 more errors)
+t40: _|_ // error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 5 more errors)
 t41: ["a", "b"]
-t42: _|_ // t42: invalid type element 0 (int) of string list argument 0 (and 1 more errors)
+t42: _|_ // t42: invalid type element 0 (int) of string list argument 0
 t43: 10
 t44: 0
 t45: _|_ // t45: cannot use "foo" (type string) as list in argument 1 to list.Sum
 t46: []
 t47: [1, 2]
 t48: [1, 2, 3, 4]
-t49: _|_ // error in call to list.Take: negative index (and 1 more errors)
+t49: _|_ // error in call to list.Take: negative index
 t50: true
 t51: false
 t52: true
 t53: false
-t54: _|_ // error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 11 more errors)
+t54: _|_ // error in call to list.Sort: Ascending.x: 2 errors in empty disjunction: (and 5 more errors)
 

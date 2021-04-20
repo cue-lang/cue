@@ -89,7 +89,7 @@ repeat: {
 	t8: {
 		x: [1]
 		n: -1
-		v: _|_ // error in call to list.Repeat: negative count (and 1 more errors)
+		v: _|_ // error in call to list.Repeat: negative count
 	}
 }
 concat: {
@@ -123,7 +123,7 @@ concat: {
 	}
 	t8: {
 		x: [1, [2]]
-		v: _|_ // error in call to list.Concat: cannot use value 1 (type int) as list (and 1 more errors)
+		v: _|_ // error in call to list.Concat: cannot use value 1 (type int) as list
 	}
 }
 unique: {

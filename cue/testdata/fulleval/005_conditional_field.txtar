@@ -63,6 +63,7 @@ d: {
   d: (_|_){
     // [incomplete] d: non-concrete value int in operand to >:
     //     ./in.cue:14:5
+    //     ./in.cue:13:2
     a: (int){ int }
   }
   a: (string){ "foo" }

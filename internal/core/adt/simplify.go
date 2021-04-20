@@ -154,7 +154,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 			fallthrough
 
 		case d.Negative:
-			return ctx.NewErrf("incompatible bounds %v and %v", ctx.Str(x), ctx.Str(y))
+			return ctx.NewErrf("incompatible bounds %v and %v", x, y)
 		}
 
 	case x.Op == NotEqualOp:

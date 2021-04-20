@@ -55,6 +55,7 @@ ti: t & {
     d: (_|_){
       // [incomplete] t.d: non-concrete value number in operand to *:
       //     ./in.cue:3:19
+      //     ./in.cue:3:5
     }
   }
   ti: (struct){
@@ -62,6 +63,8 @@ ti: t & {
     d: (_|_){
       // [incomplete] ti.d: non-concrete value int in operand to *:
       //     ./in.cue:3:19
+      //     ./in.cue:3:5
+      //     ./in.cue:4:10
     }
   }
 }

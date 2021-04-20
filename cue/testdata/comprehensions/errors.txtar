@@ -48,6 +48,7 @@ Result:
   userError: (_|_){
     // [incomplete] userError: non-concrete value string in operand to !=:
     //     ./in.cue:21:8
+    //     ./in.cue:20:5
     a: (string){ string }
   }
 }

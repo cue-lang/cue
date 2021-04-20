@@ -40,6 +40,7 @@ err: _|_ // invalid operation 2 == "s" (mismatched types int and string)
 Errors:
 err: invalid operands 2 and "s" to '==' (type int and string):
     ./in.cue:9:6
+    ./in.cue:9:11
 
 Result:
 (_|_){
@@ -54,5 +55,6 @@ Result:
   err: (_|_){
     // [eval] err: invalid operands 2 and "s" to '==' (type int and string):
     //     ./in.cue:9:6
+    //     ./in.cue:9:11
   }
 }

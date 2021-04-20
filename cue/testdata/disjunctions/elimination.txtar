@@ -264,7 +264,9 @@ preserveClosedness: medium: p3: {
                 a: (_|_){
                   // [incomplete] nestedNonMonotonic.incomplete.a.n1.p1.x.a: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                   //     ./in.cue:84:13
+                  //     ./in.cue:84:10
                   //     ./in.cue:84:30
+                  //     ./in.cue:85:10
                   c: (int){ 1 }
                 }
               }, (null){ null }) }
@@ -274,6 +276,8 @@ preserveClosedness: medium: p3: {
                 a: (_|_){
                   // [incomplete] nestedNonMonotonic.incomplete.a.n1.p2.x.a: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                   //     ./in.cue:90:13
+                  //     ./in.cue:89:10
+                  //     ./in.cue:90:10
                   //     ./in.cue:90:30
                   c: (int){ 1 }
                 }
@@ -287,7 +291,9 @@ preserveClosedness: medium: p3: {
                   b: (_|_){
                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p1.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:94:16
+                    //     ./in.cue:94:13
                     //     ./in.cue:94:33
+                    //     ./in.cue:95:13
                     c: (int){ 1 }
                   }
                 }
@@ -299,6 +305,8 @@ preserveClosedness: medium: p3: {
                   b: (_|_){
                     // [incomplete] nestedNonMonotonic.incomplete.a.n2.p2.x.a.b: invalid value {c:1} (does not satisfy struct.MinFields(2)): len(fields) < MinFields(2) (1 < 2):
                     //     ./in.cue:100:16
+                    //     ./in.cue:99:13
+                    //     ./in.cue:100:13
                     //     ./in.cue:100:33
                     c: (int){ 1 }
                   }
@@ -314,7 +322,10 @@ preserveClosedness: medium: p3: {
                 a: (_|_){
                   // [incomplete] nestedNonMonotonic.incomplete.b.n1.p1.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                   //     ./in.cue:105:13
+                  //     ./in.cue:105:10
                   //     ./in.cue:105:30
+                  //     ./in.cue:106:10
+                  //     ./in.cue:107:10
                   c: (int){ 1 }
                   d: (int){ 1 }
                 }
@@ -325,7 +336,10 @@ preserveClosedness: medium: p3: {
                 a: (_|_){
                   // [incomplete] nestedNonMonotonic.incomplete.b.n1.p2.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                   //     ./in.cue:112:13
+                  //     ./in.cue:111:10
+                  //     ./in.cue:112:10
                   //     ./in.cue:112:30
+                  //     ./in.cue:113:10
                   c: (int){ 1 }
                   d: (int){ 1 }
                 }
@@ -336,6 +350,9 @@ preserveClosedness: medium: p3: {
                 a: (_|_){
                   // [incomplete] nestedNonMonotonic.incomplete.b.n1.p3.x.a: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                   //     ./in.cue:119:13
+                  //     ./in.cue:117:10
+                  //     ./in.cue:118:10
+                  //     ./in.cue:119:10
                   //     ./in.cue:119:30
                   c: (int){ 1 }
                   d: (int){ 1 }
@@ -350,6 +367,15 @@ preserveClosedness: medium: p3: {
                   b: (_|_){
                     // [incomplete] nestedNonMonotonic.incomplete.b.n2.p1.x.a.b: invalid value {c:1,d:1} (does not satisfy struct.MinFields(3)): len(fields) < MinFields(3) (2 < 3):
                     //     ./in.cue:137:16
+                    //     ./in.cue:123:13
+                    //     ./in.cue:124:13
+                    //     ./in.cue:125:13
+                    //     ./in.cue:129:13
+                    //     ./in.cue:130:13
+                    //     ./in.cue:131:13
+                    //     ./in.cue:135:13
+                    //     ./in.cue:136:13
+                    //     ./in.cue:137:13
                     //     ./in.cue:137:33
                     c: (int){ 1 }
                     d: (int){ 1 }

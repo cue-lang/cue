@@ -74,6 +74,8 @@ a: {
         s: (_|_){
           // [incomplete] a.b.c.s: non-concrete value string in operand to +:
           //     ./in.cue:4:34
+          //     ./in.cue:4:20
+          //     ./in.cue:5:10
         }
       }
     }

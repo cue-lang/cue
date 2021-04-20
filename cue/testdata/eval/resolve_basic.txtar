@@ -18,6 +18,7 @@
     y: (_|_){
       // [incomplete] d.y: non-concrete value _ in operand to +:
       //     ./in.cue:5:6
+      //     ./in.cue:4:3
     }
   }
   e: (struct){

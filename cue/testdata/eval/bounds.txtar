@@ -119,27 +119,27 @@ Result:
     basic5: (bytes){ bytes }
     bne1: (_|_){
       // [incomplete] simplifyExpr.bne1: non-concrete value s for bound !=:
-      //     ./in.cue:55:11
+      //     ./in.cue:55:14
     }
     bne2: (_|_){
       // [incomplete] simplifyExpr.bne2: non-concrete value n for bound !=:
-      //     ./in.cue:56:11
+      //     ./in.cue:56:14
     }
     bne3: (_|_){
       // [incomplete] simplifyExpr.bne3: non-concrete value n for bound !=:
-      //     ./in.cue:57:11
+      //     ./in.cue:57:14
     }
     bne4: (_|_){
       // [incomplete] simplifyExpr.bne4: non-concrete value i for bound !=:
-      //     ./in.cue:58:11
+      //     ./in.cue:58:14
     }
     bne5: (_|_){
       // [incomplete] simplifyExpr.bne5: non-concrete value b for bound !=:
-      //     ./in.cue:59:11
+      //     ./in.cue:59:14
     }
     e1: (_|_){
       // [incomplete] simplifyExpr.e1: non-concrete value =~"foo" for bound <:
-      //     ./in.cue:61:9
+      //     ./in.cue:61:11
     }
     e2: (_|_){
       // [eval] simplifyExpr.e2: cannot use null for bound >:

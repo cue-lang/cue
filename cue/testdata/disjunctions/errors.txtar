@@ -126,6 +126,7 @@ Result:
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
     //     ./in.cue:30:8
+    //     ./in.cue:28:5
     a: (string){ string }
   }
 }

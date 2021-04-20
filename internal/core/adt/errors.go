@@ -34,6 +34,7 @@ package adt
 import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
+	cueformat "cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/token"
 )
 
@@ -260,20 +261,38 @@ func (c *OpContext) Newf(format string, args ...interface{}) *ValueError {
 	return c.NewPosf(c.pos(), format, args...)
 }
 
+func appendNodePositions(a []token.Pos, n Node) []token.Pos {
+	if p := pos(n); p != token.NoPos {
+		a = append(a, p)
+	} else if v, ok := n.(*Vertex); ok {
+		for _, c := range v.Conjuncts {
+			a = appendNodePositions(a, c.x)
+		}
+	}
+	return a
+}
+
 func (c *OpContext) NewPosf(p token.Pos, format string, args ...interface{}) *ValueError {
 	var a []token.Pos
 	if len(c.positions) > 0 {
 		a = make([]token.Pos, 0, len(c.positions))
 		for _, n := range c.positions {
-			if p := pos(n); p != token.NoPos {
+			a = appendNodePositions(a, n)
+		}
+	}
+	for i, arg := range args {
+		switch x := arg.(type) {
+		case Node:
+			a = appendNodePositions(a, x)
+			args[i] = c.Str(x)
+		case ast.Node:
+			b, _ := cueformat.Node(x)
+			if p := x.Pos(); p != token.NoPos {
 				a = append(a, p)
-			} else if v, ok := n.(*Vertex); ok {
-				for _, c := range v.Conjuncts {
-					if p := pos(c.x); p != token.NoPos {
-						a = append(a, p)
-					}
-				}
 			}
+			args[i] = string(b)
+		case Feature:
+			args[i] = x.SelectorString(c.Runtime)
 		}
 	}
 	return &ValueError{

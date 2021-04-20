@@ -477,13 +477,12 @@ func (x *BoundExpr) evaluate(ctx *OpContext) Value {
 			mask |= NullKind
 		}
 		if k&mask != 0 {
-			ctx.addErrf(IncompleteError, ctx.pos(),
-				"non-concrete value %s for bound %s", ctx.Str(x.Expr), x.Op)
+			ctx.addErrf(IncompleteError, token.NoPos, // TODO(errors): use ctx.pos()?
+				"non-concrete value %s for bound %s", x.Expr, x.Op)
 			return nil
 		}
 		err := ctx.NewPosf(pos(x.Expr),
-			"invalid value %s (type %s) for bound %s",
-			ctx.Str(v), k, x.Op)
+			"invalid value %s (type %s) for bound %s", v, k, x.Op)
 		return &Bottom{Err: err}
 	}
 
@@ -565,8 +564,8 @@ func (x *BoundExpr) evaluate(ctx *OpContext) Value {
 	}
 	if v.Concreteness() > Concrete {
 		// TODO(errors): analyze dependencies of x.Expr to get positions.
-		ctx.addErrf(IncompleteError, ctx.pos(),
-			"non-concrete value %s for bound %s", ctx.Str(x.Expr), x.Op)
+		ctx.addErrf(IncompleteError, token.NoPos, // TODO(errors): use ctx.pos()?
+			"non-concrete value %s for bound %s", x.Expr, x.Op)
 		return nil
 	}
 	return &BoundValue{x.Src, x.Op, v}
@@ -616,8 +615,7 @@ func (x *BoundValue) validate(c *OpContext, y Value) *Bottom {
 		}
 		// TODO(errors): use "invalid value %v (not an %s)" if x is a
 		// predeclared identifier such as `int`.
-		err := c.Newf("invalid value %v (out of bound %s)",
-			c.Str(y), c.Str(x))
+		err := c.Newf("invalid value %v (out of bound %s)", y, x)
 		err.AddPosition(y)
 		return &Bottom{Src: c.src, Err: err, Code: EvalError}
 
@@ -934,8 +932,7 @@ func (x *SliceExpr) evaluate(c *OpContext) Value {
 
 	switch v := v.(type) {
 	case nil:
-		c.addErrf(IncompleteError, c.pos(),
-			"non-concrete slice subject %s", c.Str(x.X))
+		c.addErrf(IncompleteError, c.pos(), "non-concrete slice subject %s", x.X)
 		return nil
 	case *Vertex:
 		if !v.IsList() {
@@ -997,7 +994,7 @@ func (x *SliceExpr) evaluate(c *OpContext) Value {
 	if isError(v) {
 		return v
 	}
-	return c.NewErrf("cannot slice %v (type %s)", c.Str(v), v.Kind())
+	return c.NewErrf("cannot slice %v (type %s)", v, v.Kind())
 }
 
 // An Interpolation is a string interpolation.
@@ -1097,10 +1094,10 @@ func (x *UnaryExpr) evaluate(c *OpContext) Value {
 	}
 	if k&expectedKind != BottomKind {
 		c.addErrf(IncompleteError, pos(x.X),
-			"operand %s of '%s' not concrete (was %s)", c.Str(x.X), op, k)
+			"operand %s of '%s' not concrete (was %s)", x.X, op, k)
 		return nil
 	}
-	return c.NewErrf("invalid operation %s (%s %s)", c.Str(x), op, k)
+	return c.NewErrf("invalid operation %s (%s %s)", x, op, k)
 }
 
 // BinaryExpr is a binary expression.
@@ -1244,8 +1241,7 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 		// value to be called with zero arguments.
 		switch {
 		case f.Src != nil:
-			c.addErrf(0, pos(x.Fun),
-				"cannot call previously called validator %s", c.Str(x.Fun))
+			c.AddErrf("cannot call previously called validator %s", x.Fun)
 
 		case f.Builtin.IsValidator(len(x.Args)):
 			v := *f
@@ -1257,8 +1253,7 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 		}
 
 	default:
-		c.addErrf(0, pos(x.Fun), "cannot call non-function %s (type %s)",
-			c.Str(x.Fun), kind(fun))
+		c.AddErrf("cannot call non-function %s (type %s)", x.Fun, kind(fun))
 		return nil
 	}
 	args := []Value{}
@@ -1269,7 +1264,7 @@ func (x *CallExpr) evaluate(c *OpContext) Value {
 			// There SHOULD be an error in the context. If not, we generate
 			// one.
 			c.Assertf(pos(x.Fun), c.HasErr(),
-				"argument %d to function %s is incomplete", i, c.Str(x.Fun))
+				"argument %d to function %s is incomplete", i, x.Fun)
 
 		case *Bottom:
 			// TODO(errors): consider adding an argument index for this errors.
@@ -1488,7 +1483,7 @@ func validateWithBuiltin(c *OpContext, src token.Pos, b *Builtin, args []Value) 
 		buf.WriteString(")")
 	}
 
-	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", c.Str(args[0]), buf.String())
+	vErr := c.NewPosf(src, "invalid value %s (does not satisfy %s)", args[0], buf.String())
 	vErr.err = err
 
 	for _, v := range args {

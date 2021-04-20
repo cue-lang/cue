@@ -65,18 +65,22 @@ s3:  strings.ContainsAny(str, "dd")
   n4: (_|_){
     // [incomplete] n4: non-concrete value <4 in operand to +:
     //     ./in.cue:6:5
+    //     ./in.cue:18:6
   }
   n5: (_|_){
     // [incomplete] n5: non-concrete value <4 in operand to -:
     //     ./in.cue:7:5
+    //     ./in.cue:18:6
   }
   n6: (_|_){
     // [incomplete] n6: non-concrete value <4 in operand to *:
     //     ./in.cue:8:5
+    //     ./in.cue:18:6
   }
   n7: (_|_){
     // [incomplete] n7: non-concrete value <4 in operand to /:
     //     ./in.cue:9:5
+    //     ./in.cue:18:6
   }
   b1: (_|_){
     // [incomplete] b1: operand is of '!' not concrete (was bool):

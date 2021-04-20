@@ -974,12 +974,11 @@ func (n *nodeContext) addConflict(
 
 	var err *ValueError
 	if k1 == k2 {
-		err = ctx.NewPosf(token.NoPos,
-			"conflicting values %s and %s", ctx.Str(v1), ctx.Str(v2))
+		err = ctx.NewPosf(token.NoPos, "conflicting values %s and %s", v1, v2)
 	} else {
 		err = ctx.NewPosf(token.NoPos,
 			"conflicting values %s and %s (mismatched types %s and %s)",
-			ctx.Str(v1), ctx.Str(v2), k1, k2)
+			v1, v2, k1, k2)
 	}
 
 	err.AddPosition(v1)
@@ -1005,7 +1004,7 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 		} else {
 			n.addErr(ctx.Newf(
 				"conflicting value %s (mismatched types %s and %s)",
-				ctx.Str(v), n.kind, k))
+				v, n.kind, k))
 		}
 	}
 

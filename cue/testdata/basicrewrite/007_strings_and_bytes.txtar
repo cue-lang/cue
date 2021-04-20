@@ -43,8 +43,10 @@ e1: _|_ // invalid operation 'b' + "c" (mismatched types bytes and string)
 Errors:
 e0: invalid operands "a" and '' to '+' (type string and bytes):
     ./in.cue:10:5
+    ./in.cue:10:11
 e1: invalid operands 'b' and "c" to '+' (type bytes and string):
     ./in.cue:11:5
+    ./in.cue:11:11
 
 Result:
 (_|_){
@@ -58,9 +60,11 @@ Result:
   e0: (_|_){
     // [eval] e0: invalid operands "a" and '' to '+' (type string and bytes):
     //     ./in.cue:10:5
+    //     ./in.cue:10:11
   }
   e1: (_|_){
     // [eval] e1: invalid operands 'b' and "c" to '+' (type bytes and string):
     //     ./in.cue:11:5
+    //     ./in.cue:11:11
   }
 }

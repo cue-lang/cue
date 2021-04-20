@@ -34,6 +34,7 @@ incompleteIndex: {
 Errors:
 incompleteIndex.a: invalid index top (invalid type _):
     ./in.cue:29:8
+    ./in.cue:29:12
 
 Result:
 (_|_){
@@ -78,6 +79,7 @@ Result:
     a: (_|_){
       // [eval] incompleteIndex.a: invalid index top (invalid type _):
       //     ./in.cue:29:8
+      //     ./in.cue:29:12
     }
   }
 }

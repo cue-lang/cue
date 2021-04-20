@@ -5,13 +5,19 @@ x: [string, ...string]
 x: ["x","x"]
 -- out/eval --
 Errors:
-x: invalid value ["x","x"] (does not satisfy list.UniqueItems)
+x: invalid value ["x","x"] (does not satisfy list.UniqueItems):
+    ./in.cue:2:1
+    ./in.cue:3:1
+    ./in.cue:4:1
 
 Result:
 (_|_){
   // [eval]
   x: (_|_){
-    // [eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems)
+    // [eval] x: invalid value ["x","x"] (does not satisfy list.UniqueItems):
+    //     ./in.cue:2:1
+    //     ./in.cue:3:1
+    //     ./in.cue:4:1
     0: (string){ "x" }
     1: (string){ "x" }
   }

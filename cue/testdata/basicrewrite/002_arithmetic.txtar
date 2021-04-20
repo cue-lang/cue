@@ -109,14 +109,19 @@ irem00: division by zero:
     ./in.cue:16:9
 e0: invalid operands 2 and "a" to '+' (type int and string):
     ./in.cue:23:5
+    ./in.cue:23:9
 e5: invalid operands 1.0 and 2 to 'div' (type float and int):
     ./in.cue:29:5
+    ./in.cue:29:13
 e6: invalid operands 2 and 2.0 to 'rem' (type int and float):
     ./in.cue:30:5
+    ./in.cue:30:11
 e7: invalid operands 2 and 2.0 to 'quo' (type int and float):
     ./in.cue:31:5
+    ./in.cue:31:11
 e8: invalid operands 1.0 and 1 to 'mod' (type float and int):
     ./in.cue:32:5
+    ./in.cue:32:13
 
 Result:
 (_|_){
@@ -160,21 +165,26 @@ Result:
   e0: (_|_){
     // [eval] e0: invalid operands 2 and "a" to '+' (type int and string):
     //     ./in.cue:23:5
+    //     ./in.cue:23:9
   }
   e5: (_|_){
     // [eval] e5: invalid operands 1.0 and 2 to 'div' (type float and int):
     //     ./in.cue:29:5
+    //     ./in.cue:29:13
   }
   e6: (_|_){
     // [eval] e6: invalid operands 2 and 2.0 to 'rem' (type int and float):
     //     ./in.cue:30:5
+    //     ./in.cue:30:11
   }
   e7: (_|_){
     // [eval] e7: invalid operands 2 and 2.0 to 'quo' (type int and float):
     //     ./in.cue:31:5
+    //     ./in.cue:31:11
   }
   e8: (_|_){
     // [eval] e8: invalid operands 1.0 and 1 to 'mod' (type float and int):
     //     ./in.cue:32:5
+    //     ./in.cue:32:13
   }
 }

@@ -103,16 +103,19 @@ e2: invalid operand 2 (found int, want list or struct):
     ./in.cue:7:5
 e3: invalid index true (invalid type bool):
     ./in.cue:8:5
+    ./in.cue:8:8
 e4: index out of range [3] with length 3:
     ./in.cue:9:15
 e5: invalid index -1 (index must be non-negative):
     ./in.cue:10:5
+    ./in.cue:10:15
 e6: invalid list index 1 (out of bounds):
     ./in.cue:11:16
 e7: index out of range [3] with length 3:
     ./in.cue:12:15
 e8: invalid index -1 (index must be non-negative):
     ./in.cue:13:5
+    ./in.cue:13:15
 e9: invalid list index 1 (out of bounds):
     ./in.cue:14:16
 
@@ -142,6 +145,7 @@ Result:
   e3: (_|_){
     // [eval] e3: invalid index true (invalid type bool):
     //     ./in.cue:8:5
+    //     ./in.cue:8:8
   }
   e4: (_|_){
     // [eval] e4: index out of range [3] with length 3:
@@ -150,6 +154,7 @@ Result:
   e5: (_|_){
     // [eval] e5: invalid index -1 (index must be non-negative):
     //     ./in.cue:10:5
+    //     ./in.cue:10:15
   }
   e6: (_|_){
     // [eval] e6: invalid list index 1 (out of bounds):
@@ -162,6 +167,7 @@ Result:
   e8: (_|_){
     // [eval] e8: invalid index -1 (index must be non-negative):
     //     ./in.cue:13:5
+    //     ./in.cue:13:15
   }
   e9: (_|_){
     // [eval] e9: invalid list index 1 (out of bounds):

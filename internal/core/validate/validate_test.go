@@ -100,7 +100,7 @@ y: conflicting values 4 and 2:
 		y: 2 + x
 		x: string
 		`,
-		out: "incomplete\ny: non-concrete value string in operand to +:\n    test:2:6",
+		out: "incomplete\ny: non-concrete value string in operand to +:\n    test:2:6\n    test:3:3",
 	}, {
 		desc: "allowed incomplete cycle",
 		in: `

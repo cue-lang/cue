@@ -85,8 +85,16 @@ a: {
       s: (_|_){
         // [incomplete] f1.res.s: non-concrete value string in operand to +:
         //     ./in.cue:5:25
+        //     ./in.cue:3:31
+        //     ./in.cue:5:11
+        //     ./in.cue:6:20
+        //     ./in.cue:7:10
         // f1.res.s: non-concrete value string in operand to +:
         //     ./in.cue:6:34
+        //     ./in.cue:3:31
+        //     ./in.cue:5:11
+        //     ./in.cue:6:20
+        //     ./in.cue:7:10
       }
     }
   }
@@ -97,8 +105,14 @@ a: {
         s: (_|_){
           // [incomplete] a.b.c.s: non-concrete value string in operand to +:
           //     ./in.cue:5:25
+          //     ./in.cue:5:11
+          //     ./in.cue:6:20
+          //     ./in.cue:7:10
           // a.b.c.s: non-concrete value string in operand to +:
           //     ./in.cue:6:34
+          //     ./in.cue:5:11
+          //     ./in.cue:6:20
+          //     ./in.cue:7:10
         }
       }
     }

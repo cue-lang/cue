@@ -114,6 +114,7 @@ useDefault: {
 Errors:
 wrongConcreteType: cannot use 2 (type int) as type bool:
     ./in.cue:4:2
+    ./in.cue:1:9
 wrongType: cannot use int (type int) as type bool:
     ./in.cue:10:2
 
@@ -127,6 +128,7 @@ Result:
   wrongConcreteType: (_|_){
     // [eval] wrongConcreteType: cannot use 2 (type int) as type bool:
     //     ./in.cue:4:2
+    //     ./in.cue:1:9
   }
   wrongType: (_|_){
     // [eval] wrongType: cannot use int (type int) as type bool:

@@ -166,6 +166,7 @@ Result:
       out: (_|_){
         // [incomplete] outPattern.sum.out: non-concrete value int in operand to +:
         //     ./in.cue:44:14
+        //     ./in.cue:45:9
       }
       #a: (int){ int }
       #b: (int){ int }
@@ -180,6 +181,7 @@ Result:
     sum: (_|_){
       // [incomplete] arithmetic.sum: non-concrete value int in operand to +:
       //     ./in.cue:53:9
+      //     ./in.cue:54:9
       #a: (int){ int }
       #b: (int){ int }
     }

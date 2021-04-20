@@ -125,6 +125,8 @@ Result:
       kv: (_|_){
         // [incomplete] incompleteError2.MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
         //     ./in.cue:22:17
+        //     ./in.cue:21:13
+        //     ./in.cue:22:13
         //     ./in.cue:22:34
       }
     }
@@ -148,6 +150,8 @@ Result:
       kv: (_|_){
         // [incomplete] violation.#MyType.kv: invalid value {} (does not satisfy struct.MinFields(1)): len(fields) < MinFields(1) (0 < 1):
         //     ./in.cue:49:17
+        //     ./in.cue:48:13
+        //     ./in.cue:49:13
         //     ./in.cue:49:34
       }
     }

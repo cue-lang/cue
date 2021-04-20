@@ -24,6 +24,7 @@ okay: (>10 & <a) + 3
   e1: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
     //     ./in.cue:3:5
+    //     ./in.cue:1:1
   }
   e2: (string){ >"bar" }
   e3: (string){ "foo" }
@@ -31,6 +32,7 @@ okay: (>10 & <a) + 3
   e4: (_|_){
     // [incomplete] e1: non-concrete value string in operand to +:
     //     ./in.cue:3:5
+    //     ./in.cue:1:1
   }
   e5: (_|_){
     // [cycle] cycle error
@@ -55,6 +57,7 @@ okay: (>10 & <a) + 3
   okay: (_|_){
     // [incomplete] okay: non-concrete value >10 & int in operand to +:
     //     ./in.cue:18:7
+    //     ./in.cue:18:8
   }
 }
 -- out/compile --

@@ -39,14 +39,14 @@ m:  _|_ // invalid operation -false (- bool)
 }
 -- out/eval --
 Errors:
+b: invalid operand int ('!' requires concrete value):
+    ./in.cue:7:6
 e: conflicting values int and string (mismatched types int and string):
     ./in.cue:5:5
     ./in.cue:5:11
 e2: conflicting values 1 and string (mismatched types int and string):
     ./in.cue:6:5
     ./in.cue:6:9
-b: invalid operand int ('!' requires concrete value):
-    ./in.cue:7:5
 p: invalid operation +true (+ bool):
     ./in.cue:8:5
 m: invalid operation -false (- bool):
@@ -71,7 +71,7 @@ Result:
   }
   b: (_|_){
     // [eval] b: invalid operand int ('!' requires concrete value):
-    //     ./in.cue:7:5
+    //     ./in.cue:7:6
   }
   p: (_|_){
     // [eval] p: invalid operation +true (+ bool):

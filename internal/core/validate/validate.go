@@ -92,7 +92,7 @@ func (v *validator) validate(x *adt.Vertex) {
 			x := x.Value()
 			v.add(&adt.Bottom{
 				Code: adt.IncompleteError,
-				Err:  v.ctx.Newf("incomplete value %v", v.ctx.Str(x)),
+				Err:  v.ctx.Newf("incomplete value %v", x),
 			})
 		}
 	}

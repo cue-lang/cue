@@ -88,6 +88,7 @@ b1: {
     d: (_|_){
       // [incomplete] b1.d: non-concrete value string in operand to +:
       //     ./in.cue:10:5
+      //     ./in.cue:11:2
     }
     c: (string){ string }
   }

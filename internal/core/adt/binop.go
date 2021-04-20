@@ -31,13 +31,13 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 	if left.Concreteness() > Concrete {
 		return &Bottom{
 			Code: IncompleteError,
-			Err:  c.Newf(msg, c.Str(left), op),
+			Err:  c.Newf(msg, left, op),
 		}
 	}
 	if right.Concreteness() > Concrete {
 		return &Bottom{
 			Code: IncompleteError,
-			Err:  c.Newf(msg, c.Str(right), op),
+			Err:  c.Newf(msg, right, op),
 		}
 	}
 
@@ -290,7 +290,7 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 	}
 
 	return c.NewErrf("invalid operands %s and %s to '%s' (type %s and %s)",
-		c.Str(left), c.Str(right), op, left.Kind(), right.Kind())
+		left, right, op, left.Kind(), right.Kind())
 }
 
 func cmpTonode(c *OpContext, op Op, r int) Value {

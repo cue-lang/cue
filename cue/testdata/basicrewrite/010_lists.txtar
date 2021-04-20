@@ -83,6 +83,7 @@ e2: invalid list index d (type string):
     ./in.cue:5:12
 e3: invalid index -1 (index must be non-negative):
     ./in.cue:6:8
+    ./in.cue:6:12
 e4.3: invalid value 8 (out of bound <=5):
     ./in.cue:7:24
     ./in.cue:7:41
@@ -116,6 +117,7 @@ Result:
   e3: (_|_){
     // [eval] e3: invalid index -1 (index must be non-negative):
     //     ./in.cue:6:8
+    //     ./in.cue:6:12
   }
   e4: (_|_){
     // [eval]

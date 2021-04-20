@@ -22,6 +22,7 @@ okIncompleteChild: {
 Errors:
 fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
     ./in.cue:3:12
+    ./in.cue:3:20
 0.a: undefined field c:
     ./in.cue:9:20
 
@@ -33,6 +34,7 @@ Result:
     x: (_|_){
       // [eval] fatalArg.x: invalid operands "eee" and 'eee' to '+' (type string and bytes):
       //     ./in.cue:3:12
+      //     ./in.cue:3:20
     }
   }
   fatalChild: (_|_){

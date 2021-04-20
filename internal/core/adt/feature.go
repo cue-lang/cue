@@ -196,7 +196,7 @@ func labelFromValue(c *OpContext, src Expr, v Value) Feature {
 			if src == nil {
 				src = v
 			}
-			c.AddErrf("invalid index %v: %v", c.Str(src), err)
+			c.AddErrf("invalid index %v: %v", src, err)
 			return InvalidLabel
 		}
 		if i < 0 {
@@ -204,11 +204,10 @@ func labelFromValue(c *OpContext, src Expr, v Value) Feature {
 			case nil, *Num, *UnaryExpr:
 				// If the value is a constant, we know it is always an error.
 				// UnaryExpr is an approximation for a constant value here.
-				c.AddErrf("invalid index %s (index must be non-negative)",
-					c.Str(x))
+				c.AddErrf("invalid index %s (index must be non-negative)", x)
 			default:
 				// Use a different message is it is the result of evaluation.
-				c.AddErrf("index %s out of range [%s]", c.Str(src), c.Str(x))
+				c.AddErrf("index %s out of range [%s]", src, x)
 			}
 			return InvalidLabel
 		}
@@ -224,8 +223,7 @@ func labelFromValue(c *OpContext, src Expr, v Value) Feature {
 
 	default:
 		if src != nil {
-			c.AddErrf("invalid index %s (invalid type %v)",
-				c.Str(src), v.Kind())
+			c.AddErrf("invalid index %s (invalid type %v)", src, v.Kind())
 		} else {
 			c.AddErrf("invalid index type %v", v.Kind())
 		}

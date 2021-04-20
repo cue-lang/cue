@@ -91,15 +91,21 @@ Result:
     out: (_|_){
       // [incomplete] non-concrete value int in operand to >=:
       //     ./in.cue:7:5
+      //     ./in.cue:3:32
+      //     ./in.cue:5:2
       // non-concrete value int in operand to <:
       //     ./in.cue:10:5
+      //     ./in.cue:3:32
+      //     ./in.cue:5:2
     }
   }
   fib: (_|_){
     // [incomplete] fib: non-concrete value int in operand to >=:
     //     ./in.cue:7:5
+    //     ./in.cue:5:2
     // fib: non-concrete value int in operand to <:
     //     ./in.cue:10:5
+    //     ./in.cue:5:2
     n: (int){ int }
   }
   fib2: (int){ 1 }

@@ -65,8 +65,10 @@ e5: cannot slice 4 (type int):
     ./in.cue:7:5
 e6: cannot use "" (type string) as type int in slice index:
     ./in.cue:8:5
+    ./in.cue:8:9
 e7: cannot use "9" (type string) as type int in slice index:
     ./in.cue:9:5
+    ./in.cue:9:10
 
 Result:
 (_|_){
@@ -98,9 +100,11 @@ Result:
   e6: (_|_){
     // [eval] e6: cannot use "" (type string) as type int in slice index:
     //     ./in.cue:8:5
+    //     ./in.cue:8:9
   }
   e7: (_|_){
     // [eval] e7: cannot use "9" (type string) as type int in slice index:
     //     ./in.cue:9:5
+    //     ./in.cue:9:10
   }
 }

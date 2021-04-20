@@ -54,7 +54,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 	default:
 		// Unknown type.
 		v = ctx.NewErrf(
-			"could not evaluate expression %s of type %T", ctx.Str(c.Expr()), c)
+			"could not evaluate expression %s of type %T", c.Expr(), c)
 	}
 
 	return ToVertex(v)

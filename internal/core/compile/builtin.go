@@ -69,7 +69,7 @@ var lenBuiltin = &adt.Builtin{
 			if k&supportedByLen == adt.BottomKind {
 				return c.NewErrf("invalid argument type %v", k)
 			}
-			b := c.NewErrf("incomplete argument %s (type %v)", c.Str(v), k)
+			b := c.NewErrf("incomplete argument %s (type %v)", v, k)
 			b.Code = adt.IncompleteError
 			return b
 		}

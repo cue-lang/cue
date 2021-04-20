@@ -52,7 +52,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 
 	case *adt.ListMarker:
 		if !y.IsList() {
-			s.errf("list does not subsume %s (type %s)", ctx.Str(y), y.Kind())
+			s.errf("list does not subsume %s (type %s)", y, y.Kind())
 			return false
 		}
 		if !s.listVertices(x, y) {
@@ -157,8 +157,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		s.gt = a
 		s.lt = y
 
-		s.errf("field %s not present in %s",
-			f.SelectorString(ctx), ctx.Str(y))
+		s.errf("field %s not present in %s", f, y)
 		return false
 	}
 
@@ -195,8 +194,7 @@ outer:
 			if s.Profile.IgnoreClosedness {
 				continue
 			}
-			s.errf("field %s not allowed in closed struct",
-				f.SelectorString(ctx))
+			s.errf("field %s not allowed in closed struct", f)
 			return false
 		}
 

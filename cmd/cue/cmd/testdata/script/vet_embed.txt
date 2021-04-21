@@ -32,7 +32,6 @@ e: 2
 
 -- expect-foo --
 field c not allowed:
-    ./foo.yaml:1:2
     ./foo.yaml:2:2
     ./schema.cue:1:1
     ./schema.cue:3:7
@@ -42,12 +41,10 @@ field d not allowed:
     ./schema.cue:1:1
     ./schema.cue:3:7
     ./schema.cue:7:1
-    ./stream.yaml:1:2
     ./stream.yaml:2:2
 -- expect-stream --
 field d not allowed:
     ./schema.cue:1:1
     ./schema.cue:3:7
     ./schema.cue:7:1
-    ./stream.yaml:1:2
     ./stream.yaml:2:2

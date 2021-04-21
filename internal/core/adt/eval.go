@@ -1359,7 +1359,15 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 		defer func() { arc.SelfCount-- }()
 	}
 
-	closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
+	// Performance: the following if check filters cases that are not strictly
+	// necessary for correct functioning. Not updating the closeInfo may cause
+	// some position information to be lost for top-level positions of merges
+	// resulting form APIs. These tend to be fairly uninteresting.
+	// At the same time, this optimization may prevent considerable slowdown
+	// in case an API does many calls to Unify.
+	if !inline || arc.IsClosedStruct() || arc.IsClosedList() {
+		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
+	}
 
 	if arc.status == 0 && !inline {
 		// This is a rare condition, but can happen in certain

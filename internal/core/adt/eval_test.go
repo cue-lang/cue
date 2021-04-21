@@ -22,6 +22,8 @@ import (
 
 	"github.com/rogpeppe/go-internal/txtar"
 
+	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
@@ -134,4 +136,18 @@ module: "example.com"
 	t.Error(debug.NodeString(r, v, nil))
 
 	t.Log(ctx.Stats())
+}
+
+func BenchmarkUnifyAPI(b *testing.B) {
+	for i := 0; i < b.N; i++ {
+		b.StopTimer()
+		ctx := cuecontext.New()
+		v := ctx.CompileString("")
+		for j := 0; j < 500; j++ {
+			if j == 400 {
+				b.StartTimer()
+			}
+			v = v.FillPath(cue.ParsePath(fmt.Sprintf("i_%d", i)), i)
+		}
+	}
 }

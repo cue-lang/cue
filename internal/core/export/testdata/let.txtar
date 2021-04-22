@@ -129,17 +129,8 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	let filepath = "kind-\(cfg.name)"
-	files: {
-		"\(filepath)": {
-			patches: cfg
-		}
-	} & {
-		"\(filepath)": {
-			patches: cfg
-		}
-	}
-	y: "foo"
+	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field name (and 3 more errors)
+	y:     "foo"
 }
 == All
 {

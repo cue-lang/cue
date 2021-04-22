@@ -32,11 +32,12 @@ const debug = false
 type Profile struct {
 	Simplify bool
 
+	// Final reports incomplete errors as errors.
+	Final bool
+
 	// TakeDefaults is used in Value mode to drop non-default values.
 	TakeDefaults bool
 
-	// TODO:
-	// IncludeDocs
 	ShowOptional    bool
 	ShowDefinitions bool
 
@@ -65,6 +66,7 @@ var Simplified = &Profile{
 var Final = &Profile{
 	Simplify:     true,
 	TakeDefaults: true,
+	Final:        true,
 }
 
 var Raw = &Profile{

@@ -124,7 +124,7 @@ func (p *printer) Print(v interface{}) {
 			// 2) simplified structs are explicitly referenced separately
 			//    in the AST.
 			if p.indent < 6 {
-				data = literal.IndentTabs(data, p.indent+1)
+				data = literal.IndentTabs(data, p.cfg.Indent+p.indent+1)
 			}
 
 		case token.INT:

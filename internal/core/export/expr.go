@@ -275,6 +275,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 		if isComplexStruct(x) {
 			_, saved := e.pushFrame(nil)
 			e.embed = append(e.embed, e.adt(x, nil))
+			e.top().upCount-- // not necessary, but for proper form
 			e.popFrame(saved)
 			return
 		}
@@ -331,7 +332,13 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 				x = nil
 
 			case adt.Value:
-				e.values.AddConjunct(adt.MakeRootConjunct(env, y)) // GOBBLE TOP
+				if v.IsData() {
+					e.values.AddConjunct(adt.MakeRootConjunct(env, y))
+					break
+				}
+				for _, c := range v.Conjuncts {
+					e.values.AddConjunct(c)
+				}
 			}
 
 			// generated, only consider arcs.
@@ -377,6 +384,9 @@ func isOptional(a []adt.Conjunct) bool {
 		return false
 	}
 	for _, c := range a {
+		if v, ok := c.Expr().(*adt.Vertex); ok && !v.IsData() && len(v.Conjuncts) > 0 {
+			return isOptional(v.Conjuncts)
+		}
 		switch f := c.Source().(type) {
 		case nil:
 			return false

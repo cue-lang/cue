@@ -19,6 +19,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/parser"
@@ -32,6 +33,7 @@ import (
 	"cuelang.org/go/internal/core/runtime"
 	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/internal/cuetxtar"
+	"cuelang.org/go/internal/value"
 	"github.com/rogpeppe/go-internal/txtar"
 )
 
@@ -78,6 +80,7 @@ func TestGenerated(t *testing.T) {
 	testCases := []struct {
 		in  func(ctx *adt.OpContext) (adt.Expr, error)
 		out string
+		p   *export.Profile
 	}{{
 		in: func(ctx *adt.OpContext) (adt.Expr, error) {
 			in := &C{
@@ -131,7 +134,28 @@ func TestGenerated(t *testing.T) {
 
 			return n, nil
 		},
-		out: `<[l2// x: undefined field #Terminal] _|_>`,
+		// TODO: should probably print path.
+		out: `<[l2// undefined field #Terminal] _|_>`,
+		p:   export.Final,
+	}, {
+		in: func(ctx *adt.OpContext) (adt.Expr, error) {
+			c := cuecontext.New()
+			v := c.CompileString(`
+				#Provider: {
+					ID: string
+					notConcrete: bool
+					a: int
+					b: a + 1
+				}`)
+
+			spec := v.LookupPath(cue.ParsePath("#Provider"))
+			spec2 := spec.FillPath(cue.ParsePath("ID"), "12345")
+			root := v.FillPath(cue.ParsePath("providers.foo"), spec2)
+			_, n := value.ToInternal(root)
+
+			return n, nil
+		},
+		out: `{#Provider: {ID: string, notConcrete: bool, a: int, b: a+1}, providers: {foo: {ID: "12345", notConcrete: bool, a: int, b: a+1}}}`,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
@@ -142,7 +166,13 @@ func TestGenerated(t *testing.T) {
 			if err != nil {
 				t.Fatal("failed test case: ", err)
 			}
-			expr, err := export.Expr(ctx, "", v)
+
+			p := tc.p
+			if p == nil {
+				p = export.Simplified
+			}
+
+			expr, err := p.Expr(ctx, "", v)
 			if err != nil {
 				t.Fatal("failed export: ", err)
 			}

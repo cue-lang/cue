@@ -249,13 +249,23 @@ func (c *Context) EncodeType(x interface{}, option ...EncodeOption) Value {
 	return c.make(n)
 }
 
+// NewList creates a Value that is a list of the given values.
+//
+// All Values must be created by c.
+func (c *Context) NewList(v ...Value) Value {
+	a := make([]adt.Value, len(v))
+	for i, x := range v {
+		if x.idx != (*runtime.Runtime)(c) {
+			panic("values must be from same Context")
+		}
+		a[i] = x.v
+	}
+	return c.make(c.ctx().NewList(a...))
+}
+
 // TODO:
 
 // func (c *Context) NewExpr(op Op, v ...Value) Value {
-// 	return Value{}
-// }
-
-// func (c *Context) NewList(v ...Value) Value {
 // 	return Value{}
 // }
 

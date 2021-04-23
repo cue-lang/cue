@@ -2074,7 +2074,7 @@ outer:
 
 			// Terminate early n case of runaway comprehension.
 			if !isOpen && int(index) > max {
-				n.invalidListLength(max, int(index), maxNode, l.list)
+				n.invalidListLength(max, len(l.list.Elems), maxNode, l.list)
 				continue outer
 			}
 		}

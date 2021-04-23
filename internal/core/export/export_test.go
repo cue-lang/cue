@@ -156,6 +156,7 @@ func TestGenerated(t *testing.T) {
 			return n, nil
 		},
 		out: `#Provider: {ID: string, notConcrete: bool, a: int, b: a+1}, providers: {foo: {ID: "12345", notConcrete: bool, a: int, b: a+1}}`,
+		p:   export.All,
 	}, {
 		// Issue #882
 		in: func(r *adt.OpContext) (adt.Expr, error) {
@@ -172,6 +173,21 @@ func TestGenerated(t *testing.T) {
 			return n, nil
 		},
 		out: `#One: {version: string}, ones: {[string]: #One}`,
+		p:   export.All,
+	}, {
+		// Indicate closedness in an element that is closed and misses parent
+		// context.
+		// Issue #882
+		in: func(r *adt.OpContext) (adt.Expr, error) {
+			v := ctx.CompileString(`
+					#A: b: c: string
+				`)
+			v = v.LookupPath(cue.ParsePath("#A.b"))
+
+			_, n := value.ToInternal(v)
+			return n, nil
+		},
+		out: `_#def, _#def: {c: string}`,
 		p:   export.All,
 	}}
 	for _, tc := range testCases {

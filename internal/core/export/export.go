@@ -97,18 +97,19 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 	e := newExporter(p, r, pkgID, v)
 	e.markUsedFeatures(v)
 
-	if v.Label.IsDef() {
+	isDef := v.IsRecursivelyClosed()
+	if isDef {
 		e.inDefinition++
 	}
 
 	expr := e.expr(v)
 
-	if v.Label.IsDef() {
+	if isDef {
 		e.inDefinition--
 		if s, ok := expr.(*ast.StructLit); ok {
 			expr = ast.NewStruct(
-				ast.Embed(ast.NewIdent("#_def")),
-				ast.NewIdent("#_def"), s,
+				ast.Embed(ast.NewIdent("_#def")),
+				ast.NewIdent("_#def"), s,
 			)
 		}
 	}

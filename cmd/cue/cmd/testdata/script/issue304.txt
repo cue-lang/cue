@@ -3,8 +3,8 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 
-#_def
-#_def: {
+_#def
+_#def: {
 	x: int
 	body?: {
 		a:  int

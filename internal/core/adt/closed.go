@@ -70,6 +70,29 @@ package adt
 // TODO(errors): return a dedicated ConflictError that can track original
 // positions on demand.
 
+func (v *Vertex) IsInOneOf(t SpanType) bool {
+	for _, s := range v.Structs {
+		if s.CloseInfo.IsInOneOf(t) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsRecursivelyClosed returns true if this value is either a definition or unified
+// with a definition.
+func (v *Vertex) IsRecursivelyClosed() bool {
+	if v.IsInOneOf(DefinitionSpan) {
+		return true
+	}
+	for p := v; p != nil; p = p.Parent {
+		if p.Label.IsDef() {
+			return true
+		}
+	}
+	return false
+}
+
 type closeNodeType uint8
 
 const (

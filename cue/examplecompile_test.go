@@ -31,13 +31,13 @@ func ExampleContext() {
 	`)
 
 	p("lookups")
-	p("a:     %+v", v.LookupPath(cue.ParsePath("a")))
-	p("b:     %+v", v.LookupPath(cue.ParsePath("b")))
-	p(`"a+b": %+v`, v.LookupPath(cue.ParsePath(`"a+b"`)))
+	p("a:     %v", v.LookupPath(cue.ParsePath("a")))
+	p("b:     %v", v.LookupPath(cue.ParsePath("b")))
+	p(`"a+b": %v`, v.LookupPath(cue.ParsePath(`"a+b"`)))
 	p("")
 	p("expressions")
-	p("a + b: %+v", ctx.CompileString("a + b", cue.Scope(v)))
-	p("a * b: %+v", ctx.CompileString("a * b", cue.Scope(v)))
+	p("a + b: %v", ctx.CompileString("a + b", cue.Scope(v)))
+	p("a * b: %v", ctx.CompileString("a * b", cue.Scope(v)))
 
 	// Output:
 	// lookups

@@ -63,7 +63,7 @@ func extractFormat(v cue.Value) string {
 	if op == cue.CallOp {
 		v = a[0]
 		if len(a) == 2 {
-			arg = fmt.Sprintf(" (%s)", a[1].Eval())
+			arg = fmt.Sprintf(" (%v)", a[1].Eval())
 		}
 	}
 	if inst, ref := v.Reference(); len(ref) > 0 {

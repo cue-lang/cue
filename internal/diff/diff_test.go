@@ -114,7 +114,7 @@ func TestDiff(t *testing.T) {
 		`,
 		kind: Modified,
 		diff: `  {
-      ls: [2,3,4]
+      ls: [2, 3, 4]
 -     "foo-bar": 2
 +     "foo-bar": 3
       s: 4
@@ -128,7 +128,7 @@ func TestDiff(t *testing.T) {
       lm2: [
 -         6,
       ]
-+     la: [2,3,4]
++     la: [2, 3, 4]
   }
 `,
 	}, {
@@ -302,7 +302,9 @@ a: x: "hello"
 		`,
 		kind: Modified,
 		diff: `  {
--     a: {x:"hello"}
+-     a: {
+-     	x: "hello"
+-     }
   }
 `,
 	}, {

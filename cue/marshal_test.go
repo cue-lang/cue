@@ -148,9 +148,9 @@ func TestMarshalMultiPackage(t *testing.T) {
 				`package test
 
 		import pkg2 "example.com/foo/pkg1"
-		pkg1: pkg2.Object
+		"Hello \(pkg1)!"
 
-		"Hello \(pkg1)!"`),
+		pkg1: pkg2.Object`),
 		}),
 		`"Hello World!"`,
 	}, {

@@ -29,7 +29,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/format"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
@@ -1826,25 +1825,6 @@ func (v Value) Equals(other Value) bool {
 		return false
 	}
 	return adt.Equal(v.ctx(), v.v, other.v, 0)
-}
-
-// Format prints a debug version of a value.
-func (v Value) Format(state fmt.State, verb rune) {
-	ctx := v.ctx()
-	if v.v == nil {
-		fmt.Fprint(state, "<nil>")
-		return
-	}
-	switch {
-	case state.Flag('#'):
-		_, _ = io.WriteString(state, str(ctx, v.v))
-	case state.Flag('+'):
-		_, _ = io.WriteString(state, ctx.Str(v.v))
-	default:
-		n, _ := export.Raw.Expr(v.idx, v.instance().ID(), v.v)
-		b, _ := format.Node(n)
-		_, _ = state.Write(b)
-	}
 }
 
 func (v Value) instance() *Instance {

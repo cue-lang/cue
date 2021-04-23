@@ -90,7 +90,7 @@ func runModInit(cmd *Command, args []string) (err error) {
 			return fmt.Errorf("invalid module name: %v", module)
 		}
 		if h := u.Hostname(); !strings.Contains(h, ".") {
-			return fmt.Errorf("invalid host name %q", h)
+			return fmt.Errorf("invalid host name %s", h)
 		}
 	}
 

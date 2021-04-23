@@ -97,7 +97,16 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	for _, c := range a {
 		e.top().upCount = c.up
 		x := c.c.Expr()
-		e.addExpr(c.c.Env, x, false)
+		e.addExpr(c.c.Env, src, x, false)
+	}
+
+	if src != nil {
+		for _, a := range src.Arcs {
+			if x, ok := e.fields[a.Label]; ok {
+				x.arc = a
+				e.fields[a.Label] = x
+			}
+		}
 	}
 
 	s := x.top().scope
@@ -107,9 +116,9 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	}
 
 	// Unify values only for one level.
-	if len(e.values.Conjuncts) > 0 {
+	if a := e.values.Conjuncts; len(a) > 0 {
 		e.values.Finalize(e.ctx)
-		e.embed = append(e.embed, e.value(e.values, e.values.Conjuncts...))
+		e.embed = append(e.embed, e.value(e.values, a...))
 	}
 
 	// Collect and order set of fields.
@@ -196,7 +205,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			top.fields[f] = fr
 		}
 
-		d.Value = e.mergeValues(f, nil, c, a...)
+		d.Value = e.mergeValues(f, field.arc, c, a...)
 
 		if f.IsDef() {
 			x.inDefinition--
@@ -218,9 +227,12 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	}
 	if e.hasEllipsis {
 		s.Elts = append(s.Elts, &ast.Ellipsis{})
-	} else if src != nil && src.IsClosedStruct() && e.inDefinition == 0 {
-		return ast.NewCall(ast.NewIdent("close"), s)
 	}
+
+	// TODO: why was this necessary?
+	// else if src != nil && src.IsClosedStruct() && e.inDefinition == 0 {
+	// return ast.NewCall(ast.NewIdent("close"), s)
+	// }
 
 	e.conjuncts = append(e.conjuncts, s)
 
@@ -240,8 +252,16 @@ type conjuncts struct {
 	hasEllipsis bool
 }
 
-func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node) {
+func (c *conjuncts) addValueConjunct(src *adt.Vertex, env *adt.Environment, x adt.Expr) {
+	switch b, ok := x.(adt.BaseValue); {
+	case ok && src != nil && isTop(b) && !isTop(src.BaseValue):
+		// drop top
+	default:
+		c.values.AddConjunct(adt.MakeRootConjunct(env, x))
+	}
+}
 
+func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node) {
 	x := c.fields[f]
 	v := adt.MakeRootConjunct(env, n)
 	x.conjuncts = append(x.conjuncts, conjunct{
@@ -254,6 +274,7 @@ func (c *conjuncts) addConjunct(f adt.Feature, env *adt.Environment, n adt.Node)
 
 type field struct {
 	docs      []*ast.CommentGroup
+	arc       *adt.Vertex
 	conjuncts []conjunct
 }
 
@@ -262,7 +283,7 @@ type conjunct struct {
 	up int32
 }
 
-func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
+func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Expr, isEmbed bool) {
 	switch x := x.(type) {
 	case *adt.StructLit:
 		e.top().upCount++
@@ -294,7 +315,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 				e.hasEllipsis = true
 				continue
 			case adt.Expr:
-				e.addExpr(env, f, true)
+				e.addExpr(env, nil, f, true)
 				continue
 
 				// TODO: also handle dynamic fields
@@ -309,54 +330,44 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 		switch v := x.(type) {
 		case nil:
 		default:
-			e.values.AddConjunct(adt.MakeRootConjunct(env, x)) // GOBBLE TOP
+			e.addValueConjunct(src, env, x)
 
 		case *adt.Vertex:
-			e.structs = append(e.structs, v.Structs...)
-
-			switch y := v.BaseValue.(type) {
-			case *adt.ListMarker:
-				a := []ast.Expr{}
-				for _, x := range v.Elems() {
-					a = append(a, e.expr(x))
+			if b, ok := v.BaseValue.(*adt.Bottom); ok {
+				if !b.IsIncomplete() || e.cfg.Final {
+					e.addExpr(env, v, b, false)
+					return
 				}
-				if !v.IsClosedList() {
-					v := &adt.Vertex{}
-					v.MatchAndInsert(e.ctx, v)
-					a = append(a, &ast.Ellipsis{Type: e.expr(v)})
-				}
-				e.embed = append(e.embed, ast.NewList(a...))
-				return
+			}
 
-			case *adt.StructMarker:
-				x = nil
-
-			case adt.Value:
-				if v.IsData() {
-					e.values.AddConjunct(adt.MakeRootConjunct(env, y))
-					break
-				}
+			switch {
+			default:
 				for _, c := range v.Conjuncts {
-					e.values.AddConjunct(c)
+					e.addExpr(c.Env, v, c.Expr(), false)
+				}
+
+			case v.IsData():
+				e.structs = append(e.structs, v.Structs...)
+
+				if y, ok := v.BaseValue.(adt.Value); ok {
+					e.addValueConjunct(src, env, y)
+				}
+
+				for _, a := range v.Arcs {
+					a.Finalize(e.ctx) // TODO: should we do this?
+
+					e.addConjunct(a.Label, env, a)
 				}
 			}
-
-			// generated, only consider arcs.
-			for _, a := range v.Arcs {
-				a.Finalize(e.ctx) // TODO: should we do this?
-
-				e.addConjunct(a.Label, env, a)
-			}
-			// e.exprs = append(e.exprs, e.value(v, v.Conjuncts...))
 		}
 
 	case *adt.BinaryExpr:
 		switch {
 		case x.Op == adt.AndOp && !isEmbed:
-			e.addExpr(env, x.X, false)
-			e.addExpr(env, x.Y, false)
+			e.addExpr(env, src, x.X, false)
+			e.addExpr(env, src, x.Y, false)
 		case isSelfContained(x):
-			e.values.AddConjunct(adt.MakeRootConjunct(env, x))
+			e.addValueConjunct(src, env, x)
 		default:
 			if isEmbed {
 				e.embed = append(e.embed, e.expr(x))
@@ -368,12 +379,23 @@ func (e *conjuncts) addExpr(env *adt.Environment, x adt.Expr, isEmbed bool) {
 	default:
 		switch {
 		case isSelfContained(x):
-			e.values.AddConjunct(adt.MakeRootConjunct(env, x))
+			e.addValueConjunct(src, env, x)
 		case isEmbed:
 			e.embed = append(e.embed, e.expr(x))
 		default:
 			e.conjuncts = append(e.conjuncts, e.expr(x))
 		}
+	}
+}
+
+func isTop(x adt.BaseValue) bool {
+	switch v := x.(type) {
+	case *adt.Top:
+		return true
+	case *adt.BasicType:
+		return v.K == adt.TopKind
+	default:
+		return false
 	}
 }
 

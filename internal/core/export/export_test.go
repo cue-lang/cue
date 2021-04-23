@@ -77,6 +77,8 @@ func formatNode(t *testing.T, n ast.Node) []byte {
 // TestGenerated tests conversions of generated Go structs, which may be
 // different from parsed or evaluated CUE, such as having Vertex values.
 func TestGenerated(t *testing.T) {
+	ctx := cuecontext.New()
+
 	testCases := []struct {
 		in  func(ctx *adt.OpContext) (adt.Expr, error)
 		out string
@@ -88,7 +90,7 @@ func TestGenerated(t *testing.T) {
 			}
 			return convert.GoValueToValue(ctx, in, false), nil
 		},
-		out: `{Terminals: [{Name: "Name", Description: "Desc"}]}`,
+		out: `Terminals: [{Name: "Name", Description: "Desc"}]`,
 	}, {
 		in: func(ctx *adt.OpContext) (adt.Expr, error) {
 			in := &C{
@@ -134,13 +136,11 @@ func TestGenerated(t *testing.T) {
 
 			return n, nil
 		},
-		// TODO: should probably print path.
-		out: `<[l2// undefined field #Terminal] _|_>`,
+		out: `<[l2// x: undefined field #Terminal] _|_>`,
 		p:   export.Final,
 	}, {
-		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			c := cuecontext.New()
-			v := c.CompileString(`
+		in: func(r *adt.OpContext) (adt.Expr, error) {
+			v := ctx.CompileString(`
 				#Provider: {
 					ID: string
 					notConcrete: bool
@@ -155,12 +155,28 @@ func TestGenerated(t *testing.T) {
 
 			return n, nil
 		},
-		out: `{#Provider: {ID: string, notConcrete: bool, a: int, b: a+1}, providers: {foo: {ID: "12345", notConcrete: bool, a: int, b: a+1}}}`,
+		out: `#Provider: {ID: string, notConcrete: bool, a: int, b: a+1}, providers: {foo: {ID: "12345", notConcrete: bool, a: int, b: a+1}}`,
+	}, {
+		// Issue #882
+		in: func(r *adt.OpContext) (adt.Expr, error) {
+			valA := ctx.CompileString(`
+				#One: { version: string }
+			`)
+
+			valB := ctx.CompileString(`
+				#One: _
+				ones: {[string]: #One}
+			`)
+			v := valB.Unify(valA)
+			_, n := value.ToInternal(v)
+			return n, nil
+		},
+		out: `#One: {version: string}, ones: {[string]: #One}`,
+		p:   export.All,
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			r := runtime.New()
-			ctx := adt.NewContext(r, &adt.Vertex{})
+			ctx := adt.NewContext((*runtime.Runtime)(ctx), &adt.Vertex{})
 
 			v, err := tc.in(ctx)
 			if err != nil {
@@ -172,11 +188,17 @@ func TestGenerated(t *testing.T) {
 				p = export.Simplified
 			}
 
-			expr, err := p.Expr(ctx, "", v)
+			var n ast.Node
+			switch x := v.(type) {
+			case *adt.Vertex:
+				n, err = p.Def(ctx, "", x)
+			default:
+				n, err = p.Expr(ctx, "", v)
+			}
 			if err != nil {
 				t.Fatal("failed export: ", err)
 			}
-			got := astinternal.DebugStr(expr)
+			got := astinternal.DebugStr(n)
 			if got != tc.out {
 				t.Errorf("got:  %s\nwant: %s", got, tc.out)
 			}

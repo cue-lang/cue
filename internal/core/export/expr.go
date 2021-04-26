@@ -82,7 +82,7 @@ func (e *exporter) expr(v adt.Expr) (result ast.Expr) {
 // For a struct, piece out conjuncts that are already values. Those can be
 // unified. All other conjuncts are added verbatim.
 
-func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct, orig ...adt.Conjunct) ast.Expr {
+func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct, orig ...adt.Conjunct) (expr ast.Expr) {
 
 	e := conjuncts{
 		exporter: x,
@@ -93,6 +93,30 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 	_, saved := e.pushFrame(orig)
 	defer e.popFrame(saved)
+
+	// Handle value aliases
+	var valueAlias *ast.Alias
+	for _, c := range a {
+		if f, ok := c.c.Field().Source().(*ast.Field); ok {
+			if a, ok := f.Value.(*ast.Alias); ok {
+				if valueAlias == nil {
+					if e.valueAlias == nil {
+						e.valueAlias = map[*ast.Alias]*ast.Alias{}
+					}
+					name := a.Ident.Name
+					name = e.uniqueAlias(name)
+					valueAlias = &ast.Alias{Ident: ast.NewIdent(name)}
+				}
+				e.valueAlias[a] = valueAlias
+			}
+		}
+	}
+	defer func() {
+		if valueAlias != nil {
+			valueAlias.Expr = expr
+			expr = valueAlias
+		}
+	}()
 
 	for _, c := range a {
 		e.top().upCount = c.up

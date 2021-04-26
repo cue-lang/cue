@@ -1,0 +1,46 @@
+-- in.cue --
+structShorthand: X={b: 3, c: X.b}
+
+// Note that X and Y are subtly different, as they have different bindings:
+// one binds to the field, the other to the value. In this case, that does not
+// make a difference.
+fieldAndValue: X=foo: Y={ 3, #sum: X + Y }
+
+valueCycle: b: X=3+X
+
+-- out/eval --
+(struct){
+  structShorthand: (struct){
+    b: (int){ 3 }
+    c: (int){ 3 }
+  }
+  fieldAndValue: (struct){
+    foo: (int){
+      3
+      #sum: (int){ 6 }
+    }
+  }
+  valueCycle: (struct){
+    b: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:8:18
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  structShorthand: {
+    b: 3
+    c: 〈1〉.b
+  }
+  fieldAndValue: {
+    foo: {
+      3
+      #sum: (〈1;foo〉 + 〈1〉)
+    }
+  }
+  valueCycle: {
+    b: (3 + 〈0〉)
+  }
+}

@@ -714,6 +714,31 @@ func (x *FieldReference) resolve(c *OpContext, state VertexStatus) *Vertex {
 	return c.lookup(n, pos, x.Label, state)
 }
 
+// A ValueReference represents a lexical reference to a value.
+//
+//    a: X=b
+//
+type ValueReference struct {
+	Src     *ast.Ident
+	UpCount int32
+	Label   Feature // for informative purposes
+}
+
+func (x *ValueReference) Source() ast.Node {
+	if x.Src == nil {
+		return nil
+	}
+	return x.Src
+}
+
+func (x *ValueReference) resolve(c *OpContext, state VertexStatus) *Vertex {
+	if x.UpCount == 0 {
+		return c.vertex
+	}
+	n := c.relNode(x.UpCount - 1)
+	return n
+}
+
 // A LabelReference refers to the string or integer value of a label.
 //
 //    [X=Pattern]: b: X

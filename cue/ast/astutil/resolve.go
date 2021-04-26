@@ -54,9 +54,12 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 // Let Clause             File/Struct    LetClause
 // Alias declaration      File/Struct    Alias (deprecated)
 // Illegal Reference      File/Struct
+// Value
+//   X in a: X=y          Field          Alias
 // Fields
 //   X in X: y            File/Struct    Expr (y)
 //   X in X=x: y          File/Struct    Field
+//   X in X=(x): y        File/Struct    Field
 //   X in X="\(x)": y     File/Struct    Field
 //   X in [X=x]: y        Field          Expr (x)
 //   X in X=[x]: y        Field          Field
@@ -143,7 +146,12 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			// default:
 			name, isIdent, _ := ast.LabelName(label)
 			if isIdent {
-				s.insert(name, x.Value, x)
+				v := x.Value
+				// Avoid interpreting value aliases at this point.
+				if a, ok := v.(*ast.Alias); ok {
+					v = a.Expr
+				}
+				s.insert(name, v, x)
 			}
 		case *ast.LetClause:
 			name, isIdent, _ := ast.LabelName(x.Ident)
@@ -335,9 +343,16 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 			}
 		}
 
-		if x.Value != nil {
+		if n := x.Value; n != nil {
+			if alias, ok := x.Value.(*ast.Alias); ok {
+				// TODO: this should move into Before once decl attributes
+				// have been fully deprecated and embed attributes are introduced.
+				s = newScope(s.file, s, x, nil)
+				s.insert(alias.Ident.Name, alias, x)
+				n = alias.Expr
+			}
 			s.inField = true
-			walk(s, x.Value)
+			walk(s, n)
 			s.inField = false
 		}
 

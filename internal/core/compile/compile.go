@@ -363,6 +363,7 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 	//   X in [X=x]: y  Scope: Field  Node: Expr (x)
 	//   X in X=[x]: y  Scope: Field  Node: Field
+	//   X in x: X=y    Scope: Field  Node: Alias
 	if f, ok := n.Scope.(*ast.Field); ok {
 		upCount := int32(0)
 
@@ -379,12 +380,21 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			UpCount: upCount,
 		}
 
-		if f, ok := n.Node.(*ast.Field); ok {
+		switch f := n.Node.(type) {
+		case *ast.Field:
 			_ = c.lookupAlias(k, f.Label.(*ast.Alias).Ident) // mark as used
 			return &adt.DynamicReference{
 				Src:     n,
 				UpCount: upCount,
 				Label:   label,
+			}
+
+		case *ast.Alias:
+			_ = c.lookupAlias(k, f.Ident) // mark as used
+			return &adt.ValueReference{
+				Src:     n,
+				UpCount: upCount,
+				Label:   c.label(f.Ident),
 			}
 		}
 		return label
@@ -408,11 +418,18 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			n.Name)
 	}
 
-	switch n.Node.(type) {
+	if n.Scope == nil {
+		// Package.
+		// Should have been handled above.
+		return c.errf(n, "unresolved identifier %v", n.Name)
+	}
+
+	switch f := n.Node.(type) {
 	// Local expressions
 	case *ast.LetClause:
 		entry := c.lookupAlias(k, n)
 
+		// let x = y
 		return &adt.LetReference{
 			Src:     n,
 			UpCount: upCount,
@@ -420,19 +437,12 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			X:       entry.expr,
 		}
 
-		// TODO: handle new-style aliases
-	}
+	// TODO: handle new-style aliases
 
-	if n.Scope == nil {
-		// Package.
-		// Should have been handled above.
-		panic("unreachable") // Or direct ancestor node?
-	}
-
-	// X=x: y
-	// X=(x): y
-	// X="\(x)": y
-	if f, ok := n.Node.(*ast.Field); ok {
+	case *ast.Field:
+		// X=x: y
+		// X=(x): y
+		// X="\(x)": y
 		a, ok := f.Label.(*ast.Alias)
 		if !ok {
 			return c.errf(n, "illegal reference %s", n.Name)
@@ -534,7 +544,16 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 			}
 		}
 
-		value := c.labeledExpr(x, (*fieldLabel)(x), x.Value)
+		v := x.Value
+		var value adt.Expr
+		if a, ok := v.(*ast.Alias); ok {
+			c.pushScope(nil, 0, a)
+			c.insertAlias(a.Ident, aliasEntry{source: a})
+			value = c.labeledExpr(x, (*fieldLabel)(x), a.Expr)
+			c.popScope()
+		} else {
+			value = c.labeledExpr(x, (*fieldLabel)(x), v)
+		}
 
 		switch l := lab.(type) {
 		case *ast.Ident, *ast.BasicLit:
@@ -607,7 +626,7 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 
 	// Handled in addLetDecl.
 	case *ast.LetClause:
-	// case: *ast.Alias:
+	// case: *ast.Alias: // TODO(value aliases)
 
 	case *ast.CommentGroup:
 		// Nothing to do for a free-floating comment group.

@@ -230,6 +230,7 @@ type exporter struct {
 	// unique let expression.
 	usedFeature map[adt.Feature]adt.Expr
 	labelAlias  map[adt.Expr]adt.Feature
+	valueAlias  map[*ast.Alias]*ast.Alias
 
 	usedHidden map[string]bool
 }

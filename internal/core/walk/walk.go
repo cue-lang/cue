@@ -79,6 +79,9 @@ func (w *Visitor) node(n adt.Node) {
 	case *adt.FieldReference:
 		w.feature(x.Label, x)
 
+	case *adt.ValueReference:
+		w.feature(x.Label, x)
+
 	case *adt.LabelReference:
 
 	case *adt.DynamicReference:

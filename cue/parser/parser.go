@@ -846,73 +846,62 @@ func (p *parser) parseField() (decl ast.Decl) {
 	this := &ast.Field{Label: nil}
 	m := this
 
-	for i := 0; ; i++ {
-		tok := p.tok
+	tok := p.tok
 
-		label, expr, decl, ok := p.parseLabel(false)
-		if decl != nil {
-			return decl
+	label, expr, decl, ok := p.parseLabel(false)
+	if decl != nil {
+		return decl
+	}
+	m.Label = label
+
+	if !ok {
+		if expr == nil {
+			expr = p.parseRHS()
 		}
-		m.Label = label
-
-		if !ok {
-			if expr == nil {
-				expr = p.parseRHS()
-			}
-			if a, ok := expr.(*ast.Alias); ok {
-				if i > 0 {
-					p.errorExpected(p.pos, "label or ':'")
-					return &ast.BadDecl{From: pos, To: p.pos}
-				}
-				p.consumeDeclComma()
-				return a
-			}
-			e := &ast.EmbedDecl{Expr: expr}
+		if a, ok := expr.(*ast.Alias); ok {
 			p.consumeDeclComma()
-			return e
+			return a
 		}
+		e := &ast.EmbedDecl{Expr: expr}
+		p.consumeDeclComma()
+		return e
+	}
 
-		if p.tok == token.OPTION {
-			m.Optional = p.pos
-			p.next()
+	if p.tok == token.OPTION {
+		m.Optional = p.pos
+		p.next()
+	}
+
+	// TODO: consider disallowing comprehensions with more than one label.
+	// This can be a bit awkward in some cases, but it would naturally
+	// enforce the proper style that a comprehension be defined in the
+	// smallest possible scope.
+	// allowComprehension = false
+
+	switch p.tok {
+	case token.COLON, token.ISA:
+	case token.COMMA:
+		p.expectComma() // sync parser.
+		fallthrough
+
+	case token.RBRACE, token.EOF:
+		if a, ok := expr.(*ast.Alias); ok {
+			p.assertV0(p.pos, 1, 3, `old-style alias; use "let X = expr"`)
+
+			return a
 		}
-
-		if p.tok == token.COLON || p.tok == token.ISA {
-			break
+		switch tok {
+		case token.IDENT, token.LBRACK, token.LPAREN,
+			token.STRING, token.INTERPOLATION,
+			token.NULL, token.TRUE, token.FALSE,
+			token.FOR, token.IF, token.LET, token.IN:
+			return &ast.EmbedDecl{Expr: expr}
 		}
+		fallthrough
 
-		// TODO: consider disallowing comprehensions with more than one label.
-		// This can be a bit awkward in some cases, but it would naturally
-		// enforce the proper style that a comprehension be defined in the
-		// smallest possible scope.
-		// allowComprehension = false
-
-		switch p.tok {
-		case token.COMMA:
-			p.expectComma() // sync parser.
-			fallthrough
-
-		case token.RBRACE, token.EOF:
-			if i == 0 {
-				if a, ok := expr.(*ast.Alias); ok {
-					p.assertV0(p.pos, 1, 3, `old-style alias; use "let X = expr"`)
-
-					return a
-				}
-				switch tok {
-				case token.IDENT, token.LBRACK, token.LPAREN,
-					token.STRING, token.INTERPOLATION,
-					token.NULL, token.TRUE, token.FALSE,
-					token.FOR, token.IF, token.LET, token.IN:
-					return &ast.EmbedDecl{Expr: expr}
-				}
-			}
-			fallthrough
-
-		default:
-			p.errorExpected(p.pos, "label or ':'")
-			return &ast.BadDecl{From: pos, To: p.pos}
-		}
+	default:
+		p.errorExpected(p.pos, "label or ':'")
+		return &ast.BadDecl{From: pos, To: p.pos}
 	}
 
 	m.TokenPos = p.pos
@@ -935,9 +924,6 @@ func (p *parser) parseField() (decl ast.Decl) {
 		if !ok || (p.tok != token.COLON && p.tok != token.ISA && p.tok != token.OPTION) {
 			if expr == nil {
 				expr = p.parseRHS()
-			}
-			if a, ok := expr.(*ast.Alias); ok {
-				p.errf(expr.Pos(), "alias %q not allowed as value", debugStr(a.Ident))
 			}
 			m.Value = expr
 			break

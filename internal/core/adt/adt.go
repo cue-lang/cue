@@ -206,6 +206,7 @@ func (*Builtin) expr()          {}
 
 func (*NodeLink) expr()         {}
 func (*FieldReference) expr()   {}
+func (*ValueReference) expr()   {}
 func (*LabelReference) expr()   {}
 func (*DynamicReference) expr() {}
 func (*ImportReference) expr()  {}
@@ -281,6 +282,8 @@ func (*NodeLink) declNode()         {}
 func (*NodeLink) elemNode()         {}
 func (*FieldReference) declNode()   {}
 func (*FieldReference) elemNode()   {}
+func (*ValueReference) declNode()   {}
+func (*ValueReference) elemNode()   {}
 func (*LabelReference) declNode()   {}
 func (*LabelReference) elemNode()   {}
 func (*DynamicReference) declNode() {}
@@ -338,6 +341,7 @@ func (*ListLit) node()           {}
 func (*BoundExpr) node()         {}
 func (*NodeLink) node()          {}
 func (*FieldReference) node()    {}
+func (*ValueReference) node()    {}
 func (*LabelReference) node()    {}
 func (*DynamicReference) node()  {}
 func (*ImportReference) node()   {}

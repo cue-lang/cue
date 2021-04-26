@@ -330,6 +330,16 @@ func TestParse(t *testing.T) {
 		}`,
 		"{[foo=_]: {a: int}, a: {a: 1}}",
 	}, {
+		"value alias",
+		`
+		{
+			a: X=foo
+			b: Y={foo}
+			c: d: e: X=5
+		}
+		`,
+		`{a: X=foo, b: Y={foo}, c: {d: {e: X=5}}}`,
+	}, {
 		"dynamic labels",
 		`{
 			(x): a: int
@@ -567,7 +577,7 @@ bar: 2
 		in: `
 		a: int=>2
 		`,
-		out: "a: int=>2\nalias \"int\" not allowed as value",
+		out: "a: int=>2",
 	}, {
 		desc: "struct comments",
 		in: `

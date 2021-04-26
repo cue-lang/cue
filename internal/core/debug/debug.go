@@ -359,6 +359,11 @@ func (w *printer) node(n adt.Node) {
 		w.label(x.Label)
 		w.string(closeTuple)
 
+	case *adt.ValueReference:
+		w.string(openTuple)
+		w.string(strconv.Itoa(int(x.UpCount)))
+		w.string(closeTuple)
+
 	case *adt.LabelReference:
 		w.string(openTuple)
 		w.string(strconv.Itoa(int(x.UpCount)))

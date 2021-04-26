@@ -55,7 +55,26 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 		s := &ast.StructLit{}
 
 		for _, d := range x.Decls {
-			s.Elts = append(s.Elts, e.decl(d))
+			var a *ast.Alias
+			if orig, ok := d.Source().(*ast.Field); ok {
+				if alias, ok := orig.Value.(*ast.Alias); ok {
+					if e.valueAlias == nil {
+						e.valueAlias = map[*ast.Alias]*ast.Alias{}
+					}
+					a = &ast.Alias{Ident: ast.NewIdent(alias.Ident.Name)}
+					e.valueAlias[alias] = a
+				}
+			}
+			decl := e.decl(d)
+
+			if a != nil {
+				if f, ok := decl.(*ast.Field); ok {
+					a.Expr = f.Value
+					f.Value = a
+				}
+			}
+
+			s.Elts = append(s.Elts, decl)
 		}
 
 		return s
@@ -85,6 +104,16 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 			f.fields[x.Label] = entry
 		}
 
+		return ident
+
+	case *adt.ValueReference:
+		name := x.Label.IdentString(e.ctx)
+		if a, ok := x.Src.Node.(*ast.Alias); ok { // Should always pass
+			if b, ok := e.valueAlias[a]; ok {
+				name = b.Ident.Name
+			}
+		}
+		ident := ast.NewIdent(name)
 		return ident
 
 	case *adt.LabelReference:

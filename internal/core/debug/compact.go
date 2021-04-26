@@ -179,6 +179,9 @@ func (w *compactPrinter) node(n adt.Node) {
 	case *adt.FieldReference:
 		w.label(x.Label)
 
+	case *adt.ValueReference:
+		w.label(x.Label)
+
 	case *adt.LabelReference:
 		if x.Src == nil {
 			w.string("LABEL")

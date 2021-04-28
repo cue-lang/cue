@@ -746,6 +746,9 @@ func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
 		}
 	}
 
+	// Set path equal to the package from which it is loading.
+	ti.ImportPath = binst[0].ImportPath
+
 	inst = inst.Build(ti)
 	return inst, inst.Err
 }

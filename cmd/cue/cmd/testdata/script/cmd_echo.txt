@@ -1,6 +1,12 @@
 cue cmd echo
 stdout 'Hello World!'
 
+cue cmd echohidden
+stdout 'Hello World!'
+
+-- cue.mod/module.cue --
+module: "example.com/foo"
+
 -- data.cue --
 package hello
 
@@ -24,4 +30,17 @@ command: echo: {
         text: echo.stdout
     }
 }
--- cue.mod --
+
+// Issue #924
+command: echohidden: {
+    echo: {
+        kind:   "exec"
+        cmd:    "echo Hello \(_who)!"
+        stdout: string
+    }
+
+    task: display: {
+        kind: "print"
+        text: echo.stdout
+    }
+}

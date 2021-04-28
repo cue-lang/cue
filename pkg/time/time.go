@@ -192,7 +192,7 @@ func Parse(layout, value string) (string, error) {
 	return t.UTC().Format(time.RFC3339Nano), nil
 }
 
-// Unix returns the local Time corresponding to the given Unix time,
+// Unix returns the Time, in UTC, corresponding to the given Unix time,
 // sec seconds and nsec nanoseconds since January 1, 1970 UTC.
 // It is valid to pass nsec outside the range [0, 999999999].
 // Not all sec values have a corresponding time value. One such

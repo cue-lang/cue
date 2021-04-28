@@ -1016,22 +1016,6 @@ outer:
 	}
 }
 
-// Decode initializes x with Value v. If x is a struct, it will validate the
-// constraints specified in the field tags.
-func (v Value) Decode(x interface{}) error {
-	// TODO: optimize
-	b, err := v.MarshalJSON()
-	if err != nil {
-		return err
-	}
-	return json.Unmarshal(b, x)
-}
-
-// // EncodeJSON generates JSON for the given value.
-// func (v Value) EncodeJSON(w io.Writer, v Value) error {
-// 	return nil
-// }
-
 // Doc returns all documentation comments associated with the field from which
 // the current value originates.
 func (v Value) Doc() []*ast.CommentGroup {

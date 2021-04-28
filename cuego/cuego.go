@@ -105,7 +105,7 @@ func (c *Context) Complete(x interface{}) error {
 		return err
 	}
 	v = a.Unify(v)
-	if err := v.Validate(); err != nil {
+	if err := v.Validate(cue.Concrete(true)); err != nil {
 		return err
 	}
 	return v.Decode(x)

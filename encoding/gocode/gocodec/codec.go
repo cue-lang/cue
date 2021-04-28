@@ -158,7 +158,11 @@ func (c *Codec) Complete(v cue.Value, x interface{}) error {
 		return err
 	}
 
-	return w.Unify(v).Decode(x)
+	w = w.Unify(v)
+	if err := w.Validate(cue.Concrete(true)); err != nil {
+		return err
+	}
+	return w.Decode(x)
 }
 
 func fromGoValue(r *cue.Context, x interface{}, allowDefault bool) (cue.Value, error) {

@@ -1139,6 +1139,44 @@ func TestFillPath(t *testing.T) {
 		x:    1,
 		path: ParsePath("0"),
 		out:  `[1]`,
+	}, {
+		in:   `[1, ...int]`,
+		x:    1,
+		path: ParsePath("1"),
+		out:  `[1, 1]`,
+	}, {
+		in:   `a: {b: v: int, c: v: int}`,
+		x:    1,
+		path: MakePath(Str("a"), AnyString, Str("v")),
+		out: `{
+	a: {
+		b: {
+			v: 1
+		}
+		c: {
+			v: 1
+		}
+	}
+}`,
+	}, {
+		in:   `a: [_]`,
+		x:    1,
+		path: MakePath(Str("a"), AnyIndex, Str("b")),
+		out: `{
+	a: [{
+		b: 1
+	}]
+}`,
+	}, {
+		in:   `a: 1`,
+		x:    1,
+		path: MakePath(Str("b").Optional()),
+		out:  `{a: 1}`,
+	}, {
+		in:   `b: int`,
+		x:    1,
+		path: MakePath(Str("b").Optional()),
+		out:  `{b: 1}`,
 	}}
 
 	for _, tc := range testCases {

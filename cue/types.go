@@ -1590,7 +1590,6 @@ func (v hiddenValue) Fill(x interface{}, path ...string) Value {
 // Any reference in v referring to the value at the given path will resolve to x
 // in the newly created value. The resulting value is not validated.
 //
-// List paths are not supported at this time.
 func (v Value) FillPath(p Path, x interface{}) Value {
 	if v.v == nil {
 		// TODO: panic here?
@@ -1616,9 +1615,26 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 		expr = convert.GoValueToValue(ctx, x, true)
 	}
 	for i := len(p.path) - 1; i >= 0; i-- {
-		switch sel := p.path[i]; {
-		case sel.sel.kind() == adt.IntLabel:
-			i := sel.sel.feature(ctx.Runtime).Index()
+		switch sel := p.path[i].sel; {
+		case sel == AnyString.sel:
+			expr = &adt.StructLit{Decls: []adt.Decl{
+				&adt.BulkOptionalField{
+					Filter: &adt.BasicType{K: adt.StringKind},
+					Value:  expr,
+				},
+			}}
+
+		case sel == anyIndex.sel:
+			expr = &adt.ListLit{Elems: []adt.Elem{
+				&adt.Ellipsis{Value: expr},
+			}}
+
+		case sel == anyDefinition.sel:
+			expr = &adt.Bottom{Err: errors.Newf(token.NoPos,
+				"AnyDefinition not supported")}
+
+		case sel.kind() == adt.IntLabel:
+			i := sel.feature(ctx.Runtime).Index()
 			list := &adt.ListLit{}
 			any := &adt.Top{}
 			// TODO(perf): make this a constant thing. This will be possible with the query extension.
@@ -1629,12 +1645,19 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 			expr = list
 
 		default:
-			expr = &adt.StructLit{Decls: []adt.Decl{
-				&adt.Field{
-					Label: p.path[i].sel.feature(v.idx),
+			var d adt.Decl
+			if sel.optional() {
+				d = &adt.OptionalField{
+					Label: sel.feature(v.idx),
 					Value: expr,
-				},
-			}}
+				}
+			} else {
+				d = &adt.Field{
+					Label: sel.feature(v.idx),
+					Value: expr,
+				}
+			}
+			expr = &adt.StructLit{Decls: []adt.Decl{d}}
 		}
 	}
 	n := &adt.Vertex{}

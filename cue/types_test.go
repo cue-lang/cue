@@ -1134,6 +1134,11 @@ func TestFillPath(t *testing.T) {
 		`,
 		x:   ast.NewIdent("#foo"),
 		out: `{1, #foo: 1}`,
+	}, {
+		in:   `[...int]`,
+		x:    1,
+		path: ParsePath("0"),
+		out:  `[1]`,
 	}}
 
 	for _, tc := range testCases {

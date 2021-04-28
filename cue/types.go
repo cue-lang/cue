@@ -1615,12 +1615,26 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 		expr = convert.GoValueToValue(ctx, x, true)
 	}
 	for i := len(p.path) - 1; i >= 0; i-- {
-		expr = &adt.StructLit{Decls: []adt.Decl{
-			&adt.Field{
-				Label: p.path[i].sel.feature(v.idx),
-				Value: expr,
-			},
-		}}
+		switch sel := p.path[i]; {
+		case sel.sel.kind() == adt.IntLabel:
+			i := sel.sel.feature(ctx.Runtime).Index()
+			list := &adt.ListLit{}
+			any := &adt.Top{}
+			// TODO(perf): make this a constant thing. This will be possible with the query extension.
+			for k := 0; k < i; k++ {
+				list.Elems = append(list.Elems, any)
+			}
+			list.Elems = append(list.Elems, expr, &adt.Ellipsis{})
+			expr = list
+
+		default:
+			expr = &adt.StructLit{Decls: []adt.Decl{
+				&adt.Field{
+					Label: p.path[i].sel.feature(v.idx),
+					Value: expr,
+				},
+			}}
+		}
 	}
 	n := &adt.Vertex{}
 	n.AddConjunct(adt.MakeRootConjunct(nil, expr))

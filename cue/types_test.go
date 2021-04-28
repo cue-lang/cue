@@ -3326,6 +3326,12 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: [...number] | *[1, 2, 3]`,
 		want:  `([...number]|*[1,2,3])`,
+	}, {
+		input: `v: or([1, 2, 3])`,
+		want:  `|(1 2 3)`,
+	}, {
+		input: `v: and([1, 2, 3])`,
+		want:  `&(1 2 3)`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

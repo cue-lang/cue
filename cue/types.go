@@ -2292,6 +2292,21 @@ func (v Value) Expr() (Op, []Value) {
 		a = append(a, remakeValue(v, env, x.Hi))
 		op = SliceOp
 	case *adt.CallExpr:
+		// Interpret "and" and "or" builtin semantically.
+		if fn, ok := x.Fun.(*adt.Builtin); ok && len(x.Args) == 1 &&
+			(fn.Name == "or" || fn.Name == "and") {
+
+			iter, _ := remakeValue(v, env, x.Args[0]).List()
+			for iter.Next() {
+				a = append(a, iter.Value())
+			}
+
+			op = OrOp
+			if fn.Name == "and" {
+				op = AndOp
+			}
+			break
+		}
 		a = append(a, remakeValue(v, env, x.Fun))
 		for _, arg := range x.Args {
 			a = append(a, remakeValue(v, env, arg))

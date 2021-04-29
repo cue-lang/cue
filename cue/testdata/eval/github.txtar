@@ -29,8 +29,11 @@ workflows:           [...{
 	file:   "release.yml"
 	schema: release
 }, {
-	file:   "rebuild_tip_cuelang_org.yml"
-	schema: rebuild_tip_cuelang_org
+	file:   "tip_triggers.yml"
+	schema: tip_triggers
+}, {
+	file:   "new_version_triggers.yml"
+	schema: new_version_triggers
 }, {
 	file:   "mirror.yml"
 	schema: mirror
@@ -247,14 +250,37 @@ release: _#bashWorkflow & {
 		}
 	}
 }
-rebuild_tip_cuelang_org: _#bashWorkflow & {
-	name: "Push to tip"
+tip_triggers: _#bashWorkflow & {
+	name: "Push to tip triggers"
 	on: push: branches: [_#masterBranch]
 	jobs: push: {
 		"runs-on": _#linuxMachine
 		steps: [{
 			name: "Rebuild tip.cuelang.org"
 			run:  "curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
+		}, {
+			name: "Trigger unity build"
+			run: """
+				curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA})\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+				"""
+		}]
+	}
+}
+new_version_triggers: _#bashWorkflow & {
+	name: "New release triggers"
+	on: push: tags: [_#releaseTagPattern]
+	jobs: push: {
+		"runs-on": _#linuxMachine
+		steps: [{
+			name: "Rebuild tip.cuelang.org"
+			run: """
+				curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cuelang/cuelang.org/dispatches
+				"""
+		}, {
+			name: "Trigger unity build"
+			run: """
+				curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}}})\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+				"""
 		}]
 	}
 }
@@ -1284,7 +1310,7 @@ import "strings"
             }
             res: (_|_){
               // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-              //     ./workflows.cue:126:9
+              //     ./workflows.cue:129:9
             }
           }
         }
@@ -1408,7 +1434,7 @@ import "strings"
           _#type(:ci): (string){ string }
           if: (_|_){
             // [incomplete] workflows.1.schema._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
-            //     ./workflows.cue:139:14
+            //     ./workflows.cue:142:14
           }
         }
         name: (string){ "Repository Dispatch" }
@@ -1548,7 +1574,7 @@ import "strings"
       }
     }
     3: (struct){
-      file: (string){ "rebuild_tip_cuelang_org.yml" }
+      file: (string){ "tip_triggers.yml" }
       schema: (#struct){
         #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
         #branch: (list){
@@ -1596,6 +1622,10 @@ import "strings"
                 name: (string){ "Rebuild tip.cuelang.org" }
                 run: (string){ "curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}" }
               }
+              1: (#struct){
+                name: (string){ "Trigger unity build" }
+                run: (string){ "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA})\\\"\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches" }
+              }
             }
             defaults: (#struct){
               run: (#struct){
@@ -1604,7 +1634,7 @@ import "strings"
             }
           }
         }
-        name: (string){ "Push to tip" }
+        name: (string){ "Push to tip triggers" }
         on: (#struct){
           push: (#struct){
             branches: (#list){
@@ -1615,6 +1645,77 @@ import "strings"
       }
     }
     4: (struct){
+      file: (string){ "new_version_triggers.yml" }
+      schema: (#struct){
+        #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
+        #branch: (list){
+          0: (string){ strings.MinRunes(1) }
+        }
+        #configuration: ((bool|string|list|struct|number)){ |((string){ string }, (number){ number }, (bool){ bool }, (#struct){
+          }, (list){
+          }) }
+        #container: (#struct){
+          image: (string){ string }
+        }
+        #defaults: (#struct){
+        }
+        #env: (#struct){
+        }
+        #environment: (#struct){
+          name: (string){ string }
+        }
+        #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
+        #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
+        #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
+        #globs: (list){
+          0: (string){ strings.MinRunes(1) }
+        }
+        #machine: (string){ |((string){ "linux" }, (string){ "macos" }, (string){ "windows" }) }
+        #name: (string){ =~"^[_a-zA-Z][a-zA-Z0-9_-]*$" }
+        #path: (list){
+          0: (string){ strings.MinRunes(1) }
+        }
+        #ref: ((null|struct)){ |((null){ null }, (#struct){
+          }) }
+        #shell: (string){ |((string){ string }, (string){ "bash" }, (string){ "pwsh" }, (string){ "python" }, (string){ "sh" }, (string){ "cmd" }, (string){ "powershell" }) }
+        #types: (list){
+          0: (_){ _ }
+        }
+        #: (#struct){
+          "working-directory": (string){ string }
+        }
+        jobs: (#struct){
+          push: (#struct){
+            "runs-on": (string){ "ubuntu-18.04" }
+            steps: (#list){
+              0: (#struct){
+                name: (string){ "Rebuild tip.cuelang.org" }
+                run: (string){ "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}\" https://api.github.com/repos/cuelang/cuelang.org/dispatches" }
+              }
+              1: (#struct){
+                name: (string){ "Trigger unity build" }
+                run: (string){ "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}}})\\\"\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches" }
+              }
+            }
+            defaults: (#struct){
+              run: (#struct){
+                shell: (string){ "bash" }
+              }
+            }
+          }
+        }
+        name: (string){ "New release triggers" }
+        on: (#struct){
+          push: (#struct){
+            tags: (#list){
+              0: (string){ "v*" }
+            }
+          }
+        }
+      }
+    }
+    5: (struct){
       file: (string){ "mirror.yml" }
       schema: (#struct){
         #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
@@ -1915,7 +2016,7 @@ import "strings"
         }
         res: (_|_){
           // [incomplete] invalid interpolation: cannot convert incomplete value "string" to JSON:
-          //     ./workflows.cue:126:9
+          //     ./workflows.cue:129:9
         }
       }
     }
@@ -2036,7 +2137,7 @@ import "strings"
       _#type(:ci): (string){ string }
       if: (_|_){
         // [incomplete] repository_dispatch._#dispatchJob.if: invalid interpolation: non-concrete value string (type string):
-        //     ./workflows.cue:139:14
+        //     ./workflows.cue:142:14
       }
     }
     name: (string){ "Repository Dispatch" }
@@ -2244,7 +2345,7 @@ import "strings"
       }
     }
   }
-  rebuild_tip_cuelang_org: (#struct){
+  tip_triggers: (#struct){
     #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
     #branch: (list){
       0: (string){ strings.MinRunes(1) }
@@ -2291,6 +2392,10 @@ import "strings"
             name: (string){ "Rebuild tip.cuelang.org" }
             run: (string){ "curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}" }
           }
+          1: (#struct){
+            name: (string){ "Trigger unity build" }
+            run: (string){ "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA})\\\"\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches" }
+          }
         }
         defaults: (#struct){
           run: (#struct){
@@ -2299,11 +2404,79 @@ import "strings"
         }
       }
     }
-    name: (string){ "Push to tip" }
+    name: (string){ "Push to tip triggers" }
     on: (#struct){
       push: (#struct){
         branches: (#list){
           0: (string){ "master" }
+        }
+      }
+    }
+  }
+  new_version_triggers: (#struct){
+    #architecture: (string){ |((string){ "ARM32" }, (string){ "x64" }, (string){ "x86" }) }
+    #branch: (list){
+      0: (string){ strings.MinRunes(1) }
+    }
+    #configuration: ((bool|string|list|struct|number)){ |((string){ string }, (number){ number }, (bool){ bool }, (#struct){
+      }, (list){
+      }) }
+    #container: (#struct){
+      image: (string){ string }
+    }
+    #defaults: (#struct){
+    }
+    #env: (#struct){
+    }
+    #environment: (#struct){
+      name: (string){ string }
+    }
+    #event: (string){ |((string){ "check_run" }, (string){ "check_suite" }, (string){ "create" }, (string){ "delete" }, (string){ "deployment" }, (string){ "deployment_status" }, (string){ "fork" }, (string){ "gollum" }, (string){ "issue_comment" }, (string){ "issues" }, (string){ "label" }, (string){ "member" }, (string){ "milestone" }, (string){ "page_build" }, (string){ "project" }, (string){ "project_card" }, (string){ "project_column" }, (string){ "public" }, (string){ "pull_request" }, (string){ "pull_request_review" }, (string){ "pull_request_review_comment" }, (string){ "pull_request_target" }, (string){ "push" }, (string){ "registry_package" }, (string){ "release" }, (string){ "status" }, (string){ "watch" }, (string){ "workflow_dispatch" }, (string){ "workflow_run" }, (string){ "repository_dispatch" }) }
+    #eventObject: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
+    #expressionSyntax: (string){ =~"^\\$\\{\\{.*\\}\\}$" }
+    #globs: (list){
+      0: (string){ strings.MinRunes(1) }
+    }
+    #machine: (string){ |((string){ "linux" }, (string){ "macos" }, (string){ "windows" }) }
+    #name: (string){ =~"^[_a-zA-Z][a-zA-Z0-9_-]*$" }
+    #path: (list){
+      0: (string){ strings.MinRunes(1) }
+    }
+    #ref: ((null|struct)){ |((null){ null }, (#struct){
+      }) }
+    #shell: (string){ |((string){ string }, (string){ "bash" }, (string){ "pwsh" }, (string){ "python" }, (string){ "sh" }, (string){ "cmd" }, (string){ "powershell" }) }
+    #types: (list){
+      0: (_){ _ }
+    }
+    #: (#struct){
+      "working-directory": (string){ string }
+    }
+    jobs: (#struct){
+      push: (#struct){
+        "runs-on": (string){ "ubuntu-18.04" }
+        steps: (#list){
+          0: (#struct){
+            name: (string){ "Rebuild tip.cuelang.org" }
+            run: (string){ "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}\" https://api.github.com/repos/cuelang/cuelang.org/dispatches" }
+          }
+          1: (#struct){
+            name: (string){ "Trigger unity build" }
+            run: (string){ "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}}})\\\"\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches" }
+          }
+        }
+        defaults: (#struct){
+          run: (#struct){
+            shell: (string){ "bash" }
+          }
+        }
+      }
+    }
+    name: (string){ "New release triggers" }
+    on: (#struct){
+      push: (#struct){
+        tags: (#list){
+          0: (string){ "v*" }
         }
       }
     }
@@ -2400,7 +2573,7 @@ import "strings"
     name: (string){ "Set go build tags" }
     run: (_|_){
       // [incomplete] _#setGoBuildTags.run: invalid interpolation: non-concrete value string (type string):
-      //     ./workflows.cue:285:10
+      //     ./workflows.cue:311:10
     }
   }
   _#installGo(:ci): (#struct){
@@ -2454,7 +2627,7 @@ import "strings"
   _#cueckooCopybaraImage(:ci): (string){ "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c" }
   _#copybaraCmd(:ci): (_|_){
     // [incomplete] _#copybaraCmd: invalid interpolation: non-concrete value string (type string):
-    //     ./workflows.cue:352:2
+    //     ./workflows.cue:378:2
     _#cmd(:ci): (string){ string }
   }
   _#copybaraSteps(:ci): (#list){
@@ -2468,7 +2641,7 @@ import "strings"
       name: (string){ string }
       run: (_|_){
         // [incomplete] _#copybaraSteps.1.run: invalid interpolation: non-concrete value string (type string):
-        //     ./workflows.cue:352:2
+        //     ./workflows.cue:378:2
         _#cmd(:ci): (string){ string }
       }
     }
@@ -2499,8 +2672,12 @@ import "strings"
       schema: 〈1;release〉
     },
     {
-      file: "rebuild_tip_cuelang_org.yml"
-      schema: 〈1;rebuild_tip_cuelang_org〉
+      file: "tip_triggers.yml"
+      schema: 〈1;tip_triggers〉
+    },
+    {
+      file: "new_version_triggers.yml"
+      schema: 〈1;new_version_triggers〉
     },
     {
       file: "mirror.yml"
@@ -2762,8 +2939,8 @@ import "strings"
       }
     }
   })
-  rebuild_tip_cuelang_org: (〈0;_#bashWorkflow〉 & {
-    name: "Push to tip"
+  tip_triggers: (〈0;_#bashWorkflow〉 & {
+    name: "Push to tip triggers"
     on: {
       push: {
         branches: [
@@ -2778,6 +2955,35 @@ import "strings"
           {
             name: "Rebuild tip.cuelang.org"
             run: "curl -f -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
+          },
+          {
+            name: "Trigger unity build"
+            run: "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA})\\\"\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches"
+          },
+        ]
+      }
+    }
+  })
+  new_version_triggers: (〈0;_#bashWorkflow〉 & {
+    name: "New release triggers"
+    on: {
+      push: {
+        tags: [
+          〈3;_#releaseTagPattern〉,
+        ]
+      }
+    }
+    jobs: {
+      push: {
+        "runs-on": 〈3;_#linuxMachine〉
+        steps: [
+          {
+            name: "Rebuild tip.cuelang.org"
+            run: "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}\" https://api.github.com/repos/cuelang/cuelang.org/dispatches"
+          },
+          {
+            name: "Trigger unity build"
+            run: "curl -s -H \"Content-Type: application/json\" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary \"{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}}})\\\"\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches"
           },
         ]
       }

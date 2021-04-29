@@ -1194,6 +1194,40 @@ func TestFillPath(t *testing.T) {
 	}
 }
 
+func TestFillPathError(t *testing.T) {
+	r := &Runtime{}
+
+	type key struct{ a int }
+
+	testCases := []struct {
+		in   string
+		x    interface{}
+		path Path
+		err  string
+	}{{
+		// unsupported type.
+		in:  `_`,
+		x:   make(chan int),
+		err: "unsupported Go type (chan int)",
+	}}
+
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			v := compileT(t, r, tc.in).Value()
+			v = v.FillPath(tc.path, tc.x)
+
+			err := v.Err()
+			if err == nil {
+				t.Errorf("unexpected success")
+			}
+
+			if got := err.Error(); !strings.Contains(got, tc.err) {
+				t.Errorf("\ngot:  %s\nwant: %s", got, tc.err)
+			}
+		})
+	}
+}
+
 func TestAllows(t *testing.T) {
 	r := &Runtime{}
 

@@ -14,7 +14,10 @@
 
 package convert_test
 
+// TODO: generate tests from Go's json encoder.
+
 import (
+	"encoding"
 	"math/big"
 	"reflect"
 	"testing"
@@ -32,7 +35,21 @@ import (
 
 func mkBigInt(a int64) (v apd.Decimal) { v.SetInt64(a); return }
 
+type textMarshaller struct {
+	b string
+}
+
+func (t *textMarshaller) MarshalText() (b []byte, err error) {
+	return []byte(t.b), nil
+}
+
+var _ encoding.TextMarshaler = &textMarshaller{}
+
 func TestConvert(t *testing.T) {
+	type key struct {
+		a int
+	}
+	type stringType string
 	i34 := big.NewInt(34)
 	d35 := mkBigInt(35)
 	n36 := mkBigInt(-36)
@@ -51,7 +68,7 @@ func TestConvert(t *testing.T) {
 	}, {
 		"foo", `(string){ "foo" }`,
 	}, {
-		"\x80", "(_|_){\n  // [eval] cannot convert result to string: invalid UTF-8\n}",
+		"\x80", `(string){ "�" }`,
 	}, {
 		3, "(int){ 3 }",
 	}, {
@@ -198,7 +215,21 @@ func TestConvert(t *testing.T) {
   A: (string){ "" }
   B: (int){ 0 }
 }`,
-	}}
+	},
+		{map[key]string{{a: 1}: "foo"},
+			"(_|_){\n  // [eval] unsupported Go type for map key (convert_test.key)\n}"},
+		{map[*textMarshaller]string{{b: "bar"}: "foo"},
+			"(struct){\n  \"&{bar}\": (string){ \"foo\" }\n}"},
+		{map[int]string{1: "foo"},
+			"(struct){\n  \"1\": (string){ \"foo\" }\n}"},
+		{map[string]encoding.TextMarshaler{"foo": nil},
+			"(struct){\n  foo: (_){ _ }\n}"},
+		{make(chan int),
+			"(_|_){\n  // [eval] unsupported Go type (chan int)\n}"},
+		{[]interface{}{func() {}},
+			"(_|_){\n  // [eval] unsupported Go type (func())\n}"},
+		{stringType("\x80"), `(string){ "�" }`},
+	}
 	r := runtime.New()
 	for _, tc := range testCases {
 		ctx := adt.NewContext(r, &adt.Vertex{})

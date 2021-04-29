@@ -24,9 +24,9 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"unicode/utf8"
 
 	"github.com/cockroachdb/apd/v2"
+	"golang.org/x/text/encoding/unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
@@ -209,7 +209,7 @@ func isZero(v reflect.Value) bool {
 func GoValueToExpr(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Expr {
 	e := convertRec(ctx, nilIsTop, x)
 	if e == nil {
-		return ctx.AddErrf("unsupported Go type (%v)", e)
+		return ctx.AddErrf("unsupported Go type (%T)", x)
 	}
 	return e
 }
@@ -321,10 +321,8 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 	case bool:
 		return &adt.Bool{Src: ctx.Source(), B: v}
 	case string:
-		if !utf8.ValidString(v) {
-			return ctx.AddErrf("cannot convert result to string: invalid UTF-8")
-		}
-		return &adt.String{Src: ctx.Source(), Str: v}
+		s, _ := unicode.UTF8.NewEncoder().String(v)
+		return &adt.String{Src: ctx.Source(), Str: s}
 	case []byte:
 		return &adt.Bytes{Src: ctx.Source(), B: v}
 	case int:
@@ -377,9 +375,11 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 		case reflect.String:
 			str := value.String()
-			if !utf8.ValidString(str) {
-				return ctx.AddErrf("cannot convert result to string: invalid UTF-8")
-			}
+			str, _ = unicode.UTF8.NewEncoder().String(str)
+			// TODO: here and above: allow to fail on invalid strings.
+			// if !utf8.ValidString(str) {
+			// 	return ctx.AddErrf("cannot convert result to string: invalid UTF-8")
+			// }
 			return &adt.String{Src: ctx.Source(), Str: str}
 
 		case reflect.Int, reflect.Int8, reflect.Int16,
@@ -475,11 +475,17 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 
 			t := value.Type()
 			switch key := t.Key(); key.Kind() {
+			default:
+				if !key.Implements(textMarshaler) {
+					return ctx.AddErrf("unsupported Go type for map key (%v)", key)
+				}
+				fallthrough
 			case reflect.String,
 				reflect.Int, reflect.Int8, reflect.Int16,
 				reflect.Int32, reflect.Int64,
 				reflect.Uint, reflect.Uint8, reflect.Uint16,
 				reflect.Uint32, reflect.Uint64, reflect.Uintptr:
+
 				keys := value.MapKeys()
 				sort.Slice(keys, func(i, j int) bool {
 					return fmt.Sprint(keys[i]) < fmt.Sprint(keys[j])
@@ -494,7 +500,7 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					// mimic behavior of encoding/json: report error of
 					// unsupported type.
 					if sub == nil {
-						return ctx.AddErrf("unsupported Go type (%v)", val)
+						return ctx.AddErrf("unsupported Go type (%T)", val.Interface())
 					}
 					if isBottom(sub) {
 						return sub
@@ -514,9 +520,6 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 					}
 					v.Arcs = append(v.Arcs, arc)
 				}
-
-			default:
-				return ctx.AddErrf("unsupported Go type for map key (%v)", key)
 			}
 
 			return v
@@ -528,7 +531,8 @@ func convertRec(ctx *adt.OpContext, nilIsTop bool, x interface{}) adt.Value {
 				val := value.Index(i)
 				x := convertRec(ctx, nilIsTop, val.Interface())
 				if x == nil {
-					return ctx.AddErrf("unsupported Go type (%v)", val)
+					return ctx.AddErrf("unsupported Go type (%T)",
+						val.Interface())
 				}
 				if isBottom(x) {
 					return x

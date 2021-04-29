@@ -211,6 +211,86 @@ func NilIsAny(isAny bool) EncodeOption {
 //
 // The returned Value will represent an error, accessible through Err, if any
 // error occurred.
+//
+// Encode traverses the value v recursively. If an encountered value implements
+// the json.Marshaler interface and is not a nil pointer, Encode calls its
+// MarshalJSON method to produce JSON and convert that to CUE instead. If no
+// MarshalJSON method is present but the value implements encoding.TextMarshaler
+// instead, Encode calls its MarshalText method and encodes the result as a
+// string.
+//
+// Otherwise, Encode uses the following type-dependent default encodings:
+//
+// Boolean values encode as CUE booleans.
+//
+// Floating point, integer, and *big.Int and *big.Float values encode as CUE
+// numbers.
+//
+// String values encode as CUE strings coerced to valid UTF-8, replacing
+// sequences of invalid bytes with the Unicode replacement rune as per Unicode's
+// and W3C's recommendation.
+//
+// Array and slice values encode as CUE lists, except that []byte encodes as a
+// bytes value, and a nil slice encodes as the null.
+//
+// Struct values encode as CUE structs. Each exported struct field becomes a
+// member of the object, using the field name as the object key, unless the
+// field is omitted for one of the reasons given below.
+//
+// The encoding of each struct field can be customized by the format string
+// stored under the "json" key in the struct field's tag. The format string
+// gives the name of the field, possibly followed by a comma-separated list of
+// options. The name may be empty in order to specify options without overriding
+// the default field name.
+//
+// The "omitempty" option specifies that the field should be omitted from the
+// encoding if the field has an empty value, defined as false, 0, a nil pointer,
+// a nil interface value, and any empty array, slice, map, or string.
+//
+// See the documentation for Go's json.Marshal for more details on the field
+// tags and their meaning.
+//
+// Anonymous struct fields are usually encoded as if their inner exported
+// fields were fields in the outer struct, subject to the usual Go visibility
+// rules amended as described in the next paragraph. An anonymous struct field
+// with a name given in its JSON tag is treated as having that name, rather than
+// being anonymous. An anonymous struct field of interface type is treated the
+// same as having that type as its name, rather than being anonymous.
+//
+// The Go visibility rules for struct fields are amended for when deciding which
+// field to encode or decode. If there are multiple fields at the same level,
+// and that level is the least nested (and would therefore be the nesting level
+// selected by the usual Go rules), the following extra rules apply:
+//
+// 1) Of those fields, if any are JSON-tagged, only tagged fields are
+// considered, even if there are multiple untagged fields that would otherwise
+// conflict.
+//
+// 2) If there is exactly one field (tagged or not according to the first rule),
+// that is selected.
+//
+// 3) Otherwise there are multiple fields, and all are ignored; no error occurs.
+//
+// Map values encode as CUE structs. The map's key type must either be a string,
+// an integer type, or implement encoding.TextMarshaler. The map keys are sorted
+// and used as CUE struct field names by applying the following rules, subject
+// to the UTF-8 coercion described for string values above:
+//
+//  - keys of any string type are used directly
+//  - encoding.TextMarshalers are marshaled
+//  - integer keys are converted to strings
+//
+// Pointer values encode as the value pointed to. A nil pointer encodes as the
+// null CUE value.
+//
+// Interface values encode as the value contained in the interface. A nil
+// interface value encodes as the null CUE value. The NilIsAny EncodingOption
+// can be used to interpret nil as any (_) instead.
+//
+// Channel, complex, and function values cannot be encoded in CUE. Attempting to
+// encode such a value results in the returned value being an error, accessible
+// through the Err method.
+//
 func (c *Context) Encode(x interface{}, option ...EncodeOption) Value {
 	switch v := x.(type) {
 	case adt.Value:

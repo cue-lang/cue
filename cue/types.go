@@ -258,11 +258,12 @@ func (i *Iterator) Selector() Selector {
 	return featureToSel(i.f, i.idx)
 }
 
-// Label reports the label of the value if i iterates over struct fields and
-// "" otherwise.
+// Label reports the label of the value if i iterates over struct fields and ""
+// otherwise.
 //
-// Deprecated: use i.Selector().String(). Note that this will give more accurate
-// string representations.
+//
+// Slated to be deprecated: use i.Selector().String(). Note that this will give
+// more accurate string representations.
 func (i *hiddenIterator) Label() string {
 	if i.f == 0 {
 		return ""

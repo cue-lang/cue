@@ -96,9 +96,7 @@ yaml    output as YAML
 	addOrphanFlags(cmd.Flags())
 
 	cmd.Flags().Bool(string(flagEscape), false, "use HTML escaping")
-
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "export this expression only")
-
 	cmd.Flags().StringArrayP(string(flagInject), "t", nil,
 		"set the value of a tagged field")
 

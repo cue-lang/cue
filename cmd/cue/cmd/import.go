@@ -247,7 +247,6 @@ Example:
 	addOrphanFlags(cmd.Flags())
 
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
-	cmd.Flags().BoolP(string(flagForce), "f", false, "force overwriting existing files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
 

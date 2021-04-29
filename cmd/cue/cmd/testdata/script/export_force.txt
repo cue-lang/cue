@@ -1,0 +1,21 @@
+# Verify that export with --force works
+
+# First time should simply succeed
+cue export -o test.yml file.cue
+cmp test.yml test.yml.golden
+
+# Second time will fail without --force
+!  cue export -o test.yml file.cue
+stderr 'error writing "test.yml": file already exists'
+
+# Second time with --force should succeed
+cue export --force -o test.yml file.cue
+cmp test.yml test.yml.golden
+
+-- file.cue --
+package hello
+
+#who: "World"
+message: "Hello \(#who)!"
+-- test.yml.golden --
+message: Hello World!

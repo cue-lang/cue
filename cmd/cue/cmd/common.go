@@ -646,6 +646,7 @@ func (b *buildPlan) parseFlags() (err error) {
 		b.cfg.fileFilter = s
 	}
 	b.encConfig = &encoding.Config{
+		Force:     flagForce.Bool(b.cmd),
 		Mode:      b.cfg.outMode,
 		Stdin:     b.cmd.InOrStdin(),
 		Stdout:    b.cmd.OutOrStdout(),

@@ -56,6 +56,7 @@ func addOutFlags(f *pflag.FlagSet, allowNonCUE bool) {
 	}
 	f.StringP(string(flagOutFile), "o", "",
 		`filename or - for stdout with optional file prefix (run 'cue filetypes' for more info)`)
+	f.BoolP(string(flagForce), "f", false, "force overwriting existing files")
 }
 
 func addGlobalFlags(f *pflag.FlagSet) {

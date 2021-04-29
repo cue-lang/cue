@@ -100,12 +100,11 @@ func runTrim(cmd *Command, args []string) error {
 	instances := buildInstances(cmd, binst)
 
 	dst := flagOutFile.String(cmd)
-	if dst != "" && dst != "-" {
+	if dst != "" && dst != "-" && !flagForce.Bool(cmd) {
 		switch _, err := os.Stat(dst); {
 		case os.IsNotExist(err):
-		case err == nil:
 		default:
-			return fmt.Errorf("error creating file: %v", err)
+			return fmt.Errorf("error writing %q: file already exists", dst)
 		}
 	}
 

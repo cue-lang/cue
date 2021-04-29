@@ -1,0 +1,69 @@
+-- in.cue --
+import "uuid"
+
+sha1: a: uuid.SHA1(uuid.ns.DNS, "cuelang.org")
+
+md5: a: uuid.MD5(uuid.ns.URL, "https://cuelang.org")
+
+valid: {
+    a: uuid.Valid
+    a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+
+invalid: {
+    a: uuid.Valid
+    a: "052EF62D-7223-58B6-A551-C1DEEE46D401"
+
+    b: uuid.Valid
+    b: "052ef62d_7223_58b6_a551_c1deee46d401"
+}
+
+parse: a: uuid.Parse("052ef62d722358b6a551c1deee46d401")
+
+fromInt: a: uuid.FromInt(0x052ef62d_7223_58b6_a551_c1deee46d401)
+
+variant: a: uuid.Variant(sha1.a)
+version: a: uuid.Version(sha1.a)
+urn: a: uuid.URN(sha1.a)
+toInt: a: uuid.ToInt(sha1.a)
+
+-- out/uuid --
+Errors:
+invalid.a: invalid value "052EF62D-7223-58B6-A551-C1DEEE46D401" (does not satisfy uuid.Valid): invalid UUID "052EF62D-7223-58B6-A551-C1DEEE46D401":
+    ./in.cue:14:8
+invalid.b: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid UUID "052ef62d_7223_58b6_a551_c1deee46d401":
+    ./in.cue:17:8
+
+Result:
+sha1: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+md5: {
+	a: "d891d69e-ae5c-39e0-9ead-164abd207f1f"
+}
+valid: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+invalid: {
+	a: _|_ // invalid.a: invalid value "052EF62D-7223-58B6-A551-C1DEEE46D401" (does not satisfy uuid.Valid): invalid.a: invalid UUID "052EF62D-7223-58B6-A551-C1DEEE46D401"
+	b: _|_ // invalid.b: invalid value "052ef62d_7223_58b6_a551_c1deee46d401" (does not satisfy uuid.Valid): invalid.b: invalid UUID "052ef62d_7223_58b6_a551_c1deee46d401"
+}
+parse: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+fromInt: {
+	a: "052ef62d-7223-58b6-a551-c1deee46d401"
+}
+variant: {
+	a: 1
+}
+version: {
+	a: 5
+}
+urn: {
+	a: "urn:uuid:052ef62d-7223-58b6-a551-c1deee46d401"
+}
+toInt: {
+	a: 93651793875903522077150095950593860979557386807737776869062002310283964632724204171313
+}
+

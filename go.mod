@@ -5,6 +5,7 @@ require (
 	github.com/cockroachdb/apd/v2 v2.0.1
 	github.com/emicklei/proto v1.6.15
 	github.com/google/go-cmp v0.4.0
+	github.com/google/uuid v1.2.0
 	github.com/kr/pretty v0.1.0
 	github.com/kylelemons/godebug v1.1.0
 	github.com/lib/pq v1.0.0 // indirect

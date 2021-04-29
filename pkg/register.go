@@ -45,4 +45,5 @@ import (
 	_ "cuelang.org/go/pkg/tool/file"
 	_ "cuelang.org/go/pkg/tool/http"
 	_ "cuelang.org/go/pkg/tool/os"
+	_ "cuelang.org/go/pkg/uuid"
 )

@@ -178,7 +178,10 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 					hasFiles = true
 					continue
 				}
-				inst, v = parseType("", Input)
+				inst, v, err = parseType("", Input)
+				if err != nil {
+					return nil, err
+				}
 			}
 			f, err := toFile(inst, v, s)
 			if err != nil {
@@ -202,7 +205,10 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 			case qualifier != "" && !hasFiles:
 				return nil, errors.Newf(token.NoPos, "scoped qualifier %q without file", qualifier+":")
 			}
-			inst, v = parseType(a[0], Input)
+			inst, v, err = parseType(a[0], Input)
+			if err != nil {
+				return nil, err
+			}
 			qualifier = a[0]
 			hasFiles = false
 		}
@@ -233,7 +239,10 @@ func ParseFile(s string, mode Mode) (*build.File, error) {
 		return nil, errors.Newf(token.NoPos, "empty file name in %q", s)
 	}
 
-	inst, val := parseType(scope, mode)
+	inst, val, err := parseType(scope, mode)
+	if err != nil {
+		return nil, err
+	}
 	return toFile(inst, val, file)
 }
 
@@ -273,7 +282,7 @@ func toFile(i, v cue.Value, filename string) (*build.File, error) {
 	return f, nil
 }
 
-func parseType(s string, mode Mode) (inst, val cue.Value) {
+func parseType(s string, mode Mode) (inst, val cue.Value, err error) {
 	i := cuegenInstance.Value()
 	i = i.Unify(i.Lookup("modes", mode.String()))
 	v := i.LookupDef("File")
@@ -283,10 +292,15 @@ func parseType(s string, mode Mode) (inst, val cue.Value) {
 			if p := strings.IndexByte(t, '='); p >= 0 {
 				v = v.Fill(t[p+1:], "tags", t[:p])
 			} else {
-				v = v.Unify(i.Lookup("tags", t))
+				info := i.Lookup("tags", t)
+				if !info.Exists() {
+					return inst, val, errors.Newf(token.NoPos,
+						"unknown filetype %s", t)
+				}
+				v = v.Unify(info)
 			}
 		}
 	}
 
-	return i, v
+	return i, v, nil
 }

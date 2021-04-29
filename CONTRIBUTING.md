@@ -24,7 +24,8 @@ use Gerrit code reviews at https://cue-review.googlesource.com for this purpose.
 Please read the [Contributing Guide](./doc/contribute.md)
 before reading patches.
 
-## Community Guidelines
+## Code of Conduct
 
-This project follows [Google's Open Source Community
-Guidelines](https://opensource.google.com/conduct/).
+Guidelines for participating in CUE community spaces and a reporting process for
+handling issues can be found in the [Code of
+Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).

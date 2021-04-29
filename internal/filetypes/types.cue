@@ -201,6 +201,10 @@ tags: {
 		encoding: "text"
 		form:     "data"
 	}
+	binary: {
+		encoding: "binary"
+		form:     "data"
+	}
 	go: {
 		encoding:       "code"
 		interpretation: ""
@@ -306,6 +310,11 @@ encodings: jsonl: {
 }
 
 encodings: text: {
+	forms.data
+	stream: false
+}
+
+encodings: binary: {
 	forms.data
 	stream: false
 }

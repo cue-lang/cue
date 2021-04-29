@@ -19,6 +19,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"regexp"
 	"strings"
 
 	"golang.org/x/text/language"
@@ -357,7 +358,11 @@ type config struct {
 	outMode filetypes.Mode
 
 	fileFilter     string
+	reFile         *regexp.Regexp
+	encoding       build.Encoding
 	interpretation build.Interpretation
+
+	overrideDefault bool
 
 	noMerge bool // do not merge individual data files.
 
@@ -378,10 +383,19 @@ func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err e
 	if err := p.parseFlags(); err != nil {
 		return nil, err
 	}
+	re, err := regexp.Compile(p.cfg.fileFilter)
+	if err != nil {
+		return nil, err
+	}
+	cfg.reFile = re
 
 	cfg.loadCfg.Tags = flagInject.StringArray(cmd)
 
 	return p, nil
+}
+
+func (p *buildPlan) matchFile(file string) bool {
+	return p.cfg.reFile.MatchString(file)
 }
 
 type decoderInfo struct {
@@ -407,9 +421,21 @@ func (d *decoderInfo) close() {
 // returned slices. It is up to the caller to Close any of the decoders that are
 // returned.
 func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderInfo, err error) {
-	for _, f := range b.OrphanedFiles {
+	files := b.OrphanedFiles
+	if p.cfg.overrideDefault {
+		files = append(files, b.UnknownFiles...)
+	}
+	for _, f := range files {
+		if !p.matchFile(f.Filename) && f.Filename != "-" {
+			continue
+		}
+		if p.cfg.overrideDefault {
+			f.Encoding = p.cfg.encoding
+			f.Interpretation = p.cfg.interpretation
+		}
 		switch f.Encoding {
-		case build.Protobuf, build.YAML, build.JSON, build.JSONL, build.Text:
+		case build.Protobuf, build.YAML, build.JSON, build.JSONL,
+			build.Text, build.Binary:
 			if f.Interpretation == build.ProtobufJSON {
 				// Need a schema.
 				values = append(values, &decoderInfo{f, nil})

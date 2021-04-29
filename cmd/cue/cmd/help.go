@@ -189,8 +189,10 @@ var filetypeHelp = &cobra.Command{
     textproto    .textproto     Text-based protocol buffers.
     proto        .proto         Protocol Buffer definitions.
     go           .go            Go source files.
-    text         .txt           Raw text file; the evaluated
-                                value must be of type string.
+    text         .txt           Raw text file; the evaluated value
+                                must be of type string.
+    binary                      Raw binary file; the evaluated value
+                                must be of type string or bytes.
 
 OpenAPI, JSON Schema and Protocol Buffer definitions are
 always interpreted as schema. YAML and JSON are always

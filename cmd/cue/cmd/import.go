@@ -55,6 +55,8 @@ the following modes:
    json       Look for JSON files (.json, .jsonl, .ldjson).
    yaml       Look for YAML files (.yaml .yml).
    text       Look for text files (.txt).
+   binary     Look for files with extensions specified by --ext
+              and interpret them as binary.
    jsonschema Interpret JSON, YAML or CUE files as JSON Schema.
    openapi    Interpret JSON, YAML or CUE files as OpenAPI.
    auto       Look for JSON or YAML files and interpret them as
@@ -65,7 +67,9 @@ the following modes:
    proto      Convert Protocol buffer definition files and
               transitive dependencies.
 
-For user-specified files the modes only affect the
+Using the --ext flag in combination with a mode causes matched files to be
+interpreted as the format indicated by the mode, overriding any other meaning
+attributed to that extension.
 
 auto mode
 
@@ -99,6 +103,11 @@ subdirectories as well all dependencies.
    cue import proto -I ../include ./...
 
 The module root is implicitly added as an import path.
+
+
+Binary mode
+
+Loads matched files as binary.
 
 
 JSON/YAML mode
@@ -249,6 +258,7 @@ Example:
 	cmd.Flags().Bool(string(flagFiles), false, "split multiple entries into different files")
 	cmd.Flags().Bool(string(flagDryrun), false, "only run simulation")
 	cmd.Flags().BoolP(string(flagRecursive), "R", false, "recursively parse string values")
+	cmd.Flags().StringArray(string(flagExt), nil, "match files with these extensions")
 
 	return cmd
 }
@@ -261,11 +271,18 @@ func runImport(cmd *Command, args []string) (err error) {
 		interpretation: build.Auto,
 		loadCfg:        &load.Config{DataFiles: true},
 	}
+
 	var mode string
+	extensions := flagExt.StringArray(cmd)
 	if len(args) >= 1 && !strings.ContainsAny(args[0], `/\:.`) {
 		c.interpretation = ""
+		if len(extensions) > 0 {
+			c.overrideDefault = true
+		}
+
 		mode = args[0]
 		args = args[1:]
+		c.encoding = build.Encoding(mode)
 		switch mode {
 		case "proto":
 			c.fileFilter = `\.proto$`
@@ -275,13 +292,23 @@ func runImport(cmd *Command, args []string) (err error) {
 			c.fileFilter = `\.(yaml|yml)$`
 		case "text":
 			c.fileFilter = `\.txt$`
+		case "binary":
+			if len(extensions) == 0 {
+				return errors.Newf(token.NoPos,
+					"use of --ext flag required in binary mode")
+			}
 		case "auto", "openapi", "jsonschema":
 			c.interpretation = build.Interpretation(mode)
+			c.encoding = "yaml"
 		case "data":
 			// default mode for encoding/ no interpretation.
+			c.encoding = ""
 		default:
 			return errors.Newf(token.NoPos, "unknown mode %q", mode)
 		}
+	}
+	if len(extensions) > 0 {
+		c.fileFilter = `\.(` + strings.Join(extensions, "|") + `)$`
 	}
 
 	b, err := parseArgs(cmd, args, c)

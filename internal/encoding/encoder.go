@@ -219,6 +219,17 @@ func NewEncoder(f *build.File, cfg *Config) (*Encoder, error) {
 			return err
 		}
 
+	case build.Binary:
+		e.concrete = true
+		e.encValue = func(v cue.Value) error {
+			b, err := v.Bytes()
+			if err != nil {
+				return err
+			}
+			_, err = w.Write(b)
+			return err
+		}
+
 	default:
 		return nil, fmt.Errorf("unsupported encoding %q", f.Encoding)
 	}

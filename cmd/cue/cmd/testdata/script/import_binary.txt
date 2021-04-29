@@ -1,0 +1,33 @@
+cue import binary --ext crt .
+cmp x.cue out/expect.cue
+
+cue export bin.cue --out binary
+cmp stdout out/bin
+
+# TODO: txtarscript should distinguish final newline
+cue export str.cue --out binary
+cmp stdout out/str
+
+-- x.crt --
+1234
+-- y.crt2 --
+// Skip this file, wrong extension.
+-- bin.cue --
+'''
+  foo
+
+  '''
+-- str.cue --
+"""
+  foo
+
+  """
+-- out/bin --
+foo
+-- out/str --
+foo
+-- out/expect.cue --
+'''
+	1234
+
+	'''

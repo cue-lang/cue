@@ -35,6 +35,7 @@ const (
 	YAML        Encoding = "yaml"
 	JSONL       Encoding = "jsonl"
 	Text        Encoding = "text"
+	Binary      Encoding = "binary"
 	Protobuf    Encoding = "proto"
 	TextProto   Encoding = "textproto"
 	BinaryProto Encoding = "pb"

@@ -31,6 +31,7 @@ import (
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/format"
+	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/encoding/json"
@@ -251,6 +252,11 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		b, err := ioutil.ReadAll(r)
 		i.err = err
 		i.expr = ast.NewString(string(b))
+	case build.Binary:
+		b, err := ioutil.ReadAll(r)
+		i.err = err
+		s := literal.Bytes.WithTabIndent(1).Quote(string(b))
+		i.expr = ast.NewLit(token.STRING, s)
 	case build.Protobuf:
 		paths := &protobuf.Config{
 			Paths:   cfg.ProtoPath,

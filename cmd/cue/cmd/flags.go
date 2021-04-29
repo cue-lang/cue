@@ -44,6 +44,7 @@ const (
 	flagFiles       flagName = "files"
 	flagProtoPath   flagName = "proto_path"
 	flagProtoEnum   flagName = "proto_enum"
+	flagExt         flagName = "ext"
 	flagWithContext flagName = "with-context"
 	flagOut         flagName = "out"
 	flagOutFile     flagName = "outfile"

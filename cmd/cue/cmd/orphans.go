@@ -17,7 +17,6 @@ package cmd
 import (
 	"fmt"
 	"path/filepath"
-	"regexp"
 	"strconv"
 
 	"cuelang.org/go/cue"
@@ -89,13 +88,8 @@ func (b *buildPlan) placeOrphans(i *build.Instance, a []*decoderInfo) error {
 
 	var files []*ast.File
 
-	re, err := regexp.Compile(b.cfg.fileFilter)
-	if err != nil {
-		return err
-	}
-
 	for _, di := range a {
-		if !i.User && !re.MatchString(filepath.Base(di.file.Filename)) {
+		if !i.User && !b.matchFile(filepath.Base(di.file.Filename)) {
 			continue
 		}
 

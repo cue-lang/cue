@@ -82,15 +82,7 @@ func (v *Vertex) IsInOneOf(t SpanType) bool {
 // IsRecursivelyClosed returns true if this value is either a definition or unified
 // with a definition.
 func (v *Vertex) IsRecursivelyClosed() bool {
-	if v.IsInOneOf(DefinitionSpan) {
-		return true
-	}
-	for p := v; p != nil; p = p.Parent {
-		if p.Label.IsDef() {
-			return true
-		}
-	}
-	return false
+	return v.Closed || v.IsInOneOf(DefinitionSpan)
 }
 
 type closeNodeType uint8

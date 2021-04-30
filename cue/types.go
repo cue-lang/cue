@@ -1777,17 +1777,8 @@ func (v hiddenValue) Subsumes(w Value) bool {
 	return p.Check(ctx, v.v, w.v)
 }
 
-func isDef(v *adt.Vertex) bool {
-	for ; v != nil; v = v.Parent {
-		if v.Label.IsDef() {
-			return true
-		}
-	}
-	return false
-}
-
 func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
-	if !parent.IsClosedList() && !parent.IsClosedStruct() && !isDef(parent) {
+	if !parent.IsClosedList() && !parent.IsClosedStruct() {
 		return nil
 	}
 

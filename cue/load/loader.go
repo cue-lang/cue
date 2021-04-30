@@ -97,6 +97,7 @@ func Instances(args []string, c *Config) []*build.Instance {
 		for _, p := range a {
 			p.ReportError(err)
 		}
+		return a
 	}
 
 	if l.replacements == nil {
@@ -135,7 +136,7 @@ const (
 type loader struct {
 	cfg          *Config
 	stk          importStack
-	tags         []tag // tags found in files
+	tags         []*tag // tags found in files
 	buildTags    map[string]bool
 	replacements map[ast.Node]ast.Node
 }

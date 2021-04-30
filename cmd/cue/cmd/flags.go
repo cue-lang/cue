@@ -21,17 +21,18 @@ import (
 
 // Common flags
 const (
-	flagAll       flagName = "all"
-	flagDryrun    flagName = "dryrun"
-	flagVerbose   flagName = "verbose"
-	flagAllErrors flagName = "all-errors"
-	flagTrace     flagName = "trace"
-	flagForce     flagName = "force"
-	flagIgnore    flagName = "ignore"
-	flagStrict    flagName = "strict"
-	flagSimplify  flagName = "simplify"
-	flagPackage   flagName = "package"
-	flagInject    flagName = "inject"
+	flagAll        flagName = "all"
+	flagDryrun     flagName = "dryrun"
+	flagVerbose    flagName = "verbose"
+	flagAllErrors  flagName = "all-errors"
+	flagTrace      flagName = "trace"
+	flagForce      flagName = "force"
+	flagIgnore     flagName = "ignore"
+	flagStrict     flagName = "strict"
+	flagSimplify   flagName = "simplify"
+	flagPackage    flagName = "package"
+	flagInject     flagName = "inject"
+	flagInjectVars flagName = "inject-vars"
 
 	flagExpression  flagName = "expression"
 	flagSchema      flagName = "schema"
@@ -90,6 +91,8 @@ func addOrphanFlags(f *pflag.FlagSet) {
 func addInjectionFlags(f *pflag.FlagSet, auto bool) {
 	f.StringArrayP(string(flagInject), "t", nil,
 		"set the value of a tagged field")
+	f.BoolP(string(flagInjectVars), "T", auto,
+		"inject system variables in tags")
 }
 
 type flagName string

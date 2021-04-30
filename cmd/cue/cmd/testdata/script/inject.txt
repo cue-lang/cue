@@ -1,6 +1,20 @@
 cue eval test.cue -t env=prod
-
 cmp stdout expect-stdout
+
+cue eval vars.cue -T
+cmp stdout expect-stdout-vars
+
+cue eval vars.cue -T -t dir=xxx
+cmp stdout expect-stdout-override
+
+cue eval vars.cue
+cmp stdout expect-stdout-novars
+
+! cue eval -T err.cue
+cmp stderr expect-stderr-err
+
+cue cmd user vars.cue vars_tool.cue
+cmp stdout expect-stdout-tool
 
 # TODO: report errors for invalid tags?
 
@@ -11,3 +25,39 @@ cmp stdout expect-stdout
 
 -- expect-stdout --
 environment: "prod"
+-- vars.cue --
+import "path"
+
+_os: string @tag(os,var=os)
+_dir: string @tag(dir,var=cwd)
+
+base: path.Base(_dir, _os)
+
+-- err.cue --
+dir: string @tag(dir,var=userz)
+
+-- vars_tool.cue --
+import (
+    "path"
+    "tool/cli"
+)
+
+wd: string @tag(wd,var=cwd)
+_os: string @tag(os,var=os)
+
+command: user: {
+    base: cli.Print & { text: path.Base(wd, _os) }
+}
+
+-- expect-stdout-vars --
+base: "script-inject"
+-- expect-stderr-err --
+tag variable 'userz' not found
+-- expect-stdout-override --
+base: "xxx"
+-- expect-stdout-novars --
+import "path"
+
+base: path.Base(_dir, _os)
+-- expect-stdout-tool --
+script-inject

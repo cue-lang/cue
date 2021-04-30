@@ -416,6 +416,9 @@ func (p *buildPlan) matchFile(file string) bool {
 func setTags(f *pflag.FlagSet, cfg *load.Config) error {
 	tags, _ := f.GetStringArray(string(flagInject))
 	cfg.Tags = tags
+	if b, _ := f.GetBool(string(flagInjectVars)); b {
+		cfg.TagVars = load.DefaultTagVars()
+	}
 	return nil
 }
 

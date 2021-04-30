@@ -218,6 +218,12 @@ type Config struct {
 	// ensures the user may only specify "prod" or "staging".
 	Tags []string
 
+	// TagVars defines a set of key value pair the values of which may be
+	// referenced by tags.
+	//
+	// Use DefaultTagVars to get a pre-loaded map with supported values.
+	TagVars map[string]TagVar
+
 	// Include all files, regardless of tags.
 	AllCUEFiles bool
 

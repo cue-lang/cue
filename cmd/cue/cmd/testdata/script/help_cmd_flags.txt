@@ -138,6 +138,7 @@ Usage:
 Flags:
   -h, --help                 help for cmd
   -t, --inject stringArray   set the value of a tagged field
+  -T, --inject-vars          inject system variables in tags (default true)
 
 Global Flags:
   -E, --all-errors   print all available errors

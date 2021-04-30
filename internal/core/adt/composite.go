@@ -729,6 +729,8 @@ func (v *Vertex) AddStruct(s *StructLit, env *Environment, ci CloseInfo) *Struct
 
 // Path computes the sequence of Features leading from the root to of the
 // instance to this Vertex.
+//
+// NOTE: this is for debugging purposes only.
 func (v *Vertex) Path() []Feature {
 	return appendPath(nil, v)
 }

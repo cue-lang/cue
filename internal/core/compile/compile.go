@@ -26,12 +26,18 @@ import (
 	"cuelang.org/go/internal/core/adt"
 )
 
+// A Scope represents a nested scope of Vertices.
+type Scope interface {
+	Parent() Scope
+	Vertex() *adt.Vertex
+}
+
 // Config configures a compilation.
 type Config struct {
 	// Scope specifies a node in which to look up unresolved references. This
 	// is useful for evaluating expressions within an already evaluated
 	// configuration.
-	Scope *adt.Vertex
+	Scope Scope
 
 	// Imports allows unresolved identifiers to resolve to imports.
 	//
@@ -267,8 +273,8 @@ func (c *compiler) compileFiles(a []*ast.File) *adt.Vertex { // Or value?
 	env := &adt.Environment{}
 	top := env
 
-	for p := c.Config.Scope; p != nil; p = p.Parent {
-		top.Vertex = p
+	for p := c.Config.Scope; p != nil; p = p.Parent() {
+		top.Vertex = p.Vertex()
 		top.Up = &adt.Environment{}
 		top = top.Up
 	}
@@ -290,8 +296,8 @@ func (c *compiler) compileExpr(x ast.Expr) adt.Conjunct {
 	env := &adt.Environment{}
 	top := env
 
-	for p := c.Config.Scope; p != nil; p = p.Parent {
-		top.Vertex = p
+	for p := c.Config.Scope; p != nil; p = p.Parent() {
+		top.Vertex = p.Vertex()
 		top.Up = &adt.Environment{}
 		top = top.Up
 	}
@@ -331,8 +337,8 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 			}
 		}
 		upCount += c.upCountOffset
-		for p := c.Scope; p != nil; p = p.Parent {
-			for _, a := range p.Arcs {
+		for p := c.Scope; p != nil; p = p.Parent() {
+			for _, a := range p.Vertex().Arcs {
 				if a.Label == label {
 					return &adt.FieldReference{
 						Src:     n,

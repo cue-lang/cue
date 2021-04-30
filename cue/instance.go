@@ -263,7 +263,7 @@ func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
 
 	rErr := r.ResolveFiles(p)
 
-	cfg := &compile.Config{Scope: inst.root}
+	cfg := &compile.Config{Scope: valueScope(Value{idx: r, v: inst.root})}
 	v, err := compile.Files(cfg, r, p.ID(), p.Files...)
 
 	v.AddConjunct(adt.MakeRootConjunct(nil, inst.root))

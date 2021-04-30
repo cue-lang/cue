@@ -33,6 +33,7 @@ import (
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/export"
@@ -240,7 +241,8 @@ func (i *Iterator) Next() bool {
 	}
 	f := i.arcs[i.p]
 	f.arc.Finalize(i.ctx)
-	i.cur = makeValue(i.val.idx, f.arc)
+	p := linkParent(i.val.parent_, i.val.v, f.arc)
+	i.cur = makeValue(i.val.idx, f.arc, p)
 	i.f = f.arc.Label
 	i.isOpt = f.isOptional
 	i.p++
@@ -575,6 +577,39 @@ func (v Value) appendPath(a []string) []string {
 type Value struct {
 	idx *runtime.Runtime
 	v   *adt.Vertex
+	// Parent keeps track of the parent if the value corresponding to v.Parent
+	// differs, recursively.
+	parent_ *parent
+}
+
+// parent is a distinct type from Value to ensure more type safety: Value
+// is typically used by value, so taking a pointer to it has a high risk
+// or globbering the contents.
+type parent struct {
+	v *adt.Vertex
+	p *parent
+}
+
+func (v Value) parent() Value {
+	switch {
+	case v.v == nil:
+		return Value{}
+	case v.parent_ != nil:
+		return Value{v.idx, v.parent_.v, v.parent_.p}
+	default:
+		return Value{v.idx, v.v.Parent, nil}
+	}
+}
+
+type valueScope Value
+
+func (v valueScope) Vertex() *adt.Vertex { return v.v }
+func (v valueScope) Parent() compile.Scope {
+	p := Value(v).parent()
+	if p.v == nil {
+		return nil
+	}
+	return valueScope(p)
 }
 
 type hiddenValue = Value
@@ -593,7 +628,7 @@ func newErrValue(v Value, b *adt.Bottom) Value {
 	}
 	node.UpdateStatus(adt.Finalized)
 	node.AddConjunct(adt.MakeRootConjunct(nil, b))
-	return makeValue(v.idx, node)
+	return makeChildValue(v.parent(), node)
 }
 
 func newVertexRoot(idx *runtime.Runtime, ctx *adt.OpContext, x *adt.Vertex) Value {
@@ -604,7 +639,7 @@ func newVertexRoot(idx *runtime.Runtime, ctx *adt.OpContext, x *adt.Vertex) Valu
 	} else {
 		x.UpdateStatus(adt.Finalized)
 	}
-	return makeValue(idx, x)
+	return makeValue(idx, x, nil)
 }
 
 func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
@@ -618,7 +653,7 @@ func newValueRoot(idx *runtime.Runtime, ctx *adt.OpContext, x adt.Expr) Value {
 
 func newChildValue(o *structValue, i int) Value {
 	arc, _ := o.at(i)
-	return makeValue(o.v.idx, arc)
+	return makeValue(o.v.idx, arc, linkParent(o.v.parent_, o.v.v, arc))
 }
 
 // Dereference reports the value v refers to if v is a reference or v itself
@@ -641,43 +676,60 @@ func Dereference(v Value) Value {
 		return newErrValue(v, b)
 	}
 	n.Finalize(ctx)
-	return makeValue(v.idx, n)
+	// NOTE: due to structure sharing, the path of the referred node may end
+	// up different from the one explicitly pointed to. The value will be the
+	// same, but the scope may differ.
+	// TODO(structureshare): see if we can construct the original path. This
+	// only has to be done if structures are being shared.
+	return makeValue(v.idx, n, nil)
 }
 
-func makeValue(idx *runtime.Runtime, v *adt.Vertex) Value {
+func makeValue(idx *runtime.Runtime, v *adt.Vertex, p *parent) Value {
 	if v.Status() == 0 || v.BaseValue == nil {
 		panic(fmt.Sprintf("not properly initialized (state: %v, value: %T)",
 			v.Status(), v.BaseValue))
 	}
-	return Value{idx, v}
+	return Value{idx, v, p}
+}
+
+// makeChildValue makes a new value, of which p is the parent, and links the
+// parent pointer to p if necessary.
+func makeChildValue(p Value, arc *adt.Vertex) Value {
+	return makeValue(p.idx, arc, linkParent(p.parent_, p.v, arc))
+}
+
+// linkParent creates the parent struct for an arc, if necessary.
+//
+// The parent struct is necessary if the parent struct also has a parent struct,
+// or if arc is (structurally) shared and does not have node as a parent.
+func linkParent(p *parent, node, arc *adt.Vertex) *parent {
+	if p == nil && node == arc.Parent {
+		return nil
+	}
+	return &parent{node, p}
 }
 
 func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
 	// TODO: right now this is necessary because disjunctions do not have
 	// populated conjuncts.
 	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
-		return Value{base.idx, v}
+		return Value{base.idx, v, nil}
 	}
 	n := &adt.Vertex{Label: base.v.Label}
 	n.AddConjunct(adt.MakeRootConjunct(env, v))
 	n = manifest(base.ctx(), n)
 	n.Parent = base.v.Parent
-	return makeValue(base.idx, n)
+	return makeChildValue(base.parent(), n)
 }
 
 func remakeFinal(base Value, env *adt.Environment, v adt.Value) Value {
 	n := &adt.Vertex{Parent: base.v.Parent, Label: base.v.Label, BaseValue: v}
 	n.UpdateStatus(adt.Finalized)
-	return makeValue(base.idx, n)
+	return makeChildValue(base.parent(), n)
 }
 
 func (v Value) ctx() *adt.OpContext {
 	return newContext(v.idx)
-}
-
-func (v Value) makeChild(ctx *adt.OpContext, i uint32, a *adt.Vertex) Value {
-	a.Parent = v.v
-	return makeValue(v.idx, a)
 }
 
 // Eval resolves the references of a value and returns the result.
@@ -690,7 +742,7 @@ func (v Value) Eval() Value {
 	// x = eval.FinalizeValue(v.idx.Runtime, v.v)
 	// x.Finalize(v.ctx())
 	x = x.ToDataSingle()
-	return makeValue(v.idx, x)
+	return makeValue(v.idx, x, v.parent_)
 	// return remakeValue(v, nil, ctx.value(x))
 }
 
@@ -705,7 +757,7 @@ func (v Value) Default() (Value, bool) {
 	if d == v.v {
 		return v, false
 	}
-	return makeValue(v.idx, d), true
+	return makeValue(v.idx, d, v.parent_), true
 
 	// d, ok := v.v.Value.(*adt.Disjunction)
 	// if !ok {
@@ -1402,7 +1454,7 @@ func (s *hiddenStruct) Field(i int) FieldInfo {
 	a, opt := s.at(i)
 	ctx := s.v.ctx()
 
-	v := makeValue(s.v.idx, a)
+	v := makeChildValue(s.v, a)
 	name := s.v.idx.LabelStr(a.Label)
 	str := a.Label.SelectorString(ctx)
 	return FieldInfo{str, name, i, v, a.Label.IsDef(), opt, a.Label.IsHidden()}
@@ -1478,27 +1530,39 @@ func (v Value) Path() Path {
 	if v.v == nil {
 		return Path{}
 	}
-	p := v.v.Path()
-	a := make([]Selector, len(p))
-	for i, f := range p {
-		switch f.Typ() {
-		case adt.IntLabel:
-			a[i] = Selector{indexSelector(f)}
+	return Path{path: appendPath(nil, v)}
+}
 
-		case adt.DefinitionLabel:
-			a[i] = Selector{definitionSelector(f.SelectorString(v.idx))}
-
-		case adt.HiddenDefinitionLabel, adt.HiddenLabel:
-			a[i] = Selector{scopedSelector{
-				name: f.IdentString(v.idx),
-				pkg:  f.PkgID(v.idx),
-			}}
-
-		case adt.StringLabel:
-			a[i] = Selector{stringSelector(f.StringValue(v.idx))}
-		}
+// Path computes the sequence of Features leading from the root to of the
+// instance to this Vertex.
+func appendPath(a []Selector, v Value) []Selector {
+	if p := v.parent(); p.v != nil {
+		a = appendPath(a, p)
 	}
-	return Path{path: a}
+
+	if v.v.Label == 0 {
+		// A Label may be 0 for programmatically inserted nodes.
+		return a
+	}
+
+	var sel selector
+	switch f := v.v.Label; f.Typ() {
+	case adt.IntLabel:
+		sel = indexSelector(f)
+
+	case adt.DefinitionLabel:
+		sel = definitionSelector(f.SelectorString(v.idx))
+
+	case adt.HiddenDefinitionLabel, adt.HiddenLabel:
+		sel = scopedSelector{
+			name: f.IdentString(v.idx),
+			pkg:  f.PkgID(v.idx),
+		}
+
+	case adt.StringLabel:
+		sel = stringSelector(f.StringValue(v.idx))
+	}
+	return append(a, Selector{sel})
 }
 
 // LookupDef is equal to LookupPath(MakePath(Def(name))).
@@ -1662,7 +1726,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 	n := &adt.Vertex{}
 	n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 	n.Finalize(ctx)
-	w := makeValue(v.idx, n)
+	w := makeValue(v.idx, n, v.parent_)
 	return v.Unify(w)
 }
 
@@ -1794,7 +1858,7 @@ func (v Value) Unify(w Value) Value {
 	n.Closed = v.v.Closed || w.v.Closed
 
 	if err := n.Err(ctx, adt.Finalized); err != nil {
-		return makeValue(v.idx, n)
+		return makeValue(v.idx, n, v.parent_)
 	}
 	if err := allowed(ctx, v.v, n); err != nil {
 		return newErrValue(w, err)
@@ -1803,7 +1867,7 @@ func (v Value) Unify(w Value) Value {
 		return newErrValue(v, err)
 	}
 
-	return makeValue(v.idx, n)
+	return makeValue(v.idx, n, v.parent_)
 }
 
 // UnifyAccept is as v.Unify(w), but will disregard any field that is allowed
@@ -1830,13 +1894,13 @@ func (v Value) UnifyAccept(w Value, accept Value) Value {
 	n.Label = v.v.Label
 
 	if err := n.Err(ctx, adt.Finalized); err != nil {
-		return makeValue(v.idx, n)
+		return makeValue(v.idx, n, v.parent_)
 	}
 	if err := allowed(ctx, accept.v, n); err != nil {
 		return newErrValue(accept, err)
 	}
 
-	return makeValue(v.idx, n)
+	return makeValue(v.idx, n, v.parent_)
 }
 
 // Equals reports whether two values are equal, ignoring optional fields.
@@ -1895,7 +1959,12 @@ func (v Value) ReferencePath() (root Value, p Path) {
 	if x == nil {
 		return Value{}, Path{}
 	}
-	return makeValue(v.idx, x), Path{path: path}
+	// NOTE: due to structure sharing, the path of the referred node may end
+	// up different from the one explicitly pointed to. The value will be the
+	// same, but the scope may differ.
+	// TODO(structureshare): see if we can construct the original path. This
+	// only has to be done if structures are being shared.
+	return makeValue(v.idx, x, nil), Path{path: path}
 }
 
 func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *adt.Vertex, path []Selector) {
@@ -2169,7 +2238,7 @@ func (v Value) Expr() (Op, []Value) {
 		switch len(v.v.Conjuncts) {
 		case 0:
 			if v.v.BaseValue == nil {
-				return NoOp, []Value{makeValue(v.idx, v.v)}
+				return NoOp, []Value{makeValue(v.idx, v.v, v.parent_)} // TODO: v?
 			}
 			expr = v.v.Value()
 
@@ -2179,7 +2248,7 @@ func (v Value) Expr() (Op, []Value) {
 			env = c.Env
 			expr = c.Expr()
 			if w, ok := expr.(*adt.Vertex); ok {
-				return Value{v.idx, w}.Expr()
+				return Value{v.idx, w, v.parent_}.Expr()
 			}
 
 		default:
@@ -2194,7 +2263,7 @@ func (v Value) Expr() (Op, []Value) {
 				}
 				n.AddConjunct(c)
 				n.Finalize(ctx)
-				a = append(a, makeValue(v.idx, n))
+				a = append(a, makeValue(v.idx, n, v.parent_))
 			}
 			return adt.AndOp, a
 		}
@@ -2357,7 +2426,7 @@ func (v Value) Expr() (Op, []Value) {
 				n.AddConjunct(c)
 				n.Finalize(ctx)
 				n.Parent = v.v.Parent
-				a = append(a, makeValue(v.idx, n))
+				a = append(a, makeValue(v.idx, n, v.parent_))
 
 			default:
 				fields = append(fields, d)
@@ -2378,7 +2447,7 @@ func (v Value) Expr() (Op, []Value) {
 			n.AddConjunct(c)
 			n.Finalize(ctx)
 			n.Parent = v.v.Parent
-			a = append(a, makeValue(v.idx, n))
+			a = append(a, makeValue(v.idx, n, v.parent_))
 		}
 
 		op = adt.AndOp

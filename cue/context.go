@@ -72,7 +72,7 @@ func Scope(scope Value) BuildOption {
 		if o.Scope != nil {
 			panic("more than one scope is given")
 		}
-		o.Scope = scope.v
+		o.Scope = valueScope(scope)
 	}
 }
 
@@ -181,8 +181,8 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 func errFn(pos token.Pos, msg string, args ...interface{}) {}
 
 // resolveExpr binds unresolved expressions to values in the expression or v.
-func resolveExpr(ctx *adt.OpContext, v *adt.Vertex, x ast.Expr) adt.Value {
-	cfg := &compile.Config{Scope: v}
+func resolveExpr(ctx *adt.OpContext, v Value, x ast.Expr) adt.Value {
+	cfg := &compile.Config{Scope: valueScope(v)}
 
 	astutil.ResolveExpr(x, errFn)
 

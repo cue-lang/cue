@@ -257,10 +257,6 @@ func New(args []string) (cmd *Command, err error) {
 		return nil, err
 	}
 
-	tags, err := cmd.cmd.Flags().GetStringArray(string(flagInject))
-	if err != nil {
-		return nil, err
-	}
 	args = cmd.cmd.Flags().Args()
 	rootCmd.SetArgs(args)
 
@@ -272,7 +268,7 @@ func New(args []string) (cmd *Command, err error) {
 		return cmd, nil // Forces unknown command message from Cobra.
 	}
 
-	tools, err := buildTools(cmd, tags, args[1:])
+	tools, err := buildTools(cmd, args[1:])
 	if err != nil {
 		return cmd, err
 	}
@@ -295,7 +291,6 @@ type subSpec struct {
 }
 
 func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string, isHelp bool) error {
-	var tags []string
 	if len(args) > 0 {
 		if _, ok := sub[args[0]]; ok {
 			oldargs := []string{args[0]}
@@ -313,10 +308,6 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string, isHelp
 				if err != nil {
 					return err
 				}
-				tags, err = cmd.cmd.Flags().GetStringArray(string(flagInject))
-				if err != nil {
-					return err
-				}
 				args = cmd.cmd.Flags().Args()
 				cmd.root.SetArgs(append(oldargs, args...))
 			}
@@ -330,7 +321,7 @@ func addSubcommands(cmd *Command, sub map[string]*subSpec, args []string, isHelp
 		args = args[1:]
 	}
 
-	tools, err := buildTools(cmd, tags, args)
+	tools, err := buildTools(cmd, args)
 	if err != nil {
 		return err
 	}

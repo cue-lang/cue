@@ -22,6 +22,7 @@ import (
 	"regexp"
 	"strings"
 
+	"github.com/spf13/pflag"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
 
@@ -392,13 +393,21 @@ func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err e
 	}
 	cfg.reFile = re
 
-	cfg.loadCfg.Tags = flagInject.StringArray(cmd)
+	if err := setTags(cmd.Flags(), cfg.loadCfg); err != nil {
+		return nil, err
+	}
 
 	return p, nil
 }
 
 func (p *buildPlan) matchFile(file string) bool {
 	return p.cfg.reFile.MatchString(file)
+}
+
+func setTags(f *pflag.FlagSet, cfg *load.Config) error {
+	tags, _ := f.GetStringArray(string(flagInject))
+	cfg.Tags = tags
+	return nil
 }
 
 type decoderInfo struct {
@@ -728,12 +737,16 @@ func buildToolInstances(cmd *Command, binst []*build.Instance) ([]*cue.Instance,
 	return instances, nil
 }
 
-func buildTools(cmd *Command, tags, args []string) (*cue.Instance, error) {
+func buildTools(cmd *Command, args []string) (*cue.Instance, error) {
 
 	cfg := &load.Config{
-		Tags:  tags,
 		Tools: true,
 	}
+	f := cmd.cmd.Flags()
+	if err := setTags(f, cfg); err != nil {
+		return nil, err
+	}
+
 	binst := loadFromArgs(cmd, args, cfg)
 	if len(binst) == 0 {
 		return nil, nil

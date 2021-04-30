@@ -37,14 +37,12 @@ The --expression flag is used to only print parts of a configuration.
 
 	addOutFlags(cmd.Flags(), true)
 	addOrphanFlags(cmd.Flags())
+	addInjectionFlags(cmd.Flags(), false)
 
 	cmd.Flags().StringArrayP(string(flagExpression), "e", nil, "evaluate this expression only")
 
 	cmd.Flags().BoolP(string(flagAttributes), "A", false,
 		"display field attributes")
-
-	cmd.Flags().StringArrayP(string(flagInject), "t", nil,
-		"set the value of a tagged field")
 
 	// TODO: Option to include comments in output.
 	return cmd

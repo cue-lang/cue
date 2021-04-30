@@ -149,8 +149,8 @@ Ensure commands are defined in a "_tool.cue" file.
 	}
 
 	cmd.Flags().SetInterspersed(false)
-	cmd.Flags().StringArrayP(string(flagInject), "t", nil,
-		"set the value of a tagged field")
+
+	addInjectionFlags(cmd.Flags(), true)
 
 	return cmd
 }

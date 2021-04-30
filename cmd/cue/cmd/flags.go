@@ -87,6 +87,11 @@ func addOrphanFlags(f *pflag.FlagSet) {
 	f.Bool(string(flagMerge), true, "merge non-CUE files")
 }
 
+func addInjectionFlags(f *pflag.FlagSet, auto bool) {
+	f.StringArrayP(string(flagInject), "t", nil,
+		"set the value of a tagged field")
+}
+
 type flagName string
 
 func (f flagName) Bool(cmd *Command) bool {

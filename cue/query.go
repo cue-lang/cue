@@ -15,11 +15,7 @@
 package cue
 
 import (
-	"cuelang.org/go/cue/ast"
-	"cuelang.org/go/cue/ast/astutil"
-	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/compile"
 )
 
 // This file contains query-related code.
@@ -36,21 +32,6 @@ func getScopePrefix(v Value, p Path) *adt.Vertex {
 		v = w
 	}
 	return v.v
-}
-
-func errFn(pos token.Pos, msg string, args ...interface{}) {}
-
-// resolveExpr binds unresolved expressions to values in the expression or v.
-func resolveExpr(ctx *adt.OpContext, v *adt.Vertex, x ast.Expr) adt.Value {
-	cfg := &compile.Config{Scope: v}
-
-	astutil.ResolveExpr(x, errFn)
-
-	c, err := compile.Expr(cfg, ctx, pkgID(), x)
-	if err != nil {
-		return &adt.Bottom{Err: err}
-	}
-	return adt.Resolve(ctx, c)
 }
 
 // LookupPath reports the value for path p relative to v.

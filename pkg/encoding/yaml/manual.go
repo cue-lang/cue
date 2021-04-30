@@ -23,7 +23,6 @@ import (
 	"cuelang.org/go/internal"
 	cueyaml "cuelang.org/go/internal/encoding/yaml"
 	"cuelang.org/go/internal/third_party/yaml"
-	"cuelang.org/go/internal/value"
 )
 
 // Marshal returns the YAML encoding of v.
@@ -84,7 +83,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := value.ConvertToRuntime(v.Context())
+	r := v.Context()
 	for {
 		expr, err := d.Decode()
 		if err != nil {
@@ -94,8 +93,8 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 			return false, err
 		}
 
-		inst, err := r.CompileExpr(expr)
-		if err != nil {
+		x := r.BuildExpr(expr)
+		if err := x.Err(); err != nil {
 			return false, err
 		}
 
@@ -108,7 +107,7 @@ func Validate(b []byte, v cue.Value) (bool, error) {
 		// if err := v.Subsume(inst.Value(), cue.Final()); err != nil {
 		// 	return false, err
 		// }
-		x := v.Unify(inst.Value())
+		x = v.Unify(x)
 		if err := x.Err(); err != nil {
 			return false, err
 		}
@@ -128,7 +127,7 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	r := value.ConvertToRuntime(v.Context())
+	r := v.Context()
 	for {
 		expr, err := d.Decode()
 		if err != nil {
@@ -138,12 +137,12 @@ func ValidatePartial(b []byte, v cue.Value) (bool, error) {
 			return false, err
 		}
 
-		inst, err := r.CompileExpr(expr)
-		if err != nil {
+		x := r.BuildExpr(expr)
+		if err := x.Err(); err != nil {
 			return false, err
 		}
 
-		if x := v.Unify(inst.Value()); x.Err() != nil {
+		if x := v.Unify(x); x.Err() != nil {
 			return false, x.Err()
 		}
 	}

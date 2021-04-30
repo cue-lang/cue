@@ -350,8 +350,11 @@ func (i *expressionIter) value() cue.Value {
 	if len(i.expr) == 0 {
 		return i.iter.value()
 	}
-	// TODO: replace with FillPath.
-	return value.EvalExpr(i.iter.value(), i.expr[i.i])
+	v := i.iter.value()
+	return v.Context().BuildExpr(i.expr[i.i],
+		cue.Scope(v),
+		cue.InferBuiltins(true),
+	)
 }
 
 type config struct {

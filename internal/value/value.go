@@ -20,10 +20,8 @@ import (
 	"strings"
 
 	"cuelang.org/go/cue"
-	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
-	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/eval"
 	"cuelang.org/go/internal/core/runtime"
@@ -96,40 +94,4 @@ func FromGoType(r *cue.Context, x interface{}) cue.Value {
 	n := &adt.Vertex{}
 	n.AddConjunct(adt.MakeRootConjunct(nil, expr))
 	return r.Encode(n)
-}
-
-// EvalExpr evaluates an expression within an existing struct value.
-// Identifiers only resolve to values defined within the struct.
-//
-// Expressions may refer to builtin packages if they can be uniquely identified
-func EvalExpr(value cue.Value, expr ast.Expr) cue.Value {
-	r, scope := ToInternal(value)
-	ctx := eval.NewContext(r, nil)
-
-	cfg := &compile.Config{
-		Scope: scope,
-		Imports: func(x *ast.Ident) (pkgPath string) {
-			if !isBuiltin(x.Name) {
-				return ""
-			}
-			return x.Name
-		},
-	}
-
-	c, err := compile.Expr(cfg, ctx, pkgID(), expr)
-	if err != nil {
-		return MakeError(r, err)
-	}
-	v := adt.Resolve(ctx, c)
-
-	return (*cue.Context)(r).Encode(v)
-}
-
-func isBuiltin(s string) bool {
-	return runtime.SharedRuntime.IsBuiltinPackage(s)
-}
-
-// pkgID reports a package path that can never resolve to a valid package.
-func pkgID() string {
-	return "_"
 }

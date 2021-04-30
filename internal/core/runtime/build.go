@@ -114,15 +114,6 @@ func (r *Runtime) CompileFile(cfg *Config, file *ast.File) (*adt.Vertex, *build.
 	return v, p
 }
 
-func (r *Runtime) CompileExpr(cfg *Config, expr ast.Expr) (*adt.Vertex, *build.Instance, error) {
-	f, err := astutil.ToFile(expr)
-	if err != nil {
-		return nil, nil, err
-	}
-	v, p := r.CompileFile(cfg, f)
-	return v, p, p.Err
-}
-
 func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec) (errs errors.Error) {
 	info, err := astutil.ParseImportSpec(spec)
 	if err != nil {

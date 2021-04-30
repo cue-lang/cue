@@ -190,66 +190,6 @@ func (inst *Instance) eval(ctx *adt.OpContext) adt.Value {
 	return v
 }
 
-// pkgID reports a package path that can never resolve to a valid package.
-func pkgID() string {
-	return "_"
-}
-
-// evalExpr evaluates expr within scope.
-func evalExpr(ctx *adt.OpContext, scope *adt.Vertex, expr ast.Expr) adt.Value {
-	cfg := &compile.Config{
-		Scope: scope,
-		Imports: func(x *ast.Ident) (pkgPath string) {
-			if !isBuiltin(x.Name) {
-				return ""
-			}
-			return x.Name
-		},
-	}
-
-	c, err := compile.Expr(cfg, ctx, pkgID(), expr)
-	if err != nil {
-		return &adt.Bottom{Err: err}
-	}
-	return adt.Resolve(ctx, c)
-
-	// scope.Finalize(ctx) // TODO: not appropriate here.
-	// switch s := scope.Value.(type) {
-	// case *bottom:
-	// 	return s
-	// case *adt.StructMarker:
-	// default:
-	// 	return ctx.mkErr(scope, "instance is not a struct, found %s", scope.Kind())
-	// }
-
-	// c := ctx
-
-	// x, err := compile.Expr(&compile.Config{Scope: scope}, c.Runtime, expr)
-	// if err != nil {
-	// 	return c.NewErrf("could not evaluate %s: %v", c.Str(x), err)
-	// }
-
-	// env := &adt.Environment{Vertex: scope}
-
-	// switch v := x.(type) {
-	// case adt.Value:
-	// 	return v
-	// case adt.Resolver:
-	// 	r, err := c.Resolve(env, v)
-	// 	if err != nil {
-	// 		return err
-	// 	}
-	// 	return r
-
-	// case adt.Evaluator:
-	// 	e, _ := c.Evaluate(env, x)
-	// 	return e
-
-	// }
-
-	// return c.NewErrf("could not evaluate %s", c.Str(x))
-}
-
 // ID returns the package identifier that uniquely qualifies module and
 // package name.
 func (inst *Instance) ID() string {
@@ -278,12 +218,12 @@ func (inst *Instance) Value() Value {
 // Eval evaluates an expression within an existing instance.
 //
 // Expressions may refer to builtin packages if they can be uniquely identified.
+//
+// Deprecated: use
+// inst.Value().Context().BuildExpr(expr, Scope(inst.Value), InferBuiltins(true))
 func (inst *hiddenInstance) Eval(expr ast.Expr) Value {
-	ctx := newContext(inst.index)
-	v := inst.root
-	v.Finalize(ctx)
-	result := evalExpr(ctx, v, expr)
-	return newValueRoot(inst.index, ctx, result)
+	v := inst.Value()
+	return v.Context().BuildExpr(expr, Scope(v), InferBuiltins(true))
 }
 
 // DO NOT USE.

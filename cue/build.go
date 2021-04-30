@@ -16,6 +16,7 @@ package cue
 
 import (
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/core/adt"
@@ -78,11 +79,22 @@ func (r *hiddenRuntime) CompileFile(file *ast.File) (*Instance, error) {
 //
 // Deprecated: use BuildExpr. The use of Instance is being phased out.
 func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
-	v, p, err := r.runtime().CompileExpr(nil, expr)
+	f, err := astutil.ToFile(expr)
 	if err != nil {
 		return nil, err
 	}
-	return r.complete(p, v)
+	v := (*Context)(r).BuildExpr(expr)
+	err = v.Err()
+	inst := &Instance{
+		index: r.runtime(),
+		root:  v.v,
+		inst: &build.Instance{
+			Files: []*ast.File{f},
+		},
+		Err:        errors.Promote(err, ""),
+		Incomplete: err != nil,
+	}
+	return inst, err
 }
 
 // Parse parses a CUE source value into a CUE Instance. The source code may be
@@ -148,8 +160,4 @@ func (r *hiddenRuntime) FromExpr(expr ast.Expr) (*Instance, error) {
 	return r.CompileFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
 	})
-}
-
-func isBuiltin(s string) bool {
-	return runtime.SharedRuntime.IsBuiltinPackage(s)
 }

@@ -16,9 +16,12 @@ package cue
 
 import (
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/adt"
+	"cuelang.org/go/internal/core/compile"
 	"cuelang.org/go/internal/core/convert"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/eval"
@@ -76,6 +79,23 @@ func Scope(scope Value) BuildOption {
 // Filename assigns a filename to parsed content.
 func Filename(filename string) BuildOption {
 	return func(o *runtime.Config) { o.Filename = filename }
+}
+
+// InferBuiltins allows unresolved references to bind to builtin packages with a
+// unique package name.
+//
+// This option is intended for evaluating expressions in a context where import
+// statements cannot be used. It is not recommended to use this for evaluating
+// CUE files.
+func InferBuiltins(elide bool) BuildOption {
+	return func(o *runtime.Config) {
+		o.Imports = func(x *ast.Ident) (pkgPath string) {
+			if !o.Runtime.IsBuiltinPackage(x.Name) {
+				return ""
+			}
+			return x.Name
+		}
+	}
 }
 
 func (c *Context) parseOptions(options []BuildOption) (cfg runtime.Config) {
@@ -143,13 +163,38 @@ func (c *Context) compile(v *adt.Vertex, p *build.Instance) Value {
 // The returned Value will represent an error, accessible through Err, if any
 // error occurred.
 func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
+	r := c.runtime()
 	cfg := c.parseOptions(options)
-	v, p, err := c.runtime().CompileExpr(&cfg, x)
+
+	ctx := c.ctx()
+
+	astutil.ResolveExpr(x, errFn)
+	conjunct, err := compile.Expr(&cfg.Config, r, anonymousPkg, x)
 	if err != nil {
-		return c.makeError(p.Err)
+		return c.makeError(err)
 	}
+	v := adt.Resolve(ctx, conjunct)
+
 	return c.make(v)
 }
+
+func errFn(pos token.Pos, msg string, args ...interface{}) {}
+
+// resolveExpr binds unresolved expressions to values in the expression or v.
+func resolveExpr(ctx *adt.OpContext, v *adt.Vertex, x ast.Expr) adt.Value {
+	cfg := &compile.Config{Scope: v}
+
+	astutil.ResolveExpr(x, errFn)
+
+	c, err := compile.Expr(cfg, ctx, anonymousPkg, x)
+	if err != nil {
+		return &adt.Bottom{Err: err}
+	}
+	return adt.Resolve(ctx, c)
+}
+
+// anonymousPkg reports a package path that can never resolve to a valid package.
+const anonymousPkg = "_"
 
 // CompileString parses and build a Value from the given source string.
 //

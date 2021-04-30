@@ -2248,7 +2248,7 @@ func TestPath(t *testing.T) {
 					v = v.Lookup(e)
 				}
 			}
-			got := v.appendPath(nil)
+			got := pathToStrings(v.Path())
 			if !reflect.DeepEqual(got, tc) {
 				t.Errorf("got %v; want %v", got, tc)
 			}
@@ -3124,6 +3124,16 @@ func TestPathCorrection(t *testing.T) {
 			if gotPath != tc.want {
 				t.Errorf("got path %s; want %s", gotPath, tc.want)
 			}
+
+			x, p := v.ReferencePath()
+			if x.Value() != inst.Value() {
+				t.Error("reference not in original instance")
+			}
+			gotPath = p.String()
+			if gotPath != tc.want {
+				t.Errorf("got path %s; want %s", gotPath, tc.want)
+			}
+
 		})
 	}
 }

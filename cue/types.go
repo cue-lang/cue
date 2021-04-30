@@ -21,7 +21,6 @@ import (
 	"io"
 	"math"
 	"math/big"
-	"strconv"
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
@@ -29,7 +28,6 @@ import (
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/ast/astutil"
 	"cuelang.org/go/cue/errors"
-	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/core/adt"
@@ -549,27 +547,6 @@ func (v Value) Float64() (float64, error) {
 	}
 	f, _ := n.X.Float64()
 	return f, nil
-}
-
-func (v Value) appendPath(a []string) []string {
-	for _, f := range v.v.Path() {
-		switch f.Typ() {
-		case adt.IntLabel:
-			a = append(a, strconv.FormatInt(int64(f.Index()), 10))
-
-		case adt.StringLabel:
-			label := v.idx.LabelStr(f)
-			if !f.IsDef() && !f.IsHidden() {
-				if !ast.IsValidIdent(label) {
-					label = literal.String.Quote(label)
-				}
-			}
-			a = append(a, label)
-		default:
-			a = append(a, f.SelectorString(v.idx))
-		}
-	}
-	return a
 }
 
 // Value holds any value, which may be a Boolean, Error, List, Null, Number,

@@ -106,6 +106,14 @@ func MakePath(selectors ...Selector) Path {
 	return Path{path: selectors}
 }
 
+// pathToString is a utility function for creating debugging info.
+func pathToStrings(p Path) (a []string) {
+	for _, sel := range p.Selectors() {
+		a = append(a, sel.String())
+	}
+	return a
+}
+
 // ParsePath parses a CUE expression into a Path. Any error resulting from
 // this conversion can be obtained by calling Err on the result.
 //

@@ -87,7 +87,7 @@ func (e *valueError) Path() (a []string) {
 			return a
 		}
 	}
-	return e.v.appendPath(nil)
+	return pathToStrings(e.v.Path())
 }
 
 var errNotExists = &adt.Bottom{

@@ -18,5 +18,5 @@ jobs:
     - name: Trigger unity build
       run: 'curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT
         --request POST --data-binary "{"event_type": "Check against ${GITHUB_SHA}",
-        "client_payload": {"type": "unity", "payload": {"versions": "\"commit:${GITHUB_SHA})\""}}}"
+        "client_payload": {"type": "unity", "payload": {"versions": "\"commit:${GITHUB_SHA}\""}}}"
         https://api.github.com/repos/cue-sh/unity/dispatches'

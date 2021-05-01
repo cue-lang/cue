@@ -333,7 +333,7 @@ tip_triggers: _#bashWorkflow & {
 			{
 				name: "Trigger unity build"
 				run: """
-					curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA})\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+					curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
 					"""
 			},
 		]
@@ -356,7 +356,7 @@ new_version_triggers: _#bashWorkflow & {
 			{
 				name: "Trigger unity build"
 				run: """
-					curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}}})\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+					curl -s -H "Content-Type: application/json" -u cueckoo:$CUECKOO_GITHUB_PAT --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}\\\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
 					"""
 			},
 		]

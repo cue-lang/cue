@@ -1522,11 +1522,15 @@ func appendPath(a []Selector, v Value) []Selector {
 		return a
 	}
 
+	f := v.v.Label
+	if index := f.Index(); index == adt.MaxIndex {
+		return append(a, Selector{anySelector(f)})
+	}
+
 	var sel selector
-	switch f := v.v.Label; f.Typ() {
+	switch f.Typ() {
 	case adt.IntLabel:
 		sel = indexSelector(f)
-
 	case adt.DefinitionLabel:
 		sel = definitionSelector(f.SelectorString(v.idx))
 

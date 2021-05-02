@@ -28,6 +28,8 @@ func TestPaths(t *testing.T) {
 		a: 3
 		b: [4, 5, 6]
 		c: "#Foo": 7
+		map: [string]: int
+		list: [...int]
 	`)
 	testCases := []struct {
 		path Path
@@ -35,6 +37,11 @@ func TestPaths(t *testing.T) {
 		str  string
 		err  bool
 	}{{
+		path: MakePath(Str("list"), AnyIndex),
+		out:  "int",
+		str:  "list.[_]",
+	}, {
+
 		path: MakePath(Def("#Foo"), Str("a"), Str("b")),
 		out:  "1",
 		str:  "#Foo.a.b",
@@ -109,6 +116,14 @@ func TestPaths(t *testing.T) {
 		str:  "_|_",
 		err:  true,
 		out:  `_|_ // invalid literal 3.3`,
+	}, {
+		path: MakePath(Str("map"), AnyString),
+		out:  "int",
+		str:  "map.[_]",
+	}, {
+		path: MakePath(Str("list"), AnyIndex),
+		out:  "int",
+		str:  "list.[_]",
 	}}
 
 	v := inst.Value()

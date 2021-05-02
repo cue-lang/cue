@@ -36,6 +36,7 @@ type buildContext struct {
 	instExt   *cue.Instance
 	refPrefix string
 	path      []string
+	errs      errors.Error
 
 	expandRefs    bool
 	structural    bool
@@ -49,6 +50,14 @@ type buildContext struct {
 
 	// Track external schemas.
 	externalRefs map[string]*externalType
+
+	// Used for cycle detection in case of using ExpandReferences. At the
+	// moment, CUE does not detect cycles when a user forcefully steps into a
+	// pattern constraint.
+	//
+	// TODO: consider an option in the CUE API where optional fields are
+	// recursively evaluated.
+	cycleNodes []*adt.Vertex
 }
 
 type externalType struct {
@@ -168,7 +177,7 @@ func schemas(g *Generator, inst *cue.Instance) (schemas *ast.StructLit, err erro
 		return x < y
 	})
 
-	return (*ast.StructLit)(c.schemas), nil
+	return (*ast.StructLit)(c.schemas), c.errs
 }
 
 func (c *buildContext) build(name string, v cue.Value) *ast.StructLit {
@@ -314,6 +323,9 @@ var fieldOrder = map[string]int{
 }
 
 func (b *builder) value(v cue.Value, f typeFunc) (isRef bool) {
+	b.pushNode(v)
+	defer b.popNode()
+
 	count := 0
 	disallowDefault := false
 	var values cue.Value
@@ -770,7 +782,8 @@ func (b *builder) object(v cue.Value) {
 		b.setSingle("properties", (*ast.StructLit)(properties), false)
 	}
 
-	if t, ok := v.Elem(); ok && (b.core == nil || b.core.items == nil) {
+	if t, ok := v.Elem(); ok &&
+		(b.core == nil || b.core.items == nil) && b.checkCycle(t) {
 		schema := b.schema(nil, "*", t)
 		if len(schema.Elts) > 0 {
 			b.setSingle("additionalProperties", schema, true) // Not allowed in structural.
@@ -871,7 +884,7 @@ func (b *builder) array(v cue.Value) {
 	}
 
 	if !hasMax || int64(len(items)) < maxLength {
-		if typ, ok := v.Elem(); ok {
+		if typ, ok := v.Elem(); ok && b.checkCycle(typ) {
 			var core *builder
 			if b.core != nil {
 				core = b.core.items

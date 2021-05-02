@@ -43,70 +43,71 @@ func TestParseDefinitions(t *testing.T) {
 	testCases := []struct {
 		in, out string
 		config  *openapi.Config
+		err     string
 	}{{
-		"structural.cue",
-		"structural.json",
-		resolveRefs,
+		in:     "structural.cue",
+		out:    "structural.json",
+		config: resolveRefs,
 	}, {
-		"nested.cue",
-		"nested.json",
-		defaultConfig,
+		in:     "nested.cue",
+		out:    "nested.json",
+		config: defaultConfig,
 	}, {
-		"simple.cue",
-		"simple.json",
-		resolveRefs,
+		in:     "simple.cue",
+		out:    "simple.json",
+		config: resolveRefs,
 	}, {
-		"simple.cue",
-		"simple-filter.json",
-		&openapi.Config{Info: info, FieldFilter: "min.*|max.*"},
+		in:     "simple.cue",
+		out:    "simple-filter.json",
+		config: &openapi.Config{Info: info, FieldFilter: "min.*|max.*"},
 	}, {
-		"array.cue",
-		"array.json",
-		defaultConfig,
+		in:     "array.cue",
+		out:    "array.json",
+		config: defaultConfig,
 	}, {
-		"enum.cue",
-		"enum.json",
-		defaultConfig,
+		in:     "enum.cue",
+		out:    "enum.json",
+		config: defaultConfig,
 	}, {
-		"struct.cue",
-		"struct.json",
-		defaultConfig,
+		in:     "struct.cue",
+		out:    "struct.json",
+		config: defaultConfig,
 	}, {
-		"strings.cue",
-		"strings.json",
-		defaultConfig,
+		in:     "strings.cue",
+		out:    "strings.json",
+		config: defaultConfig,
 	}, {
-		"nums.cue",
-		"nums.json",
-		defaultConfig,
+		in:     "nums.cue",
+		out:    "nums.json",
+		config: defaultConfig,
 	}, {
-		"nums.cue",
-		"nums-v3.1.0.json",
-		&openapi.Config{Info: info, Version: "3.1.0"},
+		in:     "nums.cue",
+		out:    "nums-v3.1.0.json",
+		config: &openapi.Config{Info: info, Version: "3.1.0"},
 	}, {
-		"builtins.cue",
-		"builtins.json",
-		defaultConfig,
+		in:     "builtins.cue",
+		out:    "builtins.json",
+		config: defaultConfig,
 	}, {
-		"oneof.cue",
-		"oneof.json",
-		defaultConfig,
+		in:     "oneof.cue",
+		out:    "oneof.json",
+		config: defaultConfig,
 	}, {
-		"oneof.cue",
-		"oneof-resolve.json",
-		resolveRefs,
+		in:     "oneof.cue",
+		out:    "oneof-resolve.json",
+		config: resolveRefs,
 	}, {
-		"openapi.cue",
-		"openapi.json",
-		defaultConfig,
+		in:     "openapi.cue",
+		out:    "openapi.json",
+		config: defaultConfig,
 	}, {
-		"openapi.cue",
-		"openapi-norefs.json",
-		resolveRefs,
+		in:     "openapi.cue",
+		out:    "openapi-norefs.json",
+		config: resolveRefs,
 	}, {
-		"oneof.cue",
-		"oneof-funcs.json",
-		&openapi.Config{
+		in:  "oneof.cue",
+		out: "oneof-funcs.json",
+		config: &openapi.Config{
 			Info: info,
 			ReferenceFunc: func(inst *cue.Instance, path []string) string {
 				return strings.ToUpper(strings.Join(path, "_"))
@@ -116,9 +117,9 @@ func TestParseDefinitions(t *testing.T) {
 			},
 		},
 	}, {
-		"refs.cue",
-		"refs.json",
-		&openapi.Config{
+		in:  "refs.cue",
+		out: "refs.json",
+		config: &openapi.Config{
 			Info: info,
 			ReferenceFunc: func(inst *cue.Instance, path []string) string {
 				switch {
@@ -129,9 +130,19 @@ func TestParseDefinitions(t *testing.T) {
 			},
 		},
 	}, {
-		"issue131.cue",
-		"issue131.json",
-		&openapi.Config{Info: info, SelfContained: true},
+		in:     "issue131.cue",
+		out:    "issue131.json",
+		config: &openapi.Config{Info: info, SelfContained: true},
+	}, {
+		// Issue #915
+		in:     "cycle.cue",
+		out:    "cycle.json",
+		config: &openapi.Config{Info: info},
+	}, {
+		// Issue #915
+		in:     "cycle.cue",
+		config: &openapi.Config{Info: info, ExpandReferences: true},
+		err:    "cycle",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.out, func(t *testing.T) {
@@ -144,16 +155,24 @@ func TestParseDefinitions(t *testing.T) {
 				t.Fatal(errors.Details(inst.Err, nil))
 			}
 
-			all, err := tc.config.All(inst)
-			if err != nil {
-				t.Fatal(err)
-			}
-			walk(all)
-
 			b, err := openapi.Gen(inst, tc.config)
 			if err != nil {
-				t.Fatal(err)
+				if tc.err == "" {
+					t.Fatal("unexpected error:", errors.Details(inst.Err, nil))
+				}
+				return
 			}
+
+			if tc.err != "" {
+				t.Fatal("unexpected success:", tc.err)
+			} else {
+				all, err := tc.config.All(inst)
+				if err != nil {
+					t.Fatal(err)
+				}
+				walk(all)
+			}
+
 			var out = &bytes.Buffer{}
 			_ = json.Indent(out, b, "", "   ")
 
@@ -206,7 +225,7 @@ func TestX(t *testing.T) {
 		ExpandReferences: true,
 	})
 	if err != nil {
-		t.Fatal(err)
+		t.Fatal(errors.Details(err, nil))
 	}
 
 	var out = &bytes.Buffer{}

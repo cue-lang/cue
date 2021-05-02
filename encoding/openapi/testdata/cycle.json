@@ -1,0 +1,19 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Foo": {
+            "description": "Issue #915",
+            "type": "object",
+            "additionalProperties": {
+               "$ref": "#/components/schemas/Foo"
+            }
+         }
+      }
+   }
+}

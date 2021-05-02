@@ -109,6 +109,9 @@ func (b *builder) coreSchema() *ast.StructLit {
 // To this extent, all fields of both conjunctions and disjunctions are
 // collected in a single properties map.
 func (b *builder) buildCore(v cue.Value) {
+	b.pushNode(v)
+	defer b.popNode()
+
 	if !b.ctx.expandRefs {
 		_, r := v.Reference()
 		if len(r) > 0 {
@@ -126,6 +129,9 @@ func (b *builder) buildCore(v cue.Value) {
 		switch b.kind {
 		case cue.StructKind:
 			if typ, ok := v.Elem(); ok {
+				if !b.checkCycle(typ) {
+					return
+				}
 				if b.items == nil {
 					b.items = newCoreBuilder(b.ctx)
 				}
@@ -135,6 +141,9 @@ func (b *builder) buildCore(v cue.Value) {
 
 		case cue.ListKind:
 			if typ, ok := v.Elem(); ok {
+				if !b.checkCycle(typ) {
+					return
+				}
 				if b.items == nil {
 					b.items = newCoreBuilder(b.ctx)
 				}

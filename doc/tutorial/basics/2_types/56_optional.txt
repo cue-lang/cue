@@ -7,7 +7,7 @@ description = ""
 
 -- text.md --
 Struct is the most important composite type in CUE.
-It's members are called fields.
+Its members are called fields.
 
 A struct field may be optional.
 One can use an optional field to indicate what the type should be if it were

@@ -25,7 +25,7 @@ import (
 	"github.com/cockroachdb/apd/v2"
 )
 
-// CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. It's interface may change.
+// CallCtxt is passed to builtin implementations that need to use a cue.Value. This is an internal type. Its interface may change.
 type CallCtxt struct {
 	ctx     *adt.OpContext
 	builtin *Builtin

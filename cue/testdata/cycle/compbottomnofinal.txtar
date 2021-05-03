@@ -66,7 +66,7 @@ medium: {
         }
 
         #X: {
-            // Can never determine whether Y.port exists as it's resolution
+            // Can never determine whether Y.port exists as its resolution
             // depends on #Y becoming finalized, which, in turn, depends on #X
             // becoming finalized.
             if Y.port == _|_ {
@@ -82,7 +82,7 @@ medium: {
         #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
         #X: {
-            // Can never determine whether Y.port exists as it's resolution
+            // Can never determine whether Y.port exists as its resolution
             // depends on #Y becoming finalized, which, in turn, depends on #X
             // becoming finalized.
             if Y.port == _|_ {
@@ -110,7 +110,7 @@ medium: {
         #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
 
         #X: {
-            // Can never determine whether Y.port exists as it's resolution
+            // Can never determine whether Y.port exists as its resolution
             // depends on #Y becoming finalized, which, in turn, depends on #X
             // becoming finalized.
             if Y.port == _|_ {
@@ -130,7 +130,7 @@ medium: {
         }
 
         #X: {
-            // Can never determine whether Y.port exists as it's resolution
+            // Can never determine whether Y.port exists as its resolution
             // depends on #Y becoming finalized, which, in turn, depends on #X
             // becoming finalized.
             if Y.port == _|_ {
@@ -146,7 +146,7 @@ medium: {
 
     p5: {
         #X: {
-            // Can never determine whether Y.port exists as it's resolution
+            // Can never determine whether Y.port exists as its resolution
             // depends on #Y becoming finalized, which, in turn, depends on #X
             // becoming finalized.
             if Y.port == _|_ {
@@ -168,7 +168,7 @@ medium: {
 
     p6: {
         #X: {
-            // Can never determine whether Y.port exists as it's resolution
+            // Can never determine whether Y.port exists as its resolution
             // depends on #Y becoming finalized, which, in turn, depends on #X
             // becoming finalized.
             if Y.port == _|_ {

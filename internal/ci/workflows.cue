@@ -504,4 +504,4 @@ _#copybaraSteps: {
 	]
 }
 
-_#curl: "curl -f -s"
+_#curl: "curl -s"

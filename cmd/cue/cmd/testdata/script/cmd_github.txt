@@ -66,11 +66,11 @@ jobs:
         shell: bash
     steps:
     - name: Rebuild tip.cuelang.org
-      run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
+      run: 'curl -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
         }} --request POST --data-binary "{"event_type": "Re-test post release of ${GITHUB_REF##refs/tags/}"}"
         https://api.github.com/repos/cuelang/cuelang.org/dispatches'
     - name: Trigger unity build
-      run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
+      run: 'curl -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
         }} --request POST --data-binary "{"event_type": "Check against CUE ${GITHUB_REF##refs/tags/}",
         "client_payload": {"type": "unity", "payload": {"versions": "\"${GITHUB_REF##refs/tags/}\"}}}"
         https://api.github.com/repos/cue-sh/unity/dispatches'
@@ -231,7 +231,7 @@ jobs:
       run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
       name: Update Gerrit CL message with starting message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Started
+      run: 'curl -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Started
         the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
         github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
@@ -294,7 +294,7 @@ jobs:
         GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
       name: Post any failures for this matrix entry
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
+      run: 'curl -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
         failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url
         }}/actions/runs/${{ github.run_id }} for more details","labels":{"Code-Review":-1}}''
         -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
@@ -310,7 +310,7 @@ jobs:
     - name: Write the gitcookies file
       run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
     - name: Update Gerrit CL message with success message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
+      run: 'curl -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
         succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id
         }}","labels":{"Code-Review":1}}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
@@ -346,10 +346,10 @@ jobs:
         shell: bash
     steps:
     - name: Rebuild tip.cuelang.org
-      run: curl -f -s -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook
+      run: curl -s -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook
         }}
     - name: Trigger unity build
-      run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
+      run: 'curl -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
         }} --request POST --data-binary "{"event_type": "Check against ${GITHUB_SHA}",
         "client_payload": {"type": "unity", "payload": {"versions": "\"commit:${GITHUB_SHA}\""}}}"
         https://api.github.com/repos/cue-sh/unity/dispatches'
@@ -1559,4 +1559,4 @@ _#copybaraSteps: {
 	_#name: string
 	_#cmd:  string
 }
-_#curl: "curl -f -s"
+_#curl: "curl -s"

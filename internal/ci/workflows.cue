@@ -332,9 +332,9 @@ tip_triggers: _#bashWorkflow & {
 			},
 			{
 				name: "Trigger unity build"
-				run:  """
-					echo \(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
-					"""
+				run:  #"""
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+					"""#
 			},
 		]
 	}
@@ -349,15 +349,15 @@ new_version_triggers: _#bashWorkflow & {
 		steps: [
 			{
 				name: "Rebuild tip.cuelang.org"
-				run:  """
-					\(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cuelang/cuelang.org/dispatches
-					"""
+				run:  #"""
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cuelang/cuelang.org/dispatches
+					"""#
 			},
 			{
 				name: "Trigger unity build"
-				run:  """
-					\(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}\\\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
-					"""
+				run:  #"""
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}\\\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+					"""#
 			},
 		]
 	}
@@ -504,4 +504,4 @@ _#copybaraSteps: {
 	]
 }
 
-_#curl: "curl -s"
+_#curl: "curl -f -s"

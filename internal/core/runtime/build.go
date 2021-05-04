@@ -28,8 +28,9 @@ import (
 )
 
 type Config struct {
-	Runtime  *Runtime
-	Filename string
+	Runtime    *Runtime
+	Filename   string
+	ImportPath string
 
 	compile.Config
 }
@@ -68,6 +69,10 @@ func (x *Runtime) Build(cfg *Config, b *build.Instance) (v *adt.Vertex, errs err
 	var cc *compile.Config
 	if cfg != nil {
 		cc = &cfg.Config
+	}
+	if cfg != nil && cfg.ImportPath != "" {
+		b.ImportPath = cfg.ImportPath
+		b.PkgName = astutil.ImportPathName(b.ImportPath)
 	}
 	v, err = compile.Files(cc, x, b.ID(), b.Files...)
 	errs = errors.Append(errs, err)

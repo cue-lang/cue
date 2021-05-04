@@ -125,11 +125,11 @@ func (inst *Instance) RelPath(f *File) string {
 
 // ID returns the package ID unique for this module.
 func (inst *Instance) ID() string {
-	if inst.PkgName == "" {
-		return "_"
-	}
 	if s := inst.ImportPath; s != "" {
 		return s
+	}
+	if inst.PkgName == "" {
+		return "_"
 	}
 	s := fmt.Sprintf("%s:%s", inst.Module, inst.PkgName)
 	return s

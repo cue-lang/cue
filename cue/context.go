@@ -81,6 +81,16 @@ func Filename(filename string) BuildOption {
 	return func(o *runtime.Config) { o.Filename = filename }
 }
 
+// ImportPath defines the import path to use for building CUE. The import path
+// influences the scope in which identifiers occurring in the input CUE are
+// defined. Passing the empty string is equal to not specifying this option.
+//
+// This option is typically not necessary when building using a build.Instance,
+// but takes precedence otherwise.
+func ImportPath(path string) BuildOption {
+	return func(o *runtime.Config) { o.ImportPath = path }
+}
+
 // InferBuiltins allows unresolved references to bind to builtin packages with a
 // unique package name.
 //
@@ -168,8 +178,16 @@ func (c *Context) BuildExpr(x ast.Expr, options ...BuildOption) Value {
 
 	ctx := c.ctx()
 
+	// TODO: move to runtime?: it probably does not make sense to treat BuildExpr
+	// and the expression resulting from CompileString differently.
 	astutil.ResolveExpr(x, errFn)
-	conjunct, err := compile.Expr(&cfg.Config, r, anonymousPkg, x)
+
+	pkgPath := cfg.ImportPath
+	if pkgPath == "" {
+		pkgPath = anonymousPkg
+	}
+
+	conjunct, err := compile.Expr(&cfg.Config, r, pkgPath, x)
 	if err != nil {
 		return c.makeError(err)
 	}

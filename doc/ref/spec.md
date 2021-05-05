@@ -1895,33 +1895,6 @@ e: c.greeting  // "Hello, you!"
 
 Primary expressions are the operands for unary and binary expressions.
 
-
-```
-
-Slice: indices must be complete
-([0, 1, 2, 3] | [2, 3])[0:2]   => [0, 1] | [2, 3]
-
-([0, 1, 2, 3] | *[2, 3])[0:2]   => [0, 1] | [2, 3]
-([0,1,2,3]|[2,3], [2,3])[0:2]   => ([0,1]|[2,3], [2,3])
-
-Index
-a: (1|2, 1)
-b: ([0,1,2,3]|[2,3], [2,3])[a]   => ([0,1,2,3]|[2,3][a], 3)
-
-Binary operation
-A binary is only evaluated if its operands are complete.
-
-Input          Maximum allowed evaluation
-a: string      string
-b: 2           2
-c: a * b       a * 2
-
-An error in a struct is if the evaluation of any expression results in
-bottom, where an incomplete expression is not considered bottom.
-```
-<!-- TODO(mpvl)
-	Conversion |
--->
 ```
 PrimaryExpr =
 	Operand |
@@ -1962,7 +1935,6 @@ x
 (s + ".txt")
 f(3.1415, true)
 m["foo"]
-s[i : j + 1]
 obj.color
 f.p[i].x
 ```

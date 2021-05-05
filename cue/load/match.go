@@ -18,7 +18,6 @@ import (
 	"io/ioutil"
 	"path/filepath"
 	"strings"
-	"unicode"
 
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
@@ -81,57 +80,4 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 
 	match = true
 	return
-}
-
-// doMatch reports whether the name is one of:
-//
-//	tag (if tag is listed in cfg.Build.BuildTags or cfg.Build.ReleaseTags)
-//	!tag (if tag is not listed in cfg.Build.BuildTags or cfg.Build.ReleaseTags)
-//	a comma-separated list of any of these
-//
-func doMatch(cfg *Config, name string, allTags map[string]bool) bool {
-	if name == "" {
-		if allTags != nil {
-			allTags[name] = true
-		}
-		return false
-	}
-	if i := strings.Index(name, ","); i >= 0 {
-		// comma-separated list
-		ok1 := doMatch(cfg, name[:i], allTags)
-		ok2 := doMatch(cfg, name[i+1:], allTags)
-		return ok1 && ok2
-	}
-	if strings.HasPrefix(name, "!!") { // bad syntax, reject always
-		return false
-	}
-	if strings.HasPrefix(name, "!") { // negation
-		return len(name) > 1 && !doMatch(cfg, name[1:], allTags)
-	}
-
-	if allTags != nil {
-		allTags[name] = true
-	}
-
-	// Tags must be letters, digits, underscores or dots.
-	// Unlike in CUE identifiers, all digits are fine (e.g., "386").
-	for _, c := range name {
-		if !unicode.IsLetter(c) && !unicode.IsDigit(c) && c != '_' && c != '.' {
-			return false
-		}
-	}
-
-	// other tags
-	for _, tag := range cfg.BuildTags {
-		if tag == name {
-			return true
-		}
-	}
-	for _, tag := range cfg.releaseTags {
-		if tag == name {
-			return true
-		}
-	}
-
-	return false
 }

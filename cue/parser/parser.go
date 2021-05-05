@@ -24,7 +24,6 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/scanner"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/internal"
 	"cuelang.org/go/internal/astinternal"
 )
 
@@ -754,15 +753,6 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 
 		// TODO: handle next comma here, after disallowing non-colon separator
 		// and we have eliminated the need comment positions.
-	}
-
-	if len(list) > 1 {
-		for _, d := range list {
-			if internal.IsBulkField(d) {
-				p.assertV0(p.pos, 2, 0, `combining bulk optional fields with other fields`)
-				break
-			}
-		}
 	}
 
 	return

@@ -305,22 +305,22 @@ func injectTags(tags []string, l *loader) errors.Error {
 
 // shouldBuildFile determines whether a File should be included based on its
 // attributes.
-func shouldBuildFile(f *ast.File, fp *fileProcessor) (bool, errors.Error) {
+func shouldBuildFile(f *ast.File, fp *fileProcessor) errors.Error {
 	tags := fp.c.Tags
 
 	a, errs := getBuildAttr(f)
 	if errs != nil {
-		return false, errs
+		return errs
 	}
 	if a == nil {
-		return true, nil
+		return nil
 	}
 
 	_, body := a.Split()
 
 	expr, err := parser.ParseExpr("", body)
 	if err != nil {
-		return false, errors.Promote(err, "")
+		return errors.Promote(err, "")
 	}
 
 	tagMap := map[string]bool{}
@@ -331,9 +331,12 @@ func shouldBuildFile(f *ast.File, fp *fileProcessor) (bool, errors.Error) {
 	c := checker{tags: tagMap, loader: fp.c.loader}
 	include := c.shouldInclude(expr)
 	if c.err != nil {
-		return false, c.err
+		return c.err
 	}
-	return include, nil
+	if !include {
+		return excludeError{errors.Newf(a.Pos(), "@if(%s) did not match", body)}
+	}
+	return nil
 }
 
 func getBuildAttr(f *ast.File) (*ast.Attribute, errors.Error) {

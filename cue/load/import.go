@@ -185,7 +185,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 				file, err := filetypes.ParseFile(f.Name(), filetypes.Input)
 				if err != nil {
 					p.UnknownFiles = append(p.UnknownFiles, &build.File{
-						Filename: f.Name(),
+						Filename:      f.Name(),
+						ExcludeReason: errors.Newf(token.NoPos, "unknown filetype"),
 					})
 					continue // skip unrecognized file types
 				}
@@ -356,21 +357,31 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	// badFile := func(p *build.Instance, err errors.Error) bool {
 	badFile := func(err errors.Error) bool {
 		fp.err = errors.Append(fp.err, err)
+		file.ExcludeReason = fp.err
 		p.InvalidFiles = append(p.InvalidFiles, file)
 		return true
 	}
 
 	match, data, err := matchFile(fp.c, file, true, fp.allFiles, fp.allTags)
-	if err != nil {
+	switch {
+	case match:
+
+	case err == nil:
+		// Not a CUE file.
+		p.OrphanedFiles = append(p.OrphanedFiles, file)
+		return false
+
+	case !errors.Is(err, errExclude):
 		return badFile(err)
-	}
-	if !match {
-		if file.Encoding == build.CUE && file.Interpretation == "" {
+
+	default:
+		file.ExcludeReason = err
+		if file.Interpretation == "" {
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		} else {
 			p.OrphanedFiles = append(p.OrphanedFiles, file)
 		}
-		return false // don't mark as added
+		return false
 	}
 
 	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly, parser.ParseComments)
@@ -379,7 +390,7 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return true
 	}
 
-	_, pkg, _ := internal.PackageInfo(pf)
+	_, pkg, pos := internal.PackageInfo(pf)
 	if pkg == "" {
 		pkg = "_"
 	}
@@ -405,15 +416,17 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 	case pkg != "_":
 
 	default:
+		file.ExcludeReason = excludeError{errors.Newf(pos, "no package name")}
 		p.IgnoredFiles = append(p.IgnoredFiles, file)
 		return false // don't mark as added
 	}
 
 	if !fp.c.AllCUEFiles {
-		if include, err := shouldBuildFile(pf, fp); !include {
-			if err != nil {
+		if err := shouldBuildFile(pf, fp); err != nil {
+			if !errors.Is(err, errExclude) {
 				fp.err = errors.Append(fp.err, err)
 			}
+			file.ExcludeReason = err
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 			return false
 		}
@@ -425,6 +438,8 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 			fp.firstFile = base
 		} else if pkg != p.PkgName {
 			if fp.ignoreOther {
+				file.ExcludeReason = excludeError{errors.Newf(pos,
+					"package is %s, want %s", pkg, p.PkgName)}
 				p.IgnoredFiles = append(p.IgnoredFiles, file)
 				return false
 			}
@@ -478,12 +493,16 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		if fp.c.loader.cfg.Tests {
 			p.BuildFiles = append(p.BuildFiles, file)
 		} else {
+			file.ExcludeReason = excludeError{errors.Newf(pos,
+				"_test.cue files excluded in non-test mode")}
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		}
 	case isTool:
 		if fp.c.loader.cfg.Tools {
 			p.BuildFiles = append(p.BuildFiles, file)
 		} else {
+			file.ExcludeReason = excludeError{errors.Newf(pos,
+				"_tool.cue files excluded in non-cmd mode")}
 			p.IgnoredFiles = append(p.IgnoredFiles, file)
 		}
 	default:

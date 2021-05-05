@@ -96,7 +96,8 @@ display:`,
 		cfg:  dirCfg,
 		args: args("./anon"),
 		want: `
-err:    build constraints exclude all CUE files in ./anon (ignored: anon/anon.cue)
+err:    build constraints exclude all CUE files in ./anon:
+	anon/anon.cue: no package name
 path:   example.org/test/anon
 module: example.org/test
 root:   $CWD/testdata
@@ -154,7 +155,10 @@ imports:
 		cfg:  dirCfg,
 		args: args("example.org/test/hello:nonexist"),
 		want: `
-err:    build constraints exclude all CUE files in example.org/test/hello:nonexist (ignored: anon.cue, test.cue, hello/test.cue)
+err:    build constraints exclude all CUE files in example.org/test/hello:nonexist:
+    anon.cue: no package name
+    test.cue: package is test, want nonexist
+    hello/test.cue: package is test, want nonexist
 path:   example.org/test/hello:nonexist
 module: example.org/test
 root:   $CWD/testdata
@@ -247,7 +251,10 @@ files:
 		},
 		args: args("./toolonly"),
 		want: `
-err:    build constraints exclude all CUE files in ./toolonly (ignored: anon.cue, test.cue, toolonly/foo_tool.cue)
+err:    build constraints exclude all CUE files in ./toolonly:
+    anon.cue: no package name
+    test.cue: package is test, want foo
+    toolonly/foo_tool.cue: _tool.cue files excluded in non-cmd mode
 path:   example.org/test/toolonly:foo
 module: example.org/test
 root:   $CWD/testdata

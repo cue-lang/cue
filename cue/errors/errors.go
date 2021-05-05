@@ -212,6 +212,14 @@ func (e *wrapped) Error() string {
 	}
 }
 
+func (e *wrapped) Is(target error) bool {
+	return Is(e.main, target)
+}
+
+func (e *wrapped) As(target interface{}) bool {
+	return As(e.main, target)
+}
+
 func (e *wrapped) Msg() (format string, args []interface{}) {
 	return e.main.Msg()
 }

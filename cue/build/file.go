@@ -14,6 +14,8 @@
 
 package build
 
+import "cuelang.org/go/cue/errors"
+
 // A File represents a file that is part of the build process.
 type File struct {
 	Filename string `json:"filename"`
@@ -23,7 +25,8 @@ type File struct {
 	Form           Form              `json:"form,omitempty"`
 	Tags           map[string]string `json:"tags,omitempty"` // code=go
 
-	Source interface{} `json:"-"` // TODO: swap out with concrete type.
+	ExcludeReason errors.Error `json:"-"`
+	Source        interface{}  `json:"-"` // TODO: swap out with concrete type.
 }
 
 // A Encoding indicates a file format for representing a program.

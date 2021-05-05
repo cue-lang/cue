@@ -115,19 +115,20 @@ func (e *NoFilesError) Error() string {
 	path := e.Package.DisplayPath
 
 	if len(e.Package.IgnoredFiles) > dummy {
+		b := strings.Builder{}
+		b.WriteString("build constraints exclude all CUE files in ")
+		b.WriteString(path)
+		b.WriteString(":")
 		// CUE files exist, but they were ignored due to build constraints.
-		msg := "build constraints exclude all CUE files in " + path + " (ignored: "
-		var files []string
-		for i, f := range e.Package.IgnoredFiles {
-			if i == 4 {
-				files = append(files[:4], "...")
-				break
+		for _, f := range e.Package.IgnoredFiles {
+			b.WriteString("\n    ")
+			b.WriteString(filepath.ToSlash(e.Package.RelPath(f)))
+			if f.ExcludeReason != nil {
+				b.WriteString(": ")
+				b.WriteString(f.ExcludeReason.Error())
 			}
-			files = append(files, filepath.ToSlash(e.Package.RelPath(f)))
 		}
-		msg += strings.Join(files, ", ")
-		msg += ")"
-		return msg
+		return b.String()
 	}
 	// if len(e.Package.TestCUEFiles) > 0 {
 	// 	// Test CUE files exist, but we're not interested in them.

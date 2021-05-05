@@ -2,7 +2,8 @@
 cmp stderr expect-stderr
 
 -- expect-stderr --
-build constraints exclude all CUE files in . (ignored: .foo.cue)
+build constraints exclude all CUE files in .:
+    .foo.cue: filename starts with a '.'
 -- .foo.cue --
 package foo
 

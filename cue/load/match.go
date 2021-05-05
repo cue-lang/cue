@@ -24,6 +24,15 @@ import (
 	"cuelang.org/go/cue/token"
 )
 
+var errExclude = errors.New("file rejected")
+
+type cueError = errors.Error
+type excludeError struct {
+	cueError
+}
+
+func (e excludeError) Is(err error) bool { return err == errExclude }
+
 // matchFile determines whether the file with the given name in the given directory
 // should be included in the package being constructed.
 // It returns the data read from the file.
@@ -42,7 +51,7 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 	}
 
 	if file.Encoding != build.CUE {
-		return
+		return false, nil, nil // not a CUE file, don't record.
 	}
 
 	if file.Filename == "-" {
@@ -52,32 +61,33 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 			return
 		}
 		file.Source = b
-		data = b
-		match = true // don't check shouldBuild for stdin
-		return
+		return true, b, nil // don't check shouldBuild for stdin
 	}
 
 	name := filepath.Base(file.Filename)
 	if !cfg.filesMode && strings.HasPrefix(name, ".") {
-		return
+		return false, nil, &excludeError{
+			errors.Newf(token.NoPos, "filename starts with a '.'"),
+		}
 	}
 
 	if strings.HasPrefix(name, "_") {
-		return
+		return false, nil, &excludeError{
+			errors.Newf(token.NoPos, "filename starts with a '_"),
+		}
 	}
 
 	f, err := cfg.fileSystem.openFile(file.Filename)
 	if err != nil {
-		return
+		return false, nil, err
 	}
 
 	data, err = readImports(f, false, nil)
 	f.Close()
 	if err != nil {
-		err = errors.Newf(token.NoPos, "read %s: %v", file.Filename, err)
-		return
+		return false, nil,
+			errors.Newf(token.NoPos, "read %s: %v", file.Filename, err)
 	}
 
-	match = true
-	return
+	return true, data, nil
 }

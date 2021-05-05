@@ -94,14 +94,14 @@ type DeprecationError struct {
 }
 
 func (e *DeprecationError) Error() string {
-	return "try running `cue fix` using CUE v0.2.2 on the file or module to upgrade"
+	return "try running `cue fix` (possibly with an earlier version, like v0.2.2) to upgrade"
 }
 
 // Latest specifies the latest version of the parser, effectively setting
 // the strictest implementation.
 const Latest = latest
 
-const latest = 1000
+const latest = -600
 
 // FileOffset specifies the File position info to use.
 func FileOffset(pos int) Option {

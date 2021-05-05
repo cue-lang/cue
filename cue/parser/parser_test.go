@@ -658,6 +658,12 @@ func TestStrict(t *testing.T) {
 			`a b c: 2`},
 		{"reserved identifiers",
 			`__foo: 3`},
+		{"old-style definition",
+			`foo :: 3`},
+		{"old-style alias 1",
+			`X=3`},
+		{"old-style alias 2",
+			`X={}`},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

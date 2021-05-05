@@ -401,7 +401,7 @@ func (p *parser) assertV0(pos token.Pos, minor, patch int, name string) {
 	if p.version != 0 && p.version > v {
 		p.errors = errors.Append(p.errors,
 			errors.Wrapf(&DeprecationError{v}, pos,
-				"%s deprecated as of v0.%d.%d", name, minor, patch+1))
+				"use of deprecated %s (deprecated as of v0.%d.%d)", name, minor, patch+1))
 	}
 }
 
@@ -849,6 +849,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 			expr = p.parseRHS()
 		}
 		if a, ok := expr.(*ast.Alias); ok {
+			p.assertV0(a.Pos(), 1, 3, `old-style alias; use "let X = expr" instead`)
 			p.consumeDeclComma()
 			return a
 		}
@@ -876,8 +877,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 
 	case token.RBRACE, token.EOF:
 		if a, ok := expr.(*ast.Alias); ok {
-			p.assertV0(p.pos, 1, 3, `old-style alias; use "let X = expr"`)
-
+			p.assertV0(a.Pos(), 1, 3, `old-style alias; use "let X = expr" instead`)
 			return a
 		}
 		switch tok {
@@ -897,7 +897,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 	m.TokenPos = p.pos
 	m.Token = p.tok
 	if p.tok == token.ISA {
-		p.assertV0(p.pos, 2, 0, "use of '::'")
+		p.assertV0(p.pos, 2, 0, "'::'")
 	}
 	if p.tok != token.COLON && p.tok != token.ISA {
 		p.errorExpected(pos, "':' or '::'")
@@ -930,7 +930,7 @@ func (p *parser) parseField() (decl ast.Decl) {
 		m.TokenPos = p.pos
 		m.Token = p.tok
 		if p.tok == token.ISA {
-			p.assertV0(p.pos, 2, 0, "use of '::'")
+			p.assertV0(p.pos, 2, 0, "'::'")
 		}
 		if p.tok != token.COLON && p.tok != token.ISA {
 			if p.tok.IsLiteral() {

@@ -1163,7 +1163,7 @@ StructLit       = "{" { Declaration "," } "}" .
 Declaration     = Field | Ellipsis | Embedding | LetClause | attribute .
 Ellipsis        = "..." [ Expression ] .
 Embedding       = Comprehension | AliasExpr .
-Field           = Label ":" { Label ":" } Expression { attribute } .
+Field           = Label ":" { Label ":" } AliasExpr { attribute } .
 Label           = [ identifier "=" ] LabelExpr .
 LabelExpr       = LabelName [ "?" ] | "[" AliasExpr "]" .
 LabelName       = identifier | simple_string_lit  .
@@ -1472,7 +1472,7 @@ within the [scope](#declarations-and-scopes) in which they are declared.
 The name of an alias must be unique within its scope.
 
 ```
-AliasExpr  = Expression | identifier "=" Expression .
+AliasExpr  = [ identifier "=" ] Expression .
 ```
 
 Aliases can appear in several positions:
@@ -1492,6 +1492,10 @@ In front of a Label (`X=label: value`):
 - for optional fields (`foo?: bar` and `[foo]: bar`),
   the bound identifier is only visible within the field value (`bar`).
 
+Before a value (`foo: X=x`)
+
+- binds the identifier to the value it precedes within the scope of that value.
+
 Inside a bracketed label (`[X=expr]: value`):
 
 - binds the identifier to the the concrete label that matches `expr`
@@ -1508,13 +1512,13 @@ Before a list element (`[ X=value, X+1 ]`) (Not yet implemented)
 -->
 
 ```
-// An alias declaration
-Alias = 3
-a: Alias  // 3
-
 // A field alias
 foo: X  // 4
 X="not an identifier": 4
+
+// A value alias
+foo: X={x: X.a}
+bar: foo & {a: 1}  // {a: 1, x: 1}
 
 // A label alias
 [Y=string]: { name: Y }

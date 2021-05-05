@@ -1,4 +1,4 @@
-// Copyright 2020 CUE Authors
+// Copyright 2021 CUE Authors
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -11,6 +11,12 @@
 // WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 // See the License for the specific language governing permissions and
 // limitations under the License.
+
+// Package hmac implements the Keyed-Hash Message Authentication Code (HMAC) as
+// defined in U.S. Federal Information Processing Standards Publication 198.
+//
+// An HMAC is a cryptographic hash that uses a key to sign a message.
+// The receiver verifies the hash by recomputing it using the same key.
 package hmac
 
 import (

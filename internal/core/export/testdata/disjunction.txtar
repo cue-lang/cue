@@ -1,0 +1,53 @@
+-- in.cue --
+// Issue #950
+a: *1 | int
+b: *2 | int
+c: *(a & b) | 3
+-- out/definition --
+	// Issue #950
+a: *1 | int
+b: *2 | int
+c: *(a & b) | 3
+-- out/doc --
+[]
+- Issue #950
+
+[a]
+- Issue #950
+
+[b]
+[c]
+-- out/value --
+== Simplified
+{
+	// Issue #950
+	a: *1 | int
+	b: *2 | int
+	c: 1 | 2 | int | 3
+}
+== Raw
+{
+	// Issue #950
+	a: *1 | int
+	b: *2 | int
+	c: 1 | 2 | int | 3
+}
+== Final
+{
+	a: 1
+	b: 2
+	c: 1 | 2 | int | 3
+}
+== All
+{
+	// Issue #950
+	a: *1 | int
+	b: *2 | int
+	c: 1 | 2 | int | 3
+}
+== Eval
+{
+	a: 1
+	b: 2
+	c: 1 | 2 | int | 3
+}

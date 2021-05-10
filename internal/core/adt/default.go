@@ -29,10 +29,6 @@ func Default(v Value) Value {
 func (d *Disjunction) Default() Value {
 	switch d.NumDefaults {
 	case 0:
-		if d.HasDefaults {
-			// empty disjunction
-			return &Bottom{}
-		}
 		return d
 	case 1:
 		return d.Values[0]

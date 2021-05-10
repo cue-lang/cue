@@ -16,7 +16,7 @@
 //     	url:    string // TODO: make url.URL type
 //
 //     	request: {
-//     		body: *bytes | string
+//     		body?: bytes | string
 //     		header: [string]:  string | [...string]
 //     		trailer: [string]: string | [...string]
 //     	}

@@ -36,7 +36,7 @@ var pkg = &internal.Package{
 		method: string
 		url:    string
 		request: {
-			body: *bytes | string
+			body?: bytes | string
 			header: {
 				[string]: string | [...string]
 			}

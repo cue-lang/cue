@@ -18,6 +18,7 @@ package http
 //go:generate gofmt -s -w .
 
 import (
+	"bytes"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -52,6 +53,8 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 			if err != nil {
 				return nil, err
 			}
+		} else {
+			r = bytes.NewReader([]byte(""))
 		}
 		if header, err = parseHeaders(obj, "header"); err != nil {
 			return nil, err

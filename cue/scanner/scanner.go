@@ -907,6 +907,7 @@ scanAgain:
 				if s.ch == '.' {
 					s.next()
 					tok = token.ELLIPSIS
+					insertEOL = true
 				} else {
 					s.errf(s.file.Offset(pos), "illegal token '..'; expected '.'")
 				}

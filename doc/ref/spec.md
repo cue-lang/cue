@@ -166,6 +166,7 @@ the token stream immediately after a line's final token if that token is
 - an identifier, keyword, or bottom
 - a number or string literal, including an interpolation
 - one of the characters `)`, `]`, `}`, or `?`
+- an ellipsis `...`
 
 
 Although commas are automatically inserted, the parser will require

@@ -24,6 +24,25 @@ import (
 
 func TestParse(t *testing.T) {
 	testCases := []struct{ desc, in, out string }{{
+
+		"ellipsis in structs",
+		`#Def: {
+			b: "2"
+			...
+		}
+		...
+
+		#Def2: {
+			...
+			b: "2"
+		}
+		#Def3: {...
+		_}
+		...
+		`,
+		`#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
+	}, {
+
 		"empty file", "", "",
 	}, {
 		"empty struct", "{}", "{}",
@@ -149,13 +168,17 @@ func TestParse(t *testing.T) {
 			b: "2"
 			...
 		}
+		...
 
 		#Def2: {
 			...
 			b: "2"
 		}
+		#Def3: {...
+		_}
+		...
 		`,
-		`#Def: {b: "2", ...}, #Def2: {..., b: "2"}`,
+		`#Def: {b: "2", ...}, ..., #Def2: {..., b: "2"}, #Def3: {..., _}, ...`,
 	}, {
 		"emitted referencing non-emitted",
 		`a: 1
@@ -664,6 +687,10 @@ func TestStrict(t *testing.T) {
 			`X=3`},
 		{"old-style alias 2",
 			`X={}`},
+
+		// Not yet supported
+		{"additional typed not yet supported",
+			`{...int}`},
 	}
 	for _, tc := range testCases {
 		t.Run(tc.desc, func(t *testing.T) {

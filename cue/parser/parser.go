@@ -746,6 +746,7 @@ func (p *parser) parseFieldList() (list []ast.Decl) {
 			p.next()
 			c.closeNode(p, ellipsis)
 			list = append(list, ellipsis)
+			p.consumeDeclComma()
 
 		default:
 			list = append(list, p.parseField())

@@ -83,9 +83,11 @@ func (c *httpCmd) Run(ctx *task.Context) (res interface{}, err error) {
 	// parse response body and headers
 	return map[string]interface{}{
 		"response": map[string]interface{}{
-			"body":    string(b),
-			"header":  resp.Header,
-			"trailer": resp.Trailer,
+			"status":     resp.Status,
+			"statusCode": resp.StatusCode,
+			"body":       string(b),
+			"header":     resp.Header,
+			"trailer":    resp.Trailer,
 		},
 	}, err
 }

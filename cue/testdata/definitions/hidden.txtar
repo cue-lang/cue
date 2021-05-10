@@ -35,7 +35,7 @@ package pkg
 
 -- out/eval --
 Errors:
-e._name: field c not allowed:
+e._name: field not allowed: c:
     ./in.cue:6:10
     ./in.cue:13:13
     ./in.cue:16:10
@@ -68,7 +68,7 @@ Result:
       // [eval]
       d: (int){ int }
       c: (_|_){
-        // [eval] e._name: field c not allowed:
+        // [eval] e._name: field not allowed: c:
         //     ./in.cue:6:10
         //     ./in.cue:13:13
         //     ./in.cue:16:10

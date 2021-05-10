@@ -3,7 +3,7 @@ cmp stderr expect-stderr
 
 -- expect-stderr --
 translations.hello.lang: incomplete value string
-field skip not allowed:
+field not allowed: skip:
     ./data.yaml:20:1
     ./vet.cue:1:1
     ./vet.cue:1:8

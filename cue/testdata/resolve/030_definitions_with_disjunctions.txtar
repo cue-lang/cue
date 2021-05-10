@@ -62,7 +62,7 @@ baz: #Foo & {
 -- out/eval --
 Errors:
 bar: 1 errors in empty disjunction:
-bar: field c not allowed:
+bar: field not allowed: c:
     ./in.cue:1:7
     ./in.cue:4:2
     ./in.cue:11:6
@@ -84,14 +84,14 @@ Result:
   }
   bar: (_|_){
     // [eval] bar: 1 errors in empty disjunction:
-    // bar: field c not allowed:
+    // bar: field not allowed: c:
     //     ./in.cue:1:7
     //     ./in.cue:4:2
     //     ./in.cue:11:6
     //     ./in.cue:12:7
     field: (int){ int }
     c: (_|_){
-      // [eval] bar: field c not allowed:
+      // [eval] bar: field not allowed: c:
       //     ./in.cue:1:7
       //     ./in.cue:4:2
       //     ./in.cue:5:2

@@ -119,11 +119,11 @@ mixedRec: {
 }
 -- out/eval --
 Errors:
-foo: field feild not allowed:
+foo: field not allowed: feild:
     ./in.cue:1:7
     ./in.cue:12:6
     ./in.cue:13:7
-foo1.recursive: field feild not allowed:
+foo1.recursive: field not allowed: feild:
     ./in.cue:3:13
     ./in.cue:15:7
     ./in.cue:19:3
@@ -148,7 +148,7 @@ Result:
       field: (string){ string }
     }
     feild: (_|_){
-      // [eval] foo: field feild not allowed:
+      // [eval] foo: field not allowed: feild:
       //     ./in.cue:1:7
       //     ./in.cue:12:6
       //     ./in.cue:13:7
@@ -161,7 +161,7 @@ Result:
       // [eval]
       field: (string){ string }
       feild: (_|_){
-        // [eval] foo1.recursive: field feild not allowed:
+        // [eval] foo1.recursive: field not allowed: feild:
         //     ./in.cue:3:13
         //     ./in.cue:15:7
         //     ./in.cue:19:3

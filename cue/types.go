@@ -1792,7 +1792,7 @@ func allowed(ctx *adt.OpContext, parent, n *adt.Vertex) *adt.Bottom {
 			defer ctx.PopArc(ctx.PushArc(parent))
 			label := a.Label.SelectorString(ctx)
 			parent.Accept(ctx, a.Label)
-			return ctx.NewErrf("field %s not allowed", label)
+			return ctx.NewErrf("field not allowed: %s", label)
 		}
 	}
 	return nil

@@ -104,13 +104,13 @@ a: _|_ // field "f3" not allowed in closed struct
 }
 -- out/eval --
 Errors:
-#E: field f3 not allowed:
+#E: field not allowed: f3:
     ./in.cue:1:5
     ./in.cue:27:5
     ./in.cue:27:10
     ./in.cue:28:2
     ./in.cue:29:3
-a: field f3 not allowed:
+a: field not allowed: f3:
     ./in.cue:1:5
     ./in.cue:3:1
     ./in.cue:4:5
@@ -137,7 +137,7 @@ Result:
     f1: (int){ int }
     f2: (int){ int }
     f3: (_|_){
-      // [eval] #E: field f3 not allowed:
+      // [eval] #E: field not allowed: f3:
       //     ./in.cue:1:5
       //     ./in.cue:27:5
       //     ./in.cue:27:10
@@ -150,7 +150,7 @@ Result:
     f1: (int){ int }
     f2: (int){ int }
     f3: (_|_){
-      // [eval] a: field f3 not allowed:
+      // [eval] a: field not allowed: f3:
       //     ./in.cue:1:5
       //     ./in.cue:3:1
       //     ./in.cue:4:5

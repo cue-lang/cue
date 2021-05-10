@@ -20,11 +20,11 @@ x2: _#x & {
 }
 -- out/eval --
 Errors:
-x1: field Age not allowed:
+x1: field not allowed: Age:
     ./in.cue:3:5
     ./in.cue:11:5
     ./in.cue:13:2
-x2: field Age not allowed:
+x2: field not allowed: Age:
     ./in.cue:7:6
     ./in.cue:16:5
     ./in.cue:18:2
@@ -42,7 +42,7 @@ Result:
     // [eval]
     Name: (string){ "hello" }
     Age: (_|_){
-      // [eval] x1: field Age not allowed:
+      // [eval] x1: field not allowed: Age:
       //     ./in.cue:3:5
       //     ./in.cue:11:5
       //     ./in.cue:13:2
@@ -52,7 +52,7 @@ Result:
     // [eval]
     Name: (string){ "hello" }
     Age: (_|_){
-      // [eval] x2: field Age not allowed:
+      // [eval] x2: field not allowed: Age:
       //     ./in.cue:7:6
       //     ./in.cue:16:5
       //     ./in.cue:18:2

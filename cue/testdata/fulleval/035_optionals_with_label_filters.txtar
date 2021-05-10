@@ -102,13 +102,13 @@ jobs3: _|_ // field "fooTest1" not allowed in closed struct
 }
 -- out/eval --
 Errors:
-jobs1: field foo1 not allowed:
+jobs1: field not allowed: foo1:
     ./in.cue:6:8
     ./in.cue:7:2
     ./in.cue:9:2
     ./in.cue:15:17
     ./in.cue:16:8
-jobs3: field fooTest1 not allowed:
+jobs3: field not allowed: fooTest1:
     ./in.cue:6:8
     ./in.cue:7:2
     ./in.cue:9:2
@@ -137,7 +137,7 @@ Result:
   jobs1: (_|_){
     // [eval]
     foo1: (_|_){
-      // [eval] jobs1: field foo1 not allowed:
+      // [eval] jobs1: field not allowed: foo1:
       //     ./in.cue:6:8
       //     ./in.cue:7:2
       //     ./in.cue:9:2
@@ -160,7 +160,7 @@ Result:
   jobs3: (_|_){
     // [eval]
     fooTest1: (_|_){
-      // [eval] jobs3: field fooTest1 not allowed:
+      // [eval] jobs3: field not allowed: fooTest1:
       //     ./in.cue:6:8
       //     ./in.cue:7:2
       //     ./in.cue:9:2

@@ -9,7 +9,7 @@ B: A & {
 }
 -- out/eval --
 Errors:
-B: field c not allowed:
+B: field not allowed: c:
     ./test.cue:1:10
     ./test.cue:6:4
     ./test.cue:7:2
@@ -26,7 +26,7 @@ Result:
     a: (int){ 1 }
     b: (int){ 2 }
     c: (_|_){
-      // [eval] B: field c not allowed:
+      // [eval] B: field not allowed: c:
       //     ./test.cue:1:10
       //     ./test.cue:6:4
       //     ./test.cue:7:2

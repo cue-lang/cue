@@ -62,7 +62,7 @@ Junk: {
 }
 -- out/eval --
 Errors:
-listOfCloseds.0: field b not allowed:
+listOfCloseds.0: field not allowed: b:
     ./in.cue:2:21
     ./in.cue:5:10
     ./in.cue:13:1
@@ -79,7 +79,7 @@ Result:
       // [eval]
       a: (int){ |(*(int){ 0 }, (int){ int }) }
       b: (_|_){
-        // [eval] listOfCloseds.0: field b not allowed:
+        // [eval] listOfCloseds.0: field not allowed: b:
         //     ./in.cue:2:21
         //     ./in.cue:5:10
         //     ./in.cue:13:1

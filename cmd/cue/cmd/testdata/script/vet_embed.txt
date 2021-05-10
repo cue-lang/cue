@@ -31,19 +31,19 @@ a: 1
 e: 2
 
 -- expect-foo --
-field c not allowed:
+field not allowed: c:
     ./foo.yaml:2:2
     ./schema.cue:1:1
     ./schema.cue:3:7
     ./schema.cue:7:1
 -- expect-stream --
-field d not allowed:
+field not allowed: d:
     ./schema.cue:1:1
     ./schema.cue:3:7
     ./schema.cue:7:1
     ./stream.yaml:2:2
 -- expect-stream --
-field d not allowed:
+field not allowed: d:
     ./schema.cue:1:1
     ./schema.cue:3:7
     ./schema.cue:7:1

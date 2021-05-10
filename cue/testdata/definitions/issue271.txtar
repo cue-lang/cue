@@ -8,7 +8,7 @@ x: {
 }
 -- out/eval --
 Errors:
-x: field b not allowed:
+x: field not allowed: b:
     ./in.cue:1:5
     ./in.cue:2:11
     ./in.cue:3:4
@@ -24,7 +24,7 @@ Result:
     // [eval]
     a: (string){ "hello" }
     b: (_|_){
-      // [eval] x: field b not allowed:
+      // [eval] x: field not allowed: b:
       //     ./in.cue:1:5
       //     ./in.cue:2:11
       //     ./in.cue:3:4

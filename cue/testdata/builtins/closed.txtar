@@ -44,7 +44,7 @@ withSubfields: {
 
 -- out/eval --
 Errors:
-b: field x not allowed:
+b: field not allowed: x:
     ./in.cue:1:10
     ./in.cue:5:4
     ./in.cue:5:10
@@ -63,7 +63,7 @@ Result:
       b: (int){ int }
     }
     x: (_|_){
-      // [eval] b: field x not allowed:
+      // [eval] b: field not allowed: x:
       //     ./in.cue:1:10
       //     ./in.cue:5:4
       //     ./in.cue:5:10

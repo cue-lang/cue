@@ -131,8 +131,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		if b == nil {
 			// y.f is optional
 			if !aOpt {
-				s.errf("required field %s is optional in subsumed value",
-					f.SelectorString(ctx))
+				s.errf("required field is optional in subsumed value: %s", f)
 				return false
 			}
 
@@ -194,7 +193,7 @@ outer:
 			if s.Profile.IgnoreClosedness {
 				continue
 			}
-			s.errf("field %s not allowed in closed struct", f)
+			s.errf("field not allowed in closed struct: %s", f)
 			return false
 		}
 

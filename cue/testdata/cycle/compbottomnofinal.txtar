@@ -359,18 +359,18 @@ large: {
 }
 -- out/eval --
 Errors:
-large.p1.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-large.p2.#Y: cycle: field userinfo was added after an if clause evaluated it
-large.p2.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-large.p3.#Y: cycle: field userinfo was added after an if clause evaluated it
-large.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-large.p4.#Y: cycle: field userinfo was added after an if clause evaluated it
-medium.p1.#Y: cycle: field port was added after an if clause evaluated it
-medium.p2.#Y: cycle: field port was added after an if clause evaluated it
-medium.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-minimal.b: cycle: new field port inserted by if clause that was previously evaluated by another if clause
-small.p1.#Y: cycle: field port was added after an if clause evaluated it
+large.p1.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+large.p2.#Y: cycle: field was added after an if clause evaluated it: userinfo
+large.p2.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+large.p3.#Y: cycle: field was added after an if clause evaluated it: userinfo
+large.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+large.p4.#Y: cycle: field was added after an if clause evaluated it: userinfo
+medium.p1.#Y: cycle: field was added after an if clause evaluated it: port
+medium.p2.#Y: cycle: field was added after an if clause evaluated it: port
+medium.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+medium.p4.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+minimal.b: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+small.p1.#Y: cycle: field was added after an if clause evaluated it: port
 error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
     ./in.cue:104:23
 error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
@@ -390,7 +390,7 @@ Result:
     a: (struct){
     }
     b: (_|_){
-      // [eval] minimal.b: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+      // [eval] minimal.b: cycle: field inserted by if clause that was previously evaluated by another if clause: port
       port: (string){ "" }
     }
   }
@@ -400,7 +400,7 @@ Result:
     p1: (_|_){
       // [eval]
       #Y: (_|_){
-        // [eval] small.p1.#Y: cycle: field port was added after an if clause evaluated it
+        // [eval] small.p1.#Y: cycle: field was added after an if clause evaluated it: port
         port: (string){ "" }
       }
       #X: (#struct){
@@ -424,7 +424,7 @@ Result:
     p1: (_|_){
       // [eval]
       #Y: (_|_){
-        // [eval] medium.p1.#Y: cycle: field port was added after an if clause evaluated it
+        // [eval] medium.p1.#Y: cycle: field was added after an if clause evaluated it: port
         port: (string){ "" }
       }
       Y: (struct){
@@ -436,7 +436,7 @@ Result:
     p2: (_|_){
       // [eval]
       #Y: (_|_){
-        // [eval] medium.p2.#Y: cycle: field port was added after an if clause evaluated it
+        // [eval] medium.p2.#Y: cycle: field was added after an if clause evaluated it: port
         port: (string){ "" }
       }
       #X: (#struct){
@@ -448,7 +448,7 @@ Result:
     p3: (_|_){
       // [eval]
       Y: (_|_){
-        // [eval] medium.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [eval] medium.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
         port: (_|_){
           // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
           //     ./in.cue:104:23
@@ -464,7 +464,7 @@ Result:
     p4: (_|_){
       // [eval]
       Y: (_|_){
-        // [eval] medium.p4.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [eval] medium.p4.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
         port: (_|_){
           // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
           //     ./in.cue:126:23
@@ -508,7 +508,7 @@ Result:
     p1: (_|_){
       // [eval]
       Y: (_|_){
-        // [eval] large.p1.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [eval] large.p1.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
         port: (_|_){
@@ -532,7 +532,7 @@ Result:
       // [eval]
       X: (string){ "user@example.com" }
       Y: (_|_){
-        // [eval] large.p2.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [eval] large.p2.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
         port: (_|_){
@@ -546,7 +546,7 @@ Result:
         port: (string){ "" }
       }
       #Y: (_|_){
-        // [eval] large.p2.#Y: cycle: field userinfo was added after an if clause evaluated it
+        // [eval] large.p2.#Y: cycle: field was added after an if clause evaluated it: userinfo
         host: (string){ "example.com" }
         port: (string){ "" }
         userinfo: (string){ "user" }
@@ -561,7 +561,7 @@ Result:
         port: (string){ "" }
       }
       Y: (_|_){
-        // [eval] large.p3.Y: cycle: new field port inserted by if clause that was previously evaluated by another if clause
+        // [eval] large.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
         port: (_|_){
@@ -570,7 +570,7 @@ Result:
         }
       }
       #Y: (_|_){
-        // [eval] large.p3.#Y: cycle: field userinfo was added after an if clause evaluated it
+        // [eval] large.p3.#Y: cycle: field was added after an if clause evaluated it: userinfo
         host: (string){ "example.com" }
         port: (string){ "" }
         userinfo: (string){ "user" }
@@ -585,7 +585,7 @@ Result:
         port: (string){ "" }
       }
       #Y: (_|_){
-        // [eval] large.p4.#Y: cycle: field userinfo was added after an if clause evaluated it
+        // [eval] large.p4.#Y: cycle: field was added after an if clause evaluated it: userinfo
         host: (string){ "example.com" }
         port: (string){ "" }
         userinfo: (string){ "user" }
@@ -594,7 +594,7 @@ Result:
         // [eval]
         userinfo: (string){ "user" }
         host: (_|_){
-          // [eval] large.p4.#Y: cycle: field userinfo was added after an if clause evaluated it
+          // [eval] large.p4.#Y: cycle: field was added after an if clause evaluated it: userinfo
         }
       }
     }

@@ -148,12 +148,12 @@ nestedChain: {
 }
 -- out/eval --
 Errors:
-mutual.mutualCycleFail.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
-mutual.oneDirectionalConflictFail.p1.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
-mutual.oneDirectionalConflictFail.p2.b: cycle: new field foo inserted by if clause that was previously evaluated by another if clause
-nestedChain.cycleFail.#E: cycle: new field x inserted by if clause that was previously evaluated by another if clause
-sameStruct.cycleFail: cycle: new field raises inserted by if clause that was previously evaluated by another if clause
-self.fail.a: cycle: new field b inserted by if clause that was previously evaluated by another if clause
+mutual.mutualCycleFail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
+mutual.oneDirectionalConflictFail.p1.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
+mutual.oneDirectionalConflictFail.p2.b: cycle: field inserted by if clause that was previously evaluated by another if clause: foo
+nestedChain.cycleFail.#E: cycle: field inserted by if clause that was previously evaluated by another if clause: x
+sameStruct.cycleFail: cycle: field inserted by if clause that was previously evaluated by another if clause: raises
+self.fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
 
 Result:
 (_|_){
@@ -163,7 +163,7 @@ Result:
     fail: (_|_){
       // [eval]
       a: (_|_){
-        // [eval] self.fail.a: cycle: new field b inserted by if clause that was previously evaluated by another if clause
+        // [eval] self.fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
         b: (int){ 1 }
       }
     }
@@ -193,7 +193,7 @@ Result:
       b: (struct){
       }
       a: (_|_){
-        // [eval] mutual.mutualCycleFail.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
+        // [eval] mutual.mutualCycleFail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
         bar: (string){ "" }
       }
     }
@@ -210,7 +210,7 @@ Result:
       p1: (_|_){
         // [eval]
         a: (_|_){
-          // [eval] mutual.oneDirectionalConflictFail.p1.a: cycle: new field bar inserted by if clause that was previously evaluated by another if clause
+          // [eval] mutual.oneDirectionalConflictFail.p1.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
           bar: (string){ "" }
         }
         b: (struct){
@@ -222,7 +222,7 @@ Result:
         a: (struct){
         }
         b: (_|_){
-          // [eval] mutual.oneDirectionalConflictFail.p2.b: cycle: new field foo inserted by if clause that was previously evaluated by another if clause
+          // [eval] mutual.oneDirectionalConflictFail.p2.b: cycle: field inserted by if clause that was previously evaluated by another if clause: foo
           foo: (string){ "" }
         }
       }
@@ -247,7 +247,7 @@ Result:
       }
     }
     cycleFail: (_|_){
-      // [eval] sameStruct.cycleFail: cycle: new field raises inserted by if clause that was previously evaluated by another if clause
+      // [eval] sameStruct.cycleFail: cycle: field inserted by if clause that was previously evaluated by another if clause: raises
       ret: (struct){
         a: (int){ 1 }
       }
@@ -268,7 +268,7 @@ Result:
     cycleFail: (_|_){
       // [eval]
       #E: (_|_){
-        // [eval] nestedChain.cycleFail.#E: cycle: new field x inserted by if clause that was previously evaluated by another if clause
+        // [eval] nestedChain.cycleFail.#E: cycle: field inserted by if clause that was previously evaluated by another if clause: x
         x: (bool){ true }
       }
     }

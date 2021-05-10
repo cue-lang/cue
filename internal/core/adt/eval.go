@@ -652,13 +652,13 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 		for _, a := range n.node.Arcs {
 			if a.nonMonotonicInsertGen >= a.nonMonotonicLookupGen && a.nonMonotonicLookupGen > 0 {
 				err := ctx.Newf(
-					"cycle: new field %s inserted by if clause that was previously evaluated by another if clause", a.Label.SelectorString(ctx))
+					"cycle: field inserted by if clause that was previously evaluated by another if clause: %s", a.Label)
 				err.AddPosition(n.node)
 				n.node.BaseValue = &Bottom{Err: err}
 			} else if a.nonMonotonicReject {
 				err := ctx.Newf(
-					"cycle: field %s was added after an if clause evaluated it",
-					a.Label.SelectorString(ctx))
+					"cycle: field was added after an if clause evaluated it: %s",
+					a.Label)
 				err.AddPosition(n.node)
 				n.node.BaseValue = &Bottom{Err: err}
 			}

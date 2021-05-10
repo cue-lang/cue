@@ -1,0 +1,13 @@
+-- let.cue --
+b: X
+let X = int
+a: X
+
+-- out/resolve/let --
+3[b]:   Scope: 0[<nil>]     Node: 0[]
+4[X]:   Scope: 1[*ast.File] Node: 5[let X=int]
+6[X]:   Scope: 0[<nil>]     Node: 0[]
+7[int]: Scope: 0[<nil>]     Node: 0[]
+9[a]:   Scope: 0[<nil>]     Node: 0[]
+10[X]:  Scope: 1[*ast.File] Node: 5[let X=int]
+

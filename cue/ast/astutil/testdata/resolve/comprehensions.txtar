@@ -1,0 +1,36 @@
+-- in.cue --
+src: [{foo: 3}]
+
+for k, v in src
+let y = v.foo
+if y > 3 {
+    x: [k, v, y]
+}
+
+-- out/resolve/in --
+3[src]:  Scope: 0[<nil>]           Node: 0[]
+6[foo]:  Scope: 0[<nil>]           Node: 0[]
+8[k]:    Scope: 0[<nil>]           Node: 0[]
+9[v]:    Scope: 0[<nil>]           Node: 0[]
+10[src]: Scope: 1[*ast.File]       Node: 0[[{foo: 3}]]
+12[y]:   Scope: 0[<nil>]           Node: 0[]
+13[v]:   Scope: 7[*ast.ForClause]  Node: 9[v]
+14[foo]: Scope: 0[<nil>]           Node: 0[]
+15[y]:   Scope: 11[*ast.LetClause] Node: 12[y]
+18[x]:   Scope: 0[<nil>]           Node: 0[]
+19[k]:   Scope: 7[*ast.ForClause]  Node: 8[k]
+20[v]:   Scope: 7[*ast.ForClause]  Node: 9[v]
+21[y]:   Scope: 11[*ast.LetClause] Node: 12[y]
+
+-- issue946.cue --
+x: {for a in a {}}
+y: {for aa in a {}}
+
+-- out/resolve/issue946 --
+3[x]:   Scope: 0[<nil>] Node: 0[]
+6[a]:   Scope: 0[<nil>] Node: 0[]
+7[a]:   Scope: 0[<nil>] Node: 0[]
+10[y]:  Scope: 0[<nil>] Node: 0[]
+13[aa]: Scope: 0[<nil>] Node: 0[]
+14[a]:  Scope: 0[<nil>] Node: 0[]
+

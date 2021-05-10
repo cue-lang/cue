@@ -1,0 +1,24 @@
+-- in.cue --
+[X=string]: name: X
+a: X
+
+Z=[string]: { x: string, y: Z.x }
+c: Z
+
+-- out/resolve/in --
+4[X]:       Scope: 0[<nil>]       Node: 0[]
+5[string]:  Scope: 0[<nil>]       Node: 0[]
+8[name]:    Scope: 0[<nil>]       Node: 0[]
+9[X]:       Scope: 2[*ast.Field]  Node: 5[string]
+11[a]:      Scope: 0[<nil>]       Node: 0[]
+12[X]:      Scope: 0[<nil>]       Node: 0[]
+15[Z]:      Scope: 0[<nil>]       Node: 0[]
+16[string]: Scope: 0[<nil>]       Node: 0[]
+19[x]:      Scope: 0[<nil>]       Node: 0[]
+20[string]: Scope: 0[<nil>]       Node: 0[]
+22[y]:      Scope: 0[<nil>]       Node: 0[]
+23[Z]:      Scope: 13[*ast.Field] Node: 13[Z=[string]: {x: string, y: Z.x}]
+24[x]:      Scope: 0[<nil>]       Node: 0[]
+26[c]:      Scope: 0[<nil>]       Node: 0[]
+27[Z]:      Scope: 0[<nil>]       Node: 0[]
+

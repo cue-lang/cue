@@ -1,0 +1,12 @@
+-- in.cue --
+b: X={
+    c: X.a
+}
+
+-- out/resolve/in --
+3[b]:  Scope: 0[<nil>]      Node: 0[]
+5[X]:  Scope: 0[<nil>]      Node: 0[]
+8[c]:  Scope: 0[<nil>]      Node: 0[]
+9[X]:  Scope: 2[*ast.Field] Node: 4[X={c: X.a}]
+10[a]: Scope: 0[<nil>]      Node: 0[]
+

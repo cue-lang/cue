@@ -15,7 +15,7 @@ Z1=[Z2=string]: Z1+Z2
 -- out/compile --
 unreferenced alias or let clause X:
     ./in.cue:1:1
-a: illegal reference Y:
+a: reference "Y" not found:
     ./in.cue:4:4
 definitions not supported for interpolations:
     ./in.cue:6:1
@@ -24,7 +24,7 @@ for[].a: reference "E" not found:
 --- in.cue
 {
   ["foo"]: 3
-  a: _|_(illegal reference Y)
+  a: _|_(reference "Y" not found)
   "\(〈0;b〉)": 3
   b: "foo"
   c: {}

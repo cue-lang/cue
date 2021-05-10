@@ -403,7 +403,6 @@ type Ident struct {
 	// This LHS path element may be an identifier. Possible forms:
 	//  foo:    a normal identifier
 	//  "foo":  JSON compatible
-	//  <foo>:  a template shorthand
 	Name string
 
 	Scope Node // scope in which node was found or nil if referring directly

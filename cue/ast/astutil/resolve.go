@@ -64,9 +64,9 @@ type ErrFunc func(pos token.Pos, msg string, args ...interface{})
 //   X in [X=x]: y        Field          Expr (x)
 //   X in X=[x]: y        Field          Field
 //
-// for k, v in            Field          ForClause
+// for k, v in            ForClause      Ident
+// let x = y              LetClause      Ident
 //
-// Template               Field          Template
 // Fields inside lambda
 //    Label               Field          Expr
 //    Value               Field          Field
@@ -125,21 +125,11 @@ func newScope(f *ast.File, outer *scope, node ast.Node, decls []ast.Decl) *scope
 			if a, ok := x.Label.(*ast.Alias); ok {
 				// TODO(legacy): use name := a.Ident.Name once quoted
 				// identifiers are no longer supported.
-				if name, _, _ := ast.LabelName(a.Ident); name != "" {
-					s.insert(name, x, a)
-				}
 				label, _ = a.Expr.(ast.Label)
-			}
-
-			switch y := label.(type) {
-			// TODO: support *ast.ParenExpr?
-			case *ast.ListLit:
-				// In this case, it really should be scoped like a template.
-				if len(y.Elts) != 1 {
-					break
-				}
-				if a, ok := y.Elts[0].(*ast.Alias); ok {
-					s.insert(a.Ident.Name, x, a)
+				if name, _, _ := ast.LabelName(a.Ident); name != "" {
+					if _, ok := label.(*ast.ListLit); !ok {
+						s.insert(name, x, a)
+					}
 				}
 			}
 
@@ -277,6 +267,8 @@ func (s *scope) Before(n ast.Node) (w visitor) {
 
 	case *ast.Comprehension:
 		s = scopeClauses(s, x.Clauses)
+		walk(s, x.Value)
+		return nil
 
 	case *ast.Field:
 		var n ast.Node = x.Label

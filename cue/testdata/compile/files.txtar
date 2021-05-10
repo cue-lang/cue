@@ -1,0 +1,38 @@
+// Issue #946
+-- in.cue --
+package repro
+
+a: []
+
+-- out.cue --
+package repro
+
+x: {for a in a {}}
+y: {{{for a in a {}}}}
+-- out/compile --
+--- in.cue
+{
+  a: []
+}
+--- out.cue
+{
+  x: {
+    for _, a in 〈1;a〉 {}
+  }
+  y: {
+    {
+      {
+        for _, a in 〈3;a〉 {}
+      }
+    }
+  }
+}
+-- out/eval --
+(struct){
+  a: (#list){
+  }
+  x: (struct){
+  }
+  y: (struct){
+  }
+}

@@ -830,7 +830,7 @@ float | *1                       1
 
 ### Bottom and errors
 
-Any evaluation error in CUE results in a bottom value, respresented by
+Any evaluation error in CUE results in a bottom value, represented by
 the token `_|_`.
 Bottom is an instance of every other value.
 Any evaluation error is represented as bottom.
@@ -1973,7 +1973,7 @@ If `x` is a package name, see the section on [qualified identifiers](#qualified-
 
 <!--
 TODO: consider allowing this and also for selectors. It needs to be considered
-how defaults are corried forward in cases like:
+how defaults are carried forward in cases like:
 
     x: { a: string | *"foo" } | *{ a: int | *4 }
     y: x.a & string
@@ -2941,7 +2941,7 @@ or the identifier following it.
 Note: this deviates from the Go spec where there is no such restriction.
 This restriction has the benefit of being to determine the identifiers
 for packages from within the file itself. But for CUE it is has another benefit:
-when using package hiearchies, one is more likely to want to include multiple
+when using package hierarchies, one is more likely to want to include multiple
 packages within the same directory structure. This mechanism allows
 disambiguation in these cases.
 -->

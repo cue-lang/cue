@@ -2072,7 +2072,7 @@ outer:
 				n.insertField(label, MakeConjunct(l.env, x, l.id))
 			}
 
-			// Terminate early n case of runaway comprehension.
+			// Terminate early in case of runaway comprehension.
 			if !isOpen && int(index) > max {
 				n.invalidListLength(max, len(l.list.Elems), maxNode, l.list)
 				continue outer

@@ -43,11 +43,11 @@ Result:
     a: (struct){
     }
     b: (_|_){
-      // [incomplete] comprehensions.b: undefined field b:
+      // [incomplete] comprehensions.b: undefined field: b:
       //     ./in.cue:4:14
     }
     c: (_|_){
-      // [incomplete] comprehensions.c: undefined field b:
+      // [incomplete] comprehensions.c: undefined field: b:
       //     ./in.cue:8:20
     }
   }
@@ -55,7 +55,7 @@ Result:
     a: (struct){
     }
     b: (_|_){
-      // [incomplete] openStruct.b: undefined field c:
+      // [incomplete] openStruct.b: undefined field: c:
       //     ./in.cue:14:10
     }
   }

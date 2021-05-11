@@ -126,7 +126,7 @@ Result:
       }
     }
     _Sub: (_|_){
-      // [incomplete] list1._Sub: undefined field b:
+      // [incomplete] list1._Sub: undefined field: b:
       //     ./in.cue:19:13
     }
     a: (struct){
@@ -150,7 +150,7 @@ Result:
       //     ./in.cue:30:21
     }
     #Sub: (_|_){
-      // [incomplete] list2.#Sub: undefined field b:
+      // [incomplete] list2.#Sub: undefined field: b:
       //     ./in.cue:33:13
     }
     a: (struct){

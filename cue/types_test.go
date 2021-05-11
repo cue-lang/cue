@@ -2667,7 +2667,7 @@ func TestWalk(t *testing.T) {
 	}, {
 		value: `(a.b)
 			a: {}`,
-		out: `_|_(undefined field b)`,
+		out: `_|_(undefined field: b)`,
 	}, {
 		value: `true`,
 		out:   `true`,

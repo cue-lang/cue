@@ -79,11 +79,11 @@ Result:
     //     ./in.cue:4:16
   }
   f: (_|_){
-    // [incomplete] f: undefined field b:
+    // [incomplete] f: undefined field: b:
     //     ./in.cue:5:16
   }
   g: (_|_){
-    // [incomplete] g: undefined field b:
+    // [incomplete] g: undefined field: b:
     //     ./in.cue:6:16
   }
   h: (_|_){

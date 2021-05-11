@@ -11,7 +11,7 @@ cmp stdout expect-stdout
 cmp stderr expect-stderr
 -- expect-stderr --
 a.b.2.c: incomplete value int
-out: invalid interpolation: undefined field d:
+out: invalid interpolation: undefined field: d:
     ./exporterr/export_err.cue:7:6
     ./exporterr/export_err.cue:7:16
 -- expect-stdout --

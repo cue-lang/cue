@@ -32,9 +32,9 @@ missingFieldNestedInInterpolation: {
 }
 -- out/eval --
 Errors:
-missingFieldClosed.r: undefined field b:
+missingFieldClosed.r: undefined field: b:
     ./references.cue:9:11
-missingFieldNestedClosed.r: undefined field d:
+missingFieldNestedClosed.r: undefined field: d:
     ./references.cue:21:11
 
 Result:
@@ -44,7 +44,7 @@ Result:
     a: (struct){
     }
     r: (_|_){
-      // [incomplete] missingField.r: undefined field b:
+      // [incomplete] missingField.r: undefined field: b:
       //     ./references.cue:4:10
     }
   }
@@ -53,7 +53,7 @@ Result:
     #a: (#struct){
     }
     r: (_|_){
-      // [eval] missingFieldClosed.r: undefined field b:
+      // [eval] missingFieldClosed.r: undefined field: b:
       //     ./references.cue:9:11
     }
   }
@@ -61,7 +61,7 @@ Result:
     a: (struct){
     }
     r: (_|_){
-      // [incomplete] missingFieldNested.r: undefined field b:
+      // [incomplete] missingFieldNested.r: undefined field: b:
       //     ./references.cue:15:10
     }
   }
@@ -70,7 +70,7 @@ Result:
     #a: (#struct){
     }
     r: (_|_){
-      // [eval] missingFieldNestedClosed.r: undefined field d:
+      // [eval] missingFieldNestedClosed.r: undefined field: d:
       //     ./references.cue:21:11
     }
   }
@@ -78,12 +78,12 @@ Result:
     a: (struct){
     }
     r1: (_|_){
-      // [incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field b:
+      // [incomplete] missingFieldNestedInInterpolation.r1: invalid interpolation: undefined field: b:
       //     ./references.cue:27:9
       //     ./references.cue:27:14
     }
     r2: (_|_){
-      // [incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field d:
+      // [incomplete] missingFieldNestedInInterpolation.r2: invalid interpolation: undefined field: d:
       //     ./references.cue:30:9
       //     ./references.cue:30:14
     }

@@ -31,11 +31,11 @@ e: _|_ // undefined field "t"
 }
 -- out/eval --
 Errors:
-c: undefined field c:
+c: undefined field: c:
     ./in.cue:4:9
-d: undefined field d:
+d: undefined field: d:
     ./in.cue:5:9
-e: undefined field t:
+e: undefined field: t:
     ./in.cue:6:9
 
 Result:
@@ -47,15 +47,15 @@ Result:
   }
   b: (float){ 2.0 }
   c: (_|_){
-    // [eval] c: undefined field c:
+    // [eval] c: undefined field: c:
     //     ./in.cue:4:9
   }
   d: (_|_){
-    // [eval] d: undefined field d:
+    // [eval] d: undefined field: d:
     //     ./in.cue:5:9
   }
   e: (_|_){
-    // [eval] e: undefined field t:
+    // [eval] e: undefined field: t:
     //     ./in.cue:6:9
   }
 }

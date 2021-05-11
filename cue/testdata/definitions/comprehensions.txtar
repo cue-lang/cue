@@ -11,7 +11,7 @@ issue595: {
 }
 -- out/eval --
 Errors:
-issue595.files: undefined field nam:
+issue595.files: undefined field: nam:
     ./in.cue:8:20
 
 Result:
@@ -25,7 +25,7 @@ Result:
       }
     }
     files: (_|_){
-      // [eval] issue595.files: undefined field nam:
+      // [eval] issue595.files: undefined field: nam:
       //     ./in.cue:8:20
     }
   }

@@ -30,12 +30,12 @@ b: json.Marshal(foo)
   foo: (struct){
     a: (int){ 3 }
     b: (_|_){
-      // [incomplete] foo.b: undefined field c:
+      // [incomplete] foo.b: undefined field: c:
       //     ./in.cue:5:20
     }
   }
   b: (_|_){
-    // [incomplete] foo.b: undefined field c:
+    // [incomplete] foo.b: undefined field: c:
     //     ./in.cue:5:20
   }
 }

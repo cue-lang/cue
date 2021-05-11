@@ -41,7 +41,7 @@ y: _|_ // field "c" not allowed in closed struct
 -- out/eval --
 (struct){
   #a: (_|_){
-    // [incomplete] #a: incomplete bool value 'bool'
+    // [incomplete] #a: incomplete bool: bool
     b: (bool){ bool }
   }
   x: (#struct){

@@ -33,15 +33,15 @@ e: a.t[2:3]
   }
   b: (float){ 2.0 }
   c: (_|_){
-    // [incomplete] c: undefined field c:
+    // [incomplete] c: undefined field: c:
     //     ./in.cue:1:38
   }
   d: (_|_){
-    // [incomplete] d: undefined field d:
+    // [incomplete] d: undefined field: d:
     //     ./in.cue:1:46
   }
   e: (_|_){
-    // [incomplete] e: undefined field t:
+    // [incomplete] e: undefined field: t:
     //     ./in.cue:1:57
   }
 }

@@ -412,7 +412,7 @@ Result:
         port: (string){ "" }
       }
       #Y: (_|_){
-        // [incomplete] small.p2.#Y: undefined field port:
+        // [incomplete] small.p2.#Y: undefined field: port:
         //     ./in.cue:50:50
         port: (string){ "" }
       }
@@ -482,7 +482,7 @@ Result:
         port: (string){ "" }
       }
       #Y: (_|_){
-        // [incomplete] medium.p5.#Y: undefined field port:
+        // [incomplete] medium.p5.#Y: undefined field: port:
         //     ./in.cue:158:56
         port: (string){ "" }
       }
@@ -496,7 +496,7 @@ Result:
       Y: (struct){
       }
       #Y: (_|_){
-        // [incomplete] medium.p6.#Y: undefined field port:
+        // [incomplete] medium.p6.#Y: undefined field: port:
         //     ./in.cue:186:56
         port: (string){ "" }
       }

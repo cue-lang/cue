@@ -818,9 +818,9 @@ outer:
 		} else {
 			if code != 0 && x.IsOptional(l) {
 				c.addErrf(code, pos,
-					"cannot reference optional field %s", label)
+					"cannot reference optional field: %s", label)
 			} else {
-				c.addErrf(code, pos, "undefined field %s", label)
+				c.addErrf(code, pos, "undefined field: %s", label)
 			}
 		}
 	}
@@ -836,7 +836,7 @@ func (c *OpContext) typeError(v Value, k Kind) {
 		return
 	}
 	if !IsConcrete(v) && v.Kind()&k != 0 {
-		c.addErrf(IncompleteError, pos(v), "incomplete %s value '%s'", k, v)
+		c.addErrf(IncompleteError, pos(v), "incomplete %s: %s", k, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s", v, v.Kind(), k)
 	}
@@ -852,7 +852,7 @@ func (c *OpContext) typeErrorAs(v Value, k Kind, as interface{}) {
 	}
 	if !IsConcrete(v) && v.Kind()&k != 0 {
 		c.addErrf(IncompleteError, pos(v),
-			"incomplete %s value '%s' in as", k, v, as)
+			"incomplete %s in %v: %s", k, as, v)
 	} else {
 		c.AddErrf("cannot use %s (type %s) as type %s in %v", v, v.Kind(), k, as)
 	}

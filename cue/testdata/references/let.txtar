@@ -273,12 +273,12 @@ incompleteLet: {
     bar: (struct){
       min: (int){ 1 }
       max: (_|_){
-        // [incomplete] incompleteLet.bar.max: undefined field max:
+        // [incomplete] incompleteLet.bar.max: undefined field: max:
         //     ./in.cue:54:23
       }
     }
     x: (_|_){
-      // [incomplete] incompleteLet.x: undefined field max:
+      // [incomplete] incompleteLet.x: undefined field: max:
       //     ./in.cue:61:17
     }
   }

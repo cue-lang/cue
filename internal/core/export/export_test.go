@@ -136,7 +136,7 @@ func TestGenerated(t *testing.T) {
 
 			return n, nil
 		},
-		out: `<[l2// x: undefined field #Terminal] _|_>`,
+		out: `<[l2// x: undefined field: #Terminal] _|_>`,
 		p:   export.Final,
 	}, {
 		in: func(r *adt.OpContext) (adt.Expr, error) {

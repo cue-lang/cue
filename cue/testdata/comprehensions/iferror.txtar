@@ -135,9 +135,9 @@ Result:
     //     ./in.cue:10:2
   }
   incomplete: (_|_){
-    // [incomplete] incomplete: undefined field d:
+    // [incomplete] incomplete: undefined field: d:
     //     ./in.cue:16:7
-    // incomplete: undefined field d:
+    // incomplete: undefined field: d:
     //     ./in.cue:23:21
     list: (#list){
       0: (int){ 1 }

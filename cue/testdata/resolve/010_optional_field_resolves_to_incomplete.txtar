@@ -29,11 +29,11 @@ r: {
 (struct){
   r: (struct){
     b: (_|_){
-      // [incomplete] r.b: cannot reference optional field a:
+      // [incomplete] r.b: cannot reference optional field: a:
       //     ./in.cue:3:6
     }
     c: (_|_){
-      // [incomplete] r.c: cannot reference optional field a:
+      // [incomplete] r.c: cannot reference optional field: a:
       //     ./in.cue:4:8
     }
   }

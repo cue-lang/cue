@@ -16,7 +16,7 @@ a: {
 (struct){
   a: (struct){
     b: (_|_){
-      // [incomplete] a.b: cannot reference optional field foo:
+      // [incomplete] a.b: cannot reference optional field: foo:
       //     ./in.cue:4:8
     }
   }

@@ -129,7 +129,7 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field name (and 3 more errors)
+	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
 	y:     "foo"
 }
 == All

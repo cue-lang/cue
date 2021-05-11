@@ -64,7 +64,7 @@ issue782: {
       name: (string){ "Hello" }
     }
     y: (_|_){
-      // [incomplete] lookup.y: undefined field a:
+      // [incomplete] lookup.y: undefined field: a:
       //     ./in.cue:13:10
     }
     ok1: (struct){
@@ -84,12 +84,12 @@ issue782: {
     }
     allFail1: (_|_){
       // [incomplete] lookup.allFail1: 1 errors in empty disjunction:
-      // lookup.allFail1: undefined field a:
+      // lookup.allFail1: undefined field: a:
       //     ./in.cue:20:18
     }
     allFail2: (_|_){
       // [incomplete] lookup.allFail2: 1 errors in empty disjunction:
-      // lookup.allFail2: undefined field a:
+      // lookup.allFail2: undefined field: a:
       //     ./in.cue:21:18
     }
   }

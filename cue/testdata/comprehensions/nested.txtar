@@ -71,7 +71,7 @@ for k, v in deployment {
           }
         }
         selector: (_|_){
-          // [incomplete] service."node-exporter".spec.selector: undefined field metadata:
+          // [incomplete] service."node-exporter".spec.selector: undefined field: metadata:
           //     ./in.cue:47:35
         }
       }

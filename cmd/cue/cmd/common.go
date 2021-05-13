@@ -450,7 +450,7 @@ func (p *buildPlan) getDecoders(b *build.Instance) (schemas, values []*decoderIn
 		files = append(files, b.UnknownFiles...)
 	}
 	for _, f := range files {
-		if !p.matchFile(f.Filename) && f.Filename != "-" {
+		if !b.User && !p.matchFile(f.Filename) {
 			continue
 		}
 		if p.cfg.overrideDefault {
@@ -565,6 +565,11 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		}
 	}
 
+	if len(p.insts) == 0 && flagGlob.String(p.cmd) != "" {
+		return nil, errors.Newf(token.NoPos,
+			"use of -n/--name flag without a directory")
+	}
+
 	if b := p.orphanInstance; b != nil {
 		schemas, values, err := p.getDecoders(b)
 		for _, d := range append(schemas, values...) {
@@ -630,6 +635,9 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 				}
 				p.encConfig.Schema = v
 			}
+		} else if p.schema != nil {
+			return nil, errors.Newf(token.NoPos,
+				"-d/--schema flag specified without a schema")
 		}
 
 		switch {

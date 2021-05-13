@@ -1,0 +1,50 @@
+# Issue #969
+
+! cue eval test.json -n ".+\.cue"
+cmp stderr expect-stderr1
+
+! cue eval test.json -d '#D2'
+cmp stderr expect-stderr2
+
+! cue eval test.json -n ".+\.cue" -d '#D2'
+cmp stderr expect-stderr3
+
+! cue eval test.json vector.cue -d '#D1'
+cmp stderr expect-stderr4
+
+! cue eval test.json vector.cue -d '#D2'
+cmp stderr expect-stderr5
+
+-- test.json --
+{
+  "X": 1,
+  "Y": 2,
+  "Z": 3
+}
+-- vector.cue --
+package Vector
+
+#D2: {
+    X: float
+    Y: float
+}
+
+#D3: {
+    X: float
+    Y: float
+    Z: float
+}
+
+-- expect-stderr1 --
+use of -n/--name flag without a directory
+-- expect-stderr2 --
+-d/--schema flag specified without a schema
+-- expect-stderr3 --
+use of -n/--name flag without a directory
+-- expect-stderr4 --
+reference "#D1" not found:
+    --schema:1:1
+-- expect-stderr5 --
+X: conflicting values 1 and float (mismatched types int and float):
+    ./test.json:2:8
+    ./vector.cue:4:8

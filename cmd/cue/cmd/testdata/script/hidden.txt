@@ -1,0 +1,46 @@
+cue eval pkg.cue -H
+cmp stdout expect-stdout
+
+cue eval -H
+cmp stdout expect-stdout
+
+cue eval file.cue -H
+cmp stdout expect-stdout
+
+-- pkg.cue --
+package pkg
+
+_top: 1
+
+a: _h0: int
+
+#foo: {
+    _h1: string
+}
+
+{
+    _h2: string
+}
+
+-- file.cue --
+_top: 1
+
+a: _h0: int
+
+#foo: {
+    _h1: string
+}
+
+{
+    _h2: string
+}
+
+-- expect-stdout --
+_top: 1
+a: {
+    _h0: int
+}
+_h2: string
+#foo: {
+    _h1: string
+}

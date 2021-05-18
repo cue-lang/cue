@@ -107,7 +107,7 @@ func (f Feature) PkgID(index StringIndexer) string {
 	}
 	s := index.IndexToString(f.safeIndex())
 	if p := strings.IndexByte(s, '\x00'); p >= 0 {
-		return s[p+1:]
+		s = s[p+1:]
 	}
 	return s
 }

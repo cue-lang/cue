@@ -1815,7 +1815,7 @@ func (v Value) Unify(w Value) Value {
 	if v.v == nil {
 		return w
 	}
-	if w.v == nil {
+	if w.v == nil || w.v == v.v {
 		return v
 	}
 

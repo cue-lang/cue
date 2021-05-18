@@ -173,9 +173,8 @@ func (b *buildPlan) instances() iterator {
 		}
 	default:
 		i = &instanceIterator{
-			inst: b.instance,
-			a:    []*cue.Instance{b.instance},
-			i:    -1,
+			a: []*cue.Instance{b.instance},
+			i: -1,
 		}
 		b.instance = nil
 	}

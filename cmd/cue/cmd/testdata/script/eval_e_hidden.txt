@@ -7,6 +7,10 @@ stdout '34'
 
 cue eval -e _a tst.cue
 stdout '34'
+
+cue eval -H
+stdout '_a: 34'
+
 -- dep.cue --
 package dep
 

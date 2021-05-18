@@ -64,6 +64,10 @@ func TestParseDefinitions(t *testing.T) {
 		"array.json",
 		defaultConfig,
 	}, {
+		"enum.cue",
+		"enum.json",
+		defaultConfig,
+	}, {
 		"struct.cue",
 		"struct.json",
 		defaultConfig,
@@ -140,6 +144,12 @@ func TestParseDefinitions(t *testing.T) {
 				t.Fatal(errors.Details(inst.Err, nil))
 			}
 
+			all, err := tc.config.All(inst)
+			if err != nil {
+				t.Fatal(err)
+			}
+			walk(all)
+
 			b, err := openapi.Gen(inst, tc.config)
 			if err != nil {
 				t.Fatal(err)
@@ -162,6 +172,21 @@ func TestParseDefinitions(t *testing.T) {
 				t.Errorf("files differ:\n%v", d)
 			}
 		})
+	}
+}
+
+// walk traverses an openapi.OrderedMap. This is a helper function
+// used to ensure that a generated OpenAPI value is well-formed.
+func walk(om *openapi.OrderedMap) {
+	for _, p := range om.Pairs() {
+		switch p := p.Value.(type) {
+		case *openapi.OrderedMap:
+			walk(p)
+		case []*openapi.OrderedMap:
+			for _, om := range p {
+				walk(om)
+			}
+		}
 	}
 }
 

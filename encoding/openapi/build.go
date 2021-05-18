@@ -1301,10 +1301,10 @@ func (b *builder) inta(v cue.Value, offset int64) ast.Expr {
 
 func (b *builder) decode(v cue.Value) ast.Expr {
 	v, _ = v.Default()
-	return v.Syntax().(ast.Expr)
+	return v.Syntax(cue.Final()).(ast.Expr)
 }
 
 func (b *builder) big(v cue.Value) ast.Expr {
 	v, _ = v.Default()
-	return v.Syntax().(ast.Expr)
+	return v.Syntax(cue.Final()).(ast.Expr)
 }

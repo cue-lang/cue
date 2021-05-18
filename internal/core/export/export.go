@@ -106,10 +106,10 @@ func (p *Profile) Def(r adt.Runtime, pkgID string, v *adt.Vertex) (*ast.File, er
 
 	if isDef {
 		e.inDefinition--
-		if s, ok := expr.(*ast.StructLit); ok {
+		if v.Kind() == adt.StructKind {
 			expr = ast.NewStruct(
 				ast.Embed(ast.NewIdent("_#def")),
-				ast.NewIdent("_#def"), s,
+				ast.NewIdent("_#def"), expr,
 			)
 		}
 	}

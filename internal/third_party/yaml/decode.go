@@ -12,11 +12,11 @@ import (
 	"strconv"
 	"strings"
 	"time"
-	"unicode"
 
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/token"
+	"cuelang.org/go/internal"
 )
 
 const (
@@ -539,24 +539,9 @@ func (d *decoder) scalar(n *node) ast.Expr {
 }
 
 func (d *decoder) label(n *node) ast.Label {
-	var tag string
-	if n.tag == "" && !n.implicit {
-		tag = yaml_STR_TAG
-	} else {
-		tag, _ = d.resolve(n)
-	}
-	if tag == yaml_STR_TAG {
-		// TODO: improve
-		for i, r := range n.value {
-			if !unicode.In(r, unicode.L) && r != '_' {
-				if i == 0 || !unicode.In(r, unicode.N) {
-					goto stringLabel
-				}
-			}
-		}
+	if ast.IsValidIdent(n.value) && !internal.IsDefOrHidden(n.value) {
 		return d.ident(n, n.value)
 	}
-stringLabel:
 	return &ast.BasicLit{
 		ValuePos: d.start(n),
 		Kind:     token.STRING,

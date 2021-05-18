@@ -155,6 +155,15 @@ var unmarshalTests = []struct {
 		"english: null",
 		"english: null",
 	}, {
+		"_foo: 1",
+		`"_foo": 1`,
+	}, {
+		`"#foo": 1`,
+		`"#foo": 1`,
+	}, {
+		"_#foo: 1",
+		`"_#foo": 1`,
+	}, {
 		"~: null key",
 		`"~": "null key"`,
 	}, {

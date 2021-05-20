@@ -1,0 +1,36 @@
+
+# Hidden values are dropped when outputting CUE. This is fine in eval for
+# debugging, but not when the final result needs to be compiled again to be
+# converted to another format.
+
+cue eval in.cue --out yaml
+cmp stdout expect-stdout
+
+-- in.cue --
+#Foo: {
+	a:  string
+	b:  string
+	ab: "\(a)\(b)"
+}
+
+{
+	a: "aaa"
+	b: "bbb"
+} & #Foo
+
+#Bar: {
+	_c: string
+	_d: string
+	cd: "\(_c)\(_d)"
+}
+
+{
+	_c: "ccc"
+	_d: "ddd"
+} & #Bar
+
+-- expect-stdout --
+a: aaa
+b: bbb
+ab: aaabbb
+cd: cccddd

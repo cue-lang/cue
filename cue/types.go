@@ -2392,6 +2392,10 @@ func (v Value) Expr() (Op, []Value) {
 		ctx := v.ctx()
 		for _, d := range x.Decls {
 			switch x := d.(type) {
+			default:
+				fields = append(fields, d)
+			case adt.Value:
+				fields = append(fields, d)
 			case adt.Expr:
 				// embedding
 				n := &adt.Vertex{Label: v.v.Label}
@@ -2400,9 +2404,6 @@ func (v Value) Expr() (Op, []Value) {
 				n.Finalize(ctx)
 				n.Parent = v.v.Parent
 				a = append(a, makeValue(v.idx, n, v.parent_))
-
-			default:
-				fields = append(fields, d)
 			}
 		}
 		if len(a) == 0 {
@@ -2414,9 +2415,16 @@ func (v Value) Expr() (Op, []Value) {
 			n := &adt.Vertex{
 				Label: v.v.Label,
 			}
-			c := adt.MakeRootConjunct(env, &adt.StructLit{
-				Decls: fields,
-			})
+			s := &adt.StructLit{}
+			if k := v.v.Kind(); k != adt.StructKind && k != BottomKind {
+				// TODO: we should also add such a declaration for embeddings
+				// of structs with definitions. However, this is currently
+				// also not supported at the CUE level. If we do, it may be
+				// best handled with a special mode of unification.
+				s.Decls = append(s.Decls, &adt.BasicType{K: k})
+			}
+			s.Decls = append(s.Decls, fields...)
+			c := adt.MakeRootConjunct(env, s)
 			n.AddConjunct(c)
 			n.Finalize(ctx)
 			n.Parent = v.v.Parent

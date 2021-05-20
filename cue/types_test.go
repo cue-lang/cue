@@ -3331,8 +3331,18 @@ func TestExpr(t *testing.T) {
 		input: `v: "Hello, \(x)! Welcome to \(place)", place: string, x: string`,
 		want:  `\()("Hello, " .(〈〉 "x") "! Welcome to " .(〈〉 "place") "")`,
 	}, {
+		// Split out the reference, but ensure the split-off outer struct
+		// remains valid.
+		input: `v: { a, #b: 1 }, a: 2`,
+		want:  `&(.(〈〉 "a") {int,#b:1})`,
+	}, {
+		// Result is an error, no need to split off.
 		input: `v: { a, b: 1 }, a: 2`,
 		want:  `&(.(〈〉 "a") {b:1})`,
+	}, {
+		// Don't split of concrete values.
+		input: `v: { "foo", #def: 1 }`,
+		want:  `{"foo",#def:1}`,
 	}, {
 		input: `v: { {c: a}, b: a }, a: int`,
 		want:  `&({c:a} {b:a})`,

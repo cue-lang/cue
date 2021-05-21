@@ -1,0 +1,121 @@
+{
+   "openapi": "3.0.0",
+   "info": {
+      "title": "test",
+      "version": "v1"
+   },
+   "paths": {},
+   "components": {
+      "schemas": {
+         "Foo": {
+            "type": "string"
+         },
+         "LoadBalancerSettings": {
+            "type": "object",
+            "properties": {
+               "consistentHash": {
+                  "type": "object",
+                  "properties": {
+                     "httpHeaderName": {
+                        "type": "string"
+                     }
+                  }
+               },
+               "b": {
+                  "type": "string"
+               }
+            },
+            "oneOf": [
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "consistentHash",
+                              "b"
+                           ],
+                           "properties": {
+                              "consistentHash": {
+                                 "oneOf": [
+                                    {
+                                       "not": {
+                                          "anyOf": [
+                                             {
+                                                "required": [
+                                                   "httpHeaderName"
+                                                ]
+                                             }
+                                          ]
+                                       }
+                                    },
+                                    {
+                                       "required": [
+                                          "httpHeaderName"
+                                       ]
+                                    }
+                                 ]
+                              }
+                           }
+                        }
+                     ]
+                  }
+               },
+               {
+                  "required": [
+                     "consistentHash",
+                     "b"
+                  ],
+                  "properties": {
+                     "consistentHash": {
+                        "oneOf": [
+                           {
+                              "not": {
+                                 "anyOf": [
+                                    {
+                                       "required": [
+                                          "httpHeaderName"
+                                       ]
+                                    }
+                                 ]
+                              }
+                           },
+                           {
+                              "required": [
+                                 "httpHeaderName"
+                              ]
+                           }
+                        ]
+                     }
+                  }
+               }
+            ]
+         },
+         "LoadBalancerSettings.ConsistentHashLB": {
+            "type": "object",
+            "properties": {
+               "httpHeaderName": {
+                  "type": "string"
+               }
+            },
+            "oneOf": [
+               {
+                  "not": {
+                     "anyOf": [
+                        {
+                           "required": [
+                              "httpHeaderName"
+                           ]
+                        }
+                     ]
+                  }
+               },
+               {
+                  "required": [
+                     "httpHeaderName"
+                  ]
+               }
+            ]
+         }
+      }
+   }
+}

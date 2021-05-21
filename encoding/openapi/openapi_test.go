@@ -105,6 +105,14 @@ func TestParseDefinitions(t *testing.T) {
 		out:    "openapi-norefs.json",
 		config: resolveRefs,
 	}, {
+		in:     "embed.cue",
+		out:    "embed.json",
+		config: defaultConfig,
+	}, {
+		in:     "embed.cue",
+		out:    "embed-norefs.json",
+		config: resolveRefs,
+	}, {
 		in:  "oneof.cue",
 		out: "oneof-funcs.json",
 		config: &openapi.Config{

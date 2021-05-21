@@ -3344,6 +3344,9 @@ func TestExpr(t *testing.T) {
 		input: `v: { "foo", #def: 1 }`,
 		want:  `{"foo",#def:1}`,
 	}, {
+		input: `v: { {} | { a: #A, b: #B}, #A: {} | { c: int} }, #B: int | bool`,
+		want:  `&(|({} {a:#A,b:#B}) {#A:({}|{c:int})})`,
+	}, {
 		input: `v: { {c: a}, b: a }, a: int`,
 		want:  `&({c:a} {b:a})`,
 	}, {

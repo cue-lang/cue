@@ -2383,38 +2383,34 @@ func (v Value) Expr() (Op, []Value) {
 		op = CallOp
 
 	case *adt.StructLit:
-		// Simulate old embeddings.
-		envEmbed := &adt.Environment{
-			Up:     env,
-			Vertex: v.v,
-		}
+		hasEmbed := false
 		fields := []adt.Decl{}
-		ctx := v.ctx()
 		for _, d := range x.Decls {
-			switch x := d.(type) {
+			switch d.(type) {
 			default:
 				fields = append(fields, d)
 			case adt.Value:
 				fields = append(fields, d)
 			case adt.Expr:
-				// embedding
-				n := &adt.Vertex{Label: v.v.Label}
-				c := adt.MakeRootConjunct(envEmbed, x)
-				n.AddConjunct(c)
-				n.Finalize(ctx)
-				n.Parent = v.v.Parent
-				a = append(a, makeValue(v.idx, n, v.parent_))
+				hasEmbed = true
 			}
 		}
-		if len(a) == 0 {
+
+		if !hasEmbed {
 			a = append(a, v)
 			break
 		}
 
+		ctx := v.ctx()
+
+		n := v.v
+
 		if len(fields) > 0 {
-			n := &adt.Vertex{
-				Label: v.v.Label,
+			n = &adt.Vertex{
+				Parent: v.v.Parent,
+				Label:  v.v.Label,
 			}
+
 			s := &adt.StructLit{}
 			if k := v.v.Kind(); k != adt.StructKind && k != BottomKind {
 				// TODO: we should also add such a declaration for embeddings
@@ -2428,10 +2424,36 @@ func (v Value) Expr() (Op, []Value) {
 			n.AddConjunct(c)
 			n.Finalize(ctx)
 			n.Parent = v.v.Parent
+		}
+
+		// Simulate old embeddings.
+		envEmbed := &adt.Environment{
+			Up:     env,
+			Vertex: n,
+		}
+
+		for _, d := range x.Decls {
+			switch x := d.(type) {
+			case adt.Value:
+			case adt.Expr:
+				// embedding
+				n := &adt.Vertex{Label: v.v.Label}
+				c := adt.MakeRootConjunct(envEmbed, x)
+				n.AddConjunct(c)
+				n.Finalize(ctx)
+				n.Parent = v.v.Parent
+				a = append(a, makeValue(v.idx, n, v.parent_))
+			}
+		}
+
+		// Could be done earlier, but keep struct with fields at end.
+		if len(fields) > 0 {
 			a = append(a, makeValue(v.idx, n, v.parent_))
 		}
 
-		op = adt.AndOp
+		if len(a) > 1 {
+			op = adt.AndOp
+		}
 
 	default:
 		a = append(a, v)

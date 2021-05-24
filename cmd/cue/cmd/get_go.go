@@ -133,7 +133,7 @@ For instance, for the type
 
 	package foo
 
-    type IP4String string
+	type IP4String string
 
 defined in the Go package, one could add a cue file foo.cue with the following
 contents to allow IP4String to assume only valid IP4 addresses:
@@ -180,16 +180,16 @@ translates into the following CUE definitions:
 
 	package foo
 
-	#Switch: int // enumSwitch
+	#Switch: int // #enumSwitch
 
-	enumSwitch: Off | On
+	#enumSwitch: Off | On
 
 	Off: 0
 	On:  1
 
-This definition allows any integer value for Switch, while the enumSwitch value
-defines all defined constants for Switch and thus all valid values if Switch
-were to be interpreted as an enum type. To turn Switch into an enum,
+This definition allows any integer value for #Switch, while the #enumSwitch
+value defines all defined constants for Switch and thus all valid values if
+#Switch were to be interpreted as an enum type. To turn #Switch into an enum,
 include the following constraint in, say, enum.cue, in either the original
 source directory or the generated directory:
 
@@ -197,12 +197,12 @@ source directory or the generated directory:
 
 	// limit the valid values for Switch to those existing as constants with
 	// the same type.
-	#Switch: enumSwitch
+	#Switch: #enumSwitch
 
-This tells CUE that only the values enumerated by enumSwitch are valid
-values for Switch. Note that there are now two definitions of Switch.
-CUE handles this in the usual way by unifying the two definitions, in which case
-the more restrictive enum interpretation of Switch remains.
+This tells CUE that only the values enumerated by #enumSwitch are valid values
+for #Switch. Note that there are now two definitions of #Switch. CUE handles
+this in the usual way by unifying the two definitions, in which case the more
+restrictive enum interpretation of #Switch remains.
 `,
 		// - TODO: interpret cuego's struct tags and annotations.
 

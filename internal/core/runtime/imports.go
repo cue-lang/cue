@@ -30,16 +30,24 @@ func RegisterBuiltin(importPath string, f PackageFunc) {
 }
 
 func (x *index) RegisterBuiltin(importPath string, f PackageFunc) {
-	if x.builtins == nil {
-		x.builtins = map[string]PackageFunc{}
+	if x.builtinPaths == nil {
+		x.builtinPaths = map[string]PackageFunc{}
+		x.builtinShort = map[string]string{}
 	}
-	x.builtins[importPath] = f
+	x.builtinPaths[importPath] = f
+	base := path.Base(importPath)
+	if _, ok := x.builtinShort[base]; ok {
+		importPath = "" // Don't allow ambiguous base paths.
+	}
+	x.builtinShort[base] = importPath
 }
 
 var SharedRuntime = &Runtime{index: sharedIndex}
 
-func (x *Runtime) IsBuiltinPackage(path string) bool {
-	return x.index.isBuiltin(path)
+// BuiltinPackagePath converts a short-form builtin package identifier to its
+// full path or "" if this doesn't exist.
+func (x *Runtime) BuiltinPackagePath(path string) string {
+	return x.index.shortBuiltinToPath(path)
 }
 
 // sharedIndex is used for indexing builtins and any other labels common to
@@ -55,7 +63,8 @@ type index struct {
 	imports        map[*adt.Vertex]*build.Instance
 	importsByPath  map[string]*adt.Vertex
 	importsByBuild map[*build.Instance]*adt.Vertex
-	builtins       map[string]PackageFunc
+	builtinPaths   map[string]PackageFunc // Full path
+	builtinShort   map[string]string      // Commandline shorthand
 
 	// mutex     sync.Mutex
 	typeCache sync.Map // map[reflect.Type]evaluated
@@ -71,12 +80,11 @@ func newIndex() *index {
 	return i
 }
 
-func (x *index) isBuiltin(id string) bool {
-	if x == nil || x.builtins == nil {
-		return false
+func (x *index) shortBuiltinToPath(id string) string {
+	if x == nil || x.builtinPaths == nil {
+		return ""
 	}
-	_, ok := x.builtins[id]
-	return ok
+	return x.builtinShort[id]
 }
 
 func (r *Runtime) AddInst(path string, key *adt.Vertex, p *build.Instance) {
@@ -107,8 +115,8 @@ func (r *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {
 		return key, nil
 	}
 
-	if x.builtins != nil {
-		if f := x.builtins[importPath]; f != nil {
+	if x.builtinPaths != nil {
+		if f := x.builtinPaths[importPath]; f != nil {
 			p, err := f(r)
 			if err != nil {
 				return adt.ToVertex(&adt.Bottom{Err: err}), nil

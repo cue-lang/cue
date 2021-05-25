@@ -100,10 +100,7 @@ func ImportPath(path string) BuildOption {
 func InferBuiltins(elide bool) BuildOption {
 	return func(o *runtime.Config) {
 		o.Imports = func(x *ast.Ident) (pkgPath string) {
-			if !o.Runtime.IsBuiltinPackage(x.Name) {
-				return ""
-			}
-			return x.Name
+			return o.Runtime.BuiltinPackagePath(x.Name)
 		}
 	}
 }

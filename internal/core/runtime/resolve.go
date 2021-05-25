@@ -83,7 +83,7 @@ func resolveFile(
 		name := path.Base(id)
 		if imp := p.LookupImport(id); imp != nil {
 			name = imp.PkgName
-		} else if _, ok := idx.builtins[id]; !ok {
+		} else if _, ok := idx.builtinPaths[id]; !ok {
 			errs = errors.Append(errs,
 				nodeErrorf(spec, "package %q not found", id))
 			continue

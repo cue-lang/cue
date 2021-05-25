@@ -11,6 +11,10 @@ cmp stdout expect/incomplete/stdout
 ! cue eval foo.bar
 cmp stderr expect/foobar/stderr
 
+# Issue #999
+cue export --out text -e 'yaml.MarshalStream(X)' issue999/x.cue
+cmp stdout expect/issue999/stdout
+
 -- expect/nonExist/stdout --
 -- expect/nonExist/stderr --
 reference "nonExist" not found:
@@ -41,4 +45,19 @@ package example
 
 Settings: {}
 blah: Settings.anyKey
+
+-- issue999/x.cue --
+X: [
+	{
+		a: 1
+	},
+	{
+		b: 2
+	},
+]
+
+-- expect/issue999/stdout --
+a: 1
+---
+b: 2
 

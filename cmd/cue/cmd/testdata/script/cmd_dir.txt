@@ -1,0 +1,28 @@
+cue cmd ls
+cmp stdout expect-stdout
+
+-- expect-stdout --
+a.txt
+b.txt
+
+-- ls-work-dir/a.txt --
+-- ls-work-dir/b.txt --
+
+-- ls_tool.cue --
+package ls
+
+command: ls: {
+    ls: {
+		kind:   "exec"
+		cmd:    "ls"
+		dir:    "ls-work-dir"
+		stdout: string
+	}
+
+	task: display: {
+		kind: "print"
+		text: ls.stdout
+	}
+}
+
+-- cue.mod --

@@ -20,8 +20,9 @@ var pkg = &internal.Package{
 	Native: []*internal.Builtin{},
 	CUE: `{
 	Run: {
-		$id: *"tool/exec.Run" | "exec"
-		cmd: string | [string, ...string]
+		$id:  *"tool/exec.Run" | "exec"
+		cmd:  string | [string, ...string]
+		dir?: string
 		env: {
 			[string]: string | [...=~"="]
 		}

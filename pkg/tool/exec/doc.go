@@ -11,6 +11,10 @@
 //     	// cmd is the command to run.
 //     	cmd: string | [string, ...string]
 //
+//     	// dir specifies the working directory of the command.
+//     	// The default is the current working directory.
+//     	dir?: string
+//
 //     	// env defines the environment variables to use for this system.
 //     	// If the value is a list, the entries mus be of the form key=value,
 //     	// where the last value takes precendence in the case of multiple

@@ -171,7 +171,7 @@ import (
 	// +optional
 	csi?: null | #CSIVolumeSource @go(CSI,*CSIVolumeSource) @protobuf(28,bytes,opt)
 
-	// Ephemeral represents a volume that is handled by a cluster storage driver (Alpha feature).
+	// Ephemeral represents a volume that is handled by a cluster storage driver.
 	// The volume's lifecycle is tied to the pod that defines it - it will be created before the pod starts,
 	// and deleted when the pod is removed.
 	//
@@ -195,6 +195,9 @@ import (
 	//
 	// A pod can use both types of ephemeral volumes and
 	// persistent volumes at the same time.
+	//
+	// This is a beta feature and only available when the GenericEphemeralVolume
+	// feature gate is enabled.
 	//
 	// +optional
 	ephemeral?: null | #EphemeralVolumeSource @go(Ephemeral,*EphemeralVolumeSource) @protobuf(29,bytes,opt)
@@ -2033,11 +2036,6 @@ import (
 	//
 	// Required, must not be nil.
 	volumeClaimTemplate?: null | #PersistentVolumeClaimTemplate @go(VolumeClaimTemplate,*PersistentVolumeClaimTemplate) @protobuf(1,bytes,opt)
-
-	// Specifies a read-only configuration for the volume.
-	// Defaults to false (read/write).
-	// +optional
-	readOnly?: bool @go(ReadOnly) @protobuf(2,varint,opt)
 }
 
 // PersistentVolumeClaimTemplate is used to produce
@@ -2392,6 +2390,18 @@ import (
 	// Defaults to 3. Minimum value is 1.
 	// +optional
 	failureThreshold?: int32 @go(FailureThreshold) @protobuf(6,varint,opt)
+
+	// Optional duration in seconds the pod needs to terminate gracefully upon probe failure.
+	// The grace period is the duration in seconds after the processes running in the pod are sent
+	// a termination signal and the time when the processes are forcibly halted with a kill signal.
+	// Set this value longer than the expected cleanup time for your process.
+	// If this value is nil, the pod's terminationGracePeriodSeconds will be used. Otherwise, this
+	// value overrides the value provided by the pod spec.
+	// Value must be non-negative integer. The value zero indicates stop immediately via
+	// the kill signal (no opportunity to shut down).
+	// This is an alpha field and requires enabling ProbeTerminationGracePeriod feature gate.
+	// +optional
+	terminationGracePeriodSeconds?: null | int64 @go(TerminationGracePeriodSeconds,*int64) @protobuf(7,varint,opt)
 }
 
 // PullPolicy describes a policy for if/when to pull a container image
@@ -2457,14 +2467,14 @@ import (
 // ResourceRequirements describes the compute resource requirements.
 #ResourceRequirements: {
 	// Limits describes the maximum amount of compute resources allowed.
-	// More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	// +optional
 	limits?: #ResourceList @go(Limits) @protobuf(1,bytes,rep,casttype=ResourceList,castkey=ResourceName)
 
 	// Requests describes the minimum amount of compute resources required.
 	// If Requests is omitted for a container, it defaults to Limits if that is explicitly specified,
 	// otherwise to an implementation-defined value.
-	// More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	// +optional
 	requests?: #ResourceList @go(Requests) @protobuf(2,bytes,rep,casttype=ResourceList,castkey=ResourceName)
 }
@@ -2548,7 +2558,7 @@ import (
 
 	// Compute Resources required by this container.
 	// Cannot be updated.
-	// More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	// +optional
 	resources?: #ResourceRequirements @go(Resources) @protobuf(8,bytes,opt)
 
@@ -3112,8 +3122,10 @@ import (
 	// +optional
 	labelSelector?: null | metav1.#LabelSelector @go(LabelSelector,*metav1.LabelSelector) @protobuf(1,bytes,opt)
 
-	// namespaces specifies which namespaces the labelSelector applies to (matches against);
-	// null or empty list means "this pod's namespace"
+	// namespaces specifies a static list of namespace names that the term applies to.
+	// The term is applied to the union of the namespaces listed in this field
+	// and the ones selected by namespaceSelector.
+	// null or empty namespaces list and null namespaceSelector means "this pod's namespace"
 	// +optional
 	namespaces?: [...string] @go(Namespaces,[]string) @protobuf(2,bytes,rep)
 
@@ -3123,6 +3135,15 @@ import (
 	// selected pods is running.
 	// Empty topologyKey is not allowed.
 	topologyKey: string @go(TopologyKey) @protobuf(3,bytes,opt)
+
+	// A label query over the set of namespaces that the term applies to.
+	// The term is applied to the union of the namespaces selected by this field
+	// and the ones listed in the namespaces field.
+	// null selector and null or empty namespaces list means "this pod's namespace".
+	// An empty selector ({}) matches all namespaces.
+	// This field is alpha-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
+	// +optional
+	namespaceSelector?: null | metav1.#LabelSelector @go(NamespaceSelector,*metav1.LabelSelector) @protobuf(4,bytes,opt)
 }
 
 // Node affinity is a group of node affinity scheduling rules.
@@ -3302,7 +3323,8 @@ import (
 	restartPolicy?: #RestartPolicy @go(RestartPolicy) @protobuf(3,bytes,opt,casttype=RestartPolicy)
 
 	// Optional duration in seconds the pod needs to terminate gracefully. May be decreased in delete request.
-	// Value must be non-negative integer. The value zero indicates delete immediately.
+	// Value must be non-negative integer. The value zero indicates stop immediately via
+	// the kill signal (no opportunity to shut down).
 	// If this value is nil, the default grace period will be used instead.
 	// The grace period is the duration in seconds after the processes running in the pod are sent
 	// a termination signal and the time when the processes are forcibly halted with a kill signal.
@@ -4339,6 +4361,21 @@ import (
 // record, with no exposing or proxying of any pods involved.
 #ServiceTypeExternalName: #ServiceType & "ExternalName"
 
+// ServiceInternalTrafficPolicyType describes the type of traffic routing for
+// internal traffic
+#ServiceInternalTrafficPolicyType: string // #enumServiceInternalTrafficPolicyType
+
+#enumServiceInternalTrafficPolicyType:
+	#ServiceInternalTrafficPolicyCluster |
+	#ServiceInternalTrafficPolicyLocal
+
+// ServiceInternalTrafficPolicyCluster routes traffic to all endpoints
+#ServiceInternalTrafficPolicyCluster: #ServiceInternalTrafficPolicyType & "Cluster"
+
+// ServiceInternalTrafficPolicyLocal only routes to node-local
+// endpoints, otherwise drops the traffic
+#ServiceInternalTrafficPolicyLocal: #ServiceInternalTrafficPolicyType & "Local"
+
 // Service External Traffic Policy Type string
 #ServiceExternalTrafficPolicyType: string // #enumServiceExternalTrafficPolicyType
 
@@ -4566,7 +4603,7 @@ import (
 	// externalName is the external reference that discovery mechanisms will
 	// return as an alias for this service (e.g. a DNS CNAME record). No
 	// proxying will be involved.  Must be a lowercase RFC-1123 hostname
-	// (https://tools.ietf.org/html/rfc1123) and requires Type to be
+	// (https://tools.ietf.org/html/rfc1123) and requires `type` to be "ExternalName".
 	// +optional
 	externalName?: string @go(ExternalName) @protobuf(10,bytes,opt)
 
@@ -4619,6 +4656,7 @@ import (
 	// value, if used, only makes sense as the last value in the list.
 	// If this is not specified or empty, no topology constraints will be applied.
 	// This field is alpha-level and is only honored by servers that enable the ServiceTopology feature.
+	// This field is deprecated and will be removed in a future version.
 	// +optional
 	topologyKeys?: [...string] @go(TopologyKeys,[]string) @protobuf(16,bytes,opt)
 
@@ -4663,6 +4701,30 @@ import (
 	// This field is alpha-level and is only honored by servers that enable the ServiceLBNodePortControl feature.
 	// +optional
 	allocateLoadBalancerNodePorts?: null | bool @go(AllocateLoadBalancerNodePorts,*bool) @protobuf(20,bytes,opt)
+
+	// loadBalancerClass is the class of the load balancer implementation this Service belongs to.
+	// If specified, the value of this field must be a label-style identifier, with an optional prefix,
+	// e.g. "internal-vip" or "example.com/internal-vip". Unprefixed names are reserved for end-users.
+	// This field can only be set when the Service type is 'LoadBalancer'. If not set, the default load
+	// balancer implementation is used, today this is typically done through the cloud provider integration,
+	// but should apply for any default implementation. If set, it is assumed that a load balancer
+	// implementation is watching for Services with a matching class. Any default load balancer
+	// implementation (e.g. cloud providers) should ignore Services that set this field.
+	// This field can only be set when creating or updating a Service to type 'LoadBalancer'.
+	// Once set, it can not be changed. This field will be wiped when a service is updated to a non 'LoadBalancer' type.
+	// +featureGate=LoadBalancerClass
+	// +optional
+	loadBalancerClass?: null | string @go(LoadBalancerClass,*string) @protobuf(21,bytes,opt)
+
+	// InternalTrafficPolicy specifies if the cluster internal traffic
+	// should be routed to all endpoints or node-local endpoints only.
+	// "Cluster" routes internal traffic to a Service to all endpoints.
+	// "Local" routes traffic to node-local endpoints only, traffic is
+	// dropped if no node-local endpoints are ready.
+	// The default value is "Cluster".
+	// +featureGate=ServiceInternalTrafficPolicy
+	// +optional
+	internalTrafficPolicy?: null | #ServiceInternalTrafficPolicyType @go(InternalTrafficPolicy,*ServiceInternalTrafficPolicyType) @protobuf(22,bytes,opt)
 }
 
 // ServicePort contains information on service's port.
@@ -4677,6 +4739,7 @@ import (
 
 	// The IP protocol for this port. Supports "TCP", "UDP", and "SCTP".
 	// Default is TCP.
+	// +default="TCP"
 	// +optional
 	protocol?: #Protocol @go(Protocol) @protobuf(2,bytes,opt,casttype=Protocol)
 
@@ -6007,7 +6070,7 @@ import (
 	metadata?: metav1.#ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
 
 	// Items is a list of LimitRange objects.
-	// More info: https://kubernetes.io/docs/concepts/configuration/manage-compute-resources-container/
+	// More info: https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/
 	items: [...#LimitRange] @go(Items,[]LimitRange) @protobuf(2,bytes,rep)
 }
 
@@ -6074,12 +6137,13 @@ import (
 	#ResourceQuotaScopeNotTerminating |
 	#ResourceQuotaScopeBestEffort |
 	#ResourceQuotaScopeNotBestEffort |
-	#ResourceQuotaScopePriorityClass
+	#ResourceQuotaScopePriorityClass |
+	#ResourceQuotaScopeCrossNamespacePodAffinity
 
-// Match all pod objects where spec.activeDeadlineSeconds
+// Match all pod objects where spec.activeDeadlineSeconds >=0
 #ResourceQuotaScopeTerminating: #ResourceQuotaScope & "Terminating"
 
-// Match all pod objects where !spec.activeDeadlineSeconds
+// Match all pod objects where spec.activeDeadlineSeconds is nil
 #ResourceQuotaScopeNotTerminating: #ResourceQuotaScope & "NotTerminating"
 
 // Match all pod objects that have best effort quality of service
@@ -6090,6 +6154,10 @@ import (
 
 // Match all pod objects that have priority class mentioned
 #ResourceQuotaScopePriorityClass: #ResourceQuotaScope & "PriorityClass"
+
+// Match all pod objects that have cross-namespace pod (anti)affinity mentioned.
+// This is an alpha feature enabled by the PodAffinityNamespaceSelector feature flag.
+#ResourceQuotaScopeCrossNamespacePodAffinity: #ResourceQuotaScope & "CrossNamespacePodAffinity"
 
 // ResourceQuotaSpec defines the desired hard limits to enforce for Quota.
 #ResourceQuotaSpec: {
@@ -6211,7 +6279,6 @@ import (
 	// be updated (only object metadata can be modified).
 	// If not set to true, the field can be modified at any time.
 	// Defaulted to nil.
-	// This is a beta field enabled by ImmutableEphemeralVolumes feature gate.
 	// +optional
 	immutable?: null | bool @go(Immutable,*bool) @protobuf(5,varint,opt)
 
@@ -6223,9 +6290,9 @@ import (
 	data?: {[string]: bytes} @go(Data,map[string][]byte) @protobuf(2,bytes,rep)
 
 	// stringData allows specifying non-binary secret data in string form.
-	// It is provided as a write-only convenience method.
+	// It is provided as a write-only input field for convenience.
 	// All keys and values are merged into the data field on write, overwriting any existing values.
-	// It is never output when reading from the API.
+	// The stringData field is never output when reading from the API.
 	// +k8s:conversion-gen=false
 	// +optional
 	stringData?: {[string]: string} @go(StringData,map[string]string) @protobuf(4,bytes,rep)
@@ -6366,7 +6433,6 @@ import (
 	// be updated (only object metadata can be modified).
 	// If not set to true, the field can be modified at any time.
 	// Defaulted to nil.
-	// This is a beta field enabled by ImmutableEphemeralVolumes feature gate.
 	// +optional
 	immutable?: null | bool @go(Immutable,*bool) @protobuf(4,varint,opt)
 
@@ -6665,7 +6731,7 @@ import (
 	data: bytes @go(Data,[]byte) @protobuf(3,bytes,opt)
 }
 
-// "default-scheduler" is the name of default scheduler.
+// DefaultSchedulerName defines the name of default scheduler.
 #DefaultSchedulerName: "default-scheduler"
 
 // RequiredDuringScheduling affinity is not symmetric, but there is an implicit PreferredDuringScheduling affinity rule

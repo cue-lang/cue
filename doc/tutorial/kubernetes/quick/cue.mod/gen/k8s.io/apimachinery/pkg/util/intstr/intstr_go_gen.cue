@@ -22,5 +22,10 @@ package intstr
 	#Int |
 	#String
 
+#values_Type: {
+	Int:    #Int
+	String: #String
+}
+
 #Int:    #Type & 0
 #String: #Type & 1

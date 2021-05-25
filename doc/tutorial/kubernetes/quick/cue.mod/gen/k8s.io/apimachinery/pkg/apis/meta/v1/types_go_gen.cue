@@ -84,6 +84,8 @@ import (
 	remainingItemCount?: null | int64 @go(RemainingItemCount,*int64) @protobuf(4,bytes,opt)
 }
 
+#ObjectNameField: "metadata.name"
+
 #FinalizerOrphanDependents: "orphan"
 #FinalizerDeleteDependents: "foregroundDeletion"
 
@@ -421,20 +423,6 @@ import (
 // provided.
 #ResourceVersionMatchExact: #ResourceVersionMatch & "Exact"
 
-// ExportOptions is the query options to the standard REST get call.
-// Deprecated. Planned for removal in 1.18.
-#ExportOptions: {
-	#TypeMeta
-
-	// Should this value be exported.  Export strips fields that a user can not specify.
-	// Deprecated. Planned for removal in 1.18.
-	export: bool @go(Export) @protobuf(1,varint,opt)
-
-	// Should the export be exact.  Exact export maintains cluster-specific fields like 'Namespace'.
-	// Deprecated. Planned for removal in 1.18.
-	exact: bool @go(Exact) @protobuf(2,varint,opt)
-}
-
 // GetOptions is the standard query options to the standard REST get call.
 #GetOptions: {
 	#TypeMeta
@@ -567,6 +555,33 @@ import (
 	// types (JsonPatch, MergePatch, StrategicMergePatch).
 	// +optional
 	fieldManager?: string @go(FieldManager) @protobuf(3,bytes)
+}
+
+// ApplyOptions may be provided when applying an API object.
+// FieldManager is required for apply requests.
+// ApplyOptions is equivalent to PatchOptions. It is provided as a convenience with documentation
+// that speaks specifically to how the options fields relate to apply.
+#ApplyOptions: {
+	#TypeMeta
+
+	// When present, indicates that modifications should not be
+	// persisted. An invalid or unrecognized dryRun directive will
+	// result in an error response and no further processing of the
+	// request. Valid values are:
+	// - All: all dry run stages will be processed
+	// +optional
+	dryRun?: [...string] @go(DryRun,[]string) @protobuf(1,bytes,rep)
+
+	// Force is going to "force" Apply requests. It means user will
+	// re-acquire conflicting fields owned by other people.
+	force: bool @go(Force) @protobuf(2,varint,opt)
+
+	// fieldManager is a name associated with the actor or entity
+	// that is making these changes. The value must be less than or
+	// 128 characters long, and only contain printable characters,
+	// as defined by https://golang.org/pkg/unicode/#IsPrint. This
+	// field is required.
+	fieldManager: string @go(FieldManager) @protobuf(3,bytes)
 }
 
 // UpdateOptions may be provided when updating an API object.

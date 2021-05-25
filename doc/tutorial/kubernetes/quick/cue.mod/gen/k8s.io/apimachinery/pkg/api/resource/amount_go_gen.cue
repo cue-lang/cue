@@ -20,6 +20,18 @@ package resource
 	#Peta |
 	#Exa
 
+#values_Scale: {
+	Nano:  #Nano
+	Micro: #Micro
+	Milli: #Milli
+	Kilo:  #Kilo
+	Mega:  #Mega
+	Giga:  #Giga
+	Tera:  #Tera
+	Peta:  #Peta
+	Exa:   #Exa
+}
+
 #Nano:  #Scale & -9
 #Micro: #Scale & -6
 #Milli: #Scale & -3

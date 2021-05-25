@@ -14,7 +14,7 @@ package v1
 #TaintNodeUnreachable: "node.kubernetes.io/unreachable"
 
 // TaintNodeUnschedulable will be added when node becomes unschedulable
-// and removed when node becomes scheduable.
+// and removed when node becomes schedulable.
 #TaintNodeUnschedulable: "node.kubernetes.io/unschedulable"
 
 // TaintNodeMemoryPressure will be added when node has memory pressure
@@ -30,5 +30,5 @@ package v1
 #TaintNodeNetworkUnavailable: "node.kubernetes.io/network-unavailable"
 
 // TaintNodePIDPressure will be added when node has pid pressure
-// and removed when node has enough disk.
+// and removed when node has enough pid.
 #TaintNodePIDPressure: "node.kubernetes.io/pid-pressure"

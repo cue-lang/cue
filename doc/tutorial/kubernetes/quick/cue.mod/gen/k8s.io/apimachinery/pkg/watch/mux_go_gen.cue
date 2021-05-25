@@ -12,6 +12,11 @@ package watch
 	#WaitIfChannelFull |
 	#DropIfChannelFull
 
+#values_FullChannelBehavior: {
+	WaitIfChannelFull: #WaitIfChannelFull
+	DropIfChannelFull: #DropIfChannelFull
+}
+
 #WaitIfChannelFull: #FullChannelBehavior & 0
 #DropIfChannelFull: #FullChannelBehavior & 1
 

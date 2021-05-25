@@ -114,7 +114,7 @@ _k8sSpec: X: kubernetes: {
 					for v in X.volume {
 						name:      v.name
 						mountPath: v.mountPath
-						if v.subPath != null | true {
+						if v.subPath != null {
 							subPath: v.subPath
 						}
 						if v.readOnly {

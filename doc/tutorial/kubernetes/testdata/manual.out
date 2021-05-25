@@ -1456,14 +1456,8 @@ kubernetes: {
                             image: "gcr.io/myproj/events:v0.1.31"
                             args: ["-cert=/etc/ssl/server.pem", "-key=/etc/ssl/server.key", "-grpc=:7788"]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
                             }]
                             ports: [{
                                 name:          "grpc"
@@ -1635,14 +1629,8 @@ kubernetes: {
                             image: "gcr.io/myproj/tasks:v0.2.6"
                             args: []
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
                             }]
                             ports: [{
                                 name:          "https"
@@ -1774,14 +1762,8 @@ kubernetes: {
                             image: "gcr.io/myproj/updater:v0.1.0"
                             args: ["-key=/etc/certs/updater.pem"]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-updater"
+                                mountPath: "/etc/certs"
                             }]
                             ports: [{
                                 name:          "http"
@@ -1925,14 +1907,8 @@ kubernetes: {
                             image: "gcr.io/myproj/watcher:v0.1.0"
                             args: []
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
                             }]
                             ports: [{
                                 name:          "https"
@@ -2140,32 +2116,16 @@ kubernetes: {
                                 periodSeconds:       3
                             }
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "ssd-caller"
+                                mountPath: "/logs"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-ssh-key"
+                                readOnly:  true
+                                mountPath: "/sslcerts"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-caller"
+                                readOnly:  true
+                                mountPath: "/etc/certs"
                             }]
                             ports: [{
                                 name:          "client"
@@ -2361,32 +2321,16 @@ kubernetes: {
                                 periodSeconds:       3
                             }
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-ssh-key"
+                                readOnly:  true
+                                mountPath: "/sslcerts"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "dishwasher-disk"
+                                mountPath: "/logs"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-dishwasher"
+                                readOnly:  true
+                                mountPath: "/etc/certs"
                             }]
                             ports: [{
                                 name:          "client"
@@ -2570,23 +2514,12 @@ kubernetes: {
                                 periodSeconds:       3
                             }
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "expiditer-disk"
+                                mountPath: "/logs"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-expiditer"
+                                readOnly:  true
+                                mountPath: "/etc/certs"
                             }]
                             ports: [{
                                 name:          "client"
@@ -2767,23 +2700,12 @@ kubernetes: {
                                 periodSeconds:       3
                             }
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-headchef"
+                                readOnly:  true
+                                mountPath: "/sslcerts"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "headchef-disk"
+                                mountPath: "/logs"
                             }]
                             ports: [{
                                 name:          "client"
@@ -2968,23 +2890,12 @@ kubernetes: {
                                 periodSeconds:       3
                             }
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-kitchen"
+                                readOnly:  true
+                                mountPath: "/etc/certs"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "linecook-disk"
+                                mountPath: "/logs"
                             }]
                             ports: [{
                                 name:          "client"
@@ -3169,23 +3080,12 @@ kubernetes: {
                                 periodSeconds:       3
                             }
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-ssh-key"
+                                readOnly:  true
+                                mountPath: "/etc/certs"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "pastrychef-disk"
+                                mountPath: "/logs"
                             }]
                             ports: [{
                                 name:          "client"
@@ -3520,23 +3420,11 @@ kubernetes: {
                             image: "prom/alertmanager:v0.15.2"
                             args: ["--config.file=/etc/alertmanager/alerts.yaml", "--storage.path=/alertmanager", "--web.external-url=https://alertmanager.example.com"]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "config-volume"
+                                mountPath: "/etc/alertmanager"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "alertmanager"
+                                mountPath: "/alertmanager"
                             }]
                             ports: [{
                                 name:          "alertmanager"
@@ -3747,14 +3635,8 @@ kubernetes: {
                                 value: "admin"
                             }]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "grafana-volume"
+                                mountPath: "/var/lib/grafana"
                             }]
                             ports: [{
                                 name:          "grafana"
@@ -3955,23 +3837,13 @@ kubernetes: {
                             image: "quay.io/prometheus/node-exporter:v0.16.0"
                             args: ["--path.procfs=/host/proc", "--path.sysfs=/host/sys"]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "proc"
+                                readOnly:  true
+                                mountPath: "/host/proc"
                             }, {
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "sys"
+                                readOnly:  true
+                                mountPath: "/host/sys"
                             }]
                             ports: [{
                                 name:          "scrape"
@@ -4379,14 +4251,8 @@ kubernetes: {
                             image: "prom/prometheus:v2.4.3"
                             args: ["--config.file=/etc/prometheus/prometheus.yml", "--web.external-url=https://prometheus.example.com"]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "config-volume"
+                                mountPath: "/etc/prometheus"
                             }]
                             ports: [{
                                 name:          "web"
@@ -4833,14 +4699,8 @@ kubernetes: {
                             image: "skippy/oauth2_proxy:2.0.1"
                             args: ["--config=/etc/authproxy/authproxy.cfg"]
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "config-volume"
+                                mountPath: "/etc/authproxy"
                             }]
                             ports: [{
                                 name:          "client"
@@ -5051,14 +4911,8 @@ kubernetes: {
                             image: "gcr.io/myproj/goget:v0.5.1"
                             args: []
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
                             }]
                             ports: [{
                                 name:          "https"
@@ -5415,14 +5269,8 @@ kubernetes: {
                             image: "nginx:1.11.10-alpine"
                             args: []
                             volumeMounts: [{
-                                name:      v.name
-                                mountPath: v.mountPath
-                                if v.subPath != null | true {
-                                    subPath: v.subPath
-                                }
-                                if v.readOnly {
-                                    readOnly: v.readOnly
-                                }
+                                name:      "secret-volume"
+                                mountPath: "/etc/ssl"
                             }, {
                                 name:      "config-volume"
                                 subPath:   "nginx.conf"

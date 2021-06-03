@@ -219,12 +219,12 @@ func New(cfg *Config, inst cue.InstanceOrValue, f TaskFunc) *Controller {
 }
 
 // Run runs the tasks of a workflow until completion.
-func (c *Controller) Run(ctx context.Context) error {
+func (c *Controller) Run(ctx context.Context) (cue.Value, error) {
 	c.context, c.cancelFunc = context.WithCancel(ctx)
 	defer c.cancelFunc()
 
 	c.runLoop()
-	return c.errs
+	return c.inst, c.errs
 }
 
 // A State indicates the state of a Task.

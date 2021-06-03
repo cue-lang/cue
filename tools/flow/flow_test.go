@@ -81,7 +81,7 @@ func TestFlow(t *testing.T) {
 		c := flow.New(cfg, v, taskFunc)
 
 		w := t.Writer("errors")
-		if err := c.Run(context.Background()); err != nil {
+		if _, err := c.Run(context.Background()); err != nil {
 			cwd, _ := os.Getwd()
 			fmt.Fprint(w, "error: ")
 			errors.Print(w, err, &errors.Config{
@@ -209,7 +209,7 @@ func TestX(t *testing.T) {
 
 	t.Error(mermaidGraph(c))
 
-	if err := c.Run(context.Background()); err != nil {
+	if _, err := c.Run(context.Background()); err != nil {
 		t.Fatal(errors.Details(err, nil))
 	}
 }

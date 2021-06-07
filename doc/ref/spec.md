@@ -1688,6 +1688,8 @@ CUE is lexically scoped using blocks:
   declared at top level (outside any struct literal) is the package block.
 1. The scope of an identifier denoting an alias
   declared at top level (outside any struct literal) is the file block.
+1. The scope of a let identifier
+  declared at top level (outside any struct literal) is the file block.
 1. The scope of the package name of an imported package is the file block of the
   file containing the import declaration.
 1. The scope of a field, alias or let identifier declared inside a struct

@@ -57,6 +57,8 @@ issue767: {
     }
 }
 -- out/compile --
+b.let[]: cyclic references in let clause or alias:
+    ./in.cue:10:13
 --- in.cue
 {
   a: {
@@ -92,60 +94,5 @@ issue767: {
   }
 }
 -- out/eval --
-Errors:
 b.let[]: cyclic references in let clause or alias:
     ./in.cue:10:13
-
-Result:
-(_|_){
-  // [eval]
-  a: (struct){
-    b: (int){ 5 }
-    c: (int){ 5 }
-  }
-  b: (_|_){
-    // [eval]
-    b: (_|_){
-      // [eval] b.let[]: cyclic references in let clause or alias:
-      //     ./in.cue:10:13
-    }
-    c: (int){ 5 }
-  }
-  fieldOffset: (struct){
-    a: (struct){
-      p1: (struct){
-        x: (struct){
-          value: (int){ 2 }
-        }
-      }
-      p2: (struct){
-        x: (struct){
-          value: (int){ 2 }
-        }
-      }
-    }
-    b: (struct){
-      p1: (struct){
-        x: (struct){
-          x: (struct){
-            y: (int){ 2 }
-          }
-        }
-      }
-      p2: (struct){
-        x: (struct){
-          x: (struct){
-            y: (int){ 2 }
-          }
-        }
-      }
-    }
-  }
-  issue767: (struct){
-    #Foo: (#struct){
-      out: (#struct){
-        x: (string){ "" }
-      }
-    }
-  }
-}

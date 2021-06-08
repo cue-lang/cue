@@ -64,7 +64,57 @@ incompleteLet: {
     }
 }
 
+cycles: {
+  a: {
+    let A = { c: B }
+    let B = A
+    out: A
+  }
+
+  b: {
+    let A = { c: B }
+	  let B = { A.c }
+	  out: A
+  }
+
+  issue1042: {
+    #FullAdder: {
+      // IN
+      a: bool
+      b: bool
+      c: bool
+      // OUT
+      sum: bool
+      carry: bool
+    }
+
+    #Add16: {
+      a:   [bool] * 16
+      b:   [bool] * 16
+      out: [bool] * 16
+
+      let fulladders = [
+        for i in list.Range(0, 4, 1) {
+          #FullAdder & {"a": a[i], "b": b[i], c: carries[i]}
+        }
+      ]
+      let carries = [
+        false,
+        for i in list.Range(0, 4, 1) { fulladders[i].carry }
+      ]
+      out: [
+        for i in list.Range(0, 4, 1) { fulladders[i].sum }
+      ]
+    }
+  }
+}
 -- out/compile --
+cycles.a.let[].c.c: cyclic references in let clause or alias:
+    ./in.cue:68:18
+cycles.b.let[].c.c: cyclic references in let clause or alias:
+    ./in.cue:74:18
+cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
+    ./in.cue:97:50
 --- in.cue
 {
   a1list: [
@@ -183,103 +233,44 @@ incompleteLet: {
       if (〈import;list〉.max < 0) {}
     }
   }
-}
--- out/eval --
-(struct){
-  a1list: (#list){
-    0: (int){ 1 }
-  }
-  a1: (int){ 101 }
-  a2list: (#list){
-    0: (int){ 2 }
-  }
-  a2: (struct){
-    b: (int){ 202 }
-  }
-  a3list: (#list){
-    0: (int){ 3 }
-  }
-  a3: (struct){
-    b: (struct){
-      c: (int){ 303 }
+  cycles: {
+    a: {
+      out: 〈0;let A〉
     }
-  }
-  a4list: (#list){
-    0: (int){ 4 }
-  }
-  a4: (#list){
-    0: (struct){
-      v: (int){ 404 }
+    b: {
+      out: 〈0;let A〉
     }
-  }
-  a5list: (#list){
-    0: (int){ 5 }
-  }
-  a5: (struct){
-    b: (#list){
-      0: (struct){
-        v: (int){ 505 }
+    issue1042: {
+      #FullAdder: {
+        a: bool
+        b: bool
+        c: bool
+        sum: bool
+        carry: bool
       }
-    }
-  }
-  a6list: (#list){
-    0: (int){ 6 }
-  }
-  a6: (struct){
-    b: (struct){
-      c: (#list){
-        0: (struct){
-          v: (int){ 606 }
-        }
+      #Add16: {
+        a: ([
+          bool,
+        ] * 16)
+        b: ([
+          bool,
+        ] * 16)
+        out: ([
+          bool,
+        ] * 16)
+        out: [
+          for _, i in 〈import;list〉.Range(0, 4, 1) {
+            〈2;let fulladders〉[〈1;i〉].sum
+          },
+        ]
       }
-    }
-  }
-  a7list: (#list){
-    0: (int){ 7 }
-  }
-  a7: (struct){
-    v: (int){ 707 }
-  }
-  a8list: (#list){
-    0: (int){ 8 }
-  }
-  a8: (struct){
-    b: (struct){
-      v: (int){ 808 }
-    }
-  }
-  a9list: (#list){
-    0: (int){ 9 }
-  }
-  a9: (struct){
-    b: (struct){
-      c: (struct){
-        v: (int){ 909 }
-      }
-    }
-  }
-  incompleteLet: (struct){
-    input: (#list){
-      0: (int){ 1 }
-      1: (int){ 2 }
-      2: (int){ 3 }
-      3: (int){ 4 }
-      4: (int){ 5 }
-    }
-    last: (struct){
-      min: (int){ 1 }
-      max: (int){ 5 }
-    }
-    bar: (struct){
-      min: (int){ 1 }
-      max: (_|_){
-        // [incomplete] incompleteLet.bar.max: undefined field: max:
-        //     ./in.cue:54:23
-      }
-    }
-    x: (_|_){
-      // [incomplete] incompleteLet.x: undefined field: max:
-      //     ./in.cue:61:17
     }
   }
 }
+-- out/eval --
+cycles.a.let[].c.c: cyclic references in let clause or alias:
+    ./in.cue:68:18
+cycles.b.let[].c.c: cyclic references in let clause or alias:
+    ./in.cue:74:18
+cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let clause or alias:
+    ./in.cue:97:50

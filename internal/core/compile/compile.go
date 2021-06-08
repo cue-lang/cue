@@ -190,7 +190,7 @@ func (c *compiler) updateAlias(id *ast.Ident, expr adt.Expr) {
 }
 
 // lookupAlias looks up an alias with the given name at the k'th stack position.
-func (c compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
+func (c *compiler) lookupAlias(k int, id *ast.Ident) aliasEntry {
 	m := c.stack[k].aliases
 	name := id.Name
 	entry, ok := m[name]

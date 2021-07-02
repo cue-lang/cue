@@ -46,10 +46,6 @@ workflows: [
 		file:   "new_version_triggers.yml"
 		schema: new_version_triggers
 	},
-	{
-		file:   "mirror.yml"
-		schema: mirror
-	},
 ]
 
 test: _#bashWorkflow & {
@@ -60,6 +56,7 @@ test: _#bashWorkflow & {
 			branches: ["**"] // any branch (including '/' namespaced branches)
 			"tags-ignore": [_#releaseTagPattern]
 		}
+		pull_request: {}
 	}
 
 	jobs: {
@@ -67,7 +64,7 @@ test: _#bashWorkflow & {
 			"runs-on": _#linuxMachine
 			steps: [...(_ & {if: "${{ \(_#isCLCITestBranch) }}"})]
 			steps: [
-				_#writeCookiesFile,
+				_#writeNetrcFile,
 				_#startCLBuild,
 			]
 		}
@@ -76,7 +73,7 @@ test: _#bashWorkflow & {
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
 			steps: [
-				_#writeCookiesFile,
+				_#writeNetrcFile,
 				_#installGo,
 				_#checkoutCode,
 				_#cacheGoModules,
@@ -86,12 +83,12 @@ test: _#bashWorkflow & {
 				},
 				_#goGenerate,
 				_#goTest,
-				_#goTestRace & {
-					if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
-				},
+				// _#goTestRace & {
+				//  if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				// },
 				_#goReleaseCheck,
 				_#checkGitClean,
-				_#pullThroughProxy,
+				// _#pullThroughProxy,
 				_#failCLBuild,
 			]
 		}
@@ -100,7 +97,7 @@ test: _#bashWorkflow & {
 			if:        "${{ \(_#isCLCITestBranch) }}"
 			needs:     "test"
 			steps: [
-				_#writeCookiesFile,
+				_#writeNetrcFile,
 				_#passCLBuild,
 			]
 		}
@@ -112,7 +109,7 @@ test: _#bashWorkflow & {
 				_#step & {
 					run: """
 						\(_#tempCueckooGitDir)
-						git push https://github.com/cuelang/cue :${GITHUB_REF#\(_#branchRefPrefix)}
+						git push https://github.com/cue-lang/cue :${GITHUB_REF#\(_#branchRefPrefix)}
 						"""
 				},
 			]
@@ -154,7 +151,7 @@ test: _#bashWorkflow & {
 			#args: {
 				message: "Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details"
 				labels: {
-					"Code-Review": -1
+					"TryBot-Result": -1
 				}
 			}
 		}).res
@@ -166,7 +163,7 @@ test: _#bashWorkflow & {
 			#args: {
 				message: "Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
 				labels: {
-					"Code-Review": 1
+					"TryBot-Result": 1
 				}
 			}
 		}).res
@@ -180,11 +177,11 @@ test: _#bashWorkflow & {
 				tag:     "trybot"
 				message: string
 				labels?: {
-					"Code-Review": int
+					"TryBot-Result": int
 				}
 			}
 			res: #"""
-			\#(_#curl) -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review
+			\#(_#curl) -n -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review
 			"""#
 		}
 	}
@@ -193,8 +190,6 @@ test: _#bashWorkflow & {
 repository_dispatch: _#bashWorkflow & {
 	// These constants are defined by github.com/cue-sh/tools/cmd/cueckoo
 	_#runtrybot: "runtrybot"
-	_#mirror:    "mirror"
-	_#importpr:  "importpr"
 	_#unity:     "unity"
 
 	_#dispatchJob: _#job & {
@@ -209,48 +204,17 @@ repository_dispatch: _#bashWorkflow & {
 		"\(_#runtrybot)": _#dispatchJob & {
 			_#type: _#runtrybot
 			steps: [
+				_#writeNetrcFile,
 				_#step & {
 					name: "Trigger trybot"
 					run:  """
 						\(_#tempCueckooGitDir)
-						git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}
+						git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
 						git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
-						git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
+						git push https://github.com/cue-lang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
 						"""
 				},
 			]
-		}
-		"\(_#mirror)": _#dispatchJob & {
-			_#type: _#mirror
-			steps:  _#copybaraSteps & {_
-				_#name: "Mirror Gerrit to GitHub"
-				_#cmd:  "github"
-			}
-		}
-		"\(_#importpr)": _#dispatchJob & {
-			_#type: _#importpr
-			steps:  _#copybaraSteps & {_
-				_#name: "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit"
-				_#cmd:  "github-pr ${{ github.event.client_payload.payload.pr }}"
-			}
-		}
-	}
-}
-
-mirror: _#bashWorkflow & {
-	name: "Scheduled repo mirror"
-	on:
-		schedule: [{
-			cron: "*/30 * * * *" // every 30 mins
-		}]
-
-	jobs: {
-		"mirror": {
-			"runs-on": _#linuxMachine
-			steps:     _#copybaraSteps & {_
-				_#name: "Mirror Gerrit to GitHub"
-				_#cmd:  "github"
-			}
 		}
 	}
 }
@@ -271,7 +235,7 @@ release: _#bashWorkflow & {
 				},
 				_#step & {
 					name: "Run GoReleaser"
-					env: GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
+					env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
 					uses: "goreleaser/goreleaser-action@v2"
 					with: {
 						args:    "release --rm-dist"
@@ -303,7 +267,7 @@ release: _#bashWorkflow & {
 					uses: "docker/build-push-action@v1"
 					with: {
 						tags:           "${{ env.CUE_VERSION }},latest"
-						repository:     "cuelang/cue"
+						repository:     "cue-lang/cue"
 						username:       "${{ secrets.DOCKER_USERNAME }}"
 						password:       "${{ secrets.DOCKER_PASSWORD }}"
 						tag_with_ref:   false
@@ -350,7 +314,7 @@ new_version_triggers: _#bashWorkflow & {
 			{
 				name: "Rebuild tip.cuelang.org"
 				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cuelang/cuelang.org/dispatches
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches
 					"""#
 			},
 			{
@@ -386,8 +350,16 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.16"]
-		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
+		"go-version": [
+			// _#codeGenGo,
+			// _#latestStableGo,
+			"1.16",
+		]
+		os: [
+			_#linuxMachine,
+			// _#macosMachine,
+			// _#windowsMachine,
+		]
 	}
 }
 
@@ -453,9 +425,16 @@ _#checkGitClean: _#step & {
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
 
-_#writeCookiesFile: _#step & {
-	name: "Write the gitcookies file"
-	run:  "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies"
+_#writeNetrcFile: _#step & {
+	name: "Write netrc file for cueckoo Gerrithub"
+	run: """
+		cat <<EOD > ~/.netrc
+		machine review.gerrithub.io
+		login cueckoo
+		password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+		EOD
+		chmod 600 ~/.netrc
+		"""
 }
 
 _#branchRefPrefix: "refs/heads/"
@@ -479,13 +458,11 @@ _#copybaraCmd: {
 		cd _scripts
 		docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" \#(_#cueckooCopybaraImage) bash -c " \
 			set -eu; \
-			echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
-			chmod 600 ~/.gitcookies; \
 			git config --global user.name cueckoo; \
-			git config --global user.email cueckoo@gmail.com; \
-			git config --global http.cookiefile \$HOME/.gitcookies; \
-		  	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
-			chmod 600 ~/.git-credentials; \
+			git config --global user.email cueckoo@cuelang.org; \
+		  	echo machine github.com login cueckoo password ${{ secrets.CUECKOO_GITHUB_PAT }} >> ~/.netrc; \
+		  	echo machine review.gerrithub.io login cueckoo password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }} >> ~/.netrc; \
+			chmod 600 ~/.netrc; \
 			java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky \#(_#cmd); \
 			"
 		"""#

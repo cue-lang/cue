@@ -16,71 +16,32 @@ We assume you have a basic understanding of Git and Go.
 The first step is registering as a CUE contributor and configuring your environment.
 Here is a checklist of the required steps to follow:
 
-
-- **Step 0**: Decide on a single Google Account you will be using to contribute to CUE.
-Use that account for all the following steps and make sure that `git`
-is configured to create commits with that account's e-mail address.
-- **Step 1**: [Sign and submit](https://cla.developers.google.com/clas) a
-CLA (Contributor License Agreement).
-- **Step 2**: Configure authentication credentials for the CUE Git repository.
-Visit
-[cue.googlesource.com](https://cue.googlesource.com), click
-on "Generate Password" (top right), and follow the instructions.
-- **Step 3**: Register for Gerrit, the code review tool used by the CUE team,
-by [visiting this page](https://cue-review.googlesource.com/login/).
-The CLA and the registration need to be done only once for your account.
-- **Step 4**: Install `git-codereview` by running: `GO111MODULE=on go get
+- **Step 0**: Decide which email address you want to use for contributions.
+- **Step 1**: Read and prepare for asserting a Developer Certificate of Origin.
+- **Step 2**: Set up a [GerritHub](http://gerrithub.io/) account.
+- **Step 3**: Install `git-codereview` by running: `GO111MODULE=on go get
   golang.org/x/review/git-codereview` (or just `go install
   golang.org/x/review/git-codereview@latest` if you are using Go 1.16)
 
-<!-- Keep the above steps in sync with cmd/cue/cmd/testdata/script/contributing_install*.txt -->
+Note that if you plan to contribute via GitHub, only Steps 0 and 1 are required.
 
+The rest of this chapter elaborates on these instructions.  If you have
+completed the steps above (either manually or through the tool), jump to "Before
+contributing code."
 
-<!-- TODO
-If you prefer, there is an automated tool that walks through these steps.
-Just run:
+### Step 0: Decide which email address you want to use for contributions
 
-
-```
-$ go get -u cuelang.org/x/tools/cmd/cue-contrib-init
-$ cd /code/to/edit
-$ cue-contrib-init
-```
---->
-
-The rest of this chapter elaborates on these instructions.
-If you have completed the steps above (either manually or through the tool), jump to
-Before contributing code.
-
-
-### Step 0: Select a Google Account
-
-A contribution to CUE is made through a Google account with a specific
-e-mail address.
-Make sure to use the same account throughout the process and
-for all your subsequent contributions.
-You may need to decide whether to use a personal address or a corporate address.
-The choice will depend on who
-will own the copyright for the code that you will be writing
-and submitting.
-You might want to discuss this topic with your employer before deciding which
-account to use.
-
-
-Google accounts can either be Gmail e-mail accounts, G Suite organization accounts, or
-accounts associated with an external e-mail address.
-For instance, if you need to use
-an existing corporate e-mail that is not managed through G Suite, you can create
-an account associated
-[with your existing
-e-mail address](https://accounts.google.com/SignUpWithoutGmail).
-
+A contribution to CUE is made through a specific e-mail address.  Make sure to
+use the same account throughout the process and for all your subsequent
+contributions.  You may need to decide whether to use a personal address or a
+corporate address.  The choice will depend on who will own the copyright for the
+code that you will be writing and submitting.  You might want to discuss this
+topic with your employer before deciding which account to use.
 
 You also need to make sure that your Git tool is configured to create commits
-using your chosen e-mail address.
-You can either configure Git globally
-(as a default for all projects), or locally (for a single specific project).
-You can check the current configuration with this command:
+using your chosen e-mail address.  You can either configure Git globally (as a
+default for all projects), or locally (for a single specific project).  You can
+check the current configuration with this command:
 
 
 ```
@@ -96,82 +57,98 @@ $ git config --global user.email name@example.com   # change global config
 $ git config user.email name@example.com            # change local config
 ```
 
+If the copyright holder for the code you are submitting changes&mdash;for
+example, if you start contributing code on behalf of a new company&mdash;please
+send mail to the [CUE Owners](mailto:owners@cuelang.org).  This will let us know
+the situation so we can make sure an appropriate agreement is completed and
+update the `AUTHORS` file.
 
-### Step 1: Contributor License Agreement
+### Step 1: Read and prepare for asserting a Developer Certificate of Origin
 
-Before sending your first change to the CUE project
-you must have completed one of the following two CLAs.
-Which CLA you should sign depends on who owns the copyright to your work.
+Contributions to the CUE project must be accompanied by a [Developer Certificate
+of Origin](https://developercertificate.org/), the text of which is reproduced
+here for convenience:
 
+```
+Developer Certificate of Origin
+Version 1.1
 
-- If you are the copyright holder, you will need to agree to the
-[individual contributor license agreement](https://developers.google.com/open-source/cla/individual),
-which can be completed online.
-- If your organization is the copyright holder, the organization
-will need to agree to the
-[corporate
-contributor license agreement](https://developers.google.com/open-source/cla/corporate).
+Copyright (C) 2004, 2006 The Linux Foundation and its contributors.
+1 Letterman Drive
+Suite D4700
+San Francisco, CA, 94129
 
-You can check your currently signed agreements and sign new ones at
-the
-[Google Developers Contributor License Agreements](https://cla.developers.google.com/clas?pli=1&amp;authuser=1) website.
-If the copyright holder for your contribution has already completed the
-agreement in connection with another Google open source project,
-it does not need to be completed again.
-
-
-If the copyright holder for the code you are submitting changes&mdash;for example,
-if you start contributing code on behalf of a new company&mdash;please send mail
-to the [`cue-dev` mailing list](mailto:cue-dev@googlegroups.com).
-This will let us know the situation so we can make sure an appropriate agreement is
-completed and update the `AUTHORS` file.
+Everyone is permitted to copy and distribute verbatim copies of this
+license document, but changing it is not allowed.
 
 
+Developer's Certificate of Origin 1.1
 
-### Step 2: Configure git authentication
+By making a contribution to this project, I certify that:
 
-The remaining two steps only apply if you wish to contribute through Gerrit,
-which is the source of truth for the CUE project. You can also send Pull
-Requests to the mirror at https://github.com/cuelang/cue.
+(a) The contribution was created in whole or in part by me and I
+    have the right to submit it under the open source license
+    indicated in the file; or
 
-The main CUE repository is located at
-[cue.googlesource.com](https://cue.googlesource.com),
-a Git server hosted by Google.
-Authentication on the web server is made through your Google account, but
-you also need to configure `git` on your computer to access it.
-Follow this steps:
+(b) The contribution is based upon previous work that, to the best
+    of my knowledge, is covered under an appropriate open source
+    license and I have the right under that license to submit that
+    work with modifications, whether created in whole or in part
+    by me, under the same open source license (unless I am
+    permitted to submit under a different license), as indicated
+    in the file; or
+
+(c) The contribution was provided directly to me by some other
+    person who certified (a), (b) or (c) and I have not modified
+    it.
+
+(d) I understand and agree that this project and the contribution
+    are public and that a record of the contribution (including all
+    personal information I submit with it, including my sign-off) is
+    maintained indefinitely and may be redistributed consistent with
+    this project or the open source license(s) involved.
+```
+
+All commit messages must contain the `Signed-off-by` line with an email address
+that matches the commit author. When commiting, use the `--signoff` flag:
+
+```
+git commit -s
+```
+
+### Step 2: Setup a GerritHub account
+
+If you have not used GerritHub before, setting up an account is a simple
+process:
+
+- Visit [GerritHub](http://gerrithub.io/).
+- Click "First Time Sign In".
+- Clickt the green "Sign In" button, to sign in using your GitHub
+  credentials.
+- When prompted "Which level of GitHub access do you need?", choose
+  "Default" and then click "Login."
+- Click "Authorize gerritforge-ltd" on the GitHub auth page.
+- Confirm account profile details and click "Next."
+
+If you want to use SSH for authentication, SSH keys can be [configured in your
+user profile](https://review.gerrithub.io/settings/#SSHKeys).
+
+For HTTP Credentials, [generate a password via your user
+profile](https://review.gerrithub.io/settings/#HTTPCredentials). Then use an
+existing HTTP authentication mechanism like `.netrc`, macOS KeyChain, or some
+other [crendential helper](https://git-scm.com/docs/gitcredentials). If you have
+any troubles with this step, please [raise an
+issue](https://github.com/cue-lang/cue/issues/new).
+
+Then visit https://review.gerrithub.io/admin/repos/cue-lang/cue, then click
+"HTTP" or "SSH" then copy the corresponding "Clone" command.
 
 
-- Visit [cue.googlesource.com](https://cue.googlesource.com)
-and click on "Generate Password" in the page's top right menu bar.
-You will be redirected to accounts.google.com to sign in.
-- After signing in, you will be taken to a page with the title "Configure Git".
-This page contains a personalized script that when run locally will configure Git
-to hold your unique authentication key.
-This key is paired with one that is generated and stored on the server,
-analogous to how SSH keys work.
-- Copy and run this script locally in your terminal to store your secret
-authentication token in a `.gitcookies` file.
-If you are using a Windows computer and running `cmd`,
-you should instead follow the instructions in the yellow box to run the command;
-otherwise run the regular script.
+### Step 3: Install the git-codereview command
 
-### Step 3: Create a Gerrit account
-
-Gerrit is an open-source tool used by CUE maintainers to discuss and review
-code submissions.
-
-
-To register your account, visit
-[cue-review.googlesource.com/login/](https://cue-review.googlesource.com/login/)
-and sign in once using the same Google Account you used above.
-
-
-### Step 4: Install the git-codereview command
-
-Changes to CUE must be reviewed before they are accepted, no matter who makes the change.
-A custom `git` command called `git-codereview`
-simplifies sending changes to Gerrit.
+Changes to CUE must be reviewed before they are accepted, no matter who makes
+the change.  A custom `git` command called `git-codereview` simplifies sending
+changes to Gerrit.
 
 <!-- Keep the following in sync with cmd/cue/cmd/testdata/script/contributing_install*.txt -->
 
@@ -205,7 +182,6 @@ Run `git --exec-path` to discover the right location then create a
 symbolic link or just copy the executable from $GOPATH/bin to this directory.
 
 
-
 ## Before contributing code
 
 <!--
@@ -223,7 +199,7 @@ an <a href="https://cuelang.org/issues">existing one</a>.
 ### Check the issue tracker
 
 Whether you already know what contribution to make, or you are searching for
-an idea, the [issue tracker](https://github.com/cuelang/cue/issues) is
+an idea, the [issue tracker](https://github.com/cue-lang/cue/issues) is
 always the first place to go.
 Issues are triaged to categorize them and manage the workflow.
 
@@ -247,13 +223,13 @@ You can use GitHub's search functionality to find issues to help out with. Examp
 
 -	Issues that need investigation:
 	[`is:issue is:open label:NeedsInvestigation`](
-		https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation)
+		https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation)
 -	Issues that need a fix:
-	[`is:issue is:open label:NeedsFix`](https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix)
+	[`is:issue is:open label:NeedsFix`](https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix)
 -	Issues that need a fix and have a CL:
-    [`is:issue is:open label:NeedsFix "cuelang.org/cl"`](https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+%22golang.org%2Fcl%22)
+    [`is:issue is:open label:NeedsFix "cuelang.org/cl"`](https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+%22golang.org%2Fcl%22)
 -	Issues that need a fix and do not have a CL:
-    [`is:issue is:open label:NeedsFix NOT "cuelang.org/cl"`](https://github.com/cuelang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+NOT+%22golang.org%2Fcl%22)
+    [`is:issue is:open label:NeedsFix NOT "cuelang.org/cl"`](https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+NOT+%22golang.org%2Fcl%22)
 
 ### Open an issue for any new problem
 
@@ -342,10 +318,14 @@ with help you understand the flow.
 This is an overview of the overall process:
 
 
-- **Step 1:** Clone the CUE source code from cue.googlesource.com
-and make sure it's stable by compiling and testing it once:
+- **Step 1:** Clone the CUE source code from GerritHub. Visit
+https://review.gerrithub.io/admin/repos/cue-lang/cue, then click
+"SSH" or "HTTP" dependending on which authentication mechanism you configured
+above. Then copy and run the corresponding "Clone" command.
+
+Then make sure it's stable by compiling and testing it once:
+
 ```
-$ git clone https://cue.googlesource.com/cue
 $ cd cue
 $ go test ./...
 $ go install ./cmd/cue
@@ -395,12 +375,14 @@ In addition to a recent CUE installation, you need to have a local copy of the s
 checked out from the correct repository.
 You can check out the CUE source repo onto your local file system anywhere
 you want as long as it's outside your `GOPATH`.
-Either clone from
-`cue.googlesource.com` or from GitHub:
 
+Visit https://review.gerrithub.io/admin/repos/cue-lang/cue, then click
+"SSH" or "HTTP" dependending on which authentication mechanism you configured
+above. Then copy and run the corresponding "Clone" command.
+
+Then make sure it's stable by compiling and testing it once:
 
 ```
-$ git clone https://github.com/cuelang/cue   # or https://cue.googlesource.com/cue
 $ cd cue
 $ go test ./...
 # go install ./cmd/cue
@@ -486,7 +468,7 @@ Gerrit assigns your change a number and URL, which `git` `codereview` `mail` wil
 
 ```
 remote: New Changes:
-remote:   https://cue-review.googlesource.com/99999 math: improved Sin, Cos and Tan precision for very large arguments
+remote:   https://review.gerrithub.io/99999 math: improved Sin, Cos and Tan precision for very large arguments
 ```
 
 If you get an error instead, check the
@@ -596,7 +578,7 @@ If you are sending a change against a subrepository, you must use
 the fully-qualified syntax supported by GitHub to make sure the change is
 linked to the issue in the main repository, not the subrepository.
 All issues are tracked in the main repository's issue tracker.
-The correct form is "Fixes cuelang/cue#159".
+The correct form is "Fixes #159".
 
 
 
@@ -756,7 +738,7 @@ outside the issue/edit/code review/submit process itself.
 Files in the CUE repository don't list author names, both to avoid clutter
 and to avoid having to keep the lists up to date.
 Instead, your name will appear in the
-[change log](https://cue.googlesource.com/cue/+log) and in the
+[change log](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+log) and in the
 [`CONTRIBUTORS`](../CONTRIBUTORS) file and perhaps the
 [`AUTHORS`](../AUTHORS) file.
 These files are automatically generated from the commit logs periodically.
@@ -938,7 +920,7 @@ It will look something like this:
 
 
 ```
-$ git fetch https://cue.googlesource.com/review refs/changes/21/13245/1 && git checkout FETCH_HEAD
+$ git fetch https://review.gerrithub.io/a/cue-lang/cue refs/changes/67/519567/1 && git checkout FETCH_HEAD
 ```
 
 To revert, change back to the branch you were working in.

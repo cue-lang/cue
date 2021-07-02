@@ -59,7 +59,7 @@ brews:
   commit_author:
     name: cue-bot
     email: noreply@cuelang.org
-  homepage: "https://github.com/cuelang/cue"
+  homepage: "https://cuelang.org"
   description: "CUE is an open source data constraint language which aims to simplify tasks involving defining and using data."
   test: |
     system "#{bin}/cue version"

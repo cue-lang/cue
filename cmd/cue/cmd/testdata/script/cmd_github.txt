@@ -11,7 +11,6 @@ cue cmd genworkflows
 
 # TODO: drop cd when we solve cuelang.org/issue/708
 cd ../../
-cmp .github/workflows/mirror.yml .github/workflows/mirror.yml.golden
 cmp .github/workflows/new_version_triggers.yml .github/workflows/new_version_triggers.yml.golden
 cmp .github/workflows/release.yml .github/workflows/release.yml.golden
 cmp .github/workflows/repository_dispatch.yml .github/workflows/repository_dispatch.yml.golden
@@ -26,7 +25,7 @@ module "cuelang.org/go"
 name: Scheduled repo mirror
 on:
   schedule:
-  - cron: '*/30 * * * *'
+  - cron: '*/15 * * * *'
 jobs:
   mirror:
     runs-on: ubuntu-18.04
@@ -41,13 +40,11 @@ jobs:
         cd _scripts
         docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c " \
         	set -eu; \
-        	echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
-        	chmod 600 ~/.gitcookies; \
         	git config --global user.name cueckoo; \
-        	git config --global user.email cueckoo@gmail.com; \
-        	git config --global http.cookiefile \$HOME/.gitcookies; \
-          	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
-        	chmod 600 ~/.git-credentials; \
+        	git config --global user.email cueckoo@cuelang.org; \
+          	echo machine github.com login cueckoo password ${{ secrets.CUECKOO_GITHUB_PAT }} >> ~/.netrc; \
+          	echo machine review.gerrithub.io login cueckoo password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }} >> ~/.netrc; \
+        	chmod 600 ~/.netrc; \
         	java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \
         	"
 -- .github/workflows/new_version_triggers.yml.golden --
@@ -68,7 +65,7 @@ jobs:
     - name: Rebuild tip.cuelang.org
       run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
         }} --request POST --data-binary "{\"event_type\": \"Re-test post release of
-        ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cuelang/cuelang.org/dispatches'
+        ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches'
     - name: Trigger unity build
       run: 'curl -f -s -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT
         }} --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\",
@@ -105,7 +102,7 @@ jobs:
         args: release --rm-dist
         version: v0.155.1
       env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
   docker:
     name: docker
     runs-on: ubuntu-18.04
@@ -124,7 +121,7 @@ jobs:
       uses: docker/build-push-action@v1
       with:
         tags: ${{ env.CUE_VERSION }},latest
-        repository: cuelang/cue
+        repository: cue-lang/cue
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tag_with_ref: false
@@ -152,6 +149,14 @@ jobs:
         shell: bash
     if: ${{ github.event.client_payload.type == 'runtrybot' }}
     steps:
+    - name: Write netrc file for cueckoo Gerrithub
+      run: |-
+        cat <<EOD > ~/.netrc
+        machine review.gerrithub.io
+        login cueckoo
+        password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+        EOD
+        chmod 600 ~/.netrc
     - name: Trigger trybot
       run: |-
         mkdir tmpgit
@@ -160,55 +165,9 @@ jobs:
         git config user.name cueckoo
         git config user.email cueckoo@gmail.com
         git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-        git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}
+        git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
         git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
-        git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
-  mirror:
-    runs-on: ubuntu-18.04
-    defaults:
-      run:
-        shell: bash
-    if: ${{ github.event.client_payload.type == 'mirror' }}
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: Mirror Gerrit to GitHub
-      run: |-
-        cd _scripts
-        docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c " \
-        	set -eu; \
-        	echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
-        	chmod 600 ~/.gitcookies; \
-        	git config --global user.name cueckoo; \
-        	git config --global user.email cueckoo@gmail.com; \
-        	git config --global http.cookiefile \$HOME/.gitcookies; \
-          	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
-        	chmod 600 ~/.git-credentials; \
-        	java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github; \
-        	"
-  importpr:
-    runs-on: ubuntu-18.04
-    defaults:
-      run:
-        shell: bash
-    if: ${{ github.event.client_payload.type == 'importpr' }}
-    steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
-    - name: 'Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit'
-      run: |-
-        cd _scripts
-        docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c bash -c " \
-        	set -eu; \
-        	echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies; \
-        	chmod 600 ~/.gitcookies; \
-        	git config --global user.name cueckoo; \
-        	git config --global user.email cueckoo@gmail.com; \
-        	git config --global http.cookiefile \$HOME/.gitcookies; \
-          	echo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \
-        	chmod 600 ~/.git-credentials; \
-        	java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky github-pr ${{ github.event.client_payload.payload.pr }}; \
-        	"
+        git push https://github.com/cue-lang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
 -- .github/workflows/test.yml.golden --
 # Generated by internal/ci/ci_tool.cue; do not edit
 
@@ -219,6 +178,7 @@ on:
     - '**'
     tags-ignore:
     - v*
+  pull_request: {}
 jobs:
   start:
     runs-on: ubuntu-18.04
@@ -227,13 +187,19 @@ jobs:
         shell: bash
     steps:
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
-      name: Write the gitcookies file
-      run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
+      name: Write netrc file for cueckoo Gerrithub
+      run: |-
+        cat <<EOD > ~/.netrc
+        machine review.gerrithub.io
+        login cueckoo
+        password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+        EOD
+        chmod 600 ~/.netrc
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
       name: Update Gerrit CL message with starting message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Started
-        the build... see progress at ${{ github.event.repository.html_url }}/actions/runs/${{
-        github.run_id }}"}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
+      run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
+        ''{"tag":"trybot","message":"Started the build... see progress at ${{ github.event.repository.html_url
+        }}/actions/runs/${{ github.run_id }}"}'' https://review.gerrithub.io/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   test:
     needs: start
@@ -241,20 +207,22 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
-        - 1.14.14
-        - 1.15.8
         - "1.16"
         os:
         - ubuntu-18.04
-        - macos-10.15
-        - windows-2019
     runs-on: ${{ matrix.os }}
     defaults:
       run:
         shell: bash
     steps:
-    - name: Write the gitcookies file
-      run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
+    - name: Write netrc file for cueckoo Gerrithub
+      run: |-
+        cat <<EOD > ~/.netrc
+        machine review.gerrithub.io
+        login cueckoo
+        password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+        EOD
+        chmod 600 ~/.netrc
     - name: Install Go
       uses: actions/setup-go@v2
       with:
@@ -277,27 +245,16 @@ jobs:
       run: go generate ./...
     - name: Test
       run: go test ./...
-    - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/')
-        && matrix.go-version == '1.15.8' && matrix.os == 'ubuntu-18.04' }}
-      name: Test with -race
-      run: go test -race ./...
     - name: gorelease check
       run: go run golang.org/x/exp/cmd/gorelease
     - name: Check that git is clean post generate and tests
       run: test -z "$(git status --porcelain)" || (git status; git diff; false)
-    - if: ${{ github.ref == 'refs/heads/master' }}
-      name: Pull this commit through the proxy on master
-      run: |-
-        v=$(git rev-parse HEAD)
-        cd $(mktemp -d)
-        go mod init mod.com
-        GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
       name: Post any failures for this matrix entry
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
-        failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url
-        }}/actions/runs/${{ github.run_id }} for more details","labels":{"Code-Review":-1}}''
-        -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
+      run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
+        ''{"tag":"trybot","message":"Build failed for ${{ runner.os }}-${{ matrix.go-version
+        }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id
+        }} for more details","labels":{"TryBot-Result":-1}}'' https://review.gerrithub.io/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   mark_ci_success:
     runs-on: ubuntu-18.04
@@ -307,12 +264,18 @@ jobs:
       run:
         shell: bash
     steps:
-    - name: Write the gitcookies file
-      run: echo "${{ secrets.gerritCookie }}" > ~/.gitcookies
+    - name: Write netrc file for cueckoo Gerrithub
+      run: |-
+        cat <<EOD > ~/.netrc
+        machine review.gerrithub.io
+        login cueckoo
+        password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+        EOD
+        chmod 600 ~/.netrc
     - name: Update Gerrit CL message with success message
-      run: 'curl -f -s -H "Content-Type: application/json" --request POST --data ''{"tag":"trybot","message":"Build
-        succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id
-        }}","labels":{"Code-Review":1}}'' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename
+      run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
+        ''{"tag":"trybot","message":"Build succeeded for ${{ github.event.repository.html_url
+        }}/actions/runs/${{ github.run_id }}","labels":{"TryBot-Result":1}}'' https://review.gerrithub.io/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   delete_build_branch:
     runs-on: ubuntu-18.04
@@ -329,7 +292,7 @@ jobs:
         git config user.name cueckoo
         git config user.email cueckoo@gmail.com
         git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
-        git push https://github.com/cuelang/cue :${GITHUB_REF#refs/heads/}
+        git push https://github.com/cue-lang/cue :${GITHUB_REF#refs/heads/}
 -- .github/workflows/tip_triggers.yml.golden --
 # Generated by internal/ci/ci_tool.cue; do not edit
 
@@ -1188,39 +1151,37 @@ workflows:           [...{
 }, {
 	file:   "new_version_triggers.yml"
 	schema: new_version_triggers
-}, {
-	file:   "mirror.yml"
-	schema: mirror
 }]
 test: _#bashWorkflow & {
 	name: "Test"
-	on: push: {
-		branches: ["**"]
-		"tags-ignore": [_#releaseTagPattern]
+	on: {
+		push: {
+			branches: ["**"]
+			"tags-ignore": [_#releaseTagPattern]
+		}
+		pull_request: {}
 	}
 	jobs: {
 		start: {
 			"runs-on": _#linuxMachine
 			steps:     [..._ & {
 				if: "${{ \(_#isCLCITestBranch) }}"
-			}] & [_#writeCookiesFile, _#startCLBuild]
+			}] & [_#writeNetrcFile, _#startCLBuild]
 		}
 		test: {
 			needs:     "start"
 			strategy:  _#testStrategy
 			"runs-on": "${{ matrix.os }}"
-			steps: [_#writeCookiesFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
+			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
 				_#tags: "long"
 				if:     "${{ \(_#isMaster) }}"
-			}, _#goGenerate, _#goTest, _#goTestRace & {
-				if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
-			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
+			}, _#goGenerate, _#goTest, _#goReleaseCheck, _#checkGitClean, _#failCLBuild]
 		}
 		mark_ci_success: {
 			"runs-on": _#linuxMachine
 			if:        "${{ \(_#isCLCITestBranch) }}"
 			needs:     "test"
-			steps: [_#writeCookiesFile, _#passCLBuild]
+			steps: [_#writeNetrcFile, _#passCLBuild]
 		}
 		delete_build_branch: {
 			"runs-on": _#linuxMachine
@@ -1229,7 +1190,7 @@ test: _#bashWorkflow & {
 			steps: [_#step & {
 				run: """
 							\(_#tempCueckooGitDir)
-							git push https://github.com/cuelang/cue :${GITHUB_REF#\(_#branchRefPrefix)}
+							git push https://github.com/cue-lang/cue :${GITHUB_REF#\(_#branchRefPrefix)}
 							"""
 			}]
 		}
@@ -1266,7 +1227,7 @@ test: _#bashWorkflow & {
 		run:  (_#gerrit._#setCodeReview & {
 			#args: {
 				message: "Build failed for ${{ runner.os }}-${{ matrix.go-version }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }} for more details"
-				labels: "Code-Review": -1
+				labels: "TryBot-Result": -1
 			}
 		}).res
 	}
@@ -1275,7 +1236,7 @@ test: _#bashWorkflow & {
 		run:  (_#gerrit._#setCodeReview & {
 			#args: {
 				message: "Build succeeded for ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
-				labels: "Code-Review": 1
+				labels: "TryBot-Result": 1
 			}
 		}).res
 	}
@@ -1286,17 +1247,15 @@ test: _#bashWorkflow & {
 			#args: {
 				tag:     "trybot"
 				message: string
-				labels?: "Code-Review": int
+				labels?: "TryBot-Result": int
 			}
-			res: "\(_#curl) -H \"Content-Type: application/json\" --request POST --data '\(encjson.Marshal(#args))' -b ~/.gitcookies https://cue-review.googlesource.com/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review"
+			res: "\(_#curl) -n -H \"Content-Type: application/json\" --request POST --data '\(encjson.Marshal(#args))' https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review"
 		}
 	}
 }
 repository_dispatch: _#bashWorkflow & {
 	// These constants are defined by github.com/cue-sh/tools/cmd/cueckoo
 	_#runtrybot:   "runtrybot"
-	_#mirror:      "mirror"
-	_#importpr:    "importpr"
 	_#unity:       "unity"
 	_#dispatchJob: _#job & {
 		_#type:    string
@@ -1305,49 +1264,17 @@ repository_dispatch: _#bashWorkflow & {
 	}
 	name: "Repository Dispatch"
 	on: ["repository_dispatch"]
-	jobs: {
-		"\(_#runtrybot)": _#dispatchJob & {
-			_#type: _#runtrybot
-			steps: [_#step & {
-				name: "Trigger trybot"
-				run:  """
+	jobs: "\(_#runtrybot)": _#dispatchJob & {
+		_#type: _#runtrybot
+		steps: [_#writeNetrcFile, _#step & {
+			name: "Trigger trybot"
+			run:  """
 								\(_#tempCueckooGitDir)
-								git fetch https://cue-review.googlesource.com/cue ${{ github.event.client_payload.payload.ref }}
+								git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
 								git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
-								git push https://github.com/cuelang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
+								git push https://github.com/cue-lang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}
 								"""
-			}]
-		}
-		"\(_#mirror)": _#dispatchJob & {
-			_#type: _#mirror
-			steps:  _#copybaraSteps & {
-				_
-				_#name: "Mirror Gerrit to GitHub"
-				_#cmd:  "github"
-			}
-		}
-		"\(_#importpr)": _#dispatchJob & {
-			_#type: _#importpr
-			steps:  _#copybaraSteps & {
-				_
-				_#name: "Import PR #${{ github.event.client_payload.commit }} from GitHub to Gerrit"
-				_#cmd:  "github-pr ${{ github.event.client_payload.payload.pr }}"
-			}
-		}
-	}
-}
-mirror: _#bashWorkflow & {
-	name: "Scheduled repo mirror"
-	on: schedule: [{
-		cron: "*/30 * * * *"
-	}]
-	jobs: mirror: {
-		"runs-on": _#linuxMachine
-		steps:     _#copybaraSteps & {
-			_
-			_#name: "Mirror Gerrit to GitHub"
-			_#cmd:  "github"
-		}
+		}]
 	}
 }
 release: _#bashWorkflow & {
@@ -1362,7 +1289,7 @@ release: _#bashWorkflow & {
 				with: version: _#latestStableGo
 			}, _#step & {
 				name: "Run GoReleaser"
-				env: GITHUB_TOKEN: "${{ secrets.ACTIONS_GITHUB_TOKEN }}"
+				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
 				uses: "goreleaser/goreleaser-action@v2"
 				with: {
 					args:    "release --rm-dist"
@@ -1390,7 +1317,7 @@ release: _#bashWorkflow & {
 				uses: "docker/build-push-action@v1"
 				with: {
 					tags:           "${{ env.CUE_VERSION }},latest"
-					repository:     "cuelang/cue"
+					repository:     "cue-lang/cue"
 					username:       "${{ secrets.DOCKER_USERNAME }}"
 					password:       "${{ secrets.DOCKER_PASSWORD }}"
 					tag_with_ref:   false
@@ -1425,7 +1352,7 @@ new_version_triggers: _#bashWorkflow & {
 		"runs-on": _#linuxMachine
 		steps: [{
 			name: "Rebuild tip.cuelang.org"
-			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\": \\\"Re-test post release of ${GITHUB_REF##refs/tags/}\\\"}\" https://api.github.com/repos/cuelang/cuelang.org/dispatches"
+			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\": \\\"Re-test post release of ${GITHUB_REF##refs/tags/}\\\"}\" https://api.github.com/repos/cue-lang/cuelang.org/dispatches"
 		}, {
 			name: "Trigger unity build"
 			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\": \\\"Check against CUE ${GITHUB_REF##refs/tags/}\\\", \\\"client_payload\\\": {\\\"type\\\": \\\"unity\\\", \\\"payload\\\": {\\\"versions\\\": \\\"\\\\\\\"${GITHUB_REF##refs/tags/}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-sh/unity/dispatches"
@@ -1457,8 +1384,8 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.16"]
-		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
+		"go-version": ["1.16"]
+		os: [_#linuxMachine]
 	}
 }
 _#setGoBuildTags: _#step & {
@@ -1512,9 +1439,16 @@ _#checkGitClean: _#step & {
 	name: "Check that git is clean post generate and tests"
 	run:  "test -z \"$(git status --porcelain)\" || (git status; git diff; false)"
 }
-_#writeCookiesFile: _#step & {
-	name: "Write the gitcookies file"
-	run:  "echo \"${{ secrets.gerritCookie }}\" > ~/.gitcookies"
+_#writeNetrcFile: _#step & {
+	name: "Write netrc file for cueckoo Gerrithub"
+	run: """
+		cat <<EOD > ~/.netrc
+		machine review.gerrithub.io
+		login cueckoo
+		password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }}
+		EOD
+		chmod 600 ~/.netrc
+		"""
 }
 _#branchRefPrefix: "refs/heads/"
 _#tempCueckooGitDir: """
@@ -1535,13 +1469,11 @@ _#copybaraCmd: {
 		cd _scripts
 		docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" \(_#cueckooCopybaraImage) bash -c " \\
 		\tset -eu; \\
-		\techo \\"${{ secrets.gerritCookie }}\\" > ~/.gitcookies; \\
-		\tchmod 600 ~/.gitcookies; \\
 		\tgit config --global user.name cueckoo; \\
-		\tgit config --global user.email cueckoo@gmail.com; \\
-		\tgit config --global http.cookiefile \\$HOME/.gitcookies; \\
-		  \techo https://cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }}@github.com > ~/.git-credentials; \\
-		\tchmod 600 ~/.git-credentials; \\
+		\tgit config --global user.email cueckoo@cuelang.org; \\
+		  \techo machine github.com login cueckoo password ${{ secrets.CUECKOO_GITHUB_PAT }} >> ~/.netrc; \\
+		  \techo machine review.gerrithub.io login cueckoo password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }} >> ~/.netrc; \\
+		\tchmod 600 ~/.netrc; \\
 		\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky \(_#cmd); \\
 		\t"
 		"""

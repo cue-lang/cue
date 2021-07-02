@@ -28,7 +28,7 @@ jobs:
         args: release --rm-dist
         version: v0.155.1
       env:
-        GITHUB_TOKEN: ${{ secrets.ACTIONS_GITHUB_TOKEN }}
+        GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
   docker:
     name: docker
     runs-on: ubuntu-18.04
@@ -47,7 +47,7 @@ jobs:
       uses: docker/build-push-action@v1
       with:
         tags: ${{ env.CUE_VERSION }},latest
-        repository: cuelang/cue
+        repository: cue-lang/cue
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
         tag_with_ref: false

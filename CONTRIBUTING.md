@@ -20,9 +20,10 @@ again.
 ## Code reviews
 
 All submissions, including submissions by project members, require review. We
-use Gerrit code reviews at https://cue-review.googlesource.com for this purpose.
-Please read the [Contributing Guide](./doc/contribute.md)
-before reading patches.
+use [Gerrit code
+reviews](https://review.gerrithub.io/q/project:cue-lang%252Fcue) for this
+purpose.  Please read the [Contributing Guide](./doc/contribute.md) before
+reading patches.
 
 ## Code of Conduct
 

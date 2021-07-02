@@ -1269,10 +1269,10 @@ service: {
 ```
 
 The complete top-level model definitions can be found at
-[doc/tutorial/kubernetes/manual/services/cloud.cue](https://cue.googlesource.com/cue/+/master/doc/tutorial/kubernetes/manual/services/cloud.cue).
+[doc/tutorial/kubernetes/manual/services/cloud.cue](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+/refs/heads/master/doc/tutorial/kubernetes/manual/services/cloud.cue).
 
 The tailorings for this specific project (the labels) are defined
-[here](https://cue.googlesource.com/cue/+/master/doc/tutorial/kubernetes/manual/services/kube.cue).
+[here](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+/refs/heads/master/doc/tutorial/kubernetes/manual/services/kube.cue).
 
 
 ### Converting to Kubernetes
@@ -1301,7 +1301,7 @@ the raw `kubernetes` fields for each service.
 
 Mapping deployments is a bit more involved, though analogous.
 The complete definitions for Kubernetes conversions can be found at
-[doc/tutorial/kubernetes/manual/services/k8s.cue](https://cue.googlesource.com/cue/+/master/doc/tutorial/kubernetes/manual/services/k8s.cue).
+[doc/tutorial/kubernetes/manual/services/k8s.cue](https://review.gerrithub.io/plugins/gitiles/cue-lang/cue/+/refs/heads/master/doc/tutorial/kubernetes/manual/services/k8s.cue).
 
 Converting the top-level definitions to concrete Kubernetes code is the hardest
 part of this exercise.

@@ -34,7 +34,7 @@ If possible, provide a recipe for reproducing the error.
 
 For advice on how to create a good reproducer, please see:
 
-https://github.com/cuelang/cue/wiki/Creating-test-or-performance-reproducers
+https://github.com/cue-lang/cue/wiki/Creating-test-or-performance-reproducers
 -->
 
 

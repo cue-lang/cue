@@ -137,7 +137,7 @@ func runTrim(cmd *Command, args []string) error {
 			if k != diff.Identity {
 				diff.Print(os.Stdout, script)
 				fmt.Println("Aborting trim, output differs after trimming. This is a bug! Use -i to force trim.")
-				fmt.Println("You can file a bug here: https://github.com/cuelang/cue/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=")
+				fmt.Println("You can file a bug here: https://github.com/cue-lang/cue/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=")
 				os.Exit(1)
 			}
 		}

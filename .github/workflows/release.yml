@@ -48,8 +48,8 @@ jobs:
       with:
         tags: ${{ env.CUE_VERSION }},latest
         repository: cue-lang/cue
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        username: cueckoo
+        password: ${{ secrets.CUECKOO_DOCKER_PAT }}
         tag_with_ref: false
         tag_with_sha: false
         target: cue

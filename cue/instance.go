@@ -39,7 +39,7 @@ func (Value) internal()     {}
 func (*Instance) internal() {}
 
 // Value implements value.Instance.
-func (v hiddenValue) Value() Value { return v }
+func (v Value) Value() Value { return v }
 
 // An Instance defines a single configuration based on a collection of
 // underlying CUE files.
@@ -58,8 +58,6 @@ type Instance struct {
 
 	inst *build.Instance
 }
-
-type hiddenInstance = Instance
 
 func addInst(x *runtime.Runtime, p *Instance) *Instance {
 	if p.inst == nil {
@@ -200,7 +198,7 @@ func (inst *Instance) ID() string {
 // Doc returns the package comments for this instance.
 //
 // Deprecated: use inst.Value().Doc()
-func (inst *hiddenInstance) Doc() []*ast.CommentGroup {
+func (inst *Instance) Doc() []*ast.CommentGroup {
 	return inst.Value().Doc()
 }
 
@@ -219,7 +217,7 @@ func (inst *Instance) Value() Value {
 //
 // Deprecated: use
 // inst.Value().Context().BuildExpr(expr, Scope(inst.Value), InferBuiltins(true))
-func (inst *hiddenInstance) Eval(expr ast.Expr) Value {
+func (inst *Instance) Eval(expr ast.Expr) Value {
 	v := inst.Value()
 	return v.Context().BuildExpr(expr, Scope(v), InferBuiltins(true))
 }
@@ -252,7 +250,7 @@ func Merge(inst ...*Instance) *Instance {
 // inst take precedence over predeclared identifier and builtin functions.
 //
 // Deprecated: use Context.Build
-func (inst *hiddenInstance) Build(p *build.Instance) *Instance {
+func (inst *Instance) Build(p *build.Instance) *Instance {
 	p.Complete()
 
 	idx := inst.index
@@ -291,7 +289,7 @@ func (inst *Instance) value() Value {
 // any kind of field.
 //
 // Deprecated: use Value.LookupPath
-func (inst *hiddenInstance) Lookup(path ...string) Value {
+func (inst *Instance) Lookup(path ...string) Value {
 	return inst.value().Lookup(path...)
 }
 
@@ -300,7 +298,7 @@ func (inst *hiddenInstance) Lookup(path ...string) Value {
 // not exist. The Err method reports if any error occurred during evaluation.
 //
 // Deprecated: use Value.LookupPath
-func (inst *hiddenInstance) LookupDef(path string) Value {
+func (inst *Instance) LookupDef(path string) Value {
 	return inst.value().LookupDef(path)
 }
 
@@ -313,7 +311,7 @@ func (inst *hiddenInstance) LookupDef(path string) Value {
 // FieldByName defined on inst.Value().
 //
 // Deprecated: use Value.LookupPath
-func (inst *hiddenInstance) LookupField(path ...string) (f FieldInfo, err error) {
+func (inst *Instance) LookupField(path ...string) (f FieldInfo, err error) {
 	v := inst.value()
 	for _, k := range path {
 		s, err := v.Struct()
@@ -341,7 +339,7 @@ func (inst *hiddenInstance) LookupField(path ...string) (f FieldInfo, err error)
 // Runtime.
 //
 // Deprecated: use Value.FillPath()
-func (inst *hiddenInstance) Fill(x interface{}, path ...string) (*Instance, error) {
+func (inst *Instance) Fill(x interface{}, path ...string) (*Instance, error) {
 	v := inst.Value().Fill(x, path...)
 
 	inst = addInst(inst.index, &Instance{

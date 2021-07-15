@@ -980,3 +980,8 @@ $ git codereview mail HEAD
 Make sure to explicitly specify `HEAD`, which is usually not required when sending
 single changes.
 
+## Code of Conduct
+
+Guidelines for participating in CUE community spaces and a reporting process for
+handling issues can be found in the [Code of
+Conduct](https://cuelang.org/docs/contribution_guidelines/conduct).

@@ -32,21 +32,11 @@ func newVersionCmd(c *Command) *cobra.Command {
 	return cmd
 }
 
-const (
-	defaultVersion = "devel"
-)
-
-// set by goreleaser or other builder using
-// -ldflags='-X cuelang.org/go/cmd/cue/cmd.version=<version>'
-var (
-	version = defaultVersion
-)
-
 func runVersion(cmd *Command, args []string) error {
 	w := cmd.OutOrStdout()
-	if bi, ok := debug.ReadBuildInfo(); ok && version == defaultVersion {
-		// No specific version provided via version
-		version = bi.Main.Version
+	var version = "devel"
+	if bi, ok := debug.ReadBuildInfo(); ok && bi.Main.Sum != "" {
+		version = fmt.Sprintf("%s (%s)", bi.Main.Version, bi.Main.Sum)
 	}
 	fmt.Fprintf(w, "cue version %v %s/%s\n",
 		version,

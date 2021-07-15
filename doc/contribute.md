@@ -138,7 +138,7 @@ profile](https://review.gerrithub.io/settings/#HTTPCredentials). Then use an
 existing HTTP authentication mechanism like `.netrc`, macOS KeyChain, or some
 other [crendential helper](https://git-scm.com/docs/gitcredentials). If you have
 any troubles with this step, please [raise an
-issue](https://github.com/cue-lang/cue/issues/new).
+issue](https://cuelang.org/issues/new).
 
 Then visit https://review.gerrithub.io/admin/repos/cue-lang/cue, then click
 "HTTP" or "SSH" then copy the corresponding "Clone" command.
@@ -199,7 +199,7 @@ an <a href="https://cuelang.org/issues">existing one</a>.
 ### Check the issue tracker
 
 Whether you already know what contribution to make, or you are searching for
-an idea, the [issue tracker](https://github.com/cue-lang/cue/issues) is
+an idea, the [issue tracker](https://cuelang.org/issues) is
 always the first place to go.
 Issues are triaged to categorize them and manage the workflow.
 
@@ -223,13 +223,13 @@ You can use GitHub's search functionality to find issues to help out with. Examp
 
 -	Issues that need investigation:
 	[`is:issue is:open label:NeedsInvestigation`](
-		https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation)
+		https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsInvestigation)
 -	Issues that need a fix:
-	[`is:issue is:open label:NeedsFix`](https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix)
+	[`is:issue is:open label:NeedsFix`](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix)
 -	Issues that need a fix and have a CL:
-    [`is:issue is:open label:NeedsFix "cuelang.org/cl"`](https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+%22golang.org%2Fcl%22)
+    [`is:issue is:open label:NeedsFix "cuelang.org/cl"`](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+%22golang.org%2Fcl%22)
 -	Issues that need a fix and do not have a CL:
-    [`is:issue is:open label:NeedsFix NOT "cuelang.org/cl"`](https://github.com/cue-lang/cue/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+NOT+%22golang.org%2Fcl%22)
+    [`is:issue is:open label:NeedsFix NOT "cuelang.org/cl"`](https://cuelang.org/issues?q=is%3Aissue+is%3Aopen+label%3ANeedsFix+NOT+%22golang.org%2Fcl%22)
 
 ### Open an issue for any new problem
 

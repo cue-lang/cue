@@ -152,7 +152,7 @@ https://review.gerrithub.io/q/project:cue-lang%252Fcue.
 To contribute, please read the [Contribution Guide](./doc/contribute.md).
 
 To report issues or make a feature request, use the
-[issue tracker](https://github.com/cue-lang/cue/issues).
+[issue tracker](https://cuelang.org/issues).
 
 Changes can be contributed using Gerrit or Github pull requests.
 

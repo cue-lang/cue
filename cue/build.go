@@ -40,8 +40,6 @@ func (r *Runtime) runtime() *runtime.Runtime {
 	return rt
 }
 
-type hiddenRuntime = Runtime
-
 func (r *Runtime) complete(p *build.Instance, v *adt.Vertex) (*Instance, error) {
 	idx := r.runtime()
 	inst := getImportFromBuild(idx, p, v)
@@ -58,7 +56,7 @@ func (r *Runtime) complete(p *build.Instance, v *adt.Vertex) (*Instance, error) 
 // Build to allow importing non-builtin packages.
 //
 // Deprecated: use Parse or ParseBytes. The use of Instance is being phased out.
-func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance, error) {
+func (r *Runtime) Compile(filename string, source interface{}) (*Instance, error) {
 	cfg := &runtime.Config{Filename: filename}
 	v, p := r.runtime().Compile(cfg, source)
 	return r.complete(p, v)
@@ -68,7 +66,7 @@ func (r *hiddenRuntime) Compile(filename string, source interface{}) (*Instance,
 // import builtin packages. Use Build to allow importing non-builtin packages.
 //
 // Deprecated: use BuildFile. The use of Instance is being phased out.
-func (r *hiddenRuntime) CompileFile(file *ast.File) (*Instance, error) {
+func (r *Runtime) CompileFile(file *ast.File) (*Instance, error) {
 	v, p := r.runtime().CompileFile(nil, file)
 	return r.complete(p, v)
 }
@@ -78,7 +76,7 @@ func (r *hiddenRuntime) CompileFile(file *ast.File) (*Instance, error) {
 // packages.
 //
 // Deprecated: use BuildExpr. The use of Instance is being phased out.
-func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
+func (r *Runtime) CompileExpr(expr ast.Expr) (*Instance, error) {
 	f, err := astutil.ToFile(expr)
 	if err != nil {
 		return nil, err
@@ -103,7 +101,7 @@ func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
 //
 // Deprecated: use ParseString or ParseBytes.  The use of Instance is being
 // phased out.
-func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error) {
+func (r *Runtime) Parse(name string, source interface{}) (*Instance, error) {
 	return r.Compile(name, source)
 }
 
@@ -112,7 +110,7 @@ func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error
 //
 // Deprecated: use Context.BuildInstance. The use of Instance is being phased
 // out.
-func (r *hiddenRuntime) Build(p *build.Instance) (*Instance, error) {
+func (r *Runtime) Build(p *build.Instance) (*Instance, error) {
 	v, _ := r.runtime().Build(nil, p)
 	return r.complete(p, v)
 }
@@ -134,7 +132,7 @@ func Build(instances []*build.Instance) []*Instance {
 	return a
 }
 
-func (r *hiddenRuntime) build(instances []*build.Instance) ([]*Instance, error) {
+func (r *Runtime) build(instances []*build.Instance) ([]*Instance, error) {
 	index := r.runtime()
 
 	loaded := []*Instance{}
@@ -156,7 +154,7 @@ func (r *hiddenRuntime) build(instances []*build.Instance) ([]*Instance, error) 
 // Any references must be resolved beforehand.
 //
 // Deprecated: use CompileExpr
-func (r *hiddenRuntime) FromExpr(expr ast.Expr) (*Instance, error) {
+func (r *Runtime) FromExpr(expr ast.Expr) (*Instance, error) {
 	return r.CompileFile(&ast.File{
 		Decls: []ast.Decl{&ast.EmbedDecl{Expr: expr}},
 	})

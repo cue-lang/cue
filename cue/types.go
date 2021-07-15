@@ -223,8 +223,6 @@ type Iterator struct {
 	isOpt bool
 }
 
-type hiddenIterator = Iterator
-
 type field struct {
 	arc        *adt.Vertex
 	isOptional bool
@@ -264,7 +262,7 @@ func (i *Iterator) Selector() Selector {
 //
 // Slated to be deprecated: use i.Selector().String(). Note that this will give
 // more accurate string representations.
-func (i *hiddenIterator) Label() string {
+func (i *Iterator) Label() string {
 	if i.f == 0 {
 		return ""
 	}
@@ -274,7 +272,7 @@ func (i *hiddenIterator) Label() string {
 // IsHidden reports if a field is hidden from the data model.
 //
 // Deprecated: use i.Selector().PkgPath() != ""
-func (i *hiddenIterator) IsHidden() bool {
+func (i *Iterator) IsHidden() bool {
 	return i.f.IsHidden()
 }
 
@@ -286,7 +284,7 @@ func (i *Iterator) IsOptional() bool {
 // IsDefinition reports if a field is a definition.
 //
 // Deprecated: use i.Selector().IsDefinition()
-func (i *hiddenIterator) IsDefinition() bool {
+func (i *Iterator) IsDefinition() bool {
 	return i.f.IsDef()
 }
 
@@ -348,7 +346,7 @@ func (v Value) MantExp(mant *big.Int) (exp int, err error) {
 
 // Decimal is for internal use only. The Decimal type that is returned is
 // subject to change.
-func (v hiddenValue) Decimal() (d *internal.Decimal, err error) {
+func (v Value) Decimal() (d *internal.Decimal, err error) {
 	n, err := v.getNum(adt.NumKind)
 	if err != nil {
 		return nil, err
@@ -589,10 +587,8 @@ func (v valueScope) Parent() compile.Scope {
 	return valueScope(p)
 }
 
-type hiddenValue = Value
-
 // Core is for internal use only.
-func (v hiddenValue) Core(x *types.Value) {
+func (v Value) Core(x *types.Value) {
 	x.V = v.v
 	x.R = v.idx
 }
@@ -868,7 +864,7 @@ func stripNonDefaults(expr adt.Expr) (r adt.Expr, stripped bool) {
 //
 // TODO: get rid of this somehow. Probably by including a FieldInfo struct
 // or the like.
-func (v hiddenValue) Label() (string, bool) {
+func (v Value) Label() (string, bool) {
 	if v.v == nil || v.v.Label == 0 {
 		return "", false
 	}
@@ -1062,7 +1058,7 @@ func (v Value) Doc() []*ast.CommentGroup {
 // Source returns a non-nil value.
 //
 // Deprecated: use Expr.
-func (v hiddenValue) Split() []Value {
+func (v Value) Split() []Value {
 	if v.v == nil {
 		return nil
 	}
@@ -1110,7 +1106,7 @@ func (v Value) Pos() token.Pos {
 // when the value is not a list or struct.
 //
 // Deprecated: use Allows and Kind/IncompleteKind.
-func (v hiddenValue) IsClosed() bool {
+func (v Value) IsClosed() bool {
 	if v.v == nil {
 		return false
 	}
@@ -1232,7 +1228,7 @@ func (v Value) Len() Value {
 // Elem returns the value of undefined element types of lists and structs.
 //
 // Deprecated: use LookupPath in combination with "AnyString" or "AnyIndex".
-func (v hiddenValue) Elem() (Value, bool) {
+func (v Value) Elem() (Value, bool) {
 	sel := AnyString
 	if v.v.IsList() {
 		sel = AnyIndex
@@ -1308,7 +1304,7 @@ func (v Value) Bytes() ([]byte, error) {
 
 // Reader returns a new Reader if v is a string or bytes type and an error
 // otherwise.
-func (v hiddenValue) Reader() (io.Reader, error) {
+func (v Value) Reader() (io.Reader, error) {
 	v, _ = v.Default()
 	ctx := v.ctx()
 	switch x := v.eval(ctx).(type) {
@@ -1383,7 +1379,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 
 // Struct returns the underlying struct of a value or an error if the value
 // is not a struct.
-func (v hiddenValue) Struct() (*Struct, error) {
+func (v Value) Struct() (*Struct, error) {
 	// TODO: deprecate
 	ctx := v.ctx()
 	obj, err := v.structValOpts(ctx, options{})
@@ -1408,8 +1404,6 @@ type Struct struct {
 	structValue
 }
 
-type hiddenStruct = Struct
-
 // FieldInfo contains information about a struct field.
 type FieldInfo struct {
 	Selector string
@@ -1422,12 +1416,12 @@ type FieldInfo struct {
 	IsHidden     bool
 }
 
-func (s *hiddenStruct) Len() int {
+func (s *Struct) Len() int {
 	return s.structValue.Len()
 }
 
 // field reports information about the ith field, i < o.Len().
-func (s *hiddenStruct) Field(i int) FieldInfo {
+func (s *Struct) Field(i int) FieldInfo {
 	a, opt := s.at(i)
 	ctx := s.v.ctx()
 
@@ -1440,7 +1434,7 @@ func (s *hiddenStruct) Field(i int) FieldInfo {
 // FieldByName looks up a field for the given name. If isIdent is true, it will
 // look up a definition or hidden field (starting with `_` or `_#`). Otherwise
 // it interprets name as an arbitrary string for a regular field.
-func (s *hiddenStruct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
+func (s *Struct) FieldByName(name string, isIdent bool) (FieldInfo, error) {
 	f := s.v.idx.Label(name, isIdent)
 	for i, a := range s.features {
 		if a == f {
@@ -1451,7 +1445,7 @@ func (s *hiddenStruct) FieldByName(name string, isIdent bool) (FieldInfo, error)
 }
 
 // Fields creates an iterator over the Struct's fields.
-func (s *hiddenStruct) Fields(opts ...Option) *Iterator {
+func (s *Struct) Fields(opts ...Option) *Iterator {
 	iter, _ := s.v.Fields(opts...)
 	return iter
 }
@@ -1483,7 +1477,7 @@ func (v Value) Fields(opts ...Option) (*Iterator, error) {
 //
 // Deprecated: use LookupPath. At some point before v1.0.0, this method will
 // be removed to be reused eventually for looking up a selector.
-func (v hiddenValue) Lookup(path ...string) Value {
+func (v Value) Lookup(path ...string) Value {
 	ctx := v.ctx()
 	for _, k := range path {
 		// TODO(eval) TODO(error): always search in full data and change error
@@ -1549,7 +1543,7 @@ func appendPath(a []Selector, v Value) []Selector {
 // LookupDef is equal to LookupPath(MakePath(Def(name))).
 //
 // Deprecated: use LookupPath.
-func (v hiddenValue) LookupDef(name string) Value {
+func (v Value) LookupDef(name string) Value {
 	return v.LookupPath(MakePath(Def(name)))
 }
 
@@ -1560,7 +1554,7 @@ var errNotFound = errors.Newf(token.NoPos, "field not found")
 // it interprets name as an arbitrary string for a regular field.
 //
 // Deprecated: use LookupPath.
-func (v hiddenValue) FieldByName(name string, isIdent bool) (f FieldInfo, err error) {
+func (v Value) FieldByName(name string, isIdent bool) (f FieldInfo, err error) {
 	s, err := v.Struct()
 	if err != nil {
 		return f, err
@@ -1571,7 +1565,7 @@ func (v hiddenValue) FieldByName(name string, isIdent bool) (f FieldInfo, err er
 // LookupField reports information about a field of v.
 //
 // Deprecated: use LookupPath
-func (v hiddenValue) LookupField(name string) (FieldInfo, error) {
+func (v Value) LookupField(name string) (FieldInfo, error) {
 	s, err := v.Struct()
 	if err != nil {
 		// TODO: return a Value at the same location and a new error?
@@ -1609,7 +1603,7 @@ func (v hiddenValue) LookupField(name string) (FieldInfo, error) {
 // to x in the newly created value. The resulting value is not validated.
 //
 // Deprecated: use FillPath.
-func (v hiddenValue) Fill(x interface{}, path ...string) Value {
+func (v Value) Fill(x interface{}, path ...string) Value {
 	if v.v == nil {
 		return v
 	}
@@ -1720,7 +1714,7 @@ func (v Value) FillPath(p Path, x interface{}) Value {
 // given its name.
 //
 // Deprecated: use LookupPath in combination with using optional selectors.
-func (v hiddenValue) Template() func(label string) Value {
+func (v Value) Template() func(label string) Value {
 	if v.v == nil {
 		return nil
 	}
@@ -1776,7 +1770,7 @@ func (v Value) Subsume(w Value, opts ...Option) error {
 // By default, Subsumes tests whether two values are compatible
 // Value v and w must be obtained from the same build.
 // TODO: remove this requirement.
-func (v hiddenValue) Subsumes(w Value) bool {
+func (v Value) Subsumes(w Value) bool {
 	ctx := v.ctx()
 	p := subsume.Profile{Defaults: true}
 	return p.Check(ctx, v.v, w.v)
@@ -1898,7 +1892,7 @@ func (v Value) instance() *Instance {
 // only return a reference if the index resolves to a concrete value.
 //
 // Deprecated: use ReferencePath
-func (v hiddenValue) Reference() (inst *Instance, path []string) {
+func (v Value) Reference() (inst *Instance, path []string) {
 	root, p := v.ReferencePath()
 	if !root.Exists() {
 		return nil, nil

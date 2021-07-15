@@ -84,12 +84,12 @@ test: _#bashWorkflow & {
 				},
 				_#goGenerate,
 				_#goTest,
-				// _#goTestRace & {
-				//  if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
-				// },
+				_#goTestRace & {
+					if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+				},
 				_#goReleaseCheck,
 				_#checkGitClean,
-				// _#pullThroughProxy,
+				_#pullThroughProxy,
 				_#failCLBuild,
 			]
 		}
@@ -351,16 +351,8 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [
-			// _#codeGenGo,
-			// _#latestStableGo,
-			"1.16",
-		]
-		os: [
-			_#linuxMachine,
-			// _#macosMachine,
-			// _#windowsMachine,
-		]
+		"go-version": [_#codeGenGo, _#latestStableGo, "1.16"]
+		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
 
@@ -448,38 +440,5 @@ _#tempCueckooGitDir: """
 	git config user.email cueckoo@gmail.com
 	git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
 	"""
-
-// The cueckoo/copybara Docker image to use
-_#cueckooCopybaraImage: "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c"
-
-// Define the base command for copybara
-_#copybaraCmd: {
-	_#cmd: string
-	#"""
-		cd _scripts
-		docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" \#(_#cueckooCopybaraImage) bash -c " \
-			set -eu; \
-			git config --global user.name cueckoo; \
-			git config --global user.email cueckoo@cuelang.org; \
-		  	echo machine github.com login cueckoo password ${{ secrets.CUECKOO_GITHUB_PAT }} >> ~/.netrc; \
-		  	echo machine review.gerrithub.io login cueckoo password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }} >> ~/.netrc; \
-			chmod 600 ~/.netrc; \
-			java -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky \#(_#cmd); \
-			"
-		"""#
-}
-
-_#copybaraSteps: {
-	_#name: string
-	_#cmd:  string
-	let cmdCmd = _#cmd
-	[
-		_#checkoutCode, // needed for copy.bara.sky file
-		_#step & {
-			name: _#name
-			run:  _#copybaraCmd & {_, _#cmd: cmdCmd}
-		},
-	]
-}
 
 _#curl: "curl -f -s"

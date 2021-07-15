@@ -208,9 +208,13 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
+        - 1.14.14
+        - 1.15.8
         - "1.16"
         os:
         - ubuntu-18.04
+        - macos-10.15
+        - windows-2019
     runs-on: ${{ matrix.os }}
     defaults:
       run:
@@ -246,10 +250,21 @@ jobs:
       run: go generate ./...
     - name: Test
       run: go test ./...
+    - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/')
+        && matrix.go-version == '1.15.8' && matrix.os == 'ubuntu-18.04' }}
+      name: Test with -race
+      run: go test -race ./...
     - name: gorelease check
       run: go run golang.org/x/exp/cmd/gorelease
     - name: Check that git is clean post generate and tests
       run: test -z "$(git status --porcelain)" || (git status; git diff; false)
+    - if: ${{ github.ref == 'refs/heads/master' }}
+      name: Pull this commit through the proxy on master
+      run: |-
+        v=$(git rev-parse HEAD)
+        cd $(mktemp -d)
+        go mod init mod.com
+        GOPROXY=https://proxy.golang.org go get -d cuelang.org/go/cmd/cue@$v
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
       name: Post any failures for this matrix entry
       run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
@@ -1178,7 +1193,9 @@ test: _#bashWorkflow & {
 			steps: [_#writeNetrcFile, _#installGo, _#checkoutCode, _#cacheGoModules, _#setGoBuildTags & {
 				_#tags: "long"
 				if:     "${{ \(_#isMaster) }}"
-			}, _#goGenerate, _#goTest, _#goReleaseCheck, _#checkGitClean, _#failCLBuild]
+			}, _#goGenerate, _#goTest, _#goTestRace & {
+				if: "${{ \(_#isMaster) || \(_#isCLCITestBranch) && matrix.go-version == '\(_#latestStableGo)' && matrix.os == '\(_#linuxMachine)' }}"
+			}, _#goReleaseCheck, _#checkGitClean, _#pullThroughProxy, _#failCLBuild]
 		}
 		mark_ci_success: {
 			"runs-on": _#linuxMachine
@@ -1387,8 +1404,8 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": ["1.16"]
-		os: [_#linuxMachine]
+		"go-version": [_#codeGenGo, _#latestStableGo, "1.16"]
+		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
 _#setGoBuildTags: _#step & {
@@ -1462,36 +1479,4 @@ _#tempCueckooGitDir: """
 	git config user.email cueckoo@gmail.com
 	git config http.https://github.com/.extraheader "AUTHORIZATION: basic $(echo -n cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} | base64)"
 	"""
-
-// The cueckoo/copybara Docker image to use
-_#cueckooCopybaraImage: "cueckoo/copybara:afc4ae03eed00b0c9d7415141cd1b5dfa583da7c"
-
-// Define the base command for copybara
-_#copybaraCmd: {
-	"""
-		cd _scripts
-		docker run --rm -v $PWD/cache:/root/copybara/cache -v $PWD:/usr/src/app --entrypoint="" \(_#cueckooCopybaraImage) bash -c " \\
-		\tset -eu; \\
-		\tgit config --global user.name cueckoo; \\
-		\tgit config --global user.email cueckoo@cuelang.org; \\
-		  \techo machine github.com login cueckoo password ${{ secrets.CUECKOO_GITHUB_PAT }} >> ~/.netrc; \\
-		  \techo machine review.gerrithub.io login cueckoo password ${{ secrets.CUECKOO_GERRITHUB_PASSWORD }} >> ~/.netrc; \\
-		\tchmod 600 ~/.netrc; \\
-		\tjava -jar /opt/copybara/copybara_deploy.jar migrate copy.bara.sky \(_#cmd); \\
-		\t"
-		"""
-	_#cmd: string
-}
-_#copybaraSteps: {
-	let cmdCmd = _#cmd
-	[_#checkoutCode, _#step & {
-		name: _#name
-		run:  _#copybaraCmd & {
-			_
-			_#cmd: cmdCmd
-		}
-	}]
-	_#name: string
-	_#cmd:  string
-}
 _#curl: "curl -f -s"

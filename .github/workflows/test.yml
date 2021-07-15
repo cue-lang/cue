@@ -27,9 +27,10 @@ jobs:
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') }}
       name: Update Gerrit CL message with starting message
       run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
-        ''{"tag":"trybot","message":"Started the build... see progress at ${{ github.event.repository.html_url
-        }}/actions/runs/${{ github.run_id }}"}'' https://review.gerrithub.io/a/changes/$(basename
-        $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
+        "{\"tag\":\"trybot\",\"message\":\"Started the build... see progress at ${{
+        github.event.repository.html_url }}/actions/runs/${{ github.run_id }}\"}"
+        https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename
+        $GITHUB_REF)/review'
   test:
     needs: start
     strategy:
@@ -81,9 +82,9 @@ jobs:
     - if: ${{ startsWith(github.ref, 'refs/heads/ci/') && failure() }}
       name: Post any failures for this matrix entry
       run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
-        ''{"tag":"trybot","message":"Build failed for ${{ runner.os }}-${{ matrix.go-version
+        "{\"tag\":\"trybot\",\"message\":\"Build failed for ${{ runner.os }}-${{ matrix.go-version
         }}; see ${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id
-        }} for more details","labels":{"TryBot-Result":-1}}'' https://review.gerrithub.io/a/changes/$(basename
+        }} for more details\",\"labels\":{\"TryBot-Result\":-1}}" https://review.gerrithub.io/a/changes/$(basename
         $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
   mark_ci_success:
     runs-on: ubuntu-18.04
@@ -103,9 +104,10 @@ jobs:
         chmod 600 ~/.netrc
     - name: Update Gerrit CL message with success message
       run: 'curl -f -s -n -H "Content-Type: application/json" --request POST --data
-        ''{"tag":"trybot","message":"Build succeeded for ${{ github.event.repository.html_url
-        }}/actions/runs/${{ github.run_id }}","labels":{"TryBot-Result":1}}'' https://review.gerrithub.io/a/changes/$(basename
-        $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review'
+        "{\"tag\":\"trybot\",\"message\":\"Build succeeded for ${{ github.event.repository.html_url
+        }}/actions/runs/${{ github.run_id }}\",\"labels\":{\"TryBot-Result\":1}}"
+        https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename
+        $GITHUB_REF)/review'
   delete_build_branch:
     runs-on: ubuntu-18.04
     if: ${{ startsWith(github.ref, 'refs/heads/ci/') && always() }}

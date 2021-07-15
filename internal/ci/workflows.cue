@@ -17,6 +17,7 @@ package ci
 import (
 	"github.com/SchemaStore/schemastore/src/schemas/json"
 	encjson "encoding/json"
+	"strconv"
 )
 
 workflowsDir: *"./" | string @tag(workflowsDir)
@@ -181,7 +182,7 @@ test: _#bashWorkflow & {
 				}
 			}
 			res: #"""
-			\#(_#curl) -n -H "Content-Type: application/json" --request POST --data '\#(encjson.Marshal(#args))' https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review
+			\#(_#curl) -n -H "Content-Type: application/json" --request POST --data \#(strconv.Quote(encjson.Marshal(#args))) https://review.gerrithub.io/a/changes/$(basename $(dirname $GITHUB_REF))/revisions/$(basename $GITHUB_REF)/review
 			"""#
 		}
 	}

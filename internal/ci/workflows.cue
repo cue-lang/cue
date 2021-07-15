@@ -232,7 +232,24 @@ release: _#bashWorkflow & {
 					with: "fetch-depth": 0
 				},
 				_#installGo & {
-					with: version: _#latestStableGo
+					with: "go-version": _#latestStableGo
+				},
+				_#step & {
+					name: "Setup qemu"
+					uses: "docker/setup-qemu-action@v1"
+				},
+				_#step & {
+					name: "Set up Docker Buildx"
+        			uses: "docker/setup-buildx-action@v1"
+				},
+				_#step & {
+					name: "Docker Login"
+					uses: "docker/login-action@v1"
+					with: {
+						registry: "docker.io"
+						username: "cueckoo"
+						password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
+					}
 				},
 				_#step & {
 					name: "Run GoReleaser"
@@ -240,43 +257,7 @@ release: _#bashWorkflow & {
 					uses: "goreleaser/goreleaser-action@v2"
 					with: {
 						args:    "release --rm-dist"
-						version: "v0.155.1"
-					}
-				},
-			]
-		}
-		docker: {
-			name:      "docker"
-			"runs-on": _#linuxMachine
-			steps: [
-				_#checkoutCode,
-				_#step & {
-					name: "Set version environment"
-					run: """
-						CUE_VERSION=$(echo ${GITHUB_REF##refs/tags/v})
-						echo \"CUE_VERSION=$CUE_VERSION\"
-						echo \"CUE_VERSION=$(echo $CUE_VERSION)\" >> $GITHUB_ENV
-						"""
-				},
-				_#step & {
-					name: "Push to Docker Hub"
-					env: {
-						DOCKER_BUILDKIT: 1
-						GOLANG_VERSION:  1.14
-						CUE_VERSION:     "${{ env.CUE_VERSION }}"
-					}
-					uses: "docker/build-push-action@v1"
-					with: {
-						tags:           "${{ env.CUE_VERSION }},latest"
-						repository:     "cue-lang/cue"
-						username:       "cueckoo"
-						password:       "${{ secrets.CUECKOO_DOCKER_PAT }}"
-						tag_with_ref:   false
-						tag_with_sha:   false
-						target:         "cue"
-						always_pull:    true
-						build_args:     "GOLANG_VERSION=${{ env.GOLANG_VERSION }},CUE_VERSION=v${{ env.CUE_VERSION }}"
-						add_git_labels: true
+						version: "v0.173.2"
 					}
 				},
 			]

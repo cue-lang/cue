@@ -989,7 +989,7 @@ Value:
 %v
 
 You could file a bug with the above information at:
-    https://github.com/cue-lang/cue/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=.
+    https://cuelang.org/issues/new?assignees=&labels=NeedsInvestigation&template=bug_report.md&title=.
 `
 		cg := &ast.CommentGroup{Doc: true}
 		msg := fmt.Sprintf(format, name, err, p, v)

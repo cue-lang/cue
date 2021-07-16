@@ -296,9 +296,20 @@ tip_triggers: _#bashWorkflow & {
 				run:  "\(_#curl) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
 			},
 			{
+				_#arg: {
+					event_type: "Check against ${GITHUB_SHA}"
+					client_payload: {
+						type: "unity"
+						payload: {
+							versions: """
+							"commit:${GITHUB_SHA}"
+							"""
+						}
+					}
+				}
 				name: "Trigger unity build"
 				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Check against ${GITHUB_SHA}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"commit:${GITHUB_SHA}\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-sh/unity/dispatches
 					"""#
 			},
 		]
@@ -313,15 +324,29 @@ new_version_triggers: _#bashWorkflow & {
 		"runs-on": _#linuxMachine
 		steps: [
 			{
+				_#arg: {
+					event_type: "Re-test post release of ${GITHUB_REF##refs/tags/}"
+				}
 				name: "Rebuild tip.cuelang.org"
 				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Re-test post release of ${GITHUB_REF##refs/tags/}\"}" https://api.github.com/repos/cue-lang/cuelang.org/dispatches
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/cuelang.org/dispatches
 					"""#
 			},
 			{
+				_#arg: {
+					event_type: "Check against CUE ${GITHUB_REF##refs/tags/}"
+					client_payload: {
+						type: "unity"
+						payload: {
+							versions: """
+							"${GITHUB_REF##refs/tags/}"
+							"""
+						}
+					}
+				}
 				name: "Trigger unity build"
 				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary "{\"event_type\": \"Check against CUE ${GITHUB_REF##refs/tags/}\", \"client_payload\": {\"type\": \"unity\", \"payload\": {\"versions\": \"\\\"${GITHUB_REF##refs/tags/}\\\"\"}}}" https://api.github.com/repos/cue-sh/unity/dispatches
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-sh/unity/dispatches
 					"""#
 			},
 		]

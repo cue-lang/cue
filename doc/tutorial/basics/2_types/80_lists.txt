@@ -23,7 +23,9 @@ The output contains a valid private IP address (`myIP`)
 and an invalid one (`yourIP`).
 
 -- lists.cue --
-IP: 4 * [ uint8 ]
+import "list"
+
+IP: list.Repeat([ uint8 ], 4)
 
 PrivateIP: IP
 PrivateIP: [10, ...uint8] |

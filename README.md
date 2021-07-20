@@ -103,6 +103,15 @@ Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
 `brew install cuelang/tap/cue`
 
+#### Install using MacPorts
+
+On macOS, you can also install `cue` using [MacPorts](https://www.macports.org):
+
+```
+sudo port selfupdate
+sudo port install cue
+```
+
 #### Install from Source
 
 <!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txt -->

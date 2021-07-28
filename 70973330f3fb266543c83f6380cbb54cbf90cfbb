@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "afaf691c_84e1fae9",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-07-28T17:25:04Z",
+      "side": 1,
+      "message": "Carlos - who authored the previous commit which this partially reverts - LGTM-ed this offline.",
+      "revId": "70973330f3fb266543c83f6380cbb54cbf90cfbb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

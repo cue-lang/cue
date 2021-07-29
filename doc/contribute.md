@@ -338,22 +338,22 @@ will create or amend a single commit in the branch.
 $ git checkout -b mybranch
 $ [edit files...]
 $ git add [files...]
-$ git codereview change   # create commit in the branch
+$ git codereview change -s   # create commit in the branch
 $ [edit again...]
 $ git add [files...]
-$ git codereview change   # amend the existing commit with new changes
+$ git codereview change -s   # amend the existing commit with new changes
 $ [etc.]
 ```
 
 - **Step 3:** Test your changes, re-running `go test`.
 ```
-$ go test ./...    # recompile and test
+$ go test ./...              # recompile and test
 ```
 
 - **Step 4:** Send the changes for review to Gerrit using `git`
 `codereview` `mail` (which doesn't use e-mail, despite the name).
 ```
-$ git codereview mail     # send changes to Gerrit
+$ git codereview mail        # send changes to Gerrit
 ```
 
 - **Step 5:** After a review, apply changes to the same single commit
@@ -361,8 +361,8 @@ and mail them to Gerrit again:
 ```
 $ [edit files...]
 $ git add [files...]
-$ git codereview change   # update same commit
-$ git codereview mail     # send to Gerrit again
+$ git codereview change -s   # update same commit
+$ git codereview mail        # send to Gerrit again
 ```
 
 The rest of this section describes these steps in more detail.
@@ -402,11 +402,11 @@ $ [edit files...]
 $ git add [files...]
 ```
 
-To commit changes, instead of `git commit`, use `git codereview change`.
+To commit changes, instead of `git commit -s`, use `git codereview change -s`.
 
 
 ```
-$ git codereview change
+$ git codereview change -s
 (open $EDITOR)
 ```
 
@@ -497,9 +497,9 @@ area, and then amend the commit with
 
 
 ```
-$ git codereview change     # amend current commit
+$ git codereview change -s     # amend current commit
 (open $EDITOR)
-$ git codereview mail       # send new changes to Gerrit
+$ git codereview mail          # send new changes to Gerrit
 ```
 
 If you don't need to change the commit description, just save and exit from the editor.

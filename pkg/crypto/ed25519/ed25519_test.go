@@ -17,63 +17,54 @@ package ed25519_test
 import (
 	"bytes"
 	"crypto/ed25519"
-	"flag"
 	"fmt"
 	"os"
 	"testing"
 
+	"cuelang.org/go/internal/cuetest"
 	"cuelang.org/go/pkg/internal/builtintest"
 )
 
-var update = flag.Bool("update", false, "Update the golden files")
-
 func TestBuiltin(t *testing.T) {
-	if *update {
+	if cuetest.UpdateGoldenFiles {
 		updateGoldenFiles(t)
 	}
 
 	builtintest.Run("ed25519", t)
 }
 
+// updateGoldenFiles generates deterministic test input.
 func updateGoldenFiles(t *testing.T) {
 	key := ed25519.NewKeyFromSeed(make([]byte, ed25519.SeedSize))
 
-	var inputs, result, errors bytes.Buffer
+	var inputs bytes.Buffer
 	fmt.Fprintln(&inputs, `import "encoding/hex"`)
 	fmt.Fprintln(&inputs, `import "crypto/ed25519"`)
-	fmt.Fprintln(&result, "Result:")
-	fmt.Fprintln(&errors, "Errors:")
 
 	testCases := []struct {
 		key       ed25519.PublicKey
 		message   []byte
 		signature []byte
-		expected  string
-		err       string
 	}{
 		{
 			key:       key.Public().(ed25519.PublicKey),
 			message:   []byte("valid"),
 			signature: ed25519.Sign(key, []byte("valid")),
-			expected:  "true",
 		},
 		{
 			key:       key.Public().(ed25519.PublicKey),
 			message:   []byte("message mismatch"),
 			signature: ed25519.Sign(key, []byte("mismatching message")),
-			expected:  "false",
 		},
 		{
 			key:       make(ed25519.PublicKey, ed25519.PublicKeySize),
 			message:   []byte("wrong key"),
 			signature: ed25519.Sign(key, []byte("wrong key")),
-			expected:  "false",
 		},
 		{
 			key:       ed25519.PublicKey{},
 			message:   []byte("wrong key size"),
 			signature: ed25519.Sign(key, []byte("wrong key size")),
-			err:       "error in call to crypto/ed25519.Verify: ed25519: publicKey must be 32 bytes",
 		},
 	}
 	for i, tc := range testCases {
@@ -82,21 +73,11 @@ func updateGoldenFiles(t *testing.T) {
 			"t%d: ed25519.Verify(hex.Decode(\"%x\"), hex.Decode(\"%x\"), hex.Decode(\"%x\"))\n",
 			i, tc.key, tc.message, tc.signature,
 		)
-		if tc.err == "" {
-			fmt.Fprintf(&result, "t%d: %s\n", i, tc.expected)
-		} else {
-			fmt.Fprintf(&result, "t%d: _|_ // %s\n", i, tc.err)
-			fmt.Fprintf(&errors, "%s:\n    ./in.cue:%d:5\n", tc.err, i+3)
-		}
 	}
 
 	var buf bytes.Buffer
-	fmt.Fprintln(&buf, "# go test ./pkg/crypto/ed25519 -update")
 	fmt.Fprintln(&buf, "-- in.cue --")
 	fmt.Fprintln(&buf, inputs.String())
-	fmt.Fprintln(&buf, "-- out/ed25519 --")
-	fmt.Fprintln(&buf, errors.String())
-	fmt.Fprintln(&buf, result.String())
 	if err := os.WriteFile("testdata/gen.txtar", buf.Bytes(), 0666); err != nil {
 		t.Fatal(err)
 	}

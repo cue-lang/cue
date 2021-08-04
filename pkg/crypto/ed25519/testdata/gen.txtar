@@ -1,4 +1,3 @@
-# go test ./pkg/crypto/ed25519 -update
 -- in.cue --
 import "encoding/hex"
 import "crypto/ed25519"

@@ -92,7 +92,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: 1.15.8
+        go-version: "1.17"
         stable: false
     - name: Setup qemu
       uses: docker/setup-qemu-action@v1
@@ -185,6 +185,7 @@ jobs:
       matrix:
         go-version:
         - 1.14.14
+        - "1.17"
         - 1.15.8
         - "1.16"
         os:
@@ -227,7 +228,7 @@ jobs:
     - name: Test
       run: go test ./...
     - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/')
-        && matrix.go-version == '1.15.8' && matrix.os == 'ubuntu-18.04' }}
+        && matrix.go-version == '1.17' && matrix.os == 'ubuntu-18.04' }}
       name: Test with -race
       run: go test -race ./...
     - name: gorelease check
@@ -1372,7 +1373,7 @@ _#step: ((_#job & {
 _#codeGenGo: "1.14.14"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.15.8"
+_#latestStableGo: "1.17"
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
 _#windowsMachine: "windows-2019"
@@ -1380,7 +1381,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.16"]
+		"go-version": [_#codeGenGo, _#latestStableGo, "1.15.8", "1.16"]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }

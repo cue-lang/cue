@@ -101,7 +101,7 @@ Some aspects of this are:
 
 Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
-`brew install cuelang/tap/cue`
+`brew install cue-lang/tap/cue`
 
 #### Install from Source
 

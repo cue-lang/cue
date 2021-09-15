@@ -172,7 +172,6 @@ You can get in touch with the cuelang community in the following ways:
 - Chat with us on our
   [Slack workspace](https://join.slack.com/t/cuelang/shared_invite/enQtNzQwODc3NzYzNTA0LTAxNWQwZGU2YWFiOWFiOWQ4MjVjNGQ2ZTNlMmIxODc4MDVjMDg5YmIyOTMyMjQ2MTkzMTU5ZjA1OGE0OGE1NmE).
 
-
 ---
 
 Unless otherwise noted, the CUE source files are distributed

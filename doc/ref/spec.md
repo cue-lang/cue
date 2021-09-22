@@ -1091,10 +1091,10 @@ The token `...` is a shorthand for `..._`.
 
 ```
 a: {
-    foo:    string  // foo is a string
-    ["^i"]: int     // all other fields starting with i are integers
-    ["^b"]: bool    // all other fields starting with b are booleans
-    ...string       // all other fields must be a string
+    foo:    string    // foo is a string
+    [=~"^i"]: int     // all other fields starting with i are integers
+    [=~"^b"]: bool    // all other fields starting with b are booleans
+    ...string         // all other fields must be a string
 }
 
 b: a & {

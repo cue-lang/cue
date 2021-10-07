@@ -101,7 +101,7 @@ func (r *hiddenRuntime) CompileExpr(expr ast.Expr) (*Instance, error) {
 // provided as a string, byte slice, or io.Reader. The name is used as the file
 // name in position information. The source may import builtin packages.
 //
-// Deprecated: use ParseString or ParseBytes.  The use of Instance is being
+// Deprecated: use CompileString or CompileBytes.  The use of Instance is being
 // phased out.
 func (r *hiddenRuntime) Parse(name string, source interface{}) (*Instance, error) {
 	return r.Compile(name, source)

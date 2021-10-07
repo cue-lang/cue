@@ -222,7 +222,7 @@ func (c *Context) CompileString(src string, options ...BuildOption) Value {
 	return c.compile(c.runtime().Compile(&cfg, src))
 }
 
-// ParseString parses and build a Value from the given source bytes.
+// CompileBytes parses and build a Value from the given source bytes.
 //
 // The returned Value will represent an error, accessible through Err, if any
 // error occurred.

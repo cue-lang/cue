@@ -75,6 +75,36 @@ func netGetIP(ip cue.Value) (goip net.IP) {
 	}
 }
 
+func netGetIPCIDR(ip cue.Value) (gonet *net.IPNet, err error) {
+	switch ip.Kind() {
+	case cue.StringKind:
+		s, err := ip.String()
+		if err != nil {
+			return nil, err
+		}
+		_, gonet, err := net.ParseCIDR(s)
+		if err != nil {
+			return nil, err
+		}
+		return gonet, nil
+
+	case cue.BytesKind:
+		b, err := ip.Bytes()
+		if err != nil {
+			return nil, err
+		}
+		_, gonet, err := net.ParseCIDR(string(b))
+		if err != nil {
+			return nil, err
+		}
+		return gonet, nil
+
+	default:
+		// TODO: return canonical invalid type.
+		return nil, nil
+	}
+}
+
 // ParseIP parses s as an IP address, returning the result.
 // The string s can be in dotted decimal ("192.0.2.1")
 // or IPv6 ("2001:db8::68") form.
@@ -110,6 +140,14 @@ func IPv4(ip cue.Value) bool {
 func IP(ip cue.Value) bool {
 	// TODO: convert to native CUE.
 	return netGetIP(ip) != nil
+}
+
+// IPCIDR reports whether ip is a valid IPv4 or IPv6 address with CIDR subnet notation.
+//
+// The address may be a string or list of bytes.
+func IPCIDR(ip cue.Value) (bool, error) {
+	_, err := netGetIPCIDR(ip)
+	return err == nil, err
 }
 
 // LoopbackIP reports whether ip is a loopback address.

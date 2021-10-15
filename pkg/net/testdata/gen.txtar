@@ -20,6 +20,9 @@ t14: net.LoopbackIP([127, 0, 0, 1])
 t15: net.LoopbackIP("127.0.0.1")
 t16: net.ToIP4("127.0.0.1")
 t17: net.ToIP16("127.0.0.1")
+t18: net.IPCIDR("192.168.1.0/24")
+t19: net.IPCIDR("2001:db8:a0b:12f0::1/32")
+t20: net.IPCIDR("172.16.12.3")
 -- out/net --
 Errors:
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
@@ -48,4 +51,7 @@ t14: true
 t15: true
 t16: [127, 0, 0, 1]
 t17: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 127, 0, 0, 1]
+t18: true
+t19: true
+t20: false
 

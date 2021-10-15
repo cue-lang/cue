@@ -97,6 +97,18 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "IPCIDR",
+		Params: []internal.Param{
+			{Kind: adt.TopKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *internal.CallCtxt) {
+			ip := c.Value(0)
+			if c.Do() {
+				c.Ret = IPCIDR(ip)
+			}
+		},
+	}, {
 		Name: "LoopbackIP",
 		Params: []internal.Param{
 			{Kind: adt.TopKind},

@@ -20,6 +20,9 @@ t14: net.LoopbackIP([127, 0, 0, 1])
 t15: net.LoopbackIP("127.0.0.1")
 t16: net.ToIP4("127.0.0.1")
 t17: net.ToIP16("127.0.0.1")
+t18: net.IPCIDR("192.168.1.0/24")
+t19: net.IPCIDR("2001:db8:a0b:12f0::1/32")
+t20: net.IPCIDR("172.16.12.3")
 -- out/net --
 Errors:
 t9: invalid value "23.23.23.2333" (does not satisfy net.IPv4):
@@ -29,6 +32,8 @@ error in call to net.JoinHostPort: invalid host [192, 30, 4]:
 t13: invalid value "ff02::1:3" (does not satisfy net.IPv4):
     ./in.cue:15:6
     ./in.cue:15:19
+error in call to net.IPCIDR: invalid CIDR address: 172.16.12.3:
+    ./in.cue:22:6
 
 Result:
 t1: "foo.bar."
@@ -48,4 +53,7 @@ t14: true
 t15: true
 t16: [127, 0, 0, 1]
 t17: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 255, 255, 127, 0, 0, 1]
+t18: false
+t19: false
+t20: _|_ // error in call to net.IPCIDR: invalid CIDR address: 172.16.12.3
 

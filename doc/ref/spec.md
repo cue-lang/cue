@@ -724,7 +724,7 @@ than unification or disjunction,
 non-starred elements are dropped in favor of starred ones if the starred ones
 do not resolve to bottom.
 
-To define the the unification and disjunction operation we use the notation
+To define the unification and disjunction operation we use the notation
 `⟨v⟩` to denote a CUE value `v` that is not associated with a default
 and the notation `⟨v, d⟩` to denote a value `v` associated with a default
 value `d`.

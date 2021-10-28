@@ -349,7 +349,7 @@ TODO: consider allowing Exo (and up), if not followed by a sign
 or number. Alternatively one could only allow Ei, Yi, and Zi.
 -->
 
-Neither a `float_lit` nor an `si_lit` may not appear after a token that is:
+Neither a `float_lit` nor an `si_lit` may appear after a token that is:
 
 - an identifier, keyword, or bottom
 - a number or string literal, including an interpolation
@@ -535,7 +535,7 @@ This represents the same string as:
 
 Support for other values:
 - Duration literals
-- regular expessions: `re("[a-z]")`
+- regular expressions: `re("[a-z]")`
 -->
 
 
@@ -617,7 +617,7 @@ These all follow from the definition of unification:
 - The unification of values `a` and `b` where `a ⊑ b` is always `a`.
 - The unification of a value with bottom is always bottom.
 
-Unification in CUE is a [binary expression](#Operands), written `a & b`.
+Unification in CUE is a [binary expression](#operands), written `a & b`.
 It is commutative and associative.
 As a consequence, order of evaluation is irrelevant, a property that is key
 to many of the constructs in the CUE language as well as the tooling layered
@@ -646,7 +646,7 @@ These all follow from the definition of disjunction:
 - The disjunction of a value `a` with bottom is always `a`.
 - The disjunction of two bottom values is bottom.
 
-Disjunction in CUE is a [binary expression](#Operands), written `a | b`.
+Disjunction in CUE is a [binary expression](#operands), written `a | b`.
 It is commutative, associative, and idempotent.
 
 The unification of a disjunction with another value is equal to the disjunction
@@ -704,7 +704,7 @@ where `d` must be in instance of `v` (`d ⊑ v`).
 
 Default values are introduced by means of disjunctions.
 Any element of a disjunction can be _marked_ as a default
-by prefixing it with an asterisk `*` ([a unary expression](#Operators)).
+by prefixing it with an asterisk `*` ([a unary expression](#operators)).
 Syntactically consecutive disjunctions are considered to be
 part of a single disjunction,
 whereby multiple disjuncts can be marked as default.
@@ -756,7 +756,7 @@ Note that for any marked disjunction `a`,
 the expressions `a|a`, `*a|a` and `*a|*a` all resolve to `a`.
 
 ```
-Expression               Value-default pair      Rules applied
+Expression               Value-default pair     Rules applied
 *"tcp" | "udp"           ⟨"tcp"|"udp", "tcp"⟩    M1, D1
 string | *"foo"          ⟨string, "foo"⟩         M1, D1
 
@@ -961,11 +961,11 @@ The predeclared byte sequence type is `bytes`; it is a defined type.
 
 ### Bounds
 
-A _bound_, syntactically a [unary expression](#Operands), defines
+A _bound_, syntactically a [unary expression](#operands), defines
 an infinite disjunction of concrete values than can be represented
 as a single comparison.
 
-For any [comparison operator](#Comparison-operators) `op` except `==`,
+For any [comparison operator](#comparison-operators) `op` except `==`,
 `op a` is the disjunction of every `x` such that `x op a`.
 
 ```
@@ -1003,7 +1003,7 @@ instance. It can be considered the type of all structs.
 {a: 1} ⊑ {}
 {a: 1, b: 1} ⊑ {a: 1}
 {a: 1} ⊑ {a: int}
-{a: 1, b: 1} ⊑ {a: int, b: float}
+{a: 1, b: 1.0} ⊑ {a: int, b: float}
 
 {} ⋢ {a: 1}
 {a: 2} ⋢ {a: 1}
@@ -1017,7 +1017,7 @@ the value of a field `f` in `c` is `a.f & b.f` if `f` is in both `a` and `b`,
 or just `a.f` or `b.f` if `f` is in just `a` or `b`, respectively.
 If a field `f` is in both `a` and `b`, `c.f` is optional only if both
 `a.f` and `b.f` are optional.
-Any [references](#References) to `a` or `b`
+Any [references](#references) to `a` or `b`
 in their respective field values need to be replaced with references to `c`.
 The result of a unification is bottom (`_|_`) if any of its non-optional
 fields evaluates to bottom, recursively.
@@ -1246,10 +1246,10 @@ A1: A & {
 ```
 
 A _closed struct_ `c` is a struct whose instances may not declare any field
-with a name that does not match the name of field
+with a name that does not match the name of a field
 or the pattern of a pattern constraint defined in `c`.
 Hidden fields are excluded from this limitation.
-A struct that is the result of unifying any struct with a [`...`](#Structs)
+A struct that is the result of unifying any struct with a [`...`](#structs)
 declaration is defined for all regular fields.
 Closing a struct is equivalent to adding `..._|_` to it.
 
@@ -1351,7 +1351,7 @@ All other fields are _regular_.
 Definitions and hidden fields are not emitted when converting a CUE program
 to data and are never required to be concrete.
 
-Referencing a definition will recursively [close](#ClosedStructs) it.
+Referencing a definition will recursively [close](#closed-structs) it.
 That is, a referenced definition will not unify with a struct
 that would add a field anywhere within the definition that it does not
 already define or explicitly allow with a pattern constraint or `...`.
@@ -1613,7 +1613,7 @@ An open list is indicated with a `...` at the end of an element list,
 optionally followed by a value for the remaining elements.
 
 The length of a closed list is the number of elements it contains.
-The length of an open list is the its number of elements as a lower bound
+The length of an open list is the number of elements as a lower bound
 and an unlimited number of elements as its upper bound.
 
 ```
@@ -1673,7 +1673,7 @@ A _declaration_  may bind an identifier to a field, alias, or package.
 Every identifier in a program must be declared.
 Other than for fields,
 no identifier may be declared twice within the same block.
-For fields an identifier may be declared more than once within the same block,
+For fields, an identifier may be declared more than once within the same block,
 resulting in a field with a value that is the result of unifying the values
 of all fields with the same identifier.
 String labels do not bind an identifier to the respective field.
@@ -1860,8 +1860,8 @@ QualifiedIdent = PackageName "." identifier .
 ```
 
 A qualified identifier accesses an identifier in a different package,
-which must be [imported].
-The identifier must be declared in the [package block] of that package.
+which must be [imported](#import-declarations).
+The identifier must be declared in the [package block](#blocks) of that package.
 
 ```
 math.Sin    // denotes the Sin function in package math
@@ -1920,7 +1920,7 @@ TODO: maybe reintroduce slices, as they are useful in queries, probably this
 time with Python semantics.
 Slice          = "[" [ Expression ] ":" [ Expression ] [ ":" [Expression] ] "]" .
 
-Argument       = Expression | ( identifer ":" Expression ).
+Argument       = Expression | ( identifier ":" Expression ).
 
 // & expression type
 // string_lit: same as label. Arguments is current node.
@@ -2094,7 +2094,7 @@ mul_op     = "*" | "/" .
 unary_op   = "+" | "-" | "!" | "*" | rel_op .
 ```
 
-Comparisons are discussed [elsewhere](#Comparison-operators).
+Comparisons are discussed [elsewhere](#comparison-operators).
 For any binary operators, the operand types must unify.
 
 <!-- TODO: durations
@@ -2534,7 +2534,7 @@ expressions with their string representation.
 String interpolation may be used in single- and double-quoted strings, as well
 as their multiline equivalent.
 
-A placeholder consists of "\(" followed by an expression and a ")".
+A placeholder consists of "\\(" followed by an expression and a ")".
 The expression is evaluated in the scope within which the string is defined.
 
 The result of the expression is substituted as follows:
@@ -2563,7 +2563,7 @@ Built-in functions are predeclared. They are called like any other function.
 
 ### `len`
 
-The built-in function `len` takes arguments of various types and return
+The built-in function `len` takes arguments of various types and returns
 a result of type int.
 
 ```
@@ -2694,7 +2694,7 @@ Two particular cases are discussed below.
 An expression of the form `a & e`, where `a` is an atom
 and `e` is an expression, always evaluates to `a` or bottom.
 As it does not matter how we fail, we can assume the result to be `a`
-and postpone validating `a == e` until after all referenecs
+and postpone validating `a == e` until after all references
 in `e` have been resolved.
 
 ```
@@ -2918,8 +2918,8 @@ belonging to a directory and all its ancestors.
 ### Import declarations
 
 An import declaration states that the source file containing the declaration
-depends on definitions of the _imported_ package (§Program initialization and
-execution) and enables access to exported identifiers of that package.
+depends on definitions of the _imported_ package
+and enables access to exported identifiers of that package.
 The import names an identifier (PackageName) to be used for access and an
 ImportPath that specifies the package to be imported.
 
@@ -2950,10 +2950,10 @@ The interpretation of the ImportPath is implementation-dependent but it is
 typically either the path of a builtin package or a fully qualifying location
 of a package within a source code repository.
 
-An ImportLocation must be a non-empty strings using only characters belonging
+An ImportLocation must be a non-empty string using only characters belonging to
 Unicode's L, M, N, P, and S general categories
 (the Graphic characters without spaces)
-and may not include the characters !"#$%&'()*,:;<=>?[\]^`{|}
+and may not include the characters !"#$%&'()*,:;<=>?[\\]^`{|}
 or the Unicode replacement character U+FFFD.
 
 Assume we have package containing the package clause "package math",

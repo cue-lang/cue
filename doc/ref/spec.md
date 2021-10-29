@@ -724,7 +724,7 @@ than unification or disjunction,
 non-starred elements are dropped in favor of starred ones if the starred ones
 do not resolve to bottom.
 
-To define the the unification and disjunction operation we use the notation
+To define the unification and disjunction operation we use the notation
 `⟨v⟩` to denote a CUE value `v` that is not associated with a default
 and the notation `⟨v, d⟩` to denote a value `v` associated with a default
 value `d`.
@@ -1499,7 +1499,7 @@ Before a value (`foo: X=x`)
 
 Inside a bracketed label (`[X=expr]: value`):
 
-- binds the identifier to the the concrete label that matches `expr`
+- binds the identifier to the concrete label that matches `expr`
   within the instances of the field value (`value`).
 
 Before a list element (`[ X=value, X+1 ]`) (Not yet implemented)
@@ -2781,7 +2781,7 @@ x: {
     g: f
 }
 // introduces structural cycle
-z: x & y  
+z: x & y
 ```
 Implementations should be able to detect such structural cycles dynamically.
 

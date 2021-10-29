@@ -8,9 +8,6 @@ package v1
 // webhook backend fails.
 #ImagePolicyFailedOpenKey: "alpha.image-policy.k8s.io/failed-open"
 
-// PodPresetOptOutAnnotationKey represents the annotation key for a pod to exempt itself from pod preset manipulation
-#PodPresetOptOutAnnotationKey: "podpreset.admission.kubernetes.io/exclude"
-
 // MirrorAnnotationKey represents the annotation key set by kubelets when creating mirror pods
 #MirrorPodAnnotationKey: "kubernetes.io/config.mirror"
 
@@ -130,7 +127,7 @@ _#kubectlPrefix:                 "kubectl.kubernetes.io/"
 // pod deletion order.
 // The implicit deletion cost for pods that don't set the annotation is 0, negative values are permitted.
 //
-// This annotation is alpha-level and is only honored when PodDeletionCost feature is enabled.
+// This annotation is beta-level and is only honored when PodDeletionCost feature is enabled.
 #PodDeletionCost: "controller.kubernetes.io/pod-deletion-cost"
 
 // AnnotationTopologyAwareHints can be used to enable or disable Topology

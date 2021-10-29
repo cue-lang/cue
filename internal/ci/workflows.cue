@@ -257,7 +257,7 @@ release: _#bashWorkflow & {
 					uses: "goreleaser/goreleaser-action@v2"
 					with: {
 						args:    "release --rm-dist"
-						version: "v0.173.2"
+						version: "v0.183.0"
 					}
 				},
 			]

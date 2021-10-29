@@ -240,7 +240,7 @@ release: _#bashWorkflow & {
 				},
 				_#step & {
 					name: "Set up Docker Buildx"
-        			uses: "docker/setup-buildx-action@v1"
+					uses: "docker/setup-buildx-action@v1"
 				},
 				_#step & {
 					name: "Docker Login"
@@ -343,11 +343,11 @@ _#bashWorkflow: json.#Workflow & {
 _#job:  ((json.#Workflow & {}).jobs & {x: _}).x
 _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 
-// We need at least go1.14 for code generation
-_#codeGenGo: "1.14.14"
+// We use the latest go1.15 for code generation
+_#codeGenGo: "1.15.15"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.17"
+_#latestStableGo: "1.17.2"
 
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
@@ -357,7 +357,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.15.8", "1.16"]
+		"go-version": [_#codeGenGo, "1.16.9", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }

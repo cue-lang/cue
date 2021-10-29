@@ -259,11 +259,11 @@ _#step: ((_#job & {
 	steps: _
 }).steps & [_])[0]
 
-// We need at least go1.14 for code generation
-_#codeGenGo: "1.14.14"
+// We use the latest go1.15 for code generation
+_#codeGenGo: "1.15.15"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.17"
+_#latestStableGo: "1.17.2"
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
 _#windowsMachine: "windows-2019"
@@ -271,7 +271,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.15.8", "1.16"]
+		"go-version": [_#codeGenGo, "1.16.9", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }
@@ -1088,10 +1088,9 @@ import "strings"
               "fail-fast": (bool){ false }
               matrix: (#struct){
                 "go-version": (#list){
-                  0: (string){ "1.14.14" }
-                  1: (string){ "1.17" }
-                  2: (string){ "1.15.8" }
-                  3: (string){ "1.16" }
+                  0: (string){ "1.15.15" }
+                  1: (string){ "1.16.9" }
+                  2: (string){ "1.17.2" }
                 }
                 os: (#list){
                   0: (string){ "ubuntu-18.04" }
@@ -1136,7 +1135,7 @@ import "strings"
               5: (#struct){
                 name: (string){ "Generate" }
                 run: (string){ "go generate ./..." }
-                if: (string){ "matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'" }
+                if: (string){ "matrix.go-version == '1.15.15' && matrix.os != 'windows-2019'" }
               }
               6: (#struct){
                 name: (string){ "Test" }
@@ -1145,7 +1144,7 @@ import "strings"
               7: (#struct){
                 name: (string){ "Test with -race" }
                 run: (string){ "go test -race ./..." }
-                if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17' && matrix.os == 'ubuntu-18.04' }}" }
+                if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17.2' && matrix.os == 'ubuntu-18.04' }}" }
               }
               8: (#struct){
                 name: (string){ "gorelease check" }
@@ -1390,7 +1389,7 @@ import "strings"
                 name: (string){ "Install Go" }
                 uses: (string){ "actions/setup-go@v2" }
                 with: (#struct){
-                  "go-version": (string){ "1.17" }
+                  "go-version": (string){ "1.17.2" }
                   stable: (bool){ false }
                 }
               }
@@ -1670,10 +1669,9 @@ import "strings"
           "fail-fast": (bool){ false }
           matrix: (#struct){
             "go-version": (#list){
-              0: (string){ "1.14.14" }
-              1: (string){ "1.17" }
-              2: (string){ "1.15.8" }
-              3: (string){ "1.16" }
+              0: (string){ "1.15.15" }
+              1: (string){ "1.16.9" }
+              2: (string){ "1.17.2" }
             }
             os: (#list){
               0: (string){ "ubuntu-18.04" }
@@ -1718,7 +1716,7 @@ import "strings"
           5: (#struct){
             name: (string){ "Generate" }
             run: (string){ "go generate ./..." }
-            if: (string){ "matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'" }
+            if: (string){ "matrix.go-version == '1.15.15' && matrix.os != 'windows-2019'" }
           }
           6: (#struct){
             name: (string){ "Test" }
@@ -1727,7 +1725,7 @@ import "strings"
           7: (#struct){
             name: (string){ "Test with -race" }
             run: (string){ "go test -race ./..." }
-            if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17' && matrix.os == 'ubuntu-18.04' }}" }
+            if: (string){ "${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/') && matrix.go-version == '1.17.2' && matrix.os == 'ubuntu-18.04' }}" }
           }
           8: (#struct){
             name: (string){ "gorelease check" }
@@ -1966,7 +1964,7 @@ import "strings"
             name: (string){ "Install Go" }
             uses: (string){ "actions/setup-go@v2" }
             with: (#struct){
-              "go-version": (string){ "1.17" }
+              "go-version": (string){ "1.17.2" }
               stable: (bool){ false }
             }
           }
@@ -2239,8 +2237,8 @@ import "strings"
   }
   _#step(:ci): (#struct){
   }
-  _#codeGenGo(:ci): (string){ "1.14.14" }
-  _#latestStableGo(:ci): (string){ "1.17" }
+  _#codeGenGo(:ci): (string){ "1.15.15" }
+  _#latestStableGo(:ci): (string){ "1.17.2" }
   _#linuxMachine(:ci): (string){ "ubuntu-18.04" }
   _#macosMachine(:ci): (string){ "macos-10.15" }
   _#windowsMachine(:ci): (string){ "windows-2019" }
@@ -2248,10 +2246,9 @@ import "strings"
     "fail-fast": (bool){ false }
     matrix: (#struct){
       "go-version": (#list){
-        0: (string){ "1.14.14" }
-        1: (string){ "1.17" }
-        2: (string){ "1.15.8" }
-        3: (string){ "1.16" }
+        0: (string){ "1.15.15" }
+        1: (string){ "1.16.9" }
+        2: (string){ "1.17.2" }
       }
       os: (#list){
         0: (string){ "ubuntu-18.04" }
@@ -2292,7 +2289,7 @@ import "strings"
   _#goGenerate(:ci): (#struct){
     name: (string){ "Generate" }
     run: (string){ "go generate ./..." }
-    if: (string){ "matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'" }
+    if: (string){ "matrix.go-version == '1.15.15' && matrix.os != 'windows-2019'" }
   }
   _#goTest(:ci): (#struct){
     name: (string){ "Test" }
@@ -2645,8 +2642,8 @@ import "strings"
   }).steps & [
     _,
   ])[0]
-  _#codeGenGo: "1.14.14"
-  _#latestStableGo: "1.17"
+  _#codeGenGo: "1.15.15"
+  _#latestStableGo: "1.17.2"
   _#linuxMachine: "ubuntu-18.04"
   _#macosMachine: "macos-10.15"
   _#windowsMachine: "windows-2019"
@@ -2655,9 +2652,8 @@ import "strings"
     matrix: {
       "go-version": [
         〈2;_#codeGenGo〉,
+        "1.16.9",
         〈2;_#latestStableGo〉,
-        "1.15.8",
-        "1.16",
       ]
       os: [
         〈2;_#linuxMachine〉,

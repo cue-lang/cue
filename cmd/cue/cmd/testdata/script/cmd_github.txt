@@ -92,7 +92,7 @@ jobs:
     - name: Install Go
       uses: actions/setup-go@v2
       with:
-        go-version: "1.17"
+        go-version: 1.17.2
         stable: false
     - name: Setup qemu
       uses: docker/setup-qemu-action@v1
@@ -184,10 +184,9 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
-        - 1.14.14
-        - "1.17"
-        - 1.15.8
-        - "1.16"
+        - 1.15.15
+        - 1.16.9
+        - 1.17.2
         os:
         - ubuntu-18.04
         - macos-10.15
@@ -222,13 +221,13 @@ jobs:
     - if: ${{ github.ref == 'refs/heads/master' }}
       name: Set go build tags
       run: go env -w GOFLAGS=-tags=long
-    - if: matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'
+    - if: matrix.go-version == '1.15.15' && matrix.os != 'windows-2019'
       name: Generate
       run: go generate ./...
     - name: Test
       run: go test ./...
     - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/')
-        && matrix.go-version == '1.17' && matrix.os == 'ubuntu-18.04' }}
+        && matrix.go-version == '1.17.2' && matrix.os == 'ubuntu-18.04' }}
       name: Test with -race
       run: go test -race ./...
     - name: gorelease check
@@ -1369,11 +1368,11 @@ _#step: ((_#job & {
 	steps: _
 }).steps & [_])[0]
 
-// We need at least go1.14 for code generation
-_#codeGenGo: "1.14.14"
+// We use the latest go1.15 for code generation
+_#codeGenGo: "1.15.15"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.17"
+_#latestStableGo: "1.17.2"
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
 _#windowsMachine: "windows-2019"
@@ -1381,7 +1380,7 @@ _#testStrategy: {
 	"fail-fast": false
 	matrix: {
 		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, _#latestStableGo, "1.15.8", "1.16"]
+		"go-version": [_#codeGenGo, "1.16.9", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }

@@ -34,6 +34,30 @@ func FormatBool(b bool) string {
 	return strconv.FormatBool(b)
 }
 
+// ParseComplex converts the string s to a complex number
+// with the precision specified by bitSize: 64 for complex64, or 128 for complex128.
+// When bitSize=64, the result still has type complex128, but it will be
+// convertible to complex64 without changing its value.
+//
+// The number represented by s must be of the form N, Ni, or N±Ni, where N stands
+// for a floating-point number as recognized by ParseFloat, and i is the imaginary
+// component. If the second N is unsigned, a + sign is required between the two components
+// as indicated by the ±. If the second N is NaN, only a + sign is accepted.
+// The form may be parenthesized and cannot contain any spaces.
+// The resulting complex number consists of the two components converted by ParseFloat.
+//
+// The errors that ParseComplex returns have concrete type *NumError
+// and include err.Num = s.
+//
+// If s is not syntactically well-formed, ParseComplex returns err.Err = ErrSyntax.
+//
+// If s is syntactically well-formed but either component is more than 1/2 ULP
+// away from the largest floating point number of the given component's size,
+// ParseComplex returns err.Err = ErrRange and c = ±Inf for the respective component.
+func ParseComplex(s string, bitSize int) (complex128, error) {
+	return strconv.ParseComplex(s, bitSize)
+}
+
 // ParseFloat converts the string s to a floating-point number
 // with the precision specified by bitSize: 32 for float32, or 64 for float64.
 // When bitSize=32, the result still has type float64, but it will be
@@ -56,8 +80,8 @@ func FormatBool(b bool) string {
 // away from the largest floating point number of the given size,
 // ParseFloat returns f = ±Inf, err.Err = ErrRange.
 //
-// ParseFloat recognizes the strings "NaN", "+Inf", and "-Inf" as their
-// respective special floating point values. It ignores case when matching.
+// ParseFloat recognizes the strings "NaN", and the (possibly signed) strings "Inf" and "Infinity"
+// as their respective special floating point values. It ignores case when matching.
 func ParseFloat(s string, bitSize int) (float64, error) {
 	return strconv.ParseFloat(s, bitSize)
 }
@@ -97,6 +121,17 @@ func ParseInt(s string, base int, bitSize int) (i int64, err error) {
 // Atoi is equivalent to ParseInt(s, 10, 0), converted to type int.
 func Atoi(s string) (int, error) {
 	return strconv.Atoi(s)
+}
+
+// FormatComplex converts the complex number c to a string of the
+// form (a+bi) where a and b are the real and imaginary parts,
+// formatted according to the format fmt and precision prec.
+//
+// The format fmt and precision prec have the same meaning as in FormatFloat.
+// It rounds the result assuming that the original was obtained from a complex
+// value of bitSize bits, which must be 64 for complex64 and 128 for complex128.
+func FormatComplex(c complex128, fmt byte, prec, bitSize int) string {
+	return strconv.FormatComplex(c, fmt, prec, bitSize)
 }
 
 // FormatFloat converts the floating-point number f to a string,

@@ -165,7 +165,7 @@ func ToLower(s string) string {
 
 // Trim returns a slice of the string s with all leading and
 // trailing Unicode code points contained in cutset removed.
-func Trim(s string, cutset string) string {
+func Trim(s, cutset string) string {
 	return strings.Trim(s, cutset)
 }
 
@@ -173,7 +173,7 @@ func Trim(s string, cutset string) string {
 // Unicode code points contained in cutset removed.
 //
 // To remove a prefix, use TrimPrefix instead.
-func TrimLeft(s string, cutset string) string {
+func TrimLeft(s, cutset string) string {
 	return strings.TrimLeft(s, cutset)
 }
 
@@ -181,7 +181,7 @@ func TrimLeft(s string, cutset string) string {
 // Unicode code points contained in cutset removed.
 //
 // To remove a suffix, use TrimSuffix instead.
-func TrimRight(s string, cutset string) string {
+func TrimRight(s, cutset string) string {
 	return strings.TrimRight(s, cutset)
 }
 

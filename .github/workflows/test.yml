@@ -37,10 +37,9 @@ jobs:
       fail-fast: false
       matrix:
         go-version:
-        - 1.14.14
-        - "1.17"
-        - 1.15.8
-        - "1.16"
+        - 1.15.15
+        - 1.16.9
+        - 1.17.2
         os:
         - ubuntu-18.04
         - macos-10.15
@@ -75,13 +74,13 @@ jobs:
     - if: ${{ github.ref == 'refs/heads/master' }}
       name: Set go build tags
       run: go env -w GOFLAGS=-tags=long
-    - if: matrix.go-version == '1.14.14' && matrix.os != 'windows-2019'
+    - if: matrix.go-version == '1.15.15' && matrix.os != 'windows-2019'
       name: Generate
       run: go generate ./...
     - name: Test
       run: go test ./...
     - if: ${{ github.ref == 'refs/heads/master' || startsWith(github.ref, 'refs/heads/ci/')
-        && matrix.go-version == '1.17' && matrix.os == 'ubuntu-18.04' }}
+        && matrix.go-version == '1.17.2' && matrix.os == 'ubuntu-18.04' }}
       name: Test with -race
       run: go test -race ./...
     - name: gorelease check

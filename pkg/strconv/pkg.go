@@ -54,6 +54,19 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "ParseComplex",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
+		},
+		Result: adt.TopKind,
+		Func: func(c *internal.CallCtxt) {
+			s, bitSize := c.String(0), c.Int(1)
+			if c.Do() {
+				c.Ret, c.Err = ParseComplex(s, bitSize)
+			}
+		},
+	}, {
 		Name: "ParseFloat",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},

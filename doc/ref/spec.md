@@ -2694,7 +2694,7 @@ Two particular cases are discussed below.
 An expression of the form `a & e`, where `a` is an atom
 and `e` is an expression, always evaluates to `a` or bottom.
 As it does not matter how we fail, we can assume the result to be `a`
-and postpone validating `a == e` until after all referenecs
+and postpone validating `a == e` until after all references
 in `e` have been resolved.
 
 ```

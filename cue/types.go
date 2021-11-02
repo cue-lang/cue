@@ -44,42 +44,44 @@ import (
 // Kind determines the underlying type of a Value.
 type Kind = adt.Kind
 
-const BottomKind Kind = 0
-
 const (
+	// BottomKind represents the bottom value.
+	BottomKind Kind = adt.BottomKind
+
 	// NullKind indicates a null value.
 	NullKind Kind = adt.NullKind
 
 	// BoolKind indicates a boolean value.
-	BoolKind = adt.BoolKind
+	BoolKind Kind = adt.BoolKind
 
 	// IntKind represents an integral number.
-	IntKind = adt.IntKind
+	IntKind Kind = adt.IntKind
 
 	// FloatKind represents a decimal float point number that cannot be
 	// converted to an integer. The underlying number may still be integral,
 	// but resulting from an operation that enforces the float type.
-	FloatKind = adt.FloatKind
+	FloatKind Kind = adt.FloatKind
 
 	// StringKind indicates any kind of string.
-	StringKind = adt.StringKind
+	StringKind Kind = adt.StringKind
 
 	// BytesKind is a blob of data.
-	BytesKind = adt.BytesKind
+	BytesKind Kind = adt.BytesKind
 
 	// StructKind is a kev-value map.
-	StructKind = adt.StructKind
+	StructKind Kind = adt.StructKind
 
 	// ListKind indicates a list of values.
-	ListKind = adt.ListKind
+	ListKind Kind = adt.ListKind
 
 	// _numberKind is used as a implementation detail inside
 	// Kind.String to indicate NumberKind.
 
 	// NumberKind represents any kind of number.
-	NumberKind = IntKind | FloatKind
+	NumberKind Kind = IntKind | FloatKind
 
-	TopKind = adt.TopKind
+	// TopKind represents the top value.
+	TopKind Kind = adt.TopKind
 )
 
 // An structValue represents a JSON object.

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2e833ace_fa81efb4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-03T12:25:45Z",
+      "side": 1,
+      "message": "Thanks for your patience Anton. \n\nAdding Marcel to confirm on the tweak regarding the example for int/float. It might be that this is a case where the spec refers to the intended behaviour, and that the current implementation needs to catch up with that via https://github.com/cue-lang/cue/issues/253",
+      "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2670184_468f796b",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-03T12:25:45Z",
+      "side": 1,
+      "message": "@mpvl - please can you confirm whether the spec is effectively a reference to the desired behaviour, as opposed to current implementation?",
+      "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

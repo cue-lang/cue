@@ -33,6 +33,47 @@
       "message": "@mpvl - please can you confirm whether the spec is effectively a reference to the desired behaviour, as opposed to current implementation?",
       "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a485ebc7_237e2829",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-03T13:34:04Z",
+      "side": 1,
+      "message": "In this case, it is indeed a spec bug, AFAICT. We are investigating relaxing these rules, but so far no decision has been made there.\n\nSo this change is correct.",
+      "parentUuid": "e2670184_468f796b",
+      "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a4a7c370_6dfc8b5c",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2537,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-03T13:34:04Z",
+      "side": 1,
+      "message": "Only one `\\`, no?",
+      "range": {
+        "startLine": 2537,
+        "startChar": 29,
+        "endLine": 2537,
+        "endChar": 30
+      },
+      "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

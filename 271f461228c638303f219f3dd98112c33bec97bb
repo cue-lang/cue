@@ -16,6 +16,24 @@
       "message": "Do you have an example on pkg.go.dev on how that looks like?",
       "revId": "271f461228c638303f219f3dd98112c33bec97bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "30002e3c_9f918a73",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-04T06:14:44Z",
+      "side": 1,
+      "message": "Sorry, should have been clearer. The Runtime example linked in the commit message is such an example:\n\nhttps://pkg.go.dev/cuelang.org/go@v0.4.0/cue#Runtime",
+      "parentUuid": "9cce9413_bb0620f8",
+      "revId": "271f461228c638303f219f3dd98112c33bec97bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

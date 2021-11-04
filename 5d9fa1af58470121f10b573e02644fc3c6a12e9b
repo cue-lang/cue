@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0516805_6784f284",
+        "filename": "go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2021-11-04T19:17:18Z",
+      "side": 1,
+      "message": "Does this violate the support for the last 2 Go versions? In other words, Go 1.16 is no longer supported for building `cue` or using the Go API?",
+      "revId": "5d9fa1af58470121f10b573e02644fc3c6a12e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

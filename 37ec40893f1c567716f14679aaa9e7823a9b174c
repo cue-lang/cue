@@ -53,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3eeaf8c3_8c44c384",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 1006,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-04T06:11:25Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "a485ebc7_237e2829",
+      "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a4a7c370_6dfc8b5c",
@@ -66,6 +84,30 @@
       "writtenOn": "2021-11-03T13:34:04Z",
       "side": 1,
       "message": "Only one `\\`, no?",
+      "range": {
+        "startLine": 2537,
+        "startChar": 29,
+        "endLine": 2537,
+        "endChar": 30
+      },
+      "revId": "37ec40893f1c567716f14679aaa9e7823a9b174c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8fc6fc38_26920389",
+        "filename": "doc/ref/spec.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 2537,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-04T06:11:25Z",
+      "side": 1,
+      "message": "The escaping of the `\\` is required in markdown outside of a code block",
+      "parentUuid": "a4a7c370_6dfc8b5c",
       "range": {
         "startLine": 2537,
         "startChar": 29,

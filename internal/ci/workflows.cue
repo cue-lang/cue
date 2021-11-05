@@ -347,7 +347,7 @@ _#step: ((_#job & {steps:                 _}).steps & [_])[0]
 _#codeGenGo: "1.15.15"
 
 // Use a specific latest version for release builds
-_#latestStableGo: "1.17.2"
+_#latestStableGo: "1.17.3"
 
 _#linuxMachine:   "ubuntu-18.04"
 _#macosMachine:   "macos-10.15"
@@ -356,8 +356,7 @@ _#windowsMachine: "windows-2019"
 _#testStrategy: {
 	"fail-fast": false
 	matrix: {
-		// Use a stable version of 1.14.x for go generate
-		"go-version": [_#codeGenGo, "1.16.9", _#latestStableGo]
+		"go-version": [_#codeGenGo, "1.16.10", _#latestStableGo]
 		os: [_#linuxMachine, _#macosMachine, _#windowsMachine]
 	}
 }

@@ -16,6 +16,24 @@
       "message": "Does this violate the support for the last 2 Go versions? In other words, Go 1.16 is no longer supported for building `cue` or using the Go API?",
       "revId": "5d9fa1af58470121f10b573e02644fc3c6a12e9b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f27496f0_cab7362b",
+        "filename": "go.mod",
+        "patchSetId": 1
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-05T14:25:15Z",
+      "side": 1,
+      "message": "The go directive in a go.mod does not indicate the minimum version of Go supported. Instead it indicates that a module was written assuming the semantics of a given version of Go. See more details of what is controlled/enabled by this directive here:\n\nhttps://golang.org/ref/mod#go-mod-file-go\n\nSee discussion in the thread at https://twitter.com/_myitcv/status/1373378649571876866 for a broader discussion of the confusion around this topic. \n\nWe need to do a better job of advertising our commitment to supporting the latest two (actually three) Go versions, but we maintain that commitment by ensuring we have those three versions as part of the CI matrix.",
+      "parentUuid": "c0516805_6784f284",
+      "revId": "5d9fa1af58470121f10b573e02644fc3c6a12e9b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

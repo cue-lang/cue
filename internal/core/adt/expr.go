@@ -119,7 +119,10 @@ func (o *StructLit) Init() {
 		case Expr:
 			o.HasEmbed = true
 
-		case *ForClause, Yielder:
+		case *Comprehension:
+			o.HasEmbed = true
+
+		case *LetClause:
 			o.HasEmbed = true
 
 		case *BulkOptionalField:
@@ -1594,6 +1597,18 @@ func (x *Disjunction) Kind() Kind {
 		k |= v.Kind()
 	}
 	return k
+}
+
+type Comprehension struct {
+	Clauses Yielder
+	Value   *StructLit // TODO: changes this to Expr?
+}
+
+func (x *Comprehension) Source() ast.Node {
+	if x.Clauses == nil {
+		return nil
+	}
+	return x.Clauses.Source()
 }
 
 // A ForClause represents a for clause of a comprehension. It can be used

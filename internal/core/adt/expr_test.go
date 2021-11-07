@@ -32,6 +32,7 @@ func TestNilSource(t *testing.T) {
 		&BulkOptionalField{},
 		&Bytes{},
 		&CallExpr{},
+		&Comprehension{},
 		&Conjunction{},
 		&Disjunction{},
 		&DisjunctionExpr{},

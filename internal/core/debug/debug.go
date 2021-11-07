@@ -497,6 +497,10 @@ func (w *printer) node(n adt.Node) {
 		}
 		w.string(")")
 
+	case *adt.Comprehension:
+		w.node(x.Clauses)
+		w.node(x.Value)
+
 	case *adt.ForClause:
 		w.string("for ")
 		w.ident(x.Key)
@@ -522,7 +526,6 @@ func (w *printer) node(n adt.Node) {
 		w.node(x.Dst)
 
 	case *adt.ValueClause:
-		w.node(x.StructLit)
 
 	default:
 		panic(fmt.Sprintf("unknown type %T", x))

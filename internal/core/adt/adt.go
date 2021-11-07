@@ -313,12 +313,8 @@ func (*DisjunctionExpr) elemNode()  {}
 
 // Decl, Elem, and Yielder
 
-func (*ForClause) declNode() {}
-func (*ForClause) elemNode() {}
-func (*IfClause) declNode()  {}
-func (*IfClause) elemNode()  {}
-
-// Yielder only: ValueClause
+func (*Comprehension) declNode() {}
+func (*Comprehension) elemNode() {}
 
 // Node
 
@@ -359,6 +355,7 @@ func (*OptionalField) node()     {}
 func (*BulkOptionalField) node() {}
 func (*DynamicField) node()      {}
 func (*Ellipsis) node()          {}
+func (*Comprehension) node()     {}
 func (*ForClause) node()         {}
 func (*IfClause) node()          {}
 func (*LetClause) node()         {}

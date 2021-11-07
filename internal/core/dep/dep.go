@@ -188,8 +188,8 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		env := &adt.Environment{Up: env, Vertex: empty}
 		for _, e := range x.Elems {
 			switch x := e.(type) {
-			case adt.Yielder:
-				c.markYielder(env, x)
+			case *adt.Comprehension:
+				c.markComprehension(env, x)
 
 			case adt.Expr:
 				c.markSubExpr(env, x)
@@ -287,8 +287,8 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 		// a matching field in the parallel actual evaluation.
 		c.markSubExpr(env, x.Value)
 
-	case adt.Yielder:
-		c.markYielder(env, x)
+	case *adt.Comprehension:
+		c.markComprehension(env, x)
 
 	case adt.Expr:
 		c.markExpr(env, x)
@@ -300,26 +300,29 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 	}
 }
 
-func (c *visitor) markYielder(env *adt.Environment, y adt.Yielder) {
+func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) {
+	env = c.markYielder(env, y.Clauses)
+	c.markExpr(env, y.Value)
+}
+
+func (c *visitor) markYielder(env *adt.Environment, y adt.Yielder) *adt.Environment {
 	switch x := y.(type) {
 	case *adt.ForClause:
 		c.markExpr(env, x.Src)
-		env := &adt.Environment{Up: env, Vertex: empty}
-		c.markYielder(env, x.Dst)
+		env = &adt.Environment{Up: env, Vertex: empty}
+		env = c.markYielder(env, x.Dst)
 		// In dynamic mode, iterate over all actual value and
 		// evaluate.
 
 	case *adt.LetClause:
 		c.markExpr(env, x.Expr)
-		env := &adt.Environment{Up: env, Vertex: empty}
-		c.markYielder(env, x.Dst)
+		env = &adt.Environment{Up: env, Vertex: empty}
+		env = c.markYielder(env, x.Dst)
 
 	case *adt.IfClause:
 		c.markExpr(env, x.Condition)
 		// In dynamic mode, only continue if condition is true.
-		c.markYielder(env, x.Dst)
-
-	case *adt.ValueClause:
-		c.markExpr(env, x.StructLit)
+		env = c.markYielder(env, x.Dst)
 	}
+	return env
 }

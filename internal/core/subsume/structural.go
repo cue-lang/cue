@@ -268,11 +268,8 @@ func (c *collatedDecls) collate(env *adt.Environment, s *adt.StructLit) {
 			c.isOpen = true
 			c.additional = append(c.additional, x)
 
-		case *adt.ForClause:
-			c.yielders = append(c.yielders, x)
-
-		case *adt.IfClause:
-			c.yielders = append(c.yielders, x)
+		case *adt.Comprehension:
+			c.yielders = append(c.yielders, x.Clauses)
 
 		case *adt.LetClause:
 			c.yielders = append(c.yielders, x)

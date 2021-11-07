@@ -420,7 +420,7 @@ func (e *exporter) elem(d adt.Elem) ast.Expr {
 		}
 		return t
 
-	case adt.Yielder:
+	case *adt.Comprehension:
 		return e.comprehension(x)
 
 	default:
@@ -428,9 +428,12 @@ func (e *exporter) elem(d adt.Elem) ast.Expr {
 	}
 }
 
-func (e *exporter) comprehension(y adt.Yielder) ast.Expr {
+func (e *exporter) comprehension(comp *adt.Comprehension) *ast.Comprehension {
 	c := &ast.Comprehension{}
 
+	y := comp.Clauses
+
+loop:
 	for {
 		switch x := y.(type) {
 		case *adt.ForClause:
@@ -474,16 +477,17 @@ func (e *exporter) comprehension(y adt.Yielder) ast.Expr {
 			y = x.Dst
 
 		case *adt.ValueClause:
-			v := e.expr(x.StructLit)
-			if _, ok := v.(*ast.StructLit); !ok {
-				v = ast.NewStruct(ast.Embed(v))
-			}
-			c.Value = v
-			return c
+			break loop
 
 		default:
 			panic(fmt.Sprintf("unknown field %T", x))
 		}
 	}
 
+	v := e.expr(comp.Value)
+	if _, ok := v.(*ast.StructLit); !ok {
+		v = ast.NewStruct(ast.Embed(v))
+	}
+	c.Value = v
+	return c
 }

@@ -182,13 +182,17 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 
 			x := MakeIdentLabel(c, "x", "")
 
-			forClause := func(src Expr) *ForClause {
-				return &ForClause{
-					Value: x,
-					Src:   src,
-					Dst: &ValueClause{&StructLit{Decls: []Decl{
-						&FieldReference{UpCount: 1, Label: x},
-					}}},
+			forClause := func(src Expr) *Comprehension {
+				s := &StructLit{Decls: []Decl{
+					&FieldReference{UpCount: 1, Label: x},
+				}}
+				return &Comprehension{
+					Clauses: &ForClause{
+						Value: x,
+						Src:   src,
+						Dst:   &ValueClause{s},
+					},
+					Value: s,
 				}
 			}
 
@@ -242,13 +246,17 @@ func BinOp(c *OpContext, op Op, left, right Value) Value {
 			x := MakeIdentLabel(c, "x", "")
 
 			for i := c.uint64(left, "list multiplier"); i > 0; i-- {
+				st := &StructLit{Decls: []Decl{
+					&FieldReference{UpCount: 1, Label: x},
+				}}
 				list.Elems = append(list.Elems,
-					&ForClause{
-						Value: x,
-						Src:   right,
-						Dst: &ValueClause{&StructLit{Decls: []Decl{
-							&FieldReference{UpCount: 1, Label: x},
-						}}},
+					&Comprehension{
+						Clauses: &ForClause{
+							Value: x,
+							Src:   right,
+							Dst:   &ValueClause{st},
+						},
+						Value: st,
 					},
 				)
 			}

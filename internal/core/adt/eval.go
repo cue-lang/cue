@@ -1740,13 +1740,8 @@ func (n *nodeContext) addStruct(
 			n.aStructID = closeInfo
 			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeInfo, nil})
 
-		case *ForClause:
-			// Why is this not an embedding?
-			n.comprehensions = append(n.comprehensions, envYield{childEnv, x, closeInfo, nil})
-
-		case Yielder:
-			// Why is this not an embedding?
-			n.comprehensions = append(n.comprehensions, envYield{childEnv, x, closeInfo, nil})
+		case *Comprehension:
+			n.insertComprehension(childEnv, x.Clauses, closeInfo)
 
 		case Expr:
 			// add embedding to optional
@@ -1992,9 +1987,10 @@ outer:
 		hasComprehension := false
 		for j, elem := range l.list.Elems {
 			switch x := elem.(type) {
-			case Yielder:
-				err := c.Yield(l.env, x, func(e *Environment, st *StructLit) {
-					label, err := MakeLabel(x.Source(), index, IntLabel)
+			case *Comprehension:
+				xx := x.Clauses
+				err := c.Yield(l.env, xx, func(e *Environment, st *StructLit) {
+					label, err := MakeLabel(xx.Source(), index, IntLabel)
 					n.addErr(err)
 					index++
 					c := MakeConjunct(e, st, l.id)

@@ -165,6 +165,10 @@ func (w *Visitor) node(n adt.Node) {
 
 	// Yielders
 
+	case *adt.Comprehension:
+		w.node(x.Clauses)
+		w.node(x.Value)
+
 	case *adt.ForClause:
 		w.feature(x.Key, x)
 		w.feature(x.Value, x)
@@ -180,7 +184,6 @@ func (w *Visitor) node(n adt.Node) {
 		w.node(x.Dst)
 
 	case *adt.ValueClause:
-		w.node(x.StructLit)
 
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))

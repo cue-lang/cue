@@ -21,12 +21,16 @@ type envYield struct {
 	err   *Bottom
 }
 
+func (n *nodeContext) insertComprehension(env *Environment, x Yielder, ci CloseInfo) {
+	n.comprehensions = append(n.comprehensions, envYield{env, x, ci, nil})
+}
+
 // injectComprehensions evaluates and inserts comprehensions.
 func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 	ctx := n.ctx
 	type envStruct struct {
 		env *Environment
-		s   *StructLit
+		s   *StructLit // always the same.
 	}
 	var sa []envStruct
 	f := func(env *Environment, st *StructLit) {

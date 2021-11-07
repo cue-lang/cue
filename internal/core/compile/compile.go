@@ -702,7 +702,7 @@ func (c *compiler) elem(n ast.Expr) adt.Elem {
 
 func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 	var cur adt.Yielder
-	var first adt.Elem
+	var first adt.Yielder
 	var prev, next *adt.Yielder
 	for _, v := range x.Clauses {
 		switch x := v.(type) {
@@ -745,8 +745,8 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 		if prev != nil {
 			*prev = cur
 		} else {
-			var ok bool
-			if first, ok = cur.(adt.Elem); !ok {
+			first = cur
+			if _, ok := cur.(*adt.LetClause); ok {
 				return c.errf(x,
 					"first comprehension clause must be 'if' or 'for'")
 			}
@@ -774,7 +774,10 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 		return c.errf(x, "comprehension value without clauses")
 	}
 
-	return first
+	return &adt.Comprehension{
+		Clauses: first,
+		Value:   st,
+	}
 }
 
 func (c *compiler) labeledExpr(f *ast.Field, lab labeler, expr ast.Expr) adt.Expr {

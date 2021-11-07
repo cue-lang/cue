@@ -94,7 +94,7 @@ func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 				// Structs with comprehensions may never be removed.
 				for _, d := range x.Decls {
 					switch d.(type) {
-					case *adt.IfClause, *adt.ForClause:
+					case *adt.Comprehension:
 						t.markKeep(x)
 					}
 				}

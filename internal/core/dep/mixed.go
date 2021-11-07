@@ -94,8 +94,8 @@ func (m marked) markExpr(x adt.Expr) {
 			case adt.Expr:
 				m.markExpr(x)
 
-			case adt.Yielder:
-				m.markYielder(x)
+			case *adt.Comprehension:
+				m.markComprehension(x)
 
 			default:
 				panic(fmt.Sprintf("unreachable %T", x))
@@ -108,8 +108,8 @@ func (m marked) markExpr(x adt.Expr) {
 			case adt.Expr:
 				m.markExpr(x)
 
-			case adt.Yielder:
-				m.markYielder(x)
+			case *adt.Comprehension:
+				m.markComprehension(x)
 
 			case *adt.Ellipsis:
 				m.markExpr(x.Value)
@@ -123,10 +123,12 @@ func (m marked) markExpr(x adt.Expr) {
 		for _, d := range x.Values {
 			m.markExpr(d.Val)
 		}
-
-	case adt.Yielder:
-		m.markYielder(x)
 	}
+}
+
+func (m marked) markComprehension(y *adt.Comprehension) {
+	m.markYielder(y.Clauses)
+	m.markExpr(y.Value)
 }
 
 func (m marked) markYielder(y adt.Yielder) {
@@ -139,8 +141,5 @@ func (m marked) markYielder(y adt.Yielder) {
 
 	case *adt.LetClause:
 		m.markYielder(x.Dst)
-
-	case *adt.ValueClause:
-		m.markExpr(x.StructLit)
 	}
 }

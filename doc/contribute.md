@@ -361,7 +361,7 @@ process:
 
 - Visit [GerritHub](http://gerrithub.io/).
 - Click "First Time Sign In".
-- Clickt the green "Sign In" button, to sign in using your GitHub
+- Click the green "Sign In" button, to sign in using your GitHub
   credentials.
 - When prompted "Which level of GitHub access do you need?", choose
   "Default" and then click "Login."

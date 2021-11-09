@@ -15,14 +15,10 @@ Go 1.14 or higher (see below)
 To download and install the `cue` command line tool run
 
 ```
-GO111MODULE=on go get cuelang.org/go/cmd/cue
-```
-
-Or, if you are using Go 1.16:
-
-```
 go install cuelang.org/go/cmd/cue@latest
 ```
+
+If the command fails, make sure your version of Go is 1.16 or later.
 
 And make sure the install directory is in your path.
 

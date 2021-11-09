@@ -107,13 +107,7 @@ Using [Homebrew](https://brew.sh), you can install using the CUE Homebrew tap:
 
 <!-- Keep the following in sync with cmd/cue/cmd/testdata/script/install*.txt -->
 
-If you already have Go installed, the short version is:
-
-```
-GO111MODULE=on go get cuelang.org/go/cmd/cue
-```
-
-Or, if you are using Go 1.16:
+If you already have Go 1.16 or later installed, the short version is:
 
 ```
 go install cuelang.org/go/cmd/cue@latest

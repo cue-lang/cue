@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f2b3d64a_871015b1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-09T12:40:48Z",
+      "side": 1,
+      "message": "Thanks LGTM. ",
+      "revId": "9800d40db89a7345cb48aebd3d67b2e86c06e8f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2da2d9d9_eb32c591",
+        "filename": "doc/install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-09T12:40:48Z",
+      "side": 1,
+      "message": "This seems like a really good change, thanks!",
+      "revId": "9800d40db89a7345cb48aebd3d67b2e86c06e8f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -180,6 +180,10 @@ When committing, use the `--signoff` (or `-s`) flag:
 git commit -s
 ```
 
+You can also [set up a prepare-commit-msg git
+hook](#do-i-really-have-to-add-the--s-flag-to-each-commit) to not have to supply
+the `-s` flag.
+
 The explanations of the GitHub and GerritHub contribution workflows that follow
 assume all commits you create are signed-off in this way.
 

@@ -378,9 +378,6 @@ other [credential helper](https://git-scm.com/docs/gitcredentials). If you have
 any troubles with this step, please [raise an
 issue](https://cuelang.org/issues/new).
 
-Then visit https://review.gerrithub.io/admin/repos/cue-lang/cue,  click "HTTP"
-or "SSH", copy the corresponding "Clone" command and run it locally.
-
 
 ### Step 3: Install the `git-codereview` command
 

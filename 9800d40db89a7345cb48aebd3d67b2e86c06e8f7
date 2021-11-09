@@ -33,6 +33,24 @@
       "message": "This seems like a really good change, thanks!",
       "revId": "9800d40db89a7345cb48aebd3d67b2e86c06e8f7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b5ebce4_69ad5ed6",
+        "filename": "doc/install.md",
+        "patchSetId": 1
+      },
+      "lineNbr": 21,
+      "author": {
+        "id": 1017720
+      },
+      "writtenOn": "2021-11-09T12:41:31Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "2da2d9d9_eb32c591",
+      "revId": "9800d40db89a7345cb48aebd3d67b2e86c06e8f7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

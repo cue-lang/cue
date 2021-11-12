@@ -25,40 +25,40 @@ type Op = adt.Op
 
 // Values of Op.
 const (
-	NoOp = adt.NoOp
+	NoOp Op = adt.NoOp
 
-	AndOp = adt.AndOp
-	OrOp  = adt.OrOp
+	AndOp Op = adt.AndOp
+	OrOp  Op = adt.OrOp
 
-	SelectorOp = adt.SelectorOp
-	IndexOp    = adt.IndexOp
-	SliceOp    = adt.SliceOp
-	CallOp     = adt.CallOp
+	SelectorOp Op = adt.SelectorOp
+	IndexOp    Op = adt.IndexOp
+	SliceOp    Op = adt.SliceOp
+	CallOp     Op = adt.CallOp
 
-	BooleanAndOp = adt.BoolAndOp
-	BooleanOrOp  = adt.BoolOrOp
+	BooleanAndOp Op = adt.BoolAndOp
+	BooleanOrOp  Op = adt.BoolOrOp
 
-	EqualOp            = adt.EqualOp
-	NotOp              = adt.NotOp
-	NotEqualOp         = adt.NotEqualOp
-	LessThanOp         = adt.LessThanOp
-	LessThanEqualOp    = adt.LessEqualOp
-	GreaterThanOp      = adt.GreaterThanOp
-	GreaterThanEqualOp = adt.GreaterEqualOp
+	EqualOp            Op = adt.EqualOp
+	NotOp              Op = adt.NotOp
+	NotEqualOp         Op = adt.NotEqualOp
+	LessThanOp         Op = adt.LessThanOp
+	LessThanEqualOp    Op = adt.LessEqualOp
+	GreaterThanOp      Op = adt.GreaterThanOp
+	GreaterThanEqualOp Op = adt.GreaterEqualOp
 
-	RegexMatchOp    = adt.MatchOp
-	NotRegexMatchOp = adt.NotMatchOp
+	RegexMatchOp    Op = adt.MatchOp
+	NotRegexMatchOp Op = adt.NotMatchOp
 
-	AddOp           = adt.AddOp
-	SubtractOp      = adt.SubtractOp
-	MultiplyOp      = adt.MultiplyOp
-	FloatQuotientOp = adt.FloatQuotientOp
-	IntQuotientOp   = adt.IntQuotientOp
-	IntRemainderOp  = adt.IntRemainderOp
-	IntDivideOp     = adt.IntDivideOp
-	IntModuloOp     = adt.IntModuloOp
+	AddOp           Op = adt.AddOp
+	SubtractOp      Op = adt.SubtractOp
+	MultiplyOp      Op = adt.MultiplyOp
+	FloatQuotientOp Op = adt.FloatQuotientOp
+	IntQuotientOp   Op = adt.IntQuotientOp
+	IntRemainderOp  Op = adt.IntRemainderOp
+	IntDivideOp     Op = adt.IntDivideOp
+	IntModuloOp     Op = adt.IntModuloOp
 
-	InterpolationOp = adt.InterpolationOp
+	InterpolationOp Op = adt.InterpolationOp
 )
 
 // isCmp reports whether an op is a comparator.

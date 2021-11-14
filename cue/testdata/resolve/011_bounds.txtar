@@ -42,6 +42,22 @@ s23e: >0.0 & <2.0     // no simplification
 
 s30: >0 & int
 
+floats: {
+    [string]: float
+    f1:  <10.0 & <=5.0
+    f2:  <=10.0 & <5.0
+    f3:  <1.1 & <=1.1
+    f4:  <=1.1 & <=1.1
+    f5:  >1.1 & >=1.1
+    f6:  >1.1 & >=1.1
+    f7:  >=1.1 & <=1.1
+
+    issue1310: >=2.1 & <=1.0
+    fe2: >2.1 & <=2.1
+
+    fe3: float & >2 & <=3
+}
+
 e1: null & !=null
 e2: !=null & null
 e3: >1 & 1
@@ -126,6 +142,19 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
   s23d: (>0 & (int & <2))
   s23e: (>0.0 & <2.0)
   s30: (>0 & int)
+  floats: {
+    [string]: float
+    f1: (<10.0 & <=5.0)
+    f2: (<=10.0 & <5.0)
+    f3: (<1.1 & <=1.1)
+    f4: (<=1.1 & <=1.1)
+    f5: (>1.1 & >=1.1)
+    f6: (>1.1 & >=1.1)
+    f7: (>=1.1 & <=1.1)
+    issue1310: (>=2.1 & <=1.0)
+    fe2: (>2.1 & <=2.1)
+    fe3: ((float & >2) & <=3)
+  }
   e1: (null & !=null)
   e2: (!=null & null)
   e3: (>1 & 1)
@@ -139,32 +168,38 @@ e9:   _|_ // conflicting values >"a" and <1 (mismatched types string and number)
 -- out/eval --
 Errors:
 e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
-    ./in.cue:40:5
-    ./in.cue:40:12
+    ./in.cue:56:5
+    ./in.cue:56:12
 e2: conflicting values !=null and null (mismatched types (bool|string|bytes|func|list|struct|number) and null):
-    ./in.cue:41:5
-    ./in.cue:41:14
+    ./in.cue:57:5
+    ./in.cue:57:14
 e5: incompatible bounds >1 and <0:
-    ./in.cue:44:5
-    ./in.cue:44:10
+    ./in.cue:60:5
+    ./in.cue:60:10
 e6: incompatible bounds >11 and <11:
-    ./in.cue:45:5
-    ./in.cue:45:11
+    ./in.cue:61:5
+    ./in.cue:61:11
 e7: incompatible bounds >=11 and <11:
-    ./in.cue:46:5
-    ./in.cue:46:12
+    ./in.cue:62:5
+    ./in.cue:62:12
 e8: incompatible bounds >11 and <=11:
-    ./in.cue:47:5
-    ./in.cue:47:11
+    ./in.cue:63:5
+    ./in.cue:63:11
 e9: conflicting values >"a" and <1 (mismatched types string and number):
-    ./in.cue:48:5
-    ./in.cue:48:12
+    ./in.cue:64:5
+    ./in.cue:64:12
+floats.fe2: incompatible bounds >2.1 and <=2.1:
+    ./in.cue:51:10
+    ./in.cue:51:17
+floats.issue1310: incompatible bounds >=2.1 and <=1.0:
+    ./in.cue:50:16
+    ./in.cue:50:24
 e3: invalid value 1 (out of bound >1):
-    ./in.cue:42:5
-    ./in.cue:42:10
+    ./in.cue:58:5
+    ./in.cue:58:10
 e4: invalid value 0 (out of bound <0):
-    ./in.cue:43:5
-    ./in.cue:43:10
+    ./in.cue:59:5
+    ./in.cue:59:10
 
 Result:
 (_|_){
@@ -199,49 +234,70 @@ Result:
   s23d: (int){ 1 }
   s23e: (number){ &(>0.0, <2.0) }
   s30: (int){ &(>0, int) }
+  floats: (_|_){
+    // [eval]
+    f1: (float){ &(<=5.0, float) }
+    f2: (float){ &(<5.0, float) }
+    f3: (float){ &(<1.1, float) }
+    f4: (float){ &(<=1.1, float) }
+    f5: (float){ &(>1.1, float) }
+    f6: (float){ &(>1.1, float) }
+    f7: (number){ 1.1 }
+    issue1310: (_|_){
+      // [eval] floats.issue1310: incompatible bounds >=2.1 and <=1.0:
+      //     ./in.cue:50:16
+      //     ./in.cue:50:24
+    }
+    fe2: (_|_){
+      // [eval] floats.fe2: incompatible bounds >2.1 and <=2.1:
+      //     ./in.cue:51:10
+      //     ./in.cue:51:17
+    }
+    fe3: (float){ &(>2, <=3, float) }
+  }
   e1: (_|_){
     // [eval] e1: conflicting values null and !=null (mismatched types null and (bool|string|bytes|func|list|struct|number)):
-    //     ./in.cue:40:5
-    //     ./in.cue:40:12
+    //     ./in.cue:56:5
+    //     ./in.cue:56:12
   }
   e2: (_|_){
     // [eval] e2: conflicting values !=null and null (mismatched types (bool|string|bytes|func|list|struct|number) and null):
-    //     ./in.cue:41:5
-    //     ./in.cue:41:14
+    //     ./in.cue:57:5
+    //     ./in.cue:57:14
   }
   e3: (_|_){
     // [eval] e3: invalid value 1 (out of bound >1):
-    //     ./in.cue:42:5
-    //     ./in.cue:42:10
+    //     ./in.cue:58:5
+    //     ./in.cue:58:10
   }
   e4: (_|_){
     // [eval] e4: invalid value 0 (out of bound <0):
-    //     ./in.cue:43:5
-    //     ./in.cue:43:10
+    //     ./in.cue:59:5
+    //     ./in.cue:59:10
   }
   e5: (_|_){
     // [eval] e5: incompatible bounds >1 and <0:
-    //     ./in.cue:44:5
-    //     ./in.cue:44:10
+    //     ./in.cue:60:5
+    //     ./in.cue:60:10
   }
   e6: (_|_){
     // [eval] e6: incompatible bounds >11 and <11:
-    //     ./in.cue:45:5
-    //     ./in.cue:45:11
+    //     ./in.cue:61:5
+    //     ./in.cue:61:11
   }
   e7: (_|_){
     // [eval] e7: incompatible bounds >=11 and <11:
-    //     ./in.cue:46:5
-    //     ./in.cue:46:12
+    //     ./in.cue:62:5
+    //     ./in.cue:62:12
   }
   e8: (_|_){
     // [eval] e8: incompatible bounds >11 and <=11:
-    //     ./in.cue:47:5
-    //     ./in.cue:47:11
+    //     ./in.cue:63:5
+    //     ./in.cue:63:11
   }
   e9: (_|_){
     // [eval] e9: conflicting values >"a" and <1 (mismatched types string and number):
-    //     ./in.cue:48:5
-    //     ./in.cue:48:12
+    //     ./in.cue:64:5
+    //     ./in.cue:64:12
   }
 }

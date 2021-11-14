@@ -3351,13 +3351,20 @@ func TestExpr(t *testing.T) {
 		want:  `&({c:a} {b:a})`,
 	}, {
 		input: `v: [...number] | *[1, 2, 3]`,
-		want:  `([...number]|*[1,2,3])`,
+		// Filter defaults that are subsumed by another value.
+		want: `[...number]`,
 	}, {
 		input: `v: or([1, 2, 3])`,
 		want:  `|(1 2 3)`,
 	}, {
+		input: `v: or([])`,
+		want:  `_|_(empty list in call to or)`,
+	}, {
 		input: `v: and([1, 2, 3])`,
 		want:  `&(1 2 3)`,
+	}, {
+		input: `v: and([])`,
+		want:  `_`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {
@@ -3373,7 +3380,7 @@ func TestExpr(t *testing.T) {
 func exprStr(v Value) string {
 	op, operands := v.Expr()
 	if op == NoOp {
-		return compactRawStr(v)
+		return compactRawStr(operands[0])
 	}
 	s := op.String()
 	s += "("

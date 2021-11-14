@@ -54,13 +54,6 @@ func (v *Vertex) Default() *Vertex {
 
 		switch d.NumDefaults {
 		case 0:
-			if d.HasDefaults {
-				v = &Vertex{
-					Parent:    v.Parent,
-					status:    Finalized,
-					BaseValue: &Bottom{},
-				}
-			}
 			return v
 		case 1:
 			w = d.Values[0]

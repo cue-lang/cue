@@ -1562,14 +1562,20 @@ func TestDefaults(t *testing.T) {
 		ok:    true,
 	}, {
 		value: `{a:1}&{b:2}`,
-		def:   `({a:1} & {b:2})`,
+		def:   `{a:1,b:2}`,
 		val:   ``,
+		ok:    false,
+	}, {
+		value: `*_|_ | (*"x" | string)`,
+		def:   `"x" | string`,
+		val:   `"x"|string`,
 		ok:    false,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
 			v := getInstance(t, "a: "+tc.value).Lookup("a")
 
+			v = v.Eval()
 			d, ok := v.Default()
 			if ok != tc.ok {
 				t.Errorf("hasDefault: got %v; want %v", ok, tc.ok)

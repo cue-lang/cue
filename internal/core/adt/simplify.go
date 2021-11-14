@@ -128,8 +128,6 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 		//     _|_ if b <= a
 
 		switch diff, err := d.Int64(); {
-		case err != nil:
-
 		case diff == 1:
 			if k&FloatKind == 0 {
 				if x.Op == GreaterEqualOp && y.Op == LessThanOp {
@@ -147,7 +145,7 @@ func SimplifyBounds(ctx *OpContext, k Kind, x, y *BoundValue) Value {
 
 			}
 
-		case diff == 0:
+		case diff == 0 && err == nil:
 			if x.Op == GreaterEqualOp && y.Op == LessEqualOp {
 				return ctx.newNum(&lo, k&NumKind, x, y)
 			}

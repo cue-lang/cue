@@ -2370,6 +2370,20 @@ func (v Value) Expr() (Op, []Value) {
 			if fn.Name == "and" {
 				op = AndOp
 			}
+
+			if len(a) == 0 {
+				// Mimic semantics of builtin.
+				switch op {
+				case AndOp:
+					a = append(a, remakeValue(v, env, &adt.Top{}))
+				case OrOp:
+					a = append(a, remakeValue(v, env, &adt.Bottom{
+						Code: adt.IncompleteError,
+						Err:  errors.Newf(x.Src.Fun.Pos(), "empty list in call to or"),
+					}))
+				}
+				op = NoOp
+			}
 			break
 		}
 		a = append(a, remakeValue(v, env, x.Fun))

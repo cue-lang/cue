@@ -1,0 +1,26 @@
+#Issue 1304
+
+! cue export --out json x.cue
+cmp stdout expect_stdout_json
+cmp stderr expect_stderr_json
+
+! cue export --out cue x.cue
+cmp stdout expect_stdout_cue
+cmp stderr expect_stderr_cue
+
+! cue export --out yaml x.cue
+cmp stdout expect_stdout_yaml
+cmp stderr expect_stderr_yaml
+
+-- x.cue --
+toto: value: *_|_ | (*"toto" | string)
+
+-- expect_stdout_cue --
+-- expect_stderr_cue --
+toto.value: incomplete value "toto" | string
+-- expect_stdout_json --
+-- expect_stderr_json --
+toto.value: incomplete value "toto" | string
+-- expect_stdout_yaml --
+-- expect_stderr_yaml --
+toto.value: incomplete value "toto" | string

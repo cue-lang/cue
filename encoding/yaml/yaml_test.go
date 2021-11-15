@@ -20,6 +20,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/format"
 )
 
@@ -146,6 +147,85 @@ null
 					t.Errorf("EncodeStream:\ngot  %q\nwant %q", got, yamlOut)
 				}
 			}
+		})
+	}
+}
+
+func TestYAMLValues(t *testing.T) {
+	testCases := []struct {
+		cue  string
+		yaml string
+	}{
+		// strings
+		{`"""
+	single
+	"""`, "single"}, // TODO: CUE simplifies this.
+
+		{`"""
+	aaaa
+	bbbb
+	"""`, `|-
+  aaaa
+  bbbb`},
+
+		// keep as is
+		{`"non"`, `non`},
+
+		// Non-strings in v1.2. These are single-quoted by the go-yaml.v3 package.
+		{`"#cloudmon"`, `'#cloudmon'`},
+
+		// Strings that mimic numeric values are double quoted by the go-yaml.v3
+		// package.
+		{`".inf"`, `".inf"`},
+		{`".Inf"`, `".Inf"`},
+		{`".INF"`, `".INF"`},
+		{`".NaN"`, `".NaN"`},
+		{`"+.Inf"`, `"+.Inf"`},
+		{`"-.Inf"`, `"-.Inf"`},
+		{`"2002"`, `"2002"`},
+		{`"685_230.15"`, `"685_230.15"`},
+
+		// Legacy values.format.
+		{`"no"`, `"no"`},
+		{`"on"`, `"on"`},
+		{`".Nan"`, `".Nan"`},
+
+		// binary
+		{`'no'`, `!!binary bm8=`},
+
+		// floats
+		{`.2`, "0.2"},
+		{`2.`, "2."},
+		{`".inf"`, `".inf"`},
+		{`685_230.15`, `685230.15`},
+
+		// Date and time-like
+		{`"2001-12-15T02:59:43.1Z"`, `"2001-12-15T02:59:43.1Z"`},
+		{`"2001-12-14t21:59:43.10-05:00"`, `"2001-12-14t21:59:43.10-05:00"`},
+		{`"2001-12-14 21:59:43.10 -5"`, `"2001-12-14 21:59:43.10 -5"`},
+		{`"2001-12-15 2:59:43.10"`, `"2001-12-15 2:59:43.10"`},
+		{`"2002-12-14"`, `"2002-12-14"`},
+		{`"12-12-12"`, `"12-12-12"`},
+
+		// legacy base60 floats
+		{`"2222:22"`, `"2222:22"`},
+
+		// hostport
+		{`"hostname:22"`, `hostname:22`},
+	}
+	for _, tc := range testCases {
+		t.Run(tc.cue, func(t *testing.T) {
+			c := cuecontext.New()
+			v := c.CompileString(tc.cue)
+
+			b, err := Encode(v)
+			if err != nil {
+				t.Error(err)
+			}
+			if got := strings.TrimSpace(string(b)); got != tc.yaml {
+				t.Errorf("Encode:\ngot  %q\nwant %q", got, tc.yaml)
+			}
+
 		})
 	}
 }

@@ -16,7 +16,10 @@ package yaml
 
 import (
 	"bytes"
+	"encoding/base64"
+	"fmt"
 	"math/big"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -101,6 +104,8 @@ func encode(n ast.Node) (y *yaml.Node, err error) {
 func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 	n = &yaml.Node{Kind: yaml.ScalarNode}
 
+	// TODO: use cue.Value and support attributes for setting YAML tags.
+
 	switch b.Kind {
 	case token.INT:
 		var x big.Int
@@ -118,16 +123,71 @@ func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 		n.Value = b.Value
 
 	case token.STRING:
-		str, err := literal.Unquote(b.Value)
+		info, nStart, _, err := literal.ParseQuotes(b.Value, b.Value)
 		if err != nil {
 			return nil, err
 		}
+		str, err := info.Unquote(b.Value[nStart:])
+		if err != nil {
+			panic(fmt.Sprintf("invalid string: %v", err))
+		}
 		n.SetString(str)
+
+		switch {
+		case !info.IsDouble():
+			n.Tag = "!!binary"
+			n.Value = base64.StdEncoding.EncodeToString([]byte(str))
+
+		case info.IsMulti():
+			// Preserve multi-line foramt.
+			n.Style = yaml.LiteralStyle
+
+		default:
+			// Ensure that legacy values from YAML 1.1 are interpreted as
+			// strings by using this rather aggressive quoting.
+			if legacyStrings[str] || useQuote.MatchString(str) {
+				n.Style = yaml.DoubleQuotedStyle
+			}
+		}
 
 	default:
 		return nil, errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
 	}
 	return n, nil
+}
+
+// This regular expression conservatively matches any date, time string,
+// or base60 float.
+var useQuote = regexp.MustCompile(`^[\-+0-9:\. \t]+([-:]|[tT])[\-+0-9:\. \t]+[zZ]?$`)
+
+var legacyStrings = map[string]bool{
+	"y":     true,
+	"Y":     true,
+	"yes":   true,
+	"Yes":   true,
+	"YES":   true,
+	"n":     true,
+	"N":     true,
+	"t":     true,
+	"T":     true,
+	"f":     true,
+	"F":     true,
+	"no":    true,
+	"No":    true,
+	"NO":    true,
+	"true":  true,
+	"True":  true,
+	"TRUE":  true,
+	"false": true,
+	"False": true,
+	"FALSE": true,
+	"on":    true,
+	"On":    true,
+	"ON":    true,
+	"off":   true,
+	"Off":   true,
+	"OFF":   true,
+	".Nan":  true,
 }
 
 func setNum(n *yaml.Node, s string, x interface{}) error {

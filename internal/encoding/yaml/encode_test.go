@@ -61,7 +61,7 @@ a:
     c: 3
 b:
   x: 0
-  y: 1
+  "y": 1
   z: 2
 		`,
 	}, {
@@ -89,7 +89,7 @@ hex: 0x11
 dec: .3
 dat: !!binary gA==
 nil: null
-yes: true
+"yes": true
 non: false
 `,
 	}, {

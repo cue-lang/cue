@@ -16,7 +16,10 @@ package yaml
 
 import (
 	"bytes"
+	"encoding/base64"
+	"fmt"
 	"math/big"
+	"regexp"
 	"strings"
 
 	"gopkg.in/yaml.v3"
@@ -101,6 +104,8 @@ func encode(n ast.Node) (y *yaml.Node, err error) {
 func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 	n = &yaml.Node{Kind: yaml.ScalarNode}
 
+	// TODO: use cue.Value and support attributes for setting YAML tags.
+
 	switch b.Kind {
 	case token.INT:
 		var x big.Int
@@ -118,16 +123,83 @@ func encodeScalar(b *ast.BasicLit) (n *yaml.Node, err error) {
 		n.Value = b.Value
 
 	case token.STRING:
-		str, err := literal.Unquote(b.Value)
+		info, nStart, _, err := literal.ParseQuotes(b.Value, b.Value)
 		if err != nil {
 			return nil, err
 		}
+		str, err := info.Unquote(b.Value[nStart:])
+		if err != nil {
+			panic(fmt.Sprintf("invalid string: %v", err))
+		}
 		n.SetString(str)
+
+		switch {
+		case !info.IsDouble():
+			n.Tag = "!!binary"
+			n.Value = base64.StdEncoding.EncodeToString([]byte(str))
+
+		case info.IsMulti():
+			// Preserve multi-line format.
+			n.Style = yaml.LiteralStyle
+
+		default:
+			if shouldQuote(str) {
+				n.Style = yaml.DoubleQuotedStyle
+			}
+		}
 
 	default:
 		return nil, errors.Newf(b.Pos(), "unknown literal type %v", b.Kind)
 	}
 	return n, nil
+}
+
+// shouldQuote indicates that a string may be a YAML 1.1. legacy value and that
+// the string should be quoted.
+func shouldQuote(str string) bool {
+	return legacyStrings[str] || useQuote.MatchString(str)
+}
+
+// This regular expression conservatively matches any date, time string,
+// or base60 float.
+var useQuote = regexp.MustCompile(`^[\-+0-9:\. \t]+([-:]|[tT])[\-+0-9:\. \t]+[zZ]?$`)
+
+// legacyStrings contains a map of fixed strings with special meaning for any
+// type in the YAML Tag registry (https://yaml.org/type/index.html) as used
+// in YAML 1.1.
+//
+// These strings are always quoted upon export to allow for backward
+// compatibility with YAML 1.1 parsers.
+var legacyStrings = map[string]bool{
+	"y":     true,
+	"Y":     true,
+	"yes":   true,
+	"Yes":   true,
+	"YES":   true,
+	"n":     true,
+	"N":     true,
+	"t":     true,
+	"T":     true,
+	"f":     true,
+	"F":     true,
+	"no":    true,
+	"No":    true,
+	"NO":    true,
+	"true":  true,
+	"True":  true,
+	"TRUE":  true,
+	"false": true,
+	"False": true,
+	"FALSE": true,
+	"on":    true,
+	"On":    true,
+	"ON":    true,
+	"off":   true,
+	"Off":   true,
+	"OFF":   true,
+
+	// Non-standard.
+	".Nan": true,
 }
 
 func setNum(n *yaml.Node, s string, x interface{}) error {
@@ -204,6 +276,9 @@ func encodeDecls(decls []ast.Decl) (n *yaml.Node, err error) {
 			label := &yaml.Node{}
 			addDocs(x.Label, label, label)
 			label.SetString(name)
+			if shouldQuote(name) {
+				label.Style = yaml.DoubleQuotedStyle
+			}
 
 			value, err := encode(x.Value)
 			if err != nil {

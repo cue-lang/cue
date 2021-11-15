@@ -26,6 +26,8 @@ import (
 #StatefulSet: {
 	metav1.#TypeMeta
 
+	// Standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.#ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -161,6 +163,13 @@ import (
 	// consists of all revisions not represented by a currently applied
 	// StatefulSetSpec version. The default value is 10.
 	revisionHistoryLimit?: null | int32 @go(RevisionHistoryLimit,*int32) @protobuf(8,varint,opt)
+
+	// Minimum number of seconds for which a newly created pod should be ready
+	// without any of its container crashing for it to be considered available.
+	// Defaults to 0 (pod will be considered available as soon as it is ready)
+	// This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.
+	// +optional
+	minReadySeconds?: int32 @go(MinReadySeconds) @protobuf(9,varint,opt)
 }
 
 // StatefulSetStatus represents the current state of a StatefulSet.
@@ -203,6 +212,12 @@ import (
 	// +patchMergeKey=type
 	// +patchStrategy=merge
 	conditions?: [...#StatefulSetCondition] @go(Conditions,[]StatefulSetCondition) @protobuf(10,bytes,rep)
+
+	// Total number of available pods (ready for at least minReadySeconds) targeted by this statefulset.
+	// This is an alpha field and requires enabling StatefulSetMinReadySeconds feature gate.
+	// Remove omitempty when graduating to beta
+	// +optional
+	availableReplicas?: int32 @go(AvailableReplicas) @protobuf(11,varint,opt)
 }
 
 #StatefulSetConditionType: string
@@ -232,8 +247,12 @@ import (
 #StatefulSetList: {
 	metav1.#TypeMeta
 
+	// Standard list's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.#ListMeta @go(ListMeta) @protobuf(1,bytes,opt)
+
+	// Items is the list of stateful sets.
 	items: [...#StatefulSet] @go(Items,[]StatefulSet) @protobuf(2,bytes,rep)
 }
 
@@ -241,7 +260,8 @@ import (
 #Deployment: {
 	metav1.#TypeMeta
 
-	// Standard object metadata.
+	// Standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.#ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 
@@ -486,7 +506,7 @@ import (
 	// The maximum number of DaemonSet pods that can be unavailable during the
 	// update. Value can be an absolute number (ex: 5) or a percentage of total
 	// number of DaemonSet pods at the start of the update (ex: 10%). Absolute
-	// number is calculated from percentage by rounding down to a minimum of one.
+	// number is calculated from percentage by rounding up.
 	// This cannot be 0 if MaxSurge is 0
 	// Default value is 1.
 	// Example: when this is set to 30%, at most 30% of the total number of nodes
@@ -518,7 +538,7 @@ import (
 	// daemonset on any given node can double if the readiness check fails, and
 	// so resource intensive daemonsets should take into account that they may
 	// cause evictions during disruption.
-	// This is an alpha field and requires enabling DaemonSetUpdateSurge feature gate.
+	// This is beta field and enabled/disabled by DaemonSetUpdateSurge feature gate.
 	// +optional
 	maxSurge?: null | intstr.#IntOrString @go(MaxSurge,*intstr.IntOrString) @protobuf(2,bytes,opt)
 }
@@ -680,7 +700,8 @@ import (
 
 	// If the Labels of a ReplicaSet are empty, they are defaulted to
 	// be the same as the Pod(s) that the ReplicaSet manages.
-	// Standard object's metadata. More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
+	// Standard object's metadata.
+	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#metadata
 	// +optional
 	metadata?: metav1.#ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
 

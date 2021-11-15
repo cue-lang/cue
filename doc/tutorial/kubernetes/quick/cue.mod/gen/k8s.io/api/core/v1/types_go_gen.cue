@@ -20,9 +20,6 @@ import (
 // NamespaceNodeLease is the namespace where we place node lease objects (used for node heartbeats)
 #NamespaceNodeLease: "kube-node-lease"
 
-// TopologyKeyAny is the service topology key that matches any node
-#TopologyKeyAny: "*"
-
 // Volume represents a named volume in a pod that may be accessed by any container in the pod.
 #Volume: {
 	// Volume's name.
@@ -547,13 +544,32 @@ import (
 	// This field can be used to specify either:
 	// * An existing VolumeSnapshot object (snapshot.storage.k8s.io/VolumeSnapshot)
 	// * An existing PVC (PersistentVolumeClaim)
-	// * An existing custom resource that implements data population (Alpha)
-	// In order to use custom resource types that implement data population,
-	// the AnyVolumeDataSource feature gate must be enabled.
 	// If the provisioner or an external controller can support the specified data source,
 	// it will create a new volume based on the contents of the specified data source.
+	// If the AnyVolumeDataSource feature gate is enabled, this field will always have
+	// the same contents as the DataSourceRef field.
 	// +optional
 	dataSource?: null | #TypedLocalObjectReference @go(DataSource,*TypedLocalObjectReference) @protobuf(7,bytes,opt)
+
+	// Specifies the object from which to populate the volume with data, if a non-empty
+	// volume is desired. This may be any local object from a non-empty API group (non
+	// core object) or a PersistentVolumeClaim object.
+	// When this field is specified, volume binding will only succeed if the type of
+	// the specified object matches some installed volume populator or dynamic
+	// provisioner.
+	// This field will replace the functionality of the DataSource field and as such
+	// if both fields are non-empty, they must have the same value. For backwards
+	// compatibility, both fields (DataSource and DataSourceRef) will be set to the same
+	// value automatically if one of them is empty and the other is non-empty.
+	// There are two important differences between DataSource and DataSourceRef:
+	// * While DataSource only allows two specific types of objects, DataSourceRef
+	//   allows any non-core object, as well as PersistentVolumeClaim objects.
+	// * While DataSource ignores disallowed values (dropping them), DataSourceRef
+	//   preserves all values, and generates an error if a disallowed value is
+	//   specified.
+	// (Alpha) Using this field requires the AnyVolumeDataSource feature gate to be enabled.
+	// +optional
+	dataSourceRef?: null | #TypedLocalObjectReference @go(DataSourceRef,*TypedLocalObjectReference) @protobuf(8,bytes,opt)
 }
 
 // PersistentVolumeClaimConditionType is a valid value of PersistentVolumeClaimCondition.Type
@@ -621,7 +637,8 @@ import (
 #enumPersistentVolumeAccessMode:
 	#ReadWriteOnce |
 	#ReadOnlyMany |
-	#ReadWriteMany
+	#ReadWriteMany |
+	#ReadWriteOncePod
 
 // can be mounted in read/write mode to exactly 1 host
 #ReadWriteOnce: #PersistentVolumeAccessMode & "ReadWriteOnce"
@@ -631,6 +648,10 @@ import (
 
 // can be mounted in read/write mode to many hosts
 #ReadWriteMany: #PersistentVolumeAccessMode & "ReadWriteMany"
+
+// can be mounted in read/write mode to exactly 1 pod
+// cannot be used in combination with other access modes
+#ReadWriteOncePod: #PersistentVolumeAccessMode & "ReadWriteOncePod"
 
 #PersistentVolumePhase: string // #enumPersistentVolumePhase
 
@@ -985,6 +1006,7 @@ import (
 
 // SecretReference represents a Secret Reference. It has enough information to retrieve secret
 // in any namespace
+// +structType=atomic
 #SecretReference: {
 	// Name is unique within a namespace to reference a secret resource.
 	// +optional
@@ -2164,11 +2186,12 @@ import (
 	name: string @go(Name) @protobuf(1,bytes,opt)
 
 	// Variable references $(VAR_NAME) are expanded
-	// using the previous defined environment variables in the container and
+	// using the previously defined environment variables in the container and
 	// any service environment variables. If a variable cannot be resolved,
-	// the reference in the input string will be unchanged. The $(VAR_NAME)
-	// syntax can be escaped with a double $$, ie: $$(VAR_NAME). Escaped
-	// references will never be expanded, regardless of whether the variable
+	// the reference in the input string will be unchanged. Double $$ are reduced
+	// to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e.
+	// "$$(VAR_NAME)" will produce the string literal "$(VAR_NAME)".
+	// Escaped references will never be expanded, regardless of whether the variable
 	// exists or not.
 	// Defaults to "".
 	// +optional
@@ -2201,6 +2224,7 @@ import (
 }
 
 // ObjectFieldSelector selects an APIVersioned field of an object.
+// +structType=atomic
 #ObjectFieldSelector: {
 	// Version of the schema the FieldPath is written in terms of, defaults to "v1".
 	// +optional
@@ -2211,6 +2235,7 @@ import (
 }
 
 // ResourceFieldSelector represents container resources (cpu, memory) and their output format
+// +structType=atomic
 #ResourceFieldSelector: {
 	// Container name: required for volumes, optional for env vars
 	// +optional
@@ -2225,6 +2250,7 @@ import (
 }
 
 // Selects a key from a ConfigMap.
+// +structType=atomic
 #ConfigMapKeySelector: {
 	#LocalObjectReference
 
@@ -2237,6 +2263,7 @@ import (
 }
 
 // SecretKeySelector selects a key of a Secret.
+// +structType=atomic
 #SecretKeySelector: {
 	#LocalObjectReference
 
@@ -2399,7 +2426,8 @@ import (
 	// value overrides the value provided by the pod spec.
 	// Value must be non-negative integer. The value zero indicates stop immediately via
 	// the kill signal (no opportunity to shut down).
-	// This is an alpha field and requires enabling ProbeTerminationGracePeriod feature gate.
+	// This is a beta field and requires enabling ProbeTerminationGracePeriod feature gate.
+	// Minimum value is 1. spec.terminationGracePeriodSeconds is used if unset.
 	// +optional
 	terminationGracePeriodSeconds?: null | int64 @go(TerminationGracePeriodSeconds,*int64) @protobuf(7,varint,opt)
 }
@@ -2499,10 +2527,10 @@ import (
 	// Entrypoint array. Not executed within a shell.
 	// The docker image's ENTRYPOINT is used if this is not provided.
 	// Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
-	// cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax
-	// can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
-	// regardless of whether the variable exists or not.
-	// Cannot be updated.
+	// cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
+	// to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+	// produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
+	// of whether the variable exists or not. Cannot be updated.
 	// More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
 	// +optional
 	command?: [...string] @go(Command,[]string) @protobuf(3,bytes,rep)
@@ -2510,10 +2538,10 @@ import (
 	// Arguments to the entrypoint.
 	// The docker image's CMD is used if this is not provided.
 	// Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
-	// cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax
-	// can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
-	// regardless of whether the variable exists or not.
-	// Cannot be updated.
+	// cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
+	// to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+	// produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
+	// of whether the variable exists or not. Cannot be updated.
 	// More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
 	// +optional
 	args?: [...string] @go(Args,[]string) @protobuf(4,bytes,rep)
@@ -2632,8 +2660,8 @@ import (
 	// +optional
 	imagePullPolicy?: #PullPolicy @go(ImagePullPolicy) @protobuf(14,bytes,opt,casttype=PullPolicy)
 
-	// Security options the pod should run with.
-	// More info: https://kubernetes.io/docs/concepts/policy/security-context/
+	// SecurityContext defines the security options the container should be run with.
+	// If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
 	// More info: https://kubernetes.io/docs/tasks/configure-pod-container/security-context/
 	// +optional
 	securityContext?: null | #SecurityContext @go(SecurityContext,*SecurityContext) @protobuf(15,bytes,opt)
@@ -2852,6 +2880,7 @@ import (
 
 // PodUnknown means that for some reason the state of the pod could not be obtained, typically due
 // to an error in communicating with the host of the pod.
+// Deprecated: It isn't being set since 2015 (74da3b14b0c0f658b3bb8d2def5094686d0e9095)
 #PodUnknown: #PodPhase & "Unknown"
 
 // PodConditionType is a valid value for PodCondition.Type
@@ -2958,6 +2987,7 @@ import (
 // A node selector represents the union of the results of one or more label queries
 // over a set of nodes; that is, it represents the OR of the selectors represented
 // by the node selector terms.
+// +structType=atomic
 #NodeSelector: {
 	//Required. A list of node selector terms. The terms are ORed.
 	nodeSelectorTerms: [...#NodeSelectorTerm] @go(NodeSelectorTerms,[]NodeSelectorTerm) @protobuf(1,bytes,rep)
@@ -2966,6 +2996,7 @@ import (
 // A null or empty node selector term matches no objects. The requirements of
 // them are ANDed.
 // The TopologySelectorTerm type implements a subset of the NodeSelectorTerm.
+// +structType=atomic
 #NodeSelectorTerm: {
 	// A list of node selector requirements by node's labels.
 	// +optional
@@ -3019,6 +3050,7 @@ import (
 // The requirements of them are ANDed.
 // It provides a subset of functionality as NodeSelectorTerm.
 // This is an alpha feature and may change in the future.
+// +structType=atomic
 #TopologySelectorTerm: {
 	// A list of topology selector requirements by labels.
 	// +optional
@@ -3141,7 +3173,7 @@ import (
 	// and the ones listed in the namespaces field.
 	// null selector and null or empty namespaces list means "this pod's namespace".
 	// An empty selector ({}) matches all namespaces.
-	// This field is alpha-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
+	// This field is beta-level and is only honored when PodAffinityNamespaceSelector feature is enabled.
 	// +optional
 	namespaceSelector?: null | metav1.#LabelSelector @go(NamespaceSelector,*metav1.LabelSelector) @protobuf(4,bytes,opt)
 }
@@ -3352,6 +3384,7 @@ import (
 	// Selector which must match a node's labels for the pod to be scheduled on that node.
 	// More info: https://kubernetes.io/docs/concepts/configuration/assign-pod-node/
 	// +optional
+	// +mapType=atomic
 	nodeSelector?: {[string]: string} @go(NodeSelector,map[string]string) @protobuf(7,bytes,rep)
 
 	// ServiceAccountName is the name of the ServiceAccount to use to run this pod.
@@ -3473,7 +3506,7 @@ import (
 	// If specified, all readiness gates will be evaluated for pod readiness.
 	// A pod is ready when all its containers are ready AND
 	// all conditions specified in the readiness gates have status equal to "True"
-	// More info: https://git.k8s.io/enhancements/keps/sig-network/0007-pod-ready%2B%2B.md
+	// More info: https://git.k8s.io/enhancements/keps/sig-network/580-pod-readiness-gates
 	// +optional
 	readinessGates?: [...#PodReadinessGate] @go(ReadinessGates,[]PodReadinessGate) @protobuf(28,bytes,opt)
 
@@ -3481,7 +3514,7 @@ import (
 	// to run this pod.  If no RuntimeClass resource matches the named class, the pod will not be run.
 	// If unset or empty, the "legacy" RuntimeClass will be used, which is an implicit class with an
 	// empty definition that uses the default runtime handler.
-	// More info: https://git.k8s.io/enhancements/keps/sig-node/runtime-class.md
+	// More info: https://git.k8s.io/enhancements/keps/sig-node/585-runtime-class
 	// This is a beta feature as of Kubernetes v1.14.
 	// +optional
 	runtimeClassName?: null | string @go(RuntimeClassName,*string) @protobuf(29,bytes,opt)
@@ -3505,8 +3538,8 @@ import (
 	// The RuntimeClass admission controller will reject Pod create requests which have the overhead already
 	// set. If RuntimeClass is configured and selected in the PodSpec, Overhead will be set to the value
 	// defined in the corresponding RuntimeClass, otherwise it will remain unset and treated as zero.
-	// More info: https://git.k8s.io/enhancements/keps/sig-node/20190226-pod-overhead.md
-	// This field is alpha-level as of Kubernetes v1.16, and is only honored by servers that enable the PodOverhead feature.
+	// More info: https://git.k8s.io/enhancements/keps/sig-node/688-pod-overhead/README.md
+	// This field is beta-level as of Kubernetes v1.18, and is only honored by servers that enable the PodOverhead feature.
 	// +optional
 	overhead?: #ResourceList @go(Overhead) @protobuf(32,bytes,opt)
 
@@ -3827,10 +3860,10 @@ import (
 	// Entrypoint array. Not executed within a shell.
 	// The docker image's ENTRYPOINT is used if this is not provided.
 	// Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
-	// cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax
-	// can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
-	// regardless of whether the variable exists or not.
-	// Cannot be updated.
+	// cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
+	// to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+	// produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
+	// of whether the variable exists or not. Cannot be updated.
 	// More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
 	// +optional
 	command?: [...string] @go(Command,[]string) @protobuf(3,bytes,rep)
@@ -3838,10 +3871,10 @@ import (
 	// Arguments to the entrypoint.
 	// The docker image's CMD is used if this is not provided.
 	// Variable references $(VAR_NAME) are expanded using the container's environment. If a variable
-	// cannot be resolved, the reference in the input string will be unchanged. The $(VAR_NAME) syntax
-	// can be escaped with a double $$, ie: $$(VAR_NAME). Escaped references will never be expanded,
-	// regardless of whether the variable exists or not.
-	// Cannot be updated.
+	// cannot be resolved, the reference in the input string will be unchanged. Double $$ are reduced
+	// to a single $, which allows for escaping the $(VAR_NAME) syntax: i.e. "$$(VAR_NAME)" will
+	// produce the string literal "$(VAR_NAME)". Escaped references will never be expanded, regardless
+	// of whether the variable exists or not. Cannot be updated.
 	// More info: https://kubernetes.io/docs/tasks/inject-data-application/define-command-argument-container/#running-a-command-in-a-shell
 	// +optional
 	args?: [...string] @go(Args,[]string) @protobuf(4,bytes,rep)
@@ -3934,7 +3967,8 @@ import (
 	// +optional
 	imagePullPolicy?: #PullPolicy @go(ImagePullPolicy) @protobuf(14,bytes,opt,casttype=PullPolicy)
 
-	// SecurityContext is not allowed for ephemeral containers.
+	// Optional: SecurityContext defines the security options the ephemeral container should be run with.
+	// If set, the fields of SecurityContext override the equivalent fields of PodSecurityContext.
 	// +optional
 	securityContext?: null | #SecurityContext @go(SecurityContext,*SecurityContext) @protobuf(15,bytes,opt)
 
@@ -4195,6 +4229,7 @@ import (
 	// controller, if empty defaulted to labels on Pod template.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/labels/#label-selectors
 	// +optional
+	// +mapType=atomic
 	selector?: {[string]: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
 
 	// Template is the object that describes the pod that will be created if
@@ -4437,9 +4472,6 @@ import (
 	ports?: [...#PortStatus] @go(Ports,[]PortStatus) @protobuf(4,bytes,rep)
 }
 
-// MaxServiceTopologyKeys is the largest number of topology keys allowed on a service
-#MaxServiceTopologyKeys: 16
-
 // IPFamily represents the IP Family (IPv4 or IPv6). This type is used
 // to express the family of an IP expressed by a type (e.g. service.spec.ipFamilies).
 #IPFamily: string // #enumIPFamily
@@ -4500,6 +4532,7 @@ import (
 	// Ignored if type is ExternalName.
 	// More info: https://kubernetes.io/docs/concepts/services-networking/service/
 	// +optional
+	// +mapType=atomic
 	selector?: {[string]: string} @go(Selector,map[string]string) @protobuf(2,bytes,rep)
 
 	// clusterIP is the IP address of the service and is usually assigned
@@ -4596,7 +4629,7 @@ import (
 	// If specified and supported by the platform, this will restrict traffic through the cloud-provider
 	// load-balancer will be restricted to the specified client IPs. This field will be ignored if the
 	// cloud-provider does not support the feature."
-	// More info: https://kubernetes.io/docs/tasks/access-application-cluster/configure-cloud-provider-firewall/
+	// More info: https://kubernetes.io/docs/tasks/access-application-cluster/create-external-load-balancer/
 	// +optional
 	loadBalancerSourceRanges?: [...string] @go(LoadBalancerSourceRanges,[]string) @protobuf(9,bytes,opt)
 
@@ -4643,23 +4676,6 @@ import (
 	// +optional
 	sessionAffinityConfig?: null | #SessionAffinityConfig @go(SessionAffinityConfig,*SessionAffinityConfig) @protobuf(14,bytes,opt)
 
-	// topologyKeys is a preference-order list of topology keys which
-	// implementations of services should use to preferentially sort endpoints
-	// when accessing this Service, it can not be used at the same time as
-	// externalTrafficPolicy=Local.
-	// Topology keys must be valid label keys and at most 16 keys may be specified.
-	// Endpoints are chosen based on the first topology key with available backends.
-	// If this field is specified and all entries have no backends that match
-	// the topology of the client, the service has no backends for that client
-	// and connections should fail.
-	// The special value "*" may be used to mean "any topology". This catch-all
-	// value, if used, only makes sense as the last value in the list.
-	// If this is not specified or empty, no topology constraints will be applied.
-	// This field is alpha-level and is only honored by servers that enable the ServiceTopology feature.
-	// This field is deprecated and will be removed in a future version.
-	// +optional
-	topologyKeys?: [...string] @go(TopologyKeys,[]string) @protobuf(16,bytes,opt)
-
 	// IPFamilies is a list of IP families (e.g. IPv4, IPv6) assigned to this
 	// service, and is gated by the "IPv6DualStack" feature gate.  This field
 	// is usually assigned automatically based on cluster configuration and the
@@ -4694,11 +4710,14 @@ import (
 	ipFamilyPolicy?: null | #IPFamilyPolicyType @go(IPFamilyPolicy,*IPFamilyPolicyType) @protobuf(17,bytes,opt,casttype=IPFamilyPolicyType)
 
 	// allocateLoadBalancerNodePorts defines if NodePorts will be automatically
-	// allocated for services with type LoadBalancer.  Default is "true". It may be
-	// set to "false" if the cluster load-balancer does not rely on NodePorts.
-	// allocateLoadBalancerNodePorts may only be set for services with type LoadBalancer
-	// and will be cleared if the type is changed to any other type.
-	// This field is alpha-level and is only honored by servers that enable the ServiceLBNodePortControl feature.
+	// allocated for services with type LoadBalancer.  Default is "true". It
+	// may be set to "false" if the cluster load-balancer does not rely on
+	// NodePorts.  If the caller requests specific NodePorts (by specifying a
+	// value), those requests will be respected, regardless of this field.
+	// This field may only be set for services with type LoadBalancer and will
+	// be cleared if the type is changed to any other type.
+	// This field is beta-level and is only honored by servers that enable the ServiceLBNodePortControl feature.
+	// +featureGate=ServiceLBNodePortControl
 	// +optional
 	allocateLoadBalancerNodePorts?: null | bool @go(AllocateLoadBalancerNodePorts,*bool) @protobuf(20,bytes,opt)
 
@@ -4749,8 +4768,6 @@ import (
 	// RFC-6335 and http://www.iana.org/assignments/service-names).
 	// Non-standard protocols should use prefixed names such as
 	// mycompany.com/my-custom-protocol.
-	// This is a beta field that is guarded by the ServiceAppProtocol feature
-	// gate and enabled by default.
 	// +optional
 	appProtocol?: null | string @go(AppProtocol,*string) @protobuf(6,bytes,opt)
 
@@ -4927,6 +4944,7 @@ import (
 }
 
 // EndpointAddress is a tuple that describes single IP address.
+// +structType=atomic
 #EndpointAddress: {
 	// The IP of this endpoint.
 	// May not be loopback (127.0.0.0/8), link-local (169.254.0.0/16),
@@ -4950,6 +4968,7 @@ import (
 }
 
 // EndpointPort is a tuple that describes a single port.
+// +structType=atomic
 #EndpointPort: {
 	// The name of this port.  This must match the 'name' field in the
 	// corresponding ServicePort.
@@ -4973,8 +4992,6 @@ import (
 	// RFC-6335 and http://www.iana.org/assignments/service-names).
 	// Non-standard protocols should use prefixed names such as
 	// mycompany.com/my-custom-protocol.
-	// This is a beta field that is guarded by the ServiceAppProtocol feature
-	// gate and enabled by default.
 	// +optional
 	appProtocol?: null | string @go(AppProtocol,*string) @protobuf(4,bytes,opt)
 }
@@ -5018,8 +5035,9 @@ import (
 	// +optional
 	taints?: [...#Taint] @go(Taints,[]Taint) @protobuf(5,bytes,opt)
 
-	// If specified, the source to get node configuration from
-	// The DynamicKubeletConfig feature gate must be enabled for the Kubelet to use this field
+	// Deprecated. If specified, the source of the node's configuration.
+	// The DynamicKubeletConfig feature gate must be enabled for the Kubelet to use this field.
+	// This field is deprecated as of 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration
 	// +optional
 	configSource?: null | #NodeConfigSource @go(ConfigSource,*NodeConfigSource) @protobuf(6,bytes,opt)
 
@@ -5030,12 +5048,14 @@ import (
 }
 
 // NodeConfigSource specifies a source of node configuration. Exactly one subfield (excluding metadata) must be non-nil.
+// This API is deprecated since 1.22
 #NodeConfigSource: {
 	// ConfigMap is a reference to a Node's ConfigMap
 	configMap?: null | #ConfigMapNodeConfigSource @go(ConfigMap,*ConfigMapNodeConfigSource) @protobuf(2,bytes,opt)
 }
 
 // ConfigMapNodeConfigSource contains the information to reference a ConfigMap as a config source for the Node.
+// This API is deprecated since 1.22: https://git.k8s.io/enhancements/keps/sig-node/281-dynamic-kubelet-configuration
 #ConfigMapNodeConfigSource: {
 	// Namespace is the metadata.namespace of the referenced ConfigMap.
 	// This field is required in all cases.
@@ -5273,6 +5293,7 @@ import (
 #ContainerImage: {
 	// Names by which this image is known.
 	// e.g. ["k8s.gcr.io/hyperkube:v1.0.7", "dockerhub.io/google_containers/hyperkube:v1.0.7"]
+	// +optional
 	names: [...string] @go(Names,[]string) @protobuf(1,bytes,rep)
 
 	// The size of the image in bytes.
@@ -5349,16 +5370,49 @@ import (
 
 #enumNodeAddressType:
 	#NodeHostName |
-	#NodeExternalIP |
 	#NodeInternalIP |
-	#NodeExternalDNS |
-	#NodeInternalDNS
+	#NodeExternalIP |
+	#NodeInternalDNS |
+	#NodeExternalDNS
 
-#NodeHostName:    #NodeAddressType & "Hostname"
-#NodeExternalIP:  #NodeAddressType & "ExternalIP"
-#NodeInternalIP:  #NodeAddressType & "InternalIP"
-#NodeExternalDNS: #NodeAddressType & "ExternalDNS"
+// NodeHostName identifies a name of the node. Although every node can be assumed
+// to have a NodeAddress of this type, its exact syntax and semantics are not
+// defined, and are not consistent between different clusters.
+#NodeHostName: #NodeAddressType & "Hostname"
+
+// NodeInternalIP identifies an IP address which is assigned to one of the node's
+// network interfaces. Every node should have at least one address of this type.
+//
+// An internal IP is normally expected to be reachable from every other node, but
+// may not be visible to hosts outside the cluster. By default it is assumed that
+// kube-apiserver can reach node internal IPs, though it is possible to configure
+// clusters where this is not the case.
+//
+// NodeInternalIP is the default type of node IP, and does not necessarily imply
+// that the IP is ONLY reachable internally. If a node has multiple internal IPs,
+// no specific semantics are assigned to the additional IPs.
+#NodeInternalIP: #NodeAddressType & "InternalIP"
+
+// NodeExternalIP identifies an IP address which is, in some way, intended to be
+// more usable from outside the cluster then an internal IP, though no specific
+// semantics are defined. It may be a globally routable IP, though it is not
+// required to be.
+//
+// External IPs may be assigned directly to an interface on the node, like a
+// NodeInternalIP, or alternatively, packets sent to the external IP may be NAT'ed
+// to an internal node IP rather than being delivered directly (making the IP less
+// efficient for node-to-node traffic than a NodeInternalIP).
+#NodeExternalIP: #NodeAddressType & "ExternalIP"
+
+// NodeInternalDNS identifies a DNS name which resolves to an IP address which has
+// the characteristics of a NodeInternalIP. The IP it resolves to may or may not
+// be a listed NodeInternalIP address.
 #NodeInternalDNS: #NodeAddressType & "InternalDNS"
+
+// NodeExternalDNS identifies a DNS name which resolves to an IP address which has
+// the characteristics of a NodeExternalIP. The IP it resolves to may or may not
+// be a listed NodeExternalIP address.
+#NodeExternalDNS: #NodeAddressType & "ExternalDNS"
 
 // NodeAddress contains information for the node's address.
 #NodeAddress: {
@@ -5592,21 +5646,6 @@ import (
 	target: #ObjectReference @go(Target) @protobuf(2,bytes,opt)
 }
 
-// A list of ephemeral containers used with the Pod ephemeralcontainers subresource.
-#EphemeralContainers: {
-	metav1.#TypeMeta
-
-	// +optional
-	metadata?: metav1.#ObjectMeta @go(ObjectMeta) @protobuf(1,bytes,opt)
-
-	// A list of ephemeral containers associated with this pod. New ephemeral containers
-	// may be appended to this list, but existing ephemeral containers may not be removed
-	// or modified.
-	// +patchMergeKey=name
-	// +patchStrategy=merge
-	ephemeralContainers: [...#EphemeralContainer] @go(EphemeralContainers,[]EphemeralContainer) @protobuf(2,bytes,rep)
-}
-
 // Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.
 // +k8s:openapi-gen=false
 #Preconditions: {
@@ -5804,6 +5843,7 @@ import (
 // Instead of using this type, create a locally provided and used type that is well-focused on your reference.
 // For example, ServiceReferences for admission registration: https://github.com/kubernetes/api/blob/release-1.17/admissionregistration/v1/types.go#L533 .
 // +k8s:deepcopy-gen:interfaces=k8s.io/apimachinery/pkg/runtime.Object
+// +structType=atomic
 #ObjectReference: {
 	// Kind of the referent.
 	// More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
@@ -5848,6 +5888,7 @@ import (
 
 // LocalObjectReference contains enough information to let you locate the
 // referenced object inside the same namespace.
+// +structType=atomic
 #LocalObjectReference: {
 	// Name of the referent.
 	// More info: https://kubernetes.io/docs/concepts/overview/working-with-objects/names/#names
@@ -5858,6 +5899,7 @@ import (
 
 // TypedLocalObjectReference contains enough information to let you locate the
 // typed referenced object inside the same namespace.
+// +structType=atomic
 #TypedLocalObjectReference: {
 	// APIGroup is the group for the resource being referenced.
 	// If APIGroup is not specified, the specified Kind must be in the core API group.
@@ -6156,7 +6198,7 @@ import (
 #ResourceQuotaScopePriorityClass: #ResourceQuotaScope & "PriorityClass"
 
 // Match all pod objects that have cross-namespace pod (anti)affinity mentioned.
-// This is an alpha feature enabled by the PodAffinityNamespaceSelector feature flag.
+// This is a beta feature enabled by the PodAffinityNamespaceSelector feature flag.
 #ResourceQuotaScopeCrossNamespacePodAffinity: #ResourceQuotaScope & "CrossNamespacePodAffinity"
 
 // ResourceQuotaSpec defines the desired hard limits to enforce for Quota.
@@ -6180,6 +6222,7 @@ import (
 
 // A scope selector represents the AND of the selectors represented
 // by the scoped-resource selector requirements.
+// +structType=atomic
 #ScopeSelector: {
 	// A list of scope selector requirements by scope of the resources.
 	// +optional
@@ -6395,7 +6438,7 @@ import (
 // TODO: Consider supporting different formats, specifying CA/destinationCA.
 #SecretTypeTLS: #SecretType & "kubernetes.io/tls"
 
-// TLSCertKey is the key for tls certificates in a TLS secert.
+// TLSCertKey is the key for tls certificates in a TLS secret.
 #TLSCertKey: "tls.crt"
 
 // TLSPrivateKeyKey is the key for the private key field in a TLS secret.
@@ -6713,6 +6756,16 @@ import (
 	// PodSecurityContext, the value specified in SecurityContext takes precedence.
 	// +optional
 	runAsUserName?: null | string @go(RunAsUserName,*string) @protobuf(3,bytes,opt)
+
+	// HostProcess determines if a container should be run as a 'Host Process' container.
+	// This field is alpha-level and will only be honored by components that enable the
+	// WindowsHostProcessContainers feature flag. Setting this field without the feature
+	// flag will result in errors when validating the Pod. All of a Pod's containers must
+	// have the same effective HostProcess value (it is not allowed to have a mix of HostProcess
+	// containers and non-HostProcess containers).  In addition, if HostProcess is true
+	// then HostNetwork must also be set to true.
+	// +optional
+	hostProcess?: null | bool @go(HostProcess,*bool) @protobuf(4,bytes,opt)
 }
 
 // RangeAllocation is not a public type.

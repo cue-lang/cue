@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89609212_a1b2abad",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-16T12:14:45Z",
+      "side": 1,
+      "message": "s/foramt/format/",
+      "revId": "d4079758f05e66b0866eee53b09ef3aefe97369c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b75e2ee5_7a043642",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-16T12:14:45Z",
+      "side": 1,
+      "message": "Worth including a reference to where this list came from perhaps?",
+      "revId": "d4079758f05e66b0866eee53b09ef3aefe97369c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

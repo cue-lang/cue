@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c2e4808f_32015744",
+        "filename": "cue/testdata/resolve/011_bounds.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-16T12:07:53Z",
+      "side": 1,
+      "message": "Nit: identical to the case above.",
+      "revId": "9c016d38f169028b0ed7ef5c85ab95e284ea247c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

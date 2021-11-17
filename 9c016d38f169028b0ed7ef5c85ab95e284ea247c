@@ -16,6 +16,24 @@
       "message": "Nit: identical to the case above.",
       "revId": "9c016d38f169028b0ed7ef5c85ab95e284ea247c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "40025653_bfb77efb",
+        "filename": "cue/testdata/resolve/011_bounds.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 152,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-17T13:21:52Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c2e4808f_32015744",
+      "revId": "9c016d38f169028b0ed7ef5c85ab95e284ea247c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

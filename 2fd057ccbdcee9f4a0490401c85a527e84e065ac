@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d35da95a_dc01511c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2021-11-17T23:49:07Z",
+      "side": 1,
+      "message": "fyi, GoReleaser v1 is out now",
+      "revId": "2fd057ccbdcee9f4a0490401c85a527e84e065ac",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

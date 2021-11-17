@@ -165,7 +165,7 @@ var unmarshalTests = []struct {
 		`"_#foo": 1`,
 	}, {
 		"~: null key",
-		`"~": "null key"`,
+		`"null": "null key"`,
 	}, {
 		`empty:
 apple: "newline"`,
@@ -260,6 +260,15 @@ apple: "newline"`,
 	}, {
 		"{ a: 1, b: {c: 1} }",
 		`a: 1, b: {c: 1}`,
+	}, {
+		`
+True: 1
+Null: 1
+.Inf: 2
+`,
+		`"true": 1
+"null": 1
+"+Inf": 2`,
 	},
 
 	// Some cross type conversions
@@ -734,6 +743,22 @@ func TestUnmarshal(t *testing.T) {
 			}
 		})
 	}
+}
+
+// For debug purposes: do not delete.
+func TestX(t *testing.T) {
+	y := `
+`
+	y = strings.TrimSpace(y)
+	if len(y) == 0 {
+		t.Skip()
+	}
+
+	expr, err := callUnmarshal(t, y)
+	if _, ok := err.(*yaml.TypeError); !ok && err != nil {
+		t.Fatal(err)
+	}
+	t.Error(cueStr(expr))
 }
 
 // // TODO(v3): This test should also work when unmarshaling onto an interface{}.

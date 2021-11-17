@@ -539,13 +539,35 @@ func (d *decoder) scalar(n *node) ast.Expr {
 }
 
 func (d *decoder) label(n *node) ast.Label {
-	if ast.IsValidIdent(n.value) && !internal.IsDefOrHidden(n.value) {
-		return d.ident(n, n.value)
+	pos := d.pos(n.startPos)
+
+	switch x := d.scalar(n).(type) {
+	case *ast.BasicLit:
+		if x.Kind == token.STRING {
+			if ast.IsValidIdent(n.value) && !internal.IsDefOrHidden(n.value) {
+				return &ast.Ident{
+					NamePos: pos,
+					Name:    n.value,
+				}
+			}
+			ast.SetPos(x, pos)
+			return x
+		}
+
+		return &ast.BasicLit{
+			ValuePos: pos,
+			Kind:     token.STRING,
+			Value:    literal.Label.Quote(x.Value),
+		}
+
+	default:
+		d.p.failf(n.startPos.line, "invalid label: %q", n.value)
 	}
+
 	return &ast.BasicLit{
-		ValuePos: d.start(n),
+		ValuePos: pos,
 		Kind:     token.STRING,
-		Value:    literal.Label.Quote(n.value),
+		Value:    "<invalid>",
 	}
 }
 

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "5706a0ea_df3a3af8",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-17T10:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "89609212_a1b2abad",
+      "revId": "d4079758f05e66b0866eee53b09ef3aefe97369c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b75e2ee5_7a043642",
@@ -31,6 +49,24 @@
       "writtenOn": "2021-11-16T12:14:45Z",
       "side": 1,
       "message": "Worth including a reference to where this list came from perhaps?",
+      "revId": "d4079758f05e66b0866eee53b09ef3aefe97369c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecdfeda3_cdbd0813",
+        "filename": "internal/encoding/yaml/encode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-17T10:39:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "b75e2ee5_7a043642",
       "revId": "d4079758f05e66b0866eee53b09ef3aefe97369c",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

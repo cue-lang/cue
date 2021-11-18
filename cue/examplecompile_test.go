@@ -44,7 +44,7 @@ func ExampleContext() {
 	// a:     2
 	// b:     3
 	// "a+b": 5
-
+	//
 	// expressions
 	// a + b: 5
 	// a * b: 6

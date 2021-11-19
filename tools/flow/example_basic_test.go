@@ -33,6 +33,41 @@ func Example() {
 	// setting b.output to "hello hello world"
 }
 
+func ExampleHidden() {
+	var r cue.Runtime
+	inst, err := r.Compile("example.cue", `
+	a: {
+		input: "world"
+		output: string
+	}
+	b: {
+		input: a.output
+		output: string
+	}
+	_c: {
+		input: b.output
+		output: string
+	}
+	d: {
+		input: _c.output
+		output: string
+	}
+	`)
+	if err != nil {
+		log.Fatal(err)
+	}
+	controller := flow.New(&flow.Config{FindHiddenTasks: true}, inst, ioTaskFunc)
+	// controller := flow.New(nil, inst, ioTaskFunc)
+	if err := controller.Run(context.Background()); err != nil {
+		log.Fatal(err)
+	}
+	// Output:
+	// setting a.output to "hello world"
+	// setting b.output to "hello hello world"
+	// setting _c.output to "hello hello hello world"
+	// setting d.output to "hello hello hello hello world"
+}
+
 func ioTaskFunc(v cue.Value) (flow.Runner, error) {
 	inputPath := cue.ParsePath("input")
 

@@ -51,11 +51,11 @@ func TestEncodeFile(t *testing.T) {
 		`,
 		out: `
 seq:
-- 1
-- 2
-- 3
-- a: 1
-  b: 2
+  - 1
+  - 2
+  - 3
+  - a: 1
+    b: 2
 a:
   b:
     c: 3
@@ -229,13 +229,13 @@ f4: {} # line 4
 		}`,
 		out: `
 receivers:
-- name: pager
-  slack_configs:
-  - text: |-
-      {{ range .Alerts }}{{ .Annotations.description }}
-      {{ end }}
-    channel: '#cloudmon'
-    send_resolved: true
+  - name: pager
+    slack_configs:
+      - text: |-
+          {{ range .Alerts }}{{ .Annotations.description }}
+          {{ end }}
+        channel: '#cloudmon'
+        send_resolved: true
 route:
   receiver: pager
   group_by: [alertname, cluster]

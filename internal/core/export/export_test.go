@@ -251,11 +251,18 @@ type C struct {
 
 // For debugging purposes. Do not delete.
 func TestX(t *testing.T) {
-	t.Skip()
+	// t.Skip()
 
 	in := `
 -- in.cue --
 package test
+
+// l: { #foo: 1,  [...] }
+l: ["a",...]
+l: ["a","b",...]
+// l: { #foo: 1 }
+// l: { @decl(3) }
+// l: {}
 
 // // Foo
 // a: [X=string]: [Y=string]: {

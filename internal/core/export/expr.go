@@ -191,13 +191,6 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				s.Elts = append(s.Elts, st.Elts...)
 				return s
 			}
-		case 2:
-			if len(e.attrs) > 0 {
-				break
-			}
-			// Simplify.
-			e.conjuncts = append(e.conjuncts, e.embed...)
-			return ast.NewBinExpr(token.AND, e.conjuncts...)
 		}
 	}
 
@@ -258,7 +251,13 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 	// return ast.NewCall(ast.NewIdent("close"), s)
 	// }
 
-	e.conjuncts = append(e.conjuncts, s)
+	switch {
+	case len(e.conjuncts) == 0:
+		return s
+
+	case len(e.structs) > 0, len(s.Elts) > 0:
+		e.conjuncts = append(e.conjuncts, s)
+	}
 
 	return ast.NewBinExpr(token.AND, e.conjuncts...)
 }

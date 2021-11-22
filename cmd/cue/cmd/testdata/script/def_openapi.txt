@@ -165,15 +165,15 @@ components:
     Bar:
       type: object
       required:
-      - foo
+        - foo
       properties:
         foo:
           $ref: '#/components/schemas/Foo'
     Foo:
       type: object
       required:
-      - a
-      - b
+        - a
+        - b
       properties:
         a:
           type: integer

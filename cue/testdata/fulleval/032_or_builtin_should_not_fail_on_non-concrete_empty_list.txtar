@@ -67,7 +67,7 @@ foo:
       [string]: {}
     }
     #JobID: or([
-      for k, _ in 〈0;jobs〉 {
+      for k, _ in 〈1;jobs〉 {
         〈1;k〉
       },
     ])

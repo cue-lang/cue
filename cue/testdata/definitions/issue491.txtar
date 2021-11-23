@@ -85,7 +85,7 @@ z: #PrestepNewUser & {
   })
   #NewUser: {
     Repos: [
-      ...〈1;#Repo〉,
+      ...〈2;#Repo〉,
     ]
   }
   #Repo: {
@@ -93,7 +93,7 @@ z: #PrestepNewUser & {
     Pattern: (*"*"|string)
   }
   x: [
-    ...〈0;#Repo〉,
+    ...〈1;#Repo〉,
   ]
   x: [
     {

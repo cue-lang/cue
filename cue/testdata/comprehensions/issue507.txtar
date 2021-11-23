@@ -51,7 +51,7 @@ bar: [
     ...string,
   ]|*[])
   foo: [
-    for _, e in 〈0;somelist〉 {
+    for _, e in 〈1;somelist〉 {
       "hello foo: \(〈1;e〉)"
     },
   ]
@@ -59,7 +59,7 @@ bar: [
     "something",
   ]
   z: [
-    for _, e in 〈0;otherlist〉 {
+    for _, e in 〈1;otherlist〉 {
       "hello z: \(〈1;e〉)"
     },
   ]
@@ -69,7 +69,7 @@ bar: [
     "something",
   ])
   bar: [
-    for _, e in 〈0;extlist〉 {
+    for _, e in 〈1;extlist〉 {
       "hello bar: \(〈1;e〉)"
     },
   ]

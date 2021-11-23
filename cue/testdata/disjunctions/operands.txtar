@@ -88,7 +88,7 @@ unaryOp: {
     a: 2
   })
   forLoop: [
-    for _, e in 〈0;list〉 {
+    for _, e in 〈1;list〉 {
       "count: \(〈1;e〉)"
     },
   ]

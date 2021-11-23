@@ -41,7 +41,7 @@ Junk: {
 {
   Foo: {
     listOfCloseds: [
-      ...〈1;#Closed〉,
+      ...〈2;#Closed〉,
     ]
   }
   #Closed: {
@@ -53,7 +53,7 @@ Junk: {
   (〈0;Foo〉 & {
     listOfCloseds: [
       {
-        for k, v in 〈2;Junk〉 {
+        for k, v in 〈3;Junk〉 {
           "\(〈1;k〉)": 〈1;v〉
         }
       },

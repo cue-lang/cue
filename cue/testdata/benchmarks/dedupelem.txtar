@@ -68,69 +68,69 @@ Result:
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "string"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "string"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "string"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
   foo: ([
     {
       type: "float"
     },
   ] & [
-    ...〈0;#Value〉,
+    ...〈1;#Value〉,
   ])
 }

@@ -249,9 +249,9 @@ Result:
       #bar: "bar"
     }
     s2: [
-      〈0;s1〉,
+      〈1;s1〉,
       {
-        〈1;s1〉.#bar
+        〈2;s1〉.#bar
         #baz: 4
       },
     ]
@@ -320,7 +320,7 @@ Result:
     issue794: {
       _foo: "foo"
       [
-        〈0;_foo〉,
+        〈1;_foo〉,
       ]
     }
   }

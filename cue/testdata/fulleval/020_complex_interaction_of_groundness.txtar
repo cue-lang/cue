@@ -32,14 +32,14 @@ a: {
 --- in.cue
 {
   res: [
-    for _, x in 〈0;a〉 for _, y in 〈0;x〉 {
+    for _, x in 〈1;a〉 for _, y in 〈0;x〉 {
       (〈1;y〉 & {
         d: "b"
       })
     },
   ]
   res: [
-    (〈0;a〉.b.c & {
+    (〈1;a〉.b.c & {
       d: "b"
     }),
   ]

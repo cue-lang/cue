@@ -147,7 +147,7 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
     },
   ]
   a4: [
-    for _, x in 〈0;let A4〉 {
+    for _, x in 〈1;let A4〉 {
       v: 404
     },
   ]
@@ -158,7 +158,7 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
   ]
   a5: {
     b: [
-      for _, x in 〈1;let A5〉 {
+      for _, x in 〈2;let A5〉 {
         v: 505
       },
     ]
@@ -171,7 +171,7 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
   a6: {
     b: {
       c: [
-        for _, x in 〈2;let A6〉 {
+        for _, x in 〈3;let A6〉 {
           v: 606
         },
       ]
@@ -260,7 +260,7 @@ cycles.issue1042.#Add16.let[].for[].c.for[].for[].c: cyclic references in let cl
         ] * 16)
         out: [
           for _, i in 〈import;list〉.Range(0, 4, 1) {
-            〈2;let fulladders〉[〈1;i〉].sum
+            〈3;let fulladders〉[〈1;i〉].sum
           },
         ]
       }

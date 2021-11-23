@@ -41,6 +41,11 @@ valueAlias: selfRefValue: pattern: {
 	a: [string]: X=or(X)
 }
 
+issue1308: {
+	let _xA = 1
+	sub: [{_A: _xA}]
+}
+
 -- y.cue --
 fieldAlias: cross: {
 	baz: 3
@@ -117,6 +122,12 @@ valueAlias: {
 		}
 	}
 }
+issue1308: {
+	let _xA = 1
+	sub: [{
+		_A: _xA
+	}]
+}
 -- out/doc --
 []
 [fieldAlias]
@@ -159,6 +170,10 @@ TODO: solve this issue.
 is no need to rename the variable here as the expression
 was known to compile and is known to be correct.
 
+[issue1308]
+[issue1308 sub]
+[issue1308 sub 0]
+[issue1308 sub 0 _A]
 -- out/value --
 == Simplified
 {
@@ -210,6 +225,9 @@ was known to compile and is known to be correct.
 				a: {}
 			}
 		}
+	}
+	issue1308: {
+		sub: [{}]
 	}
 }
 == Raw
@@ -266,6 +284,11 @@ was known to compile and is known to be correct.
 			}
 		}
 	}
+	issue1308: {
+		sub: [{
+			_A: 1
+		}]
+	}
 }
 == Final
 {
@@ -306,6 +329,9 @@ was known to compile and is known to be correct.
 				a: {}
 			}
 		}
+	}
+	issue1308: {
+		sub: [{}]
 	}
 }
 == All
@@ -362,6 +388,11 @@ was known to compile and is known to be correct.
 			}
 		}
 	}
+	issue1308: {
+		sub: [{
+			_A: 1
+		}]
+	}
 }
 == Eval
 {
@@ -405,5 +436,8 @@ was known to compile and is known to be correct.
 				a: {}
 			}
 		}
+	}
+	issue1308: {
+		sub: [{}]
 	}
 }

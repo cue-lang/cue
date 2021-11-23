@@ -30,10 +30,10 @@ c: { for x in top {} }
   src: {}
   top: _
   a: [
-    if 〈0;cond〉 {},
+    if 〈1;cond〉 {},
   ]
   b: [
-    for _, x in 〈0;src〉.foo {},
+    for _, x in 〈1;src〉.foo {},
   ]
   c: {
     for _, x in 〈1;top〉 {}

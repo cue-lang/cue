@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5e15c5c_945fc50b",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-23T16:57:00Z",
+      "side": 1,
+      "message": "Investigating unity failure (the large diffs are never going to sensibly be reviewable in the CI output in any case)",
+      "revId": "712856b9de38884ccf9005c3d94e33b8cd7a739c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

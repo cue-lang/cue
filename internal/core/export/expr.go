@@ -174,7 +174,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				break
 			}
 			if len(e.structs) > 0 {
-				return s
+				return e.wrapCloseIfNecessary(s, src)
 			}
 			return ast.NewIdent("_")
 		case 1:
@@ -189,7 +189,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			}
 			if st, ok := x.(*ast.StructLit); ok {
 				s.Elts = append(s.Elts, st.Elts...)
-				return s
+				return e.wrapCloseIfNecessary(s, src)
 			}
 		}
 	}
@@ -246,20 +246,25 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		s.Elts = append(s.Elts, &ast.Ellipsis{})
 	}
 
-	// TODO: why was this necessary?
-	// else if src != nil && src.IsClosedStruct() && e.inDefinition == 0 {
-	// return ast.NewCall(ast.NewIdent("close"), s)
-	// }
-
+	ws := e.wrapCloseIfNecessary(s, src)
 	switch {
 	case len(e.conjuncts) == 0:
-		return s
+		return ws
 
 	case len(e.structs) > 0, len(s.Elts) > 0:
-		e.conjuncts = append(e.conjuncts, s)
+		e.conjuncts = append(e.conjuncts, ws)
 	}
 
 	return ast.NewBinExpr(token.AND, e.conjuncts...)
+}
+
+func (e *conjuncts) wrapCloseIfNecessary(s *ast.StructLit, v *adt.Vertex) ast.Expr {
+	if !e.hasEllipsis && v != nil {
+		if st, ok := v.BaseValue.(*adt.StructMarker); ok && st.NeedClose {
+			return ast.NewCall(ast.NewIdent("close"), s)
+		}
+	}
+	return s
 }
 
 // Conjuncts if for collecting values of a single vertex.

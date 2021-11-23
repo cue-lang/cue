@@ -33,12 +33,21 @@ type Profile struct {
 	// value.
 	Defaults bool
 
+	// LeftDefaults indicates that the default value of the subsuming value
+	// needs to be taken. This is necessary for simplifications like trim
+	// and simplifying disjunctions.
+	LeftDefault bool
+
 	// Ignore optional fields.
 	IgnoreOptional bool
 
 	// IgnoreClosedness ignores closedness of structs and is used for comparing
 	// APIs.
 	IgnoreClosedness bool
+}
+
+var Simplify = Profile{
+	LeftDefault: true,
 }
 
 var CUE = Profile{}

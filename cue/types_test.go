@@ -3371,6 +3371,13 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: and([])`,
 		want:  `_`,
+	}, {
+		//Issue #1245
+		input: `
+				x: *4 | int
+				v: x | *7
+				`,
+		want: `|(.(〈〉 "x") 7)`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

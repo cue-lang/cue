@@ -16,7 +16,6 @@ package openapi
 
 import (
 	"fmt"
-	"strings"
 
 	"github.com/cockroachdb/apd/v2"
 
@@ -58,21 +57,17 @@ func extractFormat(v cue.Value) string {
 	default:
 		return ""
 	}
-	var expr, arg string
-	op, a := v.Expr()
-	if op == cue.CallOp {
+	var arg string
+
+	if op, a := v.Expr(); op == cue.CallOp {
 		v = a[0]
 		if len(a) == 2 {
 			arg = fmt.Sprintf(" (%v)", a[1].Eval())
 		}
 	}
-	if inst, ref := v.Reference(); len(ref) > 0 {
-		expr = inst.ImportPath + "." + strings.Join(ref, ".")
-		expr += arg
-	} else {
-		expr = fmt.Sprint(v.Eval())
-		expr += arg
-	}
+
+	expr := fmt.Sprint(v.Eval(), arg)
+
 	if s, ok := cueToOpenAPI[expr]; ok {
 		return s
 	}

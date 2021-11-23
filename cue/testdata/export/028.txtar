@@ -29,7 +29,7 @@ a: []
     #FindInMap: {
       #: {
         "Fn::FindInMap": [
-          (string|〈2;#FindInMap〉),
+          (string|〈3;#FindInMap〉),
         ]
       }
     }

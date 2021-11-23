@@ -804,6 +804,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 		return v
 
 	case *ast.ListLit:
+		c.pushScope(nil, 1, n)
 		v := &adt.ListLit{Src: n}
 		elts, ellipsis := internal.ListEllipsis(n)
 		for _, d := range elts {
@@ -824,6 +825,7 @@ func (c *compiler) expr(expr ast.Expr) adt.Expr {
 			}
 			v.Elems = append(v.Elems, d)
 		}
+		c.popScope()
 		return v
 
 	case *ast.SelectorExpr:

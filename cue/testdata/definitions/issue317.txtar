@@ -189,7 +189,7 @@ x: Something & #Deployment
       [string]: 〈2;#Container〉
     }
     containers: [
-      for _, c in 〈0;#Containers〉 {
+      for _, c in 〈1;#Containers〉 {
         〈1;c〉
       },
     ]

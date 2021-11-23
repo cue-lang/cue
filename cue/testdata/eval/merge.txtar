@@ -73,7 +73,7 @@ for _, manifest in manifests {
       }
       deployment: {
         #map: {
-          "\(〈3;key〉)": {
+          "\(〈4;key〉)": {
             name: "app01"
           }
         }

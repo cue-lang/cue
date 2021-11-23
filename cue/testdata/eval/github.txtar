@@ -2328,23 +2328,23 @@ import "strings"
   ] & [
     {
       file: "test.yml"
-      schema: 〈1;test〉
+      schema: 〈2;test〉
     },
     {
       file: "repository_dispatch.yml"
-      schema: 〈1;repository_dispatch〉
+      schema: 〈2;repository_dispatch〉
     },
     {
       file: "release.yml"
-      schema: 〈1;release〉
+      schema: 〈2;release〉
     },
     {
       file: "tip_triggers.yml"
-      schema: 〈1;tip_triggers〉
+      schema: 〈2;tip_triggers〉
     },
     {
       file: "new_version_triggers.yml"
-      schema: 〈1;new_version_triggers〉
+      schema: 〈2;new_version_triggers〉
     },
   ])
   test: (〈0;_#bashWorkflow〉 & {
@@ -2355,7 +2355,7 @@ import "strings"
           "**",
         ]
         "tags-ignore": [
-          〈3;_#releaseTagPattern〉,
+          〈4;_#releaseTagPattern〉,
         ]
       }
       pull_request: {}
@@ -2365,11 +2365,11 @@ import "strings"
         "runs-on": 〈3;_#linuxMachine〉
         steps: ([
           ...(_ & {
-            if: "${{ \(〈3;_#isCLCITestBranch〉) }}"
+            if: "${{ \(〈4;_#isCLCITestBranch〉) }}"
           }),
         ] & [
-          〈3;_#writeNetrcFile〉,
-          〈2;_#startCLBuild〉,
+          〈4;_#writeNetrcFile〉,
+          〈3;_#startCLBuild〉,
         ])
       }
       test: {
@@ -2377,23 +2377,23 @@ import "strings"
         strategy: 〈3;_#testStrategy〉
         "runs-on": "${{ matrix.os }}"
         steps: [
-          〈3;_#writeNetrcFile〉,
-          〈3;_#installGo〉,
-          〈3;_#checkoutCode〉,
-          〈3;_#cacheGoModules〉,
-          (〈3;_#setGoBuildTags〉 & {
+          〈4;_#writeNetrcFile〉,
+          〈4;_#installGo〉,
+          〈4;_#checkoutCode〉,
+          〈4;_#cacheGoModules〉,
+          (〈4;_#setGoBuildTags〉 & {
             _#tags: "long"
-            if: "${{ \(〈3;_#isMaster〉) }}"
+            if: "${{ \(〈4;_#isMaster〉) }}"
           }),
-          〈3;_#goGenerate〉,
-          〈3;_#goTest〉,
-          (〈3;_#goTestRace〉 & {
-            if: "${{ \(〈3;_#isMaster〉) || \(〈3;_#isCLCITestBranch〉) && matrix.go-version == '\(〈4;_#latestStableGo〉)' && matrix.os == '\(〈4;_#linuxMachine〉)' }}"
+          〈4;_#goGenerate〉,
+          〈4;_#goTest〉,
+          (〈4;_#goTestRace〉 & {
+            if: "${{ \(〈4;_#isMaster〉) || \(〈4;_#isCLCITestBranch〉) && matrix.go-version == '\(〈5;_#latestStableGo〉)' && matrix.os == '\(〈5;_#linuxMachine〉)' }}"
           }),
-          〈3;_#goReleaseCheck〉,
-          〈3;_#checkGitClean〉,
-          〈2;_#pullThroughProxy〉,
-          〈2;_#failCLBuild〉,
+          〈4;_#goReleaseCheck〉,
+          〈4;_#checkGitClean〉,
+          〈3;_#pullThroughProxy〉,
+          〈3;_#failCLBuild〉,
         ]
       }
       mark_ci_success: {
@@ -2401,8 +2401,8 @@ import "strings"
         if: "${{ \(〈2;_#isCLCITestBranch〉) }}"
         needs: "test"
         steps: [
-          〈3;_#writeNetrcFile〉,
-          〈2;_#passCLBuild〉,
+          〈4;_#writeNetrcFile〉,
+          〈3;_#passCLBuild〉,
         ]
       }
       delete_build_branch: {
@@ -2410,9 +2410,9 @@ import "strings"
         if: "${{ \(〈2;_#isCLCITestBranch〉) && always() }}"
         needs: "test"
         steps: [
-          (〈3;_#step〉 & {
-            run: "\(〈4;_#tempCueckooGitDir〉)
-            git push https://github.com/cue-lang/cue :${GITHUB_REF#\(〈4;_#branchRefPrefix〉)}"
+          (〈4;_#step〉 & {
+            run: "\(〈5;_#tempCueckooGitDir〉)
+            git push https://github.com/cue-lang/cue :${GITHUB_REF#\(〈5;_#branchRefPrefix〉)}"
           }),
         ]
       }
@@ -2484,10 +2484,10 @@ import "strings"
       "\(〈1;_#runtrybot〉)": (〈1;_#dispatchJob〉 & {
         _#type: 〈2;_#runtrybot〉
         steps: [
-          〈3;_#writeNetrcFile〉,
-          (〈3;_#step〉 & {
+          〈4;_#writeNetrcFile〉,
+          (〈4;_#step〉 & {
             name: "Trigger trybot"
-            run: "\(〈4;_#tempCueckooGitDir〉)
+            run: "\(〈5;_#tempCueckooGitDir〉)
             git fetch https://review.gerrithub.io/a/cue-lang/cue ${{ github.event.client_payload.payload.ref }}
             git checkout -b ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }} FETCH_HEAD
             git push https://github.com/cue-lang/cue ci/${{ github.event.client_payload.payload.changeID }}/${{ github.event.client_payload.payload.commit }}"
@@ -2501,7 +2501,7 @@ import "strings"
     on: {
       push: {
         tags: [
-          〈3;_#releaseTagPattern〉,
+          〈4;_#releaseTagPattern〉,
         ]
       }
     }
@@ -2509,25 +2509,25 @@ import "strings"
       goreleaser: {
         "runs-on": 〈3;_#linuxMachine〉
         steps: [
-          (〈3;_#checkoutCode〉 & {
+          (〈4;_#checkoutCode〉 & {
             with: {
               "fetch-depth": 0
             }
           }),
-          (〈3;_#installGo〉 & {
+          (〈4;_#installGo〉 & {
             with: {
-              "go-version": 〈5;_#latestStableGo〉
+              "go-version": 〈6;_#latestStableGo〉
             }
           }),
-          (〈3;_#step〉 & {
+          (〈4;_#step〉 & {
             name: "Setup qemu"
             uses: "docker/setup-qemu-action@v1"
           }),
-          (〈3;_#step〉 & {
+          (〈4;_#step〉 & {
             name: "Set up Docker Buildx"
             uses: "docker/setup-buildx-action@v1"
           }),
-          (〈3;_#step〉 & {
+          (〈4;_#step〉 & {
             name: "Docker Login"
             uses: "docker/login-action@v1"
             with: {
@@ -2536,7 +2536,7 @@ import "strings"
               password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
             }
           }),
-          (〈3;_#step〉 & {
+          (〈4;_#step〉 & {
             name: "Run GoReleaser"
             env: {
               GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
@@ -2556,7 +2556,7 @@ import "strings"
     on: {
       push: {
         branches: [
-          〈3;_#masterBranch〉,
+          〈4;_#masterBranch〉,
         ]
       }
     }
@@ -2566,7 +2566,7 @@ import "strings"
         steps: [
           {
             name: "Rebuild tip.cuelang.org"
-            run: "\(〈4;_#curl〉) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
+            run: "\(〈5;_#curl〉) -X POST -d {} https://api.netlify.com/build_hooks/${{ secrets.CuelangOrgTipRebuildHook }}"
           },
           {
             _#arg: {
@@ -2579,7 +2579,7 @@ import "strings"
               }
             }
             name: "Trigger unity build"
-            run: "\(〈4;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-sh/unity/dispatches"
+            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-sh/unity/dispatches"
           },
         ]
       }
@@ -2590,7 +2590,7 @@ import "strings"
     on: {
       push: {
         tags: [
-          〈3;_#releaseTagPattern〉,
+          〈4;_#releaseTagPattern〉,
         ]
       }
     }
@@ -2603,7 +2603,7 @@ import "strings"
               event_type: "Re-test post release of ${GITHUB_REF##refs/tags/}"
             }
             name: "Rebuild tip.cuelang.org"
-            run: "\(〈4;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-lang/cuelang.org/dispatches"
+            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-lang/cuelang.org/dispatches"
           },
           {
             _#arg: {
@@ -2616,7 +2616,7 @@ import "strings"
               }
             }
             name: "Trigger unity build"
-            run: "\(〈4;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-sh/unity/dispatches"
+            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-sh/unity/dispatches"
           },
         ]
       }
@@ -2650,14 +2650,14 @@ import "strings"
     "fail-fast": false
     matrix: {
       "go-version": [
-        〈2;_#codeGenGo〉,
+        〈3;_#codeGenGo〉,
         "1.16.10",
-        〈2;_#latestStableGo〉,
+        〈3;_#latestStableGo〉,
       ]
       os: [
-        〈2;_#linuxMachine〉,
-        〈2;_#macosMachine〉,
-        〈2;_#windowsMachine〉,
+        〈3;_#linuxMachine〉,
+        〈3;_#macosMachine〉,
+        〈3;_#windowsMachine〉,
       ]
     }
   }

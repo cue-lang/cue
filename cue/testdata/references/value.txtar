@@ -8,6 +8,9 @@ fieldAndValue: X=foo: Y={ 3, #sum: X + Y }
 
 valueCycle: b: X=3+X
 
+// Issue #1003
+listValueAlias: X = [1, 2, X[0]]
+
 -- out/eval --
 (struct){
   structShorthand: (struct){
@@ -26,6 +29,11 @@ valueCycle: b: X=3+X
       //     ./in.cue:8:18
     }
   }
+  listValueAlias: (#list){
+    0: (int){ 1 }
+    1: (int){ 2 }
+    2: (int){ 1 }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -43,4 +51,9 @@ valueCycle: b: X=3+X
   valueCycle: {
     b: (3 + 〈0〉)
   }
+  listValueAlias: [
+    1,
+    2,
+    〈1〉[0],
+  ]
 }

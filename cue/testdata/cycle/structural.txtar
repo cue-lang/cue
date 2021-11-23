@@ -417,8 +417,19 @@ a3.f.g: structural cycle
 b12b.#list.tail.tail: structural cycle
 b13.root.a.0.0: structural cycle
 b14.root.b.1.1: structural cycle
+b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
+    ./in.cue:53:8
+    ./in.cue:53:15
+    ./in.cue:54:11
+    ./in.cue:54:12
+b4.b.0.0: structural cycle
 b4.x.y.0: structural cycle
 b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
+    ./in.cue:63:8
+    ./in.cue:63:16
+    ./in.cue:63:17
+    ./in.cue:64:12
+b6.b.a.0.0: conflicting values 1 and [1] (mismatched types int and list):
     ./in.cue:63:8
     ./in.cue:63:16
     ./in.cue:63:17
@@ -426,6 +437,12 @@ b6.b.a.0: conflicting values 1 and [1] (mismatched types int and list):
 b6.b.a.0.0: structural cycle
 b6.x.a.0: structural cycle
 b7.a.0: structural cycle
+b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
+    ./in.cue:71:8
+    ./in.cue:71:14
+    ./in.cue:72:8
+    ./in.cue:72:9
+b7.b.0.0.0: structural cycle
 c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
 d1.r: structural cycle
@@ -466,8 +483,8 @@ e4.a.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:316:13
     ./in.cue:317:9
 e4.a.0.0: 2 errors in empty disjunction:
-e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-    ./in.cue:317:9
+e4.a.0.0: conflicting values [[{c:1}]] and {c:1} (mismatched types list and struct):
+    ./in.cue:317:8
     ./in.cue:317:10
 e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:316:9
@@ -478,9 +495,9 @@ e4.b.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:319:9
     ./in.cue:320:13
 e4.b.0.0: 2 errors in empty disjunction:
-e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-    ./in.cue:319:9
+e4.b.0.0: conflicting values [(b|{})] and {c:1} (mismatched types list and struct):
     ./in.cue:319:10
+    ./in.cue:320:8
 e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
     ./in.cue:319:9
     ./in.cue:320:9
@@ -489,6 +506,24 @@ p2.#T.a.b.link: structural cycle
 p3.#U.#T.a.b.link: structural cycle
 p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
+v1.y.0: 4 errors in empty disjunction:
+v1.y.0: conflicting values int and [[2],1] (mismatched types int and list):
+    ./in.cue:335:13
+    ./in.cue:336:13
+v1.y.0.0: 2 errors in empty disjunction:
+v1.y.0.0: conflicting values int and [2] (mismatched types int and list):
+    ./in.cue:335:13
+    ./in.cue:336:14
+v1.y.0.0: incompatible list lengths (1 and 2)
+v2.y.0: 4 errors in empty disjunction:
+v2.y.0: conflicting values int and [[2],1] (mismatched types int and list):
+    ./in.cue:340:13
+    ./in.cue:341:13
+v2.y.0.0: 2 errors in empty disjunction:
+v2.y.0.0: conflicting values int and [2] (mismatched types int and list):
+    ./in.cue:340:14
+    ./in.cue:341:13
+v2.y.0.0: incompatible list lengths (1 and 2)
 z1.z.f.h.h: structural cycle
 z1.z.g.h: structural cycle
 cycle error:
@@ -576,9 +611,19 @@ Result:
     }
   }
   b4: (_|_){
-    // [structural cycle]
-    b: (#list){
-      0: (int){ 1 }
+    // [eval]
+    b: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval] b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
+        //     ./in.cue:53:8
+        //     ./in.cue:53:15
+        //     ./in.cue:54:11
+        //     ./in.cue:54:12
+        0: (_|_){
+          // [structural cycle] b4.b.0.0: structural cycle
+        }
+      }
     }
     x: (_|_){
       // [structural cycle]
@@ -617,7 +662,12 @@ Result:
           //     ./in.cue:63:17
           //     ./in.cue:64:12
           0: (_|_){
-            // [structural cycle] b6.b.a.0.0: structural cycle
+            // [eval] b6.b.a.0.0: conflicting values 1 and [1] (mismatched types int and list):
+            //     ./in.cue:63:8
+            //     ./in.cue:63:16
+            //     ./in.cue:63:17
+            //     ./in.cue:64:12
+            // b6.b.a.0.0: structural cycle
           }
         }
       }
@@ -633,10 +683,21 @@ Result:
     }
   }
   b7: (_|_){
-    // [structural cycle]
-    b: (#list){
-      0: (#list){
-        0: (int){ 1 }
+    // [eval]
+    b: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval]
+        0: (_|_){
+          // [eval] b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
+          //     ./in.cue:71:8
+          //     ./in.cue:71:14
+          //     ./in.cue:72:8
+          //     ./in.cue:72:9
+          0: (_|_){
+            // [structural cycle] b7.b.0.0.0: structural cycle
+          }
+        }
       }
     }
     a: (_|_){
@@ -1176,8 +1237,8 @@ Result:
         //     ./in.cue:316:13
         //     ./in.cue:317:9
         // e4.a.0.0: 2 errors in empty disjunction:
-        // e4.a.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-        //     ./in.cue:317:9
+        // e4.a.0.0: conflicting values [[{c:1}]] and {c:1} (mismatched types list and struct):
+        //     ./in.cue:317:8
         //     ./in.cue:317:10
         // e4.a.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
         //     ./in.cue:316:9
@@ -1196,9 +1257,9 @@ Result:
         //     ./in.cue:319:9
         //     ./in.cue:320:13
         // e4.b.0.0: 2 errors in empty disjunction:
-        // e4.b.0.0: conflicting values [{c:1}] and {c:1} (mismatched types list and struct):
-        //     ./in.cue:319:9
+        // e4.b.0.0: conflicting values [(b|{})] and {c:1} (mismatched types list and struct):
         //     ./in.cue:319:10
+        //     ./in.cue:320:8
         // e4.b.0.0: conflicting values [{c:1}] and {} (mismatched types list and struct):
         //     ./in.cue:319:9
         //     ./in.cue:320:9
@@ -1217,13 +1278,24 @@ Result:
       c: (int){ int }
     }
   }
-  v1: (struct){
+  v1: (_|_){
+    // [eval]
     x: (#list){
       0: (int){ int }
       1: (int){ 1 }
     }
-    y: (#list){
-      0: (#list){
+    y: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval] v1.y.0: 4 errors in empty disjunction:
+        // v1.y.0: conflicting values int and [[2],1] (mismatched types int and list):
+        //     ./in.cue:335:13
+        //     ./in.cue:336:13
+        // v1.y.0.0: 2 errors in empty disjunction:
+        // v1.y.0.0: conflicting values int and [2] (mismatched types int and list):
+        //     ./in.cue:335:13
+        //     ./in.cue:336:14
+        // v1.y.0.0: incompatible list lengths (1 and 2)
         0: (#list){
           0: (int){ 2 }
         }
@@ -1232,9 +1304,20 @@ Result:
       1: (int){ 1 }
     }
   }
-  v2: (struct){
-    y: (#list){
-      0: (#list){
+  v2: (_|_){
+    // [eval]
+    y: (_|_){
+      // [eval]
+      0: (_|_){
+        // [eval] v2.y.0: 4 errors in empty disjunction:
+        // v2.y.0: conflicting values int and [[2],1] (mismatched types int and list):
+        //     ./in.cue:340:13
+        //     ./in.cue:341:13
+        // v2.y.0.0: 2 errors in empty disjunction:
+        // v2.y.0.0: conflicting values int and [2] (mismatched types int and list):
+        //     ./in.cue:340:14
+        //     ./in.cue:341:13
+        // v2.y.0.0: incompatible list lengths (1 and 2)
         0: (#list){
           0: (int){ 2 }
         }
@@ -1364,7 +1447,7 @@ Result:
 {
   a1: {
     f: [
-      〈0;f〉,
+      〈1;f〉,
     ]
   }
   a2: {
@@ -1377,7 +1460,7 @@ Result:
   }
   a4: {
     a: [
-      (〈0;a〉|int),
+      (〈1;a〉|int),
     ]
   }
   a5: {
@@ -1404,12 +1487,12 @@ Result:
       1,
     ])
     a: [
-      (〈0;a〉|int),
+      (〈1;a〉|int),
     ]
   }
   b2: {
     a: [
-      (〈0;a〉|int),
+      (〈1;a〉|int),
     ]
     b: (〈0;a〉 & [
       1,
@@ -1418,7 +1501,7 @@ Result:
   b3: {
     x: {
       a: [
-        (〈0;a〉|int),
+        (〈1;a〉|int),
       ]
     }
     b: (〈0;x〉 & {
@@ -1433,7 +1516,7 @@ Result:
     ])
     x: {
       y: [
-        〈0;y〉,
+        〈1;y〉,
       ]
     }
   }
@@ -1446,7 +1529,7 @@ Result:
     x: {
       y: {
         a: [
-          (〈0;a〉|int),
+          (〈1;a〉|int),
         ]
       }
     }
@@ -1459,7 +1542,7 @@ Result:
     })
     x: {
       a: [
-        〈0;a〉,
+        〈1;a〉,
       ]
     }
   }
@@ -1470,7 +1553,7 @@ Result:
       ],
     ])
     a: [
-      〈0;a〉,
+      〈1;a〉,
     ]
   }
   b8: {
@@ -1484,9 +1567,9 @@ Result:
     #a: (string|〈0;#b〉|〈0;#ref〉)
     #b: {
       c: [
-        〈1;#a〉,
-        〈1;#a〉,
-        〈1;#a〉,
+        〈2;#a〉,
+        〈2;#a〉,
+        〈2;#a〉,
       ]
     }
     #ref: {
@@ -1550,7 +1633,7 @@ Result:
   b13: {
     root: {
       a: [
-        for _, x in 〈1;root〉 {
+        for _, x in 〈2;root〉 {
           〈1;x〉
         },
       ]
@@ -1565,7 +1648,7 @@ Result:
         "\(〈1;x〉)": {}
       }
       b: [
-        for _, x in 〈1;root〉 {
+        for _, x in 〈2;root〉 {
           〈1;x〉
         },
       ]
@@ -1657,7 +1740,7 @@ Result:
     #T: {
       a: [
         ...{
-          link: 〈2;#T〉
+          link: 〈3;#T〉
         },
       ]
     }
@@ -1677,7 +1760,7 @@ Result:
     #T: {
       a: [
         ...{
-          link: 〈2;#T〉
+          link: 〈3;#T〉
         },
       ]
       a: [
@@ -1701,7 +1784,7 @@ Result:
       #T: {
         a: [
           ...{
-            link: 〈2;#T〉
+            link: 〈3;#T〉
           },
         ]
       }
@@ -1768,7 +1851,7 @@ Result:
         }
       }
       indirect: [
-        〈0;a〉.b,
+        〈1;a〉.b,
         null,
       ][〈0;i〉]
       i: (int|*1)
@@ -1803,13 +1886,13 @@ Result:
   }
   e3: {
     a: [
-      〈0;a〉,
+      〈1;a〉,
     ]
     a: {
       c: 〈1;a〉
     }
     b: [
-      〈0;b〉,
+      〈1;b〉,
     ]
     b: {
       c: 〈1;b〉
@@ -1817,7 +1900,7 @@ Result:
   }
   e4: {
     a: [
-      (〈0;a〉|{}),
+      (〈1;a〉|{}),
     ]
     a: [
       [
@@ -1834,7 +1917,7 @@ Result:
       ],
     ]
     b: [
-      (〈0;b〉|{}),
+      (〈1;b〉|{}),
     ]
   }
   e5: {
@@ -1849,7 +1932,7 @@ Result:
   }
   v1: {
     x: [
-      (〈0;x〉|int),
+      (〈1;x〉|int),
       1,
     ]
     y: (〈0;x〉 & [
@@ -1873,7 +1956,7 @@ Result:
       1,
     ])
     x: [
-      (〈0;x〉|int),
+      (〈1;x〉|int),
       1,
     ]
   }

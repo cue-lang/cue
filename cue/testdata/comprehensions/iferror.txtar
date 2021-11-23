@@ -103,7 +103,7 @@ useDefault: {
         bar: _
       }
       foo: [
-        for _, a in 〈0;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
+        for _, a in 〈1;s〉 if (〈0;a〉.b != _|_(explicit error (_|_ literal) in source)) {
           〈1;a〉
         },
       ]

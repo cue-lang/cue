@@ -179,7 +179,7 @@ for k, v in deployment {
         spec: {
           containers: [
             {
-              name: 〈4;_name〉
+              name: 〈5;_name〉
             },
           ]
         }
@@ -211,7 +211,7 @@ for k, v in deployment {
         }
         spec: {
           ports: [
-            for _, c in 〈4;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export {
+            for _, c in 〈5;v〉.spec.template.spec.containers for _, p in 〈0;c〉.ports if 〈0;p〉._export {
               port: (*〈0;let Port〉|int)
               targetPort: (*〈0;let Port〉|int)
             },

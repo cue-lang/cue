@@ -1188,7 +1188,15 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 		n.addStruct(env, x, id)
 
 	case *ListLit:
-		n.lists = append(n.lists, envList{env: env, list: x, id: id})
+		childEnv := &Environment{
+			Up:     env,
+			Vertex: n.node,
+		}
+		if env != nil {
+			childEnv.Cyclic = env.Cyclic
+			childEnv.Deref = env.Deref
+		}
+		n.lists = append(n.lists, envList{env: childEnv, list: x, id: id})
 
 	case *DisjunctionExpr:
 		n.addDisjunction(env, x, id)
@@ -2038,7 +2046,7 @@ func (n *nodeContext) addLists() (oneOfTheLists Expr, anID CloseInfo) {
 
 outer:
 	for i, l := range n.lists {
-		n.updateCyclicStatus(l.env)
+		n.updateCyclicStatus(l.env.Up)
 
 		index := int64(0)
 		hasComprehension := false

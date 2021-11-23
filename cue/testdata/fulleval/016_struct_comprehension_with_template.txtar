@@ -110,7 +110,7 @@ service:
 --- in.cue
 {
   result: [
-    for _, v in 〈0;service〉 {
+    for _, v in 〈1;service〉 {
       〈1;v〉
     },
   ]

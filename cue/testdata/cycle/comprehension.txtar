@@ -99,7 +99,7 @@ Issue486: {
     a: {
       parent: ""
       children: [
-        for k, v in 〈2;A〉 if (〈0;v〉.parent == 〈0;k〉) {
+        for k, v in 〈3;A〉 if (〈0;v〉.parent == 〈0;k〉) {
           〈1;k〉
         },
       ]
@@ -107,7 +107,7 @@ Issue486: {
     b: {
       parent: "a"
       children: [
-        for k, v in 〈2;A〉 if (〈0;v〉.parent == 〈0;k〉) {
+        for k, v in 〈3;A〉 if (〈0;v〉.parent == 〈0;k〉) {
           〈1;k〉
         },
       ]
@@ -117,7 +117,7 @@ Issue486: {
     a: {
       parent: ""
       children: [
-        for k, v in 〈2;B〉 for _, w in 〈0;v〉.children {
+        for k, v in 〈3;B〉 for _, w in 〈0;v〉.children {
           〈2;k〉
         },
       ]
@@ -147,7 +147,7 @@ Issue486: {
     A: {
       [string]: {
         children: [
-          for k, v in 〈2;A〉 if (〈0;v〉.parent == 〈2;-〉) {
+          for k, v in 〈3;A〉 if (〈0;v〉.parent == 〈3;-〉) {
             〈1;k〉
           },
         ]

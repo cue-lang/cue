@@ -44,7 +44,7 @@ Result:
     },
   ]
   b: [
-    for _, x in 〈0;a〉 {
+    for _, x in 〈1;a〉 {
       〈1;x〉
     },
   ]

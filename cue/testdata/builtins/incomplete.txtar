@@ -278,7 +278,7 @@ Result:
     ])
     Top: [
       [
-        for _, F in 〈0;_Sub〉 {
+        for _, F in 〈2;_Sub〉 {
           〈1;F〉
         },
       ],
@@ -295,7 +295,7 @@ Result:
       ...,
     ])
     _Top: [
-      for _, F in 〈0;#Sub〉 {
+      for _, F in 〈1;#Sub〉 {
         〈1;F〉
       },
     ]
@@ -316,7 +316,7 @@ Result:
       param: int
       transformed: +〈0;param〉
       max: 〈import;list〉.Max([
-        〈0;transformed〉,
+        〈1;transformed〉,
       ])
     }
   }
@@ -328,7 +328,7 @@ Result:
       param: string
       transformed: (〈0;param〉 + "")
       joined: 〈import;strings〉.Join([
-        〈0;transformed〉,
+        〈1;transformed〉,
       ], "-")
     }
   }

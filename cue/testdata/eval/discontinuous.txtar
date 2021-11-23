@@ -22,7 +22,7 @@ x: {
 --- in.cue
 {
   a: [
-    for _, c in 〈0;foo〉.bar.baz {
+    for _, c in 〈1;foo〉.bar.baz {
       〈1;c〉
     },
   ]

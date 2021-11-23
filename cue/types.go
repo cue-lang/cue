@@ -2273,7 +2273,7 @@ func (v Value) Expr() (Op, []Value) {
 		for i, disjunct := range x.Values {
 			if i < x.NumDefaults {
 				for _, n := range x.Values[x.NumDefaults:] {
-					if subsume.Value(v.ctx(), n, disjunct) == nil {
+					if subsume.Simplify.Value(v.ctx(), n, disjunct) == nil {
 						continue outer
 					}
 				}
@@ -2311,7 +2311,7 @@ func (v Value) Expr() (Op, []Value) {
 						continue
 					}
 					a.Parent = v.v.Parent
-					if !n.Default && subsume.Value(ctx, &a, &b) == nil {
+					if !n.Default && subsume.Simplify.Value(ctx, &a, &b) == nil {
 						continue outerExpr
 					}
 				}

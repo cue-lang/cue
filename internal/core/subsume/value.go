@@ -166,6 +166,16 @@ func (s *subsumer) values(a, b adt.Value) (result bool) {
 		return subsumed
 
 	case *adt.Disjunction:
+
+		if s.LeftDefault {
+			a = adt.Default(a)
+			var ok bool
+			x, ok = a.(*adt.Disjunction)
+			if !ok {
+				return s.values(a, b)
+			}
+		}
+
 		// A Disjunction subsumes another Disjunction if all values of y are
 		// subsumed by any of the values of x, and default values in y are
 		// subsumed by the default values of x.

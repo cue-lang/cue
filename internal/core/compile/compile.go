@@ -650,10 +650,10 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		return c.comprehension(x)
 
 	case *ast.EmbedDecl: // Deprecated
-		return c.embed(x.Expr)
+		return c.expr(x.Expr)
 
 	case ast.Expr:
-		return c.embed(x)
+		return c.expr(x)
 	}
 	return nil
 }
@@ -767,18 +767,6 @@ func (c *compiler) comprehension(x *ast.Comprehension) adt.Elem {
 	}
 
 	return first
-}
-
-func (c *compiler) embed(expr ast.Expr) adt.Expr {
-	switch n := expr.(type) {
-	case *ast.StructLit:
-		c.pushScope(nil, 1, n)
-		v := &adt.StructLit{Src: n}
-		c.addDecls(v, n.Elts)
-		c.popScope()
-		return v
-	}
-	return c.expr(expr)
 }
 
 func (c *compiler) labeledExpr(f *ast.Field, lab labeler, expr ast.Expr) adt.Expr {

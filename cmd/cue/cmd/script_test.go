@@ -27,6 +27,7 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/google/shlex"
 	"github.com/rogpeppe/go-internal/goproxytest"
 	"github.com/rogpeppe/go-internal/gotooltest"
 	"github.com/rogpeppe/go-internal/testscript"
@@ -154,13 +155,10 @@ func TestX(t *testing.T) {
 			continue
 		}
 
-		// TODO: Ugly hack to get args. Do more principled parsing.
-		var args []string
-		for _, a := range strings.Split(cmd, " ")[1:] {
-			args = append(args, strings.Trim(a, "'"))
-		}
+		args, err := shlex.Split(cmd)
+		check(err)
 
-		c, err := New(args)
+		c, err := New(args[1:])
 		check(err)
 		b := &bytes.Buffer{}
 		c.SetOutput(b)

@@ -88,11 +88,11 @@ var closeBuiltin = &adt.Builtin{
 		if s.IsClosedStruct() {
 			return s
 		}
-		v := *s
+		v := s.Clone()
 		// TODO(perf): do not copy the arc, but rather find a way to mark the
 		// calling nodeContext.
 		v.BaseValue = &adt.StructMarker{NeedClose: true}
-		return &v
+		return v
 	},
 }
 

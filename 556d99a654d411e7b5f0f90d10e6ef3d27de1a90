@@ -16,6 +16,24 @@
       "message": "It would be nice if the testscript package exposed something to make this sort of thing easier... but hey.",
       "revId": "556d99a654d411e7b5f0f90d10e6ef3d27de1a90",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "d377398c_b0e6d188",
+        "filename": "cmd/cue/cmd/script_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 158,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-23T16:56:43Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "bcd0d146_119c6828",
+      "revId": "556d99a654d411e7b5f0f90d10e6ef3d27de1a90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

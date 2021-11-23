@@ -125,7 +125,7 @@ as Unicode letters, and those in the Number category Nd as Unicode digits.
 The underscore character _ (U+005F) is considered a letter.
 
 ```
-letter        = unicode_letter | "_" .
+letter        = unicode_letter | "_" | "$" .
 decimal_digit = "0" … "9" .
 binary_digit  = "0" … "1" .
 octal_digit   = "0" … "7" .

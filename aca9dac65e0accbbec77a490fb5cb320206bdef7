@@ -16,6 +16,23 @@
       "message": "Noting that the unity failures here are all related to changes in whitespace formatting of the yaml output. ",
       "revId": "aca9dac65e0accbbec77a490fb5cb320206bdef7",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7ed06509_3471078c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-23T16:06:52Z",
+      "side": 1,
+      "message": "The unity failures can be ignored. \n\nBut once merged, please let me know and I will manually override the failing unity test with the fixed output.",
+      "revId": "aca9dac65e0accbbec77a490fb5cb320206bdef7",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

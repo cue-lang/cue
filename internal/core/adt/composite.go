@@ -217,6 +217,12 @@ type Vertex struct {
 	Structs []*StructInfo
 }
 
+func (v *Vertex) Clone() *Vertex {
+	c := *v
+	c.state = nil
+	return &c
+}
+
 type StructInfo struct {
 	*StructLit
 

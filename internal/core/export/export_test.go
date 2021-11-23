@@ -337,3 +337,44 @@ func TestFromGo(t *testing.T) {
 		t.Errorf("incorrect ordering: %s\n", got)
 	}
 }
+
+func TestFromAPI(t *testing.T) {
+	testCases := []struct {
+		expr ast.Expr
+		out  string
+	}{{
+		expr: ast.NewCall(ast.NewIdent("close"), ast.NewStruct()),
+		out:  `close({})`,
+	}, {
+		expr: ast.NewCall(ast.NewIdent("close"), ast.NewStruct(
+			"a", ast.NewString("foo"),
+		)),
+		out: `close({a: "foo"})`,
+	}, {
+		expr: ast.NewCall(ast.NewIdent("close"), ast.NewStruct(
+			ast.Embed(ast.NewStruct("a", ast.NewString("foo"))),
+		)),
+		out: `close({a: "foo"})`,
+	}}
+	// Issue #1204
+	for _, tc := range testCases {
+		t.Run("", func(t *testing.T) {
+			ctx := cuecontext.New()
+
+			v := ctx.BuildExpr(tc.expr)
+
+			r, x := value.ToInternal(v)
+			file, err := export.Def(r, "foo", x)
+
+			if err != nil {
+				t.Fatal(err)
+			}
+
+			got := astinternal.DebugStr(file)
+			if got != tc.out {
+				t.Errorf("got:  %s\nwant: %s", got, tc.out)
+			}
+
+		})
+	}
+}

@@ -62,10 +62,10 @@ issue574: {
   ]
   a: [
     3,
-    for _, x in 〈0;list〉 {
+    for _, x in 〈1;list〉 {
       〈1;x〉
     },
-    for _, x in 〈0;list〉 {
+    for _, x in 〈1;list〉 {
       〈1;x〉
     },
   ]
@@ -74,7 +74,7 @@ issue574: {
     if true {
       3
     },
-    for _, x in 〈0;list〉 if (〈0;x〉 > 2) {
+    for _, x in 〈1;list〉 if (〈0;x〉 > 2) {
       〈1;x〉
     },
   ]
@@ -82,18 +82,18 @@ issue574: {
     greet: true
     bye: true
     message1: [
-      if 〈0;greet〉 {
+      if 〈1;greet〉 {
         "hello"
       },
       "how are you doing?",
       "bye",
     ]
     message2: [
-      if !〈0;greet〉 {
+      if !〈1;greet〉 {
         "hello"
       },
       "how are you doing?",
-      if 〈0;bye〉 {
+      if 〈1;bye〉 {
         "bye"
       },
     ]

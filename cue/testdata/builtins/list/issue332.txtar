@@ -38,7 +38,7 @@ r: #foo & {
   #d: {
     #x: string
     result: [
-      〈0;#x〉,
+      〈1;#x〉,
     ]
   }
   #foo: {

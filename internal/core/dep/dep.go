@@ -185,6 +185,7 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Expr) {
 		c.markExpr(env, x.Stride)
 
 	case *adt.ListLit:
+		env := &adt.Environment{Up: env, Vertex: empty}
 		for _, e := range x.Elems {
 			switch x := e.(type) {
 			case adt.Yielder:

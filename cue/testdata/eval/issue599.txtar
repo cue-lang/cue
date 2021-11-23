@@ -145,13 +145,13 @@ b: {
     #A: {
       n: string
       depends_on: [
-        ...〈1;#AnyA〉,
+        ...〈2;#AnyA〉,
       ]
     }
     #AnyA: {
       n: string
       depends_on: [
-        ...〈1;#AnyA〉,
+        ...〈2;#AnyA〉,
       ]
       ...
     }
@@ -183,7 +183,7 @@ b: {
       bar: (〈1;#A2〉 & {
         i: "hello bar"
         depends_on: [
-          〈2;s〉.foo,
+          〈3;s〉.foo,
         ]
       })
     }

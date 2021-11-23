@@ -59,7 +59,7 @@ d:
 --- in.cue
 {
   a: [
-    for k, v in 〈0;b〉 if (〈0;k〉 < "d") if (〈0;v〉 > 〈1;b〉.a) {
+    for k, v in 〈1;b〉 if (〈0;k〉 < "d") if (〈0;v〉 > 〈2;b〉.a) {
       〈1;k〉
     },
   ]
@@ -70,12 +70,12 @@ d:
     d: 4
   }
   c: [
-    for _, x in 〈0;b〉 for _, y in 〈1;b〉 if (〈1;x〉 < 〈0;y〉) {
+    for _, x in 〈1;b〉 for _, y in 〈2;b〉 if (〈1;x〉 < 〈0;y〉) {
       〈2;x〉
     },
   ]
   d: [
-    for x, _ in 〈0;a〉 {
+    for x, _ in 〈1;a〉 {
       〈1;x〉
     },
   ]

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ecf9f76d_f8e82d8d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:22:27Z",
+      "side": 1,
+      "message": "unity result can be ignored; relates to list scope CL.",
+      "revId": "8ad834888b7d4611ce918cbd31463d2195367510",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5aefbcf8_1ceed755",
+        "filename": "cue/testdata/references/let.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:22:27Z",
+      "side": 1,
+      "message": "I\u0027m again assuming the ordering is significant here compared to b?",
+      "revId": "8ad834888b7d4611ce918cbd31463d2195367510",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -3371,6 +3371,14 @@ func TestExpr(t *testing.T) {
 	}, {
 		input: `v: and([])`,
 		want:  `_`,
+	}, {
+		// Issue #1119
+		// Unwrap single embedded values.
+		input: `v: {>30}`,
+		want:  `>(30)`,
+	}, {
+		input: `v: {>30, <40}`,
+		want:  `&(>(30) <(40))`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.input, func(t *testing.T) {

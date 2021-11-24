@@ -203,6 +203,22 @@ func TestGenerated(t *testing.T) {
 		},
 		out: `"foo", #enum: 2`,
 		p:   export.All,
+	}, {
+		// Issue #1131
+		in: func(r *adt.OpContext) (adt.Expr, error) {
+			m := make(map[string]interface{})
+			v := ctx.Encode(m)
+			_, x := value.ToInternal(v)
+			return x, nil
+		},
+		out: ``, // empty file
+	}, {
+		in: func(r *adt.OpContext) (adt.Expr, error) {
+			v := &adt.Vertex{}
+			v.SetValue(r, adt.Finalized, &adt.StructMarker{})
+			return v, nil
+		},
+		out: ``, // empty file
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {

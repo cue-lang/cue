@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce1ea4ef_b00e5cff",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:18:09Z",
+      "side": 1,
+      "message": "unity failure is as a result of the previous CL and so can be ignored.",
+      "revId": "b975253b2da90012d6cbc365c43f4d927364360c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

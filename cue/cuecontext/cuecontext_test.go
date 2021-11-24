@@ -35,6 +35,15 @@ func TestAPI(t *testing.T) {
 			return ctx.BuildExpr(expr)
 		},
 		want: `close({})`,
+	}, {
+		name: "issue1131",
+		fun: func() cue.Value {
+			m := make(map[string]interface{})
+			ctx := New()
+			cv := ctx.Encode(m)
+			return cv
+		},
+		want: "", // empty file.
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {

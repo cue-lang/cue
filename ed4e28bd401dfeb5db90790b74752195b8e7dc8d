@@ -1,0 +1,123 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "44e66695_9c311c77",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "LGTM with a few questions which I\u0027m sure will turn out to be my misunderstanding.\n\nFYI - the diff from unity is \"valid\" in so far as it appears to be genuine bug fix. \n\n    $ git diff overlays/projects/github.com/timberio/vector/eval.txt\n    diff --git a/overlays/projects/github.com/timberio/vector/eval.txt b/overlays/projects/github.com/timberio/vector/eval.txt\n    index fec906d9..ac61b75c 100644\n    --- a/overlays/projects/github.com/timberio/vector/eval.txt\n    +++ b/overlays/projects/github.com/timberio/vector/eval.txt\n    @@ -332,6 +332,7 @@ let Args_3318F1204D \u003d _args\n             }\n         }\n     }\n    +let Type \u003d _type\n     #TypeArray: {\n         _args: {\n             required: bool\n\nThat is to say, previously the result of the cue eval for vector elided this let clause, but under this change it does not. ",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c73215a9_2cfbb0fa",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "This comment can now go, no?",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "00cef9d7_554d8d8a",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "Isn\u0027t this identical to v1, bar the ordering of fields? Might be worth adding a comment here to explain the significance of the re-ordering if so?",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a5564568_5cc87455",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "I\u0027m not sure this error message makes sense, does it? Because y is not in scope in the context of b4.b?",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e2243334_c6e6a028",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "Same comment as for b4.",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b39849e_752925f2",
+        "filename": "cue/testdata/eval/issue494.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "Is the \u0027-\u0027 instead of \u0027rn\u0027 expected here?",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a987f247_e1023b1f",
+        "filename": "tools/flow/flow_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:11:07Z",
+      "side": 1,
+      "message": "I think you mentioned this was an unintentional diff.",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

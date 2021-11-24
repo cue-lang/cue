@@ -2467,9 +2467,10 @@ func (v Value) Expr() (Op, []Value) {
 			a = append(a, makeValue(v.idx, n, v.parent_))
 		}
 
-		if len(a) > 1 {
-			op = adt.AndOp
+		if len(a) == 1 {
+			return a[0].Expr()
 		}
+		op = adt.AndOp
 
 	default:
 		a = append(a, v)

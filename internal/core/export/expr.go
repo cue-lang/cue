@@ -173,7 +173,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			if len(e.attrs) > 0 {
 				break
 			}
-			if len(e.structs) > 0 {
+			if len(e.structs) > 0 || e.isStruct {
 				return e.wrapCloseIfNecessary(s, src)
 			}
 			return ast.NewIdent("_")
@@ -278,6 +278,10 @@ type conjuncts struct {
 	fields      map[adt.Feature]field
 	attrs       []*ast.Attribute
 	hasEllipsis bool
+
+	// A value is a struct if it has a non-zero structs slice or if isStruct is
+	// set to true. Data vertices may not have conjuncts associated with them.
+	isStruct bool
 }
 
 func (c *conjuncts) addValueConjunct(src *adt.Vertex, env *adt.Environment, x adt.Expr) {
@@ -376,6 +380,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Expr, i
 
 			case v.IsData():
 				e.structs = append(e.structs, v.Structs...)
+				e.isStruct = true
 
 				if y, ok := v.BaseValue.(adt.Value); ok {
 					e.addValueConjunct(src, env, y)

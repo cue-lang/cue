@@ -2643,6 +2643,19 @@ func TestMarshalJSON(t *testing.T) {
 		y: _
 		`,
 		err: `x: cannot range over y (incomplete type _)`,
+	}, {
+		value: `
+		package foo
+
+		#SomeBaseType: {
+			"a" | "b"
+			#AUTO: "z"
+		}
+
+		V1: ("x" | "y") | *"z"
+		V2: ("x" | "y") | *#SomeBaseType.#AUTO
+		`,
+		err: "cue: marshal error: V2: cannot convert incomplete value \"|((string){ \\\"x\\\" }, (string){ \\\"y\\\" })\" to JSON",
 	}}
 	for i, tc := range testCases {
 		t.Run(fmt.Sprintf("%d/%v", i, tc.value), func(t *testing.T) {

@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ea873bdc_d81bbffa",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:12:11Z",
+      "side": 1,
+      "message": "LGTM with a few questions which I\u0027m sure will turn out to be my misunderstanding.\n\nFYI - the diff from unity is \"valid\" in so far as it appears to be genuine bug fix. \n\n    $ git diff overlays/projects/github.com/timberio/vector/eval.txt\n    diff --git a/overlays/projects/github.com/timberio/vector/eval.txt b/overlays/projects/github.com/timberio/vector/eval.txt\n    index fec906d9..ac61b75c 100644\n    --- a/overlays/projects/github.com/timberio/vector/eval.txt\n    +++ b/overlays/projects/github.com/timberio/vector/eval.txt\n    @@ -332,6 +332,7 @@ let Args_3318F1204D \u003d _args\n             }\n         }\n     }\n    +let Type \u003d _type\n     #TypeArray: {\n         _args: {\n             required: bool\n\nThat is to say, previously the result of the cue eval for vector elided this let clause, but under this change it does not. ",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c73215a9_2cfbb0fa",

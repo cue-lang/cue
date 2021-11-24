@@ -56,7 +56,7 @@ func (v *Vertex) Default() *Vertex {
 		case 0:
 			return v
 		case 1:
-			w = d.Values[0]
+			w = d.Values[0].Default()
 		default:
 			x := *v
 			x.state = nil
@@ -66,13 +66,15 @@ func (v *Vertex) Default() *Vertex {
 				NumDefaults: 0,
 			}
 			w = &x
+			w.Conjuncts = nil
 		}
 
-		w.Conjuncts = nil
-		for _, c := range v.Conjuncts {
-			// TODO: preserve field information.
-			expr, _ := stripNonDefaults(c.Expr())
-			w.Conjuncts = append(w.Conjuncts, MakeRootConjunct(c.Env, expr))
+		if w.Conjuncts == nil {
+			for _, c := range v.Conjuncts {
+				// TODO: preserve field information.
+				expr, _ := stripNonDefaults(c.Expr())
+				w.Conjuncts = append(w.Conjuncts, MakeRootConjunct(c.Env, expr))
+			}
 		}
 		return w
 

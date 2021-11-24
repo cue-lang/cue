@@ -63,6 +63,18 @@ incompleteLet: {
         }
     }
 }
+issue1116: {
+  a: {
+    #a: ["a", "b"]
+    let List = #a
+    List[len(List)-1]
+  }
+  b: {
+    let List = #a
+    List[len(List)-1]
+    #a: ["a", "b"]
+  }
+}
 
 -- out/compile --
 --- in.cue
@@ -183,6 +195,22 @@ incompleteLet: {
       if (〈import;list〉.max < 0) {}
     }
   }
+  issue1116: {
+    a: {
+      #a: [
+        "a",
+        "b",
+      ]
+      〈0;let List〉[(len(〈0;let List〉) - 1)]
+    }
+    b: {
+      〈0;let List〉[(len(〈0;let List〉) - 1)]
+      #a: [
+        "a",
+        "b",
+      ]
+    }
+  }
 }
 -- out/eval --
 (struct){
@@ -280,6 +308,22 @@ incompleteLet: {
     x: (_|_){
       // [incomplete] incompleteLet.x: undefined field: max:
       //     ./in.cue:61:17
+    }
+  }
+  issue1116: (struct){
+    a: (string){
+      "b"
+      #a: (#list){
+        0: (string){ "a" }
+        1: (string){ "b" }
+      }
+    }
+    b: (string){
+      "b"
+      #a: (#list){
+        0: (string){ "a" }
+        1: (string){ "b" }
+      }
     }
   }
 }

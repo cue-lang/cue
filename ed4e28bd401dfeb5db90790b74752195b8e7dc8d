@@ -35,6 +35,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e2a4bd6b_9704316f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-24T21:12:46Z",
+      "side": 1,
+      "message": "Please ignore the duplicate response.\n\nAlso, just to flag I rebased this stack so please update your local branch.",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "c73215a9_2cfbb0fa",

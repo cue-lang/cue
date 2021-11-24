@@ -2,6 +2,7 @@
 import (
   "list"
   "strings"
+  "text/template"
 )
 
 
@@ -87,15 +88,27 @@ badListError: {
     str:     strings.Join(x, "")
 }
 
+// Issue #1095
+// Preserve combined error severity for multiple errors.
+multipleErrors: {
+    #T: {
+      params: {
+        x: string
+        y: string
+      }
+      out: template.Execute("{{.x}} {{.y}}", params)
+    }
+}
+
 -- out/eval --
 Errors:
 badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-    ./in.cue:77:8
+    ./in.cue:78:8
 badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-    ./in.cue:77:8
+    ./in.cue:78:8
 badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-    ./in.cue:83:8
     ./in.cue:84:8
+    ./in.cue:85:8
 
 Result:
 (_|_){
@@ -104,30 +117,30 @@ Result:
     Out1: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:16:23
+        //     ./in.cue:17:23
       }
     }
     Out2: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:16:23
+        //     ./in.cue:17:23
       }
     }
     Out3: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:16:23
+        //     ./in.cue:17:23
       }
     }
     Top: (#list){
       0: (_|_){
         // [cycle] cycle error:
-        //     ./in.cue:16:23
+        //     ./in.cue:17:23
       }
     }
     _Sub: (_|_){
       // [incomplete] list1._Sub: undefined field: b:
-      //     ./in.cue:19:13
+      //     ./in.cue:20:13
     }
     a: (struct){
     }
@@ -135,23 +148,23 @@ Result:
   list2: (struct){
     Out1: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:30:21
+      //     ./in.cue:31:21
     }
     Out2: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:30:21
+      //     ./in.cue:31:21
     }
     Out3: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:30:21
+      //     ./in.cue:31:21
     }
     _Top: (_|_){
       // [cycle] cycle error:
-      //     ./in.cue:30:21
+      //     ./in.cue:31:21
     }
     #Sub: (_|_){
       // [incomplete] list2.#Sub: undefined field: b:
-      //     ./in.cue:33:13
+      //     ./in.cue:34:13
     }
     a: (struct){
     }
@@ -159,12 +172,12 @@ Result:
   value1: (struct){
     a: (_|_){
       // [incomplete] value1.a: unresolved disjunction 'sf' | 'dd' (type bytes):
-      //     ./in.cue:38:8
+      //     ./in.cue:39:8
     }
   }
   value2: (_|_){
     // [incomplete] value2: unresolved disjunction 'sf' | 'dd' (type bytes):
-    //     ./in.cue:42:5
+    //     ./in.cue:43:5
   }
   incompleteArgDecimalList: (struct){
     a: (#struct){
@@ -176,11 +189,11 @@ Result:
       param: (int){ int }
       transformed: (_|_){
         // [incomplete] incompleteArgDecimalList.#a.transformed: operand param of '+' not concrete (was int):
-        //     ./in.cue:49:23
+        //     ./in.cue:50:23
       }
       max: (_|_){
         // [incomplete] 0: operand param of '+' not concrete (was int):
-        //     ./in.cue:49:23
+        //     ./in.cue:50:23
       }
     }
   }
@@ -194,13 +207,13 @@ Result:
       param: (string){ string }
       transformed: (_|_){
         // [incomplete] incompleteArgStringList.#a.transformed: non-concrete value string in operand to +:
-        //     ./in.cue:58:22
-        //     ./in.cue:57:9
+        //     ./in.cue:59:22
+        //     ./in.cue:58:9
       }
       joined: (_|_){
         // [incomplete] 0: non-concrete value string in operand to +:
-        //     ./in.cue:58:22
-        //     ./in.cue:57:9
+        //     ./in.cue:59:22
+        //     ./in.cue:58:9
       }
     }
   }
@@ -208,29 +221,29 @@ Result:
     x: (_){ _ }
     decimal: (_|_){
       // [incomplete] incompleteList.decimal: non-concrete list for argument 0:
-      //     ./in.cue:65:14
+      //     ./in.cue:66:14
     }
     str: (_|_){
       // [incomplete] incompleteList.str: non-concrete list for argument 0:
-      //     ./in.cue:66:14
+      //     ./in.cue:67:14
     }
   }
   incompleteListError: (struct){
     x: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:70:8
-      //     ./in.cue:71:5
+      //     ./in.cue:71:8
+      //     ./in.cue:72:5
     }
     y: (_){ _ }
     decimal: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:70:8
-      //     ./in.cue:71:5
+      //     ./in.cue:71:8
+      //     ./in.cue:72:5
     }
     str: (_|_){
       // [incomplete] incompleteListError.x: non-concrete value _ in operand to +:
-      //     ./in.cue:70:8
-      //     ./in.cue:71:5
+      //     ./in.cue:71:8
+      //     ./in.cue:72:5
     }
   }
   badListType: (_|_){
@@ -238,30 +251,43 @@ Result:
     x: (int){ 2 }
     decimal: (_|_){
       // [eval] badListType.decimal: cannot use 2 (type int) as list in argument 1 to list.Max:
-      //     ./in.cue:77:8
+      //     ./in.cue:78:8
     }
     str: (_|_){
       // [eval] badListType.str: cannot use 2 (type int) as list in argument 1 to strings.Join:
-      //     ./in.cue:77:8
+      //     ./in.cue:78:8
     }
   }
   badListError: (_|_){
     // [eval]
     x: (_|_){
       // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:83:8
       //     ./in.cue:84:8
+      //     ./in.cue:85:8
     }
     y: (string){ "foo" }
     decimal: (_|_){
       // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:83:8
       //     ./in.cue:84:8
+      //     ./in.cue:85:8
     }
     str: (_|_){
       // [eval] badListError.x: invalid operands 2 and "foo" to '+' (type int and string):
-      //     ./in.cue:83:8
       //     ./in.cue:84:8
+      //     ./in.cue:85:8
+    }
+  }
+  multipleErrors: (struct){
+    #T: (#struct){
+      params: (#struct){
+        x: (string){ string }
+        y: (string){ string }
+      }
+      out: (_|_){
+        // [incomplete] error in call to text/template.Execute: cannot convert non-concrete value string:
+        //     ./in.cue:98:12
+        //     ./in.cue:95:9
+      }
     }
   }
 }
@@ -353,5 +379,14 @@ Result:
     y: "foo"
     decimal: 〈import;list〉.Max(〈0;x〉)
     str: 〈import;strings〉.Join(〈0;x〉, "")
+  }
+  multipleErrors: {
+    #T: {
+      params: {
+        x: string
+        y: string
+      }
+      out: 〈import;"text/template"〉.Execute("{{.x}} {{.y}}", 〈0;params〉)
+    }
   }
 }

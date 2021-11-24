@@ -203,6 +203,15 @@ func TestDecode(t *testing.T) {
 		value: `{"300": 3}`,
 		dst:   &map[uint8]int{},
 		err:   "key integer 300 overflows uint8",
+	}, {
+		// Issue #1401
+		value: `a: b: _ | *[0, ...]`,
+		dst:   &map[string]interface{}{},
+		want: map[string]interface{}{
+			"a": map[string]interface{}{
+				"b": []interface{}{int(0)},
+			},
+		},
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {

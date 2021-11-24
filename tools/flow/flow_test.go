@@ -204,7 +204,7 @@ func TestX(t *testing.T) {
 	}
 
 	c := flow.New(&flow.Config{
-		// Root: cue.ParsePath("root"),
+		Root: cue.ParsePath("root"),
 	}, inst, taskFunc)
 
 	t.Error(mermaidGraph(c))

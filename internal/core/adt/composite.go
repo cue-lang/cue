@@ -142,7 +142,9 @@ func (e *Environment) evalCached(c *OpContext, x Expr) Value {
 		c.e, c.src = e, x.Source()
 		v = c.evalState(x, Partial) // TODO: should this be Finalized?
 		c.e, c.src = env, src
-		e.cache[x] = v
+		if b, ok := v.(*Bottom); !ok || !b.IsIncomplete() {
+			e.cache[x] = v
+		}
 	}
 	return v
 }

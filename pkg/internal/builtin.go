@@ -206,7 +206,21 @@ func processErr(call *CallCtxt, errVal interface{}, ret adt.Expr) adt.Expr {
 		}
 	case bottomer:
 		ret = wrapCallErr(call, err.Bottom())
+
 	case errors.Error:
+		// Convert lists of errors to a combined Bottom error.
+		if list := errors.Errors(err); len(list) != 0 && list[0] != errVal {
+			var errs *adt.Bottom
+			for _, err := range list {
+				if b, ok := processErr(call, err, nil).(*adt.Bottom); ok {
+					errs = adt.CombineErrors(nil, errs, b)
+				}
+			}
+			if errs != nil {
+				return errs
+			}
+		}
+
 		ret = wrapCallErr(call, &adt.Bottom{Err: err})
 	case error:
 		if call.Err == internal.ErrIncomplete {

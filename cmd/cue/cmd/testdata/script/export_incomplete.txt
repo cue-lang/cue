@@ -1,0 +1,48 @@
+#Issue 1153
+#Issue 1152
+
+# Default export mode
+! exec cue export x.cue
+stderr 'incomplete'
+
+# JSON
+! exec cue export --out json x.cue
+stderr 'incomplete'
+
+# Yaml
+! exec cue export --out yaml x.cue
+stderr 'incomplete'
+
+# CUE data
+! exec cue export --out cue x.cue
+stderr 'incomplete'
+
+# Concrete
+! exec cue eval -c x.cue
+stderr 'incomplete'
+
+# CUE
+exec cue eval --out cue x.cue
+cmp stdout expect-cue
+
+-- x.cue --
+package foo
+
+#SomeBaseType: {
+	"a" | "b"
+	#AUTO: "z"
+}
+
+V1: ("x" | "y") | *"z"
+V2: ("x" | "y") | *#SomeBaseType.#AUTO
+
+-- expect-cue --
+#SomeBaseType: {
+    "a"
+    #AUTO: "z"
+} | {
+    "b"
+    #AUTO: "z"
+}
+V1: "z"
+V2: "x" | "y"

@@ -16,6 +16,24 @@
       "message": "I can\u0027t say I fully understand everything (like the cache@v2 change), but LGTM",
       "revId": "af92ee8f2d4cf33cb02ca6a1740a229fb7aeb313",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "b05c2cd0_ec2b0ead",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-25T11:30:40Z",
+      "side": 1,
+      "message": "action/cache@v2 is a way of specifying in a very loose way what version of the actions/cache(@v2) action we want. It says \"give us the latest v2 version\". Strictly speaking we should require a specific semver version... but given this is a \"trusted\" GitHub-maintained action we are a bit more relaxed.",
+      "parentUuid": "0a2905b6_8b8b8ac4",
+      "revId": "af92ee8f2d4cf33cb02ca6a1740a229fb7aeb313",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

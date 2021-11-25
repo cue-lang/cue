@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "ee88b3a9_23d2a29f",
+        "filename": "logo.svg",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1019617
+      },
+      "writtenOn": "2021-11-25T19:29:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2fe2d09c_9be5b4d9",
+      "revId": "fe53bcbcd2b50677ab09e07fbd61d0a84d0f7820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "f36c6e6b_023ce5a4",
@@ -48,6 +66,24 @@
       "writtenOn": "2021-11-25T11:16:12Z",
       "side": 1,
       "message": "Suspect this is meant to be /logo.svg?\n\nFollowing the other suggestion, I guess it should then be /.github/logo.svg",
+      "revId": "fe53bcbcd2b50677ab09e07fbd61d0a84d0f7820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "46d90a53_b81e505e",
+        "filename": "navbar.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1019617
+      },
+      "writtenOn": "2021-11-25T19:29:43Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f36c6e6b_023ce5a4",
       "revId": "fe53bcbcd2b50677ab09e07fbd61d0a84d0f7820",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

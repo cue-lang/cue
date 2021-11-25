@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "5359795e_1d7ccabb",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019617
+      },
+      "writtenOn": "2021-11-25T19:29:43Z",
+      "side": 1,
+      "message": "Resolved the two suggestions. Please let me know if it is desired to add other links to the navigation header. ",
+      "revId": "d45ea038563d13285ba541162d86e7c21523e75a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -227,6 +227,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "22485cf0_199dabba",
+        "filename": "cue/testdata/eval/issue494.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 93,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:52:07Z",
+      "side": 1,
+      "message": "Yeah. Because it refers to an alias, not an identifier. The alias refers to an offset field name, and as such it does not need to have an identifier associated to it.",
+      "parentUuid": "3b39849e_752925f2",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a987f247_e1023b1f",
@@ -240,6 +258,24 @@
       "writtenOn": "2021-11-24T21:11:07Z",
       "side": 1,
       "message": "I think you mentioned this was an unintentional diff.",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "98cddf03_b33cddc7",
+        "filename": "tools/flow/flow_test.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 207,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:52:07Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a987f247_e1023b1f",
       "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

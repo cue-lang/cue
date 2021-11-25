@@ -54,6 +54,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "494a2fd5_e016baea",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:13:52Z",
+      "side": 1,
+      "message": "Is the let used? If it was used, it is a bug fix. If it wasn\u0027t, it may be a bug.",
+      "parentUuid": "44e66695_9c311c77",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "c73215a9_2cfbb0fa",
         "filename": "cue/testdata/cycle/structural.txtar",
         "patchSetId": 3
@@ -65,6 +83,24 @@
       "writtenOn": "2021-11-24T21:11:07Z",
       "side": 1,
       "message": "This comment can now go, no?",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c7451bb6_bd156d94",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 68,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:13:52Z",
+      "side": 1,
+      "message": "yep",
+      "parentUuid": "c73215a9_2cfbb0fa",
       "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +122,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0d9345e2_c33dd438",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 340,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:13:52Z",
+      "side": 1,
+      "message": "Many of the tests are reordered versions of each other. Conceptually it shouldn\u0027t matter for the implementation, but that doesn\u0027t mean one shouldn\u0027t test for it.\n\nUsually I group these tests together in a separate subsection, though. Will do that.",
+      "parentUuid": "00cef9d7_554d8d8a",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a5564568_5cc87455",
@@ -103,6 +157,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a06881d0_0f192639",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 420,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:13:52Z",
+      "side": 1,
+      "message": "It is not possible to resolve `y`, though, as that would result in an infinite expansion. I think it is okay, given that the locations indicate what is going on.\n\nThings are a bit spacey with structural cycles (note that the `[y]` refers to the expansion of `[y][0]`, not the original `[y]`), but that is a bit the nature of the beast.",
+      "parentUuid": "a5564568_5cc87455",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e2243334_c6e6a028",
@@ -116,6 +188,24 @@
       "writtenOn": "2021-11-24T21:11:07Z",
       "side": 1,
       "message": "Same comment as for b4.",
+      "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "e1dd26ab_77298a9b",
+        "filename": "cue/testdata/cycle/structural.txtar",
+        "patchSetId": 3
+      },
+      "lineNbr": 440,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:13:52Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "e2243334_c6e6a028",
       "revId": "ed4e28bd401dfeb5db90790b74752195b8e7dc8d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

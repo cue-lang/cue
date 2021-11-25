@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c0a8754c_560f65ee",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-25T11:24:24Z",
+      "side": 1,
+      "message": "Nit: s/anonomous/anonymous",
+      "revId": "07c88180914f7772ad45916b612cabda36610766",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

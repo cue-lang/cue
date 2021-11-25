@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ce82977a_77d91361",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-25T11:16:12Z",
+      "side": 1,
+      "message": "Apologies for the delay in getting to this. Couple of questions/suggestions. ",
+      "revId": "fe53bcbcd2b50677ab09e07fbd61d0a84d0f7820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2fe2d09c_9be5b4d9",
+        "filename": "logo.svg",
+        "patchSetId": 2
+      },
+      "lineNbr": 1,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-25T11:16:12Z",
+      "side": 1,
+      "message": "Can we stuff this file in the .github directory to hide it away?",
+      "revId": "fe53bcbcd2b50677ab09e07fbd61d0a84d0f7820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f36c6e6b_023ce5a4",
+        "filename": "navbar.md",
+        "patchSetId": 2
+      },
+      "lineNbr": 3,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-25T11:16:12Z",
+      "side": 1,
+      "message": "Suspect this is meant to be /logo.svg?\n\nFollowing the other suggestion, I guess it should then be /.github/logo.svg",
+      "revId": "fe53bcbcd2b50677ab09e07fbd61d0a84d0f7820",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -2622,7 +2622,7 @@ or([a])              a
 or([])               _|_
 ```
 
-#### `div`, `mod`, `quo` and `rem`
+### `div`, `mod`, `quo` and `rem`
 
 For two integer values `x` and `y`,
 the integer quotient `q = div(x, y)` and remainder `r = mod(x, y)`

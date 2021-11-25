@@ -34,6 +34,24 @@
       "parentUuid": "9cce9413_bb0620f8",
       "revId": "271f461228c638303f219f3dd98112c33bec97bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2c4ee06c_bb45b826",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:20:39Z",
+      "side": 1,
+      "message": "Hmmm, the API still looks somewhat cluttered as a result. Need to do some more thinking.\n\nIt would be great if the deprecated methods were hidden by default.",
+      "parentUuid": "30002e3c_9f918a73",
+      "revId": "271f461228c638303f219f3dd98112c33bec97bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

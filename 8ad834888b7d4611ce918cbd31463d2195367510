@@ -33,6 +33,24 @@
       "message": "I\u0027m again assuming the ordering is significant here compared to b?",
       "revId": "8ad834888b7d4611ce918cbd31463d2195367510",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "399ef06e_51d938e0",
+        "filename": "cue/testdata/references/let.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 72,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T07:13:45Z",
+      "side": 1,
+      "message": "In general it is good to test all permutations. When testing CUE one should not assume that handles equivalent cases equivalently.",
+      "parentUuid": "5aefbcf8_1ceed755",
+      "revId": "8ad834888b7d4611ce918cbd31463d2195367510",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0a2905b6_8b8b8ac4",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-25T11:26:14Z",
+      "side": 1,
+      "message": "I can\u0027t say I fully understand everything (like the cache@v2 change), but LGTM",
+      "revId": "af92ee8f2d4cf33cb02ca6a1740a229fb7aeb313",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

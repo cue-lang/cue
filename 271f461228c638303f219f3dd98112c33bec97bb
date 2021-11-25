@@ -52,6 +52,24 @@
       "parentUuid": "30002e3c_9f918a73",
       "revId": "271f461228c638303f219f3dd98112c33bec97bb",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a8916310_bfdcf1de",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-25T11:01:38Z",
+      "side": 1,
+      "message": "That got discussed as part of the UI/UX design of this feature, but was ultimately declined as a suggestion (for now).",
+      "parentUuid": "2c4ee06c_bb45b826",
+      "revId": "271f461228c638303f219f3dd98112c33bec97bb",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -67,12 +67,12 @@ fieldAlias: {
 	}
 	cross: {
 		baz: 3
-		X_85="d-2": {
+		X_2="d-2": {
 			E=[D="cue"]: {
 				C="foo\(baz)": {
 					name: "xx"
 					foo:  C.name
-					bar:  X_85
+					bar:  X_2
 					baz:  D
 					qux:  E
 				}
@@ -84,8 +84,8 @@ valueAlias: {
 	merge: {
 		// Merge fields, rename alias to avoid conflict.
 		// TODO: merged values can still be simplified.
-		value: X_BA={
-			#value: X_BA.b & X_BA.b
+		value: X_3={
+			#value: X_3.b & X_3.b
 			b:      2
 			v: {
 				X: 3
@@ -95,8 +95,8 @@ valueAlias: {
 	selfRef: {
 		struct: {
 			a: {
-				b: X_57C8={
-					#foo: X_57C8.b
+				b: X_4={
+					#foo: X_4.b
 					b:    2
 				}
 			}
@@ -110,7 +110,7 @@ valueAlias: {
 			// an issue exclusive to value aliases, and falls within the
 			// range of what is acceptable for now.
 			// TODO: solve this issue.
-			a: X_35B7E=or(X_35B7E)
+			a: X_8=or(X_8)
 		}
 		pattern: {
 			// this triggers the verbatim "adt" path. Note that there

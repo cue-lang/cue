@@ -91,10 +91,10 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		attrs:    []*ast.Attribute{},
 	}
 
-	_, saved := e.pushFrame(orig)
+	s, saved := e.pushFrame(orig)
 	defer e.popFrame(saved)
 
-	// Handle value aliases
+	// Handle value aliases and lets
 	var valueAlias *ast.Alias
 	for _, c := range a {
 		if f, ok := c.c.Field().Source().(*ast.Field); ok {
@@ -110,13 +110,19 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				e.valueAlias[a] = valueAlias
 			}
 		}
+		x.markLets(c.c.Expr().Source())
 	}
+
+	defer filterUnusedLets(s)
+
 	defer func() {
 		if valueAlias != nil {
 			valueAlias.Expr = expr
 			expr = valueAlias
 		}
 	}()
+
+	hasAlias := len(s.Elts) > 0
 
 	for _, c := range a {
 		e.top().upCount = c.up
@@ -132,8 +138,6 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			}
 		}
 	}
-
-	s := x.top().scope
 
 	for _, a := range e.attrs {
 		s.Elts = append(s.Elts, a)
@@ -184,7 +188,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 			} else {
 				x = e.embed[0]
 			}
-			if len(e.attrs) == 0 {
+			if len(e.attrs) == 0 && !hasAlias {
 				return x
 			}
 			if st, ok := x.(*ast.StructLit); ok {

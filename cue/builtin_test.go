@@ -86,7 +86,7 @@ func TestBuiltins(t *testing.T) {
 		`3`,
 	}, {
 		test("encoding/json", `json.MarshalStream([{a: 1}, {b: 2}])`),
-		`"""` + "\n\t{\"a\":1}\n\t{\"b\":2}\n\t\n\t" + `"""`,
+		`"""` + "\n\t{\"a\":1}\n\t{\"b\":2}\n\n\t" + `"""`,
 	}, {
 		test("encoding/json", `{
 			x: int
@@ -98,7 +98,7 @@ func TestBuiltins(t *testing.T) {
 }`,
 	}, {
 		test("encoding/yaml", `yaml.MarshalStream([{a: 1}, {b: 2}])`),
-		`"""` + "\n\ta: 1\n\t---\n\tb: 2\n\t\n\t" + `"""`,
+		`"""` + "\n\ta: 1\n\t---\n\tb: 2\n\n\t" + `"""`,
 	}, {
 		test("struct", `struct.MinFields(0) & ""`),
 		`_|_ // conflicting values struct.MinFields(0) and "" (mismatched types struct and string)`,
@@ -131,7 +131,7 @@ func TestBuiltins(t *testing.T) {
 			v := insts[0].Value()
 			got := fmt.Sprintf("%+v", v)
 			if got != tc.emit {
-				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)
+				t.Errorf("\n got: %q\nwant: %q", got, tc.emit)
 			}
 		})
 	}

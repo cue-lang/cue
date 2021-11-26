@@ -35,6 +35,14 @@ issue852: {
   }
 }
 
+dynamic: {
+  #D: {
+    key:   "foo"
+    (key): int
+  }
+  d: #D & { foo: 3 }
+}
+
 -- out/eval --
 Errors:
 a.q: field not allowed: e:
@@ -95,6 +103,16 @@ Result:
       Foo: (string){ "foo" }
     }
   }
+  dynamic: (struct){
+    #D: (#struct){
+      key: (string){ "foo" }
+      foo: (int){ int }
+    }
+    d: (#struct){
+      key: (string){ "foo" }
+      foo: (int){ 3 }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -129,5 +147,14 @@ Result:
         "\(〈2;k〉)": 〈2;v〉
       }
     }
+  }
+  dynamic: {
+    #D: {
+      key: "foo"
+      〈0;key〉: int
+    }
+    d: (〈0;#D〉 & {
+      foo: 3
+    })
   }
 }

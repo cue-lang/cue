@@ -1,0 +1,127 @@
+-- in.cue --
+dynamicTop: {
+    #D: {
+        for k, v in {foo: 123} {(k): v}
+    }
+}
+
+// Issue #1404
+dynamicDepth1: {
+    #D: {
+        a: foo: 123
+        b: {for k, v in a {(k): v}}
+    }
+}
+
+allowed: {
+    #D: {
+        if true {
+            d: int
+        }
+    }
+
+    vErr: #D & { d: 5 }
+}
+
+disallowed: {
+    #D: {
+        if false {
+            d: int
+        }
+    }
+
+    vErr: #D & { d: 5 }
+}
+-- out/eval --
+Errors:
+disallowed.vErr: field not allowed: d:
+    ./in.cue:26:9
+    ./in.cue:32:11
+    ./in.cue:32:18
+
+Result:
+(_|_){
+  // [eval]
+  dynamicTop: (struct){
+    #D: (#struct){
+      foo: (int){ 123 }
+    }
+  }
+  dynamicDepth1: (struct){
+    #D: (#struct){
+      a: (#struct){
+        foo: (int){ 123 }
+      }
+      b: (#struct){
+        foo: (int){ 123 }
+      }
+    }
+  }
+  allowed: (struct){
+    #D: (#struct){
+      d: (int){ int }
+    }
+    vErr: (#struct){
+      d: (int){ 5 }
+    }
+  }
+  disallowed: (_|_){
+    // [eval]
+    #D: (#struct){
+    }
+    vErr: (_|_){
+      // [eval]
+      d: (_|_){
+        // [eval] disallowed.vErr: field not allowed: d:
+        //     ./in.cue:26:9
+        //     ./in.cue:32:11
+        //     ./in.cue:32:18
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  dynamicTop: {
+    #D: {
+      for k, v in {
+        foo: 123
+      } {
+        〈1;k〉: 〈1;v〉
+      }
+    }
+  }
+  dynamicDepth1: {
+    #D: {
+      a: {
+        foo: 123
+      }
+      b: {
+        for k, v in 〈1;a〉 {
+          〈1;k〉: 〈1;v〉
+        }
+      }
+    }
+  }
+  allowed: {
+    #D: {
+      if true {
+        d: int
+      }
+    }
+    vErr: (〈0;#D〉 & {
+      d: 5
+    })
+  }
+  disallowed: {
+    #D: {
+      if false {
+        d: int
+      }
+    }
+    vErr: (〈0;#D〉 & {
+      d: 5
+    })
+  }
+}

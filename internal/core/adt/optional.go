@@ -90,6 +90,7 @@ outer:
 // the filter is erroneous, it returns false and the error will  be set in c.
 func matchBulk(c *OpContext, env *Environment, x *BulkOptionalField, f Feature, label Value) bool {
 	v := env.evalCached(c, x.Filter)
+	v = Unwrap(v)
 
 	// Fast-track certain cases.
 	switch x := v.(type) {

@@ -349,6 +349,13 @@ func (e *exporter) structComposite(v *adt.Vertex, attrs []*ast.Attribute) ast.Ex
 		e.popFrame(saved)
 	}()
 
+	for _, c := range v.Conjuncts {
+		e.markLets(c.Expr().Source())
+	}
+	if len(s.Elts) > 0 {
+		defer filterUnusedLets(s)
+	}
+
 	showRegular := false
 	switch x := v.BaseValue.(type) {
 	case *adt.StructMarker:

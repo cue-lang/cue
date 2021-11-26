@@ -217,7 +217,7 @@ type exporter struct {
 	index adt.StringIndexer
 	rand  *rand.Rand
 
-	// For resolving up references.
+	// For resolving references.
 	stack []frame
 
 	inDefinition int // for close() wrapping.
@@ -231,6 +231,7 @@ type exporter struct {
 	usedFeature map[adt.Feature]adt.Expr
 	labelAlias  map[adt.Expr]adt.Feature
 	valueAlias  map[*ast.Alias]*ast.Alias
+	letAlias    map[*ast.LetClause]*ast.LetClause
 
 	usedHidden map[string]bool
 }
@@ -307,15 +308,76 @@ func setFieldAlias(f *ast.Field, name string) {
 	}
 }
 
-// uniqueLetIdent returns a name for a let identifier that uniquely identifies
-// the given expression. If the preferred name is already taken, a new globally
-// unique name of the form base_X ... base_XXXXXXXXXXXXXX is generated.
-//
-// It prefers short extensions over large ones, while ensuring the likelihood of
-// fast termination is high. There are at least two digits to make it visually
-// clearer this concerns a generated number.
-//
-func (e exporter) uniqueLetIdent(f adt.Feature, x adt.Expr) adt.Feature {
+func (e *exporter) markLets(n ast.Node) {
+	switch v := n.(type) {
+	case *ast.StructLit:
+		e.markLetDecls(v.Elts)
+	case *ast.File:
+		e.markLetDecls(v.Decls)
+	}
+}
+
+func (e *exporter) markLetDecls(decls []ast.Decl) {
+	for _, d := range decls {
+		if let, ok := d.(*ast.LetClause); ok {
+			e.markLetAlias(let)
+		}
+	}
+}
+
+// markLetAlias inserts an uninitialized let clause into the current scope.
+// It gets initialized upon first usage.
+func (e *exporter) markLetAlias(x *ast.LetClause) {
+	// The created let clause is initialized upon first usage, and removed
+	// later if never referenced.
+	let := &ast.LetClause{}
+
+	if e.letAlias == nil {
+		e.letAlias = make(map[*ast.LetClause]*ast.LetClause)
+	}
+	e.letAlias[x] = let
+
+	scope := e.top().scope
+	scope.Elts = append(scope.Elts, let)
+}
+
+// In value mode, lets are only used if there wasn't an error.
+func filterUnusedLets(s *ast.StructLit) {
+	k := 0
+	for i, d := range s.Elts {
+		if let, ok := d.(*ast.LetClause); ok && let.Expr == nil {
+			continue
+		}
+		s.Elts[k] = s.Elts[i]
+		k++
+	}
+	s.Elts = s.Elts[:k]
+}
+
+// resolveLet actually parses the let expression.
+// If there was no recorded let expression, it expands the expression in place.
+func (e *exporter) resolveLet(x *adt.LetReference) ast.Expr {
+	letClause, _ := x.Src.Node.(*ast.LetClause)
+	let := e.letAlias[letClause]
+
+	switch {
+	case let == nil:
+		return e.expr(x.X)
+
+	case let.Expr == nil:
+		label := e.uniqueLetIdent(x.Label, x.X)
+
+		let.Ident = e.ident(label)
+		let.Expr = e.expr(x.X)
+	}
+
+	ident := ast.NewIdent(let.Ident.Name)
+	ident.Node = let
+	// TODO: set scope?
+	return ident
+}
+
+func (e *exporter) uniqueLetIdent(f adt.Feature, x adt.Expr) adt.Feature {
 	if e.usedFeature[f] == x {
 		return f
 	}
@@ -325,7 +387,7 @@ func (e exporter) uniqueLetIdent(f adt.Feature, x adt.Expr) adt.Feature {
 	return f
 }
 
-func (e exporter) uniqueAlias(name string) string {
+func (e *exporter) uniqueAlias(name string) string {
 	f := adt.MakeIdentLabel(e.ctx, name, "")
 
 	if _, ok := e.usedFeature[f]; !ok {
@@ -337,29 +399,46 @@ func (e exporter) uniqueAlias(name string) string {
 	return name
 }
 
-func (e exporter) uniqueFeature(base string) (f adt.Feature, name string) {
+// uniqueFeature returns a name for an identifier that uniquely identifies
+// the given expression. If the preferred name is already taken, a new globally
+// unique name of the form base_X ... base_XXXXXXXXXXXXXX is generated.
+//
+// It prefers short extensions over large ones, while ensuring the likelihood of
+// fast termination is high. There are at least two digits to make it visually
+// clearer this concerns a generated number.
+//
+func (e *exporter) uniqueFeature(base string) (f adt.Feature, name string) {
 	if e.rand == nil {
 		e.rand = rand.New(rand.NewSource(808))
 	}
 
-	const mask = 0xff_ffff_ffff_ffff // max bits; stay clear of int64 overflow
-	const shift = 4                  // rate of growth
-	for n := int64(0x10); ; n = int64(mask&((n<<shift)-1)) + 1 {
-		num := e.rand.Intn(int(n))
-		name := fmt.Sprintf("%s_%01X", base, num)
+	// Try the first rew numbers in sequence
+	for i := 1; i < 5; i++ {
+		name := fmt.Sprintf("%s_%01X", base, i)
 		f := adt.MakeIdentLabel(e.ctx, name, "")
 		if _, ok := e.usedFeature[f]; !ok {
 			e.usedFeature[f] = nil
 			return f, name
 		}
 	}
-}
 
-type completeFunc func(scope *ast.StructLit, m adt.Node)
+	const mask = 0xff_ffff_ffff_ffff // max bits; stay clear of int64 overflow
+	const shift = 4                  // rate of growth
+	digits := 1
+	for n := int64(0x10); ; n = int64(mask&((n<<shift)-1)) + 1 {
+		num := e.rand.Intn(int(n)-1) + 1
+		name := fmt.Sprintf("%[1]s_%0[2]*[3]X", base, digits, num)
+		f := adt.MakeIdentLabel(e.ctx, name, "")
+		if _, ok := e.usedFeature[f]; !ok {
+			e.usedFeature[f] = nil
+			return f, name
+		}
+		digits++
+	}
+}
 
 type frame struct {
 	scope *ast.StructLit
-	todo  []completeFunc
 
 	docSources []adt.Conjunct
 
@@ -370,7 +449,6 @@ type frame struct {
 
 	// labeled fields
 	fields map[adt.Feature]entry
-	let    map[adt.Expr]*ast.LetClause
 
 	// field to new field
 	mapped map[adt.Node]ast.Node

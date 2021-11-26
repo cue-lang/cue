@@ -179,51 +179,7 @@ func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
 		return ident
 
 	case *adt.LetReference:
-		// TODO: Handle references that went out of scope. In case of aliases
-		// this means they may need to be reproduced locally. Most of these
-		// issues can be avoided by either fully expanding a configuration
-		// (export) or not at all (def).
-		//
-		i := len(e.stack) - 1 - int(x.UpCount) - 1
-		if i < 0 {
-			i = 0
-		}
-		f := &(e.stack[i])
-		let := f.let[x.X]
-		if let == nil {
-			if f.let == nil {
-				f.let = map[adt.Expr]*ast.LetClause{}
-			}
-			label := e.uniqueLetIdent(x.Label, x.X)
-
-			name := label.IdentString(e.ctx)
-
-			// A let may be added multiple times to the same scope as a result
-			// of how merging works. If that happens here it must be one
-			// originating from the same expression, and it is safe to drop.
-			for _, elt := range f.scope.Elts {
-				if a, ok := elt.(*ast.LetClause); ok {
-					if a.Ident.Name == name {
-						let = a
-						break
-					}
-				}
-			}
-
-			if let == nil {
-				let = &ast.LetClause{
-					Ident: e.ident(label),
-					Expr:  e.expr(x.X),
-				}
-				f.scope.Elts = append(f.scope.Elts, let)
-			}
-
-			f.let[x.X] = let
-		}
-		ident := ast.NewIdent(let.Ident.Name)
-		ident.Node = let
-		ident.Scope = f.scope
-		return ident
+		return e.resolveLet(x)
 
 	case *adt.SelectorExpr:
 		return &ast.SelectorExpr{

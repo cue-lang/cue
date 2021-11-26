@@ -31,8 +31,73 @@ for cfg in cfgs {
         }
 }
 
+-- for.cue --
+comprehension: {
+	for cfg in [{a: "one"}] {
+		let filepath = "kind-\(cfg.name)"
+		"\(filepath)": {
+			patches: cfg
+		}
+	}
+}
+
+-- scope.cue --
+scoped: {
+	_args: required: 1
+	direct: {
+		let Args = _args
+		a: Args.required
+	}
+	embed1: {
+		let Args = _args
+		a: {Args.required}
+	}
+	embed2: {
+		let Args = _args
+		a: {{Args.required}}
+	}
+	list: {
+		let Args = _args
+		a: [Args.required]
+	}
+	listStruct: {
+		let Args = _args
+		a: [{a: Args.required}]
+	}
+	listEmbed: {
+		let Args = _args
+		a: [{Args.required}]
+	}
+}
+
+
+-- incomplete.cue --
+incomplete: a: {
+	x: "a \(run.a) z"
+	run: {
+		a: string
+	}
+}
+incomplete: b: {
+	let A = run.a
+	x: "a \(A) z"
+	run: {
+		a: string
+	}
+}
+incomplete: c: {
+	let A = run.a
+	x: "a \(A) z"
+	run: {
+		a: "foo"
+	}
+}
+
 -- out/definition --
 
+let X = 1 + 1
+let Y = x
+let Y_1 = x
 {
 	cfgs: [ for crd in ["one", "two"] {
 		metadata: {
@@ -48,12 +113,72 @@ for cfg in cfgs {
 		}
 	}
 }
-let X = 1 + 1
 #Foo: X
 x:    "foo"
-let Y = x
-let Y_1 = x
+comprehension: {
+	for cfg in [{
+		a: "one"
+	}] {
+		let filepath_1 = "kind-\(cfg.name)"
+		"\(filepath_1)": {
+			patches: cfg
+		}
+	}
+}
+scoped: {
+	_args: {
+		required: 1
+	}
+	direct: {
+		let Args = _args
+		a: Args.required
+	}
+	embed1: {
+		let Args_1 = _args
+		a: Args_1.required
+	}
+	embed2: {
+		let Args_2 = _args
+		a: Args_2.required
+	}
+	list: {
+		let Args_3 = _args
+		a: [Args_3.required]
+	}
+	listStruct: {
+		let Args_4 = _args
+		a: [{
+			a: Args_4.required
+		}]
+	}
+	listEmbed: {
+		let Args_8 = _args
+		a: [Args_8.required]
+	}
+}
 y: Y & Y_1
+incomplete: {
+	a: {
+		x: "a \(run.a) z"
+		run: {
+			a: string
+		}
+	}
+	b: {
+		let A = run.a
+		x: "a \(A) z"
+		run: {
+			a: string
+		}
+	}
+	c: {
+		let A_1 = run.a
+		x: "a \(A_1) z"
+		run: {
+			a: "foo"
+		}
+	}
+}
 -- out/doc --
 []
 [#Foo]
@@ -66,6 +191,39 @@ y: Y & Y_1
 [cfgs 1]
 [cfgs 1 metadata]
 [cfgs 1 metadata name]
+[comprehension]
+[scoped]
+[scoped _args]
+[scoped _args required]
+[scoped direct]
+[scoped direct a]
+[scoped embed1]
+[scoped embed1 a]
+[scoped embed2]
+[scoped embed2 a]
+[scoped list]
+[scoped list a]
+[scoped list a 0]
+[scoped listStruct]
+[scoped listStruct a]
+[scoped listStruct a 0]
+[scoped listStruct a 0 a]
+[scoped listEmbed]
+[scoped listEmbed a]
+[scoped listEmbed a 0]
+[incomplete]
+[incomplete a]
+[incomplete a x]
+[incomplete a run]
+[incomplete a run a]
+[incomplete b]
+[incomplete b x]
+[incomplete b run]
+[incomplete b run a]
+[incomplete c]
+[incomplete c x]
+[incomplete c run]
+[incomplete c run a]
 [files]
 -- out/value --
 == Simplified
@@ -80,17 +238,69 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	let filepath = "kind-\(cfg.name)"
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath_1 = "kind-\(cfg.name)"
+			"\(filepath_1)": {
+				patches: cfg
+			}
+		}
+	}
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	files: {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	} & {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	}
 	y: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x: "a foo z"
+			run: {
+				a: "foo"
+			}
+		}
+	}
 }
 == Raw
 {
@@ -105,17 +315,72 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	let filepath = "kind-\(cfg.name)"
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath_1 = "kind-\(cfg.name)"
+			"\(filepath_1)": {
+				patches: cfg
+			}
+		}
+	}
+	scoped: {
+		_args: {
+			required: 1
+		}
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	files: {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	} & {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	}
 	y: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x: "a foo z"
+			run: {
+				a: "foo"
+			}
+		}
+	}
 }
 == Final
 {
@@ -129,8 +394,51 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
+	comprehension: _|_ // invalid interpolation: invalid interpolation: comprehension: undefined field: name
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
 	y:     "foo"
+	incomplete: {
+		a: {
+			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
+			run: {
+				a: string
+			}
+		}
+		b: {
+			x: _|_ // invalid interpolation: incomplete.b.x: non-concrete value string (type string)
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x: "a foo z"
+			run: {
+				a: "foo"
+			}
+		}
+	}
 }
 == All
 {
@@ -145,17 +453,72 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	let filepath = "kind-\(cfg.name)"
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath_1 = "kind-\(cfg.name)"
+			"\(filepath_1)": {
+				patches: cfg
+			}
+		}
+	}
+	scoped: {
+		_args: {
+			required: 1
+		}
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	files: {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	} & {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	}
 	y: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x: "a foo z"
+			run: {
+				a: "foo"
+			}
+		}
+	}
 }
 == Eval
 {
@@ -170,15 +533,67 @@ y: Y & Y_1
 			name: "two"
 		}
 	}]
-	let filepath = "kind-\(cfg.name)"
+	comprehension: {
+		for cfg in [{
+			a: "one"
+		}] {
+			let filepath_1 = "kind-\(cfg.name)"
+			"\(filepath_1)": {
+				patches: cfg
+			}
+		}
+	}
+	scoped: {
+		direct: {
+			a: 1
+		}
+		embed1: {
+			a: 1
+		}
+		embed2: {
+			a: 1
+		}
+		list: {
+			a: [1]
+		}
+		listStruct: {
+			a: [{
+				a: 1
+			}]
+		}
+		listEmbed: {
+			a: [1]
+		}
+	}
 	files: {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	} & {
-		"\(filepath)": {
+		"\("kind-\(cfg.name)")": {
 			patches: cfg
 		}
 	}
 	y: "foo"
+	incomplete: {
+		a: {
+			x: "a \(run.a) z"
+			run: {
+				a: string
+			}
+		}
+		b: {
+			let A = run.a
+			x: "a \(A) z"
+			run: {
+				a: string
+			}
+		}
+		c: {
+			x: "a foo z"
+			run: {
+				a: "foo"
+			}
+		}
+	}
 }

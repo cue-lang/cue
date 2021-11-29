@@ -260,7 +260,7 @@ func (c *CallCtxt) DecimalList(i int) (a []*apd.Decimal) {
 
 	for j, w := range v.Elems() {
 		w.Finalize(c.ctx) // defensive
-		switch x := w.Value().(type) {
+		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.Num:
 			a = append(a, &x.X)
 
@@ -298,7 +298,7 @@ func (c *CallCtxt) StringList(i int) (a []string) {
 
 	for j, w := range v.Elems() {
 		w.Finalize(c.ctx) // defensive
-		switch x := w.Value().(type) {
+		switch x := adt.Unwrap(adt.Default(w.Value())).(type) {
 		case *adt.String:
 			a = append(a, x.Str)
 

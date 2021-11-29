@@ -26,6 +26,10 @@ issue563: {
 
     output: [...#MyDef] & list.FlattenN(_all, 1)
 }
+issue1404: {
+    a: *1 | 2
+    sum: list.Sum([a])
+}
 -- out/list --
 issue563: {
 	#MyDef: {
@@ -44,5 +48,9 @@ issue563: {
 	}, {
 		name: "3"
 	}]
+}
+issue1404: {
+	a:   *1 | 2
+	sum: 1
 }
 

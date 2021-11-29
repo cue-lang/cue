@@ -1,0 +1,14 @@
+-- in.cue --
+import "path"
+
+issues1404: {
+    p: *"hello" | string
+    q: path.Join([p], path.Unix)
+}
+
+-- out/path --
+issues1404: {
+	p: *"hello" | string
+	q: "hello"
+}
+

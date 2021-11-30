@@ -47,7 +47,7 @@ import (
 // a common root and prefixing that to the reference. This is now possible
 // with the Environment construct and could be done later.
 
-func (e *exporter) expr(v adt.Expr) (result ast.Expr) {
+func (e *exporter) expr(v adt.Elem) (result ast.Expr) {
 	switch x := v.(type) {
 	case nil:
 		return nil
@@ -110,7 +110,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				e.valueAlias[a] = valueAlias
 			}
 		}
-		x.markLets(c.c.Elem().Source())
+		x.markLets(c.c.Expr().Source())
 	}
 
 	defer filterUnusedLets(s)
@@ -288,7 +288,7 @@ type conjuncts struct {
 	isData bool
 }
 
-func (c *conjuncts) addValueConjunct(src *adt.Vertex, env *adt.Environment, x adt.Expr) {
+func (c *conjuncts) addValueConjunct(src *adt.Vertex, env *adt.Environment, x adt.Elem) {
 	switch b, ok := x.(adt.BaseValue); {
 	case ok && src != nil && isTop(b) && !isTop(src.BaseValue):
 		// drop top
@@ -319,7 +319,7 @@ type conjunct struct {
 	up int32
 }
 
-func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Expr, isEmbed bool) {
+func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, isEmbed bool) {
 	switch x := x.(type) {
 	case *adt.StructLit:
 		e.top().upCount++
@@ -491,7 +491,7 @@ func isComplexStruct(s *adt.StructLit) bool {
 	return false
 }
 
-func isSelfContained(expr adt.Expr) bool {
+func isSelfContained(expr adt.Elem) bool {
 	switch x := expr.(type) {
 	case *adt.BinaryExpr:
 		return isSelfContained(x.X) && isSelfContained(x.Y)

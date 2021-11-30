@@ -977,6 +977,7 @@ func (v Value) Syntax(opts ...Option) ast.Node {
 		ShowHidden:      !o.omitHidden && !o.concrete,
 		ShowAttributes:  !o.omitAttrs,
 		ShowDocs:        o.docs,
+		ShowErrors:      o.showErrors,
 	}
 
 	pkgID := v.instance().ID()
@@ -1007,7 +1008,7 @@ You could file a bug with the above information at:
 	// var expr ast.Expr
 	var err error
 	var f *ast.File
-	if o.concrete || o.final {
+	if o.concrete || o.final || o.resolveReferences {
 		// inst = v.instance()
 		var expr ast.Expr
 		expr, err = p.Value(v.idx, pkgID, v.v)
@@ -2006,6 +2007,7 @@ type options struct {
 	omitOptional      bool
 	omitAttrs         bool
 	resolveReferences bool
+	showErrors        bool
 	final             bool
 	ignoreClosedness  bool // used for comparing APIs
 	docs              bool
@@ -2062,7 +2064,20 @@ func DisallowCycles(disallow bool) Option {
 // ResolveReferences forces the evaluation of references when outputting.
 // This implies the input cannot have cycles.
 func ResolveReferences(resolve bool) Option {
-	return func(p *options) { p.resolveReferences = resolve }
+	return func(p *options) {
+		p.resolveReferences = resolve
+
+		// ResolveReferences is implemented as a Value printer, rather than
+		// a definition printer, even though it should be more like the latter.
+		// To reflect this we convert incomplete errors to their original
+		// expression.
+		//
+		// TODO: ShowErrors mostly shows incomplete errors, even though this is
+		// just an approximation. There seems to be some inconsistencies as to
+		// when child errors are marked as such, making the conversion somewhat
+		// inconsistent. This option is conservative, though.
+		p.showErrors = true
+	}
 }
 
 // Raw tells Syntax to generate the value as is without any simplifications.

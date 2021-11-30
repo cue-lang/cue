@@ -49,7 +49,11 @@ type Profile struct {
 	ShowAttributes bool
 
 	// ShowErrors treats errors as values and will not percolate errors up.
+	//
+	// TODO: convert this option to an error level instead, showing only
+	// errors below a certain severity.
 	ShowErrors bool
+
 	// Use unevaluated conjuncts for these error types
 	// IgnoreRecursive
 

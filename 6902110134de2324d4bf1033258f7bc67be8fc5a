@@ -16,6 +16,23 @@
       "message": "For reference, the unity diff against patchset 4 vs unity commit d7ff4d41 is:\n\nhttps://gist.github.com/myitcv/14c42d2f53cd400e47882e48d70a55e0",
       "revId": "6902110134de2324d4bf1033258f7bc67be8fc5a",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6e670062_8aacbd21",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-30T17:37:32Z",
+      "side": 1,
+      "message": "LGTM following our chats. Again per our chat noting the cases not handled \"well\" by this change (but that are already handled imperfectly) are those where there is an incomplete error as part of evaluation that then leads to surprising outputs. This example from Vector, we reviewed another from comnet.io/terraform:\n\n    package x\n    \n    #TypePrimitive: {\n    \t_args: {\n    \t\trequired: bool\n    \t}\n    \tlet Args \u003d _args\n    \n    \t{\"*\": {}} |\n    \t{\"bool\": #TypeBool \u0026 {_args: required: Args.required}}\n    }\n    \n    #TypeBool: {\n    \t_args: required: bool\n    \tlet Args \u003d _args\n    \n    \tif !Args.required {\n    \t\t// `default` sets the default value.\n    \t\tdefault: bool | null\n    \t}\n    }\n\nResults in:\n\n    #TypePrimitive: {\n        \"*\": {}\n    } | {\n        bool: #TypeBool \u0026 {\n            _args: {\n                required: _args.required\n            }\n        }\n    }\n    #TypeBool: {\n        let Args_1 \u003d _args\n        _args: {\n            required: bool\n        }\n        if !Args_1.required {\n            default: bool | null\n        }\n    }\n\nNotice the line \u0027required: _args.required\u0027. The RHS is effectively a circular reference to the containing field _args, whereas it should be a reference to the let \u0027Args\u0027. \n\nWhilst strictly speaking \"worse\" in that it now appears to be a circular reference (before a reference to an apparently out of scope let), this is the non-happy path so happy to leave as-is for now.",
+      "revId": "6902110134de2324d4bf1033258f7bc67be8fc5a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

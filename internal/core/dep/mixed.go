@@ -30,7 +30,7 @@ import (
 func dynamic(c *adt.OpContext, n *adt.Vertex, f VisitFunc, m marked, top bool) {
 	found := false
 	for _, c := range n.Conjuncts {
-		if m[c.Expr()] {
+		if m[c.Elem()] {
 			found = true
 			break
 		}
@@ -64,7 +64,7 @@ func (m marked) markExpr(x adt.Expr) {
 	case nil:
 	case *adt.Vertex:
 		for _, c := range x.Conjuncts {
-			m.markExpr(c.Expr())
+			m.markExpr(c.Elem())
 		}
 
 	case *adt.BinaryExpr:

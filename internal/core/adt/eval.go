@@ -1165,7 +1165,7 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 	env := v.Env
 	id := v.CloseInfo
 
-	switch x := v.Expr().(type) {
+	switch x := v.Elem().(type) {
 	case *Vertex:
 		if x.IsData() {
 			n.addValueConjunct(env, x, id)
@@ -1231,7 +1231,7 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 		}
 	}()
 
-	switch x := v.Expr().(type) {
+	switch x := v.Elem().(type) {
 	case Resolver:
 		arc, err := ctx.Resolve(v.Env, x)
 		if err != nil && !err.IsIncomplete() {
@@ -1243,12 +1243,12 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			break
 		}
 
-		n.addVertexConjuncts(v.Env, v.CloseInfo, v.Expr(), arc, false)
+		n.addVertexConjuncts(v.Env, v.CloseInfo, v.Elem(), arc, false)
 
 	case Evaluator:
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
 		// Could be unify?
-		val := ctx.evaluateRec(v.Env, v.Expr(), Partial)
+		val := ctx.evaluateRec(v.Env, v.Elem(), Partial)
 		if b, ok := val.(*Bottom); ok && b.IsIncomplete() {
 			n.exprs = append(n.exprs, envExpr{v, b})
 			break
@@ -1464,7 +1464,7 @@ func updateCyclic(c Conjunct, cyclic bool, deref *Vertex, a []*Vertex) Conjunct 
 	if deref != nil {
 		env.Cycles = append(env.Cycles, deref)
 	}
-	return MakeConjunct(env, c.Expr(), c.CloseInfo)
+	return MakeConjunct(env, c.Elem(), c.CloseInfo)
 }
 
 func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) {

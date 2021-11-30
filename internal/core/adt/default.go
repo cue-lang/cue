@@ -72,7 +72,7 @@ func (v *Vertex) Default() *Vertex {
 		if w.Conjuncts == nil {
 			for _, c := range v.Conjuncts {
 				// TODO: preserve field information.
-				expr, _ := stripNonDefaults(c.Expr())
+				expr, _ := stripNonDefaults(c.Elem())
 				w.Conjuncts = append(w.Conjuncts, MakeRootConjunct(c.Env, expr))
 			}
 		}

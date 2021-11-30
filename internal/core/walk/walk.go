@@ -27,7 +27,7 @@ func Features(x adt.Expr, f func(label adt.Feature, src adt.Node)) {
 	w := Visitor{
 		Feature: f,
 	}
-	w.Expr(x)
+	w.Elem(x)
 }
 
 type Visitor struct {
@@ -44,7 +44,7 @@ func (w *Visitor) init() {
 	}
 }
 
-func (w *Visitor) Expr(x adt.Expr) {
+func (w *Visitor) Elem(x adt.Elem) {
 	w.init()
 	w.node(x)
 }

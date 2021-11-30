@@ -24,8 +24,8 @@ func (s *subsumer) subsumes(gt, lt adt.Conjunct) bool {
 	}
 
 	// First try evaluating at the value level.
-	x, _ := gt.Elem().(adt.Value)
-	y, _ := lt.Elem().(adt.Value)
+	x, _ := gt.Expr().(adt.Value)
+	y, _ := lt.Expr().(adt.Value)
 	if x == nil {
 		// Fall back to structural.
 		return s.structural(gt, lt)
@@ -46,7 +46,7 @@ func (s *subsumer) c(env *adt.Environment, x adt.Expr) adt.Conjunct {
 }
 
 func isBottomConjunct(c adt.Conjunct) bool {
-	b, _ := c.Elem().(*adt.Bottom)
+	b, _ := c.Expr().(*adt.Bottom)
 	return b != nil
 }
 
@@ -58,14 +58,14 @@ func (s *subsumer) node(env *adt.Environment, up int32) *adt.Vertex {
 }
 
 func (s *subsumer) structural(a, b adt.Conjunct) bool {
-	if y, ok := b.Elem().(*adt.LetReference); ok {
+	if y, ok := b.Expr().(*adt.LetReference); ok {
 		return s.conjunct(a, s.c(b.Env, y.X))
 	}
 	if isBottomConjunct(b) {
 		return true
 	}
 
-	switch x := a.Elem().(type) {
+	switch x := a.Expr().(type) {
 	case *adt.DisjunctionExpr:
 
 	case *adt.StructLit:

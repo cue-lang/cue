@@ -103,7 +103,7 @@ func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 		},
 	}
 	for _, c := range v.Conjuncts {
-		visitor.Expr(c.Expr())
+		visitor.Expr(c.Elem())
 	}
 
 	d, _, _, pickedDefault := t.addDominators(nil, v, false)
@@ -140,10 +140,10 @@ type trimmer struct {
 var Debug bool = false
 
 func (t *trimmer) markRemove(c adt.Conjunct) {
-	if src := c.Expr().Source(); src != nil {
+	if src := c.Elem().Source(); src != nil {
 		t.remove[src] = true
 		if t.debug {
-			t.logf("removing %s", debug.NodeString(t.ctx, c.Expr(), nil))
+			t.logf("removing %s", debug.NodeString(t.ctx, c.Elem(), nil))
 		}
 	}
 }
@@ -183,7 +183,7 @@ func removable(c adt.Conjunct, v *adt.Vertex) bool {
 func (t *trimmer) allowRemove(v *adt.Vertex) bool {
 	for _, c := range v.Conjuncts {
 		_, allowRemove := isDominator(c)
-		loc := c.CloseInfo.Location() != c.Expr()
+		loc := c.CloseInfo.Location() != c.Elem()
 		isSpan := c.CloseInfo.RootSpanType() != adt.ConstraintSpan
 		if allowRemove && (loc || isSpan) {
 			return true
@@ -233,7 +233,7 @@ func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *ad
 		case isDom:
 			doms.AddConjunct(c)
 		default:
-			if r, ok := c.Expr().(adt.Resolver); ok {
+			if r, ok := c.Elem().(adt.Resolver); ok {
 				x, _ := t.ctx.Resolve(c.Env, r)
 				// Even if this is not a dominator now, descendants will be.
 				if x != nil && x.Label.IsDef() {
@@ -271,7 +271,7 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 	defer func() {
 		if result == no {
 			for _, c := range v.Conjuncts {
-				t.markKeep(c.Expr())
+				t.markKeep(c.Elem())
 			}
 		}
 	}()

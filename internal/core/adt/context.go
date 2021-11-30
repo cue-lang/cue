@@ -20,6 +20,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"strings"
 
 	"github.com/cockroachdb/apd/v2"
 	"golang.org/x/text/encoding/unicode"
@@ -82,12 +83,18 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 	if Verbosity == 0 {
 		return
 	}
+	if v == nil {
+		s := fmt.Sprintf(strings.Repeat("..", c.nest)+format, args...)
+		_ = log.Output(2, s)
+		return
+	}
 	p := pMap[v]
 	if p == 0 {
 		p = len(pMap) + 1
 		pMap[v] = p
 	}
 	a := append([]interface{}{
+		strings.Repeat("..", c.nest),
 		p,
 		v.Label.SelectorString(c),
 		v.Path(),
@@ -100,7 +107,7 @@ func (c *OpContext) Logf(v *Vertex, format string, args ...interface{}) {
 			a[i] = x.SelectorString(c)
 		}
 	}
-	s := fmt.Sprintf(" [%d] %s/%v"+format, a...)
+	s := fmt.Sprintf("%s [%d] %s/%v"+format, a...)
 	_ = log.Output(2, s)
 }
 
@@ -152,6 +159,8 @@ func New(v *Vertex, cfg *Config) *OpContext {
 type OpContext struct {
 	Runtime
 	Format func(Node) string
+
+	nest int
 
 	stats        Stats
 	freeListNode *nodeContext

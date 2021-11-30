@@ -1238,7 +1238,7 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 		}
 	}()
 
-	switch x := v.Elem().(type) {
+	switch x := v.Expr().(type) {
 	case Resolver:
 		arc, err := ctx.Resolve(v.Env, x)
 		if err != nil && !err.IsIncomplete() {
@@ -1250,12 +1250,12 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			break
 		}
 
-		n.addVertexConjuncts(v.Env, v.CloseInfo, v.Elem(), arc, false)
+		n.addVertexConjuncts(v.Env, v.CloseInfo, v.Expr(), arc, false)
 
 	case Evaluator:
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
 		// Could be unify?
-		val := ctx.evaluateRec(v.Env, v.Elem(), Partial)
+		val := ctx.evaluateRec(v.Env, v.Expr(), Partial)
 		if b, ok := val.(*Bottom); ok && b.IsIncomplete() {
 			n.exprs = append(n.exprs, envExpr{v, b})
 			break

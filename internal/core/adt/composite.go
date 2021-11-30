@@ -794,7 +794,7 @@ func MakeConjunct(env *Environment, x Node, id CloseInfo) Conjunct {
 		env = &Environment{}
 	}
 	switch x.(type) {
-	case Expr, interface{ expr() Expr }:
+	case Elem, interface{ expr() Expr }:
 	default:
 		panic(fmt.Sprintf("invalid Node type %T", x))
 	}
@@ -809,10 +809,26 @@ func (c *Conjunct) Field() Node {
 	return c.x
 }
 
-func (c *Conjunct) Elem() Expr {
+// Elem retrieves the Elem form of the contained conjunct.
+// If it is a Field, it will return the field value.
+func (c *Conjunct) Elem() Elem {
+	switch x := c.x.(type) {
+	case Elem:
+		return x
+	case interface{ expr() Expr }:
+		return x.expr()
+	default:
+		panic("unreachable")
+	}
+}
+
+// Expr retrieves the expression form of the contained conjunct.
+// If it is a field or comprehension, it will return its associated value.
+func (c *Conjunct) Expr() Expr {
 	switch x := c.x.(type) {
 	case Expr:
 		return x
+	// TODO: comprehension.
 	case interface{ expr() Expr }:
 		return x.expr()
 	default:

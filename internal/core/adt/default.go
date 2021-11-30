@@ -90,7 +90,11 @@ func (v *Vertex) Default() *Vertex {
 }
 
 // TODO: this should go: record preexpanded disjunctions in Vertex.
-func stripNonDefaults(expr Expr) (r Expr, stripped bool) {
+func stripNonDefaults(elem Elem) (r Elem, stripped bool) {
+	expr, ok := elem.(Expr)
+	if !ok {
+		return elem, false
+	}
 	switch x := expr.(type) {
 	case *DisjunctionExpr:
 		if !x.HasDefaults {
@@ -116,8 +120,8 @@ func stripNonDefaults(expr Expr) (r Expr, stripped bool) {
 		b, sb := stripNonDefaults(x.Y)
 		if sa || sb {
 			bin := *x
-			bin.X = a
-			bin.Y = b
+			bin.X = a.(Expr)
+			bin.Y = b.(Expr)
 			return &bin, true
 		}
 		return x, false

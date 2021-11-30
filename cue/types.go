@@ -688,7 +688,7 @@ func linkParent(p *parent, node, arc *adt.Vertex) *parent {
 	return &parent{node, p}
 }
 
-func remakeValue(base Value, env *adt.Environment, v adt.Expr) Value {
+func remakeValue(base Value, env *adt.Environment, v adt.Elem) Value {
 	// TODO: right now this is necessary because disjunctions do not have
 	// populated conjuncts.
 	if v, ok := v.(*adt.Vertex); ok && v.Status() >= adt.Partial {
@@ -1944,7 +1944,7 @@ func (v Value) ReferencePath() (root Value, p Path) {
 	return makeValue(v.idx, x, nil), Path{path: path}
 }
 
-func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Expr) (inst *adt.Vertex, path []Selector) {
+func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r adt.Elem) (inst *adt.Vertex, path []Selector) {
 	ctx := c
 	defer ctx.PopState(ctx.PushState(env, r.Source()))
 
@@ -2219,7 +2219,7 @@ func (v Value) Expr() (Op, []Value) {
 		return NoOp, nil
 	}
 
-	var expr adt.Expr
+	var expr adt.Elem
 	var env *adt.Environment
 
 	if v.v.IsData() {

@@ -33,7 +33,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 
 	var v Value
 
-	expr := c.Expr()
+	expr := c.Elem()
 	switch x := expr.(type) {
 	case Value:
 		v = x
@@ -54,7 +54,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 	default:
 		// Unknown type.
 		v = ctx.NewErrf(
-			"could not evaluate expression %s of type %T", c.Expr(), c)
+			"could not evaluate expression %s of type %T", c.Elem(), c)
 	}
 
 	return ToVertex(v)

@@ -39,7 +39,7 @@ func (w *compactPrinter) node(n adt.Node) {
 				if i > 0 {
 					w.string(" & ")
 				}
-				w.node(c.Expr())
+				w.node(c.Elem())
 			}
 			return
 		}

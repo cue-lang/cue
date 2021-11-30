@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "759bdd50_4276f209",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-30T06:55:11Z",
+      "side": 1,
+      "message": "For reference the unity diff for patchset 2 is https://gist.github.com/myitcv/7bcba9a2d33902ef9238d71daaa1573a. Currently working through this.",
+      "revId": "10b60e96dfbc64cc85a71f79294dd4035ec317f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "fd55c575_4e73bcd3",

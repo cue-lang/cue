@@ -1685,7 +1685,7 @@ func (x *IfClause) yield(ctx *OpContext, f YieldFunc) {
 
 // An LetClause represents a let clause in a comprehension.
 //
-//    for k, v in src {}
+//    let x = y
 //
 type LetClause struct {
 	Src   *ast.LetClause

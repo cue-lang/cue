@@ -122,7 +122,7 @@ func visit(c *adt.OpContext, n *adt.Vertex, f VisitFunc, all, top bool) (err err
 	}()
 
 	for _, x := range n.Conjuncts {
-		v.markExpr(x.Env, x.Expr())
+		v.markExpr(x.Env, x.Elem())
 	}
 
 	return nil

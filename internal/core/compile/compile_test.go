@@ -67,7 +67,7 @@ func TestCompile(t *testing.T) {
 				fmt.Fprintln(t)
 			}
 			fmt.Fprintln(t, "---", t.Rel(f.Filename))
-			debug.WriteNode(t, r, v.Conjuncts[i].Expr(), &debug.Config{
+			debug.WriteNode(t, r, v.Conjuncts[i].Elem(), &debug.Config{
 				Cwd: t.Dir,
 			})
 		}
@@ -102,5 +102,5 @@ func TestX(t *testing.T) {
 	if err != nil {
 		t.Error(errors.Details(err, nil))
 	}
-	t.Error(debug.NodeString(r, arc.Conjuncts[0].Expr(), nil))
+	t.Error(debug.NodeString(r, arc.Conjuncts[0].Elem(), nil))
 }

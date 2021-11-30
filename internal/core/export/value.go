@@ -55,7 +55,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 	}()
 
 	for _, c := range n.Conjuncts {
-		e.markLets(c.Expr().Source())
+		e.markLets(c.Elem().Source())
 	}
 
 	switch x := n.BaseValue.(type) {
@@ -99,7 +99,7 @@ func (e *exporter) vertex(n *adt.Vertex) (result ast.Expr) {
 		// fall back to expression mode
 		a := []ast.Expr{}
 		for _, c := range n.Conjuncts {
-			a = append(a, e.expr(c.Expr()))
+			a = append(a, e.expr(c.Elem()))
 		}
 		result = ast.NewBinExpr(token.AND, a...)
 	}

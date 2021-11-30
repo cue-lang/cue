@@ -344,6 +344,21 @@ func (e *exporter) listComposite(v *adt.Vertex) ast.Expr {
 
 		l.Elts = append(l.Elts, elem)
 	}
+	m, ok := v.BaseValue.(*adt.ListMarker)
+	if !e.cfg.TakeDefaults && ok && m.IsOpen {
+		ellipsis := &ast.Ellipsis{}
+		typ := &adt.Vertex{
+			Parent: v,
+			Label:  adt.AnyIndex,
+		}
+		v.MatchAndInsert(e.ctx, typ)
+		typ.Finalize(e.ctx)
+		if typ.Kind() != adt.TopKind {
+			ellipsis.Type = e.value(typ)
+		}
+
+		l.Elts = append(l.Elts, ellipsis)
+	}
 	return l
 }
 

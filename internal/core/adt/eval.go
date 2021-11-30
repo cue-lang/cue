@@ -588,10 +588,7 @@ func (n *nodeContext) incompleteErrors() *Bottom {
 	for _, d := range n.dynamicFields {
 		err = CombineErrors(nil, err, d.err)
 	}
-	for _, c := range n.forClauses {
-		err = CombineErrors(nil, err, c.err)
-	}
-	for _, c := range n.ifClauses {
+	for _, c := range n.comprehensions {
 		err = CombineErrors(nil, err, c.err)
 	}
 	for _, x := range n.exprs {
@@ -799,11 +796,10 @@ type nodeContext struct {
 	notify []*Vertex
 
 	// Struct information
-	dynamicFields []envDynamic
-	ifClauses     []envYield
-	forClauses    []envYield
-	aStruct       Expr
-	aStructID     CloseInfo
+	dynamicFields  []envDynamic
+	comprehensions []envYield
+	aStruct        Expr
+	aStructID      CloseInfo
 
 	// Expression conjuncts
 	lists  []envList
@@ -875,8 +871,7 @@ func (n *nodeContext) clone() *nodeContext {
 	d.notify = append(d.notify, n.notify...)
 	d.checks = append(d.checks, n.checks...)
 	d.dynamicFields = append(d.dynamicFields, n.dynamicFields...)
-	d.ifClauses = append(d.ifClauses, n.ifClauses...)
-	d.forClauses = append(d.forClauses, n.forClauses...)
+	d.comprehensions = append(d.comprehensions, n.comprehensions...)
 	d.lists = append(d.lists, n.lists...)
 	d.vLists = append(d.vLists, n.vLists...)
 	d.exprs = append(d.exprs, n.exprs...)
@@ -893,24 +888,23 @@ func (c *OpContext) newNodeContext(node *Vertex) *nodeContext {
 		c.freeListNode = n.nextFree
 
 		*n = nodeContext{
-			ctx:           c,
-			node:          node,
-			kind:          TopKind,
-			usedArcs:      n.usedArcs[:0],
-			arcMap:        n.arcMap[:0],
-			notify:        n.notify[:0],
-			checks:        n.checks[:0],
-			dynamicFields: n.dynamicFields[:0],
-			ifClauses:     n.ifClauses[:0],
-			forClauses:    n.forClauses[:0],
-			lists:         n.lists[:0],
-			vLists:        n.vLists[:0],
-			exprs:         n.exprs[:0],
-			disjunctions:  n.disjunctions[:0],
-			usedDefault:   n.usedDefault[:0],
-			disjunctErrs:  n.disjunctErrs[:0],
-			disjuncts:     n.disjuncts[:0],
-			buffer:        n.buffer[:0],
+			ctx:            c,
+			node:           node,
+			kind:           TopKind,
+			usedArcs:       n.usedArcs[:0],
+			arcMap:         n.arcMap[:0],
+			notify:         n.notify[:0],
+			checks:         n.checks[:0],
+			dynamicFields:  n.dynamicFields[:0],
+			comprehensions: n.comprehensions[:0],
+			lists:          n.lists[:0],
+			vLists:         n.vLists[:0],
+			exprs:          n.exprs[:0],
+			disjunctions:   n.disjunctions[:0],
+			usedDefault:    n.usedDefault[:0],
+			disjunctErrs:   n.disjunctErrs[:0],
+			disjuncts:      n.disjuncts[:0],
+			buffer:         n.buffer[:0],
 		}
 
 		return n
@@ -1034,8 +1028,7 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 
 func (n *nodeContext) done() bool {
 	return len(n.dynamicFields) == 0 &&
-		len(n.ifClauses) == 0 &&
-		len(n.forClauses) == 0 &&
+		len(n.comprehensions) == 0 &&
 		len(n.exprs) == 0
 }
 
@@ -1047,9 +1040,7 @@ func (n *nodeContext) finalDone() bool {
 			return false
 		}
 	}
-	return len(n.dynamicFields) == 0 &&
-		len(n.ifClauses) == 0 &&
-		len(n.forClauses) == 0
+	return len(n.dynamicFields) == 0 && len(n.comprehensions) == 0
 }
 
 // hasErr is used to determine if an evaluation path, for instance a single
@@ -1752,11 +1743,11 @@ func (n *nodeContext) addStruct(
 
 		case *ForClause:
 			// Why is this not an embedding?
-			n.forClauses = append(n.forClauses, envYield{childEnv, x, closeInfo, nil})
+			n.comprehensions = append(n.comprehensions, envYield{childEnv, x, closeInfo, nil})
 
 		case Yielder:
 			// Why is this not an embedding?
-			n.ifClauses = append(n.ifClauses, envYield{childEnv, x, closeInfo, nil})
+			n.comprehensions = append(n.comprehensions, envYield{childEnv, x, closeInfo, nil})
 
 		case Expr:
 			// add embedding to optional
@@ -1869,11 +1860,7 @@ func (n *nodeContext) expandOne() (done bool) {
 		return true
 	}
 
-	if progress = n.injectEmbedded(&(n.ifClauses)); progress {
-		return true
-	}
-
-	if progress = n.injectEmbedded(&(n.forClauses)); progress {
+	if progress = n.injectComprehensions(&(n.comprehensions)); progress {
 		return true
 	}
 
@@ -1927,10 +1914,8 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 	return progress
 }
 
-// injectEmbedded evaluates and inserts embeddings. It first evaluates all
-// embeddings before inserting the results to ensure that the order of
-// evaluation does not matter.
-func (n *nodeContext) injectEmbedded(all *[]envYield) (progress bool) {
+// injectComprehensions evaluates and inserts comprehensions.
+func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 	ctx := n.ctx
 	type envStruct struct {
 		env *Environment

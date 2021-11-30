@@ -258,7 +258,7 @@ func (e *exporter) markUsedFeatures(x adt.Expr) {
 		case *adt.Vertex:
 			if !x.IsData() {
 				for _, c := range x.Conjuncts {
-					w.Expr(c.Expr())
+					w.Expr(c.Elem())
 				}
 			}
 

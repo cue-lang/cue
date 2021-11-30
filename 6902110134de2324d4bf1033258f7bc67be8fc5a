@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "4697415f_63e7a958",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-11-30T17:26:12Z",
+      "side": 1,
+      "message": "For reference, the unity diff against patchset 4 vs unity commit d7ff4d41 is:\n\nhttps://gist.github.com/myitcv/14c42d2f53cd400e47882e48d70a55e0",
+      "revId": "6902110134de2324d4bf1033258f7bc67be8fc5a",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

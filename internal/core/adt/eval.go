@@ -649,19 +649,7 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 
 	ctx := n.ctx
 
-	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
-		n.node.BaseValue = CombineErrors(nil,
-			n.node.Value(),
-			&Bottom{
-				Code:  StructuralCycleError,
-				Err:   ctx.Newf("structural cycle"),
-				Value: n.node.Value(),
-				// TODO: probably, this should have the referenced arc.
-			})
-		// Don't process Arcs. This is mostly to ensure that no Arcs with
-		// an Unprocessed status remain in the output.
-		n.node.Arcs = nil
-	} else {
+	if !assertStructuralCycle(n) {
 		// Visit arcs recursively to validate and compute error.
 		for _, a := range n.node.Arcs {
 			if a.nonMonotonicInsertGen >= a.nonMonotonicLookupGen && a.nonMonotonicLookupGen > 0 {
@@ -692,6 +680,24 @@ func (n *nodeContext) completeArcs(state VertexStatus) {
 	}
 
 	n.node.UpdateStatus(state)
+}
+
+func assertStructuralCycle(n *nodeContext) bool {
+	if cyclic := n.hasCycle && !n.hasNonCycle; cyclic {
+		n.node.BaseValue = CombineErrors(nil,
+			n.node.Value(),
+			&Bottom{
+				Code:  StructuralCycleError,
+				Err:   n.ctx.Newf("structural cycle"),
+				Value: n.node.Value(),
+				// TODO: probably, this should have the referenced arc.
+			})
+		// Don't process Arcs. This is mostly to ensure that no Arcs with
+		// an Unprocessed status remain in the output.
+		n.node.Arcs = nil
+		return true
+	}
+	return false
 }
 
 // TODO: this is now a sentinel. Use a user-facing error that traces where
@@ -1134,13 +1140,6 @@ type envExpr struct {
 type envDynamic struct {
 	env   *Environment
 	field *DynamicField
-	id    CloseInfo
-	err   *Bottom
-}
-
-type envYield struct {
-	env   *Environment
-	yield Yielder
 	id    CloseInfo
 	err   *Bottom
 }
@@ -1910,54 +1909,6 @@ func (n *nodeContext) injectDynamic() (progress bool) {
 	progress = k < len(n.dynamicFields)
 
 	n.dynamicFields = a[:k]
-
-	return progress
-}
-
-// injectComprehensions evaluates and inserts comprehensions.
-func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
-	ctx := n.ctx
-	type envStruct struct {
-		env *Environment
-		s   *StructLit
-	}
-	var sa []envStruct
-	f := func(env *Environment, st *StructLit) {
-		sa = append(sa, envStruct{env, st})
-	}
-
-	k := 0
-	for i := 0; i < len(*all); i++ {
-		d := (*all)[i]
-		sa = sa[:0]
-
-		if err := ctx.Yield(d.env, d.yield, f); err != nil {
-			if err.IsIncomplete() {
-				d.err = err
-				(*all)[k] = d
-				k++
-			} else {
-				// continue to collect other errors.
-				n.addBottom(err)
-			}
-			continue
-		}
-
-		if len(sa) == 0 {
-			continue
-		}
-		id := d.id.SpawnSpan(d.yield, ComprehensionSpan)
-
-		n.ctx.nonMonotonicInsertNest++
-		for _, st := range sa {
-			n.addStruct(st.env, st.s, id)
-		}
-		n.ctx.nonMonotonicInsertNest--
-	}
-
-	progress = k < len(*all)
-
-	*all = (*all)[:k]
 
 	return progress
 }

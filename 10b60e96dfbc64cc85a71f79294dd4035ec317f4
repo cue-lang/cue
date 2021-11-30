@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5fe264f_88ce0df7",
+        "filename": "internal/core/export/export.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 402,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-30T11:45:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "fd55c575_4e73bcd3",
+      "revId": "10b60e96dfbc64cc85a71f79294dd4035ec317f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a7c747e_40cc2596",
@@ -48,6 +66,24 @@
       "writtenOn": "2021-11-28T19:28:51Z",
       "side": 1,
       "message": "Is that one tab too many?",
+      "revId": "10b60e96dfbc64cc85a71f79294dd4035ec317f4",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6dbbdb5e_df232e5d",
+        "filename": "internal/core/export/testdata/let.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 39,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-11-30T11:45:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9a7c747e_40cc2596",
       "revId": "10b60e96dfbc64cc85a71f79294dd4035ec317f4",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

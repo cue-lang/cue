@@ -312,8 +312,8 @@ _|_ // e3: index out of range [2] with length 2
 		bar
 		line
 		"""
-	l1: [3]
-	l2: []
+	l1: [3, ...int]
+	l2: [...int]
 	l3: []
 	l4: [1, 2]
 	l5: {

@@ -644,7 +644,7 @@ func Dereference(v Value) Value {
 	}
 
 	c := n.Conjuncts[0]
-	r, _ := c.Elem().(adt.Resolver)
+	r, _ := c.Expr().(adt.Resolver)
 	if r == nil {
 		return v
 	}
@@ -1072,7 +1072,7 @@ func (v hiddenValue) Split() []Value {
 	}
 	a := []Value{}
 	for _, x := range v.v.Conjuncts {
-		a = append(a, remakeValue(v, x.Env, x.Elem()))
+		a = append(a, remakeValue(v, x.Env, x.Expr()))
 	}
 	return a
 }
@@ -1932,7 +1932,7 @@ func (v Value) ReferencePath() (root Value, p Path) {
 	ctx := v.ctx()
 	c := v.v.Conjuncts[0]
 
-	x, path := reference(v.idx, ctx, c.Env, c.Elem())
+	x, path := reference(v.idx, ctx, c.Env, c.Expr())
 	if x == nil {
 		return Value{}, Path{}
 	}
@@ -2237,7 +2237,7 @@ func (v Value) Expr() (Op, []Value) {
 			// the default case, processed below.
 			c := v.v.Conjuncts[0]
 			env = c.Env
-			expr = c.Elem()
+			expr = c.Expr()
 			if w, ok := expr.(*adt.Vertex); ok {
 				return Value{v.idx, w, v.parent_}.Expr()
 			}

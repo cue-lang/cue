@@ -103,7 +103,7 @@ func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 		},
 	}
 	for _, c := range v.Conjuncts {
-		visitor.Expr(c.Elem())
+		visitor.Elem(c.Elem())
 	}
 
 	d, _, _, pickedDefault := t.addDominators(nil, v, false)
@@ -271,7 +271,7 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 	defer func() {
 		if result == no {
 			for _, c := range v.Conjuncts {
-				t.markKeep(c.Elem())
+				t.markKeep(c.Expr())
 			}
 		}
 	}()

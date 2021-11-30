@@ -1827,9 +1827,12 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 
 	case arc.Status() == 0:
 	default:
-		n.addErr(ctx.NewPosf(pos(x.Field()),
-			"cannot add field %s: was already used",
-			f.SelectorString(ctx)))
+		n.addBottom(&Bottom{
+			Code: IncompleteError,
+			Err: ctx.NewPosf(pos(x.Field()),
+				"cannot add field %s: was already used",
+				f.SelectorString(ctx)),
+		})
 	}
 	return arc
 }

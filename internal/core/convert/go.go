@@ -765,7 +765,7 @@ store:
 			ctx.AddBottom(b)
 			x = b
 		} else {
-			x = c.Elem()
+			x = c.Expr()
 		}
 		ctx.StoreType(t, e, x)
 		return e, x

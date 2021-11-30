@@ -143,7 +143,7 @@ type visitor struct {
 // some walk functionality.
 
 // markExpr visits all nodes in an expression to mark dependencies.
-func (c *visitor) markExpr(env *adt.Environment, expr adt.Expr) {
+func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 	switch x := expr.(type) {
 	case nil:
 	case adt.Resolver:

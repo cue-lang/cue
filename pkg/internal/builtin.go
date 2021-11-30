@@ -175,7 +175,7 @@ func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
 	if err != nil {
 		panic(err)
 	}
-	return c.Elem()
+	return c.Expr()
 
 }
 

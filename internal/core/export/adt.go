@@ -34,7 +34,7 @@ func (e *exporter) ident(x adt.Feature) *ast.Ident {
 	return ast.NewIdent(s)
 }
 
-func (e *exporter) adt(expr adt.Expr, conjuncts []adt.Conjunct) ast.Expr {
+func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 	switch x := expr.(type) {
 	case adt.Value:
 		return e.expr(x)

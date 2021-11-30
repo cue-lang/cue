@@ -49,7 +49,7 @@ func Resolve(ctx *OpContext, c Conjunct) *Vertex {
 
 	case Evaluator:
 		// TODO: have a way to evaluate, but not strip down to the value.
-		v, _ = ctx.Evaluate(env, expr)
+		v, _ = ctx.Evaluate(env, expr.(Expr))
 
 	default:
 		// Unknown type.

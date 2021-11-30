@@ -258,7 +258,7 @@ func (e *exporter) markUsedFeatures(x adt.Expr) {
 		case *adt.Vertex:
 			if !x.IsData() {
 				for _, c := range x.Conjuncts {
-					w.Expr(c.Elem())
+					w.Elem(c.Elem())
 				}
 			}
 
@@ -288,7 +288,7 @@ func (e *exporter) markUsedFeatures(x adt.Expr) {
 		}
 	}
 
-	w.Expr(x)
+	w.Elem(x)
 }
 
 func (e *exporter) getFieldAlias(f *ast.Field, name string) string {

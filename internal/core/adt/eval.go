@@ -166,6 +166,14 @@ func (c *OpContext) evaluate(v *Vertex, state VertexStatus) Value {
 // the cached results.
 func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 	// defer c.PopVertex(c.PushVertex(v))
+	if Debug {
+		c.nest++
+		c.Logf(v, "Unify")
+		defer func() {
+			c.Logf(v, "END Unify")
+			c.nest--
+		}()
+	}
 
 	// Ensure a node will always have a nodeContext after calling Unify if it is
 	// not yet Finalized.

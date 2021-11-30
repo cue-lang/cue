@@ -222,7 +222,7 @@ func (w *printer) node(n adt.Node) {
 				if i > 0 {
 					w.string(" & ")
 				}
-				w.node(c.Expr()) // TODO: also include env?
+				w.node(c.Elem()) // TODO: also include env?
 			}
 		}
 

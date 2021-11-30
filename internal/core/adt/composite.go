@@ -795,7 +795,7 @@ func (c *Conjunct) Field() Node {
 	return c.x
 }
 
-func (c *Conjunct) Expr() Expr {
+func (c *Conjunct) Elem() Expr {
 	switch x := c.x.(type) {
 	case Expr:
 		return x

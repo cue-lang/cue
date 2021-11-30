@@ -110,7 +110,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 				e.valueAlias[a] = valueAlias
 			}
 		}
-		x.markLets(c.c.Expr().Source())
+		x.markLets(c.c.Elem().Source())
 	}
 
 	defer filterUnusedLets(s)
@@ -126,7 +126,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 
 	for _, c := range a {
 		e.top().upCount = c.up
-		x := c.c.Expr()
+		x := c.c.Elem()
 		e.addExpr(c.c.Env, src, x, false)
 	}
 
@@ -379,7 +379,7 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Expr, i
 			switch {
 			default:
 				for _, c := range v.Conjuncts {
-					e.addExpr(c.Env, v, c.Expr(), false)
+					e.addExpr(c.Env, v, c.Elem(), false)
 				}
 
 			case v.IsData():
@@ -443,7 +443,7 @@ func isOptional(a []adt.Conjunct) bool {
 		return false
 	}
 	for _, c := range a {
-		if v, ok := c.Expr().(*adt.Vertex); ok && !v.IsData() && len(v.Conjuncts) > 0 {
+		if v, ok := c.Elem().(*adt.Vertex); ok && !v.IsData() && len(v.Conjuncts) > 0 {
 			return isOptional(v.Conjuncts)
 		}
 		switch f := c.Source().(type) {

@@ -107,7 +107,7 @@ func TestX(t *testing.T) {
 	ctxt := eval.NewContext(r, n)
 
 	for _, c := range n.Conjuncts {
-		str := debug.NodeString(ctxt, c.Expr(), nil)
+		str := debug.NodeString(ctxt, c.Elem(), nil)
 		t.Log(str)
 	}
 

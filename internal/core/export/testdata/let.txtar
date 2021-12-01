@@ -72,6 +72,13 @@ scoped: {
 
 
 -- incomplete.cue --
+complete: {
+	let A = run.a
+	x: "a \(A) z"
+	run: {
+		a: "foo"
+	}
+}
 incomplete: a: {
 	x: "a \(run.a) z"
 	run: {
@@ -86,11 +93,25 @@ incomplete: b: {
 	}
 }
 incomplete: c: {
+	{
+		let A = run.a
+		x: "a \(A) z"
+		run: a: string
+	}
+	{
+		let A = run2.a
+		x2: "a \(A) z"
+		run2: a: string
+	}
+}
+incomplete: d: {
 	let A = run.a
 	x: "a \(A) z"
-	run: {
-		a: "foo"
-	}
+	run: a: string
+} & {
+	let A = run2.a
+	x2: "a \(A) z"
+	run2: a: string
 }
 
 unresolvedDisjunction: {
@@ -178,6 +199,13 @@ scoped: {
 		a: [Args_8.required]
 	}
 }
+complete: {
+	let A = run.a
+	x: "a \(A) z"
+	run: {
+		a: "foo"
+	}
+}
 y: Y & Y_1
 incomplete: {
 	a: {
@@ -187,29 +215,46 @@ incomplete: {
 		}
 	}
 	b: {
-		let A = run.a
-		x: "a \(A) z"
+		let A_1 = run.a
+		x: "a \(A_1) z"
 		run: {
 			a: string
 		}
 	}
 	c: {
-		let A_1 = run.a
-		x: "a \(A_1) z"
+		let A_2 = run.a
+		let A_3 = run2.a
+		x:  "a \(A_2) z"
+		x2: "a \(A_3) z"
 		run: {
-			a: "foo"
+			a: string
+		}
+		run2: {
+			a: string
+		}
+	}
+	d: {
+		let A_4 = run.a
+		let A_32 = run2.a
+		x:  "a \(A_4) z"
+		x2: "a \(A_32) z"
+		run: {
+			a: string
+		}
+		run2: {
+			a: string
 		}
 	}
 }
 unresolvedDisjunction: {
 	#TypePrimitive: {
-		let Args_32 = _args
+		let Args_9 = _args
 		{
 			"*": {}
 		} | {
 			bool: #TypeBool & {
 				_args: {
-					required: Args_32.required
+					required: Args_9.required
 				}
 			}
 		}
@@ -218,11 +263,11 @@ unresolvedDisjunction: {
 		}
 	}
 	#TypeBool: {
-		let Args_9 = _args
+		let Args_B = _args
 		_args: {
 			required: bool
 		}
-		if !Args_9.required {
+		if !Args_B.required {
 			// `default` sets the default value.
 			default: bool | null
 		}
@@ -260,6 +305,10 @@ unresolvedDisjunction: {
 [scoped listEmbed]
 [scoped listEmbed a]
 [scoped listEmbed a 0]
+[complete]
+[complete x]
+[complete run]
+[complete run a]
 [incomplete]
 [incomplete a]
 [incomplete a x]
@@ -273,6 +322,16 @@ unresolvedDisjunction: {
 [incomplete c x]
 [incomplete c run]
 [incomplete c run a]
+[incomplete c x2]
+[incomplete c run2]
+[incomplete c run2 a]
+[incomplete d]
+[incomplete d x]
+[incomplete d run]
+[incomplete d run a]
+[incomplete d x2]
+[incomplete d run2]
+[incomplete d run2 a]
 [unresolvedDisjunction]
 [unresolvedDisjunction #TypePrimitive]
 [unresolvedDisjunction #TypeBool]
@@ -324,6 +383,12 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
@@ -342,16 +407,34 @@ unresolvedDisjunction: {
 			}
 		}
 		b: {
-			let A = run.a
-			x: "a \(A) z"
+			let A_1 = run.a
+			x: "a \(A_1) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x: "a foo z"
+			let A_2 = run.a
+			let A_3 = run2.a
+			x:  "a \(A_2) z"
+			x2: "a \(A_3) z"
 			run: {
-				a: "foo"
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_4 = run.a
+			let A_8 = run2.a
+			x:  "a \(A_4) z"
+			x2: "a \(A_8) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
 			}
 		}
 	}
@@ -405,6 +488,12 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
@@ -423,16 +512,34 @@ unresolvedDisjunction: {
 			}
 		}
 		b: {
-			let A = run.a
-			x: "a \(A) z"
+			let A_1 = run.a
+			x: "a \(A_1) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x: "a foo z"
+			let A_2 = run.a
+			let A_3 = run2.a
+			x:  "a \(A_2) z"
+			x2: "a \(A_3) z"
 			run: {
-				a: "foo"
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_4 = run.a
+			let A_8 = run2.a
+			x:  "a \(A_4) z"
+			x2: "a \(A_8) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
 			}
 		}
 	}
@@ -499,6 +606,12 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
 	y:     "foo"
 	incomplete: {
@@ -515,9 +628,23 @@ unresolvedDisjunction: {
 			}
 		}
 		c: {
-			x: "a foo z"
+			x:  _|_ // invalid interpolation: incomplete.c.x: non-concrete value string (type string)
+			x2: _|_ // invalid interpolation: incomplete.c.x2: non-concrete value string (type string)
 			run: {
-				a: "foo"
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			x:  _|_ // invalid interpolation: incomplete.d.x: non-concrete value string (type string)
+			x2: _|_ // invalid interpolation: incomplete.d.x2: non-concrete value string (type string)
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
 			}
 		}
 	}
@@ -571,6 +698,12 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
@@ -589,16 +722,34 @@ unresolvedDisjunction: {
 			}
 		}
 		b: {
-			let A = run.a
-			x: "a \(A) z"
+			let A_1 = run.a
+			x: "a \(A_1) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x: "a foo z"
+			let A_2 = run.a
+			let A_3 = run2.a
+			x:  "a \(A_2) z"
+			x2: "a \(A_3) z"
 			run: {
-				a: "foo"
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_4 = run.a
+			let A_8 = run2.a
+			x:  "a \(A_4) z"
+			x2: "a \(A_8) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
 			}
 		}
 	}
@@ -675,6 +826,12 @@ unresolvedDisjunction: {
 			a: [1]
 		}
 	}
+	complete: {
+		x: "a foo z"
+		run: {
+			a: "foo"
+		}
+	}
 	files: {
 		"\("kind-\(cfg.name)")": {
 			patches: cfg
@@ -693,16 +850,34 @@ unresolvedDisjunction: {
 			}
 		}
 		b: {
-			let A = run.a
-			x: "a \(A) z"
+			let A_1 = run.a
+			x: "a \(A_1) z"
 			run: {
 				a: string
 			}
 		}
 		c: {
-			x: "a foo z"
+			let A_2 = run.a
+			let A_3 = run2.a
+			x:  "a \(A_2) z"
+			x2: "a \(A_3) z"
 			run: {
-				a: "foo"
+				a: string
+			}
+			run2: {
+				a: string
+			}
+		}
+		d: {
+			let A_4 = run.a
+			let A_8 = run2.a
+			x:  "a \(A_4) z"
+			x2: "a \(A_8) z"
+			run: {
+				a: string
+			}
+			run2: {
+				a: string
 			}
 		}
 	}

@@ -92,10 +92,6 @@ func TestValueX(t *testing.T) {
 
 	in := `
 -- in.cue --
-import "strings"
-
-strings.MinRunes(4) & strings.MaxRunes(7)
-
 	`
 
 	archive := txtar.Parse([]byte(in))

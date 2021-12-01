@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a629384f_88268a0f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-12-01T13:24:05Z",
+      "side": 1,
+      "message": "LGTM (with one question). unity breakages is entirely because of the now understood diff in the preceding CL.",
+      "revId": "b4d36be8bd8abeb806f1506adb56399eeca8e74d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

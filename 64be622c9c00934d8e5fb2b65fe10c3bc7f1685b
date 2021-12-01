@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "287c7895_b79e6155",
+        "filename": "internal/core/export/value_test.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-12-01T13:24:05Z",
+      "side": 0,
+      "message": "What\u0027s happened here?",
+      "revId": "64be622c9c00934d8e5fb2b65fe10c3bc7f1685b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

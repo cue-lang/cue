@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58f25ba5_ba175174",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 5
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-12-01T12:21:30Z",
+      "side": 1,
+      "message": "For reference the final unity diff vs patchset 5:\n\nhttps://gist.github.com/myitcv/792a6cdf743f5a6626ece0f654e701de\n\nEverything now LGTM.",
+      "revId": "64be622c9c00934d8e5fb2b65fe10c3bc7f1685b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -91,7 +91,7 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		attrs:    []*ast.Attribute{},
 	}
 
-	_, saved := e.pushFrame(orig)
+	s, saved := e.pushFrame(orig)
 	defer e.popFrame(saved)
 
 	// Handle value aliases and lets
@@ -113,6 +113,8 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		x.markLets(c.c.Expr().Source())
 	}
 
+	defer filterUnusedLets(s)
+
 	defer func() {
 		if valueAlias != nil {
 			valueAlias.Expr = expr
@@ -120,7 +122,6 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		}
 	}()
 
-	s := x.top().scope
 	hasAlias := len(s.Elts) > 0
 
 	for _, c := range a {

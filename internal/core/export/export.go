@@ -309,12 +309,22 @@ func setFieldAlias(f *ast.Field, name string) {
 }
 
 func (e *exporter) markLets(n ast.Node) {
-	switch v := n.(type) {
-	case *ast.StructLit:
-		e.markLetDecls(v.Elts)
-	case *ast.File:
-		e.markLetDecls(v.Decls)
+	if n == nil {
+		return
 	}
+	ast.Walk(n, func(n ast.Node) bool {
+		switch v := n.(type) {
+		case *ast.StructLit:
+			e.markLetDecls(v.Elts)
+		case *ast.File:
+			e.markLetDecls(v.Decls)
+
+		// TODO: would be better if the LetClause were a different type.
+		case *ast.Field, *ast.LetClause:
+			return false
+		}
+		return true
+	}, nil)
 }
 
 func (e *exporter) markLetDecls(decls []ast.Decl) {

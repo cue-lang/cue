@@ -53,10 +53,10 @@ changelog:
 
 brews:
 - tap:
-    owner: cuelang
+    owner: cue-lang
     name: homebrew-tap
   commit_author:
-    name: cue-bot
+    name: cueckoo
     email: noreply@cuelang.org
   homepage: "https://cuelang.org"
   description: "CUE is an open source data constraint language which aims to simplify tasks involving defining and using data."

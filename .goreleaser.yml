@@ -80,7 +80,7 @@ dockers:
   - --label=org.opencontainers.image.revision={{ .FullCommit }}
   - --label=org.opencontainers.image.licenses=Apache 2.0
 - image_templates:
-  - "docker.io/cuelang/cue:{{ .Version }}-arm64"
+  - "docker.io/cuelang/cue:{{ .Version }}-arm64v8"
   dockerfile: Dockerfile
   use: buildx
   build_flag_templates:

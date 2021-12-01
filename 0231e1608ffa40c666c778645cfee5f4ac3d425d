@@ -52,6 +52,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "7214b90a_e9cbaa2c",
+        "filename": "internal/core/export/testdata/issue1284.txtar",
+        "patchSetId": 1
+      },
+      "lineNbr": 85,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-12-01T11:32:26Z",
+      "side": 1,
+      "message": "There are various tests, with different profiles. The profile in line 37 is only for the \"Eval\" test. The \"All\" test does not take defaults. These are defined in export.go",
+      "parentUuid": "a9e81d70_51edfa25",
+      "revId": "0231e1608ffa40c666c778645cfee5f4ac3d425d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "92a86158_f1d17516",
@@ -65,6 +83,24 @@
       "writtenOn": "2021-11-30T19:46:39Z",
       "side": 1,
       "message": "Just to confirm for my own understanding, this CL doesn\u0027t affect any cmd/cue commands, correct? Because def is a different beast entirely, eval and export do select defaults.",
+      "revId": "0231e1608ffa40c666c778645cfee5f4ac3d425d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc9d6c1d_5734ad44",
+        "filename": "internal/core/export/value.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 326,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-12-01T11:32:26Z",
+      "side": 1,
+      "message": "Correct, the `def` path is completely different and is contained in the adt.go and expr.go files.",
+      "parentUuid": "92a86158_f1d17516",
       "revId": "0231e1608ffa40c666c778645cfee5f4ac3d425d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

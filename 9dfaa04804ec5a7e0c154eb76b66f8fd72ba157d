@@ -16,6 +16,23 @@
       "message": "LGTM. The resolveReferences test shows nicely how this plays out taking a \"snippet\" of CUE.\n\nWhilst the lack of resolution in the presence of an error might be a deal breaker, this is certainly a good first step towards understanding the real needs of Kubevela. ",
       "revId": "9dfaa04804ec5a7e0c154eb76b66f8fd72ba157d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "92880a84_606ceb6c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2021-12-01T13:39:17Z",
+      "side": 1,
+      "message": "FYI the unity failure is a result of the let CL.",
+      "revId": "9dfaa04804ec5a7e0c154eb76b66f8fd72ba157d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -43,10 +43,6 @@ workflows: [
 		file:   "tip_triggers.yml"
 		schema: tip_triggers
 	},
-	{
-		file:   "new_version_triggers.yml"
-		schema: new_version_triggers
-	},
 ]
 
 test: _#bashWorkflow & {
@@ -224,44 +220,68 @@ release: _#bashWorkflow & {
 
 	name: "Release"
 	on: push: tags: [_#releaseTagPattern]
-	jobs: {
-		goreleaser: {
-			"runs-on": _#linuxMachine
-			steps: [
-				_#checkoutCode & {
-					with: "fetch-depth": 0
-				},
-				_#installGo & {
-					with: "go-version": _#latestStableGo
-				},
-				_#step & {
-					name: "Setup qemu"
-					uses: "docker/setup-qemu-action@v1"
-				},
-				_#step & {
-					name: "Set up Docker Buildx"
-					uses: "docker/setup-buildx-action@v1"
-				},
-				_#step & {
-					name: "Docker Login"
-					uses: "docker/login-action@v1"
-					with: {
-						registry: "docker.io"
-						username: "cueckoo"
-						password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
+	jobs: goreleaser: {
+		"runs-on": _#linuxMachine
+		steps: [
+			_#checkoutCode & {
+				with: "fetch-depth": 0
+			},
+			_#installGo & {
+				with: "go-version": _#latestStableGo
+			},
+			_#step & {
+				name: "Setup qemu"
+				uses: "docker/setup-qemu-action@v1"
+			},
+			_#step & {
+				name: "Set up Docker Buildx"
+				uses: "docker/setup-buildx-action@v1"
+			},
+			_#step & {
+				name: "Docker Login"
+				uses: "docker/login-action@v1"
+				with: {
+					registry: "docker.io"
+					username: "cueckoo"
+					password: "${{ secrets.CUECKOO_DOCKER_PAT }}"
+				}
+			},
+			_#step & {
+				name: "Run GoReleaser"
+				env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
+				uses: "goreleaser/goreleaser-action@v2"
+				with: {
+					args:    "release --rm-dist"
+					version: "v1.1.0"
+				}
+			},
+			_#step & {
+				_#arg: {
+					event_type: "Re-test post release of ${GITHUB_REF##refs/tags/}"
+				}
+				name: "Re-test cuelang.org"
+				run:  #"""
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/cuelang.org/dispatches
+					"""#
+			},
+			_#step & {
+				_#arg: {
+					event_type: "Check against CUE ${GITHUB_REF##refs/tags/}"
+					client_payload: {
+						type: "unity"
+						payload: {
+							versions: """
+							"${GITHUB_REF##refs/tags/}"
+							"""
+						}
 					}
-				},
-				_#step & {
-					name: "Run GoReleaser"
-					env: GITHUB_TOKEN: "${{ secrets.CUECKOO_GITHUB_PAT }}"
-					uses: "goreleaser/goreleaser-action@v2"
-					with: {
-						args:    "release --rm-dist"
-						version: "v1.1.0"
-					}
-				},
-			]
-		}
+				}
+				name: "Trigger unity build"
+				run:  #"""
+					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/unity/dispatches
+					"""#
+			},
+		]
 	}
 }
 
@@ -284,43 +304,6 @@ tip_triggers: _#bashWorkflow & {
 						payload: {
 							versions: """
 							"commit:${GITHUB_SHA}"
-							"""
-						}
-					}
-				}
-				name: "Trigger unity build"
-				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/unity/dispatches
-					"""#
-			},
-		]
-	}
-}
-
-new_version_triggers: _#bashWorkflow & {
-
-	name: "New release triggers"
-	on: push: tags: [_#releaseTagPattern]
-	jobs: push: {
-		"runs-on": _#linuxMachine
-		steps: [
-			{
-				_#arg: {
-					event_type: "Re-test post release of ${GITHUB_REF##refs/tags/}"
-				}
-				name: "Rebuild tip.cuelang.org"
-				run:  #"""
-					\#(_#curl) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \#(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/cuelang.org/dispatches
-					"""#
-			},
-			{
-				_#arg: {
-					event_type: "Check against CUE ${GITHUB_REF##refs/tags/}"
-					client_payload: {
-						type: "unity"
-						payload: {
-							versions: """
-							"${GITHUB_REF##refs/tags/}"
 							"""
 						}
 					}

@@ -32,6 +32,7 @@ archives:
 
 release:
   disable: false
+  prerelease: auto
 
 checksum:
   name_template: 'checksums.txt'

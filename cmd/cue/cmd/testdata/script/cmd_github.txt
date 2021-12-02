@@ -104,7 +104,7 @@ jobs:
         uses: goreleaser/goreleaser-action@v2
         with:
           args: release --rm-dist
-          version: v1.0.0
+          version: v1.1.0
         env:
           GITHUB_TOKEN: ${{ secrets.CUECKOO_GITHUB_PAT }}
 -- .github/workflows/repository_dispatch.yml.golden --
@@ -1279,7 +1279,7 @@ release: _#bashWorkflow & {
 			uses: "goreleaser/goreleaser-action@v2"
 			with: {
 				args:    "release --rm-dist"
-				version: "v1.0.0"
+				version: "v1.1.0"
 			}
 		}]
 	}

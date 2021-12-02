@@ -10,13 +10,7 @@ builds:
   binary: cue
   ldflags:
     - -s -w
-    # TODO: consider adding the following for a verbose mode
-    # - -X cuelang.org/go/cmd/cue/cmd.version={{.Version}}
-    # - -X cuelang.org/go/cmd/cue/cmd.commit={{.ShortCommit}}
-    # - -X cuelang.org/go/cmd/cue/cmd.date={{.Date}}
-    # - -X cuelang.org/cmd/cue/cmd.date={{.Env.GOVERSION}}
   goos:
-    # File and Issue to request including other platforms.
     - darwin
     - linux
     - windows
@@ -80,11 +74,12 @@ dockers:
   - --label=org.opencontainers.image.revision={{ .FullCommit }}
   - --label=org.opencontainers.image.licenses=Apache 2.0
 - image_templates:
-  - "docker.io/cuelang/cue:{{ .Version }}-arm64v8"
+  - "docker.io/cuelang/cue:{{ .Version }}-arm64"
+  goarch: arm64
   dockerfile: Dockerfile
   use: buildx
   build_flag_templates:
-  - --platform=linux/arm64/v8
+  - --platform=linux/arm64
   - --label=org.opencontainers.image.title={{ .ProjectName }}
   - --label=org.opencontainers.image.description={{ .ProjectName }}
   - --label=org.opencontainers.image.url=https://github.com/cue-lang/cue
@@ -98,8 +93,8 @@ docker_manifests:
 - name_template: docker.io/cuelang/cue:{{ .Version }}
   image_templates:
   - docker.io/cuelang/cue:{{ .Version }}-amd64
-  - docker.io/cuelang/cue:{{ .Version }}-arm64v8
+  - docker.io/cuelang/cue:{{ .Version }}-arm64
 - name_template: docker.io/cuelang/cue:latest
   image_templates:
   - docker.io/cuelang/cue:{{ .Version }}-amd64
-  - docker.io/cuelang/cue:{{ .Version }}-arm64v8
+  - docker.io/cuelang/cue:{{ .Version }}-arm64

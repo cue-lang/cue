@@ -92,7 +92,7 @@ into CUE.
 ```
 $ cd services
 $ cue import ./...
-must specify package name with the -p flag
+path, list, or files flag needed to handle multiple objects in file ./services/frontend/bartender/kube.yaml
 ```
 
 Since we have multiple packages and files, we need to specify the package to

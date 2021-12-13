@@ -16,6 +16,7 @@ package errors
 
 import (
 	"bytes"
+	"fmt"
 	"testing"
 
 	"cuelang.org/go/cue/token"
@@ -172,21 +173,45 @@ func TestErrorList_Err(t *testing.T) {
 }
 
 func TestPrintError(t *testing.T) {
-	type args struct {
-		err error
-	}
 	tests := []struct {
 		name  string
-		args  args
+		err   error
 		wantW string
-	}{
-		// TODO: Add test cases.
-	}
+	}{{
+		name:  "SimplePromoted",
+		err:   Promote(fmt.Errorf("hello"), "msg"),
+		wantW: "msg: hello\n",
+	}, {
+		name:  "PromoteWithPercent",
+		err:   Promote(fmt.Errorf("hello"), "msg%s"),
+		wantW: "msg%s: hello\n",
+	}, {
+		name:  "PromoteWithEmptyString",
+		err:   Promote(fmt.Errorf("hello"), ""),
+		wantW: "hello\n",
+	}, {
+		name:  "TwoErrors",
+		err:   Append(Promote(fmt.Errorf("hello"), "x"), Promote(fmt.Errorf("goodbye"), "y")),
+		wantW: "x: hello\ny: goodbye\n",
+	}, {
+		name:  "WrappedSingle",
+		err:   fmt.Errorf("wrap: %w", Promote(fmt.Errorf("hello"), "x")),
+		wantW: "x: hello\n",
+	}, {
+		name: "WrappedMultiple",
+		err: fmt.Errorf("wrap: %w",
+			Append(Promote(fmt.Errorf("hello"), "x"), Promote(fmt.Errorf("goodbye"), "y")),
+		),
+		wantW: "x: hello\ny: goodbye\n",
+	}}
+	// TODO tests for errors with positions.
 	for _, tt := range tests {
-		w := &bytes.Buffer{}
-		Print(w, tt.args.err, nil)
-		if gotW := w.String(); gotW != tt.wantW {
-			t.Errorf("%q. PrintError() = %v, want %v", tt.name, gotW, tt.wantW)
-		}
+		t.Run(tt.name, func(t *testing.T) {
+			w := &bytes.Buffer{}
+			Print(w, tt.err, nil)
+			if gotW := w.String(); gotW != tt.wantW {
+				t.Errorf("unexpected PrintError result\ngot %q\nwant %q", gotW, tt.wantW)
+			}
+		})
 	}
 }

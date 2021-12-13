@@ -254,7 +254,7 @@ func Promote(err error, msg string) Error {
 	case Error:
 		return x
 	default:
-		return Wrapf(err, token.NoPos, msg)
+		return Wrapf(err, token.NoPos, "%s", msg)
 	}
 }
 
@@ -293,13 +293,16 @@ func Append(a, b Error) Error {
 // its individual elements. If the given error is not an Error, it will be
 // promoted to one.
 func Errors(err error) []Error {
-	switch x := err.(type) {
-	case nil:
+	if err == nil {
 		return nil
-	case list:
-		return []Error(x)
-	case Error:
-		return []Error{x}
+	}
+	var listErr list
+	var errorErr Error
+	switch {
+	case As(err, &listErr):
+		return listErr
+	case As(err, &errorErr):
+		return []Error{errorErr}
 	default:
 		return []Error{Promote(err, "")}
 	}
@@ -420,14 +423,24 @@ func equalPath(a, b []string) bool {
 // Sanitize sorts multiple errors and removes duplicates on a best effort basis.
 // If err represents a single or no error, it returns the error as is.
 func Sanitize(err Error) Error {
-	if l, ok := err.(list); ok && err != nil {
-		a := make(list, len(l))
-		copy(a, l)
-		a.Sort()
-		a.RemoveMultiples()
-		return a
+	if err == nil {
+		return nil
+	}
+	if l, ok := err.(list); ok {
+		return l.sanitize()
 	}
 	return err
+}
+
+func (p list) sanitize() list {
+	if p == nil {
+		return p
+	}
+	a := make(list, len(p))
+	copy(a, p)
+	a.Sort()
+	a.RemoveMultiples()
+	return a
 }
 
 // Sort sorts an List. *posError entries are sorted by position,
@@ -534,10 +547,7 @@ func Print(w io.Writer, err error, cfg *Config) {
 	if cfg == nil {
 		cfg = &Config{}
 	}
-	if e, ok := err.(Error); ok {
-		err = Sanitize(e)
-	}
-	for _, e := range Errors(err) {
+	for _, e := range list(Errors(err)).sanitize() {
 		printError(w, e, cfg)
 	}
 }
@@ -568,8 +578,9 @@ func writeErr(w io.Writer, err Error) {
 
 		printed := false
 		msg, args := err.Msg()
-		if msg != "" || u == nil { // print at least something
-			fmt.Fprintf(w, msg, args...)
+		s := fmt.Sprintf(msg, args...)
+		if s != "" || u == nil { // print at least something
+			_, _ = io.WriteString(w, s)
 			printed = true
 		}
 

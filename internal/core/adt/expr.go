@@ -1601,7 +1601,7 @@ func (x *Disjunction) Kind() Kind {
 
 type Comprehension struct {
 	Clauses Yielder
-	Value   *StructLit // TODO: changes this to Expr?
+	Value   Expr
 }
 
 func (x *Comprehension) Source() ast.Node {

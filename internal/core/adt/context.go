@@ -437,7 +437,9 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 }
 
 // Yield evaluates a Yielder and calls f for each result.
-func (c *OpContext) Yield(env *Environment, y Yielder, f YieldFunc) *Bottom {
+func (c *OpContext) Yield(env *Environment, comp *Comprehension, f YieldFunc) *Bottom {
+	y := comp.Clauses
+
 	s := c.PushState(env, y.Source())
 
 	y.yield(c, f)

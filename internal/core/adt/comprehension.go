@@ -15,34 +15,30 @@
 package adt
 
 type envYield struct {
-	env   *Environment
-	yield Yielder
-	id    CloseInfo
-	err   *Bottom
+	comp *Comprehension
+	env  *Environment
+	id   CloseInfo
+	err  *Bottom
 }
 
-func (n *nodeContext) insertComprehension(env *Environment, x Yielder, ci CloseInfo) {
-	n.comprehensions = append(n.comprehensions, envYield{env, x, ci, nil})
+func (n *nodeContext) insertComprehension(env *Environment, x *Comprehension, ci CloseInfo) {
+	n.comprehensions = append(n.comprehensions, envYield{x, env, ci, nil})
 }
 
 // injectComprehensions evaluates and inserts comprehensions.
 func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 	ctx := n.ctx
-	type envStruct struct {
-		env *Environment
-		s   *StructLit // always the same.
-	}
-	var sa []envStruct
-	f := func(env *Environment, st *StructLit) {
-		sa = append(sa, envStruct{env, st})
-	}
 
 	k := 0
 	for i := 0; i < len(*all); i++ {
 		d := (*all)[i]
-		sa = sa[:0]
 
-		if err := ctx.Yield(d.env, d.yield, f); err != nil {
+		sa := []*Environment{}
+		f := func(env *Environment) {
+			sa = append(sa, env)
+		}
+
+		if err := ctx.Yield(d.env, d.comp, f); err != nil {
 			if err.IsIncomplete() {
 				d.err = err
 				(*all)[k] = d
@@ -57,11 +53,11 @@ func (n *nodeContext) injectComprehensions(all *[]envYield) (progress bool) {
 		if len(sa) == 0 {
 			continue
 		}
-		id := d.id.SpawnSpan(d.yield, ComprehensionSpan)
+		id := d.id.SpawnSpan(d.comp.Clauses, ComprehensionSpan)
 
 		n.ctx.nonMonotonicInsertNest++
-		for _, st := range sa {
-			n.addStruct(st.env, st.s, id)
+		for _, env := range sa {
+			n.addExprConjunct(Conjunct{env, d.comp.Value, id})
 		}
 		n.ctx.nonMonotonicInsertNest--
 	}

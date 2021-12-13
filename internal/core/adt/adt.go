@@ -118,7 +118,7 @@ type Resolver interface {
 	resolve(ctx *OpContext, state VertexStatus) *Vertex
 }
 
-type YieldFunc func(env *Environment, s *StructLit)
+type YieldFunc func(env *Environment)
 
 // A Yielder represents 0 or more labeled values of structs or lists.
 type Yielder interface {

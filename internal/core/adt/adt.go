@@ -183,6 +183,13 @@ func (*StructLit) expr()       {}
 func (*ListLit) expr()         {}
 func (*DisjunctionExpr) expr() {}
 
+// TODO: also allow?
+//       a: b: if cond {}
+//
+// It is unclear here, though, whether field `a` should be added
+// unconditionally.
+// func (*Comprehension) expr() {}
+
 // Expr and Value
 
 func (*Bottom) expr()           {}

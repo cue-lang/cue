@@ -221,7 +221,10 @@ const (
 // of defaults.
 func (t *trimmer) addDominators(d, v *adt.Vertex, hasDisjunction bool) (doms *adt.Vertex, ambiguous, hasSubs, strict bool) {
 	strict = hasDisjunction
-	doms = &adt.Vertex{}
+	doms = &adt.Vertex{
+		Parent: v.Parent,
+		Label:  v.Label,
+	}
 	if d != nil && hasDisjunction {
 		doms.Conjuncts = append(doms.Conjuncts, d.Conjuncts...)
 	}

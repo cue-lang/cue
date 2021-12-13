@@ -1747,5 +1747,5 @@ func (x *ValueClause) Source() ast.Node {
 }
 
 func (x *ValueClause) yield(op *OpContext, f YieldFunc) {
-	f(op.Env(0), x.StructLit)
+	f(op.Env(0))
 }

@@ -325,6 +325,7 @@ func (v *Vertex) Value() Value {
 	case *StructMarker, *ListMarker:
 		return v
 	case Value:
+		// TODO: recursively descend into Vertex?
 		return x
 	default:
 		panic(fmt.Sprintf("unexpected type %T", v.BaseValue))
@@ -455,8 +456,7 @@ func (v *Vertex) Finalize(c *OpContext) {
 }
 
 func (v *Vertex) AddErr(ctx *OpContext, b *Bottom) {
-	v.BaseValue = CombineErrors(nil, v.Value(), b)
-	v.UpdateStatus(Finalized)
+	v.SetValue(ctx, Finalized, CombineErrors(nil, v.Value(), b))
 }
 
 func (v *Vertex) SetValue(ctx *OpContext, state VertexStatus, value BaseValue) *Bottom {

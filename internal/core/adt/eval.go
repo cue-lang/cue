@@ -1741,7 +1741,7 @@ func (n *nodeContext) addStruct(
 			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeInfo, nil})
 
 		case *Comprehension:
-			n.insertComprehension(childEnv, x.Clauses, closeInfo)
+			n.insertComprehension(childEnv, x, closeInfo)
 
 		case Expr:
 			// add embedding to optional
@@ -1988,12 +1988,11 @@ outer:
 		for j, elem := range l.list.Elems {
 			switch x := elem.(type) {
 			case *Comprehension:
-				xx := x.Clauses
-				err := c.Yield(l.env, xx, func(e *Environment, st *StructLit) {
-					label, err := MakeLabel(xx.Source(), index, IntLabel)
+				err := c.Yield(l.env, x, func(e *Environment) {
+					label, err := MakeLabel(x.Source(), index, IntLabel)
 					n.addErr(err)
 					index++
-					c := MakeConjunct(e, st, l.id)
+					c := MakeConjunct(e, x.Value, l.id)
 					n.insertField(label, c)
 				})
 				hasComprehension = true

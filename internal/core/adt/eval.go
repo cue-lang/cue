@@ -1391,7 +1391,7 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 		// is necessary to prevent lookups in unevaluated structs.
 		// TODO(cycles): this can probably most easily be fixed with a
 		// having a more recursive implementation.
-		n.ctx.Unify(arc, AllArcs)
+		n.ctx.Unify(arc, Partial)
 	}
 
 	for _, c := range arc.Conjuncts {

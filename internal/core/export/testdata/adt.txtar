@@ -8,7 +8,6 @@ p1: [X=string]: name: X
 d1: "foo\(bar)": int
 bar: "bar"
 
-// XXX: reference not resolving.
 d2: C="foo\(bar)": {
     name: "xx"
     foo: C.name
@@ -227,8 +226,6 @@ errorListDef: {
 [d1 foobar]
 [bar]
 [d2]
-- XXX: reference not resolving.
-
 [d2 foobar]
 [d2 foobar name]
 [d2 foobar foo]
@@ -309,8 +306,6 @@ _|_ // e3: index out of range [2] with length 2
 		foobar: int
 	}
 	bar: "bar"
-
-	// XXX: reference not resolving.
 	d2: {
 		foobar: {
 			name: "xx"

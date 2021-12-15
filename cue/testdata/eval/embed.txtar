@@ -44,8 +44,8 @@ y: {
     a: (int){ int }
   }
   y: (#struct){
-    c: (int){ int }
     a: (int){ int }
+    c: (int){ int }
   }
 }
 -- out/compile --

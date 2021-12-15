@@ -56,15 +56,17 @@ d: {
 }
 -- out/eval --
 (struct){
+  a: (string){ "foo" }
   b: (bool){ true }
   c: (struct){
     a: (int){ 3 }
   }
   d: (_|_){
-    // [incomplete] d: non-concrete value int in operand to >:
+    // [cycle] cycle error:
     //     ./in.cue:14:5
-    //     ./in.cue:13:5
-    a: (int){ int }
+    a: (_|_){
+      // [cycle] cycle error:
+      //     ./in.cue:14:5
+    }
   }
-  a: (string){ "foo" }
 }

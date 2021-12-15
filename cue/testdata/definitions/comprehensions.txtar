@@ -19,14 +19,14 @@ Result:
   // [eval]
   issue595: (_|_){
     // [eval]
+    files: (_|_){
+      // [eval] issue595.files: undefined field: nam:
+      //     ./in.cue:8:14
+    }
     #cfgs: (#list){
       0: (#struct){
         name: (string){ "foo" }
       }
-    }
-    files: (_|_){
-      // [eval] issue595.files: undefined field: nam:
-      //     ./in.cue:8:14
     }
   }
 }

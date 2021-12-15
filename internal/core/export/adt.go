@@ -317,6 +317,9 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		}
 		return ast.NewBinExpr(token.OR, a...)
 
+	case *adt.Comprehension:
+		return e.adt(x.Value, conjuncts)
+
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}

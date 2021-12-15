@@ -3,7 +3,7 @@
 #name: delayed constraint failure
 #evalPartial
 -- in.cue --
-a: b - 100
+a: b - 100 // Okay to have no error here, as long as there is an error with b.
 b: a + 110
 b: 200
 
@@ -36,11 +36,7 @@ x: conflicting values 101 and 100:
 Result:
 (_|_){
   // [eval]
-  a: (_|_){
-    // [eval] b: conflicting values 210 and 200:
-    //     ./in.cue:2:4
-    //     ./in.cue:3:4
-  }
+  a: (int){ 100 }
   b: (_|_){
     // [eval] b: conflicting values 210 and 200:
     //     ./in.cue:2:4

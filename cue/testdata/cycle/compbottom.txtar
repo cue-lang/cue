@@ -133,9 +133,13 @@ medium: {
 			host:     "example.com"
 		}
 
+		// X: "user@example.com"
 		X: #X.userinfo + #X.host
 
 		#X: {
+			// userinfo: "user@"
+			// host:     "example.com"
+
 			if Y.userinfo == _|_ {
 				userinfo: ""
 			}
@@ -147,6 +151,9 @@ medium: {
 		}
 
 		Y: {
+			// userinfo: "user"
+			// host:     "example.com"
+
 			if #Y.userinfo != _|_ {
 				userinfo: #Y.userinfo
 			}
@@ -315,8 +322,8 @@ medium: {
       }
       X: (string){ "user@example.com" }
       #X: (#struct){
-        host: (string){ "example.com" }
         userinfo: (string){ "user@" }
+        host: (string){ "example.com" }
       }
       #Y: (#struct){
         host: (string){ "example.com" }
@@ -330,8 +337,8 @@ medium: {
         host: (string){ "example.com" }
       }
       #X: (#struct){
-        host: (string){ "example.com" }
         userinfo: (string){ "user@" }
+        host: (string){ "example.com" }
       }
       #Y: (#struct){
         host: (string){ "example.com" }
@@ -341,8 +348,8 @@ medium: {
     p3: (struct){
       X: (string){ "user@example.com" }
       #X: (#struct){
-        host: (string){ "example.com" }
         userinfo: (string){ "user@" }
+        host: (string){ "example.com" }
       }
       Y: (struct){
         userinfo: (string){ "user" }
@@ -356,12 +363,12 @@ medium: {
     p4: (struct){
       X: (string){ "user@example.com" }
       #X: (#struct){
-        host: (string){ "example.com" }
         userinfo: (string){ "user@" }
+        host: (string){ "example.com" }
       }
       Y: (struct){
-        host: (string){ "example.com" }
         userinfo: (string){ "user" }
+        host: (string){ "example.com" }
       }
       #Y: (#struct){
         host: (string){ "example.com" }

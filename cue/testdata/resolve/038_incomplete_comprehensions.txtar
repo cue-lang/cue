@@ -52,15 +52,15 @@ B: A & {
   A: (_|_){
     // [incomplete] A: cannot range over src (incomplete type _):
     //     ./in.cue:2:11
-    src: (_){ _ }
     baz: (string){ "baz" }
+    src: (_){ _ }
   }
   B: (struct){
+    baz: (string){ "baz" }
     src: (#list){
       0: (string){ "foo" }
       1: (string){ "bar" }
     }
-    baz: (string){ "baz" }
     foo: (string){ "foo" }
     bar: (string){ "bar" }
   }

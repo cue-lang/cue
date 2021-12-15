@@ -45,11 +45,11 @@ y: _|_ // field "c" not allowed in closed struct
     b: (bool){ bool }
   }
   x: (#struct){
-    b: (bool){ true }
     c: (int){ 4 }
+    b: (bool){ true }
   }
   y: (#struct){
-    b: (bool){ true }
     c: (int){ 4 }
+    b: (bool){ true }
   }
 }

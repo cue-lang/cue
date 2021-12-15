@@ -90,7 +90,6 @@ embed: {
   }
 }
 
-
 // Mix of both dynamic and static fields.
 mixedFields: {
   a: {
@@ -552,31 +551,27 @@ unifyDynamicReflect: {
 -- out/eval --
 Errors:
 a.c.d: field not allowed: d:
-    ./in.cue:170:5
-    ./in.cue:172:2
-    ./in.cue:173:6
-    ./in.cue:176:5
-b12a.#list.tail.tail: structural cycle
-b12a.list.tail.tail: structural cycle
+    ./in.cue:169:5
+    ./in.cue:171:2
+    ./in.cue:175:5
 embed.t1.p: field not allowed: p:
     ./in.cue:33:6
     ./in.cue:34:7
+    ./in.cue:35:3
+    ./in.cue:35:12
     ./in.cue:39:6
 embed.t4.p: field not allowed: p:
     ./in.cue:58:7
     ./in.cue:59:8
     ./in.cue:60:6
     ./in.cue:61:3
-    ./in.cue:62:4
-fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct):
-    ./in.cue:124:5
-    ./in.cue:125:5
-    ./in.cue:125:13
-cycle error:
-    ./in.cue:136:6
-cycle error:
-    ./in.cue:144:12
+fieldMismatch.a: cannot combine regular field "x" with 2:
+    ./in.cue:125:10
+    ./in.cue:123:5
+b12a.#list.tail: structural cycle:
+    ./in.cue:135:6
+b12a.list.tail: structural cycle:
+    ./in.cue:143:12
 
 Result:
 (_|_){
@@ -584,8 +579,8 @@ Result:
   linkChildren: (struct){
     w: (int){ 1 }
     v: (struct){
-      x: (int){ 1 }
       y: (int){ 1 }
+      x: (int){ 1 }
       z: (int){ 1 }
       rw: (int){ 1 }
       rx: (int){ 1 }
@@ -616,11 +611,10 @@ Result:
       }
     }
   }
-  fail: (_|_){
-    // [eval]
+  fail: (struct){
     a: (_|_){
-      // [eval] fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-      b: (int){ 1 }
+      // [cycle] fail.a.b: cycle with field a.b:
+      //     ./in.cue:26:6
     }
   }
   embed: (_|_){
@@ -631,6 +625,8 @@ Result:
         // [eval] embed.t1.p: field not allowed: p:
         //     ./in.cue:33:6
         //     ./in.cue:34:7
+        //     ./in.cue:35:3
+        //     ./in.cue:35:12
         //     ./in.cue:39:6
       }
     }
@@ -654,15 +650,13 @@ Result:
         //     ./in.cue:59:8
         //     ./in.cue:60:6
         //     ./in.cue:61:3
-        //     ./in.cue:62:4
-        q: (_|_){// 1
-        }
+        q: (int){ 1 }
       }
     }
     #C4: (#struct){
     }
     t5: (_|_){
-      // [incomplete] embed.t5: incomplete bool: bool
+      // [incomplete] embed.t5.p.q: incomplete bool: bool
       a: (bool){ bool }
     }
     t6: (struct){
@@ -711,76 +705,67 @@ Result:
   fieldMismatch: (_|_){
     // [eval]
     a: (_|_){
-      // [eval] fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct):
-      //     ./in.cue:124:5
-      //     ./in.cue:125:5
-      //     ./in.cue:125:13
+      // [eval] fieldMismatch.a: cannot combine regular field "x" with 2:
+      //     ./in.cue:125:10
+      //     ./in.cue:123:5
       x: (int){ 3 }
     }
   }
   b12a: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] cycle error:
-      //     ./in.cue:136:6
+      // [structural cycle] b12a.#list.tail: structural cycle:
+      //     ./in.cue:135:6
       tail: (_|_){
-        // [structural cycle] cycle error:
-        //     ./in.cue:136:6
-        tail: (_|_){
-          // [structural cycle] b12a.#list.tail.tail: structural cycle
-        }
+        // [structural cycle] b12a.#list.tail: structural cycle:
+        //     ./in.cue:135:6
       }
     }
     list: (_|_){
-      // [structural cycle] cycle error:
-      //     ./in.cue:144:12
+      // [structural cycle] b12a.list.tail: structural cycle:
+      //     ./in.cue:143:12
       tail: (_|_){
-        // [structural cycle] cycle error:
-        //     ./in.cue:144:12
-        tail: (_|_){
-          // [structural cycle] b12a.list.tail.tail: structural cycle
-        }
+        // [structural cycle] b12a.list.tail: structural cycle:
+        //     ./in.cue:143:12
       }
     }
   }
   xx: (struct){
     #a: (_|_){
-      // [incomplete] xx.#a: incomplete bool: bool
+      // [incomplete] xx.#a.c: incomplete bool: bool
       b: (bool){ bool }
     }
     x: (#struct){
-      b: (bool){ true }
       c: (int){ 4 }
+      b: (bool){ true }
     }
     y: (#struct){
-      b: (bool){ true }
       c: (int){ 4 }
+      b: (bool){ true }
     }
   }
   #a: (#struct){
-    b: (bool){ true }
     c: (int){ 4 }
+    b: (bool){ true }
   }
   #c: (#struct){
   }
   a: (_|_){
     // [eval]
-    b: (bool){ true }
     c: (_|_){
       // [eval]
       d: (_|_){
         // [eval] a.c.d: field not allowed: d:
-        //     ./in.cue:170:5
-        //     ./in.cue:172:2
-        //     ./in.cue:173:6
-        //     ./in.cue:176:5
+        //     ./in.cue:169:5
+        //     ./in.cue:171:2
+        //     ./in.cue:175:5
       }
     }
+    b: (bool){ true }
   }
   scopes: (struct){
     x: (int){ 1 }
     a: (struct){
-      y: (int){ 2 }
       b: (int){ 1 }
       c: (struct){
         d: (int){ 1 }
@@ -789,6 +774,7 @@ Result:
       f: (struct){
         g: (int){ 2 }
       }
+      y: (int){ 2 }
     }
   }
   drop: (struct){
@@ -799,14 +785,17 @@ Result:
   }
   cyclicError: (struct){
     a: (_|_){
-      // [incomplete] cyclicError.a: incomplete bool: bool
-      x: (bool){ bool }
-      y: (bool){ bool }
+      // [cycle] cycle error
+      y: (_|_){
+        // [cycle] cycle error
+      }
+      x: (_|_){
+        // [cycle] cycle error
+      }
       b: (struct){
       }
     }
-    c: (_|_){
-      // [incomplete] cyclicError.a: incomplete bool: bool
+    c: (struct){
     }
   }
   midwayReferences: (struct){
@@ -850,9 +839,9 @@ Result:
         }
       }
       #D: (_|_){
-        // [incomplete] closedCheck.t1.#D: non-concrete value string in operand to !=:
-        //     ./in.cue:240:8
-        //     ./in.cue:239:5
+        // [incomplete] closedCheck.t1.#D.e: non-concrete value string in operand to !=:
+        //     ./in.cue:239:8
+        //     ./in.cue:238:5
         d: (string){ string }
       }
     }
@@ -867,8 +856,8 @@ Result:
       }
       #D: (_|_){
         // [incomplete] closedCheck.t2.#D: non-concrete value string in operand to !=:
-        //     ./in.cue:256:8
-        //     ./in.cue:255:5
+        //     ./in.cue:255:8
+        //     ./in.cue:254:5
         d: (string){ string }
       }
     }
@@ -885,8 +874,8 @@ Result:
         d: (string){ string }
         e: (_|_){
           // [incomplete] closedCheck.t3.#D.e: non-concrete value string in operand to !=:
-          //     ./in.cue:273:10
-          //     ./in.cue:271:5
+          //     ./in.cue:272:10
+          //     ./in.cue:270:5
         }
       }
     }
@@ -896,7 +885,7 @@ Result:
     }
     b: (_|_){
       // [incomplete] emptyComprehension.b: undefined field: b:
-      //     ./in.cue:289:14
+      //     ./in.cue:288:14
     }
   }
   voidElimination: (struct){
@@ -929,9 +918,9 @@ Result:
         e: (bool){ bool }
         f: (_|_){
           // [incomplete] voidElimination.derefRef1.E.f: operand e of '!' not concrete (was bool):
-          //     ./in.cue:344:7
+          //     ./in.cue:343:7
           // voidElimination.derefRef1.E.f: operand e of '!' not concrete (was bool):
-          //     ./in.cue:359:7
+          //     ./in.cue:358:7
         }
       }
     }
@@ -946,14 +935,14 @@ Result:
         e: (bool){ bool }
         f: (_|_){
           // [incomplete] voidElimination.derefRef2.E.f: operand e of '!' not concrete (was bool):
-          //     ./in.cue:375:7
+          //     ./in.cue:374:7
         }
       }
       #F: (#struct){
         e: (bool){ bool }
         f: (_|_){
           // [incomplete] voidElimination.derefRef2.#F.f: operand e of '!' not concrete (was bool):
-          //     ./in.cue:375:7
+          //     ./in.cue:374:7
         }
       }
     }
@@ -968,13 +957,13 @@ Result:
           e: (bool){ bool }
           f: (_|_){
             // [incomplete] voidElimination.derefDisj1.E.f: operand e of '!' not concrete (was bool):
-            //     ./in.cue:390:7
+            //     ./in.cue:389:7
           }
         }, (struct){
           g: (bool){ bool }
           h: (_|_){
             // [incomplete] voidElimination.derefDisj1.E.h: operand g of '!' not concrete (was bool):
-            //     ./in.cue:393:7
+            //     ./in.cue:392:7
           }
         }) }
     }
@@ -989,13 +978,13 @@ Result:
           e: (bool){ bool }
           f: (_|_){
             // [incomplete] voidElimination.derefDisj2.E.f: operand e of '!' not concrete (was bool):
-            //     ./in.cue:408:7
+            //     ./in.cue:407:7
           }
         }, (struct){
           g: (bool){ bool }
           h: (_|_){
             // [incomplete] voidElimination.derefDisj2.E.h: operand g of '!' not concrete (was bool):
-            //     ./in.cue:411:7
+            //     ./in.cue:410:7
           }
         }) }
     }
@@ -1049,16 +1038,16 @@ Result:
     }
   }
   t: (struct){
-    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
     x: (int){ int }
+    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
   }
   s: (struct){
     #ok: (bool){ false }
   }
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    //     ./in.cue:493:8
-    //     ./in.cue:491:5
+    //     ./in.cue:492:8
+    //     ./in.cue:490:5
     a: (string){ string }
   }
   unity: (struct){

@@ -317,10 +317,18 @@ func (e *exporter) adt(expr adt.Elem, conjuncts []adt.Conjunct) ast.Expr {
 		}
 		return ast.NewBinExpr(token.OR, a...)
 
+	case *adt.Comprehension:
+		if !x.DidResolve() {
+			return dummyTop
+		}
+		return e.adt(x.Value, conjuncts)
+
 	default:
 		panic(fmt.Sprintf("unknown field %T", x))
 	}
 }
+
+var dummyTop = &ast.Ident{Name: "_"}
 
 func (e *exporter) decl(d adt.Decl) ast.Decl {
 	switch x := d.(type) {

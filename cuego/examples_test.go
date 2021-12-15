@@ -46,7 +46,7 @@ func ExampleComplete_structTag() {
 	// completed: cuego_test.Sum{A:2, B:6, C:8} (err: <nil>)
 	// 2 errors in empty disjunction:
 	// conflicting values null and {A:2,B:3,C:8} (mismatched types null and struct)
-	// B: conflicting values 6 and 3
+	// A: conflicting values 5 and 2
 }
 
 func ExampleConstrain() {

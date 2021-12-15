@@ -84,7 +84,7 @@ func TestSyntax(t *testing.T) {
 		options: o(cue.ResolveReferences(true)),
 		out: `
 {
-	b: _|_ // #List.next: structural cycle
+	b: _|_ // #List.next: structural cycle (and 1 more errors)
 }`,
 	}, {
 		name: "resolveReferences",

@@ -36,6 +36,9 @@ disallowed: {
 Errors:
 disallowed.vErr.d: field not allowed: d:
     ./in.cue:26:9
+    ./in.cue:27:9
+    ./in.cue:27:18
+    ./in.cue:28:13
     ./in.cue:32:11
     ./in.cue:32:18
 
@@ -74,6 +77,9 @@ Result:
       d: (_|_){
         // [eval] disallowed.vErr.d: field not allowed: d:
         //     ./in.cue:26:9
+        //     ./in.cue:27:9
+        //     ./in.cue:27:18
+        //     ./in.cue:28:13
         //     ./in.cue:32:11
         //     ./in.cue:32:18
       }

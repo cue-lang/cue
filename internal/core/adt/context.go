@@ -214,11 +214,6 @@ type OpContext struct {
 	// structural cycle errors.
 	vertex *Vertex
 
-	nonMonotonicLookupNest int32
-	nonMonotonicRejectNest int32
-	nonMonotonicInsertNest int32
-	nonMonotonicGeneration int32
-
 	// These fields are used associate scratch fields for computing closedness
 	// of a Vertex. These fields could have been included in StructInfo (like
 	// Tomabechi's unification algorithm), but we opted for an indirection to
@@ -281,15 +276,19 @@ func (c *OpContext) pos() token.Pos {
 }
 
 func (c *OpContext) spawn(node *Vertex) *Environment {
-	node.Parent = c.e.Vertex // TODO: Is this necessary?
+	// node.Parent = c.e.Vertex // TODO: Is this necessary?
+	return spawn(c.e, node)
+}
+
+func spawn(env *Environment, node *Vertex) *Environment {
 	return &Environment{
-		Up:     c.e,
+		Up:     env,
 		Vertex: node,
 
 		// Copy cycle data.
-		Cyclic: c.e.Cyclic,
-		Deref:  c.e.Deref,
-		Cycles: c.e.Cycles,
+		Cyclic: env.Cyclic,
+		Deref:  env.Deref,
+		Cycles: env.Cycles,
 	}
 }
 
@@ -469,11 +468,14 @@ func (c *OpContext) Validate(check Validator, value Value) *Bottom {
 	return err
 }
 
-// Yield evaluates a Yielder and calls f for each result.
-func (c *OpContext) Yield(env *Environment, comp *Comprehension, f YieldFunc) *Bottom {
+// yield evaluates a Yielder and calls f for each result.
+func (c *OpContext) yield(node *Vertex, env *Environment, comp *Comprehension, f YieldFunc) *Bottom {
 	y := comp.Clauses
 
 	s := c.PushState(env, y.Source())
+	if node != nil {
+		defer c.PopArc(c.PushArc(node))
+	}
 
 	y.yield(c, f)
 
@@ -655,7 +657,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 			return nil
 		}
 
-		v := c.evaluate(arc, state)
+		v := c.evaluate(arc, x, state)
 		return v
 
 	default:
@@ -822,35 +824,6 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 	}
 
 	var hasCycle bool
-outer:
-	switch {
-	case c.nonMonotonicLookupNest == 0 && c.nonMonotonicRejectNest == 0:
-	case a != nil:
-		if state == Partial {
-			a.nonMonotonicLookupGen = c.nonMonotonicGeneration
-		}
-
-	case x.state != nil && state == Partial:
-		for _, e := range x.state.exprs {
-			if isCyclePlaceholder(e.err) {
-				hasCycle = true
-			}
-		}
-		for _, a := range x.state.usedArcs {
-			if a.Label == l {
-				a.nonMonotonicLookupGen = c.nonMonotonicGeneration
-				if c.nonMonotonicRejectNest > 0 {
-					a.nonMonotonicReject = true
-				}
-				break outer
-			}
-		}
-		a := &Vertex{Label: l, nonMonotonicLookupGen: c.nonMonotonicGeneration}
-		if c.nonMonotonicRejectNest > 0 {
-			a.nonMonotonicReject = true
-		}
-		x.state.usedArcs = append(x.state.usedArcs, a)
-	}
 
 	if a != nil && state > a.status {
 		c.Unify(a, state)
@@ -889,6 +862,11 @@ outer:
 		}
 	}
 	return a
+}
+
+func (c *OpContext) undefinedFieldError(v *Vertex, code ErrorCode) {
+	label := v.Label.SelectorString(c)
+	c.addErrf(code, c.pos(), "undefined field: %s", label)
 }
 
 func (c *OpContext) Label(src Expr, x Value) Feature {

@@ -167,7 +167,7 @@ func (w *Visitor) node(n adt.Node) {
 
 	case *adt.Comprehension:
 		w.node(x.Clauses)
-		w.node(x.Value)
+		w.node(adt.ToExpr(x.Value))
 
 	case *adt.ForClause:
 		w.feature(x.Key, x)

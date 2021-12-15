@@ -1,29 +1,39 @@
 -- in.cue --
 
 self: {
-    fail: {
-        a: {
-            if a.b == _|_ {
-                b: 1
-            }
-        }
-    }
-    isConcreteFail: {
-        a: {
-            if a.b == _|_ {
-                b: 1
-            }
-            b: int
-        }
-    }
-    isNotConcrete: {
-        a: {
-            if a.b != _|_ {
-                b: 1
-            }
-            b: int
-        }
-    }
+	// This is an incomplete error, as it may succeed when the user
+	// explicitly specifies a value.
+	fail: {
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+		}
+	}
+
+	// This is an incomplete error, as it may succeed when the user
+	// explicitly specifies a value.
+	isConcreteFail: {
+		a: {
+			if a.b == _|_ {
+				b: 1
+			}
+			b: int
+		}
+	}
+
+	// TODO: new builtin semantics.
+	//     if isconcrete(a.b)  -->> cyclic error evaluating isconcrete.
+	//     if isdefined(a.b)   -->> evaluate to true as a.b is int, result is 1
+	//     if !isdefined(a.b)  -->> evaluate to false, a.b remains int
+	isNotConcrete: {
+		a: {
+			if a.b != _|_ {
+				b: 1
+			}
+			b: int
+		}
+	}
 }
 
 mutual: {
@@ -37,21 +47,21 @@ mutual: {
 		a: { if b.foo == _|_ { bar: "" } }
 	}
 
-    brokenCycleSuccess: {
+	brokenCycleSuccess: {
 		a: { if b.foo == _|_ { foo: "" } }
 		b: { if a.bar == _|_ { bar: "" } }
-        a: bar: ""
+		a: bar: ""
 	}
 
-	oneDirectionalConflictFail: {
-        p1: {
-            a: { if b.foo == _|_ { bar: "" } }
-            b: { if a.bar == _|_ { new: "" } }
-        }
-        p2: {
-            a: { if b.foo == _|_ { new: "" } }
-            b: { if a.bar == _|_ { foo: "" } }
-        }
+	allowOneDirectionalDependency: {
+		p1: {
+			a: { if b.foo == _|_ { bar: "" } } // added
+			b: { if a.bar == _|_ { new: "" } } // not added
+		}
+		p2: {
+			a: { if b.foo == _|_ { new: "" } }
+			b: { if a.bar == _|_ { foo: "" } }
+		}
 	}
 
 	oneDirectionalBrokenConflictSuccess: p1: {
@@ -87,18 +97,30 @@ mutual: {
 }
 
 sameStruct: {
-	chainSuccess: {
+	chainSuccess: a: {
 		raises?: {}
 		if raises == _|_ {
-			ret: a: 1
+		ret: a: 1
 		}
 		ret?: {}
 		if ret != _|_ {
-			foo: a: 1
+		foo: a: 1
 		}
 	}
 
-	cycleFail: {
+	chainSuccess: b: {
+		if ret != _|_ {
+		foo: a: 1
+		}
+		raises?: {}
+		if raises == _|_ {
+		ret: a: 1
+		}
+		ret?: {}
+	}
+
+
+	cycleFail: a: {
 		raises?: {}
 		if raises == _|_ {
 			ret: a: 1
@@ -106,6 +128,17 @@ sameStruct: {
 		ret?: {}
 		if ret != _|_ {
 			raises: a: 1
+		}
+	}
+
+	cycleFail: b: {
+		ret?: {}
+		if ret != _|_ {
+			raises: a: 1
+		}
+		raises?: {}
+		if raises == _|_ {
+			ret: a: 1
 		}
 	}
 
@@ -149,8 +182,6 @@ nestedChain: {
 		#E: x: true
 	}
 
-  // TODO: the current algorithm does _not_ handle checking fields that were
-  // not added in certain situations.
 	doubleAddfail: {
 		if #E.x == _|_ {
 			#E: y: true
@@ -172,39 +203,32 @@ nestedChain: {
 	}
 }
 -- out/eval --
-Errors:
-mutual.mutualCycleFail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
-mutual.oneDirectionalConflictFail.p1.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
-mutual.oneDirectionalConflictFail.p2.b: cycle: field inserted by if clause that was previously evaluated by another if clause: foo
-nestedChain.cycleFail.#E: cycle: field inserted by if clause that was previously evaluated by another if clause: x
-sameStruct.cycleFail: cycle: field inserted by if clause that was previously evaluated by another if clause: raises
-self.fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-
-Result:
-(_|_){
-  // [eval]
-  self: (_|_){
-    // [eval]
-    fail: (_|_){
-      // [eval]
+(struct){
+  self: (struct){
+    fail: (struct){
       a: (_|_){
-        // [eval] self.fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-        b: (int){ 1 }
+        // [cycle] self.fail.a: cycle with field a.b:
+        //     ./in.cue:7:7
       }
     }
     isConcreteFail: (struct){
-      a: (struct){
-        b: (int){ 1 }
+      a: (_|_){
+        // [cycle] cycle error
+        b: (_|_){
+          // [cycle] cycle error
+        }
       }
     }
     isNotConcrete: (struct){
-      a: (struct){
-        b: (int){ int }
+      a: (_|_){
+        // [cycle] cycle error
+        b: (_|_){
+          // [cycle] cycle error
+        }
       }
     }
   }
-  mutual: (_|_){
-    // [eval]
+  mutual: (struct){
     noConflicts: (struct){
       a: (struct){
         new: (string){ "" }
@@ -213,41 +237,39 @@ Result:
         new: (string){ "" }
       }
     }
-    mutualCycleFail: (_|_){
-      // [eval]
-      b: (struct){
+    mutualCycleFail: (struct){
+      b: (_|_){
+        // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
+        //     ./in.cue:46:11
+        foo: (string){ "" }
       }
-      a: (_|_){
-        // [eval] mutual.mutualCycleFail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
-        bar: (string){ "" }
+      a: (struct){
+        bar: (_|_){
+          // [cycle] mutual.mutualCycleFail.a: cycle with field b.foo:
+          //     ./in.cue:46:11
+        }
       }
     }
     brokenCycleSuccess: (struct){
       a: (struct){
-        bar: (string){ "" }
         foo: (string){ "" }
+        bar: (string){ "" }
       }
       b: (struct){
       }
     }
-    oneDirectionalConflictFail: (_|_){
-      // [eval]
-      p1: (_|_){
-        // [eval]
-        a: (_|_){
-          // [eval] mutual.oneDirectionalConflictFail.p1.a: cycle: field inserted by if clause that was previously evaluated by another if clause: bar
+    allowOneDirectionalDependency: (struct){
+      p1: (struct){
+        a: (struct){
           bar: (string){ "" }
         }
         b: (struct){
-          new: (string){ "" }
         }
       }
-      p2: (_|_){
-        // [eval]
+      p2: (struct){
         a: (struct){
         }
-        b: (_|_){
-          // [eval] mutual.oneDirectionalConflictFail.p2.b: cycle: field inserted by if clause that was previously evaluated by another if clause: foo
+        b: (struct){
           foo: (string){ "" }
         }
       }
@@ -273,8 +295,8 @@ Result:
         a: (struct){
         }
         b: (struct){
-          foo: (string){ "" }
           new: (string){ "" }
+          foo: (string){ "" }
         }
       }
       p4: (struct){
@@ -287,39 +309,58 @@ Result:
       }
       p5: (struct){
         b: (struct){
-          foo: (string){ "" }
           new: (string){ "" }
+          foo: (string){ "" }
         }
         a: (struct){
         }
       }
       p6: (struct){
         b: (struct){
-          foo: (string){ "" }
           new: (string){ "" }
+          foo: (string){ "" }
         }
         a: (struct){
         }
       }
     }
   }
-  sameStruct: (_|_){
-    // [eval]
+  sameStruct: (struct){
     chainSuccess: (struct){
-      ret: (struct){
-        a: (int){ 1 }
+      a: (struct){
+        ret: (struct){
+          a: (int){ 1 }
+        }
+        foo: (struct){
+          a: (int){ 1 }
+        }
       }
-      foo: (struct){
-        a: (int){ 1 }
+      b: (struct){
+        foo: (struct){
+          a: (int){ 1 }
+        }
+        ret: (struct){
+          a: (int){ 1 }
+        }
       }
     }
-    cycleFail: (_|_){
-      // [eval] sameStruct.cycleFail: cycle: field inserted by if clause that was previously evaluated by another if clause: raises
-      ret: (struct){
-        a: (int){ 1 }
+    cycleFail: (struct){
+      a: (_|_){
+        // [cycle] sameStruct.cycleFail.a: circular dependency in evaluation of conditionals: ret changed after evaluation:
+        //     ./in.cue:128:6
+        ret: (struct){
+          a: (int){ 1 }
+        }
       }
-      raises: (struct){
-        a: (int){ 1 }
+      b: (_|_){
+        // [cycle] sameStruct.cycleFail.b: circular dependency in evaluation of conditionals: raises changed after evaluation:
+        //     ./in.cue:139:6
+        raises: (struct){
+          a: (int){ 1 }
+        }
+        ret: (struct){
+          a: (int){ 1 }
+        }
       }
     }
     defCloseSuccess: (struct){
@@ -330,30 +371,34 @@ Result:
       }
     }
   }
-  nestedChain: (_|_){
-    // [eval]
+  nestedChain: (struct){
     cycleFail: (_|_){
-      // [eval]
+      // [cycle] nestedChain.cycleFail: cycle with field #E.y:
+      //     ./in.cue:167:6
       #E: (_|_){
-        // [eval] nestedChain.cycleFail.#E: cycle: field inserted by if clause that was previously evaluated by another if clause: x
-        x: (bool){ true }
+        // [cycle] nestedChain.cycleFail: cycle with field #E.y:
+        //     ./in.cue:167:6
       }
     }
     brokenCycleSuccess: (struct){
       #E: (#struct){
-        x: (bool){ true }
         y: (bool){ true }
+        x: (bool){ true }
       }
     }
-    doubleAddfail: (struct){
-      #E: (#struct){
+    doubleAddfail: (_|_){
+      // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
+      //     ./in.cue:188:6
+      #E: (_|_){
+        // [cycle] nestedChain.doubleAddfail: cycle with field #E.y:
+        //     ./in.cue:188:6
         y: (bool){ true }
       }
     }
     trippleSuccess: (struct){
       #E: (#struct){
-        x: (bool){ true }
         y: (bool){ true }
+        x: (bool){ true }
       }
       z: (bool){ true }
     }
@@ -427,7 +472,7 @@ Result:
         bar: ""
       }
     }
-    oneDirectionalConflictFail: {
+    allowOneDirectionalDependency: {
       p1: {
         a: {
           if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
@@ -558,30 +603,66 @@ Result:
   }
   sameStruct: {
     chainSuccess: {
-      raises?: {}
-      if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
-        ret: {
-          a: 1
+      a: {
+        raises?: {}
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret: {
+            a: 1
+          }
+        }
+        ret?: {}
+        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+          foo: {
+            a: 1
+          }
         }
       }
-      ret?: {}
-      if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
-        foo: {
-          a: 1
+    }
+    chainSuccess: {
+      b: {
+        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+          foo: {
+            a: 1
+          }
+        }
+        raises?: {}
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret: {
+            a: 1
+          }
+        }
+        ret?: {}
+      }
+    }
+    cycleFail: {
+      a: {
+        raises?: {}
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret: {
+            a: 1
+          }
+        }
+        ret?: {}
+        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+          raises: {
+            a: 1
+          }
         }
       }
     }
     cycleFail: {
-      raises?: {}
-      if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
-        ret: {
-          a: 1
+      b: {
+        ret?: {}
+        if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
+          raises: {
+            a: 1
+          }
         }
-      }
-      ret?: {}
-      if (〈0;ret〉 != _|_(explicit error (_|_ literal) in source)) {
-        raises: {
-          a: 1
+        raises?: {}
+        if (〈0;raises〉 == _|_(explicit error (_|_ literal) in source)) {
+          ret: {
+            a: 1
+          }
         }
       }
     }

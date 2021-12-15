@@ -22,7 +22,11 @@ type envYield struct {
 }
 
 func (n *nodeContext) insertComprehension(env *Environment, x *Comprehension, ci CloseInfo) {
-	n.comprehensions = append(n.comprehensions, envYield{x, env, ci, nil})
+	n.comprehensions = append(n.comprehensions, envYield{
+		comp: x,
+		env:  env,
+		id:   ci,
+	})
 }
 
 // injectComprehensions evaluates and inserts comprehensions.

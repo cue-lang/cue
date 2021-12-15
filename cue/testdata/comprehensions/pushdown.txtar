@@ -34,13 +34,13 @@ fail: {
 }
 
 embed: {
-	t: #C
-	#C: {
+	t1: #C1
+	#C1: {
 		if false {
 			p: _
 		}
 	}
-	t: p: "foo"
+	t1: p: "foo"
 
 
 	t2: #C2
@@ -50,6 +50,85 @@ embed: {
 		}
 	}
 	t2: p: "foo"
+
+  t3: #C3
+  #C3: {}
+	t3: {
+		if false {
+			p: q: 1
+		}
+	}
+
+  t4: #C4
+  #C4: {}
+	t4: {
+		if true {
+			p: q: 1
+		}
+	}
+
+  t5: {
+    a: bool
+    if a {
+      p: q: 1
+    }
+  }
+
+  t6: {
+    if false {
+      p: 1
+    }
+    p: q + 1
+    q: int
+  }
+  t7: {
+    p: q + 1
+    q: int
+    if false {
+      p: 1
+    }
+  }
+}
+
+// Mix of both dynamic and static fields.
+mixedFields: {
+  a: {
+    for _, s in ["foo"] {
+      "\(s)": 1
+      X: 1
+    }
+  }
+
+  b: #Def: {
+    for _, s in ["foo"] {
+      "\(s)": 1
+      X: 1
+    }
+  }
+  b: x: b.#Def
+  b: x: X: _
+  b: x: foo: _
+
+  c: #Def: {
+    X:   int
+    foo: int
+  }
+  c: x: c.#Def
+  c: x: {
+    for _, s in ["foo"] {
+      "\(s)": 1
+      X: 1
+    }
+  }
+}
+
+fieldMismatch: {
+  a: {
+    2
+    if true {
+      x: 3
+    }
+  }
 }
 
 // // More trigger happy on stack overflows.
@@ -209,7 +288,7 @@ closedCheck: t3: {
 emptyComprehension: {
     a: {}
     b: {
-		// b should be an incomplete error
+        // b should be an incomplete error
         if a.b {
         }
     }
@@ -254,6 +333,15 @@ voidElimination: t2: {
 	}
 }
 
+// Eliminate the top value even if there is an error (especially incomplete
+// errors).
+topElimination: {
+	_
+	if true {
+		x: a+1
+	}
+}
+
 // Do not include x in s.
 t: {
 	#ok: *true | bool
@@ -273,24 +361,82 @@ explicitDefaultError: {
     if a != "" {
     }
 }
+
+// Tests derived from Unity.
+unity: test1: {
+  #Config: {
+    name: string
+    type: string
+  }
+
+  #AnyConfig: {
+    #Config
+    ...
+  }
+
+  #Env: {
+    name: string
+    configurations: [string]: #AnyConfig
+  }
+
+  envs: "e1": #Env & {
+    configurations: c1:  #Config
+  }
+
+  envs: [string]: configurations: [string]: {
+    type: "foo"
+    if type == "terraform" {
+      backend: {
+        type: "s3"
+      }
+    }
+  }
+}
+
+-- reflect.cue --
+import "encoding/json"
+
+
+unifyDynamicReflect: {
+  for _, s in ["foo"] {
+    X: {...}
+    "\(s)": {
+      X: {...} // cannot be _
+      Y: json.Marshal(X) // cannot be yaml, X cannot be literal
+    }
+  }
+
+  [string]: X: {
+    if true {// must be there
+      x: y: {} // at least 2 nestings needed to expose problem
+    }
+  }
+}
+
 -- out/eval --
 Errors:
 a.c.d: field not allowed: d:
-    ./in.cue:90:5
-    ./in.cue:92:2
-    ./in.cue:93:6
-    ./in.cue:96:5
-b12a.#list.tail.tail: structural cycle
-b12a.list.tail.tail: structural cycle
-embed.t.p: field not allowed: p:
-    ./in.cue:33:5
-    ./in.cue:34:6
-    ./in.cue:39:5
-fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-cycle error:
-    ./in.cue:56:6
-cycle error:
-    ./in.cue:64:12
+    ./in.cue:169:5
+    ./in.cue:171:2
+    ./in.cue:175:5
+embed.t1.p: field not allowed: p:
+    ./in.cue:33:6
+    ./in.cue:34:7
+    ./in.cue:35:3
+    ./in.cue:35:12
+    ./in.cue:39:6
+embed.t4.p: field not allowed: p:
+    ./in.cue:58:7
+    ./in.cue:59:8
+    ./in.cue:60:6
+    ./in.cue:61:3
+fieldMismatch.a: cannot combine regular field "x" with 2:
+    ./in.cue:125:10
+    ./in.cue:123:5
+b12a.#list.tail: structural cycle:
+    ./in.cue:135:6
+b12a.list.tail: structural cycle:
+    ./in.cue:143:12
 
 Result:
 (_|_){
@@ -298,8 +444,8 @@ Result:
   linkChildren: (struct){
     w: (int){ 1 }
     v: (struct){
-      x: (int){ 1 }
       y: (int){ 1 }
+      x: (int){ 1 }
       z: (int){ 1 }
       rw: (int){ 1 }
       rx: (int){ 1 }
@@ -330,25 +476,25 @@ Result:
       }
     }
   }
-  fail: (_|_){
-    // [eval]
+  fail: (struct){
     a: (_|_){
-      // [eval] fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-      b: (int){ 1 }
+      // [cycle] cycle error
     }
   }
   embed: (_|_){
     // [eval]
-    t: (_|_){
+    t1: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t.p: field not allowed: p:
-        //     ./in.cue:33:5
-        //     ./in.cue:34:6
-        //     ./in.cue:39:5
+        // [eval] embed.t1.p: field not allowed: p:
+        //     ./in.cue:33:6
+        //     ./in.cue:34:7
+        //     ./in.cue:35:3
+        //     ./in.cue:35:12
+        //     ./in.cue:39:6
       }
     }
-    #C: (#struct){
+    #C1: (#struct){
     }
     t2: (#struct){
       p: (string){ "foo" }
@@ -356,70 +502,134 @@ Result:
     #C2: (#struct){
       p: (_){ _ }
     }
+    t3: (#struct){
+    }
+    #C3: (#struct){
+    }
+    t4: (_|_){
+      // [eval]
+      p: (_|_){
+        // [eval] embed.t4.p: field not allowed: p:
+        //     ./in.cue:58:7
+        //     ./in.cue:59:8
+        //     ./in.cue:60:6
+        //     ./in.cue:61:3
+        q: (int){ 1 }
+      }
+    }
+    #C4: (#struct){
+    }
+    t5: (_|_){
+      // [incomplete] embed.t5.p.q: incomplete bool: bool
+      a: (bool){ bool }
+    }
+    t6: (struct){
+      p: (_|_){
+        // [incomplete] embed.t6.p: non-concrete value int in operand to +:
+        //     ./in.cue:77:8
+        //     ./in.cue:78:5
+      }
+      q: (int){ int }
+    }
+    t7: (struct){
+      p: (_|_){
+        // [incomplete] embed.t7.p: non-concrete value int in operand to +:
+        //     ./in.cue:81:8
+        //     ./in.cue:82:5
+      }
+      q: (int){ int }
+    }
+  }
+  mixedFields: (struct){
+    a: (struct){
+      X: (int){ 1 }
+      foo: (int){ 1 }
+    }
+    b: (struct){
+      #Def: (#struct){
+        X: (int){ 1 }
+        foo: (int){ 1 }
+      }
+      x: (#struct){
+        X: (int){ 1 }
+        foo: (int){ 1 }
+      }
+    }
+    c: (struct){
+      #Def: (#struct){
+        X: (int){ int }
+        foo: (int){ int }
+      }
+      x: (#struct){
+        X: (int){ 1 }
+        foo: (int){ 1 }
+      }
+    }
+  }
+  fieldMismatch: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] fieldMismatch.a: cannot combine regular field "x" with 2:
+      //     ./in.cue:125:10
+      //     ./in.cue:123:5
+      x: (int){ 3 }
+    }
   }
   b12a: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] cycle error:
-      //     ./in.cue:56:6
+      // [structural cycle] b12a.#list.tail: structural cycle:
+      //     ./in.cue:135:6
       tail: (_|_){
-        // [structural cycle] cycle error:
-        //     ./in.cue:56:6
-        tail: (_|_){
-          // [structural cycle] b12a.#list.tail.tail: structural cycle
-        }
+        // [structural cycle] b12a.#list.tail: structural cycle:
+        //     ./in.cue:135:6
       }
     }
     list: (_|_){
-      // [structural cycle] cycle error:
-      //     ./in.cue:64:12
+      // [structural cycle] b12a.list.tail: structural cycle:
+      //     ./in.cue:143:12
       tail: (_|_){
-        // [structural cycle] cycle error:
-        //     ./in.cue:64:12
-        tail: (_|_){
-          // [structural cycle] b12a.list.tail.tail: structural cycle
-        }
+        // [structural cycle] b12a.list.tail: structural cycle:
+        //     ./in.cue:143:12
       }
     }
   }
   xx: (struct){
     #a: (_|_){
-      // [incomplete] xx.#a: incomplete bool: bool
+      // [incomplete] xx.#a.c: incomplete bool: bool
       b: (bool){ bool }
     }
     x: (#struct){
-      b: (bool){ true }
       c: (int){ 4 }
+      b: (bool){ true }
     }
     y: (#struct){
-      b: (bool){ true }
       c: (int){ 4 }
+      b: (bool){ true }
     }
   }
   #a: (#struct){
-    b: (bool){ true }
     c: (int){ 4 }
+    b: (bool){ true }
   }
   #c: (#struct){
   }
   a: (_|_){
     // [eval]
-    b: (bool){ true }
     c: (_|_){
       // [eval]
       d: (_|_){
         // [eval] a.c.d: field not allowed: d:
-        //     ./in.cue:90:5
-        //     ./in.cue:92:2
-        //     ./in.cue:93:6
-        //     ./in.cue:96:5
+        //     ./in.cue:169:5
+        //     ./in.cue:171:2
+        //     ./in.cue:175:5
       }
     }
+    b: (bool){ true }
   }
   scopes: (struct){
     x: (int){ 1 }
     a: (struct){
-      y: (int){ 2 }
       b: (int){ 1 }
       c: (struct){
         d: (int){ 1 }
@@ -428,6 +638,7 @@ Result:
       f: (struct){
         g: (int){ 2 }
       }
+      y: (int){ 2 }
     }
   }
   drop: (struct){
@@ -438,14 +649,17 @@ Result:
   }
   cyclicError: (struct){
     a: (_|_){
-      // [incomplete] cyclicError.a: incomplete bool: bool
-      x: (bool){ bool }
-      y: (bool){ bool }
+      // [cycle] cycle error
+      y: (_|_){
+        // [cycle] cycle error
+      }
+      x: (_|_){
+        // [cycle] cycle error
+      }
       b: (struct){
       }
     }
-    c: (_|_){
-      // [incomplete] cyclicError.a: incomplete bool: bool
+    c: (struct){
     }
   }
   midwayReferences: (struct){
@@ -489,9 +703,9 @@ Result:
         }
       }
       #D: (_|_){
-        // [incomplete] closedCheck.t1.#D: non-concrete value string in operand to !=:
-        //     ./in.cue:160:8
-        //     ./in.cue:159:5
+        // [incomplete] closedCheck.t1.#D.e: non-concrete value string in operand to !=:
+        //     ./in.cue:239:8
+        //     ./in.cue:238:5
         d: (string){ string }
       }
     }
@@ -506,8 +720,8 @@ Result:
       }
       #D: (_|_){
         // [incomplete] closedCheck.t2.#D: non-concrete value string in operand to !=:
-        //     ./in.cue:176:8
-        //     ./in.cue:175:5
+        //     ./in.cue:255:8
+        //     ./in.cue:254:5
         d: (string){ string }
       }
     }
@@ -524,8 +738,8 @@ Result:
         d: (string){ string }
         e: (_|_){
           // [incomplete] closedCheck.t3.#D.e: non-concrete value string in operand to !=:
-          //     ./in.cue:193:10
-          //     ./in.cue:191:5
+          //     ./in.cue:272:10
+          //     ./in.cue:270:5
         }
       }
     }
@@ -535,7 +749,7 @@ Result:
     }
     b: (_|_){
       // [incomplete] emptyComprehension.b: undefined field: b:
-      //     ./in.cue:209:14
+      //     ./in.cue:288:14
     }
   }
   voidElimination: (struct){
@@ -558,18 +772,71 @@ Result:
       }
     }
   }
+  topElimination: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
+    }
+  }
   t: (struct){
-    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
     x: (int){ int }
+    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
   }
   s: (struct){
     #ok: (bool){ false }
   }
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    //     ./in.cue:269:8
-    //     ./in.cue:267:5
+    //     ./in.cue:357:8
+    //     ./in.cue:355:5
     a: (string){ string }
+  }
+  unity: (struct){
+    test1: (struct){
+      #Config: (#struct){
+        name: (string){ string }
+        type: (string){ string }
+      }
+      #AnyConfig: (#struct){
+        name: (string){ string }
+        type: (string){ string }
+      }
+      #Env: (#struct){
+        name: (string){ string }
+        configurations: (#struct){
+        }
+      }
+      envs: (struct){
+        e1: (#struct){
+          name: (string){ string }
+          configurations: (#struct){
+            c1: (#struct){
+              name: (string){ string }
+              type: (string){ "foo" }
+            }
+          }
+        }
+      }
+    }
+  }
+  unifyDynamicReflect: (struct){
+    X: (struct){
+      X: (struct){
+        x: (struct){
+          y: (struct){
+          }
+        }
+      }
+    }
+    foo: (struct){
+      X: (struct){
+        x: (struct){
+          y: (struct){
+          }
+        }
+      }
+      Y: (string){ "{\"x\":{\"y\":{}}}" }
+    }
   }
 }
 -- out/compile --
@@ -622,13 +889,13 @@ Result:
     }
   }
   embed: {
-    t: 〈0;#C〉
-    #C: {
+    t1: 〈0;#C1〉
+    #C1: {
       if false {
         p: _
       }
     }
-    t: {
+    t1: {
       p: "foo"
     }
     t2: 〈0;#C2〉
@@ -639,6 +906,106 @@ Result:
     }
     t2: {
       p: "foo"
+    }
+    t3: 〈0;#C3〉
+    #C3: {}
+    t3: {
+      if false {
+        p: {
+          q: 1
+        }
+      }
+    }
+    t4: 〈0;#C4〉
+    #C4: {}
+    t4: {
+      if true {
+        p: {
+          q: 1
+        }
+      }
+    }
+    t5: {
+      a: bool
+      if 〈0;a〉 {
+        p: {
+          q: 1
+        }
+      }
+    }
+    t6: {
+      if false {
+        p: 1
+      }
+      p: (〈0;q〉 + 1)
+      q: int
+    }
+    t7: {
+      p: (〈0;q〉 + 1)
+      q: int
+      if false {
+        p: 1
+      }
+    }
+  }
+  mixedFields: {
+    a: {
+      for _, s in [
+        "foo",
+      ] {
+        "\(〈1;s〉)": 1
+        X: 1
+      }
+    }
+    b: {
+      #Def: {
+        for _, s in [
+          "foo",
+        ] {
+          "\(〈1;s〉)": 1
+          X: 1
+        }
+      }
+    }
+    b: {
+      x: 〈1;b〉.#Def
+    }
+    b: {
+      x: {
+        X: _
+      }
+    }
+    b: {
+      x: {
+        foo: _
+      }
+    }
+    c: {
+      #Def: {
+        X: int
+        foo: int
+      }
+    }
+    c: {
+      x: 〈1;c〉.#Def
+    }
+    c: {
+      x: {
+        for _, s in [
+          "foo",
+        ] {
+          "\(〈1;s〉)": 1
+          X: 1
+        }
+      }
+    }
+  }
+  fieldMismatch: {
+    a: {
+      2
+      if true {
+        x: 3
+      }
     }
   }
   b12a: {
@@ -879,6 +1246,12 @@ Result:
       }
     }
   }
+  topElimination: {
+    _
+    if true {
+      x: (〈2;a〉 + 1)
+    }
+  }
   t: {
     #ok: (*true|bool)
     if 〈0;#ok〉 {
@@ -891,5 +1264,71 @@ Result:
   explicitDefaultError: {
     a: (string|*_|_(explicit error (_|_ literal) in source))
     if (〈0;a〉 != "") {}
+  }
+  unity: {
+    test1: {
+      #Config: {
+        name: string
+        type: string
+      }
+      #AnyConfig: {
+        〈1;#Config〉
+        ...
+      }
+      #Env: {
+        name: string
+        configurations: {
+          [string]: 〈2;#AnyConfig〉
+        }
+      }
+      envs: {
+        e1: (〈1;#Env〉 & {
+          configurations: {
+            c1: 〈3;#Config〉
+          }
+        })
+      }
+      envs: {
+        [string]: {
+          configurations: {
+            [string]: {
+              type: "foo"
+              if (〈0;type〉 == "terraform") {
+                backend: {
+                  type: "s3"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- reflect.cue
+{
+  unifyDynamicReflect: {
+    for _, s in [
+      "foo",
+    ] {
+      X: {
+        ...
+      }
+      "\(〈1;s〉)": {
+        X: {
+          ...
+        }
+        Y: 〈import;"encoding/json"〉.Marshal(〈0;X〉)
+      }
+    }
+    [string]: {
+      X: {
+        if true {
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
   }
 }

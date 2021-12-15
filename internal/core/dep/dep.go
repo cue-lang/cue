@@ -206,6 +206,12 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		for _, e := range x.Decls {
 			c.markDecl(env, e)
 		}
+
+	case *adt.Comprehension:
+		for i := x.Nest; i > 0; i-- {
+			env = &adt.Environment{Up: env, Vertex: empty}
+		}
+		c.markComprehension(env, x)
 	}
 }
 

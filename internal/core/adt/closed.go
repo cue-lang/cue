@@ -109,6 +109,7 @@ type CloseInfo struct {
 	*closeInfo
 
 	IsClosed   bool
+	IsOptional bool
 	FieldTypes OptionalType
 }
 

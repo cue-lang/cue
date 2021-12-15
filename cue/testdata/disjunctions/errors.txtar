@@ -43,17 +43,11 @@ issue516.x.match.metrics.foo: field not allowed: foo:
     ./in.cue:19:25
     ./in.cue:22:8
     ./in.cue:23:24
-issue570.results: 2 errors in empty disjunction:
+issue570.results: 1 errors in empty disjunction:
 issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
     ./in.cue:2:14
     ./in.cue:3:22
     ./in.cue:12:18
-issue570.results.result: field not allowed: result:
-    ./in.cue:2:14
-    ./in.cue:3:14
-    ./in.cue:7:9
-    ./in.cue:11:20
-    ./in.cue:12:9
 
 Result:
 (_|_){
@@ -61,24 +55,16 @@ Result:
   issue570: (_|_){
     // [eval]
     results: (_|_){
-      // [eval] issue570.results: 2 errors in empty disjunction:
+      // [eval] issue570.results: 1 errors in empty disjunction:
       // issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
       //     ./in.cue:2:14
       //     ./in.cue:3:22
       //     ./in.cue:12:18
-      // issue570.results.result: field not allowed: result:
-      //     ./in.cue:2:14
-      //     ./in.cue:3:14
-      //     ./in.cue:7:9
-      //     ./in.cue:11:20
-      //     ./in.cue:12:9
       result: (_|_){
-        // [eval] issue570.results.result: field not allowed: result:
+        // [eval] issue570.results.result: conflicting values "hello" and [...string] (mismatched types string and list):
         //     ./in.cue:2:14
-        //     ./in.cue:3:14
-        //     ./in.cue:7:9
-        //     ./in.cue:11:20
-        //     ./in.cue:12:9
+        //     ./in.cue:3:22
+        //     ./in.cue:12:18
       }
       error: (string){ string }
     }
@@ -120,9 +106,9 @@ Result:
         //     ./in.cue:20:9
         //     ./in.cue:22:8
         //     ./in.cue:23:8
-        metrics: (_|_){// {
-          //   foo: {}
-          // }
+        metrics: (struct){
+          foo: (struct){
+          }
         }
       }
     }

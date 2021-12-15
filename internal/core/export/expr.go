@@ -60,6 +60,9 @@ func (e *exporter) expr(v adt.Elem) (result ast.Expr) {
 
 		a := []conjunct{}
 		for _, c := range x.Conjuncts {
+			if c, ok := c.Elem().(*adt.Comprehension); ok && !c.DidResolve() {
+				continue
+			}
 			a = append(a, conjunct{c, 0})
 		}
 
@@ -424,7 +427,9 @@ func (e *conjuncts) addExpr(env *adt.Environment, src *adt.Vertex, x adt.Elem, i
 		case isEmbed:
 			e.embed = append(e.embed, e.expr(x))
 		default:
-			e.conjuncts = append(e.conjuncts, e.expr(x))
+			if x := e.expr(x); x != dummyTop {
+				e.conjuncts = append(e.conjuncts, x)
+			}
 		}
 	}
 }

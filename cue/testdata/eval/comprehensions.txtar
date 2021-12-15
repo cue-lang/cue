@@ -30,27 +30,174 @@ if true {
 		files: "\(strings.Join([ run], "\n"))"
 	}
 }
+
+matchOrder: {
+  a1: {
+    out: [string]: Val: 1
+    out: in.a
+
+    in: a: {
+      if true {
+        b: {}
+      }
+    }
+  }
+  a2: {
+    out: [string]: Val: 1
+
+    in: a: {
+      if true {
+        b: {}
+      }
+    }
+
+    out: in.a
+  }
+  a3: {
+
+    in: a: {
+      if true {
+        b: {}
+      }
+    }
+
+    out: [string]: Val: 1
+    out: in.a
+  }
+  a4: {
+    out: in.a
+    out: [string]: Val: 1
+
+    in: a: {
+      if true {
+        b: {}
+      }
+    }
+  }
+  a5: {
+    out: in.a
+
+    in: a: {
+      if true {
+        b: {}
+      }
+    }
+
+    out: [string]: Val: 1
+  }
+  a6: {
+    in: a: {
+      if true {
+        b: {}
+      }
+    }
+
+    out: in.a
+    out: [string]: Val: 1
+  }
+}
+
 -- out/eval --
 (struct){
+  A: (struct){
+    X: (struct){
+      run: (string){ "dfoo" }
+      files: (string){ "dfoo" }
+    }
+  }
   a: (struct){
     x: (int){ 10 }
     y: (int){ 100 }
     z: (int){ 50 }
   }
   b: (struct){
-    x: (int){ 10 }
     k: (int){ 20 }
-    z: (int){ 50 }
     l: (int){ 40 }
+    x: (int){ 10 }
+    z: (int){ 50 }
   }
   c: (struct){
     y: (int){ 110 }
     z: (int){ 60 }
   }
-  A: (struct){
-    X: (struct){
-      run: (string){ "dfoo" }
-      files: (string){ "dfoo" }
+  matchOrder: (struct){
+    a1: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a2: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a3: (struct){
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+    }
+    a4: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a5: (struct){
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+    }
+    a6: (struct){
+      in: (struct){
+        a: (struct){
+          b: (struct){
+          }
+        }
+      }
+      out: (struct){
+        b: (struct){
+          Val: (int){ 1 }
+        }
+      }
     }
   }
 }
@@ -92,6 +239,98 @@ if true {
         files: "\(〈import;strings〉.Join([
           〈1;run〉,
         ], "\n"))"
+      }
+    }
+  }
+  matchOrder: {
+    a1: {
+      out: {
+        [string]: {
+          Val: 1
+        }
+      }
+      out: 〈0;in〉.a
+      in: {
+        a: {
+          if true {
+            b: {}
+          }
+        }
+      }
+    }
+    a2: {
+      out: {
+        [string]: {
+          Val: 1
+        }
+      }
+      in: {
+        a: {
+          if true {
+            b: {}
+          }
+        }
+      }
+      out: 〈0;in〉.a
+    }
+    a3: {
+      in: {
+        a: {
+          if true {
+            b: {}
+          }
+        }
+      }
+      out: {
+        [string]: {
+          Val: 1
+        }
+      }
+      out: 〈0;in〉.a
+    }
+    a4: {
+      out: 〈0;in〉.a
+      out: {
+        [string]: {
+          Val: 1
+        }
+      }
+      in: {
+        a: {
+          if true {
+            b: {}
+          }
+        }
+      }
+    }
+    a5: {
+      out: 〈0;in〉.a
+      in: {
+        a: {
+          if true {
+            b: {}
+          }
+        }
+      }
+      out: {
+        [string]: {
+          Val: 1
+        }
+      }
+    }
+    a6: {
+      in: {
+        a: {
+          if true {
+            b: {}
+          }
+        }
+      }
+      out: 〈0;in〉.a
+      out: {
+        [string]: {
+          Val: 1
+        }
       }
     }
   }

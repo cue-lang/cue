@@ -27,10 +27,10 @@ c: {
     z: (int){ 50 }
   }
   b: (struct){
-    x: (int){ 10 }
     k: (int){ 20 }
-    z: (int){ 50 }
     l: (int){ 40 }
+    x: (int){ 10 }
+    z: (int){ 50 }
   }
   c: (struct){
     y: (int){ 110 }

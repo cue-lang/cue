@@ -278,6 +278,7 @@ unresolvedDisjunction: {
 [#Foo]
 [x]
 [y]
+[files]
 [cfgs]
 [cfgs 0]
 [cfgs 0 metadata]
@@ -335,9 +336,9 @@ unresolvedDisjunction: {
 [unresolvedDisjunction]
 [unresolvedDisjunction #TypePrimitive]
 [unresolvedDisjunction #TypeBool]
+[unresolvedDisjunction #TypeBool default]
 [unresolvedDisjunction #TypeBool _args]
 [unresolvedDisjunction #TypeBool _args required]
-[files]
 -- out/value --
 == Simplified
 {
@@ -351,6 +352,11 @@ unresolvedDisjunction: {
 			name: "two"
 		}
 	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -387,15 +393,6 @@ unresolvedDisjunction: {
 		x: "a foo z"
 		run: {
 			a: "foo"
-		}
-	}
-	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
 		}
 	}
 	y: "foo"
@@ -453,6 +450,11 @@ unresolvedDisjunction: {
 			name: "two"
 		}
 	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -492,15 +494,6 @@ unresolvedDisjunction: {
 		x: "a foo z"
 		run: {
 			a: "foo"
-		}
-	}
-	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
 		}
 	}
 	y: "foo"
@@ -583,6 +576,7 @@ unresolvedDisjunction: {
 			name: "two"
 		}
 	}]
+	files:         _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
 	comprehension: _|_ // invalid interpolation: invalid interpolation: comprehension: undefined field: name
 	scoped: {
 		direct: {
@@ -612,8 +606,7 @@ unresolvedDisjunction: {
 			a: "foo"
 		}
 	}
-	files: _|_ // invalid interpolation: invalid interpolation: files: undefined field: name (and 3 more errors)
-	y:     "foo"
+	y: "foo"
 	incomplete: {
 		a: {
 			x: _|_ // invalid interpolation: incomplete.a.x: non-concrete value string (type string)
@@ -663,6 +656,11 @@ unresolvedDisjunction: {
 			name: "two"
 		}
 	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -702,15 +700,6 @@ unresolvedDisjunction: {
 		x: "a foo z"
 		run: {
 			a: "foo"
-		}
-	}
-	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
 		}
 	}
 	y: "foo"
@@ -794,6 +783,11 @@ unresolvedDisjunction: {
 			name: "two"
 		}
 	}]
+	files: {
+		"\("kind-\(cfg.name)")": {
+			patches: cfg
+		}
+	}
 	comprehension: {
 		for cfg in [{
 			a: "one"
@@ -830,15 +824,6 @@ unresolvedDisjunction: {
 		x: "a foo z"
 		run: {
 			a: "foo"
-		}
-	}
-	files: {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
-		}
-	} & {
-		"\("kind-\(cfg.name)")": {
-			patches: cfg
 		}
 	}
 	y: "foo"

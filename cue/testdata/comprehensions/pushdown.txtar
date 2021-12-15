@@ -187,21 +187,19 @@ explicitDefaultError: {
 }
 -- out/eval --
 Errors:
-a.c: field not allowed: d:
+a.c.d: field not allowed: d:
     ./in.cue:90:5
     ./in.cue:92:2
-    ./in.cue:93:6
     ./in.cue:96:5
-b12a.#list.tail.tail: structural cycle
-b12a.list.tail.tail: structural cycle
-embed.t: field not allowed: p:
+embed.t.p: field not allowed: p:
     ./in.cue:33:5
     ./in.cue:34:6
+    ./in.cue:35:3
+    ./in.cue:35:12
     ./in.cue:39:5
-fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-cycle error:
+b12a.#list.tail: structural cycle:
     ./in.cue:56:6
-cycle error:
+b12a.list.tail: structural cycle:
     ./in.cue:64:12
 
 Result:
@@ -210,8 +208,8 @@ Result:
   linkChildren: (struct){
     w: (int){ 1 }
     v: (struct){
-      x: (int){ 1 }
       y: (int){ 1 }
+      x: (int){ 1 }
       z: (int){ 1 }
       rw: (int){ 1 }
       rx: (int){ 1 }
@@ -242,11 +240,12 @@ Result:
       }
     }
   }
-  fail: (_|_){
-    // [eval]
+  fail: (struct){
     a: (_|_){
-      // [eval] fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
-      b: (int){ 1 }
+      // [cycle] cycle error
+      b: (_|_){
+        // [cycle] cycle error
+      }
     }
   }
   embed: (_|_){
@@ -254,9 +253,11 @@ Result:
     t: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t: field not allowed: p:
+        // [eval] embed.t.p: field not allowed: p:
         //     ./in.cue:33:5
         //     ./in.cue:34:6
+        //     ./in.cue:35:3
+        //     ./in.cue:35:12
         //     ./in.cue:39:5
       }
     }
@@ -272,66 +273,67 @@ Result:
   b12a: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] cycle error:
-      //     ./in.cue:56:6
-      tail: (_|_){
-        // [structural cycle] cycle error:
+      // [structural cycle]
+      sum: (_|_){
+        // [structural cycle] b12a.#list.tail: structural cycle:
         //     ./in.cue:56:6
-        tail: (_|_){
-          // [structural cycle] b12a.#list.tail.tail: structural cycle
-        }
+      }
+      tail: (_|_){
+        // [structural cycle] b12a.#list.tail: structural cycle:
+        //     ./in.cue:56:6
       }
     }
     list: (_|_){
-      // [structural cycle] cycle error:
-      //     ./in.cue:64:12
-      tail: (_|_){
-        // [structural cycle] cycle error:
+      // [structural cycle]
+      sum: (_|_){
+        // [structural cycle] b12a.list.tail: structural cycle:
         //     ./in.cue:64:12
-        tail: (_|_){
-          // [structural cycle] b12a.list.tail.tail: structural cycle
-        }
+      }
+      tail: (_|_){
+        // [structural cycle] b12a.list.tail: structural cycle:
+        //     ./in.cue:64:12
       }
     }
   }
   xx: (struct){
     #a: (_|_){
-      // [incomplete] xx.#a: incomplete bool: bool
+      // [incomplete] xx.#a.c: incomplete bool: bool
+      c: (_|_){
+        // [incomplete] xx.#a.c: incomplete bool: bool
+      }
       b: (bool){ bool }
     }
     x: (#struct){
-      b: (bool){ true }
       c: (int){ 4 }
+      b: (bool){ true }
     }
     y: (#struct){
-      b: (bool){ true }
       c: (int){ 4 }
+      b: (bool){ true }
     }
   }
   #a: (#struct){
-    b: (bool){ true }
     c: (int){ 4 }
+    b: (bool){ true }
   }
   #c: (#struct){
   }
   a: (_|_){
     // [eval]
-    b: (bool){ true }
     c: (_|_){
       // [eval]
       d: (_|_){
-        // [eval] a.c: field not allowed: d:
+        // [eval] a.c.d: field not allowed: d:
         //     ./in.cue:90:5
         //     ./in.cue:92:2
-        //     ./in.cue:93:6
         //     ./in.cue:96:5
       }
     }
+    b: (bool){ true }
   }
   scopes: (struct){
     x: (int){ 1 }
     a: (struct){
-      y: (int){ 2 }
       b: (int){ 1 }
       c: (struct){
         d: (int){ 1 }
@@ -340,6 +342,7 @@ Result:
       f: (struct){
         g: (int){ 2 }
       }
+      y: (int){ 2 }
     }
   }
   drop: (struct){
@@ -350,14 +353,17 @@ Result:
   }
   cyclicError: (struct){
     a: (_|_){
-      // [incomplete] cyclicError.a: incomplete bool: bool
-      x: (bool){ bool }
-      y: (bool){ bool }
+      // [cycle] cycle error
+      y: (_|_){
+        // [cycle] cycle error
+      }
+      x: (_|_){
+        // [cycle] cycle error
+      }
       b: (struct){
       }
     }
-    c: (_|_){
-      // [incomplete] cyclicError.a: incomplete bool: bool
+    c: (struct){
     }
   }
   midwayReferences: (struct){
@@ -399,8 +405,8 @@ Result:
     }
   }
   t: (struct){
-    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
     x: (int){ int }
+    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
   }
   s: (struct){
     #ok: (bool){ false }

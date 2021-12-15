@@ -1,0 +1,105 @@
+-- a.cue --
+dropEmpty: {
+	k: "a"
+	#A: {
+		b:  !=""
+
+		if k == "a" {
+			d: "\(b)"
+		}
+		if k == "b" {
+			d: ""
+		}
+	}
+	a: #A
+	a: b: "c"
+}
+-- out/definition --
+dropEmpty: {
+	k: "a"
+	#A: {
+		b: !=""
+		if k == "a" {
+			d: "\(b)"
+		}
+		if k == "b" {
+			d: ""
+		}
+	}
+	a: #A & {
+		b: "c"
+	}
+}
+-- out/doc --
+[]
+[dropEmpty]
+[dropEmpty k]
+[dropEmpty #A]
+[dropEmpty #A d]
+[dropEmpty #A b]
+[dropEmpty a]
+[dropEmpty a d]
+[dropEmpty a b]
+-- out/value --
+== Simplified
+{
+	dropEmpty: {
+		k: "a"
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+}
+== Raw
+{
+	dropEmpty: {
+		k: "a"
+		#A: {
+			b: !=""
+			d: "\(b)"
+		}
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+}
+== Final
+{
+	dropEmpty: {
+		k: "a"
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+}
+== All
+{
+	dropEmpty: {
+		k: "a"
+		#A: {
+			b: !=""
+			d: "\(b)"
+		}
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+}
+== Eval
+{
+	dropEmpty: {
+		k: "a"
+		#A: {
+			b: !=""
+			d: "\(b)"
+		}
+		a: {
+			b: "c"
+			d: "c"
+		}
+	}
+}

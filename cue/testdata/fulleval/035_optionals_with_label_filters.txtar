@@ -167,10 +167,8 @@ Result:
       //     ./in.cue:21:8
       //     ./in.cue:22:8
       //     ./in.cue:23:8
-      name: (_|_){// "badName" & string
-      }
-      cmd: (_|_){// string
-      }
+      name: (string){ "badName" }
+      cmd: (string){ string }
     }
   }
 }

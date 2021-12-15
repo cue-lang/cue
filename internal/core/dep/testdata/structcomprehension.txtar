@@ -1,15 +1,21 @@
 -- in.cue --
 a: b: {
-	for i, x in c
-	let y = x
-	if y > 0 {
-		"\(e)\(i)": x + d
-	}
+    for i, x in c
+    let y = x
+    if y > 0 {
+        "\(e)\(i)": x + d
+    }
+    x: {
+        for x in [1] { foo: f.g }
+    }
 }
 
 c: [1, 2]
 d: 2
 e: "t"
+f: {
+    g: 3
+}
 -- out/dependencies/field --
 c
 e
@@ -17,9 +23,11 @@ e
 c
 e
 d
+f.g
 -- out/dependencies/dynamic --
 c
 e
+f.g
 c[0]
 d
 c[1]

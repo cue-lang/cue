@@ -116,26 +116,26 @@ Result:
   list1: (struct){
     Out1: (#list){
       0: (_|_){
-        // [cycle] cycle error:
-        //     ./in.cue:17:23
+        // [incomplete] list1._Sub: undefined field: b:
+        //     ./in.cue:20:13
       }
     }
     Out2: (#list){
       0: (_|_){
-        // [cycle] cycle error:
-        //     ./in.cue:17:23
+        // [incomplete] list1._Sub: undefined field: b:
+        //     ./in.cue:20:13
       }
     }
     Out3: (#list){
       0: (_|_){
-        // [cycle] cycle error:
-        //     ./in.cue:17:23
+        // [incomplete] list1._Sub: undefined field: b:
+        //     ./in.cue:20:13
       }
     }
     Top: (#list){
       0: (_|_){
-        // [cycle] cycle error:
-        //     ./in.cue:17:23
+        // [incomplete] list1._Sub: undefined field: b:
+        //     ./in.cue:20:13
       }
     }
     _Sub: (_|_){
@@ -147,20 +147,20 @@ Result:
   }
   list2: (struct){
     Out1: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:31:21
+      // [incomplete] list2.#Sub: undefined field: b:
+      //     ./in.cue:34:13
     }
     Out2: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:31:21
+      // [incomplete] list2.#Sub: undefined field: b:
+      //     ./in.cue:34:13
     }
     Out3: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:31:21
+      // [incomplete] list2.#Sub: undefined field: b:
+      //     ./in.cue:34:13
     }
     _Top: (_|_){
-      // [cycle] cycle error:
-      //     ./in.cue:31:21
+      // [incomplete] list2.#Sub: undefined field: b:
+      //     ./in.cue:34:13
     }
     #Sub: (_|_){
       // [incomplete] list2.#Sub: undefined field: b:

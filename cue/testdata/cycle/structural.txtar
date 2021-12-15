@@ -422,7 +422,6 @@ n4: n1 & { x: n1 & { y: n1 & { z: int }}}
 Errors:
 a1.f.0: structural cycle
 a3.f.g: structural cycle
-b12b.#list.tail.tail: structural cycle
 b13.root.a.0.0: structural cycle
 b14.root.b.1.1: structural cycle
 b4.b.0: conflicting values 1 and [y] (mismatched types int and list):
@@ -453,7 +452,6 @@ b7.b.0.0: conflicting values 1 and [a] (mismatched types int and list):
 b7.b.0.0.0: structural cycle
 c1.a.c.c: structural cycle
 d1.a.b.c.d.t: structural cycle
-d1.r: structural cycle
 d2.r.c.d.t: structural cycle
 d2.x.d.t.c.d.t: structural cycle
 e1.a.c: structural cycle
@@ -534,8 +532,10 @@ p5.#T.a.0.link: structural cycle
 p6.#U.#T.a.0.link: structural cycle
 z1.z.f.h.h: structural cycle
 z1.z.g.h: structural cycle
-cycle error:
+b12b.#list.tail: structural cycle:
     ./in.cue:141:10
+d1.r: structural cycle:
+    ./in.cue:263:30
 d3.config.0: structural cycle:
     ./in.cue:279:19
 
@@ -781,15 +781,12 @@ Result:
   }
   b12: (struct){
     #list: (#struct){
-      value: (int){ int }
-      tail: ((null|struct)){ |(*(null){ null }, (#struct){
-          value: (int){ int }
-          tail: (null){ null }
-          sum: (int){ int }
-        }) }
       sum: (int){ int }
+      value: (int){ int }
+      tail: (null){ null }
     }
     list1: (#struct){
+      sum: (int){ 10 }
       value: (int){ 1 }
       tail: (#struct){
         value: (int){ 2 }
@@ -797,31 +794,27 @@ Result:
           value: (int){ 3 }
           tail: (#struct){
             value: (int){ 4 }
-            tail: (null){ null }
             sum: (int){ 4 }
+            tail: (null){ null }
           }
           sum: (int){ 7 }
         }
         sum: (int){ 9 }
       }
-      sum: (int){ 10 }
     }
   }
   b12b: (_|_){
     // [structural cycle]
     #list: (_|_){
-      // [structural cycle] cycle error:
+      // [structural cycle] b12b.#list.tail: structural cycle:
       //     ./in.cue:141:10
       tail: (_|_){
-        // [structural cycle] cycle error:
+        // [structural cycle] b12b.#list.tail: structural cycle:
         //     ./in.cue:141:10
-        tail: (_|_){
-          // [structural cycle] b12b.#list.tail.tail: structural cycle
-        }
       }
     }
     list1: (_|_){
-      // [structural cycle] cycle error:
+      // [structural cycle] b12b.#list.tail: structural cycle:
       //     ./in.cue:141:10
       tail: (struct){
         tail: (struct){
@@ -1080,7 +1073,8 @@ Result:
       }
     }
     r: (_|_){
-      // [structural cycle] d1.r: structural cycle
+      // [structural cycle] d1.r: structural cycle:
+      //     ./in.cue:263:30
     }
     x: (_|_){
       // [structural cycle] d1.a.b.c.d.t: structural cycle

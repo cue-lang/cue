@@ -1,0 +1,1948 @@
+# Working set of tests that unit test specifics of the aspect of the
+# comprehension algorithm that pushes down evaluation to the arcs.
+
+-- in.cue --
+linkChildren: {
+	w: 1
+	v: {
+		x: 1
+		if true {
+			y: 1
+			if true {
+				z: 1
+
+				rw: w
+				rx: x
+				ry: y
+				rz: z
+
+				n1a: na: [w, x, y, z]
+				n2a: n1a: na: [w, x, y, z]
+				n2z: n1z: nz: z
+			}
+		}
+	}
+}
+
+fail: {
+	a: {
+		// Condition of comprehensions must hold after evaluation is done.
+		if a.b == _|_ {
+			b: 1
+		}
+	}
+}
+
+embed: {
+	t1: #C1
+	#C1: {
+		if false {
+			p: _
+		}
+	}
+	t1: p: "foo"
+
+
+	t2: #C2
+	#C2: {
+		if true {
+			p: _
+		}
+	}
+	t2: p: "foo"
+
+	t3: #C3
+	#C3: {}
+	t3: {
+		if false {
+			p: q: 1
+		}
+	}
+
+	t4: #C4
+	#C4: {}
+	t4: {
+		if true {
+			p: q: 1
+		}
+	}
+
+	t5: {
+		a: bool
+		if a {
+			p: q: 1
+		}
+	}
+
+	t6: {
+		if false {
+			p: 1
+		}
+		p: q + 1
+		q: int
+	}
+	t7: {
+		p: q + 1
+		q: int
+		if false {
+			p: 1
+		}
+	}
+}
+
+
+// Mix of both dynamic and static fields.
+mixedFields: {
+	a: {
+		for _, s in ["foo"] {
+			"\(s)": 1
+			X: 1
+		}
+	}
+
+	b: #Def: {
+		for _, s in ["foo"] {
+			"\(s)": 1
+			X: 1
+		}
+	}
+	b: x: b.#Def
+	b: x: X: _
+	b: x: foo: _
+
+	c: #Def: {
+		X:   int
+		foo: int
+	}
+	c: x: c.#Def
+	c: x: {
+		for _, s in ["foo"] {
+			"\(s)": 1
+			X: 1
+		}
+	}
+}
+
+fieldMismatch: {
+	a: {
+		2
+		if true {
+			x: 3
+		}
+	}
+}
+
+// More trigger happy on stack overflows.
+b12a: {
+	#list: {
+		tail: #list
+
+		if tail != null {
+			sum: tail.sum
+		}
+	}
+
+	list: {
+		tail: list
+
+		if tail != null {
+			sum: tail.sum
+		}
+	}
+}
+
+
+xx: {
+	#a: {
+		if b {
+			c: 4
+		}
+		b: bool
+	}
+	x: (#a & {b: true}) & {c: 4}
+	y: x
+}
+
+// c should be allowed
+#a: {
+	if b {
+		c: 4
+	}
+	b: true
+}
+
+#c: {}
+a: {
+	if b {
+		c: d: 4
+	}
+	b: true
+	c: #c
+}
+
+
+scopes: {
+	x: 1
+	a: {
+		y: 2
+		if true {
+			b: x
+			c: d: x
+			e: y
+			f: g: y
+		}
+	}
+}
+
+drop: {
+	x: 1
+	a: {
+		y: 2
+		if false {
+			b: x
+			c: d: x
+			e: y
+			f: g: y
+		}
+	}
+}
+
+cyclicError: {
+	a: {
+		x: bool
+		y: bool
+		if a.x  {
+			y: true
+		}
+		if a.y {
+			x: true
+		}
+		b: {}
+	}
+	c: a.b
+}
+
+midwayReferences: {
+	a: {
+		for i, j in {a: 1, b: 2} {
+			x: y: z: (i): j
+		}
+		x: y: {}
+	}
+	b: a.x
+	c: a.x.y
+	d: a.x.y.z
+}
+
+// Ensure first closedness check is done after evaluation of
+// comprehensions.
+closedCheck: t1: {
+	a: b: [string]: #D
+
+	#D: {
+		d: string
+		if d != "c" {
+			e: string
+		}
+	}
+
+	a: b: c: {
+		d: "d"
+		e: "ok"
+	}
+}
+
+closedCheck: t2: {
+	a: b: [string]: #D
+
+	#D: {
+		d: string
+		if d != "c" {
+			("foo"+"bar"): string
+		}
+	}
+
+	a: b: c: {
+		d:      "d"
+		foobar: "ok"
+	}
+}
+
+closedCheck: t3: {
+	a: b: [string]: #D
+
+	#D: {
+		d: string
+		e: {
+			if d != "c" {
+				string
+			}
+		}
+	}
+
+	a: b: c: {
+		d: "d"
+		e: "ok"
+	}
+}
+
+emptyComprehension: {
+	a: {}
+	b: {
+		// b should be an incomplete error
+		if a.b {
+		}
+	}
+}
+
+voidElimination: t1: {
+	[string]: {
+		b: bool
+		if !b {}
+	}
+	if false {
+		a: b: true
+	}
+}
+
+voidElimination: t2: {
+	components: {
+		sinks: [string]: #C & {
+			kind: string
+			configuration: {
+				if kind != "source" {
+					inputs: {
+						required: true
+					}
+				}
+			}
+		}
+
+		#C: {
+			kind: string
+			configuration: [string]: {
+				required: bool
+				if !required {
+					common: bool
+				}
+			}
+		}
+	}
+
+	components: sinks: blah: {
+		kind: "source"
+	}
+}
+
+voidElimination: derefRef1: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e
+	}
+}
+
+voidElimination: derefRef1: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e
+	}
+}
+
+voidElimination: derefRef2: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: #F
+	#F: {
+		e: bool
+		f: !e
+	}
+}
+
+voidElimination: derefDisj1: {
+	a: [string]: c: [string]: E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e
+	} | {
+		g: bool
+		h: !g
+	}
+}
+
+voidElimination: derefDisj2: {
+	a: [string]: c: [string]: E & E
+
+	a: b: c: {
+		if false {
+			d: e: true
+		}
+	}
+
+	E: {
+		e: bool
+		f: !e
+	} | {
+		g: bool
+		h: !g
+	}
+}
+
+voidElimination: bulk1: {
+	a: b: {}
+	a: [string]: {
+		c: {
+			e: string
+			if false {
+				e: ""
+			}
+		}
+		d: c.e
+	}
+}
+
+voidElimination: opt1: {
+	a: b: {}
+	a: b?: {
+		c: {
+			e: string
+			if false {
+				e: ""
+			}
+		}
+		d: c.e
+	}
+}
+
+voidElimination: noCycle1: {
+	_x: a.b
+	a: {
+		c: h: "stream"
+		b: {
+			if c.g != _|_ {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+}
+
+voidElimination: noCycle2: {
+	a: {
+		c: h: "stream"
+		b: {
+			if c.g != _|_ {}
+		}
+		c: {
+			if false {g: _}
+		}
+	}
+	_x: a.b
+}
+
+voidLookup: {
+	a: x: z: a.y.z.void
+
+	a: y: {
+		c: _
+		z: {}
+	}
+
+	a: [string]: {
+		c: {
+			for k, v in z {
+				(k): null  // don't add this arc anywhere
+			}
+		}
+		z: {
+			if false {
+				err: {}
+			}
+		}
+	}
+}
+
+
+// Eliminate the top value even if there is an error (especially incomplete
+// errors).
+topElimination: {
+	_
+	if true {
+		x: a+1
+	}
+}
+
+// Do not include x in s.
+t: {
+	#ok: *true | bool
+	if #ok {
+		x: int
+	}
+}
+s: t & {
+	#ok: false
+}
+
+// should be error
+// issue #465
+explicitDefaultError: {
+	a: string | *_|_
+
+	if a != "" {
+	}
+}
+
+// Remove arcs for with no comprehension results.
+allArcs: p1: {
+	x: {
+		for k, _ in y {
+			(k): null
+		}
+	}
+	y: {
+		if false {
+			x: {}
+		}
+	}
+}
+
+allArcs: p2: {
+	y: {
+		if false {
+			x: {}
+		}
+	}
+	x: {
+		for k, _ in y {
+			(k): null
+		}
+	}
+}
+
+// Tests derived from Unity.
+unity: test1: {
+	#Config: {
+		name: string
+		type: string
+	}
+
+	#AnyConfig: {
+		#Config
+		...
+	}
+
+	#Env: {
+		name: string
+		configurations: [string]: #AnyConfig
+	}
+
+	envs: "e1": #Env & {
+		configurations: c1:  #Config
+	}
+
+	envs: [string]: configurations: [string]: {
+		type: "foo"
+		if type == "terraform" {
+			backend: {
+				type: "s3"
+			}
+		}
+	}
+}
+
+-- reflect.cue --
+import "encoding/json"
+
+
+unifyDynamicReflect: {
+	for _, s in ["foo"] {
+		X: {...}
+		"\(s)": {
+			X: {...} // cannot be _
+			Y: json.Marshal(X) // cannot be yaml, X cannot be literal
+		}
+	}
+
+	[string]: X: {
+		if true {// must be there
+			x: y: {} // at least 2 nestings needed to expose problem
+		}
+	}
+}
+
+-- out/eval --
+Errors:
+a.c: field not allowed: d:
+    ./in.cue:170:5
+    ./in.cue:172:2
+    ./in.cue:173:6
+    ./in.cue:176:5
+b12a.#list.tail.tail: structural cycle
+b12a.list.tail.tail: structural cycle
+embed.t1: field not allowed: p:
+    ./in.cue:33:6
+    ./in.cue:34:7
+    ./in.cue:39:6
+embed.t4: field not allowed: p:
+    ./in.cue:58:6
+    ./in.cue:59:7
+    ./in.cue:60:6
+    ./in.cue:61:3
+    ./in.cue:62:4
+fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
+fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct):
+    ./in.cue:124:3
+    ./in.cue:125:3
+    ./in.cue:125:11
+cycle error:
+    ./in.cue:136:6
+cycle error:
+    ./in.cue:144:6
+
+Result:
+(_|_){
+  // [eval]
+  linkChildren: (struct){
+    w: (int){ 1 }
+    v: (struct){
+      x: (int){ 1 }
+      y: (int){ 1 }
+      z: (int){ 1 }
+      rw: (int){ 1 }
+      rx: (int){ 1 }
+      ry: (int){ 1 }
+      rz: (int){ 1 }
+      n1a: (struct){
+        na: (#list){
+          0: (int){ 1 }
+          1: (int){ 1 }
+          2: (int){ 1 }
+          3: (int){ 1 }
+        }
+      }
+      n2a: (struct){
+        n1a: (struct){
+          na: (#list){
+            0: (int){ 1 }
+            1: (int){ 1 }
+            2: (int){ 1 }
+            3: (int){ 1 }
+          }
+        }
+      }
+      n2z: (struct){
+        n1z: (struct){
+          nz: (int){ 1 }
+        }
+      }
+    }
+  }
+  fail: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] fail.a: cycle: field inserted by if clause that was previously evaluated by another if clause: b
+      b: (int){ 1 }
+    }
+  }
+  embed: (_|_){
+    // [eval]
+    t1: (_|_){
+      // [eval]
+      p: (_|_){
+        // [eval] embed.t1: field not allowed: p:
+        //     ./in.cue:33:6
+        //     ./in.cue:34:7
+        //     ./in.cue:39:6
+      }
+    }
+    #C1: (#struct){
+    }
+    t2: (#struct){
+      p: (string){ "foo" }
+    }
+    #C2: (#struct){
+      p: (_){ _ }
+    }
+    t3: (#struct){
+    }
+    #C3: (#struct){
+    }
+    t4: (_|_){
+      // [eval]
+      p: (_|_){
+        // [eval] embed.t4: field not allowed: p:
+        //     ./in.cue:58:6
+        //     ./in.cue:59:7
+        //     ./in.cue:60:6
+        //     ./in.cue:61:3
+        //     ./in.cue:62:4
+      }
+    }
+    #C4: (#struct){
+    }
+    t5: (_|_){
+      // [incomplete] embed.t5: incomplete bool: bool
+      a: (bool){ bool }
+    }
+    t6: (struct){
+      p: (_|_){
+        // [incomplete] embed.t6.p: non-concrete value int in operand to +:
+        //     ./in.cue:77:6
+        //     ./in.cue:78:3
+      }
+      q: (int){ int }
+    }
+    t7: (struct){
+      p: (_|_){
+        // [incomplete] embed.t7.p: non-concrete value int in operand to +:
+        //     ./in.cue:81:6
+        //     ./in.cue:82:3
+      }
+      q: (int){ int }
+    }
+  }
+  mixedFields: (struct){
+    a: (struct){
+      X: (int){ 1 }
+      foo: (int){ 1 }
+    }
+    b: (struct){
+      #Def: (#struct){
+        X: (int){ 1 }
+        foo: (int){ 1 }
+      }
+      x: (#struct){
+        X: (int){ 1 }
+        foo: (int){ 1 }
+      }
+    }
+    c: (struct){
+      #Def: (#struct){
+        X: (int){ int }
+        foo: (int){ int }
+      }
+      x: (#struct){
+        X: (int){ 1 }
+        foo: (int){ 1 }
+      }
+    }
+  }
+  fieldMismatch: (_|_){
+    // [eval]
+    a: (_|_){
+      // [eval] fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct):
+      //     ./in.cue:124:3
+      //     ./in.cue:125:3
+      //     ./in.cue:125:11
+      x: (int){ 3 }
+    }
+  }
+  b12a: (_|_){
+    // [structural cycle]
+    #list: (_|_){
+      // [structural cycle] cycle error:
+      //     ./in.cue:136:6
+      tail: (_|_){
+        // [structural cycle] cycle error:
+        //     ./in.cue:136:6
+        tail: (_|_){
+          // [structural cycle] b12a.#list.tail.tail: structural cycle
+        }
+      }
+    }
+    list: (_|_){
+      // [structural cycle] cycle error:
+      //     ./in.cue:144:6
+      tail: (_|_){
+        // [structural cycle] cycle error:
+        //     ./in.cue:144:6
+        tail: (_|_){
+          // [structural cycle] b12a.list.tail.tail: structural cycle
+        }
+      }
+    }
+  }
+  xx: (struct){
+    #a: (_|_){
+      // [incomplete] xx.#a: incomplete bool: bool
+      b: (bool){ bool }
+    }
+    x: (#struct){
+      b: (bool){ true }
+      c: (int){ 4 }
+    }
+    y: (#struct){
+      b: (bool){ true }
+      c: (int){ 4 }
+    }
+  }
+  #a: (#struct){
+    b: (bool){ true }
+    c: (int){ 4 }
+  }
+  #c: (#struct){
+  }
+  a: (_|_){
+    // [eval]
+    b: (bool){ true }
+    c: (_|_){
+      // [eval]
+      d: (_|_){
+        // [eval] a.c: field not allowed: d:
+        //     ./in.cue:170:5
+        //     ./in.cue:172:2
+        //     ./in.cue:173:6
+        //     ./in.cue:176:5
+      }
+    }
+  }
+  scopes: (struct){
+    x: (int){ 1 }
+    a: (struct){
+      y: (int){ 2 }
+      b: (int){ 1 }
+      c: (struct){
+        d: (int){ 1 }
+      }
+      e: (int){ 2 }
+      f: (struct){
+        g: (int){ 2 }
+      }
+    }
+  }
+  drop: (struct){
+    x: (int){ 1 }
+    a: (struct){
+      y: (int){ 2 }
+    }
+  }
+  cyclicError: (struct){
+    a: (_|_){
+      // [incomplete] cyclicError.a: incomplete bool: bool
+      x: (bool){ bool }
+      y: (bool){ bool }
+      b: (struct){
+      }
+    }
+    c: (_|_){
+      // [incomplete] cyclicError.a: incomplete bool: bool
+    }
+  }
+  midwayReferences: (struct){
+    a: (struct){
+      x: (struct){
+        y: (struct){
+          z: (struct){
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }
+        }
+      }
+    }
+    b: (struct){
+      y: (struct){
+        z: (struct){
+          a: (int){ 1 }
+          b: (int){ 2 }
+        }
+      }
+    }
+    c: (struct){
+      z: (struct){
+        a: (int){ 1 }
+        b: (int){ 2 }
+      }
+    }
+    d: (struct){
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }
+  }
+  closedCheck: (struct){
+    t1: (struct){
+      a: (struct){
+        b: (struct){
+          c: (#struct){
+            d: (string){ "d" }
+            e: (string){ "ok" }
+          }
+        }
+      }
+      #D: (_|_){
+        // [incomplete] closedCheck.t1.#D: non-concrete value string in operand to !=:
+        //     ./in.cue:240:6
+        //     ./in.cue:239:3
+        d: (string){ string }
+      }
+    }
+    t2: (struct){
+      a: (struct){
+        b: (struct){
+          c: (#struct){
+            d: (string){ "d" }
+            foobar: (string){ "ok" }
+          }
+        }
+      }
+      #D: (_|_){
+        // [incomplete] closedCheck.t2.#D: non-concrete value string in operand to !=:
+        //     ./in.cue:256:6
+        //     ./in.cue:255:3
+        d: (string){ string }
+      }
+    }
+    t3: (struct){
+      a: (struct){
+        b: (struct){
+          c: (#struct){
+            d: (string){ "d" }
+            e: (string){ "ok" }
+          }
+        }
+      }
+      #D: (#struct){
+        d: (string){ string }
+        e: (_|_){
+          // [incomplete] closedCheck.t3.#D.e: non-concrete value string in operand to !=:
+          //     ./in.cue:273:7
+          //     ./in.cue:271:3
+        }
+      }
+    }
+  }
+  emptyComprehension: (struct){
+    a: (struct){
+    }
+    b: (_|_){
+      // [incomplete] emptyComprehension.b: undefined field: b:
+      //     ./in.cue:289:8
+    }
+  }
+  voidElimination: (struct){
+    t1: (struct){
+    }
+    t2: (struct){
+      components: (struct){
+        sinks: (struct){
+          blah: (#struct){
+            kind: (string){ "source" }
+            configuration: (#struct){
+            }
+          }
+        }
+        #C: (#struct){
+          kind: (string){ string }
+          configuration: (#struct){
+          }
+        }
+      }
+    }
+    derefRef1: (struct){
+      a: (struct){
+        b: (struct){
+          c: (struct){
+          }
+        }
+      }
+      E: (struct){
+        e: (bool){ bool }
+        f: (_|_){
+          // [incomplete] voidElimination.derefRef1.E.f: operand e of '!' not concrete (was bool):
+          //     ./in.cue:344:7
+          // voidElimination.derefRef1.E.f: operand e of '!' not concrete (was bool):
+          //     ./in.cue:359:7
+        }
+      }
+    }
+    derefRef2: (struct){
+      a: (struct){
+        b: (struct){
+          c: (struct){
+          }
+        }
+      }
+      E: (#struct){
+        e: (bool){ bool }
+        f: (_|_){
+          // [incomplete] voidElimination.derefRef2.E.f: operand e of '!' not concrete (was bool):
+          //     ./in.cue:375:7
+        }
+      }
+      #F: (#struct){
+        e: (bool){ bool }
+        f: (_|_){
+          // [incomplete] voidElimination.derefRef2.#F.f: operand e of '!' not concrete (was bool):
+          //     ./in.cue:375:7
+        }
+      }
+    }
+    derefDisj1: (struct){
+      a: (struct){
+        b: (struct){
+          c: (struct){
+          }
+        }
+      }
+      E: (struct){ |((struct){
+          e: (bool){ bool }
+          f: (_|_){
+            // [incomplete] voidElimination.derefDisj1.E.f: operand e of '!' not concrete (was bool):
+            //     ./in.cue:390:7
+          }
+        }, (struct){
+          g: (bool){ bool }
+          h: (_|_){
+            // [incomplete] voidElimination.derefDisj1.E.h: operand g of '!' not concrete (was bool):
+            //     ./in.cue:393:7
+          }
+        }) }
+    }
+    derefDisj2: (struct){
+      a: (struct){
+        b: (struct){
+          c: (struct){
+          }
+        }
+      }
+      E: (struct){ |((struct){
+          e: (bool){ bool }
+          f: (_|_){
+            // [incomplete] voidElimination.derefDisj2.E.f: operand e of '!' not concrete (was bool):
+            //     ./in.cue:408:7
+          }
+        }, (struct){
+          g: (bool){ bool }
+          h: (_|_){
+            // [incomplete] voidElimination.derefDisj2.E.h: operand g of '!' not concrete (was bool):
+            //     ./in.cue:411:7
+          }
+        }) }
+    }
+    bulk1: (struct){
+      a: (struct){
+        b: (struct){
+          c: (struct){
+            e: (string){ string }
+          }
+          d: (string){ string }
+        }
+      }
+    }
+    opt1: (struct){
+      a: (struct){
+        b: (struct){
+          c: (struct){
+            e: (string){ string }
+          }
+          d: (string){ string }
+        }
+      }
+    }
+    noCycle1: (struct){
+      _x: (struct){
+      }
+      a: (struct){
+        c: (struct){
+          h: (string){ "stream" }
+        }
+        b: (struct){
+        }
+      }
+    }
+    noCycle2: (struct){
+      a: (struct){
+        c: (struct){
+          h: (string){ "stream" }
+        }
+        b: (struct){
+        }
+      }
+      _x: (struct){
+      }
+    }
+  }
+  voidLookup: (struct){
+    a: (struct){
+      x: (struct){
+        z: (_|_){
+          // [incomplete] voidLookup.a.x.z: undefined field: void:
+          //     ./in.cue:468:17
+        }
+        c: (_|_){
+          // [incomplete] voidLookup.a.x.z: undefined field: void:
+          //     ./in.cue:468:17
+        }
+      }
+      y: (struct){
+        c: (_){ _ }
+        z: (struct){
+        }
+      }
+    }
+  }
+  topElimination: (_|_){
+    // [eval]
+    x: (_|_){
+      // [eval]
+    }
+  }
+  t: (struct){
+    #ok: (bool){ |(*(bool){ true }, (bool){ bool }) }
+    x: (int){ int }
+  }
+  s: (struct){
+    #ok: (bool){ false }
+  }
+  explicitDefaultError: (_|_){
+    // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
+    //     ./in.cue:515:5
+    //     ./in.cue:513:2
+    a: (string){ string }
+  }
+  allArcs: (struct){
+    p1: (struct){
+      x: (struct){
+      }
+      y: (struct){
+      }
+    }
+    p2: (struct){
+      y: (struct){
+      }
+      x: (struct){
+      }
+    }
+  }
+  unity: (struct){
+    test1: (struct){
+      #Config: (#struct){
+        name: (string){ string }
+        type: (string){ string }
+      }
+      #AnyConfig: (#struct){
+        name: (string){ string }
+        type: (string){ string }
+      }
+      #Env: (#struct){
+        name: (string){ string }
+        configurations: (#struct){
+        }
+      }
+      envs: (struct){
+        e1: (#struct){
+          name: (string){ string }
+          configurations: (#struct){
+            c1: (#struct){
+              name: (string){ string }
+              type: (string){ "foo" }
+            }
+          }
+        }
+      }
+    }
+  }
+  unifyDynamicReflect: (struct){
+    X: (struct){
+      X: (struct){
+        x: (struct){
+          y: (struct){
+          }
+        }
+      }
+    }
+    foo: (struct){
+      X: (struct){
+        x: (struct){
+          y: (struct){
+          }
+        }
+      }
+      Y: (string){ "{\"x\":{\"y\":{}}}" }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  linkChildren: {
+    w: 1
+    v: {
+      x: 1
+      if true {
+        y: 1
+        if true {
+          z: 1
+          rw: 〈3;w〉
+          rx: 〈2;x〉
+          ry: 〈1;y〉
+          rz: 〈0;z〉
+          n1a: {
+            na: [
+              〈5;w〉,
+              〈4;x〉,
+              〈3;y〉,
+              〈2;z〉,
+            ]
+          }
+          n2a: {
+            n1a: {
+              na: [
+                〈6;w〉,
+                〈5;x〉,
+                〈4;y〉,
+                〈3;z〉,
+              ]
+            }
+          }
+          n2z: {
+            n1z: {
+              nz: 〈2;z〉
+            }
+          }
+        }
+      }
+    }
+  }
+  fail: {
+    a: {
+      if (〈1;a〉.b == _|_(explicit error (_|_ literal) in source)) {
+        b: 1
+      }
+    }
+  }
+  embed: {
+    t1: 〈0;#C1〉
+    #C1: {
+      if false {
+        p: _
+      }
+    }
+    t1: {
+      p: "foo"
+    }
+    t2: 〈0;#C2〉
+    #C2: {
+      if true {
+        p: _
+      }
+    }
+    t2: {
+      p: "foo"
+    }
+    t3: 〈0;#C3〉
+    #C3: {}
+    t3: {
+      if false {
+        p: {
+          q: 1
+        }
+      }
+    }
+    t4: 〈0;#C4〉
+    #C4: {}
+    t4: {
+      if true {
+        p: {
+          q: 1
+        }
+      }
+    }
+    t5: {
+      a: bool
+      if 〈0;a〉 {
+        p: {
+          q: 1
+        }
+      }
+    }
+    t6: {
+      if false {
+        p: 1
+      }
+      p: (〈0;q〉 + 1)
+      q: int
+    }
+    t7: {
+      p: (〈0;q〉 + 1)
+      q: int
+      if false {
+        p: 1
+      }
+    }
+  }
+  mixedFields: {
+    a: {
+      for _, s in [
+        "foo",
+      ] {
+        "\(〈1;s〉)": 1
+        X: 1
+      }
+    }
+    b: {
+      #Def: {
+        for _, s in [
+          "foo",
+        ] {
+          "\(〈1;s〉)": 1
+          X: 1
+        }
+      }
+    }
+    b: {
+      x: 〈1;b〉.#Def
+    }
+    b: {
+      x: {
+        X: _
+      }
+    }
+    b: {
+      x: {
+        foo: _
+      }
+    }
+    c: {
+      #Def: {
+        X: int
+        foo: int
+      }
+    }
+    c: {
+      x: 〈1;c〉.#Def
+    }
+    c: {
+      x: {
+        for _, s in [
+          "foo",
+        ] {
+          "\(〈1;s〉)": 1
+          X: 1
+        }
+      }
+    }
+  }
+  fieldMismatch: {
+    a: {
+      2
+      if true {
+        x: 3
+      }
+    }
+  }
+  b12a: {
+    #list: {
+      tail: 〈1;#list〉
+      if (〈0;tail〉 != null) {
+        sum: 〈1;tail〉.sum
+      }
+    }
+    list: {
+      tail: 〈1;list〉
+      if (〈0;tail〉 != null) {
+        sum: 〈1;tail〉.sum
+      }
+    }
+  }
+  xx: {
+    #a: {
+      if 〈0;b〉 {
+        c: 4
+      }
+      b: bool
+    }
+    x: ((〈0;#a〉 & {
+      b: true
+    }) & {
+      c: 4
+    })
+    y: 〈0;x〉
+  }
+  #a: {
+    if 〈0;b〉 {
+      c: 4
+    }
+    b: true
+  }
+  #c: {}
+  a: {
+    if 〈0;b〉 {
+      c: {
+        d: 4
+      }
+    }
+    b: true
+    c: 〈1;#c〉
+  }
+  scopes: {
+    x: 1
+    a: {
+      y: 2
+      if true {
+        b: 〈2;x〉
+        c: {
+          d: 〈3;x〉
+        }
+        e: 〈1;y〉
+        f: {
+          g: 〈2;y〉
+        }
+      }
+    }
+  }
+  drop: {
+    x: 1
+    a: {
+      y: 2
+      if false {
+        b: 〈2;x〉
+        c: {
+          d: 〈3;x〉
+        }
+        e: 〈1;y〉
+        f: {
+          g: 〈2;y〉
+        }
+      }
+    }
+  }
+  cyclicError: {
+    a: {
+      x: bool
+      y: bool
+      if 〈1;a〉.x {
+        y: true
+      }
+      if 〈1;a〉.y {
+        x: true
+      }
+      b: {}
+    }
+    c: 〈0;a〉.b
+  }
+  midwayReferences: {
+    a: {
+      for i, j in {
+        a: 1
+        b: 2
+      } {
+        x: {
+          y: {
+            z: {
+              〈4;i〉: 〈4;j〉
+            }
+          }
+        }
+      }
+      x: {
+        y: {}
+      }
+    }
+    b: 〈0;a〉.x
+    c: 〈0;a〉.x.y
+    d: 〈0;a〉.x.y.z
+  }
+  closedCheck: {
+    t1: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        if (〈0;d〉 != "c") {
+          e: string
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            e: "ok"
+          }
+        }
+      }
+    }
+  }
+  closedCheck: {
+    t2: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        if (〈0;d〉 != "c") {
+          ("foo" + "bar"): string
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            foobar: "ok"
+          }
+        }
+      }
+    }
+  }
+  closedCheck: {
+    t3: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        e: {
+          if (〈1;d〉 != "c") {
+            string
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            e: "ok"
+          }
+        }
+      }
+    }
+  }
+  emptyComprehension: {
+    a: {}
+    b: {
+      if 〈1;a〉.b {}
+    }
+  }
+  voidElimination: {
+    t1: {
+      [string]: {
+        b: bool
+        if !〈0;b〉 {}
+      }
+      if false {
+        a: {
+          b: true
+        }
+      }
+    }
+  }
+  voidElimination: {
+    t2: {
+      components: {
+        sinks: {
+          [string]: (〈1;#C〉 & {
+            kind: string
+            configuration: {
+              if (〈1;kind〉 != "source") {
+                inputs: {
+                  required: true
+                }
+              }
+            }
+          })
+        }
+        #C: {
+          kind: string
+          configuration: {
+            [string]: {
+              required: bool
+              if !〈0;required〉 {
+                common: bool
+              }
+            }
+          }
+        }
+      }
+      components: {
+        sinks: {
+          blah: {
+            kind: "source"
+          }
+        }
+      }
+    }
+  }
+  voidElimination: {
+    derefRef1: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: {
+        e: bool
+        f: !〈0;e〉
+      }
+    }
+  }
+  voidElimination: {
+    derefRef1: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: {
+        e: bool
+        f: !〈0;e〉
+      }
+    }
+  }
+  voidElimination: {
+    derefRef2: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: 〈0;#F〉
+      #F: {
+        e: bool
+        f: !〈0;e〉
+      }
+    }
+  }
+  voidElimination: {
+    derefDisj1: {
+      a: {
+        [string]: {
+          c: {
+            [string]: 〈3;E〉
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: ({
+        e: bool
+        f: !〈0;e〉
+      }|{
+        g: bool
+        h: !〈0;g〉
+      })
+    }
+  }
+  voidElimination: {
+    derefDisj2: {
+      a: {
+        [string]: {
+          c: {
+            [string]: (〈3;E〉 & 〈3;E〉)
+          }
+        }
+      }
+      a: {
+        b: {
+          c: {
+            if false {
+              d: {
+                e: true
+              }
+            }
+          }
+        }
+      }
+      E: ({
+        e: bool
+        f: !〈0;e〉
+      }|{
+        g: bool
+        h: !〈0;g〉
+      })
+    }
+  }
+  voidElimination: {
+    bulk1: {
+      a: {
+        b: {}
+      }
+      a: {
+        [string]: {
+          c: {
+            e: string
+            if false {
+              e: ""
+            }
+          }
+          d: 〈0;c〉.e
+        }
+      }
+    }
+  }
+  voidElimination: {
+    opt1: {
+      a: {
+        b: {}
+      }
+      a: {
+        b?: {
+          c: {
+            e: string
+            if false {
+              e: ""
+            }
+          }
+          d: 〈0;c〉.e
+        }
+      }
+    }
+  }
+  voidElimination: {
+    noCycle1: {
+      _x: 〈0;a〉.b
+      a: {
+        c: {
+          h: "stream"
+        }
+        b: {
+          if (〈1;c〉.g != _|_(explicit error (_|_ literal) in source)) {}
+        }
+        c: {
+          if false {
+            g: _
+          }
+        }
+      }
+    }
+  }
+  voidElimination: {
+    noCycle2: {
+      a: {
+        c: {
+          h: "stream"
+        }
+        b: {
+          if (〈1;c〉.g != _|_(explicit error (_|_ literal) in source)) {}
+        }
+        c: {
+          if false {
+            g: _
+          }
+        }
+      }
+      _x: 〈0;a〉.b
+    }
+  }
+  voidLookup: {
+    a: {
+      x: {
+        z: 〈2;a〉.y.z.void
+      }
+    }
+    a: {
+      y: {
+        c: _
+        z: {}
+      }
+    }
+    a: {
+      [string]: {
+        c: {
+          for k, v in 〈1;z〉 {
+            〈1;k〉: null
+          }
+        }
+        z: {
+          if false {
+            err: {}
+          }
+        }
+      }
+    }
+  }
+  topElimination: {
+    _
+    if true {
+      x: (〈2;a〉 + 1)
+    }
+  }
+  t: {
+    #ok: (*true|bool)
+    if 〈0;#ok〉 {
+      x: int
+    }
+  }
+  s: (〈0;t〉 & {
+    #ok: false
+  })
+  explicitDefaultError: {
+    a: (string|*_|_(explicit error (_|_ literal) in source))
+    if (〈0;a〉 != "") {}
+  }
+  allArcs: {
+    p1: {
+      x: {
+        for k, _ in 〈1;y〉 {
+          〈1;k〉: null
+        }
+      }
+      y: {
+        if false {
+          x: {}
+        }
+      }
+    }
+  }
+  allArcs: {
+    p2: {
+      y: {
+        if false {
+          x: {}
+        }
+      }
+      x: {
+        for k, _ in 〈1;y〉 {
+          〈1;k〉: null
+        }
+      }
+    }
+  }
+  unity: {
+    test1: {
+      #Config: {
+        name: string
+        type: string
+      }
+      #AnyConfig: {
+        〈1;#Config〉
+        ...
+      }
+      #Env: {
+        name: string
+        configurations: {
+          [string]: 〈2;#AnyConfig〉
+        }
+      }
+      envs: {
+        e1: (〈1;#Env〉 & {
+          configurations: {
+            c1: 〈3;#Config〉
+          }
+        })
+      }
+      envs: {
+        [string]: {
+          configurations: {
+            [string]: {
+              type: "foo"
+              if (〈0;type〉 == "terraform") {
+                backend: {
+                  type: "s3"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+--- reflect.cue
+{
+  unifyDynamicReflect: {
+    for _, s in [
+      "foo",
+    ] {
+      X: {
+        ...
+      }
+      "\(〈1;s〉)": {
+        X: {
+          ...
+        }
+        Y: 〈import;"encoding/json"〉.Marshal(〈0;X〉)
+      }
+    }
+    [string]: {
+      X: {
+        if true {
+          x: {
+            y: {}
+          }
+        }
+      }
+    }
+  }
+}

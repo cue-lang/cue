@@ -1246,11 +1246,6 @@ kubernetes: {
                             name:  "etcd"
                             image: "quay.io/coreos/etcd:v3.3.10"
                             args: ["-name=$(NAME)", "-data-dir=/data/etcd3", "-initial-advertise-peer-urls=http://$(IP):2380", "-listen-peer-urls=http://$(IP):2380", "-listen-client-urls=http://$(IP):2379,http://127.0.0.1:2379", "-advertise-client-urls=http://$(IP):2379", "-discovery=https://discovery.etcd.io/xxxxxx"]
-                            command: ["/usr/local/bin/etcd"]
-                            volumeMounts: [{
-                                name:      "etcd3"
-                                mountPath: "/data"
-                            }]
                             env: [{
                                 name: "NAME"
                                 valueFrom: {
@@ -1272,6 +1267,11 @@ kubernetes: {
                                 name:  "ETCD_AUTO_COMPACTION_RETENTION"
                                 value: "4"
                             }]
+                            volumeMounts: [{
+                                name:      "etcd3"
+                                mountPath: "/data"
+                            }]
+                            command: ["/usr/local/bin/etcd"]
                             ports: [{
                                 name:          "client"
                                 containerPort: 2379
@@ -1467,6 +1467,9 @@ kubernetes: {
                                 containerPort: 7080
                             }]
                         }]
+                        volumes: [{
+                            name: "secret-volume"
+                        }]
                         affinity: {
                             podAntiAffinity: {
                                 requiredDuringSchedulingIgnoredDuringExecution: [{
@@ -1481,9 +1484,6 @@ kubernetes: {
                                 }]
                             }
                         }
-                        volumes: [{
-                            name: "secret-volume"
-                        }]
                     }
                 }
                 replicas: 2
@@ -2107,14 +2107,6 @@ kubernetes: {
                             name:  "caller"
                             image: "gcr.io/myproj/caller:v0.20.14"
                             args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-key=/etc/certs/client.key", "-cert=/etc/certs/client.pem", "-ca=/etc/certs/servfx.ca", "-ssh-tunnel-key=/sslcerts/tunnel-private.pem"]
-                            livenessProbe: {
-                                httpGet: {
-                                    path: "/debug/health"
-                                    port: 8080
-                                }
-                                initialDelaySeconds: 40
-                                periodSeconds:       3
-                            }
                             volumeMounts: [{
                                 name:      "ssd-caller"
                                 mountPath: "/logs"
@@ -2127,6 +2119,14 @@ kubernetes: {
                                 readOnly:  true
                                 mountPath: "/etc/certs"
                             }]
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/debug/health"
+                                    port: 8080
+                                }
+                                initialDelaySeconds: 40
+                                periodSeconds:       3
+                            }
                             ports: [{
                                 name:          "client"
                                 containerPort: 8080
@@ -2312,14 +2312,6 @@ kubernetes: {
                             name:  "dishwasher"
                             image: "gcr.io/myproj/dishwasher:v0.2.13"
                             args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"]
-                            livenessProbe: {
-                                httpGet: {
-                                    path: "/debug/health"
-                                    port: 8080
-                                }
-                                initialDelaySeconds: 40
-                                periodSeconds:       3
-                            }
                             volumeMounts: [{
                                 name:      "secret-ssh-key"
                                 readOnly:  true
@@ -2332,6 +2324,14 @@ kubernetes: {
                                 readOnly:  true
                                 mountPath: "/etc/certs"
                             }]
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/debug/health"
+                                    port: 8080
+                                }
+                                initialDelaySeconds: 40
+                                periodSeconds:       3
+                            }
                             ports: [{
                                 name:          "client"
                                 containerPort: 8080
@@ -2505,14 +2505,6 @@ kubernetes: {
                             name:  "expiditer"
                             image: "gcr.io/myproj/expiditer:v0.5.34"
                             args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem"]
-                            livenessProbe: {
-                                httpGet: {
-                                    path: "/debug/health"
-                                    port: 8080
-                                }
-                                initialDelaySeconds: 40
-                                periodSeconds:       3
-                            }
                             volumeMounts: [{
                                 name:      "expiditer-disk"
                                 mountPath: "/logs"
@@ -2521,6 +2513,14 @@ kubernetes: {
                                 readOnly:  true
                                 mountPath: "/etc/certs"
                             }]
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/debug/health"
+                                    port: 8080
+                                }
+                                initialDelaySeconds: 40
+                                periodSeconds:       3
+                            }
                             ports: [{
                                 name:          "client"
                                 containerPort: 8080
@@ -2691,14 +2691,6 @@ kubernetes: {
                             name:  "headchef"
                             image: "gcr.io/myproj/headchef:v0.2.16"
                             args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788"]
-                            livenessProbe: {
-                                httpGet: {
-                                    path: "/debug/health"
-                                    port: 8080
-                                }
-                                initialDelaySeconds: 40
-                                periodSeconds:       3
-                            }
                             volumeMounts: [{
                                 name:      "secret-headchef"
                                 readOnly:  true
@@ -2707,6 +2699,14 @@ kubernetes: {
                                 name:      "headchef-disk"
                                 mountPath: "/logs"
                             }]
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/debug/health"
+                                    port: 8080
+                                }
+                                initialDelaySeconds: 40
+                                periodSeconds:       3
+                            }
                             ports: [{
                                 name:          "client"
                                 containerPort: 8080
@@ -2881,14 +2881,6 @@ kubernetes: {
                             name:  "linecook"
                             image: "gcr.io/myproj/linecook:v0.1.42"
                             args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-name=linecook", "-etcd=etcd:2379", "-reconnect-delay=1h", "--recovery-overlap=100000"]
-                            livenessProbe: {
-                                httpGet: {
-                                    path: "/debug/health"
-                                    port: 8080
-                                }
-                                initialDelaySeconds: 40
-                                periodSeconds:       3
-                            }
                             volumeMounts: [{
                                 name:      "secret-kitchen"
                                 readOnly:  true
@@ -2897,6 +2889,14 @@ kubernetes: {
                                 name:      "linecook-disk"
                                 mountPath: "/logs"
                             }]
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/debug/health"
+                                    port: 8080
+                                }
+                                initialDelaySeconds: 40
+                                periodSeconds:       3
+                            }
                             ports: [{
                                 name:          "client"
                                 containerPort: 8080
@@ -3071,14 +3071,6 @@ kubernetes: {
                             name:  "pastrychef"
                             image: "gcr.io/myproj/pastrychef:v0.1.15"
                             args: ["-env=prod", "-logdir=/logs", "-event-server=events:7788", "-ssh-tunnel-key=/etc/certs/tunnel-private.pem", "-reconnect-delay=1m", "-etcd=etcd:2379", "-recovery-overlap=10000"]
-                            livenessProbe: {
-                                httpGet: {
-                                    path: "/debug/health"
-                                    port: 8080
-                                }
-                                initialDelaySeconds: 40
-                                periodSeconds:       3
-                            }
                             volumeMounts: [{
                                 name:      "secret-ssh-key"
                                 readOnly:  true
@@ -3087,6 +3079,14 @@ kubernetes: {
                                 name:      "pastrychef-disk"
                                 mountPath: "/logs"
                             }]
+                            livenessProbe: {
+                                httpGet: {
+                                    path: "/debug/health"
+                                    port: 8080
+                                }
+                                initialDelaySeconds: 40
+                                periodSeconds:       3
+                            }
                             ports: [{
                                 name:          "client"
                                 containerPort: 8080
@@ -3825,13 +3825,13 @@ kubernetes: {
                         }
                     }
                     spec: {
-                        hostNetwork: true
-                        hostPID:     true
                         volumes: [{
                             name: "proc"
                         }, {
                             name: "sys"
                         }]
+                        hostNetwork: true
+                        hostPID:     true
                         containers: [{
                             name:  "node-exporter"
                             image: "quay.io/prometheus/node-exporter:v0.16.0"

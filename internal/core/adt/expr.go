@@ -1195,9 +1195,6 @@ func (x *BinaryExpr) evaluate(c *OpContext) Value {
 
 func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r Value) {
 	s := c.PushState(env, src)
-	if c.nonMonotonicLookupNest == 0 {
-		c.nonMonotonicGeneration++
-	}
 
 	var match bool
 	// NOTE: using Unwrap is maybe note entirely accurate, as it may discard
@@ -1206,19 +1203,29 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 	switch b := c.value(x).(type) {
 	case nil:
 	case *Bottom:
-		if b.Code == CycleError {
+		switch b.Code {
+		case CycleError:
 			c.PopState(s)
 			c.AddBottom(b)
+			// TODO: add this. This erases some
+			// c.verifyNonMonotonicResult(env, x, true)
 			return nil
+
+		case IncompleteError:
+			c.evalState(x, Finalized)
+
+			// We have a nonmonotonic use of a failure. Referenced fields should
+			// not be added anymore.
+			c.verifyNonMonotonicResult(env, x, true)
 		}
+
 		match = op == EqualOp
-		// We have a nonmonotonic use of a failure. Referenced fields should
-		// not be added anymore.
-		c.nonMonotonicRejectNest++
-		c.evalState(x, Partial)
-		c.nonMonotonicRejectNest--
 
 	default:
+		v, ok := b.(*Vertex)
+		isVoid := ok && !v.isDefined()
+		c.verifyNonMonotonicResult(env, x, isVoid)
+
 		// TODO(cycle): if EqualOp:
 		// - ensure to pass special status to if clause or keep a track of "hot"
 		//   paths.
@@ -1227,7 +1234,7 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 		//   previously marked fields.
 		//
 		switch {
-		case b.Concreteness() > Concrete:
+		case b.Concreteness() > Concrete, isVoid:
 			// TODO: mimic comparison to bottom semantics. If it is a valid
 			// value, check for concreteness that this level only. This
 			// should ultimately be replaced with an exists and valid
@@ -1236,13 +1243,25 @@ func (c *OpContext) validate(env *Environment, src ast.Node, x Expr, op Op) (r V
 		default:
 			match = op != EqualOp
 		}
-		c.nonMonotonicLookupNest++
 		c.evalState(x, Partial)
-		c.nonMonotonicLookupNest--
 	}
 
 	c.PopState(s)
 	return &Bool{src, match}
+}
+
+// verifyNonMonotonicResult re-evaluates the given expression at a later point
+// to ensure that the result has not changed. This is relevant when a function
+// uses reflection, as in `if a != _|_`, where the result of an evaluation may
+// change after the fact.
+func (c *OpContext) verifyNonMonotonicResult(env *Environment, x Expr, expectError bool) {
+	if n := env.Vertex.getNodeContext(c, 0); n != nil {
+		n.postChecks = append(n.postChecks, envCheck{
+			env:         env,
+			expr:        x,
+			expectError: expectError,
+		})
+	}
 }
 
 // A CallExpr represents a call to a builtin.
@@ -1601,7 +1620,11 @@ func (x *Disjunction) Kind() Kind {
 
 type Comprehension struct {
 	Clauses Yielder
-	Value   Expr
+	Value   Expr // TODO: rename field to Expr.
+
+	// Only used for partial comprehensions.
+	comp *envComprehension
+	Nest int
 }
 
 func (x *Comprehension) Source() ast.Node {

@@ -128,7 +128,7 @@ func (m marked) markExpr(x adt.Expr) {
 
 func (m marked) markComprehension(y *adt.Comprehension) {
 	m.markYielder(y.Clauses)
-	m.markExpr(y.Value)
+	m.markExpr(adt.ToExpr(y.Value))
 }
 
 func (m marked) markYielder(y adt.Yielder) {

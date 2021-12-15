@@ -207,6 +207,12 @@ func (c *visitor) markExpr(env *adt.Environment, expr adt.Elem) {
 		for _, e := range x.Decls {
 			c.markDecl(env, e)
 		}
+
+	case *adt.Comprehension:
+		for i := x.Nest; i > 0; i-- {
+			env = &adt.Environment{Up: env, Vertex: empty}
+		}
+		c.markComprehension(env, x)
 	}
 }
 
@@ -303,7 +309,7 @@ func (c *visitor) markDecl(env *adt.Environment, d adt.Decl) {
 
 func (c *visitor) markComprehension(env *adt.Environment, y *adt.Comprehension) {
 	env = c.markYielder(env, y.Clauses)
-	c.markExpr(env, y.Value)
+	c.markExpr(env, adt.ToExpr(y.Value))
 }
 
 func (c *visitor) markYielder(env *adt.Environment, y adt.Yielder) *adt.Environment {

@@ -221,6 +221,7 @@ errorListDef: {
 }
 -- out/doc --
 []
+[x]
 [p1]
 [d1]
 [d1 foobar]
@@ -290,7 +291,6 @@ errorListDef: {
 [errorListDef #Def]
 [errorListDef 0]
 [errorListDef 1]
-[x]
 -- out/value --
 == Simplified
 _|_ // e3: index out of range [2] with length 2

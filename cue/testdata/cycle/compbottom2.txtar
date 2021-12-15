@@ -54,10 +54,35 @@ mutual: {
         }
 	}
 
-	oneDirectionalBrokenConflictSuccess: {
+	oneDirectionalBrokenConflictSuccess: p1: {
+		b: foo: ""
 		a: { if b.foo == _|_ { bar: "" } }
 		b: { if a.bar == _|_ { new: "" } }
-        b: foo: ""
+	}
+	oneDirectionalBrokenConflictSuccess: p2: {
+		a: { if b.foo == _|_ { bar: "" } }
+		b: foo: ""
+		b: { if a.bar == _|_ { new: "" } }
+	}
+	oneDirectionalBrokenConflictSuccess: p3: {
+		a: { if b.foo == _|_ { bar: "" } }
+		b: { if a.bar == _|_ { new: "" } }
+		b: foo: ""
+	}
+	oneDirectionalBrokenConflictSuccess: p4: {
+		b: foo: ""
+		b: { if a.bar == _|_ { new: "" } }
+		a: { if b.foo == _|_ { bar: "" } }
+	}
+	oneDirectionalBrokenConflictSuccess: p5: {
+		b: { if a.bar == _|_ { new: "" } }
+		b: foo: ""
+		a: { if b.foo == _|_ { bar: "" } }
+	}
+	oneDirectionalBrokenConflictSuccess: p6: {
+		b: { if a.bar == _|_ { new: "" } }
+		a: { if b.foo == _|_ { bar: "" } }
+		b: foo: ""
 	}
 }
 
@@ -228,11 +253,53 @@ Result:
       }
     }
     oneDirectionalBrokenConflictSuccess: (struct){
-      a: (struct){
+      p1: (struct){
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+        a: (struct){
+        }
       }
-      b: (struct){
-        foo: (string){ "" }
-        new: (string){ "" }
+      p2: (struct){
+        a: (struct){
+        }
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+      }
+      p3: (struct){
+        a: (struct){
+        }
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+      }
+      p4: (struct){
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+        a: (struct){
+        }
+      }
+      p5: (struct){
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+        a: (struct){
+        }
+      }
+      p6: (struct){
+        b: (struct){
+          foo: (string){ "" }
+          new: (string){ "" }
+        }
+        a: (struct){
+        }
       }
     }
   }
@@ -387,18 +454,105 @@ Result:
       }
     }
     oneDirectionalBrokenConflictSuccess: {
-      a: {
-        if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
-          bar: ""
+      p1: {
+        b: {
+          foo: ""
+        }
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
         }
       }
-      b: {
-        if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
-          new: ""
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      p2: {
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+        b: {
+          foo: ""
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
         }
       }
-      b: {
-        foo: ""
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      p3: {
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+        b: {
+          foo: ""
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      p4: {
+        b: {
+          foo: ""
+        }
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      p5: {
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+        b: {
+          foo: ""
+        }
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+      }
+    }
+    oneDirectionalBrokenConflictSuccess: {
+      p6: {
+        b: {
+          if (〈1;a〉.bar == _|_(explicit error (_|_ literal) in source)) {
+            new: ""
+          }
+        }
+        a: {
+          if (〈1;b〉.foo == _|_(explicit error (_|_ literal) in source)) {
+            bar: ""
+          }
+        }
+        b: {
+          foo: ""
+        }
       }
     }
   }

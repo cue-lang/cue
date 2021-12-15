@@ -21,6 +21,17 @@ for _, manifest in manifests {
 }
 -- out/eval --
 (struct){
+  results: (struct){
+    deployment: (struct){
+      #map: (#struct){
+        app01: (#struct){
+          image: (string){ "image01" }
+          name: (string){ "app01" }
+          desc: (string){ string }
+        }
+      }
+    }
+  }
   key: (string){ "app01" }
   manifests: (#list){
     0: (struct){
@@ -40,17 +51,6 @@ for _, manifest in manifests {
           app01: (#struct){
             image: (string){ "image01" }
           }
-        }
-      }
-    }
-  }
-  results: (struct){
-    deployment: (struct){
-      #map: (#struct){
-        app01: (#struct){
-          image: (string){ "image01" }
-          name: (string){ "app01" }
-          desc: (string){ string }
         }
       }
     }

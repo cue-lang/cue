@@ -1699,6 +1699,7 @@ deployment: {
                     }
                 }
                 spec: {
+                    volumes: []
                     containers: [{
                         name:  "souschef"
                         image: "gcr.io/myproj/souschef:v0.5.3"

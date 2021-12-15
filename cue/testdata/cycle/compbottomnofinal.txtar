@@ -10,6 +10,7 @@ import (
 //
 // This tests shows the essences of when an existence check cannot be resolved.
 minimal: {
+    // TODO: missing path indications on errors.
     a: {
         if b.port == _|_ {
             port: ""
@@ -144,6 +145,7 @@ medium: {
         #Y: regexp.FindNamedSubmatch(#userHostPort, #X.port)
     }
 
+    // TODO: missing path indications on errors.
     p5: {
         #X: {
             // Can never determine whether Y.port exists as its resolution
@@ -358,169 +360,146 @@ large: {
     }
 }
 -- out/eval --
-Errors:
-large.p1.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-large.p2.#Y: cycle: field was added after an if clause evaluated it: userinfo
-large.p2.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-large.p3.#Y: cycle: field was added after an if clause evaluated it: userinfo
-large.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-large.p4.#Y: cycle: field was added after an if clause evaluated it: userinfo
-medium.p1.#Y: cycle: field was added after an if clause evaluated it: port
-medium.p2.#Y: cycle: field was added after an if clause evaluated it: port
-medium.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-medium.p4.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-minimal.b: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-small.p1.#Y: cycle: field was added after an if clause evaluated it: port
-error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-    ./in.cue:104:23
-error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-    ./in.cue:126:23
-error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-    ./in.cue:228:23
-error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-    ./in.cue:269:23
-error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-    ./in.cue:310:23
-
-Result:
-(_|_){
-  // [eval]
-  minimal: (_|_){
-    // [eval]
-    a: (struct){
+(struct){
+  minimal: (struct){
+    a: (_|_){
+      // [cycle] cycle error
     }
-    b: (_|_){
-      // [eval] minimal.b: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+    b: (struct){
       port: (string){ "" }
     }
   }
-  small: (_|_){
-    // [eval]
+  small: (struct){
     #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-    p1: (_|_){
-      // [eval]
-      #Y: (_|_){
-        // [eval] small.p1.#Y: cycle: field was added after an if clause evaluated it: port
+    p1: (struct){
+      #Y: (#struct){
         port: (string){ "" }
       }
-      #X: (#struct){
+      #X: (_|_){
+        // [cycle] small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
+        //     ./in.cue:32:16
+        // small.p1.#X: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
+        //     ./in.cue:35:16
         port: (string){ "" }
       }
     }
     p2: (struct){
-      #X: (#struct){
-        port: (string){ "" }
+      #X: (_|_){
+        // [cycle] small.p2.#X.port: undefined field: port:
+        //     ./in.cue:43:19
+        // small.p2.#X.port: undefined field: port:
+        //     ./in.cue:46:19
       }
       #Y: (_|_){
-        // [incomplete] small.p2.#Y: undefined field: port:
-        //     ./in.cue:50:50
-        port: (string){ "" }
+        // [cycle] small.p2.#X.port: undefined field: port:
+        //     ./in.cue:43:19
+        // small.p2.#X.port: undefined field: port:
+        //     ./in.cue:46:19
       }
     }
   }
-  medium: (_|_){
-    // [eval]
+  medium: (struct){
     #userHostPort: (string){ "^(:(?P<port>\\d+))?$" }
-    p1: (_|_){
-      // [eval]
-      #Y: (_|_){
-        // [eval] medium.p1.#Y: cycle: field was added after an if clause evaluated it: port
+    p1: (struct){
+      #Y: (#struct){
         port: (string){ "" }
       }
-      Y: (struct){
-      }
-      #X: (#struct){
-        port: (string){ "" }
-      }
-    }
-    p2: (_|_){
-      // [eval]
-      #Y: (_|_){
-        // [eval] medium.p2.#Y: cycle: field was added after an if clause evaluated it: port
-        port: (string){ "" }
-      }
-      #X: (#struct){
-        port: (string){ "" }
-      }
-      Y: (struct){
-      }
-    }
-    p3: (_|_){
-      // [eval]
       Y: (_|_){
-        // [eval] medium.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-        port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-          //     ./in.cue:104:23
-        }
+        // [cycle] medium.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
+        //     ./in.cue:62:16
       }
+      #X: (_|_){
+        // [cycle] medium.p1.#X: circular dependency in evaluation of conditionals: Y.port changed after evaluation:
+        //     ./in.cue:71:16
+        // medium.p1.#X: circular dependency in evaluation of conditionals: Y.port changed after evaluation:
+        //     ./in.cue:74:16
+        port: (string){ "" }
+      }
+    }
+    p2: (struct){
       #Y: (#struct){
         port: (string){ "" }
       }
       #X: (#struct){
         port: (string){ "" }
       }
-    }
-    p4: (_|_){
-      // [eval]
       Y: (_|_){
-        // [eval] medium.p4.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-        port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-          //     ./in.cue:126:23
-        }
+        // [cycle] medium.p2.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
+        //     ./in.cue:96:16
       }
-      #X: (#struct){
-        port: (string){ "" }
+    }
+    p3: (struct){
+      Y: (_|_){
+        // [cycle] medium.p3.Y.port: undefined field: port:
+        //     ./in.cue:104:19
       }
-      #Y: (#struct){
-        port: (string){ "" }
+      #Y: (_|_){
+        // [cycle] cycle error
+      }
+      #X: (_|_){
+        // [cycle] medium.p3.Y.port: undefined field: port:
+        //     ./in.cue:104:19
+      }
+    }
+    p4: (struct){
+      Y: (_|_){
+        // [cycle] medium.p4.Y.port: undefined field: port:
+        //     ./in.cue:126:19
+      }
+      #X: (_|_){
+        // [cycle] medium.p4.Y.port: undefined field: port:
+        //     ./in.cue:126:19
+      }
+      #Y: (_|_){
+        // [cycle] medium.p4.Y.port: undefined field: port:
+        //     ./in.cue:126:19
       }
     }
     p5: (struct){
-      #X: (#struct){
-        port: (string){ "" }
+      #X: (_|_){
+        // [cycle] cycle error
       }
       #Y: (_|_){
         // [incomplete] medium.p5.#Y: undefined field: port:
-        //     ./in.cue:158:56
-        port: (string){ "" }
+        //     ./in.cue:160:56
       }
       Y: (struct){
       }
     }
     p6: (struct){
-      #X: (#struct){
-        port: (string){ "" }
+      #X: (_|_){
+        // [cycle] cycle error
       }
       Y: (struct){
       }
       #Y: (_|_){
         // [incomplete] medium.p6.#Y: undefined field: port:
-        //     ./in.cue:186:56
-        port: (string){ "" }
+        //     ./in.cue:188:56
       }
     }
   }
-  large: (_|_){
-    // [eval]
+  large: (struct){
     #userHostPort: (string){ "^((?P<userinfo>[[:alnum:]]*)@)?(?P<host>[[:alnum:].]+)(:(?P<port>\\d+))?$" }
-    p1: (_|_){
-      // [eval]
+    p1: (struct){
       Y: (_|_){
-        // [eval] large.p1.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
+        // [cycle] large.p1.Y: circular dependency in evaluation of conditionals: #Y.port changed after evaluation:
+        //     ./in.cue:229:16
         userinfo: (string){ "user" }
         host: (string){ "example.com" }
-        port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-          //     ./in.cue:228:23
-        }
       }
       X: (string){ "user@example.com" }
-      #X: (#struct){
-        host: (string){ "example.com" }
+      #X: (_|_){
+        // [cycle] large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:205:16
+        // large.p1.#X: circular dependency in evaluation of conditionals: Y.userinfo changed after evaluation:
+        //     ./in.cue:208:16
+        // large.p1.#X: circular dependency in evaluation of conditionals: Y.port changed after evaluation:
+        //     ./in.cue:214:16
+        // large.p1.#X: circular dependency in evaluation of conditionals: Y.port changed after evaluation:
+        //     ./in.cue:217:16
         userinfo: (string){ "user@" }
         port: (string){ "" }
+        host: (string){ "example.com" }
       }
       #Y: (#struct){
         host: (string){ "example.com" }
@@ -528,73 +507,83 @@ Result:
         userinfo: (string){ "user" }
       }
     }
-    p2: (_|_){
-      // [eval]
-      X: (string){ "user@example.com" }
-      Y: (_|_){
-        // [eval] large.p2.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-        userinfo: (string){ "user" }
-        host: (string){ "example.com" }
-        port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-          //     ./in.cue:269:23
-        }
+    p2: (struct){
+      X: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:238:12
       }
-      #X: (#struct){
-        host: (string){ "example.com" }
-        userinfo: (string){ "user@" }
-        port: (string){ "" }
-      }
-      #Y: (_|_){
-        // [eval] large.p2.#Y: cycle: field was added after an if clause evaluated it: userinfo
-        host: (string){ "example.com" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p3: (_|_){
-      // [eval]
-      X: (string){ "user@example.com" }
-      #X: (#struct){
-        host: (string){ "example.com" }
-        userinfo: (string){ "user@" }
-        port: (string){ "" }
-      }
-      Y: (_|_){
-        // [eval] large.p3.Y: cycle: field inserted by if clause that was previously evaluated by another if clause: port
-        userinfo: (string){ "user" }
-        host: (string){ "example.com" }
-        port: (_|_){
-          // [eval] error in call to strconv.Atoi: strconv.Atoi: parsing "": invalid syntax:
-          //     ./in.cue:310:23
-        }
-      }
-      #Y: (_|_){
-        // [eval] large.p3.#Y: cycle: field was added after an if clause evaluated it: userinfo
-        host: (string){ "example.com" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-    }
-    p4: (_|_){
-      // [eval]
-      X: (string){ "user@example.com" }
-      #X: (#struct){
-        host: (string){ "example.com" }
-        userinfo: (string){ "user@" }
-        port: (string){ "" }
-      }
-      #Y: (_|_){
-        // [eval] large.p4.#Y: cycle: field was added after an if clause evaluated it: userinfo
-        host: (string){ "example.com" }
-        port: (string){ "" }
-        userinfo: (string){ "user" }
-      }
-      Y: (_|_){
-        // [eval]
+      Y: (struct){
         userinfo: (string){ "user" }
         host: (_|_){
-          // [eval] large.p4.#Y: cycle: field was added after an if clause evaluated it: userinfo
+          // [incomplete] large.p2.Y.host: undefined field: host:
+          //     ./in.cue:268:22
+        }
+      }
+      #X: (#struct){
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+        host: (_|_){
+          // [incomplete] large.p2.#X.host: undefined field: host:
+          //     ./in.cue:268:22
+        }
+      }
+      #Y: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:238:12
+      }
+    }
+    p3: (struct){
+      X: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:279:12
+      }
+      #X: (#struct){
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+        host: (_|_){
+          // [incomplete] large.p3.#X.host: undefined field: host:
+          //     ./in.cue:309:22
+        }
+      }
+      Y: (struct){
+        userinfo: (string){ "user" }
+        host: (_|_){
+          // [incomplete] large.p3.Y.host: undefined field: host:
+          //     ./in.cue:309:22
+        }
+      }
+      #Y: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:279:12
+      }
+    }
+    p4: (struct){
+      X: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:320:12
+      }
+      #X: (#struct){
+        userinfo: (string){ "user@" }
+        port: (string){ "" }
+        host: (_|_){
+          // [incomplete] large.p4.#X.host: undefined field: host:
+          //     ./in.cue:352:22
+        }
+      }
+      #Y: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:320:12
+      }
+      Y: (_|_){
+        // [cycle] cycle error:
+        //     ./in.cue:320:12
+        userinfo: (_|_){
+          // [cycle] cycle error:
+          //     ./in.cue:320:12
+        }
+        host: (_|_){
+          // [cycle] cycle error:
+          //     ./in.cue:320:12
         }
       }
     }

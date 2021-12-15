@@ -119,6 +119,18 @@ a.f3: field not allowed: f3:
 Result:
 (_|_){
   // [eval]
+  a: (_|_){
+    // [eval]
+    f1: (int){ int }
+    f2: (int){ int }
+    f3: (_|_){
+      // [eval] a.f3: field not allowed: f3:
+      //     ./in.cue:1:5
+      //     ./in.cue:3:1
+      //     ./in.cue:4:5
+      //     ./in.cue:4:11
+    }
+  }
   #A: (#struct){
     f1: (int){ int }
     f2: (int){ int }
@@ -143,18 +155,6 @@ Result:
       //     ./in.cue:27:10
       //     ./in.cue:28:2
       //     ./in.cue:29:3
-    }
-  }
-  a: (_|_){
-    // [eval]
-    f1: (int){ int }
-    f2: (int){ int }
-    f3: (_|_){
-      // [eval] a.f3: field not allowed: f3:
-      //     ./in.cue:1:5
-      //     ./in.cue:3:1
-      //     ./in.cue:4:5
-      //     ./in.cue:4:11
     }
   }
 }

@@ -180,11 +180,11 @@ type Vertex struct {
 	// isData indicates that this Vertex is to be interepreted as data: pattern
 	// and additional constraints, as well as optional fields, should be
 	// ignored.
-	isData                bool
-	Closed                bool
-	nonMonotonicReject    bool
-	nonMonotonicInsertGen int32
-	nonMonotonicLookupGen int32
+	isData bool
+	Closed bool
+
+	// arcType indicates the level of optionality of this arc.
+	arcType arcType
 
 	// EvalCount keeps track of temporary dereferencing during evaluation.
 	// If EvalCount > 0, status should be considered to be EvaluatingArcs.
@@ -216,6 +216,29 @@ type Vertex struct {
 	// This information is used to compute the topological sort of arcs.
 	Structs []*StructInfo
 }
+
+// isDefined indicates whether this arc is a non-optional field.
+func (v *Vertex) isDefined() bool {
+	return v.arcType == arcMember
+}
+
+type arcType uint8
+
+const (
+	// arcMember means that this arc is a normal non-optional field
+	// (including regular, hidden, and definition fields).
+	arcMember arcType = iota
+
+	// TODO: define a type for optional arcs. This will be needed for pulling
+	// in optional fields into the Vertex, which, in turn, is needed for
+	// structure sharing, among other things.
+	// We could also define types for required fields and potentially lets.
+
+	// arcVoid means that an arc does not exist. This happens when an arc
+	// is provisionally added as part of a comprehension, but when this
+	// comprehension has not yet yielded any results.
+	arcVoid
+)
 
 func (v *Vertex) Clone() *Vertex {
 	c := *v
@@ -334,6 +357,9 @@ func (v *Vertex) Value() Value {
 
 // isUndefined reports whether a vertex does not have a useable BaseValue yet.
 func (v *Vertex) isUndefined() bool {
+	if !v.isDefined() {
+		return true
+	}
 	switch v.BaseValue {
 	case nil, cycle:
 		return true
@@ -529,6 +555,8 @@ func (v *Vertex) Kind() Kind {
 	// This is possible when evaluating comprehensions. It is potentially
 	// not known at this time what the type is.
 	switch {
+	// TODO: using this line would be more stable.
+	// case v.status != Finalized && v.state != nil:
 	case v.state != nil:
 		return v.state.kind
 	case v.BaseValue == nil:
@@ -550,7 +578,7 @@ func (v *Vertex) OptionalTypes() OptionalType {
 // as opposed to whether it is allowed by a pattern constraint.
 func (v *Vertex) IsOptional(label Feature) bool {
 	for _, s := range v.Structs {
-		if s.IsOptional(label) {
+		if s.IsOptionalField(label) {
 			return true
 		}
 	}
@@ -674,31 +702,12 @@ func (v *Vertex) Elems() []*Vertex {
 
 // GetArc returns a Vertex for the outgoing arc with label f. It creates and
 // ads one if it doesn't yet exist.
-func (v *Vertex) GetArc(c *OpContext, f Feature) (arc *Vertex, isNew bool) {
+func (v *Vertex) GetArc(c *OpContext, f Feature, t arcType) (arc *Vertex, isNew bool) {
 	arc = v.Lookup(f)
 	if arc == nil {
-		for _, a := range v.state.usedArcs {
-			if a.Label == f {
-				arc = a
-				v.Arcs = append(v.Arcs, arc)
-				isNew = true
-				if c.nonMonotonicInsertNest > 0 {
-					a.nonMonotonicInsertGen = c.nonMonotonicGeneration
-				}
-				break
-			}
-		}
-	}
-	if arc == nil {
-		arc = &Vertex{Parent: v, Label: f}
+		arc = &Vertex{Parent: v, Label: f, arcType: t}
 		v.Arcs = append(v.Arcs, arc)
 		isNew = true
-		if c.nonMonotonicInsertNest > 0 {
-			arc.nonMonotonicInsertGen = c.nonMonotonicGeneration
-		}
-	}
-	if c.nonMonotonicInsertNest == 0 {
-		arc.nonMonotonicInsertGen = 0
 	}
 	return arc, isNew
 }
@@ -726,11 +735,20 @@ func (v *Vertex) AddConjunct(c Conjunct) *Bottom {
 }
 
 func (v *Vertex) addConjunct(c Conjunct) {
+	switch c.x.(type) {
+	case *OptionalField, *BulkOptionalField, *Ellipsis:
+	default:
+		v.arcType = arcMember
+	}
 	for _, x := range v.Conjuncts {
 		if x == c {
 			return
 		}
 	}
+	v.Conjuncts = append(v.Conjuncts, c)
+}
+
+func (v *Vertex) addConjunctUnchecked(c Conjunct) {
 	v.Conjuncts = append(v.Conjuncts, c)
 }
 
@@ -807,7 +825,12 @@ func (c *Conjunct) Source() ast.Node {
 }
 
 func (c *Conjunct) Field() Node {
-	return c.x
+	switch x := c.x.(type) {
+	case *Comprehension:
+		return x.Value
+	default:
+		return c.x
+	}
 }
 
 // Elem retrieves the Elem form of the contained conjunct.
@@ -826,12 +849,20 @@ func (c *Conjunct) Elem() Elem {
 // Expr retrieves the expression form of the contained conjunct.
 // If it is a field or comprehension, it will return its associated value.
 func (c *Conjunct) Expr() Expr {
-	switch x := c.x.(type) {
+	return ToExpr(c.x)
+}
+
+// ToExpr extracts the underlying expression for a Node. If something is already
+// an Expr, it will return it as is, if it is a field, it will return its value,
+// and for comprehensions it returns the yielded struct.
+func ToExpr(n Node) Expr {
+	switch x := n.(type) {
 	case Expr:
 		return x
-	// TODO: comprehension.
 	case interface{ expr() Expr }:
 		return x.expr()
+	case *Comprehension:
+		return ToExpr(x.Value)
 	default:
 		panic("unreachable")
 	}

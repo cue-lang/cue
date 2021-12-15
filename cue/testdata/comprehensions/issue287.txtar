@@ -10,8 +10,8 @@ if #E["y"] != _|_ {
 -- out/eval --
 (struct){
   #E: (#struct){
-    x: (bool){ true }
     y: (bool){ true }
+    x: (bool){ true }
   }
   z: (bool){ true }
 }

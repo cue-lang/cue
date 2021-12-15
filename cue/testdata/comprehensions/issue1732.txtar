@@ -1,0 +1,460 @@
+-- in.cue --
+package config
+
+networkingv1: {
+	metav1: {
+		#LabelSelector: {
+			matchLabels: {[string]: string}
+		}
+	}
+
+	#NetworkPolicy: {
+		spec: #NetworkPolicySpec
+	}
+
+	#NetworkPolicySpec: {
+		ingress: [...#NetworkPolicyIngressRule]
+		egress: [...#NetworkPolicyEgressRule]
+	}
+
+	#NetworkPolicyIngressRule: {
+		from: [...#NetworkPolicyPeer]
+	}
+
+	#NetworkPolicyEgressRule: {
+		to: [...#NetworkPolicyPeer]
+	}
+
+	#NetworkPolicyPeer: {
+		namespaceSelector: null | metav1.#LabelSelector
+	}
+}
+
+global_config: {
+	#GlobalConfig: {
+		auth0: {
+			enabled: bool
+		}
+	}
+}
+common: {
+	#SomeConfig: {
+		enabled: bool
+		if enabled {
+			foo: string
+		}
+	}
+}
+
+foo: {
+	#Values: {
+		global: global_config.#GlobalConfig
+	}
+}
+
+#Config: R={
+	tenant: id: string
+
+	auth0: common.#SomeConfig & {
+		enabled: bool
+		if (enabled) {
+			foo: "\(tenant.id)-value"
+		}
+	}
+
+	charts: {
+		"foo": foo.#Values & {
+			global: R.global
+		}
+	}
+
+	global: global_config.#GlobalConfig & {
+		auth0: enabled: R.auth0.enabled
+	}
+}
+
+#NetworkPolicy: networkingv1.#NetworkPolicy
+
+#Flux: R={
+	#Config
+
+	charts: _
+
+	formatOutput: {...}
+
+	_outputs: {...}
+
+	for _chartName, _chartValues in charts {
+		_outputs: "\(_chartName)": {}
+	}
+
+	_outputs: {
+		for ns in ["ns"] {
+			"\(ns)/network": #NetworkPolicy & {
+				spec: {
+					ingress: [
+						{
+							from: [{
+								namespaceSelector: matchLabels: {
+									tenant: R.tenant.id
+								}
+							}]
+						},
+					]
+					egress: [
+						{
+							to: [{
+								namespaceSelector: matchLabels: {
+									tenant: R.tenant.id
+								}
+							}]
+						},
+					]
+				}
+			}
+		}
+	}
+
+	for ns in ["ns"] {
+		for k, v in _outputs {
+			formatOutput: "\(k)": v
+		}
+	}
+}
+-- out/eval --
+(struct){
+  networkingv1: (struct){
+    metav1: (struct){
+      #LabelSelector: (#struct){
+        matchLabels: (#struct){
+        }
+      }
+    }
+    #NetworkPolicy: (#struct){
+      spec: (#struct){
+        ingress: (list){
+        }
+        egress: (list){
+        }
+      }
+    }
+    #NetworkPolicySpec: (#struct){
+      ingress: (list){
+      }
+      egress: (list){
+      }
+    }
+    #NetworkPolicyIngressRule: (#struct){
+      from: (list){
+      }
+    }
+    #NetworkPolicyEgressRule: (#struct){
+      to: (list){
+      }
+    }
+    #NetworkPolicyPeer: (#struct){
+      namespaceSelector: ((null|struct)){ |((null){ null }, (#struct){
+          matchLabels: (#struct){
+          }
+        }) }
+    }
+  }
+  global_config: (struct){
+    #GlobalConfig: (#struct){
+      auth0: (#struct){
+        enabled: (bool){ bool }
+      }
+    }
+  }
+  common: (struct){
+    #SomeConfig: (_|_){
+      // [incomplete] common.#SomeConfig: incomplete bool: bool:
+      //     ./in.cue:41:12
+      enabled: (bool){ bool }
+    }
+  }
+  foo: (struct){
+    #Values: (#struct){
+      global: (#struct){
+        auth0: (#struct){
+          enabled: (bool){ bool }
+        }
+      }
+    }
+  }
+  #Config: (#struct){
+    tenant: (#struct){
+      id: (string){ string }
+    }
+    auth0: (_|_){
+      // [incomplete] #Config.auth0: incomplete bool: bool:
+      //     ./in.cue:41:12
+      enabled: (bool){ bool }
+    }
+    charts: (#struct){
+      foo: (#struct){
+        global: (#struct){
+          auth0: (#struct){
+            enabled: (_|_){
+              // [incomplete] #Config.auth0: incomplete bool: bool:
+              //     ./in.cue:41:12
+            }
+          }
+        }
+      }
+    }
+    global: (#struct){
+      auth0: (#struct){
+        enabled: (_|_){
+          // [incomplete] #Config.auth0: incomplete bool: bool:
+          //     ./in.cue:41:12
+        }
+      }
+    }
+  }
+  #NetworkPolicy: (#struct){
+    spec: (#struct){
+      ingress: (list){
+      }
+      egress: (list){
+      }
+    }
+  }
+  #Flux: (#struct){
+    tenant: (#struct){
+      id: (string){ string }
+    }
+    auth0: (_|_){
+      // [incomplete] #Flux.auth0: incomplete bool: bool:
+      //     ./in.cue:41:12
+      enabled: (bool){ bool }
+    }
+    charts: (#struct){
+      foo: (#struct){
+        global: (#struct){
+          auth0: (#struct){
+            enabled: (_|_){
+              // [incomplete] #Flux.auth0: incomplete bool: bool:
+              //     ./in.cue:41:12
+            }
+          }
+        }
+      }
+    }
+    global: (#struct){
+      auth0: (#struct){
+        enabled: (_|_){
+          // [incomplete] #Flux.auth0: incomplete bool: bool:
+          //     ./in.cue:41:12
+        }
+      }
+    }
+    _outputs(:config): (#struct){
+      foo: (#struct){
+      }
+      "ns/network": (#struct){
+        spec: (#struct){
+          ingress: (#list){
+            0: (#struct){
+              from: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          egress: (#list){
+            0: (#struct){
+              to: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    formatOutput: (#struct){
+      foo: (#struct){
+      }
+      "ns/network": (#struct){
+        spec: (#struct){
+          ingress: (#list){
+            0: (#struct){
+              from: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+          egress: (#list){
+            0: (#struct){
+              to: (#list){
+                0: (#struct){
+                  namespaceSelector: (#struct){
+                    matchLabels: (#struct){
+                      tenant: (string){ string }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+-- out/compile --
+--- in.cue
+{
+  networkingv1: {
+    metav1: {
+      #LabelSelector: {
+        matchLabels: {
+          [string]: string
+        }
+      }
+    }
+    #NetworkPolicy: {
+      spec: 〈1;#NetworkPolicySpec〉
+    }
+    #NetworkPolicySpec: {
+      ingress: [
+        ...〈2;#NetworkPolicyIngressRule〉,
+      ]
+      egress: [
+        ...〈2;#NetworkPolicyEgressRule〉,
+      ]
+    }
+    #NetworkPolicyIngressRule: {
+      from: [
+        ...〈2;#NetworkPolicyPeer〉,
+      ]
+    }
+    #NetworkPolicyEgressRule: {
+      to: [
+        ...〈2;#NetworkPolicyPeer〉,
+      ]
+    }
+    #NetworkPolicyPeer: {
+      namespaceSelector: (null|〈1;metav1〉.#LabelSelector)
+    }
+  }
+  global_config: {
+    #GlobalConfig: {
+      auth0: {
+        enabled: bool
+      }
+    }
+  }
+  common: {
+    #SomeConfig: {
+      enabled: bool
+      if 〈0;enabled〉 {
+        foo: string
+      }
+    }
+  }
+  foo: {
+    #Values: {
+      global: 〈2;global_config〉.#GlobalConfig
+    }
+  }
+  #Config: {
+    tenant: {
+      id: string
+    }
+    auth0: (〈1;common〉.#SomeConfig & {
+      enabled: bool
+      if 〈0;enabled〉 {
+        foo: "\(〈2;tenant〉.id)-value"
+      }
+    })
+    charts: {
+      foo: (〈2;foo〉.#Values & {
+        global: 〈3〉.global
+      })
+    }
+    global: (〈1;global_config〉.#GlobalConfig & {
+      auth0: {
+        enabled: 〈3〉.auth0.enabled
+      }
+    })
+  }
+  #NetworkPolicy: 〈0;networkingv1〉.#NetworkPolicy
+  #Flux: {
+    〈1;#Config〉
+    charts: _
+    formatOutput: {
+      ...
+    }
+    _outputs: {
+      ...
+    }
+    for _chartName, _chartValues in 〈0;charts〉 {
+      _outputs: {
+        "\(〈2;_chartName〉)": {}
+      }
+    }
+    _outputs: {
+      for _, ns in [
+        "ns",
+      ] {
+        "\(〈1;ns〉)/network": (〈4;#NetworkPolicy〉 & {
+          spec: {
+            ingress: [
+              {
+                from: [
+                  {
+                    namespaceSelector: {
+                      matchLabels: {
+                        tenant: 〈12〉.tenant.id
+                      }
+                    }
+                  },
+                ]
+              },
+            ]
+            egress: [
+              {
+                to: [
+                  {
+                    namespaceSelector: {
+                      matchLabels: {
+                        tenant: 〈12〉.tenant.id
+                      }
+                    }
+                  },
+                ]
+              },
+            ]
+          }
+        })
+      }
+    }
+    for _, ns in [
+      "ns",
+    ] {
+      for k, v in 〈2;_outputs〉 {
+        formatOutput: {
+          "\(〈2;k〉)": 〈2;v〉
+        }
+      }
+    }
+  }
+}

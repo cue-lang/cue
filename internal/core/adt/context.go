@@ -627,13 +627,7 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 
 		// TODO: remove this when we handle errors more principally.
 		if b, ok := result.(*Bottom); ok {
-			if c.src != nil &&
-				b.Code == CycleError &&
-				len(errors.Positions(b.Err)) == 0 {
-				bb := *b
-				bb.Err = errors.Wrapf(b.Err, c.src.Pos(), "")
-				result = &bb
-			}
+			result = c.wrapCycleError(c.src, b)
 			if c.errs != result {
 				c.errs = CombineErrors(c.src, c.errs, result)
 			}
@@ -668,6 +662,19 @@ func (c *OpContext) evalState(v Expr, state VertexStatus) (result Value) {
 		// This can only happen, really, if v == nil, which is not allowed.
 		panic(fmt.Sprintf("unexpected Expr type %T", v))
 	}
+}
+
+// wrapCycleError converts the sentinel cycleError in a concrete one with
+// position information.
+func (c *OpContext) wrapCycleError(src ast.Node, b *Bottom) *Bottom {
+	if src != nil &&
+		b.Code == CycleError &&
+		len(errors.Positions(b.Err)) == 0 {
+		bb := *b
+		bb.Err = errors.Wrapf(b.Err, src.Pos(), "")
+		b = &bb
+	}
+	return b
 }
 
 // unifyNode returns a possibly partially evaluated node value.

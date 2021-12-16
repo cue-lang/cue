@@ -70,6 +70,7 @@ const (
 	JSONSchema   Interpretation = "jsonschema"
 	OpenAPI      Interpretation = "openapi"
 	ProtobufJSON Interpretation = "pb"
+	CUEdata      Interpretation = "cuedata"
 )
 
 // A Form specifies the form in which a program should be represented.

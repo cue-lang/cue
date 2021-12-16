@@ -670,6 +670,14 @@ func (f *formatter) exprRaw(expr ast.Expr, prec1, depth int) {
 	case *ast.Ellipsis:
 		f.ellipsis(x)
 
+	case *ast.Comprehension:
+		if !x.Pos().HasRelPos() || x.Pos().RelPos() >= token.Newline {
+			f.print(formfeed)
+		}
+		f.walkClauseList(x.Clauses, blank)
+		f.print(blank, nooverride)
+		f.expr(x.Value)
+
 	default:
 		panic(fmt.Sprintf("unimplemented type %T", x))
 	}

@@ -119,10 +119,9 @@ The --path/-l flag can be used to specify a CUE path at which to
 place a value. Each -l flag specifies either a CUE expression or
 a CUE field (without the value following the colon), both of
 which are evaluated within the value. Together, the -l flags
-specify the path at increasingly deeper nesting. In the path
-notation, path elements that end with a "::", instead of ":",
-are created as definitions. An expression may refer to builtin
-packages as long as the name can be uniquely identified.
+specify the path at increasingly deeper nesting. An expression
+may refer to builtin packages as long as the name can be uniquely
+identified.
 
 The --with-context flag can be used to evaluate the label
 expression within a struct of contextual data, instead of

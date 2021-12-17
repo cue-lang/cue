@@ -54,3 +54,21 @@ func TestAPI(t *testing.T) {
 		})
 	}
 }
+
+// TestConcurrency tests whether concurrent use of an index is allowed.
+// This test only functions well with the --race flag.
+func TestConcurrency(t *testing.T) {
+	c := New()
+	go func() {
+		c.CompileString(`
+		package foo
+		a: 1
+		`)
+	}()
+	go func() {
+		c.CompileString(`
+		package bar
+		a: 2
+		`)
+	}()
+}

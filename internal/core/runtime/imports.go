@@ -58,13 +58,17 @@ var sharedIndex = newIndex()
 //
 // All instances belonging to the same package should share this index.
 type index struct {
-	// Change this to Instance at some point.
-	// From *structLit/*Vertex -> Instance
+	// lock is used to guard imports-related maps.
+	// TODO: makes these per cuecontext.
+	lock           sync.RWMutex
 	imports        map[*adt.Vertex]*build.Instance
 	importsByPath  map[string]*adt.Vertex
 	importsByBuild map[*build.Instance]*adt.Vertex
-	builtinPaths   map[string]PackageFunc // Full path
-	builtinShort   map[string]string      // Commandline shorthand
+
+	// These are initialized during Go package initialization time and do not
+	// need to be guarded.
+	builtinPaths map[string]PackageFunc // Full path
+	builtinShort map[string]string      // Commandline shorthand
 
 	typeCache sync.Map // map[reflect.Type]evaluated
 }
@@ -86,6 +90,9 @@ func (x *index) shortBuiltinToPath(id string) string {
 }
 
 func (r *Runtime) AddInst(path string, key *adt.Vertex, p *build.Instance) {
+	r.index.lock.Lock()
+	defer r.index.lock.Unlock()
+
 	x := r.index
 	if key == nil {
 		panic("key must not be nil")
@@ -98,14 +105,23 @@ func (r *Runtime) AddInst(path string, key *adt.Vertex, p *build.Instance) {
 }
 
 func (r *Runtime) GetInstanceFromNode(key *adt.Vertex) *build.Instance {
+	r.index.lock.RLock()
+	defer r.index.lock.RUnlock()
+
 	return r.index.imports[key]
 }
 
 func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
+	r.index.lock.RLock()
+	defer r.index.lock.RUnlock()
+
 	return r.index.importsByBuild[key]
 }
 
 func (r *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {
+	r.index.lock.Lock()
+	defer r.index.lock.Unlock()
+
 	x := r.index
 
 	key := x.importsByPath[importPath]

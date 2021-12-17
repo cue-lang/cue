@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "51f9f70e_64cda93e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2021-12-17T09:05:53Z",
+      "side": 1,
+      "message": "Looks great overall.\n\nI\u0027m a bit confused as to where the additional empty wrapped error when printing comes from. It may make sense to factor this into two CLs: one with the refactorings and one with the actual changes. At first glance I don\u0027t see any change that could cause this.\n\nThe affected tests can be run as `go test ./pkg/...`",
+      "revId": "854d69695c6dee43a7fba1a7565c28afc06fbbc3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

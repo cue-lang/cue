@@ -135,7 +135,7 @@ func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec
 		return nil // TODO: check the builtin package exists here.
 	}
 
-	if v := x.index.importsByBuild[pkg]; v != nil {
+	if v := x.getNodeFromInstance(pkg); v != nil {
 		return pkg.Err
 	}
 

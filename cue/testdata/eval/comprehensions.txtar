@@ -1,4 +1,6 @@
 -- in.cue --
+import "strings"
+
 a: { x: 10, y: 100, z: 50 }
 b: {
 	for k, v in a if v <= 50 {
@@ -19,6 +21,16 @@ c: {
     "\(k)": y
   }
 }
+
+A: X: run: "dfoo"
+
+if true {
+	A: X: {
+		run: string
+		files: "\(strings.Join([ run ], "\n"))"
+	}
+}
+
 -- out/eval --
 (struct){
   a: (struct){
@@ -35,6 +47,12 @@ c: {
   c: (struct){
     y: (int){ 110 }
     z: (int){ 60 }
+  }
+  A: (struct){
+    X: (struct){
+      run: (string){ "dfoo" }
+      files: (string){ "dfoo" }
+    }
   }
 }
 -- out/compile --
@@ -61,6 +79,21 @@ c: {
   c: {
     for k, v in 〈1;a〉 let y = (〈0;v〉 + 10) if (〈0;y〉 > 50) {
       "\(〈2;k〉)": 〈1;y〉
+    }
+  }
+  A: {
+    X: {
+      run: "dfoo"
+    }
+  }
+  if true {
+    A: {
+      X: {
+        run: string
+        files: "\(〈import;strings〉.Join([
+          〈1;run〉,
+        ], "\n"))"
+      }
     }
   }
 }

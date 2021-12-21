@@ -192,7 +192,7 @@ Result:
         //     ./in.cue:50:23
       }
       max: (_|_){
-        // [incomplete] 0: operand param of '+' not concrete (was int):
+        // [incomplete] incompleteArgDecimalList.#a.0: operand param of '+' not concrete (was int):
         //     ./in.cue:50:23
       }
     }
@@ -211,7 +211,7 @@ Result:
         //     ./in.cue:58:9
       }
       joined: (_|_){
-        // [incomplete] 0: non-concrete value string in operand to +:
+        // [incomplete] incompleteArgStringList.#a.0: non-concrete value string in operand to +:
         //     ./in.cue:59:22
         //     ./in.cue:58:9
       }

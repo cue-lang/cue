@@ -143,8 +143,10 @@ func (c *Context) BuildInstances(instances []*build.Instance) ([]Value, error) {
 		v, err := c.runtime().Build(nil, b)
 		if err != nil {
 			errs = errors.Append(errs, err)
+			a = append(a, c.makeError(err))
+		} else {
+			a = append(a, c.make(v))
 		}
-		a = append(a, c.make(v))
 	}
 	return a, errs
 }

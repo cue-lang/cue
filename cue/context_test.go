@@ -16,10 +16,14 @@ package cue_test
 
 import (
 	"fmt"
+	"io/ioutil"
 	"testing"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/cuecontext"
+	"cuelang.org/go/internal/cuetxtar"
+	"github.com/rogpeppe/go-internal/txtar"
 )
 
 func TestNewList(t *testing.T) {
@@ -78,5 +82,60 @@ func TestNewList(t *testing.T) {
 				t.Errorf(" got: %v\nwant: %v", got, tc.out)
 			}
 		})
+	}
+}
+
+func TestBuildInstancesSuccess(t *testing.T) {
+	in := `
+-- foo.cue --
+package foo
+
+foo: [{a: "b", c: "d"}, {a: "e", g: "f"}]
+bar: [
+	for f in foo
+	if (f & {c: "b"}) != _|_
+	{f}
+]
+`
+
+	a := txtar.Parse([]byte(in))
+	dir, _ := ioutil.TempDir("", "*")
+	instance := cuetxtar.Load(a, dir)[0]
+	if instance.Err != nil {
+		t.Fatal(instance.Err)
+	}
+
+	_, err := cuecontext.New().BuildInstances([]*build.Instance{instance})
+	if err != nil {
+		t.Fatalf("BuildInstances() = %v", err)
+	}
+}
+
+func TestBuildInstancesError(t *testing.T) {
+	in := `
+-- foo.cue --
+package foo
+
+foo: [{a: "b", c: "d"}, {a: "e", g: "f"}]
+bar: [
+	for f in foo
+	if f & {c: "b") != _|_   // NOTE: ')' instead of '}'
+	{f}
+]
+`
+
+	a := txtar.Parse([]byte(in))
+	dir, _ := ioutil.TempDir("", "*")
+	instance := cuetxtar.Load(a, dir)[0]
+
+	// Normally, this should be checked, however, this is explicitly
+	// testing the path where this was NOT checked.
+	// if instance.Err != nil {
+	// 	t.Fatal(instance.Err)
+	// }
+
+	vs, err := cuecontext.New().BuildInstances([]*build.Instance{instance})
+	if err == nil {
+		t.Fatalf("BuildInstances() = %#v, wanted error", vs)
 	}
 }

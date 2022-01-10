@@ -137,3 +137,61 @@ func TestGlob(t *testing.T) {
 		t.Errorf("got %v; want %v", got, want)
 	}
 }
+
+func TestMkdir(t *testing.T) {
+	d1 := "/tmp/foo"
+	defer os.RemoveAll(d1)
+	v := parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, d1))
+	_, err := (*cmdMkdir).Run(nil, &task.Context{Obj: v})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fi1, err := os.Stat(d1)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !fi1.IsDir() {
+		t.Fatal("not a directory")
+	}
+	expectedMode1 := os.ModeDir | 0755
+	if int(fi1.Mode()) != int(expectedMode1) {
+		t.Fatal("wrong permissions", fi1.Mode())
+	}
+	// already exists
+	v = parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, d1))
+	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
+	if err != nil {
+		t.Fatal(err)
+	}
+	// create parents
+	// set permissions
+	d2 := "/tmp/bar/x"
+	defer os.RemoveAll(d2)
+	v = parse(t, "tool/file.MkdirAll", fmt.Sprintf(`{path: "%s", permissions: 0o700}`, d2))
+	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
+	if err != nil {
+		t.Fatal(err)
+	}
+	fi2, err := os.Stat(d2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !fi2.IsDir() {
+		t.Fatal("not a directory")
+	}
+	expectedMode2 := os.ModeDir | 0700
+	if int(fi2.Mode()) != int(expectedMode2) {
+		t.Fatal("wrong permissions", fi2.Mode())
+	}
+	// file at same path
+	f, err := ioutil.TempFile("", "")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer os.Remove(f.Name())
+	v = parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, f.Name()))
+	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
+	if err == nil {
+		t.Fatal("should not create directory at existing filepath")
+	}
+}

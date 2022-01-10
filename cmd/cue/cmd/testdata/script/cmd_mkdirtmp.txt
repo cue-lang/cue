@@ -1,0 +1,19 @@
+cue cmd mkdir
+
+-- mkdir_tool.cue --
+package mkdir
+
+import (
+    "tool/file"
+)
+
+command: mkdir: {
+    tmp: file.MkdirTemp & {
+        path: string
+    }
+
+    rm: file.RemoveAll & {
+        path: tmp.path
+    }
+}
+-- cue.mod --

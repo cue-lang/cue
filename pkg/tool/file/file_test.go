@@ -42,6 +42,7 @@ func parse(t *testing.T, kind, expr string) cue.Value {
 	}
 	return value.UnifyBuiltin(i.Value(), kind)
 }
+
 func TestRead(t *testing.T) {
 	v := parse(t, "tool/file.Read", `{filename: "testdata/input.foo"}`)
 	got, err := (*cmdRead).Run(nil, &task.Context{Obj: v})
@@ -193,4 +194,37 @@ func TestMkdir(t *testing.T) {
 	if err == nil {
 		t.Fatal("should not create directory at existing filepath")
 	}
+}
+
+func TestMkdirTemp(t *testing.T) {
+	// create temp dir
+	v := parse(t, "tool/file.MkdirTemp", "{}")
+	r, err := (*cmdMkdirTemp).Run(nil, &task.Context{Obj: v})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, exists := r.(map[string]interface{})["path"]; !exists {
+		t.Fatal("no directory path returned")
+	}
+	path := r.(map[string]interface{})["path"].(string)
+	defer os.RemoveAll(path)
+	fi, err := os.Stat(path)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !fi.IsDir() {
+		t.Fatal("not a directory")
+	}
+
+	// removes temp dir
+	v2 := parse(t, "tool/file.RemoveAll", fmt.Sprintf(`{path: #"%s"#}`, path))
+	_, err = (*cmdRemoveAll).Run(nil, &task.Context{Obj: v2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, err = os.Stat(path)
+	if err == nil {
+		t.Fatal(err)
+	}
+
 }

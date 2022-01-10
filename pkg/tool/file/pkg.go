@@ -50,5 +50,13 @@ var pkg = &internal.Package{
 	MkdirAll: Mkdir & {
 		createParents: true
 	}
+	MkdirTemp: {
+		dir:     string | *""
+		pattern: string | *""
+		path:    string
+	}
+	RemoveAll: {
+		path: string
+	}
 }`,
 }

@@ -45,4 +45,16 @@
 //         $id: "tool/os.Clearenv"
 //     }
 //
+//     // Mkdir creates a new directory at the specified path
+//     Mkdir: {
+//         $id: "tool/os.Mkdir"
+//
+//         // The directory path to create
+//         // If path is already a directory, Mkdir does nothing
+//         path: string
+//
+//         // When true any necessary parents are created as well
+//         createParents: *false | bool
+//     }
+//
 package os

@@ -42,5 +42,11 @@ var pkg = &internal.Package{
 	Clearenv: {
 		$id: "tool/os.Clearenv"
 	}
+	Mkdir: {
+		$id:           "tool/os.Mkdir"
+		path:          string
+		createParents: bool | *false
+		permissions:   int | *493
+	}
 }`,
 }

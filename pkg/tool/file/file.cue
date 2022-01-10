@@ -75,3 +75,18 @@ Glob: {
 	glob: !=""
 	files: [...string]
 }
+
+// Mkdir creates a new directory at the specified path.
+Mkdir: {
+	$id: "tool/file.Mkdir"
+
+	// The directory path to create.
+	// If path is already a directory, Mkdir does nothing.
+	path: string
+
+	// When true any necessary parents are created as well.
+	createParents: bool | *false
+
+	// Directory mode and permission bits.
+	permissions: int | *0o755
+}

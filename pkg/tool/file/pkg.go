@@ -41,5 +41,11 @@ var pkg = &internal.Package{
 		glob: !=""
 		files: [...string]
 	}
+	Mkdir: {
+		$id:           "tool/file.Mkdir"
+		path:          string
+		createParents: bool | *false
+		permissions:   int | *493
+	}
 }`,
 }

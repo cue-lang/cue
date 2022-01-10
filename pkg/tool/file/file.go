@@ -23,6 +23,7 @@ import (
 	"path/filepath"
 
 	"cuelang.org/go/cue"
+	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/internal/task"
 )
 
@@ -31,17 +32,20 @@ func init() {
 	task.Register("tool/file.Append", newAppendCmd)
 	task.Register("tool/file.Create", newCreateCmd)
 	task.Register("tool/file.Glob", newGlobCmd)
+	task.Register("tool/file.Mkdir", newMkdirCmd)
 }
 
 func newReadCmd(v cue.Value) (task.Runner, error)   { return &cmdRead{}, nil }
 func newAppendCmd(v cue.Value) (task.Runner, error) { return &cmdAppend{}, nil }
 func newCreateCmd(v cue.Value) (task.Runner, error) { return &cmdCreate{}, nil }
 func newGlobCmd(v cue.Value) (task.Runner, error)   { return &cmdGlob{}, nil }
+func newMkdirCmd(v cue.Value) (task.Runner, error)  { return &cmdMkdir{}, nil }
 
 type cmdRead struct{}
 type cmdAppend struct{}
 type cmdCreate struct{}
 type cmdGlob struct{}
+type cmdMkdir struct{}
 
 func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	filename := ctx.String("filename")
@@ -110,4 +114,30 @@ func (c *cmdGlob) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 	files := map[string]interface{}{"files": m}
 	return files, err
+}
+
+func (c *cmdMkdir) Run(ctx *task.Context) (res interface{}, err error) {
+	path := ctx.String("path")
+	mode := ctx.Int64("permissions")
+	createParents, _ := ctx.Lookup("createParents").Bool()
+
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+
+	if createParents {
+		if err := os.MkdirAll(path, os.FileMode(mode)); err != nil {
+			return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to create directory")
+		}
+	} else {
+		dir, err := os.Stat(path)
+		if err == nil && dir.IsDir() {
+			return nil, nil
+		}
+		if err := os.Mkdir(path, os.FileMode(mode)); err != nil {
+			return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to create directory")
+		}
+	}
+
+	return nil, nil
 }

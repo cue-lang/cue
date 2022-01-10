@@ -33,19 +33,25 @@ func init() {
 	task.Register("tool/file.Create", newCreateCmd)
 	task.Register("tool/file.Glob", newGlobCmd)
 	task.Register("tool/file.Mkdir", newMkdirCmd)
+	task.Register("tool/file.MkdirTemp", newMkdirTempCmd)
+	task.Register("tool/file.RemoveAll", newRemoveAllCmd)
 }
 
-func newReadCmd(v cue.Value) (task.Runner, error)   { return &cmdRead{}, nil }
-func newAppendCmd(v cue.Value) (task.Runner, error) { return &cmdAppend{}, nil }
-func newCreateCmd(v cue.Value) (task.Runner, error) { return &cmdCreate{}, nil }
-func newGlobCmd(v cue.Value) (task.Runner, error)   { return &cmdGlob{}, nil }
-func newMkdirCmd(v cue.Value) (task.Runner, error)  { return &cmdMkdir{}, nil }
+func newReadCmd(v cue.Value) (task.Runner, error)      { return &cmdRead{}, nil }
+func newAppendCmd(v cue.Value) (task.Runner, error)    { return &cmdAppend{}, nil }
+func newCreateCmd(v cue.Value) (task.Runner, error)    { return &cmdCreate{}, nil }
+func newGlobCmd(v cue.Value) (task.Runner, error)      { return &cmdGlob{}, nil }
+func newMkdirCmd(v cue.Value) (task.Runner, error)     { return &cmdMkdir{}, nil }
+func newMkdirTempCmd(v cue.Value) (task.Runner, error) { return &cmdMkdirTemp{}, nil }
+func newRemoveAllCmd(v cue.Value) (task.Runner, error) { return &cmdRemoveAll{}, nil }
 
 type cmdRead struct{}
 type cmdAppend struct{}
 type cmdCreate struct{}
 type cmdGlob struct{}
 type cmdMkdir struct{}
+type cmdMkdirTemp struct{}
+type cmdRemoveAll struct{}
 
 func (c *cmdRead) Run(ctx *task.Context) (res interface{}, err error) {
 	filename := ctx.String("filename")
@@ -140,4 +146,38 @@ func (c *cmdMkdir) Run(ctx *task.Context) (res interface{}, err error) {
 	}
 
 	return nil, nil
+}
+
+func (c *cmdMkdirTemp) Run(ctx *task.Context) (res interface{}, err error) {
+	dir := ctx.String("dir")
+	pattern := ctx.String("pattern")
+
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+
+	path, err := os.MkdirTemp(dir, pattern)
+	if err != nil {
+		return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to create temporary directory")
+	}
+
+	return map[string]interface{}{"path": path}, nil
+}
+
+func (c *cmdRemoveAll) Run(ctx *task.Context) (res interface{}, err error) {
+	path := ctx.String("path")
+
+	if ctx.Err != nil {
+		return nil, ctx.Err
+	}
+
+	if _, err := os.Stat(path); err != nil {
+		return map[string]interface{}{"success": false}, nil
+	}
+
+	if err := os.RemoveAll(path); err != nil {
+		return nil, errors.Wrapf(err, ctx.Obj.Pos(), "failed to remove path")
+	}
+
+	return map[string]interface{}{"success": true}, nil
 }

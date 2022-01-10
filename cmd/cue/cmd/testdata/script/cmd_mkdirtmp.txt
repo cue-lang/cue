@@ -1,0 +1,20 @@
+cue cmd mkdirtmp
+
+-- mkdir_tool.cue --
+package mkdirtmp
+
+import (
+	"tool/file"
+)
+
+command: mkdirtmp: {
+	tmp: file.MkdirTemp & {
+		path: string
+	}
+
+	rm: file.RemoveAll & {
+		path:    tmp.path
+		success: true
+	}
+}
+-- cue.mod --

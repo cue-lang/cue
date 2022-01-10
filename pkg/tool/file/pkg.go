@@ -50,5 +50,16 @@ var pkg = &internal.Package{
 	MkdirAll: Mkdir & {
 		createParents: true
 	}
+	MkdirTemp: {
+		$id:     "tool/file.MkdirTemp"
+		dir:     string | *""
+		pattern: string | *""
+		path:    string
+	}
+	RemoveAll: {
+		$id:     "tool/file.RemoveAll"
+		path:    string
+		success: bool
+	}
 }`,
 }

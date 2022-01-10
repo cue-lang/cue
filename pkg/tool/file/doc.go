@@ -66,4 +66,28 @@
 //     	files: [...string]
 //     }
 //
+//     // Mkdir creates a directory at the specified path.
+//     Mkdir: {
+//     	$id: "tool/file.Mkdir"
+//
+//     	// The directory path to create.
+//     	// If path is already a directory, Mkdir does nothing.
+//     	// If path already exists and is not a directory, Mkdir will return an error.
+//     	path: string
+//
+//     	// When true any necessary parents are created as well.
+//     	createParents: bool | *false
+//
+//     	// Directory mode and permission bits (before umask).
+//     	permissions: int | *0o755
+//     }
+//
+//     // MkdirAll creates a directory at the specified path along with any necessary
+//     // parents.
+//     // If path is already a directory, MkdirAll does nothing.
+//     // If path already exists and is not a directory, MkdirAll will return an error.
+//     MkdirAll: Mkdir & {
+//     	createParents: true
+//     }
+//
 package file

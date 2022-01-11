@@ -131,8 +131,11 @@ func (x *Runtime) buildSpec(cfg *Config, b *build.Instance, spec *ast.ImportSpec
 			return errors.Newf(spec.Pos(),
 				"package %q imported but not defined in %s",
 				info.ID, b.ImportPath)
+		} else if x.index.builtinPaths[info.ID] == nil {
+			return errors.Newf(spec.Pos(),
+				"builtin package %q undefined", info.ID)
 		}
-		return nil // TODO: check the builtin package exists here.
+		return nil
 	}
 
 	if v := x.getNodeFromInstance(pkg); v != nil {

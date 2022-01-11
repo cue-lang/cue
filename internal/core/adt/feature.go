@@ -68,9 +68,6 @@ type StringIndexer interface {
 // SelectorString reports the shortest string representation of f when used as a
 // selector.
 func (f Feature) SelectorString(index StringIndexer) string {
-	if f == 0 {
-		return "_"
-	}
 	x := f.safeIndex()
 	switch f.Typ() {
 	case IntLabel:

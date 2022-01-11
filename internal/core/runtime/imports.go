@@ -118,7 +118,7 @@ func (r *Runtime) getNodeFromInstance(key *build.Instance) *adt.Vertex {
 	return r.index.importsByBuild[key]
 }
 
-func (r *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {
+func (r *Runtime) LoadImport(importPath string) *adt.Vertex {
 	r.index.lock.Lock()
 	defer r.index.lock.Unlock()
 
@@ -126,14 +126,14 @@ func (r *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {
 
 	key := x.importsByPath[importPath]
 	if key != nil {
-		return key, nil
+		return key
 	}
 
 	if x.builtinPaths != nil {
 		if f := x.builtinPaths[importPath]; f != nil {
 			p, err := f(r)
 			if err != nil {
-				return adt.ToVertex(&adt.Bottom{Err: err}), nil
+				return adt.ToVertex(&adt.Bottom{Err: err})
 			}
 			inst := &build.Instance{
 				ImportPath: importPath,
@@ -142,9 +142,9 @@ func (r *Runtime) LoadImport(importPath string) (*adt.Vertex, errors.Error) {
 			x.imports[p] = inst
 			x.importsByPath[importPath] = p
 			x.importsByBuild[inst] = p
-			return p, nil
+			return p
 		}
 	}
 
-	return key, nil
+	return key
 }

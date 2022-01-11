@@ -826,7 +826,10 @@ func (x *ImportReference) Source() ast.Node {
 
 func (x *ImportReference) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	path := x.ImportPath.StringValue(ctx)
-	v, _ := ctx.Runtime.LoadImport(path)
+	v := ctx.Runtime.LoadImport(path)
+	if v == nil {
+		ctx.addErrf(EvalError, x.Src.Pos(), "cannot find package %q", path)
+	}
 	return v
 }
 

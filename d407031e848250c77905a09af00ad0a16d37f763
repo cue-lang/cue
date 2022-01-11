@@ -1,0 +1,191 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f4335e0a_ffd4f977",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "Thanks for the contribution. A few comments.\n",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "23e0d19a_84445dad",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "It makes more sense to me to put this in `pkg/tool/file` with the other file-related functionality.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "68af5aa5_298055bb",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "Please also allow:\n\npermissions: int | *0o755\n\nlike the other functions in `pkg/tool/file`.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cabb0778_9e1f1407",
+        "filename": "pkg/tool/os/os.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 62,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "End sentence with full stop.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "63d715ff_9e8a0e5f",
+        "filename": "pkg/tool/os/os.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "40e9efc0_241f8c92",
+        "filename": "pkg/tool/os/os.cue",
+        "patchSetId": 3
+      },
+      "lineNbr": 66,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "276a6a67_82a4c4b8",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 44,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "There should be no need to check for Exists: if it doesn\u0027t, Bool will just return `false, err`.\n\nSo you could just write: \ncParents, _ :\u003d ctx.Lookup(\"createParents\").Bool()",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "492aee2d_68b4c7d8",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 45,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "Bool (below) already takes the default value, so this line is not necessary.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b8b9c1f3_6c72ec13",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 50,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "pass permissions.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8b9ec435_606ca4a9",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 55,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "I prefer\n\nif err \u003d\u003d nil \u0026\u0026 dir.IsDir() {",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8644ae64_d9ed516b",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 60,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-11T15:14:39Z",
+      "side": 1,
+      "message": "pass permissions.",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

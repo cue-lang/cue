@@ -5,21 +5,8 @@ foo: [
 	y,
 ]
 -- out/eval --
-Errors:
-foo.0: cannot find package "x/y":
-    ./x.cue:4:2
-
-Result:
-(_|_){
-  // [eval]
-  foo: (_|_){
-    // [eval]
-    0: (_|_){
-      // [eval] foo.0: cannot find package "x/y":
-      //     ./x.cue:4:2
-    }
-  }
-}
+builtin package "x/y" undefined:
+    ./x.cue:1:8
 -- out/compile --
 --- x.cue
 {

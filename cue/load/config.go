@@ -124,6 +124,9 @@ func GenPath(root string) string {
 
 // A Config configures load behavior.
 type Config struct {
+	// TODO: allow passing a cuecontext to be able to lookup and verify builtin
+	// packages at loading time.
+
 	// Context specifies the context for the load operation.
 	// If the context is cancelled, the loader may stop early
 	// and return an ErrCancelled error.

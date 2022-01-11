@@ -1972,7 +1972,7 @@ func reference(rt *runtime.Runtime, c *adt.OpContext, env *adt.Environment, r ad
 		path = appendSelector(path, valueToSel(v))
 
 	case *adt.ImportReference:
-		inst, _ = rt.LoadImport(rt.LabelStr(x.ImportPath))
+		inst = rt.LoadImport(rt.LabelStr(x.ImportPath))
 
 	case *adt.SelectorExpr:
 		inst, path = reference(rt, c, env, x.X)

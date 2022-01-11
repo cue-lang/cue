@@ -1,0 +1,72 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6436dd68_31d7013f",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-01-11T20:44:14Z",
+      "side": 1,
+      "message": "What if the path designates a regular file, or some other non-directory entry?",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "84a94174_9a8c92ec",
+        "filename": "pkg/tool/os/os.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-01-11T20:44:14Z",
+      "side": 1,
+      "message": "Likewise: What if such an entry exists, but it\u0027s not a directory?",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d40ca515_799d2e35",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-01-11T20:44:14Z",
+      "side": 1,
+      "message": "s/dir/directory/\n\nShould the error message indicate the path of the intended directory? Does the \"err\" value\u0027s Error method already include that detail?",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d703bc3_1f47bafe",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-01-11T20:44:14Z",
+      "side": 1,
+      "message": "Likewise.",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

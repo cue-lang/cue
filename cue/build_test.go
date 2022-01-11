@@ -12,16 +12,19 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package cue
+package cue_test
 
 import (
 	"fmt"
 	"testing"
 
+	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
+	"cuelang.org/go/cue/cuecontext"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/core/debug"
+	"cuelang.org/go/internal/value"
 )
 
 func TestFromExpr(t *testing.T) {
@@ -40,12 +43,12 @@ func TestFromExpr(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			r := &Runtime{}
-			inst, err := r.CompileExpr(tc.expr)
-			if err != nil {
+			r := cuecontext.New()
+			v := r.BuildExpr(tc.expr)
+			if err := v.Err(); err != nil {
 				t.Fatal(err)
 			}
-			if got := fmt.Sprint(inst.Value()); got != tc.out {
+			if got := fmt.Sprint(v); got != tc.out {
 				t.Errorf("\n got: %v; want %v", got, tc.out)
 			}
 		})
@@ -194,13 +197,14 @@ func TestBuild(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			insts := Build(makeInstances(tc.instances))
+			insts := cue.Build(makeInstances(tc.instances))
 			var got string
 			if err := insts[0].Err; err != nil {
 				got = err.Error()
 			} else {
 				cfg := &debug.Config{Compact: true}
-				got = debug.NodeString(insts[0].index, insts[0].Value().v, cfg)
+				r, v := value.ToInternal(insts[0].Value())
+				got = debug.NodeString(r, v, cfg)
 			}
 			if got != tc.emit {
 				t.Errorf("\n got: %s\nwant: %s", got, tc.emit)

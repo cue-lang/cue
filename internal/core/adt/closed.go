@@ -340,12 +340,10 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 		optionalTypes |= s.types
 	}
 
+	var str Value
 	if f.Index() == MaxIndex {
 		f = 0
-	}
-
-	var str Value
-	if optionalTypes&(HasComplexPattern|HasDynamic) != 0 && f.IsString() && f > 0 {
+	} else if optionalTypes&(HasComplexPattern|HasDynamic) != 0 && f.IsString() {
 		str = f.ToValue(ctx)
 	}
 

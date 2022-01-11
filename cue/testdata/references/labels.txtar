@@ -50,6 +50,38 @@ emptyLabel: {
     a: emptyLabel[""]
 }
 
+underscore: a: {
+    // Issue #1454
+    foo: #Foo
+    foo: "_": "bar"
+    #Foo: [=~""]: string
+}
+
+underscore: b: {
+    foo: #Foo
+    // TODO: we should probably disallow the hidden label `_` to avoid confusion.
+    foo: _: "bar"
+    #Foo: [=~""]: string
+}
+
+underscore: c: {
+    foo: "_": "any"
+    foo: [=~""]: string
+}
+
+underscore: d: {
+    bar: "_": "any"
+    #bar: [string]: string
+    bar: #bar
+}
+
+underscore: e: {
+    baz: "_h": "any"
+    #baz: [=~"_"]: string
+    baz: #baz
+}
+
+
 // TODO: support. Also not yet supported in old implementation.
 // c10: {
 // 	C=[string]: {
@@ -103,6 +135,41 @@ emptyLabel: {
   emptyLabel: (struct){
     "": (int){ 1 }
     a: (int){ 1 }
+  }
+  underscore: (struct){
+    a: (struct){
+      foo: (#struct){
+        "_": (string){ "bar" }
+      }
+      #Foo: (#struct){
+      }
+    }
+    b: (struct){
+      foo: (#struct){
+        _: (string){ "bar" }
+      }
+      #Foo: (#struct){
+      }
+    }
+    c: (struct){
+      foo: (struct){
+        "_": (string){ "any" }
+      }
+    }
+    d: (struct){
+      bar: (#struct){
+        "_": (string){ "any" }
+      }
+      #bar: (#struct){
+      }
+    }
+    e: (struct){
+      baz: (#struct){
+        "_h": (string){ "any" }
+      }
+      #baz: (#struct){
+      }
+    }
   }
 }
 -- out/compile --
@@ -187,5 +254,59 @@ emptyLabel: {
   emptyLabel: {
     "": 1
     a: 〈1;emptyLabel〉[""]
+  }
+  underscore: {
+    a: {
+      foo: 〈0;#Foo〉
+      foo: {
+        "_": "bar"
+      }
+      #Foo: {
+        [=~""]: string
+      }
+    }
+  }
+  underscore: {
+    b: {
+      foo: 〈0;#Foo〉
+      foo: {
+        _: "bar"
+      }
+      #Foo: {
+        [=~""]: string
+      }
+    }
+  }
+  underscore: {
+    c: {
+      foo: {
+        "_": "any"
+      }
+      foo: {
+        [=~""]: string
+      }
+    }
+  }
+  underscore: {
+    d: {
+      bar: {
+        "_": "any"
+      }
+      #bar: {
+        [string]: string
+      }
+      bar: 〈0;#bar〉
+    }
+  }
+  underscore: {
+    e: {
+      baz: {
+        "_h": "any"
+      }
+      #baz: {
+        [=~"_"]: string
+      }
+      baz: 〈0;#baz〉
+    }
   }
 }

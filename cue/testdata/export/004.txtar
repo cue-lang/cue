@@ -17,7 +17,7 @@ _bar:   int
 {
   {
     $type: 3
-    _: int
+    "_": int
     "_foo": int
     _bar: int
   }
@@ -25,7 +25,7 @@ _bar:   int
 -- out/eval --
 (struct){
   $type: (int){ 3 }
-  _: (int){ int }
+  "_": (int){ int }
   "_foo": (int){ int }
   _bar: (int){ int }
 }

@@ -17,7 +17,7 @@
 //     // Example:
 //     //     task: ask: cli.Ask({
 //     //         prompt:   "Are you okay?"
-//     //         repsonse: bool
+//     //         response: bool
 //     //     })
 //     Ask: {
 //     	kind: "tool/cli.Ask"

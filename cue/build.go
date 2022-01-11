@@ -117,14 +117,8 @@ func (r *hiddenRuntime) Build(p *build.Instance) (*Instance, error) {
 	return r.complete(p, v)
 }
 
-// Build creates one Instance for each build.Instance. A returned Instance may
-// be incomplete, in which case its Err field is set.
-//
-// Example:
-//	inst := cue.Build(load.Instances(args))
-//
-// Deprecated: use Context.BuildInstances. The use of Instance is being phased
-// out.
+// Deprecated: use cuecontext.Context.BuildInstances. The use of Instance is
+// being phased out.
 func Build(instances []*build.Instance) []*Instance {
 	if len(instances) == 0 {
 		panic("cue: list of instances must not be empty")

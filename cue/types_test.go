@@ -33,14 +33,16 @@ import (
 	"cuelang.org/go/internal/core/debug"
 )
 
-func getInstance(t *testing.T, body ...string) *Instance {
+func getInstance(t *testing.T, body string) *Instance {
 	t.Helper()
 
-	insts := Build(makeInstances([]*bimport{{files: body}}))
-	if insts[0].Err != nil {
-		t.Fatalf("unexpected parse error: %v", insts[0].Err)
+	var r Runtime // TODO: use Context and return Value
+
+	inst, err := r.Compile("foo", body)
+	if err != nil {
+		t.Fatalf("unexpected parse error: %v", err)
 	}
-	return insts[0]
+	return inst
 }
 
 func TestAPI(t *testing.T) {

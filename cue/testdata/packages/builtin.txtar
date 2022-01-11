@@ -1,0 +1,29 @@
+-- x.cue --
+import "x/y"
+
+foo: [
+	y,
+]
+-- out/eval --
+Errors:
+foo.0: cannot find package "x/y":
+    ./x.cue:4:2
+
+Result:
+(_|_){
+  // [eval]
+  foo: (_|_){
+    // [eval]
+    0: (_|_){
+      // [eval] foo.0: cannot find package "x/y":
+      //     ./x.cue:4:2
+    }
+  }
+}
+-- out/compile --
+--- x.cue
+{
+  foo: [
+    〈import;"x/y"〉,
+  ]
+}

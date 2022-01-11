@@ -60,7 +60,7 @@ func MakeError(r *runtime.Runtime, err errors.Error) cue.Value {
 func UnifyBuiltin(v cue.Value, kind string) cue.Value {
 	p := strings.Split(kind, ".")
 	pkg, name := p[0], p[1]
-	s, _ := runtime.SharedRuntime.LoadImport(pkg)
+	s := runtime.SharedRuntime.LoadImport(pkg)
 	if s == nil {
 		return v
 	}

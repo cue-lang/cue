@@ -116,7 +116,7 @@ func getImportFromNode(x *runtime.Runtime, v *adt.Vertex) *Instance {
 }
 
 func getImportFromPath(x *runtime.Runtime, id string) *Instance {
-	node, _ := x.LoadImport(id)
+	node := x.LoadImport(id)
 	if node == nil {
 		return nil
 	}

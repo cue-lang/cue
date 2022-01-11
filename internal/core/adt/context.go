@@ -112,8 +112,8 @@ type Runtime interface {
 	StringIndexer
 
 	// LoadImport loads a unique Vertex associated with a given import path. It
-	// returns an error if no import for this package could be found.
-	LoadImport(importPath string) (*Vertex, errors.Error)
+	// returns an nil if no import for this package could be found.
+	LoadImport(importPath string) *Vertex
 
 	// StoreType associates a CUE expression with a Go type.
 	StoreType(t reflect.Type, src ast.Expr, expr Expr)

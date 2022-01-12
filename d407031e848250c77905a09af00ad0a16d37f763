@@ -73,6 +73,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "7dfa0473_a314c07c",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-12T11:35:41Z",
+      "side": 1,
+      "message": "Marcel and I just discussed. Our suggestion is as follows: add Mkdir to tool/file for now, and then we will immediately follow up with an issue that revisits the entire builtin API surface to make sure it is fit for purpose. Because if file.Mkdir is in the \"wrong\" place, then arguably so is file.Read (if we are using the Go model). But all these points and discussions can then be made as part of that follow up issue.",
+      "parentUuid": "757228bc_c81c6108",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "68af5aa5_298055bb",
         "filename": "pkg/tool/os/doc.go",
         "patchSetId": 3

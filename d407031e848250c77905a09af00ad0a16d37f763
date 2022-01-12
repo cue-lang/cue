@@ -91,6 +91,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "dbc62566_40d81bc6",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-12T13:45:46Z",
+      "side": 1,
+      "message": "Alright, I will move the code in the file package",
+      "parentUuid": "7dfa0473_a314c07c",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "68af5aa5_298055bb",
         "filename": "pkg/tool/os/doc.go",
         "patchSetId": 3

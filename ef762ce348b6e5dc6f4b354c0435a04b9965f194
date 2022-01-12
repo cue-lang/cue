@@ -20,6 +20,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "a83a9865_2b92eb7f",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-12T13:45:46Z",
+      "side": 1,
+      "message": "The underlying go error is wrapped in the cue error, here is an example:\n\n```\ncommand: foo: {\n\td: os.Mkdir \u0026 {\n\t\tpath: \"/home/eon/.bashrc\"\n\t}\n```\n\n```\n /home/eon/vcs/cue/cmd/cue/cue cmd foo\nfailed to create dir: mkdir /home/eon/.bashrc: file exists:\n    ./test_tool.cue:9:2\n```\n\n```\ncommand: foo: {\n\td: os.Mkdir \u0026 {\n\t\tpath:          \"/home/eon/.bashrc\"\n\t\tcreateParents: true\n\t}\n}\n```\n\n```\n /home/eon/vcs/cue/cmd/cue/cue cmd foo\nfailed to create dir: mkdir /home/eon/.bashrc: not a directory:\n    ./test_tool.cue:9:2\n```",
+      "parentUuid": "6436dd68_31d7013f",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "84a94174_9a8c92ec",
         "filename": "pkg/tool/os/os.cue",
         "patchSetId": 4
@@ -31,6 +49,24 @@
       "writtenOn": "2022-01-11T20:44:14Z",
       "side": 1,
       "message": "Likewise: What if such an entry exists, but it\u0027s not a directory?",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d338580_c4560e2b",
+        "filename": "pkg/tool/os/os.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-12T13:45:46Z",
+      "side": 1,
+      "message": "Posted an example in a previous comment",
+      "parentUuid": "84a94174_9a8c92ec",
       "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -72,6 +108,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "09bfbeec_8084b56d",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-12T13:45:46Z",
+      "side": 1,
+      "message": "Posted an example in a previous comment",
+      "parentUuid": "6ada39f5_82cbde0d",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "0d703bc3_1f47bafe",
         "filename": "pkg/tool/os/os.go",
         "patchSetId": 4
@@ -83,6 +137,24 @@
       "writtenOn": "2022-01-11T20:44:14Z",
       "side": 1,
       "message": "Likewise.",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b786f119_2a281723",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-12T13:45:46Z",
+      "side": 1,
+      "message": "Posted an example in a previous comment",
+      "parentUuid": "0d703bc3_1f47bafe",
       "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

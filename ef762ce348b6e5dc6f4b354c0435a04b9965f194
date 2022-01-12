@@ -38,6 +38,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "6a01b10f_050c0aaa",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1019328
+      },
+      "writtenOn": "2022-01-12T13:49:17Z",
+      "side": 1,
+      "message": "Thank you for the example. I think we should amend the comment—here and where the similar comment arises—to indicate that any existing file entry that\u0027s not a directory causes Mkdir to fail.",
+      "parentUuid": "a83a9865_2b92eb7f",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "84a94174_9a8c92ec",
         "filename": "pkg/tool/os/os.cue",
         "patchSetId": 4

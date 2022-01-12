@@ -55,6 +55,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "757228bc_c81c6108",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 49,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-12T07:27:41Z",
+      "side": 1,
+      "message": "I don\u0027t think it\u0027s totally clear cut where this belongs because Go\u0027s os pkg contains Mkdir, ReadFile. So to a certain extent the tool/file package has already broken that mould. \n\nThis CL definitely gives us the opportunity to decide whether we want to follow the Go template (at least as the std lib currently stands for 1.18, because there has been change over time here too).\n\nMy vote would be erring towards the Go model, with a two-version phased move of existing builtins (i.e. duplicate and deprecate, then remove).",
+      "parentUuid": "4a1a5194_329725b8",
+      "revId": "d407031e848250c77905a09af00ad0a16d37f763",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "68af5aa5_298055bb",
         "filename": "pkg/tool/os/doc.go",
         "patchSetId": 3

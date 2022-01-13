@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3b9afd7b_42051ff1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-13T08:30:21Z",
+      "side": 1,
+      "message": "Added file.MkdirAll in the schema which is just a shorthand for file.Mkdir \u0026 {createParents: true}\n\nThis is in the same spirit as http.Get|Post|... that are shorthands for http.Do.",
+      "revId": "9df29fa1279f054b2e463c00f862671d10d50bee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

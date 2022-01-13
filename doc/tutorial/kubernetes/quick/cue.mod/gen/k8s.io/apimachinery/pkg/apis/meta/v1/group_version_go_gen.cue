@@ -14,7 +14,7 @@ package v1
 }
 
 // GroupVersionResource unambiguously identifies a resource.  It doesn't anonymously include GroupVersion
-// to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling
+// to avoid automatic coercion.  It doesn't use a GroupVersion to avoid custom marshalling
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 #GroupVersionResource: {
@@ -33,7 +33,7 @@ package v1
 }
 
 // GroupVersionKind unambiguously identifies a kind.  It doesn't anonymously include GroupVersion
-// to avoid automatic coersion.  It doesn't use a GroupVersion to avoid custom marshalling
+// to avoid automatic coercion.  It doesn't use a GroupVersion to avoid custom marshalling
 //
 // +protobuf.options.(gogoproto.goproto_stringer)=false
 #GroupVersionKind: {

@@ -198,6 +198,15 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 			}
 		}
 
+		if p := v.Parent; p != nil && p.state != nil && v.Label.IsString() {
+			for _, s := range p.state.node.Structs {
+				if s.Disable {
+					continue
+				}
+				s.MatchAndInsert(n.ctx, v)
+			}
+		}
+
 		if !n.checkClosed(state) {
 			return
 		}
@@ -1692,8 +1701,6 @@ func (n *nodeContext) addStruct(
 
 	n.updateCyclicStatus(env) // to handle empty structs.
 
-	ctx := n.ctx
-
 	// NOTE: This is a crucial point in the code:
 	// Unification derferencing happens here. The child nodes are set to
 	// an Environment linked to the current node. Together with the De Bruijn
@@ -1768,12 +1775,6 @@ func (n *nodeContext) addStruct(
 		n.aStructID = closeInfo
 	}
 
-	// Apply existing fields
-	for _, arc := range n.node.Arcs {
-		// Reuse Acceptor interface.
-		parent.MatchAndInsert(ctx, arc)
-	}
-
 	parent.Disable = false
 
 	for _, d := range s.Decls {
@@ -1801,19 +1802,11 @@ func (n *nodeContext) addStruct(
 // disjunctions.
 func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	ctx := n.ctx
-	arc, isNew := n.node.GetArc(ctx, f)
+	arc, _ := n.node.GetArc(ctx, f)
 
 	arc.addConjunct(x)
 
 	switch {
-	case isNew:
-		for _, s := range n.node.Structs {
-			if s.Disable {
-				continue
-			}
-			s.MatchAndInsert(ctx, arc)
-		}
-
 	case arc.state != nil:
 		s := arc.state
 		switch {

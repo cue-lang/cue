@@ -74,8 +74,6 @@ _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mi
     ./in.cue:35:13
     ./in.cue:54:12
     ./in.cue:55:15
-#DoDeploy._params.manifest.description.service.description: undefined field: service:
-    ./in.cue:5:28
 _params.hsize.$_instances: 2 errors in empty disjunction::
     ./in.cue:33:20
 #RelabelService.out.labstr: undefined field: label:
@@ -143,7 +141,7 @@ Result:
               kind: (string){ "service" }
             }
             description: (_|_){
-              // [eval] #DoDeploy._params.manifest.description.service.description: undefined field: service:
+              // [incomplete] #DoDeploy._params.manifest.description.service.description: undefined field: service:
               //     ./in.cue:5:28
             }
           }
@@ -157,8 +155,18 @@ Result:
       description: (_|_){
         // [eval]
         service: (_|_){
-          // [eval] #DoDeploy._params.manifest.description.service.description: undefined field: service:
-          //     ./in.cue:5:28
+          // [eval] _params.hsize.$_instances: conflicting values 1 and {$_instances:(>=0|*1)} (mismatched types int and struct):
+          //     ./in.cue:29:20
+          //     ./in.cue:35:13
+          //     ./in.cue:54:12
+          //     ./in.cue:55:22
+          // _params.hsize.$_instances: conflicting values >=0 and {$_instances:(>=0|*1)} (mismatched types number and struct):
+          //     ./in.cue:29:20
+          //     ./in.cue:35:13
+          //     ./in.cue:54:12
+          //     ./in.cue:55:15
+          // _params.hsize.$_instances: 2 errors in empty disjunction::
+          //     ./in.cue:33:20
         }
       }
     }

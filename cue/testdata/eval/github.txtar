@@ -208,7 +208,7 @@ release: _#bashWorkflow & {
 				}
 			}
 			name: "Trigger unity build"
-			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/unity/dispatches"
+			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-unity/unity/dispatches"
 		}]
 	}
 }
@@ -231,7 +231,7 @@ tip_triggers: _#bashWorkflow & {
 				}
 			}
 			name: "Trigger unity build"
-			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-lang/unity/dispatches"
+			run:  "\(_#curl) -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(strconv.Quote(encjson.Marshal(_#arg))) https://api.github.com/repos/cue-unity/unity/dispatches"
 		}]
 	}
 }
@@ -1426,7 +1426,7 @@ import "strings"
                   }
                 }
                 name: (string){ "Trigger unity build" }
-                run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against CUE ${GITHUB_REF##refs/tags/}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"${GITHUB_REF##refs/tags/}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-lang/unity/dispatches" }
+                run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against CUE ${GITHUB_REF##refs/tags/}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"${GITHUB_REF##refs/tags/}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-unity/unity/dispatches" }
               }
             }
             defaults: (#struct){
@@ -1506,7 +1506,7 @@ import "strings"
                   }
                 }
                 name: (string){ "Trigger unity build" }
-                run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against ${GITHUB_SHA}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"commit:${GITHUB_SHA}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-lang/unity/dispatches" }
+                run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against ${GITHUB_SHA}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"commit:${GITHUB_SHA}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-unity/unity/dispatches" }
               }
             }
             defaults: (#struct){
@@ -1937,7 +1937,7 @@ import "strings"
               }
             }
             name: (string){ "Trigger unity build" }
-            run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against CUE ${GITHUB_REF##refs/tags/}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"${GITHUB_REF##refs/tags/}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-lang/unity/dispatches" }
+            run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against CUE ${GITHUB_REF##refs/tags/}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"${GITHUB_REF##refs/tags/}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-unity/unity/dispatches" }
           }
         }
         defaults: (#struct){
@@ -2014,7 +2014,7 @@ import "strings"
               }
             }
             name: (string){ "Trigger unity build" }
-            run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against ${GITHUB_SHA}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"commit:${GITHUB_SHA}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-lang/unity/dispatches" }
+            run: (string){ "curl -f -s -H \"Content-Type: application/json\" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \"{\\\"event_type\\\":\\\"Check against ${GITHUB_SHA}\\\",\\\"client_payload\\\":{\\\"type\\\":\\\"unity\\\",\\\"payload\\\":{\\\"versions\\\":\\\"\\\\\\\"commit:${GITHUB_SHA}\\\\\\\"\\\"}}}\" https://api.github.com/repos/cue-unity/unity/dispatches" }
           }
         }
         defaults: (#struct){
@@ -2424,7 +2424,7 @@ import "strings"
               }
             }
             name: "Trigger unity build"
-            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-lang/unity/dispatches"
+            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-unity/unity/dispatches"
           }),
         ]
       }
@@ -2458,7 +2458,7 @@ import "strings"
               }
             }
             name: "Trigger unity build"
-            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-lang/unity/dispatches"
+            run: "\(〈5;_#curl〉) -H "Content-Type: application/json" -u cueckoo:${{ secrets.CUECKOO_GITHUB_PAT }} --request POST --data-binary \(〈import;strconv〉.Quote(〈import;"encoding/json"〉.Marshal(〈0;_#arg〉))) https://api.github.com/repos/cue-unity/unity/dispatches"
           },
         ]
       }

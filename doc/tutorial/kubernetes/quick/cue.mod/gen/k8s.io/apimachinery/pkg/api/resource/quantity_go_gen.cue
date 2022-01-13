@@ -84,3 +84,13 @@ package resource
 _#splitREString: "^([+-]?[0-9.]+)([eEinumkKMGTP]*[-+]?[0-9]*)$"
 
 _#int64QuantityExpectedBytes: 18
+
+// QuantityValue makes it possible to use a Quantity as value for a command
+// line parameter.
+//
+// +protobuf=true
+// +protobuf.embed=string
+// +protobuf.options.marshal=false
+// +protobuf.options.(gogoproto.goproto_stringer)=false
+// +k8s:deepcopy-gen=true
+#QuantityValue: _

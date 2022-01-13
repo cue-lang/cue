@@ -64,6 +64,10 @@ package runtime
 	// readability.
 	PrettySerializer: #Serializer
 
+	// StrictSerializer, if set, deserializes this object strictly,
+	// erring on unknown fields.
+	StrictSerializer: #Serializer
+
 	// StreamSerializer, if set, describes the streaming serialization format
 	// for this media type.
 	StreamSerializer?: null | #StreamSerializerInfo @go(,*StreamSerializerInfo)

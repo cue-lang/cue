@@ -506,6 +506,15 @@ import (
 	dryRun?: [...string] @go(DryRun,[]string) @protobuf(5,bytes,rep)
 }
 
+// FieldValidationIgnore ignores unknown/duplicate fields
+#FieldValidationIgnore: "Ignore"
+
+// FieldValidationWarn responds with a warning, but successfully serve the request
+#FieldValidationWarn: "Warn"
+
+// FieldValidationStrict fails the request on unknown/duplicate fields
+#FieldValidationStrict: "Strict"
+
 // CreateOptions may be provided when creating an API object.
 #CreateOptions: {
 	#TypeMeta
@@ -524,6 +533,19 @@ import (
 	// as defined by https://golang.org/pkg/unicode/#IsPrint.
 	// +optional
 	fieldManager?: string @go(FieldManager) @protobuf(3,bytes)
+
+	// fieldValidation determines how the server should respond to
+	// unknown/duplicate fields in the object in the request.
+	// Introduced as alpha in 1.23, older servers or servers with the
+	// `ServerSideFieldValidation` feature disabled will discard valid values
+	// specified in  this param and not perform any server side field validation.
+	// Valid values are:
+	// - Ignore: ignores unknown/duplicate fields.
+	// - Warn: responds with a warning for each
+	// unknown/duplicate field, but successfully serves the request.
+	// - Strict: fails the request on unknown/duplicate fields.
+	// +optional
+	fieldValidation?: string @go(FieldValidation) @protobuf(4,bytes)
 }
 
 // PatchOptions may be provided when patching an API object.
@@ -554,6 +576,19 @@ import (
 	// types (JsonPatch, MergePatch, StrategicMergePatch).
 	// +optional
 	fieldManager?: string @go(FieldManager) @protobuf(3,bytes)
+
+	// fieldValidation determines how the server should respond to
+	// unknown/duplicate fields in the object in the request.
+	// Introduced as alpha in 1.23, older servers or servers with the
+	// `ServerSideFieldValidation` feature disabled will discard valid values
+	// specified in  this param and not perform any server side field validation.
+	// Valid values are:
+	// - Ignore: ignores unknown/duplicate fields.
+	// - Warn: responds with a warning for each
+	// unknown/duplicate field, but successfully serves the request.
+	// - Strict: fails the request on unknown/duplicate fields.
+	// +optional
+	fieldValidation?: string @go(FieldValidation) @protobuf(4,bytes)
 }
 
 // ApplyOptions may be provided when applying an API object.
@@ -602,6 +637,19 @@ import (
 	// as defined by https://golang.org/pkg/unicode/#IsPrint.
 	// +optional
 	fieldManager?: string @go(FieldManager) @protobuf(2,bytes)
+
+	// fieldValidation determines how the server should respond to
+	// unknown/duplicate fields in the object in the request.
+	// Introduced as alpha in 1.23, older servers or servers with the
+	// `ServerSideFieldValidation` feature disabled will discard valid values
+	// specified in  this param and not perform any server side field validation.
+	// Valid values are:
+	// - Ignore: ignores unknown/duplicate fields.
+	// - Warn: responds with a warning for each
+	// unknown/duplicate field, but successfully serves the request.
+	// - Strict: fails the request on unknown/duplicate fields.
+	// +optional
+	fieldValidation?: string @go(FieldValidation) @protobuf(3,bytes)
 }
 
 // Preconditions must be fulfilled before an operation (update, delete, etc.) is carried out.

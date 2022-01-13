@@ -16,7 +16,7 @@ that don't involve writing code.
 * Using CUE is a form of contributing! Especially when combined with raising
   issues, providing feedback, tell us what works well and what doesn't, pointing
 out gaps etc.
-* Adding your CUE-based project to [`unity`](https://github.com/cue-lang/unity)
+* Adding your CUE-based project to [`unity`](https://github.com/cue-unity/unity)
   helps ensure that we don't create releases that unintentionally break
 configurations, but also gives a wide variety of scenarios in which to test bug
 fixes, performance improvements and the like.
@@ -654,7 +654,7 @@ an associated issue.
 ### Continuous Integration (CI) checks
 
 After an initial reading of your change, maintainers will trigger CI checks,
-that run a  full test suite and [`unity`](https://github.com/cue-lang/unity)
+that run a  full test suite and [`unity`](https://github.com/cue-unity/unity)
 checks.  Most CI tests complete in a few minutes, at which point a link will be
 posted in Gerrit where you can see the results, or if you are submitting a PR
 results are presented as checks towards the bottom of the PR.

@@ -54,6 +54,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "d69579a6_f6672fde",
+        "filename": "pkg/tool/os/doc.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 53,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-13T08:21:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "6a01b10f_050c0aaa",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "84a94174_9a8c92ec",
@@ -85,6 +103,24 @@
       "side": 1,
       "message": "Posted an example in a previous comment",
       "parentUuid": "84a94174_9a8c92ec",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "58797c1c_f87b1d4f",
+        "filename": "pkg/tool/os/os.cue",
+        "patchSetId": 4
+      },
+      "lineNbr": 63,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-13T08:21:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "1d338580_c4560e2b",
       "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -142,6 +178,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "f95bf807_d18eafe3",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 46,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-13T08:21:18Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "09bfbeec_8084b56d",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "0d703bc3_1f47bafe",
@@ -173,6 +227,24 @@
       "side": 1,
       "message": "Posted an example in a previous comment",
       "parentUuid": "0d703bc3_1f47bafe",
+      "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "23e69040_acb39e7c",
+        "filename": "pkg/tool/os/os.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-13T08:21:18Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "b786f119_2a281723",
       "revId": "ef762ce348b6e5dc6f4b354c0435a04b9965f194",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

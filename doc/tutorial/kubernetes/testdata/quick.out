@@ -16,8 +16,8 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "bartender"
@@ -86,8 +86,8 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "breaddispatcher"
@@ -156,8 +156,8 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "host"
@@ -226,8 +226,8 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "maitred"
@@ -366,8 +366,8 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "waiter"
@@ -511,8 +511,8 @@ service: {
             ports: [{
                 port:       7080
                 targetPort: 7080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "download"
@@ -577,8 +577,8 @@ service: {
             ports: [{
                 port:       2379
                 targetPort: 2379
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }, {
                 name:       "peer"
                 port:       2380
@@ -587,8 +587,8 @@ service: {
             }]
             selector: {
                 app:       "etcd"
-                domain:    "prod"
                 component: "infra"
+                domain:    "prod"
             }
         }
         metadata: {
@@ -900,8 +900,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "updater"
@@ -1061,8 +1061,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "caller"
@@ -1167,8 +1167,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "dishwasher"
@@ -1273,8 +1273,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "expiditer"
@@ -1370,8 +1370,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "headchef"
@@ -1467,8 +1467,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "linecook"
@@ -1564,8 +1564,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "pastrychef"
@@ -1661,8 +1661,8 @@ service: {
             ports: [{
                 port:       8080
                 targetPort: 8080
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "souschef"
@@ -1760,8 +1760,8 @@ service: {
                 targetPort: 9093
             }]
             selector: {
-                name:      "alertmanager"
                 app:       "alertmanager"
+                name:      "alertmanager"
                 domain:    "prod"
                 component: "mon"
             }
@@ -1981,8 +1981,8 @@ service: {
             }]
             selector: {
                 app:       "node-exporter"
-                domain:    "prod"
                 component: "mon"
+                domain:    "prod"
             }
         }
         kind:       "Service"
@@ -2086,8 +2086,8 @@ service: {
                 targetPort: 9090
             }]
             selector: {
-                name:      "prometheus"
                 app:       "prometheus"
+                name:      "prometheus"
                 domain:    "prod"
                 component: "mon"
             }
@@ -2410,8 +2410,8 @@ service: {
             ports: [{
                 port:       4180
                 targetPort: 4180
-                name:       "client"
                 protocol:   "TCP"
+                name:       "client"
             }]
             selector: {
                 app:       "authproxy"

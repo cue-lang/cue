@@ -1970,13 +1970,13 @@ deployment: {
                 mountPath: "/logs"
                 subPath:   null
                 readOnly:  false
-                kubernetes: {}
                 spec: {
                     gcePersistentDisk: {
                         pdName: "ssd-caller"
                         fsType: "ext4"
                     }
                 }
+                kubernetes: {}
             }
             "secret-ssh-key": {
                 name:      "secret-ssh-key"
@@ -2566,12 +2566,12 @@ deployment: {
                 mountPath: "/sslcerts"
                 subPath:   null
                 readOnly:  true
-                kubernetes: {}
                 spec: {
                     secret: {
                         secretName: "headchef-secrets"
                     }
                 }
+                kubernetes: {}
             }
             "headchef-disk": {
                 name:      "headchef-disk"
@@ -2756,12 +2756,12 @@ deployment: {
                 mountPath: "/etc/certs"
                 subPath:   null
                 readOnly:  true
-                kubernetes: {}
                 spec: {
                     secret: {
                         secretName: "linecook-secrets"
                     }
                 }
+                kubernetes: {}
             }
             "linecook-disk": {
                 name:      "linecook-disk"

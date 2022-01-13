@@ -145,8 +145,8 @@ Result:
   issue642: (struct){
     test: (#struct){
       a: (struct){
-        y: (_){ _ }
         x: (_){ _ }
+        y: (_){ _ }
       }
       b: (struct){
         x: (_){ _ }
@@ -157,8 +157,8 @@ Result:
   withSubfields: (struct){
     test: (#struct){
       a: (struct){
-        y: (_){ _ }
         x: (_){ _ }
+        y: (_){ _ }
       }
       b: (struct){
         x: (_){ _ }

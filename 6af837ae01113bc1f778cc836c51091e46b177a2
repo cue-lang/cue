@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "7f5e0c20_3909734a",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-13T12:47:12Z",
+      "side": 1,
+      "message": "LGTM with one small tidy up.\n\nAs discussed - unity failures are re-ordering related. After we merge this CL I will update the overlay expectations to make things pass.",
+      "revId": "6af837ae01113bc1f778cc836c51091e46b177a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "118e9d90_ca964a03",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 2130,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-13T12:47:12Z",
+      "side": 1,
+      "message": "Nit: leftover",
+      "revId": "6af837ae01113bc1f778cc836c51091e46b177a2",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -6,53 +6,78 @@ module: "example.com"
 -- in.cue --
 import "strings"
 
-#User: {
-    tags_str: string
-    tags_map: {
-         for k, v in strings.Split(tags_str, " ") {
-             "\(v)": string
-         }
-         "{a}": string
+dynamic: {
+    for _, s in ["foo"] {
+        (s):       1
+        "\(s)bar": 2
     }
 }
 
-user: {
-    #User
-    tags_str: "b {c}"
+issue560: {
+    #User: {
+        tags_str: string
+        tags_map: {
+            for k, v in strings.Split(tags_str, " ") {
+                "\(v)": string
+            }
+            "{a}": string
+        }
+    }
+
+    user: {
+        #User
+        tags_str: "b {c}"
+    }
 }
 -- out/eval --
 (struct){
-  #User: (#struct){
-    tags_str: (string){ string }
-    tags_map: (_|_){
-      // [incomplete] error in call to strings.Split: non-concrete value string:
-      //     ./in.cue:6:22
-      "{a}": (string){ string }
-    }
+  dynamic: (struct){
+    foo: (int){ 1 }
+    foobar: (int){ 2 }
   }
-  user: (#struct){
-    tags_str: (string){ "b {c}" }
-    tags_map: (#struct){
-      "{a}": (string){ string }
-      b: (string){ string }
-      "{c}": (string){ string }
+  issue560: (struct){
+    #User: (#struct){
+      tags_str: (string){ string }
+      tags_map: (_|_){
+        // [incomplete] error in call to strings.Split: non-concrete value string:
+        //     ./in.cue:14:25
+        "{a}": (string){ string }
+      }
+    }
+    user: (#struct){
+      tags_str: (string){ "b {c}" }
+      tags_map: (#struct){
+        "{a}": (string){ string }
+        b: (string){ string }
+        "{c}": (string){ string }
+      }
     }
   }
 }
 -- out/compile --
 --- in.cue
 {
-  #User: {
-    tags_str: string
-    tags_map: {
-      for k, v in 〈import;strings〉.Split(〈1;tags_str〉, " ") {
-        "\(〈1;v〉)": string
-      }
-      "{a}": string
+  dynamic: {
+    for _, s in [
+      "foo",
+    ] {
+      〈1;s〉: 1
+      "\(〈1;s〉)bar": 2
     }
   }
-  user: {
-    〈1;#User〉
-    tags_str: "b {c}"
+  issue560: {
+    #User: {
+      tags_str: string
+      tags_map: {
+        for k, v in 〈import;strings〉.Split(〈1;tags_str〉, " ") {
+          "\(〈1;v〉)": string
+        }
+        "{a}": string
+      }
+    }
+    user: {
+      〈1;#User〉
+      tags_str: "b {c}"
+    }
   }
 }

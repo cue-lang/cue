@@ -400,13 +400,7 @@ func (c *OpContext) Resolve(env *Environment, r Resolver) (*Vertex, *Bottom) {
 		return nil, arc.ChildErrors
 	}
 
-	for {
-		x, ok := arc.BaseValue.(*Vertex)
-		if !ok {
-			break
-		}
-		arc = x
-	}
+	arc = arc.Indirect()
 
 	return arc, err
 }
@@ -761,6 +755,9 @@ func (c *OpContext) lookup(x *Vertex, pos token.Pos, l Feature, state VertexStat
 	}
 
 	a := x.Lookup(l)
+	if a != nil {
+		a = a.Indirect()
+	}
 
 	var hasCycle bool
 outer:

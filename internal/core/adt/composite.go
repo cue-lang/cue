@@ -487,7 +487,7 @@ func Unwrap(v Value) Value {
 	if !ok {
 		return v
 	}
-	// b, _ := x.BaseValue.(*Bottom)
+	x = x.Indirect()
 	if n := x.state; n != nil && isCyclePlaceholder(x.BaseValue) {
 		if n.errs != nil && !n.errs.IsIncomplete() {
 			return n.errs
@@ -497,6 +497,19 @@ func Unwrap(v Value) Value {
 		}
 	}
 	return x.Value()
+}
+
+// Indirect unrolls indirections of Vertex values. These may be introduced,
+// for instance, by temporary bindings such as comprehension values.
+// It returns v itself if v does not point to another Vertex.
+func (v *Vertex) Indirect() *Vertex {
+	for {
+		arc, ok := v.BaseValue.(*Vertex)
+		if !ok {
+			return v
+		}
+		v = arc
+	}
 }
 
 // OptionalType is a bit field of the type of optional constraints in use by an
@@ -639,6 +652,7 @@ func (v *Vertex) IsList() bool {
 func (v *Vertex) Lookup(f Feature) *Vertex {
 	for _, a := range v.Arcs {
 		if a.Label == f {
+			a = a.Indirect()
 			return a
 		}
 	}

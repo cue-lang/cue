@@ -34,21 +34,18 @@ type Feature uint32
 
 // InvalidLabel is an encoding of an erroneous label.
 const (
-	InvalidLabel Feature = 0x7 // 0xb111
+	InvalidLabel Feature = 0
 
 	// MaxIndex indicates the maximum number of unique strings that are used for
 	// labeles within this CUE implementation.
-	MaxIndex = 1<<28 - 1
+	MaxIndex = 1<<(32-indexShift) - 1
 )
 
 // These labels can be used for wildcard queries.
 var (
-	// AnyLabel represents any label or index.
-	AnyLabel Feature = 0
-
 	AnyDefinition Feature = makeLabel(MaxIndex, DefinitionLabel)
 	AnyHidden     Feature = makeLabel(MaxIndex, HiddenLabel)
-	AnyRegular    Feature = makeLabel(MaxIndex, StringLabel)
+	AnyString     Feature = makeLabel(MaxIndex, StringLabel)
 	AnyIndex      Feature = makeLabel(MaxIndex, IntLabel)
 )
 
@@ -257,25 +254,26 @@ func makeLabel(index int64, f FeatureType) Feature {
 type FeatureType int8
 
 const (
-	StringLabel           FeatureType = 0 // 0b000
-	IntLabel              FeatureType = 1 // 0b001
-	DefinitionLabel       FeatureType = 3 // 0b011
-	HiddenLabel           FeatureType = 6 // 0b110
-	HiddenDefinitionLabel FeatureType = 7 // 0b111
+	InvalidLabelType FeatureType = iota
+	StringLabel
+	IntLabel
+	DefinitionLabel
+	HiddenLabel
+	HiddenDefinitionLabel
+)
 
-	// letLabel              FeatureType = 0b010
+const (
+	fTypeMask Feature = 0b1111
 
-	fTypeMask Feature = 7 // 0b111
-
-	indexShift = 3
+	indexShift = 4
 )
 
 func (f FeatureType) IsDef() bool {
-	return f&DefinitionLabel == DefinitionLabel
+	return f == DefinitionLabel || f == HiddenDefinitionLabel
 }
 
 func (f FeatureType) IsHidden() bool {
-	return f&HiddenLabel == HiddenLabel
+	return f == HiddenLabel || f == HiddenDefinitionLabel
 }
 
 // IsValid reports whether f is a valid label.
@@ -285,7 +283,10 @@ func (f Feature) IsValid() bool { return f != InvalidLabel }
 func (f Feature) Typ() FeatureType { return FeatureType(f & fTypeMask) }
 
 // IsRegular reports whether a label represents a data field.
-func (f Feature) IsRegular() bool { return f.Typ() <= IntLabel }
+func (f Feature) IsRegular() bool {
+	t := f.Typ()
+	return t == IntLabel || t == StringLabel
+}
 
 // IsString reports whether a label represents a regular field.
 func (f Feature) IsString() bool { return f.Typ() == StringLabel }
@@ -293,10 +294,6 @@ func (f Feature) IsString() bool { return f.Typ() == StringLabel }
 // IsDef reports whether the label is a definition (an identifier starting with
 // # or #_.
 func (f Feature) IsDef() bool {
-	if f == InvalidLabel {
-		// TODO(perf): do more mask trickery to avoid this branch.
-		return false
-	}
 	return f.Typ().IsDef()
 }
 
@@ -306,10 +303,6 @@ func (f Feature) IsInt() bool { return f.Typ() == IntLabel }
 // IsHidden reports whether this label is hidden (an identifier starting with
 // _ or #_).
 func (f Feature) IsHidden() bool {
-	if f == InvalidLabel {
-		// TODO(perf): do more mask trickery to avoid this branch.
-		return false
-	}
 	return f.Typ().IsHidden()
 }
 

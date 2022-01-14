@@ -342,7 +342,7 @@ func Accept(ctx *OpContext, n *Vertex, f Feature) (found, required bool) {
 
 	var str Value
 	if f.Index() == MaxIndex {
-		f = 0
+		f &= fTypeMask
 	} else if optionalTypes&(HasComplexPattern|HasDynamic) != 0 && f.IsString() {
 		str = f.ToValue(ctx)
 	}
@@ -466,7 +466,7 @@ func getScratch(ctx *OpContext, s *closeInfo) *closeStats {
 }
 
 func verifyArc(ctx *OpContext, s *StructInfo, f Feature, label Value) bool {
-	isRegular := f.IsRegular()
+	isRegular := f.IsString()
 
 	o := s.StructLit
 	env := s.Env

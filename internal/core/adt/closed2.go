@@ -41,8 +41,8 @@ func verifyArc2(ctx *OpContext, f Feature, v *Vertex, isClosed bool) (found bool
 		return true, nil
 	}
 
-	if !f.IsString() && f != InvalidLabel {
-		// if f.IsHidden() && f != InvalidLabel { Also change Accept in composite.go
+	if !f.IsString() {
+		// if f.IsHidden()  { Also change Accept in composite.go
 		return false, nil
 	}
 

@@ -594,7 +594,7 @@ func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
 		}
 	}
 
-	if k := v.Kind(); k&StructKind == 0 && f.IsString() && f != AnyLabel {
+	if k := v.Kind(); k&StructKind == 0 && f.IsString() {
 		// If the value is bottom, we may not really know if this used to
 		// be a struct.
 		if k != BottomKind || len(v.Structs) == 0 {

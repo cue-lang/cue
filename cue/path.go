@@ -57,11 +57,6 @@ func (sel Selector) PkgPath() string {
 }
 
 var (
-	// AnyField can be used to ask for any single label.
-	//
-	// In paths it is used to select constraints that apply to all elements.
-	// AnyField = anyField
-	anyField = Selector{sel: anySelector(adt.AnyLabel)}
 
 	// AnyDefinition can be used to ask for any definition.
 	//
@@ -78,8 +73,8 @@ var (
 	// AnyString can be used to ask for any regular string field.
 	//
 	// In paths it is used to select constraints that apply to all elements.
-	AnyString = anyLabel
-	anyLabel  = Selector{sel: anySelector(adt.AnyRegular)}
+	AnyString = anyString
+	anyString = Selector{sel: anySelector(adt.AnyString)}
 )
 
 // Optional converts sel into an optional equivalent.

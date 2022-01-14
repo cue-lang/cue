@@ -40,12 +40,11 @@ outer:
 	if !f.IsRegular() {
 		return
 	}
+	var label Value
+
 	if int64(f.Index()) == MaxIndex {
 		f = 0
-	}
-
-	var label Value
-	if o.types&HasComplexPattern != 0 && f.IsString() {
+	} else if o.types&HasComplexPattern != 0 && f.IsString() {
 		label = f.ToValue(c)
 	}
 

@@ -232,7 +232,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 	case x.IsClosedList():
 		return false
 	default:
-		a := &adt.Vertex{Label: 0}
+		a := &adt.Vertex{Label: adt.AnyIndex}
 		x.MatchAndInsert(ctx, a)
 		a.Finalize(ctx)
 
@@ -244,7 +244,7 @@ func (s *subsumer) listVertices(x, y *adt.Vertex) bool {
 		}
 
 		if !y.IsClosedList() {
-			b := &adt.Vertex{Label: adt.InvalidLabel}
+			b := &adt.Vertex{Label: adt.AnyIndex}
 			y.MatchAndInsert(ctx, b)
 			b.Finalize(ctx)
 		}

@@ -17,6 +17,7 @@ package cue
 import (
 	"reflect"
 	"testing"
+	"time"
 
 	"github.com/google/go-cmp/cmp"
 )
@@ -212,6 +213,24 @@ func TestDecode(t *testing.T) {
 				"b": []interface{}{int(0)},
 			},
 		},
+	}, {
+		// Issue #1466
+		value: `{"x": "1s"}
+		`,
+		dst:  &S{},
+		want: S{X: Duration{D: 1000000000}},
+	}, {
+		// Issue #1466
+		value: `{"x": '1s'}
+			`,
+		dst:  &S{},
+		want: S{X: Duration{D: 1000000000}},
+	}, {
+		// Issue #1466
+		value: `{"x": 1}
+				`,
+		dst: &S{},
+		err: "Decode: x: cannot use value 1 (type int) as (string|bytes)",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
@@ -225,4 +244,24 @@ func TestDecode(t *testing.T) {
 			}
 		})
 	}
+}
+
+type Duration struct {
+	D time.Duration
+}
+type S struct {
+	X Duration `json:"x"`
+}
+
+func (d *Duration) UnmarshalText(data []byte) error {
+	v, err := time.ParseDuration(string(data))
+	if err != nil {
+		return err
+	}
+	d.D = v
+	return nil
+}
+
+func (d *Duration) MarshalText() ([]byte, error) {
+	return []byte(d.D.String()), nil
 }

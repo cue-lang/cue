@@ -117,12 +117,12 @@ func (d *decoder) decode(x reflect.Value, v Value, isPtr bool) {
 	}
 
 	if it != nil {
-		if kind := v.Kind(); kind == StringKind || kind == BytesKind {
-			d.addErr(errors.Newf(v.Pos(),
-				"cannot unmarshal %v with TextUnmarshaler", kind))
-		}
 		b, err := v.Bytes()
-		d.addErr(err)
+		if err != nil {
+			err = errors.Wrapf(err, v.Pos(), "Decode")
+			d.addErr(err)
+			return
+		}
 		d.addErr(it.UnmarshalText(b))
 		return
 	}

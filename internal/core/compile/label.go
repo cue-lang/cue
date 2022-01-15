@@ -29,6 +29,9 @@ func (c *compiler) label(n ast.Node) adt.Feature {
 	index := c.index
 	switch x := n.(type) {
 	case *ast.Ident:
+		if x.Name == "_" {
+			return adt.InvalidLabel
+		}
 		return adt.MakeIdentLabel(c.index, x.Name, c.pkgPath)
 
 	case *ast.BasicLit:

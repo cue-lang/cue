@@ -323,6 +323,10 @@ func (c *compiler) resolve(n *ast.Ident) adt.Expr {
 
 	label := c.label(n)
 
+	if label == adt.InvalidLabel { // `_`
+		return &adt.Top{Src: n}
+	}
+
 	// Unresolved field.
 	if n.Node == nil {
 		upCount := int32(0)
@@ -564,6 +568,10 @@ func (c *compiler) decl(d ast.Decl) adt.Decl {
 		switch l := lab.(type) {
 		case *ast.Ident, *ast.BasicLit:
 			label := c.label(lab)
+
+			if label == adt.InvalidLabel {
+				return c.errf(x, "cannot use _ as label")
+			}
 
 			// TODO(legacy): remove: old-school definitions
 			if x.Token == token.ISA && !label.IsDef() {

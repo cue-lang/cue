@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3e5e60f_e42877a5",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-01-15T17:59:47Z",
+      "side": 1,
+      "message": "TextUnmarshal",
+      "revId": "b8b020e096ba3ea4f669a4ca9a4026179e208232",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1f25850d_de3e9472",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-01-15T17:59:47Z",
+      "side": 1,
+      "message": "LGTM modulo a couple of minor thoughts, thanks for the prompt fix!",
+      "revId": "b8b020e096ba3ea4f669a4ca9a4026179e208232",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "34f6aa2f_9097184e",
+        "filename": "cue/decode.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1007275
+      },
+      "writtenOn": "2022-01-15T17:59:47Z",
+      "side": 1,
+      "message": "Is that error correct? It talks about TextUnmarshal where the method is named UnmarshalText, and it looks like UnmarshalText hasn\u0027t even been called at this point.",
+      "revId": "b8b020e096ba3ea4f669a4ca9a4026179e208232",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

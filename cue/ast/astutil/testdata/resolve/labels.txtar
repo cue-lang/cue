@@ -5,6 +5,12 @@ a: X
 Z=[string]: { x: string, y: Z.x }
 c: Z
 
+// `_` should not resolve.
+_: 1
+x: _
+
+for _ in [1] { a: _ }
+
 -- out/resolve/in --
 4[X]:       Scope: 0[<nil>]       Node: 0[]
 5[string]:  Scope: 0[<nil>]       Node: 0[]
@@ -21,4 +27,10 @@ c: Z
 24[x]:      Scope: 0[<nil>]       Node: 0[]
 26[c]:      Scope: 0[<nil>]       Node: 0[]
 27[Z]:      Scope: 0[<nil>]       Node: 0[]
+29[_]:      Scope: 0[<nil>]       Node: 0[]
+31[x]:      Scope: 0[<nil>]       Node: 0[]
+32[_]:      Scope: 0[<nil>]       Node: 0[]
+34[_]:      Scope: 0[<nil>]       Node: 0[]
+37[a]:      Scope: 0[<nil>]       Node: 0[]
+38[_]:      Scope: 0[<nil>]       Node: 0[]
 

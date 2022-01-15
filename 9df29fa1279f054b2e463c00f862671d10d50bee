@@ -16,6 +16,57 @@
       "message": "Added file.MkdirAll in the schema which is just a shorthand for file.Mkdir \u0026 {createParents: true}\n\nThis is in the same spirit as http.Get|Post|... that are shorthands for http.Do.",
       "revId": "9df29fa1279f054b2e463c00f862671d10d50bee",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "56318e9a_e4dc093c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 6
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-15T05:57:46Z",
+      "side": 1,
+      "message": "Apologies - a couple of last-minute nits from my side (I only had time to briefly reply to the question about file vs os last time)",
+      "revId": "9df29fa1279f054b2e463c00f862671d10d50bee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "83f8e415_187fc3b2",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 6
+      },
+      "lineNbr": 96,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-15T05:57:46Z",
+      "side": 1,
+      "message": "We should repeat the docs here about the \"do nothing\" and error cases.",
+      "revId": "9df29fa1279f054b2e463c00f862671d10d50bee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d5fd00a4_3b632a6d",
+        "filename": "pkg/tool/file/file_test.go",
+        "patchSetId": 6
+      },
+      "lineNbr": 142,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-15T05:57:46Z",
+      "side": 1,
+      "message": "This is fragile because the test will fail on a system where either a) /tmp/foo already exists or b) /tmp is not a valid path. \n\nInstead, I would suggest creating using an os.MkTempDir-created directory, defer its removal, then performing tests on directories under that directory (which also saves you from having to defer the removal of each \"test\" case.",
+      "revId": "9df29fa1279f054b2e463c00f862671d10d50bee",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

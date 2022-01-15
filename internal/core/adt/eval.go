@@ -982,10 +982,10 @@ func (c *OpContext) freeNodeContext(n *nodeContext) {
 
 // TODO(perf): return a dedicated ConflictError that can track original
 // positions on demand.
-func (n *nodeContext) addConflict(
+func (n *nodeContext) reportConflict(
 	v1, v2 Node,
 	k1, k2 Kind,
-	id1, id2 CloseInfo) {
+	ids ...CloseInfo) {
 
 	ctx := n.ctx
 
@@ -1000,8 +1000,48 @@ func (n *nodeContext) addConflict(
 
 	err.AddPosition(v1)
 	err.AddPosition(v2)
-	err.AddClosedPositions(id1)
-	err.AddClosedPositions(id2)
+	for _, id := range ids {
+		err.AddClosedPositions(id)
+	}
+
+	n.addErr(err)
+}
+
+// reportFieldMismatch reports the mixture of regular fields with non-struct
+// values. Either s or f needs to be given.
+func (n *nodeContext) reportFieldMismatch(
+	p token.Pos,
+	s *StructLit,
+	f Feature,
+	scalar Expr,
+	id ...CloseInfo) {
+
+	ctx := n.ctx
+
+	if f == InvalidLabel {
+		for _, a := range s.Decls {
+			if x, ok := a.(*Field); ok && x.Label.IsRegular() {
+				f = x.Label
+				p = pos(x)
+				break
+			}
+		}
+	}
+
+	if f == InvalidLabel {
+		n.reportConflict(scalar, s, n.kind, StructKind, id...)
+		return
+	}
+
+	err := ctx.NewPosf(p, "cannot combine regular field %q with %v", f, scalar)
+
+	if s != nil {
+		err.AddPosition(s)
+	}
+
+	for _, ci := range id {
+		err.AddClosedPositions(ci)
+	}
 
 	n.addErr(err)
 }
@@ -1015,14 +1055,22 @@ func (n *nodeContext) updateNodeType(k Kind, v Expr, id CloseInfo) bool {
 		k == BottomKind:
 		return false
 
-	case kind == BottomKind:
-		if n.kindExpr != nil {
-			n.addConflict(n.kindExpr, v, n.kind, k, n.kindID, id)
-		} else {
-			n.addErr(ctx.Newf(
-				"conflicting value %s (mismatched types %s and %s)",
-				v, n.kind, k))
-		}
+	case kind != BottomKind:
+
+	// TODO: we could consider changing the reporting for structs, but this
+	// makes only sense in case they are for embeddings. Otherwise the type
+	// of a struct is more relevant for the failure.
+	// case k == StructKind:
+	// 	s, _ := v.(*StructLit)
+	// 	n.reportFieldMismatch(token.NoPos, s, 0, n.kindExpr, id, n.kindID)
+
+	case n.kindExpr != nil:
+		n.reportConflict(n.kindExpr, v, n.kind, k, n.kindID, id)
+
+	default:
+		n.addErr(ctx.Newf(
+			"conflicting value %s (mismatched types %s and %s)",
+			v, n.kind, k))
 	}
 
 	if n.kind != kind || n.kindExpr == nil {
@@ -1642,7 +1690,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 	case Value: // *NullLit, *BoolLit, *NumLit, *StringLit, *BytesLit, *Builtin
 		if y := n.scalar; y != nil {
 			if b, ok := BinOp(ctx, EqualOp, x, y).(*Bool); !ok || !b.B {
-				n.addConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)
+				n.reportConflict(x, y, x.Kind(), y.Kind(), n.scalarID, id)
 			}
 			// TODO: do we need to explicitly add again?
 			// n.scalar = nil

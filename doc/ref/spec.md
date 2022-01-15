@@ -1345,7 +1345,7 @@ S3: {
 #### Definitions and hidden fields
 
 A field is a _definition_ if its identifier starts with `#` or `_#`.
-A field is _hidden_ if its starts with a `_`.
+A field is _hidden_ if its identifier starts with a `_`.
 All other fields are _regular_.
 
 Definitions and hidden fields are not emitted when converting a CUE program

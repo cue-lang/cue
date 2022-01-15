@@ -7,6 +7,11 @@ y: {} // check that empty struct after reference works.
 
 k: { for v in e { v } }
 e: int
+
+comprehensionBinds: {
+    a: { for _ in [1] { a: _ } }
+    b: { for _, _ in [1] { a: _ } }
+}
 -- out/eval --
 Errors:
 k: invalid operand e (found int, want list or struct):
@@ -32,6 +37,14 @@ Result:
     //     ./in.cue:7:15
   }
   e: (int){ int }
+  comprehensionBinds: (struct){
+    a: (struct){
+      a: (_){ _ }
+    }
+    b: (struct){
+      a: (_){ _ }
+    }
+  }
 }
 -- out/compile --
 --- in.cue
@@ -57,4 +70,20 @@ Result:
     }
   }
   e: int
+  comprehensionBinds: {
+    a: {
+      for _, _ in [
+        1,
+      ] {
+        a: _
+      }
+    }
+    b: {
+      for _, _ in [
+        1,
+      ] {
+        a: _
+      }
+    }
+  }
 }

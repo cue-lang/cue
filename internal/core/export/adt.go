@@ -444,7 +444,7 @@ func (e *exporter) comprehension(y adt.Yielder) ast.Expr {
 			_, saved := e.pushFrame(nil)
 			defer e.popFrame(saved)
 
-			if x.Key != 0 {
+			if x.Key != 0 || (x.Syntax != nil && x.Syntax.Key != nil) {
 				key := e.ident(x.Key)
 				clause.Key = key
 				e.addField(x.Key, nil, clause)

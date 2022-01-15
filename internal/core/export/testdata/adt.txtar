@@ -99,6 +99,12 @@ y1: {
 	]
 }
 
+preserveKeyFieldInComprehension: {
+	for _, s in [1] {
+		s
+	}
+}
+
 errorStructDef: {
 	a: 1
 	b: 1 & 2
@@ -199,6 +205,11 @@ y1: {
 		y
 	}]
 }
+preserveKeyFieldInComprehension: {
+	for _, s in [1] {
+		s
+	}
+}
 errorStructDef: {
 	a:    1
 	b:    _|_ // conflicting values 2 and 1
@@ -270,6 +281,7 @@ errorListDef: {
 [y1 bar2]
 [y1 foo1]
 [y1 foo2]
+[preserveKeyFieldInComprehension]
 [errorStructDef]
 [errorStructDef a]
 [errorStructDef b]
@@ -354,6 +366,7 @@ _|_ // e3: index out of range [2] with length 2
 		x: [1, 2, 3]
 		foo2: 3
 	}
+	preserveKeyFieldInComprehension: 1
 	errorStructDef: {
 		a:    1
 		b:    _|_ // errorStructDef.b: conflicting values 2 and 1

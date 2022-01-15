@@ -238,6 +238,9 @@ func (s *scope) resolveScope(name string, node ast.Node) (scope ast.Node, e entr
 func (s *scope) lookup(name string) (p *scope, obj ast.Node, node entry) {
 	// TODO(#152): consider returning nil for obj if it is a reference to root.
 	// last := s
+	if name == "_" {
+		return nil, nil, entry{}
+	}
 	for s != nil {
 		if n, ok := s.index[name]; ok {
 			if _, ok := n.node.(*ast.ImportSpec); ok {

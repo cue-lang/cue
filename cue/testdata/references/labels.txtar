@@ -57,13 +57,6 @@ underscore: a: {
     #Foo: [=~""]: string
 }
 
-underscore: b: {
-    foo: #Foo
-    // TODO: we should probably disallow the hidden label `_` to avoid confusion.
-    foo: _: "bar"
-    #Foo: [=~""]: string
-}
-
 underscore: c: {
     foo: "_": "any"
     foo: [=~""]: string
@@ -140,13 +133,6 @@ underscore: e: {
     a: (struct){
       foo: (#struct){
         "_": (string){ "bar" }
-      }
-      #Foo: (#struct){
-      }
-    }
-    b: (struct){
-      foo: (#struct){
-        _: (string){ "bar" }
       }
       #Foo: (#struct){
       }
@@ -260,17 +246,6 @@ underscore: e: {
       foo: 〈0;#Foo〉
       foo: {
         "_": "bar"
-      }
-      #Foo: {
-        [=~""]: string
-      }
-    }
-  }
-  underscore: {
-    b: {
-      foo: 〈0;#Foo〉
-      foo: {
-        _: "bar"
       }
       #Foo: {
         [=~""]: string

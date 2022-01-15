@@ -27,8 +27,6 @@ func predeclared(n *ast.Ident) adt.Expr {
 	// String, Bytes, Boolean, Integer, Number.
 	// These names will not conflict with idiomatic camel-case JSON.
 	switch n.Name {
-	case "_":
-		return &adt.Top{Src: n}
 	case "string", "__string":
 		return &adt.BasicType{Src: n, K: adt.StringKind}
 	case "bytes", "__bytes":

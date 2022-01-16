@@ -33,6 +33,24 @@
       "message": "Should be:\n\n    x.Key !\u003d adt.InvalidLabel\n    \nfor consistency?",
       "revId": "5fe4132a73a0798fc64dcb0802af3149ff8a4767",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "0c834454_2b2ef016",
+        "filename": "internal/core/export/adt.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 447,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-16T06:57:29Z",
+      "side": 1,
+      "message": "Yep, makes sense.",
+      "parentUuid": "1a1852c5_28be6408",
+      "revId": "5fe4132a73a0798fc64dcb0802af3149ff8a4767",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

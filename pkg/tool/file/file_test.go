@@ -20,6 +20,7 @@ import (
 	"os"
 	"path/filepath"
 	"reflect"
+	"runtime"
 	"testing"
 
 	"cuelang.org/go/cue"
@@ -147,7 +148,7 @@ func TestMkdir(t *testing.T) {
 
 	// simple dir creation
 	d1 := filepath.Join(baseDir, "foo")
-	v := parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, d1))
+	v := parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: #"%s"#}`, d1))
 	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
@@ -160,12 +161,15 @@ func TestMkdir(t *testing.T) {
 		t.Fatal("not a directory")
 	}
 	expectedMode1 := os.ModeDir | 0755
+	if runtime.GOOS == "windows" {
+		expectedMode1 = os.ModeDir | 0777
+	}
 	if int(fi1.Mode()) != int(expectedMode1) {
 		t.Fatal("wrong permissions", fi1.Mode())
 	}
 
 	// dir already exists
-	v = parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, d1))
+	v = parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: #"%s"#}`, d1))
 	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
@@ -174,7 +178,7 @@ func TestMkdir(t *testing.T) {
 	// create parents
 	// set permissions
 	d2 := filepath.Join(baseDir, "bar/x")
-	v = parse(t, "tool/file.MkdirAll", fmt.Sprintf(`{path: "%s", permissions: 0o700}`, d2))
+	v = parse(t, "tool/file.MkdirAll", fmt.Sprintf(`{path: #"%s"#, permissions: 0o700}`, d2))
 	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)
@@ -187,6 +191,9 @@ func TestMkdir(t *testing.T) {
 		t.Fatal("not a directory")
 	}
 	expectedMode2 := os.ModeDir | 0700
+	if runtime.GOOS == "windows" {
+		expectedMode2 = os.ModeDir | 0777
+	}
 	if int(fi2.Mode()) != int(expectedMode2) {
 		t.Fatal("wrong permissions", fi2.Mode())
 	}
@@ -196,7 +203,7 @@ func TestMkdir(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	v = parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, f.Name()))
+	v = parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: #"%s"#}`, f.Name()))
 	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
 	if err == nil {
 		t.Fatal("should not create directory at existing filepath")

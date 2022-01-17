@@ -50,6 +50,16 @@ func Duration(s string) (bool, error) {
 	return true, nil
 }
 
+// FormatDuration converts nanoseconds to a string representing the duration in
+// the form "72h3m0.5s".
+//
+// Leading zero units are omitted. As a special case, durations less than
+// one second use a smaller unit (milli-, micro-, or nanoseconds) to ensure
+// that the leading digit is non-zero. The zero duration formats as 0s.
+func FormatDuration(d int64) string {
+	return time.Duration(d).String()
+}
+
 // ParseDuration reports the nanoseconds represented by a duration string.
 //
 // A duration string is a possibly signed sequence of

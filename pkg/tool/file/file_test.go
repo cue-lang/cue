@@ -147,7 +147,7 @@ func TestMkdir(t *testing.T) {
 
 	// simple dir creation
 	d1 := filepath.Join(baseDir, "foo")
-	v := parse(t, "tool/file.Mkdir", fmt.Sprintf(`{path: "%s"}`, d1))
+	v := parse(t, "tool/file.Mkdir", `{path: "`+d1+`"}`)
 	_, err = (*cmdMkdir).Run(nil, &task.Context{Obj: v})
 	if err != nil {
 		t.Fatal(err)

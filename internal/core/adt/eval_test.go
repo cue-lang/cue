@@ -104,8 +104,11 @@ func TestX(t *testing.T) {
 -- cue.mod/module.cue --
 module: "example.com"
 
--- in.cue --
-	`
+-- x.cue --
+b: {...}
+ok: len(b) == 1
+ok: true
+`
 
 	if strings.HasSuffix(strings.TrimSpace(in), ".cue --") {
 		t.Skip()

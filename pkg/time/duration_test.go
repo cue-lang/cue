@@ -48,6 +48,26 @@ func TestDuration(t *testing.T) {
 	}
 }
 
+func TestFormatDuration(t *testing.T) {
+	valid := []struct {
+		in  int64
+		out string
+	}{
+		{3*Hour + 2*Minute, "3h2m0s"},
+		{5 * Second, "5s"},
+		{600 * Millisecond, "600ms"},
+	}
+
+	for _, tc := range valid {
+		t.Run(tc.out, func(t *testing.T) {
+			s := FormatDuration(tc.in)
+			if s != tc.out {
+				t.Fatalf("got %v; want %v", s, tc.out)
+			}
+		})
+	}
+}
+
 func TestParseDuration(t *testing.T) {
 	valid := []struct {
 		in  string

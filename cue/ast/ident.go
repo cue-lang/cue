@@ -68,38 +68,6 @@ func IsValidIdent(ident string) bool {
 	return true
 }
 
-// QuoteIdent quotes an identifier, if needed, and reports
-// an error if the identifier is invalid.
-//
-// Deprecated: quoted identifiers are deprecated. Use aliases.
-func QuoteIdent(ident string) (string, error) {
-	if ident != "" && ident[0] == '`' {
-		if _, err := strconv.Unquote(ident); err != nil {
-			return "", errors.Newf(token.NoPos, "invalid quoted identifier %q", ident)
-		}
-		return ident, nil
-	}
-
-	// TODO: consider quoting keywords
-	// switch ident {
-	// case "for", "in", "if", "let", "true", "false", "null":
-	// 	goto escape
-	// }
-
-	for _, r := range ident {
-		if isLetter(r) || isDigit(r) || r == '_' || r == '$' {
-			continue
-		}
-		if r == '-' {
-			return "`" + ident + "`", nil
-		}
-		return "", errors.Newf(token.NoPos, "invalid character '%s' in identifier", string(r))
-	}
-
-	_, err := parseIdent(token.NoPos, ident)
-	return ident, err
-}
-
 // ParseIdent unquotes a possibly quoted identifier and validates
 // if the result is valid.
 //

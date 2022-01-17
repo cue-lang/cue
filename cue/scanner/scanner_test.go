@@ -85,7 +85,6 @@ var testTokens = [...]elt{
 	{token.IDENT, "#_foobar", literal},
 	{token.IDENT, "_#foobar", literal},
 	{token.IDENT, "__#foobar", literal},
-	{token.IDENT, "`foobar`", literal},
 	{token.IDENT, "a۰۱۸", literal},
 	{token.IDENT, "foo६४", literal},
 	{token.IDENT, "bar９８７６", literal},
@@ -739,13 +738,12 @@ var errorTests = []struct {
 	lit string
 	err string
 }{
+	{"`", token.ILLEGAL, 0, "", "illegal character U+0060 '`'"},
+
 	{"\a", token.ILLEGAL, 0, "", "illegal character U+0007"},
 	{`^`, token.ILLEGAL, 0, "", "illegal character U+005E '^'"},
 	{`…`, token.ILLEGAL, 0, "", "illegal character U+2026 '…'"},
 	{`_|`, token.ILLEGAL, 0, "", "illegal token '_|'; expected '_'"},
-
-	{"`foo=bar`", token.IDENT, 4, "`foo=bar`", "invalid character '=' in identifier"},
-	{"`foo\nbar`", token.IDENT, 4, "`foo", "quoted identifier not terminated"},
 
 	{`@`, token.ATTRIBUTE, 1, `@`, "invalid attribute: expected '('"},
 	{`@foo`, token.ATTRIBUTE, 4, `@foo`, "invalid attribute: expected '('"},
@@ -784,6 +782,7 @@ var errorTests = []struct {
 	{`"\U00000000"`, token.STRING, 0, `"\U00000000"`, ""},
 	{`"\Uffffffff"`, token.STRING, 2, `"\Uffffffff"`, "escape sequence is invalid Unicode code point"},
 	{`'`, token.STRING, 0, `'`, "string literal not terminated"},
+	{`"`, token.STRING, 0, `"`, "string literal not terminated"},
 	{`""`, token.STRING, 0, `""`, ""},
 	{`"abc`, token.STRING, 0, `"abc`, "string literal not terminated"},
 	{`""abc`, token.STRING, 0, `""`, ""},

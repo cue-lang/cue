@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "17d5ef36_c34f2ec0",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-17T17:14:53Z",
+      "side": 1,
+      "message": "Thanks very much for tracking this down. Apologies again for failing to run the trybots on your first CL - entirely my bad.\n\nCouple of comments which I think we need to address.\n\nAnd on that basis I\u0027ve actually submitted https://review.gerrithub.io/c/cue-lang/cue/+/531318 to revert the previous CL whilst we finalise the changes.",
+      "revId": "523bab029c55300e155e77af5c4a91fea2e860d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9a76c2fb_75dbdf4f",
+        "filename": "pkg/tool/file/file_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-17T17:14:53Z",
+      "side": 1,
+      "message": "This failure actually caused me to look a bit harder at how Go itself tests Mkdir. \n\nI had a quick look, but can\u0027t see that Go actually tests the resulting permissions anywhere. \n\nDid you find anything? Is that what prompted you to make the change below?\n\nIn any case, I think writing a test ends up being a bit more tricky because we also need to set umask (on Unix systems), because that will affect the result. \n\nSo on the basis that Go doesn\u0027t appear to actually test the result of Mkdir, and given the complications with actually doing so, I\u0027d suggest we drop the assertions about resulting permissions altogether. \n\nWe also need to tweak the docs for Mkdir (per https://pkg.go.dev/os#Mkdir) to say that the permissions are before umask.",
+      "revId": "523bab029c55300e155e77af5c4a91fea2e860d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

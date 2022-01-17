@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "e68f240b_6e426158",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-17T19:01:17Z",
+      "side": 1,
+      "message": "Updated this CL to includes all changes + fixes",
+      "parentUuid": "17d5ef36_c34f2ec0",
+      "revId": "523bab029c55300e155e77af5c4a91fea2e860d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9a76c2fb_75dbdf4f",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-01-17T17:14:53Z",
       "side": 1,
       "message": "This failure actually caused me to look a bit harder at how Go itself tests Mkdir. \n\nI had a quick look, but can\u0027t see that Go actually tests the resulting permissions anywhere. \n\nDid you find anything? Is that what prompted you to make the change below?\n\nIn any case, I think writing a test ends up being a bit more tricky because we also need to set umask (on Unix systems), because that will affect the result. \n\nSo on the basis that Go doesn\u0027t appear to actually test the result of Mkdir, and given the complications with actually doing so, I\u0027d suggest we drop the assertions about resulting permissions altogether. \n\nWe also need to tweak the docs for Mkdir (per https://pkg.go.dev/os#Mkdir) to say that the permissions are before umask.",
+      "revId": "523bab029c55300e155e77af5c4a91fea2e860d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "2fa35b3f_f6c7d48b",
+        "filename": "pkg/tool/file/file_test.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 163,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-17T19:01:17Z",
+      "side": 1,
+      "message": "\u003e This failure actually caused me to look a bit harder at how Go itself tests Mkdir. \n\u003e \n\u003e I had a quick look, but can\u0027t see that Go actually tests the resulting permissions anywhere. \n\u003e \n\u003e Did you find anything? Is that what prompted you to make the change below?\n\nNo I didn\u0027t check, I just went ahead to validate the dev I was doing\n\n\u003e In any case, I think writing a test ends up being a bit more tricky because we also need to set umask (on Unix systems), because that will affect the result. \n\u003e \n\u003e So on the basis that Go doesn\u0027t appear to actually test the result of Mkdir, and given the complications with actually doing so, I\u0027d suggest we drop the assertions about resulting permissions altogether. \n\nAgreed, that\u0027s not necessary but go probably should have some tests about that :)\n\n\u003e We also need to tweak the docs for Mkdir (per https://pkg.go.dev/os#Mkdir) to say that the permissions are before umask.\n\nDone",
+      "parentUuid": "9a76c2fb_75dbdf4f",
       "revId": "523bab029c55300e155e77af5c4a91fea2e860d8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

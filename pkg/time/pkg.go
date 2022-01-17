@@ -48,6 +48,18 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "FormatDuration",
+		Params: []internal.Param{
+			{Kind: adt.IntKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			d := c.Int64(0)
+			if c.Do() {
+				c.Ret = FormatDuration(d)
+			}
+		},
+	}, {
 		Name: "ParseDuration",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},

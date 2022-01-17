@@ -131,8 +131,8 @@ func (n *nodeContext) expandDisjuncts(
 		n.node = node
 	}()
 
-	for n.expandOne() {
-	}
+	n.injectDynamic()
+	n.injectDynamicFields()
 
 	// save node to snapShot in nodeContex
 	// save nodeContext.

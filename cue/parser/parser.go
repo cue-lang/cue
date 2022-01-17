@@ -388,10 +388,6 @@ func (p *parser) next() {
 			p.comments.add(comment)
 		}
 	}
-
-	if p.tok == token.IDENT && p.lit[0] == '`' {
-		p.assertV0(p.pos, 0, 13, "quoted identifiers")
-	}
 }
 
 // assertV0 indicates the last version at which a certain feature was

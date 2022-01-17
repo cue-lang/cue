@@ -44,34 +44,6 @@ c: __quo(2, 9)
 d: __rem(1.0, 1.0) // pass on illegal values.
 `,
 	}, {
-		name: "referenced quoted fields",
-		in: `package foo
-
-a: {
-	fiz: 4
-	faz: ` + "`fiz`" + `
-
-	// biz
-	` + "`biz`" + `: 5 // biz
-	buz: ` + "`biz`" + `
-	in: 3
-	ref: ` + "`in`" + ` & x
-}
-`,
-		out: `package foo
-
-a: {
-	fiz: 4
-	faz: fiz
-
-	// biz
-	biz:     5 // biz
-	buz:     biz
-	X1="in": 3
-	ref:     X1 & x
-}
-`,
-	}, {
 		in: `
 		y = foo
 		`,

@@ -20,7 +20,6 @@
 package fix
 
 import (
-	"fmt"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -118,95 +117,6 @@ func File(f *ast.File, o ...Option) *ast.File {
 			}
 			x.List = comments
 			return false
-		}
-		return true
-	}, nil)
-
-	// Referred nodes and used identifiers.
-	referred := map[ast.Node]string{}
-	used := map[string]bool{}
-	replacement := map[ast.Node]string{}
-
-	ast.Walk(f, func(n ast.Node) bool {
-		if i, ok := n.(*ast.Ident); ok {
-			str, err := ast.ParseIdent(i)
-			if err != nil {
-				return false
-			}
-			referred[i.Node] = str
-			used[str] = true
-		}
-		return true
-	}, nil)
-
-	num := 0
-	newIdent := func() string {
-		for num++; ; num++ {
-			str := fmt.Sprintf("X%d", num)
-			if !used[str] {
-				used[str] = true
-				return str
-			}
-		}
-	}
-
-	// Rewrite quoted identifier fields that are referenced.
-	f = astutil.Apply(f, func(c astutil.Cursor) bool {
-		n := c.Node()
-		switch x := n.(type) {
-		case *ast.Field:
-			m, ok := referred[x.Value]
-			if !ok {
-				break
-			}
-
-			if b, ok := x.Label.(*ast.Ident); ok {
-				str, err := ast.ParseIdent(b)
-				var expr ast.Expr = b
-
-				switch {
-				case token.Lookup(str) != token.IDENT:
-					// quote keywords
-					expr = ast.NewString(b.Name)
-
-				case err != nil || str != m || str == b.Name:
-					return true
-
-				case ast.IsValidIdent(str):
-					x.Label = astutil.CopyMeta(ast.NewIdent(str), x.Label).(ast.Label)
-					return true
-				}
-
-				ident := newIdent()
-				replacement[x.Value] = ident
-				expr = &ast.Alias{Ident: ast.NewIdent(ident), Expr: expr}
-				ast.SetRelPos(x.Label, token.NoRelPos)
-				x.Label = astutil.CopyMeta(expr, x.Label).(ast.Label)
-			}
-		}
-		return true
-	}, nil).(*ast.File)
-
-	// Replace quoted references with their alias identifier.
-	astutil.Apply(f, func(c astutil.Cursor) bool {
-		n := c.Node()
-		switch x := n.(type) {
-		case *ast.Ident:
-			if r, ok := replacement[x.Node]; ok {
-				c.Replace(astutil.CopyMeta(ast.NewIdent(r), n))
-				break
-			}
-			str, err := ast.ParseIdent(x)
-			if err != nil || str == x.Name {
-				break
-			}
-			// Either the identifier is valid, in which can be replaced simply
-			// as here, or it is a complicated identifier and the original
-			// destination must have been quoted, in which case it is handled
-			// above.
-			if ast.IsValidIdent(str) && token.Lookup(str) == token.IDENT {
-				c.Replace(astutil.CopyMeta(ast.NewIdent(str), n))
-			}
 		}
 		return true
 	}, nil)

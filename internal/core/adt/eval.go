@@ -253,7 +253,6 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		n.conjuncts = v.Conjuncts
 		if n.insertConjuncts(state) {
-			n.maybeSetCache()
 			v.UpdateStatus(Partial)
 			return
 		}
@@ -267,9 +266,7 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		v.status = Evaluating
 
-		// Use maybeSetCache for cycle breaking
-		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
-		}
+		n.injectDynamic()
 
 		n.doNotify()
 
@@ -411,6 +408,7 @@ func (n *nodeContext) insertConjuncts(state VertexStatus) bool {
 			}
 		}
 		if n.scalar != nil && n.node.isDefined() {
+			n.maybeSetCache()
 			return true
 		}
 	}
@@ -481,9 +479,9 @@ func (n *nodeContext) postDisjunct(state VertexStatus) {
 	ctx := n.ctx
 
 	for {
-		// Use maybeSetCache for cycle breaking
-		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
-		}
+		// All embeddings, and thus also all comprehensions, must have been
+		// evaluated at this point.
+		n.injectDynamic()
 
 		if aList, id := n.addLists(); aList != nil {
 			n.updateNodeType(ListKind, aList, id)
@@ -1327,6 +1325,7 @@ type envExpr struct {
 type envDynamic struct {
 	env   *Environment
 	field *DynamicField
+	f     Feature
 	id    CloseInfo
 	err   *Bottom
 }
@@ -1939,7 +1938,11 @@ func (n *nodeContext) addStruct(
 		case *DynamicField:
 			n.aStruct = s
 			n.aStructID = closeInfo
-			n.dynamicFields = append(n.dynamicFields, envDynamic{childEnv, x, closeInfo, nil})
+			n.dynamicFields = append(n.dynamicFields, envDynamic{
+				env:   childEnv,
+				field: x,
+				id:    closeInfo,
+			})
 
 		case *Comprehension:
 			n.insertComprehension(childEnv, x, closeInfo)
@@ -2015,86 +2018,61 @@ func (n *nodeContext) insertField(f Feature, x Conjunct) *Vertex {
 	return arc
 }
 
-// expandOne adds dynamic fields to a node until a fixed point is reached.
-// On each iteration, dynamic fields that cannot resolve due to incomplete
-// values are skipped. They will be retried on the next iteration until no
-// progress can be made. Note that a dynamic field may add more dynamic fields.
-//
-// forClauses are processed after all other clauses. A struct may be referenced
-// before it is complete, meaning that fields added by other forms of injection
-// may influence the result of a for clause _after_ it has already been
-// processed. We could instead detect such insertion and feed it to the
-// ForClause to generate another entry or have the for clause be recomputed.
-// This seems to be too complicated and lead to iffy edge cases.
-// TODO(errors): detect when a field is added to a struct that is already used
-// in a for clause.
-func (n *nodeContext) expandOne() (done bool) {
+func (n *nodeContext) injectDynamic() {
+	defer n.maybeSetCache()
+
 	// Don't expand incomplete expressions if we detected a cycle.
 	if n.done() || (n.hasCycle && !n.hasNonCycle) {
-		return false
+		return
 	}
 
-	var progress bool
+	for progress := true; progress; {
+		// TODO: collect fields added by expressions and only insert them
+		// after all expressions are evaluated.
+		exprs := n.exprs
+		sz := len(exprs)
+		n.exprs = n.exprs[:0]
+		for _, x := range exprs {
+			n.addExprConjunct(x.c)
+		}
 
-	if progress = n.injectDynamic(); progress {
-		return true
+		progress = len(n.exprs) < sz
+
+		progress = progress || n.injectComprehensions(&(n.comprehensions))
 	}
 
-	if progress = n.injectComprehensions(&(n.comprehensions)); progress {
-		return true
-	}
-
-	// Do expressions after comprehensions, as comprehensions can never
-	// refer to embedded scalars, whereas expressions may refer to generated
-	// fields if we were to allow attributes to be defined alongside
-	// scalars.
-	exprs := n.exprs
-	n.exprs = n.exprs[:0]
-	for _, x := range exprs {
-		n.addExprConjunct(x.c)
-
-		// collect and and or
-	}
-	if len(n.exprs) < len(exprs) {
-		return true
-	}
-
-	// No progress, report error later if needed: unification with
-	// disjuncts may resolve this later later on.
-	return false
+	n.injectDynamicFields()
 }
 
-// injectDynamic evaluates and inserts dynamic declarations.
-func (n *nodeContext) injectDynamic() (progress bool) {
+// injectDynamicFields evaluates and inserts dynamic declarations.
+func (n *nodeContext) injectDynamicFields() {
 	ctx := n.ctx
 	k := 0
 
 	a := n.dynamicFields
-	for _, d := range n.dynamicFields {
-		var f Feature
-		v, complete := ctx.Evaluate(d.env, d.field.Key)
-		if !complete {
-			d.err, _ = v.(*Bottom)
-			a[k] = d
-			k++
-			continue
-		}
+	n.dynamicFields = a[:0]
+
+	for _, d := range a {
+		v, _ := ctx.Evaluate(d.env, d.field.Key)
 		if b, _ := v.(*Bottom); b != nil {
 			n.addValueConjunct(nil, b, d.id)
 			continue
 		}
-		f = ctx.Label(d.field.Key, v)
+		f := ctx.Label(d.field.Key, v)
 		if f.IsInt() {
 			n.addErr(ctx.NewPosf(pos(d.field.Key), "integer fields not supported"))
 		}
-		n.insertField(f, MakeConjunct(d.env, d.field, d.id))
+		a[k] = d
+		a[k].f = f
+		k++
 	}
+	a = a[:k]
 
-	progress = k < len(n.dynamicFields)
-
-	n.dynamicFields = a[:k]
-
-	return progress
+	// Add fields in a separate loop to ensure that the evaluation of dynamic
+	// fields do not depend on each other.
+	for _, d := range a {
+		n.insertField(d.f, MakeConjunct(d.env, d.field, d.id))
+	}
 }
 
 // addLists

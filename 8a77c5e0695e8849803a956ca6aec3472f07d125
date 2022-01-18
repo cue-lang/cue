@@ -1,6 +1,23 @@
 {
   "comments": [
     {
+      "unresolved": true,
+      "key": {
+        "uuid": "563194bf_76bdd617",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 1
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-01-18T09:27:41Z",
+      "side": 1,
+      "message": "Replace by:\n\n`Closes #1496`\n\nSo that the issue will be closed automatically when the patch is merged",
+      "revId": "8a77c5e0695e8849803a956ca6aec3472f07d125",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": false,
       "key": {
         "uuid": "03347930_f3e49a64",

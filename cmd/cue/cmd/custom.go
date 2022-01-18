@@ -202,6 +202,7 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		// Verify entry against template.
 		v = value.UnifyBuiltin(v, kind)
 		if err := v.Err(); err != nil {
+			err = v.Validate()
 			return nil, errors.Promote(err, "newTask")
 		}
 

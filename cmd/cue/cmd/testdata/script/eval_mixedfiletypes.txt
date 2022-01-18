@@ -1,0 +1,62 @@
+#Issue 1479
+
+exec cue eval x.cue data.json y.cue
+
+
+# Demonstrate checks are ok
+exec cue eval x.cue data.json
+cmp stdout stdout.golden
+
+# Import JSON and verify that we can assert checks are ok
+exec cue import data.json
+exec cue eval x.cue data.cue y.cue
+
+# Assert checks ok using CUE + JSON
+exec cue eval x.cue data.json y.cue
+
+-- data.json --
+{
+	"team": {
+		"alice": [
+			"EM"
+		],
+		"bob": [
+			"TL"
+		]
+	}
+}
+-- x.cue --
+import (
+	"list"
+)
+
+#Team: [string]: [...("EM" | "IC" | "TL")]
+
+team: #Team
+
+checks: {
+	enoughMembers: {
+		ok: len(team) >= 1
+	}
+
+	hasManager: {
+		ok: len([ for m in team if list.Contains(m, "EM") {m}]) >= 1
+	}
+}
+-- y.cue --
+checks: [string]: ok: true
+
+-- stdout.golden --
+#Team: {}
+team: {
+    alice: ["EM"]
+    bob: ["TL"]
+}
+checks: {
+    enoughMembers: {
+        ok: true
+    }
+    hasManager: {
+        ok: true
+    }
+}

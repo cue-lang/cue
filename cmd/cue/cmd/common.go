@@ -168,7 +168,7 @@ func (b *buildPlan) instances() iterator {
 	case len(b.insts) > 0:
 		i = &instanceIterator{
 			inst: b.instance,
-			a:    buildInstances(b.cmd, b.insts),
+			a:    buildInstances(b.cmd, b.insts, false),
 			i:    -1,
 		}
 	default:
@@ -620,7 +620,10 @@ func parseArgs(cmd *Command, args []string, cfg *config) (p *buildPlan, err erro
 		}
 
 		if schema != nil && len(schema.Files) > 0 {
-			inst := buildInstances(p.cmd, []*build.Instance{schema})[0]
+			// TODO: ignore errors here for now until reporting of concreteness
+			// of errors is correct.
+			// See https://github.com/cue-lang/cue/issues/1483.
+			inst := buildInstances(p.cmd, []*build.Instance{schema}, true)[0]
 
 			if inst.Err != nil {
 				return nil, err
@@ -715,7 +718,7 @@ func (b *buildPlan) parseFlags() (err error) {
 	return nil
 }
 
-func buildInstances(cmd *Command, binst []*build.Instance) []*cue.Instance {
+func buildInstances(cmd *Command, binst []*build.Instance, ignoreErrors bool) []*cue.Instance {
 	// TODO:
 	// If there are no files and User is true, then use those?
 	// Always use all files in user mode?
@@ -726,7 +729,7 @@ func buildInstances(cmd *Command, binst []*build.Instance) []*cue.Instance {
 		exitIfErr(cmd, inst, inst.Err, true)
 	}
 
-	if flagIgnore.Bool(cmd) {
+	if ignoreErrors || flagIgnore.Bool(cmd) {
 		return instances
 	}
 

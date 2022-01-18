@@ -145,7 +145,7 @@ func runEval(cmd *Command, args []string) error {
 		}
 		if err := v.Err(); err != nil {
 			errHeader()
-			return err
+			return v.Validate(syn...)
 		}
 
 		// TODO(#553): this can be removed once v.Syntax() below retains line

@@ -76,6 +76,28 @@ func Unmarshal(data []byte) (ast.Expr, error) {
 	return yaml.Unmarshal("", data)
 }
 
+// UnmarshalStream parses the YAML to a CUE instance.
+func UnmarshalStream(data []byte) (ast.Expr, error) {
+	d, err := yaml.NewDecoder("", data)
+	if err != nil {
+		return nil, err
+	}
+
+	a := []ast.Expr{}
+	for {
+		x, err := d.Decode()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		a = append(a, x)
+	}
+
+	return ast.NewList(a...), nil
+}
+
 // Validate validates YAML and confirms it is an instance of the schema
 // specified by v. If the YAML source is a stream, every object must match v.
 func Validate(b []byte, v cue.Value) (bool, error) {

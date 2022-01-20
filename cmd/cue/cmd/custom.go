@@ -29,6 +29,7 @@ import (
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/errors"
+	"cuelang.org/go/cue/token"
 	itask "cuelang.org/go/internal/task"
 	"cuelang.org/go/internal/value"
 	_ "cuelang.org/go/pkg/tool/cli" // Register tasks
@@ -165,7 +166,7 @@ func isTask(v cue.Value) bool {
 		return false
 	}
 	return v.Kind() == cue.StructKind &&
-		(v.Lookup("$id").Exists() || v.Lookup("kind").Exists())
+		v.Lookup("$id").Exists()
 }
 
 var legacyKinds = map[string]string{
@@ -183,13 +184,7 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 
 		kind, err := v.Lookup("$id").String()
 		if err != nil {
-			// Lookup kind for backwards compatibility.
-			// TODO: consider at some point whether kind can be removed.
-			var err1 error
-			kind, err1 = v.Lookup("kind").String()
-			if err1 != nil {
-				return nil, errors.Promote(err1, "newTask")
-			}
+			return nil, errors.Wrapf(err, token.NoPos, "new task")
 		}
 		if k, ok := legacyKinds[kind]; ok {
 			kind = k

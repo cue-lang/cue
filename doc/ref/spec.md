@@ -1062,7 +1062,8 @@ Expression                             Result (without optional fields)
 ```
 
 A struct may define constraints that apply to fields that are added when unified
-with another struct using pattern or default constraints.
+with another struct using pattern or default constraints (_Note_: default
+constraints are not yet implemented).
 
 A _pattern constraint_, denoted `[pattern]: value`, defines a pattern, which
 is a value of type string, and a value to unify with fields whose label
@@ -1087,6 +1088,7 @@ whose label does not unify with any of the patterns of the pattern
 constraints defined for `a` _and_ for which there exists no field in `a`
 with that label.
 The token `...` is a shorthand for `..._`.
+_Note_: default constraints are not yet implemented.
 
 
 ```
@@ -1094,7 +1096,7 @@ a: {
     foo:    string    // foo is a string
     [=~"^i"]: int     // all other fields starting with i are integers
     [=~"^b"]: bool    // all other fields starting with b are booleans
-    ...string         // all other fields must be a string
+    ...string         // all other fields must be a string. Note: default constraints are not yet implemented.
 }
 
 b: a & {

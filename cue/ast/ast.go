@@ -27,7 +27,7 @@ import (
 // ----------------------------------------------------------------------------
 // Interfaces
 //
-// There are two main classes of nodes: expressions, clauses, and declaration
+// There are three main classes of nodes: expressions, clauses, and declaration
 // nodes. The node names usually match the corresponding CUE spec production
 // names to which they correspond. The node fields correspond to the individual
 // parts of the respective productions.

@@ -1,0 +1,21 @@
+cue import -o - x.yaml -l objects: -l metadata.name
+cmp stdout expect-stdout
+
+-- x.yaml --
+kind: "foo"
+metadata:
+  name: foo
+---
+kind: "foo"
+metadata:
+  name: bar
+
+-- expect-stdout --
+objects: foo: {
+	kind: "foo"
+	metadata: name: "foo"
+}
+objects: bar: {
+	kind: "foo"
+	metadata: name: "bar"
+}

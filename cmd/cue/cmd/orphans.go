@@ -220,6 +220,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 							astinternal.DebugStr(x), arg)
 					}
 				}
+				ast.SetPos(label, token.NoPos)
 				a = append(a, cue.Label(label))
 				labels = append(labels, label)
 			}

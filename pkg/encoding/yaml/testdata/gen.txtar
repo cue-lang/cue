@@ -12,6 +12,20 @@ t6: yaml.ValidatePartial("a: 2\n", {a:<5, b:int})
 t7: yaml.MarshalStream([{a: 1}, {b: 2}])
 t8: yaml.Marshal({b: int | *2})
 t9: yaml.MarshalStream([{a: 1}, {b: int | *2}])
+
+unmarshalStream: {
+	t1: yaml.UnmarshalStream("a: 1\n---\nb: 2")
+	t1: yaml.UnmarshalStream('a: 1\n---\nb: 2')
+	empty: yaml.UnmarshalStream('')
+	empty: yaml.UnmarshalStream("")
+	nums: yaml.UnmarshalStream('1\n---\n2')
+	nums: yaml.UnmarshalStream("1\n---\n2")
+	null1: yaml.UnmarshalStream('1\n---\n---\n2')
+	null1: yaml.UnmarshalStream("1\n---\n---\n2")
+	null2: yaml.UnmarshalStream('1\n---\n---\n2')
+	null2: yaml.UnmarshalStream("1\n---\n---\n2")
+}
+
 -- out/yaml --
 Errors:
 a: error in call to encoding/yaml.Validate: invalid value 4 (out of bound <3):
@@ -48,4 +62,15 @@ t9: """
 	b: 2
 
 	"""
+unmarshalStream: {
+	t1: [{
+		a: 1
+	}, {
+		b: 2
+	}]
+	empty: []
+	nums: [1, 2]
+	null1: [1, null, 2]
+	null2: [1, null, 2]
+}
 

@@ -71,9 +71,31 @@ func MarshalStream(v cue.Value) (string, error) {
 	return buf.String(), nil
 }
 
-// Unmarshal parses the YAML to a CUE instance.
+// Unmarshal parses the YAML to a CUE expression.
 func Unmarshal(data []byte) (ast.Expr, error) {
 	return yaml.Unmarshal("", data)
+}
+
+// UnmarshalStream parses the YAML to a CUE list expression on success.
+func UnmarshalStream(data []byte) (ast.Expr, error) {
+	d, err := yaml.NewDecoder("", data)
+	if err != nil {
+		return nil, err
+	}
+
+	a := []ast.Expr{}
+	for {
+		x, err := d.Decode()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		a = append(a, x)
+	}
+
+	return ast.NewList(a...), nil
 }
 
 // Validate validates YAML and confirms it is an instance of the schema

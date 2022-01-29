@@ -92,6 +92,18 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "UnmarshalStream",
+		Params: []internal.Param{
+			{Kind: adt.BytesKind | adt.StringKind},
+		},
+		Result: adt.TopKind,
+		Func: func(c *internal.CallCtxt) {
+			data := c.Bytes(0)
+			if c.Do() {
+				c.Ret, c.Err = UnmarshalStream(data)
+			}
+		},
+	}, {
 		Name: "Unmarshal",
 		Params: []internal.Param{
 			{Kind: adt.BytesKind | adt.StringKind},

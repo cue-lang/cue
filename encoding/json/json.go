@@ -16,7 +16,8 @@
 package json
 
 import (
-	gojson "encoding/json"
+	"encoding/json"
+	"fmt"
 	"io"
 	"strings"
 
@@ -27,19 +28,31 @@ import (
 	"cuelang.org/go/cue/literal"
 	"cuelang.org/go/cue/parser"
 	"cuelang.org/go/cue/token"
-	"cuelang.org/go/pkg/encoding/json"
+	"cuelang.org/go/internal/value"
 )
 
 // Valid reports whether data is a valid JSON encoding.
 func Valid(b []byte) bool {
-	return gojson.Valid(b)
+	return json.Valid(b)
 }
 
 // Validate validates JSON and confirms it matches the constraints
 // specified by v.
 func Validate(b []byte, v cue.Value) error {
-	_, err := json.Validate(b, v)
-	return err
+	if !json.Valid(b) {
+		return fmt.Errorf("json: invalid JSON")
+	}
+	r := value.ConvertToRuntime(v.Context())
+	inst, err := r.Compile("json.Validate", b)
+	if err != nil {
+		return err
+	}
+
+	v = v.Unify(inst.Value())
+	if v.Err() != nil {
+		return v.Err()
+	}
+	return nil
 }
 
 // Extract parses JSON-encoded data to a CUE expression, using path for
@@ -67,13 +80,13 @@ func Decode(r *cue.Runtime, path string, data []byte) (*cue.Instance, error) {
 
 func extract(path string, b []byte) (ast.Expr, error) {
 	expr, err := parser.ParseExpr(path, b)
-	if err != nil || !gojson.Valid(b) {
+	if err != nil || !json.Valid(b) {
 		p := token.NoPos
 		if pos := errors.Positions(err); len(pos) > 0 {
 			p = pos[0]
 		}
 		var x interface{}
-		err := gojson.Unmarshal(b, &x)
+		err := json.Unmarshal(b, &x)
 		return nil, errors.Wrapf(err, p, "invalid JSON for file %q", path)
 	}
 	return expr, nil
@@ -88,7 +101,7 @@ func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 	return &Decoder{
 		r:      r,
 		path:   path,
-		dec:    gojson.NewDecoder(src),
+		dec:    json.NewDecoder(src),
 		offset: 1,
 	}
 }
@@ -97,7 +110,7 @@ func NewDecoder(r *cue.Runtime, path string, src io.Reader) *Decoder {
 type Decoder struct {
 	r      *cue.Runtime
 	path   string
-	dec    *gojson.Decoder
+	dec    *json.Decoder
 	offset int
 }
 
@@ -113,7 +126,7 @@ func (d *Decoder) Extract() (ast.Expr, error) {
 }
 
 func (d *Decoder) extract() (ast.Expr, error) {
-	var raw gojson.RawMessage
+	var raw json.RawMessage
 	err := d.dec.Decode(&raw)
 	if err == io.EOF {
 		return nil, err

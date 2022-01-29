@@ -15,6 +15,16 @@ t8: {
 	y: json.Marshal({a: x})
 }
 t9: json.MarshalStream([{a: 1}, {b: int | *2}])
+
+unmarshalStream: {
+	t1: json.UnmarshalStream(#"{"a": 1}{"b": 2}"#)
+	t1: json.UnmarshalStream(#'{"a": 1}{"b": 2}'#)
+	empty: json.UnmarshalStream('')
+	empty: json.UnmarshalStream("")
+	nums: json.UnmarshalStream('1 2')
+	nums: json.UnmarshalStream("1 2")
+}
+
 -- out/json --
 Errors:
 a: error in call to encoding/json.Validate: invalid value 10 (out of bound <3):
@@ -52,4 +62,13 @@ t9: """
 	{"b":2}
 
 	"""
+unmarshalStream: {
+	t1: [{
+		a: 1
+	}, {
+		b: 2
+	}]
+	empty: []
+	nums: [1, 2]
+}
 

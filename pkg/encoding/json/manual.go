@@ -18,6 +18,7 @@ import (
 	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 
 	"cuelang.org/go/cue"
 	"cuelang.org/go/cue/ast"
@@ -90,6 +91,26 @@ func MarshalStream(v cue.Value) (string, error) {
 		buf.WriteByte('\n')
 	}
 	return buf.String(), nil
+}
+
+// UnmarshalStream parses the JSON to a CUE instance.
+func UnmarshalStream(data []byte) (ast.Expr, error) {
+	var r cue.Runtime
+	d := cuejson.NewDecoder(&r, "", bytes.NewReader(data))
+
+	a := []ast.Expr{}
+	for {
+		x, err := d.Extract()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			return nil, err
+		}
+		a = append(a, x)
+	}
+
+	return ast.NewList(a...), nil
 }
 
 // Unmarshal parses the JSON-encoded data.

@@ -164,8 +164,16 @@ func isTask(v cue.Value) bool {
 	if len(v.Path().Selectors()) == 0 {
 		return false
 	}
-	return v.Kind() == cue.StructKind &&
-		(v.Lookup("$id").Exists() || v.Lookup("kind").Exists())
+	if v.Kind() != cue.StructKind {
+		return false
+	}
+	if v.Lookup("$id").Exists() {
+		return true
+	}
+	// Is it an existing legacy kind.
+	str, err := v.Lookup("kind").String()
+	_, ok := legacyKinds[str]
+	return err == nil && ok
 }
 
 var legacyKinds = map[string]string{
@@ -184,10 +192,10 @@ func newTaskFunc(cmd *Command) flow.TaskFunc {
 		kind, err := v.Lookup("$id").String()
 		if err != nil {
 			// Lookup kind for backwards compatibility.
-			// TODO: consider at some point whether kind can be removed.
+			// This should not be supported for cue run.
 			var err1 error
 			kind, err1 = v.Lookup("kind").String()
-			if err1 != nil {
+			if err1 != nil || legacyKinds[kind] == "" {
 				return nil, errors.Promote(err1, "newTask")
 			}
 		}

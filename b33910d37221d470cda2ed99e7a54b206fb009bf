@@ -16,6 +16,40 @@
       "message": "It\u0027s should be 1469.",
       "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a2843fc4_c83eab33",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-31T12:04:15Z",
+      "side": 1,
+      "message": "Looks good overall. Small comments.\n\nThere are some missing tests in testdata/, but we still need to add a section in the Contributors guide on how to add builtins. Haven\u0027t gotten around that yet. So for now I\u0027m fine with checking it in as is (after the few small fixes).\n",
+      "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "3c8e4843_2d376a95",
+        "filename": "pkg/time/duration.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-31T12:04:15Z",
+      "side": 1,
+      "message": "s/one-second/one second/\n\nEither\ns/format use/format using/\nor\ns/format use/use/",
+      "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

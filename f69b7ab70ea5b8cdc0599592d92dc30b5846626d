@@ -72,6 +72,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "ab94c707_27a28bc9",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-01-31T17:09:35Z",
+      "side": 1,
+      "message": "Not sure how backwards compatibility is impacted here. It seems that any struct with $id, which is not a known task type to cue/cmd, will eventually fail anyhow. Why build a task in the first place?\n\nWhat I am suggesting is to only create a task from structs with $id when it is a recognized task, by making a lookup for such tasks earlier. This is the same idea as looking for the `kind` field to see if it is something cmd/cmd recognizes as a task.",
+      "parentUuid": "2efce63a_ca482881",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55685328_17861565",
         "filename": "cmd/cue/cmd/custom.go",
         "patchSetId": 1

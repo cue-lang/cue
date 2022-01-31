@@ -90,6 +90,24 @@
     {
       "unresolved": true,
       "key": {
+        "uuid": "c718959d_f5c81d62",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-31T18:35:04Z",
+      "side": 1,
+      "message": "Generally it is bad practice to let a field like $id count only if it has a special value, as it means that the introduction of any new task type can be a breaking change. This is not the case for \"kind\" as it was only supported for backwards compatibility and only previously supported types are supported. This CL avoids clashes with Kubernetes objects, which use \"kind\" heavily.\n\nThe plan is to ultimately redo all this as cuerun, instead of cue cmd. The right thing to do, really, is to use hidden fields tied to the tool package, for instance, ensuring there can never be any conflict at all.",
+      "parentUuid": "ab94c707_27a28bc9",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
         "uuid": "55685328_17861565",
         "filename": "cmd/cue/cmd/custom.go",
         "patchSetId": 1
@@ -101,6 +119,24 @@
       "writtenOn": "2022-01-31T00:38:17Z",
       "side": 1,
       "message": "i.e. make this lookup before saying that a struct with `$id` is a task?",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f0140eef_fe737e0f",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-31T18:35:04Z",
+      "side": 1,
+      "message": "See above.",
+      "parentUuid": "55685328_17861565",
       "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

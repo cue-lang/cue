@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "b99e5826_ec7a14bf",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 3
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1019312
+      },
+      "writtenOn": "2022-01-31T18:31:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "c4e9bdfd_882317a9",
+      "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "a2843fc4_c83eab33",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 3
@@ -31,6 +49,24 @@
       "writtenOn": "2022-01-31T12:04:15Z",
       "side": 1,
       "message": "Looks good overall. Small comments.\n\nThere are some missing tests in testdata/, but we still need to add a section in the Contributors guide on how to add builtins. Haven\u0027t gotten around that yet. So for now I\u0027m fine with checking it in as is (after the few small fixes).\n",
+      "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "04bf278c_97b02c18",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019312
+      },
+      "writtenOn": "2022-01-31T18:31:28Z",
+      "side": 1,
+      "message": "I\u0027ve added a duration.txtar with some test cases as best as I\u0027ve currently could.",
+      "parentUuid": "a2843fc4_c83eab33",
       "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -48,6 +84,24 @@
       "writtenOn": "2022-01-31T12:04:15Z",
       "side": 1,
       "message": "s/one-second/one second/\n\nEither\ns/format use/format using/\nor\ns/format use/use/",
+      "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f5ed1518_d559d54e",
+        "filename": "pkg/time/duration.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1019312
+      },
+      "writtenOn": "2022-01-31T18:31:28Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3c8e4843_2d376a95",
       "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

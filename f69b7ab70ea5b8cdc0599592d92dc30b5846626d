@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "eda4c306_e492b88c",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-01-31T00:38:17Z",
+      "side": 1,
+      "message": "I happened to be in this code today, and get on gerrit, so I thought I\u0027d add a review",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cc57ac49_4f69275d",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-01-31T00:38:17Z",
+      "side": 1,
+      "message": "does this mean that any struct with an `$id: _` looks like a task?\n\nShould the same lookup to see if it is a known task logic be used for this as well?",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "55685328_17861565",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1019304
+      },
+      "writtenOn": "2022-01-31T00:38:17Z",
+      "side": 1,
+      "message": "i.e. make this lookup before saying that a struct with `$id` is a task?",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

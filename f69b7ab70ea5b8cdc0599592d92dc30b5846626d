@@ -106,6 +106,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "80139e98_d71ad722",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-31T18:45:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "c718959d_f5c81d62",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "55685328_17861565",
@@ -137,6 +155,24 @@
       "side": 1,
       "message": "See above.",
       "parentUuid": "55685328_17861565",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "77a54cbd_c34d4a14",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 205,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-01-31T18:45:22Z",
+      "side": 1,
+      "message": "Ack",
+      "parentUuid": "f0140eef_fe737e0f",
       "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

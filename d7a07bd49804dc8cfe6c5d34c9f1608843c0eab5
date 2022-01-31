@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b91ca8cd_4a6732e2",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 9,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-31T15:10:52Z",
+      "side": 1,
+      "message": "Nit: weird newlines in commit message. New client breaking things?",
+      "revId": "d7a07bd49804dc8cfe6c5d34c9f1608843c0eab5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1d15ecf7_ec780714",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 15,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-31T15:10:52Z",
+      "side": 1,
+      "message": "I think you meant #1479; certainly that\u0027s what this CL and the test appear to relate to.",
+      "revId": "d7a07bd49804dc8cfe6c5d34c9f1608843c0eab5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "f82a6ee4_0e6c7543",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-31T15:10:52Z",
+      "side": 1,
+      "message": "LGTM with one fix for the commit message, and a formatting nit :)",
+      "revId": "d7a07bd49804dc8cfe6c5d34c9f1608843c0eab5",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

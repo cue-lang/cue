@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "9e93205b_d0a8dc59",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-31T15:40:13Z",
+      "side": 1,
+      "message": "LGTM - but I defer to Marcel for the authoritative answer on Tony\u0027s questions",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cc57ac49_4f69275d",
@@ -31,6 +48,24 @@
       "writtenOn": "2022-01-31T00:38:17Z",
       "side": 1,
       "message": "does this mean that any struct with an `$id: _` looks like a task?\n\nShould the same lookup to see if it is a known task logic be used for this as well?",
+      "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2efce63a_ca482881",
+        "filename": "cmd/cue/cmd/custom.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 171,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-01-31T15:40:13Z",
+      "side": 1,
+      "message": "\u003e does this mean that any struct with an `$id: _` looks like a task?\n\nThis has always been the case AFAIK. And we keep it for backwards compatibility.\n\n\u003e Should the same lookup to see if it is a known task logic be used for this as well?\n\nAfraid I don\u0027t follow your question",
+      "parentUuid": "cc57ac49_4f69275d",
       "revId": "f69b7ab70ea5b8cdc0599592d92dc30b5846626d",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },

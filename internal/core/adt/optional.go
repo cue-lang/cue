@@ -78,9 +78,10 @@ outer:
 	// match others
 	for _, x := range o.Additional {
 		info := closeInfo
-		if _, ok := x.(*Top); !ok {
+		if _, ok := x.expr().(*Top); !ok {
 			info = info.SpawnSpan(x, ConstraintSpan)
 		}
+		// TODO: consider moving in above block (2 lines up).
 		arc.AddConjunct(MakeConjunct(&addEnv, x, info))
 	}
 }

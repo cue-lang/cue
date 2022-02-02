@@ -45,7 +45,7 @@ type StructLit struct {
 	// excluded are all literal fields that already exist.
 	Bulk []*BulkOptionalField
 
-	Additional  []Expr
+	Additional  []*Ellipsis
 	HasEmbed    bool
 	IsOpen      bool // has a ...
 	initialized bool
@@ -135,16 +135,16 @@ func (o *StructLit) Init() {
 			}
 
 		case *Ellipsis:
-			expr := x.Value
-			if x.Value == nil {
+			switch x.Value.(type) {
+			case nil, *Top:
 				o.IsOpen = true
 				o.types |= IsOpen
-				// TODO(perf): encode more efficiently.
-				expr = &Top{}
-			} else {
+
+			default:
+				// TODO: consider only adding for non-top.
 				o.types |= HasAdditional
 			}
-			o.Additional = append(o.Additional, expr)
+			o.Additional = append(o.Additional, x)
 
 		default:
 			panic("unreachable")

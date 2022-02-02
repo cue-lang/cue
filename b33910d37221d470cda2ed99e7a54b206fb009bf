@@ -104,6 +104,24 @@
       "parentUuid": "3c8e4843_2d376a95",
       "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "94c369e0_5677a539",
+        "filename": "pkg/time/duration.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 57,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-02T07:32:15Z",
+      "side": 1,
+      "message": "The hyphen between one and second still needs to be be removed (one second is not an adjective here).",
+      "parentUuid": "f5ed1518_d559d54e",
+      "revId": "b33910d37221d470cda2ed99e7a54b206fb009bf",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

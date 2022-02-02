@@ -813,10 +813,10 @@ func (c *Conjunct) Field() Node {
 // If it is a Field, it will return the field value.
 func (c *Conjunct) Elem() Elem {
 	switch x := c.x.(type) {
-	case Elem:
-		return x
 	case interface{ expr() Expr }:
 		return x.expr()
+	case Elem:
+		return x
 	default:
 		panic("unreachable")
 	}

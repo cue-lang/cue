@@ -241,6 +241,19 @@ func (x *BulkOptionalField) expr() Expr { return x.Value }
 func (*DynamicField) declNode()         {}
 func (x *DynamicField) expr() Expr      { return x.Value }
 
+// Decl, Elem, and Expr (so allow attaching original source in Conjunct)
+
+func (*Ellipsis) elemNode() {}
+func (*Ellipsis) declNode() {}
+func (x *Ellipsis) expr() Expr {
+	if x.Value == nil {
+		return top
+	}
+	return x.Value
+}
+
+var top = &Top{}
+
 // Decl and Yielder
 
 func (*LetClause) declNode() {}
@@ -251,8 +264,6 @@ func (*StructLit) declNode()        {}
 func (*StructLit) elemNode()        {}
 func (*ListLit) declNode()          {}
 func (*ListLit) elemNode()          {}
-func (*Ellipsis) elemNode()         {}
-func (*Ellipsis) declNode()         {}
 func (*Bottom) declNode()           {}
 func (*Bottom) elemNode()           {}
 func (*Null) declNode()             {}

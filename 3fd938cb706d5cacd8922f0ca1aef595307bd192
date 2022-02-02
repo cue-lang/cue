@@ -16,6 +16,57 @@
       "message": "Following Mkdir, I thought that MkdirTemp would be a useful addition. Possible use case is:\n\n* create tmp dir\n* generate files in it\n* run something\n* cleanup with file.RemoveAll\n\nI was a bit worried by windows path issues (yes I\u0027m traumatized) so I\u0027ve added the cmd_mkdirtemp test to check if the created windows temp dir path is properly filled, as it contains as \\U invalid espace code.\n\nTurns out it works (tested on my github fork), so cue seems to ignore ignore escape codes when filling values coming from tasks ?",
       "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "71b8168c_4855ad6d",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-02T07:50:30Z",
+      "side": 1,
+      "message": "MkdirTemp creates a new temporary directory in the directory dir and sets the pathname of the new directory in path. \nIt is the caller\u0027s responsibility to remove the directory when it is no longer needed.",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "e4946637_d6d42b79",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-02T07:50:30Z",
+      "side": 1,
+      "message": "The temporary directory is created in the directory specified by dir.\nIf dir is the empty string, MkdirTemp uses the default directory for\ntemporary files.",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "b7f1eff6_c665ba9f",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-02T07:50:30Z",
+      "side": 1,
+      "message": "Perhaps it is an idea to write the success status to a `success` field. The task does not have to fail, but that way other tasks can at least make decisions based on this status.",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

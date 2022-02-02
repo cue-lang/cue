@@ -19,6 +19,7 @@ foo.0: 2 errors in empty disjunction:
 foo.0.type: conflicting values "int" and "float":
     ./in.cue:3:16
     ./in.cue:5:14
+    ./in.cue:5:27
     ./in.cue:5:30
 foo.0.type: conflicting values "string" and "float":
     ./in.cue:5:14
@@ -41,6 +42,7 @@ Result:
       // foo.0.type: conflicting values "int" and "float":
       //     ./in.cue:3:16
       //     ./in.cue:5:14
+      //     ./in.cue:5:27
       //     ./in.cue:5:30
       // foo.0.type: conflicting values "string" and "float":
       //     ./in.cue:5:14

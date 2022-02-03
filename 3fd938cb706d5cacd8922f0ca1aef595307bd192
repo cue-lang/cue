@@ -35,6 +35,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "1b977156_1ad1c312",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 104,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-03T09:46:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "71b8168c_4855ad6d",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "e4946637_d6d42b79",
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "cd635804_318518f1",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 106,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-03T09:46:29Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "e4946637_d6d42b79",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "b7f1eff6_c665ba9f",
@@ -65,6 +101,24 @@
       "writtenOn": "2022-02-02T07:50:30Z",
       "side": 1,
       "message": "Perhaps it is an idea to write the success status to a `success` field. The task does not have to fail, but that way other tasks can at least make decisions based on this status.",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d70688e8_073f92db",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-03T09:46:29Z",
+      "side": 1,
+      "message": "Do you mean setting success to true if files/directories have been deleted ?",
+      "parentUuid": "b7f1eff6_c665ba9f",
       "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

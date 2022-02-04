@@ -320,7 +320,7 @@ func TestX(t *testing.T) {
 -- in.cue --
 `
 
-	t.Skip()
+	// t.Skip()
 
 	a := txtar.Parse([]byte(in))
 	instances := cuetxtar.Load(a, "/tmp/test")

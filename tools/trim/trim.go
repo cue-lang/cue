@@ -59,6 +59,7 @@ import (
 	"cuelang.org/go/internal/core/adt"
 	"cuelang.org/go/internal/core/debug"
 	"cuelang.org/go/internal/core/subsume"
+	"cuelang.org/go/internal/core/walk"
 	"cuelang.org/go/internal/value"
 )
 
@@ -81,6 +82,28 @@ func Files(files []*ast.File, inst cue.InstanceOrValue, cfg *Config) error {
 		exclude: map[ast.Node]bool{},
 		debug:   Debug,
 		w:       os.Stderr,
+	}
+
+	// Mark certain expressions as off limits.
+	// TODO: We could alternatively ensure that comprehensions unconditionally
+	// resolve.
+	visitor := &walk.Visitor{
+		Before: func(n adt.Node) bool {
+			switch x := n.(type) {
+			case *adt.StructLit:
+				// Structs with comprehensions may never be removed.
+				for _, d := range x.Decls {
+					switch d.(type) {
+					case *adt.IfClause, *adt.ForClause:
+						t.markKeep(x)
+					}
+				}
+			}
+			return true
+		},
+	}
+	for _, c := range v.Conjuncts {
+		visitor.Expr(c.Expr())
 	}
 
 	d, _, _, pickedDefault := t.addDominators(nil, v, false)
@@ -125,11 +148,8 @@ func (t *trimmer) markRemove(c adt.Conjunct) {
 	}
 }
 
-func (t *trimmer) markKeep(c adt.Conjunct) {
-	if isDom, _ := isDominator(c); isDom {
-		return
-	}
-	if src := c.Expr().Source(); src != nil {
+func (t *trimmer) markKeep(x adt.Expr) {
+	if src := x.Source(); src != nil {
 		t.exclude[src] = true
 		if t.debug {
 			t.logf("keeping")
@@ -251,7 +271,7 @@ func (t *trimmer) findSubordinates(doms, v *adt.Vertex, hasDisjunction bool) (re
 	defer func() {
 		if result == no {
 			for _, c := range v.Conjuncts {
-				t.markKeep(c)
+				t.markKeep(c.Expr())
 			}
 		}
 	}()

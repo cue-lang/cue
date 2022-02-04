@@ -280,6 +280,9 @@ type ListLit struct {
 
 	// scalars, comprehensions, ...T
 	Elems []Elem
+
+	info *StructLit // Shared closedness info.
+
 }
 
 func (x *ListLit) Source() ast.Node {

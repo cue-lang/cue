@@ -1,0 +1,223 @@
+#Issue: 758
+#Issue: 1044
+
+-- in.cue --
+A: #Task
+B: #steps: #Script & { mount: [A] }
+C: #steps: #Script & { mount: [B] }
+
+#Script: { mount: [...#Task] }
+
+#Task: {
+	// Without the proper constructs, repeating the below results
+	// in exponential runtime.
+	#ref
+	#ref
+	_ | {}
+	_ | {}
+	#steps: #Script
+	...
+}
+
+#ref: {a:1} | {b:2}
+-- out/eval --
+(struct){
+  A: (#struct){ |((#struct){
+      #steps: (#struct){
+        mount: (list){
+        }
+      }
+      a: (int){ 1 }
+    }, (#struct){
+      #steps: (#struct){
+        mount: (list){
+        }
+      }
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }, (#struct){
+      #steps: (#struct){
+        mount: (list){
+        }
+      }
+      b: (int){ 2 }
+    }) }
+  B: (struct){
+    #steps: (#struct){
+      mount: (#list){
+        0: (#struct){ |((#struct){
+            #steps: (#struct){
+              mount: (list){
+              }
+            }
+            a: (int){ 1 }
+          }, (#struct){
+            #steps: (#struct){
+              mount: (list){
+              }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            #steps: (#struct){
+              mount: (list){
+              }
+            }
+            b: (int){ 2 }
+          }) }
+      }
+    }
+  }
+  C: (struct){
+    #steps: (#struct){
+      mount: (#list){
+        0: (#struct){ |((#struct){
+            #steps: (#struct){
+              mount: (#list){
+                0: (#struct){ |((#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    a: (int){ 1 }
+                  }, (#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    a: (int){ 1 }
+                    b: (int){ 2 }
+                  }, (#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    b: (int){ 2 }
+                  }) }
+              }
+            }
+            a: (int){ 1 }
+          }, (#struct){
+            #steps: (#struct){
+              mount: (#list){
+                0: (#struct){ |((#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    a: (int){ 1 }
+                  }, (#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    a: (int){ 1 }
+                    b: (int){ 2 }
+                  }, (#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    b: (int){ 2 }
+                  }) }
+              }
+            }
+            a: (int){ 1 }
+            b: (int){ 2 }
+          }, (#struct){
+            #steps: (#struct){
+              mount: (#list){
+                0: (#struct){ |((#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    a: (int){ 1 }
+                  }, (#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    a: (int){ 1 }
+                    b: (int){ 2 }
+                  }, (#struct){
+                    #steps: (#struct){
+                      mount: (list){
+                      }
+                    }
+                    b: (int){ 2 }
+                  }) }
+              }
+            }
+            b: (int){ 2 }
+          }) }
+      }
+    }
+  }
+  #Script: (#struct){
+    mount: (list){
+    }
+  }
+  #Task: (#struct){ |((#struct){
+      #steps: (#struct){
+        mount: (list){
+        }
+      }
+      a: (int){ 1 }
+    }, (#struct){
+      #steps: (#struct){
+        mount: (list){
+        }
+      }
+      a: (int){ 1 }
+      b: (int){ 2 }
+    }, (#struct){
+      #steps: (#struct){
+        mount: (list){
+        }
+      }
+      b: (int){ 2 }
+    }) }
+  #ref: (#struct){ |((#struct){
+      a: (int){ 1 }
+    }, (#struct){
+      b: (int){ 2 }
+    }) }
+}
+-- out/compile --
+--- in.cue
+{
+  A: 〈0;#Task〉
+  B: {
+    #steps: (〈1;#Script〉 & {
+      mount: [
+        〈3;A〉,
+      ]
+    })
+  }
+  C: {
+    #steps: (〈1;#Script〉 & {
+      mount: [
+        〈3;B〉,
+      ]
+    })
+  }
+  #Script: {
+    mount: [
+      ...〈2;#Task〉,
+    ]
+  }
+  #Task: {
+    〈1;#ref〉
+    〈1;#ref〉
+    (_|{})
+    (_|{})
+    #steps: 〈1;#Script〉
+    ...
+  }
+  #ref: ({
+    a: 1
+  }|{
+    b: 2
+  })
+}

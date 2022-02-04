@@ -2123,8 +2123,12 @@ outer:
 			continue
 		}
 
-		s := &StructLit{Decls: []Decl{l.elipsis}}
-		s.Init()
+		s := l.list.info
+		if s == nil {
+			s = &StructLit{Decls: []Decl{l.elipsis}}
+			s.Init()
+			l.list.info = s
+		}
 		info := n.node.AddStruct(s, l.env, l.id)
 
 		for _, arc := range elems[l.n:] {

@@ -16,6 +16,24 @@
       "message": "The empty line at the end of the struct is odd.",
       "revId": "cef7fd557749e30b1eed1a9a97d8c8caa45afd7e",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "97196ef3_c51f5541",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 2
+      },
+      "lineNbr": 285,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-04T16:00:54Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "3a62a9c6_5c3cff2b",
+      "revId": "cef7fd557749e30b1eed1a9a97d8c8caa45afd7e",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

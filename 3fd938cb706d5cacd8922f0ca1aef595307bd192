@@ -121,6 +121,24 @@
       "parentUuid": "b7f1eff6_c665ba9f",
       "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "c3b12b15_48acd3ea",
+        "filename": "pkg/tool/file/file.cue",
+        "patchSetId": 1
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-04T11:52:32Z",
+      "side": 1,
+      "message": "Yes. And false if the indicated file/directory could not be found.",
+      "parentUuid": "d70688e8_073f92db",
+      "revId": "3fd938cb706d5cacd8922f0ca1aef595307bd192",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

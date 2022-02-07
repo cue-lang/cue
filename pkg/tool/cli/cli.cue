@@ -30,7 +30,7 @@ Print: {
 //         repsonse: bool
 //     })
 Ask: {
-	kind: "tool/cli.Ask"
+	$id: "tool/cli.Ask"
 
 	// prompt sends this message to the output.
 	prompt: string

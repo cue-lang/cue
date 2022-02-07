@@ -24,7 +24,7 @@ var pkg = &internal.Package{
 		text: string
 	}
 	Ask: {
-		kind:     "tool/cli.Ask"
+		$id:      "tool/cli.Ask"
 		prompt:   string
 		response: string | bool
 	}

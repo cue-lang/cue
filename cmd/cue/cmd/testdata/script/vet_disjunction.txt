@@ -1,0 +1,43 @@
+# vet a.json using #A
+exec cue vet x.cue justa.cue a.json
+
+# vet b.json using #B
+exec cue vet x.cue justb.cue b.json
+
+# Ensure a.json does not vet with #B
+! exec cue vet x.cue justb.cue a.json
+
+# Ensure b.json does not vet with #A
+! exec cue vet x.cue justa.cue b.json
+
+# vet a.json using #A | #B
+exec cue vet x.cue both.cue a.json
+
+# vet b.json using #A | #B
+exec cue vet x.cue both.cue b.json
+
+-- a.json --
+{
+	"a": "test"
+}
+-- b.json --
+{
+	"b": 42
+}
+-- both.cue --
+package x
+
+#A | #B
+-- justa.cue --
+package x
+
+#A
+-- justb.cue --
+package x
+
+#B
+-- x.cue --
+package x
+
+#A: {a: string}
+#B: {b: int}

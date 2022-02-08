@@ -585,22 +585,23 @@ func (v *Vertex) IsClosedList() bool {
 
 // TODO: return error instead of boolean? (or at least have version that does.)
 func (v *Vertex) Accept(ctx *OpContext, f Feature) bool {
+	if x, ok := v.BaseValue.(*Disjunction); ok {
+		for _, v := range x.Values {
+			if v.Accept(ctx, f) {
+				return true
+			}
+		}
+		return false
+	}
+
 	if f.IsInt() {
-		switch x := v.BaseValue.(type) {
+		switch v.BaseValue.(type) {
 		case *ListMarker:
 			// TODO(perf): use precomputed length.
 			if f.Index() < len(v.Elems()) {
 				return true
 			}
 			return !v.IsClosedList()
-
-		case *Disjunction:
-			for _, v := range x.Values {
-				if v.Accept(ctx, f) {
-					return true
-				}
-			}
-			return false
 
 		default:
 			return v.Kind()&ListKind != 0

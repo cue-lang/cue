@@ -22,13 +22,6 @@ import (
 
 var errNoMatch = errors.New("no match")
 
-// Valid reports whether the given regular expression
-// is valid.
-func Valid(pattern string) (bool, error) {
-	_, err := regexp.Compile(pattern)
-	return err == nil, err
-}
-
 // Find returns a string holding the text of the leftmost match in s of
 // the regular expression. It returns bottom if there was no match.
 func Find(pattern, s string) (string, error) {
@@ -61,24 +54,36 @@ func FindAll(pattern, s string, n int) ([]string, error) {
 	return m, nil
 }
 
-// FindSubmatch returns a list of strings holding the text of the leftmost match
-// of the regular expression in s and the matches, if any, of its
-// subexpressions. Submatches are matches of parenthesized subexpressions (also
-// known as capturing groups) within the regular expression, numbered from left
-// to right in order of opening parenthesis. Submatch 0 is the match of the
-// entire expression, submatch 1 the match of the first parenthesized
-// subexpression, and so on. It returns bottom for no match.
-func FindSubmatch(pattern, s string) ([]string, error) {
+// FindAllNamedSubmatch is like FindAllSubmatch, but returns a map with the
+// named used in capturing groups. See FindNamedSubmatch for an example on
+// how to use named groups.
+func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, err
 	}
-	m := re.FindStringSubmatch(s)
+	names := re.SubexpNames()
+	if len(names) == 0 {
+		return nil, errNoNamedGroup
+	}
+	m := re.FindAllStringSubmatch(s, n)
 	if m == nil {
 		return nil, errNoMatch
 	}
-	return m, nil
+	result := make([]map[string]string, len(m))
+	for i, m := range m {
+		r := make(map[string]string, len(names)-1)
+		for k, name := range names {
+			if name != "" {
+				r[name] = m[k]
+			}
+		}
+		result[i] = r
+	}
+	return result, nil
 }
+
+var errNoNamedGroup = errors.New("no named groups")
 
 // FindAllSubmatch finds successive matches as returned by FindSubmatch,
 // observing the rules of FindAll. It returns bottom for no match.
@@ -93,8 +98,6 @@ func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 	}
 	return m, nil
 }
-
-var errNoNamedGroup = errors.New("no named groups")
 
 // FindNamedSubmatch is like FindSubmatch, but returns a map with the names used
 // in capturing groups.
@@ -126,31 +129,28 @@ func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
 	return r, nil
 }
 
-// FindAllNamedSubmatch is like FindAllSubmatch, but returns a map with the
-// named used in capturing groups. See FindNamedSubmatch for an example on
-// how to use named groups.
-func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error) {
+// FindSubmatch returns a list of strings holding the text of the leftmost match
+// of the regular expression in s and the matches, if any, of its
+// subexpressions. Submatches are matches of parenthesized subexpressions (also
+// known as capturing groups) within the regular expression, numbered from left
+// to right in order of opening parenthesis. Submatch 0 is the match of the
+// entire expression, submatch 1 the match of the first parenthesized
+// subexpression, and so on. It returns bottom for no match.
+func FindSubmatch(pattern, s string) ([]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
 		return nil, err
 	}
-	names := re.SubexpNames()
-	if len(names) == 0 {
-		return nil, errNoNamedGroup
-	}
-	m := re.FindAllStringSubmatch(s, n)
+	m := re.FindStringSubmatch(s)
 	if m == nil {
 		return nil, errNoMatch
 	}
-	result := make([]map[string]string, len(m))
-	for i, m := range m {
-		r := make(map[string]string, len(names)-1)
-		for k, name := range names {
-			if name != "" {
-				r[name] = m[k]
-			}
-		}
-		result[i] = r
-	}
-	return result, nil
+	return m, nil
+}
+
+// Valid reports whether the given regular expression
+// is valid.
+func Valid(pattern string) (bool, error) {
+	_, err := regexp.Compile(pattern)
+	return err == nil, err
 }

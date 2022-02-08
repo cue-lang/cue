@@ -154,6 +154,39 @@ midwayReferences: {
 	d: a.x.y.z
 }
 
+// Ensure first closedness check is done after evaluation of
+// comprehensions.
+closedCheck: t1: {
+  a: b: [string]: #D
+
+  #D: {
+    d: string
+    if d != "c" {
+      e: string
+    }
+  }
+
+  a: b: c: {
+    d: "d"
+    e: "ok"
+  }
+}
+
+closedCheck: t2: {
+  a: b: [string]: #D
+
+  #D: {
+    d: string
+    if d != "c" {
+      ("foo"+"bar"): string
+    }
+  }
+
+  a: b: c: {
+    d:      "d"
+    foobar: "ok"
+  }
+}
 
 
 emptyComprehension: {
@@ -187,14 +220,14 @@ explicitDefaultError: {
 }
 -- out/eval --
 Errors:
-a.c: field not allowed: d:
+a.c.d: field not allowed: d:
     ./in.cue:90:5
     ./in.cue:92:2
     ./in.cue:93:6
     ./in.cue:96:5
 b12a.#list.tail.tail: structural cycle
 b12a.list.tail.tail: structural cycle
-embed.t: field not allowed: p:
+embed.t.p: field not allowed: p:
     ./in.cue:33:5
     ./in.cue:34:6
     ./in.cue:39:5
@@ -254,7 +287,7 @@ Result:
     t: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t: field not allowed: p:
+        // [eval] embed.t.p: field not allowed: p:
         //     ./in.cue:33:5
         //     ./in.cue:34:6
         //     ./in.cue:39:5
@@ -320,7 +353,7 @@ Result:
     c: (_|_){
       // [eval]
       d: (_|_){
-        // [eval] a.c: field not allowed: d:
+        // [eval] a.c.d: field not allowed: d:
         //     ./in.cue:90:5
         //     ./in.cue:92:2
         //     ./in.cue:93:6
@@ -390,12 +423,46 @@ Result:
       b: (int){ 2 }
     }
   }
+  closedCheck: (struct){
+    t1: (struct){
+      a: (struct){
+        b: (struct){
+          c: (#struct){
+            d: (string){ "d" }
+            e: (string){ "ok" }
+          }
+        }
+      }
+      #D: (_|_){
+        // [incomplete] closedCheck.t1.#D: non-concrete value string in operand to !=:
+        //     ./in.cue:160:8
+        //     ./in.cue:159:5
+        d: (string){ string }
+      }
+    }
+    t2: (struct){
+      a: (struct){
+        b: (struct){
+          c: (#struct){
+            d: (string){ "d" }
+            foobar: (string){ "ok" }
+          }
+        }
+      }
+      #D: (_|_){
+        // [incomplete] closedCheck.t2.#D: non-concrete value string in operand to !=:
+        //     ./in.cue:176:8
+        //     ./in.cue:175:5
+        d: (string){ string }
+      }
+    }
+  }
   emptyComprehension: (struct){
     a: (struct){
     }
     b: (_|_){
       // [incomplete] emptyComprehension.b: undefined field: b:
-      //     ./in.cue:159:14
+      //     ./in.cue:192:14
     }
   }
   t: (struct){
@@ -407,8 +474,8 @@ Result:
   }
   explicitDefaultError: (_|_){
     // [incomplete] explicitDefaultError: non-concrete value string in operand to !=:
-    //     ./in.cue:181:8
-    //     ./in.cue:179:5
+    //     ./in.cue:214:8
+    //     ./in.cue:212:5
     a: (string){ string }
   }
 }
@@ -592,6 +659,52 @@ Result:
     b: 〈0;a〉.x
     c: 〈0;a〉.x.y
     d: 〈0;a〉.x.y.z
+  }
+  closedCheck: {
+    t1: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        if (〈0;d〉 != "c") {
+          e: string
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            e: "ok"
+          }
+        }
+      }
+    }
+  }
+  closedCheck: {
+    t2: {
+      a: {
+        b: {
+          [string]: 〈2;#D〉
+        }
+      }
+      #D: {
+        d: string
+        if (〈0;d〉 != "c") {
+          ("foo" + "bar"): string
+        }
+      }
+      a: {
+        b: {
+          c: {
+            d: "d"
+            foobar: "ok"
+          }
+        }
+      }
+    }
   }
   emptyComprehension: {
     a: {}

@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "65e81a34_cb54568e",
+        "filename": "pkg/regexp/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-08T09:45:44Z",
+      "side": 1,
+      "message": "I don\u0027t think we add Expand. So this comment makes no sense. If it makes sense, we should add Expand too. Otherwise the comments need to clarify.",
+      "revId": "e6bc16dc6aa120160e1c264f023a99f7355cd4c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "a56901bb_ff26294f",
+        "filename": "pkg/regexp/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-08T09:45:44Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "e6bc16dc6aa120160e1c264f023a99f7355cd4c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

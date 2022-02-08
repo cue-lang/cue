@@ -16,6 +16,13 @@ t10: regexp.FindAllNamedSubmatch(#"f(?P<A>optional)?"#, "fbla", -1)
 t11: regexp.FindAllNamedSubmatch(#"f(?P<A>\w)(?P<B>\w)"#, "aglom", -1)
 t12: regexp.Valid & "valid"
 t13: regexp.Valid & "invalid)"
+
+// The following two calls should be identical
+t14: regexp.ReplaceAll(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", "-${A}-${B}-")
+t14: regexp.ReplaceAll(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", "-$1-$2-")
+
+t15: regexp.ReplaceAllLiteral(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", "-${A}-${B}-")
+t16: regexp.ReplaceAllLiteral(#"f(?P<A>\w)(?P<B>\w)"#, "afloat afoot from", "-$1-$2-")
 -- out/regexp --
 Errors:
 t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`:
@@ -57,4 +64,9 @@ t10: [{
 t11: _|_ // error in call to regexp.FindAllNamedSubmatch: no match
 t12: "valid"
 t13: _|_ // t13: invalid value "invalid)" (does not satisfy regexp.Valid): error in call to regexp.Valid: error parsing regexp: unexpected ): `invalid)`
+
+// The following two calls should be identical
+t14: "a-l-o-at a-o-o-t -r-o-m"
+t15: "a-${A}-${B}-at a-${A}-${B}-t -${A}-${B}-m"
+t16: "a-$1-$2-at a-$1-$2-t -$1-$2-m"
 

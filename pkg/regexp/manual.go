@@ -183,6 +183,28 @@ func FindSubmatch(pattern, s string) ([]string, error) {
 	return m, nil
 }
 
+// ReplaceAll returns a copy of src, replacing matches of the regexp pattern
+// with the replacement text repl. Inside repl, $ signs are interpreted as
+// in Expand, so for instance $1 represents the text of the first submatch.
+func ReplaceAll(pattern, src, repl string) (string, error) {
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return "", err
+	}
+	return re.ReplaceAllString(src, repl), nil
+}
+
+// ReplaceAllLiteral returns a copy of src, replacing matches of the regexp
+// pattern with the replacement string repl. The replacement repl is substituted
+// directly, without using Expand.
+func ReplaceAllLiteral(pattern, src, repl string) (string, error) {
+	re, err := regexp.Compile(pattern)
+	if err != nil {
+		return "", err
+	}
+	return re.ReplaceAllLiteralString(src, repl), nil
+}
+
 // Valid reports whether the given regular expression
 // is valid.
 func Valid(pattern string) (bool, error) {

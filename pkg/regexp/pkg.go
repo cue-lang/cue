@@ -18,18 +18,6 @@ var _ = adt.TopKind // in case the adt package isn't used
 
 var pkg = &internal.Package{
 	Native: []*internal.Builtin{{
-		Name: "Valid",
-		Params: []internal.Param{
-			{Kind: adt.StringKind},
-		},
-		Result: adt.BoolKind,
-		Func: func(c *internal.CallCtxt) {
-			pattern := c.String(0)
-			if c.Do() {
-				c.Ret, c.Err = Valid(pattern)
-			}
-		},
-	}, {
 		Name: "Find",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},
@@ -57,16 +45,17 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name: "FindSubmatch",
+		Name: "FindAllNamedSubmatch",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
+			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
-			pattern, s := c.String(0), c.String(1)
+			pattern, s, n := c.String(0), c.String(1), c.Int(2)
 			if c.Do() {
-				c.Ret, c.Err = FindSubmatch(pattern, s)
+				c.Ret, c.Err = FindAllNamedSubmatch(pattern, s, n)
 			}
 		},
 	}, {
@@ -97,17 +86,28 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
-		Name: "FindAllNamedSubmatch",
+		Name: "FindSubmatch",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},
 			{Kind: adt.StringKind},
-			{Kind: adt.IntKind},
 		},
 		Result: adt.ListKind,
 		Func: func(c *internal.CallCtxt) {
-			pattern, s, n := c.String(0), c.String(1), c.Int(2)
+			pattern, s := c.String(0), c.String(1)
 			if c.Do() {
-				c.Ret, c.Err = FindAllNamedSubmatch(pattern, s, n)
+				c.Ret, c.Err = FindSubmatch(pattern, s)
+			}
+		},
+	}, {
+		Name: "Valid",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+		},
+		Result: adt.BoolKind,
+		Func: func(c *internal.CallCtxt) {
+			pattern := c.String(0)
+			if c.Do() {
+				c.Ret, c.Err = Valid(pattern)
 			}
 		},
 	}, {

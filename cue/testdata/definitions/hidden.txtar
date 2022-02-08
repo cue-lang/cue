@@ -32,7 +32,7 @@ package pkg
 #D: {_val: f: 3}
 -- out/eval --
 Errors:
-e._name.c: field not allowed: c:
+e._name.c: field not allowed:
     ./in.cue:6:9
     ./in.cue:13:13
     ./in.cue:16:9
@@ -65,7 +65,7 @@ Result:
       // [eval]
       d: (int){ int }
       c: (_|_){
-        // [eval] e._name.c: field not allowed: c:
+        // [eval] e._name.c: field not allowed:
         //     ./in.cue:6:9
         //     ./in.cue:13:13
         //     ./in.cue:16:9

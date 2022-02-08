@@ -34,11 +34,11 @@ explicitDefaultError: {
 -- out/eval --
 Errors:
 issue516.x: 2 errors in empty disjunction:
-issue516.x.match: field not allowed: match:
+issue516.x.match: field not allowed:
     ./in.cue:20:6
     ./in.cue:22:5
     ./in.cue:23:5
-issue516.x.match.metrics.foo: field not allowed: foo:
+issue516.x.match.metrics.foo: field not allowed:
     ./in.cue:19:19
     ./in.cue:22:5
     ./in.cue:23:21
@@ -92,16 +92,16 @@ Result:
       }) }
     x: (_|_){
       // [eval] issue516.x: 2 errors in empty disjunction:
-      // issue516.x.match: field not allowed: match:
+      // issue516.x.match: field not allowed:
       //     ./in.cue:20:6
       //     ./in.cue:22:5
       //     ./in.cue:23:5
-      // issue516.x.match.metrics.foo: field not allowed: foo:
+      // issue516.x.match.metrics.foo: field not allowed:
       //     ./in.cue:19:19
       //     ./in.cue:22:5
       //     ./in.cue:23:21
       match: (_|_){
-        // [eval] issue516.x.match: field not allowed: match:
+        // [eval] issue516.x.match: field not allowed:
         //     ./in.cue:20:6
         //     ./in.cue:22:5
         //     ./in.cue:23:5

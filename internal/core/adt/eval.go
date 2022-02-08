@@ -215,18 +215,9 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 			}
 		}
 
-		if !n.checkClosed(state) {
-			return
-		}
-
 		defer c.PopArc(c.PushArc(v))
 
 		c.stats.UnifyCount++
-
-		// Clear any remaining error.
-		if err := c.Err(); err != nil {
-			panic("uncaught error")
-		}
 
 		// Set the cache to a cycle error to ensure a cyclic reference will result
 		// in an error if applicable. A cyclic error may be ignored for
@@ -252,6 +243,10 @@ func (c *OpContext) Unify(v *Vertex, state VertexStatus) {
 
 		// Use maybeSetCache for cycle breaking
 		for n.maybeSetCache(); n.expandOne(); n.maybeSetCache() {
+		}
+
+		if !n.checkClosed(state) {
+			return
 		}
 
 		n.doNotify()

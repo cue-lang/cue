@@ -612,11 +612,11 @@ unifyDynamicReflectSuccess: {
 
 -- out/eval --
 Errors:
-embed.fail1: field not allowed: p:
+embed.fail1.p: field not allowed: p:
     ./in.cue:37:9
     ./in.cue:38:7
     ./in.cue:43:9
-embed.fail4: field not allowed: p:
+embed.fail4.p: field not allowed: p:
     ./in.cue:63:9
     ./in.cue:64:7
     ./in.cue:65:9
@@ -629,7 +629,7 @@ fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct
     ./in.cue:133:11
 noStackOverflowStructCycle.#list.tail.tail: structural cycle
 noStackOverflowStructCycle.list.tail.tail: structural cycle
-provideIncompleteSuccess.t2.a.c: field not allowed: d:
+provideIncompleteSuccess.t2.a.c.d: field not allowed: d:
     ./in.cue:182:7
     ./in.cue:184:4
     ./in.cue:185:8
@@ -689,7 +689,7 @@ Result:
     fail1: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.fail1: field not allowed: p:
+        // [eval] embed.fail1.p: field not allowed: p:
         //     ./in.cue:37:9
         //     ./in.cue:38:7
         //     ./in.cue:43:9
@@ -710,12 +710,14 @@ Result:
     fail4: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.fail4: field not allowed: p:
+        // [eval] embed.fail4.p: field not allowed: p:
         //     ./in.cue:63:9
         //     ./in.cue:64:7
         //     ./in.cue:65:9
         //     ./in.cue:66:3
         //     ./in.cue:68:4
+        q: (_|_){// 1
+        }
       }
     }
     #C4: (#struct){
@@ -834,7 +836,7 @@ Result:
         c: (_|_){
           // [eval]
           d: (_|_){
-            // [eval] provideIncompleteSuccess.t2.a.c: field not allowed: d:
+            // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed: d:
             //     ./in.cue:182:7
             //     ./in.cue:184:4
             //     ./in.cue:185:8

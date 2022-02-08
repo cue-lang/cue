@@ -29,11 +29,11 @@ t2: {
 }
 -- out/eval --
 Errors:
-t1.c: field not allowed: z:
+t1.c.z: field not allowed: z:
     ./in.cue:15:6
     ./in.cue:19:5
     ./in.cue:19:11
-t2.c: field not allowed: z:
+t2.c.z: field not allowed: z:
     ./in.cue:23:6
     ./in.cue:27:5
     ./in.cue:27:11
@@ -70,7 +70,7 @@ Result:
     c: (_|_){
       // [eval]
       z: (_|_){
-        // [eval] t1.c: field not allowed: z:
+        // [eval] t1.c.z: field not allowed: z:
         //     ./in.cue:15:6
         //     ./in.cue:19:5
         //     ./in.cue:19:11
@@ -87,7 +87,7 @@ Result:
     c: (_|_){
       // [eval]
       z: (_|_){
-        // [eval] t2.c: field not allowed: z:
+        // [eval] t2.c.z: field not allowed: z:
         //     ./in.cue:23:6
         //     ./in.cue:27:5
         //     ./in.cue:27:11

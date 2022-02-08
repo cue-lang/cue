@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "dc3e04fc_6fb63dc4",
+        "filename": "pkg/tool/file/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-08T10:35:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "945eec5e_a602670b",
+      "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "58c80c88_da1a043e",
@@ -35,6 +53,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "947690a6_28591c1f",
+        "filename": "pkg/tool/file/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-08T10:35:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "58c80c88_da1a043e",
+      "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "9878e7e1_839200ee",
@@ -48,6 +84,24 @@
       "writtenOn": "2022-02-08T09:58:52Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "9171dbdd_a95f6bdb",
+        "filename": "pkg/tool/file/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1019560
+      },
+      "writtenOn": "2022-02-08T10:35:05Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "9878e7e1_839200ee",
       "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

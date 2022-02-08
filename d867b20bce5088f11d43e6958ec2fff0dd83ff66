@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "fff5963b_83f95325",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-08T09:49:53Z",
+      "side": 1,
+      "message": "It looks like there is both a reordering and changes. Could these be done in separate CLs?",
+      "revId": "d867b20bce5088f11d43e6958ec2fff0dd83ff66",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "945eec5e_a602670b",
+        "filename": "pkg/tool/file/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 122,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-08T09:58:52Z",
+      "side": 1,
+      "message": "I prefer a full sentence: like \"success contains the status of the removal.\" At the very least it should end with a full stop, though.",
+      "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "58c80c88_da1a043e",
+        "filename": "pkg/tool/file/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 123,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-08T09:58:52Z",
+      "side": 1,
+      "message": "Missing full stop at end of sentence.",
+      "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "9878e7e1_839200ee",
+        "filename": "pkg/tool/file/doc.go",
+        "patchSetId": 3
+      },
+      "lineNbr": 124,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-08T09:58:52Z",
+      "side": 1,
+      "message": "Ditto.",
+      "revId": "d82b5d6475c3cb30e4273e1a9bbffa6726d0a1d8",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

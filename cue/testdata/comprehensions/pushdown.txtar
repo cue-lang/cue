@@ -600,18 +600,18 @@ unifyDynamicReflect: {
 
 -- out/eval --
 Errors:
-a.c: field not allowed: d:
+a.c.d: field not allowed: d:
     ./in.cue:170:5
     ./in.cue:172:2
     ./in.cue:173:6
     ./in.cue:176:5
 b12a.#list.tail.tail: structural cycle
 b12a.list.tail.tail: structural cycle
-embed.t1: field not allowed: p:
+embed.t1.p: field not allowed: p:
     ./in.cue:33:6
     ./in.cue:34:7
     ./in.cue:39:6
-embed.t4: field not allowed: p:
+embed.t4.p: field not allowed: p:
     ./in.cue:58:6
     ./in.cue:59:7
     ./in.cue:60:6
@@ -677,7 +677,7 @@ Result:
     t1: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t1: field not allowed: p:
+        // [eval] embed.t1.p: field not allowed: p:
         //     ./in.cue:33:6
         //     ./in.cue:34:7
         //     ./in.cue:39:6
@@ -698,12 +698,14 @@ Result:
     t4: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t4: field not allowed: p:
+        // [eval] embed.t4.p: field not allowed: p:
         //     ./in.cue:58:6
         //     ./in.cue:59:7
         //     ./in.cue:60:6
         //     ./in.cue:61:3
         //     ./in.cue:62:4
+        q: (_|_){// 1
+        }
       }
     }
     #C4: (#struct){
@@ -816,7 +818,7 @@ Result:
     c: (_|_){
       // [eval]
       d: (_|_){
-        // [eval] a.c: field not allowed: d:
+        // [eval] a.c.d: field not allowed: d:
         //     ./in.cue:170:5
         //     ./in.cue:172:2
         //     ./in.cue:173:6

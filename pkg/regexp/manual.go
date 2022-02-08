@@ -12,6 +12,43 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package regexp implements regular expression search.
+//
+// The syntax of the regular expressions accepted is the same
+// general syntax used by Perl, Python, and other languages.
+// More precisely, it is the syntax accepted by RE2 and described at
+// https://golang.org/s/re2syntax, except for \C.
+// For an overview of the syntax, run
+//   go doc regexp/syntax
+//
+// The regexp implementation provided by this package is
+// guaranteed to run in time linear in the size of the input.
+// (This is a property not guaranteed by most open source
+// implementations of regular expressions.) For more information
+// about this property, see
+//	https://swtch.com/~rsc/regexp/regexp1.html
+// or any book about automata theory.
+//
+// All characters are UTF-8-encoded code points.
+//
+// The regexp package functions match a regular expression and identify
+// the matched text. Their names are matched by this regular expression:
+//
+//	Find(All)?(Submatch)?
+//
+// If 'All' is present, the routine matches successive non-overlapping
+// matches of the entire expression. Empty matches abutting a preceding
+// match are ignored. The return value is a slice containing the successive
+// return values of the corresponding non-'All' routine. These routines take
+// an extra integer argument, n. If n >= 0, the function returns at most n
+// matches/submatches; otherwise, it returns all of them.
+//
+// If 'Submatch' is present, the return value is a slice identifying the
+// successive submatches of the expression. Submatches are matches of
+// parenthesized subexpressions (also known as capturing groups) within the
+// regular expression, numbered from left to right in order of opening
+// parenthesis. Submatch 0 is the match of the entire expression, submatch 1
+// the match of the first parenthesized subexpression, and so on.
 package regexp
 
 import (
@@ -22,8 +59,8 @@ import (
 
 var errNoMatch = errors.New("no match")
 
-// Find returns a string holding the text of the leftmost match in s of
-// the regular expression. It returns bottom if there was no match.
+// Find returns a list holding the text of the leftmost match in b of the regular expression.
+// A return value of bottom indicates no match.
 func Find(pattern, s string) (string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -36,12 +73,10 @@ func Find(pattern, s string) (string, error) {
 	return s[m[0]:m[1]], nil
 }
 
-// FindAll returns a list of all successive matches of the expression. It
-// matches successive non-overlapping matches of the entire expression. Empty
-// matches abutting a preceding match are ignored. The return value is a list
-// containing the successive matches. The integer argument n indicates the
-// maximum number of matches to return for n >= 0, or all matches otherwise. It
-// returns bottom for no match.
+// FindAll is the 'All' version of Find; it returns a list of all successive
+// matches of the expression, as defined by the 'All' description in the
+// package comment.
+// A return value of bottom indicates no match.
 func FindAll(pattern, s string, n int) ([]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -54,9 +89,9 @@ func FindAll(pattern, s string, n int) ([]string, error) {
 	return m, nil
 }
 
-// FindAllNamedSubmatch is like FindAllSubmatch, but returns a map with the
-// named used in capturing groups. See FindNamedSubmatch for an example on
-// how to use named groups.
+// FindAllNamedSubmatch is like FindAllSubmatch, but returns a list of maps
+// with the named used in capturing groups. See FindNamedSubmatch for an
+// example on how to use named groups.
 func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -85,8 +120,10 @@ func FindAllNamedSubmatch(pattern, s string, n int) ([]map[string]string, error)
 
 var errNoNamedGroup = errors.New("no named groups")
 
-// FindAllSubmatch finds successive matches as returned by FindSubmatch,
-// observing the rules of FindAll. It returns bottom for no match.
+// FindAllSubmatch is the 'All' version of FindSubmatch; it returns a list
+// of all successive matches of the expression, as defined by the 'All'
+// description in the package comment.
+// A return value of bottom indicates no match.
 func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {
@@ -103,8 +140,8 @@ func FindAllSubmatch(pattern, s string, n int) ([][]string, error) {
 // in capturing groups.
 //
 // Example:
-//     regexp.MapSubmatch(#"Hello (?P<person>\w*)!"#, "Hello World!")
-//  Output:
+//     regexp.FindNamedSubmatch(#"Hello (?P<person>\w*)!"#, "Hello World!")
+// Output:
 //     [{person: "World"}]
 //
 func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
@@ -129,13 +166,11 @@ func FindNamedSubmatch(pattern, s string) (map[string]string, error) {
 	return r, nil
 }
 
-// FindSubmatch returns a list of strings holding the text of the leftmost match
-// of the regular expression in s and the matches, if any, of its
-// subexpressions. Submatches are matches of parenthesized subexpressions (also
-// known as capturing groups) within the regular expression, numbered from left
-// to right in order of opening parenthesis. Submatch 0 is the match of the
-// entire expression, submatch 1 the match of the first parenthesized
-// subexpression, and so on. It returns bottom for no match.
+// FindSubmatch returns a list of lists holding the text of the leftmost
+// match of the regular expression in b and the matches, if any, of its
+// subexpressions, as defined by the 'Submatch' descriptions in the package
+// comment.
+// A return value of bottom indicates no match.
 func FindSubmatch(pattern, s string) ([]string, error) {
 	re, err := regexp.Compile(pattern)
 	if err != nil {

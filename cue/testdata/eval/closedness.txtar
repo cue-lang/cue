@@ -45,13 +45,13 @@ dynamic: {
 
 -- out/eval --
 Errors:
-a.q.e: field not allowed: e:
+a.q.e: field not allowed:
     ./in.cue:1:5
     ./in.cue:6:8
     ./in.cue:7:9
     ./in.cue:11:4
     ./in.cue:15:9
-issue852.a.Foo: field not allowed: Foo:
+issue852.a.Foo: field not allowed:
     ./in.cue:30:15
     ./in.cue:22:7
     ./in.cue:26:6
@@ -78,7 +78,7 @@ Result:
       c: (int){ 2 }
       d: (int){ int }
       e: (_|_){
-        // [eval] a.q.e: field not allowed: e:
+        // [eval] a.q.e: field not allowed:
         //     ./in.cue:1:5
         //     ./in.cue:6:8
         //     ./in.cue:7:9
@@ -88,7 +88,7 @@ Result:
     }
   }
   issue852: (_|_){
-    // [eval] issue852.a.Foo: field not allowed: Foo:
+    // [eval] issue852.a.Foo: field not allowed:
     //     ./in.cue:30:15
     //     ./in.cue:22:7
     //     ./in.cue:26:6
@@ -98,7 +98,7 @@ Result:
     a: (_|_){
       // [eval]
       Foo: (_|_){
-        // [eval] issue852.a.Foo: field not allowed: Foo:
+        // [eval] issue852.a.Foo: field not allowed:
         //     ./in.cue:30:15
         //     ./in.cue:22:7
         //     ./in.cue:26:6

@@ -606,19 +606,19 @@ unifyDynamicReflect: {
 
 -- out/eval --
 Errors:
-a.c.d: field not allowed: d:
+a.c.d: field not allowed:
     ./in.cue:176:5
     ./in.cue:178:2
     ./in.cue:179:6
     ./in.cue:182:5
-embed.t1.p: field not allowed: p:
+embed.t1.p: field not allowed:
     ./in.cue:33:6
     ./in.cue:34:7
     ./in.cue:41:3
     ./in.cue:41:12
     ./in.cue:42:4
     ./in.cue:45:6
-embed.t4.p: field not allowed: p:
+embed.t4.p: field not allowed:
     ./in.cue:64:6
     ./in.cue:65:7
     ./in.cue:66:6
@@ -681,7 +681,7 @@ Result:
     t1: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t1.p: field not allowed: p:
+        // [eval] embed.t1.p: field not allowed:
         //     ./in.cue:33:6
         //     ./in.cue:34:7
         //     ./in.cue:41:3
@@ -705,7 +705,7 @@ Result:
     t4: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.t4.p: field not allowed: p:
+        // [eval] embed.t4.p: field not allowed:
         //     ./in.cue:64:6
         //     ./in.cue:65:7
         //     ./in.cue:66:6
@@ -816,7 +816,7 @@ Result:
     c: (_|_){
       // [eval]
       d: (_|_){
-        // [eval] a.c.d: field not allowed: d:
+        // [eval] a.c.d: field not allowed:
         //     ./in.cue:176:5
         //     ./in.cue:178:2
         //     ./in.cue:179:6

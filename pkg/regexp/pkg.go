@@ -99,6 +99,34 @@ var pkg = &internal.Package{
 			}
 		},
 	}, {
+		Name: "ReplaceAll",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			pattern, src, repl := c.String(0), c.String(1), c.String(2)
+			if c.Do() {
+				c.Ret, c.Err = ReplaceAll(pattern, src, repl)
+			}
+		},
+	}, {
+		Name: "ReplaceAllLiteral",
+		Params: []internal.Param{
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+			{Kind: adt.StringKind},
+		},
+		Result: adt.StringKind,
+		Func: func(c *internal.CallCtxt) {
+			pattern, src, repl := c.String(0), c.String(1), c.String(2)
+			if c.Do() {
+				c.Ret, c.Err = ReplaceAllLiteral(pattern, src, repl)
+			}
+		},
+	}, {
 		Name: "Valid",
 		Params: []internal.Param{
 			{Kind: adt.StringKind},

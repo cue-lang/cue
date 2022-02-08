@@ -617,20 +617,20 @@ unifyDynamicReflectSuccess: {
 
 -- out/eval --
 Errors:
-embed.fail1.p: field not allowed: p:
+embed.fail1.p: field not allowed:
     ./in.cue:37:9
     ./in.cue:38:7
     ./in.cue:45:3
     ./in.cue:45:12
     ./in.cue:46:4
     ./in.cue:49:9
-embed.fail4.p: field not allowed: p:
+embed.fail4.p: field not allowed:
     ./in.cue:69:9
     ./in.cue:70:7
     ./in.cue:71:9
     ./in.cue:72:3
     ./in.cue:74:4
-provideIncompleteSuccess.t2.a.c.d: field not allowed: d:
+provideIncompleteSuccess.t2.a.c.d: field not allowed:
     ./in.cue:187:7
     ./in.cue:189:4
     ./in.cue:190:8
@@ -696,7 +696,7 @@ Result:
     fail1: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.fail1.p: field not allowed: p:
+        // [eval] embed.fail1.p: field not allowed:
         //     ./in.cue:37:9
         //     ./in.cue:38:7
         //     ./in.cue:45:3
@@ -720,7 +720,7 @@ Result:
     fail4: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.fail4.p: field not allowed: p:
+        // [eval] embed.fail4.p: field not allowed:
         //     ./in.cue:69:9
         //     ./in.cue:70:7
         //     ./in.cue:71:9
@@ -842,7 +842,7 @@ Result:
         c: (_|_){
           // [eval]
           d: (_|_){
-            // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed: d:
+            // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed:
             //     ./in.cue:187:7
             //     ./in.cue:189:4
             //     ./in.cue:190:8

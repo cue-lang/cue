@@ -52,14 +52,14 @@ d: _|_ // field "aaa" not allowed in closed struct
 }
 -- out/eval --
 Errors:
-c.aaa: field not allowed: aaa:
+c.aaa: field not allowed:
     ./in.cue:2:2
     ./in.cue:4:5
     ./in.cue:8:5
     ./in.cue:8:10
     ./in.cue:9:5
     ./in.cue:9:11
-d.aaa: field not allowed: aaa:
+d.aaa: field not allowed:
     ./in.cue:2:2
     ./in.cue:4:5
     ./in.cue:11:5
@@ -80,7 +80,7 @@ Result:
   c: (_|_){
     // [eval]
     aaa: (_|_){
-      // [eval] c.aaa: field not allowed: aaa:
+      // [eval] c.aaa: field not allowed:
       //     ./in.cue:2:2
       //     ./in.cue:4:5
       //     ./in.cue:8:5
@@ -94,7 +94,7 @@ Result:
   d: (_|_){
     // [eval]
     aaa: (_|_){
-      // [eval] d.aaa: field not allowed: aaa:
+      // [eval] d.aaa: field not allowed:
       //     ./in.cue:2:2
       //     ./in.cue:4:5
       //     ./in.cue:11:5

@@ -18,6 +18,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b5deb352_c6f2eb20",
+        "filename": "pkg/regexp/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 188,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-08T11:01:44Z",
+      "side": 1,
+      "message": "Done. Fixed by \"expanding\" (pun intended) the Expand docs in place here.\n\nExpand does not make sense to include, but it expects the match list/slice to have come from FindSubmatchIndex. And per our offline conversation this doesn\u0027t make sense, because we don\u0027t have byte-indexed strings.",
+      "parentUuid": "65e81a34_cb54568e",
+      "revId": "e6bc16dc6aa120160e1c264f023a99f7355cd4c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "a56901bb_ff26294f",
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-08T09:45:44Z",
       "side": 1,
       "message": "Ditto.",
+      "revId": "e6bc16dc6aa120160e1c264f023a99f7355cd4c0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "efe443f8_34fa6b56",
+        "filename": "pkg/regexp/manual.go",
+        "patchSetId": 1
+      },
+      "lineNbr": 199,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-08T11:01:44Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a56901bb_ff26294f",
       "revId": "e6bc16dc6aa120160e1c264f023a99f7355cd4c0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

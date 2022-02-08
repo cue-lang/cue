@@ -1,0 +1,87 @@
+#FindHiddenTasks: true
+-- in.cue --
+root: {
+    a: {
+        $id: "valToOut"
+        val: "foo"
+        out: string
+    }
+    _b: {
+        $id: "valToOut"
+        $after: a
+        val: "bar"
+        out: string
+    }
+    c: {
+        $id: "valToOut"
+        out: a.out + _b.out
+    }
+    // These tasks should _not_ run, because they are definitions.
+    _#c: {
+        $id: "valToOut"
+        out: c.out + "baz"
+    }
+    #d: {
+        $id: "valToOut"
+        out: c.out + "baz"
+    }
+}
+-- out/run/errors --
+-- out/run/t0 --
+graph TD
+  t0("root.a [Ready]")
+  t1("root._b [Waiting]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t1 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root._b [Ready]")
+  t1-->t0
+  t2("root.c [Waiting]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t1/value --
+{
+	$id: "valToOut"
+	val: "foo"
+	out: "foo"
+}
+-- out/run/t2 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root._b [Terminated]")
+  t1-->t0
+  t2("root.c [Ready]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t2/value --
+{
+	$id: "valToOut"
+	$after: {
+		$id: "valToOut"
+		val: "foo"
+		out: "foo"
+	}
+	val: "bar"
+	out: "bar"
+}
+-- out/run/t3 --
+graph TD
+  t0("root.a [Terminated]")
+  t1("root._b [Terminated]")
+  t1-->t0
+  t2("root.c [Terminated]")
+  t2-->t0
+  t2-->t1
+
+-- out/run/t3/value --
+{
+	$id: "valToOut"
+	out: "foobar"
+}

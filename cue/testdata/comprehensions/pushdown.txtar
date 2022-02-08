@@ -612,11 +612,11 @@ unifyDynamicReflectSuccess: {
 
 -- out/eval --
 Errors:
-embed.fail1: field not allowed: p:
+embed.fail1.p: field not allowed: p:
     ./in.cue:37:9
     ./in.cue:38:7
     ./in.cue:43:9
-embed.fail4: field not allowed: p:
+embed.fail4.p: field not allowed: p:
     ./in.cue:63:9
     ./in.cue:64:7
     ./in.cue:65:9
@@ -629,7 +629,7 @@ fieldMismatch.a: conflicting values 2 and {x:3} (mismatched types int and struct
     ./in.cue:133:11
 noStackOverflowStructCycle.#list.tail.tail: structural cycle
 noStackOverflowStructCycle.list.tail.tail: structural cycle
-provideIncompleteSuccess.t2.a.c: field not allowed: d:
+provideIncompleteSuccess.t2.a.c.d: field not allowed: d:
     ./in.cue:182:7
     ./in.cue:184:4
     ./in.cue:185:8
@@ -689,7 +689,7 @@ Result:
     fail1: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.fail1: field not allowed: p:
+        // [eval] embed.fail1.p: field not allowed: p:
         //     ./in.cue:37:9
         //     ./in.cue:38:7
         //     ./in.cue:43:9
@@ -710,12 +710,14 @@ Result:
     fail4: (_|_){
       // [eval]
       p: (_|_){
-        // [eval] embed.fail4: field not allowed: p:
+        // [eval] embed.fail4.p: field not allowed: p:
         //     ./in.cue:63:9
         //     ./in.cue:64:7
         //     ./in.cue:65:9
         //     ./in.cue:66:3
         //     ./in.cue:68:4
+        q: (_|_){// 1
+        }
       }
     }
     #C4: (#struct){
@@ -834,7 +836,7 @@ Result:
         c: (_|_){
           // [eval]
           d: (_|_){
-            // [eval] provideIncompleteSuccess.t2.a.c: field not allowed: d:
+            // [eval] provideIncompleteSuccess.t2.a.c.d: field not allowed: d:
             //     ./in.cue:182:7
             //     ./in.cue:184:4
             //     ./in.cue:185:8
@@ -1269,43 +1271,43 @@ Result:
     }
   }
   embed: {
-    t1: 〈0;#C1〉
+    fail1: 〈0;#C1〉
     #C1: {
       if false {
         p: _
       }
     }
-    t1: {
+    fail1: {
       p: "foo"
     }
-    t2: 〈0;#C2〉
+    success2: 〈0;#C2〉
     #C2: {
       if true {
         p: _
       }
     }
-    t2: {
+    success2: {
       p: "foo"
     }
-    t3: 〈0;#C3〉
+    success3: 〈0;#C3〉
     #C3: {}
-    t3: {
+    success3: {
       if false {
         p: {
           q: 1
         }
       }
     }
-    t4: 〈0;#C4〉
+    fail4: 〈0;#C4〉
     #C4: {}
-    t4: {
+    fail4: {
       if true {
         p: {
           q: 1
         }
       }
     }
-    t5: {
+    incomplete5: {
       a: bool
       if 〈0;a〉 {
         p: {
@@ -1313,22 +1315,22 @@ Result:
         }
       }
     }
-    t6: {
+    incomplete6: {
       if false {
         p: 1
       }
       p: (〈0;q〉 + 1)
       q: int
     }
-    t7: {
+    incomplete7: {
       p: (〈0;q〉 + 1)
       q: int
       if false {
-        p: 1
+        q: 1
       }
     }
   }
-  mixedFields: {
+  mixedFieldsSuccess: {
     a: {
       for _, s in [
         "foo",
@@ -1388,7 +1390,7 @@ Result:
       }
     }
   }
-  b12a: {
+  noStackOverflowStructCycle: {
     #list: {
       tail: 〈1;#list〉
       if (〈0;tail〉 != null) {
@@ -1402,64 +1404,70 @@ Result:
       }
     }
   }
-  xx: {
-    #a: {
-      if 〈0;b〉 {
+  provideIncompleteSuccess: {
+    t1: {
+      #a: {
+        if 〈0;b〉 {
+          c: 4
+        }
+        b: bool
+      }
+      x: ((〈0;#a〉 & {
+        b: true
+      }) & {
         c: 4
-      }
-      b: bool
+      })
+      y: 〈0;x〉
     }
-    x: ((〈0;#a〉 & {
-      b: true
-    }) & {
-      c: 4
-    })
-    y: 〈0;x〉
-  }
-  #a: {
-    if 〈0;b〉 {
-      c: 4
-    }
-    b: true
-  }
-  #c: {}
-  a: {
-    if 〈0;b〉 {
-      c: {
-        d: 4
-      }
-    }
-    b: true
-    c: 〈1;#c〉
-  }
-  scopes: {
-    x: 1
-    a: {
-      y: 2
-      if true {
-        b: 〈2;x〉
-        c: {
-          d: 〈3;x〉
+    t2: {
+      #a: {
+        if 〈0;b〉 {
+          c: 4
         }
-        e: 〈1;y〉
-        f: {
-          g: 〈2;y〉
+        b: true
+      }
+      #c: {}
+      a: {
+        if 〈0;b〉 {
+          c: {
+            d: 4
+          }
         }
+        b: true
+        c: 〈1;#c〉
       }
     }
   }
-  drop: {
-    x: 1
-    a: {
-      y: 2
-      if false {
-        b: 〈2;x〉
-        c: {
-          d: 〈3;x〉
+  voidArcs: {
+    scopes: {
+      x: 1
+      a: {
+        y: 2
+        if true {
+          b: 〈2;x〉
+          c: {
+            d: 〈3;x〉
+          }
+          e: 〈1;y〉
+          f: {
+            g: 〈2;y〉
+          }
         }
-        e: 〈1;y〉
-        f: {
-          g: 〈2;y〉
+      }
+    }
+    drop: {
+      x: 1
+      a: {
+        y: 2
+        if false {
+          b: 〈2;x〉
+          c: {
+            d: 〈3;x〉
+          }
+          e: 〈1;y〉
+          f: {
+            g: 〈2;y〉
+          }
         }
       }
     }
@@ -1501,7 +1509,7 @@ Result:
     d: 〈0;a〉.x.y.z
   }
   closedCheck: {
-    t1: {
+    success1: {
       a: {
         b: {
           [string]: 〈2;#D〉
@@ -1524,7 +1532,7 @@ Result:
     }
   }
   closedCheck: {
-    t2: {
+    success2: {
       a: {
         b: {
           [string]: 〈2;#D〉
@@ -1547,7 +1555,7 @@ Result:
     }
   }
   closedCheck: {
-    t3: {
+    success3: {
       a: {
         b: {
           [string]: 〈2;#D〉
@@ -1571,13 +1579,13 @@ Result:
       }
     }
   }
-  emptyComprehension: {
+  emptyComprehensionIncomplete: {
     a: {}
     b: {
       if 〈1;a〉.b {}
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     t1: {
       [string]: {
         b: bool
@@ -1590,7 +1598,7 @@ Result:
       }
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     t2: {
       components: {
         sinks: {
@@ -1626,7 +1634,7 @@ Result:
       }
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     derefRef1: {
       a: {
         [string]: {
@@ -1652,33 +1660,7 @@ Result:
       }
     }
   }
-  voidElimination: {
-    derefRef1: {
-      a: {
-        [string]: {
-          c: {
-            [string]: 〈3;E〉
-          }
-        }
-      }
-      a: {
-        b: {
-          c: {
-            if false {
-              d: {
-                e: true
-              }
-            }
-          }
-        }
-      }
-      E: {
-        e: bool
-        f: !〈0;e〉
-      }
-    }
-  }
-  voidElimination: {
+  voidEliminationSuccess: {
     derefRef2: {
       a: {
         [string]: {
@@ -1705,7 +1687,7 @@ Result:
       }
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     derefDisj1: {
       a: {
         [string]: {
@@ -1734,7 +1716,7 @@ Result:
       })
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     derefDisj2: {
       a: {
         [string]: {
@@ -1763,7 +1745,7 @@ Result:
       })
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     bulk1: {
       a: {
         b: {}
@@ -1781,7 +1763,7 @@ Result:
       }
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     opt1: {
       a: {
         b: {}
@@ -1799,7 +1781,7 @@ Result:
       }
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     noCycle1: {
       _x: 〈0;a〉.b
       a: {
@@ -1817,7 +1799,7 @@ Result:
       }
     }
   }
-  voidElimination: {
+  voidEliminationSuccess: {
     noCycle2: {
       a: {
         c: {
@@ -1863,25 +1845,30 @@ Result:
     }
   }
   topElimination: {
+    a: int
     _
     if true {
-      x: (〈2;a〉 + 1)
+      x: (〈1;a〉 + 1)
     }
   }
-  t: {
-    #ok: (*true|bool)
-    if 〈0;#ok〉 {
-      x: int
+  voidEliminationSuccess: {
+    drop1: {
+      t: {
+        #ok: (*true|bool)
+        if 〈0;#ok〉 {
+          x: int
+        }
+      }
+      s: (〈0;t〉 & {
+        #ok: false
+      })
     }
   }
-  s: (〈0;t〉 & {
-    #ok: false
-  })
   explicitDefaultError: {
     a: (string|*_|_(explicit error (_|_ literal) in source))
     if (〈0;a〉 != "") {}
   }
-  allArcs: {
+  allArcsSuccess: {
     p1: {
       x: {
         for k, _ in 〈1;y〉 {
@@ -1895,7 +1882,7 @@ Result:
       }
     }
   }
-  allArcs: {
+  allArcsSuccess: {
     p2: {
       y: {
         if false {
@@ -1910,7 +1897,7 @@ Result:
     }
   }
   unity: {
-    test1: {
+    success1: {
       #Config: {
         name: string
         type: string
@@ -1951,7 +1938,7 @@ Result:
 }
 --- reflect.cue
 {
-  unifyDynamicReflect: {
+  unifyDynamicReflectSuccess: {
     for _, s in [
       "foo",
     ] {

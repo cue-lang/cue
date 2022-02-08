@@ -68,7 +68,13 @@ func (c *Controller) findRootTasks(v cue.Value) {
 		return
 	}
 
-	for iter, _ := v.Fields(); iter.Next(); {
+	opts := []cue.Option{}
+
+	if c.cfg.FindHiddenTasks {
+		opts = append(opts, cue.Hidden(true), cue.Definitions(false))
+	}
+
+	for iter, _ := v.Fields(opts...); iter.Next(); {
 		c.findRootTasks(iter.Value())
 	}
 }

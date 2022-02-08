@@ -51,6 +51,6 @@ X: conflicting values 1 and float (mismatched types int and float):
 Y: conflicting values 2 and float (mismatched types int and float):
     ./test.json:3:8
     ./vector.cue:5:8
-Z: field not allowed: Z:
+Z: field not allowed:
     ./test.json:4:3
     ./vector.cue:3:6

@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1df95430_64917154",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 3
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1019161
+      },
+      "writtenOn": "2022-02-09T16:25:12Z",
+      "side": 1,
+      "message": "Cleaned up the commit message and the test!",
+      "revId": "0f8f992575dc9bfe1396e9e5b924217dfa743b66",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1225,7 +1225,7 @@ func (n *nodeContext) addExprConjunct(v Conjunct) {
 		if x.IsData() {
 			n.addValueConjunct(env, x, id)
 		} else {
-			n.addVertexConjuncts(env, id, x, x, true)
+			n.addVertexConjuncts(v, x, true)
 		}
 
 	case Value:
@@ -1298,7 +1298,7 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 			break
 		}
 
-		n.addVertexConjuncts(v.Env, v.CloseInfo, v.Expr(), arc, false)
+		n.addVertexConjuncts(v, arc, false)
 
 	case Evaluator:
 		// Interpolation, UnaryExpr, BinaryExpr, CallExpr
@@ -1341,7 +1341,8 @@ func (n *nodeContext) evalExpr(v Conjunct) {
 	}
 }
 
-func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, x Expr, arc *Vertex, inline bool) {
+func (n *nodeContext) addVertexConjuncts(c Conjunct, arc *Vertex, inline bool) {
+	closeInfo := c.CloseInfo
 
 	// We need to ensure that each arc is only unified once (or at least) a
 	// bounded time, witch each conjunct. Comprehensions, for instance, may
@@ -1369,6 +1370,7 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 	}
 	n.arcMap = append(n.arcMap, key)
 
+	env := c.Env
 	// Pass detection of structural cycles from parent to children.
 	cyclic := false
 	if env != nil {
@@ -1428,6 +1430,7 @@ func (n *nodeContext) addVertexConjuncts(env *Environment, closeInfo CloseInfo, 
 	// resulting form APIs. These tend to be fairly uninteresting.
 	// At the same time, this optimization may prevent considerable slowdown
 	// in case an API does many calls to Unify.
+	x := c.Expr()
 	if !inline || arc.IsClosedStruct() || arc.IsClosedList() {
 		closeInfo = closeInfo.SpawnRef(arc, IsDef(x), x)
 	}
@@ -1543,7 +1546,7 @@ func (n *nodeContext) addValueConjunct(env *Environment, v Value, id CloseInfo) 
 			// TODO: this really shouldn't happen anymore.
 			if isComplexStruct(ctx, x) {
 				// This really shouldn't happen, but just in case.
-				n.addVertexConjuncts(env, id, x, x, true)
+				n.addVertexConjuncts(MakeConjunct(env, x, id), x, true)
 				return
 			}
 

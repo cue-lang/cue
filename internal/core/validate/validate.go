@@ -74,7 +74,7 @@ func (v *validator) validate(x *adt.Vertex) {
 				v.add(b)
 			}
 
-		case adt.IncompleteError, adt.NotExistError:
+		case adt.IncompleteError:
 			if v.checkConcrete() {
 				v.add(b)
 			}

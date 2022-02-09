@@ -1,0 +1,33 @@
+#Issue: 1509
+
+# export
+! exec cue export
+cmp stderr expect-stderr1
+cmp stdout expect-stdout1
+
+# eval
+exec cue eval
+cmp stderr expect-stderr2
+cmp stdout expect-stdout2
+
+-- x.cue --
+package x
+
+import "list"
+
+x: [1, 2, 3]
+sortedx: list.Sort(x, cmp)
+
+cmp: {}
+
+-- expect-stdout1 --
+-- expect-stderr1 --
+error in call to list.Sort: field not found: less:
+    ./x.cue:6:10
+-- expect-stdout2 --
+import "list"
+
+x: [1, 2, 3]
+sortedx: list.Sort(x, cmp)
+cmp: {}
+-- expect-stderr2 --

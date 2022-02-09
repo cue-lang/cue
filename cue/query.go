@@ -71,8 +71,11 @@ outer:
 		if err, ok := sel.sel.(pathError); ok {
 			x = &adt.Bottom{Err: err.Error}
 		} else {
-			// TODO: better message.
-			x = mkErr(v.idx, n, adt.NotExistError, "field %q not found", sel.sel)
+			x = mkErr(v.idx, n, adt.EvalError, "field not found: %v", sel.sel)
+			if n.Accept(ctx, f) {
+				x.Code = adt.IncompleteError
+			}
+			x.NotExists = true
 		}
 		v := makeValue(v.idx, n, parent)
 		return newErrValue(v, x)

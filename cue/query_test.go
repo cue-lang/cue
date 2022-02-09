@@ -53,11 +53,11 @@ func TestLookupPath(t *testing.T) {
 	}, {
 		in:   `_foo: 3`,
 		path: cue.MakePath(cue.Def("_foo")),
-		err:  `field "#_foo" not found`,
+		err:  `field not found: #_foo`,
 	}, {
 		in:   `_#foo: 3`,
 		path: cue.MakePath(cue.Def("_#foo")),
-		err:  `field "_#foo" not found`,
+		err:  `field not found: _#foo`,
 	}, {
 		in:   `"foo", #foo: 3`,
 		path: cue.ParsePath("#foo"),
@@ -104,7 +104,7 @@ func TestLookupPath(t *testing.T) {
 		[Name=string]: { a: Name }
 		`,
 		path: cue.MakePath(cue.Str("a")),
-		err:  `field "a" not found`,
+		err:  `field not found: a`,
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.path.String(), func(t *testing.T) {

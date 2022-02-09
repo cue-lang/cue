@@ -49,10 +49,6 @@ const (
 	// A UserError is a fatal error originating from the user.
 	UserError
 
-	// NotExistError is used to indicate a value does not exist.
-	// Mostly used for legacy reasons.
-	NotExistError
-
 	// StructuralCycleError means a structural cycle was found. Structural
 	// cycles are permanent errors, but they are not passed up recursively,
 	// as a unification of a value with a structural cycle with one that
@@ -96,6 +92,7 @@ type Bottom struct {
 	Code         ErrorCode
 	HasRecursive bool
 	ChildError   bool // Err is the error of the child
+	NotExists    bool // This error originated from a failed lookup.
 	// Value holds the computed value so far in case
 	Value Value
 }

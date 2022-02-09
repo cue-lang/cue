@@ -137,8 +137,15 @@ func (o *hiddenStructValue) Lookup(key string) Value {
 		}
 	}
 	if i == len {
-		// TODO: better message.
-		x := mkErr(o.v.idx, o.obj, adt.NotExistError, "value %q not found", key)
+		x := mkErr(o.v.idx, o.obj, 0, "field not found: %v", key)
+		x.NotExists = true
+		// TODO: more specifically we should test whether the values that
+		// are addressable from the root of the configuration can support the
+		// looked up value. This will avoid false positives such as when
+		// an open literal struct is passed to a builtin.
+		if o.obj.Accept(o.ctx, f) {
+			x.Code = adt.IncompleteError
+		}
 		return newErrValue(o.v, x)
 	}
 	return newChildValue(o, i)
@@ -1165,7 +1172,7 @@ func (v Value) Exists() bool {
 		return false
 	}
 	if err, ok := v.v.BaseValue.(*adt.Bottom); ok {
-		return err.Code != adt.NotExistError
+		return !err.NotExists
 	}
 	return true
 }

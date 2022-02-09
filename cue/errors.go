@@ -91,8 +91,9 @@ func (e *valueError) Path() (a []string) {
 }
 
 var errNotExists = &adt.Bottom{
-	Code: adt.NotExistError,
-	Err:  errors.Newf(token.NoPos, "undefined value"),
+	Code:      adt.IncompleteError,
+	NotExists: true,
+	Err:       errors.Newf(token.NoPos, "undefined value"),
 }
 
 func mkErr(idx *runtime.Runtime, src adt.Node, args ...interface{}) *adt.Bottom {

@@ -1,0 +1,55 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "fbc0a009_1ed5f63c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 2
+      },
+      "lineNbr": 7,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-09T08:04:59Z",
+      "side": 1,
+      "message": "s/Allow/allow/",
+      "revId": "4b126bfe06ba6865e8b61e9d046eeaa2d5134876",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "90c26676_178ec5dd",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 2
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-09T08:04:59Z",
+      "side": 1,
+      "message": "Two minor things. Looking good.",
+      "revId": "4b126bfe06ba6865e8b61e9d046eeaa2d5134876",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8f3c86f1_bdc9393a",
+        "filename": "tools/flow/testdata/hidden.txtar",
+        "patchSetId": 2
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-09T08:04:59Z",
+      "side": 1,
+      "message": "trailing whitespace.",
+      "revId": "4b126bfe06ba6865e8b61e9d046eeaa2d5134876",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

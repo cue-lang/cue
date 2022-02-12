@@ -20,6 +20,7 @@ import (
 	"os"
 	"reflect"
 	"regexp"
+	"sort"
 	"strings"
 
 	"github.com/cockroachdb/apd/v2"
@@ -39,6 +40,44 @@ var Debug bool = os.Getenv("CUE_DEBUG") != "0"
 //   0: no logging
 //   1: logging
 var Verbosity int
+
+// DebugSort specifies that arcs be sorted consistently between implementations.
+// 0: default
+// 1: sort by Feature: this should be consistent between implementations where
+//    there is no change in the compiler and indexing code.
+// 2: alphabetical
+var DebugSort int
+
+func DebugSortArcs(c *OpContext, n *Vertex) {
+	if n.IsList() {
+		return
+	}
+	switch a := n.Arcs; DebugSort {
+	case 1:
+		sort.SliceStable(a, func(i, j int) bool {
+			return a[i].Label < a[j].Label
+		})
+	case 2:
+		sort.SliceStable(a, func(i, j int) bool {
+			return a[i].Label.SelectorString(c.Runtime) <
+				a[j].Label.SelectorString(c.Runtime)
+		})
+	}
+}
+
+func DebugSortFields(c *OpContext, a []Feature) {
+	switch DebugSort {
+	case 1:
+		sort.SliceStable(a, func(i, j int) bool {
+			return a[i] < a[j]
+		})
+	case 2:
+		sort.SliceStable(a, func(i, j int) bool {
+			return a[i].SelectorString(c.Runtime) <
+				a[j].SelectorString(c.Runtime)
+		})
+	}
+}
 
 // Assert panics if the condition is false. Assert can be used to check for
 // conditions that are considers to break an internal variant or unexpected

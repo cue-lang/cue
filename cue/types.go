@@ -1354,7 +1354,7 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 		}
 	}
 
-	features := export.VertexFeatures(obj)
+	features := export.VertexFeatures(ctx, obj)
 
 	k := 0
 	for _, f := range features {

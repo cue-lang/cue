@@ -99,7 +99,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 	}
 
 	// All arcs in x must exist in y and its values must subsume.
-	xFeatures := export.VertexFeatures(x)
+	xFeatures := export.VertexFeatures(s.ctx, x)
 	for _, f := range xFeatures {
 		if s.Final && !f.IsRegular() {
 			continue
@@ -165,7 +165,7 @@ func (s *subsumer) vertices(x, y *adt.Vertex) bool {
 		return false
 	}
 
-	yFeatures := export.VertexFeatures(y)
+	yFeatures := export.VertexFeatures(s.ctx, y)
 outer:
 	for _, f := range yFeatures {
 		if s.Final && !f.IsRegular() {

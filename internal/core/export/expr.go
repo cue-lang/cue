@@ -163,13 +163,17 @@ func (x *exporter) mergeValues(label adt.Feature, src *adt.Vertex, a []conjunct,
 		return fields[i] > fields[j]
 	})
 
-	m := sortArcs(extractFeatures(e.structs))
-	sort.SliceStable(fields, func(i, j int) bool {
-		if m[fields[j]] == 0 {
-			return m[fields[i]] != 0
-		}
-		return m[fields[i]] > m[fields[j]]
-	})
+	if adt.DebugSort == 0 {
+		m := sortArcs(extractFeatures(e.structs))
+		sort.SliceStable(fields, func(i, j int) bool {
+			if m[fields[j]] == 0 {
+				return m[fields[i]] != 0
+			}
+			return m[fields[i]] > m[fields[j]]
+		})
+	} else {
+		adt.DebugSortFields(e.ctx, fields)
+	}
 
 	if len(e.fields) == 0 && !e.hasEllipsis {
 		switch len(e.embed) + len(e.conjuncts) {

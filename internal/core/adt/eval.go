@@ -639,6 +639,9 @@ func (n *nodeContext) checkClosed(state VertexStatus) bool {
 }
 
 func (n *nodeContext) completeArcs(state VertexStatus) {
+	if DebugSort > 0 {
+		DebugSortArcs(n.ctx, n.node)
+	}
 
 	if state <= AllArcs {
 		n.node.UpdateStatus(AllArcs)

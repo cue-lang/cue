@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "1c4af8c6_b2c73c82",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-14T14:55:20Z",
+      "side": 1,
+      "message": "WIP equivalent of https://review.gerrithub.io/c/cue-lang/cue/+/533062/ but cherry-picked onto tip",
+      "revId": "b0b7f0d3c58a6592a8ead9174a19b4e56cbeb341",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

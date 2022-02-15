@@ -249,7 +249,12 @@ func initFile(cmd *Command, file string, getBuild func(path string) *build.Insta
 			return nil, fmt.Errorf("cannot append to directory %s", file)
 		}
 
-		f, err := parser.ParseFile(file, nil)
+		contents, err := ioutil.ReadFile(file)
+		if err != nil {
+			return nil, err
+		}
+
+		f, err := parser.ParseFile(file, contents)
 		if err != nil {
 			return nil, err
 		}

@@ -21,9 +21,9 @@ import (
 	"bytes"
 	"fmt"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"net/url"
-	"os"
 	"strings"
 
 	"cuelang.org/go/cue"
@@ -145,9 +145,10 @@ type Config struct {
 	Mode filetypes.Mode
 
 	// Out specifies an overwrite destination.
-	Out    io.Writer
-	Stdin  io.Reader
-	Stdout io.Writer
+	Out        io.Writer
+	Stdin      io.Reader
+	Stdout     io.Writer
+	FileSystem fs.FS
 
 	PkgName string // package name for files to generate
 
@@ -186,7 +187,7 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		return i
 	}
 
-	rc, err := reader(f, cfg.Stdin)
+	rc, err := reader(f, cfg.Stdin, cfg.FileSystem)
 	i.closer = rc
 	i.err = err
 	if err != nil {
@@ -259,8 +260,9 @@ func NewDecoder(f *build.File, cfg *Config) *Decoder {
 		i.expr = ast.NewLit(token.STRING, s)
 	case build.Protobuf:
 		paths := &protobuf.Config{
-			Paths:   cfg.ProtoPath,
-			PkgName: cfg.PkgName,
+			Paths:      cfg.ProtoPath,
+			PkgName:    cfg.PkgName,
+			FileSystem: cfg.FileSystem,
 		}
 		i.file, i.err = protobuf.Extract(path, r, paths)
 	case build.TextProto:
@@ -324,7 +326,7 @@ func protobufJSONFunc(cfg *Config, file *build.File) rewriteFunc {
 	}
 }
 
-func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
+func reader(f *build.File, stdin io.Reader, fsys fs.FS) (io.ReadCloser, error) {
 	switch s := f.Source.(type) {
 	case nil:
 		// Use the file name.
@@ -344,7 +346,8 @@ func reader(f *build.File, stdin io.Reader) (io.ReadCloser, error) {
 	if f.Filename == "-" {
 		return ioutil.NopCloser(stdin), nil
 	}
-	return os.Open(f.Filename)
+
+	return fsys.Open(f.Filename)
 }
 
 func shouldValidate(i *filetypes.FileInfo) bool {

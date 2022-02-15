@@ -16,6 +16,7 @@ package protobuf
 
 import (
 	"bytes"
+	"cuelang.org/go/internal/filesystem"
 	"fmt"
 	"io/ioutil"
 	"os"
@@ -43,7 +44,8 @@ func TestExtractDefinitions(t *testing.T) {
 			root := "testdata/istio.io/api"
 			filename := filepath.Join(root, filepath.FromSlash(file))
 			c := &Config{
-				Paths: []string{"testdata", root},
+				Paths:      []string{"testdata", root},
+				FileSystem: &filesystem.OSFS{},
 			}
 
 			out := &bytes.Buffer{}
@@ -82,6 +84,9 @@ func TestBuild(t *testing.T) {
 		Paths: []string{
 			root,
 			filepath.Join(cwd, "testdata"),
+		},
+		FileSystem: &filesystem.OSFS{
+			CWD: cwd,
 		},
 	}
 

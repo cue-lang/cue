@@ -15,7 +15,9 @@
 package cmd
 
 import (
+	pathext "cuelang.org/go/internal/path"
 	"fmt"
+	"io/fs"
 	"io/ioutil"
 	"os"
 	"path/filepath"
@@ -360,11 +362,12 @@ func protoMode(b *buildPlan) error {
 	}
 
 	c := &protobuf.Config{
-		Root:     root,
-		Module:   module,
-		Paths:    b.encConfig.ProtoPath,
-		PkgName:  b.encConfig.PkgName,
-		EnumMode: flagProtoEnum.String(b.cmd),
+		Root:       root,
+		Module:     module,
+		Paths:      b.encConfig.ProtoPath,
+		PkgName:    b.encConfig.PkgName,
+		EnumMode:   flagProtoEnum.String(b.cmd),
+		FileSystem: b.cfg.loadCfg.FileSystem,
 	}
 	if module != "" {
 		// We only allow imports from packages within the module if an actual
@@ -383,14 +386,14 @@ func protoMode(b *buildPlan) error {
 
 	modDir := ""
 	if root != "" {
-		modDir = internal.GenPath(root)
+		modDir = internal.GenPath(root, c.FileSystem)
 	}
 
 	for _, f := range files {
 		// Only write the cue.mod files if they don't exist or if -Rf is used.
 		abs := f.Filename
-		if !filepath.IsAbs(abs) {
-			abs = filepath.Join(root, abs)
+		if !pathext.IsAbs(abs) {
+			abs = pathext.Join(root, abs)
 		}
 		force := flagForce.Bool(b.cmd)
 		if flagRecursive.Bool(b.cmd) && strings.HasPrefix(abs, modDir) {
@@ -433,24 +436,28 @@ func genericMode(cmd *Command, b *buildPlan) error {
 }
 
 func getFilename(b *buildPlan, f *ast.File, root string, force bool) (filename string, err error) {
+	fsys := b.cfg.loadCfg.FileSystem
+
 	cueFile := f.Filename
 	if out := flagOutFile.String(b.cmd); out != "" {
 		cueFile = out
 	}
 
+	var pathError *fs.PathError
+
 	if cueFile != "-" {
-		switch _, err := os.Stat(cueFile); {
-		case os.IsNotExist(err):
+		switch _, err := fs.Stat(fsys, cueFile); {
+		case errors.As(err, &pathError):
 		case err == nil:
 			if !force {
 				// TODO: mimic old behavior: write to stderr, but do not exit
 				// with error code. Consider what is best to do here.
 				stderr := b.cmd.Command.OutOrStderr()
 				if root != "" {
-					cueFile, _ = filepath.Rel(root, cueFile)
+					cueFile, _ = pathext.Rel(root, cueFile)
 				}
 				fmt.Fprintf(stderr, "Skipping file %q: already exists.\n",
-					filepath.ToSlash(cueFile))
+					cueFile)
 				if strings.HasPrefix(cueFile, "cue.mod") {
 					fmt.Fprintln(stderr, "Use -Rf to override.")
 				} else {

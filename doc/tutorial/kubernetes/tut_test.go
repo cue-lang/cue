@@ -17,6 +17,7 @@ package kubernetes
 import (
 	"bytes"
 	"context"
+	"cuelang.org/go/internal/filesystem"
 	"flag"
 	"fmt"
 	"io"
@@ -50,6 +51,8 @@ func TestTutorial(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+
+	fsys := filesystem.OSFS{}
 
 	// Read the tutorial.
 	b, err := ioutil.ReadFile("README.md")
@@ -85,7 +88,7 @@ func TestTutorial(t *testing.T) {
 		logf(t, "%s", out)
 	} else {
 		// We only fetch new kubernetes files with when updating.
-		err := copy.Dir(load.GenPath("quick"), load.GenPath(dir))
+		err := copy.Dir(load.GenPathWithFileSystem("quick", &fsys), load.GenPathWithFileSystem(dir, &fsys))
 		if err != nil {
 			t.Fatal(err)
 		}

@@ -16,6 +16,7 @@ package load
 
 import (
 	"bytes"
+	"embed"
 	"os"
 	"path/filepath"
 	"strconv"
@@ -31,6 +32,17 @@ import (
 	"cuelang.org/go/internal/str"
 )
 
+//go:embed "testdata/*"
+var testdataFS embed.FS
+
+type testCase struct {
+	cfg                *Config
+	args               []string
+	want               string
+	embeddedFileSystem bool
+	skipEmbedded       bool
+}
+
 // TestLoad is an end-to-end test.
 func TestLoad(t *testing.T) {
 	cwd, err := os.Getwd()
@@ -44,11 +56,7 @@ func TestLoad(t *testing.T) {
 	}
 
 	args := str.StringList
-	testCases := []struct {
-		cfg  *Config
-		args []string
-		want string
-	}{{
+	baseTestCases := []testCase{{
 		// Even though the directory is called testdata, the last path in
 		// the module is test. So "package test" is correctly the default
 		// package of this directory.
@@ -179,7 +187,8 @@ files:
 	}, {
 		cfg: dirCfg,
 		// Absolute file is normalized.
-		args: args(filepath.Join(cwd, "testdata", "anon.cue")),
+		args:         args(filepath.Join(cwd, "testdata", "anon.cue")),
+		skipEmbedded: true,
 		want: `
 path:   ""
 module: ""
@@ -302,8 +311,35 @@ root:   $CWD/testdata
 dir:    $CWD/testdata/tagsbad
 display:./tagsbad`,
 	}}
+
+	// Added embedded test cases
+	testCases := make([]testCase, 0, 2*len(baseTestCases))
+
+	for _, tc := range baseTestCases {
+		tc.embeddedFileSystem = false
+		testCases = append(testCases, tc)
+
+		tc.embeddedFileSystem = true
+
+		if tc.skipEmbedded {
+			continue
+		}
+
+		cfg := *tc.cfg
+		cfg.FileSystem = testdataFS
+		cfg.Dir = testdata // EmbeddedFS does not use CWD
+		tc.cfg = &cfg
+
+		testCases = append(testCases, tc)
+	}
+
 	for i, tc := range testCases {
-		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":"), func(t *testing.T) {
+		postfix := ""
+		if tc.embeddedFileSystem {
+			postfix = "_embedded"
+		}
+
+		t.Run(strconv.Itoa(i)+"/"+strings.Join(tc.args, ":")+postfix, func(t *testing.T) {
 			pkgs := Instances(tc.args, tc.cfg)
 
 			buf := &bytes.Buffer{}
@@ -313,12 +349,19 @@ display:./tagsbad`,
 			}
 
 			got := strings.TrimSpace(buf.String())
-			got = strings.Replace(got, cwd, "$CWD", -1)
-			// Make test work with Windows.
-			got = strings.Replace(got, string(filepath.Separator), "/", -1)
+
+			if !tc.embeddedFileSystem {
+				got = strings.Replace(got, filepath.ToSlash(cwd), "$CWD", -1)
+			}
 
 			want := strings.TrimSpace(tc.want)
 			want = strings.Replace(want, "\t", "    ", -1)
+
+			if tc.embeddedFileSystem {
+				//$CWD is not used for embedded
+				want = strings.Replace(want, "$CWD/", "", -1)
+			}
+
 			if got != want {
 				t.Errorf("\n%s", diff.Diff(want, got))
 				t.Logf("\n%s", got)

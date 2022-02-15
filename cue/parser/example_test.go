@@ -13,26 +13,3 @@
 // limitations under the License.
 
 package parser_test
-
-import (
-	"fmt"
-
-	"cuelang.org/go/cue/parser"
-)
-
-func ExampleParseFile() {
-	// Parse the file containing this very example
-	// but stop after processing the imports.
-	f, err := parser.ParseFile("testdata/test.cue", nil)
-	if err != nil {
-		fmt.Println(err)
-		return
-	}
-
-	// Print the imports from the file's AST.
-	for _, s := range f.Imports {
-		fmt.Println(s.Path.Value)
-	}
-	// Output:
-	// "math"
-}

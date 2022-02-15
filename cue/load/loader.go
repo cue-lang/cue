@@ -20,17 +20,18 @@ package load
 //    - go/build
 
 import (
-	pathpkg "path"
-	"path/filepath"
-	"strings"
-	"unicode"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
+	pathext "cuelang.org/go/internal/path"
+	"io/fs"
+	pathpkg "path"
+	"path/filepath"
+	"strings"
+	"unicode"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -45,10 +46,18 @@ import (
 // instance, but errors that occur loading dependencies are recorded in these
 // dependencies.
 func Instances(args []string, c *Config) []*build.Instance {
+	// TODO: Move OS path compatability to command line code. Give args a more appropriate name.
+	osNeutralArgs := make([]string, len(args))
+	for i, arg := range args {
+		osNeutralArgs[i] = filepath.ToSlash(arg)
+	}
+
+	args = osNeutralArgs
+
 	if c == nil {
 		c = &Config{}
 	}
-	newC, err := c.complete()
+	newC, err := c.Complete()
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
 	}
@@ -145,7 +154,7 @@ func (l *loader) abs(filename string) string {
 	if !isLocalImport(filename) {
 		return filename
 	}
-	return filepath.Join(l.cfg.Dir, filename)
+	return pathpkg.Join(l.cfg.Dir, filename)
 }
 
 // cueFilesPackage creates a package for building a collection of CUE files
@@ -157,7 +166,7 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 	// ModInit() // TODO: support modules
 	pkg := l.cfg.Context.NewInstance(cfg.Dir, l.loadFunc())
 
-	_, err := filepath.Abs(cfg.Dir)
+	_, err := pathext.Abs(cfg.Dir)
 	if err != nil {
 		return cfg.newErrInstance(pos, toImportPath(cfg.Dir),
 			errors.Wrapf(err, pos, "could not convert '%s' to absolute path", cfg.Dir))
@@ -168,10 +177,12 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		if f == "-" {
 			continue
 		}
-		if !filepath.IsAbs(f) {
-			f = filepath.Join(cfg.Dir, f)
+
+		if strings.HasPrefix(f, "./") {
+			f = pathpkg.Join(cfg.Dir, f)
 		}
-		fi, err := cfg.fileSystem.stat(f)
+
+		fi, err := fs.Stat(cfg.FileSystem, f)
 		if err != nil {
 			return cfg.newErrInstance(pos, toImportPath(f),
 				errors.Wrapf(err, pos, "could not find file"))
@@ -219,8 +230,9 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 func (l *loader) addFiles(dir string, p *build.Instance) {
 	for _, f := range p.BuildFiles {
 		d := encoding.NewDecoder(f, &encoding.Config{
-			Stdin:     l.cfg.stdin(),
-			ParseFile: l.cfg.ParseFile,
+			Stdin:      l.cfg.stdin(),
+			ParseFile:  l.cfg.ParseFile,
+			FileSystem: l.cfg.FileSystem,
 		})
 		for ; !d.Done(); d.Next() {
 			_ = p.AddSyntax(d.File())

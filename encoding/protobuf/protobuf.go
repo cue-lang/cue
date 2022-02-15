@@ -86,7 +86,9 @@ package protobuf
 //                   ...}
 
 import (
-	"os"
+	pathext "cuelang.org/go/internal/path"
+	"io/fs"
+	pathpkg "path"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -147,6 +149,9 @@ type Config struct {
 	//            disjunction of the enum to interpret strings.
 	//
 	EnumMode string
+
+	// FileSystem is used for all io operations while processing protobufs
+	FileSystem fs.FS
 }
 
 // An Extractor converts a collection of proto files, typically belonging to one
@@ -161,7 +166,6 @@ type Config struct {
 //
 type Extractor struct {
 	root     string
-	cwd      string
 	module   string
 	paths    []string
 	pkgName  string
@@ -172,6 +176,9 @@ type Extractor struct {
 
 	errs errors.Error
 	done bool
+
+	// fileSystem is used for all io operations in the Extractor
+	fileSystem fs.FS
 }
 
 type result struct {
@@ -183,20 +190,15 @@ type result struct {
 // it will be observable by the Err method fo the Extractor. It is safe,
 // however, to only check errors after building the output.
 func NewExtractor(c *Config) *Extractor {
-	cwd, _ := os.Getwd()
 	b := &Extractor{
-		root:      c.Root,
-		cwd:       cwd,
-		paths:     c.Paths,
-		pkgName:   c.PkgName,
-		module:    c.Module,
-		enumMode:  c.EnumMode,
-		fileCache: map[string]result{},
-		imports:   map[string]*build.Instance{},
-	}
-
-	if b.root == "" {
-		b.root = b.cwd
+		root:       filepath.ToSlash(c.Root),
+		paths:      c.Paths,
+		pkgName:    c.PkgName,
+		module:     c.Module,
+		enumMode:   c.EnumMode,
+		fileCache:  map[string]result{},
+		imports:    map[string]*build.Instance{},
+		fileSystem: c.FileSystem,
 	}
 
 	return b
@@ -221,16 +223,20 @@ func (b *Extractor) addErr(err error) {
 // Config.
 //
 func (b *Extractor) AddFile(filename string, src interface{}) error {
+	filename = filepath.ToSlash(filename)
+
 	if b.done {
 		err := errors.Newf(token.NoPos,
 			"protobuf: cannot call AddFile: Instances was already called")
 		b.errs = errors.Append(b.errs, err)
 		return err
 	}
-	if b.root != b.cwd && !filepath.IsAbs(filename) {
-		filename = filepath.Join(b.root, filename)
+
+	if b.root != "" && !pathext.IsAbs(filename) {
+		filename = pathext.Join(b.root, filename)
 	}
 	_, err := b.parse(filename, src)
+
 	return err
 }
 
@@ -281,9 +287,9 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 
 		// Set canonical CUE path for generated file.
 		f := r.p.file
-		base := filepath.Base(f.Filename)
+		base := pathpkg.Base(f.Filename)
 		base = base[:len(base)-len(".proto")] + "_proto_gen.cue"
-		f.Filename = filepath.Join(inst.Dir, base)
+		f.Filename = pathpkg.Join(inst.Dir, base)
 		buf, err := format.Node(f)
 		if err != nil {
 			b.addErr(err)
@@ -343,8 +349,8 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 	dir := b.root
 	path := p.importPath()
 	file := p.file.Filename
-	if !filepath.IsAbs(file) {
-		file = filepath.Join(b.root, p.file.Filename)
+	if !pathext.IsAbs(file) {
+		file = pathext.Join(b.root, p.file.Filename)
 	}
 	// Determine whether the generated file should be included in place, or
 	// within cue.mod.
@@ -356,9 +362,9 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 		inPlace = false
 	}
 	if !inPlace {
-		dir = filepath.Join(internal.GenPath(dir), path)
+		dir = pathext.Join(internal.GenPath(dir, b.fileSystem), path)
 	} else {
-		dir = filepath.Dir(p.file.Filename)
+		dir = pathext.Dir(p.file.Filename)
 	}
 
 	// TODO: verify module name from go_package option against that of actual
@@ -402,6 +408,7 @@ func Extract(filename string, src interface{}, c *Config) (f *ast.File, err erro
 	if c == nil {
 		c = &Config{}
 	}
+
 	b := NewExtractor(c)
 
 	p, err := b.parse(filename, src)

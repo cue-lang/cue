@@ -15,6 +15,7 @@
 package protobuf_test
 
 import (
+	"cuelang.org/go/internal/filesystem"
 	"fmt"
 	"log"
 	"os"
@@ -32,6 +33,9 @@ func ExampleExtract() {
 
 	f, err := protobuf.Extract("examples/basic/basic.proto", nil, &protobuf.Config{
 		Paths: paths,
+		FileSystem: &filesystem.OSFS{
+			CWD: cwd,
+		},
 	})
 
 	if err != nil {

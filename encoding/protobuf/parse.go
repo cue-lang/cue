@@ -16,10 +16,10 @@ package protobuf
 
 import (
 	"bytes"
+	pathext "cuelang.org/go/internal/path"
 	"fmt"
-	"os"
+	"io/fs"
 	"path"
-	"path/filepath"
 	"strconv"
 	"strings"
 	"text/scanner"
@@ -47,7 +47,16 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		s.fileCache[filename] = result{p, err}
 	}()
 
-	b, err := source.Read(filename, src)
+	if src == nil {
+		var err error
+		src, err = s.fileSystem.Open(filename)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	b, err := source.Read(src)
 	if err != nil {
 		return nil, err
 	}
@@ -65,11 +74,12 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 	tfile.SetLinesForContent(b)
 
 	p = &protoConverter{
-		id:       filename,
-		state:    s,
-		tfile:    tfile,
-		imported: map[string]bool{},
-		symbols:  map[string]bool{},
+		id:         filename,
+		state:      s,
+		tfile:      tfile,
+		imported:   map[string]bool{},
+		symbols:    map[string]bool{},
+		fileSystem: s.fileSystem,
 	}
 
 	defer func() {
@@ -169,6 +179,8 @@ type protoConverter struct {
 	path    []string
 	scope   []map[string]mapping // for symbols resolution within package.
 	symbols map[string]bool      // symbols provided by package
+
+	fileSystem fs.FS // The file system used for all io done by protoconverter
 }
 
 type mapping struct {
@@ -302,9 +314,9 @@ func (p *protoConverter) doImport(v *proto.Import) error {
 	}
 
 	filename := ""
-	for _, p := range p.state.paths {
-		name := filepath.Join(p, v.Filename)
-		_, err := os.Stat(name)
+	for _, path := range p.state.paths {
+		name := pathext.Join(path, v.Filename)
+		_, err := fs.Stat(p.fileSystem, name)
 		if err != nil {
 			continue
 		}

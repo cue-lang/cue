@@ -20,7 +20,6 @@ import (
 	"bytes"
 	"fmt"
 	"io"
-	"io/ioutil"
 )
 
 // Read loads the source bytes for the given arguments. If src != nil,
@@ -28,26 +27,23 @@ import (
 // error. If src == nil, readSource returns the result of reading the file
 // specified by filename.
 //
-func Read(filename string, src interface{}) ([]byte, error) {
-	if src != nil {
-		switch s := src.(type) {
-		case string:
-			return []byte(s), nil
-		case []byte:
-			return s, nil
-		case *bytes.Buffer:
-			// is io.Reader, but src is already available in []byte form
-			if s != nil {
-				return s.Bytes(), nil
-			}
-		case io.Reader:
-			var buf bytes.Buffer
-			if _, err := io.Copy(&buf, s); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
+func Read(src interface{}) ([]byte, error) {
+	switch s := src.(type) {
+	case string:
+		return []byte(s), nil
+	case []byte:
+		return s, nil
+	case *bytes.Buffer:
+		// is io.Reader, but src is already available in []byte form
+		if s != nil {
+			return s.Bytes(), nil
 		}
-		return nil, fmt.Errorf("invalid source type %T", src)
+	case io.Reader:
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, s); err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
 	}
-	return ioutil.ReadFile(filename)
+	return nil, fmt.Errorf("invalid source type %T", src)
 }

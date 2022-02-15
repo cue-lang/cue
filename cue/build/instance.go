@@ -120,7 +120,8 @@ func (inst *Instance) RelPath(f *File) string {
 	if err != nil {
 		return f.Filename
 	}
-	return p
+
+	return filepath.ToSlash(p)
 }
 
 // ID returns the package ID unique for this module.
@@ -188,6 +189,7 @@ func (inst *Instance) parse(name string, src interface{}) (*ast.File, error) {
 	if inst.ctxt != nil && inst.ctxt.parseFunc != nil {
 		return inst.ctxt.parseFunc(name, src)
 	}
+
 	return parser.ParseFile(name, src, parser.ParseComments)
 }
 

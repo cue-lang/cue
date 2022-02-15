@@ -391,12 +391,32 @@ type config struct {
 
 func newBuildPlan(cmd *Command, args []string, cfg *config) (p *buildPlan, err error) {
 	if cfg == nil {
-		cfg = &defaultConfig
+		// Prevent modification of default config
+		tmpCfg := defaultConfig
+		loadCfg := *tmpCfg.loadCfg
+		tmpCfg.loadCfg = &loadCfg
+		cfg = &tmpCfg
 	}
+
 	if cfg.loadCfg == nil {
-		cfg.loadCfg = defaultConfig.loadCfg
+		// Prevent modification of default config
+		loadCfg := *defaultConfig.loadCfg
+		cfg.loadCfg = &loadCfg
 	}
+
+	if cfg.loadCfg.ParseFile == nil {
+		cfg.loadCfg.ParseFile = defaultConfig.loadCfg.ParseFile
+	}
+
 	cfg.loadCfg.Stdin = cmd.InOrStdin()
+
+	// TODO: Only call complete in individual functions that don't call load
+	l, err := cfg.loadCfg.Complete()
+	if err != nil {
+		return nil, err
+	}
+
+	cfg.loadCfg = l
 
 	p = &buildPlan{cfg: cfg, cmd: cmd, importing: cfg.loadCfg.DataFiles}
 
@@ -719,14 +739,15 @@ func (b *buildPlan) parseFlags() (err error) {
 		b.cfg.fileFilter = s
 	}
 	b.encConfig = &encoding.Config{
-		Force:     flagForce.Bool(b.cmd),
-		Mode:      b.cfg.outMode,
-		Stdin:     b.cmd.InOrStdin(),
-		Stdout:    b.cmd.OutOrStdout(),
-		ProtoPath: flagProtoPath.StringArray(b.cmd),
-		AllErrors: flagAllErrors.Bool(b.cmd),
-		PkgName:   flagPackage.String(b.cmd),
-		Strict:    flagStrict.Bool(b.cmd),
+		Force:      flagForce.Bool(b.cmd),
+		Mode:       b.cfg.outMode,
+		Stdin:      b.cmd.InOrStdin(),
+		Stdout:     b.cmd.OutOrStdout(),
+		ProtoPath:  flagProtoPath.StringArray(b.cmd),
+		AllErrors:  flagAllErrors.Bool(b.cmd),
+		PkgName:    flagPackage.String(b.cmd),
+		Strict:     flagStrict.Bool(b.cmd),
+		FileSystem: b.cfg.loadCfg.FileSystem,
 	}
 	return nil
 }

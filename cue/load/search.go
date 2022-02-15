@@ -17,15 +17,15 @@ package load
 import (
 	// TODO: remove this usage
 
-	"os"
-	"path"
-	"path/filepath"
-	"regexp"
-	"strings"
-
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	pathext "cuelang.org/go/internal/path"
+	"io/fs"
+	pathpkg "path"
+	"path/filepath"
+	"regexp"
+	"strings"
 )
 
 // A match represents the result of matching a single package pattern.
@@ -41,6 +41,7 @@ type match struct {
 // "cmd" (standard commands), or a path including "...".
 func (l *loader) matchPackages(pattern, pkgName string) *match {
 	// cfg := l.cfg
+
 	m := &match{
 		Pattern: pattern,
 		Literal: false,
@@ -125,6 +126,7 @@ func (l *loader) matchPackages(pattern, pkgName string) *match {
 	// 		return nil
 	// 	})
 	// }
+
 	return m
 }
 
@@ -139,54 +141,62 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		Literal: false,
 	}
 
+	fsys := c.FileSystem
+
 	// Find directory to begin the scan.
 	// Could be smarter but this one optimization
 	// is enough for now, since ... is usually at the
 	// end of a path.
 	i := strings.Index(pattern, "...")
-	dir, _ := path.Split(pattern[:i])
+	dir, _ := pathpkg.Split(pattern[:i])
 
 	root := l.abs(dir)
 
 	// Find new module root from here or check there are no additional
 	// cue.mod files between here and the next module.
 
-	if !hasFilepathPrefix(root, c.ModuleRoot) {
+	if !hasPathPrefix(root, c.ModuleRoot) {
 		m.Err = errors.Newf(token.NoPos,
 			"cue: pattern %s refers to dir %s, outside module root %s",
 			pattern, root, c.ModuleRoot)
 		return m
 	}
 
-	pkgDir := filepath.Join(root, modDir)
+	pkgDir := pathpkg.Join(root, modDir)
 	// TODO(legacy): remove
-	pkgDir2 := filepath.Join(root, "pkg")
+	pkgDir2 := pathpkg.Join(root, "pkg")
 
-	_ = c.fileSystem.walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
-		if err != nil || !fi.IsDir() {
+	walkDirFunction := c.WalkDir
+
+	if walkDirFunction == nil {
+		walkDirFunction = WalkDirWithSymlinks
+	}
+
+	_ = walkDirFunction(fsys, root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || !d.IsDir() {
 			return nil
 		}
 		if path == pkgDir || path == pkgDir2 {
-			return skipDir
+			return fs.SkipDir
 		}
 
 		top := path == root
 
 		// Avoid .foo, _foo, and testdata directory trees, but do not avoid "." or "..".
-		_, elem := filepath.Split(path)
+		_, elem := pathpkg.Split(path)
 		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
 		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
-			return skipDir
+			return fs.SkipDir
 		}
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := c.fileSystem.stat(filepath.Join(path, modDir)); err == nil {
-				return skipDir
+			if _, err := fs.Stat(fsys, pathpkg.Join(path, modDir)); err == nil {
+				return fs.SkipDir
 			}
 		}
 
-		// name := prefix + filepath.ToSlash(path)
+		// name := prefix + pathpkg.ToSlash(path)
 		// if !match(name) {
 		// 	return nil
 		// }
@@ -197,7 +207,8 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		// silently skipped as not matching the pattern.
 		// Do not take root, as we want to stay relative
 		// to one dir only.
-		dir, e := filepath.Rel(c.Dir, path)
+		dir, e := pathext.Rel(c.Dir, path)
+
 		if e != nil {
 			panic(err)
 		} else {
@@ -394,12 +405,12 @@ func cleanPatterns(patterns []string) []string {
 
 		// Put argument in canonical form, but preserve leading ./.
 		if strings.HasPrefix(a, "./") {
-			a = "./" + path.Clean(a)
+			a = "./" + pathpkg.Clean(a)
 			if a == "./." {
 				a = "."
 			}
 		} else {
-			a = path.Clean(a)
+			a = pathpkg.Clean(a)
 		}
 		out = append(out, a)
 	}
@@ -436,10 +447,10 @@ func hasFilepathPrefix(s, prefix string) bool {
 	case len(s) == len(prefix):
 		return s == prefix
 	case len(s) > len(prefix):
-		if prefix != "" && prefix[len(prefix)-1] == filepath.Separator {
+		if prefix != "" && prefix[len(prefix)-1] == '/' {
 			return strings.HasPrefix(s, prefix)
 		}
-		return s[len(prefix)] == filepath.Separator && s[:len(prefix)] == prefix
+		return s[len(prefix)] == '/' && s[:len(prefix)] == prefix
 	}
 }
 

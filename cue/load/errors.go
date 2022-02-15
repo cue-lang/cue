@@ -16,7 +16,7 @@ package load
 
 import (
 	"fmt"
-	"path/filepath"
+	pathpkg "path"
 	"strings"
 
 	"cuelang.org/go/cue/build"
@@ -106,7 +106,7 @@ func (e *NoFilesError) Error() string {
 	// Count files beginning with _, which we will pretend don't exist at all.
 	dummy := 0
 	for _, f := range e.Package.IgnoredFiles {
-		if strings.HasPrefix(filepath.Base(f.Filename), "_") {
+		if strings.HasPrefix(pathpkg.Base(f.Filename), "_") {
 			dummy++
 		}
 	}
@@ -122,7 +122,7 @@ func (e *NoFilesError) Error() string {
 		// CUE files exist, but they were ignored due to build constraints.
 		for _, f := range e.Package.IgnoredFiles {
 			b.WriteString("\n    ")
-			b.WriteString(filepath.ToSlash(e.Package.RelPath(f)))
+			b.WriteString(e.Package.RelPath(f))
 			if f.ExcludeReason != nil {
 				b.WriteString(": ")
 				b.WriteString(f.ExcludeReason.Error())

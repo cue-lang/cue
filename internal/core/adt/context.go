@@ -741,8 +741,13 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 		}
 
 		if v.isUndefined() {
+			// Keep a minimum state of AllArcs.
+			state := state
+			if state < AllArcs {
+				state = AllArcs
+			}
 			// Use node itself to allow for cycle detection.
-			c.Unify(v, AllArcs)
+			c.Unify(v, state)
 		}
 
 		return v

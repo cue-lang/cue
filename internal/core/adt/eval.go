@@ -834,6 +834,13 @@ type nodeContext struct {
 	disjunctErrs []*Bottom
 }
 
+// Logf substitutes args in format. Arguments of type Feature, Value, and Expr
+// are printed in human-friendly formats. The printed string is prefixed and
+// indented with the path associated with the current nodeContext.
+func (n *nodeContext) Logf(format string, args ...interface{}) {
+	n.ctx.Logf(n.node, format, args...)
+}
+
 type defaultInfo struct {
 	// parentMode indicates whether this values was used as a default value,
 	// based on the parent mode.

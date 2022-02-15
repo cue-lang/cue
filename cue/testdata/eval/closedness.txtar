@@ -51,7 +51,8 @@ a.q: field not allowed: e:
     ./in.cue:7:9
     ./in.cue:11:4
     ./in.cue:15:9
-issue852.a: field not allowed: Foo:
+issue852.a.Foo: field not allowed: Foo:
+    ./in.cue:30:15
     ./in.cue:22:7
     ./in.cue:26:6
     ./in.cue:28:6
@@ -87,20 +88,22 @@ Result:
     }
   }
   issue852: (_|_){
-    // [eval]
+    // [eval] issue852.a.Foo: field not allowed: Foo:
+    //     ./in.cue:30:15
+    //     ./in.cue:22:7
+    //     ./in.cue:26:6
+    //     ./in.cue:28:6
     #A: (#struct){
     }
     a: (_|_){
       // [eval]
       Foo: (_|_){
-        // [eval] issue852.a: field not allowed: Foo:
+        // [eval] issue852.a.Foo: field not allowed: Foo:
+        //     ./in.cue:30:15
         //     ./in.cue:22:7
         //     ./in.cue:26:6
         //     ./in.cue:28:6
       }
-    }
-    b: (struct){
-      Foo: (string){ "foo" }
     }
   }
   dynamic: (struct){

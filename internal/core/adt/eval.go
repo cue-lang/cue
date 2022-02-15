@@ -834,6 +834,10 @@ type nodeContext struct {
 	disjunctErrs []*Bottom
 }
 
+func (n *nodeContext) Logf(format string, args ...interface{}) {
+	n.ctx.Logf(n.node, format, args...)
+}
+
 type defaultInfo struct {
 	// parentMode indicates whether this values was used as a default value,
 	// based on the parent mode.

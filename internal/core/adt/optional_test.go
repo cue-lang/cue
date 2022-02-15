@@ -55,7 +55,7 @@ func TestOptionalTypes(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
 			ctx := eval.NewContext(runtime.New(), nil)
-			f, err := parser.ParseFile("opt", tc.in)
+			f, err := parser.ParseFileWithSource("opt", tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}

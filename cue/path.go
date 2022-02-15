@@ -121,7 +121,7 @@ func ParsePath(s string) Path {
 	if s == "" {
 		return Path{}
 	}
-	expr, err := parser.ParseExpr("", s)
+	expr, err := parser.ParseExprWithSource("", s)
 	if err != nil {
 		return MakePath(Selector{pathError{errors.Promote(err, "invalid path")}})
 	}

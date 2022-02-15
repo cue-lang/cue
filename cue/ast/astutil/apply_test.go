@@ -323,7 +323,7 @@ a: list6c6973
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := parser.ParseFile(tc.name, tc.in, parser.ParseComments)
+			f, err := parser.ParseFileWithSource(tc.name, tc.in, parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}

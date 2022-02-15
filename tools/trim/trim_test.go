@@ -252,7 +252,7 @@ foo: entry: {
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := parser.ParseFile("test", tc.in)
+			f, err := parser.ParseFileWithSource("test", tc.in)
 			if err != nil {
 				t.Fatal(err)
 			}

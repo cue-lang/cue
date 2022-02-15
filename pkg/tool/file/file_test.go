@@ -31,7 +31,7 @@ import (
 func parse(t *testing.T, kind, expr string) cue.Value {
 	t.Helper()
 
-	x, err := parser.ParseExpr("test", expr)
+	x, err := parser.ParseExprWithSource("test", expr)
 	if err != nil {
 		t.Fatal(err)
 	}

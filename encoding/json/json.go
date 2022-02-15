@@ -79,7 +79,7 @@ func Decode(r *cue.Runtime, path string, data []byte) (*cue.Instance, error) {
 }
 
 func extract(path string, b []byte) (ast.Expr, error) {
-	expr, err := parser.ParseExpr(path, b)
+	expr, err := parser.ParseExprWithSource(path, b)
 	if err != nil || !json.Valid(b) {
 		p := token.NoPos
 		if pos := errors.Positions(err); len(pos) > 0 {
@@ -137,7 +137,7 @@ func (d *Decoder) extract() (ast.Expr, error) {
 		pos := token.NewFile(d.path, offset, len(raw)).Pos(0, 0)
 		return nil, errors.Wrapf(err, pos, "invalid JSON for file %q", d.path)
 	}
-	expr, err := parser.ParseExpr(d.path, []byte(raw), parser.FileOffset(offset))
+	expr, err := parser.ParseExprWithSource(d.path, []byte(raw), parser.FileOffset(offset))
 	if err != nil {
 		return nil, err
 	}

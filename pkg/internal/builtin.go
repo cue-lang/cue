@@ -87,7 +87,7 @@ func (p *Package) MustCompile(ctx *adt.OpContext, importPath string) *adt.Vertex
 
 	// Parse builtin CUE
 	if p.CUE != "" {
-		expr, err := parser.ParseExpr(importPath, p.CUE)
+		expr, err := parser.ParseExprWithSource(importPath, p.CUE)
 		if err != nil {
 			panic(fmt.Errorf("could not parse %v: %v", p.CUE, err))
 		}
@@ -167,7 +167,7 @@ func toBuiltin(ctx *adt.OpContext, b *Builtin) *adt.Builtin {
 // newConstBuiltin parses and creates any CUE expression that does not have
 // fields.
 func mustParseConstBuiltin(ctx adt.Runtime, name, val string) adt.Expr {
-	expr, err := parser.ParseExpr("<builtin:"+name+">", val)
+	expr, err := parser.ParseExprWithSource("<builtin:"+name+">", val)
 	if err != nil {
 		panic(err)
 	}

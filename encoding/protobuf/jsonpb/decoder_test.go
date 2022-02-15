@@ -61,7 +61,7 @@ func TestParse(t *testing.T) {
 				continue
 
 			case strings.HasSuffix(f.Name, ".cue"):
-				f, err := parser.ParseFile(f.Name, f.Data, parser.ParseComments)
+				f, err := parser.ParseFileWithSource(f.Name, f.Data, parser.ParseComments)
 				if err != nil {
 					t.Fatal(err)
 				}
@@ -117,7 +117,7 @@ func TestX(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	file, err := parser.ParseFile("data", data)
+	file, err := parser.ParseFileWithSource("data", data)
 	if err != nil {
 		t.Fatal(err)
 	}

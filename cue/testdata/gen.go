@@ -220,7 +220,7 @@ func (e *extractor) extractTest(x *ast.CompositeLit) {
 			src := []byte(e.stringConst(f.Value))
 			src, err := cueformat.Source(src)
 
-			if f, err := parser.ParseFile("in.cue", src, parser.ParseComments); err == nil {
+			if f, err := parser.ParseFileWithSource("in.cue", src, parser.ParseComments); err == nil {
 				f = fix.File(f)
 				b, err := cueformat.Node(f)
 				if err == nil {

@@ -113,7 +113,7 @@ func TestGenerated(t *testing.T) {
 		out: `*null|[...*null|{Name: string, Description: string}]`,
 	}, {
 		in: func(ctx *adt.OpContext) (adt.Expr, error) {
-			expr, err := parser.ParseExpr("test", `{
+			expr, err := parser.ParseExprWithSource("test", `{
 				x: Guide.#Terminal
 				Guide: {}
 			}`)

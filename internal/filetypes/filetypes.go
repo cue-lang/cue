@@ -171,7 +171,7 @@ func ParseArgs(args []string) (files []*build.File, err error) {
 				if len(a) == 1 && strings.HasSuffix(a[0], ".cue") {
 					// Handle majority case.
 					files = append(files, &build.File{
-						Filename: a[0],
+						Filename: filepath.ToSlash(a[0]),
 						Encoding: build.CUE,
 						Form:     build.Schema,
 					})

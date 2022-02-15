@@ -88,7 +88,7 @@ func TestPackageName(t *testing.T) {
 	}}
 	for _, tc := range testCases {
 		t.Run("", func(t *testing.T) {
-			f, err := parser.ParseFile("test", tc.input)
+			f, err := parser.ParseFileWithSource("test", tc.input)
 			if err != nil {
 				t.Fatal(err)
 			}

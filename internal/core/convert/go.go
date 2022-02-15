@@ -82,7 +82,7 @@ func parseTag(ctx *adt.OpContext, obj *ast.StructLit, field, tag string) ast.Exp
 	if tag == "" {
 		return topSentinel
 	}
-	expr, err := parser.ParseExpr("<field:>", tag)
+	expr, err := parser.ParseExprWithSource("<field:>", tag)
 	if err != nil {
 		err := errors.Promote(err, "parser")
 		ctx.AddErr(errors.Wrapf(err, ctx.Pos(),
@@ -175,7 +175,7 @@ func isOmitEmpty(f *reflect.StructField) bool {
 
 // parseJSON parses JSON into a CUE value. b must be valid JSON.
 func parseJSON(ctx *adt.OpContext, b []byte) adt.Value {
-	expr, err := parser.ParseExpr("json", b)
+	expr, err := parser.ParseExprWithSource("json", b)
 	if err != nil {
 		panic(err) // cannot happen
 	}

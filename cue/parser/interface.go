@@ -141,6 +141,7 @@ const (
 // errors were found, the result is a partial AST (with Bad* nodes
 // representing the fragments of erroneous source code). Multiple errors
 // are returned via a ErrorList which is sorted by file position.
+// Deprecated: Use ParseFileWithSource
 func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
 
 	// get source
@@ -149,6 +150,21 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 		return nil, err
 	}
 
+	return ParseFileText(filename, text, mode...)
+}
+
+func ParseFileWithSource(filename string, src interface{}, mode ...Option) (f *ast.File, err error) {
+
+	// get source
+	text, err := source.ReadSource(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return ParseFileText(filename, text, mode...)
+}
+
+func ParseFileText(filename string, text []byte, mode ...Option) (f *ast.File, err error) {
 	var pp parser
 	defer func() {
 		if pp.panicking {
@@ -184,12 +200,28 @@ func ParseFile(filename string, src interface{}, mode ...Option) (f *ast.File, e
 // The arguments have the same meaning as for Parse, but the source must
 // be a valid CUE (type or value) expression. Specifically, fset must not
 // be nil.
+// Deprecated: Use ParseExprWithSource
 func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, error) {
 	// get source
 	text, err := source.Read(filename, src)
 	if err != nil {
 		return nil, err
 	}
+
+	return ParseExprText(filename, text, mode...)
+}
+
+func ParseExprWithSource(filename string, src interface{}, mode ...Option) (ast.Expr, error) {
+	// get source
+	text, err := source.ReadSource(src)
+	if err != nil {
+		return nil, err
+	}
+
+	return ParseExprText(filename, text, mode...)
+}
+
+func ParseExprText(filename string, text []byte, mode ...Option) (expr ast.Expr, err error) {
 
 	var p parser
 	defer func() {
@@ -228,5 +260,5 @@ func ParseExpr(filename string, src interface{}, mode ...Option) (ast.Expr, erro
 // expression x. The position information recorded in the AST is undefined. The
 // filename used in error messages is the empty string.
 func parseExprString(x string) (ast.Expr, error) {
-	return ParseExpr("", []byte(x))
+	return ParseExprText("", []byte(x))
 }

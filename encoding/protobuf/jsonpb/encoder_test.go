@@ -53,7 +53,7 @@ func TestEncoder(t *testing.T) {
 				schema = inst.Value()
 
 			case f.Name == "value.cue":
-				f, err := parser.ParseFile(f.Name, f.Data, parser.ParseComments)
+				f, err := parser.ParseFileWithSource(f.Name, f.Data, parser.ParseComments)
 				if err != nil {
 					t.WriteErrors(errors.Promote(err, "test"))
 					return

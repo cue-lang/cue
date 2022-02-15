@@ -28,26 +28,31 @@ import (
 // error. If src == nil, readSource returns the result of reading the file
 // specified by filename.
 //
+// Deprecated: Due to unpredictable file system behavior. Use ReadSource
 func Read(filename string, src interface{}) ([]byte, error) {
 	if src != nil {
-		switch s := src.(type) {
-		case string:
-			return []byte(s), nil
-		case []byte:
-			return s, nil
-		case *bytes.Buffer:
-			// is io.Reader, but src is already available in []byte form
-			if s != nil {
-				return s.Bytes(), nil
-			}
-		case io.Reader:
-			var buf bytes.Buffer
-			if _, err := io.Copy(&buf, s); err != nil {
-				return nil, err
-			}
-			return buf.Bytes(), nil
-		}
-		return nil, fmt.Errorf("invalid source type %T", src)
+		return ReadSource(src)
 	}
 	return ioutil.ReadFile(filename)
+}
+
+func ReadSource(src interface{}) ([]byte, error) {
+	switch s := src.(type) {
+	case string:
+		return []byte(s), nil
+	case []byte:
+		return s, nil
+	case *bytes.Buffer:
+		// is io.Reader, but src is already available in []byte form
+		if s != nil {
+			return s.Bytes(), nil
+		}
+	case io.Reader:
+		var buf bytes.Buffer
+		if _, err := io.Copy(&buf, s); err != nil {
+			return nil, err
+		}
+		return buf.Bytes(), nil
+	}
+	return nil, fmt.Errorf("invalid source type %T", src)
 }

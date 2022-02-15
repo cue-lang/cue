@@ -92,7 +92,7 @@ func TestX(t *testing.T) {
 		t.Skip()
 	}
 
-	file, err := parser.ParseFile("TestX", in)
+	file, err := parser.ParseFileWithSource("TestX", in)
 	if err != nil {
 		t.Fatal(err)
 	}

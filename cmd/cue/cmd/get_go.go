@@ -16,14 +16,16 @@ package cmd
 
 import (
 	"bytes"
+	"cuelang.org/go/cue/filesystem"
 	"fmt"
 	"go/ast"
 	"go/token"
 	"go/types"
 	"io"
+	"io/fs"
 	"io/ioutil"
 	"os"
-	"path"
+	pathpkg "path"
 	"path/filepath"
 	"reflect"
 	"regexp"
@@ -262,6 +264,8 @@ type extractor struct {
 
 	exclusions []*regexp.Regexp
 	exclude    string
+
+	fileSystem fs.FS
 }
 
 type pkgInfo struct {
@@ -414,10 +418,11 @@ func extract(cmd *Command, args []string) error {
 	}
 
 	e := extractor{
-		cmd:    cmd,
-		stderr: cmd.Stderr(),
-		pkgs:   pkgs,
-		orig:   map[types.Type]*ast.StructType{},
+		cmd:        cmd,
+		stderr:     cmd.Stderr(),
+		pkgs:       pkgs,
+		orig:       map[types.Type]*ast.StructType{},
+		fileSystem: &filesystem.OSFS{},
 	}
 
 	e.initExclusions(flagExclude.String(cmd))
@@ -466,7 +471,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 	}
 
 	pkg := p.PkgPath
-	dir := filepath.Join(load.GenPath(root), filepath.FromSlash(pkg))
+	dir := pathpkg.Join(load.GenPath(root, e.fileSystem), filepath.FromSlash(pkg))
 
 	isMain := flagLocal.Bool(e.cmd) && p.Module != nil && p.Module.Main
 	if isMain {
@@ -498,7 +503,7 @@ func (e *extractor) extractPkg(root string, p *packages.Package) error {
 			pkg := p.Imports[pkgPath]
 
 			info := pkgInfo{id: pkgPath, name: pkg.Name}
-			if path.Base(pkgPath) != pkg.Name {
+			if pathpkg.Base(pkgPath) != pkg.Name {
 				info.id += ":" + pkg.Name
 			}
 
@@ -585,7 +590,13 @@ func (e *extractor) importCUEFiles(p *packages.Package, dir, args string) error 
 			if filepath.Ext(path) != ".cue" {
 				return nil
 			}
-			f, err := parser.ParseFile(path, nil)
+
+			contents, err := ioutil.ReadFile(path)
+			if err != nil {
+				return err
+			}
+
+			f, err := parser.ParseFileWithSource(path, contents)
 			if err != nil {
 				return err
 			}
@@ -783,7 +794,7 @@ func (e *extractor) reportDecl(x *ast.GenDecl) (a []cueast.Decl) {
 
 				c := e.pkg.TypesInfo.Defs[v.Names[i]].(*types.Const)
 				sv := c.Val().ExactString()
-				cv, err := parser.ParseExpr("", sv)
+				cv, err := parser.ParseExprWithSource("", sv)
 				if err != nil {
 					panic(fmt.Errorf("failed to parse %v: %v", sv, err))
 				}
@@ -1207,7 +1218,7 @@ func (e *extractor) addFields(x *types.Struct, st *cueast.StructLit) {
 		add(field)
 
 		if s := reflect.StructTag(tag).Get("cue"); s != "" {
-			expr, err := parser.ParseExpr("get go", s)
+			expr, err := parser.ParseExprWithSource("get go", s)
 			if err != nil {
 				e.logf("error parsing struct tag %q:", s, err)
 			}

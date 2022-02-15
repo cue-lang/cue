@@ -360,11 +360,12 @@ func protoMode(b *buildPlan) error {
 	}
 
 	c := &protobuf.Config{
-		Root:     root,
-		Module:   module,
-		Paths:    b.encConfig.ProtoPath,
-		PkgName:  b.encConfig.PkgName,
-		EnumMode: flagProtoEnum.String(b.cmd),
+		Root:       root,
+		Module:     module,
+		Paths:      b.encConfig.ProtoPath,
+		PkgName:    b.encConfig.PkgName,
+		EnumMode:   flagProtoEnum.String(b.cmd),
+		FileSystem: b.cfg.loadCfg.FileSystem,
 	}
 	if module != "" {
 		// We only allow imports from packages within the module if an actual
@@ -383,7 +384,7 @@ func protoMode(b *buildPlan) error {
 
 	modDir := ""
 	if root != "" {
-		modDir = internal.GenPath(root)
+		modDir = internal.GenPath(root, c.FileSystem)
 	}
 
 	for _, f := range files {
@@ -570,7 +571,7 @@ func (h *hoister) hoist(f *ast.File) {
 func tryParse(str string) (s ast.Expr, pkg string) {
 	b := []byte(str)
 	if json.Valid(b) {
-		expr, err := parser.ParseExpr("", b)
+		expr, err := parser.ParseExprWithSource("", b)
 		if err != nil {
 			// TODO: report error
 			return nil, ""

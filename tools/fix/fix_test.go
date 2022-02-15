@@ -114,7 +114,7 @@ x6: 4 & 9
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			f, err := parser.ParseFile("", tc.in, parser.ParseComments)
+			f, err := parser.ParseFileWithSource("", tc.in, parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}
@@ -133,7 +133,7 @@ x6: 4 & 9
 			if got != tc.out {
 				t.Errorf("got %v; want %v", got, tc.out)
 			}
-			_, err = parser.ParseFile("rewritten", got, parser.ParseComments)
+			_, err = parser.ParseFileWithSource("rewritten", got, parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}

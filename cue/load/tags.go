@@ -318,7 +318,7 @@ func shouldBuildFile(f *ast.File, fp *fileProcessor) errors.Error {
 
 	_, body := a.Split()
 
-	expr, err := parser.ParseExpr("", body)
+	expr, err := parser.ParseExprWithSource("", body)
 	if err != nil {
 		return errors.Promote(err, "")
 	}

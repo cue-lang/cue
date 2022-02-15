@@ -16,7 +16,8 @@ package load
 
 import (
 	"bytes"
-	"os"
+	"io/fs"
+	pathpkg "path"
 	"path/filepath"
 	"sort"
 	"strconv"
@@ -78,7 +79,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	defer l.stk.Pop()
 
 	cfg := l.cfg
-	ctxt := &cfg.fileSystem
+
+	fsys := cfg.FileSystem
 
 	if p.Err != nil {
 		return []*build.Instance{p}
@@ -118,21 +120,23 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	}
 
 	var dirs [][2]string
-	genDir := GenPath(cfg.ModuleRoot)
+	genDir := GenPath(cfg.ModuleRoot, cfg.FileSystem)
 	if strings.HasPrefix(p.Dir, genDir) {
 		dirs = append(dirs, [2]string{genDir, p.Dir})
 		// TODO(legacy): don't support "pkg"
 		// && p.PkgName != "_"
-		if filepath.Base(genDir) != "pkg" {
+		if pathpkg.Base(genDir) != "pkg" {
 			for _, sub := range []string{"pkg", "usr"} {
 				rel, err := filepath.Rel(genDir, p.Dir)
+				rel = filepath.ToSlash(rel)
+
 				if err != nil {
 					// should not happen
 					return retErr(
 						errors.Wrapf(err, token.NoPos, "invalid path"))
 				}
-				base := filepath.Join(cfg.ModuleRoot, modDir, sub)
-				dir := filepath.Join(base, rel)
+				base := pathpkg.Join(cfg.ModuleRoot, modDir, sub)
+				dir := pathpkg.Join(base, rel)
 				dirs = append(dirs, [2]string{base, dir})
 			}
 		}
@@ -142,7 +146,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 
 	found := false
 	for _, d := range dirs {
-		info, err := ctxt.stat(d[1])
+		info, err := fs.Stat(fsys, d[1])
 		if err == nil && info.IsDir() {
 			found = true
 			break
@@ -168,9 +172,12 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 	}
 
 	for _, d := range dirs {
-		for dir := filepath.Clean(d[1]); ctxt.isDir(dir); {
-			files, err := ctxt.readDir(dir)
-			if err != nil && !os.IsNotExist(err) {
+		for dir := pathpkg.Clean(d[1]); isDir(fsys, dir); {
+
+			files, err := fs.ReadDir(fsys, dir)
+			var pathError *fs.PathError
+
+			if err != nil && !errors.As(err, &pathError) {
 				return retErr(errors.Wrapf(err, pos, "import failed reading dir %v", dirs[0][1]))
 			}
 			for _, f := range files {
@@ -178,7 +185,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 					continue
 				}
 				if f.Name() == "-" {
-					if _, err := cfg.fileSystem.stat("-"); !os.IsNotExist(err) {
+					if _, err := fs.Stat(fsys, "-"); !errors.Is(err, pathError) {
 						continue
 					}
 				}
@@ -190,6 +197,7 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 					})
 					continue // skip unrecognized file types
 				}
+
 				fp.add(pos, dir, file, importComment)
 			}
 
@@ -201,8 +209,8 @@ func (l *loader) importPkg(pos token.Pos, p *build.Instance) []*build.Instance {
 			// package.
 			fp.ignoreOther = true
 
-			parent, _ := filepath.Split(dir)
-			parent = filepath.Clean(parent)
+			parent, _ := pathpkg.Split(dir)
+			parent = pathpkg.Clean(parent)
 
 			if parent == dir || len(parent) < len(d[0]) {
 				break
@@ -276,7 +284,7 @@ func rewriteFiles(p *build.Instance, root string, isLocal bool) {
 
 func normalizeFiles(a []*build.File) {
 	sort.Slice(a, func(i, j int) bool {
-		return len(filepath.Dir(a[i].Filename)) < len(filepath.Dir(a[j].Filename))
+		return len(pathpkg.Dir(a[i].Filename)) < len(pathpkg.Dir(a[j].Filename))
 	})
 }
 
@@ -347,9 +355,12 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 			fullPath = filepath.Join(root, fullPath)
 		}
 	}
+
+	fullPath = filepath.ToSlash(fullPath)
+
 	file.Filename = fullPath
 
-	base := filepath.Base(fullPath)
+	base := pathpkg.Base(fullPath)
 
 	// special * and _
 	p := fp.pkg // default package
@@ -384,13 +395,15 @@ func (fp *fileProcessor) add(pos token.Pos, root string, file *build.File, mode 
 		return false
 	}
 
-	pf, perr := parser.ParseFile(fullPath, data, parser.ImportsOnly, parser.ParseComments)
+	pf, perr := parser.ParseFileWithSource(fullPath, data, parser.ImportsOnly, parser.ParseComments)
 	if perr != nil {
 		badFile(errors.Promote(perr, "add failed"))
 		return true
 	}
 
-	_, pkg, pos := internal.PackageInfo(pf)
+	pkgInfo := internal.GetPackageInfo(pf)
+	pkg := pkgInfo.Name
+
 	if pkg == "" {
 		pkg = "_"
 	}

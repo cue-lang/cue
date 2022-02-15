@@ -86,7 +86,7 @@ package protobuf
 //                   ...}
 
 import (
-	"os"
+	"io/fs"
 	"path/filepath"
 	"sort"
 	"strings"
@@ -147,6 +147,8 @@ type Config struct {
 	//            disjunction of the enum to interpret strings.
 	//
 	EnumMode string
+
+	FileSystem fs.FS
 }
 
 // An Extractor converts a collection of proto files, typically belonging to one
@@ -161,7 +163,6 @@ type Config struct {
 //
 type Extractor struct {
 	root     string
-	cwd      string
 	module   string
 	paths    []string
 	pkgName  string
@@ -172,6 +173,8 @@ type Extractor struct {
 
 	errs errors.Error
 	done bool
+
+	fileSystem fs.FS
 }
 
 type result struct {
@@ -183,20 +186,15 @@ type result struct {
 // it will be observable by the Err method fo the Extractor. It is safe,
 // however, to only check errors after building the output.
 func NewExtractor(c *Config) *Extractor {
-	cwd, _ := os.Getwd()
 	b := &Extractor{
-		root:      c.Root,
-		cwd:       cwd,
-		paths:     c.Paths,
-		pkgName:   c.PkgName,
-		module:    c.Module,
-		enumMode:  c.EnumMode,
-		fileCache: map[string]result{},
-		imports:   map[string]*build.Instance{},
-	}
-
-	if b.root == "" {
-		b.root = b.cwd
+		root:       c.Root,
+		paths:      c.Paths,
+		pkgName:    c.PkgName,
+		module:     c.Module,
+		enumMode:   c.EnumMode,
+		fileCache:  map[string]result{},
+		imports:    map[string]*build.Instance{},
+		fileSystem: c.FileSystem,
 	}
 
 	return b
@@ -221,16 +219,19 @@ func (b *Extractor) addErr(err error) {
 // Config.
 //
 func (b *Extractor) AddFile(filename string, src interface{}) error {
+
 	if b.done {
 		err := errors.Newf(token.NoPos,
 			"protobuf: cannot call AddFile: Instances was already called")
 		b.errs = errors.Append(b.errs, err)
 		return err
 	}
-	if b.root != b.cwd && !filepath.IsAbs(filename) {
+
+	if b.root != "" && !filepath.IsAbs(filename) {
 		filename = filepath.Join(b.root, filename)
 	}
 	_, err := b.parse(filename, src)
+
 	return err
 }
 
@@ -290,7 +291,7 @@ func (b *Extractor) Instances() (instances []*build.Instance, err error) {
 			// return nil, err
 			continue
 		}
-		f, err = parser.ParseFile(f.Filename, buf, parser.ParseComments)
+		f, err = parser.ParseFileWithSource(f.Filename, buf, parser.ParseComments)
 		if err != nil {
 			b.addErr(err)
 			continue
@@ -356,7 +357,7 @@ func (b *Extractor) getInst(p *protoConverter) *build.Instance {
 		inPlace = false
 	}
 	if !inPlace {
-		dir = filepath.Join(internal.GenPath(dir), path)
+		dir = filepath.Join(internal.GenPath(dir, b.fileSystem), path)
 	} else {
 		dir = filepath.Dir(p.file.Filename)
 	}
@@ -402,6 +403,7 @@ func Extract(filename string, src interface{}, c *Config) (f *ast.File, err erro
 	if c == nil {
 		c = &Config{}
 	}
+
 	b := NewExtractor(c)
 
 	p, err := b.parse(filename, src)

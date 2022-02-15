@@ -12,12 +12,13 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+//go:build gofuzz
 // +build gofuzz
 
 package parser
 
 func Fuzz(b []byte) int {
-	_, err := ParseFile("go-fuzz", b)
+	_, err := ParseFileWithSource("go-fuzz", b)
 	if err != nil {
 		return 0
 	}

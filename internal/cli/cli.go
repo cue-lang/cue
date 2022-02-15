@@ -29,7 +29,7 @@ func ParseValue(pos token.Pos, name, str string, k cue.Kind) (x ast.Expr, errs e
 
 	if k&cue.NumberKind != 0 {
 		var err error
-		expr, err = parser.ParseExpr(name, str)
+		expr, err = parser.ParseExprWithSource(name, str)
 		if err != nil {
 			errs = errors.Wrapf(err, pos,
 				"invalid number for environment variable %s", name)

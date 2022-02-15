@@ -16,7 +16,7 @@ package load
 
 import (
 	"io/ioutil"
-	"path/filepath"
+	pathpkg "path"
 	"strings"
 
 	"cuelang.org/go/cue/build"
@@ -42,13 +42,6 @@ func (e excludeError) Is(err error) bool { return err == errExclude }
 // If allTags is non-nil, matchFile records any encountered build tag
 // by setting allTags[tag] = true.
 func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allTags map[string]bool) (match bool, data []byte, err errors.Error) {
-	if fi := cfg.fileSystem.getOverlay(file.Filename); fi != nil {
-		if fi.file != nil {
-			file.Source = fi.file
-		} else {
-			file.Source = fi.contents
-		}
-	}
 
 	if file.Encoding != build.CUE {
 		return false, nil, nil // not a CUE file, don't record.
@@ -64,7 +57,7 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 		return true, b, nil // don't check shouldBuild for stdin
 	}
 
-	name := filepath.Base(file.Filename)
+	name := pathpkg.Base(file.Filename)
 	if !cfg.filesMode && strings.HasPrefix(name, ".") {
 		return false, nil, &excludeError{
 			errors.Newf(token.NoPos, "filename starts with a '.'"),
@@ -77,9 +70,9 @@ func matchFile(cfg *Config, file *build.File, returnImports, allFiles bool, allT
 		}
 	}
 
-	f, err := cfg.fileSystem.openFile(file.Filename)
-	if err != nil {
-		return false, nil, err
+	f, err2 := cfg.FileSystem.Open(file.Filename)
+	if err2 != nil {
+		return false, nil, errors.Newf(token.NoPos, "read %s: %v", file.Filename, err2)
 	}
 
 	data, err = readImports(f, false, nil)

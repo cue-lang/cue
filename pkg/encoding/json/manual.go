@@ -118,7 +118,7 @@ func Unmarshal(b []byte) (ast.Expr, error) {
 	if !json.Valid(b) {
 		return nil, fmt.Errorf("json: invalid JSON")
 	}
-	expr, err := parser.ParseExpr("json", b)
+	expr, err := parser.ParseExprWithSource("json", b)
 	if err != nil {
 		// NOTE: should never happen.
 		return nil, errors.Wrapf(err, token.NoPos, "json: could not parse JSON")

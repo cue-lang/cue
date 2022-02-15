@@ -35,7 +35,7 @@ func TestLatest(t *testing.T) {
 					return
 				}
 				v := parser.FromVersion(parser.Latest)
-				_, err := parser.ParseFile(f.Name, f.Data, v)
+				_, err := parser.ParseFileWithSource(f.Name, f.Data, v)
 				if err != nil {
 					t.Errorf("%v: %v", fullpath, err)
 				}

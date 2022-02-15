@@ -20,17 +20,16 @@ package load
 //    - go/build
 
 import (
-	pathpkg "path"
-	"path/filepath"
-	"strings"
-	"unicode"
-
 	"cuelang.org/go/cue/ast"
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
 	"cuelang.org/go/internal/encoding"
 	"cuelang.org/go/internal/filetypes"
+	"io/fs"
+	pathpkg "path"
+	"path/filepath"
+	"strings"
 
 	// Trigger the unconditional loading of all core builtin packages if load
 	// is used. This was deemed the simplest way to avoid having to import
@@ -45,10 +44,18 @@ import (
 // instance, but errors that occur loading dependencies are recorded in these
 // dependencies.
 func Instances(args []string, c *Config) []*build.Instance {
+	// TODO: Move OS path compatability to command line code. Give args a more appropriate name.
+	osNeutralArgs := make([]string, len(args))
+	for i, arg := range args {
+		osNeutralArgs[i] = filepath.ToSlash(arg)
+	}
+
+	args = osNeutralArgs
+
 	if c == nil {
 		c = &Config{}
 	}
-	newC, err := c.complete()
+	newC, err := c.Complete()
 	if err != nil {
 		return []*build.Instance{c.newErrInstance(token.NoPos, "", err)}
 	}
@@ -145,7 +152,7 @@ func (l *loader) abs(filename string) string {
 	if !isLocalImport(filename) {
 		return filename
 	}
-	return filepath.Join(l.cfg.Dir, filename)
+	return pathpkg.Join(l.cfg.Dir, filename)
 }
 
 // cueFilesPackage creates a package for building a collection of CUE files
@@ -168,10 +175,12 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 		if f == "-" {
 			continue
 		}
-		if !filepath.IsAbs(f) {
-			f = filepath.Join(cfg.Dir, f)
+
+		if strings.HasPrefix(f, "./") {
+			f = pathpkg.Join(cfg.Dir, f)
 		}
-		fi, err := cfg.fileSystem.stat(f)
+
+		fi, err := fs.Stat(cfg.FileSystem, f)
 		if err != nil {
 			return cfg.newErrInstance(pos, toImportPath(f),
 				errors.Wrapf(err, pos, "could not find file"))
@@ -219,8 +228,9 @@ func (l *loader) cueFilesPackage(files []*build.File) *build.Instance {
 func (l *loader) addFiles(dir string, p *build.Instance) {
 	for _, f := range p.BuildFiles {
 		d := encoding.NewDecoder(f, &encoding.Config{
-			Stdin:     l.cfg.stdin(),
-			ParseFile: l.cfg.ParseFile,
+			Stdin:      l.cfg.stdin(),
+			ParseFile:  l.cfg.ParseFile,
+			FileSystem: l.cfg.FileSystem,
 		})
 		for ; !d.Done(); d.Next() {
 			_ = p.AddSyntax(d.File())
@@ -256,64 +266,4 @@ func (s *importStack) Pop() {
 
 func (s *importStack) Copy() []string {
 	return append([]string{}, *s...)
-}
-
-// shorterThan reports whether sp is shorter than t.
-// We use this to record the shortest import sequences
-// that leads to a particular package.
-func (sp *importStack) shorterThan(t []string) bool {
-	s := *sp
-	if len(s) != len(t) {
-		return len(s) < len(t)
-	}
-	// If they are the same length, settle ties using string ordering.
-	for i := range s {
-		if s[i] != t[i] {
-			return s[i] < t[i]
-		}
-	}
-	return false // they are equal
-}
-
-// reusePackage reuses package p to satisfy the import at the top
-// of the import stack stk. If this use causes an import loop,
-// reusePackage updates p's error information to record the loop.
-func (l *loader) reusePackage(p *build.Instance) *build.Instance {
-	// We use p.Internal.Imports==nil to detect a package that
-	// is in the midst of its own loadPackage call
-	// (all the recursion below happens before p.Internal.Imports gets set).
-	if p.ImportPaths == nil {
-		if err := lastError(p); err == nil {
-			err = l.errPkgf(nil, "import cycle not allowed")
-			err.IsImportCycle = true
-			report(p, err)
-		}
-		p.Incomplete = true
-	}
-	// Don't rewrite the import stack in the error if we have an import cycle.
-	// If we do, we'll lose the path that describes the cycle.
-	if err := lastError(p); err != nil && !err.IsImportCycle && l.stk.shorterThan(err.ImportStack) {
-		err.ImportStack = l.stk.Copy()
-	}
-	return p
-}
-
-// dirToImportPath returns the pseudo-import path we use for a package
-// outside the CUE path. It begins with _/ and then contains the full path
-// to the directory. If the package lives in c:\home\gopher\my\pkg then
-// the pseudo-import path is _/c_/home/gopher/my/pkg.
-// Using a pseudo-import path like this makes the ./ imports no longer
-// a special case, so that all the code to deal with ordinary imports works
-// automatically.
-func dirToImportPath(dir string) string {
-	return pathpkg.Join("_", strings.Map(makeImportValid, filepath.ToSlash(dir)))
-}
-
-func makeImportValid(r rune) rune {
-	// Should match Go spec, compilers, and ../../go/parser/parser.go:/isValidImport.
-	const illegalChars = `!"#$%&'()*,:;<=>?[\]^{|}` + "`\uFFFD"
-	if !unicode.IsGraphic(r) || unicode.IsSpace(r) || strings.ContainsRune(illegalChars, r) {
-		return '_'
-	}
-	return r
 }

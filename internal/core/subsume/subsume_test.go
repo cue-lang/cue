@@ -45,7 +45,7 @@ func TestX(t *testing.T) {
 func parse(t *testing.T, ctx *adt.OpContext, str string) *adt.Vertex {
 	t.Helper()
 
-	file, err := parser.ParseFile("subsume", str)
+	file, err := parser.ParseFileWithSource("subsume", str)
 	if err != nil {
 		t.Fatal(err)
 	}

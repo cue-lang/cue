@@ -68,7 +68,7 @@ func (p *protoConverter) setBuiltin(from string, to func() ast.Expr, pkg *protoC
 
 func (p *protoConverter) setBuiltinParse(from, to string, pkg *protoConverter) {
 	f := func() ast.Expr {
-		expr, err := parser.ParseExpr("", to, parser.ParseComments)
+		expr, err := parser.ParseExprWithSource("", to, parser.ParseComments)
 		if err != nil {
 			panic(fmt.Sprintf("error parsing name %q: %v", to, err))
 		}

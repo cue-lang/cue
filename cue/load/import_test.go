@@ -26,7 +26,7 @@ import (
 const testdata = "./testdata/"
 
 func getInst(pkg, cwd string) (*build.Instance, error) {
-	c, _ := (&Config{Dir: cwd}).complete()
+	c, _ := (&Config{Dir: cwd}).Complete()
 	l := loader{cfg: c}
 	inst := c.newRelInstance(token.NoPos, pkg, c.Package)
 	p := l.importPkg(token.NoPos, inst)[0]

@@ -15,11 +15,12 @@
 package load
 
 import (
+	"cuelang.org/go/cue/filesystem"
 	"io"
+	"io/fs"
 	"os"
 	pathpkg "path"
 	"path/filepath"
-	goruntime "runtime"
 	"strings"
 
 	"cuelang.org/go/cue/ast"
@@ -39,6 +40,8 @@ const (
 	configFile = "module.cue"
 	pkgDir     = "pkg"
 )
+
+const syntaxVersion = -1000 + 100*2 + 1
 
 // FromArgsUsage is a partial usage message that applications calling
 // FromArgs may wish to include in their -help output.
@@ -118,8 +121,8 @@ const FromArgsUsage = `
 
 // GenPath reports the directory in which to store generated
 // files.
-func GenPath(root string) string {
-	return internal.GenPath(root)
+func GenPath(root string, fsys fs.FS) string {
+	return internal.GenPath(root, fsys)
 }
 
 // A Config configures load behavior.
@@ -271,13 +274,14 @@ type Config struct {
 	// Overlay provides a mapping of absolute file paths to file contents.  If
 	// the file with the given path already exists, the parser will use the
 	// alternative file contents provided by the map.
+	// Deprecated: use FileSystem
 	Overlay map[string]Source
 
 	// Stdin defines an alternative for os.Stdin for the file "-". When used,
 	// the corresponding build.File will be associated with the full buffer.
 	Stdin io.Reader
 
-	fileSystem
+	FileSystem fs.FS
 
 	loadFunc build.LoadFunc
 }
@@ -304,14 +308,12 @@ func (c *Config) newInstance(pos token.Pos, p importPath) *build.Instance {
 }
 
 func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Instance {
-	fs := c.fileSystem
-
 	var err errors.Error
 	dir := path
 
 	p := c.Context.NewInstance(path, c.loadFunc)
 	p.PkgName = pkgName
-	p.DisplayPath = filepath.ToSlash(path)
+	p.DisplayPath = path
 	// p.ImportPath = string(dir) // compute unique ID.
 	p.Root = c.ModuleRoot
 	p.Module = c.Module
@@ -320,7 +322,7 @@ func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 		if c.Dir == "" {
 			err = errors.Append(err, errors.Newf(pos, "cwd unknown"))
 		}
-		dir = filepath.Join(c.Dir, filepath.FromSlash(path))
+		dir = pathpkg.Join(c.Dir, path)
 	}
 
 	if path == "" {
@@ -339,7 +341,7 @@ func (c *Config) newRelInstance(pos token.Pos, path, pkgName string) *build.Inst
 
 	p.Dir = dir
 
-	if fs.isAbsPath(path) || strings.HasPrefix(path, "/") {
+	if filepath.IsAbs(path) || strings.HasPrefix(path, "/") {
 		err = errors.Append(err, errors.Newf(pos,
 			"absolute import path %q not allowed", path))
 	}
@@ -358,7 +360,7 @@ func (c Config) newErrInstance(pos token.Pos, path importPath, err error) *build
 }
 
 func toImportPath(dir string) importPath {
-	return importPath(filepath.ToSlash(dir))
+	return importPath(dir)
 }
 
 type importPath string
@@ -371,13 +373,13 @@ func (c *Config) importPathFromAbsDir(absDir fsPath, key string) (importPath, er
 			"cannot determine import path for %q (root undefined)", key)
 	}
 
-	dir := filepath.Clean(string(absDir))
+	dir := pathpkg.Clean(string(absDir))
 	if !strings.HasPrefix(dir, c.ModuleRoot) {
 		return "", errors.Newf(token.NoPos,
 			"cannot determine import path for %q (dir outside of root)", key)
 	}
 
-	pkg := filepath.ToSlash(dir[len(c.ModuleRoot):])
+	pkg := dir[len(c.ModuleRoot):]
 	switch {
 	case strings.HasPrefix(pkg, "/cue.mod/"):
 		pkg = pkg[len("/cue.mod/"):]
@@ -462,30 +464,29 @@ func (c *Config) absDirFromImportPath(pos token.Pos, p importPath) (absDir, name
 	}
 
 	// Determine the directory.
-
-	sub := filepath.FromSlash(string(p))
+	sub := string(p)
 	switch hasPrefix := strings.HasPrefix(string(p), c.Module); {
 	case hasPrefix && len(sub) == len(c.Module):
 		absDir = c.ModuleRoot
 
 	case hasPrefix && p[len(c.Module)] == '/':
-		absDir = filepath.Join(c.ModuleRoot, sub[len(c.Module)+1:])
+		absDir = pathpkg.Join(c.ModuleRoot, sub[len(c.Module)+1:])
 
 	default:
-		absDir = filepath.Join(GenPath(c.ModuleRoot), sub)
+		absDir = pathpkg.Join(GenPath(c.ModuleRoot, c.FileSystem), sub)
 	}
 
 	return absDir, name, err
 }
 
-// Complete updates the configuration information. After calling complete,
+// Complete updates the configuration information. After calling Complete,
 // the following invariants hold:
 //  - c.ModuleRoot != ""
 //  - c.Module is set to the module import prefix if there is a cue.mod file
 //    with the module property.
 //  - c.loader != nil
 //  - c.cache != ""
-func (c Config) complete() (cfg *Config, err error) {
+func (c Config) Complete() (cfg *Config, err error) {
 	// Each major CUE release should add a tag here.
 	// Old tags should not be removed. That is, the cue1.x tag is present
 	// in all releases >= CUE 1.x. Code that requires CUE 1.x or later should
@@ -493,19 +494,45 @@ func (c Config) complete() (cfg *Config, err error) {
 	// (perhaps it is the stub to use in that case) should say "+build !cue1.x".
 	c.releaseTags = []string{"cue0.1"}
 
-	if c.Dir == "" {
-		c.Dir, err = os.Getwd()
+	if c.FileSystem == nil {
+		// Default filesystem behavior is only used when filesystem is unspecified
+		cwd, err := os.Getwd()
 		if err != nil {
 			return nil, err
 		}
-	} else if c.Dir, err = filepath.Abs(c.Dir); err != nil {
-		return nil, err
+
+		if c.Dir == "" {
+			c.Dir = cwd
+
+		} else if c.Dir, err = filepath.Abs(c.Dir); err != nil {
+			return nil, err
+		}
+
+		c.Dir = pathpkg.Clean(filepath.ToSlash(c.Dir))
+
+		if c.Overlay != nil {
+			fsys := overlayFS{
+				cwd: c.Dir,
+			}
+			fsys.init(c.Overlay)
+			c.FileSystem = &fsys
+		} else {
+			c.FileSystem = &filesystem.OSFS{
+				CWD: c.Dir,
+			}
+		}
+
+	} else if c.Overlay != nil {
+		// Does not break backward compatability, while also limiting the additional complexity of making
+		// overlay work with additional filesystems
+		return &c, errors.Newf(token.NoPos, "overlay cannot be used with a custom filesystem")
 	}
 
-	// TODO: we could populate this already with absolute file paths,
-	// but relative paths cannot be added. Consider what is reasonable.
-	if err := c.fileSystem.init(&c); err != nil {
-		return nil, err
+	c.Dir = pathpkg.Clean(filepath.ToSlash(c.Dir))
+
+	c.ParseFile = func(name string, src interface{}) (*ast.File, error) {
+		// TODO: Fix dependencies that cannot handle parse version argument being set
+		return parser.ParseFileWithSource(name, src, parser.ParseComments)
 	}
 
 	// TODO: determine root on a package basis. Maybe we even need a
@@ -519,6 +546,8 @@ func (c Config) complete() (cfg *Config, err error) {
 		}
 	}
 
+	c.ModuleRoot = pathpkg.Clean(filepath.ToSlash(c.ModuleRoot))
+
 	c.loader = &loader{
 		cfg:       &c,
 		buildTags: make(map[string]bool),
@@ -527,21 +556,22 @@ func (c Config) complete() (cfg *Config, err error) {
 	// TODO: also make this work if run from outside the module?
 	switch {
 	case true:
-		mod := filepath.Join(c.ModuleRoot, modDir)
-		info, cerr := c.fileSystem.stat(mod)
+		mod := pathpkg.Join(c.ModuleRoot, modDir)
+		info, cerr := fs.Stat(c.FileSystem, mod)
 		if cerr != nil {
 			break
 		}
+
 		if info.IsDir() {
-			mod = filepath.Join(mod, configFile)
+			mod = pathpkg.Join(mod, configFile)
 		}
-		f, cerr := c.fileSystem.openFile(mod)
+		f, cerr := c.FileSystem.Open(mod)
 		if cerr != nil {
 			break
 		}
 
 		// TODO: move to full build again
-		file, err := parser.ParseFile("load", f)
+		file, err := parser.ParseFileWithSource("load", f)
 		if err != nil {
 			return nil, errors.Wrapf(err, token.NoPos, "invalid cue.mod file")
 		}
@@ -583,28 +613,22 @@ func (c Config) complete() (cfg *Config, err error) {
 	return &c, nil
 }
 
-func (c Config) isRoot(dir string) bool {
-	fs := &c.fileSystem
+func (c *Config) isRoot(dir string) bool {
 	// Note: cue.mod used to be a file. We still allow both to match.
-	_, err := fs.stat(filepath.Join(dir, modDir))
+	_, err := fs.Stat(c.FileSystem, pathpkg.Join(dir, modDir))
 	return err == nil
 }
 
 // findRoot returns the module root or "" if none was found.
-func (c Config) findRoot(dir string) string {
-	fs := &c.fileSystem
-
-	absDir, err := filepath.Abs(dir)
-	if err != nil {
-		return ""
-	}
+func (c *Config) findRoot(dir string) string {
+	absDir := dir
 	abs := absDir
 	for {
 		if c.isRoot(abs) {
 			return abs
 		}
-		d := filepath.Dir(abs)
-		if filepath.Base(filepath.Dir(abs)) == modDir {
+		d := pathpkg.Dir(abs)
+		if pathpkg.Base(pathpkg.Dir(abs)) == modDir {
 			// The package was located within a "cue.mod" dir and there was
 			// not cue.mod found until now. So there is no root.
 			return ""
@@ -618,24 +642,14 @@ func (c Config) findRoot(dir string) string {
 
 	// TODO(legacy): remove this capability at some point.
 	for {
-		info, err := fs.stat(filepath.Join(abs, pkgDir))
+		info, err := fs.Stat(c.FileSystem, pathpkg.Join(abs, pkgDir))
 		if err == nil && info.IsDir() {
 			return abs
 		}
-		d := filepath.Dir(abs)
+		d := pathpkg.Dir(abs)
 		if len(d) >= len(abs) {
 			return "" // reached top of file system, no pkg dir.
 		}
 		abs = d
 	}
-}
-
-func home() string {
-	env := "HOME"
-	if goruntime.GOOS == "windows" {
-		env = "USERPROFILE"
-	} else if goruntime.GOOS == "plan9" {
-		env = "home"
-	}
-	return os.Getenv(env)
 }

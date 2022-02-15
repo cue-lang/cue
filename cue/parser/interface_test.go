@@ -62,7 +62,7 @@ func TestParseFile(t *testing.T) {
 		// TODO: Add test cases.
 	}
 	for _, tt := range tests {
-		gotF, err := ParseFile(tt.args.filename, tt.args.src, tt.args.options...)
+		gotF, err := ParseFileWithSource(tt.args.filename, tt.args.src, tt.args.options...)
 		if (err != nil) != tt.wantErr {
 			t.Errorf("%q. ParseFile() error = %v, wantErr %v", tt.name, err, tt.wantErr)
 			continue

@@ -32,7 +32,7 @@ func TestClosedness(t *testing.T) {
 	ctx := eval.NewContext(r, nil)
 
 	mkStruct := func(info adt.CloseInfo, s string) *adt.StructInfo {
-		x, err := parser.ParseExpr("", s)
+		x, err := parser.ParseExprWithSource("", s)
 		if err != nil {
 			t.Fatal(err)
 		}

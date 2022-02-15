@@ -135,7 +135,7 @@ func (c *Context) Constrain(x interface{}, constraints string) error {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	expr, err := parser.ParseExpr(fmt.Sprintf("<%T>", x), constraints)
+	expr, err := parser.ParseExprWithSource(fmt.Sprintf("<%T>", x), constraints)
 	if err != nil {
 		return err
 	}

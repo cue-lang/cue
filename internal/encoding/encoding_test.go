@@ -65,7 +65,7 @@ func TestValidate(t *testing.T) {
 	}
 	for _, tc := range testCases {
 		t.Run(path.Join(string(tc.form), tc.in), func(t *testing.T) {
-			f, err := parser.ParseFile("", tc.in, parser.ParseComments)
+			f, err := parser.ParseFileWithSource("", tc.in, parser.ParseComments)
 			if err != nil {
 				t.Fatal(err)
 			}

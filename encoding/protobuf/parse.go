@@ -47,7 +47,16 @@ func (s *Extractor) parse(filename string, src interface{}) (p *protoConverter, 
 		s.fileCache[filename] = result{p, err}
 	}()
 
-	b, err := source.Read(filename, src)
+	if src == nil {
+		var err error
+		src, err = s.fileSystem.Open(filename)
+
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	b, err := source.ReadSource(src)
 	if err != nil {
 		return nil, err
 	}
@@ -785,7 +794,7 @@ func (p *optionParser) parse(options []*proto.Option) {
 
 		case "(cue.val)":
 			// TODO: set filename and base offset.
-			expr, err := parser.ParseExpr("", o.Constant.Source)
+			expr, err := parser.ParseExprWithSource("", o.Constant.Source)
 			if err != nil {
 				failf(o.Position, "invalid cue.val value: %v", err)
 			}

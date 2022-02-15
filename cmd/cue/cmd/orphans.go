@@ -45,7 +45,7 @@ func (b *buildPlan) parsePlacementFlags() error {
 	b.useContext = flagWithContext.Bool(cmd)
 
 	for _, str := range flagPath.StringArray(cmd) {
-		l, err := parser.ParseExpr("--path", str)
+		l, err := parser.ParseExprWithSource("--path", str)
 		if err != nil {
 			labels, err := parseFullPath(str)
 			if err != nil {
@@ -299,7 +299,7 @@ func placeOrphans(b *buildPlan, d *encoding.Decoder, pkg string, objs ...*ast.Fi
 }
 
 func parseFullPath(exprs string) (p []ast.Label, err error) {
-	f, err := parser.ParseFile("--path", exprs+"_")
+	f, err := parser.ParseFileWithSource("--path", exprs+"_")
 	if err != nil {
 		return p, fmt.Errorf("parser error in path %q: %v", exprs, err)
 	}

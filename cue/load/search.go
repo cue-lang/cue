@@ -17,15 +17,14 @@ package load
 import (
 	// TODO: remove this usage
 
-	"os"
-	"path"
-	"path/filepath"
-	"regexp"
-	"strings"
-
 	"cuelang.org/go/cue/build"
 	"cuelang.org/go/cue/errors"
 	"cuelang.org/go/cue/token"
+	"io/fs"
+	pathpkg "path"
+	"path/filepath"
+	"regexp"
+	"strings"
 )
 
 // A match represents the result of matching a single package pattern.
@@ -40,91 +39,12 @@ type match struct {
 // The pattern is either "all" (all packages), "std" (standard packages),
 // "cmd" (standard commands), or a path including "...".
 func (l *loader) matchPackages(pattern, pkgName string) *match {
-	// cfg := l.cfg
+
 	m := &match{
 		Pattern: pattern,
 		Literal: false,
 	}
-	// match := func(string) bool { return true }
-	// treeCanMatch := func(string) bool { return true }
-	// if !isMetaPackage(pattern) {
-	// 	match = matchPattern(pattern)
-	// 	treeCanMatch = treeCanMatchPattern(pattern)
-	// }
 
-	// have := map[string]bool{
-	// 	"builtin": true, // ignore pseudo-package that exists only for documentation
-	// }
-
-	// for _, src := range cfg.srcDirs() {
-	// 	if pattern == "std" || pattern == "cmd" {
-	// 		continue
-	// 	}
-	// 	src = filepath.Clean(src) + string(filepath.Separator)
-	// 	root := src
-	// 	if pattern == "cmd" {
-	// 		root += "cmd" + string(filepath.Separator)
-	// 	}
-	// 	filepath.Walk(root, func(path string, fi os.FileInfo, err error) error {
-	// 		if err != nil || path == src {
-	// 			return nil
-	// 		}
-
-	// 		want := true
-	// 		// Avoid .foo, _foo, and testdata directory trees.
-	// 		_, elem := filepath.Split(path)
-	// 		if strings.HasPrefix(elem, ".") || strings.HasPrefix(elem, "_") || elem == "testdata" {
-	// 			want = false
-	// 		}
-
-	// 		name := filepath.ToSlash(path[len(src):])
-	// 		if pattern == "std" && (!isStandardImportPath(name) || name == "cmd") {
-	// 			// The name "std" is only the standard library.
-	// 			// If the name is cmd, it's the root of the command tree.
-	// 			want = false
-	// 		}
-	// 		if !treeCanMatch(name) {
-	// 			want = false
-	// 		}
-
-	// 		if !fi.IsDir() {
-	// 			if fi.Mode()&os.ModeSymlink != 0 && want {
-	// 				if target, err := os.Stat(path); err == nil && target.IsDir() {
-	// 					fmt.Fprintf(os.Stderr, "warning: ignoring symlink %s\n", path)
-	// 				}
-	// 			}
-	// 			return nil
-	// 		}
-	// 		if !want {
-	// 			return skipDir
-	// 		}
-
-	// 		if have[name] {
-	// 			return nil
-	// 		}
-	// 		have[name] = true
-	// 		if !match(name) {
-	// 			return nil
-	// 		}
-	// 		pkg := l.importPkg(".", path)
-	// 		if err := pkg.Error; err != nil {
-	// 			if _, noGo := err.(*noCUEError); noGo {
-	// 				return nil
-	// 			}
-	// 		}
-
-	// 		// If we are expanding "cmd", skip main
-	// 		// packages under cmd/vendor. At least as of
-	// 		// March, 2017, there is one there for the
-	// 		// vendored pprof tool.
-	// 		if pattern == "cmd" && strings.HasPrefix(pkg.DisplayPath, "cmd/vendor") && pkg.PkgName == "main" {
-	// 			return nil
-	// 		}
-
-	// 		m.Pkgs = append(m.Pkgs, pkg)
-	// 		return nil
-	// 	})
-	// }
 	return m
 }
 
@@ -139,12 +59,14 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		Literal: false,
 	}
 
+	fsys := c.FileSystem
+
 	// Find directory to begin the scan.
 	// Could be smarter but this one optimization
 	// is enough for now, since ... is usually at the
 	// end of a path.
 	i := strings.Index(pattern, "...")
-	dir, _ := path.Split(pattern[:i])
+	dir, _ := pathpkg.Split(pattern[:i])
 
 	root := l.abs(dir)
 
@@ -158,35 +80,35 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		return m
 	}
 
-	pkgDir := filepath.Join(root, modDir)
+	pkgDir := pathpkg.Join(root, modDir)
 	// TODO(legacy): remove
-	pkgDir2 := filepath.Join(root, "pkg")
+	pkgDir2 := pathpkg.Join(root, "pkg")
 
-	_ = c.fileSystem.walk(root, func(path string, fi os.FileInfo, err errors.Error) errors.Error {
-		if err != nil || !fi.IsDir() {
+	_ = fs.WalkDir(fsys, root, func(path string, d fs.DirEntry, err error) error {
+		if err != nil || !d.IsDir() {
 			return nil
 		}
 		if path == pkgDir || path == pkgDir2 {
-			return skipDir
+			return fs.SkipDir
 		}
 
 		top := path == root
 
 		// Avoid .foo, _foo, and testdata directory trees, but do not avoid "." or "..".
-		_, elem := filepath.Split(path)
+		_, elem := pathpkg.Split(path)
 		dot := strings.HasPrefix(elem, ".") && elem != "." && elem != ".."
 		if dot || strings.HasPrefix(elem, "_") || (elem == "testdata" && !top) {
-			return skipDir
+			return fs.SkipDir
 		}
 
 		if !top {
 			// Ignore other modules found in subdirectories.
-			if _, err := c.fileSystem.stat(filepath.Join(path, modDir)); err == nil {
-				return skipDir
+			if _, err := fs.Stat(fsys, pathpkg.Join(path, modDir)); err == nil {
+				return fs.SkipDir
 			}
 		}
 
-		// name := prefix + filepath.ToSlash(path)
+		// name := prefix + pathpkg.ToSlash(path)
 		// if !match(name) {
 		// 	return nil
 		// }
@@ -198,6 +120,8 @@ func (l *loader) matchPackagesInFS(pattern, pkgName string) *match {
 		// Do not take root, as we want to stay relative
 		// to one dir only.
 		dir, e := filepath.Rel(c.Dir, path)
+		dir = filepath.ToSlash(dir)
+
 		if e != nil {
 			panic(err)
 		} else {
@@ -394,12 +318,12 @@ func cleanPatterns(patterns []string) []string {
 
 		// Put argument in canonical form, but preserve leading ./.
 		if strings.HasPrefix(a, "./") {
-			a = "./" + path.Clean(a)
+			a = "./" + pathpkg.Clean(a)
 			if a == "./." {
 				a = "."
 			}
 		} else {
-			a = path.Clean(a)
+			a = pathpkg.Clean(a)
 		}
 		out = append(out, a)
 	}
@@ -436,106 +360,9 @@ func hasFilepathPrefix(s, prefix string) bool {
 	case len(s) == len(prefix):
 		return s == prefix
 	case len(s) > len(prefix):
-		if prefix != "" && prefix[len(prefix)-1] == filepath.Separator {
+		if prefix != "" && prefix[len(prefix)-1] == '/' {
 			return strings.HasPrefix(s, prefix)
 		}
-		return s[len(prefix)] == filepath.Separator && s[:len(prefix)] == prefix
-	}
-}
-
-// isStandardImportPath reports whether $GOROOT/src/path should be considered
-// part of the standard distribution. For historical reasons we allow people to add
-// their own code to $GOROOT instead of using $GOPATH, but we assume that
-// code will start with a domain name (dot in the first element).
-//
-// Note that this function is meant to evaluate whether a directory found in GOROOT
-// should be treated as part of the standard library. It should not be used to decide
-// that a directory found in GOPATH should be rejected: directories in GOPATH
-// need not have dots in the first element, and they just take their chances
-// with future collisions in the standard library.
-func isStandardImportPath(path string) bool {
-	i := strings.Index(path, "/")
-	if i < 0 {
-		i = len(path)
-	}
-	elem := path[:i]
-	return !strings.Contains(elem, ".")
-}
-
-// isRelativePath reports whether pattern should be interpreted as a directory
-// path relative to the current directory, as opposed to a pattern matching
-// import paths.
-func isRelativePath(pattern string) bool {
-	return strings.HasPrefix(pattern, "./") || strings.HasPrefix(pattern, "../") || pattern == "." || pattern == ".."
-}
-
-// inDir checks whether path is in the file tree rooted at dir.
-// If so, inDir returns an equivalent path relative to dir.
-// If not, inDir returns an empty string.
-// inDir makes some effort to succeed even in the presence of symbolic links.
-// TODO(rsc): Replace internal/test.inDir with a call to this function for Go 1.12.
-func inDir(path, dir string) string {
-	if rel := inDirLex(path, dir); rel != "" {
-		return rel
-	}
-	xpath, err := filepath.EvalSymlinks(path)
-	if err != nil || xpath == path {
-		xpath = ""
-	} else {
-		if rel := inDirLex(xpath, dir); rel != "" {
-			return rel
-		}
-	}
-
-	xdir, err := filepath.EvalSymlinks(dir)
-	if err == nil && xdir != dir {
-		if rel := inDirLex(path, xdir); rel != "" {
-			return rel
-		}
-		if xpath != "" {
-			if rel := inDirLex(xpath, xdir); rel != "" {
-				return rel
-			}
-		}
-	}
-	return ""
-}
-
-// inDirLex is like inDir but only checks the lexical form of the file names.
-// It does not consider symbolic links.
-// TODO(rsc): This is a copy of str.HasFilePathPrefix, modified to
-// return the suffix. Most uses of str.HasFilePathPrefix should probably
-// be calling InDir instead.
-func inDirLex(path, dir string) string {
-	pv := strings.ToUpper(filepath.VolumeName(path))
-	dv := strings.ToUpper(filepath.VolumeName(dir))
-	path = path[len(pv):]
-	dir = dir[len(dv):]
-	switch {
-	default:
-		return ""
-	case pv != dv:
-		return ""
-	case len(path) == len(dir):
-		if path == dir {
-			return "."
-		}
-		return ""
-	case dir == "":
-		return path
-	case len(path) > len(dir):
-		if dir[len(dir)-1] == filepath.Separator {
-			if path[:len(dir)] == dir {
-				return path[len(dir):]
-			}
-			return ""
-		}
-		if path[len(dir)] == filepath.Separator && path[:len(dir)] == dir {
-			if len(path) == len(dir)+1 {
-				return "."
-			}
-			return path[len(dir)+1:]
-		}
-		return ""
+		return s[len(prefix)] == '/' && s[:len(prefix)] == prefix
 	}
 }

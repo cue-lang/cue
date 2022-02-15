@@ -109,7 +109,7 @@ func Node(node ast.Node, opt ...Option) ([]byte, error) {
 func Source(b []byte, opt ...Option) ([]byte, error) {
 	cfg := newConfig(opt)
 
-	f, err := parser.ParseFile("", b, parser.ParseComments)
+	f, err := parser.ParseFileWithSource("", b, parser.ParseComments)
 	if err != nil {
 		return nil, fmt.Errorf("parse: %s", err)
 	}

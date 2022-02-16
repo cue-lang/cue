@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a5f4d5b0_a4df03a8",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:17:51Z",
+      "side": 1,
+      "message": "LGTM - with one question on the naming of a method/the type of the second parameter. ",
+      "revId": "206caa94022de2e4821c62c8abb7f13a484a553b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "dcdda619_3716bfc5",
+        "filename": "internal/core/dep/dep.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 146,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:17:51Z",
+      "side": 1,
+      "message": "Did you intend to make this more permissive, with the second argument of type adt.Elem? If so, method name needs adjusting too perhaps?",
+      "revId": "206caa94022de2e4821c62c8abb7f13a484a553b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

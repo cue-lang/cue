@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cbf09b73_29a12a01",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 7
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:30:29Z",
+      "side": 1,
+      "message": "LGTM with one small nit.",
+      "revId": "d90af916663e2b23872cd9346998c3d11eaae0de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "2abd35b0_39fa20c5",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:30:29Z",
+      "side": 1,
+      "message": "Small nit. But could be combined with previous block.",
+      "revId": "d90af916663e2b23872cd9346998c3d11eaae0de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

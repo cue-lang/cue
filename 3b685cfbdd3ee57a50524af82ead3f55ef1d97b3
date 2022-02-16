@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "551cdb23_d2fc096d",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:23:01Z",
+      "side": 1,
+      "message": "LGTM with one small question",
+      "revId": "3b685cfbdd3ee57a50524af82ead3f55ef1d97b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f3a2ab5b_ff09fb07",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 1613,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:23:01Z",
+      "side": 1,
+      "message": "When would this happen?",
+      "revId": "3b685cfbdd3ee57a50524af82ead3f55ef1d97b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

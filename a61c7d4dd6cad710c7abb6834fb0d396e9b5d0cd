@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "262dcee0_9db7891f",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 11
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:01:35Z",
+      "side": 1,
+      "message": "LGTM with one question to which I think the answer has to be \"we revisit this properly later\"",
+      "revId": "a61c7d4dd6cad710c7abb6834fb0d396e9b5d0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8c4a24ac_8f8a694d",
+        "filename": "cue/testdata/builtins/all.txtar",
+        "patchSetId": 11
+      },
+      "lineNbr": 26,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:01:35Z",
+      "side": 1,
+      "message": "Interesting that this gets reported as `fatalChild.0` because it\u0027s not actually correct. Instead it\u0027s the 0th element of first argument to the builtin whose value we are trying to assign to the x field in `fatalChild`. I guess this falls into the category of \"better error messages\" later, and outside the scope of this change.",
+      "revId": "a61c7d4dd6cad710c7abb6834fb0d396e9b5d0cd",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

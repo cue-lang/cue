@@ -897,7 +897,11 @@ func (x *SelectorExpr) Source() ast.Node {
 }
 
 func (x *SelectorExpr) resolve(c *OpContext, state VertexStatus) *Vertex {
-	n := c.node(x, x.X, x.Sel.IsRegular(), state)
+	// TODO: the node should really be evaluated as AllArcs, but the order
+	// of evaluation is slightly off, causing too much to be evaluated.
+	// This may especially result in incorrect results when using embedded
+	// scalars.
+	n := c.node(x, x.X, x.Sel.IsRegular(), Partial)
 	if n == emptyNode {
 		return n
 	}
@@ -929,7 +933,11 @@ func (x *IndexExpr) Source() ast.Node {
 
 func (x *IndexExpr) resolve(ctx *OpContext, state VertexStatus) *Vertex {
 	// TODO: support byte index.
-	n := ctx.node(x, x.X, true, state)
+	// TODO: the node should really be evaluated as AllArcs, but the order
+	// of evaluation is slightly off, causing too much to be evaluated.
+	// This may especially result in incorrect results when using embedded
+	// scalars.
+	n := ctx.node(x, x.X, true, Partial)
 	i := ctx.value(x.Index)
 	if n == emptyNode {
 		return n

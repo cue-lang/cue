@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "0d282262_a09c283c",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 10,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:25:29Z",
+      "side": 1,
+      "message": "\"references\"",
+      "revId": "d8b62e0a11195cbe84fad0068cf7451d877f65b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c18678ee_6ece1156",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:25:29Z",
+      "side": 1,
+      "message": "LGTM with one typo in the commit message.",
+      "revId": "d8b62e0a11195cbe84fad0068cf7451d877f65b1",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

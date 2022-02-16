@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "14daf46a_d8675590",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:27:01Z",
+      "side": 1,
+      "message": "LGTM with one question on whether a diff was intended as part of this CL or not",
+      "revId": "e41ea54af7def1560356ec7864093a0b4bedbf06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "78921ec9_4550531f",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T13:27:01Z",
+      "side": 1,
+      "message": "Unrelated to this CL?",
+      "revId": "e41ea54af7def1560356ec7864093a0b4bedbf06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

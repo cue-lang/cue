@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "220ff604_3f58ebf8",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 4
+      },
+      "lineNbr": 12,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T14:38:42Z",
+      "side": 1,
+      "message": "....\n\nMissed the end of this sentence?",
+      "revId": "44b5cd21c163e630fea8915846663f027584b70b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "008aeccf_47834310",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 4
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T14:38:42Z",
+      "side": 1,
+      "message": "LGTM with a nit in the commit message. ",
+      "revId": "44b5cd21c163e630fea8915846663f027584b70b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

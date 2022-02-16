@@ -740,7 +740,7 @@ func (c *OpContext) unifyNode(v Expr, state VertexStatus) (result Value) {
 			return nil
 		}
 
-		if v.isUndefined() {
+		if v.isUndefined() || state > v.status {
 			// Keep a minimum state of AllArcs.
 			state := state
 			if state < AllArcs {
@@ -851,6 +851,11 @@ outer:
 		}
 		x.state.usedArcs = append(x.state.usedArcs, a)
 	}
+
+	if a != nil && state > a.status {
+		c.Unify(a, state)
+	}
+
 	if a == nil {
 		if x.state != nil {
 			for _, e := range x.state.exprs {

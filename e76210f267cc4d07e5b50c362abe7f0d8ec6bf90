@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "0f746112_4fe4497e",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 12
+      },
+      "lineNbr": 14,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-16T13:09:38Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "a62e3a1f_4dccba91",
+      "revId": "e76210f267cc4d07e5b50c362abe7f0d8ec6bf90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "9e5171c3_0ef79b85",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 12
@@ -31,6 +49,24 @@
       "writtenOn": "2022-02-16T13:04:59Z",
       "side": 1,
       "message": "Would be great if we could leverage https://github.com/rsc/rf at some point. Which also has the capability of describing in the commit message itself the mechanical change that has happened, such that CI can re-run that mechanical change \"from scratch\" to verify the commit is then clean, i.e. that it only contains the mechanical change",
+      "revId": "e76210f267cc4d07e5b50c362abe7f0d8ec6bf90",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "6b17f1e4_234ac81e",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 12
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-16T13:09:38Z",
+      "side": 1,
+      "message": "This uses the refactoring tools of the editor. So this is quite a different flow. But could be worth considering.",
+      "parentUuid": "9e5171c3_0ef79b85",
       "revId": "e76210f267cc4d07e5b50c362abe7f0d8ec6bf90",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

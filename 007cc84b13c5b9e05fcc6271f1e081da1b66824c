@@ -1,0 +1,38 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "78dadde6_01149ef6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 17
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T14:06:35Z",
+      "side": 1,
+      "message": "FYI I only skimmed the tests, on the assumption they partially represent the debugging we\u0027ve been doing on this stack.",
+      "revId": "007cc84b13c5b9e05fcc6271f1e081da1b66824c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "8abb5191_c38ba7e7",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 17
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-16T14:06:35Z",
+      "side": 1,
+      "message": "Nit: formatting of this file in the archive (for readability in Gerrit at least)",
+      "revId": "007cc84b13c5b9e05fcc6271f1e081da1b66824c",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

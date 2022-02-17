@@ -20,6 +20,24 @@
     {
       "unresolved": false,
       "key": {
+        "uuid": "c630f6c1_ddea7509",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "f541f393_17048d27",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
         "uuid": "c17a4895_8e368fd6",
         "filename": "/PATCHSET_LEVEL",
         "patchSetId": 27
@@ -52,6 +70,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "0b6f850b_f2e63060",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Makes sense. Essentially, in the old code the struct would get mixed in early, causing field information to be available for the error.\n\nIn the new code, as only the expression was retained in the comprehension, field information, and corresponding position, was lost.\n\nChanged it now to store the Field, rather than Expr, in the Comprehension Value for generated comprehensions. This required some changes here and there, but this allows the position information to be pulled out accordingly at error generation time. All of this is communicated through the Conjunct type. It\u0027s Field method is updated accordingly.",
+      "parentUuid": "35b3b5b0_ee84a690",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "89a990c6_ac76c21a",
@@ -65,6 +101,24 @@
       "writtenOn": "2022-02-17T09:49:09Z",
       "side": 1,
       "message": "Is the idea behind the addition of these two lines that the user can see the places and conditions under which it would be valid for \"p\" in this case?\n\n\tembed: {\n\t\t~t1: #C1\n\t\t~#C1: {\n\t\t\t~if false ~{\n\t\t\t\tp: _\n\t\t\t}\n\t\t}\n\t\t~t1: p: \"foo\"\n\t}\n\nIf so, should the stack not also include a reference to the line within the if comprehension that declares p?\n\nMy only thought/worry is that this could get quite noisy if there are multiple places/conditions under which \"p\" would be valid. Indeed perhaps that\u0027s what we saw with the massive error stacks in unity (both vector and cascaad have this aspect oriented approach to conditionally adding fields).\n\nHowever, I can see being able to explore these locations being something the user would want to do via the LSP command of some sort.\n\nSubject to the point above about the missing line referencing the declaration of p, perhaps we just leave this for now and solve more for better grouping etc of error messages down the line.",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "cdeec254_2e8b5998",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Added TODO.",
+      "parentUuid": "89a990c6_ac76c21a",
       "revId": "897ae48e625a8c1bde90846718231548591703b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -86,6 +140,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "fe603c29_2daccaf9",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 891,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Now use the path of the node that contains the comprehension.",
+      "parentUuid": "bc2ccbc0_a05a6d72",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "17a98b40_a44c64b3",
@@ -99,6 +171,24 @@
       "writtenOn": "2022-02-17T09:49:09Z",
       "side": 1,
       "message": "Similar to previous comment, not sure how \"out\" participates in this error here.",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "74baab81_ea91db9f",
+        "filename": "cue/testdata/cycle/023_reentrance.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "17a98b40_a44c64b3",
       "revId": "897ae48e625a8c1bde90846718231548591703b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -120,6 +210,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "214191bc_34c8c2e3",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "No, will still be valid. The concrete values break the cycle.",
+      "parentUuid": "1c059258_6116816a",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "d6c921e8_072cf14f",
@@ -133,6 +241,24 @@
       "writtenOn": "2022-02-17T09:49:09Z",
       "side": 1,
       "message": "Nit: comments left over from debugging? Or are these to help the reader understand?",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "c248155a_b69d72d5",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "The latter.",
+      "parentUuid": "d6c921e8_072cf14f",
       "revId": "897ae48e625a8c1bde90846718231548591703b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
@@ -154,6 +280,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "b648d2e3_2941dddf",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "5052d6ef_3cf18e53",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "510fccd0_e1d51cbc",
@@ -171,6 +315,24 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "3c3e0982_bb8c6d61",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "510fccd0_e1d51cbc",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "cdb3e297_f28375a2",
@@ -184,6 +346,24 @@
       "writtenOn": "2022-02-17T09:49:09Z",
       "side": 1,
       "message": "\"includes ...\"\n\nMissing end of sentence?",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "dd37ed41_fde2b573",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T20:03:58Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "cdb3e297_f28375a2",
       "revId": "897ae48e625a8c1bde90846718231548591703b0",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }

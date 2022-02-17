@@ -33,6 +33,24 @@
       "message": "When would this happen?",
       "revId": "3b685cfbdd3ee57a50524af82ead3f55ef1d97b3",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "71155040_733c7a19",
+        "filename": "internal/core/adt/expr.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 1613,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T10:14:55Z",
+      "side": 1,
+      "message": "The Src may be missing if a value is dynamically created. For instance, in comprehensions.go in a later CL it is generated without a Src.\n\nAs you may see, this check is consistently done for all types. It is very easy to forget adding this check when a type is generated dynamically down the line, so better to be consistent.",
+      "parentUuid": "f3a2ab5b_ff09fb07",
+      "revId": "3b685cfbdd3ee57a50524af82ead3f55ef1d97b3",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

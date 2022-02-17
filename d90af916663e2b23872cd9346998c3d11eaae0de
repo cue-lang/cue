@@ -33,6 +33,24 @@
       "message": "Small nit. But could be combined with previous block.",
       "revId": "d90af916663e2b23872cd9346998c3d11eaae0de",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ae0d34fa_62200ea5",
+        "filename": "internal/core/adt/eval.go",
+        "patchSetId": 7
+      },
+      "lineNbr": 1031,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T12:03:50Z",
+      "side": 1,
+      "message": "Done",
+      "parentUuid": "2abd35b0_39fa20c5",
+      "revId": "d90af916663e2b23872cd9346998c3d11eaae0de",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

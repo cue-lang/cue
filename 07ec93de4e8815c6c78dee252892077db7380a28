@@ -1,0 +1,21 @@
+{
+  "comments": [
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "8ae77e93_6575c9e1",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 1
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T11:38:20Z",
+      "side": 1,
+      "message": "Reviewed in https://github.com/cue-lang/cue/pull/1471",
+      "revId": "07ec93de4e8815c6c78dee252892077db7380a28",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

@@ -1,0 +1,174 @@
+{
+  "comments": [
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "f541f393_17048d27",
+        "filename": "/COMMIT_MSG",
+        "patchSetId": 27
+      },
+      "lineNbr": 20,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "\"...at least one of...\"\n\nMissing \"one\"",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "35b3b5b0_ee84a690",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 603,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "I think we lose a critical line here from the error stack. Prior to this CL the error positions are as shown by the \"~\" char:\n\n\t~#c: {}\n\ta: {\n\t\t~if b {\n\t\t\t~c: d: 4\n\t\t}\n\t\tb: true\n\t\t~c: #c\n\t}\n\nAfter this CL they are as follows:\n\n\t~#c: {}\n\ta: {\n\t\t~if b {\n\t\t\tc: d: 4\n\t\t}\n\t\tb: true\n\t\t~c: #c\n\t}\n\ni.e. we have lost error stack entry to the line that actually declares \"d\"",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "89a990c6_ac76c21a",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 609,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "Is the idea behind the addition of these two lines that the user can see the places and conditions under which it would be valid for \"p\" in this case?\n\n\tembed: {\n\t\t~t1: #C1\n\t\t~#C1: {\n\t\t\t~if false ~{\n\t\t\t\tp: _\n\t\t\t}\n\t\t}\n\t\t~t1: p: \"foo\"\n\t}\n\nIf so, should the stack not also include a reference to the line within the if comprehension that declares p?\n\nMy only thought/worry is that this could get quite noisy if there are multiple places/conditions under which \"p\" would be valid. Indeed perhaps that\u0027s what we saw with the massive error stacks in unity (both vector and cascaad have this aspect oriented approach to conditionally adding fields).\n\nHowever, I can see being able to explore these locations being something the user would want to do via the LSP command of some sort.\n\nSubject to the point above about the missing line referencing the declaration of p, perhaps we just leave this for now and solve more for better grouping etc of error messages down the line.",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "bc2ccbc0_a05a6d72",
+        "filename": "cue/testdata/comprehensions/pushdown.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 891,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "Where has this extra \".e\" come from? In the context of this evaluation that also seems wrong:\n\n\tclosedCheck: t1: {\n\t\ta: b: [string]: #D\n\n\t\t#D: {\n\t\t\td: string\n\t\t\tif d !\u003d \"c\" {\n\t\t\t\te: string\n\t\t\t}\n\t\t}\n\n\t\ta: b: c: {\n\t\t\td: \"d\"\n\t\t\te: \"ok\"\n\t\t}\n\t}\n\nBecause e does not participate in the !\u003d.",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "17a98b40_a44c64b3",
+        "filename": "cue/testdata/cycle/023_reentrance.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 92,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "Similar to previous comment, not sure how \"out\" participates in this error here.",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "1c059258_6116816a",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 131,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "Question: with the cycle work, does this example then become invalid?",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "d6c921e8_072cf14f",
+        "filename": "cue/testdata/cycle/compbottom.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 137,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "Nit: comments left over from debugging? Or are these to help the reader understand?",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "5052d6ef_3cf18e53",
+        "filename": "cue/testdata/cycle/compbottom2.txtar",
+        "patchSetId": 27
+      },
+      "lineNbr": 99,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "Nit: formatting of CUE for readability (in Gerrit)",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "510fccd0_e1d51cbc",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 19,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "\"expanded\"",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "cdb3e297_f28375a2",
+        "filename": "internal/core/adt/comprehension.go",
+        "patchSetId": 27
+      },
+      "lineNbr": 155,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:49:09Z",
+      "side": 1,
+      "message": "\"includes ...\"\n\nMissing end of sentence?",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    }
+  ]
+}

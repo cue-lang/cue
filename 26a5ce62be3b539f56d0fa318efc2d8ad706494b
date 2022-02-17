@@ -16,6 +16,24 @@
       "message": "This error message now seems misleading to me. Because it reads \"for the value in the field Z, you are not allowed the field Z\"\n\nCompare with the error just above:\n\n\"Y: conflicting values 2 and float (mismatched types int and float)\"\n\nwhere the message corresponds to the value associated with the field Y.\n\nOption 1: fix this by dropping the trailing \" Z:\"?\n\nOption 2: retain the current (i.e. prior to this CL) format of the error message, where the context of the error (\"Z: \" at the start of the line in this case) does _not_ contain the field that is not allowed, and leave that to be referenced in the trailing part of the error message.\n\nEither way, the position information in the stack that follows is unambiguous in identifying the field that caused the error (and its position)",
       "revId": "26a5ce62be3b539f56d0fa318efc2d8ad706494b",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "a743da74_e21fff66",
+        "filename": "cmd/cue/cmd/testdata/script/eval_flags.txt",
+        "patchSetId": 8
+      },
+      "lineNbr": 54,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T10:28:39Z",
+      "side": 1,
+      "message": "Totally resolved as discussed by the top of the stack.",
+      "parentUuid": "be5d54dc_f1f7dcf1",
+      "revId": "26a5ce62be3b539f56d0fa318efc2d8ad706494b",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

@@ -33,6 +33,24 @@
       "message": "Unrelated to this CL?",
       "revId": "e41ea54af7def1560356ec7864093a0b4bedbf06",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": false,
+      "key": {
+        "uuid": "ad84488f_ca7266e6",
+        "filename": "internal/core/adt/composite.go",
+        "patchSetId": 12
+      },
+      "lineNbr": 459,
+      "author": {
+        "id": 1013536
+      },
+      "writtenOn": "2022-02-17T10:50:32Z",
+      "side": 1,
+      "message": "Yeah, that is probably right. But let\u0027s keep it in for convenience sake at this point, as discussed.",
+      "parentUuid": "78921ec9_4550531f",
+      "revId": "e41ea54af7def1560356ec7864093a0b4bedbf06",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }

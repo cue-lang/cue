@@ -18,6 +18,23 @@
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     },
     {
+      "unresolved": false,
+      "key": {
+        "uuid": "c17a4895_8e368fd6",
+        "filename": "/PATCHSET_LEVEL",
+        "patchSetId": 27
+      },
+      "lineNbr": 0,
+      "author": {
+        "id": 1017723
+      },
+      "writtenOn": "2022-02-17T09:52:05Z",
+      "side": 1,
+      "message": "Should have confirmed in my last message the Unity is +1 for this patchset, confirmed with offline tests.",
+      "revId": "897ae48e625a8c1bde90846718231548591703b0",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
       "unresolved": true,
       "key": {
         "uuid": "35b3b5b0_ee84a690",

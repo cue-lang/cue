@@ -1354,7 +1354,14 @@ func (v Value) structValOpts(ctx *adt.OpContext, o options) (s structValue, err 
 
 	obj := v.v
 
-	if !o.allowScalar {
+	switch b, ok := v.v.BaseValue.(*adt.Bottom); {
+	case ok && b.IsIncomplete() && !o.concrete && !o.final:
+
+	// TODO:
+	// case o.allowScalar, !o.omitHidden, !o.omitDefinitions:
+	// Allow scalar values if hidden or definition fields are requested?
+	case o.allowScalar:
+	default:
 		obj, err = v.getStruct()
 		if err != nil {
 			return structValue{}, err

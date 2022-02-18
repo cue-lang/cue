@@ -43,7 +43,8 @@ c: *1 | 2
 -- out/eval --
 (struct){
   b: (_|_){
-    // [incomplete] b: invalid non-ground value int (must be concrete int)
+    // [incomplete] b: invalid non-ground value int (must be concrete int):
+    //     ./in.cue:8:5
   }
   a: (int){ int }
   c: (int){ |(*(int){ 1 }, (int){ 2 }) }

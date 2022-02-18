@@ -88,3 +88,4 @@ enum.tooLarge: invalid enum index: 4111222333444555666777888999: greater than ma
     errors.cue:5:17
 badEnum: invalid string enum: non-concrete value string:
     schema.cue:23:10
+    schema.cue:23:12

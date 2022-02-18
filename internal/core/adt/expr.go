@@ -425,7 +425,7 @@ func (x *Top) Kind() Kind { return TopKind }
 //   bool
 //
 type BasicType struct {
-	Src *ast.Ident
+	Src ast.Node
 	K   Kind
 }
 

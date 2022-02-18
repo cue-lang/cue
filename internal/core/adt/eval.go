@@ -1148,8 +1148,12 @@ func (n *nodeContext) getValidators() BaseValue {
 		a = append(a, c)
 		kind &= c.Kind()
 	}
+
 	if kind&^n.kind != 0 {
-		a = append(a, &BasicType{K: n.kind})
+		a = append(a, &BasicType{
+			Src: n.kindExpr.Source(), // TODO:Is this always a BasicType?
+			K:   n.kind,
+		})
 	}
 
 	var v BaseValue

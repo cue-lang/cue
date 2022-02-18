@@ -7,6 +7,7 @@ cmp stderr expect-stderr
 -- expect-stderr --
 command.prompter.contents: invalid bytes argument: non-concrete value string:
     ./task_tool.cue:9:10
+    ./task_tool.cue:12:13
     ./task_tool.cue:17:3
     tool/file:11:3
 command.prompter.filename: invalid string argument: non-concrete value string:

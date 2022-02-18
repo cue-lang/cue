@@ -1,0 +1,44 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: valeter
+  labels:
+    app: valeter
+    domain: prod
+    component: frontend
+spec:
+  ports:
+  - port: 8080
+    targetPort: 8080
+    protocol: TCP
+    name: http
+  selector:
+    app: valeter
+    domain: prod
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: valeter
+spec:
+  replicas: 1
+  template:
+    metadata:
+      annotations:
+        prometheus.io.scrape: "true"
+      labels:
+        # Important: these labels need to match the selector above
+        # The api server enforces this constraint.
+        app: valeter
+        domain: prod
+        component: frontend
+    spec:
+      containers:
+      - image: gcr.io/myproj/valeter:v0.0.4
+        ports:
+        - containerPort: 8080
+        name: valeter
+        args: [
+          "-http=:8080",
+          "-etcd=etcd:2379",
+        ]

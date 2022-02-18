@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: watcher
+  labels:
+    app: watcher
+    domain: prod
+    component: infra
+spec:
+  type: LoadBalancer
+  loadBalancerIP: 1.2.3.4. # static ip
+  ports:
+  - port: 7788
+    targetPort: 7788
+    protocol: TCP
+    name: http
+  selector:
+    app: watcher

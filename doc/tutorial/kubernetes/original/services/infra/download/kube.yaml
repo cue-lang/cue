@@ -4,13 +4,13 @@ metadata:
   name: download
   labels:
     app: download
-    component: infra
     domain: prod
+    component: infra
 spec:
   ports:
   - port: 7080
-    targetPort: 7080
     protocol: TCP
+    targetPort: 7080
     name: client
   selector:
     app: download
@@ -26,11 +26,11 @@ spec:
     metadata:
       labels:
         app: download
-        component: infra
         domain: prod
+        component: infra
     spec:
       containers:
-      - name: download
-        image: gcr.io/myproj/download:v0.0.2
+      - image: gcr.io/myproj/download:v0.0.2
+        name: download
         ports:
         - containerPort: 7080

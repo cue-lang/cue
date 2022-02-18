@@ -11,7 +11,6 @@ deployment: updater: spec: template: spec: {
 			mountPath: "/etc/certs"
 			name:      "secret-updater"
 		}]
-
 		ports: [{
 			containerPort: 8080
 		}]

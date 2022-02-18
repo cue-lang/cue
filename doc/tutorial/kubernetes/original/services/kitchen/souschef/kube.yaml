@@ -4,13 +4,13 @@ metadata:
   name: souschef
   labels:
     app: souschef
-    component: kitchen
     domain: prod
+    component: kitchen
 spec:
   ports:
   - port: 8080
-    targetPort: 8080
     protocol: TCP
+    targetPort: 8080
     name: client
   selector:
     app: souschef
@@ -25,14 +25,14 @@ spec:
     metadata:
       labels:
         app: souschef
-        component: kitchen
         domain: prod
+        component: kitchen
     spec:
       containers:
-      - name: souschef
-        image: gcr.io/myproj/souschef:v0.5.3
+      - image: gcr.io/myproj/souschef:v0.5.3
         ports:
         - containerPort: 8080
+        name: souschef
         livenessProbe:
           httpGet:
             path: /debug/health

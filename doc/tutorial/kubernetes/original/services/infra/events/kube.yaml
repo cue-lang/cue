@@ -4,8 +4,8 @@ metadata:
   name: events
   labels:
     app: events
-    component: infra
     domain: prod
+    component: infra
 spec:
   ports:
   - port: 7788
@@ -14,8 +14,8 @@ spec:
     name: grpc
   selector:
     app: events
-    component: infra
     domain: prod
+    component: infra
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -25,15 +25,15 @@ spec:
   replicas: 2
   template:
     metadata:
+      annotations:
+        prometheus.io.scrape: "true"
+        prometheus.io.port:   "7080"
       labels:
         # Important: these labels need to match the selector above
         # The api server enforces this constraint.
         app: events
-        component: infra
         domain: prod
-      annotations:
-        prometheus.io.scrape: "true"
-        prometheus.io.port:   "7080"
+        component: infra
     spec:
       affinity:
         podAntiAffinity:
@@ -50,8 +50,7 @@ spec:
         secret:
           secretName: biz-secrets
       containers:
-      - name: events
-        image: gcr.io/myproj/events:v0.1.31
+      - image: gcr.io/myproj/events:v0.1.31
         ports:
         - containerPort: 7080
         - containerPort: 7788
@@ -60,6 +59,7 @@ spec:
           "-key=/etc/ssl/server.key",
           "-grpc=:7788",
         ]
+        name: events
         volumeMounts:
         - mountPath: /etc/ssl
           name: secret-volume

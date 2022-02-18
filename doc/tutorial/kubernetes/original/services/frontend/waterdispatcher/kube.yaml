@@ -5,8 +5,8 @@ metadata:
   name: waterdispatcher
   labels:
     app: waterdispatcher
-    component: frontend
     domain: prod
+    component: frontend
 spec:
   ports:
   - port: 7080
@@ -15,8 +15,8 @@ spec:
     name: http
   selector:
     app: waterdispatcher
-    component: frontend
     domain: prod
+    component: frontend
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -26,21 +26,21 @@ spec:
   replicas: 1
   template:
     metadata:
+      annotations:
+        prometheus.io.scrape: "true"
+        prometheus.io.port: "7080"
       labels:
         # Important: these labels need to match the selector above
         # The api server enforces this constraint.
         app: waterdispatcher
-        component: frontend
         domain: prod
-      annotations:
-        prometheus.io.scrape: "true"
-        prometheus.io.port: "7080"
+        component: frontend
     spec:
       containers:
-      - name: waterdispatcher
-        image: gcr.io/myproj/waterdispatcher:v0.0.48
+      - image: gcr.io/myproj/waterdispatcher:v0.0.48
         ports:
         - containerPort: 7080
+        name: waterdispatcher
         args: [
           "-http=:8080",
           "-etcd=etcd:2379",

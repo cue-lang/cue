@@ -11,7 +11,7 @@ command: ls: {
 		text: tabwriter.Write([
 			for x in objects {
 				"\(x.kind)  \t\(x.metadata.labels.component)  \t\(x.metadata.name)"
-			}
+			},
 		])
 	}
 

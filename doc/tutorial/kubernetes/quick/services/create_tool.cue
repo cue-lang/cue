@@ -8,7 +8,7 @@ import (
 
 command: create: {
 	task: kube: exec.Run & {
-		cmd:    "kubectl create --dry-run -f -"
+		cmd:    "kubectl create --dry-run=client -f -"
 		stdin:  yaml.MarshalStream(objects)
 		stdout: string
 	}

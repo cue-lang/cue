@@ -15,13 +15,13 @@ spec:
         domain: prod
     spec:
       containers:
-      - name: authproxy
-        image: skippy/oauth2_proxy:2.0.1
+      - image: skippy/oauth2_proxy:2.0.1
         ports:
         - containerPort: 4180
         args: [
           "--config=/etc/authproxy/authproxy.cfg",
         ]
+        name: authproxy
         volumeMounts:
         - name: config-volume
           mountPath: /etc/authproxy

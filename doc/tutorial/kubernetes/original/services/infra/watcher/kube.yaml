@@ -12,19 +12,19 @@ spec:
         # Important: these labels need to match the selector above
         # The api server enforces this constraint.
         app: watcher
-        component: infra
         domain: prod
+        component: infra
     spec:
       volumes:
       - name: secret-volume
         secret:
           secretName: star-example-com-secrets
       containers:
-      - name: watcher
-        image: gcr.io/myproj/watcher:v0.1.0
+      - image: gcr.io/myproj/watcher:v0.1.0
         ports:
         - containerPort: 7080
         - containerPort: 7788
+        name: watcher
         volumeMounts:
           - mountPath: /etc/ssl
             name: secret-volume

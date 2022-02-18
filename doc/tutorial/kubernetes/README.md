@@ -77,6 +77,8 @@ We do that later by giving all the same package name.
 $ cue mod init
 ```
 
+Creating a module also allows our packages import external packages.
+
 We initialize a Go module so that later we can resolve the
 `k8s.io/api/apps/v1` Go package dependency:
 
@@ -84,15 +86,11 @@ We initialize a Go module so that later we can resolve the
 $ go mod init example.com
 ```
 
-Creating a module also allows our packages import external packages.
-
 Let's try to use the `cue import` command to convert the given YAML files
 into CUE.
 
 ```
 $ cd services
-$ cue import ./...
-must specify package name with the -p flag
 ```
 
 Since we have multiple packages and files, we need to specify the package to
@@ -100,14 +98,14 @@ which they should belong.
 
 ```
 $ cue import ./... -p kube
-path, list, or files flag needed to handle multiple objects in file "./frontend/bartender/kube.yaml"
+path, list, or files flag needed to handle multiple objects in file ./services/frontend/bartender/kube.yaml
 ```
 
 Many of the files contain more than one Kubernetes object.
 Moreover, we are creating a single configuration that contains all objects
-of all files.
+from all files.
 We need to organize all Kubernetes objects such that each is individually
-identifiable within a single configuration.
+identifiable within the single configuration.
 We do so by defining a different struct for each type putting each object
 in this respective struct keyed by its name.
 This allows objects of different types to share the same name,
@@ -169,7 +167,7 @@ the majority of it was a string containing, hopefully, valid YAML.
 The `-R` option attempts to detect structured YAML or JSON strings embedded
 in the configuration files and then converts these recursively.
 
-<-- TODO: update import label format -->
+<!-- TODO: update import label format -->
 
 ```
 $ cue import ./... -p kube -l 'strings.ToCamel(kind)' -l metadata.name -f -R
@@ -204,14 +202,14 @@ a configuration file (they are when enclosed in double quotes).
 ```
 $ cue eval ./mon/prometheus -e configMap.prometheus
 apiVersion: "v1"
-kind: "ConfigMap"
+kind:       "ConfigMap"
 metadata: {
     name: "prometheus"
 }
 data: {
     "alert.rules": """
-    groups:
-    - name: rules.yaml
+        groups:
+          - name: rules.yaml
 ...
 ```
 
@@ -235,7 +233,7 @@ Before we start the restructuring, lets save a full evaluation so that we
 can verify that simplifications yield the same results.
 
 ```
-$ cue eval -c ./... > snapshot
+$ cue eval -c ./... >snapshot
 ```
 
 The `-c` option tells `cue` that only concrete values, that is valid JSON,
@@ -258,51 +256,51 @@ $ cat <<EOF > kube.cue
 package kube
 
 service: [ID=_]: {
-    apiVersion: "v1"
-    kind:       "Service"
-    metadata: {
-        name: ID
-        labels: {
-            app:       ID    // by convention
-            domain:    "prod"  // always the same in the given files
-            component: string  // varies per directory
-        }
-    }
-    spec: {
-        // Any port has the following properties.
-        ports: [...{
-            port:       int
-            protocol:   *"TCP" | "UDP"      // from the Kubernetes definition
-            name:       string | *"client"
-        }]
-        selector: metadata.labels // we want those to be the same
-    }
+	apiVersion: "v1"
+	kind:       "Service"
+	metadata: {
+		name: ID
+		labels: {
+			app:       ID     // by convention
+			domain:    "prod" // always the same in the given files
+			component: string // varies per directory
+		}
+	}
+	spec: {
+		// Any port has the following properties.
+		ports: [...{
+			port:     int
+			protocol: *"TCP" | "UDP" // from the Kubernetes definition
+			name:     string | *"client"
+		}]
+		selector: metadata.labels // we want those to be the same
+	}
 }
 
 deployment: [ID=_]: {
-    apiVersion: "apps/v1"
-    kind:       "Deployment"
-    metadata: name: ID
-    spec: {
-        // 1 is the default, but we allow any number
-        replicas: *1 | int
-        template: {
-            metadata: labels: {
-                app:       ID
-                domain:    "prod"
-                component: string
-            }
-            // we always have one namesake container
-            spec: containers: [{ name: ID }]
-        }
-    }
+	apiVersion: "apps/v1"
+	kind:       "Deployment"
+	metadata: name: ID
+	spec: {
+		// 1 is the default, but we allow any number
+		replicas: *1 | int
+		template: {
+			metadata: labels: {
+				app:       ID
+				domain:    "prod"
+				component: string
+			}
+			// we always have one namesake container
+			spec: containers: [{name: ID}]
+		}
+	}
 }
 EOF
 ```
 
 By replacing the service and deployment name with `[ID=_]` we have changed the
 definition into a template matching any field.
-CUE bind the field name to `ID` as a result.
+CUE binds the field name to `ID` as a result.
 During importing we used `metadata.name` as a key for the object names,
 so we can now set this field to `ID`.
 
@@ -335,20 +333,16 @@ other a user of the template will want to specify.
 Let's compare the result of merging our new template to our original snapshot.
 
 ```
-$ cue eval ./... -c > snapshot2
---- ./mon/alertmanager
-service.alertmanager.metadata.labels.component: incomplete value (string):
-    ./kube.cue:11:24
-service.alertmanager.spec.selector.component: incomplete value (string):
-    ./kube.cue:11:24
-deployment.alertmanager.spec.template.metadata.labels.component: incomplete value (string):
-    ./kube.cue:36:28
-service."node-exporter".metadata.labels.component: incomplete value (string):
-    ./kube.cue:11:24
+$ cue eval -c ./... >snapshot2
+// /workdir/services/mon/alertmanager
+deployment.alertmanager.spec.template.metadata.labels.component: incomplete value string:
+    ./kube.cue:36:16
+service.alertmanager.metadata.labels.component: incomplete value string:
+    ./kube.cue:11:15
+service.alertmanager.spec.selector.component: incomplete value string:
+    ./kube.cue:11:15
 ...
 ```
-
-<!-- TODO: better error messages -->
 
 Oops.
 The alert manager does not specify the `component` label.
@@ -370,7 +364,8 @@ EOF
 
 ```
 # set the component label to our new top-level field
-$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue && rm kube.cue.bak
+$ sed -i.bak 's/component:.*string/component: #Component/' kube.cue
+$ rm kube.cue.bak
 
 # add the new top-level field to our previous template definitions
 $ cat <<EOF >> kube.cue
@@ -391,8 +386,8 @@ $ cue fmt kube.cue */kube.cue
 Let's try again to see if it is fixed:
 
 ```
-$ cue eval -c ./... > snapshot2
-$ diff snapshot snapshot2
+$ cue eval -c ./... >snapshot2
+$ diff -wu snapshot snapshot2
 ...
 ```
 
@@ -406,11 +401,11 @@ $ cp snapshot2 snapshot
 The corresponding boilerplate can now be removed with `cue trim`.
 
 ```
-$ find . | grep kube.cue | xargs wc | tail -1
-    1792    3616   34815 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1887 total
 $ cue trim ./...
-$ find . | grep kube.cue | xargs wc | tail -1
-    1223    2374   22903 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1312 total
 ```
 
 `cue trim` removes configuration from files that is already generated
@@ -420,9 +415,9 @@ In doing so it removed over 500 lines of configuration, or over 30%!
 The following is proof that nothing changed semantically:
 
 ```
-$ cue eval -c ./... > snapshot2
-$ diff snapshot snapshot2 | wc
-       0       0       0
+$ cue eval -c ./... >snapshot2
+$ diff -wu snapshot snapshot2 | wc -l
+0
 ```
 
 We can do better, though.
@@ -434,43 +429,43 @@ We generalize the top-level template as follows:
 $ cat <<EOF >> kube.cue
 
 daemonSet: [ID=_]: _spec & {
-    apiVersion: "apps/v1"
-    kind:       "DaemonSet"
-    _name:      ID
+	apiVersion: "apps/v1"
+	kind:       "DaemonSet"
+	_name:      ID
 }
 
 statefulSet: [ID=_]: _spec & {
-    apiVersion: "apps/v1"
-    kind:       "StatefulSet"
-    _name:      ID
+	apiVersion: "apps/v1"
+	kind:       "StatefulSet"
+	_name:      ID
 }
 
 deployment: [ID=_]: _spec & {
-    apiVersion: "apps/v1"
-    kind:       "Deployment"
-    _name:      ID
-    spec: replicas: *1 | int
+	apiVersion: "apps/v1"
+	kind:       "Deployment"
+	_name:      ID
+	spec: replicas: *1 | int
 }
 
 configMap: [ID=_]: {
-    metadata: name: ID
-    metadata: labels: component: #Component
+	metadata: name: ID
+	metadata: labels: component: #Component
 }
 
 _spec: {
-    _name: string
+	_name: string
 
-    metadata: name: _name
-    metadata: labels: component: #Component
-    spec: selector: {}
-    spec: template: {
-        metadata: labels: {
-            app:       _name
-            component: #Component
-            domain:    "prod"
-        }
-        spec: containers: [{name: _name}]
-    }
+	metadata: name: _name
+	metadata: labels: component: #Component
+	spec: selector: {}
+	spec: template: {
+		metadata: labels: {
+			app:       _name
+			component: #Component
+			domain:    "prod"
+		}
+		spec: containers: [{name: _name}]
+	}
 }
 EOF
 $ cue fmt
@@ -496,25 +491,25 @@ $ cat <<EOF >> kube.cue
 // Define the _export option and set the default to true
 // for all ports defined in all containers.
 _spec: spec: template: spec: containers: [...{
-    ports: [...{
-        _export: *true | false // include the port in the service
-    }]
+	ports: [...{
+		_export: *true | false // include the port in the service
+	}]
 }]
 
 for x in [deployment, daemonSet, statefulSet] for k, v in x {
-    service: "\(k)": {
-        spec: selector: v.spec.template.metadata.labels
+	service: "\(k)": {
+		spec: selector: v.spec.template.metadata.labels
 
-        spec: ports: [
-            for c in v.spec.template.spec.containers
-            for p in c.ports
-            if p._export {
-                let Port = p.containerPort // Port is an alias
-                port:       *Port | int
-                targetPort: *Port | int
-            }
-        ]
-    }
+		spec: ports: [
+			for c in v.spec.template.spec.containers
+			for p in c.ports
+			if p._export {
+				let Port = p.containerPort // Port is an alias
+				port:       *Port | int
+				targetPort: *Port | int
+			},
+		]
+	}
 }
 EOF
 $ cue fmt
@@ -548,17 +543,15 @@ for the respective ports in `infra/events`, `infra/tasks`, and `infra/watcher`.
 
 For the purpose of this tutorial, here are some quick patches:
 ```
-$ cat <<EOF >> infra/events/kube.cue
+$ cat <<EOF >>infra/events/kube.cue
 
 deployment: events: spec: template: spec: containers: [{ ports: [{_export: false}, _] }]
 EOF
-
-$ cat <<EOF >> infra/tasks/kube.cue
+$ cat <<EOF >>infra/tasks/kube.cue
 
 deployment: tasks: spec: template: spec: containers: [{ ports: [{_export: false}, _] }]
 EOF
-
-$ cat <<EOF >> infra/watcher/kube.cue
+$ cat <<EOF >>infra/watcher/kube.cue
 
 deployment: watcher: spec: template: spec: containers: [{ ports: [{_export: false}, _] }]
 EOF
@@ -571,8 +564,8 @@ Then we run trim to further reduce our configuration:
 
 ```
 $ cue trim ./...
-$ find . | grep kube.cue | xargs wc | tail -1
-    1129    2270   22073 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1242 total
 ```
 This is after removing the rewritten and now redundant deployment definition.
 
@@ -590,29 +583,36 @@ $ head frontend/breaddispatcher/kube.cue
 package kube
 
 deployment: breaddispatcher: {
-    spec: {
-        template: {
-            metadata: {
-                annotations: {
-                    "prometheus.io.scrape": "true"
-                    "prometheus.io.port":   "7080"
-                }
+	spec: {
+		template: {
+			metadata: {
+				annotations: {
+					"prometheus.io.scrape": "true"
+					"prometheus.io.port":   "7080"
+				}
 $ cue trim ./... -s
 $ head -7 frontend/breaddispatcher/kube.cue
 package kube
 
 deployment: breaddispatcher: spec: template: {
-    metadata: annotations: {
-        "prometheus.io.scrape": "true"
-        "prometheus.io.port":   "7080"
-    }
-$ find . | grep kube.cue | xargs wc | tail -1
-     975    2116   20264 total
+	metadata: annotations: {
+		"prometheus.io.scrape": "true"
+		"prometheus.io.port":   "7080"
+	}
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1090 total
 ```
 
 Another 150 lines lost!
 Collapsing lines like this can improve the readability of a configuration
 by removing considerable amounts of punctuation.
+
+We save the result as the new baseline:
+
+```
+$ cue eval -c ./... >snapshot2
+$ cp snapshot2 snapshot
+```
 
 
 ### Repeat for several subdirectories
@@ -637,39 +637,60 @@ unconditionally.
 $ cat <<EOF >> frontend/kube.cue
 
 deployment: [string]: spec: template: {
-    metadata: annotations: {
-        "prometheus.io.scrape": "true"
-        "prometheus.io.port":   "\(spec.containers[0].ports[0].containerPort)"
-    }
-    spec: containers: [{
-        ports: [{containerPort: *7080 | int}] // 7080 is the default
-    }]
+	metadata: annotations: {
+		"prometheus.io.scrape": "true"
+		"prometheus.io.port":   "\(spec.containers[0].ports[0].containerPort)"
+	}
+	spec: containers: [{
+		ports: [{containerPort: *7080 | int}] // 7080 is the default
+	}]
 }
 EOF
 $ cue fmt ./frontend
 
 # check differences
-$ cue eval -c ./... > snapshot2
-$ diff snapshot snapshot2
-368a369
->                             prometheus.io.port:   "7080"
-577a579
->                             prometheus.io.port:   "8080"
+$ cue eval -c ./... >snapshot2
+$ diff -wu snapshot snapshot2
+--- snapshot	2022-02-21 06:04:10.919832150 +0000
++++ snapshot2	2022-02-21 06:04:11.907780310 +0000
+@@ -188,6 +188,7 @@
+                 metadata: {
+                     annotations: {
+                         "prometheus.io.scrape": "true"
++                        "prometheus.io.port":   "7080"
+                     }
+                     labels: {
+                         app:       "host"
+@@ -327,6 +328,7 @@
+                 metadata: {
+                     annotations: {
+                         "prometheus.io.scrape": "true"
++                        "prometheus.io.port":   "8080"
+                     }
+                     labels: {
+                         app:       "valeter"
 $ cp snapshot2 snapshot
 ```
 
 Two lines with annotations added, improving consistency.
 
 ```
-$ cue trim -s ./frontend/...
-$ find . | grep kube.cue | xargs wc | tail -1
-     931    2052   19624 total
+$ cue trim ./frontend/... -s
+$ find . | grep kube.cue | xargs wc -l | tail -1
+ 1046 total
 ```
 
-Another 40 lines removed.
+Another 40 odd lines removed.
 We may have gotten used to larger reductions, but at this point there is just
 not much left to remove: in some of the frontend files there are only 4 lines
 of configuration left.
+
+We save the result as the new baseline:
+
+```
+$ cue eval -c ./... >snapshot2
+$ cp snapshot2 snapshot
+```
 
 
 #### Directory `kitchen`
@@ -685,20 +706,20 @@ Let's add everything but the disks for now:
 $ cat <<EOF >> kitchen/kube.cue
 
 deployment: [string]: spec: template: {
-    metadata: annotations: "prometheus.io.scrape": "true"
-    spec: containers: [{
-        ports: [{
-            containerPort: 8080
-        }]
-        livenessProbe: {
-            httpGet: {
-                path: "/debug/health"
-                port: 8080
-            }
-            initialDelaySeconds: 40
-            periodSeconds:       3
-        }
-    }]
+	metadata: annotations: "prometheus.io.scrape": "true"
+	spec: containers: [{
+		ports: [{
+			containerPort: 8080
+		}]
+		livenessProbe: {
+			httpGet: {
+				path: "/debug/health"
+				port: 8080
+			}
+			initialDelaySeconds: 40
+			periodSeconds:       3
+		}
+	}]
 }
 EOF
 $ cue fmt ./kitchen
@@ -717,37 +738,37 @@ directory with two disks), and generalize it:
 $ cat <<EOF >> kitchen/kube.cue
 
 deployment: [ID=_]: spec: template: spec: {
-    _hasDisks: *true | bool
+	_hasDisks: *true | bool
 
-    // field comprehension using just "if"
-    if _hasDisks {
-        volumes: [{
-            name: *"\(ID)-disk" | string
-            gcePersistentDisk: pdName: *"\(ID)-disk" | string
-            gcePersistentDisk: fsType: "ext4"
-        }, {
-            name: *"secret-\(ID)" | string
-            secret: secretName: *"\(ID)-secrets" | string
-        }, ...]
+	// field comprehension using just "if"
+	if _hasDisks {
+		volumes: [{
+			name: *"\(ID)-disk" | string
+			gcePersistentDisk: pdName: *"\(ID)-disk" | string
+			gcePersistentDisk: fsType: "ext4"
+		}, {
+			name: *"secret-\(ID)" | string
+			secret: secretName: *"\(ID)-secrets" | string
+		}, ...]
 
-        containers: [{
-            volumeMounts: [{
-                name:      *"\(ID)-disk" | string
-                mountPath: *"/logs" | string
-            }, {
-                mountPath: *"/etc/certs" | string
-                name:      *"secret-\(ID)" | string
-                readOnly:  true
-            }, ...]
-        }]
-    }
+		containers: [{
+			volumeMounts: [{
+				name:      *"\(ID)-disk" | string
+				mountPath: *"/logs" | string
+			}, {
+				mountPath: *"/etc/certs" | string
+				name:      *"secret-\(ID)" | string
+				readOnly:  true
+			}, ...]
+		}]
+	}
 }
 EOF
 
 $ cat <<EOF >> kitchen/souschef/kube.cue
 
 deployment: souschef: spec: template: spec: {
-    _hasDisks: false
+	_hasDisks: false
 }
 
 EOF
@@ -773,15 +794,15 @@ The `souschef` configuration is the only one that defines no disks.
 $ cue trim -s ./kitchen/...
 
 # check differences
-$ cue eval ./... > snapshot2
-$ diff snapshot snapshot2
+$ cue eval -c ./... >snapshot2
+$ diff -wu snapshot snapshot2
 ...
 $ cp snapshot2 snapshot
-$ find . | grep kube.cue | xargs wc | tail -1
-     807    1862   17190 total
+$ find . | grep kube.cue | xargs wc -l | tail -1
+  925 total
 ```
 
-The diff shows that we added the `_hadDisks` option, but otherwise reveals no
+The diff shows that we added the `_hasDisks` option, but otherwise reveals no
 differences.
 We also reduced the configuration by a sizeable amount once more.
 
@@ -865,7 +886,7 @@ We create the tool file to do just that.
 $ cat <<EOF > kube_tool.cue
 package kube
 
-objects: [ for v in objectSets for x in v { x } ]
+objects: [ for v in objectSets for x in v {x}]
 
 objectSets: [
 	service,
@@ -902,7 +923,7 @@ command: ls: {
 		text: tabwriter.Write([
 			for x in objects {
 				"\(x.kind)  \t\(x.metadata.labels.component)  \t\(x.metadata.name)"
-			}
+			},
 		])
 	}
 
@@ -922,15 +943,16 @@ The command is now available in the `cue` tool:
 
 ```
 $ cue cmd ls ./frontend/maitred
-Service         frontend        maitred
-Deployment      frontend        maitred
+Service      frontend   maitred
+Deployment   frontend   maitred
 ```
 
 As long as the name does not conflict with an existing command it can be
 used as a top-level command as well:
 ```
 $ cue ls ./frontend/maitred
-...
+Service      frontend   maitred
+Deployment   frontend   maitred
 ```
 
 If more than one instance is selected the `cue` tool may either operate
@@ -947,7 +969,6 @@ A merge thus gives us a unified view of all objects.
 
 ```
 $ cue ls ./...
-Service       infra      tasks
 Service       frontend   bartender
 Service       frontend   breaddispatcher
 Service       frontend   host
@@ -958,12 +979,11 @@ Service       frontend   waterdispatcher
 Service       infra      download
 Service       infra      etcd
 Service       infra      events
-
 ...
 
-Deployment    proxy           nginx
-StatefulSet   infra           etcd
-DaemonSet     mon             node-exporter
+Deployment    proxy      nginx
+StatefulSet   infra      etcd
+DaemonSet     mon        node-exporter
 ConfigMap     mon        alertmanager
 ConfigMap     mon        prometheus
 ConfigMap     proxy      authproxy
@@ -1022,7 +1042,7 @@ import (
 
 command: create: {
 	task: kube: exec.Run & {
-		cmd:    "kubectl create --dry-run -f -"
+		cmd:    "kubectl create --dry-run=client -f -"
 		stdin:  yaml.MarshalStream(objects)
 		stdout: string
 	}
@@ -1042,23 +1062,23 @@ for which an input is missing.
 
 ```
 $ cue create ./frontend/...
-service "bartender" created (dry run)
-service "breaddispatcher" created (dry run)
-service "host" created (dry run)
-service "maitred" created (dry run)
-service "valeter" created (dry run)
-service "waiter" created (dry run)
-service "waterdispatcher" created (dry run)
-deployment.apps "bartender" created (dry run)
-deployment.apps "breaddispatcher" created (dry run)
-deployment.apps "host" created (dry run)
-deployment.apps "maitred" created (dry run)
-deployment.apps "valeter" created (dry run)
-deployment.apps "waiter" created (dry run)
-deployment.apps "waterdispatcher" created (dry run)
+service/bartender created (dry run)
+service/breaddispatcher created (dry run)
+service/host created (dry run)
+service/maitred created (dry run)
+service/valeter created (dry run)
+service/waiter created (dry run)
+service/waterdispatcher created (dry run)
+deployment.apps/bartender created (dry run)
+deployment.apps/breaddispatcher created (dry run)
+deployment.apps/host created (dry run)
+deployment.apps/maitred created (dry run)
+deployment.apps/valeter created (dry run)
+deployment.apps/waiter created (dry run)
+deployment.apps/waterdispatcher created (dry run)
 ```
 
-A production real-life version of this could should omit the `--dry-run` flag
+A production real-life version of this could should omit the `--dry-run=client` flag
 of course.
 
 ### Extract CUE templates directly from Kubernetes Go source
@@ -1066,10 +1086,7 @@ of course.
 In order for `cue get go` to generate the CUE templates from Go sources, you first need to have the sources locally:
 
 ```
-$ go get k8s.io/api/apps/v1
-```
-
-```
+$ go get k8s.io/api/apps/v1@v0.23.4
 $ cue get go k8s.io/api/apps/v1
 
 ```
@@ -1081,8 +1098,8 @@ $ cat <<EOF > k8s_defs.cue
 package kube
 
 import (
-  "k8s.io/api/core/v1"
-  apps_v1 "k8s.io/api/apps/v1"
+	"k8s.io/api/core/v1"
+	apps_v1 "k8s.io/api/apps/v1"
 )
 
 service: [string]:     v1.#Service

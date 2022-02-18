@@ -19,10 +19,10 @@ spec:
         secret:
           secretName: goget-secrets
       containers:
-      - name: goget
-        image: gcr.io/myproj/goget:v0.5.1
+      - image: gcr.io/myproj/goget:v0.5.1
         ports:
         - containerPort: 7443
+        name: goget
         volumeMounts:
           - mountPath: /etc/ssl
             name: secret-volume

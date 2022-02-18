@@ -702,6 +702,7 @@ func TestFields(t *testing.T) {
 		value string
 		res   string
 		err   string
+		opts  []Option
 	}{{
 		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
 		res:   "{reg:4,}",
@@ -725,7 +726,7 @@ func TestFields(t *testing.T) {
 		res:   "{}",
 	}, {
 		value: `{ for k, v in #y if v > 1 {"\(k)": v} }
-		#y: {a:1,b:2,c:3}`,
+			#y: {a:1,b:2,c:3}`,
 		res: "{b:2,c:3,}",
 	}, {
 		value: `{ #def: 1, _hidden: 2, opt?: 3, reg: 4 }`,
@@ -733,12 +734,35 @@ func TestFields(t *testing.T) {
 	}, {
 		value: `{a:1,b:2,c:int}`,
 		err:   "cannot convert incomplete value",
+	}, {
+		value: `
+		step1: {}
+		step2: {prefix: 3}
+		if step2.value > 100 {
+		   step3: {prefix: step2.value}
+		}
+		_hidden: 3`,
+		res: `{step1:{},step2:{"prefix":3},}`,
+	}, {
+		opts: []Option{Final()},
+		value: `
+		step1: {}
+		if step1.value > 100 {
+		}`,
+		err: "undefined field: value",
+	}, {
+		opts: []Option{Concrete(true)},
+		value: `
+		step1: {}
+		if step1.value > 100 {
+		}`,
+		err: "undefined field: value",
 	}}
 	for _, tc := range testCases {
 		t.Run(tc.value, func(t *testing.T) {
 			obj := getInstance(t, tc.value).Value()
 
-			iter, err := obj.Fields()
+			iter, err := obj.Fields(tc.opts...)
 			checkFatal(t, err, tc.err, "init")
 
 			buf := []byte{'{'}
@@ -755,7 +779,7 @@ func TestFields(t *testing.T) {
 				t.Errorf("got %v; want %v", got, tc.res)
 			}
 
-			iter, _ = obj.Fields()
+			iter, _ = obj.Fields(tc.opts...)
 			for iter.Next() {
 				want, err := iter.Value().MarshalJSON()
 				checkFatal(t, err, tc.err, "Obj.At2")

@@ -16,6 +16,29 @@
       "message": "Re-adding dropped +2",
       "revId": "eff6fb23055207f8637b9d0f83d912af4e286c91",
       "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
+    },
+    {
+      "unresolved": true,
+      "key": {
+        "uuid": "6902bd9e_66ce6c06",
+        "filename": "pkg/time/time.go",
+        "patchSetId": 4
+      },
+      "lineNbr": 149,
+      "author": {
+        "id": 1019370
+      },
+      "writtenOn": "2022-02-18T16:52:59Z",
+      "side": 1,
+      "message": "Somewhere in this file it should be specified that the \"time value string\" should use the RFC3339Nano format.\n\nAlso, to make it less ambiguous maybe write\n\u003e FormatString returns a textual representation of the time value. The returned value is formatted according",
+      "range": {
+        "startLine": 149,
+        "startChar": 56,
+        "endLine": 149,
+        "endChar": 76
+      },
+      "revId": "eff6fb23055207f8637b9d0f83d912af4e286c91",
+      "serverId": "d5d70762-12d0-45a1-890d-524b12d3f735"
     }
   ]
 }
